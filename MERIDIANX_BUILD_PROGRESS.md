@@ -223,7 +223,8 @@ weights change, no look-ahead by construction, private Blob persistence, full is
   and answered by the owner's own assistant through the connector (`docs/academy/LLM.md` section 9; no cost from this site).
   The paid-provider path stays built and off. Neither has met a real model yet: the provider path ran against a fake, the
   connector against a scripted assistant. **API money spent so far: $0.**
-- Preview deployments of branches are skipped by `scripts/vercel-ignore.sh`; a preview URL needs the owner's say-so.
+- No preview deployments: the Vercel project and `scripts/vercel-ignore.sh` are gone (17 Nov 2026); try a branch with the
+  local run (`docs/academy/ACCEPTANCE.md`, step 0).
 
 ## Next executable step
 

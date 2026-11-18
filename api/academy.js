@@ -176,6 +176,13 @@ function fileData(root) {
 }
 const DATA = new Map();
 function defaultData() { const root = fs.existsSync(path.join(process.cwd(), 'academy')) ? process.cwd() : path.join(__dirname, '..'); if (!DATA.has(root)) DATA.set(root, fileData(root)); return DATA.get(root); }
+// A host with no project files (the Cloudflare Worker) hands over its bundled copy of the same generated files, read the same
+// way as fileData() (cloudflare/src/academy-data.mjs). Node and Vercel never call useData: they read the disk as before.
+let HOSTED = null;
+function useData(data) {
+  if (data != null && !['edges', 'candidates', 'outcomes', 'features', 'calendar', 'research', 'evaluation', 'training'].every((k) => typeof data[k] === 'function')) throw new TypeError('useData: a reader of the generated files is needed');
+  HOSTED = data || null;
+}
 const edgeList = (raw) => { const a = Array.isArray(raw) ? raw : isObj(raw) && Array.isArray(raw.edges) ? raw.edges : isObj(raw) ? Object.keys(raw).map((k) => (isObj(raw[k]) ? { id: k, ...raw[k] } : null)) : []; return a.filter((e) => isObj(e) && typeof e.id === 'string' && EDGE_RE.test(e.id)); };
 const candList = (raw) => { const a = Array.isArray(raw) ? raw : isObj(raw) ? raw.candidates || raw.rows || raw.items || [] : []; return (Array.isArray(a) ? a : []).filter((c) => isObj(c) && typeof c.id === 'string'); };
 const candView = (c) => { const o = {}; for (const k of CAND_FIELDS) if (c[k] !== undefined) o[k] = c[k]; return o; };
@@ -223,7 +230,7 @@ function poolRule(cand, mode, what) {
 
 // ---- request context ------------------------------------------------------------------------------------------------------
 function context(req, d, env, acct) {
-  const now = () => (d.now ? (typeof d.now === 'function' ? d.now() : d.now) : Date.now()), data = d.data || defaultData();
+  const now = () => (d.now ? (typeof d.now === 'function' ? d.now() : d.now) : Date.now()), data = d.data || HOSTED || defaultData();
   let store = d.store || null, known = null, seq = 0;
   const X = {
     env, who: acct.u, now, data, iso: () => new Date(now()).toISOString(),
@@ -923,4 +930,5 @@ async function handle(req, res, d = {}) {
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
 module.exports.connector = CONNECTOR;
+module.exports.useData = useData;
 module.exports._t = { GET, POST, CAPS, EDGE_IDS, ENGINES, AK, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite, QUEUE_MAX, QUEUE_TRIES, Bad };

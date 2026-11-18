@@ -3,12 +3,12 @@ name: Kraken backfill
 # Fills the replay's per-day Kraken trade-history cache (council/krakenfill.mjs), so the nightly replay (backtest.yml) reads
 # crypto from Kraken, the feed the live Trader trades on, instead of falling back to Binance. Kraken's public Trades endpoint
 # answers ~1 call a second at 1,000 trades a call: BTC's 30-day window is ~5,600 calls (~2 h), far more than the nightly
-# replay spends. Every 30 min, one runner makes Kraken calls for at most 25 minutes, saves each pair's cursor, and the next
-# run goes on from there. Shares the replay's Actions cache line (duka-*); each save first merges the newest saved copy in.
+# replay spends. Once a day (01:43 UTC, before the 03:17 replay; every 30 min until 17 Nov 2026), one runner makes Kraken
+# calls for at most 25 minutes, saves each pair's cursor, and the next run goes on from there. Shares the replay's Actions cache line (duka-*); each save first merges the newest saved copy in.
 # Free (public repo), no secrets, writes no council-data file and changes no trading rule.
 on:
   schedule:
-    - cron: '11,41 * * * *'
+    - cron: '43 1 * * *'
   workflow_dispatch:
     inputs:
       minutes:

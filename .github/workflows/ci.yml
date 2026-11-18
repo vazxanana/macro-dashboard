@@ -126,7 +126,7 @@ jobs:
           node scripts/audit/academy.cjs
 
       # offline too: the audit serves out/ itself (vercel.json's rewrites and cache rules) with service workers ON, which the
-      # other audits block: first visit, offline, a deploy under open pages, the kill switch, ?sw-reset, push, manifest, fonts.
+      # other audits block: first visit, offline, a deploy under open pages, the kill switch, ?sw-reset, manifest, fonts.
       # No network and no colour readings, so nothing of scripts/audit/shared.cjs applies; one retry, the first run's failures named.
       - name: Installable app audit (service worker on)
         env:

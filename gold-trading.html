@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gold Trading Platform - Institutional</title>
+  <title>Gold terminal · Aureum Desk</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -121,7 +121,7 @@
       outline: 2px solid var(--accent-blue);
       outline-offset: 2px;
     }
-    html.dark button:focus-visible, html.dark input:focus-visible { outline-color: #D4AF37; }
+    html.dark button:focus-visible, html.dark input:focus-visible { outline-color: var(--au-accent, #9DB4D3); }
 
     /* GLASS EFFECT - Ultra Transparent */
     .glass {
@@ -802,7 +802,7 @@
     .session-pill.active-session .session-dot {
       background: var(--accent-green);
       box-shadow: 0 0 6px rgba(0,166,81,0.6);
-      animation: pulse 2s infinite;
+      animation: pulse 2s 3;
     }
 
     @keyframes pulse {
@@ -2872,7 +2872,7 @@
   .gx-hero[data-state="stale"] .gx-state { color: var(--amber); border-color: color-mix(in srgb, var(--amber) 40%, transparent); }
   .gx-hero[data-state="offline"] .gx-state { color: var(--accent-red); border-color: color-mix(in srgb, var(--accent-red) 35%, transparent); }
   @media (prefers-reduced-motion: no-preference) {
-    .gx-hero[data-state="live"] .gx-state i { animation: gx-beat 2.4s ease-in-out infinite; }
+    .gx-hero[data-state="live"] .gx-state i { animation: gx-beat 2.4s ease-in-out 3; }
     @keyframes gx-beat { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-green) 45%, transparent); } 50% { box-shadow: 0 0 0 5px transparent; } }
   }
   .gx-hero-stats { display: grid; grid-template-columns: repeat(3, auto); gap: 6px 32px; margin: 0; }
@@ -2950,6 +2950,150 @@
     #dash-setup > div:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   }
 
+  /* ── GRAPHITE (17 Nov 2026, docs/design/aureum-theme.md, owner: "do another one with other colors like grey") ──
+     Display only. The spec's --au-* tokens per theme, with every older name pointed at them, so the whole page follows.
+     Candle colours (--gx-up / --gx-dn and their -rgb) are NOT touched, so the locked structure marks and S/D zones look as before.
+     ":root:root" only lifts a rule above the older theme layers (html.dark …, :root:not(.dark) …). These rules set colour, font,
+     border and shadow, never the phone simple view's layout. */
+  :root {
+    --au-bg: #F2F3F5; --au-surface: #FFFFFF; --au-surface-2: #E7E9EC; --au-well: #F7F8F9;
+    --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20);
+    --au-ink: #17191C; --au-ink-2: #474C54; --au-ink-3: #5B616A;
+    --au-accent: #2F5E9E; --au-primary: #25292E; --au-on-primary: #FFFFFF;
+    --au-gold: var(--au-primary); --au-gold-grad: var(--au-primary); --au-gold-ink: var(--au-accent); --au-on-gold: var(--au-on-primary);
+    --au-gain: #0A7350; --au-loss: #B3261E; --au-warn: #8A5A00; --au-info: #2F5E9E;
+    --au-shadow: 0 1px 2px rgba(20,24,30,.06); --au-accent-soft: rgba(47,94,158,.08);
+    --au-font: "Inter", "Figtree", system-ui, sans-serif;
+    --bg-primary: var(--au-bg); --body-bg-a: var(--au-bg); --body-bg-b: var(--au-bg); --header-bg: transparent; --nav-bg: rgba(242,243,245,.92);
+    --panel: var(--au-surface); --panel-2: var(--au-surface-2); --card-bg: var(--au-surface); --bg-secondary: var(--au-surface); --bg-tertiary: var(--au-well);
+    --glass-light: var(--au-surface); --glass-lighter: var(--au-surface); --glass-ultra: var(--au-surface);
+    --line: var(--au-line); --line-soft: rgba(20,24,30,.06); --border: var(--au-line); --border-light: rgba(20,24,30,.06);
+    --text-primary: var(--au-ink); --text-secondary: var(--au-ink-2); --text-tertiary: var(--au-ink-3);
+    --mint: var(--au-accent); --mint-2: var(--au-accent); --mint-soft: var(--au-accent-soft); --gold: var(--au-accent); --gold-ink: var(--au-accent);
+    --accent-green: var(--au-gain); --accent-red: var(--au-loss); --accent-blue: var(--au-info); --amber: var(--au-warn);
+    --hero-core: transparent; --arc-glow-a: transparent; --arc-glow-b: transparent; --star-a: transparent; --star-b: transparent;
+    --gx-cross-bg: #3A3F46;
+  }
+  html.dark {
+    --au-bg: #121315; --au-surface: #1A1C1F; --au-surface-2: #23262A; --au-well: #16181B;
+    --au-line: rgba(255,255,255,.08); --au-line-strong: rgba(255,255,255,.16);
+    --au-ink: #ECEDEF; --au-ink-2: #B4B8BF; --au-ink-3: #8E939B;
+    --au-accent: #9DB4D3; --au-primary: #E4E6E9; --au-on-primary: #121315;
+    --au-gain: #4CC38A; --au-loss: #F2726A; --au-warn: #E8B04B; --au-info: #9DB4D3;
+    --au-shadow: 0 1px 2px rgba(0,0,0,.25); --au-accent-soft: rgba(157,180,211,.12);
+    --bg-primary: var(--au-bg); --body-bg-a: var(--au-bg); --body-bg-b: var(--au-bg); --header-bg: transparent; --nav-bg: rgba(18,19,21,.92);
+    --panel: var(--au-surface); --panel-2: var(--au-surface-2); --card-bg: var(--au-surface); --bg-secondary: var(--au-surface); --bg-tertiary: var(--au-well);
+    --glass-light: var(--au-surface); --glass-lighter: var(--au-surface); --glass-ultra: var(--au-surface);
+    --line: var(--au-line); --line-soft: rgba(255,255,255,.05); --border: var(--au-line); --border-light: rgba(255,255,255,.05);
+    --text-primary: var(--au-ink); --text-secondary: var(--au-ink-2); --text-tertiary: var(--au-ink-3);
+    --mint: var(--au-accent); --mint-2: var(--au-accent); --mint-soft: var(--au-accent-soft); --gold: var(--au-accent); --gold-ink: var(--au-accent);
+    --accent-green: var(--au-gain); --accent-red: var(--au-loss); --accent-blue: var(--au-info); --amber: var(--au-warn);
+    --hero-core: transparent; --arc-glow-a: transparent; --arc-glow-b: transparent; --star-a: transparent; --star-b: transparent;
+    --gx-cross-bg: #2C3035;
+  }
+  html.dark.midnight {
+    --au-bg: #0B0C0E; --au-surface: #131416; --au-surface-2: #1B1D20; --au-well: #0F1012;
+    --bg-primary: var(--au-bg); --body-bg-a: var(--au-bg); --body-bg-b: var(--au-bg); --nav-bg: rgba(11,12,14,.92);
+    --panel: var(--au-surface); --panel-2: var(--au-surface-2);
+    --text-primary: var(--au-ink); --text-secondary: var(--au-ink-2); --text-tertiary: var(--au-ink-3);
+    --line: var(--au-line); --line-soft: rgba(255,255,255,.05);
+    --mint: var(--au-accent); --mint-2: var(--au-accent); --mint-soft: var(--au-accent-soft);
+    --accent-green: var(--au-gain); --accent-red: var(--au-loss); --accent-blue: var(--au-info);
+    --hero-core: transparent; --arc-glow-a: transparent; --arc-glow-b: transparent; --gx-cross-bg: #26292D;
+  }
+  html, body, button, input, select, textarea, h1, h2, h3, h4 { font-family: var(--au-font) !important; }
+  html, body { background: var(--au-bg); }
+  body::before, .header::after { display: none !important; }
+  ::selection { background: var(--au-accent-soft); }
+  :root:root :focus-visible { outline: 2px solid var(--au-accent) !important; outline-offset: 2px; }
+  html.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.14); }
+
+  /* top bar: the wordmark (mark, AUREUM, DESK) links back to the Desk, then "/ Gold terminal" */
+  :root:root .primary-nav { background: var(--nav-bg); border-bottom: 1px solid var(--au-line); }
+  .pnav-desk { gap: 9px; font-size: 12px !important; font-weight: 500 !important; letter-spacing: .22em !important; text-transform: uppercase !important; color: var(--au-ink-2) !important; }
+  .pnav-desk::before { content: "Aureum"; order: -1; font-size: 15px; font-weight: 700; letter-spacing: .14em; color: var(--au-ink); }
+  .pnav-desk .ms-coin { order: -2; display: inline-flex; align-items: center; justify-content: center; flex: none; width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, #F4F5F7 0%, #B9BEC6 55%, #8A9099 100%); color: #16181B; font: 700 15px/1 var(--au-font); font-style: normal; letter-spacing: 0; }
+  :root:root .rail-brand { align-items: center; font-size: 14px; font-weight: 600; letter-spacing: 0; color: var(--au-ink-2); }
+  :root:root .rail-brand::before { content: "/"; width: auto; height: auto; border-radius: 0; background: none; box-shadow: none; margin-right: 10px; color: var(--au-ink-3); font-weight: 400; }
+  .rail-brand b { font-weight: 600; }
+  @media (max-width: 480px) { .rail-brand b { display: none; } .pnav-desk { letter-spacing: .16em !important; } .pnav-desk::before { letter-spacing: .1em; } }
+  :root:root .pnav-btn[data-section] { color: var(--au-ink-2); font-size: 13.5px; }
+  :root:root .pnav-btn[data-section]:hover { color: var(--au-ink); }
+  :root:root .pnav-btn[data-section].active { color: var(--au-ink); background: var(--au-surface-2); box-shadow: inset 0 -2px 0 var(--au-accent); }
+  /* the live state: a quiet chip; the dot says it in colour, the word in text */
+  :root:root .pnav-live { background: transparent !important; border: 1px solid var(--au-line-strong); border-radius: 999px; box-shadow: none; padding: 7px 14px; }
+  :root:root .pnav-live .pnav-live-label { color: var(--au-ink-2) !important; font-weight: 600; letter-spacing: .02em; text-transform: none; }
+  :root:root .pnav-live .pnav-live-dot { background: var(--au-gain) !important; }
+  :root:root .pnav-live.is-stale .pnav-live-dot { background: var(--au-warn) !important; }
+  :root:root .pnav-live.is-offline .pnav-live-dot { background: var(--au-loss) !important; }
+  :root:root .pnav-live.is-offline .pnav-live-label { color: var(--au-loss) !important; }
+
+  /* the market strip under it: quiet labels in sentence case, numbers in tabular figures */
+  :root:root .header { background: transparent; border-bottom: 1px solid var(--au-line); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  html:not([data-phone="simple"]) body .header { padding-bottom: 18px; }
+  :root:root .ticker-label { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--au-ink-3); }
+  :root:root .ticker-value { font-size: 19px; font-weight: 600; letter-spacing: -.01em; }
+  :root:root #goldPrice { color: var(--au-ink); text-shadow: none; }
+  :root:root .timestamp { text-transform: none; color: var(--au-ink-3); }
+  :root:root .session-pill { background: var(--au-surface); border: 1px solid var(--au-line); box-shadow: none; }
+  :root:root .session-pill.active-session { background: var(--au-surface-2); border-color: var(--au-line-strong); }
+  :root:root .session-name { text-transform: none; letter-spacing: 0; color: var(--au-ink); }
+  :root:root .session-pill.active-session .session-dot { background: var(--au-gain); box-shadow: none; }
+  :root:root .ctrl-btn { background: var(--au-surface); border: 1px solid var(--au-line); box-shadow: none; }
+  :root:root .ctrl-btn:hover { transform: none; background: var(--au-surface-2); }
+
+  /* the tabs */
+  :root:root .sub-nav { background: var(--nav-bg); border-bottom: 1px solid var(--au-line); }
+  .sub-nav:empty { display: none; }   /* the dashboard has no tabs: no empty second bar */
+  :root:root .snav-btn { color: var(--au-ink-2); font-size: 13.5px; font-weight: 500; border-radius: 8px; }
+  :root:root .snav-btn:hover { color: var(--au-ink); background: var(--au-surface-2); }
+  :root:root .snav-btn.active { color: var(--au-ink); font-weight: 600; background: var(--au-surface-2); box-shadow: inset 0 -2px 0 var(--au-accent); }
+  @media (pointer: coarse) { :root:root .snav-btn { min-height: 44px; } }
+
+  /* titles: the same sans, heavier and tighter, sentence case, no decoration */
+  :root:root .section-title { font-size: 16px; font-weight: 650; letter-spacing: -.01em; text-transform: none; color: var(--au-ink); }
+  :root:root .section-title::before { content: none; }
+  :root:root .section-header { border-bottom: 1px solid var(--au-line); }
+  :root:root :is(.dash-widget-title, .levels-panel-title, .block-title, .setup-col-title, .panel-header) { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--au-ink); }
+  :root:root :is(.kpi-label, .metric-label, .level-label, .setup-row-lbl, .ry-metric-label, .rf-em-lbl) { text-transform: none; letter-spacing: 0; font-weight: 500; }
+
+  /* surfaces: flat cards, 1 px hairlines, almost no shadow; nested blocks sit in a well */
+  :root:root :is(.card, .glass, .glass-premium, .glass-ultra, .dash-widget, .kpi-card, .levels-panel, .ems-step, .setup-card, .j-stat, .edge-card, .setup-board, .alerts-panel) {
+    background: var(--au-surface); border: 1px solid var(--au-line); border-radius: 12px; box-shadow: var(--au-shadow); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  :root:root :is(.metric-box, .direction-block, .scenario, .price-level, .cal-event, .stime-card, .setup-col, .setup-why, .confluence-score-ring, .check-box, .calc-input) {
+    background: var(--au-well); border-color: var(--au-line); box-shadow: none; }
+  :root:root :is(.card, .glass, .dash-widget, .kpi-card, .setup-card, .ems-step, .metric-box, .direction-block, .scenario, .price-level, .edge-card):hover { transform: none; border-color: var(--au-line-strong); box-shadow: var(--au-shadow); }
+  :root:root .edge-confluence { background: var(--au-surface); }
+  :root:root .badge { background: var(--au-surface-2); border-color: var(--au-line); color: var(--au-ink-2); }
+  :root:root .journal-table thead th { border-bottom: 1px solid var(--au-line); }
+  :root:root .footer { border-top: 1px solid var(--au-line); color: var(--au-ink-3); text-transform: none; letter-spacing: 0; }
+
+  /* buttons: the primary is a solid neutral fill */
+  :root:root .j-add-btn, :root:root .j-add-btn:hover { background: var(--au-primary); color: var(--au-on-primary); border-radius: 8px; box-shadow: none; font-weight: 600; filter: none; transform: none; }
+  .dash-shortcut { background: var(--au-surface) !important; border: 1px solid var(--au-line) !important; border-radius: 12px; backdrop-filter: none !important; }
+  .dash-shortcut:hover { transform: none !important; border-color: var(--au-line-strong) !important; }
+  :root:root .dash-shortcut-title { color: var(--au-ink); text-transform: none; letter-spacing: 0; font-size: 14px; }
+
+  /* dashboard: hero, chart and folds as flat cards; the live chip quiet */
+  :root:root .gx-hero { background: var(--au-surface); border-color: var(--au-line); border-radius: 16px; box-shadow: var(--au-shadow); }
+  :root:root .gx-hero-k { text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--au-ink-2); }
+  :root:root .gx-hero-price { font-family: var(--au-font); font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  :root:root .gx-state { background: transparent; border-color: var(--au-line-strong); color: var(--au-ink-2); }
+  :root:root .gx-hero[data-state="live"] .gx-state { background: transparent; color: var(--au-ink-2); border-color: var(--au-line-strong); }
+  :root:root .gx-hero[data-state="live"] .gx-state i { background: var(--au-gain); }
+  :root:root .gx-hero[data-state="stale"] .gx-state i { background: var(--au-warn); }
+  :root:root .gx-hero[data-state="offline"] .gx-state i { background: var(--au-loss); }
+  :root:root :is(.gx-chart-card, .gx-fold) { background: var(--au-surface); border-color: var(--au-line); border-radius: 12px; box-shadow: var(--au-shadow); }
+  :root:root .gx-fold > summary { border-radius: 12px; }
+  :root:root .gx-fold[open] > summary { border-radius: 12px 12px 0 0; }
+  :root:root .gx-fold > summary:hover { background: var(--au-surface-2); }
+  :root:root .gx-fold-t { font-weight: 600; }
+  :root:root .gx-chart-title { font-weight: 650; letter-spacing: -.01em; }
+  :root:root .gx-seg button[aria-pressed="true"] { background: var(--au-surface-2); }
+  :root:root .gx-bar button[aria-current="page"] { color: var(--au-ink); background: var(--au-surface-2); box-shadow: inset 0 2px 0 var(--au-accent); }
+  :root:root .gx-more-l button[aria-current="page"] { border-color: var(--au-accent); color: var(--au-ink); background: var(--au-surface-2); }
+
   /* ── PHONE, SIMPLE VIEW (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the phone") ──
      Everything here hangs on html[data-phone="simple"] (set in the head only at 640 px and under, unless Full view was chosen),
      so a wider screen and the phone's Full view are the page as it was. Nothing is removed: panels fold (the .gx-fold pattern),
@@ -2962,7 +3106,7 @@
   @media (max-width: 640px) { .gx-pv { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 20px 16px 0; font-size: 14px; color: var(--text-secondary); } }
   .gx-more { width: 100%; max-width: 100%; max-height: 86vh; margin: auto 0 0; padding: 8px 12px calc(14px + env(safe-area-inset-bottom)); border: 0; border-top: 1px solid var(--line);
     border-radius: 18px 18px 0 0; background: var(--bg-secondary); color: var(--text-primary); overflow-y: auto; }
-  html.dark .gx-more { background: #0d1416; }
+  html.dark .gx-more { background: var(--au-surface); }
   .gx-more::backdrop { background: rgba(0, 0, 0, 0.55); }
   .gx-more[open] { animation: gx-up 180ms ease-out; }
   @keyframes gx-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -2980,7 +3124,7 @@
   /* the tabs: four in a bottom bar, the rest under More */
   html[data-phone="simple"] .gx-bar { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 120;
     padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: var(--bg-secondary); }
-  html.dark[data-phone="simple"] .gx-bar { background: #0a1012; }
+  html.dark[data-phone="simple"] .gx-bar { background: var(--au-surface); }
   .gx-bar button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 58px; padding: 4px 2px; border: 0; background: none;
     color: var(--text-secondary); font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; }
   .gx-bar button i { font-style: normal; font-size: 17px; line-height: 1; }
@@ -3115,8 +3259,8 @@
 <!-- PRIMARY NAV -->
 <nav class="primary-nav" id="primaryNav">
   <!-- the way back to the desk, first so a phone shows it (QA 9 Nov: the installed app's "Gold" shortcut opens this page with no browser Back) -->
-  <a class="pnav-btn pnav-desk" href="./#home" title="Back to the Aureum Desk">← Desk</a>
-  <div class="rail-brand">GOLD<span>TERMINAL · XAU/USD</span></div>
+  <a class="pnav-btn pnav-desk" href="./#home" title="Back to the Aureum Desk" aria-label="Aureum Desk: back to the Desk">Desk<i class="ms-coin" aria-hidden="true">A</i></a>
+  <div class="rail-brand">Gold <b>terminal</b><span>XAU/USD</span></div>
   <button class="pnav-btn active" data-section="dashboard" onclick="switchSection('dashboard',this)">
     <span class="pnav-icon">▣</span> Dashboard
   </button>
@@ -3897,7 +4041,7 @@
   <!-- MULTI-TIMEFRAME CHARTS — top-down: Daily trend, H4 structure, M15 execution -->
   <div id="tab-mtf" class="tab-panel" data-ptf="d">
     <div data-pf="How to read these charts" data-pf-s="Lines, labels and boxes explained" class="section-header">
-      <div class="section-title">Multi-Timeframe Charts <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: solid <span style="color:var(--accent-green)">green</span>/<span style="color:var(--accent-red)">red</span> line = trend extreme broken by a body close, <strong>ChoCh</strong> = protected origin swing broken (reversal warning) &middot; dashed gray <em>idm</em> = inducement swept &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins — <strong>bright + &ldquo;unmitigated&rdquo;</strong> = price has never returned (highest probability), dim = already mitigated; killed by a body close through the far side</span></div>
+      <div class="section-title">Multi-Timeframe Charts <span style="font-size:var(--fs-xs);font-weight:500;color:var(--text-tertiary)">— Daily trend &middot; H4 structure &middot; M15 execution (XAU/USD, PAXG proxy) &middot; MAJOR structure only: solid <span style="color:var(--accent-green)">green</span>/<span style="color:var(--accent-red)">red</span> line = trend extreme broken by a body close, <strong>ChoCh</strong> = protected origin swing broken (reversal warning) &middot; dashed gray <em>idm</em> = inducement swept &middot; dashed amber = sweep (wick through, level held) &middot; green/red boxes = demand/supply order blocks at break origins — <strong>bright + &ldquo;unmitigated&rdquo;</strong> = price has never returned, dim = already mitigated; killed by a body close through the far side</span></div>
     </div>
 
     <!-- Alignment verdict -->
@@ -4733,7 +4877,7 @@
 
 <!-- FOOTER -->
 <div class="footer">
-  Institutional-Grade XAU/USD Trading Platform • Data Updates Every 30 Seconds • Last Updated: <span id="footerTime">—</span>
+  Aureum Desk · Gold terminal · prices refresh every 30 seconds · last updated <span id="footerTime">—</span>
 </div>
 
 <script>
@@ -5826,10 +5970,10 @@
     const cs = getComputedStyle(document.documentElement), v = (n, d) => (cs.getPropertyValue(n) || '').trim() || d;
     const dark = document.documentElement.classList.contains('dark');
     return GX_PAL = {
-      dark, up: v('--gx-up', '#2fbf8f'), dn: v('--gx-dn', '#f2576f'), text: v('--text-secondary', '#8a92a1'), faint: v('--text-tertiary', '#8a92a1'),
+      dark, up: v('--gx-up', '#2fbf8f'), dn: v('--gx-dn', '#f2576f'), text: v('--au-ink-3', v('--text-secondary', '#8a92a1')), faint: v('--text-tertiary', '#8a92a1'),
       entry: v('--accent-blue', '#1C64F2'), stop: v('--accent-red', '#E02424'), tgt: v('--accent-green', '#0E9F6E'), vwap: v('--gx-vwap', '#8B5CF6'),
-      grid: dark ? 'rgba(255,255,255,0.045)' : 'rgba(16,32,29,0.06)', cross: dark ? 'rgba(255,255,255,0.3)' : 'rgba(16,32,29,0.32)',
-      crossBg: v('--gx-cross-bg', dark ? '#1b2627' : '#33413e'), key: dark ? 'rgba(200,215,212,0.34)' : 'rgba(16,32,29,0.32)',
+      grid: v('--au-line', dark ? 'rgba(255,255,255,0.08)' : 'rgba(20,24,30,0.10)'), cross: dark ? 'rgba(255,255,255,0.3)' : 'rgba(20,24,30,0.32)',
+      crossBg: v('--gx-cross-bg', dark ? '#1b2627' : '#33413e'), key: dark ? 'rgba(236,237,239,0.34)' : 'rgba(23,25,28,0.32)',
       upRGB: v('--gx-up-rgb', '0,166,81'), dnRGB: v('--gx-dn-rgb', '194,59,51'),
       plate: gxAlpha(v('--panel', dark ? '#081011' : '#FFFFFF'), 0.86)   // behind a key-level label, over the candles (the card's own colour per theme)
     };
@@ -8078,7 +8222,7 @@
   const corrChartCtl = makeLineChart('corrChart', [
     { name: 'vs DXY', color: '#60A5FA' }, { name: 'vs real yields', color: '#D4AF37' }
   ], 260, { zeroLine: true });
-  const cotChartCtl = makeLineChart('cotChart', [{ name: 'MM net', color: '#7BE0CE' }], 260);
+  const cotChartCtl = makeLineChart('cotChart', [{ name: 'MM net', color: '#9DB4D3' }], 260);
 
   function rollingCorr(a, b, win) {
     const out = [];

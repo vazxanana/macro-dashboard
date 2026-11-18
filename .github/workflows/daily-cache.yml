@@ -29,7 +29,7 @@ concurrency:
 # The site's candle service (scripts/daily-cache.mjs `MD_BASE`, full /md/bars path): the Cloudflare Worker since 16 Nov 2026;
 # the repository variable MD_ORIGIN (scheme + host) overrides it.
 env:
-  MD_BASE: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
+  MD_BASE: ${{ format('{0}/md/bars', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
 
 jobs:
   daily-cache:

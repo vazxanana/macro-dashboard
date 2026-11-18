@@ -16,16 +16,16 @@
 // Desk load (11 Nov): while the Desk loads, no /cdata file may be requested twice (every reader shares window.msData), and a
 // visitor who is not signed in may only ask for the guest allowlist (GUEST_OK in api/data.js). A fourth run opens the Desk as a
 // guest who chose "Continue as guest": under the first-load sign-in card the app sleeps, so that card alone no longer runs it.
-const MD_ORIGIN = process.env.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev';
+const MD_ORIGIN = process.env.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev';
 const { chromium } = require('playwright');
 const { fetchRetry, fetched } = require('./shared.cjs');
 const PORT = process.env.PORT || 8766, H = 'http://127.0.0.1:' + PORT;
 const CDATA = 'https://raw.githubusercontent.com/vazxanana/macro-dashboard/council-data/';
-const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/academy.html', '/edge-lab.html', '/gold-trading.html', '/macro/', '/veteran/', '/offline.html'];
+const PAGES = ['/', '/market-structure.html', '/macro-desk.html', '/backtest.html', '/academy.html', '/edge-lab.html', '/gold-trading.html', '/veteran/', '/offline.html'];
 // Inner views a page only draws when they are opened (the Desk's Council panes run their render functions on first show):
 // as the owner, each is opened by its hash on the loaded page and must not throw either. Council → Systems once threw
 // "sn is not defined" there, unseen by a check that only loaded the page.
-const INNER = { '/market-structure.html': ['#charts', '#setup', '#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/macro', '#council/week', '#scanner', '#gold', '#mosha', '#ict', '#crypto', '#lit', '#sdv', '#users', '#profile'] };
+const INNER = { '/market-structure.html': ['#charts', '#setup', '#council/overview', '#council/trades', '#council/systems', '#council/review', '#council/research', '#council/week', '#scanner', '#mosha', '#ict', '#users', '#profile'] };
 const OWNER = { u: 'owner', name: 'Owner', role: 'owner' };
 const DESK = ['/', '/market-structure.html'];
 const GUEST_OK = ['trades.json', 'snapshot.json', 'ict/replay.json', 'research/replay-2w.json', 'research.json', 'mt5/signals.csv'];   // api/data.js
@@ -100,7 +100,7 @@ async function wire(ctx, account, seen) {
           if (h === '#charts') { const c = all('#v-charts .ms-chart')[0], bar = q('.btab'); if (!vis(q('#ps-ch-more'))) out.push('Charts has no "More"'); if (vis(q('#v-charts .mk-mode'))) out.push('the markup row is not behind "More"'); if (vis(q('#ms-cycle'))) out.push('the market-cycle strip is not behind "More"'); if (!c) out.push('no chart is shown'); else if (vis(bar) && c.getBoundingClientRect().bottom > bar.getBoundingClientRect().top + 1) out.push(`the chart ends ${Math.round(c.getBoundingClientRect().bottom - bar.getBoundingClientRect().top)} px under the tab bar`); }
           if (h === '#council/trades') { if (!vis(q('#ps-t-ans'))) out.push('Trades does not lead with the forward record'); const n = all('#ms-c-trades > tr').length; if (n > 5) out.push(`Trades shows ${n} rows (at most 5)`); if (vis(q('#ms-c-kpi'))) out.push('the Trades tiles are not folded'); }
           if (h === '#council/systems') { const o = open('systems'), book = q('#ms-sys-book'), rows = all('#ms-cp-systems .ps-fold'); if (o.join() !== 'ms-sys-book') out.push('Systems: open cards are ' + (o.join(', ') || 'none') + ' (only "Which systems trade live")'); else if (rows.some((b) => b.getBoundingClientRect().top < book.getBoundingClientRect().top)) out.push('"Which systems trade live" is not first'); if (rows.length < 4) out.push('Systems: the other cards are not folded to rows'); }
-          if (h === '#council/research') { const o = open('research'); if (o.length) out.push('Research: open cards ' + o.join(', ')); if (all('#ms-cp-research .ps-fold').length < 6) out.push('Research: fewer than 6 rows'); }
+          if (h === '#council/research') { const o = open('research'); if (o.length) out.push('Research: open cards ' + o.join(', ')); if (all('#ms-cp-research .ps-fold, #ms-cp-research details.c-dex > summary').length < 6) out.push('Research: fewer than 6 rows');   /* the decay / expect disclosure (17 Nov 2026) is one row */ }
           if (h === '#council/week') { const o = open('week'); if (!vis(q('#ps-w-ans'))) out.push('This week does not lead with its sentence'); if (o.join() !== 'card.wk-dec') out.push('This week: open cards are ' + (o.join(', ') || 'none') + ' (only the decisions)'); }
           if (h === '#council/review' && !vis(q('#ps-r-ans'))) out.push('Review does not lead with what is not reviewed');
           if (h === '#scanner') { const n = all('#ms-scan > a').length; if (n > 4) out.push(`Scanner shows ${n} markets (at most 4)`); }

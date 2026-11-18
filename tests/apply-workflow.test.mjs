@@ -308,5 +308,4 @@ test('stop guard: fails when the ICT code reaches for the mirror, the API, anoth
 test('the guard is a file a change to the ICT edge cannot reach, and it runs in the normal suite too', () => {
   assert.ok(!RULES.okPath('tests/desk-ict-guard.test.mjs')); assert.ok(!RULES.TEST_RE.test('tests/desk-ict-guard.test.mjs'));
   assert.match(TESTS, /node --test tests\/\*\.test\.mjs tests\/\*\.test\.js/);
-  assert.match(rd('scripts/vercel-ignore.sh'), / ict /, 'a merged ICT change redeploys the functions that bundle ict/*.mjs (the backtest lab, the backup runner)');
 });

@@ -95,6 +95,8 @@ export const FILES = [
   { file: 'macro/history.json', label: 'Macro forecast log', every: 'one entry per weekday, from 21:00 UTC the evening before', check: historyCheck },
   { file: 'macro/events.json', label: 'Macro release log', every: 'each macro run', check: listCheck },
   { file: 'macro/cache.json', label: 'Macro source cache', every: 'each macro run', check: (j, c) => { if (!j || typeof j !== 'object' || !j.fred) c.add('parse', 'warn', 'no FRED cache inside'); } },
+  { file: 'research/trade-review.json', label: 'Trade review', every: 'every 6th round (~70 min), re-stamped at least every 6 h', at: (j) => j.at, warn: 12 * H, bad: 48 * H, check: (j, c) => { if (!j || !Array.isArray(j.systems)) c.add('parse', 'warn', 'no systems list'); } },
+  { file: 'research/trade-review-ledger.json', label: 'Trade review ledger', every: 'append-only, when the trade review records a new proposal', check: (j, c) => { if (!j || !Array.isArray(j.entries)) c.add('parse', 'warn', 'no entries list (the review leaves the file as it is and records nothing new)'); } },
   { file: 'coach.json', label: 'Coach (daily review + 6-hourly decay)', every: 'daily; decay every 6 h', need: true, at: (j) => j.at, warn: 26 * H, bad: 30 * H, check: coachCheck },
   { file: 'digest.json', label: 'Daily owner digest', every: '21:15 UTC Mon-Fri + Sunday preview', check: digestCheck },
   { file: 'watchdog.json', label: 'Loop watchdog', every: 'GitHub cron :11/:41 + each loop hand-over', at: (j) => j.at, warn: 3 * H, bad: 12 * H,
@@ -111,7 +113,7 @@ export const FILES = [
   // second path): over 36 h means a day was missed and the desk's unresolved replay records say "update pending" meanwhile
   { file: 'ict/replay.json', label: 'ICT replay', every: 'daily (council loop trigger, cron as backup)', at: (j) => j.at, warn: 36 * H, bad: 4 * 24 * H,
     why: 'unresolved replay records on the ICT desk stay "update pending" until ict-replay.yml runs' },
-  { file: 'lit/replay.json', label: 'LIT replay', every: 'at most every 20 h (council loop)', at: (j) => j.at, warn: 30 * H, bad: 72 * H },
+  // lit/replay.json: no longer written (council/lit-replay.mjs removed, 17 Nov 2026), so no longer watched
   { file: 'research/daily/_index.json', label: 'Daily candle cache', every: 'weekly, Saturday 03:17 UTC', at: (j) => j.updated, warn: 8 * 24 * H, bad: 15 * 24 * H, check: dailyIndexCheck },
   { file: 'reviews/latest.md', label: 'Coach AI review', type: 'text', every: 'daily (scheduled session)', need: true, check: reviewsCheck },
   { file: 'reviews/losses.json', label: 'Owner loss reviews', every: 'when the owner writes one', check: reviewList },

@@ -43,29 +43,6 @@ const OWNER_C = cookie('owner'), FRED_C = cookie('fred', 'fred-pw'), CARLOS_C = 
 // Finding 1 (medium). POST /api/push needs no sign-in. { alerts: [{ id, sym: "xau", price: "1e999" }] } passed the "price > 0"
 // check, was stored as price null, and the every-minute cron then threw while writing the notification text for that device:
 // the round answered 500 and no device after it got its alert, every minute, until someone deleted the record by hand.
-test('finding 1: a price alert that is not a finite number is refused, and a stored bad one cannot stop the other devices', async () => {
-  resetBlob(); const env = { CRON_SECRET: 'cron-fake-0123456789', OANDA_TOKEN: 'oanda-fake', VAPID_PUBLIC_KEY: 'pub', VAPID_PRIVATE_KEY: 'priv', BLOB_READ_WRITE_TOKEN: 'blob-fake' };
-  const saved = {}; for (const k of Object.keys(env)) { saved[k] = process.env[k]; process.env[k] = env[k]; }
-  try {
-    const now = Math.floor(Date.now() / 1000), keys = { p256dh: 'B'.repeat(87), auth: 'a'.repeat(22) }, ep = 'https://fcm.googleapis.com/fcm/send/';
-    globalThis.fetch = fetchWith([[/oanda\.com\/v3\/instruments\/XAU_USD\/candles/, () => json({ candles: [{ time: String(now - 30), mid: { o: '1999', h: '2001', l: '1998', c: '2000.5' } }] })]]);
-    const push = require('../api/push.js'), post = async (body) => { const r = res(); await push({ method: 'POST', headers: {}, query: {}, body: JSON.stringify(body) }, r); return r; };
-    for (const price of ['1e999', '-1e999', 'Infinity', 1e308 * 10, 0, -5, 'abc', null, {}])
-      assert.equal((await post({ sub: { endpoint: ep + 'evil', keys }, alerts: [{ id: 'a1', sym: 'xau', price, dir: 'above', at: now - 60 }] })).code, 400, `price ${JSON.stringify(price)}`);
-    assert.equal((await post({ sub: { endpoint: ep + 'evil', keys }, alerts: [{ id: 'a1', sym: 'xau', price: 2000, dir: 'above', at: '1e999' }] })).code, 400, 'the time it was set must be a number too');
-    assert.equal(BLOB.puts.length, 0, 'nothing stored');
-    // records as they could already sit in the store (saved before this fix), listed BEFORE a good device
-    const sub = (n) => ({ endpoint: ep + n, keys });
-    await fakeBlob.put('push/aaaaaaaaaaaaaaaaaaaaaaaa/d.json', JSON.stringify({ sub: sub('evil'), alerts: [{ id: 'a1', sym: 'xau', price: null, dir: 'above', at: now - 60 }] }));
-    await fakeBlob.put('push/bbbbbbbbbbbbbbbbbbbbbbbb/d.json', JSON.stringify({ sub: sub('odd'), alerts: [null, 7, { id: 'a2', sym: 'nope', price: 5, dir: 'above', at: now - 60 }, { id: 'a3', sym: 'xau', price: 'x', dir: 'below', at: now - 60 }] }));
-    await fakeBlob.put('push/cccccccccccccccccccccccc/d.json', JSON.stringify({ sub: sub('good'), alerts: [{ id: 'a4', sym: 'xau', price: 2000, dir: 'above', at: now - 60 }] }));
-    const cron = require('../api/alert-cron.js'), r = res(); await cron({ method: 'GET', headers: { authorization: `Bearer ${env.CRON_SECRET}` }, query: {} }, r);
-    assert.equal(r.code, 200, JSON.stringify(r.body)); assert.equal(r.body.sent, 1, 'the good device got its alert');
-    assert.deepEqual(PUSH.sent.map((x) => x.sub.endpoint), [ep + 'good'], 'and a bad alert never fires');
-    assert.doesNotMatch(JSON.stringify(r.body), /Cannot read|toLocaleString/);
-  } finally { globalThis.fetch = realFetch; for (const k of Object.keys(env)) { if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k]; } resetBlob(); }
-});
-
 // ---- the Mosha lessons: a store in memory, the accounts as the session gives them ----
 const ML = require('../api/mosha-lessons.js'), MO = require('../api/mosha.js');
 const MENV = { SESSION_SECRET: 'a-test-session-secret-0123456789' }, NOW = Date.UTC(2026, 10, 11, 10, 0, 0);
@@ -125,8 +102,8 @@ test('finding 3: an MCP_KEYS key does not skip the stored list: the member\'s IC
 // ---------------------------------------------------------------------------------------------------------------------------
 // Re-verification
 test('every state-changing endpoint refuses the owner\'s own cookie when the request comes from another site', async () => {
-  G._reset(); resetBlob(); const saved = { k: process.env.CTRADER_LINK_KEY, b: process.env.BLOB_READ_WRITE_TOKEN, t: process.env.TV_WEBHOOK_KEY };
-  Object.assign(process.env, { CTRADER_LINK_KEY: ENV.CTRADER_LINK_KEY, BLOB_READ_WRITE_TOKEN: 'blob-fake', TV_WEBHOOK_KEY: 'tv-key-fake-0123456789' });
+  G._reset(); resetBlob(); const saved = { k: process.env.CTRADER_LINK_KEY, b: process.env.BLOB_READ_WRITE_TOKEN };
+  Object.assign(process.env, { CTRADER_LINK_KEY: ENV.CTRADER_LINK_KEY, BLOB_READ_WRITE_TOKEN: 'blob-fake' });
   try {
     const wrote = []; const mem = { get: async () => [], put: async (...a) => { wrote.push(a); }, getBook: async () => null, putBook: async (...a) => { wrote.push(a); }, putImg: async (...a) => { wrote.push(a); } };
     const obj = { get: async () => ({}), put: async (...a) => { wrote.push(a); } };
@@ -142,13 +119,12 @@ test('every state-changing endpoint refuses the owner\'s own cookie when the req
       ['mosha-lessons', ML.handle, { remove: { id: '20261111100000000abcd' } }, d],
       ['academy', require('../api/academy.js').handle, { action: 'miss', note: 'x' }, d],
       ['bridge', require('../api/bridge.js'), { file: 'mt5' }, null],
-      ['tv-webhook', require('../api/tv-webhook.js'), { list: true }, null],
     ];
     for (const [name, fn, body, opt] of cases) {
       const r = res(); await fn({ method: 'POST', headers: { host: 'aureumdesk.co.uk', origin: 'https://evil.example', cookie: OWNER_C }, query: {}, body }, r, opt || undefined);
       assert.ok(r.code === 401 || r.code === 403, `${name}: ${r.code} ${JSON.stringify(r.body)}`);
       assert.equal(r.headers['set-cookie'], undefined, `${name}: no cookie set or cleared`);
-      assert.doesNotMatch(JSON.stringify(r.body), /CouncilBridge|tv-key-fake/, `${name}: nothing handed over`);
+      assert.doesNotMatch(JSON.stringify(r.body), /CouncilBridge/, `${name}: nothing handed over`);
     }
     assert.equal(wrote.length, 0, 'nothing was written'); assert.equal(BLOB.puts.length, 0);
     // the same cookie from the site itself is the owner (so the refusals above are the Origin check, not a bad cookie)
@@ -156,7 +132,7 @@ test('every state-changing endpoint refuses the owner\'s own cookie when the req
     assert.equal(ok.code, 200); assert.equal(wrote.length, 1);
     // an Origin that is not a URL ("null": a sandboxed frame) is foreign too
     for (const origin of ['null', 'aureumdesk.co.uk', 'https://aureumdesk.co.uk.evil.example', 'http://aureumdesk.co.uk:8080']) assert.equal(S.sameOrigin({ headers: { host: 'aureumdesk.co.uk', origin } }), false, origin);
-  } finally { for (const [k, v] of [['CTRADER_LINK_KEY', saved.k], ['BLOB_READ_WRITE_TOKEN', saved.b], ['TV_WEBHOOK_KEY', saved.t]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } G._reset(); resetBlob(); }
+  } finally { for (const [k, v] of [['CTRADER_LINK_KEY', saved.k], ['BLOB_READ_WRITE_TOKEN', saved.b]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; } G._reset(); resetBlob(); }
 });
 
 test('/cdata: the sealed tokens and the user list are never read, whatever the spelling; no path leaves the branch; guests get the allowlist only', async () => {

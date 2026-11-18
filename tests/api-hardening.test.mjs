@@ -89,38 +89,31 @@ test('the limit is shared by every password check: cTrader link, MCP key, owner-
   for (let i = 0; i < G.MAX; i++) assert.equal((await sPost('bad')).code, 403);
   assert.equal((await sPost('right')).code, 429, 'sounds ownerPw'); assert.equal(saved, 0);
 
-  // bridge / tv-webhook owner password
-  G._reset(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake'; process.env.TV_WEBHOOK_KEY = 'tv-key-fake-0123456789';
-  const bridge = require('../api/bridge.js'), tv = require('../api/tv-webhook.js');
+  // bridge owner password
+  G._reset(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake';
+  const bridge = require('../api/bridge.js');
   const bPost = async () => { const r = res(); await bridge({ method: 'POST', headers: ip('9.9.9.9'), body: { ownerPw: 'nope', file: 'mt5' } }, r); return r; };
   for (let i = 0; i < G.MAX; i++) assert.equal((await bPost()).code, 403);
   assert.equal((await bPost()).code, 429, 'bridge ownerPw');
-  const tPost = async () => { const r = res(); await tv({ method: 'POST', headers: ip('9.9.9.9'), query: {}, body: { ownerPw: 'nope', list: true } }, r); return r; };
-  assert.equal((await tPost()).code, 429, 'tv-webhook ownerPw (same IP, same budget)');
-  G._reset(); delete process.env.TV_WEBHOOK_KEY;
+  G._reset();
 });
 
 test('cron endpoints compare the secret in constant time (no plain string compare)', async () => {
   assert.equal(G.bearerOk('Bearer s3cret-value', 's3cret-value'), true);
   for (const h of ['Bearer s3cret-valuX', 'Bearer s3cret', 's3cret-value', '', undefined, 'Bearer s3cret-value ']) assert.equal(G.bearerOk(h, 's3cret-value'), false, String(h));
   assert.equal(G.bearerOk('Bearer ', ''), false, 'no secret configured: never ok'); assert.equal(G.bearerOk('Bearer undefined', undefined), false);
-  for (const f of ['../api/run.js', '../api/alert-cron.js']) {
+  for (const f of ['../api/edge-analyst.js', '../api/trade-review.js']) {
     const src = fs.readFileSync(new URL(f, import.meta.url), 'utf8');
     assert.doesNotMatch(src, /authorization\s*!==?\s*`Bearer/, `${f}: timing-unsafe compare`); assert.match(src, /bearerOk\(/, f);
   }
-  const run = require('../api/run.js'), saved = process.env.CRON_SECRET; process.env.CRON_SECRET = 'cron-fake-0123456789';
-  for (const h of [undefined, 'Bearer nope', 'Bearer cron-fake-012345678']) { const r = res(); await run({ headers: { authorization: h }, query: { job: 'council' } }, r); assert.equal(r.code, 401); }
-  if (saved === undefined) delete process.env.CRON_SECRET; else process.env.CRON_SECRET = saved;
 });
 
-test('/api/status is public and edge-cached: no stack trace or error cause of the runner in it', async () => {
-  resetBlob(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake';
-  await fakeBlob.put('runs/council-1.json', JSON.stringify({ at: new Date().toISOString(), mode: 'live', error: 'GitHub 500 /git/trees: boom', cause: 'ECONNRESET socket hang up', stack: 'at gh (/var/task/api/run.js:40:11) | at async (/var/task/api/run.js:60:3)', step: 'commit' }));
+test('/api/status is public and edge-cached: bot ages only, no flag or runner report in it (17 Nov 2026)', async () => {
   const status = require('../api/status.js'), r = res(); await status({ method: 'GET', headers: {}, query: {} }, r);
-  assert.equal(r.code, 200); const lr = r.body.bots.council.lastRun;
-  assert.equal(lr.error, 'GitHub 500 /git/trees: boom', 'the page still shows the error line'); assert.equal(lr.step, 'commit');
-  assert.equal(lr.stack, undefined); assert.equal(lr.cause, undefined); assert.doesNotMatch(JSON.stringify(r.body), /\/var\/task|ECONNRESET/);
-  resetBlob();
+  assert.equal(r.code, 200); assert.match(r.headers['cache-control'], /s-maxage=30/);
+  assert.deepEqual(Object.keys(r.body.bots).sort(), ['council', 'ict']);
+  for (const k of ['notice', 'noticeLevel', 'runMode']) assert.equal(r.body[k], undefined, k);
+  assert.equal(r.body.bots.council.lastRun, undefined);
 });
 
 test('bridge: a storage error is not echoed to the public; only GET and POST are answered', async () => {
@@ -128,38 +121,6 @@ test('bridge: a storage error is not echoed to the public; only GET and POST are
   const bridge = require('../api/bridge.js'); let r = res(); await bridge({ method: 'GET', headers: {}, query: {} }, r);
   assert.equal(r.code, 200); assert.equal(r.body.lastRead, null); assert.doesNotMatch(JSON.stringify(r.body), /store_internal_detail/);
   resetBlob(); r = res(); await bridge({ method: 'DELETE', headers: {}, query: {} }, r); assert.equal(r.code, 405);
-});
-
-test('push: unauthenticated saves are capped (endpoint / key sizes), bad alert items are a 400, storage errors stay generic', async () => {
-  resetBlob(); process.env.BLOB_READ_WRITE_TOKEN = 'blob-fake'; process.env.VAPID_PUBLIC_KEY = 'vapid-public-fake';
-  const push = require('../api/push.js'), keys = { p256dh: 'B'.repeat(87), auth: 'a'.repeat(22) }, ep = 'https://fcm.googleapis.com/fcm/send/abc';
-  const post = async (body) => { const r = res(); await push({ method: 'POST', headers: {}, query: {}, body }, r); return r; };
-  const alert = { id: 'a1', sym: 'xau', price: 2000, dir: 'above', at: 1 };
-  assert.equal((await post({ sub: { endpoint: ep, keys }, alerts: [alert] })).code, 200, 'a normal save works');
-  resetBlob();
-  assert.equal((await post({ sub: { endpoint: ep + 'x'.repeat(5000), keys }, alerts: [alert] })).code, 400, 'huge endpoint');
-  assert.equal((await post({ sub: { endpoint: ep, keys: { ...keys, p256dh: 'B'.repeat(100000) } }, alerts: [alert] })).code, 400, 'huge key');
-  assert.equal((await post({ sub: { endpoint: ep, keys: { p256dh: { x: 1 }, auth: 'a' } }, alerts: [alert] })).code, 400, 'keys must be strings');
-  assert.equal(BLOB.puts.length, 0, 'nothing stored');
-  const nul = await post({ sub: { endpoint: ep, keys }, alerts: [null] }); assert.equal(nul.code, 400); assert.doesNotMatch(JSON.stringify(nul.body), /Cannot read/);
-  BLOB.fail = new Error('Vercel Blob: store_internal_detail'); const down = await post({ sub: { endpoint: ep, keys }, get: true });
-  assert.equal(down.code, 500); assert.doesNotMatch(JSON.stringify(down.body), /store_internal_detail/);
-  resetBlob();
-});
-
-test('alert-cron: one unreadable / malformed device record does not stop the other devices\' alerts', async () => {
-  resetBlob(); const env = { CRON_SECRET: 'cron-fake-0123456789', OANDA_TOKEN: 'oanda-fake', VAPID_PUBLIC_KEY: 'pub', VAPID_PRIVATE_KEY: 'priv', BLOB_READ_WRITE_TOKEN: 'blob-fake' };
-  const saved = {}; for (const k of Object.keys(env)) { saved[k] = process.env[k]; process.env[k] = env[k]; }
-  const now = Math.floor(Date.now() / 1000);
-  await fakeBlob.put('push/aaaaaaaaaaaaaaaaaaaaaaaa/d.json', 'null');
-  await fakeBlob.put('push/bbbbbbbbbbbbbbbbbbbbbbbb/d.json', JSON.stringify({ sub: { endpoint: 'https://fcm.googleapis.com/x', keys: { p256dh: 'p', auth: 'a' } }, alerts: [{ id: 'a1', sym: 'xau', price: 2000, dir: 'above', at: now - 60 }] }));
-  globalThis.fetch = fetchWith([[/oanda\.com\/v3\/instruments\/XAU_USD\/candles/, () => json({ candles: [{ time: String(now - 30), mid: { o: '1999', h: '2001', l: '1998', c: '2000.5' } }] })]]);
-  const cron = require('../api/alert-cron.js'), r = res(); await cron({ method: 'GET', headers: { authorization: `Bearer ${env.CRON_SECRET}` }, query: {} }, r);
-  globalThis.fetch = fetchWith();
-  for (const k of Object.keys(env)) { if (saved[k] === undefined) delete process.env[k]; else process.env[k] = saved[k]; }
-  assert.equal(r.code, 200, JSON.stringify(r.body)); assert.equal(r.body.sent, 1); assert.equal(PUSH.sent.length, 1);
-  assert.ok(BLOB.blobs.some((b) => b.pathname.startsWith('push/aaaaaaaaaaaaaaaaaaaaaaaa/')), 'the unreadable record is left alone, never deleted');
-  resetBlob();
 });
 
 test('MCP: an explicit perms.mcp false revokes the connector even when the older record flag says mcp', async () => {

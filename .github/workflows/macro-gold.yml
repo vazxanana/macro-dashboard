@@ -3,7 +3,7 @@ name: Macro gold rule (out-of-sample test)
 # Paper research, run once (research/edge/macro-gold/preregistration.md): can the Macro strategist's real-yield input, known the
 # day before, make a tradable gold rule? Fetches full FRED history (DFII10, DTWEXBGS), which the sandbox cannot reach, and the
 # OANDA daily gold candles, and writes council-data research/macro-gold.json. Free (FRED fredgraph.csv, the site's /md/bars
-# proxy) and failure-tolerant: a failed fetch writes an "incomplete" result and the nightly schedule tries again; once a complete
+# proxy) and failure-tolerant: a failed fetch writes an "incomplete" result and a later dispatch tries again (no schedule since 17 Nov 2026); once a complete
 # result exists, every later run skips (no re-running a finished test) unless dispatched with force. Changes no rule.
 on:
   workflow_dispatch:
@@ -16,8 +16,6 @@ on:
     paths:
       - '.github/workflows/macro-gold.yml'
       - 'research/edge/macro-gold/run.mjs'
-  schedule:
-    - cron: '41 4 * * *'
 
 permissions:
   contents: write
@@ -29,7 +27,7 @@ concurrency:
 # The site's candle service (run.mjs `MD_BASE`): the Cloudflare Worker since 16 Nov 2026; the repository variable MD_ORIGIN
 # (scheme + host) overrides it.
 env:
-  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://meridianx.meridianx-cloudflare.workers.dev') }}
+  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureum.meridianx-cloudflare.workers.dev') }}
 
 jobs:
   macro-gold:

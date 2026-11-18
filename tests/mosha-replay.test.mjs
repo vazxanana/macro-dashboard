@@ -71,7 +71,7 @@ test('a logged trade opens in the same chart; the hand-over to ChronosTrade carr
 
 test('page wiring: the chart card on the Mosha desk, members only, nothing that trades', () => {
   assert.ok(PAGE.includes('<script src="/assets/mosha-replay.js" defer></script>'));
-  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-lit"'));
+  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-profile"'));
   for (const id of ['mo-replay', 'mo-rp-pick', 'mo-rp-chart', 'mo-rp-ov', 'mo-rp-msg', 'mo-rp-cap', 'mo-rp-start', 'mo-rp-back', 'mo-rp-play', 'mo-rp-fwd', 'mo-rp-end', 'mo-rp-slider', 'mo-rp-steps', 'mo-rp-tf', 'mo-rp-speed', 'mo-rp-ct', 'mo-rp-res']) assert.ok(sec.includes(`id="${id}"`), id);
   assert.match(sec, /id="mo-rp-cap" aria-live="polite"/); assert.match(sec, /id="mo-rp-slider"[^>]*aria-label=/); assert.match(sec, /picked examples, so they show the pattern, not how often it wins/);
   assert.match(DESK, /data-mo-replay=/); assert.match(DESK, /if \(root\.msMoshaReplay\) root\.msMoshaReplay\(\)/); assert.match(JS, /root\.msMoshaReplayTrade = function/);
@@ -124,5 +124,5 @@ test('the bigger pictures hand over to ChronosTrade too, and the page offers the
   assert.match(cy.name, /4048\.59 \/ 4076\.69 \/ 3971\.09$/); assert.equal(ev.name, 'Mosha 29 Oct evening', 'no levels in the name when no position is drawn'); assert.equal(ev.start, U('2026-10-29T20:15')); assert.equal(ev.draw.length, 5);
   assert.match(JS, /STUDIES\.map\(pick\)/); assert.match(JS, /The bigger picture/); assert.match(JS, /'&tf=' \+ \(BASE\[spec\.base\] \? spec\.base : '5m'\)/); assert.match(JS, /no position is drawn on this screenshot/);
   assert.match(JS, /\[14400, 'H4'\]/); assert.match(JS, /sec === 14400 \? R\.spec\.h4off : 0/);
-  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-lit"')); assert.match(sec, /"The bigger picture" holds the higher-timeframe views/); assert.match(sec, /<i class="bv"><\/i><span data-tr>A range, the green box<\/span>/);
+  const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-profile"')); assert.match(sec, /"The bigger picture" holds the higher-timeframe views/); assert.match(sec, /<i class="bv"><\/i><span data-tr>A range, the green box<\/span>/);
 });

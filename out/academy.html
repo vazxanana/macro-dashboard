@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
 <meta name="color-scheme" content="dark light">
-<meta name="theme-color" content="#08090c" media="(prefers-color-scheme: dark)">
-<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121315" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F3F5" media="(prefers-color-scheme: light)">
 <title>Aureum Academy</title>
 <meta name="description" content="Aureum Academy: replay real candles, watch the apprentice decide on each edge candidate, correct it, save the lesson and prove what it learned. Paper only.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="/assets/aureum-mark.svg?v=0bdb0e5e4b">
 <style>@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-ext-f153aa07.woff2?v=f153aa07c1) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
 @font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-8330490a.woff2?v=8330490a01) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-ext-9343de2c.woff2?v=9343de2ca5) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
@@ -37,8 +37,8 @@
     window.msPhoneSet = function () { set(); document.dispatchEvent(new CustomEvent('ms:phone')); };
   })();
 </script>
-<link rel="stylesheet" href="/assets/mx-page.css?v=e803654e03">
-<link rel="stylesheet" href="/assets/academy.css?v=0c8f256342">
+<link rel="stylesheet" href="/assets/mx-page.css?v=de99eeb47e">
+<link rel="stylesheet" href="/assets/academy.css?v=397285001f">
 <link rel="stylesheet" href="/assets/academy-analyst.css?v=fc15975e51">
 <!-- app tags: scripts/pwa.mjs -->
 <link rel="manifest" href="/app.webmanifest">
@@ -47,7 +47,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Aureum Desk">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<script src="/assets/pwa.js?v=938afbe5f4" defer></script>
+<script src="/assets/pwa.js?v=9cf723945c" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to the Academy</a>
@@ -67,7 +67,7 @@
     <div class="ac-hero-t">
       <span class="ac-badge">Replay and paper only</span>
       <h1>Aureum Academy</h1>
-      <p class="ac-lede">Teach the apprentice to trade your edges. Replay real candles, see what it decides on each setup, correct it, and test whether the lesson stuck. Nothing here talks to a broker.</p>
+      <p class="ac-lede">Replay real candles, see what the engine decides on each setup, correct it, and test whether the lesson holds on setups it has never seen. Nothing here talks to a broker.</p>
     </div>
     <ol class="ac-steps" aria-label="How it works">
       <li><b>Pick an edge and the days</b><span>Real candles from the past, replayed in order.</span></li>
@@ -248,7 +248,7 @@
             <div class="card pcard" id="exam">
               <h2 class="c-h">Test on new setups <small>unseen exam-pool setups, with and without your lessons</small></h2>
               <p>The engine decides each unseen setup twice: without any lesson and with the lessons in force. Both answers are stored before any result is read. These results are kept apart from same-trade replays.</p>
-              <div class="f-actions"><button type="button" class="btn primary" id="exam-run">Test on 10 new setups</button><span class="ac-status" id="exam-msg" role="status" aria-live="polite"></span></div>
+              <div class="f-actions"><button type="button" class="btn" id="exam-run">Test on 10 new setups</button><span class="ac-status" id="exam-msg" role="status" aria-live="polite"></span></div>
               <div id="exam-out" hidden>
                 <dl class="stats" id="exam-summary"></dl>
                 <p class="note" id="exam-note"></p>
@@ -277,12 +277,12 @@
 </main>
 
 <script src="/assets/lightweight-charts-4.1.3.js?v=0c146b9bfb"></script>
-<script src="/assets/backtest-engine.js?v=7909b4cc6f"></script>
+<script src="/assets/backtest-engine.js?v=30659f35c6"></script>
 <script src="/assets/academy-replay.js?v=7763ee8dee"></script>
 <script src="/assets/academy-core.js?v=b3adcdaae2"></script>
 <script src="/assets/academy-risk.js?v=9b9ae3d731"></script>
-<script src="/assets/mx-nav.js?v=3f8fef533d"></script>
-<script src="/assets/academy-ui.js?v=ea3ec74755"></script>
+<script src="/assets/mx-nav.js?v=244a0cd297"></script>
+<script src="/assets/academy-ui.js?v=1e2b695062"></script>
 <script src="/assets/academy-tabs.js?v=d36e604081"></script>
 <script src="/assets/academy-analyst.js?v=6667f165c8"></script>
 </body>

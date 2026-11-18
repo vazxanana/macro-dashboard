@@ -1,62 +1,83 @@
-/* Meridian X side pages (Edge lab, /macro, /veteran/): the desk's tokens, top bar and Desk | Macro | ChronosTrade switch in one
-   file (9 Nov 2026 quality pass), so the pages around the desk read as one product. Colours are market-structure.html's 4 Nov
-   tokens; the light theme's accent / buy / sell text colours are a shade darker so small text keeps WCAG AA (4.5:1) on the
-   raised panels. Theme: localStorage msPrefs.theme via each page's head script (light, midnight, anything else dark), else the system. */
+/* Aureum Desk side pages (Edge lab, /macro, /veteran/; the Academy loads it too): tokens, top bar, the Desk | Macro | ChronosTrade
+   switch, buttons, page head and footer in one file, so the pages around the desk read as one product.
+   17 Nov 2026, the Aureum graphite look (docs/design/aureum-theme.md; owner: "do another one with other colors like grey"):
+   neutral greys on a flat background, one steel-blue accent for focus, links and the active place, a solid neutral primary
+   button, sans titles. The --au-* tokens are the spec's values for dark (default), light and midnight; every older variable
+   (--bg, --panel, --ink, --accent, --buy …) points at them, so pages and the Academy keep working. Green / red mean up / down.
+   Theme: localStorage msPrefs.theme via each page's head script (light, midnight, anything else dark), else the system. */
+/* the Aureum tokens: dark (default, "graphite") */
 :root {
-  --bg: #08090c; --panel: #0f1116; --panel-raised: #14171e; --panel-hover: #161a22;
-  --line: rgba(255,255,255,.07); --line-soft: rgba(255,255,255,.045); --line-strong: rgba(255,255,255,.12);
-  --ink: #eceef2; --ink-dim: #a4abb8; --ink-faint: #8a92a1; --accent: #5b8cff; --accent-soft: rgba(91,140,255,.12);
-  --buy: #2fbf8f; --sell: #f2576f; --buy-soft: rgba(47,191,143,.12); --sell-soft: rgba(242,87,111,.12);
-  --gold: #e3b341; --gold-soft: rgba(227,179,65,.13);
-  --neutral-soft: rgba(255,255,255,.06); --zero: rgba(255,255,255,.22);
-  --shadow-pop: 0 24px 48px rgba(0,0,0,.55);
-  --sans: Figtree, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --au-bg: #121315; --au-surface: #1A1C1F; --au-surface-2: #23262A; --au-well: #16181B;
+  --au-line: rgba(255,255,255,.08); --au-line-strong: rgba(255,255,255,.16);
+  --au-ink: #ECEDEF; --au-ink-2: #B4B8BF; --au-ink-3: #8E939B;
+  --au-accent: #9DB4D3; --au-primary: #E4E6E9; --au-on-primary: #121315;
+  --au-gold: var(--au-primary); --au-gold-grad: var(--au-primary); --au-gold-ink: var(--au-accent); --au-on-gold: var(--au-on-primary);
+  --au-gain: #4CC38A; --au-loss: #F2726A; --au-warn: #E8B04B; --au-info: #9DB4D3;
+  --au-shadow: 0 1px 2px rgba(0,0,0,.25);
+  --au-mark: linear-gradient(135deg, #F4F5F7 0%, #B9BEC6 55%, #8A9099 100%);
+  --au-font-ui: "Inter", "Figtree", system-ui, sans-serif;
+  --au-r-sm: 8px; --au-r: 12px; --au-r-hero: 16px;
+  /* derived, per theme: the softest hairline, a neutral well tint, the zero line of a chart */
+  --line-soft: rgba(255,255,255,.05); --neutral-soft: rgba(255,255,255,.05); --zero: rgba(255,255,255,.22);
+  --shadow-pop: 0 16px 40px rgba(0,0,0,.5);
+
+  /* older names, pointed at the tokens (keep every name working) */
+  --bg: var(--au-bg); --panel: var(--au-surface); --panel-raised: var(--au-surface-2); --panel-hover: var(--au-surface-2);
+  --line: var(--au-line); --line-strong: var(--au-line-strong);
+  --ink: var(--au-ink); --ink-dim: var(--au-ink-2); --ink-faint: var(--au-ink-3);
+  --accent: var(--au-accent); --accent-soft: color-mix(in srgb, var(--au-accent) 14%, transparent);
+  --buy: var(--au-gain); --sell: var(--au-loss); --buy-soft: color-mix(in srgb, var(--au-gain) 14%, transparent); --sell-soft: color-mix(in srgb, var(--au-loss) 14%, transparent);
+  --gold: var(--au-primary); --gold-soft: color-mix(in srgb, var(--au-primary) 14%, transparent); --gold-ink: var(--au-accent); --on-gold: var(--au-on-primary);
+  --warn: var(--au-warn); --info: var(--au-info); --well: var(--au-well);
+  --sans: var(--au-font-ui);
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --r: 12px; --r-sm: 8px; --tap: 32px;
+  --r: var(--au-r); --r-sm: var(--au-r-sm); --tap: 32px;
   --z-sticky: 10; --z-tip: 40;
   --ease: cubic-bezier(.22, 1, .36, 1);
+  /* spacing (4 / 8 px rhythm) and the type scale of the spec: 12 / 13 / 14 / 16 / 20 / 26 / 32 */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 14px; --fs-lg: 16px; --fs-xl: 20px; --fs-2xl: 26px; --fs-3xl: 32px;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: light) {
   :root:not([data-theme="dark"]):not([data-theme="midnight"]) {
-    --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8;
-    --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
-    --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.09);
-    --buy: #067a64; --sell: #c92643; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
-    --gold: #8a6100; --gold-soft: rgba(201,148,0,.12);
-    --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
-    --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+    --au-bg: #F2F3F5; --au-surface: #FFFFFF; --au-surface-2: #E7E9EC; --au-well: #F7F8F9;
+    --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20);
+    --au-ink: #17191C; --au-ink-2: #474C54; --au-ink-3: #5B616A;
+    --au-accent: #2F5E9E; --au-primary: #25292E; --au-on-primary: #FFFFFF;
+    --au-gain: #0A7350; --au-loss: #B3261E; --au-warn: #8A5A00; --au-info: #2F5E9E;
+    --au-shadow: 0 1px 2px rgba(20,24,30,.06);
+    --line-soft: rgba(20,24,30,.06); --neutral-soft: rgba(20,24,30,.05); --zero: rgba(20,24,30,.28);
+    --shadow-pop: 0 16px 40px -12px rgba(20,24,30,.22), 0 2px 6px rgba(20,24,30,.06);
     color-scheme: light;
   }
 }
 :root[data-theme="light"] {
-  --bg: #f4f6f9; --panel: #ffffff; --panel-raised: #f7f8fb; --panel-hover: #f2f4f8;
-  --line: #dfe3ea; --line-soft: #eceff4; --line-strong: #cdd3dd;
-  --ink: #131722; --ink-dim: #4a5160; --ink-faint: #5f6675; --accent: #2a62f0; --accent-soft: rgba(47,107,255,.09);
-  --buy: #067a64; --sell: #c92643; --buy-soft: rgba(8,135,111,.09); --sell-soft: rgba(217,45,75,.08);
-  --gold: #8a6100; --gold-soft: rgba(201,148,0,.12);
-  --neutral-soft: rgba(19,23,34,.05); --zero: rgba(19,23,34,.28);
-  --shadow-pop: 0 18px 40px -12px rgba(16,24,40,.22), 0 2px 6px rgba(16,24,40,.06);
+  --au-bg: #F2F3F5; --au-surface: #FFFFFF; --au-surface-2: #E7E9EC; --au-well: #F7F8F9;
+  --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20);
+  --au-ink: #17191C; --au-ink-2: #474C54; --au-ink-3: #5B616A;
+  --au-accent: #2F5E9E; --au-primary: #25292E; --au-on-primary: #FFFFFF;
+  --au-gain: #0A7350; --au-loss: #B3261E; --au-warn: #8A5A00; --au-info: #2F5E9E;
+  --au-shadow: 0 1px 2px rgba(20,24,30,.06);
+  --line-soft: rgba(20,24,30,.06); --neutral-soft: rgba(20,24,30,.05); --zero: rgba(20,24,30,.28);
+  --shadow-pop: 0 16px 40px -12px rgba(20,24,30,.22), 0 2px 6px rgba(20,24,30,.06);
   color-scheme: light;
 }
 :root[data-theme="midnight"] {
-  --bg: #070d1f; --panel: #0d1630; --panel-raised: #111c3a; --panel-hover: #15224a;
-  --line: rgba(150,175,255,.12); --line-soft: rgba(150,175,255,.07); --line-strong: rgba(150,175,255,.2);
-  --ink: #eef2ff; --ink-dim: #b0bcdc; --ink-faint: #8d9ac0; --accent: #e3b341; --accent-soft: rgba(227,179,65,.14);
-  --buy: #34d6a0; --sell: #ff6b85; --buy-soft: rgba(52,214,160,.13); --sell-soft: rgba(255,107,133,.13);
+  --au-bg: #0B0C0E; --au-surface: #131416; --au-surface-2: #1B1D20; --au-well: #0F1012;
 }
 /* phones and tablets: every control at least 44 px tall */
 @media (pointer: coarse) { :root { --tap: 44px; } }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
-body { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); min-height: 100vh; }
+html { -webkit-text-size-adjust: 100%; background: var(--au-bg); }
+html, body { margin: 0; color: var(--ink); font: 14px/1.5 var(--sans); font-feature-settings: "cv11", "ss01"; -webkit-font-smoothing: antialiased; }
+body { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); min-height: 100vh; background: var(--au-bg); }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-::selection { background: rgba(91,140,255,.3); }
+:focus-visible { outline: 2px solid var(--au-accent); outline-offset: 2px; border-radius: 4px; }
+::selection { background: color-mix(in srgb, var(--au-accent) 30%, transparent); }
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .skip { position: absolute; left: 12px; top: -60px; z-index: 100; padding: 12px 14px; min-height: 44px; border-radius: var(--r-sm); background: var(--panel-raised); color: var(--ink); border: 1px solid var(--line-strong); }
@@ -65,41 +86,93 @@ button { font: inherit; color: inherit; }
 
 .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px 64px; }
 
-/* top bar */
-.top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: 12px; min-height: 56px;
-  background: color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--line); }
+/* top bar: the wordmark on the left, the place you are after it, status and the switch on the right */
+.top { position: sticky; top: 0; z-index: var(--z-sticky); display: flex; align-items: center; gap: 12px; min-height: 60px;
+  background: color-mix(in srgb, var(--au-bg) 84%, transparent); backdrop-filter: saturate(140%) blur(14px); -webkit-backdrop-filter: saturate(140%) blur(14px); border-bottom: 1px solid var(--au-line); }
 .top .wrap { display: flex; align-items: center; gap: 12px; width: 100%; padding-bottom: 0; min-width: 0; }
-.brand { display: inline-flex; align-items: center; gap: 9px; min-height: var(--tap); color: var(--ink); font: 600 14px var(--sans); letter-spacing: -.1px; white-space: nowrap; }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: var(--tap); color: var(--ink); font: 500 14px var(--sans); white-space: nowrap; }
 .brand:hover { text-decoration: none; }
-.brand.here { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.coin { width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffd768, #c99400); box-shadow: inset 0 -2px 4px rgba(0,0,0,.25); flex: none; }
-.crumb { color: var(--ink-faint); font-weight: 500; }
+.brand.here { font-weight: 500; color: var(--au-ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+/* the wordmark (spec §2): the mark, AUREUM 700 .14em, DESK 500 .22em in the second ink. A page without the two spans still
+   gets the capitals. */
+a.brand:not(.here) { font: 700 14px/1 var(--au-font-ui); text-transform: uppercase; letter-spacing: .14em; color: var(--au-ink); }
+.brand .wm-d { font: 500 12px/1 var(--au-font-ui); letter-spacing: .22em; color: var(--au-ink-2); margin-left: .15em; }
+/* the mark: a brushed-silver rounded square with a capital A, the same in every theme (the Desk draws it as .ms-coin) */
+.coin { position: relative; display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 7px; flex: none; background: var(--au-mark);
+  box-shadow: inset 0 0 0 1px rgba(22,24,27,.14); letter-spacing: 0; text-transform: none; }
+.coin::before { content: "A"; font: 700 14px/1 var(--au-font-ui); color: #16181B; }
+.crumb { color: var(--au-ink-3); font-weight: 400; }
 .top .check { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-faint); white-space: nowrap; min-width: 0; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: var(--tap); min-width: var(--tap); padding: 6px 12px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--neutral-soft); font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
-.btn:hover { color: var(--ink); border-color: var(--line-strong); text-decoration: none; }
-.btn svg { width: 14px; height: 14px; flex: none; }
-.btn[aria-busy="true"] svg { animation: mx-spin .8s linear infinite; }
-@keyframes mx-spin { to { transform: rotate(360deg); } }
 
-/* Desk | Macro | ChronosTrade switch: the main header's control (conic ring); shown to signed-in members only */
-.hdr-sw { --hm-a: #e0a526; --hm-b: #7b61ff; position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; flex: none; isolation: isolate; background: var(--panel); }
-.hdr-sw[hidden] { display: none; }
-.hdr-sw::before { content: ""; position: absolute; inset: -1.5px; border-radius: inherit; z-index: -2; background: conic-gradient(from var(--hm-r, 0turn), var(--hm-a), var(--hm-b), var(--hm-a)); }
-.hdr-sw::after { content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: -1; background: var(--panel); }
-.hdr-sw a { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 28px; min-width: 28px; padding: 0 12px; border-radius: 999px; text-decoration: none; color: var(--ink-dim); font: 700 12.5px/1 var(--sans); white-space: nowrap; transition: background .18s ease-out, color .18s ease-out; }
-.hdr-sw a i { width: 7px; height: 7px; border-radius: 50%; background: currentColor; opacity: .55; flex: none; }
-.hdr-sw a.on { color: var(--ink); background: color-mix(in srgb, var(--hm-a) 16%, var(--panel)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hm-a) 40%, transparent); }
-.hdr-sw a.on i { background: var(--hm-a); opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, var(--hm-a) 25%, transparent); }
-.hdr-sw a:not(.on):hover { color: var(--ink); background: color-mix(in srgb, var(--hm-b) 12%, var(--panel)); }
-.hdr-sw a:not(.on):hover i { background: var(--hm-b); opacity: 1; }
-@property --hm-r { syntax: '<angle>'; inherits: false; initial-value: 0turn; }
-/* sweeps once on hover / focus, as on the desk (9 Nov perf rule: no infinite animation on a custom property; it repainted every frame) */
-@media (prefers-reduced-motion: no-preference) { .hdr-sw:is(:hover, :focus-within)::before { animation: hm-spin 1.1s cubic-bezier(.22, 1, .36, 1) 1; } @keyframes hm-spin { to { --hm-r: 1turn; } } }
+/* buttons (spec §3): secondary by default; one primary per view (class .gold kept as its name); quiet = accent text only */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: var(--tap); min-width: var(--tap); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--au-line-strong); background: transparent; font: 500 13px var(--sans); color: var(--au-ink); cursor: pointer; }
+.btn:hover { background: var(--au-surface-2); text-decoration: none; }
+.btn svg { width: 14px; height: 14px; flex: none; }
+/* a busy refresh turns a few times, then rests (no endless animation: CLAUDE.md "Desk smoothness") */
+.btn[aria-busy="true"] svg { animation: mx-spin .8s linear 4; }
+@keyframes mx-spin { to { transform: rotate(360deg); } }
+.btn.gold { min-height: 44px; padding: 0 18px; border-radius: 8px; border: 0; background: var(--au-primary); color: var(--au-on-primary); font: 600 14px var(--sans); }
+.btn.gold:hover { background: var(--au-primary); color: var(--au-on-primary); filter: brightness(1.06); }
+.btn.gold svg { width: 16px; height: 16px; }
+.btn.ghost { min-height: 44px; padding: 0 18px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+.btn.quiet { border-color: transparent; background: none; color: var(--au-accent); padding-inline: 4px; font-weight: 600; }
+.btn.quiet:hover { background: none; text-decoration: underline; text-underline-offset: 3px; }
+
+/* page head (spec §4): a title, one plain sentence, at most one primary action on the right */
+.mx-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--s4) var(--s6); padding: var(--s7) 0 var(--s6); }
+.mx-head-t { flex: 1 1 440px; min-width: 0; }
+.mx-head h1 { margin: 0 0 var(--s3); font: 650 var(--fs-3xl)/1.15 var(--au-font-ui); letter-spacing: -.02em; color: var(--au-ink); text-wrap: balance; }
+.mx-lede { margin: 0; max-width: 62ch; color: var(--au-ink-2); font-size: var(--fs-lg); line-height: 1.55; text-wrap: pretty; }
+.mx-lede b { color: var(--au-ink); font-weight: 600; }
+.mx-head-a { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+/* a section heading inside a page: title, a quiet line beside it, an action at the right */
+.mx-sh { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s1) var(--s3); margin: 0 0 var(--s4); }
+.mx-sh h2 { margin: 0; font: 600 var(--fs-xl)/1.25 var(--au-font-ui); letter-spacing: -.01em; color: var(--au-ink); }
+.mx-sh p, .mx-sh small { margin: 0; color: var(--au-ink-3); font-size: var(--fs-sm); }
+.mx-sh .mx-sh-r { margin-left: auto; }
+/* a card (spec §3): surface, hairline, very little shadow */
+.mx-card { background: var(--au-surface); border: 1px solid var(--au-line); border-radius: var(--au-r); box-shadow: var(--au-shadow); padding: var(--s5); min-width: 0; }
+/* a toggle chip (filters): sentence-case label, the active one on the raised surface with the accent underline (spec §3, navigation) */
+.mx-chip { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); padding: 0 12px; border-radius: 999px; border: 1px solid var(--au-line); background: transparent; color: var(--au-ink-2); font: 500 13px var(--sans); cursor: pointer; white-space: nowrap; }
+.mx-chip[hidden] { display: none; }
+.mx-chip:hover { color: var(--au-ink); border-color: var(--au-line-strong); }
+.mx-chip[aria-pressed="true"] { color: var(--au-ink); background: var(--au-surface-2); border-color: var(--au-line-strong); }
+.mx-chip[aria-pressed="true"]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 3px; height: 2px; border-radius: 2px; background: var(--au-accent); }
+
+/* footer: a hairline, the wordmark, the way back, the small print */
+.foot { margin-top: var(--s7); padding-top: var(--s5); border-top: 1px solid var(--au-line); color: var(--au-ink-3); font-size: var(--fs-sm); line-height: 1.55; }
+.foot p { margin: 0 0 var(--s2); max-width: 90ch; }
+.foot .mx-fb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s1) var(--s4); margin: var(--s4) 0 0; max-width: none; }
+.foot .mx-fb .coin { width: 20px; height: 20px; border-radius: 6px; }
+.foot .mx-fb .coin::before { font-size: 12px; }
+.foot .mx-fb .mx-fw { display: inline-flex; align-items: center; gap: var(--s2); color: var(--au-ink-2); font: 700 12px var(--au-font-ui); letter-spacing: .14em; text-transform: uppercase; }
+
+/* Desk | Macro | ChronosTrade switch (spec §3, navigation): inactive items in the second ink, the active one raised with an accent
+   underline; shown to signed-in members only. No ring and no motion. */
+.hdr-sw { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; flex: none; background: var(--au-surface); border: 1px solid var(--au-line); }
+.hdr-sw[hidden], .hdr-sw a[hidden] { display: none !important; }
+.hdr-sw a { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 30px; min-width: 30px; padding: 0 13px; border-radius: 999px; text-decoration: none; color: var(--au-ink-2); font: 600 13px/1 var(--sans); white-space: nowrap; }
+.hdr-sw a i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .55; flex: none; }
+.hdr-sw a:hover { color: var(--au-ink); text-decoration: none; }
+.hdr-sw a.on { color: var(--au-ink); background: var(--au-surface-2); }
+.hdr-sw a.on i { background: var(--au-accent); opacity: 1; }
+.hdr-sw a.on::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 3px; height: 2px; border-radius: 2px; background: var(--au-accent); }
 @media (pointer: coarse) { .hdr-sw { padding: 0; } .hdr-sw a { height: 44px; min-width: 44px; } }
 /* phones: dots only, as on the main desk and the Macro desk */
-@media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } }
+@media (max-width: 760px) { .hdr-sw a span { display: none; } .hdr-sw a { padding: 0 9px; } .hdr-sw a.on::after { left: 9px; right: 9px; } }
 
-@media (max-width: 900px) { .wrap { padding: 0 16px 48px; } }
+@media (max-width: 900px) { .wrap { padding: 0 16px 48px; } .mx-head { padding: var(--s6) 0 var(--s5); } }
+@media (max-width: 600px) {
+  :root { --fs-3xl: 28px; }
+  .mx-head { padding: var(--s5) 0 var(--s4); }
+  .mx-card { padding: var(--s4); }
+  .foot { margin-top: var(--s6); }
+}
+/* small phones: the wordmark keeps AUREUM; DESK stays in the link's name for screen readers */
+@media (max-width: 420px) { .brand .wm-d { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } a.brand:not(.here) { letter-spacing: .12em; } }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
 }
+/* 17 Nov 2026, owner: the header switch is rectangular, not a pill (Desk | Macro | ChronosTrade | Academy) */
+.hdr-sw { border-radius: 8px !important; } .hdr-sw::before, .hdr-sw::after { border-radius: inherit !important; }
+.hdr-sw a { border-radius: 6px !important; } .hdr-sw a i { border-radius: 2px !important; }

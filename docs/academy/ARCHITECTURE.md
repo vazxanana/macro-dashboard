@@ -7,11 +7,11 @@ modules: read it before touching any `academy` file. Progress and resume notes a
 
 | Area | Finding |
 |---|---|
-| Site | Static pages built to `out/` by `scripts/build.sh`, served by Vercel. No framework. Lightweight Charts 4.1.3 for charts. |
-| Backend | Vercel functions in `api/` (CommonJS). Sign-in is a server session cookie (`api/_session.js`); the owner is `acct.u === 'owner'`. |
+| Site | Static pages built to `out/` by `scripts/build.sh`, served by Vercel (a Cloudflare Worker since 16 Nov 2026, `cloudflare/`). No framework. Lightweight Charts 4.1.3 for charts. |
+| Backend | Vercel-shaped functions in `api/` (CommonJS; run by the Cloudflare Worker since 16 Nov 2026). Sign-in is a server session cookie (`api/_session.js`); the owner is `acct.u === 'owner'`. |
 | Database | **None.** Persistence is the private Vercel Blob store (JSON files; pattern in `api/notify.js`: a failed read throws, never wipes) and the `council-data` git branch for bot output. No Postgres / Supabase. |
 | Language-model API | **None exists in the repo.** The council is deterministic JavaScript. The Academy adds an optional adapter that stays off until the owner sets a key. |
-| Market data | `/md/bars?sym=&tf=&from=&to=` (OANDA proxy, 5,000 candles a call, `OANDA_TOKEN` on Vercel). Research candles (HistData M1 2018 to 2026: gold `xau-histdata`, NQ cash `nsxusd-histdata`, dollar index `udx-histdata`, forex, S&P) are in `council-data` under `research/candles/`. |
+| Market data | `/md/bars?sym=&tf=&from=&to=` (OANDA proxy, 5,000 candles a call, `OANDA_TOKEN` a Worker secret). Research candles (HistData M1 2018 to 2026: gold `xau-histdata`, NQ cash `nsxusd-histdata`, dollar index `udx-histdata`, forex, S&P) are in `council-data` under `research/candles/`. |
 | Backtesting | Pre-registered studies in `research/edge/<topic>/` (net of costs, in sample vs out of sample). ChronosTrade (`backtest.html`, `assets/backtest-engine.js`) is a manual replay lab with prop-firm rules. |
 | Risk | Council: every trade has a stop; sizing in the Trader. ChronosTrade: prop-firm rule sets (`MXB.FIRMS` in `assets/backtest-engine.js`). |
 | Brokers | cTrader **demo** mirror only (`council/ctrader-*.mjs`). MT5: a signal CSV (`mt5/`). Tradovate: not present. No live execution anywhere. |

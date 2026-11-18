@@ -25,52 +25,53 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Where things live**
 | Path | What |
 |---|---|
-| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks (ICT, Gold, Mosha, Crypto, LIT, NQ SDV), profile, users. Public / admin split: see below. The Mosha desk's scripts are `assets/mosha-*.js` |
+| `market-structure.html` | The Desk (built to `/` and `/market-structure.html`): home, charts, council panes, desks (ICT, Mosha), profile, users. Public / admin split: see below. The Mosha desk's scripts are `assets/mosha-*.js` |
 | `macro-desk.html` (`/macro-desk`) | Macro desk: veteran glance, event playbook, score / levels charts, briefing, calls, COT |
 | `backtest.html` (`/backtest`) | ChronosTrade replay lab; engine `assets/backtest-engine.js`, review charts `assets/bt-review.js`, effects `assets/bt-fx.js` |
 | `gold-trading.html` (`/gold`) | Gold terminal; holds the locked features and the 15-driver macro stack below |
 | `academy.html` (`/academy`, owner only) | MeridianX Academy: replay a setup of one of the seven edges, the apprentice decides, the mentor corrects, a lesson is saved and proven. Page `assets/academy-ui.js` + `academy.css`; modules `assets/academy-replay.js` (`MXR`), `academy-core.js` (`MXA`), `academy-risk.js` (`MXK`); API `api/academy.js`; generated data `academy/` (edges, candidates, outcomes, features, research); offline training `ml/`. Docs: `docs/academy/`, state: `MERIDIANX_BUILD_PROGRESS.md` |
-| `edge-lab.html`, `index.html` (`/macro`), `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
+| `edge-lab.html`, `scripts/veteran-library.html` (`/veteran/`) | Side pages; shared look `assets/mx-page.css` + `assets/mx-nav.js` |
 | `app.webmanifest`, `sw.js`, `offline.html`, `icons/`, `assets/pwa.js` | Installable app (head tags added at build by `scripts/pwa.mjs`, never by hand) |
-| `api/` | Vercel functions (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `push` + `alert-cron`, `run.js` (cron runner), `status`, `bridge`, `tv-webhook`, `pine`, `og.mjs` |
-| `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
+| `api/` | The site's functions, run by the Cloudflare Worker (`_*.js` are shared modules): sign-in (`login`, `logout`, `me`, `_session`, `_accounts`, `_guard`), `/cdata` (`data.js`), `/md/bars` + `/md/stream` (OANDA), `mcp.js` + `_ictlab.js` (Fred's connector), `academy.js` + `academy-mcp.js` (the Academy and its assistant connector), `ctrader-link`, `users`, `profile`, `notify`, `sounds`, `mosha` (the Mosha desk's trade log), `mosha-lessons` (the lessons its teacher sends), `edge-analyst` (AI second opinion on each live entry), `trade-review` (+ `_trade-review`: the language-model part of the trade review), `status`, `bridge` (17 Nov 2026: `push`, `alert-cron`, `run.js`, `tv-webhook`, `pine`, `og.mjs`, `_flags` removed, section "Simplified") |
+| `council/` | Council members: `trader`, `analyst`, `coach`, `macro`, `macroscore`, `veteran` (+ `briefing`, `glance`, `calibration`, `playbook`, `outlook`), `cot`, `trade-review` (after-the-fact check of the trades taken, proposals only), `ctrader-*` (demo mirror), `datacheck` / `datahealth` / `health`, `digest`, `research-ledger`, `datasync` / `jsonio`, `live` (VPS runner) |
 | `ict/` | ICT desk tracker, replay, CME calendar; its rule book is `.claude/skills/ICT/SKILL.md` |
 | `research/edge/<topic>/` | Pre-registered studies (preregistration, `RESULT.md`, `result.json`), published to the Edge lab; `research/proposals/` = owner proposals; `research/macro-veteran/` = the veteran batch |
 | `tests/` | `node:test`, offline; pinned council-data copies in `tests/fixtures/` |
-| `scripts/` | `build.sh`, `audit/` (`smoke.cjs`, `chronostrade.cjs`), `live/` (VPS runner install), `daily-cache.mjs`, `make-icons.mjs` |
+| `scripts/` | `build.sh`, `audit/` (`smoke.cjs`, `chronostrade.cjs`, `pwa.cjs`), `daily-cache.mjs`, `make-icons.mjs` |
 | `out/` | The built site, **committed** (CI fails when it is stale) |
 | `council-data` branch | Everything the bots write (trades.json, snapshot.json, `ict/`, `macro/`, `ctrader/`, health.json, digest.json, `research/…`); the site reads it through `/cdata`. Never commit bot output to `main` |
-| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `deploy.yml` (GitHub Pages copy), `ict-apply.yml` + `ict-apply-merge.yml` (applied ICT changes: on for Fred since 10 Nov), research / cache workflows (mostly manual) |
+| `.github/workflows/` | `council.yml` (the loop), `watchdog.yml`, `tests.yml` + `ci.yml` (CI), `cloudflare-deploy.yml` (the site), `ict-apply.yml` + `ict-apply-merge.yml` (applied ICT changes: on for Fred since 10 Nov), research / cache workflows (mostly manual) |
 
 **Build, test, CI**
 ```sh
 sh scripts/build.sh                    # builds out/; commit out/ with every page, asset or study change
-for f in council/*.mjs ict/*.mjs api/*.js api/*.mjs research/edge/*.mjs; do node --check "$f" || break; done
+for f in council/*.mjs ict/*.mjs api/*.js research/edge/*.mjs; do node --check "$f" || break; done
 node --test tests/*.test.mjs tests/*.test.js
 node ict/audit-test.mjs && node council/alerts-test.mjs && node council/proposals-test.mjs
 # page checks (Playwright): serve out/ on $PORT (default 8766), e.g. python3 -m http.server 8766 --directory out, then
 node --use-env-proxy scripts/audit/smoke.cjs && node --use-env-proxy scripts/audit/chronostrade.cjs
 ```
 CI on every PR and push to `main`: `tests.yml` (syntax, unit tests, pinned audits) and `ci.yml` (build matches `out/`, page smoke
-test, ChronosTrade audit). Keep new tests offline. Vercel deploys from `main` only when a served file changes
-(`scripts/vercel-ignore.sh`); GitHub Pages still gets a copy from `deploy.yml` (no API there, so no sign-in).
+test, ChronosTrade audit). Keep new tests offline. The site deploys to Cloudflare with `cloudflare-deploy.yml` (section "Cloudflare
+move"); the GitHub Pages copy (`deploy.yml`) and the Vercel deploy gate were removed on 17 Nov 2026.
 
 **How it runs**: `council.yml` is the loop (GitHub Actions, restarts itself every ~5 h). One round takes **about 11-12 minutes**
 (the members' work, then a 4-minute wait in which the Trader and the mirror run again every minute), so "every 2nd round" is
 ~23 min, "every 3rd" ~35 min (ICT desk, research ledger) and "every 6th" ~70 min (Macro strategist, veteran, COT). Older notes
-below that say "5-minute round" or "~25 min" predate the quick pass. The Vercel crons in `vercel.json` (`/api/run?job=council`
-every 4 min, `job=ict` at :04/:19/:34/:49, `/api/alert-cron` every minute) are the backup runner: the council job stands down
-while Actions saved in the last 10 min, and both only commit when `RUN_MODE` / Edge Config `runMode` says live. With the
-owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `watchdog.yml` pages when the loop stops.
+below that say "5-minute round" or "~25 min" predate the quick pass. The loop is the ONLY council runner: the Vercel backup runner
+(`api/run.js`, its crons and the Edge Config switches) and the never-installed VPS runner (`council/live.mjs`) were removed on 17 Nov
+2026 (section "Simplified"). The Worker's one cron (`*/10`) runs the Blob backup / store mirror, the edge analyst and the trade
+review. `watchdog.yml` pages when the loop stops.
 
 **Sections below, by topic** (each is dated; later sections win where two disagree):
 - Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
   Server-side sign-in, API hardening, Profile photo and name on the server.
-- The Desk page: Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
+- The Desk page: Simplified pages (17 Nov: what was removed and folded), Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
-  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets.
+  and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets,
+  Trade review (17 Nov: the after-the-fact edge check and its optional language-model reviewer).
 - cTrader demo: cTrader demo mirror, Mirror stop safety, cTrader demo accounts on the profile, cTrader symbol specs.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
   Fred applies ICT changes (on for Fred since 10 Nov).
@@ -78,7 +79,7 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
   The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
-- Running and reliability: Vercel (stage 1 + Pro features), Council live runner, Council quick pass, One feed per market (12 Nov), Reliability: tests and data
+- Running and reliability: Simplified (17 Nov 2026: what was removed), Vercel (stage 1 + Pro features; history), Council live runner (removed), Council quick pass, One feed per market (12 Nov), Reliability: tests and data
   health, Loop watchdog, Council data files health, council-data sync and safe writes, Daily owner digest, Research ledger,
   Browser audits (false failures traced to their causes).
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
@@ -87,22 +88,152 @@ owner's VPS runner (`council/live.mjs`) alive, it owns the Trader and mirror. `w
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-53 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-59 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
 `cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
 build time (`src/routes.mjs`), the api/ handlers UNCHANGED through a Node-style adapter (`src/adapter.mjs`: Vercel's
-req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), crons alert-cron and
-edge-analyst. Stages, secrets list and what is still to port: `docs/cloudflare.md`. **Live since 16 Nov 2026** at
+req / res, body parsing by content type, streaming, `x-real-ip` from `cf-connecting-ip` only), one cron (`*/10`: edge analyst,
+trade review, backup, store mirror; the minute price-alert cron went on 17 Nov 2026). Stages, secrets list and what is still to port: `docs/cloudflare.md`. **Live since 16 Nov 2026** at
 https://aureumdesk.co.uk (+ www; the site's domain since 16 Nov 2026, a Cloudflare zone with the Worker as its custom domain) and
 https://meridianx.meridianx-cloudflare.workers.dev (the Vercel project is gone; meridianx.dev is no longer used),
 deployed by `.github/workflows/cloudflare-deploy.yml` (by hand from main; on push only for the two Cloudflare branches).
 The council, `daily-cache.yml` and `macro-gold.yml` read candles from the Worker (`MD_BASE`, repository variable
 `MD_ORIGIN` overrides). Links, the bridges' default URL, the digest and the connectors' origin lists name aureumdesk.co.uk.
-A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily). Keep api/ handlers in Vercel's (req, res) shape so
+A copy of the Vercel Blob store is kept in KV `meridianx-blob-backup` (`cloudflare/src/backup.mjs`, 10-min cron, then daily).
+**File store on D1** (17 Nov 2026, `docs/cloudflare.md` "File store on D1"): `@vercel/blob` is aliased to
+`cloudflare/src/store-blob.mjs` (real package: `vercel-blob-real`); with the Worker secret `STORE=d1` every Blob call of the
+unchanged api/ handlers goes to D1 `aureum-data` (`STORE_DB`, `src/store-d1.mjs`; store URLs on `d1.store.invalid` answered
+from D1 by a wrapped `fetch`), otherwise to Vercel (the default). `src/store-mirror.mjs` keeps D1 a copy of Vercel (10-min
+cron) and, once switched, makes one final pass that never overwrites a write made here. D1 mode fails closed until a complete
+copy is recorded; a file the site wrote in D1 mode is never touched by the mirror. Never import `@vercel/blob` in
+`cloudflare/src` for the real store: use `vercel-blob-real`. Tests: `tests/cloudflare-store.test.mjs`. Keep api/ handlers in Vercel's (req, res) shape so
 both hosts run them; a new function needs its import in `cloudflare/src/worker.mjs` (`tests/cloudflare-worker.test.mjs`
-fails otherwise). `api/run.js` is retired there (child process, files); Academy, bridge downloads and the preview image are
-stage 3; the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
+fails otherwise). `/api/og` redirects to the static card `/icons/og-card.png` (17 Nov 2026; `api/run.js` and `api/og.mjs` are gone);
+the connector's syntax check falls back to acorn where no child process can start (16 Nov 2026). Never put a secret in `wrangler.jsonc`.
+**Bundled files (16 Nov 2026)**: what `api/academy.js` (per edge `academy/data/` cand / out / feat, calendar, research, eval,
+`ml/models/index.json`; the registry `academy/edges.mjs` as code) and `api/bridge.js` (the two EA sources) read from disk on Node
+ship inside the Worker as text modules (`cloudflare/src/bundled.mjs`, wrangler.jsonc `rules`), handed over through `useData` /
+`useFiles` (Node and Vercel never call them), each file parsed on its first request (`src/academy-data.mjs`). The API's rules
+are unchanged (outcomes only after an attempt, the exam pool apart); nothing of `academy/archive/` is bundled. A file the Academy
+starts to read must be added to bundled.mjs (`tests/cloudflare-bundle.test.mjs` fails otherwise); regenerated data reaches the
+Worker with its next deploy. Upload 1,471 KiB (340 gzip) before, 4,022 KiB (671 gzip) after. Never set `ACADEMY_STORE_DIR` on the
+Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `routes` (`custom_domain`), workers.dev stays
+on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
+from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
+
+## Sign-up, email verification and password reset (17 Nov 2026, owner: 'do 2')
+People create their own account, confirm their email by a link, and the owner approves them; a member with an email can reset a
+forgotten password by email. `api/signup.js` (one endpoint, Vercel's (req, res) shape, routed in `cloudflare/src/worker.mjs`):
+- `POST { name, email, password }`: same-origin; per IP 5 an hour (`api/_guard.js` `hit`) on top of the shared password-guess
+  limit; name 1-24, email shape and <= 254, password >= 10. **A password picks the account**, so one already used by the owner, a
+  member or another request is refused with the neutral "Choose another password." and that refusal counts as a failed password
+  check (`G.failed`: it would otherwise test passwords). The answer is the SAME for a new, a pending, a confirmed and a member's
+  email (one link per email per 10 minutes). Pending record in the private store `signups/pending.json` (`{ id, name, email
+  lowercased, hash: sha256(password), tokenHash, at, exp 24 h, verified }`, at most 200; written in place, so read with
+  `?cache=0`). Token = 32 random bytes; only its sha256 is stored. Link `<origin>/api/signup?verify=<token>` (origin = the request's
+  host when it is aureumdesk.co.uk / www / the workers.dev host / localhost, else aureumdesk.co.uk).
+- `GET ?verify=`: once, within 24 h -> 302 `/market-structure.html?signup=verified` (else `?signup=expired`); the owner gets an
+  email naming the person (to `OWNER_EMAIL`, else `GMAIL_USER`). The desk's bell has no owner-only items, so nothing goes there.
+- Owner session only: `GET ?list=1` (confirmed requests: name, email, times; no hashes), `POST { approve: id, role }` (adds the
+  account to the stored user list exactly as the Users page saves it: `users.js` `clean` + `saveList`, key from the name, made
+  unique, record `{ name, role, hash, email }`; the person gets "Your seat … is ready"), `POST { refuse: id }`.
+- `POST { forgot: email }`: ALWAYS the same answer; a member whose stored record has that email gets `/market-structure.html#reset=<token>`
+  (1 h, once; `signups/resets.json`, hash only). `POST { reset, password }`: the new hash goes on the stored record (the session
+  fingerprint changes, so every old session ends); a bad token counts as a failed password check. Members made by the owner have
+  no email (reset by the owner as before).
+- **The email stays on the server**: kept on the stored record (`users.js` `clean` keeps it, `withHashes` keeps the stored one
+  when the Users page saves without it), never in `publicRecord`, `/api/me`, `/api/users` (not even the owner's), `/cdata`, the
+  guest cut or a log line; only the owner's approval list shows it.
+- **Mail senders** (`mailer`), in order: (1) the Worker's Cloudflare Email Service binding `env.EMAIL` (`send_email`, handed in per
+  request by `signup.useMail`), from `MAIL_FROM` (default desk@aureumdesk.co.uk); (2) Gmail SMTP, `api/_smtp.js` (pure: takes the
+  socket function; the Worker hands in `cloudflare:sockets` `connect` through `signup.useSmtp`; smtp.gmail.com:465 implicit TLS,
+  EHLO, AUTH PLAIN, dot-stuffing, CR/LF stripped from every header value, one plain address only), secrets `GMAIL_USER` /
+  `GMAIL_APP_PASSWORD`; with both, a binding that throws is followed by one Gmail try. Neither: 503 "Sign-ups are not open yet."
+  (and "Password reset by email is not open yet."); `GET /api/signup` answers `{ open }` for the page. **The binding line is not in
+  `wrangler.jsonc` yet** (docs/cloudflare.md says which line, after the domain is onboarded). Never import `cloudflare:` from `api/`.
+- Page: the sign-in card has "Create an account" / "Forgot password?" (`.gate-links`, quiet centred, 44 px, AA on the dark card)
+  and three panels that take the card's place (`.gate-card[data-panel]`, `#ms-gp-su` / `-fg` / `-rs`, script `#ms-su-js` under the
+  card); `?signup=` shows a line on the card (`#ms-gate-ban`), `#reset=` opens the new-password panel and is cleaned from the
+  address at once (also on a hash change). Nothing typed there is stored in the browser. Users page: "Waiting for your approval"
+  (`#ms-u-wait-card`, `renderSignups`) with a role and Approve / Refuse, failures in words.
+- Not checked live: neither sender has sent a real email from the build sandbox (no network to Gmail or Cloudflare); the
+  binding's call shape (`send({ from: { email, name }, to, subject, text, html })`) is from Cloudflare's docs as summarised by a
+  web search, the docs site itself was not reachable. Tests: `tests/signup.test.mjs` (fake store, clock, binding, SMTP socket).
+
+## Simplified (17 Nov 2026, owner: "All")
+The owner approved removing what the site no longer uses or never used. Backend and plumbing (the pages' own calls and markup were
+a separate change). No trading rule, stop, stop guard, demo-only lock or ICT file changed. Older sections below still describe these
+parts as they were; this section wins.
+- **Hosting leftovers**: `netlify.toml`, `_redirects` (an early Netlify version), `.github/workflows/deploy.yml` (the GitHub Pages
+  copy), `scripts/vercel-ignore.sh`, and `vercel.json`'s `crons`, `ignoreCommand` and `buildCommand` (the Vercel project is gone since
+  16 Nov). `vercel.json` keeps its rewrites and headers (`cloudflare/src/routes.mjs` reads them) and the `functions` entries the tests
+  read (limits and bundled files of the live handlers).
+- **Backup council runner** `api/run.js` (the Worker answered it 410; GitHub Actions is the only runner) and the **Edge Config flags**
+  `api/_flags.js` (notice bar, run mode, pause). `api/status.js` now answers `{ at, bots: { council, ict } }` (age and `stale` only;
+  no `notice`, `noticeLevel`, `runMode`, `paused` or `lastRun`).
+- **Preview image** `api/og.mjs` and the `@vercel/og` dependency: the Worker redirects `/api/og` to `/icons/og-card.png`.
+- **TradingView**: `api/tv-webhook.js` and `api/pine.js`.
+- **Price alerts (Web Push)**: `api/push.js`, `api/alert-cron.js`, `api/_alerts.js`, the Worker's every-minute cron (`wrangler.jsonc`
+  triggers and `CRONS`: only `*/10` is left), the `web-push` dependency (root and `cloudflare/`), and the service worker's `push` /
+  `notificationclick` handlers. `sw.js` keeps install, the offline page, the asset cache and the kill switch (`tests/pwa.test.mjs`,
+  `scripts/audit/pwa.cjs`). Side effect: the store mirror's first-hour fast final pass after a `STORE=d1` switch ran on the minute
+  cron; it now runs on the 10-minute one (same result, later).
+- **Workflows**: `bars.yml` and `futures-roll-data.yml` removed; `macro-gold.yml` and `macroscore-overlay.yml` dispatch only (both
+  studies are complete); `kraken-backfill.yml` once a day at 01:43 UTC (was every 30 min; the 25-minute box is unchanged, so a coin's
+  Kraken cache catches up over more days).
+- **VPS live runner** `council/live.mjs`, `scripts/live/`, `tests/live.test.mjs` and `livefresh()` in `council.yml`: never installed;
+  the loop now runs the Trader and the mirror on every round and quick pass, exactly as it did with no heartbeat.
+- **LIT paper stream**: owner rule `lit-off` (`config.litShadow = false`, applied after `lit-shadow`) and `council/lit-replay.mjs`
+  (+ its test, its `council.yml` line and the `lit/replay.json` entry in `datahealth.mjs`) removed. No new LIT order is recorded; the
+  LIT block in `trader.mjs` still runs while a LIT record is open or pending (`litLeft`: the day-end hold and the swing break-even),
+  and the loop manages those records to their exits with their stops. `council/lit.mjs` stays (tests and the block import it).
+  `snapshot.lit.on` says whether the stream places orders. Undo: a user rule setting `c.litShadow = true`.
+- **Cleanup (17 Nov 2026, owner: "keep doing some cleanup")**: no code was left that imports a removed file (every export of
+  `api/`, `council/` and `cloudflare/src` still has a caller; `out/` holds nothing the build does not make; both lockfiles are
+  without `web-push` / `@vercel/og`). What went was stale text: `council/README.md` (the ICT desk row named `api/run.js?job=ict`),
+  `council.yml` / `ci.yml` / `cloudflare-deploy.yml` comments (Pages, the Vercel fallback, the pwa audit's push checks, "does not
+  touch the domain"), `api/_oanda.js` (price alerts), `app.webmanifest` description (price alerts), `docs/cloudflare.md` (secrets
+  list without `EDGE_CONFIG` / `VAPID_*` / `TV_WEBHOOK_KEY` / `RUN_MODE`, the superseded R2 / KV storage plan, `/macro`),
+  `MERIDIAN-X.md` and `README.md` (domain, price alerts, removed desks, the backup runner and VPS), the Academy docs
+  (`ACCEPTANCE.md` domain, `PREVIEW.md` marked history, `LLM.md` / `ARCHITECTURE.md` Worker secrets), `MERIDIANX_BUILD_PROGRESS.md`,
+  `api/mcp.js` `serverInfo.websiteUrl` and `academy/gen/clock-check.mjs`'s default candle host (aureumdesk.co.uk), and dated
+  "Status, 17 Nov" lines on `docs/owner-decisions.md` items 5, 6, 12 (ticked: LIT stopped by "All"), 15, 28, 31 and 32.
+  Kept on purpose: the `/macro-dashboard/*` rewrite and its asset headers (old links; three tests pin them), `meridianx.dev` in
+  the connectors' `ORIGINS`, `ict/tracker.mjs` `MD_BARS` (Fred's; the workflows pass `ICT_MD_BARS`), research study code and
+  generated Academy data, and the `GH_DISPATCH_TOKEN` read-token fallback in `api/data.js` / `api/mcp.js`.
+## Simplified pages (17 Nov 2026, owner: "All")
+The page side of the 17 Nov simplification (the backend side, push / alert-cron / tv-webhook / pine / run.js / flags / og, went in
+its own change). Removed from the Desk (`market-structure.html`, 1,843,985 → about 1,582,000 bytes) with their tests:
+- **Vercel Analytics / Speed Insights loader**: gone; `window.msTrack` is a no-op kept for its callers. **The Edge Config notice
+  bar** `#ms-notice`: gone; the "Council bot behind" pill (`#ms-botwarn`, `/api/status`) stays. **Link previews**:
+  `og:image` / `twitter:image` = `https://aureumdesk.co.uk/icons/og-card.png`.
+- **Desks**: the Gold playbook view `#gold` (`renderGold`, `gpDays`) and the Setup card `#ms-pb` (`renderPlaybook`), the LIT
+  desk `#lit` (`renderLit`, `litReplay`, `#ms-lit-css`), the NQ SDV placeholder `#sdv`, and the Crypto desk `#crypto` (the coins
+  stay markets on Charts). The desk switch is **ICT | Mosha**; `VIEWS`, `VIEW_PERM`, the Desks entry's `DESKS`, the simple phone
+  view's `DESKS` list and the palette names follow. The `desks` permission now opens the Mosha desk only.
+- **Council → Macro pane** (`#ms-cp-macro`, `#ms-md-css`, `#ms-md-js`, the Home quick link): the Council's tab bar keeps a plain
+  link `<a class="adm c-nav-link" id="ms-cn-macro" href="/macro-desk">` where the tab was (hidden for `data-deny~="macro"`).
+  The Macro desk page (`macro-desk.html`) is unchanged; `tests/macro-desk.test.mjs` checks the strategist's output only.
+- **Book weights card** `#ms-book` (`#ms-book-css`, `#ms-book-js`): gone; `council/book.mjs` and the digest's line are unchanged.
+  `MS_BOOK_NOW` (the decay script's "between two Coach readings") is not part of it and stays.
+- **Price alerts**: the dialog `#ms-pa`, Settings → Price alerts, the chart bell (and its key, right-click / Alt+click, the
+  position chip's "Alert at entry"), the alert chips `#ms-pa-chips`, the palette entries. **TradingView**: the webhook owner
+  dialog ("TradingView alerts in") and the Pine add-on. The `pa-*` dialog classes stay: the Broker bridge dialog uses them.
+  The Setup page's level bells (`#ms-levels`, in-page notifications) and the header's setup-alert toggle `#ms-alerts` stay.
+- **Journal**: the `#journal` view and its nav entries, the Home tile, the Setup button "Log selected trade" and the browser
+  Trader (`autoTrade`, `jAdd`, `journalTick`, the hidden `#ms-auto` toggle). The council's closed system trades are the Council →
+  Trades tab "Closed" (`data-ct="journal"`, the same `systemClosed()` list). A member's old localStorage `msJournal` is left
+  alone, unused. The `journal` permission key stays in `MS_PERM_KEYS` (stored records keep validating) but gates nothing and is
+  not offered in the permission dialog.
+- **The /macro landing** (`index.html`): deleted; `scripts/build.sh` no longer makes `out/macro/`. `/macro` should rewrite to the
+  Macro desk (`vercel.json`, owned by the backend change).
+Folded: the Council research pane leads with the Edge scoreboard; the edge-decay monitor `#ms-decay` and "What to expect"
+`#ms-expect` sit unchanged in one closed disclosure `<details class="c-dex adm" id="ms-dex">` "Decay and expectations" under it
+(`.c-dex:not([open]) > .c-dex-b { display: none }`; the simple phone view does not fold the cards inside it again; the smoke test
+counts the disclosure as one Research row). The forward card `#ms-fwd` stays the headline of Council → Systems. Home and the
+Council overview were already apart (Home: Today strip, open positions, sections; overview: active trades and the calendar), so
+nothing more was cut there. The sections below about these features are history: their headings say "(removed 17 Nov 2026)".
 
 ## Locked features — do NOT remove or replace in redesigns
 
@@ -335,6 +466,41 @@ the live part shown), then two columns: Setup now (admin) + Open positions (`#h-
 rows open the trade chart) on the left, compact tiles (`.tile-s`) on the right. The bottom tab bar (`.btab`, now with
 Scanner for admin) becomes a fixed left sidebar at ≥1180 px, where the header's top tabs are hidden.
 
+**The graphite look (17 Nov 2026, docs/design/aureum-theme.md; owner rejected the 16 Nov black-and-gold).** The Desk's tokens live in ONE
+place: the first `<style>` block of `market-structure.html` defines `--au-*` (bg, surface, surface-2, well, line, ink-1/2/3, accent,
+primary / on-primary, gain / loss / warn / info, shadow, mark, font, sizes, spacing, radii) for dark (`:root`), light and midnight
+(pro uses dark), and points every older name at them (`--bg`, `--panel`, `--ink*`, `--line*`, `--accent*`, `--buy*`, `--sell*`,
+`--gold*` = the accent, `--au-gold*` = primary / accent, `--sans` / `--mono` = Figtree). The later redefinitions (4 Nov, Design pass
+100, the midnight navy block, pro's oklch tokens, scoped light overrides on Home and the guest page) were removed: never redefine a
+token further down. The frame (mark `.ms-coin` = silver rounded square with "A", wordmark `.wm` AUREUM / DESK in the header below
+1180 px and for guests, in the sidebar and on the sign-in card; flat header with quiet icon buttons; the Desk | Macro | ChronosTrade
+switch without its ring; nav active = surface-2 + a 2 px accent bar; 12 px cards; one neutral primary button; Home without the wash,
+quiet jump links, open positions before the setup and the market cards after the grid at 641 px and up) is `<style id="ms-shell-css">`,
+the LAST style block, so it wins over the older passes; it never mentions the simple phone view. The UI font stays Figtree (Inter is
+not loaded on the Desk). `tests/qa-sweep.test.mjs` `tok()` follows `var()` into the first `:root` block, so the contrast checks
+measure the real colours. Not done: a desktop "what waits on you" line (the phone has `#ps-need`).
+**Design pass (17 Nov 2026, owner: "More improvements on the design"; found on screenshots of every page, dark / light, 1440 / 390 px).**
+Display only. In `#ms-shell-css`: Home's three section tiles showed empty squares (an older rule painted the masked icon in
+`--au-surface-2` on its own `--au-surface-2` square; the glyph is `--au-ink-2` again); the Market pulse cards are flat (the colour
+stays in the trend bars); on phones up to 430 px the header's account button was cut off (17 px at 390, 7 px at 360): tighter
+gaps, nothing hidden. The default portrait is a neutral silver bust with a sans "A" (it was sepia with a serif italic), and the
+Profile card's copy gets its own gradient ids (it drew an empty circle). Setup's trade-card labels are sentence case. Every page's
+favicon is the silver mark (`/assets/aureum-mark.svg`; offline.html inline), not the gold coin. ChronosTrade's Hide sits beside
+the session title on a phone.
+**Simpler Home (17 Nov 2026, owner: "Simpler home page, and improve the design").** From 641 px Home answers first (spec section 4):
+`#hs-home` = the date line (mirrored from `#h-date` / `#h-clock`), ONE sentence as the page's title (`#hs-a`: today's forward paper
+result of the main systems, "before costs", from `window.MS_TODAY` through `MS_PS.answer`; never a replay figure), two columns
+**Open now** (ours first, the shadow trades in their own list "Shadow, followed on paper" with their own count and floating figure,
+never one figure; `MS_PS.openRows` / `rowHTML`) and **Waiting on you** (`.hs-need adm`, hidden for viewers; `MS_PS.needs`, the
+phone's `#ps-need` source), the places (Charts, Council, Desks, Macro desk, ChronosTrade; the Charts / Macro / desks gates kept),
+then ONE closed disclosure "More on the desk" (`#hs-more-t`, toggles `#v-home.hs-open`; not remembered). Everything Home held before
+(setup headline, jump links, Today strip, markets, open positions, setup now, sessions, possible trades, sections, market pulse,
+the phone blocks) is unchanged inside `#hs-more-b`; up to 640 px that wrapper is `display: contents` and `.hs-only` is not drawn,
+so both phone views are the page as they were (390 px: same blocks, numbers and height). CSS `<style id="ms-hs-css">` right before
+`#ms-shell-css` (tokens only, never `data-phone` / `.ps-`); script `#ms-hs-js` after `#ms-ps-js` (fetches nothing, `window.MS_HS`).
+The shell's desktop order rules now read `#v-home .hs-more-b > …`. First screen as the owner at 1440 px: 13 blocks / 64 numbers
+before, 4 / 15 after (1024 px: 11 / 52 → 4 / 15); load CLS about 0.01-0.03. Test: `tests/home-simple.test.mjs`.
+
 ## Users page (6 Nov 2026)
 
 Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (server side, `api/_accounts.js`; their public records
@@ -343,7 +509,8 @@ come from `/api/users`) and the ones added or changed on the page, which live in
 `disabled: true` removes one. A signed-in account is re-checked by `/api/me` after load and signed out if removed or if the
 password changed. Passwords must stay unique per account (the server refuses a duplicate).
 
-## Gold playbook check (6 Nov 2026, owner's skills)
+## Gold playbook check (6 Nov 2026, owner's skills) (removed 17 Nov 2026)
+The view is gone (section "Simplified pages"); the text below is history.
 
 Admin card `#ms-pb` on the Setup view (`renderPlaybook()`, called from `renderHome()`), from the owner's skill collection
 (gold-msnr-playbook §2-5, Mosha S.CODE, Zlankator, MMXM): context tiles (council Weekly structure `goldW1` vs the setup,
@@ -589,7 +756,8 @@ Same day, later (owner, #530; user rule `gold-trend-fast-shadow`, `config.goldTr
 paper shadows (`blockedBy owner-shadow`), still managed by the same loop, never alerted; `council/decay.mjs` lists it `shadow: true`.
 
 
-## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill")
+## Gold playbook view (7 Nov 2026, owner: "make dashboard only for this skill") (removed 17 Nov 2026)
+The view is gone (section "Simplified pages"); the text below is history.
 Admin-only view `#gold` (`#v-gold`, nav "Gold playbook"; hidden for viewers and guests) for the owner's gold-master-playbook skill
 (kept locally only, never in this public repo). It shows the skill's tested edge in my own words: Weekly structure bullish (last
 completed W1 body close above the last 2-bar-fractal swing high) + a New York-close Daily candle closing above the prior day's low
@@ -612,6 +780,17 @@ repository variables `FUT_ACCOUNT` / `FUT_RISK`, default $10,000 / 0.25%; stop /
 prices = spot + the GC−spot basis from the ICT snapshot) and opens that contract's TradingView chart. Limit systems get a
 LIMIT ticket when placed and a cancel when they expire; closes get a CLOSE ticket. Manual workflow "Futures ticket test"
 (`council/futures-test.mjs`) sends one sample ticket. Later option 2: broker API (TradeStation / Tradovate) with TradingView as the screen.
+
+## Working areas in the graphite look (17 Nov 2026, docs/design/aureum-theme.md)
+Charts (`#v-charts`), the Council workspace (`#v-council`) and the trade dialog (`#ms-tv`). Display only. `<style id="ms-wa-css">`
+(between `#ms-hc-css` and `#ms-sz-css`) maps the `--au-` tokens to local `--wa-` names, each falling back to the old variable, and
+re-points the Charts chrome tokens (`--cx-*`): neutral selected state (surface-2 + hairline), active Council tab = surface-2 + 2 px
+accent bar, flat 12 px cards, sans titles weight 650 / 600, sticky Trades table header, 2 px accent focus ring; Style sits beside
+Indicators on the right. No hex in it (only the spec's two shadows). The chart canvas reads `--au-surface` / `--au-ink-3` /
+`--au-line` when defined (`auChart` beside `THEMES`, called from `applyTheme`); candle colours untouched. Bug fixed: the markup
+switch (`setMode` and its click handler) matched every `[data-mk]` button, including the Council calendar's market filter
+(`data-mk="all|xau|nq|pairs"`): the calendar never showed its selected market and a tap on "Gold" there reset the chart markup to
+Meridian; both are now scoped to `.mk-mode`. The veteran discussion's "STRATEGIST" label no longer runs into its text.
 
 ## Home and Council reading pass (11 Nov 2026, quality round)
 Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
@@ -780,6 +959,7 @@ Server-side login landed on 9 Nov (below); broker-order functions are a later st
 - **Web Analytics** (custom events: View {view}, Sign in {result}, Guest, Trade review) and **Speed Insights**, loaded from /_vercel/* only on the Vercel site. Fluid compute, skew protection (12 h) and preview-only deployment protection are on.
 
 ## Macro strategist (7 Nov 2026, owner: a council member for macro, paper only)
+(17 Nov 2026: the Desk's Council → Macro pane described below was removed; the Macro desk page is `macro-desk.html`.)
 `council/macro.mjs`, run by council.yml every 6th round (~70 min; "~25 min" when rounds were shorter; `timeout 180`, a failure never stops the loop). Mixes the
 15-driver stack of `gold-trading.html` (`computeDailyBias`, `dollarSmileRegime`, `refreshFundamentalsX`, ported, not imported)
 with the handbook knowledge encoded there, a VIX/VIX3M term-structure input, and net liquidity / the FOMC calendar as context.
@@ -1024,7 +1204,8 @@ daily-candle cache with the run's closed OANDA days for the DXY / gold; the Gold
 (`stale`) and is withheld past 28. `injectSection` drops a lone block marker. Tests: `tests/datasync.test.mjs` (local git
 repos), `tests/jsonio.test.mjs`, `tests/macro-reliability.test.mjs`, `tests/macroscore-stale.test.mjs`, `tests/analyst-report.test.mjs`.
 
-## Book weights, paper comparison (8 Nov 2026; portfolio-v2 proposal, owner undecided)
+## Book weights, paper comparison (8 Nov 2026; portfolio-v2 proposal, owner undecided) (removed 17 Nov 2026)
+The card is gone (section "Simplified pages"); council/book.mjs and the digest line stay.
 `council/book.mjs` (pure; tests `tests/book.test.mjs`): from the forward paper records (trades.json live + NQ open-run paper via
 `alertable`, after costs; ICT A-setups from ict/trades.json with ict/replay.json filling the days the forward tracker has no record
 of, replay copies dropped by id) it computes, day by day since `BK.from` (4 Nov, the legacy engine's retirement), the R of (a) the
@@ -1191,7 +1372,22 @@ labelled "for study only": `loose-limit` (MX re-anchors, no quality filters, R:R
 `market-break` (market on the close after the M5 break); `buildStudy` / `simulateStudy`; each reports every fill and the gated trades.
 First run: loose-limit 19 fills +3.7R (gated 14, +5.2R), market-break 9 fills −1.0R. Tests: `tests/lit-replay.test.mjs`.
 
-## LIT and NQ SDV desks (8 Nov 2026)
+## Desks in graphite (17 Nov 2026, owner: "do another one with other colors like grey"; spec docs/design/aureum-theme.md)
+Display only, `market-structure.html`: the ICT, Gold playbook, LIT, Crypto and NQ SDV desks, the desk switch, Setup and Scanner.
+One block `<style id="ms-dk-css">` (right before `#ms-ps-css`; every text 12 px or more, so the ICT typography test still holds):
+inside these views `--gold` / `--gold-soft` / `--gold-line` / `--gold-ink` and the ICT desk's `--ict-*` tokens point at the
+steel-blue accent (`--au-accent`, fallback #9db4d3 dark, #2f5e9e light), so every former gold mark turns blue without touching
+the rule that draws it; cards flat with 12 px corners; selected segments are a raised neutral with a 2 px accent underline (the
+ICT source switch was a gold fill); the desk switch is one look on every desk (each desk had its own colour). Header pattern:
+title, ONE plain sentence (`.dk-ans`), the long description folded in `details.dk-more` (wording kept word for word). ICT:
+`#ict-ans` ("n live trades open now. Latest signal: …", written by `render()` from `OL` and `T`), and the Signals card
+(`#ict-sig`) now comes right after "Open now", before the markets strip. Also fixed: LIT / NQ SDV title tags styled, Crypto
+READY green and IN ORIGIN amber (as Setup / Scanner), the LIT replay card escaped its strings twice ("&#39;"; the parse already
+escapes them), its setups table scrolls under a sticky header, the Gold playbook's cards say "could not be loaded" when no
+candles came (`.gp-fail`), and the Council calendar's today cell lost its gold outline (`#v-council .cal-d.today`).
+
+## LIT and NQ SDV desks (8 Nov 2026) (removed 17 Nov 2026)
+The view is gone (section "Simplified pages"); the text below is history.
 The desk switch is ICT | Gold | Crypto | LIT | NQ SDV (soon). `#lit` (v-lit, `renderLit`, re-run when council-data lands) shows the paper
 shadow stream: record from trades with `k 'lit'` / ids `xau-lit-*`, the detector funnel and dropped-candidate counts from `snapshot.lit`,
 open / resting and closed tables. `#sdv` (v-sdv) is a placeholder that states the steps before a desk opens (pre-registration, 2020→now
@@ -1869,6 +2065,371 @@ order, stop or account code touched).
   block; the table's box), `tests/backtest.test.mjs` (the phone block's new heading). Audit: section 35 (768 x 1024 and
   1024 x 1366 touch, a 600 px mouse, the day table at 360 / 390 Full / 430): 247 checks.
 
+Graphite look (16-17 Nov 2026, owner: a different, simpler look; spec `docs/design/aureum-theme.md`; display only, no engine,
+order, stop, account or replay code touched). The `--au-*` tokens for dark (default), light and midnight are the first rules of
+the sheet and the page's older names (`--bg`, `--panel`, `--ink*`, `--accent`, `--buy` / `--sell`, the `--c-*` chart tokens,
+`--c-text` new, read by `readTheme` as the chart's text colour) point at them; candle colours are unchanged. Component rules
+sit in one "Graphite look" block right before the simple view's block (never `data-phone` or `.ps-` in it: a test). Buy / Sell
+fills are fixed `--fill-buy` / `--fill-sell` (white at 5.9 / 6.5:1 in every theme; the dark tokens are for text). The header
+is the wordmark (silver mark `.brand i.ms-coin`, AUREUM DESK, then ChronosTrade); the session card is the page header; the
+strip keeps "n% replayed" only (equity is the Account card's headline, its change since start is in `#acc-sub`, the time is
+the toolbar's); the Trade card reads Sell | Buy like the quick bar; before a load the chart shows `#ch-empty` and the quick bar
+is hidden (`.chartc.nodata`). The audit pins the body colours of the themes: dark rgb(18, 19, 21), midnight rgb(11, 12, 14).
+Two audit checks failed from 16 Nov on dates near a weekend, the page was right: the gold quick start (now - 30 days) began on
+Saturday, so the moment was Friday's 21:00 close and a 4h switch moves it to the end of that complete candle (no price in
+between); and on a Friday's day candle (ends 24:00) a lower pane's last candle ends at the 22:00 close. Both checks now accept
+that only when candles fetched apart from the page prove no price lies between (`shut`, `lowerOk`).
+
+Trade coach (17 Nov 2026, owner: "Work on the ChronosTrade so while I backtest he understands what I'm doing"; then "the coach
+must also read the drawings I make"). Deterministic, in the browser, no API call; display and record only: it never places,
+changes or refuses an order and never moves a stop (a test reads its page helpers for any order call or `.stop =`).
+- **Context at entry** `BT.coachCtx(bars, sec, T, o, prior)` (pure, `assets/backtest-engine.js`): only candles that ENDED by the
+  moment T (`closedBy`: time + sec <= T; a forming candle is never read). Instant Buy / Sell and a confirmed market draft use
+  `mom()`; a resting order that fills uses the start of the candle it filled in (`openedAt`). Stored on the position as `ctx`
+  (closes and partial closes copy it; export / import carry it as part of the account): side, session (= `bySession`), ATR 14
+  (the page's `atr`), stop in ATR (from the OPENING stop, `r0`), planned R:R, trend = EMA 20 vs 50 + EMA 20's 5-bar slope on the
+  main timeframe and on H4, else H1, built from closed candles (`bucketBars`, 55 buckets needed, else the main timeframe is
+  named), with / against / flat; yesterday's UTC range (position, distance to the high / low in ATR); a close through the last
+  swing (3 bars a side) within 5 bars (`swingBreak`), with / against; the previous closed trade (result, run, minutes;
+  `revenge` = a loss within `COACH.revengeMin` 30 min); risk set (%) and risked (%).
+- **Drawings** `BT.coachDraw(draw, T, o, atr)`: new drawings carry `at: mom()` (the moment drawn); one with `at > T` is ignored,
+  one without a stamp (older sessions, the Mosha hand-over) counts as drawn earlier. Price lines, box edges and a trend line's
+  value at the entry time (`lineAt`: the straight line through its two [time, price] points, extended, no pixels) are levels:
+  the nearest (ATR, above / below), "at your level" within `AT_LEVEL` 0.5 ATR, inside a box, the protecting level (at the entry
+  or on its losing side) and whether the stop is beyond it, the next level ahead and whether the target is before it, the trend
+  line's side and whether the trade respects it. Moving or adding a drawing later never rewrites a stored `ctx`.
+- **The sentence** `BT.coachSentence(ctx)`: "Selling in Asia, against the 15m uptrend, 1 ATR stop, 2R target, 1.3 ATR over
+  yesterday's low, 2 bars after a break up through the last swing high; selling at your drawn level 4,174.78 (0 ATR away), stop
+  1 ATR above it." Shown on the draft readout (`#dchip .dsay`, cached by `draftSay`), under each journal row's levels
+  (`small.say`; "No context recorded for this trade." otherwise), in the review dialog, and in the session report ("What the coach
+  saw", last 40 trades, + the copy text). An older session's trades get their context once on resume when the loaded candles
+  reach 60 bars before the entry (`coachBackfill`, marked `late`, "worked out after the trade from the same candles").
+- **Behaviour** `BT.coachStop(p)` (called after a stop is dragged, typed or set to break-even; records only) keeps `stopAway`
+  (the widest the risk ever grew, as a share of `r0`), `beMoved`, `stopLocked`. `BT.coachFlags(t, closed)`: stop moved away
+  ("Moved my stop"), stop to break-even (no mistake), closed by hand in profit under 1R before the target ("Exited early"),
+  opened within 30 min of a loss ("Revenge trade"), risked over 1.1x the risk % set ("Oversized"), entered over 1 ATR from every
+  drawn level ("Against my plan"). They are SUGGESTIONS: the review dialog (`#mist-seen`) lists them and marks the matching
+  boxes "suggested" with a "Tick the suggested mistakes" button; nothing is ticked or saved for the owner. The journal shows
+  "n seen" beside "+ review" until the trade is reviewed.
+- **"How you trade"** card (`#vc-coach`, Statistics, follows the journal filters through `jRecs()`): `BT.coachSplits(records)`
+  splits the closed trades with `ctx` by trend, session, place in yesterday's range, stop size, after a loss, swing break, "Your
+  levels" (at a drawn level / away) and "Stop and your levels" (behind a drawn level / not): n, win rate, mean R, t (mean against
+  zero). A group under `COACH.minN` 20 reads "too few to judge", from 20 "your record, not a tested edge". The lead sentence names
+  the largest difference in mean R (Welch t) only when both sides have 20 or more trades; trades without context are counted
+  apart. Chips pick the split (localStorage `btLab:coachF`); bars from `BTR.hbars` with short labels (`CO_SHORT`). It is a plain
+  half-width `.vc`, so the simple phone view keeps it behind "Show all statistics" like the other cards.
+- Tests: `tests/backtest-coach.test.mjs` (10: no look-ahead by changing every price after the moment, the forming candle, the
+  sentence, the flags, the splits' 20-trade rule, old sessions and JSON, drawings made after the entry, trend lines in time
+  terms, page wiring, 12 px). Audit section 36 (a drawn level, the draft sentence naming it, ctx on every trade, the journal
+  sentence, the dialog ticking nothing, the card's "too few to judge", AA in dark / light / midnight, nothing under 12 px;
+  screenshots `coach-draft.png`, `coach-journal.png`, `coach-card.png`). `window.ctChart()` gained `pxY` (the last price's y,
+  for the audit's drawing) and `coach` (the draft's sentence). Found on the way: two inline scripts of backtest.html share one
+  global scope, so a top-level `const` named like one in another script fails at run time, not at parse (`stop0` exists already).
+
+AI coach (17 Nov 2026, owner: the provider's API "in the edges and in ChronosTrade"). "Ask the coach" in the review dialog
+(`#mistd`, box `#ai-tr`) and in the "How you trade" card (`#ai-ss`) sends one replayed trade, or the session's splits, to
+`api/chronos-coach.js` (pure part `api/_chronos-coach.js`), which asks the shared language-model adapter. Display only: the
+page block between `// ---- AI coach (17 Nov 2026)` and `// ---- end AI coach` reads the account and candles and writes text;
+no order, stop or account code (a test reads it for order calls, `.stop =` and browser storage); answers live in memory for
+the visit. Card label "AI coach · a language model's reading, not a tested edge"; off (no key, `CHRONOS_COACH=off`, no
+storage, or GET failing) = the quiet line "The AI coach is off". Server rules (never trusts the page): POST only from the same
+origin, a signed-in member, every field checked and capped (`buildRequest`: side, a finite OPENING stop on the losing side or
+400, a known timeframe, strings trimmed, `ctx` cut to a fixed depth, flags / tags / mistakes capped); question `trade` = the
+trade, the last 60 candles that ENDED by its entry (120 before 17 Nov 2026, "faster") and, for a closed trade (closedAt by the replay `moment`), the candles from
+entry to exit; an OPEN trade carries no exit or result and no candle that ends after the moment (`cleanBars` drops them);
+question `session` = `BT.coachSplits` output and the last 40 trades' sentence and R, no candles. System prompt: plain English
+(French with `lang: 'fr'`, trading terms in English), every point tied to the given numbers, never a tested edge or a promise,
+under 20 trades too small to judge, never removing or widening a stop. Answer `{ summary, points 1-6 (good|risk|habit|idea),
+question }` checked in code (`parseAnswer` also refuses stop-widening / removing advice and "proven / tested edge",
+"guaranteed" claims). Store `chronos-coach/answers.json` (+ the adapter's `cost.json`, `llm-cache.json`): an answered or
+billed-and-refused question (hash of account + prompt) is answered from it, never paid twice; a budget skip or an unbilled
+error is not stored. Limits: `CHRONOS_COACH_PER_DAY` 20 calls an account a UTC day (memory, per instance), budgets
+`CHRONOS_LLM_DAILY_USD` 0.50 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 100 (30 before the live coach), output cap `CHRONOS_LLM_MAX_TOKENS`
+4000; `CHRONOS_COACH=off` / `CHRONOS_LLM_STOP=1` stop it. Routed on the Worker (`HANDLERS['chronos-coach']`) and in
+vercel.json `functions`. Tests: `tests/chronos-coach.test.mjs`; audit section 37 (the off state with the stubbed API).
+**Faster (17 Nov 2026, owner: "he needs to be faster")**: answers are STREAMED. The adapter's `stream(req, d, onText)`
+(`api/_academy-llm.js`, 'messages' format: `stream: true`, server-sent events; `text_delta` handed over, thinking / signature
+deltas never; input usage from `message_start`, stop reason and output usage from `message_delta`, an `error` event = broke off)
+keeps `complete()`'s rules: the same reservation and correction to reported usage, refusal and output cap (a cut answer is never
+cached), an HTTP error before the stream is not billed; a stream that breaks off or times out after it started keeps its estimate
+as billed (`unconfirmed`) and is never an answer (`partial` holds what came). The 'chat' format makes one ordinary call. The page
+POSTs with `stream: true` and the endpoint answers `text/event-stream` (`data: {"t":"start"}`, `{"t":"text","d":…}` pieces, then
+`{"t":"done", …}` = the CHECKED result; every early answer stays JSON); the Worker adapter (`cloudflare/src/adapter.mjs`, the
+response starts with the first `res.write`) passes it through (test). The trade card shows the summary while the JSON is written.
+`req.cacheSystem` sends the system text as one block with `cache_control` (a text under the provider's minimum cacheable length is
+simply not cached). Prompts are smaller (60 candles before the entry, at most 120 after). The coach's own settings, read by
+`llmEnv` only for this feature: `CHRONOS_LLM_MODEL` (the provider's model id for the coach, else `ACADEMY_LLM_MODEL`),
+`CHRONOS_LLM_BODY` (JSON body fields, else `ACADEMY_LLM_BODY`; on the 'messages' format `output_config.effort: 'low'` is added
+unless one of the two names an effort), `CHRONOS_LLM_USD_PER_MTOK_IN` / `_OUT` / `_CACHE_READ` / `_CACHE_WRITE`. A provider that
+refuses the request (a 4xx, e.g. an effort or model id it does not take) is said in words with the variables to check. Each call
+that reaches the model stores `ms { first, total }` (time to the first text, in all) on its row and `lastMs` in answers.json /
+live.json; GET returns `lastMs`.
+**Live coach (17 Nov 2026, owner: "I want him to be live while I backtest, him watching the screen and trades live")**: a "Live
+coach" toggle under the AI coach line in the Trade card (`#lc-on`, made by the page script; off by default; localStorage
+`btLab:liveCoach`, a display preference, the one storage key of its block; the Trade card is the dock in full screen) shows a docked
+panel `#lc` (`aside.lc`, appended to `.chartc`, over the price pane's lower left, placed from `#chart`'s box since `#panes` is
+`display: contents` with one chart; clear of the quick bar; collapsible; newest first; at most 60 notes in memory for the session
+view). Page block `// ---- Live coach (17 Nov 2026` … `// ---- end Live coach` (after the AI coach's), CSS `/* Live coach (17 Nov
+2026)` … `/* end Live coach */`, phone strip rules in the simple view's block (a one-line strip above the chart and its quick bar,
+`order: -1`, the chart 52 px shorter, a tap opens the list; it starts folded there). DISPLAY ONLY (a test reads the block for order
+calls, `.stop =`, `BT.coachStop`, `save()` and every storage key). A 300 ms watcher compares the account with its last look: (a)
+FREE notes, no API call: an entry (`coachSay`: the trade coach's sentence), a draft that stood still 1.2 s (`draftSay`), a stop
+moved (break-even, away from the entry with the risk growth, profit locked, trailing on; a trailing stop's own moves are not
+noted), a part close, an exit with its R and `BT.coachFlags`, the challenge's state and its daily / max loss buffers under 30 %; a
+new session or an undo re-baselines without notes. (b) AI comments (kind `live`, `trigger` open / close / ask) at an entry, at an
+exit and on "What do you see?": the chart at `mom()` (the last 60 candles that ENDED by it; `livePayload` drops any candle,
+position or trade after the moment again), positions with the OPENING stop (a losing-side stop or 400) and floating R, the draft,
+`BT.coachDraw` against the price, the last 10 closed trades' R / sentence / flags and the splits' lead; 2-4 plain sentences
+streamed into the note (`liveSystem`: calm coach, the trader's own context, at most one question, no forecast as fact, no promise,
+under 20 trades too small); `parseLive` refuses stop removing / widening advice, "proven / tested edge" / "guaranteed" and a
+forecast stated as fact ("price will fall"), and the note becomes "Withdrawn: the answer broke the coach's rules." (stored
+refused in live.json, never asked again). Limits: one live call in flight and one per `CHRONOS_LIVE_GAP_S` 8 s (page and server,
+the page reads it from GET; events in between get their free note only), `CHRONOS_LIVE_PER_DAY` 150 an account a UTC day (its own
+counter, memory, per instance; the adapter's USD budgets stay the hard stop: the panel then says "Coach resting: daily budget
+reached" and keeps the free notes), output cap `CHRONOS_LIVE_MAX_TOKENS` 1500.
+**More live (17 Nov 2026, owner: "the live AI while backtesting needs to be more live")**: market events while the replay plays,
+`BT.liveEvents(bars, sec, T, st, o)` (pure, `assets/backtest-engine.js`; only candles CLOSED by `T`, at most the last 3 since the
+last look, each event once, `t` = its candle's close): a drawn line / ray / box edge / trend line (`lineAt`) closed through (imp 3)
+or touched (2), a close within 0.25R of a position's stop (3) or target (2) (again after 0.5R away), a close through the last swing
+(the coach's swing rule, 3 a side) (2), Asia / London / New York opening (1), a candle over 2x ATR(14) (2), floating R crossing
++1R (3) / -0.5R (2), an order set up and not placed for 5 candles (1). Each is a free one-line note at once (`mk`, `mk hi`). With
+"Comment on market events" (`#lc-talk`, on by default, memory only) the most important one waits as the one pending event
+(replaced by a more important or newer one): it reaches the AI (trigger `event`, `{ kind, text, at }`) when no call is in flight
+and the gap has passed; only importance 2+ at 1x / 2x, 3 from 5x; dropped when it is more than 10 candles before the replay moment
+(the server refuses such an event, or one after the moment, with 400; known kinds only). The panel: newest note on top with a
+150 ms fade (`lc-in`, none under reduced motion), each note's candle time, a still dot and "Watching the replay" while it plays
+(three pulses, never infinite), "n AI comments left today" (`liveLeftToday` from GET, `liveLeft` on each live answer), "typing…"
+until the first words. Docked at the chart's lower right (clear of the drawing tool strip on the left, the quick bar and the price
+scale), its height capped to the chart; on the phone strip the quick bar follows the chart down (`overlay()`). Playback never waits; "Pause the replay while the coach answers" (memory
+only, off) presses the play control and presses it again after. Tests: `tests/llm-stream.test.mjs` (4), `tests/chronos-live.test.mjs`
+(11); audit section 39 (toggle, panel off the quick bar, notes on entry / exit / draft / market events with the AI off, the AI on with
+a stubbed stream and a withdrawn answer, the gap, commentary on a market event, the watching dot, AA in three themes, phone strip).
+
+Coach reads the chart as an edge (17 Nov 2026, owner: "the coach — I can choose the edge and he will view the market as the
+edge"). Display and record only: nothing places, changes or refuses an order or moves a stop. "Read the chart as" (`#ln-edge` in
+the Trade card under the live coach toggle, `#lc-lens` in the live panel, kept in step; localStorage `btLab:lens`, a display
+preference) picks None | Gold trend | Gold daily engulf | Mosha cycle | ICT (iFVG A-setup) | MSNR direction | LIT.
+- **`assets/coach-lens.js`** (`window.CL`, `module.exports`): its GENERATED block is a verbatim copy, written by
+  `node scripts/coach-lens-gen.mjs`, of the rules the council and the desk run (council/fills.mjs `foldWeekend` / `gegFresh` /
+  `spotClosed`, council/engine.mjs `msAnalyze`, council/mosha-cycle.mjs, ict/tracker.mjs `signals` / `isASetup` / `dailyNY` with
+  council/events.mjs's NFP times written out, council/lit.mjs `detect`, research/edge/msnr-direction `calls`); the browser cannot load
+  council/ or ict/. **After a change to any of those files run the generator** (`tests/coach-lens.test.mjs` fails until the copy is
+  byte for byte the source). `CL.read(edge, data, T, { price, sym, dec })` reads ONLY candles closed by the replay moment T and
+  returns `{ state, text, marks, signal, dir, notes, record }`; a signal's stop is always on the losing side or it is dropped. Gold
+  trend and Gold daily engulf use the Trader's own blocks' values (gtrend n 20 / k 2 on the 719 closed raw UTC days; geg on trading
+  days); Mosha cycle the Trader's 719 closed bars a timeframe, N 6; ICT OANDA mid H1 with the 17:00 New York hour dropped and D1 =
+  `dailyNY` (as the desk's lab; gold rule on xau, index rule on nas100 / spx500 / us30 / us2000); MSNR ladder L1 on the last 720 H4;
+  LIT the 4,000 closed M5 of the stream. What a lens adds is said in its text: Gold trend's own position (bought at the next day's
+  open, no intraday re-entry), the engulf zones' fill / fail / expiry (its 3-order cap not counted), LIT's resting order (the stream's
+  daily gates not applied). **Left out on purpose: H4 trendline and NQ open run** (their rules read the Trader's own state inside
+  council/trader.mjs and could not be copied faithfully; no approximation is offered as the edge).
+- **Record line** under each reading, from the studies (test against result.json): Gold trend +0.313R a position (n 74, t 1.20) and
+  the engulf +0.141R (n 256, t 1.46), supported-book untouched 2006-17, not proven; Mosha cycle −0.175R (n 244, t −1.50, FAIL);
+  ICT A-setups −0.013R (n 2,235, t −0.45, ict-oos-2008 FAILS); MSNR 0 of 6 (best t 1.35); LIT INCONCLUSIVE. Then "A reading by this
+  edge's rules, not advice."
+- **Page block** `// ---- coach lens (17 Nov 2026` … `// ---- end coach lens` (before the simple view's block, never in it), CSS
+  `/* coach lens (17 Nov 2026)` … `/* end coach lens */`: candles fetched per edge timeframe for the session's market from `CL.warm`
+  before its first candle (`fetchBars`), a reading every 400 ms when the moment or price moved, the marks on the overlay (`lnDraw`,
+  Layers "Edge lens", `LAY.lens`), `ctx.lens = { edge, name, state, agree: with | against | none, signal }` on every entry and draft
+  (`coachAt`, `draftSay`); the coach's sentence adds "by <edge> rules: …" (engine `lensSay`) and "How you trade" splits "The edge you
+  read with" (`COACH_F` lens, 20-trade rule). A new fact of the reading (a signal, an order, a zone filled or failed, a stage, the
+  rule's stop moving) is a free note in the live panel (kind `lens`). The AI coach's trade, session and live questions carry
+  `lens: { edge, state, signal }`; `api/_chronos-coach.js` `cleanLens` whitelists the edge, caps the state at 200 characters, drops a
+  signal without a stop on the losing side and takes the rules and the record from its OWN table `LENS` (equal to the asset's, a test),
+  and the system text then asks the model to answer as a trader of that edge, never calling it proven beyond its record (every other
+  rule unchanged). `window.ctLens()` is the audit's read-only view (`same`: the reading equals one made from candles cut at the moment).
+- Tests: `tests/coach-lens.test.mjs` (14: the copy, parity with the Trader's lifted gtrend / geg blocks, cycleTrades on the Trader's
+  events, ict signals and the A-setup verdict, LIT `detect` and `litStep`'s order, MSNR `calls`, no look-ahead, stops, records, the
+  server); audit section 41 (each edge on live candles, marks and Layers, draft sentence, ctx.lens, live notes, the AI's lens, AA in
+  three themes, 12 px, 44 px on touch; screenshots `lens-chart.png`, `lens-draft.png`, `lens-live.png`, `lens-card.png`).
+
+Chart right-click menu (17 Nov 2026, owner: "when I press right click … reset chart view, delete all drawings"): `.cmenu`
+(`#cmenu`, between `// ---- chart right-click menu` and `// ---- end chart right-click menu` in backtest.html): Reset chart view
+(price autoscale on, time scale reset, back to the latest candle), Delete this drawing (the one under the pointer is selected first;
+locked ones refused), Remove the last drawing (skips locked), Delete all drawings (styled confirm). With a drawing tool on, a
+right-click cancels the tool. Display only: no order, position or stop is touched. `window.ctMenu()` is the read-only view.
+
+Drawing tools like TradingView (17 Nov 2026, owner: "the backtest drawings need to be like TradingView: the boxes, lines, trend
+line, magnet, resize box and lines"). Display only: a drawing never places, changes or refuses an order and never moves a stop
+(a test reads the page block `// ---- drawing tools like TradingView` for order calls, `.stop =` and `S.acct`).
+- **Tools** (main chart only; split panes never draw): cursor, trend line `t`, horizontal line `h`, horizontal ray `hr`,
+  vertical line `v`, box `r`. In the Draw menu (`#drawdd`, also in More on a phone) and a vertical strip `#dstrip` on the chart's
+  left edge (shown on a chart card over 640 px, over 860 px on touch; the position tags `#ptags` and the draft readout `#dchip`
+  move right by its width, `OG.sw`). Keys: **Alt+T** trend line, **Alt+H** horizontal line, **Alt+J** horizontal ray,
+  **Alt+V** vertical line, **Alt+R** box, **Alt+M** magnet (read from `e.code`, so a Mac's Option letters work); H / T / R alone
+  still pick a tool (T also teaches the Mosha desk for a teacher, as before); Delete / Backspace removes the selected drawing,
+  Esc lets go (or puts back a drag in progress). All listed in Help (`#hk`).
+- **Placing**: click, click, or press and drag (touch: press-drag or tap, tap); one click for h / hr / v. A new shape is selected.
+  The drawing layer takes the press (`dStart`, a capture listener on `#chart`), so the chart does not pan; Shift+drag and the
+  quick bar's drag button still place orders (they are checked first), and a trade's line under the pointer wins over a
+  drawing's body (a selected drawing's handle wins over it).
+- **Magnet** (`btLab:magnet`, per device: off / weak / strong): `BT.drawSnap` puts a point on the open / high / low / close of the
+  REPLAYED candle under it (`barAt`: never past the replay moment), nearest in pixels; weak within 12 px, strong always. It acts
+  when placing, resizing, moving (the first point snaps, the rest moves by the same change) and dragging a horizontal line. With
+  a tool on, a ring shows where the click will land.
+- **Editing**: a click selects (`pickDraw`: the selected one first, then the newest; handles 7 px, 22 px on touch). Handles:
+  a line's ends, a ray's start, a box's four corners (both coordinates) and four edge midpoints (one coordinate); the body moves
+  the whole shape through pixels (`BT.drawMove` with `timeToX` / `xToTime`, so a move keeps its shape across weekend gaps).
+  A horizontal line stays a price line (axis label) and drags as before; its release selects it (`hDone`). Cursors name the
+  action (`#chart[data-dcur]`). Floating bar `#dsel` above the selected drawing: five colours from tokens (`col`: draw / up /
+  dn / gold / ink, read from `CT` per theme), width 1-3 px (`w`), dashed (`ls`), extend right (`ext`, trend line), label (`lbl`,
+  trend line and box: price change, %, bars by `BT.barsBetween`, and the angle on screen; off by default), lock (`lock`: no
+  move, resize or delete until unlocked), clone, delete. 44 px on touch; 12 px text.
+- **Stored shape**: `S.draw` as before, points [time, price]; `BT.drawNorm` checks every shape on resume (old h / t / r and the
+  Mosha hand-over load unchanged; unknown fields and bad values dropped). `at` = the moment drawn, set only for a new shape or a
+  clone; a geometry edit stamps `editedAt` and keeps `at`; the trade coach still reads `at` only (`coachDraw` now also counts a
+  horizontal ray as a level; a vertical line is no level).
+- Pure helpers on `BT`: `drawNorm`, `drawSnap`, `drawGeom`, `drawHit`, `drawResize`, `drawMove`, `barsBetween`, `drawInfo`.
+  `window.ctDraw()` / `window.ctBarAt(t)` are the audit's read-only views. Tests: `tests/backtest-draw.test.mjs`; audit section
+  38 (strip, Alt+M, a box drawn with the magnet strong has both corners on candle O / H / L / C, corner resize, trend-line move,
+  colour and width, Delete, Alt+V / Alt+J, the account untouched, a reload keeps them and loads an old-format drawing;
+  screenshots `draw-strip.png`, `draw-selected.png`, `draw-magnet.png`).
+Split charts move together and share drawings (17 Nov 2026, owner: "on charts all should be synced moving same time and when I
+draw in one should show on the others"). Display only: nothing here places, changes or refuses an order or moves a stop (a test
+reads the block `// ---- split charts move together and share drawings` for order calls, `.stop =` and `S.acct`).
+- **Time sync** (Layout menu `#splitdd` → "Sync charts" `[data-xsync]`, on by default, localStorage `btLab:splitSync` = '0' when
+  off, a display preference). Panning or zooming ANY chart (main or pane) sets every other chart's visible LOGICAL range to the
+  same TIME window: `BT.syncRange` maps a range through each chart's own shown candles (`BT.tfLogical` / `BT.tfTimeAt`: a
+  candle's start at its index, inside a candle in proportion, a weekend at the next candle, before the first / past the last one
+  index a timeframe step, so the right margin stays a margin). No echo loop: only the LEADER's range changes move the others
+  (`xsLead`: the chart a person presses, touches or wheels, while the press lasts and 1.5 s after for the chart's own glide
+  (0.6 s after a wheel), else the first chart); a range just set (`BT.syncEcho`, 400 ms, 0.02 bar) or within 60 ms (`lock`) is
+  not a change either; `XSING` guards re-entry. (A guard on the echo alone let the 5m pane lag the first chart by up to a
+  candle in the browser: the leader rule fixed it.) The replay's own scroll of the first chart carries the panes; a pane's
+  redraw (`xpDraw`) locks itself out for 80 ms and then takes the first chart's window again (`xsFrom(MCX, P.dc)`), so its
+  auto-scroll never drags the others. While the replay plays, a pane follows the first chart (panning a pane then is undone
+  by the next candle). A pane still
+  shows no candle past the moment (sync only moves the view). Lower-timeframe panes now hold 6,000 shown candles (`XSHOW * 12`,
+  was 1,000) and panes allow `minBarSpacing: 0.05`, so a 1m pane can show a 15m chart's whole window. The crosshair sync stays.
+- **Drawings on every pane**: each pane has its own overlay canvas (`.xpov` inside `.xp`) drawn by `xpOvAll()` at the end of
+  `drawOverlay` through the SAME `drawShapes(x, c, W, PH, main)` as the first chart (the old loop moved into it), with that
+  pane's mapping; on a pane a horizontal line is drawn on the canvas with its price pill. `scaleWatch` also keys on each pane's
+  price scale and range (`xpScaleKey`), so a pane's axis drag, zoom or auto-fit redraws it; a pane resize too.
+- **Draw on any pane**: one drawing context per chart (`MCX` for the first chart, `P.dc = xpCx(P)` per pane: `chart`, `series`,
+  `host`, `tX` / `xT` through the pane's candles, `bar` = the magnet candle `BT.closedBarAt`, closed by the moment on that
+  pane's own timeframe, `view`). `DCX` = the chart a gesture is on (`useCx` on a press, `onCx` on a move; a two-click tool
+  started on another chart starts again; nothing switches mid-drag); `paneH`, `Ypx`, `snapP`, `ptAt`, `geo`, `pickDraw`,
+  `locOf`, `hitShape`, `dStart` / `dMove` / `dEnd` take the context. Every tool, Alt+T / H / J / V / R, the magnet, select, move,
+  resize (a pane's horizontal line drags as a shape), Delete, the `#dsel` bar (placed over the chart where the selection was
+  made: `SELC`) and the right-click menu (`CMC`: Reset also fits that pane's price) work on a pane; the result goes into the one
+  `S.draw` (with `at` = the moment), so it shows on every chart at once. Selection and hover are shared across charts; the
+  preview and the magnet ring show on the chart the gesture is on. Orders, drafts, order lines and the edge lens stay on the
+  first chart; `ctDraw().geo` is still the first chart's geometry. Closing a pane ends a gesture or selection made on it (`xpGone`).
+- Pure helpers on `BT`: `tfLogical`, `tfTimeAt`, `syncRange`, `syncEcho`, `closedBarAt`. `ctSplit()` adds `sync`, `range` (the
+  first chart's window in times) and per pane `range`, `draw` (the geometry drawn there) and `host`; `window.ctPaneXY(i, t, p)` =
+  where the chart library puts a time and price on chart i (-1 = the first). Tests: `tests/backtest-split-sync.test.mjs`; audit
+  section 40 (15m + 5m + 1m: windows match, pan main and a pane, wheel zoom, a box and a trend line drawn on the main chart sit on
+  both panes within 1 px of `timeToCoordinate` / `priceToCoordinate`, a pane's price-axis drag, a box drawn on a pane lands in
+  `S.draw` and on the first chart, moved and deleted there, the account untouched, the replay steps on, Sync off and on;
+  screenshots `split-sync-drawings.png`, `split-three-charts.png`). The audit's session is 8 days (a 1m pane refuses over 40,000
+  candles; the 30-day quick start is too long for it). Its Layout note is hidden on a phone's More sheet (`@container cc (max-width:
+  640px)`), so the menu with Sync still opens on the screen at 360-430 px. Run with `MD_ORIGIN=https://aureumdesk.co.uk` while the
+  workers.dev origin answers "OANDA_TOKEN not set" (17 Nov 2026).
+
+## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
+Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =
+rename), then the account as a list (`.pf-box.pf-list`, rows `.pf-row`: round icon, title, one line, chevron or switch): Demo
+accounts (`data-pf-go` scrolls to the card, opening its fold on the phone's simple view), Change photo / Display name (ids
+`ms-pf-photo` / `ms-pf-rename`, hidden when the menu has none), Light theme (`#ms-pf-theme`, `role="switch"`), Log out; "More"
+(`#ms-pf-more`): notification / sounds / connector rows follow their card's `hidden` (`pfSync`, MutationObserver), Academy only where
+the account menu shows `#ms-me-academy`. From 901 px the list column is sticky on the left and every section card in the right
+column. The hero and lists are not `.card`, so the simple view still keeps the first card (Demo accounts) and folds the rest.
+
+Coach for results (17 Nov 2026, owner: "do more critical and useful for productivity and results improvements for the coach").
+Display and record only: nothing here places, changes or refuses an order and nothing moves a stop. Page block `// ---- Coach for
+results (17 Nov 2026` … `// ---- end Coach for results` (after the live coach's; its state is `CFR`: `CR` is the drawing tools'
+name), CSS `/* Coach for results (17 Nov 2026)` … `/* end Coach for results */` (outside the simple view's block). Pure helpers on
+`BT`, tested in `tests/backtest-coach-leaks.test.mjs`.
+- **One record across sessions**: `BT.gatherSessions(sessions, { current })` reads every saved session of `btLab:sessions` (read
+  only; the live account replaces its saved copy), merges partial closes inside their own session, labels each trade with its
+  market and timeframe (`sess.label`) and gives it the id `<session>#<id>`, so two sessions' trade #1 stay two trades. A scope
+  switch "This session | All my sessions" (`.cr-sc`, localStorage `btLab:coachScope`) on "How you trade" and on the leak card; the
+  journal filters still apply (`crPass` = jList's tests); the session question to the AI carries `scope`, `sessions` and each
+  trade's `market` (`api/_chronos-coach.js` caps them). Never merges accounts.
+- **Where your R goes** (card `#lk`, top of Statistics, `BT.coachLeaks(trades, barsFor)`): one row per habit (stop moved away,
+  exited early, closed by hand, stopped out after +1R, revenge within a session, oversized, against the trend, away from your
+  levels, outside your best session) with n, sum R, mean R and the R given up (`lost`), sorted by it, and one headline sentence.
+  Exits by hand get a COUNTERFACTUAL (`BT.exitCf`): candles AFTER the exit only (`time > closedAt`, each ended by the replay
+  moment), to the stop and target the trade OPENED with (`ctx.tgt0`, else the target; stop first when one candle holds both, a
+  gap at the open); never a candle at or before the exit (a test rewrites them). Only the live session's candles are held: other
+  sessions' exits are "not measured", never guessed. "Break-even at +1R" (trades that reached +1R and closed at a loss) and the
+  winners' capture of their best move read the recorded MFE (approximate, said so). Under 20 trades a row is "too few to judge",
+  else "your record, not a tested edge".
+- **Patterns**: `coachSplits` now also returns every comparison (`diffs`); `BT.coachPatterns` keeps those with 20+ trades on BOTH
+  sides and Welch |t| >= 2 (always over all sessions), `BT.patternMatch(pats, ctx)` the costly ones a context matches. A matching
+  draft gets an amber line in the draft readout (`.dwarn`, from `draftSay`'s context `CSC`), a new position or a draft a note on
+  the live panel ("Your pattern"). A warning only: it never refuses or changes an order. The leak card lists the patterns.
+- **Session plan and tilt guard** (Trade card `details#pl`, localStorage `btLab:plan`, `BT.planNorm` / `BT.planCheck`): max trades a
+  day, max daily loss in R, stop after n losses in a row today (the replay's UTC day), a focus rule, "Ask me before trading past my
+  plan", "Ask a grade (A / B / C) on each entry". Past a limit a banner (`#pl-ban`) and, only when the owner ticked "Ask me", a
+  styled confirm (`msConfirm`, "Trade anyway") before an order: `crGate(go)` is called by `instant()` and the draft's Confirm,
+  each handing in its own step, which runs unchanged when the owner says go on (the stop is never touched). The grade: chips in the
+  draft readout (`D.grade`) and in the Trade card for the next one-click entry (`#pl-grade`), stored as `rec.grade` and `ctx.grade`;
+  "Your grade" is a split of "How you trade" and of the debrief.
+- **Debrief** (`#debd`, "End session debrief" on the leak card and "Debrief" on the score line; offered there when the replay
+  reaches the session's end or on a pause after 5 or more trades): the free part `BT.coachDebrief` (totals, plan adherence
+  `BT.planAdherence`, the top 3 leaks, best and worst trade, results by grade, a focus rule from the top leak). AI on: kind
+  `debrief` (`api/_chronos-coach.js` `debriefPayload`, no candles, every field capped; answer `{ summary, leaks 1-3, focus, drill }`
+  checked by `parseDebrief` with the same stop and claim rules; its own daily count `CHRONOS_DEBRIEF_PER_DAY` 5, `debrief|<account>`,
+  stored in answers.json), streamed. The debrief lives in memory, goes into the session report ("Session debrief") and the JSON
+  export (`debrief`); its focus rule (the AI's, or "Use this focus") is kept as `plan.nextFocus` and becomes the focus of the next
+  new session that has no trade yet.
+- **Productivity**: **A** = the last closed trade's review dialog (`openMist`, now a function) and, AI on, "Ask the coach" on it;
+  **Shift+A** = the live coach on and "What do you see?" (outside fields and open dialogs; no other A key on the page). The score
+  line `#co-score` in the Trade card: today's trades, R, plan kept / broken, the top leak. `window.ctCoach()` is the audit's
+  read-only view. Audit section 40 (seeded saved sessions; screenshots `coach2-leak.png`, `coach2-pattern-draft.png`,
+  `coach2-plan-banner.png`, `coach2-plan-confirm.png`, `coach2-debrief.png`, `coach2-debrief-ai.png`).
+
+## Phone sign-in like the owner's Figma example (17 Nov 2026, owner: "and the login as well, only for the phone")
+Display only, up to 640 px, one block at the end of `#ms-shell-css`: the gate card is the screen (no frame), the mark centred,
+title and one line, the password with its eye, "Continue as guest" and the invitation as quiet centred text, a full-width pill
+Sign in at the bottom of the first screen (`.gate-card` flex column, its `form` `display: contents` so the button can sit last;
+submitting unchanged), the live strip and proof under it. A device where someone was signed in keeps `localStorage ms-was-in`
+(no name, no account) and its phone title reads "Welcome back". Wider screens unchanged; the laptop version is a mockup only.
+
+## Face ID / fingerprint sign-in with passkeys (17 Nov 2026, owner)
+Owner: "Face ID or fingerprint login", like the Face ID button of the Figma login. WebAuthn passkeys; the password stays the
+primary way in. No npm dependency: `api/_passkey.js` (pure) reads CBOR, COSE keys (ES256 P-256 and RS256 only), authenticator data
+and DER signatures (to raw r || s) and verifies with WebCrypto `crypto.subtle`; `api/passkey.js` is the endpoint (Worker route in
+`cloudflare/src/worker.mjs`, `vercel.json` `functions`).
+- **Ops** (every POST refuses a foreign Origin): `reg-options` / `register` / `rename` / `remove` and GET (list) need the session
+  cookie; `login-options` / `login` do not. Options ask for a discoverable credential (`residentKey: 'required'`) and
+  `userVerification: 'required'`, attestation `'none'` (not verified; the key comes from the authenticator data). Checked: client
+  data type, challenge, origin (the request's own `https://<host>`, or `http://localhost:<port>`), `crossOrigin` not true, RP ID
+  hash, UP and UV flags, the signature over authData || SHA-256(clientDataJSON), the sign counter (a counter that does not grow is
+  refused once either side is non-zero; synced passkeys that stay 0 pass), the user handle when sent.
+- **RP ID** (`rpFor`): `aureumdesk.co.uk` for both aureumdesk.co.uk and www (one passkey serves both); the workers.dev host and
+  `localhost` as themselves; env `PASSKEY_HOSTS` adds hosts; any other host gets 400 (no passkey on an unknown address).
+- **Challenges** are stateless: HMAC-signed with a key derived from the session key (`S.secret`), bound to the operation, the RP ID
+  and (registration) the account, 5 minutes; a used nonce is kept in the store until it expires, so a challenge works once.
+- **Sign-in issues the same session as `/api/login`** (`S.issue`, `S.setCookie`, answer `{ account }`; a test compares the two).
+  The account is re-read from the user list (removed / disabled: refused; list unreadable: 503, fails closed). Each passkey keeps
+  `fp` = the session's keyed fingerprint of the password hash it was made under (`S.fingerprint`): **a password change ends every
+  passkey of that account**, as it ends sessions (code `password-changed`, the page says to turn it on again). Failed sign-ins count
+  in `api/_guard.js` with failed passwords (429 after 10 from one address). The owner may use a passkey too.
+- **Store**: one private file `passkeys/all.json` (`{ creds: { <credential id>: { u, alg, pub (JWK), counter, fp, name, at,
+  used } }, seen }`; public keys only, no hash), overwritten in place and read with `cache=0` (the freshness rule; listed in
+  `tests/blob-fresh.test.mjs`), one write at a time per instance. At most 10 passkeys a member, 2,000 in all. Device name from the
+  User-Agent (iPhone, Mac, Android phone…), renamable.
+- **Page** (`market-structure.html`, one self-contained block right after the sign-in card: `<style id="ms-pk-css">` +
+  `<script id="ms-pk-js">`; `window.MS_PK`): the button `#ms-gate-pk` / `#ms-gate-pkb` "Use Face ID or fingerprint" (face-scan glyph)
+  sits in the form after Sign in, shown whenever WebAuthn exists on a secure page with the API; on the phone (<= 640 px) it is
+  icon-over-label, centred under the password (`order: 5`, above the bottom Sign in pill); wider, a secondary button under Sign in.
+  The password field has `autocomplete="current-password webauthn"` and the script starts conditional mediation, so a passkey is
+  also offered in the field's own suggestion list. Success = the password form's path (store `ms-acct`, reload). Errors in words in
+  `#ms-gate-err` (cancelled or no passkey here -> "Sign in with your password, then turn on Face ID in your Profile"; removed;
+  password changed; 429; offline). Profile: switch row `#ms-pf-pkrow` ("On for this device" / "Off") in the account list, a More row
+  `data-pf-go="ms-pf-pk"` and the card `#ms-pf-pk` (devices with Rename / Remove, "Turn on for this device"); hidden for guests
+  and where WebAuthn is missing. After a password sign-in (a `sessionStorage ms-pk-pw` flag set on submit) on a device with a
+  platform authenticator and no passkey here, `#ms-pk-offer` asks once per account and device ("Turn on Face ID for next time?",
+  `ms-pk-asked-<u>`). Browser storage holds only public ids and flags: `ms-pk-<u>` = this device's credential id.
+- Tests: `tests/passkey.test.mjs` (12: a software authenticator built with WebCrypto, real CBOR attestation objects and DER
+  signatures, P-256 and RSA; refusals for origin, RP ID, challenge (foreign, other account, expired, reused), UV, signature,
+  counter, user handle, removed / disabled / password-changed accounts, unreadable list, own-only rename / remove, the 10 limit,
+  the rate limit; a CBOR unit test). Checked end to end in Chromium with a CDP virtual authenticator (register from the offer,
+  Profile switch, sign-in through the suggestion list and through the button, `/api/me` after, remove, refusal after removal).
+  Not checked: real Face ID / Touch ID / Android hardware, Safari and iCloud-synced passkeys, the live Worker and Blob store.
+
 ## Profile photo and name on the server (8 Nov 2026, owner: "the profile photo gets back to default")
 They lived only in localStorage (`ms-photo-<name>`, `ms-name-<name>`), which Safari and the home-screen app keep separately, other
 devices never see, and Safari wipes after about a week without a visit. `api/profile.js` stores them per account in the private
@@ -2077,6 +2638,7 @@ week's first version is kept; `freezeHypotheses` shows the recorded one with the
 macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. Paper only.
 
 ## Side pages: /macro, /veteran/, Edge lab, gold terminal (9 Nov 2026, owner: "keep improving", "more visual, and simpler")
+(17 Nov 2026: the /macro landing page, `index.html`, was removed; its bullet below is history.)
 - Shared look: `assets/mx-page.css` (the desk's tokens per theme, top bar, Desk | Macro | ChronosTrade switch `.hdr-sw`, 44 px
   controls on touch screens via `--tap`) and `assets/mx-nav.js` (asks `/api/me` once, `window.MX_ME`; `[data-mx-members]` shows to
   signed-in members, `[data-mx-macro]` hides when `perms.macro === false`). Used by edge-lab.html, index.html and the veteran page.
@@ -2139,6 +2701,26 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   library) named an assistant product in its title and headings and had words run together in its source (done 12 Nov 2026: the
   names are neutral, the spacing mended, `tests/no-model-names.test.mjs` guards rule 6); the macro desk's levels
   and "last close" come from the weekly daily-candle cache, so mid-week they trail the live price (council side).
+- **Graphite look on the side pages and the Macro desk** (16-17 Nov 2026, owner: "do another one with other colors like grey";
+  spec `docs/design/aureum-theme.md`). `assets/mx-page.css` defines the `--au-*` tokens for dark / light / midnight and points every
+  older name at them (`--bg`, `--panel`, `--ink`, `--accent` = the steel-blue `--au-accent`, `--buy` / `--sell`, `--gold` = the
+  neutral `--au-primary`, `--gold-ink` = the accent), so the Academy, which loads the same file, follows it. Shared parts: the
+  wordmark (`.coin` = the silver "A" mark, `.wm-a` / `.wm-d`; under 420 px DESK stays only in the link's name), the switch
+  `.hdr-sw` (no conic ring: the active place raised with a 2 px accent underline), `.btn` (secondary), `.btn.gold` (the one
+  primary action, a solid neutral fill despite its old name), `.btn.quiet`, `.mx-head` / `.mx-lede` / `.mx-head-a` (title, one
+  sentence, the action on the right), `.mx-sh`, `.mx-card`, `.mx-chip` (filter toggles), `.foot .mx-fb`. Fonts: the pages' Google
+  link asks for `Inter:300..800` (vendored) instead of Figtree. `macro-desk.html` does not load mx-page.css: it keeps literal token
+  values per theme (a test reads its light blocks), so **keep the two in step**; its section titles and tile labels are sentence
+  case in the ink, the stale stamp uses `--au-warn`, the signed-out gate `#md-gate` is a card with the mark and one primary button
+  (same sentence). Edge lab: a filter bar `#flt` (search `#flt-q`, verdict chips `#flt-v`, order `#flt-s`: reading order /
+  newest first / A to Z; `decorate` / `applySort` / `applyFilter` run at the end of `render()` before `deepLink()`, which clears
+  the filter when the linked row is hidden; display only), rows stagger at most 12 x 30 ms, the "Running" dot pulses three times.
+  Veteran library: a 16 px body at about 72 characters, the facts as one quiet line, the document list folded on phones (opens
+  while searching, folds after a choice). /macro: the head action "Open the Macro desk" (members) and a "Tools" heading; tool dots
+  are neutral. offline.html: the same tokens inline, the mark drawn in CSS, the Desk's theme setting read. Measured: every text
+  token 4.5:1 or more on bg / surface / surface-2 in all three themes (lowest light gain on surface-2, 4.82); 72 page states
+  (5 pages x 360 / 390 / 430 / 1440 x three themes, signed in and out, folds open) with no text under 12 px, no touch target
+  under 44 px, no text under AA and no sideways scroll.
 - **Gold terminal, simple phone view** (11 Nov 2026, owner: "on the mobile there's too much, we need a simpler version for the
   phone"; display only, no number, score or rule changed, the locked features untouched). At 640 px and under the head script sets
   `html[data-phone="simple"]` unless this device chose Full (localStorage `ms-phone` = "full": the Desk's key and its "Phone view:
@@ -2163,6 +2745,18 @@ macro-desk.html (`#c-brief`, `renderBrief`). Tests: `tests/briefing.test.mjs`. P
   (0 of about 2,300 and 2,070 compared differ). Not folded: Edge Tracker (its cards are re-rendered by the page), Backtest Lab (short; its
   "Honest assumptions" stay open). Tests: `tests/side-pages.test.mjs` ("phone simple view"); the smoke test opens each tab's folds
   on the phone and fails on a block or chart past the screen or a tab with no phone button.
+
+- **Gold terminal, graphite look** (16-17 Nov 2026, owner: "do another one with other colors like grey"; display only, the locked
+  features, the driver stack, every score and the candle colours untouched). One block `GRAPHITE (17 Nov 2026 …)` right before the
+  phone simple view's block defines the `docs/design/aureum-theme.md` tokens (`--au-*`) for light, dark and midnight and points every
+  older name at them (`--panel`, `--line`, `--text-*`, `--mint` = the steel-blue accent, `--accent-green/red/blue`, `--amber`,
+  `--gold-ink`; the starfield, teal arc and mint glows are off). Its rules start with `:root:root` only to rise above the older
+  theme layers; they set colour, font, border and shadow, never the simple view's layout (keep it so). `--gx-up` / `--gx-dn` (and
+  `-rgb`) are not touched, so `makeStructPrimitive`'s marks and the S/D zones look as before. The top bar's first link is the
+  wordmark (`.pnav-desk`: the text "Desk", `::before` "Aureum", `.ms-coin` silver mark, back to the Desk; the qa test reads its
+  text), then `.rail-brand` "/ Gold terminal". Charts read `--au-line` (grid) and `--au-ink-3` (text) in `gxPalette`. The two
+  infinite animations (hero live dot, session dot) run three times; the MTF legend no longer says "highest probability". Left:
+  the daily bias still shows its "60%" agreement figure (computeDailyBias's `conf`), and the theme / alert buttons are emoji.
 
 ## The veteran at a glance, self-calibration, what changed (9 Nov 2026, owner: "be the best of all time veteran, more visual, simpler")
 `council/glance.mjs` (built by `council/veteran.mjs`): `summary(v)` → `veteran.json.summary`: one plain sentence ("This week: …"), the
@@ -2264,6 +2858,13 @@ member and for every single-key combination; members never get a demo account nu
 `app.webmanifest` (id `/`, "Meridian X", standalone, `#08090c` = the desk's dark `--bg`, shortcuts /gold, /macro-desk, /backtest)
 with icons in `icons/` drawn from the coin favicon by `scripts/make-icons.mjs` (any 192/512, maskable 192/512, apple-touch-icon 180,
 badge-96 for push; run it by hand with Playwright, commit the PNGs). The old GOLD `manifest.json` and root icon-192/512 stay for old installs.
+**Mark and icons, graphite (16-17 Nov 2026, docs/design/aureum-theme.md section 2):** the one drawing is `assets/aureum-mark.svg`
+(brushed-silver rounded square, 8 px radius on 28 px, a bold "A" as a path in #16181B, no font); `assets/aureum-mark.css`
+`.ms-coin` is the same letter as a mask (a test compares the paths). `NODE_PATH=$(npm root -g) node scripts/make-icons.mjs`
+reads the SVG and draws every icon (any on transparent; maskable, apple-touch and the root icon-192/512 on #121315 with the
+tile inside the 40 % safe circle; badge-96 = white tile, A cut out; favicon-32) and `icons/og-card.png` (1200 x 630 link
+preview, vendored Inter embedded, not wired to pages yet). Manifest and pwa.mjs theme colour #121315 (`--au-bg`).
+Tests: `tests/aureum-mark.test.mjs`, `tests/pwa.test.mjs`.
 - Build step `scripts/pwa.mjs out` (build.sh, before stamp-assets): adds the missing head tags to every built page (manifest,
   theme-color, apple-touch-icon, apple-mobile-web-app-capable / -title / -status-bar-style black, mobile-web-app-capable, and
   `/assets/pwa.js` which stamp-assets versions). Never hand-add these to page sources. It also writes out/sw.js `VERSION` = hash
@@ -2746,6 +3347,17 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   the sequence is reproduced with the real handler and the real Blob backend over a fake Blob service that lags as documented.
   The same CDN read is in the other private-Blob modules (`api/notify.js`, `profile.js`, `sounds.js`, `mosha.js`,
   `mosha-lessons.js`, which overwrite one file in place): not changed here. Tests: `tests/academy-correction.test.mjs`; audit section 11l.
+- **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`, the site-wide spec; the 16 Nov black-and-gold draft was
+  rejected by the owner). Display only. `assets/academy.css` section "Graphite", right before the phone block: the `--au-*`
+  tokens for dark / light / midnight, and the Academy's older names (`--panel`, `--ink`, `--accent`, `--buy`, `--gold`, …)
+  pointed at them by one rule whose selector list outweighs every theme rule of `assets/mx-page.css`, so the page looks right
+  whether or not that file has the tokens. Candles keep their colours (`--ac-up` / `--ac-down`, read by `candleLook`); chart text
+  `--au-ink-3`, grid `--au-line`. One primary (solid neutral) in view: `#c-play` gives way while a train verdict waits, the
+  decision card's Continue becomes primary once the verdict is saved, Resume and "Test on 10 new setups" are secondary. From
+  1081 px the decision, verdict, lesson, proof and What if lead the column beside the chart (CSS `order`; the phone's full view
+  keeps chart, account, decision, verdict). Levels are one strip (`.kv.lvl`), the decision's folds one grouped list, entry / stop
+  / target appear only for a changed trade (`.choices + .lv`), a chosen verdict reads in its colour. The verdict card is "Your
+  verdict" (small: "on attempt N"; the audit's correction check reads that). No decision, lesson, API or storage change.
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
@@ -3352,8 +3964,27 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   requests a second while the desk was open); now once per read of the lessons (`S.tried`, cleared by `msMoshaRecord`). The rows
   carry the log's cell classes (`mo-c-time`, `mo-c-side`, `mo-c-res`, `data-l`), so on a phone they are the log's cards (the side
   chip sat over the entry time). Tests in `tests/mosha-record.test.mjs`.
+- **Why the systems missed the owner's trades** (17 Nov 2026, owner: "I've been taking good trades on mosha so I don't
+  understand why u not catching them"; `research/proposals/2026-11-17-mosha-misses.md`, items 55-56; nothing live changed).
+  The owner's log `mosha/trades.json` was never written (0 logged, 0 `pre`) and no lesson carries levels, so the six shared
+  examples were replayed through the Trader's Mosha BO block and `mosha-cycle.mjs` on OANDA candles: 4 never signalled (the
+  engine's H1 break, 6 candles a side at the protected swing, came days later or never; the owner's turn is an M5 sweep, VR,
+  CF), 2 seen in the same move (an earlier entry stopped by the owner's sweep, then the one-per-leg cap; a Mosha BO signal
+  blocked by weekly + slow pullback, stop 5.5x wider). Mosha BO recorded nothing 1-17 Nov; the one cycle record came from
+  weekend candles of the fallback feed (item 56). The M5 trigger that would catch all six is the one `mosha-sweep` /
+  `mosha-select` already failed: never present a rule that catches these picked trades as evidence. Never commit the
+  owner's or Luxus's individual trades or lesson text (public repository): aggregate counts only.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
+- **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
+  only, in `<style id="ms-mosha-css">`. `html` defines `--mo-*` aliases (each reads an `--au-*` token, falling back to the
+  page's older variable), and `#v-mosha, .mo-tut, .mo-lv-dlg, .mo-l-dlg` point the older names the rules use (`--panel`,
+  `--ink*`, `--line*`, `--accent`, `--gold*`, `--buy` / `--sell`, `--sans`) at them, so the desk and its three dialogs follow the
+  tokens with no rule rewritten; the desk's old gold marks (`--mo-gold`) are the steel-blue accent. Generic card, title and
+  button rules sit EARLY in the block (later, more specific rules such as the green "That is right" must still win); the
+  "last word" rules sit just before the light-theme `--buy` / `--sell` line (kept: it is AA and pinned). One primary button a
+  view ("Send to the desk"; the guide's tutorial button is secondary). Markup, ids, gates (`#mo-rules`, `#mo-cycle`, `#mo-lux`
+  hidden for the teacher) and the French dictionary unchanged.
 
 ## Desk load: one request per file, late loading (11 Nov 2026)
 Owner request: the Desk (`market-structure.html`) should load faster and steadier. Measured with Playwright on a phone profile
@@ -3511,6 +4142,9 @@ Test: `tests/mcycle-shadow.test.mjs`.
 - **Money**: a paid key, the owner's exception to absolute rule 5 (docs/owner-decisions.md item 47; owner, 12 Nov 2026: keep, "Yes to all"). Shares the provider
   settings (`ACADEMY_LLM_KEY`, `_URL`, `_MODEL`, `_FORMAT`); own budgets `EDGE_LLM_DAILY_USD` 0.50, `EDGE_LLM_MONTHLY_USD` 5,
   `EDGE_LLM_HARD_USD` 25, `EDGE_LLM_MAX_CALLS_DAY` 12; `EDGE_ANALYST=off` / `EDGE_LLM_STOP=1` stops it. No key = no call.
+- **Output cap (17 Nov 2026)**: 900 -> `EDGE_LLM_MAX_TOKENS` (default 4000) through the adapter's `cap: 'feature'`: a model that
+  always reasons spends output tokens on that first; an answer cut at the cap (stop `length`) is never cached and is stored as
+  refused once (`LLM.cutAtCap`). Provider secrets and the reasoning effort (`ACADEMY_LLM_BODY`): docs/academy/LLM.md section 11.
 - Paper only: it changes no rule, size, filter or trade, imports nothing of the council or the mirror (test), and no council
   member reads its file. Tests: `tests/edge-analyst.test.mjs`.
 - **Money and safety review (12 Nov 2026)**, `tests/edge-analyst-money.test.mjs` (real adapter, fake provider / Blob / clock).
@@ -3596,3 +4230,137 @@ out of sample; the best, gold rintra +0.014R, t 0.14, lost in sample; placebo 0 
   (`council/backtest.mjs`) and the Coach's backtest evidence still cover the setups. Off-switch: a user rule setting
   `c.shadowCut = null`; a stream comes back only through a new pre-registered study. Tests: `tests/shadow-cut.test.mjs`,
   `tests/shadow-best.test.mjs`.
+
+## Trade review: the after-the-fact edge check and its optional language-model reviewer (17 Nov 2026, owner: "Check as well the edges and add an AI to check the actual trades and help the edge bots to trade better")
+Proposals only (absolute rule 3): nothing here changes `config.json`, a rule, a size, a stop or a filter, and no council member
+reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ict…` record or the ICT demo account is never counted.
+- **`council/trade-review.mjs`** (pure + `main(dir)`; council.yml every 6th round, `timeout 60`, never fails the loop) reads
+  trades.json, research.json, coach.json (decay / expect), config.json, the demo mirrors through `ctrader/mirror-accounts.json`
+  (books with `ict` skipped) and `reviews/analyst.json` + `reviews/losses.json`; writes council-data `research/trade-review.json`
+  (`hash` = content without its time; written when it changes, re-stamped at least every `REFRESH_S` 6 h; `datahealth.mjs` warns
+  at 12 h, bad at 48 h). One **stream** per system and book: `live` (not a shadow; the NQ open run's `nyflip` research rows as
+  `alertable` counts them), `shadow`, `research` (research.json's other forward paper streams: the replica's research trades,
+  NQ variants by session). Closed = win / loss / be with a finite R, never `void`, `replay` or a duplicate. Engine setups are
+  named apart (`SETUP_NAME`: three of them are "Retrace" on the records). Per stream, last 7 / 30 days and the whole record on
+  file: n, win rate, R before costs (`R`) and after (`merNet`, the digest's), t, cost per trade and share of gross wins (research
+  rows carry no cost: "no cost on record", never a made-up cost); where the R goes: exits by type (`exitType`: target / stop /
+  trail / breakeven / time), stops within `FAST_S` 30 min of the fill, trades that reached +1R and closed at a loss, MFE given
+  back, the paired counterfactual "close at +1R once reached" (`lock1R`, from the recorded MFE: approximate, said so), losses
+  whose target came after the stop (post-mortem `pm.after.hitT1`); demo slippage (`slipR`, positive = worse); session (the
+  council's UTC clock), 4-hour block, side and market splits, each against the rest by Welch t with a Student-t p.
+- **Flags** (`flagsOf`), every one with n and t: `losing` / `positive` (n >= 10, |t| >= 2 on R after costs), `costs` (gross > 0,
+  net < 0, cost >= 0.1R a trade), `weak-*` / `strong-*` splits (both sides >= 10 trades, |t| >= 2), `exit-lock1R` / `exit-runs`.
+  Splits carry `p` and `holm` (Holm over every split test of the file, `thresholds.splitTests`). **Proposals** (`proposalOf`):
+  skip session / hours / market, one side only, change exit, cut costs, move to shadow / keep off live; each with evidence (n,
+  mean, t, p, Holm, `inSample: true` and the warning) and `test` = the pre-registered study that would confirm it (`TEST_BASE`:
+  2020 → now, in sample 2020-2023 vs out of sample 2024 → now, net of the council cost model, OOS t >= 2 on month sums after
+  Holm, PREREGISTRATION.md first). `strong` = n >= 30, |t| >= 2 and (a split) Holm passed. One subset under two names (Asia =
+  00-04 UTC) is proposed once. Nothing is proposed for a live engine setup no longer in `config.focusSetups` (`retired`) or a
+  shadow the owner's shadow cut stopped recording (`stopped`): reported, not proposed.
+- **Language-model reviewer** (`api/_trade-review.js` pure, `api/trade-review.js` endpoint; the Academy's adapter
+  `api/_academy-llm.js`, own budgets `TRADE_REVIEW_LLM_DAILY_USD` 0.50 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 2,
+  `TRADE_REVIEW=off` or `TRADE_REVIEW_LLM_STOP=1` stops it, no key = off and the page shows the rule-based review alone). Cron
+  `GET /api/trade-review?job=review` (Bearer `CRON_SECRET`): reads the file through `api/data.js` `readFile`, asks once per new
+  `hash` and at most every `MIN_GAP_S` 12 h; store `trade-review/` (`latest.json`, `state.json`, the adapter's `cost.json` /
+  `llm-cache.json`). The answer is checked in code (`parseAnswer`): unknown streams dropped, a proposal must name one of ITS
+  stream's own flag ids or it is dropped (`dropped` counted); its evidence and test are copied from the file, never the model's
+  numbers. A billed answer that fails the checks is stored as refused (never paid twice); a budget skip is retried. `GET` for
+  the owner or a reviewer: `{ enabled, reason, cost, ai }`. Cloudflare: handler `'trade-review'` in `HANDLERS`, run after the
+  10-minute cron through `CHAINED` (no new trigger; `wrangler.jsonc` unchanged; vercel.json has no crons since 17 Nov 2026).
+  Output cap (17 Nov 2026): 3000 -> `TRADE_REVIEW_LLM_MAX_TOKENS` (default 8000, `cap: 'feature'`); a cut answer is stored as
+  refused, naming the variable.
+  No connector queue (optional, not built).
+- **Page**: card `#ms-tr` (class `adm`) in Council → Review after `#ms-ea`; `<style id="ms-tr-css">` on the graphite tokens of
+  `docs/design/aureum-theme.md` with the page's tokens as fallbacks (`--au-ink, var(--ink)`); `<script id="ms-tr-js">` reads the
+  file through `msData` and `/api/trade-review` (owner / reviewer; viewers and guests read nothing), `window.MS_TR` pure pieces.
+  Live / Shadow / Research / All filter (localStorage `msTrBook`), a stream row opens its review, numbers, exits, splits, flags;
+  then the proposals with evidence and test; then the language-model review. The week pane's "Decisions waiting" lists the
+  file's **strong** proposals only (at most three, `k: 'review'`, `loadExtra` reads the file); the simple phone view folds the
+  card like the other review cards (`.tr-sum` is its summary line).
+- **First reading (council-data of 17 Nov 2026 07:14 UTC)**: 30 streams, 18 flags, 2 proposals. The live book's main systems
+  have too few closed trades to judge (Gold daily engulf 2, −2.06R after costs; H4 trendline 1; live replica 2, +0.95R; NQ open
+  run 1); the four legacy engine setups' live record of 1-4 Nov is −24.2R after costs on 31 trades (retired, nothing proposed).
+  Shadow book (stopped by the 12 Nov cut except Position / Swing / M30): +182.2R before costs, −6.3R after on 970 trades; the
+  scalps +114.2R gross, +7.9R after (costs 106.3R, 24 % of gross wins; 121 of 326 losses stopped within 30 min); Retrace scalp
+  −92.4R after costs (t −3.41); Intraday +48.3R (n 96, t 2.86, whose 2020-26 study `shadow-best` failed: a forward 15 days, not
+  an edge). Replica research trades: −85.7R before costs on 977 (t −1.91), buys −0.40R vs sells +0.25R a trade (t −7.21, Holm
+  passed: in sample over two weeks of one market regime), demo copies 0.065R a trade worse than paper (n 152, t 3.10).
+- Tests: `tests/trade-review.test.mjs` (9), `tests/trade-review-ai.test.mjs` (7); fixture `tests/fixtures/trade-review/`
+  (a made-up desk, `make.mjs` builds it).
+- **Proposal ledger (17 Nov 2026, owner: "improve the brain")**: council-data `research/trade-review-ledger.json`, APPEND-ONLY
+  (`ledgerOf`): each proposal is recorded once (`ledgerId` = stream key + `#` + flag id) with its evidence of that day
+  (`recordedAt`); an entry is never edited or removed, and the file is written only when a new one is added. Every run
+  re-measures each entry (`forwardCheck`) ONLY on its stream's trades closed strictly after `recordedAt` (never the trades
+  that suggested it): the subset against the rest by Welch t (a session / hours / side / market flag), t against zero
+  (losing, costs), the paired +1R counterfactual (exit flags). Status (`FWD`): `too few` (under 20 new trades, or under 10 in
+  the rest), `held` (the recorded sign and |t| >= 2), `faded` (the sign turned, or |t| < 1), `unclear`. The review file
+  carries `ledger { n, counts, items }` and each proposal `forward`; a **faded proposal is not strong** (`fadedForward`), so
+  the week pane's "Decisions waiting" drops it with no page change. A ledger file that does not parse is never overwritten
+  (`ledger.error`, nothing new recorded). "Held" is a second small sample, never an edge. `datahealth.mjs` lists the file
+  (no staleness: written only on a new proposal).
+- **Pre-registration drafts**: each strong proposal carries `prereg`, the text of a PREREGISTRATION.md (`preregOf`: why, H1 /
+  H0 and the variant, data 2020 → now, IS 2020-23 / OOS 2024 →, the council cost model, month-sum t of the paired difference
+  (or of the rule against zero for losing / keep-off-live), Holm, the pass bar), dated the day the proposal was recorded so
+  the hash does not move daily. No study folder is made; the owner approves and commits it alone.
+- **Already tested** (`STUDIED`, `studiedOf`): a proposal whose question a committed study already answered (key: system id |
+  action; `replica|one side only` -> `replica-sides` FAIL, `replica|keep off live` -> `replica-oos` FAIL) carries `studied`
+  (verdict, one line, Edge lab link), is never strong and gets no draft; the card shows "already tested". Add a row only for a
+  study with a result in `research/edge/` (a test checks the folder exists).
+- **The language-model reviewer** gets each stream's `forwardChecks` and `parseAnswer` drops a proposal on a faded flag.
+  **The edge analyst** (`api/_edge-analyst.js` `forwardRecord`, passed by `api/edge-analyst.js` as `buildRequest`'s 4th
+  argument) adds `systemForwardRecord`: the same system's trades (not shadow, add, replay, void, nor the trade itself; the NQ
+  open run's `nyflip` session only) closed STRICTLY before the entry: n, win rate, mean R after costs (`Rnet`, else before,
+  said in `basis`), the last 10 results; under 10 closed it says "Too few" and gives no win rate or mean. No id, time or price
+  of another trade is sent. Card `#ms-tr`: the ledger counts in the summary, a forward chip and line per proposal, the draft
+  in a fold (inside `#ms-tr-js`). Tests: `tests/trade-review-ledger.test.mjs` (7), `tests/brain-forward.test.mjs` (3).
+- **First reading with the ledger** (council-data of 17 Nov 2026 12:00 UTC): 30 streams, 19 flags, 3 proposals, all on the
+  replica's research trades, all recorded and "too few" forward (0 trades since): take only sells (buys n 525, −0.41R, t −7.58,
+  Holm, strong; already answered by `replica-sides` FAIL), keep off live (n 1,009, −0.09R, t −2.00, strong), skip 04-08 UTC
+  (n 214, t −2.57, not Holm).
+
+## Edge check and the replica's sides (17 Nov 2026, owner: "Try to check the edges which ones can we improve and focus like the replica")
+An evidence review and one pre-registered study; no live rule, size, filter, stop, config, Trader or mirror code changed. The
+owner's document is `research/proposals/2026-11-17-edge-check.md` (decisions: `docs/owner-decisions.md` items 57-59, open).
+- **Ranking** (what can still improve): (1) the live book (Gold trend + Gold daily engulf) only through its holding cost
+  (item 49; book t 1.86 at the demo rate, about 1.96-2.02 on cheaper carry), no rule test (item 44); (2) the NQ open run as a
+  regime bet (2023-26 +0.318R, n 309, t 3.45; flat 2004-22) with item 50 open; (3) one rule question item 44 does not block,
+  the Gold daily engulf on silver (item 59, low prior). Every other system is null or negative on untouched data and a shadow
+  already. The forward records are 0-2 closed trades a system: nothing to judge.
+- **`research/edge/replica-sides/`** (PREREGISTRATION.md committed alone first; `run.mjs`, `months.json`, RESULT.md,
+  result.json): the replica's RAW research signal (`replicaSignals` copied verbatim from the Trader via
+  `research/edge/gold-systems/live.mjs`; every signal, market entry at the next M5 open, 2R, 48 h, gold round-number stops) on
+  council-data HistData M1 (gold + five forex, `council/histdata.mjs`) and Binance 5m (four coins, from March 2022), net of
+  `tradeCost` with the 17 Nov 2026 cost model pinned in `MODEL` (coin spreads as a share of the 17 Nov price). IS 2020-23,
+  OOS 2024 - Oct 2026, three tests, Holm. **FAIL, 0 of 3**: sells −0.196R a trade OOS (n 44,458, month t −12.63); sells minus
+  buys +0.007R (34 months, t 0.38); with the 20-day move −0.194R. Before costs every market is within 0.05R of zero (174,316
+  trades). The forward split of 3-17 Nov (buys −0.41R, sells +0.26R) is a regime artefact: the side that wins a month is the
+  side of that month's move in 61-84 % of months. ETH / SOL pay 0.49 / 0.45R a trade (66-72 % of stops under 5 CFD spreads).
+  **Never propose a side rule for the replica from its forward records.** To repeat: `run.mjs fetch <dir>` (git, no network),
+  `market <key> <dir> <out>` for the ten keys, `report <out>` (about a minute). Test: `tests/replica-sides.test.mjs`.
+- **Replica demo slippage** (council-data `ctrader/mirror-10152148.json`, 157 copies 10-17 Nov): +0.062R a trade (t 3.06);
+  ETH +0.19R, SOL +0.14R (half a CFD spread on tight stops), copies 5 min or more late +0.16R, forex about 0; the buy / sell
+  gap (−0.003 / +0.127R) is mostly a price basis between the council's feed and the broker, which cancels across sides.
+
+## Diversified time-series momentum, a CFD portfolio (17 Nov 2026, owner: "keep finding the ultimate edge")
+`research/edge/tsmom-portfolio/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, result.json). The literature's
+managed-futures rule, never tested here as a portfolio: 38 OANDA daily CFDs from the council's candle cache (5 metals, 13
+indices, 3 energies, 6 bond CFDs, 4 ags, 7 forex majors; crosses, exotics and gold-in-other-currencies left out), each month
+long / short on the sign of its 12-month return skipping the last (closes strictly before the first close of the month), 10 %
+volatility per market from 60 days (notional cap 4x its share), equal risk, the book scaled to 10 % from its last 252 days;
+pre-registered round trips per market and CFD financing (long pays DGS2 + 2.5 %, short pays 2.5 % − DGS2; forex 1 % either
+side, no interest differential). **Verdict: FAIL, 0 of 5 checks**: net −0.34 % a month out of sample 2024-01 to 2026-10
+(n 34, t −0.70), −0.23 % in 2020-23 (t −0.51), −0.13 % in 2005-19 (n 180, t −0.61). Before any cost +0.41 % a month on 2005-19
+(t 1.85, Sharpe 0.48) and +0.40 % out of sample (t 0.85): financing at 2.3-3.0x gross notional (123-235 % of gross) is what
+turns it negative; spreads are 9-21 %. Post hoc, financing at the rate alone (a futures-like excess return): t 1.49 / 0.40 /
+0.37. The 3- and 6-month look-backs are worse (OOS t −2.13, −1.42). Not an edge on CFDs, no paper shadow proposed, no owner
+decision. Nothing live changed. To repeat: `run.mjs fetch <dir>` (git, no network), `run.mjs run <dir>`. Test:
+`tests/tsmom-portfolio.test.mjs`.
+
+## Gold daily engulf on silver (17 Nov 2026, item 59's recommendation)
+`research/edge/geg-silver/` (PREREGISTRATION.md committed alone first; `fetch.mjs`, `run.mjs`, RESULT.md, result.json). The live
+`geg` rule (trading days via `foldWeekend`, the reopen freshness window, maxOpen 3, 10R, 2R / 1R trail, 240 h) on OANDA XAG/USD
+M5 + D1, buffer $0.30 -> $0.004, cost 0.10 % of price a round trip and 0.015 % a night on longs (assumed: no XAGUSD on the demo
+broker's file). Parity gate first: the harness reproduces `gold-weekend`'s gold engulf exactly (n 247 +0.207R, n 176 +0.326R).
+**Verdict: FAIL**: OOS 2024 on +0.098R a position (n 63, month-sum t 0.52), IS 2020-23 −0.158R (n 85), replication 2006-19
++0.060R (n 252, month t 0.55); one at a time is worse. No paper shadow, nothing live changed; do not test it on another
+market. Test: `tests/geg-silver.test.mjs`.

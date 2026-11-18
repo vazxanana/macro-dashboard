@@ -9,10 +9,15 @@
 <meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
 <title>Veteran library · Aureum Desk</title>
 <meta name="description" content="The Macro veteran's research library: frameworks, briefs, the CPI pilot forecast and the release-integrity study, as published with the desk.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fbe7a6'/%3E%3Cstop offset='.55' stop-color='%23e3b341'/%3E%3Cstop offset='1' stop-color='%238a6312'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='14' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='10.5' fill='none' stroke='%23fff' stroke-opacity='.35'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="/assets/aureum-mark.svg?v=0bdb0e5e4b">
 <!-- fonts never hold up the first paint: the system font shows until Figtree arrives -->
-<style>@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-ext-f153aa07.woff2?v=f153aa07c1) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
-@font-face{font-family:'Figtree';font-style:normal;font-weight:400 700;font-display:swap;src:url(/assets/fonts/figtree-latin-8330490a.woff2?v=8330490a01) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+<style>@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-cyrillic-ext-fccca918.woff2?v=fccca918fe) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-cyrillic-aebf2ab4.woff2?v=aebf2ab4a4) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-greek-ext-a2e2c783.woff2?v=a2e2c783ca) format('woff2');unicode-range:U+1F00-1FFF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-greek-46dd4cdc.woff2?v=46dd4cdca5) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-vietnamese-8db00ff4.woff2?v=8db00ff46c) format('woff2');unicode-range:U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-latin-ext-a28eb6d3.woff2?v=a28eb6d3cc) format('woff2');unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:'Inter';font-style:normal;font-weight:300 800;font-display:swap;src:url(/assets/fonts/inter-latin-c9407645.woff2?v=c940764593) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-ext-9343de2c.woff2?v=9343de2ca5) format('woff2');unicode-range:U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-cyrillic-4995a9a4.woff2?v=4995a9a43a) format('woff2');unicode-range:U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500 600;font-display:swap;src:url(/assets/fonts/jetbrains-mono-greek-49c3da6c.woff2?v=49c3da6c9a) format('woff2');unicode-range:U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF}
@@ -23,24 +28,24 @@
   // Same theme key as the desk (localStorage msPrefs.theme): light stays light, every other desk theme is dark; else the system.
   (function () { try { var p = JSON.parse(localStorage.getItem('msPrefs') || 'null'); if (p && p.theme) document.documentElement.dataset.theme = p.theme === 'light' ? 'light' : p.theme === 'midnight' ? 'midnight' : 'dark'; } catch (e) {} })();
 </script>
-<link rel="stylesheet" href="/assets/mx-page.css?v=e803654e03">
-<script src="/assets/mx-nav.js?v=3f8fef533d" defer></script>
+<link rel="stylesheet" href="/assets/mx-page.css?v=de99eeb47e">
+<script src="/assets/mx-nav.js?v=244a0cd297" defer></script>
 <style>
   /* the Veteran library (scripts/veteran-library.html, copied to /veteran/index.html by scripts/veteran-index.mjs) */
   .head { padding: 32px 0 20px; }
-  h1 { font: 600 clamp(24px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.5px; margin: 0 0 8px; }
+  h1 { font: 650 clamp(26px, 3vw, 32px)/1.15 var(--sans); letter-spacing: -.02em; margin: 0 0 8px; }
   .lede { margin: 0; color: var(--ink-dim); max-width: 70ch; font-size: 14.5px; text-wrap: pretty; }
   .lede b { color: var(--ink); font-weight: 600; }
   .more-cpi { margin-top: 4px; font-size: 12.5px; color: var(--ink-faint); }
   .more-cpi summary { display: inline-flex; align-items: center; min-height: var(--tap); cursor: pointer; color: var(--accent); }
   .more-cpi p { margin: 0; }
-  .facts { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 12px 0 0; padding: 0; list-style: none; }
-  .facts li { padding: 3px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); font-size: 12.5px; color: var(--ink-dim); }
+  .facts { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .facts li { font-size: 13px; color: var(--ink-faint); }
   .facts b { color: var(--ink); font-weight: 600; }
 
   .lib { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 20px; align-items: start; }
   .side { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow: auto; padding: 2px 4px 12px 2px; display: flex; flex-direction: column; gap: 12px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; box-shadow: var(--au-shadow); }
   .k { margin: 0 0 4px; font: 600 12px var(--sans); color: var(--ink-faint); }
   .cpi b { display: block; font: 600 22px var(--mono); letter-spacing: -.5px; margin: 2px 0; color: var(--ink); }
   .cpi p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-dim); }
@@ -59,18 +64,19 @@
   .nav h2:first-child { margin-top: 2px; }
   .nav a { display: flex; align-items: baseline; gap: 6px; min-height: var(--tap); padding: 6px 8px; border-radius: 6px; font: 500 13px/1.35 var(--sans); color: var(--ink-dim); text-decoration: none; }
   .nav a:hover { background: var(--panel-hover); color: var(--ink); }
-  .nav a[aria-current="page"] { background: var(--accent-soft); color: var(--ink); box-shadow: inset 2px 0 0 var(--accent); }
+  .nav a[aria-current="page"] { background: var(--panel-raised); color: var(--ink); box-shadow: inset 2px 0 0 var(--accent); }
   .nav a small { margin-left: auto; color: var(--ink-faint); font-weight: 400; font-size: 12px; flex: none; }
   .nav .none { color: var(--ink-faint); font-size: 13px; padding: 6px 8px; }
 
-  .doc { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 20px 24px 28px; font-size: 14.5px; line-height: 1.6; color: var(--ink-dim); scroll-margin-top: 72px; }
+  .doc { min-width: 0; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 28px 40px 36px; font-size: 16px; line-height: 1.7; color: var(--ink-dim); scroll-margin-top: 72px; box-shadow: var(--au-shadow); }
+  .doc > :is(p, ul, ol, blockquote, h1, h2, h3, h4) { max-width: 72ch; }
   .doc:focus { outline: none; }
   .doc .meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--ink-faint); margin: 0 0 12px; }
   .doc .meta a { margin-left: auto; }
   @media (pointer: coarse) { .doc .meta { align-items: center; } .doc .meta a { display: inline-flex; align-items: center; min-height: 44px; } }   /* "Open raw" was a 20 px target on touch */
-  .doc h1 { font-size: 22px; margin: 0 0 10px; color: var(--ink); line-height: 1.25; }
-  .doc h2 { font-size: 18px; margin: 22px 0 8px; color: var(--ink); } .doc h3 { font-size: 15.5px; margin: 18px 0 6px; color: var(--ink); } .doc h4 { font-size: 14.5px; margin: 14px 0 4px; color: var(--ink); }
-  .doc p { margin: 8px 0; } .doc ul, .doc ol { padding-left: 22px; margin: 8px 0; } .doc li { margin: 4px 0; }
+  .doc h1 { font-size: 26px; font-weight: 650; letter-spacing: -.02em; margin: 0 0 14px; color: var(--ink); line-height: 1.2; }
+  .doc h2 { font-size: 20px; font-weight: 600; margin: 32px 0 10px; color: var(--ink); } .doc h3 { font-size: 15.5px; margin: 18px 0 6px; color: var(--ink); } .doc h4 { font-size: 14.5px; margin: 14px 0 4px; color: var(--ink); }
+  .doc p { margin: 12px 0; } .doc ul, .doc ol { padding-left: 22px; margin: 8px 0; } .doc li { margin: 4px 0; }
   .doc .tbl { overflow-x: auto; margin: 10px 0; border: 1px solid var(--line); border-radius: var(--r-sm); }
   .doc table { border-collapse: collapse; font-size: 13px; width: 100%; }
   .doc th, .doc td { border-bottom: 1px solid var(--line-soft); padding: 6px 9px; vertical-align: top; text-align: left; }
@@ -87,13 +93,11 @@
   .pager a { display: inline-flex; flex-direction: column; min-height: var(--tap); justify-content: center; max-width: 48%; font-size: 13px; }
   .pager a small { color: var(--ink-faint); font-size: 12px; }
   .pager a.nx { text-align: right; margin-left: auto; }
-  .foot { margin-top: 28px; color: var(--ink-faint); font-size: 12.5px; max-width: 80ch; }
-  .foot p { margin: 0 0 6px; }
 
   @media (max-width: 900px) {
     .lib { grid-template-columns: minmax(0, 1fr); }
     .side { position: static; max-height: none; overflow: visible; padding: 0; }
-    .doc { padding: 16px 16px 22px; }
+    .doc { padding: 20px 16px 24px; font-size: 15px; }
   }
   @media (max-width: 520px) { .top .crumb, .top .brand.here { display: none; } .doc h1 { font-size: 20px; } }
 </style>
@@ -104,17 +108,17 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Aureum Desk">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<script src="/assets/pwa.js?v=938afbe5f4" defer></script>
+<script src="/assets/pwa.js?v=9cf723945c" defer></script>
 </head>
 <body>
 <a class="skip" href="#doc">Skip to the document</a>
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span>Aureum Desk</a>
+    <a class="brand" href="/" title="Back to the desk"><span class="coin" aria-hidden="true"></span><span class="wm-a">Aureum</span> <span class="wm-d">Desk</span></a>
     <span class="crumb" aria-hidden="true">/</span>
     <span class="brand here">Veteran library</span>
     <div class="check">
-      <nav class="hdr-sw" data-mx-members hidden aria-label="Desk, macro or ChronosTrade"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" data-mx-macro href="/macro-desk" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a></nav>
+      <nav class="hdr-sw" data-mx-members hidden aria-label="Desk, macro, ChronosTrade or Academy"><a href="/#home" title="Back to the main desk"><i aria-hidden="true"></i><span>Desk</span></a><a class="on" data-mx-macro href="/macro-desk" title="Macro desk"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a><a href="/academy" class="hdr-ac" data-mx-owner hidden title="Aureum Academy: replay, decide, correct and prove"><i aria-hidden="true"></i><span>Academy</span></a></nav>
     </div>
   </div>
 </header>
@@ -135,7 +139,7 @@
   </div>
   <footer class="foot">
     <p>Published from <span class="num">research/macro-veteran/</span> with every build. Times are shown in UTC with your local time alongside. Paper only: the veteran can lower the desk's conviction, never place a trade.</p>
-    <p><a href="/">Back to the desk</a> <span data-mx-members hidden>· <a data-mx-macro href="/macro-desk">Macro desk</a></span></p>
+    <p class="mx-fb"><span class="mx-fw"><span class="coin" aria-hidden="true"></span>Aureum Desk</span><a href="/">Back to the desk</a> <span data-mx-members hidden><a data-mx-macro href="/macro-desk">Macro desk</a></span></p>
   </footer>
 </main>
 <script>
@@ -237,7 +241,7 @@
     var i = I.docs.indexOf(d), pv = I.docs[i - 1], nx = I.docs[i + 1];
     var pager = '<nav class="pager" aria-label="Previous and next document">' + (pv ? '<a href="#' + esc(pv.path) + '"><small>Previous</small>' + esc(pv.title) + '</a>' : '') + (nx ? '<a class="nx" href="#' + esc(nx.path) + '"><small>Next</small>' + esc(nx.title) + '</a>' : '') + '</nav>';
     var meta = '<p class="meta"><span>' + esc(d.group) + '</span><span class="num">' + esc(d.path) + '</span>' + (d.date ? '<span>' + esc(d.date) + '</span>' : '') + '<span>' + kb(d.bytes) + '</span><a href="' + encodeURI(d.path) + '" target="_blank" rel="noopener">Open raw</a></p>';
-    var done = function () { if (fromUser) { var el = $('doc'); if (phone.matches) el.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 }); try { el.focus({ preventScroll: true }); } catch (e) {} } };
+    var done = function () { if (fromUser && phone.matches && !$('q').value.trim()) $('docs').open = false; if (fromUser) { var el = $('doc'); if (phone.matches) el.scrollIntoView({ block: 'start' }); else window.scrollTo({ top: 0 }); try { el.focus({ preventScroll: true }); } catch (e) {} } };
     if (d.kind !== 'doc') {
       $('doc').innerHTML = meta + '<h1>' + esc(d.title) + '</h1><p>' + ({ script: 'A tool from the batch. Run it from a checkout of the repository, never from the browser.', workbook: 'A spreadsheet from the batch; open it with Excel or Numbers.', data: 'A data file from the batch.', log: 'A test log from the batch.' }[d.kind] || '') + '</p><p><a class="btn" href="' + encodeURI(d.path) + '" target="_blank" rel="noopener">Open the file</a></p>' + pager;
       done(); return;
@@ -249,7 +253,8 @@
   }
   function route(fromUser) { var p = decodeURIComponent((location.hash || '').slice(1)); open(p || first(), fromUser && !!p); }
 
-  $('q').addEventListener('input', function () { nav(this.value); });
+  if (phone.matches) $('docs').open = false;
+  $('q').addEventListener('input', function () { nav(this.value); if (this.value.trim()) $('docs').open = true; });
   $('q').addEventListener('keydown', function (e) { if (e.key === 'Enter') { var a = document.querySelector('#nav a'); if (a) { location.hash = a.getAttribute('href').slice(1); } } });
   document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[data-again]'); if (a) { e.preventDefault(); route(true); } });
   window.addEventListener('hashchange', function () { route(true); });

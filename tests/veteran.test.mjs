@@ -144,11 +144,7 @@ test('build + run: veteran.json, the ledger and the analysis block, from the str
   const d2 = fs.mkdtempSync(path.join(os.tmpdir(), 'vet-')); assert.equal(V.run({ dir: d2, now: NOW, log: () => {} }), null); assert.equal(fs.existsSync(path.join(d2, 'macro', 'veteran.json')), false);
 });
 
-test('wiring: the Macro desk loads macro/veteran.json and renders the discussion; the council round runs the veteran after the strategist', () => {
-  const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  assert.ok(html.includes("get('macro/veteran.json')")); assert.match(html, /<section class="md-vet" id="ms-md-vet"/); assert.match(html, /function renderVet\(\)/); assert.match(html, /renderScore, renderVet, renderSmile/);
-  for (const id of ['ms-md-vet-verdict', 'ms-md-vet-list', 'ms-md-vet-foot', 'ms-md-vet-at']) assert.ok(html.includes(`id="${id}"`), id);
-  assert.match(html, /#ms-cp-macro \.md-vet-row\.disagree \.md-vet-st/);
+test('wiring: the council round runs the veteran after the strategist', () => {
   const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   const i = yml.indexOf('node council/macro.mjs data'), j = yml.indexOf('node council/veteran.mjs data'); assert.ok(i > 0 && j > i, 'veteran right after the strategist');
   assert.ok(fs.existsSync(new URL('../research/macro-veteran/SKILL.md', import.meta.url))); assert.ok(fs.existsSync(new URL('../research/macro-veteran/references/gold-driver-map.md', import.meta.url)));
