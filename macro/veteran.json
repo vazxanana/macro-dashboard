@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-18T23:01:11.000Z",
+ "at": "2026-11-18T23:19:29.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-18T23:00:48.000Z",
+ "strategistAt": "2026-11-18T23:19:20.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -97,7 +97,7 @@
  "debate": [
   {
    "topic": "Direction for gold",
-   "macro": "Gold Macro Score −0.94 → AUCTION (no macro edge); next-day P(up) 51%",
+   "macro": "Gold Macro Score −0.95 → AUCTION (no macro edge); next-day P(up) 52%",
    "veteran": "7 of 8 channels observed; tally −2 → against gold",
    "stance": "qualify",
    "why": "The score is the only directional engine that passed a 20-year test (IC +0.15, > +0.25 up 69%); the channel tally is a narrative check that can lower conviction, not flip the call. A negative tally is not a sell.",
@@ -115,11 +115,11 @@
   },
   {
    "topic": "US dollar",
-   "macro": "no data (vote flat); score z (4-week fall) −0.85",
+   "macro": "+0.89 pts in 5 sessions (vote down); score z (4-week fall) −0.86",
    "veteran": "DXY 103.64, +0.69% on the week, +1.91% over 4 weeks · broad USD +0.89% over 4 weeks",
-   "stance": "qualify",
+   "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
-   "m": null,
+   "m": -1,
    "v": -1
   },
   {
@@ -154,8 +154,8 @@
   "bias": "AUCTION",
   "conviction": null,
   "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Employment Change): the bias is conditional until the print.",
-  "agree": 2,
-  "qualify": 4,
+  "agree": 3,
+  "qualify": 3,
   "disagree": 0,
   "invalidation": [
    "10Y TIPS real yield above 3.04% (+15 bp from 2.89%) ends the real-rate support",
@@ -225,15 +225,15 @@
     "k": "v_ry4w",
     "vs": "ry",
     "challenger": {
-     "n": 278,
-     "hit": 0.525,
-     "t": 0.84,
+     "n": 645,
+     "hit": 0.515,
+     "t": 0.75,
      "proven": false
     },
     "incumbent": {
-     "n": 350,
-     "hit": 0.5,
-     "t": 0,
+     "n": 752,
+     "hit": 0.519,
+     "t": 1.02,
      "proven": false
     }
    },
@@ -241,27 +241,37 @@
     "k": "v_d2_4w",
     "vs": "dgs2",
     "challenger": {
-     "n": 199,
-     "hit": 0.563,
-     "t": 1.77,
+     "n": 514,
+     "hit": 0.523,
+     "t": 1.06,
      "proven": false
     },
     "incumbent": {
-     "n": 375,
-     "hit": 0.541,
-     "t": 1.6,
+     "n": 804,
+     "hit": 0.539,
+     "t": 2.19,
      "proven": false
     }
    },
    {
     "k": "v_dxy4w",
     "vs": "dxymom",
-    "challenger": null,
-    "incumbent": null
+    "challenger": {
+     "n": 623,
+     "hit": 0.498,
+     "t": -0.12,
+     "proven": false
+    },
+    "incumbent": {
+     "n": 760,
+     "hit": 0.492,
+     "t": -0.44,
+     "proven": false
+    }
    }
   ],
   "recent": [],
-  "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 53%, t 0.84 vs ry hit 50%, t 0; v_d2_4w hit 56%, t 1.77 vs dgs2 hit 54%, t 1.6; v_dxy4w no record yet vs dxymom no record yet. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
+  "line": "The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.12 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven."
  },
  "releases": [
   {
@@ -739,7 +749,7 @@
     },
     {
      "src": "Council strategist: Gold Macro Score",
-     "read": "score -0.94 (tested 2007-26, 4-week horizon)",
+     "read": "score -0.95 (tested 2007-26, 4-week horizon)",
      "says": "no tested edge (auction)",
      "limit": "Never a sell signal: a negative score did not predict falls."
     }
@@ -1168,7 +1178,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-18T23:01:11.000Z",
+  "at": "2026-11-18T23:19:29.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1176,14 +1186,14 @@
     "lean": 0,
     "fx": "Hot → EUR/USD mixed (DXY down), USD/JPY mixed; cool the reverse.",
     "k": "event",
-    "score": 3.18,
+    "score": 3.19,
     "event": {
      "title": "Employment Change",
      "country": "AUD",
      "at": "2026-11-19T00:30:00.000Z",
      "consensus": "25.5K",
      "previous": "-39.3K",
-     "goldMovePct": 1.15
+     "goldMovePct": 1.26
     },
     "title": "AUD Employment Change on Thu, 19 Nov is the week's pivot",
     "evidence": [
@@ -1193,7 +1203,7 @@
       "source": "economic calendar (Forex Factory feed via the strategist); veteran-expectations.json"
      },
      {
-      "text": "typical gold day move 1.15% (naive: mean absolute move of the last 20 days)",
+      "text": "typical gold day move 1.26% (naive: mean absolute move of the last 20 days)",
       "asOf": "2026-11-18",
       "source": "macro/forecast.json playbook"
      },
@@ -1256,7 +1266,7 @@
     "fx": null,
     "k": "price",
     "score": 1.25,
-    "title": "Gold below its 10-week average (−6.0%); Gold Macro Score −0.94 (AUCTION)",
+    "title": "Gold below its 10-week average (−6.0%); Gold Macro Score −0.95 (AUCTION)",
     "evidence": [
      {
       "text": "gold 3848.80 vs 10-week average 4093; −30.2% from the 52-week closing high",
@@ -1264,7 +1274,7 @@
       "source": "council daily gold candles (OANDA)"
      },
      {
-      "text": "Gold Macro Score −0.94 → AUCTION (no macro edge)",
+      "text": "Gold Macro Score −0.95 → AUCTION (no macro edge)",
       "asOf": "2026-11-20",
       "source": "council/macroscore.mjs (tested 2007-26, 4-week horizon)"
      }
@@ -1547,7 +1557,8 @@
       "why": "The veteran's week call: the middle 60% of past 5-session outcomes ends above this.",
       "dist": -0.24,
       "side": "below",
-      "near": 1
+      "near": 1,
+      "crossed": true
      },
      {
       "price": 3832.5,
@@ -1556,7 +1567,8 @@
       "why": "The bottom of the quarter's range.",
       "dist": -0.42,
       "side": "below",
-      "near": 1
+      "near": 1,
+      "crossed": true
      },
      {
       "price": 3804.2,
@@ -1565,7 +1577,8 @@
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends above this.",
       "dist": -1.16,
       "side": "below",
-      "near": 1
+      "near": 1,
+      "crossed": true
      },
      {
       "price": 3800,
@@ -1574,7 +1587,8 @@
       "why": "Option strikes and resting orders cluster at round numbers; price often pauses there.",
       "dist": -1.27,
       "side": "below",
-      "near": 1
+      "near": 1,
+      "crossed": true
      }
     ],
     "fresh": {
@@ -1583,7 +1597,11 @@
      "stale": false,
      "text": "as of 2026-11-17 close"
     },
-    "mark": null
+    "mark": {
+     "px": 3734.13,
+     "at": "2026-11-18T23:19:20.000Z",
+     "dist": -2.98
+    }
    },
    "dxy": {
     "name": "DXY",
@@ -2906,7 +2924,7 @@
     "Employment Change",
     "Unemployment Rate"
    ],
-   "expMovePct": 1.15,
+   "expMovePct": 1.26,
    "note": null,
    "bands": {
     "cool": 25.5,
@@ -2977,7 +2995,7 @@
   }
  ],
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). AUD Employment Change (Thu 19 Nov, 00:30 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 17 Nov close).",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). AUD Employment Change (Thu 19 Nov, 00:30 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,734. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close).",
   "bias": {
    "lean": "neutral",
    "p": 0.55,
@@ -3002,30 +3020,36 @@
    "at": "2026-11-19T00:30:00.000Z",
    "consensus": "25.5K",
    "previous": "-39.3K",
-   "goldMovePct": 1.15,
+   "goldMovePct": 1.26,
    "when": "Thu 19 Nov, 00:30 UTC"
   },
   "levels": {
    "px": 3848.795,
    "asOf": "2026-11-17",
    "above": {
-    "price": 3870.3,
-    "label": "October low",
-    "dist": 0.56
+    "price": 3800,
+    "label": "Round number",
+    "dist": -1.27,
+    "distNow": 1.76,
+    "crossed": true
    },
-   "below": {
-    "price": 3832.5,
-    "label": "13-week low",
-    "dist": -0.42
-   },
+   "below": null,
    "fresh": {
     "asOf": "2026-11-17",
     "sessions": 0,
     "stale": false,
     "text": "as of 2026-11-17 close"
    },
-   "mark": null,
-   "broken": null
+   "mark": {
+    "px": 3734.13,
+    "at": "2026-11-18T23:19:20.000Z",
+    "dist": -2.98
+   },
+   "broken": {
+    "price": 3832.5,
+    "label": "13-week low",
+    "side": "below"
+   }
   },
   "calibration": {
    "status": "waiting",
@@ -3034,7 +3058,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-18 23:01 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 2 agree, 4 qualify, 0 disagree; qualified: Direction for gold, Real yields, US dollar, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Employment Change): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.04% (+15 bp from 2.89%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 53%, t 0.84 vs ry hit 50%, t 0; v_d2_4w hit 56%, t 1.77 vs dgs2 hit 54%, t 1.6; v_dxy4w no record yet vs dxymom no record yet. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. AUD Employment Change on Thu, 19 Nov is the week's pivot | 2. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 3. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | H1 (58%): If gold stays below $3,870 (october low), it closes at or below $3,833 (13-week low) by 2026-11-24 before any close above $3,870 | H2 (27%): Gold's daily closes stay between $3,800 (round number) and $3,900 (round number) every day through 2026-11-24 | H3 (56%): DXY closes 2026-12-15 below 103.64 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). AUD Employment Change (Thu 19 Nov, 00:30 UTC) is the event that matters most. Watch $3,870 above and $3,833 below (levels as of the 17 Nov close). Event playbook: AUD Employment Change 2026-11-19 00:30 UTC: consensus 25.2K (previous -39.3K). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-18 23:19 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Real yields, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Employment Change): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.04% (+15 bp from 2.89%) ends the real-rate support; DXY above 105.2 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4093 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.75 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.12 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. AUD Employment Change on Thu, 19 Nov is the week's pivot | 2. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 3. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | H1 (58%): If gold stays below $3,870 (october low), it closes at or below $3,833 (13-week low) by 2026-11-24 before any close above $3,870 | H2 (27%): Gold's daily closes stay between $3,800 (round number) and $3,900 (round number) every day through 2026-11-24 | H3 (56%): DXY closes 2026-12-15 below 103.64 (the latest close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 11 Dec, base 57%). AUD Employment Change (Thu 19 Nov, 00:30 UTC) is the event that matters most. Gold has traded below $3,833 (13-week low) since the 17 Nov close and is near $3,734. Watch $3,800 above (broken since the close) (levels as of the 17 Nov close). Event playbook: AUD Employment Change 2026-11-19 00:30 UTC: consensus 25.2K (previous -39.3K). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
