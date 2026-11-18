@@ -114,7 +114,7 @@ test('page wiring: context recorded at every entry, stops tracked, sentence on t
   assert.match(page, /rec\.riskSet = \+\$\('o-risk'\)\.value \|\| 0; rec\.riskPct = coachRisk\(u, e, stop\); coachAt\(rec, mom\(\)\);/);   // instant
   assert.match(page, /if \(type === 'market'\) coachAt\(rec, mom\(\)\);/);   // draft confirm
   assert.match(page, /if \(e\.kind === 'fill'\) coachAt\(e\.pos, e\.pos\.openedAt\)/);   // a resting order filled
-  assert.equal((page.match(/BT\.coachStop\(p\)/g) || []).length, 3, 'drag, typed stop, break-even');
+  assert.equal((page.match(/BT\.coachStop\(p\)/g) || []).length, 4, 'drag, typed stop, break-even, break-even on every trade in profit (18 Nov 2026)');
   assert.match(page, /class="dsay"/); assert.match(page, /class="say\$\{t\.ctx/); assert.match(page, /id="mist-seen"/); assert.match(page, /What the coach saw/);
   assert.match(page, /id="vc-coach"/); assert.match(page, /renderCoach\(RC\)/); assert.match(page, /coachBackfill\(\); render\(\);/);
   // the coach never places, closes or cancels anything: its helpers call no order function

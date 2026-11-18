@@ -687,6 +687,20 @@ with newer prices (-5.22R on screen), and the connector counted outcomes differe
   delta-coded), about 0.4 MB of new blobs a day; it needs an additive level shift at each contract switch, which cannot be
   checked without the live feed.
 
+## The watchdog's own timer (18 Nov 2026, owner: "lets go"; docs/owner-decisions.md items 15 and 31)
+`watchdog.yml` sends the "council stopped" alert but ran only on GitHub's :11 / :41 cron (a few times a day) and after a
+completed council run (none comes when the loop hangs inside a run). The Worker's 10-minute cron now runs
+`/api/status?job=watchdog` FIRST in its chain (`CHAINED`; no new trigger): `api/_watchdog-kick.js` (no imports) reads the `at` of
+council-data `snapshot.json` and `ict/snapshot.json` through `api/data.js` `readFile` and, when the council is over
+`COUNCIL_MIN` 20 min old or the ICT desk over `ICT_MIN` 45 min outside the futures weekend (the limits and weekend of
+`council/health.mjs`, a test compares them), starts `watchdog.yml` on main with `GH_DISPATCH_TOKEN` (Actions: write). At most once
+per `GAP_MIN` 30 min: no start while a watchdog run is queued or running or one was created in the last 30 min, by anyone
+(GitHub's run list is the marker, as `council/replay-due.mjs`). Not sure is no: an unreadable snapshot or run list, or no token,
+starts nothing; a fresh desk asks GitHub nothing. The watchdog still decides what to send and keeps its `watchdog.json` mark, so
+no alert is doubled; this path sends no message and writes no file. Guarded by `CRON_SECRET` (401 otherwise, `private, no-store`);
+the public `/api/status` answer is unchanged. Tests: `tests/watchdog-kick.test.mjs` (8). Not checked live: the dispatch itself
+(Actions cannot be started from the build sandbox) and whether the Worker's token has Actions: write.
+
 ## ICT replay: a trigger that does not depend on GitHub's cron (11 Nov 2026, reliability)
 `ict-replay.yml`'s cron is not enough: of its 35 runs up to 11 Nov, one came from the schedule (the then weekly cron, 8 Nov,
 started 13:49 UTC for 06:41) and 34 from pushes; a run takes 2-32 min (median about 10). So the council loop starts it:
@@ -753,8 +767,8 @@ and the trail's new stop `entry ± (mfe − 1) x r0` jumps past the rule's level
 carry no `r0` / `stop0`. Effect so far: none (no `nq-open` record in research.json's whole history ever had `trailMoved`; the
 only two runner records, 9 Nov, stopped at −1.05R); `research/replay-2w.json` rows come from another program that keeps the
 opening stop and are unaffected. The fix (stamp the opening risk as a new field `r0`, from `tp1` / 2 for a record already
-trailed) changes where the trail puts the stop, so it is a proposal: `research/proposals/2026-11-12-nq-open-r0.md`. Never
-compute an NQ open-run R from the current stop. Test: `tests/nq-open-r0.test.mjs` (lifts the loop from the trader's text).
+trailed) changes where the trail puts the stop, so it was a proposal (`research/proposals/2026-11-12-nq-open-r0.md`); **applied 18 Nov
+2026** (owner: "do all"): the loop stamps `r0` before its trail can move the stop. Never compute an NQ open-run R from the current stop. Test: `tests/nq-open-r0.test.mjs` (lifts the loop from the trader's text).
 
 ## LIT paper shadow stream (8 Nov 2026, owner: "leave it as paper shadow or just LIT")
 `council/lit.mjs` (pure; tests/lit-shadow.test.mjs) is a verbatim port of the LIT study's detector (research/edge/lit run.mjs: #596
@@ -1051,8 +1065,8 @@ Gold fidelity (8 Nov, research/edge/gold-fidelity): (11 Nov 2026: the cost also 
 `tests/fills-live.test.mjs` lifts the Trader's loop text out of trader.mjs and checks parity, so a change to the live loop must be
 mirrored there. A pyramid add inherits its parent's `shadow` flag (a blocked Mosha chain's add is not a live trade).
 **Moved-stop audit (12 Nov 2026, after item 50; `research/proposals/2026-11-12-moved-stop-audit.md`, item 51).** 1R is the risk a
-trade OPENED with, never `|entry - stop|` once a trail, break-even or ratchet has moved the stop. Every Trader loop but the NQ
-open run's (item 50) reads a stamped `r0`: pushed with the record for every system whose stop moves (also outside the loop: the
+trade OPENED with, never `|entry - stop|` once a trail, break-even or ratchet has moved the stop. Every Trader loop (the NQ
+open run's too since item 50 was applied) reads a stamped `r0`: pushed with the record for every system whose stop moves (also outside the loop: the
 gold trend and crypto ratchets, the LIT swing break-even), stamped on the first managed candle otherwise (`tr.r0 || (tr.r0 =
 ...)` before any move); a test lists every `.stop = ` in trader.mjs, so a new stop move must be audited. Readers use
 `fills.mjs` `openRisk(x)` (`r0`; else `|entry - stop|` while unmoved; else `stop0`; else the NQ open run's 2R mark / 2; else
@@ -1060,8 +1074,9 @@ null = leave the figure out): the mirror's `fillQuality` (imported as `riskAtOpe
 the reconciliation report, the digest's floating R; copies in `api/_edge-analyst.js` (`stopAtEntry`; an unknown opening stop is
 not studied) and the page (`risk0`: Active trades, the trade table's live R, the guest trade card, "R now"), compared by
 `tests/moved-stop-audit.test.mjs`. On the replica `stop0` is the level BEFORE the round-number step, not the opening stop.
-Open for the owner (item 51): a market copy of a trade whose stop is already past its entry gets its demo stop on the losing
-side (ICT A-setups copied late; council trades without a fresh price), and the late-copy check reads 1R from the moved stop.
+Item 51, **applied 18 Nov 2026** (owner: "do all"): a trade whose stop already sits past its entry is never copied as a market
+order (its relative stop would land on the losing side of the fill; ICT A-setups copied late were the case), and the late-copy
+check reads 1R from the opening risk (`riskAtOpen(t) || |entry - stop|`). Tests: the two "item 51" tests in `tests/ctrader-mirror.test.mjs`.
 
 ## Forex spreads: a raw-spread account, measured (12 Nov 2026, owner approved the cost-measurement fix)
 council-data `ctrader/symbols.json` showed `spread: 0` on EUR/USD, GBP/USD, AUD/USD (and at times USD/CAD, USD/CHF), so
@@ -2350,6 +2365,14 @@ reads the block `// ---- split charts move together and share drawings` for orde
   candles; the 30-day quick start is too long for it). Its Layout note is hidden on a phone's More sheet (`@container cc (max-width:
   640px)`), so the menu with Sync still opens on the screen at 360-430 px. Run with `MD_ORIGIN=https://aureumdesk.co.uk` while the
   workers.dev origin answers "OANDA_TOKEN not set" (17 Nov 2026).
+
+## ChronosTrade battles, seconds charts, compact order bar (18 Nov 2026, owner: "make it more professional and easier … add 30s chart and 15s chart … allow battle with someone … max 4 people … live same chart … see the % profit"; then "the user can invite and the other player can accept")
+Paper only: no order, broker, council or ICT file is touched; no stop is ever moved further away.
+- **15 s and 30 s charts**: `api/bars.js` `TF` `15s` / `30s` (OANDA `S15` / `S30`), page `TFS` / `XLBL` / `XNAME` and the session form (a "Seconds" group), `BT.TF_SECS` starts at 15 (a 1m candle cut at :30 forms from 30 s candles; nothing finer than 15 s). A seconds session loads at most `DAYMAX` 2 days (15 s) / 4 days (30 s). Tests: `tests/oanda-symbols.test.mjs`, `tests/backtest.test.mjs` ("seconds charts").
+- **Order bar**: the quick bar's risk is a button stepping 0.25 / 0.5 / 1 / 2 % (`qRisk`, right-click back; writes `#o-risk`); a strip `#qpos` under it while trades are open: count, floating R, **BE all** (`beAll`: stop to entry only on a trade in profit whose stop is still behind the entry, so it only tightens) and **Close all** (`closeAll`, confirms for 2+). Keys **E** / **X**; in Help. Compact 36 px buttons with a mouse, 44 px on touch.
+- **Battles**: a room per 6-character code (`api/_battle.js` `ALPHA`, no 0 / O / 1 / I / L) in a Durable Object (`cloudflare/src/worker.mjs` `BattleRoom`, binding `BATTLE`, migration `battle-v1` `new_sqlite_classes`; logic pure in `cloudflare/src/battle-room.mjs` `Room`). `/api/battle` (Vercel shape, signed in, same origin, 30 calls / 10 min per account) hands out a two-minute ticket signed with a key derived from the session key and its own label (`aureum/battle/v1`): never a session, and a session never a ticket. `/api/battle-ws?t=` (Worker, same origin, ticket checked BEFORE the room) opens the socket. Up to `MAX` 4 players, one socket per account (a second tab replaces the first), rooms take no one new after 6 h or once ended. The **host** (first account in) sends `setup` (market, timeframe, exact `from` / `to`, start, balance, costs), `go` (the moment), `clock` (replay moment T, never backwards, held inside the window) and `end`; players send `stat` (% of the start with floating, trades, wins, open; clamped, 4 a second at most) and `chat` (140 plain characters, paced). Page block `// ---- Battle (18 Nov 2026` … `// ---- end Battle` (before the simple view's block; CSS `/* Battle (18 Nov 2026)` … `/* end Battle */`): every player loads the host's window with `loadSession` (the Load button's body, now a function) and follows the host's moment with `step(true)` (each candle through their own engine once), so nobody sees ahead; a player who comes back gets their own saved battle session (name `Battle <code> · …`) by `resume`. In a battle Undo, the timeframe switch, Load / Resume / New and quick starts are off for everyone, and a guest's replay controls follow the host (capture-phase locks, `btWhy` says why). Standings card `#btb` (side column: rank, % bar, trades, win %, open, last trade, reactions, chat), rank pill `#bt-pill` in the price pane, 3-2-1 countdown, final podium. `window.ctBattle()` is the read-only view.
+- **Invites**: `/api/battle { box: true }` gives a box ticket (`kind: 'box'`, never opens a room) and the other members (key and name only); `/api/battle-inbox` (Worker, same origin, box ticket) talks to one `Inbox` (`idFromName('__inbox__')`, memory only): `invite` (room code, up to 3 keys, 20 a sender per 10 min), `list` (my open invites + replies to my invites, each reply once), `answer` (accept / decline once; the inviter is told). Invites last 15 min. The ChronosTrade page reads its inbox every 6 s while visible and shows a card with Accept and join / Decline (`btCard`); the room dialog lists members to invite (`btInviteList`). Invites show on ChronosTrade only, not on the Desk.
+- Tests: `tests/battle-room.test.mjs` (tickets, door, room rules, inbox, wiring). Checked end to end with `wrangler dev` (Durable Object local) and five browsers: invite accepted / declined, four seats and a fifth refused, every page on the host's exact window and moment through steps and 12x play, Undo locked, standings and chat, a reload that keeps its trades, final standings. Not checked live: the Durable Object on Cloudflare (it ships with the next `cloudflare-deploy.yml` run).
 
 ## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
 Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =

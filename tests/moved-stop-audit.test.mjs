@@ -157,7 +157,7 @@ test('reconciliation: an ICT copy whose trail moved past the entry is not called
   assert.ok(row); assert.deepEqual(row.issues, [], 'before: "the stop is on the wrong side of the entry" and a stop distance mismatch');
 });
 
-test('Trader text: every stop assignment is in a loop that reads a stamped r0, except the NQ open run (item 50); the research loops never move a stop', () => {
+test('Trader text: every stop assignment is in a loop that reads a stamped r0 (the NQ open run too since item 50); the research loops never move a stop', () => {
   const src = rd('council/trader.mjs');
   const moves = [...src.matchAll(/\b(\w+)\.stop = /g)].map((m) => m[1]);
   // tr (generic loop: trail, Coach break-even, beAt), open + gAdd (gold trend ratchet), open (crypto trend midpoint ratchet), r (NQ open run)
@@ -169,8 +169,8 @@ test('Trader text: every stop assignment is in a loop that reads a stamped r0, e
     const a = src.indexOf(head), z = src.indexOf('r.checked = bars.at(-1).time;', a); assert.ok(a > 0 && z > a, head);
     assert.doesNotMatch(src.slice(a, z), /r\.stop = |trailMoved|beMoved/, 'no stop move inside');
   }
-  // the NQ open run: the defect of item 50, still as found (a fix there is the owner's decision; tests/nq-open-r0 on its branch)
-  assert.match(src, /for \(const r of openNq\) \{\n {6}const s = r\.side === 'sell', r0 = Math\.abs\(r\.entry - r\.stop\);/);
+  // the NQ open run: item 50 applied 18 Nov 2026 (owner: "do all"): it stamps the opening risk before its trail can move the stop
+  assert.match(src, /for \(const r of openNq\) \{\n.*\n {6}if \(!\(r\.r0 > 0\)\) r\.r0 = r\.trailMoved && r\.tp1 != null \? Math\.abs\(r\.tp1 - r\.entry\) \/ 2 : Math\.abs\(r\.entry - r\.stop\);\n {6}const s = r\.side === 'sell', r0 = r\.r0;/);
 });
 
 test('page: the floating / live R figures read the opening risk (risk0), never |entry - stop| of a moved stop', () => {

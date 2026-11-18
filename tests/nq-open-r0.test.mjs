@@ -2,7 +2,7 @@
 // on every Trader run, and the runner trail moves `stop`, so once the stop has trailed, the loop's "1R" is no longer the
 // opening risk (research/proposals/2026-11-12-nq-open-r0.md, docs/owner-decisions.md item 50). The loop is lifted from the
 // trader's own text and run on hand-made one-minute candles; the "proposed" loop is the same text with the one-line change
-// of the proposal. Offline. Nothing here edits the trader: the proposal waits for the owner.
+// of the proposal. Offline. Applied to the trader on 18 Nov 2026 (owner: "do all").
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -20,7 +20,8 @@ const NEW = "      // the OPENING risk (12 Nov 2026, item 50): the runner trail 
 const nyFmt = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' });
 function nyParts(t) { const o = {}; for (const p of nyFmt.formatToParts(new Date(t * 1000))) o[p.type] = p.value; return { d: `${o.year}-${o.month}-${o.day}`, m: +o.hour * 60 + +o.minute, wd: o.weekday }; }
 const mk = (body) => new Function('openNq', 'bars', 'nyParts', 'stopFill', 'exitR', body);
-const current = mk(LOOP), proposed = mk(LOOP.replace(OLD, NEW));
+// applied 18 Nov 2026 (owner: "do all", item 50): the trader now holds NEW; `current` rebuilds the old line to keep the defect on record
+const current = mk(LOOP.replace(NEW, OLD)), proposed = mk(LOOP);
 
 // Monday 16 Nov 2026, 10:00 ET = 15:00 UTC. A buy at 100, stop 90 (1R = 10), the live push's levels: 2R mark 120, target 10R
 // 200, trail [2, 1] (config.nqRun = { atR: 2, trail: 1 }), out at 11:00 ET.
@@ -39,10 +40,10 @@ const A = [bar(1, 100, 112, 99, 111), bar(2, 111, 124, 110, 123),   // up to +2.
   bar(3, 123, 124, 121, 122),                                       // no new high
   bar(4, 122, 122.5, 119, 120), bar(5, 120, 121, 118, 119)];        // dips to 118, above the rule's stop of 114
 
-test('the lifted loop is the trader\'s loop, and the line the proposal replaces is in it once', () => {
+test('the lifted loop is the trader\'s loop, and it reads the opening risk (the fix is applied, item 50)', () => {
   assert.ok(LOOP.length > 500 && LOOP.includes('r.trailMoved = true'), 'the open-run management loop was found');
-  assert.equal(LOOP.split(OLD).length, 2, 'the r0 line is there exactly once');
-  assert.notEqual(LOOP.replace(OLD, NEW), LOOP);
+  assert.equal(LOOP.split(NEW).length, 2, 'the opening-risk lines are there exactly once');
+  assert.ok(!LOOP.includes(OLD), 'the old line (1R from the current stop) is gone');
 });
 
 test('one run over every candle: the stop trails as the rule says and nothing is booked (the defect needs a second run)', () => {
