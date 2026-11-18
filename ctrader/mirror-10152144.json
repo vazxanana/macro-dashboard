@@ -642,7 +642,7 @@
     "lots": 0.05,
     "digits": 2,
     "setup": "ict-A",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-18T00:42:38.000Z",
     "councilEntry": 50959,
     "stop": 50626,
@@ -653,11 +653,13 @@
     "fillPrice": 50891.12,
     "lagSec": 22,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-18T00:42:38.000Z",
     "brokerStop": 50558.12,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "closedAt": "2026-11-18T14:32:55.000Z"
    }
   },
   "day": {
@@ -665,7 +667,7 @@
    "startBalance": 9975.34
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9933 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 9916.11 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -673,8 +675,8 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 9933,
-  "lastRun": "2026-11-18T14:29:29.000Z"
+  "balance": 9916.11,
+  "lastRun": "2026-11-18T14:32:55.000Z"
  },
  "log": [
   {
@@ -1683,6 +1685,11 @@
   {
    "at": "2026-11-18T00:42:38.000Z",
    "msg": "opened buy US30 0.05 lot (council ict-A)",
+   "trade": "ict:ym-b-1794956400"
+  },
+  {
+   "at": "2026-11-18T14:32:55.000Z",
+   "msg": "US30 position 50238807 closed at the broker",
    "trade": "ict:ym-b-1794956400"
   }
  ],
