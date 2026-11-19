@@ -2459,6 +2459,12 @@ a market's ticks into every free chart of it (`FTL` = last tick per market, `tic
 to H1. **1 second** (`1s`, "S1", Seconds group): OANDA stores nothing under 5 s, so a 1 s chart starts from 5 s candles (`spFetch`, said
 in its source line) and builds true 1 s candles from live ticks; with ticks live it is never re-read (a read would put 5 s candles back).
 `window.msFreeTicks()` is the read-only view.
+**Split without its own bar** (same day, owner's marked screenshot: "remove the x and make everything in the same bar row … people
+should be able to change timeframes from each chart"): the Split bar `#ms-sp-bar` is never drawn (its selects stay in the page as the
+values the code reads); its Sync menu `.sp-sync` sits in the toolbar after Split / Layout / Markets (shown in Split only). Each chart's
+header picks its timeframe: the LEFT chart (an analysed pane) takes only the underlined, analysed timeframes (others greyed in its
+menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analysed pane of the same market) any timeframe and, from
+its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
