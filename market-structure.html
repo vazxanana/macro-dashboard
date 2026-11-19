@@ -3782,6 +3782,8 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         html[data-clean="1"] #v-charts :is(#ms-cycle, #ms-adr, #ms-mtf, #ms-cx-tog, .ms-ro, .ms-role) { display: none !important; }</style>
       <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
       <div class="sty-pop" id="ms-sty-pop" role="dialog" aria-label="Chart style" hidden>
+        <div class="sty-h">Markup</div>
+        <div class="sty-seg seg mk-mode mk-in-sty" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" aria-pressed="true">Meridian</button><button type="button" data-mk="ict" aria-pressed="false">ICT</button><button type="button" data-mk="clean" aria-pressed="false">Clean</button></div>
         <div class="sty-h">Chart type</div>
         <div class="sty-seg seg" role="group" aria-label="Chart type"><button type="button" data-cs="candles">Candles</button><button type="button" data-cs="line">Line</button><button type="button" data-cs="both">Both</button></div>
         <div class="sty-h">Colours</div>
@@ -6902,7 +6904,7 @@ function msNextSetup(bars, A) {
   const grid4 = root.querySelector('.ms-grid4');
   function setView(v) {
     if (PUB) v = 'all';   // guests: always the two screens (Daily and H1), whatever was saved or however narrow the window (8 Nov)
-    grid4.dataset.view = v; if (window.msSplitView) setTimeout(() => window.msSplitView(v === 'split'), 0); if (window.msLayView) window.msLayView(v === 'lay');
+    grid4.dataset.view = v; if (window.msSplitView) setTimeout(() => window.msSplitView(v === 'split' || v === 'one', v === 'one'), 0); if (window.msLayView) window.msLayView(v === 'lay');
     root.querySelectorAll('[data-view]').forEach((b) => { const on = b.dataset.view === v; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     try { localStorage.setItem('msView', v); } catch (e) {}
     setTimeout(() => Object.values(panes).forEach((p) => p.fit()), 60);
@@ -7014,13 +7016,14 @@ function msNextSetup(bars, A) {
     el.hidden = false;
     el.innerHTML = `<b>ICT desk</b>` + (live.length ? live.map((x) => `<a href="#ict" class="ict-sg ${x.side === 'sell' ? 'dn' : 'up'}">${x.side === 'sell' ? '▼' : '▲'} ${String(x.short || x.market || '').toUpperCase()} ${x.side} · ${x.model || 'signal'}${x.grade ? ` · ${x.grade.letter}` : ''} · ${x.status}</a>`).join('') : '<span>No open signals right now.</span>') + `<span class="ict-k">Boxes: fair value gaps · purple: Asia range · teal: London range · orange: NY midnight open · grey: 50% of yesterday</span>`; }
   // 8 Nov (owner: "the more u click ict or meridian he just loads more"): one markup at a time, and Clean = candles only
-  function setMode(m) { if (PUB) m = 'clean'; G.mode = m === 'ict' || m === 'clean' ? m : 'meridian'; try { if (!PUB) localStorage.setItem('ms-mode', G.mode); } catch (e) {}
+  function setMode(m) { if (PUB) m = 'clean'; G.mode = m === 'ict' || m === 'clean' ? m : 'meridian'; if (G.mode !== 'clean') G.lastMk = G.mode; try { if (!PUB) localStorage.setItem('ms-mode', G.mode); } catch (e) {}
     document.documentElement.dataset.mk = G.mode;
     document.querySelectorAll('.mk-mode [data-mk]').forEach((b) => { if (b.tagName !== 'BUTTON') return; const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     Object.values(panes).forEach((P) => { if (P.setMode && P.bars) P.setMode(G.mode); });
     try { councilLines(); councilMarkers(); } catch (e) {} ictStrip(); if (window.msSplitMarkup) window.msSplitMarkup(); window.msTrack && msTrack('Chart markup', { mode: G.mode }); }
   document.addEventListener('click', (ev) => { const b = ev.target.closest && ev.target.closest('.mk-mode button[data-mk]'); if (!b) return;
     if (PUB && b.dataset.mk !== 'clean') { if (window.msGate) msGate(true); window.msTrack && msTrack('Locked markup', { mode: b.dataset.mk }); return; }   // members only: the sign-in opens
+    if (b.dataset.mk === 'clean' && G.mode === 'clean' && !b.closest('.mk-in-sty')) { setMode(G.lastMk || 'meridian'); return; }   // the toolbar's Clean is a toggle (19 Nov 2026)
     setMode(b.dataset.mk); });
   document.documentElement.dataset.mk = G.mode;
   setTimeout(() => { if (G.mode !== 'meridian') setMode(G.mode); else document.querySelectorAll('.mk-mode button[data-mk]').forEach((b) => { const on = b.dataset.mk === G.mode; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }, 3200);
@@ -7074,16 +7077,33 @@ function msNextSetup(bars, A) {
   const SP = { on: false, ltf: '1h', rtf: '15m', sym: instKey, sync: { sym: true, tf: false, cross: true, time: true, range: true }, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] };
   try { Object.assign(SP, JSON.parse(localStorage.getItem('ms-split') || '{}'), { on: false, chart: null, series: null, bars: [], key: '', busy: false, unsub: [] }); SP.sync = Object.assign({ sym: true, tf: false, cross: true, time: true, range: true }, SP.sync || {}); } catch (e) {}
   const spSave = () => { try { localStorage.setItem('ms-split', JSON.stringify({ ltf: SP.ltf, rtf: SP.rtf, sym: SP.sym, sync: SP.sync })); } catch (e) {} };
-  const spSym = () => (SP.sync.sym ? instKey : SP.sym), spTf = () => (SP.sync.tf ? SP.ltf : SP.rtf);
+  // one chart on any timeframe (19 Nov 2026): the view 'one' shows the free chart alone, full width, on SP.one
+  try { const o = localStorage.getItem('ms-one-tf'); if (o) SP.one = o; } catch (e) {} if (!SP.one) SP.one = '1w';
+  const spSym = () => (SP.solo || SP.sync.sym ? instKey : SP.sym), spTf = () => (SP.solo ? SP.one : SP.sync.tf ? SP.ltf : SP.rtf);
   // same market and a different timeframe: the right side is a full analysed chart (Meridian / ICT markups, indicators, tools)
-  const spPane = () => (spSym() === instKey && spTf() !== SP.ltf && panes[spTf()] ? panes[spTf()] : null);
+  const spPane = () => (!SP.solo && spSym() === instKey && spTf() !== SP.ltf && panes[spTf()] ? panes[spTf()] : null);
   // seconds charts (18 Nov 2026, as ChronosTrade): 15 s and 30 s candles on Split's right chart, from the OANDA candle proxy only
   // (an exchange market has none; the chart then says so). The six analysed panes keep their timeframes.
-  const SEC_TFS = [{ id: '15s', label: 'S15', role: 'Seconds', sec: 15, binance: null, kraken: null, poll: 5e3 }, { id: '30s', label: 'S30', role: 'Seconds', sec: 30, binance: null, kraken: null, poll: 5e3 }];
-  const SPTFS = SEC_TFS.concat(TFS);
+  const XTF = (id, label, role, sec, binance = null, kraken = null) => ({ id, label, role, sec, binance, kraken, poll: Math.min(15e3, Math.max(3e3, sec * 1e3)) });
+  const SEC_TFS = [XTF('5s', 'S5', 'Seconds', 5), XTF('10s', 'S10', 'Seconds', 10), XTF('15s', 'S15', 'Seconds', 15), XTF('30s', 'S30', 'Seconds', 30)];
+  // 19 Nov 2026 (owner: "any timeframe starting from seconds … grouped in seconds, minutes, hours, days, week, month, year"):
+  // the timeframes no analysed pane has; they open on the free chart (one chart, or Split's right side). A year is built from months.
+  const EXTRA_TFS = [XTF('2m', 'M2', 'Minutes', 120), XTF('10m', 'M10', 'Minutes', 600), XTF('30m', 'M30', 'Minutes', 1800, '30m', 30), XTF('2h', 'H2', 'Hours', 7200, '2h'),
+    XTF('3h', 'H3', 'Hours', 10800), XTF('6h', 'H6', 'Hours', 21600, '6h'), XTF('8h', 'H8', 'Hours', 28800, '8h'), XTF('12h', 'H12', 'Hours', 43200, '12h'),
+    XTF('1w', 'W1', 'Week', 604800, '1w', 10080), XTF('1M', 'MN', 'Month', 2678400, '1M'), XTF('1Y', 'Y1', 'Year', 31536000)];
+  const SPTFS = SEC_TFS.concat(TFS, EXTRA_TFS);
+  // the menu's groups, in order (each id once); a timeframe with an analysed pane opens that pane
+  const TF_GROUPS = [['Seconds', ['5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
+  window.msTfGroups = () => TF_GROUPS.map(([g, ids]) => [g, ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return { id, label: t ? t.label : id, analysed: !!panes[id] }; })]);
+  // a year's candles from monthly ones (UTC calendar years)
+  const yearOf = (bars) => { const out = []; bars.forEach((b) => { const y = new Date(b.time * 1e3).getUTCFullYear(), t = Date.UTC(y, 0, 1) / 1e3, l = out[out.length - 1];
+    if (l && l.time === t) { l.high = Math.max(l.high, +b.high); l.low = Math.min(l.low, +b.low); l.close = +b.close; l.volume = (l.volume || 0) + (+b.volume || 0); }
+    else out.push({ time: t, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }); }); return out; };
+  window.msYearOf = yearOf;
+  async function spFetch(tf, I, n) { if (tf && tf.id === '1Y') { const r = await fetchBars(SPTFS.find((t) => t.id === '1M'), I, Math.min(600, n * 12 + 12)); return r && r.bars ? { src: r.src, bars: yearOf(r.bars).slice(-n) } : r; } return fetchBars(tf || TFS[2], I, n); }
   function spInit() {
     const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym'); if (!lt || lt.options.length) return;
-    const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = `<optgroup label="Seconds (OANDA markets)">${SEC_TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join('')}</optgroup><optgroup label="Minutes to days">${opts}</optgroup>`;
+    const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = TF_GROUPS.map(([g, ids]) => `<optgroup label="${g}">${ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return t ? `<option value="${t.id}">${t.label}</option>` : ''; }).join('')}</optgroup>`).join('');
     const groups = {}; Object.entries(INSTRUMENTS).forEach(([k, v]) => { (groups[v.group] = groups[v.group] || []).push(`<option value="${k}">${v.label}</option>`); });
     sy.innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
     lt.addEventListener('change', () => { SP.ltf = lt.value; spSave(); spApply(); });
@@ -7141,28 +7161,30 @@ function msNextSetup(bars, A) {
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = SPTFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
+    { const b = document.querySelector('.ms-splitc .ph-tf'); if (b) { b.textContent = T ? T.label : tf; b.setAttribute('aria-label', `Timeframe ${b.textContent}: choose another`); } }
+    try { SP.chart.timeScale().applyOptions({ secondsVisible: !!T && T.sec < 60 }); } catch (e) {}
     if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; SP.raw = []; spMarkup(); }   // no old market's markups on an empty chart
     // another market: its own daily bars (three weeks), for the key levels and the ICT 50%-of-yesterday line
     if (k !== instKey && SP.dk !== k) { SP.dk = k; SP.d = null; fetchBars(TFS.find((t) => t.id === '1d') || TFS[0], I, 20).then((r) => { if (SP.dk === k && r && r.bars) { SP.d = r.bars; if (SP.bars.length) { if (G.mode === 'ict') spMarkup(); else spKL(); } } }).catch(() => {}); }
-    try { const r = await fetchBars(SPTFS.find((t) => t.id === tf) || TFS[2], I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
+    try { const r = await spFetch(SPTFS.find((t) => t.id === tf), I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
       SP.raw = r.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }));   // feed candles, for volume and VWAP
       SP.bars = SP.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
       SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
       SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || ''; spMarkup();
-      if (SP.sync.range || SP.sync.time) spFromLeft(); else SP.chart.timeScale().fitContent();
+      if (!SP.solo && (SP.sync.range || SP.sync.time)) spFromLeft(); else SP.chart.timeScale().fitContent();
     } catch (e) { document.getElementById('ms-sp-src').textContent = 'no data'; }
   }
   const leftP = () => panes[SP.ltf];
   const rightC = () => { const R = spPane(); return R ? { chart: R.chart, series: R.series, bars: R.bars, pane: true } : SP.chart ? { chart: SP.chart, series: SP.series, bars: SP.bars } : null; };
-  function spFromLeft() { const L = leftP(), RC = rightC(); if (!L || !RC || SP.busy) return; const vr = L.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
+  function spFromLeft() { const L = leftP(), RC = rightC(); if (SP.solo || !L || !RC || SP.busy) return; const vr = L.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
     try { if (SP.sync.range) RC.chart.timeScale().setVisibleRange(vr);
       else if (SP.sync.time) { const ts = RC.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) { const w = cur.to - cur.from; ts.setVisibleRange({ from: vr.to - w, to: vr.to }); } } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
-  function spToLeft() { const L = leftP(), RC = rightC(); if (!L || !RC || SP.busy) return; const vr = RC.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
+  function spToLeft() { const L = leftP(), RC = rightC(); if (SP.solo || !L || !RC || SP.busy) return; const vr = RC.chart.timeScale().getVisibleRange(); if (!vr) return; SP.busy = true;
     try { if (SP.sync.range) L.chart.timeScale().setVisibleRange(vr);
       else if (SP.sync.time) { const ts = L.chart.timeScale(), cur = ts.getVisibleRange(); if (cur) ts.setVisibleRange({ from: vr.to - (cur.to - cur.from), to: vr.to }); } } catch (e) {} finally { setTimeout(() => { SP.busy = false; }, 0); } }
   const barAtT = (B, t) => { let lo = 0, hi = B.length - 1, r = null; while (lo <= hi) { const m = (lo + hi) >> 1; if (B[m].time <= t) { r = B[m]; lo = m + 1; } else hi = m - 1; } return r; };
-  function spWire() { SP.unsub.forEach((f) => { try { f(); } catch (e) {} }); SP.unsub = []; const L = leftP(), RC = rightC(); if (!L || !RC) return;
+  function spWire() { SP.unsub.forEach((f) => { try { f(); } catch (e) {} }); SP.unsub = []; const L = leftP(), RC = rightC(); if (SP.solo || !L || !RC) return;
     const onL = () => { if (SP.on && (SP.sync.range || SP.sync.time)) spFromLeft(); }, onR = () => { if (SP.on && (SP.sync.range || SP.sync.time)) spToLeft(); };
     L.chart.timeScale().subscribeVisibleTimeRangeChange(onL); RC.chart.timeScale().subscribeVisibleTimeRangeChange(onR);
     if (RC.pane) { SP.unsub.push(() => L.chart.timeScale().unsubscribeVisibleTimeRangeChange(onL), () => RC.chart.timeScale().unsubscribeVisibleTimeRangeChange(onR)); return; }   // two analysed panes already share the crosshair
@@ -7171,13 +7193,19 @@ function msNextSetup(bars, A) {
     L.chart.subscribeCrosshairMove(cxL); SP.chart.subscribeCrosshairMove(cxR);
     SP.unsub.push(() => L.chart.timeScale().unsubscribeVisibleTimeRangeChange(onL), () => SP.chart.timeScale().unsubscribeVisibleTimeRangeChange(onR), () => L.chart.unsubscribeCrosshairMove(cxL), () => SP.chart.unsubscribeCrosshairMove(cxR)); }
   function spApply() { grid4.dataset.splitL = SP.ltf; grid4.dataset.splitR = SP.on && spPane() ? spTf() : ''; if (!SP.on) return; if (!spPane()) spChart(); spControls(); spWire(); spLoad(); }
-  window.msSplitView = (on) => { SP.on = on; const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on; if (on) { spInit(); spApply(); } };
-  setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key;
-    try { const r = await fetchBars(SPTFS.find((t) => t.id === tf) || TFS[2], I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
+  window.msSplitView = (on, solo) => { SP.on = on; SP.solo = !!(on && solo); const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on || SP.solo; if (on) { spInit(); spApply(); } };
+  // pick the one-chart timeframe: an analysed timeframe opens its own pane (markups, setups), any other the free chart alone
+  window.msOneTf = (t) => { if (!SPTFS.some((x) => x.id === t)) return false; if (panes[t]) { setView(t); return true; } SP.one = t; try { localStorage.setItem('ms-one-tf', t); } catch (e) {}
+    if (grid4.dataset.view === 'one') window.msSplitView(true, true); else setView('one'); return true; };
+  window.msOneState = () => ({ view: grid4.dataset.view, tf: SP.one, solo: !!SP.solo, bars: SP.solo ? SP.bars.length : 0, label: (document.getElementById('ms-sp-t') || {}).textContent || '' });
+  let SP_POLL = 0;
+  setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key, T = SPTFS.find((t) => t.id === tf);
+    const now = Date.now(); if (now - SP_POLL < (T ? T.poll : 15e3) - 500) return; SP_POLL = now;
+    try { const r = await spFetch(T, I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
       r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }; const last = SP.bars[SP.bars.length - 1];
       if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {}
       const w = { time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }; if (SP.raw.length && SP.raw[SP.raw.length - 1].time === w.time) SP.raw[SP.raw.length - 1] = w; else SP.raw.push(w); });
-      if (ch) spMarkup(); } catch (e) {} }, 15e3);   // markups and indicators follow the live candle, as on the panes
+      if (ch) spMarkup(); } catch (e) {} }, 3e3);   // each timeframe at its own pace (3 s for seconds charts, 15 s from a minute up)   // markups and indicators follow the live candle, as on the panes
   if (root.querySelector('[data-view]')) {
     root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
     let v0 = null; try { v0 = localStorage.getItem('msView'); } catch (e) {}
@@ -7686,19 +7714,27 @@ function msNextSetup(bars, A) {
   // chart layout it changes that chart only (msLaySet); otherwise it opens that timeframe. On a phone the header also carries
   // the market (it opens the header's own market list), so the page's title, market chips and timeframe row can go.
   { const MENU = document.createElement('div'); MENU.className = 'ph-menu'; MENU.id = 'ms-ph-menu'; MENU.setAttribute('role', 'menu'); MENU.hidden = true; document.body.appendChild(MENU);
-    const TFL = TFS.filter((t) => panes[t.id]).map((t) => [t.id, t.label]);
+    const GROUPS = () => (window.msTfGroups ? window.msTfGroups() : [['Timeframe', TFS.filter((t) => panes[t.id]).map((t) => ({ id: t.id, label: t.label, analysed: true }))]]);
     let forPane = null, forBtn = null;
     const close = () => { MENU.hidden = true; if (forBtn) forBtn.setAttribute('aria-expanded', 'false'); forPane = forBtn = null; };
     const viewNow = () => (grid4.dataset.view || 'all');
-    const openMenu = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const tf = pn.dataset.tf, v = viewNow(), L = window.msLayState ? window.msLayState() : null;
-      MENU.innerHTML = '<div class="ph-m-h">Timeframe</div>' + TFL.map(([id, l]) => `<button type="button" role="menuitemradio" aria-checked="${id === tf}" data-ph-tf="${id}">${l}</button>`).join('')
+    const curTf = (pn) => (pn.classList.contains('ms-splitc') ? (window.msOneState ? (viewNow() === 'one' ? window.msOneState().tf : ((document.getElementById('ms-sp-rtf') || {}).value || '')) : '') : pn.dataset.tf);
+    const openMenu = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const tf = curTf(pn), v = viewNow(), L = window.msLayState ? window.msLayState() : null;
+      const chip = (t) => `<button type="button" role="menuitemradio" class="ph-c${t.analysed ? ' an' : ''}" aria-checked="${t.id === tf}" data-ph-tf="${t.id}" title="${t.analysed ? 'With the Meridian / ICT markup' : 'Candles only, one chart'}">${t.label}</button>`;
+      const G = GROUPS(), big = G.filter(([, l]) => l.length > 1), one = G.filter(([, l]) => l.length === 1);
+      MENU.innerHTML = big.map(([g, l]) => `<div class="ph-m-h">${g}</div><div class="ph-m-row">${l.map(chip).join('')}</div>`).join('')
+        + (one.length ? `<div class="ph-m-g4">${one.map(([g, l]) => `<div><div class="ph-m-h">${g}</div>${l.map(chip).join('')}</div>`).join('')}</div>` : '')
+        + '<p class="ph-m-n">Underlined: with the Meridian / ICT markup.</p>'
         + '<div class="ph-m-h">Charts</div>' + [['all', 'All timeframes'], ['split', 'Split, two charts'], ['lay', 'Layout, 1 to 4 charts']].map(([id, l]) => `<button type="button" role="menuitemradio" aria-checked="${v === id}" data-ph-v="${id}">${l}</button>`).join('')
-        + (v === 'lay' && L ? '<p class="ph-m-n">In the layout this changes this chart only.</p>' : '');
-      const r = btn.getBoundingClientRect(); MENU.hidden = false; const w = MENU.offsetWidth; MENU.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px'; MENU.style.top = (r.bottom + 6) + 'px';
+        + (v === 'lay' && L ? '<p class="ph-m-n">In the layout an underlined timeframe changes this chart only; another opens on one chart.</p>' : '');
+      const r = btn.getBoundingClientRect(); MENU.hidden = false; const w = MENU.offsetWidth, h = MENU.offsetHeight; MENU.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px';
+      MENU.style.top = Math.max(8, r.bottom + 6 + h > innerHeight - 8 ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
       btn.setAttribute('aria-expanded', 'true'); const f = MENU.querySelector('[aria-checked="true"]') || MENU.querySelector('button'); if (f) f.focus({ preventScroll: true }); };
     MENU.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !forPane) return; const tf = forPane.dataset.tf, v = viewNow();
-      if (b.dataset.phTf) { const t = b.dataset.phTf; if (v === 'lay' && window.msLayState) { const L = window.msLayState(), i = L.tfs.indexOf(tf); if (i >= 0) window.msLaySet(i, t); }
-        else { const g = document.querySelector(`#v-charts .seg [data-view="${t}"]`); if (g) g.click(); } }
+      if (b.dataset.phTf) { const t = b.dataset.phTf, an = !!panes[t];
+        if (forPane.classList.contains('ms-splitc') && v === 'split') { const rt = document.getElementById('ms-sp-rtf'), sy = document.querySelector('[data-sync="tf"]'); if (sy && sy.checked) sy.click(); if (rt) { rt.value = t; rt.dispatchEvent(new Event('change')); } }
+        else if (v === 'lay' && an && window.msLayState) { const L = window.msLayState(), i = L.tfs.indexOf(tf); if (i >= 0) window.msLaySet(i, t); }
+        else if (window.msOneTf) window.msOneTf(t); }
       else if (b.dataset.phV) { const g = document.querySelector(`#v-charts .seg [data-view="${b.dataset.phV}"]`); if (g) g.click(); }
       close(); });
     MENU.addEventListener('keydown', (e) => { const bs = [...MENU.querySelectorAll('button')], i = bs.indexOf(document.activeElement);
@@ -7708,7 +7744,7 @@ function msNextSetup(bars, A) {
     const mkName = () => { const m = document.getElementById('ms-mk-btn'); return m ? m.textContent.trim() : ''; };
     const openMarket = () => { const d = document.getElementById('ms-mk'); if (!d) return; document.documentElement.classList.add('mk-sheet'); d.open = true; setTimeout(() => { const q = document.getElementById('ms-mk-q'); if (q) q.focus(); }, 30); };
     { const d = document.getElementById('ms-mk'); if (d) d.addEventListener('toggle', () => { if (!d.open) document.documentElement.classList.remove('mk-sheet'); }); }
-    root.querySelectorAll('.ms-grid4 > .ms-pane[data-tf]:not(.ms-splitc)').forEach((pn) => { const ph = pn.querySelector('.ms-ph'), lab = ph && ph.querySelector(':scope > b'); if (!ph || !lab || ph.querySelector('.ph-tf')) return;
+    root.querySelectorAll('.ms-grid4 > .ms-pane[data-tf]').forEach((pn) => { const ph = pn.querySelector('.ms-ph'), lab = ph && ph.querySelector(':scope > b'); if (!ph || !lab || ph.querySelector('.ph-tf')) return;
       const t = document.createElement('button'); t.type = 'button'; t.className = 'ph-tf'; t.setAttribute('aria-haspopup', 'menu'); t.setAttribute('aria-expanded', 'false'); t.textContent = lab.textContent; t.setAttribute('aria-label', `Timeframe ${lab.textContent}: choose another`);
       t.addEventListener('click', (e) => { e.stopPropagation(); openMenu(pn, t); });
       const m = document.createElement('button'); m.type = 'button'; m.className = 'ph-mk'; m.textContent = mkName() || 'Market'; m.setAttribute('aria-label', `Market ${mkName()}: choose another`);
@@ -14968,6 +15004,24 @@ html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role=
 .ph-menu button[aria-checked="true"] { font-weight: 700; } .ph-menu button[aria-checked="true"]::after { content: ""; margin-left: auto; width: 10px; height: 5px; border-left: 2px solid var(--au-accent, var(--accent)); border-bottom: 2px solid var(--au-accent, var(--accent)); transform: rotate(-45deg); }
 .ph-menu .ph-m-n { margin: 4px 10px 6px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); max-width: 220px; }
 @media (pointer: coarse) { .ms-ph .ph-tf, .ms-ph .ph-mk, .ph-menu button { min-height: 44px; } }
+/* the grouped timeframe menu (19 Nov 2026): seconds to a year as chips, the analysed ones underlined */
+.ph-menu { max-height: calc(100vh - 16px); overflow-y: auto; width: 296px; box-sizing: border-box; }
+.ph-menu .ph-m-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 2px; }
+.ph-menu .ph-m-g4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 2px; }
+.ph-menu .ph-m-g4 .ph-m-h { padding-left: 8px; }
+.ph-menu button.ph-c { justify-content: center; text-align: center; padding: 0 4px; font-variant-numeric: tabular-nums; }
+.ph-menu button.ph-c[aria-checked="true"] { background: var(--au-surface-2, var(--panel-2)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
+.ph-menu button.ph-c[aria-checked="true"]::after { display: none; }
+.ph-menu button.ph-c.an { text-decoration: underline; text-decoration-color: var(--au-ink-3, var(--ink-faint)); text-underline-offset: 3px; }
+.ph-menu .ph-m-n { max-width: none; }
+/* one chart on any timeframe: the free chart alone, full width */
+.ms-grid4.ms-grid4[data-view="one"] { grid-template-columns: minmax(0, 1fr); }
+.ms-grid4.ms-grid4[data-view="one"] > .ms-pane:not(.ms-splitc) { display: none !important; }
+.ms-grid4.ms-grid4[data-view="one"] > .ms-splitc { display: block; }
+.ms-grid4.ms-grid4[data-view="one"] .ms-splitc .ms-chart { height: max(420px, calc(100vh - 300px)); }
+/* the toolbar: no timeframe row (each chart's header chooses its own) and the markup choice lives in Style; Clean stays as a toggle */
+#v-charts .sec-h > .seg[aria-label="Chart view"] > [data-view]:not([data-view="split"]):not([data-view="lay"]) { display: none !important; }
+#v-charts .sec-h > .mk-mode:not(.mk-in-sty) > [data-mk="meridian"], #v-charts .sec-h > .mk-mode:not(.mk-in-sty) > [data-mk="ict"] { display: none !important; }
 /* phone, Charts, members: the market and the timeframe live in each chart's header; the page title, the market chips, the
    timeframe row and the header's market picker go (the picker's list still opens, as a sheet, from a chart's market button) */
 @media (max-width: 640px) {

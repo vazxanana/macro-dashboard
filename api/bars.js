@@ -5,7 +5,7 @@
 const { SYM } = require('./_oanda');
 // tf: page keys plus OANDA's own names for the daily and weekly granularity (D / W), used by research scripts
 // 15s / 30s (18 Nov 2026): ChronosTrade's seconds charts (OANDA S15 / S30); 2m / 10m / 30m / 2h (10 Nov 2026): ChronosTrade's extra timeframes; OANDA only (the Kraken comparison below has no such candles)
-const TF = Object.assign(Object.create(null), { '15s': ['S15', 15, 2], '30s': ['S30', 30, 2], '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '2m': ['M2', 120, 3], '10m': ['M10', 600, 8], '30m': ['M30', 1800, 15], '2h': ['H2', 7200, 25], '1d': ['D', 86400, 60], D: ['D', 86400, 60], '1w': ['W', 604800, 60], W: ['W', 604800, 60] });
+const TF = Object.assign(Object.create(null), { '5s': ['S5', 5, 2], '10s': ['S10', 10, 2], '15s': ['S15', 15, 2], '30s': ['S30', 30, 2], '1m': ['M1', 60, 2], '5m': ['M5', 300, 5], '15m': ['M15', 900, 10], '1h': ['H1', 3600, 20], '4h': ['H4', 14400, 30], '2m': ['M2', 120, 3], '10m': ['M10', 600, 8], '30m': ['M30', 1800, 15], '2h': ['H2', 7200, 25], '3h': ['H3', 10800, 30], '6h': ['H6', 21600, 40], '8h': ['H8', 28800, 45], '12h': ['H12', 43200, 50], '1d': ['D', 86400, 60], D: ['D', 86400, 60], '1w': ['W', 604800, 60], W: ['W', 604800, 60], '1M': ['M', 2678400, 60] });   // 19 Nov 2026: any timeframe on the Desk's charts (a year is built from months there)
 module.exports = async (req, res) => {
   const q = req.query || {};
   // src=kraken (7 Nov): the exact candles the council trader reads (Kraken OHLC; gold = PAXG), to compare with OANDA
