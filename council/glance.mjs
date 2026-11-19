@@ -94,7 +94,7 @@ export function summary(v) {
     const tag = (l) => (!l.crossed ? '' : br && br.price === l.price ? ' (that level, broken since the close)' : ' (broken since the close)');
     if (br) s += ` Gold has traded ${br.side === 'below' ? 'below' : 'above'} ${usd(br.price)} (${br.label.toLowerCase()}) since the ${close} and is near ${usd(levels.mark.px)}.`;
     s += ` Watch ${[levels.above && `${usd(levels.above.price)} above${tag(levels.above)}`, levels.below && `${usd(levels.below.price)} below${tag(levels.below)}`].filter(Boolean).join(' and ')}`;
-    s += f && f.stale ? `. Levels are stale: last close ${dShort(f.asOf)}, ${f.sessions} trading day${f.sessions === 1 ? '' : 's'} ago.` : f ? ` (levels as of the ${close}).` : '.';
+    s += f && f.stale ? `. Levels are stale: last close ${dShort(f.asOf)}, ${f.sessions} trading day${f.sessions === 1 ? '' : 's'} ago.` : f ? `. Levels as of the ${close}.` : '.';
   }
   return { sentence: s, bias, event, levels, calibration: v.calibration ? { status: v.calibration.status, line: v.calibration.line, k: v.calibration.k } : null, publicOnly: true };
 }

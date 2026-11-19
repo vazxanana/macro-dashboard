@@ -71,7 +71,7 @@ test('run: mid-week the veteran\'s last close and levels come from yesterday\'s 
   // honesty in words
   assert.deepEqual(gf.fresh, { asOf: '2026-11-10', sessions: 0, stale: false, text: 'as of 2026-11-10 close' });
   assert.deepEqual(gs.fresh, { asOf: '2026-11-06', sessions: 2, stale: true, text: 'Stale: last close 2026-11-06, 2 trading days ago' });
-  assert.match(fresh.summary.sentence, /\(levels as of the 10 Nov close\)\.$/); assert.match(stale.summary.sentence, /Levels are stale: last close 6 Nov, 2 trading days ago\.$/);
+  assert.match(fresh.summary.sentence, /\. Levels as of the 10 Nov close\.$/); assert.match(stale.summary.sentence, /Levels are stale: last close 6 Nov, 2 trading days ago\.$/);
   assert.equal(fresh.source.includes('fetches nothing'), true);
 });
 
@@ -205,11 +205,11 @@ test('levels to watch: a level price has already crossed is said to be broken, a
   // upward too
   const u = G.markLevels(lv(4070.59, LIST), { now: NOW, mark: { px: 4110, at: '2026-11-11T11:50:00.000Z' } }), wu = G.watchLevels(vetOf(u));
   assert.deepEqual(u.list.filter((l) => l.crossed).map((l) => l.price), [4100, 4082.8]); assert.equal(wu.above.price, 4146.9); assert.equal(wu.below.price, 4082.8); assert.equal(wu.below.crossed, true); assert.equal(wu.broken.price, 4100); assert.equal(wu.broken.side, 'above');
-  assert.match(G.summary(vetOf(u)).sentence, /Gold has traded above \$4,100 \(round number\) since the 10 Nov close and is near \$4,110\. Watch \$4,147 above and \$4,083 below \(broken since the close\) \(levels as of the 10 Nov close\)\.$/);
+  assert.match(G.summary(vetOf(u)).sentence, /Gold has traded above \$4,100 \(round number\) since the 10 Nov close and is near \$4,110\. Watch \$4,147 above and \$4,083 below \(broken since the close\)\. Levels as of the 10 Nov close\.$/);
   // price has moved but crossed nothing: the same two levels, measured from the price, nothing called broken
   const q = G.markLevels(lv(4070.59, LIST), { now: NOW, mark: { px: 4075, at: '2026-11-11T11:50:00.000Z' } }), wq = G.watchLevels(vetOf(q));
   assert.equal(q.list.some((l) => l.crossed), false); assert.equal(wq.broken, null); assert.equal(wq.above.price, 4100); assert.equal(wq.below.price, 4045.4);
-  assert.match(G.summary(vetOf(q)).sentence, /Watch \$4,100 above and \$4,045 below \(levels as of the 10 Nov close\)\.$/);
+  assert.match(G.summary(vetOf(q)).sentence, /Watch \$4,100 above and \$4,045 below\. Levels as of the 10 Nov close\.$/);
 });
 
 test('the latest price is used only when it can be trusted: same feed, later than the close; without it the close decides, as before', () => {
