@@ -2385,6 +2385,11 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   `TZ`). Every chart the page registers (`window.msCharts.add(cx)`: the six panes and Split's free chart) of the same market shows them.
   The chart library places whole indexes only (a fractional one comes back as 0), so a time inside a candle is placed between its
   neighbours (`l2x` / `x2l`). The Desk's older tools (`.ch-hl`, `.ch-tl`, Fibonacci, position, ruler; keys without Alt) are unchanged.
+- **Line alerts** (19 Nov 2026, the price alerts went on 17 Nov): the style bar's "Alert" on a horizontal line, ray or trend line
+  (`d.alert`, kept by `BT.drawNorm` with `fired`) draws an "Alert" tag on it; `alertCheck` (every 1.5 s, the last close of the first
+  chart of each market) fires once when the price crosses it (a ray from its start, a trend line within its span or extended):
+  a 12 s toast in `#ms-toasts`, a browser notification when allowed (asked on the first switch-on), then `alert` is removed and
+  `fired` stamped. Only while the page is open; nothing is sent anywhere. `window.msLineAlerts()` is the read-only view.
 - **Right-click on any chart** (`#ms-cmenu`): Reset chart view, Delete this drawing, Remove the last drawing, Delete all drawings
   (styled confirm; locked ones stay). With a tool on, a right-click cancels it.
 - **Layout** (`data-view="lay"`, button `#ms-lay-btn`, popover `#ms-lay-pop`, localStorage `ms-lay4` `{ n, tfs, sync }`, `msLayNorm`):

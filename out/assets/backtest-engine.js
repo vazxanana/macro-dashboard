@@ -539,7 +539,8 @@
       const need = d.type === 'h' ? ['price'] : d.type === 'v' ? ['t1'] : d.type === 'hr' ? ['t1', 'p1'] : ['t1', 'p1', 't2', 'p2']; if (!need.every((k) => fin(d[k]))) continue;
       const o = { type: d.type }; for (const k of need) o[k] = d[k]; if (fin(d.at)) o.at = d.at; if (fin(d.editedAt)) o.editedAt = d.editedAt;
       if (DRAW_COLS.includes(d.col) && d.col !== 'draw') o.col = d.col; if ([2, 3].includes(d.w)) o.w = d.w; if (d.ls === 'dash') o.ls = 'dash';
-      if (d.ext === true && d.type === 't') o.ext = true; if (d.lock === true) o.lock = true; if (d.lbl === true && (d.type === 't' || d.type === 'r')) o.lbl = true; out.push(o); }
+      if (d.ext === true && d.type === 't') o.ext = true; if (d.lock === true) o.lock = true; if (d.lbl === true && (d.type === 't' || d.type === 'r')) o.lbl = true;
+      if (d.alert === true && ['h', 'hr', 't'].includes(d.type)) o.alert = true; if (fin(d.fired)) o.fired = d.fired; out.push(o); }
     return out; }
   // magnet: the price snaps to the hovered candle's open / high / low / close nearest in pixels; weak (1) only within tol px,
   // strong (2) always; off (0) leaves it. Y maps a price to its pixel row. A point with no candle under it is left alone.
