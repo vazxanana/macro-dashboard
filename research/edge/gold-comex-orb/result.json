@@ -1,0 +1,472 @@
+{
+ "study": "gold-comex-orb",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-comex-orb/PREREGISTRATION.md",
+ "planSha256": "34e24f6e55e36cf4a1bd84111093c87b911436456e4029c53799a588f3e7da58",
+ "claim": "the first M5 close outside the 08:20-08:50 New York range of the COMEX gold day session points the morning on spot gold",
+ "rule": "range = high/low of the six M5 candles 08:20-08:45 NY; break = first M5 close outside it on a candle starting 08:50-11:25; entry at the next open (market); T1 with the break, stop at the opposite side, 2R; T2 = T1 on days whose range is under the median of the previous 20; T3 against the break, stop at the 08:20 → break-candle extreme, 1R; stop first, a gap through the stop fills at the open; flat at 12:00 NY; one trade a day",
+ "data": "OANDA mid XAU/USD M5 through the keyless candle proxy, 2714 trading days 2016-01-04 → 2026-11-13; New York time and the CME calendar from ict/calendar.mjs (full holidays and early closes skipped)",
+ "cost": 0.3,
+ "slip": 0.15,
+ "windows": {
+  "IS": [
+   "2016-01-01",
+   "2020-12-31"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2026-11-13"
+  ]
+ },
+ "verdict": "FAIL, 0 of 3: gold 08:20-08:50 NY breakout 2021 → now +0.006R a trade net (n 1407, month t +0.20, gross +0.075R); 2016-20 −0.155R",
+ "decision": {
+  "T1": {
+   "p": 0.421,
+   "pHolm": 0.841,
+   "checks": {
+    "netPos": true,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "p": 0.097,
+   "pHolm": 0.29,
+   "checks": {
+    "netPos": true,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": true
+   },
+   "pass": false
+  },
+  "T3": {
+   "p": 1,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "Breakout, stop at the opposite side, 2R",
+   "skips": {
+    "nobreak": 123,
+    "range": 1
+   },
+   "IS": {
+    "n": 1183,
+    "win": 0.388,
+    "netR": -0.155,
+    "grossR": -0.002,
+    "net2R": -0.308,
+    "costR": 0.153,
+    "total": -183.61,
+    "months": 60,
+    "t": -5.05,
+    "grossT": -0.08,
+    "t2x": -9.18,
+    "stops": 421,
+    "targets": 148,
+    "time": 614,
+    "maxDD": -186.06,
+    "medianStop": 4.13,
+    "buys": {
+     "n": 604,
+     "netR": -0.14
+    },
+    "sells": {
+     "n": 579,
+     "netR": -0.171
+    },
+    "byYear": {
+     "2016": {
+      "n": 235,
+      "netR": -0.14,
+      "total": -32.86
+     },
+     "2017": {
+      "n": 232,
+      "netR": -0.192,
+      "total": -44.43
+     },
+     "2018": {
+      "n": 234,
+      "netR": -0.161,
+      "total": -37.67
+     },
+     "2019": {
+      "n": 240,
+      "netR": -0.215,
+      "total": -51.66
+     },
+     "2020": {
+      "n": 242,
+      "netR": -0.07,
+      "total": -16.99
+     }
+    }
+   },
+   "OOS": {
+    "n": 1407,
+    "win": 0.446,
+    "netR": 0.006,
+    "grossR": 0.075,
+    "net2R": -0.063,
+    "costR": 0.069,
+    "total": 8.44,
+    "months": 71,
+    "t": 0.2,
+    "grossT": 2.43,
+    "t2x": -2.07,
+    "stops": 473,
+    "targets": 195,
+    "time": 739,
+    "maxDD": -36.06,
+    "medianStop": 9.19,
+    "buys": {
+     "n": 700,
+     "netR": -0.019
+    },
+    "sells": {
+     "n": 707,
+     "netR": 0.031
+    },
+    "byYear": {
+     "2021": {
+      "n": 238,
+      "netR": 0.019,
+      "total": 4.57
+     },
+     "2022": {
+      "n": 236,
+      "netR": 0.007,
+      "total": 1.62
+     },
+     "2023": {
+      "n": 234,
+      "netR": 0.074,
+      "total": 17.2
+     },
+     "2024": {
+      "n": 244,
+      "netR": -0.04,
+      "total": -9.85
+     },
+     "2025": {
+      "n": 243,
+      "netR": 0.052,
+      "total": 12.63
+     },
+     "2026": {
+      "n": 212,
+      "netR": -0.084,
+      "total": -17.72
+     }
+    }
+   }
+  },
+  "T2": {
+   "name": "T1 on a range under its 20-day median width",
+   "skips": {
+    "warmup": 21,
+    "wide": 1360,
+    "nobreak": 8
+   },
+   "IS": {
+    "n": 600,
+    "win": 0.392,
+    "netR": -0.161,
+    "grossR": 0.036,
+    "net2R": -0.358,
+    "costR": 0.197,
+    "total": -96.71,
+    "months": 59,
+    "t": -3.27,
+    "grossT": 0.78,
+    "t2x": -6.55,
+    "stops": 269,
+    "targets": 114,
+    "time": 217,
+    "maxDD": -117.78,
+    "medianStop": 3,
+    "buys": {
+     "n": 312,
+     "netR": -0.12
+    },
+    "sells": {
+     "n": 288,
+     "netR": -0.206
+    },
+    "byYear": {
+     "2016": {
+      "n": 117,
+      "netR": -0.21,
+      "total": -24.59
+     },
+     "2017": {
+      "n": 124,
+      "netR": -0.157,
+      "total": -19.47
+     },
+     "2018": {
+      "n": 120,
+      "netR": -0.161,
+      "total": -19.38
+     },
+     "2019": {
+      "n": 123,
+      "netR": -0.294,
+      "total": -36.2
+     },
+     "2020": {
+      "n": 116,
+      "netR": 0.025,
+      "total": 2.92
+     }
+    }
+   },
+   "OOS": {
+    "n": 725,
+    "win": 0.452,
+    "netR": 0.064,
+    "grossR": 0.155,
+    "net2R": -0.026,
+    "costR": 0.091,
+    "total": 46.5,
+    "months": 71,
+    "t": 1.3,
+    "grossT": 3.14,
+    "t2x": -0.53,
+    "stops": 298,
+    "targets": 151,
+    "time": 276,
+    "maxDD": -29.43,
+    "medianStop": 6.3,
+    "buys": {
+     "n": 334,
+     "netR": 0.045
+    },
+    "sells": {
+     "n": 391,
+     "netR": 0.08
+    },
+    "byYear": {
+     "2021": {
+      "n": 134,
+      "netR": 0.07,
+      "total": 9.34
+     },
+     "2022": {
+      "n": 121,
+      "netR": 0.058,
+      "total": 6.98
+     },
+     "2023": {
+      "n": 125,
+      "netR": 0.125,
+      "total": 15.6
+     },
+     "2024": {
+      "n": 118,
+      "netR": -0.125,
+      "total": -14.76
+     },
+     "2025": {
+      "n": 121,
+      "netR": 0.22,
+      "total": 26.62
+     },
+     "2026": {
+      "n": 106,
+      "netR": 0.026,
+      "total": 2.72
+     }
+    }
+   }
+  },
+  "T3": {
+   "name": "Fade of the first break, stop past its extreme, 1R",
+   "skips": {
+    "nobreak": 123,
+    "norisk": 84,
+    "range": 1
+   },
+   "IS": {
+    "n": 1147,
+    "win": 0.198,
+    "netR": -6.087,
+    "grossR": -0.354,
+    "net2R": -11.821,
+    "costR": 5.734,
+    "total": -6982.14,
+    "months": 60,
+    "t": -6.53,
+    "grossT": -11.47,
+    "t2x": -6.37,
+    "stops": 774,
+    "targets": 370,
+    "time": 3,
+    "maxDD": -6983.4,
+    "medianStop": 0.38,
+    "buys": {
+     "n": 563,
+     "netR": -4.305
+    },
+    "sells": {
+     "n": 584,
+     "netR": -7.806
+    },
+    "byYear": {
+     "2016": {
+      "n": 228,
+      "netR": -4.179,
+      "total": -952.84
+     },
+     "2017": {
+      "n": 228,
+      "netR": -8.186,
+      "total": -1866.36
+     },
+     "2018": {
+      "n": 230,
+      "netR": -5.541,
+      "total": -1274.39
+     },
+     "2019": {
+      "n": 226,
+      "netR": -9.172,
+      "total": -2072.85
+     },
+     "2020": {
+      "n": 235,
+      "netR": -3.471,
+      "total": -815.69
+     }
+    }
+   },
+   "OOS": {
+    "n": 1359,
+    "win": 0.205,
+    "netR": -3.235,
+    "grossR": -0.48,
+    "net2R": -5.989,
+    "costR": 2.755,
+    "total": -4395.9,
+    "months": 71,
+    "t": -12.94,
+    "grossT": -15.79,
+    "t2x": -12.1,
+    "stops": 1005,
+    "targets": 353,
+    "time": 1,
+    "maxDD": -4395.9,
+    "medianStop": 0.59,
+    "buys": {
+     "n": 680,
+     "netR": -3.255
+    },
+    "sells": {
+     "n": 679,
+     "netR": -3.214
+    },
+    "byYear": {
+     "2021": {
+      "n": 229,
+      "netR": -3.406,
+      "total": -779.89
+     },
+     "2022": {
+      "n": 229,
+      "netR": -3.786,
+      "total": -866.93
+     },
+     "2023": {
+      "n": 221,
+      "netR": -5.106,
+      "total": -1128.5
+     },
+     "2024": {
+      "n": 239,
+      "netR": -2.826,
+      "total": -675.3
+     },
+     "2025": {
+      "n": 236,
+      "netR": -2.436,
+      "total": -574.96
+     },
+     "2026": {
+      "n": 205,
+      "netR": -1.806,
+      "total": -370.32
+     }
+    }
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "start": "03:00-13:00 NY",
+  "means": [
+   -0.183,
+   -0.057,
+   -0.149,
+   -0.114,
+   -0.17,
+   -0.133,
+   -0.14,
+   -0.137,
+   -0.141,
+   -0.176,
+   -0.098,
+   -0.113,
+   -0.179,
+   -0.083,
+   -0.156,
+   -0.103,
+   -0.13,
+   -0.165,
+   -0.08,
+   -0.154,
+   -0.15,
+   -0.15,
+   -0.147,
+   -0.101,
+   -0.126,
+   -0.132,
+   -0.126,
+   -0.111,
+   -0.128,
+   -0.122,
+   -0.109,
+   -0.132,
+   -0.161,
+   -0.104,
+   -0.147,
+   -0.148,
+   -0.13,
+   -0.175,
+   -0.153,
+   -0.121
+  ],
+  "min": -0.183,
+  "max": -0.057,
+  "median": -0.132,
+  "p95": -0.083
+ },
+ "reading": "The primary breakout (T1) does not pass the pre-registered bar (failed: t2, holm, isPos, cost2x). Out of sample it makes +0.006R a trade after costs (n 1407, month t +0.20; before costs +0.075R, t +2.43); costs take 0.069R a trade at a median stop of $9.19. T2 (narrow range) +0.064R (n 725, t +1.30; failed: t2, holm, isPos, cost2x); T3 (fade) −3.235R (n 1359, t −12.94; failed: netPos, t2, holm, isPos, cost2x, placebo). Before costs the breakout does lean the right way out of sample (T1 gross t +2.43, T2 gross t +3.14), but not in 2016-20 (T1 gross −0.002R), and the spread and slippage take what there is. T3's per-trade figures are large because its stop sits a median $0.59 from the entry (the break candle often closes near its extreme), so $0.60 of cost is several R; it loses before costs too (gross −0.480R, t −15.79). Not an edge; nothing live changes and no proposal is written."
+}
