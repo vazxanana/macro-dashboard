@@ -13897,42 +13897,70 @@
    "startBalance": 10329.64
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10357.14 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 10357.14 · 5 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 436.90, 4.2% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 442.21, 4.3% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-19T15:15:53.000Z"
+    "at": "2026-11-19T15:18:49.000Z"
    }
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "xau-m30m1-1795101468": {
+    "orderId": "34436789",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "limitPrice": 3703.22,
+    "stop": 3714.310357142857,
+    "t1": 3681.0392857142856,
+    "placedAt": "2026-11-19T15:18:49.000Z",
+    "expires": "2026-11-19T21:17:48.000Z",
+    "riskCash": 11.09,
+    "margin": 7.4,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "gbpusd-position-1795101468": {
+    "orderId": "34436793",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "position",
+    "limitPrice": 1.31203,
+    "stop": 1.317527357142857,
+    "t1": 1.3010352857142862,
+    "placedAt": "2026-11-19T15:18:49.000Z",
+    "expires": "2026-11-24T15:17:48.000Z",
+    "riskCash": 5.5,
+    "margin": 2.62,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10357.14,
-  "lastRun": "2026-11-19T15:15:53.000Z"
+  "lastRun": "2026-11-19T15:18:49.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T03:54:08.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 428.48, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-19T03:55:21.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 426.43, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-19T03:57:53.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 420.71, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T04:00:06.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 420.12, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15417,6 +15445,21 @@
    "at": "2026-11-19T15:15:53.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 436.90, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-19T15:18:49.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 442.21, 4.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-19T15:18:49.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3703.22 (council m30m1, valid to 2026-11-19T21:17Z)",
+   "trade": "xau-m30m1-1795101468"
+  },
+  {
+   "at": "2026-11-19T15:18:49.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.31203 (council position, valid to 2026-11-24T15:17Z)",
+   "trade": "gbpusd-position-1795101468"
   }
  ],
  "limits": {
