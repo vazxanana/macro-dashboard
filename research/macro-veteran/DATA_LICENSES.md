@@ -17,3 +17,11 @@ The user's confirmed scope is private research and trading. This package is inte
 Official Treasury/Federal Reserve/BLS/DOL research captures are included with source receipts/hashes. They are current agency source versions, not independently authenticated original historical wire bytes. NBU publisher open-data terms expressly permit commercial use with attribution to the [NBU open-data page](https://bank.gov.ua/en/open-data); this applies to its published accounting output and is not a licence to upstream Bloomberg/LBMA feeds. NBU attribution, API/methodology receipts and newly preserved permission/method bodies accompany the authored route review. The separate raw NBU price response is held out under the stated working data-quality boundary until methodology/vintage audit; this is not a finding that NBU prohibits use. Its source/hash/schema/coverage remain included.
 
 Prior delivery ZIPs and dependencies are omitted as duplicate/runtime content; all current research documents and finished model files remain included. See the individual inventory records.
+
+## Revision1.4 additions
+
+NY Fed survey content remains subject to [Terms of Use](https://www.newyorkfed.org/privacy/termsofuse). Attribution: ©2026 Federal Reserve Bank of New York. Content from the New York Fed subject to the Terms of Use at newyorkfed.org. Retain source notices/URLs, applicable permissions and modification labels. Selection, metadata mapping and unit examples are independent research modifications, not NY Fed work or endorsement. This is not a public-domain designation.
+
+NBU attribution: National Bank of Ukraine, [Open Data](https://bank.gov.ua/en/open-data). Its accounting-output permission does not license upstream Bloomberg/LBMA feeds. Dated legal/API/calendar evidence and date-only projection are included. The raw numerical XAU response remains withheld under the explicit analytical-quality boundary; permission is affirmative, while historical field, calendar and vintage gates remain unresolved.
+
+Cleveland chart CC BY4.0 attribution above applies to the historical model input. The new benchmark does not become survey consensus or a prospective forecasting record. Ephemeral HTTP session headers were redacted without changing source bodies/body hashes. Removed header values are not included.

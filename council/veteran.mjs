@@ -36,8 +36,9 @@ import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs'
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
-// 1.3 = the 9 Nov batch (release-integrity checks, first-print ledger, Treasury CPI-day study, claim language)
-export const SKILL_VERSION = '1.3';
+// 1.3 = the 9 Nov batch (release-integrity checks, first-print ledger, Treasury CPI-day study, claim language);
+// 1.8 = the 1.5 base + the 1.6-1.8 news increments (19 Nov: release order, jobs ledger, news register; library only)
+export const SKILL_VERSION = '1.8';
 // the batch's own real forecast: October 2026 core CPI m/m, issued 8 Nov 2026 14:12 UTC, resolved by the BLS first print of 10 Nov.
 // Read from the repository copy of the ledger when it is there (the Vercel bundle has no research/; then null).
 export function cpiPilot(file = new URL('../research/macro-veteran/references/cpi-pilot-forecast-ledger.jsonl', import.meta.url)) {

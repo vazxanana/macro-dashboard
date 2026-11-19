@@ -2716,6 +2716,18 @@ one is `pending` (the desk and /veteran/ say "unresolved · 1 resolution attempt
 this fix the desk would have called it "resolved against the BLS first print". Tests: `tests/veteran.test.mjs`,
 `tests/veteran-library.test.mjs`.
 
+## Macro veteran revision 1.8 (19 Nov 2026, owner: "more stuff to implement on macro")
+The 1.5 top-level files (SKILL.md 1.5, START_HERE.md, DATA_LICENSES.md, validation.json, and `package-tests.txt` kept because
+1.5's validation.json has no test counts) and the 1.8 combined news batch (the 1.6-1.8 increments) installed the 1.3 way:
+`outputs/` into `references/` (handoff readmes renamed `v1-6-…`, `v1-7-…`, `v1-8-…`), assistant and tool names in the text made
+neutral (rule 6); left out: the `work/` Python scripts and five overlap JSONs carrying raw-file paths from the author's computer
+(their `.md` notes were already in `notes/`). `scripts/veteran-index.mjs` reads the revision from README.md's title (else
+SKILL.md), the test count from `package-tests.txt` when validation.json has none, and has a "News and release research" group.
+`SKILL_VERSION` '1.8'. What it adds (README "What's new in 1.8"): PPI before CPI in 5 of 36 months; CPI + PPI → PCE no robust
+added skill; a 36-release jobs ledger (payrolls, unemployment, earnings, hours, revisions); pre-release consensus deliberately
+EMPTY (never a "surprise" from it); 7 verified same-day ISM overlaps on jobs days; a ten-hypothesis news register, none
+validated. Library only: no council member, probability, rule or trade reads it.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
