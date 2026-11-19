@@ -13802,6 +13802,32 @@
     "positionId": "50320860",
     "volume": 100000,
     "status": "open"
+   },
+   "usdcad-rswing-1795071757": {
+    "symbol": "USDCAD",
+    "side": "sell",
+    "setup": "rswing",
+    "openedAt": "2026-11-19T07:08:02.000Z",
+    "councilEntry": 1.43302,
+    "stop": 1.4358932857142856,
+    "t1": 1.43164,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.43302,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 2.07,
+    "margin": 2,
+    "shadow": true,
+    "fillPrice": 1.43302,
+    "slipR": 0,
+    "lagSec": 302,
+    "positionId": "50332475",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -13809,58 +13835,27 @@
    "startBalance": 10329.64
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10357.23 · 5 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10357.23 · 6 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 403.04, 3.9% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 403.66, 3.9% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-19T07:05:49.000Z"
+    "at": "2026-11-19T07:08:02.000Z"
    }
   },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "usdcad-rswing-1795071757": {
-    "orderId": "34394830",
-    "symbol": "USDCAD",
-    "side": "sell",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "rswing",
-    "limitPrice": 1.43302,
-    "stop": 1.4358932857142856,
-    "t1": 1.43164,
-    "placedAt": "2026-11-19T07:03:33.000Z",
-    "expires": "2026-11-21T07:02:37.000Z",
-    "riskCash": 2.07,
-    "margin": 2,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10357.23,
-  "lastRun": "2026-11-19T07:05:49.000Z"
+  "lastRun": "2026-11-19T07:08:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-18T19:31:30.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 413.67, 4.0% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-18T19:33:53.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 419.48, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-18T19:33:53.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 3727.1 (council m30m1, valid to 2026-11-19T01:32Z)",
@@ -15350,6 +15345,16 @@
    "at": "2026-11-19T07:05:49.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 403.04, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-19T07:08:02.000Z",
+   "msg": "limit filled: USDCAD position 50332475 at the broker",
+   "trade": "usdcad-rswing-1795071757"
+  },
+  {
+   "at": "2026-11-19T07:08:02.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 403.66, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
   }
  ],
  "limits": {
@@ -15428,7 +15433,7 @@
   ]
  },
  "execution": {
-  "n": 455,
+  "n": 456,
   "meanSlipR": -0.017,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
@@ -15455,8 +15460,8 @@
     "meanSlipR": 0.001
    },
    "USDCAD": {
-    "n": 60,
-    "meanSlipR": -0.045
+    "n": 61,
+    "meanSlipR": -0.044
    },
    "USDCHF": {
     "n": 62,
