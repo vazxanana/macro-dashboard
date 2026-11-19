@@ -1525,6 +1525,7 @@ Guests (`PUB`) may open `#charts` on any market (watchlist chips `?s=<market>#ch
 the gate; `planLinesDraw` and `klList` return nothing for guests; `#ms-mtf`, readouts, chips and `.ms-role` are hidden. The guest
 overview carries an "Open the charts" button; the charts a "← Gold overview" link and a members note. `#ms-dense-css`: from 1400 px
 the app is 1760 px wide (2000 px from 1800 px), tighter gaps and paddings, the home markets grid auto-fills 168 px cards.
+**19 Nov 2026 fix**: a guest always lands on Charts (`showView`: `v = PUB ? 'charts' : …`). The 19 Nov "denied Home lands on Charts" fallback read the guest's viewer-default `charts: false` and sent guests to a Home they cannot see (a blank page). The chart header's cycle tag `.ms-cy` is hidden for guests (Meridian markup). The smoke test's guest run fails unless the view is Charts with a chart drawn.
 
 ## Profile page and guest view (8 Nov 2026)
 `#profile` (v-profile, in VIEWS and the viewer allow-list) holds the identity card (copied from the account menu) and the council's
@@ -2477,6 +2478,18 @@ menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analy
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
+## Charts type scale (19 Nov 2026, owner: "the currency letters look too big, make same size as the rest")
+Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts is 12.5 px: the toolbar's market button `.ch-mk`
+(was 14 px / 650), the chart headers' market and timeframe buttons `.ph-mk` / `.ph-tf` (13 px / 700), the Markets view's selects and
+price; the trend chips and the cycle tag are 11.5 px Figtree (10.5 px mono and the system font before); the Style / Indicators
+small print 12 px. The chart watermark ("XAU/USD · H1") is 26 px (38 before), still faint.
+Same day, an accessibility pass on Charts (1440 / 390 px, dark and light): every control has a name and a 2 px focus ring, no text
+under AA. Fixed: the candle countdown `.ch-cd`, the phone's price legend `.ch-lg` and the keyboard hints were 10.5 px (now 11.5);
+**Tab followed the DOM, not the screen** (the toolbar is laid out with CSS `order`: Help, Style, Indicators came before the market
+button). A small script before the rail block puts `#v-charts .sec-h`'s element children in the order they are drawn (on load, on
+resize, when a child is added; stable for equal orders; comments stay), so nothing moves on screen; `window.msBarOrder()` reads it.
+No style may depend on the toolbar's sibling order (`+`, `~`, `:nth-child` on `.sec-h > …`).
+
 ## Drawing rail on the left, floating favourites (19 Nov 2026, owner: "the drawing bar in the left and we also should be able to choose favorite and have it floated like tradingview")
 Display only, `market-structure.html` (block "Drawing rail on the left" after the one-chart bar, `<style id="ms-rail-css">`) and
 `assets/ms-charts-guide.js`. Wider than 640 px (`matchMedia('(min-width: 641px)')`) the drawing tools `#ms-dr-bar` and the chart
@@ -2893,6 +2906,16 @@ Score's falling-2-year driver, never a trading rule. The rule book's "double tig
 high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapCheck` (veteran passes `cache.release` DFEDTARU as
 `policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
 `tests/rulebook-gauges.test.mjs`.
+
+## Stress and reaction rules of the macro rule book (19 Nov 2026, owner: "keep going with the other documents")
+`research/edge/rulebook-stress/` (PREREGISTRATION.md committed first; `run.mjs` reuses `rulebook-gauges`' FRED parser, known-at
+rule and Newey-West t; RESULT.md, result.json). Five gold-overlay and event rules of the owner's rule book on FRED DGS2 / DFII10 /
+VIXCLS / DTWEXBGS and OANDA daily gold 2007-26, outcome gold's next 20 sessions. **1 of 5**: C2 "stress exception" (real yield +25
+bp in 5 sessions, VIX > 30, dollar lower) PASS on its count bar (6 episodes, 4 above, +3.05 % vs +0.60 %) but four are 2008-09:
+consistent, not proven. FAIL: C1 "rescue setup" (2-year down > 30 bp in 2 sessions; 10 episodes, only 5 above), C3 "resilience"
+(t 0.33), C4 "deleveraging, hold" (t 1.23, 13 weeks), C5 "gold up on a hawkish day cancels the sell bias" (the wrong way, t -1.04:
+do not use it). Live check `research-watch.mjs` `stressCheck` (`STRESS` = the study's thresholds, a test compares) in "Your
+research, applied" with the record; it changes no score, call or trade. Tests: `tests/rulebook-stress.test.mjs`.
 
 ## The US 10-year regime table and gold (19 Nov 2026, owner: "use the other documents too, keep going")
 `research/edge/yield-regime/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
