@@ -12,6 +12,7 @@ import { EVENTS as SCHED, HISTORY as SCHED_H } from './events.mjs';
 
 const DAY = 86400;
 const REF = new URL('../research/macro-veteran/references/', import.meta.url);
+export const HIST_SRC = 'Forex Factory via a community dataset';
 export const LABEL = 'What was expected, what printed and how gold reacted, release by release. Descriptive: not a forecast, not a tested edge.';
 const num = (x) => { if (x == null || x === '') return null; const v = parseFloat(String(x).replace(/[^\d.+-]/g, '')); return Number.isFinite(v) ? v * (/K\b/i.test(String(x)) ? 1 : 1) : null; };
 const r2 = (x, d = 2) => (x == null || !Number.isFinite(x) ? null : +x.toFixed(d));
@@ -25,7 +26,7 @@ export const TYPES = [
     { k: 'core', name: 'Core CPI m/m', re: /^Core CPI m\/m/i, fred: 'CPILFESL', calc: 'mom' },
     { k: 'head', name: 'CPI m/m', re: /^CPI m\/m/i, fred: 'CPIAUCSL', calc: 'mom' }] },
   { k: 'NFP', name: 'Jobs report', sched: 'NFP', fields: [
-    { k: 'pay', name: 'Payrolls (k)', re: /Non-Farm Employment Change/i, fred: 'PAYEMS', calc: 'diff', unit: 'k' },
+    { k: 'pay', name: 'Payrolls (k)', re: /^Non-Farm Employment Change/i, fred: 'PAYEMS', calc: 'diff', unit: 'k' },
     { k: 'ur', name: 'Unemployment rate', re: /^Unemployment Rate/i, fred: 'UNRATE', calc: 'level', unit: '%' },
     { k: 'ahe', name: 'Hourly earnings m/m', re: /Average Hourly Earnings m\/m/i, fred: 'CES0500000003', calc: 'mom' }] },
   { k: 'FOMC', name: 'Fed decision', sched: 'FOMC', rose: 'the Fed raised rates', fell: 'it cut', fields: [
@@ -55,7 +56,8 @@ export function loadInputs(dir = REF) {
   const rd = (f) => { try { return fs.readFileSync(new URL(f, dir), 'utf8'); } catch (e) { return null; } };
   let bench = null, base = null; try { bench = JSON.parse(rd('cpi-model-benchmark-inputs-2022-2024.json')); } catch (e) { bench = null; }
   try { base = JSON.parse(fs.readFileSync(new URL('./event-base.json', import.meta.url), 'utf8')); } catch (e) { base = null; }
-  return { panel: csv(rd('cpi-ppi-to-pce-release-panel-2022-2024.csv')), jobs: csv(rd('employment-situation-multifield-with-hours-2022-2024.csv')), bench, base };
+  let hist = null; try { hist = JSON.parse(fs.readFileSync(new URL('./consensus-history.json', import.meta.url), 'utf8')); } catch (e) { hist = null; }
+  return { panel: csv(rd('cpi-ppi-to-pce-release-panel-2022-2024.csv')), jobs: csv(rd('employment-situation-multifield-with-hours-2022-2024.csv')), bench, base, hist };
 }
 
 // FRED series → value of a reference period (monthly m/m, monthly diff / level, a quarter, a daily value)
@@ -83,7 +85,7 @@ function dayMove(closes, t) {
   return r2((closes[i].v / closes[i - 1].v - 1) * 100, 2);
 }
 
-export function build({ inputs, rel, captured = [], calendar = [], gold = [], dxy = [], now, since = Date.UTC(2022, 0, 1) / 1000, keep = 18 }) {
+export function build({ inputs, rel, captured = [], calendar = [], gold = [], dxy = [], now, since = Date.UTC(2018, 0, 1) / 1000, keep = 120 }) {
   const I = inputs || {}, rows = new Map();
   const row = (type, t, src) => { const k = `${type}|${isoD(t)}`; if (!rows.has(k)) rows.set(k, { type, t, at: new Date(t * 1000).toISOString(), f: {}, src: new Set() }); const r = rows.get(k); if (src) r.src.add(src); return r; };
   const set = (r, fk, o) => { r.f[fk] = { ...(r.f[fk] || {}), ...Object.fromEntries(Object.entries(o).filter(([, v]) => v != null)) }; };
@@ -104,9 +106,14 @@ export function build({ inputs, rel, captured = [], calendar = [], gold = [], dx
     set(r, 'pay', { actual: num(j.payroll_change_jobs_current_first_release) != null ? Math.round(num(j.payroll_change_jobs_current_first_release) / 1000) : null, actSrc: 'first print', revision: num(j.prior_two_month_revisions_sum_jobs) != null ? Math.round(num(j.prior_two_month_revisions_sum_jobs) / 1000) : null });
     set(r, 'ur', { actual: num(j.unemployment_rate_percent_current_first_release), actSrc: 'first print' });
     set(r, 'ahe', { actual: num(j.ahe_mom_percent_current_as_printed), actSrc: 'first print' }); }
+  // 2b. the calendar's consensus, actual and previous 2018 to Apr 2025 (council/consensus-history.json: Forex Factory via a
+  // community dataset). Its actual is the print as the calendar showed it, used where the batch has no first print.
+  for (const [title, at, cons, act, prev] of (I.hist && I.hist.rows) || []) { const m = typeOf(title, 'USD'), t = Date.parse(at) / 1000; if (!m || !Number.isFinite(t) || t < since) continue;
+    const r = row(m.T.k, t, 'history'), have = r.f[m.f.k] || {};
+    set(r, m.f.k, { exp: cons, expV: num(cons), expSrc: cons ? HIST_SRC : null, prevCal: prev, ...(have.actual == null && num(act) != null ? { actual: num(act), actSrc: 'calendar' } : {}) }); }
   // 3. the consensus the council captured before each release (veteran-expectations, events.json, the calendar cache)
   for (const c of captured) { const m = typeOf(c.title, c.country); const t = Date.parse(c.at) / 1000; if (!m || !Number.isFinite(t) || t < since) continue;
-    const r = row(m.T.k, t, 'captured'); set(r, m.f.k, { exp: c.consensus != null && c.consensus !== '' ? String(c.consensus) : null, expV: num(c.consensus), expAt: c.capturedAt || null, prevCal: c.previous != null && c.previous !== '' ? String(c.previous) : null, actualCal: c.actual != null && c.actual !== '' ? String(c.actual) : null }); }
+    const r = row(m.T.k, t, 'captured'), cn = c.consensus != null && c.consensus !== ''; set(r, m.f.k, { exp: cn ? String(c.consensus) : null, expSrc: cn ? 'captured' : null, expV: num(c.consensus), expAt: c.capturedAt || null, prevCal: c.previous != null && c.previous !== '' ? String(c.previous) : null, actualCal: c.actual != null && c.actual !== '' ? String(c.actual) : null }); }
   // 4. actuals not covered by a first print: the current FRED value of the reference period (can include revisions)
   for (const r of rows.values()) {
     if (r.t > now) continue; const T = TYPES.find((x) => x.k === r.type);
@@ -123,7 +130,7 @@ export function build({ inputs, rel, captured = [], calendar = [], gold = [], dx
       const g = dayMove(gold, r.t), d = dayMove(dxy, r.t);
       const fields = T.fields.map((f) => { const x = r.f[f.k] || {}; const surprise = x.expV != null && x.actual != null ? r2(x.actual - x.expV, 2) : null;
         const dir = x.actual != null && x.prev != null ? (x.actual > x.prev + 1e-9 ? 'up' : x.actual < x.prev - 1e-9 ? 'down' : 'same') : null;
-        return { k: f.k, name: f.name, unit: f.unit || '%', exp: x.exp ?? null, model: x.model ?? null, actual: x.actual ?? null, actSrc: x.actSrc || null, prev: x.prev ?? (x.prevCal != null ? num(x.prevCal) : null), surprise, dir, revision: x.revision ?? null }; });
+        return { k: f.k, name: f.name, unit: f.unit || '%', exp: x.exp ?? null, expSrc: x.exp != null ? (x.expSrc || 'captured') : null, model: x.model ?? null, actual: x.actual ?? null, actSrc: x.actSrc || null, prev: x.prev ?? (x.prevCal != null ? num(x.prevCal) : null), surprise, dir, revision: x.revision ?? null }; });
       return { at: r.at, day: isoD(r.t), fields, goldDay: g, usdDay: d, react: r.react || null, src: [...r.src] };
     }).filter((r) => r.fields.some((f) => f.actual != null || f.exp != null) || r.react || r.goldDay != null);
     const main = T.fields[0].k, withG = R.filter((r) => r.goldDay != null);
@@ -133,7 +140,7 @@ export function build({ inputs, rel, captured = [], calendar = [], gold = [], dx
     const sur = (sg) => withG.filter((r) => { const s = (r.fields.find((f) => f.k === main) || {}).surprise; return s != null && Math.sign(s) === sg; }).map((r) => r.goldDay);
     const stats = { n: withG.length, absMed: med(withG.map((r) => Math.abs(r.goldDay))), upShare: withG.length ? r2(withG.filter((r) => r.goldDay > 0).length / withG.length, 2) : null,
       rose: { n: by('up').length, gold: avg(by('up')) }, fell: { n: by('down').length, gold: avg(by('down')) },
-      above: { n: sur(1).length, gold: avg(sur(1)) }, below: { n: sur(-1).length, gold: avg(sur(-1)) }, from: withG.length ? withG[withG.length - 1].day : null };
+      above: { n: sur(1).length, gold: avg(sur(1)) }, below: { n: sur(-1).length, gold: avg(sur(-1)) }, inline: sur(0).length, from: withG.length ? withG[withG.length - 1].day : null };
     // the next release of this type on the calendar (US), with its consensus and the prior value
     const nx = (calendar || []).map((e) => ({ e, m: typeOf(e.title, e.country || 'USD'), t: Date.parse(e.at) / 1000 })).filter((x) => x.m && x.m.T.k === T.k && x.t > now && x.t <= now + 35 * DAY).sort((a, b) => a.t - b.t);
     if (!nx.length && T.sched) { const sc = [...(SCHED || [])].filter((e) => e.type === T.sched && e.t > now).sort((a, b) => a.t - b.t)[0];
@@ -143,14 +150,16 @@ export function build({ inputs, rel, captured = [], calendar = [], gold = [], dx
     if (stats.n >= 6) prep.push(`On ${stats.n} releases since ${stats.from}, gold moved a median ±${stats.absMed}% on the day and closed up ${Math.round(stats.upShare * 100)}% of the time.`);
     const sg = (x) => (x > 0 ? '+' : '') + x;
     if (stats.rose.n >= 4 && stats.fell.n >= 4) prep.push(T.rose ? `When ${T.rose}, gold averaged ${sg(stats.rose.gold)}% on the day (n ${stats.rose.n}); when ${T.fell}: ${sg(stats.fell.gold)}% (n ${stats.fell.n}).`
-      : `When ${T.fields[0].name} came in higher than the month before, gold averaged ${sg(stats.rose.gold)}% on the day (n ${stats.rose.n}); lower: ${sg(stats.fell.gold)}% (n ${stats.fell.n}).`);
-    if (stats.above.n + stats.below.n >= 6) prep.push(`Against the captured consensus: above it gold averaged ${stats.above.gold ?? 'n/a'}% (n ${stats.above.n}), below it ${stats.below.gold ?? 'n/a'}% (n ${stats.below.n}).`);
-    else prep.push('Not enough captured consensus yet to compare gold\'s reaction with the surprise: the council started capturing it in November 2026.');
+      : `When ${T.fields[0].name} came in higher than the release before, gold averaged ${sg(stats.rose.gold)}% on the day (n ${stats.rose.n}); lower: ${sg(stats.fell.gold)}% (n ${stats.fell.n}).`);
+    if (stats.above.n + stats.below.n >= 6) prep.push(`Against the calendar consensus (${HIST_SRC} to April 2025, the council's own captures from November 2026): above it gold averaged ${stats.above.gold == null ? 'n/a' : sg(stats.above.gold)}% (n ${stats.above.n}), below it ${stats.below.gold == null ? 'n/a' : sg(stats.below.gold)}% (n ${stats.below.n}).`);
+    else prep.push(stats.inline >= 6 ? `It printed in line with the calendar consensus on ${stats.inline} of ${stats.inline + stats.above.n + stats.below.n} releases on file: too few misses to compare gold's reaction.` : 'Not enough calendar consensus on file yet to compare gold\'s reaction with the surprise.');
     if (!R.length && !next) continue;
-    out[T.k] = { k: T.k, name: T.name, fields: T.fields.map((f) => ({ k: f.k, name: f.name })), rows: R.slice(0, keep), stats, next, prep };
+    const mf = (r) => r.fields.find((f) => f.k === main) || {}, cnt = (fn) => R.filter((r) => fn(mf(r))).length;
+    const expBasis = { histSrc: HIST_SRC, hist: cnt((f) => f.expSrc === HIST_SRC), captured: cnt((f) => f.expSrc === 'captured'), model: cnt((f) => f.exp == null && f.model != null) };
+    out[T.k] = { k: T.k, name: T.name, fields: T.fields.map((f) => ({ k: f.k, name: f.name })), rows: R.slice(0, keep), stats, next, prep, expBasis };
   }
   return { v: 1, at: new Date(now * 1000).toISOString(), label: LABEL, types: TYPES.map((T) => T.k).filter((k) => out[k]), study: out,
-    sources: 'Expected: the economic-calendar consensus the council captured before the release (a calendar value, not a verified survey); for CPI 2022-24 the Cleveland Fed model (a model, not a consensus). Printed: the veteran batch\'s first prints 2022-24, else the current FRED value of the reference month (it can include revisions). Gold / dollar: the UTC release-day close vs the close before (council daily closes); first 5 / 60 minutes from council/event-base.json (HistData, to Oct 2026).' };
+    sources: 'Expected: the economic-calendar consensus, from ' + HIST_SRC + ' (council/consensus-history.json: Forex Factory\'s calendar 2018 to 7 Apr 2025 as collected by a third party, MIT as tagged by the uploader) and the consensus the council captured before the release from November 2026 (a calendar value, not a verified survey); nothing is on file between April 2025 and November 2026; for CPI 2022-24 the Cleveland Fed model (a model, not a consensus). Printed: the veteran batch\'s first prints 2022-24, else the calendar\'s printed value to April 2025, else the current FRED value of the reference month (it can include revisions). Gold / dollar: the UTC release-day close vs the close before (council daily closes); first 5 / 60 minutes from council/event-base.json (HistData, to Oct 2026).' };
 }
 
 // captured consensus rows from the council's files (veteran-expectations.json, events.json, the calendar cache)
