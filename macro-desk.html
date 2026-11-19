@@ -521,6 +521,9 @@
     .rf-next .lab { display: block; font-size: var(--fs-xs, 12px); opacity: .8; }
     .rf-wrap { overflow-x: auto; }
     .rf-all { display: none; }
+    #c-red:not(.rf-open) .rf-y { display: none; }
+    #c-red .rf-all.rf-more:not([hidden]) { display: block; margin: 8px 0; min-height: 44px; }
+    .rf-t caption { caption-side: top; text-align: left; font-size: var(--fs-xs, 12px); opacity: .85; padding: 0 0 8px; }
 
     .rf-t td small, .rf-t th small { display: block; opacity: .85; font-weight: 400; }
     .rf-t .up { color: var(--up, #1a7f4b); } .rf-t .dn { color: var(--dn, #c0392b); }
@@ -1390,13 +1393,14 @@
     $('rf-prep').innerHTML = (S.prep || []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
     var head = '<thead><tr><th>Release</th>' + S.fields.map(function (f) { return '<th>' + esc(f.name) + '<small>printed · expected · prior</small></th>'; }).join('') + '<th>Gold, day</th><th>Dollar, day</th><th>Gold, first 5 / 60 min</th></tr></thead>';
     var body = (S.rows || []).map(function (r, ri) {
-      return '<tr' + (ri >= 6 ? ' class="rf-x"' : '') + '><td><b>' + esc(r.day) + '</b></td>' + r.fields.map(function (f) {
+      return '<tr' + (ri >= 18 ? ' class="rf-x rf-y"' : ri >= 6 ? ' class="rf-x"' : '') + '><td><b>' + esc(r.day) + '</b></td>' + r.fields.map(function (f) {
           var sur = f.surprise == null ? '' : '<small>vs consensus ' + (f.surprise > 0 ? '+' : '') + f.surprise + (f.unit === 'k' ? 'k' : '') + '</small>';
           return '<td data-l="' + esc(f.name) + '"><b>' + esc(rfVal(f, f.actual)) + '</b> · ' + esc(f.exp || (f.model != null ? f.model + '% (model)' : NA)) + ' · ' + esc(rfVal(f, f.prev)) + sur + (f.revision != null ? '<small>prior two months revised ' + (f.revision > 0 ? '+' : '') + f.revision + 'k</small>' : '') + (f.actSrc === 'first print' ? '<small>first print</small>' : '') + '</td>'; }).join('')
         + '<td data-l="Gold, day">' + rfMove(r.goldDay) + '</td><td data-l="Dollar, day">' + rfMove(r.usdDay) + '</td>'
         + '<td data-l="Gold, first 5 / 60 min">' + (r.react ? rfPct(r.react.g5 == null ? null : +r.react.g5.toFixed(2), true) + ' / ' + rfPct(r.react.g60 == null ? null : +r.react.g60.toFixed(2), true) : NA) + '</td></tr>'; }).join('');
-    $('rf-table').innerHTML = head + '<tbody>' + body + '</tbody>';
-    $('rf-all').hidden = (S.rows || []).length <= 6; $('rf-all').textContent = 'Show all ' + (S.rows || []).length + ' releases'; $('c-red').classList.remove('rf-open');
+    var eb = S.expBasis, cap = eb ? '<caption>Expected: ' + [eb.hist ? eb.hist + ' releases from ' + esc(eb.histSrc) + ' (2018 to April 2025)' : '', eb.captured ? eb.captured + ' captured by the council before the release (from November 2026)' : '', eb.model ? eb.model + ' from the Cleveland Fed model (a model, not a consensus)' : ''].filter(Boolean).join('; ') + (eb.hist || eb.captured ? '. A calendar consensus, not a verified survey; none on file between April 2025 and November 2026.' : 'none on file.') + '</caption>' : '';
+    $('rf-table').innerHTML = cap + head + '<tbody>' + body + '</tbody>';
+    $('rf-all').hidden = (S.rows || []).length <= 6; $('rf-all').textContent = 'Show all ' + (S.rows || []).length + ' releases'; $('rf-all').classList.toggle('rf-more', (S.rows || []).length > 18); $('c-red').classList.remove('rf-open');
     $('rf-note').textContent = R.label + ' ' + R.sources;
     $('one-s-red') && ($('one-s-red').innerHTML = nx ? 'Next: <b>' + esc(S.name) + '</b> ' + esc(utcWhen(nx.at)) : esc(S.name));
   }
