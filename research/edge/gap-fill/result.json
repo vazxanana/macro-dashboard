@@ -1,0 +1,826 @@
+{
+ "study": "gap-fill",
+ "built": "2026-11-13",
+ "preregistration": "research/edge/gap-fill/PREREGISTRATION.md",
+ "claim": "the gap between the previous 16:00 New York close and the 09:30 open tends to fill during the session",
+ "rule": "gap 0.15-1.0 % of price; enter at the 09:35 open against the gap; target the previous close; stop the same distance beyond the entry (1R); stop first when one candle holds both; out at the 15:55 candle close; variant: only gaps against the prior session",
+ "verdict": "FAIL: 0 of 4 tests pass in 2021 → now; NAS100 fade of every gap −0.059R a trade net (n 852, monthly t −1.84, gross −0.012R), SPX500 fade of every gap −0.121R a trade net (n 913, monthly t −4.37, gross −0.030R)",
+ "decision": {
+  "byTest": {
+   "nas100/all": {
+    "p": 0.967,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "n150": true,
+     "replicates": false,
+     "placebo": false
+    },
+    "pass": false
+   },
+   "nas100/against": {
+    "p": 0.826,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "n150": true,
+     "replicates": false,
+     "placebo": false
+    },
+    "pass": false
+   },
+   "spx500/all": {
+    "p": 1,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "n150": true,
+     "replicates": false,
+     "placebo": false
+    },
+    "pass": false
+   },
+   "spx500/against": {
+    "p": 1,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "n150": true,
+     "replicates": false,
+     "placebo": false
+    },
+    "pass": false
+   }
+  },
+  "verdict": "FAIL"
+ },
+ "markets": {
+  "nas100": {
+   "candles": 770832,
+   "from": "2015-12-01",
+   "to": "2026-11-12",
+   "costPts": 2,
+   "skips": {
+    "early": 21,
+    "prevEarly": 21,
+    "missing": 2,
+    "band": 1023,
+    "filled": 68
+   },
+   "trades": 1597,
+   "against": 787,
+   "tests": {
+    "all": {
+     "windows": {
+      "A": {
+       "n": 745,
+       "win": 0.497,
+       "netR": -0.154,
+       "grossR": 0.01,
+       "costR": 0.165,
+       "total": -114.92,
+       "months": 60,
+       "t": -3.53,
+       "grossT": 0.33,
+       "stops": 304,
+       "targets": 311,
+       "time": 130,
+       "maxDD": -125.76,
+       "medianRiskPts": 27.2,
+       "longs": 288
+      },
+      "B": {
+       "n": 852,
+       "win": 0.488,
+       "netR": -0.059,
+       "grossR": -0.012,
+       "costR": 0.047,
+       "total": -50.02,
+       "months": 71,
+       "t": -1.84,
+       "grossT": -0.38,
+       "stops": 371,
+       "targets": 366,
+       "time": 115,
+       "maxDD": -53.86,
+       "medianRiskPts": 79.8,
+       "longs": 371
+      }
+     },
+     "byYear": {
+      "2016": {
+       "n": 139,
+       "netR": -0.195,
+       "total": -27.16
+      },
+      "2017": {
+       "n": 148,
+       "netR": -0.079,
+       "total": -11.7
+      },
+      "2018": {
+       "n": 164,
+       "netR": -0.173,
+       "total": -28.36
+      },
+      "2019": {
+       "n": 159,
+       "netR": -0.094,
+       "total": -14.95
+      },
+      "2020": {
+       "n": 135,
+       "netR": -0.243,
+       "total": -32.75
+      },
+      "2021": {
+       "n": 154,
+       "netR": -0.025,
+       "total": -3.88
+      },
+      "2022": {
+       "n": 119,
+       "netR": -0.209,
+       "total": -24.93
+      },
+      "2023": {
+       "n": 155,
+       "netR": -0.059,
+       "total": -9.08
+      },
+      "2024": {
+       "n": 160,
+       "netR": 0.017,
+       "total": 2.77
+      },
+      "2025": {
+       "n": 133,
+       "netR": -0.045,
+       "total": -6.04
+      },
+      "2026": {
+       "n": 131,
+       "netR": -0.068,
+       "total": -8.87
+      }
+     },
+     "placebo": {
+      "seeds": 40,
+      "p95": -0.037,
+      "median": -0.082,
+      "values": [
+       -0.081,
+       -0.062,
+       -0.117,
+       -0.059,
+       -0.109,
+       -0.13,
+       -0.114,
+       -0.051,
+       -0.091,
+       -0.076,
+       -0.07,
+       -0.095,
+       -0.1,
+       -0.081,
+       -0.077,
+       -0.037,
+       -0.093,
+       -0.062,
+       -0.083,
+       -0.104,
+       -0.147,
+       -0.062,
+       -0.006,
+       -0.135,
+       -0.148,
+       -0.085,
+       -0.084,
+       -0.032,
+       -0.07,
+       -0.097,
+       -0.072,
+       -0.106,
+       -0.046,
+       -0.078,
+       -0.101,
+       -0.075,
+       -0.082,
+       -0.115,
+       -0.109,
+       -0.072
+      ]
+     }
+    },
+    "against": {
+     "windows": {
+      "A": {
+       "n": 356,
+       "win": 0.463,
+       "netR": -0.255,
+       "grossR": -0.051,
+       "costR": 0.204,
+       "total": -90.77,
+       "months": 60,
+       "t": -3.12,
+       "grossT": -1.08,
+       "stops": 158,
+       "targets": 141,
+       "time": 57,
+       "maxDD": -101,
+       "medianRiskPts": 25.6,
+       "longs": 151
+      },
+      "B": {
+       "n": 431,
+       "win": 0.497,
+       "netR": -0.041,
+       "grossR": 0.002,
+       "costR": 0.044,
+       "total": -17.72,
+       "months": 71,
+       "t": -0.94,
+       "grossT": 0.06,
+       "stops": 186,
+       "targets": 187,
+       "time": 58,
+       "maxDD": -23.59,
+       "medianRiskPts": 78,
+       "longs": 208
+      }
+     },
+     "byYear": {
+      "2016": {
+       "n": 65,
+       "netR": -0.292,
+       "total": -18.97
+      },
+      "2017": {
+       "n": 79,
+       "netR": -0.099,
+       "total": -7.8
+      },
+      "2018": {
+       "n": 78,
+       "netR": -0.153,
+       "total": -11.91
+      },
+      "2019": {
+       "n": 71,
+       "netR": -0.318,
+       "total": -22.6
+      },
+      "2020": {
+       "n": 63,
+       "netR": -0.468,
+       "total": -29.5
+      },
+      "2021": {
+       "n": 77,
+       "netR": -0.04,
+       "total": -3.06
+      },
+      "2022": {
+       "n": 60,
+       "netR": -0.011,
+       "total": -0.67
+      },
+      "2023": {
+       "n": 79,
+       "netR": -0.134,
+       "total": -10.58
+      },
+      "2024": {
+       "n": 84,
+       "netR": 0.096,
+       "total": 8.07
+      },
+      "2025": {
+       "n": 68,
+       "netR": -0.191,
+       "total": -12.98
+      },
+      "2026": {
+       "n": 63,
+       "netR": 0.024,
+       "total": 1.5
+      }
+     },
+     "placebo": {
+      "seeds": 40,
+      "p95": -0.008,
+      "median": -0.073,
+      "values": [
+       -0.038,
+       0.008,
+       -0.08,
+       -0.098,
+       -0.055,
+       -0.129,
+       -0.015,
+       -0.201,
+       -0.077,
+       -0.085,
+       -0.05,
+       -0.128,
+       -0.097,
+       -0.034,
+       -0.092,
+       -0.102,
+       -0.072,
+       -0.042,
+       -0.027,
+       -0.065,
+       -0.09,
+       -0.04,
+       -0.035,
+       -0.069,
+       -0.072,
+       -0.008,
+       -0.057,
+       -0.079,
+       -0.017,
+       -0.138,
+       -0.003,
+       -0.092,
+       -0.091,
+       -0.089,
+       -0.07,
+       -0.088,
+       -0.094,
+       -0.066,
+       -0.159,
+       -0.075
+      ]
+     }
+    }
+   },
+   "fillRate": {
+    "A": [
+     {
+      "from": 0,
+      "to": 0.15,
+      "days": 315,
+      "filled": 273,
+      "rate": 0.867
+     },
+     {
+      "from": 0.15,
+      "to": 0.3,
+      "days": 229,
+      "filled": 173,
+      "rate": 0.755
+     },
+     {
+      "from": 0.3,
+      "to": 0.5,
+      "days": 262,
+      "filled": 147,
+      "rate": 0.561
+     },
+     {
+      "from": 0.5,
+      "to": 1,
+      "days": 277,
+      "filled": 116,
+      "rate": 0.419
+     },
+     {
+      "from": 1,
+      "to": null,
+      "days": 152,
+      "filled": 39,
+      "rate": 0.257
+     }
+    ],
+    "B": [
+     {
+      "from": 0,
+      "to": 0.15,
+      "days": 295,
+      "filled": 275,
+      "rate": 0.932
+     },
+     {
+      "from": 0.15,
+      "to": 0.3,
+      "days": 264,
+      "filled": 200,
+      "rate": 0.758
+     },
+     {
+      "from": 0.3,
+      "to": 0.5,
+      "days": 251,
+      "filled": 156,
+      "rate": 0.622
+     },
+     {
+      "from": 0.5,
+      "to": 1,
+      "days": 382,
+      "filled": 182,
+      "rate": 0.476
+     },
+     {
+      "from": 1,
+      "to": null,
+      "days": 261,
+      "filled": 65,
+      "rate": 0.249
+     }
+    ]
+   }
+  },
+  "spx500": {
+   "candles": 753827,
+   "from": "2015-12-01",
+   "to": "2026-11-12",
+   "costPts": 1,
+   "skips": {
+    "early": 21,
+    "prevEarly": 21,
+    "missing": 2,
+    "band": 988,
+    "filled": 26
+   },
+   "trades": 1674,
+   "against": 848,
+   "tests": {
+    "all": {
+     "windows": {
+      "A": {
+       "n": 761,
+       "win": 0.49,
+       "netR": -0.116,
+       "grossR": 0.033,
+       "costR": 0.15,
+       "total": -88.58,
+       "months": 60,
+       "t": -3.14,
+       "grossT": 0.95,
+       "stops": 266,
+       "targets": 301,
+       "time": 194,
+       "maxDD": -98.93,
+       "medianRiskPts": 9.6,
+       "longs": 310
+      },
+      "B": {
+       "n": 913,
+       "win": 0.478,
+       "netR": -0.121,
+       "grossR": -0.03,
+       "costR": 0.091,
+       "total": -110.5,
+       "months": 71,
+       "t": -4.37,
+       "grossT": -1.12,
+       "stops": 377,
+       "targets": 367,
+       "time": 169,
+       "maxDD": -114.32,
+       "medianRiskPts": 19.8,
+       "longs": 387
+      }
+     },
+     "byYear": {
+      "2016": {
+       "n": 157,
+       "netR": -0.108,
+       "total": -16.93
+      },
+      "2017": {
+       "n": 129,
+       "netR": -0.231,
+       "total": -29.75
+      },
+      "2018": {
+       "n": 167,
+       "netR": -0.139,
+       "total": -23.28
+      },
+      "2019": {
+       "n": 158,
+       "netR": -0.033,
+       "total": -5.21
+      },
+      "2020": {
+       "n": 150,
+       "netR": -0.089,
+       "total": -13.4
+      },
+      "2021": {
+       "n": 163,
+       "netR": -0.091,
+       "total": -14.82
+      },
+      "2022": {
+       "n": 142,
+       "netR": -0.264,
+       "total": -37.49
+      },
+      "2023": {
+       "n": 172,
+       "netR": -0.054,
+       "total": -9.27
+      },
+      "2024": {
+       "n": 151,
+       "netR": -0.07,
+       "total": -10.55
+      },
+      "2025": {
+       "n": 136,
+       "netR": -0.086,
+       "total": -11.72
+      },
+      "2026": {
+       "n": 149,
+       "netR": -0.179,
+       "total": -26.64
+      }
+     },
+     "placebo": {
+      "seeds": 40,
+      "p95": -0.062,
+      "median": -0.112,
+      "values": [
+       -0.155,
+       -0.105,
+       -0.089,
+       -0.135,
+       -0.136,
+       -0.131,
+       -0.106,
+       -0.093,
+       -0.1,
+       -0.092,
+       -0.025,
+       -0.085,
+       -0.152,
+       -0.128,
+       -0.112,
+       -0.084,
+       -0.041,
+       -0.096,
+       -0.076,
+       -0.152,
+       -0.13,
+       -0.142,
+       -0.106,
+       -0.108,
+       -0.073,
+       -0.118,
+       -0.145,
+       -0.17,
+       -0.113,
+       -0.139,
+       -0.063,
+       -0.121,
+       -0.109,
+       -0.094,
+       -0.151,
+       -0.181,
+       -0.118,
+       -0.125,
+       -0.135,
+       -0.081
+      ]
+     }
+    },
+    "against": {
+     "windows": {
+      "A": {
+       "n": 376,
+       "win": 0.473,
+       "netR": -0.149,
+       "grossR": 0,
+       "costR": 0.15,
+       "total": -56.17,
+       "months": 60,
+       "t": -3.3,
+       "grossT": 0,
+       "stops": 142,
+       "targets": 145,
+       "time": 89,
+       "maxDD": -62.99,
+       "medianRiskPts": 9.4,
+       "longs": 171
+      },
+      "B": {
+       "n": 472,
+       "win": 0.458,
+       "netR": -0.155,
+       "grossR": -0.068,
+       "costR": 0.087,
+       "total": -73.15,
+       "months": 71,
+       "t": -3.7,
+       "grossT": -1.65,
+       "stops": 203,
+       "targets": 184,
+       "time": 85,
+       "maxDD": -75.25,
+       "medianRiskPts": 19.4,
+       "longs": 220
+      }
+     },
+     "byYear": {
+      "2016": {
+       "n": 82,
+       "netR": -0.116,
+       "total": -9.48
+      },
+      "2017": {
+       "n": 72,
+       "netR": -0.251,
+       "total": -18.04
+      },
+      "2018": {
+       "n": 81,
+       "netR": -0.154,
+       "total": -12.47
+      },
+      "2019": {
+       "n": 74,
+       "netR": -0.016,
+       "total": -1.16
+      },
+      "2020": {
+       "n": 67,
+       "netR": -0.224,
+       "total": -15.02
+      },
+      "2021": {
+       "n": 88,
+       "netR": -0.058,
+       "total": -5.14
+      },
+      "2022": {
+       "n": 68,
+       "netR": -0.229,
+       "total": -15.6
+      },
+      "2023": {
+       "n": 90,
+       "netR": -0.143,
+       "total": -12.91
+      },
+      "2024": {
+       "n": 80,
+       "netR": -0.198,
+       "total": -15.84
+      },
+      "2025": {
+       "n": 73,
+       "netR": -0.077,
+       "total": -5.59
+      },
+      "2026": {
+       "n": 73,
+       "netR": -0.247,
+       "total": -18.06
+      }
+     },
+     "placebo": {
+      "seeds": 40,
+      "p95": -0.039,
+      "median": -0.102,
+      "values": [
+       -0.122,
+       -0.156,
+       -0.17,
+       -0.063,
+       -0.096,
+       -0.066,
+       -0.048,
+       -0.166,
+       -0.125,
+       -0.1,
+       -0.139,
+       -0.099,
+       -0.105,
+       -0.197,
+       -0.066,
+       -0.013,
+       -0.14,
+       -0.122,
+       -0.076,
+       -0.089,
+       -0.115,
+       -0.083,
+       -0.163,
+       -0.147,
+       -0.083,
+       -0.012,
+       -0.133,
+       -0.053,
+       -0.125,
+       -0.134,
+       -0.065,
+       -0.066,
+       -0.155,
+       -0.074,
+       -0.093,
+       -0.04,
+       -0.151,
+       -0.133,
+       -0.101,
+       -0.103
+      ]
+     }
+    }
+   },
+   "fillRate": {
+    "A": [
+     {
+      "from": 0,
+      "to": 0.15,
+      "days": 360,
+      "filled": 314,
+      "rate": 0.872
+     },
+     {
+      "from": 0.15,
+      "to": 0.3,
+      "days": 304,
+      "filled": 182,
+      "rate": 0.599
+     },
+     {
+      "from": 0.3,
+      "to": 0.5,
+      "days": 243,
+      "filled": 120,
+      "rate": 0.494
+     },
+     {
+      "from": 0.5,
+      "to": 1,
+      "days": 219,
+      "filled": 69,
+      "rate": 0.315
+     },
+     {
+      "from": 1,
+      "to": null,
+      "days": 109,
+      "filled": 20,
+      "rate": 0.183
+     }
+    ],
+    "B": [
+     {
+      "from": 0,
+      "to": 0.15,
+      "days": 381,
+      "filled": 349,
+      "rate": 0.916
+     },
+     {
+      "from": 0.15,
+      "to": 0.3,
+      "days": 330,
+      "filled": 233,
+      "rate": 0.706
+     },
+     {
+      "from": 0.3,
+      "to": 0.5,
+      "days": 299,
+      "filled": 160,
+      "rate": 0.535
+     },
+     {
+      "from": 0.5,
+      "to": 1,
+      "days": 305,
+      "filled": 107,
+      "rate": 0.351
+     },
+     {
+      "from": 1,
+      "to": null,
+      "days": 138,
+      "filled": 35,
+      "rate": 0.254
+     }
+    ]
+   }
+  }
+ },
+ "reading": "Reading (written after the results): the gap does fill often (small gaps most days, 0.5-1.0 % gaps a third to a half of the time), but the 1R stop the same distance away is reached about as often, so the fade is a coin flip before costs (gross R a trade between −0.07R and +0.03R in every test and window) and loses its costs. Every test is negative after costs in both windows and below its own random-side placebo; the variant on gaps against the prior day is no better. Not an edge; no proposal is written and nothing live changes.",
+ "notes": [
+  "The calendar and statistics helpers are the ones of `research/edge/orb-nas100/run.mjs`, written out in `run.mjs` because that study was not on main when this one was written; the test compares them with that file when it is present.",
+  "OANDA CFDs trade through the night, so the 09:30 open is the CFD price at that minute, not a cash-index auction print; the gap is the overnight CFD move from the previous 15:55 candle close."
+ ]
+}
