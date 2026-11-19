@@ -16,7 +16,7 @@ const closes = (pairs) => pairs.map(([d, v]) => ({ t: Date.parse(d + 'T00:00:00Z
 test('types match US calendar titles only', () => {
   assert.equal(typeOf('Core CPI m/m').f.k, 'core'); assert.equal(typeOf('CPI m/m').f.k, 'head');
   assert.equal(typeOf('Non-Farm Employment Change').T.k, 'NFP'); assert.equal(typeOf('Federal Funds Rate').T.k, 'FOMC');
-  assert.equal(typeOf('FOMC Meeting Minutes'), null); assert.equal(typeOf('CPI m/m', 'GBP'), null); assert.equal(typeOf('Prelim GDP Price Index q/q'), null);
+  assert.equal(typeOf('FOMC Meeting Minutes'), null); assert.equal(typeOf('ADP Non-Farm Employment Change'), null); assert.equal(typeOf('CPI m/m', 'GBP'), null); assert.equal(typeOf('Prelim GDP Price Index q/q'), null);
 });
 
 test('FRED values: m/m to one decimal as printed, payroll change in thousands', () => {
@@ -60,4 +60,37 @@ test('the desk and the veteran are wired', () => {
   for (const w of ['id="s-red"', 'renderRed(rf)', "get('macro/redfolder.json')", 'href="#s-red"']) assert.ok(page.includes(w), w);
   const vet = fs.readFileSync(new URL('../council/veteran.mjs', import.meta.url), 'utf8'); assert.match(vet, /w\('redfolder\.json', RF\)/);
   const mod = fs.readFileSync(new URL('../council/redfolder.mjs', import.meta.url), 'utf8'); assert.ok(!/fetch\(/.test(mod));
+});
+
+test('consensus history: the calendar copy is put on New York release times, ADP and unscheduled Fed moves left out', async () => {
+  const { parseCsv, pick, releaseAt } = await import('../scripts/consensus-history.mjs');
+  const csv = 'DateTime,Currency,Impact,Event,Actual,Forecast,Previous,Detail\n'
+    + '2025-03-07T00:00:00+03:30,USD,High,Non-Farm Employment Change,151K,159K,125K,"a, b"\n'
+    + '2025-03-05T16:45:00+03:30,USD,High,ADP Non-Farm Employment Change,77K,141K,186K,x\n'
+    + '2020-03-03T18:30:00+03:30,USD,High,Federal Funds Rate,1.25%,,1.75%,x\n'
+    + '2025-03-19T21:30:00+03:30,USD,High,Federal Funds Rate,4.50%,4.50%,4.50%,x\n'
+    + '2024-06-12T16:00:00+04:30,USD,High,Core CPI m/m,0.2%,0.3%,0.3%,x\n'
+    + '2024-06-12T16:00:00+04:30,GBP,High,CPI m/m,0.2%,0.3%,0.3%,x\n';
+  const rows = pick(parseCsv(csv));
+  assert.deepEqual(rows.map((r) => r.slice(0, 3)), [['Core CPI m/m', '2024-06-12T12:30:00Z', '0.3%'], ['Non-Farm Employment Change', '2025-03-07T13:30:00Z', '159K'], ['Federal Funds Rate', '2025-03-19T18:00:00Z', '4.50%']]);
+  assert.equal(releaseAt('ISM Manufacturing PMI', '2025-03-01T00:00:00+03:30'), null, 'a weekend date is not a release');
+  // the committed file: every CPI / NFP / FOMC date the council knows falls exactly on the file's time
+  const H = JSON.parse(fs.readFileSync(new URL('../council/consensus-history.json', import.meta.url), 'utf8'));
+  assert.equal(H.source, 'Forex Factory via a community dataset'); assert.ok(H.rows.length > 800 && H.to < '2025-04-08');
+  const base = JSON.parse(fs.readFileSync(new URL('../council/event-base.json', import.meta.url), 'utf8')).rows;
+  const T = { CPI: /^Core CPI m/, NFP: /^Non-Farm/, FOMC: /Funds Rate/ }; let n = 0;
+  for (const b of base) { if (b.t > Date.parse(H.to) / 1000) continue; const near = H.rows.filter((r) => T[b.type].test(r[0]) && Math.abs(Date.parse(r[1]) / 1000 - b.t) < 3 * DAY);
+    if (near.length) { n++; assert.equal(Date.parse(near[0][1]) / 1000, b.t, b.type + ' ' + b.d); } }
+  assert.ok(n > 100, 'checked ' + n);
+});
+
+test('consensus history fills "expected" before April 2025, labelled with its source', () => {
+  const inputs = { panel: [], jobs: [], bench: null, base: null, hist: { rows: [['Core CPI m/m', '2024-06-12T12:30:00Z', '0.3%', '0.2%', '0.3%'], ['Federal Funds Rate', '2024-06-12T18:00:00Z', '5.50%', '5.50%', '5.50%']] } };
+  const R = build({ inputs, rel: null, now, gold: [], dxy: [] });
+  const c = R.study.CPI.rows.find((r) => r.day === '2024-06-12').fields.find((f) => f.k === 'core');
+  assert.equal(c.exp, '0.3%'); assert.equal(c.expSrc, 'Forex Factory via a community dataset'); assert.equal(c.actual, 0.2); assert.equal(c.actSrc, 'calendar'); assert.equal(c.surprise, -0.1);
+  assert.equal(R.study.CPI.expBasis.hist, 1); assert.match(R.sources, /community dataset/);
+  // a first print from the batch wins over the calendar's printed value
+  const R2 = build({ inputs: { ...inputs, panel: [{ pce_embargo_at_utc: '', ppi_scheduled_at_utc: '' }], jobs: [{ scheduled_at_utc: '2024-06-07T12:30:00Z', payroll_change_jobs_current_first_release: '272000' }], hist: { rows: [['Non-Farm Employment Change', '2024-06-07T12:30:00Z', '185K', '270K', '165K']] } }, rel: null, now, gold: [], dxy: [] });
+  const p = R2.study.NFP.rows[0].fields[0]; assert.equal(p.actual, 272); assert.equal(p.actSrc, 'first print'); assert.equal(p.exp, '185K');
 });

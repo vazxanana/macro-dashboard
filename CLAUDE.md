@@ -2825,7 +2825,27 @@ consensus when listed, else the schedule date), and descriptive summary lines (m
 prior, above vs below consensus once 6+ captured). The strategist (`macro.mjs` `releaseSeries`) fetches the ten FRED release series
 (`RELEASE_FRED`) once a UTC day into `cache.release`, never while FRED is unreachable that run. Desk: section 3 `#s-red` "Red folder
 study" (tabs per type, `localStorage mdRed`; phones show 6 rows then "Show all"). Descriptive only: no rule, call or trade reads it.
+**Consensus history** (19 Nov 2026, owner: "add the consensus history so expected isn't empty", chose "use it, label it"):
+`council/consensus-history.json` = the US releases of these types from the community copy of the Forex Factory calendar
+(Hugging Face `Ehsanrs2/Forex_Factory_Calendar`, MIT as tagged by its uploader; 2018 to 4 Apr 2025, 929 rows of title, time,
+consensus, actual, previous), built by hand with `node scripts/consensus-history.mjs <csv>`. The copy's clock is wrong on about
+half its rows (00:00, or a display-zone offset), so each row is put on its New York release time on its local DATE (08:30; ISM
+10:00; Fed 14:00): every CPI / NFP / FOMC date the council knows matches exactly (test); ADP is not payrolls; the two
+unscheduled March 2020 Fed moves (no consensus) are left out. Shown as `expSrc` "Forex Factory via a community dataset" (the
+table's caption counts each source); its actual is used only where the batch has no first print (`actSrc` 'calendar'). The study
+now starts in 2018 and keeps 120 rows a type (the desk shows 18, then "Show all"). Nothing is on file between April 2025 and the
+council's own captures of November 2026. A calendar consensus, not a verified survey.
 Tests: `tests/redfolder.test.mjs`.
+
+## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
+`research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
+history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss
+against the calendar consensus (hot = gold down), HistData M1 from `council/event-base.json`. **FAIL** on the pre-registered
+trade (T+5 to T+60 with the miss, after 0.03 %): −0.144 % in 2018-21 (n 24, t −2.03), −0.007 % in 2022-25 (n 59, t −0.11).
+The reaction itself is real: the first 5 minutes went the way of the miss on 60 of 83 releases (p 0.0001); the release minute
+to T+60 (not tradable) +0.33 % out of sample (t 4.01). The red folder study shows this as a prep line on CPI and payrolls
+("know the side before the print; do not chase after it", `loadInputs().surprise`). Nothing live changed. Tests:
+`tests/red-folder-surprise.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
