@@ -80,4 +80,6 @@ test('where each call stands now: price against the level, days left, the next r
   const d = P.day(fc, v2, cot, NOW); assert.equal(d.release.consensus, '0.3%'); assert.equal(d.release.scenarios[0].name, 'Hot');
   const t = P.text('week', w, NOW); assert.match(t, /This week/); assert.match(t, /now: /); assert.match(t, /not a signal/); assert.doesNotMatch(t, /<[a-z]/);
   assert.match(P.text('day', d, NOW), /Next release: USD CPI/);
+  const aud = { ...v, events: [{ at: '2026-11-18T13:00:00Z', country: 'AUD', title: 'Employment Change', released: false }] }, fc2 = { ...fc, playbook: [] };
+  assert.match(P.day(fc2, aud, cot, NOW).take, /1 release in the next 24 hours \(AUD: none of these five markets directly\)/);
 });

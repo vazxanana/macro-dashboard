@@ -1462,7 +1462,8 @@
       if (px != null && !lv.above) lv.above = { price: Math.ceil((px + 0.01) / 50) * 50, label: 'Round number (price is over every level he tracks)', made: true };
       var ups = rows.filter(function (r) { return r.lean === 'up'; }).length, dns = rows.filter(function (r) { return r.lean === 'down'; }).length, w = rows.filter(function (r) { return r.wait; }).length;
       var take = (ups + dns ? 'Macro leans ' + [ups ? ups + ' up' : '', dns ? dns + ' down' : ''].filter(Boolean).join(', ') + ' of ' + rows.length + ' markets today' : 'No macro lean on any market today')
-        + (ev.length ? '; ' + ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' in the next 24 hours' + (w ? ' (' + w + ' market' + (w > 1 ? 's' : '') + ': wait for the print)' : '') : '; no release in the next 24 hours')
+        + (ev.length ? '; ' + ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' in the next 24 hours' + (w ? ' (' + w + ' market' + (w > 1 ? 's' : '') + ': wait for the print)'
+          : ev.every(function (e) { return !e.markets.length; }) ? ' (' + ev.map(function (e) { return e.country || '?'; }).filter(function (c, i, a) { return a.indexOf(c) === i; }).join(', ') + ': none of these five markets directly)' : '') : '; no release in the next 24 hours')
         + (mood.hot ? '; stress is up' : '') + '. Leans, not calls.';
       return { rows: rows, events: ev, mood: mood, gold: { px: px, above: lv.above, below: lv.below }, release: nextRelease(v, now), take: take };
     }
