@@ -515,6 +515,7 @@
   .tc-st.clear { color: var(--ink); } .tc-st.neutral { color: var(--ink-dim); }
   .pl-list { list-style: none; margin: 0; padding: 0; }
   .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
+  .nx-bl li { display: block; }
   .pl-list li > b:first-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
   .pl-list li.pl-call { grid-template-columns: 120px 1fr; } .pl-list li.pl-call > b:first-child { font-size: var(--fs-md); }
   .pl-list li.pl-call > b .d { display: block; font-weight: 400; }
@@ -660,6 +661,7 @@
       </div>
       <h4 class="vz-h">If it prints… <small>act after the release, not before</small></h4>
       <div id="nx-sc"></div>
+      <div id="nx-batch" hidden></div>
       <h4 class="vz-h" id="nx-st-h">What past releases did</h4>
       <div class="vz" id="nx-chart"></div>
       <p class="nx-also" id="nx-also"></p>
@@ -1350,6 +1352,13 @@
       + '<p class="vz-note">Prop and funded accounts: flat or at breakeven through the release (rule G). ' + esc(e.note || '') + '</p>';
     var scT = '<h4 class="vz-h">If it prints, in full <small>Fed path, dollar, gold, past releases, what to do</small></h4><table class="nx-sc"><thead><tr><th>If it prints</th><th>Fed path</th><th>Dollar</th><th>Gold</th><th>Past releases, this read</th><th>What to do</th></tr></thead><tbody>'
       + e.scenarios.map(function (r) { return '<tr class="' + esc(r.k) + '"><td><b><span class="sw" aria-hidden="true"></span>' + esc(r.name) + '</b><small>' + esc(r.when) + '</small></td><td data-l="Fed path">' + esc(r.path) + '</td><td data-l="Dollar">' + esc(r.usd) + '</td><td data-l="Gold"><span class="dir ' + dirCls(r.gold) + '">' + esc(r.gold) + '</span></td><td data-l="Past">' + esc(r.history || 'n/a: no release history in the repository') + '</td><td data-l="Do">' + esc(r.action) + '</td></tr>'; }).join('') + '</tbody></table>';
+    // 19 Nov 2026: what the veteran's 2022-24 first-print record says about this release (council/news-context.mjs)
+    var bx = $('nx-batch'), B = e.batch, NA7 = (v.newsAhead && v.newsAhead.items || []).filter(function (y) { return y.at !== e.at || y.title !== e.title; });
+    if (B && B.points && B.points.length) { bx.hidden = false;
+      bx.innerHTML = '<h4 class="vz-h">What the 2022-24 record says <small>' + esc(B.label) + '</small></h4><ul class="pl-list nx-bl">' + B.points.map(function (p) { return '<li>' + (p.kind === 'lead' ? '<b>' + esc(p.text) + '</b>' : esc(p.text)) + '</li>'; }).join('') + '</ul>'
+        + '<p class="vz-note">' + esc(B.noSurprise) + '</p>'
+        + (NA7.length ? '<h4 class="vz-h">Later this week <small>one fact each from the same record</small></h4><ul class="pl-list nx-bl">' + NA7.map(function (y) { return '<li><b>' + esc(y.title) + '</b> · ' + esc(utcWhen(y.at)) + '<br><small>' + esc(y.point) + '</small></li>'; }).join('') + '</ul>' : ''); }
+    else { bx.hidden = true; bx.innerHTML = ''; }
     if (st) { $('nx-st-h').innerHTML = 'What past ' + esc(st.type) + ' releases did <small>gold\'s first hour, by the dollar\'s first 5-minute read · ' + st.n + ' releases ' + esc(st.from.slice(0, 4)) + '-' + esc(st.to.slice(0, 4)) + ' · ' + esc(st.label) + '</small>';
       draw('nx-chart', function (w) { return stripSvg(st, w); }); }
     else { $('nx-st-h').innerHTML = 'What past releases did'; $('nx-chart').innerHTML = '<p class="empty">No release history for this event in the repository: n/a.</p>'; }
@@ -1486,7 +1495,7 @@
         + '; ' + (ev.length ? ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' on the calendar' : 'no release on the calendar') + '.';
       return { by: c.by, from: c.from, asOf: c.asOf, calls: c.list.filter(function (x) { return x.asset === 'gold' && !x.stretch; }), stretch: c.list.filter(function (x) { return x.asset === 'gold' && x.stretch; }),
         other: c.list.filter(function (x) { return x.asset !== 'gold'; }), hyps: hy, events: ev, changes: ((v && v.changes && v.changes.items) || []).slice(0, 8),
-        since: v && v.changes && v.changes.sinceWeek, positioning: pos, score: { now: sNow, prev: sPrev }, levels: wk, px: px, take: take };
+        since: v && v.changes && v.changes.sinceWeek, news: (v && v.newsAhead && v.newsAhead.items) || [], positioning: pos, score: { now: sNow, prev: sPrev }, levels: wk, px: px, take: take };
     }
     function numFrom(claim, i) { var m = String(claim || '').match(/\$([\d,]+(?:\.\d+)?)/g); return m && m[i] ? +m[i].replace(/[$,]/g, '') : null; }
     // THIS MONTH: the veteran's month calls and hypotheses, the slower levels, the score path, the record so far
@@ -1520,6 +1529,7 @@
         if (r.hyps.length) { L.push('', 'Hypotheses:'); callLines(r.hyps); }
         if (r.other && r.other.length && view === 'month') { L.push('', 'The dollar:'); callLines(r.other); }
         if (view === 'week' && r.events.length) { L.push('', 'Releases:'); r.events.forEach(function (e) { L.push('- ' + new Date(e.at).toISOString().slice(0, 16).replace('T', ' ') + ' UTC ' + (e.country ? e.country + ' ' : '') + e.title); }); }
+        if (view === 'week' && r.news && r.news.length) { L.push('', 'What the 2022-24 record says (facts, not forecasts):'); r.news.forEach(function (y) { L.push('- ' + y.title + ': ' + y.point); }); }
       }
       L.push('', 'Context, not a signal: none of these readings has passed a test as an edge. Paper only.');
       return L.join('\n');
@@ -1560,6 +1570,7 @@
         + (r.hyps.length ? '<h4>His hypotheses for the week <small>and what proves them wrong</small></h4>' + plHyps(r.hyps) : '')
         + (r.levels.length ? '<h4>The week\'s levels</h4>' + plLevels(r.levels, r.px) : '')
         + '<h4>Releases this week</h4>' + plEvents(r.events, now)
+        + (r.news.length ? '<h4>What the 2022-24 record says about them <small>facts from the veteran\'s release ledgers, not forecasts</small></h4><ul class="pl-list">' + r.news.map(function (y) { return '<li><b>' + esc(y.title) + '<span class="d">' + esc(new Date(y.at).toISOString().slice(0, 16).replace('T', ' ')) + ' UTC</span></b><span>' + esc(y.point) + '</span></li>'; }).join('') + '</ul>' : '')
         + (r.changes.length ? '<h4>What changed since last week <small>' + esc(r.since ? 'since the week of ' + r.since : '') + '</small></h4><ul class="pl-list">' + r.changes.map(function (c) { return '<li><b>' + esc(String(c.area || '').replace(/^./, function (x) { return x.toUpperCase(); })) + '</b><span>' + esc(c.text) + '</span></li>'; }).join('') + '</ul>' : '')
         + (r.score.now != null ? '<h4>Gold Macro Score</h4><p class="note" style="margin-top:0">Now ' + M.sgn(r.score.now) + (r.score.prev != null ? ', last week ' + M.sgn(r.score.prev) + ' (' + (Math.abs(r.score.now - r.score.prev) < 0.05 ? 'about unchanged' : r.score.now > r.score.prev ? 'more support for a buy' : 'less support for a buy') + ')' : '') + '. Read for buys only (above +0.25 supports one); in sample, not proven.</p>' : '')
         + (r.positioning.length ? '<h4>Positioning <small>speculators, 3-year percentile, and the week\'s change in their net</small></h4><ul class="pl-list">' + r.positioning.map(function (p) { return '<li><b>' + esc(p.name) + '</b><span>' + plOrd(p.pct) + ' percentile' + (p.crowded ? ' · <b>crowded ' + p.crowded + '</b>' : '') + (p.chg1 != null ? ' · net ' + (p.chg1 >= 0 ? '+' : '−') + Math.abs(p.chg1).toLocaleString('en-US') + ' contracts this week' + (p.sign < 0 ? ' (yen futures)' : '') : '') + ' <span class="d">' + esc(p.who || '') + (p.asOf ? ' · report of ' + esc(p.asOf) : '') + '</span></span></li>'; }).join('') + '</ul><p class="note">Context only: the pre-registered positioning test found no edge.</p>' : '');
