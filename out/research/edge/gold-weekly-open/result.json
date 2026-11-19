@@ -1,0 +1,417 @@
+{
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "data": {
+  "src": "OANDA mid H1 XAU/USD via /md/bars",
+  "from": "2016-01-03",
+  "to": "2026-11-13T22:00",
+  "candles": 64266,
+  "weeks": 567
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippage": 0.15,
+  "slippageOn": "stop and time exits (market orders); limit entries and target exits pay none",
+  "financing": {
+   "rate": 0.000148,
+   "asOf": "2026-11-11",
+   "longsOnly": true
+  }
+ },
+ "windows": {
+  "inSample": "2016-01-01 to 2020-12-31",
+  "outOfSample": "2021-01-01 to 2026-11-13"
+ },
+ "tests": {
+  "T1": {
+   "is": {
+    "n": 73,
+    "avg": 0.016,
+    "gross": 0.089,
+    "total": 1.16,
+    "wr": 45.21,
+    "pf": 1.04,
+    "dd": -9.23,
+    "tMonth": 0.14,
+    "months": 60,
+    "stops": 22,
+    "targets": 0,
+    "medRisk": 16.74
+   },
+   "oos": {
+    "n": 79,
+    "avg": 0.066,
+    "gross": 0.117,
+    "total": 5.2,
+    "wr": 49.37,
+    "pf": 1.2,
+    "dd": -7.99,
+    "tMonth": 0.57,
+    "months": 71,
+    "stops": 20,
+    "targets": 0,
+    "medRisk": 31.46
+   },
+   "oos2x": {
+    "n": 79,
+    "avg": 0.015,
+    "tMonth": 0.13
+   },
+   "gross": {
+    "is": {
+     "avg": 0.089,
+     "tMonth": 0.77
+    },
+    "oos": {
+     "avg": 0.117,
+     "tMonth": 1
+    }
+   },
+   "skipped": 0,
+   "years": {
+    "2016": {
+     "n": 8,
+     "avg": -0.331,
+     "total": -2.65
+    },
+    "2017": {
+     "n": 14,
+     "avg": 0.191,
+     "total": 2.67
+    },
+    "2018": {
+     "n": 15,
+     "avg": -0.322,
+     "total": -4.83
+    },
+    "2019": {
+     "n": 18,
+     "avg": 0.279,
+     "total": 5.02
+    },
+    "2020": {
+     "n": 18,
+     "avg": 0.053,
+     "total": 0.95
+    },
+    "2021": {
+     "n": 14,
+     "avg": 0.351,
+     "total": 4.92
+    },
+    "2022": {
+     "n": 16,
+     "avg": -0.093,
+     "total": -1.49
+    },
+    "2023": {
+     "n": 13,
+     "avg": -0.108,
+     "total": -1.41
+    },
+    "2024": {
+     "n": 14,
+     "avg": 0.329,
+     "total": 4.61
+    },
+    "2025": {
+     "n": 14,
+     "avg": -0.038,
+     "total": -0.53
+    },
+    "2026": {
+     "n": 8,
+     "avg": -0.112,
+     "total": -0.89
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beat": 24,
+    "median": 0.049,
+    "min": -0.037,
+    "max": 0.141
+   },
+   "p": 0.2843,
+   "holmP": 0.853,
+   "checks": {
+    "oos": false,
+    "is": true,
+    "cost2x": true,
+    "n": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "is": {
+    "n": 52,
+    "avg": -0.116,
+    "gross": -0.09,
+    "total": -6.05,
+    "wr": 40.38,
+    "pf": 0.74,
+    "dd": -8.41,
+    "tMonth": -0.92,
+    "months": 60,
+    "stops": 17,
+    "targets": 0,
+    "medRisk": 15.8
+   },
+   "oos": {
+    "n": 65,
+    "avg": -0.178,
+    "gross": -0.166,
+    "total": -11.59,
+    "wr": 38.46,
+    "pf": 0.6,
+    "dd": -18.95,
+    "tMonth": -1.6,
+    "months": 71,
+    "stops": 23,
+    "targets": 0,
+    "medRisk": 33.58
+   },
+   "oos2x": {
+    "n": 65,
+    "avg": -0.191,
+    "tMonth": -1.71
+   },
+   "gross": {
+    "is": {
+     "avg": -0.09,
+     "tMonth": -0.72
+    },
+    "oos": {
+     "avg": -0.166,
+     "tMonth": -1.48
+    }
+   },
+   "skipped": 0,
+   "years": {
+    "2016": {
+     "n": 8,
+     "avg": 0.074,
+     "total": 0.59
+    },
+    "2017": {
+     "n": 12,
+     "avg": 0.064,
+     "total": 0.77
+    },
+    "2018": {
+     "n": 16,
+     "avg": -0.216,
+     "total": -3.46
+    },
+    "2019": {
+     "n": 5,
+     "avg": 0.16,
+     "total": 0.8
+    },
+    "2020": {
+     "n": 11,
+     "avg": -0.432,
+     "total": -4.75
+    },
+    "2021": {
+     "n": 14,
+     "avg": 0.337,
+     "total": 4.71
+    },
+    "2022": {
+     "n": 10,
+     "avg": -0.364,
+     "total": -3.64
+    },
+    "2023": {
+     "n": 10,
+     "avg": -0.379,
+     "total": -3.79
+    },
+    "2024": {
+     "n": 13,
+     "avg": -0.365,
+     "total": -4.74
+    },
+    "2025": {
+     "n": 9,
+     "avg": -0.458,
+     "total": -4.12
+    },
+    "2026": {
+     "n": 9,
+     "avg": -0.001,
+     "total": -0.01
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beat": 3,
+    "median": -0.114,
+    "min": -0.204,
+    "max": 0.078
+   },
+   "p": 0.9452,
+   "holmP": 1,
+   "checks": {
+    "oos": false,
+    "is": false,
+    "cost2x": false,
+    "n": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "is": {
+    "n": 127,
+    "avg": -0.086,
+    "gross": -0.045,
+    "total": -10.9,
+    "wr": 44.88,
+    "pf": 0.8,
+    "dd": -12.88,
+    "tMonth": -1.05,
+    "months": 60,
+    "stops": 41,
+    "targets": 38,
+    "medRisk": 16.07
+   },
+   "oos": {
+    "n": 167,
+    "avg": -0.131,
+    "gross": -0.107,
+    "total": -21.81,
+    "wr": 46.11,
+    "pf": 0.7,
+    "dd": -27.29,
+    "tMonth": -1.94,
+    "months": 71,
+    "stops": 63,
+    "targets": 39,
+    "medRisk": 32.64
+   },
+   "oos2x": {
+    "n": 167,
+    "avg": -0.154,
+    "tMonth": -2.28
+   },
+   "gross": {
+    "is": {
+     "avg": -0.045,
+     "tMonth": -0.55
+    },
+    "oos": {
+     "avg": -0.107,
+     "tMonth": -1.59
+    }
+   },
+   "skipped": 0,
+   "years": {
+    "2016": {
+     "n": 17,
+     "avg": -0.045,
+     "total": -0.77
+    },
+    "2017": {
+     "n": 27,
+     "avg": -0.268,
+     "total": -7.25
+    },
+    "2018": {
+     "n": 28,
+     "avg": 0.061,
+     "total": 1.72
+    },
+    "2019": {
+     "n": 26,
+     "avg": 0.135,
+     "total": 3.52
+    },
+    "2020": {
+     "n": 29,
+     "avg": -0.28,
+     "total": -8.11
+    },
+    "2021": {
+     "n": 22,
+     "avg": 0.174,
+     "total": 3.83
+    },
+    "2022": {
+     "n": 27,
+     "avg": -0.254,
+     "total": -6.85
+    },
+    "2023": {
+     "n": 33,
+     "avg": -0.112,
+     "total": -3.69
+    },
+    "2024": {
+     "n": 27,
+     "avg": -0.104,
+     "total": -2.82
+    },
+    "2025": {
+     "n": 34,
+     "avg": -0.312,
+     "total": -10.61
+    },
+    "2026": {
+     "n": 24,
+     "avg": -0.07,
+     "total": -1.68
+    }
+   },
+   "sides": {
+    "buy": {
+     "n": 75,
+     "avg": -0.086,
+     "gross": -0.047,
+     "total": -6.42,
+     "wr": 44,
+     "pf": 0.8,
+     "dd": -8.92,
+     "tMonth": -0.87,
+     "months": 71,
+     "stops": 27,
+     "targets": 22,
+     "medRisk": 31.46
+    },
+    "sell": {
+     "n": 92,
+     "avg": -0.167,
+     "gross": -0.156,
+     "total": -15.4,
+     "wr": 47.83,
+     "pf": 0.63,
+     "dd": -21.41,
+     "tMonth": -1.79,
+     "months": 71,
+     "stops": 36,
+     "targets": 17,
+     "medRisk": 36.15
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "beat": 8,
+    "median": -0.063,
+    "min": -0.189,
+    "max": 0.065
+   },
+   "p": 0.9738,
+   "holmP": 1,
+   "checks": {
+    "oos": false,
+    "is": false,
+    "cost2x": false,
+    "n": true,
+    "placebo": false
+   },
+   "pass": false
+  }
+ }
+}
