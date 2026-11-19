@@ -34,6 +34,7 @@ import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf } from './glance.mjs';
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
+import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan } from './research-watch.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
@@ -415,7 +416,7 @@ export function teaching(fc) {
 
 // `keep` (run() only): the week's RECORDED outlook and ledger view, built from the record closes; the display build shows them
 // instead of issuing its own, so what is on the record and what the desk shows as "his calls" are the same thing.
-export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null, news }) {
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null, news, docs }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -465,6 +466,13 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
     if (F) { for (const e of v.events) { const c = contextFor(e, { F, expectations: E, calendar: calN, now }); if (c) e.batch = c; }
       v.newsAhead = { label: 'From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.', items: newsAhead({ F, fc, calendar: calN, expectations: E, now }) }; }
   } catch (e) { v.newsError = String(e && e.message || e); }
+  // 19 Nov 2026 (owner: "all this stuff I sent you about macro, you are not using it"): the briefs, research maps and news
+  // register of the batch, their own conditions checked on today's data (council/research-watch.mjs); display only
+  try {
+    const DD = docs === undefined ? loadDocs() : docs, calR = calendarOf(cache).concat((fc && fc.playbook) || []);
+    const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now, calendar: calR });
+    v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; const cp = cpiPlan(DD && DD.cpiPlan, e, calR); if (cp) e.cpiPlan = cp; }
+  } catch (e) { v.researchError = String(e && e.message || e); }
   v.summary = summary(v);
   v.brief = briefOf(v);
   return { v, ledger: L, debates: Dh, expectations: E };
@@ -573,7 +581,7 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   const rec = { gold: cut(gold), dxy: cut(dx), goldBars: goldBars ? cut(goldBars) : null, spx: cut(spx) }, pxRec = Object.fromEntries(Object.entries(px).map(([k, a]) => [k, cut(a)]));
   const R = build({ fc, cache, daily: rec, ledger: ledgerResolve(ledger, gold), debates: debatesResolve(debates, gold), expectations, cot, now, cal });
   if (R.v.outlook) { R.v.outlook.cot = applyCalls(cotCalls(cot, pxRec, now), R.v.calibration); R.v.outlook.anchor = { asOf: rec.gold.length ? isoDay(rec.gold[rec.gold.length - 1].t) : null, week: weekKey(now), note: 'Dated calls are issued once a week, from the last close before the week began; they are scored on every daily close after their issue date.' }; }
-  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx }, ledger: R.ledger, debates: R.debates, expectations: R.expectations, cot, now, cal, keep: { outlook: R.v.outlook, ledger: R.v.ledger } });
+  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx, usdjpy: daily.usdjpy }, ledger: R.ledger, debates: R.debates, expectations: R.expectations, cot, now, cal, keep: { outlook: R.v.outlook, ledger: R.v.ledger } });
   v.closes = { note: 'Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.', markets: closes };
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   let CL = CL0;

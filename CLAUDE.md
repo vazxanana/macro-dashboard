@@ -2767,6 +2767,24 @@ and `v.newsAhead`; the Macro desk shows them on the Next release card (`#nx-batc
 and in Your read → This week (+ the copied text). Facts and descriptive fits with their n: never a surprise (no consensus from the
 batch is used), never a call on the record, a rule or a trade. Test: `tests/news-context.test.mjs`.
 
+## The veteran reads the owner's briefs and research maps (19 Nov 2026, owner: "all this stuff I've sent you about macro and fundamentals, you are not using it")
+`council/research-watch.mjs` (pure + `loadDocs`; run inside `veteran.mjs` `build` → `veteran.json.research`, cards' `research`)
+checks five batch documents' OWN conditions on the data the council already has (fetches nothing): the 7 Nov gold brief's three
+scenarios (4-week real yield, dollar, gold against its late-October low, managed money; "correction" needs real yields and the
+dollar rising together), the funding research map's evidence ladder on the strategist's gauges (SOFR-EFFR, broad dollar, HY
+spread, VIX curve; its own words per level, and a caution when the strategist's "stress" label lacks a funding-market
+confirmation), the Japan brief's "global yields dominate" scenario (US 10Y vs USD/JPY over 4 weeks), the positioning map's
+weekly COT note, and the news-trading register V2 (N1-N10, `hypIds`) on each release card ("What your news register says to
+test", never validated). Desk: card `#c-res` "Your research, applied" in Why. Display only: no probability, call, rule or trade
+reads it. Same day (owner: "do the next ones too, nyfed surveys and cpi plan"): the NY Fed Survey of Market Expectations'
+two verified cells (source contract: the panel's expected year-end-2027 SEP median, n 61, and its 2026 core PCE, n 58) beside
+today's 2-year yield (`nyfedSurvey`, with the clock caveat: results published after the meeting, never a pre-release
+consensus), and the October CPI pre-release plan generalized to every US CPI card (`cpiPlan`: its interpretation matrix,
+response windows, and the confounders the calendar shows: a same-day auction, a Fed statement within two days, a same-half-hour
+US release; desk "Your CPI plan"). Then (owner: "do china briefs too") the September China briefs (NBS property, MOF local
+fiscal; `chinaBriefs`): their figures read from their own tables, a staleness line once the next NBS / MOF release should be
+out (about mid-month after the month), and the next CNY release on the strategist's calendar. Tests: `tests/research-watch.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
