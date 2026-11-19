@@ -33,6 +33,7 @@ import { briefing, briefingLines, P_CLAMP } from './briefing.mjs';
 import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf } from './glance.mjs';
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
+import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
@@ -414,7 +415,7 @@ export function teaching(fc) {
 
 // `keep` (run() only): the week's RECORDED outlook and ledger view, built from the record closes; the display build shows them
 // instead of issuing its own, so what is on the record and what the desk shows as "his calls" are the same thing.
-export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null }) {
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null, news }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -457,6 +458,13 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
     v.events = playbooks({ fc, expectations: E, closes: gold, base: evBase === undefined ? eventBase() : evBase, now, pilot: v.cpiPilot });
     applyCalls(v.events.map((e) => e.call).filter(Boolean), v.calibration, EVENT_P_BAND);
   } catch (e) { v.events = []; v.eventsError = String(e && e.message || e); }
+  // 19 Nov 2026 (owner: "insights for the next results"): what the 1.6-1.8 news batch's 2022-24 first-print record says about each
+  // upcoming US release; facts and descriptive fits with their n, never a surprise, a call on the record, a rule or a trade
+  try {
+    const F = news === undefined ? newsFacts(loadBatch()) : news, calN = calendarOf(cache);
+    if (F) { for (const e of v.events) { const c = contextFor(e, { F, expectations: E, calendar: calN, now }); if (c) e.batch = c; }
+      v.newsAhead = { label: 'From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.', items: newsAhead({ F, fc, calendar: calN, expectations: E, now }) }; }
+  } catch (e) { v.newsError = String(e && e.message || e); }
   v.summary = summary(v);
   v.brief = briefOf(v);
   return { v, ledger: L, debates: Dh, expectations: E };

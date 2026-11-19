@@ -2744,6 +2744,19 @@ added skill; a 36-release jobs ledger (payrolls, unemployment, earnings, hours, 
 EMPTY (never a "surprise" from it); 7 verified same-day ISM overlaps on jobs days; a ten-hypothesis news register, none
 validated. Library only: no council member, probability, rule or trade reads it.
 
+## The veteran reads the release ledgers before the next release (19 Nov 2026, owner: "this cannot be only just notes, he needs to get insights for the next results")
+`council/news-context.mjs` (pure + `loadBatch`, which reads three 1.6-1.8 batch files from `research/macro-veteran/references/`; null in a
+bundle without them): `facts` (from the 36-month CPI / PPI / PCE panel, the 36-release jobs ledger and the ISM overlap list),
+`kindOf` (US CPI, PPI, PCE, NFP, ISM, FOMC statement; speakers and minutes are not a statement), `contextFor(card)` = points for one
+upcoming release: PCE = the core PCE that went with this month's core CPI print in 2022-24 (an in-sample fit on 36 months, a ± typical
+miss; when no print is on file a 0.2 / 0.3 / 0.4 lookup: the Forex Factory feed carries no actuals), CPI / PPI = the release order
+(PPI first in 5 of 36), NFP = the two-month revisions (negative in 22 of 35), hours, an ISM the same day, FOMC = a CPI within two days
+before (4 of 24 meetings) and statement vs press conference; `ahead` = one point for each US release of the next 7 days. Calendar =
+macro/cache.json `cal` (`calendarOf`) and the veteran's captured expectations. `veteran.mjs` `build` puts `e.batch` on each event card
+and `v.newsAhead`; the Macro desk shows them on the Next release card (`#nx-batch`, "What the 2022-24 record says", "Later this week")
+and in Your read → This week (+ the copied text). Facts and descriptive fits with their n: never a surprise (no consensus from the
+batch is used), never a call on the record, a rule or a trade. Test: `tests/news-context.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
