@@ -5283,6 +5283,33 @@
     "stopCheckedAt": "2026-11-19T13:02:04.000Z",
     "brokerStop": 3707.66,
     "closedAt": "2026-11-19T14:13:42.000Z"
+   },
+   "xau-replica-1795107913-s": {
+    "positionId": "50382504",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-19T17:06:17.000Z",
+    "councilEntry": 3673.05,
+    "stop": 3693.36,
+    "t1": 3632.43,
+    "riskCash": 20.31,
+    "margin": 7.38,
+    "minLot": true,
+    "mark": 3673.05,
+    "levelsFrom": "mark",
+    "fillPrice": 3670.4,
+    "slipR": 0.13,
+    "lagSec": 64,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-19T17:06:17.000Z",
+    "brokerStop": 3690.71
    }
   },
   "day": {
@@ -5290,7 +5317,7 @@
    "startBalance": 5283
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 5295.14 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 5295.14 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5299,14 +5326,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 5295.14,
-  "lastRun": "2026-11-19T17:04:50.000Z"
+  "lastRun": "2026-11-19T17:06:17.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T07:26:01.000Z",
-   "msg": "opened buy USDCHF 0.02 lot (council replica)",
-   "trade": "usdchf-replica-1794381896-b"
-  },
   {
    "at": "2026-11-11T07:33:52.000Z",
    "msg": "USDCHF position 48340519 closed at the broker",
@@ -6801,6 +6823,11 @@
    "at": "2026-11-19T15:30:47.000Z",
    "msg": "XAUUSD position 50331914 closed at the broker",
    "trade": "xau-replica-1795071369-s"
+  },
+  {
+   "at": "2026-11-19T17:06:17.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1795107913-s"
   }
  ],
  "limits": {
@@ -6879,11 +6906,11 @@
   ]
  },
  "execution": {
-  "n": 179,
-  "meanSlipR": 0.05,
-  "medianSlipR": 0.019,
+  "n": 180,
+  "meanSlipR": 0.051,
+  "medianSlipR": 0.021,
   "worstSlipR": 1.236,
-  "medianLagSec": 71,
+  "medianLagSec": 70.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -6894,8 +6921,8 @@
     "meanSlipR": 0.189
    },
    "XAUUSD": {
-    "n": 68,
-    "meanSlipR": 0.008
+    "n": 69,
+    "meanSlipR": 0.009
    },
    "BTCUSD": {
     "n": 17,
