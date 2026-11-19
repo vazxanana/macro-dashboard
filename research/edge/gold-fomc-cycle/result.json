@@ -1,0 +1,792 @@
+{
+ "study": "gold-fomc-cycle",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-fomc-cycle/PREREGISTRATION.md",
+ "source": "Federal Reserve FOMC meeting calendars (scheduled meetings): Dec 2006 and 2007 written here and checked on the gold M5 release window; 2008-2021 as in research/edge/fomc-even-week/dates.mjs; 2022 on from council/events.mjs",
+ "meetings": 156,
+ "firstMeeting": "2007-05-09",
+ "unscheduled": [
+  "2007-08-10",
+  "2007-08-17",
+  "2008-01-22",
+  "2008-10-08",
+  "2010-05-09",
+  "2020-03-03",
+  "2020-03-15"
+ ],
+ "newDateCheck": [
+  {
+   "date": "2006-12-12",
+   "ok": false,
+   "range": 1.8,
+   "median": 1.3,
+   "ratio": 1.38
+  },
+  {
+   "date": "2007-01-31",
+   "ok": false,
+   "range": 1.7,
+   "median": 1.4,
+   "ratio": 1.21
+  },
+  {
+   "date": "2007-03-21",
+   "ok": false,
+   "range": 2.05,
+   "median": 1.475,
+   "ratio": 1.39
+  },
+  {
+   "date": "2007-05-09",
+   "ok": true,
+   "range": 1.45,
+   "median": 0.725,
+   "ratio": 2
+  },
+  {
+   "date": "2007-06-28",
+   "ok": false,
+   "range": 0.8,
+   "median": 0.575,
+   "ratio": 1.39
+  },
+  {
+   "date": "2007-08-07",
+   "ok": true,
+   "range": 1.75,
+   "median": 0.75,
+   "ratio": 2.33
+  },
+  {
+   "date": "2007-09-18",
+   "ok": true,
+   "range": 5.37,
+   "median": 0.7,
+   "ratio": 7.67
+  },
+  {
+   "date": "2007-10-31",
+   "ok": true,
+   "range": 8.95,
+   "median": 0.85,
+   "ratio": 10.53
+  },
+  {
+   "date": "2007-12-11",
+   "ok": true,
+   "range": 6.95,
+   "median": 1.98,
+   "ratio": 3.51
+  }
+ ],
+ "newDatesDropped": [
+  "2006-12-12",
+  "2007-01-31",
+  "2007-03-21",
+  "2007-06-28"
+ ],
+ "data": {
+  "file": "council-data research/daily/xau.json (OANDA mid, UTC days, weekends folded)",
+  "from": "2006-03-20",
+  "to": "2026-11-06",
+  "updated": "2026-11-07T22:49:02.000Z"
+ },
+ "rule": "week w = days 5w-1..5w+3 after the scheduled statement day; enter at the close before the week, stop 2 x ATR(20), out at the close of its last day or at the stop; T1 long weeks 2, 4, 6; T2 short weeks 1, 3, 5; week 0 not used",
+ "costs": {
+  "roundTrip": 0.6,
+  "financingLongPerNight": 0.000148,
+  "financingSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "units": "R (risk = 2 x ATR(20))",
+ "windowsBy": "entry date",
+ "tests": {
+  "T1": {
+   "name": "long gold in weeks 2, 4, 6",
+   "side": "buy",
+   "weeks": [
+    2,
+    4,
+    6
+   ],
+   "IS": {
+    "n": 174,
+    "netR": -0.0502,
+    "grossR": -0.0035,
+    "tNet": -1.06,
+    "tGross": -0.07,
+    "months": 114,
+    "sumNet": -8.74,
+    "win": 0.489,
+    "stops": 31,
+    "costR": 0.0467,
+    "x2": {
+     "n": 174,
+     "netR": -0.097,
+     "grossR": -0.0035,
+     "tNet": -2.05,
+     "tGross": -0.07,
+     "months": 114,
+     "sumNet": -16.87,
+     "win": 0.46,
+     "stops": 31,
+     "costR": 0.0935
+    },
+    "S1": {
+     "n": 158,
+     "netR": 0.0065,
+     "grossR": 0.0541,
+     "tNet": 0.12,
+     "tGross": 1,
+     "months": 111,
+     "sumNet": 1.03,
+     "win": 0.513,
+     "stops": 21,
+     "costR": 0.0476
+    },
+    "S2": {
+     "n": 178,
+     "netR": -0.0532,
+     "grossR": -0.0066,
+     "tNet": -1.14,
+     "tGross": -0.14,
+     "months": 116,
+     "sumNet": -9.46,
+     "win": 0.489,
+     "stops": 32,
+     "costR": 0.0465
+    }
+   },
+   "OOS": {
+    "n": 186,
+    "netR": 0.1362,
+    "grossR": 0.1896,
+    "tNet": 2.27,
+    "tGross": 3.12,
+    "months": 115,
+    "sumNet": 25.34,
+    "win": 0.565,
+    "stops": 23,
+    "costR": 0.0534,
+    "x2": {
+     "n": 186,
+     "netR": 0.0829,
+     "grossR": 0.1896,
+     "tNet": 1.39,
+     "tGross": 3.12,
+     "months": 115,
+     "sumNet": 15.41,
+     "win": 0.532,
+     "stops": 23,
+     "costR": 0.1068
+    },
+    "S1": {
+     "n": 161,
+     "netR": 0.1055,
+     "grossR": 0.1593,
+     "tNet": 1.79,
+     "tGross": 2.69,
+     "months": 112,
+     "sumNet": 16.99,
+     "win": 0.559,
+     "stops": 21,
+     "costR": 0.0537
+    },
+    "S2": {
+     "n": 188,
+     "netR": 0.1237,
+     "grossR": 0.177,
+     "tNet": 2.06,
+     "tGross": 2.91,
+     "months": 116,
+     "sumNet": 23.26,
+     "win": 0.559,
+     "stops": 25,
+     "costR": 0.0532
+    },
+    "p": 0.0116,
+    "pHolm": 0.02321
+   },
+   "byYear": {
+    "2007": -1.7,
+    "2008": -1.24,
+    "2009": -2.54,
+    "2010": 2.27,
+    "2011": -2.36,
+    "2012": 0.37,
+    "2013": -1.51,
+    "2014": -0.74,
+    "2015": -0.16,
+    "2016": -1.12,
+    "2017": 3.46,
+    "2018": -2.65,
+    "2019": 2.17,
+    "2020": 5.37,
+    "2021": 1.06,
+    "2022": -0.88,
+    "2023": 4.98,
+    "2024": 6.8,
+    "2025": 5.35,
+    "2026": -0.32
+   },
+   "drop": {
+    "noDay0": [
+     "2026-12-09"
+    ],
+    "cut": 125,
+    "data": 0,
+    "hole": 0,
+    "unscheduled": 10
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "short gold in weeks 1, 3, 5",
+   "side": "sell",
+   "weeks": [
+    1,
+    3,
+    5
+   ],
+   "IS": {
+    "n": 214,
+    "netR": -0.0858,
+    "grossR": -0.0697,
+    "tNet": -1.48,
+    "tGross": -1.21,
+    "months": 114,
+    "sumNet": -18.36,
+    "win": 0.416,
+    "stops": 36,
+    "costR": 0.0161,
+    "x2": {
+     "n": 214,
+     "netR": -0.1019,
+     "grossR": -0.0697,
+     "tNet": -1.76,
+     "tGross": -1.21,
+     "months": 114,
+     "sumNet": -21.82,
+     "win": 0.407,
+     "stops": 36,
+     "costR": 0.0323
+    },
+    "S1": {
+     "n": 194,
+     "netR": -0.0569,
+     "grossR": -0.0409,
+     "tNet": -0.89,
+     "tGross": -0.64,
+     "months": 114,
+     "sumNet": -11.04,
+     "win": 0.448,
+     "stops": 37,
+     "costR": 0.016
+    },
+    "S2": {
+     "n": 217,
+     "netR": -0.0882,
+     "grossR": -0.072,
+     "tNet": -1.55,
+     "tGross": -1.27,
+     "months": 115,
+     "sumNet": -19.15,
+     "win": 0.415,
+     "stops": 37,
+     "costR": 0.0162
+    }
+   },
+   "OOS": {
+    "n": 221,
+    "netR": -0.0727,
+    "grossR": -0.0586,
+    "tNet": -1.59,
+    "tGross": -1.28,
+    "months": 116,
+    "sumNet": -16.07,
+    "win": 0.43,
+    "stops": 38,
+    "costR": 0.0141,
+    "x2": {
+     "n": 221,
+     "netR": -0.0868,
+     "grossR": -0.0586,
+     "tNet": -1.9,
+     "tGross": -1.28,
+     "months": 116,
+     "sumNet": -19.19,
+     "win": 0.412,
+     "stops": 38,
+     "costR": 0.0282
+    },
+    "S1": {
+     "n": 191,
+     "netR": -0.1374,
+     "grossR": -0.1234,
+     "tNet": -2.59,
+     "tGross": -2.32,
+     "months": 116,
+     "sumNet": -26.24,
+     "win": 0.393,
+     "stops": 37,
+     "costR": 0.014
+    },
+    "S2": {
+     "n": 222,
+     "netR": -0.077,
+     "grossR": -0.0629,
+     "tNet": -1.68,
+     "tGross": -1.37,
+     "months": 117,
+     "sumNet": -17.09,
+     "win": 0.428,
+     "stops": 39,
+     "costR": 0.0141
+    },
+    "p": 0.94408,
+    "pHolm": 0.94408
+   },
+   "byYear": {
+    "2007": -6.7,
+    "2008": -0.54,
+    "2009": -7.85,
+    "2010": -3.11,
+    "2011": -8.47,
+    "2012": -0.17,
+    "2013": 8.88,
+    "2014": -0.35,
+    "2015": 3.07,
+    "2016": -3.12,
+    "2017": -1.13,
+    "2018": -1.62,
+    "2019": -2.08,
+    "2020": -1.5,
+    "2021": 2.22,
+    "2022": -0.64,
+    "2023": 1.73,
+    "2024": -4.34,
+    "2025": -8.51,
+    "2026": -0.19
+   },
+   "pass": false
+  }
+ },
+ "reported": {
+  "allLong": {
+   "name": "long gold in every week 1-6",
+   "side": "buy",
+   "weeks": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "IS": {
+    "n": 388,
+    "netR": -0.0256,
+    "grossR": 0.0211,
+    "tNet": -0.74,
+    "tGross": 0.6,
+    "months": 115,
+    "sumNet": -9.95,
+    "win": 0.505,
+    "stops": 64,
+    "costR": 0.0467,
+    "x2": {
+     "n": 388,
+     "netR": -0.0723,
+     "grossR": 0.0211,
+     "tNet": -2.08,
+     "tGross": 0.6,
+     "months": 115,
+     "sumNet": -28.07,
+     "win": 0.474,
+     "stops": 64,
+     "costR": 0.0934
+    },
+    "S1": {
+     "n": 352,
+     "netR": 0.0008,
+     "grossR": 0.0477,
+     "tNet": 0.02,
+     "tGross": 1.22,
+     "months": 115,
+     "sumNet": 0.27,
+     "win": 0.511,
+     "stops": 55,
+     "costR": 0.0469
+    },
+    "S2": {
+     "n": 395,
+     "netR": -0.028,
+     "grossR": 0.0186,
+     "tNet": -0.82,
+     "tGross": 0.54,
+     "months": 116,
+     "sumNet": -11.04,
+     "win": 0.506,
+     "stops": 66,
+     "costR": 0.0466
+    }
+   },
+   "OOS": {
+    "n": 407,
+    "netR": 0.0869,
+    "grossR": 0.1399,
+    "tNet": 2.09,
+    "tGross": 3.34,
+    "months": 116,
+    "sumNet": 35.38,
+    "win": 0.543,
+    "stops": 58,
+    "costR": 0.0529,
+    "x2": {
+     "n": 407,
+     "netR": 0.034,
+     "grossR": 0.1399,
+     "tNet": 0.83,
+     "tGross": 3.34,
+     "months": 116,
+     "sumNet": 13.85,
+     "win": 0.506,
+     "stops": 58,
+     "costR": 0.1058
+    },
+    "S1": {
+     "n": 352,
+     "netR": 0.1195,
+     "grossR": 0.1732,
+     "tNet": 2.9,
+     "tGross": 4.17,
+     "months": 116,
+     "sumNet": 42.06,
+     "win": 0.563,
+     "stops": 39,
+     "costR": 0.0538
+    },
+    "S2": {
+     "n": 410,
+     "netR": 0.085,
+     "grossR": 0.1378,
+     "tNet": 2.07,
+     "tGross": 3.33,
+     "months": 117,
+     "sumNet": 34.84,
+     "win": 0.541,
+     "stops": 60,
+     "costR": 0.0528
+    }
+   },
+   "byYear": {
+    "2007": 2.5,
+    "2008": -1.59,
+    "2009": 3.35,
+    "2010": 1.77,
+    "2011": 5.44,
+    "2012": -1.02,
+    "2013": -8.29,
+    "2014": -3.16,
+    "2015": -5.37,
+    "2016": -3.57,
+    "2017": 2.71,
+    "2018": -4.39,
+    "2019": 2.53,
+    "2020": 6.53,
+    "2021": -3.29,
+    "2022": -0.23,
+    "2023": 4.95,
+    "2024": 8.91,
+    "2025": 17.09,
+    "2026": 0.57
+   }
+  },
+  "oddLong": {
+   "name": "long gold in weeks 1, 3, 5",
+   "side": "buy",
+   "weeks": [
+    1,
+    3,
+    5
+   ],
+   "IS": {
+    "n": 214,
+    "netR": -0.0057,
+    "grossR": 0.041,
+    "tNet": -0.12,
+    "tGross": 0.84,
+    "months": 114,
+    "sumNet": -1.21,
+    "win": 0.519,
+    "stops": 33,
+    "costR": 0.0467,
+    "x2": {
+     "n": 214,
+     "netR": -0.0523,
+     "grossR": 0.041,
+     "tNet": -1.09,
+     "tGross": 0.84,
+     "months": 114,
+     "sumNet": -11.2,
+     "win": 0.486,
+     "stops": 33,
+     "costR": 0.0933
+    },
+    "S1": {
+     "n": 194,
+     "netR": -0.0039,
+     "grossR": 0.0425,
+     "tNet": -0.07,
+     "tGross": 0.72,
+     "months": 114,
+     "sumNet": -0.76,
+     "win": 0.51,
+     "stops": 34,
+     "costR": 0.0464
+    },
+    "S2": {
+     "n": 217,
+     "netR": -0.0073,
+     "grossR": 0.0394,
+     "tNet": -0.15,
+     "tGross": 0.82,
+     "months": 115,
+     "sumNet": -1.58,
+     "win": 0.521,
+     "stops": 34,
+     "costR": 0.0467
+    }
+   },
+   "OOS": {
+    "n": 221,
+    "netR": 0.0454,
+    "grossR": 0.098,
+    "tNet": 0.85,
+    "tGross": 1.82,
+    "months": 116,
+    "sumNet": 10.04,
+    "win": 0.525,
+    "stops": 35,
+    "costR": 0.0525,
+    "x2": {
+     "n": 221,
+     "netR": -0.0071,
+     "grossR": 0.098,
+     "tNet": -0.13,
+     "tGross": 1.82,
+     "months": 116,
+     "sumNet": -1.56,
+     "win": 0.484,
+     "stops": 35,
+     "costR": 0.105
+    },
+    "S1": {
+     "n": 191,
+     "netR": 0.1313,
+     "grossR": 0.185,
+     "tNet": 2.15,
+     "tGross": 3.03,
+     "months": 116,
+     "sumNet": 25.07,
+     "win": 0.565,
+     "stops": 18,
+     "costR": 0.0538
+    },
+    "S2": {
+     "n": 222,
+     "netR": 0.0521,
+     "grossR": 0.1046,
+     "tNet": 0.97,
+     "tGross": 1.94,
+     "months": 117,
+     "sumNet": 11.57,
+     "win": 0.527,
+     "stops": 35,
+     "costR": 0.0525
+    }
+   },
+   "byYear": {
+    "2007": 4.2,
+    "2008": -0.35,
+    "2009": 5.88,
+    "2010": -0.5,
+    "2011": 7.8,
+    "2012": -1.39,
+    "2013": -6.78,
+    "2014": -2.42,
+    "2015": -5.21,
+    "2016": -2.45,
+    "2017": -0.75,
+    "2018": -1.74,
+    "2019": 0.36,
+    "2020": 1.17,
+    "2021": -4.35,
+    "2022": 0.64,
+    "2023": -0.03,
+    "2024": 2.11,
+    "2025": 11.74,
+    "2026": 0.9
+   }
+  },
+  "D_IS": {
+   "what": "per cycle: mean net R of the even-week longs minus that of the odd-week longs",
+   "cycles": 77,
+   "D": -0.011,
+   "t": -0.16
+  },
+  "D_OOS": {
+   "what": "per cycle: mean net R of the even-week longs minus that of the odd-week longs",
+   "cycles": 78,
+   "D": 0.0834,
+   "t": 1.19
+  },
+  "keepNew": {
+   "T1": {
+    "n": 184,
+    "netR": -0.0413,
+    "grossR": 0.0066,
+    "tNet": -0.89,
+    "tGross": 0.14,
+    "months": 119,
+    "sumNet": -7.61,
+    "win": 0.5,
+    "stops": 33,
+    "costR": 0.0479
+   },
+   "T2": {
+    "n": 223,
+    "netR": -0.1053,
+    "grossR": -0.0884,
+    "tNet": -1.85,
+    "tGross": -1.56,
+    "months": 119,
+    "sumNet": -23.48,
+    "win": 0.404,
+    "stops": 39,
+    "costR": 0.0169
+   }
+  }
+ },
+ "pHolmBar": 0.02275,
+ "placebo": {
+  "T1": {
+   "seeds": 40,
+   "shift": [
+    5,
+    20
+   ],
+   "t": [
+    0.11,
+    1.01,
+    0.83,
+    2.39,
+    -0.52,
+    0.44,
+    -0.21,
+    0.81,
+    0.44,
+    0.54,
+    1.93,
+    0.6,
+    0.93,
+    1.65,
+    -0.08,
+    1.24,
+    1.38,
+    0.09,
+    1.53,
+    2.59,
+    0.95,
+    0.61,
+    2.24,
+    0.62,
+    0.53,
+    1.33,
+    1.04,
+    0.44,
+    1.88,
+    0.83,
+    1.71,
+    1.37,
+    0.56,
+    0.28,
+    0.91,
+    1.1,
+    1.95,
+    0.65,
+    1.22,
+    0.27
+   ],
+   "mean": 0.95,
+   "max": 2.59,
+   "beaten": 38
+  },
+  "T2": {
+   "seeds": 40,
+   "shift": [
+    5,
+    20
+   ],
+   "t": [
+    -2.98,
+    -3.02,
+    -1.79,
+    -0.44,
+    -2.72,
+    -2.37,
+    -2.02,
+    -1.9,
+    -1.49,
+    -3.1,
+    -2.29,
+    -1.97,
+    -1.06,
+    -0.55,
+    -2.3,
+    -0.58,
+    -1.76,
+    -1.54,
+    -3.2,
+    -1.95,
+    -2.55,
+    -2.22,
+    -1.82,
+    -1.8,
+    -2.16,
+    -1.83,
+    -0.95,
+    -2.02,
+    -1.04,
+    -2.51,
+    -2.24,
+    -1.56,
+    -2.57,
+    -0.87,
+    -3.01,
+    -3.27,
+    -2.66,
+    -1.09,
+    -1.5,
+    -1.92
+   ],
+   "mean": -1.97,
+   "max": -0.44,
+   "beaten": 28
+  }
+ },
+ "checks": {
+  "T1": {
+   "oos": false,
+   "isSign": false,
+   "x2": true,
+   "placebo": true
+  },
+  "T2": {
+   "oos": false,
+   "isSign": false,
+   "x2": false,
+   "placebo": false
+  }
+ },
+ "verdict": "FAIL"
+}
