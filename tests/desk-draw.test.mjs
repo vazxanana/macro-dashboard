@@ -143,3 +143,15 @@ test('markets side by side (19 Nov 2026): 2 to 4 charts, each its own market and
   assert.match(PAGE, /if \(window\.msMultiView\) setTimeout\(\(\) => window\.msMultiView\(v === 'multi'\), 0\);/);
   assert.match(PAGE, /\['multi', 'Markets side by side'\]/, 'the chart header menu offers it (the phone has no toolbar row)');
 });
+
+test('free charts on a low timeframe keep up (19 Nov 2026): reads every 1.5-3 s, the page market moves with every live tick', () => {
+  assert.match(PAGE, /const freePoll = \(T\) => \(!T \? 15e3 : T\.sec <= 60 \? 1500 : T\.sec <= 900 \? 3000 : T\.sec <= 3600 \? 6000 : 15e3\);/);
+  assert.match(PAGE, /if \(window\.msTickSubs\) window\.msTickSubs\.forEach\(\(f\) => \{ try \{ f\(Q\); \} catch \(e\) \{\} \}\);/);
+  const ti = /const tickInto = [\s\S]*?return ch; \};/.exec(PAGE)[0];
+  const f = new Function('TZ', `${ti}; return tickInto;`)(0);
+  const bars = [{ time: 120, open: 10, high: 11, low: 9, close: 10 }], up = [], series = { update: (x) => up.push(x) };
+  assert.equal(f(bars, series, 60, 0, [{ px: 12, t: 150 }, { px: 8, t: 170 }, { px: 9, t: 185 }], null), true);
+  assert.deepEqual(bars, [{ time: 120, open: 10, high: 12, low: 8, close: 8 }, { time: 180, open: 9, high: 9, low: 9, close: 9 }]);
+  assert.equal(f(bars, series, 2678400, 0, [{ px: 1, t: 200 }], null), false, 'a month or a year is never bucketed from ticks');
+  assert.match(PAGE, /now - SP_POLL < \(k === instKey && now - \(LT\.at \|\| 0\) < 5000 \? 15e3 : freePoll\(T\)\) - 300/, 'with live ticks the read only completes candles');
+});
