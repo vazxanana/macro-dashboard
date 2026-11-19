@@ -14008,6 +14008,33 @@
     "status": "open",
     "stopCheckedAt": "2026-11-19T20:24:59.000Z",
     "brokerStop": 3673.24
+   },
+   "xau-m30m1-1795120266": {
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "setup": "m30m1",
+    "openedAt": "2026-11-19T20:33:22.000Z",
+    "councilEntry": 3667.53,
+    "stop": 3672.2151607142855,
+    "t1": 3662.08,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 3667.53,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 4.69,
+    "margin": 7.34,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 3667.54,
+    "slipR": -0.002,
+    "lagSec": 136,
+    "positionId": "50396271",
+    "volume": 100,
+    "status": "open"
    }
   },
   "day": {
@@ -14015,16 +14042,16 @@
    "startBalance": 10329.64
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10389.99 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 10389.99 · 6 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker"
   },
   "wait": {
    "xau-position-1794495673": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 471.34, 4.5% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 475.24, 4.6% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-19T20:30:21.000Z"
+    "at": "2026-11-19T20:33:22.000Z"
    }
   },
   "paused": {},
@@ -14033,24 +14060,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10389.99,
-  "lastRun": "2026-11-19T20:30:21.000Z"
+  "lastRun": "2026-11-19T20:33:22.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T09:13:50.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 406.47, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-19T09:15:15.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 407.23, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-19T09:18:14.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 407.07, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T09:20:46.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 405.10, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15535,6 +15547,21 @@
    "at": "2026-11-19T20:30:21.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 471.34, 4.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-19T20:32:08.000Z",
+   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 475.24, 4.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-19T20:32:08.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3667.53 (council m30m1, valid to 2026-11-20T02:31Z)",
+   "trade": "xau-m30m1-1795120266"
+  },
+  {
+   "at": "2026-11-19T20:33:22.000Z",
+   "msg": "limit filled: XAUUSD position 50396271 at the broker",
+   "trade": "xau-m30m1-1795120266"
   }
  ],
  "limits": {
@@ -15613,7 +15640,7 @@
   ]
  },
  "execution": {
-  "n": 462,
+  "n": 463,
   "meanSlipR": -0.018,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
@@ -15652,8 +15679,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 87,
-    "meanSlipR": -0.083
+    "n": 88,
+    "meanSlipR": -0.082
    }
   }
  }
