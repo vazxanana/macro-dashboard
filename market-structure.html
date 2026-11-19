@@ -1362,7 +1362,7 @@ window.msForgetCt = function () {
   try { for (var i = localStorage.length - 1; i >= 0; i--) { var k = localStorage.key(i); if (k && /^ms-ct-(sess|acc)-/.test(k)) localStorage.removeItem(k); } } catch (e) {}
 };
 // sign out (9 Nov): the server clears the session cookie; this browser forgets the account info and the cTrader session
-window.msSignOut = function () {
+window.msSignOut = function () { try { if (navigator.clearAppBadge) navigator.clearAppBadge().catch(function () {}); } catch (e) {}
   try { localStorage.removeItem('ms-acct'); localStorage.removeItem('ms-guest'); sessionStorage.removeItem('ms-own-pw'); } catch (e) {}
   window.msForgetCt();
   var done = function () { location.hash = '#home'; location.reload(); };
@@ -14093,7 +14093,10 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
   var markAll = function () { if (items[0]) try { localStorage.setItem(key(), items[0].at); } catch (e) {} badge(); var c = document.querySelector('.nt-in'); if (c) c.remove(); };   // the card on screen is read too
   var unread = function () { var s = seen(); return items.filter(function (x) { return x.at > s; }); };
   var when = function (iso) { return new Date(iso).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); };
-  function badge() { var n = unread().length; $('nt-n').hidden = !n; $('nt-n').textContent = n > 9 ? '9+' : String(n); bell.setAttribute('aria-label', n ? n + ' new notification' + (n > 1 ? 's' : '') : 'Notifications'); }
+  function badge() { var n = unread().length; $('nt-n').hidden = !n; $('nt-n').textContent = n > 9 ? '9+' : String(n); bell.setAttribute('aria-label', n ? n + ' new notification' + (n > 1 ? 's' : '') : 'Notifications'); 
+    // the installed app's icon shows the same count (19 Nov 2026, owner: "notifications badge"); browsers without the
+    // Badging API (and pages that are not installed) simply ignore it
+    try { if (navigator.setAppBadge) { if (n) navigator.setAppBadge(n).catch(function () {}); else navigator.clearAppBadge().catch(function () {}); } } catch (e) {} }
   function closePop() { if (pop) { pop.remove(); pop = null; bell.setAttribute('aria-expanded', 'false'); } }
   function openPop() { closePop(); var s = seen(); pop = document.createElement('div'); pop.className = 'nt-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Notifications');
     pop.innerHTML = '<header><b>Notifications</b>' + (unread().length ? '<button type="button" data-all>Mark all read</button>' : '') + '</header>' + (items.length ? '<ul>' + items.map(function (x) { return '<li class="' + (x.at > s ? 'new' : '') + '"><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + esc(x.body) + '</p>' : '') + '<small>' + esc(when(x.at)) + '</small></li>'; }).join('') + '</ul>' : '<div class="nt-empty">Nothing yet. Messages from the desk show up here.</div>');
@@ -14668,7 +14671,7 @@ html.is-scrolled .top { box-shadow: 0 1px 0 var(--au-line), 0 8px 20px -14px rgb
 .top-actions .ms-tbtn:hover, .nt-bell:hover, .top-actions details[open] > summary.ms-tbtn { background: var(--au-surface-2) !important; color: var(--au-ink); }
 .top-actions #ms-alerts.is-on, .top-actions #ms-alerts[aria-pressed="true"] { color: var(--au-accent); background: var(--accent-soft) !important; }
 .nt-bell[hidden] { display: none !important; }   /* the bell's own rule (inline-grid) beat [hidden]: it showed for guests, with nothing behind it */
-.nt-n { box-shadow: 0 0 0 2px var(--au-bg); }
+.nt-n { box-shadow: 0 0 0 2px var(--au-bg); font-size: 12px !important; }
 .hdr-open { border-radius: var(--au-r-pill); border-color: var(--au-line) !important; background: var(--au-surface) !important; color: var(--au-ink-2); }
 /* Desk | Macro | ChronosTrade: a plain segmented control, the place you are on a raised segment with an accent dot */
 .hdr-sw { background: var(--au-surface); border: 1px solid var(--au-line); }

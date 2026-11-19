@@ -1,6 +1,7 @@
 // node --test tests/notify.test.mjs — desk notifications (api/notify.js)
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
 const { handle } = createRequire(import.meta.url)('../api/notify.js');
 const mk = () => { let db = []; return { get: async () => db, put: async (v) => { db = v; }, peek: () => db }; };
@@ -34,4 +35,11 @@ test('page: the slide-in card does not take the keyboard from someone typing, ha
   assert.match(html, /if \(!typing\) setTimeout\(function \(\) \{ var b = c\.querySelector\('\[data-ok\]'\); if \(b\) b\.focus\(\); \}, 60\);/);
   assert.match(html, /var t = prev && prev !== document\.body && document\.contains\(prev\) && prev\.getClientRects\(\)\.length \? prev : bell;/);
   assert.match(html, /badge\(\); var c = document\.querySelector\('\.nt-in'\); if \(c\) c\.remove\(\); \};/);
+});
+
+test('the installed app icon shows the unread count (19 Nov 2026): set with the bell badge, cleared at zero and on sign-out', () => {
+  const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  const b = page.slice(page.indexOf('function badge() {'), page.indexOf('function closePop()'));
+  assert.match(b, /navigator\.setAppBadge\(n\)/); assert.match(b, /navigator\.clearAppBadge\(\)/);
+  assert.match(page, /window\.msSignOut = function \(\) \{ try \{ if \(navigator\.clearAppBadge\) navigator\.clearAppBadge\(\)/);
 });
