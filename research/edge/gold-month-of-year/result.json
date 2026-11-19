@@ -1,0 +1,728 @@
+{
+ "study": "gold-month-of-year",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "claim": {
+  "strong": [
+   "Nov",
+   "Dec",
+   "Jan",
+   "Feb"
+  ],
+  "weak": [
+   "Mar",
+   "Jun"
+  ],
+  "outsideReportedOnly": [
+   "Jan",
+   "Aug",
+   "Sep"
+  ],
+  "source": "gold-trading.html computeMacroScore seasS"
+ },
+ "data": {
+  "file": "council-data research/daily/xau.json",
+  "src": "OANDA",
+  "sha256": "76ac192df98e0aebb82be6aea9f08380dd9f6f7759297b3cfda32416d3555b4c",
+  "first": "2006-03-20",
+  "last": "2026-11-06"
+ },
+ "costs": {
+  "roundTrip": 0.3,
+  "financing": 0.000148,
+  "financingSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "windows": {
+  "decisive": {
+   "T1": "2016-01 to 2026-10",
+   "T2": "2016-01 to 2026-10"
+  },
+  "replication": {
+   "T1": "2006-05 to 2015-12",
+   "T2": "2006-04 to 2015-12"
+  }
+ },
+ "tests": {
+  "decisive": {
+   "T1": {
+    "nIn": 42,
+    "nOut": 88,
+    "meanIn": 0.327,
+    "meanOut": 0.047,
+    "diff": 0.28,
+    "t": 1.35,
+    "df": 84.8,
+    "p": 0.0895,
+    "gross": {
+     "nIn": 42,
+     "nOut": 88,
+     "meanIn": 0.439,
+     "meanOut": 0.147,
+     "diff": 0.293,
+     "t": 1.38,
+     "df": 84.4,
+     "p": 0.0849
+    },
+    "strongBook": {
+     "n": 42,
+     "gross": 0.439,
+     "net": 0.327,
+     "t": 1.95,
+     "total": 13.7,
+     "dd": -3.3,
+     "stops": 9
+    },
+    "otherBook": {
+     "n": 88,
+     "gross": 0.147,
+     "net": 0.047,
+     "t": 0.38,
+     "total": 4.1,
+     "dd": -11.1,
+     "stops": 25
+    },
+    "everyBook": {
+     "n": 130,
+     "gross": 0.241,
+     "net": 0.137,
+     "t": 1.39,
+     "total": 17.8,
+     "dd": -10.3,
+     "stops": 34
+    }
+   },
+   "T2": {
+    "nIn": 42,
+    "nOut": 88,
+    "meanIn": 8.04,
+    "meanOut": 2.989,
+    "diff": 5.05,
+    "t": 1.28,
+    "df": 79.5,
+    "p": 0.1019
+   },
+   "T3": {
+    "nIn": 22,
+    "nOut": 108,
+    "meanIn": 0.574,
+    "meanOut": 5.445,
+    "diff": 4.872,
+    "t": 0.79,
+    "df": 25.4,
+    "p": 0.2178
+   }
+  },
+  "replication": {
+   "T1": {
+    "nIn": 38,
+    "nOut": 78,
+    "meanIn": 0.066,
+    "meanOut": 0.003,
+    "diff": 0.063,
+    "t": 0.31,
+    "df": 74,
+    "p": 0.3776,
+    "gross": {
+     "nIn": 38,
+     "nOut": 78,
+     "meanIn": 0.142,
+     "meanOut": 0.091,
+     "diff": 0.051,
+     "t": 0.25,
+     "df": 74.5,
+     "p": 0.4027
+    },
+    "strongBook": {
+     "n": 38,
+     "gross": 0.142,
+     "net": 0.066,
+     "t": 0.4,
+     "total": 2.5,
+     "dd": -5.4,
+     "stops": 12
+    },
+    "otherBook": {
+     "n": 78,
+     "gross": 0.091,
+     "net": 0.003,
+     "t": 0.02,
+     "total": 0.2,
+     "dd": -10.2,
+     "stops": 24
+    },
+    "everyBook": {
+     "n": 116,
+     "gross": 0.108,
+     "net": 0.023,
+     "t": 0.25,
+     "total": 2.7,
+     "dd": -13.1,
+     "stops": 36
+    }
+   },
+   "T2": {
+    "nIn": 38,
+    "nOut": 79,
+    "meanIn": 6.589,
+    "meanOut": 0.544,
+    "diff": 6.045,
+    "t": 1.17,
+    "df": 69.3,
+    "p": 0.124
+   },
+   "T3": {
+    "nIn": 19,
+    "nOut": 98,
+    "meanIn": -6.915,
+    "meanOut": 4.334,
+    "diff": 11.249,
+    "t": 2.18,
+    "df": 32.9,
+    "p": 0.0183
+   }
+  }
+ },
+ "placebo": {
+  "T1": 0.075,
+  "T2": 0.096,
+  "T3": 0.163,
+  "outsideT1": 0.247,
+  "outsideT2": 0.301
+ },
+ "costCheck": {
+  "decisive": {
+   "diff": 0.268,
+   "t": 1.32,
+   "strongNet": 0.215
+  },
+  "replication": {
+   "diff": 0.076,
+   "t": 0.38,
+   "strongNet": -0.01
+  }
+ },
+ "perMonth": {
+  "decisive": [
+   {
+    "month": "Jan",
+    "n": 11,
+    "bpDay": 16.243,
+    "book": {
+     "n": 11,
+     "gross": 1.038,
+     "net": 0.898,
+     "t": 2.63,
+     "total": 9.9,
+     "dd": -1.8,
+     "stops": 1
+    }
+   },
+   {
+    "month": "Feb",
+    "n": 11,
+    "bpDay": 6.296,
+    "book": {
+     "n": 11,
+     "gross": 0.359,
+     "net": 0.249,
+     "t": 0.72,
+     "total": 2.7,
+     "dd": -2.5,
+     "stops": 2
+    }
+   },
+   {
+    "month": "Mar",
+    "n": 11,
+    "bpDay": 5.117,
+    "book": {
+     "n": 11,
+     "gross": 0.298,
+     "net": 0.211,
+     "t": 0.49,
+     "total": 2.3,
+     "dd": -3.7,
+     "stops": 4
+    }
+   },
+   {
+    "month": "Apr",
+    "n": 11,
+    "bpDay": 8.757,
+    "book": {
+     "n": 11,
+     "gross": 0.157,
+     "net": 0.064,
+     "t": 0.36,
+     "total": 0.7,
+     "dd": -1.2,
+     "stops": 1
+    }
+   },
+   {
+    "month": "May",
+    "n": 11,
+    "bpDay": 0.132,
+    "book": {
+     "n": 11,
+     "gross": -0.017,
+     "net": -0.114,
+     "t": -0.41,
+     "total": -1.3,
+     "dd": -2.7,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Jun",
+    "n": 11,
+    "bpDay": -3.969,
+    "book": {
+     "n": 11,
+     "gross": 0.136,
+     "net": 0.028,
+     "t": 0.07,
+     "total": 0.3,
+     "dd": -3.5,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Jul",
+    "n": 11,
+    "bpDay": 8.112,
+    "book": {
+     "n": 11,
+     "gross": 0.254,
+     "net": 0.159,
+     "t": 0.49,
+     "total": 1.8,
+     "dd": -2.2,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Aug",
+    "n": 11,
+    "bpDay": 7.902,
+    "book": {
+     "n": 11,
+     "gross": 0.11,
+     "net": 0.013,
+     "t": 0.04,
+     "total": 0.1,
+     "dd": -4.1,
+     "stops": 4
+    }
+   },
+   {
+    "month": "Sep",
+    "n": 11,
+    "bpDay": -5.15,
+    "book": {
+     "n": 11,
+     "gross": -0.119,
+     "net": -0.23,
+     "t": -0.52,
+     "total": -2.5,
+     "dd": -6.3,
+     "stops": 5
+    }
+   },
+   {
+    "month": "Oct",
+    "n": 11,
+    "bpDay": 3.014,
+    "book": {
+     "n": 11,
+     "gross": 0.353,
+     "net": 0.241,
+     "t": 0.74,
+     "total": 2.7,
+     "dd": -1.4,
+     "stops": 2
+    }
+   },
+   {
+    "month": "Nov",
+    "n": 10,
+    "bpDay": -1.921,
+    "book": {
+     "n": 10,
+     "gross": -0.068,
+     "net": -0.162,
+     "t": -0.55,
+     "total": -1.6,
+     "dd": -3.5,
+     "stops": 4
+    }
+   },
+   {
+    "month": "Dec",
+    "n": 10,
+    "bpDay": 10.895,
+    "book": {
+     "n": 10,
+     "gross": 0.377,
+     "net": 0.274,
+     "t": 0.91,
+     "total": 2.7,
+     "dd": -1.4,
+     "stops": 2
+    }
+   }
+  ],
+  "replication": [
+   {
+    "month": "Jan",
+    "n": 9,
+    "bpDay": 15.026,
+    "book": {
+     "n": 9,
+     "gross": 0.288,
+     "net": 0.215,
+     "t": 0.52,
+     "total": 1.9,
+     "dd": -2.4,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Feb",
+    "n": 9,
+    "bpDay": 7.025,
+    "book": {
+     "n": 9,
+     "gross": 0.296,
+     "net": 0.217,
+     "t": 0.71,
+     "total": 2,
+     "dd": -1.6,
+     "stops": 2
+    }
+   },
+   {
+    "month": "Mar",
+    "n": 9,
+    "bpDay": -8.016,
+    "book": {
+     "n": 9,
+     "gross": -0.448,
+     "net": -0.528,
+     "t": -2.93,
+     "total": -4.8,
+     "dd": -4.8,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Apr",
+    "n": 10,
+    "bpDay": 6.521,
+    "book": {
+     "n": 9,
+     "gross": 0.259,
+     "net": 0.168,
+     "t": 0.5,
+     "total": 1.5,
+     "dd": -1.2,
+     "stops": 1
+    }
+   },
+   {
+    "month": "May",
+    "n": 10,
+    "bpDay": -2.685,
+    "book": {
+     "n": 10,
+     "gross": -0.226,
+     "net": -0.302,
+     "t": -0.98,
+     "total": -3,
+     "dd": -4.2,
+     "stops": 5
+    }
+   },
+   {
+    "month": "Jun",
+    "n": 10,
+    "bpDay": -5.924,
+    "book": {
+     "n": 10,
+     "gross": -0.11,
+     "net": -0.198,
+     "t": -0.7,
+     "total": -2,
+     "dd": -3,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Jul",
+    "n": 10,
+    "bpDay": 3.832,
+    "book": {
+     "n": 10,
+     "gross": 0.185,
+     "net": 0.089,
+     "t": 0.26,
+     "total": 0.9,
+     "dd": -2.3,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Aug",
+    "n": 10,
+    "bpDay": 9.092,
+    "book": {
+     "n": 10,
+     "gross": 0.67,
+     "net": 0.569,
+     "t": 1.56,
+     "total": 5.7,
+     "dd": -1.2,
+     "stops": 1
+    }
+   },
+   {
+    "month": "Sep",
+    "n": 10,
+    "bpDay": 0.533,
+    "book": {
+     "n": 10,
+     "gross": 0.16,
+     "net": 0.078,
+     "t": 0.18,
+     "total": 0.8,
+     "dd": -2.6,
+     "stops": 5
+    }
+   },
+   {
+    "month": "Oct",
+    "n": 10,
+    "bpDay": 0.144,
+    "book": {
+     "n": 10,
+     "gross": 0.204,
+     "net": 0.11,
+     "t": 0.37,
+     "total": 1.1,
+     "dd": -2.4,
+     "stops": 3
+    }
+   },
+   {
+    "month": "Nov",
+    "n": 10,
+    "bpDay": 9.126,
+    "book": {
+     "n": 10,
+     "gross": 0.276,
+     "net": 0.194,
+     "t": 0.55,
+     "total": 1.9,
+     "dd": -2.5,
+     "stops": 2
+    }
+   },
+   {
+    "month": "Dec",
+    "n": 10,
+    "bpDay": -3.934,
+    "book": {
+     "n": 10,
+     "gross": -0.262,
+     "net": -0.332,
+     "t": -1.3,
+     "total": -3.3,
+     "dd": -3.8,
+     "stops": 5
+    }
+   }
+  ]
+ },
+ "outside": {
+  "decisive": {
+   "T1": {
+    "nIn": 33,
+    "nOut": 97,
+    "meanIn": 0.227,
+    "meanOut": 0.107,
+    "diff": 0.12,
+    "t": 0.47,
+    "df": 46.6,
+    "p": 0.3193
+   },
+   "T2": {
+    "nIn": 33,
+    "nOut": 97,
+    "meanIn": 6.331,
+    "meanOut": 4.039,
+    "diff": 2.292,
+    "t": 0.52,
+    "df": 51.3,
+    "p": 0.3035
+   }
+  },
+  "replication": {
+   "T1": {
+    "nIn": 29,
+    "nOut": 87,
+    "meanIn": 0.29,
+    "meanOut": -0.065,
+    "diff": 0.355,
+    "t": 1.43,
+    "df": 39.2,
+    "p": 0.0809
+   },
+   "T2": {
+    "nIn": 29,
+    "nOut": 88,
+    "meanIn": 7.982,
+    "meanOut": 0.703,
+    "diff": 7.279,
+    "t": 1.25,
+    "df": 44,
+    "p": 0.1081
+   }
+  }
+ },
+ "years": [
+  {
+   "year": 2006,
+   "n": 2,
+   "net": 0.02
+  },
+  {
+   "year": 2007,
+   "n": 4,
+   "net": -0.12
+  },
+  {
+   "year": 2008,
+   "n": 4,
+   "net": 4.14
+  },
+  {
+   "year": 2009,
+   "n": 4,
+   "net": 0.77
+  },
+  {
+   "year": 2010,
+   "n": 4,
+   "net": 0.92
+  },
+  {
+   "year": 2011,
+   "n": 4,
+   "net": -0.69
+  },
+  {
+   "year": 2012,
+   "n": 4,
+   "net": -0.29
+  },
+  {
+   "year": 2013,
+   "n": 4,
+   "net": -3.54
+  },
+  {
+   "year": 2014,
+   "n": 4,
+   "net": 2.04
+  },
+  {
+   "year": 2015,
+   "n": 4,
+   "net": -0.76
+  },
+  {
+   "year": 2016,
+   "n": 4,
+   "net": 2.26
+  },
+  {
+   "year": 2017,
+   "n": 4,
+   "net": 0.93
+  },
+  {
+   "year": 2018,
+   "n": 4,
+   "net": 2.12
+  },
+  {
+   "year": 2019,
+   "n": 4,
+   "net": 0.73
+  },
+  {
+   "year": 2020,
+   "n": 4,
+   "net": 1.88
+  },
+  {
+   "year": 2021,
+   "n": 4,
+   "net": -1.76
+  },
+  {
+   "year": 2022,
+   "n": 4,
+   "net": 3.27
+  },
+  {
+   "year": 2023,
+   "n": 4,
+   "net": -0.1
+  },
+  {
+   "year": 2024,
+   "n": 4,
+   "net": -1.79
+  },
+  {
+   "year": 2025,
+   "n": 4,
+   "net": 2.99
+  },
+  {
+   "year": 2026,
+   "n": 2,
+   "net": 3.2
+  }
+ ],
+ "holm": {
+  "T1": 0.2685,
+  "T2": 0.2685,
+  "T3": 0.2685
+ },
+ "pass": {
+  "T1": {
+   "bothWindows": true,
+   "holm": false,
+   "placebo": false,
+   "cost2x": true,
+   "pass": false
+  },
+  "T2": {
+   "bothWindows": true,
+   "holm": false,
+   "placebo": false,
+   "pass": false
+  },
+  "T3": {
+   "bothWindows": true,
+   "holm": false,
+   "placebo": false,
+   "pass": false
+  }
+ },
+ "positions": 246,
+ "monthsN": 247,
+ "note": "Gold only. Not a gate on the live gold book (owner item 44). A pass would only change the gold terminal wording, by the owner."
+}
