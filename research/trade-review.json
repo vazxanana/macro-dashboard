@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-19T17:30:40.000Z",
+ "at": "2026-11-19T18:02:04.000Z",
  "rule": "proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.",
  "inSample": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.",
  "windows": {
@@ -3088,7 +3088,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -3868,26 +3868,26 @@
    "stopped": true,
    "windows": {
     "d7": {
-     "n": 6,
+     "n": 5,
      "wins": 3,
-     "losses": 3,
+     "losses": 2,
      "flat": 0,
-     "winRate": 0.5,
+     "winRate": 0.6,
      "gross": {
-      "sum": 4.03,
-      "mean": 0.672,
-      "t": 0.77
+      "sum": 5.03,
+      "mean": 1.006,
+      "t": 1.02
      },
      "net": {
-      "sum": 3.43,
-      "mean": 0.572,
-      "t": 0.64
+      "sum": 4.68,
+      "mean": 0.936,
+      "t": 0.94
      },
      "cost": {
-      "known": 6,
-      "sum": 0.6,
-      "perTrade": 0.1,
-      "shareOfGrossWins": 0.085
+      "known": 5,
+      "sum": 0.35,
+      "perTrade": 0.07,
+      "shareOfGrossWins": 0.05
      }
     },
     "d30": {
@@ -4408,7 +4408,7 @@
     "rscalp|shadow|losing"
    ],
    "review": {
-    "head": "Retrace scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 276 closed, 38% won, −29.85R before costs, −92.42R after (t −3.41); last 30 days −92.42R on 276, last 7 days +3.43R on 6.",
+    "head": "Retrace scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 276 closed, 38% won, −29.85R before costs, −92.42R after (t −3.41); last 30 days −92.42R on 276, last 7 days +4.68R on 5.",
     "working": [
      "target exits +125.14R on 105",
      "demo copies filled 0.02R a trade worse than paper (n 102, t 0.67)"
@@ -4582,26 +4582,26 @@
    "stopped": true,
    "windows": {
     "d7": {
-     "n": 10,
-     "wins": 10,
+     "n": 9,
+     "wins": 9,
      "losses": 0,
      "flat": 0,
      "winRate": 1,
      "gross": {
-      "sum": 20.27,
-      "mean": 2.027,
-      "t": 82.59
+      "sum": 18.27,
+      "mean": 2.03,
+      "t": 74.54
      },
      "net": {
-      "sum": 19.94,
-      "mean": 1.994,
-      "t": 72.74
+      "sum": 18.02,
+      "mean": 2.002,
+      "t": 68.48
      },
      "cost": {
-      "known": 10,
-      "sum": 0.33,
-      "perTrade": 0.033,
-      "shareOfGrossWins": 0.016
+      "known": 9,
+      "sum": 0.25,
+      "perTrade": 0.028,
+      "shareOfGrossWins": 0.014
      }
     },
     "d30": {
@@ -5083,7 +5083,7 @@
     "intraday|shadow|exit-runs"
    ],
    "review": {
-    "head": "Intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 96 closed, 49% won, +56.07R before costs, +48.30R after (t 2.86); last 30 days +48.30R on 96, last 7 days +19.94R on 10.",
+    "head": "Intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 96 closed, 49% won, +56.07R before costs, +48.30R after (t 2.86); last 30 days +48.30R on 96, last 7 days +18.02R on 9.",
     "working": [
      "after costs +48.30R on 96 trades (+0.50R a trade, t 2.86)",
      "target exits +102.41R on 47",
@@ -8490,7 +8490,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -8930,7 +8930,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -8978,20 +8978,20 @@
    "stopped": false,
    "windows": {
     "d7": {
-     "n": 622,
+     "n": 621,
      "wins": 194,
-     "losses": 428,
+     "losses": 427,
      "flat": 0,
      "winRate": 0.312,
      "gross": {
-      "sum": -71.99,
-      "mean": -0.116,
-      "t": -1.97
+      "sum": -70.99,
+      "mean": -0.114,
+      "t": -1.94
      },
      "net": {
-      "sum": -71.99,
-      "mean": -0.116,
-      "t": -1.97
+      "sum": -70.99,
+      "mean": -0.114,
+      "t": -1.94
      },
      "cost": {
       "known": 0,
@@ -9544,7 +9544,7 @@
     "replica|research|strong-side:sell"
    ],
    "review": {
-    "head": "GBP/USD replica (research): 1278 closed, 32% won, −88.19R before costs, no cost on record (t −1.73 before costs); last 30 days −88.19R on 1278, last 7 days −71.99R on 622.",
+    "head": "GBP/USD replica (research): 1278 closed, 32% won, −88.19R before costs, no cost on record (t −1.73 before costs); last 30 days −88.19R on 1278, last 7 days −70.99R on 621.",
     "working": [
      "time exits +12.58R on 33",
      "target exits +778.02R on 389",
@@ -10613,7 +10613,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -10918,7 +10918,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -11200,7 +11200,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -11432,7 +11432,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -11652,7 +11652,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -11872,7 +11872,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -12092,7 +12092,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.16R a trade, CUSUM 2.28 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -12841,5 +12841,5 @@
    }
   ]
  },
- "hash": "4736d610407a041a"
+ "hash": "cada6784a9c8d4f5"
 }
