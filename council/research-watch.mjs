@@ -32,7 +32,24 @@ const sg = (x, d = 2) => (x == null || !Number.isFinite(x) ? 'n/a' : (x > 0 ? '+
 export function loadDocs(dir = REF) {
   const out = {};
   for (const [k, f] of Object.entries(DOCS)) { try { out[k] = fs.readFileSync(new URL(f, dir), 'utf8'); } catch (e) { out[k] = null; } }
+  try { const Y = JSON.parse(fs.readFileSync(new URL('../research/edge/yield-regime/result.json', import.meta.url), 'utf8'));
+    out.regime = { verdict: Y.verdict, classes: Y.classes, horizon: Y.horizon }; } catch (e) { out.regime = null; }
   return out;
+}
+
+// the rule book's US 10-year regime table (speed and direction, and why it moves), read today, with the record of each class
+// from research/edge/yield-regime (classOf / whyOf there; a test compares). Descriptive: the study FAILED as a forecast.
+export const REGIME_NAME = { risingFast: '10-year rising fast', risingSlow: '10-year rising slowly', flat: '10-year flat', fallingSlow: '10-year falling slowly', fallingFast: '10-year falling fast' };
+const BOOK = { risingFast: 'bearish gold', risingSlow: 'a mild headwind for gold', flat: 'no regime', fallingSlow: 'bullish gold', fallingFast: 'bullish gold after the liquidation phase' };
+export function regimeCheck({ S, now, study }) {
+  const d2 = chg(S.DGS10, now, 14), d4 = chg(S.DGS10, now, 28), d6 = chg(S.DGS10, now, 42), t2 = chg(S.DGS2, now, 28); if (d2 == null || d4 == null || d6 == null) return null;
+  const cls = d2 >= 0.25 || d4 >= 0.5 ? 'risingFast' : d2 <= -0.25 || d4 <= -0.5 ? 'fallingFast' : d6 >= 0.25 ? 'risingSlow' : d6 <= -0.25 ? 'fallingSlow' : 'flat';
+  const why = d4 >= 0.25 && t2 != null ? (t2 >= d4 ? 'led by the 2-year (growth / hawkish Fed)' : t2 <= d4 - 0.15 ? 'with the 2-year lagging (term premium)' : null) : null;
+  const bp = (x) => sg(x * 100, 0) + ' bp', C = study && study.classes, c = C && C[cls], all = C && C.all, pc = (x) => sg(x * 100, 1) + '%';
+  const rec = c && all ? `Record 2007-26 (research/edge/yield-regime, ${study.verdict}): in this class gold's next ${study.horizon} sessions averaged ${pc(c.gold)} (up ${Math.round(c.goldUp * 100)}% of ${c.n} weeks) against ${pc(all.gold)} on all weeks. Not significant: a lean, not a tested edge.` : null;
+  return { doc: 'your macro rule book (US 10-year regime table)', text: `${REGIME_NAME[cls]}${why ? ', ' + why : ''}: the rule book reads ${why && why.includes('term premium') ? 'bullish gold (fiscal / term-premium stress)' : BOOK[cls]}.`,
+    readings: [{ text: `10-year ${bp(d2)} over 2 weeks`, on: Math.abs(d2) >= 0.25 }, { text: `${bp(d4)} over 4 weeks`, on: Math.abs(d4) >= 0.5 }, { text: `${bp(d6)} over 6 weeks`, on: Math.abs(d6) >= 0.25 }].concat(t2 != null ? [{ text: `2-year ${bp(t2)} over 4 weeks`, on: false }] : []),
+    caveat: rec, asOf: (last(S.DGS10, now) || {}).t ? new Date(last(S.DGS10, now).t * 1000).toISOString().slice(0, 10) : null };
 }
 
 // markdown table rows under the first header line that matches `head`
@@ -256,6 +273,7 @@ export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [] }) {
   try { push('japan', D.japan && japanCheck({ md: D.japan, S, usdjpy, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('cot', D.positioning && positioningNote({ S })); } catch (e) { out.error = String(e.message || e); }
   try { push('china', (D.chinaHousing || D.chinaFiscal) && chinaBriefs({ housing: D.chinaHousing, fiscal: D.chinaFiscal, calendar, now })); } catch (e) { out.error = String(e.message || e); }
+  try { push('regime', regimeCheck({ S, now, study: D.regime })); } catch (e) { out.error = String(e.message || e); }
   try { push('nyfed', D.nyfed && nyfedSurvey({ json: D.nyfed, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
   out.register = R.length ? { n: R.length, doc: DOCS.register, ids: R.map((r) => r.id) } : null;
   return { watch: out, register: R };

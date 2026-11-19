@@ -2872,6 +2872,16 @@ to T+60 (not tradable) +0.33 % out of sample (t 4.01). The red folder study show
 ("know the side before the print; do not chase after it", `loadInputs().surprise`). Nothing live changed. Tests:
 `tests/red-folder-surprise.test.mjs`.
 
+## The US 10-year regime table and gold (19 Nov 2026, owner: "use the other documents too, keep going")
+`research/edge/yield-regime/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
+book's "primary gauge": the 10-year's speed and direction (fast = 25 bp in 2 weeks or 50 bp in 4; slow = 25 bp over 6 weeks) and
+"why it moves" (2-year-led vs term premium), against gold's next 20 sessions from the weekday after (yields known by then),
+1,033 weekly readings 2007-26. **FAIL, 0 of 3** (Holm; same sign in 2007-16 and 2017 on required): rising fast +0.40 % (n 82,
+t −0.23, not bearish), falling slowly +0.96 % (n 131, t 1.07), term premium vs 2-year-led t 0.18 (flips between halves); all
+weeks +0.52 %. Falling yields lean gold-up in both halves, at t near 1. Live reading `research-watch.mjs` `regimeCheck` (classes
+as the study's `classOf` / `whyOf`, a test compares) in "Your research, applied" with each class's record beside it; it changes
+no score, call or trade. Tests: `tests/yield-regime.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
