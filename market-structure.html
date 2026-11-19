@@ -3675,6 +3675,13 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   .pp-curve figcaption { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
   .pp-foot { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 10px; } .pp-foot small { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
   @media (pointer: coarse) { .pp-go, .pp-tog, .pp-q, .pp-act button, #ms-pp select, #ms-pp input { min-height: 44px; } }
+  /* laptop (19 Nov 2026, "and laptop as well"): one row from 1400 px (the note wraps under the title, Stats at the end);
+     641-1399 px two rows: title, figures, Stats / Sell | price | Buy and the settings */
+  @media (min-width: 1400px) { .pp-h { flex-wrap: nowrap; gap: 10px 22px; } .pp-ttl { max-width: 250px; } .pp-set { flex-wrap: nowrap; } .pp-tog { flex: none; } }
+  @media (min-width: 641px) and (max-width: 1399px) {
+    .pp-h { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: "ttl big tog" "trade set set"; gap: 10px 18px; align-items: center; }
+    .pp-ttl { grid-area: ttl; } .pp-big { grid-area: big; } .pp-tog { grid-area: tog; } .pp-trade { grid-area: trade; justify-self: start; } .pp-set { grid-area: set; }
+  }
   /* phone (19 Nov 2026, "more organised"): title and Stats on one line, the three figures in equal columns, Sell | price | Buy
      and Risk / Stop / Target each across the full width */
   @media (max-width: 640px) {
@@ -3688,6 +3695,23 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 </style>
       <style id="ms-dr-css">/* ChronosTrade's chart tools on the Desk (18 Nov 2026): drawing strip, style bar, right-click menu, 1-4 chart layout */
       #v-charts .sec-h { position: relative; }
+      /* Laptop toolbar (19 Nov 2026, "and laptop as well"): row 1 timeframes and markup on the left, Style and Indicators on the
+         right, all 36 px; row 2 the drawing tools and the chart tools on the left, the guide on the right. */
+      @media (min-width: 641px) {
+        #v-charts .sec-h > .ch-help { margin-left: auto; height: 38px; }
+        #v-charts .sec-h #ms-sty-btn, #v-charts .sec-h > .ind-open { height: 36px; box-sizing: border-box; }
+      }
+      /* 641-1279 px: the timeframes and the markup fill row 1, so Style and Indicators join the tools on row 2, before the guide */
+      @media (min-width: 1024px) and (max-width: 1439px) {
+        #v-charts .sec-h > #ms-sty.sty, #v-charts .sec-h > .ind-open.ind-open { order: 9; } #v-charts .sec-h > #ms-sty.sty { margin-left: auto; }
+        #v-charts .sec-h > .ch-help.ch-help { margin-left: 0; }
+      }
+      /* 641-1023 px: Style, Indicators and the guide on row 2, the drawing and chart tools together on row 3 */
+      @media (min-width: 641px) and (max-width: 1023px) {
+        #v-charts .sec-h > #ms-sty.sty, #v-charts .sec-h > .ind-open.ind-open { order: 5; margin-left: 0; }
+        #v-charts .sec-h > .ch-help.ch-help { order: 6; margin-left: auto; }
+        #v-charts .sec-h > .dr-bar.dr-bar, #v-charts .sec-h > .ch-one.ch-one { order: 9; }
+      }
       /* Phone toolbar, tidy rows (19 Nov 2026, owner: "put it more organised"): markup | style | indicators, then the drawing
          tools with the guide's "?", then the chart tools; every row runs the full width and its buttons share it (44 px tall). */
       @media (max-width: 640px) {
