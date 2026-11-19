@@ -91,7 +91,7 @@ test('the endpoint: ?job=watchdog needs the cron secret, never caches, and the p
 
 test('wiring: first in the Worker\'s 10-minute chain, no new trigger, and the module only reads, decides and dispatches the watchdog', () => {
   const w = fs.readFileSync(new URL('../cloudflare/src/worker.mjs', import.meta.url), 'utf8');
-  assert.match(w, /CHAINED = \{ '\*\/10 \* \* \* \*': \['\/api\/status\?job=watchdog', '\/api\/trade-review\?job=review'\] \}/);
+  assert.match(w, /CHAINED = \{ '\*\/10 \* \* \* \*': \['\/api\/status\?job=watchdog', [^\]]*'\/api\/trade-review\?job=review'\] \}/);   // first in the chain
   assert.match(w, /CRONS = \{ '\*\/10 \* \* \* \*': '\/api\/edge-analyst\?job=scan' \}/, 'still one cron');
   const k = fs.readFileSync(new URL('../api/_watchdog-kick.js', import.meta.url), 'utf8');
   assert.equal((k.match(/method: 'POST'/g) || []).length, 1, 'one write call: the dispatch');

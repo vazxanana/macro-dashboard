@@ -151,6 +151,9 @@ jobs:
             if [ $((i % 6)) -eq 1 ]; then timeout 60 node council/veteran.mjs data || echo "Veteran round $i failed"; fi
             # COT positioning desk (8 Nov): CFTC speculators per market + tested signals → data/macro/cot.json (fetch cached 12 h)
             if [ $((i % 6)) -eq 1 ]; then timeout 90 node council/cot.mjs data || echo "COT round $i failed"; fi
+            # Daily reports (19 Nov 2026, owner): the world-economy and markets reports, built once a London day from 06:00 from the
+            # files above (fetches nothing) → data/macro/daily-report.json; the Worker announces them at 06:30. Every round, cheap.
+            timeout 30 node council/daily-report.mjs data || echo "Daily report round $i failed"
             # Trade review (17 Nov): the after-the-fact check of the trades taken, system by system (n, t, where the R goes, costs,
             # demo slippage, session splits) and proposals only → data/research/trade-review.json. Reads files, fetches nothing,
             # changes no rule; ICT is not read. Every 6th round (~70 min), capped at 60 s; a failure never stops the loop.
