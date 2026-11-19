@@ -1424,11 +1424,14 @@
     if (!c || P.err) { if (P.data.length) { P.data = []; P.series.setData([]); } P.k = -1; xpTitle(P, P.err || 'Load candles to see this chart', !!P.err); return; }
     const B = TFS[S.tf], sec = P.sec || TFS[P.tf], now = c.time; let data = null, upd = null, k, note;
     if (sec === B) { k = S.idx; if (!force && k === P.k + 1) upd = [xpBar(S.bars[k - 1])]; else if (force || k !== P.k) data = S.bars.slice(Math.max(0, k - XSHOW), k).map(xpBar); note = 'same timeframe as the first chart'; }
-    else if (sec < B) { k = ubT(P.bars, mom() - sec); if (!force && k >= P.k && k - P.k <= 120) upd = P.bars.slice(P.k, k); else data = P.bars.slice(Math.max(0, k - XSHOW * 12), k); note = 'closed candles only'; }
+    else if (sec < B) { k = ubT(P.bars, mom() - sec); if (!force && k >= P.k && k - P.k <= 120) upd = P.bars.slice(P.k, k); else data = P.bars.slice(Math.max(0, k - XSHOW * 12), k); note = 'live while the replay plays'; }
     else { const j = ubT(P.bars, now) - 1; let nd, start, o0 = null; if (j >= 0 && now < P.bars[j].time + sec) { nd = j; start = P.bars[j].time; o0 = P.bars[j].open; } else { nd = j + 1; start = xpBucket(now, sec); }
       const f = xpForm(P, start, o0); k = nd; if (!force && nd === P.k && start === P.fs) upd = f ? [f] : []; else data = P.bars.slice(Math.max(0, nd - XSHOW), nd).concat(f ? [f] : []); P.fs = start; note = 'last candle still forming'; }
+    // a lower pane that showed live candles past what is committed now (a pause, an undo, a jump) is drawn again from its data
+    if (!data && P.liveT != null && sec < B) { const last = upd && upd.length ? upd[upd.length - 1].time : (P.data.length ? P.data[P.data.length - 1].time : -Infinity); if (P.liveT > last) data = P.data.concat(upd || []); }
+    if (sec < B) P.liveT = null;
     if (data) { P.data = data; P.series.setData(data); P.series.applyOptions({ priceFormat: { type: 'price', precision: S.dec, minMove: Math.pow(10, -S.dec) } }); P.chart.timeScale().scrollToRealTime(); }
-    else if (upd) for (const b of upd) { const n = P.data.length; if (n && P.data[n - 1].time === b.time) P.data[n - 1] = b; else P.data.push(b); P.series.update(b); }
+    else if (upd) for (const b of upd) { const n = P.data.length; if (n && P.data[n - 1].time === b.time) P.data[n - 1] = b; else P.data.push(b); try { P.series.update(b); } catch (e) {} }
     P.k = k; xpTitle(P, note); if (data || (upd && upd.length)) xsFrom(MCX, P.dc); }
   // open trades and resting orders show on every pane (read only: they are moved on the first chart)
   function xpLines(P) { const a = S.acct; if (!a) return; const k = a.positions.map((p) => [p.id, p.entry, p.stop, p.target].join()).concat(a.orders.map((o) => ['o', o.type, o.price, o.stop, o.target].join()), [CT.up, CT.dn]).join('|'); if (k === P.lk) return; P.lk = k;
@@ -1446,7 +1449,7 @@
   // read-only summary for the audit (like ctChart): what each pane shows against the replay's moment
   // read only, for the audit (19 Nov 2026): is there a stretch with no candles (wider than one candle) between two times on the main chart
   window.ctGap = (a, b) => { const lo = Math.min(a, b), hi = Math.max(a, b), T = S.bars.map((x) => x.time).filter((t) => t >= lo - 86400 && t <= hi + 86400); if (T.length < 2) return true; let step = Infinity; for (let i = 1; i < T.length; i++) step = Math.min(step, T[i] - T[i - 1]); for (let i = 1; i < T.length; i++) if (T[i] > lo && T[i - 1] < hi && T[i] - T[i - 1] > step) return true; return false; };
-  window.ctSplit = () => { const c = cur(), B = TFS[S.tf]; return { n: XP.n, tf: S.tf, bars: S.bars.length, idx: S.idx, mom: c ? mom() : null, forming: !!S.part, now: c ? c.time : null, close: c ? c.close : null, panes: XP.panes.map((P) => { const last = P.data[P.data.length - 1] || null, sec = TFS[P.tf]; let hi = null, lo = null; if (last && c && sec > B) { hi = last.open; lo = last.open; for (let i = ubT(S.bars, last.time - 1); i < S.idx; i++) { hi = Math.max(hi, S.bars[i].high); lo = Math.min(lo, S.bars[i].low); } } const nx = last && sec < B && P.bars ? P.bars[ubT(P.bars, last.time)] : null; return { tf: P.tf, sec, n: P.data.length, last, next: nx ? nx.time : null, lines: P.lines.length, title: P.el.querySelector('.xp-t').textContent, rel: sec > B ? 'higher' : sec < B ? 'lower' : 'same', hi, lo, range: xsRange(P.dc), draw: P.G.map(([k, g]) => ({ k, type: g.type, x1: g.x1, y1: g.y1, x2: g.x2, y2: g.y2 })), host: (() => { const r = P.dc.host.getBoundingClientRect(); return { x: r.left, y: r.top, w: P.chart.timeScale().width(), h: paneH(P.dc) }; })() }; }), sync: XSYNC, range: xsRange(MCX) }; };
+  window.ctSplit = () => { const c = cur(), B = TFS[S.tf]; return { n: XP.n, tf: S.tf, bars: S.bars.length, idx: S.idx, mom: c ? mom() : null, forming: !!S.part, now: c ? c.time : null, close: c ? c.close : null, panes: XP.panes.map((P) => { const last = P.data[P.data.length - 1] || null, sec = TFS[P.tf]; let hi = null, lo = null; if (last && c && sec > B) { hi = last.open; lo = last.open; for (let i = ubT(S.bars, last.time - 1); i < S.idx; i++) { hi = Math.max(hi, S.bars[i].high); lo = Math.min(lo, S.bars[i].low); } } const nx = last && sec < B && P.bars ? P.bars[ubT(P.bars, last.time)] : null; return { tf: P.tf, sec, n: P.data.length, last, liveT: P.liveT == null ? null : P.liveT, shown: (() => { try { const d = P.series.data(); return d.length ? d[d.length - 1] : null; } catch (e) { return null; } })(), next: nx ? nx.time : null, lines: P.lines.length, title: P.el.querySelector('.xp-t').textContent, rel: sec > B ? 'higher' : sec < B ? 'lower' : 'same', hi, lo, range: xsRange(P.dc), draw: P.G.map(([k, g]) => ({ k, type: g.type, x1: g.x1, y1: g.y1, x2: g.x2, y2: g.y2 })), host: (() => { const r = P.dc.host.getBoundingClientRect(); return { x: r.left, y: r.top, w: P.chart.timeScale().width(), h: paneH(P.dc) }; })() }; }), sync: XSYNC, range: xsRange(MCX) }; };
   // where a time and a price sit on chart i (-1 = the first chart), by the chart library's own mapping (the audit compares the drawn shapes with it)
   window.ctPaneXY = (i, t, p) => { const c = i < 0 ? MCX : XP.panes[i] && XP.panes[i].dc; if (!c) return null; return { x: c.chart.timeScale().timeToCoordinate(t), y: c.series.priceToCoordinate(p), tx: c.tX(t) }; };
   // the two names the rest of the page calls (they used to drive the single context chart)
@@ -1461,8 +1464,18 @@
   // one-candle path, and the forming candle of a pane on the same or a higher timeframe grows with the first chart's
   // (xpLive: display only, never stored in the pane's data; a lower timeframe still shows closed candles only).
   function xpStep() { if (!XP.panes.length || XF) return; for (const P of XP.panes) if (!P.loading && !P.err) xpDraw(P, false); }
-  let XL = 0; function xpLive(t, o, hi, lo, c) { if (!XP.panes.length || !cur()) return; const nw = performance.now(); if (nw - XL < 80) return; XL = nw; const B = TFS[S.tf];   // about 12 a second: every frame cost the first chart half its frame rate on a slow phone
-    for (const P of XP.panes) { if (P.loading || P.err || !P.data.length) continue; const sec = P.sec || TFS[P.tf]; if (sec < B) continue;
+  // a candle of a lower pane forming like a live market (19 Nov 2026, owner: "candles that still forming like real live market"): while
+  // the first chart's candle forms over its slot, the pane shows that slot's own finer candles as the slot's time passes, the one
+  // that holds the moment growing open, first extreme, second, close (the first chart's path). Display only: never stored in the
+  // pane's data, the engine still settles each candle at its close, and pausing, Undo or a jump draws the pane from its data again.
+  const xpLower = (P, sec, t, B, p) => { const tn = t + Math.max(0, Math.min(1, p)) * B, a = ubT(P.bars, t - 1), z = ubT(P.bars, tn) - 1; if (z < a) return;
+    const lastT = P.data.length ? P.data[P.data.length - 1].time : -Infinity;
+    for (let i = a; i <= z; i++) { const b = P.bars[i]; if (b.time < lastT || (P.liveT != null && b.time < P.liveT)) continue; let x = b;
+      if (b.time + sec > tn) { const q = (tn - b.time) / sec, pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], sg = q * 3, k = Math.min(2, Math.floor(sg)), f = sg - k, px = pts[k] + (pts[k + 1] - pts[k]) * f;
+        let hi = Math.max(b.open, px), lo = Math.min(b.open, px); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); } x = { time: b.time, open: b.open, high: hi, low: lo, close: px }; }
+      try { P.series.update(x); P.liveT = b.time; } catch (e) {} } };
+  let XL = 0; function xpLive(t, o, hi, lo, c, p) { if (!XP.panes.length || !cur()) return; const nw = performance.now(); if (nw - XL < 80) return; XL = nw; const B = TFS[S.tf];   // about 12 a second: every frame cost the first chart half its frame rate on a slow phone
+    for (const P of XP.panes) { if (P.loading || P.err || !P.data.length) continue; const sec = P.sec || TFS[P.tf]; if (sec < B) { if (p != null && !S.part) xpLower(P, sec, t, B, p); continue; }
       try { if (sec === B) P.series.update({ time: t, open: o, high: hi, low: lo, close: c });
         else { const L = P.data[P.data.length - 1]; if (!L || t < L.time || t >= L.time + sec) continue; P.series.update({ time: L.time, open: L.open, high: Math.max(L.high, hi), low: Math.min(L.low, lo), close: c }); } } catch (e) {} } }
   document.querySelectorAll('#splitdd [data-split]').forEach((b) => b.addEventListener('click', () => { XP.n = +b.dataset.split; xpSave(); loadHtf(); const d = $('splitdd'); if (d) d.open = false; }));
@@ -1691,7 +1704,7 @@
   let RAF = 0, A = null;
   function drawForming(b, p) { const pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], seg = p * 3, k = Math.min(2, Math.floor(seg)), f = seg - k, price = pts[k] + (pts[k + 1] - pts[k]) * f;
     let hi = Math.max(b.open, price), lo = Math.min(b.open, price); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); }
-    series.update({ time: b.time, open: b.open, high: hi, low: lo, close: price }); xpLive(b.time, b.open, hi, lo, price); A.drawn = true; LIVE = price; $('px-now').textContent = `last ${fmt(price)}`; overlay(); }
+    series.update({ time: b.time, open: b.open, high: hi, low: lo, close: price }); xpLive(b.time, b.open, hi, lo, price, p); A.drawn = true; LIVE = price; $('px-now').textContent = `last ${fmt(price)}`; overlay(); }
   // the view glides: when a forming candle is added the chart shifts one bar at once; it is put back and eased over the bar's
   // time instead, as long as the latest candle is in view and the user is not panning (any other scroll position ends it)
   let NEXT0 = 0; const tsc = () => chart.timeScale();

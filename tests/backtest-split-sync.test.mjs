@@ -88,3 +88,13 @@ test('playing with split charts (19 Nov 2026): every committed candle reaches th
   assert.doesNotMatch(blk, /P\.data\.push|P\.data\[[^\]]+\] =/, 'the live candle is never stored in the pane data');
   assert.match(page, /series\.update\(\{ time: b\.time, open: b\.open, high: hi, low: lo, close: price \}\); xpLive\(/);
 });
+
+test('a lower pane forms its candles like a live market while the replay plays (19 Nov 2026), display only', () => {
+  const blk = page.slice(page.indexOf('  const xpLower = '), page.indexOf('function xpLive(', page.indexOf('  const xpLower = ')) + 900);
+  assert.ok(blk.length > 500);
+  assert.match(blk, /const tn = t \+ Math\.max\(0, Math\.min\(1, p\)\) \* B/, 'only the part of the slot the first chart has drawn');
+  assert.match(blk, /if \(sec < B\) \{ if \(p != null && !S\.part\) xpLower\(P, sec, t, B, p\); continue; \}/);
+  assert.doesNotMatch(blk, /P\.data\.push|P\.data\[[^\]]+\] =|S\.acct|BT\.advance|\.stop\s*=/, 'never stored, never an order or a stop');
+  assert.match(page, /if \(!data && P\.liveT != null && sec < B\)/, 'a pause, Undo or a jump draws the pane from its data again');
+  assert.match(page, /xpLive\(b\.time, b\.open, hi, lo, price, p\);/);
+});
