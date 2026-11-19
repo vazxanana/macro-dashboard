@@ -61,7 +61,7 @@ function publicRecord(R) {
   if (!R) return null;
   const out = { name: String(R.name || ''), role: R.role };
   if (R.ict) out.ict = R.ict === 'read' ? 'read' : true; if (R.ct) out.ct = true; if (R.mcp) out.mcp = true; if (R.ictApply === true) out.ictApply = true;
-  if (R.mosha === 'teach' || R.mosha === 'read') out.mosha = R.mosha; if (R.home === 'mosha') out.home = 'mosha';
+  if (R.mosha === 'teach' || R.mosha === 'read') out.mosha = R.mosha; if (R.home === 'mosha' || R.home === 'macro') out.home = R.home;
   if (R.perms && typeof R.perms === 'object') out.perms = R.perms; if (R.disabled) out.disabled = true;
   return out;
 }

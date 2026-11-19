@@ -1301,6 +1301,9 @@ window.msFetchUsers = function () {
   if (E.ct) document.documentElement.dataset.ct = owner ? 'owner' : '1';   // the demo accounts' results on the profile; non-owners see edge labels, never account numbers (8 Nov)
   if (E.mcp) document.documentElement.dataset.mcp = '1';
   if (E.mosha) document.documentElement.dataset.mosha = E.mosha;   // the Mosha desk is open to this account ('teach' = may send lessons)
+  // owner, 18 Nov 2026: a member whose home is the Macro desk (the "macro" account) lands there, once per browser tab, so the
+  // Desk switch still opens the Desk afterwards; a link to a view (#…) is never redirected; no redirect when storage is unavailable
+  if (R && R.home === 'macro' && E.macro && !location.hash) { try { if (!sessionStorage.getItem('ms-landed')) { sessionStorage.setItem('ms-landed', '1'); location.replace('/macro-desk'); } } catch (e) {} }
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 /* ms-data:start */

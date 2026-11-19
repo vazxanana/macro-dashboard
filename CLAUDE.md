@@ -2463,6 +2463,12 @@ Tests: `tests/signup.test.mjs` ("usernames"), `tests/gate-welcome.test.mjs`.
 - **Sign-in screen**: the desktop left side leads with the mark at 44 px and a larger wordmark (`.gs-brand`, last style block); on
   phones the card's wordmark is `inline-flex` again (a flex column made it a block and the words ran together: "AUREUMDESK").
 
+## The "macro" account lands on the Macro desk (18 Nov 2026, owner: "the first page for user macro will be the macro area not the desk")
+`api/_session.js` `account()` gives the account whose key is `macro` `home: 'macro'` (`api/_accounts.js` `publicRecord` passes
+`home` only as `mosha` or `macro`); the Desk's head script sends such a member (role viewer / reviewer, `macro` permission on) to
+`/macro-desk` once per browser tab (`sessionStorage ms-landed`), never when the address names a view (`#…`), so the Desk switch
+still opens the Desk afterwards. Test: `tests/macro-home.test.mjs`.
+
 ## The signed-in screen (18 Nov 2026, owner: "a similar animation for the login")
 Display only, `market-structure.html`. On a successful sign-in (password or passkey) the card's contents fade and `#ms-gate-ok`
 plays inside the card (`<style id="ms-gate-ok-css">` + `<script id="ms-gate-ok-js">`, before `#ms-su-sent-css`, reusing its
