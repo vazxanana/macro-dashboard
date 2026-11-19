@@ -311,6 +311,14 @@ test('usernames (18 Nov 2026): required, 3-24 of a-z 0-9 -, reserved words refus
   assert.equal((await log({ password: 'zed-password-1' })).code, 401, 'password only: built-in members and the owner alone');
   assert.equal((await log({ password: 'fred-password' })).body.account.u, 'fred', 'a built-in member signs in with the password alone');
   assert.equal((await log({ id: 'fred', password: 'fred-password' })).body.account.u, 'fred');
+  // 19 Nov 2026 (owner: "macro should be able to login only with password"): the stored "macro" account signs in with the password
+  // alone; its password is kept unique (a sign-up with it is refused); with a wrong password or as another stored member it is not
+  W.list.users.macro = { name: 'Macro', role: 'viewer', hash: sha('macro-password-1') };
+  assert.equal((await log({ password: 'macro-password-1' })).body.account.u, 'macro', 'macro: the password alone');
+  assert.equal((await log({ id: 'macro', password: 'macro-password-1' })).body.account.u, 'macro', 'macro: with its username too');
+  assert.equal((await log({ password: 'maria-password-1' })).code, 401, 'other stored members still need a username or email');
+  const clash = await call(W, { method: 'POST', body: { name: 'Mac', username: 'mac-2', email: 'mac@example.com', password: 'macro-password-1' } });
+  assert.equal(clash.code, 400); assert.match(clash.body.error, /another password/, 'a sign-up may not take the macro password');
 });
 
 test('every email shows the Aureum Desk logo from the site (a PNG with its size and alt text)', async () => {
