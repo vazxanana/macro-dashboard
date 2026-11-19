@@ -2473,6 +2473,12 @@ Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts 
 (was 14 px / 650), the chart headers' market and timeframe buttons `.ph-mk` / `.ph-tf` (13 px / 700), the Markets view's selects and
 price; the trend chips and the cycle tag are 11.5 px Figtree (10.5 px mono and the system font before); the Style / Indicators
 small print 12 px. The chart watermark ("XAU/USD · H1") is 26 px (38 before), still faint.
+Same day, an accessibility pass on Charts (1440 / 390 px, dark and light): every control has a name and a 2 px focus ring, no text
+under AA. Fixed: the candle countdown `.ch-cd`, the phone's price legend `.ch-lg` and the keyboard hints were 10.5 px (now 11.5);
+**Tab followed the DOM, not the screen** (the toolbar is laid out with CSS `order`: Help, Style, Indicators came before the market
+button). A small script before the rail block puts `#v-charts .sec-h`'s element children in the order they are drawn (on load, on
+resize, when a child is added; stable for equal orders; comments stay), so nothing moves on screen; `window.msBarOrder()` reads it.
+No style may depend on the toolbar's sibling order (`+`, `~`, `:nth-child` on `.sec-h > …`).
 
 ## Drawing rail on the left, floating favourites (19 Nov 2026, owner: "the drawing bar in the left and we also should be able to choose favorite and have it floated like tradingview")
 Display only, `market-structure.html` (block "Drawing rail on the left" after the one-chart bar, `<style id="ms-rail-css">`) and

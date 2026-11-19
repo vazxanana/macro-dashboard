@@ -8029,6 +8029,18 @@ function msNextSetup(bars, A) {
       bar.insertAdjacentElement('afterend', tg); }
     window.msChartOne = () => ({ built, tools: [...bar.querySelectorAll('[data-t]')].map((b) => b.dataset.t), active: (active() && active().querySelector('.ms-ph b') || {}).textContent || null, multi: shown().length });
   }
+  // ─── Keyboard order of the charts toolbar (19 Nov 2026, the type-scale pass): the toolbar is laid out with CSS `order`, so Tab
+  //     went Help, Style, Indicators, Clean before the market button the eye reads first. Its element children are put in the DOM
+  //     in the order they are drawn (stable for equal orders; comments stay where they are). Nothing moves on screen.
+  { const SH = document.querySelector('#v-charts .sec-h');
+    if (SH) { let busy = false;
+      const sortBar = () => { if (busy) return; const els = [...SH.children], ord = els.map((e, i) => [parseFloat(getComputedStyle(e).order) || 0, i, e]);
+        const want = ord.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]).map((x) => x[2]); if (want.every((e, i) => e === els[i])) return;
+        busy = true; want.forEach((e) => SH.appendChild(e)); busy = false; };
+      const soon = () => requestAnimationFrame(sortBar);
+      new MutationObserver((m) => { if (!busy && m.some((r) => r.type === 'childList')) soon(); }).observe(SH, { childList: true });
+      let rt = 0; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(sortBar, 150); });
+      soon(); setTimeout(sortBar, 1500); window.msBarOrder = () => [...SH.children].map((e) => e.id || String(e.className).split(' ')[0] || e.tagName); } }
   // ─── Drawing rail on the left and a floating favourites bar (19 Nov 2026, owner: "the drawing bar in the left and we also should be
   //     able to choose favorite and have it floated like tradingview"). Wider than 640 px the drawing tools and the chart tools leave the
   //     toolbar for a column at the charts' left edge; a phone keeps them behind "Draw". A star on a tool (hover, or right-click / long
@@ -15397,6 +15409,9 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
 #v-charts .ms-ph .ms-cy { font-family: var(--sans); font-size: 11.5px; }
 #v-charts .sec-h #ms-sty-now, #v-charts .sec-h #ms-ind-n { font-size: 12px; }
 .mm-h select, .mm-px { font-size: 12.5px; }
+#v-charts .kbd-hint kbd { font-size: 11.5px; }
+#v-charts .ch-cd { font-size: 11.5px; height: 17px; }
+@media (max-width: 700px) { #v-charts .ch-lg { font-size: 11.5px; } }
 </style>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked
