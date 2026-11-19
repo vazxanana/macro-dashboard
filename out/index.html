@@ -9638,7 +9638,7 @@ function msNextSetup(bars, A) {
   const XTF = (id, label, role, sec, binance = null, kraken = null) => ({ id, label, role, sec, binance, kraken, poll: Math.min(15e3, Math.max(3e3, sec * 1e3)) });
   // how often a free chart (one chart, Split's right side, markets side by side) reads its newest candles (19 Nov 2026, owner: "the
   // charts in low tf are too slow"): a low timeframe every 1.5-3 s; the page's own market also moves with every live tick (msTickSubs)
-  const freePoll = (T) => (!T ? 15e3 : T.sec <= 60 ? 1500 : T.sec <= 900 ? 3000 : T.sec <= 3600 ? 6000 : 15e3);
+  const freePoll = (T) => (!T ? 15e3 : T.sec <= 60 ? 1000 : T.sec <= 900 ? 2000 : T.sec <= 3600 ? 5000 : 15e3);
   window.msTickSubs = window.msTickSubs || [];
   // fold live ticks into a free chart's last candle (bars carry TZ and the offset; buckets in UTC up to a day)
   const tickInto = (bars, series, sec, off, Q, raw) => { if (!bars.length || !(sec > 0) || sec > 86400) return false; let ch = false;
@@ -9648,7 +9648,7 @@ function msNextSetup(bars, A) {
       if (bt === L.time) bars[bars.length - 1] = x; else bars.push(x); ch = true; try { series.update(x); } catch (e) {}
       if (raw) { const w = { time: bt - TZ, open: x.open - off, high: x.high - off, low: x.low - off, close: x.close - off, volume: 0 }, R = raw[raw.length - 1]; if (R && R.time === w.time) { w.volume = R.volume; raw[raw.length - 1] = w; } else if (!R || w.time > R.time) raw.push(w); } }
     return ch; };
-  const SEC_TFS = [XTF('5s', 'S5', 'Seconds', 5), XTF('10s', 'S10', 'Seconds', 10), XTF('15s', 'S15', 'Seconds', 15), XTF('30s', 'S30', 'Seconds', 30)];
+  const SEC_TFS = [XTF('1s', 'S1', 'Seconds', 1), XTF('5s', 'S5', 'Seconds', 5), XTF('10s', 'S10', 'Seconds', 10), XTF('15s', 'S15', 'Seconds', 15), XTF('30s', 'S30', 'Seconds', 30)];
   // 19 Nov 2026 (owner: "any timeframe starting from seconds … grouped in seconds, minutes, hours, days, week, month, year"):
   // the timeframes no analysed pane has; they open on the free chart (one chart, or Split's right side). A year is built from months.
   const EXTRA_TFS = [XTF('2m', 'M2', 'Minutes', 120), XTF('10m', 'M10', 'Minutes', 600), XTF('30m', 'M30', 'Minutes', 1800, '30m', 30), XTF('2h', 'H2', 'Hours', 7200, '2h'),
@@ -9656,14 +9656,16 @@ function msNextSetup(bars, A) {
     XTF('1w', 'W1', 'Week', 604800, '1w', 10080), XTF('1M', 'MN', 'Month', 2678400, '1M'), XTF('1Y', 'Y1', 'Year', 31536000)];
   const SPTFS = SEC_TFS.concat(TFS, EXTRA_TFS);
   // the menu's groups, in order (each id once); a timeframe with an analysed pane opens that pane
-  const TF_GROUPS = [['Seconds', ['5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
+  const TF_GROUPS = [['Seconds', ['1s', '5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
   window.msTfGroups = () => TF_GROUPS.map(([g, ids]) => [g, ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return { id, label: t ? t.label : id, analysed: !!panes[id] }; })]);
   // a year's candles from monthly ones (UTC calendar years)
   const yearOf = (bars) => { const out = []; bars.forEach((b) => { const y = new Date(b.time * 1e3).getUTCFullYear(), t = Date.UTC(y, 0, 1) / 1e3, l = out[out.length - 1];
     if (l && l.time === t) { l.high = Math.max(l.high, +b.high); l.low = Math.min(l.low, +b.low); l.close = +b.close; l.volume = (l.volume || 0) + (+b.volume || 0); }
     else out.push({ time: t, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }); }); return out; };
   window.msYearOf = yearOf;
-  async function spFetch(tf, I, n) { if (tf && tf.id === '1Y') { const r = await fetchBars(SPTFS.find((t) => t.id === '1M'), I, Math.min(600, n * 12 + 12)); return r && r.bars ? { src: r.src, bars: yearOf(r.bars).slice(-n) } : r; } return fetchBars(tf || TFS[2], I, n); }
+  // one second: OANDA stores nothing finer than 5 s, so a 1 s chart starts from 5 s candles and builds 1 s candles from live ticks
+  async function spFetch(tf, I, n) { if (tf && tf.id === '1s') { const r = await fetchBars(SPTFS.find((t) => t.id === '5s'), I, n); return r && r.bars ? { src: 'live 1 s, 5 s history', bars: r.bars } : r; }
+    if (tf && tf.id === '1Y') { const r = await fetchBars(SPTFS.find((t) => t.id === '1M'), I, Math.min(600, n * 12 + 12)); return r && r.bars ? { src: r.src, bars: yearOf(r.bars).slice(-n) } : r; } return fetchBars(tf || TFS[2], I, n); }
   function spInit() {
     const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym'); if (!lt || lt.options.length) return;
     const opts = TFS.map((t) => `<option value="${t.id}">${t.label}</option>`).join(''); lt.innerHTML = opts; rt.innerHTML = TF_GROUPS.map(([g, ids]) => `<optgroup label="${g}">${ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return t ? `<option value="${t.id}">${t.label}</option>` : ''; }).join('')}</optgroup>`).join('');
@@ -9797,23 +9799,40 @@ function msNextSetup(bars, A) {
   window.msMultiView = (on) => { MM.on = on; if (on) { mmBuild(); MM.host.hidden = false; mmLay(); } else if (MM.built) MM.host.hidden = true; };
   window.msMulti = () => ({ on: MM.on, n: MM.n, cells: MM.cells.slice(0, MM.n).map((c, i) => ({ ...c, bars: MM.ch[i] ? MM.ch[i].bars.length : 0 })) });
   setInterval(async () => { if (!MM.on || document.hidden) return; const now = Date.now();
-    for (const C of MM.ch.slice(0, MM.n)) { const c = MM.cells[C.i], T = SPTFS.find((t) => t.id === c.tf), I = INSTRUMENTS[c.k]; if (!T || !I || !C.bars.length || now - C.at < (c.k === instKey && now - (LT.at || 0) < 5000 ? 15e3 : freePoll(T)) - 300) continue; C.at = now; const key = C.key;
+    for (const C of MM.ch.slice(0, MM.n)) { const c = MM.cells[C.i], T = SPTFS.find((t) => t.id === c.tf), I = INSTRUMENTS[c.k]; if (!T || !I || !C.bars.length || now - C.at < (tickLive(c.k) ? (T.id === '1s' ? Infinity : 15e3) : freePoll(T)) - 300) continue; C.at = now; const key = C.key;
       spFetch(T, I, 3).then((r) => { if (C.key === key && r && r.bars) mmSet(C, r.bars, false); }).catch(() => {}); } }, 1e3);
-  window.msTickSubs.push((Q) => { if (!MM.on) return; for (const C of MM.ch.slice(0, MM.n)) { const c = MM.cells[C.i]; if (c.k !== instKey || !C.bars.length) continue; const T = SPTFS.find((t) => t.id === c.tf);
-    if (T && tickInto(C.bars, C.series, T.sec, 0, Q, null)) { const L = C.bars[C.bars.length - 1]; C.cell.querySelector('.mm-px').textContent = fmtI(L.close, INSTRUMENTS[c.k]); } } });
   window.msOneTf = (t) => { if (!SPTFS.some((x) => x.id === t)) return false; if (panes[t]) { setView(t); return true; } SP.one = t; try { localStorage.setItem('ms-one-tf', t); } catch (e) {}
     if (grid4.dataset.view === 'one') window.msSplitView(true, true); else setView('one'); return true; };
   window.msOneState = () => ({ view: grid4.dataset.view, tf: SP.one, solo: !!SP.solo, bars: SP.solo ? SP.bars.length : 0, label: (document.getElementById('ms-sp-t') || {}).textContent || '' });
   let SP_POLL = 0;
   setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key, T = SPTFS.find((t) => t.id === tf);
-    const now = Date.now(); if (now - SP_POLL < (k === instKey && now - (LT.at || 0) < 5000 ? 15e3 : freePoll(T)) - 300) return; SP_POLL = now;   // live ticks carry the forming candle; the read only completes candles
+    const now = Date.now(); if (now - SP_POLL < (tickLive(k) ? (T && T.id === '1s' ? Infinity : 15e3) : freePoll(T)) - 300) return; SP_POLL = now;   // live ticks carry the forming candle; the read only completes candles
     try { const r = await spFetch(T, I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
       r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }; const last = SP.bars[SP.bars.length - 1];
       if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {}
       const w = { time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }; if (SP.raw.length && SP.raw[SP.raw.length - 1].time === w.time) SP.raw[SP.raw.length - 1] = w; else SP.raw.push(w); });
       if (ch) spMarkup(); } catch (e) {} }, 1e3);
-  { let SPM = 0; window.msTickSubs.push((Q) => { if (!SP.on || !SP.series || spPane() || spSym() !== instKey || !SP.bars.length) return; const T = SPTFS.find((t) => t.id === spTf());
-    if (T && tickInto(SP.bars, SP.series, T.sec, G.offset || 0, Q, SP.raw) && Date.now() - SPM > 2000) { SPM = Date.now(); spMarkup(); } }); }   // each timeframe at its own pace (3 s for seconds charts, 15 s from a minute up)   // markups and indicators follow the live candle, as on the panes
+  // live ticks for the free charts (19 Nov 2026, owner: "more faster please and add 1 second timeframe"): the page's own market takes
+  // the page stream's ticks (msTickSubs); every other market a free chart shows gets its own OANDA stream (/md/stream, at most four,
+  // closed when no free chart shows it). freeTicks folds a batch into every free chart of that market; FTL = when a market last ticked.
+  const FT = new Map(), FTL = {}; let SPM = 0;
+  const tickLive = (k) => Date.now() - (FTL[k] || 0) < 5000;
+  function freeTicks(k, Q) { FTL[k] = Date.now();
+    if (SP.on && SP.series && !spPane() && spSym() === k && SP.bars.length) { const T = SPTFS.find((t) => t.id === spTf()); if (T && tickInto(SP.bars, SP.series, T.sec, k === instKey ? G.offset || 0 : 0, Q, SP.raw) && Date.now() - SPM > 2000) { SPM = Date.now(); spMarkup(); } }
+    if (MM.on) for (const C of MM.ch.slice(0, MM.n)) { const c = MM.cells[C.i]; if (c.k !== k || !C.bars.length) continue; const T = SPTFS.find((t) => t.id === c.tf);
+      if (T && tickInto(C.bars, C.series, T.sec, 0, Q, null)) { const L = C.bars[C.bars.length - 1]; C.cell.querySelector('.mm-px').textContent = fmtI(L.close, INSTRUMENTS[c.k]); } } }
+  window.msTickSubs.push((Q) => freeTicks(instKey, Q));
+  function ftSync() { const want = new Set(); if (typeof EventSource !== 'undefined' && MD.base && !document.hidden) {
+      if (SP.on && !spPane() && spSym() !== instKey) want.add(spSym()); if (MM.on) MM.cells.slice(0, MM.n).forEach((c) => { if (c.k !== instKey) want.add(c.k); }); }
+    for (const [k, f] of FT) if (!want.has(k)) { try { f.es.close(); } catch (e) {} clearTimeout(f.re); FT.delete(k); }
+    for (const k of [...want].slice(0, 4)) { if (FT.has(k)) continue; const I = INSTRUMENTS[k]; if (!I || !I.md) continue; const f = { q: [], raf: 0 }; FT.set(k, f);
+      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es;
+        es.onmessage = (m) => { let d; try { d = JSON.parse(m.data); } catch (e) { return; } if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
+          f.q.push({ px: (d.b + d.a) / 2, t: d.t || Date.now() / 1000 }); if (!f.raf) f.raf = requestAnimationFrame(() => { f.raf = 0; const Q = f.q.splice(0); if (Q.length) freeTicks(k, Q); }); };
+        es.onerror = () => { if (es.readyState === 2 && FT.get(k) === f) f.re = setTimeout(open, 5000); }; };
+      open(); } }
+  setInterval(ftSync, 2000); document.addEventListener('visibilitychange', ftSync);
+  window.msFreeTicks = () => ({ streams: [...FT.keys()], live: Object.keys(FTL).filter(tickLive) });
   if (root.querySelector('[data-view]')) {
     root.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
     let v0 = null; try { v0 = localStorage.getItem('msView'); } catch (e) {}
