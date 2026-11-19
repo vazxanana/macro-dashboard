@@ -3351,7 +3351,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     <nav class="hdr-sw" aria-label="Desk, macro, ChronosTrade or Academy"><a class="on" href="#home" aria-current="page"><i aria-hidden="true"></i><span>Desk</span></a><a id="ms-macro-btn" href="/macro-desk" title="Macro desk: the strategist and the veteran, their debate, the key insights and the source data"><i aria-hidden="true"></i><span>Macro</span></a><a href="/backtest" class="hdr-ct" title="ChronosTrade: manual backtesting, journal and prop-firm challenges"><i aria-hidden="true"></i><span>ChronosTrade</span></a><a href="/academy" class="hdr-ac adm own" title="Aureum Academy: replay, decide, correct and prove"><i aria-hidden="true"></i><span>Academy</span></a></nav>
     <a class="ms-badge" id="ms-scan-badge" href="#scanner" hidden></a>
     <a class="ms-botwarn" id="ms-botwarn" href="#council" hidden></a>
-    <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span class="upd"> · <span id="ms-updated">—</span></span></span>
+    <span class="ms-status"><i class="ms-live-dot" id="ms-live-dot"></i><span id="ms-live-txt">Connecting…</span><span id="ms-live-lag" class="ms-live-lag"></span><span class="upd"> · <span id="ms-updated">—</span></span></span>
     <div class="top-actions">
       <a class="hdr-open" id="ms-hdr-open" href="#council" title="Open trades placed by the system. % = floating result in account terms at the sizing guide: 0.25% risk per NQ / gold trade, 0.5% per crypto trend trade">—</a>
       <button type="button" class="ms-tbtn" id="ms-focus-btn" title="Focus mode: open trades, full screen (F)" aria-label="Focus mode" aria-keyshortcuts="F Shift+F">Focus</button><button type="button" class="ms-tbtn" id="ms-cmdk-btn" title="Search and jump (Ctrl K)" aria-label="Search and jump" aria-keyshortcuts="Control+K /">Search</button><button type="button" class="ms-tbtn" id="ms-alerts" aria-pressed="false" title="Price alerts off">Alerts off</button><button type="button" class="ms-tbtn ms-theme-q" id="ms-theme-q" data-theme-set title="Switch to the light theme">Light theme</button>
@@ -3622,6 +3622,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .sty-seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
       .sty-c { display: flex; align-items: center; justify-content: space-between; font-size: 13px; } .sty-c input { width: 44px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: transparent; padding: 0; cursor: pointer; }
       .sty-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; } .sty-note { font-size: 12px; color: var(--ink-dim); line-height: 1.4; }
+      .sty-ck { gap: 8px; justify-content: flex-start; } .sty-ck input { width: 16px; height: 16px; } .ms-live-lag { margin-left: 6px; color: var(--ink-faint); font-variant-numeric: tabular-nums; } .ms-live-lag:empty { display: none; }
       #ms-sty-clean[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
       @media (pointer: coarse) { .sty-btn, .sty-seg button, #ms-sty-pop .ms-tbtn { min-height: 44px; } .sty-c input { width: 52px; height: 40px; } }
       </style>
@@ -3690,7 +3691,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .ms-dsel .del { color: var(--sell); }
       .ms-cmenu { position: fixed; left: 0; top: 0; z-index: 70; min-width: 210px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 10px 30px rgba(0,0,0,.3); display: grid; }
       .ms-cmenu[hidden] { display: none; } .ms-cmenu button { text-align: left; min-height: 34px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--ink); font: 500 13px var(--sans); cursor: pointer; }
-      .ms-cmenu button:hover:not([disabled]), .ms-cmenu button:focus-visible { background: var(--panel-hover, rgba(127,127,127,.12)); outline: none; } .ms-cmenu button[disabled] { color: var(--ink-faint); cursor: default; }
+      .ms-cmenu button:hover:not([disabled]), .ms-cmenu button:focus-visible { background: var(--panel-hover, rgba(127,127,127,.12)); outline: none; } .ms-cmenu button[disabled] { color: var(--ink-faint); cursor: default; } .ms-cmenu .cm-sep { border: 0; border-top: 1px solid var(--line); margin: 4px 6px; }
       .lay-pop { position: absolute; z-index: 45; right: 0; top: calc(100% + 6px); width: 300px; max-width: calc(100vw - 32px); display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px rgba(0,0,0,.3); }
       .lay-pop[hidden] { display: none; } .lay-pop .sty-seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
       .lay-tfs { display: grid; gap: 6px; } .lay-tfs label { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; } .lay-tfs select { min-height: 32px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); padding: 0 6px; }
@@ -3719,6 +3720,9 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button></div>
+        <div class="sty-h">Live price</div>
+        <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion</label>
+        <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
         <div class="sty-h">Markup</div>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Keeps only the BO, VR and CF; hides the rest (origin, next setup, trade lines, iBO, earlier breaks, zones, Mosha and cycle notes, trade history, sessions, news, volume, key levels). Tap again to bring them back.</small></div>
       </div></div>
@@ -6543,19 +6547,108 @@ function msNextSetup(bars, A) {
   function startStream() {
     if (G.csv) return;
     try {
-      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + ACTIVE.map((t) => `${INST.binance.toLowerCase()}@kline_${t.binance}`).join('/'));
+      ws = new WebSocket('wss://stream.binance.com:9443/stream?streams=' + ACTIVE.map((t) => `${INST.binance.toLowerCase()}@kline_${t.binance}`).concat(`${INST.binance.toLowerCase()}@aggTrade`).join('/'));
       const kill = setTimeout(() => { if (!G.live) { try { ws.close(); } catch (e) {} startPolling(); startRestTicks(); } }, 8000);
       ws.onmessage = (m) => {
-        const d = JSON.parse(m.data).data, k = d && d.k; if (!k) return;
+        const d = JSON.parse(m.data).data; if (!d) return;
         if (!G.live) { G.live = true; clearTimeout(kill); setStatus(); }
+        // trades (19 Nov 2026): Binance sends a kline every 2 s, its trades as they happen; each trade moves every timeframe
+        if (d.e === 'aggTrade') { const p = +d.p; if (isFinite(p) && p > 0) liveTick(p, (d.T || Date.now()) / 1000); return; }
+        const k = d.k; if (!k) return;
         const tf = TFS.find((t) => t.binance === k.i);
-        if (tf && panes[tf.id]) panes[tf.id].push({ time: k.t / 1000, open: +k.o, high: +k.h, low: +k.l, close: +k.c, closed: k.x });
-        $('ms-updated').textContent = new Date().toLocaleTimeString();
+        if (tf && panes[tf.id]) { const c = { time: k.t / 1000, open: +k.o, high: +k.h, low: +k.l, close: +k.c, volume: +k.v || 0, closed: k.x };
+          if (!k.x && LT.px != null && LT.t * 1000 >= (d.E || 0) && Math.floor(LT.t / tf.sec) * tf.sec === c.time) { c.close = LT.px; c.high = Math.max(c.high, LT.px); c.low = Math.min(c.low, LT.px); }   // never back to an older price
+          panes[tf.id].push(c); }
       };
       ws.onclose = () => { if (G.live) { G.live = false; setStatus(); setTimeout(startStream, 3000); } };
       ws.onerror = () => {};
     } catch (e) { startPolling(); startRestTicks(); }
   }
+  // ─── Live tick engine (19 Nov 2026, owner: "the candles need to be more live, moving with no delay") ───
+  // Every quote (OANDA stream, Binance trades, exchange price reads) goes through liveTick: the ticks of one frame are applied
+  // together on the next animation frame (the high and low of every tick kept), the header price follows each frame, and the
+  // forming candle's body eases to the new price over a few frames ("Smooth price motion" in Style, on by default; the candle's
+  // data, the markup and every reading use the real quotes only, never an eased value). A candle refresh that comes back from
+  // the edge cache older than the last tick keeps the tick (liveKeep), so the candle never jumps back.
+  const LT = { q: [], px: null, t: 0, at: 0, raf: 0, disp: null, tgt: null, bt: 0, hdr: 0, n: 0, rate: 0, rt: 0 };
+  try { G.smooth = localStorage.getItem('ms-smooth') !== '0'; G.bidAsk = localStorage.getItem('ms-bidask') === '1'; } catch (e) { G.smooth = true; G.bidAsk = false; }
+  function liveTick(px, t, quote) {
+    if (!isFinite(px) || px <= 0 || G.csv) return;
+    if (!G.live) { G.live = true; setStatus(); }
+    LT.q.push({ px, t: isFinite(t) ? t : Date.now() / 1000 }); LT.at = Date.now(); LT.n++; if (quote) LT.quote = quote;
+    if (LT.q.length > 500) LT.q.splice(0, LT.q.length - 500);
+    if (!LT.raf) LT.raf = document.hidden ? setTimeout(liveFrame, 200) : requestAnimationFrame(liveFrame);   // a hidden tab gets no frames
+  }
+  window.msLiveTick = liveTick;
+  function liveKeep(P) {   // a refreshed candle older than the last tick keeps the tick's price
+    if (LT.px == null || !P.raw || !P.raw.length) return; const last = P.raw[P.raw.length - 1], bt = Math.floor(LT.t / P.tf.sec) * P.tf.sec;
+    if (last.time !== bt) return; last.close = LT.px; last.high = Math.max(last.high, LT.px); last.low = Math.min(last.low, LT.px);
+  }
+  function liveFrame(now) {
+    LT.raf = 0; const Q = LT.q.splice(0);
+    if (Q.length) {
+      ACTIVE.forEach((tf) => {
+        const P = panes[tf.id]; if (!P || !P.raw || !P.raw.length) return;
+        let cur = null;
+        for (const k of Q) {
+          const bt = Math.floor(k.t / tf.sec) * tf.sec, last = P.raw[P.raw.length - 1];
+          if (cur && cur.time !== bt) { P.push(cur); cur = null; }
+          const base = cur || (bt === last.time ? last : null);
+          if (base) cur = { time: bt, open: base.open, high: Math.max(base.high, k.px), low: Math.min(base.low, k.px), close: k.px, volume: base.volume };
+          else if (bt > last.time) cur = { time: bt, open: k.px, high: k.px, low: k.px, close: k.px };
+        }
+        if (cur) P.push(cur);
+      });
+      const k = Q[Q.length - 1], prev = LT.px; LT.px = k.px; LT.t = k.t;
+      const bt = Math.floor(k.t / 60) * 60;
+      if (!G.smooth || G.ha || G.cs === 'line' || LT.disp == null || bt !== LT.bt) LT.disp = k.px; LT.tgt = k.px; LT.bt = bt;
+      LT.rate = LT.rate * 0.8 + 0.2 * Q.length;
+      const hp = $('ms-hdr-price'); if (hp) { const p0 = +hp.dataset.p; if (p0 && p0 !== k.px) { hp.classList.remove('tick-up', 'tick-down'); void hp.offsetWidth; hp.classList.add(k.px > p0 ? 'tick-up' : 'tick-down'); } hp.dataset.p = k.px; hp.textContent = fmt(k.px); }
+      const d = LT.quote, sp = $('ms-hdr-spr'); if (d && sp && isFinite(d.b) && isFinite(d.a)) { sp.hidden = false; sp.textContent = `Bid ${fmt(d.b)} · Ask ${fmt(d.a)}`; sp.title = `OANDA spread ${fmt(d.a - d.b)}${d.ok === false ? ' (market not tradeable now)' : ''}`; }
+      if (Date.now() - LT.hdr > 1000) { LT.hdr = Date.now(); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+      bidAskDraw();
+    }
+    // ease the forming candle's body to the newest price (display only)
+    if (LT.disp != null && LT.tgt != null && LT.disp !== LT.tgt) {
+      const step = (LT.tgt - LT.disp) * 0.35, tiny = Math.pow(10, -INST.dec) / 2;
+      LT.disp = Math.abs(LT.tgt - LT.disp) <= tiny || Math.abs(step) <= tiny ? LT.tgt : LT.disp + step;
+      liveEase(); if (LT.disp !== LT.tgt && !LT.raf && !document.hidden) LT.raf = requestAnimationFrame(liveFrame);
+    }
+  }
+  function liveEase() {
+    if (!G.smooth || G.ha || G.cs === 'line') return;
+    ACTIVE.forEach((tf) => {
+      const P = panes[tf.id]; if (!P || !P.bars || !P.bars.length || !P.vis || P.rp || !P.series) return;
+      const b = P.bars[P.bars.length - 1], c = LT.disp + (G.offset || 0);
+      if (Math.floor((LT.t) / tf.sec) * tf.sec + TZ !== b.time) return;
+      try { P.series.update({ time: b.time, open: b.open, high: Math.max(b.high, c), low: Math.min(b.low, c), close: c }); } catch (e) {}
+    });
+  }
+  // bid and ask lines (19 Nov 2026; Style → "Bid and ask lines", OANDA quotes only): two quiet lines on every chart
+  function bidAskDraw() {
+    const d = LT.quote, on = G.bidAsk && d && isFinite(d.b) && isFinite(d.a) && !G.csv;
+    ACTIVE.forEach((tf) => {
+      const P = panes[tf.id]; if (!P || !P.series) return;
+      if (!on) { if (P.baL) { P.baL.forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} }); P.baL = null; } return; }
+      if (!P.vis && P.baL) return;
+      const off = G.offset || 0;
+      if (!P.baL) P.baL = [P.series.createPriceLine({ price: d.b + off, color: 'rgba(242,54,69,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Dotted, axisLabelVisible: true, title: 'Bid' }), P.series.createPriceLine({ price: d.a + off, color: 'rgba(41,98,255,.8)', lineWidth: 1, lineStyle: LW.LineStyle.Dotted, axisLabelVisible: true, title: 'Ask' })];
+      else { try { P.baL[0].applyOptions({ price: d.b + off }); P.baL[1].applyOptions({ price: d.a + off }); } catch (e) {} }
+    });
+  }
+  // how fresh the last tick is, beside "Live" (every half second)
+  setInterval(() => {
+    const el = $('ms-live-lag'); if (!el) return;
+    if (!G.live || !LT.at) { el.textContent = ''; return; }
+    const age = (Date.now() - LT.at) / 1000, r = Math.round(LT.rate * 60 * 10) / 10;
+    el.textContent = age < 1.5 ? 'now' : age < 60 ? `${Math.round(age)} s ago` : `${Math.round(age / 60)} min ago`;
+    el.title = `Last price ${age.toFixed(1)} s ago${r ? `; about ${r} updates a second recently` : ''}`;
+  }, 500);
+  window.msLive = () => ({ px: LT.px, t: LT.t, at: LT.at, n: LT.n, disp: LT.disp, smooth: !!G.smooth, bidAsk: !!G.bidAsk });
+  // live price options in Style (19 Nov 2026): smooth motion of the forming candle, bid and ask lines
+  { const sm = document.getElementById('ms-sty-smooth'), ba = document.getElementById('ms-sty-bidask');
+    if (sm) { sm.checked = !!G.smooth; sm.addEventListener('change', () => { G.smooth = sm.checked; try { localStorage.setItem('ms-smooth', sm.checked ? '1' : '0'); } catch (e) {} if (!G.smooth) { LT.disp = LT.tgt; liveEase(); } }); }
+    if (ba) { ba.checked = !!G.bidAsk; ba.addEventListener('change', () => { G.bidAsk = ba.checked; try { localStorage.setItem('ms-bidask', ba.checked ? '1' : '0'); } catch (e) {} bidAskDraw(); }); } }
   // OANDA ticks (Server-Sent Events from the /md/stream Vercel function): every price change moves the forming candle on all timeframes
   function startTicks() {
     if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') return;
@@ -6564,17 +6657,7 @@ function msNextSetup(bars, A) {
     es.onmessage = (m) => {
       let d; try { d = JSON.parse(m.data); } catch (e) { return; }
       if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
-      const px = (d.b + d.a) / 2, t = d.t || Date.now() / 1000; G.quote = d;
-      if (!G.live) { G.live = true; setStatus(); }
-      ACTIVE.forEach((tf) => {
-        const P = panes[tf.id]; if (!P || !P.raw || !P.raw.length) return;
-        const bt = Math.floor(t / tf.sec) * tf.sec, last = P.raw[P.raw.length - 1];
-        if (bt === last.time) P.push({ time: bt, open: last.open, high: Math.max(last.high, px), low: Math.min(last.low, px), close: px });
-        else if (bt > last.time) P.push({ time: bt, open: px, high: px, low: px, close: px });
-      });
-      const now = Date.now(); if (now - upd > 1000) { upd = now; $('ms-updated').textContent = new Date().toLocaleTimeString();
-        const hp = $('ms-hdr-price'); if (hp) { const prev = +hp.dataset.p; if (prev && prev !== px) { hp.classList.remove('tick-up', 'tick-down'); void hp.offsetWidth; hp.classList.add(px > prev ? 'tick-up' : 'tick-down'); } hp.dataset.p = px; hp.textContent = fmt(px); }
-        const sp = $('ms-hdr-spr'); if (sp) { sp.hidden = false; sp.textContent = `Bid ${fmt(d.b)} · Ask ${fmt(d.a)}`; sp.title = `OANDA spread ${fmt(d.a - d.b)}${d.ok === false ? ' (market not tradeable now)' : ''}`; } }
+      G.quote = d; liveTick((d.b + d.a) / 2, d.t || Date.now() / 1000, d);
     };
     es.onerror = () => { if (es.readyState === 2) { G.es = null; const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
   }
@@ -6594,18 +6677,11 @@ function msNextSetup(bars, A) {
       if (G.csv) { restTicking = false; return; }
       if (G.live && G.tickSrc !== 'rest') { restTicking = false; G.tickSrc = null; return; }   // a stream took over
       try {
-        const { px, src } = await read(); fails = 0; const t = Date.now() / 1000;
-        ACTIVE.forEach((tf) => {
-          const P = panes[tf.id]; if (!P || !P.raw || !P.raw.length) return;
-          const bt = Math.floor(t / tf.sec) * tf.sec, last = P.raw[P.raw.length - 1];
-          if (bt === last.time) P.push({ time: bt, open: last.open, high: Math.max(last.high, px), low: Math.min(last.low, px), close: px });
-          else if (bt > last.time) P.push({ time: bt, open: px, high: px, low: px, close: px });
-        });
+        const { px, src } = await read(); fails = 0;
         if (!G.live || G.tickSrc !== 'rest') { G.live = true; G.tickSrc = 'rest'; G.tickName = src; setStatus(); }
-        $('ms-updated').textContent = new Date().toLocaleTimeString();
-        const hp = $('ms-hdr-price'); if (hp) { const prev = +hp.dataset.p; if (prev && prev !== px) { hp.classList.remove('tick-up', 'tick-down'); void hp.offsetWidth; hp.classList.add(px > prev ? 'tick-up' : 'tick-down'); } hp.dataset.p = px; hp.textContent = fmt(px); }
+        liveTick(px, Date.now() / 1000);
       } catch (e) { if (++fails >= 4 && G.tickSrc === 'rest') { G.live = false; G.tickSrc = null; setStatus(); } }
-      setTimeout(loop, fails ? 8000 : 2500);
+      setTimeout(loop, fails ? 8000 : 1000);
     };
     loop();
   }
@@ -6615,7 +6691,7 @@ function msNextSetup(bars, A) {
     ACTIVE.forEach((tf) => {
       const tick = async () => {
         try { const I = INST, r = await fetchBars(tf, I, POLL_N); const P = panes[tf.id]; if (I !== INST) throw 0;
-          P.raw = r.src === G.source ? mergeBars(P.raw, r.bars) : r.bars; P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+          P.raw = r.src === G.source ? mergeBars(P.raw, r.bars) : r.bars; liveKeep(P); P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
         if (!G.csv) setTimeout(tick, iv());
       };

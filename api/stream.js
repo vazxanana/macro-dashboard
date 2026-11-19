@@ -1,5 +1,5 @@
 // Live OANDA prices as Server-Sent Events: /md/stream?sym=xau. One upstream pricing stream per viewer, forwarded tick by tick
-// (at most ~5 messages a second). It closes after ~4.5 min and the browser's EventSource reconnects on its own.
+// (at most ~10 messages a second since 19 Nov 2026; 5 before). It closes after ~4.5 min and the browser's EventSource reconnects on its own.
 const { SYM } = require('./_oanda');
 let acct = null;
 module.exports = async (req, res) => {
@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
   const ac = new AbortController(), stop = setTimeout(() => ac.abort(), 270e3);
   req.on('close', () => ac.abort());
   res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
-  res.write('retry: 1500\n\n');
+  res.write('retry: 300\n\n');
   let last = 0, pend = null, flushT = null;
   const send = (o) => { try { res.write(`data: ${JSON.stringify(o)}\n\n`); } catch (e) { ac.abort(); } };
   const flush = () => { flushT = null; if (pend) { send(pend); pend = null; last = Date.now(); } };
@@ -33,7 +33,7 @@ module.exports = async (req, res) => {
         if (m.type === 'HEARTBEAT') { res.write(': hb\n\n'); continue; }
         if (m.type !== 'PRICE' || !m.bids || !m.asks) continue;
         pend = { t: +m.time, b: +m.bids[0].price, a: +m.asks[0].price, ok: m.tradeable !== false };
-        const wait = 200 - (Date.now() - last); if (wait <= 0) flush(); else if (!flushT) flushT = setTimeout(flush, wait);
+        const wait = 100 - (Date.now() - last); if (wait <= 0) flush(); else if (!flushT) flushT = setTimeout(flush, wait);
       }
     }
   } catch (e) { /* aborted or closed: the browser reconnects */ }
