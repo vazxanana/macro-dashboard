@@ -34,7 +34,7 @@ const FORGOT = 'If that email belongs to an account, a link to choose a new pass
 const AGAIN = 'Choose another password.';
 // 18 Nov 2026: a password alone signs in only the owner and the built-in members, so a new or reset password is refused only when
 // it is one of theirs (else typing it without a username would open their account); members' passwords may repeat each other.
-const pwClash = (h, users, builtIns) => A.same(h, A.OWNER_HASH) || Object.keys(builtIns || {}).some((k) => users[k] && A.same(users[k].hash, h));
+const pwClash = (h, users, builtIns) => A.same(h, A.OWNER_HASH) || Object.keys(builtIns || {}).concat(A.PW_ONLY).some((k) => users[k] && A.same(users[k].hash, h));
 
 let CONNECT = null, BINDING = null;   // handed in by cloudflare/src/worker.mjs: the socket function (cloudflare:sockets connect) and env.EMAIL
 const useSmtp = (fn) => { CONNECT = typeof fn === 'function' ? fn : null; };
@@ -225,7 +225,7 @@ async function handle(req, res, d = {}) {
       const h = A.sha(b.password), cur = (await loadUsers()) || { users: {} }, users = await A.userList({ ...deps, builtIns, blobUsers: async () => cur });
       if (!users[r.u]) { await store.put(RESETS, resets.filter((x) => x !== r)); return res.status(400).json({ error: 'This link has expired or was already used. Ask for a new one.' }); }
       const pend = live(await store.get(PENDING));
-      if (A.same(h, A.OWNER_HASH) || Object.keys(builtIns).some((j) => j !== r.u && users[j] && A.same(users[j].hash, h))) { G.failed(req); return res.status(400).json({ error: AGAIN }); }
+      if (A.same(h, A.OWNER_HASH) || Object.keys(builtIns).concat(A.PW_ONLY).some((j) => j !== r.u && users[j] && A.same(users[j].hash, h))) { G.failed(req); return res.status(400).json({ error: AGAIN }); }
       const stored = { ...(cur.users || {}) }; stored[r.u] = { ...(stored[r.u] || builtIns[r.u]), hash: h }; delete stored[r.u].disabled;
       const clean = U.clean(stored); if (!clean) return res.status(500).json({ error: 'The new password could not be saved.' });
       await saveUsers({ users: clean, updated: new Date(now).toISOString(), note: 'a password was reset by email' });

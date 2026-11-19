@@ -62,10 +62,11 @@ async function login(deps, pw, id) {
       if (mine && A.same(R.hash, h) && !hit) hit = k; }
     return hit ? { u: hit, h, account: account(hit, users[hit]) } : null;
   }
-  // password only (owner, 18 Nov 2026: "only for built in users"): the owner and the built-in members; every other account
+  // password only (owner, 18 Nov 2026: "only for built in users"; 19 Nov: and the "macro" account, A.PW_ONLY): the owner,
+  // the built-in members and A.PW_ONLY; every other account
   // signs in with its username or email
   if (A.same(h, A.OWNER_HASH)) return { u: 'owner', h, account: account('owner') };
-  const users = await A.userList(deps), built = Object.keys(deps.builtIns || A.BUILT_IN); let hit = null;
+  const users = await A.userList(deps), built = [...new Set(Object.keys(deps.builtIns || A.BUILT_IN).concat(A.PW_ONLY))]; let hit = null;
   for (const k of built) { const R = users[k]; if (R && A.KEY_RE.test(k) && A.same(R.hash, h) && !hit) hit = k; }
   return hit ? { u: hit, h, account: account(hit, users[hit]) } : null;
 }
