@@ -1438,6 +1438,16 @@
   function tfTouch() { XF = true; for (const P of XP.panes) { P.fm = null; P.fs = null; } }   // the forming candle of the first chart grew: the panes rebuild theirs
   function tfDirty() { DR.key = ''; tfTouch(); }
   function renderHtf() { const f = XF; XF = false; for (const P of XP.panes) { xpDraw(P, f); xpLines(P); } }
+  // while the replay plays (19 Nov 2026, owner: "the main moves nice but the other 2 of 3 delay and go slow"): the extra charts
+  // took the new candles only in the idle redraw (every 160 ms or later), so a lower-timeframe pane fell 120+ candles behind and
+  // was rebuilt from scratch (thousands of candles) each time. Now every committed candle reaches each pane through its cheap
+  // one-candle path, and the forming candle of a pane on the same or a higher timeframe grows with the first chart's
+  // (xpLive: display only, never stored in the pane's data; a lower timeframe still shows closed candles only).
+  function xpStep() { if (!XP.panes.length || XF) return; for (const P of XP.panes) if (!P.loading && !P.err) xpDraw(P, false); }
+  let XL = 0; function xpLive(t, o, hi, lo, c) { if (!XP.panes.length || !cur()) return; const nw = performance.now(); if (nw - XL < 80) return; XL = nw; const B = TFS[S.tf];   // about 12 a second: every frame cost the first chart half its frame rate on a slow phone
+    for (const P of XP.panes) { if (P.loading || P.err || !P.data.length) continue; const sec = P.sec || TFS[P.tf]; if (sec < B) continue;
+      try { if (sec === B) P.series.update({ time: t, open: o, high: hi, low: lo, close: c });
+        else { const L = P.data[P.data.length - 1]; if (!L || t < L.time || t >= L.time + sec) continue; P.series.update({ time: L.time, open: L.open, high: Math.max(L.high, hi), low: Math.min(L.low, lo), close: c }); } } catch (e) {} } }
   document.querySelectorAll('#splitdd [data-split]').forEach((b) => b.addEventListener('click', () => { XP.n = +b.dataset.split; xpSave(); loadHtf(); const d = $('splitdd'); if (d) d.open = false; }));
   if (window.ResizeObserver) new ResizeObserver(() => { xpGeom(); }).observe($('chart'));
   // ---- split charts move together and share drawings (17 Nov 2026, owner: "on charts all should be synced moving same time and
@@ -1604,7 +1614,7 @@
     ema20.setData(LAY.ema20 ? e2.data : []); ema50.setData(LAY.ema50 ? e5.data : []); volume.setData(LAY.vol ? vis.map(volPt) : []); DR.e20 = e2.v; DR.e50 = e5.v; DR.key = key; DR.n = S.idx; }
   let LP = 0, HV = 0; const ric = window.requestIdleCallback ? (fn) => requestIdleCallback(fn, { timeout: 200 }) : (fn) => setTimeout(fn, 30), cic = window.cancelIdleCallback || clearTimeout;
   const nowTxt = () => { const v = cur() ? `${when(S.part ? S.part.T : cur().time)} UTC · bar ${S.idx} / ${S.bars.length}${S.part ? ' · forming' : ''}` : '—', e = $('now'); if (e.textContent !== v) e.textContent = v; };
-  function render(light) { drawChart(); if (light) { overlay(); nowTxt(); if (!HV && performance.now() - LP >= 160) HV = ric(() => { HV = 0; if (S.bars.length) panels(); }); return; } panels(); }
+  function render(light) { drawChart(); if (light) { overlay(); nowTxt(); xpStep(); if (!HV && performance.now() - LP >= 160) HV = ric(() => { HV = 0; if (S.bars.length) panels(); }); return; } panels(); }
   function panels() { if (HV) { cic(HV); HV = 0; } LP = performance.now();
     renderHtf(); drawLines(); renderAccount(); renderOpen(); renderPF(); nowTxt(); setT('px-now', px() != null ? `last ${fmt(px())}` : ''); if (D && D.type === 'market') { const dl = px() - D.entry; if (dl) { D.entry = px(); D.stop = rnd(D.stop + dl); if (D.target != null) D.target = rnd(D.target + dl); setRef(); } syncDraft(); } else if (D) calc(); const c = cur(); if (c && !RV) { const pb = S.bars[S.idx - 2]; setH('legend', lgHTML(c, pb ? pb.close : null)); } ps(); CO.tick(); }
 
@@ -1664,7 +1674,7 @@
   let RAF = 0, A = null;
   function drawForming(b, p) { const pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], seg = p * 3, k = Math.min(2, Math.floor(seg)), f = seg - k, price = pts[k] + (pts[k + 1] - pts[k]) * f;
     let hi = Math.max(b.open, price), lo = Math.min(b.open, price); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); }
-    series.update({ time: b.time, open: b.open, high: hi, low: lo, close: price }); A.drawn = true; LIVE = price; $('px-now').textContent = `last ${fmt(price)}`; overlay(); }
+    series.update({ time: b.time, open: b.open, high: hi, low: lo, close: price }); xpLive(b.time, b.open, hi, lo, price); A.drawn = true; LIVE = price; $('px-now').textContent = `last ${fmt(price)}`; overlay(); }
   // the view glides: when a forming candle is added the chart shifts one bar at once; it is put back and eased over the bar's
   // time instead, as long as the latest candle is in view and the user is not panning (any other scroll position ends it)
   let NEXT0 = 0; const tsc = () => chart.timeScale();
