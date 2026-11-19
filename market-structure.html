@@ -34,6 +34,8 @@
 <script src="/assets/ms-dialog.js"></script>
 <script src="/assets/backtest-engine.js" defer></script>
 <script src="/assets/ms-draw.js" defer></script>
+<script src="/assets/ms-paper.js" defer></script>
+<script src="/assets/ms-vprof.js" defer></script>
 <script src="/assets/mosha-desk.js" defer></script>
 <script src="/assets/mosha-record.js" defer></script>
 <script src="/assets/mosha-replay.js" defer></script>
@@ -3621,9 +3623,53 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       @media (pointer: coarse) { .sty-btn, .sty-seg button, #ms-sty-pop .ms-tbtn { min-height: 44px; } .sty-c input { width: 52px; height: 40px; } }
       </style>
       <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
+      <style id="ms-cfs-css">/* Full screen on the Charts (18 Nov 2026, owner: "when I go fullscreen on charts should be the full layout and split if I had"):
+         the whole view goes full screen; the charts share the height that is left, in whatever view is on (All, Split, Layout, one chart) */
+      #v-charts:fullscreen { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
+      #v-charts:fullscreen > :not(.sec-h):not(.ms-grid4):not(#ms-sp-bar):not(#ms-pp) { display: none !important; }
+      #v-charts:fullscreen > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
+      #v-charts:fullscreen > #ms-pp { margin: 0; padding: 6px 10px; } #v-charts:fullscreen > #ms-pp .pp-ttl small { display: none; }
+      #v-charts:fullscreen > .ms-grid4 { flex: 1 1 0; min-height: 0; grid-auto-rows: minmax(0, 1fr); align-content: stretch; gap: 8px; }
+      #v-charts:fullscreen > .ms-grid4 .ms-pane { min-height: 0; height: 100%; }
+      #v-charts:fullscreen > .ms-grid4 .ms-chart { height: calc(100% - var(--ms-ph-h, 46px)) !important; min-height: 0 !important; }
+      #v-charts:fullscreen > .ms-grid4 .ms-ro { display: none !important; }
+      #v-charts:fullscreen > .ms-grid4[data-view="all"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } #v-charts:fullscreen > .ms-grid4[data-view="all"] .ms-pane { grid-column: auto !important; }   /* six charts: three by two */
+      </style>
+      <style id="ms-pp-css">/* The paper trading account on the Charts (18 Nov 2026, assets/ms-paper.js): one bar above the charts, stats and history behind a button */
+  html[data-role="public"] #ms-pp { display: none !important; }
+  #ms-pp { margin: 0 0 10px; padding: 10px 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font-size: 13px; font-variant-numeric: tabular-nums; }
+  #ms-pp .up { color: var(--buy-ink, var(--buy)); } #ms-pp .dn { color: var(--sell-ink, var(--sell)); }
+  .pp-h { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  .pp-ttl { display: grid; gap: 1px; min-width: 150px; } .pp-ttl b { font-size: 14px; font-weight: 650; } .pp-ttl small, .pp-big small, .pp-t small, .pp-set label { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+  .pp-big { display: flex; gap: 18px; } .pp-big span { display: grid; gap: 1px; } .pp-big b { font-size: 16px; font-weight: 650; }
+  .pp-trade { display: inline-flex; align-items: stretch; border-radius: 10px; overflow: hidden; border: 1px solid var(--au-line, var(--line)); }
+  .pp-go { border: 0; min-height: 36px; min-width: 76px; padding: 0 14px; font: 650 14px var(--sans); color: #fff; cursor: pointer; }
+  .pp-go.buy { background: #0f7a5c; } .pp-go.sell { background: #c8243f; } .pp-go:hover { filter: brightness(1.1); } .pp-go:focus-visible, .pp-q:focus-visible, .pp-tog:focus-visible, .pp-act button:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 2px; }
+  .pp-px { display: grid; place-items: center; min-width: 92px; padding: 0 10px; font-weight: 650; background: var(--au-surface-2, var(--panel-2)); }
+  .pp-set { display: flex; gap: 10px; flex-wrap: wrap; } .pp-set label { display: inline-flex; gap: 6px; align-items: center; }
+  #ms-pp select, #ms-pp input { min-height: 32px; padding: 0 8px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: var(--au-well, var(--bg)); color: inherit; font: 500 13px var(--sans); font-variant-numeric: tabular-nums; }
+  .pp-tog, .pp-q, .pp-act button { min-height: 32px; padding: 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: none; color: inherit; font: 600 12.5px var(--sans); cursor: pointer; }
+  .pp-tog { margin-left: auto; } .pp-q:disabled { opacity: .5; cursor: default; }
+  .pp-draft { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 10px; padding: 8px 10px; border-radius: 10px; background: var(--au-surface-2, var(--panel-2)); border-left: 3px solid var(--sell); }
+  .pp-draft.buy { border-left-color: var(--buy); } .pp-draft label { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; } .pp-draft input { width: 110px; } .pp-dside { font-weight: 650; }
+  .pp-dsum { font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); }
+  .pp-live { margin: 6px 0 0; min-height: 0; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); } .pp-live:empty { display: none; } .pp-live.bad { color: var(--sell-ink, var(--sell)); }
+  .pp-tw { margin-top: 10px; overflow-x: auto; } .pp-tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; } .pp-tbl th { text-align: left; font-weight: 600; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); padding: 4px 8px; border-bottom: 1px solid var(--au-line, var(--line)); white-space: nowrap; }
+  .pp-tbl td { padding: 5px 8px; border-bottom: 1px solid var(--au-line, var(--line)); white-space: nowrap; } .pp-tbl .n { text-align: right; } .pp-tbl small { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+  .pp-tbl .pp-ed { width: 100px; text-align: right; } .pp-act { display: flex; gap: 4px; justify-content: flex-end; } .pp-ord td { color: var(--au-ink-2, var(--ink-dim)); }
+  .pp-s { font-size: 12px; font-weight: 600; text-transform: capitalize; } .pp-s.buy { color: var(--buy-ink, var(--buy)); } .pp-s.sell { color: var(--sell-ink, var(--sell)); }
+  .pp-body { margin-top: 12px; } .pp-body[hidden] { display: none; }
+  .pp-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; } .pp-t { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: var(--au-surface-2, var(--panel-2)); } .pp-t b { font-size: 15px; font-weight: 650; } .pp-t b small { font-size: 12px; font-weight: 500; }
+  .pp-few { margin: 8px 0 0; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); }
+  .pp-curve { margin: 10px 0 0; } .pp-curve svg { width: 100%; height: 90px; display: block; } .pp-cl { fill: none; stroke: var(--au-accent, var(--accent)); stroke-width: 2; vector-effect: non-scaling-stroke; } .pp-c0 { stroke: var(--au-ink-3, var(--ink-faint)); stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+  .pp-curve figcaption { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+  .pp-foot { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 10px; } .pp-foot small { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+  @media (pointer: coarse) { .pp-go, .pp-tog, .pp-q, .pp-act button, #ms-pp select, #ms-pp input { min-height: 44px; } }
+  @media (max-width: 640px) { .pp-big { gap: 12px; } .pp-tog { margin-left: 0; } }
+</style>
       <style id="ms-dr-css">/* ChronosTrade's chart tools on the Desk (18 Nov 2026): drawing strip, style bar, right-click menu, 1-4 chart layout */
       #v-charts .sec-h { position: relative; }
-      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; } .ms-vp-cv { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
       html[data-drawing] #v-charts .ms-chart { cursor: crosshair; }
       .ms-chart[data-dcur="move"] { cursor: move; } .ms-chart[data-dcur="size"] { cursor: crosshair; } .ms-chart[data-dcur="lock"] { cursor: not-allowed; }
       #v-charts .sec-h > .dr-bar { order: 9; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); align-items: center; }
@@ -3701,6 +3747,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label title="Both charts show exactly the same date range (zoom too)"><span>Date range</span><input type="checkbox" data-sync="range" checked></label>
       </div></details>
     </div>
+    <section class="pp" id="ms-pp" aria-label="Paper trading account" hidden></section>
     <div class="ms-grid4">
       <div class="ms-pane ms-splitc" data-tf="split"><div class="ms-ph"><b id="ms-sp-t">—</b><span class="ms-role" id="ms-sp-src"></span></div><div class="ms-legend" id="ms-sp-lg"></div><div class="ms-chart sp-chart" id="ms-sp-c"></div></div>
       <div class="ms-pane" data-tf="1d"><div class="ms-ph"><b>D1</b><span class="ms-role">Bias</span><span class="ms-chip" id="ms-t-1d">—</span><span class="ms-cd" id="ms-cd-1d" title="Time until this candle closes"></span></div><div class="ms-legend" id="ms-l-1d"></div><div class="ms-chart" id="ms-c-1d"></div><div class="ms-ro" id="ms-r-1d"></div></div>
@@ -4351,7 +4398,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     <button type="button" class="btab-more-btn" id="ms-more-btn" popovertarget="ms-more" aria-controls="ms-more" aria-expanded="false" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg><span>More</span></button>
   </nav>
   <div class="btab-more" id="ms-more" popover aria-label="More sections"><p class="btab-more-h">More sections</p><nav class="btab-more-list" id="ms-more-list" aria-label="More sections"></nav></div>
-  <dialog class="ind-dlg" id="ms-ind" aria-labelledby="ms-ind-t"><div class="ind-h"><h3 id="ms-ind-t">Indicators</h3><span class="ms-note">Up to 10, on every chart. Saved for your account on this device.</span><button type="button" class="tv-x" id="ms-ind-x" aria-label="Close">×</button></div>
+  <dialog class="ind-dlg" id="ms-ind" aria-labelledby="ms-ind-t"><div class="ind-h"><h3 id="ms-ind-t">Indicators</h3><span class="ms-note">Up to 10, on every chart. Saved for your account on this device. Order flow studies are estimated from candles: the feeds give a volume per candle, not the trades at the bid and the ask.</span><button type="button" class="tv-x" id="ms-ind-x" aria-label="Close">×</button></div>
     <ul class="ind-cur" id="ms-ind-cur"></ul><div class="ind-lib" id="ms-ind-lib"></div></dialog>
   <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-nb" id="ms-tv-nb" hidden></div><div class="tv-tk" id="ms-tv-tk" hidden></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
   <button type="button" class="to-top" id="ms-to-top" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
@@ -5513,7 +5560,7 @@ function msNextSetup(bars, A) {
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
         { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
-        tl.querySelector('.ch-fs').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (pane.requestFullscreen) pane.requestFullscreen().catch(() => {}); });
+        tl.querySelector('.ch-fs').addEventListener('click', () => { const vc = document.getElementById('v-charts') || pane; if (document.fullscreenElement) document.exitFullscreen(); else if (vc.requestFullscreen) vc.requestFullscreen().catch(() => {}); });   // the whole Charts view: the layout, split and tools as they are (18 Nov 2026)
       }
       el.addEventListener('dblclick', () => P.fit()); }
     // candle-close countdown (7 Nov loop): a small pill under the last-price label on the price scale, mm:ss (or h:mm) to this bar's close
@@ -5699,7 +5746,7 @@ function msNextSetup(bars, A) {
     P.setLog = function () { try { chart.priceScale('right').applyOptions({ mode: G.log ? LW.PriceScaleMode.Logarithmic : LW.PriceScaleMode.Normal }); } catch (e) {} };
     P.rebuild = function (keepView) {
       const off = G.offset;
-      P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+      P.bars = P.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off, volume: b.volume || 0 }));
       if (P.rp) return;   // replaying: keep the hidden future hidden (analysis resumes on exit)
       series.setData(P.view(P.bars)); P.setLine(P.bars); P.setStyle();
       P.setLog();
@@ -5800,8 +5847,8 @@ function msNextSetup(bars, A) {
       if (k.time === last.time) Object.assign(last, k);
       else if (k.time > last.time) { P.raw.push(k); if (P.raw.length > CAP) P.raw.shift(); }
       else return;
-      const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off };
-      if (P.bars[P.bars.length - 1].time === b.time) P.bars[P.bars.length - 1] = b; else P.bars.push(b);
+      const off = G.offset, b = { time: k.time + TZ, open: k.open + off, high: k.high + off, low: k.low + off, close: k.close + off, volume: k.volume || 0 };
+      if (P.bars[P.bars.length - 1].time === b.time) { b.volume = Math.max(b.volume, P.bars[P.bars.length - 1].volume || 0); P.bars[P.bars.length - 1] = b; } else P.bars.push(b);
       if (P.bars.length > P.raw.length) P.bars.shift();
       // perf (9 Nov): a pane that is off screen (another view, another timeframe picked, or scrolled away) only keeps its data;
       // the canvases are brought up to date in one go when it shows again (P.resync), instead of being repainted on every tick
@@ -5829,6 +5876,11 @@ function msNextSetup(bars, A) {
   // shapes on every chart of a market, drawn and edited on any of them. Display only.
   window.msCharts = window.msCharts || { list: [], add(cx) { this.list.push(cx); document.dispatchEvent(new CustomEvent('ms:chart', { detail: cx })); } };
   Object.values(panes).forEach((P) => window.msCharts.add({ id: P.tf.id, el: P.el, chart: P.chart, series: P.series, bars: () => P.bars || [], sec: () => P.tf.sec, market: () => instKey, TZ, dec: () => INST.dec ?? 2, fmt: (v) => fmt(v), visible: () => !!P.el.offsetParent }));
+  // the paper trading account (assets/ms-paper.js, 18 Nov 2026): the page's one-minute candles, the 15-minute candles for its ATR
+  // stop, and one-minute candles of another market for the catch-up of its open positions. Read only.
+  window.msPaperHost = { key: instKey, insts: INSTRUMENTS, TZ, m1: () => (panes['1m'] && panes['1m'].bars) || [], atr: () => (panes['15m'] && panes['15m'].bars) || [],
+    since: (k, from) => rangeBars(TFS.find((t) => t.id === '1m'), INSTRUMENTS[k], from, Date.now() / 1000) };
+  document.dispatchEvent(new Event('ms:paperhost'));
   // key levels (7 Nov loop): previous day / week high and low and today's open, as quiet dotted lines on the intraday charts
   // the levels from a market's daily candles (raw prices): [title, price, pivot?]
   function klList(d) { const L = [];
@@ -6725,6 +6777,8 @@ function msNextSetup(bars, A) {
   const iHH = (B, n) => B.map((_, i) => i < n - 1 ? null : Math.max(...B.slice(i - n + 1, i + 1).map((b) => b.high)));
   const iLL = (B, n) => B.map((_, i) => i < n - 1 ? null : Math.min(...B.slice(i - n + 1, i + 1).map((b) => b.low)));
   const C_ = (B) => B.map((b) => b.close);
+  // estimated delta of one candle: its volume (1 when the feed has none) times where it closed in its range, from -1 (at the low) to +1 (at the high)
+  const iDelta = (B) => B.map((b) => { const r = b.high - b.low, w = b.volume > 0 ? b.volume : 1; return r > 0 ? w * (2 * (b.close - b.low) / r - 1) : 0; });
   const IND_DEF = {
     sma: { name: 'Moving Average (SMA)', p: { len: 50 }, calc: (B, x) => [{ v: iSMA(C_(B), x.len), title: `SMA ${x.len}`, last: true }] },
     ema: { name: 'Moving Average Exponential (EMA)', p: { len: 21 }, calc: (B, x) => [{ v: iEMA(C_(B), x.len), title: `EMA ${x.len}`, last: true }] },
@@ -6755,15 +6809,28 @@ function msNextSetup(bars, A) {
     cci: { name: 'Commodity Channel Index (CCI)', osc: true, p: { len: 20 }, calc: (B, x) => { const tp = B.map((b) => (b.high + b.low + b.close) / 3), m = iSMA(tp, x.len);
       const v = tp.map((t, i) => { if (m[i] == null) return null; let d = 0; for (let j = i - x.len + 1; j <= i; j++) d += Math.abs(tp[j] - m[i]); d /= x.len; return d ? (t - m[i]) / (0.015 * d) : 0; });
       return [{ v, title: `CCI ${x.len}`, last: true }, { v: v.map((q) => q == null ? null : 100), color: 'rgba(138,148,168,.5)', w: 1, dash: true }, { v: v.map((q) => q == null ? null : -100), color: 'rgba(138,148,168,.5)', w: 1, dash: true }]; } },
+    // order flow (18 Nov 2026, owner: "add orderflow indicators"). OANDA and the exchanges give candles with a volume (OANDA: the
+    // tick count), not the trades at the bid and the ask, so buying and selling are ESTIMATED from each candle: its volume split by
+    // where it closed in its range (close at the high = all buying). Said in the menu and in each title.
+    delta: { name: 'Volume Delta (estimated)', osc: true, flow: true, p: {}, calc: (B) => [{ v: iDelta(B), hist: true }, { v: iDelta(B).map(() => 0), color: 'rgba(138,148,168,.5)', w: 1, title: 'Delta (est.)' }] },
+    cvd: { name: 'Cumulative Volume Delta (estimated, daily)', osc: true, flow: true, p: {}, calc: (B) => { const d = iDelta(B); let c = 0, day = null; const v = B.map((b, i) => { const k = Math.floor((b.time - TZ) / 86400); if (k !== day) { day = k; c = 0; } c += d[i]; return c; });
+      return [{ v, title: 'CVD (est.)', last: true, w: 2 }]; } },
+    vwap: { name: 'VWAP (daily, with bands)', flow: true, p: { mult: 2 }, calc: (B, x) => { const v = [], u = [], l = []; let pv = 0, vv = 0, p2 = 0, day = null;
+      B.forEach((b) => { const k = Math.floor((b.time - TZ) / 86400); if (k !== day) { day = k; pv = vv = p2 = 0; } const w = b.volume > 0 ? b.volume : 1, tp = (b.high + b.low + b.close) / 3; pv += tp * w; vv += w; p2 += tp * tp * w;
+        const m = pv / vv, sd = Math.sqrt(Math.max(0, p2 / vv - m * m)); v.push(m); u.push(m + x.mult * sd); l.push(m - x.mult * sd); });
+      return [{ v, title: 'VWAP', last: true, w: 2 }, { v: u, w: 1, dash: true }, { v: l, w: 1, dash: true }]; } },
+    vprof: { name: 'Volume Profile (visible range)', flow: true, p: { rows: 60, va: 70 }, calc: () => [] },   // drawn by assets/ms-vprof.js: a histogram of the candles in view, POC, value area
+    rvol: { name: 'Relative Volume', osc: true, flow: true, p: { len: 20 }, calc: (B, x) => { const vol = B.map((b) => b.volume || 0); if (!vol.some((v) => v > 0)) return []; const m = iSMA(vol, x.len);
+      return [{ v: vol.map((v, i) => (m[i] ? v / m[i] - 1 : null)), hist: true }, { v: vol.map((v, i) => (m[i] ? 1 : null)), color: 'rgba(138,148,168,.5)', w: 1, dash: true, title: 'RVOL − 1 (2x = +1)' }]; } },
   };
   const IND_COLORS = ['#2962ff', '#ff9800', '#9c27b0', '#00bcd4', '#e91e63', '#4caf50', '#795548', '#607d8b', '#f44336', '#3f51b5'];
   window.msInd = { key: () => 'ms-ind-' + (window.MS_WHO || 'guest'), max: 10,
     list() { try { const L = JSON.parse(localStorage.getItem(this.key()) || '[]'); return Array.isArray(L) ? L.filter((x) => IND_DEF[x.type]).slice(0, 10) : []; } catch (e) { return []; } },
-    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); if (window.msSplitMarkup) window.msSplitMarkup(); indRender(); } };
+    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); if (window.msSplitMarkup) window.msSplitMarkup(); if (window.msVprofRepaint) window.msVprofRepaint(); indRender(); } };
   function indRender() {
     const L = window.msInd.list(), cnt = document.getElementById('ms-ind-n'); if (cnt) cnt.textContent = `${L.length}/10`;
     const lib = document.getElementById('ms-ind-lib'), cur = document.getElementById('ms-ind-cur'); if (!lib || !cur) return;
-    lib.innerHTML = Object.entries(IND_DEF).map(([k, d]) => `<button type="button" data-ind-add="${k}"${L.length >= 10 ? ' disabled' : ''}><b>${esc(d.name)}</b><small>${d.osc ? 'separate band' : 'on price'}</small></button>`).join('');
+    lib.innerHTML = Object.entries(IND_DEF).map(([k, d]) => `<button type="button" data-ind-add="${k}"${L.length >= 10 ? ' disabled' : ''}><b>${esc(d.name)}</b><small>${d.flow ? 'order flow · ' : ''}${d.osc ? 'separate band' : 'on price'}</small></button>`).join('');
     cur.innerHTML = L.length ? L.map((x, i) => { const d = IND_DEF[x.type]; return `<li><input type="color" value="${esc(x.color)}" data-ind-col="${i}" aria-label="Colour of ${esc(d.name)}"><span class="ind-nm">${esc(d.name)}</span>${Object.keys(d.p).map((pk) => `<label>${pk}<input type="number" step="${pk === 'step' || pk === 'max' ? '0.01' : pk === 'mult' ? '0.1' : '1'}" min="${pk === 'step' || pk === 'max' ? '0.01' : '1'}" value="${x[pk]}" data-ind-p="${i}" data-k="${pk}"></label>`).join('')}<button type="button" data-ind-rm="${i}" aria-label="Remove ${esc(d.name)}">×</button></li>`; }).join('') : '<li class="empty">No indicators yet. Pick up to 10 from the list.</li>';
   }
   document.addEventListener('click', (ev) => { const t = ev.target.closest && ev.target.closest('[data-ind-add],[data-ind-rm],#ms-ind-open,#ms-ind-x'); if (!t) return;
@@ -14190,6 +14257,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle, .dr-bar, .dr-note) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) #ms-pp { display: none !important; }   /* the paper account waits behind More (18 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 
