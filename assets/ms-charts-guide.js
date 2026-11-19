@@ -172,7 +172,7 @@ dialog.ms-chgd::backdrop { background: rgba(0,0,0,.45); }
     if (!bar || document.getElementById('ms-ch-help')) return;
     const b = document.createElement('button'); b.type = 'button'; b.id = 'ms-ch-help'; b.className = 'ch-help';
     b.title = 'How to use the charts: a short guide'; b.setAttribute('aria-haspopup', 'dialog');
-    b.innerHTML = '<span class="q" aria-hidden="true">?</span>How to use';
+    b.innerHTML = '<span class="q" aria-hidden="true">?</span><span class="t">How to use</span>'; b.setAttribute('aria-label', 'How to use the charts');
     if (!store('ms-ch-guide')) b.classList.add('new');
     b.addEventListener('click', () => open());
     bar.insertAdjacentElement('afterend', b);

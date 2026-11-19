@@ -27,7 +27,7 @@ test('every "Show me" points at a part of the page that exists, and every text i
 test('the guide styles none of the page\'s own classes (19 Nov 2026: ".chg" turned every chart legend\'s change figure into a box over the chart)', () => {
   const css = SRC.slice(SRC.indexOf('const css = `'), SRC.indexOf('`;', SRC.indexOf('const css = `')));
   const used = new Set([...css.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((m) => m[1]));
-  const own = new Set(['ch-help', 'q', 'new', 'n', 'seen', 'st', 'sp', 'lead', 'pri', 'on']);
+  const own = new Set(['ch-help', 't', 'q', 'new', 'n', 'seen', 'st', 'sp', 'lead', 'pri', 'on']);
   for (const c of used) {
     if (own.has(c) || /^chg-|^ms-chgd$/.test(c)) continue;
     assert.fail(`the guide styles .${c}, a class it does not own`);

@@ -41,7 +41,7 @@
 <script src="/assets/ms-draw.js?v=871e4372d8" defer></script>
 <script src="/assets/ms-paper.js?v=abde961f68" defer></script>
 <script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
-<script src="/assets/ms-charts-guide.js?v=e0b6f09bcc" defer></script>
+<script src="/assets/ms-charts-guide.js?v=523be2f8d2" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -2871,10 +2871,35 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
   .pp-curve figcaption { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
   .pp-foot { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-top: 10px; } .pp-foot small { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
   @media (pointer: coarse) { .pp-go, .pp-tog, .pp-q, .pp-act button, #ms-pp select, #ms-pp input { min-height: 44px; } }
-  @media (max-width: 640px) { .pp-big { gap: 12px; } .pp-tog { margin-left: 0; } }
+  /* phone (19 Nov 2026, "more organised"): title and Stats on one line, the three figures in equal columns, Sell | price | Buy
+     and Risk / Stop / Target each across the full width */
+  @media (max-width: 640px) {
+    .pp-h { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "ttl tog" "big big" "trade trade" "set set"; gap: 10px; }
+    .pp-ttl { grid-area: ttl; min-width: 0; } .pp-tog { grid-area: tog; margin-left: 0; align-self: start; }
+    .pp-big { grid-area: big; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .pp-trade { grid-area: trade; display: flex; } .pp-trade .pp-go { flex: 1 1 0; } .pp-px { flex: 1 1 0; min-width: 0; }
+    .pp-set { grid-area: set; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .pp-set label { display: grid; gap: 4px; } .pp-set select { width: 100%; min-width: 0; }
+  }
 </style>
 <style id="ms-dr-css">/* ChronosTrade's chart tools on the Desk (18 Nov 2026): drawing strip, style bar, right-click menu, 1-4 chart layout */
       #v-charts .sec-h { position: relative; }
+      /* Phone toolbar, tidy rows (19 Nov 2026, owner: "put it more organised"): markup | style | indicators, then the drawing
+         tools with the guide's "?", then the chart tools; every row runs the full width and its buttons share it (44 px tall). */
+      @media (max-width: 640px) {
+        #v-charts .sec-h > .mk-mode.mk-mode { flex: 1 1 auto; display: flex; } #v-charts .sec-h > .mk-mode.mk-mode button { flex: 1 1 0; }
+        #v-charts .sec-h > .seg[aria-label="Chart view"].seg { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+        #v-charts .sec-h > .seg[aria-label="Chart view"].seg > button:nth-child(n+7) { grid-column: span 2; margin-left: 0; box-shadow: none; }
+        #v-charts .sec-h > .seg[aria-label="Chart view"].seg > button:nth-child(n+7)::before { display: none; }
+        #v-charts .sec-h #ms-sty-now { display: none; }
+        #v-charts .sec-h > .dr-bar { flex: 1 1 0; min-width: 0; justify-content: space-between; box-sizing: border-box; }
+        #v-charts .sec-h > .dr-bar button { flex: 1 1 0; width: auto; min-width: 0; }
+        #v-charts .sec-h > .ch-help.ch-help { order: 9; flex: none; width: 52px; padding: 0; justify-content: center; height: auto; align-self: stretch; }
+        #v-charts .sec-h > .ch-help .t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        #v-charts .sec-h > .ch-one.ch-one { order: 10; flex: 1 1 100%; min-width: 0; justify-content: space-between; box-sizing: border-box; }
+        #v-charts .sec-h > .ch-one .ch-b { flex: 1 1 0; width: auto; min-width: 0; }
+        #v-charts .sec-h > .ch-one .ch-one-tf { flex: none; }
+      }
       .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; } .ms-vp-cv, .ms-pp-cv { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
       html[data-drawing] #v-charts .ms-chart { cursor: crosshair; }
       .ms-chart[data-dcur="move"] { cursor: move; } .ms-chart[data-dcur="size"] { cursor: crosshair; } .ms-chart[data-dcur="lock"] { cursor: not-allowed; }
@@ -4988,7 +5013,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   /* 19 Nov: behind More the timeframe and view switch wraps instead of cutting "Layout", the markup switch keeps each word whole,
      and the paper account is one compact block */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .seg { flex-wrap: wrap; row-gap: 4px; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .mk-mode { flex: none; } html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .mk-mode > button { flex: none; white-space: nowrap; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .mk-mode { flex: 1 1 auto; } html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .mk-mode > button { flex: 1 1 0; white-space: nowrap; }
   html[data-phone="simple"] #ms-pp .pp-ttl small { display: none; } html[data-phone="simple"] #ms-pp .pp-trade { width: 100%; } html[data-phone="simple"] #ms-pp .pp-go { flex: 1; }
   html[data-phone="simple"] #ms-pp .pp-set { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } html[data-phone="simple"] #ms-pp .pp-set label { display: grid; gap: 2px; } html[data-phone="simple"] #ms-pp .pp-set select { width: 100%; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
