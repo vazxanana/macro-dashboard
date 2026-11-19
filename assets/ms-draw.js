@@ -59,6 +59,9 @@
       else { x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.xe != null ? g.xe : g.x2, g.ye != null ? g.ye : g.y2); x.stroke(); }
       x.setLineDash([]);
       if (d.type === 'h' || d.type === 'hr') { const lab = cx.fmt(d.type === 'h' ? d.price : d.p1); x.font = '600 12px Figtree, system-ui, sans-serif'; const tw = x.measureText(lab).width + 10; x.fillStyle = col; x.fillRect(W - tw - 2, g.y1 - 9, tw, 18); x.fillStyle = '#fff'; x.fillText(lab, W - tw + 3, g.y1 + 4); }
+      if (d.alert && (d.type === 'h' || d.type === 'hr' || d.type === 't')) { x.font = '600 12px Figtree, system-ui, sans-serif'; const s = 'Alert', aw = x.measureText(s).width + 10, pw = d.type === 't' ? 0 : x.measureText(cx.fmt(d.type === 'h' ? d.price : d.p1)).width + 10;
+        const ax = d.type === 't' ? Math.min(W - aw - 2, Math.max(g.x1, g.x2) + 6) : W - pw - aw - 6, ay = d.type === 't' ? (g.x2 >= g.x1 ? g.y2 : g.y1) : g.y1;
+        x.fillStyle = css('--panel') || '#fff'; x.fillRect(ax, ay - 9, aw, 18); x.strokeStyle = col; x.lineWidth = 1; x.strokeRect(ax + 0.5, ay - 8.5, aw - 1, 17); x.fillStyle = col; x.textBaseline = 'middle'; x.fillText(s, ax + 5, ay); x.textBaseline = 'alphabetic'; }
       if (d.lbl && (d.type === 't' || d.type === 'r')) { const v = view(cx), dd = toChart(d, cx.TZ), nb = BT().barsBetween(v.bars, v.n, v.sec, dd.t1, dd.t2), ang = d.type === 't' ? Math.atan2(-(g.y2 - g.y1), g.x2 - g.x1) * 180 / Math.PI : null, s = BT().drawInfo(d, nb, ang, cx.dec());
         x.font = '600 12px Figtree, system-ui, sans-serif'; const tw = x.measureText(s).width + 10, lx = Math.max(g.x1, g.x2) + 6, ly = Math.min(g.y1, g.y2) - 6; x.fillStyle = 'rgba(0,0,0,.6)'; x.fillRect(lx, ly - 14, tw, 18); x.fillStyle = '#fff'; x.fillText(s, lx + 5, ly); }
       if (sel || hov) for (const [, px, py] of g.pts) { x.beginPath(); x.arc(px, py, sel ? 5 : 4, 0, Math.PI * 2); x.fillStyle = sel ? col : css('--panel') || '#fff'; x.fill(); x.strokeStyle = col; x.lineWidth = 1.5; x.stroke(); }
@@ -125,6 +128,7 @@
       + `<span class="sep"></span>` + [1, 2, 3].map((w) => `<button type="button" data-w="${w}" title="Width ${w}"${on((d.w || 1) === w)}>${w}px</button>`).join('')
       + `<button type="button" data-ls title="Dashed"${on(d.ls === 'dash')}>- -</button>` + (d.type === 't' ? `<button type="button" data-ext title="Extend to the right"${on(d.ext)}>→</button>` : '')
       + (d.type === 't' || d.type === 'r' ? `<button type="button" data-lbl title="Label: price change, %, bars"${on(d.lbl)}>Label</button>` : '')
+      + (['h', 'hr', 't'].includes(d.type) ? `<span class="sep"></span><button type="button" data-alert title="Tell me when price crosses this line (while this page is open)"${on(d.alert)}>${d.alert ? 'Alert on' : 'Alert'}</button>` : '')
       + `<span class="sep"></span><button type="button" data-lock title="${d.lock ? 'Unlock' : 'Lock'}"${on(d.lock)}>${d.lock ? 'Locked' : 'Lock'}</button><button type="button" data-clone title="Clone">Clone</button><button type="button" data-del title="Delete (Del)" class="del">Delete</button>`;
     el.hidden = false; const cx = SELC && SELC.visible() && mkOf(SELC) === SEL.mk ? SELC : CX.find((c) => c.visible() && mkOf(c) === SEL.mk), g = cx && geo(cx, d), r = cx && cx.el.getBoundingClientRect();
     const bw = el.offsetWidth || 360; let lx = r ? r.left + (g ? Math.min(g.x1, g.x2 != null ? g.x2 : g.x1) : 8) : 16, ty = r ? r.top + (g ? Math.min(g.y1, g.y2 != null ? g.y2 : g.y1) : 8) - 48 : 80;
@@ -136,6 +140,7 @@
     else if (b.hasAttribute('data-ext')) { if (d.ext) delete d.ext; else d.ext = true; }
     else if (b.hasAttribute('data-lbl')) { if (d.lbl) delete d.lbl; else d.lbl = true; }
     else if (b.hasAttribute('data-lock')) { if (d.lock) delete d.lock; else d.lock = true; }
+    else if (b.hasAttribute('data-alert')) { if (d.alert) { delete d.alert; note('Alert off.'); } else { d.alert = true; delete d.fired; note('Alert on: you are told when price crosses this line while this page is open.'); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); } catch (x) {} } }
     else if (b.hasAttribute('data-clone')) { const c = { ...d }; delete c.lock; for (const k of ['p1', 'p2', 'price']) if (fin(c[k])) c[k] *= 1.002; c.at = Math.floor(Date.now() / 1000); L.push(c); SEL = { mk, i: L.length - 1 }; }
     else if (b.hasAttribute('data-del')) { remove(mk, SEL.i); return; }
     save(mk); bar(); paintAll(); }
@@ -175,6 +180,24 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', strip); else strip();
   // a full-screen element hides everything outside it: the style bar and the menu move into it, and back (18 Nov 2026)
   document.addEventListener('fullscreenchange', () => { const host = document.fullscreenElement || document.body; for (const id of ['ms-dsel', 'ms-cmenu']) { const el = document.getElementById(id); if (el && el.parentNode !== host) host.appendChild(el); } setTimeout(paintAll, 120); });
+  // ---- line alerts (19 Nov 2026): a horizontal line, ray or trend line marked "Alert" tells you once when the live price crosses
+  // it while the page is open (a note on the page, and a browser notification when allowed); then the alert switches itself off.
+  // Display only: nothing is sent anywhere and no order is placed.
+  const LASTPX = {};
+  function levelNow(d, t) { if (d.type === 'h') return d.price; if (d.type === 'hr') return t >= d.t1 ? d.p1 : null;
+    if (d.type === 't') { const a = Math.min(d.t1, d.t2), b = Math.max(d.t1, d.t2); if (t < a || (t > b && !d.ext) || d.t1 === d.t2) return null; return BT().lineAt(d, t); } return null; }
+  function alertCheck() { if (!BT()) return; const t = Math.floor(Date.now() / 1000), done = new Set();
+    for (const cx of CX) { const mk = mkOf(cx); if (done.has(mk)) continue; const B = cx.bars() || []; if (!B.length) continue; done.add(mk);
+      const px = B[B.length - 1].close, prev = LASTPX[mk]; LASTPX[mk] = px; if (!fin(prev) || !fin(px) || prev === px) continue; let ch = false;
+      for (const d of load(mk)) { if (!d.alert) continue; const lv = levelNow(d, t); if (!fin(lv) || (prev - lv) * (px - lv) > 0) continue;
+        delete d.alert; d.fired = t; ch = true; const I = window.msPaperHost && window.msPaperHost.insts && window.msPaperHost.insts[mk], name = (I && I.label) || mk.toUpperCase();
+        const what = d.type === 'h' ? 'line' : d.type === 'hr' ? 'ray' : 'trend line', msg = `${name} ${px > prev ? 'rose through' : 'fell through'} your ${what} at ${cx.fmt(lv)}.`; alertToast(msg);
+        try { if ('Notification' in window && Notification.permission === 'granted') new Notification('Line alert', { body: msg, tag: 'ms-line-' + mk + '-' + t, icon: '/icons/icon-192.png' }); } catch (e) {} }
+      if (ch) { save(mk); bar(); paintAll(); } } }
+  function alertToast(msg) { const box = document.getElementById('ms-toasts'); if (!box) { note(msg); return; } const el = document.createElement('div'); el.className = 'ms-toast'; el.setAttribute('role', 'status');
+    el.innerHTML = '<b></b><span></span>'; el.querySelector('b').textContent = 'Line alert'; el.querySelector('span').textContent = msg; box.appendChild(el); setTimeout(() => el.remove(), 12000); }
+  setInterval(alertCheck, 1500);
+  window.msLineAlerts = () => Object.fromEntries(Object.entries(ST).map(([k, v]) => [k, { on: v.filter((d) => d.alert).length, fired: v.filter((d) => d.fired).length }]));
   // read-only view for the audit
   window.msDrawState = () => ({ tool: TOOL, mag: MAG, sel: SEL, charts: CX.length, shapes: Object.fromEntries(Object.entries(ST).map(([k, v]) => [k, v.length])), geo: CX.filter((c) => c.visible()).map((c) => ({ id: c.id, mk: mkOf(c), g: load(mkOf(c)).map((d) => geo(c, d)) })) });
   window.msDrawRepaint = paintAll;

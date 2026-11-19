@@ -57,3 +57,13 @@ test('style: no text under 12 px, 44 px on touch, guests get no layout, the phon
   assert.doesNotMatch(css, /data-phone/, 'nothing of the phone view in this block');
   assert.match(PAGE, /\.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle, \.dr-bar, \.dr-note\) \{ display: none !important; \}/);
 });
+
+test('line alerts: a horizontal line, ray or trend line keeps its alert; crossing fires once; nothing is sent anywhere', () => {
+  const BT = require('../assets/backtest-engine.js');
+  const n = BT.drawNorm([{ type: 'h', price: 4000, alert: true }, { type: 'r', t1: 1, p1: 1, t2: 2, p2: 2, alert: true }, { type: 't', t1: 1, p1: 1, t2: 2, p2: 2, alert: 'yes', fired: 5 }]);
+  assert.equal(n[0].alert, true, 'kept on a line'); assert.equal(n[1].alert, undefined, 'never on a box'); assert.equal(n[2].alert, undefined, 'only true'); assert.equal(n[2].fired, 5);
+  assert.match(SRC, /if \(!fin\(lv\) \|\| \(prev - lv\) \* \(px - lv\) > 0\) continue;\s*delete d\.alert; d\.fired = t;/, 'fires on a cross, then switches itself off');
+  assert.match(SRC, /data-alert title="Tell me when price crosses this line \(while this page is open\)"/);
+  const blk = SRC.slice(SRC.indexOf('// ---- line alerts'), SRC.indexOf('// read-only view for the audit'));
+  assert.doesNotMatch(blk, /fetch\(|XMLHttpRequest|sendBeacon|\.stop\s*=/);
+});
