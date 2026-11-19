@@ -1,0 +1,552 @@
+{
+  "status": "PASS_BOUNDED_SOURCE_INVENTORY_GAPS_RETAINED",
+  "validated_at_utc": "2026-11-17T21:15:14.546561+00:00",
+  "regular_monthly_records_across_six_families": 216,
+  "additional_ip_annual_revisions": 3,
+  "known_ppi_reissues": 1,
+  "ip_date_only_correction_notices": 2,
+  "bea_supplementary_flow_dates_or_scope_questions": 12,
+  "dol_archived_pdf_sample_only": 8,
+  "frozen_core_families": [
+    "FOMC statements",
+    "BLS Employment Situation",
+    "BLS PPI",
+    "Census advance retail sales",
+    "BEA GDP including revised estimates",
+    "BEA Personal Income and Outlays/PCE",
+    "Federal Reserve industrial production",
+    "DOL weekly initial claims"
+  ],
+  "preserved_intervals": 133,
+  "unique_saved_source_bodies_hash_and_length_verified": 121,
+  "ip_manifest_http_successes_verified": 93,
+  "ip_receipt_header_allowlist_verified": true,
+  "independent_census_interval_check": {
+    "file": "work/census-and-interval-independent-check-2026-11-17.json",
+    "sha256": "e9355a40b3d60ef041151cb72a6b0725a0aeaaf9acdd545a10afcf0ae3a50f5e",
+    "passed": 23,
+    "failed": 0
+  },
+  "inventories": [
+    {
+      "file": "work/bls-core-overlap-route-2026-11-17.json",
+      "sha256": "536e9e262e57f501460813537b534cf61a2406561e9d09d719700988b5e28f34"
+    },
+    {
+      "file": "work/bea-core-overlap-route-2026-11-17.json",
+      "sha256": "b3e5c863d24513b4aecc9bf266991bbe8ebc19e470eadabd208587748bb73468"
+    },
+    {
+      "file": "work/census-retail-overlap-route-2026-11-17.json",
+      "sha256": "f3529544d45c4b84d6136ca082318e9547fc061bd885f7c2ec4d29033fa21a3d"
+    },
+    {
+      "file": "work/claims-ip-overlap-route-2026-11-17.json",
+      "sha256": "66bd97e0868890791ff811f7d346450034f21872e449a32c70e2afbd8d7c4262"
+    }
+  ],
+  "interval_projection": {
+    "file": "work/treasury-core-overlap-intervals-2026-11-17.json",
+    "sha256": "31ecf6b0df2de00cf60fd8800e769fd6750a7d0326319a99fd64869bc18f34d2"
+  },
+  "source_bodies": {
+    "work/raw/bls-core-overlap-2026-11-17/bls_annual_data_open.txt": {
+      "sha256": "5ad07e32a5ee9a01b1b44b1bc99421e5a11ed326e99175bdf76166d90f014327",
+      "bytes": 25398
+    },
+    "work/raw/bls-core-overlap-2026-11-17/bls_annual_open.txt": {
+      "sha256": "bbc657b8ef7b58c6fdcad5d695e2d9419a331bfbc2d0323f7a5d6f6eb5ceee4c",
+      "bytes": 26839
+    },
+    "work/raw/bls-core-overlap-2026-11-17/bls_aug_sep.txt": {
+      "sha256": "928a07e409fc6d32e33cfe87110a0f63c39e29e00231d2dee68e418163a6c30d",
+      "bytes": 26183
+    },
+    "work/raw/bls-core-overlap-2026-11-17/bls_mar_may.txt": {
+      "sha256": "ce77ce1d8ed2c1efe6a92add95ae7343bdd51732ea702ef8b3309d08608d4a0d",
+      "bytes": 25639
+    },
+    "work/raw/bls-core-overlap-2026-11-17/bls_mid_calendars.txt": {
+      "sha256": "996816b05f744ba3ef69cd394616370226d7fcbe16eceb7317e1283a53ff8604",
+      "bytes": 25978
+    },
+    "work/raw/bls-core-overlap-2026-11-17/errata-ppi-reissue-excerpt.txt": {
+      "sha256": "7d9ec79d92d0188ec0ab0127259b6a85d870d88accaf00efccb490ec93277401",
+      "bytes": 707
+    },
+    "work/raw/bls-core-overlap-2026-11-17/native-fetch-receipts.json": {
+      "sha256": "37a42058400b14a09d79d5fe2b2b1a2b2cb7cebba268ed2de7a6a78d4ca0c9b0",
+      "bytes": 2226
+    },
+    "work/raw/bea-core-overlap-2026-11-17/calendar-2022.web.txt": {
+      "sha256": "769c83267420727f9405f2b7ba02cad6016dff32b07d6161f143626bf277a9f0",
+      "bytes": 6647
+    },
+    "work/raw/bea-core-overlap-2026-11-17/calendar-2023.web.txt": {
+      "sha256": "f924ec76e1599b3b6a90b0b3f069f36b16256c6c3627bda6f24d0ea9813a13cd",
+      "bytes": 6727
+    },
+    "work/raw/bea-core-overlap-2026-11-17/calendar-2024.web.txt": {
+      "sha256": "9ad8d00be2efa79e58933f233544655c51be1971b922aa0b38c736f2ecb8a06a",
+      "bytes": 6481
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-4.web.txt": {
+      "sha256": "656a4771fc1b5a9d242dbc722b772b75d7928451b60974b226bb289ed59d9a81",
+      "bytes": 2909
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-5.web.txt": {
+      "sha256": "3ab91bc465530e445ac01bc5c076328bf81f9d42d37afe3c1a125233e9afa1b3",
+      "bytes": 2808
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-6.web.txt": {
+      "sha256": "405ba5ebd6420dd05ee4b287811eb22cfcd73f9a11958c4c0f6dc495eb5d7434",
+      "bytes": 2844
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-7.web.txt": {
+      "sha256": "7cf1f843358a7c2d564ad66f9b69d4f047c3e27c38babe5d140f1a5ab83921a0",
+      "bytes": 2935
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-8.web.txt": {
+      "sha256": "5c5da2e8503e9aead16e3fb59a67e632efc3854d050aa772d5da9aaca1deb163",
+      "bytes": 2795
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-9.web.txt": {
+      "sha256": "97f0a5cca3ccbe300c40db453be5461c33279e2cbe74d927d784aba6b1706eb5",
+      "bytes": 2846
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-10.web.txt": {
+      "sha256": "83d0d5224d6c44ee09dc846e6e0aecd7f8460aaaa5d0ddcc10f289f45e0ebe8b",
+      "bytes": 2822
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-11.web.txt": {
+      "sha256": "5f70ddfc3b601dc38e71dd6ec86ec487d416ab5879f27a9fb1cc9da43765cd58",
+      "bytes": 2769
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-12.web.txt": {
+      "sha256": "35d633f2cac872bb97fbd0ae7e4059a60fc54b195f8361461237be64e2b5f0f1",
+      "bytes": 2794
+    },
+    "work/raw/bea-core-overlap-2026-11-17/archive-page-13.web.txt": {
+      "sha256": "6c2228b5916f179f1c6b5b1ab7f0c6171d4e1edfe7caa1410cb1006d8f28bb8d",
+      "bytes": 9385
+    },
+    "work/raw/bea-core-overlap-2026-11-17/2023-update.web.txt": {
+      "sha256": "95a51146bf9e44e5cf2e0b2f0c654d8190a65f07d67727f692769426bb686eb9",
+      "bytes": 13693
+    },
+    "work/raw/bea-core-overlap-2026-11-17/2024-update-and-route-errors.web.txt": {
+      "sha256": "6fbbfa15ee9f0878ba2a6ed14696929618f786b9889e307ead31fc5402639c81",
+      "bytes": 11642
+    },
+    "work/raw/bea-core-overlap-2026-11-17/2022-update-and-2024-schedule.web.txt": {
+      "sha256": "5b91aab4ddec81f247ba967e0849b0c6ffb8cbe75b06fe073ce14cd249a9b691",
+      "bytes": 12802
+    },
+    "work/raw/bea-core-overlap-2026-11-17/previous-updates-and-special-time.web.txt": {
+      "sha256": "de0836888cc78faffa9d05feb3b9667408b0016bd3a8ceb08c31c7a1d757d51b",
+      "bytes": 25431
+    },
+    "work/raw/census-retail-calendar-2026-11-17/calendar-2022.html": {
+      "sha256": "0305d154f241f527395195ed80b9bfac8baa860d7373e72a077934caad9f28d9",
+      "bytes": 82219
+    },
+    "work/raw/census-retail-calendar-2026-11-17/calendar-2023.html": {
+      "sha256": "99b2224476c5a48a234e46142e992feb76c074a694e4d7b74451227e582783fe",
+      "bytes": 82624
+    },
+    "work/raw/census-retail-calendar-2026-11-17/calendar-2024.html": {
+      "sha256": "3308aebb94a0d5f029cb444bb1d7d854784c706296b4ccf8c2d8c74999ccc1d7",
+      "bytes": 81226
+    },
+    "work/raw/census-retail-calendar-2026-11-17/release-schedule.html": {
+      "sha256": "cf9db2db8e1e4c33293ebac86076e7e52429a95eee15c2ba69011979962738d7",
+      "bytes": 53350
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_archive.html": {
+      "sha256": "aaf1ade106a79afca449491b1c60b11d968588b1d626caf429413a32a8e94cb5",
+      "bytes": 333176
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_release_dates.html": {
+      "sha256": "8c2715df95af191f9630551636858735a47426b1c1206d3e1a4ec124b66297f3",
+      "bytes": 117274
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_ui_archive.html": {
+      "sha256": "3adf9e071bc6cf1d87bfca6dd4abff253ca6c1237faada6d28b89e4aa84c4ed1",
+      "bytes": 56901
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_ui_archive_year2024.html": {
+      "sha256": "3adf9e071bc6cf1d87bfca6dd4abff253ca6c1237faada6d28b89e4aa84c4ed1",
+      "bytes": 56901
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_ui_archive_yr2024.html": {
+      "sha256": "3adf9e071bc6cf1d87bfca6dd4abff253ca6c1237faada6d28b89e4aa84c4ed1",
+      "bytes": 56901
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_ui_archive_cy2024.html": {
+      "sha256": "3adf9e071bc6cf1d87bfca6dd4abff253ca6c1237faada6d28b89e4aa84c4ed1",
+      "bytes": 56901
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-12-17.html": {
+      "sha256": "221eeadb2bcf579b9ea61f8cabf997c4aa1bab3970e35365e0d49fb3d14affdc",
+      "bytes": 113895
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-11-15.html": {
+      "sha256": "cf345b0d03695878065a7cfcdf58c2c0baf9f7cf584bb8fabdce8554ff95aeee",
+      "bytes": 114050
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-10-17.html": {
+      "sha256": "5b7bd24763a26d09bf6e9a54cbaa9ad7312f813cc3ab9d144ab7ca1834e5fab6",
+      "bytes": 113938
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-09-17.html": {
+      "sha256": "0c4b703774f1340282c9b953eceb3b8437c5abdcf59288e19a90d4e765c153dc",
+      "bytes": 114369
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-08-15.html": {
+      "sha256": "47eda2eb49cfda9b329e19e5fd8b0fb539b3a28704405eb8619938dacee8504d",
+      "bytes": 115637
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-07-17.html": {
+      "sha256": "0bf645a454c56b39b5dd55e8d336816349bcdd692cc0dc51a28f57107f2c139c",
+      "bytes": 115310
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_annual_revision_2024-06-28.html": {
+      "sha256": "bd2fed4caee3229916108311d24bd143c3751fb94fe3f23b2fb1f0b379eca4fa",
+      "bytes": 112546
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-06-18.html": {
+      "sha256": "5ab863b430035cab5d16d0ffb29a6090c39c16662421ef3f9018b74cb8662ff7",
+      "bytes": 114991
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-05-16.html": {
+      "sha256": "ef950af19a8367bdd8ec15ddbd611185ce4911726aa0be5c17e077c113b51532",
+      "bytes": 115329
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-04-16.html": {
+      "sha256": "538eaebf978e86d59795d2281282999bca5f86c054e00f0024742a79420f0e38",
+      "bytes": 115656
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-03-15.html": {
+      "sha256": "926ddee6762654a538c881e8b752dca2d791d7ef18a25338454a34a5475a3332",
+      "bytes": 114781
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-02-15.html": {
+      "sha256": "c615d96346ff2177b55539fcd94e057b8f4223392033c9c05ab1e82d6842ee63",
+      "bytes": 115410
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-01-17.html": {
+      "sha256": "a87b7d6f7473aaf580d26cfa6d86971bb8dfdb8d88b9938e1066e06812e7d3fa",
+      "bytes": 114756
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-12-15.html": {
+      "sha256": "a33a1fe577da678063bc36eeaec03315a1491a355c2a8e695e5c413ccfe6f0a9",
+      "bytes": 113631
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-11-16.html": {
+      "sha256": "ca376c3edef3fb403228d9d6f79fd399a12a58c0fcb1e1c7112e3a07e0815fac",
+      "bytes": 113420
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-10-17.html": {
+      "sha256": "de82e4b456e6e31ba6f293ee53aa638b6bc2cc5bedfb05b34e0d0d0bfb01cc82",
+      "bytes": 113098
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-08-16.html": {
+      "sha256": "cf46138293a719f71881114bfd8a386d7895db7437a214d554732ac8bd6a3d48",
+      "bytes": 111263
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-07-18.html": {
+      "sha256": "40ba37e5441204151037f3dc3a052f87986f101a09338fe71c2d97bd8b48c66b",
+      "bytes": 111315
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-06-15.html": {
+      "sha256": "a92f14ad12d5661e092ae476c99a037add2ef245f98e7a23b8b4e87054a49d15",
+      "bytes": 110906
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-04-14.html": {
+      "sha256": "c79619f8c5440b27ffd5e7039907558bf32f7ac2463e219483c22e62d578dcc3",
+      "bytes": 112974
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_annual_revision_2023-03-28.html": {
+      "sha256": "63969290e7998e74a28b78f577f0edc34f51a17fb7e382676d882213178ab308",
+      "bytes": 109463
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-03-17.html": {
+      "sha256": "11cc3f0efedccb0bae120f243c36ba245fb6781207fe1e2bb56cd87991a00fce",
+      "bytes": 113128
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-02-15.html": {
+      "sha256": "6f859cda6c561191c45bb4f1b46c597028b6ffb02cc5c74d0c8ea46decf7192a",
+      "bytes": 113437
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-01-18.html": {
+      "sha256": "395dabbce556d12b3948a3faed9277e6c31030855657c4084758065d4e0d9d98",
+      "bytes": 112802
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-12-15.html": {
+      "sha256": "b3d8245ae65f84aae36b0936808ea6df88343806c9bdeabcc43b6cccf895db00",
+      "bytes": 111196
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-10-18.html": {
+      "sha256": "faf9bd7de4d7692078e5ee6f06b80010a7df31f5beecbaec8a99d5fdaf989eb9",
+      "bytes": 111311
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-08-16.html": {
+      "sha256": "567d2e8672b66a7022a28dabc223944e990da5aad78209306d8dacde88c1f22c",
+      "bytes": 113285
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-07-15.html": {
+      "sha256": "0f9ca7be0f66701754c5174104fb59daf288264ebdcd6d74b750ae4eb3bacba4",
+      "bytes": 113389
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_annual_revision_2022-06-28.html": {
+      "sha256": "fbb3ee8d23894f0d5976e686accc3ba37297346a4939e44e190a5b2d09822af0",
+      "bytes": 91723
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-06-17.html": {
+      "sha256": "05bd42ef31eb20d3d3682783e4ecf95e4391fab85e311beac2d0c047f9ffdb6f",
+      "bytes": 93784
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-05-17.html": {
+      "sha256": "57e251877d618eca260b6c58c1c2556bbc218744c56c3ff4114053a2daf088d8",
+      "bytes": 94416
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-04-15.html": {
+      "sha256": "c2d5ac377c4c377d4be58976de33542bb7ed8c5ee2915a2d1ba5879cef241a13",
+      "bytes": 94456
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-03-17.html": {
+      "sha256": "e6b7f5b2c4f1f386d5eea31a68495846d6a3ee229e2a89087ef8bdee5e2f874b",
+      "bytes": 94649
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-02-16.html": {
+      "sha256": "b620c74de50f3c13400442385e15fd22d244a00c5d1331a328f928c7ccd772cf",
+      "bytes": 95311
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-01-14.html": {
+      "sha256": "624248306d28d6bd254e0e43870a6dcf1836f60a8b9331fa59a6ad00df0ec1f9",
+      "bytes": 94430
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_announcements.html": {
+      "sha256": "4e4244162011d958c30d175778bb7d19c855759226255680650f7be86a8de907",
+      "bytes": 622985
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2022_010622.pdf": {
+      "sha256": "dbe74597722307ffdbe87140b1e080c506cec6a44b2a1cf621a8ba4d080839f1",
+      "bytes": 787714
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2022_112322.pdf": {
+      "sha256": "3f1a2da45b180baf476c07916fb07a31425623afc9d88b9e29659f9e34487673",
+      "bytes": 570512
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2023_010523.pdf": {
+      "sha256": "c13896d486f1d071f88e93421f87b1631fd031d8ad91662c4cf230effd712fe7",
+      "bytes": 706661
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2023_112223.pdf": {
+      "sha256": "7fa7f7e0308b469a15e86201f19d3cf6bff00752ca5de3a7d618147cd53e2d99",
+      "bytes": 601771
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2024_010424.pdf": {
+      "sha256": "89e02839c024633029228ab82cd45785c2525625828c163bd952dee1e3ab106d",
+      "bytes": 640139
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2024_070324.pdf": {
+      "sha256": "0d7dea1e8ae212d894c361d0803503f9dc1fa3541f0d840fe023cb893aa81fff",
+      "bytes": 907285
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2024_112724.pdf": {
+      "sha256": "b1c43206122d75dc75fe08d167da471c544e645b95c79326977b798be4103f9c",
+      "bytes": 327323
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/dol_claims_2024_122624.pdf": {
+      "sha256": "3dd9e489ad878fa60ff4192cb65fee74056d8b77863e5a64fffbdce3fe41829e",
+      "bytes": 597755
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-01-14_pdf.pdf": {
+      "sha256": "d9237fdd87ce6074212d76014706942823636fee638c32d84ccfd65068cf3502",
+      "bytes": 296000
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-02-16_pdf.pdf": {
+      "sha256": "e4e6ea44311e9ca4d249730fcb9f13e4889f9f51990107da03b29acbe7bde9e9",
+      "bytes": 296340
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-03-17_pdf.pdf": {
+      "sha256": "c4e880749668735904712ddac09e2d82def61caf6793eb922dc33171d74973f1",
+      "bytes": 295279
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-04-15_pdf.pdf": {
+      "sha256": "1dea170593dd4c74aef0236a0cfe2940bbc5ea35473dfbd39f46b4f5df988a38",
+      "bytes": 294115
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-05-17_pdf.pdf": {
+      "sha256": "c047f96bf00cc33ab31a588963b58688581567459a327f9e2a4783408947ff5a",
+      "bytes": 295247
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-06-17_pdf.pdf": {
+      "sha256": "cddad90d37baa82cd3c1c0edfc998f680d72d3959d598a12304f5f6053906d9b",
+      "bytes": 294975
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_annual_revision_2022-06-28_pdf.pdf": {
+      "sha256": "eeb379b5d48b90ae39d57d02a3ad55e9edcf76e083b3635a8b5a4c03288bd99b",
+      "bytes": 404328
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-07-15_pdf.pdf": {
+      "sha256": "e1c404e743f66d11fb63ff7e0382035a50998fd77717d87f96d05f3559b31a66",
+      "bytes": 294823
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-08-16_pdf.pdf": {
+      "sha256": "5551c95484f16fa4e6d017f0bdbca88c1bbb3dac633fb170242414ba779d9147",
+      "bytes": 295412
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-09-15_pdf.pdf": {
+      "sha256": "38fd69fbac82b870e40fad6653ca545cf22a3b9923b7f9ea3b89d297ca1beead",
+      "bytes": 294421
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-09-15.html": {
+      "sha256": "dcb557b0592fdf0e7c4c28ab79f54be1e1a0ce82e2c64e7a81dc391fba159768",
+      "bytes": 112504
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-10-18_pdf.pdf": {
+      "sha256": "0c381d4f7e59414145b223f6830f8d7fe43aa1dc893e52577b08f5301692d6f8",
+      "bytes": 292335
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-11-16_pdf.pdf": {
+      "sha256": "3a7acbda909e1e142ffa97943e445be6914703aa5c5fe10c7783a1f4889fbbaf",
+      "bytes": 292731
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-11-16.html": {
+      "sha256": "44cde1301948bb6207373f0f88743fa3a5708581daad46eb0ec49fa89ba01108",
+      "bytes": 111295
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2022-12-15_pdf.pdf": {
+      "sha256": "253d15fe509fe1a837b2d03de02c6660f63c6c83a36716e69877f8161bb3ba00",
+      "bytes": 293622
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-01-18_pdf.pdf": {
+      "sha256": "b78f5855dcd0efa5261c6f11be63599c9ed93a3e791bb19ed54f0a9b0743ab93",
+      "bytes": 296097
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-02-15_pdf.pdf": {
+      "sha256": "2c522447ac220b1eb11811ce60f0429316e7502068599829e246e1f0afbbfc07",
+      "bytes": 296819
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-03-17_pdf.pdf": {
+      "sha256": "c266a677946d3d235b45c3427d26c9a5738a19a164181d1ee8075a26d5000c2c",
+      "bytes": 294454
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_annual_revision_2023-03-28_pdf.pdf": {
+      "sha256": "b0d85ae7938d17c94e1907326b626af6b0fd85dc7a6be2990f48e8c320afae40",
+      "bytes": 402795
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-04-14_pdf.pdf": {
+      "sha256": "100fa03564e3cb657b54fae8118548ac7a963df89c0bff1a4dfc10d00d546f5f",
+      "bytes": 294457
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-05-16_pdf.pdf": {
+      "sha256": "0eff0be062f55d07ebe46b8f3b069928d744c68b63b7fd719ff2edc99b944d14",
+      "bytes": 294852
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-05-16.html": {
+      "sha256": "6a26b590d39f6775871b3d78482817bcd8496ea88a0ab73a5edfebcd0f6e45df",
+      "bytes": 113065
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-06-15_pdf.pdf": {
+      "sha256": "007774e5d93710dca5c59fe979776d3d47c2e39b92514c84e9130fd14987b0f7",
+      "bytes": 293501
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-07-18_pdf.pdf": {
+      "sha256": "8dd77e6142dd11fe16aa63ec5a4dc96dcd39efdeed17b254012401ce25faa519",
+      "bytes": 293160
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-08-16_pdf.pdf": {
+      "sha256": "b7cb0932f629da8b18ab39a5d253051b6c28f6c0db5f01d7bf6f3a69998a7cbb",
+      "bytes": 293797
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-09-15_pdf.pdf": {
+      "sha256": "b4c7dc32104013e282928acbc2807db93bf2fb4227f86e22c53a8b7c09bbd02d",
+      "bytes": 293593
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-09-15.html": {
+      "sha256": "50e43a2d752e66e4961cbd28ef682c76f28ddc8e029cf267de3449e6ccc54ccd",
+      "bytes": 111271
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-10-17_pdf.pdf": {
+      "sha256": "a3d8624f4f8406e173756beac10fbe747e74aa29d0939ba401c73c1d29ece7d7",
+      "bytes": 293673
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-11-16_pdf.pdf": {
+      "sha256": "7653bc18d46479f8fa01d64f840f474cd0d9c767324bff86c9c1fb58d1723b9b",
+      "bytes": 294008
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2023-12-15_pdf.pdf": {
+      "sha256": "e14697e903856ea6dfe167465dc27ef9bf86fee6a133db41f89c51364a9dd56f",
+      "bytes": 294562
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-01-17_pdf.pdf": {
+      "sha256": "3393009c0e8e287a57f6aae7cbdc7bc6baaaf27e5a1fa9188b8bed94571738fd",
+      "bytes": 297194
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-02-15_pdf.pdf": {
+      "sha256": "aaf7f0cde1e2dc1d89c25fc3f1f12854c5ece880284b07774b50f58d72f35d73",
+      "bytes": 297448
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-03-15_pdf.pdf": {
+      "sha256": "e2abf7738ce401fd1e439ecff5d137e1dfbbca246d6b7cb10e5ad6ed4e6b53cf",
+      "bytes": 296320
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-04-16_pdf.pdf": {
+      "sha256": "a9c931516cbf3d2b882babb20ee91d04d6c21c074189cbf3048d6261a6414b13",
+      "bytes": 297293
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-05-16_pdf.pdf": {
+      "sha256": "acedc7da61a92ef359acc5a861835686308745cae17194d4e813d3c9747f89b3",
+      "bytes": 296613
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-06-18_pdf.pdf": {
+      "sha256": "9ab74767dd7b4f3aefebe5cc65e8a619e58336de76b29ba12377d30a5bab663c",
+      "bytes": 297135
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_annual_revision_2024-06-28_pdf.pdf": {
+      "sha256": "fdd6632ddf7b4d35bfe96063487d13bb9562e2d790084b4c24dcfaad5dab01fa",
+      "bytes": 390128
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-07-17_pdf.pdf": {
+      "sha256": "ddfb5f62c14ce9fa9b7063fd4786fcfed7071746d477fe4601ae321bb5631368",
+      "bytes": 297087
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-08-15_pdf.pdf": {
+      "sha256": "11192c7f4e034794b1d9af3cac04c64ea0c09b5f706552f3aab32f2b28a3985a",
+      "bytes": 297680
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-09-17_pdf.pdf": {
+      "sha256": "6785f2dc896fe591fb4d08f599faeb3a3d98f2a59c114b27ac900372d9bdb719",
+      "bytes": 295185
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-10-17_pdf.pdf": {
+      "sha256": "c292349406294aebf452b593fbd3f6a906f337f0b7a0592eba6f6b1846a0bbb4",
+      "bytes": 295151
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-11-15_pdf.pdf": {
+      "sha256": "ba215c08846c845ea944e66dc9b19bc9a96d86c43fd3821ca489e470027be27f",
+      "bytes": 295728
+    },
+    "work/raw/claims-ip-overlap-2026-11-17/fed_g17_monthly_release_2024-12-17_pdf.pdf": {
+      "sha256": "e635d6c1ae5d28b76ec74595bc34219be83eaba336b7d618f3eefcef9dec25cb",
+      "bytes": 295612
+    }
+  },
+  "bea_receipt_note_copyedit": {
+    "before_sha256": "f736aff34dbe6f9428a405b1e6c0832e835de3356b7b22ffcce9b7a1dca6c497",
+    "after_sha256": "b3e5c863d24513b4aecc9bf266991bbe8ebc19e470eadabd208587748bb73468",
+    "change": "Replaced stale hash-to-be-filled wording after confirming hashes were populated; source bytes, dates, clocks and numeric metadata unchanged."
+  },
+  "broader_official_calendar_coverage_complete": false,
+  "broader_exclusion_applied": false,
+  "new_outcome_or_return_analysis_performed": false,
+  "limits": [
+    "Local source bindings, inventory counts and independent Census/interval projection only; not exhaustive independent review of every family fact.",
+    "Current source hashes, printed release headers and official schedules do not authenticate historical first network availability.",
+    "Retrospective source/notice coverage, date-only clocks, supplementary scope and DOL enumeration remain unresolved.",
+    "No new Treasury sensitivity result, clean-window label or control rematching; earlier study results and delivered ZIPs retained."
+  ]
+}

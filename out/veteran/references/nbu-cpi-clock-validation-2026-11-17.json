@@ -1,0 +1,519 @@
+{
+  "status": "PASS_SAVED_CONDITIONAL_CLOCK_METADATA_VALIDATED",
+  "validated_at_utc": "2026-11-17T20:55:28.521415+00:00",
+  "scope": "Bounded verification of saved source outputs; no timezone-library rerun, research or downloads.",
+  "interpretation": "Conditional reference clocks only; NOT actual publications, quote timestamps, price freshness or event-study observations.",
+  "summary": {
+    "events": 36,
+    "cross_result_fields_compared": 756,
+    "conditional_cases": 35,
+    "frozen_cases": [
+      "2022-03-10"
+    ],
+    "dst_exception_dates": [
+      "2023-03-14",
+      "2024-03-12"
+    ],
+    "early_publication_caveat_retained": "2024-05-15",
+    "failures": 0
+  },
+  "checks_by_category": {
+    "hashes": 88,
+    "bindings": 117,
+    "metadata": 481,
+    "per_event_cross_result": 756
+  },
+  "failures": [],
+  "timestamp_comparison": "ISO timestamps normalized to aware UTC datetime instants; optional milliseconds are representation only.",
+  "saved_runtime_provenance_unchanged": {
+    "root_python": {
+      "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+      "tzdata_version": "2026.6",
+      "zone_loading": "ZoneInfo.from_file over explicitly hashed tzdata package bytes; no system-path/cache dependency.",
+      "zone_file_sha256": {
+        "Europe/Kyiv": "0589e80ddecebf9d3077898c12975d2be7393df2856ee9926c534763e1e26bf2",
+        "America/New_York": "d7f2206b3a45989fc9ad63d558922532fa7352280d5f87176bf1db79cb1d1fa9"
+      }
+    },
+    "independent_javascript": {
+      "engine": "Node Intl.DateTimeFormat; independent of Python zoneinfo",
+      "node": "24.16.0",
+      "icu": "78.3",
+      "cldr": "48.0",
+      "tz": "2026b",
+      "v8": "13.6.233.17-node.49",
+      "platform": "win32",
+      "requested_zone": "Europe/Kyiv",
+      "resolved_options": {
+        "locale": "en-GB",
+        "calendar": "gregory",
+        "numberingSystem": "latn",
+        "timeZone": "Europe/Kiev",
+        "hourCycle": "h23",
+        "hour12": false,
+        "year": "numeric",
+        "month": "2-digit",
+        "day": "2-digit",
+        "hour": "2-digit",
+        "minute": "2-digit",
+        "second": "2-digit"
+      }
+    }
+  },
+  "validator_runtime": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:01:42) [MSC v.1944 64 bit (AMD64)]",
+    "timezone_library_used": false,
+    "offset_arithmetic": "Only the saved explicit numeric offsets; no ZoneInfo/Intl imports or conversion rerun."
+  },
+  "bound_files": [
+    {
+      "file": "outputs/cpi-first-print-release-ledger-2022-2024.json",
+      "sha256": "0004d715f03c8e6f557721cf527dee4fad4a98dcea1679d9212efa58c9012052",
+      "bytes": 147234
+    },
+    {
+      "file": "outputs/nbu-cpi-clock-compatibility-2022-2024.json",
+      "sha256": "81f4efe66929e58e0f49500af5e9e6910013f1b411df582e532f3818ed8e0e09",
+      "bytes": 86222
+    },
+    {
+      "file": "outputs/nbu-cpi-clock-compatibility-2022-2024.md",
+      "sha256": "daf43db54f64b0ccf41f3af2716e9436b93a2bbc271109fc3e18622cd806d61c",
+      "bytes": 3489
+    },
+    {
+      "file": "outputs/scripts/nbu-cpi-clock-audit.py",
+      "sha256": "fb881c439c9c1b5bfdccea1974828a81bf84323ddb9ff8241214daaaa71943c5",
+      "bytes": 6994
+    },
+    {
+      "file": "work/nbu-cpi-clock-independent.json",
+      "sha256": "2bcabb553d894fa4b0e967ec443e32aa48ddfb5a2b91e40dd7e2d2385e5dd589",
+      "bytes": 75958
+    },
+    {
+      "file": "work/nbu-cpi-clock-independent.md",
+      "sha256": "3e4a11c98acd66ca1e53933d93af966e92d8a3865f0224ec633d5f7a513d2f7b",
+      "bytes": 9776
+    },
+    {
+      "file": "work/nbu-date-label-profile-2022-2024.json",
+      "sha256": "e0dc4dd1ddf57c489689368e3528e524efb0ff4da44cc0276ec64ab8a37f1906",
+      "bytes": 533986
+    },
+    {
+      "file": "work/nbu-gold-method-version-audit.json",
+      "sha256": "58b03a7015ce9f6e17ad466447602f5a50d7b26a50c0fcc9d838fafc565cd69a",
+      "bytes": 51231
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_01112024.htm",
+      "sha256": "5af03777daf991ada26ce61a3002e3f49d9f8f25c3e4ce88131692c86a6eb7e6",
+      "bytes": 1369632
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_01122022.htm",
+      "sha256": "45ca364e1633fd50ab3a299a5da2abe5cf9086f36c8aecfe4dd9f4658df50174",
+      "bytes": 1349362
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_01122023.htm",
+      "sha256": "9d5d5aa086ad1b9f299e9ea2603ef76695b4b2c8abe48ca90554c9237e8d60a1",
+      "bytes": 1370787
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_02102022.htm",
+      "sha256": "278ff1e8da6a2c199312427cba7e1dbd0102da6a31d2c0dd2264113834abbd1f",
+      "bytes": 1345668
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_02132024.htm",
+      "sha256": "90914201190d8f8b1f19da73932f83e2c3651f31316a65de6de5dd605647cb16",
+      "bytes": 1363495
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_02142023.htm",
+      "sha256": "5bddfbdd162cc083d7b8db217f5093612544f1b6f29a525740f65bfb34223c00",
+      "bytes": 1364964
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_03102022.htm",
+      "sha256": "89ebc9016ab0ea900fefddf2f3f186b8bcbe7a00cf8684f8059c3363ea7dc35a",
+      "bytes": 1347137
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_03122024.htm",
+      "sha256": "233d5f46067ec4110fcbb59e3c19a880f81184177f56733062dd312e4253ae66",
+      "bytes": 1362862
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_03142023.htm",
+      "sha256": "0d1282519139a5511365c44bafe20353c3a0fd41a81f0b94202df7238042cf41",
+      "bytes": 1363761
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_04102024.htm",
+      "sha256": "c23838dff36779ca5a3e439b9d5c451b1cbb8689adebcfb42c477dd9284337b8",
+      "bytes": 1364250
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_04122022.htm",
+      "sha256": "7d654607289ed3e15ec297d2be342975a2121ce5d4c6deb25c61ec044785f18b",
+      "bytes": 1347435
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_04122023.htm",
+      "sha256": "ffdfcfe1c00558469848e28eeb1f0a1f716be8f90879a45f6ccd8d18daa34cb9",
+      "bytes": 1364487
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_05102023.htm",
+      "sha256": "0586dd5f313c59d400ca5795c3d202e0740317dd643fb25325abe3b513a27766",
+      "bytes": 1366737
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_05112022.htm",
+      "sha256": "d9d7eaa0508822501f09a3c5e691d64c23c9a9c1fbb48a1cc6d3fd5b2aa8c0eb",
+      "bytes": 1366149
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_05152024.htm",
+      "sha256": "5ed19921c617b95f99140ad464a59c142d5d24726a39508a67d471660a4185c8",
+      "bytes": 1364198
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_06102022.htm",
+      "sha256": "03658a0ce2c08701bb423cf232e8c255555abe84fc77ff802fe2e728927fc7d9",
+      "bytes": 1366432
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_06122024.htm",
+      "sha256": "76eff97eff76a812263bd21d8e55c29c42ea2b883c7dea4ff98f326112cf8437",
+      "bytes": 1365393
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_06132023.htm",
+      "sha256": "441fbaa7e7e15727f107dbf06b7965dd0e35621501952af435d9a2ce12b26f65",
+      "bytes": 1366871
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_07112024.htm",
+      "sha256": "fb0a5c1351be3a2a15c6c249ed792d630af5e47e4c7278db492c079a702086db",
+      "bytes": 1364413
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_07122023.htm",
+      "sha256": "0dac29c5d2b108e4b32731f6b1db8d8da5372ddf6ac4802b4b1ee4932b3265d1",
+      "bytes": 1367243
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_07132022.htm",
+      "sha256": "0e4feecbeb007b5271816feb7a6209b3becb651ec0a850d56dcdd3f7e9c8b8a6",
+      "bytes": 1367409
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_08102022.htm",
+      "sha256": "f613dce5a40c06f857fc4c92f181dac917405bb541d707fbdc7d123787feff38",
+      "bytes": 1366655
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_08102023.htm",
+      "sha256": "847727876ffbf92677e38b6591743411666107ba883e90f2bd9da3584d96568b",
+      "bytes": 1367397
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_08142024.htm",
+      "sha256": "4568374b38f65dac54e32f3a166725e7e62fa2ed8ba38bc7aa280ba625e82781",
+      "bytes": 1364754
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_09112024.htm",
+      "sha256": "0d933d2577073291772e8123c6f1b7def0822ae3f4a009c0ef028587bad98217",
+      "bytes": 1364014
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_09132022.htm",
+      "sha256": "0fe793a6526f424fa85619b4283e172f0ae143ae94162f1a1910b968be1b97c3",
+      "bytes": 1367873
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_09132023.htm",
+      "sha256": "83a7380d4e81463a3266935617ac086f8edc5f2ef3b9fee826bd2b521eaccf49",
+      "bytes": 1368220
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_10102024.htm",
+      "sha256": "e2d8d6f1689494275ef6879be7548b97fcaec8862c944f6fc0f1911c621f6ac0",
+      "bytes": 1366088
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_10122023.htm",
+      "sha256": "5d33f0a6efd860412cdefe5911ab4cf0fa27e0dc852102c1cc5a6619bfb413cd",
+      "bytes": 1368922
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_10132022.htm",
+      "sha256": "10186f619f5b69fc3f0589a3953544ec72e730da62e0ac2593e89360889358a0",
+      "bytes": 1368107
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_11102022.htm",
+      "sha256": "003a8366cdc1ba4750dff3bf753d79ae3aba7b5965821dd0fb44581ed17d80f0",
+      "bytes": 1368844
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_11132024.htm",
+      "sha256": "ad0279d8d9bf165360affa63a8b640b28dbea9c49c6bfcc6f66f451d9e637769",
+      "bytes": 1370138
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_11142023.htm",
+      "sha256": "95e006e0d5d3093939016bd5b08159fb688aae1de2f256ef56caf041763d946b",
+      "bytes": 1370156
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_12112024.htm",
+      "sha256": "415282398015c224606261fb978ec7c61c35647ec5b3438fa3f613111217bb0e",
+      "bytes": 1370251
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_12122023.htm",
+      "sha256": "0342155f3fcb4dd68166c8c8e33e0a049662c97100de2d0f4903628d179b660e",
+      "bytes": 1370079
+    },
+    {
+      "file": "work/raw/cpi-expectations-history/bls-releases/cpi_12132022.htm",
+      "sha256": "a4897e63121e1941cdfee5d6f412df676a00e1f1b2c852859b2554bae48c2b69",
+      "bytes": 1371475
+    }
+  ],
+  "validator": {
+    "file": "work/validate_nbu_cpi_clock_audit.py",
+    "sha256": "b23355efb5cc0f16f315ae956379f869beb6923e423e0e01c0829e49c3ea5709"
+  },
+  "events": [
+    {
+      "release_date": "2022-01-12",
+      "paired_calcdate_label": "2022-01-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-02-10",
+      "paired_calcdate_label": "2022-02-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-03-10",
+      "paired_calcdate_label": "2022-03-09",
+      "frozen_rule_case": true,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-04-12",
+      "paired_calcdate_label": "2022-04-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-05-11",
+      "paired_calcdate_label": "2022-05-10",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-06-10",
+      "paired_calcdate_label": "2022-06-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-07-13",
+      "paired_calcdate_label": "2022-07-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-08-10",
+      "paired_calcdate_label": "2022-08-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-09-13",
+      "paired_calcdate_label": "2022-09-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-10-13",
+      "paired_calcdate_label": "2022-10-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-11-10",
+      "paired_calcdate_label": "2022-11-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2022-12-13",
+      "paired_calcdate_label": "2022-12-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-01-12",
+      "paired_calcdate_label": "2023-01-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-02-14",
+      "paired_calcdate_label": "2023-02-13",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-03-14",
+      "paired_calcdate_label": "2023-03-13",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-04-12",
+      "paired_calcdate_label": "2023-04-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-05-10",
+      "paired_calcdate_label": "2023-05-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-06-13",
+      "paired_calcdate_label": "2023-06-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-07-12",
+      "paired_calcdate_label": "2023-07-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-08-10",
+      "paired_calcdate_label": "2023-08-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-09-13",
+      "paired_calcdate_label": "2023-09-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-10-12",
+      "paired_calcdate_label": "2023-10-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-11-14",
+      "paired_calcdate_label": "2023-11-13",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2023-12-12",
+      "paired_calcdate_label": "2023-12-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-01-11",
+      "paired_calcdate_label": "2024-01-10",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-02-13",
+      "paired_calcdate_label": "2024-02-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-03-12",
+      "paired_calcdate_label": "2024-03-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-04-10",
+      "paired_calcdate_label": "2024-04-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-05-15",
+      "paired_calcdate_label": "2024-05-14",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-06-12",
+      "paired_calcdate_label": "2024-06-11",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-07-11",
+      "paired_calcdate_label": "2024-07-10",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-08-14",
+      "paired_calcdate_label": "2024-08-13",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-09-11",
+      "paired_calcdate_label": "2024-09-10",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-10-10",
+      "paired_calcdate_label": "2024-10-09",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-11-13",
+      "paired_calcdate_label": "2024-11-12",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    },
+    {
+      "release_date": "2024-12-11",
+      "paired_calcdate_label": "2024-12-10",
+      "frozen_rule_case": false,
+      "cross_result_fields": 21
+    }
+  ],
+  "limits": [
+    "Raw NBU price JSON was neither opened nor hashed. Its upstream hash is carried only by the pre-existing date-label profile.",
+    "BLS source HTML bytes were hashed only; no CPI outcomes, forecasts, errors, returns or price computations were performed.",
+    "Source hashes establish matching saved bytes, not original historical dissemination or source availability.",
+    "Existing report JSON/Markdown, audit code, index, checkpoint and immutable V1.4 ZIP were not changed.",
+    "The root and independent clocks retain their recorded timezone runtimes; current installed timezone data was not consulted."
+  ]
+}

@@ -195,10 +195,10 @@
       $('cpi').hidden = false;
       $('cpi').innerHTML = '<p class="k">The veteran\'s forecast: core CPI m/m, ' + esc(c.reference) + '</p><b>' + (c.point == null ? 'n/a' : (+c.point).toFixed(3) + '%') + '</b>' +
         '<p>Issued ' + esc(utc(c.issuedAt)) + '</p><p>BLS first print ' + esc(utc(c.releaseUtc)) + '</p>' +
-        '<p><span class="pill' + (c.status === 'resolved' ? ' ok' : '') + '">' + esc(c.status) + (c.outcome != null ? ' · actual ' + esc(String(c.outcome)) : '') + '</span></p>' +
+        '<p><span class="pill' + (c.status === 'resolved' ? ' ok' : '') + '">' + esc(c.status) + (c.outcome != null ? ' · actual ' + esc(String(c.outcome)) : c.pending ? ' · ' + c.pending + ' resolution attempt' + (c.pending > 1 ? 's' : '') + ' on file, no qualifying first print yet' : '') + '</span></p>' +
         '<details class="more-cpi"><summary>How it is scored</summary><p>Against the exact one-decimal first-release value, never a revision. One case, so no skill claim.</p></details>';
     }
-    if (I.whatsNew && I.whatsNew.length) { $('new').hidden = false; $('new').innerHTML = '<summary>What’s new in ' + esc(I.version || 'this revision') + '</summary><ul>' + I.whatsNew.map(function (l) { return '<li>' + mdInline(esc(l), '') + '</li>'; }).join('') + '</ul>'; }
+    if (I.whatsNew && I.whatsNew.length) { $('new').hidden = false; $('new').innerHTML = '<summary>What’s new in ' + esc(I.newIn || I.version || 'this revision') + '</summary><ul>' + I.whatsNew.map(function (l) { return '<li>' + mdInline(esc(l), '') + '</li>'; }).join('') + '</ul>'; }
   }
 
   function nav(q) {

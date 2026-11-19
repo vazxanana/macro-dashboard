@@ -217,7 +217,8 @@ export function sourceIssues(sources, now) {
       if (FRED_DAILY.includes(id) || k === 'ecb:2y') { const n = bizDays(last, today);
         if (n > FRED_BIZ.warn) out.push(['input', n > FRED_BIZ.bad && FRED_CORE.includes(id) ? 'bad' : 'warn', `${k} last value ${last}, ${n} business days old (normally ≤ 3)`]); }
       else if (FRED_DAYS[id]) { const d = Math.floor((now - dayT(last)) / DAY);
-        if (d > FRED_DAYS[id]) out.push(['input', 'warn', `${k} last value ${last} (${d} days old; over ${FRED_DAYS[id]} the strategist drops it as "no data")`]); }
+        // over a year past its limit it is a standing gap (18 Nov 2026: the Eurozone series of item 16 stopped in 2024): listed, not a daily warning
+        if (d > FRED_DAYS[id]) out.push(['input', d > FRED_DAYS[id] + 365 ? 'note' : 'warn', `${k} last value ${last} (${d} days old; over ${FRED_DAYS[id]} the strategist drops it as "no data"${d > FRED_DAYS[id] + 365 ? '; a standing gap' : ''})`]); }
     } else if (k === 'calendar:thisweek' && !ok) out.push(['source', 'warn', `this week's calendar ${s} (the last good copy is used)`]);
     else if (k === 'calendar:nextweek' && !ok) { if (lateWeek) out.push(['source', 'warn', `next week's calendar ${s}: the 1-5 day playbook misses Monday's releases`]); }
     else if (k.startsWith('bars:') && !ok) out.push(['source', 'warn', `${k} ${s}`]);

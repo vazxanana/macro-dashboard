@@ -2519,6 +2519,12 @@ Tests: `tests/signup.test.mjs` ("usernames"), `tests/gate-welcome.test.mjs`.
 - **Sign-in screen**: the desktop left side leads with the mark at 44 px and a larger wordmark (`.gs-brand`, last style block); on
   phones the card's wordmark is `inline-flex` again (a flex column made it a block and the words ran together: "AUREUMDESK").
 
+## The "macro" account lands on the Macro desk (18 Nov 2026, owner: "the first page for user macro will be the macro area not the desk")
+`api/_session.js` `account()` gives the account whose key is `macro` `home: 'macro'` (`api/_accounts.js` `publicRecord` passes
+`home` only as `mosha` or `macro`); the Desk's head script sends such a member (role viewer / reviewer, `macro` permission on) to
+`/macro-desk` once per browser tab (`sessionStorage ms-landed`), never when the address names a view (`#…`), so the Desk switch
+still opens the Desk afterwards. Test: `tests/macro-home.test.mjs`.
+
 ## The signed-in screen (18 Nov 2026, owner: "a similar animation for the login")
 Display only, `market-structure.html`. On a successful sign-in (password or passkey) the card's contents fade and `#ms-gate-ok`
 plays inside the card (`<style id="ms-gate-ok-css">` + `<script id="ms-gate-ok-js">`, before `#ms-su-sent-css`, reusing its
@@ -2636,6 +2642,19 @@ checks pass (never print minus previous) and, for CPI, reads the release-day 10Y
 a note to the verdict; no probability, rule or trade changes. `CLAIM` labels (descriptive association / prospective prediction
 / causal / execution) on the hypothesis card (`claimType`) and release records; `cpiPilot().label` never calls the unresolved
 pilot scored. Not ported (reading only): the NBU gold route, the Cleveland-vs-baseline plan, the GLD study.
+
+## Macro veteran: the 1.4 research outputs (18 Nov 2026, owner uploaded three zips)
+`research/macro-veteran/`: the new and changed `outputs/` files are in `references/` and the authored `work/*.md` in `notes/`
+(the 1.2 / 1.3 rule; scripts, raw captures, the synthetic CPI-resolution rehearsal and the forecast-schema test cases stay out).
+README.md "What's new in 1.4 research outputs" feeds the library (`index.json.newIn` = the heading's own words, since SKILL.md is
+still 1.3: `SKILL_VERSION` unchanged). Rule 6: product names in the markdown were made neutral (as in 1.3);
+`cpi-model-benchmark-protocol-2022-2024.json` is left out (it names a product and its bytes are bound by a published SHA-256, so
+it is never edited; the `.sha256` stays). **The CPI pilot**: the batch appended a `record_type: "resolved"` line with
+`outcome: null` (a pending attempt: today's archive shows 0.3%, the original release-day evidence is unauthenticated). Both readers
+(`council/veteran.mjs` `cpiPilot`, `scripts/veteran-index.mjs` `cpiPilot`) count a resolution only with a numeric outcome; a null
+one is `pending` (the desk and /veteran/ say "unresolved · 1 resolution attempt on file, no qualifying first print yet"). Before
+this fix the desk would have called it "resolved against the BLS first print". Tests: `tests/veteran.test.mjs`,
+`tests/veteran-library.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
@@ -3114,21 +3133,35 @@ Measured at 390 x 844 on the 11 Nov files: 8.9 screens → 1.9, 1,357 words → 
 - Tests: `tests/macro-visual.test.mjs` (simple phone view: three tests). `scripts/audit/smoke.cjs`: on the phone, as a member,
   every folded section is opened and each chart in it must be drawn at its host's width (fails with "folded section opened: …").
 
-## Macro desk: Before you trade (18 Nov 2026, owner: "more improvement on macro as well, I want people to be able to use it to take or decide for trades")
-Display only, `macro-desk.html` section 2 `#s-trade` (`sfold`, folds on the phone like sections 3-7; TOC chip). Reads what the page
-already loads (forecast.json, veteran.json, and cot.json, now fetched with the others), fetches nothing else, changes nothing.
-- **Today, market by market** (`#tc-today`): per market the strategist's lean (pUp ± `LEAN` 0.03 → Up / Down / No lean), a normal
-  day (`expMovePct`, "1.7x usual" from `volRatio` >= 1.3), the next release in 24 h that reaches it (`CCY`: USD for all, EUR for
-  EUR/USD, JPY for USD/JPY; the veteran's `events` first, else `fc.playbook`), positioning (COT `pct1y`, crowded at 90 / 10, the yen
-  inverted as `council/cot.mjs` `sign`). A row fills the check below.
-- **Check a trade** (`#tc-form`: market, Buy / Sell, entry (default the price now), stop, target): rows Macro lean, Gold Macro Score
-  (gold; read for buys only, the veteran never calls a macro sell), Release risk (wait within an hour either side of a release:
-  "the playbook acts after the release"), Market mood (VIX >= 25 or inverted curve, `volRatio` >= 1.3), the stop against a normal
-  day (under 0.25x = inside noise) with the target's R, gold's levels in the way (`v.summary.levels`), Positioning. A stop or target
-  on the wrong side is refused in words (absolute rule 1). One verdict line ("Macro leans with / against / no lean · n to watch",
-  or "Wait for the release"), never "take it"; the footnote says no reading has passed a test as an edge.
-- Pure logic `window.MD_CHECK` (`today`, `check`, `lean`, `cotOf`, `nextFor`); test `tests/macro-trade-check.test.mjs` runs it;
-  `tests/macro-visual.test.mjs` counts six folding sections.
+## Macro desk: Your read, today / this week / this month (18 Nov 2026, owner: "we don't need 'check a trade', find ways to be able to use it daily weekly and monthly")
+Display only, `macro-desk.html` section 2 `#s-plan` / `#c-plan` (`sfold`, folds on the phone; TOC chip "Your read"). It replaced the
+same day's "Before you trade" (its Check-a-trade form, `MD_CHECK` and `tests/macro-trade-check.test.mjs` are gone). One switch
+(`.pl-tabs`, Today | This week | This month, arrow keys; localStorage `mdPlan`, a display preference) over what load() already has
+(forecast.json, veteran.json, cot.json); nothing else is fetched and nothing is computed as a new forecast.
+- **Today** (`MD_PLAN.day`): per market the strategist's lean (pUp ± 0.03), a normal day as ± % AND as a price range around the price
+  now (gold: the strategist's latest mark), "1.7x usual" from `volRatio` >= 1.3, the next release in 24 h that reaches it (Wait within
+  an hour), positioning (COT 3-year percentile, crowded at 90 / 10, the yen inverted); gold's nearest levels above and below the PRICE
+  NOW from `briefing.levels.gold.list`; the mood (VIX, curve, markets moving more than usual).
+- **This week** (`MD_PLAN.week`): the veteran's week calls (`outlook.week`, stretch calls left out) and hypotheses (`horizon: 'week'`,
+  with "Wrong if"), each as his % beside the base rate; the header names the close they were issued from (`outlook.anchor.asOf`:
+  "today's close" inside a call means that close); the week's levels (kind `week`, week `range60`), releases over 7 days (veteran
+  cards + the strategist's playbook, once each), `changes.items`, the Gold Macro Score now against last week (`hist`), positioning
+  with the week's change in net contracts.
+- **This month** (`MD_PLAN.month`): month calls, month hypotheses, the dollar's calls apart, the slower levels (month extremes,
+  averages, the quarter's range, month `range60`), the last 8 weekly Gold Macro Scores, and the record so far (calibration n of
+  `need.scored`, "too few to judge" until then; the weekly ledger's issued / resolved).
+- Every view's first line (`#pl-take`) is the folded header's line (`syncOne`). Wording: "Leans, not calls", never an edge or advice.
+- **More useful (18 Nov 2026, owner: "keep improving it make it more useful")**: every week / month call and hypothesis shows where it
+  stands NOW (`MD_PLAN.status`: the price now, gold = the strategist's mark, the DXY = `regime.dxyProxy`, against the call's level;
+  On track / Off track / Open with the distance; a race read by its geometry, not its kind's name) and the daily closes left
+  (`daysLeft`: weekdays' 22:00 UTC closes still to come, today's included until it is in); a note says the record is scored on daily closes, not this reading. Today adds the next release's
+  hot / in-line / cool cases (`nextRelease`, from `veteran.json.events` scenarios, its own "not a tested edge" label). "Copy as
+  text" (`#pl-copy`, `MD_PLAN.text`) puts the open view on the clipboard as plain text with the same honesty line.
+- **Found and fixed on the way**: `council/veteran.mjs` `freezeHypotheses` showed the recorded claim with the LIVE reading's kind,
+  base and "Wrong if" when the two differed (18 Nov: H1 read "closes at or above $4,000" with kind `firstTouchDown`, H2 "between
+  $3,853 and $4,149" with "Wrong if: outside $3,800-$3,900"). Display only: scoring reads the ledger, which was right. Now the kind
+  and base come from the record, "Wrong if" is rebuilt from it (`invalidOf`), and the live why / Wrong if go to `live`.
+  Tests: `tests/macro-plan.test.mjs` (runs the page's pure block), `tests/macro-visual.test.mjs` (six folding sections).
 
 ## The veteran's closes are as fresh as the strategist's run (11 Nov 2026)
 Found mid-week: the Macro desk said "Last close 2026-11-06" and "Watch $4,100 above and $4,045 below" with gold near 4,030.

@@ -71,3 +71,7 @@ Preserve one immutable record per capture. A current chart is not a substitute f
 - [ ] Is the actual measured against a contemporaneous consensus, or is the event only a price reaction?
 - [ ] Can another analyst reproduce the calculation from the archived inputs?
 
+## 7. Worked survey-ingestion case
+
+The [NY Fed survey case](nyfed-survey-expectations-ingestion-2026-11-09.md) and its [source contract](nyfed-survey-source-contract-2026-11-09.json) show how these rules apply to two real workbook fields. A questionnaire's distribution date is different from the later public release of responses. Historical XLSX/Combined backfills and the2025 panel merger require separate availability and instrument labels. A respondent's expectation of the Fed's SEP projection also differs from their own forecast; preserve that target distinction alongside question-specific unit rules and response counts. The examples illustrate source reading and establish no forecasting record.
+

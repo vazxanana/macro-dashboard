@@ -26,21 +26,23 @@ export function buildIndex(src = SRC) {
   const skill = fs.readFileSync(path.join(src, 'SKILL.md'), 'utf8'), ver = (/version:\s*"?([\d.]+)/.exec(skill) || [])[1] || null;
   let validation = null; try { validation = JSON.parse(fs.readFileSync(path.join(src, 'validation.json'), 'utf8')); } catch (e) {}
   // README.md's "## What's new in <version>" bullets: plain words for the owner
-  let whatsNew = []; try { const rd = fs.readFileSync(path.join(src, 'README.md'), 'utf8'), m = /^## What's new in [\d.]+[^\n]*\n([\s\S]*?)(?=\n## |(?![\s\S]))/m.exec(rd);
-    if (m) whatsNew = m[1].split('\n').filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim()); } catch (e) {}
+  let whatsNew = [], newIn = null; try { const rd = fs.readFileSync(path.join(src, 'README.md'), 'utf8'), m = /^## What's new in ([\d.]+)([^\n]*)\n([\s\S]*?)(?=\n## |(?![\s\S]))/m.exec(rd);
+    if (m) { whatsNew = m[3].split('\n').filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim()); newIn = (m[1] + m[2]).trim(); } } catch (e) {}
   const py = validation && validation.packaged_python_tests;
   const tests = validation && (validation.forecast_tests || (py && { tests: py.passed + py.failed, passed: py.passed, kind: 'packaged Python tests' }));
-  return { v: 1, builtAt: new Date().toISOString(), skill: 'gptmacro-v-1', version: ver, prepared: (validation && validation.checked_at_utc || '').slice(0, 10) || null, whatsNew, groups: GROUPS.map((g) => g[0]).filter((g) => docs.some((d) => d.group === g)), docs, cpiPilot: cpiPilot(src),
+  return { v: 1, builtAt: new Date().toISOString(), skill: 'gptmacro-v-1', version: ver, prepared: (validation && validation.checked_at_utc || '').slice(0, 10) || null, whatsNew, newIn, groups: GROUPS.map((g) => g[0]).filter((g) => docs.some((d) => d.group === g)), docs, cpiPilot: cpiPilot(src),
     validation: validation && { checkedAt: validation.checked_at_utc, tests, intervalTests: validation.packaged_interval_tests || null, cpiStatus: validation.cpi_status || null, limits: validation.limits } };
 }
 // the batch's one real prospective forecast: October 2026 core CPI m/m, issued 8 Nov 2026, resolved by the BLS first print
 export function cpiPilot(src = SRC) {
   try {
     const recs = fs.readFileSync(path.join(src, 'references', 'cpi-pilot-forecast-ledger.jsonl'), 'utf8').split(/\r?\n/).filter((l) => l.trim()).map((l) => JSON.parse(l));
+    // a "resolved" record with outcome null is a pending attempt (1.4 batch, 17 Nov 2026): only a numeric outcome resolves
     const issued = recs.filter((r) => r.record_type === 'issued'), res = recs.filter((r) => r.record_type === 'resolved' || r.record_type === 'resolution');
-    return issued.map((r) => { const f = r.forecast || {}, d = f.distribution || {}, rr = res.find((x) => x.forecast_id === r.forecast_id);
+    const scored = (x) => x.resolution && x.resolution.outcome !== null && Number.isFinite(+x.resolution.outcome);
+    return issued.map((r) => { const f = r.forecast || {}, d = f.distribution || {}, mine = res.filter((x) => x.forecast_id === r.forecast_id), rr = mine.filter(scored).pop();
       return { forecastId: r.forecast_id, issuedAt: f.issued_at_utc, cutoff: f.information_cutoff_utc, variable: f.target && f.target.variable, reference: 'October 2026', point: d.point_estimate ?? null, unit: d.unit || (f.target && f.target.unit) || null,
-        releaseUtc: '2026-11-10T13:30:00Z', deadline: f.target && f.target.deadline_utc, rule: f.resolution_rule && f.resolution_rule.rule, status: rr ? 'resolved' : 'unresolved', outcome: rr ? (rr.resolution && rr.resolution.outcome) ?? null : null, publisherUrl: f.resolution_rule && f.resolution_rule.direct_url }; });
+        releaseUtc: '2026-11-10T13:30:00Z', deadline: f.target && f.target.deadline_utc, rule: f.resolution_rule && f.resolution_rule.rule, status: rr ? 'resolved' : 'unresolved', outcome: rr ? +rr.resolution.outcome : null, pending: rr ? 0 : mine.length, publisherUrl: f.resolution_rule && f.resolution_rule.direct_url }; });
   } catch (e) { return []; }
 }
 if (import.meta.url === `file://${process.argv[1]}`) {
