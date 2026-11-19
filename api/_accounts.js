@@ -29,6 +29,9 @@ const KEY_RE = /^[a-z0-9-]{1,24}$/;
 const sha = (s) => crypto.createHash('sha256').update(String(s), 'utf8').digest('hex');
 // constant-time compare of two hex hashes (false for anything that is not a 64-char hex string)
 const same = (a, b) => /^[0-9a-f]{64}$/.test(String(a)) && /^[0-9a-f]{64}$/.test(String(b)) && crypto.timingSafeEqual(Buffer.from(String(a)), Buffer.from(String(b)));
+// 19 Nov 2026 (owner: "macro should be able to login only with password"): stored accounts that, like the built-in members,
+// sign in with the password alone (no username or email); their passwords must stay unique (api/signup.js pwClash, api/users.js)
+const PW_ONLY = ['macro'];
 const builtInUsers = () => JSON.parse(JSON.stringify(BUILT_IN));
 
 // the stored list: the newest Blob users/…json, else council-data users.json (first run, read straight from GitHub on the
@@ -67,4 +70,4 @@ function publicRecord(R) {
 }
 const stripHashes = (users) => { const out = {}; for (const [k, u] of Object.entries(users || {})) out[k] = publicRecord(u); return out; };
 
-module.exports = { OWNER_HASH, BUILT_IN, KEY_RE, sha, same, builtInUsers, blobUsers, userList, publicRecord, stripHashes };
+module.exports = { OWNER_HASH, BUILT_IN, PW_ONLY, KEY_RE, sha, same, builtInUsers, blobUsers, userList, publicRecord, stripHashes };
