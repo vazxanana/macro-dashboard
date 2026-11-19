@@ -55,7 +55,7 @@ test('style: no text under 12 px, 44 px on touch, guests get no layout, the phon
   assert.match(css, /@media \(pointer: coarse\) \{ \.dr-bar button \{ width: 44px; height: 44px; \}/);
   assert.match(css, /html\[data-role="public"\] :is\(#ms-lay-btn, #ms-lay-pop\) \{ display: none !important; \}/);
   assert.doesNotMatch(css, /data-phone/, 'nothing of the phone view in this block');
-  assert.match(PAGE, /\.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle, \.dr-bar, \.dr-note\) \{ display: none !important; \}/);
+  assert.match(PAGE, /\.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle, \.dr-bar, \.ch-one, \.dr-note\) \{ display: none !important; \}/);
 });
 
 test('line alerts: a horizontal line, ray or trend line keeps its alert; crossing fires once; nothing is sent anywhere', () => {
@@ -66,4 +66,13 @@ test('line alerts: a horizontal line, ray or trend line keeps its alert; crossin
   assert.match(SRC, /data-alert title="Tell me when price crosses this line \(while this page is open\)"/);
   const blk = SRC.slice(SRC.indexOf('// ---- line alerts'), SRC.indexOf('// read-only view for the audit'));
   assert.doesNotMatch(blk, /fetch\(|XMLHttpRequest|sendBeacon|\.stop\s*=/);
+});
+
+test('one chart toolbar: pane headers carry no tools of their own, one bar acts on the chart last touched', () => {
+  const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  assert.match(page, /<div class="ch-one" id="ms-ch-one" role="toolbar"/);
+  assert.match(page, /\.ms-ph \.ch-tools \{ display: none !important; \}/);
+  const js = page.slice(page.indexOf('// ─── One chart toolbar'), page.indexOf('window.msChartOne'));
+  assert.match(js, /pointerdown/); assert.match(js, /t\.click\(\)/);
+  assert.doesNotMatch(js, /\.stop\s*=|[^e]place\(|fetch\(/);
 });

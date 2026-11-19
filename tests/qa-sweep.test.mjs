@@ -770,7 +770,7 @@ test('simple phone view 2: Charts puts the rarely used rows behind "More", and a
   for (const sel of rules) for (const one of sel.split(/,(?![^(]*\))/)) assert.match(one, /html\[data-phone="simple"\]:not\(\[data-role="public"\]\) #v-charts/, `reaches a guest's charts: ${one.trim()}`);
   assert.match(PS_CSS, /html\[data-role="public"\] \.ps-cmore \{ display: none !important; \}/);
   // behind "More": the markup switch, indicators and the context strip; the timeframes and the markets stay
-  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle, \.dr-bar, \.dr-note\) \{ display: none !important; \}/);   // 18 Nov 2026: the drawing tools wait there too
+  assert.match(PS_CSS, /#v-charts:not\(\[data-ps-more\]\) \.sec-h > :is\(\.mk-mode, \.ind-open, \.cx-tog, \.adr, \.mtf, \.cycle, \.dr-bar, \.ch-one, \.dr-note\) \{ display: none !important; \}/);   // 18 Nov 2026: the drawing tools wait there too
   assert.doesNotMatch(PS_CSS, /\.seg\[aria-label="Chart view"\]|#ms-wl[^{]*\{[^}]*display: none/, 'timeframes and watchlist are never hidden');
   // hidden is not switched off: the markup in use is named on the button, and the page's own setMode is not touched
   assert.match(PS_CSS, /html\[data-phone="simple"\]\[data-mk="ict"\] \.ps-cmore::before \{ content: "ICT ·";/);
