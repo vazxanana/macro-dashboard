@@ -56,7 +56,7 @@ test('practice only: no network write, no council, no broker; wired on the Chart
   assert.match(PAGE, /<section class="pp" id="ms-pp" aria-label="Paper trading account" hidden><\/section>\n {4}<div class="ms-grid4">/);
   assert.match(PAGE, /window\.msPaperHost = \{ key: instKey,/);
   const css = /<style id="ms-pp-css">([\s\S]*?)<\/style>/.exec(PAGE)[1];
-  assert.match(css, /html\[data-role="public"\] #ms-pp \{ display: none !important; \}/); assert.doesNotMatch(css, /data-phone/);
+  assert.match(css, /html\[data-role="public"\] #ms-pp, html\[data-role="public"\] #hs-pp/); assert.doesNotMatch(css, /data-phone/);
   for (const m of css.matchAll(/font(?:-size)?:\s*(?:\d+\s+)?([\d.]+)px/g)) assert.ok(+m[1] >= 12, m[0]);
 });
 
@@ -95,4 +95,10 @@ test('closed paper trades are drawn on the charts of their market: entry to exit
   assert.match(SRC, /function marks\(\) \{/); assert.match(SRC, /root\.msChartX\(cx, t\.openedAt \+ cx\.TZ\)/);
   assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /window\.msChartX = \(cx, t\) => X\(cx, t\);/);
   assert.match(PAGE, /\.ms-vp-cv, \.ms-pp-cv \{ position: absolute; inset: 0; pointer-events: none; z-index: 2; \}/);
+});
+
+test('Home shows the paper account in one line once it has a trade (members with the charts only)', () => {
+  assert.match(PAGE, /<p class="hs-fwd adm" id="hs-fwd" hidden><\/p><p class="hs-fwd hs-pp" id="hs-pp" hidden><\/p><\/header>/);
+  assert.match(PAGE, /html\[data-role="public"\] #hs-pp, html\[data-deny~="charts"\] #hs-pp \{ display: none !important; \}/);
+  assert.match(SRC, /function home\(\) \{[\s\S]*?if \(!T\.length && !n\) \{ el\.hidden = true; return; \}[\s\S]*?Your paper account: /);
 });

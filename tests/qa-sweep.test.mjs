@@ -933,7 +933,7 @@ test('17 Nov: the decay monitor and what to expect sit in one closed "Decay and 
 });
 
 test('Home (18 Nov 2026): one line on the live book against its plan, owner and reviewers only, linking to the forward card; the same reading', () => {
-  assert.match(FW_HTML, /<p class="hs-fwd adm" id="hs-fwd" hidden><\/p><\/header>/, 'under the headline, class adm, hidden until a reading is in');
+  assert.match(FW_HTML, /<p class="hs-fwd adm" id="hs-fwd" hidden><\/p><p class="hs-fwd hs-pp" id="hs-pp" hidden><\/p><\/header>/, 'under the headline, class adm, hidden until a reading is in');
   const els = {}, el = (id) => (els[id] = els[id] || { id, hidden: true, innerHTML: '', textContent: '', classList: { toggle() {} }, setAttribute() {} });
   const W = { MS_COUNCIL: { coach: { forward: { status: 'few', head: 'Too few trades to say', record: { n: 2, from: '2026-11-12T00:00:00Z', total: -1.234, open: 1 } } } } };
   const doc = { getElementById: el, addEventListener() {} };

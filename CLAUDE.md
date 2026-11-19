@@ -2417,7 +2417,9 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   balance curve, the latest 50 trades, CSV, reset (styled confirm). The main script hands over `window.msPaperHost` (key, insts, TZ,
   m1, atr, since); `window.msPaper()` is a read-only view. Closed paper trades of the market are drawn on its charts (19 Nov 2026:
   `marks()`, a canvas `.ms-pp-cv` per chart, a dashed entry-to-exit line coloured by result with its R; times placed through
-  `ms-draw.js`'s `window.msChartX`, the last 60 trades). Tests: `tests/desk-paper.test.mjs`.
+  `ms-draw.js`'s `window.msChartX`, the last 60 trades). Home's line `#hs-pp` (19 Nov 2026, under the headline from 641 px; hidden
+  for guests and without the charts permission, and until the account has a trade): equity, return, open / waiting, closed and
+  win rate, "Open the charts" (`home()`). Tests: `tests/desk-paper.test.mjs`.
 - **Order flow** in the indicator library (`IND_DEF` `delta`, `cvd`, `vwap`, `vprof`, `rvol`, flag `flow`): Volume Delta and CVD
   (reset each UTC day) from `iDelta` = the candle's volume times where it closed in its range (-1 at the low, +1 at the high), VWAP
   with ±n SD bands (UTC day), Relative Volume, and the Volume Profile (owner: "i want volume profile"): `assets/ms-vprof.js`

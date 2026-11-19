@@ -39,7 +39,7 @@
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=4ca22b2e7f" defer></script>
 <script src="/assets/ms-draw.js?v=377829e198" defer></script>
-<script src="/assets/ms-paper.js?v=2f4faf5f5b" defer></script>
+<script src="/assets/ms-paper.js?v=fcb20eaf45" defer></script>
 <script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
@@ -2835,7 +2835,7 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       #v-charts:fullscreen > .ms-grid4[data-view="all"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } #v-charts:fullscreen > .ms-grid4[data-view="all"] .ms-pane { grid-column: auto !important; }   /* six charts: three by two */
       </style>
 <style id="ms-pp-css">/* The paper trading account on the Charts (18 Nov 2026, assets/ms-paper.js): one bar above the charts, stats and history behind a button */
-  html[data-role="public"] #ms-pp { display: none !important; }
+  html[data-role="public"] #ms-pp, html[data-role="public"] #hs-pp, html[data-deny~="charts"] #hs-pp { display: none !important; }
   #ms-pp { margin: 0 0 10px; padding: 10px 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font-size: 13px; font-variant-numeric: tabular-nums; }
   #ms-pp .up { color: var(--buy-ink, var(--buy)); } #ms-pp .dn { color: var(--sell-ink, var(--sell)); }
   .pp-h { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
@@ -5971,7 +5971,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
          waits on you, then the places. Everything Home held before sits unchanged behind "More on the desk" (#hs-more-b; on a phone
          that wrapper is display: contents, so both phone views are the page as they were). Filled by #ms-hs-js from window.MS_PS. -->
     <div class="hs-only hs-home" id="hs-home">
-      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p><p class="hs-fwd adm" id="hs-fwd" hidden></p></header>
+      <header class="hs-head"><p class="hs-date" id="hs-date">&nbsp;</p><h1 class="hs-a" id="hs-a">Loading the results…</h1><p class="hs-s" id="hs-s"><span id="hs-s-w">&nbsp;</span><span class="hs-f">Forward paper record of the main systems, before costs. Backtest replays are not counted here.</span></p><p class="hs-fwd adm" id="hs-fwd" hidden></p><p class="hs-fwd hs-pp" id="hs-pp" hidden></p></header>
       <div class="h-warn hs-warn" id="hs-warn" role="alert" hidden></div>
       <div class="hs-cols">
         <section class="hs-card hs-open" aria-labelledby="hs-o-k"><div class="hs-ch"><h2 id="hs-o-k">Open now</h2><span class="hs-n" id="hs-o-n"></span></div>
