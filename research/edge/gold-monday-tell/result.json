@@ -1,0 +1,247 @@
+{
+ "study": "gold-monday-tell",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "params": {
+  "atrN": 20,
+  "k": 0.5,
+  "stopAtr": 1.5,
+  "cost": 0.6,
+  "fin": 0.000148
+ },
+ "windows": {
+  "is": [
+   2007,
+   2016
+  ],
+  "oos": [
+   2017,
+   "2026-10"
+  ]
+ },
+ "data": {
+  "src": "council-data research/daily/xau.json (OANDA mid, UTC days, weekend folded)",
+  "first": "2006-03-20",
+  "last": "2026-11-13"
+ },
+ "is": {
+  "weeks": 514,
+  "baseline": {
+   "long": 0.015,
+   "short": -0.079
+  },
+  "T1": {
+   "n": 169,
+   "gross": 0.042,
+   "net": 0.005,
+   "excess": 0.036,
+   "tNet": 0.08,
+   "tExcess": 0.58,
+   "costShare": 0.878,
+   "stopped": 34
+  },
+  "T2": {
+   "n": 86,
+   "gross": 0.136,
+   "net": 0.085,
+   "excess": 0.07,
+   "tNet": 0.95,
+   "tExcess": 0.78,
+   "costShare": 0.373,
+   "stopped": 13
+  },
+  "T3": {
+   "n": 83,
+   "gross": -0.056,
+   "net": -0.078,
+   "excess": 0.001,
+   "tNet": -0.76,
+   "tExcess": 0.01,
+   "costShare": 0.388,
+   "stopped": 21
+  },
+  "medianStop": 28.28
+ },
+ "oos": {
+  "weeks": 500,
+  "baseline": {
+   "long": 0.079,
+   "short": -0.124
+  },
+  "T1": {
+   "n": 188,
+   "gross": -0.026,
+   "net": -0.063,
+   "excess": -0.048,
+   "tNet": -0.95,
+   "tExcess": -0.73,
+   "costShare": 1.418,
+   "stopped": 55
+  },
+  "T2": {
+   "n": 100,
+   "gross": 0.123,
+   "net": 0.071,
+   "excess": -0.009,
+   "tNet": 0.75,
+   "tExcess": -0.09,
+   "costShare": 0.428,
+   "stopped": 27
+  },
+  "T3": {
+   "n": 88,
+   "gross": -0.196,
+   "net": -0.216,
+   "excess": -0.092,
+   "tNet": -2.55,
+   "tExcess": -1.11,
+   "costShare": 0.099,
+   "stopped": 28
+  },
+  "medianStop": 35.85
+ },
+ "x2": {
+  "is": {
+   "weeks": 514,
+   "baseline": {
+    "long": -0.036,
+    "short": -0.101
+   },
+   "T1": {
+    "n": 169,
+    "gross": 0.042,
+    "net": -0.031,
+    "excess": 0.037,
+    "tNet": -0.51,
+    "tExcess": 0.59,
+    "costShare": 1.755,
+    "stopped": 34
+   },
+   "T2": {
+    "n": 86,
+    "gross": 0.136,
+    "net": 0.034,
+    "excess": 0.07,
+    "tNet": 0.39,
+    "tExcess": 0.79,
+    "costShare": 0.746,
+    "stopped": 13
+   },
+   "T3": {
+    "n": 83,
+    "gross": -0.056,
+    "net": -0.1,
+    "excess": 0.002,
+    "tNet": -0.97,
+    "tExcess": 0.02,
+    "costShare": 0.776,
+    "stopped": 21
+   },
+   "medianStop": 28.28
+  },
+  "oos": {
+   "weeks": 500,
+   "baseline": {
+    "long": 0.025,
+    "short": -0.142
+   },
+   "T1": {
+    "n": 188,
+    "gross": -0.026,
+    "net": -0.101,
+    "excess": -0.047,
+    "tNet": -1.53,
+    "tExcess": -0.73,
+    "costShare": 2.837,
+    "stopped": 55
+   },
+   "T2": {
+    "n": 100,
+    "gross": 0.123,
+    "net": 0.018,
+    "excess": -0.007,
+    "tNet": 0.19,
+    "tExcess": -0.07,
+    "costShare": 0.855,
+    "stopped": 27
+   },
+   "T3": {
+    "n": 88,
+    "gross": -0.196,
+    "net": -0.235,
+    "excess": -0.093,
+    "tNet": -2.76,
+    "tExcess": -1.12,
+    "costShare": 0.198,
+    "stopped": 28
+   },
+   "medianStop": 35.85
+  }
+ },
+ "holm": {
+  "T1": {
+   "p": 0.465,
+   "adj": 0.931
+  },
+  "T2": {
+   "p": 0.928,
+   "adj": 0.931
+  },
+  "T3": {
+   "p": 0.267,
+   "adj": 0.801
+  }
+ },
+ "placebo": {
+  "draws": [
+   1.21,
+   -0.57,
+   -1.24,
+   0.38,
+   -2.63,
+   0.97,
+   0.33,
+   1.85,
+   0.28,
+   -0.41,
+   -0.58,
+   1.03,
+   0.13,
+   0.16,
+   0.09,
+   -0.76,
+   -0.02,
+   0.99,
+   -1.35,
+   0.74,
+   -0.56,
+   0.47,
+   2.44,
+   -0.28,
+   -1.01,
+   -1.43,
+   -1.7,
+   -1.62,
+   0.5,
+   1.49,
+   -0.88,
+   -1.79,
+   -0.84,
+   0.48,
+   -0.26,
+   0.82,
+   0.51,
+   -2.2,
+   -0.28,
+   0.38
+  ],
+  "beatenBy": 12,
+  "of": 40
+ },
+ "checks": {
+  "oosT": false,
+  "sameSignIS": false,
+  "net2x": false,
+  "placebo": false
+ }
+}
