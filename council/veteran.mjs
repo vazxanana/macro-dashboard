@@ -471,7 +471,8 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   // register of the batch, their own conditions checked on today's data (council/research-watch.mjs); display only
   try {
     const DD = docs === undefined ? loadDocs() : docs, calR = calendarOf(cache).concat((fc && fc.playbook) || []);
-    const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now, calendar: calR });
+    const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now, calendar: calR,
+      policy: ((cache && cache.release && cache.release.series && cache.release.series.DFEDTARU) || []).map(([d, x]) => ({ t: Date.parse(d + 'T00:00:00Z') / 1000, v: +x })).filter((o) => Number.isFinite(o.v)) });
     v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; const cp = cpiPlan(DD && DD.cpiPlan, e, calR); if (cp) { e.cpiPlan = cp; const b = cpiBenchmark(DD && DD.cpiBench, e); if (b) cp.benchmark = b; }
       const g = consensusGate(e, now); if (g) e.gate = g; const gd = gdpCase(DD && DD.gdp, e); if (gd) e.gdpCase = gd; }
   } catch (e) { v.researchError = String(e && e.message || e); }

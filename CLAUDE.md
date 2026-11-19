@@ -2872,6 +2872,18 @@ to T+60 (not tradable) +0.33 % out of sample (t 4.01). The red folder study show
 ("know the side before the print; do not chase after it", `loadInputs().surprise`). Nothing live changed. Tests:
 `tests/red-folder-surprise.test.mjs`.
 
+## Two gauges of the macro rule book: VIX panic and the 2-year against the policy rate (19 Nov 2026, owner: "use the other documents too, keep going")
+`research/edge/rulebook-gauges/` (PREREGISTRATION.md committed first; `run.mjs` fetches FRED VIXCLS / DGS2 / DFEDTARU / DFEDTAR
+keyless, RESULT.md, result.json). Values known at the next weekday's close; gold OANDA daily, 2007-26. **A FAIL** (VIX at 40 or
+above, 9 episodes: gold dipped every time, median about −4 %, but higher 60 sessions later in only 4 of 9; +0.98 % against
++1.80 % on all days). **B1 FAIL** (2-year more than 25 bp above the upper policy target, "hikes priced": +0.44 %, t −0.83).
+**B2 PASS** (2-year more than 25 bp below it, "cuts priced": gold's next 20 sessions +1.76 %, up 67 %, n 241 weeks, t 3.05, Holm p
+0.005, both halves positive) on about five easing cycles (12 runs, 9 positive): a tested lean of the same family as the Gold Macro
+Score's falling-2-year driver, never a trading rule. The rule book's "double tightening" claim is untestable here (FRED's
+high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapCheck` (veteran passes `cache.release` DFEDTARU as
+`policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
+`tests/rulebook-gauges.test.mjs`.
+
 ## The US 10-year regime table and gold (19 Nov 2026, owner: "use the other documents too, keep going")
 `research/edge/yield-regime/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
 book's "primary gauge": the 10-year's speed and direction (fast = 25 bp in 2 weeks or 50 bp in 4; slow = 25 bp over 6 weeks) and

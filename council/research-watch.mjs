@@ -36,7 +36,22 @@ export function loadDocs(dir = REF) {
     out.regime = { verdict: Y.verdict, classes: Y.classes, horizon: Y.horizon }; } catch (e) { out.regime = null; }
   try { const B = JSON.parse(fs.readFileSync(new URL('../research/edge/blowoff-veto/result.json', import.meta.url), 'utf8'));
     out.blowoff = { verdict: B.verdict, test: B.test, dailyAfter: B.dailyAfter, veto: B.veto }; } catch (e) { out.blowoff = null; }
+  try { const P = JSON.parse(fs.readFileSync(new URL('../research/edge/rulebook-gauges/result.json', import.meta.url), 'utf8'));
+    out.gauges = { verdict: P.verdict, B: P.B, A: { n: P.A.n, above: P.A.above, mean60: P.A.mean60, base60: P.A.base60 } }; } catch (e) { out.gauges = null; }
   return out;
+}
+
+// the rule book's policy gauge: the 2-year yield against the upper policy target ("above = hikes priced, gold down; below = cuts
+// priced"), with its record from research/edge/rulebook-gauges (cuts priced PASSED there, on about five easing cycles)
+export function policyGapCheck({ S, policy, now, study }) {
+  const y = last(S.DGS2, now), p = last(policy, now); if (!y || !p) return null;
+  const gap = y.v - p.v, cls = gap > 0.25 ? 'hikes' : gap < -0.25 ? 'cuts' : 'flat', bp = (x) => sg(x * 100, 0) + ' bp', pc = (x) => sg(x * 100, 1) + '%';
+  const B = study && study.B, c = B && B.classes[cls], all = B && B.classes.all, t = B && B.tests;
+  const name = { hikes: 'hikes priced (2-year above the policy rate)', cuts: 'cuts priced (2-year below the policy rate)', flat: 'neither: the 2-year sits near the policy rate' }[cls];
+  const rec = c && all ? `Record 2007-26 (research/edge/rulebook-gauges): in this class gold's next 20 sessions averaged ${pc(c.gold)} (up ${Math.round(c.up * 100)}% of ${c.n} weeks) against ${pc(all.gold)} on all weeks. ` +
+    `Cuts priced PASSED its pre-registered test (t ${String(t.B2.all.t).replace("-", "−")}, both halves) but rests on about five easing cycles; hikes priced did not (t ${String(t.B1.all.t).replace("-", "−")}). A tested lean, not a trading rule.` : null;
+  return { doc: 'your macro rule book (2-year vs the policy rate)', text: `${name[0].toUpperCase() + name.slice(1)}: the 2-year at ${y.v.toFixed(2)}% against the policy rate's upper bound ${p.v.toFixed(2)}% (${bp(gap)}).`,
+    readings: [{ text: `gap ${bp(gap)} (cuts priced below −25 bp, hikes priced above +25 bp)`, on: cls !== 'flat' }], caveat: rec, asOf: new Date(y.t * 1000).toISOString().slice(0, 10) };
 }
 
 // the blow-off veto of the owner's macro rule book (no new gold BUY while gold is stretched), checked on the daily closes up to
@@ -282,7 +297,7 @@ export function gdpCase(md, card) {
   return { doc: DOCS.gdp, lines };
 }
 
-export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [] }) {
+export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [], policy = [] }) {
   const D = docs || {}, out = { label: LABEL, items: [], used: [] }, R = D.register ? register(D.register) : [];
   const push = (k, x) => { if (x) { out.items.push({ k, ...x }); out.used.push(x.doc); } };
   try { push('gold', D.gold && goldScenarios({ md: D.gold, S, gold, now })); } catch (e) { out.error = String(e.message || e); }
@@ -290,6 +305,7 @@ export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [] }) {
   try { push('japan', D.japan && japanCheck({ md: D.japan, S, usdjpy, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('cot', D.positioning && positioningNote({ S })); } catch (e) { out.error = String(e.message || e); }
   try { push('china', (D.chinaHousing || D.chinaFiscal) && chinaBriefs({ housing: D.chinaHousing, fiscal: D.chinaFiscal, calendar, now })); } catch (e) { out.error = String(e.message || e); }
+  try { push('policy', policyGapCheck({ S, policy, now, study: D.gauges })); } catch (e) { out.error = String(e.message || e); }
   try { push('regime', regimeCheck({ S, now, study: D.regime })); } catch (e) { out.error = String(e.message || e); }
   try { push('blowoff', blowoffCheck({ gold, now, study: D.blowoff })); } catch (e) { out.error = String(e.message || e); }
   try { push('nyfed', D.nyfed && nyfedSurvey({ json: D.nyfed, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
