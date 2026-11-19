@@ -90,3 +90,9 @@ test('volume profile: a histogram of the candles in view, split into buying and 
   assert.match(PAGE, /<script src="\/assets\/ms-paper\.js" defer><\/script>\n<script src="\/assets\/ms-vprof\.js" defer><\/script>/);
   assert.doesNotMatch(fs.readFileSync('assets/ms-vprof.js', 'utf8'), /fetch\(|localStorage|XMLHttpRequest/);
 });
+
+test('closed paper trades are drawn on the charts of their market: entry to exit, coloured by result, with the R', () => {
+  assert.match(SRC, /function marks\(\) \{/); assert.match(SRC, /root\.msChartX\(cx, t\.openedAt \+ cx\.TZ\)/);
+  assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /window\.msChartX = \(cx, t\) => X\(cx, t\);/);
+  assert.match(PAGE, /\.ms-vp-cv, \.ms-pp-cv \{ position: absolute; inset: 0; pointer-events: none; z-index: 2; \}/);
+});

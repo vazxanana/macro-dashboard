@@ -1066,7 +1066,11 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
     check('a box drawn on a pane goes into the one list of drawings, selected, and is drawn on the first chart (at its time and price) and the other pane', dp.n === 3 && dp.d.type === 'r' && dp.d.at > 0 && dp.sel === 2 && dp.bar && dp.main && Math.abs(dp.main.y1 - dp.a.y) <= 1 && Math.abs(dp.main.y2 - dp.z.y) <= 1 && dp.onPane.every(Boolean), JSON.stringify(dp).slice(0, 300));
     // move it by its body on the pane: one change, seen on every chart
     { const g = (await t.evaluate(() => ctSplit().panes[0].draw.find((q) => q.k === 2))), mx = pz.x + (g.x1 + g.x2) / 2, my = pz.y + (g.y1 + g.y2) / 2; await t.mouse.move(mx, my); await t.mouse.down(); await t.mouse.move(mx - 40, my + 30, { steps: 8 }); await t.mouse.up(); await t.waitForTimeout(400);
-      const mv = await t.evaluate(() => ctDraw().list[2]); check('moving that box by its body on the pane moves both points by the same time and price, the drawing keeps its moment', mv.t1 < dp.d.t1 && mv.t1 - dp.d.t1 === mv.t2 - dp.d.t2 && mv.p1 < dp.d.p1 && Math.abs((mv.p1 - dp.d.p1) - (mv.p2 - dp.d.p2)) < 0.02 && mv.at === dp.d.at && mv.editedAt > 0, JSON.stringify([dp.d, mv])); }
+      const mv = await t.evaluate(() => ctDraw().list[2]);
+      // a move goes through pixels (BT.drawMove), so it keeps the shape on screen: across a stretch with no candles (the 21:00 UTC
+      // daily break, a weekend) the two corners move by different times. Equal times are required only when no gap lies between.
+      const gapBetween = await t.evaluate(([a, b]) => window.ctGap(a, b), [Math.min(mv.t1, dp.d.t1), Math.max(mv.t2, dp.d.t2)]);
+      check('moving that box by its body on the pane moves both points by the same time and price, the drawing keeps its moment', mv.t1 < dp.d.t1 && mv.t2 < dp.d.t2 && (mv.t1 - dp.d.t1 === mv.t2 - dp.d.t2 || gapBetween) && mv.p1 < dp.d.p1 && Math.abs((mv.p1 - dp.d.p1) - (mv.p2 - dp.d.p2)) < 0.02 && mv.at === dp.d.at && mv.editedAt > 0, JSON.stringify([dp.d, mv])); }
     // Delete on the pane's selection removes it from every chart
     await t.keyboard.press('Delete'); await t.waitForTimeout(300); const dl = await t.evaluate(() => ({ n: ctDraw().list.length, p: ctSplit().panes.map((P) => P.draw.length) }));
     check('Delete removes the drawing selected on the pane from every chart', dl.n === 2 && dl.p.every((x) => x === 2), JSON.stringify(dl));

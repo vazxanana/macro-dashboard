@@ -100,6 +100,7 @@
     if (!S || !H()) return;
     const ev = process(S.acct, H().key, m1(), now()); const px = livePx(); if (px > 0) S.last[H().key] = px;
     if (ev.length) { save(); say(ev); }
+    try { marks(); } catch (e) {}
     if (D) { D.price = px; if (D.follow) { setDraftDefaults(false); } }
     draw();
   }
@@ -202,6 +203,25 @@
     const xy = pts.map((v, i) => `${(i / (pts.length - 1) * W).toFixed(1)},${(Hh - 6 - (v - lo) / sp * (Hh - 12)).toFixed(1)}`).join(' '), y0 = (Hh - 6 - (S.start - lo) / sp * (Hh - 12)).toFixed(1);
     return `<figure class="pp-curve"><svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Closed balance after each trade, from ${money(S.start)} to ${money(pts[pts.length - 1])}"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" class="pp-c0"/><polyline points="${xy}" class="pp-cl"/></svg><figcaption>Balance after each closed trade · dashed = start</figcaption></figure>`;
   }
+  // closed paper trades of this market on the charts: a dashed line from the entry to the exit, green or red, with its R
+  function marks() {
+    const L = root.msCharts ? root.msCharts.list.filter((c) => c.market() === H().key) : [], T = BT().trades(S.acct.closed).filter((t) => t.mk === H().key).slice(-60);
+    for (const cx of L) {
+      let c = cx.ppc; if (!T.length || !cx.visible() || !root.msChartX) { if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height); continue; }
+      if (!c || !c.isConnected) { c = cx.ppc = document.createElement('canvas'); c.className = 'ms-pp-cv'; c.setAttribute('aria-hidden', 'true'); cx.el.appendChild(c); }
+      const dpr = devicePixelRatio || 1, w = cx.el.clientWidth, h = cx.el.clientHeight; if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = w + 'px'; c.style.height = h + 'px'; }
+      const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h); let W = w; try { W = cx.chart.timeScale().width(); } catch (e) {}
+      x.save(); x.beginPath(); x.rect(0, 0, W, h); x.clip(); x.font = '600 12px system-ui, sans-serif'; x.textBaseline = 'middle';
+      for (const t of T) {
+        const x1 = root.msChartX(cx, t.openedAt + cx.TZ), x2 = root.msChartX(cx, t.closedAt + cx.TZ), y1 = cx.series.priceToCoordinate(t.entry), y2 = cx.series.priceToCoordinate(t.exit);
+        if (x1 == null || x2 == null || y1 == null || y2 == null) continue; const win = (t.net || 0) > 0, col = win ? '#0f7a5c' : (t.net || 0) < 0 ? '#c8243f' : '#6b7280';
+        x.strokeStyle = col; x.lineWidth = 1.5; x.setLineDash([4, 3]); x.beginPath(); x.moveTo(x1, y1); x.lineTo(Math.max(x2, x1 + 2), y2); x.stroke(); x.setLineDash([]);
+        x.fillStyle = col; x.beginPath(); x.arc(x1, y1, 3, 0, 7); x.fill(); x.beginPath(); x.arc(Math.max(x2, x1 + 2), y2, 3, 0, 7); x.fill();
+        const lbl = rTxt(t.R), tw = x.measureText(lbl).width + 8, lx = Math.max(x2, x1 + 2) + 6; x.fillRect(lx, y2 - 9, tw, 18); x.fillStyle = '#fff'; x.fillText(lbl, lx + 4, y2);
+      }
+      x.restore();
+    }
+  }
   function open(on) { const el = $('ms-pp'); if (!el) return; el.hidden = false; const b = $('ms-pp-btn'); if (b) b.setAttribute('aria-expanded', 'true'); if (on) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
 
   function onClick(e) {
@@ -214,8 +234,8 @@
     const id = +t.dataset.id, a = t.dataset.a; if (!a) return;
     if (a === 'cancel') { BT().cancel(S.acct, id); save(); draw(); return; }
     const p = S.acct.positions.find((x) => x.id === id); if (!p) return; const cur = pxOf(p.mk); if (!(cur > 0)) { msg('No price for that market yet.', true); return; }
-    if (a === 'close') { const c = BT().close(S.acct, p, cur, now(), 'closed by hand'); c.mk = p.mk; save(); say([{ kind: 'close', trade: c }]); draw(); return; }
-    if (a === 'half') { const c = BT().closePartial(S.acct, p, cur, now(), 0.5, 'half closed by hand'); c.mk = p.mk; save(); say([{ kind: 'close', trade: c }]); draw(); return; }
+    if (a === 'close') { const c = BT().close(S.acct, p, cur, now(), 'closed by hand'); c.mk = p.mk; save(); say([{ kind: 'close', trade: c }]); draw(); marks(); return; }
+    if (a === 'half') { const c = BT().closePartial(S.acct, p, cur, now(), 0.5, 'half closed by hand'); c.mk = p.mk; save(); say([{ kind: 'close', trade: c }]); draw(); marks(); return; }
     if (a === 'be') { const dir = p.side === 'buy' ? 1 : -1; if ((cur - p.entry) * dir <= 0) { msg('Break-even only on a trade in profit: the price is not past the entry.', true); return; } if ((p.stop - p.entry) * dir >= 0) { msg('The stop is already at or past the entry.'); return; } p.stop = p.entry; p.beMoved = true; save(); draw(); msg(`Stop of #${p.id} moved to the entry.`); }
   }
   function onChange(e) {
@@ -241,9 +261,11 @@
     const el = $('ms-pp'); try { el.dataset.open = localStorage.getItem('ms-pp-open') || ''; } catch (e) {} el.hidden = false;
     el.addEventListener('click', onClick); el.addEventListener('change', onChange); el.addEventListener('keydown', onKey);
     const b = $('ms-pp-btn'); if (b) { b.hidden = false; b.addEventListener('click', () => { open(true); }); }
+    let raf = 0; const again = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { try { marks(); } catch (e) {} }); };
+    const hook = (c) => { try { c.chart.timeScale().subscribeVisibleLogicalRangeChange(again); } catch (e) {} }; (root.msCharts ? root.msCharts.list : []).forEach(hook); document.addEventListener('ms:chart', (e) => hook(e.detail)); root.addEventListener('resize', again);
     draw(); catchUp(); tmr = setInterval(tick, 2000); setInterval(catchUp, 60e3);
     root.addEventListener('storage', (e) => { if (e.key === KEY) { load(); sig = ''; draw(); } });
-    root.msPaper = () => ({ balance: S.acct.balance, positions: S.acct.positions.map((p) => ({ id: p.id, mk: p.mk, side: p.side, entry: p.entry, stop: p.stop, target: p.target })), orders: S.acct.orders.length, closed: S.acct.closed.length, lines: LINES.length, draft: D && { ...D } });
+    root.msPaper = () => ({ balance: S.acct.balance, positions: S.acct.positions.map((p) => ({ id: p.id, mk: p.mk, side: p.side, entry: p.entry, stop: p.stop, target: p.target })), orders: S.acct.orders.length, closed: S.acct.closed.length, lines: LINES.length, draft: D && { ...D }, marks: (root.msCharts ? root.msCharts.list : []).filter((c) => c.ppc && c.visible()).length });
   }
   if (H()) start(); else document.addEventListener('ms:paperhost', start, { once: true });
 })(typeof window !== 'undefined' ? window : globalThis);
