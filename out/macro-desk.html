@@ -525,7 +525,9 @@
   .tc-st.clear { color: var(--ink); } .tc-st.neutral { color: var(--ink-dim); }
   .pl-list { list-style: none; margin: 0; padding: 0; }
   .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
-  .nx-bl li { display: block; }
+  .nx-bl li, .res-l li { display: block; }
+    .res-l li + li { margin-top: var(--s3, 12px); }
+    .res-doc { color: var(--ink-2, inherit); }
   .pl-list li > b:first-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
   .pl-list li.pl-call { grid-template-columns: 120px 1fr; } .pl-list li.pl-call > b:first-child { font-size: var(--fs-md); }
   .pl-list li.pl-call > b .d { display: block; font-weight: 400; }
@@ -689,7 +691,7 @@
 
   <!-- 3. Why: the tested Gold Macro Score and its four drivers, then the briefing's key insights -->
   <section class="story sfold" id="s-why" aria-labelledby="why-h">
-    <header class="st-h"><h2 id="why-h">Why</h2><small class="st-m">the tested score, what moves it, and the readings that stand out</small><button type="button" class="st-go" id="go-s-why" aria-expanded="false" aria-controls="c-score c-ins" aria-labelledby="why-h one-s-why"><span class="st-one" id="one-s-why"></span></button></header>
+    <header class="st-h"><h2 id="why-h">Why</h2><small class="st-m">the tested score, what moves it, and the readings that stand out</small><button type="button" class="st-go" id="go-s-why" aria-expanded="false" aria-controls="c-score c-ins c-res" aria-labelledby="why-h one-s-why"><span class="st-one" id="one-s-why"></span></button></header>
     <article class="card" id="c-score" aria-labelledby="sc-h" hidden>
       <h3 class="c-t" id="sc-h">Gold Macro Score <small id="sc-sub"></small></h3>
       <div class="sc-grid">
@@ -703,6 +705,12 @@
       <p class="c-take">Ranked by how unusual each reading is against its own history. Tap one for the evidence.</p>
       <ol class="bins" id="brief-ins"></ol>
       <p class="pubonly" id="brief-pub"></p>
+    </article>
+    <article class="card" id="c-res" aria-labelledby="res-h" hidden>
+      <h3 class="c-t" id="res-h">Your research, applied <small id="res-sub"></small></h3>
+      <p class="c-take" id="res-take"></p>
+      <ul class="pl-list res-l" id="res-list"></ul>
+      <p class="vz-note" id="res-note"></p>
     </article>
   </section>
 
@@ -1341,6 +1349,24 @@
   var dirCls = function (t) { return /^Up/.test(t) ? 'up' : /^Down/.test(t) ? 'dn' : ''; };
   function cellRow(c) { return c && c.n ? '<td class="num">' + c.n + '</td><td class="num">' + pc2(c.median) + '</td><td class="num">' + pct(c.up) + '</td>' : '<td>0</td><td>' + NA + '</td><td>' + NA + '</td>'; }
   function splitTable(head, obj, names) { return '<table class="vt"><thead><tr><th>' + esc(head) + '</th><th>n</th><th>median</th><th>up</th></tr></thead><tbody>' + names.map(function (nm) { return '<tr><td>' + esc(nm[1]) + '</td>' + cellRow(obj && obj[nm[0]]) + '</tr>'; }).join('') + '</tbody></table>'; }
+  // 19 Nov 2026: the owner's briefs, research maps and news register, their own conditions checked on today's data
+  // (council/research-watch.mjs → veteran.json research); display only
+  function renderResearch(v) {
+    var R = v && v.research, sec = $('c-res'), it = (R && R.items) || [];
+    if (!it.length) { sec.hidden = true; return; } sec.hidden = false;
+    var lead = it.filter(function (x) { return x.k === 'gold'; })[0] || it[0];
+    $('res-sub').textContent = it.length + ' of your documents read against today\'s data';
+    $('res-take').innerHTML = esc(lead.text);
+    $('res-list').innerHTML = it.map(function (x) {
+      var h = '<li><b>' + esc(x.text) + '</b>';
+      if (x.checks) h += '<br><small>' + x.checks.map(function (c) { return esc(c.text) + ' → ' + esc(c.ok); }).join(' · ') + '</small>'
+        + (x.weaken ? '<br><small>What would weaken it (the brief): ' + esc(x.weaken) + '</small>' : '');
+      if (x.readings) h += '<br><small>' + x.readings.map(function (c) { return esc(c.text) + (c.on ? ' (flagged)' : ''); }).join(' · ') + '</small>' + (x.caution ? '<br><small>' + esc(x.caution) + '</small>' : '');
+      if (x.watch) h += '<br><small>' + esc(x.watch) + '</small>';
+      if (x.caveat) h += '<br><small>' + esc(x.caveat) + '</small>';
+      return h + '<br><small class="res-doc">Source: ' + esc(x.doc) + (x.asOf ? ' (' + esc(x.asOf) + ')' : '') + '</small></li>'; }).join('');
+    $('res-note').textContent = R.label + (R.register ? ' Your news-trading register (' + R.register.n + ' hypotheses) is shown on each release it covers.' : '');
+  }
   function renderNext(v) {
     var E = (v && v.events) || [], sec = $('c-next'), e = E.filter(function (x) { return !x.released; })[0] || E[0];
     if (!e) { sec.hidden = true; NX = null; return; } sec.hidden = false; NX = e;
@@ -1377,6 +1403,8 @@
         + '<p class="vz-note">' + esc(B.noSurprise) + '</p>'
         + (NA7.length ? '<h4 class="vz-h">Later this week <small>one fact each from the same record</small></h4><ul class="pl-list nx-bl">' + NA7.map(function (y) { return '<li><b>' + esc(y.title) + '</b> · ' + esc(utcWhen(y.at)) + '<br><small>' + esc(y.point) + '</small></li>'; }).join('') + '</ul>' : ''); }
     else { bx.hidden = true; bx.innerHTML = ''; }
+    if (e.research && e.research.items && e.research.items.length) { bx.hidden = false;
+      bx.innerHTML += '<h4 class="vz-h">What your news register says to test <small>' + esc(e.research.status) + '</small></h4><ul class="pl-list nx-bl">' + e.research.items.map(function (h) { return '<li><b>' + esc(h.id + ' · ' + h.title) + '</b> <small>(' + esc(h.priority) + ' priority)</small><br><small>Test: ' + esc(h.rule) + '</small><br><small>Fails if: ' + esc(h.gate) + '</small></li>'; }).join('') + '</ul>'; }
     if (st) { $('nx-st-h').innerHTML = 'What past ' + esc(st.type) + ' releases did <small>gold\'s first hour, by the dollar\'s first 5-minute read · ' + st.n + ' releases ' + esc(st.from.slice(0, 4)) + '-' + esc(st.to.slice(0, 4)) + ' · ' + esc(st.label) + '</small>';
       draw('nx-chart', function (w) { return stripSvg(st, w); }); }
     else { $('nx-st-h').innerHTML = 'What past releases did'; $('nx-chart').innerHTML = '<p class="empty">No release history for this event in the repository: n/a.</p>'; }
@@ -1628,7 +1656,7 @@
       ((v && v.events) || []).forEach(function (e) { (e.scenarios || []).forEach(function (c) { var m = /^>\s*(.+?)\s+and\s+<\s*(.+)$/.exec(String(c.when || '')); if (m && m[1] === m[2]) c.when = 'at ' + m[1] + ' (one reporting step)'; }); });
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
-      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot);
+      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot);
       syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
