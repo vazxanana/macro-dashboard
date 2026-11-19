@@ -2397,6 +2397,32 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   Checked in a browser (local build, live candles): the strip on six panes, a three-chart layout moving together, a box drawn on H1
   at the same time on H4 and M15, style bar, Alt keys, Delete, the menu, a reload keeping drawings and layout, a 15 s Split chart.
 
+## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
+- **Paper account** `assets/ms-paper.js` (`window.MS_PAPER` pure: `fresh`, `norm`, `order`, `process`, `stats`, `floating`, `sizeText`;
+  page part after `module.exports`), a bar `#ms-pp` above the six panes (`<style id="ms-pp-css">`; hidden for guests; behind More
+  in the simple phone view). Practice only: localStorage `ms-paper-<account>` (`ms-pp-open` = stats shown), no request of its
+  own, nothing reaches the council, the mirror, a broker or the server (a test reads the asset). $10,000, risk 0.25 / 0.5 / 1 / 2 %,
+  stop 0.5-2 ATR(14) of the M15 chart, target none / 1-3R. Buy / Sell open a draft (entry empty = market, else a limit or stop
+  order) whose stop and target are drawn on every chart of the market; every order has a stop on its losing side (`order` throws,
+  `norm` drops a stored one without). ChronosTrade's engine (`BT.place`, `onBar`, `close`, `closePartial`, `stats`) runs each
+  position on CLOSED one-minute candles that started after it was placed (`chk`): the page's M1 pane for its market, one-minute
+  candles from `rangeBars` for another market with open positions (on load and every minute). Fills at the chart's price, no
+  costs (said on the bar). BE only on a trade in profit; ½ and Close by hand; stop / target editable in the table. Stats: balance,
+  equity, floating, return, net, trades, win rate, profit factor, avg R, expectancy, max drawdown, best / worst, streaks, hold, a
+  balance curve, the latest 50 trades, CSV, reset (styled confirm). The main script hands over `window.msPaperHost` (key, insts, TZ,
+  m1, atr, since); `window.msPaper()` is a read-only view. Tests: `tests/desk-paper.test.mjs`.
+- **Order flow** in the indicator library (`IND_DEF` `delta`, `cvd`, `vwap`, `vprof`, `rvol`, flag `flow`): Volume Delta and CVD
+  (reset each UTC day) from `iDelta` = the candle's volume times where it closed in its range (-1 at the low, +1 at the high), VWAP
+  with ±n SD bands (UTC day), Volume Profile over the last `len` candles (60 bins, POC, 70 % value area), Relative Volume. ESTIMATED:
+  OANDA's volume is a tick count and no feed gives the trades at the bid and ask; the menu says so. The pane bars now keep `volume`.
+- **Full screen** (each pane's ⛶) takes `#v-charts` full screen, so the view on (All as three by two, Split, Layout, one chart),
+  the switches, the drawing strip and the paper bar stay; the charts share the height (`<style id="ms-cfs-css">`); `ms-draw.js`
+  moves the style bar and the right-click menu into the full-screen element and back.
+- **ChronosTrade font**: Inter everywhere (the page, the chart scales and legend `MONO` / `SANS`, the report image in
+  `assets/bt-review.js`, the trade effects in `assets/bt-fx.js`), tabular figures through `font-feature-settings: "tnum"` on the
+  body (the `font` shorthand resets `font-variant-numeric`, not that); JetBrains Mono and Figtree are no longer requested there.
+  The audit checks the scales read Inter.
+
 ## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
 Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =
 rename), then the account as a list (`.pf-box.pf-list`, rows `.pf-row`: round icon, title, one line, chevron or switch): Demo
