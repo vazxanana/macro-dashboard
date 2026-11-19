@@ -1,0 +1,842 @@
+{
+ "study": "index-long-reversal",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "statement": "Buying the three national indices with the worst 36-month return and shorting the three best is not an edge after costs (decisive 2016-now -0.047R a month, Newey-West t -3.8).",
+ "claim": "Balvers, Wu & Gilliland (2000); Richards (1997): past 3-year losers among national indices beat past winners over the next year.",
+ "params": {
+  "L": 36,
+  "skip": 1,
+  "nLong": 3,
+  "nShort": 3,
+  "minRanked": 6,
+  "hold": 12,
+  "atrN": 20,
+  "atrK": 3,
+  "staleDays": 7,
+  "cost": {
+   "roundTrip": 0.0004,
+   "markup": 0.025,
+   "fallbackRate": 4
+  },
+  "windows": {
+   "decFrom": "2016-01",
+   "repTo": "2015-12",
+   "minRankedRep": 10
+  },
+  "bar": {
+   "minT": 2,
+   "nwLags": 12,
+   "placeboPct": 0.95
+  },
+  "placebo": {
+   "draws": 40,
+   "seed": 20261114
+  },
+  "financing": "(max(0, DGS2) + 2.5 %) / 365 of the close a rollover night, longs and shorts alike; 4 % before the first DGS2 value",
+  "dgs2": "council-data macro/cache.json score.fred.DGS2"
+ },
+ "universe": [
+  {
+   "key": "au200",
+   "inst": "AU200_AUD",
+   "first": "2004-03-18",
+   "last": "2026-11-06",
+   "days": 5781
+  },
+  {
+   "key": "ch20",
+   "inst": "CH20_CHF",
+   "first": "2003-03-24",
+   "last": "2026-11-06",
+   "days": 5939
+  },
+  {
+   "key": "cn50",
+   "inst": "CN50_USD",
+   "first": "2011-08-30",
+   "last": "2026-11-06",
+   "days": 3855
+  },
+  {
+   "key": "de40",
+   "inst": "DE30_EUR",
+   "first": "2003-03-25",
+   "last": "2026-11-06",
+   "days": 6010
+  },
+  {
+   "key": "es35",
+   "inst": "ESPIX_EUR",
+   "first": "2016-12-02",
+   "last": "2026-11-06",
+   "days": 2523
+  },
+  {
+   "key": "eu50",
+   "inst": "EU50_EUR",
+   "first": "2003-09-22",
+   "last": "2026-11-06",
+   "days": 5885
+  },
+  {
+   "key": "fr40",
+   "inst": "FR40_EUR",
+   "first": "2003-02-03",
+   "last": "2026-11-06",
+   "days": 5949
+  },
+  {
+   "key": "hk33",
+   "inst": "HK33_HKD",
+   "first": "2003-02-04",
+   "last": "2026-11-06",
+   "days": 5867
+  },
+  {
+   "key": "in50",
+   "inst": "IN50_USD",
+   "first": "2011-08-26",
+   "last": "2022-07-12",
+   "days": 2735
+  },
+  {
+   "key": "jp225",
+   "inst": "JP225_USD",
+   "first": "2003-03-14",
+   "last": "2026-11-06",
+   "days": 6115
+  },
+  {
+   "key": "nas100",
+   "inst": "NAS100_USD",
+   "first": "2003-03-24",
+   "last": "2026-11-06",
+   "days": 6124
+  },
+  {
+   "key": "nl25",
+   "inst": "NL25_EUR",
+   "first": "2008-01-21",
+   "last": "2026-11-06",
+   "days": 4812
+  },
+  {
+   "key": "sg30",
+   "inst": "SG30_SGD",
+   "first": "2004-01-21",
+   "last": "2026-11-06",
+   "days": 5834
+  },
+  {
+   "key": "spx500",
+   "inst": "SPX500_USD",
+   "first": "2003-03-24",
+   "last": "2026-11-06",
+   "days": 6124
+  },
+  {
+   "key": "uk100",
+   "inst": "UK100_GBP",
+   "first": "2003-03-24",
+   "last": "2026-11-06",
+   "days": 5975
+  },
+  {
+   "key": "us2000",
+   "inst": "US2000_USD",
+   "first": "2003-03-24",
+   "last": "2026-11-06",
+   "days": 6114
+  },
+  {
+   "key": "us30",
+   "inst": "US30_USD",
+   "first": "2003-03-24",
+   "last": "2026-11-06",
+   "days": 6101
+  }
+ ],
+ "windows": {
+  "decisive": {
+   "from": "2016-01",
+   "to": "2026-10"
+  },
+  "replication": {
+   "firstTenRanked": "2006-04",
+   "from": "2006-05",
+   "to": "2015-12"
+  }
+ },
+ "checks": {
+  "decPositive": false,
+  "repPositive": false,
+  "tNW": false,
+  "placebo": false
+ },
+ "main": {
+  "decisive": {
+   "x0": {
+    "months": 130,
+    "mean": -0.015,
+    "sd": 0.1743,
+    "total": -1.95,
+    "tNW": -1.17,
+    "tPlain": -0.98,
+    "posShare": 0.469,
+    "maxDD": -3.44,
+    "years": 10.83
+   },
+   "x1": {
+    "months": 130,
+    "mean": -0.0472,
+    "sd": 0.1739,
+    "total": -6.14,
+    "tNW": -3.8,
+    "tPlain": -3.1,
+    "posShare": 0.385,
+    "maxDD": -6.8,
+    "years": 10.83
+   },
+   "x2": {
+    "months": 130,
+    "mean": -0.0795,
+    "sd": 0.1745,
+    "total": -10.33,
+    "tNW": -6.17,
+    "tPlain": -5.19,
+    "posShare": 0.315,
+    "maxDD": -10.93,
+    "years": 10.83
+   }
+  },
+  "replication": {
+   "x0": {
+    "months": 116,
+    "mean": 0.003,
+    "sd": 0.2206,
+    "total": 0.35,
+    "tNW": 0.15,
+    "tPlain": 0.15,
+    "posShare": 0.483,
+    "maxDD": -2.84,
+    "years": 9.67
+   },
+   "x1": {
+    "months": 116,
+    "mean": -0.026,
+    "sd": 0.2207,
+    "total": -3.01,
+    "tNW": -1.29,
+    "tPlain": -1.27,
+    "posShare": 0.414,
+    "maxDD": -3.57,
+    "years": 9.67
+   },
+   "x2": {
+    "months": 116,
+    "mean": -0.055,
+    "sd": 0.2238,
+    "total": -6.38,
+    "tNW": -2.42,
+    "tPlain": -2.65,
+    "posShare": 0.371,
+    "maxDD": -6.47,
+    "years": 9.67
+   }
+  },
+  "costPerMonth": {
+   "decisive": {
+    "spread": 0.0008,
+    "financing": 0.0314
+   },
+   "replication": {
+    "spread": 0.0009,
+    "financing": 0.0281
+   }
+  },
+  "liveCohorts": {
+   "decisiveMin": 12,
+   "decisiveMax": 12
+  },
+  "legs": {
+   "decisive": {
+    "legs": 780,
+    "why": {
+     "stop": 605,
+     "time": 125,
+     "stop-gap": 30,
+     "data-end": 5,
+     "open": 15
+    },
+    "notEntered": 0
+   },
+   "replication": {
+    "legs": 696,
+    "why": {
+     "stop": 506,
+     "stop-gap": 44,
+     "time": 146
+    },
+    "notEntered": 0
+   }
+  },
+  "independentYears": {
+   "decisive": 10.83,
+   "replication": 9.67
+  }
+ },
+ "perYear": [
+  {
+   "year": 2006,
+   "months": 8,
+   "net": -0.73,
+   "gross": 0.03
+  },
+  {
+   "year": 2007,
+   "months": 12,
+   "net": -0.67,
+   "gross": 0.09
+  },
+  {
+   "year": 2008,
+   "months": 12,
+   "net": 1.43,
+   "gross": 1.66
+  },
+  {
+   "year": 2009,
+   "months": 12,
+   "net": -0.65,
+   "gross": -0.47
+  },
+  {
+   "year": 2010,
+   "months": 12,
+   "net": -1.13,
+   "gross": -0.95
+  },
+  {
+   "year": 2011,
+   "months": 12,
+   "net": -0.41,
+   "gross": -0.21
+  },
+  {
+   "year": 2012,
+   "months": 12,
+   "net": -0.28,
+   "gross": -0.06
+  },
+  {
+   "year": 2013,
+   "months": 12,
+   "net": 0.56,
+   "gross": 0.88
+  },
+  {
+   "year": 2014,
+   "months": 12,
+   "net": -0.38,
+   "gross": -0.09
+  },
+  {
+   "year": 2015,
+   "months": 12,
+   "net": -0.75,
+   "gross": -0.53
+  },
+  {
+   "year": 2016,
+   "months": 12,
+   "net": -0.61,
+   "gross": -0.36
+  },
+  {
+   "year": 2017,
+   "months": 12,
+   "net": 0.67,
+   "gross": 1.19
+  },
+  {
+   "year": 2018,
+   "months": 12,
+   "net": -0.83,
+   "gross": -0.4
+  },
+  {
+   "year": 2019,
+   "months": 12,
+   "net": -0.9,
+   "gross": -0.46
+  },
+  {
+   "year": 2020,
+   "months": 12,
+   "net": -1.05,
+   "gross": -0.92
+  },
+  {
+   "year": 2021,
+   "months": 12,
+   "net": -0.31,
+   "gross": -0.06
+  },
+  {
+   "year": 2022,
+   "months": 12,
+   "net": -0.11,
+   "gross": 0.16
+  },
+  {
+   "year": 2023,
+   "months": 12,
+   "net": -1.8,
+   "gross": -1.28
+  },
+  {
+   "year": 2024,
+   "months": 12,
+   "net": -0.22,
+   "gross": 0.23
+  },
+  {
+   "year": 2025,
+   "months": 12,
+   "net": -0.26,
+   "gross": 0.25
+  },
+  {
+   "year": 2026,
+   "months": 10,
+   "net": -0.72,
+   "gross": -0.3
+  }
+ ],
+ "drivers": {
+  "decisive": [
+   {
+    "key": "sg30",
+    "side": "long",
+    "net": 0.36
+   },
+   {
+    "key": "hk33",
+    "side": "long",
+    "net": 0.3
+   },
+   {
+    "key": "us2000",
+    "side": "long",
+    "net": 0.15
+   },
+   {
+    "key": "sg30",
+    "side": "short",
+    "net": 0.03
+   },
+   {
+    "key": "de40",
+    "side": "long",
+    "net": -0.03
+   },
+   {
+    "key": "us2000",
+    "side": "short",
+    "net": -0.07
+   },
+   {
+    "key": "de40",
+    "side": "short",
+    "net": -0.11
+   },
+   {
+    "key": "au200",
+    "side": "long",
+    "net": -0.12
+   },
+   {
+    "key": "eu50",
+    "side": "short",
+    "net": -0.12
+   },
+   {
+    "key": "nl25",
+    "side": "short",
+    "net": -0.14
+   },
+   {
+    "key": "ch20",
+    "side": "long",
+    "net": -0.15
+   },
+   {
+    "key": "eu50",
+    "side": "long",
+    "net": -0.15
+   },
+   {
+    "key": "es35",
+    "side": "long",
+    "net": -0.17
+   },
+   {
+    "key": "fr40",
+    "side": "long",
+    "net": -0.18
+   },
+   {
+    "key": "uk100",
+    "side": "long",
+    "net": -0.21
+   },
+   {
+    "key": "fr40",
+    "side": "short",
+    "net": -0.34
+   },
+   {
+    "key": "in50",
+    "side": "short",
+    "net": -0.37
+   },
+   {
+    "key": "es35",
+    "side": "short",
+    "net": -0.38
+   },
+   {
+    "key": "cn50",
+    "side": "short",
+    "net": -0.46
+   },
+   {
+    "key": "jp225",
+    "side": "short",
+    "net": -0.47
+   },
+   {
+    "key": "cn50",
+    "side": "long",
+    "net": -0.5
+   },
+   {
+    "key": "us30",
+    "side": "short",
+    "net": -0.6
+   },
+   {
+    "key": "spx500",
+    "side": "short",
+    "net": -0.69
+   },
+   {
+    "key": "nas100",
+    "side": "short",
+    "net": -1.73
+   }
+  ],
+  "replication": [
+   {
+    "key": "jp225",
+    "side": "long",
+    "net": 0.69
+   },
+   {
+    "key": "de40",
+    "side": "short",
+    "net": 0.36
+   },
+   {
+    "key": "sg30",
+    "side": "short",
+    "net": 0.35
+   },
+   {
+    "key": "ch20",
+    "side": "long",
+    "net": 0.19
+   },
+   {
+    "key": "cn50",
+    "side": "long",
+    "net": 0.16
+   },
+   {
+    "key": "au200",
+    "side": "long",
+    "net": 0.11
+   },
+   {
+    "key": "nas100",
+    "side": "long",
+    "net": 0.03
+   },
+   {
+    "key": "in50",
+    "side": "short",
+    "net": 0.02
+   },
+   {
+    "key": "cn50",
+    "side": "short",
+    "net": 0.02
+   },
+   {
+    "key": "nl25",
+    "side": "long",
+    "net": 0.01
+   },
+   {
+    "key": "fr40",
+    "side": "long",
+    "net": -0.02
+   },
+   {
+    "key": "hk33",
+    "side": "long",
+    "net": -0.03
+   },
+   {
+    "key": "uk100",
+    "side": "short",
+    "net": -0.07
+   },
+   {
+    "key": "fr40",
+    "side": "short",
+    "net": -0.08
+   },
+   {
+    "key": "ch20",
+    "side": "short",
+    "net": -0.09
+   },
+   {
+    "key": "au200",
+    "side": "short",
+    "net": -0.09
+   },
+   {
+    "key": "us2000",
+    "side": "long",
+    "net": -0.09
+   },
+   {
+    "key": "hk33",
+    "side": "short",
+    "net": -0.18
+   },
+   {
+    "key": "us30",
+    "side": "short",
+    "net": -0.23
+   },
+   {
+    "key": "eu50",
+    "side": "long",
+    "net": -0.26
+   },
+   {
+    "key": "sg30",
+    "side": "long",
+    "net": -0.26
+   },
+   {
+    "key": "spx500",
+    "side": "short",
+    "net": -0.32
+   },
+   {
+    "key": "spx500",
+    "side": "long",
+    "net": -0.37
+   },
+   {
+    "key": "jp225",
+    "side": "short",
+    "net": -0.38
+   },
+   {
+    "key": "us30",
+    "side": "long",
+    "net": -0.39
+   },
+   {
+    "key": "uk100",
+    "side": "long",
+    "net": -0.42
+   },
+   {
+    "key": "us2000",
+    "side": "short",
+    "net": -0.52
+   },
+   {
+    "key": "nas100",
+    "side": "short",
+    "net": -1.19
+   }
+  ]
+ },
+ "picks": {
+  "decisive": {
+   "sg30": {
+    "long": 90,
+    "short": 1
+   },
+   "hk33": {
+    "long": 69,
+    "short": 0
+   },
+   "uk100": {
+    "long": 40,
+    "short": 0
+   },
+   "de40": {
+    "long": 5,
+    "short": 11
+   },
+   "nas100": {
+    "long": 0,
+    "short": 123
+   },
+   "jp225": {
+    "long": 0,
+    "short": 35
+   },
+   "spx500": {
+    "long": 0,
+    "short": 52
+   },
+   "in50": {
+    "long": 0,
+    "short": 34
+   },
+   "ch20": {
+    "long": 47,
+    "short": 0
+   },
+   "cn50": {
+    "long": 45,
+    "short": 34
+   },
+   "au200": {
+    "long": 19,
+    "short": 0
+   },
+   "us30": {
+    "long": 0,
+    "short": 33
+   },
+   "us2000": {
+    "long": 4,
+    "short": 11
+   },
+   "eu50": {
+    "long": 24,
+    "short": 6
+   },
+   "fr40": {
+    "long": 11,
+    "short": 15
+   },
+   "es35": {
+    "long": 36,
+    "short": 29
+   },
+   "nl25": {
+    "long": 0,
+    "short": 6
+   }
+  }
+ },
+ "variants": [
+  {
+   "lookback": 12,
+   "firstTenRanked": "2004-04",
+   "replicationFrom": "2004-05",
+   "decisive": {
+    "months": 130,
+    "mean": -0.0366,
+    "sd": 0.1901,
+    "total": -4.75,
+    "tNW": -2.91,
+    "tPlain": -2.19,
+    "posShare": 0.4,
+    "maxDD": -5.67,
+    "years": 10.83
+   },
+   "replication": {
+    "months": 140,
+    "mean": -0.0151,
+    "sd": 0.2237,
+    "total": -2.11,
+    "tNW": -0.78,
+    "tPlain": -0.8,
+    "posShare": 0.414,
+    "maxDD": -2.97,
+    "years": 11.67
+   },
+   "decisiveGross": {
+    "months": 130,
+    "mean": -0.0021,
+    "sd": 0.1915,
+    "total": -0.27,
+    "tNW": -0.16,
+    "tPlain": -0.13,
+    "posShare": 0.462,
+    "maxDD": -2.59,
+    "years": 10.83
+   }
+  },
+  {
+   "lookback": 60,
+   "firstTenRanked": "2008-04",
+   "replicationFrom": "2008-05",
+   "decisive": {
+    "months": 130,
+    "mean": -0.0452,
+    "sd": 0.1819,
+    "total": -5.87,
+    "tNW": -2.97,
+    "tPlain": -2.83,
+    "posShare": 0.377,
+    "maxDD": -6.77,
+    "years": 10.83
+   },
+   "replication": {
+    "months": 92,
+    "mean": -0.0167,
+    "sd": 0.2354,
+    "total": -1.54,
+    "tNW": -0.73,
+    "tPlain": -0.68,
+    "posShare": 0.446,
+    "maxDD": -3.19,
+    "years": 7.67
+   },
+   "decisiveGross": {
+    "months": 130,
+    "mean": -0.0141,
+    "sd": 0.1827,
+    "total": -1.84,
+    "tNW": -0.89,
+    "tPlain": -0.88,
+    "posShare": 0.454,
+    "maxDD": -3.72,
+    "years": 10.83
+   }
+  }
+ ],
+ "placebo": {
+  "draws": 40,
+  "seed": 20261114,
+  "real": -0.0472,
+  "p95": -0.0323,
+  "median": -0.0408,
+  "p5": -0.0455,
+  "atOrAbove": 39
+ }
+}
