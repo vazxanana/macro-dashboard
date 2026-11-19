@@ -1,0 +1,684 @@
+{
+ "study": "gold-vol-breakout-histdata",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-vol-breakout-histdata/PREREGISTRATION.md",
+ "planSha256": "a679a46885c62528d9bd34602104c55c6fbf6dbc7ffdf29cf8b04122b4784346",
+ "originalSha256": "afa36e031e39daabb4f88ed9231daa55246fcccb659b0a9668fda52ad022276f",
+ "claim": "the gold-vol-breakout T1 result is a property of gold, not of the OANDA feed (feed check, no new rule)",
+ "system": "gold-vol-breakout T1 (stand-alone research rule, not live)",
+ "rule": "O = open of the first M5 candle 00:00-00:55 UTC; prevRange = high − low of the previous weekend-folded UTC D1; buy stop O + 0.5 × prevRange and sell stop O − 0.5 × prevRange live 00:00-20:55 UTC, first filled wins; stop back at O; out at the 20:55 candle close (gold-vol-breakout T1, unchanged); data guard on both feeds: skip a day whose previous folded day is more than 4 calendar days back",
+ "data": {
+  "text": "HistData XAU/USD M1 (bid) from council-data research/candles/xau-histdata via git show, labels converted with council/histdata.mjs histStampUtc only, aggregated to UTC M5; OANDA mid M5 XAU/USD from the candle proxy (cache out of git). Window 2018-01-01 → 2026-10-31 (the last full month in the HistData files).",
+  "hist": {
+   "files": 29,
+   "first": "2018-01-01T23:01",
+   "last": "2026-10-30T20:58",
+   "m1": 3081124,
+   "dupes": 1624,
+   "m5": 616766
+  }
+ },
+ "window": [
+  "2018-01-01",
+  "2026-10-31"
+ ],
+ "cost": 0.6,
+ "verdict": "PASS, not an OANDA artifact (all three checks hold): T1 on HistData 2018-26 +0.042R net (n 1603, gross month t +4.21); same side as OANDA on 99.7 % of 1593 common days",
+ "decision": {
+  "checks": {
+   "netPos": true,
+   "grossT2": true,
+   "sameSide70": true
+  },
+  "pass": true
+ },
+ "feeds": {
+  "hist": {
+   "skips": {
+    "noprev": 1,
+    "nofill": 560,
+    "noopen": 13,
+    "thin": 115
+   },
+   "W": {
+    "n": 1603,
+    "win": 0.419,
+    "netR": 0.042,
+    "grossR": 0.109,
+    "net2R": -0.024,
+    "costR": 0.067,
+    "finR": 0,
+    "total": 67.64,
+    "months": 104,
+    "t": 1.57,
+    "grossT": 4.21,
+    "t2x": -0.86,
+    "stops": 550,
+    "time": 1053,
+    "maxDD": -33.14,
+    "medianStop": 10.71,
+    "buys": {
+     "n": 828,
+     "netR": 0.017
+    },
+    "sells": {
+     "n": 775,
+     "netR": 0.069
+    },
+    "byYear": {
+     "2018": {
+      "n": 189,
+      "netR": -0.021,
+      "total": -3.88
+     },
+     "2019": {
+      "n": 190,
+      "netR": -0.071,
+      "total": -13.49
+     },
+     "2020": {
+      "n": 190,
+      "netR": 0.132,
+      "total": 25.06
+     },
+     "2021": {
+      "n": 179,
+      "netR": 0.018,
+      "total": 3.22
+     },
+     "2022": {
+      "n": 194,
+      "netR": 0.019,
+      "total": 3.65
+     },
+     "2023": {
+      "n": 107,
+      "netR": -0.068,
+      "total": -7.23
+     },
+     "2024": {
+      "n": 200,
+      "netR": 0.029,
+      "total": 5.78
+     },
+     "2025": {
+      "n": 193,
+      "netR": 0.08,
+      "total": 15.51
+     },
+     "2026": {
+      "n": 161,
+      "netR": 0.242,
+      "total": 39.01
+     }
+    }
+   },
+   "A": {
+    "n": 569,
+    "win": 0.392,
+    "netR": 0.014,
+    "grossR": 0.114,
+    "net2R": -0.087,
+    "costR": 0.1,
+    "finR": 0,
+    "total": 7.69,
+    "months": 36,
+    "t": 0.3,
+    "grossT": 2.68,
+    "t2x": -1.81,
+    "stops": 194,
+    "time": 375,
+    "maxDD": -33.14,
+    "medianStop": 6.69,
+    "buys": {
+     "n": 286,
+     "netR": 0.026
+    },
+    "sells": {
+     "n": 283,
+     "netR": 0.001
+    },
+    "byYear": {
+     "2018": {
+      "n": 189,
+      "netR": -0.021,
+      "total": -3.88
+     },
+     "2019": {
+      "n": 190,
+      "netR": -0.071,
+      "total": -13.49
+     },
+     "2020": {
+      "n": 190,
+      "netR": 0.132,
+      "total": 25.06
+     }
+    }
+   },
+   "B": {
+    "n": 1034,
+    "win": 0.434,
+    "netR": 0.058,
+    "grossR": 0.106,
+    "net2R": 0.01,
+    "costR": 0.048,
+    "finR": 0,
+    "total": 59.94,
+    "months": 68,
+    "t": 1.71,
+    "grossT": 3.24,
+    "t2x": 0.28,
+    "stops": 356,
+    "time": 678,
+    "maxDD": -31.69,
+    "medianStop": 13.99,
+    "buys": {
+     "n": 542,
+     "netR": 0.012
+    },
+    "sells": {
+     "n": 492,
+     "netR": 0.108
+    },
+    "byYear": {
+     "2021": {
+      "n": 179,
+      "netR": 0.018,
+      "total": 3.22
+     },
+     "2022": {
+      "n": 194,
+      "netR": 0.019,
+      "total": 3.65
+     },
+     "2023": {
+      "n": 107,
+      "netR": -0.068,
+      "total": -7.23
+     },
+     "2024": {
+      "n": 200,
+      "netR": 0.029,
+      "total": 5.78
+     },
+     "2025": {
+      "n": 193,
+      "netR": 0.08,
+      "total": 15.51
+     },
+     "2026": {
+      "n": 161,
+      "netR": 0.242,
+      "total": 39.01
+     }
+    }
+   }
+  },
+  "oanda": {
+   "skips": {
+    "noopen": 15,
+    "nofill": 596
+   },
+   "W": {
+    "n": 1682,
+    "win": 0.42,
+    "netR": 0.05,
+    "grossR": 0.116,
+    "net2R": -0.016,
+    "costR": 0.066,
+    "finR": 0,
+    "total": 84.2,
+    "months": 106,
+    "t": 1.65,
+    "grossT": 3.98,
+    "t2x": -0.5,
+    "stops": 584,
+    "time": 1098,
+    "maxDD": -39.18,
+    "medianStop": 10.69,
+    "buys": {
+     "n": 868,
+     "netR": 0.05
+    },
+    "sells": {
+     "n": 814,
+     "netR": 0.05
+    },
+    "byYear": {
+     "2018": {
+      "n": 188,
+      "netR": -0.097,
+      "total": -18.15
+     },
+     "2019": {
+      "n": 191,
+      "netR": -0.04,
+      "total": -7.62
+     },
+     "2020": {
+      "n": 189,
+      "netR": 0.178,
+      "total": 33.67
+     },
+     "2021": {
+      "n": 179,
+      "netR": 0.021,
+      "total": 3.72
+     },
+     "2022": {
+      "n": 193,
+      "netR": 0.016,
+      "total": 3.16
+     },
+     "2023": {
+      "n": 186,
+      "netR": -0.095,
+      "total": -17.76
+     },
+     "2024": {
+      "n": 200,
+      "netR": 0.053,
+      "total": 10.53
+     },
+     "2025": {
+      "n": 193,
+      "netR": 0.181,
+      "total": 34.9
+     },
+     "2026": {
+      "n": 163,
+      "netR": 0.256,
+      "total": 41.74
+     }
+    }
+   },
+   "A": {
+    "n": 568,
+    "win": 0.393,
+    "netR": 0.014,
+    "grossR": 0.113,
+    "net2R": -0.085,
+    "costR": 0.099,
+    "finR": 0,
+    "total": 7.91,
+    "months": 36,
+    "t": 0.29,
+    "grossT": 2.5,
+    "t2x": -1.62,
+    "stops": 194,
+    "time": 374,
+    "maxDD": -35.14,
+    "medianStop": 6.7,
+    "buys": {
+     "n": 284,
+     "netR": 0.02
+    },
+    "sells": {
+     "n": 284,
+     "netR": 0.008
+    },
+    "byYear": {
+     "2018": {
+      "n": 188,
+      "netR": -0.097,
+      "total": -18.15
+     },
+     "2019": {
+      "n": 191,
+      "netR": -0.04,
+      "total": -7.62
+     },
+     "2020": {
+      "n": 189,
+      "netR": 0.178,
+      "total": 33.67
+     }
+    }
+   },
+   "B": {
+    "n": 1114,
+    "win": 0.434,
+    "netR": 0.068,
+    "grossR": 0.118,
+    "net2R": 0.019,
+    "costR": 0.049,
+    "finR": 0,
+    "total": 76.29,
+    "months": 70,
+    "t": 1.77,
+    "grossT": 3.11,
+    "t2x": 0.48,
+    "stops": 390,
+    "time": 724,
+    "maxDD": -39.18,
+    "medianStop": 13.45,
+    "buys": {
+     "n": 584,
+     "netR": 0.065
+    },
+    "sells": {
+     "n": 530,
+     "netR": 0.072
+    },
+    "byYear": {
+     "2021": {
+      "n": 179,
+      "netR": 0.021,
+      "total": 3.72
+     },
+     "2022": {
+      "n": 193,
+      "netR": 0.016,
+      "total": 3.16
+     },
+     "2023": {
+      "n": 186,
+      "netR": -0.095,
+      "total": -17.76
+     },
+     "2024": {
+      "n": 200,
+      "netR": 0.053,
+      "total": 10.53
+     },
+     "2025": {
+      "n": 193,
+      "netR": 0.181,
+      "total": 34.9
+     },
+     "2026": {
+      "n": 163,
+      "netR": 0.256,
+      "total": 41.74
+     }
+    }
+   }
+  }
+ },
+ "agreement": {
+  "both": 1593,
+  "histOnly": 10,
+  "oandaOnly": 89,
+  "sameSide": 1588,
+  "sameSideShare": 0.997,
+  "corrNet": 0.909,
+  "corrGross": 0.909,
+  "sameSignNet": 0.982,
+  "stopOnlyHist": 11,
+  "stopOnlyOanda": 11,
+  "fillMinAbs": {
+   "median": 0,
+   "p95": 15
+  },
+  "entryAbs": {
+   "median": 0.2,
+   "p95": 0.72
+  },
+  "entrySignedMedian": -0.19,
+  "commonHist": {
+   "n": 1593,
+   "win": 0.421,
+   "netR": 0.046,
+   "grossR": 0.113,
+   "net2R": -0.02,
+   "costR": 0.067,
+   "finR": 0,
+   "total": 73.51,
+   "months": 104,
+   "t": 1.7,
+   "grossT": 4.32,
+   "t2x": -0.71,
+   "stops": 547,
+   "time": 1046,
+   "maxDD": -31.29,
+   "medianStop": 10.71,
+   "buys": {
+    "n": 823,
+    "netR": 0.021
+   },
+   "sells": {
+    "n": 770,
+    "netR": 0.073
+   },
+   "byYear": {
+    "2018": {
+     "n": 187,
+     "netR": -0.016,
+     "total": -2.94
+    },
+    "2019": {
+     "n": 188,
+     "netR": -0.061,
+     "total": -11.44
+    },
+    "2020": {
+     "n": 188,
+     "netR": 0.138,
+     "total": 25.96
+    },
+    "2021": {
+     "n": 179,
+     "netR": 0.018,
+     "total": 3.22
+    },
+    "2022": {
+     "n": 192,
+     "netR": 0.021,
+     "total": 4.04
+    },
+    "2023": {
+     "n": 107,
+     "netR": -0.068,
+     "total": -7.23
+    },
+    "2024": {
+     "n": 200,
+     "netR": 0.029,
+     "total": 5.78
+    },
+    "2025": {
+     "n": 192,
+     "netR": 0.084,
+     "total": 16.09
+    },
+    "2026": {
+     "n": 160,
+     "netR": 0.25,
+     "total": 40.03
+    }
+   }
+  },
+  "commonOanda": {
+   "n": 1593,
+   "win": 0.423,
+   "netR": 0.063,
+   "grossR": 0.129,
+   "net2R": -0.004,
+   "costR": 0.066,
+   "finR": 0,
+   "total": 99.65,
+   "months": 104,
+   "t": 2.09,
+   "grossT": 4.48,
+   "t2x": -0.12,
+   "stops": 548,
+   "time": 1045,
+   "maxDD": -32.22,
+   "medianStop": 10.69,
+   "buys": {
+    "n": 824,
+    "netR": 0.057
+   },
+   "sells": {
+    "n": 769,
+    "netR": 0.069
+   },
+   "byYear": {
+    "2018": {
+     "n": 187,
+     "netR": -0.091,
+     "total": -17
+    },
+    "2019": {
+     "n": 188,
+     "netR": -0.031,
+     "total": -5.83
+    },
+    "2020": {
+     "n": 188,
+     "netR": 0.182,
+     "total": 34.19
+    },
+    "2021": {
+     "n": 179,
+     "netR": 0.021,
+     "total": 3.72
+    },
+    "2022": {
+     "n": 192,
+     "netR": 0.022,
+     "total": 4.21
+    },
+    "2023": {
+     "n": 107,
+     "netR": -0.087,
+     "total": -9.31
+    },
+    "2024": {
+     "n": 200,
+     "netR": 0.053,
+     "total": 10.53
+    },
+    "2025": {
+     "n": 192,
+     "netR": 0.187,
+     "total": 35.93
+    },
+    "2026": {
+     "n": 160,
+     "netR": 0.27,
+     "total": 43.23
+    }
+   }
+  }
+ },
+ "coverage": {
+  "weekdays": 2305,
+  "noData": 26,
+  "noDataDays": [
+   "2018-01-01",
+   "2018-03-30",
+   "2018-12-25",
+   "2019-01-01",
+   "2019-04-19",
+   "2019-12-25",
+   "2020-01-01",
+   "2020-04-10",
+   "2020-12-25",
+   "2021-01-01",
+   "2021-04-02",
+   "2021-12-24",
+   "2022-04-15",
+   "2022-12-26",
+   "2023-01-02",
+   "2023-04-07",
+   "2023-12-25",
+   "2024-01-01",
+   "2024-03-29",
+   "2024-12-25",
+   "2025-01-01",
+   "2025-04-18",
+   "2025-12-25",
+   "2026-01-01",
+   "2026-04-03",
+   "2026-09-25"
+  ],
+  "noDataOanda": 25,
+  "noDataOandaDays": [
+   "2018-01-01",
+   "2018-03-30",
+   "2018-12-25",
+   "2019-01-01",
+   "2019-04-19",
+   "2019-12-25",
+   "2020-01-01",
+   "2020-04-10",
+   "2020-12-25",
+   "2021-01-01",
+   "2021-04-02",
+   "2021-12-24",
+   "2022-04-15",
+   "2022-12-26",
+   "2023-01-02",
+   "2023-04-07",
+   "2023-12-25",
+   "2024-01-01",
+   "2024-03-29",
+   "2024-12-25",
+   "2025-01-01",
+   "2025-04-18",
+   "2025-12-25",
+   "2026-01-01",
+   "2026-04-03"
+  ],
+  "missingMin": 52358,
+  "expectedMin": 2871540,
+  "gapDays": 188,
+  "maxGapMin": 1020,
+  "maxGapDay": "2021-05-31",
+  "longestHoleDays": 3.18,
+  "longestHole": "2020-12-24T18:40 → 2020-12-27T23:00 UTC"
+ },
+ "placebo": {
+  "seeds": 40,
+  "means": [
+   0.002,
+   -0.049,
+   -0.043,
+   -0.088,
+   -0.022,
+   -0.08,
+   -0.065,
+   -0.046,
+   -0.08,
+   -0.073,
+   -0.016,
+   -0.041,
+   -0.047,
+   -0.034,
+   -0.047,
+   -0.061,
+   -0.053,
+   -0.086,
+   -0.048,
+   -0.058,
+   -0.024,
+   -0.054,
+   -0.042,
+   -0.026,
+   -0.047,
+   -0.059,
+   -0.097,
+   -0.066,
+   -0.064,
+   -0.037,
+   -0.063,
+   -0.017,
+   -0.046,
+   -0.064,
+   -0.036,
+   -0.064,
+   -0.033,
+   -0.075,
+   -0.052,
+   -0.045
+  ],
+  "min": -0.097,
+  "max": 0.002,
+  "median": -0.048,
+  "p95": -0.017,
+  "beaten": 40
+ },
+ "reading": "On HistData the rule keeps its sign and its strength before costs (gross month t +4.21) and the two feeds take the same side on 99.7 % of the days both trade, so the result is a property of gold's price path, not of the OANDA candles or fills. Over the same 2018 → 2026-10 days OANDA gives +0.050R net a trade (n 1682, month t +1.65, gross t +3.98) and HistData +0.042R (n 1603, month t +1.57, gross t +4.21); at 2x costs HistData −0.024R, OANDA −0.016R. On the 1593 common days the daily net R correlates 0.909 and the common-day means are +0.046R (HistData) and +0.063R (OANDA). By split: 2018-20 HistData +0.014R, OANDA +0.014R; 2021 → 2026-10 HistData +0.058R, OANDA +0.068R. The net month t on HistData over the window is +1.57: this check asks whether the feed carries the effect, not whether 2018-26 alone is an edge (the original's 2016-20 net was flat; the 2007-15 replication carries the evidence). HistData misses 115 days as too thin (fewer than 200 M5 candles), 112 of them in the file's 2023 hole (20 Feb to 28 Jul 2023, about 15 of every 21 hours present; XAU/USD 2023 is UNCERTIFIED in the clock audit research/edge/histdata-clock): the original's own thin rule skips them, so HistData has 79 fewer trades than OANDA, nearly all in 2023. Where both feeds trade, the fill candle is the same (median fill time difference 0 min), which also confirms the converted clock. The placebo on HistData: the real +0.042R beats 40 of 40 seeds (median −0.048R). Not an edge to trade and not a council rule; nothing live changes and no proposal is written."
+}
