@@ -68,3 +68,23 @@ test('watch(): no forecast words, nothing without its source; the veteran and th
   const mod = fs.readFileSync(new URL('../council/research-watch.mjs', import.meta.url), 'utf8');
   assert.ok(!/fetch\(|placeOrder|\.stop =/.test(mod));
 });
+
+test('NY Fed survey: the verified cells beside today\'s 2-year yield, with the clock caveat', async () => {
+  const { nyfedSurvey } = await import('../council/research-watch.mjs');
+  const r = nyfedSurvey({ json: D.nyfed, fc: { regime: { us2y: 4.8 } }, S: {}, now });
+  assert.equal(r.gapBp, 117); assert.match(r.text, /3\.63%/); assert.match(r.text, /n 61/); assert.match(r.text, /3\.20%/);
+  assert.match(r.caveat, /published after the 2026-09 meeting/);
+  assert.equal(nyfedSurvey({ json: '{bad', fc: {}, S: {}, now }), null);
+});
+
+test('CPI plan on CPI cards: the matrix, the windows, the confounders the calendar shows', async () => {
+  const { cpiPlan } = await import('../council/research-watch.mjs');
+  const at = '2026-12-10T13:30:00.000Z', cal = [{ title: '10-y Bond Auction', country: 'USD', at: '2026-12-10T18:00:00.000Z' }, { title: 'Federal Funds Rate', country: 'USD', at: '2026-12-11T19:00:00.000Z' }, { title: 'CPI m/m', country: 'USD', at }];
+  const p = cpiPlan(D.cpiPlan, { title: 'Core CPI m/m', titles: ['Core CPI m/m', 'CPI m/m'], country: 'USD', at }, cal);
+  assert.equal(p.matrix.length, 5); assert.match(p.matrix[0].outcome, /Headline and core both hotter/);
+  assert.equal(p.confounders.length, 2); assert.match(p.confounders[0], /Auction the same day/i);
+  assert.match(p.rule, /no surprise/);
+  assert.equal(cpiPlan(D.cpiPlan, { title: 'Non-Farm Employment Change', at }, cal), null);
+  assert.equal(cpiPlan(D.cpiPlan, { title: 'CPI y/y', country: 'EUR', at }, cal), null);
+  const page = fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'utf8'); assert.match(page, /Your CPI plan/);
+});

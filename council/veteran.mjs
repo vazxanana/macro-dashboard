@@ -34,7 +34,7 @@ import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf } from './glance.mjs';
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
-import { loadDocs, watch as researchWatch, hypothesesFor } from './research-watch.mjs';
+import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan } from './research-watch.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
@@ -469,8 +469,9 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   // 19 Nov 2026 (owner: "all this stuff I sent you about macro, you are not using it"): the briefs, research maps and news
   // register of the batch, their own conditions checked on today's data (council/research-watch.mjs); display only
   try {
-    const { watch: W, register: RG } = researchWatch({ docs: docs === undefined ? loadDocs() : docs, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now });
-    v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; }
+    const DD = docs === undefined ? loadDocs() : docs, calR = calendarOf(cache).concat((fc && fc.playbook) || []);
+    const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now });
+    v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; const cp = cpiPlan(DD && DD.cpiPlan, e, calR); if (cp) e.cpiPlan = cp; }
   } catch (e) { v.researchError = String(e && e.message || e); }
   v.summary = summary(v);
   v.brief = briefOf(v);

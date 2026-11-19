@@ -2770,7 +2770,12 @@ spread, VIX curve; its own words per level, and a caution when the strategist's 
 confirmation), the Japan brief's "global yields dominate" scenario (US 10Y vs USD/JPY over 4 weeks), the positioning map's
 weekly COT note, and the news-trading register V2 (N1-N10, `hypIds`) on each release card ("What your news register says to
 test", never validated). Desk: card `#c-res` "Your research, applied" in Why. Display only: no probability, call, rule or trade
-reads it. Tests: `tests/research-watch.test.mjs`.
+reads it. Same day (owner: "do the next ones too, nyfed surveys and cpi plan"): the NY Fed Survey of Market Expectations'
+two verified cells (source contract: the panel's expected year-end-2027 SEP median, n 61, and its 2026 core PCE, n 58) beside
+today's 2-year yield (`nyfedSurvey`, with the clock caveat: results published after the meeting, never a pre-release
+consensus), and the October CPI pre-release plan generalized to every US CPI card (`cpiPlan`: its interpretation matrix,
+response windows, and the confounders the calendar shows: a same-day auction, a Fed statement within two days, a same-half-hour
+US release; desk "Your CPI plan"). Tests: `tests/research-watch.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days

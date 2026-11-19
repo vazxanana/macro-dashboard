@@ -15,6 +15,8 @@ export const DOCS = {
   japan: 'japan-boj-normalization-brief-2026-11-07.md',
   funding: 'funding-collateral-and-sovereign-supply-research-map.md',
   positioning: 'derivatives-positioning-and-flow-research.md',
+  cpiPlan: 'us-october-2026-cpi-pre-release-plan.md',
+  nyfed: 'nyfed-survey-source-contract-2026-11-09.json',
 };
 export const LABEL = 'Your research, applied: each line checks a document\'s own conditions against today\'s data. Not a forecast, not a tested edge.';
 const DAY = 86400;
@@ -140,6 +142,40 @@ export function positioningNote({ S }) {
     caveat: 'A lagged listed-futures snapshot: it excludes OTC exposure and says nothing of a mandate or capacity to add (your positioning research map).' };
 }
 
+// NY Fed Survey of Market Expectations (the batch's two verified cells), set beside today's market. The panel's answers were
+// collected before the September meeting and published weeks after it: an old snapshot of professional expectations, never
+// a pre-release consensus and never usable as public information before that meeting (the source contract's own rule).
+export function nyfedSurvey({ json, fc, S, now }) {
+  let J; try { J = typeof json === 'string' ? JSON.parse(json) : json; } catch (e) { return null; } if (!J || !Array.isArray(J.examples)) return null;
+  const ex = (id) => J.examples.find((e) => e.example_id === id), ff = ex('expected_sep_fftr_2027'), pce = ex('own_modal_core_pce_2026'); if (!ff) return null;
+  const v = +ff.normalized_value, y2 = Number.isFinite(fc && fc.regime && fc.regime.us2y) ? fc.regime.us2y : (last(S.DGS2, now) || {}).v;
+  const due = Date.parse(ff.source_response_due_date + 'T18:00:00Z') / 1000, wk = Math.round((now - due) / (7 * DAY));
+  const gap = Number.isFinite(y2) ? Math.round((y2 - v) * 100) : null;
+  const lines = [`The NY Fed's market-participant panel (Survey of Market Expectations, ${ff.cycle}, answers due ${ff.source_response_due_date}, n ${ff.response_count}) expected the Fed's year-end-${ff.horizon_raw.replace(/\D+/g, '')} median projection at ${v.toFixed(2)}%.`];
+  if (gap != null) lines.push(`The 2-year yield is ${y2.toFixed(2)}% today, ${Math.abs(gap)} bp ${gap >= 0 ? 'above' : 'below'} it: the market prices a ${gap >= 0 ? 'higher' : 'lower'} rate path than the panel expected ${wk} weeks ago.`);
+  if (pce) lines.push(`The same panel's median forecast for ${pce.horizon_raw} core PCE (Q4 over Q4) was ${(+pce.normalized_value).toFixed(2)}% (n ${pce.response_count}).`);
+  return { doc: DOCS.nyfed, asOf: ff.source_response_due_date, gapBp: gap, text: lines.join(' '),
+    caveat: `A 2-year yield is not the same quantity as an expected year-end projection (it averages two years of policy and carries a term premium). The panel's results were published after the ${ff.cycle} meeting, so they are an old snapshot of professional expectations, not a consensus for the next release (your NY Fed ingestion note).` };
+}
+
+// the October CPI pre-release plan, generalized to every CPI card: its interpretation matrix, its response windows, and the
+// confounders it names (an auction the same day, a Fed statement within two days, other US releases in the same hour)
+export const CPI_WINDOWS = ['0-1 min', '0-5 min', '0-30 min', '0-55 min (before the cash equity open)', '0-120 min and the close: exploratory'];
+export function cpiPlan(md, card, calendar = []) {
+  if (!md || !card) return null;
+  const titles = [card.title, ...(card.titles || [])]; if (!titles.some((t) => /\bCPI\b/i.test(t || '')) || (card.country && card.country !== 'USD')) return null;
+  const M = tableAfter(md, /^\|\s*CPI outcome\s*\|/i).map((r) => ({ outcome: r[0], read: r[1], need: r[2] })); if (!M.length) return null;
+  const t = Date.parse(card.at) / 1000, d0 = t - (t % DAY), C = [];
+  const at = (e) => Date.parse(e.at) / 1000;
+  for (const e of calendar) { const u = at(e); if (!Number.isFinite(u) || (e.country || 'USD') !== 'USD' || titles.includes(e.title)) continue;
+    if (/auction/i.test(e.title) && u >= d0 && u < d0 + DAY) C.push(`${e.title} the same day (${new Date(u * 1000).toISOString().slice(11, 16)} UTC): label the afternoon and the close exploratory for CPI.`);
+    else if (/federal funds rate|FOMC statement/i.test(e.title) && u > t && u <= t + 2 * DAY) C.push(`${e.title} within two days: keep the CPI move and the statement move apart.`);
+    else if (Math.abs(u - t) <= 1800 && /PPI|retail sales|claims|empire|philly|GDP/i.test(e.title)) C.push(`${e.title} in the same half hour: the first minutes are a joint reaction.`); }
+  return { doc: DOCS.cpiPlan, matrix: M, windows: CPI_WINDOWS, confounders: [...new Set(C)],
+    classify: 'After the print: classify the event clean, mixed, confounded or unusable before reading any move as the CPI\'s.',
+    rule: 'Surprise = first-release actual minus a frozen, comparable expectation; no expectation captured means no surprise, only a market response.' };
+}
+
 export function watch({ docs, fc, S, gold, usdjpy, now }) {
   const D = docs || {}, out = { label: LABEL, items: [], used: [] }, R = D.register ? register(D.register) : [];
   const push = (k, x) => { if (x) { out.items.push({ k, ...x }); out.used.push(x.doc); } };
@@ -147,6 +183,7 @@ export function watch({ docs, fc, S, gold, usdjpy, now }) {
   try { push('funding', D.funding && fundingLadder({ md: D.funding, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('japan', D.japan && japanCheck({ md: D.japan, S, usdjpy, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('cot', D.positioning && positioningNote({ S })); } catch (e) { out.error = String(e.message || e); }
+  try { push('nyfed', D.nyfed && nyfedSurvey({ json: D.nyfed, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
   out.register = R.length ? { n: R.length, doc: DOCS.register, ids: R.map((r) => r.id) } : null;
   return { watch: out, register: R };
 }
