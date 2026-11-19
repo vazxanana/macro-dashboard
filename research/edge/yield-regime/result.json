@@ -1,0 +1,7365 @@
+{
+ "study": "yield-regime",
+ "title": "The US 10-year regime table and gold",
+ "built": "2026-11-19",
+ "horizon": 20,
+ "tests": {
+  "T1": {
+   "want": -1,
+   "all": {
+    "n": 1033,
+    "nX": 82,
+    "slope": -0.0013,
+    "t": -0.23
+   },
+   "first": {
+    "n": 522,
+    "nX": 45,
+    "slope": 0.0018,
+    "t": 0.24
+   },
+   "second": {
+    "n": 511,
+    "nX": 37,
+    "slope": -0.0045,
+    "t": -0.57
+   },
+   "p": 0.8180916287267349,
+   "holm": 1,
+   "pass": false
+  },
+  "T2": {
+   "want": 1,
+   "all": {
+    "n": 1033,
+    "nX": 131,
+    "slope": 0.005,
+    "t": 1.07
+   },
+   "first": {
+    "n": 522,
+    "nX": 81,
+    "slope": 0.0056,
+    "t": 0.88
+   },
+   "second": {
+    "n": 511,
+    "nX": 50,
+    "slope": 0.0058,
+    "t": 0.88
+   },
+   "p": 0.2846193155663578,
+   "holm": 0.8539,
+   "pass": false
+  },
+  "T3": {
+   "want": 1,
+   "all": {
+    "n": 120,
+    "nX": 80,
+    "slope": 0.0016,
+    "t": 0.18
+   },
+   "first": {
+    "n": 59,
+    "nX": 53,
+    "slope": -0.0282,
+    "t": -1.9
+   },
+   "second": {
+    "n": 61,
+    "nX": 27,
+    "slope": 0.0156,
+    "t": 1.69
+   },
+   "p": 0.85715234111042,
+   "holm": 1,
+   "pass": false
+  }
+ },
+ "classes": {
+  "risingFast": {
+   "n": 82,
+   "gold": 0.004,
+   "goldUp": 0.52,
+   "nas": 0.0007
+  },
+  "risingSlow": {
+   "n": 134,
+   "gold": 0.0015,
+   "goldUp": 0.47,
+   "nas": 0.0109
+  },
+  "flat": {
+   "n": 620,
+   "gold": 0.0042,
+   "goldUp": 0.54,
+   "nas": 0.0095
+  },
+  "fallingSlow": {
+   "n": 131,
+   "gold": 0.0096,
+   "goldUp": 0.63,
+   "nas": 0.0144
+  },
+  "fallingFast": {
+   "n": 66,
+   "gold": 0.0145,
+   "goldUp": 0.67,
+   "nas": 0.0204
+  },
+  "led2y": {
+   "n": 40,
+   "gold": -0.0002,
+   "goldUp": 0.42,
+   "nas": 0.0097
+  },
+  "termPremium": {
+   "n": 80,
+   "gold": 0.0014,
+   "goldUp": 0.47,
+   "nas": 0.0066
+  },
+  "all": {
+   "n": 1033,
+   "gold": 0.0052,
+   "goldUp": 0.55,
+   "nas": 0.0103
+  }
+ },
+ "passed": 0,
+ "verdict": "FAIL, 0 of 3",
+ "rows": [
+  {
+   "day": "2007-01-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05484,
+   "nas": -0.0027
+  },
+  {
+   "day": "2007-01-12",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.03499,
+   "nas": -0.02598
+  },
+  {
+   "day": "2007-01-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04011,
+   "nas": -0.00379
+  },
+  {
+   "day": "2007-01-26",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.04617,
+   "nas": 0.03519
+  },
+  {
+   "day": "2007-02-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03826,
+   "nas": -0.03095
+  },
+  {
+   "day": "2007-02-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02927,
+   "nas": -0.02103
+  },
+  {
+   "day": "2007-02-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04026,
+   "nas": -0.05592
+  },
+  {
+   "day": "2007-02-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0368,
+   "nas": -0.03785
+  },
+  {
+   "day": "2007-03-02",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03521,
+   "nas": 0.03794
+  },
+  {
+   "day": "2007-03-09",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02139,
+   "nas": 0.02842
+  },
+  {
+   "day": "2007-03-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03506,
+   "nas": 0.04199
+  },
+  {
+   "day": "2007-03-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04376,
+   "nas": 0.02301
+  },
+  {
+   "day": "2007-03-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02696,
+   "nas": 0.04686
+  },
+  {
+   "day": "2007-04-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0026,
+   "nas": 0.02937
+  },
+  {
+   "day": "2007-04-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00051,
+   "nas": 0.04008
+  },
+  {
+   "day": "2007-04-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03055,
+   "nas": 0.01235
+  },
+  {
+   "day": "2007-04-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03167,
+   "nas": 0.01045
+  },
+  {
+   "day": "2007-05-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04601,
+   "nas": 0.00105
+  },
+  {
+   "day": "2007-05-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00156,
+   "nas": 0.01365
+  },
+  {
+   "day": "2007-05-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02153,
+   "nas": -0.00597
+  },
+  {
+   "day": "2007-05-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00183,
+   "nas": 0.02658
+  },
+  {
+   "day": "2007-06-01",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.04206,
+   "nas": -0.01362
+  },
+  {
+   "day": "2007-06-08",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.00644,
+   "nas": 0.02795
+  },
+  {
+   "day": "2007-06-15",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00675,
+   "nas": 0.01573
+  },
+  {
+   "day": "2007-06-22",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.01951,
+   "nas": 0.05174
+  },
+  {
+   "day": "2007-06-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04647,
+   "nas": 0.03811
+  },
+  {
+   "day": "2007-07-06",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.01342,
+   "nas": -0.0317
+  },
+  {
+   "day": "2007-07-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0065,
+   "nas": -0.02921
+  },
+  {
+   "day": "2007-07-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01941,
+   "nas": -0.06745
+  },
+  {
+   "day": "2007-07-27",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.00553,
+   "nas": -0.02009
+  },
+  {
+   "day": "2007-08-03",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.01588,
+   "nas": -0.01172
+  },
+  {
+   "day": "2007-08-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0155,
+   "nas": 0.04727
+  },
+  {
+   "day": "2007-08-17",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.08341,
+   "nas": 0.0558
+  },
+  {
+   "day": "2007-08-24",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.08076,
+   "nas": 0.03767
+  },
+  {
+   "day": "2007-08-31",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.08339,
+   "nas": 0.04437
+  },
+  {
+   "day": "2007-09-07",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.04499,
+   "nas": 0.07445
+  },
+  {
+   "day": "2007-09-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04037,
+   "nas": 0.08361
+  },
+  {
+   "day": "2007-09-21",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.03532,
+   "nas": 0.06075
+  },
+  {
+   "day": "2007-09-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01383,
+   "nas": 0.04235
+  },
+  {
+   "day": "2007-10-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.06387,
+   "nas": 0.02527
+  },
+  {
+   "day": "2007-10-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07309,
+   "nas": 0.01759
+  },
+  {
+   "day": "2007-10-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04361,
+   "nas": -0.03218
+  },
+  {
+   "day": "2007-10-26",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.01287,
+   "nas": -0.07994
+  },
+  {
+   "day": "2007-11-02",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02283,
+   "nas": -0.08152
+  },
+  {
+   "day": "2007-11-09",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.04512,
+   "nas": 0.01462
+  },
+  {
+   "day": "2007-11-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02661,
+   "nas": 0.01941
+  },
+  {
+   "day": "2007-11-23",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.0302,
+   "nas": 0.00123
+  },
+  {
+   "day": "2007-11-30",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03064,
+   "nas": 0.02568
+  },
+  {
+   "day": "2007-12-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.04704,
+   "nas": -0.03381
+  },
+  {
+   "day": "2007-12-14",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.10429,
+   "nas": -0.06309
+  },
+  {
+   "day": "2007-12-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.09625,
+   "nas": -0.13131
+  },
+  {
+   "day": "2007-12-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05774,
+   "nas": -0.15624
+  },
+  {
+   "day": "2008-01-04",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.07188,
+   "nas": -0.09141
+  },
+  {
+   "day": "2008-01-11",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.00237,
+   "nas": -0.07579
+  },
+  {
+   "day": "2008-01-18",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.05193,
+   "nas": -0.03353
+  },
+  {
+   "day": "2008-01-25",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.02864,
+   "nas": -0.00405
+  },
+  {
+   "day": "2008-02-01",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05222,
+   "nas": -0.03242
+  },
+  {
+   "day": "2008-02-08",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0678,
+   "nas": -0.01326
+  },
+  {
+   "day": "2008-02-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08093,
+   "nas": -0.01394
+  },
+  {
+   "day": "2008-02-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03931,
+   "nas": -0.00723
+  },
+  {
+   "day": "2008-02-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04064,
+   "nas": 0.03329
+  },
+  {
+   "day": "2008-03-07",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.09552,
+   "nas": 0.08749
+  },
+  {
+   "day": "2008-03-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.10257,
+   "nas": 0.07282
+  },
+  {
+   "day": "2008-03-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01688,
+   "nas": 0.03807
+  },
+  {
+   "day": "2008-03-28",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01049,
+   "nas": 0.06182
+  },
+  {
+   "day": "2008-04-04",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02691,
+   "nas": 0.03685
+  },
+  {
+   "day": "2008-04-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04833,
+   "nas": 0.1061
+  },
+  {
+   "day": "2008-04-18",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.03796,
+   "nas": 0.05192
+  },
+  {
+   "day": "2008-04-25",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": 0.02043,
+   "nas": 0.04566
+  },
+  {
+   "day": "2008-05-02",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.04924,
+   "nas": 0.00498
+  },
+  {
+   "day": "2008-05-09",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.00888,
+   "nas": 0.01713
+  },
+  {
+   "day": "2008-05-16",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.04108,
+   "nas": -0.02981
+  },
+  {
+   "day": "2008-05-23",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.04801,
+   "nas": 0.00793
+  },
+  {
+   "day": "2008-05-30",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00132,
+   "nas": -0.06606
+  },
+  {
+   "day": "2008-06-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03779,
+   "nas": -0.06568
+  },
+  {
+   "day": "2008-06-13",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.05089,
+   "nas": -0.05429
+  },
+  {
+   "day": "2008-06-20",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.07477,
+   "nas": -0.07122
+  },
+  {
+   "day": "2008-06-27",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.01912,
+   "nas": -0.02121
+  },
+  {
+   "day": "2008-07-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01399,
+   "nas": 0.01689
+  },
+  {
+   "day": "2008-07-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0978,
+   "nas": 0.02469
+  },
+  {
+   "day": "2008-07-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.16613,
+   "nas": 0.06416
+  },
+  {
+   "day": "2008-07-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.12788,
+   "nas": 0.0393
+  },
+  {
+   "day": "2008-08-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.09877,
+   "nas": 0.03627
+  },
+  {
+   "day": "2008-08-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.06601,
+   "nas": -0.04458
+  },
+  {
+   "day": "2008-08-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02903,
+   "nas": -0.11256
+  },
+  {
+   "day": "2008-08-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.049,
+   "nas": -0.10263
+  },
+  {
+   "day": "2008-08-29",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05996,
+   "nas": -0.11985
+  },
+  {
+   "day": "2008-09-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.06962,
+   "nas": -0.12631
+  },
+  {
+   "day": "2008-09-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.13267,
+   "nas": -0.26992
+  },
+  {
+   "day": "2008-09-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03827,
+   "nas": -0.23643
+  },
+  {
+   "day": "2008-09-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.12517,
+   "nas": -0.23679
+  },
+  {
+   "day": "2008-10-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.08841,
+   "nas": -0.11635
+  },
+  {
+   "day": "2008-10-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.11204,
+   "nas": 0.0437
+  },
+  {
+   "day": "2008-10-17",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.07467,
+   "nas": -0.07668
+  },
+  {
+   "day": "2008-10-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0007,
+   "nas": -0.02555
+  },
+  {
+   "day": "2008-10-31",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.11358,
+   "nas": -0.16115
+  },
+  {
+   "day": "2008-11-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03769,
+   "nas": -0.14652
+  },
+  {
+   "day": "2008-11-14",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.04611,
+   "nas": 0.05569
+  },
+  {
+   "day": "2008-11-21",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.06285,
+   "nas": 0.12431
+  },
+  {
+   "day": "2008-11-28",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.02578,
+   "nas": 0.00974
+  },
+  {
+   "day": "2008-12-05",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.14123,
+   "nas": 0.02217
+  },
+  {
+   "day": "2008-12-12",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.04027,
+   "nas": 0.02852
+  },
+  {
+   "day": "2008-12-19",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.0225,
+   "nas": -0.02532
+  },
+  {
+   "day": "2008-12-26",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.02683,
+   "nas": 0.00992
+  },
+  {
+   "day": "2009-01-02",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.01849,
+   "nas": -0.04034
+  },
+  {
+   "day": "2009-01-09",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.05298,
+   "nas": -0.00708
+  },
+  {
+   "day": "2009-01-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.08394,
+   "nas": 0.01175
+  },
+  {
+   "day": "2009-01-23",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.07744,
+   "nas": 0.02439
+  },
+  {
+   "day": "2009-01-30",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.0384,
+   "nas": -0.01099
+  },
+  {
+   "day": "2009-02-06",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.00802,
+   "nas": -0.16755
+  },
+  {
+   "day": "2009-02-13",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.04894,
+   "nas": -0.09371
+  },
+  {
+   "day": "2009-02-20",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.085,
+   "nas": 0.02134
+  },
+  {
+   "day": "2009-02-27",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.02018,
+   "nas": 0.11402
+  },
+  {
+   "day": "2009-03-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02093,
+   "nas": 0.12354
+  },
+  {
+   "day": "2009-03-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05921,
+   "nas": 0.10271
+  },
+  {
+   "day": "2009-03-20",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.06269,
+   "nas": 0.09806
+  },
+  {
+   "day": "2009-03-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04304,
+   "nas": 0.06335
+  },
+  {
+   "day": "2009-04-03",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.00185,
+   "nas": 0.0416
+  },
+  {
+   "day": "2009-04-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01529,
+   "nas": 0.06603
+  },
+  {
+   "day": "2009-04-17",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.06332,
+   "nas": 0.02845
+  },
+  {
+   "day": "2009-04-24",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.00906,
+   "nas": 0.02368
+  },
+  {
+   "day": "2009-05-01",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.07122,
+   "nas": 0.00468
+  },
+  {
+   "day": "2009-05-08",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.06846,
+   "nas": 0.06616
+  },
+  {
+   "day": "2009-05-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02634,
+   "nas": 0.10299
+  },
+  {
+   "day": "2009-05-22",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.02436,
+   "nas": 0.0567
+  },
+  {
+   "day": "2009-05-29",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.05405,
+   "nas": -0.00483
+  },
+  {
+   "day": "2009-06-05",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.02938,
+   "nas": -0.00823
+  },
+  {
+   "day": "2009-06-12",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.0158,
+   "nas": -0.05202
+  },
+  {
+   "day": "2009-06-19",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01085,
+   "nas": 0.00559
+  },
+  {
+   "day": "2009-06-26",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.01132,
+   "nas": 0.05526
+  },
+  {
+   "day": "2009-07-03",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.00819,
+   "nas": 0.10603
+  },
+  {
+   "day": "2009-07-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0548,
+   "nas": 0.13809
+  },
+  {
+   "day": "2009-07-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00621,
+   "nas": 0.0449
+  },
+  {
+   "day": "2009-07-24",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.01538,
+   "nas": -0.00724
+  },
+  {
+   "day": "2009-07-31",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01335,
+   "nas": 0.0171
+  },
+  {
+   "day": "2009-08-07",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.00298,
+   "nas": -0.01327
+  },
+  {
+   "day": "2009-08-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05427,
+   "nas": 0.02605
+  },
+  {
+   "day": "2009-08-21",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.05602,
+   "nas": 0.03793
+  },
+  {
+   "day": "2009-08-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05853,
+   "nas": 0.05776
+  },
+  {
+   "day": "2009-09-04",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00031,
+   "nas": 0.04958
+  },
+  {
+   "day": "2009-09-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03081,
+   "nas": 0.01406
+  },
+  {
+   "day": "2009-09-18",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05694,
+   "nas": 0.01385
+  },
+  {
+   "day": "2009-09-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05975,
+   "nas": 0.03622
+  },
+  {
+   "day": "2009-10-02",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.03729,
+   "nas": 0.03351
+  },
+  {
+   "day": "2009-10-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02839,
+   "nas": -0.0311
+  },
+  {
+   "day": "2009-10-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04853,
+   "nas": 0.02567
+  },
+  {
+   "day": "2009-10-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07997,
+   "nas": 0.03352
+  },
+  {
+   "day": "2009-10-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.11254,
+   "nas": 0.07048
+  },
+  {
+   "day": "2009-11-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08685,
+   "nas": 0.03539
+  },
+  {
+   "day": "2009-11-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00574,
+   "nas": -0.01598
+  },
+  {
+   "day": "2009-11-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02922,
+   "nas": 0.01892
+  },
+  {
+   "day": "2009-11-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.07568,
+   "nas": 0.04089
+  },
+  {
+   "day": "2009-12-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05741,
+   "nas": 0.04533
+  },
+  {
+   "day": "2009-12-11",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.02045,
+   "nas": 0.0462
+  },
+  {
+   "day": "2009-12-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02143,
+   "nas": 0.04211
+  },
+  {
+   "day": "2009-12-25",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.0065,
+   "nas": 0.0023
+  },
+  {
+   "day": "2010-01-01",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.00335,
+   "nas": -0.03812
+  },
+  {
+   "day": "2010-01-08",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.03424,
+   "nas": -0.0694
+  },
+  {
+   "day": "2010-01-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04931,
+   "nas": -0.06027
+  },
+  {
+   "day": "2010-01-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0039,
+   "nas": -0.0015
+  },
+  {
+   "day": "2010-01-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02768,
+   "nas": 0.03189
+  },
+  {
+   "day": "2010-02-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04742,
+   "nas": 0.05957
+  },
+  {
+   "day": "2010-02-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02621,
+   "nas": 0.06591
+  },
+  {
+   "day": "2010-02-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00061,
+   "nas": 0.05664
+  },
+  {
+   "day": "2010-02-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01256,
+   "nas": 0.06623
+  },
+  {
+   "day": "2010-03-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02856,
+   "nas": 0.03814
+  },
+  {
+   "day": "2010-03-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02631,
+   "nas": 0.0262
+  },
+  {
+   "day": "2010-03-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04196,
+   "nas": 0.03864
+  },
+  {
+   "day": "2010-03-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03032,
+   "nas": 0.04127
+  },
+  {
+   "day": "2010-04-02",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.02868,
+   "nas": 0.02328
+  },
+  {
+   "day": "2010-04-09",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.01467,
+   "nas": -0.01687
+  },
+  {
+   "day": "2010-04-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05543,
+   "nas": -0.03939
+  },
+  {
+   "day": "2010-04-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05687,
+   "nas": -0.09027
+  },
+  {
+   "day": "2010-04-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02136,
+   "nas": -0.09155
+  },
+  {
+   "day": "2010-05-07",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.02058,
+   "nas": -0.02255
+  },
+  {
+   "day": "2010-05-14",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.0015,
+   "nas": -0.06255
+  },
+  {
+   "day": "2010-05-21",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.04312,
+   "nas": 0.04163
+  },
+  {
+   "day": "2010-05-28",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02497,
+   "nas": 0.0109
+  },
+  {
+   "day": "2010-06-04",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01901,
+   "nas": -0.0342
+  },
+  {
+   "day": "2010-06-11",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.03147,
+   "nas": -0.06705
+  },
+  {
+   "day": "2010-06-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03903,
+   "nas": -0.0363
+  },
+  {
+   "day": "2010-06-25",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.05174,
+   "nas": 0.0052
+  },
+  {
+   "day": "2010-07-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04172,
+   "nas": 0.09127
+  },
+  {
+   "day": "2010-07-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01867,
+   "nas": 0.04613
+  },
+  {
+   "day": "2010-07-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00836,
+   "nas": 0.05061
+  },
+  {
+   "day": "2010-07-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02777,
+   "nas": -0.01792
+  },
+  {
+   "day": "2010-07-30",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.04098,
+   "nas": -0.05085
+  },
+  {
+   "day": "2010-08-06",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03462,
+   "nas": -0.0682
+  },
+  {
+   "day": "2010-08-13",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.03321,
+   "nas": 0.02336
+  },
+  {
+   "day": "2010-08-20",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03371,
+   "nas": 0.04978
+  },
+  {
+   "day": "2010-08-27",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03974,
+   "nas": 0.10072
+  },
+  {
+   "day": "2010-09-03",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.04767,
+   "nas": 0.07399
+  },
+  {
+   "day": "2010-09-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07405,
+   "nas": 0.06248
+  },
+  {
+   "day": "2010-09-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05703,
+   "nas": 0.04397
+  },
+  {
+   "day": "2010-09-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02767,
+   "nas": 0.01734
+  },
+  {
+   "day": "2010-10-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01817,
+   "nas": 0.06376
+  },
+  {
+   "day": "2010-10-08",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00097,
+   "nas": 0.06071
+  },
+  {
+   "day": "2010-10-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02167,
+   "nas": 0.0385
+  },
+  {
+   "day": "2010-10-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0043,
+   "nas": -0.00452
+  },
+  {
+   "day": "2010-10-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00641,
+   "nas": -0.00535
+  },
+  {
+   "day": "2010-11-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00867,
+   "nas": -0.0338
+  },
+  {
+   "day": "2010-11-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02179,
+   "nas": 0.02343
+  },
+  {
+   "day": "2010-11-19",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.02698,
+   "nas": 0.03137
+  },
+  {
+   "day": "2010-11-26",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02124,
+   "nas": 0.03628
+  },
+  {
+   "day": "2010-12-03",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00374,
+   "nas": 0.01695
+  },
+  {
+   "day": "2010-12-10",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.00258,
+   "nas": 0.02654
+  },
+  {
+   "day": "2010-12-17",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.00042,
+   "nas": 0.03854
+  },
+  {
+   "day": "2010-12-24",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.00341,
+   "nas": 0.04761
+  },
+  {
+   "day": "2010-12-31",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.05742,
+   "nas": 0.03411
+  },
+  {
+   "day": "2011-01-07",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01913,
+   "nas": 0.02261
+  },
+  {
+   "day": "2011-01-14",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01142,
+   "nas": 0.01888
+  },
+  {
+   "day": "2011-01-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01053,
+   "nas": 0.04964
+  },
+  {
+   "day": "2011-01-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03903,
+   "nas": 0.02812
+  },
+  {
+   "day": "2011-02-04",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.04478,
+   "nas": -0.01042
+  },
+  {
+   "day": "2011-02-11",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.05313,
+   "nas": -0.01893
+  },
+  {
+   "day": "2011-02-18",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.01969,
+   "nas": -0.05919
+  },
+  {
+   "day": "2011-02-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00323,
+   "nas": -0.03663
+  },
+  {
+   "day": "2011-03-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00069,
+   "nas": -0.01529
+  },
+  {
+   "day": "2011-03-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00788,
+   "nas": 0.01772
+  },
+  {
+   "day": "2011-03-18",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03888,
+   "nas": 0.02889
+  },
+  {
+   "day": "2011-03-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03907,
+   "nas": -0.00056
+  },
+  {
+   "day": "2011-04-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05286,
+   "nas": 0.02735
+  },
+  {
+   "day": "2011-04-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05857,
+   "nas": 0.02361
+  },
+  {
+   "day": "2011-04-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00575,
+   "nas": 0.03226
+  },
+  {
+   "day": "2011-04-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00771,
+   "nas": -0.01504
+  },
+  {
+   "day": "2011-04-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03375,
+   "nas": -0.04615
+  },
+  {
+   "day": "2011-05-06",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02697,
+   "nas": -0.00369
+  },
+  {
+   "day": "2011-05-13",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03098,
+   "nas": -0.03669
+  },
+  {
+   "day": "2011-05-20",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01274,
+   "nas": -0.04015
+  },
+  {
+   "day": "2011-05-27",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00196,
+   "nas": -0.03725
+  },
+  {
+   "day": "2011-06-03",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02593,
+   "nas": -0.00288
+  },
+  {
+   "day": "2011-06-10",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02881,
+   "nas": 0.06625
+  },
+  {
+   "day": "2011-06-17",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00308,
+   "nas": 0.06855
+  },
+  {
+   "day": "2011-06-24",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05885,
+   "nas": 0.08842
+  },
+  {
+   "day": "2011-07-01",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.07361,
+   "nas": 0.02757
+  },
+  {
+   "day": "2011-07-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05232,
+   "nas": -0.04745
+  },
+  {
+   "day": "2011-07-15",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.04299,
+   "nas": -0.08419
+  },
+  {
+   "day": "2011-07-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08676,
+   "nas": -0.09531
+  },
+  {
+   "day": "2011-07-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.12946,
+   "nas": -0.11936
+  },
+  {
+   "day": "2011-08-05",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.09311,
+   "nas": 0.03636
+  },
+  {
+   "day": "2011-08-12",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.07525,
+   "nas": -0.00913
+  },
+  {
+   "day": "2011-08-19",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.00186,
+   "nas": 0.08464
+  },
+  {
+   "day": "2011-08-26",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.00942,
+   "nas": 0.06217
+  },
+  {
+   "day": "2011-09-02",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.128,
+   "nas": 0.04424
+  },
+  {
+   "day": "2011-09-09",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.13338,
+   "nas": -0.01462
+  },
+  {
+   "day": "2011-09-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.1007,
+   "nas": 0.00013
+  },
+  {
+   "day": "2011-09-23",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0144,
+   "nas": 0.05112
+  },
+  {
+   "day": "2011-09-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01099,
+   "nas": 0.08552
+  },
+  {
+   "day": "2011-10-07",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.06274,
+   "nas": 0.03546
+  },
+  {
+   "day": "2011-10-14",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.04409,
+   "nas": 0.00993
+  },
+  {
+   "day": "2011-10-21",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.08116,
+   "nas": 0.01115
+  },
+  {
+   "day": "2011-10-28",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.02405,
+   "nas": -0.07477
+  },
+  {
+   "day": "2011-11-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02175,
+   "nas": -0.06775
+  },
+  {
+   "day": "2011-11-11",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.04193,
+   "nas": -0.01654
+  },
+  {
+   "day": "2011-11-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03254,
+   "nas": 0.01202
+  },
+  {
+   "day": "2011-11-25",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.06087,
+   "nas": 0.03975
+  },
+  {
+   "day": "2011-12-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.09385,
+   "nas": -0.01426
+  },
+  {
+   "day": "2011-12-09",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.0607,
+   "nas": 0.01135
+  },
+  {
+   "day": "2011-12-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02424,
+   "nas": 0.05888
+  },
+  {
+   "day": "2011-12-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03471,
+   "nas": 0.06104
+  },
+  {
+   "day": "2011-12-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07059,
+   "nas": 0.05591
+  },
+  {
+   "day": "2012-01-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.06992,
+   "nas": 0.0454
+  },
+  {
+   "day": "2012-01-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05109,
+   "nas": 0.06367
+  },
+  {
+   "day": "2012-01-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03485,
+   "nas": 0.05893
+  },
+  {
+   "day": "2012-01-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00243,
+   "nas": 0.05324
+  },
+  {
+   "day": "2012-02-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02418,
+   "nas": 0.04322
+  },
+  {
+   "day": "2012-02-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00556,
+   "nas": 0.02183
+  },
+  {
+   "day": "2012-02-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01195,
+   "nas": 0.02054
+  },
+  {
+   "day": "2012-02-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.06515,
+   "nas": 0.04808
+  },
+  {
+   "day": "2012-03-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02559,
+   "nas": 0.0509
+  },
+  {
+   "day": "2012-03-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0201,
+   "nas": 0.04873
+  },
+  {
+   "day": "2012-03-16",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.0106,
+   "nas": -0.00468
+  },
+  {
+   "day": "2012-03-23",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00628,
+   "nas": -0.00762
+  },
+  {
+   "day": "2012-03-30",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01868,
+   "nas": -0.03361
+  },
+  {
+   "day": "2012-04-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01487,
+   "nas": -0.00172
+  },
+  {
+   "day": "2012-04-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00917,
+   "nas": -0.01934
+  },
+  {
+   "day": "2012-04-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05271,
+   "nas": -0.03397
+  },
+  {
+   "day": "2012-04-27",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.04206,
+   "nas": -0.07835
+  },
+  {
+   "day": "2012-05-04",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.05378,
+   "nas": -0.02701
+  },
+  {
+   "day": "2012-05-11",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02324,
+   "nas": -0.01508
+  },
+  {
+   "day": "2012-05-18",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00838,
+   "nas": 0.02686
+  },
+  {
+   "day": "2012-05-25",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02909,
+   "nas": 0.03111
+  },
+  {
+   "day": "2012-06-01",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02823,
+   "nas": 0.04525
+  },
+  {
+   "day": "2012-06-08",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01117,
+   "nas": 0.01943
+  },
+  {
+   "day": "2012-06-15",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02971,
+   "nas": -0.00089
+  },
+  {
+   "day": "2012-06-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00932,
+   "nas": 0.00631
+  },
+  {
+   "day": "2012-06-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01189,
+   "nas": -0.03636
+  },
+  {
+   "day": "2012-07-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02166,
+   "nas": 0.01205
+  },
+  {
+   "day": "2012-07-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01238,
+   "nas": 0.04997
+  },
+  {
+   "day": "2012-07-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01182,
+   "nas": 0.04393
+  },
+  {
+   "day": "2012-07-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00898,
+   "nas": 0.04911
+  },
+  {
+   "day": "2012-08-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03753,
+   "nas": 0.0385
+  },
+  {
+   "day": "2012-08-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04316,
+   "nas": 0.01861
+  },
+  {
+   "day": "2012-08-17",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.06625,
+   "nas": 0.00244
+  },
+  {
+   "day": "2012-08-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05045,
+   "nas": 0.02401
+  },
+  {
+   "day": "2012-08-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04712,
+   "nas": 0.03336
+  },
+  {
+   "day": "2012-09-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01716,
+   "nas": -0.01301
+  },
+  {
+   "day": "2012-09-14",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.00184,
+   "nas": -0.02346
+  },
+  {
+   "day": "2012-09-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02117,
+   "nas": -0.04227
+  },
+  {
+   "day": "2012-09-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03156,
+   "nas": -0.04373
+  },
+  {
+   "day": "2012-10-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03874,
+   "nas": -0.05346
+  },
+  {
+   "day": "2012-10-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01793,
+   "nas": -0.0141
+  },
+  {
+   "day": "2012-10-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00484,
+   "nas": -0.03494
+  },
+  {
+   "day": "2012-10-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00737,
+   "nas": -0.02317
+  },
+  {
+   "day": "2012-11-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03483,
+   "nas": -0.00068
+  },
+  {
+   "day": "2012-11-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02315,
+   "nas": 0.02889
+  },
+  {
+   "day": "2012-11-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00488,
+   "nas": 0.05422
+  },
+  {
+   "day": "2012-11-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04322,
+   "nas": 0.02932
+  },
+  {
+   "day": "2012-11-30",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03426,
+   "nas": -0.01663
+  },
+  {
+   "day": "2012-12-07",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02527,
+   "nas": 0.03279
+  },
+  {
+   "day": "2012-12-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01274,
+   "nas": 0.03929
+  },
+  {
+   "day": "2012-12-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01338,
+   "nas": 0.02359
+  },
+  {
+   "day": "2012-12-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02124,
+   "nas": 0.06129
+  },
+  {
+   "day": "2013-01-04",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.00027,
+   "nas": 0.00623
+  },
+  {
+   "day": "2013-01-11",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00696,
+   "nas": -0.01242
+  },
+  {
+   "day": "2013-01-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02207,
+   "nas": 0.0101
+  },
+  {
+   "day": "2013-01-25",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.03321,
+   "nas": 0.01958
+  },
+  {
+   "day": "2013-02-01",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.03272,
+   "nas": -0.01588
+  },
+  {
+   "day": "2013-02-08",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.05511,
+   "nas": 0.00825
+  },
+  {
+   "day": "2013-02-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01268,
+   "nas": 0.01503
+  },
+  {
+   "day": "2013-02-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0213,
+   "nas": 0.01435
+  },
+  {
+   "day": "2013-03-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0131,
+   "nas": 0.02183
+  },
+  {
+   "day": "2013-03-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01511,
+   "nas": -0.00265
+  },
+  {
+   "day": "2013-03-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03065,
+   "nas": 0.03034
+  },
+  {
+   "day": "2013-03-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.15839,
+   "nas": 0.00582
+  },
+  {
+   "day": "2013-03-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.11422,
+   "nas": -0.00555
+  },
+  {
+   "day": "2013-04-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.0681,
+   "nas": 0.03248
+  },
+  {
+   "day": "2013-04-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01067,
+   "nas": 0.03309
+  },
+  {
+   "day": "2013-04-19",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01515,
+   "nas": 0.07532
+  },
+  {
+   "day": "2013-04-26",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.06184,
+   "nas": 0.0653
+  },
+  {
+   "day": "2013-05-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.06303,
+   "nas": 0.02117
+  },
+  {
+   "day": "2013-05-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02758,
+   "nas": 0.00222
+  },
+  {
+   "day": "2013-05-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02139,
+   "nas": -0.01843
+  },
+  {
+   "day": "2013-05-24",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.01236,
+   "nas": -0.0012
+  },
+  {
+   "day": "2013-05-31",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.08972,
+   "nas": -0.04315
+  },
+  {
+   "day": "2013-06-07",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.1062,
+   "nas": -0.01875
+  },
+  {
+   "day": "2013-06-14",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.1072,
+   "nas": 0.01099
+  },
+  {
+   "day": "2013-06-21",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.00747,
+   "nas": 0.06826
+  },
+  {
+   "day": "2013-06-28",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.08022,
+   "nas": 0.04531
+  },
+  {
+   "day": "2013-07-05",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.08568,
+   "nas": 0.0385
+  },
+  {
+   "day": "2013-07-12",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00555,
+   "nas": 0.01596
+  },
+  {
+   "day": "2013-07-19",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00625,
+   "nas": 0.0292
+  },
+  {
+   "day": "2013-07-26",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02797,
+   "nas": 0.00357
+  },
+  {
+   "day": "2013-08-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07779,
+   "nas": -0.02504
+  },
+  {
+   "day": "2013-08-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05999,
+   "nas": -0.00793
+  },
+  {
+   "day": "2013-08-16",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": -0.00774,
+   "nas": 0.03486
+  },
+  {
+   "day": "2013-08-23",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.06616,
+   "nas": 0.02249
+  },
+  {
+   "day": "2013-08-30",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.04094,
+   "nas": 0.03837
+  },
+  {
+   "day": "2013-09-06",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.07457,
+   "nas": 0.03499
+  },
+  {
+   "day": "2013-09-13",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00726,
+   "nas": -0.01512
+  },
+  {
+   "day": "2013-09-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04175,
+   "nas": 0.0116
+  },
+  {
+   "day": "2013-09-27",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.00065,
+   "nas": 0.04439
+  },
+  {
+   "day": "2013-10-04",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02244,
+   "nas": 0.04865
+  },
+  {
+   "day": "2013-10-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03081,
+   "nas": 0.05082
+  },
+  {
+   "day": "2013-10-18",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.03867,
+   "nas": 0.00387
+  },
+  {
+   "day": "2013-10-25",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.05623,
+   "nas": -0.00083
+  },
+  {
+   "day": "2013-11-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05515,
+   "nas": 0.02252
+  },
+  {
+   "day": "2013-11-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04985,
+   "nas": 0.0338
+  },
+  {
+   "day": "2013-11-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02127,
+   "nas": 0.02857
+  },
+  {
+   "day": "2013-11-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00551,
+   "nas": 0.01026
+  },
+  {
+   "day": "2013-11-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03599,
+   "nas": 0.02312
+  },
+  {
+   "day": "2013-12-06",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.0191,
+   "nas": 0.01475
+  },
+  {
+   "day": "2013-12-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00542,
+   "nas": 0.02631
+  },
+  {
+   "day": "2013-12-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03224,
+   "nas": 0.01284
+  },
+  {
+   "day": "2013-12-27",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.02411,
+   "nas": 0.0173
+  },
+  {
+   "day": "2014-01-03",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.0149,
+   "nas": -0.00742
+  },
+  {
+   "day": "2014-01-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0034,
+   "nas": -0.03096
+  },
+  {
+   "day": "2014-01-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02396,
+   "nas": 0.00672
+  },
+  {
+   "day": "2014-01-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03478,
+   "nas": 0.03898
+  },
+  {
+   "day": "2014-01-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07532,
+   "nas": 0.04445
+  },
+  {
+   "day": "2014-02-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0529,
+   "nas": 0.04292
+  },
+  {
+   "day": "2014-02-14",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01801,
+   "nas": 0.00596
+  },
+  {
+   "day": "2014-02-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0239,
+   "nas": 0.01009
+  },
+  {
+   "day": "2014-02-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02146,
+   "nas": -0.00838
+  },
+  {
+   "day": "2014-03-07",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04353,
+   "nas": -0.01234
+  },
+  {
+   "day": "2014-03-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05692,
+   "nas": -0.02406
+  },
+  {
+   "day": "2014-03-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02242,
+   "nas": -0.04091
+  },
+  {
+   "day": "2014-03-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00935,
+   "nas": 0.00351
+  },
+  {
+   "day": "2014-04-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00935,
+   "nas": 0.01267
+  },
+  {
+   "day": "2014-04-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02767,
+   "nas": 0.02817
+  },
+  {
+   "day": "2014-04-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00264,
+   "nas": 0.02031
+  },
+  {
+   "day": "2014-04-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00729,
+   "nas": 0.01792
+  },
+  {
+   "day": "2014-05-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02896,
+   "nas": 0.03805
+  },
+  {
+   "day": "2014-05-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03005,
+   "nas": 0.04851
+  },
+  {
+   "day": "2014-05-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02582,
+   "nas": 0.05637
+  },
+  {
+   "day": "2014-05-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01596,
+   "nas": 0.02605
+  },
+  {
+   "day": "2014-05-30",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05543,
+   "nas": 0.01774
+  },
+  {
+   "day": "2014-06-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05552,
+   "nas": 0.0245
+  },
+  {
+   "day": "2014-06-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03055,
+   "nas": 0.02667
+  },
+  {
+   "day": "2014-06-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01385,
+   "nas": 0.03145
+  },
+  {
+   "day": "2014-06-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00556,
+   "nas": 0.02824
+  },
+  {
+   "day": "2014-07-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01405,
+   "nas": 0.01045
+  },
+  {
+   "day": "2014-07-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03821,
+   "nas": -0.00699
+  },
+  {
+   "day": "2014-07-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00143,
+   "nas": -0.00694
+  },
+  {
+   "day": "2014-07-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00851,
+   "nas": 0.0207
+  },
+  {
+   "day": "2014-08-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01014,
+   "nas": 0.04833
+  },
+  {
+   "day": "2014-08-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03327,
+   "nas": 0.04688
+  },
+  {
+   "day": "2014-08-15",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.03665,
+   "nas": 0.02264
+  },
+  {
+   "day": "2014-08-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03452,
+   "nas": 0.0016
+  },
+  {
+   "day": "2014-08-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0516,
+   "nas": -0.009
+  },
+  {
+   "day": "2014-09-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0477,
+   "nas": -0.01122
+  },
+  {
+   "day": "2014-09-12",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.01508,
+   "nas": -0.02265
+  },
+  {
+   "day": "2014-09-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01063,
+   "nas": -0.06709
+  },
+  {
+   "day": "2014-09-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02596,
+   "nas": -0.01836
+  },
+  {
+   "day": "2014-10-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03555,
+   "nas": 0.01184
+  },
+  {
+   "day": "2014-10-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05171,
+   "nas": 0.07552
+  },
+  {
+   "day": "2014-10-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.06086,
+   "nas": 0.08872
+  },
+  {
+   "day": "2014-10-24",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02702,
+   "nas": 0.04668
+  },
+  {
+   "day": "2014-10-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02947,
+   "nas": 0.03369
+  },
+  {
+   "day": "2014-11-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02281,
+   "nas": 0.03651
+  },
+  {
+   "day": "2014-11-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03897,
+   "nas": 0.0171
+  },
+  {
+   "day": "2014-11-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00321,
+   "nas": -0.03811
+  },
+  {
+   "day": "2014-11-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02354,
+   "nas": -0.00983
+  },
+  {
+   "day": "2014-12-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00861,
+   "nas": -0.00562
+  },
+  {
+   "day": "2014-12-12",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00469,
+   "nas": -0.01902
+  },
+  {
+   "day": "2014-12-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03089,
+   "nas": -0.03014
+  },
+  {
+   "day": "2014-12-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07908,
+   "nas": -0.03452
+  },
+  {
+   "day": "2015-01-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08837,
+   "nas": 0
+  },
+  {
+   "day": "2015-01-09",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.02881,
+   "nas": 0.002
+  },
+  {
+   "day": "2015-01-16",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.03601,
+   "nas": 0.03563
+  },
+  {
+   "day": "2015-01-23",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.06977,
+   "nas": 0.03478
+  },
+  {
+   "day": "2015-01-30",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.06111,
+   "nas": 0.0725
+  },
+  {
+   "day": "2015-02-06",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.0273,
+   "nas": 0.05568
+  },
+  {
+   "day": "2015-02-13",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.05439,
+   "nas": -0.00758
+  },
+  {
+   "day": "2015-02-20",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": -0.04465,
+   "nas": -0.01451
+  },
+  {
+   "day": "2015-02-27",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": -0.01852,
+   "nas": -0.0031
+  },
+  {
+   "day": "2015-03-06",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.01191,
+   "nas": -0.01674
+  },
+  {
+   "day": "2015-03-13",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.0376,
+   "nas": 0.00879
+  },
+  {
+   "day": "2015-03-20",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.01532,
+   "nas": -0.01388
+  },
+  {
+   "day": "2015-03-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00697,
+   "nas": 0.02518
+  },
+  {
+   "day": "2015-04-03",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00506,
+   "nas": 0.053
+  },
+  {
+   "day": "2015-04-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01048,
+   "nas": -0.00156
+  },
+  {
+   "day": "2015-04-17",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01176,
+   "nas": 0.01586
+  },
+  {
+   "day": "2015-04-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02464,
+   "nas": -0.00757
+  },
+  {
+   "day": "2015-05-01",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.00831,
+   "nas": 0.00241
+  },
+  {
+   "day": "2015-05-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0031,
+   "nas": 0.01174
+  },
+  {
+   "day": "2015-05-15",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.03878,
+   "nas": -0.01244
+  },
+  {
+   "day": "2015-05-22",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.01814,
+   "nas": -0.01575
+  },
+  {
+   "day": "2015-05-29",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01056,
+   "nas": 0.00708
+  },
+  {
+   "day": "2015-06-05",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00114,
+   "nas": -0.01888
+  },
+  {
+   "day": "2015-06-12",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.02518,
+   "nas": -0.00397
+  },
+  {
+   "day": "2015-06-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03637,
+   "nas": -0.0006
+  },
+  {
+   "day": "2015-06-26",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.07521,
+   "nas": 0.04468
+  },
+  {
+   "day": "2015-07-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.06809,
+   "nas": 0.0427
+  },
+  {
+   "day": "2015-07-10",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.06826,
+   "nas": 0.03569
+  },
+  {
+   "day": "2015-07-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02093,
+   "nas": -0.02878
+  },
+  {
+   "day": "2015-07-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01828,
+   "nas": -0.0043
+  },
+  {
+   "day": "2015-07-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04732,
+   "nas": -0.14728
+  },
+  {
+   "day": "2015-08-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0426,
+   "nas": -0.08159
+  },
+  {
+   "day": "2015-08-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0075,
+   "nas": -0.05294
+  },
+  {
+   "day": "2015-08-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.05101,
+   "nas": 0.0455
+  },
+  {
+   "day": "2015-08-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.007,
+   "nas": -0.00645
+  },
+  {
+   "day": "2015-09-04",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00467,
+   "nas": -0.03019
+  },
+  {
+   "day": "2015-09-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03696,
+   "nas": -0.01573
+  },
+  {
+   "day": "2015-09-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02627,
+   "nas": 0.00334
+  },
+  {
+   "day": "2015-09-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02625,
+   "nas": 0.05236
+  },
+  {
+   "day": "2015-10-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02562,
+   "nas": 0.08236
+  },
+  {
+   "day": "2015-10-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03138,
+   "nas": 0.07922
+  },
+  {
+   "day": "2015-10-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.07702,
+   "nas": 0.0449
+  },
+  {
+   "day": "2015-10-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.08497,
+   "nas": -0.01008
+  },
+  {
+   "day": "2015-10-30",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05893,
+   "nas": 0.007
+  },
+  {
+   "day": "2015-11-06",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.0186,
+   "nas": 0.00163
+  },
+  {
+   "day": "2015-11-13",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01212,
+   "nas": 0.04887
+  },
+  {
+   "day": "2015-11-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01365,
+   "nas": -0.01932
+  },
+  {
+   "day": "2015-11-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01543,
+   "nas": -0.0182
+  },
+  {
+   "day": "2015-12-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01985,
+   "nas": -0.01233
+  },
+  {
+   "day": "2015-12-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01878,
+   "nas": -0.01906
+  },
+  {
+   "day": "2015-12-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02758,
+   "nas": -0.07932
+  },
+  {
+   "day": "2015-12-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01107,
+   "nas": -0.10614
+  },
+  {
+   "day": "2016-01-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05173,
+   "nas": -0.09157
+  },
+  {
+   "day": "2016-01-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01839,
+   "nas": -0.01173
+  },
+  {
+   "day": "2016-01-15",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.08666,
+   "nas": -0.04281
+  },
+  {
+   "day": "2016-01-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0912,
+   "nas": -0.03788
+  },
+  {
+   "day": "2016-01-29",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.09603,
+   "nas": -0.02567
+  },
+  {
+   "day": "2016-02-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0563,
+   "nas": 0.07531
+  },
+  {
+   "day": "2016-02-12",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02391,
+   "nas": 0.05608
+  },
+  {
+   "day": "2016-02-19",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00602,
+   "nas": 0.05215
+  },
+  {
+   "day": "2016-02-26",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02181,
+   "nas": 0.05038
+  },
+  {
+   "day": "2016-03-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0297,
+   "nas": 0.03813
+  },
+  {
+   "day": "2016-03-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02238,
+   "nas": 0.04173
+  },
+  {
+   "day": "2016-03-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00975,
+   "nas": 0.03498
+  },
+  {
+   "day": "2016-03-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02924,
+   "nas": 0.02509
+  },
+  {
+   "day": "2016-04-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01811,
+   "nas": -0.0255
+  },
+  {
+   "day": "2016-04-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03331,
+   "nas": -0.03052
+  },
+  {
+   "day": "2016-04-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02226,
+   "nas": -0.02646
+  },
+  {
+   "day": "2016-04-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03723,
+   "nas": -0.03445
+  },
+  {
+   "day": "2016-04-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05519,
+   "nas": 0.02929
+  },
+  {
+   "day": "2016-05-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05512,
+   "nas": 0.0419
+  },
+  {
+   "day": "2016-05-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02383,
+   "nas": 0.04401
+  },
+  {
+   "day": "2016-05-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02558,
+   "nas": 0.01156
+  },
+  {
+   "day": "2016-05-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04951,
+   "nas": -0.02704
+  },
+  {
+   "day": "2016-06-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05138,
+   "nas": -0.0503
+  },
+  {
+   "day": "2016-06-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.06436,
+   "nas": -0.01151
+  },
+  {
+   "day": "2016-06-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03397,
+   "nas": 0.03884
+  },
+  {
+   "day": "2016-06-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00029,
+   "nas": 0.0836
+  },
+  {
+   "day": "2016-07-01",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01785,
+   "nas": 0.05816
+  },
+  {
+   "day": "2016-07-08",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00494,
+   "nas": 0.04112
+  },
+  {
+   "day": "2016-07-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00668,
+   "nas": 0.04201
+  },
+  {
+   "day": "2016-07-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01838,
+   "nas": 0.02968
+  },
+  {
+   "day": "2016-07-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00836,
+   "nas": 0.01783
+  },
+  {
+   "day": "2016-08-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01612,
+   "nas": -0.00307
+  },
+  {
+   "day": "2016-08-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00747,
+   "nas": 0.00401
+  },
+  {
+   "day": "2016-08-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01239,
+   "nas": -0.01743
+  },
+  {
+   "day": "2016-08-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00367,
+   "nas": 0.00459
+  },
+  {
+   "day": "2016-09-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00297,
+   "nas": 0.01277
+  },
+  {
+   "day": "2016-09-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04711,
+   "nas": 0.04024
+  },
+  {
+   "day": "2016-09-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04403,
+   "nas": -0.00002
+  },
+  {
+   "day": "2016-09-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05742,
+   "nas": -0.00661
+  },
+  {
+   "day": "2016-09-30",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03179,
+   "nas": -0.00045
+  },
+  {
+   "day": "2016-10-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02193,
+   "nas": -0.02347
+  },
+  {
+   "day": "2016-10-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01607,
+   "nas": 0.00441
+  },
+  {
+   "day": "2016-10-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03152,
+   "nas": -0.01676
+  },
+  {
+   "day": "2016-10-28",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": -0.05293,
+   "nas": 0.01453
+  },
+  {
+   "day": "2016-11-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.08114,
+   "nas": 0.03134
+  },
+  {
+   "day": "2016-11-11",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.05029,
+   "nas": 0.00437
+  },
+  {
+   "day": "2016-11-18",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.04019,
+   "nas": 0.02666
+  },
+  {
+   "day": "2016-11-25",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.04721,
+   "nas": 0.01957
+  },
+  {
+   "day": "2016-12-02",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.03257,
+   "nas": 0.04421
+  },
+  {
+   "day": "2016-12-09",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.01905,
+   "nas": 0.01195
+  },
+  {
+   "day": "2016-12-16",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.05176,
+   "nas": 0.02291
+  },
+  {
+   "day": "2016-12-23",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.06018,
+   "nas": 0.02254
+  },
+  {
+   "day": "2016-12-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04304,
+   "nas": 0.05182
+  },
+  {
+   "day": "2017-01-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03168,
+   "nas": 0.02318
+  },
+  {
+   "day": "2017-01-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02354,
+   "nas": 0.02441
+  },
+  {
+   "day": "2017-01-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01065,
+   "nas": 0.04439
+  },
+  {
+   "day": "2017-01-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03354,
+   "nas": 0.03759
+  },
+  {
+   "day": "2017-02-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02052,
+   "nas": 0.03469
+  },
+  {
+   "day": "2017-02-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01146,
+   "nas": 0.02118
+  },
+  {
+   "day": "2017-02-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02945,
+   "nas": 0.01093
+  },
+  {
+   "day": "2017-02-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00785,
+   "nas": -0.00422
+  },
+  {
+   "day": "2017-03-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01068,
+   "nas": 0.01099
+  },
+  {
+   "day": "2017-03-10",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.04033,
+   "nas": 0.01412
+  },
+  {
+   "day": "2017-03-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03576,
+   "nas": -0.00111
+  },
+  {
+   "day": "2017-03-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0211,
+   "nas": 0.0102
+  },
+  {
+   "day": "2017-03-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01528,
+   "nas": 0.01832
+  },
+  {
+   "day": "2017-04-07",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01341,
+   "nas": 0.03595
+  },
+  {
+   "day": "2017-04-14",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.05655,
+   "nas": 0.05761
+  },
+  {
+   "day": "2017-04-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.0245,
+   "nas": 0.03833
+  },
+  {
+   "day": "2017-04-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01541,
+   "nas": 0.02337
+  },
+  {
+   "day": "2017-05-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02233,
+   "nas": 0.02649
+  },
+  {
+   "day": "2017-05-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0506,
+   "nas": 0.03024
+  },
+  {
+   "day": "2017-05-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00808,
+   "nas": 0.0169
+  },
+  {
+   "day": "2017-05-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01872,
+   "nas": -0.01291
+  },
+  {
+   "day": "2017-06-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02435,
+   "nas": -0.0373
+  },
+  {
+   "day": "2017-06-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03296,
+   "nas": -0.02891
+  },
+  {
+   "day": "2017-06-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02973,
+   "nas": 0.00497
+  },
+  {
+   "day": "2017-06-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01174,
+   "nas": 0.01534
+  },
+  {
+   "day": "2017-06-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00401,
+   "nas": 0.04698
+  },
+  {
+   "day": "2017-07-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04378,
+   "nas": 0.04684
+  },
+  {
+   "day": "2017-07-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02487,
+   "nas": 0.00927
+  },
+  {
+   "day": "2017-07-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01327,
+   "nas": -0.00119
+  },
+  {
+   "day": "2017-07-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01017,
+   "nas": -0.00321
+  },
+  {
+   "day": "2017-08-04",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04018,
+   "nas": -0.00386
+  },
+  {
+   "day": "2017-08-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04023,
+   "nas": 0.01315
+  },
+  {
+   "day": "2017-08-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03622,
+   "nas": 0.03248
+  },
+  {
+   "day": "2017-08-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01401,
+   "nas": 0.02806
+  },
+  {
+   "day": "2017-09-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03259,
+   "nas": -0.01266
+  },
+  {
+   "day": "2017-09-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05002,
+   "nas": 0.00796
+  },
+  {
+   "day": "2017-09-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02033,
+   "nas": 0.0106
+  },
+  {
+   "day": "2017-09-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00484,
+   "nas": 0.02964
+  },
+  {
+   "day": "2017-09-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00177,
+   "nas": 0.01375
+  },
+  {
+   "day": "2017-10-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00512,
+   "nas": 0.02999
+  },
+  {
+   "day": "2017-10-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02054,
+   "nas": 0.03226
+  },
+  {
+   "day": "2017-10-20",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00461,
+   "nas": 0.02776
+  },
+  {
+   "day": "2017-10-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00737,
+   "nas": 0.0284
+  },
+  {
+   "day": "2017-11-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01837,
+   "nas": 0.02051
+  },
+  {
+   "day": "2017-11-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00698,
+   "nas": -0.00634
+  },
+  {
+   "day": "2017-11-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03946,
+   "nas": 0.01061
+  },
+  {
+   "day": "2017-11-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02001,
+   "nas": 0.01176
+  },
+  {
+   "day": "2017-12-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01056,
+   "nas": 0.00894
+  },
+  {
+   "day": "2017-12-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05631,
+   "nas": 0.03703
+  },
+  {
+   "day": "2017-12-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05353,
+   "nas": 0.03197
+  },
+  {
+   "day": "2017-12-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04192,
+   "nas": 0.05021
+  },
+  {
+   "day": "2017-12-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03717,
+   "nas": 0.07744
+  },
+  {
+   "day": "2018-01-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01435,
+   "nas": 0.03968
+  },
+  {
+   "day": "2018-01-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00874,
+   "nas": -0.0216
+  },
+  {
+   "day": "2018-01-19",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00214,
+   "nas": -0.04007
+  },
+  {
+   "day": "2018-01-26",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01569,
+   "nas": -0.03278
+  },
+  {
+   "day": "2018-02-02",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.01134,
+   "nas": 0.03096
+  },
+  {
+   "day": "2018-02-09",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.01708,
+   "nas": 0.05988
+  },
+  {
+   "day": "2018-02-16",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01627,
+   "nas": 0.03457
+  },
+  {
+   "day": "2018-02-23",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01283,
+   "nas": -0.00359
+  },
+  {
+   "day": "2018-03-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01663,
+   "nas": -0.03977
+  },
+  {
+   "day": "2018-03-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0079,
+   "nas": -0.07925
+  },
+  {
+   "day": "2018-03-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0297,
+   "nas": -0.06169
+  },
+  {
+   "day": "2018-03-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00169,
+   "nas": 0.04443
+  },
+  {
+   "day": "2018-03-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00372,
+   "nas": -0.00359
+  },
+  {
+   "day": "2018-04-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02035,
+   "nas": 0.03685
+  },
+  {
+   "day": "2018-04-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0206,
+   "nas": 0.01913
+  },
+  {
+   "day": "2018-04-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03053,
+   "nas": 0.0287
+  },
+  {
+   "day": "2018-04-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02282,
+   "nas": 0.0352
+  },
+  {
+   "day": "2018-05-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00962,
+   "nas": 0.02229
+  },
+  {
+   "day": "2018-05-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01765,
+   "nas": 0.03004
+  },
+  {
+   "day": "2018-05-18",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00342,
+   "nas": 0.04184
+  },
+  {
+   "day": "2018-05-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01848,
+   "nas": 0.03466
+  },
+  {
+   "day": "2018-06-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02716,
+   "nas": -0.001
+  },
+  {
+   "day": "2018-06-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03467,
+   "nas": -0.01911
+  },
+  {
+   "day": "2018-06-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01984,
+   "nas": -0.00468
+  },
+  {
+   "day": "2018-06-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03502,
+   "nas": 0.02944
+  },
+  {
+   "day": "2018-06-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02263,
+   "nas": 0.04782
+  },
+  {
+   "day": "2018-07-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02618,
+   "nas": 0.00481
+  },
+  {
+   "day": "2018-07-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02335,
+   "nas": 0.00936
+  },
+  {
+   "day": "2018-07-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03221,
+   "nas": 0.0144
+  },
+  {
+   "day": "2018-07-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02185,
+   "nas": 0.01168
+  },
+  {
+   "day": "2018-08-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01015,
+   "nas": 0.02651
+  },
+  {
+   "day": "2018-08-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01698,
+   "nas": 0.03161
+  },
+  {
+   "day": "2018-08-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01123,
+   "nas": 0.01744
+  },
+  {
+   "day": "2018-08-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00685,
+   "nas": -0.00305
+  },
+  {
+   "day": "2018-08-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00178,
+   "nas": -0.01241
+  },
+  {
+   "day": "2018-09-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00785,
+   "nas": 0.02436
+  },
+  {
+   "day": "2018-09-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00294,
+   "nas": -0.01998
+  },
+  {
+   "day": "2018-09-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02229,
+   "nas": -0.0236
+  },
+  {
+   "day": "2018-09-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03299,
+   "nas": -0.074
+  },
+  {
+   "day": "2018-10-05",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.01548,
+   "nas": -0.08219
+  },
+  {
+   "day": "2018-10-12",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00702,
+   "nas": -0.02365
+  },
+  {
+   "day": "2018-10-19",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.02003,
+   "nas": -0.02788
+  },
+  {
+   "day": "2018-10-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00909,
+   "nas": -0.05777
+  },
+  {
+   "day": "2018-11-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0161,
+   "nas": -0.03238
+  },
+  {
+   "day": "2018-11-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02285,
+   "nas": -0.02851
+  },
+  {
+   "day": "2018-11-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01669,
+   "nas": -0.02303
+  },
+  {
+   "day": "2018-11-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02023,
+   "nas": -0.01143
+  },
+  {
+   "day": "2018-11-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03638,
+   "nas": -0.18499
+  },
+  {
+   "day": "2018-12-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02531,
+   "nas": -0.03341
+  },
+  {
+   "day": "2018-12-14",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03798,
+   "nas": -0.00907
+  },
+  {
+   "day": "2018-12-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02418,
+   "nas": 0.09924
+  },
+  {
+   "day": "2018-12-28",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0038,
+   "nas": 0.04849
+  },
+  {
+   "day": "2019-01-04",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.0204,
+   "nas": 0.03485
+  },
+  {
+   "day": "2019-01-11",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02067,
+   "nas": 0.06433
+  },
+  {
+   "day": "2019-01-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02138,
+   "nas": 0.03645
+  },
+  {
+   "day": "2019-01-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02999,
+   "nas": 0.04386
+  },
+  {
+   "day": "2019-02-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00915,
+   "nas": 0.03535
+  },
+  {
+   "day": "2019-02-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01979,
+   "nas": 0.03523
+  },
+  {
+   "day": "2019-02-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01461,
+   "nas": 0.0207
+  },
+  {
+   "day": "2019-02-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01632,
+   "nas": 0.03231
+  },
+  {
+   "day": "2019-03-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01621,
+   "nas": 0.02159
+  },
+  {
+   "day": "2019-03-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00425,
+   "nas": 0.06615
+  },
+  {
+   "day": "2019-03-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0031,
+   "nas": 0.0344
+  },
+  {
+   "day": "2019-03-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02709,
+   "nas": 0.04238
+  },
+  {
+   "day": "2019-03-29",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01332,
+   "nas": 0.05334
+  },
+  {
+   "day": "2019-04-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01144,
+   "nas": 0.01788
+  },
+  {
+   "day": "2019-04-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00654,
+   "nas": -0.00195
+  },
+  {
+   "day": "2019-04-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01571,
+   "nas": -0.03643
+  },
+  {
+   "day": "2019-04-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00876,
+   "nas": -0.0459
+  },
+  {
+   "day": "2019-05-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00336,
+   "nas": -0.05413
+  },
+  {
+   "day": "2019-05-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0292,
+   "nas": -0.04107
+  },
+  {
+   "day": "2019-05-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0384,
+   "nas": -0.00292
+  },
+  {
+   "day": "2019-05-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04622,
+   "nas": 0.04729
+  },
+  {
+   "day": "2019-05-31",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.07998,
+   "nas": 0.07074
+  },
+  {
+   "day": "2019-06-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.06966,
+   "nas": 0.0461
+  },
+  {
+   "day": "2019-06-14",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.04152,
+   "nas": 0.04252
+  },
+  {
+   "day": "2019-06-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00118,
+   "nas": 0.02253
+  },
+  {
+   "day": "2019-06-28",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01769,
+   "nas": 0.0196
+  },
+  {
+   "day": "2019-07-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02488,
+   "nas": 0.01869
+  },
+  {
+   "day": "2019-07-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04194,
+   "nas": -0.05803
+  },
+  {
+   "day": "2019-07-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05183,
+   "nas": -0.01114
+  },
+  {
+   "day": "2019-07-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05885,
+   "nas": -0.04216
+  },
+  {
+   "day": "2019-08-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.06974,
+   "nas": -0.0103
+  },
+  {
+   "day": "2019-08-09",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.03167,
+   "nas": -0.00235
+  },
+  {
+   "day": "2019-08-16",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.01499,
+   "nas": 0.02136
+  },
+  {
+   "day": "2019-08-23",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.03053,
+   "nas": 0.0632
+  },
+  {
+   "day": "2019-08-30",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00168,
+   "nas": 0.01366
+  },
+  {
+   "day": "2019-09-06",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01626,
+   "nas": -0.02081
+  },
+  {
+   "day": "2019-09-13",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.00171,
+   "nas": -0.02851
+  },
+  {
+   "day": "2019-09-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02163,
+   "nas": 0.0101
+  },
+  {
+   "day": "2019-09-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00501,
+   "nas": 0.01599
+  },
+  {
+   "day": "2019-10-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01391,
+   "nas": 0.04068
+  },
+  {
+   "day": "2019-10-11",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00014,
+   "nas": 0.04003
+  },
+  {
+   "day": "2019-10-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02259,
+   "nas": 0.04692
+  },
+  {
+   "day": "2019-10-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0198,
+   "nas": 0.03346
+  },
+  {
+   "day": "2019-11-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0352,
+   "nas": 0.02869
+  },
+  {
+   "day": "2019-11-08",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.01059,
+   "nas": 0.00211
+  },
+  {
+   "day": "2019-11-15",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00349,
+   "nas": 0.00679
+  },
+  {
+   "day": "2019-11-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01032,
+   "nas": 0.03364
+  },
+  {
+   "day": "2019-11-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02532,
+   "nas": 0.03331
+  },
+  {
+   "day": "2019-12-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03835,
+   "nas": 0.04118
+  },
+  {
+   "day": "2019-12-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07887,
+   "nas": 0.0265
+  },
+  {
+   "day": "2019-12-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05127,
+   "nas": 0.04045
+  },
+  {
+   "day": "2019-12-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03115,
+   "nas": 0.04387
+  },
+  {
+   "day": "2020-01-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.005,
+   "nas": 0.03952
+  },
+  {
+   "day": "2020-01-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.007,
+   "nas": 0.03073
+  },
+  {
+   "day": "2020-01-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00648,
+   "nas": 0.03859
+  },
+  {
+   "day": "2020-01-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01135,
+   "nas": 0.06954
+  },
+  {
+   "day": "2020-01-31",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.03123,
+   "nas": -0.01104
+  },
+  {
+   "day": "2020-02-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.04408,
+   "nas": -0.08812
+  },
+  {
+   "day": "2020-02-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0429,
+   "nas": -0.1622
+  },
+  {
+   "day": "2020-02-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.07981,
+   "nas": -0.2595
+  },
+  {
+   "day": "2020-02-28",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.0314,
+   "nas": -0.10855
+  },
+  {
+   "day": "2020-03-06",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.07411,
+   "nas": -0.0517
+  },
+  {
+   "day": "2020-03-13",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.05659,
+   "nas": 0.06237
+  },
+  {
+   "day": "2020-03-20",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.14025,
+   "nas": 0.25256
+  },
+  {
+   "day": "2020-03-27",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05052,
+   "nas": 0.1443
+  },
+  {
+   "day": "2020-04-03",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.05657,
+   "nas": 0.17357
+  },
+  {
+   "day": "2020-04-10",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00996,
+   "nas": 0.09944
+  },
+  {
+   "day": "2020-04-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01576,
+   "nas": 0.0307
+  },
+  {
+   "day": "2020-04-24",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01197,
+   "nas": 0.06214
+  },
+  {
+   "day": "2020-05-01",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00762,
+   "nas": 0.08956
+  },
+  {
+   "day": "2020-05-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01156,
+   "nas": 0.04398
+  },
+  {
+   "day": "2020-05-15",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02584,
+   "nas": 0.08553
+  },
+  {
+   "day": "2020-05-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00241,
+   "nas": 0.05549
+  },
+  {
+   "day": "2020-05-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01653,
+   "nas": 0.0694
+  },
+  {
+   "day": "2020-06-05",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.05865,
+   "nas": 0.02702
+  },
+  {
+   "day": "2020-06-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03486,
+   "nas": 0.10058
+  },
+  {
+   "day": "2020-06-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03386,
+   "nas": 0.07863
+  },
+  {
+   "day": "2020-06-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0395,
+   "nas": 0.10097
+  },
+  {
+   "day": "2020-07-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0969,
+   "nas": 0.01636
+  },
+  {
+   "day": "2020-07-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.12071,
+   "nas": 0.01798
+  },
+  {
+   "day": "2020-07-17",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05384,
+   "nas": 0.02513
+  },
+  {
+   "day": "2020-07-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04675,
+   "nas": 0.08843
+  },
+  {
+   "day": "2020-07-31",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02683,
+   "nas": 0.0728
+  },
+  {
+   "day": "2020-08-07",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02733,
+   "nas": 0.10619
+  },
+  {
+   "day": "2020-08-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0012,
+   "nas": -0.01149
+  },
+  {
+   "day": "2020-08-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00957,
+   "nas": -0.01308
+  },
+  {
+   "day": "2020-08-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03559,
+   "nas": -0.07884
+  },
+  {
+   "day": "2020-09-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01961,
+   "nas": -0.00537
+  },
+  {
+   "day": "2020-09-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03281,
+   "nas": 0.00762
+  },
+  {
+   "day": "2020-09-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02879,
+   "nas": 0.10242
+  },
+  {
+   "day": "2020-09-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02552,
+   "nas": 0.04752
+  },
+  {
+   "day": "2020-10-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00119,
+   "nas": 0.01799
+  },
+  {
+   "day": "2020-10-09",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00762,
+   "nas": -0.03687
+  },
+  {
+   "day": "2020-10-16",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01276,
+   "nas": -0.02389
+  },
+  {
+   "day": "2020-10-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00843,
+   "nas": 0.0291
+  },
+  {
+   "day": "2020-10-30",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03688,
+   "nas": 0.09711
+  },
+  {
+   "day": "2020-11-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.07814,
+   "nas": 0.01719
+  },
+  {
+   "day": "2020-11-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01084,
+   "nas": 0.0482
+  },
+  {
+   "day": "2020-11-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01061,
+   "nas": 0.05286
+  },
+  {
+   "day": "2020-11-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04248,
+   "nas": 0.03189
+  },
+  {
+   "day": "2020-12-04",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03197,
+   "nas": 0.02508
+  },
+  {
+   "day": "2020-12-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04193,
+   "nas": 0.0422
+  },
+  {
+   "day": "2020-12-18",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01943,
+   "nas": 0.01436
+  },
+  {
+   "day": "2020-12-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00978,
+   "nas": 0.04485
+  },
+  {
+   "day": "2021-01-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03287,
+   "nas": 0.05275
+  },
+  {
+   "day": "2021-01-08",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00454,
+   "nas": 0.03055
+  },
+  {
+   "day": "2021-01-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01393,
+   "nas": 0.07088
+  },
+  {
+   "day": "2021-01-22",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03753,
+   "nas": 0.0239
+  },
+  {
+   "day": "2021-01-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0273,
+   "nas": 0.02824
+  },
+  {
+   "day": "2021-02-05",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.0458,
+   "nas": -0.0411
+  },
+  {
+   "day": "2021-02-12",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.05945,
+   "nas": -0.07677
+  },
+  {
+   "day": "2021-02-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02943,
+   "nas": -0.03276
+  },
+  {
+   "day": "2021-02-26",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00696,
+   "nas": 0.00284
+  },
+  {
+   "day": "2021-03-05",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.01313,
+   "nas": 0.01874
+  },
+  {
+   "day": "2021-03-12",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.00661,
+   "nas": 0.04883
+  },
+  {
+   "day": "2021-03-19",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00087,
+   "nas": 0.08196
+  },
+  {
+   "day": "2021-03-26",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.03549,
+   "nas": 0.06165
+  },
+  {
+   "day": "2021-04-02",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02708,
+   "nas": 0.04463
+  },
+  {
+   "day": "2021-04-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02098,
+   "nas": -0.01857
+  },
+  {
+   "day": "2021-04-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03256,
+   "nas": -0.04813
+  },
+  {
+   "day": "2021-04-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05226,
+   "nas": -0.05532
+  },
+  {
+   "day": "2021-04-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07036,
+   "nas": -0.01406
+  },
+  {
+   "day": "2021-05-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03349,
+   "nas": -0.00819
+  },
+  {
+   "day": "2021-05-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0247,
+   "nas": 0.03068
+  },
+  {
+   "day": "2021-05-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01374,
+   "nas": 0.04879
+  },
+  {
+   "day": "2021-05-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.06858,
+   "nas": 0.04094
+  },
+  {
+   "day": "2021-06-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.07016,
+   "nas": 0.05885
+  },
+  {
+   "day": "2021-06-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04258,
+   "nas": 0.05277
+  },
+  {
+   "day": "2021-06-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0205,
+   "nas": 0.05578
+  },
+  {
+   "day": "2021-06-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0155,
+   "nas": 0.02653
+  },
+  {
+   "day": "2021-07-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00764,
+   "nas": 0.0139
+  },
+  {
+   "day": "2021-07-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00258,
+   "nas": 0.01357
+  },
+  {
+   "day": "2021-07-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.05018,
+   "nas": 0.02615
+  },
+  {
+   "day": "2021-07-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00791,
+   "nas": -0.01154
+  },
+  {
+   "day": "2021-07-30",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00669,
+   "nas": 0.02277
+  },
+  {
+   "day": "2021-08-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05406,
+   "nas": 0.03706
+  },
+  {
+   "day": "2021-08-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00942,
+   "nas": 0.03519
+  },
+  {
+   "day": "2021-08-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01392,
+   "nas": 0.0198
+  },
+  {
+   "day": "2021-08-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02426,
+   "nas": -0.03053
+  },
+  {
+   "day": "2021-09-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05181,
+   "nas": -0.05464
+  },
+  {
+   "day": "2021-09-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01581,
+   "nas": -0.05569
+  },
+  {
+   "day": "2021-09-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00354,
+   "nas": -0.04813
+  },
+  {
+   "day": "2021-09-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01088,
+   "nas": 0.00567
+  },
+  {
+   "day": "2021-10-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01711,
+   "nas": 0.049
+  },
+  {
+   "day": "2021-10-08",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.01875,
+   "nas": 0.07986
+  },
+  {
+   "day": "2021-10-15",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.0327,
+   "nas": 0.07014
+  },
+  {
+   "day": "2021-10-22",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.03071,
+   "nas": 0.06239
+  },
+  {
+   "day": "2021-10-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00538,
+   "nas": 0.02893
+  },
+  {
+   "day": "2021-11-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0189,
+   "nas": -0.02318
+  },
+  {
+   "day": "2021-11-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04496,
+   "nas": 0.00892
+  },
+  {
+   "day": "2021-11-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0165,
+   "nas": -0.00406
+  },
+  {
+   "day": "2021-11-26",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00276,
+   "nas": -0.01223
+  },
+  {
+   "day": "2021-12-03",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01201,
+   "nas": 0.04604
+  },
+  {
+   "day": "2021-12-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01505,
+   "nas": -0.03489
+  },
+  {
+   "day": "2021-12-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01387,
+   "nas": 0.01166
+  },
+  {
+   "day": "2021-12-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00382,
+   "nas": -0.073
+  },
+  {
+   "day": "2021-12-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01148,
+   "nas": -0.14368
+  },
+  {
+   "day": "2022-01-07",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.00308,
+   "nas": -0.02867
+  },
+  {
+   "day": "2022-01-14",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.00521,
+   "nas": -0.05346
+  },
+  {
+   "day": "2022-01-21",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.00996,
+   "nas": -0.00001
+  },
+  {
+   "day": "2022-01-28",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.05895,
+   "nas": -0.03083
+  },
+  {
+   "day": "2022-02-04",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.07053,
+   "nas": -0.04657
+  },
+  {
+   "day": "2022-02-11",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.09442,
+   "nas": -0.07314
+  },
+  {
+   "day": "2022-02-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00691,
+   "nas": -0.02952
+  },
+  {
+   "day": "2022-02-25",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00494,
+   "nas": 0.05651
+  },
+  {
+   "day": "2022-03-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03704,
+   "nas": 0.11367
+  },
+  {
+   "day": "2022-03-11",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02758,
+   "nas": 0.10458
+  },
+  {
+   "day": "2022-03-18",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.02408,
+   "nas": -0.02803
+  },
+  {
+   "day": "2022-03-25",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.00017,
+   "nas": -0.04341
+  },
+  {
+   "day": "2022-04-01",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.02048,
+   "nas": -0.1176
+  },
+  {
+   "day": "2022-04-08",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.02645,
+   "nas": -0.10056
+  },
+  {
+   "day": "2022-04-15",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.08023,
+   "nas": -0.10755
+  },
+  {
+   "day": "2022-04-22",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.06305,
+   "nas": -0.06012
+  },
+  {
+   "day": "2022-04-29",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": -0.01585,
+   "nas": -0.08349
+  },
+  {
+   "day": "2022-05-06",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.02412,
+   "nas": -0.01892
+  },
+  {
+   "day": "2022-05-13",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02199,
+   "nas": 0.01628
+  },
+  {
+   "day": "2022-05-20",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.01936,
+   "nas": -0.04913
+  },
+  {
+   "day": "2022-05-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01009,
+   "nas": -0.09828
+  },
+  {
+   "day": "2022-06-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01802,
+   "nas": -0.07358
+  },
+  {
+   "day": "2022-06-10",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.05897,
+   "nas": 0.00786
+  },
+  {
+   "day": "2022-06-17",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.06347,
+   "nas": 0.03021
+  },
+  {
+   "day": "2022-06-24",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": -0.06844,
+   "nas": 0.0186
+  },
+  {
+   "day": "2022-07-01",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.05111,
+   "nas": 0.05973
+  },
+  {
+   "day": "2022-07-08",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.0084,
+   "nas": 0.06341
+  },
+  {
+   "day": "2022-07-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04787,
+   "nas": 0.07977
+  },
+  {
+   "day": "2022-07-22",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.0291,
+   "nas": 0.09634
+  },
+  {
+   "day": "2022-07-29",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.0092,
+   "nas": -0.00183
+  },
+  {
+   "day": "2022-08-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02928,
+   "nas": -0.06296
+  },
+  {
+   "day": "2022-08-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0546,
+   "nas": -0.11935
+  },
+  {
+   "day": "2022-08-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02529,
+   "nas": -0.08861
+  },
+  {
+   "day": "2022-08-26",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": -0.04021,
+   "nas": -0.04599
+  },
+  {
+   "day": "2022-09-02",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.04741,
+   "nas": -0.07095
+  },
+  {
+   "day": "2022-09-09",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.0041,
+   "nas": -0.0881
+  },
+  {
+   "day": "2022-09-16",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.00827,
+   "nas": -0.09237
+  },
+  {
+   "day": "2022-09-23",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": 0.00506,
+   "nas": 0.00163
+  },
+  {
+   "day": "2022-09-30",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.00688,
+   "nas": 0.04841
+  },
+  {
+   "day": "2022-10-07",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.02987,
+   "nas": 0.02842
+  },
+  {
+   "day": "2022-10-14",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": 0.03819,
+   "nas": 0.03295
+  },
+  {
+   "day": "2022-10-21",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.06954,
+   "nas": 0.03949
+  },
+  {
+   "day": "2022-10-28",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.05775,
+   "nas": 0.01731
+  },
+  {
+   "day": "2022-11-04",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.04452,
+   "nas": 0.06378
+  },
+  {
+   "day": "2022-11-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00423,
+   "nas": -0.01791
+  },
+  {
+   "day": "2022-11-18",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.03222,
+   "nas": 0.01332
+  },
+  {
+   "day": "2022-11-25",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03718,
+   "nas": -0.05129
+  },
+  {
+   "day": "2022-12-02",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.00373,
+   "nas": -0.11246
+  },
+  {
+   "day": "2022-12-09",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02086,
+   "nas": -0.06871
+  },
+  {
+   "day": "2022-12-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05804,
+   "nas": 0.01859
+  },
+  {
+   "day": "2022-12-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.06966,
+   "nas": 0.0224
+  },
+  {
+   "day": "2022-12-30",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.06298,
+   "nas": 0.07685
+  },
+  {
+   "day": "2023-01-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0304,
+   "nas": 0.08499
+  },
+  {
+   "day": "2023-01-13",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.02322,
+   "nas": 0.09771
+  },
+  {
+   "day": "2023-01-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03826,
+   "nas": 0.08057
+  },
+  {
+   "day": "2023-01-27",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04962,
+   "nas": -0.00594
+  },
+  {
+   "day": "2023-02-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02166,
+   "nas": -0.04449
+  },
+  {
+   "day": "2023-02-10",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": -0.02652,
+   "nas": -0.00908
+  },
+  {
+   "day": "2023-02-17",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": 0.03442,
+   "nas": -0.01034
+  },
+  {
+   "day": "2023-02-24",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.06997,
+   "nas": 0.06116
+  },
+  {
+   "day": "2023-03-03",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.06259,
+   "nas": 0.03059
+  },
+  {
+   "day": "2023-03-10",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.07389,
+   "nas": 0.09162
+  },
+  {
+   "day": "2023-03-17",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.02059,
+   "nas": 0.03203
+  },
+  {
+   "day": "2023-03-24",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.00905,
+   "nas": 0.02006
+  },
+  {
+   "day": "2023-03-31",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01751,
+   "nas": -0.0187
+  },
+  {
+   "day": "2023-04-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00518,
+   "nas": 0.00466
+  },
+  {
+   "day": "2023-04-14",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01653,
+   "nas": 0.00967
+  },
+  {
+   "day": "2023-04-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00257,
+   "nas": 0.03476
+  },
+  {
+   "day": "2023-04-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00595,
+   "nas": 0.03487
+  },
+  {
+   "day": "2023-05-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02893,
+   "nas": 0.08323
+  },
+  {
+   "day": "2023-05-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02328,
+   "nas": 0.09058
+  },
+  {
+   "day": "2023-05-19",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.01884,
+   "nas": 0.0779
+  },
+  {
+   "day": "2023-05-26",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.00329,
+   "nas": 0.04851
+  },
+  {
+   "day": "2023-06-02",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": -0.01755,
+   "nas": 0.02738
+  },
+  {
+   "day": "2023-06-09",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.01735,
+   "nas": 0.04151
+  },
+  {
+   "day": "2023-06-16",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01224,
+   "nas": 0.00061
+  },
+  {
+   "day": "2023-06-23",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02674,
+   "nas": 0.05804
+  },
+  {
+   "day": "2023-06-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02426,
+   "nas": 0.02182
+  },
+  {
+   "day": "2023-07-07",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": 0.01407,
+   "nas": 0.04035
+  },
+  {
+   "day": "2023-07-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01428,
+   "nas": -0.01657
+  },
+  {
+   "day": "2023-07-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03097,
+   "nas": -0.02482
+  },
+  {
+   "day": "2023-07-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03085,
+   "nas": -0.0566
+  },
+  {
+   "day": "2023-08-04",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00397,
+   "nas": 0.00547
+  },
+  {
+   "day": "2023-08-11",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.00673,
+   "nas": 0.02753
+  },
+  {
+   "day": "2023-08-18",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.01203,
+   "nas": 0.03963
+  },
+  {
+   "day": "2023-08-25",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.00851,
+   "nas": 0.01635
+  },
+  {
+   "day": "2023-09-01",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.02031,
+   "nas": -0.05926
+  },
+  {
+   "day": "2023-09-08",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.05107,
+   "nas": -0.04942
+  },
+  {
+   "day": "2023-09-15",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.03363,
+   "nas": -0.00479
+  },
+  {
+   "day": "2023-09-22",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00006,
+   "nas": 0.02423
+  },
+  {
+   "day": "2023-09-29",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.06515,
+   "nas": -0.0058
+  },
+  {
+   "day": "2023-10-06",
+   "cls": "risingFast",
+   "why": "termPremium",
+   "gold": 0.0709,
+   "nas": -0.03536
+  },
+  {
+   "day": "2023-10-13",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.02212,
+   "nas": 0.0167
+  },
+  {
+   "day": "2023-10-20",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00463,
+   "nas": 0.08088
+  },
+  {
+   "day": "2023-10-27",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": -0.00172,
+   "nas": 0.10987
+  },
+  {
+   "day": "2023-11-03",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.0277,
+   "nas": 0.0583
+  },
+  {
+   "day": "2023-11-10",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03968,
+   "nas": 0.02598
+  },
+  {
+   "day": "2023-11-17",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00398,
+   "nas": 0.03735
+  },
+  {
+   "day": "2023-11-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01909,
+   "nas": 0.05549
+  },
+  {
+   "day": "2023-12-01",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01816,
+   "nas": 0.06036
+  },
+  {
+   "day": "2023-12-08",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.01834,
+   "nas": 0.01372
+  },
+  {
+   "day": "2023-12-15",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.00882,
+   "nas": 0.01104
+  },
+  {
+   "day": "2023-12-22",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.01523,
+   "nas": 0.0116
+  },
+  {
+   "day": "2023-12-29",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.02323,
+   "nas": 0.03742
+  },
+  {
+   "day": "2024-01-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00385,
+   "nas": 0.05937
+  },
+  {
+   "day": "2024-01-12",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00604,
+   "nas": 0.04409
+  },
+  {
+   "day": "2024-01-19",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": -0.01797,
+   "nas": 0.01454
+  },
+  {
+   "day": "2024-01-26",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.00115,
+   "nas": 0.00825
+  },
+  {
+   "day": "2024-02-02",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00448,
+   "nas": 0.01948
+  },
+  {
+   "day": "2024-02-09",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.04942,
+   "nas": -0.00091
+  },
+  {
+   "day": "2024-02-16",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.06862,
+   "nas": 0.02983
+  },
+  {
+   "day": "2024-02-23",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.05873,
+   "nas": 0.00672
+  },
+  {
+   "day": "2024-03-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.045,
+   "nas": -0.00102
+  },
+  {
+   "day": "2024-03-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05176,
+   "nas": 0.01319
+  },
+  {
+   "day": "2024-03-15",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.07973,
+   "nas": 0.00766
+  },
+  {
+   "day": "2024-03-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08802,
+   "nas": -0.04622
+  },
+  {
+   "day": "2024-03-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03383,
+   "nas": -0.04644
+  },
+  {
+   "day": "2024-04-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00864,
+   "nas": -0.04169
+  },
+  {
+   "day": "2024-04-12",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.02115,
+   "nas": 0.00137
+  },
+  {
+   "day": "2024-04-19",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01293,
+   "nas": 0.06734
+  },
+  {
+   "day": "2024-04-26",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.03606,
+   "nas": 0.0528
+  },
+  {
+   "day": "2024-05-03",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02828,
+   "nas": 0.0527
+  },
+  {
+   "day": "2024-05-10",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01348,
+   "nas": 0.02949
+  },
+  {
+   "day": "2024-05-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04443,
+   "nas": 0.03419
+  },
+  {
+   "day": "2024-05-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.0038,
+   "nas": 0.06221
+  },
+  {
+   "day": "2024-05-31",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00252,
+   "nas": 0.06285
+  },
+  {
+   "day": "2024-06-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01372,
+   "nas": 0.05331
+  },
+  {
+   "day": "2024-06-14",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.01539,
+   "nas": 0.04055
+  },
+  {
+   "day": "2024-06-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.06233,
+   "nas": 0.03077
+  },
+  {
+   "day": "2024-06-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03531,
+   "nas": -0.00428
+  },
+  {
+   "day": "2024-07-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00989,
+   "nas": -0.0735
+  },
+  {
+   "day": "2024-07-12",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.01034,
+   "nas": -0.1261
+  },
+  {
+   "day": "2024-07-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02158,
+   "nas": -0.03258
+  },
+  {
+   "day": "2024-07-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04716,
+   "nas": 0.03097
+  },
+  {
+   "day": "2024-08-02",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.03395,
+   "nas": 0.07265
+  },
+  {
+   "day": "2024-08-09",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.02658,
+   "nas": 0.02044
+  },
+  {
+   "day": "2024-08-16",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.00485,
+   "nas": -0.03891
+  },
+  {
+   "day": "2024-08-23",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.02283,
+   "nas": -0.01018
+  },
+  {
+   "day": "2024-08-30",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.06014,
+   "nas": 0.02312
+  },
+  {
+   "day": "2024-09-06",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.06342,
+   "nas": 0.07043
+  },
+  {
+   "day": "2024-09-13",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": 0.01648,
+   "nas": 0.02983
+  },
+  {
+   "day": "2024-09-20",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01526,
+   "nas": 0.017
+  },
+  {
+   "day": "2024-09-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03068,
+   "nas": 0.01548
+  },
+  {
+   "day": "2024-10-04",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": 0.04603,
+   "nas": 0.02846
+  },
+  {
+   "day": "2024-10-11",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.03617,
+   "nas": -0.00072
+  },
+  {
+   "day": "2024-10-18",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.04678,
+   "nas": 0.03402
+  },
+  {
+   "day": "2024-10-25",
+   "cls": "risingFast",
+   "why": "led2y",
+   "gold": -0.03748,
+   "nas": 0.01169
+  },
+  {
+   "day": "2024-11-01",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.03951,
+   "nas": 0.04384
+  },
+  {
+   "day": "2024-11-08",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01604,
+   "nas": 0.004
+  },
+  {
+   "day": "2024-11-15",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.04736,
+   "nas": 0.04342
+  },
+  {
+   "day": "2024-11-22",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.02696,
+   "nas": 0.05165
+  },
+  {
+   "day": "2024-11-29",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.01106,
+   "nas": 0.04372
+  },
+  {
+   "day": "2024-12-06",
+   "cls": "fallingFast",
+   "why": null,
+   "gold": -0.00606,
+   "nas": -0.02609
+  },
+  {
+   "day": "2024-12-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00066,
+   "nas": -0.02486
+  },
+  {
+   "day": "2024-12-20",
+   "cls": "risingFast",
+   "why": null,
+   "gold": 0.01934,
+   "nas": -0.03054
+  },
+  {
+   "day": "2024-12-27",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.04481,
+   "nas": 0.00768
+  },
+  {
+   "day": "2025-01-03",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.04505,
+   "nas": 0.0033
+  },
+  {
+   "day": "2025-01-10",
+   "cls": "risingSlow",
+   "why": "termPremium",
+   "gold": 0.05434,
+   "nas": 0.02887
+  },
+  {
+   "day": "2025-01-17",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.07227,
+   "nas": 0.0149
+  },
+  {
+   "day": "2025-01-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05836,
+   "nas": 0.02923
+  },
+  {
+   "day": "2025-01-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04365,
+   "nas": 0.00827
+  },
+  {
+   "day": "2025-02-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01619,
+   "nas": -0.04765
+  },
+  {
+   "day": "2025-02-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01246,
+   "nas": -0.12899
+  },
+  {
+   "day": "2025-02-21",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.03179,
+   "nas": -0.10628
+  },
+  {
+   "day": "2025-02-28",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.05091,
+   "nas": -0.02802
+  },
+  {
+   "day": "2025-03-07",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.066,
+   "nas": -0.02596
+  },
+  {
+   "day": "2025-03-14",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.00388,
+   "nas": -0.14843
+  },
+  {
+   "day": "2025-03-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07237,
+   "nas": -0.06864
+  },
+  {
+   "day": "2025-03-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.071,
+   "nas": -0.01899
+  },
+  {
+   "day": "2025-04-04",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.08714,
+   "nas": 0.17807
+  },
+  {
+   "day": "2025-04-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04623,
+   "nas": 0.05088
+  },
+  {
+   "day": "2025-04-18",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.02841,
+   "nas": 0.15317
+  },
+  {
+   "day": "2025-04-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00369,
+   "nas": 0.09872
+  },
+  {
+   "day": "2025-05-02",
+   "cls": "flat",
+   "why": "termPremium",
+   "gold": 0.01873,
+   "nas": 0.06896
+  },
+  {
+   "day": "2025-05-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02175,
+   "nas": 0.06164
+  },
+  {
+   "day": "2025-05-16",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.02834,
+   "nas": 0.02903
+  },
+  {
+   "day": "2025-05-23",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01328,
+   "nas": 0.02605
+  },
+  {
+   "day": "2025-05-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00422,
+   "nas": 0.04474
+  },
+  {
+   "day": "2025-06-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00601,
+   "nas": 0.03602
+  },
+  {
+   "day": "2025-06-13",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04206,
+   "nas": 0.04783
+  },
+  {
+   "day": "2025-06-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.01245,
+   "nas": 0.05852
+  },
+  {
+   "day": "2025-06-27",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0489,
+   "nas": 0.02192
+  },
+  {
+   "day": "2025-07-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00042,
+   "nas": 0.02415
+  },
+  {
+   "day": "2025-07-11",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00466,
+   "nas": 0.01098
+  },
+  {
+   "day": "2025-07-18",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00045,
+   "nas": 0.03237
+  },
+  {
+   "day": "2025-07-25",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00581,
+   "nas": -0.00224
+  },
+  {
+   "day": "2025-08-01",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.0085,
+   "nas": 0.03187
+  },
+  {
+   "day": "2025-08-08",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04003,
+   "nas": -0.01348
+  },
+  {
+   "day": "2025-08-15",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08813,
+   "nas": 0.00367
+  },
+  {
+   "day": "2025-08-22",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.09217,
+   "nas": 0.03283
+  },
+  {
+   "day": "2025-08-29",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08768,
+   "nas": 0.04782
+  },
+  {
+   "day": "2025-09-05",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": 0.07296,
+   "nas": 0.03743
+  },
+  {
+   "day": "2025-09-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.09339,
+   "nas": 0.03168
+  },
+  {
+   "day": "2025-09-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.12126,
+   "nas": -0.0006
+  },
+  {
+   "day": "2025-09-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08305,
+   "nas": 0.02148
+  },
+  {
+   "day": "2025-10-03",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01402,
+   "nas": 0.0464
+  },
+  {
+   "day": "2025-10-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02524,
+   "nas": 0.03117
+  },
+  {
+   "day": "2025-10-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02278,
+   "nas": 0.02754
+  },
+  {
+   "day": "2025-10-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00303,
+   "nas": -0.04262
+  },
+  {
+   "day": "2025-10-31",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03804,
+   "nas": -0.03673
+  },
+  {
+   "day": "2025-11-07",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04886,
+   "nas": 0.01338
+  },
+  {
+   "day": "2025-11-14",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.02751,
+   "nas": 0.02179
+  },
+  {
+   "day": "2025-11-21",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05559,
+   "nas": 0.02798
+  },
+  {
+   "day": "2025-11-28",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.06454,
+   "nas": 0.00791
+  },
+  {
+   "day": "2025-12-05",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03223,
+   "nas": -0.0087
+  },
+  {
+   "day": "2025-12-12",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.04347,
+   "nas": 0.01956
+  },
+  {
+   "day": "2025-12-19",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05401,
+   "nas": 0.01085
+  },
+  {
+   "day": "2025-12-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05352,
+   "nas": -0.0273
+  },
+  {
+   "day": "2026-01-02",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.16793,
+   "nas": 0.02884
+  },
+  {
+   "day": "2026-01-09",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08596,
+   "nas": -0.01582
+  },
+  {
+   "day": "2026-01-16",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.07595,
+   "nas": -0.00529
+  },
+  {
+   "day": "2026-01-23",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03645,
+   "nas": -0.03155
+  },
+  {
+   "day": "2026-01-30",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08189,
+   "nas": -0.01714
+  },
+  {
+   "day": "2026-02-06",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.01759,
+   "nas": -0.02102
+  },
+  {
+   "day": "2026-02-13",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.03468,
+   "nas": 0.00892
+  },
+  {
+   "day": "2026-02-20",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03204,
+   "nas": -0.00432
+  },
+  {
+   "day": "2026-02-27",
+   "cls": "fallingSlow",
+   "why": null,
+   "gold": -0.16953,
+   "nas": -0.01887
+  },
+  {
+   "day": "2026-03-06",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.07772,
+   "nas": -0.01257
+  },
+  {
+   "day": "2026-03-13",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.05804,
+   "nas": 0.01977
+  },
+  {
+   "day": "2026-03-20",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": 0.07727,
+   "nas": 0.0829
+  },
+  {
+   "day": "2026-03-27",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": 0.06079,
+   "nas": 0.14868
+  },
+  {
+   "day": "2026-04-03",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.00328,
+   "nas": 0.12553
+  },
+  {
+   "day": "2026-04-10",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.01676,
+   "nas": 0.1295
+  },
+  {
+   "day": "2026-04-17",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00806,
+   "nas": 0.08919
+  },
+  {
+   "day": "2026-04-24",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04161,
+   "nas": 0.05763
+  },
+  {
+   "day": "2026-05-01",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02065,
+   "nas": 0.08055
+  },
+  {
+   "day": "2026-05-08",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04745,
+   "nas": 0.04886
+  },
+  {
+   "day": "2026-05-15",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": -0.07197,
+   "nas": 0.0001
+  },
+  {
+   "day": "2026-05-22",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.05307,
+   "nas": 0.00945
+  },
+  {
+   "day": "2026-05-29",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.10205,
+   "nas": -0.03036
+  },
+  {
+   "day": "2026-06-05",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.08108,
+   "nas": 0.04279
+  },
+  {
+   "day": "2026-06-12",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.04654,
+   "nas": -0.03132
+  },
+  {
+   "day": "2026-06-19",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02132,
+   "nas": -0.01291
+  },
+  {
+   "day": "2026-06-26",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.00432,
+   "nas": -0.00912
+  },
+  {
+   "day": "2026-07-03",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.03859,
+   "nas": -0.06233
+  },
+  {
+   "day": "2026-07-10",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00297,
+   "nas": 0.00055
+  },
+  {
+   "day": "2026-07-17",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.08997,
+   "nas": 0.02963
+  },
+  {
+   "day": "2026-07-24",
+   "cls": "flat",
+   "why": null,
+   "gold": 0.05674,
+   "nas": 0.02984
+  },
+  {
+   "day": "2026-07-31",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": 0.13304,
+   "nas": 0.02271
+  },
+  {
+   "day": "2026-08-07",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.002,
+   "nas": -0.02141
+  },
+  {
+   "day": "2026-08-14",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.00462,
+   "nas": -0.02204
+  },
+  {
+   "day": "2026-08-21",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.07649,
+   "nas": -0.01331
+  },
+  {
+   "day": "2026-08-28",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.02141,
+   "nas": 0.05226
+  },
+  {
+   "day": "2026-09-04",
+   "cls": "flat",
+   "why": null,
+   "gold": -0.05541,
+   "nas": 0.03192
+  },
+  {
+   "day": "2026-09-11",
+   "cls": "flat",
+   "why": "led2y",
+   "gold": -0.03932,
+   "nas": 0.07557
+  },
+  {
+   "day": "2026-09-18",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.05104,
+   "nas": 0.02638
+  },
+  {
+   "day": "2026-09-25",
+   "cls": "risingSlow",
+   "why": "led2y",
+   "gold": -0.03495,
+   "nas": -0.02835
+  },
+  {
+   "day": "2026-10-02",
+   "cls": "risingFast",
+   "why": null,
+   "gold": -0.01948,
+   "nas": -0.03974
+  },
+  {
+   "day": "2026-10-09",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.06212,
+   "nas": -0.09589
+  },
+  {
+   "day": "2026-10-16",
+   "cls": "risingSlow",
+   "why": null,
+   "gold": -0.03546,
+   "nas": -0.05554
+  }
+ ]
+}

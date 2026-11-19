@@ -2885,6 +2885,49 @@ to T+60 (not tradable) +0.33 % out of sample (t 4.01). The red folder study show
 ("know the side before the print; do not chase after it", `loadInputs().surprise`). Nothing live changed. Tests:
 `tests/red-folder-surprise.test.mjs`.
 
+## Two gauges of the macro rule book: VIX panic and the 2-year against the policy rate (19 Nov 2026, owner: "use the other documents too, keep going")
+`research/edge/rulebook-gauges/` (PREREGISTRATION.md committed first; `run.mjs` fetches FRED VIXCLS / DGS2 / DFEDTARU / DFEDTAR
+keyless, RESULT.md, result.json). Values known at the next weekday's close; gold OANDA daily, 2007-26. **A FAIL** (VIX at 40 or
+above, 9 episodes: gold dipped every time, median about −4 %, but higher 60 sessions later in only 4 of 9; +0.98 % against
++1.80 % on all days). **B1 FAIL** (2-year more than 25 bp above the upper policy target, "hikes priced": +0.44 %, t −0.83).
+**B2 PASS** (2-year more than 25 bp below it, "cuts priced": gold's next 20 sessions +1.76 %, up 67 %, n 241 weeks, t 3.05, Holm p
+0.005, both halves positive) on about five easing cycles (12 runs, 9 positive): a tested lean of the same family as the Gold Macro
+Score's falling-2-year driver, never a trading rule. The rule book's "double tightening" claim is untestable here (FRED's
+high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapCheck` (veteran passes `cache.release` DFEDTARU as
+`policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
+`tests/rulebook-gauges.test.mjs`.
+
+## Stress and reaction rules of the macro rule book (19 Nov 2026, owner: "keep going with the other documents")
+`research/edge/rulebook-stress/` (PREREGISTRATION.md committed first; `run.mjs` reuses `rulebook-gauges`' FRED parser, known-at
+rule and Newey-West t; RESULT.md, result.json). Five gold-overlay and event rules of the owner's rule book on FRED DGS2 / DFII10 /
+VIXCLS / DTWEXBGS and OANDA daily gold 2007-26, outcome gold's next 20 sessions. **1 of 5**: C2 "stress exception" (real yield +25
+bp in 5 sessions, VIX > 30, dollar lower) PASS on its count bar (6 episodes, 4 above, +3.05 % vs +0.60 %) but four are 2008-09:
+consistent, not proven. FAIL: C1 "rescue setup" (2-year down > 30 bp in 2 sessions; 10 episodes, only 5 above), C3 "resilience"
+(t 0.33), C4 "deleveraging, hold" (t 1.23, 13 weeks), C5 "gold up on a hawkish day cancels the sell bias" (the wrong way, t -1.04:
+do not use it). Live check `research-watch.mjs` `stressCheck` (`STRESS` = the study's thresholds, a test compares) in "Your
+research, applied" with the record; it changes no score, call or trade. Tests: `tests/rulebook-stress.test.mjs`.
+
+## The US 10-year regime table and gold (19 Nov 2026, owner: "use the other documents too, keep going")
+`research/edge/yield-regime/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
+book's "primary gauge": the 10-year's speed and direction (fast = 25 bp in 2 weeks or 50 bp in 4; slow = 25 bp over 6 weeks) and
+"why it moves" (2-year-led vs term premium), against gold's next 20 sessions from the weekday after (yields known by then),
+1,033 weekly readings 2007-26. **FAIL, 0 of 3** (Holm; same sign in 2007-16 and 2017 on required): rising fast +0.40 % (n 82,
+t −0.23, not bearish), falling slowly +0.96 % (n 131, t 1.07), term premium vs 2-year-led t 0.18 (flips between halves); all
+weeks +0.52 %. Falling yields lean gold-up in both halves, at t near 1. Live reading `research-watch.mjs` `regimeCheck` (classes
+as the study's `classOf` / `whyOf`, a test compares) in "Your research, applied" with each class's record beside it; it changes
+no score, call or trade. Tests: `tests/yield-regime.test.mjs`.
+## Blow-off veto on the Gold Macro Score (19 Nov 2026, owner: "there are still other documents I've sent you … how to predict or increase the chances to be correct")
+`research/edge/blowoff-veto/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
+book's blow-off veto (no new gold BUY when gold is > 15 % over its 50-day average, > 20 % up in 20 sessions or > 10 % up in 7;
+the implied-volatility clause left out, no history on file), tested on the score's own weekly reading (the council's
+`macroscore.mjs` drivers, parity with `goldMacroScore`), 2007-24 = data the veto was not fitted to. **FAIL**: 1 of 177 BUY weeks
+flagged (it did better), the long-or-flat Sharpe no better (0.343 / 0.338); the 2025-26 blow-offs peaked mid-week, no Friday was
+flagged. Reported after the result, descriptive: on the 16 DAYS it fired in 2007-24 (7 episodes) gold averaged −1.3 % over the
+next 20 sessions (+0.5 % on all days). Live check `research-watch.mjs` `blowoffCheck` (`BLOWOFF` = the study's `VETO`, a test
+compares them) in the Macro desk's "Your research, applied", with that record beside it; it changes no score, call or trade.
+Not testable from the repository: the rule book's exhaustion veto (sells only; the score never sells), headline-spike veto (no
+headline history) and priced-event veto (no FedWatch history). Tests: `tests/blowoff-veto.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
