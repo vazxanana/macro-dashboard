@@ -59,7 +59,7 @@
         'When the price crosses it you get a message on the page and, if you allow it, a browser notification. Then the alert switches off.',
         'It only works while this page is open.'] },
     { t: 'Practise with the paper account', show: '#ms-pp',
-      lead: 'Practise trades on the live charts with play money. Nothing reaches a broker.',
+      lead: 'Practise trades on the live charts with play money. Nothing reaches a broker. It is off until you switch it on: Profile, then <b>Paper account on the charts</b>.',
       li: ['<b>Buy</b> or <b>Sell</b> opens an order: leave the entry empty to buy at the price now, or type a price for a limit or stop order.',
         'Every order has a stop. Choose the risk, the stop (in ATR) and the target (in R); the stop and target are drawn on the charts.',
         'Move the stop to break-even, close half, or close from the table. <b>Stats and history</b> shows your balance curve, win rate, R and drawdown.',

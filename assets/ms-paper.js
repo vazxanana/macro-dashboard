@@ -205,10 +205,12 @@
     return `<figure class="pp-curve"><svg viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none" role="img" aria-label="Closed balance after each trade, from ${money(S.start)} to ${money(pts[pts.length - 1])}"><line x1="0" x2="${W}" y1="${y0}" y2="${y0}" class="pp-c0"/><polyline points="${xy}" class="pp-cl"/></svg><figcaption>Balance after each closed trade · dashed = start</figcaption></figure>`;
   }
   // closed paper trades of this market on the charts: a dashed line from the entry to the exit, green or red, with its R
+  // the account is optional (19 Nov 2026): off until the member switches it on in the Profile (msPaperOn, head of the page)
+  function on() { return !root.msPaperOn || root.msPaperOn(); }
   function marks() {
     const L = root.msCharts ? root.msCharts.list.filter((c) => c.market() === H().key) : [], T = BT().trades(S.acct.closed).filter((t) => t.mk === H().key).slice(-60);
     for (const cx of L) {
-      let c = cx.ppc; if (!T.length || !cx.visible() || !root.msChartX) { if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height); continue; }
+      let c = cx.ppc; if (!T.length || !cx.visible() || !root.msChartX || !on()) { if (c) c.getContext('2d').clearRect(0, 0, c.width, c.height); continue; }
       if (!c || !c.isConnected) { c = cx.ppc = document.createElement('canvas'); c.className = 'ms-pp-cv'; c.setAttribute('aria-hidden', 'true'); cx.el.appendChild(c); }
       const dpr = devicePixelRatio || 1, w = cx.el.clientWidth, h = cx.el.clientHeight; if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = w + 'px'; c.style.height = h + 'px'; }
       const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h); let W = w; try { W = cx.chart.timeScale().width(); } catch (e) {}
@@ -275,9 +277,10 @@
     root.addEventListener('storage', (e) => { if (e.key === KEY) { load(); sig = ''; draw(); } });
     // a paper order from the chart's right-click menu (19 Nov 2026): the draft opens with its entry at the price clicked; the
     // engine decides limit or stop from the side of the price, and the stop and target are set as for any draft (a stop always)
-    root.msPaperDraftAt = (side, price) => { if (document.documentElement.dataset.role === 'public' || !H() || !(price > 0) || !['buy', 'sell'].includes(side)) return false;
+    root.msPaperDraftAt = (side, price) => { if (document.documentElement.dataset.role === 'public' || !on() || !H() || !(price > 0) || !['buy', 'sell'].includes(side)) return false;
       draft(side); if (!D) return false; D.at = +(+price).toFixed(dec(H().key)); D.follow = true; setDraftDefaults(true); draw(); return true; };
-    root.msPaperMarket = () => (H() && document.documentElement.dataset.role !== 'public' ? H().key : null);
+    root.msPaperMarket = () => (H() && on() && document.documentElement.dataset.role !== 'public' ? H().key : null);
+    document.addEventListener('ms:paper', () => { try { marks(); home(); } catch (e) {} });
     root.msPaper = () => ({ balance: S.acct.balance, positions: S.acct.positions.map((p) => ({ id: p.id, mk: p.mk, side: p.side, entry: p.entry, stop: p.stop, target: p.target })), orders: S.acct.orders.length, closed: S.acct.closed.length, lines: LINES.length, draft: D && { ...D }, marks: (root.msCharts ? root.msCharts.list : []).filter((c) => c.ppc && c.visible()).length });
   }
   if (H()) start(); else document.addEventListener('ms:paperhost', start, { once: true });

@@ -102,3 +102,12 @@ test('Home shows the paper account in one line once it has a trade (members with
   assert.match(PAGE, /html\[data-role="public"\] #hs-pp, html\[data-deny~="charts"\] #hs-pp \{ display: none !important; \}/);
   assert.match(SRC, /function home\(\) \{[\s\S]*?if \(!T\.length && !n\) \{ el\.hidden = true; return; \}[\s\S]*?Your paper account: /);
 });
+
+test('the paper account is optional: off until switched on in the Profile, set before the first paint, no orders from the chart while off', () => {
+  assert.match(PAGE, /localStorage\.getItem\('ms-pp-on'\) === '1'/);
+  assert.ok(PAGE.indexOf("getItem('ms-pp-on')") < PAGE.indexOf('<body'), 'set in the head');
+  assert.match(PAGE, /html:not\(\[data-pp-on\]\) #ms-pp, html:not\(\[data-pp-on\]\) #hs-pp \{ display: none !important; \}/);
+  assert.match(PAGE, /id="ms-pf-pp" role="switch"/);
+  assert.match(SRC, /root\.msPaperMarket = \(\) => \(H\(\) && on\(\)/);
+  assert.match(SRC, /root\.msPaperDraftAt = \(side, price\) => \{ if \([^)]*!on\(\)/);
+});
