@@ -8,7 +8,8 @@ test('the index lists the revision 1.8 package with groups, titles, what is new 
   const I = buildIndex('research/macro-veteran');
   // 19 Nov 2026: the 1.5 base (SKILL.md 1.5, validation.json of 17 Nov) plus the 1.6-1.8 news increments; the revision is README.md's
   assert.equal(I.version, '1.8'); assert.ok(I.docs.length >= 200); assert.equal(I.prepared, '2026-11-17');
-  assert.ok(I.whatsNew.length >= 5); assert.equal(I.newIn, '1.8'); assert.ok(I.whatsNew.some((l) => /5 of 36/.test(l)));
+  assert.ok(I.whatsNew.length >= 5); assert.equal(I.newIn, '1.8'); assert.ok(I.whatsNew.some((l) => /5 of 36/.test(l))); assert.ok(I.whatsNew.some((l) => /24 Fed statements/.test(l)));
+  assert.equal(I.docs.find((d) => d.path === 'references/fomc-statement-presser-market-data-route-2026-11-19.md').group, 'News and release research');
   assert.ok(I.whatsNew.some((l) => /deliberately left empty/.test(l) && /No surprise/.test(l)), 'no surprise without a frozen consensus');
   for (const p of ['references/news-trading-strategy-register-v2-2026-11-19.md', 'references/employment-situation-multifield-with-hours-2022-2024.csv',
     'references/ism-jobs-same-day-verified-2022-2024.json', 'references/v1-8-combined-news-batch-readme.md'])

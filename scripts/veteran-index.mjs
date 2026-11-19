@@ -12,7 +12,7 @@ const GROUPS = [
   ['Start here', /^(SKILL|BATCH_INDEX|README|START_HERE)\.md$|references\/(research-pack-index|latest-research-batch-status|research-analyst-operating-standard|research-brief-template)/],
   ['Gold and macro frameworks', /references\/(gold-driver-map|cross-asset-macro-regime|funding-collateral|derivatives-positioning|market-expectations|probability-forecast|macro-gold-source|advanced-market|hard-to-get|issuer-and-physical|issuer-fundamental|source-gap|empirical-market|meridianx-research-system)/],
   ['Release integrity and rates study', /references\/(bls-release-integrity|cpi-first-print|treasury-cpi|scripts\/(treasury-cpi|test_treasury))/],
-  ['News and release research', /references\/(news-|red-folder|v1-[678]-|employment-|ism-jobs|ppi-|pce-original|cpi-ppi-to-pce|core-cpi-to-core-pce)/],
+  ['News and release research', /references\/(news-|red-folder|v1-[678]-|employment-|ism-jobs|ppi-|pce-original|cpi-ppi-to-pce|core-cpi-to-core-pce|fomc-premeeting|fomc-statement-presser)/],
   ['Briefs and cases',/references\/(gold-market-brief|japan-boj|china-|us-bank|gold-producer|integrated-oil|snc-credit|gdp-revision|newmont-cash-flow-model|us-october-2026)/],
   ['CPI pilot and forecast tools', /references\/(cpi-pilot|core-cpi|bls-publication|forecast-|scripts\/)/],
   ['Working notes', /^notes\//],
