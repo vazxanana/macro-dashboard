@@ -76,3 +76,15 @@ test('one chart toolbar: pane headers carry no tools of their own, one bar acts 
   assert.match(js, /pointerdown/); assert.match(js, /t\.click\(\)/);
   assert.doesNotMatch(js, /\.stop\s*=|[^e]place\(|fetch\(/);
 });
+
+test('flat Charts toolbar (19 Nov 2026): no box around the groups, a Draw button holds the tools on a phone, every phone rule in the phone block', () => {
+  const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  const css = page.slice(page.indexOf('<style id="ms-ch-flat-css">'), page.indexOf('</style>', page.indexOf('<style id="ms-ch-flat-css">')));
+  assert.ok(css.length > 500, 'the flat block exists');
+  assert.ok(page.indexOf('<style id="ms-ch-flat-css">') > page.indexOf('<style id="ms-shell-css">'), 'it comes after the shell, so it wins');
+  assert.match(css, /#v-charts \.sec-h > :is\(\.seg, \.mk-mode, \.dr-bar, \.ch-one\) \{ border: 0 !important; background: transparent !important;/);
+  const phone = css.slice(css.indexOf('@media (max-width: 640px)'), css.indexOf('@media (max-width: 389px)'));
+  assert.match(phone, /#v-charts:not\(\[data-tools\]\) \.sec-h > :is\(\.dr-bar, \.ch-one\) \{ display: none !important; \}/);
+  assert.match(phone, /#v-charts\[data-tools\] \.sec-h > \.ch-one\.ch-one/, 'the open tools rules sit in the phone block, not the narrow-phone one');
+  assert.match(page, /tg\.className = 'ch-tools-tog'; tg\.id = 'ms-ch-tools-tog'/);
+});
