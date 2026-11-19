@@ -7059,6 +7059,9 @@ function msNextSetup(bars, A) {
         const lp = LAY.lead && performance.now() - LAY.leadAt < 1500 ? LAY.lead : layPanes()[0]; if (lp !== P) return; laySync(P); };
       const ts = P.chart.timeScale(); ts.subscribeVisibleLogicalRangeChange(onR); P.el.addEventListener('pointerdown', lead, true); P.el.addEventListener('wheel', lead, { capture: true, passive: true }); P.el.addEventListener('touchstart', lead, { capture: true, passive: true });
       LAY.unsub.push(() => ts.unsubscribeVisibleLogicalRangeChange(onR), () => P.el.removeEventListener('pointerdown', lead, true), () => P.el.removeEventListener('wheel', lead, true), () => P.el.removeEventListener('touchstart', lead, true)); } }
+  // one chart's timeframe in the layout, from its own header (19 Nov 2026): the same swap the layout menu makes
+  window.msLaySet = (i, t) => { if (!LAY_IDS.includes(t) || i < 0 || i >= LAY.n) return false; const j = LAY.tfs.indexOf(t); if (j >= 0) LAY.tfs[j] = LAY.tfs[i]; LAY.tfs[i] = t; laySave(); layApply(); return true; };
+  window.msLayState = () => ({ on: LAY.on, n: LAY.n, tfs: LAY.tfs.slice(0, LAY.n) });
   window.msLayView = (on) => { LAY.on = on; const b = document.getElementById('ms-lay-btn'), pop = document.getElementById('ms-lay-pop'); if (!on && pop) { pop.hidden = true; if (b) b.setAttribute('aria-expanded', 'false'); } layApply(); };
   { const b = document.getElementById('ms-lay-btn'), pop = document.getElementById('ms-lay-pop');
     if (b && pop) { b.addEventListener('click', () => { const open = pop.hidden; pop.hidden = !open; b.setAttribute('aria-expanded', String(open)); if (open) layUI(); });
@@ -7678,6 +7681,41 @@ function msNextSetup(bars, A) {
     renderMk();
   }
 
+  // ─── Each chart chooses its own timeframe (19 Nov 2026, owner: "better to be able to choose each timeframe on the individual
+  // chart"): the timeframe in a chart's header is a button with a menu (D1 … M1, then All charts / Split / Layout). In the 1-4
+  // chart layout it changes that chart only (msLaySet); otherwise it opens that timeframe. On a phone the header also carries
+  // the market (it opens the header's own market list), so the page's title, market chips and timeframe row can go.
+  { const MENU = document.createElement('div'); MENU.className = 'ph-menu'; MENU.id = 'ms-ph-menu'; MENU.setAttribute('role', 'menu'); MENU.hidden = true; document.body.appendChild(MENU);
+    const TFL = TFS.filter((t) => panes[t.id]).map((t) => [t.id, t.label]);
+    let forPane = null, forBtn = null;
+    const close = () => { MENU.hidden = true; if (forBtn) forBtn.setAttribute('aria-expanded', 'false'); forPane = forBtn = null; };
+    const viewNow = () => (grid4.dataset.view || 'all');
+    const openMenu = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const tf = pn.dataset.tf, v = viewNow(), L = window.msLayState ? window.msLayState() : null;
+      MENU.innerHTML = '<div class="ph-m-h">Timeframe</div>' + TFL.map(([id, l]) => `<button type="button" role="menuitemradio" aria-checked="${id === tf}" data-ph-tf="${id}">${l}</button>`).join('')
+        + '<div class="ph-m-h">Charts</div>' + [['all', 'All timeframes'], ['split', 'Split, two charts'], ['lay', 'Layout, 1 to 4 charts']].map(([id, l]) => `<button type="button" role="menuitemradio" aria-checked="${v === id}" data-ph-v="${id}">${l}</button>`).join('')
+        + (v === 'lay' && L ? '<p class="ph-m-n">In the layout this changes this chart only.</p>' : '');
+      const r = btn.getBoundingClientRect(); MENU.hidden = false; const w = MENU.offsetWidth; MENU.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px'; MENU.style.top = (r.bottom + 6) + 'px';
+      btn.setAttribute('aria-expanded', 'true'); const f = MENU.querySelector('[aria-checked="true"]') || MENU.querySelector('button'); if (f) f.focus({ preventScroll: true }); };
+    MENU.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !forPane) return; const tf = forPane.dataset.tf, v = viewNow();
+      if (b.dataset.phTf) { const t = b.dataset.phTf; if (v === 'lay' && window.msLayState) { const L = window.msLayState(), i = L.tfs.indexOf(tf); if (i >= 0) window.msLaySet(i, t); }
+        else { const g = document.querySelector(`#v-charts .seg [data-view="${t}"]`); if (g) g.click(); } }
+      else if (b.dataset.phV) { const g = document.querySelector(`#v-charts .seg [data-view="${b.dataset.phV}"]`); if (g) g.click(); }
+      close(); });
+    MENU.addEventListener('keydown', (e) => { const bs = [...MENU.querySelectorAll('button')], i = bs.indexOf(document.activeElement);
+      if (e.key === 'Escape') { const b = forBtn; close(); if (b) b.focus(); } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = bs[(i + (e.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length]; if (n) n.focus(); } });
+    document.addEventListener('pointerdown', (e) => { if (!MENU.hidden && !MENU.contains(e.target) && !(forBtn && forBtn.contains(e.target))) close(); }, true);
+    addEventListener('scroll', () => { if (!MENU.hidden) close(); }, { passive: true });
+    const mkName = () => { const m = document.getElementById('ms-mk-btn'); return m ? m.textContent.trim() : ''; };
+    const openMarket = () => { const d = document.getElementById('ms-mk'); if (!d) return; document.documentElement.classList.add('mk-sheet'); d.open = true; setTimeout(() => { const q = document.getElementById('ms-mk-q'); if (q) q.focus(); }, 30); };
+    { const d = document.getElementById('ms-mk'); if (d) d.addEventListener('toggle', () => { if (!d.open) document.documentElement.classList.remove('mk-sheet'); }); }
+    root.querySelectorAll('.ms-grid4 > .ms-pane[data-tf]:not(.ms-splitc)').forEach((pn) => { const ph = pn.querySelector('.ms-ph'), lab = ph && ph.querySelector(':scope > b'); if (!ph || !lab || ph.querySelector('.ph-tf')) return;
+      const t = document.createElement('button'); t.type = 'button'; t.className = 'ph-tf'; t.setAttribute('aria-haspopup', 'menu'); t.setAttribute('aria-expanded', 'false'); t.textContent = lab.textContent; t.setAttribute('aria-label', `Timeframe ${lab.textContent}: choose another`);
+      t.addEventListener('click', (e) => { e.stopPropagation(); openMenu(pn, t); });
+      const m = document.createElement('button'); m.type = 'button'; m.className = 'ph-mk'; m.textContent = mkName() || 'Market'; m.setAttribute('aria-label', `Market ${mkName()}: choose another`);
+      m.addEventListener('click', (e) => { e.stopPropagation(); openMarket(); });
+      lab.classList.add('ph-orig'); lab.before(m, t); });
+    window.msPaneMenu = () => ({ open: !MENU.hidden, items: [...MENU.querySelectorAll('button')].map((b) => b.textContent) });
+  }
   // ─── Keyboard: 1–6 pick a chart, 0 shows all, F fits, G goes home ───
   document.addEventListener('keydown', (ev) => {
     if (ev.metaKey || ev.ctrlKey || ev.altKey || /INPUT|TEXTAREA|SELECT/.test((ev.target || {}).tagName || '')) return;
@@ -14914,6 +14952,34 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
    phone "what waits on you" is a plain row with a dot, not an amber card */
 @media (min-width: 1180px) { #v-home #hs-go { display: none; } }
 #ps-need.ps-need { border: 0 !important; border-top: 1px solid var(--au-line, var(--line)) !important; border-bottom: 1px solid var(--au-line, var(--line)) !important; border-radius: 0 !important; background: transparent !important; padding: 10px 2px !important; }
+/* each chart's own timeframe (and, on a phone, market) in its header (19 Nov 2026) */
+.ms-ph > b.ph-orig { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ms-ph .ph-tf, .ms-ph .ph-mk { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 8px; margin-left: -8px; border: 0; border-radius: 8px; background: transparent; color: var(--au-ink, var(--ink)); font: 700 13px var(--sans); cursor: pointer; }
+.ms-ph .ph-tf::after, .ms-ph .ph-mk::after { content: ""; width: 6px; height: 6px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(45deg) translateY(-2px); opacity: .6; }
+.ms-ph .ph-tf:hover, .ms-ph .ph-mk:hover, .ms-ph .ph-tf[aria-expanded="true"] { background: var(--au-surface-2, var(--panel-2)); }
+.ms-ph .ph-tf:focus-visible, .ms-ph .ph-mk:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 1px; }
+.ms-ph .ph-mk { display: none; margin-left: -8px; margin-right: -4px; }
+html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role="public"] .ms-ph .ph-tf::after { display: none; }
+.ph-menu { position: fixed; z-index: 60; min-width: 200px; padding: 6px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); box-shadow: 0 12px 32px rgba(0,0,0,.28); }
+.ph-menu[hidden] { display: none; }
+.ph-menu .ph-m-h { padding: 8px 10px 4px; font: 600 12px var(--sans); color: var(--au-ink-3, var(--ink-faint)); }
+.ph-menu button { display: flex; align-items: center; width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--au-ink, var(--ink)); font: 500 14px var(--sans); text-align: left; cursor: pointer; }
+.ph-menu button:hover, .ph-menu button:focus-visible { background: var(--au-surface-2, var(--panel-2)); outline: none; }
+.ph-menu button[aria-checked="true"] { font-weight: 700; } .ph-menu button[aria-checked="true"]::after { content: ""; margin-left: auto; width: 10px; height: 5px; border-left: 2px solid var(--au-accent, var(--accent)); border-bottom: 2px solid var(--au-accent, var(--accent)); transform: rotate(-45deg); }
+.ph-menu .ph-m-n { margin: 4px 10px 6px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); max-width: 220px; }
+@media (pointer: coarse) { .ms-ph .ph-tf, .ms-ph .ph-mk, .ph-menu button { min-height: 44px; } }
+/* phone, Charts, members: the market and the timeframe live in each chart's header; the page title, the market chips, the
+   timeframe row and the header's market picker go (the picker's list still opens, as a sheet, from a chart's market button) */
+@media (max-width: 640px) {
+  html:not([data-role="public"])[data-view="charts"] .ms-ph .ph-mk { display: inline-flex; }
+  html:not([data-role="public"])[data-view="charts"] #v-charts .sec-h > :is(h2, #ms-wl, .seg[aria-label="Chart view"]) { display: none !important; }
+  html:not([data-role="public"])[data-view="charts"] .top .brand > .ms-coin, html:not([data-role="public"])[data-view="charts"] .top .brand .hdr-wm, html:not([data-role="public"])[data-view="charts"] #ms-mk > summary, html:not([data-role="public"])[data-view="charts"] #ms-inst-name { display: none !important; }
+  html.mk-sheet #ms-mk[open] > .mk-pop { position: fixed; left: 12px; right: 12px; top: 64px; width: auto; max-width: none; z-index: 70; }
+}
+/* the phone hides every span of the header brand (.brand span, for the wordmark); the market list sits inside it, so its names,
+   prices and states came out blank on a phone (19 Nov 2026) */
+.brand .mk-list .mk-n { display: grid !important; } .brand .mk-list .mk-n small { display: block; }
+.brand .mk-list :is(.mk-p, .ms-st, .mk-wait) { display: inline-block !important; }
 </style>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked

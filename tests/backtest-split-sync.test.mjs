@@ -79,3 +79,12 @@ test('page wiring: the sync toggle (on by default, remembered), a pane overlay a
   assert.match(page, /const geo = \(d, c\) => \{ c = cxOf\(c\);/);
   assert.match(page, /function drawShapes\(x, c, W, PH, main\)/);
 });
+
+test('playing with split charts (19 Nov 2026): every committed candle reaches the panes on their cheap path, and their forming candle grows with the first chart, about 12 times a second, display only', () => {
+  assert.match(page, /function render\(light\) \{ drawChart\(\); if \(light\) \{ overlay\(\); nowTxt\(\); xpStep\(\);/);
+  const blk = page.slice(page.indexOf('function xpStep()'), page.indexOf('function xpLive(') + 1200);
+  assert.match(blk, /xpDraw\(P, false\)/, 'never a full rebuild while playing');
+  assert.match(blk, /if \(nw - XL < 80\) return;/);
+  assert.doesNotMatch(blk, /P\.data\.push|P\.data\[[^\]]+\] =/, 'the live candle is never stored in the pane data');
+  assert.match(page, /series\.update\(\{ time: b\.time, open: b\.open, high: hi, low: lo, close: price \}\); xpLive\(/);
+});
