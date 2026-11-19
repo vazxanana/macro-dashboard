@@ -2410,7 +2410,9 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   costs (said on the bar). BE only on a trade in profit; ½ and Close by hand; stop / target editable in the table. Stats: balance,
   equity, floating, return, net, trades, win rate, profit factor, avg R, expectancy, max drawdown, best / worst, streaks, hold, a
   balance curve, the latest 50 trades, CSV, reset (styled confirm). The main script hands over `window.msPaperHost` (key, insts, TZ,
-  m1, atr, since); `window.msPaper()` is a read-only view. Tests: `tests/desk-paper.test.mjs`.
+  m1, atr, since); `window.msPaper()` is a read-only view. Closed paper trades of the market are drawn on its charts (19 Nov 2026:
+  `marks()`, a canvas `.ms-pp-cv` per chart, a dashed entry-to-exit line coloured by result with its R; times placed through
+  `ms-draw.js`'s `window.msChartX`, the last 60 trades). Tests: `tests/desk-paper.test.mjs`.
 - **Order flow** in the indicator library (`IND_DEF` `delta`, `cvd`, `vwap`, `vprof`, `rvol`, flag `flow`): Volume Delta and CVD
   (reset each UTC day) from `iDelta` = the candle's volume times where it closed in its range (-1 at the low, +1 at the high), VWAP
   with ±n SD bands (UTC day), Relative Volume, and the Volume Profile (owner: "i want volume profile"): `assets/ms-vprof.js`
@@ -2421,6 +2423,8 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
 - **Full screen** (each pane's ⛶) takes `#v-charts` full screen, so the view on (All as three by two, Split, Layout, one chart),
   the switches, the drawing strip and the paper bar stay; the charts share the height (`<style id="ms-cfs-css">`); `ms-draw.js`
   moves the style bar and the right-click menu into the full-screen element and back.
+- **Phone (19 Nov 2026)**: behind More the timeframe / view switch wraps ("Layout" was cut off), the markup switch keeps each
+  word whole, and the paper account is one compact block (Risk / Stop / Target in one row of three).
 - **ChronosTrade font**: Inter everywhere (the page, the chart scales and legend `MONO` / `SANS`, the report image in
   `assets/bt-review.js`, the trade effects in `assets/bt-fx.js`), tabular figures through `font-feature-settings: "tnum"` on the
   body (the `font` shorthand resets `font-variant-numeric`, not that); JetBrains Mono and Figtree are no longer requested there.

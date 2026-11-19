@@ -178,4 +178,5 @@
   // read-only view for the audit
   window.msDrawState = () => ({ tool: TOOL, mag: MAG, sel: SEL, charts: CX.length, shapes: Object.fromEntries(Object.entries(ST).map(([k, v]) => [k, v.length])), geo: CX.filter((c) => c.visible()).map((c) => ({ id: c.id, mk: mkOf(c), g: load(mkOf(c)).map((d) => geo(c, d)) })) });
   window.msDrawRepaint = paintAll;
+  window.msChartX = (cx, t) => X(cx, t);   // a time (chart time) to x on that chart, between candles too: used by the paper account (19 Nov 2026)
 })();
