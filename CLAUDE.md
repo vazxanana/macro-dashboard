@@ -122,6 +122,16 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## London Strategic Edge data, owner only (19 Nov 2026, owner: "build option 1")
+`api/lse.js` (routed in `cloudflare/src/worker.mjs`), key = the Worker secret `LSE_API_KEY` (set by the owner in Cloudflare; host
+`download.londonstrategicedge.com`, header `X-API-Key`, free plan: 60 calls a minute, 12.5 GiB a week, 12.5 M rows a day).
+**Their licence**: the owner's own research, backtesting and trading are allowed; showing their data to anyone else (members,
+guests, a page, a public repository, the council-data branch, a bot post) is distribution and needs their Enterprise licence. So
+the endpoint answers the owner's session only, GET only, `private, no-store`, previews and lists only (ops `usage`, `refs`, `ref`,
+`macro`, `series`; parameters allowlisted and checked, never an export), stores nothing, never returns the key. Studies may use
+the data from a folder outside git and publish results only (n, t, verdict), never the rows. Never show it on the Desk, the Macro
+desk or any member page without the owner buying a licence. Test: `tests/lse.test.mjs`.
+
 ## The 18 Nov 2026 outage and what the deploy now does (owner: "make it all you can")
 At 23:54 UTC on 17 Nov a Workers Builds deploy on the `aureum` Worker (the site; `meridianx` is deleted) published the pages
 alone and the Worker lost its code AND every secret: /api and /md answered 404, then "OANDA_TOKEN not set"; the council ran on
