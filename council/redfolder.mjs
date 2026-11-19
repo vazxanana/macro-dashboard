@@ -57,7 +57,8 @@ export function loadInputs(dir = REF) {
   let bench = null, base = null; try { bench = JSON.parse(rd('cpi-model-benchmark-inputs-2022-2024.json')); } catch (e) { bench = null; }
   try { base = JSON.parse(fs.readFileSync(new URL('./event-base.json', import.meta.url), 'utf8')); } catch (e) { base = null; }
   let hist = null; try { hist = JSON.parse(fs.readFileSync(new URL('./consensus-history.json', import.meta.url), 'utf8')); } catch (e) { hist = null; }
-  return { panel: csv(rd('cpi-ppi-to-pce-release-panel-2022-2024.csv')), jobs: csv(rd('employment-situation-multifield-with-hours-2022-2024.csv')), bench, base, hist };
+  let surprise = null; try { surprise = JSON.parse(fs.readFileSync(new URL('../research/edge/red-folder-surprise/result.json', import.meta.url), 'utf8')); } catch (e) { surprise = null; }
+  return { panel: csv(rd('cpi-ppi-to-pce-release-panel-2022-2024.csv')), jobs: csv(rd('employment-situation-multifield-with-hours-2022-2024.csv')), bench, base, hist, surprise };
 }
 
 // FRED series → value of a reference period (monthly m/m, monthly diff / level, a quarter, a daily value)
@@ -153,6 +154,9 @@ export function build({ inputs, rel, captured = [], calendar = [], gold = [], dx
       : `When ${T.fields[0].name} came in higher than the release before, gold averaged ${sg(stats.rose.gold)}% on the day (n ${stats.rose.n}); lower: ${sg(stats.fell.gold)}% (n ${stats.fell.n}).`);
     if (stats.above.n + stats.below.n >= 6) prep.push(`Against the calendar consensus (${HIST_SRC} to April 2025, the council's own captures from November 2026): above it gold averaged ${stats.above.gold == null ? 'n/a' : sg(stats.above.gold)}% (n ${stats.above.n}), below it ${stats.below.gold == null ? 'n/a' : sg(stats.below.gold)}% (n ${stats.below.n}).`);
     else prep.push(stats.inline >= 6 ? `It printed in line with the calendar consensus on ${stats.inline} of ${stats.inline + stats.above.n + stats.below.n} releases on file: too few misses to compare gold's reaction.` : 'Not enough calendar consensus on file yet to compare gold\'s reaction with the surprise.');
+    // the pre-registered surprise study (research/edge/red-folder-surprise): what to do with a miss in the first hour
+    const SU = I.surprise; if (SU && SU.events && (T.k === 'CPI' || T.k === 'NFP')) { const ev = SU.events.filter((e) => e.type === T.k), k = ev.filter((e) => Math.sign(e.g5) === e.dir).length;
+      if (ev.length >= 10) prep.push(`In the first 5 minutes gold went the way of the miss against consensus (hot = down) on ${k} of ${ev.length} releases; trading on from minute 5 to minute 60 gave no reliable gain (study ${SU.verdict}, t ${(SU.T2.byType[T.k].outOfSample || {}).t ?? 'n/a'} out of sample). Know the side before the print; do not chase after it.`); }
     if (!R.length && !next) continue;
     const mf = (r) => r.fields.find((f) => f.k === main) || {}, cnt = (fn) => R.filter((r) => fn(mf(r))).length;
     const expBasis = { histSrc: HIST_SRC, hist: cnt((f) => f.expSrc === HIST_SRC), captured: cnt((f) => f.expSrc === 'captured'), model: cnt((f) => f.exp == null && f.model != null) };

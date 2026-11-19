@@ -2837,6 +2837,16 @@ now starts in 2018 and keeps 120 rows a type (the desk shows 18, then "Show all"
 council's own captures of November 2026. A calendar consensus, not a verified survey.
 Tests: `tests/redfolder.test.mjs`.
 
+## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
+`research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
+history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss
+against the calendar consensus (hot = gold down), HistData M1 from `council/event-base.json`. **FAIL** on the pre-registered
+trade (T+5 to T+60 with the miss, after 0.03 %): −0.144 % in 2018-21 (n 24, t −2.03), −0.007 % in 2022-25 (n 59, t −0.11).
+The reaction itself is real: the first 5 minutes went the way of the miss on 60 of 83 releases (p 0.0001); the release minute
+to T+60 (not tradable) +0.33 % out of sample (t 4.01). The red folder study shows this as a prep line on CPI and payrolls
+("know the side before the print; do not chase after it", `loadInputs().surprise`). Nothing live changed. Tests:
+`tests/red-folder-surprise.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
