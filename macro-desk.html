@@ -858,7 +858,7 @@
         + (b.channels ? '<p class="sub gx">Channels: ' + b.channels.up + ' support · ' + b.channels.down + ' against · ' + b.channels.flat + ' flat' + (b.channels.unobserved ? ' · ' + b.channels.unobserved + ' not observed' : '') + '</p>' : '');
     } else $('g-meter').innerHTML = '<span class="lab">Gold bias</span><p class="empty">No read yet.</p>';
     var e = s.event, loc = function (iso) { return new Date(iso).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
-    if (e) { var hrs = (Date.parse(e.at) - Date.now()) / 36e5, rel = hrs > 0 ? 'in ' + (hrs >= 48 ? Math.round(hrs / 24) + ' days' : Math.round(hrs) + ' h') : 'released';
+    if (e) { var hrs = (Date.parse(e.at) - Date.now()) / 36e5, rel = hrs > 0 ? 'in ' + (hrs >= 48 ? Math.round(hrs / 24) + ' days' : hrs < 1 ? Math.max(1, Math.round(hrs * 60)) + ' min' : Math.round(hrs) + ' h') : 'released';
       $('g-event').innerHTML = '<span class="lab">The event that matters most</span><div class="hero">' + esc((e.country ? e.country + ' ' : '') + e.title) + '</div>'
         + '<p class="sub"><b>' + esc(e.when) + '</b> · ' + esc(rel) + '<br><small>your time: ' + esc(loc(e.at)) + '</small></p>'
         + '<p class="sub">' + (e.consensus != null ? 'Expected <b>' + esc(e.consensus) + '</b>' : 'No consensus yet') + (e.previous != null ? ' · previous ' + esc(e.previous) : '') + (num(e.goldMovePct) ? ' · gold typically moves ±' + esc(e.goldMovePct) + '% that day' : '') + '</p>'
@@ -1278,6 +1278,7 @@
   // the expectation scale: one row per number (consensus, the forecast cluster, previous) on one axis, the hot / cool bands behind
   function expScale(e, w) {
     var x0 = e.expectations[0] || {}, B = e.bands || {}, rows = [];
+    var um = /-?\d+(?:\.\d+)?\s*([%KMBT]|bp)?/i.exec(String(x0.consensus || x0.previous || '')), U = um && um[1] ? um[1] : '', uv = function (v) { return v + U; };
     (x0.cluster && x0.cluster.length ? x0.cluster : num(numOf(x0.consensus)) ? [{ label: 'Calendar consensus', value: numOf(x0.consensus) }] : []).forEach(function (c, i) { rows.push({ l: c.label, v: +c.value, cls: i === 0 ? 'mk' : i === 1 ? 'mk2' : 'mk3' }); });
     if (num(numOf(x0.previous))) rows.push({ l: 'Previous print', v: numOf(x0.previous), cls: 'mk3' });
     if (!rows.length) return '<p class="empty">No expectation captured: n/a.</p>';
@@ -1288,13 +1289,13 @@
     if (num(B.cool) && num(B.hot)) g += '<rect class="z-in" x="' + X(B.cool) + '" y="' + top + '" width="' + (X(B.hot) - X(B.cool)) + '" height="' + (bot - top) + '"/>';
     var short = function (l) { l = l.replace(/ \(.*$/, ''); return w >= 520 ? l : l.replace('Calendar consensus', 'Consensus').replace('Veteran batch pilot forecast', 'Batch pilot').replace('Cleveland Fed core nowcast', 'Cleveland nowcast').replace('Previous print', 'Previous'); };
     rows.forEach(function (r, i) { var y = top + i * RH + 24, x = X(r.v), tw = short(r.l).length * 6.6 + 12, right = x + tw > R ? true : x - tw < L ? false : x > (L + R) / 2;
-      g += '<g tabindex="0"' + tip(r.l + '\n' + r.v + '%') + '><rect class="lab-bg" x="' + L + '" y="' + (top + i * RH) + '" width="' + (R - L) + '" height="' + RH + '"/><circle class="' + r.cls + '" cx="' + x.toFixed(1) + '" cy="' + y + '" r="6"/>'
-        + '<text class="dim" x="' + (right ? x - 10 : x + 10).toFixed(1) + '" y="' + (y - 9) + '"' + (right ? ' text-anchor="end"' : '') + '>' + esc(short(r.l)) + '</text><text class="ink mono" x="' + (right ? x - 10 : x + 10).toFixed(1) + '" y="' + (y + 5) + '"' + (right ? ' text-anchor="end"' : '') + '>' + esc(r.v + '%') + '</text></g>'; });
+      g += '<g tabindex="0"' + tip(r.l + '\n' + uv(r.v)) + '><rect class="lab-bg" x="' + L + '" y="' + (top + i * RH) + '" width="' + (R - L) + '" height="' + RH + '"/><circle class="' + r.cls + '" cx="' + x.toFixed(1) + '" cy="' + y + '" r="6"/>'
+        + '<text class="dim" x="' + (right ? x - 10 : x + 10).toFixed(1) + '" y="' + (y - 9) + '"' + (right ? ' text-anchor="end"' : '') + '>' + esc(short(r.l)) + '</text><text class="ink mono" x="' + (right ? x - 10 : x + 10).toFixed(1) + '" y="' + (y + 5) + '"' + (right ? ' text-anchor="end"' : '') + '>' + esc(uv(r.v)) + '</text></g>'; });
     var ax = bot + 16;
-    if (num(B.cool)) g += '<text x="' + (X(B.cool) - 4) + '" y="' + ax + '" text-anchor="end">≤ ' + B.cool + '% cool</text>';
-    if (num(B.hot)) g += '<text x="' + (X(B.hot) + 4) + '" y="' + ax + '">hot ≥ ' + B.hot + '%</text>';
+    if (num(B.cool)) g += '<text x="' + (X(B.cool) - 4) + '" y="' + ax + '" text-anchor="end">≤ ' + esc(uv(B.cool)) + ' cool</text>';
+    if (num(B.hot)) g += '<text x="' + (X(B.hot) + 4) + '" y="' + ax + '">hot ≥ ' + esc(uv(B.hot)) + '</text>';
     if (num(B.cool) && num(B.hot) && X(B.hot) - X(B.cool) > 70) g += '<text x="' + ((X(B.cool) + X(B.hot)) / 2) + '" y="' + (ax + 14) + '" text-anchor="middle">in line</text>';
-    return '<svg width="' + w + '" height="' + (H + 6) + '" viewBox="0 0 ' + w + ' ' + (H + 6) + '" role="img" aria-label="' + esc(rows.map(function (r) { return r.l + ' ' + r.v + '%'; }).join('; ')) + '">' + g + '</svg>';
+    return '<svg width="' + w + '" height="' + (H + 6) + '" viewBox="0 0 ' + w + ' ' + (H + 6) + '" role="img" aria-label="' + esc(rows.map(function (r) { return r.l + ' ' + uv(r.v); }).join('; ')) + '">' + g + '</svg>';
   }
   // past releases: gold's first hour on each, one lane per dollar read, the median marked; dots coloured by direction with the word in the key
   function stripSvg(st, w) {
@@ -1456,6 +1457,8 @@
       var rg = (fc && fc.regime) || {}, vix = n(rg.vix) ? +rg.vix : null, inv = n(rg.vixTermRatio) && +rg.vixTermRatio >= 1, hotM = rows.filter(function (r) { return r.volRatio != null && r.volRatio >= 1.3; }).map(function (r) { return r.name; });
       var mood = { vix: vix, inverted: inv, hot: (vix != null && vix >= 25) || inv || hotM.length > 0, wide: hotM };
       var px = goldPx(fc, v), lv = px != null ? nearest(levels(v), px) : { above: null, below: null };
+      if (px != null && !lv.below) lv.below = { price: Math.floor((px - 0.01) / 50) * 50, label: 'Round number (price is under every level he tracks)', made: true };
+      if (px != null && !lv.above) lv.above = { price: Math.ceil((px + 0.01) / 50) * 50, label: 'Round number (price is over every level he tracks)', made: true };
       var ups = rows.filter(function (r) { return r.lean === 'up'; }).length, dns = rows.filter(function (r) { return r.lean === 'down'; }).length, w = rows.filter(function (r) { return r.wait; }).length;
       var take = (ups + dns ? 'Macro leans ' + [ups ? ups + ' up' : '', dns ? dns + ' down' : ''].filter(Boolean).join(', ') + ' of ' + rows.length + ' markets today' : 'No macro lean on any market today')
         + (ev.length ? '; ' + ev.length + ' release' + (ev.length > 1 ? 's' : '') + ' in the next 24 hours' + (w ? ' (' + w + ' market' + (w > 1 ? 's' : '') + ': wait for the print)' : '') : '; no release in the next 24 hours')
@@ -1585,6 +1588,7 @@
   function load() {
     Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json')]).then(function (x) {
       var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4];
+      ((v && v.events) || []).forEach(function (e) { (e.scenarios || []).forEach(function (c) { var m = /^>\s*(.+?)\s+and\s+<\s*(.+)$/.exec(String(c.when || '')); if (m && m[1] === m[2]) c.when = 'at ' + m[1] + ' (one reporting step)'; }); });
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
       renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot);
