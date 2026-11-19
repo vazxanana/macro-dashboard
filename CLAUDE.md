@@ -2897,6 +2897,16 @@ high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapC
 `policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
 `tests/rulebook-gauges.test.mjs`.
 
+## Stress and reaction rules of the macro rule book (19 Nov 2026, owner: "keep going with the other documents")
+`research/edge/rulebook-stress/` (PREREGISTRATION.md committed first; `run.mjs` reuses `rulebook-gauges`' FRED parser, known-at
+rule and Newey-West t; RESULT.md, result.json). Five gold-overlay and event rules of the owner's rule book on FRED DGS2 / DFII10 /
+VIXCLS / DTWEXBGS and OANDA daily gold 2007-26, outcome gold's next 20 sessions. **1 of 5**: C2 "stress exception" (real yield +25
+bp in 5 sessions, VIX > 30, dollar lower) PASS on its count bar (6 episodes, 4 above, +3.05 % vs +0.60 %) but four are 2008-09:
+consistent, not proven. FAIL: C1 "rescue setup" (2-year down > 30 bp in 2 sessions; 10 episodes, only 5 above), C3 "resilience"
+(t 0.33), C4 "deleveraging, hold" (t 1.23, 13 weeks), C5 "gold up on a hawkish day cancels the sell bias" (the wrong way, t -1.04:
+do not use it). Live check `research-watch.mjs` `stressCheck` (`STRESS` = the study's thresholds, a test compares) in "Your
+research, applied" with the record; it changes no score, call or trade. Tests: `tests/rulebook-stress.test.mjs`.
+
 ## The US 10-year regime table and gold (19 Nov 2026, owner: "use the other documents too, keep going")
 `research/edge/yield-regime/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
 book's "primary gauge": the 10-year's speed and direction (fast = 25 bp in 2 weeks or 50 bp in 4; slow = 25 bp over 6 weeks) and
