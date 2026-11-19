@@ -14,7 +14,7 @@
   .btfx .glow{position:absolute;inset:0;opacity:0;animation:btfxGlow 1.4s cubic-bezier(.22,1,.36,1) forwards}
   .btfx.win .glow{box-shadow:inset 0 0 140px 30px rgba(47,191,143,.55)}
   .btfx.loss .glow{background:radial-gradient(ellipse at center,rgba(242,87,111,0) 40%,rgba(242,87,111,.42) 100%)}
-  .btfx .big{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);font:800 clamp(44px,9vw,104px)/1 Figtree,system-ui,sans-serif;letter-spacing:-.03em;opacity:0;animation:btfxPop 1.6s cubic-bezier(.22,1,.36,1) forwards;text-shadow:0 10px 40px rgba(0,0,0,.35);white-space:nowrap}
+  .btfx .big{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);font:800 clamp(44px,9vw,104px)/1 Inter,system-ui,sans-serif;letter-spacing:-.03em;opacity:0;animation:btfxPop 1.6s cubic-bezier(.22,1,.36,1) forwards;text-shadow:0 10px 40px rgba(0,0,0,.35);white-space:nowrap}
   .btfx.win .big{color:#2fbf8f}.btfx.loss .big{color:#f2576f}
   .btfx .big small{display:block;text-align:center;font-size:.24em;font-weight:650;letter-spacing:.02em;margin-top:.35em;opacity:.9}
   @keyframes btfxGlow{0%{opacity:0}18%{opacity:1}100%{opacity:0}}

@@ -168,7 +168,7 @@
   function reportPNG(d) {
     const cs = getComputedStyle(document.documentElement), v = (k, f) => (cs.getPropertyValue(k) || '').trim() || f;
     const C = { bg: v('--panel', '#0f1116'), ink: v('--ink', '#eceef2'), dim: v('--ink-dim', '#a4abb8'), faint: v('--ink-faint', '#8a92a1'), line: v('--line-strong', '#333'), buy: v('--buy', '#2fbf8f'), sell: v('--sell', '#f2576f'), gold: v('--gold', '#e0a526') };
-    const c = document.createElement('canvas'), Wd = 1200, Hd = 675; c.width = Wd; c.height = Hd; const x = c.getContext('2d'), F = 'Figtree, -apple-system, Segoe UI, sans-serif', M = '"JetBrains Mono", ui-monospace, monospace';
+    const c = document.createElement('canvas'), Wd = 1200, Hd = 675; c.width = Wd; c.height = Hd; const x = c.getContext('2d'), F = 'Inter, -apple-system, Segoe UI, sans-serif', M = F;
     x.fillStyle = C.bg; x.fillRect(0, 0, Wd, Hd); x.fillStyle = C.gold; x.fillRect(0, 0, Wd, 6);
     x.fillStyle = C.ink; x.font = `700 34px ${F}`; x.fillText(d.title, 48, 66); x.fillStyle = C.dim; x.font = `500 18px ${F}`; x.fillText(d.sub, 48, 96);
     x.fillStyle = C.faint; x.font = `600 14px ${F}`; x.textAlign = 'right'; x.fillText('ChronosTrade · session report', Wd - 48, 66); x.textAlign = 'left';
