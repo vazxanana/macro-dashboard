@@ -1,0 +1,558 @@
+{
+ "study": "gold-london-reversal",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-london-reversal/PREREGISTRATION.md",
+ "planSha256": "4c6f291bb134fe0e6df6fbf5cd0e9e9a41cfcd821751dd4abcd38939ea8f9c11",
+ "claim": "London (02:00-08:00 New York) often makes the day's high or low and New York reverses it (the \"Judas swing\"); fading the London move during New York pays on spot gold",
+ "rule": "trade day when the London move (07:55 close − 02:00 open) exceeds 0.3 x ATR20 of 17:00-NY sessions; side against it; T1 market at the 09:30 open; T2 = T1 when London's extreme and the entry are beyond the midnight open; T3 = after a candle from 08:00 trades beyond the London extreme, the first candle opening 09:00-10:25 that closes back inside, entry at the next open; stop $0.30 beyond the extreme since 02:00 (at least 0.1 x ATR20); stop first; flat 16:00; one trade a day",
+ "data": "OANDA mid XAU/USD M5 through the keyless candle proxy, read from 2016-01-01; trade days 2016-02-08 → 2026-11-12; CME calendar from ict/calendar.mjs (full holidays and early closes skipped)",
+ "cost": 0.6,
+ "windows": {
+  "IS": [
+   "2016-01-01",
+   "2020-12-31"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2026-11-13"
+  ]
+ },
+ "days": {
+  "used": 671,
+  "skips": {
+   "atr": 20,
+   "small": 2022,
+   "london": 1
+  },
+  "miss": {
+   "T1": 0,
+   "T2": 48,
+   "T3": 379
+  }
+ },
+ "verdict": "FAIL, 0 of 3: fading gold's London move at 09:30 NY, 2021 → now −0.164R a trade net (n 352, month t −2.22, gross −0.064R); after a NY raid −0.380R (n 155, t −3.82)",
+ "decision": {
+  "T1": {
+   "p": 0.987,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "p": 0.99,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "p": 1,
+   "pHolm": 1,
+   "checks": {
+    "netPos": false,
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "cost2x": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "fade London at 09:30",
+   "IS": {
+    "n": 319,
+    "win": 0.335,
+    "netR": -0.224,
+    "grossR": -0.018,
+    "net2R": -0.43,
+    "costR": 0.206,
+    "total": -71.41,
+    "months": 58,
+    "t": -3.11,
+    "grossT": -0.24,
+    "t2x": -5.81,
+    "stops": 162,
+    "time": 157,
+    "maxDD": -76.08,
+    "medianStop": 3.41,
+    "buys": {
+     "n": 145,
+     "netR": -0.303
+    },
+    "sells": {
+     "n": 174,
+     "netR": -0.158
+    },
+    "byYear": {
+     "2016": {
+      "n": 43,
+      "netR": -0.327,
+      "total": -14.08
+     },
+     "2017": {
+      "n": 55,
+      "netR": -0.206,
+      "total": -11.3
+     },
+     "2018": {
+      "n": 84,
+      "netR": -0.121,
+      "total": -10.19
+     },
+     "2019": {
+      "n": 68,
+      "netR": -0.34,
+      "total": -23.12
+     },
+     "2020": {
+      "n": 69,
+      "netR": -0.184,
+      "total": -12.72
+     }
+    }
+   },
+   "OOS": {
+    "n": 352,
+    "win": 0.321,
+    "netR": -0.164,
+    "grossR": -0.064,
+    "net2R": -0.264,
+    "costR": 0.1,
+    "total": -57.71,
+    "months": 70,
+    "t": -2.22,
+    "grossT": -0.87,
+    "t2x": -3.54,
+    "stops": 194,
+    "time": 158,
+    "maxDD": -58.64,
+    "medianStop": 7.78,
+    "buys": {
+     "n": 175,
+     "netR": -0.098
+    },
+    "sells": {
+     "n": 177,
+     "netR": -0.229
+    },
+    "byYear": {
+     "2021": {
+      "n": 61,
+      "netR": -0.006,
+      "total": -0.34
+     },
+     "2022": {
+      "n": 71,
+      "netR": -0.254,
+      "total": -18
+     },
+     "2023": {
+      "n": 45,
+      "netR": -0.163,
+      "total": -7.36
+     },
+     "2024": {
+      "n": 66,
+      "netR": -0.183,
+      "total": -12.06
+     },
+     "2025": {
+      "n": 66,
+      "netR": 0.032,
+      "total": 2.12
+     },
+     "2026": {
+      "n": 43,
+      "netR": -0.513,
+      "total": -22.07
+     }
+    }
+   },
+   "placebo": {
+    "means": [
+     -0.103,
+     -0.099,
+     0.034,
+     -0.137,
+     0.017,
+     -0.03,
+     -0.227,
+     -0.024,
+     -0.06,
+     -0.068,
+     -0.127,
+     -0.188,
+     -0.046,
+     -0.135,
+     -0.048,
+     -0.151,
+     -0.086,
+     -0.011,
+     -0.086,
+     -0.059,
+     -0.04,
+     -0.107,
+     -0.117,
+     -0.095,
+     -0.149,
+     -0.013,
+     -0.12,
+     -0.136,
+     -0.059,
+     -0.122,
+     -0.171,
+     -0.118,
+     -0.082,
+     -0.1,
+     -0.105,
+     -0.047,
+     -0.206,
+     -0.041,
+     -0.216,
+     -0.068
+    ],
+    "min": -0.227,
+    "max": 0.034,
+    "median": -0.097,
+    "p95": -0.01
+   }
+  },
+  "T2": {
+   "name": "T1 on the midnight open's side",
+   "IS": {
+    "n": 301,
+    "win": 0.322,
+    "netR": -0.249,
+    "grossR": -0.036,
+    "net2R": -0.461,
+    "costR": 0.213,
+    "total": -74.81,
+    "months": 58,
+    "t": -3.29,
+    "grossT": -0.47,
+    "t2x": -5.92,
+    "stops": 161,
+    "time": 140,
+    "maxDD": -78.48,
+    "medianStop": 3.29,
+    "buys": {
+     "n": 137,
+     "netR": -0.33
+    },
+    "sells": {
+     "n": 164,
+     "netR": -0.18
+    },
+    "byYear": {
+     "2016": {
+      "n": 41,
+      "netR": -0.361,
+      "total": -14.82
+     },
+     "2017": {
+      "n": 54,
+      "netR": -0.219,
+      "total": -11.82
+     },
+     "2018": {
+      "n": 76,
+      "netR": -0.154,
+      "total": -11.7
+     },
+     "2019": {
+      "n": 65,
+      "netR": -0.347,
+      "total": -22.53
+     },
+     "2020": {
+      "n": 65,
+      "netR": -0.214,
+      "total": -13.94
+     }
+    }
+   },
+   "OOS": {
+    "n": 322,
+    "win": 0.295,
+    "netR": -0.191,
+    "grossR": -0.086,
+    "net2R": -0.296,
+    "costR": 0.105,
+    "total": -61.42,
+    "months": 70,
+    "t": -2.34,
+    "grossT": -1.05,
+    "t2x": -3.59,
+    "stops": 190,
+    "time": 132,
+    "maxDD": -61.49,
+    "medianStop": 7.34,
+    "buys": {
+     "n": 161,
+     "netR": -0.111
+    },
+    "sells": {
+     "n": 161,
+     "netR": -0.27
+    },
+    "byYear": {
+     "2021": {
+      "n": 55,
+      "netR": -0.028,
+      "total": -1.55
+     },
+     "2022": {
+      "n": 65,
+      "netR": -0.307,
+      "total": -19.95
+     },
+     "2023": {
+      "n": 39,
+      "netR": -0.158,
+      "total": -6.15
+     },
+     "2024": {
+      "n": 57,
+      "netR": -0.222,
+      "total": -12.67
+     },
+     "2025": {
+      "n": 64,
+      "netR": 0.034,
+      "total": 2.17
+     },
+     "2026": {
+      "n": 42,
+      "netR": -0.554,
+      "total": -23.26
+     }
+    }
+   },
+   "placebo": {
+    "means": [
+     -0.133,
+     0.001,
+     -0.061,
+     -0.142,
+     -0.107,
+     -0.137,
+     -0.22,
+     -0.06,
+     -0.076,
+     0.034,
+     -0.193,
+     -0.056,
+     -0.112,
+     -0.153,
+     -0.09,
+     -0.105,
+     -0.106,
+     0.026,
+     -0.153,
+     -0.022,
+     -0.106,
+     0.008,
+     -0.099,
+     0.011,
+     -0.084,
+     -0.077,
+     -0.129,
+     -0.032,
+     -0.055,
+     -0.042,
+     -0.048,
+     -0.138,
+     -0.03,
+     -0.053,
+     -0.096,
+     -0.063,
+     -0.035,
+     0.068,
+     -0.114,
+     -0.085
+    ],
+    "min": -0.22,
+    "max": 0.068,
+    "median": -0.08,
+    "p95": 0.026
+   }
+  },
+  "T3": {
+   "name": "after a New York raid of the London extreme",
+   "IS": {
+    "n": 137,
+    "win": 0.314,
+    "netR": -0.244,
+    "grossR": 0.001,
+    "net2R": -0.49,
+    "costR": 0.245,
+    "total": -33.46,
+    "months": 53,
+    "t": -1.83,
+    "grossT": 0.01,
+    "t2x": -3.51,
+    "stops": 81,
+    "time": 56,
+    "maxDD": -37.51,
+    "medianStop": 2.72,
+    "buys": {
+     "n": 60,
+     "netR": -0.497
+    },
+    "sells": {
+     "n": 77,
+     "netR": -0.047
+    },
+    "byYear": {
+     "2016": {
+      "n": 20,
+      "netR": -0.603,
+      "total": -12.07
+     },
+     "2017": {
+      "n": 25,
+      "netR": -0.466,
+      "total": -11.64
+     },
+     "2018": {
+      "n": 33,
+      "netR": 0.284,
+      "total": 9.37
+     },
+     "2019": {
+      "n": 31,
+      "netR": -0.52,
+      "total": -16.13
+     },
+     "2020": {
+      "n": 28,
+      "netR": -0.107,
+      "total": -2.98
+     }
+    }
+   },
+   "OOS": {
+    "n": 155,
+    "win": 0.277,
+    "netR": -0.38,
+    "grossR": -0.267,
+    "net2R": -0.494,
+    "costR": 0.114,
+    "total": -58.97,
+    "months": 61,
+    "t": -3.82,
+    "grossT": -2.69,
+    "t2x": -4.87,
+    "stops": 100,
+    "time": 55,
+    "maxDD": -63.18,
+    "medianStop": 5.93,
+    "buys": {
+     "n": 81,
+     "netR": -0.405
+    },
+    "sells": {
+     "n": 74,
+     "netR": -0.353
+    },
+    "byYear": {
+     "2021": {
+      "n": 27,
+      "netR": -0.132,
+      "total": -3.56
+     },
+     "2022": {
+      "n": 32,
+      "netR": -0.4,
+      "total": -12.81
+     },
+     "2023": {
+      "n": 22,
+      "netR": -0.778,
+      "total": -17.12
+     },
+     "2024": {
+      "n": 27,
+      "netR": -0.177,
+      "total": -4.77
+     },
+     "2025": {
+      "n": 30,
+      "netR": -0.353,
+      "total": -10.58
+     },
+     "2026": {
+      "n": 17,
+      "netR": -0.596,
+      "total": -10.12
+     }
+    }
+   },
+   "placebo": {
+    "means": [
+     -0.191,
+     -0.315,
+     -0.197,
+     -0.14,
+     -0.067,
+     -0.118,
+     -0.165,
+     -0.24,
+     -0.284,
+     -0.217,
+     -0.172,
+     -0.206,
+     -0.192,
+     -0.22,
+     -0.087,
+     -0.183,
+     -0.185,
+     -0.221,
+     -0.197,
+     -0.246,
+     -0.279,
+     -0.166,
+     -0.143,
+     -0.317,
+     -0.088,
+     -0.315,
+     -0.23,
+     -0.14,
+     -0.228,
+     -0.032,
+     -0.131,
+     -0.246,
+     -0.109,
+     -0.126,
+     -0.175,
+     -0.317,
+     -0.216,
+     -0.044,
+     -0.318,
+     -0.076
+    ],
+    "min": -0.318,
+    "max": -0.032,
+    "median": -0.191,
+    "p95": -0.066
+   }
+  }
+ },
+ "reading": "No test passes the pre-registered bar (T1 failed: netPos, t2, holm, isPos, cost2x, placebo). Out of sample the plain fade makes −0.164R a trade after $0.60 a round trip (n 352, month t −2.22; before costs −0.064R, t −0.87); the midnight-open condition gives −0.191R (n 322, t −2.34) and waiting for a New York raid of the London extreme −0.380R (n 155, t −3.82). Not an edge; nothing live changes and no proposal is written."
+}
