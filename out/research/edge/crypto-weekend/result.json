@@ -1,0 +1,1057 @@
+{
+ "built": "2026-11-13",
+ "verdict": "FAIL",
+ "system": "Weekend long and Monday short on BTC and ETH (Binance spot 5m, CFD costs and financing)",
+ "prereg": "PREREGISTRATION.md",
+ "source": "council-data research/candles/crypto5m and crypto1d (Binance spot); exchange APIs refused by the sandbox proxy",
+ "windows": {
+  "discovery": [
+   "2022-01-01",
+   "2023-12-31"
+  ],
+  "decisive": [
+   "2024-01-01",
+   "2099-01-01"
+  ],
+  "context": [
+   "2017-08-17",
+   "2021-12-31"
+  ]
+ },
+ "params": {
+  "rules": {
+   "W": {
+    "side": 1,
+    "dow": 5,
+    "hour": 21,
+    "hold": 180000,
+    "name": "Long the weekend (Fri 21:00 to Sun 23:00 UTC)"
+   },
+   "M": {
+    "side": -1,
+    "dow": 1,
+    "hour": 0,
+    "hold": 86400,
+    "name": "Short Monday (Mon 00:00 to Tue 00:00 UTC)"
+   }
+  },
+  "atrN": 24,
+  "atrK": 2,
+  "cost": 0.0004,
+  "fin": {
+   "btc": {
+    "long": 0.15,
+    "short": 0.075
+   },
+   "eth": {
+    "long": 0.15,
+    "short": 0.1
+   }
+  },
+  "cover": 0.95
+ },
+ "data": {
+  "btc": {
+   "from": "2022-01-01",
+   "to": "2026-10-31",
+   "m5": 508304,
+   "hours": 42358
+  },
+  "eth": {
+   "from": "2022-01-01",
+   "to": "2026-10-31",
+   "m5": 508304,
+   "hours": 42358
+  }
+ },
+ "tests": [
+  {
+   "test": "W-btc",
+   "rule": "W",
+   "coin": "btc",
+   "side": "long",
+   "n": 147,
+   "R": 0.0004,
+   "gross": 0.0985,
+   "costR": 0.0301,
+   "finR": 0.068,
+   "R_fri1": 0.0167,
+   "total": 0.05,
+   "t": 0,
+   "monthT": 0,
+   "months": 34,
+   "win": 0.4286,
+   "stops": 56,
+   "nights": 2.3401,
+   "skipped": {
+    "entry or exit candle missing": 1
+   },
+   "byYear": {
+    "2024": {
+     "n": 52,
+     "R": -0.0192,
+     "gross": 0.0703,
+     "total": -1
+    },
+    "2025": {
+     "n": 52,
+     "R": -0.0582,
+     "gross": 0.0439,
+     "total": -3.03
+    },
+    "2026": {
+     "n": 43,
+     "R": 0.0949,
+     "gross": 0.1986,
+     "total": 4.08
+    }
+   },
+   "discovery": {
+    "n": 103,
+    "R": -0.0483,
+    "gross": 0.0579,
+    "costR": 0.0299,
+    "finR": 0.0763,
+    "R_fri1": -0.0277,
+    "total": -4.97,
+    "t": -0.36,
+    "monthT": -0.34,
+    "months": 24,
+    "win": 0.3689,
+    "stops": 44,
+    "nights": 2.4563,
+    "skipped": {
+     "ATR hours missing": 1
+    },
+    "byYear": {
+     "2022": {
+      "n": 52,
+      "R": -0.3599,
+      "gross": -0.2721,
+      "total": -18.72
+     },
+     "2023": {
+      "n": 51,
+      "R": 0.2695,
+      "gross": 0.3944,
+      "total": 13.74
+     }
+    }
+   },
+   "p": 0.5,
+   "pHolm": 1,
+   "checks": {
+    "n100": true,
+    "positive": true,
+    "t2": false,
+    "holm": false,
+    "sameSignDiscovery": false
+   },
+   "pass": false
+  },
+  {
+   "test": "W-eth",
+   "rule": "W",
+   "coin": "eth",
+   "side": "long",
+   "n": 147,
+   "R": 0.0628,
+   "gross": 0.1334,
+   "costR": 0.0218,
+   "finR": 0.0488,
+   "R_fri1": 0.0753,
+   "total": 9.23,
+   "t": 0.58,
+   "monthT": 0.61,
+   "months": 34,
+   "win": 0.4218,
+   "stops": 65,
+   "nights": 2.2653,
+   "skipped": {
+    "entry or exit candle missing": 1
+   },
+   "byYear": {
+    "2024": {
+     "n": 52,
+     "R": 0.1064,
+     "gross": 0.1806,
+     "total": 5.53
+    },
+    "2025": {
+     "n": 52,
+     "R": 0.0518,
+     "gross": 0.1123,
+     "total": 2.69
+    },
+    "2026": {
+     "n": 43,
+     "R": 0.0234,
+     "gross": 0.1019,
+     "total": 1
+    }
+   },
+   "discovery": {
+    "n": 103,
+    "R": -0.117,
+    "gross": -0.0361,
+    "costR": 0.0254,
+    "finR": 0.0555,
+    "R_fri1": -0.1015,
+    "total": -12.05,
+    "t": -0.85,
+    "monthT": -1.03,
+    "months": 24,
+    "win": 0.3689,
+    "stops": 53,
+    "nights": 2.233,
+    "skipped": {
+     "ATR hours missing": 1
+    },
+    "byYear": {
+     "2022": {
+      "n": 52,
+      "R": -0.1945,
+      "gross": -0.131,
+      "total": -10.11
+     },
+     "2023": {
+      "n": 51,
+      "R": -0.038,
+      "gross": 0.0608,
+      "total": -1.94
+     }
+    }
+   },
+   "p": 0.281,
+   "pHolm": 1,
+   "checks": {
+    "n100": true,
+    "positive": true,
+    "t2": false,
+    "holm": false,
+    "sameSignDiscovery": false
+   },
+   "pass": false
+  },
+  {
+   "test": "M-btc",
+   "rule": "M",
+   "coin": "btc",
+   "side": "short",
+   "n": 148,
+   "R": -0.0764,
+   "gross": -0.0214,
+   "costR": 0.0479,
+   "finR": 0.0071,
+   "R_fri1": -0.0764,
+   "total": -11.31,
+   "t": -0.44,
+   "monthT": -0.57,
+   "months": 34,
+   "win": 0.2432,
+   "stops": 110,
+   "nights": 0.277,
+   "skipped": {},
+   "byYear": {
+    "2024": {
+     "n": 53,
+     "R": 0.123,
+     "gross": 0.1712,
+     "total": 6.52
+    },
+    "2025": {
+     "n": 52,
+     "R": -0.0155,
+     "gross": 0.0429,
+     "total": -0.81
+    },
+    "2026": {
+     "n": 43,
+     "R": -0.3958,
+     "gross": -0.3366,
+     "total": -17.02
+    }
+   },
+   "discovery": {
+    "n": 104,
+    "R": 0.2506,
+    "gross": 0.3052,
+    "costR": 0.0458,
+    "finR": 0.0087,
+    "R_fri1": 0.2506,
+    "total": 26.07,
+    "t": 1.21,
+    "monthT": 1.51,
+    "months": 24,
+    "win": 0.3654,
+    "stops": 61,
+    "nights": 0.4135,
+    "skipped": {},
+    "byYear": {
+     "2022": {
+      "n": 52,
+      "R": 0.2493,
+      "gross": 0.2905,
+      "total": 12.96
+     },
+     "2023": {
+      "n": 52,
+      "R": 0.252,
+      "gross": 0.3199,
+      "total": 13.11
+     }
+    }
+   },
+   "p": 0.67,
+   "pHolm": 1,
+   "checks": {
+    "n100": true,
+    "positive": false,
+    "t2": false,
+    "holm": false,
+    "sameSignDiscovery": true
+   },
+   "pass": false
+  },
+  {
+   "test": "M-eth",
+   "rule": "M",
+   "coin": "eth",
+   "side": "short",
+   "n": 148,
+   "R": -0.1394,
+   "gross": -0.1023,
+   "costR": 0.0309,
+   "finR": 0.0063,
+   "R_fri1": -0.1394,
+   "total": -20.63,
+   "t": -0.88,
+   "monthT": -1.09,
+   "months": 34,
+   "win": 0.223,
+   "stops": 110,
+   "nights": 0.277,
+   "skipped": {},
+   "byYear": {
+    "2024": {
+     "n": 53,
+     "R": 0.1068,
+     "gross": 0.1461,
+     "total": 5.66
+    },
+    "2025": {
+     "n": 52,
+     "R": -0.0671,
+     "gross": -0.0361,
+     "total": -3.49
+    },
+    "2026": {
+     "n": 43,
+     "R": -0.5302,
+     "gross": -0.4885,
+     "total": -22.8
+    }
+   },
+   "discovery": {
+    "n": 104,
+    "R": 0.1502,
+    "gross": 0.1937,
+    "costR": 0.0341,
+    "finR": 0.0093,
+    "R_fri1": 0.1502,
+    "total": 15.63,
+    "t": 0.84,
+    "monthT": 1.02,
+    "months": 24,
+    "win": 0.3654,
+    "stops": 62,
+    "nights": 0.4327,
+    "skipped": {},
+    "byYear": {
+     "2022": {
+      "n": 52,
+      "R": 0.0461,
+      "gross": 0.0761,
+      "total": 2.4
+     },
+     "2023": {
+      "n": 52,
+      "R": 0.2544,
+      "gross": 0.3112,
+      "total": 13.23
+     }
+    }
+   },
+   "p": 0.8106,
+   "pHolm": 1,
+   "checks": {
+    "n100": true,
+    "positive": false,
+    "t2": false,
+    "holm": false,
+    "sameSignDiscovery": true
+   },
+   "pass": false
+  }
+ ],
+ "placebo": {
+  "W": {
+   "beats": {
+    "btc": 20,
+    "eth": 17
+   },
+   "of": 40,
+   "seeds": [
+    {
+     "seed": 1,
+     "dow": 2,
+     "hour": 0,
+     "btc": -0.1542,
+     "eth": -0.2393
+    },
+    {
+     "seed": 2,
+     "dow": 3,
+     "hour": 7,
+     "btc": 0.2584,
+     "eth": 0.192
+    },
+    {
+     "seed": 3,
+     "dow": 3,
+     "hour": 0,
+     "btc": 0.013,
+     "eth": 0.3322
+    },
+    {
+     "seed": 4,
+     "dow": 3,
+     "hour": 7,
+     "btc": 0.2584,
+     "eth": 0.192
+    },
+    {
+     "seed": 5,
+     "dow": 3,
+     "hour": 18,
+     "btc": 0.0597,
+     "eth": 0.1039
+    },
+    {
+     "seed": 6,
+     "dow": 2,
+     "hour": 0,
+     "btc": -0.1542,
+     "eth": -0.2393
+    },
+    {
+     "seed": 7,
+     "dow": 1,
+     "hour": 1,
+     "btc": 0.1651,
+     "eth": 0.035
+    },
+    {
+     "seed": 8,
+     "dow": 1,
+     "hour": 15,
+     "btc": 0.0349,
+     "eth": -0.1138
+    },
+    {
+     "seed": 9,
+     "dow": 1,
+     "hour": 20,
+     "btc": -0.0498,
+     "eth": -0.1066
+    },
+    {
+     "seed": 10,
+     "dow": 2,
+     "hour": 22,
+     "btc": 0.0544,
+     "eth": 0.3588
+    },
+    {
+     "seed": 11,
+     "dow": 2,
+     "hour": 12,
+     "btc": 0.1648,
+     "eth": 0.066
+    },
+    {
+     "seed": 12,
+     "dow": 1,
+     "hour": 1,
+     "btc": 0.1651,
+     "eth": 0.035
+    },
+    {
+     "seed": 13,
+     "dow": 2,
+     "hour": 8,
+     "btc": -0.0667,
+     "eth": 0.0662
+    },
+    {
+     "seed": 14,
+     "dow": 2,
+     "hour": 10,
+     "btc": 0.1148,
+     "eth": 0.0982
+    },
+    {
+     "seed": 15,
+     "dow": 1,
+     "hour": 9,
+     "btc": 0.0659,
+     "eth": 0.0106
+    },
+    {
+     "seed": 16,
+     "dow": 2,
+     "hour": 3,
+     "btc": -0.0371,
+     "eth": 0.0189
+    },
+    {
+     "seed": 17,
+     "dow": 3,
+     "hour": 4,
+     "btc": 0.2387,
+     "eth": 0.1626
+    },
+    {
+     "seed": 18,
+     "dow": 2,
+     "hour": 14,
+     "btc": 0.1731,
+     "eth": 0.1689
+    },
+    {
+     "seed": 19,
+     "dow": 1,
+     "hour": 7,
+     "btc": -0.0029,
+     "eth": 0.1733
+    },
+    {
+     "seed": 20,
+     "dow": 3,
+     "hour": 9,
+     "btc": 0.3093,
+     "eth": 0.1165
+    },
+    {
+     "seed": 21,
+     "dow": 2,
+     "hour": 10,
+     "btc": 0.1148,
+     "eth": 0.0982
+    },
+    {
+     "seed": 22,
+     "dow": 2,
+     "hour": 5,
+     "btc": -0.0495,
+     "eth": 0.0788
+    },
+    {
+     "seed": 23,
+     "dow": 1,
+     "hour": 1,
+     "btc": 0.1651,
+     "eth": 0.035
+    },
+    {
+     "seed": 24,
+     "dow": 1,
+     "hour": 23,
+     "btc": -0.0677,
+     "eth": -0.2317
+    },
+    {
+     "seed": 25,
+     "dow": 2,
+     "hour": 19,
+     "btc": -0.0878,
+     "eth": 0.1234
+    },
+    {
+     "seed": 26,
+     "dow": 2,
+     "hour": 17,
+     "btc": -0.0082,
+     "eth": 0.237
+    },
+    {
+     "seed": 27,
+     "dow": 2,
+     "hour": 0,
+     "btc": -0.1542,
+     "eth": -0.2393
+    },
+    {
+     "seed": 28,
+     "dow": 2,
+     "hour": 16,
+     "btc": 0.0946,
+     "eth": 0.3005
+    },
+    {
+     "seed": 29,
+     "dow": 1,
+     "hour": 3,
+     "btc": 0.092,
+     "eth": 0.1674
+    },
+    {
+     "seed": 30,
+     "dow": 3,
+     "hour": 20,
+     "btc": -0.0921,
+     "eth": 0.0452
+    },
+    {
+     "seed": 31,
+     "dow": 3,
+     "hour": 20,
+     "btc": -0.0921,
+     "eth": 0.0452
+    },
+    {
+     "seed": 32,
+     "dow": 2,
+     "hour": 19,
+     "btc": -0.0878,
+     "eth": 0.1234
+    },
+    {
+     "seed": 33,
+     "dow": 2,
+     "hour": 17,
+     "btc": -0.0082,
+     "eth": 0.237
+    },
+    {
+     "seed": 34,
+     "dow": 2,
+     "hour": 19,
+     "btc": -0.0878,
+     "eth": 0.1234
+    },
+    {
+     "seed": 35,
+     "dow": 1,
+     "hour": 12,
+     "btc": 0.1093,
+     "eth": -0.1289
+    },
+    {
+     "seed": 36,
+     "dow": 3,
+     "hour": 22,
+     "btc": -0.1227,
+     "eth": -0.0614
+    },
+    {
+     "seed": 37,
+     "dow": 2,
+     "hour": 23,
+     "btc": -0.0166,
+     "eth": 0.2993
+    },
+    {
+     "seed": 38,
+     "dow": 3,
+     "hour": 20,
+     "btc": -0.0921,
+     "eth": 0.0452
+    },
+    {
+     "seed": 39,
+     "dow": 1,
+     "hour": 18,
+     "btc": 0.0264,
+     "eth": -0.0316
+    },
+    {
+     "seed": 40,
+     "dow": 2,
+     "hour": 19,
+     "btc": -0.0878,
+     "eth": 0.1234
+    }
+   ]
+  },
+  "M": {
+   "beats": {
+    "btc": 18,
+    "eth": 2
+   },
+   "of": 40,
+   "seeds": [
+    {
+     "seed": 1,
+     "dow": 4,
+     "hour": 0,
+     "btc": 0.1172,
+     "eth": 0.2689
+    },
+    {
+     "seed": 2,
+     "dow": 4,
+     "hour": 7,
+     "btc": 0.1278,
+     "eth": 0.2711
+    },
+    {
+     "seed": 3,
+     "dow": 4,
+     "hour": 0,
+     "btc": 0.1172,
+     "eth": 0.2689
+    },
+    {
+     "seed": 4,
+     "dow": 5,
+     "hour": 7,
+     "btc": -0.0293,
+     "eth": -0.0212
+    },
+    {
+     "seed": 5,
+     "dow": 4,
+     "hour": 18,
+     "btc": -0.0886,
+     "eth": -0.026
+    },
+    {
+     "seed": 6,
+     "dow": 4,
+     "hour": 0,
+     "btc": 0.1172,
+     "eth": 0.2689
+    },
+    {
+     "seed": 7,
+     "dow": 2,
+     "hour": 1,
+     "btc": 0.154,
+     "eth": 0.2084
+    },
+    {
+     "seed": 8,
+     "dow": 2,
+     "hour": 15,
+     "btc": -0.0965,
+     "eth": -0.1004
+    },
+    {
+     "seed": 9,
+     "dow": 2,
+     "hour": 20,
+     "btc": -0.1001,
+     "eth": -0.0832
+    },
+    {
+     "seed": 10,
+     "dow": 4,
+     "hour": 22,
+     "btc": -0.022,
+     "eth": -0.0283
+    },
+    {
+     "seed": 11,
+     "dow": 4,
+     "hour": 12,
+     "btc": 0.1059,
+     "eth": 0.2146
+    },
+    {
+     "seed": 12,
+     "dow": 3,
+     "hour": 1,
+     "btc": -0.1424,
+     "eth": -0.075
+    },
+    {
+     "seed": 13,
+     "dow": 4,
+     "hour": 8,
+     "btc": 0.1722,
+     "eth": 0.2489
+    },
+    {
+     "seed": 14,
+     "dow": 3,
+     "hour": 10,
+     "btc": -0.0928,
+     "eth": 0.0264
+    },
+    {
+     "seed": 15,
+     "dow": 2,
+     "hour": 9,
+     "btc": -0.1112,
+     "eth": 0.008
+    },
+    {
+     "seed": 16,
+     "dow": 4,
+     "hour": 3,
+     "btc": 0.0779,
+     "eth": 0.2033
+    },
+    {
+     "seed": 17,
+     "dow": 4,
+     "hour": 4,
+     "btc": 0.076,
+     "eth": 0.2079
+    },
+    {
+     "seed": 18,
+     "dow": 3,
+     "hour": 14,
+     "btc": -0.1003,
+     "eth": 0.0352
+    },
+    {
+     "seed": 19,
+     "dow": 2,
+     "hour": 7,
+     "btc": -0.0641,
+     "eth": 0.0333
+    },
+    {
+     "seed": 20,
+     "dow": 5,
+     "hour": 9,
+     "btc": -0.0786,
+     "eth": -0.0241
+    },
+    {
+     "seed": 21,
+     "dow": 3,
+     "hour": 10,
+     "btc": -0.0928,
+     "eth": 0.0264
+    },
+    {
+     "seed": 22,
+     "dow": 4,
+     "hour": 5,
+     "btc": 0.0762,
+     "eth": 0.2591
+    },
+    {
+     "seed": 23,
+     "dow": 2,
+     "hour": 1,
+     "btc": 0.154,
+     "eth": 0.2084
+    },
+    {
+     "seed": 24,
+     "dow": 3,
+     "hour": 23,
+     "btc": 0.0656,
+     "eth": 0.2055
+    },
+    {
+     "seed": 25,
+     "dow": 4,
+     "hour": 19,
+     "btc": -0.145,
+     "eth": -0.0369
+    },
+    {
+     "seed": 26,
+     "dow": 4,
+     "hour": 17,
+     "btc": -0.039,
+     "eth": -0.041
+    },
+    {
+     "seed": 27,
+     "dow": 3,
+     "hour": 0,
+     "btc": -0.1644,
+     "eth": -0.0847
+    },
+    {
+     "seed": 28,
+     "dow": 3,
+     "hour": 16,
+     "btc": -0.012,
+     "eth": 0.0758
+    },
+    {
+     "seed": 29,
+     "dow": 2,
+     "hour": 3,
+     "btc": 0.0981,
+     "eth": 0.1026
+    },
+    {
+     "seed": 30,
+     "dow": 5,
+     "hour": 20,
+     "btc": -0.0953,
+     "eth": -0.191
+    },
+    {
+     "seed": 31,
+     "dow": 4,
+     "hour": 20,
+     "btc": -0.154,
+     "eth": -0.0538
+    },
+    {
+     "seed": 32,
+     "dow": 3,
+     "hour": 19,
+     "btc": 0.0082,
+     "eth": 0.1378
+    },
+    {
+     "seed": 33,
+     "dow": 4,
+     "hour": 17,
+     "btc": -0.039,
+     "eth": -0.041
+    },
+    {
+     "seed": 34,
+     "dow": 4,
+     "hour": 19,
+     "btc": -0.145,
+     "eth": -0.0369
+    },
+    {
+     "seed": 35,
+     "dow": 2,
+     "hour": 12,
+     "btc": -0.0635,
+     "eth": 0.0526
+    },
+    {
+     "seed": 36,
+     "dow": 5,
+     "hour": 22,
+     "btc": -0.1077,
+     "eth": -0.1783
+    },
+    {
+     "seed": 37,
+     "dow": 4,
+     "hour": 23,
+     "btc": -0.0289,
+     "eth": 0.0246
+    },
+    {
+     "seed": 38,
+     "dow": 4,
+     "hour": 20,
+     "btc": -0.154,
+     "eth": -0.0538
+    },
+    {
+     "seed": 39,
+     "dow": 2,
+     "hour": 18,
+     "btc": -0.1955,
+     "eth": -0.1261
+    },
+    {
+     "seed": 40,
+     "dow": 4,
+     "hour": 19,
+     "btc": -0.145,
+     "eth": -0.0369
+    }
+   ]
+  }
+ },
+ "context": {
+  "btc": {
+   "early": {
+    "weekendSatSun": {
+     "n": 228,
+     "meanPct": 0.316,
+     "t": 1.15
+    },
+    "monday": {
+     "n": 228,
+     "meanPct": 0.493,
+     "t": 1.61
+    }
+   },
+   "discovery": {
+    "weekendSatSun": {
+     "n": 105,
+     "meanPct": 0.051,
+     "t": 0.22
+    },
+    "monday": {
+     "n": 104,
+     "meanPct": 0.081,
+     "t": 0.22
+    }
+   },
+   "decisive": {
+    "weekendSatSun": {
+     "n": 147,
+     "meanPct": 0.14,
+     "t": 0.71
+    },
+    "monday": {
+     "n": 148,
+     "meanPct": 0.505,
+     "t": 2.16
+    }
+   },
+   "from": "2017-08-17"
+  },
+  "eth": {
+   "early": {
+    "weekendSatSun": {
+     "n": 228,
+     "meanPct": 1.005,
+     "t": 2.52
+    },
+    "monday": {
+     "n": 228,
+     "meanPct": 0.382,
+     "t": 0.98
+    }
+   },
+   "discovery": {
+    "weekendSatSun": {
+     "n": 105,
+     "meanPct": -0.069,
+     "t": -0.21
+    },
+    "monday": {
+     "n": 104,
+     "meanPct": -0.089,
+     "t": -0.22
+    }
+   },
+   "decisive": {
+    "weekendSatSun": {
+     "n": 147,
+     "meanPct": 0.252,
+     "t": 0.81
+    },
+    "monday": {
+     "n": 148,
+     "meanPct": 0.518,
+     "t": 1.57
+    }
+   },
+   "from": "2017-08-17"
+  }
+ }
+}
