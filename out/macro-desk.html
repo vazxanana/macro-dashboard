@@ -1453,12 +1453,13 @@
       }
       return null;
     }
-    function daysLeft(by, now) {   // trading days after today up to the due date (weekends left out)
-      var end = Date.parse(String(by || '') + 'T23:59:59Z'); if (isNaN(end)) return null; if (end < now) return -1;
-      var d = new Date(now); d.setUTCHours(0, 0, 0, 0); var k = 0; d.setUTCDate(d.getUTCDate() + 1);
-      while (d.getTime() <= end) { var w = d.getUTCDay(); if (w > 0 && w < 6) k++; d.setUTCDate(d.getUTCDate() + 1); } return k;
+    // daily closes still to come up to the due date's (weekdays, gold's 17:00 New York close taken as 22:00 UTC); today's counts until it is in
+    function daysLeft(by, now) {
+      var due = Date.parse(String(by || '') + 'T22:00:00Z'); if (isNaN(due)) return null; if (due < now) return -1;
+      var d = new Date(now), k = 0; d.setUTCHours(22, 0, 0, 0); if (d.getTime() < now) d.setUTCDate(d.getUTCDate() + 1);
+      while (d.getTime() <= due) { var w = d.getUTCDay(); if (w > 0 && w < 6) k++; d.setUTCDate(d.getUTCDate() + 1); } return k;
     }
-    function leftText(k) { return k == null ? '' : k < 0 ? 'due date passed: scored on the next run' : k === 0 ? 'due today' : k + ' trading day' + (k > 1 ? 's' : '') + ' left'; }
+    function leftText(k) { return k == null ? '' : k <= 0 ? 'its last close is in: scored on the next run' : k === 1 ? '1 daily close left' : k + ' daily closes left'; }
     function withStatus(list, gpx, dpx, now) { return list.map(function (x) { var o = {}; for (var k in x) o[k] = x[k]; o.now = status(x, gpx, dpx); o.left = leftText(daysLeft(x.by, now)); return o; }); }
     // the next release with its hot / in-line / cool cases (council/playbook.mjs, veteran.json events), within 72 hours
     function nextRelease(v, now) { var e = ((v && v.events) || []).filter(function (e) { return e && !e.released && e.scenarios && e.scenarios.length && Date.parse(e.at) >= now - 30 * 60e3; })

@@ -71,8 +71,10 @@ test('where each call stands now: price against the level, days left, the next r
   assert.equal(S({ kind: 'pairDown', level: 103.45, asset: 'dxy' }, 3734, 103.82).ok, false);
   assert.equal(S({ kind: 'closeAbove', level: 1 }, null), null, 'no price, no status');
   const wed = Date.parse('2026-11-18T23:00:00Z');
-  assert.equal(P.daysLeft('2026-11-20', wed), 2); assert.equal(P.daysLeft('2026-11-18', wed), 0); assert.equal(P.daysLeft('2026-11-17', wed), -1);
+  assert.equal(P.daysLeft('2026-11-20', wed), 2); assert.equal(P.daysLeft('2026-11-18', wed), -1, 'Wednesday\'s close is in'); assert.equal(P.daysLeft('2026-11-17', wed), -1);
   assert.equal(P.daysLeft('2026-11-23', wed), 3, 'the weekend is not counted');
+  const thu = Date.parse('2026-11-19T00:20:00Z'); assert.equal(P.daysLeft('2026-11-20', thu), 2, 'today\'s close is still to come');
+  assert.equal(P.daysLeft('2026-11-19', Date.parse('2026-11-19T15:00:00Z')), 1);
   const w = P.week(fc, v, cot, NOW); assert.ok(w.calls.every((c) => 'now' in c && c.left));
   const v2 = { ...v, events: [{ at: '2026-11-18T13:30:00Z', country: 'USD', title: 'CPI', released: false, expectations: [{ consensus: '0.3%', previous: '0.2%' }], scenarios: [{ name: 'Hot', when: '≥ 0.4%', usd: 'USD up', gold: 'down' }] }] };
   const d = P.day(fc, v2, cot, NOW); assert.equal(d.release.consensus, '0.3%'); assert.equal(d.release.scenarios[0].name, 'Hot');
