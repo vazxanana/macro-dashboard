@@ -34,6 +34,7 @@ import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf } from './glance.mjs';
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
+import { build as redfolder, loadInputs as rfInputs, capturedFrom as rfCaptured } from './redfolder.mjs';
 import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan, cpiBenchmark, consensusGate, gdpCase } from './research-watch.mjs';
 
 const DAY = 86400;
@@ -598,6 +599,11 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   if (v.briefing) { const BH = rd(path.join(M, 'veteran-briefings.json'), []), wk = weekKey(now), snap = snapshot(v, wk);
     v.changes = briefDiff(previousOf(BH, wk), snap, CL); w('veteran-briefings.json', archiveWeek(BH, snap)); }
   w('veteran.json', v); w('veteran-ledger.json', L); w('veteran-debates.json', Dh); w('veteran-expectations.json', E);
+  // 19 Nov 2026: the Red folder study (council/redfolder.mjs), from the files the council already has; a failure writes nothing
+  try { const evs = rd(path.join(M, 'events.json'), []), cal = (cache && cache.cal) || [];
+    const RF = redfolder({ inputs: rfInputs(), rel: cache && cache.release, captured: rfCaptured({ expectations: E, events: Array.isArray(evs) ? evs : [], cal }),
+      calendar: cal.map((e) => ({ title: e.title, country: e.country, at: new Date(+e.at * 1000).toISOString(), forecast: e.forecast, previous: e.previous })), gold, dxy: dx, now });
+    w('redfolder.json', RF); } catch (e) { log('Red folder study skipped: ' + (e && e.message || e)); }
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
   log(v.brief);

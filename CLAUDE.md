@@ -2792,6 +2792,21 @@ quarterly, parts over headline, revision is not surprise). Left out on purpose: 
 cases (equities, not this desk), the NBU gold notes, and the playbooks already ported in code (regime framework, gold driver map,
 calibration, yield decomposition). Tests: `tests/research-watch.test.mjs`.
 
+## Red folder study (19 Nov 2026, owner: "a section of the most important red folders … study, compare previous months, the news, what we expect, what came out, how the market reacted, so we can prepare")
+`council/redfolder.mjs` (pure + `loadInputs`; run by `veteran.mjs` `run()` → council-data `macro/redfolder.json`; a failure writes
+nothing). Types CPI (core + headline), jobs report (payrolls, unemployment, hourly earnings), Fed decision, core PCE, PPI, retail sales,
+ISM manufacturing, GDP. Per release since 2022: **expected** = the calendar consensus the council captured before it
+(veteran-expectations, events.json, the calendar cache; a calendar value, not a survey) or, CPI 2022-24, the Cleveland model from the
+batch (labelled model); **printed** = the batch's first prints 2022-24, else the current FRED value of the reference month (m/m to one
+decimal as printed; can include revisions); prior; surprise only against a captured consensus; **gold / dollar** = UTC release-day
+close vs the close before (council daily closes) and first 5 / 60 minutes from `council/event-base.json` (to Oct 2026). Dates from
+`council/events.mjs` (history and the 2025-26 schedule), event-base, the batch and the captures. Per type: the next release (calendar
+consensus when listed, else the schedule date), and descriptive summary lines (median day move, up share, higher vs lower than the
+prior, above vs below consensus once 6+ captured). The strategist (`macro.mjs` `releaseSeries`) fetches the ten FRED release series
+(`RELEASE_FRED`) once a UTC day into `cache.release`, never while FRED is unreachable that run. Desk: section 3 `#s-red` "Red folder
+study" (tabs per type, `localStorage mdRed`; phones show 6 rows then "Show all"). Descriptive only: no rule, call or trade reads it.
+Tests: `tests/redfolder.test.mjs`.
+
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
 (close above today, near / stretch touch levels, middle-60% range, big move, DXY direction). Each p is gold's 10-year empirical
