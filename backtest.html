@@ -1457,8 +1457,10 @@
   const xpLower = (P, sec, t, B, p) => { const tn = t + Math.max(0, Math.min(1, p)) * B, a = ubT(P.bars, t - 1), z = ubT(P.bars, tn) - 1; if (z < a) return;
     const lastT = P.data.length ? P.data[P.data.length - 1].time : -Infinity;
     for (let i = a; i <= z; i++) { const b = P.bars[i]; if (b.time < lastT || (P.liveT != null && b.time < P.liveT)) continue; let x = b;
-      if (b.time + sec > tn) { const q = (tn - b.time) / sec, pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], sg = q * 3, k = Math.min(2, Math.floor(sg)), f = sg - k, px = pts[k] + (pts[k + 1] - pts[k]) * f;
-        let hi = Math.max(b.open, px), lo = Math.min(b.open, px); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); } x = { time: b.time, open: b.open, high: hi, low: lo, close: px }; }
+      if (b.time + sec > tn) { const R = RTK.g && RTK.g < sec ? tkAgg(b.time, b.time + sec, tn) : null;
+        if (R) x = { time: b.time, open: R.open, high: R.high, low: R.low, close: R.close };
+        else { const q = (tn - b.time) / sec, pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], sg = q * 3, k = Math.min(2, Math.floor(sg)), f = sg - k, px = pts[k] + (pts[k + 1] - pts[k]) * f;
+        let hi = Math.max(b.open, px), lo = Math.min(b.open, px); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); } x = { time: b.time, open: b.open, high: hi, low: lo, close: px }; } }
       try { P.series.update(x); P.liveT = b.time; } catch (e) {} } };
   let XL = 0; function xpLive(t, o, hi, lo, c, p) { if (!XP.panes.length || !cur()) return; const nw = performance.now(); if (nw - XL < 80) return; XL = nw; const B = TFS[S.tf];   // about 12 a second: every frame cost the first chart half its frame rate on a slow phone
     for (const P of XP.panes) { if (P.loading || P.err || !P.data.length) continue; const sec = P.sec || TFS[P.tf]; if (sec < B) { if (p != null && !S.part) xpLower(P, sec, t, B, p); continue; }
@@ -1688,8 +1690,27 @@
   // switch is different: its real finer candles are known, so it grows by them over its slot (step(false, k, keep)), each
   // committed to the engine BEFORE it is drawn; pausing in the middle leaves a forming candle at that later moment.
   let RAF = 0, A = null;
-  function drawForming(b, p) { const pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], seg = p * 3, k = Math.min(2, Math.floor(seg)), f = seg - k, price = pts[k] + (pts[k + 1] - pts[k]) * f;
-    let hi = Math.max(b.open, price), lo = Math.min(b.open, price); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); }
+  // real ticks (19 Nov 2026, owner: "make the main chart candle form from real ticks too, all of them"): while the replay plays, the
+  // forming candle follows the session's own finer candles (15 s to the hour, the finest that fits XMAX from the moment to the end),
+  // fetched in the background when Play is pressed; the price inside one finer candle moves open, first extreme, second, close.
+  // Display only: the engine still settles each candle at its close; a candle the finer data does not cover keeps the simple path.
+  const RTK = { key: '', g: 0, bars: [], from: 0, to: 0, busy: false };
+  const tkPath = (b, q) => { const pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], sg = Math.max(0, Math.min(1, q)) * 3, k = Math.min(2, Math.floor(sg)), f = sg - k, px = pts[k] + (pts[k + 1] - pts[k]) * f;
+    let hi = Math.max(b.open, px), lo = Math.min(b.open, px); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); } return { high: hi, low: lo, close: px }; };
+  // the candle [t0, t1) as the finer candles have drawn it by time tn; null where the finer data does not cover it
+  function tkAgg(t0, t1, tn) { if (!RTK.bars.length || !RTK.g || RTK.from > t0 || RTK.to < t1) return null; const B = RTK.bars, g = RTK.g, e = Math.min(t1, tn); let i = ubT(B, t0 - 1), o = null;
+    for (; i < B.length && B[i].time < e; i++) { const x = B[i]; let hi = x.high, lo = x.low, c = x.close; if (x.time + g > tn) { const r = tkPath(x, (tn - x.time) / g); hi = r.high; lo = r.low; c = r.close; }
+      if (!o) o = { time: t0, open: x.open, high: hi, low: lo, close: c }; else { o.high = Math.max(o.high, hi); o.low = Math.min(o.low, lo); o.close = c; } } return o; }
+  async function tkLoad() { const c = cur(), B = TFS[S.tf]; if (!c || !S.bars.length || S.part) return; const key = [S.id, S.sym, S.tf].join('|'), t0 = c.time + B, t1 = Math.min(S.to || Infinity, S.bars[S.bars.length - 1].time + B);
+    if (RTK.busy || (RTK.key === key && RTK.from <= t0 && RTK.to >= t1)) return; const left = Math.max(1, S.bars.length - S.idx);
+    const g = Object.values(TFS).filter((x) => x < B && B % x === 0 && x <= B / 4 && left * B / x <= XMAX).sort((a, b) => a - b)[0]; if (!g) return; const gtf = Object.keys(TFS).find((k) => TFS[k] === g);
+    RTK.busy = true; try { const bars = await fetchBars(S.sym, gtf, t0, t1); if ([S.id, S.sym, S.tf].join('|') !== key) return; Object.assign(RTK, { key, g, bars, from: t0, to: t1 }); } catch (e) {} finally { RTK.busy = false; } }
+  window.ctTicks = () => ({ key: RTK.key, g: RTK.g, n: RTK.bars.length, from: RTK.from, to: RTK.to, busy: RTK.busy });
+  function drawForming(b, p) { const R = !S.part ? tkAgg(b.time, b.time + TFS[S.tf], b.time + p * TFS[S.tf]) : null;
+    let price, hi, lo;
+    if (R) { price = R.close; hi = R.high; lo = R.low; }
+    else { const pts = b.close >= b.open ? [b.open, b.low, b.high, b.close] : [b.open, b.high, b.low, b.close], seg = p * 3, k = Math.min(2, Math.floor(seg)), f = seg - k; price = pts[k] + (pts[k + 1] - pts[k]) * f;
+    hi = Math.max(b.open, price); lo = Math.min(b.open, price); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); } }
     series.update({ time: b.time, open: b.open, high: hi, low: lo, close: price }); xpLive(b.time, b.open, hi, lo, price, p); A.drawn = true; LIVE = price; $('px-now').textContent = `last ${fmt(price)}`; overlay(); }
   // the view glides: when a forming candle is added the chart shifts one bar at once; it is put back and eased over the bar's
   // time instead, as long as the latest candle is in view and the user is not panning (any other scroll position ends it)
@@ -1703,7 +1724,7 @@
     else { const g = A.g, gl = A.gl, kept = !!A.kept; NEXT0 = A.t0 + dur; A = null; if (g != null && Math.abs(tsc().scrollPosition() - gl) < 0.05) tsc().scrollToPosition(g, false); if (!step(false, 0, kept)) return; }
     if (S.timer) RAF = requestAnimationFrame(frame); }
   function stop() { if (S.timer) save(); LIVE = null; const half = A && A.drawn; cancelAnimationFrame(RAF); RAF = 0; A = null; S.timer = 0; $('play').classList.remove('playing'); $('play').setAttribute('aria-label', 'Play'); if (half) { DR.key = ''; render(); } CO.tick(); }
-  $('step').addEventListener('click', () => { if (A && A.drawn) { A = null; } step(); }); $('play').addEventListener('click', () => { if (S.timer) return stop(); if (!S.bars.length) return; $('play').classList.add('playing'); $('play').setAttribute('aria-label', 'Pause'); S.timer = 1; A = null; NEXT0 = 0; RAF = requestAnimationFrame(frame); CO.ev('play'); });
+  $('step').addEventListener('click', () => { if (A && A.drawn) { A = null; } step(); }); $('play').addEventListener('click', () => { if (S.timer) return stop(); if (!S.bars.length) return; $('play').classList.add('playing'); $('play').setAttribute('aria-label', 'Pause'); S.timer = 1; A = null; NEXT0 = 0; RAF = requestAnimationFrame(frame); tkLoad(); CO.ev('play'); });
   $('speed').addEventListener('change', () => { if (A) A.t0 = performance.now() - (A.t0 ? 0 : 0); });
   document.querySelectorAll('.speed [data-sp]').forEach((b) => b.addEventListener('click', () => { $('speed').value = b.dataset.sp; document.querySelectorAll('.speed [data-sp]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.sp === b.dataset.sp))); $('speed').dispatchEvent(new Event('change')); }));
   document.addEventListener('click', (e) => { document.querySelectorAll('details.dd[open]').forEach((d) => { if (!d.contains(e.target)) d.open = false; }); });

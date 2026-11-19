@@ -1894,6 +1894,13 @@ the moment growing open, first extreme, second, close (`xpLower`, called from `x
 switched-timeframe candle forms, `S.part`). Display only: never in the pane's data (`P.liveT` marks what is shown), the engine still
 settles each candle at its close, and a pause, Undo or jump draws the pane from its data again (closed candles by the moment). Title:
 "live while the replay plays". `ctSplit()` panes carry `liveT` and `shown`. Test: `tests/backtest-split-sync.test.mjs`.
+Real ticks (19 Nov 2026, owner: "make the main chart candle form from real ticks too, all of them"): pressing Play fetches, in the
+background, the session's finer candles from the moment to the end (`tkLoad`: the finest of `TFS` that divides the timeframe, is at
+most a quarter of it and keeps the count under `XMAX`; M1 for 15m, 15 s for 1m), and the forming candle of the first chart
+(`drawForming`), the panes on the same or a higher timeframe (through `xpLive`) and a lower pane's forming candle (`xpLower`) follow them
+(`tkAgg`; inside one finer candle the price goes open, first extreme, second, close). A candle the finer data does not cover, and a
+switched-timeframe candle (`S.part`, already real), keep their own path. Display only: the engine still settles each candle at its close.
+`window.ctTicks()` is the read-only view. Test: `tests/backtest-split-sync.test.mjs`.
 Pass 11 (owner: "smoothness of the backtesting, the buttons organised"): measured with a frame-time bench (220 trades, 1x / 5x / 12x,
 pan / zoom, line drag, tab switches, 4× CPU throttle). Fixes: only the open tab is drawn (`JD` dirty flags, `flushTabs`; journal /
 stats / calendar while playing in an idle slot), the journal table shows the latest 50 trades (`JLIM`, "Show more"), a new snapshot

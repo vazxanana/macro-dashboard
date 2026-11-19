@@ -98,3 +98,23 @@ test('a lower pane forms its candles like a live market while the replay plays (
   assert.match(page, /if \(!data && P\.liveT != null && sec < B\)/, 'a pause, Undo or a jump draws the pane from its data again');
   assert.match(page, /xpLive\(b\.time, b\.open, hi, lo, price, p\);/);
 });
+
+test('the forming candle follows the session\'s real finer candles on every chart (19 Nov 2026), display only', () => {
+  const blk = page.slice(page.indexOf('  // real ticks (19 Nov 2026'), page.indexOf('  function drawForming(b, p)') + 900);
+  assert.ok(blk.length > 1500);
+  assert.match(blk, /x <= B \/ 4 && left \* B \/ x <= XMAX/, 'the finest finer timeframe that fits the cap');
+  assert.match(blk, /if \(!RTK\.bars\.length \|\| !RTK\.g \|\| RTK\.from > t0 \|\| RTK\.to < t1\) return null;/, 'a candle the finer data does not cover keeps the simple path');
+  assert.doesNotMatch(blk, /S\.acct|BT\.advance|\.stop\s*=|localStorage/, 'display only');
+  assert.match(page, /RAF = requestAnimationFrame\(frame\); tkLoad\(\);/);
+  assert.match(page, /const R = RTK\.g && RTK\.g < sec \? tkAgg\(b\.time, b\.time \+ sec, tn\) : null;/, 'lower panes take the same ticks');
+  // tkAgg on hand-made finer candles
+  const src = /const tkPath = [\s\S]*?return o; \}/.exec(blk)[0].replace(/RTK/g, 'K');
+  const ubT = (arr, t) => { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m].time <= t) lo = m + 1; else hi = m; } return lo; };
+  const f = new Function('K', 'ubT', `${src}; return tkAgg;`);
+  const K = { g: 60, from: 0, to: 300, bars: [{ time: 0, open: 10, high: 12, low: 9, close: 11 }, { time: 60, open: 11, high: 15, low: 11, close: 14 }, { time: 120, open: 14, high: 14, low: 8, close: 9 }] };
+  const agg = f(K, ubT);
+  assert.deepEqual(agg(0, 180, 180), { time: 0, open: 10, high: 15, low: 8, close: 9 }, 'every finer candle closed');
+  assert.deepEqual(agg(0, 180, 60), { time: 0, open: 10, high: 12, low: 9, close: 11 });
+  const mid = agg(0, 180, 90); assert.equal(mid.open, 10); assert.ok(mid.high <= 15 && mid.close > 11, 'the second candle half way up');
+  assert.equal(agg(0, 400, 90), null, 'not covered');
+});
