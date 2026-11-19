@@ -4583,3 +4583,14 @@ broker's file). Parity gate first: the harness reproduces `gold-weekend`'s gold 
 **Verdict: FAIL**: OOS 2024 on +0.098R a position (n 63, month-sum t 0.52), IS 2020-23 −0.158R (n 85), replication 2006-19
 +0.060R (n 252, month t 0.55); one at a time is worse. No paper shadow, nothing live changed; do not test it on another
 market. Test: `tests/geg-silver.test.mjs`.
+
+## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
+`MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
+website's proxy (meridianx.dev/md/; aureumdesk.co.uk since 16 Nov). When Vercel blocked the account at 10:21 UTC on 15 Nov, every gold and forex market fell to
+the Kraken fallback (`snapshot.feed` all "Kraken"; one-feed rule: OANDA-priced records held, adopted after 6 h; the weekend
+close limited the effect). `council/md-proxy.mjs` serves `/md/bars` on localhost through the site's own `api/bars.js` (the
+VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `OANDA_TOKEN` secret is set and moves `MD_BASE` /
+`ICT_MD_BARS` to it only once it answers, else the website's proxy as before. Needs the owner to add `OANDA_TOKEN` (and
+`OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
+`scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
+(a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
