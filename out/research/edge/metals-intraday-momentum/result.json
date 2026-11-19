@@ -1,0 +1,637 @@
+{
+ "study": "metals-intraday-momentum",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/metals-intraday-momentum/PREREGISTRATION.md",
+ "paper": "Gao, Han, Li and Zhou (2018), Journal of Financial Economics, \"Market intraday momentum\" (S&P 500); here on gold, silver and WTI crude",
+ "rule": "signal = the first 30 minutes of the US floor session (gold / silver 08:20-08:50, crude 09:00-09:30 New York); at 30 minutes before the close (13:00 / 14:00) long if > 0, short if < 0; exit at the close (13:30 / 14:30); stop 1.5 x the 20-day mean |last half-hour move|",
+ "standAlone": "A stand-alone study: not a gate, exit, entry or size on the live gold book; it reads no gold-book positions (owner decision 44).",
+ "sessions": {
+  "xau": {
+   "open": "08:20",
+   "close": "13:30"
+  },
+  "xag": {
+   "open": "08:20",
+   "close": "13:30"
+  },
+  "wtico": {
+   "open": "09:00",
+   "close": "14:30"
+  }
+ },
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "wtico": 0.04
+ },
+ "costBasis": {
+  "xau": "standing gold round trip of the repository",
+  "xag": "ICT lab silver round trip (api/_ictlab.js)",
+  "wtico": "assumed: ~$0.03 retail CFD spread + $0.01 slippage"
+ },
+ "windows": {
+  "A": "2007 (or first data) - 2015 (replication)",
+  "B": "2016 → 2026-11-13 (decides)"
+ },
+ "tests": {
+  "xau": {
+   "test": "T1",
+   "name": "Gold",
+   "skipped": {
+    "noPrice": 2,
+    "flat": 9,
+    "warmup": 20
+   },
+   "A": {
+    "from": "2007-01-02",
+    "to": "2015-12-31",
+    "days": 2246,
+    "n": 2238,
+    "net": -0.1029,
+    "tTrade": -5.5463,
+    "months": 108,
+    "tMonth": -4.9303,
+    "gross": 0.0443,
+    "tGross": 2.3999,
+    "costR": 0.1472,
+    "net2x": -0.2501,
+    "tMonth2x": -10.2934,
+    "totalNet": -230.2125,
+    "win": 0.4209,
+    "stops": 499,
+    "longs": 1096,
+    "placebo": {
+     "netMean": -0.1456,
+     "netQ95": -0.1197,
+     "netMax": -0.0887,
+     "beats": 39,
+     "hit": 0.5202,
+     "hitN": 2232,
+     "hitMean": 0.4979,
+     "hitQ95": 0.5143,
+     "hitBeats": 39
+    },
+    "reg": {
+     "n": 2246,
+     "slope": 0.0133,
+     "tOls": 1.0882,
+     "tWhite": 0.8671,
+     "r2": 0.0005
+    }
+   },
+   "B": {
+    "from": "2016-01-04",
+    "to": "2026-11-13",
+    "days": 2714,
+    "n": 2713,
+    "net": -0.157,
+    "tTrade": -9.6406,
+    "months": 131,
+    "tMonth": -9.2438,
+    "gross": -0.0149,
+    "tGross": -0.9187,
+    "costR": 0.142,
+    "net2x": -0.299,
+    "tMonth2x": -15.2904,
+    "totalNet": -425.8649,
+    "win": 0.4088,
+    "stops": 683,
+    "longs": 1397,
+    "placebo": {
+     "netMean": -0.1368,
+     "netQ95": -0.1145,
+     "netMax": -0.1015,
+     "beats": 3,
+     "hit": 0.5057,
+     "hitN": 2709,
+     "hitMean": 0.5025,
+     "hitQ95": 0.5161,
+     "hitBeats": 25
+    },
+    "reg": {
+     "n": 2714,
+     "slope": 0.0276,
+     "tOls": 2.7965,
+     "tWhite": 1.268,
+     "r2": 0.0029
+    }
+   },
+   "byYear": {
+    "2006": {
+     "n": 20,
+     "net": -0.057,
+     "total": -1.1395
+    },
+    "2007": {
+     "n": 246,
+     "net": -0.2022,
+     "total": -49.7531
+    },
+    "2008": {
+     "n": 249,
+     "net": -0.1641,
+     "total": -40.8575
+    },
+    "2009": {
+     "n": 247,
+     "net": -0.1116,
+     "total": -27.5633
+    },
+    "2010": {
+     "n": 251,
+     "net": -0.08,
+     "total": -20.0908
+    },
+    "2011": {
+     "n": 250,
+     "net": 0.0108,
+     "total": 2.7051
+    },
+    "2012": {
+     "n": 248,
+     "net": -0.0205,
+     "total": -5.0756
+    },
+    "2013": {
+     "n": 248,
+     "net": -0.0337,
+     "total": -8.3557
+    },
+    "2014": {
+     "n": 249,
+     "net": -0.2293,
+     "total": -57.1076
+    },
+    "2015": {
+     "n": 250,
+     "net": -0.0965,
+     "total": -24.114
+    },
+    "2016": {
+     "n": 250,
+     "net": -0.0912,
+     "total": -22.8059
+    },
+    "2017": {
+     "n": 249,
+     "net": -0.078,
+     "total": -19.4146
+    },
+    "2018": {
+     "n": 249,
+     "net": -0.2394,
+     "total": -59.6037
+    },
+    "2019": {
+     "n": 249,
+     "net": -0.275,
+     "total": -68.4638
+    },
+    "2020": {
+     "n": 251,
+     "net": -0.1802,
+     "total": -45.233
+    },
+    "2021": {
+     "n": 251,
+     "net": -0.2434,
+     "total": -61.0905
+    },
+    "2022": {
+     "n": 250,
+     "net": -0.1587,
+     "total": -39.6651
+    },
+    "2023": {
+     "n": 248,
+     "net": -0.1685,
+     "total": -41.7959
+    },
+    "2024": {
+     "n": 249,
+     "net": -0.0627,
+     "total": -15.6036
+    },
+    "2025": {
+     "n": 248,
+     "net": -0.145,
+     "total": -35.9693
+    },
+    "2026": {
+     "n": 219,
+     "net": -0.0741,
+     "total": -16.2196
+    }
+   },
+   "pass": {
+    "p": 1,
+    "holm": 1,
+    "bothPositive": false,
+    "tOk": false,
+    "holmOk": false,
+    "nOk": true,
+    "ok": false
+   }
+  },
+  "xag": {
+   "test": "T2",
+   "name": "Silver",
+   "skipped": {
+    "noPrice": 4,
+    "flat": 25,
+    "warmup": 20
+   },
+   "A": {
+    "from": "2007-01-02",
+    "to": "2015-12-31",
+    "days": 2244,
+    "n": 2222,
+    "net": -0.4653,
+    "tTrade": -23.9883,
+    "months": 108,
+    "tMonth": -15.4853,
+    "gross": 0.0238,
+    "tGross": 1.273,
+    "costR": 0.4891,
+    "net2x": -0.9544,
+    "tMonth2x": -18.9157,
+    "totalNet": -1033.9638,
+    "win": 0.2687,
+    "stops": 519,
+    "longs": 1114,
+    "placebo": {
+     "netMean": -0.4864,
+     "netQ95": -0.4686,
+     "netMax": -0.4303,
+     "beats": 38,
+     "hit": 0.5159,
+     "hitN": 2206,
+     "hitMean": 0.4993,
+     "hitQ95": 0.5159,
+     "hitBeats": 37
+    },
+    "reg": {
+     "n": 2244,
+     "slope": 0.0254,
+     "tOls": 1.9432,
+     "tWhite": 1.5455,
+     "r2": 0.0017
+    }
+   },
+   "B": {
+    "from": "2016-01-04",
+    "to": "2026-11-13",
+    "days": 2714,
+    "n": 2712,
+    "net": -0.6421,
+    "tTrade": -36.8934,
+    "months": 131,
+    "tMonth": -20.0015,
+    "gross": -0.0096,
+    "tGross": -0.5852,
+    "costR": 0.6326,
+    "net2x": -1.2747,
+    "tMonth2x": -21.8324,
+    "totalNet": -1741.4719,
+    "win": 0.2235,
+    "stops": 681,
+    "longs": 1330,
+    "placebo": {
+     "netMean": -0.6415,
+     "netQ95": -0.6201,
+     "netMax": -0.6152,
+     "beats": 21,
+     "hit": 0.5031,
+     "hitN": 2709,
+     "hitMean": 0.5033,
+     "hitQ95": 0.5186,
+     "hitBeats": 20
+    },
+    "reg": {
+     "n": 2714,
+     "slope": 0.0347,
+     "tOls": 2.9114,
+     "tWhite": 0.6862,
+     "r2": 0.0031
+    }
+   },
+   "byYear": {
+    "2006": {
+     "n": 19,
+     "net": -0.5759,
+     "total": -10.9417
+    },
+    "2007": {
+     "n": 241,
+     "net": -0.603,
+     "total": -145.3335
+    },
+    "2008": {
+     "n": 244,
+     "net": -0.3477,
+     "total": -84.8472
+    },
+    "2009": {
+     "n": 245,
+     "net": -0.4334,
+     "total": -106.1852
+    },
+    "2010": {
+     "n": 247,
+     "net": -0.443,
+     "total": -109.4312
+    },
+    "2011": {
+     "n": 250,
+     "net": -0.0636,
+     "total": -15.9014
+    },
+    "2012": {
+     "n": 248,
+     "net": -0.2704,
+     "total": -67.0635
+    },
+    "2013": {
+     "n": 248,
+     "net": -0.5147,
+     "total": -127.6396
+    },
+    "2014": {
+     "n": 249,
+     "net": -0.7242,
+     "total": -180.3306
+    },
+    "2015": {
+     "n": 250,
+     "net": -0.7889,
+     "total": -197.2316
+    },
+    "2016": {
+     "n": 251,
+     "net": -0.6343,
+     "total": -159.2145
+    },
+    "2017": {
+     "n": 249,
+     "net": -0.6735,
+     "total": -167.6933
+    },
+    "2018": {
+     "n": 249,
+     "net": -0.9727,
+     "total": -242.1997
+    },
+    "2019": {
+     "n": 249,
+     "net": -1.1712,
+     "total": -291.6283
+    },
+    "2020": {
+     "n": 251,
+     "net": -0.5032,
+     "total": -126.31
+    },
+    "2021": {
+     "n": 250,
+     "net": -0.6529,
+     "total": -163.2166
+    },
+    "2022": {
+     "n": 250,
+     "net": -0.6472,
+     "total": -161.7881
+    },
+    "2023": {
+     "n": 248,
+     "net": -0.6496,
+     "total": -161.104
+    },
+    "2024": {
+     "n": 248,
+     "net": -0.4919,
+     "total": -121.9788
+    },
+    "2025": {
+     "n": 248,
+     "net": -0.4373,
+     "total": -108.4444
+    },
+    "2026": {
+     "n": 219,
+     "net": -0.173,
+     "total": -37.8942
+    }
+   },
+   "pass": {
+    "p": 1,
+    "holm": 1,
+    "bothPositive": false,
+    "tOk": false,
+    "holmOk": false,
+    "nOk": true,
+    "ok": false
+   }
+  },
+  "wtico": {
+   "test": "T3",
+   "name": "WTI crude",
+   "skipped": {
+    "noPrice": 5,
+    "flat": 24,
+    "warmup": 20
+   },
+   "A": {
+    "from": "2007-01-02",
+    "to": "2015-12-30",
+    "days": 2243,
+    "n": 2235,
+    "net": -0.1102,
+    "tTrade": -6.0926,
+    "months": 108,
+    "tMonth": -5.7115,
+    "gross": -0.0153,
+    "tGross": -0.8458,
+    "costR": 0.0949,
+    "net2x": -0.2051,
+    "tMonth2x": -9.9501,
+    "totalNet": -246.294,
+    "win": 0.4251,
+    "stops": 546,
+    "longs": 1119,
+    "placebo": {
+     "netMean": -0.1021,
+     "netQ95": -0.0748,
+     "netMax": -0.0668,
+     "beats": 10,
+     "hit": 0.4892,
+     "hitN": 2224,
+     "hitMean": 0.4981,
+     "hitQ95": 0.5094,
+     "hitBeats": 6
+    },
+    "reg": {
+     "n": 2243,
+     "slope": 0.0916,
+     "tOls": 3.567,
+     "tWhite": 2.0234,
+     "r2": 0.0056
+    }
+   },
+   "B": {
+    "from": "2016-01-04",
+    "to": "2026-11-13",
+    "days": 2714,
+    "n": 2698,
+    "net": -0.1682,
+    "tTrade": -10.1942,
+    "months": 131,
+    "tMonth": -9.4989,
+    "gross": -0.022,
+    "tGross": -1.3351,
+    "costR": 0.1463,
+    "net2x": -0.3145,
+    "tMonth2x": -15.6145,
+    "totalNet": -453.9259,
+    "win": 0.3933,
+    "stops": 666,
+    "longs": 1378,
+    "placebo": {
+     "netMean": -0.1536,
+     "netQ95": -0.1308,
+     "netMax": -0.1163,
+     "beats": 5,
+     "hit": 0.483,
+     "hitN": 2671,
+     "hitMean": 0.499,
+     "hitQ95": 0.5122,
+     "hitBeats": 1
+    },
+    "reg": {
+     "n": 2714,
+     "slope": -0.0289,
+     "tOls": -1.3397,
+     "tWhite": -0.7805,
+     "r2": 0.0007
+    }
+   },
+   "byYear": {
+    "2006": {
+     "n": 20,
+     "net": 0.0692,
+     "total": 1.3834
+    },
+    "2007": {
+     "n": 248,
+     "net": -0.0771,
+     "total": -19.1239
+    },
+    "2008": {
+     "n": 250,
+     "net": -0.0971,
+     "total": -24.2771
+    },
+    "2009": {
+     "n": 249,
+     "net": -0.1011,
+     "total": -25.1842
+    },
+    "2010": {
+     "n": 251,
+     "net": -0.1836,
+     "total": -46.086
+    },
+    "2011": {
+     "n": 251,
+     "net": -0.1182,
+     "total": -29.6579
+    },
+    "2012": {
+     "n": 246,
+     "net": -0.1038,
+     "total": -25.5368
+    },
+    "2013": {
+     "n": 245,
+     "net": -0.2096,
+     "total": -51.3425
+    },
+    "2014": {
+     "n": 247,
+     "net": -0.0832,
+     "total": -20.5501
+    },
+    "2015": {
+     "n": 248,
+     "net": -0.0183,
+     "total": -4.5356
+    },
+    "2016": {
+     "n": 251,
+     "net": -0.2104,
+     "total": -52.8122
+    },
+    "2017": {
+     "n": 240,
+     "net": -0.2303,
+     "total": -55.2638
+    },
+    "2018": {
+     "n": 248,
+     "net": -0.2049,
+     "total": -50.8056
+    },
+    "2019": {
+     "n": 248,
+     "net": -0.1294,
+     "total": -32.0913
+    },
+    "2020": {
+     "n": 251,
+     "net": -0.2456,
+     "total": -61.6408
+    },
+    "2021": {
+     "n": 249,
+     "net": -0.1758,
+     "total": -43.7838
+    },
+    "2022": {
+     "n": 250,
+     "net": -0.0669,
+     "total": -16.7359
+    },
+    "2023": {
+     "n": 246,
+     "net": -0.0871,
+     "total": -21.4259
+    },
+    "2024": {
+     "n": 248,
+     "net": -0.1502,
+     "total": -37.2407
+    },
+    "2025": {
+     "n": 248,
+     "net": -0.2553,
+     "total": -63.3254
+    },
+    "2026": {
+     "n": 219,
+     "net": -0.0858,
+     "total": -18.8006
+    }
+   },
+   "pass": {
+    "p": 1,
+    "holm": 1,
+    "bothPositive": false,
+    "tOk": false,
+    "holmOk": false,
+    "nOk": true,
+    "ok": false
+   }
+  }
+ },
+ "passed": [],
+ "verdict": "FAIL"
+}
