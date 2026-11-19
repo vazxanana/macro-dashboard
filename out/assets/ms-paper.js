@@ -191,9 +191,10 @@
         ${hist ? `<div class="pp-tw"><table class="pp-tbl"><thead><tr><th>Closed</th><th>Market</th><th class="n">Entry → exit</th><th>Exit</th><th class="n">R</th><th class="n">Net</th></tr></thead><tbody>${hist}</tbody></table></div>${T.length > 50 ? `<p class="pp-few">The latest 50 of ${T.length} trades.</p>` : ''}` : '<p class="pp-few">No closed trades yet. Press Buy or Sell: the stop and target are set for you, and you can change them before you place the order.</p>'}
         <div class="pp-foot"><button type="button" class="pp-q" id="pp-csv"${T.length ? '' : ' disabled'}>Download CSV</button><button type="button" class="pp-q" id="pp-reset">Reset account</button><small>Started ${esc(new Date(S.made * 1000).toLocaleDateString())} with ${money(S.start)}. Positions are checked on each closed 1-minute candle.</small></div>
       </div>`;
-    lines(); live(fl, eq);
+    lines(); live(fl, eq); home();
   }
   function live(fl, eq) {
+    try { home(); } catch (e) {}
     const px = livePx(), mk = H().key; if ($('pp-px')) $('pp-px').textContent = fp(px, mk);
     if ($('pp-eqv')) $('pp-eqv').textContent = money(eq); const f = $('pp-flv'); if (f) { f.textContent = money(fl, true); f.className = fl > 0 ? 'up' : fl < 0 ? 'dn' : ''; }
     for (const p of S.acct.positions) { const c = document.querySelector(`[data-fl="${p.id}"]`), cur = pxOf(p.mk); if (!c || !(cur > 0)) continue; const pl = BT().pnl(p, cur), R = (cur - p.entry) * (p.side === 'buy' ? 1 : -1) / p.r0; c.innerHTML = `${money(pl, true)} <small>${rTxt(R)}</small>`; c.className = 'n pp-fl ' + (pl > 0 ? 'up' : pl < 0 ? 'dn' : ''); }
@@ -221,6 +222,13 @@
       }
       x.restore();
     }
+  }
+  // Home's line (19 Nov 2026): the paper account in one sentence once it has a trade; nothing fetched, the same account as the bar
+  function home() {
+    const el = $('hs-pp'); if (!el || !S) return; const T = BT().trades(S.acct.closed), n = S.acct.positions.length + S.acct.orders.length; if (!T.length && !n) { el.hidden = true; return; }
+    const fl = floating(S, pxOf), eq = r2(S.acct.balance + fl), pct = (eq - S.start) / S.start * 100, wins = T.filter((t) => t.net > 0).length;
+    const html = `Your paper account: <b>${money(eq)}</b> <b class="${pct > 0 ? 'fw-st-ok' : pct < 0 ? 'fw-st-bad' : ''}">${pct >= 0 ? '+' : '−'}${Math.abs(pct).toFixed(2)}%</b> · ${S.acct.positions.length} open${S.acct.orders.length ? `, ${S.acct.orders.length} waiting` : ''} · ${T.length} closed${T.length ? `, ${Math.round(wins / T.length * 100)}% won` : ''} · <a href="#charts">Open the charts</a>`;
+    if (el.innerHTML !== html) el.innerHTML = html; el.hidden = false;
   }
   function open(on) { const el = $('ms-pp'); if (!el) return; el.hidden = false; const b = $('ms-pp-btn'); if (b) b.setAttribute('aria-expanded', 'true'); if (on) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
 
