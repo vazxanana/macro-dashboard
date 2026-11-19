@@ -32,6 +32,9 @@ const OFF = 'Sign-ups are not open yet.', OFF_RESET = 'Password reset by email i
 const SENT = 'Check your email for a link to confirm it. The link works for 24 hours.';
 const FORGOT = 'If that email belongs to an account, a link to choose a new password is on its way. It works for one hour.';
 const AGAIN = 'Choose another password.';
+// 19 Nov 2026 (owner: "The new users will have access to charts chronos and macro only"): an approved sign-up opens Charts and
+// the Macro desk (ChronosTrade is open to every signed-in member) and nothing else; the owner can change it on the Users page
+const NEW_PERMS = { charts: true, macro: true, desk: false, scanner: false, journal: false, desks: false, council: false, ct: false, mcp: false, ict: false, mosha: false };
 // 18 Nov 2026: a password alone signs in only the owner and the built-in members, so a new or reset password is refused only when
 // it is one of theirs (else typing it without a username would open their account); members' passwords may repeat each other.
 const pwClash = (h, users, builtIns) => A.same(h, A.OWNER_HASH) || Object.keys(builtIns || {}).concat(A.PW_ONLY).some((k) => users[k] && A.same(users[k].hash, h));
@@ -186,7 +189,7 @@ async function handle(req, res, d = {}) {
       const taken = new Set(Object.keys(builtIns).concat(Object.keys(stored), ['owner'])); let k;
       if (x.username) { k = x.username; if (taken.has(k) || users[k]) return res.status(409).json({ error: `The username "${k}" is now taken by another account: refuse this request and ask them to sign up again with another username.` }); }
       else { let n = 2; k = keyOf(x.name); while (taken.has(k)) { const sfx = `-${n++}`; k = keyOf(x.name).slice(0, 24 - sfx.length) + sfx; } }   // a request made before usernames
-      stored[k] = { name: one(x.name, 24), role, hash: x.hash, email: x.email };
+      stored[k] = { name: one(x.name, 24), role, hash: x.hash, email: x.email, perms: { ...NEW_PERMS } };
       const clean = U.clean(stored); if (!clean) return res.status(500).json({ error: 'The account list could not be saved.' });
       await saveUsers({ users: clean, updated: new Date(now).toISOString(), note: `approved a sign-up: ${one(x.name, 24)}` });
       await store.put(PENDING, rest);

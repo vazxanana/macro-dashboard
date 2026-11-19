@@ -134,7 +134,10 @@ test('owner approval: list, approve (the member can sign in), refuse; members an
   assert.equal((await post(W, { approve: id }, {}, { headers: { cookie: fred } })).code, 403);
   const ap = await post(W, { approve: id, role: 'reviewer' }, {}, { headers: { cookie: ownerCookie() } });
   assert.equal(ap.code, 200); assert.equal(ap.body.key, 'maria'); assert.equal(ap.body.role, 'reviewer'); assert.equal(ap.body.emailed, true);
-  assert.deepEqual(W.list.users.maria, { name: 'Maria', role: 'reviewer', hash: sha('maria-password-1'), email: 'maria@example.com' });
+  // 19 Nov 2026 (owner: "The new users will have access to charts chronos and macro only"): an approved seat opens Charts and the
+  // Macro desk only (ChronosTrade is open to every signed-in member); Home, Setup and the Council (desk), the desks and the rest are off
+  assert.deepEqual(W.list.users.maria, { name: 'Maria', role: 'reviewer', hash: sha('maria-password-1'), email: 'maria@example.com',
+    perms: { charts: true, macro: true, desk: false, scanner: false, journal: false, desks: false, council: false, ct: false, mcp: false, ict: false, mosha: false } });
   assert.match(W.out[W.out.length - 1].subject, /seat .* is ready/);
   assert.equal(W.files['signups/pending.json'].filter((p) => p.verified).length, 0);
   // sign-in with that password now works through /api/login, and nothing the member reads carries the email
@@ -326,4 +329,18 @@ test('every email shows the Aureum Desk logo from the site (a PNG with its size 
   const h = W.out[W.out.length - 1].html;
   assert.match(h, /<img src="https:\/\/aureumdesk\.co\.uk\/icons\/email-logo\.png" width="195" height="32" alt="Aureum Desk"/);
   assert.ok(fs.existsSync('icons/email-logo.png'));
+});
+
+test('a new seat sees Charts, ChronosTrade and the Macro desk only (19 Nov 2026): the page denies Home, Setup, Council and the desks and lands on Charts', () => {
+  const PAGE = fs.readFileSync('market-structure.html', 'utf8');
+  const code = PAGE.slice(PAGE.indexOf('window.MS_PERM_KEYS = ['), PAGE.indexOf('window.msMergeUsers')), w = {}; new Function('window', code)(w);
+  const seat = { u: 'zed', role: 'viewer', perms: { charts: true, macro: true, desk: false, scanner: false, journal: false, desks: false, council: false, ct: false, mcp: false, ict: false, mosha: false } };
+  const E = w.msPerms(seat, false), deny = w.MS_PERM_KEYS.filter((k) => !E[k]);
+  assert.ok(E.charts && E.macro, 'charts and the macro desk open');
+  for (const k of ['desk', 'scanner', 'desks', 'council', 'ict', 'mosha']) assert.ok(deny.includes(k), k + ' denied');
+  assert.equal(w.msPerms({ u: 'carlos', role: 'viewer' }, false).desk, true, 'members made before keep Home, Setup and the Council');
+  assert.match(PAGE, /const VIEW_PERM = \{[^}]*home: 'desk', setup: 'desk', council: 'desk' \}/);
+  assert.match(PAGE, /v = !msDenied\(v0\) \? v0 : !msDenied\('home'\) \? 'home' : !msDenied\('charts'\) \? 'charts' : 'profile'/, 'a denied Home lands on Charts');
+  assert.match(PAGE, /html\[data-deny~="desk"\] \[data-go="home"\], html\[data-deny~="desk"\] \[data-go="setup"\], html\[data-deny~="desk"\] \[data-go="council"\]/);
+  assert.match(fs.readFileSync('api/users.js', 'utf8'), /const PERM_KEYS = \[[^\]]*'desk'\]/, 'the server keeps the new key');
 });

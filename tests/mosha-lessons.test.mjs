@@ -147,7 +147,7 @@ test('page wiring: Luxus lands on the Mosha desk, the desk opens on its own, the
   assert.equal(P(null, true), 'read'); assert.equal(P(LUXUS), 'teach'); assert.equal(P(CARLOS), false); assert.equal(P(FRED), 'read'); assert.equal(P({ ...LUXUS, perms: { mosha: false } }), false); assert.equal(P({ ...FRED, perms: { desks: false } }), false); assert.equal(P({ ...FRED, perms: { mosha: 'teach' } }), 'read');
   for (const R of [LUXUS, CARLOS, FRED, { ...LUXUS, perms: { mosha: 'read' } }, { ...FRED, perms: { mosha: false } }, { ...CARLOS, perms: { desks: true } }]) assert.equal(P(R), moshaLevel(R), 'the page and the server agree: ' + JSON.stringify(R));
   assert.equal(w.msPerms(LUXUS).desks, false, 'the other desks stay closed to him'); assert.equal(w.msPerms(LUXUS).charts, false);
-  assert.match(PAGE, /mosha: 'mosha', ict: 'ict' \}/); assert.match(PAGE, /!h0 && window\.MS_ACCT && window\.MS_ACCT\.home === 'mosha' && !msDenied\('mosha'\) \? 'mosha'/);
+  assert.match(PAGE, /mosha: 'mosha', ict: 'ict', home: 'desk'/); assert.match(PAGE, /!h0 && window\.MS_ACCT && window\.MS_ACCT\.home === 'mosha' && !msDenied\('mosha'\) \? 'mosha'/);
   assert.match(PAGE, /if \(E\.mosha\) document\.documentElement\.dataset\.mosha = E\.mosha;/); assert.match(PAGE, /x\.perms \|\| null, x\.mosha \|\| false, x\.home \|\| false\]/, 'a new Mosha level reaches a signed-in page');
   assert.match(PAGE, /html\[data-deny~="desks"\] \.desk-sw a:not\(\.ictx\):not\(\[data-dsw="mosha"\]\), html:not\(\[data-mosha\]\) \.desk-sw a\[data-dsw="mosha"\] \{ display: none !important; \}/);
   assert.match(PAGE, /html\[data-deny~="desks"\]:not\(\[data-ict\]\):not\(\[data-mosha\]\) \.dsk \{ display: none !important; \}/);

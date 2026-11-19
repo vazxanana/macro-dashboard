@@ -1259,9 +1259,11 @@ window.MS_API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(locat
 //   Macro desk switch), ct (demo accounts' results, labels only), mcp (ChatGPT connector on the profile), ict: false | 'read' | 'write',
 //   mosha: false | 'read' | 'teach' (the Mosha desk alone; 'teach' = may send lessons there). Without a mosha value of its own a
 //   member reads the Mosha desk when the other desks are open to them (the same rule as api/mosha.js moshaLevel).
-window.MS_PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict', 'mosha'];
-window.MS_PERM_DEFAULTS = { viewer: { charts: false, scanner: false, journal: false, desks: false, council: false, macro: true, ct: false, mcp: false, ict: false, mosha: false },
-  reviewer: { charts: true, scanner: true, journal: true, desks: true, council: true, macro: true, ct: false, mcp: false, ict: false, mosha: false } };
+// desk (19 Nov 2026, owner: "The new users will have access to charts chronos and macro only"): Home, Setup and the Council;
+// off for every account approved from a sign-up (api/signup.js NEW_PERMS), which then lands on Charts
+window.MS_PERM_KEYS = ['charts', 'scanner', 'journal', 'desks', 'council', 'macro', 'ct', 'mcp', 'ict', 'mosha', 'desk'];
+window.MS_PERM_DEFAULTS = { viewer: { charts: false, scanner: false, journal: false, desks: false, council: false, macro: true, ct: false, mcp: false, ict: false, mosha: false, desk: true },
+  reviewer: { charts: true, scanner: true, journal: true, desks: true, council: true, macro: true, ct: false, mcp: false, ict: false, mosha: false, desk: true } };
 window.msPerms = function (R, owner) {
   var E = {}, k, d = window.MS_PERM_DEFAULTS[R && R.role] || window.MS_PERM_DEFAULTS.viewer;
   for (k in d) E[k] = owner ? (k === 'ict' ? 'write' : k === 'mosha' ? 'read' : true) : d[k];   // teaching the Mosha desk is Luxus's alone: the owner reads it
@@ -1551,6 +1553,8 @@ document.addEventListener('DOMContentLoaded', function () {
 </style>
 <style>html[data-role="viewer"] .own, html[data-role="viewer"] .adm-x,
   html[data-deny~="charts"] [data-go="charts"], html[data-deny~="scanner"] [data-go="scanner"],
+  html[data-deny~="desk"] [data-go="home"], html[data-deny~="desk"] [data-go="setup"], html[data-deny~="desk"] [data-go="council"],
+  html[data-deny~="desk"] [data-desks], html[data-deny~="desk"] [data-go="scanner"],
   html[data-role="viewer"] .h-side, html[data-role="viewer"] .h-quick a:not([href="#council/overview"]),
   html[data-deny~="council"] #ms-cn-trades, html[data-deny~="council"] #ms-cn-systems, html[data-deny~="council"] #ms-cn-review, html[data-deny~="council"] #ms-cn-research,
   html[data-deny~="council"] #ms-cp-trades, html[data-deny~="council"] #ms-cp-systems, html[data-deny~="council"] #ms-cp-review, html[data-deny~="council"] #ms-cp-research,
@@ -8913,7 +8917,7 @@ function msNextSetup(bars, A) {
     }); }
   const uKey = (n) => n.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24);
   // per-member permissions (owner, 8 Nov): what each member can see and do, saved on the user record as `perms`
-  const PERM_LABEL = { charts: 'Charts (every market)', scanner: 'Scanner', desks: 'Desks: Mosha', council: 'Council: every tab (off = overview only)', macro: 'Macro desk', ct: 'Demo accounts\' results (labels only)', mcp: 'ChatGPT connector on the profile' };
+  const PERM_LABEL = { desk: 'Desk: Home, Setup and Council', charts: 'Charts (every market)', scanner: 'Scanner', desks: 'Desks: Mosha', council: 'Council: every tab (off = overview only)', macro: 'Macro desk', ct: 'Demo accounts\' results (labels only)', mcp: 'ChatGPT connector on the profile' };
   // ICT apply (owner, 10 Nov): the member may apply changes to the ICT edge from the connector without the owner's review.
   // A stored perms.ictApply (true or false) decides; without one the built-in record's default counts (on for Fred, by the
   // owner's decision of 10 Nov; off for everyone else), exactly as api/mcp.js applyFlag.
@@ -9145,12 +9149,12 @@ function msNextSetup(bars, A) {
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
   // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
-  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', mosha: 'mosha', ict: 'ict' };
+  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', mosha: 'mosha', ict: 'ict', home: 'desk', setup: 'desk', council: 'desk' };
   function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
   // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
   // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
   function showView(hx) {
-    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v = VIEWS.includes(h) ? h : 'home';
+    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
     // a view this account may not open (a viewer or a guest on #mosha, #ict, …) is shown as another one: the address says which
     // (QA sweep 11 Nov; replaceState, so no second hashchange and Back does not return to the refused link)
     if (h0 !== v && VIEWS.includes(h0) && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + '#' + v); } catch (e) {}
