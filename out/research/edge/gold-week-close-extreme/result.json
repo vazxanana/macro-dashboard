@@ -1,0 +1,622 @@
+{
+ "study": "gold-week-close-extreme",
+ "built": "2026-11-14",
+ "dataCommit": "d8d68407b",
+ "preregCommit": "2122e21a7",
+ "params": {
+  "ATR_N": 20,
+  "ATR_MULT": 2,
+  "MIN_DAYS": 4,
+  "SPREAD": 0.3,
+  "SLIP": 0.15,
+  "SEEDS": 40,
+  "IS": {
+   "from": "2007-01",
+   "to": "2016-12"
+  },
+  "OOS": {
+   "from": "2017-01",
+   "to": "2026-10"
+  }
+ },
+ "fin": 0.000148,
+ "verdict": "FAIL",
+ "headline": "FAIL, 0 of 3: following a gold week that closed at its high or low made +0.053R a trade net 2017-26 (n 121, month t 0.80), +0.024R over the same-side baseline",
+ "days": 5369,
+ "weeks": 1078,
+ "firstDay": "2006-03-20",
+ "lastDay": "2026-11-13",
+ "tests": [
+  {
+   "id": "T1",
+   "name": "F 0.10, hold one week (primary)",
+   "F": 0.1,
+   "H": 1,
+   "is": {
+    "trades": 115,
+    "buys": 87,
+    "sells": 28,
+    "won": 0.548,
+    "stopped": 0.174,
+    "grossR": 0.118,
+    "netR": 0.08,
+    "costR": 0.018,
+    "finR": 0.021,
+    "monthGross": 0.113,
+    "monthGrossT": 1.67,
+    "monthNet": 0.076,
+    "monthNetT": 1.13,
+    "totalNet": 9.15,
+    "worstDD": -4.44,
+    "baseR": 0.019,
+    "excessR": 0.06,
+    "excessT": 0.82
+   },
+   "oos": {
+    "trades": 121,
+    "buys": 85,
+    "sells": 36,
+    "won": 0.496,
+    "stopped": 0.157,
+    "grossR": 0.09,
+    "netR": 0.053,
+    "costR": 0.014,
+    "finR": 0.023,
+    "monthGross": 0.092,
+    "monthGrossT": 1.33,
+    "monthNet": 0.055,
+    "monthNetT": 0.8,
+    "totalNet": 6.45,
+    "worstDD": -4.96,
+    "baseR": 0.03,
+    "excessR": 0.024,
+    "excessT": 0.33,
+    "x2Net": 0.017,
+    "x2T": 0.26,
+    "x2R": 0.017
+   },
+   "sides": {
+    "is": {
+     "buy": {
+      "trades": 87,
+      "grossR": 0.084,
+      "netR": 0.039,
+      "monthNetT": 0.52,
+      "excessR": -0.001
+     },
+     "sell": {
+      "trades": 28,
+      "grossR": 0.224,
+      "netR": 0.207,
+      "monthNetT": 1.19,
+      "excessR": 0.252
+     }
+    },
+    "oos": {
+     "buy": {
+      "trades": 85,
+      "grossR": 0.112,
+      "netR": 0.066,
+      "monthNetT": 0.78,
+      "excessR": -0.015
+     },
+     "sell": {
+      "trades": 36,
+      "grossR": 0.037,
+      "netR": 0.023,
+      "monthNetT": 0.23,
+      "excessR": 0.114
+     }
+    }
+   },
+   "pOne": 0.212,
+   "placebo": {
+    "p5": -0.97,
+    "p50": 0.13,
+    "p95": 1.76,
+    "max": 2.03,
+    "below": 31
+   },
+   "years": {
+    "2007": {
+     "n": 17,
+     "net": -1.24
+    },
+    "2008": {
+     "n": 12,
+     "net": -0.4
+    },
+    "2009": {
+     "n": 12,
+     "net": 1.9
+    },
+    "2010": {
+     "n": 13,
+     "net": 1.08
+    },
+    "2011": {
+     "n": 13,
+     "net": 0.41
+    },
+    "2012": {
+     "n": 12,
+     "net": -2.23
+    },
+    "2013": {
+     "n": 5,
+     "net": 1.43
+    },
+    "2014": {
+     "n": 13,
+     "net": -0.97
+    },
+    "2015": {
+     "n": 9,
+     "net": 4.48
+    },
+    "2016": {
+     "n": 9,
+     "net": 4.71
+    },
+    "2017": {
+     "n": 12,
+     "net": -1.68
+    },
+    "2018": {
+     "n": 6,
+     "net": -2.37
+    },
+    "2019": {
+     "n": 15,
+     "net": 0.31
+    },
+    "2020": {
+     "n": 9,
+     "net": 2.29
+    },
+    "2021": {
+     "n": 12,
+     "net": 1.44
+    },
+    "2022": {
+     "n": 14,
+     "net": 0.02
+    },
+    "2023": {
+     "n": 14,
+     "net": 0.38
+    },
+    "2024": {
+     "n": 14,
+     "net": 4.81
+    },
+    "2025": {
+     "n": 12,
+     "net": 0.29
+    },
+    "2026": {
+     "n": 13,
+     "net": 0.96
+    }
+   },
+   "holmP": 0.636,
+   "checks": {
+    "oosT2": false,
+    "holm05": false,
+    "isPositive": true,
+    "x2Positive": true,
+    "excessPositive": true,
+    "beats38of40": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T2",
+   "name": "F 0.20, hold one week",
+   "F": 0.2,
+   "H": 1,
+   "is": {
+    "trades": 242,
+    "buys": 151,
+    "sells": 91,
+    "won": 0.529,
+    "stopped": 0.182,
+    "grossR": 0.065,
+    "netR": 0.03,
+    "costR": 0.018,
+    "finR": 0.017,
+    "monthGross": 0.131,
+    "monthGrossT": 1.38,
+    "monthNet": 0.061,
+    "monthNetT": 0.64,
+    "totalNet": 7.28,
+    "worstDD": -6.86,
+    "baseR": -0.001,
+    "excessR": 0.031,
+    "excessT": 0.65
+   },
+   "oos": {
+    "trades": 216,
+    "buys": 142,
+    "sells": 74,
+    "won": 0.477,
+    "stopped": 0.144,
+    "grossR": 0.045,
+    "netR": 0.01,
+    "costR": 0.014,
+    "finR": 0.022,
+    "monthGross": 0.083,
+    "monthGrossT": 1,
+    "monthNet": 0.017,
+    "monthNetT": 0.21,
+    "totalNet": 2.06,
+    "worstDD": -6.25,
+    "baseR": 0.024,
+    "excessR": -0.014,
+    "excessT": -0.29,
+    "x2Net": -0.048,
+    "x2T": -0.6,
+    "x2R": -0.026
+   },
+   "sides": {
+    "is": {
+     "buy": {
+      "trades": 151,
+      "grossR": 0.065,
+      "netR": 0.02,
+      "monthNetT": 0.33,
+      "excessR": -0.008
+     },
+     "sell": {
+      "trades": 91,
+      "grossR": 0.064,
+      "netR": 0.047,
+      "monthNetT": 0.63,
+      "excessR": 0.097
+     }
+    },
+    "oos": {
+     "buy": {
+      "trades": 142,
+      "grossR": 0.111,
+      "netR": 0.063,
+      "monthNetT": 1.02,
+      "excessR": -0.023
+     },
+     "sell": {
+      "trades": 74,
+      "grossR": -0.08,
+      "netR": -0.094,
+      "monthNetT": -1.43,
+      "excessR": 0.003
+     }
+    }
+   },
+   "pOne": 0.417,
+   "placebo": {
+    "p5": -1.11,
+    "p50": 0.13,
+    "p95": 1.72,
+    "max": 1.81,
+    "below": 21
+   },
+   "years": {
+    "2007": {
+     "n": 30,
+     "net": -5.29
+    },
+    "2008": {
+     "n": 24,
+     "net": 0.27
+    },
+    "2009": {
+     "n": 28,
+     "net": 2.69
+    },
+    "2010": {
+     "n": 24,
+     "net": 2.3
+    },
+    "2011": {
+     "n": 23,
+     "net": 5.5
+    },
+    "2012": {
+     "n": 24,
+     "net": -2.55
+    },
+    "2013": {
+     "n": 20,
+     "net": 0.46
+    },
+    "2014": {
+     "n": 24,
+     "net": 0.51
+    },
+    "2015": {
+     "n": 21,
+     "net": 1.63
+    },
+    "2016": {
+     "n": 24,
+     "net": 1.76
+    },
+    "2017": {
+     "n": 24,
+     "net": 0.64
+    },
+    "2018": {
+     "n": 14,
+     "net": -2.98
+    },
+    "2019": {
+     "n": 24,
+     "net": 2.34
+    },
+    "2020": {
+     "n": 27,
+     "net": -3.05
+    },
+    "2021": {
+     "n": 21,
+     "net": 3.16
+    },
+    "2022": {
+     "n": 24,
+     "net": -3.45
+    },
+    "2023": {
+     "n": 19,
+     "net": 1.9
+    },
+    "2024": {
+     "n": 22,
+     "net": 4.22
+    },
+    "2025": {
+     "n": 22,
+     "net": -0.69
+    },
+    "2026": {
+     "n": 19,
+     "net": -0.02
+    }
+   },
+   "holmP": 0.653,
+   "checks": {
+    "oosT2": false,
+    "holm05": false,
+    "isPositive": true,
+    "x2Positive": false,
+    "excessPositive": false,
+    "beats38of40": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T3",
+   "name": "F 0.10, hold two weeks",
+   "F": 0.1,
+   "H": 2,
+   "is": {
+    "trades": 90,
+    "buys": 67,
+    "sells": 23,
+    "won": 0.489,
+    "stopped": 0.344,
+    "grossR": 0.081,
+    "netR": 0.024,
+    "costR": 0.018,
+    "finR": 0.038,
+    "monthGross": 0.061,
+    "monthGrossT": 0.81,
+    "monthNet": 0.018,
+    "monthNetT": 0.25,
+    "totalNet": 2.2,
+    "worstDD": -3.99,
+    "baseR": 0.041,
+    "excessR": -0.016,
+    "excessT": -0.15
+   },
+   "oos": {
+    "trades": 94,
+    "buys": 66,
+    "sells": 28,
+    "won": 0.447,
+    "stopped": 0.319,
+    "grossR": 0.107,
+    "netR": 0.049,
+    "costR": 0.014,
+    "finR": 0.044,
+    "monthGross": 0.085,
+    "monthGrossT": 0.98,
+    "monthNet": 0.039,
+    "monthNetT": 0.45,
+    "totalNet": 4.61,
+    "worstDD": -9.25,
+    "baseR": 0.054,
+    "excessR": -0.005,
+    "excessT": -0.04,
+    "x2Net": -0.007,
+    "x2T": -0.09,
+    "x2R": -0.009
+   },
+   "sides": {
+    "is": {
+     "buy": {
+      "trades": 67,
+      "grossR": 0.075,
+      "netR": 0.005,
+      "monthNetT": 0.04,
+      "excessR": -0.07
+     },
+     "sell": {
+      "trades": 23,
+      "grossR": 0.099,
+      "netR": 0.082,
+      "monthNetT": 0.4,
+      "excessR": 0.139
+     }
+    },
+    "oos": {
+     "buy": {
+      "trades": 66,
+      "grossR": 0.237,
+      "netR": 0.161,
+      "monthNetT": 1.15,
+      "excessR": 0.031
+     },
+     "sell": {
+      "trades": 28,
+      "grossR": -0.199,
+      "netR": -0.214,
+      "monthNetT": -1.31,
+      "excessR": -0.088
+     }
+    }
+   },
+   "pOne": 0.326,
+   "placebo": {
+    "p5": -2.1,
+    "p50": 0.15,
+    "p95": 1.91,
+    "max": 2.2,
+    "below": 28
+   },
+   "years": {
+    "2007": {
+     "n": 12,
+     "net": 0.06
+    },
+    "2008": {
+     "n": 11,
+     "net": -1.42
+    },
+    "2009": {
+     "n": 9,
+     "net": 1.59
+    },
+    "2010": {
+     "n": 11,
+     "net": -0.82
+    },
+    "2011": {
+     "n": 9,
+     "net": 0.15
+    },
+    "2012": {
+     "n": 9,
+     "net": -0.05
+    },
+    "2013": {
+     "n": 4,
+     "net": -0.46
+    },
+    "2014": {
+     "n": 10,
+     "net": -1.05
+    },
+    "2015": {
+     "n": 7,
+     "net": 1.54
+    },
+    "2016": {
+     "n": 8,
+     "net": 2.65
+    },
+    "2017": {
+     "n": 8,
+     "net": -3.96
+    },
+    "2018": {
+     "n": 7,
+     "net": 1.45
+    },
+    "2019": {
+     "n": 11,
+     "net": -4.63
+    },
+    "2020": {
+     "n": 7,
+     "net": 1.31
+    },
+    "2021": {
+     "n": 9,
+     "net": 1.46
+    },
+    "2022": {
+     "n": 13,
+     "net": 0.5
+    },
+    "2023": {
+     "n": 10,
+     "net": 0.28
+    },
+    "2024": {
+     "n": 10,
+     "net": 1.96
+    },
+    "2025": {
+     "n": 10,
+     "net": 3.01
+    },
+    "2026": {
+     "n": 9,
+     "net": 3.22
+    }
+   },
+   "holmP": 0.653,
+   "checks": {
+    "oosT2": false,
+    "holm05": false,
+    "isPositive": true,
+    "x2Positive": false,
+    "excessPositive": false,
+    "beats38of40": false
+   },
+   "pass": false
+  }
+ ],
+ "baseline": {
+  "5d buy": {
+   "is": {
+    "trades": 2602,
+    "netR": 0.005
+   },
+   "oos": {
+    "trades": 2558,
+    "netR": 0.07
+   }
+  },
+  "5d sell": {
+   "is": {
+    "trades": 2602,
+    "netR": -0.064
+   },
+   "oos": {
+    "trades": 2558,
+    "netR": -0.108
+   }
+  },
+  "10d buy": {
+   "is": {
+    "trades": 2602,
+    "netR": 0.021
+   },
+   "oos": {
+    "trades": 2553,
+    "netR": 0.12
+   }
+  },
+  "10d sell": {
+   "is": {
+    "trades": 2602,
+    "netR": -0.1
+   },
+   "oos": {
+    "trades": 2553,
+    "netR": -0.166
+   }
+  }
+ }
+}
