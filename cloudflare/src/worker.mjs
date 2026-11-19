@@ -23,6 +23,7 @@ import ctraderLink from '../../api/ctrader-link.js';
 import data from '../../api/data.js';
 import edgeAnalyst from '../../api/edge-analyst.js';
 import login from '../../api/login.js';
+import lse from '../../api/lse.js';
 import logout from '../../api/logout.js';
 import mcp from '../../api/mcp.js';
 import me from '../../api/me.js';
@@ -44,7 +45,7 @@ import './bundled.mjs';   // the files the Academy and the bridge downloads read
 
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, bars, battle, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, data,
-  'edge-analyst': edgeAnalyst, login, logout, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
+  'edge-analyst': edgeAnalyst, login, logout, lse, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
   profile, signup, sounds, status, stream, 'trade-review': tradeReview, users,
 };
 
