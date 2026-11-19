@@ -1,0 +1,2445 @@
+{
+ "study": "gold-13w-low",
+ "built": "2026-11-14",
+ "dataCommit": "f6288251e",
+ "preregCommit": "3fce40edc",
+ "params": {
+  "LOOK": 12,
+  "ATR_N": 20,
+  "SPREAD": 0.3,
+  "SLIP": 0.15,
+  "SEEDS": 40,
+  "IS": {
+   "from": "2008-01",
+   "to": "2016-12"
+  },
+  "OOS": {
+   "from": "2017-01",
+   "to": "2026-10"
+  }
+ },
+ "fin": 0.000148,
+ "verdict": "FAIL",
+ "headline": "FAIL, 0 of 3: buying 4 weeks after a 13-week closing low made +0.043R a trade net 2017-26 (n 25, month t 0.2); fading a 13-week high -0.333R (n 62, t -2.65)",
+ "weeks": 1077,
+ "firstWeek": "2006-03-20",
+ "lastWeek": "2026-11-02",
+ "tests": [
+  {
+   "id": "T1",
+   "name": "Long 4 weeks after a 13-week closing low (primary)",
+   "ev": "low",
+   "side": 1,
+   "hold": 4,
+   "mult": 3,
+   "is": {
+    "trades": 37,
+    "months": 108,
+    "won": 0.541,
+    "stopped": 0.27,
+    "grossR": 0.043,
+    "netR": -0.033,
+    "costR": 0.01,
+    "finR": 0.065,
+    "monthGross": 0.015,
+    "monthGrossT": 0.3,
+    "monthNet": -0.011,
+    "monthNetT": -0.23,
+    "totalNet": -1.21,
+    "worstDD": -6.21
+   },
+   "oos": {
+    "trades": 25,
+    "months": 118,
+    "won": 0.48,
+    "stopped": 0.28,
+    "grossR": 0.147,
+    "netR": 0.043,
+    "costR": 0.011,
+    "finR": 0.093,
+    "monthGross": 0.031,
+    "monthGrossT": 0.69,
+    "monthNet": 0.009,
+    "monthNetT": 0.2,
+    "totalNet": 1.07,
+    "worstDD": -4.39,
+    "x2Net": -0.013,
+    "x2T": -0.3
+   },
+   "pOne": 0.421,
+   "placebo": {
+    "p5": -0.25,
+    "p50": 0.96,
+    "p95": 1.97,
+    "max": 2.1,
+    "below": 8
+   },
+   "years": {
+    "2008": {
+     "n": 5,
+     "gross": 0.91,
+     "net": 0.69
+    },
+    "2009": {
+     "n": 1,
+     "gross": 1.14,
+     "net": 1.07
+    },
+    "2010": {
+     "n": 1,
+     "gross": 0.61,
+     "net": 0.53
+    },
+    "2011": {
+     "n": 1,
+     "gross": 0.89,
+     "net": 0.78
+    },
+    "2012": {
+     "n": 3,
+     "gross": 0.74,
+     "net": 0.48
+    },
+    "2013": {
+     "n": 10,
+     "gross": -1.58,
+     "net": -2.22
+    },
+    "2014": {
+     "n": 6,
+     "gross": -1.54,
+     "net": -2.09
+    },
+    "2015": {
+     "n": 5,
+     "gross": -0.13,
+     "net": -0.53
+    },
+    "2016": {
+     "n": 5,
+     "gross": 0.52,
+     "net": 0.07
+    },
+    "2017": {
+     "n": 2,
+     "gross": 1.49,
+     "net": 1.18
+    },
+    "2018": {
+     "n": 6,
+     "gross": -1.07,
+     "net": -1.86
+    },
+    "2019": {
+     "n": 2,
+     "gross": 0.08,
+     "net": -0.23
+    },
+    "2020": {
+     "n": 2,
+     "gross": 2.09,
+     "net": 1.97
+    },
+    "2021": {
+     "n": 4,
+     "gross": -1.53,
+     "net": -1.79
+    },
+    "2022": {
+     "n": 4,
+     "gross": -0.34,
+     "net": -0.65
+    },
+    "2023": {
+     "n": 3,
+     "gross": 4.04,
+     "net": 3.6
+    },
+    "2026": {
+     "n": 2,
+     "gross": -1.07,
+     "net": -1.15
+    }
+   },
+   "trades": [
+    {
+     "week": "2008-04-28",
+     "exitMonth": "2008-05",
+     "how": "time",
+     "gross": 0.579,
+     "net": 0.518
+    },
+    {
+     "week": "2008-08-11",
+     "exitMonth": "2008-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.021
+    },
+    {
+     "week": "2008-08-18",
+     "exitMonth": "2008-09",
+     "how": "time",
+     "gross": -0.416,
+     "net": -0.47
+    },
+    {
+     "week": "2008-09-15",
+     "exitMonth": "2008-10",
+     "how": "time",
+     "gross": 1.272,
+     "net": 1.217
+    },
+    {
+     "week": "2008-10-27",
+     "exitMonth": "2008-11",
+     "how": "time",
+     "gross": 0.476,
+     "net": 0.45
+    },
+    {
+     "week": "2009-04-20",
+     "exitMonth": "2009-05",
+     "how": "time",
+     "gross": 1.14,
+     "net": 1.067
+    },
+    {
+     "week": "2010-02-01",
+     "exitMonth": "2010-02",
+     "how": "time",
+     "gross": 0.611,
+     "net": 0.529
+    },
+    {
+     "week": "2011-01-24",
+     "exitMonth": "2011-02",
+     "how": "time",
+     "gross": 0.895,
+     "net": 0.782
+    },
+    {
+     "week": "2011-12-19",
+     "exitMonth": "2012-01",
+     "how": "time",
+     "gross": 0.36,
+     "net": 0.296
+    },
+    {
+     "week": "2012-05-14",
+     "exitMonth": "2012-06",
+     "how": "time",
+     "gross": 0.24,
+     "net": 0.122
+    },
+    {
+     "week": "2012-06-25",
+     "exitMonth": "2012-07",
+     "how": "time",
+     "gross": 0.144,
+     "net": 0.064
+    },
+    {
+     "week": "2012-12-24",
+     "exitMonth": "2013-01",
+     "how": "time",
+     "gross": 0.481,
+     "net": 0.355
+    },
+    {
+     "week": "2013-02-18",
+     "exitMonth": "2013-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.021
+    },
+    {
+     "week": "2013-02-25",
+     "exitMonth": "2013-03",
+     "how": "time",
+     "gross": 0.484,
+     "net": 0.367
+    },
+    {
+     "week": "2013-04-15",
+     "exitMonth": "2013-04",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2013-04-22",
+     "exitMonth": "2013-05",
+     "how": "time",
+     "gross": -0.431,
+     "net": -0.487
+    },
+    {
+     "week": "2013-05-20",
+     "exitMonth": "2013-06",
+     "how": "time",
+     "gross": 0.341,
+     "net": 0.273
+    },
+    {
+     "week": "2013-06-24",
+     "exitMonth": "2013-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.02
+    },
+    {
+     "week": "2013-07-01",
+     "exitMonth": "2013-07",
+     "how": "time",
+     "gross": 1.087,
+     "net": 1.026
+    },
+    {
+     "week": "2013-10-14",
+     "exitMonth": "2013-11",
+     "how": "time",
+     "gross": 0.156,
+     "net": 0.092
+    },
+    {
+     "week": "2013-11-25",
+     "exitMonth": "2013-12",
+     "how": "time",
+     "gross": -0.699,
+     "net": -0.798
+    },
+    {
+     "week": "2013-12-23",
+     "exitMonth": "2014-01",
+     "how": "time",
+     "gross": 0.698,
+     "net": 0.622
+    },
+    {
+     "week": "2014-05-12",
+     "exitMonth": "2014-06",
+     "how": "time",
+     "gross": -0.721,
+     "net": -0.832
+    },
+    {
+     "week": "2014-09-08",
+     "exitMonth": "2014-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.046
+    },
+    {
+     "week": "2014-09-15",
+     "exitMonth": "2014-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.113
+    },
+    {
+     "week": "2014-11-03",
+     "exitMonth": "2014-11",
+     "how": "time",
+     "gross": -0.096,
+     "net": -0.209
+    },
+    {
+     "week": "2014-12-01",
+     "exitMonth": "2014-12",
+     "how": "time",
+     "gross": 0.576,
+     "net": 0.493
+    },
+    {
+     "week": "2015-03-09",
+     "exitMonth": "2015-04",
+     "how": "time",
+     "gross": 0.645,
+     "net": 0.545
+    },
+    {
+     "week": "2015-07-06",
+     "exitMonth": "2015-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.079
+    },
+    {
+     "week": "2015-07-20",
+     "exitMonth": "2015-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.017
+    },
+    {
+     "week": "2015-07-27",
+     "exitMonth": "2015-08",
+     "how": "time",
+     "gross": 1.301,
+     "net": 1.196
+    },
+    {
+     "week": "2015-11-09",
+     "exitMonth": "2015-12",
+     "how": "time",
+     "gross": -0.073,
+     "net": -0.177
+    },
+    {
+     "week": "2016-05-30",
+     "exitMonth": "2016-06",
+     "how": "time",
+     "gross": 1.924,
+     "net": 1.822
+    },
+    {
+     "week": "2016-09-19",
+     "exitMonth": "2016-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.08
+    },
+    {
+     "week": "2016-10-10",
+     "exitMonth": "2016-11",
+     "how": "time",
+     "gross": 1.039,
+     "net": 0.917
+    },
+    {
+     "week": "2016-11-14",
+     "exitMonth": "2016-12",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.067
+    },
+    {
+     "week": "2016-12-05",
+     "exitMonth": "2016-12",
+     "how": "time",
+     "gross": -0.441,
+     "net": -0.518
+    },
+    {
+     "week": "2017-07-10",
+     "exitMonth": "2017-08",
+     "how": "time",
+     "gross": 1.209,
+     "net": 1.062
+    },
+    {
+     "week": "2017-11-06",
+     "exitMonth": "2017-12",
+     "how": "time",
+     "gross": 0.277,
+     "net": 0.119
+    },
+    {
+     "week": "2017-12-11",
+     "exitMonth": "2018-01",
+     "how": "time",
+     "gross": 1.978,
+     "net": 1.826
+    },
+    {
+     "week": "2018-05-21",
+     "exitMonth": "2018-06",
+     "how": "time",
+     "gross": -0.324,
+     "net": -0.484
+    },
+    {
+     "week": "2018-06-18",
+     "exitMonth": "2018-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.09
+    },
+    {
+     "week": "2018-07-02",
+     "exitMonth": "2018-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.119
+    },
+    {
+     "week": "2018-07-23",
+     "exitMonth": "2018-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.127
+    },
+    {
+     "week": "2018-08-20",
+     "exitMonth": "2018-09",
+     "how": "time",
+     "gross": 0.272,
+     "net": 0.132
+    },
+    {
+     "week": "2019-04-22",
+     "exitMonth": "2019-05",
+     "how": "time",
+     "gross": 0.051,
+     "net": -0.122
+    },
+    {
+     "week": "2019-11-11",
+     "exitMonth": "2019-12",
+     "how": "time",
+     "gross": 0.026,
+     "net": -0.112
+    },
+    {
+     "week": "2020-03-23",
+     "exitMonth": "2020-04",
+     "how": "time",
+     "gross": 1.114,
+     "net": 1.074
+    },
+    {
+     "week": "2020-11-30",
+     "exitMonth": "2020-12",
+     "how": "time",
+     "gross": 0.979,
+     "net": 0.9
+    },
+    {
+     "week": "2021-02-22",
+     "exitMonth": "2021-03",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.039
+    },
+    {
+     "week": "2021-03-08",
+     "exitMonth": "2021-04",
+     "how": "time",
+     "gross": 0.26,
+     "net": 0.179
+    },
+    {
+     "week": "2021-08-09",
+     "exitMonth": "2021-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "week": "2021-09-20",
+     "exitMonth": "2021-10",
+     "how": "time",
+     "gross": 0.205,
+     "net": 0.084
+    },
+    {
+     "week": "2022-05-16",
+     "exitMonth": "2022-06",
+     "how": "time",
+     "gross": 0.66,
+     "net": 0.574
+    },
+    {
+     "week": "2022-07-04",
+     "exitMonth": "2022-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "week": "2022-07-11",
+     "exitMonth": "2022-08",
+     "how": "time",
+     "gross": 0.458,
+     "net": 0.36
+    },
+    {
+     "week": "2022-09-19",
+     "exitMonth": "2022-10",
+     "how": "time",
+     "gross": -0.461,
+     "net": -0.569
+    },
+    {
+     "week": "2023-06-26",
+     "exitMonth": "2023-07",
+     "how": "time",
+     "gross": 0.543,
+     "net": 0.424
+    },
+    {
+     "week": "2023-08-14",
+     "exitMonth": "2023-09",
+     "how": "time",
+     "gross": 0.096,
+     "net": -0.052
+    },
+    {
+     "week": "2023-10-02",
+     "exitMonth": "2023-10",
+     "how": "time",
+     "gross": 3.397,
+     "net": 3.225
+    },
+    {
+     "week": "2026-06-08",
+     "exitMonth": "2026-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.036
+    },
+    {
+     "week": "2026-06-29",
+     "exitMonth": "2026-07",
+     "how": "time",
+     "gross": -0.066,
+     "net": -0.114
+    }
+   ],
+   "holmP": 1,
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": false,
+    "x2Positive": false,
+    "abovePlacebo95": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T2",
+   "name": "Long 1 week after a 13-week closing low",
+   "ev": "low",
+   "side": 1,
+   "hold": 1,
+   "mult": 2,
+   "is": {
+    "trades": 64,
+    "months": 108,
+    "won": 0.484,
+    "stopped": 0.172,
+    "grossR": 0.042,
+    "netR": 0.001,
+    "costR": 0.016,
+    "finR": 0.025,
+    "monthGross": 0.025,
+    "monthGrossT": 0.44,
+    "monthNet": 0.001,
+    "monthNetT": 0.01,
+    "totalNet": 0.06,
+    "worstDD": -4.98
+   },
+   "oos": {
+    "trades": 41,
+    "months": 118,
+    "won": 0.488,
+    "stopped": 0.195,
+    "grossR": -0.061,
+    "netR": -0.11,
+    "costR": 0.016,
+    "finR": 0.033,
+    "monthGross": -0.021,
+    "monthGrossT": -0.6,
+    "monthNet": -0.038,
+    "monthNetT": -1.04,
+    "totalNet": -4.52,
+    "worstDD": -5.76,
+    "x2Net": -0.055,
+    "x2T": -1.45
+   },
+   "pOne": 0.851,
+   "placebo": {
+    "p5": -1.1,
+    "p50": 0.23,
+    "p95": 1.8,
+    "max": 2.51,
+    "below": 3
+   },
+   "years": {
+    "2008": {
+     "n": 7,
+     "gross": 2.13,
+     "net": 1.97
+    },
+    "2009": {
+     "n": 1,
+     "gross": 1.2,
+     "net": 1.16
+    },
+    "2010": {
+     "n": 2,
+     "gross": 0.24,
+     "net": 0.16
+    },
+    "2011": {
+     "n": 3,
+     "gross": 0.22,
+     "net": 0.1
+    },
+    "2012": {
+     "n": 5,
+     "gross": 1.26,
+     "net": 1.08
+    },
+    "2013": {
+     "n": 15,
+     "gross": 0.44,
+     "net": -0.1
+    },
+    "2014": {
+     "n": 8,
+     "gross": -0.43,
+     "net": -0.83
+    },
+    "2015": {
+     "n": 12,
+     "gross": -2.47,
+     "net": -3.04
+    },
+    "2016": {
+     "n": 11,
+     "gross": 0.07,
+     "net": -0.45
+    },
+    "2017": {
+     "n": 3,
+     "gross": 1.07,
+     "net": 0.86
+    },
+    "2018": {
+     "n": 10,
+     "gross": -2.65,
+     "net": -3.36
+    },
+    "2019": {
+     "n": 2,
+     "gross": 0.76,
+     "net": 0.62
+    },
+    "2020": {
+     "n": 2,
+     "gross": 1.98,
+     "net": 1.93
+    },
+    "2021": {
+     "n": 6,
+     "gross": -2.05,
+     "net": -2.29
+    },
+    "2022": {
+     "n": 6,
+     "gross": -0.93,
+     "net": -1.17
+    },
+    "2023": {
+     "n": 6,
+     "gross": 1.42,
+     "net": 1.1
+    },
+    "2026": {
+     "n": 6,
+     "gross": -2.09,
+     "net": -2.21
+    }
+   },
+   "trades": [
+    {
+     "week": "2008-04-28",
+     "exitMonth": "2008-05",
+     "how": "time",
+     "gross": -0.642,
+     "net": -0.672
+    },
+    {
+     "week": "2008-05-05",
+     "exitMonth": "2008-05",
+     "how": "time",
+     "gross": 0.683,
+     "net": 0.65
+    },
+    {
+     "week": "2008-08-11",
+     "exitMonth": "2008-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "week": "2008-08-18",
+     "exitMonth": "2008-08",
+     "how": "time",
+     "gross": 0.626,
+     "net": 0.598
+    },
+    {
+     "week": "2008-09-15",
+     "exitMonth": "2008-09",
+     "how": "time",
+     "gross": 2.437,
+     "net": 2.408
+    },
+    {
+     "week": "2008-10-27",
+     "exitMonth": "2008-10",
+     "how": "time",
+     "gross": -0.11,
+     "net": -0.124
+    },
+    {
+     "week": "2008-11-03",
+     "exitMonth": "2008-11",
+     "how": "time",
+     "gross": 0.139,
+     "net": 0.125
+    },
+    {
+     "week": "2009-04-20",
+     "exitMonth": "2009-04",
+     "how": "time",
+     "gross": 1.197,
+     "net": 1.159
+    },
+    {
+     "week": "2010-02-01",
+     "exitMonth": "2010-02",
+     "how": "time",
+     "gross": -0.369,
+     "net": -0.408
+    },
+    {
+     "week": "2010-02-08",
+     "exitMonth": "2010-02",
+     "how": "time",
+     "gross": 0.608,
+     "net": 0.573
+    },
+    {
+     "week": "2011-01-24",
+     "exitMonth": "2011-01",
+     "how": "time",
+     "gross": -0.164,
+     "net": -0.214
+    },
+    {
+     "week": "2011-01-31",
+     "exitMonth": "2011-02",
+     "how": "time",
+     "gross": 0.287,
+     "net": 0.244
+    },
+    {
+     "week": "2011-12-19",
+     "exitMonth": "2011-12",
+     "how": "time",
+     "gross": 0.097,
+     "net": 0.069
+    },
+    {
+     "week": "2012-01-02",
+     "exitMonth": "2012-01",
+     "how": "time",
+     "gross": 0.782,
+     "net": 0.752
+    },
+    {
+     "week": "2012-05-14",
+     "exitMonth": "2012-05",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.027
+    },
+    {
+     "week": "2012-05-28",
+     "exitMonth": "2012-06",
+     "how": "time",
+     "gross": 1.058,
+     "net": 1.017
+    },
+    {
+     "week": "2012-06-25",
+     "exitMonth": "2012-06",
+     "how": "time",
+     "gross": 0.446,
+     "net": 0.411
+    },
+    {
+     "week": "2012-12-24",
+     "exitMonth": "2012-12",
+     "how": "time",
+     "gross": -0.021,
+     "net": -0.076
+    },
+    {
+     "week": "2012-12-31",
+     "exitMonth": "2013-01",
+     "how": "time",
+     "gross": 0.004,
+     "net": -0.053
+    },
+    {
+     "week": "2013-01-07",
+     "exitMonth": "2013-01",
+     "how": "time",
+     "gross": 0.16,
+     "net": 0.108
+    },
+    {
+     "week": "2013-02-18",
+     "exitMonth": "2013-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.032
+    },
+    {
+     "week": "2013-02-25",
+     "exitMonth": "2013-03",
+     "how": "time",
+     "gross": -0.098,
+     "net": -0.149
+    },
+    {
+     "week": "2013-03-04",
+     "exitMonth": "2013-03",
+     "how": "time",
+     "gross": -0.003,
+     "net": -0.049
+    },
+    {
+     "week": "2013-04-15",
+     "exitMonth": "2013-04",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.014
+    },
+    {
+     "week": "2013-04-22",
+     "exitMonth": "2013-04",
+     "how": "time",
+     "gross": 0.748,
+     "net": 0.723
+    },
+    {
+     "week": "2013-05-20",
+     "exitMonth": "2013-05",
+     "how": "time",
+     "gross": 0.446,
+     "net": 0.415
+    },
+    {
+     "week": "2013-06-24",
+     "exitMonth": "2013-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.019
+    },
+    {
+     "week": "2013-07-01",
+     "exitMonth": "2013-07",
+     "how": "time",
+     "gross": -0.179,
+     "net": -0.207
+    },
+    {
+     "week": "2013-07-08",
+     "exitMonth": "2013-07",
+     "how": "time",
+     "gross": 1.035,
+     "net": 1.007
+    },
+    {
+     "week": "2013-10-14",
+     "exitMonth": "2013-10",
+     "how": "time",
+     "gross": 0.693,
+     "net": 0.663
+    },
+    {
+     "week": "2013-11-25",
+     "exitMonth": "2013-11",
+     "how": "time",
+     "gross": 0.227,
+     "net": 0.182
+    },
+    {
+     "week": "2013-12-09",
+     "exitMonth": "2013-12",
+     "how": "time",
+     "gross": 0.209,
+     "net": 0.167
+    },
+    {
+     "week": "2013-12-23",
+     "exitMonth": "2013-12",
+     "how": "time",
+     "gross": 0.195,
+     "net": 0.16
+    },
+    {
+     "week": "2014-05-12",
+     "exitMonth": "2014-05",
+     "how": "time",
+     "gross": 0.094,
+     "net": 0.044
+    },
+    {
+     "week": "2014-06-02",
+     "exitMonth": "2014-06",
+     "how": "time",
+     "gross": 0.097,
+     "net": 0.038
+    },
+    {
+     "week": "2014-09-08",
+     "exitMonth": "2014-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.039
+    },
+    {
+     "week": "2014-09-15",
+     "exitMonth": "2014-09",
+     "how": "time",
+     "gross": -0.478,
+     "net": -0.542
+    },
+    {
+     "week": "2014-09-22",
+     "exitMonth": "2014-09",
+     "how": "time",
+     "gross": 0.076,
+     "net": 0.016
+    },
+    {
+     "week": "2014-10-06",
+     "exitMonth": "2014-10",
+     "how": "time",
+     "gross": 1.013,
+     "net": 0.958
+    },
+    {
+     "week": "2014-11-03",
+     "exitMonth": "2014-11",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.03
+    },
+    {
+     "week": "2014-12-01",
+     "exitMonth": "2014-12",
+     "how": "time",
+     "gross": 0.765,
+     "net": 0.726
+    },
+    {
+     "week": "2015-03-09",
+     "exitMonth": "2015-03",
+     "how": "time",
+     "gross": -0.344,
+     "net": -0.393
+    },
+    {
+     "week": "2015-03-16",
+     "exitMonth": "2015-03",
+     "how": "time",
+     "gross": 0.709,
+     "net": 0.661
+    },
+    {
+     "week": "2015-07-06",
+     "exitMonth": "2015-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.032
+    },
+    {
+     "week": "2015-07-13",
+     "exitMonth": "2015-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.063
+    },
+    {
+     "week": "2015-07-20",
+     "exitMonth": "2015-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.025
+    },
+    {
+     "week": "2015-07-27",
+     "exitMonth": "2015-07",
+     "how": "time",
+     "gross": -0.126,
+     "net": -0.176
+    },
+    {
+     "week": "2015-08-03",
+     "exitMonth": "2015-08",
+     "how": "time",
+     "gross": -0.051,
+     "net": -0.098
+    },
+    {
+     "week": "2015-08-10",
+     "exitMonth": "2015-08",
+     "how": "time",
+     "gross": 0.614,
+     "net": 0.566
+    },
+    {
+     "week": "2015-11-09",
+     "exitMonth": "2015-11",
+     "how": "time",
+     "gross": -0.181,
+     "net": -0.231
+    },
+    {
+     "week": "2015-11-16",
+     "exitMonth": "2015-11",
+     "how": "time",
+     "gross": -0.43,
+     "net": -0.485
+    },
+    {
+     "week": "2015-11-23",
+     "exitMonth": "2015-11",
+     "how": "time",
+     "gross": -0.652,
+     "net": -0.706
+    },
+    {
+     "week": "2015-11-30",
+     "exitMonth": "2015-12",
+     "how": "time",
+     "gross": 0.996,
+     "net": 0.941
+    },
+    {
+     "week": "2016-05-30",
+     "exitMonth": "2016-06",
+     "how": "time",
+     "gross": 0.889,
+     "net": 0.842
+    },
+    {
+     "week": "2016-09-19",
+     "exitMonth": "2016-09",
+     "how": "time",
+     "gross": 0.961,
+     "net": 0.901
+    },
+    {
+     "week": "2016-10-10",
+     "exitMonth": "2016-10",
+     "how": "time",
+     "gross": -0.165,
+     "net": -0.221
+    },
+    {
+     "week": "2016-10-17",
+     "exitMonth": "2016-10",
+     "how": "time",
+     "gross": 0.522,
+     "net": 0.463
+    },
+    {
+     "week": "2016-11-14",
+     "exitMonth": "2016-11",
+     "how": "time",
+     "gross": -0.499,
+     "net": -0.541
+    },
+    {
+     "week": "2016-11-21",
+     "exitMonth": "2016-11",
+     "how": "time",
+     "gross": -0.562,
+     "net": -0.6
+    },
+    {
+     "week": "2016-11-28",
+     "exitMonth": "2016-12",
+     "how": "time",
+     "gross": -0.137,
+     "net": -0.173
+    },
+    {
+     "week": "2016-12-05",
+     "exitMonth": "2016-12",
+     "how": "time",
+     "gross": -0.47,
+     "net": -0.506
+    },
+    {
+     "week": "2016-12-12",
+     "exitMonth": "2016-12",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.044
+    },
+    {
+     "week": "2016-12-19",
+     "exitMonth": "2016-12",
+     "how": "time",
+     "gross": -0.041,
+     "net": -0.088
+    },
+    {
+     "week": "2016-12-26",
+     "exitMonth": "2016-12",
+     "how": "time",
+     "gross": 0.576,
+     "net": 0.522
+    },
+    {
+     "week": "2017-07-10",
+     "exitMonth": "2017-07",
+     "how": "time",
+     "gross": 0.589,
+     "net": 0.522
+    },
+    {
+     "week": "2017-11-06",
+     "exitMonth": "2017-11",
+     "how": "time",
+     "gross": 0.198,
+     "net": 0.125
+    },
+    {
+     "week": "2017-12-11",
+     "exitMonth": "2017-12",
+     "how": "time",
+     "gross": 0.282,
+     "net": 0.212
+    },
+    {
+     "week": "2018-05-21",
+     "exitMonth": "2018-05",
+     "how": "time",
+     "gross": 0.451,
+     "net": 0.378
+    },
+    {
+     "week": "2018-06-18",
+     "exitMonth": "2018-06",
+     "how": "time",
+     "gross": -0.359,
+     "net": -0.441
+    },
+    {
+     "week": "2018-06-25",
+     "exitMonth": "2018-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.077
+    },
+    {
+     "week": "2018-07-02",
+     "exitMonth": "2018-07",
+     "how": "time",
+     "gross": 0.172,
+     "net": 0.086
+    },
+    {
+     "week": "2018-07-16",
+     "exitMonth": "2018-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.074
+    },
+    {
+     "week": "2018-07-23",
+     "exitMonth": "2018-07",
+     "how": "time",
+     "gross": -0.341,
+     "net": -0.414
+    },
+    {
+     "week": "2018-07-30",
+     "exitMonth": "2018-08",
+     "how": "time",
+     "gross": -0.403,
+     "net": -0.472
+    },
+    {
+     "week": "2018-08-06",
+     "exitMonth": "2018-08",
+     "how": "time",
+     "gross": -0.087,
+     "net": -0.155
+    },
+    {
+     "week": "2018-08-13",
+     "exitMonth": "2018-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.041
+    },
+    {
+     "week": "2018-08-20",
+     "exitMonth": "2018-08",
+     "how": "time",
+     "gross": 0.914,
+     "net": 0.848
+    },
+    {
+     "week": "2019-04-22",
+     "exitMonth": "2019-04",
+     "how": "time",
+     "gross": 0.471,
+     "net": 0.392
+    },
+    {
+     "week": "2019-11-11",
+     "exitMonth": "2019-11",
+     "how": "time",
+     "gross": 0.287,
+     "net": 0.227
+    },
+    {
+     "week": "2020-03-23",
+     "exitMonth": "2020-03",
+     "how": "time",
+     "gross": 1.16,
+     "net": 1.142
+    },
+    {
+     "week": "2020-11-30",
+     "exitMonth": "2020-12",
+     "how": "time",
+     "gross": 0.822,
+     "net": 0.788
+    },
+    {
+     "week": "2021-02-22",
+     "exitMonth": "2021-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.042
+    },
+    {
+     "week": "2021-03-01",
+     "exitMonth": "2021-03",
+     "how": "time",
+     "gross": -0.541,
+     "net": -0.578
+    },
+    {
+     "week": "2021-03-08",
+     "exitMonth": "2021-03",
+     "how": "time",
+     "gross": 0.341,
+     "net": 0.305
+    },
+    {
+     "week": "2021-08-09",
+     "exitMonth": "2021-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "week": "2021-09-20",
+     "exitMonth": "2021-09",
+     "how": "time",
+     "gross": -0.097,
+     "net": -0.149
+    },
+    {
+     "week": "2021-09-27",
+     "exitMonth": "2021-10",
+     "how": "time",
+     "gross": 0.242,
+     "net": 0.193
+    },
+    {
+     "week": "2022-05-16",
+     "exitMonth": "2022-05",
+     "how": "time",
+     "gross": 0.577,
+     "net": 0.541
+    },
+    {
+     "week": "2022-07-04",
+     "exitMonth": "2022-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.023
+    },
+    {
+     "week": "2022-07-11",
+     "exitMonth": "2022-07",
+     "how": "time",
+     "gross": -0.65,
+     "net": -0.692
+    },
+    {
+     "week": "2022-07-18",
+     "exitMonth": "2022-07",
+     "how": "time",
+     "gross": 0.476,
+     "net": 0.429
+    },
+    {
+     "week": "2022-09-19",
+     "exitMonth": "2022-09",
+     "how": "time",
+     "gross": -0.702,
+     "net": -0.749
+    },
+    {
+     "week": "2022-09-26",
+     "exitMonth": "2022-09",
+     "how": "time",
+     "gross": 0.364,
+     "net": 0.322
+    },
+    {
+     "week": "2023-06-26",
+     "exitMonth": "2023-06",
+     "how": "time",
+     "gross": -0.095,
+     "net": -0.145
+    },
+    {
+     "week": "2023-07-03",
+     "exitMonth": "2023-07",
+     "how": "time",
+     "gross": 0.151,
+     "net": 0.097
+    },
+    {
+     "week": "2023-08-14",
+     "exitMonth": "2023-08",
+     "how": "time",
+     "gross": -0.65,
+     "net": -0.712
+    },
+    {
+     "week": "2023-08-21",
+     "exitMonth": "2023-08",
+     "how": "time",
+     "gross": 0.698,
+     "net": 0.633
+    },
+    {
+     "week": "2023-10-02",
+     "exitMonth": "2023-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.028
+    },
+    {
+     "week": "2023-10-09",
+     "exitMonth": "2023-10",
+     "how": "time",
+     "gross": 2.321,
+     "net": 2.258
+    },
+    {
+     "week": "2026-06-08",
+     "exitMonth": "2026-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2026-06-15",
+     "exitMonth": "2026-06",
+     "how": "time",
+     "gross": -0.666,
+     "net": -0.686
+    },
+    {
+     "week": "2026-06-22",
+     "exitMonth": "2026-06",
+     "how": "time",
+     "gross": -0.297,
+     "net": -0.316
+    },
+    {
+     "week": "2026-06-29",
+     "exitMonth": "2026-07",
+     "how": "time",
+     "gross": 0.427,
+     "net": 0.409
+    },
+    {
+     "week": "2026-07-20",
+     "exitMonth": "2026-07",
+     "how": "time",
+     "gross": 0.287,
+     "net": 0.266
+    },
+    {
+     "week": "2026-10-26",
+     "exitMonth": "2026-10",
+     "how": "time",
+     "gross": -0.845,
+     "net": -0.873
+    }
+   ],
+   "holmP": 1,
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": true,
+    "x2Positive": false,
+    "abovePlacebo95": false
+   },
+   "pass": false
+  },
+  {
+   "id": "T3",
+   "name": "Short 4 weeks after a 13-week closing high",
+   "ev": "high",
+   "side": -1,
+   "hold": 4,
+   "mult": 3,
+   "is": {
+    "trades": 46,
+    "months": 108,
+    "won": 0.37,
+    "stopped": 0.457,
+    "grossR": -0.132,
+    "netR": -0.143,
+    "costR": 0.011,
+    "finR": 0,
+    "monthGross": -0.056,
+    "monthGrossT": -0.83,
+    "monthNet": -0.061,
+    "monthNetT": -0.89,
+    "totalNet": -6.56,
+    "worstDD": -11.5
+   },
+   "oos": {
+    "trades": 62,
+    "months": 118,
+    "won": 0.29,
+    "stopped": 0.5,
+    "grossR": -0.324,
+    "netR": -0.333,
+    "costR": 0.009,
+    "finR": 0,
+    "monthGross": -0.17,
+    "monthGrossT": -2.59,
+    "monthNet": -0.175,
+    "monthNetT": -2.65,
+    "totalNet": -20.63,
+    "worstDD": -24.1,
+    "x2Net": -0.18,
+    "x2T": -2.72
+   },
+   "pOne": 0.996,
+   "placebo": {
+    "p5": -3.06,
+    "p50": -1.61,
+    "p95": -0.58,
+    "max": 0.06,
+    "below": 8
+   },
+   "years": {
+    "2008": {
+     "n": 5,
+     "gross": -2.34,
+     "net": -2.4
+    },
+    "2009": {
+     "n": 8,
+     "gross": -3.54,
+     "net": -3.62
+    },
+    "2010": {
+     "n": 8,
+     "gross": -3.39,
+     "net": -3.49
+    },
+    "2011": {
+     "n": 8,
+     "gross": -1.46,
+     "net": -1.53
+    },
+    "2012": {
+     "n": 4,
+     "gross": 1.24,
+     "net": 1.2
+    },
+    "2013": {
+     "n": 1,
+     "gross": 0.92,
+     "net": 0.92
+    },
+    "2014": {
+     "n": 3,
+     "gross": 0.89,
+     "net": 0.85
+    },
+    "2015": {
+     "n": 3,
+     "gross": 3.55,
+     "net": 3.52
+    },
+    "2016": {
+     "n": 6,
+     "gross": -1.94,
+     "net": -2.01
+    },
+    "2017": {
+     "n": 4,
+     "gross": 2.76,
+     "net": 2.7
+    },
+    "2018": {
+     "n": 4,
+     "gross": -1.22,
+     "net": -1.29
+    },
+    "2019": {
+     "n": 7,
+     "gross": -4.34,
+     "net": -4.44
+    },
+    "2020": {
+     "n": 11,
+     "gross": -4.03,
+     "net": -4.13
+    },
+    "2021": {
+     "n": 3,
+     "gross": 2,
+     "net": 1.97
+    },
+    "2022": {
+     "n": 3,
+     "gross": -0.85,
+     "net": -0.87
+    },
+    "2023": {
+     "n": 6,
+     "gross": -0.8,
+     "net": -0.84
+    },
+    "2024": {
+     "n": 9,
+     "gross": -4.52,
+     "net": -4.58
+    },
+    "2025": {
+     "n": 11,
+     "gross": -7.85,
+     "net": -7.9
+    },
+    "2026": {
+     "n": 4,
+     "gross": -1.23,
+     "net": -1.24
+    }
+   },
+   "trades": [
+    {
+     "week": "2007-12-31",
+     "exitMonth": "2008-01",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.014
+    },
+    {
+     "week": "2008-01-14",
+     "exitMonth": "2008-02",
+     "how": "time",
+     "gross": -0.624,
+     "net": -0.638
+    },
+    {
+     "week": "2008-02-11",
+     "exitMonth": "2008-03",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2008-03-17",
+     "exitMonth": "2008-04",
+     "how": "time",
+     "gross": 1.284,
+     "net": 1.274
+    },
+    {
+     "week": "2008-06-30",
+     "exitMonth": "2008-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "week": "2008-12-29",
+     "exitMonth": "2009-01",
+     "how": "time",
+     "gross": -0.395,
+     "net": -0.402
+    },
+    {
+     "week": "2009-01-26",
+     "exitMonth": "2009-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.008
+    },
+    {
+     "week": "2009-02-23",
+     "exitMonth": "2009-03",
+     "how": "time",
+     "gross": 0.557,
+     "net": 0.548
+    },
+    {
+     "week": "2009-05-25",
+     "exitMonth": "2009-06",
+     "how": "time",
+     "gross": 0.508,
+     "net": 0.495
+    },
+    {
+     "week": "2009-09-07",
+     "exitMonth": "2009-10",
+     "how": "time",
+     "gross": -0.206,
+     "net": -0.22
+    },
+    {
+     "week": "2009-10-12",
+     "exitMonth": "2009-11",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "week": "2009-11-09",
+     "exitMonth": "2009-11",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "week": "2009-11-23",
+     "exitMonth": "2009-12",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "week": "2010-04-12",
+     "exitMonth": "2010-05",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "week": "2010-05-10",
+     "exitMonth": "2010-06",
+     "how": "time",
+     "gross": -0.213,
+     "net": -0.224
+    },
+    {
+     "week": "2010-06-21",
+     "exitMonth": "2010-07",
+     "how": "time",
+     "gross": 1.203,
+     "net": 1.192
+    },
+    {
+     "week": "2010-09-20",
+     "exitMonth": "2010-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.016
+    },
+    {
+     "week": "2010-10-04",
+     "exitMonth": "2010-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "week": "2010-10-11",
+     "exitMonth": "2010-11",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "week": "2010-11-08",
+     "exitMonth": "2010-12",
+     "how": "time",
+     "gross": -0.28,
+     "net": -0.289
+    },
+    {
+     "week": "2010-12-06",
+     "exitMonth": "2010-12",
+     "how": "time",
+     "gross": -0.1,
+     "net": -0.109
+    },
+    {
+     "week": "2011-01-03",
+     "exitMonth": "2011-01",
+     "how": "time",
+     "gross": 1.621,
+     "net": 1.609
+    },
+    {
+     "week": "2011-03-07",
+     "exitMonth": "2011-04",
+     "how": "time",
+     "gross": 0.04,
+     "net": 0.028
+    },
+    {
+     "week": "2011-04-11",
+     "exitMonth": "2011-04",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "week": "2011-05-02",
+     "exitMonth": "2011-05",
+     "how": "time",
+     "gross": 0.524,
+     "net": 0.513
+    },
+    {
+     "week": "2011-07-18",
+     "exitMonth": "2011-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "week": "2011-08-08",
+     "exitMonth": "2011-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2011-08-15",
+     "exitMonth": "2011-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.006
+    },
+    {
+     "week": "2011-08-22",
+     "exitMonth": "2011-09",
+     "how": "time",
+     "gross": 0.358,
+     "net": 0.353
+    },
+    {
+     "week": "2012-02-27",
+     "exitMonth": "2012-03",
+     "how": "time",
+     "gross": 1.564,
+     "net": 1.556
+    },
+    {
+     "week": "2012-08-27",
+     "exitMonth": "2012-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "week": "2012-09-10",
+     "exitMonth": "2012-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "week": "2012-10-08",
+     "exitMonth": "2012-11",
+     "how": "time",
+     "gross": 1.679,
+     "net": 1.669
+    },
+    {
+     "week": "2013-08-26",
+     "exitMonth": "2013-09",
+     "how": "time",
+     "gross": 0.923,
+     "net": 0.915
+    },
+    {
+     "week": "2014-02-17",
+     "exitMonth": "2014-03",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "week": "2014-03-17",
+     "exitMonth": "2014-04",
+     "how": "time",
+     "gross": 1.227,
+     "net": 1.216
+    },
+    {
+     "week": "2014-07-07",
+     "exitMonth": "2014-08",
+     "how": "time",
+     "gross": 0.661,
+     "net": 0.647
+    },
+    {
+     "week": "2015-01-19",
+     "exitMonth": "2015-02",
+     "how": "time",
+     "gross": 0.859,
+     "net": 0.849
+    },
+    {
+     "week": "2015-05-18",
+     "exitMonth": "2015-06",
+     "how": "time",
+     "gross": 0.816,
+     "net": 0.805
+    },
+    {
+     "week": "2015-10-19",
+     "exitMonth": "2015-11",
+     "how": "time",
+     "gross": 1.879,
+     "net": 1.867
+    },
+    {
+     "week": "2016-02-01",
+     "exitMonth": "2016-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "week": "2016-02-08",
+     "exitMonth": "2016-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "week": "2016-02-15",
+     "exitMonth": "2016-03",
+     "how": "time",
+     "gross": -0.271,
+     "net": -0.282
+    },
+    {
+     "week": "2016-05-02",
+     "exitMonth": "2016-05",
+     "how": "time",
+     "gross": 1.389,
+     "net": 1.378
+    },
+    {
+     "week": "2016-06-20",
+     "exitMonth": "2016-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "week": "2016-06-27",
+     "exitMonth": "2016-07",
+     "how": "time",
+     "gross": -0.061,
+     "net": -0.07
+    },
+    {
+     "week": "2017-02-13",
+     "exitMonth": "2017-03",
+     "how": "time",
+     "gross": 0.649,
+     "net": 0.635
+    },
+    {
+     "week": "2017-04-17",
+     "exitMonth": "2017-05",
+     "how": "time",
+     "gross": 1.773,
+     "net": 1.757
+    },
+    {
+     "week": "2017-08-14",
+     "exitMonth": "2017-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.017
+    },
+    {
+     "week": "2017-09-04",
+     "exitMonth": "2017-09",
+     "how": "time",
+     "gross": 1.34,
+     "net": 1.326
+    },
+    {
+     "week": "2018-01-01",
+     "exitMonth": "2018-01",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.02
+    },
+    {
+     "week": "2018-01-15",
+     "exitMonth": "2018-02",
+     "how": "time",
+     "gross": 0.646,
+     "net": 0.628
+    },
+    {
+     "week": "2018-10-22",
+     "exitMonth": "2018-11",
+     "how": "time",
+     "gross": 0.138,
+     "net": 0.122
+    },
+    {
+     "week": "2018-12-10",
+     "exitMonth": "2018-12",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.019
+    },
+    {
+     "week": "2018-12-31",
+     "exitMonth": "2019-01",
+     "how": "time",
+     "gross": -0.697,
+     "net": -0.716
+    },
+    {
+     "week": "2019-01-28",
+     "exitMonth": "2019-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.019
+    },
+    {
+     "week": "2019-02-25",
+     "exitMonth": "2019-03",
+     "how": "time",
+     "gross": 0.498,
+     "net": 0.479
+    },
+    {
+     "week": "2019-06-10",
+     "exitMonth": "2019-06",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.017
+    },
+    {
+     "week": "2019-06-24",
+     "exitMonth": "2019-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "week": "2019-07-22",
+     "exitMonth": "2019-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.008
+    },
+    {
+     "week": "2019-08-12",
+     "exitMonth": "2019-09",
+     "how": "time",
+     "gross": -0.14,
+     "net": -0.149
+    },
+    {
+     "week": "2020-01-06",
+     "exitMonth": "2020-01",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.019
+    },
+    {
+     "week": "2020-01-13",
+     "exitMonth": "2020-02",
+     "how": "time",
+     "gross": -0.169,
+     "net": -0.182
+    },
+    {
+     "week": "2020-02-24",
+     "exitMonth": "2020-03",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "week": "2020-03-09",
+     "exitMonth": "2020-04",
+     "how": "time",
+     "gross": 0.891,
+     "net": 0.884
+    },
+    {
+     "week": "2020-04-13",
+     "exitMonth": "2020-05",
+     "how": "time",
+     "gross": -0.091,
+     "net": -0.095
+    },
+    {
+     "week": "2020-05-18",
+     "exitMonth": "2020-06",
+     "how": "time",
+     "gross": 0.177,
+     "net": 0.169
+    },
+    {
+     "week": "2020-06-22",
+     "exitMonth": "2020-07",
+     "how": "time",
+     "gross": -0.815,
+     "net": -0.823
+    },
+    {
+     "week": "2020-07-20",
+     "exitMonth": "2020-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "week": "2020-07-27",
+     "exitMonth": "2020-07",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "week": "2020-08-03",
+     "exitMonth": "2020-08",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.007
+    },
+    {
+     "week": "2020-08-10",
+     "exitMonth": "2020-09",
+     "how": "time",
+     "gross": 0.978,
+     "net": 0.972
+    },
+    {
+     "week": "2021-05-10",
+     "exitMonth": "2021-05",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2021-05-31",
+     "exitMonth": "2021-06",
+     "how": "time",
+     "gross": 1.708,
+     "net": 1.7
+    },
+    {
+     "week": "2021-11-15",
+     "exitMonth": "2021-12",
+     "how": "time",
+     "gross": 1.29,
+     "net": 1.281
+    },
+    {
+     "week": "2022-02-14",
+     "exitMonth": "2022-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "week": "2022-03-07",
+     "exitMonth": "2022-04",
+     "how": "time",
+     "gross": 0.561,
+     "net": 0.555
+    },
+    {
+     "week": "2022-11-14",
+     "exitMonth": "2022-12",
+     "how": "time",
+     "gross": -0.411,
+     "net": -0.418
+    },
+    {
+     "week": "2022-12-26",
+     "exitMonth": "2023-01",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.008
+    },
+    {
+     "week": "2023-01-16",
+     "exitMonth": "2023-02",
+     "how": "time",
+     "gross": 0.828,
+     "net": 0.819
+    },
+    {
+     "week": "2023-03-20",
+     "exitMonth": "2023-04",
+     "how": "time",
+     "gross": -0.226,
+     "net": -0.233
+    },
+    {
+     "week": "2023-05-08",
+     "exitMonth": "2023-06",
+     "how": "time",
+     "gross": 0.712,
+     "net": 0.706
+    },
+    {
+     "week": "2023-10-23",
+     "exitMonth": "2023-11",
+     "how": "time",
+     "gross": -0.11,
+     "net": -0.118
+    },
+    {
+     "week": "2023-12-04",
+     "exitMonth": "2023-12",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2024-03-04",
+     "exitMonth": "2024-03",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "week": "2024-03-11",
+     "exitMonth": "2024-04",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "week": "2024-04-08",
+     "exitMonth": "2024-04",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.006
+    },
+    {
+     "week": "2024-04-15",
+     "exitMonth": "2024-05",
+     "how": "time",
+     "gross": -0.009,
+     "net": -0.014
+    },
+    {
+     "week": "2024-05-20",
+     "exitMonth": "2024-06",
+     "how": "time",
+     "gross": 0.838,
+     "net": 0.833
+    },
+    {
+     "week": "2024-08-05",
+     "exitMonth": "2024-08",
+     "how": "time",
+     "gross": -0.541,
+     "net": -0.546
+    },
+    {
+     "week": "2024-09-16",
+     "exitMonth": "2024-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.007
+    },
+    {
+     "week": "2024-09-30",
+     "exitMonth": "2024-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.006
+    },
+    {
+     "week": "2024-10-28",
+     "exitMonth": "2024-11",
+     "how": "time",
+     "gross": 0.193,
+     "net": 0.186
+    },
+    {
+     "week": "2025-01-27",
+     "exitMonth": "2025-02",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.007
+    },
+    {
+     "week": "2025-02-10",
+     "exitMonth": "2025-03",
+     "how": "time",
+     "gross": -0.5,
+     "net": -0.506
+    },
+    {
+     "week": "2025-03-17",
+     "exitMonth": "2025-03",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.005
+    },
+    {
+     "week": "2025-04-14",
+     "exitMonth": "2025-04",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "week": "2025-05-26",
+     "exitMonth": "2025-06",
+     "how": "time",
+     "gross": -0.074,
+     "net": -0.076
+    },
+    {
+     "week": "2025-09-01",
+     "exitMonth": "2025-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.005
+    },
+    {
+     "week": "2025-09-08",
+     "exitMonth": "2025-09",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.005
+    },
+    {
+     "week": "2025-09-29",
+     "exitMonth": "2025-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.004
+    },
+    {
+     "week": "2025-10-13",
+     "exitMonth": "2025-10",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "week": "2025-10-20",
+     "exitMonth": "2025-11",
+     "how": "time",
+     "gross": 0.724,
+     "net": 0.722
+    },
+    {
+     "week": "2025-12-15",
+     "exitMonth": "2025-12",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "week": "2025-12-29",
+     "exitMonth": "2026-01",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "week": "2026-01-26",
+     "exitMonth": "2026-01",
+     "how": "stop",
+     "gross": -1,
+     "net": -1.002
+    },
+    {
+     "week": "2026-02-16",
+     "exitMonth": "2026-03",
+     "how": "time",
+     "gross": -0.005,
+     "net": -0.006
+    },
+    {
+     "week": "2026-08-24",
+     "exitMonth": "2026-09",
+     "how": "time",
+     "gross": 0.771,
+     "net": 0.769
+    }
+   ],
+   "holmP": 1,
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": false,
+    "x2Positive": false,
+    "abovePlacebo95": false
+   },
+   "pass": false
+  }
+ ],
+ "everyFourth": {
+  "is": {
+   "trades": 117,
+   "months": 108,
+   "won": 0.487,
+   "stopped": 0.299,
+   "grossR": 0.105,
+   "netR": 0.021,
+   "costR": 0.01,
+   "finR": 0.073,
+   "monthGross": 0.113,
+   "monthGrossT": 1.13,
+   "monthNet": 0.023,
+   "monthNetT": 0.23,
+   "totalNet": 2.47,
+   "worstDD": -13.26
+  },
+  "oos": {
+   "trades": 129,
+   "months": 118,
+   "won": 0.535,
+   "stopped": 0.186,
+   "grossR": 0.25,
+   "netR": 0.145,
+   "costR": 0.009,
+   "finR": 0.095,
+   "monthGross": 0.273,
+   "monthGrossT": 2.87,
+   "monthNet": 0.159,
+   "monthNetT": 1.69,
+   "totalNet": 18.73,
+   "worstDD": -6.23
+  }
+ }
+}
