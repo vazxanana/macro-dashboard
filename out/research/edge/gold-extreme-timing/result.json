@@ -1,0 +1,608 @@
+{
+ "study": "gold-extreme-timing",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "data": {
+  "src": "OANDA mid H1 XAU/USD via the candle proxy (/md/bars), New York 17:00 days",
+  "from": "2006-03-20",
+  "to": "2026-10-30",
+  "h1": 125474
+ },
+ "params": {
+  "late": 4,
+  "minBars": 20,
+  "atrN": 14,
+  "stopAtr": 1,
+  "hold": 1,
+  "holdLong": 5,
+  "cost": 0.6
+ },
+ "windows": {
+  "is": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ]
+ },
+ "costs": {
+  "roundTrip": 0.6,
+  "finLong": 0.000148
+ },
+ "usableDays": 5272,
+ "signals": {
+  "late": 1688,
+  "early": 145
+ },
+ "baseline": {
+  "b0": {
+   "is:buy": {
+    "n": 2570,
+    "net": -0.0173,
+    "gross": 0.0233
+   },
+   "is:sell": {
+    "n": 2570,
+    "net": -0.0431,
+    "gross": -0.0093
+   },
+   "oos:buy": {
+    "n": 2503,
+    "net": 0.0128,
+    "gross": 0.0404
+   },
+   "oos:sell": {
+    "n": 2503,
+    "net": -0.0589,
+    "gross": -0.0313
+   }
+  },
+  "b1": {
+   "is:buy": {
+    "n": 1327,
+    "net": -0.0291,
+    "gross": 0.0116
+   },
+   "is:sell": {
+    "n": 1241,
+    "net": -0.0525,
+    "gross": -0.019
+   },
+   "oos:sell": {
+    "n": 1170,
+    "net": -0.0648,
+    "gross": -0.0374
+   },
+   "oos:buy": {
+    "n": 1333,
+    "net": -0.0018,
+    "gross": 0.026
+   }
+  },
+  "b5": {
+   "is:buy": {
+    "n": 2570,
+    "net": -0.0008,
+    "gross": 0.0781
+   },
+   "is:sell": {
+    "n": 2570,
+    "net": -0.074,
+    "gross": -0.0402
+   },
+   "oos:buy": {
+    "n": 2499,
+    "net": 0.1218,
+    "gross": 0.1989
+   },
+   "oos:sell": {
+    "n": 2499,
+    "net": -0.1458,
+    "gross": -0.1182
+   }
+  },
+  "b0x2": {
+   "is:buy": {
+    "n": 2570,
+    "net": -0.0579,
+    "gross": 0.0233
+   },
+   "is:sell": {
+    "n": 2570,
+    "net": -0.0769,
+    "gross": -0.0093
+   },
+   "oos:buy": {
+    "n": 2503,
+    "net": -0.0148,
+    "gross": 0.0404
+   },
+   "oos:sell": {
+    "n": 2503,
+    "net": -0.0865,
+    "gross": -0.0313
+   }
+  }
+ },
+ "S": {
+  "T1": {
+   "is": {
+    "n": 756,
+    "gross": 0.07,
+    "net": 0.034,
+    "excess": 0.063,
+    "totalNet": 25.53,
+    "tGross": 2.93,
+    "tNet": 1.43,
+    "tExcess": 2.65,
+    "months": 120,
+    "win": 0.492,
+    "dd": -14.15,
+    "medianStop": 19.23,
+    "costShare": 0.07,
+    "buy": {
+     "n": 402,
+     "gross": 0.071,
+     "net": 0.031,
+     "excess": 0.048,
+     "base": -0.017
+    },
+    "sell": {
+     "n": 354,
+     "gross": 0.069,
+     "net": 0.037,
+     "excess": 0.08,
+     "base": -0.043
+    }
+   },
+   "oos": {
+    "n": 858,
+    "gross": -0.015,
+    "net": -0.043,
+    "excess": -0.024,
+    "totalNet": -36.92,
+    "tGross": -0.71,
+    "tNet": -1.97,
+    "tExcess": -1.11,
+    "months": 118,
+    "win": 0.428,
+    "dd": -43.62,
+    "medianStop": 24.09,
+    "costShare": 0.057,
+    "buy": {
+     "n": 479,
+     "gross": 0.004,
+     "net": -0.024,
+     "excess": -0.037,
+     "base": 0.013
+    },
+    "sell": {
+     "n": 379,
+     "gross": -0.039,
+     "net": -0.067,
+     "excess": -0.008,
+     "base": -0.059
+    }
+   }
+  },
+  "T2": {
+   "is": {
+    "n": 756,
+    "gross": 0.07,
+    "net": 0.034,
+    "excess": 0.074,
+    "totalNet": 25.53,
+    "tGross": 2.93,
+    "tNet": 1.43,
+    "tExcess": 3.1,
+    "months": 120,
+    "win": 0.492,
+    "dd": -14.15,
+    "medianStop": 19.23,
+    "costShare": 0.07,
+    "buy": {
+     "n": 402,
+     "gross": 0.071,
+     "net": 0.031,
+     "excess": 0.06,
+     "base": -0.029
+    },
+    "sell": {
+     "n": 354,
+     "gross": 0.069,
+     "net": 0.037,
+     "excess": 0.089,
+     "base": -0.053
+    }
+   },
+   "oos": {
+    "n": 858,
+    "gross": -0.015,
+    "net": -0.043,
+    "excess": -0.013,
+    "totalNet": -36.92,
+    "tGross": -0.71,
+    "tNet": -1.97,
+    "tExcess": -0.62,
+    "months": 118,
+    "win": 0.428,
+    "dd": -43.62,
+    "medianStop": 24.09,
+    "costShare": 0.057,
+    "buy": {
+     "n": 479,
+     "gross": 0.004,
+     "net": -0.024,
+     "excess": -0.022,
+     "base": -0.002
+    },
+    "sell": {
+     "n": 379,
+     "gross": -0.039,
+     "net": -0.067,
+     "excess": -0.002,
+     "base": -0.065
+    }
+   }
+  },
+  "T3": {
+   "is": {
+    "n": 346,
+    "gross": 0.128,
+    "net": 0.07,
+    "excess": 0.106,
+    "totalNet": 24.08,
+    "tGross": 1.77,
+    "tNet": 0.97,
+    "tExcess": 1.47,
+    "months": 120,
+    "win": 0.442,
+    "dd": -11.48,
+    "medianStop": 18.92,
+    "costShare": 0.054,
+    "buy": {
+     "n": 179,
+     "gross": 0.152,
+     "net": 0.07,
+     "excess": 0.071,
+     "base": -0.001
+    },
+    "sell": {
+     "n": 167,
+     "gross": 0.102,
+     "net": 0.069,
+     "excess": 0.143,
+     "base": -0.074
+    }
+   },
+   "oos": {
+    "n": 371,
+    "gross": 0.004,
+    "net": -0.05,
+    "excess": -0.051,
+    "totalNet": -18.67,
+    "tGross": 0.06,
+    "tNet": -0.81,
+    "tExcess": -0.83,
+    "months": 118,
+    "win": 0.388,
+    "dd": -39.89,
+    "medianStop": 24.16,
+    "costShare": 0.05,
+    "buy": {
+     "n": 203,
+     "gross": 0.162,
+     "net": 0.086,
+     "excess": -0.036,
+     "base": 0.122
+    },
+    "sell": {
+     "n": 168,
+     "gross": -0.188,
+     "net": -0.215,
+     "excess": -0.069,
+     "base": -0.146
+    }
+   }
+  },
+  "x2": {
+   "is": {
+    "n": 756,
+    "gross": 0.07,
+    "net": -0.002,
+    "excess": 0.065,
+    "totalNet": -1.67,
+    "tGross": 2.93,
+    "tNet": -0.09,
+    "tExcess": 2.71,
+    "months": 120,
+    "win": 0.468,
+    "dd": -21.64,
+    "medianStop": 19.23,
+    "costShare": 0.14,
+    "buy": {
+     "n": 402,
+     "gross": 0.071,
+     "net": -0.008,
+     "excess": 0.05,
+     "base": -0.058
+    },
+    "sell": {
+     "n": 354,
+     "gross": 0.069,
+     "net": 0.005,
+     "excess": 0.082,
+     "base": -0.077
+    }
+   },
+   "oos": {
+    "n": 858,
+    "gross": -0.015,
+    "net": -0.071,
+    "excess": -0.024,
+    "totalNet": -60.8,
+    "tGross": -0.71,
+    "tNet": -3.17,
+    "tExcess": -1.11,
+    "months": 118,
+    "win": 0.409,
+    "dd": -66.36,
+    "medianStop": 24.09,
+    "costShare": 0.114,
+    "buy": {
+     "n": 479,
+     "gross": 0.004,
+     "net": -0.052,
+     "excess": -0.037,
+     "base": -0.015
+    },
+    "sell": {
+     "n": 379,
+     "gross": -0.039,
+     "net": -0.095,
+     "excess": -0.009,
+     "base": -0.087
+    }
+   }
+  },
+  "early": {
+   "is": {
+    "n": 55,
+    "gross": -0.274,
+    "net": -0.31,
+    "excess": -0.283,
+    "totalNet": -17.06,
+    "tGross": -3.26,
+    "tNet": -3.6,
+    "tExcess": -3.36,
+    "months": 120,
+    "win": 0.291,
+    "dd": -17.2,
+    "medianStop": 18.58,
+    "costShare": 0.067,
+    "buy": {
+     "n": 33,
+     "gross": -0.182,
+     "net": -0.219,
+     "excess": -0.202,
+     "base": -0.017
+    },
+    "sell": {
+     "n": 22,
+     "gross": -0.412,
+     "net": -0.447,
+     "excess": -0.403,
+     "base": -0.043
+    }
+   },
+   "oos": {
+    "n": 83,
+    "gross": -0.112,
+    "net": -0.135,
+    "excess": -0.112,
+    "totalNet": -11.22,
+    "tGross": -1.42,
+    "tNet": -1.71,
+    "tExcess": -1.42,
+    "months": 118,
+    "win": 0.422,
+    "dd": -11.59,
+    "medianStop": 26.06,
+    "costShare": 0.038,
+    "buy": {
+     "n": 41,
+     "gross": -0.076,
+     "net": -0.103,
+     "excess": -0.116,
+     "base": 0.013
+    },
+    "sell": {
+     "n": 42,
+     "gross": -0.147,
+     "net": -0.167,
+     "excess": -0.108,
+     "base": -0.059
+    }
+   }
+  }
+ },
+ "tests": [
+  {
+   "id": "T1",
+   "what": "late extreme, 1-day hold, excess over the every-day same-side baseline",
+   "t": -1.11,
+   "isMean": 0.063,
+   "p": 0.267,
+   "holm": 0.801
+  },
+  {
+   "id": "T2",
+   "what": "late extreme, 1-day hold, excess over the same-direction-day baseline",
+   "t": -0.62,
+   "isMean": 0.074,
+   "p": 0.5353,
+   "holm": 0.8131
+  },
+  {
+   "id": "T3",
+   "what": "late extreme, 5-day hold, excess over the every-day same-side baseline",
+   "t": -0.83,
+   "isMean": 0.106,
+   "p": 0.4065,
+   "holm": 0.8131
+  }
+ ],
+ "placebo": {
+  "draws": 40,
+  "median": 0.11,
+  "p95": 1.52,
+  "max": 1.93,
+  "atLeastActual": 36,
+  "ts": [
+   -0.57,
+   -0.18,
+   -0.33,
+   1.18,
+   0.47,
+   1.6,
+   -1.49,
+   0.07,
+   -0.73,
+   1.14,
+   -1.39,
+   -1.61,
+   0.18,
+   0.54,
+   1.93,
+   -0.71,
+   0.46,
+   -0.74,
+   1.52,
+   -1.11,
+   0.17,
+   0.71,
+   -1.06,
+   -1.23,
+   0.82,
+   -0.82,
+   -0.74,
+   -0.57,
+   0.77,
+   0.78,
+   -0.36,
+   0.45,
+   0.41,
+   0.23,
+   1.22,
+   0.15,
+   -0.51,
+   -0.58,
+   -0.74,
+   1.43
+  ]
+ },
+ "years": {
+  "2007": {
+   "n": 67,
+   "net": -3.99,
+   "excess": -2.16
+  },
+  "2008": {
+   "n": 71,
+   "net": 7.71,
+   "excess": 9.77
+  },
+  "2009": {
+   "n": 81,
+   "net": 0.93,
+   "excess": 3.26
+  },
+  "2010": {
+   "n": 73,
+   "net": -7.96,
+   "excess": -5.97
+  },
+  "2011": {
+   "n": 87,
+   "net": 5.04,
+   "excess": 7.53
+  },
+  "2012": {
+   "n": 85,
+   "net": 5.27,
+   "excess": 7.77
+  },
+  "2013": {
+   "n": 78,
+   "net": 6.95,
+   "excess": 9.44
+  },
+  "2014": {
+   "n": 68,
+   "net": -3.41,
+   "excess": -1.25
+  },
+  "2015": {
+   "n": 60,
+   "net": 10.22,
+   "excess": 12.08
+  },
+  "2016": {
+   "n": 86,
+   "net": 4.76,
+   "excess": 7.28
+  },
+  "2017": {
+   "n": 104,
+   "net": -18.53,
+   "excess": -16.63
+  },
+  "2018": {
+   "n": 91,
+   "net": -6.38,
+   "excess": -4.18
+  },
+  "2019": {
+   "n": 89,
+   "net": -6.37,
+   "excess": -5
+  },
+  "2020": {
+   "n": 86,
+   "net": -4.04,
+   "excess": -3.21
+  },
+  "2021": {
+   "n": 70,
+   "net": 3.21,
+   "excess": 4.68
+  },
+  "2022": {
+   "n": 92,
+   "net": 3.36,
+   "excess": 5.41
+  },
+  "2023": {
+   "n": 84,
+   "net": -3.98,
+   "excess": -1.83
+  },
+  "2024": {
+   "n": 83,
+   "net": -9.42,
+   "excess": -7.76
+  },
+  "2025": {
+   "n": 82,
+   "net": 3.4,
+   "excess": 4.43
+  },
+  "2026": {
+   "n": 77,
+   "net": 1.84,
+   "excess": 3.36
+  }
+ }
+}
