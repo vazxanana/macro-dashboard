@@ -111,7 +111,16 @@ jobs:
           CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
           GH_TOKEN: ${{ github.token }}   # newcode(): compare this run's commit with main (read only)
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}   # council/md-proxy.mjs: the loop's own OANDA candles (empty = the website's proxy)
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
         run: |
+          # own OANDA candles (15 Nov 2026): with the OANDA_TOKEN secret the loop serves /md/bars itself on localhost, so the
+          # Trader's gold and forex feed no longer depends on the website (the outage of 15 Nov put every market on Kraken)
+          if [ -n "$OANDA_TOKEN" ]; then
+            (node council/md-proxy.mjs 8790 > md-proxy.log 2>&1 &)
+            for t in $(seq 1 20); do curl -fs -o /dev/null "http://127.0.0.1:8790/md/bars?sym=xau&tf=1h&n=2" && break; sleep 0.5; done
+            if curl -fs -o /dev/null "http://127.0.0.1:8790/md/bars?sym=xau&tf=1h&n=2"; then export MD_BASE=http://127.0.0.1:8790/md/ ICT_MD_BARS=http://127.0.0.1:8790/md/bars; echo "own OANDA candles on"; else echo "own OANDA candles did not answer: using the website's proxy"; fi
+          fi
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           ROUNDS=60

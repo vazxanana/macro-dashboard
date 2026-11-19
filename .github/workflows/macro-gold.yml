@@ -63,6 +63,12 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"; echo "A complete result exists: not running the test again."
           fi
 
+      - name: Own OANDA candles (no website needed; scripts/own-candles.sh)
+        env:
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
+        run: sh scripts/own-candles.sh
+
       - name: Out-of-sample test
         if: steps.done.outputs.skip != 'true'
         run: node research/edge/macro-gold/run.mjs data/research/macro-gold.json
