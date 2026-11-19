@@ -2453,6 +2453,12 @@ before (`MM_PREV`; the phone has no toolbar row). `window.msMulti()` is the read
 Markets) read their newest candles every `freePoll(T)` = 1.5 s up to M1, 3 s up to M15, 6 s up to H1 (they polled every 15 s), and a
 free chart of the page's own market folds every live tick into its last candle (`window.msTickSubs`, called from `liveFrame`,
 `tickInto`; up to a day, never a week / month / year); while ticks arrive (`LT.at` under 5 s old) its read runs every 15 s only.
+Then (owner: "more faster please and add 1 second timeframe"): every OTHER market a free chart shows gets its own OANDA stream
+(`/md/stream`, `ftSync` every 2 s, at most four, closed when no free chart shows it, none while the tab is hidden); `freeTicks(k, Q)` folds
+a market's ticks into every free chart of it (`FTL` = last tick per market, `tickLive(k)`). Reads every 1 s up to M1, 2 s up to M15, 5 s up
+to H1. **1 second** (`1s`, "S1", Seconds group): OANDA stores nothing under 5 s, so a 1 s chart starts from 5 s candles (`spFetch`, said
+in its source line) and builds true 1 s candles from live ticks; with ticks live it is never re-read (a read would put 5 s candles back).
+`window.msFreeTicks()` is the read-only view.
 Tests: `tests/desk-draw.test.mjs`.
 
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
@@ -3147,6 +3153,12 @@ preview, vendored Inter embedded, not wired to pages yet). Manifest and pwa.mjs 
 Tests: `tests/aureum-mark.test.mjs`, `tests/pwa.test.mjs`.
 **Email logo** (18 Nov 2026, owner: "aureum should have a image or logo for email"): `icons/email-logo.png` (the mark + AUREUM
 / DESK on one line, graphite ink, transparent, 585 x 96 drawn at 3x by make-icons.mjs) heads every email of `api/signup.js`
+**Email design** (19 Nov 2026, owner's screenshot: "improve the email design, make green shorter, remove red"): `api/signup.js` `html` =
+the logo centred, a white card with a 3 px graphite top edge, a bold greeting, a larger button with an arrow, the fallback as one short
+line "Button not working? Open this link (aureumdesk.co.uk)" (`shortLink`: the host only; the whole address is behind the link, the
+token never printed), the note in a grey band, and a centred footer "Aureum Desk · aureumdesk.co.uk" WITHOUT the "paper-trading desk /
+not financial advice" line. The sender picture in Gmail is not set by the email itself (a Google account for the sending address with
+the logo as its photo, or BIMI, which needs a paid certificate): the owner's step.
 (`LOGO`, always from https://aureumdesk.co.uk/, shown 195 x 32, alt "Aureum Desk"). PNG on purpose: most mail apps show no SVG.
 - Build step `scripts/pwa.mjs out` (build.sh, before stamp-assets): adds the missing head tags to every built page (manifest,
   theme-color, apple-touch-icon, apple-mobile-web-app-capable / -title / -status-bar-style black, mobile-web-app-capable, and

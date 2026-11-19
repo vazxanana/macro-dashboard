@@ -43,7 +43,7 @@ test('display only: the drawing layer places, changes and cancels no order and t
 });
 
 test('any timeframe from seconds to a year (19 Nov 2026): grouped, the free chart for the ones no analysed pane has', () => {
-  assert.match(PAGE, /const SEC_TFS = \[XTF\('5s', 'S5', 'Seconds', 5\), XTF\('10s', 'S10', 'Seconds', 10\), XTF\('15s', 'S15', 'Seconds', 15\), XTF\('30s', 'S30', 'Seconds', 30\)\];/);
+  assert.match(PAGE, /const SEC_TFS = \[XTF\('1s', 'S1', 'Seconds', 1\), XTF\('5s', 'S5', 'Seconds', 5\), XTF\('10s', 'S10', 'Seconds', 10\), XTF\('15s', 'S15', 'Seconds', 15\), XTF\('30s', 'S30', 'Seconds', 30\)\];/);
   const sp = PAGE.slice(PAGE.indexOf('  function spInit() {'), PAGE.indexOf('      if (ch) spMarkup(); } catch (e) {} }, 3e3);'));
   assert.ok(sp.length > 1000);
   assert.doesNotMatch(sp, /(?<!SP)TFS\.find\(\(t\) => t\.id === (spTf\(\)|tf)\)/, 'every timeframe lookup of the free chart knows every timeframe');
@@ -51,8 +51,8 @@ test('any timeframe from seconds to a year (19 Nov 2026): grouped, the free char
   assert.deepEqual(JSON.parse(groups.replace(/'/g, '"')).map((g) => g[0]), ['Seconds', 'Minutes', 'Hours', 'Days', 'Week', 'Month', 'Year']);
   const ids = JSON.parse(groups.replace(/'/g, '"')).flatMap((g) => g[1]);
   const bars = fs.readFileSync(new URL('../api/bars.js', import.meta.url), 'utf8');
-  for (const id of ids) if (id !== '1Y') assert.match(bars, new RegExp(`'${id}': \\['`), `the candle proxy serves ${id}`);
-  assert.match(PAGE, /async function spFetch\(tf, I, n\) \{ if \(tf && tf\.id === '1Y'\)/, 'a year is built from months');
+  for (const id of ids) if (id !== '1Y' && id !== '1s') assert.match(bars, new RegExp(`'${id}': \\['`), `the candle proxy serves ${id}`);
+  assert.match(PAGE, /\n    if \(tf && tf\.id === '1Y'\) \{ const r = await fetchBars\(SPTFS\.find\(\(t\) => t\.id === '1M'\)/, 'a year is built from months');
   // the year builder on hand-made months
   const yb = new Function(`${/const yearOf = [^\n]*\n[^\n]*\n[^\n]*return out; \};/.exec(PAGE)[0]}; return yearOf;`)();
   const m = (y, mo, o, h, l, c) => ({ time: Date.UTC(y, mo, 1) / 1e3, open: o, high: h, low: l, close: c, volume: 1 });
@@ -145,7 +145,7 @@ test('markets side by side (19 Nov 2026): 2 to 4 charts, each its own market and
 });
 
 test('free charts on a low timeframe keep up (19 Nov 2026): reads every 1.5-3 s, the page market moves with every live tick', () => {
-  assert.match(PAGE, /const freePoll = \(T\) => \(!T \? 15e3 : T\.sec <= 60 \? 1500 : T\.sec <= 900 \? 3000 : T\.sec <= 3600 \? 6000 : 15e3\);/);
+  assert.match(PAGE, /const freePoll = \(T\) => \(!T \? 15e3 : T\.sec <= 60 \? 1000 : T\.sec <= 900 \? 2000 : T\.sec <= 3600 \? 5000 : 15e3\);/);
   assert.match(PAGE, /if \(window\.msTickSubs\) window\.msTickSubs\.forEach\(\(f\) => \{ try \{ f\(Q\); \} catch \(e\) \{\} \}\);/);
   const ti = /const tickInto = [\s\S]*?return ch; \};/.exec(PAGE)[0];
   const f = new Function('TZ', `${ti}; return tickInto;`)(0);
@@ -153,5 +153,8 @@ test('free charts on a low timeframe keep up (19 Nov 2026): reads every 1.5-3 s,
   assert.equal(f(bars, series, 60, 0, [{ px: 12, t: 150 }, { px: 8, t: 170 }, { px: 9, t: 185 }], null), true);
   assert.deepEqual(bars, [{ time: 120, open: 10, high: 12, low: 8, close: 8 }, { time: 180, open: 9, high: 9, low: 9, close: 9 }]);
   assert.equal(f(bars, series, 2678400, 0, [{ px: 1, t: 200 }], null), false, 'a month or a year is never bucketed from ticks');
-  assert.match(PAGE, /now - SP_POLL < \(k === instKey && now - \(LT\.at \|\| 0\) < 5000 \? 15e3 : freePoll\(T\)\) - 300/, 'with live ticks the read only completes candles');
+  assert.match(PAGE, /now - SP_POLL < \(tickLive\(k\) \? \(T && T\.id === '1s' \? Infinity : 15e3\) : freePoll\(T\)\) - 300/, 'with live ticks the read only completes candles');
+  assert.match(PAGE, /new EventSource\(`\$\{MD\.base\}stream\?sym=\$\{I\.md\}`\); f\.es = es;/, 'a stream per other market a free chart shows');
+  assert.match(PAGE, /for \(const k of \[\.\.\.want\]\.slice\(0, 4\)\)/, 'at most four');
+  assert.match(PAGE, /if \(tf && tf\.id === '1s'\) \{ const r = await fetchBars\(SPTFS\.find\(\(t\) => t\.id === '5s'\), I, n\);/, 'one second starts from 5 s candles');
 });
