@@ -7704,7 +7704,9 @@ function msNextSetup(bars, A) {
         ctx.fillStyle = ln.color; ctx.beginPath(); ctx.arc(x2, Math.round(y) + 0.5, 3, 0, 7); ctx.fill();
         ctx.strokeStyle = ln.color; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x1, Math.round(y) - 3.5); ctx.lineTo(x1, Math.round(y) + 4.5); ctx.stroke();
       }
-      if (ln.text) texts.push({ pr: 3 - k / 1000, text: ln.text, x: (x1 + x2) / 2, y: ln.below ? y + 14 : y - 6, align: 'center', color: ln.color });
+      // label the middle of the part of the line on screen (a line that starts off the left edge put its word at the edge, cut)
+      const cw = ctx.canvas.width / (window.devicePixelRatio || 1), vx1 = Math.max(x1, 24), vx2 = Math.min(x2, cw - 24);
+      if (ln.text) texts.push({ pr: 3 - k / 1000, text: ln.text, x: vx2 > vx1 ? (vx1 + vx2) / 2 : (x1 + x2) / 2, y: ln.below ? y + 14 : y - 6, align: 'center', color: ln.color });
     });
     if (it.path.length > 1) {
       ctx.strokeStyle = Z.proj; ctx.lineWidth = 2; ctx.setLineDash([6, 5]); ctx.beginPath();
