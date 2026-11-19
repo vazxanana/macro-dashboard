@@ -206,3 +206,24 @@ test('Fibonacci retracement, arrow and text are drawing shapes (19 Nov 2026)', (
   assert.match(SRC, /data-txt title="Change the words">Edit text</);
   assert.doesNotMatch(PAGE, /const TOOLS = \['\.ch-pos', '\.ch-fib'/, 'the old Fibonacci button leaves the rail: the drawing tool replaces it');
 });
+
+test('channel, range, anchored VWAP, measured move and ATR band; 18 more indicators in groups (19 Nov 2026)', () => {
+  const B = require('../assets/backtest-engine.js'), X = (t) => t * 100, Y = (p) => 200 - p * 5;
+  const n = B.drawNorm([{ type: 'c', t1: 1, p1: 10, t2: 3, p2: 20, off: -4 }, { type: 'm', t1: 1, p1: 10, t2: 2, p2: 12 }, { type: 'w', t1: 1, p1: 5 }, { type: 'p', t1: 1, p1: 10, t2: 2, p2: 15 }, { type: 'b', price: 10, hw: 2 }, { type: 'b', price: 10, hw: 0 }]);
+  assert.deepEqual(n.map((d) => d.type), ['c', 'm', 'w', 'p', 'b'], 'an ATR band with no width is dropped');
+  const g = B.drawGeom(n[0], X, Y, 800, 400); assert.equal(B.drawHit(g, 200, Y(13)), 'body', 'inside the channel'); assert.equal(B.drawHit(g, 200, Y(17)), null);
+  assert.equal(B.drawResize(n[0], 'o', 2, 10).off, -5, 'the middle handle sets the width');
+  assert.deepEqual(B.measuredMove(n[3]), { t: 3, one: 20, ext: 15 + 5 * 1.618 });
+  assert.equal(B.drawHit(B.drawGeom(n[2], X, Y, 800, 400), 300, 300), null, 'anchored VWAP: only its handle is hit');
+  assert.match(SRC, /KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b'/);
+  const a = PAGE.indexOf('  const iSMA = '), b = PAGE.indexOf('  const IND_COLORS');
+  const lib = new Function('TZ', PAGE.slice(a, b) + '\nreturn { IND_DEF, IND_GROUP, IND_GROUPS };')(0);
+  let p = 100; const bars = []; for (let i = 0; i < 400; i++) { const o = p; p += Math.sin(i / 9) * 1.3 + (i % 7 - 3) * 0.2; bars.push({ time: 1.79e9 + i * 3600, open: o, high: Math.max(o, p) + 0.6, low: Math.min(o, p) - 0.6, close: p, volume: 100 + (i % 13) * 10 }); }
+  for (const k of ['hma', 'kama', 'ichi', 'chand', 'pivots', 'adx', 'willr', 'stochrsi', 'ao', 'aroon', 'fisher', 'chop', 'sqz', 'zscore', 'rexp', 'obv', 'mfi', 'cmf']) {
+    const d = lib.IND_DEF[k]; assert.ok(d, k); assert.ok(lib.IND_GROUPS.includes(lib.IND_GROUP[k]), `${k} has a group`);
+    const r = d.calc(bars, { ...d.p }); assert.ok(r.length, k); for (const s of r) assert.ok(s.v.every((v) => v == null || Number.isFinite(v)), `${k} finite`);
+    assert.ok(r.some((s) => s.v[s.v.length - 1] != null), `${k} has a value on the last candle`); }
+  for (const k of Object.keys(lib.IND_DEF)) assert.ok(lib.IND_GROUP[k], `${k} is in a group`);
+  const rsi = lib.IND_DEF.willr.calc(bars, { len: 14 })[0].v; assert.ok(rsi.every((v) => v == null || (v <= 0 && v >= -100)), 'Williams %R stays in 0..-100');
+  assert.match(PAGE, /id="ms-ind-q" placeholder="Search indicators/);
+});

@@ -1,6 +1,7 @@
 /* Drawing tools like ChronosTrade on the Desk's charts (18 Nov 2026, owner: "chart should have the same chronotrades charts
    features all of them"). Display only: a drawing never places, changes or refuses an order and moves no stop.
-   - Tools: trend line, horizontal line, horizontal ray, vertical line, box, Fibonacci retracement, arrow, text (19 Nov 2026); magnet (off / weak / strong) on the candle's
+   - Tools: trend line, horizontal line, horizontal ray, vertical line, box, Fibonacci retracement, arrow, text, parallel channel,
+     price and date range, anchored VWAP, measured move, ATR band (19 Nov 2026); magnet (off / weak / strong) on the candle's
      open / high / low / close; select, move, resize by handles; a style bar (5 colours, width, dashed, extend, label, lock,
      clone, delete; a text's words and size); Alt+T / H / J / V / R / F / A / X / M; a double-click edits a text; Delete removes the selected drawing, Esc lets go.
    - Every chart the page registers (window.msCharts) of the same market shows the same drawings: draw on one, see it on all.
@@ -55,7 +56,26 @@
     const list = L.map((d, i) => [d, i]); if (DRAFT && DRAFT.mk === mk) list.push([DRAFT.d, -1]);
     for (const [d, i] of list) { const g = geo(cx, d); if (!g) continue; const sel = SEL && SEL.mk === mk && SEL.i === i, hov = HOV && HOV.mk === mk && HOV.i === i, col = colOf(d);
       x.strokeStyle = col; x.lineWidth = (d.w || 1) + (hov && !sel ? 0.5 : 0); x.setLineDash(d.ls === 'dash' ? [6, 4] : []);
-      if (g.type === 'x') { x.setLineDash([]); x.font = `600 ${g.fs}px Figtree, system-ui, sans-serif`; x.fillStyle = col; x.textBaseline = 'alphabetic'; x.fillText(d.text, g.x1 + 4, g.y1 - 5);
+      if (g.type === 'c') { const ex = g.xe != null ? g.xe : g.x2, ey = g.ye != null ? g.ye : g.y2, eyo = g.yeo != null ? g.yeo : g.y2o;
+        x.fillStyle = col + '18'; x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(ex, ey); x.lineTo(ex, eyo); x.lineTo(g.x1, g.y1o); x.closePath(); x.fill();
+        x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(ex, ey); x.moveTo(g.x1, g.y1o); x.lineTo(ex, eyo); x.stroke();
+        x.setLineDash([4, 4]); x.lineWidth = 1; x.beginPath(); x.moveTo(g.x1, (g.y1 + g.y1o) / 2); x.lineTo(ex, (ey + eyo) / 2); x.stroke(); }
+      else if (g.type === 'm') { const rx = Math.min(g.x1, g.x2), ry = Math.min(g.y1, g.y2), rw = Math.abs(g.x2 - g.x1), rh = Math.abs(g.y2 - g.y1), up = d.p2 >= d.p1, mc = css(up ? '--buy' : '--sell') || col;
+        x.fillStyle = mc + '22'; x.fillRect(rx, ry, rw, rh); x.strokeStyle = mc; x.lineWidth = 1; x.beginPath(); x.moveTo(g.x2, g.y1); x.lineTo(g.x2, g.y2); x.moveTo(g.x1, g.y2); x.lineTo(g.x2, g.y2); x.stroke();
+        const v = view(cx), dd = toChart(d, cx.TZ), nb = BT().barsBetween(v.bars, v.n, v.sec, dd.t1, dd.t2), span = Math.abs(d.t2 - d.t1), dur = span >= 86400 ? `${(span / 86400).toFixed(1)} d` : span >= 3600 ? `${Math.floor(span / 3600)} h ${Math.round(span % 3600 / 60)} m` : `${Math.round(span / 60)} m`;
+        const s = `${BT().drawInfo(d, nb, null, cx.dec())} · ${dur}`; x.font = '600 12px Figtree, system-ui, sans-serif'; const tw = x.measureText(s).width + 10, lx = rx + rw / 2 - tw / 2, ly = up ? ry - 6 : ry + rh + 20;
+        x.fillStyle = mc; x.fillRect(lx, ly - 14, tw, 18); x.fillStyle = '#fff'; x.fillText(s, lx + 5, ly); }
+      else if (g.type === 'w') { const B = cx.bars() || [], t0 = d.t1 + cx.TZ; let i0 = B.findIndex((b) => b.time >= t0); if (i0 >= 0) { let pv = 0, vv = 0, last = null; x.beginPath();
+          for (let i = i0; i < B.length; i++) { const b = B[i], w2 = b.volume > 0 ? b.volume : 1; pv += (b.high + b.low + b.close) / 3 * w2; vv += w2; const xx = l2x(cx, i), yy = Y(cx, pv / vv); if (xx == null || yy == null) continue; if (last) x.lineTo(xx, yy); else x.moveTo(xx, yy); last = [xx, yy, pv / vv]; }
+          x.lineWidth = (d.w || 1) + 0.5; x.stroke(); if (last) { x.font = '600 12px Figtree, system-ui, sans-serif'; x.fillStyle = col; x.fillText(`AVWAP ${cx.fmt(last[2])}`, Math.min(last[0] + 6, W - 110), last[1] - 6); } }
+        x.beginPath(); x.arc(g.x1, g.y1, 3, 0, Math.PI * 2); x.fillStyle = col; x.fill(); }
+      else if (g.type === 'p') { const mm = BT().measuredMove(d), xc = X(cx, mm.t + cx.TZ), y1c = Y(cx, mm.one), y2c = Y(cx, mm.ext); x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.x2, g.y2); x.stroke();
+        if (xc != null && y1c != null) { x.setLineDash([5, 4]); x.beginPath(); x.moveTo(g.x2, g.y2); x.lineTo(xc, y1c); x.stroke(); x.setLineDash([]); x.font = '600 12px Figtree, system-ui, sans-serif';
+          for (const [yy, pr, nm] of [[y1c, mm.one, '1:1'], [y2c, mm.ext, '1.618']]) { if (yy == null) continue; x.lineWidth = 1; x.beginPath(); x.moveTo(xc - 30, yy); x.lineTo(xc + 30, yy); x.stroke(); x.fillStyle = col; x.fillText(`${nm} ${cx.fmt(pr)}`, xc + 34, yy + 4); } } }
+      else if (g.type === 'b') { x.fillStyle = col + '18'; x.fillRect(0, Math.min(g.yt, g.yb), W, Math.abs(g.yb - g.yt)); x.beginPath(); x.moveTo(0, g.y1); x.lineTo(W, g.y1); x.stroke();
+        x.setLineDash([4, 4]); x.lineWidth = 1; x.beginPath(); x.moveTo(0, g.yt); x.lineTo(W, g.yt); x.moveTo(0, g.yb); x.lineTo(W, g.yb); x.stroke(); x.setLineDash([]);
+        x.font = '600 12px Figtree, system-ui, sans-serif'; x.fillStyle = col; x.fillText(`+1 ATR ${cx.fmt(d.price + d.hw)}`, 8, g.yt - 4); x.fillText(`−1 ATR ${cx.fmt(d.price - d.hw)}`, 8, g.yb + 14); x.fillText(`ATR ${cx.fmt(d.hw)}`, 8, g.y1 - 4); }
+      else if (g.type === 'x') { x.setLineDash([]); x.font = `600 ${g.fs}px Figtree, system-ui, sans-serif`; x.fillStyle = col; x.textBaseline = 'alphabetic'; x.fillText(d.text, g.x1 + 4, g.y1 - 5);
         if (sel || hov) { x.lineWidth = 1; x.strokeRect(g.x1 + 0.5, g.y2 + 0.5, g.x2 - g.x1, g.y1 - g.y2); } }
       else if (g.type === 'f') { const lw = x.lineWidth; x.font = '600 12px Figtree, system-ui, sans-serif';
         for (let k = 0; k + 1 < g.lv.length; k++) { x.globalAlpha = k % 2 ? 0.07 : 0.12; x.fillStyle = col; x.fillRect(g.fx1, Math.min(g.lv[k][1], g.lv[k + 1][1]), g.fx2 - g.fx1, Math.abs(g.lv[k + 1][1] - g.lv[k][1])); }
@@ -91,11 +111,17 @@
   // ---- gestures ----
   function place(cx, a) { const mk = mkOf(cx); if (TOOL === 'h') return commit(mk, { type: 'h', price: a.p });
     if (TOOL === 'hr') return commit(mk, { type: 'hr', t1: a.t - cx.TZ, p1: a.p }); if (TOOL === 'v') return commit(mk, { type: 'v', t1: a.t - cx.TZ });
+    if (TOOL === 'w') return commit(mk, { type: 'w', t1: a.t - cx.TZ, p1: a.p });
+    if (TOOL === 'b') { const hw = atrOf(cx); if (!(hw > 0)) { note('Not enough candles for an ATR yet.'); return; } return commit(mk, { type: 'b', price: a.p, hw }); }
     if (TOOL === 'x') { const t1 = a.t - cx.TZ, p1 = a.p; setTool(null); askText('').then((s) => { if (s) commit(mk, { type: 'x', t1, p1, text: s }); }); return; }
     DRAFT = { mk, d: { type: TOOL, t1: a.t - cx.TZ, p1: a.p, t2: a.t - cx.TZ, p2: a.p }, cx }; }
+  // ATR(14) of the chart's closed candles (Wilder): the ATR band's half width, and the parallel channel's first width
+  function atrOf(cx) { const B = cx.bars() || [], n = 14; if (B.length < n + 2) return null; let a = null;
+    for (let i = 1; i < B.length - 1; i++) { const b = B[i], tr = Math.max(b.high - b.low, Math.abs(b.high - B[i - 1].close), Math.abs(b.low - B[i - 1].close)); a = a == null ? tr : i <= n ? a + (tr - a) / i : (a * (n - 1) + tr) / n; } return a; }
   async function askText(v) { const s = window.msAsk ? await window.msAsk('Text on the chart', v, { title: v ? 'Edit text' : 'Add text', ok: v ? 'Save' : 'Add', max: 120 }) : prompt('Text on the chart', v);
     return s == null ? null : BT().drawNorm([{ type: 'x', t1: 0, p1: 0, text: s }]).map((o) => o.text)[0] || null; }
-  function commit(mk, d) { const L = load(mk), at = Math.floor(Date.now() / 1000); L.push(Object.assign(d, { at })); save(mk); SEL = { mk, i: L.length - 1 }; SELC = LASTCX; DRAFT = null; setTool(null); paintAll(); bar(); }
+  function commit(mk, d) { if (d.type === 'c' && !d.off) { const cx = LASTCX, w2 = cx && atrOf(cx); d.off = w2 > 0 ? -2 * w2 : -(Math.abs(d.p2 - d.p1) || 1) / 2; }
+    const L = load(mk), at = Math.floor(Date.now() / 1000); L.push(Object.assign(d, { at })); save(mk); SEL = { mk, i: L.length - 1 }; SELC = LASTCX; DRAFT = null; setTool(null); paintAll(); bar(); }
   function lock(cx, on) { try { cx.chart.applyOptions({ handleScroll: !on, handleScale: !on }); } catch (e) {} }
   let LASTCX = null;
   function down(cx, ev) { LASTCX = cx; if (!BT() || ev.button === 2 || ev.shiftKey || !cx.visible()) return; const a = pt(cx, ev); if (a.t == null || a.p == null) return;
@@ -121,8 +147,10 @@
 
   // ---- the strip of tools (in the charts toolbar) and the style bar ----
   const ICON = { '': '<path d="M6 3l12 9-5.5 1.2L10 19z"/>', t: '<path d="M4.5 18.5L19.5 5.5"/><circle cx="4.5" cy="18.5" r="1.6"/><circle cx="19.5" cy="5.5" r="1.6"/>', h: '<path d="M3 12h18"/>', hr: '<path d="M6 12h15"/><circle cx="5" cy="12" r="1.8"/>', v: '<path d="M12 3v18"/>', r: '<rect x="4" y="6" width="16" height="12" rx="1"/>', mag: '<path d="M6 4v7a6 6 0 0 0 12 0V4"/><path d="M6 8h3M15 8h3"/>',
-    f: '<path d="M3 5h18M3 10h18M3 14h18M3 19h18"/><path d="M5 19L19 5" stroke-dasharray="2 2"/>', a: '<path d="M5 19L18 6"/><path d="M11 6h7v7"/>', x: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>' };
-  const NAME = { '': 'Cursor (Esc)', t: 'Trend line (Alt+T)', h: 'Horizontal line (Alt+H)', hr: 'Horizontal ray (Alt+J)', v: 'Vertical line (Alt+V)', r: 'Box (Alt+R)', f: 'Fibonacci retracement (Alt+F)', a: 'Arrow (Alt+A)', x: 'Text (Alt+X)' };
+    f: '<path d="M3 5h18M3 10h18M3 14h18M3 19h18"/><path d="M5 19L19 5" stroke-dasharray="2 2"/>', a: '<path d="M5 19L18 6"/><path d="M11 6h7v7"/>', x: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>',
+    c: '<path d="M3 15L15 5M9 19L21 9"/>', m: '<rect x="4" y="5" width="16" height="14" rx="1"/><path d="M12 8v8M9 13l3 3 3-3"/>', w: '<path d="M4 18c4-1 5-8 9-9s5 3 7 1"/><circle cx="4" cy="18" r="1.8"/>',
+    p: '<path d="M4 18L11 9M11 9l7 4" /><path d="M14 5h6M14 9h6" stroke-dasharray="2 2"/>', b: '<path d="M3 12h18"/><path d="M3 7h18M3 17h18" stroke-dasharray="3 3"/>' };
+  const NAME = { '': 'Cursor (Esc)', t: 'Trend line (Alt+T)', h: 'Horizontal line (Alt+H)', hr: 'Horizontal ray (Alt+J)', v: 'Vertical line (Alt+V)', r: 'Box (Alt+R)', f: 'Fibonacci retracement (Alt+F)', a: 'Arrow (Alt+A)', x: 'Text (Alt+X)', c: 'Parallel channel (Alt+C)', m: 'Price and date range (Alt+G)', w: 'Anchored VWAP (Alt+W)', p: 'Measured move: 1:1 and 1.618 targets (Alt+P)', b: 'ATR band: the typical move around a price (Alt+B)' };
   const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
   function strip() { const host = document.getElementById('ms-dr-bar'); if (!host || host.dataset.done) return; host.dataset.done = '1';
     host.innerHTML = Object.keys(NAME).map((k) => `<button type="button" data-dt="${k}" aria-pressed="${k === ''}" title="${NAME[k]}" aria-label="${NAME[k].replace(/ \(.*/, '')}">${svg(k)}</button>`).join('') + `<button type="button" class="dr-mag" data-mag aria-pressed="false" title="Magnet: off (Alt+M)" aria-label="Magnet">${svg('mag')}<small></small></button>`;
@@ -139,7 +167,7 @@
     const on = (b) => (b ? ' aria-pressed="true"' : ' aria-pressed="false"');
     el.innerHTML = CHIP.map((c) => `<button type="button" class="dc" data-col="${c}" title="Colour"${on((d.col || 'draw') === c)} style="--c:${COLS[c].startsWith('--') ? `var(${COLS[c]})` : COLS[c]}"><i></i></button>`).join('')
       + `<span class="sep"></span>` + [1, 2, 3].map((w) => d.type === 'x' ? `<button type="button" data-w="${w}" title="Text size"${on((d.w || 1) === w)}>${['S', 'M', 'L'][w - 1]}</button>` : `<button type="button" data-w="${w}" title="Width ${w}"${on((d.w || 1) === w)}>${w}px</button>`).join('')
-      + `<button type="button" data-ls title="Dashed"${on(d.ls === 'dash')}>- -</button>` + (d.type === 't' || d.type === 'f' ? `<button type="button" data-ext title="Extend to the right"${on(d.ext)}>→</button>` : '')
+      + `<button type="button" data-ls title="Dashed"${on(d.ls === 'dash')}>- -</button>` + (['t', 'f', 'c'].includes(d.type) ? `<button type="button" data-ext title="Extend to the right"${on(d.ext)}>→</button>` : '')
       + (d.type === 'x' ? `<button type="button" data-txt title="Change the words">Edit text</button>` : '')
       + (d.type === 't' || d.type === 'r' ? `<button type="button" data-lbl title="Label: price change, %, bars"${on(d.lbl)}>Label</button>` : '')
       + (['h', 'hr', 't'].includes(d.type) ? `<span class="sep"></span><button type="button" data-alert title="Tell me when price crosses this line (while this page is open)"${on(d.alert)}>${d.alert ? 'Alert on' : 'Alert'}</button>` : '')
@@ -183,7 +211,7 @@
 
   // ---- keys ----
   document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '') || document.querySelector('dialog[open]') || !CX.some((c) => c.visible())) return;
-    if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
+    if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x', KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
     if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES && SEL) { const L = load(SEL.mk); if (GES.d0) L[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
     if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); } });
   addEventListener('scroll', () => { if (SEL) bar(); }, { passive: true });
