@@ -41,7 +41,7 @@
 <script src="/assets/ms-draw.js?v=871e4372d8" defer></script>
 <script src="/assets/ms-paper.js?v=1ddae9c0e4" defer></script>
 <script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
-<script src="/assets/ms-charts-guide.js?v=572e45cf5c" defer></script>
+<script src="/assets/ms-charts-guide.js?v=203903a17c" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -2839,14 +2839,58 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
 <style id="ms-cfs-css">/* Full screen on the Charts (18 Nov 2026, owner: "when I go fullscreen on charts should be the full layout and split if I had"):
          the whole view goes full screen; the charts share the height that is left, in whatever view is on (All, Split, Layout, one chart) */
       #v-charts:fullscreen { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
-      #v-charts:fullscreen > :not(.sec-h):not(.ms-grid4):not(#ms-sp-bar):not(#ms-pp) { display: none !important; }
+      #v-charts:fullscreen > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav) { display: none !important; }
+      #v-charts:fullscreen > .ch-row { flex: 1 1 0; min-height: 0; } #v-charts:fullscreen .ch-col { display: flex; flex-direction: column; min-height: 0; } #v-charts:fullscreen .ch-col > .mm { display: none !important; }
       #v-charts:fullscreen > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
       #v-charts:fullscreen > #ms-pp { margin: 0; padding: 6px 10px; } #v-charts:fullscreen > #ms-pp .pp-ttl small { display: none; }
-      #v-charts:fullscreen > .ms-grid4 { flex: 1 1 0; min-height: 0; grid-auto-rows: minmax(0, 1fr); align-content: stretch; gap: 8px; }
-      #v-charts:fullscreen > .ms-grid4 .ms-pane { min-height: 0; height: 100%; }
-      #v-charts:fullscreen > .ms-grid4 .ms-chart { height: calc(100% - var(--ms-ph-h, 46px)) !important; min-height: 0 !important; }
-      #v-charts:fullscreen > .ms-grid4 .ms-ro { display: none !important; }
-      #v-charts:fullscreen > .ms-grid4[data-view="all"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } #v-charts:fullscreen > .ms-grid4[data-view="all"] .ms-pane { grid-column: auto !important; }   /* six charts: three by two */
+      #v-charts:fullscreen .ms-grid4 { flex: 1 1 0; min-height: 0; grid-auto-rows: minmax(0, 1fr); align-content: stretch; gap: 8px; }
+      #v-charts:fullscreen .ms-grid4 .ms-pane { min-height: 0; height: 100%; }
+      #v-charts:fullscreen .ms-grid4 .ms-chart { height: calc(100% - var(--ms-ph-h, 46px)) !important; min-height: 0 !important; }
+      #v-charts:fullscreen .ms-grid4 .ms-ro { display: none !important; }
+      #v-charts:fullscreen .ms-grid4[data-view="all"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } #v-charts:fullscreen .ms-grid4[data-view="all"] .ms-pane { grid-column: auto !important; }   /* six charts: three by two */
+      </style>
+<style id="ms-rail-css">/* The drawing rail on the left and the floating favourites bar (19 Nov 2026, owner: "the drawing bar in the left … favorite and
+         have it floated like tradingview"); wider than 640 px only, a phone keeps its "Draw" button */
+      #v-charts .ch-row { display: block; min-width: 0; } #v-charts .ch-col { min-width: 0; }
+      #v-charts.has-rail .ch-row { display: flex; gap: 8px; align-items: stretch; }
+      #v-charts.has-rail .ch-col { flex: 1 1 auto; }
+      .ch-rail { display: none; }
+      #v-charts.has-rail .ch-rail { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 44px; box-sizing: border-box; padding: 4px; align-self: flex-start;
+        position: sticky; top: calc(var(--ms-hdr-h, 64px) + 8px); max-height: calc(100vh - var(--ms-hdr-h, 64px) - 24px); overflow-y: auto; scrollbar-width: none;
+        border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); }
+      #v-charts.has-rail .ch-rail::-webkit-scrollbar { display: none; }
+      #v-charts:fullscreen.has-rail .ch-rail { position: static; max-height: 100%; }
+      .ch-rail :is(.dr-bar, .ch-one) { display: flex !important; flex-direction: column; align-items: center; gap: 2px; padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+      .ch-rail .ch-one { border-top: 1px solid var(--au-line, var(--line)) !important; padding-top: 4px !important; margin-top: 2px; width: 100%; }
+      .ch-rail .ch-one .ch-one-tf { padding: 2px 0 4px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); text-align: center; }
+      .ch-rail :is(.dr-bar button, .ch-one .ch-b) { position: relative; width: 34px; height: 34px; min-width: 0; margin: 0; border-radius: 8px; flex: none; }
+      .ch-rail :is(.dr-bar, .ch-one) :is(button, .ch-b):is([aria-pressed="true"], .on) { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 2px 0 0 var(--au-accent, var(--accent)); }
+      .ch-rail .rl-star { position: absolute; right: -1px; top: -1px; width: 13px; height: 13px; display: none; border-radius: 50%; cursor: pointer;
+        background: var(--au-surface, var(--panel)); -webkit-mask: none; }
+      .ch-rail .rl-star::before { content: ""; position: absolute; inset: 1px; background: var(--au-ink-3, var(--ink-faint));
+        clip-path: polygon(50% 0, 63% 35%, 100% 38%, 71% 61%, 80% 100%, 50% 78%, 20% 100%, 29% 61%, 0 38%, 37% 35%); }
+      .ch-rail .rl-star.on::before { background: var(--au-warn, #d7a03b); }
+      .ch-rail :is(button, .ch-b):hover > .rl-star, .ch-rail .rl-star.on { display: block; }
+      .ch-rail .rl-fav { width: 34px; height: 34px; margin-top: 4px; display: grid; place-items: center; border: 0; border-top: 1px solid var(--au-line, var(--line)); border-radius: 0; background: none; color: var(--au-ink-3, var(--ink-faint)); cursor: pointer; padding: 0; }
+      .ch-rail .rl-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+      .ch-rail .rl-fav[aria-pressed="true"] { color: var(--au-warn, #d7a03b); } .ch-rail .rl-fav[aria-pressed="true"] svg { fill: currentColor; }
+      .ch-rail .rl-fav:hover { color: var(--au-ink, var(--ink)); }
+      #v-charts.has-rail .sec-h > .ch-tools-tog { display: none !important; }
+      #v-charts.has-rail .sec-h > .ch-help.ch-help { order: 4; margin-left: auto; width: 38px; padding: 0; justify-content: center; }
+      @media (min-width: 1440px) { #v-charts.has-rail .sec-h > #ms-sty.sty { margin-left: 0; } }
+      #v-charts.has-rail .sec-h > .ch-help .t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      .ms-fav { position: fixed; z-index: 58; display: flex; align-items: center; gap: 2px; padding: 3px 4px 3px 2px; border: 1px solid var(--au-line, var(--line)); border-radius: 10px;
+        background: var(--au-surface, var(--panel)); box-shadow: 0 8px 24px rgba(0,0,0,.28); touch-action: none; }
+      .ms-fav[hidden] { display: none; } .ms-fav.drag { box-shadow: 0 12px 32px rgba(0,0,0,.38); }
+      .ms-fav .fv-grip { width: 12px; align-self: stretch; cursor: grab; border-radius: 6px; margin-right: 2px;
+        background-image: radial-gradient(circle, var(--au-ink-3, var(--ink-faint)) 1.1px, transparent 1.3px); background-size: 5px 5px; background-position: center; }
+      .ms-fav.drag .fv-grip { cursor: grabbing; }
+      .ms-fav button { position: relative; width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--au-ink-2, var(--ink-dim)); cursor: pointer; padding: 0; }
+      .ms-fav button:hover { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); }
+      .ms-fav button[aria-pressed="true"] { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
+      .ms-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+      .ms-fav small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--au-accent, var(--accent)); } .ms-fav small:empty { display: none; }
+      @media (pointer: coarse) { #v-charts.has-rail .ch-rail { width: 52px; } .ch-rail :is(.dr-bar button, .ch-one .ch-b), .ch-rail .rl-fav, .ms-fav button { width: 44px; height: 44px; } .ms-fav .fv-grip { width: 20px; } }
       </style>
 <style id="ms-pp-css">/* The paper trading account on the Charts (18 Nov 2026, assets/ms-paper.js): one bar above the charts, stats and history behind a button */
   html[data-role="public"] #ms-pp, html[data-role="public"] #hs-pp, html[data-deny~="charts"] #hs-pp { display: none !important; }
@@ -6373,7 +6417,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="adr" id="ms-adr" role="status" aria-label="Daily range" hidden></div>
       <div class="mtf" id="ms-mtf" role="group" aria-label="Timeframe alignment: last structure break per timeframe" hidden></div>
             <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
-                              <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
+                                    <div class="sty" id="ms-sty"><button type="button" class="sty-btn" id="ms-sty-btn" aria-expanded="false" aria-controls="ms-sty-pop" title="Chart type, colours and a clean look">Style <small id="ms-sty-now">Candles</small></button>
       <div class="sty-pop" id="ms-sty-pop" role="dialog" aria-label="Chart style" hidden>
         <div class="sty-h">Markup</div>
         <div class="sty-seg seg mk-mode mk-in-sty" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian" aria-pressed="true">Meridian</button><button type="button" data-mk="ict" aria-pressed="false">ICT</button><button type="button" data-mk="clean" aria-pressed="false">Clean</button></div>
@@ -10473,6 +10517,78 @@ function msNextSetup(bars, A) {
       tg.addEventListener('click', () => { const on = !VCH0.hasAttribute('data-tools'); VCH0.toggleAttribute('data-tools', on); tg.setAttribute('aria-expanded', String(on)); });
       bar.insertAdjacentElement('afterend', tg); }
     window.msChartOne = () => ({ built, tools: [...bar.querySelectorAll('[data-t]')].map((b) => b.dataset.t), active: (active() && active().querySelector('.ms-ph b') || {}).textContent || null, multi: shown().length });
+  }
+  // ─── Drawing rail on the left and a floating favourites bar (19 Nov 2026, owner: "the drawing bar in the left and we also should be
+  //     able to choose favorite and have it floated like tradingview"). Wider than 640 px the drawing tools and the chart tools leave the
+  //     toolbar for a column at the charts' left edge; a phone keeps them behind "Draw". A star on a tool (hover, or right-click / long
+  //     press) adds it to the favourites bar, which floats over the page and is dragged by its grip. Display only: the bar's buttons
+  //     press the rail's own buttons, so no tool works differently. localStorage ms-dr-fav { tools, on, x, y } (this device).
+  { const VC = document.getElementById('v-charts'), G4 = VC && VC.querySelector('.ms-grid4'), DB = document.getElementById('ms-dr-bar'), CO = document.getElementById('ms-ch-one');
+    const FK = 'ms-dr-fav', rd = () => { try { const o = JSON.parse(localStorage.getItem(FK) || '{}'); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; } };
+    let F = rd(); if (!Array.isArray(F.tools)) F.tools = []; F.tools = F.tools.filter((k) => typeof k === 'string').slice(0, 20); if (F.on == null) F.on = true;
+    const wr = () => { try { localStorage.setItem(FK, JSON.stringify(F)); } catch (e) {} };
+    if (VC && G4 && DB && CO) {
+      const ph = { db: document.createComment('dr-bar'), co: document.createComment('ch-one') }; DB.before(ph.db); CO.before(ph.co);
+      const row = document.createElement('div'); row.className = 'ch-row'; const rail = document.createElement('div'); rail.className = 'ch-rail'; rail.id = 'ms-rail';
+      rail.setAttribute('role', 'toolbar'); rail.setAttribute('aria-orientation', 'vertical'); rail.setAttribute('aria-label', 'Drawing and chart tools');
+      const col = document.createElement('div'); col.className = 'ch-col'; G4.before(row); row.append(rail, col); col.appendChild(G4);
+      const favBtn = document.createElement('button'); favBtn.type = 'button'; favBtn.className = 'rl-fav'; favBtn.id = 'ms-rail-fav';
+      favBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>';
+      // the tool a button stands for: a drawing tool, the magnet, or a chart tool of the one-chart bar
+      const keyOf = (b) => b.hasAttribute('data-mag') ? 'mag' : b.hasAttribute('data-dt') ? 'dt:' + b.dataset.dt : b.dataset.t ? 'ct:' + b.dataset.t : null;
+      const btnOf = (k) => k === 'mag' ? DB.querySelector('[data-mag]') : k.startsWith('dt:') ? DB.querySelector(`[data-dt="${k.slice(3)}"]`) : CO.querySelector(`[data-t="${k.slice(3)}"]`);
+      const nameOf = (b) => (b.getAttribute('aria-label') || b.title || '').replace(/ \(.*/, '');
+      const wide = window.matchMedia('(min-width: 641px)');
+      function place() { if (wide.matches) { if (DB.parentNode !== rail) { rail.prepend(DB); DB.after(CO); rail.appendChild(favBtn); } VC.classList.add('has-rail'); }
+        else { if (DB.parentNode === rail) { ph.db.after(DB); ph.co.after(CO); favBtn.remove(); } VC.classList.remove('has-rail'); } stars(); fav(); }
+      // a star on every tool of the rail (a span inside the button; the capture listener below keeps its click from pressing the tool)
+      function stars() { rail.querySelectorAll('.dr-bar button, .ch-one [data-t]').forEach((b) => { const k = keyOf(b); if (!k) return;
+          let s = b.querySelector(':scope > .rl-star'); if (!s) { s = document.createElement('span'); s.className = 'rl-star'; s.setAttribute('aria-hidden', 'true'); b.appendChild(s); }
+          const on = F.tools.includes(k); if (s.classList.contains('on') !== on) s.classList.toggle('on', on); if (b.classList.contains('is-fav') !== on) b.classList.toggle('is-fav', on); });
+        const n = F.tools.length;
+        favBtn.title = n ? (F.on ? 'Hide the favourites bar' : 'Show the favourites bar') + ` (${n} tool${n > 1 ? 's' : ''})` : 'Favourites: hover a tool and tap its star (or right-click it) to add it';
+        favBtn.setAttribute('aria-label', n ? (F.on ? 'Hide the favourites bar' : 'Show the favourites bar') : 'Favourites bar: no favourites yet');
+        const pr = String(!!(n && F.on)); if (favBtn.getAttribute('aria-pressed') !== pr) favBtn.setAttribute('aria-pressed', pr); }
+      function toggleFav(k) { if (!k) return; const i = F.tools.indexOf(k); if (i >= 0) F.tools.splice(i, 1); else { F.tools.push(k); F.on = true; } wr(); stars(); fav(); }
+      rail.addEventListener('click', (e) => { const s = e.target.closest && e.target.closest('.rl-star'); if (!s) return; e.preventDefault(); e.stopPropagation(); toggleFav(keyOf(s.closest('button, a'))); }, true);
+      rail.addEventListener('contextmenu', (e) => { const b = e.target.closest && e.target.closest('.dr-bar button, .ch-one [data-t]'); if (!b) return; e.preventDefault(); toggleFav(keyOf(b)); });
+      favBtn.addEventListener('click', () => { if (!F.tools.length) { const n = document.getElementById('ms-dr-note'); if (n) { n.textContent = 'Hover a tool on the left and tap its star (or right-click it) to add it to your favourites.'; setTimeout(() => { if (n.textContent.startsWith('Hover a tool')) n.textContent = ''; }, 5000); } return; }
+        F.on = !F.on; wr(); stars(); fav(); });
+      // the floating favourites bar
+      const FB = document.createElement('div'); FB.className = 'ms-fav'; FB.id = 'ms-dr-fav'; FB.setAttribute('role', 'toolbar'); FB.setAttribute('aria-label', 'Favourite drawing tools'); FB.hidden = true;
+      VC.appendChild(FB);
+      const clamp = () => { const r = FB.getBoundingClientRect(), W = window.innerWidth, H = window.innerHeight;
+        let x = Number.isFinite(F.x) ? F.x : Math.max(12, W / 2 - r.width / 2), y = Number.isFinite(F.y) ? F.y : 90;
+        x = Math.min(Math.max(4, x), Math.max(4, W - r.width - 4)); y = Math.min(Math.max(4, y), Math.max(4, H - r.height - 4)); FB.style.left = x + 'px'; FB.style.top = y + 'px'; };
+      function fav() { const show = wide.matches && F.on && F.tools.length > 0 && !VC.hidden; FB.hidden = !show; if (!show) return;
+        const ks = F.tools.filter((k) => btnOf(k)), sig = ks.join('|');
+        if (FB.dataset.sig !== sig) { FB.dataset.sig = sig;
+          FB.innerHTML = '<span class="fv-grip" title="Drag to move" aria-hidden="true"></span>' + ks.map((k) => { const b = btnOf(k), sv = b.querySelector('svg');
+            const cls = k.startsWith('ct:') ? ` class="ch-b ${k.slice(4)}"` : '';   // a chart tool's icon is drawn by its own class (.ch-b::before)
+            return `<button type="button"${cls} data-fk="${k.replace(/"/g, '&quot;')}" title="${nameOf(b).replace(/"/g, '&quot;')}" aria-label="${nameOf(b).replace(/"/g, '&quot;')}">${sv ? sv.outerHTML : ''}${k === 'mag' ? '<small></small>' : ''}</button>`; }).join(''); }
+        mirror(); clamp(); }
+      function mirror() { if (FB.hidden) return; FB.querySelectorAll('[data-fk]').forEach((f) => { const b = btnOf(f.dataset.fk); if (!b) return;
+        const on = String(b.getAttribute('aria-pressed') === 'true' || b.classList.contains('on')); if (f.getAttribute('aria-pressed') !== on) f.setAttribute('aria-pressed', on);
+        if (f.dataset.fk === 'mag') { const s = b.querySelector('small'), t = f.querySelector('small'); if (s && t && t.textContent !== s.textContent) t.textContent = s.textContent; if (f.title !== b.title) f.title = b.title; } }); }
+      FB.addEventListener('click', (e) => { const f = e.target.closest('[data-fk]'); if (!f) return; const b = btnOf(f.dataset.fk); if (b) { b.click(); requestAnimationFrame(mirror); } });
+      FB.addEventListener('contextmenu', (e) => { const f = e.target.closest('[data-fk]'); if (!f) return; e.preventDefault(); toggleFav(f.dataset.fk); });
+      { let d = null; const g = (e) => e.target.closest && e.target.closest('.fv-grip');
+        FB.addEventListener('pointerdown', (e) => { if (!g(e)) return; e.preventDefault(); const r = FB.getBoundingClientRect(); d = { dx: e.clientX - r.left, dy: e.clientY - r.top }; FB.setPointerCapture(e.pointerId); FB.classList.add('drag'); });
+        FB.addEventListener('pointermove', (e) => { if (!d) return; F.x = e.clientX - d.dx; F.y = e.clientY - d.dy; clamp(); });
+        const end = () => { if (!d) return; d = null; FB.classList.remove('drag'); const r = FB.getBoundingClientRect(); F.x = r.left; F.y = r.top; wr(); };
+        FB.addEventListener('pointerup', end); FB.addEventListener('pointercancel', end); }
+      let raf = 0; const soon = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; stars(); fav(); }); };
+      if (window.MutationObserver) { new MutationObserver((ms) => { if (ms.every((m) => m.target.classList && (m.target.classList.contains('rl-star') || m.target === favBtn) || [...(m.addedNodes || [])].every((x) => x.classList && x.classList.contains('rl-star')) && m.type === 'childList' && m.addedNodes.length)) return; soon(); })
+          .observe(rail, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-pressed', 'class'] });
+        new MutationObserver(fav).observe(VC, { attributes: true, attributeFilter: ['hidden'] }); }
+      // a fullscreen Charts view keeps the bar inside it (it is a child of #v-charts); a resize keeps it on the screen
+      window.addEventListener('resize', () => { if (!FB.hidden) clamp(); });
+      if (wide.addEventListener) wide.addEventListener('change', place); else if (wide.addListener) wide.addListener(place);
+      place();
+      window.msRail = () => ({ inRail: DB.parentNode === rail, favs: F.tools.slice(), on: !!F.on, bar: !FB.hidden, at: FB.hidden ? null : { x: parseFloat(FB.style.left), y: parseFloat(FB.style.top) },
+        tools: [...rail.querySelectorAll('.dr-bar button, .ch-one [data-t]')].map(keyOf).filter(Boolean) });
+      window.msRailFav = toggleFav;
+    }
   }
 
   // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
