@@ -23,3 +23,18 @@ test('every "Show me" points at a part of the page that exists, and every text i
   for (const m of SRC.matchAll(/(\d+(?:\.\d+)?)px\/?[\d.]*\s+var\(--(?:sans|mono)/g)) assert.ok(+m[1] >= 12, m[0]);
   for (const m of SRC.matchAll(/font-size:\s*(\d+)px/g)) assert.ok(+m[1] >= 12, m[0]);
 });
+
+test('the guide styles none of the page\'s own classes (19 Nov 2026: ".chg" turned every chart legend\'s change figure into a box over the chart)', () => {
+  const css = SRC.slice(SRC.indexOf('const css = `'), SRC.indexOf('`;', SRC.indexOf('const css = `')));
+  const used = new Set([...css.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((m) => m[1]));
+  const own = new Set(['ch-help', 'q', 'new', 'n', 'seen', 'st', 'sp', 'lead', 'pri', 'on']);
+  for (const c of used) {
+    if (own.has(c) || /^chg-|^ms-chgd$/.test(c)) continue;
+    assert.fail(`the guide styles .${c}, a class it does not own`);
+  }
+  for (const m of css.matchAll(/(^|\n)\s*([^@{}\n][^{}\n]*)\{/g)) {
+    const sel = m[2].trim();
+    for (const part of sel.split(',')) assert.match(part.trim(), /(\.ch-help|dialog\.ms-chgd|\.chg-|^html\[data-role="public"\] \.ch-help)/, part);
+  }
+  assert.match(PAGE, /class="dn chg"|b\.chg|\$\{cl\} chg/);
+});

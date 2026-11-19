@@ -80,8 +80,8 @@
 .ch-help .q { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; font: 700 12px/1 var(--sans, system-ui); }
 .ch-help.new::after { content: ""; position: absolute; top: 5px; right: 5px; width: 7px; height: 7px; border-radius: 50%; background: var(--au-accent, var(--accent)); }
 html[data-role="public"] .ch-help { display: none; }
-.chg { width: min(760px, calc(100vw - 32px)); max-height: min(640px, calc(100dvh - 32px)); padding: 0; border: 1px solid var(--au-line, var(--line)); border-radius: 14px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden; }
-.chg::backdrop { background: rgba(0,0,0,.45); }
+dialog.ms-chgd { width: min(760px, calc(100vw - 32px)); max-height: min(640px, calc(100dvh - 32px)); padding: 0; border: 1px solid var(--au-line, var(--line)); border-radius: 14px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); box-shadow: 0 20px 60px rgba(0,0,0,.35); overflow: hidden; }
+dialog.ms-chgd::backdrop { background: rgba(0,0,0,.45); }
 .chg-in { display: grid; grid-template-columns: 210px 1fr; height: min(640px, calc(100dvh - 32px)); }
 .chg-nav { border-right: 1px solid var(--au-line, var(--line)); padding: 14px 8px; overflow-y: auto; background: var(--au-surface-2, transparent); }
 .chg-nav h2 { font: 650 14px var(--sans, system-ui); margin: 2px 8px 10px; }
@@ -106,7 +106,7 @@ html[data-role="public"] .ch-help { display: none; }
 .chg-dots { display: flex; gap: 5px; } .chg-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--au-line, var(--line)); } .chg-dots i.on { background: var(--au-accent, var(--accent)); }
 .chg-hl { outline: 2px solid var(--au-accent, var(--accent)) !important; outline-offset: 3px; border-radius: 10px; transition: outline-color .2s; }
 @media (max-width: 640px) {
-  .chg { width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0; inset: 0; border: 0; border-radius: 0; }
+  dialog.ms-chgd { width: 100%; max-width: none; height: 100dvh; max-height: none; margin: 0; inset: 0; border: 0; border-radius: 0; }
   .chg-in { grid-template-columns: 1fr; height: 100dvh; }
   .chg-nav { display: none; }
   .chg-foot .chg-dots { display: none; }
@@ -132,7 +132,7 @@ html[data-role="public"] .ch-help { display: none; }
   }
   function go(i) { cur = Math.max(0, Math.min(CH.length - 1, i)); draw(); }
   function build() {
-    dlg = document.createElement('dialog'); dlg.className = 'chg'; dlg.id = 'ms-chg'; dlg.setAttribute('aria-labelledby', 'chg-h');
+    dlg = document.createElement('dialog'); dlg.className = 'ms-chgd'; dlg.id = 'ms-chg'; dlg.setAttribute('aria-labelledby', 'chg-h');
     dlg.innerHTML = `<div class="chg-in"><nav class="chg-nav" aria-label="Chapters"><h2>How to use the charts</h2>${CH.map((c, i) => `<button type="button" data-i="${i}"><span class="n">${i + 1}</span><span>${c.t}</span></button>`).join('')}</nav>
       <div class="chg-main"><div class="chg-top"><span class="st"></span><button type="button" class="chg-x" data-a="close" aria-label="Close the guide">×</button></div>
       <div class="chg-body"></div>
