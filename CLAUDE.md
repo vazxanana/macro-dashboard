@@ -122,6 +122,21 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## Daily reports at 06:30 London (19 Nov 2026, owner: "daily reports every 6:30 am … (those who got macro activated), 2 reports: the world economy … and the markets")
+`council/daily-report.mjs` (council.yml, every round, `timeout 30`; builds once a London day from 06:00, `--force` rebuilds) reads
+the files the council already wrote (macro/forecast.json: regime, assets, central-bank `news`, Gold Macro Score; macro/cache.json
+`cal` = the week's economic calendar; macro/veteran.json: summary, levels, week calls, research items; macro/cot.json; snapshot.json
+prices) and writes council-data `macro/daily-report.json` (`reports[]`, last 14 London days: `day`, `publishAt` = 06:30 London in
+UTC, `world` and `markets` = `{ title, lead, sections: [{ h, lines }] }`, `note`). Deterministic text, fetches nothing, no language
+model, no system, trade or rule names, no third-party licensed data (London Strategic Edge's licence forbids showing it to members).
+**Notice**: `api/notify.js` `?job=daily` (Bearer CRON_SECRET, in the Worker's `CHAINED` 10-minute chain) posts ONE notice per day
+(`id daily-<day>`, `perm: 'macro'`, `link: '/macro-desk#s-daily'`) from the publish time, never more than 18 h late; notify GET
+shows a `perm` notice only to the owner and accounts whose `perms.macro` is not false (`allowed`). The bell and the slide-in card
+draw the body's lines and an "Open the reports" link (same-site paths only). **Page**: Macro desk section `#s-daily` first (TOC
+"Daily reports"), tabs World economy / Markets (localStorage `mdDaily`, a display preference), a day picker; a report shows only
+from its publish time. `datahealth.mjs` warns after 27 h. Only those who open the Desk see the bell; the Macro desk shows the
+section itself (no push or email: Web Push went on 17 Nov). Test: `tests/daily-report.test.mjs`.
+
 ## London Strategic Edge data, owner only (19 Nov 2026, owner: "build option 1")
 `api/lse.js` (routed in `cloudflare/src/worker.mjs`), key = the Worker secret `LSE_API_KEY` (set by the owner in Cloudflare; host
 `download.londonstrategicedge.com`, header `X-API-Key`, free plan: 60 calls a minute, 12.5 GiB a week, 12.5 M rows a day).
