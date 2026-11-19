@@ -1,0 +1,110 @@
+{
+ "study": "gold-vol-breakout-with-book",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-vol-breakout-with-book/PREREGISTRATION.md",
+ "planSha256": "2bc15904c8c5fc861126f5bd838acba7dcd6b10d2e5410849905a5faec362a0a",
+ "kind": "descriptive",
+ "test": "none",
+ "originalSha256": "afa36e031e39daabb4f88ed9231daa55246fcccb659b0a9668fda52ad022276f",
+ "dataEnd": "2026-11-12",
+ "book": "Gold trend + Gold daily engulf from research/edge/supported-book/legs.json through its positions() / bookStats() (x1F1: $0.30 a unit, financing on every unit), net R a position booked on its close day, 1R a unit",
+ "breakout": "gold-vol-breakout T1 (UTC open ± 0.5 x the previous folded day's range, stop at the open, out at 20:55 UTC) from original.mjs on OANDA mid M5 XAU/USD, $0.60 a round trip, net R a trade on its trade day, 1R a trade; 3740 trades 2006-11-02 → 2026-11-12",
+ "windows": {
+  "A": {
+   "label": "2007-2017, the book's untouched window",
+   "from": "2007-01-01",
+   "to": "2017-12-31",
+   "weekdays": 2870,
+   "years": 11,
+   "book": {
+    "n": 311,
+    "total": 62.1,
+    "perYear": 5.64,
+    "maxDD": 19.8,
+    "longestUnder": 988,
+    "posMonths": 0.394,
+    "months": 132,
+    "tMonthly": 1.74
+   },
+   "breakout": {
+    "n": 2024,
+    "total": 184,
+    "perYear": 16.73,
+    "maxDD": 35.2,
+    "longestUnder": 397,
+    "posMonths": 0.561,
+    "months": 132,
+    "tMonthly": 2.91
+   },
+   "combined": {
+    "n": 2335,
+    "total": 246.1,
+    "perYear": 22.37,
+    "maxDD": 32.4,
+    "longestUnder": 406,
+    "posMonths": 0.621,
+    "months": 132,
+    "tMonthly": 3.46
+   },
+   "corr": {
+    "daily": -0.073,
+    "monthly": -0.045
+   },
+   "ddRatio": 0.588,
+   "check": {
+    "tMonthly": 1.74,
+    "maxDD": 19.8,
+    "ok": true
+   }
+  },
+  "B": {
+   "label": "2018 to 2026-10, built-on years for the book (description only)",
+   "from": "2018-01-01",
+   "to": "2026-10-31",
+   "weekdays": 2305,
+   "years": 8.83,
+   "book": {
+    "n": 255,
+    "total": 118.1,
+    "perYear": 13.37,
+    "maxDD": 11.3,
+    "longestUnder": 320,
+    "posMonths": 0.472,
+    "months": 106,
+    "tMonthly": 3.04
+   },
+   "breakout": {
+    "n": 1682,
+    "total": 84.2,
+    "perYear": 9.53,
+    "maxDD": 39.2,
+    "longestUnder": 821,
+    "posMonths": 0.538,
+    "months": 106,
+    "tMonthly": 1.65
+   },
+   "combined": {
+    "n": 1937,
+    "total": 202.3,
+    "perYear": 22.9,
+    "maxDD": 40.8,
+    "longestUnder": 498,
+    "posMonths": 0.575,
+    "months": 106,
+    "tMonthly": 3.05
+   },
+   "corr": {
+    "daily": -0.043,
+    "monthly": 0.073
+   },
+   "ddRatio": 0.809,
+   "check": {
+    "tMonthly": 3.04,
+    "maxDD": 11.3,
+    "ok": true
+   }
+  }
+ },
+ "reading": "In 2007-17 the two records barely move together (daily −0.07, monthly −0.04): the book is a few long gold positions held for days to weeks, the breakout one intraday trade most weekdays, either side. Side by side at equal size the worst drawdown was 32.4R against 19.8R (book) and 35.2R (breakout) alone, 59 % of the two added; the longest stretch under water 406 weekdays against 988 and 397; month-sum t +3.46 against +1.74 and +2.91. In 2018-26 (built-on years for the book, description only) the correlation was daily −0.04, monthly +0.07, and the combined drawdown 81 % of the two added. At 1R each the breakout carries about 7 times as many trades as the book has positions, so it sets most of the combined figures; the combined month-sum t is a description of these two paths, not evidence of anything. These are two independent paper records laid side by side, not a test:the breakout's own evidence is its replication study (2007-15) and the original study (2016-26), the book's is supported-book (a FAIL on its t). Equal size is a reporting convention, not a weight; the figures change nothing in the book, its forward-test protocol or its stop lines, and they are not a sizing proposal.",
+ "verdict": "DESCRIPTIVE, no rule tested: 2007-17 the breakout and the gold book correlate −0.04 by month; side by side their worst drawdown is 59 % of the two drawdowns added"
+}
