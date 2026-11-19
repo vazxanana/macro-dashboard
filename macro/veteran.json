@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-19T22:39:04.000Z",
+ "at": "2026-11-19T23:16:58.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-19T22:38:55.000Z",
+ "strategistAt": "2026-11-19T23:16:48.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -115,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.67 pts in 5 sessions (vote down); score z (4-week fall) −0.96",
+   "macro": "+0.66 pts in 5 sessions (vote down); score z (4-week fall) −0.96",
    "veteran": "DXY 103.84, +0.55% on the week, +1.75% over 4 weeks · broad USD +0.89% over 4 weeks",
    "stance": "agree",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -1174,7 +1174,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 38%."
  },
  "briefing": {
-  "at": "2026-11-19T22:39:04.000Z",
+  "at": "2026-11-19T23:16:58.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1576,9 +1576,9 @@
      "text": "as of 2026-11-18 close"
     },
     "mark": {
-     "px": 3624.615,
-     "at": "2026-11-19T22:38:55.000Z",
-     "dist": -3.09
+     "px": 3631.74,
+     "at": "2026-11-19T23:16:48.000Z",
+     "dist": -2.9
     }
    },
    "dxy": {
@@ -2893,12 +2893,76 @@
  "events": [],
  "research": {
   "label": "Your research, applied: each line checks a document's own conditions against today's data. Not a forecast, not a tested edge.",
-  "items": [],
-  "used": [],
+  "items": [
+   {
+    "k": "policy",
+    "doc": "your macro rule book (2-year vs the policy rate)",
+    "text": "Hikes priced (2-year above the policy rate): the 2-year at 4.80% against the policy rate's upper bound 4.00% (+80 bp).",
+    "readings": [
+     {
+      "text": "gap +80 bp (cuts priced below −25 bp, hikes priced above +25 bp)",
+      "on": true
+     }
+    ],
+    "caveat": "Record 2007-26 (research/edge/rulebook-gauges): in this class gold's next 20 sessions averaged +0.4% (up 52% of 381 weeks) against +0.7% on all weeks. Cuts priced PASSED its pre-registered test (t 3.05, both halves) but rests on about five easing cycles; hikes priced did not (t −0.83). A tested lean, not a trading rule.",
+    "asOf": "2026-11-18"
+   },
+   {
+    "k": "regime",
+    "doc": "your macro rule book (US 10-year regime table)",
+    "text": "10-year flat: the rule book reads no regime.",
+    "readings": [
+     {
+      "text": "10-year +23 bp over 2 weeks",
+      "on": false
+     },
+     {
+      "text": "+11 bp over 4 weeks",
+      "on": false
+     },
+     {
+      "text": "−15 bp over 6 weeks",
+      "on": false
+     },
+     {
+      "text": "2-year +15 bp over 4 weeks",
+      "on": false
+     }
+    ],
+    "caveat": "Record 2007-26 (research/edge/yield-regime, FAIL, 0 of 3): in this class gold's next 20 sessions averaged +0.4% (up 54% of 620 weeks) against +0.5% on all weeks. Not significant: a lean, not a tested edge.",
+    "asOf": "2026-11-18"
+   },
+   {
+    "k": "blowoff",
+    "doc": "your macro rule book (blow-off veto)",
+    "asOf": "2026-11-18",
+    "readings": [
+     {
+      "text": "−8.3% against the 50-day average (veto above +15%)",
+      "on": false
+     },
+     {
+      "text": "−6.6% over 20 sessions (veto above +20%)",
+      "on": false
+     },
+     {
+      "text": "−7.4% over 7 sessions (veto above +10%)",
+      "on": false
+     }
+    ],
+    "text": "Blow-off veto off: gold is not stretched by the rule book's three measures.",
+    "caveat": "Tested on 19 Nov 2026 (research/edge/blowoff-veto, FAIL): on the score's weekly clock it almost never fires (1 BUY week in 2007-24). On the 16 days it fired in 2007-24 (7 episodes), gold averaged −1.3% over the next 20 sessions (up 44% of the time) against +0.5% on all days: a caution, not a tested edge."
+   }
+  ],
+  "used": [
+   "your macro rule book (2-year vs the policy rate)",
+   "your macro rule book (US 10-year regime table)",
+   "your macro rule book (blow-off veto)"
+  ],
   "register": null
  },
  "summary": {
-  "sentence": "This week: the macro leans against gold (53% chance it is higher by 11 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,720 (13-week low) since the 18 Nov close and is near $3,625. Watch $3,700 above (broken since the close). Levels as of the 18 Nov close.",
+  "sentence": "This week: the macro leans against gold (53% chance it is higher by 11 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,720 (13-week low) since the 18 Nov close and is near $3,632. Watch $3,700 above (broken since the close). Levels as of the 18 Nov close.",
   "bias": {
    "lean": "against",
    "p": 0.53,
@@ -2925,7 +2989,7 @@
     "price": 3700,
     "label": "Round number",
     "dist": -1.08,
-    "distNow": 2.08,
+    "distNow": 1.88,
     "crossed": true
    },
    "below": null,
@@ -2936,9 +3000,9 @@
     "text": "as of 2026-11-18 close"
    },
    "mark": {
-    "px": 3624.615,
-    "at": "2026-11-19T22:38:55.000Z",
-    "dist": -3.09
+    "px": 3631.74,
+    "at": "2026-11-19T23:16:48.000Z",
+    "dist": -2.9
    },
    "broken": {
     "price": 3720,
@@ -2953,7 +3017,7 @@
   },
   "publicOnly": true
  },
- "brief": "Macro veteran, 2026-11-19 22:39 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Inflation and the next release, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.03% (+15 bp from 2.88%) ends the real-rate support; DXY above 105.4 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4080 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.79 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−8.3%); Gold Macro Score −0.98 (AUCTION) | H1 (34%): If gold holds above $3,720 (13-week low), it closes at or above $3,800 (round number) by 2026-11-25 before any close below $3,720 | H2 (31%): Gold's daily closes stay between $3,700 (round number) and $3,800 (round number) every day through 2026-11-25 | H3 (63%): DXY closes 2026-12-16 below 103.84 (the latest close) At a glance: This week: the macro leans against gold (53% chance it is higher by 11 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,720 (13-week low) since the 18 Nov close and is near $3,625. Watch $3,700 above (broken since the close). Levels as of the 18 Nov close.",
+ "brief": "Macro veteran, 2026-11-19 23:16 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 3 agree, 3 qualify, 0 disagree; qualified: Direction for gold, Inflation and the next release, Positioning. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.03% (+15 bp from 2.88%) ends the real-rate support; DXY above 105.4 (+1.5%) says the dollar channel has turned; a weekly close below the 10-week average 4080 removes the trend tiebreaker. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.79 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.06 vs dgs2 hit 54%, t 2.19; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 25, curve inverted), funding still calm | 2. The 20 closest past set-ups: gold higher 20 sessions on in 70% (all weeks 55%) | 3. Gold below its 10-week average (−8.3%); Gold Macro Score −0.98 (AUCTION) | H1 (34%): If gold holds above $3,720 (13-week low), it closes at or above $3,800 (round number) by 2026-11-25 before any close below $3,720 | H2 (31%): Gold's daily closes stay between $3,700 (round number) and $3,800 (round number) every day through 2026-11-25 | H3 (63%): DXY closes 2026-12-16 below 103.84 (the latest close) At a glance: This week: the macro leans against gold (53% chance it is higher by 11 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,720 (13-week low) since the 18 Nov close and is near $3,632. Watch $3,700 above (broken since the close). Levels as of the 18 Nov close.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
