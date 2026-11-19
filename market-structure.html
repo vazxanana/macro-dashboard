@@ -3672,7 +3672,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 </style>
       <style id="ms-dr-css">/* ChronosTrade's chart tools on the Desk (18 Nov 2026): drawing strip, style bar, right-click menu, 1-4 chart layout */
       #v-charts .sec-h { position: relative; }
-      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; } .ms-vp-cv { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; } .ms-vp-cv, .ms-pp-cv { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
       html[data-drawing] #v-charts .ms-chart { cursor: crosshair; }
       .ms-chart[data-dcur="move"] { cursor: move; } .ms-chart[data-dcur="size"] { cursor: crosshair; } .ms-chart[data-dcur="lock"] { cursor: not-allowed; }
       #v-charts .sec-h > .dr-bar { order: 9; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); align-items: center; }
@@ -14261,6 +14261,12 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle, .dr-bar, .dr-note) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) #ms-pp { display: none !important; }   /* the paper account waits behind More (18 Nov) */
+  /* 19 Nov: behind More the timeframe and view switch wraps instead of cutting "Layout", the markup switch keeps each word whole,
+     and the paper account is one compact block */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .seg { flex-wrap: wrap; row-gap: 4px; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .mk-mode { flex: none; } html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .mk-mode > button { flex: none; white-space: nowrap; }
+  html[data-phone="simple"] #ms-pp .pp-ttl small { display: none; } html[data-phone="simple"] #ms-pp .pp-trade { width: 100%; } html[data-phone="simple"] #ms-pp .pp-go { flex: 1; }
+  html[data-phone="simple"] #ms-pp .pp-set { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } html[data-phone="simple"] #ms-pp .pp-set label { display: grid; gap: 2px; } html[data-phone="simple"] #ms-pp .pp-set select { width: 100%; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
 
