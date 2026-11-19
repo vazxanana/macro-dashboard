@@ -2881,6 +2881,17 @@ t −0.23, not bearish), falling slowly +0.96 % (n 131, t 1.07), term premium vs
 weeks +0.52 %. Falling yields lean gold-up in both halves, at t near 1. Live reading `research-watch.mjs` `regimeCheck` (classes
 as the study's `classOf` / `whyOf`, a test compares) in "Your research, applied" with each class's record beside it; it changes
 no score, call or trade. Tests: `tests/yield-regime.test.mjs`.
+## Blow-off veto on the Gold Macro Score (19 Nov 2026, owner: "there are still other documents I've sent you … how to predict or increase the chances to be correct")
+`research/edge/blowoff-veto/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). The owner's macro rule
+book's blow-off veto (no new gold BUY when gold is > 15 % over its 50-day average, > 20 % up in 20 sessions or > 10 % up in 7;
+the implied-volatility clause left out, no history on file), tested on the score's own weekly reading (the council's
+`macroscore.mjs` drivers, parity with `goldMacroScore`), 2007-24 = data the veto was not fitted to. **FAIL**: 1 of 177 BUY weeks
+flagged (it did better), the long-or-flat Sharpe no better (0.343 / 0.338); the 2025-26 blow-offs peaked mid-week, no Friday was
+flagged. Reported after the result, descriptive: on the 16 DAYS it fired in 2007-24 (7 episodes) gold averaged −1.3 % over the
+next 20 sessions (+0.5 % on all days). Live check `research-watch.mjs` `blowoffCheck` (`BLOWOFF` = the study's `VETO`, a test
+compares them) in the Macro desk's "Your research, applied", with that record beside it; it changes no score, call or trade.
+Not testable from the repository: the rule book's exhaustion veto (sells only; the score never sells), headline-spike veto (no
+headline history) and priced-event veto (no FedWatch history). Tests: `tests/blowoff-veto.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
