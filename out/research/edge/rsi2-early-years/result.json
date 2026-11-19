@@ -1,0 +1,228 @@
+{
+ "built": "2026-11-14",
+ "title": "The 2-day RSI pullback on US index CFDs, the years before the original study",
+ "verdict": "NOT MEASURABLE",
+ "verdictText": "NOT MEASURABLE (inconclusive: OANDA daily candles start 2003-03-24, so after the 200-day warm-up only 4.00 years of entries exist before 2008, under the pre-registered 5-year floor; the financing benchmark starts 2006-01-06; and 2004-07 lies inside the rule's own development sample)",
+ "system": "frozen: the rsi2-pullback rule and cost model, unchanged (frozen.mjs)",
+ "frozen": {
+  "branch": "rsi2-pullback",
+  "commit": "4e1b4e1dd",
+  "file": "research/edge/rsi2-pullback/run.mjs",
+  "sha256": "edade889f2825fa71d911e039bfe5b9fdaaf5677e7b2fd55742e742830d5ab65"
+ },
+ "src": "OANDA mid daily candles, council-data research/daily/<key>.json (first candle 2003-03-24; the candle proxy serves nothing earlier); DGS2 from council-data macro/cache.json",
+ "original": {
+  "windows": {
+   "A": [
+    "2008-01-01",
+    "2015-12-31"
+   ],
+   "B": [
+    "2016-01-01",
+    "2099-12-31"
+   ]
+  },
+  "params": {
+   "SMA_LONG": 200,
+   "SMA_EXIT": 5,
+   "RSI_N": 2,
+   "RSI_MAX": 10,
+   "ATR_N": 20,
+   "STOP_ATR": 3,
+   "FIN_ADD": 2.5,
+   "SEEDS": 40
+  }
+ },
+ "gate": {
+  "pass": true,
+  "verdict": "FAIL",
+  "rows": [
+   {
+    "market": "spx500",
+    "same": true,
+    "A": [
+     67,
+     0.559,
+     0.134,
+     8.95,
+     3.15,
+     3.23
+    ],
+    "B": [
+     99,
+     0.318,
+     0.112,
+     11.14,
+     2.02,
+     1.83,
+     0.233,
+     0.0217
+    ],
+    "holmP": 0.0651,
+    "published": {
+     "A": [
+      67,
+      0.559,
+      0.134,
+      8.95,
+      3.15,
+      3.23
+     ],
+     "B": [
+      99,
+      0.318,
+      0.112,
+      11.14,
+      2.02,
+      1.83,
+      0.233,
+      0.0217
+     ],
+     "holm": 0.0651
+    }
+   },
+   {
+    "market": "nas100",
+    "same": true,
+    "A": [
+     75,
+     0.444,
+     0.104,
+     7.82,
+     2.02,
+     1.97
+    ],
+    "B": [
+     99,
+     0.292,
+     0.061,
+     6.03,
+     1.24,
+     1.29,
+     0.477,
+     0.1073
+    ],
+    "holmP": 0.1073,
+    "published": {
+     "A": [
+      75,
+      0.444,
+      0.104,
+      7.82,
+      2.02,
+      1.97
+     ],
+     "B": [
+      99,
+      0.292,
+      0.061,
+      6.03,
+      1.24,
+      1.29,
+      0.477,
+      0.1073
+     ],
+     "holm": 0.1073
+    }
+   },
+   {
+    "market": "us30",
+    "same": true,
+    "A": [
+     67,
+     0.228,
+     0.052,
+     3.45,
+     1.22,
+     1.39
+    ],
+    "B": [
+     102,
+     0.288,
+     0.087,
+     8.82,
+     1.88,
+     2.28,
+     0.175,
+     0.0301
+    ],
+    "holmP": 0.0651,
+    "published": {
+     "A": [
+      67,
+      0.228,
+      0.052,
+      3.45,
+      1.22,
+      1.39
+     ],
+     "B": [
+      102,
+      0.288,
+      0.087,
+      8.82,
+      1.88,
+      2.28,
+      0.175,
+      0.0301
+     ],
+     "holm": 0.0651
+    }
+   }
+  ]
+ },
+ "replicationWindow": {
+  "from": "first signal day",
+  "to": "2007-12-31",
+  "floorYears": 5,
+  "inventory": {
+   "spx500": {
+    "first": "2003-03-24",
+    "firstSignal": "2004-01-02",
+    "years": 4,
+    "gapsOver4d": 0,
+    "weekdaysToEnd": 1234
+   },
+   "nas100": {
+    "first": "2003-03-24",
+    "firstSignal": "2004-01-02",
+    "years": 4,
+    "gapsOver4d": 0,
+    "weekdaysToEnd": 1234
+   },
+   "us30": {
+    "first": "2003-03-24",
+    "firstSignal": "2004-01-07",
+    "years": 3.98,
+    "gapsOver4d": 0,
+    "weekdaysToEnd": 1211
+   }
+  },
+  "measurable": {
+   "floorYears": 5,
+   "ok": false,
+   "short": [
+    "spx500",
+    "nas100",
+    "us30"
+   ]
+  },
+  "financingFrom": "2006-01-06",
+  "rulePublishedOnDataTo": 2008
+ },
+ "notComputed": [
+  "2004-07 trades and returns",
+  "pooled and per-market tests",
+  "demo-broker cost run",
+  "placebo",
+  "Fisher combination with #838"
+ ],
+ "fisher": {
+  "computed": false,
+  "why": "no replication p exists; the ledger entry \"none on other years\" stands",
+  "original": {
+   "id": "#838 rsi2-pullback: spx500",
+   "p": 0.0217
+  }
+ }
+}
