@@ -3481,7 +3481,9 @@ written anywhere the veteran reads. Display / freshness only: no probability, ca
   "as of <date> close", or "Stale: last close <date>, <n> trading days ago" from one missed session. `markOf(fc)` = the
   strategist's latest gold price (`assets.gold.last` at `fc.at`, OANDA only); `markLevels` stamps `mark` and `crossed: true`
   on every level between the close and that price; `watchLevels` then picks the two levels either side of the PRICE, tags a
-  crossed one, and `broken` names the level that was the one to watch at the close. The sentence says "Gold has traded below
+  crossed one, and `broken` names the level that was the one to watch at the close. When the price is past every level on file on a
+  side (19 Nov 2026: gold 3.7% under the close), that side is the next $50 round number beyond the price, `made: true`, labelled
+  "price is under every level he tracks" (the rule of "Your read"); never added to the list. The sentence says "Gold has traded below
   $X (label) since the <date> close and is near $Y". None of it is read by a hypothesis or a call (`nearestLevel`'s `ref`
   argument is display only; a test pins that hypotheses, calls and level prices are the same whatever the latest price is).
 - **Desk** (macro-desk.html): `lvFresh` / `lvStale` / `hmUtc`; the glance tile, the ladder (`#ld-stale`, a hollow dot for
