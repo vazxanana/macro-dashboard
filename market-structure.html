@@ -14907,6 +14907,10 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
   #v-charts .sec-h > :is(.ind-open.ind-open, .ch-tools-tog, .ch-help.ch-help), #v-charts .sec-h #ms-sty-btn { width: 38px !important; }
   #v-charts .sec-h > .mk-mode.mk-mode button { padding: 0 5px; }
 }
+/* Home, calmer (19 Nov 2026, same request): the row of place buttons repeats the sidebar where the sidebar shows; on the
+   phone "what waits on you" is a plain row with a dot, not an amber card */
+@media (min-width: 1180px) { #v-home #hs-go { display: none; } }
+#ps-need.ps-need { border: 0 !important; border-top: 1px solid var(--au-line, var(--line)) !important; border-bottom: 1px solid var(--au-line, var(--line)) !important; border-radius: 0 !important; background: transparent !important; padding: 10px 2px !important; }
 </style>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked
