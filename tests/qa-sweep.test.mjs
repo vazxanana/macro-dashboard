@@ -942,6 +942,7 @@ test('Home (18 Nov 2026): one line on the live book against its plan, owner and 
   assert.equal(els['hs-fwd'].hidden, false);
   assert.equal(els['hs-fwd'].innerHTML, 'Live book against its plan: <b class="fw-st-few">Too few trades to say</b> · 2 positions closed since 12 Nov 2026, −1.23R after costs · 1 open · <a href="#council/systems">See the forward record</a>');
   W.MS_COUNCIL.coach.forward = null; W.MS_FWD.home(); assert.equal(els['hs-fwd'].hidden, true, 'no reading, no line');
+});
 
 // ---- CI red, 13 Nov 2026: an empty, hidden Coach card counted as an open card on the phone's Systems pane ----
 test('a hidden card is never drawn (#v-council .c-sleeve set display: flex over [hidden], so the empty Coach card showed unfolded on a phone)', () => {
