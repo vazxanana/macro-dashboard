@@ -99,3 +99,17 @@ test('China briefs: figures from their own tables, staleness, the next China rel
   assert.ok(!/should be out/.test(early.watch)); assert.match(early.caveat, /not a home sale/);
   assert.equal(chinaBriefs({ housing: '', fiscal: '', now }), null);
 });
+
+test('CPI benchmark, consensus gate and GDP case on release cards', async () => {
+  const { cpiBenchmark, consensusGate, gdpCase } = await import('../council/research-watch.mjs');
+  const card = { title: 'Core CPI m/m', titles: ['Core CPI m/m', 'CPI m/m'], country: 'USD', at: '2026-12-10T13:30:00Z', expectations: [{ title: 'Core CPI m/m', consensus: '0.3%', previous: '0.2%', captured: '2026-12-09T10:00:00Z' }, { title: 'CPI m/m', previous: '0.4%' }] };
+  const b = cpiBenchmark(D.cpiBench, card);
+  assert.match(b.lines[0], /0\.107 vs 0\.094/); assert.match(b.lines[0], /0\.091/); assert.match(b.lines[1], /0\.136 vs 0\.253/); assert.match(b.lines[2], /0\.2% \(calendar consensus 0\.3%\)/);
+  const g = consensusGate(card); assert.equal(g.state, 'context'); assert.match(g.text, /below your gate for a scored surprise/); assert.match(g.nowcast, /before 08:30 ET/);
+  assert.equal(consensusGate({ title: 'X', at: '2026-12-10T13:30:00Z', expectations: [] }).state, 'missing');
+  assert.equal(consensusGate({ title: 'X', at: '2026-12-10T13:30:00Z', expectations: [{ consensus: '1', captured: '2026-12-10T13:28:00Z' }] }).state, 'late');
+  const d = gdpCase(D.gdp, { title: 'Advance GDP q/q', country: 'USD', at: '2027-01-28T13:30:00Z', expectations: [{ title: 'Advance GDP q/q', consensus: '2.4%' }] });
+  assert.match(d.lines[0], /about 0\.59% quarter over quarter/); assert.match(d.lines[1], /−0\.9 pp/);
+  assert.equal(gdpCase(D.gdp, { title: 'CPI m/m', country: 'USD', at: '2027-01-28T13:30:00Z' }), null);
+  const page = fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'utf8'); for (const w of ['Your CPI model benchmark', 'Your GDP case', 'Consensus gate']) assert.ok(page.includes(w), w);
+});

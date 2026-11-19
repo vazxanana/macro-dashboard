@@ -653,6 +653,22 @@ async function treasuryFallback(fetchImpl, now, data, src) {
   if (need('T10YIE') && y10 && data.fred.DFII10) { const b = by(data.fred.DFII10); data.fred.T10YIE = y10.filter((o) => b.has(o.t)).map((o) => ({ t: o.t, v: +(o.v - b.get(o.t)).toFixed(3) })); note('T10YIE', 'Treasury 10Y − real 10Y ok'); }
 }
 const FRED_TRY = [[{ 'User-Agent': 'macro-dashboard-council/1.0 (+https://aureumdesk.co.uk)', Accept: 'text/csv,*/*' }, 20000], [UA, 10000]];
+// monthly / quarterly / daily series behind the red-folder releases (current FRED values: they include later revisions)
+export const RELEASE_FRED = ['CPIAUCSL', 'CPILFESL', 'PAYEMS', 'UNRATE', 'CES0500000003', 'PCEPILFE', 'PPIFIS', 'RSAFS', 'A191RL1Q225SBEA', 'DFEDTARU'];
+export async function releaseSeries(fetchImpl, now, prev, reachable = true, src = {}) {
+  const day = iso(now), keep = prev && prev.series ? prev : null;
+  if (keep && keep.day === day) { src.release = `kept from today's earlier run`; return keep; }
+  if (!reachable) { src.release = 'skipped: FRED unreachable this run' + (keep ? `, kept ${keep.day}` : ''); return keep; }
+  const out = { day, series: {} }; let ok = 0;
+  await pool(RELEASE_FRED, 2, async (id) => {
+    const r = await get(fetchImpl, `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${id}&cosd=${iso(now - 6 * 365 * DAY)}`, 'text', 15000, FRED_TRY[0][0]);
+    const obs = r.body ? parseFredCsv(r.body) : [];
+    if (obs.length) { out.series[id] = obs.slice(id === 'DFEDTARU' ? -2200 : -80).map((o) => [iso(o.t), o.v]); ok++; }
+    else if (keep && keep.series[id]) out.series[id] = keep.series[id];
+  });
+  src.release = `${ok} of ${RELEASE_FRED.length} release series fetched`;
+  return ok ? out : keep;
+}
 export async function gather(fetchImpl, now, cache = {}) {
   const src = {}, data = { fred: {}, bars: {}, cot: [], cal: [], rss: [] };
   const cosd = iso(now - 5 * 365 * DAY);
@@ -671,6 +687,9 @@ export async function gather(fetchImpl, now, cache = {}) {
     else src[`fred:${id}`] = `failed (${r.err || 'empty'})`;
   });
   await treasuryFallback(fetchImpl, now, data, src);
+  // 19 Nov 2026: the release series the Red folder study reads (council/redfolder.mjs), once a day, keyless, and never while
+  // FRED is unreachable this run; a failure keeps the last good copy (cache.release)
+  data.release = await releaseSeries(fetchImpl, now, cache.release, fredFails < 4, src);
   // still missing: the last good copy from an earlier run
   for (const id of FRED) if ((!data.fred[id] || !data.fred[id].length) && cache.fred && cache.fred[id] && cache.fred[id].length) {
     data.fred[id] = cache.fred[id].map(([d, v]) => ({ t: Date.parse(d + 'T00:00:00Z') / 1000, v })); src[`fred:${id}`] += `, using cache to ${cache.fred[id][cache.fred[id].length - 1][0]}`; }
@@ -941,6 +960,7 @@ export async function run({ dir = 'data', fetchImpl = globalThis.fetch, now = Ma
   for (const id of [...FRED, 'ECB2Y']) if (data.fred[id] && data.fred[id].length) nc.fred[id] = data.fred[id].slice(-300).map((o) => [iso(o.t), o.v]); else if (cache.fred && cache.fred[id]) nc.fred[id] = cache.fred[id];
   nc.score = S.ry.length && S.y2.length && S.y10.length ? scoreCache(S) : cache.score || null;
   nc.daily = handDaily(data, src, now, cache.daily);
+  if (data.release) nc.release = data.release; else if (cache.release) nc.release = cache.release;
   w('cache.json', nc, false);
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, macroSection(fc), MACRO_START, MACRO_END); if (nx !== md) writeAtomic(fA, nx); } } catch (e) { log('macro: analysis section skipped:', e.message); }

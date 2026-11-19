@@ -109,7 +109,7 @@ test('desk simple phone view: sections 2 to 6 fold to a title and one line, the 
     for (const c of ctl.split(' ')) assert.ok(html.includes('id="' + c + '"'));
   }
   assert.match(html, /<section class="story" id="s-week"/); assert.match(html, /<section class="story" id="s-deep"/);
-  assert.equal(html.match(/class="story sfold"/g).length, 6);   // 18 Nov 2026: "Before you trade" folds on a phone like the others
+  assert.equal(html.match(/class="story sfold"/g).length, 7);   // 18 Nov 2026 "Before you trade", 19 Nov 2026 the Red folder study; // 18 Nov 2026: "Before you trade" folds on a phone like the others
   // opening draws the section's charts at the width they have then; switching the view redraws all
   assert.match(html, /function foldSet\(sx, open\) \{[^\n]*if \(open\) redraw\(sx\); \}/);
   assert.match(html, /document\.addEventListener\('ms:phone', function \(\) \{ syncSw\(\); redraw\(\); \}\)/);

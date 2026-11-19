@@ -526,6 +526,14 @@
   .pl-list { list-style: none; margin: 0; padding: 0; }
   .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
   .nx-bl li, .res-l li { display: block; }
+    .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
+    .rf-next { padding: 12px 14px; border-radius: 10px; background: var(--well, rgba(127,127,127,.08)); margin-bottom: var(--s3, 12px); }
+    .rf-next .lab { display: block; font-size: var(--fs-xs, 12px); opacity: .8; }
+    .rf-wrap { overflow-x: auto; }
+    .rf-all { display: none; }
+
+    .rf-t td small, .rf-t th small { display: block; opacity: .85; font-weight: 400; }
+    .rf-t .up { color: var(--up, #1a7f4b); } .rf-t .dn { color: var(--dn, #c0392b); }
     .res-l li + li { margin-top: var(--s3, 12px); }
     .res-doc { color: var(--ink-2, inherit); }
   .pl-list li > b:first-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -556,6 +564,8 @@
      query and, apart from the switch itself, under the attribute, so a wider screen and the Full view are untouched. ─── */
   .ps-sw, .st-go, .g-more { display: none; }
   @media (max-width: 640px) {
+    html[data-phone="simple"] #c-red:not(.rf-open) .rf-x { display: none; }
+    html[data-phone="simple"] .rf-all:not([hidden]) { display: block; margin: 8px 0; min-height: 44px; }
     main[data-loading] .ps-sw { display: none; }   /* shown with the story, so it is never pushed down when the data lands */
     main:not([data-loading]) > .ps-sw { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 28px 0 4px; color: var(--ink-dim); font: 500 13px var(--sans); }
     .ps-sw-b { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
@@ -637,7 +647,7 @@
     <p class="stamp" id="stamp" role="status"><span class="sd" aria-hidden="true"></span><span id="stamp-t">Loading…</span></p>
   </div>
   <nav class="toc" id="toc" aria-label="Sections on this page">
-    <a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
+    <a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-red">Red folders</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
   </nav>
 
   <!-- 1. This week: council/glance.mjs → veteran.json.summary; what changed (veteran.json.changes) folded under it -->
@@ -690,6 +700,19 @@
   </section>
 
   <!-- 3. Why: the tested Gold Macro Score and its four drivers, then the briefing's key insights -->
+  <!-- 19 Nov 2026: the Red folder study (council/redfolder.mjs → macro/redfolder.json): past releases, expected vs printed, gold's reaction -->
+  <section class="story sfold" id="s-red" aria-labelledby="rf-h">
+    <header class="st-h"><h2 id="rf-h">Red folder study</h2><small class="st-m">each key release: what was expected, what printed, how gold and the dollar reacted</small><button type="button" class="st-go" id="go-s-red" aria-expanded="false" aria-controls="c-red" aria-labelledby="rf-h one-s-red"><span class="st-one" id="one-s-red"></span></button></header>
+    <article class="card" id="c-red" hidden>
+      <div class="pl-tabs rf-tabs" role="tablist" aria-label="Release" id="rf-tabs"></div>
+      <div id="rf-next" class="rf-next"></div>
+      <ul class="pl-list nx-bl" id="rf-prep"></ul>
+      <div class="rf-wrap" role="region" aria-label="Past releases" tabindex="0"><table class="nx-sc rf-t" id="rf-table"></table></div>
+      <button type="button" class="pl-copy rf-all" id="rf-all" hidden>Show all</button>
+      <p class="vz-note" id="rf-note"></p>
+    </article>
+  </section>
+
   <section class="story sfold" id="s-why" aria-labelledby="why-h">
     <header class="st-h"><h2 id="why-h">Why</h2><small class="st-m">the tested score, what moves it, and the readings that stand out</small><button type="button" class="st-go" id="go-s-why" aria-expanded="false" aria-controls="c-score c-ins c-res" aria-labelledby="why-h one-s-why"><span class="st-one" id="one-s-why"></span></button></header>
     <article class="card" id="c-score" aria-labelledby="sc-h" hidden>
@@ -1367,6 +1390,37 @@
       return h + '<br><small class="res-doc">Source: ' + esc(x.doc) + (x.also ? ', ' + esc(x.also) : '') + (x.asOf ? ' (' + esc(x.asOf) + ')' : '') + '</small></li>'; }).join('');
     $('res-note').textContent = R.label + (R.register ? ' Your news-trading register (' + R.register.n + ' hypotheses) is shown on each release it covers.' : '');
   }
+  // 19 Nov 2026: the Red folder study (macro/redfolder.json, council/redfolder.mjs); display only
+  var RF = null, RFK = null;
+  function rfPct(x, sign) { if (x == null) return NA; return (sign && x > 0 ? '+' : '') + x + '%'; }
+  function rfMove(x) { if (x == null) return '<span>' + NA + '</span>'; return '<span class="' + (x > 0 ? 'up' : x < 0 ? 'dn' : '') + '">' + (x > 0 ? '▲ +' : x < 0 ? '▼ ' : '') + x + '%</span>'; }
+  function rfVal(f, x) { if (x == null) return NA; return f.unit === 'k' ? (x > 0 ? '+' : '') + x + 'k' : x + (f.unit === '' ? '' : '%'); }
+  function renderRed(R) {
+    RF = R; var sec = $('c-red'), types = (R && R.types) || [];
+    if (!types.length) { sec.hidden = true; return; } sec.hidden = false;
+    try { RFK = RFK || localStorage.getItem('mdRed'); } catch (e) {} if (types.indexOf(RFK) < 0) RFK = types[0];
+    $('rf-tabs').innerHTML = types.map(function (k) { var on = k === RFK; return '<button type="button" role="tab" data-rf="' + esc(k) + '" aria-selected="' + on + '"' + (on ? '' : ' tabindex="-1"') + '>' + esc(R.study[k].name) + '</button>'; }).join('');
+    var S = R.study[RFK], nx = S.next;
+    $('rf-next').innerHTML = nx ? '<span class="lab">Next ' + esc(S.name) + '</span><b>' + esc(utcWhen(nx.at)) + '</b> <small>(' + esc(cdText(nx.at)) + ' · your time ' + esc(locWhen(nx.at)) + ')</small><br>'
+        + nx.items.map(function (i) { return esc(i.name) + ': expected <b>' + esc(i.exp || NA) + '</b>, previous ' + esc(i.prev || NA); }).join(' · ')
+        + (nx.fromSchedule ? '<br><small>Date from the council\'s release calendar; the consensus appears once the week\'s calendar lists it.</small>' : '')
+      : '<span class="lab">Next ' + esc(S.name) + '</span>Not on the calendar yet.';
+    $('rf-prep').innerHTML = (S.prep || []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
+    var head = '<thead><tr><th>Release</th>' + S.fields.map(function (f) { return '<th>' + esc(f.name) + '<small>printed · expected · prior</small></th>'; }).join('') + '<th>Gold, day</th><th>Dollar, day</th><th>Gold, first 5 / 60 min</th></tr></thead>';
+    var body = (S.rows || []).map(function (r, ri) {
+      return '<tr' + (ri >= 6 ? ' class="rf-x"' : '') + '><td><b>' + esc(r.day) + '</b></td>' + r.fields.map(function (f) {
+          var sur = f.surprise == null ? '' : '<small>vs consensus ' + (f.surprise > 0 ? '+' : '') + f.surprise + (f.unit === 'k' ? 'k' : '') + '</small>';
+          return '<td data-l="' + esc(f.name) + '"><b>' + esc(rfVal(f, f.actual)) + '</b> · ' + esc(f.exp || (f.model != null ? f.model + '% (model)' : NA)) + ' · ' + esc(rfVal(f, f.prev)) + sur + (f.revision != null ? '<small>prior two months revised ' + (f.revision > 0 ? '+' : '') + f.revision + 'k</small>' : '') + (f.actSrc === 'first print' ? '<small>first print</small>' : '') + '</td>'; }).join('')
+        + '<td data-l="Gold, day">' + rfMove(r.goldDay) + '</td><td data-l="Dollar, day">' + rfMove(r.usdDay) + '</td>'
+        + '<td data-l="Gold, first 5 / 60 min">' + (r.react ? rfPct(r.react.g5 == null ? null : +r.react.g5.toFixed(2), true) + ' / ' + rfPct(r.react.g60 == null ? null : +r.react.g60.toFixed(2), true) : NA) + '</td></tr>'; }).join('');
+    $('rf-table').innerHTML = head + '<tbody>' + body + '</tbody>';
+    $('rf-all').hidden = (S.rows || []).length <= 6; $('rf-all').textContent = 'Show all ' + (S.rows || []).length + ' releases'; $('c-red').classList.remove('rf-open');
+    $('rf-note').textContent = R.label + ' ' + R.sources;
+    $('one-s-red') && ($('one-s-red').innerHTML = nx ? 'Next: <b>' + esc(S.name) + '</b> ' + esc(utcWhen(nx.at)) : esc(S.name));
+  }
+  $('rf-all').addEventListener('click', function () { $('c-red').classList.add('rf-open'); this.hidden = true; });
+  $('rf-tabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-rf]'); if (!b) return; RFK = b.dataset.rf; try { localStorage.setItem('mdRed', RFK); } catch (x) {} renderRed(RF); });
+  $('rf-tabs').addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; var t = (RF && RF.types) || [], i = t.indexOf(RFK); RFK = t[(i + (e.key === 'ArrowRight' ? 1 : t.length - 1)) % t.length]; renderRed(RF); var b = document.querySelector('#rf-tabs [aria-selected="true"]'); if (b) b.focus(); });
   function renderNext(v) {
     var E = (v && v.events) || [], sec = $('c-next'), e = E.filter(function (x) { return !x.released; })[0] || E[0];
     if (!e) { sec.hidden = true; NX = null; return; } sec.hidden = false; NX = e;
@@ -1407,8 +1461,13 @@
       bx.innerHTML += '<h4 class="vz-h">Your CPI plan <small>how to read it, from your pre-release plan</small></h4>'
         + (P.confounders.length ? '<p class="sub"><b>Watch for:</b> ' + P.confounders.map(esc).join(' ') + '</p>' : '<p class="sub">No same-day auction, Fed statement or same-hour release on the calendar: a cleaner CPI window.</p>')
         + '<table class="nx-sc"><thead><tr><th>If it prints</th><th>First read</th><th>What must confirm it</th></tr></thead><tbody>' + P.matrix.map(function (r) { return '<tr><td><b>' + esc(r.outcome) + '</b></td><td data-l="First read">' + esc(r.read) + '</td><td data-l="Confirm">' + esc(r.need) + '</td></tr>'; }).join('') + '</tbody></table>'
-        + '<p class="vz-note">Windows: ' + P.windows.map(esc).join(' · ') + '. ' + esc(P.rule) + ' ' + esc(P.classify) + '</p>';
+        + '<p class="vz-note">Windows: ' + P.windows.map(esc).join(' · ') + '. ' + esc(P.rule) + ' ' + esc(P.classify) + '</p>'
+        + (P.benchmark ? '<h4 class="vz-h">Your CPI model benchmark <small>' + esc(P.benchmark.label) + '</small></h4><ul class="pl-list nx-bl">' + P.benchmark.lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>' : '');
     }
+    if (e.gdpCase) { bx.hidden = false;
+      bx.innerHTML += '<h4 class="vz-h">Your GDP case <small>2023 Q3 worked example: revisions and annualization</small></h4><ul class="pl-list nx-bl">' + e.gdpCase.lines.map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul>'; }
+    if (e.gate) { bx.hidden = false;
+      bx.innerHTML += '<h4 class="vz-h">Consensus gate <small>your expectation timing rules</small></h4><p class="sub">' + esc(e.gate.text) + (e.gate.nowcast ? ' ' + esc(e.gate.nowcast) : '') + '</p>'; }
     if (e.research && e.research.items && e.research.items.length) { bx.hidden = false;
       bx.innerHTML += '<h4 class="vz-h">What your news register says to test <small>' + esc(e.research.status) + '</small></h4><ul class="pl-list nx-bl">' + e.research.items.map(function (h) { return '<li><b>' + esc(h.id + ' · ' + h.title) + '</b> <small>(' + esc(h.priority) + ' priority)</small><br><small>Test: ' + esc(h.rule) + '</small><br><small>Fails if: ' + esc(h.gate) + '</small></li>'; }).join('') + '</ul>'; }
     if (st) { $('nx-st-h').innerHTML = 'What past ' + esc(st.type) + ' releases did <small>gold\'s first hour, by the dollar\'s first 5-minute read · ' + st.n + ' releases ' + esc(st.from.slice(0, 4)) + '-' + esc(st.to.slice(0, 4)) + ' · ' + esc(st.label) + '</small>';
@@ -1657,12 +1716,12 @@
   $('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; var t = document.querySelector(a.getAttribute('href')); if (t && t.id === 's-deep') $('deep').open = true; });
   $('g-event').addEventListener('click', function (e) { if (e.target.closest('a[href="#s-next"]')) foldSet($('s-next'), true); });   // the glance's link into a folded section opens it
   function load() {
-    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json')]).then(function (x) {
-      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4];
+    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json'), get('macro/redfolder.json')]).then(function (x) {
+      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4], rf = x[5];
       ((v && v.events) || []).forEach(function (e) { (e.scenarios || []).forEach(function (c) { var m = /^>\s*(.+?)\s+and\s+<\s*(.+)$/.exec(String(c.when || '')); if (m && m[1] === m[2]) c.when = 'at ' + m[1] + ' (one reporting step)'; }); });
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
-      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot);
+      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot); renderRed(rf);
       syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
@@ -1724,7 +1783,8 @@
       's-why': scv ? 'Gold Macro Score <b>' + esc(scv.textContent) + '</b>' + (scl ? ' · ' + esc(scl.textContent) : '') + (scp ? '. ' + takeOf(scp) : '') : '',
       's-price': (stb ? '<b>' + esc(stb.textContent) + '</b> ' : '') + takeOf('ld-take'),
       's-expect': takeOf('hyp-take'),
-      's-track': takeOf('calls-take') || takeOf('calib-take') };
+      's-track': takeOf('calls-take') || takeOf('calib-take'),
+      's-red': (function () { var o = $('one-s-red'); return o ? o.innerHTML : ''; })() };
     Object.keys(one).forEach(function (id) { var o = $('one-' + id), m = $(id).querySelector('.st-h .st-m'); if (o) o.innerHTML = one[id]; if (m) m.classList.toggle('has-one', !!one[id]); });
   }
   document.querySelectorAll('.st-go').forEach(function (b) { b.addEventListener('click', function () { var sx = b.closest('.sfold'); foldSet(sx, !sx.classList.contains('open')); }); });
