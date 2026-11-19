@@ -2437,6 +2437,26 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   body (the `font` shorthand resets `font-variant-numeric`, not that); JetBrains Mono and Figtree are no longer requested there.
   The audit checks the scales read Inter.
 
+## Live candles with no delay, bid / ask lines, paper orders from the chart (19 Nov 2026, owner: "More improvement on the charts, try to make it better than tradingview", "The candles needs to be more live moving with no delay")
+Display only, `market-structure.html` (Desk Charts), `api/stream.js`, `assets/ms-draw.js`, `assets/ms-paper.js`.
+- **One tick engine** (`liveTick(px, t, quote)`, `LT`, `liveFrame`, before `startTicks`): the OANDA stream, Binance trades and the
+  exchange price reads all feed it; the ticks of one frame are applied together on the next animation frame (a hidden tab:
+  a 200 ms timer), keeping every tick's high and low; the header price and bid / ask follow every frame (was once a second).
+  `window.msLiveTick` / `window.msLive()` (read-only view).
+- **Faster feeds**: `api/stream.js` forwards up to 10 quotes a second (was 5) and sends `retry: 300` (was 1500 ms); Binance adds
+  its `@aggTrade` stream (klines come every 2 s), and a forming kline older than the last trade keeps the trade's price; the
+  exchange price read runs every 1 s (was 2.5 s).
+- **No jump back** (`liveKeep`): a candle refresh (edge cached, up to a minute old) that returns the forming candle keeps the last
+  tick's close, high and low.
+- **Smooth price motion** (Style → Live price, localStorage `ms-smooth`, on by default): the forming candle's body eases to the new
+  price over a few frames (`liveEase`, `series.update` only; never in Heikin-Ashi or Line). The candle data, the markup and every
+  reading use the real quotes. **Bid and ask lines** (`ms-bidask`, off by default; OANDA quotes): two dotted price lines.
+  `#ms-live-lag` beside the live dot: "now" / "n s ago" / "n min ago".
+- **Paper orders from the chart**: the right-click menu (`#ms-cmenu`) offers "Paper buy / sell at <price>" at the price under the
+  pointer on a chart of the paper account's market (`window.msPaperDraftAt`, `msPaperMarket`; never for guests): the draft
+  opens with that entry (the engine makes it a limit or stop) and the usual stop and target. Practice only, a stop always.
+- Tests: `tests/desk-live.test.mjs`.
+
 ## Profile page like the owner's Figma example (17 Nov 2026, owner: "make profile like this example")
 Display only, `market-structure.html` `#v-profile`. A filled name card (`.pf-hero`: portrait, name, role, edit button `#ms-pf-edit` =
 rename), then the account as a list (`.pf-box.pf-list`, rows `.pf-row`: round icon, title, one line, chevron or switch): Demo

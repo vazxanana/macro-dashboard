@@ -273,6 +273,11 @@
     const hook = (c) => { try { c.chart.timeScale().subscribeVisibleLogicalRangeChange(again); } catch (e) {} }; (root.msCharts ? root.msCharts.list : []).forEach(hook); document.addEventListener('ms:chart', (e) => hook(e.detail)); root.addEventListener('resize', again);
     draw(); catchUp(); tmr = setInterval(tick, 2000); setInterval(catchUp, 60e3);
     root.addEventListener('storage', (e) => { if (e.key === KEY) { load(); sig = ''; draw(); } });
+    // a paper order from the chart's right-click menu (19 Nov 2026): the draft opens with its entry at the price clicked; the
+    // engine decides limit or stop from the side of the price, and the stop and target are set as for any draft (a stop always)
+    root.msPaperDraftAt = (side, price) => { if (document.documentElement.dataset.role === 'public' || !H() || !(price > 0) || !['buy', 'sell'].includes(side)) return false;
+      draft(side); if (!D) return false; D.at = +(+price).toFixed(dec(H().key)); D.follow = true; setDraftDefaults(true); draw(); return true; };
+    root.msPaperMarket = () => (H() && document.documentElement.dataset.role !== 'public' ? H().key : null);
     root.msPaper = () => ({ balance: S.acct.balance, positions: S.acct.positions.map((p) => ({ id: p.id, mk: p.mk, side: p.side, entry: p.entry, stop: p.stop, target: p.target })), orders: S.acct.orders.length, closed: S.acct.closed.length, lines: LINES.length, draft: D && { ...D }, marks: (root.msCharts ? root.msCharts.list : []).filter((c) => c.ppc && c.visible()).length });
   }
   if (H()) start(); else document.addEventListener('ms:paperhost', start, { once: true });
