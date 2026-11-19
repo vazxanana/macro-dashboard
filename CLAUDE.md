@@ -1515,6 +1515,7 @@ Guests (`PUB`) may open `#charts` on any market (watchlist chips `?s=<market>#ch
 the gate; `planLinesDraw` and `klList` return nothing for guests; `#ms-mtf`, readouts, chips and `.ms-role` are hidden. The guest
 overview carries an "Open the charts" button; the charts a "← Gold overview" link and a members note. `#ms-dense-css`: from 1400 px
 the app is 1760 px wide (2000 px from 1800 px), tighter gaps and paddings, the home markets grid auto-fills 168 px cards.
+**19 Nov 2026 fix**: a guest always lands on Charts (`showView`: `v = PUB ? 'charts' : …`). The 19 Nov "denied Home lands on Charts" fallback read the guest's viewer-default `charts: false` and sent guests to a Home they cannot see (a blank page). The chart header's cycle tag `.ms-cy` is hidden for guests (Meridian markup). The smoke test's guest run fails unless the view is Charts with a chart drawn.
 
 ## Profile page and guest view (8 Nov 2026)
 `#profile` (v-profile, in VIEWS and the viewer allow-list) holds the identity card (copied from the account menu) and the council's
@@ -2466,6 +2467,18 @@ header picks its timeframe: the LEFT chart (an analysed pane) takes only the und
 menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analysed pane of the same market) any timeframe and, from
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
+
+## Charts type scale (19 Nov 2026, owner: "the currency letters look too big, make same size as the rest")
+Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts is 12.5 px: the toolbar's market button `.ch-mk`
+(was 14 px / 650), the chart headers' market and timeframe buttons `.ph-mk` / `.ph-tf` (13 px / 700), the Markets view's selects and
+price; the trend chips and the cycle tag are 11.5 px Figtree (10.5 px mono and the system font before); the Style / Indicators
+small print 12 px. The chart watermark ("XAU/USD · H1") is 26 px (38 before), still faint.
+Same day, an accessibility pass on Charts (1440 / 390 px, dark and light): every control has a name and a 2 px focus ring, no text
+under AA. Fixed: the candle countdown `.ch-cd`, the phone's price legend `.ch-lg` and the keyboard hints were 10.5 px (now 11.5);
+**Tab followed the DOM, not the screen** (the toolbar is laid out with CSS `order`: Help, Style, Indicators came before the market
+button). A small script before the rail block puts `#v-charts .sec-h`'s element children in the order they are drawn (on load, on
+resize, when a child is added; stable for equal orders; comments stay), so nothing moves on screen; `window.msBarOrder()` reads it.
+No style may depend on the toolbar's sibling order (`+`, `~`, `:nth-child` on `.sec-h > …`).
 
 ## Drawing rail on the left, floating favourites (19 Nov 2026, owner: "the drawing bar in the left and we also should be able to choose favorite and have it floated like tradingview")
 Display only, `market-structure.html` (block "Drawing rail on the left" after the one-chart bar, `<style id="ms-rail-css">`) and
