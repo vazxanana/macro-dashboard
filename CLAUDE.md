@@ -4592,6 +4592,21 @@ broker's file). Parity gate first: the harness reproduces `gold-weekend`'s gold 
 +0.060R (n 252, month t 0.55); one at a time is worse. No paper shadow, nothing live changed; do not test it on another
 market. Test: `tests/geg-silver.test.mjs`.
 
+## The gotobi fade on a cTrader demo account (19 Nov 2026, owner: "start on any of the demo accounts ctrader"; item 61)
+The one candidate the studies support after the replica and the council's own streams failed: the gotobi study's T2 (PASS,
+REPLICATES, FEED-ROBUST). `council/gotobi.mjs` (pure rule + runner): on a gotobi day (calendar = `council/yen-spread.mjs`, a copy of
+`research/edge/gotobi/run.mjs`, compared day by day 2016-2027 in the test) sell USD/JPY at 00:55:00 UTC with `relativeStopLoss` D
+(= the study's `stopDist`, compared in the test), buy back at 06:00:00 UTC; risk 0.25 % of the balance. Run by
+`.github/workflows/gotobi.yml` (GitHub cron 00:22 / 00:37 Mon-Fri, and the Worker's 10-minute cron through `api/_gotobi-kick.js`
+in `/api/status?job=watchdog`, 00:25-00:49 on weekdays, one start an hour): the job waits, connects 40 s before, sends on the
+second, re-reads the position (no stop: amend, else close at once), sleeps, closes; a run after 00:56 records "missed" and does not
+enter; a position of an earlier day still open is closed late and said so. Account: `config.gotobi.account`, else
+`CTRADER_GOTOBI_ACCOUNT`, else the LIT book's (idle since 17 Nov). Label "gotobi": the mirror ignores it (it only manages its own
+label). Demo host, `isLive === false`, the mirror's message allowlist; council-data `gotobi/trades.json` (one record a day, R before
+costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
+Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
+`tests/gotobi-demo.test.mjs`.
+
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
 website's proxy (meridianx.dev/md/; aureumdesk.co.uk since 16 Nov). When Vercel blocked the account at 10:21 UTC on 15 Nov, every gold and forex market fell to

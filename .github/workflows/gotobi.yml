@@ -1,0 +1,56 @@
+name: Gotobi fade (cTrader demo)
+
+# The gotobi study's T2 on a cTrader DEMO account (council/gotobi.mjs; owner, 19 Nov 2026, docs/owner-decisions.md item 61):
+# on a gotobi day, sell USD/JPY at 00:55:00 UTC with its stop at entry + D, buy back at 06:00:00 UTC. The job starts before
+# 00:55 (GitHub's cron below, and the website's 10-minute timer through api/_gotobi-kick.js, since GitHub's cron can be late),
+# waits, places the order on time, sleeps, and closes. On any other day it ends at once. Demo only: the demo host, an account
+# that reports isLive false, the mirror's message allowlist. Its record: council-data gotobi/trades.json.
+
+on:
+  schedule:
+    - cron: '22 0 * * 1-5'
+    - cron: '37 0 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gotobi
+  cancel-in-progress: false
+
+jobs:
+  fade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            council
+
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # built-in WebSocket for the cTrader demo session
+
+      - name: Sell at 00:55, buy back at 06:00 (gotobi days only)
+        env:
+          CTRADER_MIRROR: ${{ secrets.CTRADER_MIRROR || vars.CTRADER_MIRROR }}
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID || vars.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET || vars.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN || vars.CTRADER_ACCESS_TOKEN }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
+          CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
+          CTRADER_GOTOBI_ACCOUNT: ${{ vars.CTRADER_GOTOBI_ACCOUNT }}
+          MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          node council/gotobi.mjs data
