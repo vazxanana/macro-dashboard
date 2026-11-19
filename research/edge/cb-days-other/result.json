@@ -1,0 +1,7531 @@
+{
+ "study": "cb-days-other",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/cb-days-other/PREREGISTRATION.md",
+ "dates": "Written from memory of the five central banks' published decision calendars, because the build sandbox cannot reach their sites (none of these banks is in council/events.mjs, which covers US releases, the ECB and the BoJ only; its zonedToUtc is used for the local-to-UTC conversion). Not checked against the official pages. Where to check: Bank of England MPC dates and Monetary Policy Summaries (bankofengland.co.uk/monetary-policy/upcoming-mpc-dates and /monetary-policy-summary-and-minutes); Bank of Canada interest-rate announcement schedule and press releases (bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/ and /press/press-releases/); Swiss National Bank monetary policy assessments (snb.ch/en/the-snb/mandates-goals/monetary-policy/decisions); Reserve Bank of Australia board meeting dates and monetary policy decisions (rba.gov.au/monetary-policy/int-rate-decisions/ and /schedules-events/); Reserve Bank of New Zealand OCR decision history (rbnz.govt.nz/monetary-policy/official-cash-rate-decisions).",
+ "scope": "The frozen ecb-boj-days rule on five other central banks' scheduled decisions; a stand-alone event rule on forex, not a test of the gold book (owner decision item 44 untouched).",
+ "rule": "direction of the first 60 minutes after the decision (close of the M5 candle ending at D + 60 min against the one ending at D); entry at D + 60 min in that direction, stop 1 x the 14-hour ATR known at D, no target, out at 21:00 UTC (BoE, BoC, SNB) / 15:00 UTC (RBA, RBNZ). D: 12:00 London, 09:45 or 10:00 Toronto (larger-range candle), 09:30 Zurich, 14:30 Sydney, 14:00 Wellington (before 2019 the larger-range candle of 09:00 and 14:00; 09:00 = no trade)",
+ "costs": "per round trip 0.3 pip spread + 0.3 pip slippage + 45 USD per million notional commission (0.0045 % of the price)",
+ "windows": {
+  "rep": "2010-2017",
+  "dec": "2018 → now"
+ },
+ "banks": [
+  {
+   "bank": "BOE",
+   "sym": "gbpusd",
+   "n": 71,
+   "netR": 0.11,
+   "monthT": 0.46,
+   "p": 0.3218,
+   "holmP": 0.9655,
+   "repN": 90,
+   "repNetR": -0.215,
+   "placeboP5": -0.352,
+   "placeboP50": -0.172,
+   "placeboP95": 0.194,
+   "net2R": 0.036,
+   "monthT2": 0.15,
+   "nOk": true,
+   "positive": true,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": false,
+   "cost2": true,
+   "pass": false
+  },
+  {
+   "bank": "BOC",
+   "sym": "usdcad",
+   "n": 71,
+   "netR": -0.121,
+   "monthT": -0.6,
+   "p": 0.7266,
+   "holmP": 0.9655,
+   "repN": 64,
+   "repNetR": 0.253,
+   "placeboP5": -0.361,
+   "placeboP50": -0.081,
+   "placeboP95": 0.19,
+   "net2R": -0.221,
+   "monthT2": -1.1,
+   "nOk": true,
+   "positive": false,
+   "t2": false,
+   "holm": false,
+   "sameSign": true,
+   "beatsPlacebo": false,
+   "cost2": false,
+   "pass": false
+  },
+  {
+   "bank": "SNB",
+   "sym": "usdchf",
+   "n": 35,
+   "netR": 0.038,
+   "monthT": 0.09,
+   "p": 0.4651,
+   "holmP": 0.9655,
+   "repN": 32,
+   "repNetR": -0.179,
+   "placeboP5": -0.572,
+   "placeboP50": -0.216,
+   "placeboP95": 0.714,
+   "net2R": -0.067,
+   "monthT2": -0.15,
+   "nOk": false,
+   "positive": true,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": false,
+   "cost2": false,
+   "pass": false
+  },
+  {
+   "bank": "RBA",
+   "sym": "audusd",
+   "n": 89,
+   "netR": 0.445,
+   "monthT": 1.73,
+   "p": 0.0419,
+   "holmP": 0.2093,
+   "repN": 87,
+   "repNetR": 0.009,
+   "placeboP5": -0.325,
+   "placeboP50": -0.134,
+   "placeboP95": 0.098,
+   "net2R": 0.349,
+   "monthT2": 1.36,
+   "nOk": true,
+   "positive": true,
+   "t2": false,
+   "holm": false,
+   "sameSign": true,
+   "beatsPlacebo": true,
+   "cost2": true,
+   "pass": false
+  },
+  {
+   "bank": "RBNZ",
+   "sym": "nzdusd",
+   "n": 54,
+   "netR": 0.489,
+   "monthT": 1.52,
+   "p": 0.0638,
+   "holmP": 0.2551,
+   "repN": 0,
+   "repNetR": null,
+   "placeboP5": -0.425,
+   "placeboP50": -0.052,
+   "placeboP95": 0.372,
+   "net2R": 0.401,
+   "monthT2": 1.25,
+   "nOk": true,
+   "positive": true,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": true,
+   "cost2": true,
+   "pass": false
+  }
+ ],
+ "detail": {
+  "BOE": {
+   "bank": "BOE",
+   "sym": "gbpusd",
+   "candles": 1273117,
+   "from": "2009-11-01",
+   "to": "2026-11-13",
+   "windows": {
+    "rep": {
+     "events": 90,
+     "skipped": {},
+     "n": 90,
+     "netR": -0.215,
+     "monthT": -1.09,
+     "months": 96,
+     "tradeT": -1.09,
+     "grossR": -0.141,
+     "costR": 0.075,
+     "net2R": -0.29,
+     "monthT2": -1.47,
+     "win": 0.233,
+     "exits": {
+      "stop": 69,
+      "time": 21
+     },
+     "byYear": {
+      "2010": {
+       "n": 12,
+       "netR": -1.047
+      },
+      "2011": {
+       "n": 12,
+       "netR": -0.343
+      },
+      "2012": {
+       "n": 12,
+       "netR": -0.087
+      },
+      "2013": {
+       "n": 12,
+       "netR": -0.155
+      },
+      "2014": {
+       "n": 12,
+       "netR": 0.113
+      },
+      "2015": {
+       "n": 11,
+       "netR": 0.406
+      },
+      "2016": {
+       "n": 11,
+       "netR": -0.565
+      },
+      "2017": {
+       "n": 8,
+       "netR": 0.078
+      }
+     },
+     "clock": {
+      "picks": {},
+      "confirmed": 73,
+      "unconfirmed": [
+       "2010-09-09",
+       "2010-12-09",
+       "2011-06-09",
+       "2011-07-07",
+       "2011-12-08",
+       "2012-01-12",
+       "2012-03-08",
+       "2012-04-05",
+       "2014-07-10",
+       "2014-10-09",
+       "2015-01-08",
+       "2015-02-05",
+       "2015-03-05",
+       "2015-04-09",
+       "2015-05-11",
+       "2015-06-04",
+       "2015-07-09"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2010-01-07",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.59052,
+       "stop": 1.59379,
+       "exit": 1.59379,
+       "why": "stop",
+       "R": -1,
+       "net": -1.04
+      },
+      {
+       "date": "2010-02-04",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.58604,
+       "stop": 1.58354,
+       "exit": 1.58354,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2010-03-04",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.51008,
+       "stop": 1.50756,
+       "exit": 1.50756,
+       "why": "stop",
+       "R": -1,
+       "net": -1.051
+      },
+      {
+       "date": "2010-04-08",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.52021,
+       "stop": 1.52297,
+       "exit": 1.52297,
+       "why": "stop",
+       "R": -1,
+       "net": -1.047
+      },
+      {
+       "date": "2010-05-10",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.50107,
+       "stop": 1.4956,
+       "exit": 1.4956,
+       "why": "stop",
+       "R": -1,
+       "net": -1.023
+      },
+      {
+       "date": "2010-06-10",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.4593,
+       "stop": 1.46274,
+       "exit": 1.46274,
+       "why": "stop",
+       "R": -1,
+       "net": -1.037
+      },
+      {
+       "date": "2010-07-08",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.51412,
+       "stop": 1.51154,
+       "exit": 1.51154,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2010-08-05",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.5889,
+       "stop": 1.59165,
+       "exit": 1.59165,
+       "why": "stop",
+       "R": -1,
+       "net": -1.048
+      },
+      {
+       "date": "2010-09-09",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.5391,
+       "stop": 1.54119,
+       "exit": 1.54119,
+       "why": "stop",
+       "R": -1,
+       "net": -1.062
+      },
+      {
+       "date": "2010-10-07",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.60032,
+       "stop": 1.59739,
+       "exit": 1.59739,
+       "why": "stop",
+       "R": -1,
+       "net": -1.045
+      },
+      {
+       "date": "2010-11-04",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.62758,
+       "stop": 1.6247,
+       "exit": 1.6247,
+       "why": "stop",
+       "R": -1,
+       "net": -1.046
+      },
+      {
+       "date": "2010-12-09",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.57667,
+       "stop": 1.57456,
+       "exit": 1.57456,
+       "why": "stop",
+       "R": -1,
+       "net": -1.062
+      },
+      {
+       "date": "2011-01-13",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.57791,
+       "stop": 1.57574,
+       "exit": 1.5822,
+       "why": "time",
+       "R": 1.978,
+       "net": 1.918
+      },
+      {
+       "date": "2011-02-10",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.60659,
+       "stop": 1.60451,
+       "exit": 1.60451,
+       "why": "stop",
+       "R": -1,
+       "net": -1.064
+      },
+      {
+       "date": "2011-03-10",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.6137,
+       "stop": 1.61555,
+       "exit": 1.60507,
+       "why": "time",
+       "R": 4.668,
+       "net": 4.597
+      },
+      {
+       "date": "2011-04-07",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.6302,
+       "stop": 1.63183,
+       "exit": 1.63183,
+       "why": "stop",
+       "R": -1,
+       "net": -1.082
+      },
+      {
+       "date": "2011-05-05",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.65137,
+       "stop": 1.64885,
+       "exit": 1.64885,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2011-06-09",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.64275,
+       "stop": 1.64107,
+       "exit": 1.64107,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2011-07-07",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.59727,
+       "stop": 1.59944,
+       "exit": 1.59944,
+       "why": "stop",
+       "R": -1,
+       "net": -1.061
+      },
+      {
+       "date": "2011-08-04",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.63386,
+       "stop": 1.63076,
+       "exit": 1.63076,
+       "why": "stop",
+       "R": -1,
+       "net": -1.043
+      },
+      {
+       "date": "2011-09-08",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.60118,
+       "stop": 1.59904,
+       "exit": 1.59904,
+       "why": "stop",
+       "R": -1,
+       "net": -1.062
+      },
+      {
+       "date": "2011-10-06",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.53023,
+       "stop": 1.53283,
+       "exit": 1.53283,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2011-11-10",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.5961,
+       "stop": 1.594,
+       "exit": 1.594,
+       "why": "stop",
+       "R": -1,
+       "net": -1.063
+      },
+      {
+       "date": "2011-12-08",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.57336,
+       "stop": 1.57153,
+       "exit": 1.57153,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2012-01-12",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.53472,
+       "stop": 1.53682,
+       "exit": 1.53432,
+       "why": "time",
+       "R": 0.191,
+       "net": 0.129
+      },
+      {
+       "date": "2012-02-09",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.58556,
+       "stop": 1.58379,
+       "exit": 1.58379,
+       "why": "stop",
+       "R": -1,
+       "net": -1.074
+      },
+      {
+       "date": "2012-03-08",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.57974,
+       "stop": 1.58162,
+       "exit": 1.58162,
+       "why": "stop",
+       "R": -1,
+       "net": -1.07
+      },
+      {
+       "date": "2012-04-05",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.58546,
+       "stop": 1.58367,
+       "exit": 1.58367,
+       "why": "stop",
+       "R": -1,
+       "net": -1.073
+      },
+      {
+       "date": "2012-05-10",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.61656,
+       "stop": 1.61499,
+       "exit": 1.61499,
+       "why": "stop",
+       "R": -1,
+       "net": -1.085
+      },
+      {
+       "date": "2012-06-07",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.5571,
+       "stop": 1.55511,
+       "exit": 1.55511,
+       "why": "stop",
+       "R": -1,
+       "net": -1.065
+      },
+      {
+       "date": "2012-07-05",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.55786,
+       "stop": 1.55957,
+       "exit": 1.55252,
+       "why": "time",
+       "R": 3.127,
+       "net": 3.051
+      },
+      {
+       "date": "2012-08-02",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.55801,
+       "stop": 1.55638,
+       "exit": 1.55638,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2012-09-06",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.59088,
+       "stop": 1.59165,
+       "exit": 1.59165,
+       "why": "stop",
+       "R": -1,
+       "net": -1.172
+      },
+      {
+       "date": "2012-10-04",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.61128,
+       "stop": 1.6099,
+       "exit": 1.61918,
+       "why": "time",
+       "R": 5.719,
+       "net": 5.623
+      },
+      {
+       "date": "2012-11-08",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.59946,
+       "stop": 1.59807,
+       "exit": 1.59807,
+       "why": "stop",
+       "R": -1,
+       "net": -1.095
+      },
+      {
+       "date": "2012-12-06",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.6117,
+       "stop": 1.61072,
+       "exit": 1.61072,
+       "why": "stop",
+       "R": -1,
+       "net": -1.136
+      },
+      {
+       "date": "2013-01-10",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.60492,
+       "stop": 1.60636,
+       "exit": 1.60636,
+       "why": "stop",
+       "R": -1,
+       "net": -1.092
+      },
+      {
+       "date": "2013-02-07",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.57114,
+       "stop": 1.57318,
+       "exit": 1.57068,
+       "why": "time",
+       "R": 0.225,
+       "net": 0.161
+      },
+      {
+       "date": "2013-03-07",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.50592,
+       "stop": 1.50394,
+       "exit": 1.50394,
+       "why": "stop",
+       "R": -1,
+       "net": -1.064
+      },
+      {
+       "date": "2013-04-04",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.51076,
+       "stop": 1.50872,
+       "exit": 1.52341,
+       "why": "time",
+       "R": 6.208,
+       "net": 6.145
+      },
+      {
+       "date": "2013-05-09",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.5575,
+       "stop": 1.55618,
+       "exit": 1.55618,
+       "why": "stop",
+       "R": -1,
+       "net": -1.099
+      },
+      {
+       "date": "2013-06-06",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.54474,
+       "stop": 1.54632,
+       "exit": 1.54632,
+       "why": "stop",
+       "R": -1,
+       "net": -1.082
+      },
+      {
+       "date": "2013-07-04",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.5101,
+       "stop": 1.51179,
+       "exit": 1.50722,
+       "why": "time",
+       "R": 1.703,
+       "net": 1.628
+      },
+      {
+       "date": "2013-08-01",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.52302,
+       "stop": 1.52081,
+       "exit": 1.52081,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2013-09-05",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.56466,
+       "stop": 1.56336,
+       "exit": 1.56336,
+       "why": "stop",
+       "R": -1,
+       "net": -1.1
+      },
+      {
+       "date": "2013-10-10",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.59579,
+       "stop": 1.59422,
+       "exit": 1.59422,
+       "why": "stop",
+       "R": -1,
+       "net": -1.084
+      },
+      {
+       "date": "2013-11-07",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.60428,
+       "stop": 1.60527,
+       "exit": 1.60527,
+       "why": "stop",
+       "R": -1,
+       "net": -1.133
+      },
+      {
+       "date": "2013-12-05",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.63358,
+       "stop": 1.63523,
+       "exit": 1.63523,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2014-01-09",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.64587,
+       "stop": 1.64463,
+       "exit": 1.64814,
+       "why": "time",
+       "R": 1.823,
+       "net": 1.716
+      },
+      {
+       "date": "2014-02-06",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.62948,
+       "stop": 1.63108,
+       "exit": 1.63108,
+       "why": "stop",
+       "R": -1,
+       "net": -1.083
+      },
+      {
+       "date": "2014-03-06",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.67052,
+       "stop": 1.67186,
+       "exit": 1.67186,
+       "why": "stop",
+       "R": -1,
+       "net": -1.101
+      },
+      {
+       "date": "2014-04-10",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.67694,
+       "stop": 1.67836,
+       "exit": 1.67836,
+       "why": "stop",
+       "R": -1,
+       "net": -1.096
+      },
+      {
+       "date": "2014-05-08",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.69474,
+       "stop": 1.69553,
+       "exit": 1.69553,
+       "why": "stop",
+       "R": -1,
+       "net": -1.173
+      },
+      {
+       "date": "2014-06-05",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.67508,
+       "stop": 1.67608,
+       "exit": 1.67608,
+       "why": "stop",
+       "R": -1,
+       "net": -1.136
+      },
+      {
+       "date": "2014-07-10",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.71116,
+       "stop": 1.71222,
+       "exit": 1.71222,
+       "why": "stop",
+       "R": -1,
+       "net": -1.129
+      },
+      {
+       "date": "2014-08-07",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.68416,
+       "stop": 1.68515,
+       "exit": 1.68515,
+       "why": "stop",
+       "R": -1,
+       "net": -1.137
+      },
+      {
+       "date": "2014-09-04",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.64286,
+       "stop": 1.64375,
+       "exit": 1.64375,
+       "why": "stop",
+       "R": -1,
+       "net": -1.151
+      },
+      {
+       "date": "2014-10-09",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.62089,
+       "stop": 1.62283,
+       "exit": 1.61171,
+       "why": "time",
+       "R": 4.744,
+       "net": 4.675
+      },
+      {
+       "date": "2014-11-06",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.59316,
+       "stop": 1.59508,
+       "exit": 1.58336,
+       "why": "time",
+       "R": 5.116,
+       "net": 5.047
+      },
+      {
+       "date": "2014-12-04",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.56577,
+       "stop": 1.56743,
+       "exit": 1.56743,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2015-01-08",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.5069,
+       "stop": 1.50523,
+       "exit": 1.50836,
+       "why": "time",
+       "R": 0.876,
+       "net": 0.799
+      },
+      {
+       "date": "2015-02-05",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.52418,
+       "stop": 1.52616,
+       "exit": 1.52616,
+       "why": "stop",
+       "R": -1,
+       "net": -1.065
+      },
+      {
+       "date": "2015-03-05",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.52476,
+       "stop": 1.5234,
+       "exit": 1.5234,
+       "why": "stop",
+       "R": -1,
+       "net": -1.094
+      },
+      {
+       "date": "2015-04-09",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.48386,
+       "stop": 1.48147,
+       "exit": 1.48147,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2015-05-11",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.54802,
+       "stop": 1.55049,
+       "exit": 1.55049,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2015-06-04",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.53893,
+       "stop": 1.54115,
+       "exit": 1.5366,
+       "why": "time",
+       "R": 1.052,
+       "net": 0.993
+      },
+      {
+       "date": "2015-07-09",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.54008,
+       "stop": 1.5383,
+       "exit": 1.5383,
+       "why": "stop",
+       "R": -1,
+       "net": -1.073
+      },
+      {
+       "date": "2015-08-06",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.54914,
+       "stop": 1.55082,
+       "exit": 1.55082,
+       "why": "stop",
+       "R": -1,
+       "net": -1.077
+      },
+      {
+       "date": "2015-09-10",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.53922,
+       "stop": 1.53764,
+       "exit": 1.5445,
+       "why": "time",
+       "R": 3.336,
+       "net": 3.254
+      },
+      {
+       "date": "2015-11-05",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.52875,
+       "stop": 1.52985,
+       "exit": 1.521,
+       "why": "time",
+       "R": 7.032,
+       "net": 6.915
+      },
+      {
+       "date": "2015-12-10",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.51373,
+       "stop": 1.51532,
+       "exit": 1.51532,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2016-01-14",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.43952,
+       "stop": 1.4375,
+       "exit": 1.44116,
+       "why": "time",
+       "R": 0.814,
+       "net": 0.752
+      },
+      {
+       "date": "2016-02-04",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.46162,
+       "stop": 1.45903,
+       "exit": 1.45903,
+       "why": "stop",
+       "R": -1,
+       "net": -1.048
+      },
+      {
+       "date": "2016-03-17",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.44069,
+       "stop": 1.43766,
+       "exit": 1.4483,
+       "why": "time",
+       "R": 2.515,
+       "net": 2.473
+      },
+      {
+       "date": "2016-04-14",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.41432,
+       "stop": 1.41184,
+       "exit": 1.41184,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2016-05-12",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.44462,
+       "stop": 1.44616,
+       "exit": 1.44616,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2016-06-16",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.41377,
+       "stop": 1.41087,
+       "exit": 1.41087,
+       "why": "stop",
+       "R": -1,
+       "net": -1.043
+      },
+      {
+       "date": "2016-07-14",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.33729,
+       "stop": 1.33373,
+       "exit": 1.33373,
+       "why": "stop",
+       "R": -1,
+       "net": -1.034
+      },
+      {
+       "date": "2016-08-04",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.3149,
+       "stop": 1.31711,
+       "exit": 1.31711,
+       "why": "stop",
+       "R": -1,
+       "net": -1.054
+      },
+      {
+       "date": "2016-09-15",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.32007,
+       "stop": 1.32248,
+       "exit": 1.32248,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2016-11-03",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.24755,
+       "stop": 1.24488,
+       "exit": 1.24488,
+       "why": "stop",
+       "R": -1,
+       "net": -1.044
+      },
+      {
+       "date": "2016-12-15",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.2469,
+       "stop": 1.24973,
+       "exit": 1.24973,
+       "why": "stop",
+       "R": -1,
+       "net": -1.041
+      },
+      {
+       "date": "2017-02-02",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.2573,
+       "stop": 1.25939,
+       "exit": 1.25375,
+       "why": "time",
+       "R": 1.699,
+       "net": 1.643
+      },
+      {
+       "date": "2017-03-16",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.23685,
+       "stop": 1.23504,
+       "exit": 1.23504,
+       "why": "stop",
+       "R": -1,
+       "net": -1.064
+      },
+      {
+       "date": "2017-05-11",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.28573,
+       "stop": 1.287,
+       "exit": 1.287,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2017-06-15",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.27666,
+       "stop": 1.27526,
+       "exit": 1.27526,
+       "why": "stop",
+       "R": -1,
+       "net": -1.084
+      },
+      {
+       "date": "2017-08-03",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.31437,
+       "stop": 1.3158,
+       "exit": 1.31386,
+       "why": "time",
+       "R": 0.356,
+       "net": 0.273
+      },
+      {
+       "date": "2017-09-14",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.33358,
+       "stop": 1.33244,
+       "exit": 1.33244,
+       "why": "stop",
+       "R": -1,
+       "net": -1.105
+      },
+      {
+       "date": "2017-11-02",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.31165,
+       "stop": 1.31357,
+       "exit": 1.306,
+       "why": "time",
+       "R": 2.949,
+       "net": 2.887
+      },
+      {
+       "date": "2017-12-14",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.3434,
+       "stop": 1.3454,
+       "exit": 1.34295,
+       "why": "time",
+       "R": 0.225,
+       "net": 0.165
+      }
+     ]
+    },
+    "dec": {
+     "events": 71,
+     "skipped": {},
+     "n": 71,
+     "netR": 0.11,
+     "monthT": 0.46,
+     "months": 107,
+     "tradeT": 0.46,
+     "grossR": 0.184,
+     "costR": 0.074,
+     "net2R": 0.036,
+     "monthT2": 0.15,
+     "win": 0.338,
+     "exits": {
+      "stop": 47,
+      "time": 24
+     },
+     "byYear": {
+      "2018": {
+       "n": 8,
+       "netR": 0.122
+      },
+      "2019": {
+       "n": 8,
+       "netR": 0.548
+      },
+      "2020": {
+       "n": 8,
+       "netR": 0.792
+      },
+      "2021": {
+       "n": 8,
+       "netR": -0.5
+      },
+      "2022": {
+       "n": 8,
+       "netR": -0.412
+      },
+      "2023": {
+       "n": 8,
+       "netR": -0.696
+      },
+      "2024": {
+       "n": 8,
+       "netR": 1.078
+      },
+      "2025": {
+       "n": 8,
+       "netR": -0.445
+      },
+      "2026": {
+       "n": 7,
+       "netR": 0.558
+      }
+     },
+     "clock": {
+      "picks": {},
+      "confirmed": 69,
+      "unconfirmed": [
+       "2018-12-20",
+       "2020-11-05"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2018-02-08",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.39884,
+       "stop": 1.3964,
+       "exit": 1.3964,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2018-03-22",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.4129,
+       "stop": 1.4146,
+       "exit": 1.40956,
+       "why": "time",
+       "R": 1.964,
+       "net": 1.891
+      },
+      {
+       "date": "2018-05-10",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.35314,
+       "stop": 1.35509,
+       "exit": 1.35509,
+       "why": "stop",
+       "R": -1,
+       "net": -1.062
+      },
+      {
+       "date": "2018-06-21",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.32172,
+       "stop": 1.32009,
+       "exit": 1.32437,
+       "why": "time",
+       "R": 1.626,
+       "net": 1.552
+      },
+      {
+       "date": "2018-08-02",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.30461,
+       "stop": 1.30578,
+       "exit": 1.30578,
+       "why": "stop",
+       "R": -1,
+       "net": -1.101
+      },
+      {
+       "date": "2018-09-13",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.30466,
+       "stop": 1.30594,
+       "exit": 1.30594,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2018-11-01",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.2911,
+       "stop": 1.28804,
+       "exit": 1.30011,
+       "why": "time",
+       "R": 2.947,
+       "net": 2.908
+      },
+      {
+       "date": "2018-12-20",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.267,
+       "stop": 1.26879,
+       "exit": 1.26879,
+       "why": "stop",
+       "R": -1,
+       "net": -1.065
+      },
+      {
+       "date": "2019-02-07",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.29035,
+       "stop": 1.28908,
+       "exit": 1.29492,
+       "why": "time",
+       "R": 3.596,
+       "net": 3.503
+      },
+      {
+       "date": "2019-03-21",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.31286,
+       "stop": 1.31077,
+       "exit": 1.31077,
+       "why": "stop",
+       "R": -1,
+       "net": -1.057
+      },
+      {
+       "date": "2019-05-02",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.30452,
+       "stop": 1.30569,
+       "exit": 1.30322,
+       "why": "time",
+       "R": 1.112,
+       "net": 1.01
+      },
+      {
+       "date": "2019-06-20",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.26894,
+       "stop": 1.27059,
+       "exit": 1.27059,
+       "why": "stop",
+       "R": -1,
+       "net": -1.071
+      },
+      {
+       "date": "2019-08-01",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.21156,
+       "stop": 1.20965,
+       "exit": 1.20965,
+       "why": "stop",
+       "R": -1,
+       "net": -1.06
+      },
+      {
+       "date": "2019-09-19",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.24704,
+       "stop": 1.24552,
+       "exit": 1.25241,
+       "why": "time",
+       "R": 3.531,
+       "net": 3.455
+      },
+      {
+       "date": "2019-11-07",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.28238,
+       "stop": 1.28356,
+       "exit": 1.28147,
+       "why": "time",
+       "R": 0.769,
+       "net": 0.669
+      },
+      {
+       "date": "2019-12-19",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.30794,
+       "stop": 1.30616,
+       "exit": 1.30616,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2020-01-30",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.30892,
+       "stop": 1.30741,
+       "exit": 1.30942,
+       "why": "time",
+       "R": 0.331,
+       "net": 0.253
+      },
+      {
+       "date": "2020-03-26",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.19879,
+       "stop": 1.19313,
+       "exit": 1.22032,
+       "why": "time",
+       "R": 3.801,
+       "net": 3.781
+      },
+      {
+       "date": "2020-05-07",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.2348,
+       "stop": 1.23698,
+       "exit": 1.23698,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2020-06-18",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.24856,
+       "stop": 1.25089,
+       "exit": 1.24223,
+       "why": "time",
+       "R": 2.716,
+       "net": 2.666
+      },
+      {
+       "date": "2020-08-06",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.31644,
+       "stop": 1.31847,
+       "exit": 1.31423,
+       "why": "time",
+       "R": 1.091,
+       "net": 1.032
+      },
+      {
+       "date": "2020-09-17",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.29033,
+       "stop": 1.2926,
+       "exit": 1.2926,
+       "why": "stop",
+       "R": -1,
+       "net": -1.052
+      },
+      {
+       "date": "2020-11-05",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.30834,
+       "stop": 1.30494,
+       "exit": 1.31451,
+       "why": "time",
+       "R": 1.815,
+       "net": 1.78
+      },
+      {
+       "date": "2020-12-17",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.35889,
+       "stop": 1.36055,
+       "exit": 1.36055,
+       "why": "stop",
+       "R": -1,
+       "net": -1.073
+      },
+      {
+       "date": "2021-02-04",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.36652,
+       "stop": 1.3649,
+       "exit": 1.36765,
+       "why": "time",
+       "R": 0.698,
+       "net": 0.623
+      },
+      {
+       "date": "2021-03-18",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.39445,
+       "stop": 1.39686,
+       "exit": 1.39237,
+       "why": "time",
+       "R": 0.864,
+       "net": 0.813
+      },
+      {
+       "date": "2021-05-06",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.39164,
+       "stop": 1.39033,
+       "exit": 1.39033,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2021-06-24",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.39115,
+       "stop": 1.39265,
+       "exit": 1.39265,
+       "why": "stop",
+       "R": -1,
+       "net": -1.082
+      },
+      {
+       "date": "2021-08-05",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.39249,
+       "stop": 1.39131,
+       "exit": 1.39131,
+       "why": "stop",
+       "R": -1,
+       "net": -1.104
+      },
+      {
+       "date": "2021-09-23",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.37186,
+       "stop": 1.37024,
+       "exit": 1.372,
+       "why": "time",
+       "R": 0.087,
+       "net": 0.011
+      },
+      {
+       "date": "2021-11-04",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.35448,
+       "stop": 1.35599,
+       "exit": 1.35599,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2021-12-16",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.33512,
+       "stop": 1.33372,
+       "exit": 1.33372,
+       "why": "stop",
+       "R": -1,
+       "net": -1.086
+      },
+      {
+       "date": "2022-02-03",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.35781,
+       "stop": 1.35658,
+       "exit": 1.35658,
+       "why": "stop",
+       "R": -1,
+       "net": -1.098
+      },
+      {
+       "date": "2022-03-17",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.30998,
+       "stop": 1.31186,
+       "exit": 1.31186,
+       "why": "stop",
+       "R": -1,
+       "net": -1.063
+      },
+      {
+       "date": "2022-05-05",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.23945,
+       "stop": 1.24209,
+       "exit": 1.2356,
+       "why": "time",
+       "R": 1.457,
+       "net": 1.413
+      },
+      {
+       "date": "2022-06-16",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.21323,
+       "stop": 1.21636,
+       "exit": 1.21636,
+       "why": "stop",
+       "R": -1,
+       "net": -1.037
+      },
+      {
+       "date": "2022-08-04",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.20858,
+       "stop": 1.2103,
+       "exit": 1.2103,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2022-09-22",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.13144,
+       "stop": 1.13489,
+       "exit": 1.12568,
+       "why": "time",
+       "R": 1.671,
+       "net": 1.638
+      },
+      {
+       "date": "2022-11-03",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.11634,
+       "stop": 1.11939,
+       "exit": 1.11939,
+       "why": "stop",
+       "R": -1,
+       "net": -1.036
+      },
+      {
+       "date": "2022-12-15",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.2311,
+       "stop": 1.23347,
+       "exit": 1.23347,
+       "why": "stop",
+       "R": -1,
+       "net": -1.049
+      },
+      {
+       "date": "2023-02-02",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.22923,
+       "stop": 1.23136,
+       "exit": 1.23136,
+       "why": "stop",
+       "R": -1,
+       "net": -1.054
+      },
+      {
+       "date": "2023-03-23",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.22756,
+       "stop": 1.22956,
+       "exit": 1.22956,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2023-05-11",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.25862,
+       "stop": 1.25725,
+       "exit": 1.25725,
+       "why": "stop",
+       "R": -1,
+       "net": -1.085
+      },
+      {
+       "date": "2023-06-22",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.27734,
+       "stop": 1.27859,
+       "exit": 1.27482,
+       "why": "time",
+       "R": 2.01,
+       "net": 1.917
+      },
+      {
+       "date": "2023-08-03",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.26472,
+       "stop": 1.26645,
+       "exit": 1.26645,
+       "why": "stop",
+       "R": -1,
+       "net": -1.068
+      },
+      {
+       "date": "2023-09-21",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.22686,
+       "stop": 1.22852,
+       "exit": 1.22852,
+       "why": "stop",
+       "R": -1,
+       "net": -1.07
+      },
+      {
+       "date": "2023-11-02",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.22156,
+       "stop": 1.22014,
+       "exit": 1.22014,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2023-12-14",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.27154,
+       "stop": 1.26981,
+       "exit": 1.26981,
+       "why": "stop",
+       "R": -1,
+       "net": -1.068
+      },
+      {
+       "date": "2024-02-01",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.26738,
+       "stop": 1.26592,
+       "exit": 1.26592,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2024-03-21",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.27355,
+       "stop": 1.27484,
+       "exit": 1.26575,
+       "why": "time",
+       "R": 6.03,
+       "net": 5.939
+      },
+      {
+       "date": "2024-05-09",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.24698,
+       "stop": 1.24788,
+       "exit": 1.24788,
+       "why": "stop",
+       "R": -1,
+       "net": -1.129
+      },
+      {
+       "date": "2024-06-20",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.26808,
+       "stop": 1.26881,
+       "exit": 1.26881,
+       "why": "stop",
+       "R": -1,
+       "net": -1.161
+      },
+      {
+       "date": "2024-08-01",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.2793,
+       "stop": 1.27781,
+       "exit": 1.27781,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2024-09-19",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.32854,
+       "stop": 1.32642,
+       "exit": 1.32642,
+       "why": "stop",
+       "R": -1,
+       "net": -1.057
+      },
+      {
+       "date": "2024-11-07",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.29561,
+       "stop": 1.29413,
+       "exit": 1.29828,
+       "why": "time",
+       "R": 1.808,
+       "net": 1.728
+      },
+      {
+       "date": "2024-12-19",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.26135,
+       "stop": 1.26304,
+       "exit": 1.25032,
+       "why": "time",
+       "R": 6.532,
+       "net": 6.463
+      },
+      {
+       "date": "2025-02-06",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.23744,
+       "stop": 1.23892,
+       "exit": 1.23892,
+       "why": "stop",
+       "R": -1,
+       "net": -1.078
+      },
+      {
+       "date": "2025-03-20",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.29514,
+       "stop": 1.29654,
+       "exit": 1.29654,
+       "why": "stop",
+       "R": -1,
+       "net": -1.085
+      },
+      {
+       "date": "2025-05-08",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.33262,
+       "stop": 1.33026,
+       "exit": 1.33026,
+       "why": "stop",
+       "R": -1,
+       "net": -1.051
+      },
+      {
+       "date": "2025-06-19",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.34472,
+       "stop": 1.34304,
+       "exit": 1.34304,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2025-08-07",
+       "D": "11:00",
+       "side": "buy",
+       "entry": 1.34128,
+       "stop": 1.34019,
+       "exit": 1.34019,
+       "why": "stop",
+       "R": -1,
+       "net": -1.11
+      },
+      {
+       "date": "2025-09-18",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.36218,
+       "stop": 1.36382,
+       "exit": 1.35541,
+       "why": "time",
+       "R": 4.137,
+       "net": 4.063
+      },
+      {
+       "date": "2025-11-06",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.31002,
+       "stop": 1.3089,
+       "exit": 1.3089,
+       "why": "stop",
+       "R": -1,
+       "net": -1.106
+      },
+      {
+       "date": "2025-12-18",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.33954,
+       "stop": 1.33853,
+       "exit": 1.33853,
+       "why": "stop",
+       "R": -1,
+       "net": -1.119
+      },
+      {
+       "date": "2026-02-05",
+       "D": "12:00",
+       "side": "sell",
+       "entry": 1.35817,
+       "stop": 1.36014,
+       "exit": 1.35387,
+       "why": "time",
+       "R": 2.183,
+       "net": 2.121
+      },
+      {
+       "date": "2026-03-19",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.32991,
+       "stop": 1.3281,
+       "exit": 1.34312,
+       "why": "time",
+       "R": 7.287,
+       "net": 7.221
+      },
+      {
+       "date": "2026-04-30",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.35172,
+       "stop": 1.35336,
+       "exit": 1.35336,
+       "why": "stop",
+       "R": -1,
+       "net": -1.074
+      },
+      {
+       "date": "2026-06-18",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.3211,
+       "stop": 1.32284,
+       "exit": 1.32284,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2026-07-30",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.3388,
+       "stop": 1.34029,
+       "exit": 1.34029,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2026-09-17",
+       "D": "11:00",
+       "side": "sell",
+       "entry": 1.33698,
+       "stop": 1.33806,
+       "exit": 1.33806,
+       "why": "stop",
+       "R": -1,
+       "net": -1.111
+      },
+      {
+       "date": "2026-11-05",
+       "D": "12:00",
+       "side": "buy",
+       "entry": 1.34672,
+       "stop": 1.34552,
+       "exit": 1.34552,
+       "why": "stop",
+       "R": -1,
+       "net": -1.1
+      }
+     ],
+     "placebo": {
+      "seeds": 40,
+      "p5": -0.352,
+      "p50": -0.172,
+      "p95": 0.194,
+      "max": 0.637,
+      "beaten": 36
+     },
+     "window": [
+      "2018-01-01",
+      "2026-11-13"
+     ]
+    }
+   }
+  },
+  "BOC": {
+   "bank": "BOC",
+   "sym": "usdcad",
+   "candles": 1271380,
+   "from": "2009-11-01",
+   "to": "2026-11-13",
+   "windows": {
+    "rep": {
+     "events": 64,
+     "skipped": {},
+     "n": 64,
+     "netR": 0.253,
+     "monthT": 0.94,
+     "months": 96,
+     "tradeT": 0.94,
+     "grossR": 0.329,
+     "costR": 0.076,
+     "net2R": 0.178,
+     "monthT2": 0.66,
+     "win": 0.375,
+     "exits": {
+      "stop": 34,
+      "time": 30
+     },
+     "byYear": {
+      "2010": {
+       "n": 8,
+       "netR": 0.37
+      },
+      "2011": {
+       "n": 8,
+       "netR": -0.58
+      },
+      "2012": {
+       "n": 8,
+       "netR": -0.893
+      },
+      "2013": {
+       "n": 8,
+       "netR": -0.392
+      },
+      "2014": {
+       "n": 8,
+       "netR": 0.498
+      },
+      "2015": {
+       "n": 8,
+       "netR": 1.061
+      },
+      "2016": {
+       "n": 8,
+       "netR": 0.116
+      },
+      "2017": {
+       "n": 8,
+       "netR": 1.848
+      }
+     },
+     "clock": {
+      "picks": {
+       "2010": {
+        "09:45": 5,
+        "10:00": 3
+       },
+       "2011": {
+        "10:00": 6,
+        "09:45": 2
+       },
+       "2012": {
+        "10:00": 5,
+        "09:45": 3
+       },
+       "2013": {
+        "10:00": 8
+       },
+       "2014": {
+        "10:00": 8
+       },
+       "2015": {
+        "10:00": 8
+       },
+       "2016": {
+        "10:00": 8
+       },
+       "2017": {
+        "10:00": 8
+       }
+      },
+      "confirmed": 45,
+      "unconfirmed": [
+       "2010-01-19",
+       "2010-03-02",
+       "2010-07-20",
+       "2010-09-08",
+       "2010-10-19",
+       "2010-12-07",
+       "2011-01-18",
+       "2011-03-01",
+       "2011-04-12",
+       "2011-05-31",
+       "2011-07-19",
+       "2011-09-07",
+       "2011-12-06",
+       "2012-01-17",
+       "2012-03-08",
+       "2012-04-17",
+       "2012-06-05",
+       "2012-12-04",
+       "2013-06-05"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2010-01-19",
+       "D": "14:45",
+       "side": "buy",
+       "entry": 1.0318,
+       "stop": 1.03022,
+       "exit": 1.03022,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2010-03-02",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.03266,
+       "stop": 1.03514,
+       "exit": 1.03514,
+       "why": "stop",
+       "R": -1,
+       "net": -1.043
+      },
+      {
+       "date": "2010-04-20",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 0.99874,
+       "stop": 1.00063,
+       "exit": 0.99846,
+       "why": "time",
+       "R": 0.148,
+       "net": 0.093
+      },
+      {
+       "date": "2010-06-01",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.04597,
+       "stop": 1.05003,
+       "exit": 1.05003,
+       "why": "stop",
+       "R": -1,
+       "net": -1.026
+      },
+      {
+       "date": "2010-07-20",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.05539,
+       "stop": 1.05819,
+       "exit": 1.04348,
+       "why": "time",
+       "R": 4.249,
+       "net": 4.211
+      },
+      {
+       "date": "2010-09-08",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.03689,
+       "stop": 1.0395,
+       "exit": 1.03745,
+       "why": "time",
+       "R": -0.214,
+       "net": -0.255
+      },
+      {
+       "date": "2010-10-19",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.03238,
+       "stop": 1.03466,
+       "exit": 1.03466,
+       "why": "stop",
+       "R": -1,
+       "net": -1.047
+      },
+      {
+       "date": "2010-12-07",
+       "D": "14:45",
+       "side": "buy",
+       "entry": 1.00693,
+       "stop": 1.00551,
+       "exit": 1.01142,
+       "why": "time",
+       "R": 3.172,
+       "net": 3.097
+      },
+      {
+       "date": "2011-01-18",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 0.99213,
+       "stop": 0.99056,
+       "exit": 0.99056,
+       "why": "stop",
+       "R": -1,
+       "net": -1.066
+      },
+      {
+       "date": "2011-03-01",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 0.97366,
+       "stop": 0.97244,
+       "exit": 0.97495,
+       "why": "time",
+       "R": 1.058,
+       "net": 0.973
+      },
+      {
+       "date": "2011-04-12",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 0.96382,
+       "stop": 0.96194,
+       "exit": 0.96194,
+       "why": "stop",
+       "R": -1,
+       "net": -1.055
+      },
+      {
+       "date": "2011-05-31",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 0.96867,
+       "stop": 0.96684,
+       "exit": 0.96842,
+       "why": "time",
+       "R": -0.137,
+       "net": -0.194
+      },
+      {
+       "date": "2011-07-19",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 0.95022,
+       "stop": 0.9487,
+       "exit": 0.95008,
+       "why": "time",
+       "R": -0.092,
+       "net": -0.16
+      },
+      {
+       "date": "2011-09-07",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 0.98888,
+       "stop": 0.98716,
+       "exit": 0.98716,
+       "why": "stop",
+       "R": -1,
+       "net": -1.061
+      },
+      {
+       "date": "2011-10-25",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.01638,
+       "stop": 1.01351,
+       "exit": 1.01351,
+       "why": "stop",
+       "R": -1,
+       "net": -1.037
+      },
+      {
+       "date": "2011-12-06",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.01328,
+       "stop": 1.01083,
+       "exit": 1.01083,
+       "why": "stop",
+       "R": -1,
+       "net": -1.043
+      },
+      {
+       "date": "2012-01-17",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.01424,
+       "stop": 1.01594,
+       "exit": 1.01594,
+       "why": "stop",
+       "R": -1,
+       "net": -1.062
+      },
+      {
+       "date": "2012-03-08",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 0.99348,
+       "stop": 0.99218,
+       "exit": 0.99218,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2012-04-17",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 0.98818,
+       "stop": 0.9893,
+       "exit": 0.9893,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2012-06-05",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.03934,
+       "stop": 1.03745,
+       "exit": 1.03814,
+       "why": "time",
+       "R": -0.634,
+       "net": -0.691
+      },
+      {
+       "date": "2012-07-17",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.01656,
+       "stop": 1.01552,
+       "exit": 1.01552,
+       "why": "stop",
+       "R": -1,
+       "net": -1.102
+      },
+      {
+       "date": "2012-09-05",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 0.99158,
+       "stop": 0.99025,
+       "exit": 0.99025,
+       "why": "stop",
+       "R": -1,
+       "net": -1.078
+      },
+      {
+       "date": "2012-10-23",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 0.9922,
+       "stop": 0.99122,
+       "exit": 0.99239,
+       "why": "time",
+       "R": 0.195,
+       "net": 0.087
+      },
+      {
+       "date": "2012-12-04",
+       "D": "14:45",
+       "side": "buy",
+       "entry": 0.99276,
+       "stop": 0.99191,
+       "exit": 0.99191,
+       "why": "stop",
+       "R": -1,
+       "net": -1.123
+      },
+      {
+       "date": "2013-01-23",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 0.99856,
+       "stop": 0.99777,
+       "exit": 0.99902,
+       "why": "time",
+       "R": 0.579,
+       "net": 0.447
+      },
+      {
+       "date": "2013-03-06",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.03085,
+       "stop": 1.02981,
+       "exit": 1.0315,
+       "why": "time",
+       "R": 0.625,
+       "net": 0.523
+      },
+      {
+       "date": "2013-04-17",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.02812,
+       "stop": 1.02692,
+       "exit": 1.02692,
+       "why": "stop",
+       "R": -1,
+       "net": -1.089
+      },
+      {
+       "date": "2013-06-05",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.03652,
+       "stop": 1.03505,
+       "exit": 1.03505,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2013-07-17",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.04269,
+       "stop": 1.0445,
+       "exit": 1.04046,
+       "why": "time",
+       "R": 1.231,
+       "net": 1.172
+      },
+      {
+       "date": "2013-09-04",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.04855,
+       "stop": 1.04976,
+       "exit": 1.04957,
+       "why": "time",
+       "R": -0.845,
+       "net": -0.934
+      },
+      {
+       "date": "2013-10-23",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.03885,
+       "stop": 1.03766,
+       "exit": 1.03766,
+       "why": "stop",
+       "R": -1,
+       "net": -1.09
+      },
+      {
+       "date": "2013-12-04",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.069,
+       "stop": 1.06786,
+       "exit": 1.06786,
+       "why": "stop",
+       "R": -1,
+       "net": -1.095
+      },
+      {
+       "date": "2014-01-22",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.10511,
+       "stop": 1.10407,
+       "exit": 1.10873,
+       "why": "time",
+       "R": 3.464,
+       "net": 3.359
+      },
+      {
+       "date": "2014-03-05",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.1062,
+       "stop": 1.10729,
+       "exit": 1.10366,
+       "why": "time",
+       "R": 2.324,
+       "net": 2.224
+      },
+      {
+       "date": "2014-04-16",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.10144,
+       "stop": 1.10027,
+       "exit": 1.10027,
+       "why": "stop",
+       "R": -1,
+       "net": -1.094
+      },
+      {
+       "date": "2014-06-04",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.09449,
+       "stop": 1.09351,
+       "exit": 1.09351,
+       "why": "stop",
+       "R": -1,
+       "net": -1.112
+      },
+      {
+       "date": "2014-07-16",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.07589,
+       "stop": 1.07667,
+       "exit": 1.074,
+       "why": "time",
+       "R": 2.412,
+       "net": 2.274
+      },
+      {
+       "date": "2014-09-03",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.08884,
+       "stop": 1.08996,
+       "exit": 1.08871,
+       "why": "time",
+       "R": 0.116,
+       "net": 0.019
+      },
+      {
+       "date": "2014-10-22",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.12089,
+       "stop": 1.12225,
+       "exit": 1.12225,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2014-12-03",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.13586,
+       "stop": 1.13739,
+       "exit": 1.13668,
+       "why": "time",
+       "R": -0.535,
+       "net": -0.607
+      },
+      {
+       "date": "2015-01-21",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.22867,
+       "stop": 1.2274,
+       "exit": 1.23362,
+       "why": "time",
+       "R": 3.898,
+       "net": 3.807
+      },
+      {
+       "date": "2015-03-04",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.24563,
+       "stop": 1.24726,
+       "exit": 1.24154,
+       "why": "time",
+       "R": 2.506,
+       "net": 2.435
+      },
+      {
+       "date": "2015-04-15",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.24106,
+       "stop": 1.24323,
+       "exit": 1.2291,
+       "why": "time",
+       "R": 5.522,
+       "net": 5.469
+      },
+      {
+       "date": "2015-05-27",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.24792,
+       "stop": 1.24574,
+       "exit": 1.24574,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2015-07-15",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.2893,
+       "stop": 1.28738,
+       "exit": 1.2915,
+       "why": "time",
+       "R": 1.144,
+       "net": 1.083
+      },
+      {
+       "date": "2015-09-09",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.31887,
+       "stop": 1.32077,
+       "exit": 1.32077,
+       "why": "stop",
+       "R": -1,
+       "net": -1.063
+      },
+      {
+       "date": "2015-10-21",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.30943,
+       "stop": 1.30766,
+       "exit": 1.30766,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2015-12-02",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.33496,
+       "stop": 1.33597,
+       "exit": 1.33597,
+       "why": "stop",
+       "R": -1,
+       "net": -1.119
+      },
+      {
+       "date": "2016-01-20",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.46474,
+       "stop": 1.46146,
+       "exit": 1.46146,
+       "why": "stop",
+       "R": -1,
+       "net": -1.038
+      },
+      {
+       "date": "2016-03-09",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.33006,
+       "stop": 1.33195,
+       "exit": 1.32507,
+       "why": "time",
+       "R": 2.644,
+       "net": 2.581
+      },
+      {
+       "date": "2016-04-13",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.2777,
+       "stop": 1.28013,
+       "exit": 1.28013,
+       "why": "stop",
+       "R": -1,
+       "net": -1.048
+      },
+      {
+       "date": "2016-05-25",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.30863,
+       "stop": 1.31055,
+       "exit": 1.30197,
+       "why": "time",
+       "R": 3.473,
+       "net": 3.411
+      },
+      {
+       "date": "2016-07-13",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.29845,
+       "stop": 1.30067,
+       "exit": 1.29771,
+       "why": "time",
+       "R": 0.333,
+       "net": 0.28
+      },
+      {
+       "date": "2016-09-07",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.2902,
+       "stop": 1.28883,
+       "exit": 1.28883,
+       "why": "stop",
+       "R": -1,
+       "net": -1.086
+      },
+      {
+       "date": "2016-10-19",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.3014,
+       "stop": 1.30316,
+       "exit": 1.30316,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2016-12-07",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.32414,
+       "stop": 1.3253,
+       "exit": 1.3253,
+       "why": "stop",
+       "R": -1,
+       "net": -1.103
+      },
+      {
+       "date": "2017-01-18",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.30942,
+       "stop": 1.30778,
+       "exit": 1.3259,
+       "why": "time",
+       "R": 10.066,
+       "net": 9.994
+      },
+      {
+       "date": "2017-03-01",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.33522,
+       "stop": 1.33316,
+       "exit": 1.33316,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2017-04-12",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.32692,
+       "stop": 1.32795,
+       "exit": 1.32795,
+       "why": "stop",
+       "R": -1,
+       "net": -1.117
+      },
+      {
+       "date": "2017-05-24",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.34445,
+       "stop": 1.34573,
+       "exit": 1.34573,
+       "why": "stop",
+       "R": -1,
+       "net": -1.094
+      },
+      {
+       "date": "2017-07-12",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.28236,
+       "stop": 1.2837,
+       "exit": 1.27514,
+       "why": "time",
+       "R": 5.377,
+       "net": 5.289
+      },
+      {
+       "date": "2017-09-06",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.22312,
+       "stop": 1.22457,
+       "exit": 1.22252,
+       "why": "time",
+       "R": 0.414,
+       "net": 0.335
+      },
+      {
+       "date": "2017-10-25",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.27876,
+       "stop": 1.27722,
+       "exit": 1.27962,
+       "why": "time",
+       "R": 0.557,
+       "net": 0.481
+      },
+      {
+       "date": "2017-12-06",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.27656,
+       "stop": 1.275,
+       "exit": 1.27973,
+       "why": "time",
+       "R": 2.028,
+       "net": 1.953
+      }
+     ]
+    },
+    "dec": {
+     "events": 71,
+     "skipped": {},
+     "n": 71,
+     "netR": -0.121,
+     "monthT": -0.6,
+     "months": 107,
+     "tradeT": -0.6,
+     "grossR": -0.021,
+     "costR": 0.1,
+     "net2R": -0.221,
+     "monthT2": -1.1,
+     "win": 0.296,
+     "exits": {
+      "stop": 46,
+      "time": 25
+     },
+     "byYear": {
+      "2018": {
+       "n": 8,
+       "netR": -0.485
+      },
+      "2019": {
+       "n": 8,
+       "netR": 1.093
+      },
+      "2020": {
+       "n": 8,
+       "netR": 0.202
+      },
+      "2021": {
+       "n": 8,
+       "netR": -0.404
+      },
+      "2022": {
+       "n": 8,
+       "netR": -0.286
+      },
+      "2023": {
+       "n": 8,
+       "netR": -1.084
+      },
+      "2024": {
+       "n": 8,
+       "netR": -0.278
+      },
+      "2025": {
+       "n": 8,
+       "netR": -0.27
+      },
+      "2026": {
+       "n": 7,
+       "netR": 0.504
+      }
+     },
+     "clock": {
+      "picks": {
+       "2018": {
+        "10:00": 8
+       },
+       "2019": {
+        "10:00": 8
+       },
+       "2020": {
+        "10:00": 8
+       },
+       "2021": {
+        "10:00": 8
+       },
+       "2022": {
+        "10:00": 8
+       },
+       "2023": {
+        "10:00": 8
+       },
+       "2024": {
+        "09:45": 8
+       },
+       "2025": {
+        "09:45": 7,
+        "10:00": 1
+       },
+       "2026": {
+        "10:00": 2,
+        "09:45": 5
+       }
+      },
+      "confirmed": 68,
+      "unconfirmed": [
+       "2025-06-04",
+       "2026-03-18",
+       "2026-07-15"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2018-01-17",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.24594,
+       "stop": 1.24823,
+       "exit": 1.24823,
+       "why": "stop",
+       "R": -1,
+       "net": -1.051
+      },
+      {
+       "date": "2018-03-07",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.29682,
+       "stop": 1.29508,
+       "exit": 1.29508,
+       "why": "stop",
+       "R": -1,
+       "net": -1.068
+      },
+      {
+       "date": "2018-04-18",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.25954,
+       "stop": 1.25827,
+       "exit": 1.26274,
+       "why": "time",
+       "R": 2.518,
+       "net": 2.426
+      },
+      {
+       "date": "2018-05-30",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.2878,
+       "stop": 1.28956,
+       "exit": 1.28735,
+       "why": "time",
+       "R": 0.256,
+       "net": 0.189
+      },
+      {
+       "date": "2018-07-11",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.31287,
+       "stop": 1.31431,
+       "exit": 1.31431,
+       "why": "stop",
+       "R": -1,
+       "net": -1.083
+      },
+      {
+       "date": "2018-09-05",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.31874,
+       "stop": 1.31718,
+       "exit": 1.31718,
+       "why": "stop",
+       "R": -1,
+       "net": -1.077
+      },
+      {
+       "date": "2018-10-24",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.30097,
+       "stop": 1.30213,
+       "exit": 1.30213,
+       "why": "stop",
+       "R": -1,
+       "net": -1.103
+      },
+      {
+       "date": "2018-12-05",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.33779,
+       "stop": 1.33674,
+       "exit": 1.33674,
+       "why": "stop",
+       "R": -1,
+       "net": -1.114
+      },
+      {
+       "date": "2019-01-09",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.32396,
+       "stop": 1.32263,
+       "exit": 1.32263,
+       "why": "stop",
+       "R": -1,
+       "net": -1.09
+      },
+      {
+       "date": "2019-03-06",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.34216,
+       "stop": 1.34114,
+       "exit": 1.34342,
+       "why": "time",
+       "R": 1.239,
+       "net": 1.12
+      },
+      {
+       "date": "2019-04-24",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.34818,
+       "stop": 1.34711,
+       "exit": 1.34711,
+       "why": "stop",
+       "R": -1,
+       "net": -1.113
+      },
+      {
+       "date": "2019-05-29",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.35272,
+       "stop": 1.35161,
+       "exit": 1.35161,
+       "why": "stop",
+       "R": -1,
+       "net": -1.109
+      },
+      {
+       "date": "2019-07-10",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.31154,
+       "stop": 1.31047,
+       "exit": 1.31047,
+       "why": "stop",
+       "R": -1,
+       "net": -1.111
+      },
+      {
+       "date": "2019-09-04",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.32828,
+       "stop": 1.32927,
+       "exit": 1.32236,
+       "why": "time",
+       "R": 5.993,
+       "net": 5.872
+      },
+      {
+       "date": "2019-10-30",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.31534,
+       "stop": 1.31454,
+       "exit": 1.3161,
+       "why": "time",
+       "R": 0.947,
+       "net": 0.799
+      },
+      {
+       "date": "2019-12-04",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.32332,
+       "stop": 1.32401,
+       "exit": 1.31948,
+       "why": "time",
+       "R": 5.548,
+       "net": 5.375
+      },
+      {
+       "date": "2020-01-22",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.31188,
+       "stop": 1.3111,
+       "exit": 1.3111,
+       "why": "stop",
+       "R": -1,
+       "net": -1.152
+      },
+      {
+       "date": "2020-03-04",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.33968,
+       "stop": 1.33834,
+       "exit": 1.33941,
+       "why": "time",
+       "R": -0.201,
+       "net": -0.291
+      },
+      {
+       "date": "2020-04-15",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.40716,
+       "stop": 1.41023,
+       "exit": 1.41023,
+       "why": "stop",
+       "R": -1,
+       "net": -1.04
+      },
+      {
+       "date": "2020-06-03",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.3489,
+       "stop": 1.35133,
+       "exit": 1.34954,
+       "why": "time",
+       "R": -0.263,
+       "net": -0.313
+      },
+      {
+       "date": "2020-07-15",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.35371,
+       "stop": 1.35507,
+       "exit": 1.35084,
+       "why": "time",
+       "R": 2.108,
+       "net": 2.019
+      },
+      {
+       "date": "2020-09-09",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.31756,
+       "stop": 1.31915,
+       "exit": 1.31454,
+       "why": "time",
+       "R": 1.9,
+       "net": 1.825
+      },
+      {
+       "date": "2020-10-28",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.33224,
+       "stop": 1.33072,
+       "exit": 1.33072,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2020-12-09",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.28014,
+       "stop": 1.2791,
+       "exit": 1.28198,
+       "why": "time",
+       "R": 1.762,
+       "net": 1.649
+      },
+      {
+       "date": "2021-01-20",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.26266,
+       "stop": 1.264,
+       "exit": 1.264,
+       "why": "stop",
+       "R": -1,
+       "net": -1.087
+      },
+      {
+       "date": "2021-03-10",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.26424,
+       "stop": 1.26275,
+       "exit": 1.26275,
+       "why": "stop",
+       "R": -1,
+       "net": -1.078
+      },
+      {
+       "date": "2021-04-21",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.24858,
+       "stop": 1.25016,
+       "exit": 1.2498,
+       "why": "time",
+       "R": -0.773,
+       "net": -0.846
+      },
+      {
+       "date": "2021-06-09",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.20898,
+       "stop": 1.20805,
+       "exit": 1.21114,
+       "why": "time",
+       "R": 2.314,
+       "net": 2.191
+      },
+      {
+       "date": "2021-07-14",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.24959,
+       "stop": 1.24806,
+       "exit": 1.25096,
+       "why": "time",
+       "R": 0.896,
+       "net": 0.82
+      },
+      {
+       "date": "2021-09-08",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.2725,
+       "stop": 1.2709,
+       "exit": 1.2709,
+       "why": "stop",
+       "R": -1,
+       "net": -1.073
+      },
+      {
+       "date": "2021-10-27",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.23412,
+       "stop": 1.23546,
+       "exit": 1.23546,
+       "why": "stop",
+       "R": -1,
+       "net": -1.086
+      },
+      {
+       "date": "2021-12-08",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.26603,
+       "stop": 1.26434,
+       "exit": 1.26434,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2022-01-26",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.26273,
+       "stop": 1.2612,
+       "exit": 1.2612,
+       "why": "stop",
+       "R": -1,
+       "net": -1.076
+      },
+      {
+       "date": "2022-03-02",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.26948,
+       "stop": 1.26793,
+       "exit": 1.26793,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2022-04-13",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.26313,
+       "stop": 1.26475,
+       "exit": 1.25654,
+       "why": "time",
+       "R": 4.068,
+       "net": 3.996
+      },
+      {
+       "date": "2022-06-01",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.26431,
+       "stop": 1.26293,
+       "exit": 1.26293,
+       "why": "stop",
+       "R": -1,
+       "net": -1.085
+      },
+      {
+       "date": "2022-07-13",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.29592,
+       "stop": 1.2981,
+       "exit": 1.2981,
+       "why": "stop",
+       "R": -1,
+       "net": -1.054
+      },
+      {
+       "date": "2022-09-07",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.31848,
+       "stop": 1.3165,
+       "exit": 1.3165,
+       "why": "stop",
+       "R": -1,
+       "net": -1.06
+      },
+      {
+       "date": "2022-10-26",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.3559,
+       "stop": 1.35889,
+       "exit": 1.3554,
+       "why": "time",
+       "R": 0.167,
+       "net": 0.127
+      },
+      {
+       "date": "2022-12-07",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.36068,
+       "stop": 1.36269,
+       "exit": 1.36269,
+       "why": "stop",
+       "R": -1,
+       "net": -1.06
+      },
+      {
+       "date": "2023-01-25",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.34112,
+       "stop": 1.33962,
+       "exit": 1.33962,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2023-03-08",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.37904,
+       "stop": 1.37769,
+       "exit": 1.37769,
+       "why": "stop",
+       "R": -1,
+       "net": -1.09
+      },
+      {
+       "date": "2023-04-12",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.34534,
+       "stop": 1.34689,
+       "exit": 1.34689,
+       "why": "stop",
+       "R": -1,
+       "net": -1.078
+      },
+      {
+       "date": "2023-06-07",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.33566,
+       "stop": 1.33717,
+       "exit": 1.33717,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2023-07-12",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.3159,
+       "stop": 1.31751,
+       "exit": 1.31751,
+       "why": "stop",
+       "R": -1,
+       "net": -1.074
+      },
+      {
+       "date": "2023-09-06",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.36651,
+       "stop": 1.36495,
+       "exit": 1.36495,
+       "why": "stop",
+       "R": -1,
+       "net": -1.078
+      },
+      {
+       "date": "2023-10-25",
+       "D": "14:00",
+       "side": "buy",
+       "entry": 1.37826,
+       "stop": 1.37699,
+       "exit": 1.37699,
+       "why": "stop",
+       "R": -1,
+       "net": -1.096
+      },
+      {
+       "date": "2023-12-06",
+       "D": "15:00",
+       "side": "sell",
+       "entry": 1.3564,
+       "stop": 1.35767,
+       "exit": 1.35767,
+       "why": "stop",
+       "R": -1,
+       "net": -1.096
+      },
+      {
+       "date": "2024-01-24",
+       "D": "14:45",
+       "side": "buy",
+       "entry": 1.34745,
+       "stop": 1.34627,
+       "exit": 1.35276,
+       "why": "time",
+       "R": 4.516,
+       "net": 4.414
+      },
+      {
+       "date": "2024-03-06",
+       "D": "14:45",
+       "side": "sell",
+       "entry": 1.35202,
+       "stop": 1.35307,
+       "exit": 1.35172,
+       "why": "time",
+       "R": 0.285,
+       "net": 0.17
+      },
+      {
+       "date": "2024-04-10",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.36679,
+       "stop": 1.36814,
+       "exit": 1.36814,
+       "why": "stop",
+       "R": -1,
+       "net": -1.09
+      },
+      {
+       "date": "2024-06-05",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 1.3713,
+       "stop": 1.37042,
+       "exit": 1.37042,
+       "why": "stop",
+       "R": -1,
+       "net": -1.138
+      },
+      {
+       "date": "2024-07-24",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 1.37986,
+       "stop": 1.37917,
+       "exit": 1.37917,
+       "why": "stop",
+       "R": -1,
+       "net": -1.178
+      },
+      {
+       "date": "2024-09-04",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.35,
+       "stop": 1.35107,
+       "exit": 1.35107,
+       "why": "stop",
+       "R": -1,
+       "net": -1.113
+      },
+      {
+       "date": "2024-10-23",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 1.38509,
+       "stop": 1.38443,
+       "exit": 1.38443,
+       "why": "stop",
+       "R": -1,
+       "net": -1.186
+      },
+      {
+       "date": "2024-12-11",
+       "D": "14:45",
+       "side": "sell",
+       "entry": 1.41472,
+       "stop": 1.41592,
+       "exit": 1.41592,
+       "why": "stop",
+       "R": -1,
+       "net": -1.103
+      },
+      {
+       "date": "2025-01-29",
+       "D": "14:45",
+       "side": "sell",
+       "entry": 1.4439,
+       "stop": 1.44515,
+       "exit": 1.44515,
+       "why": "stop",
+       "R": -1,
+       "net": -1.1
+      },
+      {
+       "date": "2025-03-12",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.44141,
+       "stop": 1.44324,
+       "exit": 1.43708,
+       "why": "time",
+       "R": 2.373,
+       "net": 2.304
+      },
+      {
+       "date": "2025-04-16",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.38902,
+       "stop": 1.39032,
+       "exit": 1.38584,
+       "why": "time",
+       "R": 2.441,
+       "net": 2.347
+      },
+      {
+       "date": "2025-06-04",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.36668,
+       "stop": 1.36783,
+       "exit": 1.36783,
+       "why": "stop",
+       "R": -1,
+       "net": -1.106
+      },
+      {
+       "date": "2025-07-30",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 1.38098,
+       "stop": 1.38001,
+       "exit": 1.38001,
+       "why": "stop",
+       "R": -1,
+       "net": -1.126
+      },
+      {
+       "date": "2025-09-17",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.37573,
+       "stop": 1.37642,
+       "exit": 1.37642,
+       "why": "stop",
+       "R": -1,
+       "net": -1.177
+      },
+      {
+       "date": "2025-10-29",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.39098,
+       "stop": 1.39187,
+       "exit": 1.39187,
+       "why": "stop",
+       "R": -1,
+       "net": -1.138
+      },
+      {
+       "date": "2025-12-10",
+       "D": "14:45",
+       "side": "buy",
+       "entry": 1.38588,
+       "stop": 1.38513,
+       "exit": 1.38513,
+       "why": "stop",
+       "R": -1,
+       "net": -1.164
+      },
+      {
+       "date": "2026-01-28",
+       "D": "15:00",
+       "side": "buy",
+       "entry": 1.35601,
+       "stop": 1.35439,
+       "exit": 1.35581,
+       "why": "time",
+       "R": -0.124,
+       "net": -0.198
+      },
+      {
+       "date": "2026-03-18",
+       "D": "14:00",
+       "side": "sell",
+       "entry": 1.36973,
+       "stop": 1.37076,
+       "exit": 1.37076,
+       "why": "stop",
+       "R": -1,
+       "net": -1.118
+      },
+      {
+       "date": "2026-04-29",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.36882,
+       "stop": 1.36954,
+       "exit": 1.36838,
+       "why": "time",
+       "R": 0.608,
+       "net": 0.44
+      },
+      {
+       "date": "2026-06-10",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 1.39237,
+       "stop": 1.39155,
+       "exit": 1.39439,
+       "why": "time",
+       "R": 2.468,
+       "net": 2.318
+      },
+      {
+       "date": "2026-07-15",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.40556,
+       "stop": 1.40657,
+       "exit": 1.40412,
+       "why": "time",
+       "R": 1.421,
+       "net": 1.299
+      },
+      {
+       "date": "2026-09-02",
+       "D": "13:45",
+       "side": "sell",
+       "entry": 1.38624,
+       "stop": 1.3871,
+       "exit": 1.38446,
+       "why": "time",
+       "R": 2.077,
+       "net": 1.934
+      },
+      {
+       "date": "2026-10-28",
+       "D": "13:45",
+       "side": "buy",
+       "entry": 1.40582,
+       "stop": 1.40497,
+       "exit": 1.40497,
+       "why": "stop",
+       "R": -1,
+       "net": -1.144
+      }
+     ],
+     "placebo": {
+      "seeds": 40,
+      "p5": -0.361,
+      "p50": -0.081,
+      "p95": 0.19,
+      "max": 0.306,
+      "beaten": 17
+     },
+     "window": [
+      "2018-01-01",
+      "2026-11-13"
+     ]
+    }
+   }
+  },
+  "SNB": {
+   "bank": "SNB",
+   "sym": "usdchf",
+   "candles": 1263412,
+   "from": "2009-11-01",
+   "to": "2026-11-13",
+   "windows": {
+    "rep": {
+     "events": 32,
+     "skipped": {},
+     "n": 32,
+     "netR": -0.179,
+     "monthT": -0.62,
+     "months": 96,
+     "tradeT": -0.62,
+     "grossR": -0.105,
+     "costR": 0.074,
+     "net2R": -0.252,
+     "monthT2": -0.87,
+     "win": 0.281,
+     "exits": {
+      "stop": 22,
+      "time": 9,
+      "gap": 1
+     },
+     "byYear": {
+      "2010": {
+       "n": 4,
+       "netR": 0.289
+      },
+      "2011": {
+       "n": 4,
+       "netR": -0.346
+      },
+      "2012": {
+       "n": 4,
+       "netR": -1.102
+      },
+      "2013": {
+       "n": 4,
+       "netR": -1.082
+      },
+      "2014": {
+       "n": 4,
+       "netR": -0.748
+      },
+      "2015": {
+       "n": 4,
+       "netR": -0.791
+      },
+      "2016": {
+       "n": 4,
+       "netR": 2.085
+      },
+      "2017": {
+       "n": 4,
+       "netR": 0.263
+      }
+     },
+     "clock": {
+      "picks": {},
+      "confirmed": 22,
+      "unconfirmed": [
+       "2010-03-11",
+       "2010-09-16",
+       "2011-09-15",
+       "2012-06-14",
+       "2012-12-13",
+       "2013-09-19",
+       "2013-12-12",
+       "2016-12-15",
+       "2017-03-16",
+       "2017-06-15"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2010-03-11",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 1.07063,
+       "stop": 1.0718,
+       "exit": 1.0718,
+       "why": "stop",
+       "R": -1,
+       "net": -1.092
+      },
+      {
+       "date": "2010-06-17",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 1.11871,
+       "stop": 1.12022,
+       "exit": 1.11197,
+       "why": "time",
+       "R": 4.455,
+       "net": 4.382
+      },
+      {
+       "date": "2010-09-16",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 1.00238,
+       "stop": 1.00098,
+       "exit": 1.00098,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2010-12-16",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.96758,
+       "stop": 0.9693,
+       "exit": 0.9693,
+       "why": "stop",
+       "R": -1,
+       "net": -1.06
+      },
+      {
+       "date": "2011-03-17",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.90424,
+       "stop": 0.8997,
+       "exit": 0.8997,
+       "why": "stop",
+       "R": -1,
+       "net": -1.022
+      },
+      {
+       "date": "2011-06-16",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.85081,
+       "stop": 0.85257,
+       "exit": 0.84761,
+       "why": "time",
+       "R": 1.814,
+       "net": 1.759
+      },
+      {
+       "date": "2011-09-15",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.8771,
+       "stop": 0.8754,
+       "exit": 0.8754,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2011-12-15",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.94449,
+       "stop": 0.94286,
+       "exit": 0.94286,
+       "why": "stop",
+       "R": -1,
+       "net": -1.063
+      },
+      {
+       "date": "2012-03-15",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.92712,
+       "stop": 0.9285,
+       "exit": 0.9285,
+       "why": "stop",
+       "R": -1,
+       "net": -1.074
+      },
+      {
+       "date": "2012-06-14",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.95504,
+       "stop": 0.95628,
+       "exit": 0.95628,
+       "why": "stop",
+       "R": -1,
+       "net": -1.083
+      },
+      {
+       "date": "2012-09-13",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.9364,
+       "stop": 0.93564,
+       "exit": 0.93564,
+       "why": "stop",
+       "R": -1,
+       "net": -1.134
+      },
+      {
+       "date": "2012-12-13",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.92492,
+       "stop": 0.92579,
+       "exit": 0.92579,
+       "why": "stop",
+       "R": -1,
+       "net": -1.117
+      },
+      {
+       "date": "2013-03-14",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.9547,
+       "stop": 0.95381,
+       "exit": 0.95381,
+       "why": "stop",
+       "R": -1,
+       "net": -1.115
+      },
+      {
+       "date": "2013-06-20",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.93284,
+       "stop": 0.92994,
+       "exit": 0.92994,
+       "why": "stop",
+       "R": -1,
+       "net": -1.035
+      },
+      {
+       "date": "2013-09-19",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.91045,
+       "stop": 0.91244,
+       "exit": 0.91244,
+       "why": "stop",
+       "R": -1,
+       "net": -1.051
+      },
+      {
+       "date": "2013-12-12",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.88782,
+       "stop": 0.88702,
+       "exit": 0.88702,
+       "why": "stop",
+       "R": -1,
+       "net": -1.126
+      },
+      {
+       "date": "2014-03-20",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.88339,
+       "stop": 0.88202,
+       "exit": 0.8838,
+       "why": "time",
+       "R": 0.3,
+       "net": 0.227
+      },
+      {
+       "date": "2014-06-19",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.89264,
+       "stop": 0.89375,
+       "exit": 0.89376,
+       "why": "gap",
+       "R": -1.005,
+       "net": -1.095
+      },
+      {
+       "date": "2014-09-18",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.93732,
+       "stop": 0.93909,
+       "exit": 0.93909,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2014-12-11",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.96717,
+       "stop": 0.96557,
+       "exit": 0.96557,
+       "why": "stop",
+       "R": -1,
+       "net": -1.065
+      },
+      {
+       "date": "2015-03-19",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.99066,
+       "stop": 0.99677,
+       "exit": 0.99006,
+       "why": "time",
+       "R": 0.098,
+       "net": 0.081
+      },
+      {
+       "date": "2015-06-18",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.91608,
+       "stop": 0.91786,
+       "exit": 0.91786,
+       "why": "stop",
+       "R": -1,
+       "net": -1.057
+      },
+      {
+       "date": "2015-09-17",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.96751,
+       "stop": 0.96862,
+       "exit": 0.96862,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2015-12-10",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.98831,
+       "stop": 0.98722,
+       "exit": 0.98722,
+       "why": "stop",
+       "R": -1,
+       "net": -1.096
+      },
+      {
+       "date": "2016-03-17",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.97282,
+       "stop": 0.97484,
+       "exit": 0.96753,
+       "why": "time",
+       "R": 2.621,
+       "net": 2.569
+      },
+      {
+       "date": "2016-06-16",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.96051,
+       "stop": 0.95892,
+       "exit": 0.96496,
+       "why": "time",
+       "R": 2.801,
+       "net": 2.736
+      },
+      {
+       "date": "2016-09-15",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.97566,
+       "stop": 0.97658,
+       "exit": 0.9718,
+       "why": "time",
+       "R": 4.192,
+       "net": 4.08
+      },
+      {
+       "date": "2016-12-15",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 1.02396,
+       "stop": 1.02639,
+       "exit": 1.02639,
+       "why": "stop",
+       "R": -1,
+       "net": -1.044
+      },
+      {
+       "date": "2017-03-16",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.99966,
+       "stop": 1.00155,
+       "exit": 0.99648,
+       "why": "time",
+       "R": 1.683,
+       "net": 1.628
+      },
+      {
+       "date": "2017-06-15",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.97301,
+       "stop": 0.97163,
+       "exit": 0.97532,
+       "why": "time",
+       "R": 1.668,
+       "net": 1.593
+      },
+      {
+       "date": "2017-09-14",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.96666,
+       "stop": 0.96539,
+       "exit": 0.96539,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2017-12-14",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.98772,
+       "stop": 0.98653,
+       "exit": 0.98653,
+       "why": "stop",
+       "R": -1,
+       "net": -1.088
+      }
+     ]
+    },
+    "dec": {
+     "events": 35,
+     "skipped": {},
+     "n": 35,
+     "netR": 0.038,
+     "monthT": 0.09,
+     "months": 107,
+     "tradeT": 0.09,
+     "grossR": 0.143,
+     "costR": 0.105,
+     "net2R": -0.067,
+     "monthT2": -0.15,
+     "win": 0.2,
+     "exits": {
+      "stop": 27,
+      "time": 8
+     },
+     "byYear": {
+      "2018": {
+       "n": 4,
+       "netR": 1.833
+      },
+      "2019": {
+       "n": 4,
+       "netR": -1.106
+      },
+      "2020": {
+       "n": 4,
+       "netR": 1.06
+      },
+      "2021": {
+       "n": 4,
+       "netR": -0.022
+      },
+      "2022": {
+       "n": 4,
+       "netR": 0.165
+      },
+      "2023": {
+       "n": 4,
+       "netR": -0.888
+      },
+      "2024": {
+       "n": 4,
+       "netR": -1.14
+      },
+      "2025": {
+       "n": 4,
+       "netR": 0.413
+      },
+      "2026": {
+       "n": 3,
+       "netR": 0.023
+      }
+     },
+     "clock": {
+      "picks": {},
+      "confirmed": 29,
+      "unconfirmed": [
+       "2018-06-21",
+       "2018-12-13",
+       "2019-03-21",
+       "2020-09-24",
+       "2020-12-17",
+       "2021-06-17"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2018-03-15",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.9454,
+       "stop": 0.94467,
+       "exit": 0.94467,
+       "why": "stop",
+       "R": -1,
+       "net": -1.14
+      },
+      {
+       "date": "2018-06-21",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.99624,
+       "stop": 0.99707,
+       "exit": 0.99707,
+       "why": "stop",
+       "R": -1,
+       "net": -1.127
+      },
+      {
+       "date": "2018-09-20",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.96623,
+       "stop": 0.96691,
+       "exit": 0.95884,
+       "why": "time",
+       "R": 10.868,
+       "net": 10.715
+      },
+      {
+       "date": "2018-12-13",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.99204,
+       "stop": 0.99294,
+       "exit": 0.99294,
+       "why": "stop",
+       "R": -1,
+       "net": -1.116
+      },
+      {
+       "date": "2019-03-21",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.99318,
+       "stop": 0.99166,
+       "exit": 0.99166,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2019-06-13",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.99338,
+       "stop": 0.99409,
+       "exit": 0.99409,
+       "why": "stop",
+       "R": -1,
+       "net": -1.147
+      },
+      {
+       "date": "2019-09-19",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.99232,
+       "stop": 0.99343,
+       "exit": 0.99343,
+       "why": "stop",
+       "R": -1,
+       "net": -1.094
+      },
+      {
+       "date": "2019-12-12",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.98223,
+       "stop": 0.98133,
+       "exit": 0.98133,
+       "why": "stop",
+       "R": -1,
+       "net": -1.116
+      },
+      {
+       "date": "2020-03-19",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.97226,
+       "stop": 0.96919,
+       "exit": 0.98604,
+       "why": "time",
+       "R": 4.482,
+       "net": 4.449
+      },
+      {
+       "date": "2020-06-18",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.94919,
+       "stop": 0.94992,
+       "exit": 0.94992,
+       "why": "stop",
+       "R": -1,
+       "net": -1.142
+      },
+      {
+       "date": "2020-09-24",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.92501,
+       "stop": 0.92416,
+       "exit": 0.92685,
+       "why": "time",
+       "R": 2.152,
+       "net": 2.033
+      },
+      {
+       "date": "2020-12-17",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.88302,
+       "stop": 0.884,
+       "exit": 0.884,
+       "why": "stop",
+       "R": -1,
+       "net": -1.102
+      },
+      {
+       "date": "2021-03-25",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.93697,
+       "stop": 0.93754,
+       "exit": 0.93754,
+       "why": "stop",
+       "R": -1,
+       "net": -1.179
+      },
+      {
+       "date": "2021-06-17",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.91261,
+       "stop": 0.91107,
+       "exit": 0.91773,
+       "why": "time",
+       "R": 3.314,
+       "net": 3.249
+      },
+      {
+       "date": "2021-09-23",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.92306,
+       "stop": 0.92443,
+       "exit": 0.92443,
+       "why": "stop",
+       "R": -1,
+       "net": -1.074
+      },
+      {
+       "date": "2021-12-16",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.92234,
+       "stop": 0.92355,
+       "exit": 0.92355,
+       "why": "stop",
+       "R": -1,
+       "net": -1.084
+      },
+      {
+       "date": "2022-03-24",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.93311,
+       "stop": 0.93384,
+       "exit": 0.93022,
+       "why": "time",
+       "R": 3.936,
+       "net": 3.797
+      },
+      {
+       "date": "2022-06-16",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.98153,
+       "stop": 0.98424,
+       "exit": 0.98424,
+       "why": "stop",
+       "R": -1,
+       "net": -1.038
+      },
+      {
+       "date": "2022-09-22",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.97841,
+       "stop": 0.97601,
+       "exit": 0.97601,
+       "why": "stop",
+       "R": -1,
+       "net": -1.043
+      },
+      {
+       "date": "2022-12-15",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.92838,
+       "stop": 0.92658,
+       "exit": 0.92658,
+       "why": "stop",
+       "R": -1,
+       "net": -1.057
+      },
+      {
+       "date": "2023-03-23",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.9162,
+       "stop": 0.91823,
+       "exit": 0.91664,
+       "why": "time",
+       "R": -0.217,
+       "net": -0.267
+      },
+      {
+       "date": "2023-06-22",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.89396,
+       "stop": 0.89329,
+       "exit": 0.89329,
+       "why": "stop",
+       "R": -1,
+       "net": -1.15
+      },
+      {
+       "date": "2023-09-21",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.90494,
+       "stop": 0.90373,
+       "exit": 0.90373,
+       "why": "stop",
+       "R": -1,
+       "net": -1.083
+      },
+      {
+       "date": "2023-12-14",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.869,
+       "stop": 0.87098,
+       "exit": 0.87098,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2024-03-21",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.8946,
+       "stop": 0.89351,
+       "exit": 0.89351,
+       "why": "stop",
+       "R": -1,
+       "net": -1.092
+      },
+      {
+       "date": "2024-06-20",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.89046,
+       "stop": 0.89,
+       "exit": 0.89,
+       "why": "stop",
+       "R": -1,
+       "net": -1.22
+      },
+      {
+       "date": "2024-09-26",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.84936,
+       "stop": 0.85017,
+       "exit": 0.85017,
+       "why": "stop",
+       "R": -1,
+       "net": -1.121
+      },
+      {
+       "date": "2024-12-12",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.88716,
+       "stop": 0.88794,
+       "exit": 0.88794,
+       "why": "stop",
+       "R": -1,
+       "net": -1.129
+      },
+      {
+       "date": "2025-03-20",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.88228,
+       "stop": 0.88118,
+       "exit": 0.88118,
+       "why": "stop",
+       "R": -1,
+       "net": -1.09
+      },
+      {
+       "date": "2025-06-19",
+       "D": "07:30",
+       "side": "sell",
+       "entry": 0.81728,
+       "stop": 0.81842,
+       "exit": 0.81842,
+       "why": "stop",
+       "R": -1,
+       "net": -1.085
+      },
+      {
+       "date": "2025-09-25",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.79626,
+       "stop": 0.79575,
+       "exit": 0.79575,
+       "why": "stop",
+       "R": -1,
+       "net": -1.189
+      },
+      {
+       "date": "2025-12-11",
+       "D": "08:30",
+       "side": "sell",
+       "entry": 0.79923,
+       "stop": 0.8001,
+       "exit": 0.79478,
+       "why": "time",
+       "R": 5.128,
+       "net": 5.017
+      },
+      {
+       "date": "2026-03-19",
+       "D": "08:30",
+       "side": "buy",
+       "entry": 0.79333,
+       "stop": 0.79232,
+       "exit": 0.79232,
+       "why": "stop",
+       "R": -1,
+       "net": -1.095
+      },
+      {
+       "date": "2026-06-18",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.80149,
+       "stop": 0.80012,
+       "exit": 0.80468,
+       "why": "time",
+       "R": 2.335,
+       "net": 2.264
+      },
+      {
+       "date": "2026-09-24",
+       "D": "07:30",
+       "side": "buy",
+       "entry": 0.82794,
+       "stop": 0.82698,
+       "exit": 0.82698,
+       "why": "stop",
+       "R": -1,
+       "net": -1.101
+      }
+     ],
+     "placebo": {
+      "seeds": 40,
+      "p5": -0.572,
+      "p50": -0.216,
+      "p95": 0.714,
+      "max": 0.763,
+      "beaten": 30
+     },
+     "window": [
+      "2018-01-01",
+      "2026-11-13"
+     ]
+    }
+   }
+  },
+  "RBA": {
+   "bank": "RBA",
+   "sym": "audusd",
+   "candles": 1271134,
+   "from": "2009-11-01",
+   "to": "2026-11-13",
+   "windows": {
+    "rep": {
+     "events": 88,
+     "skipped": {
+      "no direction": 1
+     },
+     "n": 87,
+     "netR": 0.009,
+     "monthT": 0.04,
+     "months": 96,
+     "tradeT": 0.04,
+     "grossR": 0.083,
+     "costR": 0.074,
+     "net2R": -0.065,
+     "monthT2": -0.29,
+     "win": 0.264,
+     "exits": {
+      "stop": 63,
+      "time": 24
+     },
+     "byYear": {
+      "2010": {
+       "n": 11,
+       "netR": 0.973
+      },
+      "2011": {
+       "n": 11,
+       "netR": 0.598
+      },
+      "2012": {
+       "n": 11,
+       "netR": -0.495
+      },
+      "2013": {
+       "n": 11,
+       "netR": -1.071
+      },
+      "2014": {
+       "n": 11,
+       "netR": -0.116
+      },
+      "2015": {
+       "n": 11,
+       "netR": 0.448
+      },
+      "2016": {
+       "n": 10,
+       "netR": 0.602
+      },
+      "2017": {
+       "n": 11,
+       "netR": -0.811
+      }
+     },
+     "clock": {
+      "picks": {},
+      "confirmed": 87,
+      "unconfirmed": []
+     },
+     "trades": [
+      {
+       "date": "2010-02-02",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.88012,
+       "stop": 0.88224,
+       "exit": 0.88224,
+       "why": "stop",
+       "R": -1,
+       "net": -1.047
+      },
+      {
+       "date": "2010-03-02",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.89822,
+       "stop": 0.89617,
+       "exit": 0.90357,
+       "why": "time",
+       "R": 2.612,
+       "net": 2.563
+      },
+      {
+       "date": "2010-04-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.92268,
+       "stop": 0.92127,
+       "exit": 0.92127,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2010-05-04",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.92243,
+       "stop": 0.92395,
+       "exit": 0.91068,
+       "why": "time",
+       "R": 7.727,
+       "net": 7.66
+      },
+      {
+       "date": "2010-06-01",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.84031,
+       "stop": 0.83704,
+       "exit": 0.83704,
+       "why": "stop",
+       "R": -1,
+       "net": -1.03
+      },
+      {
+       "date": "2010-07-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.84034,
+       "stop": 0.8383,
+       "exit": 0.85421,
+       "why": "time",
+       "R": 6.787,
+       "net": 6.739
+      },
+      {
+       "date": "2010-08-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.91192,
+       "stop": 0.9101,
+       "exit": 0.9101,
+       "why": "stop",
+       "R": -1,
+       "net": -1.055
+      },
+      {
+       "date": "2010-09-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.91239,
+       "stop": 0.91366,
+       "exit": 0.91366,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2010-10-05",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.95771,
+       "stop": 0.95948,
+       "exit": 0.95948,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2010-11-02",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.99686,
+       "stop": 0.99493,
+       "exit": 0.99916,
+       "why": "time",
+       "R": 1.19,
+       "net": 1.136
+      },
+      {
+       "date": "2010-12-07",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.99039,
+       "stop": 0.99233,
+       "exit": 0.99233,
+       "why": "stop",
+       "R": -1,
+       "net": -1.054
+      },
+      {
+       "date": "2011-02-01",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 1.00054,
+       "stop": 0.99878,
+       "exit": 1.00785,
+       "why": "time",
+       "R": 4.15,
+       "net": 4.09
+      },
+      {
+       "date": "2011-03-01",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 1.01671,
+       "stop": 1.01823,
+       "exit": 1.01823,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2011-04-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.03252,
+       "stop": 1.03392,
+       "exit": 1.03392,
+       "why": "stop",
+       "R": -1,
+       "net": -1.076
+      },
+      {
+       "date": "2011-05-03",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.09036,
+       "stop": 1.09277,
+       "exit": 1.0901,
+       "why": "time",
+       "R": 0.108,
+       "net": 0.063
+      },
+      {
+       "date": "2011-06-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.06857,
+       "stop": 1.07044,
+       "exit": 1.07044,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2011-07-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.06816,
+       "stop": 1.06961,
+       "exit": 1.06961,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2011-08-02",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.09179,
+       "stop": 1.09418,
+       "exit": 1.08399,
+       "why": "time",
+       "R": 3.27,
+       "net": 3.225
+      },
+      {
+       "date": "2011-09-06",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.051,
+       "stop": 1.05309,
+       "exit": 1.05309,
+       "why": "stop",
+       "R": -1,
+       "net": -1.051
+      },
+      {
+       "date": "2011-10-04",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.94961,
+       "stop": 0.95418,
+       "exit": 0.94378,
+       "why": "time",
+       "R": 1.276,
+       "net": 1.253
+      },
+      {
+       "date": "2011-11-01",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 1.04726,
+       "stop": 1.05065,
+       "exit": 1.03252,
+       "why": "time",
+       "R": 4.348,
+       "net": 4.316
+      },
+      {
+       "date": "2011-12-06",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 1.01948,
+       "stop": 1.0218,
+       "exit": 1.0218,
+       "why": "stop",
+       "R": -1,
+       "net": -1.046
+      },
+      {
+       "date": "2012-02-07",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 1.078,
+       "stop": 1.07644,
+       "exit": 1.07644,
+       "why": "stop",
+       "R": -1,
+       "net": -1.07
+      },
+      {
+       "date": "2012-03-06",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 1.06163,
+       "stop": 1.0633,
+       "exit": 1.0633,
+       "why": "stop",
+       "R": -1,
+       "net": -1.064
+      },
+      {
+       "date": "2012-04-03",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.04054,
+       "stop": 1.04222,
+       "exit": 1.03805,
+       "why": "time",
+       "R": 1.482,
+       "net": 1.419
+      },
+      {
+       "date": "2012-05-01",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.032,
+       "stop": 1.03314,
+       "exit": 1.03314,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2012-06-05",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.97853,
+       "stop": 0.97649,
+       "exit": 0.97649,
+       "why": "stop",
+       "R": -1,
+       "net": -1.051
+      },
+      {
+       "date": "2012-07-03",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.02605,
+       "stop": 1.02778,
+       "exit": 1.02778,
+       "why": "stop",
+       "R": -1,
+       "net": -1.061
+      },
+      {
+       "date": "2012-08-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.05788,
+       "stop": 1.05907,
+       "exit": 1.05907,
+       "why": "stop",
+       "R": -1,
+       "net": -1.091
+      },
+      {
+       "date": "2012-09-04",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 1.0269,
+       "stop": 1.02576,
+       "exit": 1.02576,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2012-10-02",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.03036,
+       "stop": 1.0319,
+       "exit": 1.0319,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2012-11-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 1.0433,
+       "stop": 1.04239,
+       "exit": 1.04239,
+       "why": "stop",
+       "R": -1,
+       "net": -1.117
+      },
+      {
+       "date": "2012-12-04",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 1.04424,
+       "stop": 1.04317,
+       "exit": 1.04739,
+       "why": "time",
+       "R": 2.946,
+       "net": 2.846
+      },
+      {
+       "date": "2013-02-05",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 1.04029,
+       "stop": 1.04156,
+       "exit": 1.04156,
+       "why": "stop",
+       "R": -1,
+       "net": -1.084
+      },
+      {
+       "date": "2013-03-05",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 1.02359,
+       "stop": 1.02205,
+       "exit": 1.02205,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2013-04-02",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 1.04613,
+       "stop": 1.04513,
+       "exit": 1.04513,
+       "why": "stop",
+       "R": -1,
+       "net": -1.107
+      },
+      {
+       "date": "2013-05-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 1.0192,
+       "stop": 1.02024,
+       "exit": 1.02024,
+       "why": "stop",
+       "R": -1,
+       "net": -1.102
+      },
+      {
+       "date": "2013-06-04",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.97252,
+       "stop": 0.96969,
+       "exit": 0.96969,
+       "why": "stop",
+       "R": -1,
+       "net": -1.037
+      },
+      {
+       "date": "2013-07-02",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.91774,
+       "stop": 0.91964,
+       "exit": 0.91964,
+       "why": "stop",
+       "R": -1,
+       "net": -1.053
+      },
+      {
+       "date": "2013-08-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.89853,
+       "stop": 0.89682,
+       "exit": 0.89682,
+       "why": "stop",
+       "R": -1,
+       "net": -1.059
+      },
+      {
+       "date": "2013-09-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.90392,
+       "stop": 0.90216,
+       "exit": 0.90216,
+       "why": "stop",
+       "R": -1,
+       "net": -1.057
+      },
+      {
+       "date": "2013-10-01",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.93968,
+       "stop": 0.93794,
+       "exit": 0.93794,
+       "why": "stop",
+       "R": -1,
+       "net": -1.059
+      },
+      {
+       "date": "2013-11-05",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.94756,
+       "stop": 0.94867,
+       "exit": 0.94867,
+       "why": "stop",
+       "R": -1,
+       "net": -1.092
+      },
+      {
+       "date": "2013-12-03",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.90838,
+       "stop": 0.91002,
+       "exit": 0.91002,
+       "why": "stop",
+       "R": -1,
+       "net": -1.062
+      },
+      {
+       "date": "2014-02-04",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.88766,
+       "stop": 0.88589,
+       "exit": 0.89048,
+       "why": "time",
+       "R": 1.591,
+       "net": 1.535
+      },
+      {
+       "date": "2014-03-04",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.89242,
+       "stop": 0.89388,
+       "exit": 0.89388,
+       "why": "stop",
+       "R": -1,
+       "net": -1.068
+      },
+      {
+       "date": "2014-04-01",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.92638,
+       "stop": 0.92781,
+       "exit": 0.92781,
+       "why": "stop",
+       "R": -1,
+       "net": -1.071
+      },
+      {
+       "date": "2014-05-06",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.92754,
+       "stop": 0.92839,
+       "exit": 0.92839,
+       "why": "stop",
+       "R": -1,
+       "net": -1.12
+      },
+      {
+       "date": "2014-06-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.92675,
+       "stop": 0.92564,
+       "exit": 0.92564,
+       "why": "stop",
+       "R": -1,
+       "net": -1.091
+      },
+      {
+       "date": "2014-07-01",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.94534,
+       "stop": 0.94418,
+       "exit": 0.9482,
+       "why": "time",
+       "R": 2.464,
+       "net": 2.376
+      },
+      {
+       "date": "2014-08-05",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.93382,
+       "stop": 0.93325,
+       "exit": 0.93325,
+       "why": "stop",
+       "R": -1,
+       "net": -1.178
+      },
+      {
+       "date": "2014-09-02",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.92972,
+       "stop": 0.93048,
+       "exit": 0.9275,
+       "why": "time",
+       "R": 2.935,
+       "net": 2.8
+      },
+      {
+       "date": "2014-10-07",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.87476,
+       "stop": 0.87661,
+       "exit": 0.87661,
+       "why": "stop",
+       "R": -1,
+       "net": -1.054
+      },
+      {
+       "date": "2014-11-04",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.87229,
+       "stop": 0.87031,
+       "exit": 0.87168,
+       "why": "time",
+       "R": -0.309,
+       "net": -0.359
+      },
+      {
+       "date": "2014-12-02",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.852,
+       "stop": 0.85002,
+       "exit": 0.85002,
+       "why": "stop",
+       "R": -1,
+       "net": -1.05
+      },
+      {
+       "date": "2015-02-03",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.76562,
+       "stop": 0.76731,
+       "exit": 0.76731,
+       "why": "stop",
+       "R": -1,
+       "net": -1.056
+      },
+      {
+       "date": "2015-03-03",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.78224,
+       "stop": 0.7811,
+       "exit": 0.7811,
+       "why": "stop",
+       "R": -1,
+       "net": -1.084
+      },
+      {
+       "date": "2015-04-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7704,
+       "stop": 0.76822,
+       "exit": 0.76822,
+       "why": "stop",
+       "R": -1,
+       "net": -1.043
+      },
+      {
+       "date": "2015-05-05",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7916,
+       "stop": 0.79056,
+       "exit": 0.79056,
+       "why": "stop",
+       "R": -1,
+       "net": -1.092
+      },
+      {
+       "date": "2015-06-02",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.76876,
+       "stop": 0.76756,
+       "exit": 0.76756,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2015-07-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.74943,
+       "stop": 0.74806,
+       "exit": 0.74806,
+       "why": "stop",
+       "R": -1,
+       "net": -1.069
+      },
+      {
+       "date": "2015-08-04",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7347,
+       "stop": 0.73347,
+       "exit": 0.7418,
+       "why": "time",
+       "R": 5.759,
+       "net": 5.683
+      },
+      {
+       "date": "2015-09-01",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.71252,
+       "stop": 0.71417,
+       "exit": 0.70332,
+       "why": "time",
+       "R": 5.561,
+       "net": 5.506
+      },
+      {
+       "date": "2015-10-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.71255,
+       "stop": 0.71128,
+       "exit": 0.71128,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2015-11-03",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.72042,
+       "stop": 0.71937,
+       "exit": 0.71937,
+       "why": "stop",
+       "R": -1,
+       "net": -1.088
+      },
+      {
+       "date": "2015-12-01",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.72657,
+       "stop": 0.72516,
+       "exit": 0.72994,
+       "why": "time",
+       "R": 2.385,
+       "net": 2.32
+      },
+      {
+       "date": "2016-02-02",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.70762,
+       "stop": 0.70916,
+       "exit": 0.70465,
+       "why": "time",
+       "R": 1.934,
+       "net": 1.874
+      },
+      {
+       "date": "2016-03-01",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.71336,
+       "stop": 0.71193,
+       "exit": 0.7155,
+       "why": "time",
+       "R": 1.493,
+       "net": 1.429
+      },
+      {
+       "date": "2016-05-03",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.75701,
+       "stop": 0.75839,
+       "exit": 0.75839,
+       "why": "stop",
+       "R": -1,
+       "net": -1.068
+      },
+      {
+       "date": "2016-06-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7427,
+       "stop": 0.74138,
+       "exit": 0.74526,
+       "why": "time",
+       "R": 1.939,
+       "net": 1.869
+      },
+      {
+       "date": "2016-07-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.75131,
+       "stop": 0.75246,
+       "exit": 0.75246,
+       "why": "stop",
+       "R": -1,
+       "net": -1.082
+      },
+      {
+       "date": "2016-08-02",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.75285,
+       "stop": 0.75155,
+       "exit": 0.76066,
+       "why": "time",
+       "R": 6.028,
+       "net": 5.955
+      },
+      {
+       "date": "2016-09-06",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.76216,
+       "stop": 0.763,
+       "exit": 0.763,
+       "why": "stop",
+       "R": -1,
+       "net": -1.112
+      },
+      {
+       "date": "2016-10-04",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.76682,
+       "stop": 0.76783,
+       "exit": 0.76783,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2016-11-01",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.76568,
+       "stop": 0.76459,
+       "exit": 0.76612,
+       "why": "time",
+       "R": 0.402,
+       "net": 0.316
+      },
+      {
+       "date": "2016-12-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.74596,
+       "stop": 0.74456,
+       "exit": 0.74456,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2017-02-07",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.76754,
+       "stop": 0.76639,
+       "exit": 0.76639,
+       "why": "stop",
+       "R": -1,
+       "net": -1.082
+      },
+      {
+       "date": "2017-03-07",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.76187,
+       "stop": 0.76093,
+       "exit": 0.76093,
+       "why": "stop",
+       "R": -1,
+       "net": -1.1
+      },
+      {
+       "date": "2017-04-04",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.75776,
+       "stop": 0.75874,
+       "exit": 0.75566,
+       "why": "time",
+       "R": 2.148,
+       "net": 2.051
+      },
+      {
+       "date": "2017-05-02",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7543,
+       "stop": 0.7535,
+       "exit": 0.7535,
+       "why": "stop",
+       "R": -1,
+       "net": -1.118
+      },
+      {
+       "date": "2017-06-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7494,
+       "stop": 0.74844,
+       "exit": 0.74844,
+       "why": "stop",
+       "R": -1,
+       "net": -1.097
+      },
+      {
+       "date": "2017-07-04",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.76128,
+       "stop": 0.76225,
+       "exit": 0.76225,
+       "why": "stop",
+       "R": -1,
+       "net": -1.097
+      },
+      {
+       "date": "2017-08-01",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.80259,
+       "stop": 0.80131,
+       "exit": 0.80131,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2017-09-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.79598,
+       "stop": 0.79695,
+       "exit": 0.79695,
+       "why": "stop",
+       "R": -1,
+       "net": -1.098
+      },
+      {
+       "date": "2017-10-03",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.78018,
+       "stop": 0.78124,
+       "exit": 0.78124,
+       "why": "stop",
+       "R": -1,
+       "net": -1.09
+      },
+      {
+       "date": "2017-11-07",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.7684,
+       "stop": 0.76759,
+       "exit": 0.76759,
+       "why": "stop",
+       "R": -1,
+       "net": -1.117
+      },
+      {
+       "date": "2017-12-05",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.76496,
+       "stop": 0.76402,
+       "exit": 0.76402,
+       "why": "stop",
+       "R": -1,
+       "net": -1.1
+      }
+     ]
+    },
+    "dec": {
+     "events": 89,
+     "skipped": {},
+     "n": 89,
+     "netR": 0.445,
+     "monthT": 1.73,
+     "months": 107,
+     "tradeT": 1.73,
+     "grossR": 0.542,
+     "costR": 0.096,
+     "net2R": 0.349,
+     "monthT2": 1.36,
+     "win": 0.326,
+     "exits": {
+      "stop": 56,
+      "time": 33
+     },
+     "byYear": {
+      "2018": {
+       "n": 11,
+       "netR": 1.07
+      },
+      "2019": {
+       "n": 11,
+       "netR": 0.312
+      },
+      "2020": {
+       "n": 11,
+       "netR": 0.346
+      },
+      "2021": {
+       "n": 11,
+       "netR": 0.348
+      },
+      "2022": {
+       "n": 11,
+       "netR": 0.182
+      },
+      "2023": {
+       "n": 11,
+       "netR": 1.598
+      },
+      "2024": {
+       "n": 8,
+       "netR": -0.037
+      },
+      "2025": {
+       "n": 8,
+       "netR": 0.654
+      },
+      "2026": {
+       "n": 7,
+       "netR": -1.103
+      }
+     },
+     "clock": {
+      "picks": {},
+      "confirmed": 87,
+      "unconfirmed": [
+       "2020-04-07",
+       "2020-12-01"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2018-02-06",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.78434,
+       "stop": 0.78637,
+       "exit": 0.78637,
+       "why": "stop",
+       "R": -1,
+       "net": -1.047
+      },
+      {
+       "date": "2018-03-06",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.77778,
+       "stop": 0.77898,
+       "exit": 0.77898,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2018-04-03",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.76852,
+       "stop": 0.76955,
+       "exit": 0.76955,
+       "why": "stop",
+       "R": -1,
+       "net": -1.092
+      },
+      {
+       "date": "2018-05-01",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.75406,
+       "stop": 0.75487,
+       "exit": 0.74802,
+       "why": "time",
+       "R": 7.49,
+       "net": 7.373
+      },
+      {
+       "date": "2018-06-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.76282,
+       "stop": 0.76368,
+       "exit": 0.76368,
+       "why": "stop",
+       "R": -1,
+       "net": -1.11
+      },
+      {
+       "date": "2018-07-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.73484,
+       "stop": 0.73361,
+       "exit": 0.73758,
+       "why": "time",
+       "R": 2.235,
+       "net": 2.16
+      },
+      {
+       "date": "2018-08-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.7395,
+       "stop": 0.73888,
+       "exit": 0.74232,
+       "why": "time",
+       "R": 4.554,
+       "net": 4.403
+      },
+      {
+       "date": "2018-09-04",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.72294,
+       "stop": 0.72226,
+       "exit": 0.72226,
+       "why": "stop",
+       "R": -1,
+       "net": -1.136
+      },
+      {
+       "date": "2018-10-02",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.72124,
+       "stop": 0.72199,
+       "exit": 0.72002,
+       "why": "time",
+       "R": 1.633,
+       "net": 1.509
+      },
+      {
+       "date": "2018-11-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.72117,
+       "stop": 0.72029,
+       "exit": 0.7232,
+       "why": "time",
+       "R": 2.314,
+       "net": 2.209
+      },
+      {
+       "date": "2018-12-04",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.73738,
+       "stop": 0.73629,
+       "exit": 0.73702,
+       "why": "time",
+       "R": -0.331,
+       "net": -0.417
+      },
+      {
+       "date": "2019-02-05",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.72583,
+       "stop": 0.72499,
+       "exit": 0.72499,
+       "why": "stop",
+       "R": -1,
+       "net": -1.11
+      },
+      {
+       "date": "2019-03-05",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.70784,
+       "stop": 0.70691,
+       "exit": 0.70691,
+       "why": "stop",
+       "R": -1,
+       "net": -1.099
+      },
+      {
+       "date": "2019-04-02",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.70816,
+       "stop": 0.70887,
+       "exit": 0.70647,
+       "why": "time",
+       "R": 2.392,
+       "net": 2.262
+      },
+      {
+       "date": "2019-05-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.70342,
+       "stop": 0.70267,
+       "exit": 0.70267,
+       "why": "stop",
+       "R": -1,
+       "net": -1.122
+      },
+      {
+       "date": "2019-06-04",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.69796,
+       "stop": 0.6972,
+       "exit": 0.6972,
+       "why": "stop",
+       "R": -1,
+       "net": -1.12
+      },
+      {
+       "date": "2019-07-02",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.69816,
+       "stop": 0.6975,
+       "exit": 0.6975,
+       "why": "stop",
+       "R": -1,
+       "net": -1.138
+      },
+      {
+       "date": "2019-08-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.67808,
+       "stop": 0.67688,
+       "exit": 0.67731,
+       "why": "time",
+       "R": -0.639,
+       "net": -0.714
+      },
+      {
+       "date": "2019-09-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.67127,
+       "stop": 0.67053,
+       "exit": 0.6756,
+       "why": "time",
+       "R": 5.829,
+       "net": 5.707
+      },
+      {
+       "date": "2019-10-01",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.67202,
+       "stop": 0.67277,
+       "exit": 0.66924,
+       "why": "time",
+       "R": 3.703,
+       "net": 3.583
+      },
+      {
+       "date": "2019-11-05",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.69047,
+       "stop": 0.68962,
+       "exit": 0.68998,
+       "why": "time",
+       "R": -0.578,
+       "net": -0.686
+      },
+      {
+       "date": "2019-12-03",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.68426,
+       "stop": 0.68357,
+       "exit": 0.68357,
+       "why": "stop",
+       "R": -1,
+       "net": -1.131
+      },
+      {
+       "date": "2020-02-04",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.67219,
+       "stop": 0.67138,
+       "exit": 0.67138,
+       "why": "stop",
+       "R": -1,
+       "net": -1.112
+      },
+      {
+       "date": "2020-03-03",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.65562,
+       "stop": 0.65392,
+       "exit": 0.65842,
+       "why": "time",
+       "R": 1.646,
+       "net": 1.593
+      },
+      {
+       "date": "2020-04-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.61411,
+       "stop": 0.6123,
+       "exit": 0.61789,
+       "why": "time",
+       "R": 2.088,
+       "net": 2.04
+      },
+      {
+       "date": "2020-05-05",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.6451,
+       "stop": 0.64392,
+       "exit": 0.64392,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2020-06-02",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.68047,
+       "stop": 0.67875,
+       "exit": 0.68936,
+       "why": "time",
+       "R": 5.16,
+       "net": 5.107
+      },
+      {
+       "date": "2020-07-07",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.69656,
+       "stop": 0.6954,
+       "exit": 0.6954,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2020-08-04",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.71222,
+       "stop": 0.71126,
+       "exit": 0.71486,
+       "why": "time",
+       "R": 2.758,
+       "net": 2.662
+      },
+      {
+       "date": "2020-09-01",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.74008,
+       "stop": 0.73864,
+       "exit": 0.73864,
+       "why": "stop",
+       "R": -1,
+       "net": -1.065
+      },
+      {
+       "date": "2020-10-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.71918,
+       "stop": 0.71821,
+       "exit": 0.71821,
+       "why": "stop",
+       "R": -1,
+       "net": -1.096
+      },
+      {
+       "date": "2020-11-03",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.70352,
+       "stop": 0.70455,
+       "exit": 0.70455,
+       "why": "stop",
+       "R": -1,
+       "net": -1.089
+      },
+      {
+       "date": "2020-12-01",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.73672,
+       "stop": 0.73549,
+       "exit": 0.73549,
+       "why": "stop",
+       "R": -1,
+       "net": -1.076
+      },
+      {
+       "date": "2021-02-02",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.76262,
+       "stop": 0.76405,
+       "exit": 0.75688,
+       "why": "time",
+       "R": 4.016,
+       "net": 3.95
+      },
+      {
+       "date": "2021-03-02",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.77626,
+       "stop": 0.77464,
+       "exit": 0.77464,
+       "why": "stop",
+       "R": -1,
+       "net": -1.059
+      },
+      {
+       "date": "2021-04-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.76482,
+       "stop": 0.76401,
+       "exit": 0.76401,
+       "why": "stop",
+       "R": -1,
+       "net": -1.116
+      },
+      {
+       "date": "2021-05-04",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.77374,
+       "stop": 0.77464,
+       "exit": 0.77464,
+       "why": "stop",
+       "R": -1,
+       "net": -1.106
+      },
+      {
+       "date": "2021-06-01",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.77442,
+       "stop": 0.77516,
+       "exit": 0.77516,
+       "why": "stop",
+       "R": -1,
+       "net": -1.128
+      },
+      {
+       "date": "2021-07-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.75665,
+       "stop": 0.75582,
+       "exit": 0.75582,
+       "why": "stop",
+       "R": -1,
+       "net": -1.113
+      },
+      {
+       "date": "2021-08-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.74028,
+       "stop": 0.73942,
+       "exit": 0.73942,
+       "why": "stop",
+       "R": -1,
+       "net": -1.108
+      },
+      {
+       "date": "2021-09-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.74214,
+       "stop": 0.74288,
+       "exit": 0.74288,
+       "why": "stop",
+       "R": -1,
+       "net": -1.127
+      },
+      {
+       "date": "2021-10-05",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.72639,
+       "stop": 0.7276,
+       "exit": 0.7276,
+       "why": "stop",
+       "R": -1,
+       "net": -1.076
+      },
+      {
+       "date": "2021-11-02",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.74985,
+       "stop": 0.75073,
+       "exit": 0.7449,
+       "why": "time",
+       "R": 5.598,
+       "net": 5.492
+      },
+      {
+       "date": "2021-12-07",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.70728,
+       "stop": 0.7063,
+       "exit": 0.71053,
+       "why": "time",
+       "R": 3.314,
+       "net": 3.22
+      },
+      {
+       "date": "2022-02-01",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.70563,
+       "stop": 0.70686,
+       "exit": 0.70686,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2022-03-01",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.72564,
+       "stop": 0.72692,
+       "exit": 0.72692,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2022-04-05",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.76019,
+       "stop": 0.75927,
+       "exit": 0.7623,
+       "why": "time",
+       "R": 2.29,
+       "net": 2.188
+      },
+      {
+       "date": "2022-05-03",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.71152,
+       "stop": 0.70983,
+       "exit": 0.70983,
+       "why": "stop",
+       "R": -1,
+       "net": -1.055
+      },
+      {
+       "date": "2022-06-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.71746,
+       "stop": 0.71887,
+       "exit": 0.71887,
+       "why": "stop",
+       "R": -1,
+       "net": -1.065
+      },
+      {
+       "date": "2022-07-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.68734,
+       "stop": 0.68861,
+       "exit": 0.67765,
+       "why": "time",
+       "R": 7.63,
+       "net": 7.558
+      },
+      {
+       "date": "2022-08-02",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.69618,
+       "stop": 0.69747,
+       "exit": 0.69508,
+       "why": "time",
+       "R": 0.85,
+       "net": 0.78
+      },
+      {
+       "date": "2022-09-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.68083,
+       "stop": 0.67988,
+       "exit": 0.67988,
+       "why": "stop",
+       "R": -1,
+       "net": -1.095
+      },
+      {
+       "date": "2022-10-04",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.6463,
+       "stop": 0.64791,
+       "exit": 0.64791,
+       "why": "stop",
+       "R": -1,
+       "net": -1.055
+      },
+      {
+       "date": "2022-11-01",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.643,
+       "stop": 0.64455,
+       "exit": 0.64455,
+       "why": "stop",
+       "R": -1,
+       "net": -1.058
+      },
+      {
+       "date": "2022-12-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.67376,
+       "stop": 0.67176,
+       "exit": 0.67176,
+       "why": "stop",
+       "R": -1,
+       "net": -1.045
+      },
+      {
+       "date": "2023-02-07",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.69346,
+       "stop": 0.69198,
+       "exit": 0.69198,
+       "why": "stop",
+       "R": -1,
+       "net": -1.061
+      },
+      {
+       "date": "2023-03-07",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.67104,
+       "stop": 0.67201,
+       "exit": 0.67201,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2023-04-04",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.67689,
+       "stop": 0.67783,
+       "exit": 0.67498,
+       "why": "time",
+       "R": 2.035,
+       "net": 1.939
+      },
+      {
+       "date": "2023-05-02",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.67032,
+       "stop": 0.66939,
+       "exit": 0.66939,
+       "why": "stop",
+       "R": -1,
+       "net": -1.097
+      },
+      {
+       "date": "2023-06-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.66694,
+       "stop": 0.66602,
+       "exit": 0.66602,
+       "why": "stop",
+       "R": -1,
+       "net": -1.097
+      },
+      {
+       "date": "2023-07-04",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.6653,
+       "stop": 0.66611,
+       "exit": 0.66611,
+       "why": "stop",
+       "R": -1,
+       "net": -1.111
+      },
+      {
+       "date": "2023-08-01",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.6673,
+       "stop": 0.66828,
+       "exit": 0.66186,
+       "why": "time",
+       "R": 5.535,
+       "net": 5.443
+      },
+      {
+       "date": "2023-09-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.64213,
+       "stop": 0.64281,
+       "exit": 0.63732,
+       "why": "time",
+       "R": 7.103,
+       "net": 6.972
+      },
+      {
+       "date": "2023-10-03",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.63244,
+       "stop": 0.63351,
+       "exit": 0.63038,
+       "why": "time",
+       "R": 1.929,
+       "net": 1.846
+      },
+      {
+       "date": "2023-11-07",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.64538,
+       "stop": 0.64627,
+       "exit": 0.64129,
+       "why": "time",
+       "R": 4.599,
+       "net": 4.499
+      },
+      {
+       "date": "2023-12-05",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.6583,
+       "stop": 0.65959,
+       "exit": 0.6552,
+       "why": "time",
+       "R": 2.404,
+       "net": 2.335
+      },
+      {
+       "date": "2024-02-06",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.65149,
+       "stop": 0.65068,
+       "exit": 0.65068,
+       "why": "stop",
+       "R": -1,
+       "net": -1.11
+      },
+      {
+       "date": "2024-03-19",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.65335,
+       "stop": 0.65399,
+       "exit": 0.6533,
+       "why": "time",
+       "R": 0.078,
+       "net": -0.062
+      },
+      {
+       "date": "2024-05-07",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.66136,
+       "stop": 0.66218,
+       "exit": 0.66218,
+       "why": "stop",
+       "R": -1,
+       "net": -1.11
+      },
+      {
+       "date": "2024-06-18",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.66156,
+       "stop": 0.66087,
+       "exit": 0.66087,
+       "why": "stop",
+       "R": -1,
+       "net": -1.131
+      },
+      {
+       "date": "2024-08-06",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.6507,
+       "stop": 0.64889,
+       "exit": 0.64889,
+       "why": "stop",
+       "R": -1,
+       "net": -1.049
+      },
+      {
+       "date": "2024-09-24",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.68678,
+       "stop": 0.68583,
+       "exit": 0.68583,
+       "why": "stop",
+       "R": -1,
+       "net": -1.095
+      },
+      {
+       "date": "2024-11-05",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.6596,
+       "stop": 0.65863,
+       "exit": 0.66348,
+       "why": "time",
+       "R": 4.015,
+       "net": 3.922
+      },
+      {
+       "date": "2024-12-10",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.63998,
+       "stop": 0.6411,
+       "exit": 0.6384,
+       "why": "time",
+       "R": 1.415,
+       "net": 1.336
+      },
+      {
+       "date": "2025-02-18",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.63407,
+       "stop": 0.63469,
+       "exit": 0.63469,
+       "why": "stop",
+       "R": -1,
+       "net": -1.144
+      },
+      {
+       "date": "2025-04-01",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.62536,
+       "stop": 0.62446,
+       "exit": 0.62446,
+       "why": "stop",
+       "R": -1,
+       "net": -1.098
+      },
+      {
+       "date": "2025-05-20",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.64368,
+       "stop": 0.64439,
+       "exit": 0.64033,
+       "why": "time",
+       "R": 4.704,
+       "net": 4.579
+      },
+      {
+       "date": "2025-07-08",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.6542,
+       "stop": 0.65312,
+       "exit": 0.65312,
+       "why": "stop",
+       "R": -1,
+       "net": -1.083
+      },
+      {
+       "date": "2025-08-12",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.6499,
+       "stop": 0.65058,
+       "exit": 0.65058,
+       "why": "stop",
+       "R": -1,
+       "net": -1.132
+      },
+      {
+       "date": "2025-09-30",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.66064,
+       "stop": 0.65993,
+       "exit": 0.65993,
+       "why": "stop",
+       "R": -1,
+       "net": -1.126
+      },
+      {
+       "date": "2025-11-04",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.65318,
+       "stop": 0.65404,
+       "exit": 0.64931,
+       "why": "time",
+       "R": 4.515,
+       "net": 4.411
+      },
+      {
+       "date": "2025-12-09",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.66314,
+       "stop": 0.66237,
+       "exit": 0.66463,
+       "why": "time",
+       "R": 1.944,
+       "net": 1.827
+      },
+      {
+       "date": "2026-02-03",
+       "D": "03:30",
+       "side": "buy",
+       "entry": 0.70216,
+       "stop": 0.70054,
+       "exit": 0.70054,
+       "why": "stop",
+       "R": -1,
+       "net": -1.057
+      },
+      {
+       "date": "2026-03-17",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.70606,
+       "stop": 0.70742,
+       "exit": 0.70742,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2026-05-05",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.71446,
+       "stop": 0.71543,
+       "exit": 0.71543,
+       "why": "stop",
+       "R": -1,
+       "net": -1.095
+      },
+      {
+       "date": "2026-06-16",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.70539,
+       "stop": 0.70607,
+       "exit": 0.70607,
+       "why": "stop",
+       "R": -1,
+       "net": -1.134
+      },
+      {
+       "date": "2026-08-11",
+       "D": "04:30",
+       "side": "sell",
+       "entry": 0.70433,
+       "stop": 0.7049,
+       "exit": 0.7049,
+       "why": "stop",
+       "R": -1,
+       "net": -1.161
+      },
+      {
+       "date": "2026-09-29",
+       "D": "04:30",
+       "side": "buy",
+       "entry": 0.70184,
+       "stop": 0.70101,
+       "exit": 0.70101,
+       "why": "stop",
+       "R": -1,
+       "net": -1.11
+      },
+      {
+       "date": "2026-11-03",
+       "D": "03:30",
+       "side": "sell",
+       "entry": 0.69844,
+       "stop": 0.69941,
+       "exit": 0.69941,
+       "why": "stop",
+       "R": -1,
+       "net": -1.094
+      }
+     ],
+     "placebo": {
+      "seeds": 40,
+      "p5": -0.325,
+      "p50": -0.134,
+      "p95": 0.098,
+      "max": 0.464,
+      "beaten": 39
+     },
+     "window": [
+      "2018-01-01",
+      "2026-11-13"
+     ]
+    }
+   }
+  },
+  "RBNZ": {
+   "bank": "RBNZ",
+   "sym": "nzdusd",
+   "candles": 1272074,
+   "from": "2009-11-01",
+   "to": "2026-11-13",
+   "windows": {
+    "rep": {
+     "events": 62,
+     "skipped": {
+      "early clock (09:00 Wellington)": 62
+     },
+     "n": 0,
+     "netR": null,
+     "monthT": null,
+     "months": 96,
+     "tradeT": null,
+     "grossR": null,
+     "costR": null,
+     "net2R": null,
+     "monthT2": null,
+     "win": 0,
+     "exits": {},
+     "byYear": {},
+     "clock": {
+      "picks": {
+       "2010": {
+        "09:00": 8
+       },
+       "2011": {
+        "09:00": 8
+       },
+       "2012": {
+        "09:00": 8
+       },
+       "2013": {
+        "09:00": 8
+       },
+       "2014": {
+        "09:00": 8
+       },
+       "2015": {
+        "09:00": 8
+       },
+       "2016": {
+        "09:00": 7
+       },
+       "2017": {
+        "09:00": 7
+       }
+      },
+      "confirmed": 0,
+      "unconfirmed": []
+     },
+     "trades": []
+    },
+    "dec": {
+     "events": 61,
+     "skipped": {
+      "early clock (09:00 Wellington)": 7
+     },
+     "n": 54,
+     "netR": 0.489,
+     "monthT": 1.52,
+     "months": 107,
+     "tradeT": 1.53,
+     "grossR": 0.577,
+     "costR": 0.088,
+     "net2R": 0.401,
+     "monthT2": 1.25,
+     "win": 0.389,
+     "exits": {
+      "time": 22,
+      "stop": 31,
+      "gap": 1
+     },
+     "byYear": {
+      "2019": {
+       "n": 7,
+       "netR": 0.29
+      },
+      "2020": {
+       "n": 6,
+       "netR": -0.066
+      },
+      "2021": {
+       "n": 7,
+       "netR": 1.34
+      },
+      "2022": {
+       "n": 7,
+       "netR": -0.189
+      },
+      "2023": {
+       "n": 7,
+       "netR": 0.506
+      },
+      "2024": {
+       "n": 7,
+       "netR": 0.682
+      },
+      "2025": {
+       "n": 7,
+       "netR": -0.598
+      },
+      "2026": {
+       "n": 6,
+       "netR": 2.095
+      }
+     },
+     "clock": {
+      "picks": {
+       "2018": {
+        "09:00": 7
+       }
+      },
+      "confirmed": 52,
+      "unconfirmed": [
+       "2026-08-19",
+       "2026-10-07"
+      ]
+     },
+     "trades": [
+      {
+       "date": "2019-02-13",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.68038,
+       "stop": 0.67961,
+       "exit": 0.68235,
+       "why": "time",
+       "R": 2.563,
+       "net": 2.445
+      },
+      {
+       "date": "2019-03-27",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.68095,
+       "stop": 0.68183,
+       "exit": 0.67934,
+       "why": "time",
+       "R": 1.837,
+       "net": 1.734
+      },
+      {
+       "date": "2019-05-08",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.65753,
+       "stop": 0.65817,
+       "exit": 0.65817,
+       "why": "stop",
+       "R": -1,
+       "net": -1.139
+      },
+      {
+       "date": "2019-06-26",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.66542,
+       "stop": 0.66428,
+       "exit": 0.66811,
+       "why": "time",
+       "R": 2.366,
+       "net": 2.286
+      },
+      {
+       "date": "2019-08-07",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.64352,
+       "stop": 0.64464,
+       "exit": 0.64464,
+       "why": "stop",
+       "R": -1,
+       "net": -1.08
+      },
+      {
+       "date": "2019-09-25",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.63438,
+       "stop": 0.63343,
+       "exit": 0.63343,
+       "why": "stop",
+       "R": -1,
+       "net": -1.093
+      },
+      {
+       "date": "2019-11-13",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.63954,
+       "stop": 0.63881,
+       "exit": 0.63881,
+       "why": "stop",
+       "R": -1,
+       "net": -1.121
+      },
+      {
+       "date": "2020-02-12",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.64632,
+       "stop": 0.64556,
+       "exit": 0.64556,
+       "why": "stop",
+       "R": -1,
+       "net": -1.117
+      },
+      {
+       "date": "2020-05-13",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.60324,
+       "stop": 0.60469,
+       "exit": 0.60469,
+       "why": "stop",
+       "R": -1,
+       "net": -1.06
+      },
+      {
+       "date": "2020-06-24",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.64749,
+       "stop": 0.64874,
+       "exit": 0.6433,
+       "why": "time",
+       "R": 3.356,
+       "net": 3.284
+      },
+      {
+       "date": "2020-08-12",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.65462,
+       "stop": 0.65577,
+       "exit": 0.65577,
+       "why": "stop",
+       "R": -1,
+       "net": -1.078
+      },
+      {
+       "date": "2020-09-23",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.66156,
+       "stop": 0.6602,
+       "exit": 0.6602,
+       "why": "stop",
+       "R": -1,
+       "net": -1.066
+      },
+      {
+       "date": "2020-11-11",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.68621,
+       "stop": 0.68489,
+       "exit": 0.68715,
+       "why": "time",
+       "R": 0.712,
+       "net": 0.643
+      },
+      {
+       "date": "2021-02-24",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.7368,
+       "stop": 0.73548,
+       "exit": 0.73768,
+       "why": "time",
+       "R": 0.666,
+       "net": 0.596
+      },
+      {
+       "date": "2021-04-14",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.70817,
+       "stop": 0.70702,
+       "exit": 0.71385,
+       "why": "time",
+       "R": 4.93,
+       "net": 4.85
+      },
+      {
+       "date": "2021-05-26",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.72846,
+       "stop": 0.72726,
+       "exit": 0.72852,
+       "why": "time",
+       "R": 0.05,
+       "net": -0.027
+      },
+      {
+       "date": "2021-07-14",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.70116,
+       "stop": 0.69941,
+       "exit": 0.69941,
+       "why": "stop",
+       "R": -1,
+       "net": -1.052
+      },
+      {
+       "date": "2021-08-18",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.69216,
+       "stop": 0.69341,
+       "exit": 0.69341,
+       "why": "stop",
+       "R": -1,
+       "net": -1.073
+      },
+      {
+       "date": "2021-10-06",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.69374,
+       "stop": 0.69477,
+       "exit": 0.69144,
+       "why": "time",
+       "R": 2.239,
+       "net": 2.15
+      },
+      {
+       "date": "2021-11-24",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.69256,
+       "stop": 0.69381,
+       "exit": 0.68754,
+       "why": "time",
+       "R": 4.009,
+       "net": 3.936
+      },
+      {
+       "date": "2022-02-23",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.677,
+       "stop": 0.67585,
+       "exit": 0.67585,
+       "why": "stop",
+       "R": -1,
+       "net": -1.079
+      },
+      {
+       "date": "2022-04-13",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.6858,
+       "stop": 0.6874,
+       "exit": 0.67754,
+       "why": "time",
+       "R": 5.153,
+       "net": 5.097
+      },
+      {
+       "date": "2022-05-25",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.64944,
+       "stop": 0.64784,
+       "exit": 0.64784,
+       "why": "stop",
+       "R": -1,
+       "net": -1.056
+      },
+      {
+       "date": "2022-07-13",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.6127,
+       "stop": 0.61376,
+       "exit": 0.61376,
+       "why": "stop",
+       "R": -1,
+       "net": -1.083
+      },
+      {
+       "date": "2022-08-17",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.63532,
+       "stop": 0.63433,
+       "exit": 0.63433,
+       "why": "stop",
+       "R": -1,
+       "net": -1.089
+      },
+      {
+       "date": "2022-10-05",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.57666,
+       "stop": 0.57469,
+       "exit": 0.57469,
+       "why": "stop",
+       "R": -1,
+       "net": -1.044
+      },
+      {
+       "date": "2022-11-23",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.61722,
+       "stop": 0.61601,
+       "exit": 0.61601,
+       "why": "stop",
+       "R": -1,
+       "net": -1.072
+      },
+      {
+       "date": "2023-02-22",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.62236,
+       "stop": 0.62096,
+       "exit": 0.62432,
+       "why": "time",
+       "R": 1.397,
+       "net": 1.334
+      },
+      {
+       "date": "2023-04-05",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.63516,
+       "stop": 0.63398,
+       "exit": 0.63398,
+       "why": "stop",
+       "R": -1,
+       "net": -1.075
+      },
+      {
+       "date": "2023-05-24",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.61808,
+       "stop": 0.61901,
+       "exit": 0.61092,
+       "why": "time",
+       "R": 7.675,
+       "net": 7.581
+      },
+      {
+       "date": "2023-07-12",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.6235,
+       "stop": 0.62241,
+       "exit": 0.62241,
+       "why": "stop",
+       "R": -1,
+       "net": -1.081
+      },
+      {
+       "date": "2023-08-16",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.59598,
+       "stop": 0.5947,
+       "exit": 0.59467,
+       "why": "gap",
+       "R": -1.021,
+       "net": -1.088
+      },
+      {
+       "date": "2023-10-04",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.58824,
+       "stop": 0.58953,
+       "exit": 0.58953,
+       "why": "stop",
+       "R": -1,
+       "net": -1.067
+      },
+      {
+       "date": "2023-11-29",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.61928,
+       "stop": 0.61784,
+       "exit": 0.61784,
+       "why": "stop",
+       "R": -1,
+       "net": -1.061
+      },
+      {
+       "date": "2024-02-28",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.61231,
+       "stop": 0.61306,
+       "exit": 0.60906,
+       "why": "time",
+       "R": 4.354,
+       "net": 4.237
+      },
+      {
+       "date": "2024-04-10",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.6071,
+       "stop": 0.60626,
+       "exit": 0.60626,
+       "why": "stop",
+       "R": -1,
+       "net": -1.104
+      },
+      {
+       "date": "2024-05-22",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.61374,
+       "stop": 0.61302,
+       "exit": 0.61302,
+       "why": "stop",
+       "R": -1,
+       "net": -1.123
+      },
+      {
+       "date": "2024-07-10",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.60801,
+       "stop": 0.60861,
+       "exit": 0.60861,
+       "why": "stop",
+       "R": -1,
+       "net": -1.145
+      },
+      {
+       "date": "2024-08-14",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.60338,
+       "stop": 0.60428,
+       "exit": 0.60276,
+       "why": "time",
+       "R": 0.689,
+       "net": 0.593
+      },
+      {
+       "date": "2024-10-09",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.61068,
+       "stop": 0.61181,
+       "exit": 0.60562,
+       "why": "time",
+       "R": 4.481,
+       "net": 4.403
+      },
+      {
+       "date": "2024-11-27",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.58747,
+       "stop": 0.58647,
+       "exit": 0.58647,
+       "why": "stop",
+       "R": -1,
+       "net": -1.086
+      },
+      {
+       "date": "2025-02-19",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.5694,
+       "stop": 0.57003,
+       "exit": 0.57003,
+       "why": "stop",
+       "R": -1,
+       "net": -1.136
+      },
+      {
+       "date": "2025-04-09",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.55336,
+       "stop": 0.55562,
+       "exit": 0.55562,
+       "why": "stop",
+       "R": -1,
+       "net": -1.038
+      },
+      {
+       "date": "2025-05-28",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.59514,
+       "stop": 0.59413,
+       "exit": 0.5958,
+       "why": "time",
+       "R": 0.654,
+       "net": 0.568
+      },
+      {
+       "date": "2025-07-09",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.59876,
+       "stop": 0.59975,
+       "exit": 0.59975,
+       "why": "stop",
+       "R": -1,
+       "net": -1.088
+      },
+      {
+       "date": "2025-08-20",
+       "D": "02:00",
+       "side": "sell",
+       "entry": 0.58322,
+       "stop": 0.58399,
+       "exit": 0.58399,
+       "why": "stop",
+       "R": -1,
+       "net": -1.112
+      },
+      {
+       "date": "2025-10-08",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.57513,
+       "stop": 0.57574,
+       "exit": 0.57574,
+       "why": "stop",
+       "R": -1,
+       "net": -1.14
+      },
+      {
+       "date": "2025-11-26",
+       "D": "01:00",
+       "side": "buy",
+       "entry": 0.56684,
+       "stop": 0.56579,
+       "exit": 0.56772,
+       "why": "time",
+       "R": 0.841,
+       "net": 0.759
+      },
+      {
+       "date": "2026-02-18",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.60186,
+       "stop": 0.60292,
+       "exit": 0.5984,
+       "why": "time",
+       "R": 3.264,
+       "net": 3.182
+      },
+      {
+       "date": "2026-04-08",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.57991,
+       "stop": 0.57787,
+       "exit": 0.58382,
+       "why": "time",
+       "R": 1.92,
+       "net": 1.878
+      },
+      {
+       "date": "2026-05-27",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.58731,
+       "stop": 0.58669,
+       "exit": 0.58669,
+       "why": "stop",
+       "R": -1,
+       "net": -1.139
+      },
+      {
+       "date": "2026-07-08",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.56998,
+       "stop": 0.56919,
+       "exit": 0.56919,
+       "why": "stop",
+       "R": -1,
+       "net": -1.108
+      },
+      {
+       "date": "2026-08-19",
+       "D": "02:00",
+       "side": "buy",
+       "entry": 0.58724,
+       "stop": 0.58647,
+       "exit": 0.5929,
+       "why": "time",
+       "R": 7.357,
+       "net": 7.245
+      },
+      {
+       "date": "2026-10-07",
+       "D": "01:00",
+       "side": "sell",
+       "entry": 0.56144,
+       "stop": 0.56209,
+       "exit": 0.55972,
+       "why": "time",
+       "R": 2.646,
+       "net": 2.515
+      }
+     ],
+     "placebo": {
+      "seeds": 40,
+      "p5": -0.425,
+      "p50": -0.052,
+      "p95": 0.372,
+      "max": 0.432,
+      "beaten": 40
+     },
+     "window": [
+      "2018-01-01",
+      "2026-11-13"
+     ]
+    }
+   }
+  }
+ },
+ "pooled": {
+  "n": 320,
+  "netR": 0.208,
+  "monthT": 1.77,
+  "months": 107,
+  "tradeT": 1.7,
+  "grossR": 0.3,
+  "costR": 0.092,
+  "win": 0.319,
+  "exits": {
+   "stop": 207,
+   "time": 112,
+   "gap": 1
+  },
+  "p": 0.0384,
+  "repN": 273,
+  "repNetR": -0.03,
+  "repMonthT": -0.25,
+  "net2R": 0.116,
+  "monthT2": 0.99,
+  "placeboP5": -0.253,
+  "placeboP50": -0.119,
+  "placeboP95": 0.068,
+  "placeboBeaten": 40,
+  "nOk": true,
+  "positive": true,
+  "t2": false,
+  "sameSign": false,
+  "beatsPlacebo": true,
+  "cost2": true,
+  "pass": false
+ },
+ "verdict": "FAIL"
+}
