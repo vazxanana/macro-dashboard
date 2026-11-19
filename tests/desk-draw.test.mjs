@@ -158,3 +158,12 @@ test('free charts on a low timeframe keep up (19 Nov 2026): reads every 1.5-3 s,
   assert.match(PAGE, /for \(const k of \[\.\.\.want\]\.slice\(0, 4\)\)/, 'at most four');
   assert.match(PAGE, /if \(tf && tf\.id === '1s'\) \{ const r = await fetchBars\(SPTFS\.find\(\(t\) => t\.id === '5s'\), I, n\);/, 'one second starts from 5 s candles');
 });
+
+test('Split without its own bar (19 Nov 2026): Sync in the toolbar, each chart\'s header picks its timeframe, the right one its market', () => {
+  assert.match(PAGE, /#ms-sp-bar \{ display: none !important; \}/);
+  assert.match(PAGE, /const sx = document\.querySelector\('#ms-sp-bar \.sp-sync'\), seg = document\.querySelector\('#v-charts \.sec-h > \.seg\[aria-label="Chart view"\]'\); if \(sx && seg\) \{ sx\.hidden = true; seg\.after\(sx\); \}/);
+  assert.match(PAGE, /const spMarkRight = \(\) =>/, 'the right chart is marked, the free chart or an analysed pane');
+  assert.match(PAGE, /else if \(v === 'split' && an\) \{ const lt = document\.getElementById\('ms-sp-ltf'\);/, 'the left chart takes an analysed timeframe');
+  assert.match(PAGE, /else if \(b\.dataset\.phMk\) \{ const sy = document\.querySelector\('\[data-sync="sym"\]'\)/, 'the right chart picks its market');
+  assert.match(PAGE, /if \(pn\.classList\.contains\('sp-right'\) && viewNow\(\) === 'split'\) openMk\(pn, m\); else openMarket\(\);/);
+});

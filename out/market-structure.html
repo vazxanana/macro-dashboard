@@ -5490,6 +5490,13 @@ html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role=
 .mm[data-n="2"] .mm-chart, .mm[data-n="3"] .mm-chart { height: max(380px, calc(100vh - 300px)); }
 @media (max-width: 900px) { .mm-g, .mm[data-n="3"] .mm-g { grid-template-columns: minmax(0, 1fr); } .mm-chart, .mm[data-n] .mm-chart { height: min(46vh, 420px); } .mm-src { display: none; } }
 @media (pointer: coarse) { .mm-n button, .mm-h select { min-height: 44px; } }
+/* Split without its own bar (19 Nov 2026): Sync in the toolbar, the right chart's market and timeframe in its header */
+#ms-sp-bar { display: none !important; }
+#v-charts .sec-h > .sp-sync { order: 2; margin-left: 6px; }
+#v-charts .sec-h > .sp-sync[hidden] { display: none; }
+.ms-grid4[data-view="split"] .ms-pane.sp-right .ms-ph .ph-mk, .ms-grid4[data-view="one"] .ms-splitc .ms-ph .ph-mk { display: inline-flex; }
+.ph-menu .ph-m-mk { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ph-menu button.ph-c:disabled { opacity: .38; cursor: not-allowed; text-decoration: none; }
 /* the market on the toolbar next to Split; the header's picker and the price chips leave the Charts page (19 Nov 2026) */
 #v-charts .sec-h > .ch-mk { order: 2; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; margin-right: 8px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font: 650 14px var(--sans); cursor: pointer; }
 #v-charts .sec-h > .ch-mk::after { content: ""; width: 6px; height: 6px; margin-top: -3px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); opacity: .7; }
@@ -9727,6 +9734,7 @@ function msNextSetup(bars, A) {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = SPTFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
     { const b = document.querySelector('.ms-splitc .ph-tf'); if (b) { b.textContent = T ? T.label : tf; b.setAttribute('aria-label', `Timeframe ${b.textContent}: choose another`); } }
+    { const b = document.querySelector('.ms-splitc .ph-mk'); if (b) { b.textContent = I.label; b.setAttribute('aria-label', `Market ${I.label}: choose another`); } }
     try { SP.chart.timeScale().applyOptions({ secondsVisible: !!T && T.sec < 60 }); } catch (e) {}
     if (SP.key !== key) { SP.key = key; SP.series.setData([]); SP.bars = []; SP.raw = []; spMarkup(); }   // no old market's markups on an empty chart
     // another market: its own daily bars (three weeks), for the key levels and the ICT 50%-of-yesterday line
@@ -9757,8 +9765,16 @@ function msNextSetup(bars, A) {
     const cxR = (pr) => { if (!SP.on || !SP.sync.cross || SP.cx) return; SP.cx = 1; try { const b = pr && pr.time != null && L.bars ? barAtT(L.bars, pr.time) : null; if (b) L.chart.setCrosshairPosition(b.close, b.time, L.series); else L.chart.clearCrosshairPosition(); } catch (e) {} SP.cx = 0; };
     L.chart.subscribeCrosshairMove(cxL); SP.chart.subscribeCrosshairMove(cxR);
     SP.unsub.push(() => L.chart.timeScale().unsubscribeVisibleTimeRangeChange(onL), () => SP.chart.timeScale().unsubscribeVisibleTimeRangeChange(onR), () => L.chart.unsubscribeCrosshairMove(cxL), () => SP.chart.unsubscribeCrosshairMove(cxR)); }
-  function spApply() { grid4.dataset.splitL = SP.ltf; grid4.dataset.splitR = SP.on && spPane() ? spTf() : ''; if (!SP.on) return; if (!spPane()) spChart(); spControls(); spWire(); spLoad(); }
-  window.msSplitView = (on, solo) => { SP.on = on; SP.solo = !!(on && solo); const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on || SP.solo; if (on) { spInit(); spApply(); } };
+  // which chart is Split's right one (the free chart, or an analysed pane of the same market): its header chooses the right side
+  const spMarkRight = () => { root.querySelectorAll('.ms-grid4 > .ms-pane.sp-right').forEach((x) => x.classList.remove('sp-right')); if (!SP.on || SP.solo) return;
+    const R = spPane() ? root.querySelector(`.ms-grid4 > .ms-pane[data-tf="${spTf()}"]:not(.ms-splitc)`) : root.querySelector('.ms-grid4 > .ms-splitc'); if (R) R.classList.add('sp-right');
+    const I = INSTRUMENTS[spSym()]; if (R && I) { const m = R.querySelector('.ph-mk'); if (m) { m.textContent = I.label; m.setAttribute('aria-label', `Market ${I.label}: choose another`); } } };
+  function spApply() { grid4.dataset.splitL = SP.ltf; grid4.dataset.splitR = SP.on && spPane() ? spTf() : ''; spMarkRight(); if (!SP.on) return; if (!spPane()) spChart(); spControls(); spWire(); spLoad(); }
+  // Sync sits in the charts toolbar beside Split (19 Nov 2026, owner: "everything in the same bar row"); the Split bar's own row
+  // (left timeframe, right market, right timeframe) is gone: each chart's header chooses those
+  { const sx = document.querySelector('#ms-sp-bar .sp-sync'), seg = document.querySelector('#v-charts .sec-h > .seg[aria-label="Chart view"]'); if (sx && seg) { sx.hidden = true; seg.after(sx); } }
+  window.msSplitView = (on, solo) => { SP.on = on; SP.solo = !!(on && solo); const bar = document.getElementById('ms-sp-bar'); if (bar) bar.hidden = !on || SP.solo;
+    { const sx = document.querySelector('#v-charts .sec-h > .sp-sync'); if (sx) sx.hidden = !on || SP.solo; } if (on) { spInit(); spApply(); } };
   // pick the one-chart timeframe: an analysed timeframe opens its own pane (markups, setups), any other the free chart alone
   // ─── Markets side by side (19 Nov 2026, owner: "they should be able to see different pairs at the same time, different charts"):
   // the view 'multi' = 2 to 4 charts, each its own market and timeframe (any of SPTFS), candles and volume, live, each with the
@@ -10345,9 +10361,10 @@ function msNextSetup(bars, A) {
     let forPane = null, forBtn = null;
     const close = () => { MENU.hidden = true; if (forBtn) forBtn.setAttribute('aria-expanded', 'false'); forPane = forBtn = null; };
     const viewNow = () => (grid4.dataset.view || 'all');
-    const curTf = (pn) => (pn.classList.contains('ms-splitc') ? (window.msOneState ? (viewNow() === 'one' ? window.msOneState().tf : ((document.getElementById('ms-sp-rtf') || {}).value || '')) : '') : pn.dataset.tf);
+    const curTf = (pn) => (pn.classList.contains('ms-splitc') || (pn.classList.contains('sp-right') && viewNow() === 'split') ? (window.msOneState ? (viewNow() === 'one' ? window.msOneState().tf : ((document.getElementById('ms-sp-rtf') || {}).value || '')) : '') : pn.dataset.tf);
     const openMenu = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const tf = curTf(pn), v = viewNow(), L = window.msLayState ? window.msLayState() : null;
-      const chip = (t) => `<button type="button" role="menuitemradio" class="ph-c${t.analysed ? ' an' : ''}" aria-checked="${t.id === tf}" data-ph-tf="${t.id}" title="${t.analysed ? 'With the Meridian / ICT markup' : 'Candles only, one chart'}">${t.label}</button>`;
+      const leftSplit = v === 'split' && !pn.classList.contains('sp-right');   // Split's left chart is an analysed pane: only those timeframes
+      const chip = (t) => `<button type="button" role="menuitemradio" class="ph-c${t.analysed ? ' an' : ''}" aria-checked="${t.id === tf}" data-ph-tf="${t.id}"${leftSplit && !t.analysed ? ' disabled' : ''} title="${leftSplit && !t.analysed ? 'The left chart of Split takes an underlined timeframe; pick this one on the right chart' : t.analysed ? 'With the Meridian / ICT markup' : 'Candles only, one chart'}">${t.label}</button>`;
       const G = GROUPS(), big = G.filter(([, l]) => l.length > 1), one = G.filter(([, l]) => l.length === 1);
       MENU.innerHTML = big.map(([g, l]) => `<div class="ph-m-h">${g}</div><div class="ph-m-row">${l.map(chip).join('')}</div>`).join('')
         + (one.length ? `<div class="ph-m-g4">${one.map(([g, l]) => `<div><div class="ph-m-h">${g}</div>${l.map(chip).join('')}</div>`).join('')}</div>` : '')
@@ -10359,11 +10376,20 @@ function msNextSetup(bars, A) {
       btn.setAttribute('aria-expanded', 'true'); const f = MENU.querySelector('[aria-checked="true"]') || MENU.querySelector('button'); if (f) f.focus({ preventScroll: true }); };
     MENU.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b || !forPane) return; const tf = forPane.dataset.tf, v = viewNow();
       if (b.dataset.phTf) { const t = b.dataset.phTf, an = !!panes[t];
-        if (forPane.classList.contains('ms-splitc') && v === 'split') { const rt = document.getElementById('ms-sp-rtf'), sy = document.querySelector('[data-sync="tf"]'); if (sy && sy.checked) sy.click(); if (rt) { rt.value = t; rt.dispatchEvent(new Event('change')); } }
+        if (forPane.classList.contains('sp-right') && v === 'split') { const rt = document.getElementById('ms-sp-rtf'), sy = document.querySelector('[data-sync="tf"]'); if (sy && sy.checked) sy.click(); if (rt) { rt.value = t; rt.dispatchEvent(new Event('change')); } }
+        else if (v === 'split' && an) { const lt = document.getElementById('ms-sp-ltf'); if (lt) { lt.value = t; lt.dispatchEvent(new Event('change')); } }
         else if (v === 'lay' && an && window.msLayState) { const L = window.msLayState(), i = L.tfs.indexOf(tf); if (i >= 0) window.msLaySet(i, t); }
         else if (window.msOneTf) window.msOneTf(t); }
       else if (b.dataset.phV) { const g = document.querySelector(`#v-charts .seg [data-view="${b.dataset.phV}"]`); if (g) g.click(); }
+      else if (b.dataset.phMk) { const sy = document.querySelector('[data-sync="sym"]'), sel = document.getElementById('ms-sp-sym'); if (sy && sy.checked) sy.click(); if (sel) { sel.value = b.dataset.phMk; sel.dispatchEvent(new Event('change')); } }
       close(); });
+    // Split's right chart chooses its own market from its header (19 Nov 2026, owner: the Split bar's pickers go)
+    const openMk = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const cur = (document.getElementById('ms-sp-sym') || {}).value, g = {};
+      Object.entries(INSTRUMENTS).forEach(([k, I]) => { (g[I.group] = g[I.group] || []).push(`<button type="button" role="menuitemradio" class="ph-c ph-mkc" aria-checked="${k === cur}" data-ph-mk="${k}">${I.label}</button>`); });
+      MENU.innerHTML = Object.entries(g).map(([n, l]) => `<div class="ph-m-h">${n}</div><div class="ph-m-row ph-m-mk">${l.join('')}</div>`).join('');
+      const r = btn.getBoundingClientRect(); MENU.hidden = false; const w = MENU.offsetWidth, h = MENU.offsetHeight; MENU.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px';
+      MENU.style.top = Math.max(8, r.bottom + 6 + h > innerHeight - 8 ? Math.max(8, r.top - h - 6) : r.bottom + 6) + 'px';
+      btn.setAttribute('aria-expanded', 'true'); const f = MENU.querySelector('[aria-checked="true"]') || MENU.querySelector('button'); if (f) f.focus({ preventScroll: true }); };
     MENU.addEventListener('keydown', (e) => { const bs = [...MENU.querySelectorAll('button')], i = bs.indexOf(document.activeElement);
       if (e.key === 'Escape') { const b = forBtn; close(); if (b) b.focus(); } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); const n = bs[(i + (e.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length]; if (n) n.focus(); } });
     document.addEventListener('pointerdown', (e) => { if (!MENU.hidden && !MENU.contains(e.target) && !(forBtn && forBtn.contains(e.target))) close(); }, true);
@@ -10383,7 +10409,7 @@ function msNextSetup(bars, A) {
       const t = document.createElement('button'); t.type = 'button'; t.className = 'ph-tf'; t.setAttribute('aria-haspopup', 'menu'); t.setAttribute('aria-expanded', 'false'); t.textContent = lab.textContent; t.setAttribute('aria-label', `Timeframe ${lab.textContent}: choose another`);
       t.addEventListener('click', (e) => { e.stopPropagation(); openMenu(pn, t); });
       const m = document.createElement('button'); m.type = 'button'; m.className = 'ph-mk'; m.textContent = mkName() || 'Market'; m.setAttribute('aria-label', `Market ${mkName()}: choose another`);
-      m.addEventListener('click', (e) => { e.stopPropagation(); openMarket(); });
+      m.addEventListener('click', (e) => { e.stopPropagation(); if (pn.classList.contains('sp-right') && viewNow() === 'split') openMk(pn, m); else openMarket(); });
       lab.classList.add('ph-orig'); lab.before(m, t); });
     window.msPaneMenu = () => ({ open: !MENU.hidden, items: [...MENU.querySelectorAll('button')].map((b) => b.textContent) });
   }
