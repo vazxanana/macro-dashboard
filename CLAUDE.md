@@ -2789,7 +2789,29 @@ consensus), and the October CPI pre-release plan generalized to every US CPI car
 response windows, and the confounders the calendar shows: a same-day auction, a Fed statement within two days, a same-half-hour
 US release; desk "Your CPI plan"). Then (owner: "do china briefs too") the September China briefs (NBS property, MOF local
 fiscal; `chinaBriefs`): their figures read from their own tables, a staleness line once the next NBS / MOF release should be
-out (about mid-month after the month), and the next CNY release on the strategist's calendar. Tests: `tests/research-watch.test.mjs`.
+out (about mid-month after the month), and the next CNY release on the strategist's calendar. Then (owner: "do all the content
+you think might be useful"): on CPI cards the 2022-24 CPI model benchmark (`cpiBenchmark`: core nowcast vs "same as last
+month" vs a 50/50 blend, headline too, and this release's persistence baseline from the calendar's previous), on every card the
+expectation timing gates (`consensusGate`: missing / late / context; a Forex Factory value is never above the gate for a scored
+surprise; the Cleveland nowcast must be the pre-08:30 ET value), and on US GDP cards the 2023 Q3 revision case (`gdpCase`: SAAR to
+quarterly, parts over headline, revision is not surprise). Left out on purpose: the issuer, producer, oil-major, bank and credit
+cases (equities, not this desk), the NBU gold notes, and the playbooks already ported in code (regime framework, gold driver map,
+calibration, yield decomposition). Tests: `tests/research-watch.test.mjs`.
+
+## Red folder study (19 Nov 2026, owner: "a section of the most important red folders … study, compare previous months, the news, what we expect, what came out, how the market reacted, so we can prepare")
+`council/redfolder.mjs` (pure + `loadInputs`; run by `veteran.mjs` `run()` → council-data `macro/redfolder.json`; a failure writes
+nothing). Types CPI (core + headline), jobs report (payrolls, unemployment, hourly earnings), Fed decision, core PCE, PPI, retail sales,
+ISM manufacturing, GDP. Per release since 2022: **expected** = the calendar consensus the council captured before it
+(veteran-expectations, events.json, the calendar cache; a calendar value, not a survey) or, CPI 2022-24, the Cleveland model from the
+batch (labelled model); **printed** = the batch's first prints 2022-24, else the current FRED value of the reference month (m/m to one
+decimal as printed; can include revisions); prior; surprise only against a captured consensus; **gold / dollar** = UTC release-day
+close vs the close before (council daily closes) and first 5 / 60 minutes from `council/event-base.json` (to Oct 2026). Dates from
+`council/events.mjs` (history and the 2025-26 schedule), event-base, the batch and the captures. Per type: the next release (calendar
+consensus when listed, else the schedule date), and descriptive summary lines (median day move, up share, higher vs lower than the
+prior, above vs below consensus once 6+ captured). The strategist (`macro.mjs` `releaseSeries`) fetches the ten FRED release series
+(`RELEASE_FRED`) once a UTC day into `cache.release`, never while FRED is unreachable that run. Desk: section 3 `#s-red` "Red folder
+study" (tabs per type, `localStorage mdRed`; phones show 6 rows then "Show all"). Descriptive only: no rule, call or trade reads it.
+Tests: `tests/redfolder.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days
