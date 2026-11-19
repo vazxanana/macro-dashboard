@@ -2781,7 +2781,9 @@ two verified cells (source contract: the panel's expected year-end-2027 SEP medi
 today's 2-year yield (`nyfedSurvey`, with the clock caveat: results published after the meeting, never a pre-release
 consensus), and the October CPI pre-release plan generalized to every US CPI card (`cpiPlan`: its interpretation matrix,
 response windows, and the confounders the calendar shows: a same-day auction, a Fed statement within two days, a same-half-hour
-US release; desk "Your CPI plan"). Tests: `tests/research-watch.test.mjs`.
+US release; desk "Your CPI plan"). Then (owner: "do china briefs too") the September China briefs (NBS property, MOF local
+fiscal; `chinaBriefs`): their figures read from their own tables, a staleness line once the next NBS / MOF release should be
+out (about mid-month after the month), and the next CNY release on the strategist's calendar. Tests: `tests/research-watch.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days

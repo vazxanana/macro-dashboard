@@ -1364,7 +1364,7 @@
       if (x.readings) h += '<br><small>' + x.readings.map(function (c) { return esc(c.text) + (c.on ? ' (flagged)' : ''); }).join(' · ') + '</small>' + (x.caution ? '<br><small>' + esc(x.caution) + '</small>' : '');
       if (x.watch) h += '<br><small>' + esc(x.watch) + '</small>';
       if (x.caveat) h += '<br><small>' + esc(x.caveat) + '</small>';
-      return h + '<br><small class="res-doc">Source: ' + esc(x.doc) + (x.asOf ? ' (' + esc(x.asOf) + ')' : '') + '</small></li>'; }).join('');
+      return h + '<br><small class="res-doc">Source: ' + esc(x.doc) + (x.also ? ', ' + esc(x.also) : '') + (x.asOf ? ' (' + esc(x.asOf) + ')' : '') + '</small></li>'; }).join('');
     $('res-note').textContent = R.label + (R.register ? ' Your news-trading register (' + R.register.n + ' hypotheses) is shown on each release it covers.' : '');
   }
   function renderNext(v) {

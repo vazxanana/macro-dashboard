@@ -470,7 +470,7 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   // register of the batch, their own conditions checked on today's data (council/research-watch.mjs); display only
   try {
     const DD = docs === undefined ? loadDocs() : docs, calR = calendarOf(cache).concat((fc && fc.playbook) || []);
-    const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now });
+    const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now, calendar: calR });
     v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; const cp = cpiPlan(DD && DD.cpiPlan, e, calR); if (cp) e.cpiPlan = cp; }
   } catch (e) { v.researchError = String(e && e.message || e); }
   v.summary = summary(v);

@@ -17,6 +17,8 @@ export const DOCS = {
   positioning: 'derivatives-positioning-and-flow-research.md',
   cpiPlan: 'us-october-2026-cpi-pre-release-plan.md',
   nyfed: 'nyfed-survey-source-contract-2026-11-09.json',
+  chinaHousing: 'china-housing-developer-funding-2026-09.md',
+  chinaFiscal: 'china-local-fiscal-pulse-2026-09.md',
 };
 export const LABEL = 'Your research, applied: each line checks a document\'s own conditions against today\'s data. Not a forecast, not a tested edge.';
 const DAY = 86400;
@@ -176,13 +178,36 @@ export function cpiPlan(md, card, calendar = []) {
     rule: 'Surprise = first-release actual minus a frozen, comparable expectation; no expectation captured means no surprise, only a market response.' };
 }
 
-export function watch({ docs, fc, S, gold, usdjpy, now }) {
+// China: the two September briefs (NBS property, MOF local fiscal), their figures read from their own tables, how old they are,
+// and the next China release the strategist's calendar shows. The briefs are data notes, not market forecasts; so is this.
+export function chinaBriefs({ housing, fiscal, calendar = [], now }) {
+  const H = tableAfter(housing, /^\|\s*NBS measure\s*\|/i), F = tableAfter(fiscal, /^\|\s*Account \/ item\s*\|/i); if (!H.length && !F.length) return null;
+  const pick = (rows, re) => { const r = rows.find((x) => re.test(x[0])); return r ? r[2] : null; };
+  const inv = pick(H, /development investment/i), funds = pick(H, /developer funds/i), sales = pick(H, /contract sales area/i), resale = pick(H, /second-hand/i);
+  const land = pick(F, /^Land-use-right transfer revenue/i), lfund = pick(F, /^Local government-fund budget revenue/i), lspend = pick(F, /^Local general public budget spending/i);
+  const per = /\*\*Observation period:\*\*\s*([^\n]+)/.exec(housing || '') || /cumulative values|Jan–Sep/.exec(fiscal || '');
+  const facts = [];
+  if (inv || funds) facts.push(`property investment ${inv || 'n/a'}, developer funds ${funds || 'n/a'} (domestic loans the steepest fall)`);
+  if (sales || resale) facts.push(`new-home sales area ${sales || 'n/a'} while resale area ${resale || 'n/a'}: a shift between channels, not proof of higher demand`);
+  if (land || lfund) facts.push(`local land-sale revenue ${land || 'n/a'} and government-fund revenue ${lfund || 'n/a'}, local spending ${lspend || 'n/a'}`);
+  if (!facts.length) return null;
+  // NBS and MOF publish a month's cumulative figures about mid-month after it: count the releases that should be out since
+  const end = Date.UTC(2026, 8, 30) / 1000, age = Math.max(0, Math.floor((now - end - 16 * DAY) / (30.44 * DAY)));
+  const next = (calendar || []).map((e) => ({ ...e, t: Date.parse(e.at) / 1000 })).filter((e) => e.country === 'CNY' && e.t > now && e.t <= now + 14 * DAY).sort((a, b) => a.t - b.t)[0];
+  return { doc: DOCS.chinaHousing, also: DOCS.chinaFiscal, asOf: '2026-09',
+    text: `China, Jan-Sep 2026 (your NBS and MOF briefs, year on year): ${facts.join('; ')}. The briefs read this as a strained property-linked local revenue base, not a measure of home demand.`,
+    watch: (age >= 1 ? `${age === 1 ? 'A newer release' : age + ' newer releases'} should be out by now (Jan-${['Oct', 'Nov', 'Dec', 'Jan'][Math.min(3, age - 1)]}): these September figures may be stale; refresh the brief before relying on them. ` : '') + (next ? `Next China release on the calendar: ${next.title}, ${new Date(next.t * 1000).toISOString().slice(0, 16).replace('T', ' ')} UTC.` : 'No China release on the calendar in the next two weeks.'),
+    caveat: 'Cumulative nominal figures, not seasonally adjusted; a land-transfer receipt is not a home sale, and sales value divided by area is not a price (your briefs\' own limits).' };
+}
+
+export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [] }) {
   const D = docs || {}, out = { label: LABEL, items: [], used: [] }, R = D.register ? register(D.register) : [];
   const push = (k, x) => { if (x) { out.items.push({ k, ...x }); out.used.push(x.doc); } };
   try { push('gold', D.gold && goldScenarios({ md: D.gold, S, gold, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('funding', D.funding && fundingLadder({ md: D.funding, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('japan', D.japan && japanCheck({ md: D.japan, S, usdjpy, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('cot', D.positioning && positioningNote({ S })); } catch (e) { out.error = String(e.message || e); }
+  try { push('china', (D.chinaHousing || D.chinaFiscal) && chinaBriefs({ housing: D.chinaHousing, fiscal: D.chinaFiscal, calendar, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('nyfed', D.nyfed && nyfedSurvey({ json: D.nyfed, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
   out.register = R.length ? { n: R.length, doc: DOCS.register, ids: R.map((r) => r.id) } : null;
   return { watch: out, register: R };

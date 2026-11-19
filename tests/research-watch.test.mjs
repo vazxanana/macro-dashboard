@@ -88,3 +88,14 @@ test('CPI plan on CPI cards: the matrix, the windows, the confounders the calend
   assert.equal(cpiPlan(D.cpiPlan, { title: 'CPI y/y', country: 'EUR', at }, cal), null);
   const page = fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'utf8'); assert.match(page, /Your CPI plan/);
 });
+
+test('China briefs: figures from their own tables, staleness, the next China release', async () => {
+  const { chinaBriefs } = await import('../council/research-watch.mjs');
+  const cal = [{ title: '1-y Loan Prime Rate', country: 'CNY', at: '2026-11-20T01:00:00.000Z' }];
+  const r = chinaBriefs({ housing: D.chinaHousing, fiscal: D.chinaFiscal, calendar: cal, now });
+  assert.match(r.text, /property investment −20\.6%/); assert.match(r.text, /land-sale revenue −27\.9%/); assert.match(r.text, /resale area \+10\.7%/);
+  assert.match(r.watch, /should be out by now \(Jan-Oct\)/); assert.match(r.watch, /Loan Prime Rate/);
+  const early = chinaBriefs({ housing: D.chinaHousing, fiscal: D.chinaFiscal, calendar: [], now: Date.UTC(2026, 9, 25) / 1000 });
+  assert.ok(!/should be out/.test(early.watch)); assert.match(early.caveat, /not a home sale/);
+  assert.equal(chinaBriefs({ housing: '', fiscal: '', now }), null);
+});
