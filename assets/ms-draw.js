@@ -1,8 +1,8 @@
 /* Drawing tools like ChronosTrade on the Desk's charts (18 Nov 2026, owner: "chart should have the same chronotrades charts
    features all of them"). Display only: a drawing never places, changes or refuses an order and moves no stop.
-   - Tools: trend line, horizontal line, horizontal ray, vertical line, box; magnet (off / weak / strong) on the candle's
+   - Tools: trend line, horizontal line, horizontal ray, vertical line, box, Fibonacci retracement, arrow, text (19 Nov 2026); magnet (off / weak / strong) on the candle's
      open / high / low / close; select, move, resize by handles; a style bar (5 colours, width, dashed, extend, label, lock,
-     clone, delete); Alt+T / H / J / V / R / M; Delete removes the selected drawing, Esc lets go.
+     clone, delete; a text's words and size); Alt+T / H / J / V / R / F / A / X / M; a double-click edits a text; Delete removes the selected drawing, Esc lets go.
    - Every chart the page registers (window.msCharts) of the same market shows the same drawings: draw on one, see it on all.
    - A right-click on a chart: Reset chart view, Delete this drawing, Remove the last drawing, Delete all drawings.
    - Shapes are ChronosTrade's ({ type, t1, p1, t2, p2 | price, col, w, ls, ext, lock, lbl }), the geometry, hit test, magnet,
@@ -55,7 +55,16 @@
     const list = L.map((d, i) => [d, i]); if (DRAFT && DRAFT.mk === mk) list.push([DRAFT.d, -1]);
     for (const [d, i] of list) { const g = geo(cx, d); if (!g) continue; const sel = SEL && SEL.mk === mk && SEL.i === i, hov = HOV && HOV.mk === mk && HOV.i === i, col = colOf(d);
       x.strokeStyle = col; x.lineWidth = (d.w || 1) + (hov && !sel ? 0.5 : 0); x.setLineDash(d.ls === 'dash' ? [6, 4] : []);
-      if (g.type === 'r') { x.fillStyle = col + '22'; const rx = Math.min(g.x1, g.x2), ry = Math.min(g.y1, g.y2), rw = Math.abs(g.x2 - g.x1), rh = Math.abs(g.y2 - g.y1); x.fillRect(rx, ry, rw, rh); x.strokeRect(rx, ry, rw, rh); }
+      if (g.type === 'x') { x.setLineDash([]); x.font = `600 ${g.fs}px Figtree, system-ui, sans-serif`; x.fillStyle = col; x.textBaseline = 'alphabetic'; x.fillText(d.text, g.x1 + 4, g.y1 - 5);
+        if (sel || hov) { x.lineWidth = 1; x.strokeRect(g.x1 + 0.5, g.y2 + 0.5, g.x2 - g.x1, g.y1 - g.y2); } }
+      else if (g.type === 'f') { const lw = x.lineWidth; x.font = '600 12px Figtree, system-ui, sans-serif';
+        for (let k = 0; k + 1 < g.lv.length; k++) { x.globalAlpha = k % 2 ? 0.07 : 0.12; x.fillStyle = col; x.fillRect(g.fx1, Math.min(g.lv[k][1], g.lv[k + 1][1]), g.fx2 - g.fx1, Math.abs(g.lv[k + 1][1] - g.lv[k][1])); }
+        x.globalAlpha = 1; for (const [r, yy] of g.lv) { x.lineWidth = lw; x.beginPath(); x.moveTo(g.fx1, yy); x.lineTo(g.fx2, yy); x.stroke();
+          const pr = d.p2 + (d.p1 - d.p2) * r, lab = `${r === 0 || r === 1 ? r : r.toFixed(3).replace(/0+$/, '')} (${cx.fmt(pr)})`; x.fillStyle = col; x.fillText(lab, g.fx1 + 4, yy - 4); }
+        x.setLineDash([4, 4]); x.lineWidth = 1; x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.x2, g.y2); x.stroke(); }
+      else if (g.type === 'a') { x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.x2, g.y2); x.stroke(); const an = Math.atan2(g.y2 - g.y1, g.x2 - g.x1), hl = 10 + (d.w || 1) * 2;
+        x.setLineDash([]); x.beginPath(); x.moveTo(g.x2, g.y2); x.lineTo(g.x2 - hl * Math.cos(an - 0.45), g.y2 - hl * Math.sin(an - 0.45)); x.lineTo(g.x2 - hl * Math.cos(an + 0.45), g.y2 - hl * Math.sin(an + 0.45)); x.closePath(); x.fillStyle = col; x.fill(); }
+      else if (g.type === 'r') { x.fillStyle = col + '22'; const rx = Math.min(g.x1, g.x2), ry = Math.min(g.y1, g.y2), rw = Math.abs(g.x2 - g.x1), rh = Math.abs(g.y2 - g.y1); x.fillRect(rx, ry, rw, rh); x.strokeRect(rx, ry, rw, rh); }
       else { x.beginPath(); x.moveTo(g.x1, g.y1); x.lineTo(g.xe != null ? g.xe : g.x2, g.ye != null ? g.ye : g.y2); x.stroke(); }
       x.setLineDash([]);
       if (d.type === 'h' || d.type === 'hr') { const lab = cx.fmt(d.type === 'h' ? d.price : d.p1); x.font = '600 12px Figtree, system-ui, sans-serif'; const tw = x.measureText(lab).width + 10; x.fillStyle = col; x.fillRect(W - tw - 2, g.y1 - 9, tw, 18); x.fillStyle = '#fff'; x.fillText(lab, W - tw + 3, g.y1 + 4); }
@@ -82,7 +91,10 @@
   // ---- gestures ----
   function place(cx, a) { const mk = mkOf(cx); if (TOOL === 'h') return commit(mk, { type: 'h', price: a.p });
     if (TOOL === 'hr') return commit(mk, { type: 'hr', t1: a.t - cx.TZ, p1: a.p }); if (TOOL === 'v') return commit(mk, { type: 'v', t1: a.t - cx.TZ });
+    if (TOOL === 'x') { const t1 = a.t - cx.TZ, p1 = a.p; setTool(null); askText('').then((s) => { if (s) commit(mk, { type: 'x', t1, p1, text: s }); }); return; }
     DRAFT = { mk, d: { type: TOOL, t1: a.t - cx.TZ, p1: a.p, t2: a.t - cx.TZ, p2: a.p }, cx }; }
+  async function askText(v) { const s = window.msAsk ? await window.msAsk('Text on the chart', v, { title: v ? 'Edit text' : 'Add text', ok: v ? 'Save' : 'Add', max: 120 }) : prompt('Text on the chart', v);
+    return s == null ? null : BT().drawNorm([{ type: 'x', t1: 0, p1: 0, text: s }]).map((o) => o.text)[0] || null; }
   function commit(mk, d) { const L = load(mk), at = Math.floor(Date.now() / 1000); L.push(Object.assign(d, { at })); save(mk); SEL = { mk, i: L.length - 1 }; SELC = LASTCX; DRAFT = null; setTool(null); paintAll(); bar(); }
   function lock(cx, on) { try { cx.chart.applyOptions({ handleScroll: !on, handleScale: !on }); } catch (e) {} }
   let LASTCX = null;
@@ -108,8 +120,9 @@
     save(mkOf(cx)); bar(); }
 
   // ---- the strip of tools (in the charts toolbar) and the style bar ----
-  const ICON = { '': '<path d="M6 3l12 9-5.5 1.2L10 19z"/>', t: '<path d="M4.5 18.5L19.5 5.5"/><circle cx="4.5" cy="18.5" r="1.6"/><circle cx="19.5" cy="5.5" r="1.6"/>', h: '<path d="M3 12h18"/>', hr: '<path d="M6 12h15"/><circle cx="5" cy="12" r="1.8"/>', v: '<path d="M12 3v18"/>', r: '<rect x="4" y="6" width="16" height="12" rx="1"/>', mag: '<path d="M6 4v7a6 6 0 0 0 12 0V4"/><path d="M6 8h3M15 8h3"/>' };
-  const NAME = { '': 'Cursor (Esc)', t: 'Trend line (Alt+T)', h: 'Horizontal line (Alt+H)', hr: 'Horizontal ray (Alt+J)', v: 'Vertical line (Alt+V)', r: 'Box (Alt+R)' };
+  const ICON = { '': '<path d="M6 3l12 9-5.5 1.2L10 19z"/>', t: '<path d="M4.5 18.5L19.5 5.5"/><circle cx="4.5" cy="18.5" r="1.6"/><circle cx="19.5" cy="5.5" r="1.6"/>', h: '<path d="M3 12h18"/>', hr: '<path d="M6 12h15"/><circle cx="5" cy="12" r="1.8"/>', v: '<path d="M12 3v18"/>', r: '<rect x="4" y="6" width="16" height="12" rx="1"/>', mag: '<path d="M6 4v7a6 6 0 0 0 12 0V4"/><path d="M6 8h3M15 8h3"/>',
+    f: '<path d="M3 5h18M3 10h18M3 14h18M3 19h18"/><path d="M5 19L19 5" stroke-dasharray="2 2"/>', a: '<path d="M5 19L18 6"/><path d="M11 6h7v7"/>', x: '<path d="M5 6V4h14v2M12 4v16M9 20h6"/>' };
+  const NAME = { '': 'Cursor (Esc)', t: 'Trend line (Alt+T)', h: 'Horizontal line (Alt+H)', hr: 'Horizontal ray (Alt+J)', v: 'Vertical line (Alt+V)', r: 'Box (Alt+R)', f: 'Fibonacci retracement (Alt+F)', a: 'Arrow (Alt+A)', x: 'Text (Alt+X)' };
   const svg = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${ICON[k]}</svg>`;
   function strip() { const host = document.getElementById('ms-dr-bar'); if (!host || host.dataset.done) return; host.dataset.done = '1';
     host.innerHTML = Object.keys(NAME).map((k) => `<button type="button" data-dt="${k}" aria-pressed="${k === ''}" title="${NAME[k]}" aria-label="${NAME[k].replace(/ \(.*/, '')}">${svg(k)}</button>`).join('') + `<button type="button" class="dr-mag" data-mag aria-pressed="false" title="Magnet: off (Alt+M)" aria-label="Magnet">${svg('mag')}<small></small></button>`;
@@ -125,8 +138,9 @@
     if (!el) { el = document.createElement('div'); el.id = 'ms-dsel'; el.className = 'ms-dsel'; el.setAttribute('role', 'toolbar'); el.setAttribute('aria-label', 'Selected drawing'); document.body.appendChild(el); el.addEventListener('click', selAct); el.addEventListener('pointerdown', (e) => e.stopPropagation()); }
     const on = (b) => (b ? ' aria-pressed="true"' : ' aria-pressed="false"');
     el.innerHTML = CHIP.map((c) => `<button type="button" class="dc" data-col="${c}" title="Colour"${on((d.col || 'draw') === c)} style="--c:${COLS[c].startsWith('--') ? `var(${COLS[c]})` : COLS[c]}"><i></i></button>`).join('')
-      + `<span class="sep"></span>` + [1, 2, 3].map((w) => `<button type="button" data-w="${w}" title="Width ${w}"${on((d.w || 1) === w)}>${w}px</button>`).join('')
-      + `<button type="button" data-ls title="Dashed"${on(d.ls === 'dash')}>- -</button>` + (d.type === 't' ? `<button type="button" data-ext title="Extend to the right"${on(d.ext)}>→</button>` : '')
+      + `<span class="sep"></span>` + [1, 2, 3].map((w) => d.type === 'x' ? `<button type="button" data-w="${w}" title="Text size"${on((d.w || 1) === w)}>${['S', 'M', 'L'][w - 1]}</button>` : `<button type="button" data-w="${w}" title="Width ${w}"${on((d.w || 1) === w)}>${w}px</button>`).join('')
+      + `<button type="button" data-ls title="Dashed"${on(d.ls === 'dash')}>- -</button>` + (d.type === 't' || d.type === 'f' ? `<button type="button" data-ext title="Extend to the right"${on(d.ext)}>→</button>` : '')
+      + (d.type === 'x' ? `<button type="button" data-txt title="Change the words">Edit text</button>` : '')
       + (d.type === 't' || d.type === 'r' ? `<button type="button" data-lbl title="Label: price change, %, bars"${on(d.lbl)}>Label</button>` : '')
       + (['h', 'hr', 't'].includes(d.type) ? `<span class="sep"></span><button type="button" data-alert title="Tell me when price crosses this line (while this page is open)"${on(d.alert)}>${d.alert ? 'Alert on' : 'Alert'}</button>` : '')
       + `<span class="sep"></span><button type="button" data-lock title="${d.lock ? 'Unlock' : 'Lock'}"${on(d.lock)}>${d.lock ? 'Locked' : 'Lock'}</button><button type="button" data-clone title="Clone">Clone</button><button type="button" data-del title="Delete (Del)" class="del">Delete</button>`;
@@ -143,6 +157,7 @@
     else if (b.hasAttribute('data-alert')) { if (d.alert) { delete d.alert; note('Alert off.'); } else { d.alert = true; delete d.fired; note('Alert on: you are told when price crosses this line while this page is open.'); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {}); } catch (x) {} } }
     else if (b.hasAttribute('data-clone')) { const c = { ...d }; delete c.lock; for (const k of ['p1', 'p2', 'price']) if (fin(c[k])) c[k] *= 1.002; c.at = Math.floor(Date.now() / 1000); L.push(c); SEL = { mk, i: L.length - 1 }; }
     else if (b.hasAttribute('data-del')) { remove(mk, SEL.i); return; }
+    else if (b.hasAttribute('data-txt')) { const i = SEL.i; askText(d.text).then((s) => { if (s && L[i] === d) { d.text = s; d.editedAt = Math.floor(Date.now() / 1000); save(mk); bar(); paintAll(); } }); return; }
     save(mk); bar(); paintAll(); }
   function remove(mk, i) { const L = load(mk), d = L[i]; if (!d) return false; if (d.lock) { note('Locked: unlock it first.'); return false; } L.splice(i, 1); save(mk); SEL = null; HOV = null; bar(); paintAll(); return true; }
   const note = (s) => { if (window.msToast) try { window.msToast(s); return; } catch (e) {} const n = document.getElementById('ms-dr-note'); if (n) { n.textContent = s; clearTimeout(n._t); n._t = setTimeout(() => { n.textContent = ''; }, 2500); } };
@@ -168,7 +183,7 @@
 
   // ---- keys ----
   document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '') || document.querySelector('dialog[open]') || !CX.some((c) => c.visible())) return;
-    if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
+    if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
     if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES && SEL) { const L = load(SEL.mk); if (GES.d0) L[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
     if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); } });
   addEventListener('scroll', () => { if (SEL) bar(); }, { passive: true });
@@ -177,7 +192,10 @@
   function attach(cx) { if (CX.includes(cx)) return; CX.push(cx); strip();
     const el = cx.el; el.addEventListener('pointerdown', (e) => down(cx, e), true); el.addEventListener('pointermove', (e) => move(cx, e), true);
     el.addEventListener('pointerup', () => up(cx), true); el.addEventListener('pointercancel', () => up(cx), true); el.addEventListener('pointerleave', () => { cx.ring = null; if (HOV) { HOV = null; paintAll(); } });
-    el.addEventListener('contextmenu', (e) => menu(cx, e)); paint(cx); }
+    el.addEventListener('contextmenu', (e) => menu(cx, e));
+    el.addEventListener('dblclick', (e) => { if (!BT() || TOOL) return; const r = el.getBoundingClientRect(), h = hitAt(cx, e.clientX - r.left, e.clientY - r.top); if (!h) return; const L = load(h.mk), d = L[h.i];
+      if (!d || d.type !== 'x' || d.lock) return; e.preventDefault(); e.stopPropagation(); askText(d.text).then((s) => { if (s && L[h.i] === d) { d.text = s; d.editedAt = Math.floor(Date.now() / 1000); save(h.mk); bar(); paintAll(); } }); }, true);
+    paint(cx); }
   const reg = window.msCharts = window.msCharts || { list: [], add(cx) { this.list.push(cx); document.dispatchEvent(new CustomEvent('ms:chart', { detail: cx })); } };
   reg.list.forEach(attach); document.addEventListener('ms:chart', (e) => attach(e.detail));
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', strip); else strip();

@@ -533,15 +533,21 @@
   //   v  vertical line { t1 }               t  trend line { t1, p1, t2, p2 } (ext: extended to the right)
   //   r  box { t1, p1, t2, p2 }             at = the replay moment it was drawn (the trade coach reads only at <= the entry);
   // an edit keeps at and stamps editedAt. Older sessions and the Mosha hand-over store h / t / r without the style fields.
-  const DRAW_TYPES = ['h', 'hr', 'v', 't', 'r'], DRAW_COLS = ['draw', 'up', 'dn', 'gold', 'ink'];
+  //   f  Fibonacci retracement { t1, p1, t2, p2 } (levels FIB_LEVELS: 1 at the first point, 0 at the second; ext: levels to the right)
+  //   a  arrow { t1, p1, t2, p2 } (head at the second point)      x  text { t1, p1, text } (19 Nov 2026, the Desk's charts)
+  const DRAW_TYPES = ['h', 'hr', 'v', 't', 'r', 'f', 'a', 'x'], FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1], DRAW_COLS = ['draw', 'up', 'dn', 'gold', 'ink'];
   const fin = (v) => typeof v === 'number' && Number.isFinite(v);
   function drawNorm(list) { const out = []; for (const d of Array.isArray(list) ? list : []) { if (!d || !DRAW_TYPES.includes(d.type)) continue;
-      const need = d.type === 'h' ? ['price'] : d.type === 'v' ? ['t1'] : d.type === 'hr' ? ['t1', 'p1'] : ['t1', 'p1', 't2', 'p2']; if (!need.every((k) => fin(d[k]))) continue;
-      const o = { type: d.type }; for (const k of need) o[k] = d[k]; if (fin(d.at)) o.at = d.at; if (fin(d.editedAt)) o.editedAt = d.editedAt;
+      const need = d.type === 'h' ? ['price'] : d.type === 'v' ? ['t1'] : d.type === 'hr' || d.type === 'x' ? ['t1', 'p1'] : ['t1', 'p1', 't2', 'p2']; if (!need.every((k) => fin(d[k]))) continue;
+      const txt = d.type === 'x' ? textOf(d.text) : ''; if (d.type === 'x' && !txt) continue;
+      const o = { type: d.type }; for (const k of need) o[k] = d[k]; if (txt) o.text = txt; if (fin(d.at)) o.at = d.at; if (fin(d.editedAt)) o.editedAt = d.editedAt;
       if (DRAW_COLS.includes(d.col) && d.col !== 'draw') o.col = d.col; if ([2, 3].includes(d.w)) o.w = d.w; if (d.ls === 'dash') o.ls = 'dash';
-      if (d.ext === true && d.type === 't') o.ext = true; if (d.lock === true) o.lock = true; if (d.lbl === true && (d.type === 't' || d.type === 'r')) o.lbl = true;
+      if (d.ext === true && (d.type === 't' || d.type === 'f')) o.ext = true; if (d.lock === true) o.lock = true; if (d.lbl === true && (d.type === 't' || d.type === 'r')) o.lbl = true;
       if (d.alert === true && ['h', 'hr', 't'].includes(d.type)) o.alert = true; if (fin(d.fired)) o.fired = d.fired; out.push(o); }
     return out; }
+  // a text shape's words: plain, one line, at most 120 characters
+  function textOf(v) { return typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) : ''; }
+  const TEXT_PX = [13, 16, 20];   // a text shape's font size by its width setting (1-3)
   // magnet: the price snaps to the hovered candle's open / high / low / close nearest in pixels; weak (1) only within tol px,
   // strong (2) always; off (0) leaves it. Y maps a price to its pixel row. A point with no candle under it is left alone.
   function drawSnap(bar, price, Y, mode, tol = 12) { if (!mode || !bar || !fin(price)) return price; const yp = Y(price); if (yp == null) return price; let best = null, bd = Infinity;
@@ -553,7 +559,10 @@
     if (d.type === 'v') { const x = X(d.t1); if (x == null) return null; Object.assign(g, { x1: x, y1: 0, x2: x, y2: H }); g.pts = [['a', x, H / 2]]; return g; }
     const x1 = X(d.t1), y1 = Y(d.p1); if (x1 == null || y1 == null) return null;
     if (d.type === 'hr') { Object.assign(g, { x1, y1, x2: Math.max(x1, W), y2: y1 }); g.pts = [['a', x1, y1]]; return g; }
+    if (d.type === 'x') { const fs = TEXT_PX[(d.w || 1) - 1] || 13; Object.assign(g, { x1, y1, x2: x1 + Math.max(12, String(d.text || '').length * fs * 0.58) + 8, y2: y1 - fs - 6, fs }); g.pts = [['a', x1, y1]]; return g; }
     const x2 = X(d.t2), y2 = Y(d.p2); if (x2 == null || y2 == null) return null; Object.assign(g, { x1, y1, x2, y2 });
+    if (d.type === 'a') { g.pts = [['a', x1, y1], ['b', x2, y2]]; return g; }
+    if (d.type === 'f') { g.pts = [['a', x1, y1], ['b', x2, y2]]; g.fx1 = Math.min(x1, x2); g.fx2 = d.ext ? Math.max(W, x1, x2) : Math.max(x1, x2); g.lv = FIB_LEVELS.map((r) => [r, y2 + (y1 - y2) * r]); return g; }
     if (d.type === 't') { g.pts = [['a', x1, y1], ['b', x2, y2]]; if (d.ext && x2 !== x1) { const k = (y2 - y1) / (x2 - x1), xe = x2 > x1 ? W : 0; g.xe = xe; g.ye = y2 + k * (xe - x2); } return g; }
     const mx = (x1 + x2) / 2, my = (y1 + y2) / 2; g.pts = [['c11', x1, y1], ['c22', x2, y2], ['c12', x1, y2], ['c21', x2, y1], ['ep1', mx, y1], ['ep2', mx, y2], ['et1', x1, my], ['et2', x2, my]]; return g; }
   const segD = (xp, yp, ax, ay, bx, by) => { const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy, u = L2 ? Math.max(0, Math.min(1, ((xp - ax) * dx + (yp - ay) * dy) / L2)) : 0; return Math.hypot(xp - (ax + u * dx), yp - (ay + u * dy)); };
@@ -563,13 +572,15 @@
     for (const [k, x, y] of g.pts) { const dd = Math.hypot(xp - x, yp - y); if (dd <= hTol && dd < bd) { bd = dd; best = k; } } if (best) return best;
     if (g.type === 'h') return Math.abs(yp - g.y1) <= tol ? 'body' : null;
     if (g.type === 'v') return Math.abs(xp - g.x1) <= tol && yp >= 0 && yp <= g.y2 ? 'body' : null;
+    if (g.type === 'x') return xp >= g.x1 - tol && xp <= g.x2 + tol && yp >= g.y2 - tol && yp <= g.y1 + tol ? 'body' : null;
+    if (g.type === 'f') { if (xp >= g.fx1 - tol && xp <= g.fx2 + tol && g.lv.some(([, y]) => Math.abs(yp - y) <= tol)) return 'body'; return segD(xp, yp, g.x1, g.y1, g.x2, g.y2) <= tol ? 'body' : null; }
     if (g.type === 'r') return xp >= Math.min(g.x1, g.x2) - tol && xp <= Math.max(g.x1, g.x2) + tol && yp >= Math.min(g.y1, g.y2) - tol && yp <= Math.max(g.y1, g.y2) + tol ? 'body' : null;
     const ex = g.xe != null ? g.xe : g.x2, ey = g.ye != null ? g.ye : g.y2; return segD(xp, yp, g.x1, g.y1, ex, ey) <= tol ? 'body' : null; }
   // drag a handle to (t, p): a trend line's or ray's end, a box corner (both coordinates) or edge (one), a vertical line's time
   function drawResize(d, part, t, p) { const o = { ...d };
     if (d.type === 'h') { if (fin(p)) o.price = p; return o; } if (d.type === 'v') { if (fin(t)) o.t1 = t; return o; }
     const set = (tk, pk) => { if (tk && fin(t)) o[tk] = t; if (pk && fin(p)) o[pk] = p; };
-    if (d.type === 'hr' || d.type === 't') { if (part === 'a') set('t1', 'p1'); else if (part === 'b' && d.type === 't') set('t2', 'p2'); return o; }
+    if (['hr', 't', 'f', 'a', 'x'].includes(d.type)) { if (part === 'a') set('t1', 'p1'); else if (part === 'b' && ['t', 'f', 'a'].includes(d.type)) set('t2', 'p2'); return o; }
     ({ c11: () => set('t1', 'p1'), c22: () => set('t2', 'p2'), c12: () => set('t1', 'p2'), c21: () => set('t2', 'p1'), ep1: () => set(null, 'p1'), ep2: () => set(null, 'p2'), et1: () => set('t1', null), et2: () => set('t2', null) }[part] || (() => {}))(); return o; }
   // move the whole shape: every time through fT, every price through fP (the page maps them through pixels, so a move keeps
   // its shape on screen across weekend gaps)
@@ -654,6 +665,6 @@
     TF_SECS, tfMoment, tfHold, tfPlan, tfFineSec, tfWindow, tfPart, tfEnter, tfSeat, tfUnseat, tfNext, advance, tfResume, tfStamp, tfProgress, sessionName,
     COACH, lensSay, closedBy, bucketBars, trendOf, atrOf, swingBreak, coachCtx, coachDraw, lineAt, coachSentence, coachStop, coachFlags, coachSplits,
     GRADES, gatherSessions, exitCf, coachLeaks, coachPatterns, patternMatch, planNorm, planCheck, planAdherence, coachDebrief,
-    DRAW_TYPES, DRAW_COLS, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, tfLogical, tfTimeAt, syncRange, syncEcho, closedBarAt, LIVE_EV, liveEvents };
+    DRAW_TYPES, DRAW_COLS, FIB_LEVELS, TEXT_PX, drawNorm, drawSnap, drawGeom, drawHit, drawResize, drawMove, barsBetween, drawInfo, tfLogical, tfTimeAt, syncRange, syncEcho, closedBarAt, LIVE_EV, liveEvents };
   if (typeof module !== 'undefined' && module.exports) module.exports = BT; else root.BT = BT;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

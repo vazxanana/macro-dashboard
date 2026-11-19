@@ -7931,7 +7931,7 @@ function msNextSetup(bars, A) {
   // ─── One chart toolbar (19 Nov 2026): the tools act on the chart last touched, in every layout (All, Split, Layout, one chart) ───
   { const bar = document.getElementById('ms-ch-one'), VCH0 = document.getElementById('v-charts');
     // the ChronosTrade strip next to it already draws horizontal and trend lines, so those two are not repeated here (H / T keys still work)
-    const TOOLS = ['.ch-pos', '.ch-fib', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-tv', '.ch-fs'];
+    const TOOLS = ['.ch-pos', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-tv', '.ch-fs'];
     let ACT = null, MO = null, built = false;
     const shown = () => [...document.querySelectorAll('#v-charts .ms-pane')].filter((x) => x.offsetParent && x.querySelector('.ch-tools'));
     const active = () => { const v = shown(); return ACT && v.includes(ACT) ? ACT : (KB_PANE && v.includes(KB_PANE) ? KB_PANE : v[0] || null); };

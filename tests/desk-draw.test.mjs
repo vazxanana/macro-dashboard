@@ -189,3 +189,20 @@ test('drawing rail on the left and a floating favourites bar (19 Nov 2026)', () 
   assert.match(G, /const bar = document\.querySelector\('#v-charts \.sec-h'\);/, 'the guide button stays in the toolbar, not in the rail');
   assert.match(G, /<b>Favourites<\/b>/, 'the guide explains the favourites');
 });
+
+test('Fibonacci retracement, arrow and text are drawing shapes (19 Nov 2026)', () => {
+  const B = require('../assets/backtest-engine.js');
+  const n = B.drawNorm([{ type: 'f', t1: 1, p1: 10, t2: 2, p2: 20, ext: true }, { type: 'x', t1: 1, p1: 5, text: ' two\nwords ' }, { type: 'x', t1: 1, p1: 5, text: '   ' }, { type: 'a', t1: 1, p1: 1, t2: 2, p2: 2 }]);
+  assert.deepEqual(n.map((d) => d.type), ['f', 'x', 'a'], 'a text with no words is dropped');
+  assert.equal(n[1].text, 'two words'); assert.equal(n[0].ext, true);
+  assert.equal(B.drawNorm([{ type: 'x', t1: 1, p1: 1, text: 'y'.repeat(300) }])[0].text.length, 120);
+  const g = B.drawGeom(n[0], (t) => t * 100, (p) => 200 - p * 5, 800, 400);
+  assert.deepEqual(g.lv.map(([r]) => r), B.FIB_LEVELS); assert.equal(g.lv[0][1], 100, 'level 0 at the second point'); assert.equal(g.lv[6][1], 150, 'level 1 at the first point');
+  assert.equal(g.fx2, 800, 'extended to the right'); assert.equal(B.drawHit(g, 400, 125), 'body', 'the 0.5 level is hit');
+  assert.equal(B.drawResize(n[0], 'b', 3, 30).p2, 30); assert.equal(B.drawResize(n[1], 'a', 4, 40).text, 'two words', 'moving a text keeps its words');
+  const gx = B.drawGeom(n[1], (t) => t * 100, (p) => 200 - p * 5, 800, 400); assert.equal(B.drawHit(gx, gx.x1 + 10, gx.y1 - 5), 'body');
+  assert.match(SRC, /f: 'Fibonacci retracement \(Alt\+F\)', a: 'Arrow \(Alt\+A\)', x: 'Text \(Alt\+X\)'/);
+  assert.match(SRC, /KeyF: 'f', KeyA: 'a', KeyX: 'x'/);
+  assert.match(SRC, /data-txt title="Change the words">Edit text</);
+  assert.doesNotMatch(PAGE, /const TOOLS = \['\.ch-pos', '\.ch-fib'/, 'the old Fibonacci button leaves the rail: the drawing tool replaces it');
+});
