@@ -2449,6 +2449,10 @@ each its own market and timeframe (any of `SPTFS`, a year from months through `s
 timeframe's `poll`), the drawing tools on each (`msCharts` ids `mm0`-`mm3`); localStorage `ms-multi` `{ n, cells: [{ k, tf }] }`,
 read through the market / timeframe lists. No Meridian / ICT markup there (said on the bar). "One market" goes back to the view
 before (`MM_PREV`; the phone has no toolbar row). `window.msMulti()` is the read-only view.
+**Low timeframes keep up** (same day, owner: "the charts in low tf are too slow"): the free charts (one chart, Split's right side,
+Markets) read their newest candles every `freePoll(T)` = 1.5 s up to M1, 3 s up to M15, 6 s up to H1 (they polled every 15 s), and a
+free chart of the page's own market folds every live tick into its last candle (`window.msTickSubs`, called from `liveFrame`,
+`tickInto`; up to a day, never a week / month / year); while ticks arrive (`LT.at` under 5 s old) its read runs every 15 s only.
 Tests: `tests/desk-draw.test.mjs`.
 
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
