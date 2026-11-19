@@ -344,3 +344,14 @@ test('a new seat sees Charts, ChronosTrade and the Macro desk only (19 Nov 2026)
   assert.match(PAGE, /html\[data-deny~="desk"\] \[data-go="home"\], html\[data-deny~="desk"\] \[data-go="setup"\], html\[data-deny~="desk"\] \[data-go="council"\]/);
   assert.match(fs.readFileSync('api/users.js', 'utf8'), /const PERM_KEYS = \[[^\]]*'desk'\]/, 'the server keeps the new key');
 });
+
+test('the email (19 Nov 2026): a short fallback link that opens the whole address, no disclaimer line in the footer', async () => {
+  const W = world(); await join(W);
+  const h = W.out[W.out.length - 1].html, link = linkOf(W);
+  if (process.env.EMAIL_OUT) fs.writeFileSync(process.env.EMAIL_OUT, h);
+  assert.doesNotMatch(h, /financial advice|paper-trading desk/);
+  assert.match(h, /Button not working\? <a href="https:\/\/[^"]+verify=[^"]+"[^>]*>Open this link<\/a>/, 'the whole address behind the short text');
+  const shown = />\(([^)]+)\)<\/span>/.exec(h)[1];
+  assert.ok(shown.length < 40, `shown short: ${shown}`);
+  assert.ok(!h.includes(`>${link}<`), 'the long token is never printed');
+});

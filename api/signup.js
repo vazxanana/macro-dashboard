@@ -115,19 +115,24 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&
 // the logo (icons/email-logo.png, drawn by scripts/make-icons.mjs from the mark): always from the site's own domain, a PNG
 // because most mail apps show no SVG; its alt text and font say "Aureum Desk" when a mail app blocks images
 const SITE = 'https://aureumdesk.co.uk/', LOGO = SITE + 'icons/email-logo.png';
+// the fallback link is shown short (the site's name only) and still opens the whole address (19 Nov 2026,
+// owner: "make green shorter"); the footer has no disclaimer line (owner: "remove red")
+const shortLink = (u) => { try { return new URL(u).host; } catch (e) { return 'aureumdesk.co.uk'; } };
 const html = (lines, link, label, o = {}) => {
   const F = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-  const p = (t, st = '') => `<p style="margin:0 0 16px;font:15px/1.6 ${F};color:#3a3f47;${st}">${esc(t)}</p>`;
-  const body = lines.map((l, i) => p(l, i === 0 ? 'color:#16181b;' : '')).join('');
-  const btn = link ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:8px 0 24px"><tr><td style="border-radius:8px;background:#16181b"><a href="${esc(link)}" style="display:inline-block;padding:13px 26px;font:600 15px/1 ${F};color:#ffffff;text-decoration:none;border-radius:8px">${esc(label)}</a></td></tr></table>`
-    + `<p style="margin:0 0 6px;font:13px/1.5 ${F};color:#6b717b">If the button does not work, copy this address into your browser:</p><p style="margin:0 0 8px;font:13px/1.5 ${F};word-break:break-all"><a href="${esc(link)}" style="color:#2f5e9e;text-decoration:underline">${esc(link)}</a></p>` : '';
-  const note = o.note ? `<tr><td style="padding:20px 40px;border-top:1px solid #e6e8eb;font:13px/1.55 ${F};color:#6b717b">${esc(o.note)}</td></tr>` : '';
-  return `<!doctype html><html><body style="margin:0;padding:0;background:#f3f4f6"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f3f4f6"><tr><td align="center" style="padding:32px 16px">`
+  const p = (t, st = '') => `<p style="margin:0 0 16px;font:15px/1.65 ${F};color:#454b55;${st}">${esc(t)}</p>`;
+  const body = lines.map((l, i) => p(l, i === 0 ? 'color:#16181b;font-weight:600;' : '')).join('');
+  const btn = link ? `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:12px 0 28px"><tr><td style="border-radius:10px;background:#16181b"><a href="${esc(link)}" style="display:inline-block;padding:15px 30px;font:600 15px/1 ${F};color:#ffffff;text-decoration:none;border-radius:10px">${esc(label)}&nbsp;&nbsp;&rarr;</a></td></tr></table>`
+    + `<p style="margin:0;font:13px/1.55 ${F};color:#7a808a">Button not working? <a href="${esc(link)}" style="color:#2f5e9e;text-decoration:underline">Open this link</a> <span style="color:#a3a8b0">(${esc(shortLink(link))})</span></p>` : '';
+  const note = o.note ? `<tr><td style="padding:18px 40px 22px;background:#f8f9fa;border-top:1px solid #eceef1;border-radius:0 0 14px 14px;font:13px/1.55 ${F};color:#6b717b">${esc(o.note)}</td></tr>` : '';
+  return `<!doctype html><html><head><meta name="color-scheme" content="light"><meta name="supported-color-schemes" content="light"></head><body style="margin:0;padding:0;background:#eef0f3">`
+    + (o.pre ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0">${esc(o.pre)}</div>` : '')
+    + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef0f3"><tr><td align="center" style="padding:36px 16px 40px">`
     + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px">`
-    + `<tr><td style="padding:0 4px 20px"><a href="${SITE}" style="text-decoration:none"><img src="${LOGO}" width="195" height="32" alt="Aureum Desk" style="display:block;border:0;outline:none;width:195px;height:32px;font:700 15px/32px ${F};letter-spacing:.16em;color:#16181b"></a></td></tr>`
-    + `<tr><td style="background:#ffffff;border:1px solid #e6e8eb;border-radius:12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
-    + `<tr><td style="padding:36px 40px 12px">${o.title ? `<h1 style="margin:0 0 20px;font:600 22px/1.3 ${F};color:#16181b">${esc(o.title)}</h1>` : ''}${body}${btn}</td></tr>${note}</table></td></tr>`
-    + `<tr><td style="padding:20px 4px 0;font:12px/1.6 ${F};color:#8a9099">Aureum Desk · aureumdesk.co.uk<br>A paper-trading desk. Nothing here is financial advice.</td></tr>`
+    + `<tr><td align="center" style="padding:0 4px 24px"><a href="${SITE}" style="text-decoration:none"><img src="${LOGO}" width="195" height="32" alt="Aureum Desk" style="display:block;border:0;outline:none;width:195px;height:32px;font:700 15px/32px ${F};letter-spacing:.16em;color:#16181b"></a></td></tr>`
+    + `<tr><td style="background:#ffffff;border:1px solid #e3e6ea;border-top:3px solid #16181b;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04)"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
+    + `<tr><td style="padding:36px 40px 28px">${o.title ? `<h1 style="margin:0 0 22px;font:700 24px/1.3 ${F};color:#16181b;letter-spacing:-.01em">${esc(o.title)}</h1>` : ''}${body}${btn}</td></tr>${note}</table></td></tr>`
+    + `<tr><td align="center" style="padding:22px 4px 0;font:12px/1.6 ${F};color:#8a9099"><a href="${SITE}" style="color:#8a9099;text-decoration:none">Aureum Desk</a> &middot; <a href="${SITE}" style="color:#8a9099;text-decoration:underline">aureumdesk.co.uk</a></td></tr>`
     + `</table></td></tr></table></body></html>`;
 };
 
