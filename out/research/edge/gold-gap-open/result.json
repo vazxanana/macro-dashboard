@@ -1,0 +1,453 @@
+{
+ "study": "gold-gap-open",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "preregistration": "86d26102f99c536d8f60819392f18f59f390f313501b4634c2cd98f900808e09",
+ "costs": {
+  "spread": 0.3,
+  "slipPerMarketOrder": 0.15,
+  "roundTrip": 0.6,
+  "roundTripTarget": 0.44999999999999996,
+  "financing": 0.000148
+ },
+ "rule": {
+  "eligible": "|gap| >= 0.05 x ATR20",
+  "stop": "0.25 x ATR20",
+  "windows": {
+   "is": [
+    "2016-01-04",
+    "2020-12-31"
+   ],
+   "oos": [
+    "2021-01-01",
+    "2099-12-31"
+   ]
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "Fade the gap in Asia (18:05 -> 02:00, target the 17:00 close)",
+   "skipped": {
+    "small": 1846,
+    "filledFirst": 62
+   },
+   "is": {
+    "from": "2016-01-04",
+    "to": "2020-12-31",
+    "n": 107,
+    "buys": 36,
+    "sells": 71,
+    "gross": 0.0158,
+    "avg": -0.1179,
+    "total": -12.61,
+    "avgX2": -0.2515,
+    "tX2": -3.63,
+    "wr": 60.7,
+    "exits": {
+     "stop": 20,
+     "target": 81,
+     "time": 6
+    },
+    "dd": -14.29,
+    "months": 60,
+    "tGross": 0.3,
+    "t": -1.98,
+    "p": 0.9736,
+    "medStop": 3.43,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.1864,
+     "p50": -0.1212,
+     "p95": -0.0357
+    }
+   },
+   "yearsIS": {
+    "2016": {
+     "n": 27,
+     "total": -2.98
+    },
+    "2017": {
+     "n": 21,
+     "total": -3.46
+    },
+    "2018": {
+     "n": 23,
+     "total": -2.97
+    },
+    "2019": {
+     "n": 22,
+     "total": -3.72
+    },
+    "2020": {
+     "n": 14,
+     "total": 0.52
+    }
+   },
+   "oos": {
+    "from": "2021-01-01",
+    "to": "2026-11-12",
+    "n": 142,
+    "buys": 40,
+    "sells": 102,
+    "gross": -0.0272,
+    "avg": -0.0769,
+    "total": -10.93,
+    "avgX2": -0.1267,
+    "tX2": -2.43,
+    "wr": 69.7,
+    "exits": {
+     "stop": 39,
+     "target": 97,
+     "time": 6
+    },
+    "dd": -13.5,
+    "months": 71,
+    "tGross": -0.55,
+    "t": -1.52,
+    "p": 0.9333,
+    "medStop": 12.15,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.1405,
+     "p50": -0.052,
+     "p95": 0.0072
+    }
+   },
+   "years": {
+    "2021": {
+     "n": 7,
+     "total": 0.3
+    },
+    "2022": {
+     "n": 18,
+     "total": -4.22
+    },
+    "2023": {
+     "n": 19,
+     "total": 0.91
+    },
+    "2024": {
+     "n": 14,
+     "total": -3.3
+    },
+    "2025": {
+     "n": 42,
+     "total": -3.88
+    },
+    "2026": {
+     "n": 42,
+     "total": -0.73
+    }
+   },
+   "holm": 1,
+   "lines": {
+    "oosNet": false,
+    "oosT2": false,
+    "holm": false,
+    "isNet": false,
+    "x2": false,
+    "n": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "Follow the gap to 02:00 (18:05 -> 02:00, no target)",
+   "skipped": {
+    "small": 1846,
+    "closedBack": 22
+   },
+   "is": {
+    "from": "2016-01-04",
+    "to": "2020-12-31",
+    "n": 146,
+    "buys": 94,
+    "sells": 52,
+    "gross": -0.0439,
+    "avg": -0.2098,
+    "total": -30.62,
+    "avgX2": -0.3756,
+    "tX2": -4.25,
+    "wr": 40.4,
+    "exits": {
+     "stop": 52,
+     "target": 0,
+     "time": 94
+    },
+    "dd": -31.39,
+    "months": 60,
+    "tGross": -0.52,
+    "t": -2.47,
+    "p": 0.9917,
+    "medStop": 3.44,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.2952,
+     "p50": -0.1497,
+     "p95": 0.0265
+    }
+   },
+   "yearsIS": {
+    "2016": {
+     "n": 39,
+     "total": -7.1
+    },
+    "2017": {
+     "n": 31,
+     "total": -8.56
+    },
+    "2018": {
+     "n": 32,
+     "total": -9.26
+    },
+    "2019": {
+     "n": 26,
+     "total": -3.82
+    },
+    "2020": {
+     "n": 18,
+     "total": -1.89
+    }
+   },
+   "oos": {
+    "from": "2021-01-01",
+    "to": "2026-11-12",
+    "n": 143,
+    "buys": 103,
+    "sells": 40,
+    "gross": 0.0263,
+    "avg": -0.0336,
+    "total": -4.81,
+    "avgX2": -0.0935,
+    "tX2": -0.89,
+    "wr": 39.2,
+    "exits": {
+     "stop": 61,
+     "target": 0,
+     "time": 82
+    },
+    "dd": -20.11,
+    "months": 71,
+    "tGross": 0.25,
+    "t": -0.32,
+    "p": 0.6261,
+    "medStop": 11.54,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.1958,
+     "p50": -0.0098,
+     "p95": 0.21
+    }
+   },
+   "years": {
+    "2021": {
+     "n": 8,
+     "total": 1.9
+    },
+    "2022": {
+     "n": 18,
+     "total": 2.73
+    },
+    "2023": {
+     "n": 19,
+     "total": -6.16
+    },
+    "2024": {
+     "n": 14,
+     "total": 0.07
+    },
+    "2025": {
+     "n": 42,
+     "total": -8.31
+    },
+    "2026": {
+     "n": 42,
+     "total": 4.96
+    }
+   },
+   "holm": 1,
+   "lines": {
+    "oosNet": false,
+    "oosT2": false,
+    "holm": false,
+    "isNet": false,
+    "x2": false,
+    "n": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "name": "NDOG midpoint as a London magnet (03:00 -> 08:00, target the midpoint)",
+   "skipped": {
+    "small": 1846,
+    "touched": 287
+   },
+   "is": {
+    "from": "2016-01-04",
+    "to": "2020-12-31",
+    "n": 10,
+    "buys": 2,
+    "sells": 8,
+    "gross": 0.1807,
+    "avg": 0.0282,
+    "total": 0.28,
+    "avgX2": -0.1242,
+    "tX2": -0.44,
+    "wr": 70,
+    "exits": {
+     "stop": 3,
+     "target": 4,
+     "time": 3
+    },
+    "dd": -3.6,
+    "months": 60,
+    "tGross": 0.67,
+    "t": 0.1,
+    "p": 0.4591,
+    "medStop": 3.28,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.5561,
+     "p50": -0.1554,
+     "p95": 0.2405
+    }
+   },
+   "yearsIS": {
+    "2016": {
+     "n": 2,
+     "total": 0.86
+    },
+    "2017": {
+     "n": 2,
+     "total": -2.38
+    },
+    "2018": {
+     "n": 1,
+     "total": -1.22
+    },
+    "2019": {
+     "n": 4,
+     "total": 2.91
+    },
+    "2020": {
+     "n": 1,
+     "total": 0.11
+    }
+   },
+   "oos": {
+    "from": "2021-01-01",
+    "to": "2026-11-12",
+    "n": 14,
+    "buys": 3,
+    "sells": 11,
+    "gross": 0.1268,
+    "avg": 0.0559,
+    "total": 0.78,
+    "avgX2": -0.0149,
+    "tX2": -0.07,
+    "wr": 42.9,
+    "exits": {
+     "stop": 3,
+     "target": 2,
+     "time": 9
+    },
+    "dd": -4.24,
+    "months": 71,
+    "tGross": 0.55,
+    "t": 0.25,
+    "p": 0.4019,
+    "medStop": 10.67,
+    "finR": 0,
+    "placebo": {
+     "seeds": 40,
+     "p5": -0.369,
+     "p50": -0.0206,
+     "p95": 0.2428
+    }
+   },
+   "years": {
+    "2021": {
+     "n": 1,
+     "total": 0.68
+    },
+    "2022": {
+     "n": 3,
+     "total": 3.37
+    },
+    "2023": {
+     "n": 3,
+     "total": -0.76
+    },
+    "2024": {
+     "n": 1,
+     "total": -0.09
+    },
+    "2025": {
+     "n": 3,
+     "total": -2.07
+    },
+    "2026": {
+     "n": 3,
+     "total": -0.34
+    }
+   },
+   "holm": 1,
+   "lines": {
+    "oosNet": true,
+    "oosT2": false,
+    "holm": false,
+    "isNet": true,
+    "x2": false,
+    "n": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "skip": {
+  "shut": 110,
+  "noCandle": 1,
+  "look": 0
+ },
+ "descriptive": {
+  "evenings": 2157,
+  "breakPrints": 22,
+  "byWindow": {
+   "is": {
+    "evenings": 992,
+    "zero": 55,
+    "withinSpread": 438,
+    "medianGap": 0.35,
+    "elig05": 168,
+    "elig10": 17,
+    "filledBy02": 0.881,
+    "filledBy12": 0.9643,
+    "midBy0255": 0.9405,
+    "midBy12": 0.9702
+   },
+   "oos": {
+    "evenings": 1165,
+    "zero": 12,
+    "withinSpread": 351,
+    "medianGap": 0.57,
+    "elig05": 143,
+    "elig10": 33,
+    "filledBy02": 0.7552,
+    "filledBy12": 0.8951,
+    "midBy0255": 0.9021,
+    "midBy12": 0.951
+   }
+  }
+ },
+ "data": {
+  "candles": 776427,
+  "from": "2015-12-01T00:00:00.000Z",
+  "to": "2026-11-13T21:55:00.000Z"
+ }
+}
