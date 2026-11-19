@@ -1,0 +1,1485 @@
+{
+ "study": "intl-index-orb",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/intl-index-orb/PREREGISTRATION.md",
+ "source": "orb-nas100 (branch orb-nas100), rule unchanged",
+ "rule": "side of the first M5 candle after the local cash open (doji = no trade); entry at the next candle's open; stop at the other end of the first candle; target 10R; stop first when one candle holds both; out at the last candle before the local cash close",
+ "verdict": "FAIL: European ORB book −0.260R a trade net 2021 on (n 5875, monthly t −5.54; gross +0.046R); 0 of 8 tests pass after Holm",
+ "decision": {
+  "byTest": {
+   "T1": {
+    "p": 1,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T2": {
+    "p": 0.504,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T3": {
+    "p": 1,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T4": {
+    "p": 0.996,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T5": {
+    "p": 0.999,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T6": {
+    "p": 0.926,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T7": {
+    "p": 1,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   },
+   "T8": {
+    "p": 1,
+    "pHolm": 1,
+    "checks": {
+     "positive": false,
+     "t2": false,
+     "holm": false,
+     "placebo": true,
+     "inSample": false,
+     "cost2x": false
+    },
+    "pass": false
+   }
+  },
+  "verdict": "FAIL"
+ },
+ "tests": {
+  "T1": {
+   "label": "Europe pooled",
+   "markets": [
+    "de40",
+    "eu50",
+    "fr40",
+    "uk100"
+   ],
+   "windows": {
+    "A": {
+     "n": 4954,
+     "win": 0.203,
+     "netR": -0.395,
+     "grossR": 0.07,
+     "net2R": -0.859,
+     "netSpreadR": -0.15,
+     "costR": 0.465,
+     "total": -1954.48,
+     "months": 60,
+     "t": -7.25,
+     "grossT": 1.46,
+     "stops": 3859,
+     "targets": 163,
+     "time": 932,
+     "maxDD": -2098.41,
+     "medianRiskPts": 9.6,
+     "longs": 2374
+    },
+    "B": {
+     "n": 5875,
+     "win": 0.21,
+     "netR": -0.26,
+     "grossR": 0.046,
+     "net2R": -0.566,
+     "netSpreadR": -0.1,
+     "costR": 0.306,
+     "total": -1527.69,
+     "months": 71,
+     "t": -5.54,
+     "grossT": 1.05,
+     "stops": 4538,
+     "targets": 167,
+     "time": 1170,
+     "maxDD": -1619.53,
+     "medianRiskPts": 13,
+     "longs": 3180
+    },
+    "Bp": {
+     "n": 3701,
+     "win": 0.21,
+     "netR": -0.266,
+     "grossR": 0.027,
+     "net2R": -0.558,
+     "netSpreadR": -0.113,
+     "costR": 0.292,
+     "total": -984.16,
+     "months": 45,
+     "t": -5.35,
+     "grossT": 0.57,
+     "stops": 2868,
+     "targets": 97,
+     "time": 736,
+     "maxDD": -1078.7,
+     "medianRiskPts": 13,
+     "longs": 2078
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.683,
+    "median": -0.728,
+    "values": [
+     -0.745,
+     -0.74,
+     -0.716,
+     -0.76,
+     -0.718,
+     -0.732,
+     -0.704,
+     -0.743,
+     -0.683,
+     -0.755,
+     -0.777,
+     -0.715,
+     -0.727,
+     -0.728,
+     -0.735,
+     -0.729,
+     -0.728,
+     -0.767,
+     -0.728,
+     -0.747,
+     -0.683,
+     -0.736,
+     -0.738,
+     -0.72,
+     -0.677,
+     -0.721,
+     -0.762,
+     -0.759,
+     -0.685,
+     -0.768,
+     -0.712,
+     -0.715,
+     -0.711,
+     -0.666,
+     -0.785,
+     -0.687,
+     -0.709,
+     -0.731,
+     -0.781,
+     -0.723
+    ]
+   }
+  },
+  "T2": {
+   "label": "de40",
+   "markets": [
+    "de40"
+   ],
+   "windows": {
+    "A": {
+     "n": 1257,
+     "win": 0.201,
+     "netR": -0.025,
+     "grossR": 0.121,
+     "net2R": -0.17,
+     "netSpreadR": 0.033,
+     "costR": 0.146,
+     "total": -31.23,
+     "months": 60,
+     "t": -0.33,
+     "grossT": 1.59,
+     "stops": 993,
+     "targets": 50,
+     "time": 214,
+     "maxDD": -107.19,
+     "medianRiskPts": 17.4,
+     "longs": 595
+    },
+    "B": {
+     "n": 1487,
+     "win": 0.219,
+     "netR": -0.001,
+     "grossR": 0.096,
+     "net2R": -0.097,
+     "netSpreadR": 0.038,
+     "costR": 0.097,
+     "total": -0.9,
+     "months": 71,
+     "t": -0.01,
+     "grossT": 1.49,
+     "stops": 1138,
+     "targets": 45,
+     "time": 304,
+     "maxDD": -91.72,
+     "medianRiskPts": 29.4,
+     "longs": 775
+    },
+    "Bp": {
+     "n": 937,
+     "win": 0.211,
+     "netR": -0.055,
+     "grossR": 0.04,
+     "net2R": -0.151,
+     "netSpreadR": -0.017,
+     "costR": 0.096,
+     "total": -51.99,
+     "months": 45,
+     "t": -0.78,
+     "grossT": 0.57,
+     "stops": 726,
+     "targets": 25,
+     "time": 186,
+     "maxDD": -74.61,
+     "medianRiskPts": 30,
+     "longs": 509
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.257,
+    "median": -0.316,
+    "values": [
+     -0.348,
+     -0.443,
+     -0.315,
+     -0.289,
+     -0.31,
+     -0.294,
+     -0.258,
+     -0.311,
+     -0.237,
+     -0.297,
+     -0.342,
+     -0.427,
+     -0.339,
+     -0.301,
+     -0.354,
+     -0.3,
+     -0.345,
+     -0.31,
+     -0.333,
+     -0.3,
+     -0.24,
+     -0.319,
+     -0.277,
+     -0.336,
+     -0.295,
+     -0.335,
+     -0.372,
+     -0.346,
+     -0.266,
+     -0.349,
+     -0.326,
+     -0.288,
+     -0.317,
+     -0.264,
+     -0.41,
+     -0.283,
+     -0.387,
+     -0.304,
+     -0.362,
+     -0.342
+    ]
+   }
+  },
+  "T3": {
+   "label": "eu50",
+   "markets": [
+    "eu50"
+   ],
+   "windows": {
+    "A": {
+     "n": 1189,
+     "win": 0.164,
+     "netR": -1.216,
+     "grossR": -0.071,
+     "net2R": -2.361,
+     "netSpreadR": -0.562,
+     "costR": 1.145,
+     "total": -1445.78,
+     "months": 60,
+     "t": -12.19,
+     "grossT": -1.2,
+     "stops": 965,
+     "targets": 38,
+     "time": 186,
+     "maxDD": -1453.31,
+     "medianRiskPts": 5,
+     "longs": 578
+    },
+    "B": {
+     "n": 1437,
+     "win": 0.182,
+     "netR": -0.687,
+     "grossR": 0.02,
+     "net2R": -1.394,
+     "netSpreadR": -0.283,
+     "costR": 0.707,
+     "total": -986.89,
+     "months": 71,
+     "t": -8.85,
+     "grossT": 0.33,
+     "stops": 1153,
+     "targets": 48,
+     "time": 236,
+     "maxDD": -1004.12,
+     "medianRiskPts": 7,
+     "longs": 776
+    },
+    "Bp": {
+     "n": 895,
+     "win": 0.188,
+     "netR": -0.633,
+     "grossR": 0.038,
+     "net2R": -1.303,
+     "netSpreadR": -0.249,
+     "costR": 0.671,
+     "total": -566.3,
+     "months": 45,
+     "t": -7.55,
+     "grossT": 0.55,
+     "stops": 716,
+     "targets": 27,
+     "time": 152,
+     "maxDD": -583.79,
+     "medianRiskPts": 7,
+     "longs": 505
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -1.302,
+    "median": -1.38,
+    "values": [
+     -1.395,
+     -1.348,
+     -1.25,
+     -1.54,
+     -1.356,
+     -1.492,
+     -1.38,
+     -1.388,
+     -1.346,
+     -1.513,
+     -1.413,
+     -1.327,
+     -1.466,
+     -1.391,
+     -1.349,
+     -1.314,
+     -1.358,
+     -1.45,
+     -1.433,
+     -1.41,
+     -1.374,
+     -1.435,
+     -1.381,
+     -1.381,
+     -1.363,
+     -1.368,
+     -1.369,
+     -1.446,
+     -1.383,
+     -1.464,
+     -1.302,
+     -1.358,
+     -1.413,
+     -1.3,
+     -1.448,
+     -1.309,
+     -1.345,
+     -1.371,
+     -1.405,
+     -1.374
+    ]
+   }
+  },
+  "T4": {
+   "label": "fr40",
+   "markets": [
+    "fr40"
+   ],
+   "windows": {
+    "A": {
+     "n": 1259,
+     "win": 0.203,
+     "netR": -0.3,
+     "grossR": 0.055,
+     "net2R": -0.654,
+     "netSpreadR": -0.138,
+     "costR": 0.355,
+     "total": -377.11,
+     "months": 60,
+     "t": -4.06,
+     "grossT": 0.8,
+     "stops": 980,
+     "targets": 38,
+     "time": 241,
+     "maxDD": -443.51,
+     "medianRiskPts": 8.1,
+     "longs": 610
+    },
+    "B": {
+     "n": 1485,
+     "win": 0.218,
+     "netR": -0.188,
+     "grossR": 0.039,
+     "net2R": -0.414,
+     "netSpreadR": -0.085,
+     "costR": 0.226,
+     "total": -278.87,
+     "months": 71,
+     "t": -2.62,
+     "grossT": 0.55,
+     "stops": 1135,
+     "targets": 39,
+     "time": 311,
+     "maxDD": -311.66,
+     "medianRiskPts": 12.8,
+     "longs": 814
+    },
+    "Bp": {
+     "n": 940,
+     "win": 0.223,
+     "netR": -0.161,
+     "grossR": 0.054,
+     "net2R": -0.376,
+     "netSpreadR": -0.063,
+     "costR": 0.215,
+     "total": -151.37,
+     "months": 45,
+     "t": -1.87,
+     "grossT": 0.63,
+     "stops": 714,
+     "targets": 25,
+     "time": 201,
+     "maxDD": -185.23,
+     "medianRiskPts": 13,
+     "longs": 536
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.529,
+    "median": -0.607,
+    "values": [
+     -0.604,
+     -0.535,
+     -0.607,
+     -0.711,
+     -0.579,
+     -0.586,
+     -0.569,
+     -0.644,
+     -0.531,
+     -0.58,
+     -0.66,
+     -0.534,
+     -0.564,
+     -0.68,
+     -0.671,
+     -0.65,
+     -0.605,
+     -0.656,
+     -0.57,
+     -0.689,
+     -0.623,
+     -0.641,
+     -0.735,
+     -0.571,
+     -0.594,
+     -0.567,
+     -0.607,
+     -0.615,
+     -0.482,
+     -0.681,
+     -0.645,
+     -0.617,
+     -0.542,
+     -0.496,
+     -0.651,
+     -0.531,
+     -0.548,
+     -0.693,
+     -0.672,
+     -0.614
+    ]
+   }
+  },
+  "T5": {
+   "label": "uk100",
+   "markets": [
+    "uk100"
+   ],
+   "windows": {
+    "A": {
+     "n": 1249,
+     "win": 0.243,
+     "netR": -0.08,
+     "grossR": 0.169,
+     "net2R": -0.33,
+     "netSpreadR": 0.044,
+     "costR": 0.249,
+     "total": -100.37,
+     "months": 60,
+     "t": -1,
+     "grossT": 2.16,
+     "stops": 921,
+     "targets": 37,
+     "time": 291,
+     "maxDD": -177.61,
+     "medianRiskPts": 11.4,
+     "longs": 591
+    },
+    "B": {
+     "n": 1466,
+     "win": 0.22,
+     "netR": -0.178,
+     "grossR": 0.027,
+     "net2R": -0.384,
+     "netSpreadR": -0.075,
+     "costR": 0.206,
+     "total": -261.03,
+     "months": 71,
+     "t": -3.24,
+     "grossT": 0.52,
+     "stops": 1112,
+     "targets": 35,
+     "time": 319,
+     "maxDD": -287.61,
+     "medianRiskPts": 12.8,
+     "longs": 815
+    },
+    "Bp": {
+     "n": 929,
+     "win": 0.215,
+     "netR": -0.231,
+     "grossR": -0.026,
+     "net2R": -0.436,
+     "netSpreadR": -0.128,
+     "costR": 0.205,
+     "total": -214.5,
+     "months": 45,
+     "t": -3.43,
+     "grossT": -0.4,
+     "stops": 712,
+     "targets": 20,
+     "time": 197,
+     "maxDD": -247.84,
+     "medianRiskPts": 12.7,
+     "longs": 528
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.571,
+    "median": -0.659,
+    "values": [
+     -0.697,
+     -0.685,
+     -0.743,
+     -0.571,
+     -0.693,
+     -0.63,
+     -0.678,
+     -0.695,
+     -0.68,
+     -0.708,
+     -0.756,
+     -0.624,
+     -0.614,
+     -0.606,
+     -0.625,
+     -0.71,
+     -0.663,
+     -0.722,
+     -0.643,
+     -0.656,
+     -0.562,
+     -0.612,
+     -0.623,
+     -0.654,
+     -0.523,
+     -0.678,
+     -0.752,
+     -0.692,
+     -0.677,
+     -0.638,
+     -0.635,
+     -0.655,
+     -0.642,
+     -0.664,
+     -0.695,
+     -0.692,
+     -0.61,
+     -0.623,
+     -0.752,
+     -0.631
+    ]
+   }
+  },
+  "T6": {
+   "label": "jp225",
+   "markets": [
+    "jp225"
+   ],
+   "windows": {
+    "A": {
+     "n": 1178,
+     "win": 0.219,
+     "netR": -0.737,
+     "grossR": 0.072,
+     "net2R": -1.545,
+     "netSpreadR": -0.288,
+     "costR": 0.808,
+     "total": -867.98,
+     "months": 60,
+     "t": -9.8,
+     "grossT": 1.2,
+     "stops": 878,
+     "targets": 31,
+     "time": 269,
+     "maxDD": -881.49,
+     "medianRiskPts": 32.5,
+     "longs": 548
+    },
+    "B": {
+     "n": 1410,
+     "win": 0.278,
+     "netR": -0.103,
+     "grossR": 0.199,
+     "net2R": -0.405,
+     "netSpreadR": 0.065,
+     "costR": 0.302,
+     "total": -145.08,
+     "months": 71,
+     "t": -1.45,
+     "grossT": 2.91,
+     "stops": 965,
+     "targets": 38,
+     "time": 407,
+     "maxDD": -218.56,
+     "medianRiskPts": 80,
+     "longs": 716
+    },
+    "Bp": {
+     "n": 893,
+     "win": 0.272,
+     "netR": -0.087,
+     "grossR": 0.166,
+     "net2R": -0.341,
+     "netSpreadR": 0.053,
+     "costR": 0.253,
+     "total": -77.99,
+     "months": 45,
+     "t": -0.98,
+     "grossT": 1.93,
+     "stops": 617,
+     "targets": 22,
+     "time": 254,
+     "maxDD": -133.53,
+     "medianRiskPts": 95,
+     "longs": 437
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -0.655,
+    "median": -0.792,
+    "values": [
+     -0.764,
+     -0.696,
+     -0.899,
+     -0.746,
+     -0.711,
+     -0.732,
+     -0.829,
+     -0.784,
+     -0.803,
+     -0.737,
+     -0.741,
+     -0.717,
+     -0.649,
+     -0.814,
+     -0.817,
+     -0.853,
+     -0.637,
+     -0.822,
+     -0.956,
+     -0.778,
+     -0.718,
+     -0.818,
+     -0.857,
+     -0.794,
+     -0.747,
+     -0.685,
+     -0.824,
+     -0.937,
+     -0.771,
+     -0.877,
+     -0.872,
+     -0.791,
+     -0.655,
+     -0.874,
+     -0.961,
+     -0.747,
+     -0.79,
+     -0.852,
+     -0.86,
+     -0.848
+    ]
+   }
+  },
+  "T7": {
+   "label": "au200",
+   "markets": [
+    "au200"
+   ],
+   "windows": {
+    "A": {
+     "n": 1237,
+     "win": 0.2,
+     "netR": -0.748,
+     "grossR": 0.013,
+     "net2R": -1.509,
+     "netSpreadR": -0.368,
+     "costR": 0.761,
+     "total": -925.52,
+     "months": 60,
+     "t": -8.96,
+     "grossT": 0.17,
+     "stops": 956,
+     "targets": 32,
+     "time": 249,
+     "maxDD": -960.91,
+     "medianRiskPts": 7.4,
+     "longs": 603
+    },
+    "B": {
+     "n": 1438,
+     "win": 0.2,
+     "netR": -0.632,
+     "grossR": -0.037,
+     "net2R": -1.227,
+     "netSpreadR": -0.334,
+     "costR": 0.595,
+     "total": -908.52,
+     "months": 71,
+     "t": -10.16,
+     "grossT": -0.64,
+     "stops": 1109,
+     "targets": 32,
+     "time": 297,
+     "maxDD": -913.39,
+     "medianRiskPts": 9,
+     "longs": 670
+    },
+    "Bp": {
+     "n": 910,
+     "win": 0.197,
+     "netR": -0.663,
+     "grossR": -0.079,
+     "net2R": -1.247,
+     "netSpreadR": -0.371,
+     "costR": 0.584,
+     "total": -603.06,
+     "months": 45,
+     "t": -9.02,
+     "grossT": -1.15,
+     "stops": 704,
+     "targets": 18,
+     "time": 188,
+     "maxDD": -603.06,
+     "medianRiskPts": 9.5,
+     "longs": 416
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -1.41,
+    "median": -1.51,
+    "values": [
+     -1.384,
+     -1.518,
+     -1.459,
+     -1.669,
+     -1.505,
+     -1.457,
+     -1.662,
+     -1.428,
+     -1.597,
+     -1.53,
+     -1.504,
+     -1.595,
+     -1.437,
+     -1.53,
+     -1.573,
+     -1.546,
+     -1.412,
+     -1.497,
+     -1.544,
+     -1.487,
+     -1.535,
+     -1.455,
+     -1.513,
+     -1.535,
+     -1.58,
+     -1.567,
+     -1.453,
+     -1.428,
+     -1.495,
+     -1.517,
+     -1.481,
+     -1.603,
+     -1.546,
+     -1.516,
+     -1.39,
+     -1.411,
+     -1.454,
+     -1.448,
+     -1.574,
+     -1.508
+    ]
+   }
+  },
+  "T8": {
+   "label": "Asia pooled",
+   "markets": [
+    "jp225",
+    "au200"
+   ],
+   "windows": {
+    "A": {
+     "n": 2415,
+     "win": 0.21,
+     "netR": -0.743,
+     "grossR": 0.041,
+     "net2R": -1.527,
+     "netSpreadR": -0.329,
+     "costR": 0.784,
+     "total": -1793.49,
+     "months": 60,
+     "t": -12.04,
+     "grossT": 0.79,
+     "stops": 1834,
+     "targets": 63,
+     "time": 518,
+     "maxDD": -1832.12,
+     "medianRiskPts": 13.2,
+     "longs": 1151
+    },
+    "B": {
+     "n": 2848,
+     "win": 0.239,
+     "netR": -0.37,
+     "grossR": 0.08,
+     "net2R": -0.82,
+     "netSpreadR": -0.137,
+     "costR": 0.45,
+     "total": -1053.6,
+     "months": 71,
+     "t": -7.46,
+     "grossT": 1.75,
+     "stops": 2074,
+     "targets": 70,
+     "time": 704,
+     "maxDD": -1061.81,
+     "medianRiskPts": 22,
+     "longs": 1386
+    },
+    "Bp": {
+     "n": 1803,
+     "win": 0.234,
+     "netR": -0.378,
+     "grossR": 0.042,
+     "net2R": -0.798,
+     "netSpreadR": -0.161,
+     "costR": 0.42,
+     "total": -681.06,
+     "months": 45,
+     "t": -6.25,
+     "grossT": 0.79,
+     "stops": 1321,
+     "targets": 40,
+     "time": 442,
+     "maxDD": -681.72,
+     "medianRiskPts": 23.5,
+     "longs": 853
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "p95": -1.072,
+    "median": -1.159,
+    "values": [
+     -1.074,
+     -1.105,
+     -1.18,
+     -1.207,
+     -1.109,
+     -1.094,
+     -1.246,
+     -1.107,
+     -1.198,
+     -1.135,
+     -1.122,
+     -1.159,
+     -1.043,
+     -1.173,
+     -1.196,
+     -1.2,
+     -1.024,
+     -1.159,
+     -1.248,
+     -1.131,
+     -1.127,
+     -1.136,
+     -1.185,
+     -1.166,
+     -1.164,
+     -1.127,
+     -1.138,
+     -1.18,
+     -1.135,
+     -1.197,
+     -1.176,
+     -1.196,
+     -1.1,
+     -1.196,
+     -1.176,
+     -1.079,
+     -1.12,
+     -1.151,
+     -1.216,
+     -1.178
+    ]
+   }
+  }
+ },
+ "markets": {
+  "de40": {
+   "name": "DAX",
+   "open": "09:00",
+   "close": "17:30",
+   "candles": 615287,
+   "from": "2015-12-01",
+   "to": "2026-11-13",
+   "costPts": 2,
+   "spreadPts": 1.2,
+   "skips": {
+    "holiday": 65,
+    "early": 0,
+    "missing": 13,
+    "doji": 14,
+    "norisk": 0
+   },
+   "trades": 2744,
+   "byYear": {
+    "2016": {
+     "n": 253,
+     "netR": 0.096,
+     "total": 24.22
+    },
+    "2017": {
+     "n": 249,
+     "netR": -0.26,
+     "total": -64.65
+    },
+    "2018": {
+     "n": 249,
+     "netR": 0.169,
+     "total": 42.14
+    },
+    "2019": {
+     "n": 253,
+     "netR": -0.204,
+     "total": -51.49
+    },
+    "2020": {
+     "n": 253,
+     "netR": 0.073,
+     "total": 18.56
+    },
+    "2021": {
+     "n": 255,
+     "netR": 0.05,
+     "total": 12.73
+    },
+    "2022": {
+     "n": 253,
+     "netR": 0.18,
+     "total": 45.43
+    },
+    "2023": {
+     "n": 254,
+     "netR": -0.105,
+     "total": -26.76
+    },
+    "2024": {
+     "n": 252,
+     "netR": -0.1,
+     "total": -25.24
+    },
+    "2025": {
+     "n": 251,
+     "netR": 0.085,
+     "total": 21.25
+    },
+    "2026": {
+     "n": 222,
+     "netR": -0.128,
+     "total": -28.31
+    }
+   },
+   "medianRiskB": 29.4
+  },
+  "eu50": {
+   "name": "Euro Stoxx 50",
+   "open": "09:00",
+   "close": "17:30",
+   "candles": 551164,
+   "from": "2015-12-01",
+   "to": "2026-11-13",
+   "costPts": 3.5,
+   "spreadPts": 1.5,
+   "skips": {
+    "holiday": 65,
+    "early": 0,
+    "missing": 13,
+    "doji": 87,
+    "norisk": 45
+   },
+   "trades": 2626,
+   "byYear": {
+    "2016": {
+     "n": 248,
+     "netR": -0.811,
+     "total": -201.15
+    },
+    "2017": {
+     "n": 235,
+     "netR": -1.579,
+     "total": -371.07
+    },
+    "2018": {
+     "n": 235,
+     "netR": -1.567,
+     "total": -368.35
+    },
+    "2019": {
+     "n": 225,
+     "netR": -1.514,
+     "total": -340.73
+    },
+    "2020": {
+     "n": 246,
+     "netR": -0.669,
+     "total": -164.47
+    },
+    "2021": {
+     "n": 250,
+     "netR": -1.045,
+     "total": -261.26
+    },
+    "2022": {
+     "n": 251,
+     "netR": -0.599,
+     "total": -150.41
+    },
+    "2023": {
+     "n": 244,
+     "netR": -0.804,
+     "total": -196.11
+    },
+    "2024": {
+     "n": 237,
+     "netR": -0.861,
+     "total": -204.18
+    },
+    "2025": {
+     "n": 238,
+     "netR": -0.44,
+     "total": -104.65
+    },
+    "2026": {
+     "n": 217,
+     "netR": -0.324,
+     "total": -70.27
+    }
+   },
+   "medianRiskB": 7
+  },
+  "fr40": {
+   "name": "CAC 40",
+   "open": "09:00",
+   "close": "17:30",
+   "candles": 466595,
+   "from": "2015-12-01",
+   "to": "2026-11-13",
+   "costPts": 2.2,
+   "spreadPts": 1.2,
+   "skips": {
+    "holiday": 53,
+    "early": 12,
+    "missing": 14,
+    "doji": 13,
+    "norisk": 0
+   },
+   "trades": 2744,
+   "byYear": {
+    "2016": {
+     "n": 251,
+     "netR": -0.029,
+     "total": -7.2
+    },
+    "2017": {
+     "n": 253,
+     "netR": -0.512,
+     "total": -129.44
+    },
+    "2018": {
+     "n": 252,
+     "netR": -0.418,
+     "total": -105.38
+    },
+    "2019": {
+     "n": 251,
+     "netR": -0.498,
+     "total": -125.08
+    },
+    "2020": {
+     "n": 252,
+     "netR": -0.04,
+     "total": -10.01
+    },
+    "2021": {
+     "n": 252,
+     "netR": -0.354,
+     "total": -89.28
+    },
+    "2022": {
+     "n": 251,
+     "netR": -0.167,
+     "total": -41.96
+    },
+    "2023": {
+     "n": 255,
+     "netR": -0.25,
+     "total": -63.79
+    },
+    "2024": {
+     "n": 253,
+     "netR": -0.048,
+     "total": -12.2
+    },
+    "2025": {
+     "n": 252,
+     "netR": -0.209,
+     "total": -52.76
+    },
+    "2026": {
+     "n": 222,
+     "netR": -0.085,
+     "total": -18.88
+    }
+   },
+   "medianRiskB": 12.8
+  },
+  "uk100": {
+   "name": "FTSE 100",
+   "open": "08:00",
+   "close": "16:30",
+   "candles": 656133,
+   "from": "2015-12-01",
+   "to": "2026-11-13",
+   "costPts": 2,
+   "spreadPts": 1,
+   "skips": {
+    "holiday": 89,
+    "early": 12,
+    "missing": 3,
+    "doji": 15,
+    "norisk": 2
+   },
+   "trades": 2715,
+   "byYear": {
+    "2016": {
+     "n": 251,
+     "netR": -0.134,
+     "total": -33.67
+    },
+    "2017": {
+     "n": 252,
+     "netR": -0.225,
+     "total": -56.68
+    },
+    "2018": {
+     "n": 249,
+     "netR": 0.099,
+     "total": 24.58
+    },
+    "2019": {
+     "n": 248,
+     "netR": -0.131,
+     "total": -32.61
+    },
+    "2020": {
+     "n": 249,
+     "netR": -0.008,
+     "total": -2
+    },
+    "2021": {
+     "n": 249,
+     "netR": -0.036,
+     "total": -9.04
+    },
+    "2022": {
+     "n": 247,
+     "netR": -0.103,
+     "total": -25.51
+    },
+    "2023": {
+     "n": 249,
+     "netR": -0.284,
+     "total": -70.62
+    },
+    "2024": {
+     "n": 251,
+     "netR": -0.414,
+     "total": -103.86
+    },
+    "2025": {
+     "n": 250,
+     "netR": -0.19,
+     "total": -47.55
+    },
+    "2026": {
+     "n": 220,
+     "netR": -0.02,
+     "total": -4.46
+    }
+   },
+   "medianRiskB": 12.8
+  },
+  "jp225": {
+   "name": "Nikkei 225",
+   "open": "09:00",
+   "close": "15:00, 15:30 from 2024-11-05",
+   "candles": 760414,
+   "from": "2015-12-01",
+   "to": "2026-11-13",
+   "costPts": 18,
+   "spreadPts": 8,
+   "skips": {
+    "holiday": 182,
+    "early": 0,
+    "missing": 21,
+    "doji": 37,
+    "norisk": 8
+   },
+   "trades": 2588,
+   "byYear": {
+    "2016": {
+     "n": 237,
+     "netR": -0.841,
+     "total": -199.22
+    },
+    "2017": {
+     "n": 239,
+     "netR": -1.007,
+     "total": -240.61
+    },
+    "2018": {
+     "n": 239,
+     "netR": -0.64,
+     "total": -152.96
+    },
+    "2019": {
+     "n": 228,
+     "netR": -0.619,
+     "total": -141.15
+    },
+    "2020": {
+     "n": 235,
+     "netR": -0.57,
+     "total": -134.04
+    },
+    "2021": {
+     "n": 242,
+     "netR": -0.006,
+     "total": -1.48
+    },
+    "2022": {
+     "n": 237,
+     "netR": -0.274,
+     "total": -64.87
+    },
+    "2023": {
+     "n": 243,
+     "netR": -0.284,
+     "total": -69.08
+    },
+    "2024": {
+     "n": 241,
+     "netR": 0.037,
+     "total": 8.96
+    },
+    "2025": {
+     "n": 241,
+     "netR": -0.228,
+     "total": -54.85
+    },
+    "2026": {
+     "n": 206,
+     "netR": 0.176,
+     "total": 36.23
+    }
+   },
+   "medianRiskB": 80
+  },
+  "au200": {
+   "name": "ASX 200",
+   "open": "10:00",
+   "close": "16:00",
+   "candles": 680739,
+   "from": "2015-12-01",
+   "to": "2026-11-13",
+   "costPts": 4,
+   "spreadPts": 2,
+   "skips": {
+    "holiday": 83,
+    "early": 12,
+    "missing": 12,
+    "doji": 50,
+    "norisk": 4
+   },
+   "trades": 2675,
+   "byYear": {
+    "2016": {
+     "n": 248,
+     "netR": -0.863,
+     "total": -213.97
+    },
+    "2017": {
+     "n": 247,
+     "netR": -0.731,
+     "total": -180.53
+    },
+    "2018": {
+     "n": 250,
+     "netR": -1.01,
+     "total": -252.49
+    },
+    "2019": {
+     "n": 245,
+     "netR": -0.865,
+     "total": -212
+    },
+    "2020": {
+     "n": 247,
+     "netR": -0.269,
+     "total": -66.53
+    },
+    "2021": {
+     "n": 248,
+     "netR": -0.536,
+     "total": -132.85
+    },
+    "2022": {
+     "n": 242,
+     "netR": -0.525,
+     "total": -126.97
+    },
+    "2023": {
+     "n": 245,
+     "netR": -1.076,
+     "total": -263.64
+    },
+    "2024": {
+     "n": 243,
+     "netR": -0.716,
+     "total": -174.1
+    },
+    "2025": {
+     "n": 239,
+     "netR": -0.439,
+     "total": -105
+    },
+    "2026": {
+     "n": 221,
+     "netR": -0.479,
+     "total": -105.95
+    }
+   },
+   "medianRiskB": 9
+  }
+ },
+ "reading": "**Reading.** The US gross tilt (+0.14R a trade at the New York open, orb-nas100) is much weaker at the European opens: the pooled book makes +0.046R a trade before costs in 2021 → now (t 1.05; DAX the best, +0.096R, t 1.49), and the CFD round trip (0.31R a trade on a median risk of 13 points) turns it into −0.260R (t −5.54). Every test is negative net in both windows; none passes even net > 0. Before costs no European market has t above 1.5, so this is not only a cost problem: the opening candle points the day far less in Europe than in New York. The Asian pair loses too (−0.370R net); the ASX loses even before costs. Not an edge; no proposal is written and nothing live changes.",
+ "notes": [
+  "Post hoc, descriptive only: the Nikkei (jp225) is the one market with a clear gross tilt in 2021 → now, +0.199R a trade before costs (monthly t +2.91, n 1410), but its 18-point round trip on a median 80-point risk costs 0.30R and it is −0.103R net (spread only, 8 points: +0.065R). In 2016-20 it was +0.072R gross and −0.737R net. A cheaper venue (OSE micro future) would be a different study with its own pre-registration; this one does not support it.",
+  "Costs are the repo's published typical figures with slippage (open-run-breadth tables), not measured bid/ask at the open; spreads at the first five minutes of a cash session are usually wider than the daytime figure, so the true net is, if anything, lower. The spread-only column shows the conclusion does not hinge on the slippage part: the European book is −0.100R a trade at spread only.",
+  "Euro Stoxx 50 opening ranges are small (median risk 7 points against a 3.5-point round trip), so its net figures are dominated by cost; its gross is +0.020R.",
+  "Pooled drawdowns are on the union of the markets' trades in time order at 1R each, not a sized portfolio.",
+  "The rule is orb-nas100's, unchanged (side of the first M5 candle, entry at the next open, stop at the other end, 10R target, stop first, out before the local cash close); only the clock, calendar and cost change."
+ ]
+}
