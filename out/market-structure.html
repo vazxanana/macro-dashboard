@@ -41,6 +41,7 @@
 <script src="/assets/ms-draw.js?v=871e4372d8" defer></script>
 <script src="/assets/ms-paper.js?v=abde961f68" defer></script>
 <script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
+<script src="/assets/ms-charts-guide.js?v=9b3f24a38c" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -2877,6 +2878,13 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; } .ms-vp-cv, .ms-pp-cv { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
       html[data-drawing] #v-charts .ms-chart { cursor: crosshair; }
       .ms-chart[data-dcur="move"] { cursor: move; } .ms-chart[data-dcur="size"] { cursor: crosshair; } .ms-chart[data-dcur="lock"] { cursor: not-allowed; }
+      /* One chart toolbar (19 Nov 2026, owner: "no need to be bar on all of them, just 1 that works for any layout"): the pane
+         headers no longer carry their own tools; this bar acts on the chart last touched (outlined while more than one shows). */
+      .ms-ph .ch-tools { display: none !important; }
+      #v-charts .sec-h > .ch-one { order: 9; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); align-items: center; }
+      .ch-one:empty { display: none !important; }
+      .ch-one .ch-one-tf { font: 600 12px/1 var(--sans); color: var(--ink-dim); padding: 0 6px 0 4px; white-space: nowrap; }
+      #v-charts.ch-multi .ms-pane.ch-act { box-shadow: inset 0 0 0 1px var(--accent); }
       #v-charts .sec-h > .dr-bar { order: 9; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); align-items: center; }
       .dr-bar button { position: relative; width: 32px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 7px; background: transparent; color: var(--ink-dim); cursor: pointer; padding: 0; }
       .dr-bar button:hover { background: var(--panel-hover, rgba(127,127,127,.12)); color: var(--ink); }
@@ -4975,7 +4983,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .ps-cmore:not([hidden]) { display: inline-flex; order: 1; flex: none; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > .wl { flex: 1 1 0; width: auto; min-width: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle, .dr-bar, .dr-note) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h > :is(.mk-mode, .ind-open, .cx-tog, .adr, .mtf, .cycle, .dr-bar, .ch-one, .dr-note) { display: none !important; }   /* .cycle: the market-cycle strip (12 Nov) */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) #ms-pp { display: none !important; }   /* the paper account waits behind More (18 Nov) */
   /* 19 Nov: behind More the timeframe and view switch wraps instead of cutting "Layout", the markup switch keeps each word whole,
      and the paper account is one compact block */
@@ -6140,7 +6148,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="lay-sync"><input type="checkbox" id="ms-lay-sync" checked> Sync charts: scrolling or zooming one moves the others to the same time</label>
         <small class="sty-note">Drawings show on every chart of the market. Seconds charts (15 s, 30 s) are in Split's right chart.</small>
       </div>
-      <div class="dr-bar" id="ms-dr-bar" role="toolbar" aria-label="Drawing tools"></div><span class="dr-note" id="ms-dr-note" role="status" aria-live="polite"></span>
+      <div class="dr-bar" id="ms-dr-bar" role="toolbar" aria-label="Drawing tools"></div><div class="ch-one" id="ms-ch-one" role="toolbar" aria-label="Chart tools: they act on the chart you last touched"></div><span class="dr-note" id="ms-dr-note" role="status" aria-live="polite"></span>
     </div>
     <div class="ict-strip" id="ms-ict-strip" hidden></div>
     <div class="sp-bar" id="ms-sp-bar" hidden>
@@ -9971,6 +9979,47 @@ function msNextSetup(bars, A) {
     }
   });
   let KB_PANE = null; document.addEventListener('mouseover', (ev) => { const pn = ev.target.closest && ev.target.closest('.ms-pane'); if (pn) KB_PANE = pn; });
+  // ─── One chart toolbar (19 Nov 2026): the tools act on the chart last touched, in every layout (All, Split, Layout, one chart) ───
+  { const bar = document.getElementById('ms-ch-one'), VCH0 = document.getElementById('v-charts');
+    // the ChronosTrade strip next to it already draws horizontal and trend lines, so those two are not repeated here (H / T keys still work)
+    const TOOLS = ['.ch-pos', '.ch-fib', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-tv', '.ch-fs'];
+    let ACT = null, MO = null, built = false;
+    const shown = () => [...document.querySelectorAll('#v-charts .ms-pane')].filter((x) => x.offsetParent && x.querySelector('.ch-tools'));
+    const active = () => { const v = shown(); return ACT && v.includes(ACT) ? ACT : (KB_PANE && v.includes(KB_PANE) ? KB_PANE : v[0] || null); };
+    const sync = () => {
+      const pn = active(); if (!built) build(pn); if (!built) return;
+      const v = shown(); if (VCH0) VCH0.classList.toggle('ch-multi', v.length > 1);
+      document.querySelectorAll('#v-charts .ms-pane.ch-act').forEach((x) => { if (x !== pn) x.classList.remove('ch-act'); });
+      if (pn) pn.classList.add('ch-act');
+      const tf = bar.querySelector('.ch-one-tf'), lab = pn && pn.querySelector('.ms-ph b');
+      if (tf) tf.textContent = lab ? lab.textContent.trim() : '';
+      bar.querySelectorAll('[data-t]').forEach((b) => { const src = pn && pn.querySelector('.ch-tools ' + b.dataset.t);
+        const on = !!(src && src.classList.contains('on')); b.classList.toggle('on', on); if (b.tagName === 'BUTTON' && b.dataset.t !== '.ch-snap' && b.dataset.t !== '.ch-fit' && b.dataset.t !== '.ch-fs') b.setAttribute('aria-pressed', String(on));
+        if (b.dataset.t === '.ch-tv' && src) b.href = src.href; });
+      if (MO) MO.disconnect(); if (pn && window.MutationObserver) { MO = new MutationObserver(sync); MO.observe(pn.querySelector('.ch-tools'), { subtree: true, attributes: true, attributeFilter: ['class', 'href'] }); }
+    };
+    function build(pn) {
+      if (!bar || !pn) return; const src = pn.querySelector('.ch-tools'); if (!src) return;
+      bar.innerHTML = '<span class="ch-one-tf" aria-live="polite"></span>';
+      TOOLS.forEach((sel) => { const o = src.querySelector(sel); if (!o) return;
+        const b = o.cloneNode(false); b.dataset.t = sel; b.removeAttribute('id');
+        b.setAttribute('title', (o.getAttribute('title') || '').replace('this chart', 'the chart you last touched'));
+        b.setAttribute('aria-label', (o.getAttribute('aria-label') || '').replace(/ the \S+ chart/, ' the chart'));
+        b.addEventListener('click', (e) => { const p = active(), t = p && p.querySelector('.ch-tools ' + sel); if (!t) return;
+          if (sel === '.ch-tv') { b.href = t.href; t.dispatchEvent(new MouseEvent('click')); return; }
+          e.preventDefault(); t.click(); sync(); });
+        if (sel === '.ch-tl') b.addEventListener('dblclick', () => { const t = active() && active().querySelector('.ch-tools .ch-tl'); if (t) t.dispatchEvent(new MouseEvent('dblclick')); });
+        bar.appendChild(b); });
+      built = true;
+    }
+    const pick = (ev) => { const pn = ev.target.closest && ev.target.closest('#v-charts .ms-pane'); if (pn && pn !== ACT) { ACT = pn; sync(); } };
+    document.addEventListener('pointerdown', pick, true); document.addEventListener('focusin', pick);
+    window.addEventListener('hashchange', () => setTimeout(sync, 60)); window.addEventListener('resize', () => setTimeout(sync, 60));
+    // a layout or view change shows other panes: a cheap look once a second (a handful of panes), redrawn only when the set changed
+    let seen = ''; setInterval(() => { if (document.hidden || !VCH0 || !VCH0.offsetParent) return; const v = shown(), k = v.map((x) => x.id || x.querySelector('.ms-ph b') && x.querySelector('.ms-ph b').textContent).join('|') + (built ? '' : '?');
+      if (k !== seen) { seen = k; sync(); } }, 1000);
+    window.msChartOne = () => ({ built, tools: [...bar.querySelectorAll('[data-t]')].map((b) => b.dataset.t), active: (active() && active().querySelector('.ms-ph b') || {}).textContent || null, multi: shown().length });
+  }
 
   // ─── Council: Analyst, Trader and Coach (always-on data from the council-data branch) ───
   const CDATA = window.MS_CDATA;
