@@ -45,3 +45,12 @@ test('Users page: no model name in the page text, and the owner note says where 
   assert.doesNotMatch(view, /Claude|ChatGPT|page code/);
   assert.match(view, /Its password is changed in the server code \(api\/_accounts\.js\), not on this page\./);
 });
+
+test('Users page in tabs (19 Nov 2026): Accounts | Waiting | Add a user, one panel at a time, a search, removed accounts folded, each account one line until Manage', () => {
+  const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  for (const id of ['ms-ut-acc', 'ms-ut-wait', 'ms-ut-add', 'ms-u-q', 'ms-u-showoff']) assert.match(page, new RegExp(`id="${id}"`));
+  for (const up of ['acc', 'wait', 'add']) assert.match(page, new RegExp(`data-up="${up}" role="tabpanel"`));
+  assert.match(page, /#v-users\[data-up="acc"\] \.u-card:not\(\[data-up="acc"\]\)/);
+  assert.match(page, /<p id="ms-u-msg" class="ms-note u-msg" role="status"><\/p>/, 'the save message sits outside the tabs, so it shows on every tab');
+  assert.match(page, /#v-users \.u-t tr\[data-u\]:not\(\.u-open\) > td:not\(:first-child\) \{ display: none; \}/);
+});

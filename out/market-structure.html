@@ -3783,6 +3783,40 @@ html[data-role="public"] .hdr-sw { display: none; }
 @media (max-width: 900px) { #v-profile .pf-grid { grid-template-columns: 1fr; } #v-profile .pf-side { position: static; } }
 </style>
 <style id="ms-acct-css">
+/* Users page in tabs (19 Nov 2026): one panel at a time, a sticky tab bar, search and "show removed" over the accounts */
+#v-users .u-tabs { position: sticky; top: var(--hdr-h, 64px); z-index: 5; display: flex; gap: 4px; padding: 4px; margin: 0 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); width: max-content; max-width: 100%; }
+#v-users .u-tabs button { min-height: 40px; padding: 0 16px; border: 0; border-radius: 9px; background: transparent; color: var(--au-ink-2, var(--ink-dim)); font: 600 13.5px var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+#v-users .u-tabs button[aria-selected="true"] { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
+#v-users .u-tabs button:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: -2px; }
+#v-users .u-tabs small { font: 600 12px var(--sans); padding: 1px 7px; border-radius: 99px; background: var(--au-well, rgba(127,127,127,.15)); color: inherit; } #v-users .u-tabs small:empty { display: none; }
+#v-users .u-tabs .u-has small { background: var(--au-accent, var(--accent)); color: var(--au-on-primary, #fff); }
+#v-users[data-up="acc"] .u-card:not([data-up="acc"]), #v-users[data-up="wait"] .u-card:not([data-up="wait"]), #v-users[data-up="add"] .u-card:not([data-up="add"]) { display: none; }
+#v-users .u-msg { margin: 0 0 10px; } #v-users .u-msg:empty { display: none; }
+#v-users .u-tools { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin: 4px 0 10px; }
+#v-users .u-tools input[type="search"] { flex: 1 1 220px; max-width: 360px; min-height: 38px; padding: 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 9px; background: var(--au-well, var(--bg)); color: var(--au-ink, var(--ink)); font: 500 14px var(--sans); }
+#v-users .u-showoff { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--au-ink-2, var(--ink-dim)); } #v-users .u-showoff[hidden] { display: none; }
+#v-users .u-t tr[hidden] { display: none !important; }
+/* each account one line until opened (19 Nov 2026): name, access, how many areas, Manage; the controls under it when opened */
+#v-users .u-t { min-width: 0 !important; width: 100%; } #v-users .u-t thead { display: none; }
+#v-users .u-t tbody { display: block; } #v-users .u-t tr[data-u] { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--au-line, var(--line)); }
+#v-users .u-t tr[data-u] > td { display: block; height: auto; padding: 0; border: 0; text-align: left; }
+#v-users .u-t tr[data-u]:not(.u-open) > td:not(:first-child) { display: none; }
+#v-users .u-t tr[data-u].u-open > td:not(:first-child) { padding-left: 42px; }
+#v-users .u-t tr[data-u] > td:nth-child(3) { display: none !important; }   /* where the record comes from (built-in / added here): not needed in the list */
+#v-users .u-t tr[data-u].u-open > td.u-acts { display: flex; flex-wrap: wrap; gap: 8px; white-space: normal; } #v-users .u-t tr[data-u].u-open .u-acts button { margin: 0; }
+#v-users .u-head { display: flex; align-items: center; gap: 12px; min-height: 44px; }
+#v-users .u-head .u-who { flex: 0 1 auto; min-width: 0; } #v-users .u-head .u-who b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#v-users .u-sum { flex: 1 1 auto; min-width: 0; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#v-users .u-exp { flex: none; min-height: 34px; padding: 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: none; color: var(--au-ink, var(--ink)); font: 600 12.5px var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+#v-users .u-exp::after { content: ""; width: 7px; height: 7px; border-right: 1.6px solid currentColor; border-bottom: 1.6px solid currentColor; transform: rotate(45deg) translate(-2px, -2px); }
+#v-users .u-open .u-exp::after { transform: rotate(-135deg) translate(-2px, -2px); }
+#v-users .u-exp:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 2px; }
+#v-users .u-t tr[data-u] > td { background: transparent !important; }
+#v-users .u-t tr[data-u].u-open { background: var(--au-surface-2, transparent); border-radius: 10px; padding: 8px 10px; margin: 4px -10px; }
+@media (max-width: 640px) { #v-users .u-head { gap: 8px; } #v-users .u-sum { font-size: 12px; } #v-users .u-t tr[data-u].u-open > td:not(:first-child) { padding-left: 0; } #v-users .u-tools input[type="search"] { max-width: none; } }
+@media (pointer: coarse) { #v-users .u-exp { min-height: 44px; } }
+@media (max-width: 640px) { #v-users .u-tabs { width: auto; } #v-users .u-tabs button { flex: 1 1 0; padding: 0 8px; justify-content: center; } }
+@media (pointer: coarse) { #v-users .u-tabs button, #v-users .u-tools input[type="search"] { min-height: 44px; } #v-users .u-showoff { min-height: 44px; } }
 /* Users page: sign-ups waiting for the owner (17 Nov 2026) */
 .u-wait-l { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
 .u-wait-l .empty { color: var(--ink-dim); font-size: 13px; padding: 6px 0; }
@@ -6506,27 +6540,32 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   </section>
 
 
-  <section class="view own adm" id="v-users" aria-label="Users" hidden>
+  <section class="view own adm" id="v-users" aria-label="Users" data-up="acc" hidden>
     <div class="v-head"><h1 class="h-head">Users</h1><p class="ms-note">Who can sign in and what they see. Changes are saved on the server and apply on every device straight away.</p></div>
-    <div class="card u-card u-wait" id="ms-u-wait-card">
+    <div class="u-tabs" role="tablist" aria-label="Users">
+      <button type="button" role="tab" id="ms-ut-acc" data-up="acc" aria-selected="true" aria-controls="ms-u-acc-card">Accounts <small id="ms-ut-acc-n"></small></button><button type="button" role="tab" id="ms-ut-wait" data-up="wait" aria-selected="false" aria-controls="ms-u-wait-card">Waiting <small id="ms-ut-wait-n"></small></button><button type="button" role="tab" id="ms-ut-add" data-up="add" aria-selected="false" aria-controls="ms-u-add-card">Add a user</button>
+    </div>
+    <p id="ms-u-msg" class="ms-note u-msg" role="status"></p>
+    <div class="card u-card u-wait" id="ms-u-wait-card" data-up="wait" role="tabpanel" aria-labelledby="ms-ut-wait">
       <div class="ms-k"><span>Waiting for your approval</span><small id="ms-u-wait-n"></small></div>
       <p class="ms-note">People who created an account and confirmed their email. Approve gives them a seat with the access you pick (they sign in with the password they chose and get an email); Refuse removes the request.</p>
       <ul class="u-wait-l" id="ms-u-wait"><li class="empty">Loading…</li></ul>
       <p id="ms-u-wait-msg" class="ms-note" role="status"></p>
     </div>
-    <div class="card u-card">
+    <div class="card u-card" id="ms-u-acc-card" data-up="acc" role="tabpanel" aria-labelledby="ms-ut-acc">
       <div class="ms-k"><span>Accounts</span><small id="ms-u-sync"></small></div>
+      <div class="u-tools"><input type="search" id="ms-u-q" placeholder="Search by name" aria-label="Search accounts by name" autocomplete="off"><label class="u-showoff"><input type="checkbox" id="ms-u-showoff"> Show removed <small id="ms-u-off-n"></small></label></div>
       <div class="ms-bt-wrap"><table class="ms-bt-t c-t u-t"><thead><tr><th>Name</th><th>Access</th><th>Password</th><th class="n">Actions</th></tr></thead><tbody id="ms-u-body"><tr><td colspan="4" class="empty">Loading…</td></tr></tbody></table></div>
       <p class="ms-note">The owner account is not in this list. Its password is changed in the server code (api/_accounts.js), not on this page.</p>
     </div>
-    <div class="card u-card">
+    <div class="card u-card" id="ms-u-add-card" data-up="add" role="tabpanel" aria-labelledby="ms-ut-add">
       <div class="ms-k"><span>Add a user</span></div>
       <form class="u-form" id="ms-u-form" novalidate>
         <label for="ms-u-name">Name</label><input id="ms-u-name" autocomplete="off" maxlength="24" required>
         <label for="ms-u-pw">Password</label><input id="ms-u-pw" type="text" autocomplete="off" spellcheck="false" required>
         <label for="ms-u-role">Access</label>
         <select id="ms-u-role"><option value="viewer">Viewer: setups, P&amp;L calendar, active trades (read-only)</option><option value="reviewer">Reviewer: everything read-only, can write loss reviews</option></select>
-        <div class="u-actions"><button type="submit" class="u-btn">Add user</button><span id="ms-u-msg" class="ms-note" role="status"></span></div>
+        <div class="u-actions"><button type="submit" class="u-btn">Add user</button></div>
       </form>
     </div>
   </section>
@@ -11354,6 +11393,39 @@ function msNextSetup(bars, A) {
     if (msg && !msg.dataset.keep) msg.textContent = ''; if (msg) delete msg.dataset.keep;
   }
   window.renderSignups = renderSignups;
+  // Users page in three tabs (19 Nov 2026, owner: "make the users more organised, don't want to scroll all the way down"):
+  // Accounts | Waiting | Add a user, one at a time; a search over the accounts; removed accounts folded behind a switch.
+  // Display only: every save, approve and refuse path is the same as before.
+  { const V = document.getElementById('v-users'), Q = document.getElementById('ms-u-q'), OFF = document.getElementById('ms-u-showoff'), TB = document.getElementById('ms-u-body');
+    if (V && TB) {
+      let picked = false;
+      const show = (k, user) => { V.dataset.up = k; if (user) picked = true; V.querySelectorAll('.u-tabs [data-up]').forEach((b) => { const on = b.dataset.up === k; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; }); };
+      const OPEN = new Set();
+      // one line a account: the name cell gets the access in words and a Manage button; the rest opens under it
+      const head = (r) => { const td = r.cells[0]; if (!td) return; const k = r.dataset.u, off = r.classList.contains('u-off');
+        const sel = r.querySelector('select[data-act="role"]'), role = sel ? (sel.options[sel.selectedIndex] || {}).text || '' : '', chips = r.querySelectorAll('.u-chip:not(.u-chip-off)').length;
+        const sum = off ? 'Removed' : `${role.split(' · ')[0]}${chips ? ` · ${chips} area${chips === 1 ? '' : 's'}` : ''}`;
+        let h = td.querySelector('.u-head'); if (!h) { h = document.createElement('div'); h.className = 'u-head'; while (td.firstChild) h.appendChild(td.firstChild); td.appendChild(h);
+          const sm = document.createElement('span'); sm.className = 'u-sum'; h.appendChild(sm);
+          const b = document.createElement('button'); b.type = 'button'; b.className = 'u-exp'; h.appendChild(b);
+          b.addEventListener('click', () => { const on = !r.classList.contains('u-open'); if (on) OPEN.add(k); else OPEN.delete(k); r.classList.toggle('u-open', on); b.setAttribute('aria-expanded', String(on)); b.textContent = on ? 'Close' : 'Manage'; }); }
+        h.querySelector('.u-sum').textContent = sum;
+        const on = OPEN.has(k), b = h.querySelector('.u-exp'); r.classList.toggle('u-open', on); b.setAttribute('aria-expanded', String(on)); b.setAttribute('aria-label', `${on ? 'Close' : 'Manage'} ${(h.querySelector('b') || {}).textContent || k}`); b.textContent = on ? 'Close' : 'Manage'; };
+      const filter = () => { const q = (Q && Q.value || '').trim().toLowerCase(), so = !!(OFF && OFF.checked); let n = 0, off = 0, shown = 0;
+        [...TB.rows].forEach((r) => { if (!r.dataset.u) return; head(r); const isOff = r.classList.contains('u-off'), name = (r.querySelector('b') || r).textContent.toLowerCase() + ' ' + r.dataset.u;
+          if (isOff) off++; else n++; const vis = (so || !isOff) && (!q || name.includes(q)); r.hidden = !vis; if (vis) shown++; });
+        const an = document.getElementById('ms-ut-acc-n'); if (an) an.textContent = n ? String(n) : '';
+        const on = document.getElementById('ms-u-off-n'); if (on) on.textContent = off ? `(${off})` : ''; if (OFF) OFF.closest('label').hidden = !off;
+        let e = TB.querySelector('tr.u-none'); if (!shown && (n || off)) { if (!e) { e = document.createElement('tr'); e.className = 'u-none'; e.innerHTML = '<td colspan="4" class="empty">No account matches.</td>'; TB.appendChild(e); } } else if (e) e.remove(); };
+      const waiting = () => { const t = (document.getElementById('ms-u-wait-n') || {}).textContent || '', m = /(\d+)/.exec(t), n = m ? +m[1] : 0, w = document.getElementById('ms-ut-wait-n'); if (w) w.textContent = n ? String(n) : ''; const b = document.getElementById('ms-ut-wait'); if (b) b.classList.toggle('u-has', n > 0); if (n && !picked) show('wait'); };
+      V.querySelector('.u-tabs').addEventListener('click', (e) => { const b = e.target.closest('[data-up]'); if (b) { show(b.dataset.up, true); if (b.dataset.up === 'add') { const i = document.getElementById('ms-u-name'); if (i) i.focus({ preventScroll: true }); } } });
+      V.querySelector('.u-tabs').addEventListener('keydown', (e) => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; const bs = [...V.querySelectorAll('.u-tabs [data-up]')], i = bs.findIndex((b) => b.dataset.up === V.dataset.up), nx = bs[(i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length]; show(nx.dataset.up, true); nx.focus(); e.preventDefault(); });
+      if (Q) Q.addEventListener('input', filter); if (OFF) OFF.addEventListener('change', filter);
+      new MutationObserver(filter).observe(TB, { childList: true });
+      const wn = document.getElementById('ms-u-wait-n'); if (wn) new MutationObserver(waiting).observe(wn, { childList: true, characterData: true, subtree: true });
+      const form = document.getElementById('ms-u-form'); if (form) form.addEventListener('submit', () => setTimeout(() => { const m = document.getElementById('ms-u-msg'); if (m && /added|saved/i.test(m.textContent)) show('acc'); }, 1500));
+      show('acc');
+    } }
   { const ul = document.getElementById('ms-u-wait');
     if (ul) ul.addEventListener('click', async (ev) => {
       const b = ev.target.closest('button[data-act]'); if (!b || b.disabled) return; const li = b.closest('li'), id = li.dataset.id, name = li.querySelector('b').textContent, msg = document.getElementById('ms-u-wait-msg');
