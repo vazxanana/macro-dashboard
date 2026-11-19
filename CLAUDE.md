@@ -2443,6 +2443,12 @@ the crosses EUR/GBP, EUR/JPY, GBP/JPY, AUD/JPY, EUR/CHF, EUR/AUD (OANDA only). A
 its lot size goes through the quote currency's USD rate from the shared quotes (`window.msQuoteUsd`), on the setup card and in the
 paper account (whose engine units are dollars a price unit). The early Home market skeleton draws 17 cards. ChronosTrade, same day:
 at 5x and 12x a committed candle reaches the split panes one pane a frame (`XQ`, `xpQueue`), and `xpLive` skips a pane still queued.
+**Markets side by side** (same day, owner: "they should be able to see different pairs at the same time, different charts"): the
+view `multi` (toolbar "Markets" `#ms-mm-btn`, and "Markets side by side" in every chart header's menu; `#ms-mm`) = 2, 3 or 4 charts,
+each its own market and timeframe (any of `SPTFS`, a year from months through `spFetch`), candles and volume, live (each at its
+timeframe's `poll`), the drawing tools on each (`msCharts` ids `mm0`-`mm3`); localStorage `ms-multi` `{ n, cells: [{ k, tf }] }`,
+read through the market / timeframe lists. No Meridian / ICT markup there (said on the bar). "One market" goes back to the view
+before (`MM_PREV`; the phone has no toolbar row). `window.msMulti()` is the read-only view.
 Tests: `tests/desk-draw.test.mjs`.
 
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")

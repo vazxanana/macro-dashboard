@@ -62,7 +62,7 @@ test('any timeframe from seconds to a year (19 Nov 2026): grouped, the free char
 });
 
 test('the toolbar keeps Split, Layout and a Clean toggle; the markup choice is in Style (19 Nov 2026)', () => {
-  assert.match(PAGE, /#v-charts \.sec-h > \.seg\[aria-label="Chart view"\] > \[data-view\]:not\(\[data-view="split"\]\):not\(\[data-view="lay"\]\) \{ display: none !important; \}/);
+  assert.match(PAGE, /#v-charts \.sec-h > \.seg\[aria-label="Chart view"\] > \[data-view\]:not\(\[data-view="split"\]\):not\(\[data-view="lay"\]\):not\(\[data-view="multi"\]\) \{ display: none !important; \}/);
   assert.match(PAGE, /<div class="sty-seg seg mk-mode mk-in-sty" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian"/);
   assert.match(PAGE, /if \(b\.dataset\.mk === 'clean' && G\.mode === 'clean' && !b\.closest\('\.mk-in-sty'\)\) \{ setMode\(G\.lastMk \|\| 'meridian'\); return; \}/);
 });
@@ -130,4 +130,16 @@ test('more forex pairs, sized through the quote currency; the market on the tool
   assert.match(PAGE, /b\.id = 'ms-ch-mk'/);
   assert.match(PAGE, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] #v-charts \.sec-h > #ms-wl \{ display: none !important; \}/);
   assert.match(PAGE, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] \.top \.brand #ms-mk-btn \{ display: none !important; \}/);
+});
+
+test('markets side by side (19 Nov 2026): 2 to 4 charts, each its own market and timeframe, display only', () => {
+  assert.match(PAGE, /<button type="button" data-view="multi" id="ms-mm-btn"/);
+  const blk = PAGE.slice(PAGE.indexOf('  // ─── Markets side by side'), PAGE.indexOf('  window.msOneTf = (t) =>'));
+  assert.ok(blk.length > 3000);
+  assert.match(blk, /MM\.n = \[2, 3, 4\]\.includes\(\+j\.n\) \? \+j\.n : 3;/, 'a stored count outside 2-4 is not taken');
+  assert.match(blk, /if \(c && INSTRUMENTS\[c\.k\] && SPTFS\.some\(\(t\) => t\.id === c\.tf\)\)/, 'a stored market or timeframe that does not exist is not taken');
+  assert.match(blk, /window\.msCharts\.add\(\{ id: 'mm' \+ i/, 'the drawing tools work on every chart');
+  assert.doesNotMatch(blk, /\.stop\s*=|S\.acct|place\(/, 'display only');
+  assert.match(PAGE, /if \(window\.msMultiView\) setTimeout\(\(\) => window\.msMultiView\(v === 'multi'\), 0\);/);
+  assert.match(PAGE, /\['multi', 'Markets side by side'\]/, 'the chart header menu offers it (the phone has no toolbar row)');
 });
