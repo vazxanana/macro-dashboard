@@ -340,7 +340,7 @@ test('a new seat sees Charts, ChronosTrade and the Macro desk only (19 Nov 2026)
   for (const k of ['desk', 'scanner', 'desks', 'council', 'ict', 'mosha']) assert.ok(deny.includes(k), k + ' denied');
   assert.equal(w.msPerms({ u: 'carlos', role: 'viewer' }, false).desk, true, 'members made before keep Home, Setup and the Council');
   assert.match(PAGE, /const VIEW_PERM = \{[^}]*home: 'desk', setup: 'desk', council: 'desk' \}/);
-  assert.match(PAGE, /v = PUB ? 'charts' : !msDenied\(v0\) \? v0 : !msDenied\('home'\) \? 'home' : !msDenied\('charts'\) \? 'charts' : 'profile'/, 'a denied Home lands on Charts');
+  assert.match(PAGE, /v = PUB \? 'charts' : !msDenied\(v0\) \? v0 : !msDenied\('home'\) \? 'home' : !msDenied\('charts'\) \? 'charts' : 'profile'/, 'a denied Home lands on Charts');
   assert.match(PAGE, /html\[data-deny~="desk"\] \[data-go="home"\], html\[data-deny~="desk"\] \[data-go="setup"\], html\[data-deny~="desk"\] \[data-go="council"\]/);
   assert.match(fs.readFileSync('api/users.js', 'utf8'), /const PERM_KEYS = \[[^\]]*'desk'\]/, 'the server keeps the new key');
 });
