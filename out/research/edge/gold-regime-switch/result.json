@@ -1,0 +1,719 @@
+{
+ "study": "gold-regime-switch",
+ "title": "Gold H4 regime switch: 20-bar breakout when trending, Bollinger fade when ranging (efficiency ratio)",
+ "built": "2026-11-13",
+ "verdict": "FAIL",
+ "data": {
+  "h4": {
+   "n": 17386,
+   "from": 1451649600,
+   "to": 1794600000
+  }
+ },
+ "params": {
+  "ER_LEN": 20,
+  "ER_TREND": 0.35,
+  "ER_RANGE": 0.2,
+  "ATR_LEN": 14,
+  "DON": 20,
+  "DON_EXIT": 10,
+  "BB_LEN": 20,
+  "BB_K": 2,
+  "STOP_ATR": 1.5,
+  "HOLD": 30,
+  "SPREAD": 0.3,
+  "SLIP": 0.5,
+  "SEEDS": 40,
+  "BLOCK": 20,
+  "START": "2016-01-01",
+  "IS": [
+   "2016-01-01",
+   "2021-01-01"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2100-01-01"
+  ]
+ },
+ "costs": {
+  "spread": 0.3,
+  "slippageEachWay": 0.15,
+  "financingLong": 0.000148,
+  "financingSrc": "cTrader demo XAUUSD swap.long -5.903 pips (ctrader/symbols.json), research/edge/trend-breadth Part A"
+ },
+ "tests": {
+  "T1": {
+   "legs": [
+    "brk",
+    "fade"
+   ],
+   "label": "The switch: breakout in TREND, fade in RANGE (primary)",
+   "skipped": 900,
+   "is": {
+    "n": 330,
+    "buys": 178,
+    "gross": 0.103,
+    "net": -0.005,
+    "net2": -0.113,
+    "fin": 0.036,
+    "totalNet": -1.7,
+    "win": 0.373,
+    "maxDD": -34.35,
+    "months": 60,
+    "t": -0.05,
+    "tGross": 1.02,
+    "p": 0.5205,
+    "heldMedian": 8,
+    "why": {
+     "channel": 40,
+     "mid": 71,
+     "stop": 179,
+     "time": 39,
+     "gap": 1
+    }
+   },
+   "oos": {
+    "n": 400,
+    "buys": 226,
+    "gross": -0.031,
+    "net": -0.094,
+    "net2": -0.158,
+    "fin": 0.028,
+    "totalNet": -37.78,
+    "win": 0.357,
+    "maxDD": -58.45,
+    "months": 71,
+    "t": -1.19,
+    "tGross": -0.39,
+    "p": 0.8829,
+    "heldMedian": 8,
+    "why": {
+     "channel": 44,
+     "time": 40,
+     "stop": 231,
+     "mid": 83,
+     "gap": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "median": -0.061,
+    "p95": 0.027,
+    "min": -0.177,
+    "max": 0.052
+   },
+   "years": {
+    "2016": {
+     "n": 65,
+     "net": -13.08
+    },
+    "2017": {
+     "n": 58,
+     "net": 15.51
+    },
+    "2018": {
+     "n": 68,
+     "net": -16.58
+    },
+    "2019": {
+     "n": 65,
+     "net": 1.75
+    },
+    "2020": {
+     "n": 74,
+     "net": 10.7
+    },
+    "2021": {
+     "n": 68,
+     "net": -5.67
+    },
+    "2022": {
+     "n": 63,
+     "net": -6.03
+    },
+    "2023": {
+     "n": 67,
+     "net": -14.64
+    },
+    "2024": {
+     "n": 72,
+     "net": -6.99
+    },
+    "2025": {
+     "n": 71,
+     "net": -20.03
+    },
+    "2026": {
+     "n": 59,
+     "net": 15.58
+    }
+   },
+   "byLeg": {
+    "brk": {
+     "n": 206,
+     "buys": 129,
+     "gross": 0.049,
+     "net": -0.026,
+     "net2": -0.101,
+     "fin": 0.039,
+     "totalNet": -5.37,
+     "win": 0.291,
+     "maxDD": -22.13,
+     "months": 71,
+     "t": -0.19,
+     "tGross": 0.35,
+     "p": 0.5753,
+     "heldMedian": 12,
+     "why": {
+      "channel": 44,
+      "time": 40,
+      "stop": 122
+     }
+    },
+    "fade": {
+     "n": 194,
+     "buys": 97,
+     "gross": -0.115,
+     "net": -0.167,
+     "net2": -0.219,
+     "fin": 0.015,
+     "totalNet": -32.41,
+     "win": 0.428,
+     "maxDD": -44.4,
+     "months": 71,
+     "t": -2.16,
+     "tGross": -1.5,
+     "p": 0.9847,
+     "heldMedian": 6,
+     "why": {
+      "mid": 83,
+      "stop": 109,
+      "gap": 2
+     }
+    }
+   },
+   "bySide": {
+    "buy": {
+     "n": 226,
+     "buys": 226,
+     "gross": 0.021,
+     "net": -0.064,
+     "net2": -0.149,
+     "fin": 0.049,
+     "totalNet": -14.5,
+     "win": 0.372,
+     "maxDD": -27.6,
+     "months": 71,
+     "t": -0.58,
+     "tGross": 0.18,
+     "p": 0.7182,
+     "heldMedian": 8,
+     "why": {
+      "channel": 24,
+      "mid": 49,
+      "stop": 130,
+      "time": 23
+     }
+    },
+    "sell": {
+     "n": 174,
+     "buys": 0,
+     "gross": -0.098,
+     "net": -0.134,
+     "net2": -0.17,
+     "fin": 0,
+     "totalNet": -23.28,
+     "win": 0.339,
+     "maxDD": -41.66,
+     "months": 71,
+     "t": -1.19,
+     "tGross": -0.87,
+     "p": 0.8828,
+     "heldMedian": 7,
+     "why": {
+      "time": 17,
+      "stop": 101,
+      "mid": 34,
+      "channel": 20,
+      "gap": 2
+     }
+    }
+   },
+   "holm": {
+    "adj": 1,
+    "ok": false
+   },
+   "checks": {
+    "tHolm": false,
+    "isSign": false,
+    "x2": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T2": {
+   "legs": [
+    "brk"
+   ],
+   "label": "Breakout leg alone, TREND regimes only",
+   "skipped": 729,
+   "is": {
+    "n": 181,
+    "buys": 103,
+    "gross": 0.222,
+    "net": 0.1,
+    "net2": -0.022,
+    "fin": 0.05,
+    "totalNet": 18.08,
+    "win": 0.298,
+    "maxDD": -18.61,
+    "months": 60,
+    "t": 0.63,
+    "tGross": 1.37,
+    "p": 0.265,
+    "heldMedian": 13,
+    "why": {
+     "channel": 43,
+     "stop": 99,
+     "time": 39
+    }
+   },
+   "oos": {
+    "n": 215,
+    "buys": 133,
+    "gross": 0.055,
+    "net": -0.02,
+    "net2": -0.095,
+    "fin": 0.039,
+    "totalNet": -4.24,
+    "win": 0.288,
+    "maxDD": -23.11,
+    "months": 71,
+    "t": -0.14,
+    "tGross": 0.38,
+    "p": 0.5553,
+    "heldMedian": 12,
+    "why": {
+     "channel": 47,
+     "time": 41,
+     "stop": 127
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "median": 0.013,
+    "p95": 0.16,
+    "min": -0.2,
+    "max": 0.172
+   },
+   "years": {
+    "2016": {
+     "n": 39,
+     "net": -3.83
+    },
+    "2017": {
+     "n": 34,
+     "net": 14.16
+    },
+    "2018": {
+     "n": 35,
+     "net": -14.42
+    },
+    "2019": {
+     "n": 32,
+     "net": 5.86
+    },
+    "2020": {
+     "n": 41,
+     "net": 16.3
+    },
+    "2021": {
+     "n": 35,
+     "net": -11.48
+    },
+    "2022": {
+     "n": 35,
+     "net": -3.63
+    },
+    "2023": {
+     "n": 36,
+     "net": 13.73
+    },
+    "2024": {
+     "n": 37,
+     "net": -2.69
+    },
+    "2025": {
+     "n": 41,
+     "net": -8.6
+    },
+    "2026": {
+     "n": 31,
+     "net": 8.43
+    }
+   },
+   "byLeg": {
+    "brk": {
+     "n": 215,
+     "buys": 133,
+     "gross": 0.055,
+     "net": -0.02,
+     "net2": -0.095,
+     "fin": 0.039,
+     "totalNet": -4.24,
+     "win": 0.288,
+     "maxDD": -23.11,
+     "months": 71,
+     "t": -0.14,
+     "tGross": 0.38,
+     "p": 0.5553,
+     "heldMedian": 12,
+     "why": {
+      "channel": 47,
+      "time": 41,
+      "stop": 127
+     }
+    }
+   },
+   "bySide": {
+    "buy": {
+     "n": 133,
+     "buys": 133,
+     "gross": -0.004,
+     "net": -0.103,
+     "net2": -0.202,
+     "fin": 0.063,
+     "totalNet": -13.65,
+     "win": 0.271,
+     "maxDD": -20.65,
+     "months": 71,
+     "t": -0.67,
+     "tGross": -0.02,
+     "p": 0.7472,
+     "heldMedian": 11,
+     "why": {
+      "channel": 24,
+      "stop": 85,
+      "time": 24
+     }
+    },
+    "sell": {
+     "n": 82,
+     "buys": 0,
+     "gross": 0.151,
+     "net": 0.115,
+     "net2": 0.079,
+     "fin": 0,
+     "totalNet": 9.41,
+     "win": 0.317,
+     "maxDD": -12.24,
+     "months": 71,
+     "t": 0.47,
+     "tGross": 0.62,
+     "p": 0.3179,
+     "heldMedian": 13,
+     "why": {
+      "time": 17,
+      "stop": 42,
+      "channel": 23
+     }
+    }
+   },
+   "holm": {
+    "adj": 1,
+    "ok": false
+   },
+   "checks": {
+    "tHolm": false,
+    "isSign": true,
+    "x2": false,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "T3": {
+   "legs": [
+    "fade"
+   ],
+   "label": "Fade leg alone, RANGE regimes only",
+   "skipped": 142,
+   "is": {
+    "n": 164,
+    "buys": 81,
+    "gross": -0.039,
+    "net": -0.129,
+    "net2": -0.219,
+    "fin": 0.018,
+    "totalNet": -21.17,
+    "win": 0.463,
+    "maxDD": -23.91,
+    "months": 60,
+    "t": -1.48,
+    "tGross": -0.45,
+    "p": 0.93,
+    "heldMedian": 6,
+    "why": {
+     "stop": 87,
+     "mid": 76,
+     "gap": 1
+    }
+   },
+   "oos": {
+    "n": 199,
+    "buys": 100,
+    "gross": -0.125,
+    "net": -0.177,
+    "net2": -0.229,
+    "fin": 0.016,
+    "totalNet": -35.18,
+    "win": 0.427,
+    "maxDD": -44.78,
+    "months": 71,
+    "t": -2.34,
+    "tGross": -1.66,
+    "p": 0.9903,
+    "heldMedian": 6,
+    "why": {
+     "mid": 85,
+     "stop": 112,
+     "gap": 2
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "median": -0.104,
+    "p95": -0.011,
+    "min": -0.186,
+    "max": 0.006
+   },
+   "years": {
+    "2016": {
+     "n": 30,
+     "net": -13.17
+    },
+    "2017": {
+     "n": 29,
+     "net": 2.27
+    },
+    "2018": {
+     "n": 35,
+     "net": 1.11
+    },
+    "2019": {
+     "n": 33,
+     "net": -3.47
+    },
+    "2020": {
+     "n": 37,
+     "net": -7.91
+    },
+    "2021": {
+     "n": 37,
+     "net": 1.39
+    },
+    "2022": {
+     "n": 30,
+     "net": 0.28
+    },
+    "2023": {
+     "n": 31,
+     "net": -24.46
+    },
+    "2024": {
+     "n": 37,
+     "net": -3.23
+    },
+    "2025": {
+     "n": 32,
+     "net": -13.54
+    },
+    "2026": {
+     "n": 32,
+     "net": 4.37
+    }
+   },
+   "byLeg": {
+    "fade": {
+     "n": 199,
+     "buys": 100,
+     "gross": -0.125,
+     "net": -0.177,
+     "net2": -0.229,
+     "fin": 0.016,
+     "totalNet": -35.18,
+     "win": 0.427,
+     "maxDD": -44.78,
+     "months": 71,
+     "t": -2.34,
+     "tGross": -1.66,
+     "p": 0.9903,
+     "heldMedian": 6,
+     "why": {
+      "mid": 85,
+      "stop": 112,
+      "gap": 2
+     }
+    }
+   },
+   "bySide": {
+    "buy": {
+     "n": 100,
+     "buys": 100,
+     "gross": -0.003,
+     "net": -0.07,
+     "net2": -0.137,
+     "fin": 0.031,
+     "totalNet": -7.02,
+     "win": 0.49,
+     "maxDD": -15.37,
+     "months": 71,
+     "t": -0.64,
+     "tGross": -0.03,
+     "p": 0.7389,
+     "heldMedian": 7,
+     "why": {
+      "mid": 49,
+      "stop": 51
+     }
+    },
+    "sell": {
+     "n": 99,
+     "buys": 0,
+     "gross": -0.247,
+     "net": -0.284,
+     "net2": -0.321,
+     "fin": 0,
+     "totalNet": -28.16,
+     "win": 0.364,
+     "maxDD": -34.58,
+     "months": 71,
+     "t": -2.51,
+     "tGross": -2.19,
+     "p": 0.9939,
+     "heldMedian": 6,
+     "why": {
+      "mid": 36,
+      "stop": 61,
+      "gap": 2
+     }
+    }
+   },
+   "holm": {
+    "adj": 1,
+    "ok": false
+   },
+   "checks": {
+    "tHolm": false,
+    "isSign": false,
+    "x2": false,
+    "placebo": false
+   },
+   "pass": false
+  }
+ },
+ "descriptive": {
+  "brkAnyRegime": {
+   "is": {
+    "n": 285,
+    "buys": 164,
+    "gross": 0.181,
+    "net": 0.066,
+    "net2": -0.049,
+    "fin": 0.045,
+    "totalNet": 18.76,
+    "win": 0.281,
+    "maxDD": -25.51,
+    "months": 60,
+    "t": 0.58,
+    "tGross": 1.57,
+    "p": 0.281,
+    "heldMedian": 12,
+    "why": {
+     "channel": 66,
+     "time": 56,
+     "stop": 163
+    }
+   },
+   "oos": {
+    "n": 345,
+    "buys": 191,
+    "gross": 0.1,
+    "net": 0.025,
+    "net2": -0.05,
+    "fin": 0.039,
+    "totalNet": 8.59,
+    "win": 0.29,
+    "maxDD": -41.95,
+    "months": 71,
+    "t": 0.23,
+    "tGross": 0.93,
+    "p": 0.4082,
+    "heldMedian": 13,
+    "why": {
+     "channel": 87,
+     "time": 67,
+     "stop": 191
+    }
+   }
+  },
+  "fadeAnyRegime": {
+   "is": {
+    "n": 509,
+    "buys": 215,
+    "gross": -0.097,
+    "net": -0.187,
+    "net2": -0.276,
+    "fin": 0.018,
+    "totalNet": -95.12,
+    "win": 0.407,
+    "maxDD": -99.59,
+    "months": 60,
+    "t": -3.76,
+    "tGross": -1.99,
+    "p": 0.9999,
+    "heldMedian": 6,
+    "why": {
+     "stop": 295,
+     "mid": 211,
+     "gap": 3
+    }
+   },
+   "oos": {
+    "n": 618,
+    "buys": 275,
+    "gross": -0.044,
+    "net": -0.093,
+    "net2": -0.141,
+    "fin": 0.014,
+    "totalNet": -57.34,
+    "win": 0.424,
+    "maxDD": -70.04,
+    "months": 71,
+    "t": -1.85,
+    "tGross": -0.89,
+    "p": 0.9676,
+    "heldMedian": 6,
+    "why": {
+     "stop": 349,
+     "mid": 264,
+     "gap": 4,
+     "time": 1
+    }
+   }
+  },
+  "regimeShare": {
+   "is": {
+    "trend": 0.286,
+    "range": 0.438,
+    "neutral": 0.275,
+    "bars": 7977
+   },
+   "oos": {
+    "trend": 0.292,
+    "range": 0.448,
+    "neutral": 0.26,
+    "bars": 9389
+   }
+  }
+ }
+}
