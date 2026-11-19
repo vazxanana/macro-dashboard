@@ -2783,7 +2783,14 @@ consensus), and the October CPI pre-release plan generalized to every US CPI car
 response windows, and the confounders the calendar shows: a same-day auction, a Fed statement within two days, a same-half-hour
 US release; desk "Your CPI plan"). Then (owner: "do china briefs too") the September China briefs (NBS property, MOF local
 fiscal; `chinaBriefs`): their figures read from their own tables, a staleness line once the next NBS / MOF release should be
-out (about mid-month after the month), and the next CNY release on the strategist's calendar. Tests: `tests/research-watch.test.mjs`.
+out (about mid-month after the month), and the next CNY release on the strategist's calendar. Then (owner: "do all the content
+you think might be useful"): on CPI cards the 2022-24 CPI model benchmark (`cpiBenchmark`: core nowcast vs "same as last
+month" vs a 50/50 blend, headline too, and this release's persistence baseline from the calendar's previous), on every card the
+expectation timing gates (`consensusGate`: missing / late / context; a Forex Factory value is never above the gate for a scored
+surprise; the Cleveland nowcast must be the pre-08:30 ET value), and on US GDP cards the 2023 Q3 revision case (`gdpCase`: SAAR to
+quarterly, parts over headline, revision is not surprise). Left out on purpose: the issuer, producer, oil-major, bank and credit
+cases (equities, not this desk), the NBU gold notes, and the playbooks already ported in code (regime framework, gold driver map,
+calibration, yield decomposition). Tests: `tests/research-watch.test.mjs`.
 
 ## Veteran's calls (8 Nov 2026, owner: week and month predictions with a % chance, plus a summary of the registry data)
 `council/outlook.mjs` (called from `council/veteran.mjs` build → `veteran.json.outlook`): dated gold calls for 5 and 20 trading days

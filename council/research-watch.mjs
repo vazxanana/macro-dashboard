@@ -19,6 +19,9 @@ export const DOCS = {
   nyfed: 'nyfed-survey-source-contract-2026-11-09.json',
   chinaHousing: 'china-housing-developer-funding-2026-09.md',
   chinaFiscal: 'china-local-fiscal-pulse-2026-09.md',
+  cpiBench: 'cpi-model-benchmark-2022-2024.md',
+  gates: 'news-expectation-source-and-timing-gates-2026-11-19.md',
+  gdp: 'gdp-revision-and-composition-case-2023-q3.md',
 };
 export const LABEL = 'Your research, applied: each line checks a document\'s own conditions against today\'s data. Not a forecast, not a tested edge.';
 const DAY = 86400;
@@ -33,8 +36,8 @@ export function loadDocs(dir = REF) {
 }
 
 // markdown table rows under the first header line that matches `head`
-export function tableAfter(md, head) {
-  const L = String(md || '').split(/\r?\n/), i = L.findIndex((l) => head.test(l) && l.trim().startsWith('|')); if (i < 0) return [];
+export function tableAfter(md, head, nth = 0) {
+  const L = String(md || '').split(/\r?\n/), hits = L.map((l, k) => (head.test(l) && l.trim().startsWith('|') ? k : -1)).filter((k) => k >= 0), i = hits[nth] ?? -1; if (i < 0) return [];
   const rows = []; for (let j = i + 2; j < L.length && L[j].trim().startsWith('|'); j++) rows.push(L[j].trim().replace(/^\||\|$/g, '').split('|').map((c) => strip(c)));
   return rows;
 }
@@ -198,6 +201,51 @@ export function chinaBriefs({ housing, fiscal, calendar = [], now }) {
     text: `China, Jan-Sep 2026 (your NBS and MOF briefs, year on year): ${facts.join('; ')}. The briefs read this as a strained property-linked local revenue base, not a measure of home demand.`,
     watch: (age >= 1 ? `${age === 1 ? 'A newer release' : age + ' newer releases'} should be out by now (Jan-${['Oct', 'Nov', 'Dec', 'Jan'][Math.min(3, age - 1)]}): these September figures may be stale; refresh the brief before relying on them. ` : '') + (next ? `Next China release on the calendar: ${next.title}, ${new Date(next.t * 1000).toISOString().slice(0, 16).replace('T', ' ')} UTC.` : 'No China release on the calendar in the next two weeks.'),
     caveat: 'Cumulative nominal figures, not seasonally adjusted; a land-transfer receipt is not a home sale, and sales value divided by area is not a price (your briefs\' own limits).' };
+}
+
+// your 2022-24 CPI model benchmark (36 releases): which baseline came closest, core and headline, and this release's
+// "same as last month" baseline from the calendar's previous value. Retrospective, not a forecast record.
+export function cpiBenchmark(md, card) {
+  const core = tableAfter(md, /^\|\s*Method\s*\|\s*MSE/i, 0), head = tableAfter(md, /^\|\s*Method\s*\|\s*MSE/i, 1); if (!core.length) return null;
+  const row = (rows, re) => { const r = rows.find((x) => re.test(x[0])); return r ? { mse: +r[1], mae: +r[2] } : null; };
+  const m = (rows) => ({ nowcast: row(rows, /Cleveland archived/i), persist: row(rows, /persistence$/i), blend: row(rows, /50\/50/i) });
+  const C = m(core), H = head.length ? m(head) : null;
+  const ex = ((card && card.expectations) || []), coreX = ex.find((x) => /core cpi m\/m/i.test(x.title || '')), headX = ex.find((x) => /^cpi m\/m/i.test(x.title || ''));
+  const lines = [];
+  if (C.nowcast && C.persist) lines.push(`Core CPI 2022-24 (36 releases): the Cleveland Fed nowcast did not beat "same as last month" (typical miss ${C.nowcast.mae.toFixed(3)} vs ${C.persist.mae.toFixed(3)} pp; the advantage reversed without 2022)${C.blend ? `; a fixed 50/50 blend came closest (${C.blend.mae.toFixed(3)} pp)` : ''}.`);
+  if (H && H.nowcast && H.persist) lines.push(`Headline CPI: the nowcast did much better than "same as last month" (${H.nowcast.mae.toFixed(3)} vs ${H.persist.mae.toFixed(3)} pp): it uses oil and gasoline between releases.`);
+  if (coreX && coreX.previous != null) lines.push(`"Same as last month" for core this time: ${coreX.previous}${coreX.consensus != null ? ` (calendar consensus ${coreX.consensus})` : ''}.`);
+  if (headX && headX.previous != null) lines.push(`For headline: ${headX.previous}${headX.consensus != null ? ` (calendar consensus ${headX.consensus})` : ''}.`);
+  return lines.length ? { doc: DOCS.cpiBench, lines, label: 'Your benchmark: a retrospective comparison on archived model paths, not a forecast record or a tested edge.' } : null;
+}
+
+// your expectation timing gates, applied to each card's captured consensus: a Forex Factory calendar value captured before the
+// release is context; a scored surprise needs a licensed point-in-time snapshot with its fetch clock and hash
+export function consensusGate(card, now) {
+  if (!card) return null;
+  const at = Date.parse(card.at) / 1000, ex = (card.expectations || []).filter((x) => x.consensus != null);
+  const cap = ex.map((x) => Date.parse(x.captured || '') / 1000).filter(Number.isFinite), first = cap.length ? Math.min(...cap) : null;
+  const before = first != null && first <= at - 300;
+  const state = !ex.length ? 'missing' : before ? 'context' : 'late';
+  const text = state === 'missing' ? 'No consensus on the calendar: the gate marks this consensus_missing; only a market-response reading is possible.'
+    : state === 'late' ? 'The consensus was captured less than 5 minutes before the release (or after it): below your gate even as context.'
+    : `Consensus captured ${Math.round((at - first) / 3600)} h before the release from the Forex Factory calendar: usable as context. It is below your gate for a scored surprise (no licensed point-in-time snapshot, fetch clock or hash).`;
+  const kind = /\b(CPI|PCE)\b/i.test([card.title, ...(card.titles || [])].join(' ')) ? 'For a nowcast baseline, use the Cleveland Fed value from before 08:30 ET; its 10:00 ET update the same day is after the release.' : null;
+  return { doc: DOCS.gates, state, text, nowcast: kind };
+}
+
+// your GDP worked case (2023 Q3): revisions and annualization, on any US GDP card
+export function gdpCase(md, card) {
+  if (!md || !card || (card.country && card.country !== 'USD')) return null;
+  const t = [card.title, ...(card.titles || [])].join(' '); if (!/\bGDP\b/i.test(t) || /price index|deflator/i.test(t) && !/GDP q\/q/i.test(t)) return null;
+  const R = tableAfter(md, /^\|\s*Comparison\s*\|/i), adv3 = R.find((r) => /Advance → third/i.test(r[0]));
+  const x = (card.expectations || []).find((e) => /GDP q\/q/i.test(e.title || '')), cons = x && x.consensus != null ? parseFloat(String(x.consensus)) : null;
+  const q = Number.isFinite(cons) ? 100 * ((1 + cons / 100) ** 0.25 - 1) : null;
+  const lines = [];
+  if (Number.isFinite(cons)) lines.push(`The calendar's ${cons}% is an annualized (SAAR) rate: about ${q.toFixed(2)}% quarter over quarter. Never compare it with a non-annualized figure.`);
+  lines.push(adv3 ? `Read the parts, not only the headline: in your 2023 Q3 case GDP ended where the advance estimate began (${adv3[1]} pp) while consumption was revised ${adv3[2]} pp and core PCE inflation ${adv3[4]} pp.` : 'Read the parts, not only the headline: consumption, inventories and the income side can tell another story.');
+  lines.push('A revision is not a surprise: compare the print with a consensus captured before it, and say which vintage you score.');
+  return { doc: DOCS.gdp, lines };
 }
 
 export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [] }) {

@@ -34,7 +34,7 @@ import { calibration, applyCalls } from './calibration.mjs';
 import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf } from './glance.mjs';
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
-import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan } from './research-watch.mjs';
+import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan, cpiBenchmark, consensusGate, gdpCase } from './research-watch.mjs';
 
 const DAY = 86400;
 // the batch revision this port follows (research/macro-veteran/SKILL.md); 1.2 = the owner's 8 Nov evening upload,
@@ -471,7 +471,8 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   try {
     const DD = docs === undefined ? loadDocs() : docs, calR = calendarOf(cache).concat((fc && fc.playbook) || []);
     const { watch: W, register: RG } = researchWatch({ docs: DD, fc, S, gold, usdjpy: (daily && daily.usdjpy) || [], now, calendar: calR });
-    v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; const cp = cpiPlan(DD && DD.cpiPlan, e, calR); if (cp) e.cpiPlan = cp; }
+    v.research = W; for (const e of v.events || []) { const h = hypothesesFor(e, RG); if (h) e.research = h; const cp = cpiPlan(DD && DD.cpiPlan, e, calR); if (cp) { e.cpiPlan = cp; const b = cpiBenchmark(DD && DD.cpiBench, e); if (b) cp.benchmark = b; }
+      const g = consensusGate(e, now); if (g) e.gate = g; const gd = gdpCase(DD && DD.gdp, e); if (gd) e.gdpCase = gd; }
   } catch (e) { v.researchError = String(e && e.message || e); }
   v.summary = summary(v);
   v.brief = briefOf(v);
