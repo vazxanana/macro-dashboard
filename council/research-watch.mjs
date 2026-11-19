@@ -32,7 +32,41 @@ const sg = (x, d = 2) => (x == null || !Number.isFinite(x) ? 'n/a' : (x > 0 ? '+
 export function loadDocs(dir = REF) {
   const out = {};
   for (const [k, f] of Object.entries(DOCS)) { try { out[k] = fs.readFileSync(new URL(f, dir), 'utf8'); } catch (e) { out[k] = null; } }
+  try { const Y = JSON.parse(fs.readFileSync(new URL('../research/edge/yield-regime/result.json', import.meta.url), 'utf8'));
+    out.regime = { verdict: Y.verdict, classes: Y.classes, horizon: Y.horizon }; } catch (e) { out.regime = null; }
+  try { const B = JSON.parse(fs.readFileSync(new URL('../research/edge/blowoff-veto/result.json', import.meta.url), 'utf8'));
+    out.blowoff = { verdict: B.verdict, test: B.test, dailyAfter: B.dailyAfter, veto: B.veto }; } catch (e) { out.blowoff = null; }
   return out;
+}
+
+// the blow-off veto of the owner's macro rule book (no new gold BUY while gold is stretched), checked on the daily closes up to
+// now, with its tested record (research/edge/blowoff-veto). Thresholds = the study's VETO (a test compares them).
+export const BLOWOFF = { sma: 50, smaMax: 1.15, n20: 20, up20: 0.20, n7: 7, up7: 0.10 };
+export function blowoffCheck({ gold, now, study }) {
+  const G = (gold || []).filter((o) => o.t <= now && Number.isFinite(o.v)), c = G.map((o) => o.v), i = c.length - 1, v = BLOWOFF;
+  if (i < v.sma) return null;
+  let s = 0; for (let k = i - v.sma + 1; k <= i; k++) s += c[k];
+  const vs = c[i] / (s / v.sma) - 1, d20 = c[i] / c[i - v.n20] - 1, d7 = c[i] / c[i - v.n7] - 1, pc = (x) => sg(x * 100, 1) + '%';
+  const R = [{ text: `${pc(vs)} against the 50-day average (veto above +15%)`, on: vs > v.smaMax - 1 }, { text: `${pc(d20)} over 20 sessions (veto above +20%)`, on: d20 > v.up20 }, { text: `${pc(d7)} over 7 sessions (veto above +10%)`, on: d7 > v.up7 }];
+  const on = R.some((r) => r.on), T = study && study.dailyAfter && study.dailyAfter.test, W = study && study.test;
+  const rec = T ? `Tested on 19 Nov 2026 (research/edge/blowoff-veto, ${study.verdict}): on the score's weekly clock it almost never fires (${W ? W.flaggedBuy : 'n/a'} BUY week in 2007-24). On the ${T.flaggedDays} days it fired in 2007-24 (${T.episodes} episodes), gold averaged ${sg(T.meanFlagged * 100, 1)}% over the next 20 sessions (up ${Math.round(T.upShareFlagged * 100)}% of the time) against ${sg(T.meanAll * 100, 1)}% on all days: a caution, not a tested edge.` : null;
+  return { doc: 'your macro rule book (blow-off veto)', asOf: new Date(G[i].t * 1000).toISOString().slice(0, 10), readings: R,
+    text: on ? 'Blow-off veto ON: the rule book says no new gold buy while gold is this stretched.' : 'Blow-off veto off: gold is not stretched by the rule book\'s three measures.', caveat: rec };
+}
+
+// the rule book's US 10-year regime table (speed and direction, and why it moves), read today, with the record of each class
+// from research/edge/yield-regime (classOf / whyOf there; a test compares). Descriptive: the study FAILED as a forecast.
+export const REGIME_NAME = { risingFast: '10-year rising fast', risingSlow: '10-year rising slowly', flat: '10-year flat', fallingSlow: '10-year falling slowly', fallingFast: '10-year falling fast' };
+const BOOK = { risingFast: 'bearish gold', risingSlow: 'a mild headwind for gold', flat: 'no regime', fallingSlow: 'bullish gold', fallingFast: 'bullish gold after the liquidation phase' };
+export function regimeCheck({ S, now, study }) {
+  const d2 = chg(S.DGS10, now, 14), d4 = chg(S.DGS10, now, 28), d6 = chg(S.DGS10, now, 42), t2 = chg(S.DGS2, now, 28); if (d2 == null || d4 == null || d6 == null) return null;
+  const cls = d2 >= 0.25 || d4 >= 0.5 ? 'risingFast' : d2 <= -0.25 || d4 <= -0.5 ? 'fallingFast' : d6 >= 0.25 ? 'risingSlow' : d6 <= -0.25 ? 'fallingSlow' : 'flat';
+  const why = d4 >= 0.25 && t2 != null ? (t2 >= d4 ? 'led by the 2-year (growth / hawkish Fed)' : t2 <= d4 - 0.15 ? 'with the 2-year lagging (term premium)' : null) : null;
+  const bp = (x) => sg(x * 100, 0) + ' bp', C = study && study.classes, c = C && C[cls], all = C && C.all, pc = (x) => sg(x * 100, 1) + '%';
+  const rec = c && all ? `Record 2007-26 (research/edge/yield-regime, ${study.verdict}): in this class gold's next ${study.horizon} sessions averaged ${pc(c.gold)} (up ${Math.round(c.goldUp * 100)}% of ${c.n} weeks) against ${pc(all.gold)} on all weeks. Not significant: a lean, not a tested edge.` : null;
+  return { doc: 'your macro rule book (US 10-year regime table)', text: `${REGIME_NAME[cls]}${why ? ', ' + why : ''}: the rule book reads ${why && why.includes('term premium') ? 'bullish gold (fiscal / term-premium stress)' : BOOK[cls]}.`,
+    readings: [{ text: `10-year ${bp(d2)} over 2 weeks`, on: Math.abs(d2) >= 0.25 }, { text: `${bp(d4)} over 4 weeks`, on: Math.abs(d4) >= 0.5 }, { text: `${bp(d6)} over 6 weeks`, on: Math.abs(d6) >= 0.25 }].concat(t2 != null ? [{ text: `2-year ${bp(t2)} over 4 weeks`, on: false }] : []),
+    caveat: rec, asOf: (last(S.DGS10, now) || {}).t ? new Date(last(S.DGS10, now).t * 1000).toISOString().slice(0, 10) : null };
 }
 
 // markdown table rows under the first header line that matches `head`
@@ -256,6 +290,8 @@ export function watch({ docs, fc, S, gold, usdjpy, now, calendar = [] }) {
   try { push('japan', D.japan && japanCheck({ md: D.japan, S, usdjpy, now })); } catch (e) { out.error = String(e.message || e); }
   try { push('cot', D.positioning && positioningNote({ S })); } catch (e) { out.error = String(e.message || e); }
   try { push('china', (D.chinaHousing || D.chinaFiscal) && chinaBriefs({ housing: D.chinaHousing, fiscal: D.chinaFiscal, calendar, now })); } catch (e) { out.error = String(e.message || e); }
+  try { push('regime', regimeCheck({ S, now, study: D.regime })); } catch (e) { out.error = String(e.message || e); }
+  try { push('blowoff', blowoffCheck({ gold, now, study: D.blowoff })); } catch (e) { out.error = String(e.message || e); }
   try { push('nyfed', D.nyfed && nyfedSurvey({ json: D.nyfed, fc, S, now })); } catch (e) { out.error = String(e.message || e); }
   out.register = R.length ? { n: R.length, doc: DOCS.register, ids: R.map((r) => r.id) } : null;
   return { watch: out, register: R };
