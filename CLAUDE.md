@@ -2481,6 +2481,31 @@ only beside the rail) and its chapters say where the tools are and how favourite
 watches to the value it already has (it looped once and froze the page). `window.msRail()` is the read-only view. Test:
 `tests/desk-draw.test.mjs`.
 
+## Fibonacci, arrow and text drawings (19 Nov 2026, owner: "add more drawing tools like fibonacci and text")
+Display only. Three shapes join ChronosTrade's drawing types in `assets/backtest-engine.js` (`DRAW_TYPES`, so `drawNorm`,
+`drawGeom`, `drawHit`, `drawResize`, `drawMove` handle them; ChronosTrade itself does not offer them yet): `f` Fibonacci retracement
+`{ t1, p1, t2, p2, ext? }` (`FIB_LEVELS` 0 / 0.236 / 0.382 / 0.5 / 0.618 / 0.786 / 1; 1 at the first point, 0 at the second; `ext`
+draws the levels to the right edge), `a` arrow `{ t1, p1, t2, p2 }` (head at the second point), `x` text `{ t1, p1, text }` (one
+plain line, 120 characters at most, `textOf`; a text with no words is dropped; size S / M / L = `w` 1-3, `TEXT_PX`). On the Desk
+(`assets/ms-draw.js`): in the rail after Box, keys Alt+F / Alt+A / Alt+X; Text asks for its words after one click (`askText`
+through the styled `msAsk`), "Edit text" in the style bar and a double-click on a text change them; the Fibonacci levels carry
+their prices and light bands. The one-chart bar's old Fibonacci button (`.ch-fib`) left the rail (the key B still works on the
+chart under the mouse). The guide's drawing chapter names them. Test: `tests/desk-draw.test.mjs`.
+
+## More drawing tools and 18 more indicators (19 Nov 2026, owner: "add the all famous tools and rare indicators used on trading view … and tools that are not in trading view but it would be super helpful")
+Display only. **Drawing shapes** (engine `DRAW_TYPES`, Desk keys): `c` parallel channel `{ t1, p1, t2, p2, off }` (Alt+C; the
+second line is the first moved by `off` in price, first width = 2 ATR(14) of the chart, the middle handle `o` sets it, `ext`
+extends), `m` price and date range (Alt+G; a box that always shows the move, %, bars and time, green up / red down), `w` anchored
+VWAP `{ t1, p1 }` (Alt+W; the page draws the curve from the candle at t1 with the candles' volume, 1 where the feed has none; only
+its handle is hit), and two not in TradingView: `p` measured move (Alt+P; A to B, then the same move from B: 1:1 and 1.618 targets,
+`BT.measuredMove`) and `b` ATR band `{ price, hw }` (Alt+B; the chart's ATR(14) above and below a price; dropped without a width).
+**Indicators** (`IND_DEF`, 36 in all; `IND_GROUP` / `IND_GROUPS` list them by group in the dialog, searched by `#ms-ind-q`): Hull MA,
+KAMA, Ichimoku (spans plotted at the current candle from values 25 candles back, lagging line 25 back), Chandelier exit, classic
+daily pivot points (UTC days of the chart's time zone), ADX / DMI, Williams %R, Stochastic RSI, Awesome Oscillator, Aroon, Fisher
+Transform, Choppiness Index, Squeeze momentum (TTM style: BB inside Keltner = red dot), Z-score of price, range expansion (range ÷
+ATR), OBV, MFI, CMF (volume = 1 where the feed has none). Decimal parameters `mult`, `bb`, `kc`. A test lifts the library out of the
+page and checks every new study is finite and grouped (`tests/desk-draw.test.mjs`). The guide's chapters list them.
+
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
 - **Paper account** `assets/ms-paper.js` (`window.MS_PAPER` pure: `fresh`, `norm`, `order`, `process`, `stats`, `floating`, `sizeText`;
   page part after `module.exports`), a bar `#ms-pp` above the six panes (`<style id="ms-pp-css">`; hidden for guests; behind More
