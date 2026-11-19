@@ -2468,6 +2468,12 @@ menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analy
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
+## Charts type scale (19 Nov 2026, owner: "the currency letters look too big, make same size as the rest")
+Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts is 12.5 px: the toolbar's market button `.ch-mk`
+(was 14 px / 650), the chart headers' market and timeframe buttons `.ph-mk` / `.ph-tf` (13 px / 700), the Markets view's selects and
+price; the trend chips and the cycle tag are 11.5 px Figtree (10.5 px mono and the system font before); the Style / Indicators
+small print 12 px. The chart watermark ("XAU/USD · H1") is 26 px (38 before), still faint.
+
 ## Drawing rail on the left, floating favourites (19 Nov 2026, owner: "the drawing bar in the left and we also should be able to choose favorite and have it floated like tradingview")
 Display only, `market-structure.html` (block "Drawing rail on the left" after the one-chart bar, `<style id="ms-rail-css">`) and
 `assets/ms-charts-guide.js`. Wider than 640 px (`matchMedia('(min-width: 641px)')`) the drawing tools `#ms-dr-bar` and the chart

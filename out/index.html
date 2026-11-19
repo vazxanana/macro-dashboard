@@ -5607,6 +5607,15 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
 #v-ict .ict-seg.ict-seg { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
 #v-ict .ict-seg.ict-seg button { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; color: var(--au-ink-2, var(--ink-dim)); }
 #v-ict .ict-seg.ict-seg button.on { color: var(--au-ink, var(--ink)) !important; box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)) !important; font-weight: 650; }
+/* Charts type scale (19 Nov 2026, owner: "the currency letters look too big, make same size as the rest"): one size for every
+   control on Charts. The market button was 14 px / 650 and the chart headers' market and timeframe 13 px / 700 beside 12.5 px
+   controls; the trend chips were 10.5 px mono, the cycle tag the system font, the toolbar's small print 10-11.5 px. Display only. */
+#v-charts .sec-h > .ch-mk { font: 550 12.5px var(--sans); }
+.ms-ph .ph-tf, .ms-ph .ph-mk { font: 600 12.5px var(--sans); }
+#v-charts .ms-ph .ms-chip { font: 600 11.5px var(--sans); letter-spacing: .02em; }
+#v-charts .ms-ph .ms-cy { font-family: var(--sans); font-size: 11.5px; }
+#v-charts .sec-h #ms-sty-now, #v-charts .sec-h #ms-ind-n { font-size: 12px; }
+.mm-h select, .mm-px { font-size: 12.5px; }
 </style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -8218,7 +8227,7 @@ function msNextSetup(bars, A) {
     };
     chart.timeScale().subscribeVisibleLogicalRangeChange((r) => { if (r && r.from < 25 && P.fitted && P.vis !== false) P.loadOlder(); });
     // charts upgrade (7 Nov): faint symbol watermark, quiet dashed crosshair, OHLC readout that follows the cursor
-    chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 38, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
+    chart.applyOptions({ watermark: { visible: true, text: `${INST.label} · ${tf.label}`, color: 'rgba(128, 138, 160, 0.05)', fontSize: 26, fontStyle: '600', horzAlign: 'center', vertAlign: 'center' },
       crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' }, horzLine: { color: 'rgba(140, 150, 170, 0.55)', width: 1, style: LW.LineStyle.Dashed, labelBackgroundColor: '#2b3242' } } });
     const lg = document.createElement('div'); lg.className = 'ch-lg'; lg.setAttribute('aria-hidden', 'true'); el.appendChild(lg);
     let lgHover = false, lgLast = '', lgRaf = 0, lgIdx = null;
