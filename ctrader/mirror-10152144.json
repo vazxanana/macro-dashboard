@@ -720,7 +720,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "ict-A",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-19T00:17:35.000Z",
     "councilEntry": 3738.3,
     "stop": 3722.2,
@@ -731,11 +731,13 @@
     "fillPrice": 3738.83,
     "lagSec": 18,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-19T00:17:35.000Z",
     "brokerStop": 3722.73,
-    "rollsSeen": 0
+    "rollsSeen": 0,
+    "closedAt": "2026-11-19T02:55:39.000Z"
    }
   },
   "day": {
@@ -743,7 +745,7 @@
    "startBalance": 9890.76
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 9890.76 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 9872.89 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -751,8 +753,8 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 9890.76,
-  "lastRun": "2026-11-19T02:53:20.000Z"
+  "balance": 9872.89,
+  "lastRun": "2026-11-19T02:55:39.000Z"
  },
  "log": [
   {
@@ -1786,6 +1788,11 @@
   {
    "at": "2026-11-19T00:17:35.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council ict-A)",
+   "trade": "ict:gc-b-1795042800"
+  },
+  {
+   "at": "2026-11-19T02:55:39.000Z",
+   "msg": "XAUUSD position 50314105 closed at the broker",
    "trade": "ict:gc-b-1795042800"
   }
  ],
