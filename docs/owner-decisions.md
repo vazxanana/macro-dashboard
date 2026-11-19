@@ -1234,3 +1234,22 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
 - **Options.** (a) Merge it (recommended: the only way to measure the cost the fade depends on, at no risk). (b) Leave it;
   the gotobi fade stays unmeasured on cost.
 - **To undo.** Delete the `watch` part of `council/ctrader-symbols.mjs`; the file's `watch` key is then simply not written.
+
+## The gotobi fade on a demo account, 19 Nov 2026
+
+### [x] 61. Trade the gotobi fade (study T2) on a cTrader demo account
+
+- **Status (19 Nov 2026): approved by the owner** ("start on any of the demo accounts ctrader"), after being shown that the replica
+  and the council's own trades have no edge to profit from, and that the gotobi fade is the best-evidenced candidate in the
+  studies: PASS on 2016-2026 (771 trades, +0.148R a trade after costs, month t 2.74; 2010-15 also positive), REPLICATES on four
+  yen crosses, FEED-ROBUST on HistData. Its open question was the cost at 00:55 and 06:00 UTC; the demo broker's measured
+  spreads on ordinary weekdays (item 60) put USD/JPY at about 0.8 pip a round trip with the commission, against the ~1.95 pips
+  where the result stops being significant. No gotobi day had been measured yet.
+- **What runs.** `council/gotobi.mjs` through `.github/workflows/gotobi.yml`: on a gotobi day sell USD/JPY at 00:55:00 UTC, stop
+  at entry + D (1.5 x the median 00:55 -> 06:00 move of the 20 Tokyo business days before), buy back at 06:00:00 UTC. Risk 0.25 %
+  of the account a trade (`config.gotobi.risk`). On the LIT book's demo account (idle since 17 Nov; `config.gotobi.account` or
+  the repository variable `CTRADER_GOTOBI_ACCOUNT` picks another), label "gotobi" so the mirror never touches it. Demo only, a
+  stop on every trade (checked at the broker, closed at once if it cannot be set). A run that starts after 00:56 does not enter.
+- **Judged how.** A forward record in council-data `gotobi/trades.json`, against the study's figures; nothing is called an edge
+  until the forward record says so (about 70 trades a year; a first look at 30).
+- **To stop.** A user rule or edit setting `config.gotobi = { on: false }`, or disable the workflow.

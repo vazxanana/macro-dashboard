@@ -14,7 +14,9 @@ module.exports = async (req, res) => {
     res.setHeader('Cache-Control', 'private, no-store');
     if (!G.bearerOk(req.headers && req.headers.authorization, env.CRON_SECRET)) return res.status(401).json({ error: 'unauthorised' });
     const out = await K.run({ readAt: atOf, token: env.GH_DISPATCH_TOKEN || null, now: now.getTime() });
-    return res.status(200).json({ at: now.toISOString(), ...out });
+    // the gotobi job (19 Nov 2026, api/_gotobi-kick.js): started before 00:55 UTC on weekdays, the job decides if it is a gotobi day
+    let gotobi = null; try { gotobi = await require('./_gotobi-kick.js').run({ token: env.GH_DISPATCH_TOKEN || null, now: now.getTime() }); } catch (e) { gotobi = { started: false, why: 'error' }; }
+    return res.status(200).json({ at: now.toISOString(), ...out, gotobi });
   }
   const age = async (p) => { const at = await atOf(p); return at ? { at, ageMin: Math.round((now - Date.parse(at)) / 6e4) } : null; };
   const [council, ict] = await Promise.all([age('snapshot.json'), age('ict/snapshot.json')]);

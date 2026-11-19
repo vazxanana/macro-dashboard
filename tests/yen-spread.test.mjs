@@ -27,8 +27,8 @@ test('gotobi calendar: the branch copy, pinned by its own output; holidays and w
   assert.deepEqual(gotobiOfMonth(2026, 5), ['2026-05-01', '2026-05-08', '2026-05-15', '2026-05-20', '2026-05-25', '2026-05-29']);   // Golden Week
   assert.equal(isGotobi('2026-11-13'), true); assert.equal(isGotobi('2026-11-16'), false); assert.equal(isGotobi('2026-11-03'), false);
   assert.equal(isGotobi('2024-12-30'), true);   // 5 Jan 2025 rolls over the New Year into December
-  // a copy, not an import of a branch: the council file names its source
-  const src = fs.readFileSync(new URL('../council/yen-spread.mjs', import.meta.url), 'utf8');
+  // a copy, not an import of a branch: the council file names its source (the calendar moved to gotobi-calendar.mjs, 19 Nov 2026)
+  const src = fs.readFileSync(new URL('../council/gotobi-calendar.mjs', import.meta.url), 'utf8');
   assert.match(src, /copied from research\/edge\/gotobi\/run\.mjs/); assert.doesNotMatch(src, /from ['"][^'"]*research\//);
 });
 
