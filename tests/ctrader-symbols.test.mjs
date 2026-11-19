@@ -6,6 +6,7 @@ import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import { symbolSpecs, lastTick, chainRate, observedValue, scheduleText, modeName, impliedPrice, SAMPLE } from '../council/ctrader-symbols.mjs';
 import { costModel } from '../council/fills.mjs';
+import { yenSpreads } from '../council/yen-spread.mjs';
 import { SYMBOLS, riskVolume, specFor } from '../council/ctrader-mirror.mjs';
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
@@ -27,7 +28,7 @@ const PX = { 41: [4000.10, 4000.40], 1: [1.10000, 1.10006], 5: [1.38000, 1.38010
 const ticks = (px, now) => { const pts = [[now - 2000, px], [now - 9000, px - 0.5], [now - 60000, px + 0.25]].map(([t, p]) => [t, Math.round(p * 1e5)]);
   return pts.map(([t, p], i) => (i ? { timestamp: t - pts[i - 1][0], tick: p - pts[i - 1][1] } : { timestamp: t, tick: p })); };
 
-function fakeBroker({ live = false, deposit = 1, quiet = false, px = PX, full = FULL } = {}) {
+function fakeBroker({ live = false, deposit = 1, quiet = false, px = PX, full = FULL, light = LIGHT, winTicks = null } = {}) {
   const sent = [];
   class WS { constructor(url) { this.url = url; setTimeout(() => this.onopen(), 0); }
     send(text) { const m = JSON.parse(text); sent.push({ url: this.url, ...m }); const P = _t.PT, p = m.payload;
@@ -38,9 +39,10 @@ function fakeBroker({ live = false, deposit = 1, quiet = false, px = PX, full = 
         case P.ACCOUNT_AUTH_REQ: return r(P.ACCOUNT_AUTH_RES, {});
         case P.TRADER_REQ: return r(P.TRADER_RES, { trader: { balance: 5000000, moneyDigits: 2, depositAssetId: deposit, leverageInCents: 50000 } });
         case P.ASSET_LIST_REQ: return r(P.ASSET_LIST_RES, { asset: ASSETS });
-        case P.SYMBOLS_LIST_REQ: return r(P.SYMBOLS_LIST_RES, { symbol: LIGHT });
+        case P.SYMBOLS_LIST_REQ: return r(P.SYMBOLS_LIST_RES, { symbol: light });
         case P.SYMBOL_BY_ID_REQ: return r(P.SYMBOL_BY_ID_RES, { symbol: p.symbolId.map((id) => ({ symbolId: id, ...full[id] })) });
-        case P.GET_TICKDATA_REQ: { if (quiet || !px[p.symbolId]) return r(P.GET_TICKDATA_RES, { tickData: [], hasMore: false });
+        case P.GET_TICKDATA_REQ: { if (winTicks && p.toTimestamp - p.fromTimestamp <= 400e3) return r(P.GET_TICKDATA_RES, { tickData: winTicks(p), hasMore: false });
+          if (quiet || !px[p.symbolId]) return r(P.GET_TICKDATA_RES, { tickData: [], hasMore: false });
           return r(P.GET_TICKDATA_RES, { tickData: ticks(px[p.symbolId][p.type === 2 ? 1 : 0], p.toTimestamp), hasMore: false }); }
         case P.SYMBOLS_FOR_CONVERSION_REQ: { // the chain from the quote asset to the account currency, through USD
           const L = (id) => LIGHT.find((x) => x.symbolId === id), via = { 4: [L(5)], 1: [] }[p.firstAssetId] || [];
@@ -192,4 +194,66 @@ test('a bid = ask quote never writes spread 0: measured, then kept with its own 
   // a file written before this change (spread 0) is never carried as a spread
   const old = { symbols: { EURUSD: { spread: 0, spreadAt: new Date(NOW - 60e3).toISOString() } } };
   assert.equal((await run(fakeBroker({ px: flat, full }), { prev: old })).symbols.EURUSD.spreadSrc, 'default');
+});
+
+// ---- the yen watch list (14 Nov 2026, owner-decisions item 54): read only, into `watch`, never into `symbols` / `markets` -----------
+ASSETS.push({ assetId: 9, name: 'JPY' });
+const JPYL = [{ symbolId: 201, symbolName: 'USDJPY', baseAssetId: 1, quoteAssetId: 9 }, { symbolId: 202, symbolName: 'GBPJPY', baseAssetId: 8, quoteAssetId: 9 },
+  { symbolId: 203, symbolName: 'AUDJPY', baseAssetId: 6, quoteAssetId: 9 }, { symbolId: 205, symbolName: 'CHFJPY', baseAssetId: 10, quoteAssetId: 9, enabled: false }];
+const JFX = { lotSize: 10000000, minVolume: 100000, stepVolume: 100000, maxVolume: 1000000000, digits: 3, pipPosition: 2, commissionType: 1, preciseTradingCommissionRate: 2250000000 };
+const JFULL = { ...FULL, 201: JFX, 202: JFX, 203: JFX }, JPX = { ...PX, 201: [155.000, 155.004], 202: [205.000, 205.010], 203: [101.000, 101.006] };
+const enc = (pts) => pts.map(([t, p]) => [t, Math.round(p * 1e5)]).map(([t, p], i, a) => (i ? { timestamp: t - a[i - 1][0], tick: p - a[i - 1][1] } : { timestamp: t, tick: p }));
+// window ticks: 0.3 pip at the minute (bid 155.000 at -100 s, ask 155.003 at -90 s), then 1 pip after it; ask under bid in between is no spread
+const winTicks = (p) => { const T = p.fromTimestamp + 180e3;
+  return p.type === 1 ? enc([[T - 100e3, 155.000], [T + 30e3, 155.010]]) : enc([[T - 90e3, 155.003], [T + 40e3, 155.020]]); };
+
+test('watch list: the yen pairs are recorded under `watch` (spread fields, commission, window spreads), and the mirror never sees them', async () => {
+  const light = LIGHT.concat(JPYL), b = fakeBroker({ light, full: JFULL, px: JPX, winTicks });
+  const f = await run(b);
+  assert.ok(b.sent.every((m) => _t.READ_ONLY.has(m.payloadType)), 'only read messages');
+  assert.ok(b.sent.every((m) => m.url === _t.HOSTS.demo), 'demo host only');
+  // the mirror's view of the file is what it was: the same markets, no yen pair in `symbols`, specFor and the cost model blind to them
+  const base = await run(fakeBroker());
+  assert.deepEqual(f.markets, base.markets); assert.deepEqual(f.missing, base.missing);
+  assert.deepEqual(Object.keys(f.symbols).sort(), Object.keys(base.symbols).sort());
+  assert.ok(!Object.keys(f.symbols).some((n) => /JPY/.test(n)));
+  for (const n of ['USDJPY', 'GBPJPY', 'AUDJPY']) assert.equal(specFor(f, n), null, n);
+  assert.ok(!Object.values(SYMBOLS).flat().some((n) => /JPY/.test(n)), 'the mirror trades no yen pair');
+  assert.equal(costModel({ usdjpy: { group: 'Forex', spot: true } }, { symbols: SYMBOLS, brokerInfo: f }).usdjpy.src, 'default');
+  // the watch entries: CADJPY not listed and CHFJPY disabled -> null
+  assert.deepEqual(Object.keys(f.watch), ['USDJPY', 'GBPJPY', 'AUDJPY', 'CADJPY', 'CHFJPY']);
+  assert.equal(f.watch.CADJPY, null); assert.equal(f.watch.CHFJPY, null);
+  const u = f.watch.USDJPY;
+  assert.equal(u.watchOnly, true); assert.deepEqual([u.base, u.quote, u.pipPosition], ['USD', 'JPY', 2]);
+  assert.deepEqual([u.bid, u.ask, u.spread, u.spreadSrc, u.quoteSpread], [155, 155.004, 0.004, 'measured', 0.004]);
+  assert.equal(u.commissionRT, 0.000045); assert.equal(u.spreadTypical, null);   /* 21:19 UTC: a rollover-hour read */ assert.deepEqual(u.spreadLog, [[Math.floor((NOW - 2000) / 1000), 0.004]]);
+  // windows: NOW is Fri 6 Nov 21:20 UTC; the last 3 days' ended windows, oldest first, four a run
+  assert.deepEqual(u.windows.map((w) => w.at), ['2026-11-03T00:55:00.000Z', '2026-11-03T06:00:00.000Z', '2026-11-04T00:55:00.000Z', '2026-11-04T06:00:00.000Z']);
+  assert.deepEqual(u.windows[0], { t: Date.parse('2026-11-03T00:55:00Z') / 1000, at: '2026-11-03T00:55:00.000Z', n: 2, atTarget: 0.003, median: 0.0065, min: 0.003, max: 0.01 });
+  // the next run adds the next four, then nothing is asked twice
+  const g = await run(fakeBroker({ light, full: JFULL, px: JPX, winTicks }), { prev: f, now: NOW + 600e3 });
+  assert.equal(g.watch.USDJPY.windows.length, 8); assert.equal(g.watch.USDJPY.windows[7].at, '2026-11-06T06:00:00.000Z');
+  const b3 = fakeBroker({ light, full: JFULL, px: JPX, winTicks }), h = await run(b3, { prev: g, now: NOW + 1200e3 });
+  assert.equal(h.watch.USDJPY.windows.length, 8);
+  assert.ok(!b3.sent.some((m) => m.payloadType === _t.PT.GET_TICKDATA_REQ && m.payload.toTimestamp - m.payload.fromTimestamp <= 400e3), 'no window read twice');
+  // the reader: 5 Nov is a gotobi day, 3, 4 and 6 Nov are not; pips by the symbol's own pip
+  const y = yenSpreads(g).USDJPY;
+  assert.deepEqual(y.summary['00:55 gotobi'], { n: 1, median: 0.3, mean: 0.3, max: 0.3 });
+  assert.equal(y.summary['00:55 other'].n, 3); assert.equal(y.summary['06:00 other'].n, 3);
+  assert.equal(y.commissionPips, 0.698);   // 0.000045 x 155.002 / 0.01
+  assert.equal(yenSpreads(g).CADJPY, null);
+});
+
+test('watch list: nothing outside ctrader-symbols.mjs and yen-spread.mjs reads it, and the symbols script sends no trading message', () => {
+  const seen = [];
+  for (const d of ['council', 'api', 'ict']) for (const f of fs.readdirSync(new URL(`../${d}/`, import.meta.url))) {
+    if (!/\.(mjs|js)$/.test(f) || (d === 'council' && /^(ctrader-symbols|yen-spread)\.mjs$/.test(f))) continue;
+    const src = fs.readFileSync(new URL(`../${d}/${f}`, import.meta.url), 'utf8').replace(/\bW\.watch\b/g, '');   // the Trader's own gold MP watch list
+    seen.push(f);
+    assert.doesNotMatch(src, /\.watch\b|\[['"]watch['"]\]|yen-spread|\bWATCH\b[^\n]*ctrader-symbols/, `${d}/${f}`);
+  }
+  assert.ok(seen.includes('ctrader-mirror.mjs') && seen.includes('fills.mjs') && seen.includes('trader.mjs'));
+  const src = fs.readFileSync(new URL('../council/ctrader-symbols.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(src, /NEW_ORDER|AMEND_|CANCEL_ORDER|CLOSE_POSITION/);
+  assert.match(src, /lib\.session\(WS, lib\.HOSTS\.demo\)/); assert.match(src, /refused: not a demo account/);
 });
