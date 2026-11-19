@@ -4,10 +4,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { buildIndex, cpiPilot } from '../scripts/veteran-index.mjs';
 
-test('the index lists the revision 1.3 batch with groups, titles, what is new and the CPI pilot; no archives', () => {
+test('the index lists the revision 1.8 package with groups, titles, what is new and the CPI pilot; no archives', () => {
   const I = buildIndex('research/macro-veteran');
-  assert.equal(I.version, '1.3'); assert.ok(I.docs.length >= 110); assert.equal(I.prepared, '2026-11-09');
-  assert.ok(I.whatsNew.length >= 5); assert.match(I.newIn, /^1\.4 research outputs/); assert.ok(I.whatsNew.some((l) => /0\.255%/.test(l) && /never as a result/.test(l)));
+  // 19 Nov 2026: the 1.5 base (SKILL.md 1.5, validation.json of 17 Nov) plus the 1.6-1.8 news increments; the revision is README.md's
+  assert.equal(I.version, '1.8'); assert.ok(I.docs.length >= 200); assert.equal(I.prepared, '2026-11-17');
+  assert.ok(I.whatsNew.length >= 5); assert.equal(I.newIn, '1.8'); assert.ok(I.whatsNew.some((l) => /5 of 36/.test(l)));
+  assert.ok(I.whatsNew.some((l) => /deliberately left empty/.test(l) && /No surprise/.test(l)), 'no surprise without a frozen consensus');
+  for (const p of ['references/news-trading-strategy-register-v2-2026-11-19.md', 'references/employment-situation-multifield-with-hours-2022-2024.csv',
+    'references/ism-jobs-same-day-verified-2022-2024.json', 'references/v1-8-combined-news-batch-readme.md'])
+    assert.equal(I.docs.find((d) => d.path === p).group, 'News and release research', p);
+  assert.ok(!I.docs.some((d) => /^notes\/.*\.json$/.test(d.path) && /overlap-route|overlap-calendar/.test(d.path)), 'work JSONs with local paths left out');
   assert.equal(I.docs.find((d) => d.path === 'START_HERE.md').group, 'Start here');
   assert.equal(I.docs.find((d) => d.path === 'references/treasury-cpi-calendar-study-2022-2024.md').group, 'Release integrity and rates study');
   assert.equal(I.docs.find((d) => d.path === 'references/bls-release-integrity-case-2026-11-09.md').group, 'Release integrity and rates study');

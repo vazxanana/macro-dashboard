@@ -2,9 +2,25 @@
 
 **Purpose:** Navigate the macro, gold, market-flow, issuer-fundamental, and cTrader demo-research material in this folder. This index is a map, not a substitute for checking the current primary source.
 
-**Reference update:** The [8 November quality audit and the assistant correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
+**Reference update:** The [8 November quality audit and assistant correction note](research-corrections-and-quality-audit-2026-11-08.md) documents a schema-example correction affecting the already shared V1 and factual/measurement corrections in the later master increment. Use the corrected master example for the next update.
 
-**Latest increment:** [17 November findings and remaining work](latest-research-batch-status-2026-11-17.md) closes the conditional NBU/CPI clock audit and records an unresolved CPI outcome attempt. The complete delivered handoff is V1.4; these later additions belong to the next batch. The [9 November status](latest-research-batch-status-2026-11-09.md) and [8 November status](latest-research-batch-status-2026-11-08.md) retain their dated research context.
+**Latest increment:** [17 November findings and remaining work](latest-research-batch-status-2026-11-17.md) closes the conditional NBU/CPI clock audit and records an unresolved CPI outcome attempt. The latest verified assistant handoff is [V1.5](claude-v1-5-delivery-check-2026-11-19.md), including the subsequent macro-calendar source audits. The [9 November status](latest-research-batch-status-2026-11-09.md) and [8 November status](latest-research-batch-status-2026-11-08.md) retain their dated research context.
+
+**V1.6 research:** [Red-folder news data and strategy V1](red-folder-news-data-and-strategy-v1-2026-11-19.md) connects CPI, PPI, PCE and release-day gold research. Its [release-order audit](ppi-cpi-release-order-2022-2024.json) shows PPI before CPI in only 5 of 36 matched months. The [36-month CPI/PPI→PCE source panel](cpi-ppi-to-pce-36-month-source-and-baseline-2022-2024.md) contains dated BEA PCE prints and four PPI aggregate figures for every month. The [exploratory expanding-window comparison](cpi-ppi-to-pce-expanding-model-check-2022-2024.md) finds no robust incremental PPI forecast skill.
+
+**News-trading expansion:** [Ten demo news-trading hypotheses](news-trading-strategy-register-v2-2026-11-19.md) cover CPI composition, payroll fields, FOMC stages, post-release continuation/reversal, claims/JOLTS/ECI, PCE, retail/real consumption, Treasury auctions, ISM and EIA. Each names the first-print/consensus/quote gate and separates an economic forecast from an executable demo trade.
+
+**Assistant handoff:** [V1.6 news research ZIP](gptmacro_v1.6-news-research-batch-under-30mb.zip) is a verified 59,110-byte increment after V1.5, with 25 research/data/script members and [handoff instructions](v1-6-news-batch-readme.md). SHA-256: `2BDF9F72AAB9AC0C08D185CCFCE7AF5CB1BEC3D52FEFCD1D8906995BE1BE339C`.
+
+**After V1.6:** [Employment-news multi-field study](employment-news-multifield-research-2022-2024.md) adds 36 dated jobs-release rows with payroll, unemployment, wages and weekly hours, plus 35 prior-two-month revision statements. The source excerpts and validation preserve revision/vintage limits; consensus and demo execution data remain open.
+
+**Assistant employment handoff:** [V1.7 compact ZIP](gptmacro_v1.7-employment-research-batch-under-30mb.zip) packages the labor increment with 14 files in 38,598 bytes. Read the [V1.7 instructions](v1-7-employment-batch-readme.md) before merging it into V1.6. SHA-256: `C10BFD3BA3541AC23DE186F392E54E5CB58EDB920F0579EA3C185AF8FA695779`.
+
+**After V1.7:** [News expectation source and timing gates](news-expectation-source-and-timing-gates-2026-11-19.md) audit Trading Economics, Cleveland Fed, CME, New York Fed and Philadelphia Fed for legitimate pre-release use. The [employment expectation join gate](employment-pre-release-expectation-gate-2022-2024.csv) deliberately leaves consensus and surprise blank until an authenticated earlier snapshot is available.
+
+**Jobs event overlap:** The [bounded 36-date overlap audit](employment-regular-release-date-overlap-audit-2022-2024.json) finds no same-day matches in seven joined regular/partial inventories. A separate [seven-date ISM ledger](ism-jobs-same-day-verified-2022-2024.json) verifies Manufacturing or Services PMI reports on jobs days and shows why longer jobs windows still need event screening.
+
+**Current assistant handoff:** [V1.8 combined news ZIP](gptmacro_v1.8-combined-news-batch-under-30mb.zip) consolidates V1.6, V1.7 and every subsequent news-research file in this workspace, with [handoff instructions](v1-8-combined-news-batch-readme.md). It is the single increment to add to the already shared V1.5 base; the [manifest](gptmacro_v1.8-combined-news-batch-manifest.json) records size and SHA-256.
 
 ## Start here
 
@@ -109,7 +125,7 @@
 - [Market Expectations Capture Playbook](market-expectations-capture-playbook.md): point-in-time Fed rate pricing, breakevens, surveys, and event-expectation capture without conflating market prices and objective probabilities.
 - [Source Gap Audit Template](source-gap-audit-template.md): structured intake, overlap and independence check, official-source evidence matrix, vintage/access/revision controls, interpretation hazards and final registry/index audit for proposed datasets.
 - [GDP revision and composition case](gdp-revision-and-composition-case-2023-q3.md): three archived releases, explicit missing GDI, 45 reported/calculated records, source hashes, revision chains and annualization arithmetic; no retrospective claim of a forecast track record.
-- [Quality audit and the assistant correction note](research-corrections-and-quality-audit-2026-11-08.md): material corrections, the V1 example replacement, and the distinction between schema checks and source verification.
+- [Quality audit and assistant correction note](research-corrections-and-quality-audit-2026-11-08.md): material corrections, the V1 example replacement, and the distinction between schema checks and source verification.
 
 ### Macro, markets, and positioning
 

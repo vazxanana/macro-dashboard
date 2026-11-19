@@ -1,0 +1,107 @@
+{
+  "status": "EXPLORATORY_RETROSPECTIVE_NO_PROVEN_INCREMENTAL_PPI_SKILL",
+  "scope": "36 month Dec 2021-Nov 2024 source panel; first 12 months train only, next 24 expanding-window evaluations",
+  "model_specification": {
+    "target": "originally reported core PCE one-month percent change, one decimal",
+    "identity_proxy": "core CPI one-month first print",
+    "cpi_only": "OLS with intercept and current-month core CPI; expanding prior-month training",
+    "candidate": "OLS with intercept, current-month core CPI and PPI final demand less foods, energy and trade services; expanding prior-month training",
+    "minimum_training_months": 12,
+    "feature_selection_status": "retrospective exploratory, not preregistered or independently held out"
+  },
+  "overall": {
+    "identity_proxy": {
+      "count": 24,
+      "mae_pp": 0.08333333333333333,
+      "rmse_pp": 0.11547005383792516
+    },
+    "cpi_only": {
+      "count": 24,
+      "mae_pp": 0.07660145018723435,
+      "rmse_pp": 0.10031356066087846
+    },
+    "cpi_plus_ppi": {
+      "count": 24,
+      "mae_pp": 0.07478128418391021,
+      "rmse_pp": 0.10011530778042382
+    }
+  },
+  "by_reference_year": {
+    "2022": {
+      "identity_proxy": {
+        "count": 1,
+        "mae_pp": 0.0,
+        "rmse_pp": 0.0
+      },
+      "cpi_only": {
+        "count": 1,
+        "mae_pp": 0.07843665768194075,
+        "rmse_pp": 0.07843665768194075
+      },
+      "cpi_plus_ppi": {
+        "count": 1,
+        "mae_pp": 0.07658079625292735,
+        "rmse_pp": 0.07658079625292735
+      }
+    },
+    "2023": {
+      "identity_proxy": {
+        "count": 12,
+        "mae_pp": 0.09166666666666667,
+        "rmse_pp": 0.12583057392117916
+      },
+      "cpi_only": {
+        "count": 12,
+        "mae_pp": 0.08127025416996111,
+        "rmse_pp": 0.11460163143363133
+      },
+      "cpi_plus_ppi": {
+        "count": 12,
+        "mae_pp": 0.07968684945368722,
+        "rmse_pp": 0.11504018714538652
+      }
+    },
+    "2024": {
+      "identity_proxy": {
+        "count": 11,
+        "mae_pp": 0.08181818181818182,
+        "rmse_pp": 0.1087114613009218
+      },
+      "cpi_only": {
+        "count": 11,
+        "mae_pp": 0.07134137243383186,
+        "rmse_pp": 0.08407395795251686
+      },
+      "cpi_plus_ppi": {
+        "count": 11,
+        "mae_pp": 0.06926616642878829,
+        "rmse_pp": 0.0830543317195419
+      }
+    }
+  },
+  "loss_differences_candidate_minus_cpi_only": {
+    "mean_squared_error_pp2": -3.973560049475299e-05,
+    "mean_absolute_error_pp": -0.0018201660033241498,
+    "candidate_better_squared_error_months": 12,
+    "three_month_circular_block_bootstrap_95pct_mse_difference_pp2": [
+      -0.000545960771223714,
+      0.0004139655497362799
+    ],
+    "three_month_circular_block_bootstrap_95pct_mae_difference_pp": [
+      -0.004751130444762039,
+      0.001010187277203151
+    ],
+    "delete_one_month_mse_difference_range_pp2": [
+      -0.00021345506962019062,
+      8.795468524968198e-05
+    ],
+    "bootstrap_design": "10,000 paired circular moving-block resamples, 3-month blocks, seed 20261119; exploratory uncertainty only"
+  },
+  "limits": [
+    "Original publication/receipt times are not authenticated; source release schedules and original-release archive figures are used.",
+    "One-decimal PCE target and component-series mismatch limit resolution.",
+    "No historical BEA source map or weights are used; this tests one broad PPI aggregate, not a component nowcast.",
+    "The 24 scores are rolling historical errors, not an untouched future or live trading record.",
+    "No consensus, XAU/USD bid/ask, slippage, or trading return is measured."
+  ]
+}

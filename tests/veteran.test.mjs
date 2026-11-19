@@ -175,7 +175,7 @@ test('the argument\'s record: weekly debates resolved at the horizon, a per-topi
 });
 
 test('revision 1.3: the port names its skill version and reads the batch\'s real CPI pilot', () => {
-  assert.equal(V.SKILL_VERSION, '1.3');
+  assert.equal(V.SKILL_VERSION, '1.8');
   const c = V.cpiPilot(); assert.equal(c.point, 0.255); assert.equal(c.status, 'unresolved'); assert.match(c.label, /not a scored forecast/); assert.equal(c.outcome, null); assert.equal(c.pending, 1, 'the 17 Nov null-outcome record is a pending attempt'); assert.equal(c.releaseUtc, '2026-11-10T13:30:00Z');
   assert.equal(V.cpiPilot('/nonexistent/ledger.jsonl'), null, 'the Vercel bundle has no research/: null, never a throw');
 });
@@ -215,7 +215,7 @@ test('revision 1.3: build carries the releases, the claim type and the untrusted
   const C = cache(), fc = forecast({ playbook: [{ title: 'Core CPI m/m', at: new Date((NOW + 2 * DAY) * 1000).toISOString(), consensus: '0.2%', previous: '0.3%' }] });
   const { v, expectations } = V.build({ fc, cache: C, daily: { gold, dxy }, now: NOW });
   assert.equal(expectations.length, 1); assert.equal(v.releases.length, 1); assert.equal(v.releases[0].firstPrint, null);
-  assert.equal(v.skillVersion, '1.3'); assert.ok(v.cpiRateStudy); assert.ok(Object.values(V.CLAIM).includes(v.card.claimType));
+  assert.equal(v.skillVersion, '1.8'); assert.ok(v.cpiRateStudy); assert.ok(Object.values(V.CLAIM).includes(v.card.claimType));
   assert.match(v.card.surprise, /captured before it \(0\.2%\); print minus previous is not a surprise/);
   // a print first seen 3 days after the release: kept, flagged, and the verdict says it is not read as a surprise
   const later = NOW + 5 * DAY, fc2 = forecast({ playbook: [{ ...fc.playbook[0], actual: '0.4%' }] });

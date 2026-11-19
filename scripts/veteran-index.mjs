@@ -1,4 +1,4 @@
-// Publishes the Macro veteran's research library (research/macro-veteran/, gptmacro_v.1 rev 1.3) to <out>/veteran/ with an
+// Publishes the Macro veteran's research library (research/macro-veteran/, gptmacro_v.1; revision from README.md) to <out>/veteran/ with an
 // index.json the Macro desk reads: every document with its title and group, the batch version, the validation summary,
 // "what's new" (README.md) and the state of the batch's real CPI pilot. Usage: node scripts/veteran-index.mjs out   (part of scripts/build.sh)
 import fs from 'node:fs';
@@ -12,6 +12,7 @@ const GROUPS = [
   ['Start here', /^(SKILL|BATCH_INDEX|README|START_HERE)\.md$|references\/(research-pack-index|latest-research-batch-status|research-analyst-operating-standard|research-brief-template)/],
   ['Gold and macro frameworks', /references\/(gold-driver-map|cross-asset-macro-regime|funding-collateral|derivatives-positioning|market-expectations|probability-forecast|macro-gold-source|advanced-market|hard-to-get|issuer-and-physical|issuer-fundamental|source-gap|empirical-market|meridianx-research-system)/],
   ['Release integrity and rates study', /references\/(bls-release-integrity|cpi-first-print|treasury-cpi|scripts\/(treasury-cpi|test_treasury))/],
+  ['News and release research', /references\/(news-|red-folder|v1-[678]-|employment-|ism-jobs|ppi-|pce-original|cpi-ppi-to-pce|core-cpi-to-core-pce)/],
   ['Briefs and cases',/references\/(gold-market-brief|japan-boj|china-|us-bank|gold-producer|integrated-oil|snc-credit|gdp-revision|newmont-cash-flow-model|us-october-2026)/],
   ['CPI pilot and forecast tools', /references\/(cpi-pilot|core-cpi|bls-publication|forecast-|scripts\/)/],
   ['Working notes', /^notes\//],
@@ -23,13 +24,19 @@ export function buildIndex(src = SRC) {
   const docs = files.map((p) => { const full = path.join(src, p), st = fs.statSync(full), text = /\.(md|json|jsonl|mjs|py|txt|tap)$/.test(p) ? fs.readFileSync(full, 'utf8') : '';
     const ext = path.extname(p).slice(1), kind = ext === 'md' ? 'doc' : ext === 'mjs' || ext === 'py' ? 'script' : ext === 'xlsx' ? 'workbook' : ext === 'tap' ? 'log' : 'data';
     return { path: p, title: ext === 'md' ? title(p, text) : path.basename(p), group: GROUPS.find(([, re]) => re.test(p))[0], kind, bytes: st.size, date: (/(20\d\d-\d\d(?:-\d\d)?)/.exec(p) || [])[1] || null }; });
-  const skill = fs.readFileSync(path.join(src, 'SKILL.md'), 'utf8'), ver = (/version:\s*"?([\d.]+)/.exec(skill) || [])[1] || null;
+  const skill = fs.readFileSync(path.join(src, 'SKILL.md'), 'utf8'), skillVer = (/version:\s*"?([\d.]+)/.exec(skill) || [])[1] || null;
+  // the package's revision: README.md's title ("revision 1.8": the 1.5 base plus the news increments), else SKILL.md's
+  let readme = ''; try { readme = fs.readFileSync(path.join(src, 'README.md'), 'utf8'); } catch (e) {}
+  const ver = (/^#.*revision ([\d.]+)/m.exec(readme) || [])[1] || skillVer;
   let validation = null; try { validation = JSON.parse(fs.readFileSync(path.join(src, 'validation.json'), 'utf8')); } catch (e) {}
   // README.md's "## What's new in <version>" bullets: plain words for the owner
-  let whatsNew = [], newIn = null; try { const rd = fs.readFileSync(path.join(src, 'README.md'), 'utf8'), m = /^## What's new in ([\d.]+)([^\n]*)\n([\s\S]*?)(?=\n## |(?![\s\S]))/m.exec(rd);
+  let whatsNew = [], newIn = null; try { const rd = readme, m = /^## What's new in ([\d.]+)([^\n]*)\n([\s\S]*?)(?=\n## |(?![\s\S]))/m.exec(rd);
     if (m) { whatsNew = m[3].split('\n').filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim()); newIn = (m[1] + m[2]).trim(); } } catch (e) {}
   const py = validation && validation.packaged_python_tests;
-  const tests = validation && (validation.forecast_tests || (py && { tests: py.passed + py.failed, passed: py.passed, kind: 'packaged Python tests' }));
+  // from 1.5 validation.json carries no counts: read the packaged test log ("Ran 12 tests … OK")
+  let log = null; try { const t = fs.readFileSync(path.join(src, 'package-tests.txt'), 'utf8'), n = /Ran (\d+) tests?/.exec(t);
+    if (n) log = { tests: +n[1], passed: /\nOK\b/.test(t) ? +n[1] : null, kind: 'packaged Python tests' }; } catch (e) {}
+  const tests = validation && (validation.forecast_tests || (py && { tests: py.passed + py.failed, passed: py.passed, kind: 'packaged Python tests' }) || log);
   return { v: 1, builtAt: new Date().toISOString(), skill: 'gptmacro-v-1', version: ver, prepared: (validation && validation.checked_at_utc || '').slice(0, 10) || null, whatsNew, newIn, groups: GROUPS.map((g) => g[0]).filter((g) => docs.some((d) => d.group === g)), docs, cpiPilot: cpiPilot(src),
     validation: validation && { checkedAt: validation.checked_at_utc, tests, intervalTests: validation.packaged_interval_tests || null, cpiStatus: validation.cpi_status || null, limits: validation.limits } };
 }
