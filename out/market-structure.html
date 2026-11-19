@@ -40,6 +40,7 @@
 <script src="/assets/backtest-engine.js?v=c114ba5997" defer></script>
 <script src="/assets/ms-draw.js?v=208210fe83" defer></script>
 <script src="/assets/ms-paper.js?v=ca1dcb8095" defer></script>
+<script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -2864,7 +2865,7 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
 </style>
 <style id="ms-dr-css">/* ChronosTrade's chart tools on the Desk (18 Nov 2026): drawing strip, style bar, right-click menu, 1-4 chart layout */
       #v-charts .sec-h { position: relative; }
-      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+      .ms-dr-cv { position: absolute; inset: 0; pointer-events: none; z-index: 3; } .ms-vp-cv { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
       html[data-drawing] #v-charts .ms-chart { cursor: crosshair; }
       .ms-chart[data-dcur="move"] { cursor: move; } .ms-chart[data-dcur="size"] { cursor: crosshair; } .ms-chart[data-dcur="lock"] { cursor: not-allowed; }
       #v-charts .sec-h > .dr-bar { order: 9; display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); align-items: center; }
@@ -9161,19 +9162,14 @@ function msNextSetup(bars, A) {
       B.forEach((b) => { const k = Math.floor((b.time - TZ) / 86400); if (k !== day) { day = k; pv = vv = p2 = 0; } const w = b.volume > 0 ? b.volume : 1, tp = (b.high + b.low + b.close) / 3; pv += tp * w; vv += w; p2 += tp * tp * w;
         const m = pv / vv, sd = Math.sqrt(Math.max(0, p2 / vv - m * m)); v.push(m); u.push(m + x.mult * sd); l.push(m - x.mult * sd); });
       return [{ v, title: 'VWAP', last: true, w: 2 }, { v: u, w: 1, dash: true }, { v: l, w: 1, dash: true }]; } },
-    vprof: { name: 'Volume Profile (POC, value area)', flow: true, p: { len: 300 }, calc: (B, x) => { const n = B.length, a = Math.max(0, n - x.len), S = B.slice(a); if (S.length < 20) return [];
-      const hi = Math.max(...S.map((b) => b.high)), lo = Math.min(...S.map((b) => b.low)), N = 60, st = (hi - lo) / N || 1, bins = Array(N).fill(0);
-      for (const b of S) { const w = b.volume > 0 ? b.volume : 1, i0 = Math.max(0, Math.min(N - 1, Math.floor((b.low - lo) / st))), i1 = Math.max(0, Math.min(N - 1, Math.floor((b.high - lo) / st))); for (let i = i0; i <= i1; i++) bins[i] += w / (i1 - i0 + 1); }
-      let poc = 0; bins.forEach((v, i) => { if (v > bins[poc]) poc = i; }); const tot = bins.reduce((s, v) => s + v, 0); let lo_ = poc, hi_ = poc, acc = bins[poc];
-      while (acc < tot * 0.7 && (lo_ > 0 || hi_ < N - 1)) { const dn = lo_ > 0 ? bins[lo_ - 1] : -1, up = hi_ < N - 1 ? bins[hi_ + 1] : -1; if (up >= dn) acc += bins[++hi_]; else acc += bins[--lo_]; }
-      const at = (p) => B.map((_, i) => (i >= a ? p : null)); return [{ v: at(lo + (poc + 0.5) * st), title: 'POC', last: true, w: 2 }, { v: at(lo + (hi_ + 1) * st), title: 'VAH', w: 1, dash: true }, { v: at(lo + lo_ * st), title: 'VAL', w: 1, dash: true }]; } },
+    vprof: { name: 'Volume Profile (visible range)', flow: true, p: { rows: 60, va: 70 }, calc: () => [] },   // drawn by assets/ms-vprof.js: a histogram of the candles in view, POC, value area
     rvol: { name: 'Relative Volume', osc: true, flow: true, p: { len: 20 }, calc: (B, x) => { const vol = B.map((b) => b.volume || 0); if (!vol.some((v) => v > 0)) return []; const m = iSMA(vol, x.len);
       return [{ v: vol.map((v, i) => (m[i] ? v / m[i] - 1 : null)), hist: true }, { v: vol.map((v, i) => (m[i] ? 1 : null)), color: 'rgba(138,148,168,.5)', w: 1, dash: true, title: 'RVOL − 1 (2x = +1)' }]; } },
   };
   const IND_COLORS = ['#2962ff', '#ff9800', '#9c27b0', '#00bcd4', '#e91e63', '#4caf50', '#795548', '#607d8b', '#f44336', '#3f51b5'];
   window.msInd = { key: () => 'ms-ind-' + (window.MS_WHO || 'guest'), max: 10,
     list() { try { const L = JSON.parse(localStorage.getItem(this.key()) || '[]'); return Array.isArray(L) ? L.filter((x) => IND_DEF[x.type]).slice(0, 10) : []; } catch (e) { return []; } },
-    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); if (window.msSplitMarkup) window.msSplitMarkup(); indRender(); } };
+    save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); if (window.msSplitMarkup) window.msSplitMarkup(); if (window.msVprofRepaint) window.msVprofRepaint(); indRender(); } };
   function indRender() {
     const L = window.msInd.list(), cnt = document.getElementById('ms-ind-n'); if (cnt) cnt.textContent = `${L.length}/10`;
     const lib = document.getElementById('ms-ind-lib'), cur = document.getElementById('ms-ind-cur'); if (!lib || !cur) return;

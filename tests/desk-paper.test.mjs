@@ -76,3 +76,17 @@ test('full screen takes the whole Charts view, so the layout, split and tools st
   assert.match(css, /#v-charts:fullscreen > \.ms-grid4 \{ flex: 1 1 0; min-height: 0; grid-auto-rows: minmax\(0, 1fr\);/);
   assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /document\.addEventListener\('fullscreenchange', \(\) => \{ const host = document\.fullscreenElement \|\| document\.body; for \(const id of \['ms-dsel', 'ms-cmenu'\]\)/);
 });
+
+test('volume profile: a histogram of the candles in view, split into buying and selling, with POC and a 70 % value area', async () => {
+  const VP = require('../assets/ms-vprof.js');
+  const bars = [{ high: 10, low: 0, close: 10, volume: 100 }, { high: 10, low: 5, close: 5, volume: 300 }, { high: 2, low: 0, close: 1, volume: 50 }];
+  const P = VP.profile(bars, 10, 70);
+  assert.equal(P.rows, 10); assert.ok(P.poc >= 5, 'the busiest rows are 5-10');
+  const tot = P.tot.reduce((s, v) => s + v, 0); assert.ok(Math.abs(tot - 450) < 1e-9, 'every unit of volume placed once');
+  const b0 = P.buy.reduce((s, v) => s + v, 0); assert.ok(Math.abs(b0 - (100 + 0 + 25)) < 1e-9, 'buying = volume times where the candle closed in its range');
+  const va = P.tot.slice(P.vaLo, P.vaHi + 1).reduce((s, v) => s + v, 0); assert.ok(va >= 0.7 * tot);
+  assert.equal(VP.profile([bars[0]]), null, 'too few candles');
+  assert.match(PAGE, /vprof: \{ name: 'Volume Profile \(visible range\)', flow: true, p: \{ rows: 60, va: 70 \}, calc: \(\) => \[\] \}/);
+  assert.match(PAGE, /<script src="\/assets\/ms-paper\.js" defer><\/script>\n<script src="\/assets\/ms-vprof\.js" defer><\/script>/);
+  assert.doesNotMatch(fs.readFileSync('assets/ms-vprof.js', 'utf8'), /fetch\(|localStorage|XMLHttpRequest/);
+});

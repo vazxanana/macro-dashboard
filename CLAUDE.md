@@ -2413,7 +2413,10 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   m1, atr, since); `window.msPaper()` is a read-only view. Tests: `tests/desk-paper.test.mjs`.
 - **Order flow** in the indicator library (`IND_DEF` `delta`, `cvd`, `vwap`, `vprof`, `rvol`, flag `flow`): Volume Delta and CVD
   (reset each UTC day) from `iDelta` = the candle's volume times where it closed in its range (-1 at the low, +1 at the high), VWAP
-  with ±n SD bands (UTC day), Volume Profile over the last `len` candles (60 bins, POC, 70 % value area), Relative Volume. ESTIMATED:
+  with ±n SD bands (UTC day), Relative Volume, and the Volume Profile (owner: "i want volume profile"): `assets/ms-vprof.js`
+  (`MS_VPROF.profile`) draws on every chart, while the indicator `vprof` is in the list, a histogram of the candles IN VIEW on the
+  right edge (`rows` 60, value area `va` 70 %), each row split into buying (green) and selling (red) by `iDelta`'s rule, the value
+  area stronger, POC / VAH / VAL as labelled lines; it follows pan, zoom, new candles and full screen (`window.msVprofState()`). ESTIMATED:
   OANDA's volume is a tick count and no feed gives the trades at the bid and ask; the menu says so. The pane bars now keep `volume`.
 - **Full screen** (each pane's ⛶) takes `#v-charts` full screen, so the view on (All as three by two, Split, Layout, one chart),
   the switches, the drawing strip and the paper bar stay; the charts share the height (`<style id="ms-cfs-css">`); `ms-draw.js`
