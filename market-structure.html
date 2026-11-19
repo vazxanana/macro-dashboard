@@ -3514,7 +3514,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     // the same empty cards (one per market with live quotes: 10, checked by tests/desk-load.test.mjs) and then fills them; before, the
     // row appeared when that script ran, seconds into a slow load, and pushed the page down. Same condition as there: the Vercel site.
     (function () { var box = document.getElementById('h-mk'), el = document.getElementById('h-mk-row'), hd = document.getElementById('h-date'); if (!box || !el || !window.MS_API || window.msBootGate) return;
-      el.innerHTML = new Array(10 + 1).join('<span class="h-mk-i h-mk-sk" aria-hidden="true"><span class="h-mk-t"><b></b><em></em></span><span class="h-mk-p"><b></b></span><span class="h-mk-m"></span><span class="h-mk-g"></span></span>');
+      el.innerHTML = new Array(17 + 1).join('<span class="h-mk-i h-mk-sk" aria-hidden="true"><span class="h-mk-t"><b></b><em></em></span><span class="h-mk-p"><b></b></span><span class="h-mk-m"></span><span class="h-mk-g"></span></span>');
       box.hidden = false; box.dataset.state = 'loading';
       if (hd && !hd.textContent) hd.textContent = new Date().toLocaleString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }); })();
     </script>
@@ -4946,6 +4946,15 @@ function msNextSetup(bars, A) {
     usdcad: { group: 'Forex', md: 'usdcad',  label: 'USD/CAD', name: 'Loonie',   binance: null, kraken: 'USDCAD', dec: 5, size: 'fxquote', color: '#2962ff' },
     usdjpy: { group: 'Forex', md: 'usdjpy',  label: 'USD/JPY', name: 'Yen',      binance: null, kraken: null, dec: 3, pip: 0.01, size: 'fxquote', color: '#2962ff' },
     usdchf: { group: 'Forex', md: 'usdchf',  label: 'USD/CHF', name: 'Swissy',   binance: null, kraken: 'USDCHF', dec: 5, size: 'fxquote', color: '#2962ff' },
+    // the most traded pairs after the majors (19 Nov 2026, owner: "add more fx pairs the most used"); OANDA only. A cross is sized
+    // through its quote currency's USD rate (quote: [pair, +1 multiply / -1 divide], from the shared quotes, msQuoteUsd)
+    nzdusd: { group: 'Forex', md: 'nzdusd',  label: 'NZD/USD', name: 'Kiwi',     binance: null, kraken: null, dec: 5, size: 'fx',    color: '#2962ff' },
+    eurgbp: { group: 'Forex', md: 'eurgbp',  label: 'EUR/GBP', name: 'Euro / Pound',  binance: null, kraken: null, dec: 5, size: 'cross', quote: ['gbpusd', 1],  color: '#2962ff' },
+    eurjpy: { group: 'Forex', md: 'eurjpy',  label: 'EUR/JPY', name: 'Euro / Yen',    binance: null, kraken: null, dec: 3, pip: 0.01, size: 'cross', quote: ['usdjpy', -1], color: '#2962ff' },
+    gbpjpy: { group: 'Forex', md: 'gbpjpy',  label: 'GBP/JPY', name: 'Pound / Yen',   binance: null, kraken: null, dec: 3, pip: 0.01, size: 'cross', quote: ['usdjpy', -1], color: '#2962ff' },
+    audjpy: { group: 'Forex', md: 'audjpy',  label: 'AUD/JPY', name: 'Aussie / Yen',  binance: null, kraken: null, dec: 3, pip: 0.01, size: 'cross', quote: ['usdjpy', -1], color: '#2962ff' },
+    eurchf: { group: 'Forex', md: 'eurchf',  label: 'EUR/CHF', name: 'Euro / Franc',  binance: null, kraken: null, dec: 5, size: 'cross', quote: ['usdchf', -1], color: '#2962ff' },
+    euraud: { group: 'Forex', md: 'euraud',  label: 'EUR/AUD', name: 'Euro / Aussie', binance: null, kraken: null, dec: 5, size: 'cross', quote: ['audusd', 1],  color: '#2962ff' },
   };
   let instKey = null;
   try { instKey = new URLSearchParams(location.search).get('s'); } catch (e) {}
@@ -6038,6 +6047,8 @@ function msNextSetup(bars, A) {
   // 00:00 UTC daily candles; a short Sunday-evening candle is skipped so Monday (and Sunday night) compare with Friday's close.
   // closed = the newest daily candle is complete (weekend / holiday); stale = no H1 candle in the last 3 hours while not closed.
   const MDQ = { at: 0, p: null, q: {} };
+  // one unit of a cross's quote currency in US dollars, from the shared quotes (null until they are in)
+  window.msQuoteUsd = (I) => { if (!I || !I.quote) return null; const q = MDQ.q[I.quote[0]]; if (!q || !(q.c > 0)) return null; return I.quote[1] > 0 ? q.c : 1 / q.c; };
   function mdQuotes() {
     if (!MD.base || MD.on === false || window.msBootGate) return Promise.resolve({});   // no quotes under the first-load sign-in card
     if (MDQ.p && Date.now() - MDQ.at < 50e3) return MDQ.p;
@@ -6549,6 +6560,7 @@ function msNextSetup(bars, A) {
       const mgc = Math.floor(G.risk / (r * 10)), gc = Math.floor(G.risk / (r * 100));
       return mgc ? `${mgc} MGC${gc ? ` · ${gc} GC` : ''}` : `${usd(r * 10)}/MGC`;
     }
+    if (INST.size === 'cross') { const u2 = window.msQuoteUsd(INST); if (!u2) return 'size after the quotes load'; const lots = G.risk / (r * 100000 * u2); return lots >= 0.01 ? `${lots.toFixed(2)} lots` : 'Under 0.01 lot'; }
     if (INST.size === 'fx' || INST.size === 'fxquote') {
       const lots = (INST.size === 'fxquote' ? G.risk * price : G.risk) / (r * 100000);
       return lots >= 0.01 ? `${lots.toFixed(2)} lots` : 'Under 0.01 lot';
@@ -7743,7 +7755,15 @@ function msNextSetup(bars, A) {
     addEventListener('scroll', () => { if (!MENU.hidden) close(); }, { passive: true });
     const mkName = () => { const m = document.getElementById('ms-mk-btn'); return m ? m.textContent.trim() : ''; };
     const openMarket = () => { const d = document.getElementById('ms-mk'); if (!d) return; document.documentElement.classList.add('mk-sheet'); d.open = true; setTimeout(() => { const q = document.getElementById('ms-mk-q'); if (q) q.focus(); }, 30); };
-    { const d = document.getElementById('ms-mk'); if (d) d.addEventListener('toggle', () => { if (!d.open) document.documentElement.classList.remove('mk-sheet'); }); }
+    { const d = document.getElementById('ms-mk'); if (d) d.addEventListener('toggle', () => { if (!d.open) { document.documentElement.classList.remove('mk-sheet'); const pop = d.querySelector('.mk-pop'); if (pop) pop.removeAttribute('style'); } }); }
+    // the market on the Charts toolbar, next to Split (19 Nov 2026, owner: move the header's market picker there; the price chips go):
+    // it opens the header's own market list under itself
+    { const seg = document.querySelector('#v-charts .sec-h > .seg[aria-label="Chart view"]');
+      if (seg && !document.getElementById('ms-ch-mk')) { const b = document.createElement('button'); b.type = 'button'; b.id = 'ms-ch-mk'; b.className = 'ch-mk'; b.setAttribute('aria-haspopup', 'listbox');
+        const sync = () => { const n = mkName() || 'Market'; if (b.textContent !== n) { b.textContent = n; b.setAttribute('aria-label', `Market ${n}: choose another`); } };
+        b.addEventListener('click', (e) => { e.stopPropagation(); const d = document.getElementById('ms-mk'); if (!d) return; if (d.open) { d.open = false; return; } openMarket();
+          if (innerWidth > 640) { const pop = d.querySelector('.mk-pop'), r = b.getBoundingClientRect(); if (pop) pop.setAttribute('style', `position: fixed; left: ${Math.max(8, r.left)}px; top: ${r.bottom + 6}px; right: auto; z-index: 70;`); } });
+        seg.before(b); sync(); const m = document.getElementById('ms-mk-btn'); if (m && window.MutationObserver) new MutationObserver(sync).observe(m, { childList: true, characterData: true, subtree: true }); } }
     root.querySelectorAll('.ms-grid4 > .ms-pane[data-tf]').forEach((pn) => { const ph = pn.querySelector('.ms-ph'), lab = ph && ph.querySelector(':scope > b'); if (!ph || !lab || ph.querySelector('.ph-tf')) return;
       const t = document.createElement('button'); t.type = 'button'; t.className = 'ph-tf'; t.setAttribute('aria-haspopup', 'menu'); t.setAttribute('aria-expanded', 'false'); t.textContent = lab.textContent; t.setAttribute('aria-label', `Timeframe ${lab.textContent}: choose another`);
       t.addEventListener('click', (e) => { e.stopPropagation(); openMenu(pn, t); });
@@ -15004,6 +15024,16 @@ html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role=
 .ph-menu button[aria-checked="true"] { font-weight: 700; } .ph-menu button[aria-checked="true"]::after { content: ""; margin-left: auto; width: 10px; height: 5px; border-left: 2px solid var(--au-accent, var(--accent)); border-bottom: 2px solid var(--au-accent, var(--accent)); transform: rotate(-45deg); }
 .ph-menu .ph-m-n { margin: 4px 10px 6px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); max-width: 220px; }
 @media (pointer: coarse) { .ms-ph .ph-tf, .ms-ph .ph-mk, .ph-menu button { min-height: 44px; } }
+/* the market on the toolbar next to Split; the header's picker and the price chips leave the Charts page (19 Nov 2026) */
+#v-charts .sec-h > .ch-mk { order: 2; display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 12px; margin-right: 8px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font: 650 14px var(--sans); cursor: pointer; }
+#v-charts .sec-h > .ch-mk::after { content: ""; width: 6px; height: 6px; margin-top: -3px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); opacity: .7; }
+#v-charts .sec-h > .ch-mk:hover { background: var(--au-surface-2, var(--panel-2)); }
+html[data-role="public"] #v-charts .sec-h > .ch-mk { display: none; }
+html:not([data-role="public"])[data-view="charts"] #v-charts .sec-h > #ms-wl { display: none !important; }
+html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { display: none !important; }
+@media (min-width: 1180px) { html:not([data-role="public"])[data-view="charts"] .top .brand > .ms-coin { display: none !important; } }   /* the sidebar carries the mark */
+@media (pointer: coarse) { #v-charts .sec-h > .ch-mk { min-height: 44px; } }
+@media (max-width: 640px) { html:not([data-role="public"])[data-view="charts"] #v-charts .sec-h > .ch-mk { display: none; } }
 /* the grouped timeframe menu (19 Nov 2026): seconds to a year as chips, the analysed ones underlined */
 .ph-menu { max-height: calc(100vh - 16px); overflow-y: auto; width: 296px; box-sizing: border-box; }
 .ph-menu .ph-m-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 0 2px; }

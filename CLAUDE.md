@@ -2435,6 +2435,16 @@ toolbar no longer shows D1-M1 / All (the hidden buttons stay: keys 1-6 / 0 and t
 ICT: the markup switch is in Style (`.mk-mode.mk-in-sty`), the toolbar's Clean is a toggle back to the last markup (`G.lastMk`).
 Test: `tests/desk-draw.test.mjs`. Crypto markets have no OANDA candles, so their seconds / H3 / month charts may say "no data".
 
+## Charts: market on the toolbar, no price chips, more forex pairs (19 Nov 2026, owner's marked screenshot: "remove purple, move red, add more fx pairs the most used")
+Display only, `market-structure.html`. On Charts (members) the price chips `#ms-wl` and the header's market picker summary are hidden
+(desktop too; the sidebar carries the mark from 1180 px); a market button `#ms-ch-mk` before Split opens the header's own market list
+under itself (`openMarket`, the list positioned fixed; phones keep each chart's own market button). `INSTRUMENTS` gained NZD/USD and
+the crosses EUR/GBP, EUR/JPY, GBP/JPY, AUD/JPY, EUR/CHF, EUR/AUD (OANDA only). A cross has `size: 'cross'` and `quote: [pair, +1 | -1]`:
+its lot size goes through the quote currency's USD rate from the shared quotes (`window.msQuoteUsd`), on the setup card and in the
+paper account (whose engine units are dollars a price unit). The early Home market skeleton draws 17 cards. ChronosTrade, same day:
+at 5x and 12x a committed candle reaches the split panes one pane a frame (`XQ`, `xpQueue`), and `xpLive` skips a pane still queued.
+Tests: `tests/desk-draw.test.mjs`.
+
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
 - **Paper account** `assets/ms-paper.js` (`window.MS_PAPER` pure: `fresh`, `norm`, `order`, `process`, `stats`, `floating`, `sizeText`;
   page part after `module.exports`), a bar `#ms-pp` above the six panes (`<style id="ms-pp-css">`; hidden for guests; behind More

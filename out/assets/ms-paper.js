@@ -28,6 +28,7 @@
     if (!I) return '';
     if (I.size === 'fx') return r2(units / 1e5, 2) + ' lot';
     if (I.size === 'fxquote') return r2(units * entry / 1e5, 2) + ' lot';
+    if (I.size === 'cross') { const u2 = window.msQuoteUsd && window.msQuoteUsd(I); return u2 ? r2(units / (1e5 * u2), 2) + ' lot' : r2(units, 0) + ' units'; }   // engine units are dollars a price unit
     if (I.size === 'gold') return r2(units, 2) + ' oz';
     return r2(units, units < 10 ? 4 : 2) + ' ' + (I.unit || 'units');
   }

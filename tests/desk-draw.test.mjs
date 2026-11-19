@@ -117,3 +117,17 @@ test('each chart chooses its own timeframe (19 Nov 2026): a menu in the chart he
   assert.match(page, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] #v-charts \.sec-h > :is\(h2, #ms-wl, \.seg\[aria-label="Chart view"\]\) \{ display: none !important; \}/);
   assert.match(page, /\.brand \.mk-list \.mk-n \{ display: grid !important; \}/, 'the phone market list shows its names');
 });
+
+test('more forex pairs, sized through the quote currency; the market on the toolbar, no price chips on Charts (19 Nov 2026)', () => {
+  const inst = PAGE.slice(PAGE.indexOf('const INSTRUMENTS = {'), PAGE.indexOf('let instKey = null;'));
+  const oanda = fs.readFileSync(new URL('../api/_oanda.js', import.meta.url), 'utf8');
+  for (const k of ['nzdusd', 'eurgbp', 'eurjpy', 'gbpjpy', 'audjpy', 'eurchf', 'euraud']) { assert.match(inst, new RegExp(`\\n    ${k}: \\{ group: 'Forex', md: '${k}'`)); assert.match(oanda, new RegExp(`\\['${k}', '`), `the candle proxy knows ${k}`); }
+  for (const m of inst.matchAll(/size: 'cross', quote: \['(\w+)', (-?1)\]/g)) assert.match(inst, new RegExp(`\\n    ${m[1]}: \\{ group: 'Forex'`), 'the quote pair is a market with quotes');
+  assert.match(PAGE, /window\.msQuoteUsd = \(I\) => \{ if \(!I \|\| !I\.quote\) return null;/);
+  const paper = fs.readFileSync(new URL('../assets/ms-paper.js', import.meta.url), 'utf8');
+  assert.match(paper, /if \(I\.size === 'cross'\) \{ const u2 = window\.msQuoteUsd && window\.msQuoteUsd\(I\); return u2 \? r2\(units \/ \(1e5 \* u2\), 2\) \+ ' lot'/);
+  assert.match(PAGE, /el\.innerHTML = new Array\(17 \+ 1\)/);
+  assert.match(PAGE, /b\.id = 'ms-ch-mk'/);
+  assert.match(PAGE, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] #v-charts \.sec-h > #ms-wl \{ display: none !important; \}/);
+  assert.match(PAGE, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] \.top \.brand #ms-mk-btn \{ display: none !important; \}/);
+});

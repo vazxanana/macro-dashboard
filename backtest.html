@@ -1449,7 +1449,13 @@
   // was rebuilt from scratch (thousands of candles) each time. Now every committed candle reaches each pane through its cheap
   // one-candle path, and the forming candle of a pane on the same or a higher timeframe grows with the first chart's
   // (xpLive: display only, never stored in the pane's data; a lower timeframe still shows closed candles only).
-  function xpStep() { if (!XP.panes.length || XF) return; for (const P of XP.panes) if (!P.loading && !P.err) xpDraw(P, false); }
+  // at 5x and 12x (19 Nov 2026, owner: "make the replay speed smoother at 12x too"): the committed candle reaches the panes one pane a
+  // frame instead of all in the frame that commits it, so no single frame redraws every chart (the first chart's own frame stays light)
+  const XQ = new Set(); let XQR = 0;
+  const xpQueue = () => { XQR = 0; const P = XQ.values().next().value; if (!P) return; XQ.delete(P); if (XP.panes.includes(P) && !P.loading && !P.err) xpDraw(P, false); if (XQ.size) XQR = requestAnimationFrame(xpQueue); };
+  function xpStep() { if (!XP.panes.length || XF) return; const fast = S.timer && +$('speed').value < 500;
+    for (const P of XP.panes) if (!P.loading && !P.err) { if (fast) XQ.add(P); else { XQ.delete(P); xpDraw(P, false); } }
+    if (XQ.size && !XQR) XQR = requestAnimationFrame(xpQueue); }
   // a candle of a lower pane forming like a live market (19 Nov 2026, owner: "candles that still forming like real live market"): while
   // the first chart's candle forms over its slot, the pane shows that slot's own finer candles as the slot's time passes, the one
   // that holds the moment growing open, first extreme, second, close (the first chart's path). Display only: never stored in the
@@ -1463,7 +1469,7 @@
         let hi = Math.max(b.open, px), lo = Math.min(b.open, px); for (let j = 1; j <= k; j++) { hi = Math.max(hi, pts[j]); lo = Math.min(lo, pts[j]); } x = { time: b.time, open: b.open, high: hi, low: lo, close: px }; } }
       try { P.series.update(x); P.liveT = b.time; } catch (e) {} } };
   let XL = 0; function xpLive(t, o, hi, lo, c, p) { if (!XP.panes.length || !cur()) return; const nw = performance.now(); if (nw - XL < 80) return; XL = nw; const B = TFS[S.tf];   // about 12 a second: every frame cost the first chart half its frame rate on a slow phone
-    for (const P of XP.panes) { if (P.loading || P.err || !P.data.length) continue; const sec = P.sec || TFS[P.tf]; if (sec < B) { if (p != null && !S.part) xpLower(P, sec, t, B, p); continue; }
+    for (const P of XP.panes) { if (P.loading || P.err || !P.data.length || XQ.has(P)) continue; const sec = P.sec || TFS[P.tf]; if (sec < B) { if (p != null && !S.part) xpLower(P, sec, t, B, p); continue; }
       try { if (sec === B) P.series.update({ time: t, open: o, high: hi, low: lo, close: c });
         else { const L = P.data[P.data.length - 1]; if (!L || t < L.time || t >= L.time + sec) continue; P.series.update({ time: L.time, open: L.open, high: Math.max(L.high, hi), low: Math.min(L.low, lo), close: c }); } } catch (e) {} } }
   document.querySelectorAll('#splitdd [data-split]').forEach((b) => b.addEventListener('click', () => { XP.n = +b.dataset.split; xpSave(); loadHtf(); const d = $('splitdd'); if (d) d.open = false; }));
