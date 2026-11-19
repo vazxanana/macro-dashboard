@@ -176,7 +176,7 @@ test('the argument\'s record: weekly debates resolved at the horizon, a per-topi
 
 test('revision 1.3: the port names its skill version and reads the batch\'s real CPI pilot', () => {
   assert.equal(V.SKILL_VERSION, '1.3');
-  const c = V.cpiPilot(); assert.equal(c.point, 0.255); assert.equal(c.status, 'unresolved'); assert.match(c.label, /not a scored forecast/); assert.equal(c.releaseUtc, '2026-11-10T13:30:00Z');
+  const c = V.cpiPilot(); assert.equal(c.point, 0.255); assert.equal(c.status, 'unresolved'); assert.match(c.label, /not a scored forecast/); assert.equal(c.outcome, null); assert.equal(c.pending, 1, 'the 17 Nov null-outcome record is a pending attempt'); assert.equal(c.releaseUtc, '2026-11-10T13:30:00Z');
   assert.equal(V.cpiPilot('/nonexistent/ledger.jsonl'), null, 'the Vercel bundle has no research/: null, never a throw');
 });
 

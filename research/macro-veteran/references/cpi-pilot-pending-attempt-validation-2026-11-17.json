@@ -1,0 +1,37 @@
+{
+  "status": "PASS_BOUNDED_PENDING_ATTEMPT_APPEND",
+  "recorded_at_utc": "2026-11-17T21:01:06.356Z",
+  "records_schema_validated": 2,
+  "ledger": "outputs/cpi-pilot-forecast-ledger.jsonl",
+  "original_issuance_bytes": 4559,
+  "original_issuance_sha256": "3341d6397ad0715f490f80c3484a5824ee5323d5ac536ad953385f45e90ce1b1",
+  "original_bytes_preserved_as_exact_prefix": true,
+  "appended_record_id": "us-core-cpi-sa-mom-2026-10-blend-pilot-v1-pending-attempt-2026-11-17",
+  "current_ledger_sha256": "a5d1f067459fded50d8bf3890742ad422ad68d164c38f1b4f70c592827f1c2e0",
+  "observation": {
+    "file": "work/raw/cpi-pilot-outcome-2026-11-17/web-observation.json",
+    "sha256": "121bd483c328248f84792e5a921484f0ba8a30b607de48345b102dbf3ab2f2ec",
+    "kind": "selected text from web tool representation; not downloaded raw HTML"
+  },
+  "evaluation": {
+    "file": "outputs/cpi-pilot-asof-2026-11-17.json",
+    "sha256": "abe517cdcc1386ee2abad614e2ea463654b63c73cfb307dcebdeb7aa6ac29e51",
+    "counts": {
+      "registered": 1,
+      "unresolved": 1
+    },
+    "pending_resolution_attempts": 1,
+    "aggregate_scores": []
+  },
+  "immutable_policy_input_sha256": {
+    "plan": "4bbbed01b776c3f54459d11208ec21c6fc067b082acc48018750410b9f672538",
+    "protocol": "fb6fb6593672450c00af3bfa1406f3c7c1aa88403e51d30fb9ebcb71ce381157",
+    "evidence": "5bdb730452865e37719c30e9dc5872635273e7c8b8be02f1ac9f09f3c27fcb52"
+  },
+  "limits": [
+    "Local append/prefix and schema/runtime checks do not establish tamper-proof historical storage.",
+    "Current archive candidate 0.3 is unverified for the first-release contract; no primary outcome or score.",
+    "Hash identifies a qualified web-text observation, not raw HTML or original release-day bytes.",
+    "No original forecast, deadline, comparator or evaluator rule was changed."
+  ]
+}

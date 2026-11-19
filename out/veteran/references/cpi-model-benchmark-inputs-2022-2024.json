@@ -1,0 +1,4104 @@
+{
+  "created_at_utc": "2026-11-09T07:37:54.571732+00:00",
+  "status": "inputs/predictors only; no forecast errors computed",
+  "analysis_code_sha256": "47192c0a8034930e98814466c11cafb704843684db34fd96203f1b7de8659343",
+  "protocol_sha256": "20af261af80ba9c6808248b6a1fc1b2b30592a81a2036c656a48c232a3550743",
+  "bound_input_hashes": {
+    "outputs/cpi-first-print-release-ledger-2022-2024.json": "0004d715f03c8e6f557721cf527dee4fad4a98dcea1679d9212efa58c9012052",
+    "work/raw/cpi-expectations-history/release-year-cohort-2022-2024.json": "b302d10bc7eab7e413866b88a8ccce061b088107840446dd9bd80151ad9da1cc",
+    "work/raw/cpi-expectations-history/cleveland-nowcast-month.json": "9253b45d839c5fe1e5fd1e2d583f9f7aa48bedeb02b4a4060a04041d598c17cd",
+    "work/cpi-model-baseline-seed-2021.json": "9b2bba9de3d9323f350406fc132578247b66cfb2ab68e452edfc18c73b5b526e",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_01122022.htm": "45ca364e1633fd50ab3a299a5da2abe5cf9086f36c8aecfe4dd9f4658df50174",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_02102022.htm": "278ff1e8da6a2c199312427cba7e1dbd0102da6a31d2c0dd2264113834abbd1f",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_03102022.htm": "89ebc9016ab0ea900fefddf2f3f186b8bcbe7a00cf8684f8059c3363ea7dc35a",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_04122022.htm": "7d654607289ed3e15ec297d2be342975a2121ce5d4c6deb25c61ec044785f18b",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_05112022.htm": "d9d7eaa0508822501f09a3c5e691d64c23c9a9c1fbb48a1cc6d3fd5b2aa8c0eb",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_06102022.htm": "03658a0ce2c08701bb423cf232e8c255555abe84fc77ff802fe2e728927fc7d9",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_07132022.htm": "0e4feecbeb007b5271816feb7a6209b3becb651ec0a850d56dcdd3f7e9c8b8a6",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_08102022.htm": "f613dce5a40c06f857fc4c92f181dac917405bb541d707fbdc7d123787feff38",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_09132022.htm": "0fe793a6526f424fa85619b4283e172f0ae143ae94162f1a1910b968be1b97c3",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_10132022.htm": "10186f619f5b69fc3f0589a3953544ec72e730da62e0ac2593e89360889358a0",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_11102022.htm": "003a8366cdc1ba4750dff3bf753d79ae3aba7b5965821dd0fb44581ed17d80f0",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_12132022.htm": "a4897e63121e1941cdfee5d6f412df676a00e1f1b2c852859b2554bae48c2b69",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_01122023.htm": "9d5d5aa086ad1b9f299e9ea2603ef76695b4b2c8abe48ca90554c9237e8d60a1",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_02142023.htm": "5bddfbdd162cc083d7b8db217f5093612544f1b6f29a525740f65bfb34223c00",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_03142023.htm": "0d1282519139a5511365c44bafe20353c3a0fd41a81f0b94202df7238042cf41",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_04122023.htm": "ffdfcfe1c00558469848e28eeb1f0a1f716be8f90879a45f6ccd8d18daa34cb9",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_05102023.htm": "0586dd5f313c59d400ca5795c3d202e0740317dd643fb25325abe3b513a27766",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_06132023.htm": "441fbaa7e7e15727f107dbf06b7965dd0e35621501952af435d9a2ce12b26f65",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_07122023.htm": "0dac29c5d2b108e4b32731f6b1db8d8da5372ddf6ac4802b4b1ee4932b3265d1",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_08102023.htm": "847727876ffbf92677e38b6591743411666107ba883e90f2bd9da3584d96568b",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_09132023.htm": "83a7380d4e81463a3266935617ac086f8edc5f2ef3b9fee826bd2b521eaccf49",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_10122023.htm": "5d33f0a6efd860412cdefe5911ab4cf0fa27e0dc852102c1cc5a6619bfb413cd",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_11142023.htm": "95e006e0d5d3093939016bd5b08159fb688aae1de2f256ef56caf041763d946b",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_12122023.htm": "0342155f3fcb4dd68166c8c8e33e0a049662c97100de2d0f4903628d179b660e",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_01112024.htm": "5af03777daf991ada26ce61a3002e3f49d9f8f25c3e4ce88131692c86a6eb7e6",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_02132024.htm": "90914201190d8f8b1f19da73932f83e2c3651f31316a65de6de5dd605647cb16",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_03122024.htm": "233d5f46067ec4110fcbb59e3c19a880f81184177f56733062dd312e4253ae66",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_04102024.htm": "c23838dff36779ca5a3e439b9d5c451b1cbb8689adebcfb42c477dd9284337b8",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_05152024.htm": "5ed19921c617b95f99140ad464a59c142d5d24726a39508a67d471660a4185c8",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_06122024.htm": "76eff97eff76a812263bd21d8e55c29c42ea2b883c7dea4ff98f326112cf8437",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_07112024.htm": "fb0a5c1351be3a2a15c6c249ed792d630af5e47e4c7278db492c079a702086db",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_08142024.htm": "4568374b38f65dac54e32f3a166725e7e62fa2ed8ba38bc7aa280ba625e82781",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_09112024.htm": "0d933d2577073291772e8123c6f1b7def0822ae3f4a009c0ef028587bad98217",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_10102024.htm": "e2d8d6f1689494275ef6879be7548b97fcaec8862c944f6fc0f1911c621f6ac0",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_11132024.htm": "ad0279d8d9bf165360affa63a8b640b28dbea9c49c6bfcc6f66f451d9e637769",
+    "work/raw/cpi-expectations-history/bls-releases/cpi_12112024.htm": "415282398015c224606261fb978ec7c61c35647ec5b3438fa3f613111217bb0e",
+    "work/raw/cpi-model-baseline-2021/cpi_10132021.htm": "781f454108ff26581b6e588f5ea7ef1bdb31a853cbe2d26f6d389d35492251ca",
+    "work/raw/cpi-model-baseline-2021/cpi_11102021.htm": "7cd6e19b25801c6c0fc1ea47daada29ef2c1fc8f07cbc86cd6f305cb8fce684a",
+    "work/raw/cpi-model-baseline-2021/cpi_12102021.htm": "af93439757010f85ae189def01776fd25c7464498a50a5f25fd9c2bc25645432"
+  },
+  "BLS_actual_months": 39,
+  "model_field_matches_against_raw": 72,
+  "source_records": {
+    "2021-12": {
+      "release_date": "2022-01-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_01122022.htm",
+      "source_sha256": "45ca364e1633fd50ab3a299a5da2abe5cf9086f36c8aecfe4dd9f4658df50174"
+    },
+    "2022-01": {
+      "release_date": "2022-02-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_02102022.htm",
+      "source_sha256": "278ff1e8da6a2c199312427cba7e1dbd0102da6a31d2c0dd2264113834abbd1f"
+    },
+    "2022-02": {
+      "release_date": "2022-03-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_03102022.htm",
+      "source_sha256": "89ebc9016ab0ea900fefddf2f3f186b8bcbe7a00cf8684f8059c3363ea7dc35a"
+    },
+    "2022-03": {
+      "release_date": "2022-04-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_04122022.htm",
+      "source_sha256": "7d654607289ed3e15ec297d2be342975a2121ce5d4c6deb25c61ec044785f18b"
+    },
+    "2022-04": {
+      "release_date": "2022-05-11",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_05112022.htm",
+      "source_sha256": "d9d7eaa0508822501f09a3c5e691d64c23c9a9c1fbb48a1cc6d3fd5b2aa8c0eb"
+    },
+    "2022-05": {
+      "release_date": "2022-06-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_06102022.htm",
+      "source_sha256": "03658a0ce2c08701bb423cf232e8c255555abe84fc77ff802fe2e728927fc7d9"
+    },
+    "2022-06": {
+      "release_date": "2022-07-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_07132022.htm",
+      "source_sha256": "0e4feecbeb007b5271816feb7a6209b3becb651ec0a850d56dcdd3f7e9c8b8a6"
+    },
+    "2022-07": {
+      "release_date": "2022-08-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_08102022.htm",
+      "source_sha256": "f613dce5a40c06f857fc4c92f181dac917405bb541d707fbdc7d123787feff38"
+    },
+    "2022-08": {
+      "release_date": "2022-09-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_09132022.htm",
+      "source_sha256": "0fe793a6526f424fa85619b4283e172f0ae143ae94162f1a1910b968be1b97c3"
+    },
+    "2022-09": {
+      "release_date": "2022-10-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_10132022.htm",
+      "source_sha256": "10186f619f5b69fc3f0589a3953544ec72e730da62e0ac2593e89360889358a0"
+    },
+    "2022-10": {
+      "release_date": "2022-11-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_11102022.htm",
+      "source_sha256": "003a8366cdc1ba4750dff3bf753d79ae3aba7b5965821dd0fb44581ed17d80f0"
+    },
+    "2022-11": {
+      "release_date": "2022-12-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_12132022.htm",
+      "source_sha256": "a4897e63121e1941cdfee5d6f412df676a00e1f1b2c852859b2554bae48c2b69"
+    },
+    "2022-12": {
+      "release_date": "2023-01-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_01122023.htm",
+      "source_sha256": "9d5d5aa086ad1b9f299e9ea2603ef76695b4b2c8abe48ca90554c9237e8d60a1"
+    },
+    "2023-01": {
+      "release_date": "2023-02-14",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_02142023.htm",
+      "source_sha256": "5bddfbdd162cc083d7b8db217f5093612544f1b6f29a525740f65bfb34223c00"
+    },
+    "2023-02": {
+      "release_date": "2023-03-14",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_03142023.htm",
+      "source_sha256": "0d1282519139a5511365c44bafe20353c3a0fd41a81f0b94202df7238042cf41"
+    },
+    "2023-03": {
+      "release_date": "2023-04-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_04122023.htm",
+      "source_sha256": "ffdfcfe1c00558469848e28eeb1f0a1f716be8f90879a45f6ccd8d18daa34cb9"
+    },
+    "2023-04": {
+      "release_date": "2023-05-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_05102023.htm",
+      "source_sha256": "0586dd5f313c59d400ca5795c3d202e0740317dd643fb25325abe3b513a27766"
+    },
+    "2023-05": {
+      "release_date": "2023-06-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_06132023.htm",
+      "source_sha256": "441fbaa7e7e15727f107dbf06b7965dd0e35621501952af435d9a2ce12b26f65"
+    },
+    "2023-06": {
+      "release_date": "2023-07-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_07122023.htm",
+      "source_sha256": "0dac29c5d2b108e4b32731f6b1db8d8da5372ddf6ac4802b4b1ee4932b3265d1"
+    },
+    "2023-07": {
+      "release_date": "2023-08-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_08102023.htm",
+      "source_sha256": "847727876ffbf92677e38b6591743411666107ba883e90f2bd9da3584d96568b"
+    },
+    "2023-08": {
+      "release_date": "2023-09-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_09132023.htm",
+      "source_sha256": "83a7380d4e81463a3266935617ac086f8edc5f2ef3b9fee826bd2b521eaccf49"
+    },
+    "2023-09": {
+      "release_date": "2023-10-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_10122023.htm",
+      "source_sha256": "5d33f0a6efd860412cdefe5911ab4cf0fa27e0dc852102c1cc5a6619bfb413cd"
+    },
+    "2023-10": {
+      "release_date": "2023-11-14",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_11142023.htm",
+      "source_sha256": "95e006e0d5d3093939016bd5b08159fb688aae1de2f256ef56caf041763d946b"
+    },
+    "2023-11": {
+      "release_date": "2023-12-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_12122023.htm",
+      "source_sha256": "0342155f3fcb4dd68166c8c8e33e0a049662c97100de2d0f4903628d179b660e"
+    },
+    "2023-12": {
+      "release_date": "2024-01-11",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_01112024.htm",
+      "source_sha256": "5af03777daf991ada26ce61a3002e3f49d9f8f25c3e4ce88131692c86a6eb7e6"
+    },
+    "2024-01": {
+      "release_date": "2024-02-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_02132024.htm",
+      "source_sha256": "90914201190d8f8b1f19da73932f83e2c3651f31316a65de6de5dd605647cb16"
+    },
+    "2024-02": {
+      "release_date": "2024-03-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_03122024.htm",
+      "source_sha256": "233d5f46067ec4110fcbb59e3c19a880f81184177f56733062dd312e4253ae66"
+    },
+    "2024-03": {
+      "release_date": "2024-04-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_04102024.htm",
+      "source_sha256": "c23838dff36779ca5a3e439b9d5c451b1cbb8689adebcfb42c477dd9284337b8"
+    },
+    "2024-04": {
+      "release_date": "2024-05-15",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_05152024.htm",
+      "source_sha256": "5ed19921c617b95f99140ad464a59c142d5d24726a39508a67d471660a4185c8"
+    },
+    "2024-05": {
+      "release_date": "2024-06-12",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_06122024.htm",
+      "source_sha256": "76eff97eff76a812263bd21d8e55c29c42ea2b883c7dea4ff98f326112cf8437"
+    },
+    "2024-06": {
+      "release_date": "2024-07-11",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_07112024.htm",
+      "source_sha256": "fb0a5c1351be3a2a15c6c249ed792d630af5e47e4c7278db492c079a702086db"
+    },
+    "2024-07": {
+      "release_date": "2024-08-14",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_08142024.htm",
+      "source_sha256": "4568374b38f65dac54e32f3a166725e7e62fa2ed8ba38bc7aa280ba625e82781"
+    },
+    "2024-08": {
+      "release_date": "2024-09-11",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_09112024.htm",
+      "source_sha256": "0d933d2577073291772e8123c6f1b7def0822ae3f4a009c0ef028587bad98217"
+    },
+    "2024-09": {
+      "release_date": "2024-10-10",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_10102024.htm",
+      "source_sha256": "e2d8d6f1689494275ef6879be7548b97fcaec8862c944f6fc0f1911c621f6ac0"
+    },
+    "2024-10": {
+      "release_date": "2024-11-13",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_11132024.htm",
+      "source_sha256": "ad0279d8d9bf165360affa63a8b640b28dbea9c49c6bfcc6f66f451d9e637769"
+    },
+    "2024-11": {
+      "release_date": "2024-12-11",
+      "source_file": "work/raw/cpi-expectations-history/bls-releases/cpi_12112024.htm",
+      "source_sha256": "415282398015c224606261fb978ec7c61c35647ec5b3438fa3f613111217bb0e"
+    },
+    "2021-09": {
+      "release_date": "2021-10-13",
+      "source_file": "work/raw/cpi-model-baseline-2021/cpi_10132021.htm",
+      "source_sha256": "781f454108ff26581b6e588f5ea7ef1bdb31a853cbe2d26f6d389d35492251ca"
+    },
+    "2021-10": {
+      "release_date": "2021-11-10",
+      "source_file": "work/raw/cpi-model-baseline-2021/cpi_11102021.htm",
+      "source_sha256": "7cd6e19b25801c6c0fc1ea47daada29ef2c1fc8f07cbc86cd6f305cb8fce684a"
+    },
+    "2021-11": {
+      "release_date": "2021-12-10",
+      "source_file": "work/raw/cpi-model-baseline-2021/cpi_12102021.htm",
+      "source_sha256": "af93439757010f85ae189def01776fd25c7464498a50a5f25fd9c2bc25645432"
+    }
+  },
+  "records": [
+    {
+      "event_id": "us-cpi-release-2022-01-12",
+      "reference_month": "2021-12",
+      "release_date": "2022-01-12",
+      "model_chart_date": "2022-01-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "202333537521829/500000000000000",
+              "numeric": 0.404667075043658
+            },
+            "P": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "R3": {
+              "exact_fraction": "13/30",
+              "numeric": 0.43333333333333335
+            },
+            "B50": {
+              "exact_fraction": "452333537521829/1000000000000000",
+              "numeric": 0.452333537521829
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2021-11",
+              "release_date": "2021-12-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-10",
+              "release_date": "2021-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-09",
+              "release_date": "2021-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/2",
+            "numeric": 0.5
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "388985413110369/1000000000000000",
+              "numeric": 0.388985413110369
+            },
+            "P": {
+              "exact_fraction": "4/5",
+              "numeric": 0.8
+            },
+            "R3": {
+              "exact_fraction": "7/10",
+              "numeric": 0.7
+            },
+            "B50": {
+              "exact_fraction": "1188985413110369/2000000000000000",
+              "numeric": 0.5944927065551845
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2021-11",
+              "release_date": "2021-12-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-10",
+              "release_date": "2021-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-09",
+              "release_date": "2021-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-02-10",
+      "reference_month": "2022-01",
+      "release_date": "2022-02-10",
+      "model_chart_date": "2022-02-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "445653417478999/1000000000000000",
+              "numeric": 0.445653417478999
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "17/30",
+              "numeric": 0.5666666666666667
+            },
+            "B50": {
+              "exact_fraction": "1045653417478999/2000000000000000",
+              "numeric": 0.5228267087394995
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2021-12",
+              "release_date": "2022-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-11",
+              "release_date": "2021-12-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-10",
+              "release_date": "2021-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "213555771962891/500000000000000",
+              "numeric": 0.427111543925782
+            },
+            "P": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "R3": {
+              "exact_fraction": "11/15",
+              "numeric": 0.7333333333333333
+            },
+            "B50": {
+              "exact_fraction": "463555771962891/1000000000000000",
+              "numeric": 0.463555771962891
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2021-12",
+              "release_date": "2022-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-11",
+              "release_date": "2021-12-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-10",
+              "release_date": "2021-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-03-10",
+      "reference_month": "2022-02",
+      "release_date": "2022-03-10",
+      "model_chart_date": "2022-03-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/2",
+            "numeric": 0.5
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "245123655879767/500000000000000",
+              "numeric": 0.490247311759534
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "17/30",
+              "numeric": 0.5666666666666667
+            },
+            "B50": {
+              "exact_fraction": "545123655879767/1000000000000000",
+              "numeric": 0.545123655879767
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-01",
+              "release_date": "2022-02-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-12",
+              "release_date": "2022-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-11",
+              "release_date": "2021-12-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "4/5",
+            "numeric": 0.8
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "180002442288357/250000000000000",
+              "numeric": 0.720009769153428
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "19/30",
+              "numeric": 0.6333333333333333
+            },
+            "B50": {
+              "exact_fraction": "330002442288357/500000000000000",
+              "numeric": 0.660004884576714
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-01",
+              "release_date": "2022-02-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-12",
+              "release_date": "2022-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-11",
+              "release_date": "2021-12-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-04-12",
+      "reference_month": "2022-03",
+      "release_date": "2022-04-12",
+      "model_chart_date": "2022-04-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "519758596218243/1000000000000000",
+              "numeric": 0.519758596218243
+            },
+            "P": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "R3": {
+              "exact_fraction": "17/30",
+              "numeric": 0.5666666666666667
+            },
+            "B50": {
+              "exact_fraction": "1019758596218243/2000000000000000",
+              "numeric": 0.5098792981091215
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-02",
+              "release_date": "2022-03-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-01",
+              "release_date": "2022-02-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-12",
+              "release_date": "2022-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "6/5",
+            "numeric": 1.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "55617570908801/50000000000000",
+              "numeric": 1.11235141817602
+            },
+            "P": {
+              "exact_fraction": "4/5",
+              "numeric": 0.8
+            },
+            "R3": {
+              "exact_fraction": "19/30",
+              "numeric": 0.6333333333333333
+            },
+            "B50": {
+              "exact_fraction": "95617570908801/100000000000000",
+              "numeric": 0.95617570908801
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-02",
+              "release_date": "2022-03-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-01",
+              "release_date": "2022-02-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2021-12",
+              "release_date": "2022-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-05-11",
+      "reference_month": "2022-04",
+      "release_date": "2022-05-11",
+      "model_chart_date": "2022-05-10",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "130338183828121/250000000000000",
+              "numeric": 0.521352735312484
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "7/15",
+              "numeric": 0.4666666666666667
+            },
+            "B50": {
+              "exact_fraction": "205338183828121/500000000000000",
+              "numeric": 0.410676367656242
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-03",
+              "release_date": "2022-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-02",
+              "release_date": "2022-03-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-01",
+              "release_date": "2022-02-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "17798321586581/62500000000000",
+              "numeric": 0.284773145385296
+            },
+            "P": {
+              "exact_fraction": "6/5",
+              "numeric": 1.2
+            },
+            "R3": {
+              "exact_fraction": "13/15",
+              "numeric": 0.8666666666666667
+            },
+            "B50": {
+              "exact_fraction": "92798321586581/125000000000000",
+              "numeric": 0.742386572692648
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-03",
+              "release_date": "2022-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-02",
+              "release_date": "2022-03-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-01",
+              "release_date": "2022-02-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-06-10",
+      "reference_month": "2022-05",
+      "release_date": "2022-06-10",
+      "model_chart_date": "2022-06-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "62184712148413/125000000000000",
+              "numeric": 0.497477697187304
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "7/15",
+              "numeric": 0.4666666666666667
+            },
+            "B50": {
+              "exact_fraction": "137184712148413/250000000000000",
+              "numeric": 0.548738848593652
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-04",
+              "release_date": "2022-05-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-03",
+              "release_date": "2022-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-02",
+              "release_date": "2022-03-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1",
+            "numeric": 1.0
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "168081212739953/250000000000000",
+              "numeric": 0.672324850959812
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "23/30",
+              "numeric": 0.7666666666666667
+            },
+            "B50": {
+              "exact_fraction": "243081212739953/500000000000000",
+              "numeric": 0.486162425479906
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-04",
+              "release_date": "2022-05-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-03",
+              "release_date": "2022-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-02",
+              "release_date": "2022-03-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-07-13",
+      "reference_month": "2022-06",
+      "release_date": "2022-07-13",
+      "model_chart_date": "2022-07-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "7/10",
+            "numeric": 0.7
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "121948687601047/250000000000000",
+              "numeric": 0.487794750404188
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "B50": {
+              "exact_fraction": "271948687601047/500000000000000",
+              "numeric": 0.543897375202094
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-05",
+              "release_date": "2022-06-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-04",
+              "release_date": "2022-05-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-03",
+              "release_date": "2022-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "13/10",
+            "numeric": 1.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "485569235095951/500000000000000",
+              "numeric": 0.971138470191902
+            },
+            "P": {
+              "exact_fraction": "1",
+              "numeric": 1.0
+            },
+            "R3": {
+              "exact_fraction": "5/6",
+              "numeric": 0.8333333333333334
+            },
+            "B50": {
+              "exact_fraction": "985569235095951/1000000000000000",
+              "numeric": 0.985569235095951
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-05",
+              "release_date": "2022-06-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-04",
+              "release_date": "2022-05-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-03",
+              "release_date": "2022-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-08-10",
+      "reference_month": "2022-07",
+      "release_date": "2022-08-10",
+      "model_chart_date": "2022-08-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "3839710202739/8000000000000",
+              "numeric": 0.479963775342375
+            },
+            "P": {
+              "exact_fraction": "7/10",
+              "numeric": 0.7
+            },
+            "R3": {
+              "exact_fraction": "19/30",
+              "numeric": 0.6333333333333333
+            },
+            "B50": {
+              "exact_fraction": "9439710202739/16000000000000",
+              "numeric": 0.5899818876711875
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-06",
+              "release_date": "2022-07-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-05",
+              "release_date": "2022-06-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-04",
+              "release_date": "2022-05-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "0",
+            "numeric": 0.0
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "26795765016111/100000000000000",
+              "numeric": 0.26795765016111
+            },
+            "P": {
+              "exact_fraction": "13/10",
+              "numeric": 1.3
+            },
+            "R3": {
+              "exact_fraction": "13/15",
+              "numeric": 0.8666666666666667
+            },
+            "B50": {
+              "exact_fraction": "156795765016111/200000000000000",
+              "numeric": 0.783978825080555
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-06",
+              "release_date": "2022-07-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-05",
+              "release_date": "2022-06-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-04",
+              "release_date": "2022-05-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-09-13",
+      "reference_month": "2022-08",
+      "release_date": "2022-09-13",
+      "model_chart_date": "2022-09-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "119972849365509/250000000000000",
+              "numeric": 0.479891397462036
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "8/15",
+              "numeric": 0.5333333333333333
+            },
+            "B50": {
+              "exact_fraction": "194972849365509/500000000000000",
+              "numeric": 0.389945698731018
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-07",
+              "release_date": "2022-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-06",
+              "release_date": "2022-07-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-05",
+              "release_date": "2022-06-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/10",
+            "numeric": 0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "142215132323641/2500000000000000",
+              "numeric": 0.0568860529294564
+            },
+            "P": {
+              "exact_fraction": "0",
+              "numeric": 0.0
+            },
+            "R3": {
+              "exact_fraction": "23/30",
+              "numeric": 0.7666666666666667
+            },
+            "B50": {
+              "exact_fraction": "142215132323641/5000000000000000",
+              "numeric": 0.0284430264647282
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-07",
+              "release_date": "2022-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-06",
+              "release_date": "2022-07-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-05",
+              "release_date": "2022-06-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-10-13",
+      "reference_month": "2022-09",
+      "release_date": "2022-10-13",
+      "model_chart_date": "2022-10-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "511859702425673/1000000000000000",
+              "numeric": 0.511859702425673
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "8/15",
+              "numeric": 0.5333333333333333
+            },
+            "B50": {
+              "exact_fraction": "1111859702425673/2000000000000000",
+              "numeric": 0.5559298512128364
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-08",
+              "release_date": "2022-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-07",
+              "release_date": "2022-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-06",
+              "release_date": "2022-07-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "39421725775263/125000000000000",
+              "numeric": 0.315373806202104
+            },
+            "P": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "R3": {
+              "exact_fraction": "7/15",
+              "numeric": 0.4666666666666667
+            },
+            "B50": {
+              "exact_fraction": "51921725775263/250000000000000",
+              "numeric": 0.207686903101052
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-08",
+              "release_date": "2022-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-07",
+              "release_date": "2022-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-06",
+              "release_date": "2022-07-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-11-10",
+      "reference_month": "2022-10",
+      "release_date": "2022-11-10",
+      "model_chart_date": "2022-11-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "538634286225081/1000000000000000",
+              "numeric": 0.538634286225081
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "B50": {
+              "exact_fraction": "1138634286225081/2000000000000000",
+              "numeric": 0.5693171431125404
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-09",
+              "release_date": "2022-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-08",
+              "release_date": "2022-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-07",
+              "release_date": "2022-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "759750963994799/1000000000000000",
+              "numeric": 0.759750963994799
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "1/6",
+              "numeric": 0.16666666666666666
+            },
+            "B50": {
+              "exact_fraction": "1159750963994799/2000000000000000",
+              "numeric": 0.5798754819973995
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-09",
+              "release_date": "2022-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-08",
+              "release_date": "2022-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-07",
+              "release_date": "2022-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2022-12-13",
+      "reference_month": "2022-11",
+      "release_date": "2022-12-13",
+      "model_chart_date": "2022-12-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "102205618858899/200000000000000",
+              "numeric": 0.511028094294495
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "B50": {
+              "exact_fraction": "162205618858899/400000000000000",
+              "numeric": 0.4055140471472475
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-10",
+              "release_date": "2022-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-09",
+              "release_date": "2022-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-08",
+              "release_date": "2022-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/10",
+            "numeric": 0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "23372790216593/50000000000000",
+              "numeric": 0.46745580433186
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "B50": {
+              "exact_fraction": "43372790216593/100000000000000",
+              "numeric": 0.43372790216593
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-10",
+              "release_date": "2022-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-09",
+              "release_date": "2022-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-08",
+              "release_date": "2022-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-01-12",
+      "reference_month": "2022-12",
+      "release_date": "2023-01-12",
+      "model_chart_date": "2023-01-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "120995383572033/250000000000000",
+              "numeric": 0.483981534288132
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "11/30",
+              "numeric": 0.36666666666666664
+            },
+            "B50": {
+              "exact_fraction": "170995383572033/500000000000000",
+              "numeric": 0.341990767144066
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-11",
+              "release_date": "2022-12-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-10",
+              "release_date": "2022-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-09",
+              "release_date": "2022-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "-1/10",
+            "numeric": -0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "60549120965929/500000000000000",
+              "numeric": 0.121098241931858
+            },
+            "P": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "R3": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "B50": {
+              "exact_fraction": "110549120965929/1000000000000000",
+              "numeric": 0.110549120965929
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-11",
+              "release_date": "2022-12-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-10",
+              "release_date": "2022-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-09",
+              "release_date": "2022-10-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-02-14",
+      "reference_month": "2023-01",
+      "release_date": "2023-02-14",
+      "model_chart_date": "2023-02-13",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "115850737678289/250000000000000",
+              "numeric": 0.463402950713156
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "190850737678289/500000000000000",
+              "numeric": 0.381701475356578
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-12",
+              "release_date": "2023-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-11",
+              "release_date": "2022-12-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-10",
+              "release_date": "2022-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/2",
+            "numeric": 0.5
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "10110220162223/15625000000000",
+              "numeric": 0.647054090382272
+            },
+            "P": {
+              "exact_fraction": "-1/10",
+              "numeric": -0.1
+            },
+            "R3": {
+              "exact_fraction": "2/15",
+              "numeric": 0.13333333333333333
+            },
+            "B50": {
+              "exact_fraction": "8547720162223/31250000000000",
+              "numeric": 0.273527045191136
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2022-12",
+              "release_date": "2023-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-11",
+              "release_date": "2022-12-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-10",
+              "release_date": "2022-11-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-03-14",
+      "reference_month": "2023-02",
+      "release_date": "2023-03-14",
+      "model_chart_date": "2023-03-13",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/2",
+            "numeric": 0.5
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "451013118219693/1000000000000000",
+              "numeric": 0.451013118219693
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "B50": {
+              "exact_fraction": "851013118219693/2000000000000000",
+              "numeric": 0.4255065591098465
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-01",
+              "release_date": "2023-02-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-12",
+              "release_date": "2023-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-11",
+              "release_date": "2022-12-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "536749865743129/1000000000000000",
+              "numeric": 0.536749865743129
+            },
+            "P": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "R3": {
+              "exact_fraction": "1/6",
+              "numeric": 0.16666666666666666
+            },
+            "B50": {
+              "exact_fraction": "1036749865743129/2000000000000000",
+              "numeric": 0.5183749328715646
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-01",
+              "release_date": "2023-02-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-12",
+              "release_date": "2023-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-11",
+              "release_date": "2022-12-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-04-12",
+      "reference_month": "2023-03",
+      "release_date": "2023-04-12",
+      "model_chart_date": "2023-04-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "112325399748379/250000000000000",
+              "numeric": 0.449301598993516
+            },
+            "P": {
+              "exact_fraction": "1/2",
+              "numeric": 0.5
+            },
+            "R3": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "B50": {
+              "exact_fraction": "237325399748379/500000000000000",
+              "numeric": 0.474650799496758
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-02",
+              "release_date": "2023-03-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-01",
+              "release_date": "2023-02-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-12",
+              "release_date": "2023-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/10",
+            "numeric": 0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "75146541643407/250000000000000",
+              "numeric": 0.300586166573628
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "175146541643407/500000000000000",
+              "numeric": 0.350293083286814
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-02",
+              "release_date": "2023-03-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-01",
+              "release_date": "2023-02-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2022-12",
+              "release_date": "2023-01-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-05-10",
+      "reference_month": "2023-04",
+      "release_date": "2023-05-10",
+      "model_chart_date": "2023-05-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "113841780776639/250000000000000",
+              "numeric": 0.455367123106556
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "13/30",
+              "numeric": 0.43333333333333335
+            },
+            "B50": {
+              "exact_fraction": "213841780776639/500000000000000",
+              "numeric": 0.427683561553278
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-03",
+              "release_date": "2023-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-02",
+              "release_date": "2023-03-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-01",
+              "release_date": "2023-02-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "608716511827863/1000000000000000",
+              "numeric": 0.608716511827863
+            },
+            "P": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "R3": {
+              "exact_fraction": "1/3",
+              "numeric": 0.3333333333333333
+            },
+            "B50": {
+              "exact_fraction": "708716511827863/2000000000000000",
+              "numeric": 0.3543582559139315
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-03",
+              "release_date": "2023-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-02",
+              "release_date": "2023-03-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-01",
+              "release_date": "2023-02-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-06-13",
+      "reference_month": "2023-05",
+      "release_date": "2023-06-13",
+      "model_chart_date": "2023-06-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "22507060353051/50000000000000",
+              "numeric": 0.45014120706102
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "13/30",
+              "numeric": 0.43333333333333335
+            },
+            "B50": {
+              "exact_fraction": "42507060353051/100000000000000",
+              "numeric": 0.42507060353051
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-04",
+              "release_date": "2023-05-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-03",
+              "release_date": "2023-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-02",
+              "release_date": "2023-03-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/10",
+            "numeric": 0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "23887814636799/125000000000000",
+              "numeric": 0.191102517094392
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "B50": {
+              "exact_fraction": "73887814636799/250000000000000",
+              "numeric": 0.295551258547196
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-04",
+              "release_date": "2023-05-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-03",
+              "release_date": "2023-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-02",
+              "release_date": "2023-03-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-07-12",
+      "reference_month": "2023-06",
+      "release_date": "2023-07-12",
+      "model_chart_date": "2023-07-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "433611798721469/1000000000000000",
+              "numeric": 0.433611798721469
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "B50": {
+              "exact_fraction": "833611798721469/2000000000000000",
+              "numeric": 0.4168058993607345
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-05",
+              "release_date": "2023-06-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-04",
+              "release_date": "2023-05-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-03",
+              "release_date": "2023-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "423795902201497/1000000000000000",
+              "numeric": 0.423795902201497
+            },
+            "P": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "R3": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "B50": {
+              "exact_fraction": "523795902201497/2000000000000000",
+              "numeric": 0.2618979511007485
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-05",
+              "release_date": "2023-06-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-04",
+              "release_date": "2023-05-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-03",
+              "release_date": "2023-04-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-08-10",
+      "reference_month": "2023-07",
+      "release_date": "2023-08-10",
+      "model_chart_date": "2023-08-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "396385338143237/1000000000000000",
+              "numeric": 0.396385338143237
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/3",
+              "numeric": 0.3333333333333333
+            },
+            "B50": {
+              "exact_fraction": "596385338143237/2000000000000000",
+              "numeric": 0.2981926690716185
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-06",
+              "release_date": "2023-07-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-05",
+              "release_date": "2023-06-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-04",
+              "release_date": "2023-05-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "203138065368281/500000000000000",
+              "numeric": 0.406276130736562
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "7/30",
+              "numeric": 0.23333333333333334
+            },
+            "B50": {
+              "exact_fraction": "303138065368281/1000000000000000",
+              "numeric": 0.303138065368281
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-06",
+              "release_date": "2023-07-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-05",
+              "release_date": "2023-06-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-04",
+              "release_date": "2023-05-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-09-13",
+      "reference_month": "2023-08",
+      "release_date": "2023-09-13",
+      "model_chart_date": "2023-09-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "191974105793019/500000000000000",
+              "numeric": 0.383948211586038
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "291974105793019/1000000000000000",
+              "numeric": 0.291974105793019
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-07",
+              "release_date": "2023-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-06",
+              "release_date": "2023-07-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-05",
+              "release_date": "2023-06-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/5",
+            "numeric": 0.6
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "789346717069817/1000000000000000",
+              "numeric": 0.789346717069817
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/6",
+              "numeric": 0.16666666666666666
+            },
+            "B50": {
+              "exact_fraction": "989346717069817/2000000000000000",
+              "numeric": 0.4946733585349085
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-07",
+              "release_date": "2023-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-06",
+              "release_date": "2023-07-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-05",
+              "release_date": "2023-06-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-10-12",
+      "reference_month": "2023-09",
+      "release_date": "2023-10-12",
+      "model_chart_date": "2023-10-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "5605091593231/15625000000000",
+              "numeric": 0.358725861966784
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "7/30",
+              "numeric": 0.23333333333333334
+            },
+            "B50": {
+              "exact_fraction": "10292591593231/31250000000000",
+              "numeric": 0.329362930983392
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-08",
+              "release_date": "2023-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-07",
+              "release_date": "2023-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-06",
+              "release_date": "2023-07-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "7810590219657/20000000000000",
+              "numeric": 0.39052951098285
+            },
+            "P": {
+              "exact_fraction": "3/5",
+              "numeric": 0.6
+            },
+            "R3": {
+              "exact_fraction": "1/3",
+              "numeric": 0.3333333333333333
+            },
+            "B50": {
+              "exact_fraction": "19810590219657/40000000000000",
+              "numeric": 0.495264755491425
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-08",
+              "release_date": "2023-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-07",
+              "release_date": "2023-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-06",
+              "release_date": "2023-07-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-11-14",
+      "reference_month": "2023-10",
+      "release_date": "2023-11-14",
+      "model_chart_date": "2023-11-13",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "33787974828459/100000000000000",
+              "numeric": 0.33787974828459
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "63787974828459/200000000000000",
+              "numeric": 0.318939874142295
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-09",
+              "release_date": "2023-10-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-08",
+              "release_date": "2023-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-07",
+              "release_date": "2023-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "0",
+            "numeric": 0.0
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "708885450707759/10000000000000000",
+              "numeric": 0.0708885450707759
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "B50": {
+              "exact_fraction": "4708885450707759/20000000000000000",
+              "numeric": 0.23544427253538794
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-09",
+              "release_date": "2023-10-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-08",
+              "release_date": "2023-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-07",
+              "release_date": "2023-08-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2023-12-12",
+      "reference_month": "2023-11",
+      "release_date": "2023-12-12",
+      "model_chart_date": "2023-12-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "16449968858183/50000000000000",
+              "numeric": 0.32899937716366
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "26449968858183/100000000000000",
+              "numeric": 0.26449968858183
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-10",
+              "release_date": "2023-11-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-09",
+              "release_date": "2023-10-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-08",
+              "release_date": "2023-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/10",
+            "numeric": 0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "-114183989250409/12500000000000000",
+              "numeric": -0.00913471914003272
+            },
+            "P": {
+              "exact_fraction": "0",
+              "numeric": 0.0
+            },
+            "R3": {
+              "exact_fraction": "1/3",
+              "numeric": 0.3333333333333333
+            },
+            "B50": {
+              "exact_fraction": "-114183989250409/25000000000000000",
+              "numeric": -0.00456735957001636
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-10",
+              "release_date": "2023-11-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-09",
+              "release_date": "2023-10-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-08",
+              "release_date": "2023-09-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-01-11",
+      "reference_month": "2023-12",
+      "release_date": "2024-01-11",
+      "model_chart_date": "2024-01-10",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "326876950609839/1000000000000000",
+              "numeric": 0.326876950609839
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "626876950609839/2000000000000000",
+              "numeric": 0.3134384753049195
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-11",
+              "release_date": "2023-12-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-10",
+              "release_date": "2023-11-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-09",
+              "release_date": "2023-10-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "7530059702403/25000000000000",
+              "numeric": 0.30120238809612
+            },
+            "P": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "R3": {
+              "exact_fraction": "1/6",
+              "numeric": 0.16666666666666666
+            },
+            "B50": {
+              "exact_fraction": "10030059702403/50000000000000",
+              "numeric": 0.20060119404806
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-11",
+              "release_date": "2023-12-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-10",
+              "release_date": "2023-11-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-09",
+              "release_date": "2023-10-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-02-13",
+      "reference_month": "2024-01",
+      "release_date": "2024-02-13",
+      "model_chart_date": "2024-02-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "320186100133907/1000000000000000",
+              "numeric": 0.320186100133907
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "620186100133907/2000000000000000",
+              "numeric": 0.3100930500669535
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-12",
+              "release_date": "2024-01-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-11",
+              "release_date": "2023-12-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-10",
+              "release_date": "2023-11-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "3275211625141/25000000000000",
+              "numeric": 0.13100846500564
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "2/15",
+              "numeric": 0.13333333333333333
+            },
+            "B50": {
+              "exact_fraction": "10775211625141/50000000000000",
+              "numeric": 0.21550423250282
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2023-12",
+              "release_date": "2024-01-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-11",
+              "release_date": "2023-12-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-10",
+              "release_date": "2023-11-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-03-12",
+      "reference_month": "2024-02",
+      "release_date": "2024-03-12",
+      "model_chart_date": "2024-03-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "39666458237949/125000000000000",
+              "numeric": 0.317331665903592
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "1/3",
+              "numeric": 0.3333333333333333
+            },
+            "B50": {
+              "exact_fraction": "89666458237949/250000000000000",
+              "numeric": 0.358665832951796
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-01",
+              "release_date": "2024-02-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-12",
+              "release_date": "2024-01-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-11",
+              "release_date": "2023-12-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "43350625888289/100000000000000",
+              "numeric": 0.43350625888289
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "7/30",
+              "numeric": 0.23333333333333334
+            },
+            "B50": {
+              "exact_fraction": "73350625888289/200000000000000",
+              "numeric": 0.366753129441445
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-01",
+              "release_date": "2024-02-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-12",
+              "release_date": "2024-01-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-11",
+              "release_date": "2023-12-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-04-10",
+      "reference_month": "2024-03",
+      "release_date": "2024-04-10",
+      "model_chart_date": "2024-04-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "154122983245227/500000000000000",
+              "numeric": 0.308245966490454
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "11/30",
+              "numeric": 0.36666666666666664
+            },
+            "B50": {
+              "exact_fraction": "354122983245227/1000000000000000",
+              "numeric": 0.354122983245227
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-02",
+              "release_date": "2024-03-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-01",
+              "release_date": "2024-02-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-12",
+              "release_date": "2024-01-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "2/5",
+            "numeric": 0.4
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "3414123189937/10000000000000",
+              "numeric": 0.3414123189937
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "1/3",
+              "numeric": 0.3333333333333333
+            },
+            "B50": {
+              "exact_fraction": "7414123189937/20000000000000",
+              "numeric": 0.37070615949685
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-02",
+              "release_date": "2024-03-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-01",
+              "release_date": "2024-02-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2023-12",
+              "release_date": "2024-01-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-05-15",
+      "reference_month": "2024-04",
+      "release_date": "2024-05-15",
+      "model_chart_date": "2024-05-14",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "311093554960553/1000000000000000",
+              "numeric": 0.311093554960553
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "B50": {
+              "exact_fraction": "711093554960553/2000000000000000",
+              "numeric": 0.3555467774802765
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-03",
+              "release_date": "2024-04-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-02",
+              "release_date": "2024-03-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-01",
+              "release_date": "2024-02-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "41249502616939/100000000000000",
+              "numeric": 0.41249502616939
+            },
+            "P": {
+              "exact_fraction": "2/5",
+              "numeric": 0.4
+            },
+            "R3": {
+              "exact_fraction": "11/30",
+              "numeric": 0.36666666666666664
+            },
+            "B50": {
+              "exact_fraction": "81249502616939/200000000000000",
+              "numeric": 0.406247513084695
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-03",
+              "release_date": "2024-04-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-02",
+              "release_date": "2024-03-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-01",
+              "release_date": "2024-02-13",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-06-12",
+      "reference_month": "2024-05",
+      "release_date": "2024-06-12",
+      "model_chart_date": "2024-06-11",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "296432179693297/1000000000000000",
+              "numeric": 0.296432179693297
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "11/30",
+              "numeric": 0.36666666666666664
+            },
+            "B50": {
+              "exact_fraction": "596432179693297/2000000000000000",
+              "numeric": 0.2982160898466485
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-04",
+              "release_date": "2024-05-15",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-03",
+              "release_date": "2024-04-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-02",
+              "release_date": "2024-03-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "0",
+            "numeric": 0.0
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "849008879271337/10000000000000000",
+              "numeric": 0.0849008879271337
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "11/30",
+              "numeric": 0.36666666666666664
+            },
+            "B50": {
+              "exact_fraction": "3849008879271337/20000000000000000",
+              "numeric": 0.19245044396356684
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-04",
+              "release_date": "2024-05-15",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-03",
+              "release_date": "2024-04-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-02",
+              "release_date": "2024-03-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-07-11",
+      "reference_month": "2024-06",
+      "release_date": "2024-07-11",
+      "model_chart_date": "2024-07-10",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/10",
+            "numeric": 0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "6998217699719/25000000000000",
+              "numeric": 0.27992870798876
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "B50": {
+              "exact_fraction": "11998217699719/50000000000000",
+              "numeric": 0.23996435399438
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-05",
+              "release_date": "2024-06-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-04",
+              "release_date": "2024-05-15",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-03",
+              "release_date": "2024-04-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "-1/10",
+            "numeric": -0.1
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "681915069361153/10000000000000000",
+              "numeric": 0.0681915069361153
+            },
+            "P": {
+              "exact_fraction": "0",
+              "numeric": 0.0
+            },
+            "R3": {
+              "exact_fraction": "7/30",
+              "numeric": 0.23333333333333334
+            },
+            "B50": {
+              "exact_fraction": "681915069361153/20000000000000000",
+              "numeric": 0.03409575346805765
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-05",
+              "release_date": "2024-06-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-04",
+              "release_date": "2024-05-15",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-03",
+              "release_date": "2024-04-10",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-08-14",
+      "reference_month": "2024-07",
+      "release_date": "2024-08-14",
+      "model_chart_date": "2024-08-13",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "269099296682507/1000000000000000",
+              "numeric": 0.269099296682507
+            },
+            "P": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "R3": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "B50": {
+              "exact_fraction": "369099296682507/2000000000000000",
+              "numeric": 0.1845496483412535
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-06",
+              "release_date": "2024-07-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-05",
+              "release_date": "2024-06-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-04",
+              "release_date": "2024-05-15",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "237207807303367/1000000000000000",
+              "numeric": 0.237207807303367
+            },
+            "P": {
+              "exact_fraction": "-1/10",
+              "numeric": -0.1
+            },
+            "R3": {
+              "exact_fraction": "1/15",
+              "numeric": 0.06666666666666667
+            },
+            "B50": {
+              "exact_fraction": "137207807303367/2000000000000000",
+              "numeric": 0.0686039036516835
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-06",
+              "release_date": "2024-07-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-05",
+              "release_date": "2024-06-12",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-04",
+              "release_date": "2024-05-15",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-09-11",
+      "reference_month": "2024-08",
+      "release_date": "2024-09-11",
+      "model_chart_date": "2024-09-10",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "263944041823781/1000000000000000",
+              "numeric": 0.263944041823781
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/6",
+              "numeric": 0.16666666666666666
+            },
+            "B50": {
+              "exact_fraction": "463944041823781/2000000000000000",
+              "numeric": 0.2319720209118905
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-07",
+              "release_date": "2024-08-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-06",
+              "release_date": "2024-07-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-05",
+              "release_date": "2024-06-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "51136480344523/250000000000000",
+              "numeric": 0.204545921378092
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/30",
+              "numeric": 0.03333333333333333
+            },
+            "B50": {
+              "exact_fraction": "101136480344523/500000000000000",
+              "numeric": 0.202272960689046
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-07",
+              "release_date": "2024-08-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-06",
+              "release_date": "2024-07-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-05",
+              "release_date": "2024-06-12",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-10-10",
+      "reference_month": "2024-09",
+      "release_date": "2024-10-10",
+      "model_chart_date": "2024-10-09",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "67045436310537/250000000000000",
+              "numeric": 0.268181745242148
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "B50": {
+              "exact_fraction": "142045436310537/500000000000000",
+              "numeric": 0.284090872621074
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-08",
+              "release_date": "2024-09-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-07",
+              "release_date": "2024-08-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-06",
+              "release_date": "2024-07-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "106226733277263/1000000000000000",
+              "numeric": 0.106226733277263
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/10",
+              "numeric": 0.1
+            },
+            "B50": {
+              "exact_fraction": "306226733277263/2000000000000000",
+              "numeric": 0.1531133666386315
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-08",
+              "release_date": "2024-09-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-07",
+              "release_date": "2024-08-14",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-06",
+              "release_date": "2024-07-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-11-13",
+      "reference_month": "2024-10",
+      "release_date": "2024-11-13",
+      "model_chart_date": "2024-11-12",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "16726725040699/62500000000000",
+              "numeric": 0.267627600651184
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "4/15",
+              "numeric": 0.26666666666666666
+            },
+            "B50": {
+              "exact_fraction": "35476725040699/125000000000000",
+              "numeric": 0.283813800325592
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-09",
+              "release_date": "2024-10-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-08",
+              "release_date": "2024-09-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-07",
+              "release_date": "2024-08-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "1/5",
+            "numeric": 0.2
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "36366893330339/200000000000000",
+              "numeric": 0.181834466651695
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "B50": {
+              "exact_fraction": "76366893330339/400000000000000",
+              "numeric": 0.1909172333258475
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-09",
+              "release_date": "2024-10-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-08",
+              "release_date": "2024-09-11",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-07",
+              "release_date": "2024-08-14",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "event_id": "us-cpi-release-2024-12-11",
+      "reference_month": "2024-11",
+      "release_date": "2024-12-11",
+      "model_chart_date": "2024-12-10",
+      "model_age_days": 1,
+      "actual_first_publication_at_utc": null,
+      "model_original_delivery_authenticated": false,
+      "measure": {
+        "core": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "135485444546097/500000000000000",
+              "numeric": 0.270970889092194
+            },
+            "P": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "R3": {
+              "exact_fraction": "3/10",
+              "numeric": 0.3
+            },
+            "B50": {
+              "exact_fraction": "285485444546097/1000000000000000",
+              "numeric": 0.285485444546097
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-10",
+              "release_date": "2024-11-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-09",
+              "release_date": "2024-10-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-08",
+              "release_date": "2024-09-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        },
+        "headline": {
+          "actual": {
+            "exact_fraction": "3/10",
+            "numeric": 0.3
+          },
+          "forecasts": {
+            "C": {
+              "exact_fraction": "262867727953183/1000000000000000",
+              "numeric": 0.262867727953183
+            },
+            "P": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "R3": {
+              "exact_fraction": "1/5",
+              "numeric": 0.2
+            },
+            "B50": {
+              "exact_fraction": "462867727953183/2000000000000000",
+              "numeric": 0.2314338639765915
+            }
+          },
+          "primary_pair_eligible": true,
+          "all4_common_eligible": true,
+          "primary_pair_reasons": [],
+          "rolling3_reasons": [],
+          "lag_sources": [
+            {
+              "reference_month": "2024-10",
+              "release_date": "2024-11-13",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-09",
+              "release_date": "2024-10-10",
+              "valid": true,
+              "known_before_model_date": true
+            },
+            {
+              "reference_month": "2024-08",
+              "release_date": "2024-09-11",
+              "valid": true,
+              "known_before_model_date": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

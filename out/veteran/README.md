@@ -4,6 +4,15 @@ Uploaded by the owner on 8 Nov 2026 ("this is our updated veteran macro, insert 
 revision 0.1 arrived the same morning ("add this as macro veteran so he will discuss with the macro of the council").
 Revision 1.3 arrived on 9 Nov 2026 ("update veteran macro with this new info").
 
+## What's new in 1.4 research outputs (17 Nov 2026)
+
+- The October 2026 core CPI pilot is still unresolved: today's BLS archive shows 0.3% against the forecast 0.255%, but the original release-day evidence could not be authenticated, so a pending attempt was logged with no outcome and no score. The desk shows it as one pending attempt, never as a result.
+- Cleveland nowcast against a simple "last print" baseline, 36 CPI releases of 2022-24: no clear advantage (slightly lower squared error, higher absolute error, the interval spans zero, and the sign flips without 2022). A public nowcast is not a strong release predictor here.
+- NY Fed survey archive: 26 workbooks mapped and two checked in detail; usable aggregate expectations, but the collection date is not proof the answers were public before a meeting.
+- The National Bank of Ukraine's accounting gold price: a dated method history (a wartime metals freeze, clock changes) and a clock check of 36 CPI days with zero failures. Still no gold prices analysed.
+- A wider macro calendar audit (216 regular releases, PCE at 10:00, holiday-shifted claims): the broad news exclusion for the Treasury study is still not ready.
+- No new trading or gold result in this increment.
+
 ## What's new in 1.3
 
 - CPI first prints, checked: all 144 headline and core CPI figures from the 36 releases of 2022-24 agree between the BLS tables, the release text and a separate extraction. Reissues (June/July 2024) and corrections are mapped. Archived pages are not proof of the original-day bytes.
@@ -28,6 +37,10 @@ review dumps (the 1.35 MB Treasury outcome review and the like), synthetic rehea
 DOL OIG PDF, NBU responses). They are provenance, are listed with hashes in the batch's `batch-inventory.json`, and some are
 restricted (`DATA_LICENSES.md`). `batch-inventory.json` (hash list) and `package-tests.txt` (test log) are also left out;
 `validation.json` carries their summary.
+1.4 research outputs (17 Nov 2026), installed the same way: the new and changed `outputs/` files in `references/`, the authored
+`work/*.md` in `notes/`. Left out: `cpi-model-benchmark-protocol-2022-2024.json` (it names an AI product, rule 6, and is bound by
+its published SHA-256, so it is not edited; the `.sha256` file is kept), the work scripts, raw publisher captures, the synthetic
+CPI-resolution rehearsal and the forecast-schema test cases. Product names in the markdown were made neutral, as in 1.3.
 
 `council/veteran.mjs` is a code port of the parts a deterministic council member can run without an LLM or a data budget:
 the shock fingerprint (cross-asset regime framework), the gold driver panel (gold driver map), the discussion discipline

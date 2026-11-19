@@ -125,3 +125,14 @@ test('desk: the briefing section sits on top with the public-data-only note and 
   for (const f of ['publicOnly', 'insights', 'hypotheses', 'levels', 'analogs', 'evidence', 'invalid', 'zNow', 'since', 'recent']) assert.ok(html.includes(f), f);
   assert.match(B.PUBLIC_ONLY, /Nothing on this page is, or uses, non-public information/);
 });
+
+test('a recorded hypothesis is shown with its own kind and "Wrong if", never the live reading\'s', async () => {
+  const { freezeHypotheses, invalidOf } = await import('../council/veteran.mjs');
+  const rec = { id: 'hyp:w:H2', kind: 'stayInside', lo: 3852.6, hi: 4148.7, claim: 'stays between $3,853 and $4,149', p: 0.51, base: { all: 0.32 }, by: '2026-11-20', issued: '2026-11-14' };
+  const live = { id: 'hyp:w:H2', kind: 'stayInside', lo: 3800, hi: 3900, claim: 'stays between $3,800 and $3,900', p: 0.4, invalid: 'any daily close outside $3,800-$3,900', why: 'today' };
+  const h = freezeHypotheses({ hypotheses: [live] }, [rec]).hypotheses[0];
+  assert.equal(h.invalid, 'any daily close outside $3,853-$4,149'); assert.equal(h.why, null); assert.equal(h.live.invalid, live.invalid); assert.equal(h.base.all, 0.32);
+  const up = { kind: 'firstTouchUp', level: 4000.4, guard: 3852.6 }; assert.match(invalidOf(up), /below \$3,853/);
+  const k = freezeHypotheses({ hypotheses: [{ id: 'x', kind: 'firstTouchDown', claim: 'down', p: 0.2 }] }, [{ id: 'x', ...up, claim: 'up', p: 0.18 }]).hypotheses[0];
+  assert.equal(k.kind, 'firstTouchUp', 'the kind follows the record');
+});

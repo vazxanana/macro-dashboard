@@ -1,0 +1,56 @@
+{
+  "checked_at_utc": "2026-11-09T07:50:45.128110+00:00",
+  "status": "VERIFIED_RETROSPECTIVE_NUMERIC_BENCHMARK_WITH_LIMITS",
+  "hashes": {
+    "outputs/cpi-model-benchmark-protocol-2022-2024.json": "20af261af80ba9c6808248b6a1fc1b2b30592a81a2036c656a48c232a3550743",
+    "outputs/cpi-model-benchmark-inputs-2022-2024.json": "b2985a893ee73d8d23c735db3297c54d24c7974c0adb29f225fb0b482cb036ad",
+    "outputs/cpi-model-benchmark-results-2022-2024.json": "f3fb31047e3a56ebf2da07ffab806af3a87b134553f7dc8bcf8cb36ddd1220be",
+    "outputs/cpi-model-benchmark-2022-2024.md": "e381ebfa1a627395c672c3a351d71a9499ecd8628bbe038dda4a056b3166c438",
+    "outputs/scripts/cpi-model-benchmark.py": "47192c0a8034930e98814466c11cafb704843684db34fd96203f1b7de8659343",
+    "outputs/scripts/test_cpi_model_benchmark.py": "e1f701356ecb9264993371b5ee54a07318a44ff9a730498805d03ca413b32b43",
+    "work/cpi-model-baseline-seed-2021.json": "9b2bba9de3d9323f350406fc132578247b66cfb2ab68e452edfc18c73b5b526e",
+    "work/cpi-model-baseline-correction-clock-addendum.md": "78773a0d03f57086987ef75ab783a5c7a10b7517d85e55afb0580936b4741d4e",
+    "work/cpi-model-benchmark/input-binding-independent.json": "67f2d7c32dd789708a5e0521dae143b7e7b117f040847f9c1257e8a1643f058c",
+    "work/cpi-model-benchmark/outcome-independent.json": "23bfbbf1a9b399487e1ea29272158aafb56f320c5c194394bed52f7d19352d70",
+    "work/cpi-model-benchmark/actual-bootstrap-independent.json": "3096512b8c522d1441c3a7df13c5ca57023b1d5d8b14a4250cb879a1692a815b",
+    "work/cpi-model-benchmark/python-bootstrap-synthetic-crosscheck.json": "61d71592d8a6c34724355650f85ac680001d7d163c4e6347773d65fab818cda0"
+  },
+  "input_binding": {
+    "BLS_releases_reparsed": 39,
+    "monthly_fields_and_narrative_matches": 78,
+    "Cleveland_fields_matched": 72,
+    "chart_vlines_removed": 109,
+    "per_measure_lag_date_gates": 216,
+    "original_delivery_authenticated": false
+  },
+  "independent_prediction_and_loss_reconstruction": {
+    "checks": 5702,
+    "failed": 0,
+    "exact_rational_quantities_checked": 1773,
+    "numeric_displays_checked": 1773,
+    "scope": "All72 measure-event forecast sets and errors/SE/AE; paired/common masks, input lag gates and source identities; paired/common MSE/MAE/bias/medianAE; paired squared-loss differences; every exported core rounding metric and paired difference; all3 years,3 leave-year and36 leave-event outputs."
+  },
+  "bootstrap_checks": {
+    "synthetic_cross_language_fixtures": 7,
+    "actual_cross_language_checks": 35,
+    "scope": "Independent stream,counts,gates,exact aggregate and interval calculations given36paired differences; source/prediction reconstruction checked separately."
+  },
+  "python_tests": {
+    "command": "python outputs/scripts/test_cpi_model_benchmark.py",
+    "observed_passed": 12,
+    "observed_failed": 0
+  },
+  "protected_artifacts": {
+    "delivered_v1_3_unchanged": true,
+    "real_pilot_ledger_byte_identical": true,
+    "Newmont_workbook_byte_identical": true
+  },
+  "conclusion_boundary": "Both primary intervals cross zero. Core MSE modestly lower but MAE higher; specified year/event exclusions reverse the MSE contrast sign. No prospective,causal,consensus or trading-profit claim.",
+  "limits": [
+    "Current maintained model history lacks independently authenticated original per-point delivery and immutability.",
+    "Cleveland numeric point output need not be the conditional mean of rounded BLS first-print truth.",
+    "First-print persistence is explicit; it does not incorporate later revisions to the prior month.",
+    "Retrospective36-event development comparison, not an untouched holdout or prospective track record.",
+    "No survey-consensus surprise, causal market response, fitted ensemble or trading profitability established."
+  ]
+}

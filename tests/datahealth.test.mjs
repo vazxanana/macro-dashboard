@@ -104,7 +104,7 @@ test('sources: FRED by its own cadence (core rates page), calendar, COT release 
   assert.match(S({ 'fred:DGS10': 'ok, last 2026-10-28' })[0], /^input\/warn: fred:DGS10 last value 2026-10-28, 5 business days old/);
   assert.match(S({ 'fred:DGS10': 'ok, last 2026-10-20' })[0], /^input\/bad/);                   // 11 business days, a core rate
   assert.match(S({ 'fred:VIXCLS': 'ok, last 2026-10-20' })[0], /^input\/warn/);                 // not a core rate: never pages
-  assert.match(S({ 'fred:BSCICP03DEM665S': 'ok, last 2024-01-01' })[0], /^input\/warn: .*drops it as "no data"/);
+  assert.match(S({ 'fred:BSCICP03DEM665S': 'ok, last 2024-01-01' })[0], /^input\/note: .*drops it as "no data"; a standing gap/);
   assert.deepEqual(S({ 'fred:WALCL': 'ok, last 2026-10-28' }), []);
   assert.match(S({ 'fred:DGS2': 'failed (HTTP 500)' })[0], /^source\/bad/);
   assert.deepEqual(S({ 'calendar:nextweek': 'failed (HTTP 404)' }), [], 'early in the week next week\'s calendar may not exist yet');
