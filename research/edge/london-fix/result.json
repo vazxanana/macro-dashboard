@@ -1,0 +1,947 @@
+{
+ "study": "london-fix",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "passed": [],
+ "rule": "Every London weekday: A = open of the 15:55 London M5 candle minus open of the 15:30 one. Event: |A| > 1.5 x the median |A| of the 20 previous weekdays (15 or more with an A). T1 fade: enter against A at 16:05 London, stop |A| beyond, out at 17:00 London. T2 follow: enter with A at 15:55, stop |A|, out at 16:05. Six majors pooled. Net of 0.3 pip spread, USD 22.5 per million a side and 0.5 pip slippage a side.",
+ "data": {
+  "source": "OANDA mid M5 through the /md/bars proxy (the fx-london-orb files)",
+  "firstCandle": "2015-11-01",
+  "firstDay": "2015-11-02",
+  "lastDay": "2026-11-12"
+ },
+ "windows": {
+  "decisive": [
+   "2020-01-01",
+   "2026-11-12"
+  ],
+  "replication": [
+   "2016-01-01",
+   "2019-12-31"
+  ]
+ },
+ "costs": {
+  "spreadPips": 0.3,
+  "slipPipsASide": 0.5,
+  "commissionPerMillionASide": 22.5
+ },
+ "bar": {
+  "netR": "> 0",
+  "monthT": 2,
+  "replication": "same sign",
+  "holm": {
+   "tests": 2,
+   "alpha": 0.05
+  },
+  "placebo": {
+   "seeds": 40,
+   "rank": 38,
+   "slots": [
+    "12:00",
+    "12:30",
+    "13:00",
+    "13:30",
+    "14:00",
+    "14:30",
+    "15:00",
+    "17:00",
+    "17:30",
+    "18:00"
+   ]
+  }
+ },
+ "days": {
+  "all": 2879,
+  "decisive": 1792,
+  "replication": 1043
+ },
+ "counts": {
+  "eurusd": {
+   "noA": 19,
+   "events": 936,
+   "noTrade": {
+    "T1": 0,
+    "T2": 0
+   }
+  },
+  "gbpusd": {
+   "noA": 19,
+   "events": 931,
+   "noTrade": {
+    "T1": 0,
+    "T2": 0
+   }
+  },
+  "usdjpy": {
+   "noA": 19,
+   "events": 962,
+   "noTrade": {
+    "T1": 0,
+    "T2": 0
+   }
+  },
+  "audusd": {
+   "noA": 20,
+   "events": 923,
+   "noTrade": {
+    "T1": 0,
+    "T2": 0
+   }
+  },
+  "usdchf": {
+   "noA": 22,
+   "events": 898,
+   "noTrade": {
+    "T1": 0,
+    "T2": 0
+   }
+  },
+  "eurjpy": {
+   "noA": 20,
+   "events": 950,
+   "noTrade": {
+    "T1": 0,
+    "T2": 0
+   }
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "Fade after the fix (16:05 -> 17:00 London, against A)",
+   "decisive": {
+    "n": 3510,
+    "netR": -0.1516,
+    "grossR": -0.0107,
+    "costR": 0.1409,
+    "net2R": -0.2925,
+    "totalR": -532.11,
+    "months": 83,
+    "t": -7.44,
+    "t2": -13.31,
+    "tradeT": -10.79,
+    "win": 0.4128,
+    "stopShare": 0.2373
+   },
+   "replication": {
+    "n": 2036,
+    "netR": -0.166,
+    "grossR": -0.0052,
+    "costR": 0.1608,
+    "net2R": -0.3269,
+    "totalR": -338.04,
+    "months": 48,
+    "t": -6.77,
+    "t2": -11.83,
+    "tradeT": -7.8,
+    "win": 0.417,
+    "stopShare": 0.2829
+   },
+   "pOneSided": 1,
+   "placebo": {
+    "seeds": 40,
+    "rank": 38,
+    "p95": -0.1563,
+    "median": -0.1921,
+    "beats": 38,
+    "nMedian": 3584.5,
+    "values": [
+     -0.1924,
+     -0.2238,
+     -0.1943,
+     -0.2165,
+     -0.2103,
+     -0.1917,
+     -0.1916,
+     -0.1563,
+     -0.2224,
+     -0.2177,
+     -0.1896,
+     -0.1798,
+     -0.23,
+     -0.1817,
+     -0.2001,
+     -0.1974,
+     -0.1994,
+     -0.2183,
+     -0.2086,
+     -0.1648,
+     -0.2293,
+     -0.1719,
+     -0.18,
+     -0.1859,
+     -0.2259,
+     -0.2132,
+     -0.1397,
+     -0.2209,
+     -0.1639,
+     -0.1383,
+     -0.1695,
+     -0.1779,
+     -0.1857,
+     -0.1788,
+     -0.1866,
+     -0.1977,
+     -0.1836,
+     -0.1813,
+     -0.2351,
+     -0.2105
+    ]
+   },
+   "bySlot": {
+    "12:00": {
+     "n": 3548,
+     "netR": -0.2723,
+     "grossR": -0.0242,
+     "costR": 0.2481,
+     "t": -10.72
+    },
+    "12:30": {
+     "n": 3552,
+     "netR": -0.2269,
+     "grossR": -0.0008,
+     "costR": 0.2262,
+     "t": -7.81
+    },
+    "13:00": {
+     "n": 3479,
+     "netR": -0.1659,
+     "grossR": 0.0448,
+     "costR": 0.2107,
+     "t": -5.47
+    },
+    "13:30": {
+     "n": 3564,
+     "netR": -0.1711,
+     "grossR": 0.0148,
+     "costR": 0.1859,
+     "t": -5.71
+    },
+    "14:00": {
+     "n": 3666,
+     "netR": -0.1112,
+     "grossR": 0.0246,
+     "costR": 0.1358,
+     "t": -5.08
+    },
+    "14:30": {
+     "n": 3524,
+     "netR": -0.1778,
+     "grossR": -0.0178,
+     "costR": 0.1601,
+     "t": -6.19
+    },
+    "15:00": {
+     "n": 3548,
+     "netR": -0.1288,
+     "grossR": 0.0138,
+     "costR": 0.1426,
+     "t": -4.61
+    },
+    "17:00": {
+     "n": 3535,
+     "netR": -0.2014,
+     "grossR": 0.0097,
+     "costR": 0.211,
+     "t": -9.44
+    },
+    "17:30": {
+     "n": 3541,
+     "netR": -0.1989,
+     "grossR": 0.0317,
+     "costR": 0.2306,
+     "t": -7.22
+    },
+    "18:00": {
+     "n": 3552,
+     "netR": -0.313,
+     "grossR": -0.0426,
+     "costR": 0.2704,
+     "t": -11.39
+    }
+   },
+   "byPair": {
+    "eurusd": {
+     "decisive": {
+      "n": 578,
+      "netR": -0.1552,
+      "grossR": -0.0111,
+      "costR": 0.1441,
+      "net2R": -0.2992,
+      "totalR": -89.69,
+      "months": 83,
+      "t": -4.53,
+      "t2": -8.12,
+      "tradeT": -4.32,
+      "win": 0.3962,
+      "stopShare": 0.2318,
+      "stopPips": 13.6
+     },
+     "replication": {
+      "n": 351,
+      "netR": -0.1489,
+      "grossR": 0.0235,
+      "costR": 0.1724,
+      "net2R": -0.3213,
+      "totalR": -52.28,
+      "months": 48,
+      "t": -2.83,
+      "t2": -5.9,
+      "tradeT": -2.45,
+      "win": 0.4274,
+      "stopShare": 0.265,
+      "stopPips": 11.8
+     }
+    },
+    "gbpusd": {
+     "decisive": {
+      "n": 571,
+      "netR": -0.1528,
+      "grossR": -0.038,
+      "costR": 0.1148,
+      "net2R": -0.2675,
+      "totalR": -87.23,
+      "months": 83,
+      "t": -3.92,
+      "t2": -6.3,
+      "tradeT": -4.66,
+      "win": 0.4483,
+      "stopShare": 0.2469,
+      "stopPips": 17.8
+     },
+     "replication": {
+      "n": 350,
+      "netR": -0.1835,
+      "grossR": -0.0696,
+      "costR": 0.1139,
+      "net2R": -0.2974,
+      "totalR": -64.23,
+      "months": 48,
+      "t": -4.08,
+      "t2": -6.21,
+      "tradeT": -4.19,
+      "win": 0.4086,
+      "stopShare": 0.2829,
+      "stopPips": 18
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "n": 603,
+      "netR": -0.1664,
+      "grossR": -0.0223,
+      "costR": 0.1441,
+      "net2R": -0.3105,
+      "totalR": -100.35,
+      "months": 83,
+      "t": -4.86,
+      "t2": -8.42,
+      "tradeT": -4.62,
+      "win": 0.408,
+      "stopShare": 0.262,
+      "stopPips": 15.1
+     },
+     "replication": {
+      "n": 351,
+      "netR": -0.146,
+      "grossR": 0.0289,
+      "costR": 0.175,
+      "net2R": -0.321,
+      "totalR": -51.26,
+      "months": 48,
+      "t": -2.81,
+      "t2": -5.9,
+      "tradeT": -2.7,
+      "win": 0.4359,
+      "stopShare": 0.3191,
+      "stopPips": 11.4
+     }
+    },
+    "audusd": {
+     "decisive": {
+      "n": 594,
+      "netR": -0.1701,
+      "grossR": -0.0085,
+      "costR": 0.1617,
+      "net2R": -0.3318,
+      "totalR": -101.06,
+      "months": 83,
+      "t": -5.39,
+      "t2": -9.57,
+      "tradeT": -5.1,
+      "win": 0.399,
+      "stopShare": 0.2256,
+      "stopPips": 10.7
+     },
+     "replication": {
+      "n": 317,
+      "netR": -0.2532,
+      "grossR": -0.0555,
+      "costR": 0.1977,
+      "net2R": -0.4509,
+      "totalR": -80.26,
+      "months": 48,
+      "t": -5.94,
+      "t2": -9.33,
+      "tradeT": -5.1,
+      "win": 0.3691,
+      "stopShare": 0.2965,
+      "stopPips": 8.8
+     }
+    },
+    "usdchf": {
+     "decisive": {
+      "n": 573,
+      "netR": -0.126,
+      "grossR": 0.0206,
+      "costR": 0.1466,
+      "net2R": -0.2727,
+      "totalR": -72.22,
+      "months": 83,
+      "t": -3.74,
+      "t2": -7.66,
+      "tradeT": -3.99,
+      "win": 0.4136,
+      "stopShare": 0.192,
+      "stopPips": 12.1
+     },
+     "replication": {
+      "n": 317,
+      "netR": -0.1094,
+      "grossR": 0.0527,
+      "costR": 0.1622,
+      "net2R": -0.2716,
+      "totalR": -34.69,
+      "months": 47,
+      "t": -2.17,
+      "t2": -5.11,
+      "tradeT": -2.23,
+      "win": 0.4385,
+      "stopShare": 0.2208,
+      "stopPips": 11.1
+     }
+    },
+    "eurjpy": {
+     "decisive": {
+      "n": 591,
+      "netR": -0.138,
+      "grossR": -0.0049,
+      "costR": 0.1331,
+      "net2R": -0.2712,
+      "totalR": -81.56,
+      "months": 83,
+      "t": -3.53,
+      "t2": -6.68,
+      "tradeT": -3.8,
+      "win": 0.4129,
+      "stopShare": 0.264,
+      "stopPips": 16
+     },
+     "replication": {
+      "n": 350,
+      "netR": -0.1581,
+      "grossR": -0.0105,
+      "costR": 0.1476,
+      "net2R": -0.3057,
+      "totalR": -55.33,
+      "months": 48,
+      "t": -3.29,
+      "t2": -6.25,
+      "tradeT": -3.01,
+      "win": 0.42,
+      "stopShare": 0.3086,
+      "stopPips": 13.3
+     }
+    }
+   },
+   "byYear": {
+    "2016": {
+     "n": 524,
+     "netR": -0.0826,
+     "totalR": -43.27
+    },
+    "2017": {
+     "n": 494,
+     "netR": -0.1913,
+     "totalR": -94.5
+    },
+    "2018": {
+     "n": 528,
+     "netR": -0.1843,
+     "totalR": -97.31
+    },
+    "2019": {
+     "n": 490,
+     "netR": -0.2101,
+     "totalR": -102.96
+    },
+    "2020": {
+     "n": 520,
+     "netR": -0.1311,
+     "totalR": -68.18
+    },
+    "2021": {
+     "n": 506,
+     "netR": -0.1178,
+     "totalR": -59.6
+    },
+    "2022": {
+     "n": 530,
+     "netR": -0.1592,
+     "totalR": -84.37
+    },
+    "2023": {
+     "n": 506,
+     "netR": -0.1774,
+     "totalR": -89.76
+    },
+    "2024": {
+     "n": 499,
+     "netR": -0.2163,
+     "totalR": -107.96
+    },
+    "2025": {
+     "n": 494,
+     "netR": -0.1544,
+     "totalR": -76.26
+    },
+    "2026": {
+     "n": 455,
+     "netR": -0.1011,
+     "totalR": -45.98
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "netPositive": false,
+    "monthT": false,
+    "replicationSameSign": false,
+    "holm": false,
+    "placebo": true
+   },
+   "pass": false
+  },
+  "T2": {
+   "name": "Follow into the fix (15:55 -> 16:05 London, with A)",
+   "decisive": {
+    "n": 3510,
+    "netR": -0.1641,
+    "grossR": -0.0232,
+    "costR": 0.1409,
+    "net2R": -0.3049,
+    "totalR": -575.89,
+    "months": 83,
+    "t": -10.32,
+    "t2": -16.37,
+    "tradeT": -18.01,
+    "win": 0.3436,
+    "stopShare": 0.061
+   },
+   "replication": {
+    "n": 2036,
+    "netR": -0.1949,
+    "grossR": -0.034,
+    "costR": 0.1608,
+    "net2R": -0.3557,
+    "totalR": -396.72,
+    "months": 48,
+    "t": -10.32,
+    "t2": -15.34,
+    "tradeT": -13.33,
+    "win": 0.3453,
+    "stopShare": 0.1164
+   },
+   "pOneSided": 1,
+   "placebo": {
+    "seeds": 40,
+    "rank": 38,
+    "p95": -0.1909,
+    "median": -0.2067,
+    "beats": 40,
+    "nMedian": 3584.5,
+    "values": [
+     -0.1741,
+     -0.2193,
+     -0.2053,
+     -0.2316,
+     -0.199,
+     -0.1974,
+     -0.2145,
+     -0.1989,
+     -0.2055,
+     -0.2122,
+     -0.2049,
+     -0.2001,
+     -0.1913,
+     -0.2073,
+     -0.2061,
+     -0.2062,
+     -0.2001,
+     -0.2035,
+     -0.2083,
+     -0.2347,
+     -0.2022,
+     -0.1872,
+     -0.2145,
+     -0.2104,
+     -0.2078,
+     -0.2426,
+     -0.2117,
+     -0.2248,
+     -0.1909,
+     -0.2062,
+     -0.2085,
+     -0.1997,
+     -0.2099,
+     -0.196,
+     -0.2201,
+     -0.2209,
+     -0.2242,
+     -0.2345,
+     -0.2,
+     -0.2217
+    ]
+   },
+   "bySlot": {
+    "12:00": {
+     "n": 3548,
+     "netR": -0.2839,
+     "grossR": -0.0359,
+     "costR": 0.2481,
+     "t": -16.88
+    },
+    "12:30": {
+     "n": 3552,
+     "netR": -0.2255,
+     "grossR": 0.0007,
+     "costR": 0.2262,
+     "t": -15.29
+    },
+    "13:00": {
+     "n": 3479,
+     "netR": -0.2106,
+     "grossR": 0.0001,
+     "costR": 0.2107,
+     "t": -12.33
+    },
+    "13:30": {
+     "n": 3564,
+     "netR": -0.1675,
+     "grossR": 0.0184,
+     "costR": 0.1859,
+     "t": -7.37
+    },
+    "14:00": {
+     "n": 3666,
+     "netR": -0.1579,
+     "grossR": -0.022,
+     "costR": 0.1358,
+     "t": -13.19
+    },
+    "14:30": {
+     "n": 3526,
+     "netR": -0.1588,
+     "grossR": 0.0012,
+     "costR": 0.1601,
+     "t": -11.41
+    },
+    "15:00": {
+     "n": 3548,
+     "netR": -0.1273,
+     "grossR": 0.0152,
+     "costR": 0.1426,
+     "t": -8.17
+    },
+    "17:00": {
+     "n": 3535,
+     "netR": -0.2281,
+     "grossR": -0.017,
+     "costR": 0.211,
+     "t": -15.31
+    },
+    "17:30": {
+     "n": 3541,
+     "netR": -0.2395,
+     "grossR": -0.0089,
+     "costR": 0.2306,
+     "t": -16.48
+    },
+    "18:00": {
+     "n": 3553,
+     "netR": -0.2831,
+     "grossR": -0.0126,
+     "costR": 0.2704,
+     "t": -16.66
+    }
+   },
+   "byPair": {
+    "eurusd": {
+     "decisive": {
+      "n": 578,
+      "netR": -0.1629,
+      "grossR": -0.0188,
+      "costR": 0.1441,
+      "net2R": -0.3069,
+      "totalR": -94.14,
+      "months": 83,
+      "t": -6.12,
+      "t2": -9.99,
+      "tradeT": -7.62,
+      "win": 0.3218,
+      "stopShare": 0.045,
+      "stopPips": 13.6
+     },
+     "replication": {
+      "n": 351,
+      "netR": -0.2225,
+      "grossR": -0.0501,
+      "costR": 0.1724,
+      "net2R": -0.3949,
+      "totalR": -78.1,
+      "months": 48,
+      "t": -6.58,
+      "t2": -10.01,
+      "tradeT": -6.06,
+      "win": 0.3333,
+      "stopShare": 0.1168,
+      "stopPips": 11.8
+     }
+    },
+    "gbpusd": {
+     "decisive": {
+      "n": 571,
+      "netR": -0.1424,
+      "grossR": -0.0277,
+      "costR": 0.1148,
+      "net2R": -0.2572,
+      "totalR": -81.32,
+      "months": 83,
+      "t": -5.84,
+      "t2": -9.54,
+      "tradeT": -6.3,
+      "win": 0.3643,
+      "stopShare": 0.0543,
+      "stopPips": 17.8
+     },
+     "replication": {
+      "n": 350,
+      "netR": -0.1484,
+      "grossR": -0.0346,
+      "costR": 0.1139,
+      "net2R": -0.2623,
+      "totalR": -51.95,
+      "months": 48,
+      "t": -4.12,
+      "t2": -6.91,
+      "tradeT": -3.96,
+      "win": 0.3686,
+      "stopShare": 0.1257,
+      "stopPips": 18
+     }
+    },
+    "usdjpy": {
+     "decisive": {
+      "n": 603,
+      "netR": -0.1315,
+      "grossR": 0.0126,
+      "costR": 0.1441,
+      "net2R": -0.2756,
+      "totalR": -79.29,
+      "months": 83,
+      "t": -4.92,
+      "t2": -9.11,
+      "tradeT": -5.01,
+      "win": 0.3648,
+      "stopShare": 0.0697,
+      "stopPips": 15.1
+     },
+     "replication": {
+      "n": 351,
+      "netR": -0.1678,
+      "grossR": 0.0071,
+      "costR": 0.175,
+      "net2R": -0.3428,
+      "totalR": -58.9,
+      "months": 48,
+      "t": -4.03,
+      "t2": -7.47,
+      "tradeT": -4.66,
+      "win": 0.359,
+      "stopShare": 0.114,
+      "stopPips": 11.4
+     }
+    },
+    "audusd": {
+     "decisive": {
+      "n": 594,
+      "netR": -0.1807,
+      "grossR": -0.0191,
+      "costR": 0.1617,
+      "net2R": -0.3424,
+      "totalR": -107.35,
+      "months": 83,
+      "t": -7.01,
+      "t2": -10.67,
+      "tradeT": -9.13,
+      "win": 0.3367,
+      "stopShare": 0.0488,
+      "stopPips": 10.7
+     },
+     "replication": {
+      "n": 317,
+      "netR": -0.2232,
+      "grossR": -0.0255,
+      "costR": 0.1977,
+      "net2R": -0.4209,
+      "totalR": -70.74,
+      "months": 48,
+      "t": -5.99,
+      "t2": -9.51,
+      "tradeT": -6.79,
+      "win": 0.3249,
+      "stopShare": 0.0946,
+      "stopPips": 8.8
+     }
+    },
+    "usdchf": {
+     "decisive": {
+      "n": 573,
+      "netR": -0.2014,
+      "grossR": -0.0548,
+      "costR": 0.1466,
+      "net2R": -0.348,
+      "totalR": -115.42,
+      "months": 83,
+      "t": -7.87,
+      "t2": -11.9,
+      "tradeT": -9.68,
+      "win": 0.2932,
+      "stopShare": 0.0506,
+      "stopPips": 12.1
+     },
+     "replication": {
+      "n": 317,
+      "netR": -0.233,
+      "grossR": -0.0708,
+      "costR": 0.1622,
+      "net2R": -0.3951,
+      "totalR": -73.85,
+      "months": 47,
+      "t": -5.73,
+      "t2": -8.78,
+      "tradeT": -6.29,
+      "win": 0.2965,
+      "stopShare": 0.1325,
+      "stopPips": 11.1
+     }
+    },
+    "eurjpy": {
+     "decisive": {
+      "n": 591,
+      "netR": -0.1664,
+      "grossR": -0.0333,
+      "costR": 0.1331,
+      "net2R": -0.2996,
+      "totalR": -98.36,
+      "months": 83,
+      "t": -7.61,
+      "t2": -12.23,
+      "tradeT": -7.5,
+      "win": 0.379,
+      "stopShare": 0.0964,
+      "stopPips": 16
+     },
+     "replication": {
+      "n": 350,
+      "netR": -0.1805,
+      "grossR": -0.0329,
+      "costR": 0.1476,
+      "net2R": -0.3281,
+      "totalR": -63.17,
+      "months": 48,
+      "t": -4.83,
+      "t2": -7.89,
+      "tradeT": -5.3,
+      "win": 0.3829,
+      "stopShare": 0.1143,
+      "stopPips": 13.3
+     }
+    }
+   },
+   "byYear": {
+    "2016": {
+     "n": 524,
+     "netR": -0.1871,
+     "totalR": -98.04
+    },
+    "2017": {
+     "n": 494,
+     "netR": -0.1747,
+     "totalR": -86.32
+    },
+    "2018": {
+     "n": 528,
+     "netR": -0.1895,
+     "totalR": -100.03
+    },
+    "2019": {
+     "n": 490,
+     "netR": -0.2292,
+     "totalR": -112.33
+    },
+    "2020": {
+     "n": 520,
+     "netR": -0.0882,
+     "totalR": -45.84
+    },
+    "2021": {
+     "n": 506,
+     "netR": -0.2206,
+     "totalR": -111.65
+    },
+    "2022": {
+     "n": 530,
+     "netR": -0.1374,
+     "totalR": -72.8
+    },
+    "2023": {
+     "n": 506,
+     "netR": -0.2022,
+     "totalR": -102.29
+    },
+    "2024": {
+     "n": 499,
+     "netR": -0.2265,
+     "totalR": -113.04
+    },
+    "2025": {
+     "n": 494,
+     "netR": -0.09,
+     "totalR": -44.46
+    },
+    "2026": {
+     "n": 455,
+     "netR": -0.1886,
+     "totalR": -85.81
+    }
+   },
+   "holmP": 1,
+   "checks": {
+    "netPositive": false,
+    "monthT": false,
+    "replicationSameSign": false,
+    "holm": false,
+    "placebo": true
+   },
+   "pass": false
+  }
+ },
+ "notes": [
+  "Data: OANDA mid M5 of the six pairs from 2015-11-01 to 2026-11-12 (the fx-london-orb study's files, kept outside git). Weekdays: 1792 in 2020-now, 1043 in 2016-19. Days with no A (a 15:30 or 15:55 candle missing) by pair: EUR/USD 19, GBP/USD 19, USD/JPY 19, AUD/USD 20, USD/CHF 22, EUR/JPY 20; events with no trade (an entry or exit candle missing): EUR/USD 0/0, GBP/USD 0/0, USD/JPY 0/0, AUD/USD 0/0, USD/CHF 0/0, EUR/JPY 0/0 (T1/T2).",
+  "London time from Intl (Europe/London): 15:30 London is 15:30 UTC in winter and 14:30 UTC on British summer time. The windows never touch the 17:00 New York rollover (22:00 London), so no financing is charged.",
+  "Costs a round trip: 0.3 pip spread + 2 x 0.5 pip slippage + 2 x USD 22.5 per million (about 0.5 pip on EUR/USD), about 1.8 pips; in R that is divided by |A|, the stop. The 0.3 pip spread was measured on the USD majors and is used unmeasured for EUR/JPY.",
+  "The month t is on calendar-month sums of pooled net R; the trade t (`tradeT` in result.json) treats every trade as independent and is shown for information only. Six pairs on one day are correlated (the dollar), which the month sums absorb.",
+  "T1 before costs: −0.011R a trade on 2020-now and −0.005R on 2016-19; the cost is 0.141R a trade on average because the stop is only |A| (median 13.6 / 17.8 / 15.1 / 10.7 / 12.1 / 16 pips by pair, in the order of the pair table).",
+  "T2 before costs: −0.023R a trade on 2020-now and −0.034R on 2016-19; the cost is 0.141R a trade on average because the stop is only |A| (median 13.6 / 17.8 / 15.1 / 10.7 / 12.1 / 16 pips by pair, in the order of the pair table).",
+  "Placebo: both tests clear the placebo's 95th percentile (T1 above 38 of 40, T2 above 40 of 40) while losing, so the 16:00 windows lose LESS than the same rule at other afternoon half-hours, not that they make money. Before costs the ten placebo slots (12:00 to 18:00, in order) make −0.024 / −0.001 / +0.045 / +0.015 / +0.025 / −0.018 / +0.014 / +0.010 / +0.032 / −0.043R (T1) and −0.036 / +0.001 / +0.000 / +0.018 / −0.022 / +0.001 / +0.015 / −0.017 / −0.009 / −0.013R (T2), with a cost of 0.25 / 0.23 / 0.21 / 0.19 / 0.14 / 0.16 / 0.14 / 0.21 / 0.23 / 0.27R a trade against 0.141R at the fix: |A| is larger into 16:00, so the same pip cost is fewer R there. Read after the verdict, not part of it."
+ ]
+}
