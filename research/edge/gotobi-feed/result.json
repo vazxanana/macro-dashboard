@@ -1,0 +1,334 @@
+{
+ "study": "gotobi-feed",
+ "built": "2026-11-14",
+ "verdict": "FEED-ROBUST",
+ "pass": true,
+ "failed": [],
+ "shorterWindow": false,
+ "rule": "The gotobi study's T2, frozen (frozen.mjs, sha256 645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32): on gotobi days sell USD/JPY at the open of the 00:55 UTC M5 candle, buy back at 06:00 UTC; stop 1.5 x the 20-business-day median of the same window's absolute move; net of 0.3 pip spread, USD 22.5 per million a side and 0.5 pip slippage a side.",
+ "data": {
+  "hist": {
+   "source": "HistData USD/JPY M1 (bid), council-data research/candles/USDJPY, git show",
+   "files": 18,
+   "clock": "council/histdata.mjs histStampUtc",
+   "first": "2018-01-02 00:00",
+   "last": "2026-10-30 06:55",
+   "m5": 192787
+  },
+  "oanda": {
+   "source": "OANDA mid M5 through the /md/bars proxy (fetch.mjs)",
+   "first": "2017-11-01 00:00",
+   "last": "2026-11-12 06:55",
+   "m5": 196655
+  }
+ },
+ "window": [
+  "2018-01-01",
+  "2026-10-29"
+ ],
+ "lastDay": "2026-10-29",
+ "bar": {
+  "H1": {
+   "netR": "> 0",
+   "monthT": 2
+  },
+  "H2": {
+   "corrNetR": 0.8
+  }
+ },
+ "checks": {
+  "H1": {
+   "netPositive": true,
+   "monthT": true
+  },
+  "H2": {
+   "corr": true
+  }
+ },
+ "hist": {
+  "gotobiDays": 631,
+  "all": {
+   "n": 623,
+   "netR": 0.1265,
+   "grossR": 0.243,
+   "costR": 0.1166,
+   "totalR": 78.78,
+   "tradeT": 2.43,
+   "months": 106,
+   "t": 2.34,
+   "win": 0.5008,
+   "stopShare": 0.2745,
+   "stopPips": 19,
+   "netR2x": 0.0099,
+   "t2x": 0.18
+  },
+  "byYear": {
+   "2018": {
+    "n": 67,
+    "netR": -0.1296,
+    "totalR": -8.68,
+    "t": -1.22
+   },
+   "2019": {
+    "n": 71,
+    "netR": 0.2969,
+    "totalR": 21.08,
+    "t": 2.92
+   },
+   "2020": {
+    "n": 70,
+    "netR": 0.1956,
+    "totalR": 13.69,
+    "t": 1
+   },
+   "2021": {
+    "n": 70,
+    "netR": 0.0464,
+    "totalR": 3.25,
+    "t": 0.23
+   },
+   "2022": {
+    "n": 72,
+    "netR": 0.3973,
+    "totalR": 28.61,
+    "t": 2.26
+   },
+   "2023": {
+    "n": 72,
+    "netR": -0.05,
+    "totalR": -3.6,
+    "t": -0.38
+   },
+   "2024": {
+    "n": 72,
+    "netR": 0.2097,
+    "totalR": 15.1,
+    "t": 1.04
+   },
+   "2025": {
+    "n": 71,
+    "netR": 0.3149,
+    "totalR": 22.36,
+    "t": 2.43
+   },
+   "2026": {
+    "n": 58,
+    "netR": -0.2246,
+    "totalR": -13.02,
+    "t": -2.18
+   }
+  },
+  "noTrade": {
+   "noEntry": 1,
+   "noExit": 2,
+   "noLookback": 5
+  },
+  "noTradeDays": {
+   "noEntry": [
+    "2026-09-25"
+   ],
+   "noExit": [
+    "2020-11-30",
+    "2021-05-31"
+   ],
+   "noLookback": [
+    "2018-01-05",
+    "2018-01-10",
+    "2018-01-15",
+    "2018-01-19",
+    "2018-01-25"
+   ]
+  }
+ },
+ "oanda": {
+  "gotobiDays": 631,
+  "all": {
+   "n": 625,
+   "netR": 0.1432,
+   "grossR": 0.2598,
+   "costR": 0.1166,
+   "totalR": 89.48,
+   "tradeT": 2.76,
+   "months": 106,
+   "t": 2.66,
+   "win": 0.512,
+   "stopShare": 0.2656,
+   "stopPips": 18.9,
+   "netR2x": 0.0266,
+   "t2x": 0.49
+  },
+  "byYear": {
+   "2018": {
+    "n": 71,
+    "netR": -0.0394,
+    "totalR": -2.79,
+    "t": -0.32
+   },
+   "2019": {
+    "n": 70,
+    "netR": 0.3084,
+    "totalR": 21.59,
+    "t": 3.14
+   },
+   "2020": {
+    "n": 70,
+    "netR": 0.2021,
+    "totalR": 14.15,
+    "t": 1.05
+   },
+   "2021": {
+    "n": 71,
+    "netR": 0.0446,
+    "totalR": 3.17,
+    "t": 0.23
+   },
+   "2022": {
+    "n": 72,
+    "netR": 0.4069,
+    "totalR": 29.29,
+    "t": 2.29
+   },
+   "2023": {
+    "n": 71,
+    "netR": -0.0113,
+    "totalR": -0.8,
+    "t": -0.09
+   },
+   "2024": {
+    "n": 71,
+    "netR": 0.2168,
+    "totalR": 15.4,
+    "t": 1.06
+   },
+   "2025": {
+    "n": 70,
+    "netR": 0.3123,
+    "totalR": 21.86,
+    "t": 2.42
+   },
+   "2026": {
+    "n": 59,
+    "netR": -0.2098,
+    "totalR": -12.38,
+    "t": -2.03
+   }
+  },
+  "noTrade": {
+   "noEntry": 6,
+   "noExit": 0,
+   "noLookback": 0
+  },
+  "noTradeDays": {
+   "noEntry": [
+    "2018-12-25",
+    "2019-12-25",
+    "2020-12-25",
+    "2023-12-25",
+    "2024-12-25",
+    "2025-12-25"
+   ],
+   "noExit": [],
+   "noLookback": []
+  }
+ },
+ "common": {
+  "days": 617,
+  "onlyHist": [
+   "2018-12-25",
+   "2019-12-25",
+   "2020-12-25",
+   "2023-12-25",
+   "2024-12-25",
+   "2025-12-25"
+  ],
+  "onlyOanda": [
+   "2018-01-05",
+   "2018-01-10",
+   "2018-01-15",
+   "2018-01-19",
+   "2018-01-25",
+   "2020-11-30",
+   "2021-05-31",
+   "2026-09-25"
+  ],
+  "corrNetR": 0.9966,
+  "corrMovePips": 0.9979,
+  "sameSign": 0.9887,
+  "stopOnlyHist": 5,
+  "stopOnlyOanda": 0,
+  "diffPips": {
+   "entry": {
+    "medianAbs": 0.2,
+    "p95Abs": 0.9,
+    "maxAbs": 4.5,
+    "medianSigned": -0.1
+   },
+   "exit": {
+    "medianAbs": 0.25,
+    "p95Abs": 0.94,
+    "maxAbs": 38.05,
+    "medianSigned": -0.2
+   },
+   "move": {
+    "medianAbs": 0.2,
+    "p95Abs": 1.1,
+    "maxAbs": 38.15,
+    "medianSigned": -0.07
+   },
+   "stopD": {
+    "medianAbs": 0.23,
+    "p95Abs": 1.22,
+    "maxAbs": 10.65,
+    "medianSigned": 0
+   }
+  },
+  "hist": {
+   "n": 617,
+   "netR": 0.1314,
+   "grossR": 0.2481,
+   "costR": 0.1167,
+   "totalR": 81.08,
+   "tradeT": 2.51,
+   "months": 106,
+   "t": 2.4,
+   "win": 0.5041,
+   "stopShare": 0.2755,
+   "stopPips": 19,
+   "netR2x": 0.0147,
+   "t2x": 0.27
+  },
+  "oanda": {
+   "n": 617,
+   "netR": 0.1378,
+   "grossR": 0.2546,
+   "costR": 0.1168,
+   "totalR": 85.04,
+   "tradeT": 2.63,
+   "months": 106,
+   "t": 2.53,
+   "win": 0.5089,
+   "stopShare": 0.2674,
+   "stopPips": 19,
+   "netR2x": 0.0211,
+   "t2x": 0.38
+  },
+  "largest": {
+   "day": "2018-01-31",
+   "exitPips": 38.05,
+   "exitHist": 109.0745,
+   "exitOanda": 108.694,
+   "howHist": "stop",
+   "howOanda": "time",
+   "stopHist": 109.0745,
+   "stopOanda": 109.092
+  }
+ },
+ "notes": [
+  "Data: HistData USD/JPY M1 (18 files in council-data research/candles/USDJPY, read with git show, bid prices) converted to UTC with council/histdata.mjs histStampUtc only (a repeated converted time dropped), aggregated to UTC M5 candles 00:00-06:55; first candle 2018-01-02 00:00, last 2026-10-30 06:55. OANDA mid M5 from the /md/bars proxy (fetch.mjs), first 2017-11-01 00:00, last 2026-11-12 06:55. Both are judged through 2026-10-29, the frozen rule's last whole day on the HistData file.",
+  "Gotobi days in the window: 631. No trade on HistData: 1 without a 00:55 UTC candle, 2 without an exit candle, 5 without 15 of the 20 lookback days (2026-09-25, 2020-11-30, 2021-05-31, 2018-01-05, 2018-01-10, 2018-01-15, 2018-01-19, 2018-01-25; the lookback ones are the start of the file). On OANDA: 6 without a 00:55 candle (2018-12-25, 2019-12-25, 2020-12-25, 2023-12-25, 2024-12-25, 2025-12-25: Christmas Day, which the HistData files do carry), 0 without an exit, 0 without the lookback. The 2023 HistData hole (20 Feb to 30 Jul, too few bars for the clock audit's weekly reading) still holds the 00:55 and 06:00 UTC candles: both feeds trade the same 32 gotobi days in it.",
+  "The largest exit difference, 38.05 pips on 2018-01-31: HistData exits by stop at 109.0745, OANDA by time at 108.694 (stop 109.0745 / 109.092). Exit differences over 5 pips are days stopped on one feed and not the other (5 stopped on HistData only, 0 on OANDA only); where both feeds stop, the two stops sit up to a few pips apart because D differs; the 95th percentile of the exit difference is 0.94 pip.",
+  "In the clock audit (research/edge/histdata-clock) USD/JPY 2019 and 2023 are UNCERTIFIED (2019: the first bar after the US spring change; 2023: the file hole). They are kept, as pre-registered; the by-year table shows them.",
+  "Costs are the frozen model on both feeds (0.3 pip spread, 0.5 pip slippage a side, USD 22.5 per million a side). HistData bid prices carry no spread of their own; the bid/mid offset cancels in the move.",
+  "Month t is on calendar-month sums of net R (the frozen monthT). No placebo or Holm: one frozen rule on one more feed."
+ ]
+}

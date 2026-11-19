@@ -1,0 +1,484 @@
+{
+ "study": "index-spread-momentum",
+ "title": "Non-US equity index pairs: log-spread z-score momentum",
+ "built": "2026-11-14",
+ "preregistration": "PREREGISTRATION.md",
+ "system": "DE40 / UK100, EU50 / UK100, JP225 / AU200, DE40 / FR40 spread momentum (not a council system)",
+ "verdict": "FAIL, 0 of 5 pre-registered checks: following a 2-sd stretch of these non-US index spreads is not an edge after costs",
+ "pass": false,
+ "checks": {
+  "netPositive": false,
+  "tAtLeast2": false,
+  "sameSignRep": false,
+  "pairsPositive": false,
+  "aboveRandom": false
+ },
+ "pairsPositive": 1,
+ "data": {
+  "src": "OANDA mid daily DE30_EUR, UK100_GBP, EU50_EUR, JP225_USD, AU200_AUD, FR40_EUR, council-data research/daily/*.json",
+  "rates": "Approximate yearly mean policy rates, %. eur (ECB deposit facility), gbp (Bank of England Bank Rate), jpy (Bank of Japan policy rate): copied from the turnaround-replicate branch, research/edge/turnaround-replicate/run.mjs RATES (stated there, not fetched). aud (Reserve Bank of Australia cash rate): added in this study's pre-registration, same form, stated, not fetched."
+ },
+ "params": {
+  "betaN": 250,
+  "zN": 60,
+  "zIn": 2,
+  "zStop": 0,
+  "zTarget": 4,
+  "hold": 20
+ },
+ "spreads": {
+  "de40": 2,
+  "uk100": 2,
+  "eu50": 2,
+  "fr40": 2,
+  "jp225": 10,
+  "au200": 2
+ },
+ "currencies": {
+  "de40": "eur",
+  "eu50": "eur",
+  "fr40": "eur",
+  "uk100": "gbp",
+  "jp225": "jpy",
+  "au200": "aud"
+ },
+ "financing": {
+  "markup": 0.025
+ },
+ "windows": {
+  "rep": {
+   "from": "2009-01-01",
+   "to": "2016-01-01"
+  },
+  "dec": {
+   "from": "2016-01-01",
+   "to": null
+  }
+ },
+ "bar": {
+  "minT": 2,
+  "placeboPct": 0.95,
+  "minPairsPositive": 3
+ },
+ "placeboSpec": {
+  "draws": 40,
+  "seed": 20261114
+ },
+ "pooled": {
+  "dec": {
+   "n": 244,
+   "avg": -0.107,
+   "gross": 0.022,
+   "spread": 0.02,
+   "fin": 0.109,
+   "total": -26.08,
+   "wr": 42.62,
+   "pf": 0.76,
+   "months": 131,
+   "monthT": -1.56,
+   "p": 0.9403,
+   "dd": -44.51,
+   "exits": {
+    "time": 153,
+    "target": 10,
+    "stop": 70,
+    "stop-gap": 11
+   },
+   "sides": {
+    "long": 128,
+    "short": 116
+   },
+   "worstR": -3.719
+  },
+  "rep": {
+   "n": 153,
+   "avg": -0.072,
+   "gross": 0.073,
+   "spread": 0.033,
+   "fin": 0.111,
+   "total": -11.01,
+   "wr": 39.87,
+   "pf": 0.83,
+   "months": 84,
+   "monthT": -0.8,
+   "p": 0.7872,
+   "dd": -13.72,
+   "exits": {
+    "stop": 37,
+    "time": 100,
+    "stop-gap": 15,
+    "target": 1
+   },
+   "sides": {
+    "long": 90,
+    "short": 63
+   },
+   "worstR": -1.737
+  },
+  "fin0": {
+   "dec": 0.002,
+   "rep": 0.039
+  },
+  "placebo": {
+   "draws": 40,
+   "median": -0.561,
+   "p5": -1.664,
+   "p95": 0.004,
+   "atLeastReal": 5
+  }
+ },
+ "pairs": [
+  {
+   "id": "P1",
+   "name": "DE40 / UK100",
+   "legs": [
+    "de40",
+    "uk100"
+   ],
+   "dec": {
+    "n": 59,
+    "avg": -0.117,
+    "gross": 0.002,
+    "spread": 0.013,
+    "fin": 0.107,
+    "total": -6.91,
+    "wr": 44.07,
+    "pf": 0.73,
+    "months": 131,
+    "monthT": -1.08,
+    "p": 0.8609,
+    "dd": -14.14,
+    "exits": {
+     "time": 36,
+     "target": 3,
+     "stop": 18,
+     "stop-gap": 2
+    },
+    "sides": {
+     "long": 29,
+     "short": 30
+    },
+    "worstR": -1.443
+   },
+   "rep": {
+    "n": 37,
+    "avg": -0.084,
+    "gross": 0.04,
+    "spread": 0.021,
+    "fin": 0.103,
+    "total": -3.12,
+    "wr": 37.84,
+    "pf": 0.8,
+    "months": 84,
+    "monthT": -0.52,
+    "p": 0.7,
+    "dd": -6.27,
+    "exits": {
+     "stop": 11,
+     "time": 23,
+     "stop-gap": 3
+    },
+    "sides": {
+     "long": 22,
+     "short": 15
+    },
+    "worstR": -1.444
+   },
+   "fin0": {
+    "dec": -0.011,
+    "rep": 0.019
+   },
+   "skipped": {
+    "dec": 4,
+    "rep": 0
+   },
+   "zSig": {
+    "median": 2.24
+   },
+   "risk": {
+    "median": 0.0384
+   },
+   "beta": {
+    "median": 1.242,
+    "min": 0.18,
+    "max": 2.747
+   },
+   "data": {
+    "days": 5921,
+    "from": "2003-03-25",
+    "to": "2026-11-06"
+   },
+   "placebo": {
+    "draws": 40,
+    "median": -0.276,
+    "p5": -2.57,
+    "p95": 0.884,
+    "atLeastReal": 18
+   }
+  },
+  {
+   "id": "P2",
+   "name": "EU50 / UK100",
+   "legs": [
+    "eu50",
+    "uk100"
+   ],
+   "dec": {
+    "n": 61,
+    "avg": -0.121,
+    "gross": 0.015,
+    "spread": 0.027,
+    "fin": 0.109,
+    "total": -7.4,
+    "wr": 37.7,
+    "pf": 0.75,
+    "months": 131,
+    "monthT": -0.98,
+    "p": 0.837,
+    "dd": -15.93,
+    "exits": {
+     "time": 32,
+     "stop": 21,
+     "target": 4,
+     "stop-gap": 4
+    },
+    "sides": {
+     "long": 30,
+     "short": 31
+    },
+    "worstR": -1.601
+   },
+   "rep": {
+    "n": 38,
+    "avg": -0.062,
+    "gross": 0.136,
+    "spread": 0.052,
+    "fin": 0.145,
+    "total": -2.34,
+    "wr": 31.58,
+    "pf": 0.88,
+    "months": 84,
+    "monthT": -0.29,
+    "p": 0.6156,
+    "dd": -6.53,
+    "exits": {
+     "stop-gap": 6,
+     "time": 23,
+     "stop": 8,
+     "target": 1
+    },
+    "sides": {
+     "long": 21,
+     "short": 17
+    },
+    "worstR": -1.737
+   },
+   "fin0": {
+    "dec": -0.012,
+    "rep": 0.084
+   },
+   "skipped": {
+    "dec": 6,
+    "rep": 0
+   },
+   "zSig": {
+    "median": 2.17
+   },
+   "risk": {
+    "median": 0.0327
+   },
+   "beta": {
+    "median": 1.036,
+    "min": 0.117,
+    "max": 2.014
+   },
+   "data": {
+    "days": 5800,
+    "from": "2003-09-22",
+    "to": "2026-11-06"
+   },
+   "placebo": {
+    "draws": 40,
+    "median": -0.87,
+    "p5": -2.237,
+    "p95": 0.151,
+    "atLeastReal": 4
+   }
+  },
+  {
+   "id": "P3",
+   "name": "JP225 / AU200",
+   "legs": [
+    "jp225",
+    "au200"
+   ],
+   "dec": {
+    "n": 60,
+    "avg": 0.031,
+    "gross": 0.109,
+    "spread": 0.015,
+    "fin": 0.064,
+    "total": 1.83,
+    "wr": 48.33,
+    "pf": 1.09,
+    "months": 131,
+    "monthT": 0.28,
+    "p": 0.3907,
+    "dd": -5.87,
+    "exits": {
+     "time": 44,
+     "stop": 14,
+     "target": 2
+    },
+    "sides": {
+     "long": 36,
+     "short": 24
+    },
+    "worstR": -1.194
+   },
+   "rep": {
+    "n": 41,
+    "avg": -0.042,
+    "gross": 0.048,
+    "spread": 0.024,
+    "fin": 0.065,
+    "total": -1.71,
+    "wr": 51.22,
+    "pf": 0.88,
+    "months": 84,
+    "monthT": -0.31,
+    "p": 0.6202,
+    "dd": -5.83,
+    "exits": {
+     "stop-gap": 4,
+     "stop": 7,
+     "time": 30
+    },
+    "sides": {
+     "long": 23,
+     "short": 18
+    },
+    "worstR": -1.433
+   },
+   "fin0": {
+    "dec": 0.095,
+    "rep": 0.023
+   },
+   "skipped": {
+    "dec": 4,
+    "rep": 3
+   },
+   "zSig": {
+    "median": 2.24
+   },
+   "risk": {
+    "median": 0.0585
+   },
+   "beta": {
+    "median": 0.899,
+    "min": 0.002,
+    "max": 3.178
+   },
+   "data": {
+    "days": 5764,
+    "from": "2004-03-18",
+    "to": "2026-11-06"
+   },
+   "placebo": {
+    "draws": 40,
+    "median": -0.325,
+    "p5": -2.143,
+    "p95": 0.29,
+    "atLeastReal": 4
+   }
+  },
+  {
+   "id": "P4",
+   "name": "DE40 / FR40",
+   "legs": [
+    "de40",
+    "fr40"
+   ],
+   "dec": {
+    "n": 64,
+    "avg": -0.212,
+    "gross": -0.033,
+    "spread": 0.026,
+    "fin": 0.153,
+    "total": -13.59,
+    "wr": 40.63,
+    "pf": 0.61,
+    "months": 131,
+    "monthT": -1.35,
+    "p": 0.9114,
+    "dd": -14.91,
+    "exits": {
+     "stop": 17,
+     "time": 41,
+     "stop-gap": 5,
+     "target": 1
+    },
+    "sides": {
+     "long": 33,
+     "short": 31
+    },
+    "worstR": -3.719
+   },
+   "rep": {
+    "n": 37,
+    "avg": -0.104,
+    "gross": 0.069,
+    "spread": 0.037,
+    "fin": 0.136,
+    "total": -3.84,
+    "wr": 37.84,
+    "pf": 0.78,
+    "months": 84,
+    "monthT": -0.56,
+    "p": 0.7121,
+    "dd": -9.2,
+    "exits": {
+     "time": 24,
+     "stop": 11,
+     "stop-gap": 2
+    },
+    "sides": {
+     "long": 24,
+     "short": 13
+    },
+    "worstR": -1.382
+   },
+   "fin0": {
+    "dec": -0.059,
+    "rep": 0.032
+   },
+   "skipped": {
+    "dec": 9,
+    "rep": 0
+   },
+   "zSig": {
+    "median": 2.17
+   },
+   "risk": {
+    "median": 0.0232
+   },
+   "beta": {
+    "median": 1.019,
+    "min": 0.387,
+    "max": 1.75
+   },
+   "data": {
+    "days": 5879,
+    "from": "2003-03-31",
+    "to": "2026-11-06"
+   },
+   "placebo": {
+    "draws": 40,
+    "median": -0.74,
+    "p5": -1.986,
+    "p95": 0.376,
+    "atLeastReal": 10
+   }
+  }
+ ]
+}

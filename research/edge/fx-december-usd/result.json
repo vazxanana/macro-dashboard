@@ -1,0 +1,766 @@
+{
+ "study": "fx-december-usd",
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "claim": {
+  "T1": "short USD basket, first trading day on/after 15 Dec to the last trading day of December, vs the same-length hold from every other half-month of the year",
+  "T2": "long USD basket, first 10 trading days of January, vs the first 10 of every other month of the year",
+  "T3": "T1 on EUR/USD alone"
+ },
+ "basket": [
+  "long EURUSD",
+  "long GBPUSD",
+  "long AUDUSD",
+  "long NZDUSD",
+  "short USDJPY",
+  "short USDCHF"
+ ],
+ "data": {
+  "files": [
+   "council-data research/daily/eurusd.json",
+   "council-data research/daily/gbpusd.json",
+   "council-data research/daily/audusd.json",
+   "council-data research/daily/nzdusd.json",
+   "council-data research/daily/usdjpy.json",
+   "council-data research/daily/usdchf.json"
+  ],
+  "usedFrom": "2005-01-01",
+  "span": {
+   "eurusd": {
+    "first": "2002-05-07",
+    "last": "2026-11-06"
+   },
+   "gbpusd": {
+    "first": "2002-05-07",
+    "last": "2026-11-06"
+   },
+   "audusd": {
+    "first": "2002-05-07",
+    "last": "2026-11-06"
+   },
+   "nzdusd": {
+    "first": "2002-09-24",
+    "last": "2026-11-06"
+   },
+   "usdjpy": {
+    "first": "2002-05-07",
+    "last": "2026-11-06"
+   },
+   "usdchf": {
+    "first": "2002-05-07",
+    "last": "2026-11-06"
+   }
+  },
+  "sha256": {
+   "eurusd": "00798b77edcdcc531bc58389fa70f2462c3035a3a755320d89adddb4237621e5",
+   "gbpusd": "e3f376c84932092d628db7609c7acd4991b1ddb459012bb46b6a54e925c197d6",
+   "audusd": "6a7bdf90e45ac3fc0e0da904fad8bac9af562f4be2e4141e6eab0dcbaaf7479f",
+   "nzdusd": "9eff3be565f620c4c25f09ede47f89e4ae804fc0d7dfb74dbf4ffe7d26661fff",
+   "usdjpy": "cd68527148b83f0e5938fbdfe23e86c740eec56227c24558675476072769ca82",
+   "usdchf": "fa744f3214c4b59d0e83e36c6e9455a2403720e1d0dccb52405b63de5fd5ea92"
+  },
+  "symbols": {
+   "file": "council-data ctrader/symbols.json",
+   "at": "2026-11-14T01:14:58.513Z",
+   "sha256": "692ba52247a8f3068d789348379afcdf344d81632f343e34b31c9995511d347a"
+  },
+  "rates": {
+   "file": "fx-carry research/edge/fx-carry/rates.json",
+   "asOf": "2026-11-14",
+   "sha256": "925c5e2a3a38107776bb4b9015ecc09dd44bba52cebc366ea17b912c16088678"
+  }
+ },
+ "costs": {
+  "spreadPip": 0.3,
+  "slipPipEachSide": 0.15,
+  "commissionPerSide": 0.0000225,
+  "financing": {
+   "eurusd": "broker swap (pips a lot a night): long -0.621, short 0.244",
+   "gbpusd": "broker swap (pips a lot a night): long -0.179, short -0.203",
+   "audusd": "broker swap (pips a lot a night): long 0.041, short -0.273",
+   "nzdusd": "policy-rate differential, fx-carry rates.json monthEnd",
+   "usdjpy": "policy-rate differential, fx-carry rates.json monthEnd",
+   "usdchf": "broker swap (pips a lot a night): long 0.437, short -1.314"
+  }
+ },
+ "units": "returns in basis points of the entry price, basket = equal-weight mean of the pairs",
+ "tests": {
+  "T1": {
+   "decisive": {
+    "years": 16,
+    "from": 2010,
+    "to": 2025,
+    "meanExcessBp": 27.57,
+    "sdBp": 117.23,
+    "t": 0.94,
+    "p": 0.1809,
+    "positive": 9,
+    "meanClaimBp": 14.97,
+    "meanBaseBp": -12.61
+   },
+   "replication": {
+    "years": 5,
+    "from": 2005,
+    "to": 2009,
+    "meanExcessBp": 25.88,
+    "sdBp": 292.62,
+    "t": 0.2,
+    "p": 0.4264,
+    "positive": 3,
+    "meanClaimBp": 14.94,
+    "meanBaseBp": -10.94
+   }
+  },
+  "T2": {
+   "decisive": {
+    "years": 17,
+    "from": 2010,
+    "to": 2026,
+    "meanExcessBp": 9.35,
+    "sdBp": 125.3,
+    "t": 0.31,
+    "p": 0.3812,
+    "positive": 9,
+    "meanClaimBp": 8.9,
+    "meanBaseBp": -0.44
+   },
+   "replication": {
+    "years": 4,
+    "from": 2006,
+    "to": 2009,
+    "meanExcessBp": -7.79,
+    "sdBp": 363.38,
+    "t": -0.04,
+    "p": 0.5158,
+    "positive": 2,
+    "meanClaimBp": 4.6,
+    "meanBaseBp": 12.4
+   }
+  },
+  "T3": {
+   "decisive": {
+    "years": 16,
+    "from": 2010,
+    "to": 2025,
+    "meanExcessBp": 15.55,
+    "sdBp": 98.56,
+    "t": 0.63,
+    "p": 0.2687,
+    "positive": 11,
+    "meanClaimBp": 4.39,
+    "meanBaseBp": -11.16
+   },
+   "replication": {
+    "years": 5,
+    "from": 2005,
+    "to": 2009,
+    "meanExcessBp": 46.44,
+    "sdBp": 318,
+    "t": 0.33,
+    "p": 0.3802,
+    "positive": 3,
+    "meanClaimBp": 35.23,
+    "meanBaseBp": -11.21
+   }
+  }
+ },
+ "cost2x": {
+  "T1": {
+   "years": 16,
+   "from": 2010,
+   "to": 2025,
+   "meanExcessBp": 27.24,
+   "sdBp": 117.33,
+   "t": 0.93,
+   "p": 0.1839,
+   "positive": 9,
+   "meanClaimBp": 8.2,
+   "meanBaseBp": -19.04
+  },
+  "T2": {
+   "years": 17,
+   "from": 2010,
+   "to": 2026,
+   "meanExcessBp": 9.38,
+   "sdBp": 125.59,
+   "t": 0.31,
+   "p": 0.381,
+   "positive": 9,
+   "meanClaimBp": 8.45,
+   "meanBaseBp": -0.93
+  },
+  "T3": {
+   "years": 16,
+   "from": 2010,
+   "to": 2025,
+   "meanExcessBp": 15.07,
+   "sdBp": 98.65,
+   "t": 0.61,
+   "p": 0.2751,
+   "positive": 11,
+   "meanClaimBp": -5.15,
+   "meanBaseBp": -20.22
+  }
+ },
+ "placebo": {
+  "T1": {
+   "share": 0.234,
+   "draws": 1000
+  },
+  "T2": {
+   "share": 0.378,
+   "draws": 1000
+  },
+  "T3": {
+   "share": 0.35,
+   "draws": 1000
+  }
+ },
+ "years": {
+  "T1": [
+   {
+    "y": 2005,
+    "claimBp": -191.02,
+    "baseBp": -56.05,
+    "excessBp": -134.98,
+    "comps": 20,
+    "pairs": 6
+   },
+   {
+    "y": 2006,
+    "claimBp": 19.89,
+    "baseBp": 1.81,
+    "excessBp": 18.08,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2007,
+    "claimBp": 74.96,
+    "baseBp": 19.42,
+    "excessBp": 55.53,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2008,
+    "claimBp": 398.7,
+    "baseBp": -87.85,
+    "excessBp": 486.56,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2009,
+    "claimBp": -227.82,
+    "baseBp": 67.96,
+    "excessBp": -295.78,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2010,
+    "claimBp": 191.62,
+    "baseBp": 17.85,
+    "excessBp": 173.76,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2011,
+    "claimBp": 167.43,
+    "baseBp": -27.39,
+    "excessBp": 194.82,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2012,
+    "claimBp": -82.31,
+    "baseBp": 13.2,
+    "excessBp": -95.5,
+    "comps": 23,
+    "pairs": 6
+   },
+   {
+    "y": 2013,
+    "claimBp": -10.55,
+    "baseBp": -20.28,
+    "excessBp": 9.72,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2014,
+    "claimBp": -134.07,
+    "baseBp": -43.96,
+    "excessBp": -90.11,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2015,
+    "claimBp": -90.25,
+    "baseBp": -31.39,
+    "excessBp": -58.86,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2016,
+    "claimBp": -125.4,
+    "baseBp": 2.59,
+    "excessBp": -127.99,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2017,
+    "claimBp": 110.34,
+    "baseBp": 19.8,
+    "excessBp": 90.54,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2018,
+    "claimBp": 69.03,
+    "baseBp": -15.83,
+    "excessBp": 84.85,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2019,
+    "claimBp": 66.22,
+    "baseBp": -35.54,
+    "excessBp": 101.76,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2020,
+    "claimBp": 116.44,
+    "baseBp": 14.51,
+    "excessBp": 101.93,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2021,
+    "claimBp": 115.21,
+    "baseBp": -51.13,
+    "excessBp": 166.34,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2022,
+    "claimBp": -44.82,
+    "baseBp": -17.93,
+    "excessBp": -26.89,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2023,
+    "claimBp": 111.56,
+    "baseBp": -18.15,
+    "excessBp": 129.71,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2024,
+    "claimBp": -208.73,
+    "baseBp": -35.4,
+    "excessBp": -173.33,
+    "comps": 22,
+    "pairs": 6
+   },
+   {
+    "y": 2025,
+    "claimBp": -12.24,
+    "baseBp": 27.35,
+    "excessBp": -39.59,
+    "comps": 22,
+    "pairs": 6
+   }
+  ],
+  "T2": [
+   {
+    "y": 2006,
+    "claimBp": -255,
+    "baseBp": 42.15,
+    "excessBp": -297.15,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2007,
+    "claimBp": 134.03,
+    "baseBp": -6.61,
+    "excessBp": 140.64,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2008,
+    "claimBp": -187.15,
+    "baseBp": 124.64,
+    "excessBp": -311.79,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2009,
+    "claimBp": 326.53,
+    "baseBp": -110.59,
+    "excessBp": 437.13,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2010,
+    "claimBp": -171.51,
+    "baseBp": -69.96,
+    "excessBp": -101.55,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2011,
+    "claimBp": 145.47,
+    "baseBp": 73.49,
+    "excessBp": 71.98,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2012,
+    "claimBp": 28.9,
+    "baseBp": 35.6,
+    "excessBp": -6.7,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2013,
+    "claimBp": 20.6,
+    "baseBp": 5.43,
+    "excessBp": 15.17,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2014,
+    "claimBp": -47.54,
+    "baseBp": -6.87,
+    "excessBp": -40.66,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2015,
+    "claimBp": 116.91,
+    "baseBp": -11.03,
+    "excessBp": 127.95,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2016,
+    "claimBp": 195.82,
+    "baseBp": -26.05,
+    "excessBp": 221.87,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2017,
+    "claimBp": -179.69,
+    "baseBp": 13.7,
+    "excessBp": -193.39,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2018,
+    "claimBp": -149.67,
+    "baseBp": 30.05,
+    "excessBp": -179.72,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2019,
+    "claimBp": -116.79,
+    "baseBp": 2.86,
+    "excessBp": -119.65,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2020,
+    "claimBp": 120.1,
+    "baseBp": -68.89,
+    "excessBp": 188.99,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2021,
+    "claimBp": 70.89,
+    "baseBp": -8.26,
+    "excessBp": 79.15,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2022,
+    "claimBp": -20.61,
+    "baseBp": 70.05,
+    "excessBp": -90.67,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2023,
+    "claimBp": -119.75,
+    "baseBp": -36.2,
+    "excessBp": -83.55,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2024,
+    "claimBp": 136.85,
+    "baseBp": 34.19,
+    "excessBp": 102.66,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2025,
+    "claimBp": 66.03,
+    "baseBp": -62.13,
+    "excessBp": 128.15,
+    "comps": 11,
+    "pairs": 6
+   },
+   {
+    "y": 2026,
+    "claimBp": 55.36,
+    "baseBp": 16.47,
+    "excessBp": 38.89,
+    "comps": 9,
+    "pairs": 6
+   }
+  ],
+  "T3": [
+   {
+    "y": 2005,
+    "claimBp": -112.8,
+    "baseBp": -58.59,
+    "excessBp": -54.21,
+    "comps": 20,
+    "pairs": 1
+   },
+   {
+    "y": 2006,
+    "claimBp": 27,
+    "baseBp": 22.39,
+    "excessBp": 4.61,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2007,
+    "claimBp": 120.94,
+    "baseBp": 34.24,
+    "excessBp": 86.7,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2008,
+    "claimBp": 443.24,
+    "baseBp": -93.49,
+    "excessBp": 536.73,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2009,
+    "claimBp": -302.24,
+    "baseBp": 39.39,
+    "excessBp": -341.64,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2010,
+    "claimBp": 14.09,
+    "baseBp": -11.36,
+    "excessBp": 25.45,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2011,
+    "claimBp": -26.18,
+    "baseBp": -39.17,
+    "excessBp": 12.99,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2012,
+    "claimBp": 11,
+    "baseBp": 12.95,
+    "excessBp": -1.94,
+    "comps": 23,
+    "pairs": 1
+   },
+   {
+    "y": 2013,
+    "claimBp": 34.05,
+    "baseBp": 6.4,
+    "excessBp": 27.64,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2014,
+    "claimBp": -266.58,
+    "baseBp": -58.09,
+    "excessBp": -208.5,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2015,
+    "claimBp": -122,
+    "baseBp": -45.24,
+    "excessBp": -76.76,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2016,
+    "claimBp": -2.46,
+    "baseBp": -9.02,
+    "excessBp": 6.56,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2017,
+    "claimBp": 186.4,
+    "baseBp": 48.72,
+    "excessBp": 137.68,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2018,
+    "claimBp": 134.19,
+    "baseBp": -12.36,
+    "excessBp": 146.56,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2019,
+    "claimBp": 64.75,
+    "baseBp": -45.85,
+    "excessBp": 110.6,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2020,
+    "claimBp": 44.49,
+    "baseBp": 23.16,
+    "excessBp": 21.33,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2021,
+    "claimBp": 91.51,
+    "baseBp": -58.37,
+    "excessBp": 149.87,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2022,
+    "claimBp": 16.3,
+    "baseBp": -41.13,
+    "excessBp": 57.43,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2023,
+    "claimBp": 30.94,
+    "baseBp": 2.51,
+    "excessBp": 28.43,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2024,
+    "claimBp": -140.24,
+    "baseBp": -22.18,
+    "excessBp": -118.06,
+    "comps": 22,
+    "pairs": 1
+   },
+   {
+    "y": 2025,
+    "claimBp": -0.02,
+    "baseBp": 70.4,
+    "excessBp": -70.42,
+    "comps": 22,
+    "pairs": 1
+   }
+  ]
+ },
+ "holm": {
+  "T1": 0.5426,
+  "T2": 0.5426,
+  "T3": 0.5426
+ },
+ "pass": {
+  "T1": {
+   "bothWindows": true,
+   "holm": false,
+   "placebo": false,
+   "cost2x": true,
+   "pass": false
+  },
+  "T2": {
+   "bothWindows": false,
+   "holm": false,
+   "placebo": false,
+   "cost2x": true,
+   "pass": false
+  },
+  "T3": {
+   "bothWindows": true,
+   "holm": false,
+   "placebo": false,
+   "cost2x": true,
+   "pass": false
+  }
+ },
+ "costT1": {
+  "positions": 96,
+  "costBp": 1.08,
+  "finBp": -5.68,
+  "stops": 13
+ },
+ "note": "Paper only. About 16 yearly observations in the decisive window: low power. Nothing in the council reads this study."
+}

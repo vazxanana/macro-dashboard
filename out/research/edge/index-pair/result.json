@@ -1,0 +1,248 @@
+{
+ "study": "index-pair",
+ "title": "US equity index pairs: log-spread z-score mean reversion",
+ "built": "2026-11-14",
+ "preregistration": "PREREGISTRATION.md",
+ "system": "US2000 / NAS100 and SPX500 / US30 spread reversion (not a council system)",
+ "verdict": "FAIL, 0 of 2 pairs: fading a 2-sd stretch of the US index spreads is not an edge after costs",
+ "data": {
+  "src": "OANDA mid daily US2000_USD, NAS100_USD, SPX500_USD, US30_USD, council-data research/daily/*.json",
+  "rates": "FRED DGS2 from council-data macro/cache.json (score.fred weekly + fred daily), rates.json",
+  "ratesFrom": "2006-01-06",
+  "ratesTo": "2026-11-13"
+ },
+ "params": {
+  "betaN": 250,
+  "zN": 60,
+  "zIn": 2,
+  "zStop": 3.5,
+  "hold": 20
+ },
+ "spreads": {
+  "us2000": 0.4,
+  "nas100": 3,
+  "spx500": 1,
+  "us30": 4
+ },
+ "financing": {
+  "markup": 0.025
+ },
+ "windows": {
+  "rep": {
+   "from": "2009-01-01",
+   "to": "2016-01-01"
+  },
+  "dec": {
+   "from": "2016-01-01",
+   "to": null
+  }
+ },
+ "bar": {
+  "minT": 2,
+  "alpha": 0.05,
+  "placeboPct": 0.95
+ },
+ "placeboSpec": {
+  "draws": 40,
+  "seed": 20261114
+ },
+ "pairs": [
+  {
+   "id": "P1",
+   "name": "US2000 / NAS100",
+   "legs": [
+    "us2000",
+    "nas100"
+   ],
+   "rep": {
+    "n": 41,
+    "avg": -0.641,
+    "gross": -0.38,
+    "spread": 0.087,
+    "fin": 0.174,
+    "total": -26.27,
+    "wr": 41.46,
+    "pf": 0.37,
+    "months": 85,
+    "monthT": -2.41,
+    "p": 0.9921,
+    "dd": -27.31,
+    "exits": {
+     "time": 29,
+     "mean": 11,
+     "stop": 1
+    },
+    "sides": {
+     "long": 30,
+     "short": 11
+    },
+    "worstR": -4.148
+   },
+   "dec": {
+    "n": 71,
+    "avg": -0.775,
+    "gross": -0.555,
+    "spread": 0.037,
+    "fin": 0.183,
+    "total": -55.01,
+    "wr": 45.07,
+    "pf": 0.41,
+    "months": 131,
+    "monthT": -2.01,
+    "p": 0.9778,
+    "dd": -55.01,
+    "exits": {
+     "time": 44,
+     "stop": 12,
+     "mean": 15
+    },
+    "sides": {
+     "long": 39,
+     "short": 32
+    },
+    "worstR": -11.209
+   },
+   "fin0": {
+    "dec": -0.592,
+    "rep": -0.466
+   },
+   "skipped": {
+    "dec": 20,
+    "rep": 1
+   },
+   "zSig": {
+    "median": 2.22,
+    "atLeast3": 9
+   },
+   "risk": {
+    "median": 0.0191
+   },
+   "beta": {
+    "median": 0.654,
+    "min": 0.039,
+    "max": 1.89
+   },
+   "data": {
+    "days": 6114,
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "placebo": {
+    "draws": 40,
+    "median": -0.158,
+    "p5": -0.416,
+    "p95": 0.087,
+    "atLeastReal": 38
+   },
+   "holmP": 1,
+   "aboveRandom": false,
+   "checks": {
+    "netPositive": false,
+    "tAtLeast2": false,
+    "holm": false,
+    "sameSignRep": false,
+    "aboveRandom": false
+   },
+   "pass": false
+  },
+  {
+   "id": "P2",
+   "name": "SPX500 / US30",
+   "legs": [
+    "spx500",
+    "us30"
+   ],
+   "rep": {
+    "n": 42,
+    "avg": -1.227,
+    "gross": -0.361,
+    "spread": 0.219,
+    "fin": 0.648,
+    "total": -51.55,
+    "wr": 42.86,
+    "pf": 0.29,
+    "months": 84,
+    "monthT": -1.81,
+    "p": 0.9651,
+    "dd": -54.33,
+    "exits": {
+     "time": 26,
+     "mean": 14,
+     "stop": 2
+    },
+    "sides": {
+     "long": 18,
+     "short": 24
+    },
+    "worstR": -25.718
+   },
+   "dec": {
+    "n": 71,
+    "avg": -0.846,
+    "gross": -0.216,
+    "spread": 0.083,
+    "fin": 0.548,
+    "total": -60.09,
+    "wr": 38.03,
+    "pf": 0.45,
+    "months": 131,
+    "monthT": -2.21,
+    "p": 0.9865,
+    "dd": -66.76,
+    "exits": {
+     "time": 38,
+     "stop": 8,
+     "mean": 23,
+     "stop-gap": 2
+    },
+    "sides": {
+     "long": 27,
+     "short": 44
+    },
+    "worstR": -12.143
+   },
+   "fin0": {
+    "dec": -0.299,
+    "rep": -0.579
+   },
+   "skipped": {
+    "dec": 14,
+    "rep": 3
+   },
+   "zSig": {
+    "median": 2.25,
+    "atLeast3": 6
+   },
+   "risk": {
+    "median": 0.0083
+   },
+   "beta": {
+    "median": 1.049,
+    "min": 0.721,
+    "max": 1.767
+   },
+   "data": {
+    "days": 6101,
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "placebo": {
+    "draws": 40,
+    "median": -0.21,
+    "p5": -0.52,
+    "p95": 0.094,
+    "atLeastReal": 40
+   },
+   "holmP": 1,
+   "aboveRandom": false,
+   "checks": {
+    "netPositive": false,
+    "tAtLeast2": false,
+    "holm": false,
+    "sameSignRep": false,
+    "aboveRandom": false
+   },
+   "pass": false
+  }
+ ]
+}

@@ -1,0 +1,765 @@
+{
+ "topic": "index-52w-high",
+ "built": "2026-11-14",
+ "title": "The 52-week-high anchor on equity indices",
+ "system": "Long an equity index at the next daily open after a close within 1 % of its prior 252-day closing high, stop 2 x ATR20, out after 20 trading days, one at a time, net of a 0.04 % round trip and financing at the US 2Y + 2.5 %, against the same trade on every other day",
+ "verdict": "FAIL. T1 D -0.084R a trade 2016-now (n 90, month t -0.64, Holm p 1), -0.227R before 2016 (n 86, t -1.88); T2 D -0.078R a trade 2016-now (n 331, month t -0.84, Holm p 1), -0.151R before 2016 (n 325, t -1.86) (does not pass); T3 D -0.245R a trade 2016-now (n 77, month t -2.04, Holm p 1), +0.050R before 2016 (n 134, t 0.24) (does not pass).",
+ "data": {
+  "councilData": "47bf89482a2b2f3a84ce37733b7f83a47e0947c1",
+  "markets": {
+   "spx500": {
+    "inst": "SPX500_USD",
+    "days": 6124,
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "nas100": {
+    "inst": "NAS100_USD",
+    "days": 6124,
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "us30": {
+    "inst": "US30_USD",
+    "days": 6101,
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "de40": {
+    "inst": "DE30_EUR",
+    "days": 6010,
+    "from": "2003-03-25",
+    "to": "2026-11-06"
+   },
+   "uk100": {
+    "inst": "UK100_GBP",
+    "days": 5975,
+    "from": "2003-03-24",
+    "to": "2026-11-06"
+   },
+   "jp225": {
+    "inst": "JP225_USD",
+    "days": 6115,
+    "from": "2003-03-14",
+    "to": "2026-11-06"
+   }
+  },
+  "rates": "FRED DGS2 weekly from council-data macro/cache.json score.fred (from 2006-01-06); a fixed 4 % before it",
+  "fixedRateTrades": 386
+ },
+ "window": {
+  "decisive": [
+   "2016-01-01",
+   "2026-11-06"
+  ],
+  "replication": [
+   "2004-03-16",
+   "2015-12-31"
+  ]
+ },
+ "params": {
+  "LOOK": 252,
+  "NEAR": 0.99,
+  "DEEP": 0.8,
+  "ATR": 20,
+  "STOP_ATR": 2,
+  "HOLD": 20,
+  "RT": 0.0004,
+  "MARKUP": 0.025,
+  "RATE_FALLBACK": 0.04,
+  "DECISIVE_FROM": "2016-01-01",
+  "SEEDS": 40
+ },
+ "tests": [
+  {
+   "id": "T1",
+   "name": "spx500 near its 252-day high, long",
+   "keys": [
+    "spx500"
+   ],
+   "kind": "near",
+   "side": 1,
+   "decisive": {
+    "per": {
+     "spx500": {
+      "signal": {
+       "n": 90,
+       "gross": 0.222,
+       "net": 0.057,
+       "total": 5.14,
+       "win": 51.11
+      },
+      "base": {
+       "n": 175,
+       "gross": 0.255,
+       "net": 0.141,
+       "total": 24.72,
+       "win": 46.86
+      },
+      "D": -0.084,
+      "signalDays": 1134
+     }
+    },
+    "n": 90,
+    "signal": {
+     "n": 90,
+     "gross": 0.222,
+     "net": 0.057,
+     "total": 5.14,
+     "win": 51.11
+    },
+    "base": {
+     "n": 175,
+     "gross": 0.255,
+     "net": 0.141,
+     "total": 24.72,
+     "win": 46.86
+    },
+    "D": -0.084,
+    "t": -0.64,
+    "p": 0.737,
+    "months": 131
+   },
+   "replication": {
+    "per": {
+     "spx500": {
+      "signal": {
+       "n": 86,
+       "gross": -0.069,
+       "net": -0.206,
+       "total": -17.7,
+       "win": 41.86
+      },
+      "base": {
+       "n": 189,
+       "gross": 0.135,
+       "net": 0.021,
+       "total": 4.02,
+       "win": 46.03
+      },
+      "D": -0.227,
+      "signalDays": 968
+     }
+    },
+    "n": 86,
+    "signal": {
+     "n": 86,
+     "gross": -0.069,
+     "net": -0.206,
+     "total": -17.7,
+     "win": 41.86
+    },
+    "base": {
+     "n": 189,
+     "gross": 0.135,
+     "net": 0.021,
+     "total": 4.02,
+     "win": 46.03
+    },
+    "D": -0.227,
+    "t": -1.88,
+    "p": 0.97,
+    "months": 142
+   },
+   "x2": {
+    "decisive": {
+     "D": -0.136,
+     "t": -1.05,
+     "net": -0.108,
+     "baseNet": 0.028
+    },
+    "replication": {
+     "D": -0.25,
+     "t": -2.14,
+     "net": -0.342,
+     "baseNet": -0.092
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "medianD": -0.045,
+    "medianT": -0.49,
+    "reachRealT": 29,
+    "positiveD": 7
+   },
+   "holm": 1,
+   "pass": {
+    "pass": false,
+    "bothWindowsPositive": false,
+    "holm": false,
+    "n30": true
+   }
+  },
+  {
+   "id": "T2",
+   "name": "five replication indices pooled, near the high, long",
+   "keys": [
+    "nas100",
+    "us30",
+    "de40",
+    "uk100",
+    "jp225"
+   ],
+   "kind": "near",
+   "side": 1,
+   "decisive": {
+    "per": {
+     "nas100": {
+      "signal": {
+       "n": 83,
+       "gross": 0.319,
+       "net": 0.203,
+       "total": 16.83,
+       "win": 49.4
+      },
+      "base": {
+       "n": 179,
+       "gross": 0.313,
+       "net": 0.226,
+       "total": 40.37,
+       "win": 49.16
+      },
+      "D": -0.023,
+      "signalDays": 918
+     },
+     "us30": {
+      "signal": {
+       "n": 78,
+       "gross": 0.187,
+       "net": 0.02,
+       "total": 1.55,
+       "win": 41.03
+      },
+      "base": {
+       "n": 179,
+       "gross": 0.22,
+       "net": 0.1,
+       "total": 17.89,
+       "win": 46.93
+      },
+      "D": -0.08,
+      "signalDays": 943
+     },
+     "de40": {
+      "signal": {
+       "n": 62,
+       "gross": -0.1,
+       "net": -0.232,
+       "total": -14.37,
+       "win": 38.71
+      },
+      "base": {
+       "n": 182,
+       "gross": 0.113,
+       "net": 0.007,
+       "total": 1.27,
+       "win": 44.51
+      },
+      "D": -0.239,
+      "signalDays": 608
+     },
+     "uk100": {
+      "signal": {
+       "n": 59,
+       "gross": -0.157,
+       "net": -0.297,
+       "total": -17.53,
+       "win": 35.59
+      },
+      "base": {
+       "n": 188,
+       "gross": 0.079,
+       "net": -0.043,
+       "total": -8.15,
+       "win": 43.09
+      },
+      "D": -0.254,
+      "signalDays": 545
+     },
+     "jp225": {
+      "signal": {
+       "n": 49,
+       "gross": 0.387,
+       "net": 0.286,
+       "total": 14.01,
+       "win": 48.98
+      },
+      "base": {
+       "n": 196,
+       "gross": 0.125,
+       "net": 0.041,
+       "total": 7.96,
+       "win": 43.88
+      },
+      "D": 0.245,
+      "signalDays": 419
+     }
+    },
+    "n": 331,
+    "signal": {
+     "n": 331,
+     "gross": 0.135,
+     "net": 0.001,
+     "total": 0.48,
+     "win": 42.9
+    },
+    "base": {
+     "n": 924,
+     "gross": 0.168,
+     "net": 0.064,
+     "total": 59.34,
+     "win": 45.45
+    },
+    "D": -0.078,
+    "t": -0.84,
+    "p": 0.799,
+    "months": 131
+   },
+   "replication": {
+    "per": {
+     "nas100": {
+      "signal": {
+       "n": 75,
+       "gross": 0.035,
+       "net": -0.059,
+       "total": -4.43,
+       "win": 42.67
+      },
+      "base": {
+       "n": 197,
+       "gross": 0.164,
+       "net": 0.079,
+       "total": 15.58,
+       "win": 45.69
+      },
+      "D": -0.138,
+      "signalDays": 774
+     },
+     "us30": {
+      "signal": {
+       "n": 74,
+       "gross": 0.005,
+       "net": -0.147,
+       "total": -10.85,
+       "win": 44.59
+      },
+      "base": {
+       "n": 189,
+       "gross": 0.139,
+       "net": 0.026,
+       "total": 4.93,
+       "win": 46.03
+      },
+      "D": -0.173,
+      "signalDays": 875
+     },
+     "de40": {
+      "signal": {
+       "n": 70,
+       "gross": 0.102,
+       "net": -0.019,
+       "total": -1.36,
+       "win": 45.71
+      },
+      "base": {
+       "n": 199,
+       "gross": 0.116,
+       "net": 0.033,
+       "total": 6.6,
+       "win": 43.22
+      },
+      "D": -0.053,
+      "signalDays": 751
+     },
+     "uk100": {
+      "signal": {
+       "n": 66,
+       "gross": -0.233,
+       "net": -0.39,
+       "total": -25.77,
+       "win": 31.82
+      },
+      "base": {
+       "n": 201,
+       "gross": 0.081,
+       "net": -0.026,
+       "total": -5.21,
+       "win": 41.79
+      },
+      "D": -0.365,
+      "signalDays": 677
+     },
+     "jp225": {
+      "signal": {
+       "n": 40,
+       "gross": 0.169,
+       "net": 0.063,
+       "total": 2.51,
+       "win": 40
+      },
+      "base": {
+       "n": 220,
+       "gross": 0.099,
+       "net": 0.018,
+       "total": 3.85,
+       "win": 41.82
+      },
+      "D": 0.045,
+      "signalDays": 391
+     }
+    },
+    "n": 325,
+    "signal": {
+     "n": 325,
+     "gross": 0.005,
+     "net": -0.123,
+     "total": -39.9,
+     "win": 41.23
+    },
+    "base": {
+     "n": 1006,
+     "gross": 0.119,
+     "net": 0.026,
+     "total": 25.75,
+     "win": 43.64
+    },
+    "D": -0.151,
+    "t": -1.86,
+    "p": 0.969,
+    "months": 142
+   },
+   "x2": {
+    "decisive": {
+     "D": -0.107,
+     "t": -1.18,
+     "net": -0.132,
+     "baseNet": -0.04
+    },
+    "replication": {
+     "D": -0.184,
+     "t": -2.3,
+     "net": -0.25,
+     "baseNet": -0.068
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "medianD": -0.012,
+    "medianT": -0.18,
+    "reachRealT": 40,
+    "positiveD": 11
+   },
+   "holm": 1,
+   "pass": {
+    "pass": false,
+    "bothWindowsPositive": false,
+    "holm": false,
+    "n30": true
+   }
+  },
+  {
+   "id": "T3",
+   "name": "all six indices, more than 20 % below the high, short",
+   "keys": [
+    "spx500",
+    "nas100",
+    "us30",
+    "de40",
+    "uk100",
+    "jp225"
+   ],
+   "kind": "deep",
+   "side": -1,
+   "decisive": {
+    "per": {
+     "spx500": {
+      "signal": {
+       "n": 9,
+       "gross": -0.726,
+       "net": -0.735,
+       "total": -6.61,
+       "win": 11.11
+      },
+      "base": {
+       "n": 197,
+       "gross": -0.259,
+       "net": -0.295,
+       "total": -58.08,
+       "win": 24.87
+      },
+      "D": -0.44,
+      "signalDays": 73
+     },
+     "nas100": {
+      "signal": {
+       "n": 21,
+       "gross": -0.346,
+       "net": -0.354,
+       "total": -7.43,
+       "win": 23.81
+      },
+      "base": {
+       "n": 182,
+       "gross": -0.308,
+       "net": -0.336,
+       "total": -61.13,
+       "win": 25.27
+      },
+      "D": -0.018,
+      "signalDays": 228
+     },
+     "us30": {
+      "signal": {
+       "n": 4,
+       "gross": -0.54,
+       "net": -0.556,
+       "total": -2.22,
+       "win": 0
+      },
+      "base": {
+       "n": 200,
+       "gross": -0.226,
+       "net": -0.263,
+       "total": -52.57,
+       "win": 27.5
+      },
+      "D": -0.293,
+      "signalDays": 36
+     },
+     "de40": {
+      "signal": {
+       "n": 15,
+       "gross": -0.37,
+       "net": -0.388,
+       "total": -5.82,
+       "win": 26.67
+      },
+      "base": {
+       "n": 187,
+       "gross": -0.127,
+       "net": -0.156,
+       "total": -29.22,
+       "win": 33.69
+      },
+      "D": -0.232,
+      "signalDays": 176
+     },
+     "uk100": {
+      "signal": {
+       "n": 11,
+       "gross": -0.295,
+       "net": -0.329,
+       "total": -3.62,
+       "win": 27.27
+      },
+      "base": {
+       "n": 176,
+       "gross": -0.052,
+       "net": -0.086,
+       "total": -15.18,
+       "win": 35.23
+      },
+      "D": -0.243,
+      "signalDays": 136
+     },
+     "jp225": {
+      "signal": {
+       "n": 17,
+       "gross": -0.581,
+       "net": -0.598,
+       "total": -10.16,
+       "win": 11.76
+      },
+      "base": {
+       "n": 192,
+       "gross": -0.151,
+       "net": -0.176,
+       "total": -33.79,
+       "win": 31.77
+      },
+      "D": -0.422,
+      "signalDays": 120
+     }
+    },
+    "n": 77,
+    "signal": {
+     "n": 77,
+     "gross": -0.45,
+     "net": -0.466,
+     "total": -35.87,
+     "win": 19.48
+    },
+    "base": {
+     "n": 1134,
+     "gross": -0.189,
+     "net": -0.22,
+     "total": -249.96,
+     "win": 29.63
+    },
+    "D": -0.245,
+    "t": -2.04,
+    "p": 0.979,
+    "months": 131
+   },
+   "replication": {
+    "per": {
+     "spx500": {
+      "signal": {
+       "n": 19,
+       "gross": -0.12,
+       "net": -0.138,
+       "total": -2.62,
+       "win": 31.58
+      },
+      "base": {
+       "n": 182,
+       "gross": -0.112,
+       "net": -0.157,
+       "total": -28.56,
+       "win": 30.22
+      },
+      "D": 0.019,
+      "signalDays": 263
+     },
+     "nas100": {
+      "signal": {
+       "n": 19,
+       "gross": -0.124,
+       "net": -0.139,
+       "total": -2.65,
+       "win": 36.84
+      },
+      "base": {
+       "n": 189,
+       "gross": -0.181,
+       "net": -0.218,
+       "total": -41.13,
+       "win": 30.69
+      },
+      "D": 0.078,
+      "signalDays": 263
+     },
+     "us30": {
+      "signal": {
+       "n": 17,
+       "gross": -0.095,
+       "net": -0.116,
+       "total": -1.97,
+       "win": 41.18
+      },
+      "base": {
+       "n": 187,
+       "gross": -0.13,
+       "net": -0.178,
+       "total": -33.27,
+       "win": 32.09
+      },
+      "D": 0.062,
+      "signalDays": 256
+     },
+     "de40": {
+      "signal": {
+       "n": 28,
+       "gross": -0.205,
+       "net": -0.222,
+       "total": -6.22,
+       "win": 35.71
+      },
+      "base": {
+       "n": 186,
+       "gross": -0.196,
+       "net": -0.231,
+       "total": -42.99,
+       "win": 31.72
+      },
+      "D": 0.009,
+      "signalDays": 375
+     },
+     "uk100": {
+      "signal": {
+       "n": 16,
+       "gross": 0.014,
+       "net": -0.004,
+       "total": -0.07,
+       "win": 37.5
+      },
+      "base": {
+       "n": 184,
+       "gross": -0.088,
+       "net": -0.132,
+       "total": -24.27,
+       "win": 33.7
+      },
+      "D": 0.128,
+      "signalDays": 236
+     },
+     "jp225": {
+      "signal": {
+       "n": 35,
+       "gross": -0.02,
+       "net": -0.042,
+       "total": -1.46,
+       "win": 37.14
+      },
+      "base": {
+       "n": 190,
+       "gross": -0.053,
+       "net": -0.084,
+       "total": -16,
+       "win": 35.26
+      },
+      "D": 0.043,
+      "signalDays": 494
+     }
+    },
+    "n": 134,
+    "signal": {
+     "n": 134,
+     "gross": -0.093,
+     "net": -0.112,
+     "total": -14.98,
+     "win": 36.57
+    },
+    "base": {
+     "n": 1118,
+     "gross": -0.127,
+     "net": -0.167,
+     "total": -186.23,
+     "win": 32.29
+    },
+    "D": 0.05,
+    "t": 0.24,
+    "p": 0.406,
+    "months": 142
+   },
+   "x2": {
+    "decisive": {
+     "D": -0.231,
+     "t": -1.95,
+     "net": -0.482,
+     "baseNet": -0.252
+    },
+    "replication": {
+     "D": 0.07,
+     "t": 0.33,
+     "net": -0.131,
+     "baseNet": -0.207
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "medianD": -0.03,
+    "medianT": -0.38,
+    "reachRealT": 40,
+    "positiveD": 13
+   },
+   "holm": 1,
+   "pass": {
+    "pass": false,
+    "bothWindowsPositive": false,
+    "holm": false,
+    "n30": true
+   }
+  }
+ ]
+}

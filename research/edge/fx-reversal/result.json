@@ -1,0 +1,207 @@
+{
+ "topic": "fx-reversal",
+ "built": "2026-11-13",
+ "title": "Cross-sectional 1-week reversal in G10 FX",
+ "system": "Each week at the last Monday-Friday UTC daily close, buy the 2 of EUR GBP JPY AUD CAD CHF NZD (vs USD) with the lowest past-week return and sell the 2 with the highest; equal 60-day volatility weights; a 3 x ATR(20) stop on every leg; one week; net of the measured raw-spread cost model and 1 % a year financing against every leg",
+ "verdict": "FAIL",
+ "checks": {
+  "sharpe": false,
+  "tMonth": false,
+  "check2008": false,
+  "placebo": false
+ },
+ "clock": "decision at the close of the last Monday-Friday OANDA daily candle of the UTC week (00:00 UTC, about 2 h after 17:00 New York); entry at the next candle open",
+ "params": {
+  "N_LEG": 2,
+  "VOL_N": 60,
+  "ATR_N": 20,
+  "STOP_K": 3,
+  "FIN_YEAR": 0.01,
+  "SEEDS": 40,
+  "PASS_SHARPE": 0.4,
+  "PASS_T": 2
+ },
+ "windows": {
+  "check": [
+   "2008-01-01",
+   "2015-12-31"
+  ],
+  "decisive": [
+   "2016-01-01",
+   "2026-11-06"
+  ]
+ },
+ "costs": {
+  "eurusd": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "gbpusd": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "usdjpy": {
+   "src": "default+commission (not in the fixture)",
+   "pip": 0.01,
+   "spreadPips": 1,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "audusd": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "usdcad": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "usdchf": {
+   "src": "quotes+commission",
+   "pip": 0.0001,
+   "spreadPips": 0,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  },
+  "nzdusd": {
+   "src": "default+commission (not in the fixture)",
+   "pip": 0.0001,
+   "spreadPips": 1,
+   "slipPips": 1,
+   "commissionRT": 0.000045
+  }
+ },
+ "decisive": {
+  "n": 566,
+  "mean": -0.0337,
+  "sd": 0.4778,
+  "sharpe": -0.509,
+  "months": 131,
+  "tMonth": -1.598,
+  "totalPct": -19.079,
+  "maxDDPct": -23.54,
+  "gross": {
+   "n": 566,
+   "mean": 0.0006,
+   "sd": 0.4782,
+   "sharpe": 0.009,
+   "months": 131,
+   "tMonth": 0.027,
+   "totalPct": 0.323,
+   "maxDDPct": -13.82
+  },
+  "costPct": 10.306,
+  "financingPct": 9.096,
+  "legs": 2264,
+  "stoppedShare": 0.052,
+  "from": "2016-01-03",
+  "to": "2026-11-01"
+ },
+ "check": {
+  "n": 417,
+  "mean": -0.0026,
+  "sd": 0.7592,
+  "sharpe": -0.024,
+  "months": 96,
+  "tMonth": -0.073,
+  "totalPct": -1.073,
+  "maxDDPct": -9.355,
+  "gross": {
+   "n": 417,
+   "mean": 0.0319,
+   "sd": 0.7596,
+   "sharpe": 0.303,
+   "months": 96,
+   "tMonth": 0.907,
+   "totalPct": 13.315,
+   "maxDDPct": -6.715
+  },
+  "costPct": 7.489,
+  "financingPct": 6.899,
+  "legs": 1668,
+  "stoppedShare": 0.044,
+  "from": "2008-01-06",
+  "to": "2015-12-27"
+ },
+ "placebo": {
+  "seeds": 40,
+  "p95": -0.168,
+  "median": -0.666,
+  "max": 0.24,
+  "sharpes": [
+   -0.566,
+   -0.532,
+   -0.448,
+   -0.678,
+   -1.195,
+   -0.907,
+   -0.81,
+   -0.377,
+   -0.657,
+   -0.693,
+   -0.91,
+   -0.525,
+   -0.738,
+   -0.622,
+   0.24,
+   -0.923,
+   -0.398,
+   -0.676,
+   -0.525,
+   -0.61,
+   -0.979,
+   -0.461,
+   -0.623,
+   -0.971,
+   -0.484,
+   -0.729,
+   -0.544,
+   -0.442,
+   -1.022,
+   -0.326,
+   -0.727,
+   -0.046,
+   -0.838,
+   -0.735,
+   -0.175,
+   -0.828,
+   -0.944,
+   -0.36,
+   -0.703,
+   -0.686
+  ],
+  "beaten": 29
+ },
+ "byYearPct": {
+  "2008": -2.324,
+  "2009": 1.164,
+  "2010": 2.607,
+  "2011": 3.162,
+  "2012": -4.085,
+  "2013": -0.792,
+  "2014": 0.914,
+  "2015": -1.719,
+  "2016": -0.29,
+  "2017": 0.678,
+  "2018": -4.137,
+  "2019": 0.307,
+  "2020": 4.518,
+  "2021": -3.281,
+  "2022": -7.54,
+  "2023": -0.675,
+  "2024": -5.037,
+  "2025": -0.307,
+  "2026": -3.315
+ }
+}

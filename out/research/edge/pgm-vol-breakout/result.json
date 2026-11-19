@@ -1,0 +1,1260 @@
+{
+ "study": "pgm-vol-breakout",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/pgm-vol-breakout/PREREGISTRATION.md",
+ "planSha256": "ec4211b4496efbeb083671cf23e93e31011200e09f8619892ccdde93f04e540d",
+ "originalSha256": "afa36e031e39daabb4f88ed9231daa55246fcccb659b0a9668fda52ad022276f",
+ "claim": "gold-vol-breakout's T1 rule (a move of 0.5 × the previous day's range away from the UTC open continues to 21:00 UTC) also holds on platinum and palladium, so the gold result is a precious-metals effect",
+ "rule": "O = open of the first M5 candle 00:00-00:55 UTC; prevRange = high − low of the previous weekend-folded UTC D1; buy stop O + 0.5 × prevRange and sell stop O − 0.5 × prevRange live 00:00-20:55 UTC, first filled wins (a gap fills at the open; both in one candle: the level nearer its open); stop back at O (worst case in the fill candle); out at the 20:55 candle close",
+ "data": "OANDA mid XPT/USD and XPD/USD M5 through the keyless candle proxy; Platinum (XPT/USD) 5650 weekdays built 2005-01-03 → 2026-11-12; Palladium (XPD/USD) 5651 weekdays built 2005-01-03 → 2026-11-12; D1 = complete UTC days folded with council/fills.mjs foldWeekend",
+ "markets": {
+  "xpt": {
+   "name": "Platinum (XPT/USD)",
+   "costPct": 0.003,
+   "firstCandle": "2005-01-03 02:00 UTC",
+   "dataEnd": "2026-11-12",
+   "windows": {
+    "ALL": [
+     "2005-02-01",
+     "2026-10-31"
+    ],
+    "IS": [
+     "2005-02-01",
+     "2016-12-31"
+    ],
+    "OOS": [
+     "2017-01-01",
+     "2026-10-31"
+    ]
+   },
+   "eligibleDays": 4228,
+   "skips": {
+    "noopen": 649,
+    "thin": 740,
+    "nofill": 1006,
+    "flatprev": 4
+   },
+   "ALL": {
+    "n": 3222,
+    "win": 0.34,
+    "netR": -0.285,
+    "grossR": 0.061,
+    "net2R": -0.63,
+    "costR": 0.346,
+    "finR": 0,
+    "total": -916.77,
+    "months": 242,
+    "t": -12.47,
+    "grossT": 3.11,
+    "t2x": -20.59,
+    "stops": 1032,
+    "time": 2190,
+    "maxDD": -919.66,
+    "medianStop": 10.64,
+    "buys": {
+     "n": 1577,
+     "netR": -0.31
+    },
+    "sells": {
+     "n": 1645,
+     "netR": -0.261
+    },
+    "byYear": {
+     "2005": {
+      "n": 7,
+      "netR": -0.293,
+      "total": -2.05,
+      "grossR": 0.194
+     },
+     "2006": {
+      "n": 14,
+      "netR": -0.055,
+      "total": -0.77,
+      "grossR": 0.346
+     },
+     "2007": {
+      "n": 23,
+      "netR": -0.822,
+      "total": -18.9,
+      "grossR": -0.283
+     },
+     "2008": {
+      "n": 83,
+      "netR": -0.277,
+      "total": -22.97,
+      "grossR": -0.083
+     },
+     "2009": {
+      "n": 104,
+      "netR": -0.289,
+      "total": -30.04,
+      "grossR": 0.028
+     },
+     "2010": {
+      "n": 137,
+      "netR": -0.442,
+      "total": -60.58,
+      "grossR": -0.059
+     },
+     "2011": {
+      "n": 56,
+      "netR": -0.227,
+      "total": -12.73,
+      "grossR": 0.184
+     },
+     "2012": {
+      "n": 148,
+      "netR": -0.348,
+      "total": -51.47,
+      "grossR": 0.069
+     },
+     "2013": {
+      "n": 189,
+      "netR": -0.223,
+      "total": -42.17,
+      "grossR": 0.195
+     },
+     "2014": {
+      "n": 192,
+      "netR": -0.374,
+      "total": -71.75,
+      "grossR": 0.169
+     },
+     "2015": {
+      "n": 193,
+      "netR": -0.312,
+      "total": -60.13,
+      "grossR": 0.092
+     },
+     "2016": {
+      "n": 188,
+      "netR": -0.248,
+      "total": -46.62,
+      "grossR": 0.089
+     },
+     "2017": {
+      "n": 199,
+      "netR": -0.527,
+      "total": -104.85,
+      "grossR": -0.059
+     },
+     "2018": {
+      "n": 205,
+      "netR": -0.491,
+      "total": -100.63,
+      "grossR": -0.054
+     },
+     "2019": {
+      "n": 193,
+      "netR": -0.275,
+      "total": -53.04,
+      "grossR": 0.12
+     },
+     "2020": {
+      "n": 163,
+      "netR": -0.317,
+      "total": -51.67,
+      "grossR": -0.085
+     },
+     "2021": {
+      "n": 168,
+      "netR": -0.131,
+      "total": -21.99,
+      "grossR": 0.116
+     },
+     "2022": {
+      "n": 200,
+      "netR": -0.155,
+      "total": -30.99,
+      "grossR": 0.076
+     },
+     "2023": {
+      "n": 198,
+      "netR": -0.229,
+      "total": -45.36,
+      "grossR": 0.063
+     },
+     "2024": {
+      "n": 205,
+      "netR": -0.15,
+      "total": -30.66,
+      "grossR": 0.161
+     },
+     "2025": {
+      "n": 201,
+      "netR": -0.222,
+      "total": -44.72,
+      "grossR": 0.019
+     },
+     "2026": {
+      "n": 156,
+      "netR": -0.081,
+      "total": -12.69,
+      "grossR": 0.098
+     }
+    }
+   },
+   "IS": {
+    "n": 1334,
+    "win": 0.323,
+    "netR": -0.315,
+    "grossR": 0.084,
+    "net2R": -0.714,
+    "costR": 0.399,
+    "finR": 0,
+    "total": -420.18,
+    "months": 124,
+    "t": -8.95,
+    "grossT": 2.67,
+    "t2x": -14.05,
+    "stops": 426,
+    "time": 908,
+    "maxDD": -420.32,
+    "medianStop": 10.62,
+    "buys": {
+     "n": 638,
+     "netR": -0.344
+    },
+    "sells": {
+     "n": 696,
+     "netR": -0.288
+    },
+    "byYear": {
+     "2005": {
+      "n": 7,
+      "netR": -0.293,
+      "total": -2.05,
+      "grossR": 0.194
+     },
+     "2006": {
+      "n": 14,
+      "netR": -0.055,
+      "total": -0.77,
+      "grossR": 0.346
+     },
+     "2007": {
+      "n": 23,
+      "netR": -0.822,
+      "total": -18.9,
+      "grossR": -0.283
+     },
+     "2008": {
+      "n": 83,
+      "netR": -0.277,
+      "total": -22.97,
+      "grossR": -0.083
+     },
+     "2009": {
+      "n": 104,
+      "netR": -0.289,
+      "total": -30.04,
+      "grossR": 0.028
+     },
+     "2010": {
+      "n": 137,
+      "netR": -0.442,
+      "total": -60.58,
+      "grossR": -0.059
+     },
+     "2011": {
+      "n": 56,
+      "netR": -0.227,
+      "total": -12.73,
+      "grossR": 0.184
+     },
+     "2012": {
+      "n": 148,
+      "netR": -0.348,
+      "total": -51.47,
+      "grossR": 0.069
+     },
+     "2013": {
+      "n": 189,
+      "netR": -0.223,
+      "total": -42.17,
+      "grossR": 0.195
+     },
+     "2014": {
+      "n": 192,
+      "netR": -0.374,
+      "total": -71.75,
+      "grossR": 0.169
+     },
+     "2015": {
+      "n": 193,
+      "netR": -0.312,
+      "total": -60.13,
+      "grossR": 0.092
+     },
+     "2016": {
+      "n": 188,
+      "netR": -0.248,
+      "total": -46.62,
+      "grossR": 0.089
+     }
+    }
+   },
+   "OOS": {
+    "n": 1888,
+    "win": 0.352,
+    "netR": -0.263,
+    "grossR": 0.045,
+    "net2R": -0.571,
+    "costR": 0.308,
+    "finR": 0,
+    "total": -496.6,
+    "months": 118,
+    "t": -8.8,
+    "grossT": 1.79,
+    "t2x": -15.19,
+    "stops": 606,
+    "time": 1282,
+    "maxDD": -499.33,
+    "medianStop": 10.7,
+    "buys": {
+     "n": 939,
+     "netR": -0.286
+    },
+    "sells": {
+     "n": 949,
+     "netR": -0.24
+    },
+    "byYear": {
+     "2017": {
+      "n": 199,
+      "netR": -0.527,
+      "total": -104.85,
+      "grossR": -0.059
+     },
+     "2018": {
+      "n": 205,
+      "netR": -0.491,
+      "total": -100.63,
+      "grossR": -0.054
+     },
+     "2019": {
+      "n": 193,
+      "netR": -0.275,
+      "total": -53.04,
+      "grossR": 0.12
+     },
+     "2020": {
+      "n": 163,
+      "netR": -0.317,
+      "total": -51.67,
+      "grossR": -0.085
+     },
+     "2021": {
+      "n": 168,
+      "netR": -0.131,
+      "total": -21.99,
+      "grossR": 0.116
+     },
+     "2022": {
+      "n": 200,
+      "netR": -0.155,
+      "total": -30.99,
+      "grossR": 0.076
+     },
+     "2023": {
+      "n": 198,
+      "netR": -0.229,
+      "total": -45.36,
+      "grossR": 0.063
+     },
+     "2024": {
+      "n": 205,
+      "netR": -0.15,
+      "total": -30.66,
+      "grossR": 0.161
+     },
+     "2025": {
+      "n": 201,
+      "netR": -0.222,
+      "total": -44.72,
+      "grossR": 0.019
+     },
+     "2026": {
+      "n": 156,
+      "netR": -0.081,
+      "total": -12.69,
+      "grossR": 0.098
+     }
+    }
+   },
+   "mults": [
+    {
+     "mult": 0.5,
+     "netR": -0.112,
+     "t": -5.45
+    },
+    {
+     "mult": 1,
+     "netR": -0.285,
+     "t": -12.47
+    },
+    {
+     "mult": 2,
+     "netR": -0.63,
+     "t": -20.59
+    }
+   ],
+   "multsOOS": [
+    {
+     "mult": 0.5,
+     "netR": -0.109,
+     "t": -4.01
+    },
+    {
+     "mult": 1,
+     "netR": -0.263,
+     "t": -8.8
+    },
+    {
+     "mult": 2,
+     "netR": -0.571,
+     "t": -15.19
+    }
+   ]
+  },
+  "xpd": {
+   "name": "Palladium (XPD/USD)",
+   "costPct": 0.008,
+   "firstCandle": "2005-01-03 05:25 UTC",
+   "dataEnd": "2026-11-12",
+   "windows": {
+    "ALL": [
+     "2005-02-01",
+     "2026-10-31"
+    ],
+    "IS": [
+     "2005-02-01",
+     "2016-12-31"
+    ],
+    "OOS": [
+     "2017-01-01",
+     "2026-10-31"
+    ]
+   },
+   "eligibleDays": 3553,
+   "skips": {
+    "noopen": 925,
+    "thin": 1138,
+    "nofill": 865,
+    "flatprev": 5
+   },
+   "ALL": {
+    "n": 2688,
+    "win": 0.245,
+    "netR": -0.643,
+    "grossR": 0.094,
+    "net2R": -1.38,
+    "costR": 0.737,
+    "finR": 0,
+    "total": -1727.53,
+    "months": 196,
+    "t": -19.39,
+    "grossT": 4.24,
+    "t2x": -24.09,
+    "stops": 823,
+    "time": 1865,
+    "maxDD": -1727.53,
+    "medianStop": 13.13,
+    "buys": {
+     "n": 1336,
+     "netR": -0.675
+    },
+    "sells": {
+     "n": 1352,
+     "netR": -0.61
+    },
+    "byYear": {
+     "2005": {
+      "n": 1,
+      "netR": -1.664,
+      "total": -1.66,
+      "grossR": -1
+     },
+     "2008": {
+      "n": 9,
+      "netR": -0.902,
+      "total": -8.11,
+      "grossR": -0.504
+     },
+     "2010": {
+      "n": 30,
+      "netR": -0.249,
+      "total": -7.48,
+      "grossR": 0.176
+     },
+     "2011": {
+      "n": 10,
+      "netR": -0.678,
+      "total": -6.78,
+      "grossR": 0.015
+     },
+     "2012": {
+      "n": 134,
+      "netR": -0.707,
+      "total": -94.7,
+      "grossR": 0.138
+     },
+     "2013": {
+      "n": 175,
+      "netR": -0.812,
+      "total": -142.13,
+      "grossR": 0.125
+     },
+     "2014": {
+      "n": 185,
+      "netR": -0.97,
+      "total": -179.54,
+      "grossR": 0.238
+     },
+     "2015": {
+      "n": 160,
+      "netR": -0.609,
+      "total": -97.44,
+      "grossR": 0.187
+     },
+     "2016": {
+      "n": 173,
+      "netR": -0.617,
+      "total": -106.7,
+      "grossR": 0.109
+     },
+     "2017": {
+      "n": 189,
+      "netR": -0.912,
+      "total": -172.31,
+      "grossR": 0.077
+     },
+     "2018": {
+      "n": 187,
+      "netR": -0.695,
+      "total": -130.01,
+      "grossR": 0.251
+     },
+     "2019": {
+      "n": 188,
+      "netR": -0.891,
+      "total": -167.52,
+      "grossR": 0.079
+     },
+     "2020": {
+      "n": 131,
+      "netR": -0.575,
+      "total": -75.31,
+      "grossR": 0.096
+     },
+     "2021": {
+      "n": 152,
+      "netR": -0.621,
+      "total": -94.45,
+      "grossR": 0.068
+     },
+     "2022": {
+      "n": 189,
+      "netR": -0.286,
+      "total": -54.12,
+      "grossR": 0.139
+     },
+     "2023": {
+      "n": 205,
+      "netR": -0.694,
+      "total": -142.17,
+      "grossR": -0.196
+     },
+     "2024": {
+      "n": 208,
+      "netR": -0.382,
+      "total": -79.37,
+      "grossR": 0.125
+     },
+     "2025": {
+      "n": 206,
+      "netR": -0.498,
+      "total": -102.59,
+      "grossR": 0.029
+     },
+     "2026": {
+      "n": 156,
+      "netR": -0.418,
+      "total": -65.13,
+      "grossR": 0.023
+     }
+    }
+   },
+   "IS": {
+    "n": 877,
+    "win": 0.226,
+    "netR": -0.735,
+    "grossR": 0.152,
+    "net2R": -1.621,
+    "costR": 0.887,
+    "finR": 0,
+    "total": -644.54,
+    "months": 78,
+    "t": -10.95,
+    "grossT": 4.16,
+    "t2x": -12.65,
+    "stops": 261,
+    "time": 616,
+    "maxDD": -644.54,
+    "medianStop": 6.69,
+    "buys": {
+     "n": 416,
+     "netR": -0.798
+    },
+    "sells": {
+     "n": 461,
+     "netR": -0.678
+    },
+    "byYear": {
+     "2005": {
+      "n": 1,
+      "netR": -1.664,
+      "total": -1.66,
+      "grossR": -1
+     },
+     "2008": {
+      "n": 9,
+      "netR": -0.902,
+      "total": -8.11,
+      "grossR": -0.504
+     },
+     "2010": {
+      "n": 30,
+      "netR": -0.249,
+      "total": -7.48,
+      "grossR": 0.176
+     },
+     "2011": {
+      "n": 10,
+      "netR": -0.678,
+      "total": -6.78,
+      "grossR": 0.015
+     },
+     "2012": {
+      "n": 134,
+      "netR": -0.707,
+      "total": -94.7,
+      "grossR": 0.138
+     },
+     "2013": {
+      "n": 175,
+      "netR": -0.812,
+      "total": -142.13,
+      "grossR": 0.125
+     },
+     "2014": {
+      "n": 185,
+      "netR": -0.97,
+      "total": -179.54,
+      "grossR": 0.238
+     },
+     "2015": {
+      "n": 160,
+      "netR": -0.609,
+      "total": -97.44,
+      "grossR": 0.187
+     },
+     "2016": {
+      "n": 173,
+      "netR": -0.617,
+      "total": -106.7,
+      "grossR": 0.109
+     }
+    }
+   },
+   "OOS": {
+    "n": 1811,
+    "win": 0.255,
+    "netR": -0.598,
+    "grossR": 0.067,
+    "net2R": -1.263,
+    "costR": 0.665,
+    "finR": 0,
+    "total": -1083,
+    "months": 118,
+    "t": -16.18,
+    "grossT": 2.39,
+    "t2x": -21.66,
+    "stops": 562,
+    "time": 1249,
+    "maxDD": -1083,
+    "medianStop": 19.29,
+    "buys": {
+     "n": 920,
+     "netR": -0.62
+    },
+    "sells": {
+     "n": 891,
+     "netR": -0.576
+    },
+    "byYear": {
+     "2017": {
+      "n": 189,
+      "netR": -0.912,
+      "total": -172.31,
+      "grossR": 0.077
+     },
+     "2018": {
+      "n": 187,
+      "netR": -0.695,
+      "total": -130.01,
+      "grossR": 0.251
+     },
+     "2019": {
+      "n": 188,
+      "netR": -0.891,
+      "total": -167.52,
+      "grossR": 0.079
+     },
+     "2020": {
+      "n": 131,
+      "netR": -0.575,
+      "total": -75.31,
+      "grossR": 0.096
+     },
+     "2021": {
+      "n": 152,
+      "netR": -0.621,
+      "total": -94.45,
+      "grossR": 0.068
+     },
+     "2022": {
+      "n": 189,
+      "netR": -0.286,
+      "total": -54.12,
+      "grossR": 0.139
+     },
+     "2023": {
+      "n": 205,
+      "netR": -0.694,
+      "total": -142.17,
+      "grossR": -0.196
+     },
+     "2024": {
+      "n": 208,
+      "netR": -0.382,
+      "total": -79.37,
+      "grossR": 0.125
+     },
+     "2025": {
+      "n": 206,
+      "netR": -0.498,
+      "total": -102.59,
+      "grossR": 0.029
+     },
+     "2026": {
+      "n": 156,
+      "netR": -0.418,
+      "total": -65.13,
+      "grossR": 0.023
+     }
+    }
+   },
+   "mults": [
+    {
+     "mult": 0.5,
+     "netR": -0.274,
+     "t": -11.19
+    },
+    {
+     "mult": 1,
+     "netR": -0.643,
+     "t": -19.39
+    },
+    {
+     "mult": 2,
+     "netR": -1.38,
+     "t": -24.09
+    }
+   ],
+   "multsOOS": [
+    {
+     "mult": 0.5,
+     "netR": -0.266,
+     "t": -8.89
+    },
+    {
+     "mult": 1,
+     "netR": -0.598,
+     "t": -16.18
+    },
+    {
+     "mult": 2,
+     "netR": -1.263,
+     "t": -21.66
+    }
+   ]
+  }
+ },
+ "decision": {
+  "xpt": {
+   "p": 1,
+   "pHolm": 1,
+   "placeboBeaten": 36,
+   "checks": {
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "oosPos": false,
+    "cost2x": false,
+    "placebo": false,
+    "n30": true
+   },
+   "pass": false
+  },
+  "xpd": {
+   "p": 1,
+   "pHolm": 1,
+   "placeboBeaten": 36,
+   "checks": {
+    "t2": false,
+    "holm": false,
+    "isPos": false,
+    "oosPos": false,
+    "cost2x": false,
+    "placebo": false,
+    "n30": true
+   },
+   "pass": false
+  }
+ },
+ "placebo": {
+  "xpt": {
+   "seeds": 40,
+   "start": "01:00-18:00 UTC",
+   "means": [
+    -0.304,
+    -0.282,
+    -0.336,
+    -0.309,
+    -0.292,
+    -0.314,
+    -0.294,
+    -0.305,
+    -0.287,
+    -0.28,
+    -0.31,
+    -0.295,
+    -0.296,
+    -0.316,
+    -0.305,
+    -0.357,
+    -0.291,
+    -0.297,
+    -0.318,
+    -0.298,
+    -0.315,
+    -0.299,
+    -0.299,
+    -0.285,
+    -0.341,
+    -0.288,
+    -0.313,
+    -0.309,
+    -0.333,
+    -0.324,
+    -0.326,
+    -0.324,
+    -0.319,
+    -0.313,
+    -0.332,
+    -0.312,
+    -0.294,
+    -0.311,
+    -0.323,
+    -0.267
+   ],
+   "min": -0.357,
+   "max": -0.267,
+   "median": -0.309,
+   "p95": -0.282
+  },
+  "xpd": {
+   "seeds": 40,
+   "start": "01:00-18:00 UTC",
+   "means": [
+    -0.657,
+    -0.657,
+    -0.649,
+    -0.68,
+    -0.67,
+    -0.628,
+    -0.667,
+    -0.664,
+    -0.659,
+    -0.678,
+    -0.669,
+    -0.64,
+    -0.645,
+    -0.676,
+    -0.653,
+    -0.669,
+    -0.654,
+    -0.674,
+    -0.664,
+    -0.643,
+    -0.649,
+    -0.668,
+    -0.659,
+    -0.673,
+    -0.638,
+    -0.679,
+    -0.666,
+    -0.658,
+    -0.665,
+    -0.688,
+    -0.658,
+    -0.652,
+    -0.656,
+    -0.659,
+    -0.674,
+    -0.659,
+    -0.707,
+    -0.677,
+    -0.66,
+    -0.673
+   ],
+   "min": -0.707,
+   "max": -0.628,
+   "median": -0.662,
+   "p95": -0.64
+  }
+ },
+ "reference": {
+  "from": "2006-11-01",
+  "cost": 0.6,
+  "windows": {
+   "ALL": [
+    "2005-02-01",
+    "2026-10-31"
+   ],
+   "IS": [
+    "2005-02-01",
+    "2016-12-31"
+   ],
+   "OOS": [
+    "2017-01-01",
+    "2026-10-31"
+   ]
+  },
+  "ALL": {
+   "n": 3733,
+   "win": 0.426,
+   "netR": 0.07,
+   "grossR": 0.152,
+   "net2R": -0.013,
+   "costR": 0.083,
+   "finR": 0,
+   "total": 260.49,
+   "months": 240,
+   "t": 3.19,
+   "grossT": 7.13,
+   "t2x": -0.57,
+   "stops": 1277,
+   "time": 2456,
+   "maxDD": -42.89,
+   "medianStop": 8.49,
+   "buys": {
+    "n": 1852,
+    "netR": 0.086
+   },
+   "sells": {
+    "n": 1881,
+    "netR": 0.053
+   },
+   "byYear": {
+    "2006": {
+     "n": 27,
+     "netR": -0.287,
+     "total": -7.76
+    },
+    "2007": {
+     "n": 183,
+     "netR": 0.208,
+     "total": 38.05
+    },
+    "2008": {
+     "n": 188,
+     "netR": 0.191,
+     "total": 35.96
+    },
+    "2009": {
+     "n": 190,
+     "netR": 0.021,
+     "total": 4.08
+    },
+    "2010": {
+     "n": 182,
+     "netR": 0.137,
+     "total": 24.95
+    },
+    "2011": {
+     "n": 186,
+     "netR": 0.044,
+     "total": 8.17
+    },
+    "2012": {
+     "n": 186,
+     "netR": 0.038,
+     "total": 7.03
+    },
+    "2013": {
+     "n": 181,
+     "netR": 0.258,
+     "total": 46.76
+    },
+    "2014": {
+     "n": 171,
+     "netR": 0.136,
+     "total": 23.34
+    },
+    "2015": {
+     "n": 190,
+     "netR": -0.025,
+     "total": -4.66
+    },
+    "2016": {
+     "n": 180,
+     "netR": 0.008,
+     "total": 1.51
+    },
+    "2017": {
+     "n": 187,
+     "netR": -0.006,
+     "total": -1.15
+    },
+    "2018": {
+     "n": 188,
+     "netR": -0.097,
+     "total": -18.15
+    },
+    "2019": {
+     "n": 191,
+     "netR": -0.04,
+     "total": -7.62
+    },
+    "2020": {
+     "n": 189,
+     "netR": 0.178,
+     "total": 33.67
+    },
+    "2021": {
+     "n": 179,
+     "netR": 0.021,
+     "total": 3.72
+    },
+    "2022": {
+     "n": 193,
+     "netR": 0.016,
+     "total": 3.16
+    },
+    "2023": {
+     "n": 186,
+     "netR": -0.095,
+     "total": -17.76
+    },
+    "2024": {
+     "n": 200,
+     "netR": 0.053,
+     "total": 10.53
+    },
+    "2025": {
+     "n": 193,
+     "netR": 0.181,
+     "total": 34.9
+    },
+    "2026": {
+     "n": 163,
+     "netR": 0.256,
+     "total": 41.74
+    }
+   }
+  },
+  "IS": {
+   "n": 1864,
+   "win": 0.43,
+   "netR": 0.095,
+   "grossR": 0.189,
+   "net2R": 0.002,
+   "costR": 0.094,
+   "finR": 0,
+   "total": 177.43,
+   "months": 122,
+   "t": 2.99,
+   "grossT": 6.04,
+   "t2x": 0.05,
+   "stops": 630,
+   "time": 1234,
+   "maxDD": -25.66,
+   "medianStop": 7.64,
+   "buys": {
+    "n": 886,
+    "netR": 0.136
+   },
+   "sells": {
+    "n": 978,
+    "netR": 0.059
+   },
+   "byYear": {
+    "2006": {
+     "n": 27,
+     "netR": -0.287,
+     "total": -7.76
+    },
+    "2007": {
+     "n": 183,
+     "netR": 0.208,
+     "total": 38.05
+    },
+    "2008": {
+     "n": 188,
+     "netR": 0.191,
+     "total": 35.96
+    },
+    "2009": {
+     "n": 190,
+     "netR": 0.021,
+     "total": 4.08
+    },
+    "2010": {
+     "n": 182,
+     "netR": 0.137,
+     "total": 24.95
+    },
+    "2011": {
+     "n": 186,
+     "netR": 0.044,
+     "total": 8.17
+    },
+    "2012": {
+     "n": 186,
+     "netR": 0.038,
+     "total": 7.03
+    },
+    "2013": {
+     "n": 181,
+     "netR": 0.258,
+     "total": 46.76
+    },
+    "2014": {
+     "n": 171,
+     "netR": 0.136,
+     "total": 23.34
+    },
+    "2015": {
+     "n": 190,
+     "netR": -0.025,
+     "total": -4.66
+    },
+    "2016": {
+     "n": 180,
+     "netR": 0.008,
+     "total": 1.51
+    }
+   }
+  },
+  "OOS": {
+   "n": 1869,
+   "win": 0.422,
+   "netR": 0.044,
+   "grossR": 0.116,
+   "net2R": -0.027,
+   "costR": 0.072,
+   "finR": 0,
+   "total": 83.05,
+   "months": 118,
+   "t": 1.49,
+   "grossT": 4.01,
+   "t2x": -0.88,
+   "stops": 647,
+   "time": 1222,
+   "maxDD": -39.18,
+   "medianStop": 9.99,
+   "buys": {
+    "n": 966,
+    "netR": 0.041
+   },
+   "sells": {
+    "n": 903,
+    "netR": 0.048
+   },
+   "byYear": {
+    "2017": {
+     "n": 187,
+     "netR": -0.006,
+     "total": -1.15
+    },
+    "2018": {
+     "n": 188,
+     "netR": -0.097,
+     "total": -18.15
+    },
+    "2019": {
+     "n": 191,
+     "netR": -0.04,
+     "total": -7.62
+    },
+    "2020": {
+     "n": 189,
+     "netR": 0.178,
+     "total": 33.67
+    },
+    "2021": {
+     "n": 179,
+     "netR": 0.021,
+     "total": 3.72
+    },
+    "2022": {
+     "n": 193,
+     "netR": 0.016,
+     "total": 3.16
+    },
+    "2023": {
+     "n": 186,
+     "netR": -0.095,
+     "total": -17.76
+    },
+    "2024": {
+     "n": 200,
+     "netR": 0.053,
+     "total": 10.53
+    },
+    "2025": {
+     "n": 193,
+     "netR": 0.181,
+     "total": 34.9
+    },
+    "2026": {
+     "n": 163,
+     "netR": 0.256,
+     "total": 41.74
+    }
+   }
+  }
+ },
+ "comparison": {
+  "xpt": {
+   "days": 2534,
+   "metalOnly": 688,
+   "usdOnly": 1199,
+   "corrGross": 0.328,
+   "corrNet": 0.312,
+   "sameSide": 0.779
+  },
+  "xpd": {
+   "days": 2042,
+   "metalOnly": 646,
+   "usdOnly": 1691,
+   "corrGross": 0.149,
+   "corrNet": 0.123,
+   "sameSide": 0.699
+  }
+ },
+ "reading": "Platinum (XPT/USD): pooled −0.285R a trade net (n 3222, month t −12.47; gross +0.061R, gross t +3.11); IS −0.315R net / +0.084R gross (n 1334, gross t +2.67); OOS −0.263R net / +0.045R gross (n 1888, gross t +1.79); costs 0.346R a trade; at 0.5x cost −0.112R (t −5.45); 36 of 40 placebo seeds beaten (median −0.309R); failed: t2, holm, isPos, oosPos, cost2x, placebo. Palladium (XPD/USD): pooled −0.643R a trade net (n 2688, month t −19.39; gross +0.094R, gross t +4.24); IS −0.735R net / +0.152R gross (n 877, gross t +4.16); OOS −0.598R net / +0.067R gross (n 1811, gross t +2.39); costs 0.737R a trade; at 0.5x cost −0.274R (t −11.19); 36 of 40 placebo seeds beaten (median −0.662R); failed: t2, holm, isPos, oosPos, cost2x, placebo. Before costs the breakout shows on Palladium (XPD/USD) in both halves (gross month t ≥ 2 each), so by the pre-registered reading the mechanism is a precious-metals one and the wider CFD cost, not the absence of the move, keeps it from paying. On Platinum (XPT/USD) the gross pooled month t is +3.11 but IS +2.67 / OOS +1.79, so it shows there less firmly. The placebo pays the same cost, so its net seeds are deeply negative too and the real streams beating 36 and 36 of 40 of them says little; the gross t is the pre-registered measure of the mechanism here. On the days both traded, the metal's T1 result correlates with XAU/USD's at 0.328 (platinum, same side 78 %) and 0.149 (palladium, same side 70 %) in gross R. The costs are the repository's stated CFD model for these metals, not a measured spread. This is a check of the gold rule, not a rule for these markets: nothing live changes and no proposal is written.",
+ "verdict": "FAIL, 0 of 2: gold's T1 breakout on platinum −0.285R net (t −12.47, gross t +3.11), palladium −0.643R net (t −19.39, gross t +4.24)"
+}

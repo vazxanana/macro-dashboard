@@ -1,0 +1,8331 @@
+{
+ "collected": "2026-11-14",
+ "studies": [
+  {
+   "topic": "gold-vol-breakout",
+   "ref": "origin/gold-vol-breakout",
+   "commit": "72009ebe62c4aa56ff7d4ea8a621fbe64a643e3e",
+   "verdict": "FAIL, 0 of 3: gold open ± 0.5 × prior range breakout 2021 → now +0.072R a trade net (n 1121, month t +1.86, gross +0.121R); 2016-20 +0.009R",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 935,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": 0.111,
+       "path": "tests.T1.IS.grossR"
+      },
+      "net": {
+       "v": 0.009,
+       "path": "tests.T1.IS.netR"
+      },
+      "tg": {
+       "v": 2.87,
+       "path": "tests.T1.IS.grossT"
+      },
+      "tn": {
+       "v": 0.22,
+       "path": "tests.T1.IS.t"
+      },
+      "costR": {
+       "v": 0.102,
+       "path": "tests.T1.IS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.IS.finR"
+      },
+      "stop": {
+       "v": 6.49,
+       "path": "tests.T1.IS.medianStop"
+      }
+     },
+     "sourceName": "k 0.5, both sides"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1121,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": 0.121,
+       "path": "tests.T1.OOS.grossR"
+      },
+      "net": {
+       "v": 0.072,
+       "path": "tests.T1.OOS.netR"
+      },
+      "tg": {
+       "v": 3.21,
+       "path": "tests.T1.OOS.grossT"
+      },
+      "tn": {
+       "v": 1.86,
+       "path": "tests.T1.OOS.t"
+      },
+      "costR": {
+       "v": 0.049,
+       "path": "tests.T1.OOS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.OOS.finR"
+      },
+      "stop": {
+       "v": 13.49,
+       "path": "tests.T1.OOS.medianStop"
+      }
+     },
+     "sourceName": "k 0.5, both sides"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 652,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": 0.12,
+       "path": "tests.T2.IS.grossR"
+      },
+      "net": {
+       "v": 0.04,
+       "path": "tests.T2.IS.netR"
+      },
+      "tg": {
+       "v": 3.31,
+       "path": "tests.T2.IS.grossT"
+      },
+      "tn": {
+       "v": 1.1,
+       "path": "tests.T2.IS.t"
+      },
+      "costR": {
+       "v": 0.079,
+       "path": "tests.T2.IS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.IS.finR"
+      },
+      "stop": {
+       "v": 8.29,
+       "path": "tests.T2.IS.medianStop"
+      }
+     },
+     "sourceName": "k 0.7, both sides"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 801,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": 0.099,
+       "path": "tests.T2.OOS.grossR"
+      },
+      "net": {
+       "v": 0.061,
+       "path": "tests.T2.OOS.netR"
+      },
+      "tg": {
+       "v": 2.53,
+       "path": "tests.T2.OOS.grossT"
+      },
+      "tn": {
+       "v": 1.54,
+       "path": "tests.T2.OOS.t"
+      },
+      "costR": {
+       "v": 0.038,
+       "path": "tests.T2.OOS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.OOS.finR"
+      },
+      "stop": {
+       "v": 17.21,
+       "path": "tests.T2.OOS.medianStop"
+      }
+     },
+     "sourceName": "k 0.7, both sides"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 310,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": 0.136,
+       "path": "tests.T3.IS.grossR"
+      },
+      "net": {
+       "v": 0.028,
+       "path": "tests.T3.IS.netR"
+      },
+      "tg": {
+       "v": 1.87,
+       "path": "tests.T3.IS.grossT"
+      },
+      "tn": {
+       "v": 0.39,
+       "path": "tests.T3.IS.t"
+      },
+      "costR": {
+       "v": 0.108,
+       "path": "tests.T3.IS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.IS.finR"
+      },
+      "stop": {
+       "v": 6.25,
+       "path": "tests.T3.IS.medianStop"
+      }
+     },
+     "sourceName": "k 0.5, buys only, previous D1 close above its 20-day mean"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 377,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": 0.111,
+       "path": "tests.T3.OOS.grossR"
+      },
+      "net": {
+       "v": 0.058,
+       "path": "tests.T3.OOS.netR"
+      },
+      "tg": {
+       "v": 1.8,
+       "path": "tests.T3.OOS.grossT"
+      },
+      "tn": {
+       "v": 0.95,
+       "path": "tests.T3.OOS.t"
+      },
+      "costR": {
+       "v": 0.053,
+       "path": "tests.T3.OOS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.OOS.finR"
+      },
+      "stop": {
+       "v": 13.07,
+       "path": "tests.T3.OOS.medianStop"
+      }
+     },
+     "sourceName": "k 0.5, buys only, previous D1 close above its 20-day mean"
+    }
+   ]
+  },
+  {
+   "topic": "gold-vol-breakout-replicate",
+   "ref": "origin/gold-vol-breakout-replicate",
+   "commit": "3360a2cfd30fd0499d3612b4ba8c1404b2fbd837",
+   "verdict": "PASS: gold open ± 0.5 × prior range breakout on untouched 2007-15 +0.111R a trade net (n 1657, month t +3.19, gross +0.203R)",
+   "passed": true,
+   "rows": [
+    {
+     "test": "R1",
+     "window": "single",
+     "values": {
+      "n": {
+       "v": 1657,
+       "path": "main.n"
+      },
+      "g": {
+       "v": 0.203,
+       "path": "main.grossR"
+      },
+      "net": {
+       "v": 0.111,
+       "path": "main.netR"
+      },
+      "tg": {
+       "v": 5.96,
+       "path": "main.grossT"
+      },
+      "tn": {
+       "v": 3.19,
+       "path": "main.t"
+      },
+      "costR": {
+       "v": 0.092,
+       "path": "main.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "main.finR"
+      },
+      "stop": {
+       "v": 7.76,
+       "path": "main.medianStop"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-comex-orb",
+   "ref": "origin/gold-comex-orb",
+   "commit": "08c7f3cd414f7d1048b90528828e0250cfda0bcc",
+   "verdict": "FAIL, 0 of 3: gold 08:20-08:50 NY breakout 2021 → now +0.006R a trade net (n 1407, month t +0.20, gross +0.075R); 2016-20 −0.155R",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1183,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": -0.002,
+       "path": "tests.T1.IS.grossR"
+      },
+      "net": {
+       "v": -0.155,
+       "path": "tests.T1.IS.netR"
+      },
+      "tg": {
+       "v": -0.08,
+       "path": "tests.T1.IS.grossT"
+      },
+      "tn": {
+       "v": -5.05,
+       "path": "tests.T1.IS.t"
+      },
+      "costR": {
+       "v": 0.153,
+       "path": "tests.T1.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 4.13,
+       "path": "tests.T1.IS.medianStop"
+      }
+     },
+     "sourceName": "Breakout, stop at the opposite side, 2R"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1407,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": 0.075,
+       "path": "tests.T1.OOS.grossR"
+      },
+      "net": {
+       "v": 0.006,
+       "path": "tests.T1.OOS.netR"
+      },
+      "tg": {
+       "v": 2.43,
+       "path": "tests.T1.OOS.grossT"
+      },
+      "tn": {
+       "v": 0.2,
+       "path": "tests.T1.OOS.t"
+      },
+      "costR": {
+       "v": 0.069,
+       "path": "tests.T1.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 9.19,
+       "path": "tests.T1.OOS.medianStop"
+      }
+     },
+     "sourceName": "Breakout, stop at the opposite side, 2R"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 600,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": 0.036,
+       "path": "tests.T2.IS.grossR"
+      },
+      "net": {
+       "v": -0.161,
+       "path": "tests.T2.IS.netR"
+      },
+      "tg": {
+       "v": 0.78,
+       "path": "tests.T2.IS.grossT"
+      },
+      "tn": {
+       "v": -3.27,
+       "path": "tests.T2.IS.t"
+      },
+      "costR": {
+       "v": 0.197,
+       "path": "tests.T2.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3,
+       "path": "tests.T2.IS.medianStop"
+      }
+     },
+     "sourceName": "T1 on a range under its 20-day median width"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 725,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": 0.155,
+       "path": "tests.T2.OOS.grossR"
+      },
+      "net": {
+       "v": 0.064,
+       "path": "tests.T2.OOS.netR"
+      },
+      "tg": {
+       "v": 3.14,
+       "path": "tests.T2.OOS.grossT"
+      },
+      "tn": {
+       "v": 1.3,
+       "path": "tests.T2.OOS.t"
+      },
+      "costR": {
+       "v": 0.091,
+       "path": "tests.T2.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 6.3,
+       "path": "tests.T2.OOS.medianStop"
+      }
+     },
+     "sourceName": "T1 on a range under its 20-day median width"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1147,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": -0.354,
+       "path": "tests.T3.IS.grossR"
+      },
+      "net": {
+       "v": -6.087,
+       "path": "tests.T3.IS.netR"
+      },
+      "tg": {
+       "v": -11.47,
+       "path": "tests.T3.IS.grossT"
+      },
+      "tn": {
+       "v": -6.53,
+       "path": "tests.T3.IS.t"
+      },
+      "costR": {
+       "v": 5.734,
+       "path": "tests.T3.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 0.38,
+       "path": "tests.T3.IS.medianStop"
+      }
+     },
+     "sourceName": "Fade of the first break, stop past its extreme, 1R"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1359,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": -0.48,
+       "path": "tests.T3.OOS.grossR"
+      },
+      "net": {
+       "v": -3.235,
+       "path": "tests.T3.OOS.netR"
+      },
+      "tg": {
+       "v": -15.79,
+       "path": "tests.T3.OOS.grossT"
+      },
+      "tn": {
+       "v": -12.94,
+       "path": "tests.T3.OOS.t"
+      },
+      "costR": {
+       "v": 2.755,
+       "path": "tests.T3.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 0.59,
+       "path": "tests.T3.OOS.medianStop"
+      }
+     },
+     "sourceName": "Fade of the first break, stop past its extreme, 1R"
+    }
+   ]
+  },
+  {
+   "topic": "gold-london-orb",
+   "ref": "origin/gold-london-orb",
+   "commit": "2b3ee55f883dc383a466d0ab9e430d48145b070f",
+   "verdict": "FAIL, 0 of 3: gold London first-hour range breakout 2017 → now −0.078R a trade net (n 2542, month t −1.78, gross +0.076R); 2008-16 −0.041R",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 2317,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": 0.15,
+       "path": "tests.T1.IS.grossR"
+      },
+      "net": {
+       "v": -0.041,
+       "path": "tests.T1.IS.netR"
+      },
+      "tg": {
+       "v": 3.28,
+       "path": "tests.T1.IS.grossT"
+      },
+      "tn": {
+       "v": -0.88,
+       "path": "tests.T1.IS.t"
+      },
+      "costR": {
+       "v": 0.19,
+       "path": "tests.T1.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3.49,
+       "path": "tests.T1.IS.medianStop"
+      }
+     },
+     "sourceName": "Breakout, stop at the opposite side, out at 20:00 UTC"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 2542,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": 0.076,
+       "path": "tests.T1.OOS.grossR"
+      },
+      "net": {
+       "v": -0.078,
+       "path": "tests.T1.OOS.netR"
+      },
+      "tg": {
+       "v": 1.77,
+       "path": "tests.T1.OOS.grossT"
+      },
+      "tn": {
+       "v": -1.78,
+       "path": "tests.T1.OOS.t"
+      },
+      "costR": {
+       "v": 0.154,
+       "path": "tests.T1.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 4.59,
+       "path": "tests.T1.OOS.medianStop"
+      }
+     },
+     "sourceName": "Breakout, stop at the opposite side, out at 20:00 UTC"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 2317,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": 0.068,
+       "path": "tests.T2.IS.grossR"
+      },
+      "net": {
+       "v": -0.122,
+       "path": "tests.T2.IS.netR"
+      },
+      "tg": {
+       "v": 2.9,
+       "path": "tests.T2.IS.grossT"
+      },
+      "tn": {
+       "v": -5.01,
+       "path": "tests.T2.IS.t"
+      },
+      "costR": {
+       "v": 0.19,
+       "path": "tests.T2.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3.49,
+       "path": "tests.T2.IS.medianStop"
+      }
+     },
+     "sourceName": "T1 with a 1.5R target"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 2542,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": 0.035,
+       "path": "tests.T2.OOS.grossR"
+      },
+      "net": {
+       "v": -0.119,
+       "path": "tests.T2.OOS.netR"
+      },
+      "tg": {
+       "v": 1.55,
+       "path": "tests.T2.OOS.grossT"
+      },
+      "tn": {
+       "v": -5.24,
+       "path": "tests.T2.OOS.t"
+      },
+      "costR": {
+       "v": 0.154,
+       "path": "tests.T2.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 4.59,
+       "path": "tests.T2.OOS.medianStop"
+      }
+     },
+     "sourceName": "T1 with a 1.5R target"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1177,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": 0.213,
+       "path": "tests.T3.IS.grossR"
+      },
+      "net": {
+       "v": -0.037,
+       "path": "tests.T3.IS.netR"
+      },
+      "tg": {
+       "v": 2.9,
+       "path": "tests.T3.IS.grossT"
+      },
+      "tn": {
+       "v": -0.5,
+       "path": "tests.T3.IS.t"
+      },
+      "costR": {
+       "v": 0.249,
+       "path": "tests.T3.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 2.55,
+       "path": "tests.T3.IS.medianStop"
+      }
+     },
+     "sourceName": "T1 on a range under its 20-day median width"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1260,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": 0.071,
+       "path": "tests.T3.OOS.grossR"
+      },
+      "net": {
+       "v": -0.127,
+       "path": "tests.T3.OOS.netR"
+      },
+      "tg": {
+       "v": 1.01,
+       "path": "tests.T3.OOS.grossT"
+      },
+      "tn": {
+       "v": -1.8,
+       "path": "tests.T3.OOS.t"
+      },
+      "costR": {
+       "v": 0.199,
+       "path": "tests.T3.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3.51,
+       "path": "tests.T3.OOS.medianStop"
+      }
+     },
+     "sourceName": "T1 on a range under its 20-day median width"
+    }
+   ]
+  },
+  {
+   "topic": "gold-london-reversal",
+   "ref": "origin/gold-london-reversal",
+   "commit": "ae93e673454ad25cf9ed1d9e2fa61929c9c398ab",
+   "verdict": "FAIL, 0 of 3: fading gold's London move at 09:30 NY, 2021 → now −0.164R a trade net (n 352, month t −2.22, gross −0.064R); after a NY raid −0.380R (n 155, t −3.82)",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 319,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": -0.018,
+       "path": "tests.T1.IS.grossR"
+      },
+      "net": {
+       "v": -0.224,
+       "path": "tests.T1.IS.netR"
+      },
+      "tg": {
+       "v": -0.24,
+       "path": "tests.T1.IS.grossT"
+      },
+      "tn": {
+       "v": -3.11,
+       "path": "tests.T1.IS.t"
+      },
+      "costR": {
+       "v": 0.206,
+       "path": "tests.T1.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3.41,
+       "path": "tests.T1.IS.medianStop"
+      }
+     },
+     "sourceName": "fade London at 09:30"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 352,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": -0.064,
+       "path": "tests.T1.OOS.grossR"
+      },
+      "net": {
+       "v": -0.164,
+       "path": "tests.T1.OOS.netR"
+      },
+      "tg": {
+       "v": -0.87,
+       "path": "tests.T1.OOS.grossT"
+      },
+      "tn": {
+       "v": -2.22,
+       "path": "tests.T1.OOS.t"
+      },
+      "costR": {
+       "v": 0.1,
+       "path": "tests.T1.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 7.78,
+       "path": "tests.T1.OOS.medianStop"
+      }
+     },
+     "sourceName": "fade London at 09:30"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 301,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": -0.036,
+       "path": "tests.T2.IS.grossR"
+      },
+      "net": {
+       "v": -0.249,
+       "path": "tests.T2.IS.netR"
+      },
+      "tg": {
+       "v": -0.47,
+       "path": "tests.T2.IS.grossT"
+      },
+      "tn": {
+       "v": -3.29,
+       "path": "tests.T2.IS.t"
+      },
+      "costR": {
+       "v": 0.213,
+       "path": "tests.T2.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3.29,
+       "path": "tests.T2.IS.medianStop"
+      }
+     },
+     "sourceName": "T1 on the midnight open's side"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 322,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": -0.086,
+       "path": "tests.T2.OOS.grossR"
+      },
+      "net": {
+       "v": -0.191,
+       "path": "tests.T2.OOS.netR"
+      },
+      "tg": {
+       "v": -1.05,
+       "path": "tests.T2.OOS.grossT"
+      },
+      "tn": {
+       "v": -2.34,
+       "path": "tests.T2.OOS.t"
+      },
+      "costR": {
+       "v": 0.105,
+       "path": "tests.T2.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 7.34,
+       "path": "tests.T2.OOS.medianStop"
+      }
+     },
+     "sourceName": "T1 on the midnight open's side"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 137,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": 0.001,
+       "path": "tests.T3.IS.grossR"
+      },
+      "net": {
+       "v": -0.244,
+       "path": "tests.T3.IS.netR"
+      },
+      "tg": {
+       "v": 0.01,
+       "path": "tests.T3.IS.grossT"
+      },
+      "tn": {
+       "v": -1.83,
+       "path": "tests.T3.IS.t"
+      },
+      "costR": {
+       "v": 0.245,
+       "path": "tests.T3.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 2.72,
+       "path": "tests.T3.IS.medianStop"
+      }
+     },
+     "sourceName": "after a New York raid of the London extreme"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 155,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": -0.267,
+       "path": "tests.T3.OOS.grossR"
+      },
+      "net": {
+       "v": -0.38,
+       "path": "tests.T3.OOS.netR"
+      },
+      "tg": {
+       "v": -2.69,
+       "path": "tests.T3.OOS.grossT"
+      },
+      "tn": {
+       "v": -3.82,
+       "path": "tests.T3.OOS.t"
+      },
+      "costR": {
+       "v": 0.114,
+       "path": "tests.T3.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 5.93,
+       "path": "tests.T3.OOS.medianStop"
+      }
+     },
+     "sourceName": "after a New York raid of the London extreme"
+    }
+   ]
+  },
+  {
+   "topic": "gold-pdhl-break",
+   "ref": "origin/gold-pdhl-break",
+   "commit": "f2ab59c9dcbe015eacba442a830a05746d830f52",
+   "verdict": "FAIL, 0 of 3: buying / selling an M15 close beyond the previous day's high / low, 2021 → now −0.026R a trade net (n 1120, month t −0.64); 2016-20 −0.090R (n 939)",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 939,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": 0.027,
+       "path": "tests.T1.IS.grossR"
+      },
+      "net": {
+       "v": -0.09,
+       "path": "tests.T1.IS.netR"
+      },
+      "tg": {
+       "v": 0.76,
+       "path": "tests.T1.IS.grossT"
+      },
+      "tn": {
+       "v": -2.44,
+       "path": "tests.T1.IS.t"
+      },
+      "costR": {
+       "v": 0.116,
+       "path": "tests.T1.IS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.IS.finR"
+      },
+      "stop": {
+       "v": 5.36,
+       "path": "tests.T1.IS.medianStop"
+      }
+     },
+     "sourceName": "no target, out at 20:00 UTC"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1120,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": 0.033,
+       "path": "tests.T1.OOS.grossR"
+      },
+      "net": {
+       "v": -0.026,
+       "path": "tests.T1.OOS.netR"
+      },
+      "tg": {
+       "v": 0.83,
+       "path": "tests.T1.OOS.grossT"
+      },
+      "tn": {
+       "v": -0.64,
+       "path": "tests.T1.OOS.t"
+      },
+      "costR": {
+       "v": 0.059,
+       "path": "tests.T1.OOS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.OOS.finR"
+      },
+      "stop": {
+       "v": 10.37,
+       "path": "tests.T1.OOS.medianStop"
+      }
+     },
+     "sourceName": "no target, out at 20:00 UTC"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 939,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": -0.019,
+       "path": "tests.T2.IS.grossR"
+      },
+      "net": {
+       "v": -0.135,
+       "path": "tests.T2.IS.netR"
+      },
+      "tg": {
+       "v": -0.59,
+       "path": "tests.T2.IS.grossT"
+      },
+      "tn": {
+       "v": -4.04,
+       "path": "tests.T2.IS.t"
+      },
+      "costR": {
+       "v": 0.116,
+       "path": "tests.T2.IS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.IS.finR"
+      },
+      "stop": {
+       "v": 5.36,
+       "path": "tests.T2.IS.medianStop"
+      }
+     },
+     "sourceName": "target 1.5R, else out at 20:00 UTC"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1120,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": -0.003,
+       "path": "tests.T2.OOS.grossR"
+      },
+      "net": {
+       "v": -0.062,
+       "path": "tests.T2.OOS.netR"
+      },
+      "tg": {
+       "v": -0.1,
+       "path": "tests.T2.OOS.grossT"
+      },
+      "tn": {
+       "v": -1.94,
+       "path": "tests.T2.OOS.t"
+      },
+      "costR": {
+       "v": 0.059,
+       "path": "tests.T2.OOS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.OOS.finR"
+      },
+      "stop": {
+       "v": 10.37,
+       "path": "tests.T2.OOS.medianStop"
+      }
+     },
+     "sourceName": "target 1.5R, else out at 20:00 UTC"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 531,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": 0.026,
+       "path": "tests.T3.IS.grossR"
+      },
+      "net": {
+       "v": -0.09,
+       "path": "tests.T3.IS.netR"
+      },
+      "tg": {
+       "v": 0.46,
+       "path": "tests.T3.IS.grossT"
+      },
+      "tn": {
+       "v": -1.54,
+       "path": "tests.T3.IS.t"
+      },
+      "costR": {
+       "v": 0.116,
+       "path": "tests.T3.IS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.IS.finR"
+      },
+      "stop": {
+       "v": 5.39,
+       "path": "tests.T3.IS.medianStop"
+      }
+     },
+     "sourceName": "T1 on the side of the 20-day average"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 633,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": 0.057,
+       "path": "tests.T3.OOS.grossR"
+      },
+      "net": {
+       "v": -0.001,
+       "path": "tests.T3.OOS.netR"
+      },
+      "tg": {
+       "v": 1.25,
+       "path": "tests.T3.OOS.grossT"
+      },
+      "tn": {
+       "v": -0.02,
+       "path": "tests.T3.OOS.t"
+      },
+      "costR": {
+       "v": 0.058,
+       "path": "tests.T3.OOS.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.OOS.finR"
+      },
+      "stop": {
+       "v": 10.39,
+       "path": "tests.T3.OOS.medianStop"
+      }
+     },
+     "sourceName": "T1 on the side of the 20-day average"
+    }
+   ]
+  },
+  {
+   "topic": "ict-silver-bullet-gold",
+   "ref": "origin/ict-silver-bullet-gold",
+   "commit": "7f7f64fabe59be0c5cbad3c5d3e4b1734cf40ccd",
+   "verdict": "FAIL, 0 of 3: AM silver bullet on gold 2021 → now −0.168R a trade net (n 401, month t −2.13, gross −0.078R); 2016-20 −0.253R",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 360,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": -0.036,
+       "path": "tests.T1.IS.grossR"
+      },
+      "net": {
+       "v": -0.253,
+       "path": "tests.T1.IS.netR"
+      },
+      "tg": {
+       "v": -0.51,
+       "path": "tests.T1.IS.grossT"
+      },
+      "tn": {
+       "v": -3.42,
+       "path": "tests.T1.IS.t"
+      },
+      "costR": {
+       "v": 0.216,
+       "path": "tests.T1.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 1.51,
+       "path": "tests.T1.IS.medianStop"
+      }
+     },
+     "sourceName": "AM 10:00-11:00"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 401,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": -0.078,
+       "path": "tests.T1.OOS.grossR"
+      },
+      "net": {
+       "v": -0.168,
+       "path": "tests.T1.OOS.netR"
+      },
+      "tg": {
+       "v": -0.98,
+       "path": "tests.T1.OOS.grossT"
+      },
+      "tn": {
+       "v": -2.13,
+       "path": "tests.T1.OOS.t"
+      },
+      "costR": {
+       "v": 0.09,
+       "path": "tests.T1.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 3.72,
+       "path": "tests.T1.OOS.medianStop"
+      }
+     },
+     "sourceName": "AM 10:00-11:00"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 351,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": 0.038,
+       "path": "tests.T2.IS.grossR"
+      },
+      "net": {
+       "v": -0.377,
+       "path": "tests.T2.IS.netR"
+      },
+      "tg": {
+       "v": 0.45,
+       "path": "tests.T2.IS.grossT"
+      },
+      "tn": {
+       "v": -4.35,
+       "path": "tests.T2.IS.t"
+      },
+      "costR": {
+       "v": 0.414,
+       "path": "tests.T2.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 0.86,
+       "path": "tests.T2.IS.medianStop"
+      }
+     },
+     "sourceName": "PM 14:00-15:00"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 490,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": -0.058,
+       "path": "tests.T2.OOS.grossR"
+      },
+      "net": {
+       "v": -0.311,
+       "path": "tests.T2.OOS.netR"
+      },
+      "tg": {
+       "v": -1.16,
+       "path": "tests.T2.OOS.grossT"
+      },
+      "tn": {
+       "v": -5.49,
+       "path": "tests.T2.OOS.t"
+      },
+      "costR": {
+       "v": 0.253,
+       "path": "tests.T2.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 1.39,
+       "path": "tests.T2.OOS.medianStop"
+      }
+     },
+     "sourceName": "PM 14:00-15:00"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 148,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": 0.046,
+       "path": "tests.T3.IS.grossR"
+      },
+      "net": {
+       "v": -0.289,
+       "path": "tests.T3.IS.netR"
+      },
+      "tg": {
+       "v": 0.47,
+       "path": "tests.T3.IS.grossT"
+      },
+      "tn": {
+       "v": -2.56,
+       "path": "tests.T3.IS.t"
+      },
+      "costR": {
+       "v": 0.335,
+       "path": "tests.T3.IS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 0.99,
+       "path": "tests.T3.IS.medianStop"
+      }
+     },
+     "sourceName": "London 03:00-04:00"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 191,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": -0.073,
+       "path": "tests.T3.OOS.grossR"
+      },
+      "net": {
+       "v": -0.224,
+       "path": "tests.T3.OOS.netR"
+      },
+      "tg": {
+       "v": -0.69,
+       "path": "tests.T3.OOS.grossT"
+      },
+      "tn": {
+       "v": -2.15,
+       "path": "tests.T3.OOS.t"
+      },
+      "costR": {
+       "v": 0.151,
+       "path": "tests.T3.OOS.costR"
+      },
+      "finR": null,
+      "stop": {
+       "v": 2.43,
+       "path": "tests.T3.OOS.medianStop"
+      }
+     },
+     "sourceName": "London 03:00-04:00"
+    }
+   ]
+  },
+  {
+   "topic": "mmxm-pdhl-raid-gold",
+   "ref": "origin/mmxm-pdhl-raid-gold",
+   "commit": "b1058bcd77eb3ad64f00f4f946ea60ab992f05c9",
+   "verdict": "FAIL: the pre-registered rule trades 12 times in 8.8 years and loses (T1 out of sample -0.131R a trade net, n 7, month t -0.32; in sample -0.400R, n 5).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 5,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.324,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.4,
+       "path": "tests.T1.is.avg"
+      },
+      "tn": {
+       "v": -1.05,
+       "path": "tests.T1.is.tMonth"
+      },
+      "stop": {
+       "v": 3.81,
+       "path": "tests.T1.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 7,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.081,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.131,
+       "path": "tests.T1.oos.avg"
+      },
+      "tn": {
+       "v": -0.32,
+       "path": "tests.T1.oos.tMonth"
+      },
+      "stop": {
+       "v": 6.1,
+       "path": "tests.T1.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 5,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.324,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.4,
+       "path": "tests.T2.is.avg"
+      },
+      "tn": {
+       "v": -1.05,
+       "path": "tests.T2.is.tMonth"
+      },
+      "stop": {
+       "v": 3.81,
+       "path": "tests.T2.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 8,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.196,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.246,
+       "path": "tests.T2.oos.avg"
+      },
+      "tn": {
+       "v": -0.65,
+       "path": "tests.T2.oos.tMonth"
+      },
+      "stop": {
+       "v": 6.1,
+       "path": "tests.T2.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 5,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.342,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.451,
+       "path": "tests.T3.is.avg"
+      },
+      "tn": {
+       "v": -0.99,
+       "path": "tests.T3.is.tMonth"
+      },
+      "stop": {
+       "v": 3.02,
+       "path": "tests.T3.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 3,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.298,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.367,
+       "path": "tests.T3.oos.avg"
+      },
+      "tn": {
+       "v": -0.59,
+       "path": "tests.T3.oos.tMonth"
+      },
+      "stop": {
+       "v": 3.66,
+       "path": "tests.T3.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T4",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 2,
+       "path": "tests.T4.is.n"
+      },
+      "g": {
+       "v": -0.698,
+       "path": "tests.T4.is.gross"
+      },
+      "net": {
+       "v": -0.759,
+       "path": "tests.T4.is.avg"
+      },
+      "tn": {
+       "v": -1.34,
+       "path": "tests.T4.is.tMonth"
+      },
+      "stop": {
+       "v": 6.75,
+       "path": "tests.T4.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T4",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 4,
+       "path": "tests.T4.oos.n"
+      },
+      "g": {
+       "v": -0.544,
+       "path": "tests.T4.oos.gross"
+      },
+      "net": {
+       "v": -0.599,
+       "path": "tests.T4.oos.avg"
+      },
+      "tn": {
+       "v": -1.59,
+       "path": "tests.T4.oos.tMonth"
+      },
+      "stop": {
+       "v": 6.1,
+       "path": "tests.T4.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-late-ny",
+   "ref": "origin/gold-late-ny",
+   "commit": "588b99c8a5512963c350cb05b24b20b1a7d2dadc",
+   "verdict": "FAIL, 0 of 3: gold's 13:30-16:30 New York move does not carry into the 18:00-02:00 Asian session (out of sample follow −0.045R a trade net, n 1445, month t −2.57; fade −0.065R, t −3.46).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1229,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.0158,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.0768,
+       "path": "tests.T1.is.avg"
+      },
+      "tg": {
+       "v": 0.85,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -4.23,
+       "path": "tests.T1.is.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.is.finR"
+      },
+      "stop": {
+       "v": 6.1,
+       "path": "tests.T1.is.medStop"
+      }
+     },
+     "sourceName": "Follow the late-NY move into Asia (every signal day)"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1445,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.002,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.0452,
+       "path": "tests.T1.oos.avg"
+      },
+      "tg": {
+       "v": 0.11,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -2.57,
+       "path": "tests.T1.oos.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.oos.finR"
+      },
+      "stop": {
+       "v": 12.03,
+       "path": "tests.T1.oos.medStop"
+      }
+     },
+     "sourceName": "Follow the late-NY move into Asia (every signal day)"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 756,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.0065,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.0868,
+       "path": "tests.T2.is.avg"
+      },
+      "tg": {
+       "v": 0.29,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -3.99,
+       "path": "tests.T2.is.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.is.finR"
+      },
+      "stop": {
+       "v": 6.09,
+       "path": "tests.T2.is.medStop"
+      }
+     },
+     "sourceName": "Follow, sizeable late-NY moves only (|move| > 0.5x its 20-day mean size)"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 906,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.0188,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.0289,
+       "path": "tests.T2.oos.avg"
+      },
+      "tg": {
+       "v": 0.83,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -1.27,
+       "path": "tests.T2.oos.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.oos.finR"
+      },
+      "stop": {
+       "v": 11.99,
+       "path": "tests.T2.oos.medStop"
+      }
+     },
+     "sourceName": "Follow, sizeable late-NY moves only (|move| > 0.5x its 20-day mean size)"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1229,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.0173,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.1099,
+       "path": "tests.T3.is.avg"
+      },
+      "tg": {
+       "v": -0.98,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -5.7,
+       "path": "tests.T3.is.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.is.finR"
+      },
+      "stop": {
+       "v": 6.1,
+       "path": "tests.T3.is.medStop"
+      }
+     },
+     "sourceName": "Fade the late-NY move in Asia (every signal day)"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1445,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.0182,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.0654,
+       "path": "tests.T3.oos.avg"
+      },
+      "tg": {
+       "v": -0.97,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -3.46,
+       "path": "tests.T3.oos.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.oos.finR"
+      },
+      "stop": {
+       "v": 12.03,
+       "path": "tests.T3.oos.medStop"
+      }
+     },
+     "sourceName": "Fade the late-NY move in Asia (every signal day)"
+    }
+   ]
+  },
+  {
+   "topic": "gold-gap-open",
+   "ref": "origin/gold-gap-open",
+   "commit": "858df19b586006105916ae37d69664ccce08ad6a",
+   "verdict": "FAIL, 0 of 3: gold's 17:00 → 18:00 New York reopen gap is usually within a spread; fading it (OOS −0.077R net, t −1.52) or following it (−0.034R, t −0.32) does not pay.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 107,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.0158,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.1179,
+       "path": "tests.T1.is.avg"
+      },
+      "tg": {
+       "v": 0.3,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -1.98,
+       "path": "tests.T1.is.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.is.finR"
+      },
+      "stop": {
+       "v": 3.43,
+       "path": "tests.T1.is.medStop"
+      }
+     },
+     "sourceName": "Fade the gap in Asia (18:05 -> 02:00, target the 17:00 close)"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 142,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.0272,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.0769,
+       "path": "tests.T1.oos.avg"
+      },
+      "tg": {
+       "v": -0.55,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -1.52,
+       "path": "tests.T1.oos.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.oos.finR"
+      },
+      "stop": {
+       "v": 12.15,
+       "path": "tests.T1.oos.medStop"
+      }
+     },
+     "sourceName": "Fade the gap in Asia (18:05 -> 02:00, target the 17:00 close)"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 146,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.0439,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.2098,
+       "path": "tests.T2.is.avg"
+      },
+      "tg": {
+       "v": -0.52,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -2.47,
+       "path": "tests.T2.is.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.is.finR"
+      },
+      "stop": {
+       "v": 3.44,
+       "path": "tests.T2.is.medStop"
+      }
+     },
+     "sourceName": "Follow the gap to 02:00 (18:05 -> 02:00, no target)"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 143,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.0263,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.0336,
+       "path": "tests.T2.oos.avg"
+      },
+      "tg": {
+       "v": 0.25,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -0.32,
+       "path": "tests.T2.oos.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.oos.finR"
+      },
+      "stop": {
+       "v": 11.54,
+       "path": "tests.T2.oos.medStop"
+      }
+     },
+     "sourceName": "Follow the gap to 02:00 (18:05 -> 02:00, no target)"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 10,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.1807,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": 0.0282,
+       "path": "tests.T3.is.avg"
+      },
+      "tg": {
+       "v": 0.67,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": 0.1,
+       "path": "tests.T3.is.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.is.finR"
+      },
+      "stop": {
+       "v": 3.28,
+       "path": "tests.T3.is.medStop"
+      }
+     },
+     "sourceName": "NDOG midpoint as a London magnet (03:00 -> 08:00, target the midpoint)"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 14,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.1268,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": 0.0559,
+       "path": "tests.T3.oos.avg"
+      },
+      "tg": {
+       "v": 0.55,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 0.25,
+       "path": "tests.T3.oos.t"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.oos.finR"
+      },
+      "stop": {
+       "v": 10.67,
+       "path": "tests.T3.oos.medStop"
+      }
+     },
+     "sourceName": "NDOG midpoint as a London magnet (03:00 -> 08:00, target the midpoint)"
+    }
+   ]
+  },
+  {
+   "topic": "gold-volume-spike",
+   "ref": "origin/gold-volume-spike",
+   "commit": "516935301e78b278f2a2a5379cc58636ce9e5a8e",
+   "verdict": "FAIL, 0 of 3 pass: OOS 2021-now net R a trade, continuation −0.054 (n 515, t −0.85), reversal −0.363 (t −2.65), strong-close +0.061 (t +1.02).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 841,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.009,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.155,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": -0.25,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -3.89,
+       "path": "tests.T1.is.t"
+      },
+      "stop": {
+       "v": 5.61,
+       "path": "tests.T1.is.stop$"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 515,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.061,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.054,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": 0.79,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -0.85,
+       "path": "tests.T1.oos.t"
+      },
+      "stop": {
+       "v": 8.36,
+       "path": "tests.T1.oos.stop$"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 394,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.285,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.072,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 2.02,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -0.53,
+       "path": "tests.T2.is.t"
+      },
+      "stop": {
+       "v": 1.77,
+       "path": "tests.T2.is.stop$"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 307,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.05,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.363,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": -0.44,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -2.65,
+       "path": "tests.T2.oos.t"
+      },
+      "stop": {
+       "v": 2.13,
+       "path": "tests.T2.oos.stop$"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 531,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.062,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.172,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": -2.03,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -4.86,
+       "path": "tests.T3.is.t"
+      },
+      "stop": {
+       "v": 6.9,
+       "path": "tests.T3.is.stop$"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 339,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.147,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": 0.061,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 2.06,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 1.02,
+       "path": "tests.T3.oos.t"
+      },
+      "stop": {
+       "v": 10.21,
+       "path": "tests.T3.oos.stop$"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-hourly-shock",
+   "ref": "origin/gold-hourly-shock",
+   "commit": "2c5315eec519a12a81caf20290b155ea28541fc0",
+   "verdict": "FAIL, 0 of 3 pass: OOS 2017-now net R a trade T1 −0.349 (n 1051, t −5.56), T2 −0.103 (n 937, t −1.88), T3 −0.345 (n 949, t −5.21).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1041,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.02,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.422,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": -0.37,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -7.48,
+       "path": "tests.T1.is.t"
+      },
+      "stop": {
+       "v": 2.22,
+       "path": "tests.T1.is.stop$"
+      }
+     },
+     "sourceName": "fade (against the shock, target the 50%)"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1051,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.069,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.349,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": 1.1,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -5.56,
+       "path": "tests.T1.oos.t"
+      },
+      "stop": {
+       "v": 2.11,
+       "path": "tests.T1.oos.stop$"
+      }
+     },
+     "sourceName": "fade (against the shock, target the 50%)"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 933,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.085,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.071,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 1.43,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -1.16,
+       "path": "tests.T2.is.t"
+      },
+      "stop": {
+       "v": 4.47,
+       "path": "tests.T2.is.stop$"
+      }
+     },
+     "sourceName": "follow (with the shock, stop at the 50%)"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 937,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.029,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.103,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 0.53,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -1.88,
+       "path": "tests.T2.oos.t"
+      },
+      "stop": {
+       "v": 5.92,
+       "path": "tests.T2.oos.stop$"
+      }
+     },
+     "sourceName": "follow (with the shock, stop at the 50%)"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 966,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.004,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.404,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 0.06,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -6.89,
+       "path": "tests.T3.is.t"
+      },
+      "stop": {
+       "v": 2.15,
+       "path": "tests.T3.is.stop$"
+      }
+     },
+     "sourceName": "fade, non-release shocks only"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 949,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.084,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.345,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 1.29,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -5.21,
+       "path": "tests.T3.oos.t"
+      },
+      "stop": {
+       "v": 1.99,
+       "path": "tests.T3.oos.stop$"
+      }
+     },
+     "sourceName": "fade, non-release shocks only"
+    }
+   ]
+  },
+  {
+   "topic": "gold-silver-lead-intraday",
+   "ref": "origin/gold-silver-lead-intraday",
+   "commit": "f39030929247123dbf96147d9365d9e26d76705d",
+   "verdict": "FAIL, 0 of 3: a silver M5 shock gold lags is followed by a tiny gold catch-up (+0.027R gross, 2021-26) that $0.60 of costs turns into -0.125R a trade (n 3295, month t -6.16).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 2653,
+       "path": "tests.T1.windows.inSample.n"
+      },
+      "g": {
+       "v": 0.009,
+       "path": "tests.T1.windows.inSample.grossAvg"
+      },
+      "net": {
+       "v": -0.272,
+       "path": "tests.T1.windows.inSample.avg"
+      },
+      "tg": {
+       "v": 0.52,
+       "path": "tests.T1.windows.inSample.tGross"
+      },
+      "tn": {
+       "v": -12.1,
+       "path": "tests.T1.windows.inSample.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 3295,
+       "path": "tests.T1.windows.outOfSample.n"
+      },
+      "g": {
+       "v": 0.027,
+       "path": "tests.T1.windows.outOfSample.grossAvg"
+      },
+      "net": {
+       "v": -0.125,
+       "path": "tests.T1.windows.outOfSample.avg"
+      },
+      "tg": {
+       "v": 1.44,
+       "path": "tests.T1.windows.outOfSample.tGross"
+      },
+      "tn": {
+       "v": -6.16,
+       "path": "tests.T1.windows.outOfSample.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 2401,
+       "path": "tests.T2.windows.inSample.n"
+      },
+      "g": {
+       "v": 0.034,
+       "path": "tests.T2.windows.inSample.grossAvg"
+      },
+      "net": {
+       "v": -0.248,
+       "path": "tests.T2.windows.inSample.avg"
+      },
+      "tg": {
+       "v": 1.29,
+       "path": "tests.T2.windows.inSample.tGross"
+      },
+      "tn": {
+       "v": -8.66,
+       "path": "tests.T2.windows.inSample.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 2990,
+       "path": "tests.T2.windows.outOfSample.n"
+      },
+      "g": {
+       "v": 0.039,
+       "path": "tests.T2.windows.outOfSample.grossAvg"
+      },
+      "net": {
+       "v": -0.113,
+       "path": "tests.T2.windows.outOfSample.avg"
+      },
+      "tg": {
+       "v": 1.6,
+       "path": "tests.T2.windows.outOfSample.tGross"
+      },
+      "tn": {
+       "v": -4.37,
+       "path": "tests.T2.windows.outOfSample.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 2076,
+       "path": "tests.T3.windows.inSample.n"
+      },
+      "g": {
+       "v": 0.053,
+       "path": "tests.T3.windows.inSample.grossAvg"
+      },
+      "net": {
+       "v": -0.229,
+       "path": "tests.T3.windows.inSample.avg"
+      },
+      "tg": {
+       "v": 2.06,
+       "path": "tests.T3.windows.inSample.tGross"
+      },
+      "tn": {
+       "v": -8.56,
+       "path": "tests.T3.windows.inSample.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 2848,
+       "path": "tests.T3.windows.outOfSample.n"
+      },
+      "g": {
+       "v": 0.02,
+       "path": "tests.T3.windows.outOfSample.grossAvg"
+      },
+      "net": {
+       "v": -0.127,
+       "path": "tests.T3.windows.outOfSample.avg"
+      },
+      "tg": {
+       "v": 1.02,
+       "path": "tests.T3.windows.outOfSample.tGross"
+      },
+      "tn": {
+       "v": -5.99,
+       "path": "tests.T3.windows.outOfSample.t"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-round-numbers",
+   "ref": "origin/gold-round-numbers",
+   "commit": "b7f09e820c10529dcdfb78ededce3584c9ab4c31",
+   "verdict": "FAIL, 0 of 3: T1 OOS -0.09R net (n 344, t -1.37), IS -0.361R; T2 OOS -0.219R net (n 348, t -2.87), IS -0.231R; T3 OOS -0.062R net (n 615, t -0.83), IS -0.028R",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 123,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.258,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.361,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": -2.24,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -3.03,
+       "path": "tests.T1.is.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 344,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.053,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.09,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -0.81,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -1.37,
+       "path": "tests.T1.oos.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 112,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.134,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.231,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": -1.32,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -2.23,
+       "path": "tests.T2.is.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 348,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.18,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.219,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": -2.39,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -2.87,
+       "path": "tests.T2.oos.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 221,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.149,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.028,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 1.38,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -0.25,
+       "path": "tests.T3.is.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 615,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.007,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.062,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 0.09,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -0.83,
+       "path": "tests.T3.oos.t"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-vwap",
+   "ref": "origin/gold-vwap",
+   "commit": "b908a105b57ea1f329050c2cdaebd852cb24ea3f",
+   "verdict": "FAIL, 0 of 3 tests pass: fading the 2 sd close to VWAP made −0.310R a trade net out of sample (2021-now, n 1061, month t −4.97); follow and pullback failed too.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 599,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.083,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.252,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 1.3,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -3.91,
+       "path": "tests.T1.is.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1061,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.079,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.31,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -1.33,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -4.97,
+       "path": "tests.T1.oos.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 1011,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.072,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.228,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 1,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -3.08,
+       "path": "tests.T2.is.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1345,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.038,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.138,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 0.56,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -1.96,
+       "path": "tests.T2.oos.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 920,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.059,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.256,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": -1.59,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -6.6,
+       "path": "tests.T3.is.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 1177,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.006,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.113,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 0.18,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -3.07,
+       "path": "tests.T3.oos.t"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-floor-pivots",
+   "ref": "origin/gold-floor-pivots",
+   "commit": "a0650342f0cb7cf6016e79233e1e23c4899ba5ca",
+   "verdict": "FAIL: fading R1/S1 made −0.151R a trade net out of sample (n 796, month t −3.83); 0 of 3 tests pass.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 693,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.011,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.169,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": -0.28,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -4.17,
+       "path": "tests.T1.is.tNet"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 796,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.071,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.151,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -1.84,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -3.83,
+       "path": "tests.T1.oos.tNet"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.oos.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 627,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.074,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.061,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 1.77,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -1.44,
+       "path": "tests.T2.is.tNet"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 744,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.018,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.05,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 0.37,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -1.03,
+       "path": "tests.T2.oos.tNet"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.oos.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 504,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.028,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.169,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 0.45,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -2.6,
+       "path": "tests.T3.is.tNet"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 596,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.023,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.081,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 0.43,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -1.48,
+       "path": "tests.T3.oos.tNet"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T3.oos.fin"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-ote-retrace",
+   "ref": "origin/gold-ote-retrace",
+   "commit": "f84b1bf730e3e00ed7a7b25206d8ac9c912f0142",
+   "verdict": "FAIL, 0 of 3: a limit at the 0.705 retracement of an H1 structure-break leg loses after costs in and out of sample (T1 out of sample -0.230R a trade, n 740, month t -3.42).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 628,
+       "path": "tests.T1.is.net.n"
+      },
+      "g": {
+       "v": -0.034,
+       "path": "tests.T1.is.gross.avg"
+      },
+      "net": {
+       "v": -0.279,
+       "path": "tests.T1.is.net.avg"
+      },
+      "tg": {
+       "v": -0.64,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -5.12,
+       "path": "tests.T1.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 740,
+       "path": "tests.T1.oos.net.n"
+      },
+      "g": {
+       "v": -0.094,
+       "path": "tests.T1.oos.gross.avg"
+      },
+      "net": {
+       "v": -0.23,
+       "path": "tests.T1.oos.net.avg"
+      },
+      "tg": {
+       "v": -1.44,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -3.42,
+       "path": "tests.T1.oos.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 589,
+       "path": "tests.T2.is.net.n"
+      },
+      "g": {
+       "v": -0.062,
+       "path": "tests.T2.is.gross.avg"
+      },
+      "net": {
+       "v": -0.308,
+       "path": "tests.T2.is.net.avg"
+      },
+      "tg": {
+       "v": -1.02,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -5,
+       "path": "tests.T2.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 707,
+       "path": "tests.T2.oos.net.n"
+      },
+      "g": {
+       "v": -0.092,
+       "path": "tests.T2.oos.gross.avg"
+      },
+      "net": {
+       "v": -0.229,
+       "path": "tests.T2.oos.net.avg"
+      },
+      "tg": {
+       "v": -1.23,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -2.98,
+       "path": "tests.T2.oos.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 401,
+       "path": "tests.T3.is.net.n"
+      },
+      "g": {
+       "v": 0.012,
+       "path": "tests.T3.is.gross.avg"
+      },
+      "net": {
+       "v": -0.241,
+       "path": "tests.T3.is.net.avg"
+      },
+      "tg": {
+       "v": 0.19,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -3.67,
+       "path": "tests.T3.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 485,
+       "path": "tests.T3.oos.net.n"
+      },
+      "g": {
+       "v": -0.038,
+       "path": "tests.T3.oos.gross.avg"
+      },
+      "net": {
+       "v": -0.182,
+       "path": "tests.T3.oos.net.avg"
+      },
+      "tg": {
+       "v": -0.44,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -2.13,
+       "path": "tests.T3.oos.tNet"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-squeeze",
+   "ref": "origin/gold-squeeze",
+   "commit": "0124bf3d9ca049b815970bc06022ce218b2a30b1",
+   "verdict": "FAIL, 0 of 3 tests pass: the H4 squeeze release lost out of sample (2021-now −0.086R a trade net, n 108, month t −0.58), D1 and the slope filter lost too.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 95,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.353,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": 0.23,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 1.72,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": 1.15,
+       "path": "tests.T1.is.t"
+      },
+      "finR": {
+       "v": 0.048,
+       "path": "tests.T1.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 108,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.016,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.086,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -0.1,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -0.58,
+       "path": "tests.T1.oos.t"
+      },
+      "finR": {
+       "v": 0.034,
+       "path": "tests.T1.oos.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 15,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.091,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.19,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": -0.26,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -0.56,
+       "path": "tests.T2.is.t"
+      },
+      "finR": {
+       "v": 0.072,
+       "path": "tests.T2.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 17,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.391,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.479,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": -1.49,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -1.81,
+       "path": "tests.T2.oos.t"
+      },
+      "finR": {
+       "v": 0.073,
+       "path": "tests.T2.oos.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 54,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.409,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": 0.284,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 1.44,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": 1.03,
+       "path": "tests.T3.is.t"
+      },
+      "finR": {
+       "v": 0.049,
+       "path": "tests.T3.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 68,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.158,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.231,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": -0.89,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -1.31,
+       "path": "tests.T3.oos.t"
+      },
+      "finR": {
+       "v": 0.036,
+       "path": "tests.T3.oos.fin"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-regime-switch",
+   "ref": "origin/gold-regime-switch",
+   "commit": "a6c678fd3ad9d98d7d4377ffdc9f43234006a485",
+   "verdict": "FAIL, 0 of 3 tests pass: the ER switch lost out of sample (2021-now −0.094R a trade net, n 400, month t −1.19) and sat under its shuffled-label placebo's median.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 330,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.103,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.005,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 1.02,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -0.05,
+       "path": "tests.T1.is.t"
+      },
+      "finR": {
+       "v": 0.036,
+       "path": "tests.T1.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 400,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.031,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.094,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -0.39,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -1.19,
+       "path": "tests.T1.oos.t"
+      },
+      "finR": {
+       "v": 0.028,
+       "path": "tests.T1.oos.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 181,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.222,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": 0.1,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 1.37,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": 0.63,
+       "path": "tests.T2.is.t"
+      },
+      "finR": {
+       "v": 0.05,
+       "path": "tests.T2.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 215,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.055,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.02,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 0.38,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -0.14,
+       "path": "tests.T2.oos.t"
+      },
+      "finR": {
+       "v": 0.039,
+       "path": "tests.T2.oos.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 164,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.039,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.129,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": -0.45,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -1.48,
+       "path": "tests.T3.is.t"
+      },
+      "finR": {
+       "v": 0.018,
+       "path": "tests.T3.is.fin"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 199,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.125,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.177,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": -1.66,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -2.34,
+       "path": "tests.T3.oos.t"
+      },
+      "finR": {
+       "v": 0.016,
+       "path": "tests.T3.oos.fin"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-comex-calendar",
+   "ref": "origin/gold-comex-calendar",
+   "commit": "514cc960f08e1871e9d2b364b09370268a31350a",
+   "verdict": "FAIL: shorting gold into options expiry lost -0.130R a trade net out of sample (n 118, month t -2.13), -0.014R in sample; 0 of 3 tests pass.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 108,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.001,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.014,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 0.02,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -0.21,
+       "path": "tests.T1.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 118,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.116,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.13,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -1.91,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -2.13,
+       "path": "tests.T1.oos.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 108,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.016,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.033,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 0.25,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -0.5,
+       "path": "tests.T2.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 118,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.104,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": 0.05,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 1.39,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": 0.67,
+       "path": "tests.T2.oos.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 54,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.02,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": 0.005,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 0.25,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": 0.06,
+       "path": "tests.T3.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 59,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.03,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.044,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": -0.32,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -0.47,
+       "path": "tests.T3.oos.tNet"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-turn-of-month",
+   "ref": "origin/gold-turn-of-month",
+   "commit": "c0ae1524ef25cb383438940270264665d4b9881c",
+   "verdict": "FAIL: long gold TD-2 to TD+3 made +0.117R a trade net out of sample (n 118, month t 1.80, Holm p 0.11), +0.000R in sample, 36 of 40 placebos; 0 of 3 pass.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 108,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.042,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": 0,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 0.64,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": 0.01,
+       "path": "tests.T1.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 118,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.163,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": 0.117,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": 2.5,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": 1.8,
+       "path": "tests.T1.oos.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 108,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.04,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": 0.025,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 0.84,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": 0.52,
+       "path": "tests.T2.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 118,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.018,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": 0.005,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 0.34,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": 0.09,
+       "path": "tests.T2.oos.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 108,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.062,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": 0.015,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 0.88,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": 0.21,
+       "path": "tests.T3.is.tNet"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 118,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.175,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": 0.121,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 2.1,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 1.46,
+       "path": "tests.T3.oos.tNet"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-china-holidays",
+   "ref": "origin/gold-china-holidays",
+   "commit": "98a9438c9bc60e35508a60ed1fbdf9a3b96552e2",
+   "verdict": "FAIL (tOos, placebo not met): long gold the 10 days before the Lunar New Year closure makes +0.224R a year net out of sample 2017-26 (n 10, t +1.38).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 9,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.1691,
+       "path": "tests.T1.is.grossR"
+      },
+      "net": {
+       "v": 0.1164,
+       "path": "tests.T1.is.netR"
+      },
+      "tg": {
+       "v": 0.623,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": 0.4298,
+       "path": "tests.T1.is.t"
+      },
+      "costR": {
+       "v": 0.0105,
+       "path": "tests.T1.is.costR"
+      },
+      "finR": {
+       "v": 0.0423,
+       "path": "tests.T1.is.finR"
+      }
+     },
+     "sourceName": "Lunar New Year, 10 days before the closure (claim a)"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 10,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.2949,
+       "path": "tests.T1.oos.grossR"
+      },
+      "net": {
+       "v": 0.224,
+       "path": "tests.T1.oos.netR"
+      },
+      "tg": {
+       "v": 1.805,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": 1.3787,
+       "path": "tests.T1.oos.t"
+      },
+      "costR": {
+       "v": 0.0106,
+       "path": "tests.T1.oos.costR"
+      },
+      "finR": {
+       "v": 0.0603,
+       "path": "tests.T1.oos.finR"
+      }
+     },
+     "sourceName": "Lunar New Year, 10 days before the closure (claim a)"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 9,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.3292,
+       "path": "tests.T2.is.grossR"
+      },
+      "net": {
+       "v": 0.2977,
+       "path": "tests.T2.is.netR"
+      },
+      "tg": {
+       "v": 1.4848,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": 1.3396,
+       "path": "tests.T2.is.t"
+      },
+      "costR": {
+       "v": 0.0101,
+       "path": "tests.T2.is.costR"
+      },
+      "finR": {
+       "v": 0.0214,
+       "path": "tests.T2.is.finR"
+      }
+     },
+     "sourceName": "Lunar New Year, while Shanghai is shut (claim b predicts <= 0)"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 10,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.1251,
+       "path": "tests.T2.oos.grossR"
+      },
+      "net": {
+       "v": 0.0849,
+       "path": "tests.T2.oos.netR"
+      },
+      "tg": {
+       "v": 0.6849,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": 0.4655,
+       "path": "tests.T2.oos.t"
+      },
+      "costR": {
+       "v": 0.0101,
+       "path": "tests.T2.oos.costR"
+      },
+      "finR": {
+       "v": 0.0301,
+       "path": "tests.T2.oos.finR"
+      }
+     },
+     "sourceName": "Lunar New Year, while Shanghai is shut (claim b predicts <= 0)"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 9,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.0309,
+       "path": "tests.T3.is.grossR"
+      },
+      "net": {
+       "v": -0.0597,
+       "path": "tests.T3.is.netR"
+      },
+      "tg": {
+       "v": -0.188,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -0.3657,
+       "path": "tests.T3.is.t"
+      },
+      "costR": {
+       "v": 0.0098,
+       "path": "tests.T3.is.costR"
+      },
+      "finR": {
+       "v": 0.019,
+       "path": "tests.T3.is.finR"
+      }
+     },
+     "sourceName": "Lunar New Year, 5 days after the reopening (claim c)"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 10,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.1513,
+       "path": "tests.T3.oos.grossR"
+      },
+      "net": {
+       "v": 0.1122,
+       "path": "tests.T3.oos.netR"
+      },
+      "tg": {
+       "v": 0.9531,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 0.7095,
+       "path": "tests.T3.oos.t"
+      },
+      "costR": {
+       "v": 0.0101,
+       "path": "tests.T3.oos.costR"
+      },
+      "finR": {
+       "v": 0.029,
+       "path": "tests.T3.oos.finR"
+      }
+     },
+     "sourceName": "Lunar New Year, 5 days after the reopening (claim c)"
+    },
+    {
+     "test": "T4",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 27,
+       "path": "tests.T4.is.n"
+      },
+      "g": {
+       "v": 0.1331,
+       "path": "tests.T4.is.grossR"
+      },
+      "net": {
+       "v": 0.093,
+       "path": "tests.T4.is.netR"
+      },
+      "tg": {
+       "v": 1.1024,
+       "path": "tests.T4.is.tGross"
+      },
+      "tn": {
+       "v": 0.7748,
+       "path": "tests.T4.is.t"
+      },
+      "costR": {
+       "v": 0.0106,
+       "path": "tests.T4.is.costR"
+      },
+      "finR": {
+       "v": 0.0295,
+       "path": "tests.T4.is.finR"
+      }
+     },
+     "sourceName": "Golden Week, the three windows pooled (secondary)"
+    },
+    {
+     "test": "T4",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 30,
+       "path": "tests.T4.oos.n"
+      },
+      "g": {
+       "v": 0.1058,
+       "path": "tests.T4.oos.grossR"
+      },
+      "net": {
+       "v": 0.0624,
+       "path": "tests.T4.oos.netR"
+      },
+      "tg": {
+       "v": 0.8623,
+       "path": "tests.T4.oos.tGross"
+      },
+      "tn": {
+       "v": 0.5075,
+       "path": "tests.T4.oos.t"
+      },
+      "costR": {
+       "v": 0.0088,
+       "path": "tests.T4.oos.costR"
+      },
+      "finR": {
+       "v": 0.0347,
+       "path": "tests.T4.oos.finR"
+      }
+     },
+     "sourceName": "Golden Week, the three windows pooled (secondary)"
+    }
+   ]
+  },
+  {
+   "topic": "gold-record-high",
+   "ref": "origin/gold-record-high",
+   "commit": "9522d5d2347505c6d016def403a4fb3897e27a96",
+   "verdict": "FAIL: long 20 days after an all-time closing high made +0.319R a trade net 2017-26 (n 17, month t 0.93); 0 of 3 tests pass.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 16,
+       "path": "tests.0.is.trades"
+      },
+      "g": {
+       "v": 0.659,
+       "path": "tests.0.is.grossR"
+      },
+      "net": {
+       "v": 0.563,
+       "path": "tests.0.is.netR"
+      },
+      "tg": {
+       "v": 2.09,
+       "path": "tests.0.is.monthGrossT"
+      },
+      "tn": {
+       "v": 1.87,
+       "path": "tests.0.is.monthNetT"
+      },
+      "costR": {
+       "v": 0.011,
+       "path": "tests.0.is.costR"
+      },
+      "finR": {
+       "v": 0.085,
+       "path": "tests.0.is.finR"
+      }
+     },
+     "sourceName": "Long after an all-time closing high (primary)"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 17,
+       "path": "tests.0.oos.trades"
+      },
+      "g": {
+       "v": 0.412,
+       "path": "tests.0.oos.grossR"
+      },
+      "net": {
+       "v": 0.319,
+       "path": "tests.0.oos.netR"
+      },
+      "tg": {
+       "v": 1.15,
+       "path": "tests.0.oos.monthGrossT"
+      },
+      "tn": {
+       "v": 0.93,
+       "path": "tests.0.oos.monthNetT"
+      },
+      "costR": {
+       "v": 0.006,
+       "path": "tests.0.oos.costR"
+      },
+      "finR": {
+       "v": 0.088,
+       "path": "tests.0.oos.finR"
+      }
+     },
+     "sourceName": "Long after an all-time closing high (primary)"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 22,
+       "path": "tests.1.is.trades"
+      },
+      "g": {
+       "v": 0.407,
+       "path": "tests.1.is.grossR"
+      },
+      "net": {
+       "v": 0.315,
+       "path": "tests.1.is.netR"
+      },
+      "tg": {
+       "v": 1.73,
+       "path": "tests.1.is.monthGrossT"
+      },
+      "tn": {
+       "v": 1.39,
+       "path": "tests.1.is.monthNetT"
+      },
+      "costR": {
+       "v": 0.011,
+       "path": "tests.1.is.costR"
+      },
+      "finR": {
+       "v": 0.081,
+       "path": "tests.1.is.finR"
+      }
+     },
+     "sourceName": "Long after a 52-week closing high"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 30,
+       "path": "tests.1.oos.trades"
+      },
+      "g": {
+       "v": 0.388,
+       "path": "tests.1.oos.grossR"
+      },
+      "net": {
+       "v": 0.285,
+       "path": "tests.1.oos.netR"
+      },
+      "tg": {
+       "v": 1.58,
+       "path": "tests.1.oos.monthGrossT"
+      },
+      "tn": {
+       "v": 1.21,
+       "path": "tests.1.oos.monthNetT"
+      },
+      "costR": {
+       "v": 0.008,
+       "path": "tests.1.oos.costR"
+      },
+      "finR": {
+       "v": 0.095,
+       "path": "tests.1.oos.finR"
+      }
+     },
+     "sourceName": "Long after a 52-week closing high"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 30,
+       "path": "tests.2.is.trades"
+      },
+      "g": {
+       "v": -0.29,
+       "path": "tests.2.is.grossR"
+      },
+      "net": {
+       "v": -0.301,
+       "path": "tests.2.is.netR"
+      },
+      "tg": {
+       "v": -1.51,
+       "path": "tests.2.is.monthGrossT"
+      },
+      "tn": {
+       "v": -1.55,
+       "path": "tests.2.is.monthNetT"
+      },
+      "costR": {
+       "v": 0.011,
+       "path": "tests.2.is.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.2.is.finR"
+      }
+     },
+     "sourceName": "Short (fade) after a 52-week closing high"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 53,
+       "path": "tests.2.oos.trades"
+      },
+      "g": {
+       "v": -0.396,
+       "path": "tests.2.oos.grossR"
+      },
+      "net": {
+       "v": -0.404,
+       "path": "tests.2.oos.netR"
+      },
+      "tg": {
+       "v": -2.43,
+       "path": "tests.2.oos.monthGrossT"
+      },
+      "tn": {
+       "v": -2.47,
+       "path": "tests.2.oos.monthNetT"
+      },
+      "costR": {
+       "v": 0.007,
+       "path": "tests.2.oos.costR"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.2.oos.finR"
+      }
+     },
+     "sourceName": "Short (fade) after a 52-week closing high"
+    }
+   ]
+  },
+  {
+   "topic": "gold-weekly-momentum",
+   "ref": "origin/gold-weekly-momentum",
+   "commit": "a1f601ef83ab7c2ccc6f7fe435c24e18f780990a",
+   "verdict": "FAIL, 0 of 3: last week's sign made +0.029R a trade net 2017-26 (n 513, month t 0.95); fading a 2-sd week -0.061R (n 28, t -0.29).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 470,
+       "path": "tests.0.is.trades"
+      },
+      "g": {
+       "v": 0.037,
+       "path": "tests.0.is.grossR"
+      },
+      "net": {
+       "v": 0.007,
+       "path": "tests.0.is.netR"
+      },
+      "tg": {
+       "v": 1.15,
+       "path": "tests.0.is.monthGrossT"
+      },
+      "tn": {
+       "v": 0.23,
+       "path": "tests.0.is.monthNetT"
+      },
+      "costR": {
+       "v": 0.016,
+       "path": "tests.0.is.costR"
+      },
+      "finR": {
+       "v": 0.014,
+       "path": "tests.0.is.finR"
+      }
+     },
+     "sourceName": "One-week momentum (primary)"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 513,
+       "path": "tests.0.oos.trades"
+      },
+      "g": {
+       "v": 0.062,
+       "path": "tests.0.oos.grossR"
+      },
+      "net": {
+       "v": 0.029,
+       "path": "tests.0.oos.netR"
+      },
+      "tg": {
+       "v": 1.99,
+       "path": "tests.0.oos.monthGrossT"
+      },
+      "tn": {
+       "v": 0.95,
+       "path": "tests.0.oos.monthNetT"
+      },
+      "costR": {
+       "v": 0.014,
+       "path": "tests.0.oos.costR"
+      },
+      "finR": {
+       "v": 0.019,
+       "path": "tests.0.oos.finR"
+      }
+     },
+     "sourceName": "One-week momentum (primary)"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 470,
+       "path": "tests.1.is.trades"
+      },
+      "g": {
+       "v": 0.016,
+       "path": "tests.1.is.grossR"
+      },
+      "net": {
+       "v": -0.014,
+       "path": "tests.1.is.netR"
+      },
+      "tg": {
+       "v": 0.49,
+       "path": "tests.1.is.monthGrossT"
+      },
+      "tn": {
+       "v": -0.43,
+       "path": "tests.1.is.monthNetT"
+      },
+      "costR": {
+       "v": 0.016,
+       "path": "tests.1.is.costR"
+      },
+      "finR": {
+       "v": 0.014,
+       "path": "tests.1.is.finR"
+      }
+     },
+     "sourceName": "Four-week momentum"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 513,
+       "path": "tests.1.oos.trades"
+      },
+      "g": {
+       "v": 0.03,
+       "path": "tests.1.oos.grossR"
+      },
+      "net": {
+       "v": -0.003,
+       "path": "tests.1.oos.netR"
+      },
+      "tg": {
+       "v": 0.84,
+       "path": "tests.1.oos.monthGrossT"
+      },
+      "tn": {
+       "v": -0.08,
+       "path": "tests.1.oos.monthNetT"
+      },
+      "costR": {
+       "v": 0.014,
+       "path": "tests.1.oos.costR"
+      },
+      "finR": {
+       "v": 0.019,
+       "path": "tests.1.oos.finR"
+      }
+     },
+     "sourceName": "Four-week momentum"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 29,
+       "path": "tests.2.is.trades"
+      },
+      "g": {
+       "v": -0.148,
+       "path": "tests.2.is.grossR"
+      },
+      "net": {
+       "v": -0.171,
+       "path": "tests.2.is.netR"
+      },
+      "tg": {
+       "v": -1.23,
+       "path": "tests.2.is.monthGrossT"
+      },
+      "tn": {
+       "v": -1.41,
+       "path": "tests.2.is.monthNetT"
+      },
+      "costR": {
+       "v": 0.013,
+       "path": "tests.2.is.costR"
+      },
+      "finR": {
+       "v": 0.009,
+       "path": "tests.2.is.finR"
+      }
+     },
+     "sourceName": "Reversal after a week over 2 sd"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 28,
+       "path": "tests.2.oos.trades"
+      },
+      "g": {
+       "v": -0.041,
+       "path": "tests.2.oos.grossR"
+      },
+      "net": {
+       "v": -0.061,
+       "path": "tests.2.oos.netR"
+      },
+      "tg": {
+       "v": -0.2,
+       "path": "tests.2.oos.monthGrossT"
+      },
+      "tn": {
+       "v": -0.29,
+       "path": "tests.2.oos.monthNetT"
+      },
+      "costR": {
+       "v": 0.011,
+       "path": "tests.2.oos.costR"
+      },
+      "finR": {
+       "v": 0.009,
+       "path": "tests.2.oos.finR"
+      }
+     },
+     "sourceName": "Reversal after a week over 2 sd"
+    }
+   ]
+  },
+  {
+   "topic": "gold-oil-lead",
+   "ref": "origin/gold-oil-lead",
+   "commit": "54a29a877d92f4a261640d8d267b2efaf5660c43",
+   "verdict": "FAIL, 0 of 3: a big WTI day does not lead gold over the next 3 days (follow, out of sample 2017-26: −0.028R a trade net, n 126, month t −0.47); the fade and copper fail too.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 126,
+       "path": "tests.0.is.n"
+      },
+      "g": {
+       "v": -0.069,
+       "path": "tests.0.is.gross"
+      },
+      "net": {
+       "v": -0.094,
+       "path": "tests.0.is.net"
+      },
+      "tg": {
+       "v": -1.31,
+       "path": "tests.0.is.tMonthGross"
+      },
+      "tn": {
+       "v": -1.77,
+       "path": "tests.0.is.tMonth"
+      },
+      "costR": {
+       "v": 0.024,
+       "path": "tests.0.is.meanCost"
+      },
+      "stop": {
+       "v": 40.69,
+       "path": "tests.0.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 126,
+       "path": "tests.0.oos.n"
+      },
+      "g": {
+       "v": -0.006,
+       "path": "tests.0.oos.gross"
+      },
+      "net": {
+       "v": -0.028,
+       "path": "tests.0.oos.net"
+      },
+      "tg": {
+       "v": -0.1,
+       "path": "tests.0.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -0.47,
+       "path": "tests.0.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.022,
+       "path": "tests.0.oos.meanCost"
+      },
+      "stop": {
+       "v": 82.21,
+       "path": "tests.0.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 125,
+       "path": "tests.1.is.n"
+      },
+      "g": {
+       "v": 0.075,
+       "path": "tests.1.is.gross"
+      },
+      "net": {
+       "v": 0.049,
+       "path": "tests.1.is.net"
+      },
+      "tg": {
+       "v": 1.48,
+       "path": "tests.1.is.tMonthGross"
+      },
+      "tn": {
+       "v": 0.97,
+       "path": "tests.1.is.tMonth"
+      },
+      "costR": {
+       "v": 0.026,
+       "path": "tests.1.is.meanCost"
+      },
+      "stop": {
+       "v": 40.55,
+       "path": "tests.1.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 125,
+       "path": "tests.1.oos.n"
+      },
+      "g": {
+       "v": 0.05,
+       "path": "tests.1.oos.gross"
+      },
+      "net": {
+       "v": 0.022,
+       "path": "tests.1.oos.net"
+      },
+      "tg": {
+       "v": 0.81,
+       "path": "tests.1.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 0.37,
+       "path": "tests.1.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.028,
+       "path": "tests.1.oos.meanCost"
+      },
+      "stop": {
+       "v": 77.6,
+       "path": "tests.1.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 136,
+       "path": "tests.2.is.n"
+      },
+      "g": {
+       "v": -0.018,
+       "path": "tests.2.is.gross"
+      },
+      "net": {
+       "v": -0.043,
+       "path": "tests.2.is.net"
+      },
+      "tg": {
+       "v": -0.4,
+       "path": "tests.2.is.tMonthGross"
+      },
+      "tn": {
+       "v": -0.99,
+       "path": "tests.2.is.tMonth"
+      },
+      "costR": {
+       "v": 0.026,
+       "path": "tests.2.is.meanCost"
+      },
+      "stop": {
+       "v": 42.04,
+       "path": "tests.2.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 121,
+       "path": "tests.2.oos.n"
+      },
+      "g": {
+       "v": 0.092,
+       "path": "tests.2.oos.gross"
+      },
+      "net": {
+       "v": 0.067,
+       "path": "tests.2.oos.net"
+      },
+      "tg": {
+       "v": 1.46,
+       "path": "tests.2.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 1.07,
+       "path": "tests.2.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.026,
+       "path": "tests.2.oos.meanCost"
+      },
+      "stop": {
+       "v": 67.54,
+       "path": "tests.2.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-bond-lead",
+   "ref": "origin/gold-bond-lead",
+   "commit": "1754d4ca9a23caf9332133ec6dc9a96da1e2962b",
+   "verdict": "FAIL, 0 of 3: buying gold after a 10-year bond up week that gold lagged makes +0.088R a trade net out of sample 2017-26 (n 30, month t 0.46); the mirror short and the daily 2-year lose.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 32,
+       "path": "tests.0.is.n"
+      },
+      "g": {
+       "v": 0.176,
+       "path": "tests.0.is.gross"
+      },
+      "net": {
+       "v": 0.133,
+       "path": "tests.0.is.net"
+      },
+      "tg": {
+       "v": 1.42,
+       "path": "tests.0.is.tMonthGross"
+      },
+      "tn": {
+       "v": 1.08,
+       "path": "tests.0.is.tMonth"
+      },
+      "costR": {
+       "v": 0.043,
+       "path": "tests.0.is.meanCost"
+      },
+      "stop": {
+       "v": 42.34,
+       "path": "tests.0.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 30,
+       "path": "tests.0.oos.n"
+      },
+      "g": {
+       "v": 0.133,
+       "path": "tests.0.oos.gross"
+      },
+      "net": {
+       "v": 0.088,
+       "path": "tests.0.oos.net"
+      },
+      "tg": {
+       "v": 0.69,
+       "path": "tests.0.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 0.46,
+       "path": "tests.0.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.045,
+       "path": "tests.0.oos.meanCost"
+      },
+      "stop": {
+       "v": 66.2,
+       "path": "tests.0.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 33,
+       "path": "tests.1.is.n"
+      },
+      "g": {
+       "v": -0.105,
+       "path": "tests.1.is.gross"
+      },
+      "net": {
+       "v": -0.122,
+       "path": "tests.1.is.net"
+      },
+      "tg": {
+       "v": -0.87,
+       "path": "tests.1.is.tMonthGross"
+      },
+      "tn": {
+       "v": -1,
+       "path": "tests.1.is.tMonth"
+      },
+      "costR": {
+       "v": 0.017,
+       "path": "tests.1.is.meanCost"
+      },
+      "stop": {
+       "v": 43.41,
+       "path": "tests.1.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 53,
+       "path": "tests.1.oos.n"
+      },
+      "g": {
+       "v": -0.105,
+       "path": "tests.1.oos.gross"
+      },
+      "net": {
+       "v": -0.119,
+       "path": "tests.1.oos.net"
+      },
+      "tg": {
+       "v": -1.19,
+       "path": "tests.1.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -1.35,
+       "path": "tests.1.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.014,
+       "path": "tests.1.oos.meanCost"
+      },
+      "stop": {
+       "v": 58.76,
+       "path": "tests.1.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 309,
+       "path": "tests.2.is.n"
+      },
+      "g": {
+       "v": 0.023,
+       "path": "tests.2.is.gross"
+      },
+      "net": {
+       "v": 0.002,
+       "path": "tests.2.is.net"
+      },
+      "tg": {
+       "v": 1.21,
+       "path": "tests.2.is.tMonthGross"
+      },
+      "tn": {
+       "v": 0.13,
+       "path": "tests.2.is.tMonth"
+      },
+      "costR": {
+       "v": 0.021,
+       "path": "tests.2.is.meanCost"
+      },
+      "stop": {
+       "v": 38.46,
+       "path": "tests.2.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 317,
+       "path": "tests.2.oos.n"
+      },
+      "g": {
+       "v": -0.03,
+       "path": "tests.2.oos.gross"
+      },
+      "net": {
+       "v": -0.048,
+       "path": "tests.2.oos.net"
+      },
+      "tg": {
+       "v": -1.54,
+       "path": "tests.2.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -2.37,
+       "path": "tests.2.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.017,
+       "path": "tests.2.oos.meanCost"
+      },
+      "stop": {
+       "v": 63.57,
+       "path": "tests.2.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-dollar-lead",
+   "ref": "origin/gold-dollar-lead",
+   "commit": "c5c9b635090760f2a9f38b99701171a4bbb43d3c",
+   "verdict": "FAIL, 0 of 3: buying gold after a dollar down week that gold lagged makes +0.174R a trade net out of sample 2017-26 (n 30, month t 1.12); the mirror short and the daily version lose.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 28,
+       "path": "tests.0.is.n"
+      },
+      "g": {
+       "v": 0.166,
+       "path": "tests.0.is.gross"
+      },
+      "net": {
+       "v": 0.125,
+       "path": "tests.0.is.net"
+      },
+      "tg": {
+       "v": 1.16,
+       "path": "tests.0.is.tMonthGross"
+      },
+      "tn": {
+       "v": 0.88,
+       "path": "tests.0.is.tMonth"
+      },
+      "costR": {
+       "v": 0.042,
+       "path": "tests.0.is.meanCost"
+      },
+      "stop": {
+       "v": 40.83,
+       "path": "tests.0.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 30,
+       "path": "tests.0.oos.n"
+      },
+      "g": {
+       "v": 0.22,
+       "path": "tests.0.oos.gross"
+      },
+      "net": {
+       "v": 0.174,
+       "path": "tests.0.oos.net"
+      },
+      "tg": {
+       "v": 1.41,
+       "path": "tests.0.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 1.12,
+       "path": "tests.0.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.046,
+       "path": "tests.0.oos.meanCost"
+      },
+      "stop": {
+       "v": 74.71,
+       "path": "tests.0.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 47,
+       "path": "tests.1.is.n"
+      },
+      "g": {
+       "v": -0.024,
+       "path": "tests.1.is.gross"
+      },
+      "net": {
+       "v": -0.038,
+       "path": "tests.1.is.net"
+      },
+      "tg": {
+       "v": -0.22,
+       "path": "tests.1.is.tMonthGross"
+      },
+      "tn": {
+       "v": -0.35,
+       "path": "tests.1.is.tMonth"
+      },
+      "costR": {
+       "v": 0.015,
+       "path": "tests.1.is.meanCost"
+      },
+      "stop": {
+       "v": 46.52,
+       "path": "tests.1.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 44,
+       "path": "tests.1.oos.n"
+      },
+      "g": {
+       "v": -0.193,
+       "path": "tests.1.oos.gross"
+      },
+      "net": {
+       "v": -0.207,
+       "path": "tests.1.oos.net"
+      },
+      "tg": {
+       "v": -2,
+       "path": "tests.1.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -2.14,
+       "path": "tests.1.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.014,
+       "path": "tests.1.oos.meanCost"
+      },
+      "stop": {
+       "v": 63.47,
+       "path": "tests.1.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 388,
+       "path": "tests.2.is.n"
+      },
+      "g": {
+       "v": -0.001,
+       "path": "tests.2.is.gross"
+      },
+      "net": {
+       "v": -0.019,
+       "path": "tests.2.is.net"
+      },
+      "tg": {
+       "v": -0.05,
+       "path": "tests.2.is.tMonthGross"
+      },
+      "tn": {
+       "v": -1.14,
+       "path": "tests.2.is.tMonth"
+      },
+      "costR": {
+       "v": 0.019,
+       "path": "tests.2.is.meanCost"
+      },
+      "stop": {
+       "v": 42.94,
+       "path": "tests.2.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 344,
+       "path": "tests.2.oos.n"
+      },
+      "g": {
+       "v": -0.051,
+       "path": "tests.2.oos.gross"
+      },
+      "net": {
+       "v": -0.069,
+       "path": "tests.2.oos.net"
+      },
+      "tg": {
+       "v": -2.64,
+       "path": "tests.2.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -3.51,
+       "path": "tests.2.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.017,
+       "path": "tests.2.oos.meanCost"
+      },
+      "stop": {
+       "v": 58.89,
+       "path": "tests.2.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-platinum-ratio",
+   "ref": "origin/gold-platinum-ratio",
+   "commit": "4e5d2d0cfe1c33dc5d4a1c148d6a1b445d57a063",
+   "verdict": "FAIL, 0 of 3: a gold / platinum ratio extreme does not predict gold (reversion on gold, OOS 2017-26 −0.112R a trade net, n 67, month t −1.13); palladium and monthly relative momentum fail too.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 70,
+       "path": "tests.0.is.n"
+      },
+      "g": {
+       "v": -0.023,
+       "path": "tests.0.is.gross"
+      },
+      "net": {
+       "v": -0.048,
+       "path": "tests.0.is.net"
+      },
+      "tg": {
+       "v": -0.24,
+       "path": "tests.0.is.tMonthGross"
+      },
+      "tn": {
+       "v": -0.49,
+       "path": "tests.0.is.tMonth"
+      },
+      "costR": {
+       "v": 0.024,
+       "path": "tests.0.is.meanCost"
+      },
+      "stop": {
+       "v": 70.01,
+       "path": "tests.0.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 67,
+       "path": "tests.0.oos.n"
+      },
+      "g": {
+       "v": -0.093,
+       "path": "tests.0.oos.gross"
+      },
+      "net": {
+       "v": -0.112,
+       "path": "tests.0.oos.net"
+      },
+      "tg": {
+       "v": -0.94,
+       "path": "tests.0.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -1.13,
+       "path": "tests.0.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.019,
+       "path": "tests.0.oos.meanCost"
+      },
+      "stop": {
+       "v": 86.35,
+       "path": "tests.0.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 80,
+       "path": "tests.1.is.n"
+      },
+      "g": {
+       "v": -0.103,
+       "path": "tests.1.is.gross"
+      },
+      "net": {
+       "v": -0.137,
+       "path": "tests.1.is.net"
+      },
+      "tg": {
+       "v": -1.1,
+       "path": "tests.1.is.tMonthGross"
+      },
+      "tn": {
+       "v": -1.46,
+       "path": "tests.1.is.tMonth"
+      },
+      "costR": {
+       "v": 0.034,
+       "path": "tests.1.is.meanCost"
+      },
+      "stop": {
+       "v": 62.56,
+       "path": "tests.1.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 64,
+       "path": "tests.1.oos.n"
+      },
+      "g": {
+       "v": 0.036,
+       "path": "tests.1.oos.gross"
+      },
+      "net": {
+       "v": -0.011,
+       "path": "tests.1.oos.net"
+      },
+      "tg": {
+       "v": 0.4,
+       "path": "tests.1.oos.tMonthGross"
+      },
+      "tn": {
+       "v": -0.13,
+       "path": "tests.1.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.048,
+       "path": "tests.1.oos.meanCost"
+      },
+      "stop": {
+       "v": 74.95,
+       "path": "tests.1.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 119,
+       "path": "tests.2.is.n"
+      },
+      "g": {
+       "v": 0.061,
+       "path": "tests.2.is.gross"
+      },
+      "net": {
+       "v": 0.005,
+       "path": "tests.2.is.net"
+      },
+      "tg": {
+       "v": 0.66,
+       "path": "tests.2.is.tMonthGross"
+      },
+      "tn": {
+       "v": 0.06,
+       "path": "tests.2.is.tMonth"
+      },
+      "costR": {
+       "v": 0.056,
+       "path": "tests.2.is.meanCost"
+      },
+      "stop": {
+       "v": 58.88,
+       "path": "tests.2.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 104,
+       "path": "tests.2.oos.n"
+      },
+      "g": {
+       "v": 0.129,
+       "path": "tests.2.oos.gross"
+      },
+      "net": {
+       "v": 0.064,
+       "path": "tests.2.oos.net"
+      },
+      "tg": {
+       "v": 1.26,
+       "path": "tests.2.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 0.64,
+       "path": "tests.2.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.066,
+       "path": "tests.2.oos.meanCost"
+      },
+      "stop": {
+       "v": 101.2,
+       "path": "tests.2.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-dollar-divergence",
+   "ref": "origin/gold-dollar-divergence",
+   "commit": "bc48fb127b03a911801c8c0d2259678d173e8877",
+   "verdict": "FAIL, 0 of 3: buying gold after a day both gold and the dollar rose makes +0.120R a trade net out of sample 2017-26 (n 92, month t 1.23, Holm p 0.33); it beats 34 of 40 placebos.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 98,
+       "path": "tests.0.is.n"
+      },
+      "g": {
+       "v": 0.167,
+       "path": "tests.0.is.gross"
+      },
+      "net": {
+       "v": 0.121,
+       "path": "tests.0.is.net"
+      },
+      "tg": {
+       "v": 2.39,
+       "path": "tests.0.is.tMonthGross"
+      },
+      "tn": {
+       "v": 1.77,
+       "path": "tests.0.is.tMonth"
+      },
+      "costR": {
+       "v": 0.046,
+       "path": "tests.0.is.meanCost"
+      },
+      "stop": {
+       "v": 34.44,
+       "path": "tests.0.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 92,
+       "path": "tests.0.oos.n"
+      },
+      "g": {
+       "v": 0.169,
+       "path": "tests.0.oos.gross"
+      },
+      "net": {
+       "v": 0.12,
+       "path": "tests.0.oos.net"
+      },
+      "tg": {
+       "v": 1.69,
+       "path": "tests.0.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 1.23,
+       "path": "tests.0.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.049,
+       "path": "tests.0.oos.meanCost"
+      },
+      "stop": {
+       "v": 55.43,
+       "path": "tests.0.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 67,
+       "path": "tests.1.is.n"
+      },
+      "g": {
+       "v": -0.144,
+       "path": "tests.1.is.gross"
+      },
+      "net": {
+       "v": -0.165,
+       "path": "tests.1.is.net"
+      },
+      "tg": {
+       "v": -1.72,
+       "path": "tests.1.is.tMonthGross"
+      },
+      "tn": {
+       "v": -1.95,
+       "path": "tests.1.is.tMonth"
+      },
+      "costR": {
+       "v": 0.021,
+       "path": "tests.1.is.meanCost"
+      },
+      "stop": {
+       "v": 31.89,
+       "path": "tests.1.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 74,
+       "path": "tests.1.oos.n"
+      },
+      "g": {
+       "v": 0.101,
+       "path": "tests.1.oos.gross"
+      },
+      "net": {
+       "v": 0.083,
+       "path": "tests.1.oos.net"
+      },
+      "tg": {
+       "v": 1.14,
+       "path": "tests.1.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 0.95,
+       "path": "tests.1.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.017,
+       "path": "tests.1.oos.meanCost"
+      },
+      "stop": {
+       "v": 49.27,
+       "path": "tests.1.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 110,
+       "path": "tests.2.is.n"
+      },
+      "g": {
+       "v": 0.048,
+       "path": "tests.2.is.gross"
+      },
+      "net": {
+       "v": 0.02,
+       "path": "tests.2.is.net"
+      },
+      "tg": {
+       "v": 1.35,
+       "path": "tests.2.is.tMonthGross"
+      },
+      "tn": {
+       "v": 0.57,
+       "path": "tests.2.is.tMonth"
+      },
+      "costR": {
+       "v": 0.028,
+       "path": "tests.2.is.meanCost"
+      },
+      "stop": {
+       "v": 34.13,
+       "path": "tests.2.is.meanRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 105,
+       "path": "tests.2.oos.n"
+      },
+      "g": {
+       "v": 0.087,
+       "path": "tests.2.oos.gross"
+      },
+      "net": {
+       "v": 0.06,
+       "path": "tests.2.oos.net"
+      },
+      "tg": {
+       "v": 1.69,
+       "path": "tests.2.oos.tMonthGross"
+      },
+      "tn": {
+       "v": 1.2,
+       "path": "tests.2.oos.tMonth"
+      },
+      "costR": {
+       "v": 0.027,
+       "path": "tests.2.oos.meanCost"
+      },
+      "stop": {
+       "v": 54.82,
+       "path": "tests.2.oos.meanRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-weekly-open",
+   "ref": "origin/gold-weekly-open",
+   "commit": "2426265a824b0acaf8c7b1b8bc26acc32cc41857",
+   "verdict": "FAIL, 0 of 3 tests: the bullish-week long T1 made +0.066R a trade net out of sample (n 79, month t 0.57, Holm p 0.85) and beat 24 of 40 placebos; T2 and T3 lose in both windows.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 73,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.089,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": 0.016,
+       "path": "tests.T1.is.avg"
+      },
+      "tn": {
+       "v": 0.14,
+       "path": "tests.T1.is.tMonth"
+      },
+      "stop": {
+       "v": 16.74,
+       "path": "tests.T1.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 79,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.117,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": 0.066,
+       "path": "tests.T1.oos.avg"
+      },
+      "tn": {
+       "v": 0.57,
+       "path": "tests.T1.oos.tMonth"
+      },
+      "stop": {
+       "v": 31.46,
+       "path": "tests.T1.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 52,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.09,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.116,
+       "path": "tests.T2.is.avg"
+      },
+      "tn": {
+       "v": -0.92,
+       "path": "tests.T2.is.tMonth"
+      },
+      "stop": {
+       "v": 15.8,
+       "path": "tests.T2.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 65,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.166,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.178,
+       "path": "tests.T2.oos.avg"
+      },
+      "tn": {
+       "v": -1.6,
+       "path": "tests.T2.oos.tMonth"
+      },
+      "stop": {
+       "v": 33.58,
+       "path": "tests.T2.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 127,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.045,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.086,
+       "path": "tests.T3.is.avg"
+      },
+      "tn": {
+       "v": -1.05,
+       "path": "tests.T3.is.tMonth"
+      },
+      "stop": {
+       "v": 16.07,
+       "path": "tests.T3.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 167,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.107,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.131,
+       "path": "tests.T3.oos.avg"
+      },
+      "tn": {
+       "v": -1.94,
+       "path": "tests.T3.oos.tMonth"
+      },
+      "stop": {
+       "v": 32.64,
+       "path": "tests.T3.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-month-levels",
+   "ref": "origin/gold-month-levels",
+   "commit": "7eb40c4e6ade85a7a40b9a82f4e555e037de6ae3",
+   "verdict": "FAIL, 0 of 3 tests: no rule at last month's high / low reaches t 2 after Holm (best Holm p 0.06), and random levels near them do as well.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 81,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.093,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.02,
+       "path": "tests.T1.is.avg"
+      },
+      "tn": {
+       "v": -0.11,
+       "path": "tests.T1.is.tMonth"
+      },
+      "stop": {
+       "v": 14.92,
+       "path": "tests.T1.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 80,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.259,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": 0.145,
+       "path": "tests.T1.oos.avg"
+      },
+      "tn": {
+       "v": 0.55,
+       "path": "tests.T1.oos.tMonth"
+      },
+      "stop": {
+       "v": 18.7,
+       "path": "tests.T1.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 77,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.272,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": 0.21,
+       "path": "tests.T2.is.avg"
+      },
+      "tn": {
+       "v": 1.41,
+       "path": "tests.T2.is.tMonth"
+      },
+      "stop": {
+       "v": 27.77,
+       "path": "tests.T2.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 83,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.23,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": 0.148,
+       "path": "tests.T2.oos.avg"
+      },
+      "tn": {
+       "v": 1,
+       "path": "tests.T2.oos.tMonth"
+      },
+      "stop": {
+       "v": 34.02,
+       "path": "tests.T2.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 42,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.467,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": 0.37,
+       "path": "tests.T3.is.avg"
+      },
+      "tn": {
+       "v": 1.59,
+       "path": "tests.T3.is.tMonth"
+      },
+      "stop": {
+       "v": 28.5,
+       "path": "tests.T3.is.medRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 52,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.553,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": 0.435,
+       "path": "tests.T3.oos.avg"
+      },
+      "tn": {
+       "v": 2.06,
+       "path": "tests.T3.oos.tMonth"
+      },
+      "stop": {
+       "v": 37.75,
+       "path": "tests.T3.oos.medRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-inside-week",
+   "ref": "origin/gold-inside-week",
+   "commit": "5e626606c3302c64e6c77f36594ca963e4cfca6c",
+   "verdict": "FAIL, 0 of 3: the inside-week breakout made +0.177R a trade net out of sample (n 67, month t 0.94) but lost in sample (−0.087R, n 50); the NR4-week and Monday-range tests fail too.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 50,
+       "path": "tests.T1.windows.inSample.n"
+      },
+      "g": {
+       "v": -0.034,
+       "path": "tests.T1.windows.inSample.gross"
+      },
+      "net": {
+       "v": -0.087,
+       "path": "tests.T1.windows.inSample.net"
+      },
+      "tn": {
+       "v": -0.83,
+       "path": "tests.T1.windows.inSample.t"
+      },
+      "stop": {
+       "v": 36.11,
+       "path": "tests.T1.windows.inSample.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 67,
+       "path": "tests.T1.windows.outOfSample.n"
+      },
+      "g": {
+       "v": 0.236,
+       "path": "tests.T1.windows.outOfSample.gross"
+      },
+      "net": {
+       "v": 0.177,
+       "path": "tests.T1.windows.outOfSample.net"
+      },
+      "tn": {
+       "v": 0.94,
+       "path": "tests.T1.windows.outOfSample.t"
+      },
+      "stop": {
+       "v": 35.53,
+       "path": "tests.T1.windows.outOfSample.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 102,
+       "path": "tests.T2.windows.inSample.n"
+      },
+      "g": {
+       "v": 0.052,
+       "path": "tests.T2.windows.inSample.gross"
+      },
+      "net": {
+       "v": -0.002,
+       "path": "tests.T2.windows.inSample.net"
+      },
+      "tn": {
+       "v": -0.17,
+       "path": "tests.T2.windows.inSample.t"
+      },
+      "stop": {
+       "v": 31.27,
+       "path": "tests.T2.windows.inSample.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 101,
+       "path": "tests.T2.windows.outOfSample.n"
+      },
+      "g": {
+       "v": 0.146,
+       "path": "tests.T2.windows.outOfSample.gross"
+      },
+      "net": {
+       "v": 0.077,
+       "path": "tests.T2.windows.outOfSample.net"
+      },
+      "tn": {
+       "v": 0.54,
+       "path": "tests.T2.windows.outOfSample.t"
+      },
+      "stop": {
+       "v": 35.01,
+       "path": "tests.T2.windows.outOfSample.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 18,
+       "path": "tests.T3.windows.inSample.n"
+      },
+      "g": {
+       "v": 0.187,
+       "path": "tests.T3.windows.inSample.gross"
+      },
+      "net": {
+       "v": 0.158,
+       "path": "tests.T3.windows.inSample.net"
+      },
+      "tn": {
+       "v": 1.46,
+       "path": "tests.T3.windows.inSample.t"
+      },
+      "stop": {
+       "v": 22.46,
+       "path": "tests.T3.windows.inSample.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 19,
+       "path": "tests.T3.windows.outOfSample.n"
+      },
+      "g": {
+       "v": -0.167,
+       "path": "tests.T3.windows.outOfSample.gross"
+      },
+      "net": {
+       "v": -0.193,
+       "path": "tests.T3.windows.outOfSample.net"
+      },
+      "tn": {
+       "v": -1.37,
+       "path": "tests.T3.windows.outOfSample.t"
+      },
+      "stop": {
+       "v": 29.98,
+       "path": "tests.T3.windows.outOfSample.medianRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-ibs",
+   "ref": "origin/gold-ibs",
+   "commit": "514519df56cc4c1ccce30aa1a240d5bc3df2a1ab",
+   "verdict": "FAIL. 0 of 3 tests pass: buying gold after a close in the bottom 20 % of its day made +0.004R a trade net in 2017-26 (n 353, month t 0.18) and -0.034R in 2008-16; the short and the trend version fail too.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 310,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.01,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.034,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": -0.36,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -1.17,
+       "path": "tests.T1.is.t"
+      },
+      "costR": {
+       "v": 0.015,
+       "path": "tests.T1.is.cost"
+      },
+      "finR": {
+       "v": 0.008,
+       "path": "tests.T1.is.fin"
+      }
+     },
+     "sourceName": "T1 long, IBS < 0.2"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 353,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.024,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": 0.004,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": 1.06,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": 0.18,
+       "path": "tests.T1.oos.t"
+      },
+      "costR": {
+       "v": 0.014,
+       "path": "tests.T1.oos.cost"
+      },
+      "finR": {
+       "v": 0.006,
+       "path": "tests.T1.oos.fin"
+      }
+     },
+     "sourceName": "T1 long, IBS < 0.2"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 362,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.061,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.076,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": -2.64,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -3.26,
+       "path": "tests.T2.is.t"
+      },
+      "costR": {
+       "v": 0.015,
+       "path": "tests.T2.is.cost"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.is.fin"
+      }
+     },
+     "sourceName": "T2 short, IBS > 0.8"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 442,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.063,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.077,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": -2.64,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -3.2,
+       "path": "tests.T2.oos.t"
+      },
+      "costR": {
+       "v": 0.014,
+       "path": "tests.T2.oos.cost"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T2.oos.fin"
+      }
+     },
+     "sourceName": "T2 short, IBS > 0.8"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 173,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.014,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.037,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": -0.38,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -1.01,
+       "path": "tests.T3.is.t"
+      },
+      "costR": {
+       "v": 0.015,
+       "path": "tests.T3.is.cost"
+      },
+      "finR": {
+       "v": 0.008,
+       "path": "tests.T3.is.fin"
+      }
+     },
+     "sourceName": "T3 long, IBS < 0.2 above SMA200"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 231,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.026,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": 0.008,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 0.96,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 0.28,
+       "path": "tests.T3.oos.t"
+      },
+      "costR": {
+       "v": 0.013,
+       "path": "tests.T3.oos.cost"
+      },
+      "finR": {
+       "v": 0.005,
+       "path": "tests.T3.oos.fin"
+      }
+     },
+     "sourceName": "T3 long, IBS < 0.2 above SMA200"
+    }
+   ]
+  },
+  {
+   "topic": "gold-key-reversal",
+   "ref": "origin/gold-key-reversal",
+   "commit": "20f095c25e1264d04ad94648d6a6a5ef2863d2f3",
+   "verdict": "FAIL: 0 of 3 tests pass; shorting a bearish key reversal at a 20-day high lost -0.176R a trade net in 2017-26 (n 90, month t -1.50) and -0.031R in 2008-16.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 77,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.011,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.031,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 0.09,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -0.24,
+       "path": "tests.T1.is.t"
+      },
+      "costR": {
+       "v": 0.043,
+       "path": "tests.T1.is.cost"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.is.fin"
+      },
+      "stop": {
+       "v": 0.96,
+       "path": "tests.T1.is.riskAtr"
+      }
+     },
+     "sourceName": "T1 bearish key reversal at a 20-day high, short"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 90,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.144,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.176,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -1.25,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -1.5,
+       "path": "tests.T1.oos.t"
+      },
+      "costR": {
+       "v": 0.032,
+       "path": "tests.T1.oos.cost"
+      },
+      "finR": {
+       "v": 0,
+       "path": "tests.T1.oos.fin"
+      },
+      "stop": {
+       "v": 1.1,
+       "path": "tests.T1.oos.riskAtr"
+      }
+     },
+     "sourceName": "T1 bearish key reversal at a 20-day high, short"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 55,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.121,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": 0.053,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 0.75,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": 0.32,
+       "path": "tests.T2.is.t"
+      },
+      "costR": {
+       "v": 0.039,
+       "path": "tests.T2.is.cost"
+      },
+      "finR": {
+       "v": 0.03,
+       "path": "tests.T2.is.fin"
+      },
+      "stop": {
+       "v": 1.01,
+       "path": "tests.T2.is.riskAtr"
+      }
+     },
+     "sourceName": "T2 bullish key reversal at a 20-day low, long"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 58,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.061,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.131,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": -0.4,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -0.85,
+       "path": "tests.T2.oos.t"
+      },
+      "costR": {
+       "v": 0.04,
+       "path": "tests.T2.oos.cost"
+      },
+      "finR": {
+       "v": 0.029,
+       "path": "tests.T2.oos.fin"
+      },
+      "stop": {
+       "v": 0.88,
+       "path": "tests.T2.oos.riskAtr"
+      }
+     },
+     "sourceName": "T2 bullish key reversal at a 20-day low, long"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 210,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.015,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.032,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 0.21,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -0.46,
+       "path": "tests.T3.is.t"
+      },
+      "costR": {
+       "v": 0.034,
+       "path": "tests.T3.is.cost"
+      },
+      "finR": {
+       "v": 0.013,
+       "path": "tests.T3.is.fin"
+      },
+      "stop": {
+       "v": 1.15,
+       "path": "tests.T3.is.riskAtr"
+      }
+     },
+     "sourceName": "T3 outside reversal day, both sides"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 263,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.048,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": 0.003,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 0.74,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 0.05,
+       "path": "tests.T3.oos.t"
+      },
+      "costR": {
+       "v": 0.031,
+       "path": "tests.T3.oos.cost"
+      },
+      "finR": {
+       "v": 0.014,
+       "path": "tests.T3.oos.fin"
+      },
+      "stop": {
+       "v": 1.06,
+       "path": "tests.T3.oos.riskAtr"
+      }
+     },
+     "sourceName": "T3 outside reversal day, both sides"
+    }
+   ]
+  },
+  {
+   "topic": "gold-daily-turtle-soup",
+   "ref": "origin/gold-daily-turtle-soup",
+   "commit": "0730f3bf748c772a3c3fc7c88a6dc89aefd77a1a",
+   "verdict": "FAIL: the classic Turtle Soup lost −0.181R a trade net out of sample 2017-26 (n 156, month t −1.75) and −0.396R in 2007-16 (n 170, t −4.07); 0 of 3 tests pass.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 170,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.22,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.396,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": -2.39,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -4.07,
+       "path": "tests.T1.is.t"
+      },
+      "costR": {
+       "v": 0.167,
+       "path": "tests.T1.is.cost"
+      },
+      "finR": {
+       "v": 0.009,
+       "path": "tests.T1.is.fin"
+      },
+      "stop": {
+       "v": 4.1,
+       "path": "tests.T1.is.riskUsd"
+      }
+     },
+     "sourceName": "T1 classic Turtle Soup, both sides"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 156,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": -0.026,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.181,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": -0.25,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -1.75,
+       "path": "tests.T1.oos.t"
+      },
+      "costR": {
+       "v": 0.147,
+       "path": "tests.T1.oos.cost"
+      },
+      "finR": {
+       "v": 0.008,
+       "path": "tests.T1.oos.fin"
+      },
+      "stop": {
+       "v": 6.66,
+       "path": "tests.T1.oos.riskUsd"
+      }
+     },
+     "sourceName": "T1 classic Turtle Soup, both sides"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 66,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.27,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": -0.36,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": -2.3,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": -2.98,
+       "path": "tests.T2.is.t"
+      },
+      "costR": {
+       "v": 0.073,
+       "path": "tests.T2.is.cost"
+      },
+      "finR": {
+       "v": 0.018,
+       "path": "tests.T2.is.fin"
+      },
+      "stop": {
+       "v": 10.51,
+       "path": "tests.T2.is.riskUsd"
+      }
+     },
+     "sourceName": "T2 Turtle Soup Plus One, both sides"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 56,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.223,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": 0.153,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 1.3,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": 0.89,
+       "path": "tests.T2.oos.t"
+      },
+      "costR": {
+       "v": 0.06,
+       "path": "tests.T2.oos.cost"
+      },
+      "finR": {
+       "v": 0.011,
+       "path": "tests.T2.oos.fin"
+      },
+      "stop": {
+       "v": 12.13,
+       "path": "tests.T2.oos.riskUsd"
+      }
+     },
+     "sourceName": "T2 Turtle Soup Plus One, both sides"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 74,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.278,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": -0.442,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": -1.94,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": -2.87,
+       "path": "tests.T3.is.t"
+      },
+      "costR": {
+       "v": 0.143,
+       "path": "tests.T3.is.cost"
+      },
+      "finR": {
+       "v": 0.021,
+       "path": "tests.T3.is.fin"
+      },
+      "stop": {
+       "v": 5.09,
+       "path": "tests.T3.is.riskUsd"
+      }
+     },
+     "sourceName": "T3 classic Turtle Soup, longs only"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 67,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.014,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.167,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": 0.09,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -0.99,
+       "path": "tests.T3.oos.t"
+      },
+      "costR": {
+       "v": 0.161,
+       "path": "tests.T3.oos.cost"
+      },
+      "finR": {
+       "v": 0.02,
+       "path": "tests.T3.oos.fin"
+      },
+      "stop": {
+       "v": 7.2,
+       "path": "tests.T3.oos.riskUsd"
+      }
+     },
+     "sourceName": "T3 classic Turtle Soup, longs only"
+    }
+   ]
+  },
+  {
+   "topic": "gold-h4-pinbar",
+   "ref": "origin/gold-h4-pinbar",
+   "commit": "3950a17e5de15038e3d751ae4e4d9b66eef46ff5",
+   "verdict": "FAIL, 0 of 3: the gold H4 pin bar at a 20-candle extreme loses after costs (T1 OOS −0.065R a trade, n 156, t −0.63; in sample −0.030R).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 141,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.065,
+       "path": "tests.T1.is.gross"
+      },
+      "net": {
+       "v": -0.03,
+       "path": "tests.T1.is.net"
+      },
+      "tg": {
+       "v": 0.63,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -0.28,
+       "path": "tests.T1.is.t"
+      },
+      "costR": {
+       "v": 0.078,
+       "path": "tests.T1.is.cost"
+      },
+      "finR": {
+       "v": 0.017,
+       "path": "tests.T1.is.fin"
+      }
+     },
+     "sourceName": "T1 both sides, target 2R"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 156,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.014,
+       "path": "tests.T1.oos.gross"
+      },
+      "net": {
+       "v": -0.065,
+       "path": "tests.T1.oos.net"
+      },
+      "tg": {
+       "v": 0.13,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -0.63,
+       "path": "tests.T1.oos.t"
+      },
+      "costR": {
+       "v": 0.064,
+       "path": "tests.T1.oos.cost"
+      },
+      "finR": {
+       "v": 0.015,
+       "path": "tests.T1.oos.fin"
+      }
+     },
+     "sourceName": "T1 both sides, target 2R"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 138,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.205,
+       "path": "tests.T2.is.gross"
+      },
+      "net": {
+       "v": 0.105,
+       "path": "tests.T2.is.net"
+      },
+      "tg": {
+       "v": 1.28,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": 0.65,
+       "path": "tests.T2.is.t"
+      },
+      "costR": {
+       "v": 0.078,
+       "path": "tests.T2.is.cost"
+      },
+      "finR": {
+       "v": 0.021,
+       "path": "tests.T2.is.fin"
+      }
+     },
+     "sourceName": "T2 both sides, no target, time exit after 12 H4 candles"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 154,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.001,
+       "path": "tests.T2.oos.gross"
+      },
+      "net": {
+       "v": -0.083,
+       "path": "tests.T2.oos.net"
+      },
+      "tg": {
+       "v": 0.01,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": -0.7,
+       "path": "tests.T2.oos.t"
+      },
+      "costR": {
+       "v": 0.064,
+       "path": "tests.T2.oos.cost"
+      },
+      "finR": {
+       "v": 0.02,
+       "path": "tests.T2.oos.fin"
+      }
+     },
+     "sourceName": "T2 both sides, no target, time exit after 12 H4 candles"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 37,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.208,
+       "path": "tests.T3.is.gross"
+      },
+      "net": {
+       "v": 0.109,
+       "path": "tests.T3.is.net"
+      },
+      "tg": {
+       "v": 1.06,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": 0.56,
+       "path": "tests.T3.is.t"
+      },
+      "costR": {
+       "v": 0.063,
+       "path": "tests.T3.is.cost"
+      },
+      "finR": {
+       "v": 0.035,
+       "path": "tests.T3.is.fin"
+      }
+     },
+     "sourceName": "T3 bullish pins only, target 2R, D1 close above its 100-day average"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 54,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.09,
+       "path": "tests.T3.oos.gross"
+      },
+      "net": {
+       "v": -0.176,
+       "path": "tests.T3.oos.net"
+      },
+      "tg": {
+       "v": -0.59,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": -1.15,
+       "path": "tests.T3.oos.t"
+      },
+      "costR": {
+       "v": 0.062,
+       "path": "tests.T3.oos.cost"
+      },
+      "finR": {
+       "v": 0.024,
+       "path": "tests.T3.oos.fin"
+      }
+     },
+     "sourceName": "T3 bullish pins only, target 2R, D1 close above its 100-day average"
+    }
+   ]
+  },
+  {
+   "topic": "gold-streak",
+   "ref": "origin/gold-streak",
+   "commit": "5afc05590e478242593c1be0c4a68fc6e7540128",
+   "verdict": "FAIL: 0 of 3 tests pass; buying after 3+ down closes made -0.028R a trade net in 2017-26 (n 215, month t -0.90) and selling after 3+ up closes -0.049R (n 349, t -1.82).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 239,
+       "path": "gold.tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.017,
+       "path": "gold.tests.T1.isGross.mean"
+      },
+      "net": {
+       "v": -0.013,
+       "path": "gold.tests.T1.is.mean"
+      },
+      "tg": {
+       "v": 0.62,
+       "path": "gold.tests.T1.isGross.monthT"
+      },
+      "tn": {
+       "v": -0.46,
+       "path": "gold.tests.T1.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 215,
+       "path": "gold.tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0,
+       "path": "gold.tests.T1.oosGross.mean"
+      },
+      "net": {
+       "v": -0.028,
+       "path": "gold.tests.T1.oos.mean"
+      },
+      "tg": {
+       "v": -0.02,
+       "path": "gold.tests.T1.oosGross.monthT"
+      },
+      "tn": {
+       "v": -0.9,
+       "path": "gold.tests.T1.oos.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 323,
+       "path": "gold.tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.029,
+       "path": "gold.tests.T2.isGross.mean"
+      },
+      "net": {
+       "v": -0.05,
+       "path": "gold.tests.T2.is.mean"
+      },
+      "tg": {
+       "v": -1.25,
+       "path": "gold.tests.T2.isGross.monthT"
+      },
+      "tn": {
+       "v": -2.1,
+       "path": "gold.tests.T2.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 349,
+       "path": "gold.tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.029,
+       "path": "gold.tests.T2.oosGross.mean"
+      },
+      "net": {
+       "v": -0.049,
+       "path": "gold.tests.T2.oos.mean"
+      },
+      "tg": {
+       "v": -1.13,
+       "path": "gold.tests.T2.oosGross.monthT"
+      },
+      "tn": {
+       "v": -1.82,
+       "path": "gold.tests.T2.oos.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 74,
+       "path": "gold.tests.T3.is.n"
+      },
+      "g": {
+       "v": -0.099,
+       "path": "gold.tests.T3.isGross.mean"
+      },
+      "net": {
+       "v": -0.142,
+       "path": "gold.tests.T3.is.mean"
+      },
+      "tg": {
+       "v": -1.1,
+       "path": "gold.tests.T3.isGross.monthT"
+      },
+      "tn": {
+       "v": -1.53,
+       "path": "gold.tests.T3.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 57,
+       "path": "gold.tests.T3.oos.n"
+      },
+      "g": {
+       "v": -0.119,
+       "path": "gold.tests.T3.oosGross.mean"
+      },
+      "net": {
+       "v": -0.162,
+       "path": "gold.tests.T3.oos.mean"
+      },
+      "tg": {
+       "v": -0.97,
+       "path": "gold.tests.T3.oosGross.monthT"
+      },
+      "tn": {
+       "v": -1.32,
+       "path": "gold.tests.T3.oos.monthT"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-premium-discount",
+   "ref": "origin/gold-premium-discount",
+   "commit": "d57460e3ef1ccebf415bd327a3abd4d37fc7b1b2",
+   "verdict": "FAIL: 0 of 3 tests pass; buying the bottom quarter of the 20-day range made +0.009R a trade net in 2017-26 (n 138, month t 0.14) and lost to 40 of 40 random buy-day placebos.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 147,
+       "path": "gold.tests.T1.is.n"
+      },
+      "g": {
+       "v": 0.007,
+       "path": "gold.tests.T1.isGross.mean"
+      },
+      "net": {
+       "v": -0.055,
+       "path": "gold.tests.T1.is.mean"
+      },
+      "tg": {
+       "v": 0.08,
+       "path": "gold.tests.T1.isGross.monthT"
+      },
+      "tn": {
+       "v": -0.66,
+       "path": "gold.tests.T1.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 138,
+       "path": "gold.tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.08,
+       "path": "gold.tests.T1.oosGross.mean"
+      },
+      "net": {
+       "v": 0.009,
+       "path": "gold.tests.T1.oos.mean"
+      },
+      "tg": {
+       "v": 1.28,
+       "path": "gold.tests.T1.oosGross.monthT"
+      },
+      "tn": {
+       "v": 0.14,
+       "path": "gold.tests.T1.oos.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 170,
+       "path": "gold.tests.T2.is.n"
+      },
+      "g": {
+       "v": -0.074,
+       "path": "gold.tests.T2.isGross.mean"
+      },
+      "net": {
+       "v": -0.096,
+       "path": "gold.tests.T2.is.mean"
+      },
+      "tg": {
+       "v": -0.87,
+       "path": "gold.tests.T2.isGross.monthT"
+      },
+      "tn": {
+       "v": -1.1,
+       "path": "gold.tests.T2.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 224,
+       "path": "gold.tests.T2.oos.n"
+      },
+      "g": {
+       "v": -0.2,
+       "path": "gold.tests.T2.oosGross.mean"
+      },
+      "net": {
+       "v": -0.22,
+       "path": "gold.tests.T2.oos.mean"
+      },
+      "tg": {
+       "v": -2.46,
+       "path": "gold.tests.T2.oosGross.monthT"
+      },
+      "tn": {
+       "v": -2.66,
+       "path": "gold.tests.T2.oos.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 42,
+       "path": "gold.tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.013,
+       "path": "gold.tests.T3.isGross.mean"
+      },
+      "net": {
+       "v": -0.048,
+       "path": "gold.tests.T3.is.mean"
+      },
+      "tg": {
+       "v": 0.09,
+       "path": "gold.tests.T3.isGross.monthT"
+      },
+      "tn": {
+       "v": -0.33,
+       "path": "gold.tests.T3.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 56,
+       "path": "gold.tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.159,
+       "path": "gold.tests.T3.oosGross.mean"
+      },
+      "net": {
+       "v": 0.097,
+       "path": "gold.tests.T3.oos.mean"
+      },
+      "tg": {
+       "v": 1.4,
+       "path": "gold.tests.T3.oosGross.monthT"
+      },
+      "tn": {
+       "v": 0.87,
+       "path": "gold.tests.T3.oos.monthT"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-measured-move",
+   "ref": "origin/gold-measured-move",
+   "commit": "deb73df855cc161571a9150a7432e28b3ed50bea",
+   "verdict": "FAIL, 0 of 3 tests: after a close beyond B, gold reaches D no more often than a random-side trade does (67.1 % vs 66.7 %).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 206,
+       "path": "tests.T1.is.net.n"
+      },
+      "g": {
+       "v": 0.059,
+       "path": "tests.T1.is.gross.avg"
+      },
+      "net": {
+       "v": 0.02,
+       "path": "tests.T1.is.net.avg"
+      },
+      "tg": {
+       "v": 1.3,
+       "path": "tests.T1.is.gross.t"
+      },
+      "tn": {
+       "v": 0.42,
+       "path": "tests.T1.is.net.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 231,
+       "path": "tests.T1.oos.net.n"
+      },
+      "g": {
+       "v": -0.004,
+       "path": "tests.T1.oos.gross.avg"
+      },
+      "net": {
+       "v": -0.043,
+       "path": "tests.T1.oos.net.avg"
+      },
+      "tg": {
+       "v": -0.1,
+       "path": "tests.T1.oos.gross.t"
+      },
+      "tn": {
+       "v": -0.97,
+       "path": "tests.T1.oos.net.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 176,
+       "path": "tests.T2.is.net.n"
+      },
+      "g": {
+       "v": -0.001,
+       "path": "tests.T2.is.gross.avg"
+      },
+      "net": {
+       "v": -0.038,
+       "path": "tests.T2.is.net.avg"
+      },
+      "tg": {
+       "v": -0.02,
+       "path": "tests.T2.is.gross.t"
+      },
+      "tn": {
+       "v": -1.06,
+       "path": "tests.T2.is.net.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 189,
+       "path": "tests.T2.oos.net.n"
+      },
+      "g": {
+       "v": -0.018,
+       "path": "tests.T2.oos.gross.avg"
+      },
+      "net": {
+       "v": -0.053,
+       "path": "tests.T2.oos.net.avg"
+      },
+      "tg": {
+       "v": -0.5,
+       "path": "tests.T2.oos.gross.t"
+      },
+      "tn": {
+       "v": -1.45,
+       "path": "tests.T2.oos.net.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 121,
+       "path": "tests.T3.is.net.n"
+      },
+      "g": {
+       "v": 0.022,
+       "path": "tests.T3.is.gross.avg"
+      },
+      "net": {
+       "v": -0.015,
+       "path": "tests.T3.is.net.avg"
+      },
+      "tg": {
+       "v": 0.34,
+       "path": "tests.T3.is.gross.t"
+      },
+      "tn": {
+       "v": -0.23,
+       "path": "tests.T3.is.net.t"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 138,
+       "path": "tests.T3.oos.net.n"
+      },
+      "g": {
+       "v": -0.034,
+       "path": "tests.T3.oos.gross.avg"
+      },
+      "net": {
+       "v": -0.07,
+       "path": "tests.T3.oos.net.avg"
+      },
+      "tg": {
+       "v": -0.61,
+       "path": "tests.T3.oos.gross.t"
+      },
+      "tn": {
+       "v": -1.26,
+       "path": "tests.T3.oos.net.t"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-macd",
+   "ref": "origin/gold-macd",
+   "commit": "a3dbb481ae1da527b71b93697edfe39af515321e",
+   "verdict": "FAIL, 0 of 3: no test has an out-of-sample month t near 2 (best MACD long only +0.253R a trade, t 1.53, Holm p 0.39), none beats 38 of 40 placebos, and the 50/200 cross has 7 trades.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 186,
+       "path": "tests.T1.IS.n"
+      },
+      "g": {
+       "v": 0.1485,
+       "path": "tests.T1.IS.gross"
+      },
+      "net": {
+       "v": 0.0903,
+       "path": "tests.T1.IS.net"
+      },
+      "tn": {
+       "v": 0.923,
+       "path": "tests.T1.IS.t"
+      }
+     },
+     "sourceName": "MACD stop-and-reverse"
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 200,
+       "path": "tests.T1.OOS.n"
+      },
+      "g": {
+       "v": 0.1153,
+       "path": "tests.T1.OOS.gross"
+      },
+      "net": {
+       "v": 0.0452,
+       "path": "tests.T1.OOS.net"
+      },
+      "tn": {
+       "v": 0.474,
+       "path": "tests.T1.OOS.t"
+      }
+     },
+     "sourceName": "MACD stop-and-reverse"
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 93,
+       "path": "tests.T2.IS.n"
+      },
+      "g": {
+       "v": 0.249,
+       "path": "tests.T2.IS.gross"
+      },
+      "net": {
+       "v": 0.1479,
+       "path": "tests.T2.IS.net"
+      },
+      "tn": {
+       "v": 0.966,
+       "path": "tests.T2.IS.t"
+      }
+     },
+     "sourceName": "MACD long only"
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 100,
+       "path": "tests.T2.OOS.n"
+      },
+      "g": {
+       "v": 0.3792,
+       "path": "tests.T2.OOS.gross"
+      },
+      "net": {
+       "v": 0.253,
+       "path": "tests.T2.OOS.net"
+      },
+      "tn": {
+       "v": 1.527,
+       "path": "tests.T2.OOS.t"
+      }
+     },
+     "sourceName": "MACD long only"
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 6,
+       "path": "tests.T3.IS.n"
+      },
+      "g": {
+       "v": 1.1807,
+       "path": "tests.T3.IS.gross"
+      },
+      "net": {
+       "v": 0.6814,
+       "path": "tests.T3.IS.net"
+      },
+      "tn": {
+       "v": 0.483,
+       "path": "tests.T3.IS.t"
+      }
+     },
+     "sourceName": "50/200 SMA long only"
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 7,
+       "path": "tests.T3.OOS.n"
+      },
+      "g": {
+       "v": 1.6687,
+       "path": "tests.T3.OOS.gross"
+      },
+      "net": {
+       "v": 0.7969,
+       "path": "tests.T3.OOS.net"
+      },
+      "tn": {
+       "v": 0.47,
+       "path": "tests.T3.OOS.t"
+      }
+     },
+     "sourceName": "50/200 SMA long only"
+    }
+   ]
+  },
+  {
+   "topic": "gold-ichimoku",
+   "ref": "origin/gold-ichimoku",
+   "commit": "958dedbc586d9f8646f26901e1ff93b27de78aec",
+   "verdict": "FAIL, 0 of 3 tests pass: the best, the daily Tenkan / Kijun cross, made +0.39R a trade net out of sample (n 50, month t 1.49, Holm p 0.21), most of it in 2025.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 62,
+       "path": "tests.T1.is.n"
+      },
+      "g": {
+       "v": -0.029,
+       "path": "tests.T1.is.grossPer"
+      },
+      "net": {
+       "v": -0.117,
+       "path": "tests.T1.is.netPer"
+      },
+      "tg": {
+       "v": -0.19,
+       "path": "tests.T1.is.tGross"
+      },
+      "tn": {
+       "v": -0.83,
+       "path": "tests.T1.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T1",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 66,
+       "path": "tests.T1.oos.n"
+      },
+      "g": {
+       "v": 0.098,
+       "path": "tests.T1.oos.grossPer"
+      },
+      "net": {
+       "v": -0.029,
+       "path": "tests.T1.oos.netPer"
+      },
+      "tg": {
+       "v": 0.56,
+       "path": "tests.T1.oos.tGross"
+      },
+      "tn": {
+       "v": -0.19,
+       "path": "tests.T1.oos.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 42,
+       "path": "tests.T2.is.n"
+      },
+      "g": {
+       "v": 0.179,
+       "path": "tests.T2.is.grossPer"
+      },
+      "net": {
+       "v": 0.102,
+       "path": "tests.T2.is.netPer"
+      },
+      "tg": {
+       "v": 0.79,
+       "path": "tests.T2.is.tGross"
+      },
+      "tn": {
+       "v": 0.48,
+       "path": "tests.T2.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 50,
+       "path": "tests.T2.oos.n"
+      },
+      "g": {
+       "v": 0.527,
+       "path": "tests.T2.oos.grossPer"
+      },
+      "net": {
+       "v": 0.389,
+       "path": "tests.T2.oos.netPer"
+      },
+      "tg": {
+       "v": 1.9,
+       "path": "tests.T2.oos.tGross"
+      },
+      "tn": {
+       "v": 1.49,
+       "path": "tests.T2.oos.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "is",
+     "values": {
+      "n": {
+       "v": 399,
+       "path": "tests.T3.is.n"
+      },
+      "g": {
+       "v": 0.163,
+       "path": "tests.T3.is.grossPer"
+      },
+      "net": {
+       "v": 0.087,
+       "path": "tests.T3.is.netPer"
+      },
+      "tg": {
+       "v": 1.75,
+       "path": "tests.T3.is.tGross"
+      },
+      "tn": {
+       "v": 0.94,
+       "path": "tests.T3.is.monthT"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "oos",
+     "values": {
+      "n": {
+       "v": 450,
+       "path": "tests.T3.oos.n"
+      },
+      "g": {
+       "v": 0.096,
+       "path": "tests.T3.oos.grossPer"
+      },
+      "net": {
+       "v": 0.018,
+       "path": "tests.T3.oos.netPer"
+      },
+      "tg": {
+       "v": 1.04,
+       "path": "tests.T3.oos.tGross"
+      },
+      "tn": {
+       "v": 0.2,
+       "path": "tests.T3.oos.monthT"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-pre-cpi",
+   "ref": "origin/gold-pre-cpi",
+   "commit": "489459537105e9519095ee186430727723cafd03",
+   "verdict": "FAIL: 0 of 3 tests pass; best T2 +0.088R a trade net (n 47, month t 2.07, Holm p 0.067, 37 of 40 placebos).",
+   "passed": false,
+   "rows": [
+    {
+     "test": "T1",
+     "window": "single",
+     "values": {
+      "n": {
+       "v": 74,
+       "path": "tests.T1.n"
+      },
+      "g": {
+       "v": 0.043,
+       "path": "tests.T1.gross"
+      },
+      "net": {
+       "v": 0.024,
+       "path": "tests.T1.net"
+      },
+      "tn": {
+       "v": 0.93,
+       "path": "tests.T1.t"
+      },
+      "stop": {
+       "v": 99.98,
+       "path": "tests.T1.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T2",
+     "window": "single",
+     "values": {
+      "n": {
+       "v": 47,
+       "path": "tests.T2.n"
+      },
+      "g": {
+       "v": 0.109,
+       "path": "tests.T2.gross"
+      },
+      "net": {
+       "v": 0.088,
+       "path": "tests.T2.net"
+      },
+      "tn": {
+       "v": 2.07,
+       "path": "tests.T2.t"
+      },
+      "stop": {
+       "v": 108.62,
+       "path": "tests.T2.medianRisk"
+      }
+     },
+     "sourceName": null
+    },
+    {
+     "test": "T3",
+     "window": "single",
+     "values": {
+      "n": {
+       "v": 121,
+       "path": "tests.T3.n"
+      },
+      "g": {
+       "v": -0.001,
+       "path": "tests.T3.gross"
+      },
+      "net": {
+       "v": -0.027,
+       "path": "tests.T3.net"
+      },
+      "tn": {
+       "v": -0.53,
+       "path": "tests.T3.t"
+      },
+      "stop": {
+       "v": 24.1,
+       "path": "tests.T3.medianRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-pre-nfp-replicate",
+   "ref": "origin/gold-pre-nfp-replicate",
+   "commit": "a68b8048865ea11a6241e2ba70005a3de17d3bca",
+   "verdict": "FAIL: no replication on 2006-21, -0.024R a trade net (n 156, month t -0.97, 14 of 40 placebos); month t -0.97 under 2, 2x costs not positive, 14 of 40 placebos, a half not positive.",
+   "passed": false,
+   "rows": [
+    {
+     "test": "R1",
+     "window": "single",
+     "values": {
+      "n": {
+       "v": 156,
+       "path": "test.n"
+      },
+      "g": {
+       "v": 0.003,
+       "path": "test.gross"
+      },
+      "net": {
+       "v": -0.024,
+       "path": "test.net"
+      },
+      "tg": {
+       "v": 0.14,
+       "path": "test.tGross"
+      },
+      "tn": {
+       "v": -0.97,
+       "path": "test.t"
+      },
+      "stop": {
+       "v": 56.18,
+       "path": "test.medianRisk"
+      }
+     },
+     "sourceName": null
+    }
+   ]
+  },
+  {
+   "topic": "gold-vol-target",
+   "ref": "origin/gold-vol-target",
+   "commit": "54b83c54da33521e16bc75438634480ed7a53b7b",
+   "verdict": "FAIL, 0 of 3 tests pass: vol-targeted gold beats a matched constant holding out of sample (Sharpe +0.07, t 0.59) but lost to it in 2008-16; no test near Holm p 0.05.",
+   "passed": false,
+   "rows": []
+  }
+ ]
+}

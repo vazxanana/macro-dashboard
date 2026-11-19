@@ -1,0 +1,4187 @@
+{
+ "study": "fomc-follow",
+ "built": "2026-11-13",
+ "preregistration": "research/edge/fomc-follow/PREREGISTRATION.md",
+ "source": "Federal Reserve FOMC meeting calendars (federalreserve.gov/monetarypolicy/fomccalendars.htm and the historical materials by year), scheduled meetings only; 2022 on from council/events.mjs",
+ "unscheduledExcluded": [
+  "2008-01-22",
+  "2008-10-08",
+  "2010-05-09",
+  "2020-03-03",
+  "2020-03-15"
+ ],
+ "scope": "A new stand-alone event rule decided on 2020 → now; not a test of the gold book (owner decision item 44 untouched).",
+ "rule": "direction of the first 30 minutes after the scheduled FOMC statement (close of the candle ending at S + 30 min against the one ending at S); F follows it, R fades it; entry at S + 30 min, stop beyond the window's extreme on the losing side (at least 0.25 x the window range), target 1.5R, out at 15:55 New York; skipped when the window range is under 0.5 x the mean of the same window on the 20 previous weekdays",
+ "costs": {
+  "points": {
+   "nas100": 2,
+   "spx500": 1,
+   "xau": 0.3
+  }
+ },
+ "windows": {
+  "rep": "2010-2019",
+  "dec": "2020 → now"
+ },
+ "tests": [
+  {
+   "market": "nas100",
+   "rule": "F",
+   "n": 54,
+   "netR": -0.038,
+   "t": -0.24,
+   "p": 0.5959,
+   "holmP": 1,
+   "repNetR": 0.016,
+   "repN": 79,
+   "placeboP95": 0.172,
+   "nOk": true,
+   "positive": false,
+   "t2": false,
+   "holm": false,
+   "sameSign": true,
+   "beatsPlacebo": false,
+   "pass": false
+  },
+  {
+   "market": "nas100",
+   "rule": "R",
+   "n": 54,
+   "netR": 0.095,
+   "t": 0.56,
+   "p": 0.2892,
+   "holmP": 1,
+   "repNetR": -0.313,
+   "repN": 79,
+   "placeboP95": 0.171,
+   "nOk": true,
+   "positive": true,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": false,
+   "pass": false
+  },
+  {
+   "market": "spx500",
+   "rule": "F",
+   "n": 54,
+   "netR": -0.137,
+   "t": -0.85,
+   "p": 0.8031,
+   "holmP": 1,
+   "repNetR": -0.048,
+   "repN": 77,
+   "placeboP95": 0.095,
+   "nOk": true,
+   "positive": false,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": false,
+   "pass": false
+  },
+  {
+   "market": "spx500",
+   "rule": "R",
+   "n": 54,
+   "netR": -0.139,
+   "t": -0.83,
+   "p": 0.7958,
+   "holmP": 1,
+   "repNetR": -0.289,
+   "repN": 77,
+   "placeboP95": 0.077,
+   "nOk": true,
+   "positive": false,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": false,
+   "pass": false
+  },
+  {
+   "market": "xau",
+   "rule": "F",
+   "n": 54,
+   "netR": 0.042,
+   "t": 0.28,
+   "p": 0.391,
+   "holmP": 1,
+   "repNetR": 0.122,
+   "repN": 80,
+   "placeboP95": 0.288,
+   "nOk": true,
+   "positive": true,
+   "t2": false,
+   "holm": false,
+   "sameSign": true,
+   "beatsPlacebo": false,
+   "pass": false
+  },
+  {
+   "market": "xau",
+   "rule": "R",
+   "n": 54,
+   "netR": -0.154,
+   "t": -0.93,
+   "p": 0.8232,
+   "holmP": 1,
+   "repNetR": -0.217,
+   "repN": 80,
+   "placeboP95": 0.061,
+   "nOk": true,
+   "positive": false,
+   "t2": false,
+   "holm": false,
+   "sameSign": false,
+   "beatsPlacebo": false,
+   "pass": false
+  }
+ ],
+ "markets": {
+  "nas100": {
+   "candles": 1316889,
+   "from": "2007-11-01",
+   "to": "2026-11-12",
+   "rules": {
+    "F": {
+     "rep": {
+      "events": 80,
+      "skipped": {
+       "no direction": 1
+      },
+      "n": 79,
+      "netR": 0.016,
+      "t": 0.15,
+      "sd": 0.934,
+      "grossR": 0.153,
+      "grossT": 1.46,
+      "costR": 0.137,
+      "win": 0.494,
+      "exits": {
+       "time": 44,
+       "stop": 20,
+       "target": 15
+      }
+     },
+     "dec": {
+      "events": 54,
+      "skipped": {},
+      "n": 54,
+      "netR": -0.038,
+      "t": -0.24,
+      "sd": 1.157,
+      "grossR": -0.005,
+      "grossT": -0.03,
+      "costR": 0.033,
+      "win": 0.426,
+      "exits": {
+       "stop": 29,
+       "time": 7,
+       "target": 18
+      },
+      "placebo": {
+       "seeds": 40,
+       "mean": -0.073,
+       "p95": 0.172,
+       "max": 0.346,
+       "beaten": 23
+      },
+      "byYear": {
+       "2020": {
+        "n": 7,
+        "netR": -0.804
+       },
+       "2021": {
+        "n": 8,
+        "netR": 0.688
+       },
+       "2022": {
+        "n": 8,
+        "netR": -0.276
+       },
+       "2023": {
+        "n": 8,
+        "netR": -0.228
+       },
+       "2024": {
+        "n": 8,
+        "netR": 0.006
+       },
+       "2025": {
+        "n": 8,
+        "netR": 0.531
+       },
+       "2026": {
+        "n": 7,
+        "netR": -0.316
+       }
+      },
+      "trades": [
+       {
+        "date": "2020-01-29",
+        "side": "buy",
+        "entry": 9143.6,
+        "stop": 9123.9,
+        "target": 9173.15,
+        "exit": 9123.9,
+        "why": "stop",
+        "R": -1,
+        "net": -1.102
+       },
+       {
+        "date": "2020-04-29",
+        "side": "sell",
+        "entry": 8961.2,
+        "stop": 8981.9,
+        "target": 8930.15,
+        "exit": 8981.9,
+        "why": "stop",
+        "R": -1,
+        "net": -1.097
+       },
+       {
+        "date": "2020-06-10",
+        "side": "buy",
+        "entry": 10145,
+        "stop": 10034.2,
+        "target": 10311.2,
+        "exit": 10114.2,
+        "why": "time",
+        "R": -0.278,
+        "net": -0.296
+       },
+       {
+        "date": "2020-07-29",
+        "side": "buy",
+        "entry": 10650.2,
+        "stop": 10614.2,
+        "target": 10704.2,
+        "exit": 10653.6,
+        "why": "time",
+        "R": 0.094,
+        "net": 0.039
+       },
+       {
+        "date": "2020-09-16",
+        "side": "buy",
+        "entry": 11420.6,
+        "stop": 11354.4,
+        "target": 11519.9,
+        "exit": 11354.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.03
+       },
+       {
+        "date": "2020-11-05",
+        "side": "buy",
+        "entry": 12092.4,
+        "stop": 12061.4,
+        "target": 12138.9,
+        "exit": 12061.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.065
+       },
+       {
+        "date": "2020-12-16",
+        "side": "sell",
+        "entry": 12621.6,
+        "stop": 12647.4,
+        "target": 12582.9,
+        "exit": 12647.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.078
+       },
+       {
+        "date": "2021-01-27",
+        "side": "sell",
+        "entry": 13226.2,
+        "stop": 13319.2,
+        "target": 13086.7,
+        "exit": 13086.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.478
+       },
+       {
+        "date": "2021-03-17",
+        "side": "buy",
+        "entry": 13096.6,
+        "stop": 13010,
+        "target": 13226.5,
+        "exit": 13226.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.477
+       },
+       {
+        "date": "2021-04-28",
+        "side": "buy",
+        "entry": 13932.4,
+        "stop": 13898.2,
+        "target": 13983.7,
+        "exit": 13983.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.442
+       },
+       {
+        "date": "2021-06-16",
+        "side": "sell",
+        "entry": 13933.6,
+        "stop": 14026.5,
+        "target": 13794.25,
+        "exit": 14026.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.022
+       },
+       {
+        "date": "2021-07-28",
+        "side": "buy",
+        "entry": 15015.4,
+        "stop": 14938,
+        "target": 15131.5,
+        "exit": 15032.6,
+        "why": "time",
+        "R": 0.222,
+        "net": 0.196
+       },
+       {
+        "date": "2021-09-22",
+        "side": "buy",
+        "entry": 15221.2,
+        "stop": 15111.2,
+        "target": 15386.2,
+        "exit": 15111.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.018
+       },
+       {
+        "date": "2021-11-03",
+        "side": "buy",
+        "entry": 16028.6,
+        "stop": 15973.3,
+        "target": 16111.55,
+        "exit": 16111.55,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.464
+       },
+       {
+        "date": "2021-12-15",
+        "side": "buy",
+        "entry": 15925.8,
+        "stop": 15763.1,
+        "target": 16169.85,
+        "exit": 16169.85,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.488
+       },
+       {
+        "date": "2022-01-26",
+        "side": "buy",
+        "entry": 14523,
+        "stop": 14407.5,
+        "target": 14696.25,
+        "exit": 14407.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.017
+       },
+       {
+        "date": "2022-03-16",
+        "side": "sell",
+        "entry": 13525.6,
+        "stop": 13728.5,
+        "target": 13221.25,
+        "exit": 13728.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.01
+       },
+       {
+        "date": "2022-05-04",
+        "side": "sell",
+        "entry": 13134.2,
+        "stop": 13236,
+        "target": 12981.5,
+        "exit": 12981.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.48
+       },
+       {
+        "date": "2022-06-15",
+        "side": "sell",
+        "entry": 11431.8,
+        "stop": 11608.2,
+        "target": 11167.2,
+        "exit": 11608.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.011
+       },
+       {
+        "date": "2022-07-27",
+        "side": "buy",
+        "entry": 12430.6,
+        "stop": 12379.2,
+        "target": 12507.7,
+        "exit": 12507.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.461
+       },
+       {
+        "date": "2022-09-21",
+        "side": "sell",
+        "entry": 11774.8,
+        "stop": 11971,
+        "target": 11480.5,
+        "exit": 11971,
+        "why": "stop",
+        "R": -1,
+        "net": -1.01
+       },
+       {
+        "date": "2022-11-02",
+        "side": "buy",
+        "entry": 11397,
+        "stop": 11164.4,
+        "target": 11745.9,
+        "exit": 11164.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.009
+       },
+       {
+        "date": "2022-12-14",
+        "side": "sell",
+        "entry": 11758.2,
+        "stop": 11933.6,
+        "target": 11495.1,
+        "exit": 11772.2,
+        "why": "time",
+        "R": -0.08,
+        "net": -0.091
+       },
+       {
+        "date": "2023-02-01",
+        "side": "buy",
+        "entry": 12095.8,
+        "stop": 12020.2,
+        "target": 12209.2,
+        "exit": 12020.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.026
+       },
+       {
+        "date": "2023-03-22",
+        "side": "buy",
+        "entry": 12863.4,
+        "stop": 12793.8,
+        "target": 12967.8,
+        "exit": 12793.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.029
+       },
+       {
+        "date": "2023-05-03",
+        "side": "buy",
+        "entry": 13195.4,
+        "stop": 13116.6,
+        "target": 13313.6,
+        "exit": 13116.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.025
+       },
+       {
+        "date": "2023-06-14",
+        "side": "sell",
+        "entry": 14861.6,
+        "stop": 14957.3,
+        "target": 14718.05,
+        "exit": 14957.3,
+        "why": "stop",
+        "R": -1,
+        "net": -1.021
+       },
+       {
+        "date": "2023-07-26",
+        "side": "buy",
+        "entry": 15462.4,
+        "stop": 15439.3,
+        "target": 15497.05,
+        "exit": 15497.05,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.413
+       },
+       {
+        "date": "2023-09-20",
+        "side": "sell",
+        "entry": 15165.6,
+        "stop": 15202.8,
+        "target": 15109.8,
+        "exit": 15202.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.054
+       },
+       {
+        "date": "2023-11-01",
+        "side": "buy",
+        "entry": 14541.4,
+        "stop": 14500.4,
+        "target": 14602.9,
+        "exit": 14602.9,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.451
+       },
+       {
+        "date": "2023-12-13",
+        "side": "buy",
+        "entry": 16507.8,
+        "stop": 16401.1,
+        "target": 16667.85,
+        "exit": 16559.8,
+        "why": "time",
+        "R": 0.487,
+        "net": 0.469
+       },
+       {
+        "date": "2024-01-31",
+        "side": "sell",
+        "entry": 17222.5,
+        "stop": 17291,
+        "target": 17119.75,
+        "exit": 17291,
+        "why": "stop",
+        "R": -1,
+        "net": -1.029
+       },
+       {
+        "date": "2024-03-20",
+        "side": "buy",
+        "entry": 18160.4,
+        "stop": 18062.2,
+        "target": 18307.7,
+        "exit": 18244.3,
+        "why": "time",
+        "R": 0.854,
+        "net": 0.834
+       },
+       {
+        "date": "2024-05-01",
+        "side": "buy",
+        "entry": 17460,
+        "stop": 17361.2,
+        "target": 17608.2,
+        "exit": 17608.2,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.48
+       },
+       {
+        "date": "2024-06-12",
+        "side": "buy",
+        "entry": 19507.5,
+        "stop": 19430.5,
+        "target": 19623,
+        "exit": 19430.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.026
+       },
+       {
+        "date": "2024-07-31",
+        "side": "buy",
+        "entry": 19356,
+        "stop": 19276.9,
+        "target": 19474.65,
+        "exit": 19389.6,
+        "why": "time",
+        "R": 0.425,
+        "net": 0.399
+       },
+       {
+        "date": "2024-09-18",
+        "side": "buy",
+        "entry": 19610.5,
+        "stop": 19434.5,
+        "target": 19874.5,
+        "exit": 19434.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.011
+       },
+       {
+        "date": "2024-11-07",
+        "side": "buy",
+        "entry": 21097.4,
+        "stop": 21075,
+        "target": 21131,
+        "exit": 21075,
+        "why": "stop",
+        "R": -1,
+        "net": -1.089
+       },
+       {
+        "date": "2024-12-18",
+        "side": "sell",
+        "entry": 21799.5,
+        "stop": 22016.8,
+        "target": 21473.55,
+        "exit": 21473.55,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.491
+       },
+       {
+        "date": "2025-01-29",
+        "side": "sell",
+        "entry": 21288,
+        "stop": 21372.2,
+        "target": 21161.7,
+        "exit": 21372.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.024
+       },
+       {
+        "date": "2025-03-19",
+        "side": "buy",
+        "entry": 19691.8,
+        "stop": 19590.4,
+        "target": 19843.9,
+        "exit": 19843.9,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.48
+       },
+       {
+        "date": "2025-05-07",
+        "side": "sell",
+        "entry": 19696.2,
+        "stop": 19790.4,
+        "target": 19554.9,
+        "exit": 19790.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.021
+       },
+       {
+        "date": "2025-06-18",
+        "side": "sell",
+        "entry": 21809.6,
+        "stop": 21878.2,
+        "target": 21706.7,
+        "exit": 21706.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.471
+       },
+       {
+        "date": "2025-07-30",
+        "side": "buy",
+        "entry": 23444.2,
+        "stop": 23401.8,
+        "target": 23507.8,
+        "exit": 23401.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.047
+       },
+       {
+        "date": "2025-09-17",
+        "side": "sell",
+        "entry": 24221.6,
+        "stop": 24303.8,
+        "target": 24098.3,
+        "exit": 24098.3,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.476
+       },
+       {
+        "date": "2025-10-29",
+        "side": "sell",
+        "entry": 26137.4,
+        "stop": 26174.7,
+        "target": 26081.45,
+        "exit": 26081.45,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.446
+       },
+       {
+        "date": "2025-12-10",
+        "side": "buy",
+        "entry": 25647.9,
+        "stop": 25586.8,
+        "target": 25739.55,
+        "exit": 25739.55,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.467
+       },
+       {
+        "date": "2026-01-28",
+        "side": "sell",
+        "entry": 26021.2,
+        "stop": 26094,
+        "target": 25912,
+        "exit": 26094,
+        "why": "stop",
+        "R": -1,
+        "net": -1.027
+       },
+       {
+        "date": "2026-03-18",
+        "side": "sell",
+        "entry": 24668.2,
+        "stop": 24728.8,
+        "target": 24577.3,
+        "exit": 24577.3,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.467
+       },
+       {
+        "date": "2026-04-29",
+        "side": "sell",
+        "entry": 27105.2,
+        "stop": 27152.3,
+        "target": 27034.55,
+        "exit": 27152.3,
+        "why": "stop",
+        "R": -1,
+        "net": -1.042
+       },
+       {
+        "date": "2026-06-17",
+        "side": "sell",
+        "entry": 29986.4,
+        "stop": 30212.6,
+        "target": 29647.1,
+        "exit": 30212.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.009
+       },
+       {
+        "date": "2026-07-29",
+        "side": "buy",
+        "entry": 27662.4,
+        "stop": 27607.8,
+        "target": 27744.3,
+        "exit": 27607.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.037
+       },
+       {
+        "date": "2026-09-16",
+        "side": "sell",
+        "entry": 29201,
+        "stop": 29284.3,
+        "target": 29076.05,
+        "exit": 29076.05,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.476
+       },
+       {
+        "date": "2026-10-28",
+        "side": "sell",
+        "entry": 29727.3,
+        "stop": 29779.8,
+        "target": 29648.55,
+        "exit": 29779.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.038
+       }
+      ]
+     }
+    },
+    "R": {
+     "rep": {
+      "events": 80,
+      "skipped": {
+       "no direction": 1
+      },
+      "n": 79,
+      "netR": -0.313,
+      "t": -2.3,
+      "sd": 1.208,
+      "grossR": 0.036,
+      "grossT": 0.27,
+      "costR": 0.35,
+      "win": 0.43,
+      "exits": {
+       "target": 31,
+       "stop": 44,
+       "time": 4
+      }
+     },
+     "dec": {
+      "events": 54,
+      "skipped": {},
+      "n": 54,
+      "netR": 0.095,
+      "t": 0.56,
+      "sd": 1.26,
+      "grossR": 0.157,
+      "grossT": 0.92,
+      "costR": 0.062,
+      "win": 0.463,
+      "exits": {
+       "target": 25,
+       "stop": 29
+      },
+      "placebo": {
+       "seeds": 40,
+       "mean": -0.077,
+       "p95": 0.171,
+       "max": 0.243,
+       "beaten": 35
+      },
+      "byYear": {
+       "2020": {
+        "n": 7,
+        "netR": 0.651
+       },
+       "2021": {
+        "n": 8,
+        "netR": -0.428
+       },
+       "2022": {
+        "n": 8,
+        "netR": -0.094
+       },
+       "2023": {
+        "n": 8,
+        "netR": 0.2
+       },
+       "2024": {
+        "n": 8,
+        "netR": 0.492
+       },
+       "2025": {
+        "n": 8,
+        "netR": -0.432
+       },
+       "2026": {
+        "n": 7,
+        "netR": 0.384
+       }
+      },
+      "trades": [
+       {
+        "date": "2020-01-29",
+        "side": "sell",
+        "entry": 9143.6,
+        "stop": 9153.6,
+        "target": 9128.6,
+        "exit": 9128.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.3
+       },
+       {
+        "date": "2020-04-29",
+        "side": "buy",
+        "entry": 8961.2,
+        "stop": 8932.2,
+        "target": 9004.7,
+        "exit": 9004.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.431
+       },
+       {
+        "date": "2020-06-10",
+        "side": "sell",
+        "entry": 10145,
+        "stop": 10172.85,
+        "target": 10103.23,
+        "exit": 10103.23,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.428
+       },
+       {
+        "date": "2020-07-29",
+        "side": "sell",
+        "entry": 10650.2,
+        "stop": 10660.7,
+        "target": 10634.45,
+        "exit": 10660.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.19
+       },
+       {
+        "date": "2020-09-16",
+        "side": "sell",
+        "entry": 11420.6,
+        "stop": 11447.2,
+        "target": 11380.7,
+        "exit": 11380.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.425
+       },
+       {
+        "date": "2020-11-05",
+        "side": "sell",
+        "entry": 12092.4,
+        "stop": 12100.95,
+        "target": 12079.58,
+        "exit": 12100.95,
+        "why": "stop",
+        "R": -1,
+        "net": -1.234
+       },
+       {
+        "date": "2020-12-16",
+        "side": "buy",
+        "entry": 12621.6,
+        "stop": 12602.2,
+        "target": 12650.7,
+        "exit": 12650.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.397
+       },
+       {
+        "date": "2021-01-27",
+        "side": "buy",
+        "entry": 13226.2,
+        "stop": 13201.45,
+        "target": 13263.33,
+        "exit": 13201.45,
+        "why": "stop",
+        "R": -1,
+        "net": -1.081
+       },
+       {
+        "date": "2021-03-17",
+        "side": "sell",
+        "entry": 13096.6,
+        "stop": 13168.6,
+        "target": 12988.6,
+        "exit": 13168.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.028
+       },
+       {
+        "date": "2021-04-28",
+        "side": "sell",
+        "entry": 13932.4,
+        "stop": 13962.2,
+        "target": 13887.7,
+        "exit": 13962.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.067
+       },
+       {
+        "date": "2021-06-16",
+        "side": "buy",
+        "entry": 13933.6,
+        "stop": 13868,
+        "target": 14032,
+        "exit": 13868,
+        "why": "stop",
+        "R": -1,
+        "net": -1.03
+       },
+       {
+        "date": "2021-07-28",
+        "side": "sell",
+        "entry": 15015.4,
+        "stop": 15038.85,
+        "target": 14980.23,
+        "exit": 14980.23,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.415
+       },
+       {
+        "date": "2021-09-22",
+        "side": "sell",
+        "entry": 15221.2,
+        "stop": 15255.05,
+        "target": 15170.43,
+        "exit": 15170.43,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.441
+       },
+       {
+        "date": "2021-11-03",
+        "side": "sell",
+        "entry": 16028.6,
+        "stop": 16064.7,
+        "target": 15974.45,
+        "exit": 16064.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.055
+       },
+       {
+        "date": "2021-12-15",
+        "side": "sell",
+        "entry": 15925.8,
+        "stop": 16018.4,
+        "target": 15786.9,
+        "exit": 16018.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.022
+       },
+       {
+        "date": "2022-01-26",
+        "side": "sell",
+        "entry": 14523,
+        "stop": 14654.8,
+        "target": 14325.3,
+        "exit": 14325.3,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.485
+       },
+       {
+        "date": "2022-03-16",
+        "side": "buy",
+        "entry": 13525.6,
+        "stop": 13472.38,
+        "target": 13605.44,
+        "exit": 13472.38,
+        "why": "stop",
+        "R": -1,
+        "net": -1.038
+       },
+       {
+        "date": "2022-05-04",
+        "side": "buy",
+        "entry": 13134.2,
+        "stop": 13019.6,
+        "target": 13306.1,
+        "exit": 13019.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.017
+       },
+       {
+        "date": "2022-06-15",
+        "side": "buy",
+        "entry": 11431.8,
+        "stop": 11371.6,
+        "target": 11522.1,
+        "exit": 11371.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.033
+       },
+       {
+        "date": "2022-07-27",
+        "side": "sell",
+        "entry": 12430.6,
+        "stop": 12463.6,
+        "target": 12381.1,
+        "exit": 12463.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.061
+       },
+       {
+        "date": "2022-09-21",
+        "side": "buy",
+        "entry": 11774.8,
+        "stop": 11692,
+        "target": 11899,
+        "exit": 11899,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.476
+       },
+       {
+        "date": "2022-11-02",
+        "side": "sell",
+        "entry": 11397,
+        "stop": 11456.2,
+        "target": 11308.2,
+        "exit": 11308.2,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.466
+       },
+       {
+        "date": "2022-12-14",
+        "side": "buy",
+        "entry": 11758.2,
+        "stop": 11696.9,
+        "target": 11850.15,
+        "exit": 11696.9,
+        "why": "stop",
+        "R": -1,
+        "net": -1.033
+       },
+       {
+        "date": "2023-02-01",
+        "side": "sell",
+        "entry": 12095.8,
+        "stop": 12150.6,
+        "target": 12013.6,
+        "exit": 12013.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.464
+       },
+       {
+        "date": "2023-03-22",
+        "side": "sell",
+        "entry": 12863.4,
+        "stop": 12921.9,
+        "target": 12775.65,
+        "exit": 12775.65,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.466
+       },
+       {
+        "date": "2023-05-03",
+        "side": "sell",
+        "entry": 13195.4,
+        "stop": 13221.6,
+        "target": 13156.1,
+        "exit": 13156.1,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.424
+       },
+       {
+        "date": "2023-06-14",
+        "side": "buy",
+        "entry": 14861.6,
+        "stop": 14798.4,
+        "target": 14956.4,
+        "exit": 14956.4,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.468
+       },
+       {
+        "date": "2023-07-26",
+        "side": "sell",
+        "entry": 15462.4,
+        "stop": 15509.2,
+        "target": 15392.2,
+        "exit": 15509.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.043
+       },
+       {
+        "date": "2023-09-20",
+        "side": "buy",
+        "entry": 15165.6,
+        "stop": 15119.8,
+        "target": 15234.3,
+        "exit": 15119.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.044
+       },
+       {
+        "date": "2023-11-01",
+        "side": "sell",
+        "entry": 14541.4,
+        "stop": 14567.6,
+        "target": 14502.1,
+        "exit": 14567.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.076
+       },
+       {
+        "date": "2023-12-13",
+        "side": "sell",
+        "entry": 16507.8,
+        "stop": 16540.22,
+        "target": 16459.16,
+        "exit": 16540.22,
+        "why": "stop",
+        "R": -1,
+        "net": -1.062
+       },
+       {
+        "date": "2024-01-31",
+        "side": "buy",
+        "entry": 17222.5,
+        "stop": 17200.05,
+        "target": 17256.18,
+        "exit": 17256.18,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.411
+       },
+       {
+        "date": "2024-03-20",
+        "side": "sell",
+        "entry": 18160.4,
+        "stop": 18193.5,
+        "target": 18110.75,
+        "exit": 18110.75,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.44
+       },
+       {
+        "date": "2024-05-01",
+        "side": "sell",
+        "entry": 17460,
+        "stop": 17486.3,
+        "target": 17420.55,
+        "exit": 17420.55,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.424
+       },
+       {
+        "date": "2024-06-12",
+        "side": "sell",
+        "entry": 19507.5,
+        "stop": 19528.5,
+        "target": 19476,
+        "exit": 19476,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.405
+       },
+       {
+        "date": "2024-07-31",
+        "side": "sell",
+        "entry": 19356,
+        "stop": 19378.47,
+        "target": 19322.29,
+        "exit": 19378.47,
+        "why": "stop",
+        "R": -1,
+        "net": -1.089
+       },
+       {
+        "date": "2024-09-18",
+        "side": "sell",
+        "entry": 19610.5,
+        "stop": 19698.4,
+        "target": 19478.65,
+        "exit": 19478.65,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.477
+       },
+       {
+        "date": "2024-11-07",
+        "side": "sell",
+        "entry": 21097.4,
+        "stop": 21118,
+        "target": 21066.5,
+        "exit": 21118,
+        "why": "stop",
+        "R": -1,
+        "net": -1.097
+       },
+       {
+        "date": "2024-12-18",
+        "side": "buy",
+        "entry": 21799.5,
+        "stop": 21743.35,
+        "target": 21883.73,
+        "exit": 21743.35,
+        "why": "stop",
+        "R": -1,
+        "net": -1.036
+       },
+       {
+        "date": "2025-01-29",
+        "side": "buy",
+        "entry": 21288,
+        "stop": 21263.6,
+        "target": 21324.6,
+        "exit": 21324.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.418
+       },
+       {
+        "date": "2025-03-19",
+        "side": "sell",
+        "entry": 19691.8,
+        "stop": 19742.2,
+        "target": 19616.2,
+        "exit": 19742.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.04
+       },
+       {
+        "date": "2025-05-07",
+        "side": "buy",
+        "entry": 19696.2,
+        "stop": 19602.8,
+        "target": 19836.3,
+        "exit": 19836.3,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.479
+       },
+       {
+        "date": "2025-06-18",
+        "side": "buy",
+        "entry": 21809.6,
+        "stop": 21767.6,
+        "target": 21872.6,
+        "exit": 21767.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.048
+       },
+       {
+        "date": "2025-07-30",
+        "side": "sell",
+        "entry": 23444.2,
+        "stop": 23455.68,
+        "target": 23426.99,
+        "exit": 23455.68,
+        "why": "stop",
+        "R": -1,
+        "net": -1.174
+       },
+       {
+        "date": "2025-09-17",
+        "side": "buy",
+        "entry": 24221.6,
+        "stop": 24072.2,
+        "target": 24445.7,
+        "exit": 24072.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.013
+       },
+       {
+        "date": "2025-10-29",
+        "side": "buy",
+        "entry": 26137.4,
+        "stop": 26094.6,
+        "target": 26201.6,
+        "exit": 26094.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.047
+       },
+       {
+        "date": "2025-12-10",
+        "side": "sell",
+        "entry": 25647.9,
+        "stop": 25720.6,
+        "target": 25538.85,
+        "exit": 25720.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.028
+       },
+       {
+        "date": "2026-01-28",
+        "side": "buy",
+        "entry": 26021.2,
+        "stop": 26001.65,
+        "target": 26050.53,
+        "exit": 26050.53,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.398
+       },
+       {
+        "date": "2026-03-18",
+        "side": "buy",
+        "entry": 24668.2,
+        "stop": 24638.8,
+        "target": 24712.3,
+        "exit": 24638.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.068
+       },
+       {
+        "date": "2026-04-29",
+        "side": "buy",
+        "entry": 27105.2,
+        "stop": 27055,
+        "target": 27180.5,
+        "exit": 27180.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.46
+       },
+       {
+        "date": "2026-06-17",
+        "side": "buy",
+        "entry": 29986.4,
+        "stop": 29817.6,
+        "target": 30239.6,
+        "exit": 30239.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.488
+       },
+       {
+        "date": "2026-07-29",
+        "side": "sell",
+        "entry": 27662.4,
+        "stop": 27773.8,
+        "target": 27495.3,
+        "exit": 27773.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.018
+       },
+       {
+        "date": "2026-09-16",
+        "side": "buy",
+        "entry": 29201,
+        "stop": 29152.8,
+        "target": 29273.3,
+        "exit": 29152.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.041
+       },
+       {
+        "date": "2026-10-28",
+        "side": "buy",
+        "entry": 29727.3,
+        "stop": 29653.8,
+        "target": 29837.55,
+        "exit": 29837.55,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.473
+       }
+      ]
+     }
+    }
+   }
+  },
+  "spx500": {
+   "candles": 1299317,
+   "from": "2007-11-01",
+   "to": "2026-11-12",
+   "rules": {
+    "F": {
+     "rep": {
+      "events": 80,
+      "skipped": {
+       "no direction": 3
+      },
+      "n": 77,
+      "netR": -0.048,
+      "t": -0.46,
+      "sd": 0.915,
+      "grossR": 0.104,
+      "grossT": 1,
+      "costR": 0.152,
+      "win": 0.494,
+      "exits": {
+       "time": 42,
+       "stop": 21,
+       "target": 14
+      }
+     },
+     "dec": {
+      "events": 54,
+      "skipped": {},
+      "n": 54,
+      "netR": -0.137,
+      "t": -0.85,
+      "sd": 1.178,
+      "grossR": -0.065,
+      "grossT": -0.4,
+      "costR": 0.072,
+      "win": 0.389,
+      "exits": {
+       "stop": 32,
+       "target": 17,
+       "time": 5
+      },
+      "placebo": {
+       "seeds": 40,
+       "mean": -0.155,
+       "p95": 0.095,
+       "max": 0.162,
+       "beaten": 22
+      },
+      "byYear": {
+       "2020": {
+        "n": 7,
+        "netR": -0.785
+       },
+       "2021": {
+        "n": 8,
+        "netR": 0.635
+       },
+       "2022": {
+        "n": 8,
+        "netR": -0.91
+       },
+       "2023": {
+        "n": 8,
+        "netR": -0.239
+       },
+       "2024": {
+        "n": 8,
+        "netR": 0.117
+       },
+       "2025": {
+        "n": 8,
+        "netR": 0.184
+       },
+       "2026": {
+        "n": 7,
+        "netR": -0.025
+       }
+      },
+      "trades": [
+       {
+        "date": "2020-01-29",
+        "side": "buy",
+        "entry": 3291.7,
+        "stop": 3287.9,
+        "target": 3297.4,
+        "exit": 3287.9,
+        "why": "stop",
+        "R": -1,
+        "net": -1.263
+       },
+       {
+        "date": "2020-04-29",
+        "side": "sell",
+        "entry": 2939.6,
+        "stop": 2945.8,
+        "target": 2930.3,
+        "exit": 2945.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.161
+       },
+       {
+        "date": "2020-06-10",
+        "side": "buy",
+        "entry": 3220,
+        "stop": 3188.8,
+        "target": 3266.8,
+        "exit": 3188.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.032
+       },
+       {
+        "date": "2020-07-29",
+        "side": "buy",
+        "entry": 3251.6,
+        "stop": 3244.4,
+        "target": 3262.4,
+        "exit": 3262.4,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.361
+       },
+       {
+        "date": "2020-09-16",
+        "side": "buy",
+        "entry": 3424.2,
+        "stop": 3409.4,
+        "target": 3446.4,
+        "exit": 3409.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.068
+       },
+       {
+        "date": "2020-11-05",
+        "side": "buy",
+        "entry": 3522,
+        "stop": 3517,
+        "target": 3529.5,
+        "exit": 3517,
+        "why": "stop",
+        "R": -1,
+        "net": -1.2
+       },
+       {
+        "date": "2020-12-16",
+        "side": "sell",
+        "entry": 3695.4,
+        "stop": 3702.8,
+        "target": 3684.3,
+        "exit": 3702.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.135
+       },
+       {
+        "date": "2021-01-27",
+        "side": "sell",
+        "entry": 3772.4,
+        "stop": 3794,
+        "target": 3740,
+        "exit": 3740,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.454
+       },
+       {
+        "date": "2021-03-17",
+        "side": "buy",
+        "entry": 3957.8,
+        "stop": 3944,
+        "target": 3978.5,
+        "exit": 3978.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.428
+       },
+       {
+        "date": "2021-04-28",
+        "side": "buy",
+        "entry": 4189.8,
+        "stop": 4182.4,
+        "target": 4200.9,
+        "exit": 4200.9,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.365
+       },
+       {
+        "date": "2021-06-16",
+        "side": "sell",
+        "entry": 4217.8,
+        "stop": 4228.8,
+        "target": 4201.3,
+        "exit": 4228.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.091
+       },
+       {
+        "date": "2021-07-28",
+        "side": "buy",
+        "entry": 4404.8,
+        "stop": 4387.2,
+        "target": 4431.2,
+        "exit": 4407,
+        "why": "time",
+        "R": 0.125,
+        "net": 0.068
+       },
+       {
+        "date": "2021-09-22",
+        "side": "buy",
+        "entry": 4414,
+        "stop": 4389,
+        "target": 4451.5,
+        "exit": 4389,
+        "why": "stop",
+        "R": -1,
+        "net": -1.04
+       },
+       {
+        "date": "2021-11-03",
+        "side": "buy",
+        "entry": 4637.4,
+        "stop": 4622.7,
+        "target": 4659.45,
+        "exit": 4659.45,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.432
+       },
+       {
+        "date": "2021-12-15",
+        "side": "buy",
+        "entry": 4642.4,
+        "stop": 4613.8,
+        "target": 4685.3,
+        "exit": 4685.3,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.465
+       },
+       {
+        "date": "2022-01-26",
+        "side": "buy",
+        "entry": 4429.4,
+        "stop": 4402.2,
+        "target": 4470.2,
+        "exit": 4402.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.037
+       },
+       {
+        "date": "2022-03-16",
+        "side": "sell",
+        "entry": 4264.8,
+        "stop": 4313.6,
+        "target": 4191.6,
+        "exit": 4313.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.02
+       },
+       {
+        "date": "2022-05-04",
+        "side": "buy",
+        "entry": 4200.4,
+        "stop": 4168.8,
+        "target": 4247.8,
+        "exit": 4168.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.032
+       },
+       {
+        "date": "2022-06-15",
+        "side": "sell",
+        "entry": 3746.4,
+        "stop": 3798.4,
+        "target": 3668.4,
+        "exit": 3798.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.019
+       },
+       {
+        "date": "2022-07-27",
+        "side": "buy",
+        "entry": 3976.8,
+        "stop": 3965.8,
+        "target": 3993.3,
+        "exit": 3965.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.091
+       },
+       {
+        "date": "2022-09-21",
+        "side": "sell",
+        "entry": 3833.4,
+        "stop": 3888,
+        "target": 3751.5,
+        "exit": 3888,
+        "why": "stop",
+        "R": -1,
+        "net": -1.018
+       },
+       {
+        "date": "2022-11-02",
+        "side": "buy",
+        "entry": 3890.2,
+        "stop": 3832,
+        "target": 3977.5,
+        "exit": 3832,
+        "why": "stop",
+        "R": -1,
+        "net": -1.017
+       },
+       {
+        "date": "2022-12-14",
+        "side": "sell",
+        "entry": 4008.4,
+        "stop": 4056.3,
+        "target": 3936.55,
+        "exit": 4009.6,
+        "why": "time",
+        "R": -0.025,
+        "net": -0.046
+       },
+       {
+        "date": "2023-02-01",
+        "side": "sell",
+        "entry": 4058.4,
+        "stop": 4072.6,
+        "target": 4037.1,
+        "exit": 4037.1,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.43
+       },
+       {
+        "date": "2023-03-22",
+        "side": "buy",
+        "entry": 4017,
+        "stop": 4002.6,
+        "target": 4038.6,
+        "exit": 4002.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.069
+       },
+       {
+        "date": "2023-05-03",
+        "side": "buy",
+        "entry": 4136.8,
+        "stop": 4121.8,
+        "target": 4159.3,
+        "exit": 4121.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.067
+       },
+       {
+        "date": "2023-06-14",
+        "side": "sell",
+        "entry": 4351.6,
+        "stop": 4379.8,
+        "target": 4309.3,
+        "exit": 4379.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.035
+       },
+       {
+        "date": "2023-07-26",
+        "side": "buy",
+        "entry": 4559.6,
+        "stop": 4553.9,
+        "target": 4568.15,
+        "exit": 4568.15,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.325
+       },
+       {
+        "date": "2023-09-20",
+        "side": "sell",
+        "entry": 4447.2,
+        "stop": 4457.5,
+        "target": 4431.75,
+        "exit": 4457.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.097
+       },
+       {
+        "date": "2023-11-01",
+        "side": "buy",
+        "entry": 4217.4,
+        "stop": 4206,
+        "target": 4234.5,
+        "exit": 4206,
+        "why": "stop",
+        "R": -1,
+        "net": -1.088
+       },
+       {
+        "date": "2023-12-13",
+        "side": "buy",
+        "entry": 4684.8,
+        "stop": 4653.4,
+        "target": 4731.9,
+        "exit": 4707.4,
+        "why": "time",
+        "R": 0.72,
+        "net": 0.688
+       },
+       {
+        "date": "2024-01-31",
+        "side": "sell",
+        "entry": 4875,
+        "stop": 4892,
+        "target": 4849.5,
+        "exit": 4892,
+        "why": "stop",
+        "R": -1,
+        "net": -1.059
+       },
+       {
+        "date": "2024-03-20",
+        "side": "buy",
+        "entry": 5206.3,
+        "stop": 5184.2,
+        "target": 5239.45,
+        "exit": 5225.8,
+        "why": "time",
+        "R": 0.882,
+        "net": 0.837
+       },
+       {
+        "date": "2024-05-01",
+        "side": "buy",
+        "entry": 5050,
+        "stop": 5027,
+        "target": 5084.5,
+        "exit": 5084.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.457
+       },
+       {
+        "date": "2024-06-12",
+        "side": "buy",
+        "entry": 5436,
+        "stop": 5417.7,
+        "target": 5463.45,
+        "exit": 5417.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.055
+       },
+       {
+        "date": "2024-07-31",
+        "side": "buy",
+        "entry": 5534.1,
+        "stop": 5518.4,
+        "target": 5557.65,
+        "exit": 5557.65,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.436
+       },
+       {
+        "date": "2024-09-18",
+        "side": "buy",
+        "entry": 5676.8,
+        "stop": 5636.8,
+        "target": 5736.8,
+        "exit": 5636.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.025
+       },
+       {
+        "date": "2024-11-07",
+        "side": "sell",
+        "entry": 5972.7,
+        "stop": 5980,
+        "target": 5961.75,
+        "exit": 5980,
+        "why": "stop",
+        "R": -1,
+        "net": -1.137
+       },
+       {
+        "date": "2024-12-18",
+        "side": "sell",
+        "entry": 6025.1,
+        "stop": 6081.8,
+        "target": 5940.05,
+        "exit": 5940.05,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.482
+       },
+       {
+        "date": "2025-01-29",
+        "side": "sell",
+        "entry": 6016.6,
+        "stop": 6038,
+        "target": 5984.5,
+        "exit": 6038,
+        "why": "stop",
+        "R": -1,
+        "net": -1.047
+       },
+       {
+        "date": "2025-03-19",
+        "side": "buy",
+        "entry": 5662.2,
+        "stop": 5639.2,
+        "target": 5696.7,
+        "exit": 5696.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.457
+       },
+       {
+        "date": "2025-05-07",
+        "side": "sell",
+        "entry": 5599.1,
+        "stop": 5624.6,
+        "target": 5560.85,
+        "exit": 5624.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.039
+       },
+       {
+        "date": "2025-06-18",
+        "side": "sell",
+        "entry": 6008.2,
+        "stop": 6024.6,
+        "target": 5983.6,
+        "exit": 5983.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.439
+       },
+       {
+        "date": "2025-07-30",
+        "side": "buy",
+        "entry": 6395.1,
+        "stop": 6387.3,
+        "target": 6406.8,
+        "exit": 6387.3,
+        "why": "stop",
+        "R": -1,
+        "net": -1.128
+       },
+       {
+        "date": "2025-09-17",
+        "side": "buy",
+        "entry": 6624.1,
+        "stop": 6591.6,
+        "target": 6672.85,
+        "exit": 6591.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.031
+       },
+       {
+        "date": "2025-10-29",
+        "side": "sell",
+        "entry": 6910.8,
+        "stop": 6919.4,
+        "target": 6897.9,
+        "exit": 6897.9,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.384
+       },
+       {
+        "date": "2025-12-10",
+        "side": "buy",
+        "entry": 6855.7,
+        "stop": 6840.6,
+        "target": 6878.35,
+        "exit": 6878.35,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.434
+       },
+       {
+        "date": "2026-01-28",
+        "side": "sell",
+        "entry": 6972,
+        "stop": 6986.7,
+        "target": 6949.95,
+        "exit": 6986.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.068
+       },
+       {
+        "date": "2026-03-18",
+        "side": "sell",
+        "entry": 6681.4,
+        "stop": 6694.9,
+        "target": 6661.15,
+        "exit": 6661.15,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.426
+       },
+       {
+        "date": "2026-04-29",
+        "side": "sell",
+        "entry": 7123.5,
+        "stop": 7137.8,
+        "target": 7102.05,
+        "exit": 7137.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.07
+       },
+       {
+        "date": "2026-06-17",
+        "side": "sell",
+        "entry": 7492.8,
+        "stop": 7539.6,
+        "target": 7422.6,
+        "exit": 7431.3,
+        "why": "time",
+        "R": 1.314,
+        "net": 1.293
+       },
+       {
+        "date": "2026-07-29",
+        "side": "buy",
+        "entry": 7403.8,
+        "stop": 7393.8,
+        "target": 7418.8,
+        "exit": 7393.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.1
+       },
+       {
+        "date": "2026-09-16",
+        "side": "sell",
+        "entry": 7622.3,
+        "stop": 7638.1,
+        "target": 7598.6,
+        "exit": 7598.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.437
+       },
+       {
+        "date": "2026-10-28",
+        "side": "sell",
+        "entry": 7741.2,
+        "stop": 7752.4,
+        "target": 7724.4,
+        "exit": 7752.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.089
+       }
+      ]
+     }
+    },
+    "R": {
+     "rep": {
+      "events": 80,
+      "skipped": {
+       "no direction": 3
+      },
+      "n": 77,
+      "netR": -0.289,
+      "t": -2.11,
+      "sd": 1.201,
+      "grossR": 0.074,
+      "grossT": 0.53,
+      "costR": 0.363,
+      "win": 0.429,
+      "exits": {
+       "stop": 42,
+       "target": 31,
+       "time": 4
+      }
+     },
+     "dec": {
+      "events": 54,
+      "skipped": {},
+      "n": 54,
+      "netR": -0.139,
+      "t": -0.83,
+      "sd": 1.235,
+      "grossR": -0.001,
+      "grossT": 0,
+      "costR": 0.138,
+      "win": 0.407,
+      "exits": {
+       "target": 21,
+       "stop": 32,
+       "time": 1
+      },
+      "placebo": {
+       "seeds": 40,
+       "mean": -0.192,
+       "p95": 0.077,
+       "max": 0.343,
+       "beaten": 28
+      },
+      "byYear": {
+       "2020": {
+        "n": 7,
+        "netR": 0.155
+       },
+       "2021": {
+        "n": 8,
+        "netR": -0.641
+       },
+       "2022": {
+        "n": 8,
+        "netR": 0.18
+       },
+       "2023": {
+        "n": 8,
+        "netR": -0.489
+       },
+       "2024": {
+        "n": 8,
+        "netR": 0.413
+       },
+       "2025": {
+        "n": 8,
+        "netR": 0.122
+       },
+       "2026": {
+        "n": 7,
+        "netR": -0.755
+       }
+      },
+      "trades": [
+       {
+        "date": "2020-01-29",
+        "side": "sell",
+        "entry": 3291.7,
+        "stop": 3295.8,
+        "target": 3285.55,
+        "exit": 3285.55,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.256
+       },
+       {
+        "date": "2020-04-29",
+        "side": "buy",
+        "entry": 2939.6,
+        "stop": 2930.8,
+        "target": 2952.8,
+        "exit": 2952.8,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.386
+       },
+       {
+        "date": "2020-06-10",
+        "side": "sell",
+        "entry": 3220,
+        "stop": 3228.5,
+        "target": 3207.25,
+        "exit": 3207.25,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.382
+       },
+       {
+        "date": "2020-07-29",
+        "side": "sell",
+        "entry": 3251.6,
+        "stop": 3253.65,
+        "target": 3248.53,
+        "exit": 3253.65,
+        "why": "stop",
+        "R": -1,
+        "net": -1.488
+       },
+       {
+        "date": "2020-09-16",
+        "side": "sell",
+        "entry": 3424.2,
+        "stop": 3428.75,
+        "target": 3417.38,
+        "exit": 3428.75,
+        "why": "stop",
+        "R": -1,
+        "net": -1.22
+       },
+       {
+        "date": "2020-11-05",
+        "side": "sell",
+        "entry": 3522,
+        "stop": 3524.4,
+        "target": 3518.4,
+        "exit": 3524.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.417
+       },
+       {
+        "date": "2020-12-16",
+        "side": "buy",
+        "entry": 3695.4,
+        "stop": 3692.2,
+        "target": 3700.2,
+        "exit": 3700.2,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.188
+       },
+       {
+        "date": "2021-01-27",
+        "side": "buy",
+        "entry": 3772.4,
+        "stop": 3766.7,
+        "target": 3780.95,
+        "exit": 3766.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.175
+       },
+       {
+        "date": "2021-03-17",
+        "side": "sell",
+        "entry": 3957.8,
+        "stop": 3973.2,
+        "target": 3934.7,
+        "exit": 3973.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.065
+       },
+       {
+        "date": "2021-04-28",
+        "side": "sell",
+        "entry": 4189.8,
+        "stop": 4195.4,
+        "target": 4181.4,
+        "exit": 4195.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.179
+       },
+       {
+        "date": "2021-06-16",
+        "side": "buy",
+        "entry": 4217.8,
+        "stop": 4201.2,
+        "target": 4242.7,
+        "exit": 4225.4,
+        "why": "time",
+        "R": 0.458,
+        "net": 0.398
+       },
+       {
+        "date": "2021-07-28",
+        "side": "sell",
+        "entry": 4404.8,
+        "stop": 4409.75,
+        "target": 4397.38,
+        "exit": 4409.75,
+        "why": "stop",
+        "R": -1,
+        "net": -1.202
+       },
+       {
+        "date": "2021-09-22",
+        "side": "sell",
+        "entry": 4414,
+        "stop": 4421.7,
+        "target": 4402.45,
+        "exit": 4402.45,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.37
+       },
+       {
+        "date": "2021-11-03",
+        "side": "sell",
+        "entry": 4637.4,
+        "stop": 4641.92,
+        "target": 4630.61,
+        "exit": 4641.92,
+        "why": "stop",
+        "R": -1,
+        "net": -1.221
+       },
+       {
+        "date": "2021-12-15",
+        "side": "sell",
+        "entry": 4642.4,
+        "stop": 4661.8,
+        "target": 4613.3,
+        "exit": 4661.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.052
+       },
+       {
+        "date": "2022-01-26",
+        "side": "sell",
+        "entry": 4429.4,
+        "stop": 4455.2,
+        "target": 4390.7,
+        "exit": 4390.7,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.461
+       },
+       {
+        "date": "2022-03-16",
+        "side": "buy",
+        "entry": 4264.8,
+        "stop": 4252.35,
+        "target": 4283.48,
+        "exit": 4252.35,
+        "why": "stop",
+        "R": -1,
+        "net": -1.08
+       },
+       {
+        "date": "2022-05-04",
+        "side": "sell",
+        "entry": 4200.4,
+        "stop": 4213.4,
+        "target": 4180.9,
+        "exit": 4180.9,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.423
+       },
+       {
+        "date": "2022-06-15",
+        "side": "buy",
+        "entry": 3746.4,
+        "stop": 3730.9,
+        "target": 3769.65,
+        "exit": 3730.9,
+        "why": "stop",
+        "R": -1,
+        "net": -1.065
+       },
+       {
+        "date": "2022-07-27",
+        "side": "sell",
+        "entry": 3976.8,
+        "stop": 3986,
+        "target": 3963,
+        "exit": 3986,
+        "why": "stop",
+        "R": -1,
+        "net": -1.109
+       },
+       {
+        "date": "2022-09-21",
+        "side": "buy",
+        "entry": 3833.4,
+        "stop": 3815.95,
+        "target": 3859.58,
+        "exit": 3859.58,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.443
+       },
+       {
+        "date": "2022-11-02",
+        "side": "sell",
+        "entry": 3890.2,
+        "stop": 3905.1,
+        "target": 3867.85,
+        "exit": 3867.85,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.433
+       },
+       {
+        "date": "2022-12-14",
+        "side": "buy",
+        "entry": 4008.4,
+        "stop": 3992.68,
+        "target": 4031.99,
+        "exit": 3992.68,
+        "why": "stop",
+        "R": -1,
+        "net": -1.064
+       },
+       {
+        "date": "2023-02-01",
+        "side": "buy",
+        "entry": 4058.4,
+        "stop": 4041,
+        "target": 4084.5,
+        "exit": 4041,
+        "why": "stop",
+        "R": -1,
+        "net": -1.057
+       },
+       {
+        "date": "2023-03-22",
+        "side": "sell",
+        "entry": 4017,
+        "stop": 4035,
+        "target": 3990,
+        "exit": 4035,
+        "why": "stop",
+        "R": -1,
+        "net": -1.056
+       },
+       {
+        "date": "2023-05-03",
+        "side": "sell",
+        "entry": 4136.8,
+        "stop": 4144.8,
+        "target": 4124.8,
+        "exit": 4124.8,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.375
+       },
+       {
+        "date": "2023-06-14",
+        "side": "buy",
+        "entry": 4351.6,
+        "stop": 4342.45,
+        "target": 4365.33,
+        "exit": 4365.33,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.391
+       },
+       {
+        "date": "2023-07-26",
+        "side": "sell",
+        "entry": 4559.6,
+        "stop": 4566.4,
+        "target": 4549.4,
+        "exit": 4566.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.147
+       },
+       {
+        "date": "2023-09-20",
+        "side": "buy",
+        "entry": 4447.2,
+        "stop": 4437.2,
+        "target": 4462.2,
+        "exit": 4437.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.1
+       },
+       {
+        "date": "2023-11-01",
+        "side": "sell",
+        "entry": 4217.4,
+        "stop": 4222.4,
+        "target": 4209.9,
+        "exit": 4222.4,
+        "why": "stop",
+        "R": -1,
+        "net": -1.2
+       },
+       {
+        "date": "2023-12-13",
+        "side": "sell",
+        "entry": 4684.8,
+        "stop": 4693.6,
+        "target": 4671.6,
+        "exit": 4693.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.114
+       },
+       {
+        "date": "2024-01-31",
+        "side": "buy",
+        "entry": 4875,
+        "stop": 4869.5,
+        "target": 4883.25,
+        "exit": 4883.25,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.318
+       },
+       {
+        "date": "2024-03-20",
+        "side": "sell",
+        "entry": 5206.3,
+        "stop": 5214.1,
+        "target": 5194.6,
+        "exit": 5194.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.372
+       },
+       {
+        "date": "2024-05-01",
+        "side": "sell",
+        "entry": 5050,
+        "stop": 5055.95,
+        "target": 5041.08,
+        "exit": 5041.08,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.332
+       },
+       {
+        "date": "2024-06-12",
+        "side": "sell",
+        "entry": 5436,
+        "stop": 5441,
+        "target": 5428.5,
+        "exit": 5428.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.3
+       },
+       {
+        "date": "2024-07-31",
+        "side": "sell",
+        "entry": 5534.1,
+        "stop": 5538.88,
+        "target": 5526.94,
+        "exit": 5538.88,
+        "why": "stop",
+        "R": -1,
+        "net": -1.209
+       },
+       {
+        "date": "2024-09-18",
+        "side": "sell",
+        "entry": 5676.8,
+        "stop": 5705.2,
+        "target": 5634.2,
+        "exit": 5634.2,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.465
+       },
+       {
+        "date": "2024-11-07",
+        "side": "buy",
+        "entry": 5972.7,
+        "stop": 5967.7,
+        "target": 5980.2,
+        "exit": 5967.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.2
+       },
+       {
+        "date": "2024-12-18",
+        "side": "buy",
+        "entry": 6025.1,
+        "stop": 6010.75,
+        "target": 6046.63,
+        "exit": 6010.75,
+        "why": "stop",
+        "R": -1,
+        "net": -1.07
+       },
+       {
+        "date": "2025-01-29",
+        "side": "buy",
+        "entry": 6016.6,
+        "stop": 6010.75,
+        "target": 6025.38,
+        "exit": 6025.38,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.329
+       },
+       {
+        "date": "2025-03-19",
+        "side": "sell",
+        "entry": 5662.2,
+        "stop": 5675,
+        "target": 5643,
+        "exit": 5675,
+        "why": "stop",
+        "R": -1,
+        "net": -1.078
+       },
+       {
+        "date": "2025-05-07",
+        "side": "buy",
+        "entry": 5599.1,
+        "stop": 5579.4,
+        "target": 5628.65,
+        "exit": 5628.65,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.449
+       },
+       {
+        "date": "2025-06-18",
+        "side": "buy",
+        "entry": 6008.2,
+        "stop": 5998.9,
+        "target": 6022.15,
+        "exit": 6022.15,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.392
+       },
+       {
+        "date": "2025-07-30",
+        "side": "sell",
+        "entry": 6395.1,
+        "stop": 6398.1,
+        "target": 6390.6,
+        "exit": 6398.1,
+        "why": "stop",
+        "R": -1,
+        "net": -1.333
+       },
+       {
+        "date": "2025-09-17",
+        "side": "sell",
+        "entry": 6624.1,
+        "stop": 6637.9,
+        "target": 6603.4,
+        "exit": 6603.4,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.428
+       },
+       {
+        "date": "2025-10-29",
+        "side": "buy",
+        "entry": 6910.8,
+        "stop": 6903.8,
+        "target": 6921.3,
+        "exit": 6903.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.143
+       },
+       {
+        "date": "2025-12-10",
+        "side": "sell",
+        "entry": 6855.7,
+        "stop": 6870.7,
+        "target": 6833.2,
+        "exit": 6870.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.067
+       },
+       {
+        "date": "2026-01-28",
+        "side": "buy",
+        "entry": 6972,
+        "stop": 6968.03,
+        "target": 6977.96,
+        "exit": 6977.96,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.248
+       },
+       {
+        "date": "2026-03-18",
+        "side": "buy",
+        "entry": 6681.4,
+        "stop": 6673.6,
+        "target": 6693.1,
+        "exit": 6673.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.128
+       },
+       {
+        "date": "2026-04-29",
+        "side": "buy",
+        "entry": 7123.5,
+        "stop": 7115.5,
+        "target": 7135.5,
+        "exit": 7115.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.125
+       },
+       {
+        "date": "2026-06-17",
+        "side": "buy",
+        "entry": 7492.8,
+        "stop": 7464.8,
+        "target": 7534.8,
+        "exit": 7464.8,
+        "why": "stop",
+        "R": -1,
+        "net": -1.036
+       },
+       {
+        "date": "2026-07-29",
+        "side": "sell",
+        "entry": 7403.8,
+        "stop": 7426.5,
+        "target": 7369.75,
+        "exit": 7426.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.044
+       },
+       {
+        "date": "2026-09-16",
+        "side": "buy",
+        "entry": 7622.3,
+        "stop": 7613.3,
+        "target": 7635.8,
+        "exit": 7613.3,
+        "why": "stop",
+        "R": -1,
+        "net": -1.111
+       },
+       {
+        "date": "2026-10-28",
+        "side": "buy",
+        "entry": 7741.2,
+        "stop": 7730.2,
+        "target": 7757.7,
+        "exit": 7730.2,
+        "why": "stop",
+        "R": -1,
+        "net": -1.091
+       }
+      ]
+     }
+    }
+   }
+  },
+  "xau": {
+   "candles": 1358347,
+   "from": "2007-11-01",
+   "to": "2026-11-12",
+   "rules": {
+    "F": {
+     "rep": {
+      "events": 80,
+      "skipped": {},
+      "n": 80,
+      "netR": 0.122,
+      "t": 1.35,
+      "sd": 0.809,
+      "grossR": 0.171,
+      "grossT": 1.9,
+      "costR": 0.049,
+      "win": 0.563,
+      "exits": {
+       "stop": 15,
+       "time": 53,
+       "target": 12
+      }
+     },
+     "dec": {
+      "events": 54,
+      "skipped": {},
+      "n": 54,
+      "netR": 0.042,
+      "t": 0.28,
+      "sd": 1.114,
+      "grossR": 0.086,
+      "grossT": 0.57,
+      "costR": 0.044,
+      "win": 0.5,
+      "exits": {
+       "time": 14,
+       "stop": 24,
+       "target": 16
+      },
+      "placebo": {
+       "seeds": 40,
+       "mean": -0.102,
+       "p95": 0.288,
+       "max": 0.35,
+       "beaten": 34
+      },
+      "byYear": {
+       "2020": {
+        "n": 7,
+        "netR": -0.202
+       },
+       "2021": {
+        "n": 8,
+        "netR": 0.303
+       },
+       "2022": {
+        "n": 8,
+        "netR": -0.728
+       },
+       "2023": {
+        "n": 8,
+        "netR": -0.186
+       },
+       "2024": {
+        "n": 8,
+        "netR": 0.021
+       },
+       "2025": {
+        "n": 8,
+        "netR": 0.453
+       },
+       "2026": {
+        "n": 7,
+        "netR": 0.682
+       }
+      },
+      "trades": [
+       {
+        "date": "2020-01-29",
+        "side": "buy",
+        "entry": 1573.23,
+        "stop": 1568.89,
+        "target": 1579.72,
+        "exit": 1576.61,
+        "why": "time",
+        "R": 0.782,
+        "net": 0.713
+       },
+       {
+        "date": "2020-04-29",
+        "side": "sell",
+        "entry": 1701.33,
+        "stop": 1709.07,
+        "target": 1689.72,
+        "exit": 1709.07,
+        "why": "stop",
+        "R": -1,
+        "net": -1.039
+       },
+       {
+        "date": "2020-06-10",
+        "side": "buy",
+        "entry": 1727.47,
+        "stop": 1708.34,
+        "target": 1756.18,
+        "exit": 1739.34,
+        "why": "time",
+        "R": 0.62,
+        "net": 0.604
+       },
+       {
+        "date": "2020-07-29",
+        "side": "buy",
+        "entry": 1967.05,
+        "stop": 1954.42,
+        "target": 1985.99,
+        "exit": 1954.42,
+        "why": "stop",
+        "R": -1,
+        "net": -1.024
+       },
+       {
+        "date": "2020-09-16",
+        "side": "buy",
+        "entry": 1965.27,
+        "stop": 1955.23,
+        "target": 1980.32,
+        "exit": 1955.23,
+        "why": "stop",
+        "R": -1,
+        "net": -1.03
+       },
+       {
+        "date": "2020-11-05",
+        "side": "buy",
+        "entry": 1948.08,
+        "stop": 1945.31,
+        "target": 1952.24,
+        "exit": 1952.24,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.392
+       },
+       {
+        "date": "2020-12-16",
+        "side": "sell",
+        "entry": 1848.34,
+        "stop": 1857.82,
+        "target": 1834.13,
+        "exit": 1857.82,
+        "why": "stop",
+        "R": -1,
+        "net": -1.032
+       },
+       {
+        "date": "2021-01-27",
+        "side": "sell",
+        "entry": 1844.12,
+        "stop": 1849.23,
+        "target": 1836.45,
+        "exit": 1842.54,
+        "why": "time",
+        "R": 0.309,
+        "net": 0.25
+       },
+       {
+        "date": "2021-03-17",
+        "side": "buy",
+        "entry": 1742.89,
+        "stop": 1730.1,
+        "target": 1762.07,
+        "exit": 1743.96,
+        "why": "time",
+        "R": 0.084,
+        "net": 0.061
+       },
+       {
+        "date": "2021-04-28",
+        "side": "buy",
+        "entry": 1776.01,
+        "stop": 1770.5,
+        "target": 1784.27,
+        "exit": 1781.25,
+        "why": "time",
+        "R": 0.951,
+        "net": 0.897
+       },
+       {
+        "date": "2021-06-16",
+        "side": "sell",
+        "entry": 1839.73,
+        "stop": 1861.89,
+        "target": 1806.49,
+        "exit": 1829.84,
+        "why": "time",
+        "R": 0.446,
+        "net": 0.433
+       },
+       {
+        "date": "2021-07-28",
+        "side": "sell",
+        "entry": 1798.67,
+        "stop": 1802.32,
+        "target": 1793.19,
+        "exit": 1802.32,
+        "why": "stop",
+        "R": -1,
+        "net": -1.082
+       },
+       {
+        "date": "2021-09-22",
+        "side": "buy",
+        "entry": 1784.32,
+        "stop": 1769.56,
+        "target": 1806.46,
+        "exit": 1769.56,
+        "why": "stop",
+        "R": -1,
+        "net": -1.02
+       },
+       {
+        "date": "2021-11-03",
+        "side": "buy",
+        "entry": 1765.27,
+        "stop": 1761.56,
+        "target": 1770.82,
+        "exit": 1770.82,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.419
+       },
+       {
+        "date": "2021-12-15",
+        "side": "buy",
+        "entry": 1763.06,
+        "stop": 1753.07,
+        "target": 1778.03,
+        "exit": 1778.03,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.47
+       },
+       {
+        "date": "2022-01-26",
+        "side": "buy",
+        "entry": 1832.02,
+        "stop": 1824.95,
+        "target": 1842.63,
+        "exit": 1824.95,
+        "why": "stop",
+        "R": -1,
+        "net": -1.042
+       },
+       {
+        "date": "2022-03-16",
+        "side": "sell",
+        "entry": 1904.28,
+        "stop": 1916.53,
+        "target": 1885.9,
+        "exit": 1916.53,
+        "why": "stop",
+        "R": -1,
+        "net": -1.024
+       },
+       {
+        "date": "2022-05-04",
+        "side": "buy",
+        "entry": 1875.39,
+        "stop": 1864.51,
+        "target": 1891.71,
+        "exit": 1864.51,
+        "why": "stop",
+        "R": -1,
+        "net": -1.028
+       },
+       {
+        "date": "2022-06-15",
+        "side": "buy",
+        "entry": 1822.98,
+        "stop": 1813.76,
+        "target": 1836.81,
+        "exit": 1836.81,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.467
+       },
+       {
+        "date": "2022-07-27",
+        "side": "buy",
+        "entry": 1725.49,
+        "stop": 1720.43,
+        "target": 1733.07,
+        "exit": 1720.43,
+        "why": "stop",
+        "R": -1,
+        "net": -1.059
+       },
+       {
+        "date": "2022-09-21",
+        "side": "sell",
+        "entry": 1665.53,
+        "stop": 1669.32,
+        "target": 1659.84,
+        "exit": 1669.32,
+        "why": "stop",
+        "R": -1,
+        "net": -1.079
+       },
+       {
+        "date": "2022-11-02",
+        "side": "buy",
+        "entry": 1664.81,
+        "stop": 1647.95,
+        "target": 1690.1,
+        "exit": 1647.95,
+        "why": "stop",
+        "R": -1,
+        "net": -1.018
+       },
+       {
+        "date": "2022-12-14",
+        "side": "sell",
+        "entry": 1802.6,
+        "stop": 1810.27,
+        "target": 1791.08,
+        "exit": 1810.27,
+        "why": "stop",
+        "R": -1,
+        "net": -1.039
+       },
+       {
+        "date": "2023-02-01",
+        "side": "sell",
+        "entry": 1925.02,
+        "stop": 1929.02,
+        "target": 1919.01,
+        "exit": 1929.02,
+        "why": "stop",
+        "R": -1,
+        "net": -1.075
+       },
+       {
+        "date": "2023-03-22",
+        "side": "buy",
+        "entry": 1960.03,
+        "stop": 1946.28,
+        "target": 1980.64,
+        "exit": 1973.45,
+        "why": "time",
+        "R": 0.977,
+        "net": 0.955
+       },
+       {
+        "date": "2023-05-03",
+        "side": "sell",
+        "entry": 2022.23,
+        "stop": 2036.19,
+        "target": 2001.29,
+        "exit": 2033.38,
+        "why": "time",
+        "R": -0.799,
+        "net": -0.82
+       },
+       {
+        "date": "2023-06-14",
+        "side": "sell",
+        "entry": 1944.89,
+        "stop": 1954.04,
+        "target": 1931.17,
+        "exit": 1946.78,
+        "why": "time",
+        "R": -0.206,
+        "net": -0.239
+       },
+       {
+        "date": "2023-07-26",
+        "side": "sell",
+        "entry": 1967.74,
+        "stop": 1973.08,
+        "target": 1959.73,
+        "exit": 1973.08,
+        "why": "stop",
+        "R": -1,
+        "net": -1.056
+       },
+       {
+        "date": "2023-09-20",
+        "side": "sell",
+        "entry": 1942.99,
+        "stop": 1946.3,
+        "target": 1938.02,
+        "exit": 1946.3,
+        "why": "stop",
+        "R": -1,
+        "net": -1.091
+       },
+       {
+        "date": "2023-11-01",
+        "side": "buy",
+        "entry": 1978.69,
+        "stop": 1977.58,
+        "target": 1980.36,
+        "exit": 1980.36,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.23
+       },
+       {
+        "date": "2023-12-13",
+        "side": "buy",
+        "entry": 2006.13,
+        "stop": 1982.25,
+        "target": 2041.94,
+        "exit": 2020.83,
+        "why": "time",
+        "R": 0.616,
+        "net": 0.603
+       },
+       {
+        "date": "2024-01-31",
+        "side": "sell",
+        "entry": 2042.61,
+        "stop": 2048.57,
+        "target": 2033.66,
+        "exit": 2048.57,
+        "why": "stop",
+        "R": -1,
+        "net": -1.05
+       },
+       {
+        "date": "2024-03-20",
+        "side": "buy",
+        "entry": 2168.95,
+        "stop": 2157.27,
+        "target": 2186.46,
+        "exit": 2186.46,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.474
+       },
+       {
+        "date": "2024-05-01",
+        "side": "buy",
+        "entry": 2313.53,
+        "stop": 2295.11,
+        "target": 2341.16,
+        "exit": 2313.98,
+        "why": "time",
+        "R": 0.025,
+        "net": 0.008
+       },
+       {
+        "date": "2024-06-12",
+        "side": "sell",
+        "entry": 2330.92,
+        "stop": 2335.27,
+        "target": 2324.4,
+        "exit": 2324.4,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.431
+       },
+       {
+        "date": "2024-07-31",
+        "side": "sell",
+        "entry": 2425.17,
+        "stop": 2427.54,
+        "target": 2421.62,
+        "exit": 2427.54,
+        "why": "stop",
+        "R": -1,
+        "net": -1.127
+       },
+       {
+        "date": "2024-09-18",
+        "side": "buy",
+        "entry": 2594.53,
+        "stop": 2567.7,
+        "target": 2634.77,
+        "exit": 2567.7,
+        "why": "stop",
+        "R": -1,
+        "net": -1.011
+       },
+       {
+        "date": "2024-11-07",
+        "side": "sell",
+        "entry": 2690.57,
+        "stop": 2698.12,
+        "target": 2679.24,
+        "exit": 2698.12,
+        "why": "stop",
+        "R": -1,
+        "net": -1.04
+       },
+       {
+        "date": "2024-12-18",
+        "side": "sell",
+        "entry": 2619.95,
+        "stop": 2636.68,
+        "target": 2594.86,
+        "exit": 2594.86,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.482
+       },
+       {
+        "date": "2025-01-29",
+        "side": "sell",
+        "entry": 2745.85,
+        "stop": 2752.1,
+        "target": 2736.48,
+        "exit": 2752.1,
+        "why": "stop",
+        "R": -1,
+        "net": -1.048
+       },
+       {
+        "date": "2025-03-19",
+        "side": "buy",
+        "entry": 3037.71,
+        "stop": 3030.11,
+        "target": 3049.1,
+        "exit": 3049.1,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.461
+       },
+       {
+        "date": "2025-05-07",
+        "side": "buy",
+        "entry": 3387.59,
+        "stop": 3384.33,
+        "target": 3392.47,
+        "exit": 3384.33,
+        "why": "stop",
+        "R": -1,
+        "net": -1.092
+       },
+       {
+        "date": "2025-06-18",
+        "side": "buy",
+        "entry": 3391.11,
+        "stop": 3385.5,
+        "target": 3399.53,
+        "exit": 3385.5,
+        "why": "stop",
+        "R": -1,
+        "net": -1.053
+       },
+       {
+        "date": "2025-07-30",
+        "side": "sell",
+        "entry": 3297.68,
+        "stop": 3305.19,
+        "target": 3286.4,
+        "exit": 3286.4,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.46
+       },
+       {
+        "date": "2025-09-17",
+        "side": "sell",
+        "entry": 3682.44,
+        "stop": 3707.56,
+        "target": 3644.77,
+        "exit": 3658.39,
+        "why": "time",
+        "R": 0.958,
+        "net": 0.946
+       },
+       {
+        "date": "2025-10-29",
+        "side": "sell",
+        "entry": 3981.14,
+        "stop": 4007.88,
+        "target": 3941.04,
+        "exit": 3941.04,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.489
+       },
+       {
+        "date": "2025-12-10",
+        "side": "buy",
+        "entry": 4199.06,
+        "stop": 4190.42,
+        "target": 4212.01,
+        "exit": 4212.01,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.465
+       },
+       {
+        "date": "2026-01-28",
+        "side": "buy",
+        "entry": 5283.54,
+        "stop": 5269.3,
+        "target": 5304.91,
+        "exit": 5304.91,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.479
+       },
+       {
+        "date": "2026-03-18",
+        "side": "sell",
+        "entry": 4885.68,
+        "stop": 4899.46,
+        "target": 4865.01,
+        "exit": 4865.01,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.478
+       },
+       {
+        "date": "2026-04-29",
+        "side": "sell",
+        "entry": 4533.06,
+        "stop": 4553.05,
+        "target": 4503.08,
+        "exit": 4548.02,
+        "why": "time",
+        "R": -0.749,
+        "net": -0.764
+       },
+       {
+        "date": "2026-06-17",
+        "side": "sell",
+        "entry": 4292.86,
+        "stop": 4379.51,
+        "target": 4162.89,
+        "exit": 4238.35,
+        "why": "time",
+        "R": 0.629,
+        "net": 0.626
+       },
+       {
+        "date": "2026-07-29",
+        "side": "buy",
+        "entry": 4067.93,
+        "stop": 4042.78,
+        "target": 4105.66,
+        "exit": 4105.66,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.488
+       },
+       {
+        "date": "2026-09-16",
+        "side": "sell",
+        "entry": 4322.3,
+        "stop": 4367.42,
+        "target": 4254.62,
+        "exit": 4254.62,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.493
+       },
+       {
+        "date": "2026-10-28",
+        "side": "sell",
+        "entry": 4036.37,
+        "stop": 4047.6,
+        "target": 4019.51,
+        "exit": 4047.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.027
+       }
+      ]
+     }
+    },
+    "R": {
+     "rep": {
+      "events": 80,
+      "skipped": {},
+      "n": 80,
+      "netR": -0.217,
+      "t": -1.85,
+      "sd": 1.053,
+      "grossR": -0.107,
+      "grossT": -0.9,
+      "costR": 0.11,
+      "win": 0.388,
+      "exits": {
+       "target": 19,
+       "time": 20,
+       "stop": 41
+      }
+     },
+     "dec": {
+      "events": 54,
+      "skipped": {},
+      "n": 54,
+      "netR": -0.154,
+      "t": -0.93,
+      "sd": 1.216,
+      "grossR": -0.074,
+      "grossT": -0.45,
+      "costR": 0.079,
+      "win": 0.37,
+      "exits": {
+       "stop": 34,
+       "target": 20
+      },
+      "placebo": {
+       "seeds": 40,
+       "mean": -0.198,
+       "p95": 0.061,
+       "max": 0.233,
+       "beaten": 25
+      },
+      "byYear": {
+       "2020": {
+        "n": 7,
+        "netR": -0.415
+       },
+       "2021": {
+        "n": 8,
+        "netR": -0.475
+       },
+       "2022": {
+        "n": 8,
+        "netR": 0.791
+       },
+       "2023": {
+        "n": 8,
+        "netR": -0.453
+       },
+       "2024": {
+        "n": 8,
+        "netR": 0.179
+       },
+       "2025": {
+        "n": 8,
+        "netR": -0.131
+       },
+       "2026": {
+        "n": 7,
+        "netR": -0.668
+       }
+      },
+      "trades": [
+       {
+        "date": "2020-01-29",
+        "side": "sell",
+        "entry": 1573.23,
+        "stop": 1574.38,
+        "target": 1571.5,
+        "exit": 1574.38,
+        "why": "stop",
+        "R": -1,
+        "net": -1.26
+       },
+       {
+        "date": "2020-04-29",
+        "side": "buy",
+        "entry": 1701.33,
+        "stop": 1699.06,
+        "target": 1704.74,
+        "exit": 1704.74,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.368
+       },
+       {
+        "date": "2020-06-10",
+        "side": "sell",
+        "entry": 1727.47,
+        "stop": 1733.21,
+        "target": 1718.87,
+        "exit": 1733.21,
+        "why": "stop",
+        "R": -1,
+        "net": -1.052
+       },
+       {
+        "date": "2020-07-29",
+        "side": "sell",
+        "entry": 1967.05,
+        "stop": 1970.64,
+        "target": 1961.66,
+        "exit": 1970.64,
+        "why": "stop",
+        "R": -1,
+        "net": -1.083
+       },
+       {
+        "date": "2020-09-16",
+        "side": "sell",
+        "entry": 1965.27,
+        "stop": 1969.83,
+        "target": 1958.43,
+        "exit": 1969.83,
+        "why": "stop",
+        "R": -1,
+        "net": -1.066
+       },
+       {
+        "date": "2020-11-05",
+        "side": "sell",
+        "entry": 1948.08,
+        "stop": 1949.41,
+        "target": 1946.1,
+        "exit": 1949.41,
+        "why": "stop",
+        "R": -1,
+        "net": -1.227
+       },
+       {
+        "date": "2020-12-16",
+        "side": "buy",
+        "entry": 1848.34,
+        "stop": 1844.84,
+        "target": 1853.6,
+        "exit": 1853.6,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.414
+       },
+       {
+        "date": "2021-01-27",
+        "side": "buy",
+        "entry": 1844.12,
+        "stop": 1842.79,
+        "target": 1846.11,
+        "exit": 1842.79,
+        "why": "stop",
+        "R": -1,
+        "net": -1.226
+       },
+       {
+        "date": "2021-03-17",
+        "side": "sell",
+        "entry": 1742.89,
+        "stop": 1746.49,
+        "target": 1737.48,
+        "exit": 1746.49,
+        "why": "stop",
+        "R": -1,
+        "net": -1.083
+       },
+       {
+        "date": "2021-04-28",
+        "side": "sell",
+        "entry": 1776.01,
+        "stop": 1777.58,
+        "target": 1773.64,
+        "exit": 1777.58,
+        "why": "stop",
+        "R": -1,
+        "net": -1.19
+       },
+       {
+        "date": "2021-06-16",
+        "side": "buy",
+        "entry": 1839.73,
+        "stop": 1832.75,
+        "target": 1850.2,
+        "exit": 1832.75,
+        "why": "stop",
+        "R": -1,
+        "net": -1.043
+       },
+       {
+        "date": "2021-07-28",
+        "side": "buy",
+        "entry": 1798.67,
+        "stop": 1792.8,
+        "target": 1807.47,
+        "exit": 1807.47,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.449
+       },
+       {
+        "date": "2021-09-22",
+        "side": "sell",
+        "entry": 1784.32,
+        "stop": 1788.76,
+        "target": 1777.66,
+        "exit": 1777.66,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.432
+       },
+       {
+        "date": "2021-11-03",
+        "side": "sell",
+        "entry": 1765.27,
+        "stop": 1770.46,
+        "target": 1757.48,
+        "exit": 1770.46,
+        "why": "stop",
+        "R": -1,
+        "net": -1.058
+       },
+       {
+        "date": "2021-12-15",
+        "side": "sell",
+        "entry": 1763.06,
+        "stop": 1766.84,
+        "target": 1757.38,
+        "exit": 1766.84,
+        "why": "stop",
+        "R": -1,
+        "net": -1.079
+       },
+       {
+        "date": "2022-01-26",
+        "side": "sell",
+        "entry": 1832.02,
+        "stop": 1834.12,
+        "target": 1828.88,
+        "exit": 1828.88,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.357
+       },
+       {
+        "date": "2022-03-16",
+        "side": "buy",
+        "entry": 1904.28,
+        "stop": 1895.07,
+        "target": 1918.09,
+        "exit": 1918.09,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.467
+       },
+       {
+        "date": "2022-05-04",
+        "side": "sell",
+        "entry": 1875.39,
+        "stop": 1878.26,
+        "target": 1871.07,
+        "exit": 1871.07,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.396
+       },
+       {
+        "date": "2022-06-15",
+        "side": "sell",
+        "entry": 1822.98,
+        "stop": 1827.09,
+        "target": 1816.82,
+        "exit": 1827.09,
+        "why": "stop",
+        "R": -1,
+        "net": -1.073
+       },
+       {
+        "date": "2022-07-27",
+        "side": "sell",
+        "entry": 1725.49,
+        "stop": 1727.15,
+        "target": 1722.99,
+        "exit": 1722.99,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.32
+       },
+       {
+        "date": "2022-09-21",
+        "side": "buy",
+        "entry": 1665.53,
+        "stop": 1653.87,
+        "target": 1683.02,
+        "exit": 1683.02,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.474
+       },
+       {
+        "date": "2022-11-02",
+        "side": "sell",
+        "entry": 1664.81,
+        "stop": 1669.22,
+        "target": 1658.19,
+        "exit": 1669.22,
+        "why": "stop",
+        "R": -1,
+        "net": -1.068
+       },
+       {
+        "date": "2022-12-14",
+        "side": "buy",
+        "entry": 1802.6,
+        "stop": 1795.5,
+        "target": 1813.25,
+        "exit": 1813.25,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.458
+       },
+       {
+        "date": "2023-02-01",
+        "side": "buy",
+        "entry": 1925.02,
+        "stop": 1921.53,
+        "target": 1930.25,
+        "exit": 1921.53,
+        "why": "stop",
+        "R": -1,
+        "net": -1.086
+       },
+       {
+        "date": "2023-03-22",
+        "side": "sell",
+        "entry": 1960.03,
+        "stop": 1966.55,
+        "target": 1950.24,
+        "exit": 1966.55,
+        "why": "stop",
+        "R": -1,
+        "net": -1.046
+       },
+       {
+        "date": "2023-05-03",
+        "side": "buy",
+        "entry": 2022.23,
+        "stop": 2018.04,
+        "target": 2028.51,
+        "exit": 2018.04,
+        "why": "stop",
+        "R": -1,
+        "net": -1.072
+       },
+       {
+        "date": "2023-06-14",
+        "side": "buy",
+        "entry": 1944.89,
+        "stop": 1940.07,
+        "target": 1952.12,
+        "exit": 1952.12,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.438
+       },
+       {
+        "date": "2023-07-26",
+        "side": "buy",
+        "entry": 1967.74,
+        "stop": 1965.61,
+        "target": 1970.94,
+        "exit": 1970.94,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.359
+       },
+       {
+        "date": "2023-09-20",
+        "side": "buy",
+        "entry": 1942.99,
+        "stop": 1939.36,
+        "target": 1948.43,
+        "exit": 1939.36,
+        "why": "stop",
+        "R": -1,
+        "net": -1.083
+       },
+       {
+        "date": "2023-11-01",
+        "side": "sell",
+        "entry": 1978.69,
+        "stop": 1982.23,
+        "target": 1973.38,
+        "exit": 1982.23,
+        "why": "stop",
+        "R": -1,
+        "net": -1.085
+       },
+       {
+        "date": "2023-12-13",
+        "side": "sell",
+        "entry": 2006.13,
+        "stop": 2012.58,
+        "target": 1996.44,
+        "exit": 2012.58,
+        "why": "stop",
+        "R": -1,
+        "net": -1.046
+       },
+       {
+        "date": "2024-01-31",
+        "side": "buy",
+        "entry": 2042.61,
+        "stop": 2039.49,
+        "target": 2047.3,
+        "exit": 2047.3,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.404
+       },
+       {
+        "date": "2024-03-20",
+        "side": "sell",
+        "entry": 2168.95,
+        "stop": 2175.21,
+        "target": 2159.56,
+        "exit": 2175.21,
+        "why": "stop",
+        "R": -1,
+        "net": -1.048
+       },
+       {
+        "date": "2024-05-01",
+        "side": "sell",
+        "entry": 2313.53,
+        "stop": 2318.23,
+        "target": 2306.47,
+        "exit": 2318.23,
+        "why": "stop",
+        "R": -1,
+        "net": -1.064
+       },
+       {
+        "date": "2024-06-12",
+        "side": "buy",
+        "entry": 2330.92,
+        "stop": 2324.97,
+        "target": 2339.85,
+        "exit": 2324.97,
+        "why": "stop",
+        "R": -1,
+        "net": -1.05
+       },
+       {
+        "date": "2024-07-31",
+        "side": "buy",
+        "entry": 2425.17,
+        "stop": 2421.62,
+        "target": 2430.5,
+        "exit": 2430.5,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.415
+       },
+       {
+        "date": "2024-09-18",
+        "side": "sell",
+        "entry": 2594.53,
+        "stop": 2602.09,
+        "target": 2583.17,
+        "exit": 2583.17,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.46
+       },
+       {
+        "date": "2024-11-07",
+        "side": "buy",
+        "entry": 2690.57,
+        "stop": 2688.24,
+        "target": 2694.06,
+        "exit": 2694.06,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.371
+       },
+       {
+        "date": "2024-12-18",
+        "side": "buy",
+        "entry": 2619.95,
+        "stop": 2614.63,
+        "target": 2627.93,
+        "exit": 2614.63,
+        "why": "stop",
+        "R": -1,
+        "net": -1.056
+       },
+       {
+        "date": "2025-01-29",
+        "side": "buy",
+        "entry": 2745.85,
+        "stop": 2744.06,
+        "target": 2748.53,
+        "exit": 2748.53,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.332
+       },
+       {
+        "date": "2025-03-19",
+        "side": "sell",
+        "entry": 3037.71,
+        "stop": 3041.38,
+        "target": 3032.2,
+        "exit": 3041.38,
+        "why": "stop",
+        "R": -1,
+        "net": -1.082
+       },
+       {
+        "date": "2025-05-07",
+        "side": "sell",
+        "entry": 3387.59,
+        "stop": 3398.02,
+        "target": 3371.93,
+        "exit": 3371.93,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.471
+       },
+       {
+        "date": "2025-06-18",
+        "side": "sell",
+        "entry": 3391.11,
+        "stop": 3395.93,
+        "target": 3383.89,
+        "exit": 3383.89,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.438
+       },
+       {
+        "date": "2025-07-30",
+        "side": "buy",
+        "entry": 3297.68,
+        "stop": 3295.65,
+        "target": 3300.72,
+        "exit": 3295.65,
+        "why": "stop",
+        "R": -1,
+        "net": -1.148
+       },
+       {
+        "date": "2025-09-17",
+        "side": "buy",
+        "entry": 3682.44,
+        "stop": 3649.83,
+        "target": 3731.36,
+        "exit": 3649.83,
+        "why": "stop",
+        "R": -1,
+        "net": -1.009
+       },
+       {
+        "date": "2025-10-29",
+        "side": "buy",
+        "entry": 3981.14,
+        "stop": 3973.37,
+        "target": 3992.8,
+        "exit": 3973.37,
+        "why": "stop",
+        "R": -1,
+        "net": -1.039
+       },
+       {
+        "date": "2025-12-10",
+        "side": "sell",
+        "entry": 4199.06,
+        "stop": 4219.86,
+        "target": 4167.85,
+        "exit": 4219.86,
+        "why": "stop",
+        "R": -1,
+        "net": -1.014
+       },
+       {
+        "date": "2026-01-28",
+        "side": "sell",
+        "entry": 5283.54,
+        "stop": 5302.07,
+        "target": 5255.75,
+        "exit": 5302.07,
+        "why": "stop",
+        "R": -1,
+        "net": -1.016
+       },
+       {
+        "date": "2026-03-18",
+        "side": "buy",
+        "entry": 4885.68,
+        "stop": 4876.73,
+        "target": 4899.11,
+        "exit": 4876.73,
+        "why": "stop",
+        "R": -1,
+        "net": -1.034
+       },
+       {
+        "date": "2026-04-29",
+        "side": "buy",
+        "entry": 4533.06,
+        "stop": 4525.16,
+        "target": 4544.91,
+        "exit": 4525.16,
+        "why": "stop",
+        "R": -1,
+        "net": -1.038
+       },
+       {
+        "date": "2026-06-17",
+        "side": "buy",
+        "entry": 4292.86,
+        "stop": 4267.31,
+        "target": 4331.18,
+        "exit": 4331.18,
+        "why": "target",
+        "R": 1.5,
+        "net": 1.488
+       },
+       {
+        "date": "2026-07-29",
+        "side": "sell",
+        "entry": 4067.93,
+        "stop": 4086.23,
+        "target": 4040.49,
+        "exit": 4086.23,
+        "why": "stop",
+        "R": -1,
+        "net": -1.016
+       },
+       {
+        "date": "2026-09-16",
+        "side": "buy",
+        "entry": 4322.3,
+        "stop": 4306.23,
+        "target": 4346.4,
+        "exit": 4306.23,
+        "why": "stop",
+        "R": -1,
+        "net": -1.019
+       },
+       {
+        "date": "2026-10-28",
+        "side": "buy",
+        "entry": 4036.37,
+        "stop": 4029.6,
+        "target": 4046.52,
+        "exit": 4029.6,
+        "why": "stop",
+        "R": -1,
+        "net": -1.044
+       }
+      ]
+     }
+    }
+   }
+  }
+ },
+ "passed": [],
+ "verdict": "FAIL"
+}

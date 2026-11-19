@@ -1,0 +1,854 @@
+{
+ "topic": "fx-asia-london-reversal",
+ "built": "2026-11-14",
+ "at": "2026-11-14T03:17:59.702Z",
+ "system": "Asian-session (00:00-07:00 UTC) move over 0.3 x ATR20 faded at the 07:00 UTC open, stop one Asia range past the Asia extreme, exit 12:00 UTC; seven forex majors, OANDA mid M5",
+ "window": {
+  "is": "2016-01-01 to 2021-06-30",
+  "oos": "2021-07-01 to 2026-11-12"
+ },
+ "params": {
+  "M5": 300,
+  "ASIA_MIN": 80,
+  "ATR_N": 20,
+  "NY_MIN": 100,
+  "KATR": 0.3,
+  "LATE": 1800,
+  "EPS": 1e-9,
+  "SPREAD_PIP": 0.3,
+  "COMM_SIDE": 0.0000225,
+  "SLIP_PIP": 0.5,
+  "SEEDS": 40,
+  "DATA_FROM": 1446336000,
+  "IS_FROM": 1451606400,
+  "OOS_FROM": 1625097600,
+  "END": 1794528000
+ },
+ "pairs": [
+  "eurusd",
+  "gbpusd",
+  "audusd",
+  "nzdusd",
+  "usdjpy",
+  "usdcad",
+  "usdchf"
+ ],
+ "costs": "spread 0.3 pip + commission 22.5 USD per million a side (2 x 22.5e-6 x price a round trip) + 0.5 pip slippage on the entry and on the exit",
+ "funnel": {
+  "eurusd": {
+   "candles": 821744,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 24,
+   "weekend": 1134,
+   "trade": 439,
+   "small": 2372
+  },
+  "gbpusd": {
+   "candles": 821204,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 33,
+   "weekend": 1134,
+   "small": 2363,
+   "trade": 439
+  },
+  "audusd": {
+   "candles": 818540,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 32,
+   "weekend": 1134,
+   "trade": 925,
+   "small": 1878
+  },
+  "nzdusd": {
+   "candles": 820871,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 25,
+   "weekend": 1134,
+   "trade": 912,
+   "small": 1898
+  },
+  "usdjpy": {
+   "candles": 822120,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 22,
+   "weekend": 1134,
+   "trade": 832,
+   "small": 1981
+  },
+  "usdcad": {
+   "candles": 821525,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 33,
+   "weekend": 1134,
+   "trade": 474,
+   "small": 2328
+  },
+  "usdchf": {
+   "candles": 813417,
+   "from": "2015-11-01 22:00",
+   "to": "2026-11-12 23:55",
+   "asia-candles": 200,
+   "weekend": 1134,
+   "small": 2223,
+   "trade": 412
+  }
+ },
+ "pool": {
+  "is": {
+   "n": 2183,
+   "net": -0.031,
+   "gross": 0.005,
+   "net2": -0.067,
+   "median": -0.024,
+   "total": -68.25,
+   "win": 0.471,
+   "months": 66,
+   "t": -2.58,
+   "tGross": 0.37,
+   "t2": -5.6,
+   "stops": 121,
+   "medR0pip": 50.9
+  },
+  "oos": {
+   "n": 2250,
+   "net": -0.048,
+   "gross": -0.011,
+   "net2": -0.085,
+   "median": -0.048,
+   "total": -107.79,
+   "win": 0.457,
+   "months": 65,
+   "t": -3.24,
+   "tGross": -0.77,
+   "t2": -5.63,
+   "stops": 139,
+   "medR0pip": 49.55
+  },
+  "placebo": {
+   "seeds": 40,
+   "mean": -0.037,
+   "p95": -0.022,
+   "min": -0.06,
+   "max": -0.014,
+   "rank": 4,
+   "beats": false
+  },
+  "p": 0.9994,
+  "tests": {
+   "OOS month-sum t >= 2 (net)": false,
+   "IS net R a trade > 0": false,
+   "OOS net R a trade > 0 at 2x costs": false,
+   "beats the placebo 95th percentile": false
+  },
+  "pHolm": 1,
+  "verdict": "FAIL"
+ },
+ "byPair": {
+  "eurusd": {
+   "is": {
+    "n": 219,
+    "net": -0.012,
+    "gross": 0.028,
+    "net2": -0.052,
+    "median": -0.048,
+    "total": -2.57,
+    "win": 0.452,
+    "months": 66,
+    "t": -0.35,
+    "tGross": 0.82,
+    "t2": -1.51,
+    "stops": 13,
+    "medR0pip": 46
+   },
+   "oos": {
+    "n": 220,
+    "net": -0.052,
+    "gross": -0.01,
+    "net2": -0.094,
+    "median": -0.033,
+    "total": -11.42,
+    "win": 0.455,
+    "months": 65,
+    "t": -1.49,
+    "tGross": -0.28,
+    "t2": -2.67,
+    "stops": 25,
+    "medR0pip": 46.8
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.045,
+    "p95": 0.005,
+    "min": -0.097,
+    "max": 0.026,
+    "rank": 16,
+    "beats": false
+   },
+   "p": 0.93189,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": false,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  },
+  "gbpusd": {
+   "is": {
+    "n": 208,
+    "net": 0.02,
+    "gross": 0.049,
+    "net2": -0.01,
+    "median": 0.036,
+    "total": 4.14,
+    "win": 0.529,
+    "months": 66,
+    "t": 0.45,
+    "tGross": 1.11,
+    "t2": -0.22,
+    "stops": 22,
+    "medR0pip": 66.15
+   },
+   "oos": {
+    "n": 231,
+    "net": -0.05,
+    "gross": -0.016,
+    "net2": -0.085,
+    "median": -0.021,
+    "total": -11.66,
+    "win": 0.481,
+    "months": 65,
+    "t": -1.39,
+    "tGross": -0.44,
+    "t2": -2.3,
+    "stops": 28,
+    "medR0pip": 56.8
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.047,
+    "p95": 0.021,
+    "min": -0.138,
+    "max": 0.032,
+    "rank": 20,
+    "beats": false
+   },
+   "p": 0.91774,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": true,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  },
+  "audusd": {
+   "is": {
+    "n": 479,
+    "net": -0.036,
+    "gross": -0.002,
+    "net2": -0.07,
+    "median": -0.027,
+    "total": -17.04,
+    "win": 0.459,
+    "months": 66,
+    "t": -2.22,
+    "tGross": -0.1,
+    "t2": -4.28,
+    "stops": 17,
+    "medR0pip": 51.4
+   },
+   "oos": {
+    "n": 446,
+    "net": -0.052,
+    "gross": -0.017,
+    "net2": -0.088,
+    "median": -0.058,
+    "total": -23.41,
+    "win": 0.437,
+    "months": 65,
+    "t": -2.93,
+    "tGross": -0.93,
+    "t2": -4.88,
+    "stops": 12,
+    "medR0pip": 48.35
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.03,
+    "p95": 0.005,
+    "min": -0.081,
+    "max": 0.013,
+    "rank": 4,
+    "beats": false
+   },
+   "p": 0.99831,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": false,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  },
+  "nzdusd": {
+   "is": {
+    "n": 452,
+    "net": -0.06,
+    "gross": -0.024,
+    "net2": -0.096,
+    "median": -0.032,
+    "total": -27.27,
+    "win": 0.451,
+    "months": 66,
+    "t": -3.77,
+    "tGross": -1.53,
+    "t2": -5.91,
+    "stops": 20,
+    "medR0pip": 46.6
+   },
+   "oos": {
+    "n": 460,
+    "net": -0.055,
+    "gross": -0.017,
+    "net2": -0.093,
+    "median": -0.056,
+    "total": -25.29,
+    "win": 0.446,
+    "months": 65,
+    "t": -3.07,
+    "tGross": -0.97,
+    "t2": -5.07,
+    "stops": 14,
+    "medR0pip": 43.8
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.038,
+    "p95": -0.011,
+    "min": -0.084,
+    "max": 0.001,
+    "rank": 7,
+    "beats": false
+   },
+   "p": 0.99893,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": false,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  },
+  "usdjpy": {
+   "is": {
+    "n": 423,
+    "net": -0.034,
+    "gross": -0.002,
+    "net2": -0.067,
+    "median": -0.018,
+    "total": -14.43,
+    "win": 0.482,
+    "months": 66,
+    "t": -1.68,
+    "tGross": -0.08,
+    "t2": -3.23,
+    "stops": 13,
+    "medR0pip": 57
+   },
+   "oos": {
+    "n": 409,
+    "net": -0.009,
+    "gross": 0.015,
+    "net2": -0.034,
+    "median": -0.014,
+    "total": -3.79,
+    "win": 0.484,
+    "months": 65,
+    "t": -0.36,
+    "tGross": 0.6,
+    "t2": -1.29,
+    "stops": 9,
+    "medR0pip": 95.9
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.019,
+    "p95": 0.019,
+    "min": -0.059,
+    "max": 0.025,
+    "rank": 27,
+    "beats": false
+   },
+   "p": 0.64058,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": false,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  },
+  "usdcad": {
+   "is": {
+    "n": 227,
+    "net": -0.022,
+    "gross": 0.017,
+    "net2": -0.061,
+    "median": -0.027,
+    "total": -5.06,
+    "win": 0.48,
+    "months": 66,
+    "t": -0.6,
+    "tGross": 0.44,
+    "t2": -1.66,
+    "stops": 16,
+    "medR0pip": 50.6
+   },
+   "oos": {
+    "n": 247,
+    "net": -0.105,
+    "gross": -0.061,
+    "net2": -0.149,
+    "median": -0.067,
+    "total": -26,
+    "win": 0.437,
+    "months": 65,
+    "t": -2.89,
+    "tGross": -1.68,
+    "t2": -4.05,
+    "stops": 20,
+    "medR0pip": 43.9
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.037,
+    "p95": 0.029,
+    "min": -0.109,
+    "max": 0.07,
+    "rank": 1,
+    "beats": false
+   },
+   "p": 0.99807,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": false,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  },
+  "usdchf": {
+   "is": {
+    "n": 175,
+    "net": -0.034,
+    "gross": 0.013,
+    "net2": -0.081,
+    "median": -0.024,
+    "total": -6.01,
+    "win": 0.469,
+    "months": 66,
+    "t": -0.66,
+    "tGross": 0.24,
+    "t2": -1.58,
+    "stops": 20,
+    "medR0pip": 38.3
+   },
+   "oos": {
+    "n": 237,
+    "net": -0.026,
+    "gross": 0.02,
+    "net2": -0.072,
+    "median": -0.076,
+    "total": -6.21,
+    "win": 0.468,
+    "months": 65,
+    "t": -0.64,
+    "tGross": 0.48,
+    "t2": -1.77,
+    "stops": 31,
+    "medR0pip": 38
+   },
+   "placebo": {
+    "seeds": 40,
+    "mean": -0.055,
+    "p95": 0,
+    "min": -0.141,
+    "max": 0.029,
+    "rank": 30,
+    "beats": false
+   },
+   "p": 0.73891,
+   "tests": {
+    "OOS month-sum t >= 2 (net)": false,
+    "IS net R a trade > 0": false,
+    "OOS net R a trade > 0 at 2x costs": false,
+    "beats the placebo 95th percentile": false
+   },
+   "pHolm": 1,
+   "verdict": "FAIL"
+  }
+ },
+ "years": {
+  "2016": {
+   "n": 409,
+   "net": 0.001,
+   "gross": 0.028,
+   "total": 0.53
+  },
+  "2017": {
+   "n": 380,
+   "net": -0.034,
+   "gross": 0.001,
+   "total": -12.75
+  },
+  "2018": {
+   "n": 425,
+   "net": -0.039,
+   "gross": -0.001,
+   "total": -16.75
+  },
+  "2019": {
+   "n": 349,
+   "net": -0.035,
+   "gross": 0.009,
+   "total": -12.18
+  },
+  "2020": {
+   "n": 428,
+   "net": -0.048,
+   "gross": -0.013,
+   "total": -20.43
+  },
+  "2021": {
+   "n": 411,
+   "net": -0.057,
+   "gross": -0.014,
+   "total": -23.28
+  },
+  "2022": {
+   "n": 412,
+   "net": 0.012,
+   "gross": 0.042,
+   "total": 5.13
+  },
+  "2023": {
+   "n": 389,
+   "net": -0.031,
+   "gross": 0.002,
+   "total": -12.17
+  },
+  "2024": {
+   "n": 378,
+   "net": -0.077,
+   "gross": -0.039,
+   "total": -29.21
+  },
+  "2025": {
+   "n": 462,
+   "net": -0.059,
+   "gross": -0.023,
+   "total": -27.11
+  },
+  "2026": {
+   "n": 390,
+   "net": -0.071,
+   "gross": -0.029,
+   "total": -27.82
+  }
+ },
+ "verdict": "FAIL: the pool made -0.048R a trade net out of sample (n 2250, month-sum t -3.24; gross -0.011R, at 2x costs -0.085R), in sample -0.031R (n 2183, t -2.58); placebo 95th percentile -0.022R (real above 4 of 40). Best pair out of sample usdjpy -0.009R (n 409, t -0.36, Holm p 1); 0 of 7 pairs pass on their own.",
+ "candidates": [
+  {
+   "rule": "Fade a 00:00-07:00 UTC move over 0.3 x ATR20 at the 07:00 UTC open, stop one Asia range past the Asia extreme, exit 12:00 UTC (pool of seven majors)",
+   "verdict": "FAIL",
+   "is": {
+    "n": 2183,
+    "net": -0.031,
+    "gross": 0.005,
+    "net2": -0.067,
+    "median": -0.024,
+    "total": -68.25,
+    "win": 0.471,
+    "months": 66,
+    "t": -2.58,
+    "tGross": 0.37,
+    "t2": -5.6,
+    "stops": 121,
+    "medR0pip": 50.9
+   },
+   "oos": {
+    "n": 2250,
+    "net": -0.048,
+    "gross": -0.011,
+    "net2": -0.085,
+    "median": -0.048,
+    "total": -107.79,
+    "win": 0.457,
+    "months": 65,
+    "t": -3.24,
+    "tGross": -0.77,
+    "t2": -5.63,
+    "stops": 139,
+    "medR0pip": 49.55
+   }
+  },
+  {
+   "rule": "same rule, eurusd alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 219,
+    "net": -0.012,
+    "gross": 0.028,
+    "net2": -0.052,
+    "median": -0.048,
+    "total": -2.57,
+    "win": 0.452,
+    "months": 66,
+    "t": -0.35,
+    "tGross": 0.82,
+    "t2": -1.51,
+    "stops": 13,
+    "medR0pip": 46
+   },
+   "oos": {
+    "n": 220,
+    "net": -0.052,
+    "gross": -0.01,
+    "net2": -0.094,
+    "median": -0.033,
+    "total": -11.42,
+    "win": 0.455,
+    "months": 65,
+    "t": -1.49,
+    "tGross": -0.28,
+    "t2": -2.67,
+    "stops": 25,
+    "medR0pip": 46.8
+   }
+  },
+  {
+   "rule": "same rule, gbpusd alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 208,
+    "net": 0.02,
+    "gross": 0.049,
+    "net2": -0.01,
+    "median": 0.036,
+    "total": 4.14,
+    "win": 0.529,
+    "months": 66,
+    "t": 0.45,
+    "tGross": 1.11,
+    "t2": -0.22,
+    "stops": 22,
+    "medR0pip": 66.15
+   },
+   "oos": {
+    "n": 231,
+    "net": -0.05,
+    "gross": -0.016,
+    "net2": -0.085,
+    "median": -0.021,
+    "total": -11.66,
+    "win": 0.481,
+    "months": 65,
+    "t": -1.39,
+    "tGross": -0.44,
+    "t2": -2.3,
+    "stops": 28,
+    "medR0pip": 56.8
+   }
+  },
+  {
+   "rule": "same rule, audusd alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 479,
+    "net": -0.036,
+    "gross": -0.002,
+    "net2": -0.07,
+    "median": -0.027,
+    "total": -17.04,
+    "win": 0.459,
+    "months": 66,
+    "t": -2.22,
+    "tGross": -0.1,
+    "t2": -4.28,
+    "stops": 17,
+    "medR0pip": 51.4
+   },
+   "oos": {
+    "n": 446,
+    "net": -0.052,
+    "gross": -0.017,
+    "net2": -0.088,
+    "median": -0.058,
+    "total": -23.41,
+    "win": 0.437,
+    "months": 65,
+    "t": -2.93,
+    "tGross": -0.93,
+    "t2": -4.88,
+    "stops": 12,
+    "medR0pip": 48.35
+   }
+  },
+  {
+   "rule": "same rule, nzdusd alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 452,
+    "net": -0.06,
+    "gross": -0.024,
+    "net2": -0.096,
+    "median": -0.032,
+    "total": -27.27,
+    "win": 0.451,
+    "months": 66,
+    "t": -3.77,
+    "tGross": -1.53,
+    "t2": -5.91,
+    "stops": 20,
+    "medR0pip": 46.6
+   },
+   "oos": {
+    "n": 460,
+    "net": -0.055,
+    "gross": -0.017,
+    "net2": -0.093,
+    "median": -0.056,
+    "total": -25.29,
+    "win": 0.446,
+    "months": 65,
+    "t": -3.07,
+    "tGross": -0.97,
+    "t2": -5.07,
+    "stops": 14,
+    "medR0pip": 43.8
+   }
+  },
+  {
+   "rule": "same rule, usdjpy alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 423,
+    "net": -0.034,
+    "gross": -0.002,
+    "net2": -0.067,
+    "median": -0.018,
+    "total": -14.43,
+    "win": 0.482,
+    "months": 66,
+    "t": -1.68,
+    "tGross": -0.08,
+    "t2": -3.23,
+    "stops": 13,
+    "medR0pip": 57
+   },
+   "oos": {
+    "n": 409,
+    "net": -0.009,
+    "gross": 0.015,
+    "net2": -0.034,
+    "median": -0.014,
+    "total": -3.79,
+    "win": 0.484,
+    "months": 65,
+    "t": -0.36,
+    "tGross": 0.6,
+    "t2": -1.29,
+    "stops": 9,
+    "medR0pip": 95.9
+   }
+  },
+  {
+   "rule": "same rule, usdcad alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 227,
+    "net": -0.022,
+    "gross": 0.017,
+    "net2": -0.061,
+    "median": -0.027,
+    "total": -5.06,
+    "win": 0.48,
+    "months": 66,
+    "t": -0.6,
+    "tGross": 0.44,
+    "t2": -1.66,
+    "stops": 16,
+    "medR0pip": 50.6
+   },
+   "oos": {
+    "n": 247,
+    "net": -0.105,
+    "gross": -0.061,
+    "net2": -0.149,
+    "median": -0.067,
+    "total": -26,
+    "win": 0.437,
+    "months": 65,
+    "t": -2.89,
+    "tGross": -1.68,
+    "t2": -4.05,
+    "stops": 20,
+    "medR0pip": 43.9
+   }
+  },
+  {
+   "rule": "same rule, usdchf alone",
+   "verdict": "FAIL",
+   "is": {
+    "n": 175,
+    "net": -0.034,
+    "gross": 0.013,
+    "net2": -0.081,
+    "median": -0.024,
+    "total": -6.01,
+    "win": 0.469,
+    "months": 66,
+    "t": -0.66,
+    "tGross": 0.24,
+    "t2": -1.58,
+    "stops": 20,
+    "medR0pip": 38.3
+   },
+   "oos": {
+    "n": 237,
+    "net": -0.026,
+    "gross": 0.02,
+    "net2": -0.072,
+    "median": -0.076,
+    "total": -6.21,
+    "win": 0.468,
+    "months": 65,
+    "t": -0.64,
+    "tGross": 0.48,
+    "t2": -1.77,
+    "stops": 31,
+    "medR0pip": 38
+   }
+  }
+ ],
+ "reading": [
+  "Written after the run. There is no reversal to trade: before any cost the pooled fade made +0.005R a trade in sample (t 0.37) and -0.011R out of sample (t -0.77); the costs (0.3 pip spread, commission, 1 pip of slippage, about 0.035-0.04R on a median 50-pip stop) turn both clearly negative.",
+  "The real fade sits close to a random-direction entry on the same days with the same stop: -0.048R against a placebo mean of -0.037R and a 95th percentile of -0.022R (above 4 of 40 seeds). The direction chosen from the Asian move adds nothing.",
+  "No pair works alone: every pair is negative net out of sample, USD/JPY nearest to flat (-0.009R, t -0.36, gross +0.015R); USD/CAD worst (-0.105R, t -2.89). USD/CHF lost 200 days to missing Asian candles (thin night hours on OANDA), counted in the funnel.",
+  "The wide stop (one Asia range past the extreme) is rarely hit (121 + 139 stops in 4,433 trades): almost every trade ends at 12:00 UTC, so the result is the London morning's drift against the Asian move, which is about zero.",
+  "Not an edge. No proposal is written; nothing live changes. Other k, entry or exit times were not tried and must not be tried on this data without a new pre-registration."
+ ]
+}

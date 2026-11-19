@@ -1,0 +1,2213 @@
+{
+ "study": "gold-record-high",
+ "built": "2026-11-14",
+ "dataCommit": "389931b46",
+ "params": {
+  "ATR_N": 20,
+  "ATR_MULT": 3,
+  "HOLD": 20,
+  "H52": 252,
+  "PRIOR_RECORD": 850,
+  "GAP": 60,
+  "SPREAD": 0.3,
+  "SLIP": 0.15,
+  "SEEDS": 40,
+  "IS": {
+   "from": "2008-01",
+   "to": "2016-12"
+  },
+  "OOS": {
+   "from": "2017-01",
+   "to": "2026-10"
+  }
+ },
+ "fin": 0.000148,
+ "verdict": "FAIL",
+ "headline": "FAIL: long 20 days after an all-time closing high made +0.319R a trade net 2017-26 (n 17, month t 0.93); 0 of 3 tests pass",
+ "tests": [
+  {
+   "id": "T1",
+   "name": "Long after an all-time closing high (primary)",
+   "sig": "ath",
+   "side": 1,
+   "is": {
+    "trades": 16,
+    "months": 108,
+    "won": 0.625,
+    "stopped": 0.188,
+    "grossR": 0.659,
+    "netR": 0.563,
+    "costR": 0.011,
+    "finR": 0.085,
+    "monthGross": 0.098,
+    "monthGrossT": 2.09,
+    "monthNet": 0.083,
+    "monthNetT": 1.87,
+    "totalNet": 9,
+    "worstDD": -1.81
+   },
+   "oos": {
+    "trades": 17,
+    "months": 118,
+    "won": 0.588,
+    "stopped": 0.353,
+    "grossR": 0.412,
+    "netR": 0.319,
+    "costR": 0.006,
+    "finR": 0.088,
+    "monthGross": 0.059,
+    "monthGrossT": 1.15,
+    "monthNet": 0.046,
+    "monthNetT": 0.93,
+    "totalNet": 5.42,
+    "worstDD": -2.91,
+    "x2Net": 0.032,
+    "x2T": 0.68
+   },
+   "pOne": 0.176,
+   "placebo": {
+    "p5": 0.9,
+    "p50": 1.56,
+    "p95": 2.22,
+    "max": 2.34,
+    "atOrAbove": 37
+   },
+   "years": {
+    "2008": {
+     "n": 2,
+     "gross": 2.69,
+     "net": 2.51
+    },
+    "2009": {
+     "n": 3,
+     "gross": 3.17,
+     "net": 2.85
+    },
+    "2010": {
+     "n": 6,
+     "gross": -0.24,
+     "net": -0.75
+    },
+    "2011": {
+     "n": 5,
+     "gross": 4.93,
+     "net": 4.39
+    },
+    "2020": {
+     "n": 1,
+     "gross": -1,
+     "net": -1.07
+    },
+    "2023": {
+     "n": 1,
+     "gross": -1,
+     "net": -1.04
+    },
+    "2024": {
+     "n": 8,
+     "gross": 1.04,
+     "net": 0.23
+    },
+    "2025": {
+     "n": 6,
+     "gross": 6.27,
+     "net": 5.67
+    },
+    "2026": {
+     "n": 1,
+     "gross": 1.7,
+     "net": 1.62
+    }
+   },
+   "trades": [
+    {
+     "signal": "2008-01-02",
+     "exitMonth": "2008-01",
+     "entry": 857.11,
+     "stop": 815.16,
+     "exit": 926.6,
+     "how": "time",
+     "gross": 1.657,
+     "net": 1.558
+    },
+    {
+     "signal": "2008-02-19",
+     "exitMonth": "2008-03",
+     "entry": 929.31,
+     "stop": 874.61,
+     "exit": 985.8,
+     "how": "time",
+     "gross": 1.033,
+     "net": 0.951
+    },
+    {
+     "signal": "2009-09-11",
+     "exitMonth": "2009-10",
+     "entry": 1005.16,
+     "stop": 961.27,
+     "exit": 1049.3,
+     "how": "time",
+     "gross": 1.006,
+     "net": 0.897
+    },
+    {
+     "signal": "2009-10-12",
+     "exitMonth": "2009-11",
+     "entry": 1054.74,
+     "stop": 1008.58,
+     "exit": 1104.51,
+     "how": "time",
+     "gross": 1.078,
+     "net": 0.97
+    },
+    {
+     "signal": "2009-11-09",
+     "exitMonth": "2009-12",
+     "entry": 1104.46,
+     "stop": 1053.87,
+     "exit": 1159.29,
+     "how": "time",
+     "gross": 1.084,
+     "net": 0.982
+    },
+    {
+     "signal": "2010-05-11",
+     "exitMonth": "2010-05",
+     "entry": 1229.99,
+     "stop": 1169.39,
+     "exit": 1169.39,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.043
+    },
+    {
+     "signal": "2010-06-07",
+     "exitMonth": "2010-07",
+     "entry": 1239.4,
+     "stop": 1174.8,
+     "exit": 1209.42,
+     "how": "time",
+     "gross": -0.464,
+     "net": -0.553
+    },
+    {
+     "signal": "2010-09-14",
+     "exitMonth": "2010-10",
+     "entry": 1268.6,
+     "stop": 1229.55,
+     "exit": 1351.79,
+     "how": "time",
+     "gross": 2.13,
+     "net": 1.98
+    },
+    {
+     "signal": "2010-10-13",
+     "exitMonth": "2010-10",
+     "entry": 1373.27,
+     "stop": 1324.66,
+     "exit": 1324.66,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.042
+    },
+    {
+     "signal": "2010-11-04",
+     "exitMonth": "2010-12",
+     "entry": 1387.11,
+     "stop": 1317.44,
+     "exit": 1386.64,
+     "how": "time",
+     "gross": -0.007,
+     "net": -0.098
+    },
+    {
+     "signal": "2010-12-03",
+     "exitMonth": "2010-12",
+     "entry": 1414.43,
+     "stop": 1344.28,
+     "exit": 1421.46,
+     "how": "time",
+     "gross": 0.1,
+     "net": 0.008
+    },
+    {
+     "signal": "2011-03-01",
+     "exitMonth": "2011-03",
+     "entry": 1433.72,
+     "stop": 1384.54,
+     "exit": 1384.54,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.068
+    },
+    {
+     "signal": "2011-03-23",
+     "exitMonth": "2011-04",
+     "entry": 1438.09,
+     "stop": 1380.21,
+     "exit": 1501.37,
+     "how": "time",
+     "gross": 1.093,
+     "net": 0.98
+    },
+    {
+     "signal": "2011-04-20",
+     "exitMonth": "2011-05",
+     "entry": 1501.35,
+     "stop": 1448.61,
+     "exit": 1496.13,
+     "how": "time",
+     "gross": -0.099,
+     "net": -0.228
+    },
+    {
+     "signal": "2011-07-12",
+     "exitMonth": "2011-08",
+     "entry": 1567.49,
+     "stop": 1512.05,
+     "exit": 1763.86,
+     "how": "time",
+     "gross": 3.542,
+     "net": 3.414
+    },
+    {
+     "signal": "2011-08-09",
+     "exitMonth": "2011-09",
+     "entry": 1763.9,
+     "stop": 1682.87,
+     "exit": 1876.49,
+     "how": "time",
+     "gross": 1.39,
+     "net": 1.292
+    },
+    {
+     "signal": "2020-07-27",
+     "exitMonth": "2020-08",
+     "entry": 1965.15,
+     "stop": 1894.7,
+     "exit": 1894.7,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.07
+    },
+    {
+     "signal": "2023-12-01",
+     "exitMonth": "2023-12",
+     "entry": 2073.55,
+     "stop": 2008.34,
+     "exit": 2008.34,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.037
+    },
+    {
+     "signal": "2023-12-27",
+     "exitMonth": "2024-01",
+     "entry": 2079.69,
+     "stop": 1989.04,
+     "exit": 2016.41,
+     "how": "time",
+     "gross": -0.698,
+     "net": -0.8
+    },
+    {
+     "signal": "2024-03-01",
+     "exitMonth": "2024-04",
+     "entry": 2082.9,
+     "stop": 2023.04,
+     "exit": 2249.06,
+     "how": "time",
+     "gross": 2.776,
+     "net": 2.617
+    },
+    {
+     "signal": "2024-04-01",
+     "exitMonth": "2024-04",
+     "entry": 2249.05,
+     "stop": 2156.43,
+     "exit": 2333.19,
+     "how": "time",
+     "gross": 0.908,
+     "net": 0.801
+    },
+    {
+     "signal": "2024-05-17",
+     "exitMonth": "2024-06",
+     "entry": 2425.2,
+     "stop": 2314.76,
+     "exit": 2314.76,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.07
+    },
+    {
+     "signal": "2024-07-16",
+     "exitMonth": "2024-07",
+     "entry": 2468.36,
+     "stop": 2376.63,
+     "exit": 2376.63,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.046
+    },
+    {
+     "signal": "2024-08-12",
+     "exitMonth": "2024-09",
+     "entry": 2475.57,
+     "stop": 2351.16,
+     "exit": 2506.84,
+     "how": "time",
+     "gross": 0.251,
+     "net": 0.164
+    },
+    {
+     "signal": "2024-09-12",
+     "exitMonth": "2024-10",
+     "entry": 2558.57,
+     "stop": 2465.31,
+     "exit": 2633.24,
+     "how": "time",
+     "gross": 0.801,
+     "net": 0.681
+    },
+    {
+     "signal": "2024-10-16",
+     "exitMonth": "2024-11",
+     "entry": 2674.19,
+     "stop": 2579.86,
+     "exit": 2579.86,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.111
+    },
+    {
+     "signal": "2025-01-30",
+     "exitMonth": "2025-02",
+     "entry": 2796.34,
+     "stop": 2707.88,
+     "exit": 2875.89,
+     "how": "time",
+     "gross": 0.899,
+     "net": 0.762
+    },
+    {
+     "signal": "2025-03-13",
+     "exitMonth": "2025-04",
+     "entry": 2986.46,
+     "stop": 2861.92,
+     "exit": 3189.11,
+     "how": "time",
+     "gross": 1.627,
+     "net": 1.523
+    },
+    {
+     "signal": "2025-04-10",
+     "exitMonth": "2025-05",
+     "entry": 3189.11,
+     "stop": 3019.23,
+     "exit": 3325.39,
+     "how": "time",
+     "gross": 0.802,
+     "net": 0.718
+    },
+    {
+     "signal": "2025-08-29",
+     "exitMonth": "2025-09",
+     "entry": 3445.43,
+     "stop": 3336.3,
+     "exit": 3759.86,
+     "how": "time",
+     "gross": 2.881,
+     "net": 2.745
+    },
+    {
+     "signal": "2025-09-29",
+     "exitMonth": "2025-10",
+     "entry": 3832.97,
+     "stop": 3676.86,
+     "exit": 3998.66,
+     "how": "time",
+     "gross": 1.061,
+     "net": 0.956
+    },
+    {
+     "signal": "2025-12-22",
+     "exitMonth": "2025-12",
+     "entry": 4460.1,
+     "stop": 4278.65,
+     "exit": 4278.65,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.032
+    },
+    {
+     "signal": "2026-01-12",
+     "exitMonth": "2026-02",
+     "entry": 4599.58,
+     "stop": 4345.5,
+     "exit": 5032,
+     "how": "time",
+     "gross": 1.702,
+     "net": 1.625
+    }
+   ],
+   "holmP": 0.352,
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": true,
+    "x2Positive": true
+   },
+   "pass": false
+  },
+  {
+   "id": "T2",
+   "name": "Long after a 52-week closing high",
+   "sig": "h52",
+   "side": 1,
+   "is": {
+    "trades": 22,
+    "months": 108,
+    "won": 0.545,
+    "stopped": 0.227,
+    "grossR": 0.407,
+    "netR": 0.315,
+    "costR": 0.011,
+    "finR": 0.081,
+    "monthGross": 0.083,
+    "monthGrossT": 1.73,
+    "monthNet": 0.064,
+    "monthNetT": 1.39,
+    "totalNet": 6.93,
+    "worstDD": -1.81
+   },
+   "oos": {
+    "trades": 30,
+    "months": 118,
+    "won": 0.567,
+    "stopped": 0.3,
+    "grossR": 0.388,
+    "netR": 0.285,
+    "costR": 0.008,
+    "finR": 0.095,
+    "monthGross": 0.099,
+    "monthGrossT": 1.58,
+    "monthNet": 0.073,
+    "monthNetT": 1.21,
+    "totalNet": 8.56,
+    "worstDD": -2.91,
+    "x2Net": 0.046,
+    "x2T": 0.8
+   },
+   "pOne": 0.113,
+   "placebo": {
+    "p5": 0.54,
+    "p50": 1.33,
+    "p95": 2.51,
+    "max": 2.79,
+    "atOrAbove": 24
+   },
+   "years": {
+    "2008": {
+     "n": 3,
+     "gross": 1.63,
+     "net": 1.38
+    },
+    "2009": {
+     "n": 4,
+     "gross": 2.43,
+     "net": 2.09
+    },
+    "2010": {
+     "n": 6,
+     "gross": -0.24,
+     "net": -0.75
+    },
+    "2011": {
+     "n": 5,
+     "gross": 4.93,
+     "net": 4.39
+    },
+    "2016": {
+     "n": 4,
+     "gross": 0.21,
+     "net": -0.18
+    },
+    "2017": {
+     "n": 1,
+     "gross": -1,
+     "net": -1.07
+    },
+    "2018": {
+     "n": 1,
+     "gross": -1,
+     "net": -1.07
+    },
+    "2019": {
+     "n": 3,
+     "gross": 2.44,
+     "net": 2.08
+    },
+    "2020": {
+     "n": 6,
+     "gross": 3.71,
+     "net": 2.95
+    },
+    "2022": {
+     "n": 1,
+     "gross": 0.39,
+     "net": 0.26
+    },
+    "2023": {
+     "n": 3,
+     "gross": -1.91,
+     "net": -2.11
+    },
+    "2024": {
+     "n": 8,
+     "gross": 1.04,
+     "net": 0.23
+    },
+    "2025": {
+     "n": 6,
+     "gross": 6.27,
+     "net": 5.67
+    },
+    "2026": {
+     "n": 1,
+     "gross": 1.7,
+     "net": 1.62
+    }
+   },
+   "trades": [
+    {
+     "signal": "2007-09-06",
+     "exitMonth": "2007-10",
+     "entry": 694.8,
+     "stop": 666.75,
+     "exit": 735.9,
+     "how": "time",
+     "gross": 1.465,
+     "net": 1.341
+    },
+    {
+     "signal": "2007-10-11",
+     "exitMonth": "2007-11",
+     "entry": 749.11,
+     "stop": 711.4,
+     "exit": 835.6,
+     "how": "time",
+     "gross": 2.294,
+     "net": 2.195
+    },
+    {
+     "signal": "2007-11-08",
+     "exitMonth": "2007-11",
+     "entry": 835.6,
+     "stop": 791.14,
+     "exit": 791.14,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.016
+    },
+    {
+     "signal": "2007-12-28",
+     "exitMonth": "2008-01",
+     "entry": 840.78,
+     "stop": 797.1,
+     "exit": 913.9,
+     "how": "time",
+     "gross": 1.674,
+     "net": 1.581
+    },
+    {
+     "signal": "2008-01-28",
+     "exitMonth": "2008-02",
+     "entry": 927.22,
+     "stop": 864.82,
+     "exit": 938.4,
+     "how": "time",
+     "gross": 0.179,
+     "net": 0.108
+    },
+    {
+     "signal": "2008-02-26",
+     "exitMonth": "2008-03",
+     "entry": 950.7,
+     "stop": 894.04,
+     "exit": 937.9,
+     "how": "time",
+     "gross": -0.226,
+     "net": -0.306
+    },
+    {
+     "signal": "2009-09-04",
+     "exitMonth": "2009-10",
+     "entry": 994.01,
+     "stop": 951.12,
+     "exit": 1002.83,
+     "how": "time",
+     "gross": 0.206,
+     "net": 0.096
+    },
+    {
+     "signal": "2009-10-06",
+     "exitMonth": "2009-11",
+     "entry": 1039.03,
+     "stop": 991.04,
+     "exit": 1082.39,
+     "how": "time",
+     "gross": 0.904,
+     "net": 0.801
+    },
+    {
+     "signal": "2009-11-03",
+     "exitMonth": "2009-12",
+     "entry": 1082.36,
+     "stop": 1032.92,
+     "exit": 1197.22,
+     "how": "time",
+     "gross": 2.323,
+     "net": 2.22
+    },
+    {
+     "signal": "2009-12-01",
+     "exitMonth": "2009-12",
+     "entry": 1197.26,
+     "stop": 1138.49,
+     "exit": 1138.49,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.025
+    },
+    {
+     "signal": "2010-05-11",
+     "exitMonth": "2010-05",
+     "entry": 1229.99,
+     "stop": 1169.39,
+     "exit": 1169.39,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.043
+    },
+    {
+     "signal": "2010-06-07",
+     "exitMonth": "2010-07",
+     "entry": 1239.4,
+     "stop": 1174.8,
+     "exit": 1209.42,
+     "how": "time",
+     "gross": -0.464,
+     "net": -0.553
+    },
+    {
+     "signal": "2010-09-14",
+     "exitMonth": "2010-10",
+     "entry": 1268.6,
+     "stop": 1229.55,
+     "exit": 1351.79,
+     "how": "time",
+     "gross": 2.13,
+     "net": 1.98
+    },
+    {
+     "signal": "2010-10-13",
+     "exitMonth": "2010-10",
+     "entry": 1373.27,
+     "stop": 1324.66,
+     "exit": 1324.66,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.042
+    },
+    {
+     "signal": "2010-11-04",
+     "exitMonth": "2010-12",
+     "entry": 1387.11,
+     "stop": 1317.44,
+     "exit": 1386.64,
+     "how": "time",
+     "gross": -0.007,
+     "net": -0.098
+    },
+    {
+     "signal": "2010-12-03",
+     "exitMonth": "2010-12",
+     "entry": 1414.43,
+     "stop": 1344.28,
+     "exit": 1421.46,
+     "how": "time",
+     "gross": 0.1,
+     "net": 0.008
+    },
+    {
+     "signal": "2011-03-01",
+     "exitMonth": "2011-03",
+     "entry": 1433.72,
+     "stop": 1384.54,
+     "exit": 1384.54,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.068
+    },
+    {
+     "signal": "2011-03-23",
+     "exitMonth": "2011-04",
+     "entry": 1438.09,
+     "stop": 1380.21,
+     "exit": 1501.37,
+     "how": "time",
+     "gross": 1.093,
+     "net": 0.98
+    },
+    {
+     "signal": "2011-04-20",
+     "exitMonth": "2011-05",
+     "entry": 1501.35,
+     "stop": 1448.61,
+     "exit": 1496.13,
+     "how": "time",
+     "gross": -0.099,
+     "net": -0.228
+    },
+    {
+     "signal": "2011-07-12",
+     "exitMonth": "2011-08",
+     "entry": 1567.49,
+     "stop": 1512.05,
+     "exit": 1763.86,
+     "how": "time",
+     "gross": 3.542,
+     "net": 3.414
+    },
+    {
+     "signal": "2011-08-09",
+     "exitMonth": "2011-09",
+     "entry": 1763.9,
+     "stop": 1682.87,
+     "exit": 1876.49,
+     "how": "time",
+     "gross": 1.39,
+     "net": 1.292
+    },
+    {
+     "signal": "2016-02-11",
+     "exitMonth": "2016-03",
+     "entry": 1240.36,
+     "stop": 1184.51,
+     "exit": 1271.19,
+     "how": "time",
+     "gross": 0.552,
+     "net": 0.449
+    },
+    {
+     "signal": "2016-03-10",
+     "exitMonth": "2016-04",
+     "entry": 1271.09,
+     "stop": 1196.2,
+     "exit": 1239.54,
+     "how": "time",
+     "gross": -0.421,
+     "net": -0.502
+    },
+    {
+     "signal": "2016-04-29",
+     "exitMonth": "2016-05",
+     "entry": 1291.16,
+     "stop": 1234.98,
+     "exit": 1234.98,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.086
+    },
+    {
+     "signal": "2016-06-15",
+     "exitMonth": "2016-07",
+     "entry": 1293.65,
+     "stop": 1245.19,
+     "exit": 1345.91,
+     "how": "time",
+     "gross": 1.078,
+     "net": 0.955
+    },
+    {
+     "signal": "2017-09-05",
+     "exitMonth": "2017-09",
+     "entry": 1341.76,
+     "stop": 1296.2,
+     "exit": 1296.2,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.074
+    },
+    {
+     "signal": "2018-01-24",
+     "exitMonth": "2018-02",
+     "entry": 1356.16,
+     "stop": 1318.52,
+     "exit": 1318.52,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.075
+    },
+    {
+     "signal": "2019-06-13",
+     "exitMonth": "2019-07",
+     "entry": 1344.53,
+     "stop": 1309.48,
+     "exit": 1404.04,
+     "how": "time",
+     "gross": 1.698,
+     "net": 1.522
+    },
+    {
+     "signal": "2019-07-18",
+     "exitMonth": "2019-08",
+     "entry": 1442.99,
+     "stop": 1370.01,
+     "exit": 1526.65,
+     "how": "time",
+     "gross": 1.146,
+     "net": 1.056
+    },
+    {
+     "signal": "2019-08-15",
+     "exitMonth": "2019-09",
+     "entry": 1526.61,
+     "stop": 1455.34,
+     "exit": 1497.95,
+     "how": "time",
+     "gross": -0.402,
+     "net": -0.499
+    },
+    {
+     "signal": "2020-01-03",
+     "exitMonth": "2020-01",
+     "entry": 1560.85,
+     "stop": 1528.83,
+     "exit": 1589.98,
+     "how": "time",
+     "gross": 0.909,
+     "net": 0.689
+    },
+    {
+     "signal": "2020-02-18",
+     "exitMonth": "2020-03",
+     "entry": 1600.91,
+     "stop": 1554.83,
+     "exit": 1554.83,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.142
+    },
+    {
+     "signal": "2020-04-09",
+     "exitMonth": "2020-05",
+     "entry": 1688.23,
+     "stop": 1533.52,
+     "exit": 1702.39,
+     "how": "time",
+     "gross": 0.091,
+     "net": 0.042
+    },
+    {
+     "signal": "2020-05-14",
+     "exitMonth": "2020-06",
+     "entry": 1733.18,
+     "stop": 1649.56,
+     "exit": 1726.88,
+     "how": "time",
+     "gross": -0.075,
+     "net": -0.168
+    },
+    {
+     "signal": "2020-06-22",
+     "exitMonth": "2020-07",
+     "entry": 1755.38,
+     "stop": 1680.74,
+     "exit": 1818.13,
+     "how": "time",
+     "gross": 0.841,
+     "net": 0.735
+    },
+    {
+     "signal": "2020-07-20",
+     "exitMonth": "2020-08",
+     "entry": 1818.18,
+     "stop": 1761.91,
+     "exit": 1983.75,
+     "how": "time",
+     "gross": 2.942,
+     "net": 2.798
+    },
+    {
+     "signal": "2022-02-21",
+     "exitMonth": "2022-03",
+     "entry": 1909.53,
+     "stop": 1841.93,
+     "exit": 1935.71,
+     "how": "time",
+     "gross": 0.387,
+     "net": 0.261
+    },
+    {
+     "signal": "2023-03-17",
+     "exitMonth": "2023-04",
+     "entry": 1986.75,
+     "stop": 1909.07,
+     "exit": 1994.05,
+     "how": "time",
+     "gross": 0.094,
+     "net": -0.024
+    },
+    {
+     "signal": "2023-05-03",
+     "exitMonth": "2023-05",
+     "entry": 2052.07,
+     "stop": 1961.31,
+     "exit": 1961.31,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.053
+    },
+    {
+     "signal": "2023-12-01",
+     "exitMonth": "2023-12",
+     "entry": 2073.55,
+     "stop": 2008.34,
+     "exit": 2008.34,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.037
+    },
+    {
+     "signal": "2023-12-27",
+     "exitMonth": "2024-01",
+     "entry": 2079.69,
+     "stop": 1989.04,
+     "exit": 2016.41,
+     "how": "time",
+     "gross": -0.698,
+     "net": -0.8
+    },
+    {
+     "signal": "2024-03-01",
+     "exitMonth": "2024-04",
+     "entry": 2082.9,
+     "stop": 2023.04,
+     "exit": 2249.06,
+     "how": "time",
+     "gross": 2.776,
+     "net": 2.617
+    },
+    {
+     "signal": "2024-04-01",
+     "exitMonth": "2024-04",
+     "entry": 2249.05,
+     "stop": 2156.43,
+     "exit": 2333.19,
+     "how": "time",
+     "gross": 0.908,
+     "net": 0.801
+    },
+    {
+     "signal": "2024-05-17",
+     "exitMonth": "2024-06",
+     "entry": 2425.2,
+     "stop": 2314.76,
+     "exit": 2314.76,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.07
+    },
+    {
+     "signal": "2024-07-16",
+     "exitMonth": "2024-07",
+     "entry": 2468.36,
+     "stop": 2376.63,
+     "exit": 2376.63,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.046
+    },
+    {
+     "signal": "2024-08-12",
+     "exitMonth": "2024-09",
+     "entry": 2475.57,
+     "stop": 2351.16,
+     "exit": 2506.84,
+     "how": "time",
+     "gross": 0.251,
+     "net": 0.164
+    },
+    {
+     "signal": "2024-09-12",
+     "exitMonth": "2024-10",
+     "entry": 2558.57,
+     "stop": 2465.31,
+     "exit": 2633.24,
+     "how": "time",
+     "gross": 0.801,
+     "net": 0.681
+    },
+    {
+     "signal": "2024-10-16",
+     "exitMonth": "2024-11",
+     "entry": 2674.19,
+     "stop": 2579.86,
+     "exit": 2579.86,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.111
+    },
+    {
+     "signal": "2025-01-30",
+     "exitMonth": "2025-02",
+     "entry": 2796.34,
+     "stop": 2707.88,
+     "exit": 2875.89,
+     "how": "time",
+     "gross": 0.899,
+     "net": 0.762
+    },
+    {
+     "signal": "2025-03-13",
+     "exitMonth": "2025-04",
+     "entry": 2986.46,
+     "stop": 2861.92,
+     "exit": 3189.11,
+     "how": "time",
+     "gross": 1.627,
+     "net": 1.523
+    },
+    {
+     "signal": "2025-04-10",
+     "exitMonth": "2025-05",
+     "entry": 3189.11,
+     "stop": 3019.23,
+     "exit": 3325.39,
+     "how": "time",
+     "gross": 0.802,
+     "net": 0.718
+    },
+    {
+     "signal": "2025-08-29",
+     "exitMonth": "2025-09",
+     "entry": 3445.43,
+     "stop": 3336.3,
+     "exit": 3759.86,
+     "how": "time",
+     "gross": 2.881,
+     "net": 2.745
+    },
+    {
+     "signal": "2025-09-29",
+     "exitMonth": "2025-10",
+     "entry": 3832.97,
+     "stop": 3676.86,
+     "exit": 3998.66,
+     "how": "time",
+     "gross": 1.061,
+     "net": 0.956
+    },
+    {
+     "signal": "2025-12-22",
+     "exitMonth": "2025-12",
+     "entry": 4460.1,
+     "stop": 4278.65,
+     "exit": 4278.65,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.032
+    },
+    {
+     "signal": "2026-01-12",
+     "exitMonth": "2026-02",
+     "entry": 4599.58,
+     "stop": 4345.5,
+     "exit": 5032,
+     "how": "time",
+     "gross": 1.702,
+     "net": 1.625
+    }
+   ],
+   "holmP": 0.339,
+   "checks": {
+    "oosPositive": true,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": true,
+    "x2Positive": true
+   },
+   "pass": false
+  },
+  {
+   "id": "T3",
+   "name": "Short (fade) after a 52-week closing high",
+   "sig": "h52",
+   "side": -1,
+   "is": {
+    "trades": 30,
+    "months": 108,
+    "won": 0.267,
+    "stopped": 0.467,
+    "grossR": -0.29,
+    "netR": -0.301,
+    "costR": 0.011,
+    "finR": 0,
+    "monthGross": -0.081,
+    "monthGrossT": -1.51,
+    "monthNet": -0.084,
+    "monthNetT": -1.55,
+    "totalNet": -9.03,
+    "worstDD": -9.74
+   },
+   "oos": {
+    "trades": 53,
+    "months": 118,
+    "won": 0.321,
+    "stopped": 0.566,
+    "grossR": -0.396,
+    "netR": -0.404,
+    "costR": 0.007,
+    "finR": 0,
+    "monthGross": -0.178,
+    "monthGrossT": -2.43,
+    "monthNet": -0.181,
+    "monthNetT": -2.47,
+    "totalNet": -21.4,
+    "worstDD": -24.69,
+    "x2Net": -0.185,
+    "x2T": -2.5
+   },
+   "pOne": 0.993,
+   "placebo": {
+    "p5": -3.72,
+    "p50": -2.97,
+    "p95": -1.52,
+    "max": -1.33,
+    "atOrAbove": 13
+   },
+   "years": {
+    "2008": {
+     "n": 4,
+     "gross": -1.04,
+     "net": -1.09
+    },
+    "2009": {
+     "n": 5,
+     "gross": -1.43,
+     "net": -1.49
+    },
+    "2010": {
+     "n": 7,
+     "gross": -1.64,
+     "net": -1.72
+    },
+    "2011": {
+     "n": 9,
+     "gross": -4.78,
+     "net": -4.87
+    },
+    "2016": {
+     "n": 5,
+     "gross": 0.2,
+     "net": 0.15
+    },
+    "2017": {
+     "n": 1,
+     "gross": 1.52,
+     "net": 1.51
+    },
+    "2018": {
+     "n": 1,
+     "gross": 0.78,
+     "net": 0.76
+    },
+    "2019": {
+     "n": 5,
+     "gross": -2.9,
+     "net": -2.96
+    },
+    "2020": {
+     "n": 11,
+     "gross": -4.91,
+     "net": -5.03
+    },
+    "2022": {
+     "n": 2,
+     "gross": -0.31,
+     "net": -0.33
+    },
+    "2023": {
+     "n": 3,
+     "gross": -0.15,
+     "net": -0.17
+    },
+    "2024": {
+     "n": 12,
+     "gross": -4.18,
+     "net": -4.27
+    },
+    "2025": {
+     "n": 13,
+     "gross": -7.87,
+     "net": -7.93
+    },
+    "2026": {
+     "n": 5,
+     "gross": -2.97,
+     "net": -2.98
+    }
+   },
+   "trades": [
+    {
+     "signal": "2007-09-06",
+     "exitMonth": "2007-09",
+     "entry": 694.8,
+     "stop": 722.85,
+     "exit": 722.85,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.021
+    },
+    {
+     "signal": "2007-09-18",
+     "exitMonth": "2007-10",
+     "entry": 723.75,
+     "stop": 751.77,
+     "exit": 751.77,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.021
+    },
+    {
+     "signal": "2007-10-11",
+     "exitMonth": "2007-10",
+     "entry": 749.11,
+     "stop": 786.82,
+     "exit": 786.82,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.016
+    },
+    {
+     "signal": "2007-10-29",
+     "exitMonth": "2007-11",
+     "entry": 791.2,
+     "stop": 830.96,
+     "exit": 830.96,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "signal": "2007-11-07",
+     "exitMonth": "2007-12",
+     "entry": 825.25,
+     "stop": 868.33,
+     "exit": 794.05,
+     "how": "time",
+     "gross": 0.724,
+     "net": 0.71
+    },
+    {
+     "signal": "2007-12-28",
+     "exitMonth": "2008-01",
+     "entry": 840.78,
+     "stop": 884.46,
+     "exit": 884.46,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.014
+    },
+    {
+     "signal": "2008-01-10",
+     "exitMonth": "2008-02",
+     "entry": 896.08,
+     "stop": 939.66,
+     "exit": 909.45,
+     "how": "time",
+     "gross": -0.307,
+     "net": -0.321
+    },
+    {
+     "signal": "2008-02-19",
+     "exitMonth": "2008-03",
+     "entry": 929.31,
+     "stop": 984.01,
+     "exit": 984.01,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "signal": "2008-03-03",
+     "exitMonth": "2008-03",
+     "entry": 986.72,
+     "stop": 1040.11,
+     "exit": 919.14,
+     "how": "time",
+     "gross": 1.266,
+     "net": 1.255
+    },
+    {
+     "signal": "2009-09-04",
+     "exitMonth": "2009-10",
+     "entry": 994.01,
+     "stop": 1036.9,
+     "exit": 1002.83,
+     "how": "time",
+     "gross": -0.206,
+     "net": -0.22
+    },
+    {
+     "signal": "2009-10-06",
+     "exitMonth": "2009-11",
+     "entry": 1039.03,
+     "stop": 1087.02,
+     "exit": 1087.02,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "signal": "2009-11-03",
+     "exitMonth": "2009-11",
+     "entry": 1082.36,
+     "stop": 1131.8,
+     "exit": 1131.8,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "signal": "2009-11-16",
+     "exitMonth": "2009-11",
+     "entry": 1137.71,
+     "stop": 1189.25,
+     "exit": 1189.25,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "signal": "2009-11-25",
+     "exitMonth": "2009-12",
+     "entry": 1188.76,
+     "stop": 1243.38,
+     "exit": 1091.91,
+     "how": "time",
+     "gross": 1.773,
+     "net": 1.762
+    },
+    {
+     "signal": "2010-05-11",
+     "exitMonth": "2010-06",
+     "entry": 1229.99,
+     "stop": 1290.59,
+     "exit": 1237.31,
+     "how": "time",
+     "gross": -0.121,
+     "net": -0.131
+    },
+    {
+     "signal": "2010-06-17",
+     "exitMonth": "2010-07",
+     "entry": 1245.24,
+     "stop": 1298.63,
+     "exit": 1209.87,
+     "how": "time",
+     "gross": 0.663,
+     "net": 0.651
+    },
+    {
+     "signal": "2010-09-14",
+     "exitMonth": "2010-09",
+     "entry": 1268.6,
+     "stop": 1307.64,
+     "exit": 1307.64,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "signal": "2010-09-28",
+     "exitMonth": "2010-10",
+     "entry": 1309.17,
+     "stop": 1348.26,
+     "exit": 1348.26,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.015
+    },
+    {
+     "signal": "2010-10-06",
+     "exitMonth": "2010-11",
+     "entry": 1345.04,
+     "stop": 1387.59,
+     "exit": 1348.59,
+     "how": "time",
+     "gross": -0.083,
+     "net": -0.098
+    },
+    {
+     "signal": "2010-11-04",
+     "exitMonth": "2010-12",
+     "entry": 1387.11,
+     "stop": 1456.77,
+     "exit": 1386.64,
+     "how": "time",
+     "gross": 0.007,
+     "net": -0.002
+    },
+    {
+     "signal": "2010-12-03",
+     "exitMonth": "2010-12",
+     "entry": 1414.43,
+     "stop": 1484.58,
+     "exit": 1421.46,
+     "how": "time",
+     "gross": -0.1,
+     "net": -0.109
+    },
+    {
+     "signal": "2011-03-01",
+     "exitMonth": "2011-03",
+     "entry": 1433.72,
+     "stop": 1482.9,
+     "exit": 1417.33,
+     "how": "time",
+     "gross": 0.333,
+     "net": 0.321
+    },
+    {
+     "signal": "2011-04-05",
+     "exitMonth": "2011-04",
+     "entry": 1454.03,
+     "stop": 1513.23,
+     "exit": 1513.23,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "signal": "2011-04-25",
+     "exitMonth": "2011-04",
+     "entry": 1506.99,
+     "stop": 1555.73,
+     "exit": 1555.73,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "signal": "2011-04-29",
+     "exitMonth": "2011-05",
+     "entry": 1563.75,
+     "stop": 1615.87,
+     "exit": 1536.43,
+     "how": "time",
+     "gross": 0.524,
+     "net": 0.513
+    },
+    {
+     "signal": "2011-07-12",
+     "exitMonth": "2011-07",
+     "entry": 1567.49,
+     "stop": 1622.93,
+     "exit": 1622.93,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "signal": "2011-07-25",
+     "exitMonth": "2011-08",
+     "entry": 1613.98,
+     "stop": 1672.52,
+     "exit": 1672.52,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "signal": "2011-08-03",
+     "exitMonth": "2011-08",
+     "entry": 1660.4,
+     "stop": 1725.28,
+     "exit": 1725.28,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "signal": "2011-08-09",
+     "exitMonth": "2011-08",
+     "entry": 1763.9,
+     "stop": 1844.92,
+     "exit": 1844.92,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.007
+    },
+    {
+     "signal": "2011-08-19",
+     "exitMonth": "2011-09",
+     "entry": 1852.05,
+     "stop": 1964.94,
+     "exit": 1811.65,
+     "how": "time",
+     "gross": 0.358,
+     "net": 0.353
+    },
+    {
+     "signal": "2016-02-11",
+     "exitMonth": "2016-03",
+     "entry": 1240.36,
+     "stop": 1296.2,
+     "exit": 1271.19,
+     "how": "time",
+     "gross": -0.552,
+     "net": -0.563
+    },
+    {
+     "signal": "2016-03-10",
+     "exitMonth": "2016-04",
+     "entry": 1271.09,
+     "stop": 1345.98,
+     "exit": 1239.54,
+     "how": "time",
+     "gross": 0.421,
+     "net": 0.413
+    },
+    {
+     "signal": "2016-04-29",
+     "exitMonth": "2016-05",
+     "entry": 1291.16,
+     "stop": 1347.34,
+     "exit": 1213.15,
+     "how": "time",
+     "gross": 1.389,
+     "net": 1.378
+    },
+    {
+     "signal": "2016-06-15",
+     "exitMonth": "2016-06",
+     "entry": 1293.65,
+     "stop": 1342.11,
+     "exit": 1342.11,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "signal": "2016-06-24",
+     "exitMonth": "2016-07",
+     "entry": 1318.47,
+     "stop": 1385.45,
+     "exit": 1322.53,
+     "how": "time",
+     "gross": -0.061,
+     "net": -0.07
+    },
+    {
+     "signal": "2017-09-05",
+     "exitMonth": "2017-10",
+     "entry": 1341.76,
+     "stop": 1387.33,
+     "exit": 1272.5,
+     "how": "time",
+     "gross": 1.52,
+     "net": 1.507
+    },
+    {
+     "signal": "2018-01-24",
+     "exitMonth": "2018-02",
+     "entry": 1356.16,
+     "stop": 1393.8,
+     "exit": 1326.9,
+     "how": "time",
+     "gross": 0.777,
+     "net": 0.761
+    },
+    {
+     "signal": "2019-06-13",
+     "exitMonth": "2019-06",
+     "entry": 1344.53,
+     "stop": 1379.57,
+     "exit": 1379.57,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.017
+    },
+    {
+     "signal": "2019-06-20",
+     "exitMonth": "2019-06",
+     "entry": 1390.94,
+     "stop": 1434.63,
+     "exit": 1434.63,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.014
+    },
+    {
+     "signal": "2019-07-02",
+     "exitMonth": "2019-07",
+     "entry": 1431.44,
+     "stop": 1493.9,
+     "exit": 1430.91,
+     "how": "time",
+     "gross": 0.008,
+     "net": -0.001
+    },
+    {
+     "signal": "2019-08-05",
+     "exitMonth": "2019-08",
+     "entry": 1474.09,
+     "stop": 1538.83,
+     "exit": 1539.58,
+     "how": "gap",
+     "gross": -1.012,
+     "net": -1.021
+    },
+    {
+     "signal": "2019-08-26",
+     "exitMonth": "2019-09",
+     "entry": 1528.71,
+     "stop": 1605.97,
+     "exit": 1521.01,
+     "how": "time",
+     "gross": 0.1,
+     "net": 0.092
+    },
+    {
+     "signal": "2020-01-03",
+     "exitMonth": "2020-01",
+     "entry": 1560.85,
+     "stop": 1592.88,
+     "exit": 1592.88,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.019
+    },
+    {
+     "signal": "2020-01-07",
+     "exitMonth": "2020-02",
+     "entry": 1595.13,
+     "stop": 1636.93,
+     "exit": 1554.21,
+     "how": "time",
+     "gross": 0.979,
+     "net": 0.965
+    },
+    {
+     "signal": "2020-02-18",
+     "exitMonth": "2020-02",
+     "entry": 1600.91,
+     "stop": 1646.99,
+     "exit": 1646.99,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.013
+    },
+    {
+     "signal": "2020-02-21",
+     "exitMonth": "2020-03",
+     "entry": 1643.4,
+     "stop": 1691.67,
+     "exit": 1691.67,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.012
+    },
+    {
+     "signal": "2020-04-09",
+     "exitMonth": "2020-05",
+     "entry": 1688.23,
+     "stop": 1842.95,
+     "exit": 1702.39,
+     "how": "time",
+     "gross": -0.091,
+     "net": -0.095
+    },
+    {
+     "signal": "2020-05-14",
+     "exitMonth": "2020-06",
+     "entry": 1733.18,
+     "stop": 1816.8,
+     "exit": 1726.88,
+     "how": "time",
+     "gross": 0.075,
+     "net": 0.068
+    },
+    {
+     "signal": "2020-06-22",
+     "exitMonth": "2020-07",
+     "entry": 1755.38,
+     "stop": 1830.02,
+     "exit": 1818.13,
+     "how": "time",
+     "gross": -0.841,
+     "net": -0.849
+    },
+    {
+     "signal": "2020-07-20",
+     "exitMonth": "2020-07",
+     "entry": 1818.18,
+     "stop": 1874.45,
+     "exit": 1874.45,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.011
+    },
+    {
+     "signal": "2020-07-22",
+     "exitMonth": "2020-07",
+     "entry": 1870.21,
+     "stop": 1928.78,
+     "exit": 1928.78,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "signal": "2020-07-27",
+     "exitMonth": "2020-08",
+     "entry": 1965.15,
+     "stop": 2035.61,
+     "exit": 2035.61,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "signal": "2020-08-05",
+     "exitMonth": "2020-09",
+     "entry": 2036.56,
+     "stop": 2131.58,
+     "exit": 1944.88,
+     "how": "time",
+     "gross": 0.965,
+     "net": 0.959
+    },
+    {
+     "signal": "2022-02-21",
+     "exitMonth": "2022-03",
+     "entry": 1909.53,
+     "stop": 1977.13,
+     "exit": 1977.39,
+     "how": "gap",
+     "gross": -1.004,
+     "net": -1.013
+    },
+    {
+     "signal": "2022-03-07",
+     "exitMonth": "2022-04",
+     "entry": 1998.87,
+     "stop": 2096.12,
+     "exit": 1931.61,
+     "how": "time",
+     "gross": 0.692,
+     "net": 0.685
+    },
+    {
+     "signal": "2023-03-17",
+     "exitMonth": "2023-04",
+     "entry": 1986.75,
+     "stop": 2064.43,
+     "exit": 1994.05,
+     "how": "time",
+     "gross": -0.094,
+     "net": -0.102
+    },
+    {
+     "signal": "2023-05-03",
+     "exitMonth": "2023-05",
+     "entry": 2052.07,
+     "stop": 2142.83,
+     "exit": 1966.38,
+     "how": "time",
+     "gross": 0.944,
+     "net": 0.937
+    },
+    {
+     "signal": "2023-12-01",
+     "exitMonth": "2023-12",
+     "entry": 2073.55,
+     "stop": 2138.76,
+     "exit": 2138.76,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "signal": "2023-12-27",
+     "exitMonth": "2024-01",
+     "entry": 2079.69,
+     "stop": 2170.33,
+     "exit": 2016.41,
+     "how": "time",
+     "gross": 0.698,
+     "net": 0.691
+    },
+    {
+     "signal": "2024-03-01",
+     "exitMonth": "2024-03",
+     "entry": 2082.9,
+     "stop": 2142.75,
+     "exit": 2142.75,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.01
+    },
+    {
+     "signal": "2024-03-06",
+     "exitMonth": "2024-03",
+     "entry": 2147.5,
+     "stop": 2213.79,
+     "exit": 2213.79,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.009
+    },
+    {
+     "signal": "2024-03-20",
+     "exitMonth": "2024-04",
+     "entry": 2204.08,
+     "stop": 2283.59,
+     "exit": 2283.59,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.008
+    },
+    {
+     "signal": "2024-04-02",
+     "exitMonth": "2024-04",
+     "entry": 2279.78,
+     "stop": 2372.58,
+     "exit": 2372.58,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.006
+    },
+    {
+     "signal": "2024-04-11",
+     "exitMonth": "2024-05",
+     "entry": 2376.89,
+     "stop": 2485.64,
+     "exit": 2346.64,
+     "how": "time",
+     "gross": 0.278,
+     "net": 0.273
+    },
+    {
+     "signal": "2024-05-17",
+     "exitMonth": "2024-06",
+     "entry": 2425.2,
+     "stop": 2535.64,
+     "exit": 2332.65,
+     "how": "time",
+     "gross": 0.838,
+     "net": 0.833
+    },
+    {
+     "signal": "2024-07-16",
+     "exitMonth": "2024-08",
+     "entry": 2468.36,
+     "stop": 2560.1,
+     "exit": 2464.19,
+     "how": "time",
+     "gross": 0.046,
+     "net": 0.039
+    },
+    {
+     "signal": "2024-08-16",
+     "exitMonth": "2024-09",
+     "entry": 2506.53,
+     "stop": 2629.91,
+     "exit": 2578.72,
+     "how": "time",
+     "gross": -0.585,
+     "net": -0.59
+    },
+    {
+     "signal": "2024-09-13",
+     "exitMonth": "2024-09",
+     "entry": 2578.79,
+     "stop": 2667.59,
+     "exit": 2667.59,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.007
+    },
+    {
+     "signal": "2024-09-26",
+     "exitMonth": "2024-10",
+     "entry": 2672.68,
+     "stop": 2766.53,
+     "exit": 2733.85,
+     "how": "time",
+     "gross": -0.652,
+     "net": -0.658
+    },
+    {
+     "signal": "2024-10-25",
+     "exitMonth": "2024-11",
+     "entry": 2734.07,
+     "stop": 2825.93,
+     "exit": 2716.34,
+     "how": "time",
+     "gross": 0.193,
+     "net": 0.186
+    },
+    {
+     "signal": "2025-01-30",
+     "exitMonth": "2025-02",
+     "entry": 2796.34,
+     "stop": 2884.79,
+     "exit": 2884.79,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.007
+    },
+    {
+     "signal": "2025-02-10",
+     "exitMonth": "2025-03",
+     "entry": 2918.02,
+     "stop": 3019.51,
+     "exit": 2884.79,
+     "how": "time",
+     "gross": 0.327,
+     "net": 0.321
+    },
+    {
+     "signal": "2025-03-13",
+     "exitMonth": "2025-03",
+     "entry": 2986.46,
+     "stop": 3111,
+     "exit": 3111,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.005
+    },
+    {
+     "signal": "2025-03-31",
+     "exitMonth": "2025-04",
+     "entry": 3120.54,
+     "stop": 3228.24,
+     "exit": 3228.24,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.006
+    },
+    {
+     "signal": "2025-04-11",
+     "exitMonth": "2025-04",
+     "entry": 3222.96,
+     "stop": 3397.92,
+     "exit": 3397.92,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "signal": "2025-04-21",
+     "exitMonth": "2025-05",
+     "entry": 3434.54,
+     "stop": 3642.74,
+     "exit": 3222.67,
+     "how": "time",
+     "gross": 1.018,
+     "net": 1.015
+    },
+    {
+     "signal": "2025-08-29",
+     "exitMonth": "2025-09",
+     "entry": 3445.43,
+     "stop": 3554.56,
+     "exit": 3554.56,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.005
+    },
+    {
+     "signal": "2025-09-03",
+     "exitMonth": "2025-09",
+     "entry": 3560.56,
+     "stop": 3679.64,
+     "exit": 3679.64,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.005
+    },
+    {
+     "signal": "2025-09-15",
+     "exitMonth": "2025-09",
+     "entry": 3676.84,
+     "stop": 3810.93,
+     "exit": 3810.93,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.004
+    },
+    {
+     "signal": "2025-09-29",
+     "exitMonth": "2025-10",
+     "entry": 3832.97,
+     "stop": 3989.07,
+     "exit": 3989.07,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.004
+    },
+    {
+     "signal": "2025-10-07",
+     "exitMonth": "2025-10",
+     "entry": 3994.43,
+     "stop": 4158.34,
+     "exit": 4158.34,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.004
+    },
+    {
+     "signal": "2025-10-14",
+     "exitMonth": "2025-10",
+     "entry": 4161.51,
+     "stop": 4370.5,
+     "exit": 4370.5,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "signal": "2025-10-16",
+     "exitMonth": "2025-11",
+     "entry": 4365.81,
+     "stop": 4595.1,
+     "exit": 4186.21,
+     "how": "time",
+     "gross": 0.783,
+     "net": 0.781
+    },
+    {
+     "signal": "2025-12-22",
+     "exitMonth": "2026-01",
+     "entry": 4460.1,
+     "stop": 4641.54,
+     "exit": 4641.54,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.003
+    },
+    {
+     "signal": "2026-01-14",
+     "exitMonth": "2026-01",
+     "entry": 4615.29,
+     "stop": 4870.11,
+     "exit": 4870.11,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.002
+    },
+    {
+     "signal": "2026-01-21",
+     "exitMonth": "2026-01",
+     "entry": 4778.23,
+     "stop": 5045.54,
+     "exit": 5045.54,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.002
+    },
+    {
+     "signal": "2026-01-26",
+     "exitMonth": "2026-01",
+     "entry": 5043.58,
+     "stop": 5317.07,
+     "exit": 5317.07,
+     "how": "stop",
+     "gross": -1,
+     "net": -1.002
+    },
+    {
+     "signal": "2026-01-28",
+     "exitMonth": "2026-02",
+     "entry": 5513.59,
+     "stop": 5853.43,
+     "exit": 5163.27,
+     "how": "time",
+     "gross": 1.031,
+     "net": 1.029
+    }
+   ],
+   "holmP": 0.993,
+   "checks": {
+    "oosPositive": false,
+    "oosT2": false,
+    "holm05": false,
+    "isSameSign": false,
+    "x2Positive": false
+   },
+   "pass": false
+  }
+ ],
+ "firstAfterGap": [
+  {
+   "signal": "2008-01-02",
+   "how": "time",
+   "gross": 1.657,
+   "net": 1.558
+  },
+  {
+   "signal": "2009-09-11",
+   "how": "time",
+   "gross": 1.006,
+   "net": 0.897
+  },
+  {
+   "signal": "2010-05-11",
+   "how": "stop",
+   "gross": -1,
+   "net": -1.043
+  },
+  {
+   "signal": "2010-09-14",
+   "how": "time",
+   "gross": 2.13,
+   "net": 1.98
+  },
+  {
+   "signal": "2011-03-01",
+   "how": "stop",
+   "gross": -1,
+   "net": -1.068
+  },
+  {
+   "signal": "2020-07-27",
+   "how": "stop",
+   "gross": -1,
+   "net": -1.07
+  },
+  {
+   "signal": "2023-12-01",
+   "how": "stop",
+   "gross": -1,
+   "net": -1.037
+  },
+  {
+   "signal": "2025-01-30",
+   "how": "time",
+   "gross": 0.899,
+   "net": 0.762
+  },
+  {
+   "signal": "2025-08-29",
+   "how": "time",
+   "gross": 2.881,
+   "net": 2.745
+  }
+ ]
+}

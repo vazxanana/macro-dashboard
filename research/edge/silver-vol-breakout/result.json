@@ -1,0 +1,323 @@
+{
+ "study": "silver-vol-breakout",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/silver-vol-breakout/PREREGISTRATION.md",
+ "planSha256": "6b4eb497ab6d8132d2d99a5600aaae624fb407e86b461193858743ddd2c082f7",
+ "claim": "gold-vol-breakout's T1 rule (a move of 0.5 × the previous day's range away from the UTC open continues to 21:00 UTC) also holds on spot silver, a market it was not found on",
+ "rule": "O = open of the first M5 candle 00:00-00:55 UTC; prevRange = high − low of the previous weekend-folded UTC D1; buy stop O + 0.5 × prevRange and sell stop O − 0.5 × prevRange live 00:00-20:55 UTC, first filled wins (a gap fills at the open; both in one candle: the level nearer its open); stop back at O (worst case in the fill candle); out at the 20:55 candle close",
+ "data": "OANDA mid XAG/USD M5 through the keyless candle proxy; 2821 weekdays built 2016-01-01 → 2026-11-12; D1 = complete UTC days folded with council/fills.mjs foldWeekend",
+ "dataEnd": "2026-11-12",
+ "cost": 0.03,
+ "financing": {
+  "rate": 0.000148,
+  "assumed": "gold FIN.xau.long; no silver rate in the repository"
+ },
+ "windows": {
+  "IS": [
+   "2016-01-01",
+   "2020-12-31"
+  ],
+  "OOS": [
+   "2021-01-01",
+   "2026-11-12"
+  ],
+  "ALL": [
+   "2016-01-01",
+   "2026-11-12"
+  ]
+ },
+ "verdict": "FAIL (isPos, oosPos, t2, cost2x): gold's T1 breakout on silver 2016 → now −0.084R a trade net (n 2015, month t −3.04; gross +0.086R, t +3.37)",
+ "decision": {
+  "p": 0.999,
+  "placeboBeaten": 40,
+  "checks": {
+   "isPos": false,
+   "oosPos": false,
+   "t2": false,
+   "cost2x": false,
+   "placebo": true,
+   "n30": true
+  },
+  "pass": false
+ },
+ "tests": {
+  "name": "k 0.5, both sides",
+  "k": 0.5,
+  "eligibleDays": 2791,
+  "skips": {
+   "noprev": 1,
+   "flatprev": 1,
+   "thin": 9,
+   "noopen": 19,
+   "nofill": 776
+  },
+  "IS": {
+   "n": 925,
+   "win": 0.347,
+   "netR": -0.135,
+   "grossR": 0.113,
+   "net2R": -0.383,
+   "costR": 0.248,
+   "finR": 0,
+   "total": -124.73,
+   "months": 60,
+   "t": -2.99,
+   "grossT": 2.68,
+   "t2x": -7.54,
+   "stops": 346,
+   "time": 579,
+   "maxDD": -149.79,
+   "medianStop": 0.131,
+   "buys": {
+    "n": 450,
+    "netR": -0.086
+   },
+   "sells": {
+    "n": 475,
+    "netR": -0.181
+   },
+   "byYear": {
+    "2016": {
+     "n": 183,
+     "netR": -0.103,
+     "grossR": 0.098,
+     "total": -18.78
+    },
+    "2017": {
+     "n": 190,
+     "netR": -0.219,
+     "grossR": 0.046,
+     "total": -41.62
+    },
+    "2018": {
+     "n": 193,
+     "netR": -0.183,
+     "grossR": 0.125,
+     "total": -35.4
+    },
+    "2019": {
+     "n": 182,
+     "netR": -0.217,
+     "grossR": 0.104,
+     "total": -39.46
+    },
+    "2020": {
+     "n": 177,
+     "netR": 0.059,
+     "grossR": 0.198,
+     "total": 10.53
+    }
+   }
+  },
+  "OOS": {
+   "n": 1090,
+   "win": 0.414,
+   "netR": -0.041,
+   "grossR": 0.063,
+   "net2R": -0.144,
+   "costR": 0.103,
+   "finR": 0,
+   "total": -44.52,
+   "months": 71,
+   "t": -1.23,
+   "grossT": 2.05,
+   "t2x": -3.92,
+   "stops": 379,
+   "time": 711,
+   "maxDD": -104,
+   "medianStop": 0.31,
+   "buys": {
+    "n": 525,
+    "netR": 0.003
+   },
+   "sells": {
+    "n": 565,
+    "netR": -0.081
+   },
+   "byYear": {
+    "2021": {
+     "n": 189,
+     "netR": -0.108,
+     "grossR": 0.017,
+     "total": -20.34
+    },
+    "2022": {
+     "n": 188,
+     "netR": -0.076,
+     "grossR": 0.047,
+     "total": -14.29
+    },
+    "2023": {
+     "n": 184,
+     "netR": -0.246,
+     "grossR": -0.103,
+     "total": -45.28
+    },
+    "2024": {
+     "n": 180,
+     "netR": 0.033,
+     "grossR": 0.146,
+     "total": 6.03
+    },
+    "2025": {
+     "n": 188,
+     "netR": 0.072,
+     "grossR": 0.155,
+     "total": 13.52
+    },
+    "2026": {
+     "n": 161,
+     "netR": 0.098,
+     "grossR": 0.122,
+     "total": 15.84
+    }
+   }
+  },
+  "ALL": {
+   "n": 2015,
+   "win": 0.383,
+   "netR": -0.084,
+   "grossR": 0.086,
+   "net2R": -0.254,
+   "costR": 0.17,
+   "finR": 0,
+   "total": -169.24,
+   "months": 131,
+   "t": -3.04,
+   "grossT": 3.37,
+   "t2x": -7.86,
+   "stops": 725,
+   "time": 1290,
+   "maxDD": -227.58,
+   "medianStop": 0.219,
+   "buys": {
+    "n": 975,
+    "netR": -0.038
+   },
+   "sells": {
+    "n": 1040,
+    "netR": -0.127
+   },
+   "byYear": {
+    "2016": {
+     "n": 183,
+     "netR": -0.103,
+     "grossR": 0.098,
+     "total": -18.78
+    },
+    "2017": {
+     "n": 190,
+     "netR": -0.219,
+     "grossR": 0.046,
+     "total": -41.62
+    },
+    "2018": {
+     "n": 193,
+     "netR": -0.183,
+     "grossR": 0.125,
+     "total": -35.4
+    },
+    "2019": {
+     "n": 182,
+     "netR": -0.217,
+     "grossR": 0.104,
+     "total": -39.46
+    },
+    "2020": {
+     "n": 177,
+     "netR": 0.059,
+     "grossR": 0.198,
+     "total": 10.53
+    },
+    "2021": {
+     "n": 189,
+     "netR": -0.108,
+     "grossR": 0.017,
+     "total": -20.34
+    },
+    "2022": {
+     "n": 188,
+     "netR": -0.076,
+     "grossR": 0.047,
+     "total": -14.29
+    },
+    "2023": {
+     "n": 184,
+     "netR": -0.246,
+     "grossR": -0.103,
+     "total": -45.28
+    },
+    "2024": {
+     "n": 180,
+     "netR": 0.033,
+     "grossR": 0.146,
+     "total": 6.03
+    },
+    "2025": {
+     "n": 188,
+     "netR": 0.072,
+     "grossR": 0.155,
+     "total": 13.52
+    },
+    "2026": {
+     "n": 161,
+     "netR": 0.098,
+     "grossR": 0.122,
+     "total": 15.84
+    }
+   }
+  }
+ },
+ "placebo": {
+  "seeds": 40,
+  "start": "01:00-18:00 UTC",
+  "window": "2016 → now",
+  "means": [
+   -0.133,
+   -0.097,
+   -0.169,
+   -0.115,
+   -0.155,
+   -0.148,
+   -0.14,
+   -0.144,
+   -0.168,
+   -0.133,
+   -0.133,
+   -0.154,
+   -0.14,
+   -0.125,
+   -0.124,
+   -0.141,
+   -0.148,
+   -0.118,
+   -0.132,
+   -0.144,
+   -0.156,
+   -0.149,
+   -0.125,
+   -0.162,
+   -0.111,
+   -0.134,
+   -0.13,
+   -0.121,
+   -0.157,
+   -0.091,
+   -0.164,
+   -0.137,
+   -0.12,
+   -0.114,
+   -0.109,
+   -0.169,
+   -0.161,
+   -0.152,
+   -0.132,
+   -0.109
+  ],
+  "min": -0.169,
+  "max": -0.091,
+  "median": -0.135,
+  "p95": -0.108
+ },
+ "reading": "The rule does not pass the pre-registered bar on silver (failed: isPos, oosPos, t2, cost2x). 2016-20 −0.135R a trade net (n 925, month t −2.99; gross +0.113R, t +2.68); 2021 → now −0.041R net (n 1090, t −1.23; gross +0.063R, t +2.05). Pooled −0.084R net (n 2015, t −3.04), −0.254R at 2x costs; costs take 0.170R a trade at a median stop of $0.219. 40 of 40 placebo seeds beaten (placebo median −0.135R). By year: 2016 −0.103R, 2017 −0.219R, 2018 −0.183R, 2019 −0.217R, 2020 +0.059R, 2021 −0.108R, 2022 −0.076R, 2023 −0.246R, 2024 +0.033R, 2025 +0.072R, 2026 +0.098R (4 of 11 positive). Before costs the effect gold showed does repeat on silver (gross month t +2.68 in 2016-20 and +2.05 after, the real stream above every placebo seed), but the cost, 0.248R and 0.103R a trade in the two windows, is larger than the gross gain in both: silver's daily range is small against its spread. Not an edge on silver; nothing live changes and no proposal is written."
+}

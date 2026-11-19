@@ -1,0 +1,515 @@
+{
+ "built": "2026-11-14",
+ "original": {
+  "branch": "gold-weekday",
+  "file": "research/edge/gold-weekday/run.mjs",
+  "sha256": "7cc7253fe685f8912422743571e61e31a69a2b2435d374443b08526066a85c68",
+  "oos": {
+   "n": 500,
+   "gross": 0.088,
+   "net": 0.06,
+   "net2x": 0.033,
+   "cost": 0.028,
+   "fin": 0,
+   "nights": 0,
+   "total": 30.23,
+   "win": 54.6,
+   "stops": 60,
+   "months": 118,
+   "t": 2.1,
+   "tGross": 3.05,
+   "dd": -5.87
+  },
+  "is": {
+   "n": 520,
+   "gross": 0.111,
+   "net": 0.072,
+   "net2x": 0.032,
+   "cost": 0.034,
+   "fin": 0.006,
+   "nights": 295,
+   "total": 37.21,
+   "win": 53.85,
+   "stops": 61,
+   "months": 120,
+   "t": 2.24,
+   "tGross": 3.44,
+   "dd": -11.14
+  }
+ },
+ "rule": "long every Friday 17:00 New York session: first H1 open -> last H1 close, stop 1 x ATR(20) checked on H1; $0.60 a round trip + FIN.xau.long on longs (original.mjs)",
+ "windows": {
+  "is": [
+   "2007-01-01",
+   "2016-12-31"
+  ],
+  "oos": [
+   "2017-01-01",
+   "2026-10-31"
+  ],
+  "r2": [
+   "2018-01-01",
+   "2026-10-31"
+  ]
+ },
+ "data": {
+  "oanda": {
+   "src": "OANDA mid H1 XAU_USD (gold-weekday fetch.mjs request; cache out of git)",
+   "from": "2006-03-19",
+   "to": "2026-11-13",
+   "h1": 125704
+  },
+  "histdata": {
+   "src": "HistData XAU/USD M1 bid (council-data research/candles/xau-histdata, council/histdata.mjs histStampUtc) -> UTC H1",
+   "from": "2018-01-01",
+   "to": "2026-10-30",
+   "h1": 51544
+  },
+  "xaueur": {
+   "src": "OANDA mid M5 XAU_EUR via the site proxy (cache out of git) -> UTC H1",
+   "from": "2006-03-18",
+   "to": "2026-11-13",
+   "h1": 127099,
+   "m5": 1496024
+  }
+ },
+ "g0": {
+  "n": 500,
+  "net": 0.06,
+  "t": 2.1,
+  "pass": true,
+  "original": {
+   "n": 500,
+   "net": 0.06,
+   "t": 2.1
+  }
+ },
+ "R1": {
+  "def": "payroll Friday = closing date is a US Employment Situation release (events.mjs from 2022, BLS rule before)",
+  "bar": "other Fridays OOS net > 0 and month t >= 1.5",
+  "oos": {
+   "pay": {
+    "n": 108,
+    "gross": 0.037,
+    "net": 0.008,
+    "net2x": -0.022,
+    "cost": 0.029,
+    "fin": 0,
+    "nights": 0,
+    "total": 0.81,
+    "win": 52.78,
+    "stops": 21,
+    "months": 118,
+    "t": 0.11,
+    "tGross": 0.52,
+    "dd": -8.56
+   },
+   "other": {
+    "n": 392,
+    "gross": 0.103,
+    "net": 0.075,
+    "net2x": 0.048,
+    "cost": 0.028,
+    "fin": 0,
+    "nights": 0,
+    "total": 29.42,
+    "win": 55.1,
+    "stops": 39,
+    "months": 118,
+    "t": 2.44,
+    "tGross": 3.3,
+    "dd": -8.64
+   }
+  },
+  "is": {
+   "pay": {
+    "n": 115,
+    "gross": 0.141,
+    "net": 0.101,
+    "net2x": 0.062,
+    "cost": 0.034,
+    "fin": 0.005,
+    "nights": 58,
+    "total": 11.67,
+    "win": 57.39,
+    "stops": 23,
+    "months": 120,
+    "t": 1.33,
+    "tGross": 1.84,
+    "dd": -3.66
+   },
+   "other": {
+    "n": 405,
+    "gross": 0.103,
+    "net": 0.063,
+    "net2x": 0.024,
+    "cost": 0.034,
+    "fin": 0.006,
+    "nights": 237,
+    "total": 25.54,
+    "win": 52.84,
+    "stops": 38,
+    "months": 120,
+    "t": 1.9,
+    "tGross": 3.07,
+    "dd": -8.5
+   }
+  },
+  "proxy": {
+   "oos": {
+    "pay": {
+     "n": 114,
+     "gross": 0.08,
+     "net": 0.052,
+     "net2x": 0.023,
+     "cost": 0.028,
+     "fin": 0,
+     "nights": 0,
+     "total": 5.9,
+     "win": 54.39,
+     "stops": 20,
+     "months": 118,
+     "t": 0.74,
+     "tGross": 1.14,
+     "dd": -6.66
+    },
+    "other": {
+     "n": 386,
+     "gross": 0.091,
+     "net": 0.063,
+     "net2x": 0.035,
+     "cost": 0.028,
+     "fin": 0,
+     "nights": 0,
+     "total": 24.34,
+     "win": 54.66,
+     "stops": 40,
+     "months": 118,
+     "t": 2,
+     "tGross": 2.86,
+     "dd": -9.87
+    }
+   }
+  },
+  "placeboOther": {
+   "beaten": 39,
+   "of": 40,
+   "p5": -0.034,
+   "median": -0.003,
+   "p95": 0.058
+  },
+  "survives": true
+ },
+ "R2": {
+  "window": [
+   "2018-01-01",
+   "2026-10-31"
+  ],
+  "histdata": {
+   "n": 445,
+   "gross": 0.08,
+   "net": 0.053,
+   "net2x": 0.027,
+   "cost": 0.026,
+   "fin": 0.001,
+   "nights": 20,
+   "total": 23.72,
+   "win": 53.26,
+   "stops": 54,
+   "months": 106,
+   "t": 1.69,
+   "tGross": 2.51,
+   "dd": -5.96
+  },
+  "oandaSameWindow": {
+   "n": 449,
+   "gross": 0.081,
+   "net": 0.055,
+   "net2x": 0.029,
+   "cost": 0.026,
+   "fin": 0,
+   "nights": 0,
+   "total": 24.64,
+   "win": 53.45,
+   "stops": 57,
+   "months": 106,
+   "t": 1.76,
+   "tGross": 2.56,
+   "dd": -5.87
+  },
+  "placebo": {
+   "beaten": 35,
+   "of": 40,
+   "p5": -0.042,
+   "median": 0.021,
+   "p95": 0.065
+  },
+  "p": 0.0455,
+  "agreement": {
+   "histdata": 445,
+   "oanda": 449,
+   "both": 445,
+   "sameSign": 436
+  },
+  "holm": 0.0455,
+  "pass": false
+ },
+ "R3": {
+  "cost": "0.016 % of the entry price a round trip (assumed)",
+  "financing": 0.000148,
+  "oos": {
+   "n": 500,
+   "gross": 0.088,
+   "net": 0.074,
+   "net2x": 0.06,
+   "cost": 0.014,
+   "fin": 0,
+   "nights": 0,
+   "total": 37.22,
+   "win": 57,
+   "stops": 59,
+   "months": 118,
+   "t": 2.51,
+   "tGross": 2.97,
+   "dd": -4.61
+  },
+  "is": {
+   "n": 520,
+   "gross": 0.122,
+   "net": 0.106,
+   "net2x": 0.089,
+   "cost": 0.011,
+   "fin": 0.006,
+   "nights": 296,
+   "total": 54.86,
+   "win": 57.12,
+   "stops": 52,
+   "months": 120,
+   "t": 3.21,
+   "tGross": 3.72,
+   "dd": -14.25
+  },
+  "placebo": {
+   "beaten": 36,
+   "of": 40,
+   "p5": -0.013,
+   "median": 0.024,
+   "p95": 0.076
+  },
+  "p": 0.006,
+  "holm": 0.012,
+  "pass": true
+ },
+ "years": {
+  "oanda": {
+   "2007": {
+    "n": 52,
+    "net": 0.29
+   },
+   "2008": {
+    "n": 52,
+    "net": -0.003
+   },
+   "2009": {
+    "n": 53,
+    "net": 0.052
+   },
+   "2010": {
+    "n": 52,
+    "net": 0.092
+   },
+   "2011": {
+    "n": 52,
+    "net": 0.156
+   },
+   "2012": {
+    "n": 52,
+    "net": 0.091
+   },
+   "2013": {
+    "n": 52,
+    "net": -0.114
+   },
+   "2014": {
+    "n": 52,
+    "net": 0.042
+   },
+   "2015": {
+    "n": 52,
+    "net": 0.063
+   },
+   "2016": {
+    "n": 51,
+    "net": 0.048
+   },
+   "2017": {
+    "n": 51,
+    "net": 0.11
+   },
+   "2018": {
+    "n": 51,
+    "net": 0.028
+   },
+   "2019": {
+    "n": 51,
+    "net": 0.023
+   },
+   "2020": {
+    "n": 50,
+    "net": 0.101
+   },
+   "2021": {
+    "n": 50,
+    "net": -0.007
+   },
+   "2022": {
+    "n": 51,
+    "net": -0.009
+   },
+   "2023": {
+    "n": 51,
+    "net": 0.164
+   },
+   "2024": {
+    "n": 51,
+    "net": 0.143
+   },
+   "2025": {
+    "n": 51,
+    "net": 0.044
+   },
+   "2026": {
+    "n": 45,
+    "net": -0.006
+   }
+  },
+  "histdata": {
+   "2018": {
+    "n": 47,
+    "net": -0.023
+   },
+   "2019": {
+    "n": 51,
+    "net": 0.02
+   },
+   "2020": {
+    "n": 50,
+    "net": 0.111
+   },
+   "2021": {
+    "n": 50,
+    "net": -0.004
+   },
+   "2022": {
+    "n": 51,
+    "net": -0.009
+   },
+   "2023": {
+    "n": 51,
+    "net": 0.157
+   },
+   "2024": {
+    "n": 51,
+    "net": 0.145
+   },
+   "2025": {
+    "n": 51,
+    "net": 0.062
+   },
+   "2026": {
+    "n": 43,
+    "net": 0.008
+   }
+  },
+  "xaueur": {
+   "2007": {
+    "n": 52,
+    "net": 0.286
+   },
+   "2008": {
+    "n": 52,
+    "net": 0.096
+   },
+   "2009": {
+    "n": 53,
+    "net": 0.106
+   },
+   "2010": {
+    "n": 52,
+    "net": 0.048
+   },
+   "2011": {
+    "n": 52,
+    "net": 0.213
+   },
+   "2012": {
+    "n": 52,
+    "net": -0.015
+   },
+   "2013": {
+    "n": 52,
+    "net": -0.113
+   },
+   "2014": {
+    "n": 52,
+    "net": 0.135
+   },
+   "2015": {
+    "n": 52,
+    "net": 0.166
+   },
+   "2016": {
+    "n": 51,
+    "net": 0.134
+   },
+   "2017": {
+    "n": 51,
+    "net": 0.03
+   },
+   "2018": {
+    "n": 51,
+    "net": 0.094
+   },
+   "2019": {
+    "n": 51,
+    "net": 0.012
+   },
+   "2020": {
+    "n": 50,
+    "net": 0.102
+   },
+   "2021": {
+    "n": 50,
+    "net": 0.026
+   },
+   "2022": {
+    "n": 51,
+    "net": 0.088
+   },
+   "2023": {
+    "n": 51,
+    "net": 0.188
+   },
+   "2024": {
+    "n": 51,
+    "net": 0.195
+   },
+   "2025": {
+    "n": 51,
+    "net": -0.004
+   },
+   "2026": {
+    "n": 45,
+    "net": 0.009
+   }
+  }
+ },
+ "R4": {
+  "line": "next 52 Friday sessions from the one closing 20 Nov 2026, frozen rule on OANDA mid H1 XAU_USD, $0.60 + FIN.xau.long: mean net R > 0",
+  "computed": false
+ },
+ "verdict": "FAIL",
+ "broke": [
+  "R2 (HistData)"
+ ]
+}

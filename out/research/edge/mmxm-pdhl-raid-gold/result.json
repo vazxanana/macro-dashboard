@@ -1,0 +1,694 @@
+{
+ "built": "2026-11-14",
+ "verdict": "FAIL",
+ "reasons": [
+  "T1 out-of-sample month t -0.32 (bar 2)",
+  "Holm p 1",
+  "in sample -0.4R a trade",
+  "-0.18R a trade at 2x costs"
+ ],
+ "data": {
+  "src": "OANDA mid M15 + H1 XAU/USD, M15 XAG/USD via /md/bars",
+  "from": "2018-01-01",
+  "to": "2026-11-13",
+  "m15": 209728,
+  "h1": 52456,
+  "xag15": 209426
+ },
+ "windows": {
+  "is": "2018-01-01 to 2020-12-31",
+  "oos": "2021-01-01 to 2026-11-13"
+ },
+ "params": {
+  "buf": 0.3,
+  "cost": 0.3,
+  "minRR": 1.5,
+  "piv": 2,
+  "mssMin": 105,
+  "look": 240,
+  "lastMin": 945
+ },
+ "costs": {
+  "roundTrip": 0.3,
+  "financing": "none (flat by 16:00 ET)"
+ },
+ "tests": {
+  "T1": {
+   "is": {
+    "n": 5,
+    "wr": 20,
+    "gross": -0.324,
+    "avg": -0.4,
+    "total": -2,
+    "dd": -2.81,
+    "tMonth": -1.05,
+    "pOne": 0.8504,
+    "months": 36,
+    "stops": 2,
+    "targets": 0,
+    "flat": 3,
+    "medRisk": 3.81,
+    "sells": 4
+   },
+   "oos": {
+    "n": 7,
+    "wr": 28.57,
+    "gross": -0.081,
+    "avg": -0.131,
+    "total": -0.91,
+    "dd": -3.3,
+    "tMonth": -0.32,
+    "pOne": 0.6262,
+    "months": 71,
+    "stops": 3,
+    "targets": 1,
+    "flat": 3,
+    "medRisk": 6.1,
+    "sells": 6,
+    "holm": 1
+   },
+   "oos2x": {
+    "n": 7,
+    "wr": 28.57,
+    "gross": -0.081,
+    "avg": -0.18,
+    "total": -1.26,
+    "dd": -3.58,
+    "tMonth": -0.43,
+    "pOne": 0.6674,
+    "months": 71,
+    "stops": 3,
+    "targets": 1,
+    "flat": 3,
+    "medRisk": 6.1,
+    "sells": 6
+   },
+   "is2x": {
+    "n": 5,
+    "wr": 20,
+    "gross": -0.324,
+    "avg": -0.475,
+    "total": -2.38,
+    "dd": -3.07,
+    "tMonth": -1.2,
+    "pOne": 0.8811,
+    "months": 36,
+    "stops": 2,
+    "targets": 0,
+    "flat": 3,
+    "medRisk": 3.81,
+    "sells": 4
+   },
+   "years": {
+    "2018": {
+     "n": 2,
+     "avg": -0.147,
+     "total": -0.29
+    },
+    "2019": {
+     "n": 1,
+     "avg": -0.474,
+     "total": -0.47
+    },
+    "2020": {
+     "n": 2,
+     "avg": -0.616,
+     "total": -1.23
+    },
+    "2021": {
+     "n": 1,
+     "avg": -1.049,
+     "total": -1.05
+    },
+    "2022": {
+     "n": 3,
+     "avg": -0.751,
+     "total": -2.25
+    },
+    "2023": {
+     "n": 1,
+     "avg": 0.517,
+     "total": 0.52
+    },
+    "2025": {
+     "n": 1,
+     "avg": -0.168,
+     "total": -0.17
+    },
+    "2026": {
+     "n": 1,
+     "avg": 2.041,
+     "total": 2.04
+    }
+   },
+   "funnel": {
+    "days": 2200,
+    "raid": 515,
+    "mss": 35,
+    "target": 30,
+    "rr": 22,
+    "filter": 21,
+    "fill": 12,
+    "cancel_target": 3,
+    "cancel_expired": 6
+   }
+  },
+  "T2": {
+   "is": {
+    "n": 5,
+    "wr": 20,
+    "gross": -0.324,
+    "avg": -0.4,
+    "total": -2,
+    "dd": -2.81,
+    "tMonth": -1.05,
+    "pOne": 0.8504,
+    "months": 36,
+    "stops": 2,
+    "targets": 0,
+    "flat": 3,
+    "medRisk": 3.81,
+    "sells": 4
+   },
+   "oos": {
+    "n": 8,
+    "wr": 25,
+    "gross": -0.196,
+    "avg": -0.246,
+    "total": -1.97,
+    "dd": -4.01,
+    "tMonth": -0.65,
+    "pOne": 0.7421,
+    "months": 71,
+    "stops": 4,
+    "targets": 1,
+    "flat": 3,
+    "medRisk": 6.1,
+    "sells": 7,
+    "holm": 1
+   },
+   "oos2x": {
+    "n": 8,
+    "wr": 25,
+    "gross": -0.196,
+    "avg": -0.296,
+    "total": -2.37,
+    "dd": -4.4,
+    "tMonth": -0.77,
+    "pOne": 0.7767,
+    "months": 71,
+    "stops": 4,
+    "targets": 1,
+    "flat": 3,
+    "medRisk": 6.1,
+    "sells": 7
+   },
+   "is2x": {
+    "n": 5,
+    "wr": 20,
+    "gross": -0.324,
+    "avg": -0.475,
+    "total": -2.38,
+    "dd": -3.07,
+    "tMonth": -1.2,
+    "pOne": 0.8811,
+    "months": 36,
+    "stops": 2,
+    "targets": 0,
+    "flat": 3,
+    "medRisk": 3.81,
+    "sells": 4
+   },
+   "years": {
+    "2018": {
+     "n": 2,
+     "avg": -0.147,
+     "total": -0.29
+    },
+    "2019": {
+     "n": 1,
+     "avg": -0.474,
+     "total": -0.47
+    },
+    "2020": {
+     "n": 2,
+     "avg": -0.616,
+     "total": -1.23
+    },
+    "2021": {
+     "n": 1,
+     "avg": -1.049,
+     "total": -1.05
+    },
+    "2022": {
+     "n": 3,
+     "avg": -0.751,
+     "total": -2.25
+    },
+    "2023": {
+     "n": 1,
+     "avg": 0.517,
+     "total": 0.52
+    },
+    "2024": {
+     "n": 1,
+     "avg": -1.056,
+     "total": -1.06
+    },
+    "2025": {
+     "n": 1,
+     "avg": -0.168,
+     "total": -0.17
+    },
+    "2026": {
+     "n": 1,
+     "avg": 2.041,
+     "total": 2.04
+    }
+   },
+   "funnel": {
+    "days": 2200,
+    "raid": 515,
+    "mss": 35,
+    "target": 30,
+    "rr": 22,
+    "filter": 22,
+    "fill": 13,
+    "cancel_target": 3,
+    "cancel_expired": 6
+   }
+  },
+  "T3": {
+   "is": {
+    "n": 5,
+    "wr": 20,
+    "gross": -0.342,
+    "avg": -0.451,
+    "total": -2.25,
+    "dd": -2.26,
+    "tMonth": -0.99,
+    "pOne": 0.835,
+    "months": 36,
+    "stops": 3,
+    "targets": 0,
+    "flat": 2,
+    "medRisk": 3.02,
+    "sells": 3
+   },
+   "oos": {
+    "n": 3,
+    "wr": 33.33,
+    "gross": -0.298,
+    "avg": -0.367,
+    "total": -1.1,
+    "dd": -2.17,
+    "tMonth": -0.59,
+    "pOne": 0.7199,
+    "months": 71,
+    "stops": 2,
+    "targets": 0,
+    "flat": 1,
+    "medRisk": 3.66,
+    "sells": 1,
+    "holm": 1
+   },
+   "oos2x": {
+    "n": 3,
+    "wr": 33.33,
+    "gross": -0.298,
+    "avg": -0.436,
+    "total": -1.31,
+    "dd": -2.34,
+    "tMonth": -0.67,
+    "pOne": 0.7463,
+    "months": 71,
+    "stops": 2,
+    "targets": 0,
+    "flat": 1,
+    "medRisk": 3.66,
+    "sells": 1
+   },
+   "is2x": {
+    "n": 5,
+    "wr": 20,
+    "gross": -0.342,
+    "avg": -0.559,
+    "total": -2.8,
+    "dd": -2.8,
+    "tMonth": -1.15,
+    "pOne": 0.8712,
+    "months": 36,
+    "stops": 3,
+    "targets": 0,
+    "flat": 2,
+    "medRisk": 3.02,
+    "sells": 3
+   },
+   "years": {
+    "2019": {
+     "n": 2,
+     "avg": -0.59,
+     "total": -1.18
+    },
+    "2020": {
+     "n": 3,
+     "avg": -0.358,
+     "total": -1.07
+    },
+    "2023": {
+     "n": 2,
+     "avg": -1.086,
+     "total": -2.17
+    },
+    "2025": {
+     "n": 1,
+     "avg": 1.071,
+     "total": 1.07
+    }
+   },
+   "funnel": {
+    "days": 2200,
+    "raid": 260,
+    "mss": 15,
+    "target": 13,
+    "rr": 13,
+    "filter": 12,
+    "fill": 8,
+    "cancel_target": 3,
+    "cancel_expired": 1
+   }
+  },
+  "T4": {
+   "is": {
+    "n": 2,
+    "wr": 0,
+    "gross": -0.698,
+    "avg": -0.759,
+    "total": -1.52,
+    "dd": -1.52,
+    "tMonth": -1.34,
+    "pOne": 0.9053,
+    "months": 36,
+    "stops": 1,
+    "targets": 0,
+    "flat": 1,
+    "medRisk": 6.75,
+    "sells": 1
+   },
+   "oos": {
+    "n": 4,
+    "wr": 0,
+    "gross": -0.544,
+    "avg": -0.599,
+    "total": -2.4,
+    "dd": -2.4,
+    "tMonth": -1.59,
+    "pOne": 0.9419,
+    "months": 71,
+    "stops": 2,
+    "targets": 0,
+    "flat": 2,
+    "medRisk": 6.1,
+    "sells": 3,
+    "holm": 1
+   },
+   "oos2x": {
+    "n": 4,
+    "wr": 0,
+    "gross": -0.544,
+    "avg": -0.655,
+    "total": -2.62,
+    "dd": -2.62,
+    "tMonth": -1.63,
+    "pOne": 0.9461,
+    "months": 71,
+    "stops": 2,
+    "targets": 0,
+    "flat": 2,
+    "medRisk": 6.1,
+    "sells": 3
+   },
+   "is2x": {
+    "n": 2,
+    "wr": 0,
+    "gross": -0.698,
+    "avg": -0.821,
+    "total": -1.64,
+    "dd": -1.64,
+    "tMonth": -1.36,
+    "pOne": 0.9087,
+    "months": 36,
+    "stops": 1,
+    "targets": 0,
+    "flat": 1,
+    "medRisk": 6.75,
+    "sells": 1
+   },
+   "years": {
+    "2019": {
+     "n": 1,
+     "avg": -0.474,
+     "total": -0.47
+    },
+    "2020": {
+     "n": 1,
+     "avg": -1.044,
+     "total": -1.04
+    },
+    "2021": {
+     "n": 1,
+     "avg": -1.049,
+     "total": -1.05
+    },
+    "2022": {
+     "n": 2,
+     "avg": -0.59,
+     "total": -1.18
+    },
+    "2025": {
+     "n": 1,
+     "avg": -0.168,
+     "total": -0.17
+    }
+   },
+   "funnel": {
+    "days": 2200,
+    "raid": 515,
+    "mss": 35,
+    "target": 30,
+    "rr": 22,
+    "filter": 21,
+    "smt": 10,
+    "fill": 6,
+    "cancel_expired": 4
+   }
+  }
+ },
+ "placebo": {
+  "draws": [
+   {
+    "seed": 1,
+    "n": 4,
+    "avg": -0.186
+   },
+   {
+    "seed": 2,
+    "n": 5,
+    "avg": -0.061
+   },
+   {
+    "seed": 3,
+    "n": 3,
+    "avg": -0.208
+   },
+   {
+    "seed": 4,
+    "n": 4,
+    "avg": 0.354
+   },
+   {
+    "seed": 5,
+    "n": 5,
+    "avg": -0.071
+   },
+   {
+    "seed": 6,
+    "n": 4,
+    "avg": -0.198
+   },
+   {
+    "seed": 7,
+    "n": 4,
+    "avg": 0.354
+   },
+   {
+    "seed": 8,
+    "n": 3,
+    "avg": -0.727
+   },
+   {
+    "seed": 9,
+    "n": 6,
+    "avg": 0.037
+   },
+   {
+    "seed": 10,
+    "n": 5,
+    "avg": -0.364
+   },
+   {
+    "seed": 11,
+    "n": 5,
+    "avg": -0.243
+   },
+   {
+    "seed": 12,
+    "n": 5,
+    "avg": -0.547
+   },
+   {
+    "seed": 13,
+    "n": 5,
+    "avg": -0.364
+   },
+   {
+    "seed": 14,
+    "n": 6,
+    "avg": -0.238
+   },
+   {
+    "seed": 15,
+    "n": 5,
+    "avg": -0.557
+   },
+   {
+    "seed": 16,
+    "n": 5,
+    "avg": 0.068
+   },
+   {
+    "seed": 17,
+    "n": 5,
+    "avg": -0.694
+   },
+   {
+    "seed": 18,
+    "n": 7,
+    "avg": -0.131
+   },
+   {
+    "seed": 19,
+    "n": 4,
+    "avg": -0.412
+   },
+   {
+    "seed": 20,
+    "n": 3,
+    "avg": -0.722
+   },
+   {
+    "seed": 21,
+    "n": 7,
+    "avg": -0.123
+   },
+   {
+    "seed": 22,
+    "n": 5,
+    "avg": -0.364
+   },
+   {
+    "seed": 23,
+    "n": 3,
+    "avg": 0.316
+   },
+   {
+    "seed": 24,
+    "n": 4,
+    "avg": -0.416
+   },
+   {
+    "seed": 25,
+    "n": 5,
+    "avg": 0.25
+   },
+   {
+    "seed": 26,
+    "n": 3,
+    "avg": -0.437
+   },
+   {
+    "seed": 27,
+    "n": 4,
+    "avg": -0.428
+   },
+   {
+    "seed": 28,
+    "n": 4,
+    "avg": 0.354
+   },
+   {
+    "seed": 29,
+    "n": 3,
+    "avg": -0.437
+   },
+   {
+    "seed": 30,
+    "n": 6,
+    "avg": 0.027
+   },
+   {
+    "seed": 31,
+    "n": 4,
+    "avg": -0.416
+   },
+   {
+    "seed": 32,
+    "n": 3,
+    "avg": 0.316
+   },
+   {
+    "seed": 33,
+    "n": 5,
+    "avg": -0.366
+   },
+   {
+    "seed": 34,
+    "n": 5,
+    "avg": -0.366
+   },
+   {
+    "seed": 35,
+    "n": 3,
+    "avg": 0.316
+   },
+   {
+    "seed": 36,
+    "n": 5,
+    "avg": -0.557
+   },
+   {
+    "seed": 37,
+    "n": 7,
+    "avg": -0.131
+   },
+   {
+    "seed": 38,
+    "n": 4,
+    "avg": -0.596
+   },
+   {
+    "seed": 39,
+    "n": 5,
+    "avg": 0.068
+   },
+   {
+    "seed": 40,
+    "n": 5,
+    "avg": -0.557
+   }
+  ],
+  "beaten": 24,
+  "of": 40,
+  "real": -0.131
+ }
+}

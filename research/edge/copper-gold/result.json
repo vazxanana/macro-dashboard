@@ -1,0 +1,312 @@
+{
+ "built": "2026-11-13",
+ "prereg": "research/edge/copper-gold/PREREGISTRATION.md",
+ "rule": "paper research only: a stand-alone weekly long / flat rule on SPX500 and NAS100; not a gate, size or exit of the gold book; no live change",
+ "params": {
+  "lookWeeks": 13,
+  "threshold": 0,
+  "atrN": 20,
+  "atrK": 3,
+  "spread": {
+   "spx500": 0.5,
+   "nas100": 1.5
+  },
+  "financing": "DGS2 + 2.5 % a year / 365 a night (nights(), Wednesday three)",
+  "nwLags": 4,
+  "placeboSeeds": 40
+ },
+ "data": {
+  "xcu": {
+   "candles": 6092,
+   "first": "2003-03-31",
+   "last": "2026-11-06"
+  },
+  "xau": {
+   "candles": 5364,
+   "first": "2006-03-20",
+   "last": "2026-11-06"
+  },
+  "spx500": {
+   "candles": 6124,
+   "first": "2003-03-24",
+   "last": "2026-11-06"
+  },
+  "nas100": {
+   "candles": 6124,
+   "first": "2003-03-24",
+   "last": "2026-11-06"
+  }
+ },
+ "missing": [],
+ "signal": {
+  "W1": {
+   "label": "2008-15 (check)",
+   "from": "2008-01-04",
+   "to": "2015-12-24",
+   "ew": {
+    "nOn": 223,
+    "nOff": 194,
+    "meanOn": 0.0031,
+    "meanOff": 0.0004,
+    "diff": 0.0027,
+    "t": 0.9865,
+    "nwT": 1.0853,
+    "weeks": 417,
+    "onShare": 0.5348
+   },
+   "perIndex": {
+    "spx500": {
+     "nOn": 223,
+     "nOff": 194,
+     "meanOn": 0.0025,
+     "meanOff": -0.0002,
+     "diff": 0.0028,
+     "t": 0.9935,
+     "nwT": 1.1109,
+     "weeks": 417,
+     "onShare": 0.5348,
+     "pHolm": 0.3204
+    },
+    "nas100": {
+     "nOn": 223,
+     "nOff": 194,
+     "meanOn": 0.0037,
+     "meanOff": 0.001,
+     "diff": 0.0027,
+     "t": 0.9422,
+     "nwT": 1.0168,
+     "weeks": 417,
+     "onShare": 0.5348,
+     "pHolm": 0.3204
+    }
+   }
+  },
+  "W2": {
+   "label": "2016 to now (decisive)",
+   "from": "2016-01-01",
+   "to": "2026-10-23",
+   "ew": {
+    "nOn": 250,
+    "nOff": 315,
+    "meanOn": 0.002,
+    "meanOff": 0.004,
+    "diff": -0.002,
+    "t": -0.9186,
+    "nwT": -0.881,
+    "weeks": 565,
+    "onShare": 0.4425
+   },
+   "perIndex": {
+    "spx500": {
+     "nOn": 250,
+     "nOff": 315,
+     "meanOn": 0.0019,
+     "meanOff": 0.0032,
+     "diff": -0.0013,
+     "t": -0.6587,
+     "nwT": -0.6226,
+     "weeks": 565,
+     "onShare": 0.4425,
+     "pHolm": 1
+    },
+    "nas100": {
+     "nOn": 250,
+     "nOff": 315,
+     "meanOn": 0.0022,
+     "meanOff": 0.0049,
+     "diff": -0.0027,
+     "t": -1.1003,
+     "nwT": -1.0734,
+     "weeks": 565,
+     "onShare": 0.4425,
+     "pHolm": 1
+    }
+   },
+   "placebo": {
+    "seeds": 40,
+    "onShare": 0.4425,
+    "tMin": -1.4524,
+    "tMedian": 0.1477,
+    "tMax": 1.7498,
+    "atOrAboveReal": 34
+   }
+  }
+ },
+ "rule_vs_benchmark": {
+  "W1": {
+   "label": "2008-15 (check)",
+   "markets": {
+    "spx500": {
+     "name": "SPX500",
+     "from": "2008-01-02",
+     "to": "2015-12-31",
+     "rule": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.2231,
+      "cagr": 0.0255,
+      "vol": 0.1079,
+      "sharpe": 0.2811,
+      "maxDD": 0.1966
+     },
+     "bench": {
+      "days": 2070,
+      "months": 96,
+      "total": -0.2131,
+      "cagr": -0.0295,
+      "vol": 0.2096,
+      "sharpe": -0.0346,
+      "maxDD": 0.6076
+     },
+     "inMarket": 0.4913,
+     "benchInMarket": 0.9111,
+     "switches": 69,
+     "stops": 31,
+     "benchStops": 62,
+     "positions": 50
+    },
+    "nas100": {
+     "name": "NAS100",
+     "from": "2008-01-02",
+     "to": "2015-12-31",
+     "rule": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.5443,
+      "cagr": 0.0558,
+      "vol": 0.1196,
+      "sharpe": 0.5022,
+      "maxDD": 0.2772
+     },
+     "bench": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.311,
+      "cagr": 0.0344,
+      "vol": 0.2216,
+      "sharpe": 0.2594,
+      "maxDD": 0.5415
+     },
+     "inMarket": 0.4976,
+     "benchInMarket": 0.9193,
+     "switches": 65,
+     "stops": 27,
+     "benchStops": 55,
+     "positions": 46
+    }
+   },
+   "book": {
+    "rule": {
+     "days": 2070,
+     "months": 96,
+     "total": 0.3796,
+     "cagr": 0.041,
+     "vol": 0.1098,
+     "sharpe": 0.4117,
+     "maxDD": 0.2322
+    },
+    "bench": {
+     "days": 2070,
+     "months": 96,
+     "total": 0.0259,
+     "cagr": 0.0032,
+     "vol": 0.21,
+     "sharpe": 0.1196,
+     "maxDD": 0.5728
+    }
+   }
+  },
+  "W2": {
+   "label": "2016 to now (decisive)",
+   "markets": {
+    "spx500": {
+     "name": "SPX500",
+     "from": "2016-01-01",
+     "to": "2026-11-06",
+     "rule": {
+      "days": 2820,
+      "months": 131,
+      "total": 0.072,
+      "cagr": 0.0064,
+      "vol": 0.0911,
+      "sharpe": 0.1138,
+      "maxDD": 0.2135
+     },
+     "bench": {
+      "days": 2820,
+      "months": 131,
+      "total": 1.3915,
+      "cagr": 0.0831,
+      "vol": 0.1556,
+      "sharpe": 0.5783,
+      "maxDD": 0.2395
+     },
+     "inMarket": 0.4131,
+     "benchInMarket": 0.9245,
+     "switches": 103,
+     "stops": 33,
+     "benchStops": 75,
+     "positions": 68
+    },
+    "nas100": {
+     "name": "NAS100",
+     "from": "2016-01-01",
+     "to": "2026-11-06",
+     "rule": {
+      "days": 2820,
+      "months": 131,
+      "total": 0.1406,
+      "cagr": 0.0121,
+      "vol": 0.1283,
+      "sharpe": 0.1559,
+      "maxDD": 0.2969
+     },
+     "bench": {
+      "days": 2820,
+      "months": 131,
+      "total": 2.2579,
+      "cagr": 0.1143,
+      "vol": 0.2058,
+      "sharpe": 0.6157,
+      "maxDD": 0.4043
+     },
+     "inMarket": 0.4131,
+     "benchInMarket": 0.9301,
+     "switches": 97,
+     "stops": 29,
+     "benchStops": 68,
+     "positions": 63
+    }
+   },
+   "book": {
+    "rule": {
+     "days": 2820,
+     "months": 131,
+     "total": 0.1135,
+     "cagr": 0.0099,
+     "vol": 0.1056,
+     "sharpe": 0.1438,
+     "maxDD": 0.2499
+    },
+    "bench": {
+     "days": 2820,
+     "months": 131,
+     "total": 1.835,
+     "cagr": 0.1002,
+     "vol": 0.1747,
+     "sharpe": 0.6203,
+     "maxDD": 0.3131
+    }
+   }
+  }
+ },
+ "pass": {
+  "checks": {
+   "w2Positive": false,
+   "w1SameSign": true,
+   "w2Sharpe": false
+  },
+  "pass": false
+ },
+ "verdict": "FAIL"
+}

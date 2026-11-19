@@ -1,0 +1,604 @@
+{
+ "study": "gotobi-duka-spread",
+ "built": "2026-11-14",
+ "verdict": "NOT MEASURABLE (inconclusive: Dukascopy's datafeed host refused every connection from this build sandbox, 30 of 30 probe files failed; no bid / ask candle could be read)",
+ "probedAt": "2026-11-14T02:27:24Z",
+ "original": {
+  "branch": "gotobi",
+  "commit": "5f341e069",
+  "test": "T2",
+  "pr": 878,
+  "replication": 889,
+  "cost": "gotobi-cost"
+ },
+ "frozen": {
+  "file": "frozen.mjs",
+  "from": "research/edge/gotobi-cost/frozen.mjs",
+  "sha256": "645f273102d05ad3a654f361e5cece3753eff5b6d34c242e79f687c23cbe5e32"
+ },
+ "data": {
+  "source": "Dukascopy BID and ASK minute candles",
+  "host": "https://datafeed.dukascopy.com/datafeed",
+  "symbols": [
+   "USDJPY",
+   "GBPJPY",
+   "AUDJPY",
+   "CADJPY",
+   "CHFJPY"
+  ],
+  "probeDays": [
+   "2010-01-05",
+   "2016-02-05",
+   "2026-11-10"
+  ],
+  "gotobi": true
+ },
+ "probe": {
+  "reachable": false,
+  "ok": 0,
+  "of": 30,
+  "bySide": {
+   "BID": 0,
+   "ASK": 0
+  },
+  "errors": [
+   "fetch failed (Request was cancelled.)",
+   "curl: (56) CONNECT tunnel failed, response 403"
+  ]
+ },
+ "rows": [
+  {
+   "day": "2010-01-05",
+   "sym": "USDJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "USDJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "GBPJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "GBPJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "AUDJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "AUDJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "CADJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "CADJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "CHFJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2010-01-05",
+   "sym": "CHFJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "USDJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "USDJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "GBPJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "GBPJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "AUDJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "AUDJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "CADJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "CADJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "CHFJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2016-02-05",
+   "sym": "CHFJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "USDJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "USDJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "GBPJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "GBPJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "AUDJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "AUDJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "CADJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "CADJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "CHFJPY",
+   "side": "BID",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  },
+  {
+   "day": "2026-11-10",
+   "sym": "CHFJPY",
+   "side": "ASK",
+   "ok": false,
+   "tries": [
+    {
+     "via": "fetch",
+     "status": null,
+     "error": "fetch failed (Request was cancelled.)"
+    },
+    {
+     "via": "curl",
+     "status": null,
+     "error": "curl: (56) CONNECT tunnel failed, response 403"
+    }
+   ]
+  }
+ ],
+ "computed": {
+  "measurementA": null,
+  "testB": null,
+  "feedCheck": null,
+  "placebo": null
+ },
+ "notes": [
+  "Measurement A (the quoted spread at 00:55 and 06:00 UTC by pair and year, gotobi against other days, and the one-minute mid change), Test B (the frozen T2 signals on mid, filled at BID / bought back at ASK, commission USD 22.5 per million a side, plus 0.3 pip a side of extra slippage; streams USD/JPY 2016-now, USD/JPY 2010-15, crosses pooled 2010-now; Holm), the feed check against gotobi-cost/trades.json and the 40-seed placebo: none was run, because no candle could be read.",
+  "Not substituted, on purpose: OANDA through the site's candle proxy is mid only (api/bars.js asks for price \"M\"; api/ was not changed); council-data's HistData USD/JPY M1 files (2018-2026) carry one side only, so no spread can be taken from them; the crosses have no minute file in council-data at all.",
+  "The proxy's own log named the refusal for every request: \"connect_rejected\", the gateway answering 403 to CONNECT datafeed.dukascopy.com:443 (also www.dukascopy.com and freeserv.dukascopy.com). Dukascopy itself was never reached, so this says nothing about whether it serves these files: council-data's research/probe/cnbc2/duka.txt shows a GitHub Actions runner received a Dukascopy file (HTTP 200) earlier.",
+  "One departure from the order in the brief, said plainly: a few reachability requests (the USDJPY BID and ASK minute files and the 00h tick file of 5 Jan 2016, and the home pages of www.dukascopy.com and freeserv.dukascopy.com) were made before PREREGISTRATION.md was written, and all were refused the same way; nothing was downloaded, so no figure could have shaped the pre-registration.",
+  "How to run it where the host is reachable: a runner that can reach datafeed.dukascopy.com (a GitHub Actions job, as the ICT back-fills used) runs the pre-registered steps 1-5 unchanged, with the minute files cached outside git; this probe script then reports them reachable and stops without a verdict, so the measurement code must be added under this same pre-registration before any figure is read."
+ ]
+}

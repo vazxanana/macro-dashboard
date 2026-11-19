@@ -1,0 +1,32 @@
+// Edge research · gold-pre-cpi: OANDA mid H1 gold (xau) through the site's keyless candle proxy (/md/bars), 1 Nov 2017 to
+// 14 Nov 2026, complete candles only (UTC hours as the proxy serves them).
+//   node --use-env-proxy research/edge/gold-pre-cpi/fetch.mjs <outDir>      (writes <outDir>/xau-h1.json, rows [t,o,h,l,c])
+// Keep the output out of git.
+import fs from 'node:fs';
+import path from 'node:path';
+
+const [OUT] = process.argv.slice(2);
+if (!OUT) throw new Error('usage: node fetch.mjs <outDir>');
+const BASE = process.env.MD_BASE || 'https://meridianx.dev/md/';
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const T = (s) => Date.parse(s + 'T00:00:00Z') / 1000;
+const FROM = T('2017-11-01'), END = T('2026-11-14'), SEC = 3600;
+
+const m = new Map();
+for (let a = FROM; a < END;) {
+  const b = Math.min(END, a + 4999 * SEC);
+  let j = null, err = null;
+  for (let k = 0; k < 6 && !j; k++) {
+    try { const r = await fetch(`${BASE}bars?sym=xau&tf=1h&from=${a}&to=${b}`, { signal: AbortSignal.timeout(40000) }); const x = r.ok ? await r.json() : null;
+      if (x && x.src === 'OANDA' && Array.isArray(x.bars)) j = x; else err = x && x.error ? String(x.error) : `HTTP ${r.status}`; }
+    catch (e) { err = String(e.message || e); }
+    if (!j) await sleep(2000 * (k + 1));
+  }
+  if (!j) throw new Error(`xau ${new Date(a * 1000).toISOString()}: ${err}`);
+  for (const x of j.bars) if (!x.live && x.time >= a && x.time < b) m.set(+x.time, [+x.time, +x.open, +x.high, +x.low, +x.close]);
+  a = b; await sleep(150);
+}
+const bars = [...m.values()].sort((p, q) => p[0] - q[0]);
+fs.mkdirSync(OUT, { recursive: true });
+fs.writeFileSync(path.join(OUT, 'xau-h1.json'), JSON.stringify(bars));
+console.log(`xau H1: ${bars.length} candles ${new Date(bars[0][0] * 1000).toISOString().slice(0, 10)} → ${new Date(bars.at(-1)[0] * 1000).toISOString().slice(0, 10)}`);

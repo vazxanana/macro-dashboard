@@ -1,0 +1,48 @@
+// Dhanteras and Akshaya Tritiya, 2007-2026 (research/edge/gold-india-festivals, PREREGISTRATION.md). A fixed, written table:
+// nothing is looked up at run time. Dates are the Gregorian day of the festival as listed for New Delhi by Drik Panchang
+// (drikpanchang.com festival pages), cross-checked on 14 Nov 2026 against press reports of the day (sources per row).
+// `ok: false` = not verified, or the festival was observed on two days: excluded from every test (decided before any price was read).
+export const DHANTERAS = [
+  { year: 2007, date: '2007-11-07', ok: true, src: 'Drik Panchang list (2006 page, 2007-2013)' },
+  { year: 2008, date: '2008-10-26', ok: true, src: 'Drik Panchang list' },
+  { year: 2009, date: '2009-10-15', ok: true, src: 'Drik Panchang list' },
+  { year: 2010, date: '2010-11-03', ok: true, src: 'Drik Panchang list' },
+  { year: 2011, date: '2011-10-24', ok: true, src: 'Drik Panchang list' },
+  { year: 2012, date: '2012-11-11', ok: true, src: 'Drik Panchang list' },
+  { year: 2013, date: '2013-11-01', ok: true, src: 'Drik Panchang list' },
+  { year: 2014, date: '2014-10-21', ok: true, src: 'Drik Panchang list (2016 page, 2013-2016)' },
+  { year: 2015, date: '2015-11-09', ok: true, src: 'Drik Panchang list' },
+  { year: 2016, date: '2016-10-28', ok: true, src: 'Drik Panchang list (one calendar site gives 27 Oct; Drik Panchang and an encyclopedia mirror give 28 Oct)' },
+  { year: 2017, date: '2017-10-17', ok: true, src: 'Drik Panchang New Delhi; Epic Astrology list agrees' },
+  { year: 2018, date: '2018-11-05', ok: true, src: 'Drik Panchang New Delhi; Epic Astrology' },
+  { year: 2019, date: '2019-10-25', ok: true, src: 'Drik Panchang New Delhi (2019 page)' },
+  { year: 2020, date: '2020-11-13', ok: true, src: 'Drik Panchang New Delhi; Epic Astrology' },
+  { year: 2021, date: '2021-11-02', ok: true, src: 'Drik Panchang New Delhi (2021 page)' },
+  { year: 2022, date: '2022-10-22', ok: true, src: 'Drik Panchang New Delhi (Saturday; 23 Oct elsewhere: the same trading days)' },
+  { year: 2023, date: '2023-11-10', ok: true, src: 'Drik Panchang New Delhi (2023 page)' },
+  { year: 2024, date: '2024-10-29', ok: true, src: 'Drik Panchang (2024 page)' },
+  { year: 2025, date: '2025-10-18', ok: true, src: 'Drik Panchang New Delhi (2025 page)' },
+  { year: 2026, date: '2026-11-06', ok: true, src: 'Drik Panchang New Delhi; MyAstrology (Drik Siddhanta, New Delhi) agrees' },
+];
+export const AKSHAYA = [
+  { year: 2007, date: '2007-04-20', ok: false, src: 'not verified from a source on 14 Nov 2026: excluded' },
+  { year: 2008, date: '2008-05-08', ok: false, src: 'observed on two days, 7-8 May (Business Standard, May 2009): excluded' },
+  { year: 2009, date: '2009-04-27', ok: true, src: 'Business Standard, 2 May 2009 ("Akshaya Tritiya fails to improve gold sales")' },
+  { year: 2010, date: '2010-05-16', ok: true, src: 'Drik Panchang 2010 page; Gold Price India festival table' },
+  { year: 2011, date: '2011-05-06', ok: true, src: 'Drik Panchang 2011 New Delhi; Gold Price India' },
+  { year: 2012, date: '2012-04-24', ok: true, src: 'Drik Panchang 2012 page; Gold Price India; Business Standard 25 Apr 2012' },
+  { year: 2013, date: '2013-05-13', ok: true, src: 'Business Standard 11 May 2013 ("May 13 is Akshaya Tritiya"); Goodreturns table' },
+  { year: 2014, date: '2014-05-02', ok: true, src: 'Goodreturns Akshaya Tritiya table' },
+  { year: 2015, date: '2015-04-21', ok: true, src: 'gift-calendar site; Ratestoday festival table' },
+  { year: 2016, date: '2016-05-09', ok: true, src: 'Goodreturns table; Business Standard 6 May 2016' },
+  { year: 2017, date: '2017-04-28', ok: true, src: 'gift-calendar site; Business Standard 28 Apr 2017' },
+  { year: 2018, date: '2018-04-18', ok: true, src: 'gift-calendar site; Business Standard 18 Apr 2018' },
+  { year: 2019, date: '2019-05-07', ok: true, src: 'calendar search summary (several sites)' },
+  { year: 2020, date: '2020-04-26', ok: true, src: 'Business Today / Business Standard reports of 26 Apr 2020 (lockdown)' },
+  { year: 2021, date: '2021-05-14', ok: true, src: 'Goodreturns table' },
+  { year: 2022, date: '2022-05-03', ok: true, src: 'calendar search summary' },
+  { year: 2023, date: '2023-04-22', ok: true, src: 'calendar search summary (Saturday; 23 Apr for Kolkata: the same trading days)' },
+  { year: 2024, date: '2024-05-10', ok: true, src: 'Drik Panchang (Kolkata page)' },
+  { year: 2025, date: '2025-04-30', ok: true, src: 'Drik Panchang New Delhi (2025 page)' },
+  { year: 2026, date: '2026-04-19', ok: true, src: 'Drik Panchang New Delhi (tithi 10:49 19 Apr to 07:27 20 Apr); Business Today 14 Apr 2026' },
+];

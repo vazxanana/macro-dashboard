@@ -1,0 +1,455 @@
+{
+ "study": "audnzd-revert",
+ "title": "AUD/NZD daily z-score mean reversion",
+ "built": "2026-11-13",
+ "preregistration": "PREREGISTRATION.md",
+ "system": "AUD/NZD daily z-score fade (not a council system)",
+ "verdict": "FAIL, 0 of 3 variants: the AUD/NZD z-score fade is not an edge after costs",
+ "data": {
+  "src": "OANDA mid daily AUD_NZD, council-data research/daily/audnzd.json",
+  "from": "2004-05-04",
+  "to": "2026-11-06",
+  "bars": 5866
+ },
+ "params": {
+  "atrN": 14,
+  "stopAtr": 1.5,
+  "hold": 10
+ },
+ "cost": {
+  "spreadPx": 0.0001,
+  "slipPx": 0.0001,
+  "commRT": 0.000045,
+  "finYear": 0.02
+ },
+ "windows": {
+  "rep": {
+   "from": "2008-01-01",
+   "to": "2016-01-01"
+  },
+  "dec": {
+   "from": "2016-01-01",
+   "to": null
+  }
+ },
+ "bar": {
+  "minN": 60,
+  "minT": 2,
+  "alpha": 0.05
+ },
+ "placeboSpec": {
+  "draws": 40,
+  "seed": 20261113
+ },
+ "variants": [
+  {
+   "id": "V1",
+   "name": "SMA20 / SD20, z beyond ±2",
+   "N": 20,
+   "Z": 2,
+   "rep": {
+    "n": 112,
+    "avg": -0.232,
+    "gross": -0.172,
+    "cost": 0.059,
+    "total": -25.93,
+    "wr": 38.39,
+    "pf": 0.59,
+    "months": 96,
+    "monthT": -2.63,
+    "p": 0.9958,
+    "dd": -28.09,
+    "exits": {
+     "mean": 29,
+     "stop": 55,
+     "time": 27,
+     "stop-gap": 1
+    }
+   },
+   "dec": {
+    "n": 160,
+    "avg": -0.143,
+    "gross": -0.056,
+    "cost": 0.087,
+    "total": -22.8,
+    "wr": 42.5,
+    "pf": 0.74,
+    "months": 131,
+    "monthT": -1.72,
+    "p": 0.9575,
+    "dd": -30.27,
+    "exits": {
+     "mean": 52,
+     "stop": 69,
+     "time": 36,
+     "stop-gap": 3
+    }
+   },
+   "fin0": -0.086,
+   "fin4": -0.199,
+   "placebo": {
+    "draws": 40,
+    "median": -0.066,
+    "p5": -0.142,
+    "p95": 0.019,
+    "atLeastReal": 38
+   },
+   "holmP": 1,
+   "pass": false,
+   "aboveRandom": false
+  },
+  {
+   "id": "V2",
+   "name": "SMA20 / SD20, z beyond ±2.5",
+   "N": 20,
+   "Z": 2.5,
+   "rep": {
+    "n": 29,
+    "avg": -0.321,
+    "gross": -0.263,
+    "cost": 0.058,
+    "total": -9.31,
+    "wr": 34.48,
+    "pf": 0.53,
+    "months": 96,
+    "monthT": -1.58,
+    "p": 0.9431,
+    "dd": -12.98,
+    "exits": {
+     "mean": 8,
+     "stop": 17,
+     "stop-gap": 1,
+     "time": 3
+    }
+   },
+   "dec": {
+    "n": 48,
+    "avg": 0.061,
+    "gross": 0.15,
+    "cost": 0.089,
+    "total": 2.93,
+    "wr": 47.92,
+    "pf": 1.13,
+    "months": 131,
+    "monthT": 0.43,
+    "p": 0.3348,
+    "dd": -5.91,
+    "exits": {
+     "mean": 17,
+     "stop": 19,
+     "time": 12
+    }
+   },
+   "fin0": 0.12,
+   "fin4": 0.001,
+   "placebo": {
+    "draws": 40,
+    "median": -0.077,
+    "p5": -0.222,
+    "p95": 0.047,
+    "atLeastReal": 2
+   },
+   "holmP": 1,
+   "pass": false,
+   "aboveRandom": true
+  },
+  {
+   "id": "V3",
+   "name": "SMA50 / SD50, z beyond ±2",
+   "N": 50,
+   "Z": 2,
+   "rep": {
+    "n": 79,
+    "avg": -0.233,
+    "gross": -0.17,
+    "cost": 0.063,
+    "total": -18.43,
+    "wr": 39.24,
+    "pf": 0.6,
+    "months": 96,
+    "monthT": -1.93,
+    "p": 0.9732,
+    "dd": -20.16,
+    "exits": {
+     "stop": 41,
+     "time": 36,
+     "mean": 2
+    }
+   },
+   "dec": {
+    "n": 122,
+    "avg": -0.104,
+    "gross": -0.005,
+    "cost": 0.099,
+    "total": -12.73,
+    "wr": 45.08,
+    "pf": 0.8,
+    "months": 131,
+    "monthT": -1.03,
+    "p": 0.8478,
+    "dd": -12.73,
+    "exits": {
+     "stop": 51,
+     "time": 56,
+     "mean": 13,
+     "stop-gap": 2
+    }
+   },
+   "fin0": -0.036,
+   "fin4": -0.172,
+   "placebo": {
+    "draws": 40,
+    "median": -0.057,
+    "p5": -0.147,
+    "p95": -0.005,
+    "atLeastReal": 30
+   },
+   "holmP": 1,
+   "pass": false,
+   "aboveRandom": false
+  }
+ ],
+ "descriptive": {
+  "audcad": [
+   {
+    "id": "V1",
+    "rep": {
+     "n": 122,
+     "avg": -0.044,
+     "gross": 0.01,
+     "cost": 0.054,
+     "total": -5.33,
+     "wr": 47.54,
+     "pf": 0.91,
+     "months": 96,
+     "monthT": -0.45,
+     "p": 0.6739,
+     "dd": -14.38,
+     "exits": {
+      "stop": 53,
+      "mean": 42,
+      "time": 27
+     }
+    },
+    "dec": {
+     "n": 150,
+     "avg": 0.15,
+     "gross": 0.223,
+     "cost": 0.072,
+     "total": 22.56,
+     "wr": 56.67,
+     "pf": 1.39,
+     "months": 131,
+     "monthT": 1.82,
+     "p": 0.0344,
+     "dd": -7.63,
+     "exits": {
+      "mean": 65,
+      "stop": 47,
+      "time": 37,
+      "stop-gap": 1
+     }
+    }
+   },
+   {
+    "id": "V2",
+    "rep": {
+     "n": 42,
+     "avg": 0.014,
+     "gross": 0.067,
+     "cost": 0.052,
+     "total": 0.6,
+     "wr": 47.62,
+     "pf": 1.03,
+     "months": 96,
+     "monthT": 0.08,
+     "p": 0.4684,
+     "dd": -4.58,
+     "exits": {
+      "stop": 18,
+      "time": 10,
+      "mean": 14
+     }
+    },
+    "dec": {
+     "n": 49,
+     "avg": 0.057,
+     "gross": 0.135,
+     "cost": 0.078,
+     "total": 2.8,
+     "wr": 46.94,
+     "pf": 1.13,
+     "months": 131,
+     "monthT": 0.36,
+     "p": 0.361,
+     "dd": -4.89,
+     "exits": {
+      "mean": 15,
+      "time": 17,
+      "stop": 17
+     }
+    }
+   },
+   {
+    "id": "V3",
+    "rep": {
+     "n": 90,
+     "avg": -0.064,
+     "gross": -0.005,
+     "cost": 0.058,
+     "total": -5.72,
+     "wr": 43.33,
+     "pf": 0.87,
+     "months": 97,
+     "monthT": -0.51,
+     "p": 0.6935,
+     "dd": -6.58,
+     "exits": {
+      "stop": 40,
+      "time": 41,
+      "mean": 9
+     }
+    },
+    "dec": {
+     "n": 114,
+     "avg": 0.07,
+     "gross": 0.149,
+     "cost": 0.08,
+     "total": 7.96,
+     "wr": 48.25,
+     "pf": 1.15,
+     "months": 131,
+     "monthT": 0.68,
+     "p": 0.2481,
+     "dd": -8.96,
+     "exits": {
+      "mean": 20,
+      "time": 51,
+      "stop": 42,
+      "stop-gap": 1
+     }
+    }
+   }
+  ],
+  "eurgbp": [
+   {
+    "id": "V1",
+    "rep": {
+     "n": 114,
+     "avg": 0.051,
+     "gross": 0.116,
+     "cost": 0.065,
+     "total": 5.87,
+     "wr": 46.49,
+     "pf": 1.11,
+     "months": 96,
+     "monthT": 0.48,
+     "p": 0.3149,
+     "dd": -11.2,
+     "exits": {
+      "stop": 45,
+      "time": 27,
+      "mean": 42
+     }
+    },
+    "dec": {
+     "n": 161,
+     "avg": 0.085,
+     "gross": 0.17,
+     "cost": 0.086,
+     "total": 13.61,
+     "wr": 50.93,
+     "pf": 1.19,
+     "months": 131,
+     "monthT": 1.07,
+     "p": 0.142,
+     "dd": -8.56,
+     "exits": {
+      "stop": 59,
+      "time": 42,
+      "mean": 59,
+      "stop-gap": 1
+     }
+    }
+   },
+   {
+    "id": "V2",
+    "rep": {
+     "n": 33,
+     "avg": 0.117,
+     "gross": 0.18,
+     "cost": 0.063,
+     "total": 3.85,
+     "wr": 45.45,
+     "pf": 1.25,
+     "months": 96,
+     "monthT": 0.59,
+     "p": 0.2768,
+     "dd": -4.73,
+     "exits": {
+      "stop": 14,
+      "mean": 12,
+      "time": 7
+     }
+    },
+    "dec": {
+     "n": 55,
+     "avg": -0.03,
+     "gross": 0.059,
+     "cost": 0.088,
+     "total": -1.64,
+     "wr": 45.45,
+     "pf": 0.94,
+     "months": 131,
+     "monthT": -0.21,
+     "p": 0.5832,
+     "dd": -4.23,
+     "exits": {
+      "stop": 24,
+      "time": 17,
+      "mean": 14
+     }
+    }
+   },
+   {
+    "id": "V3",
+    "rep": {
+     "n": 95,
+     "avg": 0.134,
+     "gross": 0.206,
+     "cost": 0.072,
+     "total": 12.74,
+     "wr": 45.26,
+     "pf": 1.28,
+     "months": 96,
+     "monthT": 0.96,
+     "p": 0.1692,
+     "dd": -5.34,
+     "exits": {
+      "stop": 38,
+      "time": 38,
+      "mean": 19
+     }
+    },
+    "dec": {
+     "n": 104,
+     "avg": 0.131,
+     "gross": 0.229,
+     "cost": 0.098,
+     "total": 13.66,
+     "wr": 50,
+     "pf": 1.3,
+     "months": 131,
+     "monthT": 1.16,
+     "p": 0.1228,
+     "dd": -5.53,
+     "exits": {
+      "stop": 35,
+      "time": 53,
+      "mean": 16
+     }
+    }
+   }
+  ]
+ }
+}

@@ -1,0 +1,1267 @@
+{
+ "study": "gotobi-replicate",
+ "built": "2026-11-14",
+ "original": {
+  "branch": "gotobi",
+  "commit": "5f341e069",
+  "file": "research/edge/gotobi/run.mjs",
+  "test": {
+   "test": "T2",
+   "pair": "usdjpy",
+   "leg": "fade"
+  }
+ },
+ "rule": "The gotobi study's T2, frozen: on gotobi days (5, 10, 15, 20, 25 and the last Tokyo business day, rolled back), sell at 00:55 UTC (09:55 Tokyo), buy back at 06:00 UTC (15:00 Tokyo); stop 1.5 x the 20-business-day median of the same window's absolute move; net of 0.3 pip spread, USD 22.5 per million a side and 0.5 pip slippage a side.",
+ "data": {
+  "source": "OANDA mid M5 through the /md/bars proxy, candles starting 00:00-06:55 UTC",
+  "first": {
+   "gbpjpy": "2009-11-02",
+   "audjpy": "2009-11-02",
+   "cadjpy": "2009-11-02",
+   "chfjpy": "2009-11-02",
+   "usdjpyPre": "2005-01-03"
+  },
+  "lastDay": "2026-11-11"
+ },
+ "bar": {
+  "r1": {
+   "pooledNetR": "> 0",
+   "pooledMonthT": 2,
+   "crossesPositive": ">= 3 of 4",
+   "placebo": {
+    "seeds": 40,
+    "rank": 38
+   },
+   "minTrades": 400
+  },
+  "r2": {
+   "netR": "> 0",
+   "monthT": 1.5
+  }
+ },
+ "gate": {
+  "decisive": {
+   "n": 771,
+   "netR": 0.1481,
+   "grossR": 0.2607,
+   "costR": 0.1126,
+   "totalR": 114.19,
+   "tradeT": 2.9,
+   "months": 131,
+   "t": 2.74,
+   "win": 0.5136,
+   "stopShare": 0.2763,
+   "stopPips": 19.5,
+   "netR2x": 0.0355,
+   "t2x": 0.65
+  },
+  "replication": {
+   "n": 425,
+   "netR": 0.1306,
+   "grossR": 0.2427,
+   "costR": 0.1121,
+   "totalR": 55.52,
+   "tradeT": 2.36,
+   "months": 72,
+   "t": 2.45,
+   "win": 0.5271,
+   "stopShare": 0.2729,
+   "stopPips": 17.5,
+   "netR2x": 0.0185,
+   "t2x": 0.35
+  }
+ },
+ "r1": {
+  "window": [
+   "2010-01-01",
+   "2026-11-11"
+  ],
+  "crosses": {
+   "gbpjpy": {
+    "pair": "GBP/JPY",
+    "costs": {
+     "spreadPips": 0.3,
+     "slipPipsASide": 0.5,
+     "commissionASide": 0.0000225,
+     "pip": 0.01,
+     "spreadMeasured": false
+    },
+    "gotobiDays": 1208,
+    "noData": {
+     "gotobi": 12,
+     "other": 5
+    },
+    "all": {
+     "n": 1196,
+     "netR": 0.1357,
+     "grossR": 0.2167,
+     "costR": 0.081,
+     "totalR": 162.24,
+     "tradeT": 3.14,
+     "months": 203,
+     "t": 2.97,
+     "win": 0.4883,
+     "stopShare": 0.2826,
+     "stopPips": 27.5,
+     "netR2x": 0.0547,
+     "t2x": 1.19
+    },
+    "h2016": {
+     "n": 771,
+     "netR": 0.1189,
+     "grossR": 0.2033,
+     "costR": 0.0844,
+     "totalR": 91.65,
+     "tradeT": 2.07,
+     "months": 131,
+     "t": 1.97,
+     "win": 0.4721,
+     "stopShare": 0.2789,
+     "stopPips": 26.1,
+     "netR2x": 0.0344,
+     "t2x": 0.57
+    },
+    "h2010": {
+     "n": 425,
+     "netR": 0.1661,
+     "grossR": 0.2409,
+     "costR": 0.0748,
+     "totalR": 70.59,
+     "tradeT": 2.64,
+     "months": 72,
+     "t": 2.45,
+     "win": 0.5176,
+     "stopShare": 0.2894,
+     "stopPips": 30.4,
+     "netR2x": 0.0913,
+     "t2x": 1.35
+    },
+    "placebo": {
+     "seeds": 40,
+     "rank": 38,
+     "p95": 0.0122,
+     "median": -0.0345,
+     "values": [
+      -0.0783,
+      -0.0337,
+      -0.0353,
+      -0.0503,
+      -0.0658,
+      -0.0633,
+      -0.0157,
+      -0.0053,
+      -0.0655,
+      -0.0314,
+      -0.0039,
+      -0.0656,
+      -0.0108,
+      -0.0774,
+      -0.021,
+      -0.0203,
+      -0.0281,
+      -0.0355,
+      -0.0192,
+      -0.0617,
+      0.0122,
+      -0.0388,
+      -0.0023,
+      -0.0394,
+      0.029,
+      -0.0318,
+      -0.0534,
+      -0.0707,
+      -0.0525,
+      -0.0573,
+      0.014,
+      -0.071,
+      -0.0461,
+      -0.0201,
+      -0.0145,
+      -0.0649,
+      -0.0307,
+      -0.0312,
+      -0.0035,
+      -0.1027
+     ],
+     "beats": 40
+    },
+    "everyOtherDay": {
+     "n": 2910,
+     "netR": -0.042,
+     "grossR": 0.0392,
+     "costR": 0.0812,
+     "totalR": -122.21,
+     "tradeT": -1.98,
+     "months": 203,
+     "t": -1.92,
+     "win": 0.4234,
+     "stopShare": 0.3244,
+     "stopPips": 27.6
+    },
+    "byYear": {
+     "2010": {
+      "n": 71,
+      "netR": 0.1326,
+      "totalR": 9.42
+     },
+     "2011": {
+      "n": 72,
+      "netR": 0.3116,
+      "totalR": 22.43
+     },
+     "2012": {
+      "n": 71,
+      "netR": 0.133,
+      "totalR": 9.44
+     },
+     "2013": {
+      "n": 70,
+      "netR": 0.1468,
+      "totalR": 10.28
+     },
+     "2014": {
+      "n": 70,
+      "netR": 0.0127,
+      "totalR": 0.89
+     },
+     "2015": {
+      "n": 71,
+      "netR": 0.2555,
+      "totalR": 18.14
+     },
+     "2016": {
+      "n": 72,
+      "netR": 0.519,
+      "totalR": 37.36
+     },
+     "2017": {
+      "n": 71,
+      "netR": -0.1302,
+      "totalR": -9.25
+     },
+     "2018": {
+      "n": 71,
+      "netR": -0.1192,
+      "totalR": -8.46
+     },
+     "2019": {
+      "n": 70,
+      "netR": 0.1579,
+      "totalR": 11.06
+     },
+     "2020": {
+      "n": 70,
+      "netR": 0.0473,
+      "totalR": 3.31
+     },
+     "2021": {
+      "n": 71,
+      "netR": -0.0243,
+      "totalR": -1.72
+     },
+     "2022": {
+      "n": 72,
+      "netR": 0.2588,
+      "totalR": 18.64
+     },
+     "2023": {
+      "n": 71,
+      "netR": 0.0682,
+      "totalR": 4.84
+     },
+     "2024": {
+      "n": 71,
+      "netR": 0.3374,
+      "totalR": 23.96
+     },
+     "2025": {
+      "n": 70,
+      "netR": 0.2433,
+      "totalR": 17.03
+     },
+     "2026": {
+      "n": 62,
+      "netR": -0.0824,
+      "totalR": -5.11
+     }
+    },
+    "afterVerdict": {
+     "corrWithUsdjpyT2": {
+      "days": 1196,
+      "r": 0.73
+     }
+    }
+   },
+   "audjpy": {
+    "pair": "AUD/JPY",
+    "costs": {
+     "spreadPips": 0.3,
+     "slipPipsASide": 0.5,
+     "commissionASide": 0.0000225,
+     "pip": 0.01,
+     "spreadMeasured": false
+    },
+    "gotobiDays": 1208,
+    "noData": {
+     "gotobi": 12,
+     "other": 5
+    },
+    "all": {
+     "n": 1196,
+     "netR": 0.0298,
+     "grossR": 0.1055,
+     "costR": 0.0757,
+     "totalR": 35.63,
+     "tradeT": 0.84,
+     "months": 203,
+     "t": 0.91,
+     "win": 0.4557,
+     "stopShare": 0.2918,
+     "stopPips": 24.1,
+     "netR2x": -0.0459,
+     "t2x": -1.38
+    },
+    "h2016": {
+     "n": 771,
+     "netR": -0.0174,
+     "grossR": 0.0632,
+     "costR": 0.0806,
+     "totalR": -13.4,
+     "tradeT": -0.38,
+     "months": 131,
+     "t": -0.43,
+     "win": 0.4293,
+     "stopShare": 0.3035,
+     "stopPips": 22.8,
+     "netR2x": -0.098,
+     "t2x": -2.4
+    },
+    "h2010": {
+     "n": 425,
+     "netR": 0.1154,
+     "grossR": 0.1821,
+     "costR": 0.0668,
+     "totalR": 49.02,
+     "tradeT": 2.08,
+     "months": 72,
+     "t": 2.09,
+     "win": 0.5035,
+     "stopShare": 0.2706,
+     "stopPips": 29.3,
+     "netR2x": 0.0486,
+     "t2x": 0.87
+    },
+    "placebo": {
+     "seeds": 40,
+     "rank": 38,
+     "p95": -0.0029,
+     "median": -0.0469,
+     "values": [
+      -0.0664,
+      -0.0096,
+      -0.041,
+      -0.054,
+      -0.0715,
+      -0.0464,
+      -0.0348,
+      -0.0388,
+      -0.073,
+      -0.0157,
+      -0.0292,
+      -0.1022,
+      -0.0132,
+      -0.0563,
+      -0.056,
+      -0.0432,
+      -0.0424,
+      -0.0716,
+      -0.0471,
+      -0.0583,
+      0.0081,
+      -0.0443,
+      0.0324,
+      -0.0713,
+      -0.0151,
+      -0.0772,
+      -0.0611,
+      -0.0736,
+      -0.0643,
+      -0.0811,
+      -0.0029,
+      -0.0511,
+      -0.1095,
+      -0.017,
+      -0.0218,
+      -0.0477,
+      -0.0705,
+      -0.0256,
+      -0.0204,
+      -0.0467
+     ],
+     "beats": 39
+    },
+    "everyOtherDay": {
+     "n": 2910,
+     "netR": -0.0511,
+     "grossR": 0.0243,
+     "costR": 0.0754,
+     "totalR": -148.73,
+     "tradeT": -2.5,
+     "months": 203,
+     "t": -2.77,
+     "win": 0.4168,
+     "stopShare": 0.3223,
+     "stopPips": 24.7
+    },
+    "byYear": {
+     "2010": {
+      "n": 71,
+      "netR": 0.2457,
+      "totalR": 17.45
+     },
+     "2011": {
+      "n": 72,
+      "netR": 0.3036,
+      "totalR": 21.86
+     },
+     "2012": {
+      "n": 71,
+      "netR": -0.1025,
+      "totalR": -7.28
+     },
+     "2013": {
+      "n": 70,
+      "netR": 0.2382,
+      "totalR": 16.67
+     },
+     "2014": {
+      "n": 70,
+      "netR": 0.038,
+      "totalR": 2.66
+     },
+     "2015": {
+      "n": 71,
+      "netR": -0.0329,
+      "totalR": -2.34
+     },
+     "2016": {
+      "n": 72,
+      "netR": 0.0755,
+      "totalR": 5.44
+     },
+     "2017": {
+      "n": 71,
+      "netR": -0.2004,
+      "totalR": -14.23
+     },
+     "2018": {
+      "n": 71,
+      "netR": -0.0511,
+      "totalR": -3.63
+     },
+     "2019": {
+      "n": 70,
+      "netR": -0.117,
+      "totalR": -8.19
+     },
+     "2020": {
+      "n": 70,
+      "netR": 0.0048,
+      "totalR": 0.34
+     },
+     "2021": {
+      "n": 71,
+      "netR": -0.0684,
+      "totalR": -4.86
+     },
+     "2022": {
+      "n": 72,
+      "netR": 0.1481,
+      "totalR": 10.66
+     },
+     "2023": {
+      "n": 71,
+      "netR": 0.0447,
+      "totalR": 3.17
+     },
+     "2024": {
+      "n": 71,
+      "netR": 0.0627,
+      "totalR": 4.45
+     },
+     "2025": {
+      "n": 70,
+      "netR": -0.026,
+      "totalR": -1.82
+     },
+     "2026": {
+      "n": 62,
+      "netR": -0.0764,
+      "totalR": -4.74
+     }
+    },
+    "afterVerdict": {
+     "corrWithUsdjpyT2": {
+      "days": 1196,
+      "r": 0.51
+     }
+    }
+   },
+   "cadjpy": {
+    "pair": "CAD/JPY",
+    "costs": {
+     "spreadPips": 0.3,
+     "slipPipsASide": 0.5,
+     "commissionASide": 0.0000225,
+     "pip": 0.01,
+     "spreadMeasured": false
+    },
+    "gotobiDays": 1208,
+    "noData": {
+     "gotobi": 12,
+     "other": 6
+    },
+    "all": {
+     "n": 1196,
+     "netR": 0.0899,
+     "grossR": 0.2034,
+     "costR": 0.1135,
+     "totalR": 107.57,
+     "tradeT": 2.27,
+     "months": 203,
+     "t": 2.28,
+     "win": 0.4732,
+     "stopShare": 0.2768,
+     "stopPips": 17,
+     "netR2x": -0.0235,
+     "t2x": -0.59
+    },
+    "h2016": {
+     "n": 771,
+     "netR": 0.0677,
+     "grossR": 0.1877,
+     "costR": 0.12,
+     "totalR": 52.17,
+     "tradeT": 1.31,
+     "months": 131,
+     "t": 1.3,
+     "win": 0.4591,
+     "stopShare": 0.2776,
+     "stopPips": 15.8,
+     "netR2x": -0.0524,
+     "t2x": -0.99
+    },
+    "h2010": {
+     "n": 425,
+     "netR": 0.1304,
+     "grossR": 0.2319,
+     "costR": 0.1015,
+     "totalR": 55.4,
+     "tradeT": 2.13,
+     "months": 72,
+     "t": 2.25,
+     "win": 0.4988,
+     "stopShare": 0.2753,
+     "stopPips": 18.9,
+     "netR2x": 0.0288,
+     "t2x": 0.5
+    },
+    "placebo": {
+     "seeds": 40,
+     "rank": 38,
+     "p95": -0.0541,
+     "median": -0.0875,
+     "values": [
+      -0.122,
+      -0.0763,
+      -0.0558,
+      -0.0942,
+      -0.0945,
+      -0.1036,
+      -0.0889,
+      -0.0793,
+      -0.1099,
+      -0.0623,
+      -0.0601,
+      -0.0894,
+      -0.0359,
+      -0.0641,
+      -0.1043,
+      -0.097,
+      -0.075,
+      -0.0971,
+      -0.0833,
+      -0.1182,
+      -0.0555,
+      -0.0958,
+      -0.0466,
+      -0.0991,
+      -0.0574,
+      -0.0695,
+      -0.1127,
+      -0.1389,
+      -0.0687,
+      -0.0861,
+      -0.0541,
+      -0.0957,
+      -0.1288,
+      -0.0701,
+      -0.1076,
+      -0.0969,
+      -0.0653,
+      -0.14,
+      -0.0802,
+      -0.0705
+     ],
+     "beats": 40
+    },
+    "everyOtherDay": {
+     "n": 2909,
+     "netR": -0.0879,
+     "grossR": 0.026,
+     "costR": 0.114,
+     "totalR": -255.83,
+     "tradeT": -4.24,
+     "months": 203,
+     "t": -4.07,
+     "win": 0.4111,
+     "stopShare": 0.3334,
+     "stopPips": 17
+    },
+    "byYear": {
+     "2010": {
+      "n": 71,
+      "netR": 0.1017,
+      "totalR": 7.22
+     },
+     "2011": {
+      "n": 72,
+      "netR": 0.3306,
+      "totalR": 23.8
+     },
+     "2012": {
+      "n": 71,
+      "netR": -0.0162,
+      "totalR": -1.15
+     },
+     "2013": {
+      "n": 70,
+      "netR": 0.2735,
+      "totalR": 19.14
+     },
+     "2014": {
+      "n": 70,
+      "netR": 0.0679,
+      "totalR": 4.75
+     },
+     "2015": {
+      "n": 71,
+      "netR": 0.023,
+      "totalR": 1.64
+     },
+     "2016": {
+      "n": 72,
+      "netR": 0.2059,
+      "totalR": 14.82
+     },
+     "2017": {
+      "n": 71,
+      "netR": -0.1348,
+      "totalR": -9.57
+     },
+     "2018": {
+      "n": 71,
+      "netR": -0.0041,
+      "totalR": -0.29
+     },
+     "2019": {
+      "n": 70,
+      "netR": 0.0397,
+      "totalR": 2.78
+     },
+     "2020": {
+      "n": 70,
+      "netR": 0.0146,
+      "totalR": 1.02
+     },
+     "2021": {
+      "n": 71,
+      "netR": -0.0098,
+      "totalR": -0.7
+     },
+     "2022": {
+      "n": 72,
+      "netR": 0.2852,
+      "totalR": 20.53
+     },
+     "2023": {
+      "n": 71,
+      "netR": 0.0315,
+      "totalR": 2.24
+     },
+     "2024": {
+      "n": 71,
+      "netR": 0.2626,
+      "totalR": 18.65
+     },
+     "2025": {
+      "n": 70,
+      "netR": 0.1897,
+      "totalR": 13.28
+     },
+     "2026": {
+      "n": 62,
+      "netR": -0.1707,
+      "totalR": -10.58
+     }
+    },
+    "afterVerdict": {
+     "corrWithUsdjpyT2": {
+      "days": 1196,
+      "r": 0.77
+     }
+    }
+   },
+   "chfjpy": {
+    "pair": "CHF/JPY",
+    "costs": {
+     "spreadPips": 0.3,
+     "slipPipsASide": 0.5,
+     "commissionASide": 0.0000225,
+     "pip": 0.01,
+     "spreadMeasured": false
+    },
+    "gotobiDays": 1208,
+    "noData": {
+     "gotobi": 12,
+     "other": 5
+    },
+    "all": {
+     "n": 1196,
+     "netR": 0.1418,
+     "grossR": 0.2475,
+     "costR": 0.1057,
+     "totalR": 169.6,
+     "tradeT": 3.62,
+     "months": 203,
+     "t": 3.39,
+     "win": 0.5151,
+     "stopShare": 0.2784,
+     "stopPips": 19.3,
+     "netR2x": 0.0361,
+     "t2x": 0.85
+    },
+    "h2016": {
+     "n": 771,
+     "netR": 0.1055,
+     "grossR": 0.2174,
+     "costR": 0.1119,
+     "totalR": 81.37,
+     "tradeT": 2.11,
+     "months": 131,
+     "t": 2.01,
+     "win": 0.4994,
+     "stopShare": 0.2789,
+     "stopPips": 19.1,
+     "netR2x": -0.0063,
+     "t2x": -0.12
+    },
+    "h2010": {
+     "n": 425,
+     "netR": 0.2076,
+     "grossR": 0.3022,
+     "costR": 0.0946,
+     "totalR": 88.22,
+     "tradeT": 3.32,
+     "months": 72,
+     "t": 3.01,
+     "win": 0.5435,
+     "stopShare": 0.2776,
+     "stopPips": 19.7,
+     "netR2x": 0.113,
+     "t2x": 1.63
+    },
+    "placebo": {
+     "seeds": 40,
+     "rank": 38,
+     "p95": -0.0146,
+     "median": -0.0537,
+     "values": [
+      -0.0921,
+      -0.0424,
+      -0.015,
+      -0.0778,
+      -0.0715,
+      -0.0916,
+      -0.0186,
+      -0.0252,
+      -0.0643,
+      -0.0278,
+      -0.0146,
+      -0.0773,
+      -0.057,
+      -0.0653,
+      -0.0319,
+      -0.0486,
+      -0.0634,
+      -0.0728,
+      -0.023,
+      -0.0571,
+      -0.0278,
+      -0.0673,
+      -0.0248,
+      -0.0731,
+      -0.0126,
+      -0.0289,
+      -0.0657,
+      -0.096,
+      -0.0504,
+      -0.0763,
+      -0.0202,
+      -0.0901,
+      -0.064,
+      -0.0283,
+      -0.0122,
+      -0.0396,
+      -0.0402,
+      -0.0702,
+      -0.0166,
+      -0.0796
+     ],
+     "beats": 40
+    },
+    "everyOtherDay": {
+     "n": 2910,
+     "netR": -0.0562,
+     "grossR": 0.0498,
+     "costR": 0.106,
+     "totalR": -163.56,
+     "tradeT": -2.88,
+     "months": 203,
+     "t": -2.75,
+     "win": 0.4381,
+     "stopShare": 0.3076,
+     "stopPips": 19.2
+    },
+    "byYear": {
+     "2010": {
+      "n": 71,
+      "netR": 0.1065,
+      "totalR": 7.56
+     },
+     "2011": {
+      "n": 72,
+      "netR": 0.3751,
+      "totalR": 27.01
+     },
+     "2012": {
+      "n": 71,
+      "netR": 0.1634,
+      "totalR": 11.6
+     },
+     "2013": {
+      "n": 70,
+      "netR": 0.2892,
+      "totalR": 20.24
+     },
+     "2014": {
+      "n": 70,
+      "netR": 0.0643,
+      "totalR": 4.5
+     },
+     "2015": {
+      "n": 71,
+      "netR": 0.2438,
+      "totalR": 17.31
+     },
+     "2016": {
+      "n": 72,
+      "netR": 0.3735,
+      "totalR": 26.89
+     },
+     "2017": {
+      "n": 71,
+      "netR": -0.2222,
+      "totalR": -15.78
+     },
+     "2018": {
+      "n": 71,
+      "netR": -0.0786,
+      "totalR": -5.58
+     },
+     "2019": {
+      "n": 70,
+      "netR": 0.0947,
+      "totalR": 6.63
+     },
+     "2020": {
+      "n": 70,
+      "netR": 0.1258,
+      "totalR": 8.81
+     },
+     "2021": {
+      "n": 71,
+      "netR": -0.0519,
+      "totalR": -3.68
+     },
+     "2022": {
+      "n": 72,
+      "netR": 0.3419,
+      "totalR": 24.61
+     },
+     "2023": {
+      "n": 71,
+      "netR": 0.0033,
+      "totalR": 0.24
+     },
+     "2024": {
+      "n": 71,
+      "netR": 0.2848,
+      "totalR": 20.22
+     },
+     "2025": {
+      "n": 70,
+      "netR": 0.2933,
+      "totalR": 20.53
+     },
+     "2026": {
+      "n": 62,
+      "netR": -0.0246,
+      "totalR": -1.52
+     }
+    },
+    "afterVerdict": {
+     "corrWithUsdjpyT2": {
+      "days": 1196,
+      "r": 0.71
+     }
+    }
+   }
+  },
+  "pooled": {
+   "all": {
+    "n": 4784,
+    "netR": 0.0993,
+    "grossR": 0.1933,
+    "costR": 0.094,
+    "totalR": 475.04,
+    "tradeT": 5.02,
+    "months": 203,
+    "t": 2.75,
+    "win": 0.4831,
+    "stopShare": 0.2824,
+    "stopPips": 21.8,
+    "netR2x": 0.0053,
+    "t2x": 0.15
+   },
+   "h2016": {
+    "n": 3084,
+    "netR": 0.0687,
+    "grossR": 0.1679,
+    "costR": 0.0992,
+    "totalR": 211.79,
+    "tradeT": 2.67,
+    "months": 131,
+    "t": 1.46,
+    "win": 0.465,
+    "stopShare": 0.2847,
+    "stopPips": 20.9,
+    "netR2x": -0.0306,
+    "t2x": -0.64
+   },
+   "h2010": {
+    "n": 1700,
+    "netR": 0.1548,
+    "grossR": 0.2393,
+    "costR": 0.0844,
+    "totalR": 263.24,
+    "tradeT": 5.11,
+    "months": 72,
+    "t": 2.85,
+    "win": 0.5159,
+    "stopShare": 0.2782,
+    "stopPips": 23.6,
+    "netR2x": 0.0704,
+    "t2x": 1.28
+   },
+   "byYear": {
+    "2010": {
+     "n": 284,
+     "netR": 0.1466,
+     "totalR": 41.64
+    },
+    "2011": {
+     "n": 288,
+     "netR": 0.3302,
+     "totalR": 95.1
+    },
+    "2012": {
+     "n": 284,
+     "netR": 0.0444,
+     "totalR": 12.62
+    },
+    "2013": {
+     "n": 280,
+     "netR": 0.2369,
+     "totalR": 66.34
+    },
+    "2014": {
+     "n": 280,
+     "netR": 0.0457,
+     "totalR": 12.8
+    },
+    "2015": {
+     "n": 284,
+     "netR": 0.1224,
+     "totalR": 34.75
+    },
+    "2016": {
+     "n": 288,
+     "netR": 0.2935,
+     "totalR": 84.52
+    },
+    "2017": {
+     "n": 284,
+     "netR": -0.1719,
+     "totalR": -48.82
+    },
+    "2018": {
+     "n": 284,
+     "netR": -0.0633,
+     "totalR": -17.97
+    },
+    "2019": {
+     "n": 280,
+     "netR": 0.0439,
+     "totalR": 12.28
+    },
+    "2020": {
+     "n": 280,
+     "netR": 0.0481,
+     "totalR": 13.48
+    },
+    "2021": {
+     "n": 284,
+     "netR": -0.0386,
+     "totalR": -10.97
+    },
+    "2022": {
+     "n": 288,
+     "netR": 0.2585,
+     "totalR": 74.44
+    },
+    "2023": {
+     "n": 284,
+     "netR": 0.0369,
+     "totalR": 10.49
+    },
+    "2024": {
+     "n": 284,
+     "netR": 0.2369,
+     "totalR": 67.28
+    },
+    "2025": {
+     "n": 280,
+     "netR": 0.1751,
+     "totalR": 49.02
+    },
+    "2026": {
+     "n": 248,
+     "netR": -0.0885,
+     "totalR": -21.95
+    }
+   },
+   "positiveCrosses": 4,
+   "pOneSided": 0.003
+  },
+  "placebo": {
+   "seeds": 40,
+   "rank": 38,
+   "p95": -0.0158,
+   "median": -0.0561,
+   "values": [
+    -0.0897,
+    -0.0405,
+    -0.0368,
+    -0.0691,
+    -0.0758,
+    -0.0763,
+    -0.0395,
+    -0.0371,
+    -0.0782,
+    -0.0343,
+    -0.027,
+    -0.0836,
+    -0.0292,
+    -0.0658,
+    -0.0533,
+    -0.0523,
+    -0.0522,
+    -0.0693,
+    -0.0432,
+    -0.0738,
+    -0.0158,
+    -0.0615,
+    -0.0104,
+    -0.0707,
+    -0.014,
+    -0.0519,
+    -0.0732,
+    -0.0948,
+    -0.059,
+    -0.0752,
+    -0.0158,
+    -0.077,
+    -0.0871,
+    -0.0339,
+    -0.0391,
+    -0.0623,
+    -0.0517,
+    -0.0668,
+    -0.0302,
+    -0.0749
+   ],
+   "beats": 40
+  },
+  "checks": {
+   "pooledNetPositive": true,
+   "pooledMonthT": true,
+   "crossesPositive": true,
+   "placebo": true
+  },
+  "pass": true,
+  "enoughTrades": true
+ },
+ "r2": {
+  "pair": "USD/JPY",
+  "window": [
+   "2005-01-31",
+   "2009-12-31"
+  ],
+  "firstCandle": "2005-01-03",
+  "gotobiDays": 360,
+  "noData": {
+   "gotobi": 5,
+   "other": 10
+  },
+  "all": {
+   "n": 355,
+   "netR": 0.2605,
+   "grossR": 0.3568,
+   "costR": 0.0964,
+   "totalR": 92.46,
+   "tradeT": 4,
+   "months": 60,
+   "t": 3.8,
+   "win": 0.5662,
+   "stopShare": 0.2423,
+   "stopPips": 19.5,
+   "netR2x": 0.1641,
+   "t2x": 2.36
+  },
+  "byYear": {
+   "2005": {
+    "n": 67,
+    "netR": 0.2224,
+    "totalR": 14.9
+   },
+   "2006": {
+    "n": 72,
+    "netR": 0.4374,
+    "totalR": 31.5
+   },
+   "2007": {
+    "n": 72,
+    "netR": 0.0082,
+    "totalR": 0.59
+   },
+   "2008": {
+    "n": 72,
+    "netR": 0.3546,
+    "totalR": 25.53
+   },
+   "2009": {
+    "n": 72,
+    "netR": 0.277,
+    "totalR": 19.95
+   }
+  },
+  "placebo": {
+   "seeds": 40,
+   "rank": 38,
+   "p95": 0.1051,
+   "median": 0.0585,
+   "values": [
+    0.1123,
+    0.0951,
+    0.073,
+    0.0691,
+    0.0588,
+    0.068,
+    0.0574,
+    -0.0192,
+    -0.0027,
+    0.0467,
+    0.1214,
+    0.0515,
+    0.0716,
+    -0.0455,
+    0.0624,
+    0.0133,
+    0.0567,
+    0.0763,
+    0.0692,
+    0.0728,
+    -0.0583,
+    0.0028,
+    0.0754,
+    0.0863,
+    0.0053,
+    -0.0011,
+    0.0754,
+    0.089,
+    -0.0837,
+    0.0151,
+    -0.0547,
+    0.0337,
+    0.1051,
+    0.058,
+    0.0582,
+    0.0722,
+    -0.0075,
+    0.0328,
+    0.0705,
+    0.0833
+   ],
+   "beats": 40
+  },
+  "everyOtherDay": {
+   "n": 856,
+   "netR": 0.0472,
+   "grossR": 0.1429,
+   "costR": 0.0957,
+   "totalR": 40.43,
+   "tradeT": 1.04,
+   "months": 60,
+   "t": 1.07,
+   "win": 0.4638,
+   "stopShare": 0.3166,
+   "stopPips": 20.1
+  },
+  "checks": {
+   "netPositive": true,
+   "monthT": true
+  },
+  "pass": true
+ },
+ "verdict": "REPLICATES",
+ "notes": [
+  "Data: OANDA mid M5 through the /md/bars proxy, only candles starting 00:00-06:55 UTC kept. Crosses from GBP/JPY 2009-11-02, AUD/JPY 2009-11-02, CAD/JPY 2009-11-02, CHF/JPY 2009-11-02; USD/JPY before 2009-11 from 2005-01-03, joined to the gotobi study's file for the lookback; through 2026-11-11. Gotobi days lost to missing candles: GBP/JPY 12 of 1208, AUD/JPY 12 of 1208, CAD/JPY 12 of 1208, CHF/JPY 12 of 1208, USD/JPY R2 5 of 360.",
+  "Gate: the frozen file's own loop on the gotobi study's USD/JPY file gives T2 2016-now n 771, +0.1481R, month t +2.74 and 2010-15 n 425, +0.1306R, t +2.45 (the original's RESULT.md: n 771, +0.148R, t 2.74; +0.131R, t 2.45).",
+  "Costs: the frozen formula on every cross (0.3 pip spread + 2 x 0.5 pip slippage + 2 x USD 22.5 per million). The 0.3 pip spread on the four crosses is ASSUMED, not measured; crosses usually quote wider on a raw-spread account, so the 2 x cost columns are the more cautious reading. They are reported, not a condition.",
+  "Costs decide it: before costs the pooled fade makes +0.193R a trade, the assumed cost takes 0.094R, and at twice the cost the pooled figure is +0.005R (month t +0.15); per cross at 2 x cost: GBP/JPY +0.055, AUD/JPY −0.046, CAD/JPY −0.024, CHF/JPY +0.036. The 0.3 pip cross spread is not measured, so whether the crosses keep a net edge at a real broker's cross spreads is open.",
+  "Read after the verdict, not part of it: the crosses are not independent evidence of USD/JPY's flow. Correlation of a gotobi day's net R with USD/JPY's own T2 trade the same day (2010-now): GBP/JPY 0.73 (1196 days), AUD/JPY 0.51 (1196 days), CAD/JPY 0.77 (1196 days), CHF/JPY 0.71 (1196 days). What replicates is the yen leg on the same days, as the hypothesis said; it is not four more markets' worth of independent days. Pooled halves: 2016-now +0.069R (n 3084, t +1.46), 2010-15 +0.155R (n 1700, t +2.85).",
+  "R2 caveat, read after the verdict: on USD/JPY 2005-09 the same fade on every NON-gotobi day also made +0.047R a trade (n 856, month t +1.07; the yen rose through 2007-09), so part of R2's +0.261R is the yen's trend of those years; the gotobi days still beat all 40 placebo draws (95th percentile +0.105R).",
+  "The month t is on calendar-month sums of net R (pooled: the four crosses' trades of a month summed); the trades of a gotobi day on four yen crosses are strongly correlated (one yen flow), so the pooled n overstates the independent evidence; the month sums carry that correlation."
+ ]
+}

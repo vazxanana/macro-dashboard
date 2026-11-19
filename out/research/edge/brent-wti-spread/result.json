@@ -1,0 +1,952 @@
+{
+ "study": "brent-wti-spread",
+ "title": "Brent - WTI crude spread: log-spread z-score mean reversion",
+ "built": "2026-11-14",
+ "preregistration": "PREREGISTRATION.md",
+ "system": "Brent / WTI spread reversion (not a council system)",
+ "verdict": "FAIL: fading a 2-sd stretch of the Brent - WTI spread is not an edge after costs",
+ "data": {
+  "src": "OANDA mid daily BCO_USD (Brent) and WTICO_USD (WTI), council-data research/daily/bco.json, wtico.json",
+  "days": 5960,
+  "from": "2003-08-19",
+  "to": "2026-11-06",
+  "oneLegGapDays": 12
+ },
+ "params": {
+  "zN": 60,
+  "zIn": 2,
+  "zOut": 0.5,
+  "stopSd": 1.5,
+  "hold": 20,
+  "gapMax": 0.05
+ },
+ "variant": {
+  "id": "V1",
+  "zIn": 1.5
+ },
+ "costs": {
+  "sprPerLeg": 0.0006,
+  "finYear": 0.03,
+  "legs": 2
+ },
+ "windows": {
+  "rep": {
+   "from": null,
+   "to": "2016-01-01"
+  },
+  "dec": {
+   "from": "2016-01-01",
+   "to": null
+  },
+  "glut": {
+   "from": "2011-01-01",
+   "to": "2014-01-01"
+  }
+ },
+ "bar": {
+  "minT": 2,
+  "minN": 40,
+  "placeboPct": 0.95
+ },
+ "placeboSpec": {
+  "draws": 40,
+  "seed": 20261114
+ },
+ "base": {
+  "zIn": 2,
+  "dec": {
+   "n": 87,
+   "avg": -0.199,
+   "gross": 0.06,
+   "spread": 0.089,
+   "fin": 0.171,
+   "total": -17.34,
+   "wr": 48.28,
+   "pf": 0.7,
+   "months": 131,
+   "monthT": -1.42,
+   "dd": -24.55,
+   "exits": {
+    "mean": 38,
+    "time": 18,
+    "stop": 31
+   },
+   "sides": {
+    "long": 46,
+    "short": 41
+   },
+   "worstR": -4.012,
+   "riskPct": 1.545
+  },
+  "rep": {
+   "n": 112,
+   "avg": -0.297,
+   "gross": -0.133,
+   "spread": 0.056,
+   "fin": 0.108,
+   "total": -33.29,
+   "wr": 43.75,
+   "pf": 0.55,
+   "months": 147,
+   "monthT": -2.44,
+   "dd": -39.47,
+   "exits": {
+    "stop": 48,
+    "time": 22,
+    "mean": 42
+   },
+   "sides": {
+    "long": 48,
+    "short": 64
+   },
+   "worstR": -1.976,
+   "riskPct": 2.349
+  },
+  "glut": {
+   "n": 28,
+   "avg": -0.689,
+   "gross": -0.564,
+   "spread": 0.041,
+   "fin": 0.085,
+   "total": -19.3,
+   "wr": 25,
+   "pf": 0.19,
+   "months": 36,
+   "monthT": -3.1,
+   "dd": -20.37,
+   "exits": {
+    "stop": 16,
+    "mean": 5,
+    "time": 7
+   },
+   "sides": {
+    "long": 11,
+    "short": 17
+   },
+   "worstR": -1.945,
+   "riskPct": 3.367
+  },
+  "repExGlut": {
+   "n": 84,
+   "avg": -0.167,
+   "gross": 0.011,
+   "spread": 0.062,
+   "fin": 0.116,
+   "total": -13.99,
+   "wr": 50,
+   "pf": 0.72,
+   "months": 147,
+   "monthT": -1.21,
+   "dd": -19.1,
+   "exits": {
+    "stop": 32,
+    "time": 15,
+    "mean": 37
+   },
+   "sides": {
+    "long": 37,
+    "short": 47
+   },
+   "worstR": -1.976,
+   "riskPct": 2.071
+  },
+  "costs": {
+   "x0": {
+    "dec": {
+     "n": 87,
+     "avg": 0.06,
+     "gross": 0.06,
+     "spread": 0,
+     "fin": 0,
+     "total": 5.24,
+     "wr": 57.47,
+     "pf": 1.11,
+     "months": 131,
+     "monthT": 0.44,
+     "dd": -8.26,
+     "exits": {
+      "mean": 38,
+      "time": 18,
+      "stop": 31
+     },
+     "sides": {
+      "long": 46,
+      "short": 41
+     },
+     "worstR": -3.916,
+     "riskPct": 1.545
+    },
+    "rep": {
+     "n": 112,
+     "avg": -0.133,
+     "gross": -0.133,
+     "spread": 0,
+     "fin": 0,
+     "total": -14.9,
+     "wr": 46.43,
+     "pf": 0.77,
+     "months": 147,
+     "monthT": -1.13,
+     "dd": -28.82,
+     "exits": {
+      "stop": 48,
+      "time": 22,
+      "mean": 42
+     },
+     "sides": {
+      "long": 48,
+      "short": 64
+     },
+     "worstR": -1.842,
+     "riskPct": 2.349
+    }
+   },
+   "x1": {
+    "dec": {
+     "n": 87,
+     "avg": -0.199,
+     "gross": 0.06,
+     "spread": 0.089,
+     "fin": 0.171,
+     "total": -17.34,
+     "wr": 48.28,
+     "pf": 0.7,
+     "months": 131,
+     "monthT": -1.42,
+     "dd": -24.55,
+     "exits": {
+      "mean": 38,
+      "time": 18,
+      "stop": 31
+     },
+     "sides": {
+      "long": 46,
+      "short": 41
+     },
+     "worstR": -4.012,
+     "riskPct": 1.545
+    },
+    "rep": {
+     "n": 112,
+     "avg": -0.297,
+     "gross": -0.133,
+     "spread": 0.056,
+     "fin": 0.108,
+     "total": -33.29,
+     "wr": 43.75,
+     "pf": 0.55,
+     "months": 147,
+     "monthT": -2.44,
+     "dd": -39.47,
+     "exits": {
+      "stop": 48,
+      "time": 22,
+      "mean": 42
+     },
+     "sides": {
+      "long": 48,
+      "short": 64
+     },
+     "worstR": -1.976,
+     "riskPct": 2.349
+    }
+   },
+   "x2": {
+    "dec": {
+     "n": 87,
+     "avg": -0.459,
+     "gross": 0.06,
+     "spread": 0.177,
+     "fin": 0.342,
+     "total": -39.92,
+     "wr": 39.08,
+     "pf": 0.45,
+     "months": 131,
+     "monthT": -3.07,
+     "dd": -46.22,
+     "exits": {
+      "mean": 38,
+      "time": 18,
+      "stop": 31
+     },
+     "sides": {
+      "long": 46,
+      "short": 41
+     },
+     "worstR": -4.108,
+     "riskPct": 1.545
+    },
+    "rep": {
+     "n": 112,
+     "avg": -0.462,
+     "gross": -0.133,
+     "spread": 0.113,
+     "fin": 0.216,
+     "total": -51.69,
+     "wr": 39.29,
+     "pf": 0.39,
+     "months": 147,
+     "monthT": -3.62,
+     "dd": -55.33,
+     "exits": {
+      "stop": 48,
+      "time": 22,
+      "mean": 42
+     },
+     "sides": {
+      "long": 48,
+      "short": 64
+     },
+     "worstR": -2.199,
+     "riskPct": 2.349
+    }
+   }
+  },
+  "years": [
+   {
+    "year": 2003,
+    "n": 3,
+    "gross": 0.016,
+    "avg": -0.142,
+    "total": -0.43
+   },
+   {
+    "year": 2004,
+    "n": 9,
+    "gross": 0.177,
+    "avg": -0.029,
+    "total": -0.26
+   },
+   {
+    "year": 2005,
+    "n": 10,
+    "gross": 0.107,
+    "avg": -0.085,
+    "total": -0.85
+   },
+   {
+    "year": 2006,
+    "n": 7,
+    "gross": -0.077,
+    "avg": -0.342,
+    "total": -2.39
+   },
+   {
+    "year": 2007,
+    "n": 9,
+    "gross": 0.136,
+    "avg": -0.019,
+    "total": -0.17
+   },
+   {
+    "year": 2008,
+    "n": 12,
+    "gross": -0.064,
+    "avg": -0.256,
+    "total": -3.07
+   },
+   {
+    "year": 2009,
+    "n": 8,
+    "gross": -0.245,
+    "avg": -0.342,
+    "total": -2.74
+   },
+   {
+    "year": 2010,
+    "n": 9,
+    "gross": -0.819,
+    "avg": -1.02,
+    "total": -9.18
+   },
+   {
+    "year": 2011,
+    "n": 10,
+    "gross": -0.873,
+    "avg": -0.987,
+    "total": -9.87
+   },
+   {
+    "year": 2012,
+    "n": 8,
+    "gross": -0.233,
+    "avg": -0.383,
+    "total": -3.06
+   },
+   {
+    "year": 2013,
+    "n": 10,
+    "gross": -0.519,
+    "avg": -0.637,
+    "total": -6.37
+   },
+   {
+    "year": 2014,
+    "n": 8,
+    "gross": 0.603,
+    "avg": 0.441,
+    "total": 3.53
+   },
+   {
+    "year": 2015,
+    "n": 9,
+    "gross": 0.308,
+    "avg": 0.175,
+    "total": 1.58
+   },
+   {
+    "year": 2016,
+    "n": 6,
+    "gross": 0.217,
+    "avg": -0.001,
+    "total": -0.01
+   },
+   {
+    "year": 2017,
+    "n": 9,
+    "gross": -0.403,
+    "avg": -0.687,
+    "total": -6.18
+   },
+   {
+    "year": 2018,
+    "n": 10,
+    "gross": 0.037,
+    "avg": -0.16,
+    "total": -1.6
+   },
+   {
+    "year": 2019,
+    "n": 5,
+    "gross": 0.634,
+    "avg": 0.435,
+    "total": 2.17
+   },
+   {
+    "year": 2020,
+    "n": 10,
+    "gross": -0.007,
+    "avg": -0.207,
+    "total": -2.07
+   },
+   {
+    "year": 2021,
+    "n": 8,
+    "gross": -0.36,
+    "avg": -0.665,
+    "total": -5.32
+   },
+   {
+    "year": 2022,
+    "n": 9,
+    "gross": 0.337,
+    "avg": 0.13,
+    "total": 1.17
+   },
+   {
+    "year": 2023,
+    "n": 6,
+    "gross": 0.208,
+    "avg": -0.097,
+    "total": -0.58
+   },
+   {
+    "year": 2024,
+    "n": 5,
+    "gross": 0.479,
+    "avg": -0.05,
+    "total": -0.25
+   },
+   {
+    "year": 2025,
+    "n": 10,
+    "gross": -0.37,
+    "avg": -0.687,
+    "total": -6.87
+   },
+   {
+    "year": 2026,
+    "n": 9,
+    "gross": 0.445,
+    "avg": 0.243,
+    "total": 2.18
+   }
+  ],
+  "dropped": [
+   {
+    "opened": "2020-03-13",
+    "closed": "2020-03-16",
+    "dir": 1,
+    "grossR": -1.397,
+    "gaps": [
+     "2020-03-16"
+    ]
+   },
+   {
+    "opened": "2026-04-07",
+    "closed": "2026-04-14",
+    "dir": 1,
+    "grossR": 2.183,
+    "gaps": [
+     "2026-04-08"
+    ]
+   }
+  ],
+  "placebo": {
+   "draws": 40,
+   "median": -0.249,
+   "p5": -0.401,
+   "p95": -0.149,
+   "atLeastReal": 8
+  }
+ },
+ "v1": {
+  "zIn": 1.5,
+  "dec": {
+   "n": 135,
+   "avg": -0.229,
+   "gross": 0.021,
+   "spread": 0.093,
+   "fin": 0.158,
+   "total": -30.91,
+   "wr": 51.85,
+   "pf": 0.63,
+   "months": 131,
+   "monthT": -2.16,
+   "dd": -35.32,
+   "exits": {
+    "mean": 69,
+    "stop": 42,
+    "time": 24
+   },
+   "sides": {
+    "long": 63,
+    "short": 72
+   },
+   "worstR": -4.012,
+   "riskPct": 1.393
+  },
+  "rep": {
+   "n": 152,
+   "avg": -0.293,
+   "gross": -0.135,
+   "spread": 0.057,
+   "fin": 0.101,
+   "total": -44.52,
+   "wr": 45.39,
+   "pf": 0.53,
+   "months": 147,
+   "monthT": -3.18,
+   "dd": -50.61,
+   "exits": {
+    "stop": 62,
+    "time": 26,
+    "mean": 64
+   },
+   "sides": {
+    "long": 66,
+    "short": 86
+   },
+   "worstR": -2.644,
+   "riskPct": 2.393
+  },
+  "glut": {
+   "n": 37,
+   "avg": -0.676,
+   "gross": -0.557,
+   "spread": 0.04,
+   "fin": 0.079,
+   "total": -25.01,
+   "wr": 29.73,
+   "pf": 0.19,
+   "months": 36,
+   "monthT": -3.65,
+   "dd": -26.08,
+   "exits": {
+    "stop": 21,
+    "mean": 8,
+    "time": 8
+   },
+   "sides": {
+    "long": 13,
+    "short": 24
+   },
+   "worstR": -1.945,
+   "riskPct": 3.049
+  },
+  "repExGlut": {
+   "n": 115,
+   "avg": -0.17,
+   "gross": 0.001,
+   "spread": 0.062,
+   "fin": 0.108,
+   "total": -19.51,
+   "wr": 50.43,
+   "pf": 0.7,
+   "months": 147,
+   "monthT": -1.7,
+   "dd": -25.6,
+   "exits": {
+    "stop": 41,
+    "time": 18,
+    "mean": 56
+   },
+   "sides": {
+    "long": 53,
+    "short": 62
+   },
+   "worstR": -2.644,
+   "riskPct": 2.071
+  },
+  "costs": {
+   "x0": {
+    "dec": {
+     "n": 135,
+     "avg": 0.021,
+     "gross": 0.021,
+     "spread": 0,
+     "fin": 0,
+     "total": 2.88,
+     "wr": 55.56,
+     "pf": 1.04,
+     "months": 131,
+     "monthT": 0.21,
+     "dd": -12.35,
+     "exits": {
+      "mean": 69,
+      "stop": 42,
+      "time": 24
+     },
+     "sides": {
+      "long": 63,
+      "short": 72
+     },
+     "worstR": -3.916,
+     "riskPct": 1.393
+    },
+    "rep": {
+     "n": 152,
+     "avg": -0.135,
+     "gross": -0.135,
+     "spread": 0,
+     "fin": 0,
+     "total": -20.54,
+     "wr": 48.03,
+     "pf": 0.75,
+     "months": 147,
+     "monthT": -1.51,
+     "dd": -32.73,
+     "exits": {
+      "stop": 62,
+      "time": 26,
+      "mean": 64
+     },
+     "sides": {
+      "long": 66,
+      "short": 86
+     },
+     "worstR": -2.553,
+     "riskPct": 2.393
+    }
+   },
+   "x1": {
+    "dec": {
+     "n": 135,
+     "avg": -0.229,
+     "gross": 0.021,
+     "spread": 0.093,
+     "fin": 0.158,
+     "total": -30.91,
+     "wr": 51.85,
+     "pf": 0.63,
+     "months": 131,
+     "monthT": -2.16,
+     "dd": -35.32,
+     "exits": {
+      "mean": 69,
+      "stop": 42,
+      "time": 24
+     },
+     "sides": {
+      "long": 63,
+      "short": 72
+     },
+     "worstR": -4.012,
+     "riskPct": 1.393
+    },
+    "rep": {
+     "n": 152,
+     "avg": -0.293,
+     "gross": -0.135,
+     "spread": 0.057,
+     "fin": 0.101,
+     "total": -44.52,
+     "wr": 45.39,
+     "pf": 0.53,
+     "months": 147,
+     "monthT": -3.18,
+     "dd": -50.61,
+     "exits": {
+      "stop": 62,
+      "time": 26,
+      "mean": 64
+     },
+     "sides": {
+      "long": 66,
+      "short": 86
+     },
+     "worstR": -2.644,
+     "riskPct": 2.393
+    }
+   },
+   "x2": {
+    "dec": {
+     "n": 135,
+     "avg": -0.479,
+     "gross": 0.021,
+     "spread": 0.185,
+     "fin": 0.315,
+     "total": -64.71,
+     "wr": 42.96,
+     "pf": 0.37,
+     "months": 131,
+     "monthT": -4.22,
+     "dd": -68.02,
+     "exits": {
+      "mean": 69,
+      "stop": 42,
+      "time": 24
+     },
+     "sides": {
+      "long": 63,
+      "short": 72
+     },
+     "worstR": -4.108,
+     "riskPct": 1.393
+    },
+    "rep": {
+     "n": 152,
+     "avg": -0.451,
+     "gross": -0.135,
+     "spread": 0.114,
+     "fin": 0.202,
+     "total": -68.49,
+     "wr": 40.79,
+     "pf": 0.37,
+     "months": 147,
+     "monthT": -4.7,
+     "dd": -70.98,
+     "exits": {
+      "stop": 62,
+      "time": 26,
+      "mean": 64
+     },
+     "sides": {
+      "long": 66,
+      "short": 86
+     },
+     "worstR": -2.736,
+     "riskPct": 2.393
+    }
+   }
+  },
+  "years": [
+   {
+    "year": 2003,
+    "n": 3,
+    "gross": -0.14,
+    "avg": -0.32,
+    "total": -0.96
+   },
+   {
+    "year": 2004,
+    "n": 11,
+    "gross": 0.253,
+    "avg": 0.051,
+    "total": 0.56
+   },
+   {
+    "year": 2005,
+    "n": 12,
+    "gross": -0.236,
+    "avg": -0.432,
+    "total": -5.18
+   },
+   {
+    "year": 2006,
+    "n": 9,
+    "gross": 0.115,
+    "avg": -0.136,
+    "total": -1.22
+   },
+   {
+    "year": 2007,
+    "n": 16,
+    "gross": -0.101,
+    "avg": -0.231,
+    "total": -3.7
+   },
+   {
+    "year": 2008,
+    "n": 17,
+    "gross": -0.063,
+    "avg": -0.246,
+    "total": -4.19
+   },
+   {
+    "year": 2009,
+    "n": 9,
+    "gross": -0.129,
+    "avg": -0.229,
+    "total": -2.06
+   },
+   {
+    "year": 2010,
+    "n": 12,
+    "gross": -0.441,
+    "avg": -0.635,
+    "total": -7.63
+   },
+   {
+    "year": 2011,
+    "n": 14,
+    "gross": -0.629,
+    "avg": -0.726,
+    "total": -10.17
+   },
+   {
+    "year": 2012,
+    "n": 11,
+    "gross": -0.509,
+    "avg": -0.647,
+    "total": -7.11
+   },
+   {
+    "year": 2013,
+    "n": 12,
+    "gross": -0.518,
+    "avg": -0.644,
+    "total": -7.73
+   },
+   {
+    "year": 2014,
+    "n": 12,
+    "gross": 0.334,
+    "avg": 0.164,
+    "total": 1.97
+   },
+   {
+    "year": 2015,
+    "n": 14,
+    "gross": 0.332,
+    "avg": 0.207,
+    "total": 2.9
+   },
+   {
+    "year": 2016,
+    "n": 9,
+    "gross": -0.2,
+    "avg": -0.414,
+    "total": -3.72
+   },
+   {
+    "year": 2017,
+    "n": 11,
+    "gross": -0.364,
+    "avg": -0.626,
+    "total": -6.88
+   },
+   {
+    "year": 2018,
+    "n": 12,
+    "gross": -0.288,
+    "avg": -0.479,
+    "total": -5.74
+   },
+   {
+    "year": 2019,
+    "n": 8,
+    "gross": 0.319,
+    "avg": 0.107,
+    "total": 0.86
+   },
+   {
+    "year": 2020,
+    "n": 15,
+    "gross": -0.025,
+    "avg": -0.202,
+    "total": -3.03
+   },
+   {
+    "year": 2021,
+    "n": 13,
+    "gross": 0.111,
+    "avg": -0.2,
+    "total": -2.6
+   },
+   {
+    "year": 2022,
+    "n": 15,
+    "gross": 0.398,
+    "avg": 0.211,
+    "total": 3.17
+   },
+   {
+    "year": 2023,
+    "n": 11,
+    "gross": 0.051,
+    "avg": -0.225,
+    "total": -2.47
+   },
+   {
+    "year": 2024,
+    "n": 14,
+    "gross": 0.298,
+    "avg": -0.116,
+    "total": -1.62
+   },
+   {
+    "year": 2025,
+    "n": 15,
+    "gross": -0.245,
+    "avg": -0.532,
+    "total": -7.98
+   },
+   {
+    "year": 2026,
+    "n": 12,
+    "gross": 0.123,
+    "avg": -0.073,
+    "total": -0.88
+   }
+  ],
+  "dropped": [
+   {
+    "opened": "2020-03-13",
+    "closed": "2020-03-16",
+    "dir": 1,
+    "grossR": -1.397,
+    "gaps": [
+     "2020-03-16"
+    ]
+   },
+   {
+    "opened": "2026-04-07",
+    "closed": "2026-04-14",
+    "dir": 1,
+    "grossR": 2.183,
+    "gaps": [
+     "2026-04-08"
+    ]
+   }
+  ]
+ },
+ "checks": {
+  "netPositiveDec": false,
+  "netPositiveRep": false,
+  "tAtLeast2": false,
+  "nAtLeast40": true,
+  "aboveRandom": false
+ },
+ "pass": false
+}

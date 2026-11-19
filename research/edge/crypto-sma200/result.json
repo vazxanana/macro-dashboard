@@ -1,0 +1,434 @@
+{
+ "built": "2026-11-13",
+ "verdict": "FAIL",
+ "system": "BTC / ETH long only above the 200-day (and 100-day) average, 3 x ATR20 stop, CFD costs and financing",
+ "prereg": "PREREGISTRATION.md",
+ "source": "council-data research/candles/crypto1d (Binance spot daily); exchange APIs refused by the sandbox proxy",
+ "data": {
+  "btc": {
+   "days": 3363,
+   "from": "2017-08-17",
+   "to": "2026-10-31"
+  },
+  "eth": {
+   "days": 3363,
+   "from": "2017-08-17",
+   "to": "2026-10-31"
+  }
+ },
+ "params": {
+  "coins": {
+   "btc": "BTCUSDT",
+   "eth": "ETHUSDT"
+  },
+  "lengths": [
+   200,
+   100
+  ],
+  "atrN": 20,
+  "atrK": 3,
+  "cost": 0.0004,
+  "fin": {
+   "btc": 0.15,
+   "eth": 0.15
+  },
+  "windows": {
+   "discovery": [
+    "2018-03-05",
+    "2021-12-31"
+   ],
+   "decisive": [
+    "2022-01-01",
+    "2099-01-01"
+   ]
+  },
+  "draws": 2000,
+  "seed": 20261113,
+  "pMin": 0.9,
+  "holmMax": 0.1,
+  "ddFrac": 0.6666666666666666
+ },
+ "passed": [],
+ "tests": [
+  {
+   "id": "btc-sma200",
+   "coin": "btc",
+   "N": 200,
+   "P": 0.932,
+   "p": 0.06799999999999995,
+   "w": {
+    "discovery": {
+     "rule": {
+      "days": 1398,
+      "sharpe": 0.4858,
+      "cagr": 0.1243,
+      "maxDD": 0.6653,
+      "inMarket": 0.5401,
+      "entries": 16,
+      "stops": 1,
+      "costSum": 0.0128,
+      "finSum": 0.3908,
+      "sharpe_fri1": 0.5293
+     },
+     "bh": {
+      "days": 1398,
+      "sharpe": 0.6085,
+      "cagr": 0.185,
+      "maxDD": 0.7605,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.7389,
+      "sharpe_fri1": 0.6662
+     },
+     "ruleYears": {
+      "2018": -0.3336,
+      "2019": 0.4257,
+      "2020": 1.3662,
+      "2021": -0.3032
+     },
+     "bhYears": {
+      "2018": -0.7262,
+      "2019": 0.6034,
+      "2020": 2.3153,
+      "2021": 0.3163
+     }
+    },
+    "decisive": {
+     "rule": {
+      "days": 1765,
+      "sharpe": 0.6098,
+      "cagr": 0.1599,
+      "maxDD": 0.3633,
+      "inMarket": 0.5343,
+      "entries": 17,
+      "stops": 0,
+      "costSum": 0.0132,
+      "finSum": 0.4886,
+      "sharpe_fri1": 0.6766
+     },
+     "bh": {
+      "days": 1765,
+      "sharpe": 0.081,
+      "cagr": -0.0824,
+      "maxDD": 0.7215,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.9325,
+      "sharpe_fri1": 0.1661
+     },
+     "ruleYears": {
+      "2022": 0,
+      "2023": 0.6705,
+      "2024": 0.5671,
+      "2025": -0.2725,
+      "2026": 0.0758
+     },
+     "bhYears": {
+      "2022": -0.7052,
+      "2023": 1.109,
+      "2024": 0.8249,
+      "2025": -0.2278,
+      "2026": -0.2469
+     }
+    }
+   },
+   "holmP": 0.272,
+   "checks": {
+    "sharpeAbove": true,
+    "bootstrap": false,
+    "drawdown": true,
+    "discovery": false
+   },
+   "pass": false
+  },
+  {
+   "id": "btc-sma100",
+   "coin": "btc",
+   "N": 100,
+   "P": 0.8395,
+   "p": 0.16049999999999998,
+   "w": {
+    "discovery": {
+     "rule": {
+      "days": 1398,
+      "sharpe": 1.1102,
+      "cagr": 0.5598,
+      "maxDD": 0.3906,
+      "inMarket": 0.5765,
+      "entries": 24,
+      "stops": 0,
+      "costSum": 0.0192,
+      "finSum": 0.4142,
+      "sharpe_fri1": 1.156
+     },
+     "bh": {
+      "days": 1398,
+      "sharpe": 0.6085,
+      "cagr": 0.185,
+      "maxDD": 0.7605,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.7389,
+      "sharpe_fri1": 0.6662
+     },
+     "ruleYears": {
+      "2018": -0.2849,
+      "2019": 1.1184,
+      "2020": 1.3125,
+      "2021": 0.5668
+     },
+     "bhYears": {
+      "2018": -0.7262,
+      "2019": 0.6034,
+      "2020": 2.3153,
+      "2021": 0.3163
+     }
+    },
+    "decisive": {
+     "rule": {
+      "days": 1765,
+      "sharpe": 0.4308,
+      "cagr": 0.0917,
+      "maxDD": 0.3956,
+      "inMarket": 0.5235,
+      "entries": 32,
+      "stops": 2,
+      "costSum": 0.0252,
+      "finSum": 0.4705,
+      "sharpe_fri1": 0.4962
+     },
+     "bh": {
+      "days": 1765,
+      "sharpe": 0.081,
+      "cagr": -0.0824,
+      "maxDD": 0.7215,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.9325,
+      "sharpe_fri1": 0.1661
+     },
+     "ruleYears": {
+      "2022": -0.2147,
+      "2023": 0.5259,
+      "2024": 0.442,
+      "2025": -0.0875,
+      "2026": -0.0307
+     },
+     "bhYears": {
+      "2022": -0.7052,
+      "2023": 1.109,
+      "2024": 0.8249,
+      "2025": -0.2278,
+      "2026": -0.2469
+     }
+    }
+   },
+   "holmP": 0.429,
+   "checks": {
+    "sharpeAbove": true,
+    "bootstrap": false,
+    "drawdown": true,
+    "discovery": true
+   },
+   "pass": false
+  },
+  {
+   "id": "eth-sma200",
+   "coin": "eth",
+   "N": 200,
+   "P": 0.857,
+   "p": 0.14300000000000002,
+   "w": {
+    "discovery": {
+     "rule": {
+      "days": 1398,
+      "sharpe": 1.0174,
+      "cagr": 0.6104,
+      "maxDD": 0.6378,
+      "inMarket": 0.5973,
+      "entries": 14,
+      "stops": 2,
+      "costSum": 0.0108,
+      "finSum": 0.434,
+      "sharpe_fri1": 1.0514
+     },
+     "bh": {
+      "days": 1398,
+      "sharpe": 0.6904,
+      "cagr": 0.2022,
+      "maxDD": 0.9171,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.7389,
+      "sharpe_fri1": 0.7342
+     },
+     "ruleYears": {
+      "2018": -0.2913,
+      "2019": -0.0013,
+      "2020": 1.5429,
+      "2021": 2.4465
+     },
+     "bhYears": {
+      "2018": -0.8709,
+      "2019": -0.1896,
+      "2020": 3.7038,
+      "2021": 3.1125
+     }
+    },
+    "decisive": {
+     "rule": {
+      "days": 1765,
+      "sharpe": 0.3026,
+      "cagr": 0.0432,
+      "maxDD": 0.4292,
+      "inMarket": 0.4538,
+      "entries": 14,
+      "stops": 0,
+      "costSum": 0.0112,
+      "finSum": 0.4138,
+      "sharpe_fri1": 0.3498
+     },
+     "bh": {
+      "days": 1765,
+      "sharpe": -0.0901,
+      "cagr": -0.2549,
+      "maxDD": 0.8276,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.9325,
+      "sharpe_fri1": -0.0274
+     },
+     "ruleYears": {
+      "2022": -0.1632,
+      "2023": 0.293,
+      "2024": 0.3069,
+      "2025": -0.0987,
+      "2026": -0.0374
+     },
+     "bhYears": {
+      "2022": -0.732,
+      "2023": 0.5739,
+      "2024": 0.2058,
+      "2025": -0.266,
+      "2026": -0.3543
+     }
+    }
+   },
+   "holmP": 0.429,
+   "checks": {
+    "sharpeAbove": true,
+    "bootstrap": false,
+    "drawdown": true,
+    "discovery": true
+   },
+   "pass": false
+  },
+  {
+   "id": "eth-sma100",
+   "coin": "eth",
+   "N": 100,
+   "P": 0.7215,
+   "p": 0.27849999999999997,
+   "w": {
+    "discovery": {
+     "rule": {
+      "days": 1398,
+      "sharpe": 1.0509,
+      "cagr": 0.6307,
+      "maxDD": 0.6177,
+      "inMarket": 0.573,
+      "entries": 20,
+      "stops": 1,
+      "costSum": 0.016,
+      "finSum": 0.4138,
+      "sharpe_fri1": 1.0851
+     },
+     "bh": {
+      "days": 1398,
+      "sharpe": 0.6904,
+      "cagr": 0.2022,
+      "maxDD": 0.9171,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.7389,
+      "sharpe_fri1": 0.7342
+     },
+     "ruleYears": {
+      "2018": -0.1865,
+      "2019": 0.4884,
+      "2020": 1.3408,
+      "2021": 1.2959
+     },
+     "bhYears": {
+      "2018": -0.8709,
+      "2019": -0.1896,
+      "2020": 3.7038,
+      "2021": 3.1125
+     }
+    },
+    "decisive": {
+     "rule": {
+      "days": 1765,
+      "sharpe": 0.1343,
+      "cagr": -0.0329,
+      "maxDD": 0.5423,
+      "inMarket": 0.5122,
+      "entries": 40,
+      "stops": 1,
+      "costSum": 0.032,
+      "finSum": 0.457,
+      "sharpe_fri1": 0.1837
+     },
+     "bh": {
+      "days": 1765,
+      "sharpe": -0.0901,
+      "cagr": -0.2549,
+      "maxDD": 0.8276,
+      "inMarket": 1,
+      "entries": 0,
+      "stops": 0,
+      "costSum": 0.0008,
+      "finSum": 0.9325,
+      "sharpe_fri1": -0.0274
+     },
+     "ruleYears": {
+      "2022": -0.485,
+      "2023": 0.3254,
+      "2024": 0.0532,
+      "2025": 0.2722,
+      "2026": -0.07
+     },
+     "bhYears": {
+      "2022": -0.732,
+      "2023": 0.5739,
+      "2024": 0.2058,
+      "2025": -0.266,
+      "2026": -0.3543
+     }
+    }
+   },
+   "holmP": 0.429,
+   "checks": {
+    "sharpeAbove": true,
+    "bootstrap": false,
+    "drawdown": true,
+    "discovery": true
+   },
+   "pass": false
+  }
+ ]
+}

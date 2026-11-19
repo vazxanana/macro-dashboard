@@ -1215,3 +1215,22 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
 - **Recommendation.** Run it as one pre-registered study: 2020 to now, 2020-23 against 2024 on, net of the demo broker's
   silver costs, out-of-sample month-sum t ≥ 2. A pass makes it a paper shadow to watch, never live.
 - **If nothing is decided.** No further rule research on the supported book's systems; the forward record decides.
+
+## Yen-pair spreads for the gotobi question, 14 Nov 2026
+
+### [x] 60. Record the demo broker's yen-pair spreads at 00:55 and 06:00 UTC (read only)
+
+- **Status (19 Nov 2026): merged by the owner's "Merge all"** (numbered 60: 54 was taken on main). Branch `yen-spread-log`; write-up
+  `research/proposals/2026-11-14-yen-spread-log.md`. Nothing runs until you merge it.
+- **Context.** The gotobi fade (sell USD/JPY at 00:55 UTC on Japanese settlement days, buy back at 06:00 UTC; #878, #889)
+  stays significant only while its round-trip cost (spread + 2 x slippage) is under about 1.95 pips, commission on top
+  (#893, branch `gotobi-cost`). Nothing records a yen pair's bid and ask today, so that cost cannot be measured.
+- **What it does.** The cTrader symbol dump also reads, through its read-only demo session, USD/JPY, GBP/JPY, AUD/JPY, CAD/JPY
+  and CHF/JPY: the quoted spread and commission as for the majors, and after each weekday the broker's own bid / ask ticks
+  around 00:55 and 06:00 UTC. It writes them to `ctrader/symbols.json` under a new key `watch`; what the mirror and the cost
+  model read is unchanged, so the mirror can never trade a yen pair from it (tests). `council/yen-spread.mjs` prints the
+  reads split gotobi / other days. No order, rule, alert or page.
+- **How long.** About six gotobi days a month: about two months for ~12 gotobi reads at each minute.
+- **Options.** (a) Merge it (recommended: the only way to measure the cost the fade depends on, at no risk). (b) Leave it;
+  the gotobi fade stays unmeasured on cost.
+- **To undo.** Delete the `watch` part of `council/ctrader-symbols.mjs`; the file's `watch` key is then simply not written.

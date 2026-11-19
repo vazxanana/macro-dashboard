@@ -1,0 +1,2585 @@
+{
+ "topic": "soybean-short-robust",
+ "built": "2026-11-14",
+ "title": "Soybean short: frozen robustness checks of the grain-seasonality pass",
+ "system": "soybeans short July-September (grain-seasonality T2), frozen; OANDA mid daily candles, council-data research/daily/soybn.json",
+ "frozen": {
+  "file": "frozen.mjs",
+  "sha256": "e9ba1c2776dacb6df7f2759ea4f7caa5644e156cca7d51308438cccc90b80159",
+  "from": "research/edge/grain-seasonality/run.mjs @ dde599ff"
+ },
+ "candles": 5980,
+ "first": "2003-03-17",
+ "last": "2026-11-06",
+ "gate": {
+  "decisive": {
+   "n": 11,
+   "won": 8,
+   "meanNet": 0.52,
+   "perm": 0.01195,
+   "published": {
+    "n": 11,
+    "won": 8,
+    "meanNet": 0.52,
+    "perm": 0.01195
+   },
+   "match": true
+  },
+  "replication": {
+   "n": 13,
+   "won": 7,
+   "meanNet": 1.186,
+   "perm": 0.00067,
+   "published": {
+    "n": 13,
+    "won": 7,
+    "meanNet": 1.186,
+    "perm": 0.00067
+   },
+   "match": true
+  },
+  "pass": true
+ },
+ "base": {
+  "decisive": {
+   "n": 11,
+   "won": 8,
+   "stopped": 3,
+   "meanG": 0.658,
+   "meanNet": 0.52,
+   "t": 1.377
+  },
+  "replication": {
+   "n": 13,
+   "won": 7,
+   "stopped": 6,
+   "meanG": 1.298,
+   "meanNet": 1.186,
+   "t": 1.827
+  },
+  "years": {
+   "decisive": [
+    {
+     "year": 2016,
+     "entryDay": "2016-07-01",
+     "exitDay": "2016-09-30",
+     "entry": 11.76,
+     "stop": 12.6504,
+     "exit": 9.634,
+     "why": "window",
+     "g": 2.388,
+     "cost": 0.026,
+     "fin": 0.1,
+     "net": 2.261
+    },
+    {
+     "year": 2017,
+     "entryDay": "2017-07-03",
+     "exitDay": "2017-07-07",
+     "entry": 9.546,
+     "stop": 9.9315,
+     "exit": 9.9315,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.05,
+     "fin": 0.014,
+     "net": -1.064
+    },
+    {
+     "year": 2018,
+     "entryDay": "2018-07-02",
+     "exitDay": "2018-09-28",
+     "entry": 8.6,
+     "stop": 9.1864,
+     "exit": 8.378,
+     "why": "window",
+     "g": 0.379,
+     "cost": 0.029,
+     "fin": 0.11,
+     "net": 0.24
+    },
+    {
+     "year": 2019,
+     "entryDay": "2019-07-01",
+     "exitDay": "2019-09-30",
+     "entry": 9.061,
+     "stop": 9.5246,
+     "exit": 8.953,
+     "why": "window",
+     "g": 0.233,
+     "cost": 0.039,
+     "fin": 0.148,
+     "net": 0.046
+    },
+    {
+     "year": 2020,
+     "entryDay": "2020-07-01",
+     "exitDay": "2020-08-17",
+     "entry": 8.818,
+     "stop": 9.1226,
+     "exit": 9.1226,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.058,
+     "fin": 0.114,
+     "net": -1.172
+    },
+    {
+     "year": 2021,
+     "entryDay": "2021-07-01",
+     "exitDay": "2021-09-30",
+     "entry": 14.578,
+     "stop": 16.1316,
+     "exit": 12.755,
+     "why": "window",
+     "g": 1.173,
+     "cost": 0.019,
+     "fin": 0.071,
+     "net": 1.084
+    },
+    {
+     "year": 2022,
+     "entryDay": "2022-07-01",
+     "exitDay": "2022-09-30",
+     "entry": 16.754,
+     "stop": 17.9097,
+     "exit": 14.606,
+     "why": "window",
+     "g": 1.859,
+     "cost": 0.029,
+     "fin": 0.11,
+     "net": 1.72
+    },
+    {
+     "year": 2023,
+     "entryDay": "2023-07-03",
+     "exitDay": "2023-09-29",
+     "entry": 15.452,
+     "stop": 16.523,
+     "exit": 13.073,
+     "why": "window",
+     "g": 2.221,
+     "cost": 0.029,
+     "fin": 0.108,
+     "net": 2.085
+    },
+    {
+     "year": 2024,
+     "entryDay": "2024-07-01",
+     "exitDay": "2024-09-30",
+     "entry": 11.43,
+     "stop": 12.0042,
+     "exit": 10.698,
+     "why": "window",
+     "g": 1.275,
+     "cost": 0.04,
+     "fin": 0.151,
+     "net": 1.084
+    },
+    {
+     "year": 2025,
+     "entryDay": "2025-07-01",
+     "exitDay": "2025-09-30",
+     "entry": 10.207,
+     "stop": 10.6581,
+     "exit": 9.886,
+     "why": "window",
+     "g": 0.712,
+     "cost": 0.045,
+     "fin": 0.171,
+     "net": 0.495
+    },
+    {
+     "year": 2026,
+     "entryDay": "2026-07-01",
+     "exitDay": "2026-07-06",
+     "entry": 11.208,
+     "stop": 11.7201,
+     "exit": 11.7201,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.044,
+     "fin": 0.011,
+     "net": -1.055
+    }
+   ],
+   "replication": [
+    {
+     "year": 2003,
+     "entryDay": "2003-07-01",
+     "exitDay": "2003-09-22",
+     "entry": 6.135,
+     "stop": 6.4624,
+     "exit": 6.4624,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.037,
+     "fin": 0.129,
+     "net": -1.167
+    },
+    {
+     "year": 2004,
+     "entryDay": "2004-07-01",
+     "exitDay": "2004-09-30",
+     "entry": 8.552,
+     "stop": 9.5115,
+     "exit": 5.309,
+     "why": "window",
+     "g": 3.38,
+     "cost": 0.018,
+     "fin": 0.067,
+     "net": 3.294
+    },
+    {
+     "year": 2005,
+     "entryDay": "2005-07-01",
+     "exitDay": "2005-07-14",
+     "entry": 6.531,
+     "stop": 7.2285,
+     "exit": 7.2285,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.019,
+     "fin": 0.011,
+     "net": -1.03
+    },
+    {
+     "year": 2006,
+     "entryDay": "2006-07-03",
+     "exitDay": "2006-09-29",
+     "entry": 6.02,
+     "stop": 6.3317,
+     "exit": 5.412,
+     "why": "window",
+     "g": 1.951,
+     "cost": 0.039,
+     "fin": 0.144,
+     "net": 1.768
+    },
+    {
+     "year": 2007,
+     "entryDay": "2007-07-02",
+     "exitDay": "2007-07-13",
+     "entry": 8.505,
+     "stop": 9.1484,
+     "exit": 9.1484,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.026,
+     "fin": 0.015,
+     "net": -1.042
+    },
+    {
+     "year": 2008,
+     "entryDay": "2008-07-01",
+     "exitDay": "2008-09-30",
+     "entry": 16.042,
+     "stop": 17.4603,
+     "exit": 10.537,
+     "why": "window",
+     "g": 3.882,
+     "cost": 0.023,
+     "fin": 0.086,
+     "net": 3.773
+    },
+    {
+     "year": 2009,
+     "entryDay": "2009-07-01",
+     "exitDay": "2009-09-30",
+     "entry": 12.257,
+     "stop": 13.2409,
+     "exit": 9.458,
+     "why": "window",
+     "g": 2.845,
+     "cost": 0.025,
+     "fin": 0.096,
+     "net": 2.724
+    },
+    {
+     "year": 2010,
+     "entryDay": "2010-07-01",
+     "exitDay": "2010-07-08",
+     "entry": 9.528,
+     "stop": 9.9684,
+     "exit": 9.9684,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.043,
+     "fin": 0.014,
+     "net": -1.057
+    },
+    {
+     "year": 2011,
+     "entryDay": "2011-07-01",
+     "exitDay": "2011-07-13",
+     "entry": 13.083,
+     "stop": 13.8336,
+     "exit": 13.8336,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.035,
+     "fin": 0.019,
+     "net": -1.053
+    },
+    {
+     "year": 2012,
+     "entryDay": "2012-07-02",
+     "exitDay": "2012-07-09",
+     "entry": 15.025,
+     "stop": 15.9951,
+     "exit": 15.9951,
+     "why": "stop",
+     "g": -1,
+     "cost": 0.031,
+     "fin": 0.01,
+     "net": -1.041
+    },
+    {
+     "year": 2013,
+     "entryDay": "2013-07-01",
+     "exitDay": "2013-09-30",
+     "entry": 15.085,
+     "stop": 15.7887,
+     "exit": 13.416,
+     "why": "window",
+     "g": 2.372,
+     "cost": 0.043,
+     "fin": 0.162,
+     "net": 2.167
+    },
+    {
+     "year": 2014,
+     "entryDay": "2014-07-01",
+     "exitDay": "2014-09-30",
+     "entry": 13.738,
+     "stop": 14.4685,
+     "exit": 9.59,
+     "why": "window",
+     "g": 5.678,
+     "cost": 0.038,
+     "fin": 0.142,
+     "net": 5.498
+    },
+    {
+     "year": 2015,
+     "entryDay": "2015-07-01",
+     "exitDay": "2015-09-30",
+     "entry": 10.56,
+     "stop": 11.1255,
+     "exit": 8.996,
+     "why": "window",
+     "g": 2.766,
+     "cost": 0.037,
+     "fin": 0.144,
+     "net": 2.584
+    }
+   ]
+  }
+ },
+ "r1": [
+  {
+   "shift": -10,
+   "decisive": {
+    "n": 11,
+    "won": 7,
+    "stopped": 4,
+    "meanG": 0.511,
+    "meanNet": 0.376,
+    "t": 0.943
+   },
+   "replication": {
+    "n": 13,
+    "won": 6,
+    "stopped": 6,
+    "meanG": 0.796,
+    "meanNet": 0.683,
+    "t": 1.198
+   },
+   "years": {
+    "decisive": [
+     {
+      "year": 2016,
+      "entryDay": "2016-06-17",
+      "exitDay": "2016-09-16",
+      "entry": 11.292,
+      "stop": 12.1302,
+      "exit": 9.798,
+      "why": "window",
+      "g": 1.782,
+      "cost": 0.027,
+      "fin": 0.102,
+      "net": 1.654
+     },
+     {
+      "year": 2017,
+      "entryDay": "2017-06-19",
+      "exitDay": "2017-07-03",
+      "entry": 9.322,
+      "stop": 9.6661,
+      "exit": 9.6661,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.054,
+      "fin": 0.033,
+      "net": -1.088
+     },
+     {
+      "year": 2018,
+      "entryDay": "2018-06-18",
+      "exitDay": "2018-09-14",
+      "entry": 9.036,
+      "stop": 9.54,
+      "exit": 8.216,
+      "why": "window",
+      "g": 1.627,
+      "cost": 0.036,
+      "fin": 0.134,
+      "net": 1.457
+     },
+     {
+      "year": 2019,
+      "entryDay": "2019-06-17",
+      "exitDay": "2019-09-16",
+      "entry": 8.964,
+      "stop": 9.521,
+      "exit": 8.87,
+      "why": "window",
+      "g": 0.169,
+      "cost": 0.032,
+      "fin": 0.122,
+      "net": 0.015
+     },
+     {
+      "year": 2020,
+      "entryDay": "2020-06-17",
+      "exitDay": "2020-07-01",
+      "entry": 8.632,
+      "stop": 8.9474,
+      "exit": 8.9474,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.055,
+      "fin": 0.038,
+      "net": -1.093
+     },
+     {
+      "year": 2021,
+      "entryDay": "2021-06-17",
+      "exitDay": "2021-09-16",
+      "entry": 14.464,
+      "stop": 15.5713,
+      "exit": 13.213,
+      "why": "window",
+      "g": 1.13,
+      "cost": 0.026,
+      "fin": 0.099,
+      "net": 1.005
+     },
+     {
+      "year": 2022,
+      "entryDay": "2022-06-16",
+      "exitDay": "2022-09-16",
+      "entry": 17.01,
+      "stop": 18.1752,
+      "exit": 15.804,
+      "why": "window",
+      "g": 1.035,
+      "cost": 0.029,
+      "fin": 0.112,
+      "net": 0.894
+     },
+     {
+      "year": 2023,
+      "entryDay": "2023-06-16",
+      "exitDay": "2023-06-21",
+      "entry": 14.37,
+      "stop": 15.2596,
+      "exit": 15.2596,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.032,
+      "fin": 0.008,
+      "net": -1.04
+     },
+     {
+      "year": 2024,
+      "entryDay": "2024-06-14",
+      "exitDay": "2024-09-16",
+      "entry": 11.824,
+      "stop": 12.385,
+      "exit": 10.203,
+      "why": "window",
+      "g": 2.889,
+      "cost": 0.042,
+      "fin": 0.161,
+      "net": 2.686
+     },
+     {
+      "year": 2025,
+      "entryDay": "2025-06-16",
+      "exitDay": "2025-09-16",
+      "entry": 10.728,
+      "stop": 11.1344,
+      "exit": 10.326,
+      "why": "window",
+      "g": 0.989,
+      "cost": 0.053,
+      "fin": 0.202,
+      "net": 0.735
+     },
+     {
+      "year": 2026,
+      "entryDay": "2026-06-16",
+      "exitDay": "2026-07-06",
+      "entry": 11.127,
+      "stop": 11.6145,
+      "exit": 11.6145,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.046,
+      "fin": 0.039,
+      "net": -1.085
+     }
+    ],
+    "replication": [
+     {
+      "year": 2003,
+      "entryDay": "2003-06-17",
+      "exitDay": "2003-09-16",
+      "entry": 6.15,
+      "stop": 6.5011,
+      "exit": 6.128,
+      "why": "window",
+      "g": 0.063,
+      "cost": 0.035,
+      "fin": 0.132,
+      "net": -0.105
+     },
+     {
+      "year": 2004,
+      "entryDay": "2004-06-17",
+      "exitDay": "2004-09-16",
+      "entry": 8.716,
+      "stop": 9.7558,
+      "exit": 5.616,
+      "why": "window",
+      "g": 2.981,
+      "cost": 0.017,
+      "fin": 0.063,
+      "net": 2.901
+     },
+     {
+      "year": 2005,
+      "entryDay": "2005-06-17",
+      "exitDay": "2005-06-20",
+      "entry": 6.972,
+      "stop": 7.4397,
+      "exit": 7.4397,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.03,
+      "fin": 0.002,
+      "net": -1.032
+     },
+     {
+      "year": 2006,
+      "entryDay": "2006-06-19",
+      "exitDay": "2006-09-15",
+      "entry": 5.911,
+      "stop": 6.2138,
+      "exit": 5.413,
+      "why": "window",
+      "g": 1.644,
+      "cost": 0.039,
+      "fin": 0.146,
+      "net": 1.459
+     },
+     {
+      "year": 2007,
+      "entryDay": "2007-06-18",
+      "exitDay": "2007-07-12",
+      "entry": 8.537,
+      "stop": 8.997,
+      "exit": 8.997,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.037,
+      "fin": 0.041,
+      "net": -1.078
+     },
+     {
+      "year": 2008,
+      "entryDay": "2008-06-17",
+      "exitDay": "2008-09-16",
+      "entry": 15.303,
+      "stop": 16.7649,
+      "exit": 11.327,
+      "why": "window",
+      "g": 2.72,
+      "cost": 0.021,
+      "fin": 0.079,
+      "net": 2.62
+     },
+     {
+      "year": 2009,
+      "entryDay": "2009-06-17",
+      "exitDay": "2009-09-16",
+      "entry": 12.103,
+      "stop": 13.0499,
+      "exit": 9.731,
+      "why": "window",
+      "g": 2.505,
+      "cost": 0.026,
+      "fin": 0.099,
+      "net": 2.381
+     },
+     {
+      "year": 2010,
+      "entryDay": "2010-06-17",
+      "exitDay": "2010-07-08",
+      "entry": 9.551,
+      "stop": 9.9944,
+      "exit": 9.9944,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.043,
+      "fin": 0.039,
+      "net": -1.082
+     },
+     {
+      "year": 2011,
+      "entryDay": "2011-06-17",
+      "exitDay": "2011-08-26",
+      "entry": 13.474,
+      "stop": 14.143,
+      "exit": 14.143,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.04,
+      "fin": 0.118,
+      "net": -1.158
+     },
+     {
+      "year": 2012,
+      "entryDay": "2012-06-18",
+      "exitDay": "2012-06-25",
+      "entry": 13.821,
+      "stop": 14.7211,
+      "exit": 14.7211,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.031,
+      "fin": 0.01,
+      "net": -1.041
+     },
+     {
+      "year": 2013,
+      "entryDay": "2013-06-17",
+      "exitDay": "2013-09-16",
+      "entry": 15.338,
+      "stop": 16.2028,
+      "exit": 14.31,
+      "why": "window",
+      "g": 1.189,
+      "cost": 0.035,
+      "fin": 0.134,
+      "net": 1.019
+     },
+     {
+      "year": 2014,
+      "entryDay": "2014-06-17",
+      "exitDay": "2014-09-16",
+      "entry": 14.262,
+      "stop": 14.9972,
+      "exit": 10.409,
+      "why": "window",
+      "g": 5.241,
+      "cost": 0.039,
+      "fin": 0.147,
+      "net": 5.056
+     },
+     {
+      "year": 2015,
+      "entryDay": "2015-06-17",
+      "exitDay": "2015-06-25",
+      "entry": 9.582,
+      "stop": 9.997,
+      "exit": 9.997,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.046,
+      "fin": 0.021,
+      "net": -1.067
+     }
+    ]
+   }
+  },
+  {
+   "shift": -5,
+   "decisive": {
+    "n": 11,
+    "won": 6,
+    "stopped": 5,
+    "meanG": 0.174,
+    "meanNet": 0.057,
+    "t": 0.163
+   },
+   "replication": {
+    "n": 13,
+    "won": 6,
+    "stopped": 6,
+    "meanG": 0.959,
+    "meanNet": 0.856,
+    "t": 1.29
+   },
+   "years": {
+    "decisive": [
+     {
+      "year": 2016,
+      "entryDay": "2016-06-24",
+      "exitDay": "2016-09-23",
+      "entry": 11.222,
+      "stop": 12.0206,
+      "exit": 9.664,
+      "why": "window",
+      "g": 1.951,
+      "cost": 0.028,
+      "fin": 0.106,
+      "net": 1.817
+     },
+     {
+      "year": 2017,
+      "entryDay": "2017-06-26",
+      "exitDay": "2017-06-30",
+      "entry": 9.02,
+      "stop": 9.3872,
+      "exit": 9.3872,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.049,
+      "fin": 0.014,
+      "net": -1.063
+     },
+     {
+      "year": 2018,
+      "entryDay": "2018-06-25",
+      "exitDay": "2018-09-21",
+      "entry": 8.947,
+      "stop": 9.5171,
+      "exit": 8.412,
+      "why": "window",
+      "g": 0.938,
+      "cost": 0.031,
+      "fin": 0.117,
+      "net": 0.79
+     },
+     {
+      "year": 2019,
+      "entryDay": "2019-06-24",
+      "exitDay": "2019-09-23",
+      "entry": 8.97,
+      "stop": 9.5042,
+      "exit": 8.804,
+      "why": "window",
+      "g": 0.311,
+      "cost": 0.034,
+      "fin": 0.127,
+      "net": 0.15
+     },
+     {
+      "year": 2020,
+      "entryDay": "2020-06-24",
+      "exitDay": "2020-07-06",
+      "entry": 8.726,
+      "stop": 9.0343,
+      "exit": 9.0343,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.057,
+      "fin": 0.03,
+      "net": -1.087
+     },
+     {
+      "year": 2021,
+      "entryDay": "2021-06-24",
+      "exitDay": "2021-09-23",
+      "entry": 13.84,
+      "stop": 15.1981,
+      "exit": 13.063,
+      "why": "window",
+      "g": 0.572,
+      "cost": 0.02,
+      "fin": 0.077,
+      "net": 0.475
+     },
+     {
+      "year": 2022,
+      "entryDay": "2022-06-24",
+      "exitDay": "2022-06-30",
+      "entry": 15.888,
+      "stop": 17.0916,
+      "exit": 17.0916,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.026,
+      "fin": 0.008,
+      "net": -1.034
+     },
+     {
+      "year": 2023,
+      "entryDay": "2023-06-26",
+      "exitDay": "2023-07-03",
+      "entry": 14.921,
+      "stop": 15.8768,
+      "exit": 15.8768,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.031,
+      "fin": 0.01,
+      "net": -1.041
+     },
+     {
+      "year": 2024,
+      "entryDay": "2024-06-24",
+      "exitDay": "2024-09-23",
+      "entry": 11.568,
+      "stop": 12.1258,
+      "exit": 10.541,
+      "why": "window",
+      "g": 1.841,
+      "cost": 0.041,
+      "fin": 0.157,
+      "net": 1.643
+     },
+     {
+      "year": 2025,
+      "entryDay": "2025-06-24",
+      "exitDay": "2025-09-23",
+      "entry": 10.508,
+      "stop": 10.9152,
+      "exit": 9.978,
+      "why": "window",
+      "g": 1.301,
+      "cost": 0.052,
+      "fin": 0.195,
+      "net": 1.055
+     },
+     {
+      "year": 2026,
+      "entryDay": "2026-06-24",
+      "exitDay": "2026-07-06",
+      "entry": 11.178,
+      "stop": 11.6402,
+      "exit": 11.6402,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.048,
+      "fin": 0.026,
+      "net": -1.074
+     }
+    ],
+    "replication": [
+     {
+      "year": 2003,
+      "entryDay": "2003-06-24",
+      "exitDay": "2003-09-23",
+      "entry": 6.313,
+      "stop": 6.6395,
+      "exit": 6.542,
+      "why": "window",
+      "g": -0.701,
+      "cost": 0.039,
+      "fin": 0.146,
+      "net": -0.886
+     },
+     {
+      "year": 2004,
+      "entryDay": "2004-06-24",
+      "exitDay": "2004-09-23",
+      "entry": 9.197,
+      "stop": 10.1789,
+      "exit": 5.415,
+      "why": "window",
+      "g": 3.852,
+      "cost": 0.019,
+      "fin": 0.071,
+      "net": 3.762
+     },
+     {
+      "year": 2005,
+      "entryDay": "2005-06-24",
+      "exitDay": "2005-09-23",
+      "entry": 7.256,
+      "stop": 7.8018,
+      "exit": 5.705,
+      "why": "window",
+      "g": 2.841,
+      "cost": 0.027,
+      "fin": 0.101,
+      "net": 2.714
+     },
+     {
+      "year": 2006,
+      "entryDay": "2006-06-26",
+      "exitDay": "2006-07-06",
+      "entry": 5.781,
+      "stop": 6.09,
+      "exit": 6.09,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.037,
+      "fin": 0.02,
+      "net": -1.057
+     },
+     {
+      "year": 2007,
+      "entryDay": "2007-06-25",
+      "exitDay": "2007-06-29",
+      "entry": 7.976,
+      "stop": 8.5373,
+      "exit": 8.5373,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.028,
+      "fin": 0.008,
+      "net": -1.037
+     },
+     {
+      "year": 2008,
+      "entryDay": "2008-06-24",
+      "exitDay": "2008-09-23",
+      "entry": 15.111,
+      "stop": 16.6053,
+      "exit": 11.861,
+      "why": "window",
+      "g": 2.175,
+      "cost": 0.02,
+      "fin": 0.076,
+      "net": 2.078
+     },
+     {
+      "year": 2009,
+      "entryDay": "2009-06-24",
+      "exitDay": "2009-09-23",
+      "entry": 11.783,
+      "stop": 12.7541,
+      "exit": 9.393,
+      "why": "window",
+      "g": 2.461,
+      "cost": 0.024,
+      "fin": 0.094,
+      "net": 2.343
+     },
+     {
+      "year": 2010,
+      "entryDay": "2010-06-24",
+      "exitDay": "2010-07-08",
+      "entry": 9.596,
+      "stop": 10.0193,
+      "exit": 10.0193,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.045,
+      "fin": 0.028,
+      "net": -1.073
+     },
+     {
+      "year": 2011,
+      "entryDay": "2011-06-24",
+      "exitDay": "2011-07-14",
+      "entry": 13.164,
+      "stop": 13.8568,
+      "exit": 13.8568,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.038,
+      "fin": 0.033,
+      "net": -1.071
+     },
+     {
+      "year": 2012,
+      "entryDay": "2012-06-25",
+      "exitDay": "2012-07-05",
+      "entry": 14.608,
+      "stop": 15.5236,
+      "exit": 15.548,
+      "why": "stop-gap",
+      "g": -1.027,
+      "cost": 0.032,
+      "fin": 0.016,
+      "net": -1.074
+     },
+     {
+      "year": 2013,
+      "entryDay": "2013-06-24",
+      "exitDay": "2013-09-23",
+      "entry": 15.01,
+      "stop": 15.8172,
+      "exit": 13.767,
+      "why": "window",
+      "g": 1.54,
+      "cost": 0.037,
+      "fin": 0.141,
+      "net": 1.362
+     },
+     {
+      "year": 2014,
+      "entryDay": "2014-06-24",
+      "exitDay": "2014-09-23",
+      "entry": 14.168,
+      "stop": 14.8475,
+      "exit": 9.868,
+      "why": "window",
+      "g": 6.328,
+      "cost": 0.042,
+      "fin": 0.158,
+      "net": 6.129
+     },
+     {
+      "year": 2015,
+      "entryDay": "2015-06-24",
+      "exitDay": "2015-06-30",
+      "entry": 9.877,
+      "stop": 10.3249,
+      "exit": 10.3249,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.044,
+      "fin": 0.013,
+      "net": -1.057
+     }
+    ]
+   }
+  },
+  {
+   "shift": 5,
+   "decisive": {
+    "n": 11,
+    "won": 6,
+    "stopped": 2,
+    "meanG": 0.542,
+    "meanNet": 0.399,
+    "t": 1.145
+   },
+   "replication": {
+    "n": 13,
+    "won": 8,
+    "stopped": 5,
+    "meanG": 1.174,
+    "meanNet": 1.057,
+    "t": 1.869
+   },
+   "years": {
+    "decisive": [
+     {
+      "year": 2016,
+      "entryDay": "2016-07-11",
+      "exitDay": "2016-10-07",
+      "entry": 10.982,
+      "stop": 11.9852,
+      "exit": 9.656,
+      "why": "window",
+      "g": 1.322,
+      "cost": 0.022,
+      "fin": 0.082,
+      "net": 1.218
+     },
+     {
+      "year": 2017,
+      "entryDay": "2017-07-11",
+      "exitDay": "2017-10-06",
+      "entry": 10.316,
+      "stop": 10.7969,
+      "exit": 9.702,
+      "why": "window",
+      "g": 1.277,
+      "cost": 0.043,
+      "fin": 0.159,
+      "net": 1.075
+     },
+     {
+      "year": 2018,
+      "entryDay": "2018-07-10",
+      "exitDay": "2018-10-05",
+      "entry": 8.512,
+      "stop": 9.1438,
+      "exit": 8.636,
+      "why": "window",
+      "g": -0.196,
+      "cost": 0.027,
+      "fin": 0.1,
+      "net": -0.323
+     },
+     {
+      "year": 2019,
+      "entryDay": "2019-07-09",
+      "exitDay": "2019-10-07",
+      "entry": 8.739,
+      "stop": 9.2066,
+      "exit": 9.071,
+      "why": "window",
+      "g": -0.71,
+      "cost": 0.037,
+      "fin": 0.14,
+      "net": -0.887
+     },
+     {
+      "year": 2020,
+      "entryDay": "2020-07-09",
+      "exitDay": "2020-08-26",
+      "entry": 8.952,
+      "stop": 9.2538,
+      "exit": 9.2538,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.059,
+      "fin": 0.119,
+      "net": -1.179
+     },
+     {
+      "year": 2021,
+      "entryDay": "2021-07-09",
+      "exitDay": "2021-10-07",
+      "entry": 13.847,
+      "stop": 15.4569,
+      "exit": 12.622,
+      "why": "window",
+      "g": 0.761,
+      "cost": 0.017,
+      "fin": 0.064,
+      "net": 0.679
+     },
+     {
+      "year": 2022,
+      "entryDay": "2022-07-11",
+      "exitDay": "2022-10-07",
+      "entry": 16.209,
+      "stop": 17.5204,
+      "exit": 14.455,
+      "why": "window",
+      "g": 1.337,
+      "cost": 0.025,
+      "fin": 0.092,
+      "net": 1.22
+     },
+     {
+      "year": 2023,
+      "entryDay": "2023-07-11",
+      "exitDay": "2023-10-06",
+      "entry": 15.408,
+      "stop": 16.629,
+      "exit": 12.9,
+      "why": "window",
+      "g": 2.054,
+      "cost": 0.025,
+      "fin": 0.093,
+      "net": 1.935
+     },
+     {
+      "year": 2024,
+      "entryDay": "2024-07-09",
+      "exitDay": "2024-10-07",
+      "entry": 11.59,
+      "stop": 12.153,
+      "exit": 10.453,
+      "why": "window",
+      "g": 2.02,
+      "cost": 0.041,
+      "fin": 0.154,
+      "net": 1.825
+     },
+     {
+      "year": 2025,
+      "entryDay": "2025-07-09",
+      "exitDay": "2025-10-07",
+      "entry": 10.156,
+      "stop": 10.6418,
+      "exit": 10.11,
+      "why": "window",
+      "g": 0.095,
+      "cost": 0.042,
+      "fin": 0.156,
+      "net": -0.103
+     },
+     {
+      "year": 2026,
+      "entryDay": "2026-07-09",
+      "exitDay": "2026-07-23",
+      "entry": 11.678,
+      "stop": 12.2059,
+      "exit": 12.2059,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.044,
+      "fin": 0.027,
+      "net": -1.072
+     }
+    ],
+    "replication": [
+     {
+      "year": 2003,
+      "entryDay": "2003-07-09",
+      "exitDay": "2003-09-19",
+      "entry": 6.028,
+      "stop": 6.3463,
+      "exit": 6.3463,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.038,
+      "fin": 0.117,
+      "net": -1.155
+     },
+     {
+      "year": 2004,
+      "entryDay": "2004-07-09",
+      "exitDay": "2004-10-07",
+      "entry": 8.737,
+      "stop": 9.6487,
+      "exit": 5.284,
+      "why": "window",
+      "g": 3.787,
+      "cost": 0.019,
+      "fin": 0.072,
+      "net": 3.697
+     },
+     {
+      "year": 2005,
+      "entryDay": "2005-07-11",
+      "exitDay": "2005-10-07",
+      "entry": 6.539,
+      "stop": 7.3599,
+      "exit": 5.62,
+      "why": "window",
+      "g": 1.119,
+      "cost": 0.016,
+      "fin": 0.06,
+      "net": 1.044
+     },
+     {
+      "year": 2006,
+      "entryDay": "2006-07-10",
+      "exitDay": "2006-10-06",
+      "entry": 6.066,
+      "stop": 6.3927,
+      "exit": 5.588,
+      "why": "window",
+      "g": 1.463,
+      "cost": 0.037,
+      "fin": 0.139,
+      "net": 1.287
+     },
+     {
+      "year": 2007,
+      "entryDay": "2007-07-09",
+      "exitDay": "2007-09-12",
+      "entry": 8.641,
+      "stop": 9.2635,
+      "exit": 9.2635,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.028,
+      "fin": 0.078,
+      "net": -1.105
+     },
+     {
+      "year": 2008,
+      "entryDay": "2008-07-09",
+      "exitDay": "2008-10-07",
+      "entry": 15.731,
+      "stop": 17.2044,
+      "exit": 9.15,
+      "why": "window",
+      "g": 4.466,
+      "cost": 0.021,
+      "fin": 0.08,
+      "net": 4.365
+     },
+     {
+      "year": 2009,
+      "entryDay": "2009-07-09",
+      "exitDay": "2009-10-07",
+      "entry": 10.899,
+      "stop": 12.0583,
+      "exit": 9.297,
+      "why": "window",
+      "g": 1.382,
+      "cost": 0.019,
+      "fin": 0.07,
+      "net": 1.293
+     },
+     {
+      "year": 2010,
+      "entryDay": "2010-07-08",
+      "exitDay": "2010-07-15",
+      "entry": 9.847,
+      "stop": 10.2658,
+      "exit": 10.2658,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.047,
+      "fin": 0.015,
+      "net": -1.062
+     },
+     {
+      "year": 2011,
+      "entryDay": "2011-07-08",
+      "exitDay": "2011-08-26",
+      "entry": 13.458,
+      "stop": 14.1488,
+      "exit": 14.1488,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.039,
+      "fin": 0.08,
+      "net": -1.119
+     },
+     {
+      "year": 2012,
+      "entryDay": "2012-07-10",
+      "exitDay": "2012-07-19",
+      "entry": 16.04,
+      "stop": 17.0885,
+      "exit": 17.0885,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.031,
+      "fin": 0.015,
+      "net": -1.046
+     },
+     {
+      "year": 2013,
+      "entryDay": "2013-07-09",
+      "exitDay": "2013-10-07",
+      "entry": 15.234,
+      "stop": 15.9426,
+      "exit": 13.462,
+      "why": "window",
+      "g": 2.501,
+      "cost": 0.043,
+      "fin": 0.161,
+      "net": 2.297
+     },
+     {
+      "year": 2014,
+      "entryDay": "2014-07-09",
+      "exitDay": "2014-10-07",
+      "entry": 12.83,
+      "stop": 13.628,
+      "exit": 9.77,
+      "why": "window",
+      "g": 3.835,
+      "cost": 0.032,
+      "fin": 0.12,
+      "net": 3.682
+     },
+     {
+      "year": 2015,
+      "entryDay": "2015-07-09",
+      "exitDay": "2015-10-07",
+      "entry": 10.062,
+      "stop": 10.6978,
+      "exit": 8.972,
+      "why": "window",
+      "g": 1.714,
+      "cost": 0.032,
+      "fin": 0.118,
+      "net": 1.564
+     }
+    ]
+   }
+  },
+  {
+   "shift": 10,
+   "decisive": {
+    "n": 11,
+    "won": 4,
+    "stopped": 4,
+    "meanG": 0.081,
+    "meanNet": -0.041,
+    "t": -0.117
+   },
+   "replication": {
+    "n": 13,
+    "won": 7,
+    "stopped": 6,
+    "meanG": 0.794,
+    "meanNet": 0.686,
+    "t": 1.245
+   },
+   "years": {
+    "decisive": [
+     {
+      "year": 2016,
+      "entryDay": "2016-07-18",
+      "exitDay": "2016-10-14",
+      "entry": 10.643,
+      "stop": 11.7202,
+      "exit": 9.704,
+      "why": "window",
+      "g": 0.872,
+      "cost": 0.02,
+      "fin": 0.074,
+      "net": 0.778
+     },
+     {
+      "year": 2017,
+      "entryDay": "2017-07-18",
+      "exitDay": "2017-10-13",
+      "entry": 10.012,
+      "stop": 10.602,
+      "exit": 9.972,
+      "why": "window",
+      "g": 0.068,
+      "cost": 0.034,
+      "fin": 0.126,
+      "net": -0.092
+     },
+     {
+      "year": 2018,
+      "entryDay": "2018-07-17",
+      "exitDay": "2018-07-31",
+      "entry": 8.338,
+      "stop": 9.0002,
+      "exit": 9.0002,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.025,
+      "fin": 0.016,
+      "net": -1.041
+     },
+     {
+      "year": 2019,
+      "entryDay": "2019-07-16",
+      "exitDay": "2019-10-14",
+      "entry": 8.934,
+      "stop": 9.387,
+      "exit": 9.33,
+      "why": "window",
+      "g": -0.874,
+      "cost": 0.039,
+      "fin": 0.148,
+      "net": -1.061
+     },
+     {
+      "year": 2020,
+      "entryDay": "2020-07-16",
+      "exitDay": "2020-08-19",
+      "entry": 8.883,
+      "stop": 9.2224,
+      "exit": 9.2224,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.052,
+      "fin": 0.075,
+      "net": -1.128
+     },
+     {
+      "year": 2021,
+      "entryDay": "2021-07-16",
+      "exitDay": "2021-10-14",
+      "entry": 14.648,
+      "stop": 16.1789,
+      "exit": 12.177,
+      "why": "window",
+      "g": 1.614,
+      "cost": 0.019,
+      "fin": 0.072,
+      "net": 1.523
+     },
+     {
+      "year": 2022,
+      "entryDay": "2022-07-18",
+      "exitDay": "2022-07-29",
+      "entry": 15.38,
+      "stop": 16.7844,
+      "exit": 16.7844,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.022,
+      "fin": 0.013,
+      "net": -1.035
+     },
+     {
+      "year": 2023,
+      "entryDay": "2023-07-18",
+      "exitDay": "2023-10-13",
+      "entry": 15.43,
+      "stop": 16.6708,
+      "exit": 13.035,
+      "why": "window",
+      "g": 1.93,
+      "cost": 0.025,
+      "fin": 0.092,
+      "net": 1.813
+     },
+     {
+      "year": 2024,
+      "entryDay": "2024-07-16",
+      "exitDay": "2024-10-14",
+      "entry": 10.854,
+      "stop": 11.4453,
+      "exit": 10.045,
+      "why": "window",
+      "g": 1.368,
+      "cost": 0.037,
+      "fin": 0.137,
+      "net": 1.194
+     },
+     {
+      "year": 2025,
+      "entryDay": "2025-07-16",
+      "exitDay": "2025-10-14",
+      "entry": 9.934,
+      "stop": 10.4104,
+      "exit": 9.976,
+      "why": "window",
+      "g": -0.088,
+      "cost": 0.042,
+      "fin": 0.156,
+      "net": -0.286
+     },
+     {
+      "year": 2026,
+      "entryDay": "2026-07-16",
+      "exitDay": "2026-08-26",
+      "entry": 11.807,
+      "stop": 12.3587,
+      "exit": 12.3587,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.043,
+      "fin": 0.074,
+      "net": -1.117
+     }
+    ],
+    "replication": [
+     {
+      "year": 2003,
+      "entryDay": "2003-07-16",
+      "exitDay": "2003-09-11",
+      "entry": 5.863,
+      "stop": 6.1608,
+      "exit": 6.1608,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.039,
+      "fin": 0.097,
+      "net": -1.136
+     },
+     {
+      "year": 2004,
+      "entryDay": "2004-07-16",
+      "exitDay": "2004-10-14",
+      "entry": 7.935,
+      "stop": 8.8677,
+      "exit": 5.169,
+      "why": "window",
+      "g": 2.966,
+      "cost": 0.017,
+      "fin": 0.064,
+      "net": 2.885
+     },
+     {
+      "year": 2005,
+      "entryDay": "2005-07-18",
+      "exitDay": "2005-10-14",
+      "entry": 7.257,
+      "stop": 8.1573,
+      "exit": 5.874,
+      "why": "window",
+      "g": 1.536,
+      "cost": 0.016,
+      "fin": 0.06,
+      "net": 1.46
+     },
+     {
+      "year": 2006,
+      "entryDay": "2006-07-17",
+      "exitDay": "2006-10-13",
+      "entry": 5.941,
+      "stop": 6.2774,
+      "exit": 5.866,
+      "why": "window",
+      "g": 0.223,
+      "cost": 0.035,
+      "fin": 0.132,
+      "net": 0.056
+     },
+     {
+      "year": 2007,
+      "entryDay": "2007-07-16",
+      "exitDay": "2007-09-20",
+      "entry": 9.026,
+      "stop": 9.6587,
+      "exit": 9.6587,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.029,
+      "fin": 0.081,
+      "net": -1.109
+     },
+     {
+      "year": 2008,
+      "entryDay": "2008-07-16",
+      "exitDay": "2008-10-14",
+      "entry": 15.542,
+      "stop": 16.9253,
+      "exit": 8.905,
+      "why": "window",
+      "g": 4.798,
+      "cost": 0.022,
+      "fin": 0.084,
+      "net": 4.691
+     },
+     {
+      "year": 2009,
+      "entryDay": "2009-07-16",
+      "exitDay": "2009-08-03",
+      "entry": 10.77,
+      "stop": 12.003,
+      "exit": 12.003,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.017,
+      "fin": 0.012,
+      "net": -1.03
+     },
+     {
+      "year": 2010,
+      "entryDay": "2010-07-15",
+      "exitDay": "2010-08-02",
+      "entry": 10.075,
+      "stop": 10.5239,
+      "exit": 10.5239,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.045,
+      "fin": 0.031,
+      "net": -1.076
+     },
+     {
+      "year": 2011,
+      "entryDay": "2011-07-15",
+      "exitDay": "2011-08-31",
+      "entry": 13.833,
+      "stop": 14.5191,
+      "exit": 14.5191,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.04,
+      "fin": 0.08,
+      "net": -1.12
+     },
+     {
+      "year": 2012,
+      "entryDay": "2012-07-17",
+      "exitDay": "2012-07-20",
+      "entry": 16.523,
+      "stop": 17.6364,
+      "exit": 17.6364,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.03,
+      "fin": 0.007,
+      "net": -1.037
+     },
+     {
+      "year": 2013,
+      "entryDay": "2013-07-16",
+      "exitDay": "2013-10-14",
+      "entry": 15.109,
+      "stop": 15.8202,
+      "exit": 13.129,
+      "why": "window",
+      "g": 2.784,
+      "cost": 0.042,
+      "fin": 0.159,
+      "net": 2.583
+     },
+     {
+      "year": 2014,
+      "entryDay": "2014-07-16",
+      "exitDay": "2014-10-14",
+      "entry": 12.096,
+      "stop": 13.0107,
+      "exit": 9.954,
+      "why": "window",
+      "g": 2.342,
+      "cost": 0.026,
+      "fin": 0.099,
+      "net": 2.216
+     },
+     {
+      "year": 2015,
+      "entryDay": "2015-07-16",
+      "exitDay": "2015-10-14",
+      "entry": 10.351,
+      "stop": 11.0659,
+      "exit": 9.152,
+      "why": "window",
+      "g": 1.677,
+      "cost": 0.029,
+      "fin": 0.108,
+      "net": 1.54
+     }
+    ]
+   }
+  }
+ ],
+ "r2": [
+  {
+   "k": 2,
+   "decisive": {
+    "n": 11,
+    "won": 6,
+    "stopped": 5,
+    "meanG": 0.793,
+    "meanNet": 0.634,
+    "t": 1.128
+   },
+   "replication": {
+    "n": 13,
+    "won": 6,
+    "stopped": 7,
+    "meanG": 1.711,
+    "meanNet": 1.553,
+    "t": 1.726
+   },
+   "years": {
+    "decisive": [
+     {
+      "year": 2016,
+      "entryDay": "2016-07-01",
+      "exitDay": "2016-09-30",
+      "entry": 11.76,
+      "stop": 12.3536,
+      "exit": 9.634,
+      "why": "window",
+      "g": 3.582,
+      "cost": 0.04,
+      "fin": 0.15,
+      "net": 3.392
+     },
+     {
+      "year": 2017,
+      "entryDay": "2017-07-03",
+      "exitDay": "2017-07-03",
+      "entry": 9.546,
+      "stop": 9.803,
+      "exit": 9.803,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.074,
+      "fin": 0.003,
+      "net": -1.077
+     },
+     {
+      "year": 2018,
+      "entryDay": "2018-07-02",
+      "exitDay": "2018-07-31",
+      "entry": 8.6,
+      "stop": 8.9909,
+      "exit": 8.9909,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.044,
+      "fin": 0.054,
+      "net": -1.098
+     },
+     {
+      "year": 2019,
+      "entryDay": "2019-07-01",
+      "exitDay": "2019-09-30",
+      "entry": 9.061,
+      "stop": 9.3701,
+      "exit": 8.953,
+      "why": "window",
+      "g": 0.349,
+      "cost": 0.059,
+      "fin": 0.222,
+      "net": 0.069
+     },
+     {
+      "year": 2020,
+      "entryDay": "2020-07-01",
+      "exitDay": "2020-07-06",
+      "entry": 8.818,
+      "stop": 9.0211,
+      "exit": 9.0211,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.087,
+      "fin": 0.021,
+      "net": -1.108
+     },
+     {
+      "year": 2021,
+      "entryDay": "2021-07-01",
+      "exitDay": "2021-09-30",
+      "entry": 14.578,
+      "stop": 15.6137,
+      "exit": 12.755,
+      "why": "window",
+      "g": 1.76,
+      "cost": 0.028,
+      "fin": 0.106,
+      "net": 1.626
+     },
+     {
+      "year": 2022,
+      "entryDay": "2022-07-01",
+      "exitDay": "2022-09-30",
+      "entry": 16.754,
+      "stop": 17.5245,
+      "exit": 14.606,
+      "why": "window",
+      "g": 2.788,
+      "cost": 0.043,
+      "fin": 0.164,
+      "net": 2.58
+     },
+     {
+      "year": 2023,
+      "entryDay": "2023-07-03",
+      "exitDay": "2023-09-29",
+      "entry": 15.452,
+      "stop": 16.166,
+      "exit": 13.073,
+      "why": "window",
+      "g": 3.332,
+      "cost": 0.043,
+      "fin": 0.162,
+      "net": 3.127
+     },
+     {
+      "year": 2024,
+      "entryDay": "2024-07-01",
+      "exitDay": "2024-09-30",
+      "entry": 11.43,
+      "stop": 11.8128,
+      "exit": 10.698,
+      "why": "window",
+      "g": 1.912,
+      "cost": 0.06,
+      "fin": 0.226,
+      "net": 1.627
+     },
+     {
+      "year": 2025,
+      "entryDay": "2025-07-01",
+      "exitDay": "2025-07-03",
+      "entry": 10.207,
+      "stop": 10.5077,
+      "exit": 10.5077,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.068,
+      "fin": 0.014,
+      "net": -1.082
+     },
+     {
+      "year": 2026,
+      "entryDay": "2026-07-01",
+      "exitDay": "2026-07-06",
+      "entry": 11.208,
+      "stop": 11.5494,
+      "exit": 11.5494,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.066,
+      "fin": 0.016,
+      "net": -1.082
+     }
+    ],
+    "replication": [
+     {
+      "year": 2003,
+      "entryDay": "2003-07-01",
+      "exitDay": "2003-09-19",
+      "entry": 6.135,
+      "stop": 6.3533,
+      "exit": 6.3533,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.056,
+      "fin": 0.192,
+      "net": -1.248
+     },
+     {
+      "year": 2004,
+      "entryDay": "2004-07-01",
+      "exitDay": "2004-07-07",
+      "entry": 8.552,
+      "stop": 9.1917,
+      "exit": 9.1917,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.027,
+      "fin": 0.008,
+      "net": -1.034
+     },
+     {
+      "year": 2005,
+      "entryDay": "2005-07-01",
+      "exitDay": "2005-07-05",
+      "entry": 6.531,
+      "stop": 6.996,
+      "exit": 6.996,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.028,
+      "fin": 0.003,
+      "net": -1.032
+     },
+     {
+      "year": 2006,
+      "entryDay": "2006-07-03",
+      "exitDay": "2006-09-29",
+      "entry": 6.02,
+      "stop": 6.2278,
+      "exit": 5.412,
+      "why": "window",
+      "g": 2.926,
+      "cost": 0.058,
+      "fin": 0.217,
+      "net": 2.651
+     },
+     {
+      "year": 2007,
+      "entryDay": "2007-07-02",
+      "exitDay": "2007-07-11",
+      "entry": 8.505,
+      "stop": 8.9339,
+      "exit": 8.9339,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.04,
+      "fin": 0.02,
+      "net": -1.059
+     },
+     {
+      "year": 2008,
+      "entryDay": "2008-07-01",
+      "exitDay": "2008-09-30",
+      "entry": 16.042,
+      "stop": 16.9875,
+      "exit": 10.537,
+      "why": "window",
+      "g": 5.822,
+      "cost": 0.034,
+      "fin": 0.128,
+      "net": 5.66
+     },
+     {
+      "year": 2009,
+      "entryDay": "2009-07-01",
+      "exitDay": "2009-09-30",
+      "entry": 12.257,
+      "stop": 12.9129,
+      "exit": 9.458,
+      "why": "window",
+      "g": 4.267,
+      "cost": 0.037,
+      "fin": 0.144,
+      "net": 4.086
+     },
+     {
+      "year": 2010,
+      "entryDay": "2010-07-01",
+      "exitDay": "2010-07-07",
+      "entry": 9.528,
+      "stop": 9.8216,
+      "exit": 9.8216,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.065,
+      "fin": 0.019,
+      "net": -1.084
+     },
+     {
+      "year": 2011,
+      "entryDay": "2011-07-01",
+      "exitDay": "2011-07-11",
+      "entry": 13.083,
+      "stop": 13.5834,
+      "exit": 13.5834,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.052,
+      "fin": 0.019,
+      "net": -1.072
+     },
+     {
+      "year": 2012,
+      "entryDay": "2012-07-02",
+      "exitDay": "2012-07-05",
+      "entry": 15.025,
+      "stop": 15.6717,
+      "exit": 15.6717,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.046,
+      "fin": 0.011,
+      "net": -1.058
+     },
+     {
+      "year": 2013,
+      "entryDay": "2013-07-01",
+      "exitDay": "2013-09-30",
+      "entry": 15.085,
+      "stop": 15.5541,
+      "exit": 13.416,
+      "why": "window",
+      "g": 3.558,
+      "cost": 0.064,
+      "fin": 0.243,
+      "net": 3.25
+     },
+     {
+      "year": 2014,
+      "entryDay": "2014-07-01",
+      "exitDay": "2014-09-30",
+      "entry": 13.738,
+      "stop": 14.225,
+      "exit": 9.59,
+      "why": "window",
+      "g": 8.517,
+      "cost": 0.056,
+      "fin": 0.213,
+      "net": 8.248
+     },
+     {
+      "year": 2015,
+      "entryDay": "2015-07-01",
+      "exitDay": "2015-09-30",
+      "entry": 10.56,
+      "stop": 10.937,
+      "exit": 8.996,
+      "why": "window",
+      "g": 4.149,
+      "cost": 0.056,
+      "fin": 0.216,
+      "net": 3.876
+     }
+    ]
+   }
+  },
+  {
+   "k": 4,
+   "decisive": {
+    "n": 11,
+    "won": 8,
+    "stopped": 3,
+    "meanG": 0.423,
+    "meanNet": 0.318,
+    "t": 1.007
+   },
+   "replication": {
+    "n": 13,
+    "won": 8,
+    "stopped": 5,
+    "meanG": 1.004,
+    "meanNet": 0.912,
+    "t": 1.824
+   },
+   "years": {
+    "decisive": [
+     {
+      "year": 2016,
+      "entryDay": "2016-07-01",
+      "exitDay": "2016-09-30",
+      "entry": 11.76,
+      "stop": 12.9472,
+      "exit": 9.634,
+      "why": "window",
+      "g": 1.791,
+      "cost": 0.02,
+      "fin": 0.075,
+      "net": 1.696
+     },
+     {
+      "year": 2017,
+      "entryDay": "2017-07-03",
+      "exitDay": "2017-07-07",
+      "entry": 9.546,
+      "stop": 10.06,
+      "exit": 10.06,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.037,
+      "fin": 0.011,
+      "net": -1.048
+     },
+     {
+      "year": 2018,
+      "entryDay": "2018-07-02",
+      "exitDay": "2018-09-28",
+      "entry": 8.6,
+      "stop": 9.3818,
+      "exit": 8.378,
+      "why": "window",
+      "g": 0.284,
+      "cost": 0.022,
+      "fin": 0.082,
+      "net": 0.18
+     },
+     {
+      "year": 2019,
+      "entryDay": "2019-07-01",
+      "exitDay": "2019-09-30",
+      "entry": 9.061,
+      "stop": 9.6792,
+      "exit": 8.953,
+      "why": "window",
+      "g": 0.175,
+      "cost": 0.029,
+      "fin": 0.111,
+      "net": 0.035
+     },
+     {
+      "year": 2020,
+      "entryDay": "2020-07-01",
+      "exitDay": "2020-08-19",
+      "entry": 8.818,
+      "stop": 9.2242,
+      "exit": 9.2242,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.043,
+      "fin": 0.093,
+      "net": -1.136
+     },
+     {
+      "year": 2021,
+      "entryDay": "2021-07-01",
+      "exitDay": "2021-09-30",
+      "entry": 14.578,
+      "stop": 16.6494,
+      "exit": 12.755,
+      "why": "window",
+      "g": 0.88,
+      "cost": 0.014,
+      "fin": 0.053,
+      "net": 0.813
+     },
+     {
+      "year": 2022,
+      "entryDay": "2022-07-01",
+      "exitDay": "2022-09-30",
+      "entry": 16.754,
+      "stop": 18.295,
+      "exit": 14.606,
+      "why": "window",
+      "g": 1.394,
+      "cost": 0.022,
+      "fin": 0.082,
+      "net": 1.29
+     },
+     {
+      "year": 2023,
+      "entryDay": "2023-07-03",
+      "exitDay": "2023-09-29",
+      "entry": 15.452,
+      "stop": 16.88,
+      "exit": 13.073,
+      "why": "window",
+      "g": 1.666,
+      "cost": 0.022,
+      "fin": 0.081,
+      "net": 1.563
+     },
+     {
+      "year": 2024,
+      "entryDay": "2024-07-01",
+      "exitDay": "2024-09-30",
+      "entry": 11.43,
+      "stop": 12.1956,
+      "exit": 10.698,
+      "why": "window",
+      "g": 0.956,
+      "cost": 0.03,
+      "fin": 0.113,
+      "net": 0.813
+     },
+     {
+      "year": 2025,
+      "entryDay": "2025-07-01",
+      "exitDay": "2025-09-30",
+      "entry": 10.207,
+      "stop": 10.8084,
+      "exit": 9.886,
+      "why": "window",
+      "g": 0.534,
+      "cost": 0.034,
+      "fin": 0.128,
+      "net": 0.371
+     },
+     {
+      "year": 2026,
+      "entryDay": "2026-07-01",
+      "exitDay": "2026-07-20",
+      "entry": 11.208,
+      "stop": 11.8908,
+      "exit": 11.908,
+      "why": "stop-gap",
+      "g": -1.025,
+      "cost": 0.033,
+      "fin": 0.026,
+      "net": -1.084
+     }
+    ],
+    "replication": [
+     {
+      "year": 2003,
+      "entryDay": "2003-07-01",
+      "exitDay": "2003-09-23",
+      "entry": 6.135,
+      "stop": 6.5716,
+      "exit": 6.5716,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.028,
+      "fin": 0.098,
+      "net": -1.126
+     },
+     {
+      "year": 2004,
+      "entryDay": "2004-07-01",
+      "exitDay": "2004-09-30",
+      "entry": 8.552,
+      "stop": 9.8314,
+      "exit": 5.309,
+      "why": "window",
+      "g": 2.535,
+      "cost": 0.013,
+      "fin": 0.051,
+      "net": 2.471
+     },
+     {
+      "year": 2005,
+      "entryDay": "2005-07-01",
+      "exitDay": "2005-09-30",
+      "entry": 6.531,
+      "stop": 7.461,
+      "exit": 5.7,
+      "why": "window",
+      "g": 0.894,
+      "cost": 0.014,
+      "fin": 0.053,
+      "net": 0.826
+     },
+     {
+      "year": 2006,
+      "entryDay": "2006-07-03",
+      "exitDay": "2006-09-29",
+      "entry": 6.02,
+      "stop": 6.4356,
+      "exit": 5.412,
+      "why": "window",
+      "g": 1.463,
+      "cost": 0.029,
+      "fin": 0.108,
+      "net": 1.326
+     },
+     {
+      "year": 2007,
+      "entryDay": "2007-07-02",
+      "exitDay": "2007-09-12",
+      "entry": 8.505,
+      "stop": 9.3628,
+      "exit": 9.3628,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.02,
+      "fin": 0.061,
+      "net": -1.081
+     },
+     {
+      "year": 2008,
+      "entryDay": "2008-07-01",
+      "exitDay": "2008-09-30",
+      "entry": 16.042,
+      "stop": 17.933,
+      "exit": 10.537,
+      "why": "window",
+      "g": 2.911,
+      "cost": 0.017,
+      "fin": 0.064,
+      "net": 2.83
+     },
+     {
+      "year": 2009,
+      "entryDay": "2009-07-01",
+      "exitDay": "2009-09-30",
+      "entry": 12.257,
+      "stop": 13.5688,
+      "exit": 9.458,
+      "why": "window",
+      "g": 2.134,
+      "cost": 0.019,
+      "fin": 0.072,
+      "net": 2.043
+     },
+     {
+      "year": 2010,
+      "entryDay": "2010-07-01",
+      "exitDay": "2010-07-09",
+      "entry": 9.528,
+      "stop": 10.1152,
+      "exit": 10.1152,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.032,
+      "fin": 0.012,
+      "net": -1.044
+     },
+     {
+      "year": 2011,
+      "entryDay": "2011-07-01",
+      "exitDay": "2011-07-19",
+      "entry": 13.083,
+      "stop": 14.0838,
+      "exit": 14.0838,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.026,
+      "fin": 0.018,
+      "net": -1.044
+     },
+     {
+      "year": 2012,
+      "entryDay": "2012-07-02",
+      "exitDay": "2012-07-09",
+      "entry": 15.025,
+      "stop": 16.3184,
+      "exit": 16.3184,
+      "why": "stop",
+      "g": -1,
+      "cost": 0.023,
+      "fin": 0.008,
+      "net": -1.031
+     },
+     {
+      "year": 2013,
+      "entryDay": "2013-07-01",
+      "exitDay": "2013-09-30",
+      "entry": 15.085,
+      "stop": 16.0232,
+      "exit": 13.416,
+      "why": "window",
+      "g": 1.779,
+      "cost": 0.032,
+      "fin": 0.122,
+      "net": 1.625
+     },
+     {
+      "year": 2014,
+      "entryDay": "2014-07-01",
+      "exitDay": "2014-09-30",
+      "entry": 13.738,
+      "stop": 14.712,
+      "exit": 9.59,
+      "why": "window",
+      "g": 4.259,
+      "cost": 0.028,
+      "fin": 0.107,
+      "net": 4.124
+     },
+     {
+      "year": 2015,
+      "entryDay": "2015-07-01",
+      "exitDay": "2015-09-30",
+      "entry": 10.56,
+      "stop": 11.314,
+      "exit": 8.996,
+      "why": "window",
+      "g": 2.074,
+      "cost": 0.028,
+      "fin": 0.108,
+      "net": 1.938
+     }
+    ]
+   }
+  }
+ ],
+ "r3": {
+  "decisive": {
+   "rose": {
+    "n": 8,
+    "won": 6,
+    "meanNet": 0.682,
+    "t": 1.436,
+    "years": [
+     {
+      "year": 2016,
+      "aprJun": 0.2964,
+      "net": 2.261
+     },
+     {
+      "year": 2017,
+      "aprJun": 0.0034,
+      "net": -1.064
+     },
+     {
+      "year": 2019,
+      "aprJun": 0.024,
+      "net": 0.046
+     },
+     {
+      "year": 2020,
+      "aprJun": 0.0024,
+      "net": -1.172
+     },
+     {
+      "year": 2021,
+      "aprJun": 0.0011,
+      "net": 1.084
+     },
+     {
+      "year": 2022,
+      "aprJun": 0.0337,
+      "net": 1.72
+     },
+     {
+      "year": 2023,
+      "aprJun": 0.0207,
+      "net": 2.085
+     },
+     {
+      "year": 2025,
+      "aprJun": 0.0171,
+      "net": 0.495
+     }
+    ]
+   },
+   "fell": {
+    "n": 3,
+    "won": 2,
+    "meanNet": 0.09,
+    "t": 0.144,
+    "years": [
+     {
+      "year": 2018,
+      "aprJun": -0.1747,
+      "net": 0.24
+     },
+     {
+      "year": 2024,
+      "aprJun": -0.0364,
+      "net": 1.084
+     },
+     {
+      "year": 2026,
+      "aprJun": -0.0372,
+      "net": -1.055
+     }
+    ]
+   }
+  },
+  "replication": {
+   "rose": {
+    "n": 10,
+    "won": 5,
+    "meanNet": 0.768,
+    "t": 1.215,
+    "years": [
+     {
+      "year": 2003,
+      "aprJun": 0.0693,
+      "net": -1.167
+     },
+     {
+      "year": 2005,
+      "aprJun": 0.0316,
+      "net": -1.03
+     },
+     {
+      "year": 2006,
+      "aprJun": 0.0488,
+      "net": 1.768
+     },
+     {
+      "year": 2007,
+      "aprJun": 0.1328,
+      "net": -1.042
+     },
+     {
+      "year": 2008,
+      "aprJun": 0.427,
+      "net": 3.773
+     },
+     {
+      "year": 2009,
+      "aprJun": 0.2983,
+      "net": 2.724
+     },
+     {
+      "year": 2010,
+      "aprJun": 0.0209,
+      "net": -1.057
+     },
+     {
+      "year": 2012,
+      "aprJun": 0.063,
+      "net": -1.041
+     },
+     {
+      "year": 2013,
+      "aprJun": 0.0755,
+      "net": 2.167
+     },
+     {
+      "year": 2015,
+      "aprJun": 0.0937,
+      "net": 2.584
+     }
+    ]
+   },
+   "fell": {
+    "n": 3,
+    "won": 2,
+    "meanNet": 2.58,
+    "t": 1.34,
+    "years": [
+     {
+      "year": 2004,
+      "aprJun": -0.1436,
+      "net": 3.294
+     },
+     {
+      "year": 2011,
+      "aprJun": -0.0679,
+      "net": -1.053
+     },
+     {
+      "year": 2014,
+      "aprJun": -0.0695,
+      "net": 5.498
+     }
+    ]
+   }
+  }
+ },
+ "r4": {
+  "available": false,
+  "tried": [
+   {
+    "name": "stooq daily CSV zs.f",
+    "host": "stooq.com",
+    "answer": "connection refused by the sandbox network proxy (connect_rejected), 14 Nov 2026"
+   },
+   {
+    "name": "Yahoo chart API ZS=F",
+    "host": "query1.finance.yahoo.com",
+    "answer": "connection refused by the sandbox network proxy (connect_rejected), 14 Nov 2026"
+   },
+   {
+    "name": "CNBC bars @S.1 daily",
+    "host": "ts-api.cnbc.com",
+    "answer": "connection refused by the sandbox network proxy (connect_rejected), 14 Nov 2026"
+   }
+  ],
+  "why": "every pre-registered source was refused by the sandbox network proxy; no other soybean series exists in council-data; no data was invented"
+ },
+ "verdict": "FRAGILE"
+}

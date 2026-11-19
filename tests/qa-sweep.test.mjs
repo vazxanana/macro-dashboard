@@ -943,3 +943,23 @@ test('Home (18 Nov 2026): one line on the live book against its plan, owner and 
   assert.equal(els['hs-fwd'].innerHTML, 'Live book against its plan: <b class="fw-st-few">Too few trades to say</b> · 2 positions closed since 12 Nov 2026, −1.23R after costs · 1 open · <a href="#council/systems">See the forward record</a>');
   W.MS_COUNCIL.coach.forward = null; W.MS_FWD.home(); assert.equal(els['hs-fwd'].hidden, true, 'no reading, no line');
 });
+
+// ---- CI red, 13 Nov 2026: an empty, hidden Coach card counted as an open card on the phone's Systems pane ----
+test('a hidden card is never drawn (#v-council .c-sleeve set display: flex over [hidden], so the empty Coach card showed unfolded on a phone)', () => {
+  const css = styles(DESK).replace(/\/\*[\s\S]*?\*\//g, '');
+  // one rule for every card: hidden wins over any display a card's own rule sets (the browser's [hidden] rule loses to any author rule)
+  assert.match(css, /(^|[\s}])\.card\[hidden\] \{ display: none !important; \}/);
+  // the case that failed: the Coach card starts hidden and empty, and renderSleeve leaves it hidden and empty when nothing waits
+  assert.match(DESK, /<div class="card c-sleeve adm" id="ms-sleeve" hidden><\/div>/);
+  assert.match(css, /#v-council \.c-sleeve \{ display: flex;/);
+  assert.match(DESK, /if \(!PD\.length && !mr && !iw\) \{ el\.hidden = true; return; \}/);
+  // no rule with !important shows a hidden card again
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) if (/card/.test(m[1]) && /\[hidden\]/.test(m[1]) && /display:\s*(?!none)[\w-]+\s*!important/.test(m[2])) assert.fail(`a hidden card shown again: ${m[1].trim()}`);
+  // the simple view: a card hidden when it folds gets its row hidden with it, the row follows the card's hidden attribute (a card
+  // un-hidden later shows its row, folded), and an empty card is looked at again when it is drawn
+  assert.match(PS_JS, /b\.hidden = c\.hidden; c\.parentNode\.insertBefore\(b, c\);/);
+  assert.match(PS_JS, /if \(obs\) obs\.observe\(c, \{ attributes: true, attributeFilter: \['hidden'\] \}\);/);
+  assert.match(PS_JS, /if \(!T\.t\) \{ if \(obs2 && !c\._psw\) \{ c\._psw = 1; obs2\.observe\(c, \{ childList: true \}\); \} return; \}/);
+  // the smoke test still counts every drawn Systems card but the one that stays open
+  assert.match(src('scripts/audit/smoke.cjs'), /Systems: open cards are/);
+});

@@ -1,0 +1,438 @@
+{
+ "built": "2026-11-13",
+ "prereg": "research/edge/sma10-timing/PREREGISTRATION.md",
+ "rule": "paper research only: a stand-alone long / flat allocation rule; not a gate, size or exit of the gold book (owner decision 44 untouched); no live change",
+ "source": "Faber (2007), A Quantitative Approach to Tactical Asset Allocation, Journal of Wealth Management; its sample ends 2006, so every window here is after it",
+ "params": {
+  "nSma": 10,
+  "atrN": 20,
+  "atrK": 3,
+  "spread": {
+   "spx500": 0.5,
+   "nas100": 1.5,
+   "us30": 3,
+   "xau": 0.3
+  },
+  "indexFinancing": "DGS2 + 2.5 % a year / 365 a night",
+  "goldFinancing": 0.000148,
+  "dividendSensitivity": {
+   "spx500": 0.018,
+   "nas100": 0.008,
+   "us30": 0.02,
+   "xau": 0
+  },
+  "draws": 2000,
+  "seed": 20261113
+ },
+ "data": {
+  "spx500": {
+   "candles": 6124,
+   "first": "2003-03-24",
+   "last": "2026-11-06"
+  },
+  "nas100": {
+   "candles": 6124,
+   "first": "2003-03-24",
+   "last": "2026-11-06"
+  },
+  "us30": {
+   "candles": 6101,
+   "first": "2003-03-24",
+   "last": "2026-11-06"
+  },
+  "xau": {
+   "candles": 5364,
+   "first": "2006-03-20",
+   "last": "2026-11-06"
+  }
+ },
+ "windows": {
+  "W1": {
+   "label": "2008-15 (check)",
+   "from": "2008-01-01",
+   "to": "2015-12-31",
+   "markets": {
+    "spx500": {
+     "name": "SPX500",
+     "from": "2008-01-02",
+     "to": "2015-12-31",
+     "rule": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.1986,
+      "cagr": 0.0229,
+      "vol": 0.0954,
+      "sharpe": 0.2789,
+      "maxDD": 0.1711,
+      "rod": 0.1339
+     },
+     "bh": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.0802,
+      "cagr": 0.0097,
+      "vol": 0.2262,
+      "sharpe": 0.1542,
+      "maxDD": 0.5633,
+      "rod": 0.0172
+     },
+     "inMarket": 0.5488,
+     "switches": 26,
+     "stops": 24,
+     "positions": 25
+    },
+    "nas100": {
+     "name": "NAS100",
+     "from": "2008-01-02",
+     "to": "2015-12-31",
+     "rule": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.0581,
+      "cagr": 0.0071,
+      "vol": 0.1164,
+      "sharpe": 0.1174,
+      "maxDD": 0.2345,
+      "rod": 0.0302
+     },
+     "bh": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.7054,
+      "cagr": 0.069,
+      "vol": 0.2361,
+      "sharpe": 0.393,
+      "maxDD": 0.5256,
+      "rod": 0.1313
+     },
+     "inMarket": 0.5729,
+     "switches": 32,
+     "stops": 26,
+     "positions": 29
+    },
+    "us30": {
+     "name": "US30",
+     "from": "2008-01-02",
+     "to": "2015-12-31",
+     "rule": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.1764,
+      "cagr": 0.0205,
+      "vol": 0.0833,
+      "sharpe": 0.2792,
+      "maxDD": 0.1412,
+      "rod": 0.1452
+     },
+     "bh": {
+      "days": 2070,
+      "months": 96,
+      "total": 0.02,
+      "cagr": 0.0025,
+      "vol": 0.2063,
+      "sharpe": 0.1142,
+      "maxDD": 0.5323,
+      "rod": 0.0046
+     },
+     "inMarket": 0.5367,
+     "switches": 25,
+     "stops": 21,
+     "positions": 23
+    },
+    "xau": {
+     "name": "Gold (XAU)",
+     "from": "2008-01-01",
+     "to": "2015-12-31",
+     "rule": {
+      "days": 2081,
+      "months": 96,
+      "total": 0.146,
+      "cagr": 0.0172,
+      "vol": 0.127,
+      "sharpe": 0.1936,
+      "maxDD": 0.3296,
+      "rod": 0.0521
+     },
+     "bh": {
+      "days": 2081,
+      "months": 96,
+      "total": -0.175,
+      "cagr": -0.0238,
+      "vol": 0.1948,
+      "sharpe": -0.022,
+      "maxDD": 0.5636,
+      "rod": -0.0422
+     },
+     "inMarket": 0.4796,
+     "switches": 21,
+     "stops": 17,
+     "positions": 19
+    }
+   },
+   "book": {
+    "rule": {
+     "days": 2082,
+     "months": 96,
+     "total": 0.1684,
+     "cagr": 0.0196,
+     "vol": 0.0786,
+     "sharpe": 0.2791,
+     "maxDD": 0.1256,
+     "rod": 0.1564
+    },
+    "bh": {
+     "days": 2082,
+     "months": 96,
+     "total": 0.1974,
+     "cagr": 0.0228,
+     "vol": 0.1718,
+     "sharpe": 0.2125,
+     "maxDD": 0.4181,
+     "rod": 0.0545
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "months": 96,
+     "pBetter": 0.6245,
+     "diffP05": -0.2237,
+     "diffP50": 0.0437,
+     "diffP95": 0.3866
+    }
+   }
+  },
+  "W2": {
+   "label": "2016 to now (decisive)",
+   "from": "2016-01-01",
+   "to": "2026-11-06",
+   "markets": {
+    "spx500": {
+     "name": "SPX500",
+     "from": "2016-01-01",
+     "to": "2026-11-06",
+     "rule": {
+      "days": 2820,
+      "months": 131,
+      "total": 0.2064,
+      "cagr": 0.0173,
+      "vol": 0.0988,
+      "sharpe": 0.2192,
+      "maxDD": 0.2823,
+      "rod": 0.0614
+     },
+     "bh": {
+      "days": 2820,
+      "months": 131,
+      "total": 1.1116,
+      "cagr": 0.0709,
+      "vol": 0.1718,
+      "sharpe": 0.4748,
+      "maxDD": 0.3358,
+      "rod": 0.211
+     },
+     "inMarket": 0.6677,
+     "switches": 34,
+     "stops": 34,
+     "positions": 34
+    },
+    "nas100": {
+     "name": "NAS100",
+     "from": "2016-01-01",
+     "to": "2026-11-06",
+     "rule": {
+      "days": 2820,
+      "months": 131,
+      "total": 0.8091,
+      "cagr": 0.0558,
+      "vol": 0.1379,
+      "sharpe": 0.4533,
+      "maxDD": 0.2454,
+      "rod": 0.2274
+     },
+     "bh": {
+      "days": 2820,
+      "months": 131,
+      "total": 2.4314,
+      "cagr": 0.1196,
+      "vol": 0.2193,
+      "sharpe": 0.6122,
+      "maxDD": 0.3906,
+      "rod": 0.3061
+     },
+     "inMarket": 0.6348,
+     "switches": 36,
+     "stops": 36,
+     "positions": 36
+    },
+    "us30": {
+     "name": "US30",
+     "from": "2016-01-01",
+     "to": "2026-11-06",
+     "rule": {
+      "days": 2820,
+      "months": 131,
+      "total": 0.1623,
+      "cagr": 0.0139,
+      "vol": 0.0973,
+      "sharpe": 0.1869,
+      "maxDD": 0.1732,
+      "rod": 0.0801
+     },
+     "bh": {
+      "days": 2820,
+      "months": 131,
+      "total": 0.7235,
+      "cagr": 0.0511,
+      "vol": 0.1668,
+      "sharpe": 0.3751,
+      "maxDD": 0.3605,
+      "rod": 0.1418
+     },
+     "inMarket": 0.6571,
+     "switches": 35,
+     "stops": 32,
+     "positions": 34
+    },
+    "xau": {
+     "name": "Gold (XAU)",
+     "from": "2016-01-01",
+     "to": "2026-11-06",
+     "rule": {
+      "days": 2817,
+      "months": 131,
+      "total": 0.2191,
+      "cagr": 0.0183,
+      "vol": 0.1303,
+      "sharpe": 0.2015,
+      "maxDD": 0.4391,
+      "rod": 0.0417
+     },
+     "bh": {
+      "days": 2817,
+      "months": 131,
+      "total": 1.1348,
+      "cagr": 0.0719,
+      "vol": 0.1622,
+      "sharpe": 0.4997,
+      "maxDD": 0.3251,
+      "rod": 0.2213
+     },
+     "inMarket": 0.607,
+     "switches": 33,
+     "stops": 29,
+     "positions": 31
+    }
+   },
+   "book": {
+    "rule": {
+     "days": 2820,
+     "months": 131,
+     "total": 0.3815,
+     "cagr": 0.03,
+     "vol": 0.0808,
+     "sharpe": 0.398,
+     "maxDD": 0.1493,
+     "rod": 0.2012
+    },
+    "bh": {
+     "days": 2820,
+     "months": 131,
+     "total": 1.4357,
+     "cagr": 0.085,
+     "vol": 0.1434,
+     "sharpe": 0.6267,
+     "maxDD": 0.2665,
+     "rod": 0.3189
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "months": 131,
+     "pBetter": 0.138,
+     "diffP05": -0.4656,
+     "diffP50": -0.1437,
+     "diffP95": 0.0877
+    }
+   }
+  }
+ },
+ "dividendSensitivity": {
+  "W1": {
+   "book": {
+    "rule": {
+     "days": 2082,
+     "months": 96,
+     "total": 0.2287,
+     "cagr": 0.0261,
+     "vol": 0.0786,
+     "sharpe": 0.3565,
+     "maxDD": 0.1149,
+     "rod": 0.2269
+    },
+    "bh": {
+     "days": 2082,
+     "months": 96,
+     "total": 0.3129,
+     "cagr": 0.0346,
+     "vol": 0.1718,
+     "sharpe": 0.2775,
+     "maxDD": 0.4101,
+     "rod": 0.0844
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "months": 96,
+     "pBetter": 0.6215,
+     "diffP05": -0.2488,
+     "diffP50": 0.0493,
+     "diffP95": 0.4244
+    }
+   }
+  },
+  "W2": {
+   "book": {
+    "rule": {
+     "days": 2820,
+     "months": 131,
+     "total": 0.4997,
+     "cagr": 0.0378,
+     "vol": 0.0808,
+     "sharpe": 0.4887,
+     "maxDD": 0.1447,
+     "rod": 0.2614
+    },
+    "bh": {
+     "days": 2820,
+     "months": 131,
+     "total": 1.7595,
+     "cagr": 0.0974,
+     "vol": 0.1434,
+     "sharpe": 0.7045,
+     "maxDD": 0.2658,
+     "rod": 0.3666
+    },
+    "boot": {
+     "draws": 2000,
+     "seed": 20261113,
+     "months": 131,
+     "pBetter": 0.1565,
+     "diffP05": -0.4955,
+     "diffP50": -0.1486,
+     "diffP95": 0.111
+    }
+   }
+  }
+ },
+ "pass": {
+  "checks": {
+   "w2Sharpe": false,
+   "w2Drawdown": true,
+   "w2Bootstrap": false,
+   "w1Sharpe": true,
+   "w1Drawdown": true
+  },
+  "pass": false
+ },
+ "verdict": "FAIL"
+}

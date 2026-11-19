@@ -1,0 +1,567 @@
+{
+ "study": "gold-vol-breakout-replicate",
+ "built": "2026-11-14",
+ "preregistration": "research/edge/gold-vol-breakout-replicate/PREREGISTRATION.md",
+ "planSha256": "13836540e699edebe3a5783be28df66bacfcc7c42c84ecf5b769edf3d9f1f0bc",
+ "original": {
+  "study": "gold-vol-breakout",
+  "commit": "72009ebe62c4aa56ff7d4ea8a621fbe64a643e3e",
+  "runSha256": "afa36e031e39daabb4f88ed9231daa55246fcccb659b0a9668fda52ad022276f",
+  "how": "run.mjs copied verbatim as original.mjs; its functions imported, none changed"
+ },
+ "claim": "the gold-vol-breakout T1 rule holds on gold history its study never saw (2007-2015)",
+ "rule": "O = open of the first M5 candle 00:00-00:55 UTC; prevRange = high − low of the previous weekend-folded UTC D1; buy stop O + 0.5 × prevRange and sell stop O − 0.5 × prevRange live 00:00-20:55 UTC, first filled wins (a gap fills at the open; both in one candle: the level nearer its open); stop back at O (worst case in the fill candle); out at the 20:55 candle close",
+ "data": "OANDA mid XAU/USD M5 through the keyless candle proxy; 5206 weekdays built 2006-11-01 → 2026-11-12; D1 = complete UTC days folded with council/fills.mjs foldWeekend",
+ "dataEnd": "2026-11-12",
+ "cost": 0.6,
+ "window": [
+  "2007-01-01",
+  "2015-12-31"
+ ],
+ "halfWindows": {
+  "H1": [
+   "2007-01-01",
+   "2011-12-31"
+  ],
+  "H2": [
+   "2012-01-01",
+   "2015-12-31"
+  ]
+ },
+ "verdict": "PASS: gold open ± 0.5 × prior range breakout on untouched 2007-15 +0.111R a trade net (n 1657, month t +3.19, gross +0.203R)",
+ "decision": {
+  "placeboBeaten": 40,
+  "checks": {
+   "netPos": true,
+   "t2": true,
+   "h1Pos": true,
+   "h2Pos": true,
+   "cost2x": true,
+   "placebo": true,
+   "n30": true
+  },
+  "pass": true,
+  "p": 0.001
+ },
+ "gate": {
+  "exact": {
+   "IS": {
+    "got": {
+     "n": 935,
+     "netR": 0.009,
+     "grossR": 0.111,
+     "t": 0.22,
+     "grossT": 2.87,
+     "net2R": -0.094
+    },
+    "want": {
+     "n": 935,
+     "netR": 0.009,
+     "grossR": 0.111,
+     "t": 0.22,
+     "grossT": 2.87,
+     "net2R": -0.094
+    },
+    "diff": {
+     "n": 0,
+     "netR": 0,
+     "grossR": 0,
+     "t": 0,
+     "grossT": 0,
+     "net2R": 0
+    },
+    "ok": true
+   },
+   "OOS": {
+    "got": {
+     "n": 1121,
+     "netR": 0.072,
+     "grossR": 0.121,
+     "t": 1.86,
+     "grossT": 3.21,
+     "net2R": 0.023
+    },
+    "want": {
+     "n": 1121,
+     "netR": 0.072,
+     "grossR": 0.121,
+     "t": 1.86,
+     "grossT": 3.21,
+     "net2R": 0.023
+    },
+    "diff": {
+     "n": 0,
+     "netR": 0,
+     "grossR": 0,
+     "t": 0,
+     "grossT": 0,
+     "net2R": 0
+    },
+    "ok": true
+   },
+   "ok": true
+  },
+  "tol": {
+   "IS": {
+    "got": {
+     "n": 935,
+     "netR": 0.009,
+     "grossR": 0.111,
+     "t": 0.22,
+     "grossT": 2.87,
+     "net2R": -0.094
+    },
+    "want": {
+     "n": 935,
+     "netR": 0.009,
+     "grossR": 0.111,
+     "t": 0.22,
+     "grossT": 2.87,
+     "net2R": -0.094
+    },
+    "diff": {
+     "n": 0,
+     "netR": 0,
+     "grossR": 0,
+     "t": 0,
+     "grossT": 0,
+     "net2R": 0
+    },
+    "ok": true
+   },
+   "OOS": {
+    "got": {
+     "n": 1121,
+     "netR": 0.072,
+     "grossR": 0.121,
+     "t": 1.86,
+     "grossT": 3.21,
+     "net2R": 0.023
+    },
+    "want": {
+     "n": 1121,
+     "netR": 0.072,
+     "grossR": 0.121,
+     "t": 1.86,
+     "grossT": 3.21,
+     "net2R": 0.023
+    },
+    "diff": {
+     "n": 0,
+     "netR": 0,
+     "grossR": 0,
+     "t": 0,
+     "grossT": 0,
+     "net2R": 0
+    },
+    "ok": true
+   },
+   "ok": true
+  },
+  "tolerance": {
+   "nPct": 0.01,
+   "R": 0.01,
+   "t": 0.15
+  }
+ },
+ "main": {
+  "n": 1657,
+  "win": 0.439,
+  "netR": 0.111,
+  "grossR": 0.203,
+  "net2R": 0.018,
+  "costR": 0.092,
+  "finR": 0,
+  "total": 183.68,
+  "months": 108,
+  "t": 3.19,
+  "grossT": 5.96,
+  "t2x": 0.51,
+  "stops": 552,
+  "time": 1105,
+  "maxDD": -25.66,
+  "medianStop": 7.76,
+  "buys": {
+   "n": 790,
+   "netR": 0.138
+  },
+  "sells": {
+   "n": 867,
+   "netR": 0.086
+  },
+  "byYear": {
+   "2007": {
+    "n": 183,
+    "netR": 0.208,
+    "total": 38.05
+   },
+   "2008": {
+    "n": 188,
+    "netR": 0.191,
+    "total": 35.96
+   },
+   "2009": {
+    "n": 190,
+    "netR": 0.021,
+    "total": 4.08
+   },
+   "2010": {
+    "n": 182,
+    "netR": 0.137,
+    "total": 24.95
+   },
+   "2011": {
+    "n": 186,
+    "netR": 0.044,
+    "total": 8.17
+   },
+   "2012": {
+    "n": 186,
+    "netR": 0.038,
+    "total": 7.03
+   },
+   "2013": {
+    "n": 181,
+    "netR": 0.258,
+    "total": 46.76
+   },
+   "2014": {
+    "n": 171,
+    "netR": 0.136,
+    "total": 23.34
+   },
+   "2015": {
+    "n": 190,
+    "netR": -0.025,
+    "total": -4.66
+   }
+  }
+ },
+ "halves": {
+  "H1": {
+   "n": 929,
+   "win": 0.466,
+   "netR": 0.12,
+   "grossR": 0.217,
+   "net2R": 0.023,
+   "costR": 0.097,
+   "finR": 0,
+   "total": 111.22,
+   "months": 60,
+   "t": 2.83,
+   "grossT": 5.33,
+   "t2x": 0.51,
+   "stops": 291,
+   "time": 638,
+   "maxDD": -17.88,
+   "medianStop": 7.87,
+   "buys": {
+    "n": 460,
+    "netR": 0.234
+   },
+   "sells": {
+    "n": 469,
+    "netR": 0.008
+   },
+   "byYear": {
+    "2007": {
+     "n": 183,
+     "netR": 0.208,
+     "total": 38.05
+    },
+    "2008": {
+     "n": 188,
+     "netR": 0.191,
+     "total": 35.96
+    },
+    "2009": {
+     "n": 190,
+     "netR": 0.021,
+     "total": 4.08
+    },
+    "2010": {
+     "n": 182,
+     "netR": 0.137,
+     "total": 24.95
+    },
+    "2011": {
+     "n": 186,
+     "netR": 0.044,
+     "total": 8.17
+    }
+   }
+  },
+  "H2": {
+   "n": 728,
+   "win": 0.404,
+   "netR": 0.1,
+   "grossR": 0.186,
+   "net2R": 0.013,
+   "costR": 0.087,
+   "finR": 0,
+   "total": 72.46,
+   "months": 48,
+   "t": 1.7,
+   "grossT": 3.2,
+   "t2x": 0.22,
+   "stops": 261,
+   "time": 467,
+   "maxDD": -25.66,
+   "medianStop": 7.62,
+   "buys": {
+    "n": 330,
+    "netR": 0.005
+   },
+   "sells": {
+    "n": 398,
+    "netR": 0.178
+   },
+   "byYear": {
+    "2012": {
+     "n": 186,
+     "netR": 0.038,
+     "total": 7.03
+    },
+    "2013": {
+     "n": 181,
+     "netR": 0.258,
+     "total": 46.76
+    },
+    "2014": {
+     "n": 171,
+     "netR": 0.136,
+     "total": 23.34
+    },
+    "2015": {
+     "n": 190,
+     "netR": -0.025,
+     "total": -4.66
+    }
+   }
+  }
+ },
+ "skips": {
+  "noopen": 15,
+  "flatprev": 1,
+  "nofill": 661,
+  "thin": 8
+ },
+ "pooled": {
+  "n": 3713,
+  "win": 0.427,
+  "netR": 0.073,
+  "grossR": 0.155,
+  "net2R": -0.009,
+  "costR": 0.082,
+  "finR": 0,
+  "total": 272.23,
+  "months": 239,
+  "t": 3.35,
+  "grossT": 7.24,
+  "t2x": -0.38,
+  "stops": 1266,
+  "time": 2447,
+  "maxDD": -42.89,
+  "medianStop": 8.57,
+  "buys": {
+   "n": 1841,
+   "netR": 0.088
+  },
+  "sells": {
+   "n": 1872,
+   "netR": 0.059
+  },
+  "byYear": {
+   "2007": {
+    "n": 183,
+    "netR": 0.208,
+    "total": 38.05
+   },
+   "2008": {
+    "n": 188,
+    "netR": 0.191,
+    "total": 35.96
+   },
+   "2009": {
+    "n": 190,
+    "netR": 0.021,
+    "total": 4.08
+   },
+   "2010": {
+    "n": 182,
+    "netR": 0.137,
+    "total": 24.95
+   },
+   "2011": {
+    "n": 186,
+    "netR": 0.044,
+    "total": 8.17
+   },
+   "2012": {
+    "n": 186,
+    "netR": 0.038,
+    "total": 7.03
+   },
+   "2013": {
+    "n": 181,
+    "netR": 0.258,
+    "total": 46.76
+   },
+   "2014": {
+    "n": 171,
+    "netR": 0.136,
+    "total": 23.34
+   },
+   "2015": {
+    "n": 190,
+    "netR": -0.025,
+    "total": -4.66
+   },
+   "2016": {
+    "n": 180,
+    "netR": 0.008,
+    "total": 1.51
+   },
+   "2017": {
+    "n": 187,
+    "netR": -0.006,
+    "total": -1.15
+   },
+   "2018": {
+    "n": 188,
+    "netR": -0.097,
+    "total": -18.15
+   },
+   "2019": {
+    "n": 191,
+    "netR": -0.04,
+    "total": -7.62
+   },
+   "2020": {
+    "n": 189,
+    "netR": 0.178,
+    "total": 33.67
+   },
+   "2021": {
+    "n": 179,
+    "netR": 0.021,
+    "total": 3.72
+   },
+   "2022": {
+    "n": 193,
+    "netR": 0.016,
+    "total": 3.16
+   },
+   "2023": {
+    "n": 186,
+    "netR": -0.095,
+    "total": -17.76
+   },
+   "2024": {
+    "n": 200,
+    "netR": 0.053,
+    "total": 10.53
+   },
+   "2025": {
+    "n": 193,
+    "netR": 0.181,
+    "total": 34.9
+   },
+   "2026": {
+    "n": 170,
+    "netR": 0.269,
+    "total": 45.73
+   }
+  }
+ },
+ "split": {
+  "main": {
+   "high": {
+    "n": 682,
+    "netR": -0.015,
+    "grossR": 0.042,
+    "t": -0.46
+   },
+   "low": {
+    "n": 975,
+    "netR": 0.199,
+    "grossR": 0.316,
+    "t": 3.64
+   },
+   "noMedian": 0
+  },
+  "pooled": {
+   "high": {
+    "n": 1662,
+    "netR": 0.019,
+    "grossR": 0.068,
+    "t": 0.84
+   },
+   "low": {
+    "n": 2051,
+    "netR": 0.117,
+    "grossR": 0.226,
+    "t": 3.24
+   },
+   "noMedian": 0
+  }
+ },
+ "withoutBest": {
+  "year": "2013",
+  "yearTotal": 46.76,
+  "n": 1476,
+  "netR": 0.093,
+  "t": 2.67
+ },
+ "placebo": {
+  "seeds": 40,
+  "start": "01:00-18:00 UTC",
+  "means": [
+   -0.029,
+   -0.053,
+   -0.051,
+   -0.094,
+   0.01,
+   -0.023,
+   -0.029,
+   -0.046,
+   -0.026,
+   -0.058,
+   -0.047,
+   -0.029,
+   -0.029,
+   -0.008,
+   0.018,
+   -0.011,
+   -0.002,
+   -0.026,
+   -0.002,
+   -0.051,
+   -0.047,
+   -0.049,
+   -0.076,
+   -0.043,
+   -0.05,
+   -0.019,
+   -0.07,
+   -0.048,
+   -0.043,
+   -0.032,
+   -0.077,
+   -0.028,
+   -0.031,
+   -0.02,
+   -0.078,
+   -0.027,
+   -0.03,
+   -0.037,
+   -0.019,
+   -0.042
+  ],
+  "min": -0.094,
+  "max": 0.018,
+  "median": -0.031,
+  "p95": -0.001
+ },
+ "reading": "T1 passes every pre-registered check on the untouched 2007-2015 gold history. Paper research only: at most a candidate for a forward paper record, by the owner's decision; nothing live changes. 2007-15: +0.111R a trade net (n 1657, month t +3.19), gross +0.203R (t +5.96); 2007-11 +0.120R (n 929), 2012-15 +0.100R (n 728); at 2x costs +0.018R; 40 of 40 placebo seeds beaten (placebo median −0.031R). Costs take 0.092R a trade at a median stop of $7.76. Pooled 2007 → 2026-11-12: +0.073R net (n 3713, month t +3.35), gross +0.155R (t +7.24). High-range days (previous range above its 250-day median) 2007-15 −0.015R (n 682), low-range +0.199R (n 975); descriptive only. Cautions, said plainly: the cost is the original's fixed $0.60 a round trip, today's level; spreads of 2007-15 were not measured, and at 2x costs the rule keeps only +0.018R a trade (pooled 2007-26 −0.009R). The record is two good stretches with a flat one between: 2015-2024 together +3.25R on 1883 trades. The gain does not come from wide-range days; it comes from days after a narrower-than-usual range. A pass here is evidence for the rule's direction on gold, not proof of a tradeable edge at real costs. "
+}
