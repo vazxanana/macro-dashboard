@@ -2410,6 +2410,18 @@ Display only: no drawing, layout or chart change places, changes or cancels a tr
   Checked in a browser (local build, live candles): the strip on six panes, a three-chart layout moving together, a box drawn on H1
   at the same time on H4 and M15, style bar, Alt keys, Delete, the menu, a reload keeping drawings and layout, a 15 s Split chart.
 
+## Any timeframe on the Desk's Charts, and a quieter toolbar (19 Nov 2026, owner: "remove whats in red and give the option to change to any timeframe starting from seconds … grouped in seconds, minutes, hours, days, week, monthly, year")
+Display only, `market-structure.html` + `api/bars.js`. Each chart's header button (`.ph-tf`, `#ms-ph-menu`) lists `TF_GROUPS`:
+Seconds S5 S10 S15 S30, Minutes M1 M2 M5 M10 M15 M30, Hours H1 H2 H3 H4 H6 H8 H12, Days D1, Week W1, Month MN, Year Y1 (`window.msTfGroups()`;
+underlined = an analysed pane with the Meridian / ICT markup). An analysed timeframe opens its pane as before (in Layout: that slot
+only); any other opens the view `one` = Split's free chart alone, full width, no sync (`SP.solo`, `SP.one`, localStorage `ms-one-tf`,
+`window.msOneTf(t)` / `msOneState()`); on Split's right chart it sets that chart. `api/bars.js` `TF` gained `5s` `10s` `3h` `6h` `8h`
+`12h` `1M` (OANDA S5 S10 H3 H6 H8 H12 M); a year (`1Y`) is built in the page from monthly candles (`yearOf`, UTC years, `spFetch`).
+The free chart polls each timeframe at its own pace (`XTF` `poll`, 3-15 s) and shows seconds on the time axis under a minute. The
+toolbar no longer shows D1-M1 / All (the hidden buttons stay: keys 1-6 / 0 and the menu's "All timeframes" use them) nor Meridian /
+ICT: the markup switch is in Style (`.mk-mode.mk-in-sty`), the toolbar's Clean is a toggle back to the last markup (`G.lastMk`).
+Test: `tests/desk-draw.test.mjs`. Crypto markets have no OANDA candles, so their seconds / H3 / month charts may say "no data".
+
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
 - **Paper account** `assets/ms-paper.js` (`window.MS_PAPER` pure: `fresh`, `norm`, `order`, `process`, `stats`, `floating`, `sizeText`;
   page part after `module.exports`), a bar `#ms-pp` above the six panes (`<style id="ms-pp-css">`; hidden for guests; behind More

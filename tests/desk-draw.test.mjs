@@ -42,11 +42,29 @@ test('display only: the drawing layer places, changes and cancels no order and t
   assert.match(SRC, /localStorage/); assert.match(SRC, /'ms-dr-' \+ mk/, 'stored per market in this browser');
 });
 
-test('seconds charts on Split\'s right chart only, from the OANDA proxy', () => {
-  assert.match(PAGE, /const SEC_TFS = \[\{ id: '15s', label: 'S15', role: 'Seconds', sec: 15, binance: null, kraken: null, poll: 5e3 \}, \{ id: '30s', label: 'S30'/);
-  const sp = PAGE.slice(PAGE.indexOf('  function spInit() {'), PAGE.indexOf('      if (ch) spMarkup(); } catch (e) {} }, 15e3);'));
-  assert.doesNotMatch(sp, /(?<!SP)TFS\.find\(\(t\) => t\.id === (spTf\(\)|tf)\)/, 'every timeframe lookup of the free chart knows the seconds');
-  assert.match(PAGE, /<optgroup label="Seconds \(OANDA markets\)">/);
+test('any timeframe from seconds to a year (19 Nov 2026): grouped, the free chart for the ones no analysed pane has', () => {
+  assert.match(PAGE, /const SEC_TFS = \[XTF\('5s', 'S5', 'Seconds', 5\), XTF\('10s', 'S10', 'Seconds', 10\), XTF\('15s', 'S15', 'Seconds', 15\), XTF\('30s', 'S30', 'Seconds', 30\)\];/);
+  const sp = PAGE.slice(PAGE.indexOf('  function spInit() {'), PAGE.indexOf('      if (ch) spMarkup(); } catch (e) {} }, 3e3);'));
+  assert.ok(sp.length > 1000);
+  assert.doesNotMatch(sp, /(?<!SP)TFS\.find\(\(t\) => t\.id === (spTf\(\)|tf)\)/, 'every timeframe lookup of the free chart knows every timeframe');
+  const groups = /const TF_GROUPS = (\[[^\n]*\]);/.exec(PAGE)[1];
+  assert.deepEqual(JSON.parse(groups.replace(/'/g, '"')).map((g) => g[0]), ['Seconds', 'Minutes', 'Hours', 'Days', 'Week', 'Month', 'Year']);
+  const ids = JSON.parse(groups.replace(/'/g, '"')).flatMap((g) => g[1]);
+  const bars = fs.readFileSync(new URL('../api/bars.js', import.meta.url), 'utf8');
+  for (const id of ids) if (id !== '1Y') assert.match(bars, new RegExp(`'${id}': \\['`), `the candle proxy serves ${id}`);
+  assert.match(PAGE, /async function spFetch\(tf, I, n\) \{ if \(tf && tf\.id === '1Y'\)/, 'a year is built from months');
+  // the year builder on hand-made months
+  const yb = new Function(`${/const yearOf = [^\n]*\n[^\n]*\n[^\n]*return out; \};/.exec(PAGE)[0]}; return yearOf;`)();
+  const m = (y, mo, o, h, l, c) => ({ time: Date.UTC(y, mo, 1) / 1e3, open: o, high: h, low: l, close: c, volume: 1 });
+  assert.deepEqual(yb([m(2024, 0, 1, 5, 1, 2), m(2024, 11, 2, 9, 0.5, 3), m(2025, 0, 3, 4, 2, 4)]).map((b) => [new Date(b.time * 1e3).getUTCFullYear(), b.open, b.high, b.low, b.close, b.volume]), [[2024, 1, 9, 0.5, 3, 2], [2025, 3, 4, 2, 4, 1]]);
+  assert.match(PAGE, /window\.msOneTf = \(t\) => \{[^\n]*if \(panes\[t\]\) \{ setView\(t\); return true; \}/, 'an analysed timeframe opens its own pane');
+  assert.match(PAGE, /\.ms-grid4\.ms-grid4\[data-view="one"\] > \.ms-pane:not\(\.ms-splitc\) \{ display: none !important; \}/);
+});
+
+test('the toolbar keeps Split, Layout and a Clean toggle; the markup choice is in Style (19 Nov 2026)', () => {
+  assert.match(PAGE, /#v-charts \.sec-h > \.seg\[aria-label="Chart view"\] > \[data-view\]:not\(\[data-view="split"\]\):not\(\[data-view="lay"\]\) \{ display: none !important; \}/);
+  assert.match(PAGE, /<div class="sty-seg seg mk-mode mk-in-sty" role="group" aria-label="Chart markup"><button type="button" data-mk="meridian"/);
+  assert.match(PAGE, /if \(b\.dataset\.mk === 'clean' && G\.mode === 'clean' && !b\.closest\('\.mk-in-sty'\)\) \{ setMode\(G\.lastMk \|\| 'meridian'\); return; \}/);
 });
 
 test('style: no text under 12 px, 44 px on touch, guests get no layout, the phone view keeps the tools behind More', () => {
@@ -94,7 +112,7 @@ test('each chart chooses its own timeframe (19 Nov 2026): a menu in the chart he
   assert.match(page, /window\.msLaySet = \(i, t\) =>/);
   const js = page.slice(page.indexOf('// ─── Each chart chooses its own timeframe'), page.indexOf('// ─── Keyboard: 1–6'));
   assert.match(js, /t\.className = 'ph-tf'/); assert.match(js, /m\.className = 'ph-mk'/);
-  assert.match(js, /if \(v === 'lay' && window\.msLayState\)/, 'in the layout the menu changes that chart only');
+  assert.match(js, /else if \(v === 'lay' && an && window\.msLayState\)/, 'in the layout the menu changes that chart only');
   assert.doesNotMatch(js, /fetch\(|\.stop\s*=/);
   assert.match(page, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] #v-charts \.sec-h > :is\(h2, #ms-wl, \.seg\[aria-label="Chart view"\]\) \{ display: none !important; \}/);
   assert.match(page, /\.brand \.mk-list \.mk-n \{ display: grid !important; \}/, 'the phone market list shows its names');
