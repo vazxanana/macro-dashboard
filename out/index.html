@@ -180,6 +180,7 @@
     .ms-ph .ms-cy { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: #8a3fb0; background: rgba(166,77,201,.12); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46ch; min-width: 0; }
     @media (min-width: 1200px) { .ms-ph .ms-cy { flex-shrink: 0; max-width: none; } }
     html[data-theme="dark"] .ms-ph .ms-cy, html[data-theme="midnight"] .ms-ph .ms-cy, html[data-theme="pro"] .ms-ph .ms-cy { color: #d3a4ec; }
+    html[data-role="public"] .ms-ph .ms-cy { display: none; }   /* the cycle tag is Meridian markup: members only (19 Nov 2026) */
     .ms-ph .ms-cy.pullback { color: var(--warn-ink, #8a5a00); background: rgba(255,152,0,.14); }
     .ms-ph .ms-tbtn { margin-left: auto; padding: 2px 8px; font-size: 11px; }
     .ms-legend { position: absolute; left: 10px; top: 44px; z-index: 3; display: flex; flex-wrap: wrap; gap: 3px 9px; font: 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif; pointer-events: none; color: var(--ms-mute); }
@@ -12212,7 +12213,7 @@ function msNextSetup(bars, A) {
   // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
   // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
   function showView(hx) {
-    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
+    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = PUB ? 'charts' : !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
     // a view this account may not open (a viewer or a guest on #mosha, #ict, …) is shown as another one: the address says which
     // (QA sweep 11 Nov; replaceState, so no second hashchange and Back does not return to the refused link)
     if (h0 !== v && VIEWS.includes(h0) && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + '#' + v); } catch (e) {}

@@ -80,6 +80,9 @@ async function wire(ctx, account, seen) {
         const twice = [...new Set(seen.filter((f, i) => seen.indexOf(f) !== i))]; if (twice.length) errs.push('council-data requested more than once during load: ' + twice.join(', '));
         const leak = account ? [] : [...new Set(seen.filter((f) => !GUEST_OK.includes(f)))]; if (leak.length) errs.push('not signed in, yet asked for: ' + leak.join(', '));
         if (!seen.includes('trades.json')) errs.push('the Desk did not ask for trades.json (the load check saw nothing)');
+        // a guest always lands on Charts with a drawn chart (19 Nov 2026: the router sent guests to a Home they cannot see: a blank page)
+        if (only) { const g = await p.waitForFunction(() => document.documentElement.dataset.view === 'charts' && [...document.querySelectorAll('#v-charts .ms-chart')].some((c) => c.getClientRects().length && c.querySelector('canvas')), null, { timeout: 15000 }).then(() => true, () => false);
+          if (!g) errs.push('a guest did not land on Charts with a chart drawn (view ' + await p.evaluate(() => document.documentElement.dataset.view).catch(() => '?') + ')'); }
       }
       if (account && INNER[path]) for (const h of INNER[path]) {
         const n = errs.length; await ev(p, calm, (x) => { location.hash = x; }, h).catch((e) => errs.push('could not open: ' + e.message.split('\n')[0]));

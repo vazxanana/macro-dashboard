@@ -1515,6 +1515,7 @@ Guests (`PUB`) may open `#charts` on any market (watchlist chips `?s=<market>#ch
 the gate; `planLinesDraw` and `klList` return nothing for guests; `#ms-mtf`, readouts, chips and `.ms-role` are hidden. The guest
 overview carries an "Open the charts" button; the charts a "← Gold overview" link and a members note. `#ms-dense-css`: from 1400 px
 the app is 1760 px wide (2000 px from 1800 px), tighter gaps and paddings, the home markets grid auto-fills 168 px cards.
+**19 Nov 2026 fix**: a guest always lands on Charts (`showView`: `v = PUB ? 'charts' : …`). The 19 Nov "denied Home lands on Charts" fallback read the guest's viewer-default `charts: false` and sent guests to a Home they cannot see (a blank page). The chart header's cycle tag `.ms-cy` is hidden for guests (Meridian markup). The smoke test's guest run fails unless the view is Charts with a chart drawn.
 
 ## Profile page and guest view (8 Nov 2026)
 `#profile` (v-profile, in VIEWS and the viewer allow-list) holds the identity card (copied from the account menu) and the council's
