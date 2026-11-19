@@ -540,6 +540,9 @@
   .sess-sum { flex-direction: column; align-items: flex-start; gap: 2px; } .sess-sum b { font: 650 20px/1.2 var(--sans); letter-spacing: -.02em; } .sess-sum .hint { font-size: 13px; color: var(--ink-dim); }
   .strip { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 14px; } .strip-k { font: 500 12px var(--sans); }
   .quick { gap: 8px; } .quick .hint { font-weight: 600; color: var(--ink-dim); margin-right: 4px; } .quick .btn.sm { border-radius: 8px; min-height: 34px; padding: 4px 12px; font: 500 13px var(--sans); }
+  /* quick starts as quiet chips (19 Nov 2026, owner: "it looks made by an AI"): no box around each, one row that scrolls on a phone */
+  .quick .btn.sm { border-color: transparent; background: var(--au-surface-2, var(--panel-2)); } .quick .btn.sm:hover { border-color: var(--line); }
+  @media (max-width: 640px) { .quick { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; } .quick::-webkit-scrollbar { display: none; } .quick > * { flex: none; } }
   .welcome { border-style: solid; border-color: var(--line); background: var(--au-well); }
   .setup label, .tfpick > label { font-weight: 500; color: var(--ink-dim); }
   /* the chart card and its toolbar */

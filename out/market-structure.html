@@ -5478,6 +5478,28 @@ html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role=
    prices and states came out blank on a phone (19 Nov 2026) */
 .brand .mk-list .mk-n { display: grid !important; } .brand .mk-list .mk-n small { display: block; }
 .brand .mk-list :is(.mk-p, .ms-st, .mk-wait) { display: inline-block !important; }
+/* Council, flat (19 Nov 2026, "the rest" of "it looks made by an AI"): the status is a dot and words, the sections are underlined
+   tabs, the calendar's days carry a light tint and a coloured figure instead of a solid red or green box */
+#v-council #ms-c-status :is(.c-ok, .c-warn, .c-bad) { background: transparent !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; font-weight: 600; }
+#v-council .c-dh, #v-council .c-dh > summary, #v-council button.c-dh { background: transparent !important; border: 0 !important; box-shadow: none !important; padding-left: 0 !important; padding-right: 0 !important; font-weight: 600; }
+#v-council .c-nav { border: 0 !important; border-bottom: 1px solid var(--au-line, var(--line)) !important; border-radius: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; gap: 4px; }
+#v-council .c-nav > :is(button, a) { background: transparent !important; border-radius: 0 !important; box-shadow: none !important; color: var(--au-ink-2, var(--ink-dim)); }
+#v-council .c-nav.c-nav > button[aria-selected="true"] { background: transparent !important; color: var(--au-ink, var(--ink)) !important; box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)) !important; font-weight: 650; }
+#v-council .c-nav > :is(button, a)::before, #v-council .c-nav > :is(button, a)::after { display: none; }
+#v-council :is(.cal-seg) { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+#v-council .cal-seg button { background: transparent !important; box-shadow: none !important; border-radius: 0 !important; color: var(--au-ink-2, var(--ink-dim)); }
+#v-council .cal-seg button:is(.on, [aria-pressed="true"]) { color: var(--au-ink, var(--ink)) !important; box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)) !important; font-weight: 650; }
+#v-council .cal-d { border-color: var(--au-line, var(--line)) !important; box-shadow: none !important; }
+#v-council .cal-d.win { background: color-mix(in srgb, var(--buy) 7%, transparent) !important; }
+#v-council .cal-d.loss { background: color-mix(in srgb, var(--sell) 7%, transparent) !important; }
+#v-council .cal-d.win :is(b, strong, .cal-r) { color: var(--buy-ink, var(--buy)) !important; } #v-council .cal-d.loss :is(b, strong, .cal-r) { color: var(--sell-ink, var(--sell)) !important; }
+/* Desks, flat (19 Nov 2026): the desk switch and the ICT desk's Source / Setups switches are underlined words, not boxes */
+.view .desk-sw.desk-sw { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; border-bottom: 1px solid var(--au-line, var(--line)) !important; border-radius: 0 !important; width: 100%; max-width: 100%; gap: 4px; }
+.view .desk-sw.desk-sw a { background: transparent !important; border-radius: 0 !important; box-shadow: none !important; color: var(--au-ink-2, var(--ink-dim)); }
+.view .desk-sw.desk-sw a[aria-current="page"] { color: var(--au-ink, var(--ink)) !important; box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)) !important; font-weight: 650; }
+#v-ict .ict-seg.ict-seg { border: 0 !important; background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+#v-ict .ict-seg.ict-seg button { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; color: var(--au-ink-2, var(--ink-dim)); }
+#v-ict .ict-seg.ict-seg button.on { color: var(--au-ink, var(--ink)) !important; box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)) !important; font-weight: 650; }
 </style>
 <!-- app tags: scripts/pwa.mjs -->
 <meta name="mobile-web-app-capable" content="yes">
@@ -6360,9 +6382,9 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   </section>
 
   <!-- ─── Council ─── -->
-  <section class="view" id="v-council" aria-label="AI council" hidden>
+  <section class="view" id="v-council" aria-label="Council" hidden>
     <div class="c-head">
-      <div><h1 class="h-head">AI council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
+      <div><h1 class="h-head">Council</h1><p class="ms-note" id="ms-c-status">Loading council data…</p></div>
     </div>
     <nav class="c-nav" id="ms-c-nav" role="tablist" aria-label="Council sections"><button type="button" role="tab" class="" id="ms-cn-overview" data-pane="overview" aria-controls="ms-cp-overview" aria-selected="true">Overview<span class="c-nav-n" id="ms-cn-n-overview"></span></button><button type="button" class="c-nav-jump" id="ms-cn-cal" aria-label="Jump to the calendar">Calendar</button><button type="button" role="tab" class="" id="ms-cn-trades" data-pane="trades" aria-controls="ms-cp-trades" aria-selected="false">Trades<span class="c-nav-n" id="ms-cn-n-trades"></span></button><button type="button" role="tab" class="adm" id="ms-cn-systems" data-pane="systems" aria-controls="ms-cp-systems" aria-selected="false">Systems<span class="c-nav-n" id="ms-cn-n-systems"></span></button><button type="button" role="tab" class="adm" id="ms-cn-review" data-pane="review" aria-controls="ms-cp-review" aria-selected="false">Review<span class="c-nav-n" id="ms-cn-n-review"></span></button><button type="button" role="tab" class="adm" id="ms-cn-research" data-pane="research" aria-controls="ms-cp-research" aria-selected="false">Research<span class="c-nav-n" id="ms-cn-n-research"></span></button><a class="adm c-nav-link" id="ms-cn-macro" href="/macro-desk" title="The Macro desk: the strategist and the veteran, on their own page">Macro desk</a><button type="button" role="tab" class="adm" id="ms-cn-week" data-pane="week" aria-controls="ms-cp-week" aria-selected="false">This week<span class="c-nav-n" id="ms-cn-n-week"></span></button></nav>
     <div class="c-grid c-pane c-pane-overview" id="ms-cp-overview" role="tabpanel" aria-labelledby="ms-cn-overview" data-pane="overview">
