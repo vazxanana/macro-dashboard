@@ -2467,6 +2467,20 @@ menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analy
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
+## Drawing rail on the left, floating favourites (19 Nov 2026, owner: "the drawing bar in the left and we also should be able to choose favorite and have it floated like tradingview")
+Display only, `market-structure.html` (block "Drawing rail on the left" after the one-chart bar, `<style id="ms-rail-css">`) and
+`assets/ms-charts-guide.js`. Wider than 640 px (`matchMedia('(min-width: 641px)')`) the drawing tools `#ms-dr-bar` and the chart
+tools `#ms-ch-one` leave the toolbar for a column `#ms-rail` at the charts' left edge (`.ch-row` = rail + `.ch-col`, which holds
+`.ms-grid4` and the Markets view; sticky while the page scrolls; `#v-charts.has-rail`); a phone puts them back behind "Draw" (comment
+placeholders mark where). Each tool shows a star on hover; the star, or a right-click / long press, adds it to the favourites bar
+`#ms-dr-fav` (`.ms-fav`, position fixed, dragged by its dotted grip, kept on screen), whose buttons press the rail's own buttons
+(pressed state mirrored), so no tool works differently. The star at the foot of the rail (`#ms-rail-fav`) shows or hides the bar.
+localStorage `ms-dr-fav` `{ tools: ['dt:t', 'mag', 'ct:.ch-fib', …], on, x, y }` (this device). Full screen keeps the rail and the
+bar (`#ms-cfs-css` now reads `.ch-row` / `#v-charts:fullscreen .ms-grid4`). The guide's "?" stays in the toolbar (before Style, icon
+only beside the rail) and its chapters say where the tools are and how favourites work. Never set an attribute the rail's observer
+watches to the value it already has (it looped once and froze the page). `window.msRail()` is the read-only view. Test:
+`tests/desk-draw.test.mjs`.
+
 ## Paper account, order flow and full screen on the Desk's Charts; ChronosTrade in one font (18 Nov 2026, owner: "a paper trade account there to practise that shows its stats", "add orderflow indicators", "when I go fullscreen on charts should be the full layout and split if I had", "change the font of chronos to more professional")
 - **Paper account** `assets/ms-paper.js` (`window.MS_PAPER` pure: `fresh`, `norm`, `order`, `process`, `stats`, `floating`, `sizeText`;
   page part after `module.exports`), a bar `#ms-pp` above the six panes (`<style id="ms-pp-css">`; hidden for guests; behind More

@@ -27,15 +27,16 @@
         'Under <b>Style</b>, <b>Clean look</b> keeps only the main marks (BO, VR, CF) and hides the busy ones. Tap it again to bring them back.',
         'The markup is a reading of structure, not a tested trading rule.'] },
     { t: 'Draw on the chart', show: '#ms-dr-bar',
-      lead: 'The drawing strip has the tools: cursor, trend line, horizontal line, ray, vertical line, box and magnet.',
+      lead: 'The drawing tools sit in a column on the left of the charts (on a phone, behind Draw): cursor, trend line, horizontal line, ray, vertical line, box and magnet.',
       li: ['Pick a tool, then click twice on the chart (or press and drag). A horizontal line, ray or vertical line needs one click.',
         '<b>Magnet</b> snaps a point to the open, high, low or close of the candle under it: off, weak or strong.',
         'Click a drawing to select it: drag its handles to resize, its body to move it. The bar above it changes colour, width, dashes, adds a label, locks or copies it.',
         `${K('Delete')} removes the selected drawing, ${K('Esc')} lets it go.`,
         'A drawing shows on every chart of that market, whatever the timeframe or layout. It is kept in this browser.',
+        '<b>Favourites</b>: hover a tool on the left and tap its star (or right-click it) to put it on a small bar that floats over the charts, like TradingView. Drag the bar by its dotted grip; the star at the bottom of the column shows or hides it.',
         `Keys: ${K('Alt T')} trend line, ${K('Alt H')} horizontal line, ${K('Alt J')} ray, ${K('Alt V')} vertical line, ${K('Alt R')} box, ${K('Alt M')} magnet.`] },
     { t: 'The chart tools', show: '#ms-ch-one',
-      lead: 'One bar holds the chart tools. It works on the chart you touched last; with several charts on screen that one has a thin outline, and its timeframe is written at the start of the bar.',
+      lead: 'The chart tools sit under the drawing tools on the left (on a phone, behind Draw). They work on the chart you touched last; with several charts on screen that one has a thin outline, and its timeframe is written above them.',
       li: ['<b>Position</b>: click the entry, then the stop. The target is drawn at 2R with the size for your risk.',
         '<b>Fibonacci</b>: click the start of the swing, then its end.',
         '<b>Measure</b>: drag on the chart to see the price and time between two points (or hold Shift and drag).',
@@ -168,14 +169,15 @@ dialog.ms-chgd::backdrop { background: rgba(0,0,0,.45); }
 
   function init() {
     const st = document.createElement('style'); st.id = 'ms-chg-css'; st.textContent = css; document.head.appendChild(st);
-    const bar = document.getElementById('ms-ch-one') || document.getElementById('ms-dr-bar');
+    // in the toolbar row itself: the drawing and chart tools move to a rail at the charts' left edge on a wide screen (19 Nov 2026)
+    const bar = document.querySelector('#v-charts .sec-h');
     if (!bar || document.getElementById('ms-ch-help')) return;
     const b = document.createElement('button'); b.type = 'button'; b.id = 'ms-ch-help'; b.className = 'ch-help';
     b.title = 'How to use the charts: a short guide'; b.setAttribute('aria-haspopup', 'dialog');
     b.innerHTML = '<span class="q" aria-hidden="true">?</span><span class="t">How to use</span>'; b.setAttribute('aria-label', 'How to use the charts');
     if (!store('ms-ch-guide')) b.classList.add('new');
     b.addEventListener('click', () => open());
-    bar.insertAdjacentElement('afterend', b);
+    const sty = bar.querySelector(':scope > #ms-sty'); if (sty) sty.before(b); else bar.appendChild(b);
   }
   window.msChartsGuide = { open, chapters: () => CH.map((c) => ({ t: c.t, show: c.show })) };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

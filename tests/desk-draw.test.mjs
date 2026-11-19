@@ -167,3 +167,25 @@ test('Split without its own bar (19 Nov 2026): Sync in the toolbar, each chart\'
   assert.match(PAGE, /else if \(b\.dataset\.phMk\) \{ const sy = document\.querySelector\('\[data-sync="sym"\]'\)/, 'the right chart picks its market');
   assert.match(PAGE, /if \(pn\.classList\.contains\('sp-right'\) && viewNow\(\) === 'split'\) openMk\(pn, m\); else openMarket\(\);/);
 });
+
+test('drawing rail on the left and a floating favourites bar (19 Nov 2026)', () => {
+  const i = PAGE.indexOf('// ─── Drawing rail on the left and a floating favourites bar'), blk = PAGE.slice(i, PAGE.indexOf('window.msRailFav = toggleFav;', i));
+  assert.ok(i > 0, 'the rail block is in the page');
+  assert.match(blk, /const wide = window\.matchMedia\('\(min-width: 641px\)'\);/, 'wider than 640 px only: a phone keeps "Draw"');
+  assert.match(blk, /rail\.prepend\(DB\); DB\.after\(CO\);/, 'the drawing tools and the chart tools move into the rail');
+  assert.match(blk, /ph\.db\.after\(DB\); ph\.co\.after\(CO\);/, 'and back to the toolbar on a phone');
+  assert.match(blk, /const FK = 'ms-dr-fav'/, 'favourites are kept on this device');
+  assert.match(blk, /const b = btnOf\(f\.dataset\.fk\); if \(b\) \{ b\.click\(\);/, 'a favourite presses the rail\'s own button: no tool works differently');
+  assert.match(blk, /rail\.addEventListener\('click', \(e\) => \{ const s = e\.target\.closest && e\.target\.closest\('\.rl-star'\); if \(!s\) return; e\.preventDefault\(\); e\.stopPropagation\(\);/, 'the star does not press the tool');
+  assert.match(blk, /rail\.addEventListener\('contextmenu'/, 'right-click or long press adds a favourite');
+  assert.doesNotMatch(blk, /fetch\(|\.stop = /, 'display only');
+  // the star refresh must not set an attribute it watches to the same value (that looped and froze the page once)
+  assert.match(blk, /if \(favBtn\.getAttribute\('aria-pressed'\) !== pr\) favBtn\.setAttribute\('aria-pressed', pr\);/);
+  const css = PAGE.slice(PAGE.indexOf('<style id="ms-rail-css">'), PAGE.indexOf('</style>', PAGE.indexOf('<style id="ms-rail-css">')));
+  assert.match(css, /\.ms-fav \{ position: fixed;/, 'the favourites bar floats');
+  assert.match(css, /@media \(pointer: coarse\)[^\n]*44px/, '44 px on touch');
+  assert.match(PAGE, /#v-charts:fullscreen > :not\(\.sec-h\):not\(\.ch-row\)/, 'full screen keeps the rail and the charts');
+  const G = fs.readFileSync('assets/ms-charts-guide.js', 'utf8');
+  assert.match(G, /const bar = document\.querySelector\('#v-charts \.sec-h'\);/, 'the guide button stays in the toolbar, not in the rail');
+  assert.match(G, /<b>Favourites<\/b>/, 'the guide explains the favourites');
+});

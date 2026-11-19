@@ -73,7 +73,7 @@ test('order flow studies: estimated from candles and said so; the bars keep thei
 test('full screen takes the whole Charts view, so the layout, split and tools stay as they were', () => {
   assert.match(PAGE, /tl\.querySelector\('\.ch-fs'\)\.addEventListener\('click', \(\) => \{ const vc = document\.getElementById\('v-charts'\) \|\| pane;/);
   const css = /<style id="ms-cfs-css">([\s\S]*?)<\/style>/.exec(PAGE)[1];
-  assert.match(css, /#v-charts:fullscreen > \.ms-grid4 \{ flex: 1 1 0; min-height: 0; grid-auto-rows: minmax\(0, 1fr\);/);
+  assert.match(css, /#v-charts:fullscreen \.ms-grid4 \{ flex: 1 1 0; min-height: 0; grid-auto-rows: minmax\(0, 1fr\);/);
   assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /document\.addEventListener\('fullscreenchange', \(\) => \{ const host = document\.fullscreenElement \|\| document\.body; for \(const id of \['ms-dsel', 'ms-cmenu'\]\)/);
 });
 
