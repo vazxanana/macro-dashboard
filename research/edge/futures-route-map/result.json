@@ -1,0 +1,3490 @@
+{
+ "built": "2026-11-14",
+ "verdict": "ROUTE-SENSITIVE: 10 tests would pass at futures cost (Holm 0) (accounting, no rule tested: inconclusive as evidence for any rule)",
+ "verdictNote": "4 of the 10 already passed their own bar at the CFD cost; 6 pass only at futures cost; none survives Holm over the 32 re-costed family tests",
+ "counts": {
+  "routeOnly": 6,
+  "tests": 44,
+  "noRoute": 7,
+  "recosted": 37,
+  "perTrade": 7,
+  "approx": 30,
+  "stepA": 12,
+  "wouldPass": 10,
+  "holm": 0,
+  "familiesSurviving": 3
+ },
+ "rows": [
+  {
+   "pr": 878,
+   "topic": "gotobi",
+   "test": "T1",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "gotobi",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 760,
+   "gross": 0.1583,
+   "cfdNet": 0.0357,
+   "tCfd": 0.93,
+   "tGross": 4.12,
+   "s": 0.0384,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.1226,
+   "transSrc": "tests.T1.decisive.costR (no financing: an intraday hold)",
+   "ratio": 0.999,
+   "futCost": 0.1225,
+   "futNet": 0.0358,
+   "tFut": 0.93,
+   "fut2x": -0.0866,
+   "t2x": -2.26,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 113.696,
+     "F": 0.000159,
+     "C": 0.000159,
+     "ratio": 0.999
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 878,
+   "topic": "gotobi",
+   "test": "T2",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "gotobi",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 771,
+   "gross": 0.2607,
+   "cfdNet": 0.1481,
+   "tCfd": 2.74,
+   "tGross": 4.82,
+   "s": 0.0541,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.1126,
+   "transSrc": "tests.T2.decisive.costR (no financing: an intraday hold)",
+   "ratio": 0.999,
+   "futCost": 0.1125,
+   "futNet": 0.1482,
+   "tFut": 2.74,
+   "fut2x": 0.0357,
+   "t2x": 0.66,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 113.696,
+     "F": 0.000159,
+     "C": 0.000159,
+     "ratio": 0.999
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "net > 0": true,
+     "month t >= 2": true,
+     "2010-15 replication: same sign": true,
+     "Holm p < 0.05 over T1-T4 (futures p of all four)": true,
+     "above the placebo p95 (38 of 40), shifted by the cost change": true
+    },
+    "src": "gotobi result.json (bar, replication, placebo)",
+    "pass": true,
+    "holmP": 0.0123,
+    "replicationFutNet": 0.1649,
+    "ratioReplication": 0.694,
+    "cfdPass": true
+   },
+   "wouldPass": true,
+   "routeOnly": false
+  },
+  {
+   "pr": 878,
+   "topic": "gotobi",
+   "test": "T3",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "gotobi",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 765,
+   "gross": 0.2137,
+   "cfdNet": 0.0953,
+   "tCfd": 2.2,
+   "tGross": 4.93,
+   "s": 0.0433,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.1184,
+   "transSrc": "tests.T3.decisive.costR (no financing: an intraday hold)",
+   "ratio": 0.999,
+   "futCost": 0.1183,
+   "futNet": 0.0954,
+   "tFut": 2.2,
+   "fut2x": -0.0229,
+   "t2x": -0.53,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 113.696,
+     "F": 0.000159,
+     "C": 0.000159,
+     "ratio": 0.999
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "net > 0": true,
+     "month t >= 2": true,
+     "2010-15 replication: same sign": true,
+     "Holm p < 0.05 over T1-T4 (futures p of all four)": true,
+     "above the placebo p95 (38 of 40), shifted by the cost change": true
+    },
+    "src": "gotobi result.json (bar, replication, placebo)",
+    "pass": true,
+    "holmP": 0.0417,
+    "replicationFutNet": 0.0172,
+    "ratioReplication": 0.694,
+    "cfdPass": false
+   },
+   "wouldPass": true,
+   "routeOnly": true
+  },
+  {
+   "pr": 878,
+   "topic": "gotobi",
+   "test": "T4",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "gotobi",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 771,
+   "gross": 0.2018,
+   "cfdNet": 0.1019,
+   "tCfd": 1.84,
+   "tGross": 3.64,
+   "s": 0.0554,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.0999,
+   "transSrc": "tests.T4.decisive.costR (no financing: an intraday hold)",
+   "ratio": 0.999,
+   "futCost": 0.0998,
+   "futNet": 0.102,
+   "tFut": 1.84,
+   "fut2x": 0.0022,
+   "t2x": 0.04,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 113.696,
+     "F": 0.000159,
+     "C": 0.000159,
+     "ratio": 0.999
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 889,
+   "topic": "gotobi-replicate",
+   "test": "R2 USD/JPY 2005-09",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "gotobi",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 355,
+   "gross": 0.3568,
+   "cfdNet": 0.2605,
+   "tCfd": 3.8,
+   "tGross": 5.2,
+   "s": 0.0686,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.0964,
+   "transSrc": "r2.all.costR",
+   "ratio": 0.939,
+   "futCost": 0.0905,
+   "futNet": 0.2663,
+   "tFut": 3.88,
+   "fut2x": 0.1758,
+   "t2x": 2.56,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 109.682,
+     "F": 0.000154,
+     "C": 0.000164,
+     "ratio": 0.939
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "net > 0": true,
+     "month t >= 1.5 (R2's own bar)": true
+    },
+    "src": "gotobi-replicate bar.r2",
+    "pass": true,
+    "cfdPass": true
+   },
+   "wouldPass": true,
+   "routeOnly": false
+  },
+  {
+   "pr": 889,
+   "topic": "gotobi-replicate",
+   "test": "R1 crosses pooled",
+   "inst": "yen crosses",
+   "insts": [
+    "yen crosses"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "gotobi",
+   "cls": "net-t2",
+   "route": "none",
+   "n": 4784,
+   "gross": 0.1933,
+   "cfdNet": 0.0993,
+   "tCfd": 2.75,
+   "tGross": 5.35,
+   "s": 0.0361,
+   "method": "no route",
+   "why": "yen crosses (EUR/JPY and others): no route",
+   "stepA": null
+  },
+  {
+   "pr": 894,
+   "topic": "gotobi-feed",
+   "test": "HistData USD/JPY",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "robustness",
+   "family": "gotobi",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 623,
+   "gross": 0.243,
+   "cfdNet": 0.1265,
+   "tCfd": 2.34,
+   "tGross": 4.5,
+   "s": 0.0541,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.1166,
+   "transSrc": "hist.all.costR",
+   "ratio": 1.252,
+   "futCost": 0.146,
+   "futNet": 0.097,
+   "tFut": 1.79,
+   "fut2x": -0.0491,
+   "t2x": -0.91,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 129.836,
+     "F": 0.000182,
+     "C": 0.000145,
+     "ratio": 1.252
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 912,
+   "topic": "gotobi-minute-histdata",
+   "test": "gotobi T2 on M1",
+   "inst": "usdjpy",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "robustness",
+   "family": "gotobi",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 623,
+   "gross": 0.243,
+   "cfdNet": 0.1265,
+   "tCfd": 2.34,
+   "tGross": 4.5,
+   "s": 0.0541,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.1166,
+   "transSrc": "gate.m1.costR",
+   "ratio": 1.252,
+   "futCost": 0.146,
+   "futNet": 0.097,
+   "tFut": 1.79,
+   "fut2x": -0.0491,
+   "t2x": -0.91,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 129.836,
+     "F": 0.000182,
+     "C": 0.000145,
+     "ratio": 1.252
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 880,
+   "topic": "fx-weekend-gap",
+   "test": "G",
+   "inst": "forex majors",
+   "insts": [
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd",
+    "usdchf",
+    "eurjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "weekend gap",
+   "cls": "net-t2",
+   "route": "none",
+   "n": 243,
+   "gross": 0.2923,
+   "cfdNet": 0.194,
+   "tCfd": 2.1411,
+   "tGross": 3.23,
+   "s": 0.0906,
+   "method": "no route",
+   "why": "EUR/JPY (a cross) is one of its six pairs; also CME Globex FX reopens on Sunday after spot FX (from memory, not opened), so the reopen entry has no futures twin",
+   "stepA": null
+  },
+  {
+   "pr": 928,
+   "topic": "fx-weekend-gap-replicate",
+   "test": "R1",
+   "inst": "forex (other pairs)",
+   "insts": [
+    "crosses"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "weekend gap",
+   "cls": "net-t2",
+   "route": "none",
+   "n": 294,
+   "gross": 0.3649,
+   "cfdNet": 0.2385,
+   "tCfd": 2.9878,
+   "tGross": 4.57,
+   "s": 0.0798,
+   "method": "no route",
+   "why": "all six pairs are crosses (AUD/JPY, EUR/AUD, EUR/CHF, GBP/JPY, GBP/AUD, EUR/GBP)",
+   "stepA": null
+  },
+  {
+   "pr": 938,
+   "topic": "fx-weekend-gap-replicate2",
+   "test": "S1",
+   "inst": "forex (other pairs)",
+   "insts": [
+    "crosses"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "weekend gap",
+   "cls": "cost-blocked",
+   "route": "none",
+   "n": 588,
+   "gross": 0.1792,
+   "cfdNet": 0.0608,
+   "tCfd": 1.0216,
+   "tGross": 3.01,
+   "s": 0.0595,
+   "method": "no route",
+   "why": "all six pairs are crosses",
+   "stepA": null
+  },
+  {
+   "pr": 938,
+   "topic": "fx-weekend-gap-replicate2",
+   "test": "S2",
+   "inst": "forex (other pairs)",
+   "insts": [
+    "nzdusd",
+    "usdcad",
+    "crosses"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "weekend gap",
+   "cls": "net-t2",
+   "route": "none",
+   "n": 481,
+   "gross": 0.2931,
+   "cfdNet": 0.1532,
+   "tCfd": 3.1876,
+   "tGross": 6.1,
+   "s": 0.0481,
+   "method": "no route",
+   "why": "four of its six pairs are crosses (CAD/JPY, NZD/JPY, AUD/NZD, AUD/CAD)",
+   "stepA": null
+  },
+  {
+   "pr": 868,
+   "topic": "fx-london-orb",
+   "test": "F1",
+   "inst": "eurusd / gbpusd",
+   "insts": [
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd",
+    "usdchf",
+    "eurjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "London opening range",
+   "cls": "cost-blocked",
+   "route": "none",
+   "n": 9875,
+   "gross": 0.08,
+   "cfdNet": -0.05,
+   "tCfd": -2.28,
+   "tGross": 3.74,
+   "s": 0.0216,
+   "method": "no route",
+   "why": "EUR/JPY (a cross) is one of the six pairs of the pooled test (cost-floor-map's label \"eurusd / gbpusd\" is short)",
+   "stepA": null
+  },
+  {
+   "pr": 868,
+   "topic": "fx-london-orb",
+   "test": "F2",
+   "inst": "eurusd / gbpusd",
+   "insts": [
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd",
+    "usdchf",
+    "eurjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "London opening range",
+   "cls": "cost-blocked",
+   "route": "none",
+   "n": 9875,
+   "gross": 0.04,
+   "cfdNet": -0.075,
+   "tCfd": -5.36,
+   "tGross": 3.04,
+   "s": 0.0137,
+   "method": "no route",
+   "why": "EUR/JPY (a cross) is one of the six pairs of the pooled test (cost-floor-map's label \"eurusd / gbpusd\" is short)",
+   "stepA": null
+  },
+  {
+   "pr": 910,
+   "topic": "wmr-fix-reversal",
+   "test": "T1",
+   "inst": "forex majors",
+   "insts": [
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd",
+    "usdchf",
+    "usdcad"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "FX fixes",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 12272,
+   "gross": 0.041,
+   "cfdNet": -0.083,
+   "tCfd": -6.01,
+   "tGross": 2.99,
+   "s": 0.0138,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.124,
+   "transSrc": "tests.T1.dec.costR (no financing)",
+   "ratio": 1.717,
+   "futCost": 0.2129,
+   "futNet": -0.1719,
+   "tFut": -12.45,
+   "fut2x": -0.3847,
+   "t2x": -27.88,
+   "weights": "equal (no per-pair n stored)",
+   "perInst": {
+    "eurusd": {
+     "ref": 1.12268,
+     "F": 0.000125,
+     "C": 0.000098,
+     "ratio": 1.267
+    },
+    "gbpusd": {
+     "ref": 1.30301,
+     "F": 0.000215,
+     "C": 0.000091,
+     "ratio": 2.36
+    },
+    "usdjpy": {
+     "ref": 113.693,
+     "F": 0.000159,
+     "C": 0.000098,
+     "ratio": 1.628
+    },
+    "audusd": {
+     "ref": 0.70548,
+     "F": 0.000213,
+     "C": 0.00013,
+     "ratio": 1.635
+    },
+    "usdchf": {
+     "ref": 0.93076,
+     "F": 0.00013,
+     "C": 0.000109,
+     "ratio": 1.19
+    },
+    "usdcad": {
+     "ref": 1.33214,
+     "F": 0.0002,
+     "C": 0.00009,
+     "ratio": 2.219
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 910,
+   "topic": "wmr-fix-reversal",
+   "test": "T3",
+   "inst": "forex majors",
+   "insts": [
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd",
+    "usdchf",
+    "usdcad"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "FX fixes",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 12272,
+   "gross": 0.044,
+   "cfdNet": -0.08,
+   "tCfd": -6.72,
+   "tGross": 3.87,
+   "s": 0.0117,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.124,
+   "transSrc": "tests.T3.dec.costR (no financing)",
+   "ratio": 1.717,
+   "futCost": 0.2129,
+   "futNet": -0.1689,
+   "tFut": -14.43,
+   "fut2x": -0.3817,
+   "t2x": -32.62,
+   "weights": "equal (no per-pair n stored)",
+   "perInst": {
+    "eurusd": {
+     "ref": 1.12268,
+     "F": 0.000125,
+     "C": 0.000098,
+     "ratio": 1.267
+    },
+    "gbpusd": {
+     "ref": 1.30301,
+     "F": 0.000215,
+     "C": 0.000091,
+     "ratio": 2.36
+    },
+    "usdjpy": {
+     "ref": 113.693,
+     "F": 0.000159,
+     "C": 0.000098,
+     "ratio": 1.628
+    },
+    "audusd": {
+     "ref": 0.70548,
+     "F": 0.000213,
+     "C": 0.00013,
+     "ratio": 1.635
+    },
+    "usdchf": {
+     "ref": 0.93076,
+     "F": 0.00013,
+     "C": 0.000109,
+     "ratio": 1.19
+    },
+    "usdcad": {
+     "ref": 1.33214,
+     "F": 0.0002,
+     "C": 0.00009,
+     "ratio": 2.219
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 921,
+   "topic": "ecb-ref-fix",
+   "test": "T1",
+   "inst": "eurusd and crosses",
+   "insts": [
+    "eurusd"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "FX fixes",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 2018,
+   "gross": 0.119,
+   "cfdNet": -0.136,
+   "tCfd": -2.93,
+   "tGross": 2.59,
+   "s": 0.0462,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.255,
+   "transSrc": "tests.T1.dec.costR (no financing)",
+   "ratio": 1.267,
+   "futCost": 0.323,
+   "futNet": -0.204,
+   "tFut": -4.42,
+   "fut2x": -0.527,
+   "t2x": -11.41,
+   "weights": null,
+   "perInst": {
+    "eurusd": {
+     "ref": 1.12264,
+     "F": 0.000125,
+     "C": 0.000098,
+     "ratio": 1.267
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 921,
+   "topic": "ecb-ref-fix",
+   "test": "T2",
+   "inst": "eurusd and crosses",
+   "insts": [
+    "eurusd"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "FX fixes",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 2018,
+   "gross": 0.131,
+   "cfdNet": -0.124,
+   "tCfd": -2.88,
+   "tGross": 3.08,
+   "s": 0.0428,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.255,
+   "transSrc": "tests.T2.dec.costR (no financing)",
+   "ratio": 1.267,
+   "futCost": 0.323,
+   "futNet": -0.192,
+   "tFut": -4.49,
+   "fut2x": -0.515,
+   "t2x": -12.03,
+   "weights": null,
+   "perInst": {
+    "eurusd": {
+     "ref": 1.12264,
+     "F": 0.000125,
+     "C": 0.000098,
+     "ratio": 1.267
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 927,
+   "topic": "cnh-fix",
+   "test": "T2",
+   "inst": "usdcnh",
+   "insts": [
+    "usdcnh"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "FX fixes",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 1667,
+   "gross": 0.248,
+   "cfdNet": -0.406,
+   "tCfd": -5.54,
+   "tGross": 3.78,
+   "s": 0.0702,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.654,
+   "transSrc": "tests.T2.dec.costR (no financing)",
+   "ratio": 0.599,
+   "futCost": 0.3918,
+   "futNet": -0.1438,
+   "tFut": -2.05,
+   "fut2x": -0.5355,
+   "t2x": -7.63,
+   "weights": null,
+   "perInst": {
+    "usdcnh": {
+     "ref": 6.91753,
+     "F": 0.000079,
+     "C": 0.000132,
+     "ratio": 0.599
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 836,
+   "topic": "overnight-drift",
+   "test": "nas100",
+   "inst": "nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index overnight",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 2722,
+   "gross": 0.021,
+   "cfdNet": 0.001,
+   "tCfd": 0.2,
+   "tGross": 4.2,
+   "s": 0.005,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.009,
+   "transSrc": "markets.nas100.dec.night.spreadR (financing finR 0.01 stored apart, dropped)",
+   "ratio": 0.747,
+   "futCost": 0.0067,
+   "futNet": 0.0143,
+   "tFut": 2.86,
+   "fut2x": 0.0076,
+   "t2x": 1.51,
+   "weights": null,
+   "perInst": {
+    "nas100": {
+     "ref": 12101.9,
+     "F": 0.000093,
+     "C": 0.000124,
+     "ratio": 0.747
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "net > 0, month t >= 2": true,
+     "Holm p < 0.05 over the three indices (futures p; US30 re-costed the same way)": true,
+     "overnight beats the cash session per hour held, both legs at futures cost": false
+    },
+    "src": "overnight-drift pass rule (PREREGISTRATION.md \"Pass rule\")",
+    "pass": false,
+    "holmP": 0.0064,
+    "us30": {
+     "futNet": 0.0002,
+     "tFut": 0.04
+    },
+    "perHour": {
+     "night": 0.001041,
+     "day": 0.004714
+    },
+    "cfdPass": false
+   },
+   "wouldPass": false
+  },
+  {
+   "pr": 836,
+   "topic": "overnight-drift",
+   "test": "spx500",
+   "inst": "spx500",
+   "insts": [
+    "spx500"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index overnight",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 2722,
+   "gross": 0.016,
+   "cfdNet": -0.009,
+   "tCfd": -1.39,
+   "tGross": 2.47,
+   "s": 0.0065,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.011,
+   "transSrc": "markets.spx500.dec.night.spreadR (financing finR 0.014 stored apart, dropped)",
+   "ratio": 1.496,
+   "futCost": 0.0165,
+   "futNet": -0.0005,
+   "tFut": -0.07,
+   "fut2x": -0.0169,
+   "t2x": -2.6,
+   "weights": null,
+   "perInst": {
+    "spx500": {
+     "ref": 3887.8,
+     "F": 0.000192,
+     "C": 0.000129,
+     "ratio": 1.496
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 891,
+   "topic": "index-overnight",
+   "test": "T1",
+   "inst": "spx500",
+   "insts": [
+    "spx500"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index overnight",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 2721,
+   "gross": 0.023,
+   "cfdNet": -0.022,
+   "tCfd": -2.86,
+   "tGross": 2.87,
+   "s": 0.0079,
+   "method": "per trade",
+   "tForm": "month sums over months with a trade",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 2721,
+     "gross": 0.0225,
+     "net": -0.0219,
+     "t": -2.86
+    },
+    "published": {
+     "n": 2721,
+     "gross": 0.023,
+     "net": -0.022,
+     "t": -2.86
+    },
+    "skipped": 0
+   },
+   "futCost": 0.0198,
+   "futNet": 0.0027,
+   "tFut": 0.35,
+   "fut2x": -0.0171,
+   "t2x": -2.2,
+   "replication": {
+    "n": 2743,
+    "gross": 0.0144,
+    "cfdNet": -0.025,
+    "futNet": -0.0295,
+    "tFut": -4.73
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 891,
+   "topic": "index-overnight",
+   "test": "T2",
+   "inst": "nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index overnight",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 2721,
+   "gross": 0.026,
+   "cfdNet": -0.006,
+   "tCfd": -0.84,
+   "tGross": 3.54,
+   "s": 0.0073,
+   "method": "per trade",
+   "tForm": "month sums over months with a trade",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 2721,
+     "gross": 0.0263,
+     "net": -0.006,
+     "t": -0.84
+    },
+    "published": {
+     "n": 2721,
+     "gross": 0.026,
+     "net": -0.006,
+     "t": -0.84
+    },
+    "skipped": 0
+   },
+   "futCost": 0.0082,
+   "futNet": 0.0181,
+   "tFut": 2.45,
+   "fut2x": 0.0099,
+   "t2x": 1.35,
+   "replication": {
+    "n": 2743,
+    "gross": 0.0275,
+    "cfdNet": -0.004,
+    "futNet": -0.006,
+    "tFut": -1.01
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "n >= 300 both windows": true,
+     "net > 0, month t >= 2 (2016-26)": true,
+     "net > 0 (2005-15)": false,
+     "Holm p < 0.05 over T1, T2 (#900)": true,
+     "above the placebo p95, re-costed (#900)": true,
+     "net > 0 at twice the trading cost": true,
+     "pooled T1 + T2 condition (#900)": false
+    },
+    "src": "index-futures-cost (#900) conditions, with this study's no-carry figures where they differ",
+    "pass": false,
+    "cfdPass": false,
+    "cfdPassSrc": "index-overnight verdict FAIL (published), #900 published on CFD costs: FAIL"
+   },
+   "wouldPass": false
+  },
+  {
+   "pr": 895,
+   "topic": "index-ibs",
+   "test": "T2",
+   "inst": "nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 473,
+   "gross": 0.096,
+   "cfdNet": 0.056,
+   "tCfd": 1.65,
+   "tGross": 2.83,
+   "s": 0.0339,
+   "method": "per trade",
+   "tForm": "month sums over every calendar month of the window",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 473,
+     "gross": 0.0963,
+     "net": 0.0558,
+     "t": 1.65
+    },
+    "published": {
+     "n": 473,
+     "gross": 0.096,
+     "net": 0.056,
+     "t": 1.65
+    },
+    "skipped": 0
+   },
+   "futCost": 0.0069,
+   "futNet": 0.0895,
+   "tFut": 2.68,
+   "fut2x": 0.0826,
+   "t2x": 2.47,
+   "replication": {
+    "n": 513,
+    "gross": 0.0513,
+    "cfdNet": 0.0097,
+    "futNet": 0.0188,
+    "tFut": 0.66
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "(a) n >= 100": true,
+     "(b) net > 0": true,
+     "(c) month t >= 2 and Holm p < 0.05 over T1-T3 (#900)": true,
+     "(d) 2005-15 net > 0": true,
+     "(e) above 38 of 40 placebo seeds, re-costed (#900)": true
+    },
+    "src": "index-futures-cost (#900) conditions, with this study's no-carry figures where they differ",
+    "pass": true,
+    "cfdPass": false,
+    "cfdPassSrc": "index-ibs verdict FAIL (published), #900 published on CFD costs: FAIL"
+   },
+   "wouldPass": true,
+   "routeOnly": true
+  },
+  {
+   "pr": 838,
+   "topic": "rsi2-pullback",
+   "test": "spx500",
+   "inst": "spx500",
+   "insts": [
+    "spx500"
+   ],
+   "unit": "%",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 99,
+   "gross": 0.402,
+   "cfdNet": 0.318,
+   "tCfd": 2.02,
+   "tGross": 2.55,
+   "s": 0.1574,
+   "method": "approx (constant cost, % of price)",
+   "futCost": 0.0192,
+   "futNet": 0.3828,
+   "tFut": 2.43,
+   "fut2x": 0.3636,
+   "t2x": 2.31,
+   "cfdTrans": 0.026,
+   "weights": null,
+   "transSrc": "markets.spx500.B: avgGross - avgRet - finPct (financing stored apart, dropped)",
+   "perInst": {
+    "spx500": {
+     "ref": 3892.2,
+     "futPct": 0.0192
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "positive": true,
+     "trade t >= 2": true,
+     "month t >= 2 (scaled with the mean)": true,
+     "above the placebo p95, shifted by the cost change": true,
+     "Holm p < 0.05 over the three markets (futures p)": true
+    },
+    "src": "rsi2-pullback RESULT.md \"Checks, window B (all five needed)\"",
+    "pass": true,
+    "holmP": 0.0226,
+    "tMonthsFut": 2.2,
+    "carryPct": 0.0091,
+    "cfdPass": false
+   },
+   "wouldPass": true,
+   "routeOnly": true
+  },
+  {
+   "pr": 838,
+   "topic": "rsi2-pullback",
+   "test": "us30",
+   "inst": "us30",
+   "insts": [
+    "us30"
+   ],
+   "unit": "%",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 102,
+   "gross": 0.364,
+   "cfdNet": 0.288,
+   "tCfd": 1.88,
+   "tGross": 2.38,
+   "s": 0.1532,
+   "method": "approx (constant cost, % of price)",
+   "futCost": 0.0141,
+   "futNet": 0.3499,
+   "tFut": 2.28,
+   "fut2x": 0.3357,
+   "t2x": 2.19,
+   "cfdTrans": 0.013,
+   "weights": null,
+   "transSrc": "markets.us30.B: avgGross - avgRet - finPct (financing stored apart, dropped)",
+   "perInst": {
+    "us30": {
+     "ref": 31661.2,
+     "futPct": 0.0141
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "positive": true,
+     "trade t >= 2": true,
+     "month t >= 2 (scaled with the mean)": true,
+     "above the placebo p95, shifted by the cost change": true,
+     "Holm p < 0.05 over the three markets (futures p)": true
+    },
+    "src": "rsi2-pullback RESULT.md \"Checks, window B (all five needed)\"",
+    "pass": true,
+    "holmP": 0.0226,
+    "tMonthsFut": 2.77,
+    "carryPct": 0.0053,
+    "cfdPass": false
+   },
+   "wouldPass": true,
+   "routeOnly": true
+  },
+  {
+   "pr": 860,
+   "topic": "vol-spike-rebound",
+   "test": "10-day hold",
+   "inst": "spx500 / nas100 / us30",
+   "insts": [
+    "spx500",
+    "nas100",
+    "us30"
+   ],
+   "unit": "%",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "net-t2",
+   "route": "B",
+   "n": 165,
+   "gross": 1.063,
+   "cfdNet": 0.899,
+   "tCfd": 2.53,
+   "tGross": 2.99,
+   "s": 0.3553,
+   "method": "approx (constant cost, % of price)",
+   "futCost": 0.0142,
+   "futNet": 1.0488,
+   "tFut": 2.95,
+   "fut2x": 1.0346,
+   "t2x": 2.91,
+   "cfdTrans": null,
+   "weights": "equal (no per-market n stored)",
+   "transSrc": "not stored apart (financing and spread together): % unit, so the CFD transaction cost is not needed",
+   "perInst": {
+    "spx500": {
+     "ref": 3892.2,
+     "futPct": 0.0192
+    },
+    "nas100": {
+     "ref": 12121.3,
+     "futPct": 0.0092
+    },
+    "us30": {
+     "ref": 31661.2,
+     "futPct": 0.0141
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "pooled n >= 40": true,
+     "net > 0": true,
+     "t >= 2": true,
+     "Holm p < 0.05 over the two holds (futures p)": true,
+     "window A (2008-15) pooled net R > 0": true
+    },
+    "src": "vol-spike-rebound PREREGISTRATION.md \"Test and pass bar\"",
+    "pass": true,
+    "holmP": 0.0032,
+    "windowA": {
+     "avgRcfd": 0.013,
+     "cfdCostPct": 0.183,
+     "futCostPct": 0.0142
+    },
+    "carryPct": 0.0295,
+    "cfdPass": true
+   },
+   "wouldPass": true,
+   "routeOnly": false
+  },
+  {
+   "pr": 860,
+   "topic": "vol-spike-rebound",
+   "test": "5-day hold",
+   "inst": "spx500 / nas100 / us30",
+   "insts": [
+    "spx500",
+    "nas100",
+    "us30"
+   ],
+   "unit": "%",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 216,
+   "gross": 0.588,
+   "cfdNet": 0.497,
+   "tCfd": 1.96,
+   "tGross": 2.32,
+   "s": 0.2536,
+   "method": "approx (constant cost, % of price)",
+   "futCost": 0.0142,
+   "futNet": 0.5738,
+   "tFut": 2.26,
+   "fut2x": 0.5596,
+   "t2x": 2.21,
+   "cfdTrans": null,
+   "weights": "equal (no per-market n stored)",
+   "transSrc": "not stored apart (financing and spread together): % unit, so the CFD transaction cost is not needed",
+   "perInst": {
+    "spx500": {
+     "ref": 3892.2,
+     "futPct": 0.0192
+    },
+    "nas100": {
+     "ref": 12121.3,
+     "futPct": 0.0092
+    },
+    "us30": {
+     "ref": 31661.2,
+     "futPct": 0.0141
+    }
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "pooled n >= 40": true,
+     "net > 0": true,
+     "t >= 2": true,
+     "Holm p < 0.05 over the two holds (futures p)": true,
+     "window A (2008-15) pooled net R > 0": true
+    },
+    "src": "vol-spike-rebound PREREGISTRATION.md \"Test and pass bar\"",
+    "pass": true,
+    "holmP": 0.0119,
+    "windowA": {
+     "avgRcfd": 0.026,
+     "cfdCostPct": 0.132,
+     "futCostPct": 0.0142
+    },
+    "carryPct": 0.0137,
+    "cfdPass": false
+   },
+   "wouldPass": true,
+   "routeOnly": true
+  },
+  {
+   "pr": 857,
+   "topic": "turnaround-tuesday",
+   "test": "nas100-r2",
+   "inst": "nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "net-t2",
+   "route": "A",
+   "n": 81,
+   "gross": 0.114,
+   "cfdNet": 0.098,
+   "tCfd": 2.33,
+   "tGross": 2.72,
+   "s": 0.041,
+   "method": "approx (the trade list failed its gate; mean futures cost of the list, constant cost)",
+   "tForm": "trade t",
+   "gate": {
+    "pass": false,
+    "checks": {
+     "n": true,
+     "gross": false,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 81,
+     "gross": null,
+     "net": 0.0981,
+     "t": 2.33
+    },
+    "published": {
+     "n": 81,
+     "gross": 0.114,
+     "net": 0.098,
+     "t": 2.33
+    },
+    "skipped": 1
+   },
+   "skipped": 1,
+   "futCost": 0.0024,
+   "futNet": 0.1116,
+   "tFut": 2.72,
+   "fut2x": 0.1092,
+   "t2x": 2.66,
+   "listFigures": {
+    "futNet": 0.1133,
+    "tFut": 2.67
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "C1 net > 0, trade t >= 2": true,
+     "C1 Holm p < 0.05 over the four cells (futures p)": true,
+     "C2 n": true,
+     "C3 2008-15 net > 0": true,
+     "C4 against all Tuesdays (before costs, as published)": true,
+     "C5 placebo: 38 of 40 seeds, shifted by the cost change": true
+    },
+    "src": "turnaround-tuesday PREREGISTRATION.md C1-C5",
+    "pass": true,
+    "holmP": 0.013,
+    "isFutNet": 0.1056,
+    "placeboBeaten": 40,
+    "cfdPass": true
+   },
+   "wouldPass": true,
+   "routeOnly": false
+  },
+  {
+   "pr": 857,
+   "topic": "turnaround-tuesday",
+   "test": "nas100-r1",
+   "inst": "nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index short-term reversal",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 224,
+   "gross": 0.049,
+   "cfdNet": 0.03,
+   "tCfd": 1.23,
+   "tGross": 2.04,
+   "s": 0.0235,
+   "method": "approx (the trade list failed its gate; mean futures cost of the list, constant cost)",
+   "tForm": "trade t",
+   "gate": {
+    "pass": false,
+    "checks": {
+     "n": true,
+     "gross": false,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 224,
+     "gross": null,
+     "net": 0.0297,
+     "t": 1.23
+    },
+    "published": {
+     "n": 224,
+     "gross": 0.049,
+     "net": 0.03,
+     "t": 1.23
+    },
+    "skipped": 1
+   },
+   "skipped": 1,
+   "futCost": 0.0028,
+   "futNet": 0.0462,
+   "tFut": 1.97,
+   "fut2x": 0.0434,
+   "t2x": 1.85,
+   "listFigures": {
+    "futNet": 0.0464,
+    "tFut": 1.92
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 862,
+   "topic": "turnaround-replicate",
+   "test": "pooled",
+   "inst": "indices (6)",
+   "insts": [
+    "us30",
+    "us2000",
+    "de40",
+    "eu50",
+    "uk100",
+    "jp225"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "index short-term reversal",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 411,
+   "gross": 0.072,
+   "cfdNet": 0.052,
+   "tCfd": 1.69,
+   "tGross": 2.34,
+   "s": 0.0308,
+   "method": "approx (the trade list failed its gate; mean futures cost of the list, constant cost)",
+   "tForm": "month sums over every calendar month (131)",
+   "gate": {
+    "pass": false,
+    "checks": {
+     "n": true,
+     "gross": false,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 411,
+     "gross": null,
+     "net": 0.052,
+     "t": 1.69
+    },
+    "published": {
+     "n": 411,
+     "gross": 0.072,
+     "net": 0.052,
+     "t": 1.69,
+     "tradeT": 2.63
+    },
+    "skipped": 5
+   },
+   "skipped": 5,
+   "futCost": 0.0094,
+   "futNet": 0.0626,
+   "tFut": 2.03,
+   "fut2x": 0.0532,
+   "t2x": 1.73,
+   "listFigures": {
+    "futNet": 0.0636,
+    "tFut": 2.04
+   },
+   "stepA": true,
+   "stepB": {
+    "conditions": {
+     "P1 net > 0, month t >= 2": true,
+     "P2 at least 4 of 6 markets net > 0": true,
+     "P3 placebo: 38 of 40 seeds, shifted by the cost change": true
+    },
+    "src": "turnaround-replicate PREREGISTRATION.md P1-P3",
+    "pass": true,
+    "perMarket": {
+     "us30": 0.0304,
+     "us2000": 0.0778,
+     "de40": 0.0635,
+     "eu50": 0.0275,
+     "uk100": 0.0537,
+     "jp225": 0.1081
+    },
+    "placeboBeaten": 40,
+    "cfdPass": false
+   },
+   "wouldPass": true,
+   "routeOnly": true
+  },
+  {
+   "pr": 837,
+   "topic": "orb-nas100",
+   "test": "nas100",
+   "inst": "nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index intraday breakout and momentum",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 1460,
+   "gross": 0.135,
+   "cfdNet": 0.075,
+   "tCfd": 1.27,
+   "tGross": 2.27,
+   "s": 0.06,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.06,
+   "transSrc": "markets.nas100.windows.B.costR (intraday, no financing)",
+   "ratio": 0.56,
+   "futCost": 0.0336,
+   "futNet": 0.1014,
+   "tFut": 1.69,
+   "fut2x": 0.0678,
+   "t2x": 1.13,
+   "weights": null,
+   "perInst": {
+    "nas100": {
+     "ref": 16406.3,
+     "F": 0.000068,
+     "C": 0.000122,
+     "ratio": 0.56
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 837,
+   "topic": "orb-nas100",
+   "test": "spx500",
+   "inst": "spx500",
+   "insts": [
+    "spx500"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index intraday breakout and momentum",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 1456,
+   "gross": 0.138,
+   "cfdNet": -0.053,
+   "tCfd": -0.79,
+   "tGross": 2.08,
+   "s": 0.0666,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.191,
+   "transSrc": "markets.spx500.windows.B.costR (intraday, no financing)",
+   "ratio": 0.748,
+   "futCost": 0.1429,
+   "futNet": -0.0049,
+   "tFut": -0.07,
+   "fut2x": -0.1477,
+   "t2x": -2.22,
+   "weights": null,
+   "perInst": {
+    "spx500": {
+     "ref": 4722.6,
+     "F": 0.000158,
+     "C": 0.000212,
+     "ratio": 0.748
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 914,
+   "topic": "index-midday-turn",
+   "test": "T2",
+   "inst": "spx500 / nas100",
+   "insts": [
+    "nas100"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index intraday breakout and momentum",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 2308,
+   "gross": 0.0161,
+   "cfdNet": -0.01,
+   "tCfd": -1.5983,
+   "tGross": 2.64,
+   "s": 0.0062,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.0262,
+   "transSrc": "tests.T2.decisive.costR (intraday, no financing)",
+   "ratio": 0.231,
+   "futCost": 0.0061,
+   "futNet": 0.01,
+   "tFut": 1.62,
+   "fut2x": 0.004,
+   "t2x": 0.64,
+   "weights": null,
+   "perInst": {
+    "nas100": {
+     "ref": 12123.4,
+     "F": 0.000092,
+     "C": 0.0004,
+     "ratio": 0.231
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 867,
+   "topic": "nr7-breakout",
+   "test": "B",
+   "inst": "indices",
+   "insts": [
+    "xau",
+    "nas100",
+    "spx500",
+    "eurusd",
+    "gbpusd",
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "index intraday breakout and momentum",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 2191,
+   "gross": 0.056,
+   "cfdNet": 0.008,
+   "tCfd": 0.29,
+   "tGross": 2.03,
+   "s": 0.0276,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.033,
+   "transSrc": "variants.B.windows.decisive: net - net2 per market (net2 doubles the spread only: run.mjs costs({ mult }))",
+   "ratio": 1.145,
+   "futCost": 0.0378,
+   "futNet": 0.0182,
+   "tFut": 0.66,
+   "fut2x": -0.0195,
+   "t2x": -0.71,
+   "weights": "per-market n",
+   "perInst": {
+    "xau": {
+     "ref": 1791.655,
+     "F": 0.00023,
+     "C": 0.000167,
+     "ratio": 1.373,
+     "n": 357,
+     "trans": 0.028
+    },
+    "nas100": {
+     "ref": 12121.3,
+     "F": 0.000092,
+     "C": 0.000247,
+     "ratio": 0.373,
+     "n": 368,
+     "trans": 0.044
+    },
+    "spx500": {
+     "ref": 3892.2,
+     "F": 0.000192,
+     "C": 0.000257,
+     "ratio": 0.748,
+     "n": 362,
+     "trans": 0.055
+    },
+    "eurusd": {
+     "ref": 1.12264,
+     "F": 0.000125,
+     "C": 0.000089,
+     "ratio": 1.4,
+     "n": 379,
+     "trans": 0.026
+    },
+    "gbpusd": {
+     "ref": 1.30308,
+     "F": 0.000215,
+     "C": 0.000077,
+     "ratio": 2.8,
+     "n": 356,
+     "trans": 0.019
+    },
+    "usdjpy": {
+     "ref": 113.696,
+     "F": 0.000159,
+     "C": 0.000088,
+     "ratio": 1.81,
+     "n": 369,
+     "trans": 0.023
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 831,
+   "topic": "pre-fomc-drift",
+   "test": "spx500",
+   "inst": "spx500",
+   "insts": [
+    "spx500"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "scheduled-event drift",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 86,
+   "gross": 0.073,
+   "cfdNet": 0.044,
+   "tCfd": 1.35,
+   "tGross": 2.25,
+   "s": 0.0322,
+   "method": "per trade",
+   "tForm": "trade t",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 86,
+     "gross": 0.0731,
+     "net": 0.0442,
+     "t": 1.35
+    },
+    "published": {
+     "n": 86,
+     "gross": 0.073,
+     "net": 0.044,
+     "t": 1.35
+    },
+    "skipped": 0
+   },
+   "futCost": 0.0139,
+   "futNet": 0.0592,
+   "tFut": 1.82,
+   "fut2x": 0.0453,
+   "t2x": 1.38,
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 901,
+   "topic": "cb-days-other",
+   "test": "pooled five banks",
+   "inst": "gbp / cad / chf / aud / nzd",
+   "insts": [
+    "gbpusd",
+    "usdcad",
+    "usdchf",
+    "audusd",
+    "nzdusd"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "scheduled-event drift",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 320,
+   "gross": 0.3,
+   "cfdNet": 0.208,
+   "tCfd": 1.77,
+   "tGross": 2.55,
+   "s": 0.1175,
+   "method": "per trade",
+   "tForm": "month sums over every calendar month of the window",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 320,
+     "gross": 0.2999,
+     "net": 0.2082,
+     "t": 1.77
+    },
+    "published": {
+     "n": 320,
+     "gross": 0.3,
+     "net": 0.208,
+     "t": 1.77
+    },
+    "skipped": 0
+   },
+   "futCost": 0.171,
+   "futNet": 0.1289,
+   "tFut": 1.1,
+   "fut2x": -0.042,
+   "t2x": -0.36,
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 926,
+   "topic": "bond-lead-intraday",
+   "test": "T1",
+   "inst": "spx500 / nas100 (bond lead)",
+   "insts": [
+    "xau"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "cross-asset lead and session drift",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 3886,
+   "gross": 0.047,
+   "cfdNet": -0.097,
+   "tCfd": -3.94,
+   "tGross": 2.04,
+   "s": 0.0241,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.144,
+   "transSrc": "grossAvg - avg (one-hour hold, no financing)",
+   "ratio": 1.373,
+   "futCost": 0.1978,
+   "futNet": -0.1508,
+   "tFut": -6.26,
+   "fut2x": -0.3485,
+   "t2x": -14.46,
+   "weights": null,
+   "perInst": {
+    "xau": {
+     "ref": 1791.655,
+     "F": 0.00023,
+     "C": 0.000167,
+     "ratio": 1.373
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 926,
+   "topic": "bond-lead-intraday",
+   "test": "T2",
+   "inst": "spx500 / nas100 (bond lead)",
+   "insts": [
+    "usdjpy"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "cross-asset lead and session drift",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 3846,
+   "gross": 0.083,
+   "cfdNet": -0.116,
+   "tCfd": -3.98,
+   "tGross": 2.89,
+   "s": 0.029,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.199,
+   "transSrc": "grossAvg - avg (one-hour hold, no financing)",
+   "ratio": 1.197,
+   "futCost": 0.2382,
+   "futNet": -0.1552,
+   "tFut": -5.35,
+   "fut2x": -0.3935,
+   "t2x": -13.57,
+   "weights": null,
+   "perInst": {
+    "usdjpy": {
+     "ref": 113.696,
+     "F": 0.000159,
+     "C": 0.000133,
+     "ratio": 1.197
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 926,
+   "topic": "bond-lead-intraday",
+   "test": "T3",
+   "inst": "spx500 / nas100 (bond lead)",
+   "insts": [
+    "xau"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "cross-asset lead and session drift",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 3107,
+   "gross": 0.072,
+   "cfdNet": -0.071,
+   "tCfd": -2.5,
+   "tGross": 2.62,
+   "s": 0.0279,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.143,
+   "transSrc": "grossAvg - avg (one-hour hold, no financing)",
+   "ratio": 1.373,
+   "futCost": 0.1964,
+   "futNet": -0.1244,
+   "tFut": -4.46,
+   "fut2x": -0.3208,
+   "t2x": -11.5,
+   "weights": null,
+   "perInst": {
+    "xau": {
+     "ref": 1791.655,
+     "F": 0.00023,
+     "C": 0.000167,
+     "ratio": 1.373
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 875,
+   "topic": "gold-session-drift",
+   "test": "T2",
+   "inst": "xau",
+   "insts": [
+    "xau"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "cross-asset lead and session drift",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 1063,
+   "gross": 0.0396,
+   "cfdNet": 0.0229,
+   "tCfd": 1.37,
+   "tGross": 2.37,
+   "s": 0.0167,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.0167,
+   "transSrc": "gross - avg ($0.30 a round trip, 0 nights of financing)",
+   "ratio": 1.373,
+   "futCost": 0.0229,
+   "futNet": 0.0167,
+   "tFut": 1,
+   "fut2x": -0.0063,
+   "t2x": -0.38,
+   "weights": null,
+   "perInst": {
+    "xau": {
+     "ref": 1957.145,
+     "F": 0.000211,
+     "C": 0.000153,
+     "ratio": 1.373
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 887,
+   "topic": "eth-btc-ratio",
+   "test": "test 1",
+   "inst": "eth / btc",
+   "insts": [
+    "btc",
+    "eth"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "cross-asset lead and session drift",
+   "cls": "cost-blocked",
+   "route": "B",
+   "n": 251,
+   "gross": 0.047,
+   "cfdNet": 0.014,
+   "tCfd": 0.682,
+   "tGross": 2.29,
+   "s": 0.0205,
+   "method": "approx (constant cost)",
+   "cfdTrans": 0.006,
+   "transSrc": "tests.0.decisive.costR (financing finR 0.027 stored apart, dropped)",
+   "ratio": 25.35,
+   "futCost": 0.1521,
+   "futNet": -0.1051,
+   "tFut": -5.13,
+   "fut2x": -0.2572,
+   "t2x": -12.55,
+   "weights": "equal (two legs of one spread)",
+   "perInst": {
+    "btc": {
+     "ref": 62135.47,
+     "F": 0.001239,
+     "C": 0.0006,
+     "ratio": 2.065
+    },
+    "eth": {
+     "ref": 2330.26,
+     "F": 0.029181,
+     "C": 0.0006,
+     "ratio": 48.635
+    }
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": 939,
+   "topic": "bond-month-end",
+   "test": "USB10Y",
+   "inst": "usb10y",
+   "insts": [
+    "usb10y"
+   ],
+   "unit": "R",
+   "role": "family",
+   "family": "bond month-end",
+   "cls": "cost-blocked",
+   "route": "A",
+   "n": 130,
+   "gross": 0.107,
+   "cfdNet": 0.036,
+   "tCfd": 0.77,
+   "tGross": 2.31,
+   "s": 0.0461,
+   "method": "per trade",
+   "tForm": "trade t (one a month)",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 130,
+     "gross": 0.1065,
+     "net": 0.0358,
+     "t": 0.77
+    },
+    "published": {
+     "n": 130,
+     "gross": 0.107,
+     "net": 0.036,
+     "t": 0.77
+    },
+    "skipped": 0
+   },
+   "futCost": 0.0327,
+   "futNet": 0.0739,
+   "tFut": 1.6,
+   "fut2x": 0.0412,
+   "t2x": 0.89,
+   "replication": {
+    "n": 153,
+    "gross": 0.0671,
+    "cfdNet": 0.0083,
+    "futNet": 0.0394,
+    "tFut": 0.87
+   },
+   "stepA": false,
+   "wouldPass": false
+  },
+  {
+   "pr": null,
+   "topic": "bond-month-end-replicate",
+   "test": "pool",
+   "inst": "usb02y / usb05y / de10yb / uk10yb",
+   "insts": [
+    "usb02y",
+    "usb05y",
+    "de10yb",
+    "uk10yb"
+   ],
+   "unit": "R",
+   "role": "replication",
+   "family": "bond month-end",
+   "cls": "cost-blocked (added by name)",
+   "route": "A",
+   "n": 130,
+   "gross": 0.107,
+   "cfdNet": -0.034,
+   "tCfd": -0.81,
+   "tGross": 2.66,
+   "method": "per trade",
+   "tForm": "one equal-weight value a month (mean of the markets that traded), trade t over the months",
+   "gate": {
+    "pass": true,
+    "checks": {
+     "n": true,
+     "gross": true,
+     "net": true,
+     "t": true
+    },
+    "got": {
+     "n": 130,
+     "gross": 0.1069,
+     "net": -0.0336,
+     "t": -0.81
+    },
+    "published": {
+     "n": 130,
+     "gross": 0.107,
+     "net": -0.034,
+     "t": -0.81
+    },
+    "skipped": 0
+   },
+   "trades": 520,
+   "futCost": 0.0301,
+   "futNet": 0.0767,
+   "tFut": 1.9,
+   "fut2x": 0.0466,
+   "t2x": 1.15,
+   "theirs": {
+    "net": 0.089,
+    "t": 2.21,
+    "how": "bond-month-end-replicate's own futures row: one tick a ROUND TRIP"
+   },
+   "stepA": false,
+   "wouldPass": false
+  }
+ ],
+ "primary": {
+  "futures": {
+   "N": 32,
+   "holm05": [],
+   "bh05": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#836 overnight-drift nas100",
+    "#891 index-overnight T2",
+    "#895 index-ibs T2",
+    "#838 rsi2-pullback spx500",
+    "#838 rsi2-pullback us30",
+    "#860 vol-spike-rebound 10-day hold",
+    "#860 vol-spike-rebound 5-day hold",
+    "#857 turnaround-tuesday nas100-r2"
+   ],
+   "bh10": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#878 gotobi T4",
+    "#836 overnight-drift nas100",
+    "#891 index-overnight T2",
+    "#895 index-ibs T2",
+    "#838 rsi2-pullback spx500",
+    "#838 rsi2-pullback us30",
+    "#860 vol-spike-rebound 10-day hold",
+    "#860 vol-spike-rebound 5-day hold",
+    "#857 turnaround-tuesday nas100-r2",
+    "#857 turnaround-tuesday nas100-r1",
+    "#831 pre-fomc-drift spx500"
+   ],
+   "t2": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#836 overnight-drift nas100",
+    "#891 index-overnight T2",
+    "#895 index-ibs T2",
+    "#838 rsi2-pullback spx500",
+    "#838 rsi2-pullback us30",
+    "#860 vol-spike-rebound 10-day hold",
+    "#860 vol-spike-rebound 5-day hold",
+    "#857 turnaround-tuesday nas100-r2"
+   ],
+   "rows": [
+    {
+     "id": "#878 gotobi T1",
+     "t": 0.93,
+     "p": 0.1762,
+     "holm": 1,
+     "bh": 0.2967
+    },
+    {
+     "id": "#878 gotobi T2",
+     "t": 2.74,
+     "p": 0.0031,
+     "holm": 0.0922,
+     "bh": 0.0236
+    },
+    {
+     "id": "#878 gotobi T3",
+     "t": 2.2,
+     "p": 0.0139,
+     "holm": 0.3198,
+     "bh": 0.0445
+    },
+    {
+     "id": "#878 gotobi T4",
+     "t": 1.84,
+     "p": 0.0329,
+     "holm": 0.6906,
+     "bh": 0.0846
+    },
+    {
+     "id": "#910 wmr-fix-reversal T1",
+     "t": -12.45,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#910 wmr-fix-reversal T3",
+     "t": -14.43,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T1",
+     "t": -4.42,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T2",
+     "t": -4.49,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#927 cnh-fix T2",
+     "t": -2.05,
+     "p": 0.9798,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#836 overnight-drift nas100",
+     "t": 2.86,
+     "p": 0.0021,
+     "holm": 0.0657,
+     "bh": 0.0236
+    },
+    {
+     "id": "#836 overnight-drift spx500",
+     "t": -0.07,
+     "p": 0.5279,
+     "holm": 1,
+     "bh": 0.7345
+    },
+    {
+     "id": "#891 index-overnight T1",
+     "t": 0.35,
+     "p": 0.3632,
+     "holm": 1,
+     "bh": 0.5534
+    },
+    {
+     "id": "#891 index-overnight T2",
+     "t": 2.45,
+     "p": 0.0071,
+     "holm": 0.1929,
+     "bh": 0.0345
+    },
+    {
+     "id": "#895 index-ibs T2",
+     "t": 2.68,
+     "p": 0.0037,
+     "holm": 0.1031,
+     "bh": 0.0236
+    },
+    {
+     "id": "#838 rsi2-pullback spx500",
+     "t": 2.43,
+     "p": 0.0075,
+     "holm": 0.1963,
+     "bh": 0.0345
+    },
+    {
+     "id": "#838 rsi2-pullback us30",
+     "t": 2.28,
+     "p": 0.0113,
+     "holm": 0.2826,
+     "bh": 0.0423
+    },
+    {
+     "id": "#860 vol-spike-rebound 10-day hold",
+     "t": 2.95,
+     "p": 0.0016,
+     "holm": 0.0508,
+     "bh": 0.0236
+    },
+    {
+     "id": "#860 vol-spike-rebound 5-day hold",
+     "t": 2.26,
+     "p": 0.0119,
+     "holm": 0.2859,
+     "bh": 0.0423
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r2",
+     "t": 2.72,
+     "p": 0.0033,
+     "holm": 0.0947,
+     "bh": 0.0236
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r1",
+     "t": 1.97,
+     "p": 0.0244,
+     "holm": 0.5372,
+     "bh": 0.071
+    },
+    {
+     "id": "#837 orb-nas100 nas100",
+     "t": 1.69,
+     "p": 0.0455,
+     "holm": 0.8648,
+     "bh": 0.104
+    },
+    {
+     "id": "#837 orb-nas100 spx500",
+     "t": -0.07,
+     "p": 0.5279,
+     "holm": 1,
+     "bh": 0.7345
+    },
+    {
+     "id": "#914 index-midday-turn T2",
+     "t": 1.62,
+     "p": 0.0526,
+     "holm": 0.9471,
+     "bh": 0.1096
+    },
+    {
+     "id": "#867 nr7-breakout B",
+     "t": 0.66,
+     "p": 0.2546,
+     "holm": 1,
+     "bh": 0.4074
+    },
+    {
+     "id": "#831 pre-fomc-drift spx500",
+     "t": 1.82,
+     "p": 0.0344,
+     "holm": 0.6906,
+     "bh": 0.0846
+    },
+    {
+     "id": "#901 cb-days-other pooled five banks",
+     "t": 1.1,
+     "p": 0.1357,
+     "holm": 1,
+     "bh": 0.2554
+    },
+    {
+     "id": "#926 bond-lead-intraday T1",
+     "t": -6.26,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T2",
+     "t": -5.35,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T3",
+     "t": -4.46,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#875 gold-session-drift T2",
+     "t": 1,
+     "p": 0.1587,
+     "holm": 1,
+     "bh": 0.2821
+    },
+    {
+     "id": "#887 eth-btc-ratio test 1",
+     "t": -5.13,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#939 bond-month-end USB10Y",
+     "t": 1.6,
+     "p": 0.0548,
+     "holm": 0.9471,
+     "bh": 0.1096
+    }
+   ]
+  },
+  "cfd": {
+   "N": 32,
+   "holm05": [],
+   "bh05": [],
+   "bh10": [
+    "#878 gotobi T2",
+    "#860 vol-spike-rebound 10-day hold"
+   ],
+   "t2": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#838 rsi2-pullback spx500",
+    "#860 vol-spike-rebound 10-day hold",
+    "#857 turnaround-tuesday nas100-r2"
+   ],
+   "rows": [
+    {
+     "id": "#878 gotobi T1",
+     "t": 0.93,
+     "p": 0.1762,
+     "holm": 1,
+     "bh": 0.3759
+    },
+    {
+     "id": "#878 gotobi T2",
+     "t": 2.74,
+     "p": 0.0031,
+     "holm": 0.0983,
+     "bh": 0.0913
+    },
+    {
+     "id": "#878 gotobi T3",
+     "t": 2.2,
+     "p": 0.0139,
+     "holm": 0.4032,
+     "bh": 0.1112
+    },
+    {
+     "id": "#878 gotobi T4",
+     "t": 1.84,
+     "p": 0.0329,
+     "holm": 0.8221,
+     "bh": 0.1315
+    },
+    {
+     "id": "#910 wmr-fix-reversal T1",
+     "t": -6.01,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#910 wmr-fix-reversal T3",
+     "t": -6.72,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T1",
+     "t": -2.93,
+     "p": 0.9983,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T2",
+     "t": -2.88,
+     "p": 0.998,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#927 cnh-fix T2",
+     "t": -5.54,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#836 overnight-drift nas100",
+     "t": 0.2,
+     "p": 0.4207,
+     "holm": 1,
+     "bh": 0.7086
+    },
+    {
+     "id": "#836 overnight-drift spx500",
+     "t": -1.39,
+     "p": 0.9177,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#891 index-overnight T1",
+     "t": -2.86,
+     "p": 0.9979,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#891 index-overnight T2",
+     "t": -0.84,
+     "p": 0.7995,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#895 index-ibs T2",
+     "t": 1.65,
+     "p": 0.0495,
+     "holm": 1,
+     "bh": 0.1583
+    },
+    {
+     "id": "#838 rsi2-pullback spx500",
+     "t": 2.02,
+     "p": 0.0217,
+     "holm": 0.6074,
+     "bh": 0.1315
+    },
+    {
+     "id": "#838 rsi2-pullback us30",
+     "t": 1.88,
+     "p": 0.0301,
+     "holm": 0.7814,
+     "bh": 0.1315
+    },
+    {
+     "id": "#860 vol-spike-rebound 10-day hold",
+     "t": 2.53,
+     "p": 0.0057,
+     "holm": 0.1768,
+     "bh": 0.0913
+    },
+    {
+     "id": "#860 vol-spike-rebound 5-day hold",
+     "t": 1.96,
+     "p": 0.025,
+     "holm": 0.6749,
+     "bh": 0.1315
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r2",
+     "t": 2.33,
+     "p": 0.0099,
+     "holm": 0.2971,
+     "bh": 0.1056
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r1",
+     "t": 1.23,
+     "p": 0.1093,
+     "holm": 1,
+     "bh": 0.2499
+    },
+    {
+     "id": "#837 orb-nas100 nas100",
+     "t": 1.27,
+     "p": 0.102,
+     "holm": 1,
+     "bh": 0.2499
+    },
+    {
+     "id": "#837 orb-nas100 spx500",
+     "t": -0.79,
+     "p": 0.7852,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#914 index-midday-turn T2",
+     "t": -1.5983,
+     "p": 0.945,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#867 nr7-breakout B",
+     "t": 0.29,
+     "p": 0.3859,
+     "holm": 1,
+     "bh": 0.6861
+    },
+    {
+     "id": "#831 pre-fomc-drift spx500",
+     "t": 1.35,
+     "p": 0.0885,
+     "holm": 1,
+     "bh": 0.236
+    },
+    {
+     "id": "#901 cb-days-other pooled five banks",
+     "t": 1.77,
+     "p": 0.0384,
+     "holm": 0.9207,
+     "bh": 0.1364
+    },
+    {
+     "id": "#926 bond-lead-intraday T1",
+     "t": -3.94,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T2",
+     "t": -3.98,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T3",
+     "t": -2.5,
+     "p": 0.9938,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#875 gold-session-drift T2",
+     "t": 1.37,
+     "p": 0.0853,
+     "holm": 1,
+     "bh": 0.236
+    },
+    {
+     "id": "#887 eth-btc-ratio test 1",
+     "t": 0.682,
+     "p": 0.2476,
+     "holm": 1,
+     "bh": 0.4661
+    },
+    {
+     "id": "#939 bond-month-end USB10Y",
+     "t": 0.77,
+     "p": 0.2206,
+     "holm": 1,
+     "bh": 0.4413
+    }
+   ]
+  }
+ },
+ "withAll": {
+  "futures": {
+   "N": 37,
+   "holm05": [
+    "#889 gotobi-replicate R2 USD/JPY 2005-09"
+   ],
+   "bh05": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#889 gotobi-replicate R2 USD/JPY 2005-09",
+    "#836 overnight-drift nas100",
+    "#891 index-overnight T2",
+    "#895 index-ibs T2",
+    "#838 rsi2-pullback spx500",
+    "#838 rsi2-pullback us30",
+    "#860 vol-spike-rebound 10-day hold",
+    "#860 vol-spike-rebound 5-day hold",
+    "#857 turnaround-tuesday nas100-r2"
+   ],
+   "bh10": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#878 gotobi T4",
+    "#889 gotobi-replicate R2 USD/JPY 2005-09",
+    "#894 gotobi-feed HistData USD/JPY",
+    "#912 gotobi-minute-histdata gotobi T2 on M1",
+    "#836 overnight-drift nas100",
+    "#891 index-overnight T2",
+    "#895 index-ibs T2",
+    "#838 rsi2-pullback spx500",
+    "#838 rsi2-pullback us30",
+    "#860 vol-spike-rebound 10-day hold",
+    "#860 vol-spike-rebound 5-day hold",
+    "#857 turnaround-tuesday nas100-r2",
+    "#857 turnaround-tuesday nas100-r1",
+    "#862 turnaround-replicate pooled",
+    "#837 orb-nas100 nas100",
+    "#914 index-midday-turn T2",
+    "#831 pre-fomc-drift spx500",
+    "#939 bond-month-end USB10Y",
+    "bond-month-end-replicate pool"
+   ],
+   "t2": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#889 gotobi-replicate R2 USD/JPY 2005-09",
+    "#836 overnight-drift nas100",
+    "#891 index-overnight T2",
+    "#895 index-ibs T2",
+    "#838 rsi2-pullback spx500",
+    "#838 rsi2-pullback us30",
+    "#860 vol-spike-rebound 10-day hold",
+    "#860 vol-spike-rebound 5-day hold",
+    "#857 turnaround-tuesday nas100-r2",
+    "#862 turnaround-replicate pooled"
+   ],
+   "rows": [
+    {
+     "id": "#878 gotobi T1",
+     "t": 0.93,
+     "p": 0.1762,
+     "holm": 1,
+     "bh": 0.2716
+    },
+    {
+     "id": "#878 gotobi T2",
+     "t": 2.74,
+     "p": 0.0031,
+     "holm": 0.1044,
+     "bh": 0.0227
+    },
+    {
+     "id": "#878 gotobi T3",
+     "t": 2.2,
+     "p": 0.0139,
+     "holm": 0.3754,
+     "bh": 0.0468
+    },
+    {
+     "id": "#878 gotobi T4",
+     "t": 1.84,
+     "p": 0.0329,
+     "holm": 0.7563,
+     "bh": 0.0755
+    },
+    {
+     "id": "#889 gotobi-replicate R2 USD/JPY 2005-09",
+     "t": 3.88,
+     "p": 0.0001,
+     "holm": 0.0019,
+     "bh": 0.0019
+    },
+    {
+     "id": "#894 gotobi-feed HistData USD/JPY",
+     "t": 1.79,
+     "p": 0.0367,
+     "holm": 0.7713,
+     "bh": 0.0755
+    },
+    {
+     "id": "#912 gotobi-minute-histdata gotobi T2 on M1",
+     "t": 1.79,
+     "p": 0.0367,
+     "holm": 0.7713,
+     "bh": 0.0755
+    },
+    {
+     "id": "#910 wmr-fix-reversal T1",
+     "t": -12.45,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#910 wmr-fix-reversal T3",
+     "t": -14.43,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T1",
+     "t": -4.42,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T2",
+     "t": -4.49,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#927 cnh-fix T2",
+     "t": -2.05,
+     "p": 0.9798,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#836 overnight-drift nas100",
+     "t": 2.86,
+     "p": 0.0021,
+     "holm": 0.0741,
+     "bh": 0.0227
+    },
+    {
+     "id": "#836 overnight-drift spx500",
+     "t": -0.07,
+     "p": 0.5279,
+     "holm": 1,
+     "bh": 0.6976
+    },
+    {
+     "id": "#891 index-overnight T1",
+     "t": 0.35,
+     "p": 0.3632,
+     "holm": 1,
+     "bh": 0.5168
+    },
+    {
+     "id": "#891 index-overnight T2",
+     "t": 2.45,
+     "p": 0.0071,
+     "holm": 0.2214,
+     "bh": 0.0349
+    },
+    {
+     "id": "#895 index-ibs T2",
+     "t": 2.68,
+     "p": 0.0037,
+     "holm": 0.1178,
+     "bh": 0.0227
+    },
+    {
+     "id": "#838 rsi2-pullback spx500",
+     "t": 2.43,
+     "p": 0.0075,
+     "holm": 0.2265,
+     "bh": 0.0349
+    },
+    {
+     "id": "#838 rsi2-pullback us30",
+     "t": 2.28,
+     "p": 0.0113,
+     "holm": 0.3278,
+     "bh": 0.0441
+    },
+    {
+     "id": "#860 vol-spike-rebound 10-day hold",
+     "t": 2.95,
+     "p": 0.0016,
+     "holm": 0.0572,
+     "bh": 0.0227
+    },
+    {
+     "id": "#860 vol-spike-rebound 5-day hold",
+     "t": 2.26,
+     "p": 0.0119,
+     "holm": 0.3335,
+     "bh": 0.0441
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r2",
+     "t": 2.72,
+     "p": 0.0033,
+     "holm": 0.1077,
+     "bh": 0.0227
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r1",
+     "t": 1.97,
+     "p": 0.0244,
+     "holm": 0.6105,
+     "bh": 0.0695
+    },
+    {
+     "id": "#862 turnaround-replicate pooled",
+     "t": 2.03,
+     "p": 0.0212,
+     "holm": 0.5506,
+     "bh": 0.0653
+    },
+    {
+     "id": "#837 orb-nas100 nas100",
+     "t": 1.69,
+     "p": 0.0455,
+     "holm": 0.8648,
+     "bh": 0.0886
+    },
+    {
+     "id": "#837 orb-nas100 spx500",
+     "t": -0.07,
+     "p": 0.5279,
+     "holm": 1,
+     "bh": 0.6976
+    },
+    {
+     "id": "#914 index-midday-turn T2",
+     "t": 1.62,
+     "p": 0.0526,
+     "holm": 0.9471,
+     "bh": 0.0966
+    },
+    {
+     "id": "#867 nr7-breakout B",
+     "t": 0.66,
+     "p": 0.2546,
+     "holm": 1,
+     "bh": 0.3768
+    },
+    {
+     "id": "#831 pre-fomc-drift spx500",
+     "t": 1.82,
+     "p": 0.0344,
+     "holm": 0.7563,
+     "bh": 0.0755
+    },
+    {
+     "id": "#901 cb-days-other pooled five banks",
+     "t": 1.1,
+     "p": 0.1357,
+     "holm": 1,
+     "bh": 0.2282
+    },
+    {
+     "id": "#926 bond-lead-intraday T1",
+     "t": -6.26,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T2",
+     "t": -5.35,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T3",
+     "t": -4.46,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#875 gold-session-drift T2",
+     "t": 1,
+     "p": 0.1587,
+     "holm": 1,
+     "bh": 0.2552
+    },
+    {
+     "id": "#887 eth-btc-ratio test 1",
+     "t": -5.13,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#939 bond-month-end USB10Y",
+     "t": 1.6,
+     "p": 0.0548,
+     "holm": 0.9471,
+     "bh": 0.0966
+    },
+    {
+     "id": "bond-month-end-replicate pool",
+     "t": 1.9,
+     "p": 0.0287,
+     "holm": 0.6892,
+     "bh": 0.0755
+    }
+   ]
+  },
+  "cfd": {
+   "N": 37,
+   "holm05": [
+    "#889 gotobi-replicate R2 USD/JPY 2005-09"
+   ],
+   "bh05": [
+    "#889 gotobi-replicate R2 USD/JPY 2005-09"
+   ],
+   "bh10": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#889 gotobi-replicate R2 USD/JPY 2005-09",
+    "#894 gotobi-feed HistData USD/JPY",
+    "#912 gotobi-minute-histdata gotobi T2 on M1",
+    "#860 vol-spike-rebound 10-day hold",
+    "#857 turnaround-tuesday nas100-r2"
+   ],
+   "t2": [
+    "#878 gotobi T2",
+    "#878 gotobi T3",
+    "#889 gotobi-replicate R2 USD/JPY 2005-09",
+    "#894 gotobi-feed HistData USD/JPY",
+    "#912 gotobi-minute-histdata gotobi T2 on M1",
+    "#838 rsi2-pullback spx500",
+    "#860 vol-spike-rebound 10-day hold",
+    "#857 turnaround-tuesday nas100-r2"
+   ],
+   "rows": [
+    {
+     "id": "#878 gotobi T1",
+     "t": 0.93,
+     "p": 0.1762,
+     "holm": 1,
+     "bh": 0.3431
+    },
+    {
+     "id": "#878 gotobi T2",
+     "t": 2.74,
+     "p": 0.0031,
+     "holm": 0.1106,
+     "bh": 0.0568
+    },
+    {
+     "id": "#878 gotobi T3",
+     "t": 2.2,
+     "p": 0.0139,
+     "holm": 0.431,
+     "bh": 0.0735
+    },
+    {
+     "id": "#878 gotobi T4",
+     "t": 1.84,
+     "p": 0.0329,
+     "holm": 0.8879,
+     "bh": 0.1106
+    },
+    {
+     "id": "#889 gotobi-replicate R2 USD/JPY 2005-09",
+     "t": 3.8,
+     "p": 0.0001,
+     "holm": 0.0027,
+     "bh": 0.0027
+    },
+    {
+     "id": "#894 gotobi-feed HistData USD/JPY",
+     "t": 2.34,
+     "p": 0.0096,
+     "holm": 0.3278,
+     "bh": 0.0611
+    },
+    {
+     "id": "#912 gotobi-minute-histdata gotobi T2 on M1",
+     "t": 2.34,
+     "p": 0.0096,
+     "holm": 0.3278,
+     "bh": 0.0611
+    },
+    {
+     "id": "#910 wmr-fix-reversal T1",
+     "t": -6.01,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#910 wmr-fix-reversal T3",
+     "t": -6.72,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T1",
+     "t": -2.93,
+     "p": 0.9983,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#921 ecb-ref-fix T2",
+     "t": -2.88,
+     "p": 0.998,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#927 cnh-fix T2",
+     "t": -5.54,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#836 overnight-drift nas100",
+     "t": 0.2,
+     "p": 0.4207,
+     "holm": 1,
+     "bh": 0.6768
+    },
+    {
+     "id": "#836 overnight-drift spx500",
+     "t": -1.39,
+     "p": 0.9177,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#891 index-overnight T1",
+     "t": -2.86,
+     "p": 0.9979,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#891 index-overnight T2",
+     "t": -0.84,
+     "p": 0.7995,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#895 index-ibs T2",
+     "t": 1.65,
+     "p": 0.0495,
+     "holm": 1,
+     "bh": 0.1307
+    },
+    {
+     "id": "#838 rsi2-pullback spx500",
+     "t": 2.02,
+     "p": 0.0217,
+     "holm": 0.6507,
+     "bh": 0.1003
+    },
+    {
+     "id": "#838 rsi2-pullback us30",
+     "t": 1.88,
+     "p": 0.0301,
+     "holm": 0.8415,
+     "bh": 0.1106
+    },
+    {
+     "id": "#860 vol-spike-rebound 10-day hold",
+     "t": 2.53,
+     "p": 0.0057,
+     "holm": 0.1996,
+     "bh": 0.0611
+    },
+    {
+     "id": "#860 vol-spike-rebound 5-day hold",
+     "t": 1.96,
+     "p": 0.025,
+     "holm": 0.7249,
+     "bh": 0.1028
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r2",
+     "t": 2.33,
+     "p": 0.0099,
+     "holm": 0.3278,
+     "bh": 0.0611
+    },
+    {
+     "id": "#857 turnaround-tuesday nas100-r1",
+     "t": 1.23,
+     "p": 0.1093,
+     "holm": 1,
+     "bh": 0.2248
+    },
+    {
+     "id": "#862 turnaround-replicate pooled",
+     "t": 1.69,
+     "p": 0.0455,
+     "holm": 1,
+     "bh": 0.1295
+    },
+    {
+     "id": "#837 orb-nas100 nas100",
+     "t": 1.27,
+     "p": 0.102,
+     "holm": 1,
+     "bh": 0.2221
+    },
+    {
+     "id": "#837 orb-nas100 spx500",
+     "t": -0.79,
+     "p": 0.7852,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#914 index-midday-turn T2",
+     "t": -1.5983,
+     "p": 0.945,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#867 nr7-breakout B",
+     "t": 0.29,
+     "p": 0.3859,
+     "holm": 1,
+     "bh": 0.649
+    },
+    {
+     "id": "#831 pre-fomc-drift spx500",
+     "t": 1.35,
+     "p": 0.0885,
+     "holm": 1,
+     "bh": 0.2047
+    },
+    {
+     "id": "#901 cb-days-other pooled five banks",
+     "t": 1.77,
+     "p": 0.0384,
+     "holm": 0.9975,
+     "bh": 0.1183
+    },
+    {
+     "id": "#926 bond-lead-intraday T1",
+     "t": -3.94,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T2",
+     "t": -3.98,
+     "p": 1,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#926 bond-lead-intraday T3",
+     "t": -2.5,
+     "p": 0.9938,
+     "holm": 1,
+     "bh": 1
+    },
+    {
+     "id": "#875 gold-session-drift T2",
+     "t": 1.37,
+     "p": 0.0853,
+     "holm": 1,
+     "bh": 0.2047
+    },
+    {
+     "id": "#887 eth-btc-ratio test 1",
+     "t": 0.682,
+     "p": 0.2476,
+     "holm": 1,
+     "bh": 0.4363
+    },
+    {
+     "id": "#939 bond-month-end USB10Y",
+     "t": 0.77,
+     "p": 0.2206,
+     "holm": 1,
+     "bh": 0.4082
+    },
+    {
+     "id": "bond-month-end-replicate pool",
+     "t": -0.81,
+     "p": 0.791,
+     "holm": 1,
+     "bh": 1
+    }
+   ]
+  }
+ },
+ "in333": {
+  "N": 333,
+  "replaced": 31,
+  "notInFamily": [
+   "#901 cb-days-other pooled five banks"
+  ],
+  "holm05": [],
+  "bh05": [],
+  "bh10": [],
+  "bonferroniT": 3.62
+ },
+ "families": [
+  {
+   "family": "gotobi",
+   "tests": 8,
+   "noRoute": 1,
+   "recostedFamily": 4,
+   "stepA": 3,
+   "wouldPass": 3,
+   "zFut": 3.86,
+   "pFut": 0.0001,
+   "zCfd": 3.86,
+   "pCfd": 0.0001,
+   "replications": [
+    {
+     "id": "#889 gotobi-replicate R2 USD/JPY 2005-09",
+     "tFut": 3.88
+    },
+    {
+     "id": "#894 gotobi-feed HistData USD/JPY",
+     "tFut": 1.79
+    },
+    {
+     "id": "#912 gotobi-minute-histdata gotobi T2 on M1",
+     "tFut": 1.79
+    }
+   ],
+   "holmFut": 0.0007,
+   "holmCfd": 0.0007,
+   "survives": true
+  },
+  {
+   "family": "weekend gap",
+   "tests": 4,
+   "noRoute": 4,
+   "recostedFamily": 0,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": null,
+   "pFut": null,
+   "zCfd": null,
+   "pCfd": null,
+   "replications": []
+  },
+  {
+   "family": "London opening range",
+   "tests": 2,
+   "noRoute": 2,
+   "recostedFamily": 0,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": null,
+   "pFut": null,
+   "zCfd": null,
+   "pCfd": null,
+   "replications": []
+  },
+  {
+   "family": "FX fixes",
+   "tests": 5,
+   "noRoute": 0,
+   "recostedFamily": 5,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": -16.92,
+   "pFut": 1,
+   "zCfd": -10.77,
+   "pCfd": 1,
+   "replications": [],
+   "holmFut": 1,
+   "holmCfd": 1,
+   "survives": false
+  },
+  {
+   "family": "index overnight",
+   "tests": 4,
+   "noRoute": 0,
+   "recostedFamily": 4,
+   "stepA": 2,
+   "wouldPass": 0,
+   "zFut": 2.79,
+   "pFut": 0.0026,
+   "zCfd": -2.44,
+   "pCfd": 0.9928,
+   "replications": [],
+   "holmFut": 0.0156,
+   "holmCfd": 1,
+   "survives": true
+  },
+  {
+   "family": "index short-term reversal",
+   "tests": 8,
+   "noRoute": 0,
+   "recostedFamily": 7,
+   "stepA": 7,
+   "wouldPass": 7,
+   "zFut": 6.54,
+   "pFut": 0,
+   "zCfd": 5.14,
+   "pCfd": 0,
+   "replications": [
+    {
+     "id": "#862 turnaround-replicate pooled",
+     "tFut": 2.03
+    }
+   ],
+   "holmFut": 0,
+   "holmCfd": 0,
+   "survives": true
+  },
+  {
+   "family": "index intraday breakout and momentum",
+   "tests": 4,
+   "noRoute": 0,
+   "recostedFamily": 4,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": 1.95,
+   "pFut": 0.0256,
+   "zCfd": -0.41,
+   "pCfd": 0.6606,
+   "replications": [],
+   "holmFut": 0.1024,
+   "holmCfd": 1,
+   "survives": false
+  },
+  {
+   "family": "scheduled-event drift",
+   "tests": 2,
+   "noRoute": 0,
+   "recostedFamily": 2,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": 2.06,
+   "pFut": 0.0195,
+   "zCfd": 2.21,
+   "pCfd": 0.0137,
+   "replications": [],
+   "holmFut": 0.0975,
+   "holmCfd": 0.0822,
+   "survives": false
+  },
+  {
+   "family": "cross-asset lead and session drift",
+   "tests": 5,
+   "noRoute": 0,
+   "recostedFamily": 5,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": -9.03,
+   "pFut": 1,
+   "zCfd": -3.74,
+   "pCfd": 0.9999,
+   "replications": [],
+   "holmFut": 1,
+   "holmCfd": 1,
+   "survives": false
+  },
+  {
+   "family": "bond month-end",
+   "tests": 2,
+   "noRoute": 0,
+   "recostedFamily": 1,
+   "stepA": 0,
+   "wouldPass": 0,
+   "zFut": 1.6,
+   "pFut": 0.0548,
+   "zCfd": 0.77,
+   "pCfd": 0.2206,
+   "replications": [
+    {
+     "id": "bond-month-end-replicate pool",
+     "tFut": 1.9
+    }
+   ],
+   "holmFut": 0.1644,
+   "holmCfd": 1,
+   "survives": false
+  }
+ ]
+}
