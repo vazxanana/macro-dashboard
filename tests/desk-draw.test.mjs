@@ -88,3 +88,14 @@ test('flat Charts toolbar (19 Nov 2026): no box around the groups, a Draw button
   assert.match(phone, /#v-charts\[data-tools\] \.sec-h > \.ch-one\.ch-one/, 'the open tools rules sit in the phone block, not the narrow-phone one');
   assert.match(page, /tg\.className = 'ch-tools-tog'; tg\.id = 'ms-ch-tools-tog'/);
 });
+
+test('each chart chooses its own timeframe (19 Nov 2026): a menu in the chart header, the layout slot changed for that chart only, the phone header and the shared rows go', () => {
+  const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  assert.match(page, /window\.msLaySet = \(i, t\) =>/);
+  const js = page.slice(page.indexOf('// ─── Each chart chooses its own timeframe'), page.indexOf('// ─── Keyboard: 1–6'));
+  assert.match(js, /t\.className = 'ph-tf'/); assert.match(js, /m\.className = 'ph-mk'/);
+  assert.match(js, /if \(v === 'lay' && window\.msLayState\)/, 'in the layout the menu changes that chart only');
+  assert.doesNotMatch(js, /fetch\(|\.stop\s*=/);
+  assert.match(page, /html:not\(\[data-role="public"\]\)\[data-view="charts"\] #v-charts \.sec-h > :is\(h2, #ms-wl, \.seg\[aria-label="Chart view"\]\) \{ display: none !important; \}/);
+  assert.match(page, /\.brand \.mk-list \.mk-n \{ display: grid !important; \}/, 'the phone market list shows its names');
+});
