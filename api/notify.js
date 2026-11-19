@@ -3,13 +3,11 @@
 //   GET  /api/notify                       signed in -> { items: [{ id, at, title, body }] } newest first (last 50)
 //   POST /api/notify { title, body }       owner session only -> the new item; { remove: id } deletes one
 // Stored privately in the Blob store as notices/list.json (100 kept). Read/unread is kept per browser and account (localStorage).
-//   GET  /api/notify?job=daily             the Worker's 10-minute cron (Bearer CRON_SECRET), 19 Nov 2026: once the day's two
-//        reports (council-data macro/daily-report.json, council/daily-report.mjs) reach their 06:30 London publish time, posts ONE
-//        notice for that day (id `daily-<day>`, `perm: 'macro'`, `link`). A notice with `perm` is shown only to accounts that have
-//        that permission (owner: all; a member: unless `perms.macro === false`, the role defaults give macro to every role).
+// 19 Nov 2026: api/daily.js posts ONE notice a day for the daily reports (`dailyNotice`: id `daily-<day>`, `perm: 'macro'`, `link`).
+// A notice with `perm` is shown only to accounts that have that permission (owner: all; a member: unless `perms.macro === false`,
+// the role defaults give macro to every role).
 const S = require('./_session.js');
-const G = require('./_guard.js');
-const DAILY_LATE = 18 * 3600e3;   // a report found more than 18 h after its publish time is not announced (the next day's will be)
+const DAILY_LATE = 3 * 3600e3;   // a report found more than 3 h after its publish time is not announced (a late build never wakes everyone)
 // effective permission of a signed-in account, as the page's msPerms reads it (only macro is used today)
 function allowed(acct, perm) { if (!perm) return true; if (!acct) return false; if (acct.u === 'owner') return true;
   const P = acct.perms && typeof acct.perms === 'object' ? acct.perms : {}; return P[perm] !== false; }
@@ -40,18 +38,6 @@ async function handle(req, res, d = {}) {
   const env = d.env || process.env; res.setHeader('Cache-Control', 'private, no-store');
   if (!env.BLOB_READ_WRITE_TOKEN && !d.store) return res.status(503).json({ error: 'storage not set up' });
   const store = d.store || blobStore(env), who = d.who || ((r) => S.fromRequest(r, env, S.defaultDeps(env), { cacheMs: 60e3 }));
-  const q = req.query || {};
-  if (q.job === 'daily') {
-    if (!G.bearerOk(req.headers && req.headers.authorization, env.CRON_SECRET)) return res.status(401).json({ error: 'unauthorised' });
-    try {
-      const read = d.readFile || require('./data.js').readFile, f = await read('macro/daily-report.json', env);
-      if (!f || !f.ok) return res.status(200).json({ ok: true, posted: false, why: 'no report file' });
-      let file; try { file = JSON.parse(f.buf.toString('utf8')); } catch (e) { return res.status(200).json({ ok: true, posted: false, why: 'report does not parse' }); }
-      const list = await store.get(), item = dailyNotice(file, list, d.now || Date.now());
-      if (!item) return res.status(200).json({ ok: true, posted: false });
-      await store.put(list.concat(item).slice(-KEEP)); return res.status(200).json({ ok: true, posted: item.id });
-    } catch (e) { return res.status(500).json({ error: 'daily notice failed' }); }
-  }
   try {
     if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });
     if (req.method === 'POST' && !(d.sameOrigin || S.sameOrigin)(req)) return res.status(403).json({ error: 'not allowed' });

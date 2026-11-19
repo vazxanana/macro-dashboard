@@ -125,11 +125,15 @@ export function buildReports({ fc, vet, cache, cot, snap, now }) {
     dataAt: { strategist: (fc && fc.at) || null, veteran: (vet && vet.at) || null, cot: (cot && cot.at) || null }, note: NOTE,
     world: worldReport({ fc, vet, cal: C, now }), markets: marketsReport({ fc, vet, cot, snap, now }) };
 }
-// whether this round should build: from 06:00 London, once per London day (force rebuilds)
+// whether this round should build: once per London day from 06:00; a day's report built before 06:00 (the very first file is built
+// at once, whatever the hour, so there is something to read and test) is built again from 06:00 with that morning's data
 export function due(file, now, force = false) {
-  const L = london(now); if (L.h < BUILD_FROM) return false;
+  const L = london(now), reps = (file && file.reports) || [];
   if (force) return true;
-  return !((file && file.reports) || []).some((r) => r.day === L.day);
+  if (!reps.length) return true;
+  if (L.h < BUILD_FROM) return false;
+  const r = reps.find((x) => x.day === L.day); if (!r) return true;
+  const b = london(Date.parse(r.builtAt) / 1000); return b.day === L.day && b.h < BUILD_FROM;
 }
 export function merge(file, rep) { return { v: 1, at: rep.builtAt, label: 'Daily reports: world economy and markets, 06:30 London', reports: [rep, ...((file && file.reports) || []).filter((r) => r.day !== rep.day)].slice(0, KEEP) }; }
 

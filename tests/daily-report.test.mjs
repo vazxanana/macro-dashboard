@@ -27,9 +27,13 @@ test('London clock, the 06:30 publish time in both seasons, when to build', () =
   assert.deepEqual(london(T('2026-11-20T06:30:00Z')).h, 6);
   assert.equal(new Date(londonAt('2026-11-20', 6, 30) * 1000).toISOString(), '2026-11-20T06:30:00.000Z');   // GMT
   assert.equal(new Date(londonAt('2026-07-01', 6, 30) * 1000).toISOString(), '2026-07-01T05:30:00.000Z');   // BST
-  assert.equal(due(null, T('2026-11-20T05:59:00Z')), false); assert.equal(due(null, T('2026-11-20T06:00:00Z')), true);
-  assert.equal(due({ reports: [{ day: '2026-11-20' }] }, T('2026-11-20T08:00:00Z')), false);
-  assert.equal(due({ reports: [{ day: '2026-11-20' }] }, T('2026-11-20T08:00:00Z'), true), true);
+  assert.equal(due(null, T('2026-11-20T01:00:00Z')), true);                                          // the first file: built at once
+  const at6 = { reports: [{ day: '2026-11-19', builtAt: '2026-11-19T07:00:00Z' }] };
+  assert.equal(due(at6, T('2026-11-20T05:59:00Z')), false); assert.equal(due(at6, T('2026-11-20T06:00:00Z')), true);
+  const early = { reports: [{ day: '2026-11-20', builtAt: '2026-11-20T00:40:00Z' }] };
+  assert.equal(due(early, T('2026-11-20T05:00:00Z')), false); assert.equal(due(early, T('2026-11-20T06:01:00Z')), true);   // rebuilt with the morning's data
+  assert.equal(due({ reports: [{ day: '2026-11-20', builtAt: '2026-11-20T06:05:00Z' }] }, T('2026-11-20T08:00:00Z')), false);
+  assert.equal(due({ reports: [{ day: '2026-11-20', builtAt: '2026-11-20T06:05:00Z' }] }, T('2026-11-20T08:00:00Z'), true), true);
   let f = null; for (let i = 0; i < KEEP + 3; i++) f = merge(f, { day: '2026-11-' + String(i + 1).padStart(2, '0'), builtAt: 'x' });
   assert.equal(f.reports.length, KEEP); assert.equal(f.reports[0].day, '2026-11-17');
 });
@@ -60,27 +64,20 @@ test('the notice: once a day, from 06:30, macro accounts only', async () => {
   const it = N.dailyNotice(file, [], Date.parse('2026-11-20T06:30:05Z'));
   assert.equal(it.id, 'daily-2026-11-20'); assert.equal(it.perm, 'macro'); assert.equal(it.link, '/macro-desk#s-daily'); assert.match(it.body, /^World economy: W lead\nMarkets: M lead$/);
   assert.equal(N.dailyNotice(file, [it], Date.parse('2026-11-20T06:40:00Z')), null);
-  assert.equal(N.dailyNotice(file, [], Date.parse('2026-11-21T01:00:00Z')), null);   // over 18 h late: not announced
+  assert.equal(N.dailyNotice(file, [], Date.parse('2026-11-20T09:31:00Z')), null);   // over 3 h late: not announced
   assert.equal(N.allowed({ u: 'owner' }, 'macro'), true); assert.equal(N.allowed({ u: 'luxus', perms: {} }, 'macro'), true);
   assert.equal(N.allowed({ u: 'carlos', perms: { macro: false } }, 'macro'), false); assert.equal(N.allowed(null, 'macro'), false);
   const mk = () => ({ code: 0, body: null, headers: {}, setHeader() {}, status(c) { this.code = c; return this; }, json(b) { this.body = b; return this; } });
-  let list = [{ id: 'a', at: '2026-11-19T10:00:00Z', title: 'Hello' }];
-  const store = { get: async () => list, put: async (l) => { list = l; } }, env = { CRON_SECRET: 's'.repeat(24), BLOB_READ_WRITE_TOKEN: 'x' };
-  const readFile = async () => ({ ok: true, buf: Buffer.from(JSON.stringify(file)) });
-  let res = mk(); await N.handle({ method: 'GET', query: { job: 'daily' }, headers: {} }, res, { env, store, readFile, now: Date.parse('2026-11-20T06:30:05Z') });
-  assert.equal(res.code, 401);
-  res = mk(); await N.handle({ method: 'GET', query: { job: 'daily' }, headers: { authorization: 'Bearer ' + env.CRON_SECRET } }, res, { env, store, readFile, now: Date.parse('2026-11-20T06:30:05Z') });
-  assert.equal(res.body.posted, 'daily-2026-11-20'); assert.equal(list.length, 2);
-  res = mk(); await N.handle({ method: 'GET', query: { job: 'daily' }, headers: { authorization: 'Bearer ' + env.CRON_SECRET } }, res, { env, store, readFile, now: Date.parse('2026-11-20T06:40:05Z') });
-  assert.equal(res.body.posted, false); assert.equal(list.length, 2);
+  const list = [{ id: 'a', at: '2026-11-19T10:00:00Z', title: 'Hello' }, { ...it }];
+  const store = { get: async () => list, put: async () => {} }, env = { BLOB_READ_WRITE_TOKEN: 'x' };
   for (const [who, n] of [[{ u: 'owner' }, 2], [{ u: 'fred', perms: {} }, 2], [{ u: 'carlos', perms: { macro: false } }, 1]]) {
-    res = mk(); await N.handle({ method: 'GET', query: {}, headers: {} }, res, { env, store, who: async () => who }); assert.equal(res.body.items.length, n, who.u); }
+    const res = mk(); await N.handle({ method: 'GET', query: {}, headers: {} }, res, { env, store, who: async () => who }); assert.equal(res.body.items.length, n, who.u); }
 });
 
 test('wiring: the loop, the Worker chain, the bell link, the Macro desk section, data health', () => {
   const rd = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
   assert.match(rd('.github/workflows/council.yml'), /timeout 30 node council\/daily-report\.mjs data \|\| echo/);
-  assert.match(rd('cloudflare/src/worker.mjs'), /'\/api\/notify\?job=daily'/);
+  assert.match(rd('cloudflare/src/worker.mjs'), /'\/api\/daily\?job=daily'/); assert.match(rd('cloudflare/src/worker.mjs'), /import daily from '\.\.\/\.\.\/api\/daily\.js'/);
   const ms = rd('market-structure.html'); assert.ok(ms.includes('nt-go') && ms.includes("/^\\/[\\w\\-./#?=&]*$/.test(x.link)"));
   const md = rd('macro-desk.html'); assert.ok(md.includes('id="s-daily"') && md.includes("get('macro/daily-report.json')") && md.includes('renderDaily(dr)') && md.includes('href="#s-daily"'));
   assert.ok(rd('council/datahealth.mjs').includes("file: 'macro/daily-report.json'"));
