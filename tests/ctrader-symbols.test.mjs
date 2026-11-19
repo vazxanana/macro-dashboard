@@ -247,7 +247,7 @@ test('watch list: the yen pairs are recorded under `watch` (spread fields, commi
 test('watch list: nothing outside ctrader-symbols.mjs and yen-spread.mjs reads it, and the symbols script sends no trading message', () => {
   const seen = [];
   for (const d of ['council', 'api', 'ict']) for (const f of fs.readdirSync(new URL(`../${d}/`, import.meta.url))) {
-    if (!/\.(mjs|js)$/.test(f) || (d === 'council' && /^(ctrader-symbols|yen-spread)\.mjs$/.test(f))) continue;
+    if (!/\.(mjs|js)$/.test(f) || (d === 'council' && /^(ctrader-symbols|yen-spread)\.mjs$/.test(f)) || (d === 'api' && f === 'signup.js')) continue;   // signup.js: the sign-up answer's own `watch` code, not the yen watch list
     const src = fs.readFileSync(new URL(`../${d}/${f}`, import.meta.url), 'utf8').replace(/\bW\.watch\b/g, '');   // the Trader's own gold MP watch list
     seen.push(f);
     assert.doesNotMatch(src, /\.watch\b|\[['"]watch['"]\]|yen-spread|\bWATCH\b[^\n]*ctrader-symbols/, `${d}/${f}`);
