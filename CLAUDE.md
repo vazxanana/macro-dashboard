@@ -5108,6 +5108,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   positive in both windows and 40 of 40 placebos beaten, so a faint tilt, not an edge. GBP/JPY alone clears its checks (+0.050R,
   t 2.63, Holm p 0.020), CHF/JPY loses. By the pre-registered reading USD/JPY's result stands alone (one market of eleven); its
   forward record is the judge. Nothing live changed.
+- `yen-gold` (pre-registered 20 Nov 2026): the macro skill's "falling USD/JPY helps gold": a 4-week USD/JPY move over 2 %, then
+  gold's next 20 sessions (OANDA daily, 1,013 weeks 2007-26). **FAIL, 0 of 2**: yen strong t 0.96 (gold +0.9 % vs +0.5 % on all
+  weeks), yen weak t −0.91; both the claimed way, halves agree in sign, neither close. A faint lean at most; the Gold Macro Score
+  and the driver stack's carry row are unchanged. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
