@@ -75,9 +75,21 @@ function glance(rep) {
   return out.slice(0, 6);
 }
 // today's calendar: "07:00 · United Kingdom · Retail Sales m/m · expected 0.0%, previous -0.4%"
+// A high-impact row is written "High · 13:30 · …" by the report (20 Nov 2026: such rows were left out, so the day's main release
+// was missing from the list): it is kept and marked `hi`. Over AGENDA rows the high-impact ones stay, in time order.
+const AGENDA = 8, NOTES = 6;
+const calRow = (l) => { const p = String(l).split(' · '), hi = p[0] === 'High'; if (hi) p.shift(); return /^\d\d:\d\d$/.test(p[0]) ? { at: p[0], where: p[1] || '', what: p[2] || '', more: p.slice(3).join(' · '), ...(hi ? { hi: true } : {}) } : null; };
 function agenda(rep) {
+  const s = secOf(rep.world, /^Today/), all = ((s && s.lines) || []).map(calRow).filter(Boolean);
+  if (all.length <= AGENDA) return all;
+  const keep = new Set([...all.filter((e) => e.hi), ...all.filter((e) => !e.hi)].slice(0, AGENDA));
+  return all.filter((e) => keep.has(e));
+}
+// the Today lines that are not calendar rows (20 Nov 2026: the nowcast before a US inflation print, the Fed's own events, the
+// Treasury's auctions, "no release today"): shown under the calendar as "Also today", never as a release with a time pill
+function todayNotes(rep) {
   const s = secOf(rep.world, /^Today/);
-  return ((s && s.lines) || []).map((l) => { const p = l.split(' · '); return /^\d\d:\d\d$/.test(p[0]) ? { at: p[0], where: p[1] || '', what: p[2] || '', more: p.slice(3).join(' · ') } : null; }).filter(Boolean).slice(0, 8);
+  return ((s && s.lines) || []).filter((l) => !calRow(l)).slice(0, NOTES);
 }
 // plain words for the VIX tile's note, and a short "What the words mean" box for the market terms the email uses
 const plainNote = (n) => (/elevated|high/i.test(n || '') ? 'higher than usual: markets are nervous' : /low|calm/i.test(n || '') ? 'low: markets are calm' : n || '');
@@ -92,7 +104,13 @@ const WORDS = [
   [/percentile|CFTC|Speculators/, 'Positioning (CFTC)', 'A weekly US report on how big traders are betting. "Bottom of the 3-year range" = they hold fewer bets on it rising than at almost any time in three years.'],
   [/Macro Score/, 'Gold Macro Score', 'Our own score of whether interest rates and the dollar are helping gold. Only above +0.25 does it count as help.'],
   [/m\/m/, 'm/m', 'Change from the month before.'],
-  [/basis point|\bbp\b/, 'bp (basis point)', 'One hundredth of a percent: 80 bp = 0.80%.'],
+  [/basis point|\bbps?\b|\dbps?\b/, 'bp (basis point)', 'One hundredth of a percent: 80 bp = 0.80%. A "25 bp hike" is interest rates going up by a quarter of a percent.'],
+  [/nowcast/i, 'Nowcast', 'A running estimate, made by a formula at a branch of the US central bank, of a figure that has not been published yet (here: last month\'s US inflation). It can miss.'],
+  [/\bPCE\b/, 'PCE', 'A measure of how fast prices are rising for US households; the one the US central bank watches most. "Core" leaves out food and energy.'],
+  [/GDPNow/, 'GDPNow', 'A running estimate, from the Atlanta branch of the US central bank, of how fast the US economy is growing this quarter. It changes as new figures come in.'],
+  [/Kalshi|Polymarket|Prediction market/i, 'Prediction markets (Kalshi, Polymarket)', 'Websites where people bet money on what will happen, such as the next interest-rate decision. The prices show what the bettors think is likely; they can be wrong.'],
+  [/Beige Book/, 'Beige Book', 'The US central bank\'s own report on how business is doing around the country, published eight times a year.'],
+  [/Treasury .{0,40}auction/, 'Treasury auction', 'The US government selling new debt to investors. When few want to buy, interest rates tend to rise.'],
 ];
 function glossary(rep, brief) {
   const all = JSON.stringify([rep.world, rep.markets, brief || null]);
@@ -101,14 +119,14 @@ function glossary(rep, brief) {
 function emailOf(rep, brief, o = {}) {
   const day = dayLabel(rep), link = SITE + 'macro-desk#s-daily', test = o.test ? 'Test · ' : '';
   const subject = `${test}Morning note · ${day}`;
-  const G = glance(rep), A = agenda(rep);
+  const G = glance(rep), A = agenda(rep), TN = todayNotes(rep);
   const lean = (g) => (g.p == null ? '' : g.p > g.base ? 'a little more likely up than usual' : g.p < g.base ? 'a little less likely up than usual' : 'as likely up as usual');
   const nameOf = (g) => (g.name === 'VIX' ? 'Fear gauge (VIX)' : g.name);
   // ---- plain text ----
   const sec = (r) => (r.sections || []).map((s) => `${s.h}\n${(s.lines || []).map((l) => '  • ' + l).join('\n')}`).join('\n\n');
   const sumT = brief ? `SUMMARY\n${brief.headline ? brief.headline + '\n' : ''}${(brief.points || [brief.world, brief.markets]).map((x) => '  • ' + x).join('\n')}\n\n` : '';
   const glT = G.length ? `PRICES THIS MORNING\n${G.map((g) => `  • ${nameOf(g)} ${g.px}${g.move ? ` · usually moves about ${g.move}% a day · ${g.p}% chance it ends today higher (normally ${g.base}%)` : g.note ? ` (${plainNote(g.note)})` : ''}`).join('\n')}\n\n` : '';
-  const agT = A.length ? `COMING OUT TODAY (London time)\n${A.map((e) => `  • ${e.at}  ${e.where}: ${e.what}${e.more ? ' (' + e.more + ')' : ''}`).join('\n')}\n\n` : '';
+  const agT = A.length ? `COMING OUT TODAY (London time)\n${A.map((e) => `  • ${e.at}  ${e.where}: ${e.what}${e.more ? ' (' + e.more + ')' : ''}${e.hi ? ' · key release' : ''}`).join('\n')}\n\n` : '';
   const text = `${subject}\n\n${sumT}${glT}${agT}WORLD ECONOMY\n${rep.world.lead}\n\n${sec(rep.world)}\n\nMARKETS\n${rep.markets.lead}\n\n${sec(rep.markets)}${glossary(rep, brief).length ? '\n\nWHAT THE WORDS MEAN\n' + glossary(rep, brief).map((x) => `  • ${x.w}: ${x.m}`).join('\n') : ''}\n\nThe full notes on the Macro desk: ${link}\n\nThe Aureum Desk\n\n${NOTE}`;
   // ---- HTML (tables and inline styles only: mail apps) ----
   const label = (t, st = '') => `<p style="margin:0 0 10px;font:700 11px/1.4 ${F};color:${INK3};letter-spacing:.08em;text-transform:uppercase;${st}">${esc(t)}</p>`;
@@ -126,10 +144,11 @@ function emailOf(rep, brief, o = {}) {
   const rows = []; for (let i = 0; i < G.length; i += 3) rows.push(`<tr>${G.slice(i, i + 3).map(tile).join('')}${'<td width="33%"></td>'.repeat(Math.max(0, 3 - G.slice(i, i + 3).length))}</tr>`);
   const glH = G.length ? `<tr><td style="padding:0 0 24px">${label('Prices this morning')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 -4px">${rows.join('')}</table>`
     + `<p style="margin:8px 0 0;font:12px/1.5 ${F};color:${INK3}">"Chance up" is how likely the price is to end today higher than it started; "normally" is how often that happens on an ordinary day. Green: a bit more likely than usual; red: a bit less.</p></td></tr>` : '';
-  const agH = A.length ? `<tr><td style="padding:0 0 26px">${label('Coming out today · London time')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
+  const agH = A.length || TN.length ? `<tr><td style="padding:0 0 26px">${label('Coming out today · London time')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
     + A.map((e) => `<tr><td valign="top" width="62" style="padding:0 0 10px"><span style="display:inline-block;padding:3px 8px;border-radius:6px;background:${INK};font:700 12px/1.4 ${F};color:#ffffff">${esc(e.at)}</span></td>`
-      + `<td style="padding:1px 0 10px;font:14px/1.5 ${F};color:${INK}"><b>${esc(e.what)}</b> <span style="color:${INK3}">· ${esc(e.where)}</span>${e.more ? `<br><span style="font-size:13px;color:${INK2}">${esc(e.more)}</span>` : ''}</td></tr>`).join('')
-    + `</table></td></tr>` : '';
+      + `<td style="padding:1px 0 10px;font:14px/1.5 ${F};color:${INK}"><b>${esc(e.what)}</b> <span style="color:${INK3}">· ${esc(e.where)}</span>${e.hi ? ` <span style="font:700 11px/1.4 ${F};color:${DN};white-space:nowrap">· key release</span>` : ''}${e.more ? `<br><span style="font-size:13px;color:${INK2}">${esc(e.more)}</span>` : ''}</td></tr>`).join('')
+    + `</table>`
+    + (TN.length ? `<p style="margin:${A.length ? 6 : 0}px 0 6px;font:600 13px/1.4 ${F};color:${INK3}">Also today</p>${bullets(TN, `font-size:14px;color:${INK2}`)}` : '') + `</td></tr>` : '';
   const W = glossary(rep, brief);
   const wordsH = W.length ? `<tr><td style="padding:22px 0 0;border-top:1px solid ${LINE}">${label('What the words mean')}`
     + W.map((x) => `<p style="margin:0 0 9px;font:14px/1.5 ${F};color:${INK2}"><b style="color:${INK}">${esc(x.w)}</b> &mdash; ${esc(x.m)}</p>`).join('') + `</td></tr>` : '';
@@ -157,4 +176,4 @@ function emailOf(rep, brief, o = {}) {
   return { subject, text, html };
 }
 
-module.exports = { recipients, briefRequest, parseBrief, emailOf, glance, agenda, glossary, MAX_TO, SYSTEM, mail };
+module.exports = { recipients, briefRequest, parseBrief, emailOf, glance, agenda, todayNotes, glossary, MAX_TO, SYSTEM, mail };
