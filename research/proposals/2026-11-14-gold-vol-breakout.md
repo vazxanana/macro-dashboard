@@ -13,6 +13,12 @@ own quotes at every UTC hour (44 weekdays) put gold's spread at $0.07-0.10 in As
 +0.105R a trade on 2021-26 (month t 2.79) and +0.139R pooled 2007-26 (t 6.47; past years charged today's relative spread).
 What a forward demo record would now measure first is the stop-order slippage, the one cost still assumed.
 
+**Update 20 Nov 2026, later (`gold-vol-breakout-exec`):** the stop-order slippage is measured too. T1 filled at the demo
+broker's own ticks over 24 Nov 2023 - 12 Nov 2026 (first tick across the trigger and the stop, the last quote before 21:00 UTC)
+made **+0.184R a trade after commission, n 572, month t 3.54** (PASS on its pre-registered bar), against +0.192R on OANDA mid
+before costs; entry slippage $0.07 median (0.011R). These years are in sample for the rule, the ten best trades carry 55 % of the
+total and 2024 was +0.07R. The cost questions are closed; the open one is the forward record (item 62).
+
 ## In plain words
 
 1. **One gold rule replicated.** Of the 44 gold studies of 13-14 Nov, this intraday breakout is the only rule that is

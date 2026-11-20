@@ -4935,3 +4935,7 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   +0.163R a trade over 211 gotobi days, month t 1.80 (FAIL on its bar; the cost no longer threatens the study's result).
 - `fx-weekend-gap-exec`: the Sunday reopen costs about 11 pips of spread at Rule G's entry minute, and on 237 of 488 weekends
   this broker was not quoting yet; on the rest Rule G nets +0.165R (month t 1.52, FAIL). Not tradable as written on this account.
+- `gold-vol-breakout-exec`: T1 filled at the broker's own ticks (first tick across the trigger / stop, the last quote before
+  21:00 UTC), 24 Nov 2023 - 12 Nov 2026: **PASS**, +0.184R a trade after commission, n 572, month t 3.54 (OANDA mid +0.192R before
+  costs); entry slippage $0.07 median, 0.011R. In-sample years (not new evidence); the ten best trades carry 55 %, 2024 +0.07R.
+  21:00 UTC is gold's daily break on US summer-time days: the probe's marks take `PROBE_MARKS_BACK` (workflow input `marks_back`).

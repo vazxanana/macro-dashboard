@@ -73,8 +73,12 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     const st = { n: filled.length, notFilled: rows.length - filled.length, net: r4(mean(rows.map((x) => x.net))), netFilled: r4(mean(filled.map((x) => x.net))), monthT: r4(monthT(rows)),
       oandaGross: r4(mean(rows.map((x) => x.R))), stops: filled.filter((x) => x.b.how === 'stop').length, oandaStops: rows.filter((x) => x.how === 'stop').length };
     const slip = { entry$: { median: r4(med(slE)), mean: r4(mean(slE)), p90: r4(pct(slE, 0.9)) }, entryR: r4(mean(filled.map((x) => x.b.slipE / x.b.r))), stop$: { median: r4(med(slX)), mean: r4(mean(slX)), p90: r4(pct(slX, 0.9)) } };
+    // descriptive, reported beside the verdict (not part of the bar): by year, by side, and how much the ten best trades carry
+    const grp = (f) => { const o = {}; for (const x of filled) (o[f(x)] = o[f(x)] || []).push(x.net); return Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { n: v.length, net: r4(mean(v)) }])); };
+    const best = filled.map((x) => x.net).sort((p, q) => q - p), tot = best.reduce((u, v) => u + v, 0);
+    const split = { byYear: grp((x) => x.day.slice(0, 4)), bySide: grp((x) => (x.side > 0 ? 'buy' : 'sell')), top10Share: r4(best.slice(0, 10).reduce((u, v) => u + v, 0) / tot), netWithoutTop10: r4(mean(best.slice(10))) };
     const verdict = st.n < N_MIN ? `TOO FEW (${st.n} filled)` : st.net > 0 && st.monthT >= 2 ? 'PASS' : 'FAIL';
-    const out = { study: 'gold-vol-breakout-exec', built: new Date().toISOString().slice(0, 10), probe: { at: P.at, commit: commit || null }, window: [FROM, TO], exitAge: { max: X_AGE, median: r4(med(ages)), p90: r4(pct(ages, 0.9)), over120: ages.filter((x) => x > 120).length }, skipped, stats: st, slip,
+    const out = { study: 'gold-vol-breakout-exec', built: new Date().toISOString().slice(0, 10), probe: { at: P.at, commit: commit || null }, window: [FROM, TO], exitAge: { max: X_AGE, median: r4(med(ages)), p90: r4(pct(ages, 0.9)), over120: ages.filter((x) => x > 120).length }, skipped, stats: st, slip, split,
       verdict: `${verdict}: T1 filled at the demo broker's ticks, ${FROM} → ${TO}: ${st.net}R a trade net (n ${rows.length}, ${st.n} filled; month t ${st.monthT}); entry slippage $${slip.entry$.median} median ($${slip.entry$.mean} mean), ${slip.entryR}R` };
     fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1));
     console.log(out.verdict); console.log(JSON.stringify({ st, slip, skipped }));
