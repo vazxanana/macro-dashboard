@@ -5025,6 +5025,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - `nas-vol-breakout-early` (pre-registered 20 Nov 2026): T1 on NAS100 at the measured C1 cost on untouched 2010-2015 (OANDA M5).
   **FAIL**: −0.011R a trade net (n 1,110, month t −0.28; gross +0.001R), 2013-15 −0.026R, 30 of 40 placebos beaten. The 2016-26
   +0.043R does not replicate: the breakout is gold's, not an index rule. Do not test it on another index.
+- `fx-vol-breakout` (pre-registered 20 Nov 2026): T1 on six forex majors (OANDA M5 2016-26) at the demo's cost (commission
+  0.000045 of price + 0.5 pip). **FAIL**: pooled −0.022R a trade net (n 12,664, month t −1.59; gross +0.012R). USD/JPY alone
+  passes its checks (+0.063R, t 2.50, Holm p 0.043, 40 of 40 placebos): by the pre-registration a hypothesis for its own test on
+  other data, not an edge. The breakout is gold's. Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
