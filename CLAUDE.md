@@ -3156,6 +3156,26 @@ covers the day; null = say nothing). `besideNowcast` puts the Cleveland Fed nowc
 same print" / "the model and the traders differ"). Probe 4 (taken out after use) found no open Kalshi series for PPI, retail sales,
 headline PCE, JOLTS or the ECB.
 
+## Your plan for the week, and the source scorecard (20 Nov 2026, owner: "make it in a way I'm able to use all of our work for the next weeks to increase accuracy")
+`council/game-plan.mjs` (pure; imports `jsonio.mjs` only). (1) `planOf(days, hd)` -> `week-ahead.json` `plan { routine, cards, note }`:
+one card per US release of a known type (the day's rows of one type share a card, core first; a row from the council's own schedule
+stands for the core figure): **Before** = what each source says (calendar consensus, Cleveland Fed nowcast, a prediction market's
+most likely print, `sourcesOf`), whether they agree or differ, the Red folder record's above / below line, "Check the date" when
+the agency's calendar lacks it; **At the print** = the tested facts for that type (`FACTS`: `red-folder-surprise` 60 of 83 first
+five minutes with the miss and the failed chase, CPI / NFP; `gold-release-quotes` spread about 18x at T+5 s, CPI / NFP / FOMC;
+constants a test compares with each result.json), else "no test of the first minutes exists"; **After** = the type's median gold day
+move, the day's typical range, and where the print gets compared. `ROUTINE` = six fixed steps (Sunday, each morning, the evening
+before, at the print, after the close, Friday) with where each is on the site. (2) **Source scorecard**, council-data
+`macro/source-record.json` (append-only; `capture` / `resolve` / `score` / `updateFile`, run by `veteran.mjs` `run()` after the prep
+record -> `week-ahead.json` `sources`): per m/m CPI / PCE row still to come (id `<type>:<month>:<core|headline>`), each source's
+figure written the FIRST time it is seen before the release with its own time (`at.<source>`), never edited; after the release the
+first print on the nowcast file is attached once with each source's miss (`err`), whether it had the exact one-decimal print
+(`exact`) and which was `closest`. `score`: under `MIN_SCORE` 10 scored "too few to judge", else each source's mean miss and
+exact count; "a forward record, not a tested edge". Only CPI / PCE resolve (the nowcast file carries their prints; it keeps three
+months). Macro desk: fold `#wa-plan` "Your plan for the week" (open, first in the Week ahead card; cards, the scorecard's line,
+the routine in its own fold; every string as text). No rule, size, call or trade reads either; never call a source "accurate"
+before the scorecard has its 10. `datahealth.mjs` lists the file. Test: `tests/game-plan.test.mjs`.
+
 ## Nowcast against consensus: a forward record (20 Nov 2026)
 `council/prep-record.mjs` (pure + `updateFile`; run by `veteran.mjs` `run()` right after the Week ahead is built → council-data
 `macro/prep-record.json` `{ v, label, records }`, append-only, written only on a change; a file that does not parse is never

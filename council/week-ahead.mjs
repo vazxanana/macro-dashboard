@@ -8,6 +8,7 @@
 // readings of the owner's rule book that are on now (veteran.json `research`).
 // Display only: it fetches nothing, forecasts nothing new, and no rule, size, call or trade reads it. A study that FAILED is
 // listed as tested and failed, so it is not chased; a PASS is never called an edge here (its own headline says what it is).
+import { planOf } from './game-plan.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { EVENTS } from './events.mjs';
@@ -412,5 +413,7 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
     label: 'Week ahead: a plan from the calendar, the Red folder record, the tested calendar rules and the desk\'s levels. Not advice, not a forecast; paper only.',
     lines, days, frame, calls, calNote,
     // 20 Nov 2026: the hard-to-find data as titled groups with their source and date (hard-sources.mjs `board`)
-    hard: board(hd, { goldPx: fc && fc.assets && fc.assets.gold ? Number(fc.assets.gold.last) : null }) };
+    hard: board(hd, { goldPx: fc && fc.assets && fc.assets.gold ? Number(fc.assets.gold.last) : null }),
+    // 20 Nov 2026: the week as a plan to follow (game-plan.mjs): a routine, and a before / at / after card per top US release
+    plan: planOf(days, hd) };
 }
