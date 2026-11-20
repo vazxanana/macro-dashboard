@@ -2942,6 +2942,22 @@ now starts in 2018 and keeps 120 rows a type (the desk shows 18, then "Show all"
 council's own captures of November 2026. A calendar consensus, not a verified survey.
 Tests: `tests/redfolder.test.mjs`.
 
+## Week ahead (20 Nov 2026, owner: "focus on improving the macro and fundamental so next week we can smash the markets")
+`council/week-ahead.mjs` (pure + run from `veteran.mjs` `run()` after the Red folder study → council-data `macro/week-ahead.json`; a
+failure writes nothing). The coming trading week day by day: from Friday (New York date) on, next Monday to Friday, else the rest
+of this week (`weekOf`). Per day: US market holidays and early closes (`ict/calendar.mjs` `cmeYear`; `nyseHoliday` = CME's full
+holidays plus the named ones CME only shortens), the releases (`releasesOf`: the strategist's calendar `cache.cal`, high impact any
+currency + US medium of the Red folder types; the council's own schedule `council/events.mjs` fills what the calendar lacks, so the
+big US releases show before Forex Factory publishes next week), each US release with its Red folder record (`recordOf`: median gold
+move, up share, above / below consensus from `macro/redfolder.json`), and the calendar rules the desk has TESTED (`RULES`:
+gold-pre-holiday, post-holiday-metals, gotobi, turnaround-tuesday-forward, gold-turn-of-month) with their own study's verdict and
+headline (`research-ledger.mjs` `studyRow`) and the forward record's latest reading (`research/forward/<x>.json`). A failed study
+is listed as "Tested: failed" so it is not chased; a pass is never called an edge. The frame: Gold Macro Score (a negative score is
+not a sell), regime, the veteran's levels and month call, the rule book's readings that are on, and the week's dated calls once
+issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
+as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
+`tests/week-ahead.test.mjs`.
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss

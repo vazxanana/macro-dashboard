@@ -1,0 +1,212 @@
+// Week ahead (20 Nov 2026, owner: "focus on improving the macro and fundamental so next week we can smash the markets").
+// One plan for the coming trading week, day by day, from what the council already has: the economic calendar the strategist read
+// (macro/cache.json `cal`, Forex Factory; next week's file appears over the weekend), the council's own release schedule
+// (council/events.mjs, so the big US releases are known before that file is out), the Red folder study's record of how gold
+// reacted to each kind of release (macro/redfolder.json), US market holidays and early closes (ict/calendar.mjs), the calendar
+// rules the council has TESTED (each with its own study's verdict and headline, research-ledger.mjs `studyRow`, and the latest
+// forward reading where one runs), and the frame: the Gold Macro Score, the regime, the veteran's levels and calls, and the
+// readings of the owner's rule book that are on now (veteran.json `research`).
+// Display only: it fetches nothing, forecasts nothing new, and no rule, size, call or trade reads it. A study that FAILED is
+// listed as tested and failed, so it is not chased; a PASS is never called an edge here (its own headline says what it is).
+import fs from 'node:fs';
+import path from 'node:path';
+import { EVENTS } from './events.mjs';
+import { cmeYear, nyParts } from '../ict/calendar.mjs';
+import { isGotobi } from './gotobi-calendar.mjs';
+import { readStudy, studyRow, EDGE_DIR } from './research-ledger.mjs';
+
+const DAY = 86400;
+const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const ymdOf = (t) => nyParts(t).ymd;
+const addD = (ymd, n) => new Date(Date.parse(ymd + 'T12:00:00Z') + n * DAY * 1000).toISOString().slice(0, 10);
+const dowOf = (ymd) => new Date(ymd + 'T12:00:00Z').getUTCDay();
+const weekday = (ymd) => { const w = dowOf(ymd); return w >= 1 && w <= 5; };
+
+// The week the plan covers: Monday to Friday of the coming week from Friday on (New York date: Friday and the weekend prepare
+// the next week), else the rest of this week (today to Friday).
+export function weekOf(now) {
+  const p = nyParts(now), w = dowOf(p.ymd);
+  const next = w === 6 || w === 0 || w === 5;
+  const from = next ? addD(p.ymd, w === 6 ? 2 : w === 0 ? 1 : 3) : p.ymd;
+  const to = addD(from, 5 - dowOf(from));
+  return { from, to, next };
+}
+
+// NYSE full holidays (the gold-pre-holiday study's set): CME's full holidays plus the named holidays CME only shortens.
+const NOT_NYSE = /eve|after thanksgiving/i;
+export function nyseHoliday(ymd) {
+  const Y = cmeYear(+ymd.slice(0, 4));
+  if (Y.full.has(ymd)) return Y.full.get(ymd);
+  const e = Y.early.get(ymd); return e && !NOT_NYSE.test(e.name) ? e.name : null;
+}
+export function marketNote(ymd) {
+  const Y = cmeYear(+ymd.slice(0, 4)), h = nyseHoliday(ymd);
+  if (h) return { kind: 'holiday', text: `${h}: US stock markets are closed; CME futures (gold, indices) trade a short session and halt early. Thin trading: moves can be jumpy and fade.` };
+  const e = Y.early.get(ymd);
+  if (e) return { kind: 'early', text: `${e.name}: US markets close early (stocks 13:00 New York, CME gold and indices about ${Math.floor(e.published / 60)}:${String(e.published % 60).padStart(2, '0')}). Thin trading.` };
+  return null;
+}
+const tradingDay = (ymd) => weekday(ymd) && !nyseHoliday(ymd);
+const prevTrading = (ymd) => { let d = addD(ymd, -1); while (!tradingDay(d)) d = addD(d, -1); return d; };
+const nextTrading = (ymd) => { let d = addD(ymd, 1); while (!tradingDay(d)) d = addD(d, 1); return d; };
+
+// Release title -> Red folder type (US releases only).
+export function typeOf(title, country) {
+  if (country && country !== 'USD') return null;
+  const s = String(title || '');
+  if (/\bPPI\b|Producer Price/i.test(s)) return 'PPI';
+  if (/\bPCE\b|Personal Income|Core PCE/i.test(s)) return 'PCE';
+  if (/\bCPI\b|Consumer Price/i.test(s)) return 'CPI';
+  if (/Non-?Farm|\bNFP\b|Employment Situation/i.test(s)) return 'NFP';
+  if (/FOMC|Federal Funds Rate/i.test(s)) return 'FOMC';
+  if (/Retail Sales/i.test(s)) return 'RETAIL';
+  if (/ISM Manufacturing/i.test(s)) return 'ISM';
+  if (/\bGDP\b/i.test(s)) return 'GDP';
+  return null;
+}
+
+// The releases of the week: the calendar's high-impact events (all currencies) and the US medium ones of the Red folder types,
+// then the council's own schedule for what the calendar does not hold yet (tier 1 and 2), each placed on its New York day.
+export function releasesOf(cal, from, to) {
+  const out = [], seen = [];
+  const inWeek = (t) => { const d = ymdOf(t); return d >= from && d <= to ? d : null; };
+  for (const e of Array.isArray(cal) ? cal : []) {
+    const t = +e.at; if (!Number.isFinite(t)) continue;
+    const day = inWeek(t); if (!day) continue;
+    const type = typeOf(e.title, e.country), hi = /high/i.test(e.impact || '');
+    if (!hi && !(type && /medium/i.test(e.impact || ''))) continue;
+    out.push({ day, t, title: String(e.title || '').slice(0, 80), country: e.country, impact: hi ? 'high' : 'medium', type,
+      exp: e.forecast || null, prev: e.previous || null, src: 'calendar' });
+    seen.push({ t, type, title: e.title });
+  }
+  for (const e of EVENTS) {
+    const day = inWeek(e.t); if (!day || (e.tier !== 1 && e.tier !== 2 && e.tier !== 'cb')) continue;
+    const type = typeOf(e.title, e.country);
+    const dup = seen.some((s) => Math.abs(s.t - e.t) <= 3600 && (type ? s.type === type : String(s.title).toLowerCase().includes(e.type.toLowerCase().slice(0, 4))));
+    if (dup) continue;
+    out.push({ day, t: e.t, title: e.title, country: e.country, impact: e.tier === 1 || e.tier === 'cb' ? 'high' : 'medium', type,
+      exp: null, prev: null, src: 'schedule' });
+  }
+  return out.sort((a, b) => a.t - b.t || (a.impact === 'high' ? -1 : 1));
+}
+
+// The calendar rules the council has tested: when each one applies, and what its study found (its own words).
+export const RULES = [
+  { topic: 'gold-pre-holiday', forward: 'gold-pre-holiday', when: (d) => tradingDay(d) && !!nyseHoliday(nextDay(d)) && 'the last trading day before a US market holiday',
+    what: 'Long gold from the 17:00 New York open to that day\'s close, stop 1 ATR.' },
+  { topic: 'post-holiday-metals', when: (d) => tradingDay(d) && !!nyseHoliday(prevWeekday(d)) && 'the first trading day after a US market holiday',
+    what: 'Shorting gold and silver the day after a US holiday was tested.' },
+  { topic: 'gotobi', when: (d) => weekday(d) && isGotobi(d) && 'a gotobi day (a Tokyo settlement day: the 5th, 10th, 15th, 20th, 25th or 30th)',
+    what: 'Sell USD/JPY at 00:55 UTC, buy back at 06:00 UTC (the demo account runs it).' },
+  { topic: 'turnaround-tuesday-forward', forward: 'turnaround-tuesday', when: (d) => dowOf(d) === 2 && tradingDay(d) && 'a Tuesday',
+    what: 'Only if the Nasdaq 100 fell more than 1% on Monday: buy Monday\'s close, out at Tuesday\'s close or the stop.' },
+  { topic: 'gold-turn-of-month', when: (d) => turnOfMonth(d) && 'the last two and first three trading days of a month',
+    what: 'Long gold from two trading days before the month ends to three after.' },
+];
+const nextDay = (d) => { let x = addD(d, 1); while (!weekday(x)) x = addD(x, 1); return x; };
+const prevWeekday = (d) => { let x = addD(d, -1); while (!weekday(x)) x = addD(x, -1); return x; };
+export function turnOfMonth(d) {
+  if (!tradingDay(d)) return false;
+  const m = d.slice(0, 7), nextFirst = addD(`${m}-01`, 40).slice(0, 7) + '-01';
+  const last = prevTrading(nextFirst), last2 = prevTrading(last);
+  let f1 = `${m}-01`; while (!tradingDay(f1)) f1 = addD(f1, 1);
+  const f2 = nextTrading(f1), f3 = nextTrading(f2);
+  return [last2, last, f1, f2, f3].includes(d);
+}
+
+// The study's own verdict and headline (cached per run), and the forward record's latest reading when one runs.
+export function ruleRecord(topic, dataDir, edgeDir = EDGE_DIR, forward = null) {
+  let row = null; try { row = studyRow(readStudy(edgeDir, topic)); } catch (e) {}
+  let fwd = null;
+  if (forward && dataDir) {
+    try { const j = JSON.parse(fs.readFileSync(path.join(dataDir, 'research', 'forward', forward + '.json'), 'utf8'));
+      fwd = { reading: j.reading || null, verdict: j.verdict || null, n: Number.isFinite(j.n) ? j.n : null, dataEnd: j.dataEnd || null }; } catch (e) {}
+  }
+  return row ? { verdict: row.verdict, headline: row.headline, link: 'edge-lab.html#' + topic, forward: fwd } : null;
+}
+
+const pct = (x) => (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2) + '%';
+// What the Red folder record says for one release type, in one or two plain lines.
+export function recordOf(rf, type) {
+  const s = rf && rf.study && rf.study[type]; if (!s || !s.stats || !s.stats.n) return null;
+  const st = s.stats, lines = [`Gold moved a median ±${st.absMed}% on the day of the last ${st.n} (since ${String(st.from).slice(0, 4)}), up ${Math.round(st.upShare * 100)}% of the time.`];
+  if (st.above && st.below && st.above.n >= 10 && st.below.n >= 10) lines.push(`Above the consensus gold averaged ${pct(st.above.gold)} (n ${st.above.n}); below it ${pct(st.below.gold)} (n ${st.below.n}).`);
+  else if (st.rose && st.fell && st.rose.n >= 10 && st.fell.n >= 10) lines.push(`Higher than the release before: gold averaged ${pct(st.rose.gold)} (n ${st.rose.n}); lower: ${pct(st.fell.gold)} (n ${st.fell.n}).`);
+  return { name: s.name, n: st.n, absMed: st.absMed, upShare: st.upShare, lines, prep: (s.prep || []).filter((l) => /know the side|chase/i.test(l)).slice(0, 1) };
+}
+
+const money = (x) => '$' + Math.round(x).toLocaleString('en-US');
+// The frame of the week: one place for the numbers the desk already shows elsewhere.
+export function frameOf(fc, v) {
+  const g = fc && fc.goldScore, r = fc && fc.regime, sum = v && v.summary, out = { lines: [] };
+  if (g && Number.isFinite(g.score)) {
+    out.score = { score: g.score, label: g.label || g.bias || null, asOf: g.asOf || null };
+    out.lines.push(`Gold Macro Score ${g.score > 0 ? '+' : ''}${g.score}: ${g.label || g.bias}. ${g.score > 0.25 ? 'The tested score leans to buying gold.' : 'The tested score gives no buy lean; a negative score is not a sell (no short edge was found).'}`);
+  }
+  if (r && r.label) { out.regime = r.label; out.lines.push(`Regime: ${r.label}${Number.isFinite(r.vix) ? ` (VIX ${r.vix})` : ''}.`); }
+  const L = sum && sum.levels;
+  if (L && Number.isFinite(L.px)) {
+    out.levels = { px: L.px, asOf: L.asOf || null, above: L.above || null, below: L.below || null };
+    const a = L.above, b = L.below;
+    out.lines.push(`Gold near ${money(L.px)}${L.asOf ? ` (as of the ${L.asOf} close)` : ''}${a ? `; watch ${money(a.price)} above (${a.label})` : ''}${b ? ` and ${money(b.price)} below (${b.label})` : ''}.`);
+  }
+  if (sum && sum.bias && Number.isFinite(sum.bias.p)) {
+    const B = sum.bias; out.bias = { lean: B.lean, p: B.p, base: B.base, by: B.by, confidence: B.confidence || null };
+    out.lines.push(`The veteran's month call: ${Math.round(B.p * 100)}% that gold is higher by ${B.by} against a base rate of ${Math.round(B.base * 100)}% (${B.lean === 'against' ? 'leans against gold' : B.lean === 'supportive' ? 'leans for gold' : 'neutral'}, confidence ${B.confidence || 'n/a'}).`);
+  }
+  const rs = v && v.research && Array.isArray(v.research.items) ? v.research.items : [];
+  out.rulebook = rs.filter((i) => Array.isArray(i.readings) && i.readings.some((x) => x.on)).slice(0, 5).map((i) => ({ k: i.k, text: i.text, caveat: i.caveat || null }));
+  return out;
+}
+
+// The calls for the week, only when the recorded ones fall due inside it (they are re-issued once a week).
+function callsOf(v, from, to) {
+  const w = v && v.outlook && v.outlook.week; if (!w || !Array.isArray(w.list)) return { list: [], note: null };
+  if (!(w.by >= from && w.by <= addD(to, 2))) return { list: [], note: 'The veteran issues the week\'s dated calls with his first run of the week; they appear here once issued.' };
+  return { list: w.list.filter((c) => !/stretch/i.test(c.claim)).slice(0, 4).map((c) => ({ claim: c.claim, p: c.p, base: c.baseP })), note: null };
+}
+
+// One sentence a day: what matters most that day, in plain words.
+function dayLine(d) {
+  const hi = d.releases.filter((r) => r.impact === 'high');
+  const us = hi.filter((r) => r.country === 'USD');
+  const parts = [];
+  if (d.market && d.market.kind === 'holiday') parts.push('US markets closed');
+  else if (d.market && d.market.kind === 'early') parts.push('early close');
+  if (us.length) parts.push(us.map((r) => r.title.replace(/\s*\(.*\)$/, '')).filter((x, i, a) => a.indexOf(x) === i).slice(0, 3).join(', '));
+  else if (hi.length) parts.push(hi.slice(0, 2).map((r) => `${r.country} ${r.title}`).join(', '));
+  if (!parts.length) parts.push('no major release scheduled');
+  return parts.join(' · ');
+}
+
+// The plan: { at, from, to, next, days: [...], frame, calls, lines, note }.
+export function build({ now, cal, rf, fc, v, dataDir = null, edgeDir = EDGE_DIR }) {
+  const W = weekOf(now), days = [], recs = new Map();
+  const rec = (rule) => { if (!recs.has(rule.topic)) recs.set(rule.topic, ruleRecord(rule.topic, dataDir, edgeDir, rule.forward)); return recs.get(rule.topic); };
+  const rel = releasesOf(cal, W.from, W.to);
+  for (let d = W.from; d <= W.to; d = addD(d, 1)) {
+    if (!weekday(d)) continue;
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null }));
+    const rules = [];
+    for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
+    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules };
+    day.line = dayLine(day); days.push(day);
+  }
+  const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
+  const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));
+  const busiest = days.slice().sort((a, b) => b.releases.filter((r) => r.impact === 'high').length - a.releases.filter((r) => r.impact === 'high').length)[0];
+  const lines = [];
+  const closed = days.filter((d) => d.market && d.market.kind === 'holiday'), early = days.filter((d) => d.market && d.market.kind === 'early');
+  if (closed.length || early.length) lines.push(`A short week: ${[...closed.map((d) => `US markets closed ${d.dow}`), ...early.map((d) => `early close ${d.dow}`)].join(', ')}. Expect thin trading around ${closed.length ? 'the holiday' : 'the early close'}.`);
+  if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
+  else lines.push('No top-tier US release is scheduled on the files read so far.');
+  if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);
+  const tested = days.filter((d) => d.rules.some((r) => r.verdict === 'pass')).map((d) => `${d.dow} (${d.rules.filter((r) => r.verdict === 'pass').map((r) => r.when).join('; ')})`);
+  if (tested.length) lines.push(`Calendar rules the desk has tested that passed their bar: ${tested.join(', ')}. Paper only, each with its own forward record: not proven.`);
+  const failed = days.filter((d) => d.rules.some((r) => r.verdict === 'fail')).map((d) => d.dow);
+  if (failed.length) lines.push(`Rules tested and failed also fall on ${failed.join(', ')}: listed there so they are not chased.`);
+  const calNote = (W.next && !rel.some((r) => r.src === 'calendar')) ? 'Next week\'s economic calendar is not published yet (it usually appears over the weekend): the big US releases come from the council\'s own schedule, without consensus figures for now.' : null;
+  return { v: 1, at: new Date(now * 1000).toISOString().replace(/\.\d+Z$/, 'Z'), from: W.from, to: W.to, next: W.next,
+    label: 'Week ahead: a plan from the calendar, the Red folder record, the tested calendar rules and the desk\'s levels. Not advice, not a forecast; paper only.',
+    lines, days, frame, calls, calNote };
+}
