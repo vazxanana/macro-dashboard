@@ -140,6 +140,14 @@ test('sanity bands and cross-file checks: prices, yields, VIX, P(up), score, spo
   // a live open trade with its stop on the wrong side pages; the same on a shadow trade is a warning; a repeated id pages
   r = checkFiles(world(NOW, { 'trades.json': [{ id: 'a', market: 'xau', side: 'buy', status: 'open', entry: 3990, stop: 4010 }, { id: 'b', market: 'xau', side: 'sell', status: 'pending', entry: 3990, stop: 3980, shadow: true }, { id: 'a', status: 'loss' }] }), NOW);
   assert.deepEqual(issues(r, 'trades.json').map((x) => x.sev + ' ' + x.detail.split(' (')[0]), ['bad 1 trade id recorded twice', 'bad 1 live open trade with impossible levels', 'warn 1 shadow trade with impossible levels']);
+  // 20 Nov 2026: an open trade whose stop moved past its entry (trail, break-even) is fine when r0 says what it opened with;
+  // a stop further away than that opening risk is flagged (rule 1), and a pending order keeps the strict side check
+  r = checkFiles(world(NOW, { 'trades.json': [{ id: 'c', market: 'xau', side: 'sell', status: 'open', entry: 3770.85, stop: 3768.445, r0: 125.16, shadow: true },
+    { id: 'd', market: 'xau', side: 'buy', status: 'open', entry: 3990, stop: 3994, r0: 12 }] }), NOW);
+  assert.deepEqual(issues(r, 'trades.json'), []);
+  r = checkFiles(world(NOW, { 'trades.json': [{ id: 'e', market: 'xau', side: 'buy', status: 'open', entry: 3990, stop: 3960, r0: 12 },
+    { id: 'f', market: 'xau', side: 'sell', status: 'pending', entry: 3990, stop: 3980, r0: 10, shadow: true }] }), NOW);
+  assert.deepEqual(issues(r, 'trades.json').map((x) => x.sev + ' ' + x.detail), ['bad 1 live open trade with impossible levels (e: stop 3960 is further from the entry than the opening risk 12)', 'warn 1 shadow trade with impossible levels (f: sell stop not over the entry)']);
   r = checkFiles(world(NOW, { 'config.json': { ...W['config.json'], minRR: 0, btAt: iso(NOW - 40 * 3600) } }), NOW);
   assert.deepEqual(issues(r, 'config.json').map((x) => x.sev), ['bad', 'warn']);
   r = checkFiles(world(NOW, { 'analysis/latest.md': '<!-- macro:start -->\nx\n' }), NOW);
