@@ -183,6 +183,11 @@ jobs:
             # only) says whether ict/replay.json is over 20 h old with no replay run active or started in the last 6 h; only then
             # main's ict-replay.yml is dispatched (its own concurrency group: never two at once). Not sure = no. Never fails the round.
             if timeout 45 node council/replay-due.mjs data; then timeout 30 gh workflow run ict-replay.yml --ref main -R "${{ github.repository }}" || echo "ICT replay not dispatched after round $i (a later round retries)"; fi
+            # Gotobi trigger (20 Nov 2026): the gotobi job must be running before 00:55 UTC on a gotobi morning; GitHub's own cron can be
+            # late and the Worker's timer has no token. council/gotobi-due.mjs (read only) says yes on a gotobi weekday 00:25-00:49 UTC
+            # when no gotobi run is active or started in the last hour; then main's gotobi.yml is dispatched (its concurrency group
+            # keeps one run). Never fails the round.
+            if timeout 30 node council/gotobi-due.mjs; then timeout 30 gh workflow run gotobi.yml --ref main -R "${{ github.repository }}" || echo "Gotobi not dispatched after round $i (a later round retries)"; fi
             if newcode; then echo "New council code on main: handing over after round $i"; break; fi
             if [ "$i" -lt "$ROUNDS" ]; then
               for k in 1 2 3 4; do sleep 60
