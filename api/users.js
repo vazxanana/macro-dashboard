@@ -15,6 +15,7 @@ const crypto = require('node:crypto');
 const A = require('./_accounts');
 const S = require('./_session');
 const G = require('./_guard');
+const SEEN = require('./_seen');
 const OWNER_HASH = A.OWNER_HASH;
 const isOwner = (pw) => !!pw && String(pw).length <= 200 && crypto.timingSafeEqual(Buffer.from(A.sha(pw)), Buffer.from(OWNER_HASH));   // constant time
 const tok = (env) => env.BLOB_READ_WRITE_TOKEN;
@@ -85,7 +86,8 @@ async function handle(req, res, d = {}) {
     if (req.method === 'GET') {
       const acct = await S.fromRequest(req, env, deps); if (!acct) return res.status(401).json({ error: 'sign in first' });
       const data = await load();
-      if (acct.u === 'owner') return res.status(200).json({ users: A.stripHashes(data.users), builtins: A.stripHashes(d.builtIns || A.builtInUsers()), updated: data.updated || null });
+      if (acct.u === 'owner') { const seen = await SEEN.read(env, d.seen || {});   // when each account was last on the site (owner only; null = unreadable)
+        return res.status(200).json({ users: A.stripHashes(data.users), builtins: A.stripHashes(d.builtIns || A.builtInUsers()), updated: data.updated || null, seen }); }
       const { u, ...own } = acct; return res.status(200).json({ users: { [u]: own } });
     }
     if (req.method !== 'POST') return res.status(405).json({ error: 'GET or POST' });

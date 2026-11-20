@@ -568,6 +568,14 @@ so both phone views are the page as they were (390 px: same blocks, numbers and 
 The shell's desktop order rules now read `#v-home .hs-more-b > …`. First screen as the owner at 1440 px: 13 blocks / 64 numbers
 before, 4 / 15 after (1024 px: 11 / 52 → 4 / 15); load CLS about 0.01-0.03. Test: `tests/home-simple.test.mjs`.
 
+## Last seen on the Users page (20 Nov 2026, owner: "when last time users been online")
+`api/_seen.js`: `touch(env, key, now)` writes `{ <account key>: ISO time }` to the private store file `presence/seen.json`
+(overwritten in place, read with `cache=0`; at most one write an account per 5 minutes per instance; every failure swallowed, so
+sign-in and pages never wait on it). Called by `/api/me` (each page load of a signed-in member) and `/api/login` after the account
+is checked. Only the owner's `GET /api/users` returns `seen` (null = unreadable). Stores the account key and a time only: no IP,
+device or page. Page: `window.msSeenText` under each name (`.u-nm` / `.u-seen`): "Online now" (under 5 min), "Last seen 3 h ago
+(20 Nov, 07:22)", or "Not seen since 20 Nov 2026" (nothing recorded before this feature). Test: `tests/last-seen.test.mjs`.
+
 ## Users page (6 Nov 2026)
 
 Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (server side, `api/_accounts.js`; their public records

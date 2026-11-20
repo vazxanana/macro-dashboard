@@ -350,7 +350,7 @@ test('wiring: the binding and aliases, the switch loads before any handler, the 
 test('coverage: the api/ modules use only list, put and del of @vercel/blob, with options the D1 store takes, and store no blob URL', () => {
   const files = fs.readdirSync('api').filter((f) => /\.m?js$/.test(f)).filter((f) => fs.readFileSync(`api/${f}`, 'utf8').includes("require('@vercel/blob')"));
   // 15 until 17 Nov 2026; run.js, status.js (runner reports), tv-webhook.js and _alerts.js (price alerts) were removed
-  assert.equal(files.length, 13, files.join(' '));   // 13 since 17 Nov 2026: api/passkey.js (Face ID sign-in), signup.js (sign-up requests, reset tokens)
+  assert.equal(files.length, 14, files.join(' '));   // 13 since 17 Nov 2026: api/passkey.js (Face ID sign-in), signup.js (sign-up requests, reset tokens); 14 since 20 Nov: _seen.js (last seen)
   const used = new Set(), opts = new Set();
   for (const f of files) {
     const t = fs.readFileSync(`api/${f}`, 'utf8');
