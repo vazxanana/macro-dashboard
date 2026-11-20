@@ -3,7 +3,7 @@
 //   GET /api/status                 public, edge-cached: { at, bots: { council, ict } } (age and `stale` only)
 //   GET /api/status?job=watchdog    the Worker's 10-minute cron (Authorization: Bearer CRON_SECRET), 18 Nov 2026: when the council
 //                                   or the ICT desk is stale, start .github/workflows/watchdog.yml so the "council stopped" alert is
-//                                   not left to GitHub's own timer (api/_watchdog-kick.js). Token: GH_DISPATCH_TOKEN (Actions write).
+//                                   not left to GitHub's own timer (api/_watchdog-kick.js). Token: GH_DISPATCH_TOKEN (Actions write), else GH_TOKEN (20 Nov 2026: the deploy copies both; without Actions write the start is refused and nothing happens).
 const closed = (d) => { const w = d.getUTCDay(), h = d.getUTCHours(); return w === 6 || (w === 5 && h >= 21) || (w === 0 && h < 22); };   // gold/NQ weekend break (UTC)
 module.exports = async (req, res) => {
   const now = new Date(), { readFile } = require('./data.js');   // straight from council-data (/cdata needs a session since 9 Nov)
@@ -13,9 +13,9 @@ module.exports = async (req, res) => {
     const G = require('./_guard.js'), K = require('./_watchdog-kick.js'), env = process.env;
     res.setHeader('Cache-Control', 'private, no-store');
     if (!G.bearerOk(req.headers && req.headers.authorization, env.CRON_SECRET)) return res.status(401).json({ error: 'unauthorised' });
-    const out = await K.run({ readAt: atOf, token: env.GH_DISPATCH_TOKEN || null, now: now.getTime() });
+    const out = await K.run({ readAt: atOf, token: env.GH_DISPATCH_TOKEN || env.GH_TOKEN || null, now: now.getTime() });
     // the gotobi job (19 Nov 2026, api/_gotobi-kick.js): started before 00:55 UTC on weekdays, the job decides if it is a gotobi day
-    let gotobi = null; try { gotobi = await require('./_gotobi-kick.js').run({ token: env.GH_DISPATCH_TOKEN || null, now: now.getTime() }); } catch (e) { gotobi = { started: false, why: 'error' }; }
+    let gotobi = null; try { gotobi = await require('./_gotobi-kick.js').run({ token: env.GH_DISPATCH_TOKEN || env.GH_TOKEN || null, now: now.getTime() }); } catch (e) { gotobi = { started: false, why: 'error' }; }
     return res.status(200).json({ at: now.toISOString(), ...out, gotobi });
   }
   const age = async (p) => { const at = await atOf(p); return at ? { at, ageMin: Math.round((now - Date.parse(at)) / 6e4) } : null; };

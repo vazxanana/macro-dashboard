@@ -91,6 +91,10 @@ test('RULE 1: a fill without a stop gets it by amend at entry + D; a live accoun
     const out = await run({ env: ENV, dir, WS: b.WS, ...c, bars: async () => bars(day, 7), log: () => {} }); assert.equal(out.skipped, 'late'); assert.equal(b.sent.length, 0); }
   { const dir = setup(), b = broker(), day = '2026-11-20', c = clockAt(dayStart(day) + 50 * 60);
     const out = await run({ env: { ...ENV, CTRADER_ENV: 'live' }, dir, WS: b.WS, ...c, bars: async () => bars(day, 7), log: () => {} }); assert.equal(out.skipped, 'config'); assert.equal(b.sent.length, 0); }
+  // 20 Nov 2026: candles refused (the website answered 403 to the runner): an error record for the day, no order, no crash
+  { const dir = setup(), b = broker(), day = '2026-11-20', c = clockAt(dayStart(day) + 50 * 60);
+    const out = await run({ env: ENV, dir, WS: b.WS, ...c, bars: async () => { throw new Error('candles: HTTP 403'); }, log: () => {} });
+    assert.equal(out.rec.status, 'error'); assert.match(out.rec.why, /HTTP 403/); assert.ok(!b.sent.some((m) => m.payloadType === PT.NEW_ORDER_REQ)); }
 });
 
 test('the module sends only the mirror\'s allowed messages and never imports the council\'s trading rules', () => {

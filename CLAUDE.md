@@ -4884,6 +4884,15 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
+`GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
+website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
+OANDA_TOKEN repository secret; the website only without it), a candle failure is an `error` record for the day (it crashed
+before), the deploy copies `GH_DISPATCH_TOKEN`, and `/api/status?job=watchdog` falls back to `GH_TOKEN`.
+**The cost at the fix, measured (20 Nov 2026, `research/edge/gotobi-exec`)**: the demo broker's own USD/JPY quotes at 00:55 and 06:00
+UTC on 211 gotobi days (Nov 2023 → Nov 2026) put a round trip at 0.81 pip median with commission (p90 0.96, worst 1.49; the study
+assumed 2.0, break-even 3.73): the cost no longer threatens T2. On those executable quotes the fade made +0.163R a trade (month t
+1.80, short of the pre-registered 2; per-trade t 2.01). Slippage beyond the quote is still unmeasured (the demo job's fills will show it).
 
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
@@ -4906,3 +4915,11 @@ research/proposals/2026-11-14-gold-vol-breakout.md) and `events` (the last bid a
 T+5 / 15 / 30 s, and the widest spread of each minute, for every US CPI, payrolls and FOMC statement of council/events.mjs inside
 the depth: the executable prices the owner's news register asks for first). Research data only, no council member reads it.
 A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
+## Gold breakout at measured hourly spreads (20 Nov 2026, `research/edge/gold-vol-breakout-hourcost`)
+Accounting, no rule tested, nothing live changed. The tick probe's first XAUUSD run (council-data `research/probe/ticks-XAUUSD.json`,
+history reaching at least 1,095 days) puts the demo's quoted gold spread at $0.07-0.10 in EVERY UTC hour, Asian hours included
+(1.7-2.6 × 10⁻⁵ of price; commission 0.000024): about 0.02R a trade for `gold-vol-breakout` T1 (the studies charged $0.60). At
+that cost + 0.05 × M stop slippage T1 nets +0.105R a trade on 2021-26 (n 1,121, month t 2.79) and +0.139R pooled 2007-26 (t 6.47;
+past years charged today's relative spread). The owner's decision is still the 14 Nov proposal (a forward paper / demo record,
+whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hourcost.test.mjs`.
+`fills` (gold-vol-breakout-exec) = the first broker tick in a window where ask >= level (dir > 0) or bid <= level (dir < 0), queries from the same file's `fills` object. `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
