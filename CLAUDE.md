@@ -4870,3 +4870,11 @@ VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `O
 `OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
 `scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
 (a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
+
+## Gold breakout at measured hourly spreads (20 Nov 2026, `research/edge/gold-vol-breakout-hourcost`)
+Accounting, no rule tested, nothing live changed. The tick probe's first XAUUSD run (council-data `research/probe/ticks-XAUUSD.json`,
+history reaching at least 1,095 days) puts the demo's quoted gold spread at $0.07-0.10 in EVERY UTC hour, Asian hours included
+(1.7-2.6 × 10⁻⁵ of price; commission 0.000024): about 0.02R a trade for `gold-vol-breakout` T1 (the studies charged $0.60). At
+that cost + 0.05 × M stop slippage T1 nets +0.105R a trade on 2021-26 (n 1,121, month t 2.79) and +0.139R pooled 2007-26 (t 6.47;
+past years charged today's relative spread). The owner's decision is still the 14 Nov proposal (a forward paper / demo record,
+whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hourcost.test.mjs`.
