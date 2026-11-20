@@ -1532,6 +1532,7 @@
     (F.rulebook || []).forEach(function (r) { fb.push('<li><b>Your rule book:</b> ' + esc(r.text) + (r.caveat ? ' <span class="wa-r">' + esc(r.caveat) + '</span>' : '') + '</li>'); });
     var O = F.odds; if (O) { var row = function (src, l) { return (l || []).length ? '<span class="wa-r">' + esc(src) + ': ' + l.map(function (m) { return esc(m.label) + ' <b>' + Math.round(m.p * 100) + '%</b>'; }).join(' · ') + '</span>' : ''; };
       fb.unshift('<li><b>Prediction markets on the ' + esc(WA_DAY(O.meeting)) + ' Fed decision</b>' + row('Kalshi', O.kalshi) + row('Polymarket', O.polymarket) + '<span class="wa-r">What traders pay, not a forecast of ours.</span></li>'); }
+    if ((F.normalDays || []).length) fb.push('<li><b>A normal day now</b>' + F.normalDays.map(function (m) { return '<span class="wa-r">' + esc(m.text) + '</span>'; }).join('') + '<span class="wa-r">A range for planning, not a forecast of direction.</span></li>');
     var C = A.calls || {}; if ((C.list || []).length) fb.push('<li><b>The veteran\'s calls for the week:</b>' + C.list.map(function (c) { return '<span class="wa-r">' + esc(c.claim) + ': ' + Math.round(c.p * 100) + '% (base ' + Math.round(c.base * 100) + '%)</span>'; }).join('') + '</li>');
     else if (C.note) fb.push('<li>' + esc(C.note) + '</li>');
     $('wa-frame-b').innerHTML = '<ul class="pl-list nx-bl">' + fb.join('') + '</ul>';

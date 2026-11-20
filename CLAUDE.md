@@ -2992,6 +2992,7 @@ heading): a normal gold day = the strategist's `fc.assets.gold.expMovePct` of it
 folder release, that type's median absolute day move (`stats.absMed`, else from its rows) only with n >= `RANGE_MIN_N` 8; thin-
 trading words on holidays and early closes; "a range for planning, not a forecast of direction"; no forecast = no range. Test:
 `tests/week-ahead-range.test.mjs`.
+**A normal day now** (20 Nov 2026): `normalDays(fc)` → `frame.normalDays` = one line per market of forecast.json `assets` (gold $, EUR/USD and USD/JPY pips, NQ / ES points, from `expMovePct` x `last`; `volRatio` >= 1.3 "1.4x its usual", <= 0.75 "quieter than usual"), drawn as ONE frame item with "A range for planning, not a forecast of direction." Test: `tests/week-ahead-normal.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):

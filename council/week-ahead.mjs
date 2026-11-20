@@ -175,6 +175,26 @@ export function dayRange(fc, day, rf) {
 }
 
 const money = (x) => '$' + Math.round(x).toLocaleString('en-US');
+// "A normal day now" for every market the strategist covers (forecast.json `assets`): the expected daily move in the market's
+// own unit, so the owner can size across markets. A range for planning, never a direction. Pure.
+const NORMAL = [
+  { k: 'gold', name: 'Gold', unit: '$', per: 1 }, { k: 'eurusd', name: 'EUR/USD', unit: 'pips', per: 0.0001 },
+  { k: 'usdjpy', name: 'USD/JPY', unit: 'pips', per: 0.01 }, { k: 'nq', name: 'NQ', unit: 'points', per: 1 }, { k: 'es', name: 'ES', unit: 'points', per: 1 }];
+export function normalDays(fc) {
+  const A = fc && fc.assets, out = [];
+  if (!A || typeof A !== 'object') return out;
+  for (const m of NORMAL) {
+    const a = A[m.k]; if (!a || a.expMovePct == null || a.last == null) continue;
+    const pct = Number(a.expMovePct), px = Number(a.last);
+    if (!Number.isFinite(pct) || !Number.isFinite(px) || !(pct > 0) || !(px > 0)) continue;
+    const move = Math.round(pct / 100 * px / m.per), ratio = a.volRatio != null && Number.isFinite(Number(a.volRatio)) ? Number(a.volRatio) : null;
+    const n = move.toLocaleString('en-US'), size = m.unit === '$' ? `±$${n}` : `±${n} ${m.unit}`;
+    const tail = ratio == null ? '' : ratio >= 1.3 ? `, ${ratio.toFixed(1)}x its usual` : ratio <= 0.75 ? ', quieter than usual' : '';
+    out.push({ k: m.k, name: m.name, pct, move, unit: m.unit, ratio, text: `${m.name}: about ${size} (±${pct.toFixed(1)}%)${tail}` });
+  }
+  return out;
+}
+
 // The frame of the week: one place for the numbers the desk already shows elsewhere.
 export function frameOf(fc, v) {
   const g = fc && fc.goldScore, r = fc && fc.regime, sum = v && v.summary, out = { lines: [] };
@@ -312,6 +332,7 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
     day.line = dayLine(day); day.range = dayRange(fc, day, rf); days.push(day);
   }
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
+  frame.normalDays = normalDays(fc);
   if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
   // How the expectations moved (macro/hard-data.json `hist`): a day and a week back, only where both readings exist.
