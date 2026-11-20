@@ -194,7 +194,8 @@ test('no page or owner document calls the Academy\'s seven edges "live systems";
   const mx = rd('MERIDIAN-X.md'); assert.match(mx, /two\s+trade live on paper: \*\*Gold trend\*\* \(the 20-day breakout\) and \*\*Gold daily engulf\*\*/); assert.match(mx, /the seven that traded live until 11 Nov 2026/);
   assert.match(html, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\) and Gold daily engulf\./); assert.match(html, /since 14 Nov the Mosha cycle \(your decision 54/);   // 12 Nov: the owner's main paper system named
   assert.match(mx, /The \*\*Mosha cycle\*\*[^.]*traded live on paper by your own choice from 11 Nov; since 14 Nov\s+it is a paper shadow too/);
-  assert.deepEqual(SYSTEMS.filter((s) => !s.shadow).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
+  assert.deepEqual(SYSTEMS.filter((s) => !s.shadow).map((s) => s.id), ['replica', 'gtrend', 'geg', 'ict-a']);   // the replica live again since 20 Nov (owner)
+  assert.match(html, /Since 20 Nov 2026, by your request, the <b>Gold replica<\/b> is live on paper again/); assert.match(mx, /the \*\*Gold replica\*\* trades live/);
   // the Academy still has the same seven edges
   assert.deepEqual(EDGES.map((e) => e.id), ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open']);
 });
