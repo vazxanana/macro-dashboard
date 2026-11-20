@@ -1,0 +1,63 @@
+name: Gold breakout forward record (research)
+
+# Weekly, free: the forward record of gold-vol-breakout's T1 (research/edge/gold-vol-breakout-forward/PREREGISTRATION.md) on
+# OANDA mid M5 gold from 1 Oct 2026, saved to council-data research/forward/gold-vol-breakout.json. Paper research only:
+# nothing is traded, alerted or copied and no council member reads the file. The previous file is read back so the first
+# crossing of a checkpoint stands.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '41 4 * * 2-6'   # Tuesday-Saturday 04:41 UTC (a day appears once a later day has candles)
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vb-forward
+  cancel-in-progress: false
+
+env:
+  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+
+jobs:
+  forward:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Checkout council data (the forward file only)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/forward/*
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Own OANDA candles (no website needed; scripts/own-candles.sh)
+        env:
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
+        run: sh scripts/own-candles.sh
+
+      - name: Candles and the forward record
+        env:
+          GGO_FROM: '2026-10-01T00:00:00Z'
+        run: |
+          mkdir -p "$RUNNER_TEMP/c" data/research/forward
+          node research/edge/gold-gap-open/fetch.mjs "$RUNNER_TEMP/c"
+          node research/edge/gold-vol-breakout-forward/run.mjs "$RUNNER_TEMP/c" data/research/forward/gold-vol-breakout.json
+
+      - name: Save
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C data add research/forward
+          git -C data commit -q -m "Gold breakout forward record $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
