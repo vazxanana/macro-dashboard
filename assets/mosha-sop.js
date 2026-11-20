@@ -103,7 +103,12 @@
     if (n > 1) { var v = cl.reduce(function (s, r) { return s + (r.R - m) * (r.R - m); }, 0) / (n - 1); t = v > 0 ? m / Math.sqrt(v / n) : null; }
     return { n: rows.length, closed: n, open: rows.length - n, wins: cl.filter(function (r) { return r.R > 0; }).length, total: sum, mean: n ? m : null, t: t };
   }
-  var API = { SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary,
+  // closed R by the UTC day a trade ended, for the desk's calendar; open trades are never added in
+  function byDay(rows) {
+    var m = {}; rows.forEach(function (r) { if (r.R == null || !r.endT) return; var d = new Date(r.endT * 1000).toISOString().slice(0, 10), x = m[d] || (m[d] = { day: d, n: 0, R: 0 }); x.n++; x.R += r.R; });
+    return Object.keys(m).sort().map(function (k) { return m[k]; });
+  }
+  var API = { SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -149,17 +154,28 @@
   }
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
-    var head = '<div class="ms-k"><span>The method, replayed on the last two weeks</span><small>the desk\'s reading of the sequence and the barrier entry on past gold candles · each trade with its log</small></div>';
+    var head = '<div class="ms-k"><span>Replayed trades</span><small>the method as the course documents write it, on the last two weeks of gold candles · each trade with its log</small></div>';
     if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading two weeks of candles and replaying them…' : 'The replay starts when the desk opens.') + '</div>'; return; }
     if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The candles could not be read, so nothing was replayed. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
     var all = S.rows || [], sop = all.filter(function (r) { return r.kind === 'sop'; }), bar = all.filter(function (r) { return r.kind === 'barrier'; });
     var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : all, shown = S.all ? list : list.slice(0, 12);
     var chip = function (k, t, n) { return '<button type="button" class="mo-sop-b" data-sop-flt="' + k + '" aria-pressed="' + (S.flt === k) + '">' + t + ' (' + n + ')</button>'; };
-    box.innerHTML = head + line('BO, VR, CF', sop) + line('Barrier entry', bar, 'It takes every fresh H1 and M15 barrier; the method says to mark the best one, and that choice is not in the replay.') +
+    var sm = summary(list), open = all.filter(function (r) { return r.R == null; }), last = all[0];
+    var ans = (open.length ? open.length + (open.length === 1 ? ' replayed trade is' : ' replayed trades are') + ' open now. ' : 'No replayed trade is open now. ') + (last ? 'Latest entry: ' + word(last.side) + ' at ' + f2(last.entry) + ', ' + utc(last.t) + '.' : '');
+    var tile = function (k, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + k + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
+    var tiles = '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Reached target', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
+      tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · two weeks') + '</div>';
+    var openHTML = open.length ? '<h3 class="mo-sop-h">Open now</h3><ul class="mo-sop-open">' + open.map(function (r) { return '<li><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span> <b>' + f2(r.entry) + '</b> · stop ' + f2(r.stop) + ' · target ' + f2(r.target) + (r['float'] != null ? ' · <b class="' + (r['float'] >= 0 ? 'pos' : 'neg') + '">' + fR(r['float']) + ' now</b>' : '') + ' <small>since ' + utc(r.t) + '</small> <button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></li>'; }).join('') + '</ul>' : '';
+    var days = byDay(list), cal = days.length ? '<h3 class="mo-sop-h">Closed R by day <small>the UTC day each trade ended · open trades not added in</small></h3><div class="mo-sop-cal">' + days.map(function (d) { return '<div class="mo-sop-day ' + (d.R > 0 ? 'pos' : d.R < 0 ? 'neg' : '') + '"><small>' + esc(new Date(d.day + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) + '</small><b>' + fR(d.R) + '</b><span>' + d.n + (d.n === 1 ? ' trade' : ' trades') + '</span></div>'; }).join('') + '</div>' : '';
+    box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
       '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + '<button type="button" class="mo-sop-b" data-sop-run>Replay again</button></div>' +
+      tiles + openHTML +
+      '<h3 class="mo-sop-h">Trades</h3>' +
       (shown.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="Replayed trades of the Mosha reading"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result and log</th></tr></thead><tbody>' + shown.map(rowHTML).join('') + '</tbody></table></div>' +
         (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No entry in the last two weeks.</div>') +
-      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. These are not Luxus\'s trades and not the council\'s, nothing was traded, and two weeks cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p>';
+      cal +
+      '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop) + line('Barrier entry', bar, 'It takes every fresh H1 and M15 barrier; the method says to mark the best one, and that choice is not in the replay.') +
+      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. These are not Luxus\'s trades and not the council\'s, nothing was traded, and two weeks cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
   document.addEventListener('click', function (e) {
@@ -169,7 +185,7 @@
     if (b.hasAttribute('data-sop-flt')) { S.flt = b.getAttribute('data-sop-flt'); S.all = false; draw(); return; }
     var id = b.getAttribute('data-sop-log') || b.getAttribute('data-sop-chart'), r = byId(id); if (!r) return;
     if (b.hasAttribute('data-sop-log')) { S.open[id] = !S.open[id]; draw(); var nb = document.querySelector('#mo-sopr [data-sop-log="' + id + '"]'); if (nb) nb.focus(); return; }
-    if (typeof root.msMoshaReplayTrade === 'function') { root.msMoshaReplayTrade({ id: r.id, market: 'xau', side: word(r.side), at: r.t, entry: +f2(r.entry), stop: +f2(r.stop), target: +f2(r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +f2(r.exit) : null, exitAt: r.endT, R: r.R });
+    if (typeof root.msMoshaReplayTrade === 'function') { root.msMoshaReplayTrade({ replayed: true, id: r.id, market: 'xau', side: word(r.side), at: r.t, entry: +f2(r.entry), stop: +f2(r.stop), target: +f2(r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +f2(r.exit) : null, exitAt: r.endT, R: r.R });
       var rp = $('mo-replay'); if (rp && rp.scrollIntoView) rp.scrollIntoView({ block: 'start' }); }
   });
   function go() { var v = $('v-mosha'); if (!v || v.hidden) return; if (API.visible(document.documentElement.dataset) && S.state === 'idle' && fns()) run(); else draw(); }

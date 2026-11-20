@@ -5037,7 +5037,7 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   "two weeks of one reading, not a tested rule". First run (7-20 Nov): the sequence 5 entries, +7.1R; the barrier entry 56 entries,
   −4R (it takes EVERY fresh barrier; the method says to mark the best one). It found two of Luxus's three trades of 18-20 Nov within a
   dollar (not shown or stored anywhere: his trades are never committed). Display only: no storage, no council file, no API call,
-  nothing traded; hidden for the teacher and guests. Never call it a record or an edge. Test: `tests/mosha-sop.test.mjs` (a seeded
+  nothing traded; hidden for the teacher and guests. Never call it a record or an edge. **The card leads the desk** (20 Nov 2026, owner: "mosha desk must be like normal desk showing the replay trades"): for the owner and readers `#mo-sopr` is first and the chart `#mo-replay` second (CSS `order`, the DOM stays), laid out like the ICT desk: one answer line (`.mo-sop-ans`), tiles (entries, reached target, total before costs, "Too few" under 20 closed else "Not a test"), Open now, the trades, closed R by UTC exit day (`byDay`, open trades never added in), and the per-type lines and the caveat in a fold; kept open in the simple phone view; a trade opened on the chart is labelled "From the replay" (`replayed: true`). Test: `tests/mosha-sop.test.mjs` (a seeded
   market: stops on the losing side, logs in time order, no look-ahead by cutting and by changing every later price).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.

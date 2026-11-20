@@ -113,7 +113,7 @@ test('the chart card and the log: neutral wording, French through the same dicti
     assert.ok(I.FR[e.yours], e.yours); }
   assert.deepEqual(SHOTS.filter((e) => e.ownLabel).map((e) => e.id), ['nov10'], 'the owner\'s own sentence is shown to the owner only');
   assert.match(RPJ, /spec\.ownLabel && document\.documentElement\.dataset\.role !== 'owner' \? ''/);
-  assert.match(RPJ, /sp\.lesson \? L\('The lesson:'\) : sp\.log \? L\('In the log:'\) : L\('On the screenshot:'\)/); assert.ok(!/'You: '/.test(RPJ));
+  assert.match(RPJ, /sp\.lesson \? L\('The lesson:'\) : sp\.rp \? L\('In the replay:'\) : sp\.log \? L\('In the log:'\) : L\('On the screenshot:'\)/); assert.ok(!/'You: '/.test(RPJ));
   const t = { id: 'x', market: 'xau', side: 'sell', at: 1794286800, entry: 4120.42, stop: 4128.92, target: 4072.84, status: 'open' }, sp = RP.specOfTrade(t, 1794300000); assert.equal(sp.log, true); assert.equal(sp.label, 'From the log'); assert.equal(sp.steps[0].text, 'The twelve hours before the entry.');
   const ls = RP.specOfLesson({ id: 'y', title: 'A lesson', trade: { ...t, at: t.at } }, 1794300000); assert.equal(ls.log, false); assert.equal(ls.lesson, true); assert.equal(ls.yours, 'the levels given with the lesson');
   // the card's fixed words are marked on the page and the picture still says it is no measure of how often it wins, in both languages

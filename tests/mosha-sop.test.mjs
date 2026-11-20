@@ -73,3 +73,14 @@ test('the card: on the Mosha desk, never for the teacher or a guest, and the cod
   assert.match(src, /not Luxus\\'s trades and not the council\\'s, nothing was traded/); assert.match(src, /Too few to judge/); assert.match(src, /not a tested rule/);
   assert.doesNotMatch(src.replace(/not a tested (rule|edge)/g, ''), /\bedge\b(?!-lab)/i, 'never called an edge');
 });
+
+test('the replay leads the desk: closed R by day, and the card comes first for the owner and readers', () => {
+  const d = M.byDay([{ R: 1, endT: 1794960000 }, { R: -1, endT: 1794960000 + 3600 }, { R: 3, endT: 1794960000 + 86400 }, { R: null, endT: null }, { R: 2, endT: null }]);
+  assert.deepEqual(d.map((x) => [x.n, x.R]), [[2, 0], [1, 3]]);
+  assert.equal(d.length, 2); assert.ok(d[0].day < d[1].day);
+  const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  assert.match(html, /#v-mosha #mo-sopr \{ order: -10; \}/); assert.match(html, /#v-mosha #mo-replay \{ order: -9; \}/);
+  assert.match(html, /c\.id === 'mo-rec' \|\| c\.id === 'mo-sopr'/);
+  const js = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8');
+  for (const k of ['mo-sop-ans', 'mo-sop-tiles', 'Open now', 'Closed R by day', 'Too few']) assert.ok(js.includes(k), k);
+});
