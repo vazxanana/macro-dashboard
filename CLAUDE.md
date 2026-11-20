@@ -5048,6 +5048,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   0.000045 of price + 0.5 pip). **FAIL**: pooled −0.022R a trade net (n 12,664, month t −1.59; gross +0.012R). USD/JPY alone
   passes its checks (+0.063R, t 2.50, Holm p 0.043, 40 of 40 placebos): by the pre-registration a hypothesis for its own test on
   other data, not an edge. The breakout is gold's. Nothing live changed.
+- `usdjpy-vol-breakout-early` (pre-registered 20 Nov 2026, the follow-up `fx-vol-breakout` named): T1 on USD/JPY 2005-2015
+  (years that study never read), same cost. **PASS**: +0.079R a trade net (n 2,089, month t 2.95; halves +0.078R / +0.081R;
+  2x cost +0.050R; 40 of 40 placebos). With 2016-26 (+0.063R, t 2.50) it holds in both stretches of OANDA history. Limits:
+  today's demo cost charged on old years, OANDA mid candles (not broker ticks), drawdowns of 20-42R. A candidate for a forward
+  paper record only (its own pre-registration); never a live rule without the owner. Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
