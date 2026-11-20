@@ -195,6 +195,35 @@ export function nowcastFor(hd, r) {
     text: `the Cleveland Fed nowcast for ${MN[+ref.slice(5) - 1]} is core ${f(m.now[c])}, headline ${f(m.now[h])} month on month${m.asOf ? ` (as of ${m.asOf})` : ''}, a model's estimate, not the consensus` };
 }
 
+// The nowcast beside the consensus (20 Nov 2026): for a CPI / PCE release with both a calendar consensus and a nowcast, which way
+// the model leans against what the calendar expects, and what the Red folder record says gold did on past prints above / below
+// the consensus (left out under MIN_PREP releases on either side). A model's estimate against a calendar consensus: no forecast,
+// no call, no rule reads it.
+export const IN_LINE = 0.05, MIN_PREP = 6;
+export function parseExp(x) {
+  if (x == null) return null;
+  const m = String(x).replace(/−/g, '-').match(/^\s*([+-]?\d+(?:\.\d+)?)\s*%?\s*$/);
+  return m ? +m[1] : null;
+}
+export function prepFor(r, nc, record) {
+  if (!r || !nc) return null;
+  const cons = parseExp(r.exp); if (cons == null) return null;
+  const core = /\bcore\b/i.test(r.title || '');
+  const fig = core ? nc.core : nc.head; if (fig == null || !Number.isFinite(fig)) return null;
+  const gap = Math.round((fig - cons) * 100) / 100;
+  const side = Math.abs(fig - cons) < IN_LINE - 1e-9 ? 'in line' : fig > cons ? 'above' : 'below';
+  const kind = (core ? 'core ' : '') + (r.type || 'release');
+  const sg = (x) => (x > 0 ? '+' : '') + x.toFixed(2) + '%';
+  const lead = side === 'in line' ? `The nowcast (${sg(fig)}) is in line with the ${r.exp} consensus (within ${IN_LINE} points).`
+    : `The nowcast (${sg(fig)}) sits ${side} the ${r.exp} consensus by ${Math.abs(gap).toFixed(2)} points.`;
+  const st = record && (record.stats || record), A = st && st.above, B = st && st.below;
+  const hist = A && B && A.n >= MIN_PREP && B.n >= MIN_PREP && Number.isFinite(A.gold) && Number.isFinite(B.gold)
+    ? ` On past ${kind} releases that printed above consensus gold averaged ${sg(A.gold)} on the day (n ${A.n}); below, ${sg(B.gold)} (n ${B.n}).` : '';
+  const text = lead + hist + ' A model\'s estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a tested edge.';
+  const short = side === 'in line' ? `nowcast ${sg(fig)} in line with the ${r.exp} consensus` : `nowcast ${sg(fig)} ${side} the ${r.exp} consensus`;
+  return { core, nowcast: fig, consensus: cons, gap, side, record: hist ? { above: { n: A.n, gold: A.gold }, below: { n: B.n, gold: B.gold } } : null, text, short };
+}
+
 // The plan: { at, from, to, next, days: [...], frame, calls, lines, note }.
 export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir = EDGE_DIR }) {
   const W = weekOf(now), days = [], recs = new Map();
@@ -202,7 +231,7 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   const rel = releasesOf(cal, W.from, W.to);
   for (let d = W.from; d <= W.to; d = addD(d, 1)) {
     if (!weekday(d)) continue;
-    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) }));
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) })).map((r) => ({ ...r, prep: prepFor(r, r.nowcast, r.type && rf && rf.study ? rf.study[r.type] : null) }));
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
@@ -220,6 +249,7 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   if (frame.odds) lines.push(hd.odds.line);
   const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
   if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
+  for (const d of days) for (const r of d.releases) if (r.prep) lines.push(`Before ${d.dow}'s ${r.title.replace(/\s*\(.*\)$/, '')}: ${r.prep.short}${r.prep.record ? `; past prints above it: gold ${pct(r.prep.record.above.gold)} (n ${r.prep.record.above.n}), below: ${pct(r.prep.record.below.gold)} (n ${r.prep.record.below.n})` : ''}. A model's estimate, descriptive only.`);
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
   else lines.push('No top-tier US release is scheduled on the files read so far.');
   if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);
