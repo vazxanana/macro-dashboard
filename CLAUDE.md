@@ -4894,6 +4894,10 @@ Not checked live: the dispatch token's Actions: write, and the first real gotobi
 website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
 OANDA_TOKEN repository secret; the website only without it), a candle failure is an `error` record for the day (it crashed
 before), the deploy copies `GH_DISPATCH_TOKEN`, and `/api/status?job=watchdog` falls back to `GH_TOKEN`.
+**The cost at the fix, measured (20 Nov 2026, `research/edge/gotobi-exec`)**: the demo broker's own USD/JPY quotes at 00:55 and 06:00
+UTC on 211 gotobi days (Nov 2023 → Nov 2026) put a round trip at 0.81 pip median with commission (p90 0.96, worst 1.49; the study
+assumed 2.0, break-even 3.73): the cost no longer threatens T2. On those executable quotes the fade made +0.163R a trade (month t
+1.80, short of the pre-registered 2; per-trade t 2.01). Slippage beyond the quote is still unmeasured (the demo job's fills will show it).
 
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
@@ -4923,4 +4927,23 @@ history reaching at least 1,095 days) puts the demo's quoted gold spread at $0.0
 that cost + 0.05 × M stop slippage T1 nets +0.105R a trade on 2021-26 (n 1,121, month t 2.79) and +0.139R pooled 2007-26 (t 6.47;
 past years charged today's relative spread). The owner's decision is still the 14 Nov proposal (a forward paper / demo record,
 whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hourcost.test.mjs`.
+`fills` (gold-vol-breakout-exec) = the first broker tick in a window where ask >= level (dir > 0) or bid <= level (dir < 0), queries from the same file's `fills` object. `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
 `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
+
+## Measured-cost studies of 20 Nov 2026 (tick probe)
+Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live changed. Results, each pre-registered before its data:
+- `gold-release-quotes`: gold's spread at T+5 s after US CPI / payrolls / FOMC is about 18× normal ($1.48 median), the widest
+  in minute T $6.71 (p90 $19); the news register's N4 continuation / reversal from T+5 to T+60 both FAIL (n 93).
+- `silver-vol-breakout-hourcost`: the demo quotes silver at about $0.02 (20× gold's relative cost); the failed silver breakout
+  holds in 0 of 4 checks.
+- `gotobi-exec`: USD/JPY at the fix costs 0.81 pip a round trip with commission (assumed 2.0); on executable quotes T2 made
+  +0.163R a trade over 211 gotobi days, month t 1.80 (FAIL on its bar; the cost no longer threatens the study's result).
+- `fx-weekend-gap-exec`: the Sunday reopen costs about 11 pips of spread at Rule G's entry minute, and on 237 of 488 weekends
+  this broker was not quoting yet; on the rest Rule G nets +0.165R (month t 1.52, FAIL). Not tradable as written on this account.
+- `gold-vol-breakout-exec`: T1 filled at the broker's own ticks (first tick across the trigger / stop, the last quote before
+  21:00 UTC), 24 Nov 2023 - 12 Nov 2026: **PASS**, +0.184R a trade after commission, n 572, month t 3.54 (OANDA mid +0.192R before
+  costs); entry slippage $0.07 median, 0.011R. In-sample years (not new evidence); the ten best trades carry 55 %, 2024 +0.07R.
+  21:00 UTC is gold's daily break on US summer-time days: the probe's marks take `PROBE_MARKS_BACK` (workflow input `marks_back`).
+- `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
+  every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
+  (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).

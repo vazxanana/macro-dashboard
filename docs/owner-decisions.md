@@ -19,9 +19,11 @@ Every item has a dated "Status" line (11 or 12 Nov): that line is the current tr
    rule tests; your own selection is never measured.
 5. **Confirm or undo the rebuilt monitoring baselines (item 19).** If nothing is decided: the rebuilt ones stay in use
    (they are the corrected ones; this is the outcome I recommend).
-6. **The "council stopped" alert: check the Worker's dispatch token (items 15 and 31).** Built 18 Nov 2026: the Worker starts
-   the watchdog within about 10 minutes of a stop. It works only if the Worker secret `GH_DISPATCH_TOKEN` may start workflows
-   (Actions: write on this repository). If it may not, the Worker logs "GitHub refused the dispatch" and the alert stays late.
+6. **Add a GitHub token for the Worker's starts (items 15, 31 and 61).** Checked 20 Nov 2026: the Worker has NO
+   `GH_DISPATCH_TOKEN` and no `GH_TOKEN`, and no repository secret of either name exists, so neither the "council stopped"
+   watchdog nor the gotobi job can be started by the website's 10-minute timer; both depend on GitHub's own cron, which ran
+   late on 20 Nov and cost the first gotobi morning. To fix: add a repository secret `GH_DISPATCH_TOKEN` (a fine-grained token,
+   this repository only, Actions: read and write), then run "Cloudflare deploy" once; the deploy now copies it to the Worker.
 7. **The ICT demo account mixes A-setups with weaker signals (item 9), and copies ICT trades late without a check
    (item 10).** If nothing is decided: the ICT demo balance does not show the rule the desk follows.
 8. **Reset the Replica demo account in the broker's own app (item 41).** You placed the 10-lot buy yourself (answered 12 Nov
@@ -1239,6 +1241,12 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
 
 ### [x] 61. Trade the gotobi fade (study T2) on a cTrader demo account
 
+- **Status (20 Nov 2026):** the first gotobi morning (20 Nov) was MISSED: GitHub's cron had not started the job by 00:31 UTC,
+  and a run started by hand stopped on `candles: HTTP 403` (the website refused the GitHub runner). Both faults are fixed (#1286:
+  the job reads its own OANDA candles; a candle failure is recorded, not a crash). The next gotobi day is 25 Nov. Until the
+  token of "What needs you now" 6 exists, only GitHub's cron starts the job. The cost question is answered:
+  `research/edge/gotobi-exec` read the demo broker's own USD/JPY quotes on 211 past gotobi days (Nov 2023 → Nov 2026): 0.81 pip
+  a round trip with commission (the study assumed 2.0), and +0.163R a trade on executable quotes (month t 1.80).
 - **Status (19 Nov 2026): approved by the owner** ("start on any of the demo accounts ctrader"), after being shown that the replica
   and the council's own trades have no edge to profit from, and that the gotobi fade is the best-evidenced candidate in the
   studies: PASS on 2016-2026 (771 trades, +0.148R a trade after costs, month t 2.74; 2010-15 also positive), REPLICATES on four
@@ -1253,3 +1261,14 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
 - **Judged how.** A forward record in council-data `gotobi/trades.json`, against the study's figures; nothing is called an edge
   until the forward record says so (about 70 trades a year; a first look at 30).
 - **To stop.** A user rule or edit setting `config.gotobi = { on: false }`, or disable the workflow.
+
+### [ ] 62. Run the gold volatility breakout (T1) as a forward paper / demo stream?
+
+- **Status (20 Nov 2026): open.** Proposed in `research/proposals/2026-11-14-gold-vol-breakout.md` (its three choices). Every
+  cost question it raised is now measured on the demo broker: spreads at every UTC hour about $0.07-0.10
+  (`gold-vol-breakout-hourcost`) and the stop order's own slippage $0.07 median (`gold-vol-breakout-exec`). Filled at the broker's
+  ticks over the last three years, T1 made +0.184R a trade after commission (n 572, month t 3.54).
+- **Why it is still your decision.** Those three years are in sample for the rule (found on 2007-26), the ten best trades carry
+  55 % of the result, and 2024 was close to flat (+0.07R). Only a forward record says whether it still pays. Nothing is built:
+  a stream would need a Trader block (or a job like the gotobi one) on a demo account, a stop on every trade, paper only.
+- **If nothing is decided.** Nothing runs; the studies stay as evidence.

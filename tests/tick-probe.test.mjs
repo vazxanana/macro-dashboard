@@ -93,3 +93,22 @@ test('marks part: the quote at each given moment, nothing past now', async () =>
   const m = r.symbols.EURUSD.marks; assert.equal(m.length, 2);
   assert.equal(m[0][0], now - 86400); assert.ok(Math.abs(m[0][2] - m[0][1] - 0.07) < 1e-6); assert.equal(m[0][3], 0); assert.equal(m[1][3], 5);
 });
+
+test('fills part: the first tick that crosses a level, by side', async () => {
+  const { probe, firstCross } = await import('../council/tick-probe.mjs');
+  const qp = [[1000, 1.0, 1.1], [2000, 1.2, 1.3], [3000, 0.9, 1.0]];
+  assert.deepEqual(firstCross(qp, 1.25, 1), [2000, 1.2, 1.3]); assert.deepEqual(firstCross(qp, 0.95, -1), [3000, 0.9, 1.0]); assert.equal(firstCross(qp, 2, 1), null);
+  const env = { CTRADER_CLIENT_ID: 'a', CTRADER_CLIENT_SECRET: 'b', CTRADER_ACCESS_TOKEN: 'c', CTRADER_ACCOUNT_ID: '7', CTRADER_ENV: 'demo' };
+  const lib = fakeBroker([]), base = lib.session(), now = Date.parse('2026-11-20T07:00:00Z') / 1000;
+  lib.session = () => ({ ...base, send: async (type, q) => (type === 3 ? { symbol: [{ symbolName: 'XAUUSD', symbolId: 41 }] } : base.send(type, q)) });
+  const t0 = now - 86400, bid0 = 100 + (t0 * 1000 / 1e7) % 1;
+  const r = await probe({ env, lib, names: ['XAUUSD:fills'], marks: { fills: { XAUUSD: [['a', t0, t0 + 600, bid0 + 0.07 + 0.00005, 1], ['b', t0, t0 + 600, 0, -1], ['c', t0, t0 + 5000, 0, 1]] } }, now: now * 1000, sleep: async () => {} });
+  const f = r.symbols.XAUUSD.fills; assert.equal(f.length, 2);   // 'c' spans over FILLS_SPAN
+  assert.equal(f[0][0], 'a'); assert.ok(f[0][1] > t0 * 1000 && f[0][3] >= bid0 + 0.07); assert.deepEqual(f[1], ['b', null]);
+});
+
+test('marks look-back: PROBE_MARKS_BACK between 60 and 3600 seconds, else 60', async () => {
+  const { marksBack } = await import('../council/tick-probe.mjs');
+  assert.equal(marksBack({}), 60); assert.equal(marksBack({ PROBE_MARKS_BACK: '' }), 60); assert.equal(marksBack({ PROBE_MARKS_BACK: '30' }), 60);
+  assert.equal(marksBack({ PROBE_MARKS_BACK: '1800' }), 1800); assert.equal(marksBack({ PROBE_MARKS_BACK: '99999' }), 3600); assert.equal(marksBack({ PROBE_MARKS_BACK: 'x' }), 60);
+});

@@ -35,10 +35,18 @@ export const MAX_PAGES = 40, GAP_MS = 260;
 // gotobi (20 Nov 2026, research/edge/gotobi-exec): the bid and ask at 00:55:00 and 06:00:00 UTC of every gotobi day inside the
 // history (council/gotobi-calendar.mjs, the demo job's calendar), with the median quoted spread in +-GOTOBI_HALF seconds
 export const GOTOBI_MARKS = [55 * 60, 6 * 3600], GOTOBI_HALF = 60;
-export const PARTS = ['depth', 'hours', 'events', 'gotobi', 'marks'];
+export const PARTS = ['depth', 'hours', 'events', 'gotobi', 'marks', 'fills'];
 // marks (20 Nov 2026, research/edge/fx-weekend-gap-exec): the bid, ask and spread at given moments, read from a JSON file
 // { SYMBOL: [unix sec, ...] } named by PROBE_MARKS (a path in the repository); at most MARKS_MAX a symbol
 export const MARKS_HALF = 60, MARKS_MAX = 600;
+// how far before a mark the quote may be looked for: PROBE_MARKS_BACK seconds (60 to 3600, default 60), for a mark that falls
+// in a daily break (gold's 21:00 UTC exit on US summer-time days, research/edge/gold-vol-breakout-exec)
+export const marksBack = (env) => { const v = Math.round(+(env && env.PROBE_MARKS_BACK) || 0); return v > MARKS_HALF ? Math.min(3600, v) : MARKS_HALF; };
+// fills (20 Nov 2026, research/edge/gold-vol-breakout-exec): for each query [id, t0, t1, level, dir] of the PROBE_MARKS file's
+// "fills" object { SYMBOL: [...] }, the first broker tick in [t0, t1] (unix sec) where ask >= level (dir > 0) or bid <= level
+// (dir < 0): [id, tickMs, bid, ask], or [id, null] when none; windows of at most FILLS_SPAN seconds, at most FILLS_MAX a symbol
+export const FILLS_SPAN = 1800, FILLS_MAX = 4000;
+export function firstCross(qp, level, dir) { for (const q of qp) if (dir > 0 ? q[2] >= level : q[1] <= level) return q; return null; }
 // "USDJPY:depth,gotobi" -> { name, parts }; a bare name reads depth, hours and events
 export function parseName(arg) { const [name, p] = String(arg).split(':'); const parts = p ? p.split(',').filter((x) => PARTS.includes(x)) : ['depth', 'hours', 'events']; if (!parts.includes('depth')) parts.unshift('depth'); return { name, parts }; }
 // the gotobi days (UTC dates) from `from` (unix sec) to now whose 06:00 mark has passed, oldest first
@@ -173,12 +181,19 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], marks = {}
       if (parts.includes('gotobi')) log(`${name}: ${gotobi.length} gotobi days`);
       const quotes = [];
       if (parts.includes('marks')) for (const t of (Array.isArray(marks[name]) ? marks[name] : []).filter((x) => Number.isFinite(x) && x + MARKS_HALF < nowSec).slice(0, MARKS_MAX)) {
-        const w = await window(t - MARKS_HALF, t + MARKS_HALF); if (!w) continue;
+        const w = await window(t - marksBack(process.env), t + MARKS_HALF); if (!w) continue;
         const before = w.qp.filter((q) => q[0] <= t * 1000), last = before[before.length - 1], sp = spreadsOf(w.qp);
         quotes.push([t, last ? r6(last[1]) : null, last ? r6(last[2]) : null, last ? Math.round(t - last[0] / 1000) : null, sp.length ? r6(med(sp)) : null]);
       }
       if (parts.includes('marks')) log(`${name}: ${quotes.length} marks`);
-      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), ...(parts.includes('marks') ? { marks: quotes } : {}), errors };
+      const fills = [], FQ = (marks && marks.fills && Array.isArray(marks.fills[name])) ? marks.fills[name] : [];
+      if (parts.includes('fills')) for (const [id, t0, t1, level, dir] of FQ.filter((q) => Array.isArray(q) && q[2] > q[1] && q[2] - q[1] <= FILLS_SPAN && q[2] < nowSec).slice(0, FILLS_MAX)) {
+        const w = await window(t0, t1); if (!w) continue;
+        const c = firstCross(w.qp.filter((q) => q[0] >= t0 * 1000), +level, +dir);
+        fills.push(c ? [id, c[0], r6(c[1]), r6(c[2])] : [id, null]);
+      }
+      if (parts.includes('fills')) log(`${name}: ${fills.length} fill queries`);
+      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), ...(parts.includes('marks') ? { marks: quotes } : {}), ...(parts.includes('fills') ? { fills } : {}), errors };
     }
   } finally { s.close(); }
   return { at: new Date(now).toISOString(), source: 'council/tick-probe.mjs', broker: acc.broker || null, symbols: out };
@@ -196,7 +211,7 @@ if (process.argv[1] && process.argv[1].endsWith('tick-probe.mjs')) {
     const OD = path.join(dir, 'research', 'probe'); fs.mkdirSync(OD, { recursive: true });
     for (const [n, v] of Object.entries(r.symbols)) {
       if (v.errors) v.errors = v.errors.map(scrub);
-      fs.writeFileSync(path.join(OD, `ticks-${n}.json`), JSON.stringify({ at: r.at, source: r.source, broker: r.broker, symbol: n, ...v }));
+      fs.writeFileSync(path.join(OD, `ticks-${n}${/^[a-z0-9-]{1,20}$/.test(process.env.PROBE_TAG || '') ? '-' + process.env.PROBE_TAG : ''}.json`), JSON.stringify({ at: r.at, source: r.source, broker: r.broker, symbol: n, ...v }));
       console.log(`tick probe ${n}: reach ${v.reachDays ?? '?'} days, ${(v.hours || []).length} hours, ${(v.events || []).length} events${v.errors && v.errors.length ? `, ${v.errors.length} errors` : ''}`);
     }
   } catch (e) { console.log(`tick probe failed: ${scrub(e.message || e)}`); process.exit(1); }
