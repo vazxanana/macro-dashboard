@@ -1,14 +1,20 @@
 {
  "v": 1,
- "at": "2026-11-20T20:30:47Z",
+ "at": "2026-11-20T20:53:39Z",
  "sources": {
   "nowcast": "ok",
   "gdpnow": "ok",
   "fed": "ok",
   "auctions": "ok",
-  "odds": "ok"
+  "odds": "ok",
+  "priced": "ok",
+  "auctionResults": "ok",
+  "plumbing": "ok",
+  "vol": "ok",
+  "under": "ok",
+  "official": "ok"
  },
- "label": "Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision, the Fed's own calendar and the US Treasury's note and bond auctions. Context, not a forecast of ours; paper only.",
+ "label": "Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision and of the next data prints, the Fed's own calendar, the US Treasury's note and bond auctions and their results, the Fed's money-market plumbing, option-implied volatility and the underlying-inflation measures. Context, not a forecast of ours; paper only.",
  "nowcast": {
   "months": [
    {
@@ -37,16 +43,16 @@
     "actual": {}
    }
   ],
-  "at": "2026-11-20T20:30:47Z"
+  "at": "2026-11-20T20:53:39Z"
  },
  "gdpnow": {
   "quarter": "2026 Q4",
   "value": 3.21,
   "prev": 3.27,
-  "at": "2026-11-20T20:30:47Z"
+  "at": "2026-11-20T20:53:39Z"
  },
  "fed": {
-  "at": "2026-11-20T20:30:47Z",
+  "at": "2026-11-20T20:53:39Z",
   "events": [
    {
     "day": "2026-11-18",
@@ -100,7 +106,7 @@
   ]
  },
  "auctions": {
-  "at": "2026-11-20T20:30:47Z",
+  "at": "2026-11-20T20:53:39Z",
   "src": "www.treasurydirect.gov",
   "list": [
    {
@@ -154,33 +160,33 @@
   ]
  },
  "odds": {
-  "at": "2026-11-20T20:30:47Z",
+  "at": "2026-11-20T20:53:39Z",
   "meeting": "2026-12-09",
   "kalshi": [
    {
     "label": "Hike 25bps",
     "p": 0.9,
-    "oi": 2420989.19
+    "oi": 2420917.89
    },
    {
     "label": "Fed maintains rate",
-    "p": 0.1,
-    "oi": 4089497.26
+    "p": 0.11,
+    "oi": 4099552.8
    },
    {
     "label": "Hike >25bps",
     "p": 0.02,
-    "oi": 2959998.53
+    "oi": 2958308.19
    },
    {
     "label": "Cut 25bps",
     "p": 0.01,
-    "oi": 1047365.78
+    "oi": 1047398.78
    },
    {
     "label": "Cut >25bps",
     "p": 0.01,
-    "oi": 839327.89
+    "oi": 839421.4
    }
   ],
   "polymarket": {
@@ -210,10 +216,1399 @@
   },
   "line": "Prediction markets on the 9 Dec Fed decision: Kalshi Hike 25bps 90%, Polymarket 25 bps increase 90%. What traders pay, not a forecast of ours."
  },
+ "priced": {
+  "at": "2026-11-20T20:53:39Z",
+  "src": "Kalshi",
+  "items": {
+   "coreCpi": [
+    {
+     "key": "coreCpi",
+     "event": "KXCPICORE-26NOV",
+     "period": "November 2026",
+     "close": "2026-12-10T13:25:00Z",
+     "rungs": [
+      {
+       "x": 0,
+       "p": 0.945
+      },
+      {
+       "x": 0.1,
+       "p": 0.865
+      },
+      {
+       "x": 0.2,
+       "p": 0.455
+      },
+      {
+       "x": 0.3,
+       "p": 0.125
+      },
+      {
+       "x": 0.4,
+       "p": 0.005
+      },
+      {
+       "x": 0.5,
+       "p": 0.005
+      },
+      {
+       "x": 0.6,
+       "p": 0.005
+      },
+      {
+       "x": 0.7,
+       "p": 0.005
+      },
+      {
+       "x": 0.8,
+       "p": 0.005
+      },
+      {
+       "x": 0.9,
+       "p": 0.005
+      },
+      {
+       "x": 1,
+       "p": 0.005
+      }
+     ],
+     "volume": 306445,
+     "mid": 0.189,
+     "likely": [
+      {
+       "v": 0.2,
+       "p": 0.41
+      },
+      {
+       "v": 0.3,
+       "p": 0.33
+      },
+      {
+       "v": 0.4,
+       "p": 0.12
+      }
+     ],
+     "text": "core CPI for November 2026: most likely +0.2% (41%), then +0.3% (33%)"
+    }
+   ],
+   "cpi": [
+    {
+     "key": "cpi",
+     "event": "KXCPI-26NOV",
+     "period": "November 2026",
+     "close": "2026-12-10T13:29:00Z",
+     "rungs": [
+      {
+       "x": -0.3,
+       "p": 0.955
+      },
+      {
+       "x": -0.2,
+       "p": 0.815
+      },
+      {
+       "x": -0.1,
+       "p": 0.375
+      },
+      {
+       "x": 0,
+       "p": 0.135
+      },
+      {
+       "x": 0.1,
+       "p": 0.015
+      },
+      {
+       "x": 0.2,
+       "p": 0.015
+      },
+      {
+       "x": 0.3,
+       "p": 0.015
+      },
+      {
+       "x": 0.4,
+       "p": 0.005
+      },
+      {
+       "x": 0.5,
+       "p": 0.005
+      }
+     ],
+     "volume": 654873,
+     "mid": -0.128,
+     "likely": [
+      {
+       "v": -0.1,
+       "p": 0.44
+      },
+      {
+       "v": 0,
+       "p": 0.24
+      },
+      {
+       "v": -0.2,
+       "p": 0.14
+      }
+     ],
+     "text": "CPI for November 2026: most likely −0.1% (44%), then 0.0% (24%)"
+    }
+   ],
+   "corePce": [
+    {
+     "key": "corePce",
+     "event": "KXPCECORE-26OCT",
+     "period": "October 2026",
+     "close": "2026-11-25T13:25:00Z",
+     "rungs": [
+      {
+       "x": 0,
+       "p": 0.955
+      },
+      {
+       "x": 0.1,
+       "p": 0.955
+      },
+      {
+       "x": 0.2,
+       "p": 0.925
+      },
+      {
+       "x": 0.3,
+       "p": 0.06
+      },
+      {
+       "x": 0.4,
+       "p": 0.005
+      }
+     ],
+     "volume": 27070,
+     "mid": 0.249,
+     "likely": [
+      {
+       "v": 0.3,
+       "p": 0.865
+      },
+      {
+       "v": 0.4,
+       "p": 0.055
+      },
+      {
+       "v": 0.2,
+       "p": 0.03
+      }
+     ],
+     "text": "core PCE for October 2026: most likely +0.3% (87%)"
+    }
+   ],
+   "payrolls": [
+    {
+     "key": "payrolls",
+     "event": "KXPAYROLLS-26NOV",
+     "period": "November 2026",
+     "close": "2026-12-04T13:29:00Z",
+     "rungs": [
+      {
+       "x": -25000,
+       "p": 0.96
+      },
+      {
+       "x": 0,
+       "p": 0.955
+      },
+      {
+       "x": 10000,
+       "p": 0.905
+      },
+      {
+       "x": 20000,
+       "p": 0.855
+      },
+      {
+       "x": 30000,
+       "p": 0.835
+      },
+      {
+       "x": 40000,
+       "p": 0.785
+      },
+      {
+       "x": 50000,
+       "p": 0.775
+      },
+      {
+       "x": 60000,
+       "p": 0.725
+      },
+      {
+       "x": 70000,
+       "p": 0.655
+      },
+      {
+       "x": 80000,
+       "p": 0.595
+      },
+      {
+       "x": 90000,
+       "p": 0.485
+      },
+      {
+       "x": 100000,
+       "p": 0.41
+      },
+      {
+       "x": 125000,
+       "p": 0.315
+      }
+     ],
+     "volume": 25131,
+     "mid": 88636.364,
+     "text": "payrolls for November 2026: the middle of the ladder is about 90,000 jobs, 41% on more than 100,000"
+    }
+   ],
+   "u3": [
+    {
+     "key": "u3",
+     "event": "KXU3-26NOV",
+     "period": "November 2026",
+     "close": "2026-12-04T13:29:00Z",
+     "rungs": [
+      {
+       "x": 3.7,
+       "p": 0.955
+      },
+      {
+       "x": 3.8,
+       "p": 0.955
+      },
+      {
+       "x": 3.9,
+       "p": 0.95
+      },
+      {
+       "x": 4,
+       "p": 0.805
+      },
+      {
+       "x": 4.1,
+       "p": 0.465
+      },
+      {
+       "x": 4.2,
+       "p": 0.13
+      },
+      {
+       "x": 4.3,
+       "p": 0.025
+      },
+      {
+       "x": 4.4,
+       "p": 0.015
+      },
+      {
+       "x": 4.5,
+       "p": 0.015
+      },
+      {
+       "x": 4.6,
+       "p": 0.015
+      },
+      {
+       "x": 4.7,
+       "p": 0.005
+      },
+      {
+       "x": 4.8,
+       "p": 0.005
+      },
+      {
+       "x": 4.9,
+       "p": 0.005
+      },
+      {
+       "x": 5,
+       "p": 0.005
+      }
+     ],
+     "volume": 130575,
+     "mid": 4.09,
+     "likely": [
+      {
+       "v": 4.1,
+       "p": 0.34
+      },
+      {
+       "v": 4.2,
+       "p": 0.335
+      },
+      {
+       "v": 4,
+       "p": 0.145
+      }
+     ],
+     "text": "the unemployment rate for November 2026: most likely 4.1% (34%), then 4.2% (34%)"
+    }
+   ],
+   "gdp": [
+    {
+     "key": "gdp",
+     "event": "KXGDP-27JAN28",
+     "period": "Q4 2026",
+     "close": "2027-01-28T13:29:00Z",
+     "rungs": [
+      {
+       "x": 0,
+       "p": 0.965
+      },
+      {
+       "x": 0.5,
+       "p": 0.96
+      },
+      {
+       "x": 1,
+       "p": 0.925
+      },
+      {
+       "x": 1.5,
+       "p": 0.85
+      },
+      {
+       "x": 2,
+       "p": 0.775
+      },
+      {
+       "x": 2.5,
+       "p": 0.665
+      },
+      {
+       "x": 3,
+       "p": 0.38
+      },
+      {
+       "x": 3.5,
+       "p": 0.255
+      },
+      {
+       "x": 4,
+       "p": 0.095
+      }
+     ],
+     "volume": 68614,
+     "mid": 2.789,
+     "text": "real GDP growth for Q4 2026: the middle of the ladder is +2.8%"
+    }
+   ],
+   "fed": [
+    {
+     "key": "fed",
+     "event": "KXFED-26DEC",
+     "period": "9 Dec 2026",
+     "close": "2026-12-09T18:55:00Z",
+     "rungs": [
+      {
+       "x": 2.75,
+       "p": 0.995
+      },
+      {
+       "x": 3,
+       "p": 0.995
+      },
+      {
+       "x": 3.25,
+       "p": 0.995
+      },
+      {
+       "x": 3.5,
+       "p": 0.995
+      },
+      {
+       "x": 3.75,
+       "p": 0.99
+      },
+      {
+       "x": 4,
+       "p": 0.915
+      },
+      {
+       "x": 4.25,
+       "p": 0.025
+      },
+      {
+       "x": 4.5,
+       "p": 0.005
+      },
+      {
+       "x": 4.75,
+       "p": 0.005
+      },
+      {
+       "x": 5,
+       "p": 0.005
+      },
+      {
+       "x": 5.25,
+       "p": 0.005
+      }
+     ],
+     "volume": 1578115,
+     "mid": 4.117,
+     "likely": [
+      {
+       "v": 4.25,
+       "p": 0.89
+      },
+      {
+       "v": 4,
+       "p": 0.075
+      },
+      {
+       "v": 4.5,
+       "p": 0.02
+      }
+     ],
+     "text": "the Fed's target rate (upper bound) for 9 Dec 2026: most likely 4.25% (89%)"
+    },
+    {
+     "key": "fed",
+     "event": "KXFED-27JAN",
+     "period": "27 Jan 2027",
+     "close": "2027-01-27T18:55:00Z",
+     "rungs": [
+      {
+       "x": 0,
+       "p": 0.985
+      },
+      {
+       "x": 0.25,
+       "p": 0.985
+      },
+      {
+       "x": 0.5,
+       "p": 0.985
+      },
+      {
+       "x": 0.75,
+       "p": 0.985
+      },
+      {
+       "x": 1,
+       "p": 0.985
+      },
+      {
+       "x": 1.25,
+       "p": 0.985
+      },
+      {
+       "x": 1.5,
+       "p": 0.985
+      },
+      {
+       "x": 1.75,
+       "p": 0.985
+      },
+      {
+       "x": 2,
+       "p": 0.985
+      },
+      {
+       "x": 2.25,
+       "p": 0.985
+      },
+      {
+       "x": 2.5,
+       "p": 0.98
+      },
+      {
+       "x": 2.75,
+       "p": 0.98
+      },
+      {
+       "x": 3,
+       "p": 0.98
+      },
+      {
+       "x": 3.25,
+       "p": 0.98
+      },
+      {
+       "x": 3.5,
+       "p": 0.975
+      },
+      {
+       "x": 3.75,
+       "p": 0.95
+      },
+      {
+       "x": 4,
+       "p": 0.93
+      },
+      {
+       "x": 4.25,
+       "p": 0.58
+      },
+      {
+       "x": 4.5,
+       "p": 0.095
+      },
+      {
+       "x": 4.75,
+       "p": 0.035
+      },
+      {
+       "x": 5,
+       "p": 0.025
+      },
+      {
+       "x": 5.25,
+       "p": 0.02
+      },
+      {
+       "x": 5.5,
+       "p": 0.02
+      },
+      {
+       "x": 5.75,
+       "p": 0.02
+      },
+      {
+       "x": 6,
+       "p": 0.01
+      }
+     ],
+     "volume": 62755,
+     "mid": 4.291,
+     "likely": [
+      {
+       "v": 4.5,
+       "p": 0.485
+      },
+      {
+       "v": 4.25,
+       "p": 0.35
+      },
+      {
+       "v": 4.75,
+       "p": 0.06
+      }
+     ],
+     "text": "the Fed's target rate (upper bound) for 27 Jan 2027: most likely 4.50% (49%), then 4.25% (35%)"
+    },
+    {
+     "key": "fed",
+     "event": "KXFED-27MAR",
+     "period": "17 Mar 2027",
+     "close": "2027-03-17T17:55:00Z",
+     "rungs": [
+      {
+       "x": 0,
+       "p": 0.975
+      },
+      {
+       "x": 0.25,
+       "p": 0.975
+      },
+      {
+       "x": 0.5,
+       "p": 0.975
+      },
+      {
+       "x": 0.75,
+       "p": 0.975
+      },
+      {
+       "x": 1,
+       "p": 0.975
+      },
+      {
+       "x": 1.25,
+       "p": 0.965
+      },
+      {
+       "x": 1.5,
+       "p": 0.965
+      },
+      {
+       "x": 1.75,
+       "p": 0.965
+      },
+      {
+       "x": 2,
+       "p": 0.965
+      },
+      {
+       "x": 2.25,
+       "p": 0.965
+      },
+      {
+       "x": 2.5,
+       "p": 0.965
+      },
+      {
+       "x": 2.75,
+       "p": 0.965
+      },
+      {
+       "x": 3,
+       "p": 0.935
+      },
+      {
+       "x": 3.25,
+       "p": 0.935
+      },
+      {
+       "x": 3.5,
+       "p": 0.92
+      },
+      {
+       "x": 3.75,
+       "p": 0.92
+      },
+      {
+       "x": 4,
+       "p": 0.92
+      },
+      {
+       "x": 4.25,
+       "p": 0.785
+      },
+      {
+       "x": 4.5,
+       "p": 0.5
+      },
+      {
+       "x": 4.75,
+       "p": 0.035
+      },
+      {
+       "x": 5,
+       "p": 0.035
+      },
+      {
+       "x": 5.25,
+       "p": 0.03
+      },
+      {
+       "x": 5.5,
+       "p": 0.03
+      },
+      {
+       "x": 5.75,
+       "p": 0.03
+      },
+      {
+       "x": 6,
+       "p": 0.03
+      }
+     ],
+     "volume": 61457,
+     "mid": 4.5,
+     "likely": [
+      {
+       "v": 4.75,
+       "p": 0.465
+      },
+      {
+       "v": 4.5,
+       "p": 0.285
+      },
+      {
+       "v": 4.25,
+       "p": 0.135
+      }
+     ],
+     "text": "the Fed's target rate (upper bound) for 17 Mar 2027: most likely 4.75% (47%), then 4.50% (28%)"
+    }
+   ],
+   "recession": [
+    {
+     "key": "recession",
+     "event": "KXRECSSNBER-26",
+     "period": "2026",
+     "close": "2027-01-31T13:25:00Z",
+     "p": 0.02,
+     "volume": 4278485,
+     "text": "a US recession in 2026: 2%"
+    },
+    {
+     "key": "recession",
+     "event": "KXRECSSNBER-27",
+     "period": "2027",
+     "close": "2028-01-31T13:25:00Z",
+     "p": 0.26,
+     "volume": 1072292,
+     "text": "a US recession in 2027: 26%"
+    }
+   ],
+   "gold": [
+    {
+     "key": "gold",
+     "event": "KXGOLDMON-26NOV3017",
+     "period": "30 Nov 2026",
+     "close": "2026-11-30T22:00:00Z",
+     "rungs": [
+      {
+       "x": 3083.99,
+       "p": 0.965
+      },
+      {
+       "x": 3123.99,
+       "p": 0.965
+      },
+      {
+       "x": 3163.99,
+       "p": 0.965
+      },
+      {
+       "x": 3203.99,
+       "p": 0.965
+      },
+      {
+       "x": 3243.99,
+       "p": 0.955
+      },
+      {
+       "x": 3283.99,
+       "p": 0.93
+      },
+      {
+       "x": 3323.99,
+       "p": 0.905
+      },
+      {
+       "x": 3363.99,
+       "p": 0.855
+      },
+      {
+       "x": 3403.99,
+       "p": 0.785
+      },
+      {
+       "x": 3443.99,
+       "p": 0.715
+      },
+      {
+       "x": 3483.99,
+       "p": 0.63
+      },
+      {
+       "x": 3523.99,
+       "p": 0.51
+      },
+      {
+       "x": 3563.99,
+       "p": 0.41
+      },
+      {
+       "x": 3603.99,
+       "p": 0.305
+      },
+      {
+       "x": 3643.99,
+       "p": 0.245
+      },
+      {
+       "x": 3683.99,
+       "p": 0.15
+      },
+      {
+       "x": 3723.99,
+       "p": 0.11
+      },
+      {
+       "x": 3763.99,
+       "p": 0.065
+      },
+      {
+       "x": 3803.99,
+       "p": 0.04
+      },
+      {
+       "x": 3843.99,
+       "p": 0.025
+      },
+      {
+       "x": 3883.99,
+       "p": 0.015
+      },
+      {
+       "x": 3923.99,
+       "p": 0.015
+      },
+      {
+       "x": 3963.99,
+       "p": 0.015
+      },
+      {
+       "x": 4003.99,
+       "p": 0.005
+      },
+      {
+       "x": 4043.99,
+       "p": 0.005
+      },
+      {
+       "x": 4083.99,
+       "p": 0.005
+      },
+      {
+       "x": 4123.99,
+       "p": 0.005
+      },
+      {
+       "x": 4163.99,
+       "p": 0.005
+      },
+      {
+       "x": 4203.99,
+       "p": 0.005
+      },
+      {
+       "x": 4243.99,
+       "p": 0.005
+      },
+      {
+       "x": 4283.99,
+       "p": 0.005
+      },
+      {
+       "x": 4323.99,
+       "p": 0.005
+      },
+      {
+       "x": 4363.99,
+       "p": 0.005
+      },
+      {
+       "x": 4403.99,
+       "p": 0.005
+      },
+      {
+       "x": 4443.99,
+       "p": 0.005
+      },
+      {
+       "x": 4483.99,
+       "p": 0.005
+      },
+      {
+       "x": 4523.99,
+       "p": 0.005
+      },
+      {
+       "x": 4563.99,
+       "p": 0.005
+      },
+      {
+       "x": 4603.99,
+       "p": 0.005
+      },
+      {
+       "x": 4643.99,
+       "p": 0.005
+      }
+     ],
+     "volume": 45001,
+     "mid": 3527.99,
+     "lo": 3395,
+     "hi": 3663,
+     "text": "gold on 30 Nov 2026: the middle of the ladder is about $3,528, a 60% chance priced between $3,395 and $3,663"
+    }
+   ],
+   "claims": [
+    {
+     "key": "claims",
+     "event": "KXJOBLESSCLAIMS-26NOV25",
+     "period": "21 Nov 2026",
+     "close": "2026-11-25T13:29:00Z",
+     "rungs": [
+      {
+       "x": 175000,
+       "p": 0.95
+      },
+      {
+       "x": 180000,
+       "p": 0.94
+      },
+      {
+       "x": 185000,
+       "p": 0.93
+      },
+      {
+       "x": 190000,
+       "p": 0.885
+      },
+      {
+       "x": 195000,
+       "p": 0.75
+      },
+      {
+       "x": 200000,
+       "p": 0.5
+      },
+      {
+       "x": 205000,
+       "p": 0.315
+      },
+      {
+       "x": 210000,
+       "p": 0.09
+      },
+      {
+       "x": 215000,
+       "p": 0.04
+      },
+      {
+       "x": 220000,
+       "p": 0.025
+      },
+      {
+       "x": 225000,
+       "p": 0.02
+      }
+     ],
+     "volume": 500,
+     "mid": 200000,
+     "text": "initial jobless claims for the week to 21 Nov 2026: the middle of the ladder is about 200,000"
+    }
+   ],
+   "ism": [
+    {
+     "key": "ism",
+     "event": "KXISMPMI-26NOV",
+     "period": "November 2026",
+     "close": "2026-12-01T14:59:00Z",
+     "rungs": [
+      {
+       "x": 52,
+       "p": 0.97
+      },
+      {
+       "x": 53,
+       "p": 0.925
+      },
+      {
+       "x": 54,
+       "p": 0.865
+      },
+      {
+       "x": 55,
+       "p": 0.585
+      },
+      {
+       "x": 56,
+       "p": 0.335
+      },
+      {
+       "x": 57,
+       "p": 0.15
+      },
+      {
+       "x": 58,
+       "p": 0.075
+      },
+      {
+       "x": 59,
+       "p": 0.025
+      }
+     ],
+     "volume": 941,
+     "mid": 55.34,
+     "text": "the ISM manufacturing index for November 2026: the middle of the ladder is about 55.3 (above 50 = growing)"
+    }
+   ],
+   "adp": [
+    {
+     "key": "adp",
+     "event": "KXADP-26NOV",
+     "period": "November 2026",
+     "close": "2026-12-02T13:14:00Z",
+     "rungs": [
+      {
+       "x": -25000,
+       "p": 0.94
+      },
+      {
+       "x": 0,
+       "p": 0.94
+      },
+      {
+       "x": 25000,
+       "p": 0.92
+      },
+      {
+       "x": 50000,
+       "p": 0.845
+      },
+      {
+       "x": 75000,
+       "p": 0.625
+      },
+      {
+       "x": 100000,
+       "p": 0.34
+      },
+      {
+       "x": 125000,
+       "p": 0.145
+      }
+     ],
+     "volume": 1389,
+     "mid": 85964.912,
+     "text": "ADP private payrolls for November 2026: the middle of the ladder is about 85,000 jobs"
+    }
+   ],
+   "boj": [
+    {
+     "key": "boj",
+     "event": "KXCBDECISIONJAPAN-26DEC17",
+     "period": "17 Dec 2026",
+     "close": "2026-12-18T03:29:00Z",
+     "options": [
+      {
+       "label": "Hike 25bps",
+       "p": 0.87
+      },
+      {
+       "label": "Maintain current rate",
+       "p": 0.11
+      },
+      {
+       "label": "Cut more than 25bps",
+       "p": 0.01
+      },
+      {
+       "label": "Cut 25bps",
+       "p": 0.01
+      }
+     ],
+     "text": "the Bank of Japan's decision on 17 Dec 2026: most likely \"Hike 25bps\" (87%), then \"Maintain current rate\" (11%)"
+    }
+   ]
+  }
+ },
+ "auctionResults": {
+  "at": "2026-11-20T20:53:39Z",
+  "list": [
+   {
+    "day": "2026-11-19",
+    "term": "9-Year 8-Month",
+    "tenor": 10,
+    "type": "TIPS",
+    "reopening": true,
+    "yield": 2.903,
+    "median": 2.84,
+    "btc": 2.43,
+    "indirect": 0.686,
+    "direct": 0.254,
+    "dealers": 0.06,
+    "amount": 19,
+    "btcPrior": 2.27,
+    "priorN": 2,
+    "indirectPrior": 0.621,
+    "text": "19 Nov 9-Year 8-Month TIPS (reopening), $19bn: high yield 2.903%, bid-to-cover 2.43 (the 2 before averaged 2.27), indirect bidders took 69% (62% before), dealers took 6%. Stronger demand than the earlier ones."
+   },
+   {
+    "day": "2026-11-18",
+    "term": "20-Year",
+    "tenor": 20,
+    "type": "Bond",
+    "reopening": false,
+    "yield": 5.459,
+    "median": 5.414,
+    "btc": 2.63,
+    "indirect": 0.602,
+    "direct": 0.267,
+    "dealers": 0.131,
+    "amount": 16,
+    "btcPrior": 2.61,
+    "priorN": 3,
+    "indirectPrior": 0.579,
+    "text": "18 Nov 20-Year Bond, $16bn: high yield 5.459%, bid-to-cover 2.63 (the 3 before averaged 2.61), indirect bidders took 60% (58% before), dealers took 13%."
+   },
+   {
+    "day": "2026-11-12",
+    "term": "30-Year",
+    "tenor": 30,
+    "type": "Bond",
+    "reopening": false,
+    "yield": 5.441,
+    "median": 5.37,
+    "btc": 2.36,
+    "indirect": 0.681,
+    "direct": 0.205,
+    "dealers": 0.114,
+    "amount": 25,
+    "btcPrior": 2.51,
+    "priorN": 3,
+    "indirectPrior": 0.729,
+    "text": "12 Nov 30-Year Bond, $25bn: high yield 5.441%, bid-to-cover 2.36 (the 3 before averaged 2.51), indirect bidders took 68% (73% before), dealers took 11%. Softer demand than the earlier ones."
+   },
+   {
+    "day": "2026-11-10",
+    "term": "10-Year",
+    "tenor": 10,
+    "type": "Note",
+    "reopening": false,
+    "yield": 5.02,
+    "median": 4.961,
+    "btc": 2.46,
+    "indirect": 0.612,
+    "direct": 0.29,
+    "dealers": 0.098,
+    "amount": 42,
+    "btcPrior": 2.67,
+    "priorN": 3,
+    "indirectPrior": 0.787,
+    "text": "10 Nov 10-Year Note, $42bn: high yield 5.020%, bid-to-cover 2.46 (the 3 before averaged 2.67), indirect bidders took 61% (79% before), dealers took 10%. Softer demand than the earlier ones."
+   }
+  ]
+ },
+ "plumbing": {
+  "at": "2026-11-20T20:53:39Z",
+  "rates": {
+   "effr": {
+    "day": "2026-11-19",
+    "rate": 3.88,
+    "p1": 3.85,
+    "p99": 3.9,
+    "vol": 100
+   },
+   "target": {
+    "from": 3.75,
+    "to": 4
+   },
+   "obfr": {
+    "day": "2026-11-19",
+    "rate": 3.88,
+    "p1": 3.78,
+    "p99": 3.95,
+    "vol": 186
+   },
+   "tgcr": {
+    "day": "2026-11-19",
+    "rate": 3.88,
+    "p1": 3.82,
+    "p99": 3.94,
+    "vol": 1245
+   },
+   "bgcr": {
+    "day": "2026-11-19",
+    "rate": 3.88,
+    "p1": 3.82,
+    "p99": 3.97,
+    "vol": 1285
+   },
+   "sofr": {
+    "day": "2026-11-19",
+    "rate": 3.91,
+    "p1": 3.85,
+    "p99": 3.98,
+    "vol": 3161
+   }
+  },
+  "iorb": {
+   "day": "2026-11-20",
+   "rate": 3.9
+  },
+  "sofrOverIorb": 1,
+  "effrInRange": 0.52,
+  "rrp": {
+   "day": "2026-11-20",
+   "bn": 0.4
+  },
+  "tga": {
+   "day": "2026-11-18",
+   "bn": 892.31,
+   "chg4w": -52.84
+  },
+  "reserves": {
+   "day": "2026-11-18",
+   "bn": 2979.66,
+   "chg4w": 17.05
+  },
+  "balanceSheet": {
+   "day": "2026-11-18",
+   "bn": 6741.45,
+   "chg4w": -12.15
+  },
+  "netLiquidity": {
+   "day": "2026-11-18",
+   "bn": 5848.81,
+   "chg4w": 40.6
+  }
+ },
+ "vol": {
+  "at": "2026-11-20T20:53:39Z",
+  "gvz": {
+   "day": "2026-11-19",
+   "value": 28.7,
+   "weekAgo": 25.91,
+   "pctile": 0.75,
+   "n": 252,
+   "dayMovePct": 1.81
+  },
+  "vix1d": {
+   "day": "2026-11-19",
+   "value": 32.06,
+   "weekAgo": 15.99,
+   "pctile": 0.99,
+   "n": 252
+  },
+  "vix9d": {
+   "day": "2026-11-19",
+   "value": 29.26,
+   "weekAgo": 17.51,
+   "pctile": 0.98,
+   "n": 252
+  },
+  "skew": {
+   "day": "2026-11-19",
+   "value": 140.86,
+   "weekAgo": 150.16,
+   "pctile": 0.19,
+   "n": 252
+  },
+  "vvix": {
+   "day": "2026-11-19",
+   "value": 127.1,
+   "weekAgo": 96.71,
+   "pctile": 0.97,
+   "n": 252
+  },
+  "ovx": {
+   "day": "2026-11-19",
+   "value": 50.67,
+   "weekAgo": 51.72,
+   "pctile": 0.4,
+   "n": 252
+  },
+  "fsi": {
+   "day": "2026-11-18",
+   "value": -1.39,
+   "weekAgo": -1.95,
+   "pctile": 0.9,
+   "n": 252
+  }
+ },
+ "under": {
+  "at": "2026-11-20T20:53:39Z",
+  "trimPce": {
+   "day": "2026-09-01",
+   "value": 2.84,
+   "prev": 1.96
+  },
+  "stickyCpi": {
+   "day": "2026-10-01",
+   "value": 3.06,
+   "prev": 2.78
+  },
+  "medianCpi": {
+   "day": "2026-10-01",
+   "value": 3.66,
+   "prev": 2.81
+  },
+  "wages": {
+   "day": "2026-09-01",
+   "value": 3.9,
+   "prev": 4.1
+  },
+  "expInf1y": {
+   "day": "2026-11-01",
+   "value": 3.04,
+   "prev": 2.98
+  },
+  "claims": {
+   "day": "2026-11-14",
+   "value": 203000,
+   "prev": 202000
+  },
+  "wei": {
+   "day": "2026-11-07",
+   "value": 3.29,
+   "prev": 3.48
+  },
+  "stlNow": {
+   "day": "2026-10-01",
+   "value": 2.05,
+   "prev": 3.19
+  },
+  "termPremium": {
+   "day": "2026-11-13",
+   "value": 0.99,
+   "prev": 0.97
+  }
+ },
+ "official": {
+  "at": "2026-11-20T20:53:39Z",
+  "read": [
+   "BLS",
+   "BEA"
+  ],
+  "from": "2026-11-18",
+  "to": "2026-12-11",
+  "list": [
+   {
+    "t": 1795613400,
+    "day": "2026-11-25",
+    "agency": "BEA",
+    "type": "GDP",
+    "title": "Gross Domestic Product"
+   },
+   {
+    "t": 1795613400,
+    "day": "2026-11-25",
+    "agency": "BEA",
+    "type": "PCE",
+    "title": "Personal income and outlays (PCE)"
+   },
+   {
+    "t": 1796137200,
+    "day": "2026-12-01",
+    "agency": "BLS",
+    "type": null,
+    "title": "Job openings (JOLTS)"
+   },
+   {
+    "t": 1796391000,
+    "day": "2026-12-04",
+    "agency": "BLS",
+    "type": "NFP",
+    "title": "Jobs report (Employment Situation)"
+   },
+   {
+    "t": 1796736600,
+    "day": "2026-12-08",
+    "agency": "BLS",
+    "type": null,
+    "title": "Productivity and costs"
+   },
+   {
+    "t": 1796736600,
+    "day": "2026-12-08",
+    "agency": "BEA",
+    "type": null,
+    "title": "Trade in goods and services"
+   },
+   {
+    "t": 1796909400,
+    "day": "2026-12-10",
+    "agency": "BLS",
+    "type": "CPI",
+    "title": "Consumer Price Index"
+   },
+   {
+    "t": 1796909400,
+    "day": "2026-12-10",
+    "agency": "BLS",
+    "type": null,
+    "title": "Real earnings"
+   }
+  ]
+ },
  "hist": [
   {"at":"2026-11-20T17:30:15Z","odds":{"meeting":"2026-12-09","top":[{"label":"Hike 25bps","p":0.89},{"label":"Fed maintains rate","p":0.08},{"label":"Hike >25bps","p":0.02}]},"nowcast":[{"month":"2026-10","corePce":0.27,"pce":0.31,"coreCpi":null,"cpi":null},{"month":"2026-11","corePce":0.26,"pce":0.17,"coreCpi":0.21,"cpi":0.07}],"gdpnow":{"quarter":"2026 Q4","value":3.21}},
   {"at":"2026-11-20T18:10:48Z","odds":{"meeting":"2026-12-09","top":[{"label":"Hike 25bps","p":0.91},{"label":"Fed maintains rate","p":0.07},{"label":"Hike >25bps","p":0.03}]},"nowcast":[{"month":"2026-10","corePce":0.27,"pce":0.31,"coreCpi":null,"cpi":null},{"month":"2026-11","corePce":0.26,"pce":0.17,"coreCpi":0.21,"cpi":0.07}],"gdpnow":{"quarter":"2026 Q4","value":3.21}},
   {"at":"2026-11-20T19:19:42Z","odds":{"meeting":"2026-12-09","top":[{"label":"Hike 25bps","p":0.91},{"label":"Fed maintains rate","p":0.06},{"label":"Hike >25bps","p":0.03}]},"nowcast":[{"month":"2026-10","corePce":0.27,"pce":0.31,"coreCpi":null,"cpi":null},{"month":"2026-11","corePce":0.26,"pce":0.17,"coreCpi":0.21,"cpi":0.07}],"gdpnow":{"quarter":"2026 Q4","value":3.21}},
-  {"at":"2026-11-20T20:30:47Z","odds":{"meeting":"2026-12-09","top":[{"label":"Hike 25bps","p":0.9},{"label":"Fed maintains rate","p":0.1},{"label":"Hike >25bps","p":0.02}]},"nowcast":[{"month":"2026-10","corePce":0.27,"pce":0.31,"coreCpi":null,"cpi":null},{"month":"2026-11","corePce":0.26,"pce":0.17,"coreCpi":0.21,"cpi":0.07}],"gdpnow":{"quarter":"2026 Q4","value":3.21}}
+  {"at":"2026-11-20T20:53:39Z","odds":{"meeting":"2026-12-09","top":[{"label":"Hike 25bps","p":0.9},{"label":"Fed maintains rate","p":0.11},{"label":"Hike >25bps","p":0.02}]},"nowcast":[{"month":"2026-10","corePce":0.27,"pce":0.31,"coreCpi":null,"cpi":null},{"month":"2026-11","corePce":0.26,"pce":0.17,"coreCpi":0.21,"cpi":0.07}],"gdpnow":{"quarter":"2026 Q4","value":3.21},"priced":{"coreCpi":{"period":"November 2026","v":0.2,"p":0.41},"cpi":{"period":"November 2026","v":-0.1,"p":0.44},"corePce":{"period":"October 2026","v":0.3,"p":0.865},"payrolls":{"period":"November 2026","mid":88636.364},"u3":{"period":"November 2026","v":4.1,"p":0.34},"gdp":{"period":"Q4 2026","mid":2.789},"fed":{"period":"9 Dec 2026","v":4.25,"p":0.89},"recession":{"period":"2026","p":0.02},"gold":{"period":"30 Nov 2026","mid":3527.99},"claims":{"period":"21 Nov 2026","mid":200000},"ism":{"period":"November 2026","mid":55.34},"adp":{"period":"November 2026","mid":85964.912}},"gvz":28.7}
  ]
 }
