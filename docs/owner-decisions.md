@@ -1277,3 +1277,24 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   range fixed in advance (pre-registered). At 120 trades (about six months) it reads "fails" or "holds so far"; at 240 trades
   "confirmed", "fails" or "not shown either way". It needs no decision and does not replace this one: a demo stream would also
   measure the fills.
+
+## The USD/JPY breakout, 20 Nov 2026
+
+### [ ] 63. Run the breakout rule (T1) on USD/JPY as a demo stream?
+
+- **Status (20 Nov 2026): open.** Gold's breakout rule T1 (UTC open ± half the previous day's range, stop at the open, out at
+  21:00 UTC) was tested on forex the same day, each test pre-registered:
+  - six majors pooled: FAIL (`fx-vol-breakout`, −0.022R a trade, n 12,664);
+  - **USD/JPY alone: +0.063R a trade on 2016-26 (n 2,079, month t 2.50) and +0.079R on 2005-15** (`usdjpy-vol-breakout-early`,
+    n 2,089, month t 2.95: years the first test never read);
+  - the five yen crosses pooled: FAIL (`yen-crosses-vol-breakout`, +0.021R, t 1.64): it is USD/JPY's, not the yen's;
+  - **at the demo broker's own ticks, Nov 2023 - Nov 2026: +0.148R a trade after commission (n 564, month t 3.11)**
+    (`usdjpy-vol-breakout-exec`); real fills cost about 0.01R a trade.
+- **Why it is still your decision.** The ten best trades carry 75 % of the last three years, and almost all of the gain is on the
+  buy side (2005-26: buys +0.148R a trade, sells +0.001R), so part of it may be USD/JPY's long rise and carry rather than the
+  breakout. One market of eleven passing is the kind of result that needs new data.
+- **Options.** (a) Wait for the forward record (`usdjpy-vol-breakout-forward`, running since 20 Nov: "holds so far" or "fails" at
+  120 trades, about seven months). (b) Also run it as a demo stream now (a job like the gotobi one, 0.25 % a trade, a stop on
+  every trade, demo only) to measure real fills going forward. (c) Drop it.
+- **Recommended: (a)**, and decide (b) together with item 62 (the gold breakout), since both are the same rule.
+- **If nothing is decided.** Nothing trades; the forward record keeps counting.

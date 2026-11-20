@@ -88,7 +88,7 @@ review. `watchdog.yml` pages when the loop stops.
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-59 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-63 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
 `cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
