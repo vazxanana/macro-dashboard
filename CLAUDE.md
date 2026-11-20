@@ -5053,6 +5053,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   2x cost +0.050R; 40 of 40 placebos). With 2016-26 (+0.063R, t 2.50) it holds in both stretches of OANDA history. Limits:
   today's demo cost charged on old years, OANDA mid candles (not broker ticks), drawdowns of 20-42R. A candidate for a forward
   paper record only (its own pre-registration); never a live rule without the owner. Nothing live changed.
+- `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
+  USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
+  +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
+  `research/forward/usdjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0).
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
