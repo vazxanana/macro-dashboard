@@ -14414,6 +14414,34 @@
     "positionId": "50420987",
     "volume": 100,
     "status": "open"
+   },
+   "usdchf-rswing-1795147785": {
+    "symbol": "USDCHF",
+    "side": "sell",
+    "setup": "rswing",
+    "openedAt": "2026-11-20T04:10:44.000Z",
+    "councilEntry": 0.8425,
+    "stop": 0.84398575,
+    "t1": 0.8285800000000001,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 0.8425,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 2.11,
+    "margin": 2,
+    "shadow": true,
+    "fillPrice": 0.8425,
+    "slipR": 0,
+    "lagSec": 59,
+    "positionId": "50425727",
+    "volume": 100000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-20T04:10:44.000Z",
+    "brokerStop": 0.84399
    }
   },
   "day": {
@@ -14421,7 +14449,7 @@
    "startBalance": 10406.4
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10543.58 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 10543.58 · 10 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker",
@@ -14434,19 +14462,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10543.58,
-  "lastRun": "2026-11-20T04:08:21.000Z"
+  "lastRun": "2026-11-20T04:10:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T14:24:07.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 433.44, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-19T14:25:41.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 433.66, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T14:29:15.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 433.89, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15936,6 +15954,16 @@
    "at": "2026-11-20T03:41:30.000Z",
    "msg": "limit filled: XAUUSD position 50420987 at the broker",
    "trade": "xau-m30m1-1795143839"
+  },
+  {
+   "at": "2026-11-20T04:10:44.000Z",
+   "msg": "placed sell limit USDCHF 0.01 lot at 0.8425 (council rswing, valid to 2026-11-22T04:09Z)",
+   "trade": "usdchf-rswing-1795147785"
+  },
+  {
+   "at": "2026-11-20T04:10:44.000Z",
+   "msg": "limit filled at once: USDCHF position 50425727 at the broker at 0.8425",
+   "trade": "usdchf-rswing-1795147785"
   }
  ],
  "limits": {
@@ -16014,11 +16042,11 @@
   ]
  },
  "execution": {
-  "n": 476,
+  "n": 477,
   "meanSlipR": -0.019,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 140.5,
+  "medianLagSec": 140,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -16045,7 +16073,7 @@
     "meanSlipR": -0.044
    },
    "USDCHF": {
-    "n": 65,
+    "n": 66,
     "meanSlipR": 0.02
    },
    "AUDUSD": {
