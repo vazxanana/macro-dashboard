@@ -88,7 +88,11 @@ export function parseAuctions(J, from, to) {
   const out = [], seen = new Set();
   for (const r of rows) {
     if (!r || typeof r !== 'object') continue;
-    const dRaw = String(pick(r, ['auctionDate', 'auction_date', 'AuctionDate']) || '');
+    // TreasuryDirect's field names differ from its documentation (20 Nov 2026 probe: no `auctionDate`): take any key that
+    // reads "auction ... date" (not a year or a time) when the known names are missing
+    let dv = pick(r, ['auctionDate', 'auction_date', 'AuctionDate']);
+    if (dv == null) { const k = Object.keys(r).find((x) => /^auction.?date$/i.test(x) && r[x]) || Object.keys(r).find((x) => /auction/i.test(x) && /date/i.test(x) && !/year|time|announce/i.test(x) && r[x]); if (k) dv = r[k]; }
+    const dRaw = String(dv || '');
     let day = (/^(\d{4}-\d{2}-\d{2})/.exec(dRaw) || [])[1] || null;
     if (!day) { const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(dRaw); if (m) day = `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`; }
     if (!day || !(day >= from && day <= to)) continue;

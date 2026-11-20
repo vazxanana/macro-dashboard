@@ -90,3 +90,12 @@ test('the Macro desk draws the auctions as escaped text, and the probe workflow 
   const yml = fs.readFileSync(new URL('../.github/workflows/macro-probe.yml', import.meta.url), 'utf8');
   assert.ok(yml.includes('node scripts/macro-probe.mjs'));
 });
+
+test('a TreasuryDirect row whose auction date sits under another key name is still read (20 Nov 2026 probe)', async () => {
+  const { parseAuctions } = await import('../council/hard-data.mjs');
+  const rows = [{ securityType: 'Note', securityTerm: '7-Year', type: 'Note', offeringAmount: '44000000000', announcementDate: '2026-11-19T00:00:00', auctionDateYear: '2026', AuctionDt: '', auctionDateTime: 'x', auction_dt: '' , auctionDateOfIssue: '2026-11-25T00:00:00' }];
+  const got = parseAuctions(rows, '2026-11-19', '2026-12-04');
+  assert.equal(got.length, 1);
+  assert.equal(got[0].day, '2026-11-25');
+  assert.equal(got[0].amount, 44);
+});
