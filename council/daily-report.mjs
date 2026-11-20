@@ -32,6 +32,16 @@ export function londonAt(day, h, m) {
   return guess;
 }
 const hm = (t) => { const L = london(t); return `${String(L.h).padStart(2, '0')}:${String(L.m).padStart(2, '0')}`; };
+// The Fed's calendar gives New York clock times ("2:15 p.m."); the report is headed in London time, so show London first.
+// Unreadable time: the Fed's own words, labelled New York. Pure.
+export function nyUnix(day, time) {
+  const m = /^(\d{1,2}):(\d{2})\s*([ap])\.?m\.?$/i.exec(String(time || '').trim()), d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(day || ''));
+  if (!m || !d) return null;
+  const h = (Number(m[1]) % 12) + (m[3].toLowerCase() === 'p' ? 12 : 0), guess = Date.UTC(+d[1], +d[2] - 1, +d[3], h, +m[2]) / 1000;
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(guess * 1000)).map((x) => [x.type, x.value]));
+  return guess - (Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute) / 1000 - guess);
+}
+const fedTime = (day, time) => { const t = nyUnix(day, time); return t == null ? `${clean(time, 20)} New York` : `${hm(t)} London (${clean(time, 20)} New York)`; };
 const dayName = (t) => new Intl.DateTimeFormat('en-GB', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' }).format(new Date(t * 1000));
 const pc = (x, d = 1) => (x == null || !Number.isFinite(x) ? 'n/a' : (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(d) + '%');
 const num = (x, d = 2) => (x == null || !Number.isFinite(+x) ? 'n/a' : (+x).toLocaleString('en-GB', { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -74,10 +84,10 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
     if (nc && !lines.today.some((l) => l.startsWith('Before the print'))) lines.today.push(`Before the print: ${nc.text}.`);
   }
   for (const f of (((hd && hd.fed) || {}).events || []).filter((x) => x && x.day === today).slice(0, 4))
-    lines.today.push(`Fed: ${clean(f.title, 100)}${f.time ? ` · ${clean(f.time, 20)} New York` : ''}${f.topic ? ` · ${clean(f.topic, 100)}` : ''}`);
+    lines.today.push(`Fed: ${clean(f.title, 100)}${f.time ? ` · ${fedTime(f.day, f.time)}` : ''}${f.topic ? ` · ${clean(f.topic, 100)}` : ''}`);
   // the US Treasury's note and bond auctions of the New York day (hard-data.mjs `auctions`): supply the bond market has to absorb
   for (const a of ((((hd && hd.auctions) || {}).list) || []).filter((x) => x && x.day === today && x.type !== 'Bill').slice(0, 4))
-    lines.today.push(`${auctionText(a)}${a.type === 'Note' || a.type === 'Bond' ? ' (results about 13:00 New York)' : ''}.`);   // FRN and TIPS auctions close at other times
+    lines.today.push(`${auctionText(a)}${a.type === 'Note' || a.type === 'Bond' ? ` (results about ${nyUnix(a.day, '1:00 p.m.') == null ? '13:00 New York' : hm(nyUnix(a.day, '1:00 p.m.')) + ' London'})` : ''}.`);   // FRN and TIPS auctions close at other times
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);

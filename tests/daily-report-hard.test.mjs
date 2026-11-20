@@ -17,7 +17,7 @@ test('today: the nowcast before the PCE print and the Fed\'s calendar of the day
   const w = DR.worldReport({ fc: {}, vet: null, cal, now: T('2026-11-25T06:30:00Z'), hd });
   const today = w.sections.find((s) => /^Today/.test(s.h)).lines, exp = w.sections.find((s) => s.h === 'What we expect').lines;
   assert.ok(today.some((l) => /^Before the print: the Cleveland Fed nowcast for October is core \+0\.27%/.test(l) && /not the consensus/.test(l)));
-  assert.ok(today.some((l) => l === 'Fed: Beige Book · 2:00 p.m. New York'));
+  assert.ok(today.some((l) => l === 'Fed: Beige Book · 19:00 London (2:00 p.m. New York)'));
   assert.ok(!today.some((l) => /Governor/.test(l)), 'only the day\'s Fed events');
   assert.ok(exp.some((l) => /Kalshi Hike 25bps 92%/.test(l) && /not a forecast of ours/.test(l)));
   assert.ok(exp.some((l) => /GDPNow for 2026 Q4: 3\.21%/.test(l)));
@@ -46,6 +46,14 @@ test('today: the Treasury note and bond auctions of the New York day, never a bi
   const now = T('2026-11-23T06:30:00Z');
   const w = DR.worldReport({ fc: {}, vet: null, cal: [], now, hd: { auctions: { list: [{ day: '2026-11-23', term: '2-Year', type: 'Note', amount: 69 }, { day: '2026-11-23', term: '13-Week', type: 'Bill', amount: 95 }, { day: '2026-11-24', term: '5-Year', type: 'Note', amount: 70 }] } } });
   const today = w.sections.find((s) => /^Today/.test(s.h)).lines;
-  assert.ok(today.includes('US Treasury 2-Year Note auction, $69 billion (results about 13:00 New York).'), today.join('\n'));
+  assert.ok(today.includes('US Treasury 2-Year Note auction, $69 billion (results about 18:00 London).'), today.join('\n'));
   assert.ok(!today.some((l) => /13-Week|5-Year/.test(l)));
+});
+
+test('nyUnix: a New York clock time on a New York day, summer and winter; an unreadable time is null', () => {
+  assert.equal(DR.nyUnix('2026-11-25', '2:00 p.m.'), T('2026-11-25T19:00:00Z'));
+  assert.equal(DR.nyUnix('2026-07-15', '8:30 a.m.'), T('2026-07-15T12:30:00Z'));
+  assert.equal(DR.nyUnix('2026-11-25', '12:15 p.m.'), T('2026-11-25T17:15:00Z'));
+  assert.equal(DR.nyUnix('2026-11-25', '12:05 a.m.'), T('2026-11-25T05:05:00Z'));
+  assert.equal(DR.nyUnix('2026-11-25', 'TBD'), null);
 });

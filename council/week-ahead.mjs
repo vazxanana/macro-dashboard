@@ -167,8 +167,8 @@ export function dayRange(fc, day, rf) {
     parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', measured over other years and as a median, so it is not comparable one for one: plan on the typical move' : ''}.`);
   }
   const mk = day && day.market;
-  if (mk && mk.kind === 'holiday') parts.push('US markets closed: thin trading, moves can be jumpy and fade.');
-  else if (mk && mk.kind === 'early') parts.push('Early close: thin trading later in the day.');
+  if (mk && mk.kind === 'holiday') parts.push('US markets closed: the typical figure comes from full trading days.');
+  else if (mk && mk.kind === 'early') parts.push('Early close: the typical figure comes from full trading days.');
   parts.push('A size for planning, not a forecast of direction.');
   out.text = parts.join(' ');
   return out;

@@ -34,9 +34,10 @@ test('fewer than 8 past releases: no release figure; signed rows alone give the 
   assert.equal(WA.dayRange(fc, { releases: [{ type: 'PCE', country: 'EUR' }] }, rf).eventPct, undefined);
 });
 
-test('holidays and early closes say thin trading', () => {
-  assert.ok(/thin trading/i.test(WA.dayRange(fc, { releases: [], market: { kind: 'holiday' } }, rf).text));
-  assert.ok(/Early close: thin trading/.test(WA.dayRange(fc, { releases: [], market: { kind: 'early' } }, rf).text));
+test('holidays and early closes say the figure is from full days, without repeating the market note', () => {
+  const hol = WA.dayRange(fc, { releases: [], market: { kind: 'holiday' } }, rf).text;
+  assert.ok(/US markets closed: the typical figure comes from full trading days/.test(hol) && !/thin trading/i.test(hol));
+  assert.ok(/Early close: the typical figure comes from full trading days/.test(WA.dayRange(fc, { releases: [], market: { kind: 'early' } }, rf).text));
 });
 
 test('no forecast file, or no expected move: no range; build attaches one per day', () => {

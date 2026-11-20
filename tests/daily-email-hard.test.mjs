@@ -35,7 +35,7 @@ test('the nowcast, the Fed events and the auctions reach the email as "Also toda
   assert.deepEqual(TN.slice(1).map((l) => l.slice(0, 12)), ['Fed: Beige B', 'Fed: Speech ', 'US Treasury ', 'US Treasury ']);
   const m = D.emailOf(rep, null), h = m.html;
   const ag = h.slice(h.indexOf('Coming out today'), h.indexOf('World economy</h2>'));
-  assert.ok(ag.includes('Also today') && ag.includes('Before the print: the Cleveland Fed nowcast') && ag.includes('Fed: Beige Book · 2:00 p.m. New York') && ag.includes('US Treasury 7-Year Note auction, $44 billion'));
+  assert.ok(ag.includes('Also today') && ag.includes('Before the print: the Cleveland Fed nowcast') && ag.includes('Fed: Beige Book · 19:00 London (2:00 p.m. New York)') && ag.includes('US Treasury 7-Year Note auction, $44 billion'));
   assert.ok(ag.indexOf('Core PCE Price Index m/m') < ag.indexOf('Also today') && (ag.match(/key release/g) || []).length === 3);
   assert.ok(m.text.includes('13:30  United States: Core PCE Price Index m/m (expected 0.2%, previous 0.3%) · key release'));
   assert.ok(m.text.includes('Fed: Beige Book') && m.text.includes('US Treasury 7-Year Note auction'));

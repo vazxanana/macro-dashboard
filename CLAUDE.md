@@ -3068,7 +3068,7 @@ study sorts by the core surprise). (5) the morning report files Fed events and a
 median is smaller, "measured over other years and as a median, so it is not comparable one for one". Also: only readings that
 moved make a line (four at most; the report's nowcast moves only for a month with a release in the next week; a broken history
 never stops the report), and the Sunday digest skips a Week ahead file that ended before today (preview up to 22 lines).
-Test: `tests/macro-review-fixes.test.mjs`.
+Test: `tests/macro-review-fixes.test.mjs`. Later the same day: the morning report shows the Fed's events and the note / bond auction results in London time (`daily-report.mjs` `nyUnix`: "19:00 London (2:00 p.m. New York)"), and a holiday's or early close's range line says "the typical figure comes from full trading days" instead of repeating the market note's "thin trading".
 **Wording found in the browser check, same day**: the frame's levels line reads from the latest price ("Gold near $3,575 now ($3,607 at the
 19 Nov close); above, $3,590 (13-week low, broken since the close)…"; it said "watch $3,590 above" under a $3,607 close); no nested
 brackets in the top lines; the morning report's "Later this week" adds the high-impact US releases of the council's schedule the
