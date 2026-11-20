@@ -12,6 +12,10 @@ on:
         description: 'Broker symbols, space separated'
         required: false
         default: 'XAUUSD'
+      marks:
+        description: 'For the marks part: a JSON file in the repository, { SYMBOL: [unix sec, ...] }'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -31,6 +35,7 @@ jobs:
           sparse-checkout: |
             council
             api
+            research/edge
 
       - name: Checkout council data
         uses: actions/checkout@v4
@@ -51,6 +56,7 @@ jobs:
           CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
           SYMS: ${{ inputs.symbols }}
+          PROBE_MARKS: ${{ inputs.marks }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
