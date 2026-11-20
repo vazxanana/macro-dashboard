@@ -5112,6 +5112,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
   `research/forward/usdjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0).
+- `energy-vol-breakout` (pre-registered 20 Nov 2026): T1 on WTI, Brent and natural gas, OANDA M5 2016 → now, 0.1 % of price a
+  round trip. **FAIL**: pooled −0.014R a trade net (n 5,221, month t −0.85); before costs +0.059R, so the verdict rests on the
+  assumed cost (the demo's energy spreads are not measured). Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
