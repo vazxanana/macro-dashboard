@@ -2517,7 +2517,18 @@ menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analy
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
-## Charts type scale (19 Nov 2026, owner: "the currency letters look too big, make same size as the rest")
+## Charts on a phone: full screen and the Style panel (20 Nov 2026, owner on an iPhone: "the phone can't read the rest", "I can't find the full screen button")
+Display only, `market-structure.html`. (1) The full-screen button was hidden under 700 px (`.ch-fs`); only the pane-header copy hides
+there now, so the chart toolbar (`#ms-ch-one`, behind the pencil "Draw" toggle on a phone) shows it as its last icon. (2) iPhone Safari
+cannot put a page element full screen: `window.msChartsFs()` uses the browser's (`requestFullscreen` / `webkitRequestFullscreen`) where
+it exists, else the page's own: `#v-charts.ch-fake-fs` (fixed over the page, `100dvh`, top 52 px for an "Exit full screen" button
+`.ch-fs-x`; Escape and a view change leave it; `window.msChartsFsState()`). Every `#ms-cfs-css` rule reads
+`:is(#v-charts:fullscreen, #v-charts.ch-fake-fs)`; without the rail the chart column now takes the full height (it was 0 px on a
+phone in the browser's full screen too). (3) The Style panel (`#ms-sty-pop`) opened from its button's left edge and ran off the right
+of a phone: up to 640 px it is a sheet across the screen above the tab bar (scrolls), wider it is moved left when it would leave the
+screen (`place`). Checked at 390 x 664 (iPhone 13) in both paths. Test: `tests/charts-phone-fs.test.mjs`.
+
+, owner: "the currency letters look too big, make same size as the rest")
 Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts is 12.5 px: the toolbar's market button `.ch-mk`
 (was 14 px / 650), the chart headers' market and timeframe buttons `.ph-mk` / `.ph-tf` (13 px / 700), the Markets view's selects and
 price; the trend chips and the cycle tag are 11.5 px Figtree (10.5 px mono and the system font before); the Style / Indicators
