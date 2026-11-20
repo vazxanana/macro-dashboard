@@ -5149,6 +5149,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - `pgm-vol-breakout` (pre-registered 20 Nov 2026): T1 on platinum and palladium, OANDA M5 2016 → now, cost 0.30 % / 0.20 % of
   price (`gold-drd-pgm`'s, not measured). **FAIL**: pooled −0.181R a trade net (n 4,082, month t −8.67); before costs +0.060R
   (palladium +0.072R), so the verdict rests on the assumed cost. Nothing live changed.
+- `pgm-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the platinum / palladium T1 trades at the demo's measured hourly
+  spreads (tick probe: XPTUSD 32-57 bp, XPDUSD 64-91 bp of price, wider than the assumed costs). **FAIL**: −0.474R a trade net
+  (t −17.85). T1 on the metals other than gold is closed. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
