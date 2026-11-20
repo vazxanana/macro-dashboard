@@ -1,6 +1,6 @@
 # Robustness audit: which edges hold up?
 
-Generated 2026-11-20T06:56:30.499Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
+Generated 2026-11-20T07:20:10.836Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
 
 ## Short answer
 
