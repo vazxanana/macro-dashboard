@@ -1,0 +1,80 @@
+{
+ "study": "yen-us-yields",
+ "built": "2026-11-20",
+ "span": [
+  "2007-01-05",
+  "2026-10-16"
+ ],
+ "verdict": "U US 10-year up > 25 bp in 4 weeks → USD/JPY higher FAIL (t 0.63, Holm 0.5603, halves t 0.22 / 0.67); D down > 25 bp → USD/JPY lower FAIL (t -1.08, Holm 0.5603, halves t -0.73 / -0.66)",
+ "tests": {
+  "U": {
+   "want": 1,
+   "all": {
+    "n": 1001,
+    "nX": 142,
+    "slope": 0.002,
+    "t": 0.63
+   },
+   "first": {
+    "n": 505,
+    "nX": 65,
+    "slope": 0.0012,
+    "t": 0.22
+   },
+   "second": {
+    "n": 496,
+    "nX": 77,
+    "slope": 0.0025,
+    "t": 0.67
+   },
+   "holm": 0.5603,
+   "pass": false
+  },
+  "D": {
+   "want": -1,
+   "all": {
+    "n": 1001,
+    "nX": 129,
+    "slope": -0.0035,
+    "t": -1.08
+   },
+   "first": {
+    "n": 505,
+    "nX": 79,
+    "slope": -0.0032,
+    "t": -0.73
+   },
+   "second": {
+    "n": 496,
+    "nX": 50,
+    "slope": -0.0034,
+    "t": -0.66
+   },
+   "holm": 0.5603,
+   "pass": false
+  }
+ },
+ "classes": {
+  "up": {
+   "n": 142,
+   "fwd": 0.0027,
+   "upShare": 0.542
+  },
+  "flat": {
+   "n": 730,
+   "fwd": 0.0011,
+   "upShare": 0.534
+  },
+  "down": {
+   "n": 129,
+   "fwd": -0.0021,
+   "upShare": 0.457
+  },
+  "all": {
+   "n": 1001,
+   "fwd": 0.0009
+  }
+ },
+ "coincidentCorr": 0.5125,
+ "weeks": 1001
+}
