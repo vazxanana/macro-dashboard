@@ -38,9 +38,9 @@
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3" defer></script>
-<script src="/assets/ms-draw.js?v=d16f960683" defer></script>
-<script src="/assets/ms-paper.js?v=1ddae9c0e4" defer></script>
-<script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
+<script src="/assets/ms-draw.js?v=c1d7e81cf2" defer></script>
+<script src="/assets/ms-paper.js?v=b052c8753d" defer></script>
+<script src="/assets/ms-vprof.js?v=b6a82cd65f" defer></script>
 <script src="/assets/ms-charts-guide.js?v=d11de693cd" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
@@ -2854,7 +2854,8 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
 <style id="ms-cfs-css">/* Full screen on the Charts (18 Nov 2026, owner: "when I go fullscreen on charts should be the full layout and split if I had"):
          the whole view goes full screen; the charts share the height that is left, in whatever view is on (All, Split, Layout, one chart) */
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
-      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ch-fs-x) { display: none !important; }
+      /* 20 Nov 2026: the floating parts that are moved in here (a drawing's style bar, the right-click menu, a chart's timeframe menu, the toasts) are not hidden with the rest */
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ms-dsel):not(.ms-cmenu):not(.ph-menu):not(#ms-toasts):not(.ch-fs-x) { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .ch-row { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-row > .ch-col { flex: 1 1 auto; }   /* a phone has no rail: the column still takes the full height (20 Nov 2026) */ :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col { display: flex; flex-direction: column; min-height: 0; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col > .mm { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp { margin: 0; padding: 6px 10px; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp .pp-ttl small { display: none; }
@@ -2994,8 +2995,10 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
         #v-charts .sec-h > .seg[aria-label="Chart view"].seg > button:nth-child(n+7) { grid-column: span 2; margin-left: 0; box-shadow: none; }
         #v-charts .sec-h > .seg[aria-label="Chart view"].seg > button:nth-child(n+7)::before { display: none; }
         #v-charts .sec-h #ms-sty-now { display: none; }
-        #v-charts .sec-h > .dr-bar { flex: 1 1 0; min-width: 0; justify-content: space-between; box-sizing: border-box; }
-        #v-charts .sec-h > .dr-bar button { flex: 1 1 0; width: auto; min-width: 0; }
+        /* 20 Nov 2026: the strip grew from 7 to 15 tools and its buttons, sharing one row, were 22 px wide on a 390 px phone;
+           they keep 44 px and take a second row */
+        #v-charts .sec-h > .dr-bar { flex: 1 1 0; min-width: 0; flex-wrap: wrap; justify-content: flex-start; box-sizing: border-box; }
+        #v-charts .sec-h > .dr-bar button { flex: 1 0 44px; width: auto; min-width: 44px; max-width: 64px; }
         #v-charts .sec-h > .ch-help.ch-help { order: 9; flex: none; width: 52px; padding: 0; justify-content: center; height: auto; align-self: stretch; }
         #v-charts .sec-h > .ch-help .t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
         #v-charts .sec-h > .ch-one.ch-one { order: 10; flex: 1 1 100%; min-width: 0; justify-content: space-between; box-sizing: border-box; }
@@ -8634,7 +8637,11 @@ function msNextSetup(bars, A) {
   // the paper trading account (assets/ms-paper.js, 18 Nov 2026): the page's one-minute candles, the 15-minute candles for its ATR
   // stop, and one-minute candles of another market for the catch-up of its open positions. Read only.
   window.msPaperHost = { key: instKey, insts: INSTRUMENTS, TZ, m1: () => (panes['1m'] && panes['1m'].bars) || [], atr: () => (panes['15m'] && panes['15m'].bars) || [],
-    since: (k, from) => rangeBars(TFS.find((t) => t.id === '1m'), INSTRUMENTS[k], from, Date.now() / 1000) };
+    // (k, from): one read up to now, as before. (k, from, to) (20 Nov 2026): one window of the catch-up; the candle service's own
+    // answer is marked `whole` (an empty window is then a closed market, not a failed read), a failed read answers null
+    since: async (k, from, to) => { const I = INSTRUMENTS[k], tf = TFS.find((t) => t.id === '1m');
+      if (to && I && I.md && MD.base && MD.on !== false) { try { const j = await getJSON(`${location.origin}${MD.base}bars?sym=${I.md}&tf=${tf.id}&from=${Math.floor(from)}&to=${Math.ceil(to)}`); if (j && Array.isArray(j.bars)) { j.bars.whole = true; return j.bars; } return null; } catch (e) { if (!/ 503$/.test(e.message)) return null; } }
+      return rangeBars(tf, I, from, to || Date.now() / 1000); } };
   document.dispatchEvent(new Event('ms:paperhost'));
   // key levels (7 Nov loop): previous day / week high and low and today's open, as quiet dotted lines on the intraday charts
   // the levels from a market's daily candles (raw prices): [title, price, pivot?]
@@ -9405,15 +9412,21 @@ function msNextSetup(bars, A) {
     if (sm) { sm.checked = !!G.smooth; sm.addEventListener('change', () => { G.smooth = sm.checked; try { localStorage.setItem('ms-smooth', sm.checked ? '1' : '0'); } catch (e) {} if (!G.smooth) { LT.disp = LT.tgt; liveEase(); } }); }
     if (ba) { ba.checked = !!G.bidAsk; ba.addEventListener('change', () => { G.bidAsk = ba.checked; try { localStorage.setItem('ms-bidask', ba.checked ? '1' : '0'); } catch (e) {} bidAskDraw(); }); } }
   // OANDA ticks (Server-Sent Events from the /md/stream Vercel function): every price change moves the forming candle on all timeframes
+  const STREAM_QUIET = 45e3;
   function startTicks() {
     if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') return;
     if (marketClosed()) { setTimeout(startTicks, 5 * 60e3); return; }   // no ticks over the weekend: look again later
-    const es = new EventSource(`${MD.base}stream?sym=${INST.md}`); G.es = es; let upd = 0;
+    const es = new EventSource(`${MD.base}stream?sym=${INST.md}`); G.es = es; let upd = 0, heard = Date.now();
     es.onmessage = (m) => {
+      heard = Date.now();
       let d; try { d = JSON.parse(m.data); } catch (e) { return; }
       if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
       G.quote = d; liveTick((d.b + d.a) / 2, d.t || Date.now() / 1000, d);
     };
+    // a stream that goes silent with its connection open (20 Nov 2026): the browser reports no error for it, so the candles
+    // froze until a reload. With the market open and the tab in view, STREAM_QUIET seconds without a price = ask again.
+    const quiet = setInterval(() => { if (G.es !== es) { clearInterval(quiet); return; } if (document.hidden) { heard = Date.now(); return; } if (marketClosed() || Date.now() - heard < STREAM_QUIET) return;
+      clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; if (G.live) { G.live = false; setStatus(); } startTicks(); }, 5000);
     es.onerror = () => { if (es.readyState === 2) { G.es = null; const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
   }
   // Exchange price ticks (8 Nov, owner: "the charts should be moving like real data; bitcoin is static"): when the Binance stream
@@ -9777,8 +9790,14 @@ function msNextSetup(bars, A) {
     const sy = document.getElementById('ms-lay-sync'); if (sy) sy.checked = LAY.sync; }
   const lvOf = (P) => ({ bars: P.bars || [], n: (P.bars || []).length, sec: P.tf.sec });
   function laySync(src) { if (!LAY.on || !LAY.sync || !src || !window.BT || LAY.busy) return; const r = src.chart.timeScale().getVisibleLogicalRange(); if (!r) return; LAY.busy = true;
-    try { for (const P of layPanes()) { if (P === src || P.rp || !P.bars || !P.bars.length) continue; const r2 = window.BT.syncRange(lvOf(src), lvOf(P), r); if (!r2) continue;
+    try { for (const P of layPanes()) { if (P === src || P.rp || !P.bars || !P.bars.length) continue; const r2 = layFit(P, window.BT.syncRange(lvOf(src), lvOf(P), r)); if (!r2) continue;
         LAY.exp.set(P, { from: r2.from, to: r2.to, at: performance.now() }); try { P.chart.timeScale().setVisibleLogicalRange(r2); } catch (e) {} } } finally { LAY.busy = false; } }
+  // A chart draws at most its width ÷ its smallest candle spacing. The leader's window can hold far more of a lower timeframe's
+  // candles than that (H4's five weeks = 10,000 M5 candles on a 620 px chart that draws 1,240): the chart library then keeps the
+  // window's right edge, which lies in the future of the lower chart, and the chart was EMPTY (the default four-chart layout's
+  // M5 chart, 20 Nov 2026). Such a window is cut to what the chart can draw, ending where its candles end.
+  window.msLayFit = (r, n, cap) => { if (!r || !(cap > 0) || !(r.to - r.from > cap)) return r; const to = Math.min(r.to, n - 1 + Math.max(2, cap * 0.08)); return { from: to - cap, to }; };
+  function layFit(P, r) { if (!r) return r; let cap = 0; try { const ts = P.chart.timeScale(), o = P.chart.options().timeScale || {}; cap = Math.floor(ts.width() / (o.minBarSpacing || 0.5)); } catch (e) {} return window.msLayFit(r, P.bars.length, cap); }
   function layWire() { LAY.unsub.forEach((f) => { try { f(); } catch (e) {} }); LAY.unsub = []; if (!LAY.on) return;
     for (const P of layPanes()) { const lead = () => { LAY.lead = P; LAY.leadAt = performance.now(); };
       const onR = (r) => { if (!LAY.sync || LAY.busy || !r) return; const ex = LAY.exp.get(P); if (window.BT && window.BT.syncEcho(ex, r, performance.now())) return;
@@ -9811,11 +9830,16 @@ function msNextSetup(bars, A) {
   // how often a free chart (one chart, Split's right side, markets side by side) reads its newest candles (19 Nov 2026, owner: "the
   // charts in low tf are too slow"): a low timeframe every 1.5-3 s; the page's own market also moves with every live tick (msTickSubs)
   const freePoll = (T) => (!T ? 15e3 : T.sec <= 60 ? 1000 : T.sec <= 900 ? 2000 : T.sec <= 3600 ? 5000 : 15e3);
+  // over the weekend a market that is shut has no new candle: its free charts are read once a minute, not every second or two
+  // (four one-minute charts made about 250 requests a minute for candles that cannot change, 20 Nov 2026). Crypto never shuts.
+  const SHUT_POLL = 60e3;
+  const shutNow = (I, d = new Date()) => { if (!I || I.group === 'Crypto') return false; const wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 22) || (wd === 5 && h >= 21); };
+  window.msShutNow = shutNow;
   window.msTickSubs = window.msTickSubs || [];
   // fold live ticks into a free chart's last candle (bars carry TZ and the offset; buckets in UTC up to a day)
   const tickInto = (bars, series, sec, off, Q, raw) => { if (!bars.length || !(sec > 0) || sec > 86400) return false; let ch = false;
     for (const k of Q) { const px = k.px + off, bt = Math.floor(k.t / sec) * sec + TZ, L = bars[bars.length - 1]; let x;
-      if (bt === L.time) x = { time: bt, open: L.open, high: Math.max(L.high, px), low: Math.min(L.low, px), close: px };
+      if (bt === L.time) { x = { time: bt, open: L.open, high: Math.max(L.high, px), low: Math.min(L.low, px), close: px }; if (L.volume != null) x.volume = L.volume; }   // the candle keeps its volume (the volume profile reads it)
       else if (bt > L.time) x = { time: bt, open: px, high: px, low: px, close: px }; else continue;
       if (bt === L.time) bars[bars.length - 1] = x; else bars.push(x); ch = true; try { series.update(x); } catch (e) {}
       if (raw) { const w = { time: bt - TZ, open: x.open - off, high: x.high - off, low: x.low - off, close: x.close - off, volume: 0 }, R = raw[raw.length - 1]; if (R && R.time === w.time) { w.volume = R.volume; raw[raw.length - 1] = w; } else if (!R || w.time > R.time) raw.push(w); } }
@@ -9907,7 +9931,7 @@ function msNextSetup(bars, A) {
     try { const r = await spFetch(SPTFS.find((t) => t.id === tf), I, 500); if (SP.key !== key || !r || !r.bars || !r.bars.length) return;
       const off = k === instKey ? G.offset || 0 : 0;   // same market: the left chart's price offset, so the plan lines sit on the candles
       SP.raw = r.bars.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }));   // feed candles, for volume and VWAP
-      SP.bars = SP.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off }));
+      SP.bars = SP.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off, volume: b.volume }));   // the volume too: the volume profile and the anchored VWAP read these candles (20 Nov 2026)
       SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
       SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || ''; spMarkup();
       if (!SP.solo && (SP.sync.range || SP.sync.time)) spFromLeft(); else SP.chart.timeScale().fitContent();
@@ -9973,23 +9997,23 @@ function msNextSetup(bars, A) {
     C.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } }); C.chart.timeScale().applyOptions({ secondsVisible: T.sec < 60 });
     try { const r = await spFetch(T, I, 500); if (C.key !== key) return; if (!r || !r.bars || !r.bars.length) { C.cell.querySelector('.mm-src').textContent = 'no data for this timeframe'; return; }
       mmSet(C, r.bars, true); C.cell.querySelector('.mm-src').textContent = r.src || ''; requestAnimationFrame(() => { try { const n = C.bars.length, w = C.chart.timeScale().width() || 600, k = Math.min(n, Math.max(60, Math.round(w / 7))); C.chart.timeScale().setVisibleLogicalRange({ from: n - k, to: n + 4 }); } catch (e) {} }); } catch (e) { if (C.key === key) C.cell.querySelector('.mm-src').textContent = 'no data'; } }
-  function mmSet(C, raw, all) { const bars = raw.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close })); const vols = raw.map((b, i) => ({ time: b.time + TZ, value: +b.volume || 0, color: +b.close >= +b.open ? 'rgba(8,153,129,.35)' : 'rgba(242,54,69,.35)' }));
+  function mmSet(C, raw, all) { const bars = raw.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 })); const vols = raw.map((b, i) => ({ time: b.time + TZ, value: +b.volume || 0, color: +b.close >= +b.open ? 'rgba(8,153,129,.35)' : 'rgba(242,54,69,.35)' }));
     if (all) { C.bars = bars; C.series.setData(bars); C.vol.setData(vols); }
     else bars.forEach((x, j) => { const L = C.bars[C.bars.length - 1]; if (L && x.time < L.time) return; if (L && x.time === L.time) C.bars[C.bars.length - 1] = x; else C.bars.push(x); try { C.series.update(x); C.vol.update(vols[j]); } catch (e) {} });
     const L = C.bars[C.bars.length - 1], I = INSTRUMENTS[MM.cells[C.i].k], q = MDQ.q[MM.cells[C.i].k]; if (L) { C.cell.querySelector('.mm-px').textContent = fmtI(L.close, I); const ch = q && isFinite(q.ch) ? q.ch : null, e2 = C.cell.querySelector('.mm-ch'); e2.textContent = ch == null ? '' : `${ch >= 0 ? '+' : '−'}${Math.abs(ch).toFixed(2)}%`; e2.className = 'mm-ch ' + (ch > 0 ? 'up' : ch < 0 ? 'dn' : ''); } }
   window.msMultiView = (on) => { MM.on = on; if (on) { mmBuild(); MM.host.hidden = false; mmLay(); } else if (MM.built) MM.host.hidden = true; };
   window.msMulti = () => ({ on: MM.on, n: MM.n, cells: MM.cells.slice(0, MM.n).map((c, i) => ({ ...c, bars: MM.ch[i] ? MM.ch[i].bars.length : 0 })) });
   setInterval(async () => { if (!MM.on || document.hidden) return; const now = Date.now();
-    for (const C of MM.ch.slice(0, MM.n)) { const c = MM.cells[C.i], T = SPTFS.find((t) => t.id === c.tf), I = INSTRUMENTS[c.k]; if (!T || !I || !C.bars.length || now - C.at < (tickLive(c.k) ? (T.id === '1s' ? Infinity : 15e3) : freePoll(T)) - 300) continue; C.at = now; const key = C.key;
+    for (const C of MM.ch.slice(0, MM.n)) { const c = MM.cells[C.i], T = SPTFS.find((t) => t.id === c.tf), I = INSTRUMENTS[c.k]; if (I && shutNow(I) && now - C.at < SHUT_POLL) continue; if (!T || !I || !C.bars.length || now - C.at < (tickLive(c.k) ? (T.id === '1s' ? Infinity : 15e3) : freePoll(T)) - 300) continue; C.at = now; const key = C.key;
       spFetch(T, I, 3).then((r) => { if (C.key === key && r && r.bars) mmSet(C, r.bars, false); }).catch(() => {}); } }, 1e3);
   window.msOneTf = (t) => { if (!SPTFS.some((x) => x.id === t)) return false; if (panes[t]) { setView(t); return true; } SP.one = t; try { localStorage.setItem('ms-one-tf', t); } catch (e) {}
     if (grid4.dataset.view === 'one') window.msSplitView(true, true); else setView('one'); return true; };
   window.msOneState = () => ({ view: grid4.dataset.view, tf: SP.one, solo: !!SP.solo, bars: SP.solo ? SP.bars.length : 0, label: (document.getElementById('ms-sp-t') || {}).textContent || '' });
   let SP_POLL = 0;
   setInterval(async () => { if (!SP.on || document.hidden || !SP.series || !SP.bars.length) return; const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = SP.key, T = SPTFS.find((t) => t.id === tf);
-    const now = Date.now(); if (now - SP_POLL < (tickLive(k) ? (T && T.id === '1s' ? Infinity : 15e3) : freePoll(T)) - 300) return; SP_POLL = now;   // live ticks carry the forming candle; the read only completes candles
+    const now = Date.now(); if (shutNow(I) && now - SP_POLL < SHUT_POLL) return; if (now - SP_POLL < (tickLive(k) ? (T && T.id === '1s' ? Infinity : 15e3) : freePoll(T)) - 300) return; SP_POLL = now;   // live ticks carry the forming candle; the read only completes candles
     try { const r = await spFetch(T, I, 3); if (SP.key !== key || !r || !r.bars) return; const off = k === instKey ? G.offset || 0 : 0; let ch = 0;
-      r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off }; const last = SP.bars[SP.bars.length - 1];
+      r.bars.forEach((b) => { const x = { time: b.time + TZ, open: +b.open + off, high: +b.high + off, low: +b.low + off, close: +b.close + off, volume: +b.volume || 0 }; const last = SP.bars[SP.bars.length - 1];
       if (x.time === last.time) SP.bars[SP.bars.length - 1] = x; else if (x.time > last.time) SP.bars.push(x); else return; ch = 1; try { SP.series.update(x); } catch (e) {}
       const w = { time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 }; if (SP.raw.length && SP.raw[SP.raw.length - 1].time === w.time) SP.raw[SP.raw.length - 1] = w; else SP.raw.push(w); });
       if (ch) spMarkup(); } catch (e) {} }, 1e3);
@@ -10007,11 +10031,14 @@ function msNextSetup(bars, A) {
       if (SP.on && !spPane() && spSym() !== instKey) want.add(spSym()); if (MM.on) MM.cells.slice(0, MM.n).forEach((c) => { if (c.k !== instKey) want.add(c.k); }); }
     for (const [k, f] of FT) if (!want.has(k)) { try { f.es.close(); } catch (e) {} clearTimeout(f.re); FT.delete(k); }
     for (const k of [...want].slice(0, 4)) { if (FT.has(k)) continue; const I = INSTRUMENTS[k]; if (!I || !I.md) continue; const f = { q: [], raf: 0 }; FT.set(k, f);
-      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es;
-        es.onmessage = (m) => { let d; try { d = JSON.parse(m.data); } catch (e) { return; } if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
+      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es; f.heard = Date.now();
+        es.onmessage = (m) => { f.heard = Date.now(); let d; try { d = JSON.parse(m.data); } catch (e) { return; } if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
           f.q.push({ px: (d.b + d.a) / 2, t: d.t || Date.now() / 1000 }); if (!f.raf) f.raf = requestAnimationFrame(() => { f.raf = 0; const Q = f.q.splice(0); if (Q.length) freeTicks(k, Q); }); };
         es.onerror = () => { if (es.readyState === 2 && FT.get(k) === f) f.re = setTimeout(open, 5000); }; };
-      open(); } }
+      f.open = open; open(); }
+    // a free chart's stream that went silent with its connection open is asked again (as the page's own stream); not over the weekend
+    { const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(), shut = wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21);
+      if (!shut && !document.hidden) for (const [k, f] of FT) if (f.es && f.open && Date.now() - (f.heard || 0) > STREAM_QUIET) { try { f.es.close(); } catch (e) {} clearTimeout(f.re); f.open(); } } }
   setInterval(ftSync, 2000); document.addEventListener('visibilitychange', ftSync);
   window.msFreeTicks = () => ({ streams: [...FT.keys()], live: Object.keys(FTL).filter(tickLive) });
   if (root.querySelector('[data-view]')) {
@@ -10527,7 +10554,8 @@ function msNextSetup(bars, A) {
     const close = () => { MENU.hidden = true; if (forBtn) forBtn.setAttribute('aria-expanded', 'false'); forPane = forBtn = null; };
     const viewNow = () => (grid4.dataset.view || 'all');
     const curTf = (pn) => (pn.classList.contains('ms-splitc') || (pn.classList.contains('sp-right') && viewNow() === 'split') ? (window.msOneState ? (viewNow() === 'one' ? window.msOneState().tf : ((document.getElementById('ms-sp-rtf') || {}).value || '')) : '') : pn.dataset.tf);
-    const openMenu = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const tf = curTf(pn), v = viewNow(), L = window.msLayState ? window.msLayState() : null;
+    const menuHost = () => { const h = window.msFsHost ? window.msFsHost() : document.fullscreenElement || document.body; if (MENU.parentNode !== h) h.appendChild(MENU); };   // full screen hides what is outside its element
+    const openMenu = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } menuHost(); forPane = pn; forBtn = btn; const tf = curTf(pn), v = viewNow(), L = window.msLayState ? window.msLayState() : null;
       const leftSplit = v === 'split' && !pn.classList.contains('sp-right');   // Split's left chart is an analysed pane: only those timeframes
       const chip = (t) => `<button type="button" role="menuitemradio" class="ph-c${t.analysed ? ' an' : ''}" aria-checked="${t.id === tf}" data-ph-tf="${t.id}"${leftSplit && !t.analysed ? ' disabled' : ''} title="${leftSplit && !t.analysed ? 'The left chart of Split takes an underlined timeframe; pick this one on the right chart' : t.analysed ? 'With the Meridian / ICT markup' : 'Candles only, one chart'}">${t.label}</button>`;
       const G = GROUPS(), big = G.filter(([, l]) => l.length > 1), one = G.filter(([, l]) => l.length === 1);
@@ -10549,7 +10577,7 @@ function msNextSetup(bars, A) {
       else if (b.dataset.phMk) { const sy = document.querySelector('[data-sync="sym"]'), sel = document.getElementById('ms-sp-sym'); if (sy && sy.checked) sy.click(); if (sel) { sel.value = b.dataset.phMk; sel.dispatchEvent(new Event('change')); } }
       close(); });
     // Split's right chart chooses its own market from its header (19 Nov 2026, owner: the Split bar's pickers go)
-    const openMk = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } forPane = pn; forBtn = btn; const cur = (document.getElementById('ms-sp-sym') || {}).value, g = {};
+    const openMk = (pn, btn) => { if (forBtn === btn && !MENU.hidden) { close(); return; } menuHost(); forPane = pn; forBtn = btn; const cur = (document.getElementById('ms-sp-sym') || {}).value, g = {};
       Object.entries(INSTRUMENTS).forEach(([k, I]) => { (g[I.group] = g[I.group] || []).push(`<button type="button" role="menuitemradio" class="ph-c ph-mkc" aria-checked="${k === cur}" data-ph-mk="${k}">${I.label}</button>`); });
       MENU.innerHTML = Object.entries(g).map(([n, l]) => `<div class="ph-m-h">${n}</div><div class="ph-m-row ph-m-mk">${l.join('')}</div>`).join('');
       const r = btn.getBoundingClientRect(); MENU.hidden = false; const w = MENU.offsetWidth, h = MENU.offsetHeight; MENU.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left)) + 'px';
@@ -10560,14 +10588,19 @@ function msNextSetup(bars, A) {
     document.addEventListener('pointerdown', (e) => { if (!MENU.hidden && !MENU.contains(e.target) && !(forBtn && forBtn.contains(e.target))) close(); }, true);
     addEventListener('scroll', () => { if (!MENU.hidden) close(); }, { passive: true });
     const mkName = () => { const m = document.getElementById('ms-mk-btn'); return m ? m.textContent.trim() : ''; };
-    const openMarket = () => { const d = document.getElementById('ms-mk'); if (!d) return; document.documentElement.classList.add('mk-sheet'); d.open = true; setTimeout(() => { const q = document.getElementById('ms-mk-q'); if (q) q.focus(); }, 30); };
+    // the market list lives in the page header, outside the Charts view: in the browser's full screen it could not be seen. A new
+    // market loads the page again anyway, so full screen is left first and the same button pressed again (20 Nov 2026)
+    const leaveFs = (again) => { const vc = document.getElementById('v-charts'); if (vc && vc.classList.contains('ch-fake-fs') && window.msChartsFs) { window.msChartsFs(); setTimeout(again, 120); return true; }   // the page's own full screen (a phone)
+      if (!document.fullscreenElement) return false; let done = false; const go = () => { if (done) return; done = true; setTimeout(again, 120); };
+      try { const r = document.exitFullscreen(); if (r && r.then) r.then(go, go); else go(); } catch (e) { go(); } return true; };
+    const openMarket = () => { if (leaveFs(openMarket)) return; const d = document.getElementById('ms-mk'); if (!d) return; document.documentElement.classList.add('mk-sheet'); d.open = true; setTimeout(() => { const q = document.getElementById('ms-mk-q'); if (q) q.focus(); }, 30); };
     { const d = document.getElementById('ms-mk'); if (d) d.addEventListener('toggle', () => { if (!d.open) { document.documentElement.classList.remove('mk-sheet'); const pop = d.querySelector('.mk-pop'); if (pop) pop.removeAttribute('style'); } }); }
     // the market on the Charts toolbar, next to Split (19 Nov 2026, owner: move the header's market picker there; the price chips go):
     // it opens the header's own market list under itself
     { const seg = document.querySelector('#v-charts .sec-h > .seg[aria-label="Chart view"]');
       if (seg && !document.getElementById('ms-ch-mk')) { const b = document.createElement('button'); b.type = 'button'; b.id = 'ms-ch-mk'; b.className = 'ch-mk'; b.setAttribute('aria-haspopup', 'listbox');
         const sync = () => { const n = mkName() || 'Market'; if (b.textContent !== n) { b.textContent = n; b.setAttribute('aria-label', `Market ${n}: choose another`); } };
-        b.addEventListener('click', (e) => { e.stopPropagation(); const d = document.getElementById('ms-mk'); if (!d) return; if (d.open) { d.open = false; return; } openMarket();
+        b.addEventListener('click', (e) => { e.stopPropagation(); if (leaveFs(() => b.click())) return; const d = document.getElementById('ms-mk'); if (!d) return; if (d.open) { d.open = false; return; } openMarket();
           if (innerWidth > 640) { const pop = d.querySelector('.mk-pop'), r = b.getBoundingClientRect(); if (pop) pop.setAttribute('style', `position: fixed; left: ${Math.max(8, r.left)}px; top: ${r.bottom + 6}px; right: auto; z-index: 70;`); } });
         seg.before(b); sync(); const m = document.getElementById('ms-mk-btn'); if (m && window.MutationObserver) new MutationObserver(sync).observe(m, { childList: true, characterData: true, subtree: true }); } }
     root.querySelectorAll('.ms-grid4 > .ms-pane[data-tf]').forEach((pn) => { const ph = pn.querySelector('.ms-ph'), lab = ph && ph.querySelector(':scope > b'); if (!ph || !lab || ph.querySelector('.ph-tf')) return;
@@ -10599,6 +10632,7 @@ function msNextSetup(bars, A) {
     const fake = (on) => { const vc = VC(); if (!vc) return; vc.classList.toggle('ch-fake-fs', on); document.documentElement.classList.toggle('ch-fake-fs-on', on);
       let x = vc.querySelector(':scope > .ch-fs-x');
       if (on && !x) { x = document.createElement('button'); x.type = 'button'; x.className = 'ch-fs-x'; x.textContent = 'Exit full screen'; x.addEventListener('click', () => fake(false)); vc.appendChild(x); }
+      document.dispatchEvent(new Event('ms:fs'));   // the floating parts follow (assets/ms-draw.js)
       setTimeout(() => window.dispatchEvent(new Event('resize')), 30); };
     window.msChartsFs = () => {
       const vc = VC(); if (!vc) return;

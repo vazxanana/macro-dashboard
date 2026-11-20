@@ -135,3 +135,21 @@ test('trade review: the week pane lists its strong proposals only', () => {
   assert.equal(W.MS_WEEK.decisions({ tradeReview: { proposals: J.proposals.map((p) => ({ ...p, strong: false })) } }, now, []).filter((d) => d.k === 'review').length, 0);
   assert.match(html, /get\('research\/trade-review\.json'\)\]\)\.then/);
 });
+
+// ---- 20 Nov 2026 audit ----
+test('trade reviewer: a model proposal for a stream the desk itself proposes nothing for is discarded; the by-day t and the regime note reach the model', () => {
+  const D = T.readData(FX), J = T.build({ ...D, config: { shadowCut: { setups: ['scalp'], keep: [] } } }, { now: NOW });
+  const sc = J.systems.find((s) => s.key === 'scalp|shadow');
+  assert.equal(sc.stopped, true); assert.equal(R.closedWhy(sc), 'its shadow signals are no longer recorded (owner, 12 Nov 2026)');
+  const q = R.buildRequest(J), s = q.payload.streams.find((x) => x.key === 'scalp|shadow');
+  assert.match(s.closed, /no longer recorded/); assert.match(q.system, /"closed" set/); assert.match(q.system, /tByDay/); assert.match(q.system, /regimeNote/);
+  const f = s.flags.find((x) => x.id === 'scalp|shadow|weak-session:asia');
+  assert.ok('tByDay' in f && Number.isInteger(f.days), 'the by-day t travels with the flag');
+  assert.ok('netTByDay' in s.all && Number.isInteger(s.all.days));
+  const p = R.parseAnswer(answer(J), J);
+  assert.equal(p.ok, true); assert.equal(p.answer.streams[0].proposals.length, 0, 'before the audit the model could propose "Skip Asia" for a stream the owner had stopped');
+  assert.equal(p.answer.dropped, 3);
+  // the stream open again: the proposal comes back, with the by-day evidence of the file
+  const open = FILE(), po = R.parseAnswer(answer(open), open).answer.streams[0].proposals;
+  assert.equal(po.length, 1); assert.ok(po[0].evidence.byDay && typeof po[0].evidence.robust === 'boolean');
+});

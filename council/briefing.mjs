@@ -200,7 +200,7 @@ export function hypotheses({ an, gl, dl, now, week, tilt = 0, insights = [] }) {
     const D = an._paths.map((p) => p.d), DA = an._all.map((p) => p.d), b = blend(freqOf(D, (p) => p[19] > 0), freqOf(DA, (p) => p[19] > 0)), up = b.p >= 0.5, P = up ? b.p : +(1 - b.p).toFixed(2);
     const byD = addSessions(Date.parse(dl.asOf + 'T00:00:00Z') / 1000, 20);
     out.push({ id: `hyp:${week}:H3`, slot: 'H3', horizon: 'month', asset: 'dxy', kind: up ? 'pairUp' : 'pairDown', level: +dl.px.toPrecision(8), by: byD, p: P,
-      claim: `DXY closes ${byD} ${up ? 'above' : 'below'} ${dl.px.toFixed(2)} (the latest close)`,
+      claim: `DXY closes ${byD} ${up ? 'above' : 'below'} ${dl.px.toFixed(2)} (the ${dl.asOf || 'latest'} close)`,
       base: { ...b, p: P, analog: b.analog == null ? null : r2(up ? b.analog : 1 - b.analog), all: r2(up ? b.all : 1 - b.all), k: up ? b.k : b.n - b.k },
       invalid: `DXY ${up ? 'below' : 'above'} ${(dl.px * (up ? 0.985 : 1.015)).toFixed(2)} (${up ? '−' : '+'}1.5%) on a close`,
       why: `${up ? b.k : b.n - b.k} of ${b.n} analogs saw the DXY ${up ? 'higher' : 'lower'} 20 sessions on vs ${Math.round((up ? b.all : 1 - b.all) * 100)}% of all weeks. Gold usually moves the other way, except in stress (both bid).` });
@@ -235,7 +235,7 @@ export function insights({ S = {}, fc, cot, expectations = [], an, gl, now }) {
   if (ry && ry4 != null) { const bp = Math.round(ry4 * 100);
     add({ k: 'real', score: Math.max(0.3, Math.abs(z('ry4w') ?? bp / 15)), lean: bp <= -10 ? 1 : bp >= 10 ? -1 : 0,
       title: `Real yields ${bp <= -10 ? 'fell' : bp >= 10 ? 'rose' : 'flat'} ${Math.abs(bp)} bp in 4 weeks (10Y TIPS ${ry.v.toFixed(2)}%)`,
-      evidence: [{ text: `10Y TIPS ${ry.v.toFixed(2)}%, ${sg(bp, 0, ' bp')} over 4 weeks${z('ry4w') != null ? ` (z ${sg(z('ry4w'), 1)} vs every week since ${an.since})` : ''}`, asOf: isoDay(ry.t), source: 'FRED DFII10 (US Treasury real par curve)' }],
+      evidence: [{ text: `10Y TIPS ${ry.v.toFixed(2)}%, ${sg(bp, 0, ' bp')} over 4 weeks${z('ry4w') != null ? (Math.abs(an.now.ry4w - bp) >= 3 ? ` (the analogs compare week-end to week-end and read ${sg(an.now.ry4w, 0, ' bp')}: z ${sg(z('ry4w'), 1)} vs every week since ${an.since})` : ` (z ${sg(z('ry4w'), 1)} vs every week since ${an.since})`) : ''}`, asOf: isoDay(ry.t), source: 'FRED DFII10 (US Treasury real par curve)' }],
       why: 'Real yields are gold\'s opportunity cost: a falling 4-week change is the strongest single input of the tested Gold Macro Score (2007-26). A high level caps the upside; the change sets the near-term lean.',
       fx: 'Falling US real yields usually weigh on the dollar (EUR/USD up, USD/JPY down) unless risk-off demand for dollars dominates.',
       change: `10Y TIPS back above ${(ry.v + 0.15).toFixed(2)}% (+15 bp)` }); }

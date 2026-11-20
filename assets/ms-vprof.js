@@ -33,7 +33,10 @@
     if (!cx.visible()) return;
     const B = cx.bars(), ts = cx.chart.timeScale(); let lr = null; try { lr = ts.getVisibleLogicalRange(); } catch (e) {}
     if (!B.length || !lr) return; const i0 = Math.max(0, Math.floor(lr.from)), i1 = Math.min(B.length - 1, Math.ceil(lr.to)), last = B[B.length - 1];
-    const W = ts.width(), H = cx.el.clientHeight, sig = [i0, i1, last.time, last.close, last.volume, W, H, set.rows, set.va, set.color, document.documentElement.dataset.theme].join('|');
+    // where the price scale puts two prices is part of the key (20 Nov 2026): a drag of the price axis, or a rescale, moves the
+    // candles without changing the candles in view, and the profile stayed where it was drawn until the next price
+    let ya = null, yb = null; try { ya = cx.series.priceToCoordinate(last.close); yb = cx.series.priceToCoordinate(last.close * 1.01); } catch (e) {}
+    const W = ts.width(), H = cx.el.clientHeight, sig = [i0, i1, last.time, last.close, last.volume, W, H, set.rows, set.va, set.color, document.documentElement.dataset.theme, ya, yb, typeof cx.market === 'function' ? cx.market() : ''].join('|');
     if (!force && SIG.get(cx) === sig) return; SIG.set(cx, sig);
     const c = canvasOf(cx), dpr = devicePixelRatio || 1, w = cx.el.clientWidth;
     if (c.width !== Math.round(w * dpr) || c.height !== Math.round(H * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(H * dpr); c.style.width = w + 'px'; c.style.height = H + 'px'; }

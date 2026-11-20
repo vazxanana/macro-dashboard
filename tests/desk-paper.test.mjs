@@ -75,7 +75,9 @@ test('full screen takes the whole Charts view, so the layout, split and tools st
   assert.match(PAGE, /window\.msChartsFs = \(\) => \{\n\s+const vc = VC\(\);/, 'the whole Charts view (#v-charts) goes full screen');
   const css = /<style id="ms-cfs-css">([\s\S]*?)<\/style>/.exec(PAGE)[1];
   assert.match(css, /#v-charts:fullscreen(?:, #v-charts\.ch-fake-fs\))? \.ms-grid4 \{ flex: 1 1 0; min-height: 0; grid-auto-rows: minmax\(0, 1fr\);/);
-  assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /document\.addEventListener\('fullscreenchange', \(\) => \{ const host = document\.fullscreenElement \|\| document\.body; for \(const id of \['ms-dsel', 'ms-cmenu'\]\)/);
+  // 20 Nov 2026 (bug hunt): the floating parts are also MADE inside the full-screen element, the page's own full screen counts,
+  // and each chart's timeframe menu and the toasts move too (tests/desk-bughunt.test.mjs)
+  assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /const fsMove = \(\) => \{ const host = fsHost\(\); for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts'\]\)/);
 });
 
 test('volume profile: a histogram of the candles in view, split into buying and selling, with POC and a 70 % value area', async () => {
