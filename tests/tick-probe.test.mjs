@@ -106,3 +106,9 @@ test('fills part: the first tick that crosses a level, by side', async () => {
   const f = r.symbols.XAUUSD.fills; assert.equal(f.length, 2);   // 'c' spans over FILLS_SPAN
   assert.equal(f[0][0], 'a'); assert.ok(f[0][1] > t0 * 1000 && f[0][3] >= bid0 + 0.07); assert.deepEqual(f[1], ['b', null]);
 });
+
+test('marks look-back: PROBE_MARKS_BACK between 60 and 3600 seconds, else 60', async () => {
+  const { marksBack } = await import('../council/tick-probe.mjs');
+  assert.equal(marksBack({}), 60); assert.equal(marksBack({ PROBE_MARKS_BACK: '' }), 60); assert.equal(marksBack({ PROBE_MARKS_BACK: '30' }), 60);
+  assert.equal(marksBack({ PROBE_MARKS_BACK: '1800' }), 1800); assert.equal(marksBack({ PROBE_MARKS_BACK: '99999' }), 3600); assert.equal(marksBack({ PROBE_MARKS_BACK: 'x' }), 60);
+});
