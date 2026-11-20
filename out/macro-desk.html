@@ -538,6 +538,7 @@
   .wa-day li .wa-r { display: block; }
   .wa-chip { display: inline-block; padding: 0 7px; margin-right: 6px; border-radius: 999px; font: 600 12px/1.6 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); }
   .wa-chip.pass { color: var(--buy); border-color: currentColor; } .wa-chip.fail { color: var(--sell); border-color: currentColor; }
+  .wa-nc { color: var(--ink); }
   .wa-quiet { color: var(--ink-faint); font-size: var(--fs-sm, 13px); margin: 4px 0 0; }
     .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
     /* daily reports (19 Nov 2026) */
@@ -1509,8 +1510,10 @@
         var iso = new Date(r.t * 1000).toISOString();
         return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'
           + (r.exp || r.prev ? '<span class="wa-r">Expected <b>' + esc(r.exp || NA) + '</b>, previous ' + esc(r.prev || NA) + '</span>' : r.src === 'schedule' ? '<span class="wa-r">From the council\'s release schedule: the consensus appears once the week\'s calendar lists it.</span>' : '')
+          + (r.nowcast ? '<span class="wa-r wa-nc"><b>Nowcast:</b> ' + esc(r.nowcast.text) + '</span>' : '')
           + (r.record ? r.record.lines.map(function (l) { return '<span class="wa-r">' + esc(l) + '</span>'; }).join('') : '') + '</li>'; }).join('') + '</ul>';
       else h += '<p class="wa-quiet">No major release on the files read so far.</p>';
+      if ((d.fed || []).length) h += '<ul>' + d.fed.map(function (e) { return '<li><b>Fed: ' + esc(e.title) + '</b>' + (e.time ? ' · ' + esc(e.time) + ' New York' : '') + (e.topic ? '<span class="wa-r">' + esc(e.topic) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
       if ((d.rules || []).length) h += '<ul>' + d.rules.map(function (r) {
         var f = r.forward && r.forward.verdict && r.forward.verdict !== r.headline ? '<span class="wa-r">Forward record: ' + esc(r.forward.verdict) + '</span>' : '';
         return '<li><span class="wa-chip ' + esc(r.verdict) + '">' + esc(WA_V[r.verdict] || r.verdict) + '</span><b>' + esc(r.what) + '</b> <small>(' + esc(r.when) + ')</small>'
@@ -1518,6 +1521,8 @@
       return h + '</div>'; }).join('');
     var F = A.frame || {}, fb = (F.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; });
     (F.rulebook || []).forEach(function (r) { fb.push('<li><b>Your rule book:</b> ' + esc(r.text) + (r.caveat ? ' <span class="wa-r">' + esc(r.caveat) + '</span>' : '') + '</li>'); });
+    var O = F.odds; if (O) { var row = function (src, l) { return (l || []).length ? '<span class="wa-r">' + esc(src) + ': ' + l.map(function (m) { return esc(m.label) + ' <b>' + Math.round(m.p * 100) + '%</b>'; }).join(' · ') + '</span>' : ''; };
+      fb.unshift('<li><b>Prediction markets on the ' + esc(WA_DAY(O.meeting)) + ' Fed decision</b>' + row('Kalshi', O.kalshi) + row('Polymarket', O.polymarket) + '<span class="wa-r">What traders pay, not a forecast of ours.</span></li>'); }
     var C = A.calls || {}; if ((C.list || []).length) fb.push('<li><b>The veteran\'s calls for the week:</b>' + C.list.map(function (c) { return '<span class="wa-r">' + esc(c.claim) + ': ' + Math.round(c.p * 100) + '% (base ' + Math.round(c.base * 100) + '%)</span>'; }).join('') + '</li>');
     else if (C.note) fb.push('<li>' + esc(C.note) + '</li>');
     $('wa-frame-b').innerHTML = '<ul class="pl-list nx-bl">' + fb.join('') + '</ul>';

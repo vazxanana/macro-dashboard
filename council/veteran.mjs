@@ -607,7 +607,7 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
       calendar: cal.map((e) => ({ title: e.title, country: e.country, at: new Date(+e.at * 1000).toISOString(), forecast: e.forecast, previous: e.previous })), gold, dxy: dx, now });
     w('redfolder.json', RF); } catch (e) { log('Red folder study skipped: ' + (e && e.message || e)); }
   // 20 Nov 2026: the Week ahead plan (council/week-ahead.mjs), day by day, from the files above; a failure writes nothing
-  try { w('week-ahead.json', weekAhead({ now, cal: (cache && cache.cal) || [], rf: rd(path.join(M, 'redfolder.json'), null), fc, v, dataDir: dir })); }
+  try { w('week-ahead.json', weekAhead({ now, cal: (cache && cache.cal) || [], rf: rd(path.join(M, 'redfolder.json'), null), fc, v, hd: rd(path.join(M, 'hard-data.json'), null), dataDir: dir })); }
   catch (e) { log('Week ahead skipped: ' + (e && e.message || e)); }
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }

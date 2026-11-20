@@ -179,25 +179,47 @@ function dayLine(d) {
   return parts.join(' · ');
 }
 
+// The Cleveland Fed nowcast for a CPI / PCE release: the reference month is the month before the release month (an October PCE
+// prints in late November). Only a nowcast without an actual print for that month is shown.
+const MN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export function nowcastFor(hd, r) {
+  const N = hd && hd.nowcast && Array.isArray(hd.nowcast.months) ? hd.nowcast.months : null;
+  if (!N || (r.type !== 'PCE' && r.type !== 'CPI')) return null;
+  const d = new Date(r.t * 1000), ref = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1)).toISOString().slice(0, 7);
+  const m = N.find((x) => x.month === ref); if (!m) return null;
+  const [h, c] = r.type === 'PCE' ? ['pce', 'corePce'] : ['cpi', 'coreCpi'];
+  if (m.actual && (m.actual[h] != null || m.actual[c] != null)) return null;
+  if (m.now[h] == null && m.now[c] == null) return null;
+  const f = (x) => x == null ? 'n/a' : (x > 0 ? '+' : '') + x.toFixed(2) + '%';
+  return { month: ref, core: m.now[c] ?? null, head: m.now[h] ?? null, asOf: m.asOf || null,
+    text: `the Cleveland Fed nowcast for ${MN[+ref.slice(5) - 1]} is core ${f(m.now[c])}, headline ${f(m.now[h])} month on month${m.asOf ? ` (as of ${m.asOf})` : ''}, a model's estimate, not the consensus` };
+}
+
 // The plan: { at, from, to, next, days: [...], frame, calls, lines, note }.
-export function build({ now, cal, rf, fc, v, dataDir = null, edgeDir = EDGE_DIR }) {
+export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir = EDGE_DIR }) {
   const W = weekOf(now), days = [], recs = new Map();
   const rec = (rule) => { if (!recs.has(rule.topic)) recs.set(rule.topic, ruleRecord(rule.topic, dataDir, edgeDir, rule.forward)); return recs.get(rule.topic); };
   const rel = releasesOf(cal, W.from, W.to);
   for (let d = W.from; d <= W.to; d = addD(d, 1)) {
     if (!weekday(d)) continue;
-    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null }));
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) }));
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
-    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules };
+    const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
+    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules, fed };
     day.line = dayLine(day); days.push(day);
   }
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
+  if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }
+  if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
   const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));
   const busiest = days.slice().sort((a, b) => b.releases.filter((r) => r.impact === 'high').length - a.releases.filter((r) => r.impact === 'high').length)[0];
   const lines = [];
   const closed = days.filter((d) => d.market && d.market.kind === 'holiday'), early = days.filter((d) => d.market && d.market.kind === 'early');
   if (closed.length || early.length) lines.push(`A short week: ${[...closed.map((d) => `US markets closed ${d.dow}`), ...early.map((d) => `early close ${d.dow}`)].join(', ')}. Expect thin trading around ${closed.length ? 'the holiday' : 'the early close'}.`);
+  if (frame.odds) lines.push(hd.odds.line);
+  const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
+  if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
   else lines.push('No top-tier US release is scheduled on the files read so far.');
   if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);

@@ -2968,6 +2968,23 @@ issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chi
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
 `tests/week-ahead.test.mjs`.
 
+## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
+`council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
+keyless public sources, each checked from a GitHub runner first (`scripts/macro-probe.mjs` + `.github/workflows/macro-probe.yml`, runs
+on a PR that changes them; the build sandbox reaches none of these hosts): the **Cleveland Fed inflation nowcast** (`nowcast_month.json`,
+FusionCharts charts, one per target month: CPI / core CPI / PCE / core PCE m/m and the "Actual" prints; `parseNowcast`), the **Atlanta Fed
+GDPNow** (FRED `GDPNOW`, `parseGdpNow`), **prediction-market odds of the next Fed decision** (Kalshi `KXFEDDECISION-<YY><MON>` markets,
+mid of bid / ask else last; Polymarket public-search for "fed decision in <month> <year>", the event ending within 3 days of the meeting;
+`nextFomc` from `council/events.mjs`), and **the Fed's own calendar** (`federalreserve.gov/json/calendar.json`: speeches, testimony,
+FOMC, Beige Book, 2 days back to 14 ahead; `parseFedCal`). A failed source keeps its last good copy and says so in `sources`
+(`datahealth.mjs` warns). The Week ahead reads it: the nowcast on a CPI / PCE release whose reference month has no actual print yet
+(`nowcastFor`; "a model's estimate, not the consensus"), the Fed calendar on its days, the odds and GDPNow in the frame, a "Before
+the print" and an odds line on top. Context only: the odds are "what traders pay, not a forecast of ours"; nothing reads it for a
+rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Kalshi) / 92.5% (Polymarket); October core PCE nowcast
++0.27%, headline +0.31%; GDPNow Q4 3.2%. Not usable from a runner on 20 Nov: GLD holdings (the CSV URL now serves a PDF), CME gold
+stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
+`tests/hard-data.test.mjs`.
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss

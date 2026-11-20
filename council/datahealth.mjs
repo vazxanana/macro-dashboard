@@ -92,6 +92,9 @@ export const FILES = [
   { file: 'macro/forecast.json', label: 'Macro forecast', every: 'every 6th round (~70 min)', need: true, at: (j) => j.at, warn: 150, bad: 240, check: forecastCheck },
   { file: 'macro/veteran.json', label: 'Macro veteran', every: 'every 6th round', at: (j) => j.at, warn: 150, bad: 240, check: veteranCheck },
   { file: 'macro/cot.json', label: 'COT positioning', every: 'every 6th round (CFTC weekly, Friday)', at: (j) => j.at, warn: 150, bad: 240, check: cotCheck },
+  { file: 'macro/hard-data.json', label: 'Hard-to-find data', every: 'every 6th round (~70 min)', at: (j) => j.at, warn: 150, bad: 1440,   // 20 Nov 2026
+    check: (j, c) => { for (const [k, v] of Object.entries((j && j.sources) || {})) if (v !== 'ok') c.add('source', 'warn', `${k}: ${String(v).slice(0, 90)}`); } },
+  { file: 'macro/week-ahead.json', label: 'Week ahead', every: 'every 6th round (~70 min)', at: (j) => j.at, warn: 150, bad: 1440 },   // 20 Nov 2026
   { file: 'macro/daily-report.json', label: 'Daily reports', every: 'once a London day from 06:00', at: (j) => j.at, warn: 1620, bad: 3000 },   // 19 Nov 2026
   { file: 'macro/history.json', label: 'Macro forecast log', every: 'one entry per weekday, from 21:00 UTC the evening before', check: historyCheck },
   { file: 'macro/events.json', label: 'Macro release log', every: 'each macro run', check: listCheck },
