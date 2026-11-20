@@ -159,6 +159,33 @@ export function frameOf(fc, v) {
   return out;
 }
 
+// Speculative positioning (macro/cot.json, council/cot.mjs), 20 Nov 2026: one plain line per market only when it is notable,
+// crowded (3-year percentile >= 90 or <= 10) or a big week (the week's change 1.5+ standard deviations of the prior year's weekly
+// changes, the COT desk's own "flow" cut). The yen futures are yen against the dollar, so their long is a bet USD/JPY falls.
+// The pre-registered COT study failed overall: a market without a passing cell is "positioning, not a tested signal".
+export const COT_KEYS = [['gold', 'Gold'], ['silver', 'Silver'], ['eur', 'EUR/USD'], ['jpy', 'USD/JPY'], ['nq', 'Nasdaq 100'], ['es', 'S&P 500']];
+const fmtN = (x) => (x < 0 ? '−' : '') + Math.abs(Math.round(x)).toLocaleString('en-US');
+const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+export function positioningOf(cot) {
+  const M = cot && Array.isArray(cot.markets) ? cot.markets : []; const out = [];
+  for (const [k, name] of COT_KEYS) {
+    const m = M.find((x) => x && x.k === k); if (!m || m.missing || !Number.isFinite(m.net)) continue;
+    const pct = Number.isFinite(m.pct) ? m.pct : null, z = Number.isFinite(m.z) ? m.z : null;
+    const crowd = pct == null ? null : pct >= 90 ? 'long' : pct <= 10 ? 'short' : null, big = z != null && Math.abs(z) >= 1.5;
+    if (!crowd && !big) continue;
+    const yen = k === 'jpy', fut = yen ? ' yen futures' : '', who = m.who ? m.who.charAt(0).toUpperCase() + m.who.slice(1) : 'Speculators';
+    const parts = [];
+    if (crowd) parts.push(`crowded ${crowd}${fut} (${ord(pct)} percentile of 3 years)`);
+    if (big) parts.push(`${z > 0 ? 'big buying' : 'big selling'}${yen ? ' of yen' : ''} this week (${Number.isFinite(m.chg1) ? `${m.chg1 >= 0 ? '+' : '−'}${Math.abs(Math.round(m.chg1)).toLocaleString('en-US')} contracts, ` : ''}${z > 0 ? '+' : ''}${z} standard deviations)`);
+    let text = `${name}: ${who} ${parts.join(', ')}; net ${fmtN(m.net)} contracts${m.asOf ? `, as of the ${m.asOf} report` : ''}${m.late ? ' (published late)' : ''}.`;
+    if (yen) text += ` The yen futures are yen against the dollar: a long there is a bet that USD/JPY falls${crowd ? `, so crowded ${crowd} yen means crowded ${crowd === 'long' ? 'short' : 'long'} USD/JPY` : ''}.`;
+    text += m.edgeStatus === 'tested' ? ` The pre-registered COT test passed one cell here (${String(m.edgeText || '').replace(/^edge: tested \(|\)$/g, '')}): a single cell, not a proven edge.`
+      : ' Positioning, not a tested signal: the pre-registered COT test found no edge.';
+    out.push({ market: k, name, pct, z, crowded: crowd, net: m.net, asOf: m.asOf || null, tested: m.edgeStatus === 'tested', text });
+  }
+  return out;
+}
+
 // The calls for the week, only when the recorded ones fall due inside it (they are re-issued once a week).
 function callsOf(v, from, to) {
   const w = v && v.outlook && v.outlook.week; if (!w || !Array.isArray(w.list)) return { list: [], note: null };
@@ -196,7 +223,7 @@ export function nowcastFor(hd, r) {
 }
 
 // The plan: { at, from, to, next, days: [...], frame, calls, lines, note }.
-export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir = EDGE_DIR }) {
+export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = null, edgeDir = EDGE_DIR }) {
   const W = weekOf(now), days = [], recs = new Map();
   const rec = (rule) => { if (!recs.has(rule.topic)) recs.set(rule.topic, ruleRecord(rule.topic, dataDir, edgeDir, rule.forward)); return recs.get(rule.topic); };
   const rel = releasesOf(cal, W.from, W.to);
@@ -212,6 +239,8 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
   if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
+  frame.positioning = positioningOf(cot).map((p) => ({ market: p.market, text: p.text }));
+  for (const p of frame.positioning) frame.lines.push(p.text);
   const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));
   const busiest = days.slice().sort((a, b) => b.releases.filter((r) => r.impact === 'high').length - a.releases.filter((r) => r.impact === 'high').length)[0];
   const lines = [];

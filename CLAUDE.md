@@ -2974,7 +2974,10 @@ is listed as "Tested: failed" so it is not chased; a pass is never called an edg
 not a sell), regime, the veteran's levels and month call, the rule book's readings that are on, and the week's dated calls once
 issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
-`tests/week-ahead.test.mjs`.
+`tests/week-ahead.test.mjs`. **Positioning** (20 Nov 2026): `positioningOf(cot)` (veteran.mjs hands it `macro/cot.json`) adds
+`frame.positioning` and one frame line per market of gold, silver, EUR, JPY, NQ, ES only when crowded (3-year percentile >= 90 /
+<= 10) or a big week (|z| >= 1.5, the COT desk's flow cut), with net, percentile and report date; the yen futures' inversion said
+plainly; "positioning, not a tested signal" unless the COT study passed a cell there. Test: `tests/week-ahead-cot.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
