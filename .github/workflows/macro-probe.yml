@@ -1,0 +1,18 @@
+# One-off probe of keyless macro sources (20 Nov 2026); prints only, writes nothing, no secrets.
+name: Macro sources probe
+on:
+  pull_request:
+    paths: ['scripts/macro-probe.mjs', '.github/workflows/macro-probe.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: { sparse-checkout: scripts }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/macro-probe.mjs
