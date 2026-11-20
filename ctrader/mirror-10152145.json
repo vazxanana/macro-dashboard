@@ -14209,6 +14209,34 @@
     "positionId": "50407435",
     "volume": 100,
     "status": "open"
+   },
+   "xau-moshabo-1794987900-add": {
+    "positionId": "50411438",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "mosha-bo",
+    "status": "open",
+    "openedAt": "2026-11-20T01:25:00.000Z",
+    "councilEntry": 3580.7,
+    "stop": 3768.4449999999997,
+    "t1": 2516.845,
+    "riskCash": 188.29,
+    "margin": 7.18,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3580.155,
+    "levelsFrom": "mark",
+    "fillPrice": 3576.7,
+    "slipR": 0.021,
+    "lagSec": 180,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-20T01:25:00.000Z",
+    "brokerStop": 3764.99
    }
   },
   "day": {
@@ -14216,7 +14244,7 @@
    "startBalance": 10406.4
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10437.89 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 10437.89 · 7 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker",
@@ -14226,22 +14254,34 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "xau-m30m1-1795137841": {
+    "orderId": "34497769",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "limitPrice": 3585.86,
+    "stop": 3610.591839285714,
+    "t1": 3536.4113214285717,
+    "placedAt": "2026-11-20T01:25:00.000Z",
+    "expires": "2026-11-20T07:24:01.000Z",
+    "riskCash": 24.73,
+    "margin": 7.18,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10437.89,
-  "lastRun": "2026-11-20T01:22:35.000Z"
+  "lastRun": "2026-11-20T01:25:00.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T13:47:02.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 427.67, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
-  {
-   "at": "2026-11-19T13:48:56.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 427.75, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T13:52:52.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 426.36, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15731,6 +15771,16 @@
    "at": "2026-11-20T00:55:17.000Z",
    "msg": "not mirrored xau-position-1794495673: price 3588.685 has run 1.00R from the council entry 3870.32: a different trade now",
    "trade": "xau-position-1794495673"
+  },
+  {
+   "at": "2026-11-20T01:25:00.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council mosha-bo)",
+   "trade": "xau-moshabo-1794987900-add"
+  },
+  {
+   "at": "2026-11-20T01:25:00.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3585.86 (council m30m1, valid to 2026-11-20T07:24Z)",
+   "trade": "xau-m30m1-1795137841"
   }
  ],
  "limits": {
@@ -15809,11 +15859,11 @@
   ]
  },
  "execution": {
-  "n": 469,
+  "n": 470,
   "meanSlipR": -0.018,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 139,
+  "medianLagSec": 139.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -15848,8 +15898,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 91,
-    "meanSlipR": -0.079
+    "n": 92,
+    "meanSlipR": -0.078
    }
   }
  }
