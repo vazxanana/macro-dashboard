@@ -4952,6 +4952,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   n 1121 / +0.105R / t 2.79). Readings: too few under 20, below the measured range (A p5), ahead of a no-edge rule (B p95);
   checkpoints at 120 (fails / holds so far) and 240 trades (confirmed / fails / not shown); the first crossing stands.
   `vb-forward.yml` (Tue-Sat 04:41 UTC) writes council-data `research/forward/gold-vol-breakout.json`. Nothing trades.
+- `gold-pre-holiday-forward` (pre-registered 20 Nov 2026): `gold-pre-holiday` T1's forward record on NYSE holidays after
+  31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
+  its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`
+  writes council-data `research/forward/gold-pre-holiday.json`. First event: Thanksgiving (25 Nov 2026). Nothing trades.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).

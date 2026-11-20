@@ -1,9 +1,10 @@
-name: Gold breakout forward record (research)
+name: Gold forward records (research)
 
-# Weekly, free: the forward record of gold-vol-breakout's T1 (research/edge/gold-vol-breakout-forward/PREREGISTRATION.md) on
-# OANDA mid M5 gold from 1 Oct 2026, saved to council-data research/forward/gold-vol-breakout.json. Paper research only:
-# nothing is traded, alerted or copied and no council member reads the file. The previous file is read back so the first
-# crossing of a checkpoint stands.
+# Weekdays, free: the forward records of gold-vol-breakout's T1 and gold-pre-holiday's T1 (their PREREGISTRATION.md under
+# research/edge/gold-vol-breakout-forward and research/edge/gold-pre-holiday-forward) on OANDA mid M5 / H1 gold, saved to
+# council-data research/forward/gold-vol-breakout.json and gold-pre-holiday.json. Paper research only: nothing is traded,
+# alerted or copied and no council member reads the files. The previous file is read back so the first crossing of a
+# checkpoint stands.
 on:
   workflow_dispatch:
   schedule:
@@ -53,6 +54,11 @@ jobs:
           mkdir -p "$RUNNER_TEMP/c" data/research/forward
           node research/edge/gold-gap-open/fetch.mjs "$RUNNER_TEMP/c"
           node research/edge/gold-vol-breakout-forward/run.mjs "$RUNNER_TEMP/c" data/research/forward/gold-vol-breakout.json
+
+      - name: Gold before US holidays, the forward record
+        run: |
+          node research/edge/gold-pre-holiday-forward/run.mjs fetch "$RUNNER_TEMP/h"
+          node research/edge/gold-pre-holiday-forward/run.mjs run "$RUNNER_TEMP/h" data/research/forward/gold-pre-holiday.json
 
       - name: Save
         run: |
