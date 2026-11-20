@@ -3,7 +3,23 @@
 //   GET  /api/notify                       signed in -> { items: [{ id, at, title, body }] } newest first (last 50)
 //   POST /api/notify { title, body }       owner session only -> the new item; { remove: id } deletes one
 // Stored privately in the Blob store as notices/list.json (100 kept). Read/unread is kept per browser and account (localStorage).
+// 19 Nov 2026: api/daily.js posts ONE notice a day for the daily reports (`dailyNotice`: id `daily-<day>`, `perm: 'macro'`, `link`).
+// A notice with `perm` is shown only to accounts that have that permission (owner: all; a member: unless `perms.macro === false`,
+// the role defaults give macro to every role).
 const S = require('./_session.js');
+const DAILY_LATE = 3 * 3600e3;   // a report found more than 3 h after its publish time is not announced (a late build never wakes everyone)
+// effective permission of a signed-in account, as the page's msPerms reads it (only macro is used today)
+function allowed(acct, perm) { if (!perm) return true; if (!acct) return false; if (acct.u === 'owner') return true;
+  const P = acct.perms && typeof acct.perms === 'object' ? acct.perms : {}; return P[perm] !== false; }
+// the notice for the latest daily report, or null when none is due
+function dailyNotice(file, list, now) {
+  const r = file && Array.isArray(file.reports) && file.reports[0]; if (!r || !r.day || !r.publishAt) return null;
+  const pub = Date.parse(r.publishAt); if (!(pub <= now) || now - pub > DAILY_LATE) return null;
+  const id = 'daily-' + r.day; if (list.some((x) => x.id === id)) return null;
+  const day = new Date(pub).toLocaleDateString('en-GB', { timeZone: 'Europe/London', weekday: 'long', day: 'numeric', month: 'long' });
+  const lead = (x) => clean(x && x.lead, 300);
+  return { id, at: new Date(now).toISOString(), title: `Daily reports · ${day}`, body: `World economy: ${lead(r.world)}\nMarkets: ${lead(r.markets)}`, perm: 'macro', link: '/macro-desk#s-daily' };
+}
 const KEEP = 100, SHOW = 50;
 // Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the file is overwritten in place, and the CDN serves an overwritten
 // file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
@@ -27,7 +43,7 @@ async function handle(req, res, d = {}) {
     if (req.method === 'POST' && !(d.sameOrigin || S.sameOrigin)(req)) return res.status(403).json({ error: 'not allowed' });
     const acct = await who(req); if (!acct) return res.status(401).json({ error: 'sign in first' });
     const list = await store.get();
-    if (req.method === 'GET') return res.status(200).json({ items: list.slice(-SHOW).reverse() });
+    if (req.method === 'GET') return res.status(200).json({ items: list.filter((x) => allowed(acct, x.perm)).slice(-SHOW).reverse() });
     if (acct.u !== 'owner') return res.status(403).json({ error: 'only the owner sends notifications' });
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
     b = b || {};
@@ -41,3 +57,5 @@ async function handle(req, res, d = {}) {
 module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
 module.exports.blobStore = blobStore;
+module.exports.dailyNotice = dailyNotice;
+module.exports.allowed = allowed;
