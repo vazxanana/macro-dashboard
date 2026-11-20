@@ -2993,6 +2993,78 @@ rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Ka
 stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
 `tests/hard-data.test.mjs`.
 
+## Macro brain audit: what the veteran's output got wrong, and the week-ahead additions (20 Nov 2026, "make the macro brain's output more correct and more useful for next week")
+Today's council-data files (veteran.json, week-ahead.json, daily-report.json, redfolder.json) were read as a trader preparing for
+the Thanksgiving week would, then each member was re-run on a copy of the data. No rule, size, trade, probability on the record or
+strategist maths changed; veteran-calls / -ledger / -debates / -expectations are byte-identical on today's data. New output fields
+are optional (macro-desk.html was not touched). Defects, each: what a reader saw, the cause, the fix.
+- **The veteran batch never reached the live loop.** `council.yml`'s sparse checkout held `research/edge` and `research/proposals`
+  but not `research/macro-veteran`, so on the live desk `cpiPilot` was null, `newsAhead` and the release cards' `batch` were absent
+  ("The veteran reads the release ledgers"), "Your research, applied" showed only the four rule-book checks (no gold brief, funding
+  map, Japan, positioning, China, NY Fed survey, CPI plan, news register), and the Red folder study had no batch first prints or
+  model column. Every loader fails soft, so nothing warned. Fix: the folder is in the sparse checkout; a test reads every
+  `new URL('../…')` and `from '../…'` of council/*.mjs against that list. **A council member that reads a repository folder needs
+  it in council.yml's sparse checkout.** It reaches the loop with its next restart.
+- **A Sunday stub was counted as a trading day.** OANDA's UTC daily candles carry a two-hour Sunday row (one row in six), and every
+  count of rows was short of its label: "200-day average" $4,314 was the last 167 trading days (true $4,418), "13-week high" $4,443
+  the last 10.8 weeks (true $4,697), "50-day (= the 10-week average)" $4,065 (true $4,106); the week / month calls' base rates and
+  touch levels came from 5 / 20 ROWS (4.2 / 16.7 trading days) against due dates 5 / 20 weekdays on (levels too near, the 60% range
+  too narrow); "over 4 weeks" was 3.3 weeks; the analogs' "first close after Friday" was the Sunday stub; the Red folder's day move
+  of a Monday release was measured from the stub (49 of 748 rows change). Fix (`veteran.mjs` `tradingDays`, `foldBars`: weekend rows
+  dropped from close series, a stub's high / low / open folded into the next weekday's bar; weekday holiday stubs stay): the display
+  build, the resolution closes, the ledger and the Red folder read trading days at once. **The record build moves with the week of
+  `TRADING_DAYS_FROM` 2026-11-21**: this week's calls were issued from raw rows and a second build would add a second set (ids carry
+  the level) to the calibration sample. From then the base rates and levels of new calls are on true horizons (said here so a shift
+  in calibration is not a surprise). The two issued ledger forecasts (0 resolved) resolve at the 20th trading-day close, as their
+  own text says ("about 28-30 calendar days on"). Not changed: the strategist's and the score's own reading of the same rows.
+- **"53% chance it is higher by 11 Dec"** read as odds against today's price; it was the month call set at the 13 Nov close on a
+  close above $3,885, with gold at $3,575. Now, from `FAR` 2 % between the price and the call's level: "(at the 13 Nov close he put
+  53% on gold closing above $3,885 on 11 Dec, base 57%; gold is now 8.0% below that level, so read the lean, not the odds)"
+  (`summary.bias` + `level`, `from`, `gapPct`; the Week ahead's month-call line the same). Calls name their starting close by date
+  ("(the 2026-11-13 close)", `outlook.week.asOf`), never "today's close" / "the latest close". The recorded p is never changed.
+- **"No major release is scheduled this week"** was a 72-hour check. With no event in 72 h the sentence names the next top-tier US
+  release on the council's schedule within 8 days (`nextScheduled`, `summary.next`: "next on the schedule: US PCE (Wed 25 Nov,
+  13:30 UTC)"). The morning note's "No high-impact release is on the calendar for the next six days" (a Friday, PCE five days away:
+  the calendar feed holds one week) now lists the schedule's releases through the Week ahead's `releasesOf` (never twice) and the US
+  holiday; its heading is "The next six days".
+- **Week ahead: "Gold near $3,607 (as of the 2026-11-19 close); watch $3,590 above"**: the levels are picked either side of the
+  latest price ($3,575), the line quoted the close. Now "Gold near $3,575 now (last close $3,607 on 2026-11-19); watch $3,590 above
+  (13-week low, traded through since that close) and $3,550 below".
+- **Decided calls shown as open odds.** "Gold closes at or below $3,860 on some day by 20 Nov: 47%" three days after it closed
+  there. `outlook.mjs` `callStatus` (display only, never recorded: a test) stamps each shown call `status` (`happened` with the date
+  and close; else where the last close stands: on / off track, % away); the morning note prints "already happened: the 2026-11-17
+  close was 3,849 (he gave it 47%)".
+- **"Fails if … a weekly close below the 10-week average 4065"** with gold 11 % under it, and "real yield above 3.03% ends the
+  real-rate support" while that channel already leaned against gold. The lines say what is already true ("gold is already below
+  …: the tiebreaker is off until a weekly close back above it", "adds to the real-rate headwind", "the dollar is still rising").
+- **One report, two ranks.** The gold COT rank read "53th percentile" in the channel and the digest (over the strategist's last 60
+  reports, unlabelled) and "33rd percentile of 3 years" in the briefing. The channel names the 3-year rank when cot.json holds the
+  same report (`S.cot.pct3y`), else its window; `S.cot.pct` stays the 60-week rank the research check reads and labels.
+- **Releases without a country, "pending" for good.** `veteran.json.releases` showed "Employment Change · 25.2K" (Australia's) with
+  no country, and every past release as "pending" (the calendar feed carries no actuals). `releaseCheck` returns `country` and,
+  past the 48-hour first-print window, "no first print was captured …: no surprise is scored".
+Additions (display only):
+- **Holidays on the calls** (`glance.mjs` `holidaysBetween`, the ICT desk's CME calendar): `summary.holidays` and a closing
+  sentence ("Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov"),
+  `outlook.holidays` for the calls' window with `due`. `session` says what a day is for a dated call: a shortened CME day prints a
+  daily close and counts (Thanksgiving); on a full closure (Good Friday, Christmas, New Year) a call due that day is scored on the
+  last close before it (what `resolveCall` does). `addSessions` still counts weekdays: the week calls of 19 Dec fall due on 25 Dec.
+- **A consistency guard** (`glance.mjs` `consistency`, `summary.check { ok, issues }`): a level "above" not above the price (or
+  below not below), a lean that contradicts its own odds, odds quoted without their level once the price is 2 % away, a month call
+  whose date has passed, a release named beside "no release", a macro SELL. A failed check withholds the sentence ("Summary
+  withheld this run: its parts disagree (…)", the original in `withheld`); the parts stay for the desk.
+- **Week ahead `days[].focus`** (`focusOf`, from fields the veteran already wrote): the two levels (once, on the first day), on a
+  top-tier US release day his own real-yield and dollar lines, the dated calls and hypotheses due at that close, and what a holiday
+  or early-close session means for them.
+Sound, left alone: calibration stays k = 1 behind its gate (14 of 30 scored, 2 of 4 weeks); no macro sell anywhere; "tested" /
+"failed" wording on the Week ahead's calendar rules matches each study; the Thanksgiving rules fall on the right days (pre-holiday
+Wednesday, post-holiday Friday, gotobi the 25th); release times are New York local converted to UTC;
+levels' freshness and broken-level wording (11 and 19 Nov). Known, not changed: two releases at the same minute with the same
+title share an expectations key (a US and a Canadian "CPI m/m"); a call due on Good Friday names a day with no candle; the
+strategist's own 20-row trend mean and base rates still read the raw rows (macro.mjs is outside this change).
+Tests: `tests/brain-veteran.test.mjs` (10); changed on purpose: `tests/glance.test.mjs` (the no-event sentence),
+`tests/daily-report.test.mjs` (the heading), `tests/veteran-fresh.test.mjs` (a call's `status` follows the fresh closes).
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss

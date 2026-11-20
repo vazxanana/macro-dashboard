@@ -45,7 +45,7 @@ test('the two reports from the council files', () => {
   assert.ok(W['The picture'][1].startsWith('Crisis'));
   assert.deepEqual(W['What happened (last 30 hours)'], ['Fed (policy): Minutes of the FOMC', calLine(cache.cal[4])]);
   const today = Object.keys(W).find((k) => k.startsWith('Today')); assert.equal(W[today].length, 2); assert.match(W[today][0], /^High · 07:00 · United Kingdom · Retail Sales m\/m · expected 0\.3%, previous 0\.1%$/);
-  assert.match(W['Later this week'][0], /Core PCE/); assert.ok(W['What we expect'].some((l) => /Hikes priced/.test(l)) && !W['What we expect'].some((l) => /No stress/.test(l)));
+  assert.match(W['The next six days'][0], /Core PCE/); assert.ok(W['What we expect'].some((l) => /Hikes priced/.test(l)) && !W['What we expect'].some((l) => /No stress/.test(l)));
   assert.match(r.world.lead, /Today: United Kingdom Retail Sales m\/m at 07:00 London/);
   assert.match(M['Where markets stand'][0], /^Gold 3,627\.5: 51% chance of closing the day higher \(usual 53%\)/); assert.match(M['Where markets stand'][1], /1\.7x its usual/);
   assert.match(M["This week's odds (gold)"][0], /the \$3,885 close it was issued from/); assert.equal(M["This week's odds (gold)"].length, 2); assert.match(M["This week's odds (gold)"][1], /gold has moved −6\.6% since/);

@@ -65,7 +65,10 @@ test('run: mid-week the veteran\'s last close and levels come from yesterday\'s 
   assert.equal(fresh.summary.levels.asOf, '2026-11-10'); assert.equal(fresh.briefing.levels.dxy.asOf, '2026-11-10', 'the dollar index too');
   // the dated calls are the week's, issued from the last close before the week began (Friday), fresh closes or not
   assert.match(fresh.outlook.week.list[0].claim, /^Gold closes 2026-11-13 above /); assert.equal(fresh.outlook.week.list[0].level, GOLD.find((b) => b.t === FRI).c);
-  assert.deepEqual(fresh.outlook.week, stale.outlook.week); assert.deepEqual(fresh.outlook.month, stale.outlook.month);
+  // (20 Nov 2026: each call's `status`, where it stands on the closes so far, is display only and follows the fresh closes)
+  const noSt = (p) => ({ ...p, list: p.list.map(({ status, ...c }) => c) });
+  assert.deepEqual(noSt(fresh.outlook.week), noSt(stale.outlook.week)); assert.deepEqual(noSt(fresh.outlook.month), noSt(stale.outlook.month));
+  assert.equal(stale.outlook.week.list[0].status.text, 'no daily close since it was issued'); assert.match(fresh.outlook.week.list[0].status.text, /the last close \(2026-11-10\)/);
   assert.equal(fresh.outlook.anchor.asOf, '2026-11-06'); assert.equal(fresh.outlook.anchor.week, '2026-11-07');
   assert.equal(fresh.closes.markets.xau.added, 2); assert.equal(fresh.closes.markets.xau.to, '2026-11-10'); assert.match(stale.closes.markets.xau.why, /handed over no closed days/);
   // honesty in words

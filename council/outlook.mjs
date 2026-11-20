@@ -20,7 +20,8 @@ const freq = (P, f) => P.filter(f).length / P.length;
 // one horizon's calls for a close series
 export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = '', asset = null }) {
   const P = paths(closes, h, { now }); const s = (closes || []).filter((o) => o.t <= now); if (!P || !s.length) return null;
-  const px = s[s.length - 1].v, by = addSessions(Math.min(now, s[s.length - 1].t), h), fmt = (v) => (unit === '$' ? '$' : '') + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
+  // the close the calls start from is named by its date (20 Nov 2026: it read "today's close" all week, after the price had moved 8%)
+  const px = s[s.length - 1].v, asOf = new Date(s[s.length - 1].t * 1000).toISOString().slice(0, 10), by = addSessions(Math.min(now, s[s.length - 1].t), h), fmt = (v) => (unit === '$' ? '$' : '') + v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp });
   const up0 = freq(P, (p) => p.end > 0), up = clamp(up0 + tilt);
   const step = px > 1000 ? 10 : px > 100 ? 0.5 : 0.005, rnd = (v) => Math.round(v / step) * step;
   const lvl = (qq, k) => { const L = rnd(px * (1 + q(P.map((p) => p[k]), qq))), r = L / px - 1; const f0 = freq(P, (p) => (k === 'hi' ? p.hi >= r : p.lo <= r)); return { L, p: clamp(f0 + (k === 'hi' ? 1 : -1) * tilt * 0.8), b: +f0.toFixed(3) }; };
@@ -28,8 +29,8 @@ export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = 
   const lo = q(P.map((p) => p.end), 0.2 - tilt / 2), hi = q(P.map((p) => p.end), 0.8 - tilt / 2);
   const big = Math.max(Math.abs(q(P.map((p) => p.end), 0.1)), q(P.map((p) => p.end), 0.9)), pBig = freq(P, (p) => Math.abs(p.end) >= big);
   const A = asset || name.toLowerCase(), r4 = (v) => +(+v).toPrecision(8);
-  return { horizon: h, by, from: fmt(px), n: P.length, list: [
-    { claim: `${name} closes ${by} above ${fmt(px)} (today's close)`, p: +up.toFixed(2), baseP: +up0.toFixed(3), asset: A, kind: 'closeAbove', level: r4(px), by },
+  return { horizon: h, by, from: fmt(px), asOf, n: P.length, list: [
+    { claim: `${name} closes ${by} above ${fmt(px)} (the ${asOf} close)`, p: +up.toFixed(2), baseP: +up0.toFixed(3), asset: A, kind: 'closeAbove', level: r4(px), by },
     { claim: `${name} closes at or above ${fmt(U.L)} on some day by ${by}`, p: +U.p.toFixed(2), baseP: U.b, asset: A, kind: 'touchUp', level: r4(U.L), by },
     { claim: `${name} closes at or above ${fmt(U2.L)} on some day by ${by} (stretch)`, p: +U2.p.toFixed(2), baseP: U2.b, asset: A, kind: 'touchUp', level: r4(U2.L), by },
     { claim: `${name} closes at or below ${fmt(D.L)} on some day by ${by}`, p: +D.p.toFixed(2), baseP: D.b, asset: A, kind: 'touchDown', level: r4(D.L), by },
@@ -42,7 +43,7 @@ export function calls({ closes, now, h, tilt = 0, name = 'Gold', dp = 0, unit = 
 export function digest(ch, fc) {
   const by = Object.fromEntries((ch.list || []).map((r) => [r.k, r])), out = [], lw = (v) => (v == null ? 'no reading' : v > 0 ? 'supportive for gold' : v < 0 ? 'against gold' : 'neutral for gold');
   const add = (src, r, extra) => { if (r && r.lean !== undefined && !/^no observation|^not observed/.test(r.obs)) out.push({ src, read: r.obs + (r.asOf && !r.obs.includes(r.asOf) ? ` (as of ${r.asOf}${r.stale ? ', stale' : ''})` : ''), says: lw(r.lean) + (extra ? '. ' + extra : ''), limit: r.cannot }); };
-  add('CFTC Commitments of Traders', by.pos, by.pos && /(\d+)th percentile/.test(by.pos.obs) ? (+RegExp.$1 >= 80 ? 'Crowded long: a hawkish surprise would hit harder than usual' : +RegExp.$1 <= 20 ? 'Light positioning: room for buyers to return' : 'Not crowded either way') : '');
+  add('CFTC Commitments of Traders', by.pos, by.pos && /(\d+)(?:st|nd|rd|th) percentile/.test(by.pos.obs) ? (+RegExp.$1 >= 80 ? 'Crowded long: a hawkish surprise would hit harder than usual' : +RegExp.$1 <= 20 ? 'Light positioning: room for buyers to return' : 'Not crowded either way') : '');
   add('Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)', by.risk, 'Stress first sells gold for cash, then buys it');
   add('CME FedWatch / 2Y (policy path)', by.policy, 'The direction of repricing is the signal, not the level');
   add('TIPS real yield (opportunity cost)', by.real, '');
@@ -91,6 +92,22 @@ export function resolveCall(c, closes, now) {
     case 'stayInside': return S.every((o) => o.v >= c.lo && o.v <= c.hi);
     default: return null;
   }
+}
+// Where an open call stands on the daily closes so far (20 Nov 2026, display only: nothing here is recorded or scored). A
+// "closes at or below X on some day" call that a close has already reached is decided, yet it kept being shown with its odds
+// until the day after its date. closes: [{ t, v }] trading days; from: the close the call was issued from (YYYY-MM-DD).
+export function callStatus(c, closes, from) {
+  if (!c || !c.kind || !/^\d{4}-\d\d-\d\d$/.test(String(from || ''))) return null;
+  const S = (closes || []).filter((o) => o.t > dayOf(from) && o.t <= dayOf(c.by)); if (!S.length) return { state: 'open', text: 'no daily close since it was issued' };
+  const d = (o) => new Date(o.t * 1000).toISOString().slice(0, 10), last = S[S.length - 1], f = (x) => (+x).toLocaleString('en-US', { maximumFractionDigits: x > 1000 ? 0 : 2 });
+  const hit = c.kind === 'touchUp' ? S.find((o) => o.v >= c.level) : c.kind === 'touchDown' ? S.find((o) => o.v <= c.level) : null;
+  if (hit) return { state: 'happened', on: d(hit), text: `already happened: the ${d(hit)} close was ${f(hit.v)}` };
+  if (c.kind === 'touchUp' || c.kind === 'touchDown') return { state: 'open', text: `not yet: the last close (${d(last)}) was ${f(last.v)}, ${Math.abs((c.level / last.v - 1) * 100).toFixed(1)}% away` };
+  if (c.kind === 'closeAbove' || c.kind === 'pairUp' || c.kind === 'pairDown') { const up = last.v > c.level, want = c.kind !== 'pairDown';
+    return { state: 'open', side: up === want ? 'on track' : 'off track', text: `${up === want ? 'on track' : 'off track'}: the last close (${d(last)}) was ${f(last.v)}, ${Math.abs((last.v / c.level - 1) * 100).toFixed(1)}% ${up ? 'above' : 'below'} the level` }; }
+  if (c.kind === 'range') { const inside = last.v >= c.lo && last.v <= c.hi; return { state: 'open', side: inside ? 'on track' : 'off track', text: `${inside ? 'inside' : 'outside'} the range at the last close (${d(last)}: ${f(last.v)})` }; }
+  if (c.kind === 'bigMove') { const mv = (last.v / c.level - 1) * 100, big = Math.abs(mv) >= c.pct * 100; return { state: 'open', side: big ? 'on track' : 'off track', text: `${mv >= 0 ? '+' : '−'}${Math.abs(mv).toFixed(1)}% at the last close (${d(last)})` }; }
+  return null;
 }
 export function callsLedger(ledger, { outlook, closesBy, now, extra = [] }) {
   const L = (ledger || []).slice(), today = new Date(now * 1000).toISOString().slice(0, 10), have = new Set(L.map((r) => r.id));

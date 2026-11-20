@@ -26,12 +26,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { injectSection } from './analyst.mjs';
 import { dailyRows, dxyDaily, isoDay } from './macroscore.mjs';
-import { outlook, cotCalls, callsLedger, callsScore } from './outlook.mjs';
+import { outlook, cotCalls, callsLedger, callsScore, callStatus } from './outlook.mjs';
 import { MARKETS as COT_MARKETS } from './cot.mjs';
 import { cotMain } from './macro.mjs';
-import { briefing, briefingLines, P_CLAMP } from './briefing.mjs';
+import { briefing, briefingLines, P_CLAMP, ordinal } from './briefing.mjs';
 import { calibration, applyCalls } from './calibration.mjs';
-import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf } from './glance.mjs';
+import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, markOf, holidaysBetween } from './glance.mjs';
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
 import { build as redfolder, loadInputs as rfInputs, capturedFrom as rfCaptured } from './redfolder.mjs';
@@ -100,7 +100,7 @@ export function captureExpectations(hist, fc, now) {
   return { hist: H.slice(-300), added };
 }
 // The integrity read of one record before its print is trusted (bls-release-integrity case; first-print coverage study).
-export function releaseCheck(r, S = {}) {
+export function releaseCheck(r, S = {}, now = null) {
   if (!r) return null;
   const ex = r.expectation || {}, fp = r.firstPrint, t = Date.parse(r.scheduledUtc) / 1000, cons = pctNum(ex.consensus), act = fp ? pctNum(fp.value) : null;
   const before = !!ex.capturedAtUtc && Date.parse(ex.capturedAtUtc) / 1000 < t;
@@ -110,8 +110,11 @@ export function releaseCheck(r, S = {}) {
     { k: 'vintage', ok: fp ? !fp.flags.length : null, text: fp ? (fp.flags.length ? fp.flags.join('; ') : `first print ${fp.value} recorded ${fp.lagHours} h after the scheduled time; later revisions are another vintage and never replace it`) : 'no print yet' },
   ];
   const trusted = !!(fp && cons != null && before && !fp.flags.length && act != null);
-  const out = { event: r.event, scheduledUtc: r.scheduledUtc, consensus: ex.consensus ?? null, previous: ex.previous ?? null, firstPrint: fp ? fp.value : null, checks, trusted,
-    surprise: trusted ? +(act - cons).toFixed(3) : null, surpriseNote: !fp ? 'pending' : trusted ? `print minus the captured expectation ${sg(+(act - cons).toFixed(3), 2, ' pp')}` : 'not scored: the print did not pass the integrity checks', claim: CLAIM.descriptive };
+  // 20 Nov 2026: the country travels with the record (an Australian "Employment Change" read like a US one), and a release whose
+  // print was never captured says so once the first-print window has passed, instead of "pending" for good
+  const missed = !fp && now != null && now > t + PRINT_LAG_HOURS * 3600;
+  const out = { event: r.event, country: r.country || null, scheduledUtc: r.scheduledUtc, consensus: ex.consensus ?? null, previous: ex.previous ?? null, firstPrint: fp ? fp.value : null, checks, trusted,
+    surprise: trusted ? +(act - cons).toFixed(3) : null, surpriseNote: missed ? `no first print was captured within ${PRINT_LAG_HOURS} hours of the release: no surprise is scored` : !fp ? 'pending' : trusted ? `print minus the captured expectation ${sg(+(act - cons).toFixed(3), 2, ' pp')}` : 'not scored: the print did not pass the integrity checks', claim: CLAIM.descriptive };
   if (/\bCPI\b/i.test(r.event)) {
     const d = isoDay(t), ry = S.DFII10 || [], at = ry.find((o) => isoDay(o.t) === d);
     // the study's rule: the immediately preceding Monday-Friday date must exist; no gap is bridged
@@ -126,7 +129,7 @@ export function releaseCheck(r, S = {}) {
 // the records the desk shows: upcoming within 7 days and released within the last 7 days, newest first
 export function releaseView(hist, S, now) {
   return (hist || []).filter((r) => { const t = Date.parse(r.scheduledUtc) / 1000; return t >= now - 7 * DAY && t <= now + 7 * DAY; })
-    .map((r) => releaseCheck(r, S)).sort((a, b) => b.scheduledUtc.localeCompare(a.scheduledUtc)).slice(0, 8);
+    .map((r) => releaseCheck(r, S, now)).sort((a, b) => b.scheduledUtc.localeCompare(a.scheduledUtc)).slice(0, 8);
 }
 
 // The event playbook's history (research/edge/event-reaction/build.mjs → council/event-base.json); null when it is missing
@@ -234,7 +237,7 @@ export function channels(S, now) {
     vix ? (vts != null && vts > 1 ? 0 : vix.v >= 22 ? 1 : 0) : null, (vix && vix.asOf) || (hy && hy.asOf), (vix && vix.stale) || (hy && hy.stale),
     'Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction.'));
   const cot = S.cot;
-  list.push(row('pos', 'Investment flows and positioning', cot ? `COT managed money ${Math.round(cot.net / 1000)}k net, ${sg(cot.chg4w / 1000, 0, 'k')} over 4 weeks, ${cot.pct}th percentile (positions as of ${cot.asOf})` : 'no observation',
+  list.push(row('pos', 'Investment flows and positioning', cot ? `COT managed money ${Math.round(cot.net / 1000)}k net, ${sg(cot.chg4w / 1000, 0, 'k')} over 4 weeks, ${cot.pct3y != null ? `${ordinal(cot.pct3y)} percentile of 3 years` : `${ordinal(cot.pct)} percentile of the last ${cot.weeks || 60} weeks`} (positions as of ${cot.asOf})` : 'no observation',
     cot ? 0 : null, cot && cot.asOf, cot && now - Date.parse(cot.asOf + 'T00:00:00Z') / 1000 > 12 * DAY,
     'COT is a Tuesday snapshot of reportable futures, published Friday: crowding and fragility context, not direction. ETF tonnage and options dealer positioning are not observed by the council.'));
   list.push(row('official', 'Official reserves and physical demand', 'not observed by the council (WGC monthly reserves run two months in arrears; quarterly demand is partly estimated)', null, null, false,
@@ -302,9 +305,9 @@ export function debate(fc, ch, fp, { now, base } = {}) {
   if (evIn72) note += ` Event within 72 hours (${ev.title}): the bias is conditional until the print.`;
   // invalidation: named levels from the observations
   const ry = C.real, inv = [];
-  if (ry.obs !== 'no observation') { const lvl = +ry.obs.match(/TIPS ([\d.]+)%/)[1]; inv.push(`10Y TIPS real yield above ${(lvl + 0.15).toFixed(2)}% (+15 bp from ${lvl.toFixed(2)}%) ends the real-rate support`); }
-  if (C.usd.obs !== 'no observation') { const lvl = +C.usd.obs.match(/DXY ([\d.]+)/)[1]; inv.push(`DXY above ${(lvl * 1.015).toFixed(1)} (+1.5%) says the dollar channel has turned`); }
-  if (C.price.obs !== 'no observation' && ch.changes && C.price.obs.includes('10-week')) { const a = C.price.obs.match(/10-week average (\d+)/); if (a) inv.push(`a weekly close below the 10-week average ${a[1]} removes the trend tiebreaker`); }
+  if (ry.obs !== 'no observation') { const lvl = +ry.obs.match(/TIPS ([\d.]+)%/)[1]; inv.push(`10Y TIPS real yield above ${(lvl + 0.15).toFixed(2)}% (+15 bp from ${lvl.toFixed(2)}%) ${ry.lean < 0 ? 'adds to the real-rate headwind' : 'ends the real-rate support'}`); }
+  if (C.usd.obs !== 'no observation') { const lvl = +C.usd.obs.match(/DXY ([\d.]+)/)[1]; inv.push(`DXY above ${(lvl * 1.015).toFixed(1)} (+1.5%) ${C.usd.lean < 0 ? 'says the dollar is still rising against gold' : 'says the dollar channel has turned'}`); }
+  if (C.price.obs !== 'no observation' && ch.changes && C.price.obs.includes('10-week')) { const a = C.price.obs.match(/10-week average (\d+)/); if (a) inv.push(/below the 10-week/.test(C.price.obs) ? `gold is already below the 10-week average ${a[1]}: the trend tiebreaker is off until a weekly close back above it` : `a weekly close below the 10-week average ${a[1]} removes the trend tiebreaker`); }
   const verdict = { bias, conviction, note, agree: topics.filter((t) => t.stance === 'agree').length, qualify: qual, disagree: dis, invalidation: inv, eventWithin72h: evIn72 ? { title: ev.title, at: ev.at, consensus: ev.consensus ?? null } : null };
   const card = hypothesisCard({ fc, fp, ch, verdict, now, base });
   return { topics, verdict, card };
@@ -350,7 +353,7 @@ export function ledgerIssue(ledger, { now, gold, verdict, base, gs, card }) {
     forecast: { issued_at_utc: issuedAt, information_cutoff_utc: issuedAt,
       target: { variable: 'XAU/USD daily close', instrument_or_population: 'council daily gold candles (OANDA spot mid), research/daily/xau.json', unit: 'USD per troy ounce',
         outcome_description: `The daily close ${HORIZON_DAYS} trading days after ${isoDay(at.t)} is above ${at.v.toFixed(2)} (the close of ${isoDay(at.t)})`, observation_start_utc: new Date(at.t * 1000).toISOString(), deadline_utc: new Date((at.t + 30 * DAY) * 1000).toISOString(), timezone_note: `UTC day candles; the deadline is the ${HORIZON_DAYS}th trading-day close, about 28-30 calendar days on` },
-      horizon: `${HORIZON_DAYS} trading days`, resolution_rule: { publisher: 'council-data', dataset_or_instrument: 'research/daily/xau.json', field_or_price_convention: 'row close (index 4)', rule: `true if close[t0 + ${HORIZON_DAYS} rows] > close[t0]`, revision_policy: 'candles are not revised; a missing day leaves the record unresolved until the next close', specified_vintage: isoDay(at.t) },
+      horizon: `${HORIZON_DAYS} trading days`, resolution_rule: { publisher: 'council-data', dataset_or_instrument: 'research/daily/xau.json', field_or_price_convention: 'row close (index 4)', rule: `true if close[t0 + ${HORIZON_DAYS} rows] > close[t0], rows = weekday candles (the Sunday reopen stub is not a trading day)`, revision_policy: 'candles are not revised; a missing day leaves the record unresolved until the next close', specified_vintage: isoDay(at.t) },
       distribution: { kind: 'binary_event', event_probability: p },
       comparator: { type: comparatorP != null ? 'model_rule' : 'none', description: comparatorP != null ? `Gold Macro Score rule: score ${sg(gs.score)} → tested 4-week up rate` : 'no score this week', probability_or_value: comparatorP, sample_size: comparatorP != null ? gs.weeks : null, captured_at_utc: issuedAt, source_url: null, limitations: 'tested hit rates are in-sample averages over 2007-26, not a live probability' },
       base_rate: base ? { probability: base.upRate, description: `unconditional ${HORIZON_DAYS}-day up rate, ${base.from}..${base.to}, n ${base.n}` } : null,
@@ -425,7 +428,12 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   if (gold.length >= 50) { const w = gold.filter((o) => o.t <= now).slice(-50); S.avg10w = w.reduce((a, o) => a + o.v, 0) / w.length; }
   const cotRows = cotMain(cache && cache.cot || []).filter((r) => r.t <= now - 4 * DAY);
   if (cotRows.length >= 5) { const w = cotRows.slice(-60), cur = w[w.length - 1], m4 = w[Math.max(0, w.length - 5)], s = w.map((r) => r.net).sort((a, b) => a - b);
-    S.cot = { net: cur.net, chg4w: cur.net - m4.net, pct: Math.round(Math.max(0, s.findIndex((v) => v >= cur.net)) / Math.max(1, s.length - 1) * 100), asOf: isoDay(cur.t) }; }
+    S.cot = { net: cur.net, chg4w: cur.net - m4.net, pct: Math.round(Math.max(0, s.findIndex((v) => v >= cur.net)) / Math.max(1, s.length - 1) * 100), asOf: isoDay(cur.t), weeks: w.length };
+    // 20 Nov 2026: one fact, one number. This rank is over the strategist's last 60 weekly reports; the COT desk and the briefing
+    // rank the same report over 3 years (53rd against 33rd on 20 Nov). The channel names the 3-year rank when cot.json holds that
+    // report, else its own window; S.cot.pct stays the 60-week rank the research check reads (and says).
+    const gm = cot && Array.isArray(cot.markets) ? cot.markets.find((m) => m.k === 'gold' && !m.missing) : null;
+    if (gm && gm.asOf === S.cot.asOf && Number.isFinite(gm.pct)) S.cot.pct3y = gm.pct; }
   const ch = channels(S, now), fp = fingerprint(ch.changes), base = baseRates(gold, { now });
   const { topics, verdict, card } = debate(fc, ch, fp, { now, base });
   let L = ledgerResolve(ledger, gold); const { ledger: L2, issued } = ledgerIssue(L, { now, gold, verdict, base, gs: fc && fc.goldScore, card }); L = L2;
@@ -541,6 +549,27 @@ export function freezeEventCalls(events, CL) {
   }
   return callsScore((CL || []).filter((r) => r.src === 'event playbook'));
 }
+// ---- trading days (20 Nov 2026) -------------------------------------------------------------------------------------------
+// OANDA's UTC daily candles carry a stub every Sunday (the two hours from the 22:00 UTC reopen to midnight): one row in six. Every
+// count of rows was therefore short of what its label says: "5 sessions" ended on Thursday, the "20-session" base rate covered
+// 3.3 weeks against a due date 4 weeks on, the "200-day average" was the last 167 trading days (20 Nov 2026: $4,314 shown, $4,418
+// on trading days) and the "13-week high" the last 10.8 weeks ($4,443 shown, $4,697). tradingDays drops the weekend rows of a
+// close series; foldBars folds a weekend stub's high and low into the next weekday's bar (its session). Weekday holiday stubs
+// stay: they are that day's close.
+const isWeekend = (t) => { const w = new Date(t * 1000).getUTCDay(); return w === 0 || w === 6; };
+export const tradingDays = (closes) => (closes || []).filter((o) => !isWeekend(o.t));
+export function foldBars(bars) {
+  const out = []; let pend = null;
+  for (const b of bars || []) {
+    if (isWeekend(b.t)) { pend = pend ? { o: pend.o, h: Math.max(pend.h, b.h), l: Math.min(pend.l, b.l) } : { o: b.o, h: b.h, l: b.l }; continue; }
+    out.push(pend ? { ...b, o: pend.o, h: Math.max(pend.h, b.h), l: Math.min(pend.l, b.l) } : b); pend = null;
+  }
+  return out;
+}
+// What is RECORDED (the week's dated calls, hypotheses, ledger forecast) is built on trading days from the week that starts on
+// this Saturday: the week of 14 Nov was already issued from the raw rows, and a second build of it would add a second set of
+// calls with other levels (ids carry the level) to the calibration sample.
+export const TRADING_DAYS_FROM = '2026-11-21';
 // The strategist's closed days (macro/cache.json `daily`, council/macro.mjs handDaily) appended after the weekly candle cache's
 // last day (11 Nov: mid-week the veteran's last close, levels and ranges were the Friday before). Complete UTC days only, cut at
 // `now`. Appended only when the handed days reach back to the cache's last day AND agree with it on that day's close (the same
@@ -567,11 +596,13 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   const hand = (cache && cache.daily && cache.daily.days) || {}, closes = {};
   const day = (k) => { const e = extendDaily(rd(path.join(dir, 'research', 'daily', `${k}.json`), null), hand[k], now); closes[k] = { cacheTo: e.cacheTo, to: e.to, added: e.added, ...(e.why ? { why: e.why } : {}) }; return e.json; };
   const daily = {}; for (const k of ['eurusd', 'usdjpy', 'gbpusd', 'usdcad', 'usdchf']) daily[k] = dailyRows(day(k));
-  const dx = dxyDaily(daily), xau = day('xau'), gold = dailyRows(xau);
-  const goldBars = xau && Array.isArray(xau.rows) ? xau.rows.filter((r) => r && r[4] > 0).map((r) => ({ t: Math.floor(r[0] / DAY) * DAY, o: +r[1], h: +r[2], l: +r[3], c: +r[4] })) : null;
-  const spx = dailyRows(day('spx500')), cot = rd(path.join(M, 'cot.json'), null);
-  // the calls' record and COT-edge calls (9 Nov): closes by asset for resolution
-  const px = { gold, dxy: dx }; for (const m of COT_MARKETS) if (!px[m.k]) px[m.k] = m.px === 'spx500' ? spx : dailyRows(day(m.px));
+  // raw = every row on file (weekend stubs included); the series the veteran reads are trading days (20 Nov 2026, above)
+  const rawDx = dxyDaily(daily), xau = day('xau'), rawGold = dailyRows(xau);
+  const rawBars = xau && Array.isArray(xau.rows) ? xau.rows.filter((r) => r && r[4] > 0).map((r) => ({ t: Math.floor(r[0] / DAY) * DAY, o: +r[1], h: +r[2], l: +r[3], c: +r[4] })) : null;
+  const rawSpx = dailyRows(day('spx500')), cot = rd(path.join(M, 'cot.json'), null);
+  const dx = tradingDays(rawDx), gold = tradingDays(rawGold), goldBars = rawBars ? foldBars(rawBars) : null, spx = tradingDays(rawSpx);
+  // the calls' record and COT-edge calls (9 Nov): closes by asset for resolution (a weekend stub is not a daily close)
+  const px = { gold, dxy: dx }; for (const m of COT_MARKETS) if (!px[m.k]) px[m.k] = m.px === 'spx500' ? spx : tradingDays(dailyRows(day(m.px)));
   // self-calibration from the record as it stands before today's calls (resolved on closes up to now only)
   const CL0 = callsLedger(rd(path.join(M, 'veteran-calls.json'), []), { outlook: null, closesBy: px, now });
   const cal = calibration({ calls: CL0, ledger: ledgerResolve(ledger, gold) });
@@ -582,7 +613,9 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   // whatever day the first run of the week falls on. Results are read from every complete close (`px`, fresh). The DISPLAY
   // (last close, levels, ladder, glance, analogs, the hypotheses' live reading) is a second build on the fresh closes.
   const w0 = Date.parse(weekKey(now) + 'T00:00:00Z') / 1000, cut = (a) => (a || []).filter((o) => o.t < w0);
-  const rec = { gold: cut(gold), dxy: cut(dx), goldBars: goldBars ? cut(goldBars) : null, spx: cut(spx) }, pxRec = Object.fromEntries(Object.entries(px).map(([k, a]) => [k, cut(a)]));
+  const td = weekKey(now) >= TRADING_DAYS_FROM;   // the record of the week of 14 Nov 2026 stays as it was issued (raw rows)
+  const rec = td ? { gold: cut(gold), dxy: cut(dx), goldBars: goldBars ? cut(goldBars) : null, spx: cut(spx) } : { gold: cut(rawGold), dxy: cut(rawDx), goldBars: rawBars ? cut(rawBars) : null, spx: cut(rawSpx) };
+  const pxRec = Object.fromEntries(Object.entries(px).map(([k, a]) => [k, cut(a)]));
   const R = build({ fc, cache, daily: rec, ledger: ledgerResolve(ledger, gold), debates: debatesResolve(debates, gold), expectations, cot, now, cal });
   if (R.v.outlook) { R.v.outlook.cot = applyCalls(cotCalls(cot, pxRec, now), R.v.calibration); R.v.outlook.anchor = { asOf: rec.gold.length ? isoDay(rec.gold[rec.gold.length - 1].t) : null, week: weekKey(now), note: 'Dated calls are issued once a week, from the last close before the week began; they are scored on every daily close after their issue date.' }; }
   const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx, usdjpy: daily.usdjpy }, ledger: R.ledger, debates: R.debates, expectations: R.expectations, cot, now, cal, keep: { outlook: R.v.outlook, ledger: R.v.ledger } });
@@ -596,6 +629,11 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
     CL = callsLedger(CL0, { outlook: v.outlook, closesBy: px, now, extra: [...hyps, ...evCalls] }); w('veteran-calls.json', CL);
     v.eventsRecord = freezeEventCalls(v.events, CL);
     v.outlook.record = callsScore(CL); v.outlook.recent = CL.filter((r) => r.hit != null).slice(-12).reverse();
+    // display only (20 Nov 2026): where each open call stands on the closes since it was issued, and the US holidays inside the
+    // calls' window (which days are thin, which still count as a daily close); neither is recorded or scored
+    const from = v.outlook.anchor && v.outlook.anchor.asOf;
+    for (const part of [v.outlook.week, v.outlook.month]) if (part) for (const c of part.list) { const st = callStatus(c, px[c.asset], from); if (st) c.status = st; }
+    if (from && v.outlook.month) v.outlook.holidays = holidaysBetween(from, v.outlook.month.by).map((h) => ({ ...h, due: [v.outlook.week, v.outlook.month].filter((p) => p && p.by === h.day).map((p) => (p.horizon === 5 ? 'week' : 'month')) }));
     if (v.briefing) freezeHypotheses(v.briefing, CL); }
   // what changed since last week (9 Nov): one compact briefing per week in macro/veteran-briefings.json, diffed against the last one
   if (v.briefing) { const BH = rd(path.join(M, 'veteran-briefings.json'), []), wk = weekKey(now), snap = snapshot(v, wk);

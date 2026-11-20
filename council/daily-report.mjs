@@ -10,6 +10,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeAtomic } from './jsonio.mjs';
+import { releasesOf } from './week-ahead.mjs';
+import { holidaysBetween } from './glance.mjs';
 
 export const TZ = 'Europe/London', BUILD_FROM = 6, PUBLISH = { h: 6, m: 30 }, KEEP = 14;
 const COUNTRY = { USD: 'United States', EUR: 'Euro area', GBP: 'United Kingdom', JPY: 'Japan', CNY: 'China', AUD: 'Australia', NZD: 'New Zealand', CAD: 'Canada', CHF: 'Switzerland', ALL: 'Global' };
@@ -66,12 +68,20 @@ export function worldReport({ fc, vet, cal, now }) {
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);
-  if (!later.length) lines.week.push('No high-impact release is on the calendar for the next six days.');
+  // 20 Nov 2026: the calendar feed holds this week only (next week's file appears over the weekend), so on a Friday the line
+  // read "No high-impact release ... for the next six days" with PCE five days away. The council's own schedule (events.mjs,
+  // through the Week ahead's releasesOf) fills what the feed does not hold yet, and US holidays in the window are said.
+  const ny = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(t * 1000));
+  const sched = releasesOf(cal, ny(endToday + 60), ny(endToday + 6 * 86400)).filter((r) => r.src === 'schedule' && r.impact === 'high' && r.t > endToday && r.t <= endToday + 6 * 86400);
+  for (const r of sched.slice(0, 6)) lines.week.push(`${dayName(r.t)} ${hm(r.t)} · ${COUNTRY[r.country] || r.country} · ${clean(r.title, 80)} · from the desk's own schedule (the calendar's consensus is not out yet)`);
+  const hols = holidaysBetween(new Date((now + 86400) * 1000).toISOString().slice(0, 10), new Date((endToday + 6 * 86400) * 1000).toISOString().slice(0, 10));
+  for (const h of hols) lines.week.push(`United States · ${clean(h.text, 200)}.`);
+  if (!later.length && !sched.length) lines.week.push(hols.length ? 'No high-impact release is on the calendar or the desk\'s schedule for the next six days.' : 'No high-impact release is on the calendar for the next six days.');
   // what we expect
-  if (S.sentence) lines.expect.push(clean(S.sentence, 400));
+  if (S.sentence) lines.expect.push(clean(S.sentence, 900));
   const gs = fc && fc.goldScore; if (gs && gs.ok && Number.isFinite(gs.score)) lines.expect.push(`Gold Macro Score ${gs.score > 0 ? '+' : ''}${gs.score.toFixed(2)}: ${gs.score > 0.25 ? 'leans to gold rising over the next four weeks (the score\'s tested side)' : 'no macro edge for gold (the score only ever points up, above +0.25)'}.`);
   for (const it of (((vet && vet.research) || {}).items || []).slice(0, 6)) if (it && it.text && !/^No |off:|no regime/i.test(it.text)) lines.expect.push(clean(it.text, 220));
-  const sections = [['The picture', lines.picture], ['What happened (last 30 hours)', lines.happened], [`Today, ${dayName(now)} (London time)`, lines.today], ['Later this week', lines.week], ['What we expect', lines.expect]]
+  const sections = [['The picture', lines.picture], ['What happened (last 30 hours)', lines.happened], [`Today, ${dayName(now)} (London time)`, lines.today], ['The next six days', lines.week], ['What we expect', lines.expect]]
     .filter(([, l]) => l.length).map(([h, l]) => ({ h, lines: l }));
   const top = todays.find((e) => e.impact === 'High') || todays[0];
   const lead = `${R.label ? clean(R.label).split(' · ')[0] + '. ' : ''}${top ? `Today: ${COUNTRY[top.country] || top.country} ${clean(top.title, 60)} at ${hm(top.at)} London.` : 'No major release today.'}`;
@@ -99,7 +109,11 @@ export function marketsReport({ fc, vet, cot, snap, now }) {
     if (lv.broken) levels.push(`Broken since the last close: $${num(lv.broken.price, 0)} (${clean(lv.broken.label, 40)}).`);
     if (lv.fresh && lv.fresh.text) levels.push(`Levels ${clean(lv.fresh.text, 60)}.`); }
   const wk = vet && vet.outlook && vet.outlook.week, calls = [];
-  if (wk && Array.isArray(wk.list)) for (const c of wk.list.filter((c) => !/stretch/.test(c.claim)).slice(0, 4)) calls.push(`${clean(c.claim, 140).replace(/ \(today's close\)/, ` (the ${wk.from || ''} close it was issued from)`.replace('the  close', 'its starting close'))}: ${pts(c.p)}% (usual ${pts(c.baseP)}%).`);
+  // a call the closes have already decided is said so, never offered as odds (20 Nov 2026: "closes at or below $3,860 on some
+  // day ... 47%" three days after gold closed below it); an open one says where the last close stands
+  if (wk && Array.isArray(wk.list)) for (const c of wk.list.filter((c) => !/stretch/.test(c.claim)).slice(0, 4)) { const st = c.status;
+    const claim = clean(c.claim, 140).replace(/ \(today's close\)/, ` (the ${wk.from || ''} close it was issued from)`.replace('the  close', 'its starting close'));
+    calls.push(st && st.state === 'happened' ? `${claim}: ${clean(st.text, 120)} (he gave it ${pts(c.p)}%).` : `${claim}: ${pts(c.p)}% (usual ${pts(c.baseP)}%)${st && st.text ? `; ${clean(st.text, 120)}` : ''}.`); }
   const from = wk && Number(String(wk.from || '').replace(/[^0-9.]/g, '')), gNow = A.gold && A.gold.last;
   if (calls.length && from > 0 && gNow > 0 && Math.abs(gNow / from - 1) >= 0.02) calls.push(`These were set from the ${wk.from} close; gold has moved ${pc((gNow / from - 1) * 100)} since, so read them against today's price.`);
   const pos = [];
