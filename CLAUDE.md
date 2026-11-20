@@ -4975,6 +4975,14 @@ longs in the same up-trend (placebo median +0.078R, 95th percentile +0.152R): it
 (60 % vs 46 %) but the R a trade is the same (+0.083 vs +0.080, t 0.02). Shorts −0.005R. Nothing live changed. Test:
 `tests/macro-donchian.test.mjs`.
 
+## The gold brief's "interim bottom" framework (20 Nov 2026, `research/edge/gold-interim-bottom`, pre-registered)
+The veteran batch's gold brief (`gold-market-brief-2026-11-07.md`) quotes a bear-regime bottom signal (gold far below its 200-day,
+a sharp 52-week dollar rise, low speculative positioning; 9 of 10 up after three months) and asks for a point-in-time test.
+Public proxy with two of the three conditions (no COT before 2019), thresholds from earlier bear month-ends, OANDA spot 2007-26,
+long 63 days with a 3 x ATR20 stop, net of costs and financing. **FAIL, too few to judge**: both conditions held at 2 month-ends
+(Sep / Oct 2022), one trade, +1.56R, n 1, no t. Reported: the stretch condition alone 6 of 7 up (+0.67R, t 1.64) against every bear
+month-end 40 of 62 (+0.21R): the brief's direction, intervals overlapping. Nothing live changed. Test: `tests/gold-interim-bottom.test.mjs`.
+
 ## Measured-cost studies of 20 Nov 2026 (tick probe)
 Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live changed. Results, each pre-registered before its data:
 - `gold-release-quotes`: gold's spread at T+5 s after US CPI / payrolls / FOMC is about 18× normal ($1.48 median), the widest
