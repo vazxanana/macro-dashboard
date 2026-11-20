@@ -3014,6 +3014,9 @@ Score's falling-2-year driver, never a trading rule. The rule book's "double tig
 high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapCheck` (veteran passes `cache.release` DFEDTARU as
 `policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
 `tests/rulebook-gauges.test.mjs`.
+Same gauge on the yen (`research/edge/rulebook-gap-yen`, pre-registered 20 Nov 2026; `gapRows` / `testB` imported, run on 1 / USD/JPY):
+**FAIL, 0 of 2** (B1 hikes priced → USD/JPY up t −0.67 the wrong way; B2 cuts priced → USD/JPY down t 0.04), 1,001 weeks 2007-26;
+USD/JPY's next 20 sessions about +0.1 % in every class. The gauge is a gold lean, not a dollar one.
 
 ## Stress and reaction rules of the macro rule book (19 Nov 2026, owner: "keep going with the other documents")
 `research/edge/rulebook-stress/` (PREREGISTRATION.md committed first; `run.mjs` reuses `rulebook-gauges`' FRED parser, known-at
