@@ -1,19 +1,178 @@
 {
- "at": "2026-11-18T11:59:29.319Z",
+ "at": "2026-11-20T08:55:36.296Z",
  "source": "OANDA spot 5m (aureumdesk.co.uk/md) vs the live Trader's Kraken-era trades (feed kraken or untagged; trades managed on OANDA since 7 Nov 16:01 UTC are counted as sameFeed, not judged)",
  "note": "Same entry/stop/target walked through spot candles, stop first inside a candle; break-even moves ignored. 5m candles cannot order a stop and target inside one candle.",
- "markets": {},
- "forex": {
-  "n": 0,
-  "liveR": 0,
-  "spotR": 0
+ "markets": {
+  "xau": {
+   "n": 19,
+   "sameFeed": 73,
+   "same": 18,
+   "liveWinSpotLoss": 1,
+   "liveWinSpotNever": 0,
+   "liveLossSpotWin": 0,
+   "liveLossSpotNever": 0,
+   "liveR": -1.48,
+   "spotR": -6,
+   "liveOnly": {
+    "n": 2,
+    "liveR": -2,
+    "spotR": -2
+   },
+   "examples": [
+    {
+     "id": "xau-m30m1-1794943539",
+     "side": "sell",
+     "entry": 3853.01,
+     "stop": 3858.36,
+     "t1": 3831.965,
+     "live": "win",
+     "spot": "loss"
+    }
+   ],
+   "from": "2026-11-09T07:50:00.000Z"
+  },
+  "eurusd": {
+   "n": 1,
+   "sameFeed": 33,
+   "same": 1,
+   "liveWinSpotLoss": 0,
+   "liveWinSpotNever": 0,
+   "liveLossSpotWin": 0,
+   "liveLossSpotNever": 0,
+   "liveR": -1,
+   "spotR": -1,
+   "liveOnly": {
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
+   },
+   "examples": [],
+   "from": "2026-11-09T16:50:00.000Z"
+  },
+  "gbpusd": {
+   "n": 5,
+   "sameFeed": 46,
+   "same": 5,
+   "liveWinSpotLoss": 0,
+   "liveWinSpotNever": 0,
+   "liveLossSpotWin": 0,
+   "liveLossSpotNever": 0,
+   "liveR": 5.95,
+   "spotR": 5.95,
+   "liveOnly": {
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
+   },
+   "examples": [],
+   "from": "2026-11-09T16:50:00.000Z"
+  },
+  "audusd": {
+   "n": 4,
+   "sameFeed": 40,
+   "same": 4,
+   "liveWinSpotLoss": 0,
+   "liveWinSpotNever": 0,
+   "liveLossSpotWin": 0,
+   "liveLossSpotNever": 0,
+   "liveR": 2,
+   "spotR": 2,
+   "liveOnly": {
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
+   },
+   "examples": [],
+   "from": "2026-11-09T16:45:00.000Z"
+  },
+  "usdcad": {
+   "n": 9,
+   "sameFeed": 41,
+   "same": 6,
+   "liveWinSpotLoss": 3,
+   "liveWinSpotNever": 0,
+   "liveLossSpotWin": 0,
+   "liveLossSpotNever": 0,
+   "liveR": 17.42,
+   "spotR": 7.91,
+   "liveOnly": {
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
+   },
+   "examples": [
+    {
+     "id": "usdcad-scalp-1794311168",
+     "side": "buy",
+     "entry": 1.41291,
+     "stop": 1.41357,
+     "t1": 1.4152,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "usdcad-scalp-1794316652",
+     "side": "buy",
+     "entry": 1.41459,
+     "stop": 1.41424,
+     "t1": 1.41574,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "usdcad-scalp-1794317055",
+     "side": "buy",
+     "entry": 1.41376,
+     "stop": 1.41372,
+     "t1": 1.41681,
+     "live": "win",
+     "spot": "loss"
+    }
+   ],
+   "from": "2026-11-09T16:50:00.000Z"
+  },
+  "usdchf": {
+   "n": 2,
+   "sameFeed": 54,
+   "same": 0,
+   "liveWinSpotLoss": 2,
+   "liveWinSpotNever": 0,
+   "liveLossSpotWin": 0,
+   "liveLossSpotNever": 0,
+   "liveR": 8.56,
+   "spotR": -2,
+   "liveOnly": {
+    "n": 0,
+    "liveR": 0,
+    "spotR": 0
+   },
+   "examples": [
+    {
+     "id": "usdchf-scalp-1794297299",
+     "side": "buy",
+     "entry": 0.81836,
+     "stop": 0.81805,
+     "t1": 0.82331,
+     "live": "win",
+     "spot": "loss"
+    },
+    {
+     "id": "usdchf-scalp-1794314304",
+     "side": "buy",
+     "entry": 0.82066,
+     "stop": 0.82081,
+     "t1": 0.82332,
+     "live": "win",
+     "spot": "loss"
+    }
+   ],
+   "from": "2026-11-09T16:35:00.000Z"
+  }
  },
- "errors": {
-  "xau": "HTTP 403",
-  "eurusd": "HTTP 403",
-  "gbpusd": "HTTP 403",
-  "audusd": "HTTP 403",
-  "usdcad": "HTTP 403",
-  "usdchf": "HTTP 403"
- }
+ "forex": {
+  "n": 21,
+  "liveR": 32.93,
+  "spotR": 12.86
+ },
+ "errors": {}
 }
