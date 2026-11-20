@@ -77,6 +77,24 @@
   .legend i { width: 8px; height: 8px; border-radius: 2px; }
   .legend b { font: 600 12px var(--mono); color: var(--ink); }
 
+  /* forward records card (20 Nov 2026): the four live paper forward records side by side, read from council-data
+     research/forward/<study>.json for a signed-in member only (the same requests as the rows' "Latest reading"). Display only. */
+  .fwc { margin: 0 0 20px; padding: 18px; }
+  .fwc-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 4px; }
+  .fwc-h h2 { margin: 0; font: 600 17px var(--sans); letter-spacing: -.2px; }
+  .fwc-n { margin: 0 0 14px; color: var(--ink-faint); font-size: 12.5px; max-width: 72ch; }
+  .fwc-g { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+  .fwc-i { min-width: 0; padding: 12px 14px; border-radius: var(--r-sm); background: var(--well); border: 1px solid var(--line-soft); }
+  .fwc-i a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--ink); font: 600 14px/1.3 var(--sans); overflow-wrap: anywhere; }
+  .fwc-i a:hover { color: var(--accent); }
+  .fwc-i dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; margin: 6px 0 0; font-size: 12.5px; }
+  .fwc-i dt { color: var(--ink-faint); }
+  .fwc-i dd { margin: 0; color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; overflow-wrap: anywhere; }
+  .fwc-i dd.w { font-family: var(--sans); }
+  .fwc-i .fwc-m { margin: 6px 0 0; font-size: 12.5px; color: var(--ink-dim); }
+  @media (max-width: 1100px) { .fwc-g { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 520px) { .fwc { padding: 14px; } .fwc-g { grid-template-columns: minmax(0, 1fr); } }
+
   /* study groups */
   .group { margin-top: 28px; }
   .group-h { display: flex; align-items: baseline; gap: 12px; margin: 0 0 10px; padding: 0 2px; }
@@ -312,6 +330,17 @@
       <details class="how"><summary>How to read the numbers</summary><p>Expectancy is in <b>R per trade</b> (R = the amount risked). Each rule is fitted in sample (IS) and then checked out of sample (OOS); only the OOS number counts. "Best candidate" is the strongest rule a study tried, "vs baseline" its gain over the current system, n the number of OOS trades, max DD the deepest OOS drawdown, the bars the expectancy year by year, and the small IS / OOS bars the best candidate's expectancy in and out of sample (the dark tick is the baseline's OOS). t is the OOS t-statistic: below 2 the result could be noise, and many variants tried raise the bar. Where a study lists its trades, a line shows its cumulative R.</p></details>
     </div>
     <div class="prog" id="prog" aria-live="polite"></div>
+  </section>
+
+  <section class="fwc mx-card" id="fwc" aria-labelledby="fwc-h">
+    <div class="fwc-h"><h2 id="fwc-h">Forward records</h2></div>
+    <p class="fwc-n">Four studies traded on paper from a set date, each judged against its own pre-registered range. A forward record is a measurement, not an edge.</p>
+    <ul class="fwc-g" id="fwc-g">
+      <li class="fwc-i" data-fwc="gold-vol-breakout-forward"><a href="#gold-vol-breakout-forward">Gold breakout</a><p class="fwc-m">Loading…</p></li>
+      <li class="fwc-i" data-fwc="usdjpy-vol-breakout-forward"><a href="#usdjpy-vol-breakout-forward">USD/JPY breakout</a><p class="fwc-m">Loading…</p></li>
+      <li class="fwc-i" data-fwc="turnaround-tuesday-forward"><a href="#turnaround-tuesday-forward">Turnaround Tuesday on NAS100</a><p class="fwc-m">Loading…</p></li>
+      <li class="fwc-i" data-fwc="gold-pre-holiday-forward"><a href="#gold-pre-holiday-forward">Gold before US holidays</a><p class="fwc-m">Loading…</p></li>
+    </ul>
   </section>
 
   <div class="flt" id="flt" role="search" aria-label="Find a study" hidden>
@@ -639,15 +668,14 @@
   var FWD = {};
   function forwardLive() {
     var me = window.MX_ME;
+    forwardCard(me);
     if (!me || !me.then) return;
     me.then(function (who) {
       if (!who) return;
       document.querySelectorAll('#groups .row[data-topic$="-forward"]').forEach(function (r) {
         var t = r.dataset.topic, f = t.replace(/-forward$/, '');
         if (!/^[a-z0-9-]+$/.test(f)) return;
-        FWD[t] = FWD[t] || fetch('/cdata/research/forward/' + f + '.json', { cache: 'no-cache', credentials: 'same-origin' })
-          .then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; });
-        FWD[t].then(function (j) {
+        fwdGet(t, f).then(function (j) {
           var row = document.querySelector('#groups .row[data-topic="' + t + '"]'), st = row && row.querySelector('.c-study');
           if (!st || !j || typeof j.verdict !== 'string' || st.querySelector('.fwd-live')) return;
           var p = document.createElement('p');
@@ -659,6 +687,55 @@
         });
       });
     });
+  }
+  // one request per file per page view, shared by the rows and the card
+  function fwdGet(t, f) {
+    FWD[t] = FWD[t] || fetch('/cdata/research/forward/' + f + '.json', { cache: 'no-cache', credentials: 'same-origin' })
+      .then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; });
+    return FWD[t];
+  }
+
+  // the "Forward records" card at the top: name, start date, trades so far, total R and the file's own reading, every value
+  // written as text (textContent), never judged here. Signed out, or a file that cannot be read, is said in words.
+  function forwardCard(me) {
+    var items = Array.prototype.slice.call(document.querySelectorAll('#fwc-g .fwc-i[data-fwc]'));
+    if (!items.length) return;
+    function clear(li) { Array.prototype.slice.call(li.querySelectorAll('.fwc-m, dl')).forEach(function (n) { li.removeChild(n); }); }
+    function say(li, text) {
+      clear(li);
+      var p = document.createElement('p'); p.className = 'fwc-m'; p.textContent = text; li.appendChild(p);
+    }
+    function fill(li, j) {
+      var num = function (v) { return typeof v === 'number' && isFinite(v); };
+      var rows = [
+        typeof j.start === 'string' ? ['From', j.start, false] : typeof j.after === 'string' ? ['Days after', j.after, false] : ['From', 'not stated', false],
+        ['Trades so far', num(j.n) ? String(j.n) : 'not stated', false],
+        ['Total', num(j.total) ? (j.total > 0 ? '+' : j.total < 0 ? '−' : '') + Math.abs(j.total).toFixed(2) + 'R' : 'not stated', false],
+        ['Reading', typeof j.reading === 'string' && j.reading ? j.reading : 'not stated', true]
+      ];
+      clear(li);
+      var dl = document.createElement('dl');
+      rows.forEach(function (r) {
+        var dt = document.createElement('dt'), dd = document.createElement('dd');
+        dt.textContent = r[0]; dd.textContent = r[1]; if (r[2]) dd.className = 'w';
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      li.appendChild(dl);
+      if (typeof j.dataEnd === 'string') { var p = document.createElement('p'); p.className = 'fwc-m'; p.textContent = 'Candles through ' + j.dataEnd; li.appendChild(p); }
+    }
+    var out = function () { items.forEach(function (li) { say(li, 'Sign in on the desk to see this record.'); }); };
+    if (!me || !me.then) { out(); return; }
+    me.then(function (who) {
+      if (!who) { out(); return; }
+      items.forEach(function (li) {
+        var t = li.getAttribute('data-fwc'), f = t.replace(/-forward$/, '');
+        if (!/^[a-z0-9-]+$/.test(f)) return;
+        fwdGet(t, f).then(function (j) {
+          if (!j || typeof j !== 'object') say(li, 'No reading on file: the file could not be read.');
+          else fill(li, j);
+        });
+      });
+    }, function () { items.forEach(function (li) { say(li, 'Could not check whether you are signed in.'); }); });
   }
 
   // pass / fail / inconclusive / still running as a donut; the legend writes each out with its count and share
@@ -699,6 +776,9 @@
     try { row.focus({ preventScroll: true }); } catch (e) {}
   }
   window.addEventListener('hashchange', function () { linked = { topic: null, scrolled: false }; deepLink(); });
+  // the forward card does not wait for the studies: it is filled once the deferred nav script has set window.MX_ME
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { forwardCard(window.MX_ME); });
+  else forwardCard(window.MX_ME);
 
   // filter, search and order (17 Nov 2026). Display only: rowHTML builds every row from the same data; a filter hides rows and an
   // order moves them, nothing is recomputed. The state lives in this page view only.

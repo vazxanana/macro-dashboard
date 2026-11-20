@@ -5081,7 +5081,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - **Edge lab shows the latest forward readings** (20 Nov 2026): a row whose topic ends in `-forward` adds "Latest reading: …"
   from `/cdata/research/forward/<study>.json` once `/api/me` names a member (`forwardLive` in edge-lab.html, escaped, display
   only); the committed result.json stays the first reading. A new forward record needs its step in `vb-forward.yml` writing that
-  file name (`tests/edge-lab-forward.test.mjs`).
+  file name (`tests/edge-lab-forward.test.mjs`). A card "Forward records" (`#fwc`, above the filter bar) shows the four records
+  side by side (start, trades, total R, the file's `reading` word for word, a link to the row) through the same cached request
+  (`fwdGet`), text only; signed out or an unreadable file is said in words (`forwardCard`, `tests/edge-lab-forward-card.test.mjs`).
 - `gold-pre-holiday-forward` (pre-registered 20 Nov 2026): `gold-pre-holiday` T1's forward record on NYSE holidays after
   31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
   its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`
