@@ -14,6 +14,7 @@ import { EVENTS } from './events.mjs';
 import { cmeYear, nyParts } from '../ict/calendar.mjs';
 import { isGotobi } from './gotobi-calendar.mjs';
 import { readStudy, studyRow, EDGE_DIR } from './research-ledger.mjs';
+import { moves, bigOddsMove, auctionText } from './hard-data.mjs';
 
 const DAY = 86400;
 const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -135,7 +136,65 @@ export function recordOf(rf, type) {
   return { name: s.name, n: st.n, absMed: st.absMed, upShare: st.upShare, lines, prep: (s.prep || []).filter((l) => /know the side|chase/i.test(l)).slice(0, 1) };
 }
 
+// How big a day to expect (20 Nov 2026, owner: plan and size the week): a normal day's gold range = the strategist's expected
+// move (fc.assets.gold.expMovePct, ± %) of its last price, in $; on a day with a US release of a Red folder type, the median
+// absolute gold day move on past releases of that type (n >= RANGE_MIN_N; the biggest of the day's types). Descriptive: a
+// range for planning, never a forecast of direction.
+export const RANGE_MIN_N = 8;
+const medOf = (a) => { const s = a.slice().sort((x, y) => x - y), n = s.length; return n ? (n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2) : null; };
+function absMedOf(s) {
+  const st = s && s.stats;
+  if (st && Number.isFinite(st.absMed) && Number.isFinite(st.n)) return { pct: st.absMed, n: st.n };
+  const g = ((s && s.rows) || []).map((r) => r.goldDay).filter(Number.isFinite).map(Math.abs);
+  return g.length ? { pct: Math.round(medOf(g) * 100) / 100, n: g.length } : null;
+}
+export function dayRange(fc, day, rf) {
+  const G = fc && fc.assets && fc.assets.gold, p = G ? Number(G.expMovePct) : NaN, px = G ? Number(G.last) : NaN;
+  if (!Number.isFinite(p) || !(p > 0)) return null;
+  const usd = (x) => (Number.isFinite(px) && px > 0 ? x / 100 * px : null);
+  const say = (pc, us, n) => us != null ? `±$${Math.round(us).toLocaleString('en-US')} (±${pc.toFixed(1)}%${n ? `, n ${n}` : ''})` : `±${pc.toFixed(1)}%${n ? ` (n ${n})` : ''}`;
+  const out = { normalPct: p, normalUsd: usd(p) }, parts = [`A typical day\'s move is about ${say(p, out.normalUsd)}, close to close.`];
+  let best = null;
+  for (const r of (day && day.releases) || []) {
+    if (!r.type || r.country !== 'USD') continue;
+    const s = rf && rf.study && rf.study[r.type], m = absMedOf(s);
+    if (m && m.n >= RANGE_MIN_N && Number.isFinite(m.pct) && (!best || m.pct > best.pct)) best = { ...m, type: r.type, name: (s && s.name) || r.type };
+  }
+  if (best) {
+    Object.assign(out, { eventPct: best.pct, eventUsd: usd(best.pct), type: best.type, n: best.n });
+    // past release days are measured in their own years' volatility: when they sit under today's normal day, say so
+    // (20 Nov 2026: core PCE days ±0.5% against a ±1.4% normal day now) instead of implying the release is the smaller risk
+    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', measured over other years and as a median, so it is not comparable one for one: plan on the typical move' : ''}.`);
+  }
+  const mk = day && day.market;
+  if (mk && mk.kind === 'holiday') parts.push('US markets closed: the typical figure comes from full trading days.');
+  else if (mk && mk.kind === 'early') parts.push('Early close: the typical figure comes from full trading days.');
+  parts.push('A size for planning, not a forecast of direction.');
+  out.text = parts.join(' ');
+  return out;
+}
+
 const money = (x) => '$' + Math.round(x).toLocaleString('en-US');
+// "A normal day now" for every market the strategist covers (forecast.json `assets`): the expected daily move in the market's
+// own unit, so the owner can size across markets. A range for planning, never a direction. Pure.
+const NORMAL = [
+  { k: 'gold', name: 'Gold', unit: '$', per: 1 }, { k: 'eurusd', name: 'EUR/USD', unit: 'pips', per: 0.0001 },
+  { k: 'usdjpy', name: 'USD/JPY', unit: 'pips', per: 0.01 }, { k: 'nq', name: 'NQ', unit: 'points', per: 1 }, { k: 'es', name: 'ES', unit: 'points', per: 1 }];
+export function normalDays(fc) {
+  const A = fc && fc.assets, out = [];
+  if (!A || typeof A !== 'object') return out;
+  for (const m of NORMAL) {
+    const a = A[m.k]; if (!a || a.expMovePct == null || a.last == null) continue;
+    const pct = Number(a.expMovePct), px = Number(a.last);
+    if (!Number.isFinite(pct) || !Number.isFinite(px) || !(pct > 0) || !(px > 0)) continue;
+    const move = Math.round(pct / 100 * px / m.per), ratio = a.volRatio != null && Number.isFinite(Number(a.volRatio)) ? Number(a.volRatio) : null;
+    const n = move.toLocaleString('en-US'), size = m.unit === '$' ? `±$${n}` : `±${n} ${m.unit}`;
+    const tail = ratio == null ? '' : ratio >= 1.3 ? `, ${ratio.toFixed(1)}x its usual` : ratio <= 0.75 ? ', quieter than usual' : '';
+    out.push({ k: m.k, name: m.name, pct, move, unit: m.unit, ratio, text: `${m.name}: about ${size} (±${pct.toFixed(1)}%)${tail}` });
+  }
+  return out;
+}
+
 // The frame of the week: one place for the numbers the desk already shows elsewhere.
 export function frameOf(fc, v) {
   const g = fc && fc.goldScore, r = fc && fc.regime, sum = v && v.summary, out = { lines: [] };
@@ -143,12 +202,15 @@ export function frameOf(fc, v) {
     out.score = { score: g.score, label: g.label || g.bias || null, asOf: g.asOf || null };
     out.lines.push(`Gold Macro Score ${g.score > 0 ? '+' : ''}${g.score}: ${g.label || g.bias}. ${g.score > 0.25 ? 'The tested score leans to buying gold.' : 'The tested score gives no buy lean; a negative score is not a sell (no short edge was found).'}`);
   }
-  if (r && r.label) { out.regime = r.label; out.lines.push(`Regime: ${r.label}${Number.isFinite(r.vix) ? ` (VIX ${r.vix})` : ''}.`); }
+  if (r && r.label) { out.regime = r.label; out.lines.push(`Regime: ${r.label}${Number.isFinite(r.vix) ? `; VIX ${r.vix}` : ''}.`); }
   const L = sum && sum.levels;
   if (L && Number.isFinite(L.px)) {
     out.levels = { px: L.px, asOf: L.asOf || null, above: L.above || null, below: L.below || null };
     const a = L.above, b = L.below;
-    out.lines.push(`Gold near ${money(L.px)}${L.asOf ? ` (as of the ${L.asOf} close)` : ''}${a ? `; watch ${money(a.price)} above (${a.label})` : ''}${b ? ` and ${money(b.price)} below (${b.label})` : ''}.`);
+    // the levels are picked either side of the latest PRICE (glance.mjs `mark`), not the close: say the price they are read from
+    const mk = L.mark && Number.isFinite(L.mark.px) ? L.mark.px : null, lab = (x) => String(x.label || '').replace(/\s*\(price is (under|over) every level he tracks\)/i, '').replace(/^Round number$/i, 'a round number');
+    const made = (x) => x && x.made ? ': the price is past every level he tracks' : '';
+    out.lines.push(`Gold ${mk != null ? `near ${money(mk)} now` : `near ${money(L.px)}`}${L.asOf ? ` (${mk != null ? `${money(L.px)} at` : 'as of'} the ${L.asOf} close)` : ''}${a ? `; above, ${money(a.price)} (${lab(a)}${a.crossed ? ', broken since the close' : ''}${made(a)})` : ''}${b ? `${a ? ';' : ';'} below, ${money(b.price)} (${lab(b)}${b.crossed ? ', broken since the close' : ''}${made(b)})` : ''}.`);
   }
   if (sum && sum.bias && Number.isFinite(sum.bias.p)) {
     const B = sum.bias; out.bias = { lean: B.lean, p: B.p, base: B.base, by: B.by, confidence: B.confidence || null };
@@ -156,6 +218,36 @@ export function frameOf(fc, v) {
   }
   const rs = v && v.research && Array.isArray(v.research.items) ? v.research.items : [];
   out.rulebook = rs.filter((i) => Array.isArray(i.readings) && i.readings.some((x) => x.on)).slice(0, 5).map((i) => ({ k: i.k, text: i.text, caveat: i.caveat || null }));
+  return out;
+}
+
+// Speculative positioning (macro/cot.json, council/cot.mjs), 20 Nov 2026: one plain line per market only when it is notable,
+// crowded (3-year percentile >= 90 or <= 10) or a big week (the week's change 1.5+ standard deviations of the prior year's weekly
+// changes, the COT desk's own "flow" cut). The yen futures are yen against the dollar, so their long is a bet USD/JPY falls.
+// The pre-registered COT study failed overall: a market without a passing cell is "positioning, not a tested signal".
+export const COT_KEYS = [['gold', 'Gold'], ['silver', 'Silver'], ['eur', 'EUR/USD'], ['jpy', 'USD/JPY'], ['nq', 'Nasdaq 100'], ['es', 'S&P 500']];
+const fmtN = (x) => (x < 0 ? '−' : '') + Math.abs(Math.round(x)).toLocaleString('en-US');
+const ord = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
+export function positioningOf(cot) {
+  const M = cot && Array.isArray(cot.markets) ? cot.markets : []; const out = [];
+  for (const [k, name] of COT_KEYS) {
+    const m = M.find((x) => x && x.k === k); if (!m || m.missing || !Number.isFinite(m.net)) continue;
+    const pct = Number.isFinite(m.pct) ? m.pct : null, z = Number.isFinite(m.z) ? m.z : null;
+    const crowd = pct == null ? null : pct >= 90 ? 'long' : pct <= 10 ? 'short' : null, big = z != null && Math.abs(z) >= 1.5;
+    if (!crowd && !big) continue;
+    const yen = k === 'jpy', fut = yen ? ' yen futures' : '', who = m.who ? m.who.charAt(0).toUpperCase() + m.who.slice(1) : 'Speculators';
+    const parts = [];
+    // a net LONG at the bottom of its range is not a crowded short (20 Nov 2026: silver net +3,615 at the 4th percentile)
+    if (crowd) parts.push(crowd === 'short' && m.net > 0 ? `the least long in 3 years${fut} (${ord(pct)} percentile, still net long)`
+      : crowd === 'long' && m.net < 0 ? `the least short in 3 years${fut} (${ord(pct)} percentile, still net short)`
+      : `crowded ${crowd}${fut} (${ord(pct)} percentile of 3 years)`);
+    if (big) parts.push(`${z > 0 ? 'big buying' : 'big selling'}${yen ? ' of yen' : ''} this week (${Number.isFinite(m.chg1) ? `${m.chg1 >= 0 ? '+' : '−'}${Math.abs(Math.round(m.chg1)).toLocaleString('en-US')} contracts, ` : ''}${z > 0 ? '+' : '−'}${Math.abs(z)} standard deviations)`);
+    let text = `${name}: ${who} ${parts.join(', ')}; net ${fmtN(m.net)} contracts${m.asOf ? `, as of the ${m.asOf} report` : ''}${m.late ? ' (published late)' : ''}.`;
+    if (yen) text += ` The yen futures are yen against the dollar: a long there is a bet that USD/JPY falls${crowd ? `, so crowded ${crowd} yen means crowded ${crowd === 'long' ? 'short' : 'long'} USD/JPY` : ''}.`;
+    text += m.edgeStatus === 'tested' ? ` The pre-registered COT test passed one cell here (${String(m.edgeText || '').replace(/^edge: tested \(|\)$/g, '')}): a single cell, not a proven edge.`
+      : ' Positioning, not a tested signal: the pre-registered COT test found no edge.';
+    out.push({ market: k, name, pct, z, crowded: crowd, net: m.net, asOf: m.asOf || null, tested: m.edgeStatus === 'tested', text });
+  }
   return out;
 }
 
@@ -175,6 +267,7 @@ function dayLine(d) {
   else if (d.market && d.market.kind === 'early') parts.push('early close');
   if (us.length) parts.push(us.map((r) => r.title.replace(/\s*\(.*\)$/, '')).filter((x, i, a) => a.indexOf(x) === i).slice(0, 3).join(', '));
   else if (hi.length) parts.push(hi.slice(0, 2).map((r) => `${r.country} ${r.title}`).join(', '));
+  if ((d.auctions || []).some((a) => a.type !== 'Bill')) parts.push(`Treasury ${d.auctions.filter((a) => a.type !== 'Bill').map((a) => `${a.term}${a.type === 'TIPS' ? ' TIPS' : a.type === 'FRN' ? ' FRN' : ''}`).join(', ')} auction`);
   if (!parts.length) parts.push('no major release scheduled');
   return parts.join(' · ');
 }
@@ -195,36 +288,87 @@ export function nowcastFor(hd, r) {
     text: `the Cleveland Fed nowcast for ${MN[+ref.slice(5) - 1]} is core ${f(m.now[c])}, headline ${f(m.now[h])} month on month${m.asOf ? ` (as of ${m.asOf})` : ''}, a model's estimate, not the consensus` };
 }
 
+// The nowcast beside the consensus (20 Nov 2026): for a CPI / PCE release with both a calendar consensus and a nowcast, which way
+// the model leans against what the calendar expects, and what the Red folder record says gold did on past prints above / below
+// the consensus (left out under MIN_PREP releases on either side). A model's estimate against a calendar consensus: no forecast,
+// no call, no rule reads it.
+export const IN_LINE = 0.05, MIN_PREP = 6;
+// The pre-registered look-back (research/edge/nowcast-vs-consensus, 20 Nov 2026, INCONCLUSIVE): on the 36 CPI releases of 2022-24,
+// did the core print land on the side the nowcast leaned to? Shown on the core CPI row only (the study's primary measure).
+// A constant so the bundle needs no file; tests/nowcast-vs-consensus.test.mjs compares it with the study's result.json.
+export const PREP_STUDY = { study: 'nowcast-vs-consensus', verdict: 'INCONCLUSIVE', hits: 8, n: 13, p: 0.58,
+  text: "In 2022-24 the nowcast's side matched the print on 8 of 13 judged core CPI releases (two-sided binomial p 0.58): too few judged releases to say." };
+export function parseExp(x) {
+  if (x == null) return null;
+  const m = String(x).replace(/−/g, '-').match(/^\s*([+-]?\d+(?:\.\d+)?)\s*%?\s*$/);
+  return m ? +m[1] : null;
+}
+export function prepFor(r, nc, record) {
+  if (!r || !nc) return null;
+  // the nowcast is a month-on-month price change: only beside an m/m CPI / PCE price row (never income, spending, q/q, y/y)
+  if (!(/m\/m/i.test(r.title || '') && /\b(CPI|PCE)\b|price index/i.test(r.title || '')) || /income|spending|y\/y|q\/q|year/i.test(r.title || '')) return null;
+  const cons = parseExp(r.exp); if (cons == null) return null;
+  const core = /\bcore\b/i.test(r.title || '');
+  const fig = core ? nc.core : nc.head; if (fig == null || !Number.isFinite(fig)) return null;
+  const gap = Math.round((fig - cons) * 100) / 100;
+  const side = Math.abs(fig - cons) < IN_LINE - 1e-9 ? 'in line' : fig > cons ? 'above' : 'below';
+  const kind = (core ? 'core ' : '') + (r.type || 'release');
+  const sg = (x) => (x > 0 ? '+' : '') + x.toFixed(2) + '%';
+  const lead = side === 'in line' ? `The nowcast (${sg(fig)}) is in line with the ${r.exp} consensus (within ${IN_LINE} points).`
+    : `The nowcast (${sg(fig)}) sits ${side} the ${r.exp} consensus by ${Math.abs(gap).toFixed(2)} points.`;
+  const st = record && (record.stats || record), A = st && st.above, B = st && st.below;
+  // the Red folder study sorts its above / below days by the CORE figure's surprise: shown on the core row only
+  const hist = core && A && B && A.n >= MIN_PREP && B.n >= MIN_PREP && Number.isFinite(A.gold) && Number.isFinite(B.gold)
+    ? ` On past ${kind} releases that printed above consensus gold averaged ${sg(A.gold)} on the day (n ${A.n}); below, ${sg(B.gold)} (n ${B.n}).` : '';
+  const study = core && r.type === 'CPI' ? PREP_STUDY : null;
+  const text = lead + hist + (study ? ' ' + study.text : '') + ' A model\'s estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a tested edge.';
+  const short = side === 'in line' ? `nowcast ${sg(fig)} in line with the ${r.exp} consensus` : `nowcast ${sg(fig)} ${side} the ${r.exp} consensus`;
+  return { core, nowcast: fig, consensus: cons, gap, side, record: hist ? { above: { n: A.n, gold: A.gold }, below: { n: B.n, gold: B.gold } } : null,
+    study: study ? { study: study.study, verdict: study.verdict, hits: study.hits, n: study.n, p: study.p } : null, text, short };
+}
+
 // The plan: { at, from, to, next, days: [...], frame, calls, lines, note }.
-export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir = EDGE_DIR }) {
+export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = null, edgeDir = EDGE_DIR }) {
   const W = weekOf(now), days = [], recs = new Map();
   const rec = (rule) => { if (!recs.has(rule.topic)) recs.set(rule.topic, ruleRecord(rule.topic, dataDir, edgeDir, rule.forward)); return recs.get(rule.topic); };
   const rel = releasesOf(cal, W.from, W.to);
   for (let d = W.from; d <= W.to; d = addD(d, 1)) {
     if (!weekday(d)) continue;
-    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) }));
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) })).map((r) => ({ ...r, prep: prepFor(r, r.nowcast, r.type && rf && rf.study ? rf.study[r.type] : null) }));
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
-    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules, fed };
-    day.line = dayLine(day); days.push(day);
+    // 20 Nov 2026: the US Treasury's announced auctions of that day (hard-data.mjs `auctions`), as plain text
+    const auctions = hd && hd.auctions && Array.isArray(hd.auctions.list) ? hd.auctions.list.filter((a) => a.day === d).slice(0, 6).map((a) => ({ ...a, text: auctionText(a) })) : [];
+    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules, fed, auctions };
+    day.line = dayLine(day); day.range = dayRange(fc, day, rf); days.push(day);
   }
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
+  frame.normalDays = normalDays(fc);
   if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
+  // How the expectations moved (macro/hard-data.json `hist`): a day and a week back, only where both readings exist.
+  const mv = hd ? moves(hd, now) : [];
+  // only what moved (an unchanged "92% now, 92% a day ago" is noise), four lines at most
+  if (mv.length) { frame.moves = mv; for (const m of mv.filter((x) => x.day || x.week).slice(0, 4)) frame.lines.push(m.text); }
+  frame.positioning = positioningOf(cot).map((p) => ({ market: p.market, text: p.text }));
+  for (const p of frame.positioning) frame.lines.push(p.text);
   const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));
   const busiest = days.slice().sort((a, b) => b.releases.filter((r) => r.impact === 'high').length - a.releases.filter((r) => r.impact === 'high').length)[0];
   const lines = [];
   const closed = days.filter((d) => d.market && d.market.kind === 'holiday'), early = days.filter((d) => d.market && d.market.kind === 'early');
   if (closed.length || early.length) lines.push(`A short week: ${[...closed.map((d) => `US markets closed ${d.dow}`), ...early.map((d) => `early close ${d.dow}`)].join(', ')}. Expect thin trading around ${closed.length ? 'the holiday' : 'the early close'}.`);
   if (frame.odds) lines.push(hd.odds.line);
+  const big = hd ? bigOddsMove(hd, now) : null;
+  if (big) lines.push(big.text);
   const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
   if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
+  for (const d of days) for (const r of d.releases) if (r.prep) lines.push(`Before ${d.dow}'s ${r.title.replace(/\s*\(.*\)$/, '')}: ${r.prep.short}${r.prep.record ? `; past prints above it: gold ${pct(r.prep.record.above.gold)} (n ${r.prep.record.above.n}), below: ${pct(r.prep.record.below.gold)} (n ${r.prep.record.below.n})` : ''}. A model's estimate, descriptive only.`);
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
   else lines.push('No top-tier US release is scheduled on the files read so far.');
   if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);
-  const tested = days.filter((d) => d.rules.some((r) => r.verdict === 'pass')).map((d) => `${d.dow} (${d.rules.filter((r) => r.verdict === 'pass').map((r) => r.when).join('; ')})`);
-  if (tested.length) lines.push(`Calendar rules the desk has tested that passed their bar: ${tested.join(', ')}. Paper only, each with its own forward record: not proven.`);
+  const tested = days.filter((d) => d.rules.some((r) => r.verdict === 'pass')).map((d) => `${d.dow}: ${d.rules.filter((r) => r.verdict === 'pass').map((r) => String(r.when).replace(/\s*\(.*\)$/, '')).join(' and ')}`);
+  if (tested.length) lines.push(`Calendar rules the desk has tested that passed their bar: ${tested.join('; ')}. Paper only, each with its own forward record: not proven.`);
   const failed = days.filter((d) => d.rules.some((r) => r.verdict === 'fail')).map((d) => d.dow);
   if (failed.length) lines.push(`Rules tested and failed also fall on ${failed.join(', ')}: listed there so they are not chased.`);
   const calNote = (W.next && !rel.some((r) => r.src === 'calendar')) ? 'Next week\'s economic calendar is not published yet (it usually appears over the weekend): the big US releases come from the council\'s own schedule, without consensus figures for now.' : null;
