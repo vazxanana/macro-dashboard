@@ -3027,6 +3027,15 @@ Macro desk tab "COT positioning". Tests: `tests/cot.test.mjs`. Paper only. Retur
 profitable close; red vignette + shake + a WebAudio-synthesized falling "faaaah" voice on a losing one. No audio files. Speaker
 button `#snd-btn` toggles sound (`btLab:sound`). Reduced motion: no confetti or shake. Chart: dotted crosshair, kinetic scroll.
 
+## The shadow book on the former LIT demo account (20 Nov 2026, owner: "one demo account … no trades with 10k USD … LIT replace it with the shadow")
+`council/ctrader-accounts.json`: `shadow` → 10152146 (the LIT account, idle since the LIT stream stopped on 17 Nov; it keeps the `lit`
+book, so `council/gotobi.mjs` still finds it as the gotobi account) and `drain: ['10152145']` (the old Shadows account). `accountsFor`
+adds a drain account as a group with no books (`drain: true`): its round opens nothing (`openBooks` empty) and keeps managing the
+copies it holds (stop guard, stop moves, closes, cancels); the CLI runs it only while `stillHolds(state)` (an open copy or a resting
+order), and `copiedIds` keeps any other account from copying those trades again. `mirror-accounts.json` lists it with `drain: true`
+while it runs; `ctrader/accounts.json` labels it "Old shadows (draining)". Owner's choice of three: move the shadows and let the old
+account run its 6 open copies out. Remove the `drain` entry once that account holds nothing. Test: `tests/mirror-drain.test.mjs`.
+
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
 1. After a market fill whose fill event shows no stop, the mirror waits `slWaitMs` (1.5 s) and reads the position back
