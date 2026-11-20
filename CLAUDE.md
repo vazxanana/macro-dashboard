@@ -5115,6 +5115,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - Two breakouts as one book (20 Nov 2026, accounting, `research/proposals/2026-11-20-two-breakouts.md`): gold T1 (C1) + USD/JPY
   T1 at 1R each from the forward baselines, Jan 2021 - Oct 2026 (in sample): monthly correlation 0.03, book month t 3.47 (gold
   2.70, USD/JPY 2.28), +35.8R a year, worst drawdown 42.9R. No verdict; the forward records judge.
+- `usdjpy-red-folder` (pre-registered 20 Nov 2026): `red-folder-surprise`'s design on USD/JPY (HistData M1, cost 0.015 %).
+  **FAIL**: T+5 → T+60 with the miss −0.019 % (2018-21, n 24) and +0.041 % (2022 → Apr 2025, n 58, t 0.90). The first 5 minutes
+  went the way of the miss on 65 of 82 releases and release → T+60 +0.41 % out of sample (t 5.37), not tradable: the dollar,
+  like gold, moves at once. Know the side before the print; do not chase after it. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
