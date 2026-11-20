@@ -68,3 +68,16 @@ test('the Macro desk draws the board as text, with each group\'s source', () => 
   assert.ok(i > 0 && /esc\(g\.title\)/.test(blk) && /esc\(l\)/.test(blk) && /esc\(g\.src/.test(blk) && /esc\(g\.at\)/.test(blk), 'every string goes through esc');
   assert.ok(/r\.priced && r\.priced\.text \? '<span class="wa-r wa-nc"><b>Priced on a prediction market:<\/b> ' \+ esc\(r\.priced\.text\)/.test(page));
 });
+
+test('a release the agency\'s own calendar does not hold that day gets one "check the date" line; silent when it does or was not read', () => {
+  const now = T('2026-12-04T19:00:00Z');
+  const cal = [{ title: 'Core CPI m/m', country: 'USD', impact: 'High', at: T('2026-12-10T13:30:00Z'), forecast: '0.3%', previous: '0.2%' }];
+  const off = (list) => ({ official: { read: ['BLS'], from: '2026-12-02', to: '2026-12-25', list } });
+  const good = WA.build({ now, cal, rf: null, fc: null, v: null, hd: off([{ t: T('2026-12-10T13:30:00Z'), day: '2026-12-10', agency: 'BLS', type: 'CPI', title: 'Consumer Price Index' }]) });
+  assert.ok(!good.lines.some((l) => /^Check the date/.test(l)));
+  const moved = WA.build({ now, cal, rf: null, fc: null, v: null, hd: off([{ t: T('2026-12-15T13:30:00Z'), day: '2026-12-15', agency: 'BLS', type: 'CPI', title: 'Consumer Price Index' }]) });
+  const hits = moved.lines.filter((l) => /^Check the date/.test(l));
+  assert.equal(hits.length, 1); assert.match(hits[0], /^Check the date: Core CPI m\/m is listed for Thursday, but the agency's own release calendar has no such release that day\.$/);
+  const unread = WA.build({ now, cal, rf: null, fc: null, v: null, hd: { official: { read: ['BEA'], from: '2026-12-02', to: '2026-12-25', list: [] } } });
+  assert.ok(!unread.lines.some((l) => /^Check the date/.test(l)));
+});

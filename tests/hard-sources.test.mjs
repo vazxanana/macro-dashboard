@@ -176,5 +176,56 @@ test('the module fetches only the public sources it names and trades nothing', (
   assert.ok(!/^import /m.test(src), 'no imports: pure parsers and one collector');
   assert.ok(!/process\.env|child_process|writeFile/.test(src));
   const hosts = [...src.matchAll(/https:\/\/([a-z0-9.-]+)\//g)].map((m) => m[1]);
-  assert.deepEqual([...new Set(hosts)].sort(), ['api.elections.kalshi.com', 'api.fiscaldata.treasury.gov', 'cdn.cboe.com', 'fred.stlouisfed.org', 'markets.newyorkfed.org', 'www.financialresearch.gov', 'www.treasurydirect.gov']);
+  assert.deepEqual([...new Set(hosts)].sort(), ['api.elections.kalshi.com', 'api.fiscaldata.treasury.gov', 'apps.bea.gov', 'cdn.cboe.com', 'fred.stlouisfed.org', 'markets.newyorkfed.org', 'www.bls.gov', 'www.financialresearch.gov', 'www.treasurydirect.gov']);
+});
+
+test('the nowcast beside what traders price: the same print, or the two differ; nothing once the month has printed', () => {
+  const hd = { nowcast: { months: [{ month: '2026-10', now: { corePce: 0.27 }, actual: {} }, { month: '2026-11', now: { coreCpi: 0.21, cpi: 0.07 }, actual: { coreCpi: 0.2 } }] } };
+  assert.equal(S.besideNowcast(hd, { key: 'corePce', period: 'October 2026', likely: [{ v: 0.3, p: 0.88 }] }), ' The Cleveland Fed nowcast is +0.27%, which rounds to the same print.');
+  assert.equal(S.besideNowcast(hd, { key: 'cpi', period: 'November 2026', likely: [{ v: -0.1, p: 0.44 }] }), ' The Cleveland Fed nowcast is +0.07%, which rounds to +0.1%: the model and the traders differ.');
+  assert.equal(S.besideNowcast(hd, { key: 'coreCpi', period: 'November 2026', likely: [{ v: 0.2, p: 0.4 }] }), '', 'already printed');
+  assert.equal(S.besideNowcast(hd, { key: 'payrolls', period: 'November 2026', mid: 90000 }), '');
+  assert.equal(S.besideNowcast(null, { key: 'cpi', period: 'November 2026', likely: [{ v: 0.1, p: 0.4 }] }), '');
+  const B = S.board({ at: '2026-11-20T18:00:00Z', nowcast: hd.nowcast, priced: { at: '2026-11-20T18:00:00Z', items: { corePce: [{ key: 'corePce', period: 'October 2026', likely: [{ v: 0.3, p: 0.88 }], text: 'core PCE for October 2026: most likely +0.3% (88%)' }] } } });
+  assert.equal(B[0].lines[0], 'Core PCE for October 2026: most likely +0.3% (88%). The Cleveland Fed nowcast is +0.27%, which rounds to the same print.');
+});
+
+const ICS = ['BEGIN:VCALENDAR', 'BEGIN:VEVENT', 'DTSTART;TZID=US-Eastern:20261204T083000', 'SUMMARY:Employment Situation', 'END:VEVENT',
+  'BEGIN:VEVENT', 'DTSTART;TZID=US-Eastern:20261210T083000', 'SUMMARY:Consumer Price Index', 'END:VEVENT',
+  'BEGIN:VEVENT', 'DTSTART;TZID=US-Eastern:20261218T100000', 'SUMMARY:State Employment and Unemployment (Monthly)', 'END:VEVENT',
+  'BEGIN:VEVENT', 'DTSTART;TZID=US-Eastern:20270702T083000', 'SUMMARY:Employment Situation', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+const BEA = { 'Gross Domestic Product': { release_dates: ['2026-11-25T13:30:00+00:00', '2026-12-23T13:30:00+00:00'] }, 'Personal Income and Outlays': { release_dates: ['2026-11-25T13:30:00+00:00'] }, 'Gross Domestic Product by State and Personal Income by State': { release_dates: ['2026-12-22T13:30:00+00:00'] } };
+
+test('the official calendars: New York times become UTC, only the releases the desk follows, each on its New York day', () => {
+  assert.equal(new Date(S.nyToUnix(2026, 12, 4, 8, 30) * 1000).toISOString(), '2026-12-04T13:30:00.000Z', 'winter: UTC-5');
+  assert.equal(new Date(S.nyToUnix(2027, 7, 2, 8, 30) * 1000).toISOString(), '2027-07-02T12:30:00.000Z', 'summer: UTC-4');
+  const all = S.parseBlsIcs(ICS, 0, 9e9);
+  assert.deepEqual(all.map((e) => [e.day, e.type]), [['2026-12-04', 'NFP'], ['2026-12-10', 'CPI'], ['2027-07-02', 'NFP']], 'the state release is not one the desk follows');
+  const from = Date.parse('2026-11-18T00:00:00Z') / 1000, to = Date.parse('2026-12-11T00:00:00Z') / 1000;
+  const list = S.mergeOfficial(S.parseBlsIcs(ICS, from, to), S.parseBea(BEA, from, to));
+  assert.deepEqual(list.map(S.officialText), ['Wed 25 Nov, 13:30 UTC: Gross Domestic Product (BEA)', 'Wed 25 Nov, 13:30 UTC: Personal income and outlays (PCE) (BEA)',
+    'Fri 4 Dec, 13:30 UTC: Jobs report (Employment Situation) (BLS)', 'Thu 10 Dec, 13:30 UTC: Consumer Price Index (BLS)']);
+  const hd = { official: { read: ['BLS', 'BEA'], from: '2026-11-18', to: '2026-12-11', list } };
+  const T = (iso) => Date.parse(iso) / 1000;
+  assert.equal(S.onOfficial(hd, 'PCE', T('2026-11-25T13:30:00Z')), true);
+  assert.equal(S.onOfficial(hd, 'PCE', T('2026-11-26T13:30:00Z')), false, 'listed for a day the agency does not have');
+  assert.equal(S.onOfficial(hd, 'CPI', T('2026-12-10T13:30:00Z')), true);
+  assert.equal(S.onOfficial(hd, 'ISM', T('2026-12-01T15:00:00Z')), null, 'not an agency release: nothing is said');
+  assert.equal(S.onOfficial({ official: { ...hd.official, read: ['BEA'] } }, 'CPI', T('2026-12-09T13:30:00Z')), null, 'the BLS file was not read: nothing is said');
+  assert.equal(S.onOfficial(hd, 'CPI', T('2027-01-13T13:30:00Z')), null, 'outside the window read');
+  assert.equal(S.onOfficial(null, 'CPI', 0), null);
+});
+
+test('the official calendar in the collector: one agency failing still leaves the other', async () => {
+  const now = Date.parse('2026-11-20T18:00:00Z') / 1000;
+  const ok = (t) => ({ ok: true, status: 200, text: async () => (typeof t === 'string' ? t : JSON.stringify(t)) });
+  const a = await H.collect({ now, fetchFn: async (u) => (u.includes('bls.gov') ? ok(ICS) : u.includes('bea.gov') ? ok(BEA) : { ok: false, status: 404, text: async () => '' }) });
+  assert.equal(a.sources.official, 'ok'); assert.deepEqual(a.official.read, ['BLS', 'BEA']);
+  assert.deepEqual(a.official.list.map((e) => e.type), ['GDP', 'PCE', 'NFP', 'CPI']);
+  const g = S.board(a).find((x) => x.k === 'official');
+  assert.equal(g.lines[0], 'Wed 25 Nov, 13:30 UTC: Gross Domestic Product (BEA)'); assert.match(g.src, /^BLS and BEA/);
+  const b = await H.collect({ now, fetchFn: async (u) => (u.includes('bea.gov') ? ok(BEA) : { ok: false, status: 503, text: async () => '' }) });
+  assert.deepEqual(b.official.read, ['BEA']);
+  const c = await H.collect({ now, fetchFn: async () => ({ ok: false, status: 503, text: async () => '' }), prev: a });
+  assert.match(c.sources.official, /^failed.*last good copy kept/); assert.deepEqual(c.official, a.official);
 });

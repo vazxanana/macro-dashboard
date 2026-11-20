@@ -15,7 +15,7 @@ import { cmeYear, nyParts } from '../ict/calendar.mjs';
 import { isGotobi } from './gotobi-calendar.mjs';
 import { readStudy, studyRow, EDGE_DIR } from './research-ledger.mjs';
 import { moves, bigOddsMove, auctionText } from './hard-data.mjs';
-import { board, pricedFor } from './hard-sources.mjs';
+import { board, pricedFor, onOfficial } from './hard-sources.mjs';
 
 const DAY = 86400;
 const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -392,6 +392,10 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
   // 20 Nov 2026: what a prediction market prices for the week's own prints (hard-sources.mjs `pricedFor`), once per release time
   const pr = [], seenPr = new Set();
   for (const d of days) for (const r of d.releases) if (r.priced && !seenPr.has(r.priced.short)) { seenPr.add(r.priced.short); pr.push(`${d.dow}: ${r.priced.short}`); }
+  // 20 Nov 2026: a release the council's own schedule (or the calendar feed) names that the agency's own calendar does not
+  // hold that day: said once, so a moved or delayed release is not planned around. Silent when the agency's file was not read.
+  const off = [];
+  for (const d of days) for (const r of d.releases) if (r.country === 'USD' && r.type && onOfficial(hd, r.type, r.t) === false && !off.includes(`${r.type}|${d.day}`)) { off.push(`${r.type}|${d.day}`); r.official = false; lines.push(`Check the date: ${r.title.replace(/\s*\(.*\)$/, '')} is listed for ${d.dow}, but the agency's own release calendar has no such release that day.`); }
   if (pr.length) lines.push(`Priced on a prediction market for this week's prints (${pr.join(' | ')}). What traders pay: not a consensus survey and not a forecast of ours.`);
   const cx = days.flatMap((d) => d.releases.filter((r) => r.context).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.context}`));
   if (cx.length) lines.push(`From the 2022-24 first-print record: ${cx[0]}`);

@@ -18,5 +18,5 @@ jobs:
         with: { node-version: 22 }
       - run: node scripts/macro-probe.mjs 2>&1 | grep -A3 '== auctions\|auctions ERR' || true
       - run: node scripts/macro-probe4.mjs 2>&1 || true
-      - run: node council/hard-data.mjs "$RUNNER_TEMP/d" && node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));delete j.hist;delete j.nowcast;delete j.fed;console.log(JSON.stringify(j,null,1).slice(0,30000))' "$RUNNER_TEMP/d/macro/hard-data.json"
+      - run: node council/hard-data.mjs "$RUNNER_TEMP/d" && node -e 'const j=JSON.parse(require("fs").readFileSync(process.argv[1]));console.log(JSON.stringify(j.sources),JSON.stringify(j.official||null).slice(0,2500))' "$RUNNER_TEMP/d/macro/hard-data.json"
       - run: node -e 'import("./council/hard-sources.mjs").then((S)=>{const j=JSON.parse(require("fs").readFileSync(process.argv[1]));for(const g of S.board(j,{goldPx:3575})){console.log("##",g.title,"|",g.src,"|",g.at);for(const l of g.lines)console.log("  -",l)}})' "$RUNNER_TEMP/d/macro/hard-data.json"

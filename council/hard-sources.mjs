@@ -406,6 +406,20 @@ export async function collectMore({ now, fetchFn, part, at, pace = 700 }) {
   });
 }
 
+// The Cleveland Fed nowcast of the SAME print beside what traders price (20 Nov 2026): two independent views of one number.
+// Only for a month the nowcast file holds and that has not printed; the nowcast is rounded to the print's one decimal.
+const NC_KEY = { coreCpi: 'coreCpi', cpi: 'cpi', corePce: 'corePce' };
+export function besideNowcast(hd, x) {
+  const k = x && NC_KEY[x.key], m = x && /^([A-Z][a-z]+) (20\d\d)$/.exec(x.period || '');
+  if (!k || !m || !x.likely || !x.likely[0]) return '';
+  const month = `${m[2]}-${String(MONTHS.indexOf(m[1]) + 1).padStart(2, '0')}`;
+  const row = ((hd && hd.nowcast && hd.nowcast.months) || []).find((r) => r && r.month === month);
+  const v = row && row.now ? row.now[k] : null;
+  if (!Number.isFinite(v) || (row.actual && row.actual[k] != null)) return '';
+  const r = Math.round(v * 10) / 10, same = Math.abs(r - x.likely[0].v) < 1e-9;
+  return ` The Cleveland Fed nowcast is ${sign(v, 2)}%, which rounds to ${same ? 'the same print' : `${sign(r)}%: the model and the traders differ`}.`;
+}
+
 // ---------- the board: every part as a titled group of plain lines, with its source and its date ----------
 // [{ k, title, src, at, lines }] for the Macro desk; a part that was not read gives no group. `goldPx` sizes gold's implied day.
 export function board(hd, { goldPx = null } = {}) {
@@ -415,7 +429,7 @@ export function board(hd, { goldPx = null } = {}) {
   const P = hd.priced;
   if (P && P.items) {
     const one = (k) => (P.items[k] || [])[0];
-    const prints = ['coreCpi', 'cpi', 'corePce', 'payrolls', 'u3', 'gdp'].map(one).filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
+    const prints = ['coreCpi', 'cpi', 'corePce', 'payrolls', 'u3', 'gdp'].map(one).filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.' + besideNowcast(hd, x));
     const fed = (P.items.fed || []).filter((x) => x.likely).map((x) => `The Fed's target rate after ${x.period}: most likely ${x.likely[0].v.toFixed(2)}% upper bound (${pct(x.likely[0].p)})${x.likely[1] && x.likely[1].p >= 0.1 ? `, then ${x.likely[1].v.toFixed(2)}% (${pct(x.likely[1].p)})` : ''}.`);
     const rest = [...(P.items.recession || []).filter((x) => x.p >= 0.05), one('gold')].filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
     add('priced', 'What traders price for the next prints', 'Kalshi prediction market', P, [...prints, ...fed, ...rest, PRICED_TAIL]);
@@ -426,6 +440,9 @@ export function board(hd, { goldPx = null } = {}) {
   add('plumbing', 'The Fed\'s plumbing', 'New York Fed, US Treasury daily statement, FRED', hd.plumbing, plumbingLines(hd.plumbing));
   add('vol', 'What options price', 'Cboe index histories, Office of Financial Research', hd.vol, volLines(hd.vol, goldPx));
   add('under', 'Under the headline', 'Dallas, Atlanta, Cleveland and New York Fed series on FRED', hd.under, underLines(hd.under));
+  const O = hd.official;
+  if (O && Array.isArray(O.list)) { const nowT = Date.parse(hd.at || '') / 1000 || 0, up = O.list.filter((e) => e.t >= nowT - 3600).slice(0, 8);
+    add('official', 'The agencies\' own release dates', `${(O.read || []).join(' and ')} release calendars`, O, up.length ? [...up.map(officialText), 'The official dates: a release moved or delayed shows here first.'] : []); }
   return out;
 }
 // The priced print(s) for one release: `type` = the Week ahead's release type, `t` = its time (unix seconds). Only a ladder
@@ -436,4 +453,72 @@ export function pricedFor(hd, type, t) {
   const hits = [];
   for (const k of BY_TYPE[type]) for (const x of P[k] || []) { const c = Date.parse(x.close || '') / 1000; if (Number.isFinite(c) && Math.abs(c - t) <= 36 * 3600) hits.push(x.text); }
   return hits.length ? { text: `${hits.join('; ')}. ${PRICED_TAIL}`, short: hits.join('; ') } : null;
+}
+
+// ---------- the official release calendars (20 Nov 2026): the agencies' own dates, not a third-party calendar ----------
+// BLS publishes an iCalendar file of its releases (New York local times), BEA a JSON of its release dates (UTC).
+export const SRC_OFFICIAL = { bls: 'https://www.bls.gov/schedule/news_release/bls.ics', bea: 'https://apps.bea.gov/API/signup/release_dates.json' };
+// New York wall clock -> unix seconds (the zone's own offset on that day, daylight time included).
+export function nyToUnix(y, mo, d, hh = 0, mm = 0) {
+  const guess = Date.UTC(y, mo - 1, d, hh, mm) / 1000;
+  const off = (t) => { const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' }).formatToParts(new Date(t * 1000)).map((x) => [x.type, +x.value]));
+    return (Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute) / 1000) - t; };
+  return guess - off(guess - off(guess));
+}
+// The releases the desk follows, by the agency's own title -> the Week ahead's release type (null = listed, no type).
+export const OFFICIAL = [
+  [/^Employment Situation/i, 'NFP', 'Jobs report (Employment Situation)'], [/^Consumer Price Index/i, 'CPI', 'Consumer Price Index'],
+  [/^Producer Price Index/i, 'PPI', 'Producer Price Index'], [/^Job Openings and Labor Turnover/i, null, 'Job openings (JOLTS)'],
+  [/^Employment Cost Index/i, null, 'Employment Cost Index'], [/Import and Export Price/i, null, 'Import and export prices'],
+  [/^Productivity and Costs/i, null, 'Productivity and costs'], [/^Real Earnings/i, null, 'Real earnings'],
+  [/^Gross Domestic Product$/i, 'GDP', 'Gross Domestic Product'], [/^Personal Income and Outlays/i, 'PCE', 'Personal income and outlays (PCE)'],
+  [/International Trade in Goods and Services/i, null, 'Trade in goods and services'],
+];
+const officialOf = (title) => { const s = String(title || '').replace(/\\,/g, ',').trim(); const m = OFFICIAL.find((o) => o[0].test(s)); return m ? { type: m[1], title: m[2] } : null; };
+const dayOfNy = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York' }).format(new Date(t * 1000));
+export function parseBlsIcs(text, from, to) {
+  const out = [];
+  for (const b of String(text || '').split('BEGIN:VEVENT').slice(1)) {
+    const d = /DTSTART[^:\r\n]*:(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)/.exec(b), s = /SUMMARY:([^\r\n]*)/.exec(b);
+    if (!d || !s) continue;
+    const o = officialOf(s[1]); if (!o) continue;
+    const t = nyToUnix(+d[1], +d[2], +d[3], +d[4], +d[5]); if (!(t >= from && t <= to)) continue;
+    out.push({ t, day: dayOfNy(t), agency: 'BLS', ...o });
+  }
+  return out;
+}
+export function parseBea(J, from, to) {
+  const out = [];
+  for (const k of Object.keys(J && typeof J === 'object' ? J : {})) {
+    const o = officialOf(k); if (!o) continue;
+    for (const iso of (J[k] && Array.isArray(J[k].release_dates) ? J[k].release_dates : [])) {
+      const t = Math.floor(Date.parse(iso) / 1000); if (!(t >= from && t <= to)) continue;
+      out.push({ t, day: dayOfNy(t), agency: 'BEA', ...o });
+    }
+  }
+  return out;
+}
+export const mergeOfficial = (a, b) => { const seen = new Set(); return [...(a || []), ...(b || [])].sort((x, y) => x.t - y.t || x.title.localeCompare(y.title)).filter((e) => { const k = `${e.t}|${e.title}`; if (seen.has(k)) return false; seen.add(k); return true; }); };
+const hmUtc = (t) => new Date(t * 1000).toISOString().slice(11, 16);
+const DOW3 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const officialText = (e) => `${DOW3[new Date(e.day + 'T12:00:00Z').getUTCDay()]} ${dayWord(e.day)}, ${hmUtc(e.t)} UTC: ${e.title} (${e.agency})`;
+// Is a release of the Week ahead on the agency's own calendar that New York day? true / false, or null when that agency's
+// calendar was not read or the type is not one it publishes (so nothing is said).
+export function onOfficial(hd, type, t) {
+  const O = hd && hd.official; if (!O || !Array.isArray(O.list)) return null;
+  const agency = type === 'GDP' || type === 'PCE' ? 'BEA' : type === 'CPI' || type === 'PPI' || type === 'NFP' ? 'BLS' : null;
+  if (!agency || !(O.read || []).includes(agency)) return null;
+  if (t < Date.parse(O.from + 'T00:00:00Z') / 1000 || t > Date.parse(O.to + 'T23:59:59Z') / 1000) return null;
+  const day = dayOfNy(t);
+  return O.list.some((e) => e.type === type && e.day === day);
+}
+// The official part of the collector: 2 days back to 21 ahead; an agency that fails is named, the other is still used.
+export async function collectOfficial({ now, fetchFn, part, at }) {
+  await part('official', async () => {
+    const from = now - 2 * 86400, to = now + 21 * 86400, read = []; let bls = [], bea = [];
+    try { bls = parseBlsIcs(await getText(fetchFn, SRC_OFFICIAL.bls, 45000), from, to); read.push('BLS'); } catch (e) { /* named by its absence from `read` */ }
+    try { bea = parseBea(JSON.parse(await getText(fetchFn, SRC_OFFICIAL.bea)), from, to); read.push('BEA'); } catch (e) { /* the same */ }
+    if (!read.length) return null;
+    return { at, read, from: new Date(from * 1000).toISOString().slice(0, 10), to: new Date(to * 1000).toISOString().slice(0, 10), list: mergeOfficial(bls, bea) };
+  });
 }

@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { EVENTS } from './events.mjs';
-import { collectMore, LADDERS } from './hard-sources.mjs';
+import { collectMore, collectOfficial, LADDERS } from './hard-sources.mjs';
 
 const UA = { 'user-agent': 'Mozilla/5.0 (macro desk; public data)', accept: '*/*' };
 export const SRC = {
@@ -332,6 +332,7 @@ export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = f
     o.line = oddsLine(o); return o;
   });
   await collectMore({ now, fetchFn, part, at: out.at, pace });
+  await collectOfficial({ now, fetchFn, part, at: out.at });
   out.hist = addHist(P.hist, histEntry(out), now);
   return out;
 }
