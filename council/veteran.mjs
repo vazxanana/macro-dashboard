@@ -35,6 +35,7 @@ import { summary, snapshot, briefDiff, archiveWeek, previousOf, markLevels, mark
 import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs';
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
 import { build as redfolder, loadInputs as rfInputs, capturedFrom as rfCaptured } from './redfolder.mjs';
+import { build as weekAhead } from './week-ahead.mjs';
 import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan, cpiBenchmark, consensusGate, gdpCase } from './research-watch.mjs';
 
 const DAY = 86400;
@@ -605,6 +606,9 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
     const RF = redfolder({ inputs: rfInputs(), rel: cache && cache.release, captured: rfCaptured({ expectations: E, events: Array.isArray(evs) ? evs : [], cal }),
       calendar: cal.map((e) => ({ title: e.title, country: e.country, at: new Date(+e.at * 1000).toISOString(), forecast: e.forecast, previous: e.previous })), gold, dxy: dx, now });
     w('redfolder.json', RF); } catch (e) { log('Red folder study skipped: ' + (e && e.message || e)); }
+  // 20 Nov 2026: the Week ahead plan (council/week-ahead.mjs), day by day, from the files above; a failure writes nothing
+  try { w('week-ahead.json', weekAhead({ now, cal: (cache && cache.cal) || [], rf: rd(path.join(M, 'redfolder.json'), null), fc, v, hd: rd(path.join(M, 'hard-data.json'), null), dataDir: dir })); }
+  catch (e) { log('Week ahead skipped: ' + (e && e.message || e)); }
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
   log(v.brief);
