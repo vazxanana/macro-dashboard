@@ -14137,7 +14137,8 @@
     "t1": 0.8479475714285714,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.84422,
@@ -14152,7 +14153,8 @@
     "lagSec": 111,
     "positionId": "50402665",
     "volume": 100000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-20T04:19:37.000Z"
    },
    "xau-m30m1-1795131359": {
     "symbol": "XAUUSD",
@@ -14449,7 +14451,7 @@
    "startBalance": 10406.4
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10543.58 · 10 open",
+  "status": "ok · demo Fusion Markets · balance 10541.33 · 9 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker",
@@ -14461,15 +14463,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10543.58,
-  "lastRun": "2026-11-20T04:16:50.000Z"
+  "balance": 10541.33,
+  "lastRun": "2026-11-20T04:19:37.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T14:29:15.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 433.89, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T14:31:54.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 426.17, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15964,6 +15961,11 @@
    "at": "2026-11-20T04:10:44.000Z",
    "msg": "limit filled at once: USDCHF position 50425727 at the broker at 0.8425",
    "trade": "usdchf-rswing-1795147785"
+  },
+  {
+   "at": "2026-11-20T04:19:37.000Z",
+   "msg": "USDCHF position 50402665 closed at the broker",
+   "trade": "usdchf-position-1795132725"
   }
  ],
  "limits": {
