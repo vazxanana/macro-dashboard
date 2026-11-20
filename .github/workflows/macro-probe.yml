@@ -16,5 +16,5 @@ jobs:
         with: { sparse-checkout: "scripts\ncouncil" }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: node scripts/macro-probe.mjs 2>&1 | grep -A2 '== auctions\|auctions ERR' || true
+      - run: node scripts/macro-probe.mjs 2>&1 | grep -A3 '== auctions\|auctions ERR' || true
       - run: node council/hard-data.mjs "$RUNNER_TEMP/d" && head -c 6000 "$RUNNER_TEMP/d/macro/hard-data.json"

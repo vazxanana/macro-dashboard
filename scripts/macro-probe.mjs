@@ -34,6 +34,7 @@ try { const { t } = await get('https://api.fiscaldata.treasury.gov/services/api/
   for (const u of SRC.auctions) {
     try { const { s, t } = await get(u); const J = JSON.parse(t.replace(/^﻿/, '')); const rows = Array.isArray(J) ? J : (J.data || []);
       console.log('== auctions', u, s, 'rows', rows.length, 'first', JSON.stringify(rows[0] || null).slice(0, 600));
+      console.log('   fields', JSON.stringify(rows.slice(0, 12).map((r) => [r.securityType, r.securityTerm, r.auctionDate, r.offeringAmount, r.type, r.security_type, r.security_term, r.auction_date])), 'window', from, to);
       console.log('   kept', JSON.stringify(parseAuctions(J, from, to)).slice(0, 1500));
     } catch (e) { console.log('auctions ERR', u, e.message); }
   }
