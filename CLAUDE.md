@@ -4958,6 +4958,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   (2016-26, +0.098R). Too few under 10, checkpoints 20 and 40; the first crossing stands. Rebuilds the study's 2 Nov 2026 trade
   exactly (+0.129R). First reading: 1 trade (16 Nov, −0.135R). `vb-forward.yml` writes council-data
   `research/forward/turnaround-tuesday.json`. Paper research only.
+- **Edge lab shows the latest forward readings** (20 Nov 2026): a row whose topic ends in `-forward` adds "Latest reading: …"
+  from `/cdata/research/forward/<study>.json` once `/api/me` names a member (`forwardLive` in edge-lab.html, escaped, display
+  only); the committed result.json stays the first reading. A new forward record needs its step in `vb-forward.yml` writing that
+  file name (`tests/edge-lab-forward.test.mjs`).
 - `gold-pre-holiday-forward` (pre-registered 20 Nov 2026): `gold-pre-holiday` T1's forward record on NYSE holidays after
   31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
   its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`

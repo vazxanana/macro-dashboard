@@ -631,6 +631,34 @@
     decorate(); applySort(); applyFilter();
     state.rendered = true;
     deepLink();
+    forwardLive();
+  }
+
+  // a forward record (topic "<study>-forward") is refreshed every weekday into council-data research/forward/<study>.json; the
+  // committed result.json is only its first reading. For a signed-in member the row adds the latest file's reading (display only).
+  var FWD = {};
+  function forwardLive() {
+    var me = window.MX_ME;
+    if (!me || !me.then) return;
+    me.then(function (who) {
+      if (!who) return;
+      document.querySelectorAll('#groups .row[data-topic$="-forward"]').forEach(function (r) {
+        var t = r.dataset.topic, f = t.replace(/-forward$/, '');
+        if (!/^[a-z0-9-]+$/.test(f)) return;
+        FWD[t] = FWD[t] || fetch('/cdata/research/forward/' + f + '.json', { cache: 'no-cache', credentials: 'same-origin' })
+          .then(function (x) { return x.ok ? x.json() : null; }).catch(function () { return null; });
+        FWD[t].then(function (j) {
+          var row = document.querySelector('#groups .row[data-topic="' + t + '"]'), st = row && row.querySelector('.c-study');
+          if (!st || !j || typeof j.verdict !== 'string' || st.querySelector('.fwd-live')) return;
+          var p = document.createElement('p');
+          p.className = 'rule fwd-live';
+          p.innerHTML = '<em>Latest reading:</em> ' + esc(j.verdict) + (j.dataEnd ? ' · candles through ' + esc(String(j.dataEnd)) : '');
+          p.title = j.verdict + ' (as last written by the daily research workflow to council-data research/forward/' + f + '.json)';
+          st.appendChild(p);
+          row.dataset.q += ' ' + j.verdict.toLowerCase();
+        });
+      });
+    });
   }
 
   // pass / fail / inconclusive / still running as a donut; the legend writes each out with its count and share
