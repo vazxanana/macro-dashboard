@@ -16,6 +16,10 @@ on:
         description: 'For the marks part: a JSON file in the repository, { SYMBOL: [unix sec, ...] }'
         required: false
         default: ''
+      marks_back:
+        description: 'For the marks part: seconds before a mark to look for its quote (60-3600)'
+        required: false
+        default: ''
       tag:
         description: 'Optional suffix of the output file (ticks-<SYMBOL>-<tag>.json), a-z 0-9 -'
         required: false
@@ -62,6 +66,7 @@ jobs:
           SYMS: ${{ inputs.symbols }}
           PROBE_MARKS: ${{ inputs.marks }}
           PROBE_TAG: ${{ inputs.tag }}
+          PROBE_MARKS_BACK: ${{ inputs.marks_back }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
