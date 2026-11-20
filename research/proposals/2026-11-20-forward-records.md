@@ -23,8 +23,8 @@ What this means in practice:
   traded or sized on its forward record before its first checkpoint.
 - None of them is an edge until its record says so. A study that passed in sample and a few weeks of forward days are not proof.
 
-Readings on 20 Nov 2026: gold breakout 2 trades, +4.3R after the measured cost (16 and 18 Nov, both sells in gold's fall from
-about 3,885 to 3,560); pre-holiday 0 events (Thanksgiving is the first); Turnaround Tuesday 1 trade, −0.135R. All "too few".
+Readings on 20 Nov 2026 (the 07:20 UTC run): gold breakout 3 trades, +4.53R after the measured cost (16, 18 and 19 Nov, all
+sells in gold's fall from about 3,885 to 3,560: +0.74R, +3.56R, +0.23R); pre-holiday 0 events (Thanksgiving is the first); Turnaround Tuesday 1 trade, −0.135R. All "too few".
 
-Fixed today: the gold breakout record read candles only up to midnight UTC, so the last complete day was left out (the 20 Nov
-run counted through 18 Nov); it now reads up to the run.
+Fixed today: the gold breakout record read candles only up to midnight UTC, so the last complete day was left out (the 06:07 run
+on 20 Nov counted through 18 Nov); it now reads up to the run, and the 07:20 run counted 19 Nov.
