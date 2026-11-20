@@ -5129,6 +5129,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   move over 25 bp, then USD/JPY over the next 20 sessions (FRED DGS10, OANDA daily, 1,001 weeks 2007-26). **FAIL, 0 of 2**: up
   t 0.63, down t −1.08 (both the claimed way, neither close). Same-4-week correlation 0.51: they move together, the move does not
   lead. Nothing live changed.
+- USD/JPY T1's risk profile (20 Nov 2026, accounting, `research/proposals/2026-11-20-usdjpy-risk.md`, from the forward baseline,
+  2016-26, in sample): +131.7R, worst drawdown 33.8R (Dec 2022 - Oct 2023), 574 days below a high, 3 losing years (2023 −15.4R).
+  At 0.25 % a trade about +3 % a year with an 8.4 % drawdown. No verdict.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
