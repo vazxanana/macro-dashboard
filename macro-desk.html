@@ -532,6 +532,18 @@
   .wa-rg { margin: 2px 0 6px; font: 400 var(--fs-sm, 13px)/1.5 var(--sans); color: var(--ink-dim); } .wa-rg b { color: var(--ink); font-weight: 600; }
   .wa-chip { display: inline-block; padding: 1px var(--s2); margin-right: 6px; border-radius: 999px; font: 600 var(--fs-xs)/1.6 var(--sans); background: var(--well); color: var(--ink-dim); }
   .wa-chip.pass { color: var(--buy); background: color-mix(in srgb, var(--buy) 14%, var(--panel)); } .wa-chip.fail { color: var(--sell); background: color-mix(in srgb, var(--sell) 14%, var(--panel)); }
+  /* Week in review (20 Nov 2026): tokens only, 12 px or more, the table scrolls inside its box */
+  .wr-tw { overflow-x: auto; margin: var(--s3) 0; }
+  .wr-t { width: 100%; border-collapse: collapse; font: 400 var(--fs-sm, 13px)/1.5 var(--sans); font-variant-numeric: tabular-nums; }
+  .wr-t th { text-align: left; font: 500 var(--fs-xs)/1.4 var(--sans); color: var(--ink-faint); padding: 6px var(--s3) 6px 0; white-space: nowrap; }
+  .wr-t td { padding: 8px var(--s3) 8px 0; border-top: 1px solid var(--line); color: var(--ink-dim); white-space: nowrap; }
+  .wr-t td:first-child, .wr-t th:first-child { position: sticky; left: 0; background: var(--panel); color: var(--ink); font-weight: 600; }
+  .wr .up { color: var(--buy); font-weight: 600; } .wr .dn { color: var(--sell); font-weight: 600; } .wr .fl { color: var(--ink-dim); font-weight: 600; }
+  .wr-sp { display: inline-flex; align-items: center; gap: 2px; height: 22px; vertical-align: middle; }
+  .wr-sp span { display: flex; height: 22px; flex-direction: column; justify-content: center; }
+  .wr-sp i { display: block; width: 5px; border-radius: 1px; background: var(--buy); } .wr-sp i.dn { background: var(--sell); }
+  .wr-dh { display: flex; flex-wrap: wrap; gap: 4px var(--s4); align-items: baseline; } .wr-dh b { color: var(--ink); }
+  .wr-cl li { display: flex; gap: var(--s2); } .wr-cl .ic { flex: none; width: 1.2em; font-weight: 700; }
   .wa-nc { color: var(--ink); }
   .wa-quiet { color: var(--ink-faint); font-size: var(--fs-sm, 13px); margin: 4px 0 0; }
     .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
@@ -677,7 +689,7 @@
     <p class="stamp" id="stamp" role="status"><span class="sd" aria-hidden="true"></span><span id="stamp-t">Loading…</span></p>
   </div>
   <nav class="toc" id="toc" aria-label="Sections on this page">
-    <a href="#s-daily">Daily reports</a><a href="#s-ahead">Week ahead</a><a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-red">Red folders</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
+    <a href="#s-daily">Daily reports</a><a href="#s-ahead">Week ahead</a><a href="#s-review">Week in review</a><a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-red">Red folders</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
   </nav>
 
   <!-- 0. Daily reports (19 Nov 2026, owner): council/daily-report.mjs → macro/daily-report.json, built from 06:00 London and announced at 06:30 -->
@@ -702,6 +714,18 @@
       <div class="wa-days" id="wa-days"></div>
       <details class="fold" id="wa-frame"><summary>The frame for the week <small>score, regime, levels, the veteran's call, your rule book</small></summary><div id="wa-frame-b"></div></details>
       <p class="note" id="wa-note"></p>
+    </article>
+  </section>
+  <!-- 20 Nov 2026, owner: "Lets make an area for week review of the market": what the markets did in the latest trading week
+       (council/week-review.mjs → macro/week-review.json); display only -->
+  <section class="story sfold" id="s-review" aria-labelledby="wr-h">
+    <header class="st-h"><h2 id="wr-h">Week in review</h2><small class="st-m" id="wr-sub"></small><button type="button" class="st-go" id="go-s-review" aria-expanded="false" aria-controls="c-review" aria-labelledby="wr-h one-s-review"><span class="st-one" id="one-s-review"></span></button></header>
+    <article class="card wa wr" id="c-review" hidden>
+      <ul class="pl-list nx-bl wa-lines" id="wr-lines"></ul>
+      <div class="wr-tw" role="region" aria-label="The week by market" tabindex="0"><table class="wr-t" id="wr-t"></table></div>
+      <div class="wa-days" id="wr-days"></div>
+      <details class="fold" id="wr-calls" hidden><summary>The veteran's calls that came due <small id="wr-calls-s"></small></summary><ul class="pl-list wr-cl" id="wr-calls-b"></ul></details>
+      <p class="note" id="wr-note"></p>
     </article>
   </section>
 
@@ -1513,6 +1537,38 @@
   var WA_RG = function (t) { t = String(t || '').replace(/^A typical day's move is\s+/i, ''); if (t.slice(-WA_RG_TAIL.length) === WA_RG_TAIL) t = t.slice(0, -WA_RG_TAIL.length).trim(); return t; };
   var WA_POS_TAIL = /\s*(Positioning, not a tested signal:[^.]*\.)$/;
   var WA_LOC = function (iso) { return new Date(iso).getTimezoneOffset() === 0 ? '' : ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'; };
+  // 20 Nov 2026: the week in review (macro/week-review.json, council/week-review.mjs); display only, every value as text
+  var WR_PCT = function (x, d) { return x == null || !isFinite(x) ? 'n/a' : (x > 0 ? '+' : x < 0 ? '\u2212' : '') + Math.abs(x).toFixed(d == null ? 1 : d) + '%'; };
+  var WR_CLS = function (x) { return x > 0 ? 'up' : x < 0 ? 'dn' : 'fl'; };
+  var WR_ARW = function (x) { return x > 0 ? '\u25B2 ' : x < 0 ? '\u25BC ' : ''; };
+  var WR_PX = function (m, v) { return v == null || !isFinite(v) ? 'n/a' : (m.money ? '$' : '') + Number(v).toLocaleString('en-US', { minimumFractionDigits: m.dec, maximumFractionDigits: m.dec }); };
+  function wrSpark(past) {
+    var mx = Math.max.apply(null, past.map(function (p) { return Math.abs(p.pct) || 0; }).concat([0.01]));
+    return '<span class="wr-sp" role="img" aria-label="' + esc('The last ' + past.length + ' weeks: ' + past.map(function (p) { return WR_PCT(p.pct); }).join(', ')) + '">' + past.map(function (p) {
+      var h = Math.max(2, Math.round(Math.abs(p.pct) / mx * 11)); return '<span><i' + (p.pct < 0 ? ' class="dn"' : '') + ' style="height:' + h + 'px;margin-' + (p.pct < 0 ? 'top' : 'bottom') + ':' + h + 'px"></i></span>'; }).join('') + '</span>';
+  }
+  function renderReview(R) {
+    var sec = $('c-review'); if (!R || !Array.isArray(R.markets) || !R.markets.length) { sec.hidden = true; $('one-s-review').innerHTML = ''; return; } sec.hidden = false;
+    $('wr-sub').textContent = WA_DAY(R.from) + ' to ' + WA_DAY(R.to) + (R.complete ? '' : ' \u00B7 so far, through the ' + WA_DAY(R.last) + ' close');
+    $('wr-lines').innerHTML = (R.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
+    $('wr-t').innerHTML = '<thead><tr><th scope="col">Market</th><th scope="col">Week</th><th scope="col">From \u2192 to</th><th scope="col">Against a normal week</th><th scope="col">High / low</th><th scope="col">Last ' + ((R.markets[0].past || []).length) + ' weeks</th></tr></thead><tbody>' +
+      R.markets.map(function (m) {
+        var nrm = m.times == null ? 'n/a' : m.times.toFixed(1) + '\u00D7 (normal ' + m.normal.toFixed(1) + '%)';
+        return '<tr><th scope="row">' + esc(m.name) + '</th><td class="' + WR_CLS(m.pct) + '">' + WR_ARW(m.pct) + esc(WR_PCT(m.pct)) + '</td><td>' + esc(WR_PX(m, m.from) + ' \u2192 ' + WR_PX(m, m.to)) + '</td><td>' + esc(nrm) + '</td><td>' + esc(WR_PX(m, m.high) + ' / ' + WR_PX(m, m.low)) + (m.highLow === 'closes' ? ' <small>closes</small>' : '') + '</td><td>' + ((m.past || []).length ? wrSpark(m.past) : '') + '</td></tr>';
+      }).join('') + '</tbody>';
+    $('wr-days').innerHTML = (R.days || []).map(function (d) {
+      return '<div class="wa-day"><div class="wr-dh"><b>' + esc(d.dow) + ' ' + esc(WA_DAY(d.day)) + '</b>' +
+        (d.gold != null ? '<span>Gold <span class="' + WR_CLS(d.gold) + '">' + WR_ARW(d.gold) + esc(WR_PCT(d.gold)) + '</span></span>' : '') +
+        (d.dxy != null ? '<span>Dollar <span class="' + WR_CLS(d.dxy) + '">' + WR_ARW(d.dxy) + esc(WR_PCT(d.dxy, 2)) + '</span></span>' : '') + '</div>' +
+        ((d.releases || []).length ? '<ul>' + d.releases.map(function (r) { return '<li>' + esc(r.text) + '</li>'; }).join('') + '</ul>' : '') + '</div>';
+    }).join('');
+    var C = R.calls, cd = $('wr-calls'); cd.hidden = !(C && C.items && C.items.length);
+    if (!cd.hidden) { $('wr-calls-s').textContent = C.hits + ' of ' + C.n + ' came true';
+      $('wr-calls-b').innerHTML = C.items.map(function (c) { return '<li><span class="ic ' + (c.hit ? 'up' : 'dn') + '">' + (c.hit ? '\u2713' : '\u2715') + '</span><span>' + esc(c.claim) + ' <small>(his odds ' + Math.round(c.p * 100) + '%; ' + (c.hit ? 'came true' : 'did not') + ')</small></span></li>'; }).join(''); }
+    $('wr-note').textContent = R.note || '';
+    var g = R.markets.filter(function (m) { return m.k === 'gold'; })[0] || R.markets[0], u = R.markets.filter(function (m) { return m.k === 'dxy'; })[0];
+    $('one-s-review').innerHTML = esc(WA_DAY(R.from) + ' to ' + WA_DAY(R.to)) + ': <b>' + esc(g.name) + '</b> ' + esc(WR_PCT(g.pct)) + (g.times != null && g.times >= 1.5 ? esc(', ' + g.times.toFixed(1) + '\u00D7 a normal week') : '') + (u && u !== g ? ' \u00B7 <b>Dollar</b> ' + esc(WR_PCT(u.pct)) : '');
+  }
   function renderAhead(A) {
     var sec = $('c-ahead'); if (!A || !Array.isArray(A.days) || !A.days.length) { sec.hidden = true; $('one-s-ahead').innerHTML = ''; return; } sec.hidden = false;
     $('wa-sub').textContent = (A.next ? 'next week' : 'the rest of this week') + ', ' + WA_DAY(A.from) + ' to ' + WA_DAY(A.to) + ' · paper only';
@@ -1847,12 +1903,12 @@
   $('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; var t = document.querySelector(a.getAttribute('href')); if (t && t.id === 's-deep') $('deep').open = true; });
   $('g-event').addEventListener('click', function (e) { if (e.target.closest('a[href="#s-next"]')) foldSet($('s-next'), true); });   // the glance's link into a folded section opens it
   function load() {
-    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json'), get('macro/redfolder.json'), get('macro/daily-report.json'), get('macro/week-ahead.json')]).then(function (x) {
-      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4], rf = x[5], dr = x[6], wa = x[7];
+    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json'), get('macro/redfolder.json'), get('macro/daily-report.json'), get('macro/week-ahead.json'), get('macro/week-review.json')]).then(function (x) {
+      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4], rf = x[5], dr = x[6], wa = x[7], wr = x[8];
       ((v && v.events) || []).forEach(function (e) { (e.scenarios || []).forEach(function (c) { var m = /^>\s*(.+?)\s+and\s+<\s*(.+)$/.exec(String(c.when || '')); if (m && m[1] === m[2]) c.when = 'at ' + m[1] + ' (one reporting step)'; }); });
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
-      renderAhead(wa); renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot); renderRed(rf); renderDaily(dr); loadBrief();
+      renderAhead(wa); renderReview(wr); renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot); renderRed(rf); renderDaily(dr); loadBrief();
       syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw
@@ -1916,7 +1972,8 @@
       's-expect': takeOf('hyp-take'),
       's-track': takeOf('calls-take') || takeOf('calib-take'),
       's-red': (function () { var o = $('one-s-red'); return o ? o.innerHTML : ''; })(),
-      's-ahead': (function () { var o = $('one-s-ahead'); return o ? o.innerHTML : ''; })() };
+      's-ahead': (function () { var o = $('one-s-ahead'); return o ? o.innerHTML : ''; })(),
+      's-review': (function () { var o = $('one-s-review'); return o ? o.innerHTML : ''; })() };
     Object.keys(one).forEach(function (id) { var o = $('one-' + id), m = $(id).querySelector('.st-h .st-m'); if (o) o.innerHTML = one[id]; if (m) m.classList.toggle('has-one', !!one[id]); });
   }
   document.querySelectorAll('.st-go').forEach(function (b) { b.addEventListener('click', function () { var sx = b.closest('.sfold'); foldSet(sx, !sx.classList.contains('open')); }); });
