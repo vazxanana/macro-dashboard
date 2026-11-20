@@ -1,76 +1,88 @@
 {
- "at": "2026-11-20T23:05:03.000Z",
- "status": "warn",
+ "at": "2026-11-20T23:29:13.000Z",
+ "status": "bad",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
-   "status": "closed",
+   "status": "bad",
    "markets": {
     "xau": {
      "label": "XAU/USD",
      "sym": "xau",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-20T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 2.57,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 520: error code: 520\n"
+      }
+     ]
     },
     "eurusd": {
      "label": "EUR/USD",
      "sym": "eurusd",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-20T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 1.65,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 520: error code: 520\n"
+      }
+     ]
     },
     "gbpusd": {
      "label": "GBP/USD",
      "sym": "gbpusd",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-20T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 3.01,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 520: error code: 520\n"
+      }
+     ]
     },
     "audusd": {
      "label": "AUD/USD",
      "sym": "audusd",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-20T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 1.99,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 520: error code: 520\n"
+      }
+     ]
     },
     "usdcad": {
      "label": "USD/CAD",
      "sym": "usdcad",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-20T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 2.28,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 520: error code: 520\n"
+      }
+     ]
     },
     "usdchf": {
      "label": "USD/CHF",
      "sym": "usdchf",
-     "status": "closed",
-     "n": 300,
-     "last": "2026-11-20T21:55:00.000Z",
-     "staleMin": 0,
-     "maxJump": 2.21,
-     "clipped": 0,
-     "issues": []
+     "status": "bad",
+     "n": 0,
+     "issues": [
+      {
+       "kind": "error",
+       "sev": "bad",
+       "detail": "unreachable: HTTP 502: OANDA 520: error code: 520\n"
+      }
+     ]
     }
    }
   },
@@ -83,7 +95,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-20T23:05:00.000Z",
+     "last": "2026-11-20T23:25:00.000Z",
      "staleMin": 0,
      "maxJump": 2.16,
      "clipped": 0,
@@ -94,7 +106,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-20T23:05:00.000Z",
+     "last": "2026-11-20T23:25:00.000Z",
      "staleMin": 0,
      "maxJump": 2.6,
      "clipped": 0,
@@ -105,7 +117,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-20T23:05:00.000Z",
+     "last": "2026-11-20T23:25:00.000Z",
      "staleMin": 0,
      "maxJump": 2.8,
      "clipped": 0,
@@ -116,7 +128,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-20T23:05:00.000Z",
+     "last": "2026-11-20T23:25:00.000Z",
      "staleMin": 0,
      "maxJump": 2.08,
      "clipped": 0,
@@ -176,8 +188,8 @@
      "label": "GC",
      "sym": "@GC.1",
      "status": "closed",
-     "n": 1104,
-     "last": "2026-11-20T21:55:00.000Z",
+     "n": 1105,
+     "last": "2026-11-20T23:20:00.000Z",
      "staleMin": 0,
      "maxJump": 2.55,
      "clipped": 0,
@@ -191,14 +203,45 @@
    "markets": {
     "snapshot.json": {
      "label": "Trader snapshot (snapshot.json)",
-     "status": "ok",
-     "ageMin": 2,
-     "issues": []
+     "status": "warn",
+     "ageMin": 3,
+     "issues": [
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "XAU/USD read from Kraken, not OANDA (proxy fallback)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "EUR/USD read from Kraken, not OANDA (proxy fallback)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "GBP/USD read from Kraken, not OANDA (proxy fallback)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "AUD/USD read from Kraken, not OANDA (proxy fallback)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "USD/CAD read from Kraken, not OANDA (proxy fallback)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "USD/CHF read from Kraken, not OANDA (proxy fallback)"
+      }
+     ]
     },
     "state.json": {
      "label": "Trader state (state.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 3,
      "issues": []
     },
     "trades.json": {
@@ -225,7 +268,7 @@
     "mt5/signals.csv": {
      "label": "MT5 / cTrader signal file (mt5/signals.csv)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 3,
      "issues": []
     },
     "analysis/latest.md": {
@@ -236,13 +279,13 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 4,
      "issues": []
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 3,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
@@ -278,7 +321,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 11,
+     "ageMin": 13,
      "issues": [
       {
        "kind": "source",
@@ -318,6 +361,46 @@
        "kind": "input",
        "sev": "note",
        "detail": "fred:BSCICP03DEM665S last value 2024-01-01 (1054 days old; over 120 the strategist drops it as \"no data\"; a standing gap)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:nq failed (HTTP 502)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:usdjpy failed (HTTP 502)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:es failed (HTTP 502)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:eurusd OANDA failed (HTTP 502), Kraken ok (721 days)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:gold OANDA failed (HTTP 502), Kraken ok (721 days)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:gbpusd OANDA failed (HTTP 502), Kraken ok (721 days)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:usdchf OANDA failed (HTTP 502), Kraken ok (721 days)"
+      },
+      {
+       "kind": "source",
+       "sev": "warn",
+       "detail": "bars:usdcad OANDA failed (HTTP 502), Kraken ok (721 days)"
       },
       {
        "kind": "source",
@@ -364,7 +447,7 @@
     "macro/daily-report.json": {
      "label": "Daily reports (macro/daily-report.json)",
      "status": "ok",
-     "ageMin": 1021,
+     "ageMin": 1046,
      "issues": []
     },
     "macro/history.json": {
@@ -396,7 +479,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1383,
+     "ageMin": 1407,
      "issues": []
     },
     "digest.json": {
@@ -407,31 +490,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 19,
+     "ageMin": 10,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 668,
+     "ageMin": 692,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 668,
+     "ageMin": 692,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 668,
+     "ageMin": 692,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 306,
+     "ageMin": 330,
      "issues": []
     },
     "research/ledger.json": {
@@ -452,13 +535,13 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 439,
+     "ageMin": 464,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 4272,
+     "ageMin": 4296,
      "issues": [
       {
        "kind": "stale",
@@ -496,21 +579,41 @@
    }
   }
  },
- "summary": "Council data files: Trade records (trades.json) range, Macro forecast (macro/forecast.json) input/source, Coach AI review (reviews/latest.md) stale",
+ "summary": "OANDA spot (md/bars): XAU/USD error, EUR/USD error, GBP/USD error, AUD/USD error, USD/CAD error, USD/CHF error · Council data files: Trader snapshot (snapshot.json) source, Trade records (trades.json) range, Macro forecast (macro/forecast.json) input/source, Coach AI review (reviews/latest.md) stale",
  "brief": {
-  "status": "warn",
-  "line": "4 warnings: Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry tha",
-  "bad": [],
+  "status": "bad",
+  "line": "6 problems, 18 warnings: OANDA spot (md/bars) XAU/USD: unreachable: HTTP 502: OANDA 520: error code: 520\n",
+  "bad": [
+   "OANDA spot (md/bars) XAU/USD: unreachable: HTTP 502: OANDA 520: error code: 520\n",
+   "OANDA spot (md/bars) EUR/USD: unreachable: HTTP 502: OANDA 520: error code: 520\n",
+   "OANDA spot (md/bars) GBP/USD: unreachable: HTTP 502: OANDA 520: error code: 520\n",
+   "OANDA spot (md/bars) AUD/USD: unreachable: HTTP 502: OANDA 520: error code: 520\n",
+   "OANDA spot (md/bars) USD/CAD: unreachable: HTTP 502: OANDA 520: error code: 520\n",
+   "OANDA spot (md/bars) USD/CHF: unreachable: HTTP 502: OANDA 520: error code: 520\n"
+  ],
   "warn": [
+   "Trader snapshot (snapshot.json): XAU/USD read from Kraken, not OANDA (proxy fallback)",
+   "Trader snapshot (snapshot.json): EUR/USD read from Kraken, not OANDA (proxy fallback)",
+   "Trader snapshot (snapshot.json): GBP/USD read from Kraken, not OANDA (proxy fallback)",
+   "Trader snapshot (snapshot.json): AUD/USD read from Kraken, not OANDA (proxy fallback)",
+   "Trader snapshot (snapshot.json): USD/CAD read from Kraken, not OANDA (proxy fallback)",
+   "Trader snapshot (snapshot.json): USD/CHF read from Kraken, not OANDA (proxy fallback)",
    "Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry than the opening risk 0.011773)",
-   "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
-   "Coach AI review (reviews/latest.md): newest daily review 2026-11-13 (5 business days ago)",
-   "Coach AI review (reviews/latest.md): newest weekly Analyst brief analysis/2026-11-09.md is 11 days old (Mondays)"
+   "Macro forecast (macro/forecast.json): bars:nq failed (HTTP 502)",
+   "Macro forecast (macro/forecast.json): bars:usdjpy failed (HTTP 502)",
+   "Macro forecast (macro/forecast.json): bars:es failed (HTTP 502)"
   ],
   "notes": 3
  },
  "alert": {
-  "streak": {},
+  "streak": {
+   "oanda:xau": 1,
+   "oanda:eurusd": 1,
+   "oanda:gbpusd": 1,
+   "oanda:audusd": 1,
+   "oanda:usdcad": 1,
+   "oanda:usdchf": 1
+  },
   "sent": {
    "key": "",
    "at": "2026-11-18T13:46:17.000Z",
