@@ -38,10 +38,10 @@
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3" defer></script>
-<script src="/assets/ms-draw.js?v=5eb2a252da" defer></script>
+<script src="/assets/ms-draw.js?v=d16f960683" defer></script>
 <script src="/assets/ms-paper.js?v=1ddae9c0e4" defer></script>
 <script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
-<script src="/assets/ms-charts-guide.js?v=46e0a2c765" defer></script>
+<script src="/assets/ms-charts-guide.js?v=d11de693cd" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -3009,6 +3009,7 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       .dr-bar .dr-mag small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--accent); } .dr-bar .dr-mag small:empty { display: none; }
       .dr-note { order: 9; font-size: 12px; color: var(--ink-dim); } .dr-note:empty { display: none; }
       .ms-dsel { position: fixed; left: 0; top: 0; z-index: 60; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); font: 600 12px var(--sans); color: var(--ink); }
+      .ms-dsel { flex-wrap: wrap; max-width: calc(100vw - 16px); box-sizing: border-box; }   /* a phone: the bar wraps to rows inside the screen (it ran 230 px past a 390 px screen: Lock, Clone, Delete out of reach; 20 Nov 2026) */
       .ms-dsel[hidden] { display: none; } .ms-dsel .sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
       .ms-dsel button { min-height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
       .ms-dsel button:hover { background: var(--panel-hover, rgba(127,127,127,.12)); } .ms-dsel button[aria-pressed="true"] { border-color: var(--accent); }
@@ -3260,6 +3261,9 @@ html[data-mk="clean"] .ict-strip { display: none; }
 .tv-tk .tk-b button, .tv-tk .tk-b a { height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
 .tv-tk .tk-b button:hover, .tv-tk .tk-b a:hover { border-color: var(--accent); }
 @media (max-width: 600px) { .tv-tk .tk-b { margin-left: 0; } }
+/* trade dialog on touch (20 Nov 2026): Before / After / Save were 37 px and the ticket's Copy buttons 32 px tall on a phone; the two small labels 11 px */
+@media (pointer: coarse) { .tv-h .tv-ba button { min-height: 44px; } .tv-tk .tk-b button, .tv-tk .tk-b a { height: 44px; } }
+.tv-tk .tk-h, .tv-nb .nb-k { font-size: 12px; }
 .ch-tv { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E"); text-decoration: none; }
 .ch-ruler { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0zM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2'/%3E%3C/svg%3E"); }
 .ch-b.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }

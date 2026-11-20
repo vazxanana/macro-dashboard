@@ -2531,6 +2531,16 @@ it exists, else the page's own: `#v-charts.ch-fake-fs` (fixed over the page, `10
 phone in the browser's full screen too). (3) The Style panel (`#ms-sty-pop`) opened from its button's left edge and ran off the right
 of a phone: up to 640 px it is a sheet across the screen above the tab bar (scrolls), wider it is moved left when it would leave the
 screen (`place`). Checked at 390 x 664 (iPhone 13) in both paths. Test: `tests/charts-phone-fs.test.mjs`.
+**Phone audit 2 (20 Nov 2026)**: every menu, popover, dialog and sheet of the Desk, ChronosTrade and the Macro desk opened at
+390 x 664 (iPhone 13 emulation, no element Fullscreen API), simple and Full view. Fixed, display only: (1) the Desk's drawing style bar
+`.ms-dsel` was one row 612 px wide, so Lock, Clone and Delete sat 230 px past the screen: it wraps inside `100vw - 16px` and is
+placed above the shape by its own height (`assets/ms-draw.js`); (2) ChronosTrade full screen on a phone: the trade dock (320 px,
+from 70 px down, z 45) covered the floating replay bar (Play, More, and in More the only way out of full screen on an iPhone) and
+ran 37 px below the screen; up to 640 px it is a bottom sheet (`max-height: 46dvh`, Sell / Buy first by flex `order`) and hides while
+More or a toolbar menu is open (`body.fs:has(#tb.more-open, #tb details[open])`: the replay bar is inside `.chartc`'s z 40 stacking
+context, under the dock); (3) the trade dialog's Before / After / Save (37 px) and ticket buttons (32 px) are 44 px on touch, its two
+11 px labels 12 px; (4) the charts guide's close button is 44 px wide on touch. Left: the header switch dots (21 x 28, the known
+width budget), ChronosTrade dropdowns that touch the screen edge or open over a toast. Test: `tests/phone-audit-2.test.mjs`.
 
 , owner: "the currency letters look too big, make same size as the rest")
 Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts is 12.5 px: the toolbar's market button `.ch-mk`
