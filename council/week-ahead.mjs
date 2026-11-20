@@ -164,7 +164,7 @@ export function dayRange(fc, day, rf) {
     Object.assign(out, { eventPct: best.pct, eventUsd: usd(best.pct), type: best.type, n: best.n });
     // past release days are measured in their own years' volatility: when they sit under today's normal day, say so
     // (20 Nov 2026: core PCE days ±0.5% against a ±1.4% normal day now) instead of implying the release is the smaller risk
-    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', measured over other years and as a median, so it is not comparable one for one: plan on today\'s figure' : ''}.`);
+    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', measured over other years and as a median, so it is not comparable one for one: plan on the typical move' : ''}.`);
   }
   const mk = day && day.market;
   if (mk && mk.kind === 'holiday') parts.push('US markets closed: thin trading, moves can be jumpy and fade.');
@@ -202,12 +202,15 @@ export function frameOf(fc, v) {
     out.score = { score: g.score, label: g.label || g.bias || null, asOf: g.asOf || null };
     out.lines.push(`Gold Macro Score ${g.score > 0 ? '+' : ''}${g.score}: ${g.label || g.bias}. ${g.score > 0.25 ? 'The tested score leans to buying gold.' : 'The tested score gives no buy lean; a negative score is not a sell (no short edge was found).'}`);
   }
-  if (r && r.label) { out.regime = r.label; out.lines.push(`Regime: ${r.label}${Number.isFinite(r.vix) ? ` (VIX ${r.vix})` : ''}.`); }
+  if (r && r.label) { out.regime = r.label; out.lines.push(`Regime: ${r.label}${Number.isFinite(r.vix) ? `; VIX ${r.vix}` : ''}.`); }
   const L = sum && sum.levels;
   if (L && Number.isFinite(L.px)) {
     out.levels = { px: L.px, asOf: L.asOf || null, above: L.above || null, below: L.below || null };
     const a = L.above, b = L.below;
-    out.lines.push(`Gold near ${money(L.px)}${L.asOf ? ` (as of the ${L.asOf} close)` : ''}${a ? `; watch ${money(a.price)} above (${a.label})` : ''}${b ? ` and ${money(b.price)} below (${b.label})` : ''}.`);
+    // the levels are picked either side of the latest PRICE (glance.mjs `mark`), not the close: say the price they are read from
+    const mk = L.mark && Number.isFinite(L.mark.px) ? L.mark.px : null, lab = (x) => String(x.label || '').replace(/\s*\(price is (under|over) every level he tracks\)/i, '').replace(/^Round number$/i, 'a round number');
+    const made = (x) => x && x.made ? ': the price is past every level he tracks' : '';
+    out.lines.push(`Gold ${mk != null ? `near ${money(mk)} now` : `near ${money(L.px)}`}${L.asOf ? ` (${mk != null ? `${money(L.px)} at` : 'as of'} the ${L.asOf} close)` : ''}${a ? `; above, ${money(a.price)} (${lab(a)}${a.crossed ? ', broken since the close' : ''}${made(a)})` : ''}${b ? `${a ? ';' : ';'} below, ${money(b.price)} (${lab(b)}${b.crossed ? ', broken since the close' : ''}${made(b)})` : ''}.`);
   }
   if (sum && sum.bias && Number.isFinite(sum.bias.p)) {
     const B = sum.bias; out.bias = { lean: B.lean, p: B.p, base: B.base, by: B.by, confidence: B.confidence || null };
@@ -357,8 +360,8 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
   else lines.push('No top-tier US release is scheduled on the files read so far.');
   if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);
-  const tested = days.filter((d) => d.rules.some((r) => r.verdict === 'pass')).map((d) => `${d.dow} (${d.rules.filter((r) => r.verdict === 'pass').map((r) => r.when).join('; ')})`);
-  if (tested.length) lines.push(`Calendar rules the desk has tested that passed their bar: ${tested.join(', ')}. Paper only, each with its own forward record: not proven.`);
+  const tested = days.filter((d) => d.rules.some((r) => r.verdict === 'pass')).map((d) => `${d.dow}: ${d.rules.filter((r) => r.verdict === 'pass').map((r) => String(r.when).replace(/\s*\(.*\)$/, '')).join(' and ')}`);
+  if (tested.length) lines.push(`Calendar rules the desk has tested that passed their bar: ${tested.join('; ')}. Paper only, each with its own forward record: not proven.`);
   const failed = days.filter((d) => d.rules.some((r) => r.verdict === 'fail')).map((d) => d.dow);
   if (failed.length) lines.push(`Rules tested and failed also fall on ${failed.join(', ')}: listed there so they are not chased.`);
   const calNote = (W.next && !rel.some((r) => r.src === 'calendar')) ? 'Next week\'s economic calendar is not published yet (it usually appears over the weekend): the big US releases come from the council\'s own schedule, without consensus figures for now.' : null;

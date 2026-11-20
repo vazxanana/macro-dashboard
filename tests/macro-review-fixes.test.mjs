@@ -48,3 +48,10 @@ test('the morning report: a broken history never stops it, and an unchanged read
   assert.ok(!flat.sections.flatMap((s) => s.lines).some((l) => /a day ago/.test(l)));
   assert.doesNotThrow(() => DR.worldReport({ fc: {}, vet: null, cal: [], now, hd: { hist: [{ at: at(now - 60), odds: { meeting: 'x', top: [null] } }] } }));
 });
+
+test('the morning report: next week\'s big US release from the council schedule before the calendar file is out', () => {
+  const w = DR.worldReport({ fc: {}, vet: null, cal: [], now: T('2026-11-20T06:30:00Z'), hd: null });
+  const week = w.sections.find((s) => s.h === 'Later this week').lines.join('\n');
+  assert.match(week, /PCE/); assert.match(week, /from the council's release schedule; no consensus yet/);
+  assert.doesNotMatch(week, /No high-impact release is on the calendar/);
+});

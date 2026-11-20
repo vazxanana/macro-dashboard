@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeAtomic } from './jsonio.mjs';
-import { typeOf, nowcastFor } from './week-ahead.mjs';
+import { typeOf, nowcastFor, releasesOf } from './week-ahead.mjs';
 import { moves, auctionText } from './hard-data.mjs';
 import { nyParts } from '../ict/calendar.mjs';
 const nyDay = (t) => nyParts(t).ymd;
@@ -81,7 +81,11 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);
-  if (!later.length) lines.week.push('No high-impact release is on the calendar for the next six days.');
+  // next week's calendar file appears over the weekend: until then the big US releases come from the council's own schedule
+  let sched = [];
+  try { sched = releasesOf(cal, nyDay(endToday + 1), nyDay(endToday + 6 * 86400)).filter((r) => r.src === 'schedule' && r.impact === 'high' && r.t > endToday); } catch (e) { sched = []; }
+  for (const r of sched.slice(0, 6)) lines.week.push(`${dayName(r.t)} ${hm(r.t)} · ${COUNTRY[r.country] || clean(r.country, 12)} · ${clean(r.title, 80)} (from the council's release schedule; no consensus yet)`);
+  if (!later.length && !sched.length) lines.week.push('No high-impact release is on the calendar for the next six days.');
   // what we expect
   if (S.sentence) lines.expect.push(clean(S.sentence, 400));
   const gs = fc && fc.goldScore; if (gs && gs.ok && Number.isFinite(gs.score)) lines.expect.push(`Gold Macro Score ${gs.score > 0 ? '+' : ''}${gs.score.toFixed(2)}: ${gs.score > 0.25 ? 'leans to gold rising over the next four weeks (the score\'s tested side)' : 'no macro edge for gold (the score only ever points up, above +0.25)'}.`);

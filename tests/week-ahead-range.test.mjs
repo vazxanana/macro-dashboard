@@ -60,5 +60,5 @@ test('the Macro desk draws the range as text under each day heading', () => {
 
 test('a release-day median under today\'s normal day says to plan on today\'s range (20 Nov 2026)', () => {
   const src = fs.readFileSync(new URL('../council/week-ahead.mjs', import.meta.url), 'utf8');
-  assert.ok(src.includes("measured over other years and as a median, so it is not comparable one for one: plan on today\\'s figure"));
+  assert.ok(src.includes("measured over other years and as a median, so it is not comparable one for one: plan on the typical move"));
 });

@@ -3056,6 +3056,10 @@ median is smaller, "measured over other years and as a median, so it is not comp
 moved make a line (four at most; the report's nowcast moves only for a month with a release in the next week; a broken history
 never stops the report), and the Sunday digest skips a Week ahead file that ended before today (preview up to 22 lines).
 Test: `tests/macro-review-fixes.test.mjs`.
+**Wording found in the browser check, same day**: the frame's levels line reads from the latest price ("Gold near $3,575 now ($3,607 at the
+19 Nov close); above, $3,590 (13-week low, broken since the close)…"; it said "watch $3,590 above" under a $3,607 close); no nested
+brackets in the top lines; the morning report's "Later this week" adds the high-impact US releases of the council's schedule the
+calendar does not hold yet, instead of "No high-impact release…" before the weekend's calendar file.
 
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
