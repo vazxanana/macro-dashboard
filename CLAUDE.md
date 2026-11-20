@@ -88,7 +88,7 @@ review. `watchdog.yml` pages when the loop stops.
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
-(1-59 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
+(1-63 today; add new ones at the end, never renumber), because this file, the studies and the tests cite them.
 
 ## Cloudflare move (16 Nov 2026, owner: "Move the whole site"; Workers Paid $5 a month approved)
 `cloudflare/` runs the site on Cloudflare Workers: `out/` as static assets, vercel.json's rewrites and headers read at
@@ -5193,6 +5193,24 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
   `research/forward/usdjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0).
+- `usdjpy-vol-breakout-exec` (pre-registered 20 Nov 2026): USD/JPY T1 filled at the demo broker's own ticks (tick probe `fills` /
+  `marks`, files `ticks-USDJPY-exec-a/-b.json`), 24 Nov 2023 - 19 Nov 2026. **PASS**: +0.148R a trade after commission (n 564
+  filled, month t 3.11; OANDA mid +0.153R before costs; entry slippage 0.012R). Cautions: the ten best trades carry 75 %, buys
+  +0.277R vs sells +0.028R (2005-26 mid: buys +0.148R, sells +0.001R): part may be USD/JPY's drift. In-sample years; the forward
+  record judges. Nothing live changed.
+- `energy-vol-breakout` (pre-registered 20 Nov 2026): T1 on WTI, Brent and natural gas, OANDA M5 2016 → now, 0.1 % of price a
+  round trip. **FAIL**: pooled −0.014R a trade net (n 5,221, month t −0.85); before costs +0.059R, so the verdict rests on the
+  assumed cost (the demo's energy spreads are not measured). Nothing live changed.
+- `usdjpy-vb-side-control` (pre-registered 20 Nov 2026): **INVALID**: its control took each real trade's side (decided by the
+  day's breakout) and entered at random times mostly before that breakout fired, i.e. look-ahead (+0.36R a trade). Nothing is
+  concluded from it; kept as a record. Corrected in `usdjpy-vb-side-control-v2` (pre-registered after v1 was found invalid):
+  long and short random entries on EVERY tradable day, no day or side chosen by the breakout. **PASS**: T1's buys +0.148R a trade
+  (n 1,998) vs long at a random time +0.026R, 40 of 40 seeds, both halves; sells +0.001R vs short −0.056R (reported). The breakout
+  entry adds about 0.06-0.12R a trade beyond USD/JPY's drift. Nothing live changed.
+- `energy-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the energy T1 trades at the demo's measured hourly spreads (tick
+  probe; broker names XTIUSD / XBRUSD / XNGUSD; WTI and Brent about 0.03 % of price, gas about 0.24 %). **FAIL**: pooled −0.003R a
+  trade net (month t −0.17); gas −0.088R (t −3.24) sinks it. WTI +0.031R (t 1.33) and Brent +0.047R (t 1.71) are positive in both
+  windows but not significant; picking them after this is not a test. Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
