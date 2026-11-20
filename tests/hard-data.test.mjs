@@ -68,7 +68,7 @@ test('collect: every source read through the injected fetch; a failing one keeps
   };
   const now = T('2026-11-20T10:00:00Z');
   const a = await H.collect({ now, fetchFn: fake() });
-  assert.deepEqual(Object.values(a.sources), ['ok', 'ok', 'ok', 'ok']);
+  assert.deepEqual(['nowcast', 'gdpnow', 'fed', 'odds'].map((k) => a.sources[k]), ['ok', 'ok', 'ok', 'ok']);
   assert.equal(a.odds.meeting, '2026-12-09'); assert.ok(a.odds.line);
   assert.equal(a.fed.events.length, 3);
   const b = await H.collect({ now: now + 3600, fetchFn: fake(['nowcast']), prev: a });
