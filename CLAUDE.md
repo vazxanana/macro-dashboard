@@ -4937,6 +4937,14 @@ whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hour
 `fills` (gold-vol-breakout-exec) = the first broker tick in a window where ask >= level (dir > 0) or bid <= level (dir < 0), queries from the same file's `fills` object. `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
 `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
 
+## The macro rule book's Donchian swing rule (20 Nov 2026, `research/edge/macro-donchian`, pre-registered)
+The rule book's execution layer (close beyond the 20-day channel with EMA20 / EMA50, stop 2 ATR, out after 5 days; "longs only,
+full size when the Gold Macro Score > +0.25"), on OANDA spot gold 2007-26 net of 0.0001 a round trip and long financing.
+**FAIL**: longs +0.082R a trade (n 170, month t 1.35; the book quoted +0.24R before costs on futures), no better than random
+longs in the same up-trend (placebo median +0.078R, 95th percentile +0.152R): it is gold's drift. Score > +0.25 wins more often
+(60 % vs 46 %) but the R a trade is the same (+0.083 vs +0.080, t 0.02). Shorts −0.005R. Nothing live changed. Test:
+`tests/macro-donchian.test.mjs`.
+
 ## Measured-cost studies of 20 Nov 2026 (tick probe)
 Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live changed. Results, each pre-registered before its data:
 - `gold-release-quotes`: gold's spread at T+5 s after US CPI / payrolls / FOMC is about 18× normal ($1.48 median), the widest
@@ -4951,6 +4959,15 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   21:00 UTC), 24 Nov 2023 - 12 Nov 2026: **PASS**, +0.184R a trade after commission, n 572, month t 3.54 (OANDA mid +0.192R before
   costs); entry slippage $0.07 median, 0.011R. In-sample years (not new evidence); the ten best trades carry 55 %, 2024 +0.07R.
   21:00 UTC is gold's daily break on US summer-time days: the probe's marks take `PROBE_MARKS_BACK` (workflow input `marks_back`).
+- `gold-vol-breakout-forward` (pre-registered 20 Nov 2026): T1's forward record on days from 13 Nov 2026 (after every candle
+  any study read), cost = hourcost's C1 frozen, against a month-block band from the 2021-26 C1 trades (`baseline.json`, gated
+  n 1121 / +0.105R / t 2.79). Readings: too few under 20, below the measured range (A p5), ahead of a no-edge rule (B p95);
+  checkpoints at 120 (fails / holds so far) and 240 trades (confirmed / fails / not shown); the first crossing stands.
+  `vb-forward.yml` (Tue-Sat 04:41 UTC) writes council-data `research/forward/gold-vol-breakout.json`. Nothing trades.
+- `gold-pre-holiday-forward` (pre-registered 20 Nov 2026): `gold-pre-holiday` T1's forward record on NYSE holidays after
+  31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
+  its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`
+  writes council-data `research/forward/gold-pre-holiday.json`. First event: Thanksgiving (25 Nov 2026). Nothing trades.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
