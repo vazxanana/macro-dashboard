@@ -5007,6 +5007,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   month-sum t −0.07), shorts above +0.25 not worse (t −0.88); sized the book's way +0.155R per unit of risk vs +0.140R flat, same
   month t and drawdown. T1 stays flat 1R. Local reruns of research fetch scripts need `MD_BASE=https://aureumdesk.co.uk/md/`
   (their default meridianx.dev answers 402 since the Vercel project went).
- the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
+- `nas-vol-breakout-early` (pre-registered 20 Nov 2026): T1 on NAS100 at the measured C1 cost on untouched 2010-2015 (OANDA M5).
+  **FAIL**: −0.011R a trade net (n 1,110, month t −0.28; gross +0.001R), 2013-15 −0.026R, 30 of 40 placebos beaten. The 2016-26
+  +0.043R does not replicate: the breakout is gold's, not an index rule. Do not test it on another index.
+- `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
