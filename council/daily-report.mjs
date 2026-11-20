@@ -77,7 +77,7 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
     lines.today.push(`Fed: ${clean(f.title, 100)}${f.time ? ` · ${clean(f.time, 20)} New York` : ''}${f.topic ? ` · ${clean(f.topic, 100)}` : ''}`);
   // the US Treasury's note and bond auctions of the New York day (hard-data.mjs `auctions`): supply the bond market has to absorb
   for (const a of ((((hd && hd.auctions) || {}).list) || []).filter((x) => x && x.day === today && x.type !== 'Bill').slice(0, 4))
-    lines.today.push(`${auctionText(a)} (results about 13:00 New York).`);
+    lines.today.push(`${auctionText(a)}${a.type === 'Note' || a.type === 'Bond' ? ' (results about 13:00 New York)' : ''}.`);   // FRN and TIPS auctions close at other times
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);
