@@ -17,7 +17,7 @@
     if (!s || s.v !== 1 || !s.acct || !Array.isArray(s.acct.positions)) return null;
     const a = s.acct; a.orders = Array.isArray(a.orders) ? a.orders : []; a.closed = Array.isArray(a.closed) ? a.closed : [];
     // a record without a stop on its losing side is dropped (never a trade without a stop)
-    const ok = (p) => p && p.mk && Number.isFinite(p.stop) && (p.side === 'buy' ? p.stop < (p.entry ?? p.price) || p.beMoved : p.stop > (p.entry ?? p.price) || p.beMoved);
+    const ok = (p) => p && p.mk && Number.isFinite(p.stop) && p.stop > 0 && (p.side === 'buy' ? p.stop < (p.entry ?? p.price) || p.beMoved : p.stop > (p.entry ?? p.price) || p.beMoved);
     a.positions = a.positions.filter((p) => ok(p) && p.r0 > 0); a.orders = a.orders.filter(ok);
     s.risk = RISKS.includes(+s.risk) ? +s.risk : 1; s.tgtR = [0, 1, 1.5, 2, 3].includes(+s.tgtR) ? +s.tgtR : 2; s.stopAtr = [0.5, 1, 1.5, 2].includes(+s.stopAtr) ? +s.stopAtr : 1; s.last = s.last || {};
     return s;
@@ -59,7 +59,8 @@
   function order(s, mk, o, now) {
     const px = +o.price, stop = o.stop === '' || o.stop == null ? NaN : +o.stop, tgt = o.target === '' || o.target == null ? null : +o.target, at = o.at === '' || o.at == null ? null : +o.at;
     if (!(px > 0)) throw new Error('No live price yet for this market.');
-    if (!Number.isFinite(stop)) throw new Error('Every trade needs a stop.');
+    if (!Number.isFinite(stop) || !(stop > 0)) throw new Error('Every trade needs a stop: a price above zero.');   // a stop at or under zero is no stop
+    if (at != null && !(at > 0)) throw new Error('Write the entry as a price above zero.');
     const entry = at != null ? at : px, dir = o.side === 'buy' ? 1 : -1;
     if ((stop - entry) * dir >= 0) throw new Error(`The stop must be ${dir === 1 ? 'below' : 'above'} the entry.`);
     if (tgt != null && (tgt - entry) * dir <= 0) throw new Error(`The target must be ${dir === 1 ? 'above' : 'below'} the entry.`);
@@ -70,10 +71,24 @@
     rec.mk = mk; rec.chk = Math.floor(now / 60) * 60; return rec;
   }
 
+  // a hand edit of an open position's stop: a real price (above zero) on the stop's side of the price now; without a price for the
+  // market nothing can be checked, so nothing is changed. Returns the words of the refusal, or null when the stop may be set.
+  function stopEdit(p, v, cur) {
+    if (v == null || !Number.isFinite(v) || !(v > 0)) return 'Every trade needs a stop: a price above zero.';
+    const dir = p.side === 'buy' ? 1 : -1;
+    if (!(cur > 0)) return 'No price for that market yet: the stop stays where it is.';
+    if ((v - cur) * dir >= 0) return `The stop must be ${dir === 1 ? 'below' : 'above'} the price now.`;
+    return null;
+  }
+  // which windows of one-minute candles a catch-up reads (20 Nov 2026): from `from` to `to` in steps of `step` seconds, at most
+  // `max` of them a pass (the candle proxy answers at most 5,000 candles a request and keeps the END of a longer window, so one
+  // long request skipped the start: a stop hit there was booked days later at another price)
+  function windows(from, to, step = 4000 * 60, max = 12) { const out = []; for (let a = from; a < to && out.length < max; a += step) out.push([a, Math.min(to, a + step)]); return out; }
+
   const stats = (s) => BT().stats(s.acct.closed, s.start);
   const floating = (s, pxOf) => r2(s.acct.positions.reduce((t, p) => { const px = pxOf(p.mk); return t + (px > 0 ? BT().pnl(p, px) : 0); }, 0));
 
-  const PP = { RISKS, START, fresh, norm, sizeText, process, order, stats, floating };
+  const PP = { RISKS, START, fresh, norm, sizeText, process, order, stats, floating, stopEdit, windows };
   if (typeof module !== 'undefined' && module.exports) { module.exports = PP; return; }
   root.MS_PAPER = PP;
 
@@ -97,26 +112,52 @@
   const livePx = () => { const b = H().m1(); return b.length ? b[b.length - 1].close : null; };
   const pxOf = (mk) => (mk === H().key ? livePx() : LAST[mk] ?? S.last[mk] ?? null);
 
+  // the oldest candle still to check for a market's open positions and resting orders (null = nothing open there)
+  const dueFrom = (mk) => { const a = S.acct.positions.concat(S.acct.orders).filter((p) => p.mk === mk).map((p) => p.chk); return a.length ? Math.min(...a) + 60 : null; };
+  // the page's one-minute pane reaches back about a day. A position left open for longer (the page was closed) has candles the
+  // pane does not hold: checking it on the pane alone booked a stop hit days ago at the first candle the pane has, as a gap, at
+  // another price (-2.6R for a -1R stop). Such a position waits for the catch-up, which reads the candles in between (20 Nov 2026).
+  const paneGap = () => { const b = H().m1(), from = dueFrom(H().key); return from != null && b.length > 0 && b[0].time - H().TZ > from; };
   function tick() {
     if (!S || !H()) return;
-    const ev = process(S.acct, H().key, m1(), now()); const px = livePx(); if (px > 0) S.last[H().key] = px;
+    const gap = paneGap(), ev = gap ? [] : process(S.acct, H().key, m1(), now()); const px = livePx(); if (px > 0) S.last[H().key] = px;
+    if (gap && !busy && Date.now() - tried > 15e3) catchUp();
     if (ev.length) { save(); say(ev); }
     try { marks(); } catch (e) {}
-    if (D) { D.price = px; if (D.follow) { setDraftDefaults(false); } }
+    // the draft follows the price only while the panel can show it: with a field or a select of the panel in hand the screen is
+    // not redrawn, and the order is placed with the numbers on the screen
+    if (D) { D.price = px; const ae = document.activeElement, held = $('ms-pp') && $('ms-pp').contains(ae) && /^(INPUT|SELECT)$/.test(ae.tagName); if (D.follow && !held) { setDraftDefaults(false); } }
+    if (chartsKey() !== CK) lines();
     draw();
   }
+  // Catch-up: another market's open positions, and this market's when the pane does not reach back to them. The candles are
+  // read window by window from the oldest one still to check (`windows`), each window through the engine in order; a window the
+  // candle service answered whole (`bars.whole`: an empty one too, a weekend) moves the check on to its end, a failed read
+  // stops the pass and the next one starts there again. Never a guess: no candle, no fill and no exit.
+  let tried = 0;
   async function catchUp() {
-    if (!S || !H() || busy) return; const others = [...new Set(S.acct.positions.concat(S.acct.orders).map((p) => p.mk))].filter((mk) => mk !== H().key && H().insts[mk]);
-    if (!others.length) return; busy = true;
-    try { for (const mk of others) { const from = Math.min(...S.acct.positions.concat(S.acct.orders).filter((p) => p.mk === mk).map((p) => p.chk)) + 60;
-      let bars = null; try { bars = await H().since(mk, from); } catch (e) { bars = null; }
-      if (Array.isArray(bars) && bars.length) { bars = bars.filter((b) => b.time >= from).sort((a, b) => a.time - b.time); LAST[mk] = bars[bars.length - 1].close; S.last[mk] = LAST[mk]; const ev = process(S.acct, mk, bars, now()); if (ev.length) say(ev); save(); } }
+    if (!S || !H() || busy) return; const own = H().key, mks = [...new Set(S.acct.positions.concat(S.acct.orders).map((p) => p.mk))].filter((mk) => H().insts[mk] && (mk !== own || paneGap()));
+    if (!mks.length) return; busy = true; tried = Date.now();
+    try { for (const mk of mks) { const from = dueFrom(mk); if (from == null) continue;
+      // this market: up to where the pane starts (the pane takes over there); another market: up to now
+      const pane0 = mk === own && H().m1().length ? H().m1()[0].time - H().TZ : null, to = pane0 != null ? pane0 : now();
+      for (const [a, z] of windows(from, to)) {
+        let bars = null; try { bars = await H().since(mk, a, z); } catch (e) { bars = null; }
+        if (!Array.isArray(bars)) break; const whole = !!bars.whole;
+        bars = bars.filter((b) => b.time >= a && (!whole || b.time < z)).sort((x, y) => x.time - y.time);
+        if (bars.length) { LAST[mk] = bars[bars.length - 1].close; S.last[mk] = LAST[mk]; const ev = process(S.acct, mk, bars, now()); if (ev.length) say(ev); }
+        if (!whole) {   // a source that cannot say it answered the whole window: one read a pass, as before; the pane takes over after it
+          if (pane0 != null) for (const p of S.acct.positions.concat(S.acct.orders)) if (p.mk === mk && p.chk < pane0 - 60) p.chk = pane0 - 60;
+          save(); break; }
+        const upto = Math.floor(Math.min(z, now() - 180) / 60) * 60 - 60;   // every candle that started before the window's end is done (the newest minutes are left to the next look)
+        for (const p of S.acct.positions.concat(S.acct.orders)) if (p.mk === mk && p.chk < upto) p.chk = upto;
+        save(); if (dueFrom(mk) == null) break; } }
     } finally { busy = false; draw(); }
   }
   function say(ev) {
     const t = ev.filter((e) => e.kind === 'close').map((e) => `${label(e.trade.mk)} ${e.trade.side} closed at ${fp(e.trade.exit, e.trade.mk)} (${e.trade.reason}): ${rTxt(e.trade.R)}, ${money(e.trade.net, true)}`)
       .concat(ev.filter((e) => e.kind === 'fill').map((e) => `${label(e.pos.mk)} ${e.pos.side} order filled at ${fp(e.pos.entry, e.pos.mk)}`));
-    if (t.length && $('ms-pp-live')) $('ms-pp-live').textContent = t.join(' · ');
+    if (t.length) msg(t.join(' · '));
   }
 
   // ---- the draft: Buy / Sell set up an order with its stop and target drawn on every chart of this market ----------------
@@ -126,7 +167,7 @@
     D.price = px;
     if (all || D.follow) { D.stop = +(e - dir * a * S.stopAtr).toFixed(dec(H().key)); D.target = S.tgtR ? +(e + dir * Math.abs(e - D.stop) * S.tgtR).toFixed(dec(H().key)) : null; }
   }
-  function draft(side) { if (!(livePx() > 0)) { msg('No live price yet: wait for the chart to load.'); return; } D = { side, at: null, follow: true }; setDraftDefaults(true); open(true); draw(); }
+  function draft(side) { if (!(livePx() > 0)) { msg('No live price yet: wait for the chart to load.'); return; } D = { side, at: null, follow: true, touched: false }; setDraftDefaults(true); open(true); draw(true); }
   function place() {
     if (!D) return;
     try { const r = order(S, H().key, { side: D.side, price: livePx(), stop: D.stop, target: D.target, at: D.at }, now()); save(); D = null;
@@ -134,11 +175,18 @@
     } catch (e) { msg(e.message, true); }
     draw();
   }
-  function msg(t, bad) { const el = $('ms-pp-live'); if (el) { el.textContent = t; el.classList.toggle('bad', !!bad); } }
+  // the panel's one line of news ("opened at …", "closed at …: +1.20R", a refusal). It is kept here and drawn with the panel: the
+  // panel is rebuilt after every order and close, which wiped the line the moment it was written (20 Nov 2026)
+  let LIVE = { t: '', bad: false };
+  function msg(t, bad) { LIVE = { t: String(t ?? ''), bad: !!bad }; const el = $('ms-pp-live'); if (el) { el.textContent = LIVE.t; el.classList.toggle('bad', LIVE.bad); } }
 
   // ---- lines on the charts of this market ------------------------------------------------------------------------------
+  // which charts show this market now: a chart made later (one chart on any timeframe, Split's right chart, Markets side by
+  // side) or one whose market changed gets or loses the lines on the next look (20 Nov 2026)
+  let CK = '';
+  const chartsKey = () => (root.msCharts ? root.msCharts.list.map((c) => c.id + ':' + c.market()).join('|') : '');
   function lines() {
-    for (const l of LINES) { try { l.s.removePriceLine(l.l); } catch (e) {} } LINES = [];
+    for (const l of LINES) { try { l.s.removePriceLine(l.l); } catch (e) {} } LINES = []; CK = chartsKey();
     const L = root.msCharts ? root.msCharts.list.filter((c) => c.market() === H().key) : [], cs = getComputedStyle(document.documentElement);
     const col = (n, d) => cs.getPropertyValue(n).trim() || d, up = col('--buy', '#2fbf8f'), dn = col('--sell', '#f2576f'), ink = col('--au-ink-2', '#9aa0a6');
     const add = (price, color, title, style) => { if (!Number.isFinite(price)) return; for (const c of L) { try { LINES.push({ s: c.series, l: c.series.createPriceLine({ price, color, lineWidth: 1, lineStyle: style, axisLabelVisible: true, title }) }); } catch (e) {} } };
@@ -148,14 +196,20 @@
   }
 
   // ---- the panel -------------------------------------------------------------------------------------------------------
-  let sig = '';
-  function draw() {
+  // Three rules of the redraw (20 Nov 2026). (1) A press in progress is never redrawn under: the panel is rebuilt as HTML, so a
+  // rebuild between the press and its release replaced the button and the click was lost (type a stop, click Place: nothing).
+  // (2) A change the member just made is always shown (`force`), also while a field or a select has the focus: the order is
+  // placed from the draft, so the screen must never show another stop than the draft holds. (3) The focus stays where it was.
+  let sig = '', pressing = 0, pend = false;   // pressing = when the press began (a press never ended, 4 s on, no longer counts)
+  function draw(force) {
     const el = $('ms-pp'); if (!el || !S) return;
+    if (pressing && Date.now() - pressing < 4000) { pend = true; return; }
     const st = stats(S), fl = floating(S, pxOf), eq = r2(S.acct.balance + fl), mk = H().key, px = livePx();
     const k = JSON.stringify([S.acct.balance, S.acct.positions.map((p) => [p.id, p.stop, p.target, p.units]), S.acct.orders.map((o) => o.id), S.acct.closed.length, D && [D.side, D.stop, D.target, D.at], S.risk, S.tgtR, S.stopAtr, el.dataset.open]);
     const eqEl = $('ms-pp-eq'); if (eqEl) eqEl.textContent = money(eq);
-    const typing = el.contains(document.activeElement) && /^(INPUT|SELECT)$/.test(document.activeElement.tagName);
-    if (k === sig || typing) { live(fl, eq); return; } sig = k;
+    const ae = document.activeElement, typing = el.contains(ae) && /^(INPUT|SELECT)$/.test(ae.tagName);
+    if (k === sig || (typing && !force)) { live(fl, eq); return; } sig = k;
+    const keep = typing ? (ae.id ? '#' + ae.id : ae.dataset.ed ? `.pp-ed[data-ed="${ae.dataset.ed}"][data-id="${ae.dataset.id}"]` : null) : null;
     const pct = (eq - S.start) / S.start * 100, risk$ = S.acct.balance * S.risk / 100;
     const dRow = D ? (() => { const e = D.at != null ? D.at : px, dist = Math.abs(e - D.stop), rr = D.target != null && dist > 0 ? Math.abs(D.target - e) / dist : null, u = dist > 0 ? risk$ / dist : 0;
       return `<div class="pp-draft ${D.side}" role="group" aria-label="Order being set up">
@@ -182,7 +236,7 @@
       <label>Stop <select id="pp-satr">${[0.5, 1, 1.5, 2].map((r) => `<option value="${r}"${r === S.stopAtr ? ' selected' : ''}>${r} ATR</option>`).join('')}</select></label>
       <label>Target <select id="pp-tgt">${[0, 1, 1.5, 2, 3].map((r) => `<option value="${r}"${r === S.tgtR ? ' selected' : ''}>${r ? r + 'R' : 'none'}</option>`).join('')}</select></label></div>
       <button type="button" class="pp-tog" id="pp-tog" aria-expanded="${el.dataset.open === '1'}" aria-controls="pp-body">${el.dataset.open === '1' ? 'Hide' : 'Stats and history'}</button></div>
-      ${dRow}<p class="pp-live" id="ms-pp-live" role="status" aria-live="polite"></p>
+      ${dRow}<p class="pp-live${LIVE.bad ? ' bad' : ''}" id="ms-pp-live" role="status" aria-live="polite">${esc(LIVE.t)}</p>
       ${rows ? `<div class="pp-tw"><table class="pp-tbl"><thead><tr><th>Open</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th class="n">Size</th><th class="n">P&amp;L</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>` : ''}
       <div class="pp-body" id="pp-body"${el.dataset.open === '1' ? '' : ' hidden'}>
         <div class="pp-tiles">${tile('Balance', money(S.acct.balance))}${tile('Net P&amp;L', money(st.net, true), st.net > 0 ? 'up' : st.net < 0 ? 'dn' : '')}${tile('Trades', st.n)}${tile('Win rate', st.winRate == null ? '—' : Math.round(st.winRate * 100) + '%')}
@@ -192,6 +246,7 @@
         ${hist ? `<div class="pp-tw"><table class="pp-tbl"><thead><tr><th>Closed</th><th>Market</th><th class="n">Entry → exit</th><th>Exit</th><th class="n">R</th><th class="n">Net</th></tr></thead><tbody>${hist}</tbody></table></div>${T.length > 50 ? `<p class="pp-few">The latest 50 of ${T.length} trades.</p>` : ''}` : '<p class="pp-few">No closed trades yet. Press Buy or Sell: the stop and target are set for you, and you can change them before you place the order.</p>'}
         <div class="pp-foot"><button type="button" class="pp-q" id="pp-csv"${T.length ? '' : ' disabled'}>Download CSV</button><button type="button" class="pp-q" id="pp-reset">Reset account</button><small>Started ${esc(new Date(S.made * 1000).toLocaleDateString())} with ${money(S.start)}. Positions are checked on each closed 1-minute candle.</small></div>
       </div>`;
+    if (keep) { const f = el.querySelector(keep); if (f) { try { f.focus({ preventScroll: true }); if (f.tagName === 'INPUT') f.select(); } catch (e) {} } }
     lines(); live(fl, eq); home();
   }
   function live(fl, eq) {
@@ -251,19 +306,19 @@
   }
   function onChange(e) {
     const t = e.target; if (!S) return;
-    if (t.id === 'pp-risk') { S.risk = +t.value; save(); draw(); return; } if (t.id === 'pp-tgt') { S.tgtR = +t.value; if (D) { D.follow = true; setDraftDefaults(true); } save(); draw(); return; }
-    if (t.id === 'pp-satr') { S.stopAtr = +t.value; if (D) { D.follow = true; setDraftDefaults(true); } save(); draw(); return; }
+    if (t.id === 'pp-risk') { S.risk = +t.value; save(); draw(true); return; } if (t.id === 'pp-tgt') { S.tgtR = +t.value; if (D) { D.follow = true; D.touched = false; setDraftDefaults(true); } save(); draw(true); return; }
+    if (t.id === 'pp-satr') { S.stopAtr = +t.value; if (D) { D.follow = true; D.touched = false; setDraftDefaults(true); } save(); draw(true); return; }
     if (D && ['pp-at', 'pp-sl', 'pp-tp'].includes(t.id)) { const v = t.value.trim() === '' ? null : +t.value; if (v != null && !Number.isFinite(v)) { msg('Write a price as a number.', true); return; }
-      if (t.id === 'pp-sl') { if (v == null) { msg('Every trade needs a stop.', true); t.value = D.stop; return; } D.stop = v; D.follow = false; } else if (t.id === 'pp-tp') { D.target = v; D.follow = false; } else { D.at = v; if (D.follow) setDraftDefaults(true); }
-      draw(); return; }
+      if (t.id === 'pp-sl') { if (v == null || !(v > 0)) { msg('Every trade needs a stop: a price above zero.', true); t.value = D.stop; return; } D.stop = v; D.follow = false; D.touched = true; } else if (t.id === 'pp-tp') { D.target = v; D.follow = false; D.touched = true; } else { D.at = v; if (!D.touched) setDraftDefaults(true); }
+      draw(true); return; }
     if (t.classList.contains('pp-ed')) { const p = S.acct.positions.find((x) => x.id === +t.dataset.id); if (!p) return; const v = t.value.trim() === '' ? null : +t.value, dir = p.side === 'buy' ? 1 : -1, cur = pxOf(p.mk);
-      if (t.dataset.ed === 'stop') { if (v == null || !Number.isFinite(v)) { msg('Every trade needs a stop.', true); t.value = p.stop; return; } if (cur > 0 && (v - cur) * dir >= 0) { msg(`The stop must be ${dir === 1 ? 'below' : 'above'} the price now.`, true); t.value = p.stop; return; } p.stop = v; if ((v - p.entry) * dir >= 0) p.beMoved = true; }
+      if (t.dataset.ed === 'stop') { const why = stopEdit(p, v, cur); if (why) { msg(why, true); t.value = p.stop; return; } p.stop = v; if ((v - p.entry) * dir >= 0) p.beMoved = true; }
       else { if (v != null && (!Number.isFinite(v) || (cur > 0 && (v - cur) * dir <= 0))) { msg(`The target must be ${dir === 1 ? 'above' : 'below'} the price now.`, true); t.value = p.target ?? ''; return; } p.target = v; }
-      save(); draw(); }
+      save(); draw(true); }
   }
   function onKey(e) { if (e.key === 'Enter' && D && e.target.closest && e.target.closest('.pp-draft')) { e.target.blur(); setTimeout(place, 0); } else if (e.key === 'Escape' && D) { D = null; draw(); } }
   function csv() {
-    const T = BT().trades(S.acct.closed), q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const T = BT().trades(S.acct.closed), q = (v) => `"${String(typeof v === 'number' && Number.isFinite(v) ? +v.toFixed(8) : v ?? '').replace(/"/g, '""')}"`;   // 3549.72, not 3549.7200000000003
     const rows = [['opened', 'closed', 'market', 'side', 'entry', 'stop', 'target', 'exit', 'reason', 'R', 'net']].concat(T.map((t) => [new Date(t.openedAt * 1000).toISOString(), new Date(t.closedAt * 1000).toISOString(), label(t.mk), t.side, t.entry, t.r0 != null ? (t.side === 'buy' ? t.entry - t.r0 : t.entry + t.r0) : '', t.target ?? '', t.exit, t.reason, t.R, t.net]));
     const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.map((r) => r.map(q).join(',')).join('\n')], { type: 'text/csv' })); a.download = 'paper-trades.csv'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   }
@@ -271,6 +326,12 @@
     if (!H() || !$('ms-pp') || document.documentElement.dataset.role === 'public') return; load();
     const el = $('ms-pp'); try { el.dataset.open = localStorage.getItem('ms-pp-open') || ''; } catch (e) {} el.hidden = false;
     el.addEventListener('click', onClick); el.addEventListener('change', onChange); el.addEventListener('keydown', onKey);
+    // a draft field in hand keeps its numbers: the stop and target stop following the price while the member reads or types them
+    el.addEventListener('focusin', (e) => { if (D && e.target.closest && e.target.closest('.pp-draft') && e.target.tagName === 'INPUT') D.follow = false; });
+    // no redraw between a press and its release (the click would be lost); what waited is drawn right after the click
+    el.addEventListener('pointerdown', () => { pressing = Date.now(); }, true);
+    const release = () => { if (!pressing) return; setTimeout(() => { pressing = 0; if (pend) { pend = false; sig = ''; draw(true); } }, 0); };
+    root.addEventListener('pointerup', release, true); root.addEventListener('pointercancel', release, true); root.addEventListener('blur', release);
     const b = $('ms-pp-btn'); if (b) { b.hidden = false; b.addEventListener('click', () => { open(true); }); }
     let raf = 0; const again = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { try { marks(); } catch (e) {} }); };
     const hook = (c) => { try { c.chart.timeScale().subscribeVisibleLogicalRangeChange(again); } catch (e) {} }; (root.msCharts ? root.msCharts.list : []).forEach(hook); document.addEventListener('ms:chart', (e) => hook(e.detail)); root.addEventListener('resize', again);
@@ -279,7 +340,7 @@
     // a paper order from the chart's right-click menu (19 Nov 2026): the draft opens with its entry at the price clicked; the
     // engine decides limit or stop from the side of the price, and the stop and target are set as for any draft (a stop always)
     root.msPaperDraftAt = (side, price) => { if (document.documentElement.dataset.role === 'public' || !on() || !H() || !(price > 0) || !['buy', 'sell'].includes(side)) return false;
-      draft(side); if (!D) return false; D.at = +(+price).toFixed(dec(H().key)); D.follow = true; setDraftDefaults(true); draw(); return true; };
+      draft(side); if (!D) return false; D.at = +(+price).toFixed(dec(H().key)); D.follow = true; setDraftDefaults(true); draw(true); return true; };
     root.msPaperMarket = () => (H() && on() && document.documentElement.dataset.role !== 'public' ? H().key : null);
     document.addEventListener('ms:paper', () => { try { marks(); home(); } catch (e) {} });
     root.msPaper = () => ({ balance: S.acct.balance, positions: S.acct.positions.map((p) => ({ id: p.id, mk: p.mk, side: p.side, entry: p.entry, stop: p.stop, target: p.target })), orders: S.acct.orders.length, closed: S.acct.closed.length, lines: LINES.length, draft: D && { ...D }, marks: (root.msCharts ? root.msCharts.list : []).filter((c) => c.ppc && c.visible()).length });
