@@ -5140,6 +5140,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   (OANDA daily, 1,012 weeks 2007-26). **FAIL, 0 of 4**: AUD/JPY up first finds nothing (t −0.05 / 0.32); AUD/JPY down while the
   index rose was followed by weaker indices (t −2.12 / −2.26, same sign in both halves) but Holm p 0.10: a near miss on data now
   read. Nothing live changed.
+- `vix-curve` (pre-registered 20 Nov 2026): an inverted VIX curve (VIX above VIX3M, FRED, 91 weeks in 43 episodes 2008-26) and
+  the next 20 sessions. **FAIL, 0 of 2**: USD/JPY −0.20 % vs +0.18 % on other weeks (t −0.79), gold +0.47 % vs +0.57 % (t −0.10).
+  Acute stress says nothing tradable about the desk's two markets a month on. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
