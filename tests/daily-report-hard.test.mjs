@@ -41,3 +41,11 @@ test('what we expect: how the odds moved over the week (hard-data hist), never m
   const exp = w.sections.find((s) => s.h === 'What we expect').lines;
   assert.ok(exp.some((l) => /^Kalshi odds of .*: 92% now, 90% a day ago, 85% a week ago\. What traders pay, not a forecast of ours\.$/.test(l)), exp.join('\n'));
 });
+
+test('today: the Treasury note and bond auctions of the New York day, never a bill', () => {
+  const now = T('2026-11-23T06:30:00Z');
+  const w = DR.worldReport({ fc: {}, vet: null, cal: [], now, hd: { auctions: { list: [{ day: '2026-11-23', term: '2-Year', type: 'Note', amount: 69 }, { day: '2026-11-23', term: '13-Week', type: 'Bill', amount: 95 }, { day: '2026-11-24', term: '5-Year', type: 'Note', amount: 70 }] } } });
+  const today = w.sections.find((s) => /^Today/.test(s.h)).lines;
+  assert.ok(today.includes('US Treasury 2-Year Note auction, $69 billion (results about 13:00 New York).'), today.join('\n'));
+  assert.ok(!today.some((l) => /13-Week|5-Year/.test(l)));
+});

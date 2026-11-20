@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { writeAtomic } from './jsonio.mjs';
 import { typeOf, nowcastFor } from './week-ahead.mjs';
-import { moves } from './hard-data.mjs';
+import { moves, auctionText } from './hard-data.mjs';
 import { nyParts } from '../ict/calendar.mjs';
 const nyDay = (t) => nyParts(t).ymd;
 
@@ -75,6 +75,9 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
   }
   for (const f of (((hd && hd.fed) || {}).events || []).filter((x) => x && x.day === nyDay(now)).slice(0, 4))
     lines.today.push(`Fed: ${clean(f.title, 100)}${f.time ? ` · ${clean(f.time, 20)} New York` : ''}${f.topic ? ` · ${clean(f.topic, 100)}` : ''}`);
+  // the US Treasury's note and bond auctions of the New York day (hard-data.mjs `auctions`): supply the bond market has to absorb
+  for (const a of ((((hd && hd.auctions) || {}).list) || []).filter((x) => x && x.day === nyDay(now) && x.type !== 'Bill').slice(0, 4))
+    lines.today.push(`${auctionText(a)} (results about 13:00 New York).`);
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);
