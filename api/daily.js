@@ -10,8 +10,14 @@
 //        (3) the email to the owner (OWNER_EMAIL, else GMAIL_USER) and every stored member with an email and macro on, through
 //            the sign-up senders (api/signup.js mailer); DAILY_EMAIL=off stops it. Addresses are never logged or returned.
 //   GET /api/daily?brief=1       a signed-in account with macro on: the latest AI summary (for the Macro desk) or { brief: null }
-//   GET /api/daily?test=email[&to=address]   the OWNER's session only: sends the latest report now, marked "Test", to `to` (else
-//        the owner's address); at most 5 in 10 minutes. Nothing is marked as sent.
+//   GET /api/daily?test=email[&to=address][&fresh=1]   the OWNER's session only: sends the latest report now, marked "Test", to `to`
+//        (else the owner's address); at most 5 in 10 minutes. Nothing is marked as sent. `fresh=1` writes the day's summary again
+//        first (one more model call, inside the same budgets; used when the summary's instructions change).
+//   GET /api/daily?send=all&day=<YYYY-MM-DD>[&fresh=1]   the OWNER's session only (owner, 20 Nov 2026: "send to the registered
+//        email users"): sends the latest report, not marked "Test", to the same list as the 06:30 email (the owner and every stored
+//        member with an email and macro on). `day` must be that report's day; at most once a day (`state.resent`, marked before
+//        sending); refused when the browser says the request came from another site (`Sec-Fetch-Site: cross-site`), so a link on
+//        another page cannot send it. Answers counts only, never an address.
 const S = require('./_session.js');
 const G = require('./_guard.js');
 const A = require('./_accounts.js');
@@ -41,8 +47,8 @@ async function latest(env, d) {
   const r = j && Array.isArray(j.reports) && j.reports[0]; return r && r.world && r.markets && r.publishAt ? r : null;
 }
 // the AI summary for a report: stored once per day (a refused billed answer too, so it is never paid twice)
-async function brief(rep, env, store, d) {
-  const K = `brief-${rep.day}.json`, have = await store.get(K, null); if (have) return have;
+async function brief(rep, env, store, d, fresh = false) {
+  const K = `brief-${rep.day}.json`, have = await store.get(K, null); if (have && !fresh) return have;
   const C = LLM.config(llmEnv(env)); if (LLM.unavailable(C) || off(env.DAILY_AI)) return null;
   const q = D.briefRequest(rep);
   const ans = LLM.cutAtCap(await (d.complete || LLM.complete)({ system: q.system, prompt: q.prompt, cap: 'feature', maxTokens: LLM.featureCap(env.DAILY_LLM_MAX_TOKENS, MAX_OUT), long: true }, { env: llmEnv(env), store, now: d.now }), 'DAILY_LLM_MAX_TOKENS');
@@ -50,6 +56,7 @@ async function brief(rep, env, store, d) {
   if (!billed && (!ans || !ans.available || ans.skipped || ans.error)) return null;   // a budget skip or an unbilled error: tried again next run
   const p = billed ? { ok: false, why: String(ans.error).slice(0, 120) } : D.parseBrief(ans.text, rep);
   const doc = { day: rep.day, at: new Date(d.now ? d.now() : Date.now()).toISOString(), costUsd: ans.costUsd || 0, ...(p.ok ? { brief: p.brief } : { refused: p.why }) };
+  if (fresh && have && have.brief && !doc.brief) return have;   // a refused rewrite never replaces a good summary
   await store.put(K, doc); return doc;
 }
 async function send(rep, br, to, env, d, o = {}) {
@@ -99,10 +106,26 @@ async function handle(req, res, d = {}) {
     const to = q.to ? D.mail(q.to) : D.mail(env.OWNER_EMAIL || env.GMAIL_USER); if (!to) return res.status(400).json({ error: q.to ? 'not an email address' : 'no owner address: pass ?to=' });
     const rep = await latest(env, d).catch(() => null); if (!rep) return res.status(404).json({ error: 'no report yet: the first one is built from 06:00 London' });
     TESTS.push(now);
-    const br = await store.get(`brief-${rep.day}.json`, null).catch(() => null);
+    const br = q.fresh ? await brief(rep, env, store, d, true).catch(() => null) : await store.get(`brief-${rep.day}.json`, null).catch(() => null);
     const r = await send(rep, br, [to], env, d, { test: true });
     const err = r.ok ? null : (require('./signup.js').lastMailError() || null);
     return res.status(r.ok ? 200 : 502).json({ sent: r.ok === 1, day: rep.day, ai: !!(br && br.brief), ...(r.why ? { why: r.why } : {}), ...(err ? { tries: err.tries } : {}) });
+  }
+  if (q.send === 'all') {
+    if (acct.u !== 'owner') return res.status(403).json({ error: 'owner only' });
+    const site = String((req.headers && req.headers['sec-fetch-site']) || '').toLowerCase();
+    if (site === 'cross-site' || site === 'same-site') return res.status(403).json({ error: 'open this address yourself, not from a link on another site' });
+    const rep = await latest(env, d).catch(() => null); if (!rep) return res.status(404).json({ error: 'no report yet' });
+    if (q.day !== rep.day) return res.status(400).json({ error: `add &day=${rep.day} to confirm which report to send` });
+    const state = (await store.get('state.json', null)) || {};
+    if (state.resent === rep.day) return res.status(409).json({ error: 'already sent to everyone today', day: rep.day });
+    await store.put('state.json', { ...state, resent: rep.day, resentAt: new Date(now).toISOString() });   // marked first: never twice
+    const br = q.fresh ? await brief(rep, env, store, d, true).catch(() => null) : await store.get(`brief-${rep.day}.json`, null).catch(() => null);
+    const users = await A.userList(S.defaultDeps(env)).catch(() => ({}));
+    const to = D.recipients(d.users || users, env.OWNER_EMAIL || env.GMAIL_USER);
+    const r = await send(rep, br, to, env, d);
+    await store.put('state.json', { ...state, resent: rep.day, resentAt: new Date(now).toISOString(), resentOk: r.ok, resentFailed: r.failed });
+    return res.status(r.ok || !to.length ? 200 : 502).json({ day: rep.day, recipients: to.length, sent: r.ok, failed: r.failed, summary: !!(br && br.brief), ...(r.why ? { why: r.why } : {}) });
   }
   return res.status(400).json({ error: 'nothing asked' });
 }
