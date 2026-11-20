@@ -4926,7 +4926,10 @@ VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `O
 `ICT_MD_BARS` to it only once it answers, else the website's proxy as before. Needs the owner to add `OANDA_TOKEN` (and
 `OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
 `scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
-(a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
+(a test pins it). **20 Nov 2026**: `backtest.yml` (council's 30-day replay) and `macro-gold.yml` checked out only part of the
+repository without `scripts/` and `api/`, so `sh scripts/own-candles.sh` failed and the daily replay had not run since 19 Nov
+(data health: "Daily replay … not updated for 44 h"); both now check out `scripts`, `council` and `api`
+(`tests/own-candles-checkout.test.mjs`): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
 
 ## Tick probe: the demo broker's own bid / ask history (20 Nov 2026, for the cost questions)
 `council/tick-probe.mjs` + `.github/workflows/tick-probe.yml` (dispatch only, input `symbols`, default XAUUSD): reads the DEMO
