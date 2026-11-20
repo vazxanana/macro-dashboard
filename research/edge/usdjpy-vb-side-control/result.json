@@ -1,0 +1,33 @@
+{
+ "study": "usdjpy-vb-side-control",
+ "built": "2026-11-20",
+ "verdict": "INVALID (look-ahead in the pre-registered control; see RESULT.md), computed FAIL: USD/JPY T1 +0.071R a trade vs same-day, same-side random entries +0.359R (n 4168; paired difference −0.288R, month t −23.23; beats 0 of 40); fails: beat, t2, halves",
+ "n": 4168,
+ "realMean": 0.071,
+ "controlMean": 0.359,
+ "beaten": 0,
+ "diffMean": -0.288,
+ "monthT": -23.229,
+ "halves": {
+  "early": -0.28,
+  "late": -0.296
+ },
+ "bySide": {
+  "buy": {
+   "n": 1998,
+   "real": 0.148,
+   "diff": -0.288
+  },
+  "sell": {
+   "n": 2170,
+   "real": 0.001,
+   "diff": -0.287
+  }
+ },
+ "checks": {
+  "beat": false,
+  "t2": false,
+  "halves": false
+ },
+ "pass": false
+}

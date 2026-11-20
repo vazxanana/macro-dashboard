@@ -1290,6 +1290,10 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   - the five yen crosses pooled: FAIL (`yen-crosses-vol-breakout`, +0.021R, t 1.64): it is USD/JPY's, not the yen's;
   - **at the demo broker's own ticks, Nov 2023 - Nov 2026: +0.148R a trade after commission (n 564, month t 3.11)**
     (`usdjpy-vol-breakout-exec`); real fills cost about 0.01R a trade.
+- **20 Nov 2026, later: the buy-side question tested.** `usdjpy-vb-side-control-v2` (pre-registered; a first design, v1, had
+  look-ahead and is recorded as INVALID): the rule's buys made +0.148R a trade against +0.026R for going long at a random time on
+  every day (40 of 40 seeds, both 2005-15 and 2016 on); its sells +0.001R against −0.056R for a random short. So the breakout
+  entry adds about 0.06-0.12R a trade beyond USD/JPY's drift; the drift explains only part of the buy / sell gap.
 - **Why it is still your decision.** The ten best trades carry 75 % of the last three years, and almost all of the gain is on the
   buy side (2005-26: buys +0.148R a trade, sells +0.001R), so part of it may be USD/JPY's long rise and carry rather than the
   breakout. One market of eleven passing is the kind of result that needs new data.
