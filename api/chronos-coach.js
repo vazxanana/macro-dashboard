@@ -69,7 +69,10 @@ function count(u, ms) { const k = `${u}|${dayOf(ms)}`; CALLS.set(k, (CALLS.get(k
 
 // a provider that refused the request itself (a 4xx other than a rate limit: an unknown model id, a body field it does not take)
 // is said in words, so a wrong CHRONOS_LLM_MODEL or CHRONOS_LLM_BODY can be put right
-function errText(ans) {
+// 20 Nov 2026 review: the provider's own words and the variable names are for the owner, who can act on them; any other member
+// gets the plain sentence (every signed-in account may ask the coach, and a provider's refusal can name the model or the account).
+function errText(ans, owner) {
+  if (!owner) return ans.partial != null ? 'The answer broke off. Try again in a minute.' : 'The coach could not be reached. Try again in a minute.';
   if (ans.status === 401 || ans.status === 403) return `The provider did not accept the key (${ans.status}). Check ACADEMY_LLM_KEY (a token with access to the model) and the account in ACADEMY_LLM_URL.`;
   if (ans.status >= 400 && ans.status < 500 && ans.status !== 408 && ans.status !== 429) return `The provider refused the request (${ans.status}${ans.errorType ? ` ${ans.errorType}` : ''})${ans.detail ? `: ${ans.detail}` : ''}. Check CHRONOS_LLM_MODEL and CHRONOS_LLM_BODY.`;
   return ans.partial != null ? 'The answer broke off. Try again in a minute.' : 'The coach could not be reached. Try again in a minute.';
@@ -145,9 +148,9 @@ async function finish(ans, { q, live, h, acct, file, store, nowMs, ms }) {
   if (ans.skipped === 'budget') { const w = ans.scope === 'day' || ans.scope === 'calls' ? 'daily' : ans.scope === 'month' ? 'monthly' : 'total'; return { state: 'budget', scope: ans.scope, message: live ? `Coach resting: ${w} budget reached.` : `The coach's ${w} budget is used up.` }; }
   if (ans.skipped) return { state: 'error', message: ans.skipped === 'too-long' ? 'Too much to send in one question.' : 'Nothing to ask.' };
   const billed = !!(ans.error && (ans.usage || ans.costEstimated || ans.costUsd > 0));
-  if (ans.error && !billed) return { state: 'error', message: errText(ans), ms };
+  if (ans.error && !billed) return { state: 'error', message: errText(ans, acct.u === 'owner'), ms };
   if (ans.error && ans.partial != null && !ans.cut) {   // broke off in the middle: may be billed, not an answer; asked again it is a new call
-    return { state: 'error', withdrawn: live, message: errText(ans), ms };
+    return { state: 'error', withdrawn: live, message: errText(ans, acct.u === 'owner'), ms };
   }
   const p = billed ? { ok: false, why: [String(ans.error).slice(0, 160)] } : live ? M.parseLive(ans.text) : q.kind === 'debrief' ? M.parseDebrief(ans.text) : M.parseAnswer(ans.text);
   const lastMs = { first: ms.first, total: ms.total, kind: q.kind, at: new Date(nowMs).toISOString(), cached: !!ans.cached };

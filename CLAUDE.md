@@ -65,7 +65,7 @@ review. `watchdog.yml` pages when the loop stops.
 
 **Sections below, by topic** (each is dated; later sections win where two disagree):
 - Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
-  Server-side sign-in, API hardening, Profile photo and name on the server.
+  Server-side sign-in, API hardening, API review (20 Nov), Profile photo and name on the server.
 - The Desk page: Simplified pages (17 Nov: what was removed and folded), Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
@@ -3175,6 +3175,66 @@ up to a minute; a read with `?cache=0` asks the origin. Every reader / writer un
   (2.8.2) has a conditional write (`put(…, { ifMatch: <listed etag> })`); it is not used because it could not be tried against
   the real service from the build sandbox and a wrong ETag form would refuse every save. Try it on a preview deployment first.
 - Not verified against the real Blob service: that `cache=0` reads are read-your-writes, and that the listing is.
+
+## API review (20 Nov 2026)
+A correctness and security review of the server functions written or changed 17-20 Nov: `api/signup.js`, `_smtp.js`, `passkey.js`,
+`_passkey.js`, `daily.js`, `_daily.js`, `_seen.js` (+ its calls in `me.js`, `login.js`, `users.js`), `battle.js`, `_battle.js`,
+`cloudflare/src/battle-room.mjs`, `lse.js`, `_watchdog-kick.js`, `_gotobi-kick.js`, `chronos-coach.js`, `_chronos-coach.js`,
+`trade-review.js` and the Worker's routing. Each defect has a test in `tests/api-review-20nov.test.mjs` that failed before its fix.
+No trading rule, stop, demo lock, council or ICT file, page or secret was touched.
+- **1. Daily email, members skipped for the day (medium).** The 06:30 job (and the owner's `send=all`) marked the day as sent and
+  THEN read the member list with `.catch(() => ({}))`: one unreadable read sent the email to the owner alone and no member got it
+  that day (`send=all` also used up its one send). Now `membersOf` is read first; unreadable = nothing sent, nothing marked, the
+  job tries again at its next run (`email.why`), `send=all` answers 503. Test hook `d.userList`. Known cost: a list unreadable for
+  the whole 3-hour window means no 06:30 email at all, the owner's included (sign-in is down then too).
+- **2. Daily email, `?test=email&to=` from another site (low-medium).** An owner-only GET that sends mail had no cross-site check
+  (`send=all` had one): a link on another page, opened by the signed-in owner, emailed the report to an address the link named
+  (5 in 10 minutes) and with `fresh=1` paid for a model call. Both now share `fromElsewhere` (`Sec-Fetch-Site` cross-site /
+  same-site refused; typed, same-origin or no header pass).
+- **3. Daily email, `state.json` written from an old copy (low).** The job and `send=all` each wrote their end state from the copy
+  they read at the start; an owner's `send=all` that ended after the job's run put `mailed` back to yesterday and the next run
+  sent the 06:30 email again. Every write now joins its fields onto the file as it stands (`mark`).
+- **4. Password reset, known addresses told apart (low-medium).** `forgot` answered the same words, but only after storing and
+  mailing the link for a known address (hundreds of ms to seconds), and a failing reset store was a 500 for a known address
+  only. The answer now leaves first; the link is stored and mailed after it (the Worker's adapter keeps the handler running under
+  `waitUntil`), and a failure of that work is logged, never answered. Keep it so: nothing slow before `res.json` in that branch.
+  A host that freezes a function at its answer would lose the email: the Worker is the only host.
+- **5. Emailed links built from a header the client types (low).** `originOf` reads `X-Forwarded-Host` first (Vercel set it
+  itself); on the Worker it was the caller's own header, so a forgot / sign-up request could have the member's link point at
+  `localhost` or the old workers.dev host (a dead link, repeatable every 10 minutes per address; never another site, the host
+  list holds). `cloudflare/src/adapter.mjs` `headersOf` now drops the header like the forwarded-for ones.
+- **6. Sign-up, the mail provider's error shown to a visitor (low).** A failed confirmation email answered 502 with `why` = the
+  provider's own error text and the shapes tried. The answer is the sentence alone; the reason is logged (addresses redacted)
+  and the owner sees the tries through `/api/daily?test=email`.
+- **7. The coach, provider detail to every member (low).** `errText` gave any signed-in account the provider's refusal text
+  (it can name the model or the account) and the variable names to check. Only the owner gets that now; members get "could not
+  be reached".
+- **8. Names inherited from Object (low).** `/api/constructor` ran `Object(req, res)` as a handler (500 "ended without an
+  answer") and `/api/lse?op=constructor` threw inside `target` (500): both lists are read with `Object.hasOwn` (404, 400).
+- **Checked and found sound**: same-origin on every state-changing POST (signup, passkey, battle, coach, users, login) and the
+  two battle Worker routes; the verify link and `watch` answer nothing but a state; no answer carries an email, hash, token or
+  key except the owner's approval list (`?list=1`); sign-up gives one answer for a new, pending, confirmed and member's email;
+  sign-in gives one 401; every in-place store (`signups/*`, `passkeys/all.json`, `presence/seen.json`, the daily / coach / review
+  stores, notices) reads with `cache=0` and throws on a failed read, so no write follows one; tokens, watch codes and reset
+  tokens are stored as hashes, single use, bounded lists; passkeys check challenge (signed, bound, once), origin, RP ID, UP + UV,
+  signature, counter, the account as it stands and the password fingerprint, and count failures in `_guard`; CBOR / DER / base64
+  inputs are length- and depth-bounded; SMTP header values and addresses cannot carry a line break; battle tickets cannot be
+  read as sessions (own key, 2 minutes), the room only sees a verified ticket, messages are size- and rate-bounded and every
+  setup field is clamped; the inbox is bounded and expires; `lse` is owner-only, GET, allowlisted, `redirect: 'error'`, never
+  returns the key; the two kicks start one named workflow on `main` with no inputs, only when sure, and nothing live is in reach
+  (the gotobi job holds the only order code, demo-locked); a cron failure never stops the chain (the adapter catches); every
+  `api/*.js` endpoint is in `HANDLERS`; daily recipients come from the live user list (a removed or disabled account is not in
+  it; `perms.macro === false` is skipped; test); `presence/seen.json` holds an account key and an ISO time only (`clean`).
+- **Seen, left, said to the owner**: (a) sign-up is still timing-distinguishable (a new address waits for its email, a known one
+  does not) and its "username is taken" check passes for the request's own email, so someone who guesses a waiting request's
+  username can confirm its email; both need the 502 / 409 answers people rely on, and are limited to 5 tries an hour per
+  address. (b) Every signed-in member can read the other members' usernames and names (battle invites, by design) and the
+  coach's spend and budgets (`GET /api/chronos-coach`). (c) All per-IP and per-account limits are in memory per Worker
+  instance. (d) A request body is read whole before any size check (the platform's limit applies). (e) Battle standings are
+  each player's own report (a changed page can report any %), and a `stat` is still accepted after the host ends the battle.
+  (f) The emails' HTML part is written as one line of several thousand characters, over SMTP's 998-character line limit;
+  whether Gmail's relay minds was not checked (the Email Service binding is the first route). (g) `HOSTS` in `api/signup.js` and `api/_passkey.js` still names the deleted `meridianx`
+  workers.dev host. **No secret needs rotating from this review** (none was found in an answer, a log line or a file).
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful

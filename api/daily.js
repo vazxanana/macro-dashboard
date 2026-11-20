@@ -66,6 +66,17 @@ async function send(rep, br, to, env, d, o = {}) {
   return { ok, failed };
 }
 
+// The member list the emails go to, read BEFORE a day is marked as sent (20 Nov 2026 review): it throws when the list cannot be
+// read, and the caller then sends nothing and marks nothing (an unreadable list used to read as "no members": the day was marked,
+// only the owner got the email, and the members got none that day).
+const membersOf = (env, d) => (d.users ? Promise.resolve(d.users) : (d.userList || (() => A.userList(S.defaultDeps(env))))());
+// state.json is written by the 06:30 job and by the owner's send=all: each write joins its fields onto the file as it stands NOW,
+// so one never puts back the other's older copy (which un-marked `mailed` and let the next run send the 06:30 email again)
+const mark = async (store, fields) => store.put('state.json', { ...((await store.get('state.json', null)) || {}), ...fields });
+// an owner-only GET that sends something: refused when the browser says the request was started by another site (a link or a
+// picture there would otherwise act with the owner's session, which SameSite=Lax lets through on a plain link)
+const fromElsewhere = (req) => { const site = String((req.headers && req.headers['sec-fetch-site']) || '').toLowerCase(); return site === 'cross-site' || site === 'same-site'; };
+
 async function handle(req, res, d = {}) {
   const env = d.env || process.env, now = d.now ? d.now() : Date.now(), q = req.query || {};
   res.setHeader('Cache-Control', 'private, no-store');
@@ -82,11 +93,14 @@ async function handle(req, res, d = {}) {
       if (item) { await notices.put(list.concat(item).slice(-100)); out.notice = item.id; }
       const state = (await store.get('state.json', null)) || {};
       if (state.mailed !== rep.day && !off(env.DAILY_EMAIL)) {
-        await store.put('state.json', { ...state, mailed: rep.day, mailedAt: new Date(now).toISOString() });   // marked first: a crash mid-way never sends twice
-        const users = await A.userList(S.defaultDeps(env)).catch(() => ({}));
-        const r = await send(rep, br, D.recipients(d.users || users, env.OWNER_EMAIL || env.GMAIL_USER), env, d);
-        await store.put('state.json', { ...state, mailed: rep.day, mailedAt: new Date(now).toISOString(), sent: r.ok, failed: r.failed });
-        out.email = { sent: r.ok, failed: r.failed, ...(r.why ? { why: r.why } : {}) };
+        let users = null; try { users = await membersOf(env, d); } catch (e) { users = null; }
+        if (!users) out.email = { sent: 0, failed: 0, why: 'the member list could not be read: nothing sent, tried again at the next run' };
+        else {
+          await mark(store, { mailed: rep.day, mailedAt: new Date(now).toISOString() });   // marked first: a crash mid-way never sends twice
+          const r = await send(rep, br, D.recipients(users, env.OWNER_EMAIL || env.GMAIL_USER), env, d);
+          await mark(store, { mailed: rep.day, mailedAt: new Date(now).toISOString(), sent: r.ok, failed: r.failed });
+          out.email = { sent: r.ok, failed: r.failed, ...(r.why ? { why: r.why } : {}) };
+        }
       }
       return res.status(200).json(out);
     } catch (e) { return res.status(500).json({ error: 'daily job failed' }); }
@@ -102,6 +116,7 @@ async function handle(req, res, d = {}) {
   }
   if (q.test === 'email') {
     if (acct.u !== 'owner') return res.status(403).json({ error: 'owner only' });
+    if (fromElsewhere(req)) return res.status(403).json({ error: 'open this address yourself, not from a link on another site' });
     while (TESTS.length && TESTS[0] < now - 600e3) TESTS.shift(); if (TESTS.length >= 5) return res.status(429).json({ error: 'at most 5 test emails in 10 minutes' });
     const to = q.to ? D.mail(q.to) : D.mail(env.OWNER_EMAIL || env.GMAIL_USER); if (!to) return res.status(400).json({ error: q.to ? 'not an email address' : 'no owner address: pass ?to=' });
     const rep = await latest(env, d).catch(() => null); if (!rep) return res.status(404).json({ error: 'no report yet: the first one is built from 06:00 London' });
@@ -113,18 +128,17 @@ async function handle(req, res, d = {}) {
   }
   if (q.send === 'all') {
     if (acct.u !== 'owner') return res.status(403).json({ error: 'owner only' });
-    const site = String((req.headers && req.headers['sec-fetch-site']) || '').toLowerCase();
-    if (site === 'cross-site' || site === 'same-site') return res.status(403).json({ error: 'open this address yourself, not from a link on another site' });
+    if (fromElsewhere(req)) return res.status(403).json({ error: 'open this address yourself, not from a link on another site' });
     const rep = await latest(env, d).catch(() => null); if (!rep) return res.status(404).json({ error: 'no report yet' });
     if (q.day !== rep.day) return res.status(400).json({ error: `add &day=${rep.day} to confirm which report to send` });
     const state = (await store.get('state.json', null)) || {};
     if (state.resent === rep.day) return res.status(409).json({ error: 'already sent to everyone today', day: rep.day });
-    await store.put('state.json', { ...state, resent: rep.day, resentAt: new Date(now).toISOString() });   // marked first: never twice
+    let users; try { users = await membersOf(env, d); } catch (e) { return res.status(503).json({ error: 'the member list could not be read: nothing was sent, try again in a minute' }); }
+    await mark(store, { resent: rep.day, resentAt: new Date(now).toISOString() });   // marked first: never twice
     const br = q.fresh ? await brief(rep, env, store, d, true).catch(() => null) : await store.get(`brief-${rep.day}.json`, null).catch(() => null);
-    const users = await A.userList(S.defaultDeps(env)).catch(() => ({}));
-    const to = D.recipients(d.users || users, env.OWNER_EMAIL || env.GMAIL_USER);
+    const to = D.recipients(users, env.OWNER_EMAIL || env.GMAIL_USER);
     const r = await send(rep, br, to, env, d);
-    await store.put('state.json', { ...state, resent: rep.day, resentAt: new Date(now).toISOString(), resentOk: r.ok, resentFailed: r.failed });
+    await mark(store, { resent: rep.day, resentAt: new Date(now).toISOString(), resentOk: r.ok, resentFailed: r.failed });
     return res.status(r.ok || !to.length ? 200 : 502).json({ day: rep.day, recipients: to.length, sent: r.ok, failed: r.failed, summary: !!(br && br.brief), ...(r.why ? { why: r.why } : {}) });
   }
   return res.status(400).json({ error: 'nothing asked' });
