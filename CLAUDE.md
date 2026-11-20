@@ -4925,6 +4925,14 @@ whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hour
 `fills` (gold-vol-breakout-exec) = the first broker tick in a window where ask >= level (dir > 0) or bid <= level (dir < 0), queries from the same file's `fills` object. `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
 `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
 
+## The macro rule book's Donchian swing rule (20 Nov 2026, `research/edge/macro-donchian`, pre-registered)
+The rule book's execution layer (close beyond the 20-day channel with EMA20 / EMA50, stop 2 ATR, out after 5 days; "longs only,
+full size when the Gold Macro Score > +0.25"), on OANDA spot gold 2007-26 net of 0.0001 a round trip and long financing.
+**FAIL**: longs +0.082R a trade (n 170, month t 1.35; the book quoted +0.24R before costs on futures), no better than random
+longs in the same up-trend (placebo median +0.078R, 95th percentile +0.152R): it is gold's drift. Score > +0.25 wins more often
+(60 % vs 46 %) but the R a trade is the same (+0.083 vs +0.080, t 0.02). Shorts −0.005R. Nothing live changed. Test:
+`tests/macro-donchian.test.mjs`.
+
 ## Measured-cost studies of 20 Nov 2026 (tick probe)
 Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live changed. Results, each pre-registered before its data:
 - `gold-release-quotes`: gold's spread at T+5 s after US CPI / payrolls / FOMC is about 18× normal ($1.48 median), the widest
