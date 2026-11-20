@@ -3014,6 +3014,9 @@ Score's falling-2-year driver, never a trading rule. The rule book's "double tig
 high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapCheck` (veteran passes `cache.release` DFEDTARU as
 `policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
 `tests/rulebook-gauges.test.mjs`.
+Same gauge on the yen (`research/edge/rulebook-gap-yen`, pre-registered 20 Nov 2026; `gapRows` / `testB` imported, run on 1 / USD/JPY):
+**FAIL, 0 of 2** (B1 hikes priced → USD/JPY up t −0.67 the wrong way; B2 cuts priced → USD/JPY down t 0.04), 1,001 weeks 2007-26;
+USD/JPY's next 20 sessions about +0.1 % in every class. The gauge is a gold lean, not a dollar one.
 
 ## Stress and reaction rules of the macro rule book (19 Nov 2026, owner: "keep going with the other documents")
 `research/edge/rulebook-stress/` (PREREGISTRATION.md committed first; `run.mjs` reuses `rulebook-gauges`' FRED parser, known-at
@@ -5168,6 +5171,47 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   positive in both windows and 40 of 40 placebos beaten, so a faint tilt, not an edge. GBP/JPY alone clears its checks (+0.050R,
   t 2.63, Holm p 0.020), CHF/JPY loses. By the pre-registered reading USD/JPY's result stands alone (one market of eleven); its
   forward record is the judge. Nothing live changed.
+- `usdjpy-vb-feed` (pre-registered 20 Nov 2026): USD/JPY T1 on a second feed, HistData M1 (council-data, `histStampUtc`) grouped
+  to 5m, 2018 → Oct 2026. **PASS**: +0.086R a trade net (n 1,582, month t 2.91); OANDA mid on the same window +0.073R (t 2.48);
+  same side on 100 % of the 1,575 days both traded, daily R correlation 0.98. Not an artefact of OANDA's candles; same years as
+  `fx-vol-breakout` (a feed check, not new evidence). Nothing live changed.
+- Two breakouts as one book (20 Nov 2026, accounting, `research/proposals/2026-11-20-two-breakouts.md`): gold T1 (C1) + USD/JPY
+  T1 at 1R each from the forward baselines, Jan 2021 - Oct 2026 (in sample): monthly correlation 0.03, book month t 3.47 (gold
+  2.70, USD/JPY 2.28), +35.8R a year, worst drawdown 42.9R. No verdict; the forward records judge.
+- `usdjpy-red-folder` (pre-registered 20 Nov 2026): `red-folder-surprise`'s design on USD/JPY (HistData M1, cost 0.015 %).
+  **FAIL**: T+5 → T+60 with the miss −0.019 % (2018-21, n 24) and +0.041 % (2022 → Apr 2025, n 58, t 0.90). The first 5 minutes
+  went the way of the miss on 65 of 82 releases and release → T+60 +0.41 % out of sample (t 5.37), not tradable: the dollar,
+  like gold, moves at once. Know the side before the print; do not chase after it. Nothing live changed.
+- `usdjpy-vb-k` (pre-registered 20 Nov 2026): USD/JPY T1 at k 0.3-0.7 (gate: k 0.5 reproduces both published studies).
+  **BROAD**: net positive at every k in 2005-15 AND 2016 → now; pooled +0.097R (k 0.3, t 4.28) to +0.049R (k 0.7, t 2.69); k 0.5
+  +0.071R (n 4,168, t 3.86). Not a lucky setting; k stays 0.5 (no setting is adopted from this). Nothing live changed.
+- `yen-us-yields` (pre-registered 20 Nov 2026): the Japan brief's "global yields dominate" as a forecast: a 4-week US 10-year
+  move over 25 bp, then USD/JPY over the next 20 sessions (FRED DGS10, OANDA daily, 1,001 weeks 2007-26). **FAIL, 0 of 2**: up
+  t 0.63, down t −1.08 (both the claimed way, neither close). Same-4-week correlation 0.51: they move together, the move does not
+  lead. Nothing live changed.
+- USD/JPY T1's risk profile (20 Nov 2026, accounting, `research/proposals/2026-11-20-usdjpy-risk.md`, from the forward baseline,
+  2016-26, in sample): +131.7R, worst drawdown 33.8R (Dec 2022 - Oct 2023), 574 days below a high, 3 losing years (2023 −15.4R).
+  At 0.25 % a trade about +3 % a year with an 8.4 % drawdown. No verdict.
+- `yen-gold` (pre-registered 20 Nov 2026): the macro skill's "falling USD/JPY helps gold": a 4-week USD/JPY move over 2 %, then
+  gold's next 20 sessions (OANDA daily, 1,013 weeks 2007-26). **FAIL, 0 of 2**: yen strong t 0.96 (gold +0.9 % vs +0.5 % on all
+  weeks), yen weak t −0.91; both the claimed way, halves agree in sign, neither close. A faint lean at most; the Gold Macro Score
+  and the driver stack's carry row are unchanged. Nothing live changed.
+- `audjpy-leads` (pre-registered 20 Nov 2026): the macro skill's "AUD/JPY turns before equities" on S&P 500 and Nasdaq 100
+  (OANDA daily, 1,012 weeks 2007-26). **FAIL, 0 of 4**: AUD/JPY up first finds nothing (t −0.05 / 0.32); AUD/JPY down while the
+  index rose was followed by weaker indices (t −2.12 / −2.26, same sign in both halves) but Holm p 0.10: a near miss on data now
+  read. Nothing live changed.
+- `vix-curve` (pre-registered 20 Nov 2026): an inverted VIX curve (VIX above VIX3M, FRED, 91 weeks in 43 episodes 2008-26) and
+  the next 20 sessions. **FAIL, 0 of 2**: USD/JPY −0.20 % vs +0.18 % on other weeks (t −0.79), gold +0.47 % vs +0.57 % (t −0.10).
+  Acute stress says nothing tradable about the desk's two markets a month on. Nothing live changed.
+- `oil-hawkish` (pre-registered 20 Nov 2026): the macro skill's "slow, persistent oil rise = hawkish" (WTI +15 % in 63 sessions,
+  up in each 21-session block; 128 weeks, 52 episodes 2007-26). **FAIL, 0 of 2**: USD/JPY nothing (t 0.22); gold weaker after
+  (−0.11 % vs +0.89 %, t −2.10) but Holm p 0.07 and almost all in 2017 on: a near miss on data now read. Nothing live changed.
+- `pgm-vol-breakout` (pre-registered 20 Nov 2026): T1 on platinum and palladium, OANDA M5 2016 → now, cost 0.30 % / 0.20 % of
+  price (`gold-drd-pgm`'s, not measured). **FAIL**: pooled −0.181R a trade net (n 4,082, month t −8.67); before costs +0.060R
+  (palladium +0.072R), so the verdict rests on the assumed cost. Nothing live changed.
+- `pgm-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the platinum / palladium T1 trades at the demo's measured hourly
+  spreads (tick probe: XPTUSD 32-57 bp, XPDUSD 64-91 bp of price, wider than the assumed costs). **FAIL**: −0.474R a trade net
+  (t −17.85). T1 on the metals other than gold is closed. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
@@ -5177,6 +5221,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   filled, month t 3.11; OANDA mid +0.153R before costs; entry slippage 0.012R). Cautions: the ten best trades carry 75 %, buys
   +0.277R vs sells +0.028R (2005-26 mid: buys +0.148R, sells +0.001R): part may be USD/JPY's drift. In-sample years; the forward
   record judges. Nothing live changed.
+- `fx-majors-vb-early` (pre-registered 20 Nov 2026): T1 on the five majors other than USD/JPY (EUR/USD, GBP/USD, AUD/USD,
+  USD/CAD, USD/CHF) on 2005-2015, years no study had read for them; same rule, cost and placebo. **FAIL**: pooled +0.013R a trade
+  net (n 10,699, month t 0.93; gross +0.038R; 2x cost −0.013R; 2005-10 +0.025R, 2011-15 −0.002R; 40 of 40 placebos beaten); no
+  market clears its checks (best USD/CHF +0.051R, t 1.86, Holm p 0.157; USD/CAD −0.045R). A faint tilt before costs, not an edge:
+  USD/JPY stands alone among the six majors in both decades. Nothing live changed.
 - `energy-vol-breakout` (pre-registered 20 Nov 2026): T1 on WTI, Brent and natural gas, OANDA M5 2016 → now, 0.1 % of price a
   round trip. **FAIL**: pooled −0.014R a trade net (n 5,221, month t −0.85); before costs +0.059R, so the verdict rests on the
   assumed cost (the demo's energy spreads are not measured). Nothing live changed.
@@ -5186,6 +5235,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   long and short random entries on EVERY tradable day, no day or side chosen by the breakout. **PASS**: T1's buys +0.148R a trade
   (n 1,998) vs long at a random time +0.026R, 40 of 40 seeds, both halves; sells +0.001R vs short −0.056R (reported). The breakout
   entry adds about 0.06-0.12R a trade beyond USD/JPY's drift. Nothing live changed.
+- `usdjpy-vb-exit` (pre-registered 20 Nov 2026): USD/JPY T1 (k 0.5) with exits 12:00 / 15:00 / 18:00 UTC and a 17:00 New York day
+  (gate: 21:00 / 00:00 UTC reproduces both published studies). **BROAD**: net positive in 2005-15 AND 2016 → now at all four, month
+  t ≥ 2 at 4 of 4 (pooled 15:00 +0.086R t 4.52, 18:00 +0.078R, rule +0.071R, NY day +0.049R t 2.70, 12:00 +0.039R t 2.23; 12:00
+  thin after 2016, +0.014R). The rule stays 21:00 / 00:00 UTC (nothing adopted). Nothing live changed.
 - `energy-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the energy T1 trades at the demo's measured hourly spreads (tick
   probe; broker names XTIUSD / XBRUSD / XNGUSD; WTI and Brent about 0.03 % of price, gas about 0.24 %). **FAIL**: pooled −0.003R a
   trade net (month t −0.17); gas −0.088R (t −3.24) sinks it. WTI +0.031R (t 1.33) and Brent +0.047R (t 1.71) are positive in both
@@ -5193,3 +5246,13 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
+
+## Discretion: taken against skipped signals (20 Nov 2026, owner: "the difference is discretion on all edges, because they work")
+`research/edge/discretion` (pre-registered; read-only on council-data; aggregates only, never a person's trade, note or name).
+Do the signals a person took before the outcome beat the ones they skipped, per stream (ICT its own section)? **TOO FEW TO
+JUDGE: 0 take / skip decisions stamped before the outcome exist** (`ict/desk.json` was never written to council-data; the 8
+human loss reviews are all after the close and losses only; no council system records a choice). Bar fixed for later: 20 a
+side, Welch t >= 2, Holm. Power arithmetic: ICT A-setup per-unit R sd 1.69R (n 259), so +0.3R a trade needs about 254 a side
+for an even chance of t 2, +0.5R about 92. Proposal for the owner (nothing built): `research/proposals/2026-11-20-discretion.md`
+(a take / skip + reason + confidence stamped by the server before the outcome on every signal, "taken by a person" beside "all
+signals"). Never quote picked examples as evidence of discretion. Test: `tests/discretion.test.mjs`.
