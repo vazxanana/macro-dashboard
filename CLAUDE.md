@@ -2987,6 +2987,11 @@ study links were 16 px tall on touch (`a.wa-st`, 44 px on a coarse pointer), and
 `frame.positioning` and one frame line per market of gold, silver, EUR, JPY, NQ, ES only when crowded (3-year percentile >= 90 /
 <= 10) or a big week (|z| >= 1.5, the COT desk's flow cut), with net, percentile and report date; the yen futures' inversion said
 plainly; "positioning, not a tested signal" unless the COT study passed a cell there. Test: `tests/week-ahead-cot.test.mjs`.
+`tests/week-ahead.test.mjs`. **How big a day** (20 Nov 2026, `dayRange` → `d.range`, a quiet line `.wa-rg` under each day
+heading): a normal gold day = the strategist's `fc.assets.gold.expMovePct` of its `last` price, in $ and %; on a day with a US Red
+folder release, that type's median absolute day move (`stats.absMed`, else from its rows) only with n >= `RANGE_MIN_N` 8; thin-
+trading words on holidays and early closes; "a range for planning, not a forecast of direction"; no forecast = no range. Test:
+`tests/week-ahead-range.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
