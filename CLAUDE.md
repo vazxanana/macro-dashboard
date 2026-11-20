@@ -4884,6 +4884,11 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
+`GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
+website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
+OANDA_TOKEN repository secret; the website only without it), a candle failure is an `error` record for the day (it crashed
+before), the deploy copies `GH_DISPATCH_TOKEN`, and `/api/status?job=watchdog` falls back to `GH_TOKEN`.
 
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
