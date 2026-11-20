@@ -530,8 +530,8 @@
   @media (pointer: coarse) { .wa a.wa-st { display: inline-flex; align-items: center; min-height: 44px; } }
   /* 20 Nov 2026 browser pass: the day's gold range is labelled and in the readable ink, apart from the quiet notes */
   .wa-rg { margin: 2px 0 6px; font: 400 var(--fs-sm, 13px)/1.5 var(--sans); color: var(--ink-dim); } .wa-rg b { color: var(--ink); font-weight: 600; }
-  .wa-chip { display: inline-block; padding: 0 7px; margin-right: 6px; border-radius: 999px; font: 600 12px/1.6 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); }
-  .wa-chip.pass { color: var(--buy); border-color: currentColor; } .wa-chip.fail { color: var(--sell); border-color: currentColor; }
+  .wa-chip { display: inline-block; padding: 1px var(--s2); margin-right: 6px; border-radius: 999px; font: 600 var(--fs-xs)/1.6 var(--sans); background: var(--well); color: var(--ink-dim); }
+  .wa-chip.pass { color: var(--buy); background: color-mix(in srgb, var(--buy) 14%, var(--panel)); } .wa-chip.fail { color: var(--sell); background: color-mix(in srgb, var(--sell) 14%, var(--panel)); }
   .wa-nc { color: var(--ink); }
   .wa-quiet { color: var(--ink-faint); font-size: var(--fs-sm, 13px); margin: 4px 0 0; }
     .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
