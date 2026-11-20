@@ -52,7 +52,9 @@ jobs:
           GGO_FROM: '2026-10-01T00:00:00Z'
         run: |
           mkdir -p "$RUNNER_TEMP/c" data/research/forward
-          node research/edge/gold-gap-open/fetch.mjs "$RUNNER_TEMP/c"
+          # up to now, not to midnight: a day counts once a later day has candles (PREREGISTRATION.md); stopping at midnight
+          # left the last complete day out (the 20 Nov run read through 18 Nov)
+          GGO_TO="$(date -u +%Y-%m-%dT%H:%M:%SZ)" node research/edge/gold-gap-open/fetch.mjs "$RUNNER_TEMP/c"
           node research/edge/gold-vol-breakout-forward/run.mjs "$RUNNER_TEMP/c" data/research/forward/gold-vol-breakout.json
 
       - name: Gold before US holidays, the forward record

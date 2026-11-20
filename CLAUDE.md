@@ -4951,7 +4951,8 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   any study read), cost = hourcost's C1 frozen, against a month-block band from the 2021-26 C1 trades (`baseline.json`, gated
   n 1121 / +0.105R / t 2.79). Readings: too few under 20, below the measured range (A p5), ahead of a no-edge rule (B p95);
   checkpoints at 120 (fails / holds so far) and 240 trades (confirmed / fails / not shown); the first crossing stands.
-  `vb-forward.yml` (Tue-Sat 04:41 UTC) writes council-data `research/forward/gold-vol-breakout.json`. Nothing trades.
+  `vb-forward.yml` (Tue-Sat 04:41 UTC) writes council-data `research/forward/gold-vol-breakout.json`; its candles run up to the
+  run (`GGO_TO`; until 20 Nov 2026 they stopped at midnight UTC and the last complete day was left out). Nothing trades.
 - `turnaround-tuesday-forward` (pre-registered 20 Nov 2026): R2 on NAS100 (a Monday down more than 1 %, buy the close, out at
   Tuesday's close or the study's stop) for weeks after 12 Nov 2026, the study's own functions (sha256-pinned), cost
   `MARKETS.nas100.cost`, DGS2 frozen at the study's last value; against a single-trade bootstrap of its 81 out-of-sample trades
