@@ -1695,6 +1695,17 @@ edge labelled "Demand / Supply OB · fresh · BO|iBO <range>". Not a tested rule
 zone mechanics alone). Tests: `tests/market-cycle.test.mjs` ("fresh zones").
 
 ## Meridian markup: the Mosha layer (12 Nov 2026, owner: "build the mosha layer"; redrawn 13 Nov 2026 from the owner's pictures)
+**20 Nov 2026: this section's reading is replaced** (owner uploaded the method's own course documents, private, never copied
+into the repository; asked to fix the layer: "both"). The 13 Nov pictures were the documents' "bad CF" exception cases, not the
+rule. `msMosha` now follows the SOP: BO of the timeframe above → **VR** = this chart's first break AGAINST the BO (formed once;
+`p50` / `deep` when the BO's far edge is known) → **CF** = the next break back WITH the BO (a failed CF is replaced by a later
+one, `cf.again`); `case` 2 = the CF zone overlaps the VR box ("inside the VR, likely to fail"). Entry: pullback into the CF zone,
+then an EG with the BO (a close, never a wick), stop $0.30 past the pullback's extreme, target the VR's extreme. A close through
+the CF zone's far side before an entry = `cf-failed` (expected move back to the BO level); a close past the VR's extreme with no
+CF = `bo-on`. States: wait-vr, wait-cf, bo-on, vr-broken, wait-pullback, wait-eg, eg, cf-failed. Layer label "Mosha storyline
+(BO, VR, CF, expected move)". Not drawn: the documents' sideways case and the barrier entry's confirmation timeframes. `msSides`
+(the M1 both-sides reading) is unchanged. Still display only, not a tested rule. Tests: `tests/market-cycle.test.mjs` ("Mosha").
+The text below is history.
 Display only, Meridian markup only (layer "Mosha storyline (VR, CF, barrier, expected move)", `G.show.mosha`, orange); no rule,
 trade or alert reads it and it is not a tested rule (the mechanical Mosha studies failed). `msMosha(htf, ltf, buf)` (pure, next to
 `msCycle`; `moshaNow(id, bars)` feeds it, closed candles only): the last BO of the timeframe above (D1 for H4, H4 for H1, H1 for
@@ -4847,6 +4858,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     a teacher confirms, corrects (the desk's first wording is kept in `was`) or erases (`{ book }`), or teaches a line directly
     (`{ learn }` → `confirmed`). The key cannot confirm, change or erase any line. `SEED` = the desk's own first twelve lines,
     all `proposed`, shown until the first change stores the book.
+    **20 Nov 2026**: `SOP` = twelve more proposed lines (ids `sop-NN`) from the owner's course documents, in the desk's own
+    words (never the documents' text): joined to the book on every read, stored or not, until the teacher confirms, corrects
+    or erases them; an erased seed / SOP line leaves a `{ id, gone: true }` marker in the stored file so it never comes back
+    (the page never gets the markers). They may contradict the older seed lines: Luxus settles it.
   - **Who teaches whom** (owner, 10 Nov: "Remember he is the one teaching you mosha strategy"). Luxus teaches the Mosha
     method and the desk's assistant is his student. Mosha is HIS method, not the desk's and not the studies'. In every
     answer, book line and page text: restate what he showed in his own terms, read the levels off his pictures, ask

@@ -37,7 +37,7 @@ const G = require('./_guard.js');
 const { moshaLevel } = require('./mosha.js');
 
 const KEEP = 300, MAX_SHOTS = 12, MAX_BYTES = 1.5 * 1024 * 1024, DAY_MAX = 80, MAX_TALK = 60, BOOK_KEEP = 400, MAX_ASK = 6;
-const ID_RE = /^[0-9]{17}[a-z0-9]{4}$/, BOOK_ID = /^(seed-[0-9]{2}|[0-9]{17}[a-z0-9]{4})$/;
+const ID_RE = /^[0-9]{17}[a-z0-9]{4}$/, BOOK_ID = /^(seed-[0-9]{2}|sop-[0-9]{2}|[0-9]{17}[a-z0-9]{4})$/;
 const TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 // the markets a lesson's trade can be on: the ones ChronosTrade replays (a trade taught from a backtest keeps its market)
 const KINDS = ['term', 'step', 'rule', 'avoid'], MARKETS = ['xau', 'xag', 'nas100', 'spx500', 'us30', 'de40', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'usdcad', 'usdchf', 'nzdusd', 'gbpjpy', 'bco', 'wtico'], TFS = ['1m', '5m', '15m', '1h', '4h'], MARK_KINDS = ['level', 'vr', 'bvr', 'zone', 'htf'], BASE = { '5m': 300, '15m': 900 };
@@ -59,6 +59,26 @@ const SEED = [
   ['rule', 'At the barrier: close, then trade with the H4.'],
   ['avoid', 'No VR, no trade: when price only slides under a level without forming a VR, wait for the pullback to give one.'],
 ].map(([kind, text], i) => ({ id: `seed-${String(i + 1).padStart(2, '0')}`, kind, text, by: 'assistant', name: READER.name, at: '2026-11-10T00:00:00.000Z', status: 'proposed', from: [], was: null, edited: null }));
+
+// The method's own SOP as the desk reads it from the two course documents the owner sent on 20 Nov 2026 (owner: "both"), in the
+// desk's words, never the documents' text. PROPOSED lines like the first twelve: none is the teacher's word until he confirms or
+// corrects it. They join the book whether or not it was stored already (a stored book gets the ones it does not hold); one the
+// teacher erases stays erased (the stored file keeps `{ id, gone: true }` for it). Where one differs from an earlier line of the
+// desk (VR, CF, barrier), the earlier line was the desk's guess from screenshots: his word settles it.
+const SOP = [
+  ['term', 'BO Normal: a candle body closes beyond an established level. BO Structure (QM): price breaks one way first, then breaks back through the other side.'],
+  ['rule', 'A breakout counts only when a candle body closes beyond the wick on its left.'],
+  ['term', 'VR, from the course notes: after a BO, the first opposite breakout exactly one timeframe lower (H4 BO, then H1 VR). It forms only once and decides which setup is traded.'],
+  ['term', 'CF, from the course notes: after the VR, a breakout back in the direction of the BO. The safer CF is on the same timeframe as the VR; the riskier one is one timeframe lower and must form inside the BO zone.'],
+  ['rule', 'VR and CF must be a BO Structure (QM), never a BO Normal.'],
+  ['step', 'The order is BO, then VR, then CF. The entry is on the pullback after the CF, in the direction of the BO.'],
+  ['step', 'Market structure gives the range, from the external high to the external low. A valid pullback reaches at least 50% of it; when it does not, the internal structure can be used.'],
+  ['term', 'Barrier, from the course notes: a zone where a reaction is expected. BO, VR, CF and the origin are the strongest ones.'],
+  ['step', 'Barrier entry: mark the barrier, wait for price to reach it, then confirm on the smaller timeframe: Daily with H1, H4 with M15, H1 with M5, M15 with M1.'],
+  ['term', 'Janda: at a barrier a QM forms, then a second BO the same way; the entry is the pullback to the engulfing candle inside that second BO.'],
+  ['avoid', 'A CF that forms inside the VR, or right after it, is likely to fail: wait for a new CF nearer the origin.'],
+  ['avoid', 'A barrier entry against the direction only gives a rejection: it does not go far.'],
+].map(([kind, text], i) => ({ id: `sop-${String(i + 1).padStart(2, '0')}`, kind, text, by: 'assistant', name: READER.name, at: '2026-11-20T00:00:00.000Z', status: 'proposed', from: [], was: null, edited: null }));
 
 // Reads ask the Blob ORIGIN (`?cache=0`), never the CDN copy: the two JSON files are overwritten in place, and the CDN serves an overwritten
 // file with its old bytes for up to a minute, so another function instance would show old data and its next save would drop
@@ -259,7 +279,10 @@ async function handle(req, res, d = {}) {
       res.setHeader('Content-Type', shot.type); res.setHeader('Content-Disposition', 'inline'); res.setHeader('Cache-Control', 'private, max-age=604800, immutable');
       return res.status(200).send(buf);
     }
-    const stored = await store.getBook(), book = stored || SEED.map((x) => ({ ...x }));
+    const stored = await store.getBook(), gone = new Set((stored || []).filter((x) => x && x.gone).map((x) => x.id));
+    const book = stored ? stored.filter((x) => x && !x.gone) : SEED.map((x) => ({ ...x }));
+    for (const x of SOP) if (!gone.has(x.id) && !book.some((y) => y.id === x.id)) book.push({ ...x });   // the 20 Nov lines join a stored book too
+    const saveBook = () => store.putBook(book.concat([...gone].map((id) => ({ id, gone: true }))));
     if (req.method === 'GET') return res.status(200).json({ lessons: list.slice().sort((a, b) => (a.at < b.at ? 1 : -1)).map(view), book, score: scoreOf(list, book), canTeach: teach, who: acct.u });
 
     let b; try { b = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}; } catch (e) { return res.status(400).json({ error: 'bad JSON' }); }
@@ -290,7 +313,7 @@ async function handle(req, res, d = {}) {
       if (book.some((x) => x.text.toLowerCase() === text.toLowerCase())) return res.status(409).json({ error: 'the book already has that line' });
       const from = (Array.isArray(b.learn.from) ? b.learn.from : []).map(String).filter((id) => ID_RE.test(id) && find(id)).slice(0, 8);
       const item = { id: newId(now), kind, text, by: acct.u, name: clean(acct.name || acct.u, 24), at: stamp, status: bot ? 'proposed' : 'confirmed', from, was: null, edited: null };
-      book.push(item); await store.putBook(book); return res.status(200).json({ ok: true, item, book });
+      book.push(item); await saveBook(); return res.status(200).json({ ok: true, item, book });
     }
     if (bot) return res.status(403).json({ error: 'the assistant\'s key reads, answers and proposes lines, nothing else' });
     if (!teach) {   // the owner reads, and may remove a lesson or a picture: nothing else of the body is carried out (a "book" or
@@ -302,11 +325,11 @@ async function handle(req, res, d = {}) {
     if (isObj(b.book)) {   // the teacher's word on a line: confirm it, correct it, or erase it
       const id = String(b.book.id), i = BOOK_ID.test(id) ? book.findIndex((x) => x.id === id) : -1; if (i < 0) return res.status(404).json({ error: 'no such line' });
       const it = book[i];
-      if (b.book.remove === true) book.splice(i, 1);
+      if (b.book.remove === true) { book.splice(i, 1); if (/^sop-/.test(id)) gone.add(id); }
       else if (b.book.text != null) { const text = clean(b.book.text, 600); if (text.length < 4) return res.status(400).json({ error: 'the line is empty' }); if (text !== it.text) { if (it.was == null && it.by === 'assistant') it.was = it.text; it.text = text; it.status = 'corrected'; } else if (it.status === 'proposed') it.status = 'confirmed'; if (KINDS.includes(b.book.kind)) it.kind = b.book.kind; it.edited = stamp; it.eby = acct.u; }
       else if (b.book.confirm === true) { if (it.status === 'proposed') it.status = 'confirmed'; it.edited = stamp; it.eby = acct.u; }
       else return res.status(400).json({ error: 'confirm, correct or erase the line' });
-      await store.putBook(book); return res.status(200).json({ ok: true, book });
+      await saveBook(); return res.status(200).json({ ok: true, book });
     }
     if (isObj(b.say)) {   // the teacher talks back: more words, and "right" / "wrong" on the desk's last answer
       const l = find(b.say.id); if (!l) return res.status(404).json({ error: 'no such lesson' });
@@ -379,4 +402,4 @@ async function handle(req, res, d = {}) {
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'the Mosha lessons are unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
-Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, stampTrade, chartOf, askOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP, MAX_ASK });
+Object.assign(module.exports, { handle, blobStore, readerKey, imageOf, tradeOf, stampTrade, chartOf, askOf, stateOf, scoreOf, nameOf, langOf, ownKey, LANGS, view, norm, SEED, SOP, KINDS, KEEP, MAX_SHOTS, MAX_BYTES, DAY_MAX, BOOK_KEEP, MAX_ASK });
