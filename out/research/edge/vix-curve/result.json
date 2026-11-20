@@ -1,0 +1,90 @@
+{
+ "study": "vix-curve",
+ "built": "2026-11-20",
+ "verdict": "J inverted VIX curve → USD/JPY lower FAIL (t -0.79, Holm 0.8591, halves t -0.49 / -0.91); G → gold higher FAIL (t -0.1, Holm 0.9203, halves t -0.18 / 0.8)",
+ "weeks": 950,
+ "invertedWeeks": 91,
+ "episodes": 43,
+ "tests": {
+  "J": {
+   "mk": "usdjpy",
+   "want": -1,
+   "all": {
+    "n": 946,
+    "nX": 90,
+    "slope": -0.0038,
+    "t": -0.79
+   },
+   "first": {
+    "n": 452,
+    "nX": 63,
+    "slope": -0.0032,
+    "t": -0.49
+   },
+   "second": {
+    "n": 494,
+    "nX": 27,
+    "slope": -0.0044,
+    "t": -0.91
+   },
+   "holm": 0.8591,
+   "pass": false
+  },
+  "G": {
+   "mk": "xau",
+   "want": 1,
+   "all": {
+    "n": 946,
+    "nX": 90,
+    "slope": -0.001,
+    "t": -0.1
+   },
+   "first": {
+    "n": 452,
+    "nX": 63,
+    "slope": -0.0023,
+    "t": -0.18
+   },
+   "second": {
+    "n": 494,
+    "nX": 27,
+    "slope": 0.0072,
+    "t": 0.8
+   },
+   "holm": 0.9203,
+   "pass": false
+  }
+ },
+ "classes": {
+  "usdjpy": {
+   "inverted": {
+    "n": 90,
+    "fwd": -0.002
+   },
+   "normal": {
+    "n": 856,
+    "fwd": 0.0018
+   }
+  },
+  "xau": {
+   "inverted": {
+    "n": 90,
+    "fwd": 0.0047
+   },
+   "normal": {
+    "n": 856,
+    "fwd": 0.0057
+   }
+  },
+  "spx500": {
+   "inverted": {
+    "n": 90,
+    "fwd": 0.0083
+   },
+   "normal": {
+    "n": 856,
+    "fwd": 0.006
+   }
+  }
+ }
+}
