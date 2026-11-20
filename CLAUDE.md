@@ -5143,6 +5143,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   long and short random entries on EVERY tradable day, no day or side chosen by the breakout. **PASS**: T1's buys +0.148R a trade
   (n 1,998) vs long at a random time +0.026R, 40 of 40 seeds, both halves; sells +0.001R vs short −0.056R (reported). The breakout
   entry adds about 0.06-0.12R a trade beyond USD/JPY's drift. Nothing live changed.
+- `usdjpy-vb-exit` (pre-registered 20 Nov 2026): USD/JPY T1 (k 0.5) with exits 12:00 / 15:00 / 18:00 UTC and a 17:00 New York day
+  (gate: 21:00 / 00:00 UTC reproduces both published studies). **BROAD**: net positive in 2005-15 AND 2016 → now at all four, month
+  t ≥ 2 at 4 of 4 (pooled 15:00 +0.086R t 4.52, 18:00 +0.078R, rule +0.071R, NY day +0.049R t 2.70, 12:00 +0.039R t 2.23; 12:00
+  thin after 2016, +0.014R). The rule stays 21:00 / 00:00 UTC (nothing adopted). Nothing live changed.
 - `energy-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the energy T1 trades at the demo's measured hourly spreads (tick
   probe; broker names XTIUSD / XBRUSD / XNGUSD; WTI and Brent about 0.03 % of price, gas about 0.24 %). **FAIL**: pooled −0.003R a
   trade net (month t −0.17); gas −0.088R (t −3.24) sinks it. WTI +0.031R (t 1.33) and Brent +0.047R (t 1.71) are positive in both

@@ -1,0 +1,358 @@
+{
+ "study": "usdjpy-vb-exit",
+ "title": "USD/JPY T1: exit time and day anchor",
+ "built": "2026-11-20",
+ "preregistration": "research/edge/usdjpy-vb-exit/PREREGISTRATION.md",
+ "planSha256": "27d3f8622c7065f014487d3ff6e82dec861938ba1d371220c5dc029cba799413",
+ "verdict": "BROAD: USD/JPY T1 net R positive in 2005-15 and 2016 → now at every alternative (exits 12:00 / 15:00 / 18:00 UTC, 17:00 New York day), pooled month t ≥ 2 at 4 of 4; rule +0.071R (n 4168, t +3.86); the rule stays as it is",
+ "reading": {
+  "posBoth": true,
+  "t2": 4,
+  "broad": true,
+  "label": "BROAD"
+ },
+ "gate": {
+  "want": {
+   "early": {
+    "n": 2089,
+    "netR": 0.079
+   },
+   "late": {
+    "n": 2079,
+    "netR": 0.063
+   }
+  },
+  "got": {
+   "early": {
+    "n": 2089,
+    "win": 0.447,
+    "netR": 0.079,
+    "grossR": 0.109,
+    "net2R": 0.05,
+    "t": 2.95,
+    "grossT": 4.06,
+    "stops": 679,
+    "time": 1410,
+    "maxDD": -42.21,
+    "total": 165.76
+   },
+   "late": {
+    "n": 2079,
+    "win": 0.444,
+    "netR": 0.063,
+    "grossR": 0.096,
+    "net2R": 0.031,
+    "t": 2.5,
+    "grossT": 3.77,
+    "stops": 695,
+    "time": 1384,
+    "maxDD": -33.76,
+    "total": 131.7
+   }
+  },
+  "ok": true,
+  "same": 4168,
+  "of": 4168
+ },
+ "windows": {
+  "early": [
+   "2005-01-04",
+   "2015-12-31"
+  ],
+  "late": [
+   "2016-01-01",
+   "2026-11-19"
+  ]
+ },
+ "k": 0.5,
+ "settings": [
+  {
+   "name": "exit 12:00",
+   "row": {
+    "early": {
+     "n": 1449,
+     "win": 0.458,
+     "netR": 0.062,
+     "grossR": 0.093,
+     "net2R": 0.031,
+     "t": 2.61,
+     "grossT": 3.95,
+     "stops": 247,
+     "time": 1202,
+     "maxDD": -37.68,
+     "total": 89.78
+    },
+    "late": {
+     "n": 1365,
+     "win": 0.438,
+     "netR": 0.014,
+     "grossR": 0.049,
+     "net2R": -0.021,
+     "t": 0.56,
+     "grossT": 1.93,
+     "stops": 288,
+     "time": 1077,
+     "maxDD": -39.07,
+     "total": 19.69
+    },
+    "pooled": {
+     "n": 2814,
+     "win": 0.448,
+     "netR": 0.039,
+     "grossR": 0.072,
+     "net2R": 0.006,
+     "t": 2.23,
+     "grossT": 4.14,
+     "stops": 535,
+     "time": 2279,
+     "maxDD": -39.07,
+     "total": 109.47
+    }
+   }
+  },
+  {
+   "name": "exit 15:00",
+   "row": {
+    "early": {
+     "n": 1860,
+     "win": 0.461,
+     "netR": 0.104,
+     "grossR": 0.134,
+     "net2R": 0.074,
+     "t": 3.83,
+     "grossT": 4.95,
+     "stops": 500,
+     "time": 1360,
+     "maxDD": -20.77,
+     "total": 193.52
+    },
+    "late": {
+     "n": 1812,
+     "win": 0.46,
+     "netR": 0.068,
+     "grossR": 0.102,
+     "net2R": 0.035,
+     "t": 2.54,
+     "grossT": 3.78,
+     "stops": 539,
+     "time": 1273,
+     "maxDD": -34.11,
+     "total": 123.84
+    },
+    "pooled": {
+     "n": 3672,
+     "win": 0.461,
+     "netR": 0.086,
+     "grossR": 0.118,
+     "net2R": 0.055,
+     "t": 4.52,
+     "grossT": 6.19,
+     "stops": 1039,
+     "time": 2633,
+     "maxDD": -34.11,
+     "total": 317.36
+    }
+   }
+  },
+  {
+   "name": "exit 18:00",
+   "row": {
+    "early": {
+     "n": 2013,
+     "win": 0.448,
+     "netR": 0.085,
+     "grossR": 0.115,
+     "net2R": 0.056,
+     "t": 3.31,
+     "grossT": 4.47,
+     "stops": 610,
+     "time": 1403,
+     "maxDD": -29.95,
+     "total": 172.01
+    },
+    "late": {
+     "n": 1992,
+     "win": 0.448,
+     "netR": 0.071,
+     "grossR": 0.104,
+     "net2R": 0.039,
+     "t": 2.74,
+     "grossT": 4,
+     "stops": 635,
+     "time": 1357,
+     "maxDD": -35.58,
+     "total": 142.28
+    },
+    "pooled": {
+     "n": 4005,
+     "win": 0.448,
+     "netR": 0.078,
+     "grossR": 0.11,
+     "net2R": 0.047,
+     "t": 4.29,
+     "grossT": 6,
+     "stops": 1245,
+     "time": 2760,
+     "maxDD": -35.58,
+     "total": 314.29
+    }
+   }
+  },
+  {
+   "name": "exit 21:00 (rule)",
+   "row": {
+    "early": {
+     "n": 2089,
+     "win": 0.447,
+     "netR": 0.079,
+     "grossR": 0.109,
+     "net2R": 0.05,
+     "t": 2.95,
+     "grossT": 4.06,
+     "stops": 679,
+     "time": 1410,
+     "maxDD": -42.21,
+     "total": 165.76
+    },
+    "late": {
+     "n": 2079,
+     "win": 0.444,
+     "netR": 0.063,
+     "grossR": 0.096,
+     "net2R": 0.031,
+     "t": 2.5,
+     "grossT": 3.77,
+     "stops": 695,
+     "time": 1384,
+     "maxDD": -33.76,
+     "total": 131.7
+    },
+    "pooled": {
+     "n": 4168,
+     "win": 0.446,
+     "netR": 0.071,
+     "grossR": 0.102,
+     "net2R": 0.041,
+     "t": 3.86,
+     "grossT": 5.55,
+     "stops": 1374,
+     "time": 2794,
+     "maxDD": -42.21,
+     "total": 297.46
+    }
+   }
+  },
+  {
+   "name": "day from 17:00 New York",
+   "row": {
+    "early": {
+     "n": 2048,
+     "win": 0.444,
+     "netR": 0.046,
+     "grossR": 0.076,
+     "net2R": 0.016,
+     "t": 1.82,
+     "grossT": 3.01,
+     "stops": 683,
+     "time": 1365,
+     "maxDD": -35.91,
+     "total": 94.02
+    },
+    "late": {
+     "n": 2045,
+     "win": 0.44,
+     "netR": 0.052,
+     "grossR": 0.085,
+     "net2R": 0.019,
+     "t": 1.99,
+     "grossT": 3.29,
+     "stops": 687,
+     "time": 1358,
+     "maxDD": -34.14,
+     "total": 106.28
+    },
+    "pooled": {
+     "n": 4093,
+     "win": 0.442,
+     "netR": 0.049,
+     "grossR": 0.081,
+     "net2R": 0.017,
+     "t": 2.7,
+     "grossT": 4.46,
+     "stops": 1370,
+     "time": 2723,
+     "maxDD": -35.91,
+     "total": 200.3
+    }
+   }
+  },
+  {
+   "name": "day from 17:00 New York, strict open",
+   "row": {
+    "early": {
+     "n": 2048,
+     "win": 0.444,
+     "netR": 0.046,
+     "grossR": 0.076,
+     "net2R": 0.016,
+     "t": 1.82,
+     "grossT": 3.01,
+     "stops": 683,
+     "time": 1365,
+     "maxDD": -35.91,
+     "total": 94.02
+    },
+    "late": {
+     "n": 2042,
+     "win": 0.44,
+     "netR": 0.053,
+     "grossR": 0.086,
+     "net2R": 0.019,
+     "t": 2,
+     "grossT": 3.29,
+     "stops": 686,
+     "time": 1356,
+     "maxDD": -34.14,
+     "total": 107.21
+    },
+    "pooled": {
+     "n": 4090,
+     "win": 0.442,
+     "netR": 0.049,
+     "grossR": 0.081,
+     "net2R": 0.018,
+     "t": 2.71,
+     "grossT": 4.47,
+     "stops": 1369,
+     "time": 2721,
+     "maxDD": -35.91,
+     "total": 201.23
+    }
+   }
+  }
+ ],
+ "holm": [
+  {
+   "name": "exit 12:00",
+   "p": 0.013,
+   "pHolm": 0.013
+  },
+  {
+   "name": "exit 15:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "exit 18:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "day from 17:00 New York",
+   "p": 0.003,
+   "pHolm": 0.007
+  }
+ ],
+ "text": "Net R a trade pooled: exit 12:00 +0.039 (t +2.23), exit 15:00 +0.086 (t +4.52), exit 18:00 +0.078 (t +4.29), exit 21:00 (rule) +0.071 (t +3.86), day from 17:00 New York +0.049 (t +2.70). Before costs: exit 12:00 +0.072, exit 15:00 +0.118, exit 18:00 +0.110, exit 21:00 (rule) +0.102, day from 17:00 New York +0.081. Net R is positive in both windows at every setting. At 2x costs pooled: exit 12:00 +0.006, exit 15:00 +0.055, exit 18:00 +0.047, exit 21:00 (rule) +0.041, day from 17:00 New York +0.017. Cautions: the 12:00 exit is thin in 2016 → now (+0.014R, month t +0.56) and near zero at 2x costs, and the 17:00 New York day keeps about two thirds of the rule's net R (+0.049R against +0.071R; +0.017R at 2x costs), so the margin over costs moves with where the day is cut and how long the trade is held; the sign does not. The strict reading of the New York open keeps 4090 trades (+0.049R). None of this selects a setting: every cell was read on data already used for the rule, so a better-looking exit or anchor would need its own pre-registration on untouched history, and none is left. Paper research; nothing live changes and no proposal is written.",
+ "data": "early cache 2004-12-01 → 2016-01-07 (834318 candles), late cache 2015-12-01 → 2026-11-20 (817614 candles); windows 2005-01-04 → 2015-12-31 and 2016-01-01 → 2026-11-19"
+}
