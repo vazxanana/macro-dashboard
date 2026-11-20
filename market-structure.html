@@ -3670,16 +3670,20 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .ch-rail .ch-one .ch-one-tf { padding: 2px 0 4px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); text-align: center; }
       .ch-rail :is(.dr-bar button, .ch-one .ch-b) { position: relative; width: 34px; height: 34px; min-width: 0; margin: 0; border-radius: 8px; flex: none; }
       .ch-rail :is(.dr-bar, .ch-one) :is(button, .ch-b):is([aria-pressed="true"], .on) { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 2px 0 0 var(--au-accent, var(--accent)); }
-      .ch-rail .rl-star { position: absolute; right: -1px; top: -1px; width: 13px; height: 13px; display: none; border-radius: 50%; cursor: pointer;
+      :is(.ch-rail, #ms-ch-one) .rl-star { position: absolute; right: -1px; top: -1px; width: 13px; height: 13px; display: none; border-radius: 50%; cursor: pointer;
         background: var(--au-surface, var(--panel)); -webkit-mask: none; }
-      .ch-rail .rl-star::before { content: ""; position: absolute; inset: 1px; background: var(--au-ink-3, var(--ink-faint));
+      :is(.ch-rail, #ms-ch-one) .rl-star::before { content: ""; position: absolute; inset: 1px; background: var(--au-ink-3, var(--ink-faint));
         clip-path: polygon(50% 0, 63% 35%, 100% 38%, 71% 61%, 80% 100%, 50% 78%, 20% 100%, 29% 61%, 0 38%, 37% 35%); }
-      .ch-rail .rl-star.on::before { background: var(--au-warn, #d7a03b); }
-      .ch-rail :is(button, .ch-b):hover > .rl-star, .ch-rail .rl-star.on { display: block; }
-      .ch-rail .rl-fav { width: 34px; height: 34px; margin-top: 4px; display: grid; place-items: center; border: 0; border-top: 1px solid var(--au-line, var(--line)); border-radius: 0; background: none; color: var(--au-ink-3, var(--ink-faint)); cursor: pointer; padding: 0; }
-      .ch-rail .rl-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
-      .ch-rail .rl-fav[aria-pressed="true"] { color: var(--au-warn, #d7a03b); } .ch-rail .rl-fav[aria-pressed="true"] svg { fill: currentColor; }
-      .ch-rail .rl-fav:hover { color: var(--au-ink, var(--ink)); }
+      :is(.ch-rail, #ms-ch-one) .rl-star.on::before { background: var(--au-warn, #d7a03b); }
+      :is(.ch-rail, #ms-ch-one) :is(button, .ch-b):hover > .rl-star, :is(.ch-rail, #ms-ch-one) .rl-star.on { display: block; }
+      #ms-ch-one .ch-b { position: relative; }
+      /* chart tools and the favourites star sit in the top toolbar after Clean (20 Nov 2026, owner); the rail keeps the drawing tools */
+      #v-charts.has-rail .sec-h > .ch-one.ch-one, #v-charts.has-rail .sec-h > .rl-fav { order: 3; }
+      #v-charts.has-rail .sec-h > .ch-one.ch-one { flex: none; width: auto; border-left: 1px solid var(--au-line, var(--line)) !important; padding-left: 6px !important; margin-left: 4px; }
+      #v-charts .rl-fav { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--au-ink-3, var(--ink-faint)); cursor: pointer; padding: 0; }
+      #v-charts .rl-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+      #v-charts .rl-fav[aria-pressed="true"] { color: var(--au-warn, #d7a03b); } #v-charts .rl-fav[aria-pressed="true"] svg { fill: currentColor; }
+      #v-charts .rl-fav:hover { color: var(--au-ink, var(--ink)); }
       #v-charts.has-rail .sec-h > .ch-tools-tog { display: none !important; }
       #v-charts.has-rail .sec-h > .ch-help.ch-help { order: 4; margin-left: auto; width: 38px; padding: 0; justify-content: center; }
       @media (min-width: 1440px) { #v-charts.has-rail .sec-h > #ms-sty.sty { margin-left: 0; } }
@@ -3695,7 +3699,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .ms-fav button[aria-pressed="true"] { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
       .ms-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .ms-fav small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--au-accent, var(--accent)); } .ms-fav small:empty { display: none; }
-      @media (pointer: coarse) { #v-charts.has-rail .ch-rail { width: 52px; } .ch-rail :is(.dr-bar button, .ch-one .ch-b), .ch-rail .rl-fav, .ms-fav button { width: 44px; height: 44px; } .ms-fav .fv-grip { width: 20px; } }
+      @media (pointer: coarse) { #v-charts.has-rail .ch-rail { width: 52px; } .ch-rail :is(.dr-bar button, .ch-one .ch-b), #v-charts .rl-fav, .ms-fav button { width: 44px; height: 44px; } .ms-fav .fv-grip { width: 20px; } }
       </style>
       <style id="ms-pp-css">/* The paper trading account on the Charts (18 Nov 2026, assets/ms-paper.js): one bar above the charts, stats and history behind a button */
   html[data-role="public"] #ms-pp, html[data-role="public"] #hs-pp, html[data-deny~="charts"] #hs-pp { display: none !important; }
@@ -3933,7 +3937,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
       <div class="card adm" id="ms-sys-book">
         <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
-        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle (not a tested edge: no study to measure it against, so it has no row in the decay and expectation cards). <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO. Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
+        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO; and since 14 Nov the Mosha cycle (your decision 54: both studies of its code lose after costs). Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
         <p class="ms-note" id="ms-rep-mcycle"></p>
         <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
       </div>
@@ -3943,7 +3947,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="fw-legend" aria-hidden="true"><span><i class="fw-sw fw-sw-band"></i>Expected range, 5 % to 95 %</span><span><i class="fw-sw fw-sw-mid"></i>Middle of the range</span><span><i class="fw-sw fw-sw-rec"></i>Forward total, after costs</span><span><i class="fw-sw fw-sw-stop"></i>Stop lines S2 to S4</span></div>
         <div class="fw-chart" id="ms-fwd-chart" role="img" aria-label="Forward total of the live book against the range the adopted protocol expects"></div>
         <div class="fw-wrap" tabindex="0" role="region" aria-label="Stop lines and execution checks, scrolls sideways"><table class="fw-t"><thead><tr><th class="fw-l" scope="col">Line or check</th><th class="fw-l" scope="col">Where it stands</th><th class="fw-l" scope="col">State</th></tr></thead><tbody id="ms-fwd-b"></tbody></table></div>
-        <p class="ms-note fw-foot" id="ms-fwd-foot">The forward-test protocol of <b>research/proposals/2026-11-12-path-to-live.md</b> (section 3) was adopted by you on 12 Nov 2026 (<a href="https://github.com/vazxanana/macro-dashboard/blob/main/docs/owner-decisions.md" target="_blank" rel="noopener">your decision 43</a>: “Yes to all”). This card measures the book against it every 6 hours with the Coach. If a stop line (S1 to S4) is crossed, the Trader sends Gold trend and Gold daily engulf back to paper shadows at its next round, once, and you are told: no open trade is closed, every stop stays, and nothing goes back by itself. A failed execution check (E1 to E5) is only reported, here, on Home and in the daily digest. Counted: the two systems' own paper trades filled from 12 Nov 2026, after costs and overnight financing; the bands and lines are the proposal's own figures. The Mosha cycle, a main paper system since 11 Nov by your choice, is not part of the protocol's book and is not counted here.</p>
+        <p class="ms-note fw-foot" id="ms-fwd-foot">The forward-test protocol of <b>research/proposals/2026-11-12-path-to-live.md</b> (section 3) was adopted by you on 12 Nov 2026 (<a href="https://github.com/vazxanana/macro-dashboard/blob/main/docs/owner-decisions.md" target="_blank" rel="noopener">your decision 43</a>: “Yes to all”). This card measures the book against it every 6 hours with the Coach. If a stop line (S1 to S4) is crossed, the Trader sends Gold trend and Gold daily engulf back to paper shadows at its next round, once, and you are told: no open trade is closed, every stop stays, and nothing goes back by itself. A failed execution check (E1 to E5) is only reported, here, on Home and in the daily digest. Counted: the two systems' own paper trades filled from 12 Nov 2026, after costs and overnight financing; the bands and lines are the proposal's own figures. The Mosha cycle (live on paper 11-14 Nov by your choice, a paper shadow since) is not part of the protocol's book and is not counted here.</p>
       </div>
       <div class="card c-edge adm" id="ms-edge">
         <div class="ms-k"><span role="heading" aria-level="2">Edge finder · where the council makes money</span><span class="ms-note" id="ms-edge-at"></span></div>
@@ -4003,6 +4007,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
       <div class="card adm" id="ms-ea">
         <style id="ms-ea-css">
+          #ms-ea, #ms-tr { align-self: start; }   /* side by side, each its own height (the short card stretched to the review's) */
           #ms-ea .ea-sum { font-size: 13px; margin: 6px 0 10px; color: var(--ink-dim); line-height: 1.5; }
           #ms-ea .ea-sum b { color: var(--ink); }
           #ms-ea .ea-tb { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -5145,7 +5150,9 @@ function msNextSetup(bars, A) {
         ctx.fillStyle = ln.color; ctx.beginPath(); ctx.arc(x2, Math.round(y) + 0.5, 3, 0, 7); ctx.fill();
         ctx.strokeStyle = ln.color; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x1, Math.round(y) - 3.5); ctx.lineTo(x1, Math.round(y) + 4.5); ctx.stroke();
       }
-      if (ln.text) texts.push({ pr: 3 - k / 1000, text: ln.text, x: (x1 + x2) / 2, y: ln.below ? y + 14 : y - 6, align: 'center', color: ln.color });
+      // label the middle of the part of the line on screen (a line that starts off the left edge put its word at the edge, cut)
+      const cw = ctx.canvas.width / (window.devicePixelRatio || 1), vx1 = Math.max(x1, 24), vx2 = Math.min(x2, cw - 24);
+      if (ln.text) texts.push({ pr: 3 - k / 1000, text: ln.text, x: vx2 > vx1 ? (vx1 + vx2) / 2 : (x1 + x2) / 2, y: ln.below ? y + 14 : y - 6, align: 'center', color: ln.color });
     });
     if (it.path.length > 1) {
       ctx.strokeStyle = Z.proj; ctx.lineWidth = 2; ctx.setLineDash([6, 5]); ctx.beginPath();
@@ -5696,7 +5703,7 @@ function msNextSetup(bars, A) {
         // phones (7 Nov loop): the toolbar scrolls sideways inside the header; a fade shows there is more until the end is reached
         { const ovf = () => { const o = tl.scrollWidth > tl.clientWidth + 1; tl.classList.toggle('ovf', o); tl.classList.toggle('end', o && tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 2); };
           tl.addEventListener('scroll', ovf, { passive: true }); if (window.ResizeObserver) new ResizeObserver(ovf).observe(tl); setTimeout(ovf, 0); }
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
@@ -5706,7 +5713,6 @@ function msNextSetup(bars, A) {
         tl.querySelector('.ch-pos').addEventListener('click', () => P.posTool && P.posTool());
         tl.querySelector('.ch-fib').addEventListener('click', () => P.fibTool && P.fibTool());
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
-        { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
         tl.querySelector('.ch-fs').addEventListener('click', () => { const vc = document.getElementById('v-charts') || pane; if (document.fullscreenElement) document.exitFullscreen(); else if (vc.requestFullscreen) vc.requestFullscreen().catch(() => {}); });   // the whole Charts view: the layout, split and tools as they are (18 Nov 2026)
       }
@@ -7986,7 +7992,7 @@ function msNextSetup(bars, A) {
   // ─── One chart toolbar (19 Nov 2026): the tools act on the chart last touched, in every layout (All, Split, Layout, one chart) ───
   { const bar = document.getElementById('ms-ch-one'), VCH0 = document.getElementById('v-charts');
     // the ChronosTrade strip next to it already draws horizontal and trend lines, so those two are not repeated here (H / T keys still work)
-    const TOOLS = ['.ch-pos', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-tv', '.ch-fs'];
+    const TOOLS = ['.ch-pos', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-fs'];   // TradingView link removed 20 Nov 2026 (owner)
     let ACT = null, MO = null, built = false;
     const shown = () => [...document.querySelectorAll('#v-charts .ms-pane')].filter((x) => x.offsetParent && x.querySelector('.ch-tools'));
     const active = () => { const v = shown(); return ACT && v.includes(ACT) ? ACT : (KB_PANE && v.includes(KB_PANE) ? KB_PANE : v[0] || null); };
@@ -7998,8 +8004,7 @@ function msNextSetup(bars, A) {
       const tf = bar.querySelector('.ch-one-tf'), lab = pn && pn.querySelector('.ms-ph b');
       if (tf) tf.textContent = lab ? lab.textContent.trim() : '';
       bar.querySelectorAll('[data-t]').forEach((b) => { const src = pn && pn.querySelector('.ch-tools ' + b.dataset.t);
-        const on = !!(src && src.classList.contains('on')); b.classList.toggle('on', on); if (b.tagName === 'BUTTON' && b.dataset.t !== '.ch-snap' && b.dataset.t !== '.ch-fit' && b.dataset.t !== '.ch-fs') b.setAttribute('aria-pressed', String(on));
-        if (b.dataset.t === '.ch-tv' && src) b.href = src.href; });
+        const on = !!(src && src.classList.contains('on')); b.classList.toggle('on', on); if (b.tagName === 'BUTTON' && b.dataset.t !== '.ch-snap' && b.dataset.t !== '.ch-fit' && b.dataset.t !== '.ch-fs') b.setAttribute('aria-pressed', String(on)); });
       if (MO) MO.disconnect(); if (pn && window.MutationObserver) { MO = new MutationObserver(sync); MO.observe(pn.querySelector('.ch-tools'), { subtree: true, attributes: true, attributeFilter: ['class', 'href'] }); }
     };
     function build(pn) {
@@ -8010,7 +8015,6 @@ function msNextSetup(bars, A) {
         b.setAttribute('title', (o.getAttribute('title') || '').replace('this chart', 'the chart you last touched'));
         b.setAttribute('aria-label', (o.getAttribute('aria-label') || '').replace(/ the \S+ chart/, ' the chart'));
         b.addEventListener('click', (e) => { const p = active(), t = p && p.querySelector('.ch-tools ' + sel); if (!t) return;
-          if (sel === '.ch-tv') { b.href = t.href; t.dispatchEvent(new MouseEvent('click')); return; }
           e.preventDefault(); t.click(); sync(); });
         if (sel === '.ch-tl') b.addEventListener('dblclick', () => { const t = active() && active().querySelector('.ch-tools .ch-tl'); if (t) t.dispatchEvent(new MouseEvent('dblclick')); });
         bar.appendChild(b); });
@@ -8062,10 +8066,10 @@ function msNextSetup(bars, A) {
       const btnOf = (k) => k === 'mag' ? DB.querySelector('[data-mag]') : k.startsWith('dt:') ? DB.querySelector(`[data-dt="${k.slice(3)}"]`) : CO.querySelector(`[data-t="${k.slice(3)}"]`);
       const nameOf = (b) => (b.getAttribute('aria-label') || b.title || '').replace(/ \(.*/, '');
       const wide = window.matchMedia('(min-width: 641px)');
-      function place() { if (wide.matches) { if (DB.parentNode !== rail) { rail.prepend(DB); DB.after(CO); rail.appendChild(favBtn); } VC.classList.add('has-rail'); }
-        else { if (DB.parentNode === rail) { ph.db.after(DB); ph.co.after(CO); favBtn.remove(); } VC.classList.remove('has-rail'); } stars(); fav(); }
+      function place() { if (wide.matches) { if (DB.parentNode !== rail) { rail.prepend(DB); CO.after(favBtn); } VC.classList.add('has-rail'); }
+        else { if (DB.parentNode === rail) { ph.db.after(DB); favBtn.remove(); } VC.classList.remove('has-rail'); } stars(); fav(); }
       // a star on every tool of the rail (a span inside the button; the capture listener below keeps its click from pressing the tool)
-      function stars() { rail.querySelectorAll('.dr-bar button, .ch-one [data-t]').forEach((b) => { const k = keyOf(b); if (!k) return;
+      function stars() { [...rail.querySelectorAll('.dr-bar button'), ...CO.querySelectorAll('[data-t]')].forEach((b) => { const k = keyOf(b); if (!k) return;
           let s = b.querySelector(':scope > .rl-star'); if (!s) { s = document.createElement('span'); s.className = 'rl-star'; s.setAttribute('aria-hidden', 'true'); b.appendChild(s); }
           const on = F.tools.includes(k); if (s.classList.contains('on') !== on) s.classList.toggle('on', on); if (b.classList.contains('is-fav') !== on) b.classList.toggle('is-fav', on); });
         const n = F.tools.length;
@@ -8073,8 +8077,8 @@ function msNextSetup(bars, A) {
         favBtn.setAttribute('aria-label', n ? (F.on ? 'Hide the favourites bar' : 'Show the favourites bar') : 'Favourites bar: no favourites yet');
         const pr = String(!!(n && F.on)); if (favBtn.getAttribute('aria-pressed') !== pr) favBtn.setAttribute('aria-pressed', pr); }
       function toggleFav(k) { if (!k) return; const i = F.tools.indexOf(k); if (i >= 0) F.tools.splice(i, 1); else { F.tools.push(k); F.on = true; } wr(); stars(); fav(); }
-      rail.addEventListener('click', (e) => { const s = e.target.closest && e.target.closest('.rl-star'); if (!s) return; e.preventDefault(); e.stopPropagation(); toggleFav(keyOf(s.closest('button, a'))); }, true);
-      rail.addEventListener('contextmenu', (e) => { const b = e.target.closest && e.target.closest('.dr-bar button, .ch-one [data-t]'); if (!b) return; e.preventDefault(); toggleFav(keyOf(b)); });
+      [rail, CO].forEach((el) => { el.addEventListener('click', (e) => { const s = e.target.closest && e.target.closest('.rl-star'); if (!s) return; e.preventDefault(); e.stopPropagation(); toggleFav(keyOf(s.closest('button, a'))); }, true);
+        el.addEventListener('contextmenu', (e) => { if (!wide.matches) return; const b = e.target.closest && e.target.closest('.dr-bar button, .ch-one [data-t]'); if (!b) return; e.preventDefault(); toggleFav(keyOf(b)); }); });
       favBtn.addEventListener('click', () => { if (!F.tools.length) { const n = document.getElementById('ms-dr-note'); if (n) { n.textContent = 'Hover a tool on the left and tap its star (or right-click it) to add it to your favourites.'; setTimeout(() => { if (n.textContent.startsWith('Hover a tool')) n.textContent = ''; }, 5000); } return; }
         F.on = !F.on; wr(); stars(); fav(); });
       // the floating favourites bar
@@ -8109,7 +8113,7 @@ function msNextSetup(bars, A) {
       if (wide.addEventListener) wide.addEventListener('change', place); else if (wide.addListener) wide.addListener(place);
       place();
       window.msRail = () => ({ inRail: DB.parentNode === rail, favs: F.tools.slice(), on: !!F.on, bar: !FB.hidden, at: FB.hidden ? null : { x: parseFloat(FB.style.left), y: parseFloat(FB.style.top) },
-        tools: [...rail.querySelectorAll('.dr-bar button, .ch-one [data-t]')].map(keyOf).filter(Boolean) });
+        tools: [...rail.querySelectorAll('.dr-bar button'), ...CO.querySelectorAll('[data-t]')].map(keyOf).filter(Boolean), top: CO.parentNode && CO.parentNode.classList.contains('sec-h') });
       window.msRailFav = toggleFav;
     }
   }
@@ -8143,6 +8147,21 @@ function msNextSetup(bars, A) {
     endTbl(); if (list) out.push('</ul>');
     return out.join('');
   }
+  // The Analyst's brief and the Coach's AI review ran to about 14,000 px on Council → Research (20 Nov 2026): each "## " section of
+  // the rendered markdown folds to its heading (details.c-mdf); the title and the lines before the first section stay open.
+  // Open state is kept in memory for the visit only (MDF, by box id and heading).
+  const MDF = new Set();
+  // "Ready right now" lists every Ready market (20 on 20 Nov 2026): the first six show, the rest behind one button (memory only)
+  let RDY_ALL = false;
+  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#ms-c-ready .c-rbtn'); if (!b) return; RDY_ALL = !RDY_ALL;
+    const u = b.closest('ul'); u.toggleAttribute('data-all', RDY_ALL); b.setAttribute('aria-expanded', String(RDY_ALL)); b.textContent = RDY_ALL ? 'Show fewer' : `Show all ${u.querySelectorAll('li:not(.c-rmore)').length}`; });
+  function mdFold(html, box) {
+    const parts = String(html).split('<h4>'); if (parts.length < 2) return html;
+    return parts[0] + parts.slice(1).map((p) => { const i = p.indexOf('</h4>'), h = p.slice(0, i), body = p.slice(i + 5);
+      const k = box + '|' + h.replace(/<[^>]+>/g, '');
+      return `<details class="c-mdf" data-mdf="${esc(k)}"${MDF.has(k) ? ' open' : ''}><summary><h4>${h}</h4></summary><div class="c-mdf-b">${body}</div></details>`; }).join('');
+  }
+  document.addEventListener('toggle', (e) => { const d = e.target; if (!d.matches || !d.matches('details.c-mdf')) return; d.open ? MDF.add(d.dataset.mdf) : MDF.delete(d.dataset.mdf); }, true);
   const ago = (t) => { const d = Date.now() / 1000 - t; return d < 90 ? 'just now' : d < 3600 ? `${Math.round(d / 60)} min ago` : d < 86400 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
   async function loadCouncil() {
     if (!document.getElementById('v-council') || window.msBootGate) return;   // under the first-load sign-in card the app sleeps
@@ -8418,7 +8437,7 @@ function msNextSetup(bars, A) {
         + `<span class="a-r ${flN.length ? (fl >= 0 ? 'pos' : 'neg') : ''}">${flN.length ? fR(fl) : '—'}</span>`
         + `<span class="a-d">${['btc', 'eth', 'sol', 'xrp'].includes(x0.market) ? `${lots >= 100 ? Math.round(lots).toLocaleString() : fmtL(lots)} ${x0.market.toUpperCase()}` : `${fmtL(lots)} lots`} total <small>(on $50k at the sizing guide)</small>${flN.length ? ` · floating <b class="${usd >= 0 ? 'pos' : 'neg'}">${fUsd(usd)}</b>` : ''}<span class="a-tap"> · tap to see the ${L.length} trades</span></span></summary>`
         + `<ul class="c-act sub">${L.map((i) => i.html).join('')}</ul></details></li>`;
-    }).join('') : (PUB ? '<li class="empty">No open trades right now.</li>' : '<li class="empty">No open trades right now. The system opens one when a gold replica signal passes (while gold is volatile), a Mosha BO setup completes (gold), a coin closes above its 55-day high (crypto trend), or the NQ open run fires (paper).</li>');
+    }).join('') : (PUB ? '<li class="empty">No open trades right now.</li>' : '<li class="empty">No open trades right now. The live paper book is Gold trend (a daily close above the 20-day high) and Gold daily engulf (a buy zone that fills); the other systems are followed as shadows, in the Shadow list.</li>');
     el.querySelectorAll('details[data-g]').forEach((dEl) => dEl.addEventListener('toggle', () => { if (dEl.open) OPEN.add(dEl.dataset.g); else OPEN.delete(dEl.dataset.g); }));
     const sum = document.getElementById('ms-active-sum');
     const trk = A0.length - A1.length;
@@ -8883,8 +8902,9 @@ function msNextSetup(bars, A) {
     renderBacktest(C.backtest, C.config || {});
     // Analyst
     const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
-    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> <em class="sd ${t.side === 'sell' ? 's' : 'b'}">${t.side === 'sell' ? 'Sell' : 'Buy'}</em> ${esc(t.name)} <small>${esc(t.pair)}</small></a><span title="Planned reward for 1R of risk, not a result">target ${(+t.rr).toFixed(2)}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
-    set('ms-c-analysis', C.analysis ? md(C.analysis) : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
+    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }, i) => `<li${i >= 6 ? ' class="c-rx"' : ''}><a href="?s=${k}#setup"><b>${esc(m.label)}</b> <em class="sd ${t.side === 'sell' ? 's' : 'b'}">${t.side === 'sell' ? 'Sell' : 'Buy'}</em> ${esc(t.name)} <small>${esc(t.pair)}</small></a><span title="Planned reward for 1R of risk, not a result">target ${(+t.rr).toFixed(2)}R</span></li>`).join('') + (ready.length > 6 ? `<li class="c-rmore"><button type="button" class="c-rbtn" aria-expanded="false">Show all ${ready.length}</button></li>` : '') : '<li class="empty">No market is Ready at the last Trader run.</li>');
+    { const u = document.getElementById('ms-c-ready'); if (u) { u.toggleAttribute('data-all', !!RDY_ALL); const bt = u.querySelector('.c-rbtn'); if (bt) { bt.setAttribute('aria-expanded', String(!!RDY_ALL)); bt.textContent = RDY_ALL ? 'Show fewer' : `Show all ${ready.length}`; } } }
+    set('ms-c-analysis', C.analysis ? mdFold(md(C.analysis), 'an') : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
     // Coach
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
@@ -8896,7 +8916,7 @@ function msNextSetup(bars, A) {
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
     set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li class="${/^user|owner/i.test(String(h.by)) ? 'by-you' : 'by-coach'}"><span>${esc(String(h.at).slice(0, 10))} · ${/^user|owner/i.test(String(h.by)) ? 'you' : esc(h.by)}</span><b>${mnTxt(esc(h.change))}</b><em>${mnTxt(esc(h.why))}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
-    set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
+    set('ms-c-review', C.review ? mdFold(md(C.review), 'rv') : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
     });
     renderHome();
     const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
@@ -11517,6 +11537,18 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-md h3 { font-size: 17px; margin: 22px 0 8px; padding-top: 16px; border-top: 1px solid var(--line-soft); text-wrap: balance; }
 #v-council .c-md > h3:first-child { margin-top: 4px; padding-top: 0; border-top: 0; }
 #v-council .c-md h4, #v-council .c-md h5 { font-size: 14px; margin: 18px 0 6px; }
+#v-council .c-md details.c-mdf { border-top: 1px solid var(--line-soft); }
+#v-council .c-md details.c-mdf > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; min-height: 44px; }
+#v-council .c-md details.c-mdf > summary::-webkit-details-marker { display: none; }
+#v-council .c-md details.c-mdf > summary::before { content: ""; width: 7px; height: 7px; border-right: 2px solid var(--ink-dim); border-bottom: 2px solid var(--ink-dim); transform: rotate(-45deg); transition: transform .15s; flex: none; }
+#v-council .c-md details.c-mdf[open] > summary::before { transform: rotate(45deg); }
+#v-council .c-md details.c-mdf > summary h4 { margin: 0; }
+#v-council .c-md details.c-mdf > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+#v-council .c-md .c-mdf-b { padding: 0 0 10px 15px; }
+#ms-c-ready:not([data-all]) > li.c-rx { display: none; }
+#ms-c-ready > li.c-rmore { border: 0; background: none; padding: 0; }
+#ms-c-ready .c-rbtn { min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--accent-ink, var(--accent)); font: inherit; font-weight: 600; cursor: pointer; }
+#ms-c-ready .c-rbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 #v-council .c-md .c-md-tw { margin: 6px 0 14px; border: 1px solid var(--line); border-radius: var(--r-sm, 6px); }
 #v-council .c-md table { font-size: 12.5px; }
 #v-council .c-md th { background: var(--panel-raised); font-size: 12px; white-space: nowrap; }
@@ -13776,8 +13808,8 @@ html[data-theme="dark"] #v-home::before, html:not([data-theme="light"]) #v-home:
     var flags = {}; arr(J && J.flags).forEach(function (f) { flags[f.id] = f; });
     var S = streamsOf(J, st.b);
     $('ms-tr-list').innerHTML = S.length ? S.map(function (s) { var a = s.windows.all, k = 's:' + s.key, nf = arr(s.flags).length;
-      return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary><b>' + esc(s.name) + '</b><span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span>' + (s.retired ? '<span class="tr-chip">no longer live</span>' : s.stopped ? '<span class="tr-chip">no longer recorded</span>' : '') + (nf ? '<span class="tr-chip strong">' + nf + ' flag' + (nf > 1 ? 's' : '') + '</span>' : '')
-        + '<span class="tr-r">' + a.n + ' closed · ' + (a.cost.known ? cR(a.net.sum) + ' after costs' : cR(a.gross.sum) + ' before costs') + ' · ' + fT(a.net.t) + '</span></summary>' + (st.open[k] ? streamHTML(s, flags) : '') + '</details></li>'; }).join('')
+      return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary><b>' + esc(s.name) + '</b>' + (s.retired ? '' : '<span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span>') + (s.retired ? '<span class="tr-chip" title="Took live trades before it was retired">retired from live</span>' : s.stopped ? '<span class="tr-chip">no longer recorded</span>' : '') + (nf ? '<span class="tr-chip strong">' + nf + ' flag' + (nf > 1 ? 's' : '') + '</span>' : '')
+        + '<span class="tr-r">' + a.n + ' closed · ' + (a.cost.known ? cR(a.net.sum) + ' after costs' : cR(a.gross.sum) + ' before costs') + ' · ' + (a.n < 10 ? 'too few to judge' : fT(a.net.t)) + '</span></summary>' + (st.open[k] ? streamHTML(s, flags) : '') + '</details></li>'; }).join('')
       : '<li class="tr-body"><p>' + (J ? 'No ' + esc(BOOK[st.b] || '') + ' stream has a closed trade on file.' : st.done ? 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.' : 'Loading…') + '</p></li>';
     var P = arr(J && J.proposals);
     $('ms-tr-props').innerHTML = P.length ? P.map(propHTML).join('') : '<li class="tr-body"><p>' + (J ? 'No pattern in the trades reaches |t| ≥ 2 with enough trades: nothing to propose.' : st.done ? 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.' : 'Loading…') + '</p></li>';
@@ -14536,7 +14568,8 @@ html[data-motion="off"] .ms-live-dot::after, html[data-motion="off"] .g-live i::
    tap away in Settings, in the chart toolbars and in the search palette; the market list never pokes past the edge */
 @media (max-width: 430px) {
   .top-actions #ms-alerts { display: none !important; }
-  .top .mk-pop { width: auto; left: 0; right: auto; max-width: calc(100vw - 24px); box-sizing: border-box; }
+  /* a sheet across the screen under the header (20 Nov 2026: width auto shrank it to the brand's 168 px and names ran into prices) */
+  .top .mk-pop { position: fixed; left: 12px; right: 12px; top: calc(var(--ms-hdr-h, 56px) + 4px); width: auto; max-width: none; box-sizing: border-box; }
 }
 @media (max-width: 430px) { .btab > a svg, .btab-more-btn svg { padding: 3px 10px; } .btab > a, .btab-more-btn { overflow: hidden; min-width: 0; } .btab { box-sizing: border-box; width: 100%; max-width: 100vw; grid-auto-columns: minmax(0, 1fr); } }
 /* the home wash bled 24 px past the right edge of a phone (the page scrolled sideways by 8 px); nothing in the app may widen the page */
@@ -15175,7 +15208,7 @@ html[data-role="public"] #v-charts::before { background: var(--au-surface) !impo
 .pz { background: var(--au-surface); }
 .pz:hover { border-color: var(--au-line-strong); }
 /* phone header: the account button was cut off by 17 px at 390 px (7 px at 360): tighter gaps, nothing hidden */
-@media (max-width: 430px) { .top { gap: 6px; } .top .inst { padding-right: 10px; } .top-actions .nt-bell { margin-right: 0; } .top-actions #ms-me { margin-left: 0; } }
+@media (max-width: 430px) { .top { gap: 5px; } .top .inst { padding-right: 15px; max-width: 81px; background-position: calc(100% - 7px) 50%, calc(100% - 2px) 50%; } .top-actions .nt-bell { margin-right: 0; } .top-actions #ms-me { margin-left: 0; } }
 /* Phone sign-in like the owner's Figma example (17 Nov 2026, "and the login as well, only for the phone"): up to 640 px the card is
    the screen: the mark centred, "Welcome back" and one line, the password, quiet links, and a full-width pill Sign in at the
    bottom of the first screen; the live strip and the proof scroll under it. The form is display: contents so its button can
@@ -15382,6 +15415,9 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
    prices and states came out blank on a phone (19 Nov 2026) */
 .brand .mk-list .mk-n { display: grid !important; } .brand .mk-list .mk-n small { display: block; }
 .brand .mk-list :is(.mk-p, .ms-st, .mk-wait) { display: inline-block !important; }
+/* the market list at the site's 12 px floor (20 Nov 2026: group names were 10 px, names, prices and states 11 px) */
+.brand .mk-list .mk-g { font-size: 12px; letter-spacing: .08em; } .brand .mk-list .mk-n small, .brand .mk-list .mk-wait { font-size: 12px; }
+.brand .mk-list .mk-p { font-size: 12.5px; } .brand .mk-list .ms-st { font-size: 12px; }
 /* Council, flat (19 Nov 2026, "the rest" of "it looks made by an AI"): the status is a dot and words, the sections are underlined
    tabs, the calendar's days carry a light tint and a coloured figure instead of a solid red or green box */
 #v-council #ms-c-status :is(.c-ok, .c-warn, .c-bad) { background: transparent !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; font-weight: 600; }

@@ -866,6 +866,13 @@ switch (`setMode` and its click handler) matched every `[data-mk]` button, inclu
 (`data-mk="all|xau|nq|pairs"`): the calendar never showed its selected market and a tap on "Gold" there reset the chart markup to
 Meridian; both are now scoped to `.mk-mode`. The veteran discussion's "STRATEGIST" label no longer runs into its text.
 
+## Council → Research, folded (20 Nov 2026)
+Display only. The Analyst's weekly brief (`analysis/latest.md`) and the Coach's latest AI review (`reviews/latest.md`) were drawn open
+and made the Research pane about 17,000 px tall at 1440 px. `mdFold(html, box)` (next to `md()`) wraps each `## ` section of the
+rendered markdown in `details.c-mdf` (summary = the heading, 44 px; the title and the lines before the first section stay open);
+open state is kept in memory for the visit (`MDF`). "Ready right now" (`#ms-c-ready`) shows six rows and "Show all n" (`.c-rbtn`,
+`RDY_ALL`, memory only). Research pane 17,094 → about 5,000 px; the Analyst card 13,791 → 1,245 px. Test: `tests/qa-sweep.test.mjs`.
+
 ## Home and Council reading pass (11 Nov 2026, quality round)
 Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
 the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three themes, each figure checked against council-data.
@@ -2528,6 +2535,9 @@ bar (`#ms-cfs-css` now reads `.ch-row` / `#v-charts:fullscreen .ms-grid4`). The 
 only beside the rail) and its chapters say where the tools are and how favourites work. Never set an attribute the rail's observer
 watches to the value it already has (it looped once and froze the page). `window.msRail()` is the read-only view. Test:
 `tests/desk-draw.test.mjs`.
+**20 Nov 2026 (owner's marked screenshot)**: only the drawing tools stay in the rail; the chart tools `#ms-ch-one` (timeframe,
+position, measure, replay, image, fit, full screen) and the favourites star `#ms-rail-fav` sit in the top toolbar after Clean
+(`order: 3`), with their stars there too. The "Open on TradingView" button (`.ch-tv`) is gone from every chart.
 
 ## Fibonacci, arrow and text drawings (19 Nov 2026, owner: "add more drawing tools like fibonacci and text")
 Display only. Three shapes join ChronosTrade's drawing types in `assets/backtest-engine.js` (`DRAW_TYPES`, so `drawNorm`,
@@ -3516,7 +3526,9 @@ written anywhere the veteran reads. Display / freshness only: no probability, ca
   "as of <date> close", or "Stale: last close <date>, <n> trading days ago" from one missed session. `markOf(fc)` = the
   strategist's latest gold price (`assets.gold.last` at `fc.at`, OANDA only); `markLevels` stamps `mark` and `crossed: true`
   on every level between the close and that price; `watchLevels` then picks the two levels either side of the PRICE, tags a
-  crossed one, and `broken` names the level that was the one to watch at the close. The sentence says "Gold has traded below
+  crossed one, and `broken` names the level that was the one to watch at the close. When the price is past every level on file on a
+  side (19 Nov 2026: gold 3.7% under the close), that side is the next $50 round number beyond the price, `made: true`, labelled
+  "price is under every level he tracks" (the rule of "Your read"); never added to the list. The sentence says "Gold has traded below
   $X (label) since the <date> close and is near $Y". None of it is read by a hypothesis or a call (`nearestLevel`'s `ref`
   argument is display only; a test pins that hypotheses, calls and level prices are the same whatever the latest price is).
 - **Desk** (macro-desk.html): `lvFresh` / `lvStale` / `hmUtc`; the glance tile, the ladder (`#ld-stale`, a hollow dot for

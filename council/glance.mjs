@@ -78,7 +78,12 @@ export function watchLevels(v) {
   const m = g.mark && Number.isFinite(g.mark.px) ? g.mark.px : null;
   const out = (l) => (l ? { price: l.price, label: l.label, dist: l.dist, ...(m != null ? { distNow: +((l.price / m - 1) * 100).toFixed(2) } : {}), ...(l.crossed ? { crossed: true } : {}) } : null);
   const was = m == null ? null : nearestLevel(g, m > g.px ? 'above' : 'below');
-  return { px: g.px, asOf: g.asOf, above: out(nearestLevel(g, 'above', 0.4, m)), below: out(nearestLevel(g, 'below', 0.4, m)),
+  // price run past every level on file (19 Nov 2026: gold 3.7% under the close, nothing below it): the next $50 round number
+  // beyond the price, said so, as the desk's "Your read" does; display only, never added to the list a hypothesis reads
+  const made = (side) => (m == null ? null : { price: side === 'below' ? Math.floor((m - 0.01) / 50) * 50 : Math.ceil((m + 0.01) / 50) * 50,
+    label: `Round number (price is ${side === 'below' ? 'under' : 'over'} every level he tracks)`, made: true });
+  const pick = (side) => { const l = nearestLevel(g, side, 0.4, m); if (l) return out(l); const r = made(side); return r ? { ...r, dist: +((r.price / g.px - 1) * 100).toFixed(2), distNow: +((r.price / m - 1) * 100).toFixed(2) } : null; };
+  return { px: g.px, asOf: g.asOf, above: pick('above'), below: pick('below'),
     fresh: g.fresh || null, mark: g.mark || null, broken: was && was.crossed ? { price: was.price, label: was.label, side: m > g.px ? 'above' : 'below' } : null };
 }
 export function summary(v) {
