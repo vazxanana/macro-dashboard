@@ -5133,3 +5133,13 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
+
+## Discretion: taken against skipped signals (20 Nov 2026, owner: "the difference is discretion on all edges, because they work")
+`research/edge/discretion` (pre-registered; read-only on council-data; aggregates only, never a person's trade, note or name).
+Do the signals a person took before the outcome beat the ones they skipped, per stream (ICT its own section)? **TOO FEW TO
+JUDGE: 0 take / skip decisions stamped before the outcome exist** (`ict/desk.json` was never written to council-data; the 8
+human loss reviews are all after the close and losses only; no council system records a choice). Bar fixed for later: 20 a
+side, Welch t >= 2, Holm. Power arithmetic: ICT A-setup per-unit R sd 1.69R (n 259), so +0.3R a trade needs about 254 a side
+for an even chance of t 2, +0.5R about 92. Proposal for the owner (nothing built): `research/proposals/2026-11-20-discretion.md`
+(a take / skip + reason + confidence stamped by the server before the outcome on every signal, "taken by a person" beside "all
+signals"). Never quote picked examples as evidence of discretion. Test: `tests/discretion.test.mjs`.
