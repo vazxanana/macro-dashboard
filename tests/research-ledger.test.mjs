@@ -90,11 +90,11 @@ test('landedIn and the digest lines: one line the day a study lands, a block in 
   assert.deepEqual(researchLines(LEDGER, T('2026-12-06T21:20:00Z'), 'preview'), ['Research this week: no new study.']);
   assert.deepEqual(researchLines(null, NOW, 'preview'), [], 'no ledger file: the digest says nothing about research');
   assert.deepEqual(researchLines(null, NOW, 'daily'), []);
-  // in the digest itself, before the time stamp; the preview may run to 18 lines for it
+  // in the digest itself, before the time stamp; the preview may run to 21 lines for it
   const d = buildDigest({ ledger: LEDGER }, { now: NOW, kind: 'daily', prev: {}, sbRows: null });
   assert.equal(d.lines.at(-2), 'New study: ICT sessions — Nothing passes. All four hypotheses FAIL the pre-registered bar.');
   const w = buildDigest({ ledger: LEDGER }, { now: T('2026-11-08T21:20:00Z'), kind: 'preview', prev: {}, sbRows: null });
-  assert.ok(w.msg.includes('Research this week: 2 studies (1 pass, 1 fail):\n• ICT sessions:'), w.msg); assert.ok(w.lines.length <= 18);
+  assert.ok(w.msg.includes('Research this week: 2 studies (1 pass, 1 fail):\n• ICT sessions:'), w.msg); assert.ok(w.lines.length <= 21);
   const none = buildDigest({}, { now: NOW, kind: 'daily', prev: {}, sbRows: null });
   assert.ok(!/study/i.test(none.msg));
 });

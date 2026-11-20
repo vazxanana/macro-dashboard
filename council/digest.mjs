@@ -48,7 +48,7 @@ export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
   at: 21 * 60 + 15,   // UTC minute of the day from which the digest may go out (about an hour after the 16:00 New York close)
   maxLines: 15,       // body lines at most
-  maxLinesPreview: 18,   // the Sunday preview may carry the "Research this week" block
+  maxLinesPreview: 21,   // the Sunday preview may carry the "Research this week" block
   macroStaleH: 12,    // a forecast older than this is labelled with its date
   dataStaleH: 3,      // a data check older than this counts as a problem
   acctStaleH: 2,      // a cTrader account file older than this shows its time
@@ -262,6 +262,13 @@ export function waiting(D, now, prev) {
   return out;
 }
 
+// Sunday preview only: up to three top lines of the Week ahead (macro/week-ahead.json, council/week-ahead.mjs) when it covers
+// the coming week. Context, never a call.
+export function weekAheadLines(wa) {
+  if (!wa || !wa.next || !Array.isArray(wa.lines) || !wa.lines.length) return [];
+  return ['The week ahead:', ...wa.lines.slice(0, 3).map((l) => '• ' + trim(l, 170))];
+}
+
 // ─── the message ───
 // D: the council-data files (see readData); prev: digest.json; sbRows: the scoreboard rows (null when they could not be built)
 export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null } = {}) {
@@ -273,7 +280,8 @@ export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null }
     `ICT desk A-setups ${tallyTxt(ictA)}${ictEvery.n > ictA.n ? ` · all signals ${fR(ictEvery.R)} (${ictEvery.n})` : ''}`,
     ctraderLine(D.account, D.mirror, now, from, kind),
     openLine(openPositions(D)),
-    ...macroLines(D.forecast, now)];
+    ...macroLines(D.forecast, now),
+    ...(kind === 'preview' ? weekAheadLines(D.weekAhead) : [])];
   const W = waiting(D, now, prev);
   if (W.length) L.push('Waiting on you:', ...W.map((s) => '• ' + s)); else L.push('Nothing waiting on you.');
   if (sbRows) {
@@ -295,7 +303,7 @@ export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null }
 export function readData(dir) {
   const rd = (f) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return null; } };
   return { rd, trades: rd('trades.json'), research: rd('research.json'), ictTrades: rd('ict/trades.json'), snapshot: rd('snapshot.json'), ictSnap: rd('ict/snapshot.json'),
-    account: rd('ctrader/account.json'), mirror: rd('ctrader/mirror.json'), forecast: rd('macro/forecast.json'), coach: rd('coach.json'), health: rd('health.json'),
+    account: rd('ctrader/account.json'), mirror: rd('ctrader/mirror.json'), forecast: rd('macro/forecast.json'), weekAhead: rd('macro/week-ahead.json'), coach: rd('coach.json'), health: rd('health.json'),
     robust: rd('research/robustness.json'), ledger: rd('research/ledger.json'), state: rd('state.json') };
 }
 // The edge scoreboard's own pure functions (market-structure.html, script#ms-sb-js), as the scoreboard test runs them

@@ -2972,7 +2972,7 @@ gold-pre-holiday, post-holiday-metals, gotobi, turnaround-tuesday-forward, gold-
 headline (`research-ledger.mjs` `studyRow`) and the forward record's latest reading (`research/forward/<x>.json`). A failed study
 is listed as "Tested: failed" so it is not chased; a pass is never called an edge. The frame: Gold Macro Score (a negative score is
 not a sell), regime, the veteran's levels and month call, the rule book's readings that are on, and the week's dated calls once
-issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
+issued. The Sunday 21:15 UTC phone digest carries its first three top lines (`digest.mjs` `weekAheadLines`, only when the file covers the coming week; the preview may run to 21 lines; `tests/digest-week-ahead.test.mjs`). Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
 `tests/week-ahead.test.mjs`. **Nowcast beside the consensus** (20 Nov 2026, `prepFor`, `parseExp`): a CPI / PCE release with a
 calendar consensus and a Cleveland nowcast gets `prep` (core nowcast for a "Core" title, else headline; `side` above / below / in line
