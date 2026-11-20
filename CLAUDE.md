@@ -4671,6 +4671,15 @@ Why: both studies of the live code fail after costs (`research/edge/mcycle-base`
 `research/edge/mcycle-oos` untouched 2007-19 −0.175R, n 244, t −1.50, break-even before costs). Undo: a rule deleting the key.
 Test: `tests/mcycle-shadow.test.mjs`.
 
+## Gold replica live again (20 Nov 2026, owner: "And mine replica shadow to live")
+User rule `replica-live-again` (council/trader.mjs (the id `replica-live` was taken by an older rule), after `replica-mirror-gold-only`) removes `replica` from `config.ownerShadow`: the gold
+replica's NEW trades are live paper trades again (alerted, main book, council demo account); its rule, stops, gates and
+`config.replicaLive` are unchanged; trades opened as owner-shadow run to their exits. `replica-mirror-gold-only` stays (its forex and
+crypto RESEARCH trades are still not copied). `council/decay.mjs` lists it live (`ownStream: true`, `liveAgain`), so its record stays
+one stream (live, owner-shadow 11-20 Nov, live); `council/expect-base.json` `live: true`. Said to the owner: no out-of-sample edge
+on record (replica-oos 2017-22 −0.05R, n 115; replica-sides FAIL). Undo: a user rule setting `ownerShadow.replica` again. Tests:
+`tests/supported-book.test.mjs`, `tests/decay.test.mjs`, `tests/expect.test.mjs`, `tests/financing-rest.test.mjs`, `tests/replica-live.test.mjs`.
+
 ## Edge analyst: an AI second opinion on each live entry (11 Nov 2026, owner: "have an ai to study the trade decisions in the edge u can use the same of the academy"; chose "each entry, blind" and "an API key, automatic")
 `api/_edge-analyst.js` (pure) + `api/edge-analyst.js` (endpoint), reusing the Academy's language-model adapter
 (`api/_academy-llm.js`) and store (`api/_academy-store.js`, `blobBackend(env, { root })`; own folder `edge-analyst/`, preview

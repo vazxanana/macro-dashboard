@@ -86,7 +86,7 @@ test('gold systems: 2006-17 out of sample and 2018-26 match gold-systems-oos bef
   for (const id of ['nq-open', 'ict-a', 'trend']) assert.equal(sys(id).fin, null, `${id}: no financing in its figures, and the file says so`);
   assert.match(BASE.financing.notComputed, /NQ open run/); assert.doesNotMatch(BASE.financing.notComputed, /replica|Mosha|pullback/i); assert.equal(BASE.financing.rate, 0.000148);
   assert.deepEqual(BASE.financing.systems, ['gtrend', 'gtrend5', 'geg', 'gtl', 'replica', 'mosha-bo', 'gmp']);
-  assert.deepEqual(BASE.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a'], 'live since 11 Nov: Gold trend, Gold daily engulf (and the separate ICT desk)');
+  assert.deepEqual(BASE.systems.filter((s) => s.live).map((s) => s.id), ['replica', 'gtrend', 'geg', 'ict-a'], 'live: the gold replica again since 20 Nov (owner), Gold trend, Gold daily engulf (and the separate ICT desk)');
   near(sys('gtrend').honest.perYear, 74 / 11.5, 0.05, 'gtrend positions a year over the 11.5-year window');
 });
 // Since 12 Nov 2026 (owner approved docs/owner-decisions.md item 42) Gold trend and Gold trend fast pay financing on EVERY unit, the

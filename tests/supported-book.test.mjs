@@ -26,9 +26,12 @@ const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 const seg = (s, a, b) => { const i = s.indexOf(a), j = s.indexOf(b, i); assert.ok(i > 0 && j > i, 'block not found: ' + a.slice(0, 50)); return s.slice(i, j + b.length); };
 const ts = (s) => Date.parse(s) / 1000;
 const SHADOWED = ['replica', 'mosha-bo', 'gtl', 'gmp', 'nq-open'];
+// the replica is live again since 20 Nov 2026 (owner, rule replica-live); the other four stay paper shadows
+const STILL_SH = SHADOWED.filter((k) => k !== 'replica');
 
 // ─── the three owner rules, lifted out of the Trader and applied to a config shaped like council-data's ───
-const rulesSrc = seg(TRADER, "  { id: 'supported-book', apply:", "Owner approved.' },\n];").replace(/\n\];$/, '');
+// (20 Nov 2026: the owner's later replica-live rule follows them; it is tested in tests/replica-live.test.mjs)
+const rulesSrc = seg(TRADER, "  { id: 'supported-book', apply:", "Owner approved.' },\n  // 20 Nov 2026").replace(/\n  \/\/ 20 Nov 2026$/, '');
 const K = TRADER.match(/const OWNER_SHADOW_K = (\[[^\]]+\]);/);
 const RULES = new Function('OWNER_SHADOW_K', 'return [' + rulesSrc + '];')(JSON.parse(K[1].replace(/'/g, '"')));
 const CONFIG = () => ({ userRules: ['gold-trend', 'gold-daily-engulf', 'gold-trend-fast-shadow'], history: [], replicaLive: ['xau'], moshaBo: true, moshaBoWeekly: true, focus: ['none'], focusSetups: [],
@@ -181,8 +184,8 @@ test('a trade open as live when the rule starts is managed exactly as before, wi
 });
 
 test('decay monitor: live = Gold trend, Gold daily engulf (and the ICT desk); a shadowed system keeps its record: live trades before, owner-shadow trades after', () => {
-  assert.deepEqual(SYSTEMS.filter((s) => !s.shadow).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
-  for (const id of SHADOWED) { const s = SYSTEMS.find((x) => x.id === id); assert.equal(s.shadow, true); assert.equal(s.since, SHADOW_11NOV); }
+  assert.deepEqual(SYSTEMS.filter((s) => !s.shadow).map((s) => s.id), ['replica', 'gtrend', 'geg', 'ict-a']);
+  for (const id of STILL_SH) { const s = SYSTEMS.find((x) => x.id === id); assert.equal(s.shadow, true); assert.equal(s.since, SHADOW_11NOV); }
   assert.equal(SYSTEMS.find((x) => x.id === 'gtrend5').since, '2026-11-07'); assert.equal(SHADOW_11NOV, '2026-11-11');
   const closed = (o) => ({ status: 'win', R: 1, closed: T0 + 100, opened: T0, ...o });
   const trades = [closed({ id: 'a', k: 'mosha-bo', shadow: false }), closed({ id: 'b', k: 'mosha-bo', ...SH, closed: T0 + 200 }), closed({ id: 'c', k: 'mosha-bo', shadow: true, blockedBy: ['weekly', 'owner-shadow'], R: -1, closed: T0 + 300 }),
@@ -200,14 +203,14 @@ test('decay monitor: live = Gold trend, Gold daily engulf (and the ICT desk); a 
   // the digest only names LIVE systems as decaying
   const base = { at: 'x', systems: Object.fromEntries(SYSTEMS.map((s) => [s.id, { ref: 0.4, sd: 1.3, h: 12, perYear: 20, maxDD: 10, mcDD: 12, n: 100, src: 't' }])) };
   const out = buildDecay({ trades: [], research: [], replay: { trades: [] } }, { now: T0, base });
-  assert.deepEqual(out.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
-  assert.deepEqual(out.systems.filter((s) => s.shadowSince === SHADOW_11NOV).map((s) => s.id), ['replica', 'mosha-bo', 'gtl', 'gmp', 'nq-open']);
+  assert.deepEqual(out.systems.filter((s) => s.live).map((s) => s.id), ['replica', 'gtrend', 'geg', 'ict-a']);
+  assert.deepEqual(out.systems.filter((s) => s.shadowSince === SHADOW_11NOV).map((s) => s.id), STILL_SH);
 });
 
 test('what to expect: live flags, shadow dates and the financing figures reach coach.json', () => {
   const base = loadExpectBase(), ex = buildExpect(null, { now: T0, base });
-  assert.deepEqual(ex.systems.filter((s) => s.live).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
-  for (const id of SHADOWED) assert.equal(ex.systems.find((s) => s.id === id).shadowSince, SHADOW_11NOV);
+  assert.deepEqual(ex.systems.filter((s) => s.live).map((s) => s.id), ['replica', 'gtrend', 'geg', 'ict-a']);
+  for (const id of STILL_SH) assert.equal(ex.systems.find((s) => s.id === id).shadowSince, SHADOW_11NOV);
   const g = ex.systems.find((s) => s.id === 'gtrend');
   // since 12 Nov 2026 (item 42): every unit, the add included, from the book study's unit records (research/edge/supported-book)
   assert.deepEqual([g.fin.before.exp, g.honest.exp, g.honest.n], [0.436, 0.313, 74]); assert.match(g.line, /^Expect \+0\.31R a position after financing on every unit/);
