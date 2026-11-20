@@ -5,13 +5,42 @@
   "lit"
  ],
  "state": {
-  "map": {},
+  "map": {
+   "sol-position-1795206921": {
+    "positionId": "50646165",
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "volume": 1000,
+    "lots": 0.01,
+    "digits": 3,
+    "setup": "position",
+    "status": "open",
+    "openedAt": "2026-11-20T20:36:37.000Z",
+    "councilEntry": 67.39,
+    "stop": 75.86303571428572,
+    "t1": 50.383928571428584,
+    "riskCash": 84.73,
+    "margin": 68.22,
+    "minLot": true,
+    "shadow": true,
+    "mark": 67.39,
+    "levelsFrom": "mark",
+    "fillPrice": 67.313,
+    "slipR": 0.009,
+    "lagSec": 76,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-20T20:36:37.000Z",
+    "brokerStop": 75.786
+   }
+  },
   "day": {
    "date": "2026-11-20",
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 10000 · 1 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -24,7 +53,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10000,
-  "lastRun": "2026-11-20T20:33:56.000Z"
+  "lastRun": "2026-11-20T20:36:37.000Z"
  },
  "log": [
   {
@@ -84,6 +113,11 @@
    "at": "2026-11-20T20:33:56.000Z",
    "msg": "not mirrored xrp-position-1795206762: none of XRPUSD found at the broker",
    "trade": "xrp-position-1795206762"
+  },
+  {
+   "at": "2026-11-20T20:36:37.000Z",
+   "msg": "opened sell SOLUSD 0.01 lot (council position)",
+   "trade": "sol-position-1795206921"
   }
  ],
  "limits": {
@@ -162,6 +196,16 @@
   ]
  },
  "execution": {
-  "n": 0
+  "n": 1,
+  "meanSlipR": 0.009,
+  "medianSlipR": 0.009,
+  "worstSlipR": 0.009,
+  "medianLagSec": 76,
+  "bySymbol": {
+   "SOLUSD": {
+    "n": 1,
+    "meanSlipR": 0.009
+   }
+  }
  }
 }
