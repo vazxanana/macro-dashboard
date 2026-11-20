@@ -227,7 +227,9 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   const rel = releasesOf(cal, W.from, W.to);
   for (let d = W.from; d <= W.to; d = addD(d, 1)) {
     if (!weekday(d)) continue;
-    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) }));
+    // 20 Nov 2026: what the 2022-24 first-print record says about a release (veteran.json newsAhead, same kind, same minute)
+    const NA = (v && v.newsAhead && Array.isArray(v.newsAhead.items) ? v.newsAhead.items : []), ctx = (r) => { const x = r.type && NA.find((i) => i.kind === r.type && Math.abs(Date.parse(i.at) / 1000 - r.t) <= 3600); return x ? x.point : null; };
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r), ...(ctx(r) ? { context: ctx(r) } : {}) }));
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
@@ -246,6 +248,8 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   if (frame.odds) lines.push(hd.odds.line);
   const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
   if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
+  const cx = days.flatMap((d) => d.releases.filter((r) => r.context).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.context}`));
+  if (cx.length) lines.push(`From the 2022-24 first-print record: ${cx[0]}`);
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
   else lines.push('No top-tier US release is scheduled on the files read so far.');
   if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);

@@ -148,8 +148,11 @@ export function hypothesesFor(card, R) {
 
 const last = (rows, now) => { const r = (rows || []).filter((o) => o.t <= now); return r[r.length - 1] || null; };
 const ago = (rows, now, days) => { const r = (rows || []).filter((o) => o.t <= now - days * DAY); return r[r.length - 1] || null; };
-const chg = (rows, now, days) => { const a = last(rows, now), b = ago(rows, now, days); return a && b ? a.v - b.v : null; };
-const lchg = (rows, now, days) => { const a = last(rows, now), b = ago(rows, now, days); return a && b && b.v > 0 ? (a.v / b.v - 1) * 100 : null; };
+// A change "over N days" is measured back from the series' LAST observation, not from the clock (20 Nov 2026): FRED runs about two
+// days behind, more over a US holiday, so from the clock "over 2 weeks" was 12 days and "over 4 weeks" 26 (the 2-year read +11 bp
+// here beside +1 bp in the veteran's own channel, a 16 bp day falling inside one window and outside the other).
+const chg = (rows, now, days) => { const a = last(rows, now), b = a && ago(rows, a.t, days); return a && b ? a.v - b.v : null; };
+const lchg = (rows, now, days) => { const a = last(rows, now), b = a && ago(rows, a.t, days); return a && b && b.v > 0 ? (a.v / b.v - 1) * 100 : null; };
 
 // 7 Nov gold brief: its three scenarios and the conditions it names, checked on today's data
 export function goldScenarios({ md, S, gold, now }) {

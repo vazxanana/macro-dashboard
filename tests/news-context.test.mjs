@@ -53,14 +53,14 @@ test('honest wording: never a surprise, an edge claim or advice to trade', () =>
   assert.doesNotMatch(all, /surprise|\bbuy\b|\bsell\b|proven|guarantee/i);
   assert.match(ctx('CPI m/m').label, /not a tested edge or a forecast on the record/);
   assert.match(ctx('CPI m/m').noSurprise, /expectation captured before the release/);
-  const A = N.ahead({ F, fc: null, calendar: cal, expectations: [], now, days: 14 });
+  const A = N.ahead({ F, fc: null, calendar: cal, expectations: [], now, days: 14, schedule: [] });   // the calendar alone (20 Nov 2026: the council's schedule adds what the calendar does not hold; tests/brain-veteran.test.mjs)
   assert.deepEqual(A.map((x) => x.kind), ['NFP', 'PCE', 'CPI', 'FOMC', 'PPI']);
   assert.equal(N.facts(null), null); assert.deepEqual(N.ahead({ F: null, now }), []);
 });
 
 test('wiring: the veteran puts it on its cards and the desk shows it', () => {
   const v = fs.readFileSync('council/veteran.mjs', 'utf8'), d = fs.readFileSync('macro-desk.html', 'utf8');
-  assert.match(v, /contextFor\(e, \{ F, expectations: E, calendar: calN, now \}\)/); assert.match(v, /v\.newsAhead = /);
+  assert.match(v, /contextFor\(e, \{ F, expectations: E, calendar: calN, now, hd \}\)/); assert.match(v, /v\.newsAhead = /);
   assert.match(d, /id="nx-batch"/); assert.match(d, /What the 2022-24 record says/); assert.match(d, /news: \(v && v\.newsAhead/);
 });
 

@@ -76,7 +76,8 @@ review. `watchdog.yml` pages when the loop stops.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
   Fred applies ICT changes (on for Fred since 10 Nov).
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
-  The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
+  The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk,
+  Macro brain audit (20 Nov: trading days, the batch in the council's checkout, odds that name their level).
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
 - Running and reliability: Simplified (17 Nov 2026: what was removed), Vercel (stage 1 + Pro features; history), Council live runner (removed), Council quick pass, One feed per market (12 Nov), Reliability: tests and data
@@ -3043,7 +3044,25 @@ are optional (macro-desk.html was not touched). Defects, each: what a reader saw
 - **Releases without a country, "pending" for good.** `veteran.json.releases` showed "Employment Change · 25.2K" (Australia's) with
   no country, and every past release as "pending" (the calendar feed carries no actuals). `releaseCheck` returns `country` and,
   past the 48-hour first-print window, "no first print was captured …: no surprise is scored".
+- **"29% before calibration" on an 18% hypothesis**, with calibration behind its gate (k = 1). `freezeHypotheses` showed the
+  recorded claim and p beside the LIVE reading's `pRaw`, and the desk prints "before calibration" whenever the two differ. The
+  record's own `pRaw` travels with it now (`freezeEventCalls` the same); the live reading keeps its own in `live`.
+- **"Over 4 weeks" measured from the clock.** `research-watch.mjs` `chg` / `lchg` took the last observation against the value N
+  days before NOW; FRED runs about two days behind (more over a US holiday), so "over 2 weeks" was 12 days and "over 4 weeks" 26.
+  On 20 Nov the rule book's regime check read "10-year +7 bp over 4 weeks, 2-year +11 bp" while the veteran's channel said the
+  2-year was +1 bp: a 16 bp day fell inside one window and outside the other. Both are measured back from the last observation
+  now (10-year −6 bp, 2-year −1 bp). The real-yield insight says which number its z belongs to when the analogs' week-end frame
+  differs from the 28-day change.
+- **A failed rule given as an instruction.** The playbook's hot-print action ended "if gold closes up anyway, cancel any sell
+  bias": the rule book's C5, which FAILED its own study (`rulebook-stress`: after such days gold fell more, n 12, t −1.04; the
+  research card on the same page says "do not use it"). The action now says the rule failed and an up-close is not an all-clear.
 Additions (display only):
+- **The release ledgers reach next week** (`news-context.mjs` `scheduleOf`, `cpiPrintFrom`). `newsAhead` read the calendar feed,
+  which holds one week and no actuals: on a Friday it said nothing of the PCE five days away, and its PCE point could never name
+  the month's core CPI. The council's schedule fills the days the feed does not hold (once per kind and day), and the month's core
+  CPI print comes from the Cleveland Fed file hard-data.mjs already fetches (`build({ hd })`, display build only): "Core CPI for
+  October printed 0.30% m/m … went with core PCE near 0.24% (fit on 36 months, typical miss ±0.07 pp): a descriptive fit …". The
+  Week ahead carries it on the release (`releases[].context`) and in its lines, beside the nowcast (+0.27%).
 - **Holidays on the calls** (`glance.mjs` `holidaysBetween`, the ICT desk's CME calendar): `summary.holidays` and a closing
   sentence ("Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov"),
   `outlook.holidays` for the calls' window with `due`. `session` says what a day is for a dated call: a shortened CME day prints a
@@ -3062,8 +3081,9 @@ Wednesday, post-holiday Friday, gotobi the 25th); release times are New York loc
 levels' freshness and broken-level wording (11 and 19 Nov). Known, not changed: two releases at the same minute with the same
 title share an expectations key (a US and a Canadian "CPI m/m"); a call due on Good Friday names a day with no candle; the
 strategist's own 20-row trend mean and base rates still read the raw rows (macro.mjs is outside this change).
-Tests: `tests/brain-veteran.test.mjs` (10); changed on purpose: `tests/glance.test.mjs` (the no-event sentence),
-`tests/daily-report.test.mjs` (the heading), `tests/veteran-fresh.test.mjs` (a call's `status` follows the fresh closes).
+Tests: `tests/brain-veteran.test.mjs` (14); changed on purpose: `tests/glance.test.mjs` (the no-event sentence),
+`tests/daily-report.test.mjs` (the heading), `tests/veteran-fresh.test.mjs` (a call's `status` follows the fresh closes),
+`tests/news-context.test.mjs` (the calendar-only path passes `schedule: []`; the `contextFor` call carries `hd`).
 
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus

@@ -169,3 +169,59 @@ test('morning note: on a Friday the six days ahead come from the council\'s sche
   const q = D.worldReport({ fc: { regime: {} }, vet: null, cal: [], now: T(2026, 11, 13, 6, 3) }).sections.find((x) => x.h === 'The next six days').lines;
   assert.deepEqual(q, ['No high-impact release is on the calendar for the next six days.']);
 });
+
+test('the release ledgers reach next week: the council\'s schedule fills the days the calendar does not hold, and the month\'s core CPI comes from the nowcast file', async () => {
+  const N = await import('../council/news-context.mjs'), F = N.facts(N.loadBatch()), now = T(2026, 11, 20, 14, 32);
+  assert.ok(F && F.pce && F.n === 36, 'the batch is in the repository');
+  assert.deepEqual(N.scheduleOf(now).map((e) => [e.title, e.at, e.src]), [['PCE (Personal Income and Outlays)', '2026-11-25T13:30:00.000Z', 'schedule']]);
+  const hd = { nowcast: { months: [{ month: '2026-10', asOf: '2026-11-19', now: { corePce: 0.27 }, actual: { cpi: 0.35, coreCpi: 0.3 } }, { month: '2026-11', asOf: '2026-11-19', now: {}, actual: {} }] } };
+  assert.deepEqual(N.cpiPrintFrom(hd, T(2026, 11, 25, 13, 30)), { num: 0.3, month: '2026-10', name: 'October', asOf: '2026-11-19' });
+  assert.equal(N.cpiPrintFrom(hd, T(2026, 12, 23, 13, 30)), null, 'November has no print yet'); assert.equal(N.cpiPrintFrom(null, now), null);
+  // on a Friday the calendar holds this week only: nothing was said about the PCE five days away
+  assert.deepEqual(N.ahead({ F, fc: { playbook: [] }, calendar: [], expectations: [], now, schedule: [] }), []);
+  const A = N.ahead({ F, fc: { playbook: [] }, calendar: [], expectations: [], now, hd });
+  assert.equal(A.length, 1); assert.equal(A[0].kind, 'PCE'); assert.equal(A[0].src, 'schedule');
+  const imp = (F.pce.a + F.pce.b * 0.3).toFixed(2);
+  assert.equal(A[0].point, `Core CPI for October printed 0.30% m/m (the Cleveland Fed's file of actual prints, read 2026-11-19). On the 2022-24 record a core CPI of 0.3% went with core PCE near ${imp}% (fit on 36 months, typical miss ±${F.pce.mae.toFixed(2)} pp): a descriptive fit on past months, not a forecast on the record.`);
+  assert.match(N.ahead({ F, fc: { playbook: [] }, calendar: [], expectations: [], now })[0].point, /^Read it from this month's core CPI print \(not on file here/, 'without the file: the lookup, never a made-up print');
+  // a release the calendar already holds is not said twice
+  const cal = [{ title: 'Core PCE Price Index m/m', country: 'USD', at: '2026-11-25T13:30:00.000Z' }];
+  const B = N.ahead({ F, fc: { playbook: [] }, calendar: cal, expectations: [], now, hd }); assert.equal(B.length, 1); assert.equal(B[0].title, 'Core PCE Price Index m/m'); assert.ok(!('src' in B[0]));
+  // the Week ahead carries the point on the release and in its lines
+  const v = vet(); v.summary = G.summary(v); v.newsAhead = { items: A };
+  const plan = W.build({ now, cal: [], rf: null, fc: null, v, hd });
+  const pce = plan.days[2].releases.find((r) => r.type === 'PCE'); assert.equal(pce.context, A[0].point); assert.ok(pce.nowcast && pce.nowcast.core === 0.27);
+  assert.ok(plan.lines.some((l) => l.startsWith('From the 2022-24 first-print record: PCE (Wednesday): Core CPI for October printed 0.30%')));
+  assert.ok(!plan.days[2].releases.find((r) => /Claims/.test(r.title)).context);
+});
+
+test('research checks: a change "over N days" is measured back from the last observation, not from the clock (FRED runs days behind, more over a holiday)', async () => {
+  const R = await import('../council/research-watch.mjs');
+  // the 10-year fell 16 bp on 22 Oct; the last observation is two days old on 20 Nov
+  const days = [['2026-10-06', 4.9], ['2026-10-20', 4.8], ['2026-10-21', 4.86], ['2026-10-22', 4.7], ['2026-10-23', 4.73], ['2026-11-04', 4.63], ['2026-11-06', 4.59], ['2026-11-18', 4.8]];
+  const s = days.map(([d, v]) => ({ t: Date.parse(d + 'T00:00:00Z') / 1000, v }));
+  const r = R.regimeCheck({ S: { DGS10: s, DGS2: s }, now: T(2026, 11, 20, 14) });
+  assert.deepEqual(r.readings.map((x) => x.text), ['10-year +17 bp over 2 weeks', '−6 bp over 4 weeks', '−10 bp over 6 weeks', '2-year −6 bp over 4 weeks'], 'from 18 Nov back to 4 Nov, 21 Oct and 7 Oct (from the clock it read +21 bp and +7 bp)');
+  assert.equal(r.asOf, '2026-11-18');
+});
+
+test('a recorded hypothesis shows its own probability before calibration, never the live reading\'s ("29% before calibration" on an 18% call, with calibration behind its gate)', () => {
+  const b = { hypotheses: [{ id: 'hyp:2026-11-14:H1', slot: 'H1', kind: 'firstTouchUp', claim: 'live claim', p: 0.29, pRaw: 0.29, by: '2026-11-26', why: 'live why', invalid: 'x' }] };
+  const CL = [{ id: 'hyp:2026-11-14:H1', src: 'veteran hypothesis', kind: 'firstTouchUp', claim: 'recorded claim', p: 0.18, level: 4000.4, guard: 3852.6, by: '2026-11-20', issued: '2026-11-14' }];
+  const h = V.freezeHypotheses(b, CL).hypotheses[0];
+  assert.equal(h.p, 0.18); assert.equal(h.pRaw, 0.18, 'the desk prints "before calibration" only when pRaw differs from p'); assert.equal(h.live.p, 0.29); assert.equal(h.claim, 'recorded claim');
+  const adj = V.freezeHypotheses({ hypotheses: [{ ...b.hypotheses[0], p: 0.29 }] }, [{ ...CL[0], p: 0.2, pRaw: 0.18 }]).hypotheses[0];
+  assert.equal(adj.pRaw, 0.18, 'a record that was calibrated keeps its own raw probability');
+  const ev = [{ at: '2026-11-25T13:30:00.000Z', call: { id: 'evt:2026-11-25:gold:dayUp', p: 0.55, pRaw: 0.55 } }];
+  V.freezeEventCalls(ev, [{ id: 'evt:2026-11-25:gold:dayUp', src: 'event playbook', kind: 'dayUp', claim: 'c', p: 0.52, baseP: 0.53, by: '2026-11-25', issued: '2026-11-23' }]);
+  assert.equal(ev[0].call.p, 0.52); assert.equal(ev[0].call.pRaw, 0.52); assert.equal(ev[0].call.live, 0.55);
+});
+
+test('playbook: a rule that failed its test is not given as an instruction ("if gold closes up anyway, cancel any sell bias" is the rule book\'s C5, FAIL)', async () => {
+  const P = await import('../council/playbook.mjs');
+  const g = { country: 'USD', type: 'CPI', items: [{ rule: null, scenarios: [] }] }, hot = P.scenarios(g, null).find((x) => x.k === 'hot').action;
+  assert.doesNotMatch(hot, /cancel any sell bias/); assert.match(hot, /failed its test \(research\/edge\/rulebook-stress C5: after such days gold fell more, n 12, t −1\.04\)/);
+  const res = JSON.parse(fs.readFileSync(new URL('research/edge/rulebook-stress/result.json', root), 'utf8')), md = fs.readFileSync(new URL('research/edge/rulebook-stress/RESULT.md', root), 'utf8');
+  assert.match(md, /C5 gold closes up on a day the 2-year rose 15 bp = cancel the sell bias \| Welch, up vs down days \| 12 vs 40 \|[^|]*\(t −1\.04\): the wrong way \| FAIL \|/, 'the figures quoted are the study\'s');
+  assert.ok(res);
+});

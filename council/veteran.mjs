@@ -421,7 +421,7 @@ export function teaching(fc) {
 
 // `keep` (run() only): the week's RECORDED outlook and ledger view, built from the record closes; the display build shows them
 // instead of issuing its own, so what is on the record and what the desk shows as "his calls" are the same thing.
-export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null, news, docs }) {
+export function build({ fc, cache, daily, ledger = [], debates = [], expectations = [], cot = null, now, cal = null, evBase, keep = null, news, docs, hd = null }) {
   const S = {}; for (const id of ['DFII10', 'T10YIE', 'DGS2', 'DGS10', 'T10Y3M', 'BAMLH0A0HYM2', 'VIXCLS', 'VXVCLS', 'DTWEXBGS', 'SOFR', 'EFFR']) S[id] = fromCache(cache && cache.fred && cache.fred[id]);
   const gold = (daily && daily.gold) || [];
   S.gold = gold; S.dxy = daily && daily.dxy ? daily.dxy : [];
@@ -473,8 +473,8 @@ export function build({ fc, cache, daily, ledger = [], debates = [], expectation
   // upcoming US release; facts and descriptive fits with their n, never a surprise, a call on the record, a rule or a trade
   try {
     const F = news === undefined ? newsFacts(loadBatch()) : news, calN = calendarOf(cache);
-    if (F) { for (const e of v.events) { const c = contextFor(e, { F, expectations: E, calendar: calN, now }); if (c) e.batch = c; }
-      v.newsAhead = { label: 'From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.', items: newsAhead({ F, fc, calendar: calN, expectations: E, now }) }; }
+    if (F) { for (const e of v.events) { const c = contextFor(e, { F, expectations: E, calendar: calN, now, hd }); if (c) e.batch = c; }
+      v.newsAhead = { label: 'From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.', items: newsAhead({ F, fc, calendar: calN, expectations: E, now, hd }) }; }
   } catch (e) { v.newsError = String(e && e.message || e); }
   // 19 Nov 2026 (owner: "all this stuff I sent you about macro, you are not using it"): the briefs, research maps and news
   // register of the batch, their own conditions checked on today's data (council/research-watch.mjs); display only
@@ -533,7 +533,9 @@ export function freezeHypotheses(b, CL) {
   b.hypotheses = b.hypotheses.map((h) => { const r = by.get(h.id); if (!r) return h;
     const moved = r.claim !== h.claim || r.p !== h.p;
     // the shown hypothesis is the recorded one: its kind, levels and "Wrong if" with it; today's reading (and its why) go to `live`
-    return { ...h, kind: r.kind ?? h.kind, base: r.base ?? h.base, claim: r.claim, p: r.p, level: r.level, guard: r.guard ?? h.guard, lo: r.lo, hi: r.hi, by: r.by, issued: r.issued, hit: r.hit ?? null,
+    // (20 Nov 2026) pRaw travels with the record too: the live reading's pRaw beside the recorded p read "29% before calibration"
+    // on an 18% hypothesis while calibration was still behind its gate (k = 1); the live reading keeps its own in `live`
+    return { ...h, kind: r.kind ?? h.kind, base: r.base ?? h.base, claim: r.claim, p: r.p, pRaw: r.pRaw ?? r.p, level: r.level, guard: r.guard ?? h.guard, lo: r.lo, hi: r.hi, by: r.by, issued: r.issued, hit: r.hit ?? null,
       invalid: moved ? (invalidOf(r) ?? null) : h.invalid, ...(moved ? { why: null, live: { claim: h.claim, p: h.p, why: h.why, invalid: h.invalid } } : {}) }; });
   const done = (CL || []).filter((r) => r.src === 'veteran hypothesis');
   b.record = callsScore(done); b.recent = done.filter((r) => r.hit != null).slice(-8).reverse();
@@ -545,7 +547,7 @@ export function freezeEventCalls(events, CL) {
   const by = new Map((CL || []).map((r) => [r.id, r]));
   for (const e of events || []) {
     const id = e.call ? e.call.id : `evt:${e.at.slice(0, 10)}:gold:dayUp`, rec = by.get(id);
-    if (rec) { e.call = { ...(e.call || {}), id, claim: rec.claim, p: rec.p, baseP: rec.baseP, by: rec.by, kind: rec.kind, issued: rec.issued, hit: rec.hit ?? null, recorded: true, ...(e.call && e.call.p !== rec.p ? { live: e.call.p } : {}) }; e.callNote = null; }
+    if (rec) { e.call = { ...(e.call || {}), id, claim: rec.claim, p: rec.p, pRaw: rec.pRaw ?? rec.p, baseP: rec.baseP, by: rec.by, kind: rec.kind, issued: rec.issued, hit: rec.hit ?? null, recorded: true, ...(e.call && e.call.p !== rec.p ? { live: e.call.p } : {}) }; e.callNote = null; }
   }
   return callsScore((CL || []).filter((r) => r.src === 'event playbook'));
 }
@@ -618,7 +620,8 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
   const pxRec = Object.fromEntries(Object.entries(px).map(([k, a]) => [k, cut(a)]));
   const R = build({ fc, cache, daily: rec, ledger: ledgerResolve(ledger, gold), debates: debatesResolve(debates, gold), expectations, cot, now, cal });
   if (R.v.outlook) { R.v.outlook.cot = applyCalls(cotCalls(cot, pxRec, now), R.v.calibration); R.v.outlook.anchor = { asOf: rec.gold.length ? isoDay(rec.gold[rec.gold.length - 1].t) : null, week: weekKey(now), note: 'Dated calls are issued once a week, from the last close before the week began; they are scored on every daily close after their issue date.' }; }
-  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx, usdjpy: daily.usdjpy }, ledger: R.ledger, debates: R.debates, expectations: R.expectations, cot, now, cal, keep: { outlook: R.v.outlook, ledger: R.v.ledger } });
+  // hd: macro/hard-data.json (the Cleveland Fed's actual prints) for the release context of the display build; never a record input
+  const { v, ledger: L, debates: Dh, expectations: E } = build({ fc, cache, daily: { gold, dxy: dx, goldBars, spx, usdjpy: daily.usdjpy }, ledger: R.ledger, debates: R.debates, expectations: R.expectations, cot, now, cal, keep: { outlook: R.v.outlook, ledger: R.v.ledger }, hd: rd(path.join(M, 'hard-data.json'), null) });
   v.closes = { note: 'Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.', markets: closes };
   const w = (f, val) => { const s = JSON.stringify(val, null, 1), p = path.join(M, f); let old = null; try { old = fs.readFileSync(p, 'utf8'); } catch (e) {} if (old !== s) fs.writeFileSync(p, s); };
   let CL = CL0;
