@@ -185,7 +185,7 @@ test('drawing rail on the left and a floating favourites bar (19 Nov 2026)', () 
   const css = PAGE.slice(PAGE.indexOf('<style id="ms-rail-css">'), PAGE.indexOf('</style>', PAGE.indexOf('<style id="ms-rail-css">')));
   assert.match(css, /\.ms-fav \{ position: fixed;/, 'the favourites bar floats');
   assert.match(css, /@media \(pointer: coarse\)[^\n]*44px/, '44 px on touch');
-  assert.match(PAGE, /#v-charts:fullscreen > :not\(\.sec-h\):not\(\.ch-row\)/, 'full screen keeps the rail and the charts');
+  assert.match(PAGE, /#v-charts:fullscreen(?:, #v-charts\.ch-fake-fs\))? > :not\(\.sec-h\):not\(\.ch-row\)/, 'full screen keeps the rail and the charts');
   const G = fs.readFileSync('assets/ms-charts-guide.js', 'utf8');
   assert.match(G, /const bar = document\.querySelector\('#v-charts \.sec-h'\);/, 'the guide button stays in the toolbar, not in the rail');
   assert.match(G, /<b>Favourites<\/b>/, 'the guide explains the favourites');
