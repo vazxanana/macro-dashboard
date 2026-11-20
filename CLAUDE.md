@@ -3507,6 +3507,34 @@ over `STALE_MIN` 90 min (red over `OLD_MIN` 6 h). COT tab: the pre-registered st
 overall, the markets with a passing cell, "no tested edge" for the rest) and a tag per gauge from `edgeStatus` / `edgeText`.
 No council logic changed. Tests: tests/macro-visual.test.mjs (calm pass).
 
+## Macro desk: design pass on the newer sections (20 Nov 2026)
+macro-desk.html only; display only, no number, probability, claim wording or council logic changed. Found by measuring every drawn
+text and control (size, contrast against its composited background, touch size, overflow, layout shift) at 1440 and 390 px in
+dark / light / midnight with every section and fold open. Fixed, in the page's own tokens:
+- **Week ahead**: in "The frame for the week" the detail lines ran into each other ("…Fed decisionKalshi: … 4%Polymarket: …":
+  `.wa-r` was a block only inside a day); it is `.wa .wa-r` now. Day tiles are wells with no border (they were bordered boxes in
+  a card), their title weight 600; verdict chips are the colour on its 14 % tint over the panel (they were outlined; the plain
+  soft tint over a well gave 4.26:1 in dark); "The study" is 44 px on touch (was 16 px).
+- **Red folder study**: the up / down moves read `--buy` / `--sell` (they read undefined `--up` / `--dn` with hex fallbacks,
+  3.1-3.7:1 on dark and midnight); small print and the caption are `--ink-faint` instead of `opacity` (4.37:1); "Show all n
+  releases" sits on its own line (it floated right over the note); on a phone the eight tabs are one row that scrolls inside itself (they wrapped to two rows of two-line labels),
+  and the chosen tab is brought into view with the row's own `scrollLeft`, never `scrollIntoView` (it would move the page).
+- **Daily reports**: tab labels never wrap ("World economy" broke in two on a phone); the Summary box is a plain well with a
+  sentence-case label (it had a 3 px accent stripe and an uppercase label reading an undefined token); the report text keeps a
+  measure of 88 characters (lines ran 1,330 px wide at 1440).
+- **Your read**: the "Market by market" table scrolls inside its box on a phone and now keeps the market column in place.
+- **The detail**: source links (16 px tall) and veteran library documents (42 px) are 44 px on touch.
+- Four dead literal fallbacks on defined tokens (one the old gold `#e3b341`) and three undefined tokens (`--accent-ink`,
+  `--ink-2`, `--up` / `--dn`) are gone.
+Rules to keep (block "Design pass (20 Nov 2026)" right before the simple phone view's block; that block got nothing new):
+every colour is a token this page defines, never `var(--x, #hex)` and never `opacity` to dim text; a tile inside a card is a
+well without a border; a chip is its colour on `color-mix(in srgb, <colour> 14%, var(--panel))`; a tab label never wraps; a
+table that scrolls sideways keeps its first column sticky. Measured after: 0 texts under 12 px, 0 under AA, no sideways scroll,
+layout shift 0.002-0.003 (1440) and 0 (390) in all three themes. Left: the level ladder's focusable chart rows are 33 px tall
+on touch (a chart row, tooltip only); older parts still use 12.5 / 13.5 px sizes off the spec's scale; with every file
+unreadable the stamp says "No macro data yet: the council has not written its files." (wording, not changed here).
+Test: `tests/macro-design-pass.test.mjs`.
+
 ## Macro desk: simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone")
 macro-desk.html only; display only, no number, probability or claim wording changed. On a screen up to 640 px the page opens in
 its simple view: the head script sets `html[data-phone="simple"]` before the first paint unless this device chose the full view
