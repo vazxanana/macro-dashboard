@@ -2988,7 +2988,8 @@ FOMC, Beige Book, 2 days back to 14 ahead; `parseFedCal`). A failed source keeps
 (`datahealth.mjs` warns). The Week ahead reads it: the nowcast on a CPI / PCE release whose reference month has no actual print yet
 (`nowcastFor`; "a model's estimate, not the consensus"), the Fed calendar on its days, the odds and GDPNow in the frame, a "Before
 the print" and an odds line on top. Context only: the odds are "what traders pay, not a forecast of ours"; nothing reads it for a
-rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Kalshi) / 92.5% (Polymarket); October core PCE nowcast
+rule, call or trade. The 06:30 world report (`council/daily-report.mjs`, `hd`) carries it too: "Before the print: …" and the
+Fed's own events of the New York day under Today, the odds and GDPNow under What we expect (`tests/daily-report-hard.test.mjs`). First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Kalshi) / 92.5% (Polymarket); October core PCE nowcast
 +0.27%, headline +0.31%; GDPNow Q4 3.2%. Not usable from a runner on 20 Nov: GLD holdings (the CSV URL now serves a PDF), CME gold
 stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
 `tests/hard-data.test.mjs`.

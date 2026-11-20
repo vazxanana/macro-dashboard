@@ -10,6 +10,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { writeAtomic } from './jsonio.mjs';
+import { typeOf, nowcastFor } from './week-ahead.mjs';
+import { nyParts } from '../ict/calendar.mjs';
+const nyDay = (t) => nyParts(t).ymd;
 
 export const TZ = 'Europe/London', BUILD_FROM = 6, PUBLISH = { h: 6, m: 30 }, KEEP = 14;
 const COUNTRY = { USD: 'United States', EUR: 'Euro area', GBP: 'United Kingdom', JPY: 'Japan', CNY: 'China', AUD: 'Australia', NZD: 'New Zealand', CAD: 'Canada', CHF: 'Switzerland', ALL: 'Global' };
@@ -43,7 +46,7 @@ export function calLine(e) {
 }
 const important = (e) => e && (e.impact === 'High' || e.impact === 'Medium') && !/^(Bank Holiday|.*Holiday)$/i.test(e.title || '');
 
-export function worldReport({ fc, vet, cal, now }) {
+export function worldReport({ fc, vet, cal, now, hd = null }) {
   const L = london(now), today = L.day, from = now - 30 * 3600, endToday = londonAt(today, 23, 59);
   const R = (fc && fc.regime) || {}, S = (vet && vet.summary) || {}, shock = vet && vet.shock;
   const lines = { picture: [], happened: [], today: [], week: [], expect: [] };
@@ -63,6 +66,14 @@ export function worldReport({ fc, vet, cal, now }) {
   // today and the rest of the week, worldwide
   const todays = cal.filter((e) => e.at > now - 3 * 3600 && e.at <= endToday && important(e)).sort((a, b) => a.at - b.at);
   for (const e of todays.slice(0, 14)) lines.today.push((e.impact === 'High' ? 'High · ' : '') + calLine(e));
+  // hard-to-find data (council/hard-data.mjs): the Cleveland Fed nowcast beside today's US CPI / PCE, the Fed's own calendar of the day
+  for (const e of todays) {
+    if (e.country !== 'USD') continue;
+    const ty = typeOf(e.title, e.country), nc = ty ? nowcastFor(hd, { type: ty, t: e.at }) : null;
+    if (nc && !lines.today.some((l) => l.startsWith('Before the print'))) lines.today.push(`Before the print: ${nc.text}.`);
+  }
+  for (const f of (((hd && hd.fed) || {}).events || []).filter((x) => x && x.day === nyDay(now)).slice(0, 4))
+    lines.today.push(`Fed: ${clean(f.title, 100)}${f.time ? ` · ${clean(f.time, 20)} New York` : ''}${f.topic ? ` · ${clean(f.topic, 100)}` : ''}`);
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);
@@ -70,6 +81,8 @@ export function worldReport({ fc, vet, cal, now }) {
   // what we expect
   if (S.sentence) lines.expect.push(clean(S.sentence, 400));
   const gs = fc && fc.goldScore; if (gs && gs.ok && Number.isFinite(gs.score)) lines.expect.push(`Gold Macro Score ${gs.score > 0 ? '+' : ''}${gs.score.toFixed(2)}: ${gs.score > 0.25 ? 'leans to gold rising over the next four weeks (the score\'s tested side)' : 'no macro edge for gold (the score only ever points up, above +0.25)'}.`);
+  if (hd && hd.odds && hd.odds.line) lines.expect.push(clean(hd.odds.line, 300));
+  if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) lines.expect.push(`Atlanta Fed GDPNow for ${clean(hd.gdpnow.quarter, 12)}: ${hd.gdpnow.value}% a year, a model's running estimate of growth.`);
   for (const it of (((vet && vet.research) || {}).items || []).slice(0, 6)) if (it && it.text && !/^No |off:|no regime/i.test(it.text)) lines.expect.push(clean(it.text, 220));
   const sections = [['The picture', lines.picture], ['What happened (last 30 hours)', lines.happened], [`Today, ${dayName(now)} (London time)`, lines.today], ['Later this week', lines.week], ['What we expect', lines.expect]]
     .filter(([, l]) => l.length).map(([h, l]) => ({ h, lines: l }));
@@ -118,12 +131,12 @@ export function marketsReport({ fc, vet, cot, snap, now }) {
 }
 
 export const NOTE = 'Built from public data the desk already reads (central banks, the economic calendar, FRED, CFTC, prices). Leans and odds come with their usual rate; none is a tested edge, a forecast as fact or advice.';
-export function buildReports({ fc, vet, cache, cot, snap, now }) {
+export function buildReports({ fc, vet, cache, cot, snap, now, hd = null }) {
   const L = london(now), raw = cache && cache.cal, cal = (Array.isArray(raw) ? raw : raw && typeof raw === 'object' ? Object.values(raw).flat() : []).filter((e) => e && Number.isFinite(e.at));
   const seen = new Set(), C = cal.filter((e) => { const k = e.at + '|' + e.country + '|' + e.title; if (seen.has(k)) return false; seen.add(k); return true; }).sort((a, b) => a.at - b.at);
   return { day: L.day, tz: TZ, publishAt: new Date(londonAt(L.day, PUBLISH.h, PUBLISH.m) * 1000).toISOString(), builtAt: new Date(now * 1000).toISOString(),
     dataAt: { strategist: (fc && fc.at) || null, veteran: (vet && vet.at) || null, cot: (cot && cot.at) || null }, note: NOTE,
-    world: worldReport({ fc, vet, cal: C, now }), markets: marketsReport({ fc, vet, cot, snap, now }) };
+    world: worldReport({ fc, vet, cal: C, now, hd }), markets: marketsReport({ fc, vet, cot, snap, now }) };
 }
 // whether this round should build: once per London day from 06:00; a day's report built before 06:00 (the very first file is built
 // at once, whatever the hour, so there is something to read and test) is built again from 06:00 with that morning's data
@@ -143,7 +156,7 @@ async function main(dir, force) {
   if (fs.existsSync(path.join(dir, 'macro/daily-report.json')) && !file) { console.log('daily-report.json does not parse: left alone'); return; }
   if (!due(file, now, force)) { console.log('daily report: not due'); return; }
   const fc = read('macro/forecast.json'); if (!fc) { console.log('daily report: no forecast.json yet'); return; }
-  const rep = buildReports({ fc, vet: read('macro/veteran.json'), cache: read('macro/cache.json'), cot: read('macro/cot.json'), snap: read('snapshot.json'), now });
+  const rep = buildReports({ fc, vet: read('macro/veteran.json'), cache: read('macro/cache.json'), cot: read('macro/cot.json'), snap: read('snapshot.json'), now, hd: read('macro/hard-data.json') });
   writeAtomic(path.join(dir, 'macro/daily-report.json'), JSON.stringify(merge(file, rep), null, 1) + '\n');
   console.log(`daily report ${rep.day}: world ${rep.world.sections.length} sections, markets ${rep.markets.sections.length}, publish ${rep.publishAt}`);
 }
