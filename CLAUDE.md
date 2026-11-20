@@ -5122,6 +5122,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   **FAIL**: T+5 → T+60 with the miss −0.019 % (2018-21, n 24) and +0.041 % (2022 → Apr 2025, n 58, t 0.90). The first 5 minutes
   went the way of the miss on 65 of 82 releases and release → T+60 +0.41 % out of sample (t 5.37), not tradable: the dollar,
   like gold, moves at once. Know the side before the print; do not chase after it. Nothing live changed.
+- `usdjpy-vb-k` (pre-registered 20 Nov 2026): USD/JPY T1 at k 0.3-0.7 (gate: k 0.5 reproduces both published studies).
+  **BROAD**: net positive at every k in 2005-15 AND 2016 → now; pooled +0.097R (k 0.3, t 4.28) to +0.049R (k 0.7, t 2.69); k 0.5
+  +0.071R (n 4,168, t 3.86). Not a lucky setting; k stays 0.5 (no setting is adopted from this). Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
