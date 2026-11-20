@@ -207,16 +207,16 @@ test('the conversation: the desk answers, the teacher says right or not right an
 
 test('the book: the desk proposes, only a teacher confirms, corrects or erases; a taught line is the teacher\'s word', async () => {
   const s = mk(), g = (await call(s, 'GET', LUXUS)).body;
-  assert.equal(g.book.length, 12); assert.ok(g.book.every((b) => b.status === 'proposed' && b.by === 'assistant' && /^seed-\d\d$/.test(b.id)), 'what the desk starts with is its own reading, never the teacher\'s'); assert.equal(s.book(), null, 'reading stores nothing');
-  assert.deepEqual([g.score.book, g.score.taught, g.score.proposed], [12, 0, 12]); assert.ok(L.SEED.some((b) => /Every trade has a stop/.test(b.text)));
-  const ok = await call(s, 'POST', LUXUS, { book: { id: 'seed-02', confirm: true } }); assert.equal(ok.body.book.find((b) => b.id === 'seed-02').status, 'confirmed'); assert.equal(s.book().length, 12, 'the first change stores the whole book');
+  assert.equal(g.book.length, 24); assert.ok(g.book.every((b) => b.status === 'proposed' && b.by === 'assistant' && /^(seed|sop)-\d\d$/.test(b.id)), 'what the desk starts with is its own reading, never the teacher\'s'); assert.equal(s.book(), null, 'reading stores nothing');
+  assert.deepEqual([g.score.book, g.score.taught, g.score.proposed], [24, 0, 24]); assert.ok(L.SEED.some((b) => /Every trade has a stop/.test(b.text)));
+  const ok = await call(s, 'POST', LUXUS, { book: { id: 'seed-02', confirm: true } }); assert.equal(ok.body.book.find((b) => b.id === 'seed-02').status, 'confirmed'); assert.equal(s.book().length, 24, 'the first change stores the whole book');
   const fix = await call(s, 'POST', LUXUS, { book: { id: 'seed-03', text: 'VR: from the high to the last low before it, on M5 only.' } }), f3 = fix.body.book.find((b) => b.id === 'seed-03');
   assert.deepEqual([f3.status, f3.text, /^VR \(the "5 mn" box/.test(f3.was), f3.eby], ['corrected', 'VR: from the high to the last low before it, on M5 only.', true, 'luxus']);
   const fix2 = await call(s, 'POST', LUXUS, { book: { id: 'seed-03', text: 'VR: from the high to the last low before it.' } }); assert.match(fix2.body.book.find((b) => b.id === 'seed-03').was, /^VR \(the "5 mn" box/, 'the desk\'s first wording stays on record');
-  assert.equal((await call(s, 'POST', LUXUS, { book: { id: 'seed-04', remove: true } })).body.book.length, 11); assert.equal((await call(s, 'POST', LUXUS, { book: { id: 'seed-04', confirm: true } })).code, 404);
+  assert.equal((await call(s, 'POST', LUXUS, { book: { id: 'seed-04', remove: true } })).body.book.length, 23); assert.equal((await call(s, 'POST', LUXUS, { book: { id: 'seed-04', confirm: true } })).code, 404);
   assert.equal((await call(s, 'POST', LUXUS, { book: { id: 'seed-05' } })).code, 400); assert.equal((await call(s, 'POST', LUXUS, { book: { id: '../x', confirm: true } })).code, 404); assert.equal((await call(s, 'POST', LUXUS, { book: { id: 'seed-05', text: ' ' } })).code, 400);
   // a line taught directly is confirmed at once; the assistant's line is only proposed, and it cannot touch any line
-  const t = await call(s, 'POST', LUXUS, { learn: { kind: 'rule', text: 'Never sell before the M5 CF closes.' } }); assert.deepEqual([t.body.item.status, t.body.item.by, t.body.book.length], ['confirmed', 'luxus', 12]);
+  const t = await call(s, 'POST', LUXUS, { learn: { kind: 'rule', text: 'Never sell before the M5 CF closes.' } }); assert.deepEqual([t.body.item.status, t.body.item.by, t.body.book.length], ['confirmed', 'luxus', 24]);
   const les = await call(s, 'POST', LUXUS, { add: { title: 'x', note: 'y' } });
   const p = await call(s, 'POST', null, { learn: { kind: 'avoid', text: 'Do not trade the first candle after the sweep.', from: [les.body.lesson.id, '20260101000000000zzzz', 'x'] } }, key()); assert.deepEqual([p.body.item.status, p.body.item.by, p.body.item.from], ['proposed', 'assistant', [les.body.lesson.id]]);
   assert.equal((await call(s, 'POST', null, { learn: { kind: 'avoid', text: 'do not trade the first candle after the sweep.' } }, key())).code, 409, 'the same line twice is refused');
@@ -224,7 +224,7 @@ test('the book: the desk proposes, only a teacher confirms, corrects or erases; 
   for (const body of [{ book: { id: t.body.item.id, text: 'changed by the key' } }, { book: { id: t.body.item.id, remove: true } }, { book: { id: p.body.item.id, confirm: true } }]) assert.equal((await call(s, 'POST', null, body, key())).code, 403);
   assert.equal(s.book().find((b) => b.id === t.body.item.id).text, 'Never sell before the M5 CF closes.');
   for (const who of [FRED, CARLOS]) { assert.ok([403].includes((await call(s, 'POST', who, { learn: { kind: 'rule', text: 'a reader teaches nothing' } })).code)); assert.equal((await call(s, 'POST', who, { book: { id: 'seed-01', remove: true } })).code, 403); }
-  const sc = (await call(s, 'GET', FRED)).body.score; assert.deepEqual([sc.book, sc.taught, sc.proposed], [13, 3, 10]);
+  const sc = (await call(s, 'GET', FRED)).body.score; assert.deepEqual([sc.book, sc.taught, sc.proposed], [25, 3, 22]);
   // the reading script puts the teacher's word first and marks the rest as not confirmed
   const txt = TOOLS.bookText(s.book()); assert.ok(txt.indexOf('Never sell before the M5 CF closes.') < txt.indexOf('NOT confirmed')); assert.ok(txt.indexOf('Do not trade the first candle') > txt.indexOf('NOT confirmed')); assert.match(txt, /\(the desk had: VR \(the "5 mn" box/);
 });
@@ -289,7 +289,7 @@ test('easier for the teacher: no name needed, his turn said at the top, captions
   // what waits on him: the desk's answers to his own lessons and the unconfirmed lines of the book
   await call(s, 'POST', null, { reply: { id: w.body.lesson.id, text: 'Understood: no sell before the CF candle closes.' } }, key());
   const g = (await call(s, 'GET', LUXUS)).body, td = TEACH.todo(g.lessons, g.book, 'luxus', true);
-  assert.deepEqual(td.judge, [w.body.lesson.id]); assert.equal(td.book, L.SEED.length); assert.equal(td.waiting, 2, 'his two pictures');
+  assert.deepEqual(td.judge, [w.body.lesson.id]); assert.equal(td.book, L.SEED.length + L.SOP.length); assert.equal(td.waiting, 2, 'his two pictures');
   assert.equal(TEACH.todo(g.lessons, g.book, 'carlos', true).waiting, 0, 'another member\'s lessons are not his'); assert.deepEqual(TEACH.todo(g.lessons, g.book, 'fred', false), { judge: [], turn: [], ask: 0, book: 0, waiting: 0 }, 'a reader has no turn');
   assert.deepEqual(Object.keys(TEACH.FLT), ['all', 'turn', 'wait', 'done']); assert.deepEqual([TEACH.filterLessons(g.lessons, 'all').length, TEACH.filterLessons(g.lessons, 'turn').length, TEACH.filterLessons(g.lessons, 'wait').length, TEACH.filterLessons(g.lessons, 'done').length], [3, 1, 2, 0]);
   await call(s, 'POST', LUXUS, { say: { id: w.body.lesson.id, verdict: 'right' } }); assert.equal(TEACH.filterLessons((await call(s, 'GET', LUXUS)).body.lessons, 'done').length, 1);
@@ -439,4 +439,21 @@ test('the reading script says whose move each lesson is, and pull counts them pl
   assert.equal(TOOLS.countsText({ all: 1, fresh: 1, more: 0, teacher: 0, agreed: 0, desk: 1 }).split('  ·  ')[0], '1 lesson waits for the desk (1 not answered yet, 0 with something new from the teacher)');
   assert.match(TOOL, /console\.log\(countsText\(counts\(lessons\)\)\);/);
   assert.match(TOOLS.bookText(L.SEED), /\n12 lines: 0 the teacher's word, 12 still the desk's own reading \(not confirmed\)\.\n/);
+});
+
+// 20 Nov 2026: the method's own SOP from the owner's course documents joins the book as proposed lines, stored book or not
+test('the SOP lines: proposed, joined to a stored book once, and an erased one stays erased', async () => {
+  assert.equal(L.SOP.length, 12); assert.ok(L.SOP.every((b) => /^sop-\d\d$/.test(b.id) && b.status === 'proposed' && b.by === 'assistant'));
+  assert.ok(L.SOP.some((b) => /back in the direction of the BO/.test(b.text)), 'the CF goes with the BO');
+  const s = mk();
+  await call(s, 'POST', LUXUS, { book: { id: 'seed-01', confirm: true } });
+  // a book stored before the SOP lines existed gets them on the next read
+  const before = s.book().filter((b) => !/^sop-/.test(b.id)); assert.equal(before.length, 12);
+  const s2 = mk(); await call(s2, 'POST', LUXUS, { book: { id: 'seed-01', confirm: true } });
+  let g = (await call(s2, 'GET', LUXUS)).body; assert.equal(g.book.filter((b) => /^sop-/.test(b.id)).length, 12);
+  const gone = await call(s2, 'POST', LUXUS, { book: { id: 'sop-03', remove: true } }); assert.equal(gone.code, 200);
+  g = (await call(s2, 'GET', LUXUS)).body; assert.equal(g.book.some((b) => b.id === 'sop-03'), false, 'erased stays erased');
+  assert.equal(g.book.length, 23); assert.ok(g.book.every((b) => b.text && !b.gone), 'no marker reaches the page');
+  const ok = await call(s2, 'POST', LUXUS, { book: { id: 'sop-04', confirm: true } }); assert.equal(ok.body.book.find((b) => b.id === 'sop-04').status, 'confirmed');
+  assert.equal((await call(s2, 'GET', LUXUS)).body.book.some((b) => b.id === 'sop-03'), false);
 });

@@ -118,65 +118,72 @@ test('internal breaks: every close beyond a labelled swing, closed candles only,
   assert.match(html, /text: `iBO \$\{sell \? '▼' : '▲'\}`/); assert.doesNotMatch(html, /'iChoCh'/, 'an internal break is an i.BO, never a ChoCh (Mosha)'); assert.match(html, /!major\.has\(e\.level\)/);
 });
 
-// The Mosha layer (12 Nov 2026, owner: "build the mosha layer"; redrawn 13 Nov 2026 from the owner's M21 pictures
-// "CF not touch Barrier", "CF Inside VR" and "CF Failed": "that the expected move to follow"). Buy side drawn here; the sell
-// side is the mirror (last test).
+// The Mosha layer (12 Nov 2026, owner: "build the mosha layer"; 20 Nov 2026 put back on the method's own SOP from the owner's
+// two course documents: BO -> VR (the first break against the BO, one timeframe lower) -> CF (the next break back WITH the
+// BO), entry on the pullback into the CF, target the VR's extreme). Buy side drawn here; the sell side is the mirror.
 const msMosha = new Function(`${fn('msMosha')}; return msMosha;`)();
 const bar = (time, high, low, open = high, close = low) => ({ time, high, low, open, close });
-const HB = { dir: 1, level: 4000, t: 100, ext: 4100 };   // BO buy on the timeframe above: its broken level 4000 is the barrier
+const HB = { dir: 1, level: 4000, t: 100, ext: 4100, far: 3960 };   // BO buy on the timeframe above, broken level 4000, origin down to 3960
 const run = [bar(110, 4060, 4010, 4010, 4055), bar(120, 4100, 4050, 4055, 4090), bar(130, 4095, 4070, 4090, 4072), bar(140, 4085, 4060, 4072, 4062)];
 const VRb = { dir: -1, level: 4070, t: 140, fromT: 120, top: 4100, bot: 4070 };          // first break against the BO: VR 4070-4100
-const CF1 = { dir: -1, level: 4050, t: 160, fromT: 150, top: 4062, bot: 4050 };          // next break against it: CF clear of the barrier
-const cf1 = run.concat([bar(150, 4062, 4052, 4062, 4055), bar(160, 4058, 4045, 4056, 4046)]);
-test('Mosha: BO only, waiting for the VR; the barrier is the BO\'s broken level', () => {
+const CF1 = { dir: 1, level: 4060, t: 180, fromT: 160, top: 4060, bot: 4040 };           // next break back with the BO: CF zone 4040-4060
+const cf1 = run.concat([bar(150, 4065, 4045, 4062, 4048), bar(160, 4055, 4040, 4048, 4044), bar(170, 4058, 4042, 4044, 4055), bar(180, 4066, 4050, 4052, 4064)]);
+test('Mosha: BO only, waiting for the VR; the trade side is the BO\'s side', () => {
   const M = msMosha(HB, { events: [], bars: run });
-  assert.equal(M.state, 'wait-vr'); assert.equal(M.barrier, 4000); assert.equal(M.side, -1, 'the CF trades against the BO');
+  assert.equal(M.state, 'wait-vr'); assert.equal(M.barrier, 4000); assert.equal(M.side, 1, 'the CF trades with the BO');
 });
-test('Mosha picture "CF not touch Barrier": VR at the extreme, CF below it, expected move from the CF to the barrier', () => {
+test('Mosha clean setup: VR at the extreme, CF back with the BO, expected move to the VR; EG entry after the pullback', () => {
   let M = msMosha(HB, { events: [VRb], bars: run });
   assert.deepEqual([M.vr.lo, M.vr.hi, M.vr.ext, M.state], [4070, 4100, 4100, 'wait-cf']);
+  assert.equal(M.p50, 4030); assert.equal(M.deep, false, 'the pullback has not reached 50% of the range yet');
   M = msMosha(HB, { events: [VRb, CF1], bars: cf1 }, 0.3);
   assert.equal(M.case, 1); assert.equal(M.state, 'wait-pullback');
-  assert.deepEqual(M.expect, { side: -1, from: 4050, fromT: 160, to: 4000 });
-  // pullback into the CF zone with green candles, then an EG down: a close under the last green candle's low
-  const pb = [bar(170, 4056, 4047, 4048, 4055), bar(180, 4061, 4053, 4055, 4060)], eg = bar(190, 4060, 4049, 4059, 4050);
-  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat(pb) }, 0.3); assert.equal(M.state, 'wait-eg');
-  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat(pb, [eg]) }, 0.3);
-  assert.equal(M.state, 'eg'); assert.deepEqual([M.trade.entry, M.trade.stop, M.trade.target], [4050, 4061.3, 4000]);
-  assert.ok(M.trade.stop > M.trade.entry, 'a sell has its stop above the entry');
-  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat(pb, [eg, bar(200, 4030, 3995, 4048, 3998)]) }, 0.3);
-  assert.equal(M.trade.status, 'target', 'the barrier was reached');
-});
-test('Mosha picture "CF Inside VR": the CF zone overlaps the VR box (case 2), same move to the barrier', () => {
-  const C2 = { dir: -1, level: 4065, t: 160, fromT: 150, top: 4088, bot: 4065 };
-  const M = msMosha(HB, { events: [VRb, C2], bars: run.concat([bar(150, 4088, 4070, 4072, 4085), bar(160, 4086, 4062, 4085, 4063)]) });
-  assert.equal(M.case, 2); assert.equal(M.expect.to, 4000);
-});
-test('Mosha picture "CF Failed": a close back through the CF zone turns the expected move with the BO, past the VR', () => {
-  let M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([bar(170, 4070, 4050, 4050, 4066)]) });
-  assert.equal(M.state, 'cf-failed'); assert.deepEqual([M.expect.side, M.expect.to, M.expect.failed], [1, 4100, true]);
-  assert.equal(M.trade, undefined);
+  assert.deepEqual(M.expect, { side: 1, from: 4060, fromT: 180, to: 4100 });
+  const pb = bar(190, 4063, 4055, 4063, 4056), eg = bar(200, 4070, 4056, 4057, 4068);
+  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([pb]) }, 0.3); assert.equal(M.state, 'wait-eg');
   // a wick through the base candle is not an EG
-  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([bar(170, 4056, 4047, 4048, 4055), bar(180, 4058, 4040, 4054, 4052)]) });
-  assert.equal(M.state, 'wait-eg');
+  assert.equal(msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([pb, bar(200, 4070, 4056, 4057, 4060)]) }, 0.3).state, 'wait-eg');
+  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([pb, eg]) }, 0.3);
+  assert.equal(M.state, 'eg'); assert.deepEqual([M.trade.side, M.trade.entry, M.trade.stop, M.trade.target], [1, 4068, 4054.7, 4100]);
+  assert.ok(M.trade.stop < M.trade.entry, 'a buy has its stop below the entry');
+  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([pb, eg, bar(210, 4105, 4066, 4068, 4102)]) }, 0.3);
+  assert.equal(M.trade.status, 'target', 'the VR\'s extreme was reached');
+  M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([pb, eg, bar(210, 4069, 4030, 4068, 4032)]) }, 0.3);
+  assert.equal(M.trade.status, 'stopped', 'a stop after the entry is the trade stopped, not a failed CF');
 });
-test('Mosha: a CF zone that reaches the barrier leaves no move; a close beyond the VR\'s extreme means the BO goes on', () => {
-  const C0 = { dir: -1, level: 3990, t: 160, fromT: 150, top: 4040, bot: 3990 };
-  assert.equal(msMosha(HB, { events: [VRb, C0], bars: cf1 }).state, 'at-barrier');
+test('Mosha case 2: a CF zone inside the VR is flagged (likely to fail)', () => {
+  const C2 = { dir: 1, level: 4090, t: 160, fromT: 150, top: 4090, bot: 4065 };
+  const M = msMosha(HB, { events: [VRb, C2], bars: run.concat([bar(150, 4088, 4064, 4066, 4085), bar(160, 4094, 4082, 4085, 4092)]) });
+  assert.equal(M.case, 2); assert.equal(M.expect.to, 4100);
+});
+test('Mosha: a close through the CF zone before any entry = CF failed, no trade; a later break with the BO is the new CF', () => {
+  const fail = bar(190, 4062, 4030, 4060, 4035);
+  let M = msMosha(HB, { events: [VRb, CF1], bars: cf1.concat([fail]) });
+  assert.equal(M.state, 'cf-failed'); assert.deepEqual([M.expect.side, M.expect.to, M.expect.failed], [-1, 4000, true]);
+  assert.equal(M.trade, undefined);
+  const CF2 = { dir: 1, level: 4050, t: 220, fromT: 200, top: 4050, bot: 4020 };
+  M = msMosha(HB, { events: [VRb, CF1, CF2], bars: cf1.concat([fail, bar(200, 4040, 4020, 4035, 4025), bar(210, 4045, 4022, 4025, 4042), bar(220, 4056, 4040, 4042, 4054)]) });
+  assert.equal(M.state, 'wait-pullback'); assert.equal(M.cf.again, true); assert.deepEqual([M.cf.lo, M.cf.hi], [4020, 4050]);
+});
+test('Mosha: a close beyond the VR\'s extreme with no CF means the BO goes on', () => {
   const up = { dir: 1, level: 4105, t: 150, fromT: 145, top: 4105, bot: 4080 };
-  assert.equal(msMosha(HB, { events: [VRb, up, CF1], bars: cf1 }).state, 'bo-on');
+  assert.equal(msMosha(HB, { events: [VRb, up], bars: cf1 }).state, 'bo-on');
 });
-test('Mosha: the sell side mirrors it (BO sell, VR at the low, CF above it, expected move up to the barrier)', () => {
-  const HS = { dir: -1, level: 4100, t: 100, ext: 4000 };
+test('Mosha: the sell side mirrors it (BO sell, VR at the low, CF back down, expected move down to the VR)', () => {
+  const HS = { dir: -1, level: 4100, t: 100, ext: 4000, far: 4140 };
   const path = [bar(110, 4090, 4040, 4090, 4045), bar(120, 4050, 4000, 4045, 4010), bar(130, 4030, 4005, 4010, 4028), bar(140, 4040, 4015, 4028, 4038)];
-  const V = { dir: 1, level: 4030, t: 140, fromT: 120, top: 4030, bot: 4000 }, C = { dir: 1, level: 4050, t: 160, fromT: 150, top: 4050, bot: 4038 };
-  const M = msMosha(HS, { events: [V, C], bars: path.concat([bar(150, 4045, 4038, 4040, 4044), bar(160, 4055, 4042, 4044, 4054)]) });
-  assert.deepEqual([M.side, M.case, M.expect.to, M.vr.lo, M.vr.hi], [1, 1, 4100, 4000, 4030]);
+  const V = { dir: 1, level: 4030, t: 140, fromT: 120, top: 4030, bot: 4000 }, C = { dir: -1, level: 4040, t: 180, fromT: 160, top: 4060, bot: 4040 };
+  const b2 = path.concat([bar(150, 4055, 4035, 4038, 4052), bar(160, 4060, 4045, 4052, 4056), bar(170, 4058, 4042, 4056, 4045), bar(180, 4050, 4034, 4048, 4036)]);
+  let M = msMosha(HS, { events: [V, C], bars: b2 }, 0.3);
+  assert.deepEqual([M.side, M.case, M.expect.side, M.expect.to, M.vr.lo, M.vr.hi], [-1, 1, -1, 4000, 4000, 4030]);
+  M = msMosha(HS, { events: [V, C], bars: b2.concat([bar(190, 4045, 4037, 4037, 4044), bar(200, 4044, 4030, 4043, 4032)]) }, 0.3);
+  assert.deepEqual([M.trade.side, M.trade.entry, M.trade.stop, M.trade.target], [-1, 4032, 4045.3, 4000]);
+  assert.ok(M.trade.stop > M.trade.entry, 'a sell has its stop above the entry');
 });
 test('Mosha layer wired: its own switch, Meridian markup only, said to be display only', () => {
   assert.match(html, /data-show="mosha" checked/); assert.match(html, /mosha: true/); assert.match(html, /G\.show\.mosha !== false/);
   assert.match(html, /function moshaNow\(/); assert.match(html, /i want eg as entry/); assert.match(html, /an EG needs a closed candle/); assert.match(html, /not a tested rule \(the\s+\/\/ mechanical Mosha studies failed\)|not a tested rule \(the mechanical Mosha studies failed\)/);
-  assert.match(html, /that the expected move\s+\/\/ to follow/); assert.match(html, /Expected \$\{ex \? '▼' : '▲'\}/);
+  assert.match(html, /back WITH the BO/); assert.match(html, /Expected \$\{ex \? '▼' : '▲'\}/); assert.match(html, /likely to fail/);
 });
 
 // 12 Nov 2026, owner: "make the chart cleaner, let me choose colour background and candle, I can't find the line chart option"

@@ -25,7 +25,7 @@ test('every phrase the teaching pages use has its French line', () => {
   // the chart card's own words: every step of the examples, the figure written on each screenshot, and the mark names that are not the method's
   const SHOTS = [...RP.EXAMPLES, ...RP.STUDIES], rpData = [...SHOTS.flatMap((e) => [...e.steps.map((s) => s.text), e.yours]), 'Zone below', 'H4 BO sell level, about 4066', 'Under the level, no VR'];
   const used = new Set([...lits(JS, 'L'), ...lits(RPJ, 'L'), ...lits(DKJ, 'L'), ...rpData, ...lits(BT, 'ML'), ...lits(TUT, 'T'), ...marked(SEC), ...marked(BT),
-    ...Object.values(TEACH.STATE), ...Object.values(TEACH.KIND), ...Object.values(TEACH.FLT), ...TEACH.STEPS.flatMap((s) => [s.t, s.p, s.go]), ...L.SEED.map((b) => b.text)]);
+    ...Object.values(TEACH.STATE), ...Object.values(TEACH.KIND), ...Object.values(TEACH.FLT), ...TEACH.STEPS.flatMap((s) => [s.t, s.p, s.go]), ...L.SEED.map((b) => b.text), ...L.SOP.map((b) => b.text)]);
   assert.ok(used.size > 230, `phrases found: ${used.size}`);
   const missing = [...used].filter((k) => !Object.prototype.hasOwnProperty.call(I.FR, k)); assert.deepEqual(missing, [], 'no French line for these');
   assert.ok(lits(JS, 'L').length > 140 && lits(BT, 'ML').length >= 14 && marked(SEC).length >= 28 && marked(BT).length >= 8);

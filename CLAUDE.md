@@ -1695,6 +1695,17 @@ edge labelled "Demand / Supply OB · fresh · BO|iBO <range>". Not a tested rule
 zone mechanics alone). Tests: `tests/market-cycle.test.mjs` ("fresh zones").
 
 ## Meridian markup: the Mosha layer (12 Nov 2026, owner: "build the mosha layer"; redrawn 13 Nov 2026 from the owner's pictures)
+**20 Nov 2026: this section's reading is replaced** (owner uploaded the method's own course documents, private, never copied
+into the repository; asked to fix the layer: "both"). The 13 Nov pictures were the documents' "bad CF" exception cases, not the
+rule. `msMosha` now follows the SOP: BO of the timeframe above → **VR** = this chart's first break AGAINST the BO (formed once;
+`p50` / `deep` when the BO's far edge is known) → **CF** = the next break back WITH the BO (a failed CF is replaced by a later
+one, `cf.again`); `case` 2 = the CF zone overlaps the VR box ("inside the VR, likely to fail"). Entry: pullback into the CF zone,
+then an EG with the BO (a close, never a wick), stop $0.30 past the pullback's extreme, target the VR's extreme. A close through
+the CF zone's far side before an entry = `cf-failed` (expected move back to the BO level); a close past the VR's extreme with no
+CF = `bo-on`. States: wait-vr, wait-cf, bo-on, vr-broken, wait-pullback, wait-eg, eg, cf-failed. Layer label "Mosha storyline
+(BO, VR, CF, expected move)". Not drawn: the documents' sideways case and the barrier entry's confirmation timeframes. `msSides`
+(the M1 both-sides reading) is unchanged. Still display only, not a tested rule. Tests: `tests/market-cycle.test.mjs` ("Mosha").
+The text below is history.
 Display only, Meridian markup only (layer "Mosha storyline (VR, CF, barrier, expected move)", `G.show.mosha`, orange); no rule,
 trade or alert reads it and it is not a tested rule (the mechanical Mosha studies failed). `msMosha(htf, ltf, buf)` (pure, next to
 `msCycle`; `moshaNow(id, bars)` feeds it, closed candles only): the last BO of the timeframe above (D1 for H4, H4 for H1, H1 for
@@ -4847,6 +4858,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     a teacher confirms, corrects (the desk's first wording is kept in `was`) or erases (`{ book }`), or teaches a line directly
     (`{ learn }` → `confirmed`). The key cannot confirm, change or erase any line. `SEED` = the desk's own first twelve lines,
     all `proposed`, shown until the first change stores the book.
+    **20 Nov 2026**: `SOP` = twelve more proposed lines (ids `sop-NN`) from the owner's course documents, in the desk's own
+    words (never the documents' text): joined to the book on every read, stored or not, until the teacher confirms, corrects
+    or erases them; an erased seed / SOP line leaves a `{ id, gone: true }` marker in the stored file so it never comes back
+    (the page never gets the markers). They may contradict the older seed lines: Luxus settles it.
   - **Who teaches whom** (owner, 10 Nov: "Remember he is the one teaching you mosha strategy"). Luxus teaches the Mosha
     method and the desk's assistant is his student. Mosha is HIS method, not the desk's and not the studies'. In every
     answer, book line and page text: restate what he showed in his own terms, read the levels off his pictures, ask
@@ -5000,6 +5015,30 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   weekend candles of the fallback feed (item 56). The M5 trigger that would catch all six is the one `mosha-sweep` /
   `mosha-select` already failed: never present a rule that catches these picked trades as evidence. Never commit the
   owner's or Luxus's individual trades or lesson text (public repository): aggregate counts only.
+- **The council's Mosha systems on the desk** (20 Nov 2026, owner: "why mosha desk doesnt have the trades like ict and executions",
+  "do it"): card `#mo-sys` before `#mo-rules`, `assets/mosha-systems.js` (`window.MS_MOSHA_SYS`: `isMosha`, `copies`, `rowOf`, `build`).
+  One row per forward trade the Trader recorded for Mosha BO (`k: 'mosha-bo'`) and the Mosha cycle (`mcycle`), newest first (40 at
+  most), with two executions in its last cell: **Paper** (the trades.json record: fill, result before and after costs) and **Demo**
+  (the mirror's own record of that trade id: fill, lots, slippage in R, status, times, which demo account; "not copied" with the
+  mirror's reason, or "no copy on file"). Reads `MS_COUNCIL.trades` (event `ms:council`) and, only while the desk is open, the
+  mirror files of `ctrader/mirror-accounts.json` through `msData` (never the ICT account's; at most once a minute). A line per system:
+  recorded / open / closed with R, and "Too few to judge" under 20 closed, else "a forward record, not a tested edge". The note says
+  both are paper shadows whose studies failed. Hidden for the teacher (CSS beside `#mo-rules`) and never drawn for a guest; folds on
+  the simple phone view like the other cards. Display only. Test: `tests/mosha-systems.test.mjs`.
+- **The method, replayed on the last two weeks** (20 Nov 2026, owner: "try to replicate the last 2 weeks", "show the trades like the
+  council and logs"): card `#mo-sopr` after `#mo-sys`, `assets/mosha-sop.js` (`window.MS_MOSHA_SOP`: `sopTrades`, `barrierTrades`,
+  `outcome`, `summary`). When the desk opens it reads gold candles from `/md/bars` (D1 to M1, 13 requests) and walks the last 14
+  days one closed candle at a time with the page's own `msAnalyze` / `msMosha` / `msZones` / `msInternal`: (1) **BO, VR, CF** on
+  the documents' ladder (`LADDER`: D1→H4, H4→H1, H1→M30, M30→M15, M15→M5), entry on the EG after the pullback, target the VR's
+  extreme; (2) **barrier entry**: a fresh H1 or M15 zone, first return of price, a QM (BO Structure) on M1 with the barrier, entry at
+  that close, stop $0.30 past the extreme made at the barrier, target `BARRIER_R` 3R (the replay's own choice, said in the log).
+  One row per entry like the council's table, "Log" opens its steps with their times, "Chart" opens it in the replay chart
+  (`msMoshaReplayTrade`). Summary a kind: entries, reached target / stopped, R before costs, "Too few to judge" under 20 closed, else
+  "two weeks of one reading, not a tested rule". First run (7-20 Nov): the sequence 5 entries, +7.1R; the barrier entry 56 entries,
+  −4R (it takes EVERY fresh barrier; the method says to mark the best one). It found two of Luxus's three trades of 18-20 Nov within a
+  dollar (not shown or stored anywhere: his trades are never committed). Display only: no storage, no council file, no API call,
+  nothing traded; hidden for the teacher and guests. Never call it a record or an edge. Test: `tests/mosha-sop.test.mjs` (a seeded
+  market: stops on the losing side, logs in time order, no look-ahead by cutting and by changing every later price).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
