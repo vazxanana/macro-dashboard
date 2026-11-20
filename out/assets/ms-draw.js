@@ -130,7 +130,10 @@
     const h = hitAt(cx, a.x, a.y); if (!h) { if (SEL) { SEL = null; bar(); paintAll(); } return; }
     ev.preventDefault(); ev.stopPropagation(); SEL = { mk: h.mk, i: h.i }; SELC = cx; bar(); const d = load(h.mk)[h.i];
     if (!d.lock) { GES = { cx, kind: h.part === 'body' ? 'move' : 'size', part: h.part, d0: { ...d }, a }; lock(cx, true); } paintAll(); }
-  function move(cx, ev) { if (!BT()) return; const a = pt(cx, ev);
+  function move(cx, ev) { if (!BT()) return;
+    // a mouse that comes back with no button down let go somewhere else (outside the window: no pointerup reaches the page)
+    if (GES && ev.pointerType === 'mouse' && ev.buttons === 0) up(GES.cx);
+    const a = pt(cx, ev);
     if (TOOL) { cx.ring = a.t != null && a.p != null ? { x: X(cx, a.t), y: Y(cx, a.p) } : null; if (DRAFT && DRAFT.cx === cx && a.t != null) { DRAFT.d.t2 = a.t - cx.TZ; DRAFT.d.p2 = a.p; } paint(cx); return; }
     if (GES && GES.cx === cx) { ev.preventDefault(); const L = load(mkOf(cx)), i = SEL && SEL.i; if (i == null || !L[i] || a.t == null) return;
       if (GES.kind === 'size') L[i] = BT().drawResize(GES.d0, GES.part, a.t - cx.TZ, a.p);
@@ -161,9 +164,14 @@
     CX.forEach((cx) => { cx.ring = null; }); bar(); paintAll(); }
   function setMag(m) { MAG = m; ls.set(MAGK, String(m)); const b = document.querySelector('#ms-dr-bar [data-mag]'); if (!b) return; const w = ['off', 'weak', 'strong'][m];
     b.setAttribute('aria-pressed', String(m > 0)); b.title = `Magnet: ${w} (Alt+M)`; b.querySelector('small').textContent = m ? (m === 1 ? 'W' : 'S') : ''; }
+  // where a floating part goes: inside the full-screen element while there is one (it hides everything outside it). The style bar
+  // and the menu are MADE on first use, so made in full screen they went to <body> and were never seen (20 Nov 2026).
+  // The page's own full screen (a phone without element full screen: #v-charts.ch-fake-fs, fixed over the page) counts too.
+  const fsHost = () => document.fullscreenElement || document.querySelector('#v-charts.ch-fake-fs') || document.body;
+  window.msFsHost = fsHost;
   const CHIP = ['draw', 'up', 'dn', 'gold', 'ink'];
   function bar() { let el = document.getElementById('ms-dsel'); if (!SEL) { if (el) el.hidden = true; return; } const L = load(SEL.mk), d = L[SEL.i]; if (!d) { SEL = null; if (el) el.hidden = true; return; }
-    if (!el) { el = document.createElement('div'); el.id = 'ms-dsel'; el.className = 'ms-dsel'; el.setAttribute('role', 'toolbar'); el.setAttribute('aria-label', 'Selected drawing'); document.body.appendChild(el); el.addEventListener('click', selAct); el.addEventListener('pointerdown', (e) => e.stopPropagation()); }
+    if (!el) { el = document.createElement('div'); el.id = 'ms-dsel'; el.className = 'ms-dsel'; el.setAttribute('role', 'toolbar'); el.setAttribute('aria-label', 'Selected drawing'); fsHost().appendChild(el); el.addEventListener('click', selAct); el.addEventListener('pointerdown', (e) => e.stopPropagation()); }
     const on = (b) => (b ? ' aria-pressed="true"' : ' aria-pressed="false"');
     el.innerHTML = CHIP.map((c) => `<button type="button" class="dc" data-col="${c}" title="Colour"${on((d.col || 'draw') === c)} style="--c:${COLS[c].startsWith('--') ? `var(${COLS[c]})` : COLS[c]}"><i></i></button>`).join('')
       + `<span class="sep"></span>` + [1, 2, 3].map((w) => d.type === 'x' ? `<button type="button" data-w="${w}" title="Text size"${on((d.w || 1) === w)}>${['S', 'M', 'L'][w - 1]}</button>` : `<button type="button" data-w="${w}" title="Width ${w}"${on((d.w || 1) === w)}>${w}px</button>`).join('')
@@ -193,7 +201,7 @@
   // ---- right-click menu ----
   function menu(cx, ev) { if (!BT()) return; ev.preventDefault(); if (TOOL) { setTool(null); return; } const r = cx.el.getBoundingClientRect(), xp = ev.clientX - r.left, yp = ev.clientY - r.top, h = hitAt(cx, xp, yp), mk = mkOf(cx), L = load(mk);
     if (h) { SEL = { mk: h.mk, i: h.i }; SELC = cx; bar(); paintAll(); }
-    let m = document.getElementById('ms-cmenu'); if (!m) { m = document.createElement('div'); m.id = 'ms-cmenu'; m.className = 'ms-cmenu'; m.setAttribute('role', 'menu'); document.body.appendChild(m); document.addEventListener('pointerdown', (e) => { if (!m.contains(e.target)) m.hidden = true; }, true); document.addEventListener('keydown', (e) => { if (e.key === 'Escape') m.hidden = true; }); }
+    let m = document.getElementById('ms-cmenu'); if (!m) { m = document.createElement('div'); m.id = 'ms-cmenu'; m.className = 'ms-cmenu'; m.setAttribute('role', 'menu'); fsHost().appendChild(m); document.addEventListener('pointerdown', (e) => { if (!m.contains(e.target)) m.hidden = true; }, true); document.addEventListener('keydown', (e) => { if (e.key === 'Escape') m.hidden = true; }); }
     const last = [...L.keys()].reverse().find((i) => !L[i].lock);
     m.innerHTML = `<button type="button" role="menuitem" data-m="reset">Reset chart view</button>` + (h ? `<button type="button" role="menuitem" data-m="del">Delete this drawing</button>` : '')
       + `<button type="button" role="menuitem" data-m="last"${last == null ? ' disabled' : ''}>Remove the last drawing</button><button type="button" role="menuitem" data-m="all"${L.length ? '' : ' disabled'}>Delete all drawings</button>`
@@ -212,23 +220,29 @@
   // ---- keys ----
   document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '') || document.querySelector('dialog[open]') || !CX.some((c) => c.visible())) return;
     if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x', KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
-    if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES && SEL) { const L = load(SEL.mk); if (GES.d0) L[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
+    if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES) { if (SEL && GES.d0) load(SEL.mk)[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
     if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); } });
   addEventListener('scroll', () => { if (SEL) bar(); }, { passive: true });
 
   // ---- charts: the page registers each one ----
   function attach(cx) { if (CX.includes(cx)) return; CX.push(cx); strip();
     const el = cx.el; el.addEventListener('pointerdown', (e) => down(cx, e), true); el.addEventListener('pointermove', (e) => move(cx, e), true);
-    el.addEventListener('pointerup', () => up(cx), true); el.addEventListener('pointercancel', () => up(cx), true); el.addEventListener('pointerleave', () => { cx.ring = null; if (HOV) { HOV = null; paintAll(); } });
+    el.addEventListener('pointerleave', () => { cx.ring = null; if (HOV) { HOV = null; paintAll(); } });
     el.addEventListener('contextmenu', (e) => menu(cx, e));
     el.addEventListener('dblclick', (e) => { if (!BT() || TOOL) return; const r = el.getBoundingClientRect(), h = hitAt(cx, e.clientX - r.left, e.clientY - r.top); if (!h) return; const L = load(h.mk), d = L[h.i];
       if (!d || d.type !== 'x' || d.lock) return; e.preventDefault(); e.stopPropagation(); askText(d.text).then((s) => { if (s && L[h.i] === d) { d.text = s; d.editedAt = Math.floor(Date.now() / 1000); save(h.mk); bar(); paintAll(); } }); }, true);
     paint(cx); }
+  // a gesture ends wherever the pointer is let go (20 Nov 2026): the listeners were on each chart, so a drawing dragged off its
+  // chart and released there stayed "held" and followed the mouse with no button down, and the chart stayed locked
+  const endGes = () => { if (GES) up(GES.cx); };
+  addEventListener('pointerup', endGes, true); addEventListener('pointercancel', endGes, true); addEventListener('blur', endGes);
   const reg = window.msCharts = window.msCharts || { list: [], add(cx) { this.list.push(cx); document.dispatchEvent(new CustomEvent('ms:chart', { detail: cx })); } };
   reg.list.forEach(attach); document.addEventListener('ms:chart', (e) => attach(e.detail));
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', strip); else strip();
   // a full-screen element hides everything outside it: the style bar and the menu move into it, and back (18 Nov 2026)
-  document.addEventListener('fullscreenchange', () => { const host = document.fullscreenElement || document.body; for (const id of ['ms-dsel', 'ms-cmenu']) { const el = document.getElementById(id); if (el && el.parentNode !== host) host.appendChild(el); } setTimeout(paintAll, 120); });
+  // 20 Nov 2026: each chart's timeframe menu and the page's toasts (a line alert) move with them
+  const fsMove = () => { const host = fsHost(); for (const id of ['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts']) { const el = document.getElementById(id); if (el && el.parentNode !== host) host.appendChild(el); } setTimeout(paintAll, 120); };
+  document.addEventListener('fullscreenchange', fsMove); document.addEventListener('ms:fs', fsMove);
   // ---- line alerts (19 Nov 2026): a horizontal line, ray or trend line marked "Alert" tells you once when the live price crosses
   // it while the page is open (a note on the page, and a browser notification when allowed); then the alert switches itself off.
   // Display only: nothing is sent anywhere and no order is placed.

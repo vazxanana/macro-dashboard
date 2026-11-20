@@ -68,7 +68,7 @@ review. `watchdog.yml` pages when the loop stops.
   Server-side sign-in, API hardening, Profile photo and name on the server.
 - The Desk page: Simplified pages (17 Nov: what was removed and folded), Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
-  Edge scoreboard, Loss review.
+  Edge scoreboard, Loss review, Charts bug hunt (20 Nov: what was broken in the 18-20 Nov chart features and how it was fixed).
 - Council systems and trading: Supported book / financing / replica mirror (11 Nov: which systems are live), Financing, the rest (baselines, replay rows), Path to live + Forward record of the live book (12 Nov), Coach evolution, Main systems first, NQ open run regime tags, LIT paper shadow / LIT replay / LIT
   and NQ SDV desks, Mosha desk, Gold trend fast, Gold playbook check / view, Trader paper fills, Near-stop market fills, Book weights, What to expect, Futures tickets,
   Trade review (17 Nov: the after-the-fact edge check and its optional language-model reviewer).
@@ -2528,6 +2528,65 @@ header picks its timeframe: the LEFT chart (an analysed pane) takes only the und
 menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analysed pane of the same market) any timeframe and, from
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
+
+## Charts bug hunt (20 Nov 2026: the chart features of 18-20 Nov, used in a browser)
+Every drawing tool, the paper account, the volume profile, Layout, Markets side by side, Split, any timeframe, full screen and the
+live ticks were driven with Playwright (1440 px mouse, 390 px touch; owner and guest; live candles). Twelve defects, each
+reproduced by a script first, then fixed. Display and practice only: no council, ICT, API or order code touched. Pinned in
+`tests/desk-bughunt.test.mjs`.
+- **A drawing dragged off its chart stayed "held"** (`assets/ms-draw.js`): the release was listened for on each chart, so letting
+  go outside it never ended the gesture; back over the chart the shape followed the mouse with no button down and the chart
+  stayed locked. The release is now heard on the window (`endGes`: pointerup, pointercancel, blur), a mouse that comes back with
+  no button ends it too, and Escape lets go of any gesture.
+- **Full screen hid the floating parts** (`ms-draw.js`, `#ms-cfs-css`): the style bar of a drawing, the right-click menu and each
+  chart's timeframe menu were made in `<body>` (outside the full-screen element), and the rule that hides everything else in full
+  screen (`> :not(.sec-h)…`) hid them again once moved in. In full screen no drawing could be styled or deleted by its bar and no
+  timeframe chosen. `fsHost()` (`window.msFsHost`: the browser's full-screen element, else `#v-charts.ch-fake-fs`, else body) is
+  where they are made and moved (`fsMove`, on `fullscreenchange` and the page's own `ms:fs`), with the toasts; the rule leaves them
+  alone. The market list lives in the page header: full screen is left for it (`leaveFs`; a new market reloads the page anyway).
+- **Layout with Sync: an empty chart** (`laySync`): the default four-chart layout (H4, H1, M15, M5) drew the M5 chart blank. The
+  leader's five weeks are about 10,000 M5 candles; the chart can draw its width / 0.5 px (about 1,240), the chart library then
+  keeps the window's right edge, which is in the lower chart's future. `window.msLayFit(r, n, cap)` cuts such a window to what
+  the chart can draw, ending at its last candles.
+- **Paper account, rule 1**: a stop of 0 or below was accepted on an open trade (hand edit) and a negative one on a new order
+  (the engine only refuses a falsy stop): a trade with no stop in effect. `order()`, the draft field, `stopEdit(p, v, cur)` (pure;
+  also refuses an edit while the market has no price) and `norm()` (a stored record) all want a stop above zero.
+- **Paper account, the order was not what the screen showed**: with a field or a select of the panel in hand the panel is not
+  redrawn, and a change of the Stop / Target / Risk select kept the focus: the draft took the new stop while the screen kept the
+  old one, and Place used the draft (3,545.4 placed under a field reading 3,551.7). `draw(true)` now redraws a change at once and
+  puts the focus back; a draft field in hand stops following the price (`D.follow`, `focusin`), and the draft does not follow
+  while the panel holds the focus. A typed entry still sets stop and target around it unless they were typed (`D.touched`).
+- **Paper account, the first click after typing did nothing**: typing a stop and clicking Place (or ½, Close) rebuilt the panel
+  between the press and its release, so the click was lost. No redraw while a press is in progress (`pressing`, `pend`).
+- **Paper account, a stop hit while the page was closed was booked at another price**: positions of the page's own market were
+  checked on the one-minute pane alone (about a day). A buy at 3,850 with its stop at 3,800, left for three days, closed at
+  3,719.8 "stop (gap)", -2.6R, when the pane's first candle came. Another market's catch-up asked for one window up to now, and
+  the candle service keeps the END of a window over 5,000 candles: the same skip after 3.5 days. Now `paneGap()` holds such a
+  position off the pane, and `catchUp()` reads the candles in between in windows of 4,000 minutes (`windows`, 12 a pass) through
+  `msPaperHost.since(k, from, to)`, whose answer is marked `whole` (an empty window = a closed market; a failed read = null,
+  tried again after 15 s, never a guess). Same position after the fix: stop at 3,800.00 on 18 Nov 02:06 UTC, -1R.
+- **Paper account, small**: the line of news ("opened at …", "closed at …: +1.20R") was wiped by the redraw that follows every
+  order and close (kept in `LIVE` and drawn with the panel); a position's lines were missing on a chart opened later (one chart,
+  Split, Markets) and stayed on a Markets chart after its market changed (`chartsKey`, looked at every 2 s); the CSV wrote
+  3549.7200000000003.
+- **Volume profile ignored the volume on the free charts** (one chart on any timeframe, Split's right chart, Markets): their
+  candles carried no `volume`, so every candle counted as 1 (H3 gold: VAH 4,342 instead of 4,361). `SP.bars`, `mmSet` and
+  `tickInto` keep the feed's volume. **And it did not follow the price scale**: its redraw key held the candles in view only, so
+  a drag of the price axis with no new price (a closed market) left the profile 32 px off its prices; the key now holds where
+  the scale puts two prices, and the market.
+- **A price stream that went silent stayed silent** (`startTicks`, `ftSync`): a stream whose connection stays open with nothing
+  arriving raises no error, so the candles froze ("2 min ago") until a reload. With the market open and the tab in view,
+  `STREAM_QUIET` 45 s without a price closes the stream and asks again (the page's own and the free charts' streams).
+- **A closed market was read every second**: on a weekend four one-minute charts in Markets made about 250 candle requests a
+  minute for candles that cannot change. `shutNow(I)` (weekend, never crypto) makes a free chart's read once a minute
+  (`SHUT_POLL`); measured 286 -> 49 requests a minute for the whole page.
+- **Phone: drawing tools 22 px wide**: the strip went from 7 to 15 tools on 19 Nov and its buttons shared one row; they keep
+  44 px and take a second row.
+Found working, nothing changed: every drawing tool (place, select, move, resize, style, lock, clone, delete, text edit, magnet on
+candle O / H / L / C), reload keeps drawings, favourites and their place, the right-click menu, line alerts (a price that
+crosses and comes back inside the 1.5 s between two looks is not seen: by design), Markets with a stream per market, any
+timeframe from 1 s to a year, Split, touch drawing, the guest's view (no paper, no layout). Not tested: Safari / a real iPhone,
+crypto markets (the exchanges are not reachable from the build sandbox), a real weekend.
 
 ## Charts on a phone: full screen and the Style panel (20 Nov 2026, owner on an iPhone: "the phone can't read the rest", "I can't find the full screen button")
 Display only, `market-structure.html`. (1) The full-screen button was hidden under 700 px (`.ch-fs`); only the pane-header copy hides
