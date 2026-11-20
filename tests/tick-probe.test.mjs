@@ -27,8 +27,8 @@ test('marks, depth dates, hour marks, events', () => {
 
 test('hour profile', () => {
   const t0 = Date.parse('2026-11-18T00:00:00Z') / 1000;
-  const p = hourProfile([{ t: t0, median: 0.1, max: 0.3 }, { t: t0 + 86400, median: 0.3, max: 0.5 }, { t: t0 + 3600, median: null, max: null }]);
-  assert.equal(p[0].n, 2); assert.equal(p[0].median, 0.2); assert.equal(p[0].max, 0.5); assert.equal(p[1].n, 0);
+  const p = hourProfile([{ t: t0, median: 0.1, max: 0.3, mid: 100 }, { t: t0 + 86400, median: 0.3, max: 0.5, mid: 100 }, { t: t0 + 3600, median: null, max: null }]);
+  assert.equal(p[0].n, 2); assert.equal(p[0].median, 0.2); assert.equal(p[0].max, 0.5); assert.equal(p[1].n, 0); assert.equal(p[0].frac, 0.002); assert.equal(p[1].frac, null);
 });
 
 // a fake broker: ticks every 10 s, bid = 100 + i/100, ask = bid + 0.07; pages of 50, newest first, relative-encoded

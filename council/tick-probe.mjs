@@ -75,11 +75,14 @@ export function eventList(from, nowSec, list = [...HISTORY, ...EVENTS]) {
   return list.filter((e) => EV_TYPES.includes(e.type) && e.t >= from && e.t + EV_TO < nowSec && !seen.has(e.type + e.t) && seen.add(e.type + e.t))
     .sort((a, b) => a.t - b.t).map((e) => ({ type: e.type, t: e.t, at: new Date(e.t * 1000).toISOString() }));
 }
-// summary of the hour profile: per UTC hour, the median / 90th percentile / max of the per-window median spreads, n windows
+// summary of the hour profile: per UTC hour, the median / 90th percentile / max of the per-window median spreads, n windows,
+// and the same median / 90th percentile as a share of the window's mid price (frac, frac90)
 export function hourProfile(rows) {
   const by = Array.from({ length: 24 }, () => []);
   for (const r of rows) if (r.median != null) by[new Date(r.t * 1000).getUTCHours()].push(r);
-  return by.map((v, h) => ({ hour: h, n: v.length, median: r6(med(v.map((r) => r.median))), p90: r6(pct(v.map((r) => r.median), 0.9)), max: r6(v.length ? Math.max(...v.map((r) => r.max)) : null) }));
+  return by.map((v, h) => { const f = v.filter((r) => r.mid > 0).map((r) => r.median / r.mid);
+    return { hour: h, n: v.length, median: r6(med(v.map((r) => r.median))), p90: r6(pct(v.map((r) => r.median), 0.9)), max: r6(v.length ? Math.max(...v.map((r) => r.max)) : null),
+      frac: f.length ? r6(med(f)) : null, frac90: f.length ? r6(pct(f, 0.9)) : null }; });
 }
 
 // every tick of one side between from and to (ms): the broker answers in pages (newest first, hasMore while older ticks remain);
@@ -131,7 +134,8 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], WS = globa
       const hours = [];
       for (const t of hourMarks(nowSec, Math.min(HOUR_DAYS, reach || 1))) {
         const w = await window(t, t + HOUR_WIN); if (!w) continue;
-        const sp = spreadsOf(w.qp); hours.push({ t, n: sp.length, median: sp.length ? r6(med(sp)) : null, max: sp.length ? r6(Math.max(...sp)) : null });
+        const sp = spreadsOf(w.qp), mid = w.qp.length ? med(w.qp.map((q) => (q[1] + q[2]) / 2)) : null;
+        hours.push({ t, n: sp.length, median: sp.length ? r6(med(sp)) : null, max: sp.length ? r6(Math.max(...sp)) : null, mid: r6(mid) });
       }
       log(`${name}: ${hours.length} hour windows`);
       // events (inside the reach only)
