@@ -4,6 +4,7 @@
 // Rules (the batch's own): never a surprise without a frozen pre-release consensus; every figure is a 2022-24 first-print fact
 // or a descriptive fit, with its n; nothing here is a tested edge, a forecast on the record, a rule or a trade.
 import fs from 'node:fs';
+import { EVENTS } from './events.mjs';
 
 export const DESCRIPTIVE = 'From the 2022-24 first-print record (36 months): descriptive, not a tested edge or a forecast on the record.';
 const REF = new URL('../research/macro-veteran/references/', import.meta.url);
@@ -86,8 +87,25 @@ function near(cal, k, t, a, b) {
     .filter((x) => Number.isFinite(x.t) && x.t >= t + a && x.t <= t + b).sort((x, y) => x.t - y.t);
 }
 
+// 20 Nov 2026: two things the calendar feed cannot give. (1) The feed holds one week (next week's file appears over the weekend),
+// so on a Friday nothing was said about the PCE five days away: the council's own schedule (events.mjs, top-tier US releases)
+// fills the days the feed does not hold. (2) The feed carries no actuals, so the PCE point could never name the month's core CPI:
+// the Cleveland Fed's nowcast file (macro/hard-data.json, already fetched by hard-data.mjs) carries the actual prints per month.
+export function scheduleOf(now, days = 7) {
+  return EVENTS.filter((e) => e.tier === 1 && e.country === 'USD' && e.t > now && e.t <= now + days * 86400)
+    .map((e) => ({ title: e.title, country: 'USD', at: new Date(e.t * 1000).toISOString(), src: 'schedule' }));
+}
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+// the core CPI print of the month a PCE release at t refers to (the month before the release month), from hard-data.json
+export function cpiPrintFrom(hd, t) {
+  const M = hd && hd.nowcast && Array.isArray(hd.nowcast.months) ? hd.nowcast.months : null; if (!M || !Number.isFinite(t)) return null;
+  const d = new Date(t * 1000), ref = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - 1, 1)).toISOString().slice(0, 7);
+  const m = M.find((x) => x.month === ref), v = m && m.actual ? m.actual.coreCpi : null;
+  return Number.isFinite(v) ? { num: v, month: ref, name: MONTHS[+ref.slice(5) - 1], asOf: m.asOf || null } : null;
+}
+
 // the points for one upcoming card { title, country, at, titles }
-export function contextFor(card, { F, expectations = [], calendar = [], now }) {
+export function contextFor(card, { F, expectations = [], calendar = [], now, hd = null }) {
   if (!F || !card) return null;
   const k = kindOf(card.title, card.country || 'USD') || (card.titles || []).map((x) => kindOf(x, card.country || 'USD')).find(Boolean); if (!k) return null;
   const t = Date.parse(card.at) / 1000, pts = [], cal = calendar.concat((expectations || []).map((r) => ({ title: r.event, country: r.country || 'USD', at: r.scheduledUtc })));
@@ -96,6 +114,8 @@ export function contextFor(card, { F, expectations = [], calendar = [], now }) {
     const cp = lastPrint(expectations, calendar, /core cpi m\/m/i, t);
     if (cp && cp.num != null) { const imp = F.pce.a + F.pce.b * cp.num;
       add(`Core CPI printed ${cp.value} m/m (${cp.at.slice(0, 10)}). On the 2022-24 record a core CPI of ${cp.num.toFixed(1)}% went with core PCE near ${imp.toFixed(2)}% (fit on ${F.pce.n} months, typical miss ±${F.pce.mae.toFixed(2)} pp): a descriptive fit on past months, not a forecast on the record.`, 'lead'); }
+    else if (cpiPrintFrom(hd, t)) { const h = cpiPrintFrom(hd, t), imp = F.pce.a + F.pce.b * h.num;
+      add(`Core CPI for ${h.name} printed ${h.num.toFixed(2)}% m/m (the Cleveland Fed's file of actual prints${h.asOf ? `, read ${h.asOf}` : ''}). On the 2022-24 record a core CPI of ${h.num.toFixed(1)}% went with core PCE near ${imp.toFixed(2)}% (fit on ${F.pce.n} months, typical miss ±${F.pce.mae.toFixed(2)} pp): a descriptive fit on past months, not a forecast on the record.`, 'lead'); }
     else add(`Read it from this month's core CPI print (not on file here; the calendar feed carries no actuals): on the 2022-24 record core CPI ${[0.2, 0.3, 0.4].map((x) => `${x.toFixed(1)}% went with core PCE near ${(F.pce.a + F.pce.b * x).toFixed(2)}%`).join(', ')} (fit on ${F.pce.n} months, typical miss ±${F.pce.mae.toFixed(2)} pp). A descriptive fit on past months, not a forecast on the record.`, 'lead');
     add(`In 2022-24 core PCE printed on average ${sg(F.pce.gapMean, 2)} pp from core CPI; the same to one decimal in ${F.pce.same} of ${F.n} months, lower in ${F.pce.below}. The CPI and PPI of the month were both out before every PCE release (36 of 36).`);
     add('Adding PPI to core CPI did not reliably improve the PCE read (24 rolling tests): read PPI as colour, not a signal.');
@@ -137,15 +157,15 @@ export function contextFor(card, { F, expectations = [], calendar = [], now }) {
 }
 
 // every upcoming release of a known kind in the next `days` days (the playbook's calendar), with its first point
-export function ahead({ F, fc, calendar = [], expectations, now, days = 7 }) {
+export function ahead({ F, fc, calendar = [], expectations, now, days = 7, hd = null, schedule = scheduleOf(now, days) }) {
   if (!F) return [];
-  const cal = ((fc && fc.playbook) || []).concat(calendar), seen = new Set(), out = [];
+  const cal = ((fc && fc.playbook) || []).concat(calendar, schedule || []), seen = new Set(), out = [];
   for (const e of cal) {
     const t = Date.parse(e.at) / 1000; if (!Number.isFinite(t) || t <= now || t > now + days * 86400 || (e.country || 'USD') !== 'USD') continue;
     const k = kindOf(e.title, 'USD'); if (!k || k === 'ISM') continue;
-    const key = `${k}|${String(e.at).slice(0, 13)}`; if (seen.has(key)) continue; seen.add(key);
-    const c = contextFor({ title: e.title, country: e.country || 'USD', at: e.at }, { F, expectations, calendar: cal, now }); if (!c) continue;
-    out.push({ kind: k, title: e.title, at: e.at, point: c.points[0].text });
+    const key = `${k}|${String(e.at).slice(0, 13)}`, dkey = `${k}|${String(e.at).slice(0, 10)}`; if (seen.has(key) || (e.src === 'schedule' && seen.has(dkey))) continue; seen.add(key); seen.add(dkey);   // a scheduled release the calendar holds that day is said once
+    const c = contextFor({ title: e.title, country: e.country || 'USD', at: e.at }, { F, expectations, calendar: cal, now, hd }); if (!c) continue;
+    out.push({ kind: k, title: e.title, at: e.at, point: c.points[0].text, ...(e.src === 'schedule' ? { src: 'schedule' } : {}) });
   }
   return out.sort((a, b) => a.at.localeCompare(b.at)).slice(0, 8);
 }

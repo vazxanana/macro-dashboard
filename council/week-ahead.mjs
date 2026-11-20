@@ -148,11 +148,18 @@ export function frameOf(fc, v) {
   if (L && Number.isFinite(L.px)) {
     out.levels = { px: L.px, asOf: L.asOf || null, above: L.above || null, below: L.below || null };
     const a = L.above, b = L.below;
-    out.lines.push(`Gold near ${money(L.px)}${L.asOf ? ` (as of the ${L.asOf} close)` : ''}${a ? `; watch ${money(a.price)} above (${a.label})` : ''}${b ? ` and ${money(b.price)} below (${b.label})` : ''}.`);
+    // 20 Nov 2026: the levels to watch sit either side of the LATEST price when the veteran has one (summary.levels.mark); the
+    // line read "Gold near $3,607 ...; watch $3,590 above" while gold traded at $3,575. Say both prices and which level broke.
+    const m = L.mark && Number.isFinite(L.mark.px) ? L.mark.px : null, br = (l) => (l && l.crossed ? ', traded through since that close' : '');
+    if (m != null) out.levels.mark = { px: m, at: L.mark.at || null };
+    out.lines.push(`Gold near ${money(m != null ? m : L.px)}${m != null ? ` now (last close ${money(L.px)}${L.asOf ? ` on ${L.asOf}` : ''})` : L.asOf ? ` (as of the ${L.asOf} close)` : ''}${a ? `; watch ${money(a.price)} above (${a.label}${br(a)})` : ''}${b ? ` and ${money(b.price)} below (${b.label}${br(b)})` : ''}.`);
   }
   if (sum && sum.bias && Number.isFinite(sum.bias.p)) {
-    const B = sum.bias; out.bias = { lean: B.lean, p: B.p, base: B.base, by: B.by, confidence: B.confidence || null };
-    out.lines.push(`The veteran's month call: ${Math.round(B.p * 100)}% that gold is higher by ${B.by} against a base rate of ${Math.round(B.base * 100)}% (${B.lean === 'against' ? 'leans against gold' : B.lean === 'supportive' ? 'leans for gold' : 'neutral'}, confidence ${B.confidence || 'n/a'}).`);
+    const B = sum.bias; out.bias = { lean: B.lean, p: B.p, base: B.base, by: B.by, confidence: B.confidence || null, ...(B.level != null ? { level: B.level, from: B.from || null, gapPct: B.gapPct ?? null } : {}) };
+    // "higher" is above the close the call was issued from, not above today's price: name the level, and the gap once it is wide
+    const what = B.level != null ? `gold closes above ${money(B.level)} on ${B.by}${B.from ? ` (set at the ${B.from} close)` : ''}` : `gold is higher by ${B.by}`;
+    const gap = Number.isFinite(B.gapPct) && Math.abs(B.gapPct) >= 2 ? ` Gold is now ${Math.abs(B.gapPct).toFixed(1)}% ${B.gapPct < 0 ? 'below' : 'above'} that level: read the lean, not the odds.` : '';
+    out.lines.push(`The veteran's month call: ${Math.round(B.p * 100)}% that ${what} against a base rate of ${Math.round(B.base * 100)}% (${B.lean === 'against' ? 'leans against gold' : B.lean === 'supportive' ? 'leans for gold' : 'neutral'}, confidence ${B.confidence || 'n/a'}).${gap}`);
   }
   const rs = v && v.research && Array.isArray(v.research.items) ? v.research.items : [];
   out.rulebook = rs.filter((i) => Array.isArray(i.readings) && i.readings.some((x) => x.on)).slice(0, 5).map((i) => ({ k: i.k, text: i.text, caveat: i.caveat || null }));
@@ -179,6 +186,24 @@ function dayLine(d) {
   return parts.join(' · ');
 }
 
+// What to watch, one line a day (20 Nov 2026), drawn only from what the veteran already wrote: the two levels
+// he watches (a daily close through either; said once, on the week's first day), on a top-tier US release day his own invalidation lines (the reaction that would
+// carry them), and the dated calls that fall due at that day's close. No new number, no forecast.
+export function focusOf(day, frame, v, first = true) {
+  const L = frame && frame.levels, parts = [];
+  const usHi = day.releases.filter((r) => r.impact === 'high' && r.country === 'USD');
+  const inv = (v && v.verdict && Array.isArray(v.verdict.invalidation) ? v.verdict.invalidation : []).filter((x) => /real yield|DXY/.test(x)).map((x) => x.replace(/ \(\+[^)]*\)/, '').replace(/ (ends|adds to|says) .*$/, ''));
+  if (usHi.length && inv.length) parts.push(`after ${usHi[0].title.replace(/\s*\(.*\)$/, '')}, the reaction against his own lines (${inv.join(', ')})`);
+  if (first && L && (L.above || L.below)) parts.push(`all week, a daily close ${[L.above && `above ${money(L.above.price)} (${L.above.label.replace(/ \(.*$/, '')})`, L.below && `below ${money(L.below.price)} (${L.below.label.replace(/ \(.*$/, '')})`].filter(Boolean).join(' or ')}`);
+  const due = [];
+  for (const part of [v && v.outlook && v.outlook.week, v && v.outlook && v.outlook.month]) if (part && part.by === day.day) due.push(`${part.horizon === 5 ? 'week' : 'month'} calls`);
+  for (const h of (v && v.briefing && v.briefing.hypotheses) || []) if (h.by === day.day && h.hit == null) due.push(h.slot);
+  let s = parts.length ? `Watch: ${parts.join('; ')}.` : '';
+  if (due.length) s += `${s ? ' ' : ''}Due at this close: ${due.join(', ')}.`;
+  if (day.market) s += (s ? ' ' : '') + (day.market.kind === 'holiday' ? 'A holiday session is thin: its close counts for the dated calls, but one thin day is weak evidence.' : 'An early close: the day still counts for the dated calls.');
+  return s || null;
+}
+
 // The Cleveland Fed nowcast for a CPI / PCE release: the reference month is the month before the release month (an October PCE
 // prints in late November). Only a nowcast without an actual print for that month is shown.
 const MN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -202,7 +227,9 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   const rel = releasesOf(cal, W.from, W.to);
   for (let d = W.from; d <= W.to; d = addD(d, 1)) {
     if (!weekday(d)) continue;
-    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r) }));
+    // 20 Nov 2026: what the 2022-24 first-print record says about a release (veteran.json newsAhead, same kind, same minute)
+    const NA = (v && v.newsAhead && Array.isArray(v.newsAhead.items) ? v.newsAhead.items : []), ctx = (r) => { const x = r.type && NA.find((i) => i.kind === r.type && Math.abs(Date.parse(i.at) / 1000 - r.t) <= 3600); return x ? x.point : null; };
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r), ...(ctx(r) ? { context: ctx(r) } : {}) }));
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
@@ -210,6 +237,7 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
     day.line = dayLine(day); days.push(day);
   }
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
+  days.forEach((d, i) => { const c = focusOf(d, frame, v, i === 0); if (c) d.focus = c; });
   if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
   const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));
@@ -220,6 +248,8 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   if (frame.odds) lines.push(hd.odds.line);
   const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
   if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
+  const cx = days.flatMap((d) => d.releases.filter((r) => r.context).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.context}`));
+  if (cx.length) lines.push(`From the 2022-24 first-print record: ${cx[0]}`);
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);
   else lines.push('No top-tier US release is scheduled on the files read so far.');
   if (busiest && busiest.releases.some((r) => r.impact === 'high') && usHi.length > 1) lines.push(`${busiest.dow} is the busiest day: plan around it, and know which side a surprise favours before the print, not after.`);
