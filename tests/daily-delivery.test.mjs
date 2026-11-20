@@ -89,6 +89,15 @@ test('the cron job: once a day inside the window, AI then notice then email; not
   assert.equal(calls, c0 + 1); assert.equal(res.body.ai, true);
   res = mk(); await API.handle({ method: 'GET', query: { test: 'email', to: 'me@x.io', fresh: '1' }, headers: {} }, res, { ...base(), who: async () => ({ u: 'owner' }), now: () => Date.parse('2026-11-20T07:02:00Z'), complete: async () => { calls++; return { available: true, text: '{"world":"x","markets":"y"}' }; } });
   assert.equal(res.body.ai, true); assert.match((await store.get('brief-2026-11-20.json')).brief.world, /UK retail/);
+  // send=all: owner only, the day confirmed, once a day, never from another site, counts only
+  const sa = (q, who = 'owner', h = {}) => { const r = mk(); return API.handle({ method: 'GET', query: { send: 'all', ...q }, headers: h }, r, { ...base(), who: async () => ({ u: who }), now: () => Date.parse('2026-11-20T08:00:00Z') }).then(() => r); };
+  assert.equal((await sa({ day: '2026-11-20' }, 'fred')).code, 403);
+  assert.equal((await sa({ day: '2026-11-20' }, 'owner', { 'sec-fetch-site': 'cross-site' })).code, 403);
+  assert.equal((await sa({})).code, 400);
+  const n0 = sent.length; res = await sa({ day: '2026-11-20' });
+  assert.equal(res.code, 200); assert.deepEqual([res.body.recipients, res.body.sent, res.body.failed], [2, 2, 0]);
+  assert.deepEqual(sent.slice(n0).map((x) => x[1]), ['Morning note · Friday 20 November', 'Morning note · Friday 20 November']);
+  assert.ok(!JSON.stringify(res.body).includes('@')); assert.equal((await sa({ day: '2026-11-20' })).code, 409);
   res = mk(); await API.handle({ method: 'GET', query: { test: 'email', to: 'nope' }, headers: {} }, res, { ...base(), who: async () => ({ u: 'owner' }) }); assert.equal(res.code, 400);
   if (prev === undefined) delete process.env.ACADEMY_LLM_KEY;
   assert.equal(API.llmEnv({ DAILY_LLM_MODEL: 'x', ACADEMY_LLM_MODEL: 'y' }).ACADEMY_LLM_MODEL, 'x'); assert.equal(API.llmEnv({ DAILY_AI: 'off' }).ACADEMY_LLM_STOP, '1');
