@@ -1294,6 +1294,12 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   look-ahead and is recorded as INVALID): the rule's buys made +0.148R a trade against +0.026R for going long at a random time on
   every day (40 of 40 seeds, both 2005-15 and 2016 on); its sells +0.001R against −0.056R for a random short. So the breakout
   entry adds about 0.06-0.12R a trade beyond USD/JPY's drift; the drift explains only part of the buy / sell gap.
+- **20 Nov 2026, later still: three robustness checks, all passed (pre-registered).** A second price feed (`usdjpy-vb-feed`,
+  HistData 2018-26: +0.086R a trade, month t 2.91; the same side as OANDA on every shared day); every trigger size from 0.3 to 0.7
+  (`usdjpy-vb-k`, positive in both 2005-15 and 2016 on); every exit from 12:00 to 21:00 UTC and a New York day (`usdjpy-vb-exit`,
+  positive in both windows; 12:00 thin after 2016). Its record also shows what a demo stream would live through
+  (`research/proposals/2026-11-20-usdjpy-risk.md`): 2023 lost 15.4R and the record stayed under a previous high for 574 days, so
+  a few months of forward record cannot settle it either way.
 - **Why it is still your decision.** The ten best trades carry 75 % of the last three years, and almost all of the gain is on the
   buy side (2005-26: buys +0.148R a trade, sells +0.001R), so part of it may be USD/JPY's long rise and carry rather than the
   breakout. One market of eleven passing is the kind of result that needs new data.
