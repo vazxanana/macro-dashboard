@@ -95,6 +95,7 @@ export const FILES = [
   { file: 'macro/hard-data.json', label: 'Hard-to-find data', every: 'every 6th round (~70 min)', at: (j) => j.at, warn: 150, bad: 1440,   // 20 Nov 2026
     check: (j, c) => { for (const [k, v] of Object.entries((j && j.sources) || {})) if (v !== 'ok') c.add('source', 'warn', `${k}: ${String(v).slice(0, 90)}`); } },
   { file: 'macro/week-ahead.json', label: 'Week ahead', every: 'every 6th round (~70 min)', at: (j) => j.at, warn: 150, bad: 1440 },   // 20 Nov 2026
+  { file: 'macro/prep-record.json', label: 'Nowcast against consensus record', every: 'append-only, when a CPI / PCE release is captured or resolved', check: (j, c) => { if (!j || !Array.isArray(j.records)) c.add('parse', 'warn', 'no records list (the veteran leaves the file as it is and records nothing new)'); } },   // 20 Nov 2026
   { file: 'macro/daily-report.json', label: 'Daily reports', every: 'once a London day from 06:00', at: (j) => j.at, warn: 1620, bad: 3000 },   // 19 Nov 2026
   { file: 'macro/history.json', label: 'Macro forecast log', every: 'one entry per weekday, from 21:00 UTC the evening before', check: historyCheck },
   { file: 'macro/events.json', label: 'Macro release log', every: 'each macro run', check: listCheck },
