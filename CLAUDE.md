@@ -4926,6 +4926,62 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
   Holm, strong; already answered by `replica-sides` FAIL), keep off live (n 1,009, −0.09R, t −2.00, strong), skip 04-08 UTC
   (n 214, t −2.57, not Holm).
 
+## Trade review audit: Holm over every test, by-day t, the regime note (20 Nov 2026, owner: "make the brain more useful and more correct")
+`council/trade-review.mjs`, the Analyst's `postMortem` / `analystReviews`, and the validation side of `api/_trade-review.js`,
+audited against council-data of 20 Nov 15:07 UTC. Proposals only, as before (absolute rule 3): no rule, size, stop, filter,
+config or page changed; every new field of `research/trade-review.json` is optional and the old ones keep their meaning.
+Tests (each failed on the code before): `tests/trade-review-audit.test.mjs` (11), three in `tests/analyst-postmortem.test.mjs`,
+one in `tests/trade-review-ai.test.mjs`; `tests/trade-review-ledger.test.mjs` rows now span days.
+**Defects fixed** (before → after on that day's data):
+- **Holm ran over the flagged comparisons only** (15 of the 107 made), so it corrected for the tests that had already passed
+  |t| >= 2: 9 flags "survived", 3 do (shadow scalp on SOL, the replica's buys / sells). Now over every comparison (`splitTestKey`;
+  buys against sells is ONE test, so 100 tests), on the unrounded p (`pRaw`, non-enumerable). The one strong proposal of the day
+  ("Skip entries 04-08 UTC" on the replica's research trades, p 0.002) is no longer strong: strong 1 → 0.
+- **The "+1R close" counterfactual was flattered.** The Trader updates `mfe` only on candles where the trade did not exit, so a
+  win that ran to its target inside one candle keeps an MFE under its own R and was left unchanged by the counterfactual (25 of
+  1,032 trades with an MFE). `reached1R` = max(MFE, R) >= 1, `lockDiff`: shadow scalp −0.092R (t −1.13) → −0.119R (t −1.45),
+  shadow intraday −0.354R (t −3.11) → −0.397R (t −3.47); "reached +1R" 260 → 272 scalps. (A LOSS with MFE >= 1 was honest: it
+  reached +1R on an earlier candle.)
+- **Counted twice**: the two live gold replica trades of 4 Nov are in trades.json and research.json; a research record whose id
+  is in trades.json is read from trades.json (as the mirror does). Replica research 1,367 → 1,365 trades, −111.20R → −112.20R.
+- **Wrong name**: a ten-market stream was named after its last record ("USD/CHF replica"); a multi-market stream drops the
+  market label ("Replica"). `systems[].markets`.
+- **Proposed away a profitable half**: "Take only sells in Position (shadow)" while its buys made +0.17R a trade (n 13). A
+  `weak-*` subset is proposed only when its own mean is negative (the flag stays). Proposals 5 → 4.
+- **A t on two trades** ("Gold daily engulf (live): t −34.33", n 2): under `STREAM_N` 10 the head says "too few to judge".
+- **Stale after the owner's decisions**: `STUDIED['replica|keep off live']` said the replica "has been a paper shadow"; it is
+  live again since 20 Nov. `OWNER_DECISIONS` (keyed by the Trader's user rule id; a test checks the id exists) + `decisionFor`:
+  a proposal on a stream the owner has just decided, with fewer than 10 trades closed since, carries `decided` and is not
+  strong. A LIVE record of a system now in `config.ownerShadow` is history (`shadowed`, in the head): nothing is proposed.
+  `totals.liveNow` leaves retired and shadowed live records out (`live`: 39 trades, −26.97R; `liveNow`: 4, −1.11R).
+- **"After costs" said of rows with no cost** (the forward check's `basis` on research rows): now "before costs (no cost on record)".
+- **Language model**: it could propose for a stream the desk itself proposes nothing for (retired, stopped, shadowed);
+  `parseAnswer` discards those (`closedWhy`), the request carries `closed`, `tByDay` and `regimeNote`.
+- **Analyst post-mortems** (latent: 0 of the 28 on file change, all are unmoved stops at −1R): a loss closed by its TIME limit
+  was written up as "stopped" and could be tagged hunt / noise / news (no stop was hit: no stop is judged, `evidence.exit
+  'time'`); "how far past the stop" assumed the stop sat 1R away, wrong for a trailed or break-even stop (`stopAtR` from `r0`);
+  a `void` loss gets no post-mortem. `PM_VERSION` unchanged, so no stored review is re-stamped.
+**Improvement 1, the by-day t.** Trades of one UTC day share that day's move (twins on correlated pairs, overlapping holds), so
+a per-trade t counts dependent trades as independent. `clusterT` / `clusterDiff` (cluster-robust, CR1) by fill day and by close
+day, the weaker of the two reported (`rowsT` / `rowsDiff`); null under `DAY_N` 5 days ("too few days to judge"). On `stats().net.byDay`,
+every `vsRest.byDay`, `lock1R.byDay`, each flag (`byDay`, `robust`, and in its text), proposal evidence. **Strong needs both**,
+and the ledger's "held" too (`FWD.DAYS`). Shadow Position +0.98R a trade: t 2.87 per trade, 1.63 over 8 days; shadow Intraday
+2.86 → 2.09 (14 days); Retrace scalp −3.41 → −2.14 (13); the legacy live Scalp's t −8.25 rests on 3 days (no by-day t). Ledger:
+1 held, 2 faded, 1 unclear, 2 too few → 0 held, 2 faded, 2 unclear, 2 too few. Not a full answer to multi-day overlap: a floor.
+**Improvement 2, the regime note** (`regimeOf`, `regimeForSide`). Per market the move = last fill price against the first; a
+buy in a market that rose traded WITH the move. On that day's data the better side was the side of the market's own move in 10
+of 10 markets for the replica's research trades and for the shadow scalps, 6 of 7 for the retrace scalps; replica with the
+move +0.34R (n 638) against −0.45R (n 727), t 10.60, against the side split's t −8.27: what `replica-sides` found. A side flag
+that this explains carries `regime` (in the proposal's `why`, so the page shows it unchanged), is not strong, and a forward
+check that "holds" in the same move says "the regime again, not evidence for the rule". The direction is known only
+afterwards: a reading, never a rule.
+**Sound, left as it was**: the closed set (42 duplicates, 98 missed, 25 void research rows, replay rows and open trades never
+counted; no ICT file or ICT demo account read; the drain account's copies still read for slippage); R after costs on every
+closed trades.json record (1,054 of 1,054 carry a cost); the ledger's forward check reads only rows closed strictly after
+`recordedAt`; retired / stopped follow `focusSetups` (now empty) and `shadowCut`. Not done: the demo slippage t is still per
+trade; hour and session splits get no regime reading; the page does not show `byDay` or `regime` as fields yet (they are in the
+flag and proposal texts it already prints).
+
 ## Edge check and the replica's sides (17 Nov 2026, owner: "Try to check the edges which ones can we improve and focus like the replica")
 An evidence review and one pre-registered study; no live rule, size, filter, stop, config, Trader or mirror code changed. The
 owner's document is `research/proposals/2026-11-17-edge-check.md` (decisions: `docs/owner-decisions.md` items 57-59, open).

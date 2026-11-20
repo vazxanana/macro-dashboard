@@ -36,6 +36,9 @@ export const TR = {
   FAST_S: 1800,      // a stop within 30 minutes of the fill is a "fast stop"
   COST_MIN: 0.1,     // costs are flagged as the reason a stream loses when they take this many R a trade
   KEEP_TRADES: 12,   // the latest closed trades kept per stream in the file (for the page and the language-model review)
+  DAY_N: 5,          // a by-day (clustered) t needs this many distinct UTC fill days; under it the days are "too few to judge"
+  REGIME_SIDE_N: 5,  // a market counts in the regime note's "better side" tally only with this many trades on each side
+  REGIME_SHARE: 0.6, // a side split is read as the market's own direction when this share of the weak side traded against the move
 };
 const DONE = new Set(['win', 'loss', 'be']);
 const SESSIONS = ['asia', 'london', 'overlap', 'newyork', 'late'];
@@ -84,6 +87,43 @@ export function holm(ps, alpha = 0.05) {
   for (let k = 0; k < idx.length; k++) { if (idx[k][0] <= alpha / (idx.length - k)) ok[idx[k][1]] = true; else break; }
   return ok;
 }
+// By-day t (20 Nov 2026). Trades filled the same UTC day share that day's market move (same-minute twins on correlated pairs,
+// overlapping holds), so a per-trade t treats dependent trades as independent. These are the cluster-robust versions, one
+// cluster per UTC fill day (CR1: the cluster sums of the residuals, scaled G / (G - 1)); df = days - 1. Under TR.DAY_N days the
+// t is null ("too few days to judge"), never a number. Shown BESIDE the per-trade t, which stays what it was.
+// Two clusterings are computed, by the UTC day a trade was FILLED and by the day it CLOSED (a multi-day hold overlaps the trades
+// of both), and the one with the smaller |t| is reported (rowsT / rowsDiff): the review errs to the cautious side. It is still
+// not a full answer to overlapping holds across days; it is a floor under the worst of the double counting.
+export const dayOf = (t) => (Number.isFinite(t) ? Math.floor(t / 86400) : null);
+const byDayOut = (G, est, v) => {
+  if (G < TR.DAY_N) return { days: G, t: null, p: null };
+  const se = Math.sqrt(v * G / (G - 1)), t = se > 0 ? est / se : 0;
+  return { days: G, t: r2(t), p: r3(pOfT(t, G - 1)) };
+};
+// the mean of xs against zero, clustered by keys
+export function clusterT(xs, keys) {
+  const n = xs.length; if (!n) return { days: 0, t: null, p: null };
+  const mean = xs.reduce((s, x) => s + x, 0) / n, g = new Map();
+  xs.forEach((x, i) => g.set(keys[i], (g.get(keys[i]) || 0) + (x - mean) / n));
+  let v = 0; for (const u of g.values()) v += u * u;
+  return byDayOut(g.size, mean, v);
+}
+// mean(a) - mean(b), clustered by the days of both groups together (a day's buys and sells are one cluster)
+export function clusterDiff(a, ka, b, kb) {
+  if (a.length < 2 || b.length < 2) return { days: new Set([...ka, ...kb]).size, t: null, p: null };
+  const ma = a.reduce((s, x) => s + x, 0) / a.length, mb = b.reduce((s, x) => s + x, 0) / b.length, g = new Map();
+  a.forEach((x, i) => g.set(ka[i], (g.get(ka[i]) || 0) + (x - ma) / a.length));
+  b.forEach((x, i) => g.set(kb[i], (g.get(kb[i]) || 0) - (x - mb) / b.length));
+  let v = 0; for (const u of g.values()) v += u * u;
+  return byDayOut(g.size, ma - mb, v);
+}
+const weaker = (a, b) => (a.t == null ? a : b.t == null ? b : Math.abs(b.t) < Math.abs(a.t) ? b : a);
+const dF = (r) => (r.day != null ? r.day : dayOf(Number.isFinite(r.e) ? r.e : r.t)), dC = (r) => (r.dayC != null ? r.dayC : dayOf(Number.isFinite(r.t) ? r.t : r.e));
+export const rowsT = (rows, f) => { const xs = rows.map(f); return weaker(clusterT(xs, rows.map(dF)), clusterT(xs, rows.map(dC))); };
+export const rowsDiff = (ra, rb, f = (r) => r.net) => { const a = ra.map(f), b = rb.map(f); return weaker(clusterDiff(a, ra.map(dF), b, rb.map(dF)), clusterDiff(a, ra.map(dC), b, rb.map(dC))); };
+const fDay = (d) => (!d ? '' : d.t == null ? ` By day: too few days to judge (${d.days}).` : ` By day (trades of the same UTC day counted together): ${fT(d.t)} over ${d.days} days.`);
+// does the by-day t back the per-trade t? (same sign, |t| >= 2, enough days)
+export const backedByDay = (t, d) => !!d && d.t != null && Math.abs(d.t) >= TR.FLAG_T && Math.sign(d.t) === Math.sign(t);
 
 // ─── one closed trade, as the review reads it ───
 export function exitType(x) {
@@ -101,7 +141,7 @@ export function norm(x) {
   const net = merNet(x), costKnown = Number.isFinite(x.Rnet) || Number.isFinite(x.costR);
   const ses = (x.feat && SESSIONS.includes(x.feat.session)) ? x.feat.session : SESSIONS.includes(x.session) ? x.session : Number.isFinite(e) ? sessionOf(e) : null;
   return {
-    id: x.id, market: x.market, side: x.side, e, t, R: x.R, net, cost: costKnown ? +(x.R - net).toFixed(4) : 0, costKnown,
+    id: x.id, market: x.market, side: x.side, e, t, day: dayOf(Number.isFinite(e) ? e : t), dayC: dayOf(Number.isFinite(t) ? t : e), px: Number.isFinite(x.entry) ? x.entry : null, R: x.R, net, cost: costKnown ? +(x.R - net).toFixed(4) : 0, costKnown,
     exit: exitType(x), mfe: Number.isFinite(x.mfe) ? x.mfe : null, mae: Number.isFinite(x.mae) ? x.mae : null,
     session: ses, hours: Number.isFinite(e) ? hourBlock(e) : null, held: Number.isFinite(e) && Number.isFinite(t) ? t - e : null,
     targetAfterStop: x.status === 'loss' && !!(x.pm && x.pm.after && x.pm.after.hitT1),
@@ -122,16 +162,25 @@ export function streamKey(x, src) {
   return { id: k, k, book: x.shadow ? 'shadow' : 'live', variant: null };
 }
 export function closed(x) { return !!x && DONE.has(x.status) && !x.void && !x.replay && Number.isFinite(x.R); }
+// A record kept in BOTH files (the live gold replica's trades are written to trades.json and to research.json) is one trade:
+// it is read from trades.json, as the mirror does, never counted in a live stream and again in a research stream.
+// A stream that spans several markets is not named after the market of its last record ("USD/CHF replica" for ten markets).
+const stripLabel = (x, name) => { const l = String(x.label || mName(x.market)); return name.startsWith(l + ' ') ? cap(name.slice(l.length + 1)) : name; };
 export function streams(trades, research) {
-  const M = new Map();
+  const M = new Map(), inTrades = new Set(arr(trades).map((x) => x && x.id).filter((id) => id != null));
   for (const [src, list] of [['trades', arr(trades)], ['research', arr(research)]]) for (const x of list) {
     if (!closed(x)) continue;
+    if (src === 'research' && inTrades.has(x.id)) continue;
     const s = streamKey(x, src); if (!s) continue;
     const key = `${s.id}|${s.book}`;
     if (!M.has(key)) M.set(key, { key, ...s, src, name: nameOf(x, s), rows: [], raw: [] });
     const S = M.get(key); S.rows.push(norm(x)); S.raw.push(x); S.name = nameOf(x, s);
   }
-  for (const S of M.values()) { const o = S.rows.map((r, i) => [r, S.raw[i]]).sort((a, b) => (a[0].t || 0) - (b[0].t || 0)); S.rows = o.map((p) => p[0]); S.raw = o.map((p) => p[1]); }
+  for (const S of M.values()) {
+    const o = S.rows.map((r, i) => [r, S.raw[i]]).sort((a, b) => (a[0].t || 0) - (b[0].t || 0)); S.rows = o.map((p) => p[0]); S.raw = o.map((p) => p[1]);
+    S.markets = [...new Set(S.rows.map((r) => r.market).filter((m) => m != null))].sort();
+    if (S.markets.length > 1 && !SETUP_NAME[S.k]) { const last = S.raw[S.raw.length - 1]; S.name = stripLabel(last, nameOf(last, S)); }
+  }
   return [...M.values()];
 }
 
@@ -140,29 +189,37 @@ export function stats(rows) {
   const n = rows.length, g = describe(rows.map((r) => r.R)), nt = describe(rows.map((r) => r.net));
   const wins = rows.filter((r) => r.R > 0).length, losses = rows.filter((r) => r.R < 0).length, known = rows.filter((r) => r.costKnown);
   const costSum = known.reduce((s, r) => s + r.cost, 0), grossWins = rows.reduce((s, r) => s + Math.max(0, r.R), 0);
+  const days = rows.map((r) => r.day);
   return {
-    n, wins, losses, flat: n - wins - losses, winRate: n ? r3(wins / n) : null,
-    gross: { sum: r2(g.sum), mean: r3(g.mean), t: r2(g.t) }, net: { sum: r2(nt.sum), mean: r3(nt.mean), t: r2(nt.t) },
+    n, wins, losses, flat: n - wins - losses, winRate: n ? r3(wins / n) : null, days: new Set(days).size,
+    gross: { sum: r2(g.sum), mean: r3(g.mean), t: r2(g.t) }, net: { sum: r2(nt.sum), mean: r3(nt.mean), t: r2(nt.t), byDay: rowsT(rows, (r) => r.net) },
     cost: { known: known.length, sum: r2(costSum), perTrade: known.length ? r3(costSum / known.length) : null, shareOfGrossWins: grossWins > 0 && known.length ? r3(costSum / grossWins) : null },
   };
 }
+// The recorded MFE is read on the candles BEFORE the exit candle (the Trader checks stop, target and time first and returns), so
+// a loss with MFE >= 1 did reach +1R on an earlier candle, but a win that ran to its target inside one candle keeps an MFE under
+// its own R. A trade closed at +1R or more reached +1R: without this, such wins were left unchanged by the "close at +1R"
+// counterfactual and the counterfactual was flattered (20 Nov 2026 audit: 25 of 1,032 trades with an MFE on file).
+export const best = (r) => Math.max(r.mfe != null ? r.mfe : -Infinity, Number.isFinite(r.R) ? r.R : -Infinity);
+export const reached1R = (r) => best(r) >= 1;
+export const lockDiff = (r) => (reached1R(r) ? 1 : r.R) - r.R;
 export function whereR(rows) {
   const ex = {};
   for (const r of rows) { const e = (ex[r.exit] = ex[r.exit] || { n: 0, net: 0 }); e.n++; e.net += r.net; }
   for (const e of Object.values(ex)) e.net = r2(e.net);
   const losses = rows.filter((r) => r.R < 0), fast = losses.filter((r) => r.held != null && r.held <= TR.FAST_S);
-  const withMfe = rows.filter((r) => r.mfe != null), reached = withMfe.filter((r) => r.mfe >= 1), lost = reached.filter((r) => r.R < 0);
+  const withMfe = rows.filter((r) => r.mfe != null), reached = withMfe.filter(reached1R), lost = reached.filter((r) => r.R < 0);
   // giveback = how much of the best open profit was not kept (R per unit); counterfactual "close at +1R when +1R is reached"
   // (approximate: the MFE is read on candle extremes and the +1R close is assumed exact, before costs): paired difference
-  const give = describe(reached.map((r) => r.mfe - r.R));
-  const lock = describe(withMfe.map((r) => (r.mfe >= 1 ? 1 : r.R) - r.R));
+  const give = describe(reached.map((r) => best(r) - r.R));
+  const lockXs = withMfe.map(lockDiff), lock = describe(lockXs);
   const tas = losses.filter((r) => r.targetAfterStop);
   return {
     exits: ex,
     fastStops: { n: fast.length, ofLosses: losses.length, share: losses.length ? r3(fast.length / losses.length) : null, net: r2(fast.reduce((s, r) => s + r.net, 0)), within: '30 minutes of the fill' },
     reached1R: { withMfe: withMfe.length, n: reached.length, closedAtLoss: lost.length, lossNet: r2(lost.reduce((s, r) => s + r.net, 0)) },
     giveback: { n: give.n, mean: r3(give.mean), note: 'best open R minus the R closed, on trades that reached +1R (candle extremes)' },
-    lock1R: { n: lock.n, mean: r3(lock.mean), t: r2(lock.t), note: 'if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE' },
+    lock1R: { n: lock.n, mean: r3(lock.mean), t: r2(lock.t), byDay: rowsT(withMfe, lockDiff), note: 'if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)' },
     targetAfterStop: { n: tas.length, ofLosses: losses.length, note: 'losses whose target was reached after the stop (post-mortem)' },
   };
 }
@@ -170,9 +227,12 @@ export function whereR(rows) {
 export function split(rows, field) {
   const vals = [...new Set(rows.map((r) => r[field]).filter((v) => v != null))].sort();
   return vals.map((v) => {
-    const a = rows.filter((r) => r[field] === v).map((r) => r.net), b = rows.filter((r) => r[field] !== v && r[field] != null).map((r) => r.net), A = describe(a), w = welch(a, b);
+    const ra = rows.filter((r) => r[field] === v), rb = rows.filter((r) => r[field] !== v && r[field] != null);
+    const a = ra.map((r) => r.net), b = rb.map((r) => r.net), A = describe(a), w = welch(a, b);
     const judged = a.length >= TR.FLAG_N && b.length >= TR.FLAG_N;
-    return { v, n: A.n, mean: r3(A.mean), sum: r2(A.sum), t: r2(A.t), rest: { n: b.length, mean: r3(describe(b).mean) }, vsRest: judged ? { diff: r3(w.diff), t: r2(w.t), df: r2(w.df), p: r3(pOfT(w.t, w.df)) } : null };
+    const vs = judged ? { diff: r3(w.diff), t: r2(w.t), df: r2(w.df), p: r3(pOfT(w.t, w.df)), byDay: rowsDiff(ra, rb) } : null;
+    if (vs) Object.defineProperty(vs, 'pRaw', { value: pOfT(w.t, w.df), enumerable: false });   // unrounded, for Holm
+    return { v, n: A.n, mean: r3(A.mean), sum: r2(A.sum), t: r2(A.t), rest: { n: b.length, mean: r3(describe(b).mean) }, vsRest: vs };
   });
 }
 export function slippage(ids, mirrors) {
@@ -189,28 +249,74 @@ export function reviewTags(raw, analyst, losses) {
   return { reviewed: n, tags: out };
 }
 
+// ─── the regime note: is a side split the rule, or the market's own direction over these days? (20 Nov 2026) ───
+// research/edge/replica-sides (17 Nov 2026) found the replica's forward "buys lose, sells win" was the side of the month's move,
+// not the rule. The same reading for any stream, from its own records: per market, the move = the last fill price against the
+// first; a buy in a market that rose (a sell in one that fell) traded WITH the move. The direction is only known afterwards, so
+// this explains a split, it is never a rule. On council-data of 20 Nov 2026 the better side was the side of the market's own
+// move in 10 of 10 markets for the replica's research trades and for the shadow scalps.
+export function regimeOf(rows) {
+  const by = new Map();
+  for (const r of rows) { if (r.px == null || !Number.isFinite(r.e) || (r.side !== 'buy' && r.side !== 'sell')) continue; if (!by.has(r.market)) by.set(r.market, []); by.get(r.market).push(r); }
+  const wi = [], ag = [], sides = { buy: { n: 0, against: 0 }, sell: { n: 0, against: 0 } };
+  let up = 0, down = 0, judged = 0, same = 0;
+  const mean = (L) => L.reduce((q, r) => q + r.net, 0) / L.length;
+  for (const L of by.values()) {
+    if (L.length < 2) continue; L.sort((a, b) => a.e - b.e);
+    const mv = L[L.length - 1].px - L[0].px; if (!mv) continue;
+    if (mv > 0) up++; else down++;
+    const b = L.filter((r) => r.side === 'buy'), sl = L.filter((r) => r.side === 'sell');
+    if (b.length >= TR.REGIME_SIDE_N && sl.length >= TR.REGIME_SIDE_N) { judged++; if ((mean(b) > mean(sl)) === (mv > 0)) same++; }
+    for (const r of L) { const w = (r.side === 'buy') === (mv > 0); (w ? wi : ag).push(r); sides[r.side].n++; if (!w) sides[r.side].against++; }
+  }
+  if (wi.length < TR.FLAG_N || ag.length < TR.FLAG_N) return null;
+  const a = wi.map((r) => r.net), b = ag.map((r) => r.net), w = welch(a, b);
+  return { markets: up + down, up, down, betterSide: { markets: judged, withMove: same }, with: { n: a.length, mean: r3(describe(a).mean) }, against: { n: b.length, mean: r3(describe(b).mean) },
+    diff: r3(w.diff), t: r2(w.t), byDay: rowsDiff(wi, ag), sides,
+    note: 'the move of a market = its last fill price against its first in this record; known only afterwards: a reading of the split, not a rule' };
+}
+// a side flag is "confounded" when trading with the move beat trading against it (t >= 2) and the weak side was mostly the side
+// against the move (or the strong side mostly the side with it)
+export function regimeForSide(reg, kind, side) {
+  if (!reg || !(reg.t >= TR.FLAG_T) || !reg.sides[side] || !reg.sides[side].n) return null;
+  const sh = reg.sides[side].against / reg.sides[side].n, weak = kind === 'weak-side';
+  if (weak ? sh < TR.REGIME_SHARE : 1 - sh < TR.REGIME_SHARE) return null;
+  const pc = Math.round((weak ? sh : 1 - sh) * 100), bs = reg.betterSide;
+  return { confounded: true, share: r3(weak ? sh : 1 - sh), with: reg.with, against: reg.against, t: reg.t, byDay: reg.byDay, markets: reg.markets, up: reg.up, down: reg.down, betterSide: bs,
+    text: `Regime note: ${reg.down} of ${reg.markets} market${reg.markets === 1 ? '' : 's'} fell and ${reg.up} rose over this record (first to last fill price), and ${pc}% of the ${side}s traded ${weak ? 'against' : 'with'} their market's own move. With the move ${fR(reg.with.mean)} a trade (n ${reg.with.n}), against it ${fR(reg.against.mean)} (n ${reg.against.n}), ${fT(reg.t)}${bs.markets ? `; the better side was the side of the move in ${bs.withMove} of ${bs.markets} market${bs.markets === 1 ? '' : 's'}` : ''}. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards.` };
+}
+
 // ─── flags: patterns, each with n and t ───
 const stat = (o) => ({ n: o.n, mean: o.mean, t: o.t, ...(o.p != null ? { p: o.p } : {}), ...(o.rest ? { rest: o.rest } : {}) });
-export function flagsOf(S, all, sp, wr) {
+// one test per comparison: the two values of a two-valued field (buys against sells) are ONE test, not two
+export const splitTestKey = (S, field, buckets, v) => (buckets.length === 2 ? `${S.key}|${field}` : `${S.key}|${field}:${v}`);
+export function flagsOf(S, all, sp, wr, reg = null) {
   const F = [], who = S.id, book = S.book;
-  const add = (kind, field, value, ev, text, extra = {}) => F.push({ id: `${who}|${book}|${kind}${value != null ? ':' + value : ''}`, stream: S.key, system: who, book, kind, field: field || null, value: value == null ? null : value, ...stat(ev), text, ...extra });
-  const basis = all.cost.known ? 'after costs' : 'before costs (no cost on record)';
-  if (all.n >= TR.STREAM_N && all.net.t <= -TR.FLAG_T) add('losing', null, null, { n: all.n, mean: all.net.mean, t: all.net.t }, `${all.n} closed trades at ${fR(all.net.mean)} a trade ${basis} (${fT(all.net.t)}): it loses.`);
-  if (all.n >= TR.STREAM_N && all.net.t >= TR.FLAG_T) add('positive', null, null, { n: all.n, mean: all.net.mean, t: all.net.t }, `${all.n} closed trades at ${fR(all.net.mean)} a trade ${basis} (${fT(all.net.t)}): positive so far, a forward record, not a proven edge.`);
+  const add = (kind, field, value, ev, text, extra = {}, hid = {}) => {
+    const d = ev.byDay || null, f = { id: `${who}|${book}|${kind}${value != null ? ':' + value : ''}`, stream: S.key, system: who, book, kind, field: field || null, value: value == null ? null : value, ...stat(ev),
+      ...(d ? { byDay: { days: d.days, t: d.t }, robust: backedByDay(ev.t, d) } : {}), text: text + fDay(d), ...extra };
+    for (const [k, v] of Object.entries(hid)) Object.defineProperty(f, k, { value: v, enumerable: false });   // the test's key and unrounded p, for Holm
+    F.push(f);
+  };
+  const basis = all.cost.known ? 'after costs' : 'before costs (no cost on record)', nd = all.net.byDay;
+  if (all.n >= TR.STREAM_N && all.net.t <= -TR.FLAG_T) add('losing', null, null, { n: all.n, mean: all.net.mean, t: all.net.t, byDay: nd }, `${all.n} closed trades at ${fR(all.net.mean)} a trade ${basis} (${fT(all.net.t)}): it loses.`);
+  if (all.n >= TR.STREAM_N && all.net.t >= TR.FLAG_T) add('positive', null, null, { n: all.n, mean: all.net.mean, t: all.net.t, byDay: nd }, `${all.n} closed trades at ${fR(all.net.mean)} a trade ${basis} (${fT(all.net.t)}): positive so far on a short forward record, which proves nothing yet.`);
   if (all.n >= 20 && all.gross.mean > 0 && all.net.mean < 0 && all.cost.perTrade >= TR.COST_MIN)
-    add('costs', null, null, { n: all.n, mean: all.net.mean, t: all.net.t }, `Before costs ${fR(all.gross.mean)} a trade (${fT(all.gross.t)}), after costs ${fR(all.net.mean)} (${fT(all.net.t)}): costs of ${fR(all.cost.perTrade)} a trade turn it negative.`, { gross: { mean: all.gross.mean, t: all.gross.t }, costPerTrade: all.cost.perTrade });
+    add('costs', null, null, { n: all.n, mean: all.net.mean, t: all.net.t, byDay: nd }, `Before costs ${fR(all.gross.mean)} a trade (${fT(all.gross.t)}), after costs ${fR(all.net.mean)} (${fT(all.net.t)}): costs of ${fR(all.cost.perTrade)} a trade turn it negative.`, { gross: { mean: all.gross.mean, t: all.gross.t }, costPerTrade: all.cost.perTrade });
   for (const [field, label] of [['session', (v) => `the ${SESSION_NAME[v] || v} session`], ['hours', (v) => `${v} UTC`], ['side', (v) => `${v}s`], ['market', (v) => mName(v)]]) {
     for (const b of sp[field] || []) {
       if (!b.vsRest || Math.abs(b.vsRest.t) < TR.FLAG_T) continue;
       const bad = b.vsRest.t < 0;
-      add(bad ? `weak-${field}` : `strong-${field}`, field, b.v, { n: b.n, mean: b.mean, t: b.vsRest.t, p: b.vsRest.p, rest: b.rest },
-        `${label(b.v)}: ${b.n} trades at ${fR(b.mean)} a trade against ${fR(b.rest.mean)} for the other ${b.rest.n} (difference ${fR(b.vsRest.diff)}, ${fT(b.vsRest.t)}).`, { split: true, own: { t: b.t } });
+      const kind = bad ? `weak-${field}` : `strong-${field}`, rg = field === 'side' ? regimeForSide(reg, kind, b.v) : null;
+      add(kind, field, b.v, { n: b.n, mean: b.mean, t: b.vsRest.t, p: b.vsRest.p, rest: b.rest, byDay: b.vsRest.byDay },
+        `${label(b.v)}: ${b.n} trades at ${fR(b.mean)} a trade ${basis} against ${fR(b.rest.mean)} for the other ${b.rest.n} (difference ${fR(b.vsRest.diff)}, ${fT(b.vsRest.t)}).`, { split: true, own: { t: b.t }, ...(rg ? { regime: rg } : {}) },
+        { testKey: splitTestKey(S, field, sp[field], b.v), pRaw: b.vsRest.pRaw != null ? b.vsRest.pRaw : b.vsRest.p });
     }
   }
   if (wr.lock1R.n >= TR.STREAM_N && Math.abs(wr.lock1R.t) >= TR.FLAG_T && wr.lock1R.mean > 0)
-    add('exit-lock1R', 'exit', null, { n: wr.lock1R.n, mean: wr.lock1R.mean, t: wr.lock1R.t }, `Closing at +1R once a trade reached +1R would have added ${fR(wr.lock1R.mean)} a trade over ${wr.lock1R.n} trades (${fT(wr.lock1R.t)}; approximate, from the recorded MFE): the exit gives back profit.`, { split: true, p: r3(pOfT(wr.lock1R.t, wr.lock1R.n - 1)) });
+    add('exit-lock1R', 'exit', null, { n: wr.lock1R.n, mean: wr.lock1R.mean, t: wr.lock1R.t, byDay: wr.lock1R.byDay }, `Closing at +1R once a trade reached +1R would have added ${fR(wr.lock1R.mean)} a trade over ${wr.lock1R.n} trades (${fT(wr.lock1R.t)}; approximate, from the recorded MFE): the exit gives back profit.`, { split: true, p: r3(pOfT(wr.lock1R.t, wr.lock1R.n - 1)) }, { testKey: `${S.key}|exit`, pRaw: pOfT(wr.lock1R.t, wr.lock1R.n - 1) });
   if (wr.lock1R.n >= TR.STREAM_N && wr.lock1R.t <= -TR.FLAG_T)
-    add('exit-runs', 'exit', null, { n: wr.lock1R.n, mean: wr.lock1R.mean, t: wr.lock1R.t }, `Letting trades run past +1R paid: a +1R close would have cost ${fR(-wr.lock1R.mean)} a trade over ${wr.lock1R.n} trades (${fT(wr.lock1R.t)}).`, { split: true, p: r3(pOfT(wr.lock1R.t, wr.lock1R.n - 1)) });
+    add('exit-runs', 'exit', null, { n: wr.lock1R.n, mean: wr.lock1R.mean, t: wr.lock1R.t, byDay: wr.lock1R.byDay }, `Letting trades run past +1R paid: a +1R close would have cost ${fR(-wr.lock1R.mean)} a trade over ${wr.lock1R.n} trades (${fT(wr.lock1R.t)}).`, { split: true, p: r3(pOfT(wr.lock1R.t, wr.lock1R.n - 1)) }, { testKey: `${S.key}|exit`, pRaw: pOfT(wr.lock1R.t, wr.lock1R.n - 1) });
   return F;
 }
 
@@ -227,15 +333,18 @@ export const TEST_BASE = {
 // Key: system id | proposal action. Add a row only for a study with a result.json / RESULT.md in research/edge/.
 export const STUDIED = {
   'replica|one side only': { study: 'replica-sides', verdict: 'FAIL', text: 'Tested on 2020-26 (17 Nov 2026): the replica\'s sells do not beat its buys (sells minus buys +0.007R, t 0.38); the forward split is a regime artefact.' },
-  'replica|keep off live': { study: 'replica-oos', verdict: 'FAIL', text: 'Already answered: the replica fails out of sample (replica-oos) and has been a paper shadow by the owner\'s rule since 11 Nov 2026.' },
+  'replica|keep off live': { study: 'replica-oos', verdict: 'FAIL', text: 'Already answered: the replica rule fails out of sample (replica-oos, 2017-22: −0.05R a trade, n 115). The owner knows this: its forex and crypto research trades are paper only, and the gold replica was put back on the live paper book by the owner on 20 Nov 2026 with that record said.' },
 };
 export function studiedOf(p) { return STUDIED[`${p.system}|${p.action}`] || null; }
 const IN_SAMPLE = 'In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.';
 export function proposalOf(f, S) {
+  // a "weak" subset that still makes money is reported as a flag, never proposed away: skipping it would cost R (20 Nov 2026:
+  // "Take only sells in Position (shadow)" was proposed while its buys made +0.17R a trade)
+  if (/^weak-/.test(f.kind) && !(f.mean < 0)) return null;
   const sys = `${S.name}${S.book === 'live' ? '' : ` (${S.book})`}`;
-  const P = (action, change, question) => ({ id: `p:${f.id}`, flag: f.id, system: S.id, book: S.book, name: S.name, action, change, why: f.text,
-    evidence: { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), ...(f.rest ? { rest: f.rest } : {}), holm: f.holm != null ? f.holm : null, inSample: true, warning: IN_SAMPLE },
-    test: { question, ...TEST_BASE }, strong: false });
+  const P = (action, change, question) => ({ id: `p:${f.id}`, flag: f.id, system: S.id, book: S.book, name: S.name, action, change, why: f.regime ? `${f.text} ${f.regime.text}` : f.text,
+    evidence: { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), ...(f.rest ? { rest: f.rest } : {}), holm: f.holm != null ? f.holm : null, ...(f.byDay ? { byDay: f.byDay, robust: !!f.robust } : {}), inSample: true, warning: IN_SAMPLE },
+    ...(f.regime ? { regime: f.regime } : {}), test: { question, ...TEST_BASE }, strong: false });
   switch (f.kind) {
     case 'weak-session': return P('skip session', `Skip the ${SESSION_NAME[f.value] || f.value} session for ${sys}`, `Does ${S.name} make more after costs without trades filled in the ${f.value} session (UTC clock of council/trader.mjs) than with them?`);
     case 'weak-hours': return P('skip hours', `Skip entries between ${f.value} UTC for ${sys}`, `Do ${S.name}'s entries between ${f.value} UTC lose after costs against its other hours?`);
@@ -252,8 +361,9 @@ export function proposalOf(f, S) {
 function readStream(S, W, wr, sp, slip, tags, flags) {
   const a = W.all, good = [], bad = [];
   const basis = a.cost.known ? 'after costs' : 'before costs (none on record)';
-  if (a.net.mean > 0) good.push(`${basis} ${fR(a.net.sum)} on ${a.n} trades (${fR(a.net.mean)} a trade, ${fT(a.net.t)})`);
-  else bad.push(`${basis} ${fR(a.net.sum)} on ${a.n} trades (${fR(a.net.mean)} a trade, ${fT(a.net.t)})`);
+  const tw = a.n < TR.STREAM_N ? 'too few to judge' : fT(a.net.t);
+  if (a.net.mean > 0) good.push(`${basis} ${fR(a.net.sum)} on ${a.n} trades (${fR(a.net.mean)} a trade, ${tw})`);
+  else bad.push(`${basis} ${fR(a.net.sum)} on ${a.n} trades (${fR(a.net.mean)} a trade, ${tw})`);
   const ex = Object.entries(wr.exits).sort((x, y) => x[1].net - y[1].net);
   for (const [k, e] of ex) if (e.net > 0.5) good.push(`${k} exits ${fR(e.net)} on ${e.n}`);
   for (const [k, e] of ex) if (e.net < -0.5) bad.push(`${k} exits ${fR(e.net)} on ${e.n}`);
@@ -265,8 +375,11 @@ function readStream(S, W, wr, sp, slip, tags, flags) {
   const tg = Object.entries(tags.tags).sort((x, y) => y[1] - x[1]).slice(0, 3);
   if (tg.length) bad.push(`loss reasons written: ${tg.map(([k, v]) => `${k} ${v}`).join(', ')} (of ${tags.reviewed} reviewed)`);
   for (const f of flags) if (f.kind.startsWith('strong-')) good.push(f.text.replace(/\.$/, ''));
-  const after = a.cost.known ? `${fR(a.net.sum)} after (${fT(a.net.t)})` : `no cost on record (${fT(a.net.t)} before costs)`;
-  const head = `${S.name} (${S.book}${S.retired ? ', no longer trades live' : S.stopped ? ', no longer recorded since the shadow cut of 12 Nov' : ''}): ${a.n} closed, ${a.winRate != null ? Math.round(a.winRate * 100) : '—'}% won, ${fR(a.gross.sum)} before costs, ${after}; last 30 days ${fR(W.d30.net.sum)} on ${W.d30.n}, last 7 days ${fR(W.d7.net.sum)} on ${W.d7.n}.`;
+  const rg = flags.find((f) => f.regime); if (rg) bad.push(rg.regime.text.replace(/\.$/, ''));
+  // under TR.STREAM_N closed trades a t is not shown at all (two near-equal losses read "t −34")
+  const tt = a.n < TR.STREAM_N ? 'too few to judge' : `${fT(a.net.t)}${a.net.byDay && a.net.byDay.t != null ? `, by day ${fT(a.net.byDay.t)} over ${a.net.byDay.days} days` : a.net.byDay ? `, too few days (${a.net.byDay.days}) for a by-day t` : ''}`;
+  const after = a.cost.known ? `${fR(a.net.sum)} after (${tt})` : `no cost on record (${tt}${a.n < TR.STREAM_N ? '' : ' before costs'})`;
+  const head = `${S.name} (${S.book}${S.retired ? ', no longer trades live' : S.shadowed ? `, a paper shadow by the owner's rule since ${S.shadowed}: its new trades are shadows` : S.stopped ? ', no longer recorded since the shadow cut of 12 Nov' : ''}): ${a.n} closed, ${a.winRate != null ? Math.round(a.winRate * 100) : '—'}% won, ${fR(a.gross.sum)} before costs, ${after}; last 30 days ${fR(W.d30.net.sum)} on ${W.d30.n}, last 7 days ${fR(W.d7.net.sum)} on ${W.d7.n}.`;
   return { head, working: good, losing: bad };
 }
 
@@ -276,38 +389,48 @@ function readStream(S, W, wr, sp, slip, tags, flags) {
 // of its stream closed STRICTLY AFTER the entry was recorded: the trades that suggested it are never reused, and nothing is read
 // before it happened. Status: too few (under 20 new trades in the subset, or under 10 in the rest it is compared with), held (the
 // same sign as when recorded and |t| >= 2), faded (the sign turned, or |t| < 1 on 20+ trades), unclear (the rest). A faded
-// proposal is no longer offered as strong. A forward check is a second small sample: "held" is not an edge either.
+// proposal is no longer offered as strong. A forward check is a second small sample: "held" proves nothing either.
+// 20 Nov 2026: "held" also needs the by-day t (same sign, |t| >= 2, at least FWD.DAYS distinct UTC days): 300 trades of three
+// days of one market move are three observations of that move, not 300. Without it the status is "unclear". And a SIDE entry
+// whose new trades show the same market direction (regimeOf on the new trades alone) says so: the replica's "take only sells"
+// read "held" on 17-20 Nov while its markets kept falling, which is the regime again, not evidence for the rule.
 export const LEDGER = 'research/trade-review-ledger.json';
-export const FWD = { N: 20, REST_N: 10, HELD_T: 2, FADE_T: 1 };
+export const FWD = { N: 20, REST_N: 10, HELD_T: 2, FADE_T: 1, DAYS: TR.DAY_N };
 export const FWD_TEXT = { 'too few': 'too few new trades to judge yet', held: 'held on the trades closed since it was recorded', faded: 'faded on the trades closed since it was recorded', unclear: 'not clear yet on the trades closed since it was recorded' };
 export const ledgerId = (streamKey, flagId) => `${streamKey}#${flagId}`;
 // the entry as recorded: the evidence of that day, never rewritten
 export function ledgerEntry(p, f, S, now) {
   return { id: ledgerId(S.key, f.id), stream: S.key, flag: f.id, system: S.id, name: S.name, book: S.book, kind: f.kind, field: f.field, value: f.value,
     action: p.action, change: p.change, recordedAt: now, recorded: new Date(now * 1000).toISOString(),
-    evidence: { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), ...(f.rest ? { rest: f.rest } : {}), holm: f.holm != null ? f.holm : null }, strongAtRecord: !!p.strong };
+    evidence: { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), ...(f.rest ? { rest: f.rest } : {}), holm: f.holm != null ? f.holm : null, ...(f.byDay ? { byDay: f.byDay } : {}) }, strongAtRecord: !!p.strong };
 }
 const sgn = (v) => (v > 0 ? 1 : v < 0 ? -1 : 0);
 // one entry measured on its stream's rows closed after it was recorded (rows: norm() rows, any order)
 export function forwardCheck(e, rows) {
   const after = arr(rows).filter((r) => Number.isFinite(r.t) && r.t > e.recordedAt);
-  let n, mean, t, rest = null, diff = null, basis;
+  // the basis in words: research rows carry no cost, and saying "after costs" of them would be wrong
+  const costs = after.some((r) => r.costKnown) ? 'R after costs' : 'R before costs (no cost on record)';
+  let n, mean, t, rest = null, diff = null, basis, byDay;
   if (e.kind === 'exit-lock1R' || e.kind === 'exit-runs') {
-    const d = describe(after.filter((r) => r.mfe != null).map((r) => (r.mfe >= 1 ? 1 : r.R) - r.R));
-    n = d.n; mean = d.mean; t = d.t; basis = 'a +1R close minus the R closed, paired, before costs';
+    const L = after.filter((r) => r.mfe != null), xs = L.map(lockDiff), d = describe(xs);
+    n = d.n; mean = d.mean; t = d.t; byDay = rowsT(L, lockDiff); basis = 'a +1R close minus the R closed, paired, before costs';
   } else if (e.field && e.field !== 'exit') {
-    const a = after.filter((r) => r[e.field] === e.value).map((r) => r.net), b = after.filter((r) => r[e.field] != null && r[e.field] !== e.value).map((r) => r.net);
-    const A = describe(a), w = welch(a, b);
+    const ra = after.filter((r) => r[e.field] === e.value), rb = after.filter((r) => r[e.field] != null && r[e.field] !== e.value);
+    const a = ra.map((r) => r.net), b = rb.map((r) => r.net), A = describe(a), w = welch(a, b);
     n = A.n; mean = A.mean; rest = { n: b.length, mean: r3(describe(b).mean) }; diff = w.diff; t = w.t;
-    basis = `${e.field} ${e.value} against the rest, R after costs (Welch t)`;
+    byDay = rowsDiff(ra, rb);
+    basis = `${e.field} ${e.value} against the rest, ${costs} (Welch t)`;
   } else {
-    const d = describe(after.map((r) => r.net)); n = d.n; mean = d.mean; t = d.t; basis = 'R a trade after costs (t against zero)';
+    const xs = after.map((r) => r.net), d = describe(xs); n = d.n; mean = d.mean; t = d.t; byDay = rowsT(after, (r) => r.net); basis = `${costs} a trade (t against zero)`;
   }
   if (!Number.isFinite(t)) t = 0;
   const few = n < FWD.N || (rest && rest.n < FWD.REST_N), rec = sgn(e.evidence && e.evidence.t), now = sgn(t);
-  const status = few ? 'too few' : now === rec && Math.abs(t) >= FWD.HELD_T ? 'held' : (now !== 0 && now !== rec) || Math.abs(t) < FWD.FADE_T ? 'faded' : 'unclear';
-  return { n, mean: n ? r3(mean) : null, ...(rest ? { rest, diff: n && rest.n ? r3(diff) : null } : {}), t: r2(t), status, basis,
-    text: `${FWD_TEXT[status]}: ${n} trade${n === 1 ? '' : 's'}${rest ? ` against ${rest.n}` : ''}${n ? `, ${fR(mean)} a trade, ${fT(t)}` : ''} (recorded with ${fT(e.evidence && e.evidence.t)}).` };
+  const perTrade = few ? 'too few' : now === rec && Math.abs(t) >= FWD.HELD_T ? 'held' : (now !== 0 && now !== rec) || Math.abs(t) < FWD.FADE_T ? 'faded' : 'unclear';
+  const status = perTrade === 'held' && !backedByDay(t, byDay) ? 'unclear' : perTrade;
+  const rg = e.field === 'side' && status !== 'too few' ? regimeForSide(regimeOf(after), e.kind, e.value) : null;
+  const why = (rg ? ' The new trades show the same market direction (most of this side traded against, or with, its market\'s own move): that is the regime again, not evidence for the rule.' : '') + (perTrade === 'held' && status === 'unclear' ? (byDay.t == null ? ` Not counted as held: the new trades span ${byDay.days} day${byDay.days === 1 ? '' : 's'} only (${FWD.DAYS} needed).` : ` Not counted as held: by day ${fT(byDay.t)} over ${byDay.days} days.`) : '');
+  return { n, mean: n ? r3(mean) : null, ...(rest ? { rest, diff: n && rest.n ? r3(diff) : null } : {}), t: r2(t), byDay: { days: byDay.days, t: byDay.t }, ...(rg ? { regime: true } : {}), status, basis,
+    text: `${FWD_TEXT[status]}: ${n} trade${n === 1 ? '' : 's'}${rest ? ` against ${rest.n}` : ''}${n ? `, ${fR(mean)} a trade, ${fT(t)}` : ''} (recorded with ${fT(e.evidence && e.evidence.t)}).${why}` };
 }
 // the ledger after this run: the old entries untouched, one new entry per proposal not recorded yet; and the view of every entry
 export function ledgerOf(prev, recs, rowsByKey) {
@@ -322,7 +445,7 @@ export function ledgerOf(prev, recs, rowsByKey) {
     file: { v: 1, rule: 'append-only: an entry is recorded once with the evidence of its day and never edited; the forward check reads only trades closed after it', entries },
     added: add.length,
     view: { file: LEDGER, n: items.length, counts, thresholds: { ...FWD },
-      rule: 'Each proposal is re-measured only on trades closed after it was recorded, never on the trades that suggested it. Too few: under 20 new trades. Held: the same sign and |t| ≥ 2. Faded: the sign turned or |t| < 1. A faded proposal is not offered as strong. Held is a second small sample, not an edge.', items },
+      rule: 'Each proposal is re-measured only on trades closed after it was recorded, never on the trades that suggested it. Too few: under 20 new trades. Held: the same sign and |t| ≥ 2, per trade AND by day (trades filled the same UTC day counted together, at least 5 days). Faded: the sign turned or |t| < 1. A faded proposal is not offered as strong. Held is a second small sample and proves nothing by itself.', items },
   };
 }
 
@@ -361,6 +484,21 @@ export function preregOf(p, S, f, at) {
   ].join('\n');
 }
 
+// ─── owner decisions the review must know (20 Nov 2026) ───
+// A proposal whose evidence was (almost) all on file when the owner decided the very question is shown WITH that decision and is
+// not offered as strong: the review must not put back to the owner what the owner has just settled. Applies while fewer than
+// TR.STREAM_N of the stream's trades closed after the decision; a new record after it is judged like any other.
+// Keyed by the Trader's user rule id (config.userRules): add a row only for a rule that is in council/trader.mjs USER_RULES.
+export const OWNER_DECISIONS = [
+  { rule: 'replica-live-again', system: 'replica', book: 'live', at: Date.UTC(2026, 10, 20) / 1000, text: 'The owner put the gold replica back on the live paper book on 20 Nov 2026, with its record said (no out-of-sample result in its favour; replica-oos and replica-sides fail).' },
+];
+export function decisionFor(S, config, rows) {
+  const done = arr(config && config.userRules);
+  const d = OWNER_DECISIONS.find((x) => x.system === S.k && x.book === S.book && done.includes(x.rule)); if (!d) return null;
+  const since = arr(rows).filter((r) => Number.isFinite(r.t) && r.t > d.at).length;
+  return since < TR.STREAM_N ? { rule: d.rule, at: new Date(d.at * 1000).toISOString().slice(0, 10), text: d.text, closedSince: since } : null;
+}
+
 // ─── the whole review ───
 export function build(D, { now = Math.floor(Date.now() / 1000) } = {}) {
   const coach = D.coach || {}, decay = arr(coach.decay && coach.decay.systems), expect = arr(coach.expect && coach.expect.systems);
@@ -372,29 +510,45 @@ export function build(D, { now = Math.floor(Date.now() / 1000) } = {}) {
     S.retired = S.book === 'live' && !!SETUP_NAME[S.k] && !!focus && !focus.includes(S.k);
     // a shadow stream the owner's shadow cut (12 Nov 2026, config.shadowCut) no longer records: reported, nothing proposed
     S.stopped = S.book === 'shadow' && !!cut && arr(cut.setups).includes(S.k) && !arr(cut.keep).includes(S.k);
+    // a LIVE record of a system the owner has since made a paper shadow (config.ownerShadow, 11 Nov 2026 on): that record is
+    // history, its new trades are shadows, so "move it to a shadow" is never proposed for it
+    const shAt = S.book === 'live' ? (Number(ownerSh[S.k]) || Number(ownerSh[S.id]) || (ownerSh[S.k] || ownerSh[S.id] ? 1 : 0)) : 0;
+    S.shadowed = shAt ? (shAt > 1e9 ? new Date(shAt * 1000).toISOString().slice(0, 10) : 'an earlier date') : null;
     const W = {};
     for (const [k, days] of TR.WINDOWS) W[k] = stats(days ? S.rows.filter((r) => r.t >= now - days * 86400) : S.rows);
     const wr = whereR(S.rows), sp = { session: split(S.rows, 'session'), hours: split(S.rows, 'hours'), side: split(S.rows, 'side'), market: split(S.rows, 'market'), exit: Object.entries(wr.exits).map(([v, e]) => ({ v, n: e.n, sum: e.net })) };
     if (new Set(S.rows.map((r) => r.market)).size < 2) sp.market = [];
     const slip = slippage(S.raw.map((x) => x.id), D.mirrors), tags = reviewTags(S.raw, D.analyst, D.losses);
-    const flags = flagsOf(S, W.all, sp, wr);
+    const reg = regimeOf(S.rows), flags = flagsOf(S, W.all, sp, wr, reg);
     const dc = decay.find((s) => s && (s.k === S.k || s.id === S.k) && (!s.session || s.session === S.variant)), xp = expect.find((s) => s && s.id === (dc && dc.id));
-    out.push({ S, W, wr, sp, slip, tags, flags,
+    out.push({ S, W, wr, sp, slip, tags, flags, reg,
       decay: dc ? { status: dc.status, few: !!dc.few, why: arr(dc.why)[0] || null, ref: dc.ref } : null,
       expect: xp && xp.perTrade ? { perTrade: xp.perTrade, src: xp.honest && xp.honest.src } : null,
       ownerShadow: !!ownerSh[S.k] || !!ownerSh[S.id], recent: S.raw.slice(-TR.KEEP_TRADES).map((x, i) => { const r = S.rows[S.rows.length - Math.min(TR.KEEP_TRADES, S.rows.length) + i]; return { id: x.id, market: x.market, side: x.side, e: r.e, t: r.t, R: r2(r.R), net: r2(r.net), exit: r.exit, mfe: r.mfe, session: r.session }; }) });
   }
   // Holm over every split comparison of the file (sessions, hours, sides, markets, the exit counterfactual)
-  const F = out.flatMap((o) => o.flags), splitF = F.filter((f) => f.split && f.p != null), ok = holm(splitF.map((f) => f.p));
-  splitF.forEach((f, i) => { f.holm = ok[i]; });
-  const tests = out.reduce((s, o) => s + ['session', 'hours', 'side', 'market'].reduce((q, k) => q + o.sp[k].filter((b) => b.vsRest).length, 0) + (o.wr.lock1R.n >= TR.STREAM_N ? 1 : 0), 0);
+  // 20 Nov 2026: over EVERY comparison made, flagged or not. Before, Holm ran over the flagged ones only (15 of 107 on that
+  // day's data), i.e. it corrected for the tests that had already passed |t| >= 2 and ignored the ones that had not: 9 flags
+  // "survived", 3 do. The unrounded p is used (a p shown as 0.001 could not be compared with a threshold of 0.0005).
+  const F = out.flatMap((o) => o.flags), T = new Map();
+  for (const o of out) {
+    for (const k of ['session', 'hours', 'side', 'market']) for (const b of o.sp[k]) if (b.vsRest) { const key = splitTestKey(o.S, k, o.sp[k], b.v); if (!T.has(key)) T.set(key, b.vsRest.pRaw != null ? b.vsRest.pRaw : b.vsRest.p); }
+    if (o.wr.lock1R.n >= TR.STREAM_N) T.set(`${o.S.key}|exit`, pOfT(o.wr.lock1R.t, o.wr.lock1R.n - 1));
+  }
+  const keys = [...T.keys()], ok = holm(keys.map((k) => T.get(k))), okBy = new Map(keys.map((k, i) => [k, ok[i]]));
+  for (const f of F) if (f.split && f.p != null) f.holm = okBy.get(f.testKey) === true;
+  const tests = keys.length;
   const proposals = [], seen = new Set();
   for (const o of out) for (const f of o.flags) {
-    const p = o.S.retired || o.S.stopped ? null : proposalOf(f, o.S); if (!p) continue;
+    const p = o.S.retired || o.S.stopped || o.S.shadowed ? null : proposalOf(f, o.S); if (!p) continue;
     const same = `${o.S.key}|${f.n}|${f.mean}|${f.t}`;   // one subset of trades, two names (Asia session = 00-04 UTC): proposed once
     if (seen.has(same)) continue; seen.add(same);
     p.evidence.holm = f.holm != null ? f.holm : null;
-    p.strong = f.n >= TR.STRONG_N && Math.abs(f.t) >= TR.FLAG_T && (f.split ? f.holm === true : true);
+    // strong: enough trades, |t| >= 2 per trade AND by day, Holm for a split, and not a side split the markets' own move explains
+    p.strong = f.n >= TR.STRONG_N && Math.abs(f.t) >= TR.FLAG_T && (f.split ? f.holm === true : true) && f.robust === true && !(f.regime && f.regime.confounded);
+    // an owner decision made on this stream after (nearly all of) the evidence: the proposal is shown with it and is not strong
+    const dec = decisionFor(o.S, D.config, o.S.rows);
+    if (dec) { p.decided = dec; p.strong = false; }
     Object.defineProperty(p, '_src', { value: { f, S: o.S }, enumerable: false });
     proposals.push(p);
   }
@@ -411,17 +565,21 @@ export function build(D, { now = Math.floor(Date.now() / 1000) } = {}) {
   if (D.ledgerBad) L.view.error = 'the ledger file could not be read: it is left as it is (never overwritten) and nothing new is recorded until it is mended';
   proposals.sort((a, b) => (b.strong - a.strong) || (a.book === 'live' ? -1 : 0) - (b.book === 'live' ? -1 : 0) || Math.abs(b.evidence.t) - Math.abs(a.evidence.t));
   const systems = out.map((o) => ({
-    key: o.S.key, id: o.S.id, k: o.S.k, name: o.S.name, book: o.S.book, src: o.S.src, variant: o.S.variant, ownerShadow: o.ownerShadow, retired: !!o.S.retired, stopped: !!o.S.stopped,
+    key: o.S.key, id: o.S.id, k: o.S.k, name: o.S.name, book: o.S.book, src: o.S.src, variant: o.S.variant, ownerShadow: o.ownerShadow, retired: !!o.S.retired, stopped: !!o.S.stopped, shadowed: o.S.shadowed || null,
+    markets: o.S.markets, regime: o.reg,
     windows: o.W, whereR: o.wr, splits: o.sp, slippage: o.slip, reviews: o.tags, decay: o.decay, expect: o.expect,
     flags: o.flags.map((f) => f.id), review: readStream(o.S, o.W, o.wr, o.sp, o.slip, o.tags, o.flags), recent: o.recent,
   })).sort((a, b) => (a.book === 'live' ? 0 : a.book === 'shadow' ? 1 : 2) - (b.book === 'live' ? 0 : b.book === 'shadow' ? 1 : 2) || b.windows.all.n - a.windows.all.n);
-  const live = systems.filter((s) => s.book === 'live'), tot = (L, w) => ({ n: L.reduce((s, x) => s + x.windows[w].n, 0), net: r2(L.reduce((s, x) => s + x.windows[w].net.sum, 0)), gross: r2(L.reduce((s, x) => s + x.windows[w].gross.sum, 0)) });
+  const live = systems.filter((s) => s.book === 'live'), liveNow = live.filter((s) => !s.retired && !s.shadowed), tot = (L, w) => ({ n: L.reduce((s, x) => s + x.windows[w].n, 0), net: r2(L.reduce((s, x) => s + x.windows[w].net.sum, 0)), gross: r2(L.reduce((s, x) => s + x.windows[w].gross.sum, 0)) });
   const J = {
     v: TR.V, at: new Date(now * 1000).toISOString(),
     rule: 'proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.',
     inSample: IN_SAMPLE, windows: Object.fromEntries(TR.WINDOWS.map(([k, d]) => [k, d ? `last ${d} days` : 'the whole forward record on file'])),
-    thresholds: { flagN: TR.FLAG_N, flagT: TR.FLAG_T, streamN: TR.STREAM_N, strongN: TR.STRONG_N, fastStopS: TR.FAST_S, splitTests: tests, holmAlpha: 0.05 },
-    totals: { live: { d7: tot(live, 'd7'), d30: tot(live, 'd30'), all: tot(live, 'all') }, shadow: { d30: tot(systems.filter((s) => s.book === 'shadow'), 'd30'), all: tot(systems.filter((s) => s.book === 'shadow'), 'all') } },
+    thresholds: { flagN: TR.FLAG_N, flagT: TR.FLAG_T, streamN: TR.STREAM_N, strongN: TR.STRONG_N, fastStopS: TR.FAST_S, splitTests: tests, holmAlpha: 0.05, dayN: TR.DAY_N },
+    byDay: 'Beside each per-trade t: a by-day t, trades filled the same UTC day counted together (cluster-robust; null under 5 days = too few days to judge). A proposal is strong only when both agree.',
+    // liveNow: the live streams that still trade live (the retired legacy engine setups and the systems the owner has since
+    // made paper shadows are history and are left out); `live` keeps every live record on file, as before
+    totals: { live: { d7: tot(live, 'd7'), d30: tot(live, 'd30'), all: tot(live, 'all') }, liveNow: { d7: tot(liveNow, 'd7'), d30: tot(liveNow, 'd30'), all: tot(liveNow, 'all'), streams: liveNow.map((s) => s.key) }, shadow: { d30: tot(systems.filter((s) => s.book === 'shadow'), 'd30'), all: tot(systems.filter((s) => s.book === 'shadow'), 'all') } },
     systems, flags: F, proposals, test: TEST_BASE, ledger: L.view,
   };
   Object.defineProperty(J, 'ledgerFile', { value: D.ledgerBad ? null : L.file, enumerable: false });

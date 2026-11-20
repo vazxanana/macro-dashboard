@@ -109,3 +109,40 @@ test('report block: tags, small-sample warning, owner comparison, empty case', (
   assert.match(md, /\(owner: hunt\)/); assert.match(md, /matched the owner on 1 of 1/);
   assert.match(postMortemSection({ reviews: {}, now }), /No live loss with a finished post-mortem/);
 });
+
+// ---- 20 Nov 2026 audit: time exits, moved stops, void records ----
+test('a loss closed by its time limit was never stopped: no hunt, noise or news tag, and the words say so', () => {
+  // closed by maxHold at -0.4R; price then went to the target without ever nearing the stop; the stop was 0.3x ATR; a release 1 h before the exit
+  const x = loss({ k: 'geg', name: 'Gold daily engulf', R: -0.4, exitKind: 'time', exit: '240 h', closed: T0 + 240 * 3600, mfe: 1.3, ctx: { stopAtr: 0.3, stopSpreads: 3, sigAge: 2 },
+    pm: { phase: 'done', until: T0 + 264 * 3600, after: { best: 3, worst: 0.5, worstPre: 0.5, hitT1: T0 + 250 * 3600 }, news: [] } });
+  const pm = postMortem(x, { events: [{ t: T0 + 239 * 3600, title: 'CPI', impact: 'High', country: 'US' }] });
+  assert.deepEqual(pm.tags, [], 'before the audit: hunt + news + noise');
+  assert.equal(pm.evidence.exit, 'time'); assert.equal(pm.evidence.after.pastStopR, undefined);
+  assert.match(pm.text, /closed by its time limit .* after the fill at −0\.40R, not by its stop/);
+  assert.match(pm.text, /the time limit, not the stop, ended the trade/);
+  assert.match(pm.text, /it is not tagged news/); assert.match(pm.text, /was not hit/);
+  assert.doesNotMatch(pm.text, /stopped|Stop swept|inside one normal candle/);
+  assert.equal(pm.title, 'Was +1.30R, then closed at a loss by the time limit');
+  assert.equal(postMortem({ ...x, mfe: 0.2 }, { events: [] }).title, 'Closed at a loss by its time limit');
+});
+
+test('how far past the stop is measured from where the stop SAT: a trailed stop is not at 1R', () => {
+  // a buy from 100, opening risk 1 (stop 99); the trail moved the stop to 99.7 and it was hit: -0.3R. Afterwards price went to
+  // 98.9 (1.1R against the entry = 0.8R past the moved stop) and only then to the target: not a sweep of this stop
+  const moved = loss({ side: 'buy', entry: 100, stop: 99.7, r0: 1, t1: 102, trailMoved: true, exitKind: 'stop', R: -0.3, mfe: 0.9,
+    pm: { phase: 'done', until: T0 + 20000, after: { best: 2.4, worst: 1.1, worstPre: 1.1, hitT1: T0 + 9000 }, news: [] } });
+  const pm = postMortem(moved, { events: [] });
+  assert.equal(pm.evidence.stopAtR, 0.3); assert.equal(pm.evidence.after.pastStopR, 0.8);
+  assert.deepEqual(pm.tags, [], 'before the audit: 1.1 - 1 = 0.1R past the stop, tagged a stop hunt');
+  assert.match(pm.text, /The stop had been moved: it sat 0\.30R from the entry when it was hit/);
+  // the same aftermath with the stop still at its opening distance is the hunt it always was
+  const plain = postMortem(loss({ side: 'buy', entry: 100, stop: 99, r0: 1, t1: 102, R: -1, mfe: 0.9, pm: moved.pm }), { events: [] });
+  assert.deepEqual(plain.tags, ['hunt']); assert.equal(plain.evidence.after.pastStopR, 0.1); assert.equal(plain.evidence.stopAtR, undefined);
+});
+
+test('a void loss gets no post-mortem (and loses an old one)', () => {
+  const x = loss({ id: 'v1', void: true });
+  const r = analystReviews({ trades: [x], prev: { v1: { id: 'v1', text: 'old' } }, now: T0 + 9e5 });
+  assert.deepEqual(r.reviews, {}); assert.equal(r.changed, true);
+  assert.equal(Object.keys(analystReviews({ trades: [{ ...x, void: false }], prev: {}, now: T0 + 9e5 }).reviews).length, 1);
+});

@@ -27,6 +27,9 @@ const SYSTEM = [
   'Your job: for each stream you are given, write a short plain review (what is working, what is losing R and why) and, where a flag supports it, propose a concrete change.',
   'A proposal MUST name exactly one flag id from that stream\'s "flags" list as its evidence. A proposal without a valid flag id is discarded.',
   'A stream may carry "forwardChecks": the desk\'s own earlier proposals re-measured only on trades closed after they were recorded. Do not propose again a flag whose forward check is "faded"; such a proposal is discarded. "held" is a second small sample, not proof.',
+  'Beside a per-trade t the file gives a by-day t ("tByDay": trades of the same UTC day counted together, since same-day trades share the market\'s move). Where it is null (too few days) or under 2, say the pattern rests on few days; do not call it solid.',
+  'A flag may carry a "regimeNote": the side split may be the markets\' own direction over these days, not the rule. Say so and do not propose a one-side rule from it.',
+  'A stream with "closed" set (the rule no longer trades live, the owner made it a paper shadow, or its shadows are no longer recorded) is history: review it, propose nothing for it; such a proposal is discarded.',
   'Proposals are only suggestions for the owner; nothing is applied. Never suggest a live account, removing a stop or moving a stop further away.',
   'Answer with ONE JSON object and nothing else, in this shape:',
   '{"overview":"2-4 sentences","streams":[{"key":"<stream key>","review":"2-4 sentences","working":["..."],"losing":["..."],"proposals":[{"flag":"<flag id>","change":"one sentence","why":"one or two sentences"}]}]}',
@@ -39,14 +42,16 @@ function pick(review) {
   return S.filter((s) => s && s.windows && s.windows.all && (s.windows.all.n >= 5 || (s.flags || []).length))
     .sort((a, b) => rank(a) - rank(b) || b.windows.all.n - a.windows.all.n).slice(0, MAX_STREAMS);
 }
-const W = (w) => (w ? { n: w.n, winRate: w.winRate, grossSum: w.gross && w.gross.sum, netSum: w.net && w.net.sum, netMean: w.net && w.net.mean, netT: w.net && w.net.t, costPerTrade: w.cost && w.cost.perTrade, costKnown: w.cost && w.cost.known } : null);
+const W = (w) => (w ? { n: w.n, winRate: w.winRate, grossSum: w.gross && w.gross.sum, netSum: w.net && w.net.sum, netMean: w.net && w.net.mean, netT: w.net && w.net.t, netTByDay: w.net && w.net.byDay ? w.net.byDay.t : undefined, days: w.days, costPerTrade: w.cost && w.cost.perTrade, costKnown: w.cost && w.cost.known } : null);
+// a stream the desk itself proposes nothing for (20 Nov 2026): the model's proposals for it are discarded too
+const closedWhy = (s) => (s.retired ? 'the rule no longer trades live' : s.shadowed ? `a paper shadow by the owner's rule since ${s.shadowed}` : s.stopped ? 'its shadow signals are no longer recorded (owner, 12 Nov 2026)' : null);
 // the ledger's forward checks by stream key, and the flag ids whose proposal faded forward (17 Nov 2026)
 function ledgerItems(review) { return review && review.ledger && Array.isArray(review.ledger.items) ? review.ledger.items : []; }
 function fadedFlags(review) { return new Set(ledgerItems(review).filter((x) => x && x.forward && x.forward.status === 'faded').map((x) => x.flag)); }
 function buildRequest(review) {
   const flags = new Map((review.flags || []).map((f) => [f.id, f])), led = ledgerItems(review);
   const streams = pick(review).map((s) => ({
-    key: s.key, name: s.name, book: s.book,
+    key: s.key, name: s.name, book: s.book, ...(closedWhy(s) ? { closed: closedWhy(s) } : {}),
     last7: W(s.windows.d7), last30: W(s.windows.d30), all: W(s.windows.all),
     exits: s.whereR && s.whereR.exits, fastStops: s.whereR && s.whereR.fastStops && { n: s.whereR.fastStops.n, ofLosses: s.whereR.fastStops.ofLosses, net: s.whereR.fastStops.net },
     reached1R: s.whereR && s.whereR.reached1R, lock1R: s.whereR && s.whereR.lock1R && { n: s.whereR.lock1R.n, mean: s.whereR.lock1R.mean, t: s.whereR.lock1R.t },
@@ -54,7 +59,7 @@ function buildRequest(review) {
     sessions: (s.splits && s.splits.session || []).map((b) => ({ v: b.v, n: b.n, mean: b.mean, t: b.t })),
     sides: (s.splits && s.splits.side || []).map((b) => ({ v: b.v, n: b.n, mean: b.mean, t: b.t })),
     lossReasons: s.reviews && s.reviews.tags, decay: s.decay && s.decay.status,
-    flags: (s.flags || []).map((id) => flags.get(id)).filter(Boolean).slice(0, MAX_FLAGS).map((f) => ({ id: f.id, kind: f.kind, n: f.n, mean: f.mean, t: f.t, holm: f.holm == null ? null : f.holm, text: f.text })),
+    flags: (s.flags || []).map((id) => flags.get(id)).filter(Boolean).slice(0, MAX_FLAGS).map((f) => ({ id: f.id, kind: f.kind, n: f.n, mean: f.mean, t: f.t, holm: f.holm == null ? null : f.holm, ...(f.byDay ? { tByDay: f.byDay.t, days: f.byDay.days } : {}), ...(f.regime ? { regimeNote: str(f.regime.text, 600) } : {}), text: f.text })),
     recent: (s.recent || []).slice(-MAX_RECENT).map((x) => ({ market: x.market, side: x.side, exit: x.exit, R: x.R, net: x.net, mfe: x.mfe, session: x.session })),
     forwardChecks: led.filter((x) => x && x.stream === s.key && x.forward).slice(0, MAX_FLAGS).map((x) => ({ flag: x.flag, change: str(x.change, LIM.change), recorded: x.recorded, recordedT: x.evidence && x.evidence.t, status: x.forward.status, n: x.forward.n, t: x.forward.t })),
   }));
@@ -77,14 +82,15 @@ function parseAnswer(text, review) {
   const out = [], why = []; let dropped = 0;
   for (const s of Array.isArray(j.streams) ? j.streams : []) {
     const S = s && byKey.get(s.key); if (!S) { if (s && s.key) why.push(`unknown stream ${str(s.key, 60)}`); continue; }
-    const own = new Set(S.flags || []), P = [];
+    const own = new Set(S.flags || []), P = [], shut = !!closedWhy(S);
     for (const p of Array.isArray(s.proposals) ? s.proposals : []) {
       const f = p && flags.get(p.flag);
+      if (shut) { dropped++; continue; }   // nothing is proposed for a rule that no longer trades live or records
       if (!f || !own.has(p.flag) || faded.has(f.id) || !str(p.change, LIM.change)) { dropped++; continue; }   // a faded idea is not proposed again
       if (P.length >= LIM.proposals) break;
       const base = props.get(f.id);
       P.push({ flag: f.id, change: str(p.change, LIM.change), why: str(p.why, LIM.why),
-        evidence: base ? base.evidence : { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), holm: f.holm == null ? null : f.holm, inSample: true, warning: review.inSample },
+        evidence: base ? base.evidence : { n: f.n, mean: f.mean, t: f.t, ...(f.p != null ? { p: f.p } : {}), holm: f.holm == null ? null : f.holm, ...(f.byDay ? { byDay: f.byDay, robust: !!f.robust } : {}), inSample: true, warning: review.inSample },
         test: base ? base.test : { question: `Does the pattern of flag ${f.id} hold out of sample?`, ...(review.test || {}) }, strong: !!(base && base.strong),
         ...(base && base.forward ? { forward: base.forward } : {}) });
     }
@@ -95,4 +101,4 @@ function parseAnswer(text, review) {
   return { ok: true, answer: { overview: str(j.overview, LIM.overview), streams: out, dropped } };
 }
 
-module.exports = { SYSTEM, MAX_STREAMS, pick, buildRequest, parseAnswer, jsonOf, fadedFlags };
+module.exports = { SYSTEM, MAX_STREAMS, pick, buildRequest, parseAnswer, jsonOf, fadedFlags, closedWhy };
