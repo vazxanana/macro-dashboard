@@ -48,7 +48,7 @@ export const COUNCIL_URL = SITE + 'market-structure.html#council';
 export const CFG = {
   at: 21 * 60 + 15,   // UTC minute of the day from which the digest may go out (about an hour after the 16:00 New York close)
   maxLines: 15,       // body lines at most
-  maxLinesPreview: 21,   // the Sunday preview may carry the "Research this week" block
+  maxLinesPreview: 22,   // the Sunday preview may carry the "Research this week" block
   macroStaleH: 12,    // a forecast older than this is labelled with its date
   dataStaleH: 3,      // a data check older than this counts as a problem
   acctStaleH: 2,      // a cTrader account file older than this shows its time
@@ -264,8 +264,9 @@ export function waiting(D, now, prev) {
 
 // Sunday preview only: up to three top lines of the Week ahead (macro/week-ahead.json, council/week-ahead.mjs) when it covers
 // the coming week. Context, never a call.
-export function weekAheadLines(wa) {
+export function weekAheadLines(wa, now = null) {
   if (!wa || !wa.next || !Array.isArray(wa.lines) || !wa.lines.length) return [];
+  if (now != null && !(typeof wa.to === 'string' && wa.to >= new Date(now * 1000).toISOString().slice(0, 10))) return [];   // a file stuck from an earlier weekend is not the week ahead
   return ['The week ahead:', ...wa.lines.slice(0, 3).map((l) => '• ' + trim(l, 170))];
 }
 
@@ -281,7 +282,7 @@ export function buildDigest(D, { now, kind = 'daily', prev = {}, sbRows = null }
     ctraderLine(D.account, D.mirror, now, from, kind),
     openLine(openPositions(D)),
     ...macroLines(D.forecast, now),
-    ...(kind === 'preview' ? weekAheadLines(D.weekAhead) : [])];
+    ...(kind === 'preview' ? weekAheadLines(D.weekAhead, now) : [])];
   const W = waiting(D, now, prev);
   if (W.length) L.push('Waiting on you:', ...W.map((s) => '• ' + s)); else L.push('Nothing waiting on you.');
   if (sbRows) {

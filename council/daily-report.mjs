@@ -73,10 +73,10 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
     const ty = typeOf(e.title, e.country), nc = ty ? nowcastFor(hd, { type: ty, t: e.at }) : null;
     if (nc && !lines.today.some((l) => l.startsWith('Before the print'))) lines.today.push(`Before the print: ${nc.text}.`);
   }
-  for (const f of (((hd && hd.fed) || {}).events || []).filter((x) => x && x.day === nyDay(now)).slice(0, 4))
+  for (const f of (((hd && hd.fed) || {}).events || []).filter((x) => x && x.day === today).slice(0, 4))
     lines.today.push(`Fed: ${clean(f.title, 100)}${f.time ? ` · ${clean(f.time, 20)} New York` : ''}${f.topic ? ` · ${clean(f.topic, 100)}` : ''}`);
   // the US Treasury's note and bond auctions of the New York day (hard-data.mjs `auctions`): supply the bond market has to absorb
-  for (const a of ((((hd && hd.auctions) || {}).list) || []).filter((x) => x && x.day === nyDay(now) && x.type !== 'Bill').slice(0, 4))
+  for (const a of ((((hd && hd.auctions) || {}).list) || []).filter((x) => x && x.day === today && x.type !== 'Bill').slice(0, 4))
     lines.today.push(`${auctionText(a)} (results about 13:00 New York).`);
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
@@ -88,7 +88,12 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
   if (hd && hd.odds && hd.odds.line) lines.expect.push(clean(hd.odds.line, 300));
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) lines.expect.push(`Atlanta Fed GDPNow for ${clean(hd.gdpnow.quarter, 12)}: ${hd.gdpnow.value}% a year, a model's running estimate of growth.`);
   // how those readings moved over the day and the week (hard-data.mjs hist): a change in what a model or traders say, never a signal
-  for (const m of (hd ? moves(hd, now) : []).slice(0, 4)) lines.expect.push(clean(m.text, 300));
+  // never let the history stop the report; nowcast moves only for a month with a release in the next week; no line when nothing moved
+  try {
+    const soon = new Set(cal.filter((e) => e.country === 'USD' && e.at > now && e.at <= now + 7 * 86400 && typeOf(e.title, e.country)).map((e) => { const d = new Date(e.at * 1000); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() - 1); return d.toISOString().slice(0, 7); }));
+    const mv = moves(hd, now).filter((m) => (m.day || m.week) && (m.kind !== 'nowcast' || soon.has(m.month)));
+    for (const m of mv.slice(0, 4)) lines.expect.push(clean(m.text, 300));
+  } catch (e) { /* context only */ }
   for (const it of (((vet && vet.research) || {}).items || []).slice(0, 6)) if (it && it.text && !/^No |off:|no regime/i.test(it.text)) lines.expect.push(clean(it.text, 220));
   const sections = [['The picture', lines.picture], ['What happened (last 30 hours)', lines.happened], [`Today, ${dayName(now)} (London time)`, lines.today], ['Later this week', lines.week], ['What we expect', lines.expect]]
     .filter(([, l]) => l.length).map(([h, l]) => ({ h, lines: l }));

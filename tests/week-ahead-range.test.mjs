@@ -11,7 +11,7 @@ const rf = { study: { PCE: { name: 'core PCE', stats: { n: 34, absMed: 1.24 } },
 test('a normal day: the expected move of the last price, in $ and %', () => {
   const r = WA.dayRange(fc, { releases: [] }, rf);
   assert.equal(r.normalPct, 0.9); assert.ok(Math.abs(r.normalUsd - 37.8) < 1e-9);
-  assert.ok(r.text.startsWith('Normal day about ±$38 (±0.9%).'));
+  assert.ok(r.text.startsWith('A typical day\'s move is about ±$38 (±0.9%), close to close.'));
   assert.ok(/not a forecast of direction/.test(r.text));
   assert.equal(r.eventPct, undefined);
 });
@@ -43,7 +43,7 @@ test('no forecast file, or no expected move: no range; build attaches one per da
   assert.equal(WA.dayRange(null, { releases: [] }, rf), null);
   assert.equal(WA.dayRange({ assets: { gold: { expMovePct: null, last: 4200 } } }, { releases: [] }, rf), null);
   const noPx = WA.dayRange({ assets: { gold: { expMovePct: 0.9 } } }, { releases: [] }, rf);
-  assert.equal(noPx.normalUsd, null); assert.ok(noPx.text.startsWith('Normal day about ±0.9%.'));
+  assert.equal(noPx.normalUsd, null); assert.ok(noPx.text.startsWith('A typical day\'s move is about ±0.9%, close to close.'));
   const A = WA.build({ now: T('2026-11-20T10:00:00Z'), cal: [], rf, fc, v: {} });
   assert.ok(A.days.every((d) => d.range && d.range.normalPct === 0.9));
   assert.equal(A.days.find((d) => d.day === '2026-11-25').range.type, 'PCE');
@@ -54,11 +54,11 @@ test('no forecast file, or no expected move: no range; build attaches one per da
 test('the Macro desk draws the range as text under each day heading', () => {
   const md = fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'utf8');
   const block = md.slice(md.indexOf('function renderAhead'), md.indexOf('function renderNext'));
-  assert.ok(block.includes("'<p class=\"wa-rg\"><b>Gold range:</b> ' + esc(d.range.text) + '</p>'"));
+  assert.ok(block.includes("'<p class=\"wa-rg\"><b>Gold, typical move:</b> ' + esc(d.range.text) + '</p>'"));
   assert.ok(block.indexOf('wa-rg') > block.indexOf('<h3>'));
 });
 
 test('a release-day median under today\'s normal day says to plan on today\'s range (20 Nov 2026)', () => {
   const src = fs.readFileSync(new URL('../council/week-ahead.mjs', import.meta.url), 'utf8');
-  assert.ok(src.includes("smaller than today\\'s normal day because gold moves more now than in most of those years: plan on today\\'s range"));
+  assert.ok(src.includes("measured over other years and as a median, so it is not comparable one for one: plan on today\\'s figure"));
 });

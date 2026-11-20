@@ -41,7 +41,7 @@ test('a release\'s nowcast-beside-consensus line is drawn as text', () => {
 
 test('the day\'s gold range is labelled, in the readable ink, and the auctions sit in their own list', () => {
   // browser pass of 20 Nov 2026 with real next-week data: the range read like the faint "no release" note beside it
-  assert.ok(block.includes("'<p class=\"wa-rg\"><b>Gold range:</b> ' + esc(d.range.text) + '</p>'"));
+  assert.ok(block.includes("'<p class=\"wa-rg\"><b>Gold, typical move:</b> ' + esc(d.range.text) + '</p>'"));
   assert.ok(!block.includes('wa-quiet wa-rg'));
   assert.match(css, /\.wa-rg \{[^}]*color: var\(--ink-dim\)/);
   assert.match(css, /\.wa-rg \{[^}]*var\(--fs-sm, 13px\)/);

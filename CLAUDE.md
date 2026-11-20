@@ -3043,6 +3043,19 @@ on the first read after the release. No page shows it yet; no rule, call or trad
 
 `prepFor` gives no prep to a year-on-year title (the nowcast is month on month); the Macro desk shows the record's one line in the Week ahead's note (`#wa-note`).
 
+## Review of the 20 Nov macro work (20 Nov 2026)
+A read-only review of the day's diff found six defects of wording or scoring, none a crash; all fixed. (1) `prep-record.mjs`: a
+print ON the consensus is not judged (`hit: null`; core PCE printed on it in about half of past releases, so counting it a miss
+would bias the rate). (2) `hard-data.mjs` `outcomeWords`: "Hike >25bps" / "50+ bps increase" read "a hike of more than 25 bp" /
+"of 50 bp or more", never "a 25 bp hike". (3) `prepFor` and the record's `monthlyPrice`: the nowcast sits only beside an m/m CPI /
+PCE price row (never income, spending, q/q, y/y). (4) the above / below gold record is shown on the core row only (the Red folder
+study sorts by the core surprise). (5) the morning report files Fed events and auctions under the London day it is headed with.
+(6) `dayRange` says "A typical day's move … close to close" (the desk label is "Gold, typical move") and, where a release-day
+median is smaller, "measured over other years and as a median, so it is not comparable one for one". Also: only readings that
+moved make a line (four at most; the report's nowcast moves only for a month with a release in the next week; a broken history
+never stops the report), and the Sunday digest skips a Week ahead file that ended before today (preview up to 22 lines).
+Test: `tests/macro-review-fixes.test.mjs`.
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss

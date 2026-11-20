@@ -153,7 +153,7 @@ export function dayRange(fc, day, rf) {
   if (!Number.isFinite(p) || !(p > 0)) return null;
   const usd = (x) => (Number.isFinite(px) && px > 0 ? x / 100 * px : null);
   const say = (pc, us, n) => us != null ? `±$${Math.round(us).toLocaleString('en-US')} (±${pc.toFixed(1)}%${n ? `, n ${n}` : ''})` : `±${pc.toFixed(1)}%${n ? ` (n ${n})` : ''}`;
-  const out = { normalPct: p, normalUsd: usd(p) }, parts = [`Normal day about ${say(p, out.normalUsd)}.`];
+  const out = { normalPct: p, normalUsd: usd(p) }, parts = [`A typical day\'s move is about ${say(p, out.normalUsd)}, close to close.`];
   let best = null;
   for (const r of (day && day.releases) || []) {
     if (!r.type || r.country !== 'USD') continue;
@@ -164,12 +164,12 @@ export function dayRange(fc, day, rf) {
     Object.assign(out, { eventPct: best.pct, eventUsd: usd(best.pct), type: best.type, n: best.n });
     // past release days are measured in their own years' volatility: when they sit under today's normal day, say so
     // (20 Nov 2026: core PCE days ±0.5% against a ±1.4% normal day now) instead of implying the release is the smaller risk
-    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', smaller than today\'s normal day because gold moves more now than in most of those years: plan on today\'s range' : ''}.`);
+    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', measured over other years and as a median, so it is not comparable one for one: plan on today\'s figure' : ''}.`);
   }
   const mk = day && day.market;
   if (mk && mk.kind === 'holiday') parts.push('US markets closed: thin trading, moves can be jumpy and fade.');
   else if (mk && mk.kind === 'early') parts.push('Early close: thin trading later in the day.');
-  parts.push('A range for planning, not a forecast of direction.');
+  parts.push('A size for planning, not a forecast of direction.');
   out.text = parts.join(' ');
   return out;
 }
@@ -297,7 +297,8 @@ export function parseExp(x) {
 }
 export function prepFor(r, nc, record) {
   if (!r || !nc) return null;
-  if (/\by\/y\b|year/i.test(r.title || '')) return null;   // the nowcast is month on month: never beside a yearly consensus
+  // the nowcast is a month-on-month price change: only beside an m/m CPI / PCE price row (never income, spending, q/q, y/y)
+  if (!(/m\/m/i.test(r.title || '') && /\b(CPI|PCE)\b|price index/i.test(r.title || '')) || /income|spending|y\/y|q\/q|year/i.test(r.title || '')) return null;
   const cons = parseExp(r.exp); if (cons == null) return null;
   const core = /\bcore\b/i.test(r.title || '');
   const fig = core ? nc.core : nc.head; if (fig == null || !Number.isFinite(fig)) return null;
@@ -308,7 +309,8 @@ export function prepFor(r, nc, record) {
   const lead = side === 'in line' ? `The nowcast (${sg(fig)}) is in line with the ${r.exp} consensus (within ${IN_LINE} points).`
     : `The nowcast (${sg(fig)}) sits ${side} the ${r.exp} consensus by ${Math.abs(gap).toFixed(2)} points.`;
   const st = record && (record.stats || record), A = st && st.above, B = st && st.below;
-  const hist = A && B && A.n >= MIN_PREP && B.n >= MIN_PREP && Number.isFinite(A.gold) && Number.isFinite(B.gold)
+  // the Red folder study sorts its above / below days by the CORE figure's surprise: shown on the core row only
+  const hist = core && A && B && A.n >= MIN_PREP && B.n >= MIN_PREP && Number.isFinite(A.gold) && Number.isFinite(B.gold)
     ? ` On past ${kind} releases that printed above consensus gold averaged ${sg(A.gold)} on the day (n ${A.n}); below, ${sg(B.gold)} (n ${B.n}).` : '';
   const text = lead + hist + ' A model\'s estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a tested edge.';
   const short = side === 'in line' ? `nowcast ${sg(fig)} in line with the ${r.exp} consensus` : `nowcast ${sg(fig)} ${side} the ${r.exp} consensus`;
@@ -337,7 +339,8 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
   // How the expectations moved (macro/hard-data.json `hist`): a day and a week back, only where both readings exist.
   const mv = hd ? moves(hd, now) : [];
-  if (mv.length) { frame.moves = mv; for (const m of mv) frame.lines.push(m.text); }
+  // only what moved (an unchanged "92% now, 92% a day ago" is noise), four lines at most
+  if (mv.length) { frame.moves = mv; for (const m of mv.filter((x) => x.day || x.week).slice(0, 4)) frame.lines.push(m.text); }
   frame.positioning = positioningOf(cot).map((p) => ({ market: p.market, text: p.text }));
   for (const p of frame.positioning) frame.lines.push(p.text);
   const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));

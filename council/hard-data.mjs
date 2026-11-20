@@ -205,8 +205,9 @@ export function addHist(prev, entry, now) {
 const NCNAME = { corePce: 'core PCE', pce: 'PCE', coreCpi: 'core CPI', cpi: 'CPI' };
 export function outcomeWords(label) {
   const s = String(label || '');
-  const n = /(\d+)\s*bps?/i.exec(s), up = /hike|increase|raise/i.test(s), dn = /cut|decrease|lower/i.test(s);
-  if (n && (up || dn)) return `a ${n[1]} bp ${up ? 'hike' : 'cut'}`;
+  const n = /(\d+)\s*\+?\s*bps?/i.exec(s), up = /hike|increase|raise/i.test(s), dn = /cut|decrease|lower/i.test(s);
+  const more = /[>+]|more than|or more|at least/i.test(s);   // "Hike >25bps", "50+ bps increase" are not "a 25 bp hike"
+  if (n && (up || dn)) return more ? `${up ? 'a hike' : 'a cut'} of ${/\+|or more|at least/i.test(s) ? `${n[1]} bp or more` : `more than ${n[1]} bp`}` : `a ${n[1]} bp ${up ? 'hike' : 'cut'}`;
   if (/maintain|no change|hold|unchanged/i.test(s)) return 'no change';
   return s;
 }

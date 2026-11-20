@@ -26,6 +26,8 @@ export function idOf(r) {
 
 // Add one record per release of the Week ahead build that carries `prep` and is still to come. Returns a NEW list; the records
 // already there are returned as they are, except `last` (the latest pre-release reading, when it differs from the one before).
+// A calendar title the monthly inflation nowcast may sit beside: an m/m CPI / PCE price row (same rule as week-ahead.mjs prepFor).
+export const monthlyPrice = (title) => /m\/m/i.test(title || '') && /\b(CPI|PCE)\b|price index/i.test(title || '') && !/income|spending|y\/y|q\/q|year/i.test(title || '');
 export function capture(prev, wa, now) {
   const out = listOf(prev).slice(), at = new Map(out.map((x, i) => [x.id, i]));
   const rels = wa && Array.isArray(wa.days) ? wa.days.flatMap((d) => (d && Array.isArray(d.releases) ? d.releases : [])) : [];
@@ -33,7 +35,7 @@ export function capture(prev, wa, now) {
     const p = r && r.prep;
     if (!p || !SERIES[r.type] || !Number.isFinite(r.t) || !(r.t > now)) continue;
     if (!Number.isFinite(p.nowcast) || !Number.isFinite(p.consensus) || !p.side) continue;
-    if (/y\/y|year/i.test(r.title || '')) continue;   // the nowcast is month on month: a yearly consensus is another quantity
+    if (!monthlyPrice(r.title)) continue;   // the nowcast is a month-on-month price change: income, spending, q/q and y/y rows are other quantities
     const id = idOf(r), read = { nowcast: p.nowcast, consensus: p.consensus, gap: p.gap, side: p.side };
     if (!at.has(id)) {
       at.set(id, out.length);
@@ -50,7 +52,8 @@ export function capture(prev, wa, now) {
 
 // Attach the first print once: the nowcast file's "Actual" for the record's month and series, read after the release time.
 // The print is compared as published (one decimal) with the captured consensus; hit = the captured side was the print's side
-// (null when the capture was in line: the model leaned nowhere, so there is nothing to judge).
+// (null when the capture was in line: the model leaned nowhere; null too when the PRINT is on the consensus, which happens
+// on about half of core PCE releases: there was no side to be right about, and counting it a miss would bias the rate).
 export function resolve(records, hd, now) {
   const N = hd && hd.nowcast && Array.isArray(hd.nowcast.months) ? hd.nowcast.months : [];
   return listOf(records).map((x) => {
@@ -58,7 +61,7 @@ export function resolve(records, hd, now) {
     const m = N.find((y) => y && y.month === x.month), k = SERIES[x.type][x.core ? 1 : 0];
     const a = m && m.actual ? m.actual[k] : null; if (a == null || !Number.isFinite(a)) return x;
     const print = Math.round(a * 10) / 10, actualSide = sideOf(print, x.consensus);
-    return { ...x, actual: a, print, actualSide, hit: x.side === 'in line' ? null : x.side === actualSide, resolvedAt: iso(now) };
+    return { ...x, actual: a, print, actualSide, hit: x.side === 'in line' || actualSide === 'in line' ? null : x.side === actualSide, resolvedAt: iso(now) };
   });
 }
 

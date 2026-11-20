@@ -64,7 +64,7 @@ test('resolve: the first print is attached once, compared as published to one de
   assert.deepEqual(PR.capture(R, plan(rel()), NOW), R);                      // and capture leaves a resolved record alone
   // 0.24 publishes as 0.2 = the consensus: in line, so a capture that leaned above missed
   const M = PR.resolve(L, HD({ corePce: 0.24 }), REL + 3600)[0];
-  assert.equal(M.actualSide, 'in line'); assert.equal(M.hit, false);
+  assert.equal(M.actualSide, 'in line'); assert.equal(M.hit, null);   // a print on the consensus is not judged
   assert.equal(PR.resolve(L, HD({ corePce: 0.1 }), REL + 3600)[0].hit, false);
   // the judged side is the FIRST capture's, not `last`
   const L2 = PR.capture(L, plan(rel({ prep: { core: true, nowcast: 0.1, consensus: 0.2, gap: -0.1, side: 'below' } })), NOW + 86400);

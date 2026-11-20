@@ -94,7 +94,7 @@ test('landedIn and the digest lines: one line the day a study lands, a block in 
   const d = buildDigest({ ledger: LEDGER }, { now: NOW, kind: 'daily', prev: {}, sbRows: null });
   assert.equal(d.lines.at(-2), 'New study: ICT sessions — Nothing passes. All four hypotheses FAIL the pre-registered bar.');
   const w = buildDigest({ ledger: LEDGER }, { now: T('2026-11-08T21:20:00Z'), kind: 'preview', prev: {}, sbRows: null });
-  assert.ok(w.msg.includes('Research this week: 2 studies (1 pass, 1 fail):\n• ICT sessions:'), w.msg); assert.ok(w.lines.length <= 21);
+  assert.ok(w.msg.includes('Research this week: 2 studies (1 pass, 1 fail):\n• ICT sessions:'), w.msg); assert.ok(w.lines.length <= 22);
   const none = buildDigest({}, { now: NOW, kind: 'daily', prev: {}, sbRows: null });
   assert.ok(!/study/i.test(none.msg));
 });
