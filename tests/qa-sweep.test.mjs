@@ -963,3 +963,10 @@ test('a hidden card is never drawn (#v-council .c-sleeve set display: flex over 
   // the smoke test still counts every drawn Systems card but the one that stays open
   assert.match(src('scripts/audit/smoke.cjs'), /Systems: open cards are/);
 });
+
+test('trade review (20 Nov 2026): no t under 10 closed trades, a retired setup is one chip, the two cards keep their own heights', () => {
+  const P = fs.readFileSync('market-structure.html', 'utf8');
+  assert.match(P, /\(a\.n < 10 \? 'too few to judge' : fT\(a\.net\.t\)\)/);
+  assert.match(P, /retired from live<\/span>/); assert.doesNotMatch(P, />no longer live<\/span>/);
+  assert.match(P, /#ms-ea, #ms-tr \{ align-self: start; \}/);
+});

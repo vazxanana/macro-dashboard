@@ -3026,6 +3026,7 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
 <style id="ms-clean-css">/* clean look (13 Nov 2026, owner: "too much labels"): only the charts with BO, VR and CF */
         html[data-clean="1"] #v-charts :is(#ms-cycle, #ms-adr, #ms-mtf, #ms-cx-tog, .ms-ro, .ms-role) { display: none !important; }</style>
 <style id="ms-ea-css">
+          #ms-ea, #ms-tr { align-self: start; }   /* side by side, each its own height (the short card stretched to the review's) */
           #ms-ea .ea-sum { font-size: 13px; margin: 6px 0 10px; color: var(--ink-dim); line-height: 1.5; }
           #ms-ea .ea-sum b { color: var(--ink); }
           #ms-ea .ea-tb { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -14834,8 +14835,8 @@ function msNextSetup(bars, A) {
     var flags = {}; arr(J && J.flags).forEach(function (f) { flags[f.id] = f; });
     var S = streamsOf(J, st.b);
     $('ms-tr-list').innerHTML = S.length ? S.map(function (s) { var a = s.windows.all, k = 's:' + s.key, nf = arr(s.flags).length;
-      return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary><b>' + esc(s.name) + '</b><span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span>' + (s.retired ? '<span class="tr-chip">no longer live</span>' : s.stopped ? '<span class="tr-chip">no longer recorded</span>' : '') + (nf ? '<span class="tr-chip strong">' + nf + ' flag' + (nf > 1 ? 's' : '') + '</span>' : '')
-        + '<span class="tr-r">' + a.n + ' closed · ' + (a.cost.known ? cR(a.net.sum) + ' after costs' : cR(a.gross.sum) + ' before costs') + ' · ' + fT(a.net.t) + '</span></summary>' + (st.open[k] ? streamHTML(s, flags) : '') + '</details></li>'; }).join('')
+      return '<li><details data-k="' + esc(k) + '"' + (st.open[k] ? ' open' : '') + '><summary><b>' + esc(s.name) + '</b>' + (s.retired ? '' : '<span class="tr-chip' + (s.book === 'live' ? ' live' : '') + '">' + esc(BOOK[s.book] || s.book) + '</span>') + (s.retired ? '<span class="tr-chip" title="Took live trades before it was retired">retired from live</span>' : s.stopped ? '<span class="tr-chip">no longer recorded</span>' : '') + (nf ? '<span class="tr-chip strong">' + nf + ' flag' + (nf > 1 ? 's' : '') + '</span>' : '')
+        + '<span class="tr-r">' + a.n + ' closed · ' + (a.cost.known ? cR(a.net.sum) + ' after costs' : cR(a.gross.sum) + ' before costs') + ' · ' + (a.n < 10 ? 'too few to judge' : fT(a.net.t)) + '</span></summary>' + (st.open[k] ? streamHTML(s, flags) : '') + '</details></li>'; }).join('')
       : '<li class="tr-body"><p>' + (J ? 'No ' + esc(BOOK[st.b] || '') + ' stream has a closed trade on file.' : st.done ? 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.' : 'Loading…') + '</p></li>';
     var P = arr(J && J.proposals);
     $('ms-tr-props').innerHTML = P.length ? P.map(propHTML).join('') : '<li class="tr-body"><p>' + (J ? 'No pattern in the trades reaches |t| ≥ 2 with enough trades: nothing to propose.' : st.done ? 'No trade review yet: the council writes research/trade-review.json every ~70 minutes.' : 'Loading…') + '</p></li>';
