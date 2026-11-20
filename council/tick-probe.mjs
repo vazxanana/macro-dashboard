@@ -35,7 +35,10 @@ export const MAX_PAGES = 40, GAP_MS = 260;
 // gotobi (20 Nov 2026, research/edge/gotobi-exec): the bid and ask at 00:55:00 and 06:00:00 UTC of every gotobi day inside the
 // history (council/gotobi-calendar.mjs, the demo job's calendar), with the median quoted spread in +-GOTOBI_HALF seconds
 export const GOTOBI_MARKS = [55 * 60, 6 * 3600], GOTOBI_HALF = 60;
-export const PARTS = ['depth', 'hours', 'events', 'gotobi'];
+export const PARTS = ['depth', 'hours', 'events', 'gotobi', 'marks'];
+// marks (20 Nov 2026, research/edge/fx-weekend-gap-exec): the bid, ask and spread at given moments, read from a JSON file
+// { SYMBOL: [unix sec, ...] } named by PROBE_MARKS (a path in the repository); at most MARKS_MAX a symbol
+export const MARKS_HALF = 60, MARKS_MAX = 600;
 // "USDJPY:depth,gotobi" -> { name, parts }; a bare name reads depth, hours and events
 export function parseName(arg) { const [name, p] = String(arg).split(':'); const parts = p ? p.split(',').filter((x) => PARTS.includes(x)) : ['depth', 'hours', 'events']; if (!parts.includes('depth')) parts.unshift('depth'); return { name, parts }; }
 // the gotobi days (UTC dates) from `from` (unix sec) to now whose 06:00 mark has passed, oldest first
@@ -111,7 +114,7 @@ export async function readSide(send, ctid, symbolId, type, fromMs, toMs, sleep) 
   }
 }
 
-export async function probe({ env, tokens = null, names = ['XAUUSD'], WS = globalThis.WebSocket, now = Date.now(), lib = _t, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), log = () => {} }) {
+export async function probe({ env, tokens = null, names = ['XAUUSD'], marks = {}, WS = globalThis.WebSocket, now = Date.now(), lib = _t, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), log = () => {} }) {
   const need = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ACCOUNT_ID', 'CTRADER_ENV'];
   if (need.some((k) => !String(env[k] || '').trim())) return { error: 'cTrader settings missing' };
   if (String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') return { error: 'refused: CTRADER_ENV is not demo' };
@@ -168,7 +171,14 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], WS = globa
         gotobi.push(row);
       }
       if (parts.includes('gotobi')) log(`${name}: ${gotobi.length} gotobi days`);
-      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), errors };
+      const quotes = [];
+      if (parts.includes('marks')) for (const t of (Array.isArray(marks[name]) ? marks[name] : []).filter((x) => Number.isFinite(x) && x + MARKS_HALF < nowSec).slice(0, MARKS_MAX)) {
+        const w = await window(t - MARKS_HALF, t + MARKS_HALF); if (!w) continue;
+        const before = w.qp.filter((q) => q[0] <= t * 1000), last = before[before.length - 1], sp = spreadsOf(w.qp);
+        quotes.push([t, last ? r6(last[1]) : null, last ? r6(last[2]) : null, last ? Math.round(t - last[0] / 1000) : null, sp.length ? r6(med(sp)) : null]);
+      }
+      if (parts.includes('marks')) log(`${name}: ${quotes.length} marks`);
+      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), ...(parts.includes('marks') ? { marks: quotes } : {}), errors };
     }
   } finally { s.close(); }
   return { at: new Date(now).toISOString(), source: 'council/tick-probe.mjs', broker: acc.broker || null, symbols: out };
@@ -180,7 +190,8 @@ if (process.argv[1] && process.argv[1].endsWith('tick-probe.mjs')) {
   const scrub = scrubber(process.env), tokens = rd('tokens.json');
   try { const t = tokens && unseal(tokens, process.env); if (t) scrub.add(t.accessToken, t.refreshToken); } catch (e) {}
   try {
-    const r = await probe({ env: process.env, tokens, names, log: (l) => console.log(scrub(l)) });
+    let marks = {}; if (process.env.PROBE_MARKS) { try { marks = JSON.parse(fs.readFileSync(process.env.PROBE_MARKS, 'utf8')); } catch (e) { console.log('tick probe: marks file unreadable'); } }
+    const r = await probe({ env: process.env, tokens, names, marks, log: (l) => console.log(scrub(l)) });
     if (r.error) { console.log(`tick probe: ${scrub(r.error)}`); process.exit(1); }
     const OD = path.join(dir, 'research', 'probe'); fs.mkdirSync(OD, { recursive: true });
     for (const [n, v] of Object.entries(r.symbols)) {
