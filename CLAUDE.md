@@ -4884,6 +4884,11 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
+`GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
+website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
+OANDA_TOKEN repository secret; the website only without it), a candle failure is an `error` record for the day (it crashed
+before), the deploy copies `GH_DISPATCH_TOKEN`, and `/api/status?job=watchdog` falls back to `GH_TOKEN`.
 
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
@@ -4895,8 +4900,14 @@ VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `O
 `OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
 `scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
 (a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
-**20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
-`GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
-website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
-OANDA_TOKEN repository secret; the website only without it), a candle failure is an `error` record for the day (it crashed
-before), the deploy copies `GH_DISPATCH_TOKEN`, and `/api/status?job=watchdog` falls back to `GH_TOKEN`.
+
+## Tick probe: the demo broker's own bid / ask history (20 Nov 2026, for the cost questions)
+`council/tick-probe.mjs` + `.github/workflows/tick-probe.yml` (dispatch only, input `symbols`, default XAUUSD): reads the DEMO
+broker's past ticks of both sides once through api/ctrader-link.js's read session (READ_ONLY allowlist, demo host, an account
+with isLive false; nothing traded, sized or alerted) and writes council-data `research/probe/ticks-<SYMBOL>.json`: `depth` (how
+far back the history goes: ticks in a 2-minute window 1-1095 days back), `hours` + `hourProfile` (the quoted spread in the first
+2 minutes of every UTC hour of the last 60 weekdays: what the gold breakout really pays at 00:00-07:00 UTC,
+research/proposals/2026-11-14-gold-vol-breakout.md) and `events` (the last bid and ask at T-10 to T+65 minutes, each minute plus
+T+5 / 15 / 30 s, and the widest spread of each minute, for every US CPI, payrolls and FOMC statement of council/events.mjs inside
+the depth: the executable prices the owner's news register asks for first). Research data only, no council member reads it.
+Test: `tests/tick-probe.test.mjs` (fake broker).
