@@ -15,5 +15,5 @@ test('profile on hand-made rows', () => {
 });
 test('the note quotes the json', () => {
   const md = fs.readFileSync(new URL('../research/proposals/2026-11-20-usdjpy-risk.md', import.meta.url), 'utf8'), p = J.profile;
-  assert.ok(md.includes('+131.7R') && md.includes('−33.8R') && md.includes(`${p.longestUnderwaterDays} days`) && md.includes(`${p.worstLosingStreak} trades`) && md.includes(p.monthsPositive));
+  assert.ok(md.includes('Wednesday +0.144R') && md.includes('+131.7R') && md.includes('−33.8R') && md.includes(`${p.longestUnderwaterDays} days`) && md.includes(`${p.worstLosingStreak} trades`) && md.includes(p.monthsPositive));
 });

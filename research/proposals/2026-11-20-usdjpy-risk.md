@@ -19,3 +19,8 @@ and 8.4 %; 0.5 % → +6.0 % and 16.9 %; 1 % → +12.0 % and 33.8 %.
 
 What it means for a demo stream (decision 63): a year like 2023 (−15R) is part of the record, so a forward record of a few
 months cannot tell a working rule from a broken one; the forward study's bands (started today) are the judge. Nothing live changed.
+
+**By weekday (reported after looking, not a test):** Monday −0.009R a trade (n 378, t −0.16), Tuesday +0.026R (n 430, t 0.45),
+Wednesday +0.144R (n 440, t 2.26), Thursday +0.153R (n 421, t 2.20), Friday −0.009R (n 410, t −0.15). The gain sits in the middle
+of the week. A weekday filter chosen from this table would be fitted to it: it is not a rule and would need its own
+pre-registration on data no study has read (there is none left on OANDA; the forward record will show whether the pattern holds).
