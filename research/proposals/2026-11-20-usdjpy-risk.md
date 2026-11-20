@@ -26,3 +26,8 @@ of the week. A weekday filter chosen from this table would be fitted to it: it i
 pre-registration on data no study has read (there is none left on OANDA; the forward record will show whether the pattern holds).
 Gold's breakout over 2021-26 (its forward baseline) shows the opposite: Monday strongest (+0.256R a trade, t 2.75), Wednesday
 negative (−0.051R). Two markets, two different "best days": read the weekday splits as noise.
+
+**Every year since 2005** (both studies' trades, k 0.5, after cost, R a year): 2005 +30.1, 2006 +0.5, 2007 +32.7, 2008 +5.4,
+2009 +27.7, 2010 −7.3, 2011 −24.6, 2012 +41.6, 2013 +57.7, 2014 +11.0, 2015 −9.2, 2016 −0.4, 2017 +6.5, 2018 +19.4, 2019 −8.8,
+2020 +17.7, 2021 +31.2, 2022 +19.8, 2023 −15.4, 2024 +37.8, 2025 +10.4, 2026 (to 19 Nov) +13.4: positive in 16 of 22 years
+(4,168 trades), worst year 2011 (−24.6R).
