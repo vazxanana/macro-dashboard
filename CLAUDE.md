@@ -5125,6 +5125,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - `usdjpy-vb-k` (pre-registered 20 Nov 2026): USD/JPY T1 at k 0.3-0.7 (gate: k 0.5 reproduces both published studies).
   **BROAD**: net positive at every k in 2005-15 AND 2016 → now; pooled +0.097R (k 0.3, t 4.28) to +0.049R (k 0.7, t 2.69); k 0.5
   +0.071R (n 4,168, t 3.86). Not a lucky setting; k stays 0.5 (no setting is adopted from this). Nothing live changed.
+- `yen-us-yields` (pre-registered 20 Nov 2026): the Japan brief's "global yields dominate" as a forecast: a 4-week US 10-year
+  move over 25 bp, then USD/JPY over the next 20 sessions (FRED DGS10, OANDA daily, 1,001 weeks 2007-26). **FAIL, 0 of 2**: up
+  t 0.63, down t −1.08 (both the claimed way, neither close). Same-4-week correlation 0.51: they move together, the move does not
+  lead. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
