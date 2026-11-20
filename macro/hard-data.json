@@ -1,13 +1,14 @@
 {
  "v": 1,
- "at": "2026-11-20T16:16:09Z",
+ "at": "2026-11-20T17:30:15Z",
  "sources": {
   "nowcast": "ok",
   "gdpnow": "ok",
   "fed": "ok",
+  "auctions": "ok",
   "odds": "ok"
  },
- "label": "Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision and the Fed's own calendar. Context, not a forecast of ours; paper only.",
+ "label": "Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision, the Fed's own calendar and the US Treasury's note and bond auctions. Context, not a forecast of ours; paper only.",
  "nowcast": {
   "months": [
    {
@@ -36,16 +37,16 @@
     "actual": {}
    }
   ],
-  "at": "2026-11-20T16:16:09Z"
+  "at": "2026-11-20T17:30:15Z"
  },
  "gdpnow": {
   "quarter": "2026 Q4",
   "value": 3.21,
   "prev": 3.27,
-  "at": "2026-11-20T16:16:09Z"
+  "at": "2026-11-20T17:30:15Z"
  },
  "fed": {
-  "at": "2026-11-20T16:16:09Z",
+  "at": "2026-11-20T17:30:15Z",
   "events": [
    {
     "day": "2026-11-18",
@@ -98,29 +99,83 @@
    }
   ]
  },
+ "auctions": {
+  "at": "2026-11-20T17:30:15Z",
+  "src": "www.treasurydirect.gov",
+  "list": [
+   {
+    "day": "2026-11-19",
+    "term": "9-Year 8-Month",
+    "type": "TIPS",
+    "amount": 19,
+    "reopening": true,
+    "cusip": "91282CRE3"
+   },
+   {
+    "day": "2026-11-23",
+    "term": "2-Year",
+    "type": "Note",
+    "amount": 69,
+    "reopening": false,
+    "cusip": "91282CRY9"
+   },
+   {
+    "day": "2026-11-24",
+    "term": "52-Week",
+    "type": "Bill",
+    "amount": 54,
+    "reopening": false,
+    "cusip": "912797XC6"
+   },
+   {
+    "day": "2026-11-24",
+    "term": "1-Year 11-Month",
+    "type": "FRN",
+    "amount": 28,
+    "reopening": true,
+    "cusip": "91282CRS2"
+   },
+   {
+    "day": "2026-11-24",
+    "term": "5-Year",
+    "type": "Note",
+    "amount": 70,
+    "reopening": false,
+    "cusip": "91282CRZ6"
+   },
+   {
+    "day": "2026-11-25",
+    "term": "7-Year",
+    "type": "Note",
+    "amount": 44,
+    "reopening": false,
+    "cusip": "91282CSA0"
+   }
+  ]
+ },
  "odds": {
-  "at": "2026-11-20T16:16:09Z",
+  "at": "2026-11-20T17:30:15Z",
   "meeting": "2026-12-09",
   "kalshi": [
    {
     "label": "Hike 25bps",
-    "p": 0.92,
-    "oi": 2362067.71
+    "p": 0.89,
+    "oi": 2397299.31
    },
    {
     "label": "Fed maintains rate",
-    "p": 0.06,
-    "oi": 3918969.29
+    "p": 0.08,
+    "oi": 3987975.77
    },
    {
     "label": "Hike >25bps",
-    "p": 0.03,
-    "oi": 2874993.48
+    "p": 0.02,
+    "oi": 2944280.11
    },
    {
     "label": "Cut 25bps",
     "p": 0.01,
-    "oi": 935983.91
+    "oi": 946082.86
    },
    {
     "label": "Cut >25bps",
@@ -133,15 +188,15 @@
    "markets": [
     {
      "label": "25 bps increase",
-     "p": 0.92
+     "p": 0.9
     },
     {
      "label": "No change",
-     "p": 0.06
+     "p": 0.07
     },
     {
      "label": "50+ bps increase",
-     "p": 0.03
+     "p": 0.02
     },
     {
      "label": "50+ bps decrease",
@@ -153,6 +208,9 @@
     }
    ]
   },
-  "line": "Prediction markets on the 9 Dec Fed decision: Kalshi Hike 25bps 92%, Polymarket 25 bps increase 92%. What traders pay, not a forecast of ours."
- }
+  "line": "Prediction markets on the 9 Dec Fed decision: Kalshi Hike 25bps 89%, Polymarket 25 bps increase 90%. What traders pay, not a forecast of ours."
+ },
+ "hist": [
+  {"at":"2026-11-20T17:30:15Z","odds":{"meeting":"2026-12-09","top":[{"label":"Hike 25bps","p":0.89},{"label":"Fed maintains rate","p":0.08},{"label":"Hike >25bps","p":0.02}]},"nowcast":[{"month":"2026-10","corePce":0.27,"pce":0.31,"coreCpi":null,"cpi":null},{"month":"2026-11","corePce":0.26,"pce":0.17,"coreCpi":0.21,"cpi":0.07}],"gdpnow":{"quarter":"2026 Q4","value":3.21}}
+ ]
 }
