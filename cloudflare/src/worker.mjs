@@ -21,6 +21,7 @@ import bridge from '../../api/bridge.js';
 import chronosCoach from '../../api/chronos-coach.js';
 import ctraderLink from '../../api/ctrader-link.js';
 import data from '../../api/data.js';
+import daily from '../../api/daily.js';
 import edgeAnalyst from '../../api/edge-analyst.js';
 import login from '../../api/login.js';
 import lse from '../../api/lse.js';
@@ -44,7 +45,7 @@ installAiFetch(globalThis);
 import './bundled.mjs';   // the files the Academy and the bridge downloads read from disk on Node, bundled
 
 export const HANDLERS = {
-  'academy-mcp': academyMcp, academy, bars, battle, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, data,
+  'academy-mcp': academyMcp, academy, bars, battle, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, daily, data,
   'edge-analyst': edgeAnalyst, login, logout, lse, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
   profile, signup, sounds, status, stream, 'trade-review': tradeReview, users,
 };
@@ -56,7 +57,8 @@ export const CRONS = { '*/10 * * * *': '/api/edge-analyst?job=scan' };
 // (17 Nov 2026) asks the language model at most once every 12 hours, and only for a new council-data reading.
 // The watchdog kick (18 Nov 2026, items 15 and 31): when the council or the ICT desk is stale, start watchdog.yml, so the
 // "council stopped" alert no longer waits for GitHub's own timer. First in the chain: it is quick and it matters most.
-export const CHAINED = { '*/10 * * * *': ['/api/status?job=watchdog', '/api/trade-review?job=review'] };
+// The daily-report notice (19 Nov 2026): posts the day's notice once the 06:30 London reports are in (api/daily.js: the AI summary, the bell notice and the email).
+export const CHAINED = { '*/10 * * * *': ['/api/status?job=watchdog', '/api/daily?job=daily', '/api/trade-review?job=review'] };
 
 // Sign-up emails (17 Nov 2026): the handler cannot import the Worker's socket module (Node tests load api/), so it is handed in
 // here; the Email Service binding (env.EMAIL, a `send_email` binding) lives on the Worker's env, not process.env, and is handed

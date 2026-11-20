@@ -148,6 +148,7 @@ jobs:
           W_CTRADER_LINK_KEY: ${{ secrets.CTRADER_LINK_KEY }}
           W_GH_TOKEN: ${{ secrets.GH_TOKEN }}
           W_GH_READ_TOKEN: ${{ secrets.GH_READ_TOKEN }}
+          W_GH_DISPATCH_TOKEN: ${{ secrets.GH_DISPATCH_TOKEN }}
           W_ACADEMY_LLM_KEY: ${{ secrets.ACADEMY_LLM_KEY }}
           W_ACADEMY_LLM_URL: ${{ secrets.ACADEMY_LLM_URL }}
           W_ACADEMY_LLM_MODEL: ${{ secrets.ACADEMY_LLM_MODEL }}
@@ -156,7 +157,7 @@ jobs:
           W_ACADEMY_LLM_USD_PER_MTOK_OUT: ${{ secrets.ACADEMY_LLM_USD_PER_MTOK_OUT }}
         run: |
           set +x
-          for n in OANDA_TOKEN OANDA_ENV SESSION_SECRET CRON_SECRET BLOB_READ_WRITE_TOKEN CTRADER_LINK_KEY GH_TOKEN GH_READ_TOKEN \
+          for n in OANDA_TOKEN OANDA_ENV SESSION_SECRET CRON_SECRET BLOB_READ_WRITE_TOKEN CTRADER_LINK_KEY GH_TOKEN GH_READ_TOKEN GH_DISPATCH_TOKEN \
                    ACADEMY_LLM_KEY ACADEMY_LLM_URL ACADEMY_LLM_MODEL ACADEMY_LLM_FORMAT ACADEMY_LLM_USD_PER_MTOK_IN ACADEMY_LLM_USD_PER_MTOK_OUT; do
             v="$(printenv "W_$n" || true)"
             if [ -z "$v" ]; then echo "skip  $n (no repository secret)"; continue; fi

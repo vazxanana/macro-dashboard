@@ -29,6 +29,8 @@ jobs:
         with:
           sparse-checkout: |
             council
+            api
+            scripts
 
       - name: Checkout council data
         uses: actions/checkout@v4
@@ -40,6 +42,14 @@ jobs:
         with:
           node-version: '22'   # built-in WebSocket for the cTrader demo session
 
+      # 20 Nov 2026: the website's /md answered HTTP 403 to the runner, so the job reads its candles from its own localhost
+      # service (scripts/own-candles.sh, as the council loop and the backtest do); it falls back to the website without the token
+      - name: Own OANDA candles
+        env:
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
+        run: sh scripts/own-candles.sh
+
       - name: Sell at 00:55, buy back at 06:00 (gotobi days only)
         env:
           CTRADER_MIRROR: ${{ secrets.CTRADER_MIRROR || vars.CTRADER_MIRROR }}
@@ -49,7 +59,6 @@ jobs:
           CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
           CTRADER_GOTOBI_ACCOUNT: ${{ vars.CTRADER_GOTOBI_ACCOUNT }}
-          MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
