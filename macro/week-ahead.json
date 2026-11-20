@@ -1,0 +1,264 @@
+{
+ "v": 1,
+ "at": "2026-11-20T11:08:13Z",
+ "from": "2026-11-23",
+ "to": "2026-11-27",
+ "next": true,
+ "label": "Week ahead: a plan from the calendar, the Red folder record, the tested calendar rules and the desk's levels. Not advice, not a forecast; paper only.",
+ "lines": [
+  "A short week: US markets closed Thursday, early close Friday. Expect thin trading around the holiday.",
+  "Prediction markets on the 9 Dec Fed decision: Kalshi Hike 25bps 92%, Polymarket 25 bps increase 93%. What traders pay, not a forecast of ours.",
+  "Before the print: PCE (Wednesday): the Cleveland Fed nowcast for October is core +0.27%, headline +0.31% month on month (as of 2026-11-19), a model's estimate, not the consensus.",
+  "The US data that move gold most: PCE (Wednesday).",
+  "Calendar rules the desk has tested that passed their bar: Wednesday (the last trading day before a US market holiday; a gotobi day (a Tokyo settlement day: the 5th, 10th, 15th, 20th, 25th or 30th)). Paper only, each with its own forward record: not proven.",
+  "Rules tested and failed also fall on Friday: listed there so they are not chased."
+ ],
+ "days": [
+  {
+   "day": "2026-11-23",
+   "dow": "Monday",
+   "market": null,
+   "releases": [],
+   "rules": [],
+   "fed": [],
+   "line": "no major release scheduled"
+  },
+  {
+   "day": "2026-11-24",
+   "dow": "Tuesday",
+   "market": null,
+   "releases": [],
+   "rules": [
+    {
+     "topic": "turnaround-tuesday-forward",
+     "when": "a Tuesday",
+     "what": "Only if the Nasdaq 100 fell more than 1% on Monday: buy Monday's close, out at Tuesday's close or the stop.",
+     "verdict": "inc",
+     "headline": "INCONCLUSIVE so far (forward record from 2026-11-12: too few, n 1, total -0.13R)",
+     "link": "edge-lab.html#turnaround-tuesday-forward",
+     "forward": {
+      "reading": "too few",
+      "verdict": "INCONCLUSIVE so far (forward record from 2026-11-12: too few, n 1, total -0.13R)",
+      "n": 1,
+      "dataEnd": "2026-11-20"
+     }
+    }
+   ],
+   "fed": [],
+   "line": "no major release scheduled"
+  },
+  {
+   "day": "2026-11-25",
+   "dow": "Wednesday",
+   "market": null,
+   "releases": [
+    {
+     "day": "2026-11-25",
+     "t": 1795613400,
+     "title": "PCE (Personal Income and Outlays)",
+     "country": "USD",
+     "impact": "high",
+     "type": "PCE",
+     "exp": null,
+     "prev": null,
+     "src": "schedule",
+     "record": {
+      "name": "Core PCE",
+      "n": 99,
+      "absMed": 0.52,
+      "upShare": 0.53,
+      "lines": [
+       "Gold moved a median ±0.52% on the day of the last 99 (since 2018), up 53% of the time.",
+       "Above the consensus gold averaged +0.06% (n 15); below it −0.13% (n 24)."
+      ],
+      "prep": []
+     },
+     "nowcast": {
+      "month": "2026-10",
+      "core": 0.27,
+      "head": 0.31,
+      "asOf": "2026-11-19",
+      "text": "the Cleveland Fed nowcast for October is core +0.27%, headline +0.31% month on month (as of 2026-11-19), a model's estimate, not the consensus"
+     }
+    },
+    {
+     "day": "2026-11-25",
+     "t": 1795613400,
+     "title": "Initial Jobless Claims",
+     "country": "USD",
+     "impact": "medium",
+     "type": null,
+     "exp": null,
+     "prev": null,
+     "src": "schedule",
+     "record": null,
+     "nowcast": null
+    }
+   ],
+   "rules": [
+    {
+     "topic": "gold-pre-holiday",
+     "when": "the last trading day before a US market holiday",
+     "what": "Long gold from the 17:00 New York open to that day's close, stop 1 ATR.",
+     "verdict": "pass",
+     "headline": "PASS (T1, T2; T3 fails): long gold on the last trading day before a US holiday makes +0.133R net out of sample 2017-26 (n 92, t 2.35, Holm p 0.021); 2022-26 alone t 0.78.",
+     "link": "edge-lab.html#gold-pre-holiday",
+     "forward": {
+      "reading": "too few",
+      "verdict": "INCONCLUSIVE so far (forward record from 2026-10-31: too few, n 0, total +0R)",
+      "n": 0,
+      "dataEnd": "2026-11-20"
+     }
+    },
+    {
+     "topic": "gotobi",
+     "when": "a gotobi day (a Tokyo settlement day: the 5th, 10th, 15th, 20th, 25th or 30th)",
+     "what": "Sell USD/JPY at 00:55 UTC, buy back at 06:00 UTC (the demo account runs it).",
+     "verdict": "pass",
+     "headline": "PASS (T2). T2 met all five pre-registered conditions.",
+     "link": "edge-lab.html#gotobi",
+     "forward": null
+    }
+   ],
+   "fed": [
+    {
+     "day": "2026-11-25",
+     "time": "2:00 p.m.",
+     "type": "Beige",
+     "title": "Beige Book",
+     "topic": null
+    }
+   ],
+   "line": "PCE"
+  },
+  {
+   "day": "2026-11-26",
+   "dow": "Thursday",
+   "market": {
+    "kind": "holiday",
+    "text": "Thanksgiving Day: US stock markets are closed; CME futures (gold, indices) trade a short session and halt early. Thin trading: moves can be jumpy and fade."
+   },
+   "releases": [],
+   "rules": [],
+   "fed": [],
+   "line": "US markets closed"
+  },
+  {
+   "day": "2026-11-27",
+   "dow": "Friday",
+   "market": {
+    "kind": "early",
+    "text": "Day after Thanksgiving: US markets close early (stocks 13:00 New York, CME gold and indices about 13:15). Thin trading."
+   },
+   "releases": [],
+   "rules": [
+    {
+     "topic": "post-holiday-metals",
+     "when": "the first trading day after a US market holiday",
+     "what": "Shorting gold and silver the day after a US holiday was tested.",
+     "verdict": "fail",
+     "headline": "FAIL (T1, T2, T3, T4 not met): short gold and silver on the day after a US holiday makes −0.092R a holiday net 2006-26 (n 185, t −2.78).",
+     "link": "edge-lab.html#post-holiday-metals",
+     "forward": null
+    },
+    {
+     "topic": "gold-turn-of-month",
+     "when": "the last two and first three trading days of a month",
+     "what": "Long gold from two trading days before the month ends to three after.",
+     "verdict": "fail",
+     "headline": "FAIL: long gold TD-2 to TD+3 made +0.117R a trade net out of sample (n 118, month t 1.80, Holm p 0.11), +0.000R in sample, 36 of 40 placebos; 0 of 3 pass.",
+     "link": "edge-lab.html#gold-turn-of-month",
+     "forward": null
+    }
+   ],
+   "fed": [],
+   "line": "early close"
+  }
+ ],
+ "frame": {
+  "lines": [
+   "Gold Macro Score -1: AUCTION (no macro edge). The tested score gives no buy lean; a negative score is not a sell (no short edge was found).",
+   "Regime: Dollar Smile left side (stress) · liquidity flat · VIX curve inverted (stress) (VIX 24.56).",
+   "Gold near $3,607 (as of the 2026-11-19 close); watch $3,700 above (Round number) and $3,550 below (Round number (price is under every level he tracks)).",
+   "The veteran's month call: 53% that gold is higher by 2026-12-11 against a base rate of 57% (leans against gold, confidence low).",
+   "Atlanta Fed GDPNow for 2026 Q4: 3.21% annualized (the quarter before: 3.27%)."
+  ],
+  "score": {
+   "score": -1,
+   "label": "AUCTION (no macro edge)",
+   "asOf": "2026-11-20"
+  },
+  "regime": "Dollar Smile left side (stress) · liquidity flat · VIX curve inverted (stress)",
+  "levels": {
+   "px": 3607.405,
+   "asOf": "2026-11-19",
+   "above": {
+    "price": 3700,
+    "label": "Round number",
+    "dist": 2.57,
+    "distNow": 3.06
+   },
+   "below": {
+    "price": 3550,
+    "label": "Round number (price is under every level he tracks)",
+    "made": true,
+    "dist": -1.59,
+    "distNow": -1.12
+   }
+  },
+  "bias": {
+   "lean": "against",
+   "p": 0.53,
+   "base": 0.57,
+   "by": "2026-12-11",
+   "confidence": "low"
+  },
+  "rulebook": [
+   {
+    "k": "policy",
+    "text": "Hikes priced (2-year above the policy rate): the 2-year at 4.80% against the policy rate's upper bound 4.00% (+80 bp).",
+    "caveat": "Record 2007-26 (research/edge/rulebook-gauges): in this class gold's next 20 sessions averaged +0.4% (up 52% of 381 weeks) against +0.7% on all weeks. Cuts priced PASSED its pre-registered test (t 3.05, both halves) but rests on about five easing cycles; hikes priced did not (t −0.83). A tested lean, not a trading rule."
+   }
+  ],
+  "odds": {
+   "meeting": "2026-12-09",
+   "kalshi": [
+    {
+     "label": "Hike 25bps",
+     "p": 0.92,
+     "oi": 2351760.56
+    },
+    {
+     "label": "Fed maintains rate",
+     "p": 0.05,
+     "oi": 3725947.76
+    },
+    {
+     "label": "Hike >25bps",
+     "p": 0.05,
+     "oi": 2881296.08
+    }
+   ],
+   "polymarket": [
+    {
+     "label": "25 bps increase",
+     "p": 0.93
+    },
+    {
+     "label": "No change",
+     "p": 0.04
+    },
+    {
+     "label": "50+ bps increase",
+     "p": 0.04
+    }
+   ],
+   "at": "2026-11-20T11:08:12Z"
+  }
+ },
+ "calls": {
+  "list": [],
+  "note": "The veteran issues the week's dated calls with his first run of the week; they appear here once issued."
+ },
+ "calNote": "Next week's economic calendar is not published yet (it usually appears over the weekend): the big US releases come from the council's own schedule, without consensus figures for now."
+}
