@@ -14336,7 +14336,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "m30m1",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-20T02:36:12.000Z",
     "councilEntry": 3535.145,
     "stop": 3544.387714285714,
@@ -14352,10 +14352,12 @@
     "lagSec": 57,
     "alerted": [
      "open",
-     "closefail"
+     "closefail",
+     "close"
     ],
     "stopCheckedAt": "2026-11-20T02:36:12.000Z",
-    "brokerStop": 3548.65
+    "brokerStop": 3548.65,
+    "closedAt": "2026-11-20T02:40:53.000Z"
    }
   },
   "day": {
@@ -14363,7 +14365,7 @@
    "startBalance": 10406.4
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10552.94 · 8 open",
+  "status": "ok · demo Fusion Markets · balance 10543.58 · 7 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker",
@@ -14375,15 +14377,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10552.94,
-  "lastRun": "2026-11-20T02:38:34.000Z"
+  "balance": 10543.58,
+  "lastRun": "2026-11-20T02:40:53.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T14:13:37.000Z",
-   "msg": "placed sell limit XAUUSD 0.01 lot at 3711.04 (council m30m1, valid to 2026-11-19T20:12Z)",
-   "trade": "xau-m30m1-1795097554"
-  },
   {
    "at": "2026-11-19T14:16:48.000Z",
    "msg": "limit filled: XAUUSD position 50362891 at the broker",
@@ -15877,6 +15874,11 @@
   {
    "at": "2026-11-20T02:38:34.000Z",
    "msg": "close XAUUSD 50418396 failed: POSITION_NOT_FOUND: Position not found with id 50418396",
+   "trade": "xau-m30m1-1795142115"
+  },
+  {
+   "at": "2026-11-20T02:40:53.000Z",
+   "msg": "XAUUSD position 50418396 closed at the broker",
    "trade": "xau-m30m1-1795142115"
   }
  ],
