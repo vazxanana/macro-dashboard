@@ -39,6 +39,9 @@ export const PARTS = ['depth', 'hours', 'events', 'gotobi', 'marks', 'fills'];
 // marks (20 Nov 2026, research/edge/fx-weekend-gap-exec): the bid, ask and spread at given moments, read from a JSON file
 // { SYMBOL: [unix sec, ...] } named by PROBE_MARKS (a path in the repository); at most MARKS_MAX a symbol
 export const MARKS_HALF = 60, MARKS_MAX = 600;
+// how far before a mark the quote may be looked for: PROBE_MARKS_BACK seconds (60 to 3600, default 60), for a mark that falls
+// in a daily break (gold's 21:00 UTC exit on US summer-time days, research/edge/gold-vol-breakout-exec)
+export const marksBack = (env) => { const v = Math.round(+(env && env.PROBE_MARKS_BACK) || 0); return v > MARKS_HALF ? Math.min(3600, v) : MARKS_HALF; };
 // fills (20 Nov 2026, research/edge/gold-vol-breakout-exec): for each query [id, t0, t1, level, dir] of the PROBE_MARKS file's
 // "fills" object { SYMBOL: [...] }, the first broker tick in [t0, t1] (unix sec) where ask >= level (dir > 0) or bid <= level
 // (dir < 0): [id, tickMs, bid, ask], or [id, null] when none; windows of at most FILLS_SPAN seconds, at most FILLS_MAX a symbol
@@ -178,7 +181,7 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], marks = {}
       if (parts.includes('gotobi')) log(`${name}: ${gotobi.length} gotobi days`);
       const quotes = [];
       if (parts.includes('marks')) for (const t of (Array.isArray(marks[name]) ? marks[name] : []).filter((x) => Number.isFinite(x) && x + MARKS_HALF < nowSec).slice(0, MARKS_MAX)) {
-        const w = await window(t - MARKS_HALF, t + MARKS_HALF); if (!w) continue;
+        const w = await window(t - marksBack(process.env), t + MARKS_HALF); if (!w) continue;
         const before = w.qp.filter((q) => q[0] <= t * 1000), last = before[before.length - 1], sp = spreadsOf(w.qp);
         quotes.push([t, last ? r6(last[1]) : null, last ? r6(last[2]) : null, last ? Math.round(t - last[0] / 1000) : null, sp.length ? r6(med(sp)) : null]);
       }
@@ -208,7 +211,7 @@ if (process.argv[1] && process.argv[1].endsWith('tick-probe.mjs')) {
     const OD = path.join(dir, 'research', 'probe'); fs.mkdirSync(OD, { recursive: true });
     for (const [n, v] of Object.entries(r.symbols)) {
       if (v.errors) v.errors = v.errors.map(scrub);
-      fs.writeFileSync(path.join(OD, `ticks-${n}.json`), JSON.stringify({ at: r.at, source: r.source, broker: r.broker, symbol: n, ...v }));
+      fs.writeFileSync(path.join(OD, `ticks-${n}${/^[a-z0-9-]{1,20}$/.test(process.env.PROBE_TAG || '') ? '-' + process.env.PROBE_TAG : ''}.json`), JSON.stringify({ at: r.at, source: r.source, broker: r.broker, symbol: n, ...v }));
       console.log(`tick probe ${n}: reach ${v.reachDays ?? '?'} days, ${(v.hours || []).length} hours, ${(v.events || []).length} events${v.errors && v.errors.length ? `, ${v.errors.length} errors` : ''}`);
     }
   } catch (e) { console.log(`tick probe failed: ${scrub(e.message || e)}`); process.exit(1); }
