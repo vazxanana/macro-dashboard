@@ -2983,6 +2983,10 @@ tested edge"; one top line "Before <day>'s …" each. Test: `tests/week-ahead-pr
 study links were 16 px tall on touch (`a.wa-st`, 44 px on a coarse pointer), and a study link / verdict from the file reached an
 `href` / class unchecked (`WA_HREF`: only `/<page>.html#<anchor>` of this site; a class only for pass / fail / inc). Checked at
 390 px touch and 1440 px in three themes: no text under 12 px or under AA, no sideways scroll. Test: `tests/macro-ahead-ui.test.mjs`.
+`tests/week-ahead.test.mjs`. **Positioning** (20 Nov 2026): `positioningOf(cot)` (veteran.mjs hands it `macro/cot.json`) adds
+`frame.positioning` and one frame line per market of gold, silver, EUR, JPY, NQ, ES only when crowded (3-year percentile >= 90 /
+<= 10) or a big week (|z| >= 1.5, the COT desk's flow cut), with net, percentile and report date; the yen futures' inversion said
+plainly; "positioning, not a tested signal" unless the COT study passed a cell there. Test: `tests/week-ahead-cot.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
