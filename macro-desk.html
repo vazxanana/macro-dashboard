@@ -533,6 +533,7 @@
   .wa-chip { display: inline-block; padding: 1px var(--s2); margin-right: 6px; border-radius: 999px; font: 600 var(--fs-xs)/1.6 var(--sans); background: var(--well); color: var(--ink-dim); }
   .wa-chip.pass { color: var(--buy); background: color-mix(in srgb, var(--buy) 14%, var(--panel)); } .wa-chip.fail { color: var(--sell); background: color-mix(in srgb, var(--sell) 14%, var(--panel)); }
   .wa-nc { color: var(--ink); }
+  .wa .wa-src { color: var(--ink-faint); font-size: var(--fs-xs); margin-top: 2px; }
   .wa-quiet { color: var(--ink-faint); font-size: var(--fs-sm, 13px); margin: 4px 0 0; }
     .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
     /* daily reports (19 Nov 2026) */
@@ -700,6 +701,7 @@
     <article class="card wa" id="c-ahead" hidden>
       <ul class="pl-list nx-bl wa-lines" id="wa-lines"></ul>
       <div class="wa-days" id="wa-days"></div>
+      <details class="fold" id="wa-hard" hidden><summary>Hard-to-find data <small>what traders price for the next prints, auction results, the Fed's plumbing, what options price</small></summary><div id="wa-hard-b"></div></details>
       <details class="fold" id="wa-frame"><summary>The frame for the week <small>score, regime, levels, the veteran's call, your rule book</small></summary><div id="wa-frame-b"></div></details>
       <p class="note" id="wa-note"></p>
     </article>
@@ -1526,6 +1528,7 @@
         return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + WA_LOC(iso)
           + (r.exp || r.prev ? '<span class="wa-r">Expected <b>' + esc(r.exp || NA) + '</b>, previous ' + esc(r.prev || NA) + '</span>' : r.src === 'schedule' ? '<span class="wa-r">From the council\'s release schedule: the consensus appears once the week\'s calendar lists it.</span>' : '')
           + (r.nowcast ? '<span class="wa-r wa-nc"><b>Nowcast:</b> ' + esc(r.nowcast.text) + '</span>' : '')
+          + (r.priced && r.priced.text ? '<span class="wa-r wa-nc"><b>Priced on a prediction market:</b> ' + esc(r.priced.text) + '</span>' : '')
           + (r.prep && r.prep.text ? '<span class="wa-r wa-nc"><b>Nowcast beside the consensus:</b> ' + esc(r.prep.text) + '</span>' : '')
           + (r.record ? r.record.lines.map(function (l) { return '<span class="wa-r">' + esc(l) + '</span>'; }).join('') : '') + '</li>'; }).join('') + '</ul>';
       else h += '<p class="wa-quiet">No major release on the files read so far.</p>';
@@ -1548,6 +1551,12 @@
     var C = A.calls || {}; if ((C.list || []).length) fb.push('<li><b>The veteran\'s calls for the week:</b>' + C.list.map(function (c) { return '<span class="wa-r">' + esc(c.claim) + ': ' + Math.round(c.p * 100) + '% (base ' + Math.round(c.base * 100) + '%)</span>'; }).join('') + '</li>');
     else if (C.note) fb.push('<li>' + esc(C.note) + '</li>');
     $('wa-frame-b').innerHTML = '<ul class="pl-list nx-bl">' + fb.join('') + '</ul>';
+    // 20 Nov 2026: the hard-to-find data, group by group, each with its source and date; every string as text
+    var HG = Array.isArray(A.hard) ? A.hard.filter(function (g) { return g && Array.isArray(g.lines) && g.lines.length; }) : [];
+    $('wa-hard').hidden = !HG.length;
+    $('wa-hard-b').innerHTML = HG.length ? '<ul class="pl-list nx-bl">' + HG.map(function (g) {
+      return '<li><b>' + esc(g.title) + '</b>' + g.lines.map(function (l) { return '<span class="wa-r">' + esc(l) + '</span>'; }).join('')
+        + '<span class="wa-r wa-src">Source: ' + esc(g.src || 'public data') + (g.at ? ' · read ' + esc(g.at) : '') + '</span></li>'; }).join('') + '</ul>' : '';
     $('wa-note').textContent = (A.label || '') + (A.prepRecord && A.prepRecord.text ? ' ' + A.prepRecord.text : '');
     var top = A.days.filter(function (d) { return d.releases.some(function (r) { return r.impact === 'high'; }) || d.market; });
     $('one-s-ahead').innerHTML = esc(WA_DAY(A.from) + ' to ' + WA_DAY(A.to)) + (top.length ? ': ' + top.slice(0, 3).map(function (d) { return '<b>' + esc(d.dow) + '</b> ' + esc(d.line); }).join(' · ') : '');

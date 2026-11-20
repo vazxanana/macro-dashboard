@@ -8,11 +8,14 @@
 //    "Fed decision in <month>" event): what traders are paying, not a forecast of ours;
 //  - the Fed's own calendar of speeches, testimony and releases (federalreserve.gov/json/calendar.json);
 //  - the US Treasury's announced note and bond auctions (TreasuryDirect TA_WS, 20 Nov 2026; the Fiscal Data upcoming-auctions
-//    file, stale from a runner on 20 Nov, only as the last fallback).
+//    file, stale from a runner on 20 Nov, only as the last fallback);
+//  - the second batch of 20 Nov 2026 (council/hard-sources.mjs): what prediction markets price for the next prints, the
+//    results of the last note and bond auctions, the Fed's plumbing, what options price, inflation under the headline.
 // A source that fails keeps its last good copy (with its own `at`); nothing here is a rule, a call or a trade.
 import fs from 'node:fs';
 import path from 'node:path';
 import { EVENTS } from './events.mjs';
+import { collectMore, LADDERS } from './hard-sources.mjs';
 
 const UA = { 'user-agent': 'Mozilla/5.0 (macro desk; public data)', accept: '*/*' };
 export const SRC = {
@@ -184,7 +187,17 @@ export function histEntry(out) {
     if (ms.length) e.nowcast = ms;
   }
   if (ok('gdpnow') && Number.isFinite(out.gdpnow.value)) e.gdpnow = { quarter: out.gdpnow.quarter, value: out.gdpnow.value };
-  return e.odds || e.nowcast || e.gdpnow ? e : null;
+  // 20 Nov 2026: what prediction markets price for the next prints (the leading print and its chance, or the ladder's middle)
+  if (ok('priced') && out.priced.items) {
+    const px = {};
+    for (const L of LADDERS) { const x = (out.priced.items[L.key] || [])[0]; if (!x) continue;
+      if (x.likely && x.likely[0]) px[L.key] = { period: x.period, v: x.likely[0].v, p: x.likely[0].p };
+      else if (Number.isFinite(x.mid)) px[L.key] = { period: x.period, mid: x.mid };
+      else if (Number.isFinite(x.p)) px[L.key] = { period: x.period, p: x.p }; }
+    if (Object.keys(px).length) e.priced = px;
+  }
+  if (ok('vol') && out.vol.gvz) e.gvz = out.vol.gvz.value;
+  return e.odds || e.nowcast || e.gdpnow || e.priced || e.gvz != null ? e : null;
 }
 const secOf = (at) => Math.floor(Date.parse(at) / 1000);
 export function addHist(prev, entry, now) {
@@ -258,6 +271,17 @@ export function moves(hd, now) {
     const d = pick(G.day), w = pick(G.week), s = said(v, d, w, (x) => `${x}%`);
     if (s) out.push({ kind: 'gdpnow', day: dif(v, d), week: dif(v, w), text: `Atlanta Fed GDPNow for ${q}: ${s} (annualized).` });
   }
+  // 20 Nov 2026: the chance traders put on today's leading print, against a day and a week ago (same period, same print)
+  const X = refs(hist, now, (x) => x.priced && typeof x.priced === 'object');
+  if (X) {
+    for (const L of LADDERS) {
+      const c = X.cur.priced[L.key]; if (!c || !L.step || c.v == null || L.key === 'fed') continue;
+      const pick = (x) => { const y = x && x.priced[L.key]; return y && y.period === c.period && y.v === c.v ? y.p : null; };
+      const d = pick(X.day), w = pick(X.week), s = said(c.p, d, w, pctP);
+      const val = L.mom ? `${c.v > 0 ? '+' : c.v < 0 ? '−' : ''}${Math.abs(c.v).toFixed(1)}%` : `${c.v.toFixed(1)}%`;
+      if (s) out.push({ kind: 'priced', series: L.key, day: dif(c.p, d), week: dif(c.p, w), text: `Kalshi's chance of a ${val} print for ${L.name} (${c.period}): ${s}. What traders pay, not a forecast of ours.` });
+    }
+  }
   return out;
 }
 // The biggest one-week move of any of Kalshi's leading outcomes for the same meeting, when it is `min` (5 points) or more; else null.
@@ -279,9 +303,9 @@ async function getText(fetchFn, url, ms = 30000) {
 }
 
 // Fetch everything; a failed part keeps `prev`'s copy of it. `now` in unix seconds.
-export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = fetch, prev = null, log = () => {} } = {}) {
+export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = fetch, prev = null, log = () => {}, pace = 0 } = {}) {
   const P = prev || {}, out = { v: 1, at: new Date(now * 1000).toISOString().replace(/\.\d+Z$/, 'Z'), sources: {},
-    label: 'Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision, the Fed\'s own calendar and the US Treasury\'s note and bond auctions. Context, not a forecast of ours; paper only.' };
+    label: 'Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision and of the next data prints, the Fed\'s own calendar, the US Treasury\'s note and bond auctions and their results, the Fed\'s money-market plumbing, option-implied volatility and the underlying-inflation measures. Context, not a forecast of ours; paper only.' };
   const part = async (k, fn) => { try { out[k] = await fn(); if (out[k] == null) throw new Error('nothing parsed'); out.sources[k] = 'ok'; }
     catch (e) { out[k] = P[k] || null; out.sources[k] = 'failed: ' + String(e && e.message || e).slice(0, 80) + (P[k] ? ' (last good copy kept)' : ''); log(`hard data ${k}: ${out.sources[k]}`); } };
   await part('nowcast', async () => { const n = parseNowcast(JSON.parse(await getText(fetchFn, SRC.nowcast, 60000))); return n && { ...n, at: out.at }; });
@@ -307,6 +331,7 @@ export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = f
     if (!o.kalshi && !o.polymarket) return null;
     o.line = oddsLine(o); return o;
   });
+  await collectMore({ now, fetchFn, part, at: out.at, pace });
   out.hist = addHist(P.hist, histEntry(out), now);
   return out;
 }
@@ -321,7 +346,7 @@ export function fileText(out) {
 export async function main(dir = 'data') {
   const M = path.join(dir, 'macro'); fs.mkdirSync(M, { recursive: true });
   const f = path.join(M, 'hard-data.json'); let prev = null; try { prev = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) {}
-  const out = await collect({ prev, log: console.log });
+  const out = await collect({ prev, log: console.log, pace: 700 });   // Kalshi answers 429 to calls in a row
   const tmp = f + '.tmp'; fs.writeFileSync(tmp, fileText(out)); fs.renameSync(tmp, f);
   console.log('Hard data:', Object.entries(out.sources).map(([k, v]) => `${k} ${v}`).join(' · '));
   if (out.odds && out.odds.line) console.log(out.odds.line);

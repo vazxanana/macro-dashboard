@@ -12,6 +12,7 @@ import path from 'node:path';
 import { writeAtomic } from './jsonio.mjs';
 import { typeOf, nowcastFor, releasesOf } from './week-ahead.mjs';
 import { moves, auctionText } from './hard-data.mjs';
+import { pricedLines, volLines } from './hard-sources.mjs';
 import { nyParts } from '../ict/calendar.mjs';
 const nyDay = (t) => nyParts(t).ymd;
 import { holidaysBetween } from './glance.mjs';
@@ -89,6 +90,9 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
   // the US Treasury's note and bond auctions of the New York day (hard-data.mjs `auctions`): supply the bond market has to absorb
   for (const a of ((((hd && hd.auctions) || {}).list) || []).filter((x) => x && x.day === today && x.type !== 'Bill').slice(0, 4))
     lines.today.push(`${auctionText(a)}${a.type === 'Note' || a.type === 'Bond' ? ` (results about ${nyUnix(a.day, '1:00 p.m.') == null ? '13:00 New York' : hm(nyUnix(a.day, '1:00 p.m.')) + ' London'})` : ''}.`);   // FRN and TIPS auctions close at other times
+  // 20 Nov 2026: how yesterday's and today's note and bond auctions went (hard-sources.mjs `auctionResults`), two at most
+  { const yd = new Date(Date.parse(today + 'T12:00:00Z') - 86400e3).toISOString().slice(0, 10);
+    for (const a of ((((hd && hd.auctionResults) || {}).list) || []).filter((x) => x && x.text && x.day >= yd && x.day <= today).slice(0, 2)) lines.happened.push(`US Treasury auction, ${clean(a.text, 320)}`); }
   if (!todays.length) lines.today.push(L.wd === 0 || L.wd === 6 ? 'Weekend: no scheduled release. Markets reopen Sunday evening (22:00 UTC for gold and currencies).' : 'No high- or medium-impact release is scheduled today.');
   const later = cal.filter((e) => e.at > endToday && e.at <= endToday + 6 * 86400 && e.impact === 'High').sort((a, b) => a.at - b.at);
   for (const e of later.slice(0, 10)) lines.week.push(`${dayName(e.at)} ${calLine(e)}`);
@@ -105,6 +109,10 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
   const gs = fc && fc.goldScore; if (gs && gs.ok && Number.isFinite(gs.score)) lines.expect.push(`Gold Macro Score ${gs.score > 0 ? '+' : ''}${gs.score.toFixed(2)}: ${gs.score > 0.25 ? 'leans to gold rising over the next four weeks (the score\'s tested side)' : 'no macro edge for gold (the score only ever points up, above +0.25)'}.`);
   if (hd && hd.odds && hd.odds.line) lines.expect.push(clean(hd.odds.line, 300));
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) lines.expect.push(`Atlanta Fed GDPNow for ${clean(hd.gdpnow.quarter, 12)}: ${hd.gdpnow.value}% a year, a model's running estimate of growth.`);
+  // 20 Nov 2026 (hard-sources.mjs): what a prediction market prices for the next prints, gold's option-implied day, the last
+  // auctions' demand and the liquidity gauge. Each line carries its own caveat; a part that was not read adds nothing.
+  for (const l of pricedLines(hd && hd.priced).slice(0, 2)) lines.expect.push(clean(l, 520));
+  for (const l of volLines(hd && hd.vol, fc && fc.assets && fc.assets.gold ? Number(fc.assets.gold.last) : null).slice(0, 1)) lines.expect.push(clean(l, 420));
   // how those readings moved over the day and the week (hard-data.mjs hist): a change in what a model or traders say, never a signal
   // never let the history stop the report; nowcast moves only for a month with a release in the next week; no line when nothing moved
   try {

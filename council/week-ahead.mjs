@@ -15,6 +15,7 @@ import { cmeYear, nyParts } from '../ict/calendar.mjs';
 import { isGotobi } from './gotobi-calendar.mjs';
 import { readStudy, studyRow, EDGE_DIR } from './research-ledger.mjs';
 import { moves, bigOddsMove, auctionText } from './hard-data.mjs';
+import { board, pricedFor } from './hard-sources.mjs';
 
 const DAY = 86400;
 const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -358,7 +359,7 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
     if (!weekday(d)) continue;
     // 20 Nov 2026: what the 2022-24 first-print record says about a release (veteran.json newsAhead, same kind, same minute)
     const NA = (v && v.newsAhead && Array.isArray(v.newsAhead.items) ? v.newsAhead.items : []), ctx = (r) => { const x = r.type && NA.find((i) => i.kind === r.type && Math.abs(Date.parse(i.at) / 1000 - r.t) <= 3600); return x ? x.point : null; };
-    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r), ...(ctx(r) ? { context: ctx(r) } : {}) })).map((r) => ({ ...r, prep: prepFor(r, r.nowcast, r.type && rf && rf.study ? rf.study[r.type] : null) }));
+    const releases = rel.filter((r) => r.day === d).map((r) => ({ ...r, record: r.type ? recordOf(rf, r.type) : null, nowcast: nowcastFor(hd, r), ...(ctx(r) ? { context: ctx(r) } : {}), ...(r.type && pricedFor(hd, r.type, r.t) ? { priced: pricedFor(hd, r.type, r.t) } : {}) })).map((r) => ({ ...r, prep: prepFor(r, r.nowcast, r.type && rf && rf.study ? rf.study[r.type] : null) }));
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
@@ -388,6 +389,10 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
   if (big) lines.push(big.text);
   const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
   if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
+  // 20 Nov 2026: what a prediction market prices for the week's own prints (hard-sources.mjs `pricedFor`), once per release time
+  const pr = [], seenPr = new Set();
+  for (const d of days) for (const r of d.releases) if (r.priced && !seenPr.has(r.priced.short)) { seenPr.add(r.priced.short); pr.push(`${d.dow}: ${r.priced.short}`); }
+  if (pr.length) lines.push(`Priced on a prediction market for this week's prints (${pr.join(' | ')}). What traders pay: not a consensus survey and not a forecast of ours.`);
   const cx = days.flatMap((d) => d.releases.filter((r) => r.context).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.context}`));
   if (cx.length) lines.push(`From the 2022-24 first-print record: ${cx[0]}`);
   for (const d of days) for (const r of d.releases) if (r.prep) lines.push(`Before ${d.dow}'s ${r.title.replace(/\s*\(.*\)$/, '')}: ${r.prep.short}${r.prep.record ? `; past prints above it: gold ${pct(r.prep.record.above.gold)} (n ${r.prep.record.above.n}), below: ${pct(r.prep.record.below.gold)} (n ${r.prep.record.below.n})` : ''}. A model's estimate, descriptive only.`);
@@ -401,5 +406,7 @@ export function build({ now, cal, rf, fc, v, hd = null, cot = null, dataDir = nu
   const calNote = (W.next && !rel.some((r) => r.src === 'calendar')) ? 'Next week\'s economic calendar is not published yet (it usually appears over the weekend): the big US releases come from the council\'s own schedule, without consensus figures for now.' : null;
   return { v: 1, at: new Date(now * 1000).toISOString().replace(/\.\d+Z$/, 'Z'), from: W.from, to: W.to, next: W.next,
     label: 'Week ahead: a plan from the calendar, the Red folder record, the tested calendar rules and the desk\'s levels. Not advice, not a forecast; paper only.',
-    lines, days, frame, calls, calNote };
+    lines, days, frame, calls, calNote,
+    // 20 Nov 2026: the hard-to-find data as titled groups with their source and date (hard-sources.mjs `board`)
+    hard: board(hd, { goldPx: fc && fc.assets && fc.assets.gold ? Number(fc.assets.gold.last) : null }) };
 }
