@@ -14327,6 +14327,34 @@
     "volume": 100,
     "status": "closed at broker",
     "closedAt": "2026-11-20T02:30:13.000Z"
+   },
+   "xau-m30m1-1795142115": {
+    "positionId": "50418396",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "status": "open",
+    "openedAt": "2026-11-20T02:36:12.000Z",
+    "councilEntry": 3535.145,
+    "stop": 3544.387714285714,
+    "t1": 3508.109571428572,
+    "riskCash": 9.24,
+    "margin": 7.05,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3535.145,
+    "levelsFrom": "mark",
+    "fillPrice": 3539.41,
+    "slipR": -0.461,
+    "lagSec": 57,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-20T02:36:12.000Z",
+    "brokerStop": 3548.65
    }
   },
   "day": {
@@ -14334,7 +14362,7 @@
    "startBalance": 10406.4
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10552.94 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 10552.94 · 8 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker",
@@ -14347,14 +14375,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10552.94,
-  "lastRun": "2026-11-20T02:33:17.000Z"
+  "lastRun": "2026-11-20T02:36:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T14:12:08.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 429.39, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T14:13:37.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 432.49, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15849,6 +15872,11 @@
    "at": "2026-11-20T02:30:13.000Z",
    "msg": "XAUUSD position 50414038 closed at the broker",
    "trade": "xau-m30m1-1795139635"
+  },
+  {
+   "at": "2026-11-20T02:36:12.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council m30m1)",
+   "trade": "xau-m30m1-1795142115"
   }
  ],
  "limits": {
@@ -15927,11 +15955,11 @@
   ]
  },
  "execution": {
-  "n": 473,
-  "meanSlipR": -0.018,
+  "n": 474,
+  "meanSlipR": -0.019,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 141,
+  "medianLagSec": 140.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -15966,8 +15994,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 95,
-    "meanSlipR": -0.076
+    "n": 96,
+    "meanSlipR": -0.08
    }
   }
  }
