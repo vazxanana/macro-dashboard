@@ -528,6 +528,8 @@
   .wa-day li .wa-r, .wa .wa-r { display: block; }
   /* 20 Nov 2026 quality pass: a study link is a 44 px target on touch */
   @media (pointer: coarse) { .wa a.wa-st { display: inline-flex; align-items: center; min-height: 44px; } }
+  /* 20 Nov 2026 browser pass: the day's gold range is labelled and in the readable ink, apart from the quiet notes */
+  .wa-rg { margin: 2px 0 6px; font: 400 var(--fs-sm, 13px)/1.5 var(--sans); color: var(--ink-dim); } .wa-rg b { color: var(--ink); font-weight: 600; }
   .wa-chip { display: inline-block; padding: 0 7px; margin-right: 6px; border-radius: 999px; font: 600 12px/1.6 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); }
   .wa-chip.pass { color: var(--buy); border-color: currentColor; } .wa-chip.fail { color: var(--sell); border-color: currentColor; }
   .wa-nc { color: var(--ink); }
@@ -1491,7 +1493,7 @@
     $('wa-lines').innerHTML = (A.lines || []).concat(A.calNote ? [A.calNote] : []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
     $('wa-days').innerHTML = A.days.map(function (d) {
       var h = '<div class="wa-day"><h3>' + esc(d.dow) + ' ' + esc(WA_DAY(d.day)) + ' <small>· ' + esc(d.line) + '</small></h3>';
-      if (d.range && d.range.text) h += '<p class="wa-quiet wa-rg">' + esc(d.range.text) + '</p>';
+      if (d.range && d.range.text) h += '<p class="wa-rg"><b>Gold range:</b> ' + esc(d.range.text) + '</p>';
       if (d.market) h += '<p class="wa-mk">' + esc(d.market.text) + '</p>';
       if ((d.releases || []).length) h += '<ul>' + d.releases.map(function (r) {
         var iso = new Date(r.t * 1000).toISOString();

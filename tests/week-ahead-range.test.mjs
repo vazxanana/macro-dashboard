@@ -54,7 +54,7 @@ test('no forecast file, or no expected move: no range; build attaches one per da
 test('the Macro desk draws the range as text under each day heading', () => {
   const md = fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'utf8');
   const block = md.slice(md.indexOf('function renderAhead'), md.indexOf('function renderNext'));
-  assert.ok(block.includes("'<p class=\"wa-quiet wa-rg\">' + esc(d.range.text) + '</p>'"));
+  assert.ok(block.includes("'<p class=\"wa-rg\"><b>Gold range:</b> ' + esc(d.range.text) + '</p>'"));
   assert.ok(block.indexOf('wa-rg') > block.indexOf('<h3>'));
 });
 
