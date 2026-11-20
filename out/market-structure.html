@@ -38,10 +38,10 @@
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3" defer></script>
-<script src="/assets/ms-draw.js?v=5eb2a252da" defer></script>
+<script src="/assets/ms-draw.js?v=d16f960683" defer></script>
 <script src="/assets/ms-paper.js?v=1ddae9c0e4" defer></script>
 <script src="/assets/ms-vprof.js?v=6e0d9cc172" defer></script>
-<script src="/assets/ms-charts-guide.js?v=46e0a2c765" defer></script>
+<script src="/assets/ms-charts-guide.js?v=d11de693cd" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
@@ -3009,6 +3009,7 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       .dr-bar .dr-mag small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--accent); } .dr-bar .dr-mag small:empty { display: none; }
       .dr-note { order: 9; font-size: 12px; color: var(--ink-dim); } .dr-note:empty { display: none; }
       .ms-dsel { position: fixed; left: 0; top: 0; z-index: 60; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); font: 600 12px var(--sans); color: var(--ink); }
+      .ms-dsel { flex-wrap: wrap; max-width: calc(100vw - 16px); box-sizing: border-box; }   /* a phone: the bar wraps to rows inside the screen (it ran 230 px past a 390 px screen: Lock, Clone, Delete out of reach; 20 Nov 2026) */
       .ms-dsel[hidden] { display: none; } .ms-dsel .sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
       .ms-dsel button { min-height: 28px; padding: 0 8px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
       .ms-dsel button:hover { background: var(--panel-hover, rgba(127,127,127,.12)); } .ms-dsel button[aria-pressed="true"] { border-color: var(--accent); }
@@ -3260,6 +3261,9 @@ html[data-mk="clean"] .ict-strip { display: none; }
 .tv-tk .tk-b button, .tv-tk .tk-b a { height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; }
 .tv-tk .tk-b button:hover, .tv-tk .tk-b a:hover { border-color: var(--accent); }
 @media (max-width: 600px) { .tv-tk .tk-b { margin-left: 0; } }
+/* trade dialog on touch (20 Nov 2026): Before / After / Save were 37 px and the ticket's Copy buttons 32 px tall on a phone; the two small labels 11 px */
+@media (pointer: coarse) { .tv-h .tv-ba button { min-height: 44px; } .tv-tk .tk-b button, .tv-tk .tk-b a { height: 44px; } }
+.tv-tk .tk-h, .tv-nb .nb-k { font-size: 12px; }
 .ch-tv { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'/%3E%3C/svg%3E"); text-decoration: none; }
 .ch-ruler { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.4 2.4 0 0 1 0-3.4l2.6-2.6a2.4 2.4 0 0 1 3.4 0zM14.5 12.5l2-2M11.5 9.5l2-2M8.5 6.5l2-2M17.5 15.5l2-2'/%3E%3C/svg%3E"); }
 .ch-b.on { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
@@ -6573,7 +6577,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="card c-sleeve adm" id="ms-sleeve" hidden></div>
       <div class="card adm" id="ms-sys-book">
         <div class="ms-k"><span role="heading" aria-level="2">Which systems trade live · since 11 Nov 2026</span></div>
-        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica, Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO; and since 14 Nov the Mosha cycle (your decision 54: both studies of its code lose after costs). Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
+        <p class="ms-note"><b>Live on paper:</b> Gold trend (20-day breakout) and Gold daily engulf. Since 20 Nov 2026, by your request, the <b>Gold replica</b> is live on paper again too (no edge on record out of sample: replica-oos 2017-22 −0.05R a trade; its forex and crypto research trades are still not copied to the demo). <b>Paper shadows</b> (your decision of 11 Nov on the edge review; the same rules and stops, every trade recorded and managed, never alerted, no futures ticket): Gold replica (until 20 Nov), Gold momentum pullback, NQ New York open run, Gold H4 trendline and Mosha BO; and since 14 Nov the Mosha cycle (your decision 54: both studies of its code lose after costs). Gold trend fast and crypto trend have been shadows since 7 Nov. A trade one of them took live before its date stays in the main record as the live trade it was; only trades opened after it are shadows. No system here has proven an edge on data it was not built on (none reaches t 2 after costs): Gold trend and Gold daily engulf are the nearest, not proven. Those two are the book of the forward-test protocol you adopted on 12 Nov 2026: if one of its stop lines is crossed they go back to paper shadows by that rule (the card below says so).</p>
         <p class="ms-note" id="ms-rep-mcycle"></p>
         <p class="ms-note" id="ms-sys-fin"><b>Costs now include overnight financing</b> on gold buys: 0.0148% of the price for each rollover held (Monday to Friday 22:00 UTC, three on Wednesday; the demo broker's own rate of 11 Nov 2026, about 5.3% a year). It is inside the cost of every trade closed from the day the rule started; trades closed before keep the cost they were recorded with, so net figures that span that day mix the two.</p>
       </div>

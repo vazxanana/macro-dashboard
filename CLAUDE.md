@@ -2531,6 +2531,16 @@ it exists, else the page's own: `#v-charts.ch-fake-fs` (fixed over the page, `10
 phone in the browser's full screen too). (3) The Style panel (`#ms-sty-pop`) opened from its button's left edge and ran off the right
 of a phone: up to 640 px it is a sheet across the screen above the tab bar (scrolls), wider it is moved left when it would leave the
 screen (`place`). Checked at 390 x 664 (iPhone 13) in both paths. Test: `tests/charts-phone-fs.test.mjs`.
+**Phone audit 2 (20 Nov 2026)**: every menu, popover, dialog and sheet of the Desk, ChronosTrade and the Macro desk opened at
+390 x 664 (iPhone 13 emulation, no element Fullscreen API), simple and Full view. Fixed, display only: (1) the Desk's drawing style bar
+`.ms-dsel` was one row 612 px wide, so Lock, Clone and Delete sat 230 px past the screen: it wraps inside `100vw - 16px` and is
+placed above the shape by its own height (`assets/ms-draw.js`); (2) ChronosTrade full screen on a phone: the trade dock (320 px,
+from 70 px down, z 45) covered the floating replay bar (Play, More, and in More the only way out of full screen on an iPhone) and
+ran 37 px below the screen; up to 640 px it is a bottom sheet (`max-height: 46dvh`, Sell / Buy first by flex `order`) and hides while
+More or a toolbar menu is open (`body.fs:has(#tb.more-open, #tb details[open])`: the replay bar is inside `.chartc`'s z 40 stacking
+context, under the dock); (3) the trade dialog's Before / After / Save (37 px) and ticket buttons (32 px) are 44 px on touch, its two
+11 px labels 12 px; (4) the charts guide's close button is 44 px wide on touch. Left: the header switch dots (21 x 28, the known
+width budget), ChronosTrade dropdowns that touch the screen edge or open over a toast. Test: `tests/phone-audit-2.test.mjs`.
 
 , owner: "the currency letters look too big, make same size as the rest")
 Display only, the end of `<style id="ms-ch-flat-css">`. Every control on Charts is 12.5 px: the toolbar's market button `.ch-mk`
@@ -4677,6 +4687,15 @@ Why: both studies of the live code fail after costs (`research/edge/mcycle-base`
 `research/edge/mcycle-oos` untouched 2007-19 −0.175R, n 244, t −1.50, break-even before costs). Undo: a rule deleting the key.
 Test: `tests/mcycle-shadow.test.mjs`.
 
+## Gold replica live again (20 Nov 2026, owner: "And mine replica shadow to live")
+User rule `replica-live-again` (council/trader.mjs (the id `replica-live` was taken by an older rule), after `replica-mirror-gold-only`) removes `replica` from `config.ownerShadow`: the gold
+replica's NEW trades are live paper trades again (alerted, main book, council demo account); its rule, stops, gates and
+`config.replicaLive` are unchanged; trades opened as owner-shadow run to their exits. `replica-mirror-gold-only` stays (its forex and
+crypto RESEARCH trades are still not copied). `council/decay.mjs` lists it live (`ownStream: true`, `liveAgain`), so its record stays
+one stream (live, owner-shadow 11-20 Nov, live); `council/expect-base.json` `live: true`. Said to the owner: no out-of-sample edge
+on record (replica-oos 2017-22 −0.05R, n 115; replica-sides FAIL). Undo: a user rule setting `ownerShadow.replica` again. Tests:
+`tests/supported-book.test.mjs`, `tests/decay.test.mjs`, `tests/expect.test.mjs`, `tests/financing-rest.test.mjs`, `tests/replica-live.test.mjs`.
+
 ## Edge analyst: an AI second opinion on each live entry (11 Nov 2026, owner: "have an ai to study the trade decisions in the edge u can use the same of the academy"; chose "each entry, blind" and "an API key, automatic")
 `api/_edge-analyst.js` (pure) + `api/edge-analyst.js` (endpoint), reusing the Academy's language-model adapter
 (`api/_academy-llm.js`) and store (`api/_academy-store.js`, `blobBackend(env, { root })`; own folder `edge-analyst/`, preview
@@ -4991,6 +5010,14 @@ longs in the same up-trend (placebo median +0.078R, 95th percentile +0.152R): it
 (60 % vs 46 %) but the R a trade is the same (+0.083 vs +0.080, t 0.02). Shorts −0.005R. Nothing live changed. Test:
 `tests/macro-donchian.test.mjs`.
 
+## The gold brief's "interim bottom" framework (20 Nov 2026, `research/edge/gold-interim-bottom`, pre-registered)
+The veteran batch's gold brief (`gold-market-brief-2026-11-07.md`) quotes a bear-regime bottom signal (gold far below its 200-day,
+a sharp 52-week dollar rise, low speculative positioning; 9 of 10 up after three months) and asks for a point-in-time test.
+Public proxy with two of the three conditions (no COT before 2019), thresholds from earlier bear month-ends, OANDA spot 2007-26,
+long 63 days with a 3 x ATR20 stop, net of costs and financing. **FAIL, too few to judge**: both conditions held at 2 month-ends
+(Sep / Oct 2022), one trade, +1.56R, n 1, no t. Reported: the stretch condition alone 6 of 7 up (+0.67R, t 1.64) against every bear
+month-end 40 of 62 (+0.21R): the brief's direction, intervals overlapping. Nothing live changed. Test: `tests/gold-interim-bottom.test.mjs`.
+
 ## Measured-cost studies of 20 Nov 2026 (tick probe)
 Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live changed. Results, each pre-registered before its data:
 - `gold-release-quotes`: gold's spread at T+5 s after US CPI / payrolls / FOMC is about 18× normal ($1.48 median), the widest
@@ -5030,6 +5057,18 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   month-sum t −0.07), shorts above +0.25 not worse (t −0.88); sized the book's way +0.155R per unit of risk vs +0.140R flat, same
   month t and drawdown. T1 stays flat 1R. Local reruns of research fetch scripts need `MD_BASE=https://aureumdesk.co.uk/md/`
   (their default meridianx.dev answers 402 since the Vercel project went).
- the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
+- `nas-vol-breakout-early` (pre-registered 20 Nov 2026): T1 on NAS100 at the measured C1 cost on untouched 2010-2015 (OANDA M5).
+  **FAIL**: −0.011R a trade net (n 1,110, month t −0.28; gross +0.001R), 2013-15 −0.026R, 30 of 40 placebos beaten. The 2016-26
+  +0.043R does not replicate: the breakout is gold's, not an index rule. Do not test it on another index.
+- `fx-vol-breakout` (pre-registered 20 Nov 2026): T1 on six forex majors (OANDA M5 2016-26) at the demo's cost (commission
+  0.000045 of price + 0.5 pip). **FAIL**: pooled −0.022R a trade net (n 12,664, month t −1.59; gross +0.012R). USD/JPY alone
+  passes its checks (+0.063R, t 2.50, Holm p 0.043, 40 of 40 placebos): by the pre-registration a hypothesis for its own test on
+  other data, not an edge. The breakout is gold's. Nothing live changed.
+- `usdjpy-vol-breakout-early` (pre-registered 20 Nov 2026, the follow-up `fx-vol-breakout` named): T1 on USD/JPY 2005-2015
+  (years that study never read), same cost. **PASS**: +0.079R a trade net (n 2,089, month t 2.95; halves +0.078R / +0.081R;
+  2x cost +0.050R; 40 of 40 placebos). With 2016-26 (+0.063R, t 2.50) it holds in both stretches of OANDA history. Limits:
+  today's demo cost charged on old years, OANDA mid candles (not broker ticks), drawdowns of 20-42R. A candidate for a forward
+  paper record only (its own pre-registration); never a live rule without the owner. Nothing live changed.
+- `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).

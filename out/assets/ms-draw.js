@@ -173,7 +173,7 @@
       + (['h', 'hr', 't'].includes(d.type) ? `<span class="sep"></span><button type="button" data-alert title="Tell me when price crosses this line (while this page is open)"${on(d.alert)}>${d.alert ? 'Alert on' : 'Alert'}</button>` : '')
       + `<span class="sep"></span><button type="button" data-lock title="${d.lock ? 'Unlock' : 'Lock'}"${on(d.lock)}>${d.lock ? 'Locked' : 'Lock'}</button><button type="button" data-clone title="Clone">Clone</button><button type="button" data-del title="Delete (Del)" class="del">Delete</button>`;
     el.hidden = false; const cx = SELC && SELC.visible() && mkOf(SELC) === SEL.mk ? SELC : CX.find((c) => c.visible() && mkOf(c) === SEL.mk), g = cx && geo(cx, d), r = cx && cx.el.getBoundingClientRect();
-    const bw = el.offsetWidth || 360; let lx = r ? r.left + (g ? Math.min(g.x1, g.x2 != null ? g.x2 : g.x1) : 8) : 16, ty = r ? r.top + (g ? Math.min(g.y1, g.y2 != null ? g.y2 : g.y1) : 8) - 48 : 80;
+    const bw = el.offsetWidth || 360; let lx = r ? r.left + (g ? Math.min(g.x1, g.x2 != null ? g.x2 : g.x1) : 8) : 16, ty = r ? r.top + (g ? Math.min(g.y1, g.y2 != null ? g.y2 : g.y1) : 8) - Math.max(48, (el.offsetHeight || 40) + 8) : 80;
     lx = Math.max(8, Math.min(innerWidth - bw - 8, lx)); ty = Math.max(8, ty); el.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ty)}px)`; }
   function selAct(e) { const b = e.target.closest('button'); if (!b || !SEL) return; const mk = SEL.mk, L = load(mk), d = L[SEL.i]; if (!d) return;
     if (b.dataset.col) { if (b.dataset.col === 'draw') delete d.col; else d.col = b.dataset.col; }
