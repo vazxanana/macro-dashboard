@@ -32,7 +32,7 @@ test('summary: supportive / against from the distance to the base rate; confiden
   const dn = G.summary(vet({ p: 0.53 })); assert.equal(dn.bias.lean, 'against'); assert.ok(dn.bias.meter < 0);
   assert.equal(G.summary(vet({ p: 0.59 })).bias.lean, 'neutral', '2 points is inside the neutral band');
   assert.equal(G.summary(vet({ p: 0.95, baseP: 0.5 })).bias.meter, 1, 'the gauge is capped');
-  const ne = G.summary(vet({ event: false })); assert.equal(ne.event, null); assert.match(ne.sentence, /No major release is scheduled this week\./);
+  const ne = G.summary(vet({ event: false })); assert.equal(ne.event, null); assert.match(ne.sentence, /No major release in the next 72 hours; next on the schedule: US CPI \(Tue 10 Nov, 13:30 UTC\)\./, '20 Nov 2026: 72 hours without an event is not a week without one');
   assert.equal(G.summary(null), null);
 });
 

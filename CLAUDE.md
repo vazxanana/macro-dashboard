@@ -65,7 +65,7 @@ review. `watchdog.yml` pages when the loop stops.
 
 **Sections below, by topic** (each is dated; later sections win where two disagree):
 - Accounts and security: Public / admin split, Accounts and sign-in, Users page, Accounts, desks…, Per-member permissions (the `mosha` key is in "Mosha desk"),
-  Server-side sign-in, API hardening, Profile photo and name on the server.
+  Server-side sign-in, API hardening, API review (20 Nov), Profile photo and name on the server.
 - The Desk page: Simplified pages (17 Nov: what was removed and folded), Simple phone view (the default on phones), Council layout, Home and navigation, Guests (three sections), Sign-in and guest polish, Profile page, Charts:
   markup switch, Desk smoothness, Exchange price ticks, Styled dialogs, Desk notifications, Installable app, This week report,
   Edge scoreboard, Loss review.
@@ -76,7 +76,8 @@ review. `watchdog.yml` pages when the loop stops.
 - ICT: ICT desk, ICT desk: every result traceable to its execution (+ frozen history), ICT MCP server (with `docs/fred-mcp.md`),
   Fred applies ICT changes (on for Fred since 10 Nov).
 - Macro: Macro driver stack (gold terminal), Macro strategist, Macro veteran (+ revision 1.3), Veteran's calls (+ track record),
-  The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk.
+  The veteran's briefing, The veteran at a glance, Macro desk charts, The veteran's event playbook, COT positioning desk,
+  Macro brain audit (20 Nov: trading days, the batch in the council's checkout, odds that name their level).
 - ChronosTrade: Backtest lab (passes 1-11, review, instant orders, chart design, analytics, onboarding), trade effects, sounds chosen by the owner.
 - Loading: Load performance: delivery layer (9 Nov), Desk load: one request per file, late loading (11 Nov).
 - Running and reliability: Simplified (17 Nov 2026: what was removed), Vercel (stage 1 + Pro features; history), Council live runner (removed), Council quick pass, One feed per market (12 Nov), Reliability: tests and data
@@ -2993,6 +2994,97 @@ rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Ka
 stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
 `tests/hard-data.test.mjs`.
 
+## Macro brain audit: what the veteran's output got wrong, and the week-ahead additions (20 Nov 2026, "make the macro brain's output more correct and more useful for next week")
+Today's council-data files (veteran.json, week-ahead.json, daily-report.json, redfolder.json) were read as a trader preparing for
+the Thanksgiving week would, then each member was re-run on a copy of the data. No rule, size, trade, probability on the record or
+strategist maths changed; veteran-calls / -ledger / -debates / -expectations are byte-identical on today's data. New output fields
+are optional (macro-desk.html was not touched). Defects, each: what a reader saw, the cause, the fix.
+- **The veteran batch never reached the live loop.** `council.yml`'s sparse checkout held `research/edge` and `research/proposals`
+  but not `research/macro-veteran`, so on the live desk `cpiPilot` was null, `newsAhead` and the release cards' `batch` were absent
+  ("The veteran reads the release ledgers"), "Your research, applied" showed only the four rule-book checks (no gold brief, funding
+  map, Japan, positioning, China, NY Fed survey, CPI plan, news register), and the Red folder study had no batch first prints or
+  model column. Every loader fails soft, so nothing warned. Fix: the folder is in the sparse checkout; a test reads every
+  `new URL('../…')` and `from '../…'` of council/*.mjs against that list. **A council member that reads a repository folder needs
+  it in council.yml's sparse checkout.** It reaches the loop with its next restart.
+- **A Sunday stub was counted as a trading day.** OANDA's UTC daily candles carry a two-hour Sunday row (one row in six), and every
+  count of rows was short of its label: "200-day average" $4,314 was the last 167 trading days (true $4,418), "13-week high" $4,443
+  the last 10.8 weeks (true $4,697), "50-day (= the 10-week average)" $4,065 (true $4,106); the week / month calls' base rates and
+  touch levels came from 5 / 20 ROWS (4.2 / 16.7 trading days) against due dates 5 / 20 weekdays on (levels too near, the 60% range
+  too narrow); "over 4 weeks" was 3.3 weeks; the analogs' "first close after Friday" was the Sunday stub; the Red folder's day move
+  of a Monday release was measured from the stub (49 of 748 rows change). Fix (`veteran.mjs` `tradingDays`, `foldBars`: weekend rows
+  dropped from close series, a stub's high / low / open folded into the next weekday's bar; weekday holiday stubs stay): the display
+  build, the resolution closes, the ledger and the Red folder read trading days at once. **The record build moves with the week of
+  `TRADING_DAYS_FROM` 2026-11-21**: this week's calls were issued from raw rows and a second build would add a second set (ids carry
+  the level) to the calibration sample. From then the base rates and levels of new calls are on true horizons (said here so a shift
+  in calibration is not a surprise). The two issued ledger forecasts (0 resolved) resolve at the 20th trading-day close, as their
+  own text says ("about 28-30 calendar days on"). Not changed: the strategist's and the score's own reading of the same rows.
+- **"53% chance it is higher by 11 Dec"** read as odds against today's price; it was the month call set at the 13 Nov close on a
+  close above $3,885, with gold at $3,575. Now, from `FAR` 2 % between the price and the call's level: "(at the 13 Nov close he put
+  53% on gold closing above $3,885 on 11 Dec, base 57%; gold is now 8.0% below that level, so read the lean, not the odds)"
+  (`summary.bias` + `level`, `from`, `gapPct`; the Week ahead's month-call line the same). Calls name their starting close by date
+  ("(the 2026-11-13 close)", `outlook.week.asOf`), never "today's close" / "the latest close". The recorded p is never changed.
+- **"No major release is scheduled this week"** was a 72-hour check. With no event in 72 h the sentence names the next top-tier US
+  release on the council's schedule within 8 days (`nextScheduled`, `summary.next`: "next on the schedule: US PCE (Wed 25 Nov,
+  13:30 UTC)"). The morning note's "No high-impact release is on the calendar for the next six days" (a Friday, PCE five days away:
+  the calendar feed holds one week) now lists the schedule's releases through the Week ahead's `releasesOf` (never twice) and the US
+  holiday; its heading is "The next six days".
+- **Week ahead: "Gold near $3,607 (as of the 2026-11-19 close); watch $3,590 above"**: the levels are picked either side of the
+  latest price ($3,575), the line quoted the close. Now "Gold near $3,575 now (last close $3,607 on 2026-11-19); watch $3,590 above
+  (13-week low, traded through since that close) and $3,550 below".
+- **Decided calls shown as open odds.** "Gold closes at or below $3,860 on some day by 20 Nov: 47%" three days after it closed
+  there. `outlook.mjs` `callStatus` (display only, never recorded: a test) stamps each shown call `status` (`happened` with the date
+  and close; else where the last close stands: on / off track, % away); the morning note prints "already happened: the 2026-11-17
+  close was 3,849 (he gave it 47%)".
+- **"Fails if … a weekly close below the 10-week average 4065"** with gold 11 % under it, and "real yield above 3.03% ends the
+  real-rate support" while that channel already leaned against gold. The lines say what is already true ("gold is already below
+  …: the tiebreaker is off until a weekly close back above it", "adds to the real-rate headwind", "the dollar is still rising").
+- **One report, two ranks.** The gold COT rank read "53th percentile" in the channel and the digest (over the strategist's last 60
+  reports, unlabelled) and "33rd percentile of 3 years" in the briefing. The channel names the 3-year rank when cot.json holds the
+  same report (`S.cot.pct3y`), else its window; `S.cot.pct` stays the 60-week rank the research check reads and labels.
+- **Releases without a country, "pending" for good.** `veteran.json.releases` showed "Employment Change · 25.2K" (Australia's) with
+  no country, and every past release as "pending" (the calendar feed carries no actuals). `releaseCheck` returns `country` and,
+  past the 48-hour first-print window, "no first print was captured …: no surprise is scored".
+- **"29% before calibration" on an 18% hypothesis**, with calibration behind its gate (k = 1). `freezeHypotheses` showed the
+  recorded claim and p beside the LIVE reading's `pRaw`, and the desk prints "before calibration" whenever the two differ. The
+  record's own `pRaw` travels with it now (`freezeEventCalls` the same); the live reading keeps its own in `live`.
+- **"Over 4 weeks" measured from the clock.** `research-watch.mjs` `chg` / `lchg` took the last observation against the value N
+  days before NOW; FRED runs about two days behind (more over a US holiday), so "over 2 weeks" was 12 days and "over 4 weeks" 26.
+  On 20 Nov the rule book's regime check read "10-year +7 bp over 4 weeks, 2-year +11 bp" while the veteran's channel said the
+  2-year was +1 bp: a 16 bp day fell inside one window and outside the other. Both are measured back from the last observation
+  now (10-year −6 bp, 2-year −1 bp). The real-yield insight says which number its z belongs to when the analogs' week-end frame
+  differs from the 28-day change.
+- **A failed rule given as an instruction.** The playbook's hot-print action ended "if gold closes up anyway, cancel any sell
+  bias": the rule book's C5, which FAILED its own study (`rulebook-stress`: after such days gold fell more, n 12, t −1.04; the
+  research card on the same page says "do not use it"). The action now says the rule failed and an up-close is not an all-clear.
+Additions (display only):
+- **The release ledgers reach next week** (`news-context.mjs` `scheduleOf`, `cpiPrintFrom`). `newsAhead` read the calendar feed,
+  which holds one week and no actuals: on a Friday it said nothing of the PCE five days away, and its PCE point could never name
+  the month's core CPI. The council's schedule fills the days the feed does not hold (once per kind and day), and the month's core
+  CPI print comes from the Cleveland Fed file hard-data.mjs already fetches (`build({ hd })`, display build only): "Core CPI for
+  October printed 0.30% m/m … went with core PCE near 0.24% (fit on 36 months, typical miss ±0.07 pp): a descriptive fit …". The
+  Week ahead carries it on the release (`releases[].context`) and in its lines, beside the nowcast (+0.27%).
+- **Holidays on the calls** (`glance.mjs` `holidaysBetween`, the ICT desk's CME calendar): `summary.holidays` and a closing
+  sentence ("Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov"),
+  `outlook.holidays` for the calls' window with `due`. `session` says what a day is for a dated call: a shortened CME day prints a
+  daily close and counts (Thanksgiving); on a full closure (Good Friday, Christmas, New Year) a call due that day is scored on the
+  last close on file by then (what `resolveCall` does: the feed's thin stub candle on 25 Dec and 1 Jan, the close before on Good Friday). `addSessions` still counts weekdays: the week calls of 19 Dec fall due on 25 Dec.
+- **A consistency guard** (`glance.mjs` `consistency`, `summary.check { ok, issues }`): a level "above" not above the price (or
+  below not below), a lean that contradicts its own odds, odds quoted without their level once the price is 2 % away, a month call
+  whose date has passed, a release named beside "no release", a macro SELL. A failed check withholds the sentence ("Summary
+  withheld this run: its parts disagree (…)", the original in `withheld`); the parts stay for the desk.
+- **Week ahead `days[].focus`** (`focusOf`, from fields the veteran already wrote): the two levels (once, on the first day), on a
+  top-tier US release day his own real-yield and dollar lines, the dated calls and hypotheses due at that close, and what a holiday
+  or early-close session means for them.
+Sound, left alone: calibration stays k = 1 behind its gate (14 of 30 scored, 2 of 4 weeks); no macro sell anywhere; "tested" /
+"failed" wording on the Week ahead's calendar rules matches each study; the Thanksgiving rules fall on the right days (pre-holiday
+Wednesday, post-holiday Friday, gotobi the 25th); release times are New York local converted to UTC;
+levels' freshness and broken-level wording (11 and 19 Nov). Known, not changed: two releases at the same minute with the same
+title share an expectations key (a US and a Canadian "CPI m/m"); a call due on Good Friday names a day with no candle; the
+strategist's own 20-row trend mean and base rates still read the raw rows (macro.mjs is outside this change).
+Tests: `tests/brain-veteran.test.mjs` (14); changed on purpose: `tests/glance.test.mjs` (the no-event sentence),
+`tests/daily-report.test.mjs` (the heading), `tests/veteran-fresh.test.mjs` (a call's `status` follows the fresh closes),
+`tests/news-context.test.mjs` (the calendar-only path passes `schedule: []`; the `contextFor` call carries `hd`).
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss
@@ -3014,6 +3106,9 @@ Score's falling-2-year driver, never a trading rule. The rule book's "double tig
 high-yield spread starts in 2023). Live reading `research-watch.mjs` `policyGapCheck` (veteran passes `cache.release` DFEDTARU as
 `policy`) in "Your research, applied" with the record beside it; it changes no score, call or trade. Tests:
 `tests/rulebook-gauges.test.mjs`.
+Same gauge on the yen (`research/edge/rulebook-gap-yen`, pre-registered 20 Nov 2026; `gapRows` / `testB` imported, run on 1 / USD/JPY):
+**FAIL, 0 of 2** (B1 hikes priced → USD/JPY up t −0.67 the wrong way; B2 cuts priced → USD/JPY down t 0.04), 1,001 weeks 2007-26;
+USD/JPY's next 20 sessions about +0.1 % in every class. The gauge is a gold lean, not a dollar one.
 
 ## Stress and reaction rules of the macro rule book (19 Nov 2026, owner: "keep going with the other documents")
 `research/edge/rulebook-stress/` (PREREGISTRATION.md committed first; `run.mjs` reuses `rulebook-gauges`' FRED parser, known-at
@@ -3175,6 +3270,66 @@ up to a minute; a read with `?cache=0` asks the origin. Every reader / writer un
   (2.8.2) has a conditional write (`put(…, { ifMatch: <listed etag> })`); it is not used because it could not be tried against
   the real service from the build sandbox and a wrong ETag form would refuse every save. Try it on a preview deployment first.
 - Not verified against the real Blob service: that `cache=0` reads are read-your-writes, and that the listing is.
+
+## API review (20 Nov 2026)
+A correctness and security review of the server functions written or changed 17-20 Nov: `api/signup.js`, `_smtp.js`, `passkey.js`,
+`_passkey.js`, `daily.js`, `_daily.js`, `_seen.js` (+ its calls in `me.js`, `login.js`, `users.js`), `battle.js`, `_battle.js`,
+`cloudflare/src/battle-room.mjs`, `lse.js`, `_watchdog-kick.js`, `_gotobi-kick.js`, `chronos-coach.js`, `_chronos-coach.js`,
+`trade-review.js` and the Worker's routing. Each defect has a test in `tests/api-review-20nov.test.mjs` that failed before its fix.
+No trading rule, stop, demo lock, council or ICT file, page or secret was touched.
+- **1. Daily email, members skipped for the day (medium).** The 06:30 job (and the owner's `send=all`) marked the day as sent and
+  THEN read the member list with `.catch(() => ({}))`: one unreadable read sent the email to the owner alone and no member got it
+  that day (`send=all` also used up its one send). Now `membersOf` is read first; unreadable = nothing sent, nothing marked, the
+  job tries again at its next run (`email.why`), `send=all` answers 503. Test hook `d.userList`. Known cost: a list unreadable for
+  the whole 3-hour window means no 06:30 email at all, the owner's included (sign-in is down then too).
+- **2. Daily email, `?test=email&to=` from another site (low-medium).** An owner-only GET that sends mail had no cross-site check
+  (`send=all` had one): a link on another page, opened by the signed-in owner, emailed the report to an address the link named
+  (5 in 10 minutes) and with `fresh=1` paid for a model call. Both now share `fromElsewhere` (`Sec-Fetch-Site` cross-site /
+  same-site refused; typed, same-origin or no header pass).
+- **3. Daily email, `state.json` written from an old copy (low).** The job and `send=all` each wrote their end state from the copy
+  they read at the start; an owner's `send=all` that ended after the job's run put `mailed` back to yesterday and the next run
+  sent the 06:30 email again. Every write now joins its fields onto the file as it stands (`mark`).
+- **4. Password reset, known addresses told apart (low-medium).** `forgot` answered the same words, but only after storing and
+  mailing the link for a known address (hundreds of ms to seconds), and a failing reset store was a 500 for a known address
+  only. The answer now leaves first; the link is stored and mailed after it (the Worker's adapter keeps the handler running under
+  `waitUntil`), and a failure of that work is logged, never answered. Keep it so: nothing slow before `res.json` in that branch.
+  A host that freezes a function at its answer would lose the email: the Worker is the only host.
+- **5. Emailed links built from a header the client types (low).** `originOf` reads `X-Forwarded-Host` first (Vercel set it
+  itself); on the Worker it was the caller's own header, so a forgot / sign-up request could have the member's link point at
+  `localhost` or the old workers.dev host (a dead link, repeatable every 10 minutes per address; never another site, the host
+  list holds). `cloudflare/src/adapter.mjs` `headersOf` now drops the header like the forwarded-for ones.
+- **6. Sign-up, the mail provider's error shown to a visitor (low).** A failed confirmation email answered 502 with `why` = the
+  provider's own error text and the shapes tried. The answer is the sentence alone; the reason is logged (addresses redacted)
+  and the owner sees the tries through `/api/daily?test=email`.
+- **7. The coach, provider detail to every member (low).** `errText` gave any signed-in account the provider's refusal text
+  (it can name the model or the account) and the variable names to check. Only the owner gets that now; members get "could not
+  be reached".
+- **8. Names inherited from Object (low).** `/api/constructor` ran `Object(req, res)` as a handler (500 "ended without an
+  answer") and `/api/lse?op=constructor` threw inside `target` (500): both lists are read with `Object.hasOwn` (404, 400).
+- **Checked and found sound**: same-origin on every state-changing POST (signup, passkey, battle, coach, users, login) and the
+  two battle Worker routes; the verify link and `watch` answer nothing but a state; no answer carries an email, hash, token or
+  key except the owner's approval list (`?list=1`); sign-up gives one answer for a new, pending, confirmed and member's email;
+  sign-in gives one 401; every in-place store (`signups/*`, `passkeys/all.json`, `presence/seen.json`, the daily / coach / review
+  stores, notices) reads with `cache=0` and throws on a failed read, so no write follows one; tokens, watch codes and reset
+  tokens are stored as hashes, single use, bounded lists; passkeys check challenge (signed, bound, once), origin, RP ID, UP + UV,
+  signature, counter, the account as it stands and the password fingerprint, and count failures in `_guard`; CBOR / DER / base64
+  inputs are length- and depth-bounded; SMTP header values and addresses cannot carry a line break; battle tickets cannot be
+  read as sessions (own key, 2 minutes), the room only sees a verified ticket, messages are size- and rate-bounded and every
+  setup field is clamped; the inbox is bounded and expires; `lse` is owner-only, GET, allowlisted, `redirect: 'error'`, never
+  returns the key; the two kicks start one named workflow on `main` with no inputs, only when sure, and nothing live is in reach
+  (the gotobi job holds the only order code, demo-locked); a cron failure never stops the chain (the adapter catches); every
+  `api/*.js` endpoint is in `HANDLERS`; daily recipients come from the live user list (a removed or disabled account is not in
+  it; `perms.macro === false` is skipped; test); `presence/seen.json` holds an account key and an ISO time only (`clean`).
+- **Seen, left, said to the owner**: (a) sign-up is still timing-distinguishable (a new address waits for its email, a known one
+  does not) and its "username is taken" check passes for the request's own email, so someone who guesses a waiting request's
+  username can confirm its email; both need the 502 / 409 answers people rely on, and are limited to 5 tries an hour per
+  address. (b) Every signed-in member can read the other members' usernames and names (battle invites, by design) and the
+  coach's spend and budgets (`GET /api/chronos-coach`). (c) All per-IP and per-account limits are in memory per Worker
+  instance. (d) A request body is read whole before any size check (the platform's limit applies). (e) Battle standings are
+  each player's own report (a changed page can report any %), and a `stat` is still accepted after the host ends the battle.
+  (f) The emails' HTML part is written as one line of several thousand characters, over SMTP's 998-character line limit;
+  whether Gmail's relay minds was not checked (the Email Service binding is the first route). (g) `HOSTS` in `api/signup.js` and `api/_passkey.js` still names the deleted `meridianx`
+  workers.dev host. **No secret needs rotating from this review** (none was found in an answer, a log line or a file).
 
 ## The veteran's briefing (9 Nov 2026, owner: "he needs to give us key insights and near-inside information, and he needs to make hypotheses with some base from what happened in the past, levels of the price, and what he knows")
 `council/briefing.mjs`, built by `council/veteran.mjs` → `veteran.json.briefing`. "Near-inside information" = early, careful
@@ -4954,6 +5109,62 @@ reads its output. ICT is Fred's separate edge: no `ict/` file is read and an `ic
   Holm, strong; already answered by `replica-sides` FAIL), keep off live (n 1,009, −0.09R, t −2.00, strong), skip 04-08 UTC
   (n 214, t −2.57, not Holm).
 
+## Trade review audit: Holm over every test, by-day t, the regime note (20 Nov 2026, owner: "make the brain more useful and more correct")
+`council/trade-review.mjs`, the Analyst's `postMortem` / `analystReviews`, and the validation side of `api/_trade-review.js`,
+audited against council-data of 20 Nov 15:07 UTC. Proposals only, as before (absolute rule 3): no rule, size, stop, filter,
+config or page changed; every new field of `research/trade-review.json` is optional and the old ones keep their meaning.
+Tests (each failed on the code before): `tests/trade-review-audit.test.mjs` (11), three in `tests/analyst-postmortem.test.mjs`,
+one in `tests/trade-review-ai.test.mjs`; `tests/trade-review-ledger.test.mjs` rows now span days.
+**Defects fixed** (before → after on that day's data):
+- **Holm ran over the flagged comparisons only** (15 of the 107 made), so it corrected for the tests that had already passed
+  |t| >= 2: 9 flags "survived", 3 do (shadow scalp on SOL, the replica's buys / sells). Now over every comparison (`splitTestKey`;
+  buys against sells is ONE test, so 100 tests), on the unrounded p (`pRaw`, non-enumerable). The one strong proposal of the day
+  ("Skip entries 04-08 UTC" on the replica's research trades, p 0.002) is no longer strong: strong 1 → 0.
+- **The "+1R close" counterfactual was flattered.** The Trader updates `mfe` only on candles where the trade did not exit, so a
+  win that ran to its target inside one candle keeps an MFE under its own R and was left unchanged by the counterfactual (25 of
+  1,032 trades with an MFE). `reached1R` = max(MFE, R) >= 1, `lockDiff`: shadow scalp −0.092R (t −1.13) → −0.119R (t −1.45),
+  shadow intraday −0.354R (t −3.11) → −0.397R (t −3.47); "reached +1R" 260 → 272 scalps. (A LOSS with MFE >= 1 was honest: it
+  reached +1R on an earlier candle.)
+- **Counted twice**: the two live gold replica trades of 4 Nov are in trades.json and research.json; a research record whose id
+  is in trades.json is read from trades.json (as the mirror does). Replica research 1,367 → 1,365 trades, −111.20R → −112.20R.
+- **Wrong name**: a ten-market stream was named after its last record ("USD/CHF replica"); a multi-market stream drops the
+  market label ("Replica"). `systems[].markets`.
+- **Proposed away a profitable half**: "Take only sells in Position (shadow)" while its buys made +0.17R a trade (n 13). A
+  `weak-*` subset is proposed only when its own mean is negative (the flag stays). Proposals 5 → 4.
+- **A t on two trades** ("Gold daily engulf (live): t −34.33", n 2): under `STREAM_N` 10 the head says "too few to judge".
+- **Stale after the owner's decisions**: `STUDIED['replica|keep off live']` said the replica "has been a paper shadow"; it is
+  live again since 20 Nov. `OWNER_DECISIONS` (keyed by the Trader's user rule id; a test checks the id exists) + `decisionFor`:
+  a proposal on a stream the owner has just decided, with fewer than 10 trades closed since, carries `decided` and is not
+  strong. A LIVE record of a system now in `config.ownerShadow` is history (`shadowed`, in the head): nothing is proposed.
+  `totals.liveNow` leaves retired and shadowed live records out (`live`: 39 trades, −26.97R; `liveNow`: 4, −1.11R).
+- **"After costs" said of rows with no cost** (the forward check's `basis` on research rows): now "before costs (no cost on record)".
+- **Language model**: it could propose for a stream the desk itself proposes nothing for (retired, stopped, shadowed);
+  `parseAnswer` discards those (`closedWhy`), the request carries `closed`, `tByDay` and `regimeNote`.
+- **Analyst post-mortems** (latent: 0 of the 28 on file change, all are unmoved stops at −1R): a loss closed by its TIME limit
+  was written up as "stopped" and could be tagged hunt / noise / news (no stop was hit: no stop is judged, `evidence.exit
+  'time'`); "how far past the stop" assumed the stop sat 1R away, wrong for a trailed or break-even stop (`stopAtR` from `r0`);
+  a `void` loss gets no post-mortem. `PM_VERSION` unchanged, so no stored review is re-stamped.
+**Improvement 1, the by-day t.** Trades of one UTC day share that day's move (twins on correlated pairs, overlapping holds), so
+a per-trade t counts dependent trades as independent. `clusterT` / `clusterDiff` (cluster-robust, CR1) by fill day and by close
+day, the weaker of the two reported (`rowsT` / `rowsDiff`); null under `DAY_N` 5 days ("too few days to judge"). On `stats().net.byDay`,
+every `vsRest.byDay`, `lock1R.byDay`, each flag (`byDay`, `robust`, and in its text), proposal evidence. **Strong needs both**,
+and the ledger's "held" too (`FWD.DAYS`). Shadow Position +0.98R a trade: t 2.87 per trade, 1.63 over 8 days; shadow Intraday
+2.86 → 2.09 (14 days); Retrace scalp −3.41 → −2.14 (13); the legacy live Scalp's t −8.25 rests on 3 days (no by-day t). Ledger:
+1 held, 2 faded, 1 unclear, 2 too few → 0 held, 2 faded, 2 unclear, 2 too few. Not a full answer to multi-day overlap: a floor.
+**Improvement 2, the regime note** (`regimeOf`, `regimeForSide`). Per market the move = last fill price against the first; a
+buy in a market that rose traded WITH the move. On that day's data the better side was the side of the market's own move in 10
+of 10 markets for the replica's research trades and for the shadow scalps, 6 of 7 for the retrace scalps; replica with the
+move +0.34R (n 638) against −0.45R (n 727), t 10.60, against the side split's t −8.27: what `replica-sides` found. A side flag
+that this explains carries `regime` (in the proposal's `why`, so the page shows it unchanged), is not strong, and a forward
+check that "holds" in the same move says "the regime again, not evidence for the rule". The direction is known only
+afterwards: a reading, never a rule.
+**Sound, left as it was**: the closed set (42 duplicates, 98 missed, 25 void research rows, replay rows and open trades never
+counted; no ICT file or ICT demo account read; the drain account's copies still read for slippage); R after costs on every
+closed trades.json record (1,054 of 1,054 carry a cost); the ledger's forward check reads only rows closed strictly after
+`recordedAt`; retired / stopped follow `focusSetups` (now empty) and `shadowCut`. Not done: the demo slippage t is still per
+trade; hour and session splits get no regime reading; the page does not show `byDay` or `regime` as fields yet (they are in the
+flag and proposal texts it already prints).
+
 ## Edge check and the replica's sides (17 Nov 2026, owner: "Try to check the edges which ones can we improve and focus like the replica")
 An evidence review and one pre-registered study; no live rule, size, filter, stop, config, Trader or mirror code changed. The
 owner's document is `research/proposals/2026-11-17-edge-check.md` (decisions: `docs/owner-decisions.md` items 57-59, open).
@@ -5136,6 +5347,47 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   positive in both windows and 40 of 40 placebos beaten, so a faint tilt, not an edge. GBP/JPY alone clears its checks (+0.050R,
   t 2.63, Holm p 0.020), CHF/JPY loses. By the pre-registered reading USD/JPY's result stands alone (one market of eleven); its
   forward record is the judge. Nothing live changed.
+- `usdjpy-vb-feed` (pre-registered 20 Nov 2026): USD/JPY T1 on a second feed, HistData M1 (council-data, `histStampUtc`) grouped
+  to 5m, 2018 → Oct 2026. **PASS**: +0.086R a trade net (n 1,582, month t 2.91); OANDA mid on the same window +0.073R (t 2.48);
+  same side on 100 % of the 1,575 days both traded, daily R correlation 0.98. Not an artefact of OANDA's candles; same years as
+  `fx-vol-breakout` (a feed check, not new evidence). Nothing live changed.
+- Two breakouts as one book (20 Nov 2026, accounting, `research/proposals/2026-11-20-two-breakouts.md`): gold T1 (C1) + USD/JPY
+  T1 at 1R each from the forward baselines, Jan 2021 - Oct 2026 (in sample): monthly correlation 0.03, book month t 3.47 (gold
+  2.70, USD/JPY 2.28), +35.8R a year, worst drawdown 42.9R. No verdict; the forward records judge.
+- `usdjpy-red-folder` (pre-registered 20 Nov 2026): `red-folder-surprise`'s design on USD/JPY (HistData M1, cost 0.015 %).
+  **FAIL**: T+5 → T+60 with the miss −0.019 % (2018-21, n 24) and +0.041 % (2022 → Apr 2025, n 58, t 0.90). The first 5 minutes
+  went the way of the miss on 65 of 82 releases and release → T+60 +0.41 % out of sample (t 5.37), not tradable: the dollar,
+  like gold, moves at once. Know the side before the print; do not chase after it. Nothing live changed.
+- `usdjpy-vb-k` (pre-registered 20 Nov 2026): USD/JPY T1 at k 0.3-0.7 (gate: k 0.5 reproduces both published studies).
+  **BROAD**: net positive at every k in 2005-15 AND 2016 → now; pooled +0.097R (k 0.3, t 4.28) to +0.049R (k 0.7, t 2.69); k 0.5
+  +0.071R (n 4,168, t 3.86). Not a lucky setting; k stays 0.5 (no setting is adopted from this). Nothing live changed.
+- `yen-us-yields` (pre-registered 20 Nov 2026): the Japan brief's "global yields dominate" as a forecast: a 4-week US 10-year
+  move over 25 bp, then USD/JPY over the next 20 sessions (FRED DGS10, OANDA daily, 1,001 weeks 2007-26). **FAIL, 0 of 2**: up
+  t 0.63, down t −1.08 (both the claimed way, neither close). Same-4-week correlation 0.51: they move together, the move does not
+  lead. Nothing live changed.
+- USD/JPY T1's risk profile (20 Nov 2026, accounting, `research/proposals/2026-11-20-usdjpy-risk.md`, from the forward baseline,
+  2016-26, in sample): +131.7R, worst drawdown 33.8R (Dec 2022 - Oct 2023), 574 days below a high, 3 losing years (2023 −15.4R).
+  At 0.25 % a trade about +3 % a year with an 8.4 % drawdown. No verdict.
+- `yen-gold` (pre-registered 20 Nov 2026): the macro skill's "falling USD/JPY helps gold": a 4-week USD/JPY move over 2 %, then
+  gold's next 20 sessions (OANDA daily, 1,013 weeks 2007-26). **FAIL, 0 of 2**: yen strong t 0.96 (gold +0.9 % vs +0.5 % on all
+  weeks), yen weak t −0.91; both the claimed way, halves agree in sign, neither close. A faint lean at most; the Gold Macro Score
+  and the driver stack's carry row are unchanged. Nothing live changed.
+- `audjpy-leads` (pre-registered 20 Nov 2026): the macro skill's "AUD/JPY turns before equities" on S&P 500 and Nasdaq 100
+  (OANDA daily, 1,012 weeks 2007-26). **FAIL, 0 of 4**: AUD/JPY up first finds nothing (t −0.05 / 0.32); AUD/JPY down while the
+  index rose was followed by weaker indices (t −2.12 / −2.26, same sign in both halves) but Holm p 0.10: a near miss on data now
+  read. Nothing live changed.
+- `vix-curve` (pre-registered 20 Nov 2026): an inverted VIX curve (VIX above VIX3M, FRED, 91 weeks in 43 episodes 2008-26) and
+  the next 20 sessions. **FAIL, 0 of 2**: USD/JPY −0.20 % vs +0.18 % on other weeks (t −0.79), gold +0.47 % vs +0.57 % (t −0.10).
+  Acute stress says nothing tradable about the desk's two markets a month on. Nothing live changed.
+- `oil-hawkish` (pre-registered 20 Nov 2026): the macro skill's "slow, persistent oil rise = hawkish" (WTI +15 % in 63 sessions,
+  up in each 21-session block; 128 weeks, 52 episodes 2007-26). **FAIL, 0 of 2**: USD/JPY nothing (t 0.22); gold weaker after
+  (−0.11 % vs +0.89 %, t −2.10) but Holm p 0.07 and almost all in 2017 on: a near miss on data now read. Nothing live changed.
+- `pgm-vol-breakout` (pre-registered 20 Nov 2026): T1 on platinum and palladium, OANDA M5 2016 → now, cost 0.30 % / 0.20 % of
+  price (`gold-drd-pgm`'s, not measured). **FAIL**: pooled −0.181R a trade net (n 4,082, month t −8.67); before costs +0.060R
+  (palladium +0.072R), so the verdict rests on the assumed cost. Nothing live changed.
+- `pgm-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the platinum / palladium T1 trades at the demo's measured hourly
+  spreads (tick probe: XPTUSD 32-57 bp, XPDUSD 64-91 bp of price, wider than the assumed costs). **FAIL**: −0.474R a trade net
+  (t −17.85). T1 on the metals other than gold is closed. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
@@ -5145,6 +5397,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   filled, month t 3.11; OANDA mid +0.153R before costs; entry slippage 0.012R). Cautions: the ten best trades carry 75 %, buys
   +0.277R vs sells +0.028R (2005-26 mid: buys +0.148R, sells +0.001R): part may be USD/JPY's drift. In-sample years; the forward
   record judges. Nothing live changed.
+- `fx-majors-vb-early` (pre-registered 20 Nov 2026): T1 on the five majors other than USD/JPY (EUR/USD, GBP/USD, AUD/USD,
+  USD/CAD, USD/CHF) on 2005-2015, years no study had read for them; same rule, cost and placebo. **FAIL**: pooled +0.013R a trade
+  net (n 10,699, month t 0.93; gross +0.038R; 2x cost −0.013R; 2005-10 +0.025R, 2011-15 −0.002R; 40 of 40 placebos beaten); no
+  market clears its checks (best USD/CHF +0.051R, t 1.86, Holm p 0.157; USD/CAD −0.045R). A faint tilt before costs, not an edge:
+  USD/JPY stands alone among the six majors in both decades. Nothing live changed.
 - `energy-vol-breakout` (pre-registered 20 Nov 2026): T1 on WTI, Brent and natural gas, OANDA M5 2016 → now, 0.1 % of price a
   round trip. **FAIL**: pooled −0.014R a trade net (n 5,221, month t −0.85); before costs +0.059R, so the verdict rests on the
   assumed cost (the demo's energy spreads are not measured). Nothing live changed.
@@ -5154,6 +5411,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   long and short random entries on EVERY tradable day, no day or side chosen by the breakout. **PASS**: T1's buys +0.148R a trade
   (n 1,998) vs long at a random time +0.026R, 40 of 40 seeds, both halves; sells +0.001R vs short −0.056R (reported). The breakout
   entry adds about 0.06-0.12R a trade beyond USD/JPY's drift. Nothing live changed.
+- `usdjpy-vb-exit` (pre-registered 20 Nov 2026): USD/JPY T1 (k 0.5) with exits 12:00 / 15:00 / 18:00 UTC and a 17:00 New York day
+  (gate: 21:00 / 00:00 UTC reproduces both published studies). **BROAD**: net positive in 2005-15 AND 2016 → now at all four, month
+  t ≥ 2 at 4 of 4 (pooled 15:00 +0.086R t 4.52, 18:00 +0.078R, rule +0.071R, NY day +0.049R t 2.70, 12:00 +0.039R t 2.23; 12:00
+  thin after 2016, +0.014R). The rule stays 21:00 / 00:00 UTC (nothing adopted). Nothing live changed.
 - `energy-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the energy T1 trades at the demo's measured hourly spreads (tick
   probe; broker names XTIUSD / XBRUSD / XNGUSD; WTI and Brent about 0.03 % of price, gas about 0.24 %). **FAIL**: pooled −0.003R a
   trade net (month t −0.17); gas −0.088R (t −3.24) sinks it. WTI +0.031R (t 1.33) and Brent +0.047R (t 1.71) are positive in both
@@ -5161,3 +5422,13 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
+
+## Discretion: taken against skipped signals (20 Nov 2026, owner: "the difference is discretion on all edges, because they work")
+`research/edge/discretion` (pre-registered; read-only on council-data; aggregates only, never a person's trade, note or name).
+Do the signals a person took before the outcome beat the ones they skipped, per stream (ICT its own section)? **TOO FEW TO
+JUDGE: 0 take / skip decisions stamped before the outcome exist** (`ict/desk.json` was never written to council-data; the 8
+human loss reviews are all after the close and losses only; no council system records a choice). Bar fixed for later: 20 a
+side, Welch t >= 2, Holm. Power arithmetic: ICT A-setup per-unit R sd 1.69R (n 259), so +0.3R a trade needs about 254 a side
+for an even chance of t 2, +0.5R about 92. Proposal for the owner (nothing built): `research/proposals/2026-11-20-discretion.md`
+(a take / skip + reason + confidence stamped by the server before the outcome on every signal, "taken by a person" beside "all
+signals"). Never quote picked examples as evidence of discretion. Test: `tests/discretion.test.mjs`.

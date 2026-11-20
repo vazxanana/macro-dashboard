@@ -210,17 +210,22 @@ async function handle(req, res, d = {}) {
       if (!send) return res.status(503).json({ error: OFF_RESET });
       const ip = G.ipOf(req), secs = G.hit('forgot', ip, 5, 3600e3, now); if (secs) return G.tooMany(res, secs);
       const e = emailOf(b.forgot); if (!e) return res.status(400).json({ error: 'Type the email address of your account.' });
-      if (!G.hit('forgot-mail', sha(e), 1, COOL_MS, now)) {
-        const users = await A.userList({ ...deps, builtIns }), k = Object.keys(users).find((j) => users[j] && users[j].email && String(users[j].email).toLowerCase() === e);
-        if (k) {
+      // 20 Nov 2026 review: the answer leaves BEFORE the member's link is stored and mailed (the Worker keeps the handler running
+      // after its answer, cloudflare/src/adapter.mjs waitUntil), so neither the time it takes nor a failure of that work tells a
+      // known address from an unknown one. The user list is read for both before the answer.
+      let k = null;
+      if (!G.hit('forgot-mail', sha(e), 1, COOL_MS, now)) { const users = await A.userList({ ...deps, builtIns }); k = Object.keys(users).find((j) => users[j] && users[j].email && String(users[j].email).toLowerCase() === e) || null; }
+      res.status(200).json({ ok: true, message: FORGOT });
+      if (k) {
+        try {
           const t = token(), resets = (await store.get(RESETS)).filter((r) => r && r.exp > now && r.u !== k).slice(-CAP);
           resets.push({ u: k, tokenHash: sha(t), at: now, exp: now + RESET_MS }); await store.put(RESETS, resets);
           const link = `${originOf(req)}/market-structure.html#reset=${t}`;
           await send(e, 'Reset your password · Aureum Desk', `Someone asked to change the password of your Aureum Desk account.\n\nChoose a new one here (the link works for one hour, once):\n${link}\n\nIf it was not you, ignore this email: your password stays as it is.`,
             html(['We received a request to reset the password for your Aureum Desk account.', 'Choose a new password with the button below. For your security, the link works once and expires in one hour.'], link, 'Reset password', { title: 'Reset your password', note: 'If you did not ask for this, you can ignore this email: your password stays as it is and nobody can change it without this link.' })).catch(() => console.log('[signup] a reset email could not be sent'));
-        }
+        } catch (er) { console.log('[signup] a reset link could not be stored'); }
       }
-      return res.status(200).json({ ok: true, message: FORGOT });
+      return res;
     }
 
     // ---- reset with a token ----
@@ -265,7 +270,7 @@ async function handle(req, res, d = {}) {
     try {
       await send(email, 'Confirm your email address · Aureum Desk', `Hello ${name},\n\nThank you for signing up to Aureum Desk. Confirm your email address with this link (it works once and expires in 24 hours):\n${link}\n\nThen the owner approves your seat, and you sign in with the password you chose.\nIf you did not sign up, ignore this email.`,
         html([`Hello ${name},`, 'Thank you for signing up to Aureum Desk. Please confirm that this is your email address to continue.', 'Once confirmed, your request goes to the desk owner for approval. We will email you as soon as your seat is ready, and you sign in with the password you chose.'], link, 'Confirm email address', { title: 'Confirm your email address', note: 'This link works once and expires in 24 hours. If you did not create an account, you can safely ignore this email.' }));
-    } catch (e) { console.log('[signup] a confirmation email could not be sent'); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.', why: e && e.tries ? e.tries : [redact(e)] }); }
+    } catch (e) { console.log('[signup] a confirmation email could not be sent:', (e && e.tries ? e.tries : [redact(e)]).join(' | ')); return res.status(502).json({ error: 'The email could not be sent. Try again in a few minutes.' }); }   // 20 Nov 2026 review: no provider text for a visitor (the tries are in the log and, for the owner, in /api/daily?test=email)
     list.push(rec); await store.put(PENDING, list);
     return res.status(200).json({ ok: true, message: SENT, watch });
   } catch (e) { console.error('[signup] failed'); return res.status(e.status === 503 ? 503 : 500).json({ error: 'Account storage is not available right now. Try again in a minute.' }); }
