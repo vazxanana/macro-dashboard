@@ -44,6 +44,7 @@
 <script src="/assets/ms-charts-guide.js?v=d11de693cd" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
+<script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
 <script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
 <script src="/assets/mosha-i18n.js?v=08699888a9" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
@@ -4042,6 +4043,11 @@ html[data-theme="light"] { --mo-on-accent: var(--au-on-primary, #ffffff); }
 /* Luxus's record (14 Nov 2026, assets/mosha-record.js): his own trades measured, for the owner and readers; never put to him. */
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-rules, html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-cycle { display: none; }
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lux { display: none; }
+/* The council's Mosha systems (20 Nov 2026, assets/mosha-systems.js): the bots' own trades with paper and demo executions; never put to the teacher. */
+html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-sys { display: none; }
+#v-mosha .mo-ex { font-size: 12.5px; line-height: 1.45; } #v-mosha .mo-ex + .mo-ex { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+#v-mosha .mo-ex small { display: block; font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-ex-no { color: var(--ink-dim); }
+#v-mosha .mo-sys-l { margin: 0 0 6px; font-size: 13px; } #v-mosha #mo-sys a { color: inherit; text-decoration: underline; }
 html:not([data-role="owner"]) #v-mosha .mo-own, html[data-role="owner"] #v-mosha .mo-tch, html:not([data-mosha="teach"]) #v-mosha .mo-tch, html[data-role="owner"] #v-mosha .mo-rdr, html[data-mosha="teach"] #v-mosha .mo-rdr { display: none; }
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-todo { order: -6; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-teach { order: -3; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lessons { order: -2; } html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-book { order: -1; }
 #v-mosha .mo-tc-lv { grid-column: 1 / -1; border: 1px solid var(--line); border-radius: 10px; padding: 0 14px; } #v-mosha .mo-tc-lv > summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; font: 600 13px var(--sans); color: var(--ink-dim); } #v-mosha .mo-tc-lv > summary small { font-weight: 500; color: var(--ink-faint); } #v-mosha .mo-tc-lv > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -7047,6 +7053,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <p class="ms-note">Log a trade while it is open and it counts in the record. One added after it closed is kept apart: its result was already known. A closed trade keeps its side, entry, stop and target.</p>
       </div>
       <div class="card mo-wide" id="mo-list"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">Loading the log…</div></div>
+      <div class="card mo-wide" id="mo-sys"><div class="ms-k"><span>The council's Mosha systems</span></div><div class="ct-empty">Loading the council's trades…</div></div>
       <div class="card mo-wide" id="mo-rules"><div class="ms-k"><span>What the fixed rules said</span><small>spot gold, after costs · 10 Nov 2026</small></div>
         <div class="ct-tw"><table class="ct-t"><thead><tr><th>Reading, taken every time</th><th>Data</th><th class="n">Trades</th><th class="n">R a trade</th><th class="n">t</th><th>Verdict</th></tr></thead><tbody>
           <tr><td><a href="/edge-lab.html#mosha-level">Tap of an H4 level, M5 breaks, limit at the zone</a></td><td>2020 to Oct 2026</td><td class="n">365</td><td class="n"><b class="neg">−0.35R</b></td><td class="n">−3.10</td><td>Fail</td></tr>

@@ -5000,6 +5000,16 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   weekend candles of the fallback feed (item 56). The M5 trigger that would catch all six is the one `mosha-sweep` /
   `mosha-select` already failed: never present a rule that catches these picked trades as evidence. Never commit the
   owner's or Luxus's individual trades or lesson text (public repository): aggregate counts only.
+- **The council's Mosha systems on the desk** (20 Nov 2026, owner: "why mosha desk doesnt have the trades like ict and executions",
+  "do it"): card `#mo-sys` before `#mo-rules`, `assets/mosha-systems.js` (`window.MS_MOSHA_SYS`: `isMosha`, `copies`, `rowOf`, `build`).
+  One row per forward trade the Trader recorded for Mosha BO (`k: 'mosha-bo'`) and the Mosha cycle (`mcycle`), newest first (40 at
+  most), with two executions in its last cell: **Paper** (the trades.json record: fill, result before and after costs) and **Demo**
+  (the mirror's own record of that trade id: fill, lots, slippage in R, status, times, which demo account; "not copied" with the
+  mirror's reason, or "no copy on file"). Reads `MS_COUNCIL.trades` (event `ms:council`) and, only while the desk is open, the
+  mirror files of `ctrader/mirror-accounts.json` through `msData` (never the ICT account's; at most once a minute). A line per system:
+  recorded / open / closed with R, and "Too few to judge" under 20 closed, else "a forward record, not a tested edge". The note says
+  both are paper shadows whose studies failed. Hidden for the teacher (CSS beside `#mo-rules`) and never drawn for a guest; folds on
+  the simple phone view like the other cards. Display only. Test: `tests/mosha-systems.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
