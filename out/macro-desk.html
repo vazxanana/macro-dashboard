@@ -578,6 +578,7 @@
   .pl-sc li.now { box-shadow: inset 0 0 0 1px var(--line-strong); }
   @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: 1fr; } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } .pl-copy { float: none; width: 100%; margin: 0 0 var(--s3); } }
   @media (pointer: coarse) { .pl-tabs button, .pl-copy { min-height: 44px; } }
+  @media (max-width: 640px) { .dr-top .pl-tabs { flex: 1 1 100%; } .dr-top .pl-tabs button { white-space: nowrap; } }   /* 20 Nov 2026: "World economy" wrapped to two lines beside the day picker */
   /* calmer (19 Nov 2026, owner: "it looks made by an AI"): the three glance columns are columns split by a hairline, not boxes
      inside the card; the Today / This week / This month switch is underlined words */
   @media (min-width: 901px) { .g-grid { gap: 0; } .g-grid .tile { border: 0; border-left: 1px solid var(--line-soft, var(--line)); border-radius: 0; background: none; padding: 4px 20px; }
@@ -1505,17 +1506,23 @@
   var WA_V = { pass: 'Passed its test', fail: 'Tested: failed', inc: 'Inconclusive' };
   // a study link stays on this site: a page of the site and an optional anchor, never another host (20 Nov 2026)
   var WA_HREF = function (l) { l = String(l || '').replace(/^\/+/, ''); return /^[\w-]+\.html(#[\w-]+)?$/.test(l) ? '/' + l : ''; };
+  // 20 Nov 2026 (browser check): display only. The day's range line loses its echo of the label and the caveat every day repeated
+  // (said once under the days); the frame's positioning lines share one caveat; a viewer on UTC is not told the same time twice.
+  var WA_RG_TAIL = 'A size for planning, not a forecast of direction.';
+  var WA_RG = function (t) { t = String(t || '').replace(/^A typical day's move is\s+/i, ''); if (t.slice(-WA_RG_TAIL.length) === WA_RG_TAIL) t = t.slice(0, -WA_RG_TAIL.length).trim(); return t; };
+  var WA_POS_TAIL = /\s*(Positioning, not a tested signal:[^.]*\.)$/;
+  var WA_LOC = function (iso) { return new Date(iso).getTimezoneOffset() === 0 ? '' : ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'; };
   function renderAhead(A) {
     var sec = $('c-ahead'); if (!A || !Array.isArray(A.days) || !A.days.length) { sec.hidden = true; $('one-s-ahead').innerHTML = ''; return; } sec.hidden = false;
     $('wa-sub').textContent = (A.next ? 'next week' : 'the rest of this week') + ', ' + WA_DAY(A.from) + ' to ' + WA_DAY(A.to) + ' · paper only';
     $('wa-lines').innerHTML = (A.lines || []).concat(A.calNote ? [A.calNote] : []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
     $('wa-days').innerHTML = A.days.map(function (d) {
       var h = '<div class="wa-day"><h3>' + esc(d.dow) + ' ' + esc(WA_DAY(d.day)) + ' <small>· ' + esc(d.line) + '</small></h3>';
-      if (d.range && d.range.text) h += '<p class="wa-rg"><b>Gold, typical move:</b> ' + esc(d.range.text) + '</p>';
+      if (d.range && d.range.text) h += '<p class="wa-rg"><b>Gold, typical move:</b> ' + esc(WA_RG(d.range.text)) + '</p>';
       if (d.market) h += '<p class="wa-mk">' + esc(d.market.text) + '</p>';
       if ((d.releases || []).length) h += '<ul>' + d.releases.map(function (r) {
         var iso = new Date(r.t * 1000).toISOString();
-        return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'
+        return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + WA_LOC(iso)
           + (r.exp || r.prev ? '<span class="wa-r">Expected <b>' + esc(r.exp || NA) + '</b>, previous ' + esc(r.prev || NA) + '</span>' : r.src === 'schedule' ? '<span class="wa-r">From the council\'s release schedule: the consensus appears once the week\'s calendar lists it.</span>' : '')
           + (r.nowcast ? '<span class="wa-r wa-nc"><b>Nowcast:</b> ' + esc(r.nowcast.text) + '</span>' : '')
           + (r.prep && r.prep.text ? '<span class="wa-r wa-nc"><b>Nowcast beside the consensus:</b> ' + esc(r.prep.text) + '</span>' : '')
@@ -1527,8 +1534,12 @@
         var f = r.forward && r.forward.verdict && r.forward.verdict !== r.headline ? '<span class="wa-r">Forward record: ' + esc(r.forward.verdict) + '</span>' : '';
         return '<li><span class="wa-chip' + (WA_V[r.verdict] ? ' ' + r.verdict : '') + '">' + esc(WA_V[r.verdict] || r.verdict) + '</span><b>' + esc(r.what) + '</b> <small>(' + esc(r.when) + ')</small>'
           + '<span class="wa-r">' + esc(r.headline) + '</span>' + f + (WA_HREF(r.link) ? '<span class="wa-r"><a class="wa-st" href="' + esc(WA_HREF(r.link)) + '">The study</a></span>' : '') + '</li>'; }).join('') + '</ul>';
-      return h + '</div>'; }).join('');
-    var F = A.frame || {}, fb = (F.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; });
+      return h + '</div>'; }).join('')
+      + (A.days.some(function (d) { return d.range && d.range.text && String(d.range.text).indexOf(WA_RG_TAIL) >= 0; }) ? '<p class="wa-rgn wa-quiet">Typical moves are close to close: a size for planning, not a forecast of direction.</p>' : '');
+    var F = A.frame || {}, pos = (F.positioning || []).map(function (p) { return p && p.text; }).filter(Boolean);
+    var fb = (F.lines || []).filter(function (l) { return pos.length < 2 || pos.indexOf(l) < 0; }).map(function (l) { return '<li>' + esc(l) + '</li>'; });
+    if (pos.length >= 2) { var tails = [], rows = pos.map(function (t) { var m = WA_POS_TAIL.exec(t); if (m && tails.indexOf(m[1]) < 0) tails.push(m[1]); return '<span class="wa-r">' + esc(m ? t.replace(WA_POS_TAIL, '') : t) + '</span>'; });
+      fb.push('<li><b>Positioning (CFTC)</b>' + rows.join('') + tails.map(function (t) { return '<span class="wa-r">' + esc(t) + '</span>'; }).join('') + '</li>'); }
     (F.rulebook || []).forEach(function (r) { fb.push('<li><b>Your rule book:</b> ' + esc(r.text) + (r.caveat ? ' <span class="wa-r">' + esc(r.caveat) + '</span>' : '') + '</li>'); });
     var O = F.odds; if (O) { var row = function (src, l) { return (l || []).length ? '<span class="wa-r">' + esc(src) + ': ' + l.map(function (m) { return esc(m.label) + ' <b>' + Math.round(m.p * 100) + '%</b>'; }).join(' · ') + '</span>' : ''; };
       fb.unshift('<li><b>Prediction markets on the ' + esc(WA_DAY(O.meeting)) + ' Fed decision</b>' + row('Kalshi', O.kalshi) + row('Polymarket', O.polymarket) + '<span class="wa-r">What traders pay, not a forecast of ours.</span></li>'); }
