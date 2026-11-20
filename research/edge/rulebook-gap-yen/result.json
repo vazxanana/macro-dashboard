@@ -1,0 +1,86 @@
+{
+ "study": "rulebook-gap-yen",
+ "built": "2026-11-20",
+ "span": {
+  "DGS2": [
+   "1976-06-01",
+   "2026-11-18"
+  ],
+  "DFEDTARU": [
+   "2008-12-16",
+   "2026-11-20"
+  ],
+  "DFEDTAR": [
+   "1982-09-27",
+   "2008-12-15"
+  ]
+ },
+ "verdict": "B1 hikes priced → USD/JPY up FAIL (t 0.67, Holm 1, halves t 0.55 / 0.19); B2 cuts priced → USD/JPY down FAIL (t -0.04, Holm 1, halves t 1.53 / -0.92)",
+ "tests": {
+  "B1": {
+   "want": -1,
+   "all": {
+    "n": 1001,
+    "nX": 381,
+    "slope": 0.0017,
+    "t": 0.67
+   },
+   "first": {
+    "n": 505,
+    "nX": 225,
+    "slope": 0.002,
+    "t": 0.55
+   },
+   "second": {
+    "n": 496,
+    "nX": 156,
+    "slope": 0.0007,
+    "t": 0.19
+   },
+   "holm": 1,
+   "pass": false
+  },
+  "B2": {
+   "want": 1,
+   "all": {
+    "n": 1001,
+    "nX": 241,
+    "slope": -0.0001,
+    "t": -0.04
+   },
+   "first": {
+    "n": 505,
+    "nX": 65,
+    "slope": 0.0083,
+    "t": 1.53
+   },
+   "second": {
+    "n": 496,
+    "nX": 176,
+    "slope": -0.0032,
+    "t": -0.92
+   },
+   "holm": 1,
+   "pass": false
+  }
+ },
+ "classes": {
+  "hikes": {
+   "n": 381,
+   "usdjpy20": -0.0001
+  },
+  "flat": {
+   "n": 379,
+   "usdjpy20": 0.0019
+  },
+  "cuts": {
+   "n": 241,
+   "usdjpy20": 0.001
+  },
+  "all": {
+   "n": 1001,
+   "usdjpy20": 0.0009
+  }
+ },
+ "weeks": 1001
+}
