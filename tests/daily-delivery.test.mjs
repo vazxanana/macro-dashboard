@@ -111,5 +111,9 @@ test('the cron job: once a day inside the window, AI then notice then email; not
 test('the page reads the summary, the endpoint is wired, no model name or address in the files', () => {
   const rd = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
   assert.ok(rd('macro-desk.html').includes("fetch('/api/daily?brief=1'") && rd('macro-desk.html').includes('id="dr-ai"'));
+  const md = rd('macro-desk.html');
+  // the Macro desk shows the same headline and bullet points as the morning email, as text (never HTML)
+  assert.ok(md.includes('id="dr-ai-h"') && md.includes('id="dr-ai-l"') && md.includes("B.headline") && md.includes("Array.isArray(B.points)"));
+  assert.ok(!/dr-ai-[hl]'\)\.innerHTML/.test(md));
   for (const p of ['api/daily.js', 'api/_daily.js']) assert.ok(!/@gmail|claude-|opus|sonnet|haiku/i.test(rd(p)), p);
 });

@@ -150,7 +150,7 @@ summary … like a person writes it"): subject "Morning note · <day>"; "Summary
 `SYSTEM` asks for the desk analyst's own voice ("we", short sentences, never naming a model or a report) and `parseBrief` refuses
 text that talks of itself; "At a glance" tiles (`glance`: price, normal day, today's odds against the usual rate, from "Where
 markets stand", + the VIX); "On the calendar today" (`agenda`, from the world report's "Today" section); then both reports with
-at most `LINES` 4 bullets a section ("n more on the Macro desk"); signed "The Aureum Desk". The Macro desk's box reads "Summary".
+at most `LINES` 4 bullets a section ("n more on the Macro desk"); signed "The Aureum Desk". The Macro desk's box reads "Summary" and shows the same headline and bullet points as the email (`#dr-ai-h`, `#dr-ai-l`, as text), then the open tab's paragraph.
 **Plain words** (20 Nov 2026, owner: "normal people should be able to understand"): `SYSTEM` asks for everyday words a non-trader understands (a term named is explained in a few words); the tiles say "Moves about x% a day", "n% chance up today", "normally n%", the VIX is "Fear gauge (VIX)"; sections "Prices this morning", "Coming out today"; a "What the words mean" box (`glossary`, `WORDS`) explains each market term the email uses. `?test=email&fresh=1` (owner) writes the day's summary again first (one call; a refused rewrite keeps the good one). `?send=all&day=<day>[&fresh=1]` (owner, 20 Nov 2026: "send to the registered email users") sends the latest report to the 06:30 list now, unmarked, once a day (`state.resent`, marked first), refused when `Sec-Fetch-Site` says another site; counts only. Tests:
 `tests/daily-report.test.mjs`, `tests/daily-delivery.test.mjs`.
 
