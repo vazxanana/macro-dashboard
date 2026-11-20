@@ -4918,3 +4918,4 @@ history reaching at least 1,095 days) puts the demo's quoted gold spread at $0.0
 that cost + 0.05 × M stop slippage T1 nets +0.105R a trade on 2021-26 (n 1,121, month t 2.79) and +0.139R pooled 2007-26 (t 6.47;
 past years charged today's relative spread). The owner's decision is still the 14 Nov proposal (a forward paper / demo record,
 whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hourcost.test.mjs`.
+`marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
