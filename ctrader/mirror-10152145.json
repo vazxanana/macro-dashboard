@@ -14351,7 +14351,8 @@
     "slipR": -0.461,
     "lagSec": 57,
     "alerted": [
-     "open"
+     "open",
+     "closefail"
     ],
     "stopCheckedAt": "2026-11-20T02:36:12.000Z",
     "brokerStop": 3548.65
@@ -14375,14 +14376,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10552.94,
-  "lastRun": "2026-11-20T02:36:12.000Z"
+  "lastRun": "2026-11-20T02:38:34.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T14:13:37.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 432.49, 4.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T14:13:37.000Z",
    "msg": "placed sell limit XAUUSD 0.01 lot at 3711.04 (council m30m1, valid to 2026-11-19T20:12Z)",
@@ -15876,6 +15872,11 @@
   {
    "at": "2026-11-20T02:36:12.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council m30m1)",
+   "trade": "xau-m30m1-1795142115"
+  },
+  {
+   "at": "2026-11-20T02:38:34.000Z",
+   "msg": "close XAUUSD 50418396 failed: POSITION_NOT_FOUND: Position not found with id 50418396",
    "trade": "xau-m30m1-1795142115"
   }
  ],
