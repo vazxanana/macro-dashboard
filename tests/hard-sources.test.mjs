@@ -108,7 +108,7 @@ test('the plumbing: rates against the range, Treasury cash, net liquidity and it
   assert.equal(p.netLiquidity.bn, 5846.74);
   assert.equal(p.netLiquidity.chg4w, -100, 'balance sheet down 50, Treasury cash up 50');
   const lines = S.plumbingLines(p);
-  assert.match(lines[0], /^Dollar liquidity .*: \$5\.85 trillion, down \$100 billion over four weeks; the Treasury holds \$892 billion at the Fed, reverse repo \$2\.4 billion\. A rough gauge of cash in the system, not a signal\.$/);
+  assert.match(lines[0], /^Dollar liquidity .*: \$5\.85 trillion, down \$100 billion over four weeks; the Treasury holds \$892 billion at the Fed, reverse repo \$0\.4 billion\. A rough gauge of cash in the system, not a signal\.$/);
   assert.match(lines[1], /^Overnight funding: SOFR 3\.91%, fed funds 3\.88%, inside the Fed's 3\.75-4\.00% range \(SOFR 1 bp over the rate on reserves\)\.$/);
   assert.match(S.plumbingLines({ ...p, sofrOverIorb: 7 })[1], /reserves are getting tighter/);
   assert.equal(S.plumbingOf({}), null);
