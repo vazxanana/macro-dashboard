@@ -5409,7 +5409,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-20T12:02:07.000Z",
     "councilEntry": 3575.54,
     "stop": 3596.23,
@@ -5423,10 +5423,12 @@
     "slipR": -0.011,
     "lagSec": 59,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-20T12:02:07.000Z",
-    "brokerStop": 3596.46
+    "brokerStop": 3596.46,
+    "closedAt": "2026-11-20T15:25:07.000Z"
    },
    "xau-replica-1795187726-s": {
     "positionId": "50568415",
@@ -5461,7 +5463,7 @@
    "startBalance": 5274.6
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12645.52 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 12686.88 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5469,15 +5471,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12645.52,
-  "lastRun": "2026-11-20T15:22:47.000Z"
+  "balance": 12686.88,
+  "lastRun": "2026-11-20T15:25:07.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T08:15:28.000Z",
-   "msg": "USDCHF position 48343327 closed at the broker",
-   "trade": "usdchf-replica-1794381896-b"
-  },
   {
    "at": "2026-11-11T08:16:55.000Z",
    "msg": "GBPUSD position 48321689 closed at the broker",
@@ -6972,6 +6969,11 @@
    "at": "2026-11-20T15:16:39.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council replica)",
    "trade": "xau-replica-1795187726-s"
+  },
+  {
+   "at": "2026-11-20T15:25:07.000Z",
+   "msg": "XAUUSD position 50523115 closed at the broker",
+   "trade": "xau-replica-1795176068-s"
   }
  ],
  "limits": {
