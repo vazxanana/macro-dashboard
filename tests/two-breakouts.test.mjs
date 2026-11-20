@@ -18,5 +18,5 @@ test('book sums the two streams by month; drawdown on hand-made rows', () => {
 test('the note quotes the json', () => {
   const md = fs.readFileSync(new URL('../research/proposals/2026-11-20-two-breakouts.md', import.meta.url), 'utf8'), w = J.window;
   assert.ok(md.includes((Math.round(w.book.monthT * 100 + 1e-9) / 100).toFixed(2)) && md.includes('0.03') && md.includes('in-sample'));
-  assert.equal(w.monthlyCorr, 0.034);
+  assert.equal(w.monthlyCorr, 0.034); assert.equal(w.daily.bothLose, 293); assert.ok(md.includes('293 days'));
 });

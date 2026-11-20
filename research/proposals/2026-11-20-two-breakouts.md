@@ -17,3 +17,7 @@ alone and its return per unit of worst drawdown is better (0.83 R a year per R o
 
 What it does not change: both forward records started this month (gold 13 Nov, USD/JPY 20 Nov) and are the judge; item 63
 (a USD/JPY demo stream) stays the owner's decision, with "wait for the forward record" recommended. Nothing live changed.
+
+**Day by day** (867 days both traded): correlation 0.10, and both lost on 293 days against about 270 expected if they were
+independent. So the two are a little more linked on single days than the monthly figure suggests (likely the days the dollar
+moves sharply), but they still diversify most of the time.
