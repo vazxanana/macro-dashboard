@@ -3124,7 +3124,8 @@ parser takes any "auction ... date" key; first read: 2-year $69bn (23 Nov), 5-ye
 alone and keeping its last copy). About 80 candidate keyless sources were read once from a GitHub runner first (probe 3, taken out
 after use); what answered and is read every macro round into `macro/hard-data.json`:
 - `priced` (Kalshi `events?series_ticker=X&with_nested_markets=true`, `LADDERS`: KXCPICORE, KXCPI, KXPCECORE, KXPAYROLLS, KXU3, KXGDP,
-  KXFED (3 meetings), KXRECSSNBER, KXGOLDMON; 700 ms between calls, a runner got 429 after about 13 in a row): an "Above x" ladder
+  KXFED (3 meetings), KXRECSSNBER, KXGOLDMON, KXJOBLESSCLAIMS ("At least x" rungs), KXISMPMI, KXADP, and KXCBDECISIONJAPAN read as named
+  outcomes (`choice`: the most likely one, the next from 10 %); 700 ms between calls, a runner got 429 after about 13 in a row): an "Above x" ladder
   (`ladderOf`: price = middle of a bid / ask at most `WIDE` 0.15 apart, else the last trade; never rising with x) becomes the most
   likely print and its chance where the print has a grid (`buckets`, step 0.1; the Fed's upper bound 0.25), else the ladder's middle
   (`quantile`); fewer than `MIN_RUNGS` 3 priced rungs = not read. Always "what traders pay: not a consensus survey and not a forecast of ours".
@@ -3144,9 +3145,16 @@ release (same type, closing within 36 h) -> the release's `priced` and one top l
 gold's implied day under "What we expect" and yesterday's / today's auction results under what happened. `hist` records the leading
 print and its chance (`priced`) and GVZ; `moves` says how that chance changed over a day and a week (kind `priced`). Answered 403 or
 unusable from a runner: Cboe delayed quotes and put/call, LBMA prices, GLD holdings (PDF / xlsx), iShares (HTML), the Atlanta Fed
-tracker (404). Answered but not used yet: BLS `bls.ics` and BEA `release_dates.json` (official release times), Polymarket economy
+tracker (404). Answered but not used yet: Polymarket economy
 tags, NY Fed primary-dealer and SOMA files, the 5-7 MB Cleveland year / quarter nowcast files. Context only: no rule, call or trade
 reads any of it. Tests: `tests/hard-sources.test.mjs`, `tests/hard-board.test.mjs`.
+**Later the same day**: `official` = the agencies' own release calendars (`collectOfficial`: BLS `bls.ics`, times in New York through
+`nyToUnix`, and BEA `release_dates.json`; `OFFICIAL` maps a title to the Week ahead's type; 2 days back to 21 ahead; one agency
+failing leaves the other): a board group "The agencies' own release dates", and `onOfficial(hd, type, t)` lets the Week ahead say
+"Check the date: … the agency's own release calendar has no such release that day" (only when that agency's calendar was read and
+covers the day; null = say nothing). `besideNowcast` puts the Cleveland Fed nowcast beside a priced CPI / PCE print ("rounds to the
+same print" / "the model and the traders differ"). Probe 4 (taken out after use) found no open Kalshi series for PPI, retail sales,
+headline PCE, JOLTS or the ECB.
 
 ## Nowcast against consensus: a forward record (20 Nov 2026)
 `council/prep-record.mjs` (pure + `updateFile`; run by `veteran.mjs` `run()` right after the Week ahead is built → council-data

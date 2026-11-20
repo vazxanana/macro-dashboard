@@ -44,6 +44,10 @@ export const LADDERS = [
   { key: 'fed', series: 'KXFED', name: 'the Fed\'s target rate (upper bound)', unit: '%', step: 0.25, many: 3 },
   { key: 'recession', series: 'KXRECSSNBER', name: 'a US recession', binary: true, many: 2 },
   { key: 'gold', series: 'KXGOLDMON', name: 'gold', unit: '$' },
+  { key: 'claims', series: 'KXJOBLESSCLAIMS', name: 'initial jobless claims', unit: 'count' },
+  { key: 'ism', series: 'KXISMPMI', name: 'the ISM manufacturing index', unit: 'level' },
+  { key: 'adp', series: 'KXADP', name: 'ADP private payrolls', unit: 'jobs' },
+  { key: 'boj', series: 'KXCBDECISIONJAPAN', name: 'the Bank of Japan\'s decision', choice: true },
 ];
 export const MIN_RUNGS = 3;      // a ladder with fewer priced rungs is not read
 export const WIDE = 0.15;        // a bid / ask further apart than this is not a price: the last trade is used instead
@@ -56,10 +60,10 @@ export function priceOf(m) {
   if (last != null && last > 0 && last < 1) return last;
   return two ? (bid + ask) / 2 : null;
 }
-// The threshold in a rung's label: "Above 0.2%", "Above -25,000", "Above $3523.99", "Above 4.25%"; else the market's floor_strike.
+// The threshold in a rung's label: "Above 0.2%", "Above -25,000", "Above $3523.99", "Above 4.25%", "At least 200,000"; else the market's floor_strike.
 export function thresholdOf(m) {
   const s = String(m.yes_sub_title || m.subtitle || '');
-  const a = /(?:above|over|more than|greater than|>)\s*(-?\$?-?[\d,]*\.?\d+)/i.exec(s);
+  const a = /(?:above|over|more than|greater than|at least|>)\s*(-?\$?-?[\d,]*\.?\d+)/i.exec(s);
   if (a) return num(a[1]);
   return num(m.floor_strike);
 }
@@ -122,6 +126,11 @@ export function readEvent(L, e) {
     const m = e.markets[0], p = m ? priceOf(m) : null; if (p == null) return null;
     return { ...base, p: r2(p), volume: Math.round(num(m.volume_fp != null ? m.volume_fp : m.volume) || 0), text: `${L.name} in ${period || 'the period'}: ${pct(p)}` };
   }
+  if (L.choice) {   // named outcomes, one market each: the most likely one, and the next when it has a tenth or more
+    const opts = e.markets.map((m) => ({ label: String(m.yes_sub_title || m.subtitle || '').replace(/[^\w %.+-]/g, '').trim().slice(0, 40), p: priceOf(m) })).filter((o) => o.label && o.p != null && o.p >= 0 && o.p <= 1).sort((a, b) => b.p - a.p);
+    if (opts.length < 2 || opts[0].p < 0.05) return null;
+    return { ...base, options: opts.slice(0, 4).map((o) => ({ label: o.label, p: r2(o.p) })), text: `${L.name}${period ? ` on ${period}` : ''}: most likely "${opts[0].label}" (${pct(opts[0].p)})${opts[1].p >= 0.1 ? `, then "${opts[1].label}" (${pct(opts[1].p)})` : ''}` };
+  }
   const { rungs, volume } = ladderOf(e.markets);
   if (rungs.length < MIN_RUNGS) return null;
   const mid = quantile(rungs, 0.5), out = { ...base, rungs, volume };
@@ -138,6 +147,9 @@ export function readEvent(L, e) {
   if (L.key === 'payrolls') { const k = rungs.find((r) => r.x === 100000); out.text = `${L.name} for ${period}: the middle of the ladder is about ${jobs(mid)} jobs${k ? `, ${pct(k.p)} on more than 100,000` : ''}`; }
   else if (L.key === 'gold') { const lo = quantile(rungs, 0.8), hi = quantile(rungs, 0.2); out.lo = lo == null ? null : Math.round(lo); out.hi = hi == null ? null : Math.round(hi);
     out.text = `${L.name} on ${period}: the middle of the ladder is about $${Math.round(mid).toLocaleString('en-US')}${lo != null && hi != null ? `, a 60% chance priced between $${Math.round(lo).toLocaleString('en-US')} and $${Math.round(hi).toLocaleString('en-US')}` : ''}`; }
+  else if (L.unit === 'jobs') out.text = `${L.name} for ${period}: the middle of the ladder is about ${jobs(mid)} jobs`;
+  else if (L.unit === 'count') out.text = `${L.name} for the week to ${period}: the middle of the ladder is about ${(Math.round(mid / 1000) * 1000).toLocaleString('en-US')}`;
+  else if (L.unit === 'level') out.text = `${L.name} for ${period}: the middle of the ladder is about ${mid.toFixed(1)} (above 50 = growing)`;
   else out.text = `${L.name} for ${period}: the middle of the ladder is ${sign(mid)}%`;
   return out;
 }
@@ -429,9 +441,9 @@ export function board(hd, { goldPx = null } = {}) {
   const P = hd.priced;
   if (P && P.items) {
     const one = (k) => (P.items[k] || [])[0];
-    const prints = ['coreCpi', 'cpi', 'corePce', 'payrolls', 'u3', 'gdp'].map(one).filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.' + besideNowcast(hd, x));
+    const prints = ['coreCpi', 'cpi', 'corePce', 'payrolls', 'u3', 'adp', 'claims', 'ism', 'gdp'].map(one).filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.' + besideNowcast(hd, x));
     const fed = (P.items.fed || []).filter((x) => x.likely).map((x) => `The Fed's target rate after ${x.period}: most likely ${x.likely[0].v.toFixed(2)}% upper bound (${pct(x.likely[0].p)})${x.likely[1] && x.likely[1].p >= 0.1 ? `, then ${x.likely[1].v.toFixed(2)}% (${pct(x.likely[1].p)})` : ''}.`);
-    const rest = [...(P.items.recession || []).filter((x) => x.p >= 0.05), one('gold')].filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
+    const rest = [...(P.items.recession || []).filter((x) => x.p >= 0.05), one('gold'), one('boj')].filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
     add('priced', 'What traders price for the next prints', 'Kalshi prediction market', P, [...prints, ...fed, ...rest, PRICED_TAIL]);
   }
   const A = hd.auctionResults;
@@ -447,7 +459,7 @@ export function board(hd, { goldPx = null } = {}) {
 }
 // The priced print(s) for one release: `type` = the Week ahead's release type, `t` = its time (unix seconds). Only a ladder
 // that closes within a day and a half of the release is the same print.
-const BY_TYPE = { CPI: ['coreCpi', 'cpi'], PCE: ['corePce'], NFP: ['payrolls', 'u3'], GDP: ['gdp'], FOMC: ['fed'] };
+const BY_TYPE = { CPI: ['coreCpi', 'cpi'], PCE: ['corePce'], NFP: ['payrolls', 'u3'], GDP: ['gdp'], FOMC: ['fed'], ISM: ['ism'] };
 export function pricedFor(hd, type, t) {
   const P = hd && hd.priced && hd.priced.items; if (!P || !BY_TYPE[type]) return null;
   const hits = [];

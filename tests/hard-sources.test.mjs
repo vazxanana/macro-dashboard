@@ -229,3 +229,28 @@ test('the official calendar in the collector: one agency failing still leaves th
   const c = await H.collect({ now, fetchFn: async () => ({ ok: false, status: 503, text: async () => '' }), prev: a });
   assert.match(c.sources.official, /^failed.*last good copy kept/); assert.deepEqual(c.official, a.official);
 });
+
+test('more ladders: claims ("At least"), ISM, ADP, and the Bank of Japan decision as named outcomes', () => {
+  const mk = (label, bid, ask) => ({ yes_sub_title: label, yes_bid_dollars: bid, yes_ask_dollars: ask, last_price_dollars: 0, close_time: '2026-11-25T13:29:00Z' });
+  const claims = S.readEvent(L('claims'), { event_ticker: 'KXJOBLESSCLAIMS-26NOV25', title: 'Initial jobless claims for the week ending November 21, 2026', sub_title: 'For the week ending Nov 21, 2026',
+    markets: [mk('At least 195,000', 0.71, 0.8), mk('At least 200,000', 0.49, 0.51), mk('At least 205,000', 0.28, 0.35), mk('At least 210,000', 0.08, 0.1)] });
+  assert.equal(S.thresholdOf({ yes_sub_title: 'At least 200,000' }), 200000);
+  assert.equal(claims.mid, 200000);
+  assert.match(claims.text, /^initial jobless claims for the week to 21 Nov 2026: the middle of the ladder is about 200,000$/);
+  const ism = S.readEvent(L('ism'), { event_ticker: 'KXISMPMI-26NOV', title: 'ISM Manufacturing PMI in November', sub_title: 'In Nov 2026',
+    markets: [mk('At least 54', 0.81, 0.91), mk('At least 55', 0.58, 0.64), mk('At least 56', 0.29, 0.38)] });
+  assert.match(ism.text, /^the ISM manufacturing index for November 2026: the middle of the ladder is about 55\.\d \(above 50 = growing\)$/);
+  const adp = S.readEvent(L('adp'), { event_ticker: 'KXADP-26NOV', title: 'ADP employment change in Nov 2026?', sub_title: 'In Nov 2026',
+    markets: [mk('Above 50000', 0.81, 0.88), mk('Above 75000', 0.58, 0.67), mk('Above 100000', 0.3, 0.38)] });
+  assert.match(adp.text, /^ADP private payrolls for November 2026: the middle of the ladder is about \d+,000 jobs$/);
+  const boj = S.readEvent(L('boj'), { event_ticker: 'KXCBDECISIONJAPAN-26DEC17', title: 'Bank of Japan rate decision in December', sub_title: 'Dec 17, 2026 meeting',
+    markets: [mk('Cut 25bps', 0, 0.01), mk('Maintain current rate', 0.1, 0.11), mk('Hike 25bps', 0.86, 0.87), mk('<b>Hike</b> more than 25bps', 0, 0.01)] });
+  assert.equal(boj.text, 'the Bank of Japan\'s decision on 17 Dec 2026: most likely "Hike 25bps" (87%), then "Maintain current rate" (11%)');
+  assert.ok(boj.options.every((o) => !/[<>]/.test(o.label)));
+  assert.equal(S.readEvent(L('boj'), { markets: [mk('Hike 25bps', 0.86, 0.87)] }), null, 'one outcome alone is not read');
+  const hd = { at: '2026-11-20T19:00:00Z', priced: { at: '2026-11-20T19:00:00Z', items: { claims: [claims], ism: [ism], adp: [adp], boj: [boj] } } };
+  const g = S.board(hd).find((x) => x.k === 'priced');
+  assert.ok(g.lines.some((l) => /^Initial jobless claims/.test(l)) && g.lines.some((l) => /^The Bank of Japan/.test(l)));
+  ism.close = '2026-12-01T14:59:00Z';
+  assert.match(S.pricedFor(hd, 'ISM', Date.parse('2026-12-01T15:00:00Z') / 1000).short, /ISM manufacturing index/);
+});
