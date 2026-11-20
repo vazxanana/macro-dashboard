@@ -56,7 +56,8 @@ between the Trader looks at the markets again every minute. If that loop stops, 
 - **ICT desk tracker** (about every 35 minutes): a separate method, described below.
 
 **The council's own systems** (all on paper). Since 11 Nov 2026, by your decision on that day's review of the edges, two
-trade live on paper: **Gold trend** (the 20-day breakout) and **Gold daily engulf**. The other five are followed as
+trade live on paper: **Gold trend** (the 20-day breakout) and **Gold daily engulf**. Since 20 Nov 2026, by your request, the **Gold replica** trades live
+on paper again too (it has no out-of-sample edge on record; its forex and crypto research trades are still not copied). The other five are followed as
 **paper shadows** from that date (the same rules and stops, every trade recorded and managed, never alerted, no futures
 ticket): Gold replica, Gold momentum pullback, the NQ New York open run, Gold H4 trendline and Mosha BO. "Gold trend fast"
 and "Crypto trend" have been shadows since 7 Nov. A trade one of them took live before its date stays in the record as the
