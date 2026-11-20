@@ -1272,3 +1272,8 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   55 % of the result, and 2024 was close to flat (+0.07R). Only a forward record says whether it still pays. Nothing is built:
   a stream would need a Trader block (or a job like the gotobi one) on a demo account, a stop on every trade, paper only.
 - **If nothing is decided.** Nothing runs; the studies stay as evidence.
+- **20 Nov 2026, a forward record started (research only, no trade).** `research/edge/gold-vol-breakout-forward` writes down,
+  weekdays, the trades the frozen rule takes from 13 Nov 2026 on (candles no study had read), after the measured cost, against a
+  range fixed in advance (pre-registered). At 120 trades (about six months) it reads "fails" or "holds so far"; at 240 trades
+  "confirmed", "fails" or "not shown either way". It needs no decision and does not replace this one: a demo stream would also
+  measure the fills.
