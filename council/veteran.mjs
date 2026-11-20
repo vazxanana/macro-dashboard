@@ -38,6 +38,7 @@ import { build as redfolder, loadInputs as rfInputs, capturedFrom as rfCaptured 
 import { build as weekAhead } from './week-ahead.mjs';
 import { build as weekReview } from './week-review.mjs';
 import { updateFile as prepUpdate } from './prep-record.mjs';
+import { updateFile as sourceUpdate } from './game-plan.mjs';
 import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan, cpiBenchmark, consensusGate, gdpCase } from './research-watch.mjs';
 
 const DAY = 86400;
@@ -655,6 +656,8 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
     // the nowcast-against-consensus forward record (council/prep-record.mjs): append-only macro/prep-record.json, its score on the plan
     try { const PR = prepUpdate(path.join(M, 'prep-record.json'), WA, hd, now); if (PR.error) log('Prep record: ' + PR.error); else WA.prepRecord = PR.score; }
     catch (e) { log('Prep record skipped: ' + (e && e.message || e)); }
+    // the source scorecard (council/game-plan.mjs): append-only macro/source-record.json, its score on the plan
+    try { const SR = sourceUpdate(path.join(M, 'source-record.json'), WA, hd, now); if (SR.error) log('Source record: ' + SR.error); else WA.sources = SR.score; } catch (e) { log('Source record failed: ' + ((e && e.message) || e)); }
     w('week-ahead.json', WA); }
   catch (e) { log('Week ahead skipped: ' + (e && e.message || e)); }
   // 20 Nov 2026: the week in review (council/week-review.mjs): what the markets did, from the closes and files above; a failure writes nothing

@@ -3132,6 +3132,63 @@ meeting / month / quarter only; nothing without an earlier reading); the Week ah
 Week ahead puts them on their day (`d.auctions`, text) and in the day line. Checked from a runner on 20 Nov 2026: TreasuryDirect's rows carry no `auctionDate` key, so the
 parser takes any "auction ... date" key; first read: 2-year $69bn (23 Nov), 5-year $70bn + 2-year FRN + 52-week bill (24 Nov), 7-year $44bn (25 Nov). Test: `tests/hard-data-auctions.test.mjs`.
 
+## Hard-to-find data, second batch (20 Nov 2026, owner: "More focus and effort on Hard-to-find data info and sources")
+`council/hard-sources.mjs` (no imports; pure parsers + `collectMore`, called at the end of `hard-data.mjs` `collect`, each part failing
+alone and keeping its last copy). About 80 candidate keyless sources were read once from a GitHub runner first (probe 3, taken out
+after use); what answered and is read every macro round into `macro/hard-data.json`:
+- `priced` (Kalshi `events?series_ticker=X&with_nested_markets=true`, `LADDERS`: KXCPICORE, KXCPI, KXPCECORE, KXPAYROLLS, KXU3, KXGDP,
+  KXFED (3 meetings), KXRECSSNBER, KXGOLDMON, KXJOBLESSCLAIMS ("At least x" rungs), KXISMPMI, KXADP, and KXCBDECISIONJAPAN read as named
+  outcomes (`choice`: the most likely one, the next from 10 %); 700 ms between calls, a runner got 429 after about 13 in a row): an "Above x" ladder
+  (`ladderOf`: price = middle of a bid / ask at most `WIDE` 0.15 apart, else the last trade; never rising with x) becomes the most
+  likely print and its chance where the print has a grid (`buckets`, step 0.1; the Fed's upper bound 0.25), else the ladder's middle
+  (`quantile`); fewer than `MIN_RUNGS` 3 priced rungs = not read. Always "what traders pay: not a consensus survey and not a forecast of ours".
+- `auctionResults` (TreasuryDirect `auctioned?days=150`; the day is `competitiveAuctionCloseDate`, shares from the
+  `indirectBiddersCompetitiveParAwarded`, `directBidders...` and `primaryDealers...` fields): notes, bonds, TIPS, FRNs of the last 10
+  days, each against the earlier auctions of its original tenor (`tenorOf`: a "9-Year 10-Month" reopening is a 10-year), "softer /
+  stronger" at `SOFT_BTC` 0.1 either way.
+- `plumbing` (NY Fed `rates/all/latest.json` and reverse-repo operations, Fiscal Data `operating_cash_balance` (the closing balance
+  sits in `open_today_bal`), FRED WALCL / WRESBAL / IORB): SOFR against the rate on reserves (5 bp or more over = "reserves getting
+  tighter"), net liquidity = balance sheet - Treasury cash - reverse repo, with its 4-week change. "A rough gauge, not a signal."
+- `vol` (Cboe `daily_prices/<ID>_History.csv`: GVZ, VIX1D, VIX9D, SKEW, VVIX, OVX; the OFR Financial Stress Index csv): GVZ as a
+  one-day move (divided by the square root of 252) with its place in the last 252 readings. "The size traders pay for, not a direction."
+- `under` (FRED: trimmed-mean PCE, sticky CPI, median CPI, wage tracker, one-year expected inflation, claims, WEI, term premium).
+`board(hd, { goldPx })` = titled groups `[{ k, title, src, at, lines }]` -> `week-ahead.json` `hard`, drawn by the Macro desk in the Week
+ahead as the fold `#wa-hard` (text, each group with its source and read time). `pricedFor(hd, type, t)` puts a ladder on its own
+release (same type, closing within 36 h) -> the release's `priced` and one top line; the morning report adds two priced lines and
+gold's implied day under "What we expect" and yesterday's / today's auction results under what happened. `hist` records the leading
+print and its chance (`priced`) and GVZ; `moves` says how that chance changed over a day and a week (kind `priced`). Answered 403 or
+unusable from a runner: Cboe delayed quotes and put/call, LBMA prices, GLD holdings (PDF / xlsx), iShares (HTML), the Atlanta Fed
+tracker (404). Answered but not used yet: Polymarket economy
+tags, NY Fed primary-dealer and SOMA files, the 5-7 MB Cleveland year / quarter nowcast files. Context only: no rule, call or trade
+reads any of it. Tests: `tests/hard-sources.test.mjs`, `tests/hard-board.test.mjs`.
+**Later the same day**: `official` = the agencies' own release calendars (`collectOfficial`: BLS `bls.ics`, times in New York through
+`nyToUnix`, and BEA `release_dates.json`; `OFFICIAL` maps a title to the Week ahead's type; 2 days back to 21 ahead; one agency
+failing leaves the other): a board group "The agencies' own release dates", and `onOfficial(hd, type, t)` lets the Week ahead say
+"Check the date: … the agency's own release calendar has no such release that day" (only when that agency's calendar was read and
+covers the day; null = say nothing). `besideNowcast` puts the Cleveland Fed nowcast beside a priced CPI / PCE print ("rounds to the
+same print" / "the model and the traders differ"). Probe 4 (taken out after use) found no open Kalshi series for PPI, retail sales,
+headline PCE, JOLTS or the ECB.
+
+## Your plan for the week, and the source scorecard (20 Nov 2026, owner: "make it in a way I'm able to use all of our work for the next weeks to increase accuracy")
+`council/game-plan.mjs` (pure; imports `jsonio.mjs` only). (1) `planOf(days, hd)` -> `week-ahead.json` `plan { routine, cards, note }`:
+one card per US release of a known type (the day's rows of one type share a card, core first; a row from the council's own schedule
+stands for the core figure): **Before** = what each source says (calendar consensus, Cleveland Fed nowcast, a prediction market's
+most likely print, `sourcesOf`), whether they agree or differ, the Red folder record's above / below line, "Check the date" when
+the agency's calendar lacks it; **At the print** = the tested facts for that type (`FACTS`: `red-folder-surprise` 60 of 83 first
+five minutes with the miss and the failed chase, CPI / NFP; `gold-release-quotes` spread about 18x at T+5 s, CPI / NFP / FOMC;
+constants a test compares with each result.json), else "no test of the first minutes exists"; **After** = the type's median gold day
+move, the day's typical range, and where the print gets compared. `ROUTINE` = six fixed steps (Sunday, each morning, the evening
+before, at the print, after the close, Friday) with where each is on the site. (2) **Source scorecard**, council-data
+`macro/source-record.json` (append-only; `capture` / `resolve` / `score` / `updateFile`, run by `veteran.mjs` `run()` after the prep
+record -> `week-ahead.json` `sources`): per m/m CPI / PCE row still to come (id `<type>:<month>:<core|headline>`), each source's
+figure written the FIRST time it is seen before the release with its own time (`at.<source>`), never edited; after the release the
+first print on the nowcast file is attached once with each source's miss (`err`), whether it had the exact one-decimal print
+(`exact`) and which was `closest`. `score`: under `MIN_SCORE` 10 scored "too few to judge", else each source's mean miss and
+exact count; "a forward record, not a tested edge". Only CPI / PCE resolve (the nowcast file carries their prints; it keeps three
+months). Macro desk: fold `#wa-plan` "Your plan for the week" (open, first in the Week ahead card; cards, the scorecard's line,
+the routine in its own fold; every string as text). No rule, size, call or trade reads either; never call a source "accurate"
+before the scorecard has its 10. `datahealth.mjs` lists the file. Test: `tests/game-plan.test.mjs`.
+
 ## Nowcast against consensus: a forward record (20 Nov 2026)
 `council/prep-record.mjs` (pure + `updateFile`; run by `veteran.mjs` `run()` right after the Week ahead is built → council-data
 `macro/prep-record.json` `{ v, label, records }`, append-only, written only on a change; a file that does not parse is never
