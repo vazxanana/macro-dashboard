@@ -55,7 +55,7 @@ export function parseGdpNow(csv) {
 
 // The Fed's calendar: speeches, testimony, the FOMC, minutes and the Beige Book in [from, to] (New York dates 'YYYY-MM-DD').
 const KEEP = /^(Speeches|Testimony|FOMC|Beige)$/;
-const unesc = (s) => String(s || '').replace(/&quot;/g, '"').replace(/&#8217;/g, '’').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/<[^>]*>/g, '').trim();
+const unesc = (s) => String(s || '').replace(/&quot;/g, '"').replace(/&#8217;/g, '’').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
 export function parseFedCal(J, from, to) {
   const ev = J && Array.isArray(J.events) ? J.events : [];
   const out = [];

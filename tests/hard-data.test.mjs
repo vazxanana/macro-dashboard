@@ -30,7 +30,7 @@ const FEDCAL = { events: [
   { title: 'Speech - Governor Christopher J. Waller', time: '8:25 a.m.', month: '2026-11', days: '24', type: 'Speeches', description: 'Welcoming &quot;Remarks&quot;' },
   { title: 'Speech - Chairman Kevin Warsh', time: '12:00 p.m.', month: '2026-11', days: '24', type: 'Speeches', description: 'Outlook' },
   { title: 'Board meeting', time: '', month: '2026-11', days: '24', type: 'Board' },
-  { title: 'FOMC Minutes', time: '2:00 p.m.', month: '2026-11', days: '25', type: 'FOMC' },
+  { title: 'FOMC Minutes', time: '2:00 p.m.', month: '2026-11', days: '25', type: 'FOMC', description: '&lt;p&gt;Meeting of October 27-28&lt;/p&gt;' },
   { title: 'Old speech', time: '9:00 a.m.', month: '2026-10', days: '2', type: 'Speeches' }] };
 
 test('Cleveland Fed nowcast: the latest value of each series per target month, the actual prints apart', () => {
@@ -56,6 +56,7 @@ test('GDPNow, Fed odds and the Fed calendar parse the probe\'s shapes', () => {
   const f = H.parseFedCal(FEDCAL, '2026-11-23', '2026-11-27');
   assert.deepEqual(f.map((e) => e.title), ['Speech - Governor Christopher J. Waller', 'Speech - Chairman Kevin Warsh', 'FOMC Minutes']);
   assert.equal(f[0].topic, 'Welcoming "Remarks"');
+  assert.equal(f[2].topic, 'Meeting of October 27-28');   // the calendar escapes its HTML (seen from the runner, 20 Nov 2026)
 });
 
 test('collect: every source read through the injected fetch; a failing one keeps its last good copy and says so', async () => {
