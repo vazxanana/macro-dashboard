@@ -2216,7 +2216,7 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .ms-pane:fullscreen { background: var(--bg); padding: 12px; display: flex; flex-direction: column; }
 .ms-pane:fullscreen .ms-chart { flex: 1; height: auto !important; min-height: 0; }
 .ms-pane:fullscreen .ch-fs { --i: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5'/%3E%3C/svg%3E"); }
-@media (max-width: 700px) { .ch-fs { display: none; } }
+@media (max-width: 700px) { .ms-ph .ch-fs { display: none; } }   /* phones keep it in the chart toolbar (#ms-ch-one) */
 
 
 /* ═══ LOGIN 2 (7 Nov): two-panel desk intro + refined card, live gold strip, caps-lock hint, shake on a wrong password ═══ */
@@ -3631,6 +3631,9 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .sty-btn small { color: var(--ink-dim); font-weight: 500; margin-left: 4px; }
       .sty-pop { position: absolute; z-index: 40; top: calc(100% + 6px); left: 0; width: 260px; max-width: calc(100vw - 32px); background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.35); display: grid; gap: 8px; }
       .sty-pop[hidden] { display: none; }
+      /* phones (20 Nov 2026, owner: "the phone can't read the rest"): the panel is a sheet across the screen above the tab bar */
+      @media (max-width: 640px) { .sty-pop { position: fixed; left: 10px; right: 10px; width: auto; max-width: none; top: auto; bottom: calc(76px + env(safe-area-inset-bottom));
+        max-height: min(70dvh, 560px); overflow-y: auto; overscroll-behavior: contain; z-index: 960; } }
       .sty-h { font: 600 12px var(--sans); color: var(--ink-dim); margin-top: 2px; }
       .sty-seg { display: flex; gap: 4px; } .sty-seg button { flex: 1; min-height: 32px; border: 1px solid var(--line); background: transparent; color: inherit; border-radius: 6px; font: 600 12px var(--sans); cursor: pointer; }
       .sty-seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -3643,17 +3646,24 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       <div class="cycle" id="ms-cycle" aria-live="polite" hidden></div>
       <style id="ms-cfs-css">/* Full screen on the Charts (18 Nov 2026, owner: "when I go fullscreen on charts should be the full layout and split if I had"):
          the whole view goes full screen; the charts share the height that is left, in whatever view is on (All, Split, Layout, one chart) */
-      #v-charts:fullscreen { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
-      #v-charts:fullscreen > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav) { display: none !important; }
-      #v-charts:fullscreen > .ch-row { flex: 1 1 0; min-height: 0; } #v-charts:fullscreen .ch-col { display: flex; flex-direction: column; min-height: 0; } #v-charts:fullscreen .ch-col > .mm { display: none !important; }
-      #v-charts:fullscreen > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
-      #v-charts:fullscreen > #ms-pp { margin: 0; padding: 6px 10px; } #v-charts:fullscreen > #ms-pp .pp-ttl small { display: none; }
-      #v-charts:fullscreen .ms-grid4 { flex: 1 1 0; min-height: 0; grid-auto-rows: minmax(0, 1fr); align-content: stretch; gap: 8px; }
-      #v-charts:fullscreen .ms-grid4 .ms-pane { min-height: 0; height: 100%; }
-      #v-charts:fullscreen .ms-grid4 .ms-chart { height: calc(100% - var(--ms-ph-h, 46px)) !important; min-height: 0 !important; }
-      #v-charts:fullscreen .ms-grid4 .ms-ro { display: none !important; }
-      #v-charts:fullscreen .ms-grid4[data-view="all"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } #v-charts:fullscreen .ms-grid4[data-view="all"] .ms-pane { grid-column: auto !important; }   /* six charts: three by two */
-      </style>
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ch-fs-x) { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .ch-row { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-row > .ch-col { flex: 1 1 auto; }   /* a phone has no rail: the column still takes the full height (20 Nov 2026) */ :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col { display: flex; flex-direction: column; min-height: 0; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col > .mm { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp { margin: 0; padding: 6px 10px; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp .pp-ttl small { display: none; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4 { flex: 1 1 0; min-height: 0; grid-auto-rows: minmax(0, 1fr); align-content: stretch; gap: 8px; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4 .ms-pane { min-height: 0; height: 100%; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4 .ms-chart { height: calc(100% - var(--ms-ph-h, 46px)) !important; min-height: 0 !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4 .ms-ro { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4[data-view="all"] { grid-template-columns: repeat(3, minmax(0, 1fr)); } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4[data-view="all"] .ms-pane { grid-column: auto !important; }   /* six charts: three by two */
+            /* the page's own full screen (20 Nov 2026, owner on an iPhone: "I can't find the full screen button"): iPhone Safari has no
+         element full screen, so the Charts view covers the page instead; the exit button sits top right */
+      #v-charts.ch-fake-fs { position: fixed; inset: 0; z-index: 900; height: 100dvh; padding: calc(max(8px, env(safe-area-inset-top)) + 52px) 10px max(8px, env(safe-area-inset-bottom)); box-sizing: border-box; }   /* the top 52 px hold the exit button */
+      html.ch-fake-fs-on, html.ch-fake-fs-on body { overflow: hidden; }
+      .ch-fs-x { display: none; }
+      #v-charts.ch-fake-fs .ch-fs-x { display: inline-flex; align-items: center; gap: 6px; position: fixed; z-index: 905; top: max(8px, env(safe-area-inset-top)); right: 10px; min-height: 44px; padding: 0 14px;
+        border-radius: 22px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface-2, var(--panel)); color: var(--au-ink-1, var(--ink)); font: 600 13px var(--sans); cursor: pointer; }
+</style>
       <style id="ms-rail-css">/* The drawing rail on the left and the floating favourites bar (19 Nov 2026, owner: "the drawing bar in the left … favorite and
          have it floated like tradingview"); wider than 640 px only, a phone keeps its "Draw" button */
       #v-charts .ch-row { display: block; min-width: 0; } #v-charts .ch-col { min-width: 0; }
@@ -5714,7 +5724,7 @@ function msNextSetup(bars, A) {
         tl.querySelector('.ch-fib').addEventListener('click', () => P.fibTool && P.fibTool());
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
-        tl.querySelector('.ch-fs').addEventListener('click', () => { const vc = document.getElementById('v-charts') || pane; if (document.fullscreenElement) document.exitFullscreen(); else if (vc.requestFullscreen) vc.requestFullscreen().catch(() => {}); });   // the whole Charts view: the layout, split and tools as they are (18 Nov 2026)
+        tl.querySelector('.ch-fs').addEventListener('click', () => window.msChartsFs && window.msChartsFs());   // the whole Charts view: the layout, split and tools as they are (18 Nov 2026)
       }
       el.addEventListener('dblclick', () => P.fit()); }
     // candle-close countdown (7 Nov loop): a small pill under the last-price label on the price scale, mm:ss (or h:mm) to this bar's close
@@ -6313,7 +6323,10 @@ function msNextSetup(bars, A) {
   // the Style popover (12 Nov 2026, owner: "make the chart cleaner, let me choose colour background and candle, I can't find the
   // line chart option"): chart type, colours (saved per device, ms-colors), and one "Clean look" switch over the busiest layers
   { const btn = $('ms-sty-btn'), pop = $('ms-sty-pop');
-    const open = (on) => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); };
+    // a wider screen: the panel opens under its button and is moved left when it would leave the screen (20 Nov 2026)
+    const place = () => { pop.style.left = ''; if (innerWidth <= 640) return; const r = pop.getBoundingClientRect(), over = r.right - (innerWidth - 8);
+      if (over > 0) pop.style.left = Math.round(-Math.min(over, r.left - 8)) + 'px'; };
+    const open = (on) => { pop.hidden = !on; btn.setAttribute('aria-expanded', String(on)); if (on) place(); };
     btn.addEventListener('click', (e) => { e.stopPropagation(); open(pop.hidden); });
     document.addEventListener('click', (e) => { if (!pop.hidden && !e.target.closest('#ms-sty')) open(false); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !pop.hidden) { open(false); btn.focus(); } });
@@ -7989,6 +8002,23 @@ function msNextSetup(bars, A) {
     }
   });
   let KB_PANE = null; document.addEventListener('mouseover', (ev) => { const pn = ev.target.closest && ev.target.closest('.ms-pane'); if (pn) KB_PANE = pn; });
+  // ─── Full screen of the Charts view (20 Nov 2026): the browser's own where an element can go full screen, else the page's own
+  // (iPhone Safari): #v-charts covers the screen with an exit button; Escape, the button or the toolbar's full-screen button leave it
+  { const VC = () => document.getElementById('v-charts');
+    const fake = (on) => { const vc = VC(); if (!vc) return; vc.classList.toggle('ch-fake-fs', on); document.documentElement.classList.toggle('ch-fake-fs-on', on);
+      let x = vc.querySelector(':scope > .ch-fs-x');
+      if (on && !x) { x = document.createElement('button'); x.type = 'button'; x.className = 'ch-fs-x'; x.textContent = 'Exit full screen'; x.addEventListener('click', () => fake(false)); vc.appendChild(x); }
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 30); };
+    window.msChartsFs = () => {
+      const vc = VC(); if (!vc) return;
+      if (vc.classList.contains('ch-fake-fs')) return fake(false);
+      if (document.fullscreenElement) return void document.exitFullscreen();
+      const req = vc.requestFullscreen || vc.webkitRequestFullscreen;
+      if (!req) return fake(true);
+      try { const r = req.call(vc); if (r && r.catch) r.catch(() => fake(true)); } catch (e) { fake(true); } };
+    window.msChartsFsState = () => ({ fake: !!(VC() && VC().classList.contains('ch-fake-fs')), native: !!document.fullscreenElement });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && VC() && VC().classList.contains('ch-fake-fs')) fake(false); });
+    window.addEventListener('hashchange', () => { if (VC() && VC().classList.contains('ch-fake-fs')) fake(false); }); }
   // ─── One chart toolbar (19 Nov 2026): the tools act on the chart last touched, in every layout (All, Split, Layout, one chart) ───
   { const bar = document.getElementById('ms-ch-one'), VCH0 = document.getElementById('v-charts');
     // the ChronosTrade strip next to it already draws horizontal and trend lines, so those two are not repeated here (H / T keys still work)
