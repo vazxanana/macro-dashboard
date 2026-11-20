@@ -152,8 +152,8 @@ summary … like a person writes it"): subject "Morning note · <day>"; "Summary
 text that talks of itself; "At a glance" tiles (`glance`: price, normal day, today's odds against the usual rate, from "Where
 markets stand", + the VIX); "On the calendar today" (`agenda`, from the world report's "Today" section); then both reports with
 at most `LINES` 4 bullets a section ("n more on the Macro desk"); signed "The Aureum Desk". The Macro desk's box reads "Summary" and shows the same headline and bullet points as the email (`#dr-ai-h`, `#dr-ai-l`, as text), then the open tab's paragraph.
-**Plain words** (20 Nov 2026, owner: "normal people should be able to understand"): `SYSTEM` asks for everyday words a non-trader understands (a term named is explained in a few words); the tiles say "Moves about x% a day", "n% chance up today", "normally n%", the VIX is "Fear gauge (VIX)"; sections "Prices this morning", "Coming out today"; a "What the words mean" box (`glossary`, `WORDS`) explains each market term the email uses. `?test=email&fresh=1` (owner) writes the day's summary again first (one call; a refused rewrite keeps the good one). `?send=all&day=<day>[&fresh=1]` (owner, 20 Nov 2026: "send to the registered email users") sends the latest report to the 06:30 list now, unmarked, once a day (`state.resent`, marked first), refused when `Sec-Fetch-Site` says another site; counts only. Tests:
-`tests/daily-report.test.mjs`, `tests/daily-delivery.test.mjs`.
+**Plain words** (20 Nov 2026, owner: "normal people should be able to understand"): `SYSTEM` asks for everyday words a non-trader understands (a term named is explained in a few words); the tiles say "Moves about x% a day", "n% chance up today", "normally n%", the VIX is "Fear gauge (VIX)"; sections "Prices this morning", "Coming out today"; a "What the words mean" box (`glossary`, `WORDS`) explains each market term the email uses. `?test=email&fresh=1` (owner) writes the day's summary again first (one call; a refused rewrite keeps the good one). `?send=all&day=<day>[&fresh=1]` (owner, 20 Nov 2026: "send to the registered email users") sends the latest report to the 06:30 list now, unmarked, once a day (`state.resent`, marked first), refused when `Sec-Fetch-Site` says another site; counts only. **Email with the hard-data lines** (20 Nov 2026): `agenda` keeps the report's "High · 13:30 · …" rows (they were left out, so the day's main release was missing) and marks them "key release" (over 8 rows the high-impact ones stay); the Today lines that are not calendar rows (the nowcast before the print, Fed events, Treasury auctions, "no release today") show under the calendar as "Also today" (`todayNotes`, 6 at most); `WORDS` explains nowcast, PCE, GDPNow, prediction markets, Beige Book, Treasury auction, and "25bps" brings the basis-point entry. Tests:
+`tests/daily-report.test.mjs`, `tests/daily-delivery.test.mjs`, `tests/daily-email-hard.test.mjs` (fixture `tests/fixtures/daily-email-hard.mjs`).
 
 ## London Strategic Edge data, owner only (19 Nov 2026, owner: "build option 1")
 `api/lse.js` (routed in `cloudflare/src/worker.mjs`), key = the Worker secret `LSE_API_KEY` (set by the owner in Cloudflare; host
@@ -2973,9 +2973,28 @@ gold-pre-holiday, post-holiday-metals, gotobi, turnaround-tuesday-forward, gold-
 headline (`research-ledger.mjs` `studyRow`) and the forward record's latest reading (`research/forward/<x>.json`). A failed study
 is listed as "Tested: failed" so it is not chased; a pass is never called an edge. The frame: Gold Macro Score (a negative score is
 not a sell), regime, the veteran's levels and month call, the rule book's readings that are on, and the week's dated calls once
-issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
+issued. The Sunday 21:15 UTC phone digest carries its first three top lines (`digest.mjs` `weekAheadLines`, only when the file covers the coming week; the preview may run to 21 lines; `tests/digest-week-ahead.test.mjs`). Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
-`tests/week-ahead.test.mjs`.
+`tests/week-ahead.test.mjs`. **Nowcast beside the consensus** (20 Nov 2026, `prepFor`, `parseExp`): a CPI / PCE release with a
+calendar consensus and a Cleveland nowcast gets `prep` (core nowcast for a "Core" title, else headline; `side` above / below / in line
+under `IN_LINE` 0.05 points) with the Red folder study's average gold day move on past prints above / below consensus (only with
+`MIN_PREP` 6+ a side) and the caveats "a model's estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a
+tested edge"; one top line "Before <day>'s …" each. Test: `tests/week-ahead-prep.test.mjs`.
+**Browser pass (20 Nov 2026)**, display only: the frame's parts ran together on one line (`.wa .wa-r` is a block now), the
+study links were 16 px tall on touch (`a.wa-st`, 44 px on a coarse pointer), and a study link / verdict from the file reached an
+`href` / class unchecked (`WA_HREF`: only `/<page>.html#<anchor>` of this site; a class only for pass / fail / inc). Checked at
+390 px touch and 1440 px in three themes: no text under 12 px or under AA, no sideways scroll. Test: `tests/macro-ahead-ui.test.mjs`.
+**Final browser check with real next-week data (20 Nov 2026)**, display only: each day's range line read "Gold, typical move: A typical day's move is …" and ended in the same caveat five times (`WA_RG` drops the echo, the caveat is said once under the days, `.wa-rgn`); two or more positioning lines of the frame are one "Positioning (CFTC)" block with their shared caveat once (`WA_POS_TAIL`); a viewer whose clock is UTC is not told the release time twice (`WA_LOC`); on a phone the Daily reports tabs take the row ("World economy" wrapped). Second pass the same day with real next-week data (ranges, auctions, COT lines): the day's gold range read like the faint "no release" note beside it, so it is labelled "Gold range:" in `--ink-dim` (`.wa-rg`); nothing else to fix (0 texts under 12 px or AA, no cut-off, 44 px links, at 390 touch and 1440 in three themes).
+`tests/week-ahead.test.mjs`. **Positioning** (20 Nov 2026): `positioningOf(cot)` (veteran.mjs hands it `macro/cot.json`) adds
+`frame.positioning` and one frame line per market of gold, silver, EUR, JPY, NQ, ES only when crowded (3-year percentile >= 90 /
+<= 10) or a big week (|z| >= 1.5, the COT desk's flow cut), with net, percentile and report date; the yen futures' inversion said
+plainly; "positioning, not a tested signal" unless the COT study passed a cell there. Test: `tests/week-ahead-cot.test.mjs`.
+`tests/week-ahead.test.mjs`. **How big a day** (20 Nov 2026, `dayRange` → `d.range`, a quiet line `.wa-rg` under each day
+heading): a normal gold day = the strategist's `fc.assets.gold.expMovePct` of its `last` price, in $ and %; on a day with a US Red
+folder release, that type's median absolute day move (`stats.absMed`, else from its rows) only with n >= `RANGE_MIN_N` 8; thin-
+trading words on holidays and early closes; "a range for planning, not a forecast of direction"; no forecast = no range. Test:
+`tests/week-ahead-range.test.mjs`.
+**A normal day now** (20 Nov 2026): `normalDays(fc)` → `frame.normalDays` = one line per market of forecast.json `assets` (gold $, EUR/USD and USD/JPY pips, NQ / ES points, from `expMovePct` x `last`; `volRatio` >= 1.3 "1.4x its usual", <= 0.75 "quieter than usual"), drawn as ONE frame item with "A range for planning, not a forecast of direction." Test: `tests/week-ahead-normal.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
@@ -2989,10 +3008,72 @@ FOMC, Beige Book, 2 days back to 14 ahead; `parseFedCal`). A failed source keeps
 (`datahealth.mjs` warns). The Week ahead reads it: the nowcast on a CPI / PCE release whose reference month has no actual print yet
 (`nowcastFor`; "a model's estimate, not the consensus"), the Fed calendar on its days, the odds and GDPNow in the frame, a "Before
 the print" and an odds line on top. Context only: the odds are "what traders pay, not a forecast of ours"; nothing reads it for a
-rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Kalshi) / 92.5% (Polymarket); October core PCE nowcast
+rule, call or trade. The 06:30 world report (`council/daily-report.mjs`, `hd`) carries it too: "Before the print: …" and the
+Fed's own events of the New York day under Today, the odds and GDPNow under What we expect, then up to four `moves` lines (how they moved over the day and week), and the day's Treasury note and bond auctions under Today (`tests/daily-report-hard.test.mjs`). The Week ahead draws each release's `prep` ("Nowcast beside the consensus") as text. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Kalshi) / 92.5% (Polymarket); October core PCE nowcast
 +0.27%, headline +0.31%; GDPNow Q4 3.2%. Not usable from a runner on 20 Nov: GLD holdings (the CSV URL now serves a PDF), CME gold
 stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
 `tests/hard-data.test.mjs`.
+**Memory** (20 Nov 2026): the file keeps `hist` (`histEntry` / `addHist`): one compact reading per UTC hour (a second run that hour
+merges), 14 days (`HIST_DAYS`): Kalshi's top 3 `{ label, p }` with the meeting, each nowcast month still waiting for a print (printed
+series null), GDPNow `{ quarter, value }`; only parts read fresh that run (a kept copy is never recorded again). `moves(hd, now)` =
+plain lines "92% now, 90% a day ago, 85% a week ago" (newest reading at most 6 h old; day = 20-30 h back, week = 6-8 days; same
+meeting / month / quarter only; nothing without an earlier reading); the Week ahead puts them in `frame.lines` (`frame.moves`) and
+`bigOddsMove` (5 points or more over a week) on top. A change in what a model or traders say, never a signal. Test:
+`tests/hard-data-history.test.mjs`.
+**Treasury auctions** (20 Nov 2026): `auctions` = the notes, bonds, TIPS, FRNs and 52-week bill announced for yesterday to +14 days
+(`parseAuctions`, `auctionText`; other bills left out), from TreasuryDirect `TA_WS/securities/announced?format=json`, then
+`…/upcoming`, then the stale Fiscal Data file (the first with auctions in the window wins; all failing keeps the last copy); the
+Week ahead puts them on their day (`d.auctions`, text) and in the day line. Checked from a runner on 20 Nov 2026: TreasuryDirect's rows carry no `auctionDate` key, so the
+parser takes any "auction ... date" key; first read: 2-year $69bn (23 Nov), 5-year $70bn + 2-year FRN + 52-week bill (24 Nov), 7-year $44bn (25 Nov). Test: `tests/hard-data-auctions.test.mjs`.
+
+## Nowcast against consensus: a forward record (20 Nov 2026)
+`council/prep-record.mjs` (pure + `updateFile`; run by `veteran.mjs` `run()` right after the Week ahead is built → council-data
+`macro/prep-record.json` `{ v, label, records }`, append-only, written only on a change; a file that does not parse is never
+overwritten and nothing is recorded that run). The question: did the Cleveland Fed nowcast point the right way against the calendar
+consensus? `capture(prev, wa, now)`: one record per CPI / PCE release of the plan that has `prep` and is still to come (`r.t > now`;
+a year-on-year title is skipped, the nowcast is month on month), id `<type>:<nowcast month>:<core|headline>`, with `capturedAt`,
+`nowcast`, `consensus`, `gap`, `side`; the first capture is never edited, a later pre-release reading goes to `last` only.
+`resolve(records, hd, now)`: after the release time, once `hard-data.json` `nowcast.months[].actual` has that series, attach once
+`actual`, `print` (one decimal, as published), `actualSide` (the Week ahead's 0.05 threshold against the captured consensus), `hit`
+(`side === actualSide`; null when the capture was in line), `resolvedAt`; never rewritten. `score(records)` → `week-ahead.json`
+`prepRecord` (`captured`, `resolved`, `judged`, `hits`, `text`): under `MIN_JUDGE` 20 judged "too few to judge (n X)", else the hit
+rate with a two-sided exact binomial p against 50% and "a forward record, not a tested edge". About two releases a month are
+captured (core and headline of one release are not independent), so 20 judged takes most of a year. Limits, said plainly: the nowcast
+file keeps three months, so a print not read within about two months is never resolved; the "actual" is whatever that file shows
+on the first read after the release. No page shows it yet; no rule, call or trade reads it. `datahealth.mjs` lists the file
+(no staleness). Test: `tests/prep-record.test.mjs`.
+
+`prepFor` gives no prep to a year-on-year title (the nowcast is month on month); the Macro desk shows the record's one line in the Week ahead's note (`#wa-note`).
+
+## Nowcast against consensus on 2022-24 (20 Nov 2026, `research/edge/nowcast-vs-consensus`, pre-registered)
+The question the forward record needs a year for, asked offline on the 36 US CPI releases of 2022-24: the veteran batch's
+first-print ledger with the Cleveland nowcast dated the day before each release (`cpi-model-benchmark-inputs-2022-2024.json`,
+`forecasts.C`; NOT an authenticated real-time vintage: `model_original_delivery_authenticated` false on all 36) joined by release
+date to `council/consensus-history.json`. Lean = nowcast against consensus with `IN_LINE` 0.05; print to one decimal; a print on
+the consensus is not judged; exact two-sided binomial against 50%; bar: 20+ judged, p < 0.05, above 50% in both 18-release
+halves. A direction-of-surprise test, not a trade (no costs). **INCONCLUSIVE**: core CPI 8 of 13 judged (62%, p 0.58; halves
+5 of 8 and 3 of 5); the nowcast leaned on 19 of 36 releases and 6 of those printed on the consensus. Headline (secondary, no
+verdict) 5 of 12 (p 0.77). The lean was one-sided: 17 of 19 core leans were ABOVE the consensus, so "above" was the usual
+state in those years, not that month's signal. `council/week-ahead.mjs` `PREP_STUDY` (a constant; the test compares it with
+result.json) adds the study's sentence to the prep text of a core CPI row and `prep.study`; never on headline CPI or PCE rows.
+Nothing live changed. Never quote 8 of 13 as the nowcast "working". Test: `tests/nowcast-vs-consensus.test.mjs`.
+
+## Review of the 20 Nov macro work (20 Nov 2026)
+A read-only review of the day's diff found six defects of wording or scoring, none a crash; all fixed. (1) `prep-record.mjs`: a
+print ON the consensus is not judged (`hit: null`; core PCE printed on it in about half of past releases, so counting it a miss
+would bias the rate). (2) `hard-data.mjs` `outcomeWords`: "Hike >25bps" / "50+ bps increase" read "a hike of more than 25 bp" /
+"of 50 bp or more", never "a 25 bp hike". (3) `prepFor` and the record's `monthlyPrice`: the nowcast sits only beside an m/m CPI /
+PCE price row (never income, spending, q/q, y/y). (4) the above / below gold record is shown on the core row only (the Red folder
+study sorts by the core surprise). (5) the morning report files Fed events and auctions under the London day it is headed with.
+(6) `dayRange` says "A typical day's move … close to close" (the desk label is "Gold, typical move") and, where a release-day
+median is smaller, "measured over other years and as a median, so it is not comparable one for one". Also: only readings that
+moved make a line (four at most; the report's nowcast moves only for a month with a release in the next week; a broken history
+never stops the report), and the Sunday digest skips a Week ahead file that ended before today (preview up to 22 lines).
+Test: `tests/macro-review-fixes.test.mjs`. Later the same day: the morning report shows the Fed's events and the note / bond auction results in London time (`daily-report.mjs` `nyUnix`: "19:00 London (2:00 p.m. New York)"), and a holiday's or early close's range line says "the typical figure comes from full trading days" instead of repeating the market note's "thin trading".
+**Wording found in the browser check, same day**: the frame's levels line reads from the latest price ("Gold near $3,575 now ($3,607 at the
+19 Nov close); above, $3,590 (13-week low, broken since the close)…"; it said "watch $3,590 above" under a $3,607 close); no nested
+brackets in the top lines; the morning report's "Later this week" adds the high-impact US releases of the council's schedule the
+calendar does not hold yet, instead of "No high-impact release…" before the weekend's calendar file.
 
 ## Macro brain audit: what the veteran's output got wrong, and the week-ahead additions (20 Nov 2026, "make the macro brain's output more correct and more useful for next week")
 Today's council-data files (veteran.json, week-ahead.json, daily-report.json, redfolder.json) were read as a trader preparing for

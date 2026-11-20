@@ -156,7 +156,7 @@
   .vlib-cpi b { font-size: 18px; display: block; margin: 2px 0; } .vlib-cpi .st { display: inline-block; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; color: var(--ink-dim); }
   .vlib-nav h4 { margin: 10px 0 4px; font: 600 12px var(--sans); color: var(--ink-faint); text-transform: uppercase; letter-spacing: .04em; }
   .vlib-nav button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 4px 6px; border-radius: 6px; font: 500 12.5px var(--sans); color: var(--ink-dim); cursor: pointer; line-height: 1.35; }
-  .vlib-nav button:hover { background: var(--panel-hover); color: var(--ink); } .vlib-nav button[aria-current="true"] { background: var(--accent-soft); color: var(--ink); }
+  .vlib-nav button:hover { background: var(--panel-hover, rgba(127,127,127,.08)); color: var(--ink); } .vlib-nav button[aria-current="true"] { background: var(--accent-soft); color: var(--ink); }
   .vlib-nav button small { color: var(--ink-faint); font-weight: 400; }
   .vlib-doc { min-width: 0; font-size: 13.5px; line-height: 1.55; color: var(--ink-dim); max-height: 72vh; overflow: auto; padding-right: 6px; }
   .vlib-doc h1 { font-size: 20px; margin: 0 0 8px; color: var(--ink); } .vlib-doc h2 { font-size: 16px; margin: 18px 0 6px; color: var(--ink); display: block; } .vlib-doc h3 { font-size: 14px; margin: 14px 0 4px; color: var(--ink); } .vlib-doc h4 { font-size: 13px; margin: 12px 0 4px; color: var(--ink); }
@@ -195,13 +195,13 @@
   .pcall { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 9px; }
   .pcall li { display: grid; grid-template-columns: 46px 1fr; gap: 4px 12px; align-items: center; font-size: 13.5px; }
   .pcall b { font: 650 15px var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; text-align: right; }
-  .pcall i { grid-column: 2; display: block; height: 4px; border-radius: 3px; background: var(--line-soft); overflow: hidden; } .pcall i s { display: block; height: 100%; background: var(--accent); }
+  .pcall i { grid-column: 2; display: block; height: 4px; border-radius: 3px; background: var(--line-soft); overflow: hidden; } .pcall i s { display: block; height: 100%; background: var(--accent, #e3b341); }
   .pcall.rec b { font-family: inherit; } #calls-cot h3, #calls-rec h3 { margin: 16px 0 4px; }
   .dig { list-style: none; margin: 6px 0 14px; padding: 0; display: grid; gap: 8px; } .dig li { font-size: 13px; } .dig small { display: block; color: var(--ink-faint); }
   .cotw { overflow-x: auto; } .cott { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 760px; }
   .cott th { text-align: left; font-weight: 600; color: var(--ink-faint); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--line-soft); }
   .cott td { padding: 9px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: top; font-variant-numeric: tabular-nums; } .cott td small { display: block; color: var(--ink-faint); font-size: 12px; }
-  .cott .up { color: var(--buy); } .cott .dn { color: var(--sell); }
+  .cott .up { color: var(--buy, #22a06b); } .cott .dn { color: var(--sell, #e5484d); }
   .rng { position: relative; width: 120px; height: 6px; border-radius: 3px; background: var(--line-soft); margin-top: 6px; } .rng s { position: absolute; top: -3px; width: 4px; height: 12px; border-radius: 2px; background: var(--ink); }
   .src { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px 20px; margin-top: 8px; }
   .src article { padding: 10px 0 0; border-top: 1px solid var(--line-soft); font-size: 12.5px; } .src h4 { margin: 0 0 3px; font: 600 13px var(--sans); } .src p { margin: 3px 0; font-size: 12.5px; } .src .lag { color: var(--ink-faint); font-size: 12px; }
@@ -528,16 +528,20 @@
   .nx-bl li, .res-l li { display: block; }
   /* Week ahead (20 Nov 2026) */
   .wa-days { display: grid; gap: var(--s3); margin: var(--s3) 0; }
-  .wa-day { border-radius: var(--r-sm); padding: var(--s3) var(--s4); background: var(--well); }
-  .wa-day h3 { margin: 0 0 var(--s1); font: 600 var(--fs-md)/1.4 var(--sans); color: var(--ink); }
+  .wa-day { border: 1px solid var(--line); border-radius: var(--r-sm, 8px); padding: var(--s3); background: var(--well, transparent); }
+  .wa-day h3 { margin: 0 0 4px; font: 650 var(--fs-md, 15px)/1.3 var(--sans); color: var(--ink); }
   .wa-day h3 small { font-weight: 400; color: var(--ink-dim); font-size: var(--fs-sm, 13px); }
   .wa-mk { margin: 6px 0; padding: 6px 10px; border-radius: var(--r-sm, 8px); background: color-mix(in srgb, var(--au-warn) 14%, var(--panel)); color: var(--ink); font-size: var(--fs-sm, 13px); line-height: 1.45; }
   .wa-day ul { list-style: none; margin: 6px 0 0; padding: 0; }
   .wa-day li { padding: 6px 0; border-top: 1px solid var(--line); font: 400 var(--fs-sm, 13px)/1.5 var(--sans); color: var(--ink-dim); }
   .wa-day li b { color: var(--ink); }
-  .wa .wa-r { display: block; }
-  .wa-chip { display: inline-block; padding: 1px var(--s2); margin-right: 6px; border-radius: 999px; font: 600 var(--fs-xs)/1.6 var(--sans); background: var(--well); color: var(--ink-dim); }
-  .wa-chip.pass { color: var(--buy); background: color-mix(in srgb, var(--buy) 14%, var(--panel)); } .wa-chip.fail { color: var(--sell); background: color-mix(in srgb, var(--sell) 14%, var(--panel)); }
+  .wa-day li .wa-r, .wa .wa-r { display: block; }
+  /* 20 Nov 2026 quality pass: a study link is a 44 px target on touch */
+  @media (pointer: coarse) { .wa a.wa-st { display: inline-flex; align-items: center; min-height: 44px; } }
+  /* 20 Nov 2026 browser pass: the day's gold range is labelled and in the readable ink, apart from the quiet notes */
+  .wa-rg { margin: 2px 0 6px; font: 400 var(--fs-sm, 13px)/1.5 var(--sans); color: var(--ink-dim); } .wa-rg b { color: var(--ink); font-weight: 600; }
+  .wa-chip { display: inline-block; padding: 0 7px; margin-right: 6px; border-radius: 999px; font: 600 12px/1.6 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); }
+  .wa-chip.pass { color: var(--buy); border-color: currentColor; } .wa-chip.fail { color: var(--sell); border-color: currentColor; }
   .wa-nc { color: var(--ink); }
   .wa-quiet { color: var(--ink-faint); font-size: var(--fs-sm, 13px); margin: 4px 0 0; }
     .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
@@ -545,22 +549,22 @@
     .dr-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2, 8px); margin-bottom: var(--s3, 12px); }
     .dr-day { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs, 12px); color: var(--ink-dim); }
     .dr-day select { min-height: 36px; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; }
-    .dr-sec { margin-top: var(--s3, 12px); } .dr-sec h4 { margin: 0 0 var(--s1); font-size: var(--fs-md); } .dr-sec ul { margin: 0; padding-left: 18px; } .dr-sec li { margin: 3px 0; line-height: 1.5; }
+    .dr-sec { margin-top: var(--s3, 12px); } .dr-sec h4 { margin: 0 0 4px; font-size: 14px; } .dr-sec ul { margin: 0; padding-left: 18px; } .dr-sec li { margin: 3px 0; line-height: 1.5; }
     @media (pointer: coarse) { .dr-day select { min-height: 44px; } }
-    .dr-ai { margin: 0 0 var(--s3); padding: var(--s3) var(--s4); background: var(--well); border-radius: var(--r-sm); }
-    .dr-ai b { font: 600 var(--fs-sm)/1.4 var(--sans); color: var(--ink); } .dr-ai p { margin: 4px 0 6px; line-height: 1.55; } .dr-ai small { font-size: 12px; color: var(--ink-dim); } .dr-ai .dr-ai-h { font-weight: 650; margin: 6px 0 4px; } .dr-ai-l { margin: 0 0 6px; padding-left: 18px; line-height: 1.5; } .dr-ai-l li { margin: 2px 0; }
-    .rf-next { padding: var(--s3) var(--s4); border-radius: var(--r-sm); background: var(--well); margin-bottom: var(--s3); }
-    .rf-next .lab { display: block; font-size: var(--fs-xs); color: var(--ink-faint); }
+    .dr-ai { margin: 0 0 var(--s3, 12px); padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--well, rgba(127,127,127,.06)); border-radius: 8px; }
+    .dr-ai b { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-ink, var(--accent)); } .dr-ai p { margin: 4px 0 6px; line-height: 1.55; } .dr-ai small { font-size: 12px; color: var(--ink-dim); } .dr-ai .dr-ai-h { font-weight: 650; margin: 6px 0 4px; } .dr-ai-l { margin: 0 0 6px; padding-left: 18px; line-height: 1.5; } .dr-ai-l li { margin: 2px 0; }
+    .rf-next { padding: 12px 14px; border-radius: 10px; background: var(--well, rgba(127,127,127,.08)); margin-bottom: var(--s3, 12px); }
+    .rf-next .lab { display: block; font-size: var(--fs-xs, 12px); opacity: .8; }
     .rf-wrap { overflow-x: auto; }
     .rf-all { display: none; }
     #c-red:not(.rf-open) .rf-y { display: none; }
     #c-red .rf-all.rf-more:not([hidden]) { display: block; margin: 8px 0; min-height: 44px; }
-    .rf-t caption { caption-side: top; text-align: left; font-size: var(--fs-xs); color: var(--ink-faint); padding: 0 0 var(--s2); }
+    .rf-t caption { caption-side: top; text-align: left; font-size: var(--fs-xs, 12px); opacity: .85; padding: 0 0 8px; }
 
-    .rf-t td small, .rf-t th small { display: block; color: var(--ink-faint); font-weight: 400; }
-    .rf-t .up { color: var(--buy); } .rf-t .dn { color: var(--sell); }
+    .rf-t td small, .rf-t th small { display: block; opacity: .85; font-weight: 400; }
+    .rf-t .up { color: var(--up, #1a7f4b); } .rf-t .dn { color: var(--dn, #c0392b); }
     .res-l li + li { margin-top: var(--s3, 12px); }
-    .res-doc { color: var(--ink-faint); }
+    .res-doc { color: var(--ink-2, inherit); }
   .pl-list li > b:first-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
   .pl-list li.pl-call { grid-template-columns: 120px 1fr; } .pl-list li.pl-call > b:first-child { font-size: var(--fs-md); }
   .pl-list li.pl-call > b .d { display: block; font-weight: 400; }
@@ -574,30 +578,13 @@
   .pl-sc li.now { box-shadow: inset 0 0 0 1px var(--line-strong); }
   @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: 1fr; } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } .pl-copy { float: none; width: 100%; margin: 0 0 var(--s3); } }
   @media (pointer: coarse) { .pl-tabs button, .pl-copy { min-height: 44px; } }
+  @media (max-width: 640px) { .dr-top .pl-tabs { flex: 1 1 100%; } .dr-top .pl-tabs button { white-space: nowrap; } }   /* 20 Nov 2026: "World economy" wrapped to two lines beside the day picker */
   /* calmer (19 Nov 2026, owner: "it looks made by an AI"): the three glance columns are columns split by a hairline, not boxes
      inside the card; the Today / This week / This month switch is underlined words */
   @media (min-width: 901px) { .g-grid { gap: 0; } .g-grid .tile { border: 0; border-left: 1px solid var(--line-soft, var(--line)); border-radius: 0; background: none; padding: 4px 20px; }
     .g-grid .tile:first-child { border-left: 0; padding-left: 0; } }
   .pl-tabs { padding: 0; background: transparent; border-bottom: 1px solid var(--line-soft, var(--line)); border-radius: 0; gap: 4px; }
   .pl-tabs button { border-radius: 0; } .pl-tabs button[aria-selected="true"] { background: transparent; }
-  /* ─── Design pass (20 Nov 2026): the newer sections (Daily reports, Week ahead, Your read, Red folder study, Your research,
-     applied) on the calm pass's anatomy. Display only. Rules to keep: every colour is a token this page defines (never a
-     var() with a hex fallback, never opacity to dim text); a tile inside a card is a well with no border; a chip is its
-     colour on that colour's soft tint; a tab label never wraps (a long tab row scrolls inside itself on a phone); a table that
-     scrolls sideways keeps its first column in place. Phone rules here are plain layout for every phone view: the simple
-     view's own rules stay in its block below. ─── */
-  .pl-tabs button { white-space: nowrap; }
-  .dr-sec ul, .dr-ai p, .dr-ai-l { max-width: 88ch; }
-  #c-red .rf-all { float: none; margin: var(--s3) 0; }
-  .tc-tw th:first-child, .tc-tw td:first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); }
-  .tc-tw thead th:first-child { background: linear-gradient(var(--well), var(--well)) var(--panel); }
-  @media (max-width: 640px) {
-    .rf-tabs { display: flex; flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
-    .rf-tabs::-webkit-scrollbar { display: none; }
-    .pl-tabs.rf-tabs button { flex: none; }
-    .rf-tabs button:focus-visible { outline-offset: -2px; }
-  }
-  @media (pointer: coarse) { .wa-day li a, .src h4 a { display: inline-flex; align-items: center; min-height: 44px; } .vlib-nav button { min-height: 44px; } #news a { padding-block: 4px; } }
   /* ─── Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
      The default on screens up to 640 px: html[data-phone="simple"], set in the head before the first paint (localStorage
      ms-phone = "full" keeps the full view; the same key and attribute as the Desk). The first screen is the glance alone: the
@@ -1492,7 +1479,6 @@
     if (!types.length) { sec.hidden = true; return; } sec.hidden = false;
     try { RFK = RFK || localStorage.getItem('mdRed'); } catch (e) {} if (types.indexOf(RFK) < 0) RFK = types[0];
     $('rf-tabs').innerHTML = types.map(function (k) { var on = k === RFK; return '<button type="button" role="tab" data-rf="' + esc(k) + '" aria-selected="' + on + '"' + (on ? '' : ' tabindex="-1"') + '>' + esc(R.study[k].name) + '</button>'; }).join('');
-    var rt = $('rf-tabs'), rb = rt.querySelector('[aria-selected="true"]'); if (rb && rt.scrollWidth > rt.clientWidth) rt.scrollLeft = Math.max(0, rb.offsetLeft - rt.offsetLeft - 24);
     var S = R.study[RFK], nx = S.next;
     $('rf-next').innerHTML = nx ? '<span class="lab">Next ' + esc(S.name) + '</span><b>' + esc(utcWhen(nx.at)) + '</b> <small>(' + esc(cdText(nx.at)) + ' · your time ' + esc(locWhen(nx.at)) + ')</small><br>'
         + nx.items.map(function (i) { return esc(i.name) + ': expected <b>' + esc(i.exp || NA) + '</b>, previous ' + esc(i.prev || NA); }).join(' · ')
@@ -1518,34 +1504,50 @@
   // 20 Nov 2026: the Week ahead plan (macro/week-ahead.json, council/week-ahead.mjs); display only
   var WA_DAY = function (ymd) { var d = new Date(ymd + 'T12:00:00Z'); return d.getUTCDate() + ' ' + MONS[d.getUTCMonth()]; };
   var WA_V = { pass: 'Passed its test', fail: 'Tested: failed', inc: 'Inconclusive' };
+  // a study link stays on this site: a page of the site and an optional anchor, never another host (20 Nov 2026)
+  var WA_HREF = function (l) { l = String(l || '').replace(/^\/+/, ''); return /^[\w-]+\.html(#[\w-]+)?$/.test(l) ? '/' + l : ''; };
+  // 20 Nov 2026 (browser check): display only. The day's range line loses its echo of the label and the caveat every day repeated
+  // (said once under the days); the frame's positioning lines share one caveat; a viewer on UTC is not told the same time twice.
+  var WA_RG_TAIL = 'A size for planning, not a forecast of direction.';
+  var WA_RG = function (t) { t = String(t || '').replace(/^A typical day's move is\s+/i, ''); if (t.slice(-WA_RG_TAIL.length) === WA_RG_TAIL) t = t.slice(0, -WA_RG_TAIL.length).trim(); return t; };
+  var WA_POS_TAIL = /\s*(Positioning, not a tested signal:[^.]*\.)$/;
+  var WA_LOC = function (iso) { return new Date(iso).getTimezoneOffset() === 0 ? '' : ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'; };
   function renderAhead(A) {
     var sec = $('c-ahead'); if (!A || !Array.isArray(A.days) || !A.days.length) { sec.hidden = true; $('one-s-ahead').innerHTML = ''; return; } sec.hidden = false;
     $('wa-sub').textContent = (A.next ? 'next week' : 'the rest of this week') + ', ' + WA_DAY(A.from) + ' to ' + WA_DAY(A.to) + ' · paper only';
     $('wa-lines').innerHTML = (A.lines || []).concat(A.calNote ? [A.calNote] : []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
     $('wa-days').innerHTML = A.days.map(function (d) {
       var h = '<div class="wa-day"><h3>' + esc(d.dow) + ' ' + esc(WA_DAY(d.day)) + ' <small>· ' + esc(d.line) + '</small></h3>';
+      if (d.range && d.range.text) h += '<p class="wa-rg"><b>Gold, typical move:</b> ' + esc(WA_RG(d.range.text)) + '</p>';
       if (d.market) h += '<p class="wa-mk">' + esc(d.market.text) + '</p>';
       if ((d.releases || []).length) h += '<ul>' + d.releases.map(function (r) {
         var iso = new Date(r.t * 1000).toISOString();
-        return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'
+        return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + WA_LOC(iso)
           + (r.exp || r.prev ? '<span class="wa-r">Expected <b>' + esc(r.exp || NA) + '</b>, previous ' + esc(r.prev || NA) + '</span>' : r.src === 'schedule' ? '<span class="wa-r">From the council\'s release schedule: the consensus appears once the week\'s calendar lists it.</span>' : '')
           + (r.nowcast ? '<span class="wa-r wa-nc"><b>Nowcast:</b> ' + esc(r.nowcast.text) + '</span>' : '')
+          + (r.prep && r.prep.text ? '<span class="wa-r wa-nc"><b>Nowcast beside the consensus:</b> ' + esc(r.prep.text) + '</span>' : '')
           + (r.record ? r.record.lines.map(function (l) { return '<span class="wa-r">' + esc(l) + '</span>'; }).join('') : '') + '</li>'; }).join('') + '</ul>';
       else h += '<p class="wa-quiet">No major release on the files read so far.</p>';
+      if ((d.auctions || []).length) h += '<ul class="wa-auc">' + d.auctions.map(function (a) { return '<li><b>' + esc(a.text) + '</b><span class="wa-r">Supply the bond market has to absorb: a weak auction can lift yields, a strong one ease them. Context, not a signal.</span></li>'; }).join('') + '</ul>';
       if ((d.fed || []).length) h += '<ul>' + d.fed.map(function (e) { return '<li><b>Fed: ' + esc(e.title) + '</b>' + (e.time ? ' · ' + esc(e.time) + ' New York' : '') + (e.topic ? '<span class="wa-r">' + esc(e.topic) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
       if ((d.rules || []).length) h += '<ul>' + d.rules.map(function (r) {
         var f = r.forward && r.forward.verdict && r.forward.verdict !== r.headline ? '<span class="wa-r">Forward record: ' + esc(r.forward.verdict) + '</span>' : '';
-        return '<li><span class="wa-chip ' + esc(r.verdict) + '">' + esc(WA_V[r.verdict] || r.verdict) + '</span><b>' + esc(r.what) + '</b> <small>(' + esc(r.when) + ')</small>'
-          + '<span class="wa-r">' + esc(r.headline) + '</span>' + f + '<span class="wa-r"><a href="/' + esc(r.link) + '">The study</a></span></li>'; }).join('') + '</ul>';
-      return h + '</div>'; }).join('');
-    var F = A.frame || {}, fb = (F.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; });
+        return '<li><span class="wa-chip' + (WA_V[r.verdict] ? ' ' + r.verdict : '') + '">' + esc(WA_V[r.verdict] || r.verdict) + '</span><b>' + esc(r.what) + '</b> <small>(' + esc(r.when) + ')</small>'
+          + '<span class="wa-r">' + esc(r.headline) + '</span>' + f + (WA_HREF(r.link) ? '<span class="wa-r"><a class="wa-st" href="' + esc(WA_HREF(r.link)) + '">The study</a></span>' : '') + '</li>'; }).join('') + '</ul>';
+      return h + '</div>'; }).join('')
+      + (A.days.some(function (d) { return d.range && d.range.text && String(d.range.text).indexOf(WA_RG_TAIL) >= 0; }) ? '<p class="wa-rgn wa-quiet">Typical moves are close to close: a size for planning, not a forecast of direction.</p>' : '');
+    var F = A.frame || {}, pos = (F.positioning || []).map(function (p) { return p && p.text; }).filter(Boolean);
+    var fb = (F.lines || []).filter(function (l) { return pos.length < 2 || pos.indexOf(l) < 0; }).map(function (l) { return '<li>' + esc(l) + '</li>'; });
+    if (pos.length >= 2) { var tails = [], rows = pos.map(function (t) { var m = WA_POS_TAIL.exec(t); if (m && tails.indexOf(m[1]) < 0) tails.push(m[1]); return '<span class="wa-r">' + esc(m ? t.replace(WA_POS_TAIL, '') : t) + '</span>'; });
+      fb.push('<li><b>Positioning (CFTC)</b>' + rows.join('') + tails.map(function (t) { return '<span class="wa-r">' + esc(t) + '</span>'; }).join('') + '</li>'); }
     (F.rulebook || []).forEach(function (r) { fb.push('<li><b>Your rule book:</b> ' + esc(r.text) + (r.caveat ? ' <span class="wa-r">' + esc(r.caveat) + '</span>' : '') + '</li>'); });
     var O = F.odds; if (O) { var row = function (src, l) { return (l || []).length ? '<span class="wa-r">' + esc(src) + ': ' + l.map(function (m) { return esc(m.label) + ' <b>' + Math.round(m.p * 100) + '%</b>'; }).join(' · ') + '</span>' : ''; };
       fb.unshift('<li><b>Prediction markets on the ' + esc(WA_DAY(O.meeting)) + ' Fed decision</b>' + row('Kalshi', O.kalshi) + row('Polymarket', O.polymarket) + '<span class="wa-r">What traders pay, not a forecast of ours.</span></li>'); }
+    if ((F.normalDays || []).length) fb.push('<li><b>A normal day now</b>' + F.normalDays.map(function (m) { return '<span class="wa-r">' + esc(m.text) + '</span>'; }).join('') + '<span class="wa-r">A range for planning, not a forecast of direction.</span></li>');
     var C = A.calls || {}; if ((C.list || []).length) fb.push('<li><b>The veteran\'s calls for the week:</b>' + C.list.map(function (c) { return '<span class="wa-r">' + esc(c.claim) + ': ' + Math.round(c.p * 100) + '% (base ' + Math.round(c.base * 100) + '%)</span>'; }).join('') + '</li>');
     else if (C.note) fb.push('<li>' + esc(C.note) + '</li>');
     $('wa-frame-b').innerHTML = '<ul class="pl-list nx-bl">' + fb.join('') + '</ul>';
-    $('wa-note').textContent = A.label || '';
+    $('wa-note').textContent = (A.label || '') + (A.prepRecord && A.prepRecord.text ? ' ' + A.prepRecord.text : '');
     var top = A.days.filter(function (d) { return d.releases.some(function (r) { return r.impact === 'high'; }) || d.market; });
     $('one-s-ahead').innerHTML = esc(WA_DAY(A.from) + ' to ' + WA_DAY(A.to)) + (top.length ? ': ' + top.slice(0, 3).map(function (d) { return '<b>' + esc(d.dow) + '</b> ' + esc(d.line); }).join(' · ') : '');
   }

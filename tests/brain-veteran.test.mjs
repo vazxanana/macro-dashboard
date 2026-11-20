@@ -139,7 +139,7 @@ test('week ahead: the levels sit either side of the latest price, the month call
   const v = vet(); v.summary = G.summary(v);
   const f = W.frameOf({ goldScore: { score: -1, label: 'AUCTION (no macro edge)' } }, v);
   const lvl = f.lines.find((l) => /^Gold near/.test(l)), call = f.lines.find((l) => /month call/.test(l));
-  assert.match(lvl, /^Gold near \$3,575 now \(last close \$3,607 on 2026-11-19\); watch \$3,590 above \(13-week low, traded through since that close\) and \$3,550 below/, 'it read "Gold near $3,607 ...; watch $3,590 above"');
+  assert.match(lvl, /^Gold near \$3,575 now \(\$3,607 at the 2026-11-19 close\); above, \$3,590 \(13-week low, broken since the close\); below, \$3,550/, 'it read "Gold near $3,607 ...; watch $3,590 above"');
   assert.ok(f.levels.above.price > f.levels.mark.px && f.levels.below.price < f.levels.mark.px);
   assert.match(call, /53% that gold closes above \$3,885 on 2026-12-11 \(set at the 2026-11-13 close\) against a base rate of 57% \(leans against gold, confidence low\)\. Gold is now 8\.0% below that level: read the lean, not the odds\.$/);
   const plan = W.build({ now: T(2026, 11, 20, 14, 32), cal: [], rf: null, fc: null, v });
@@ -157,16 +157,16 @@ test('week ahead: the levels sit either side of the latest price, the month call
 
 test('morning note: on a Friday the six days ahead come from the council\'s schedule too, with the US holiday (it said "No high-impact release ... for the next six days", five days before PCE)', () => {
   const now = T(2026, 11, 20, 6, 3), cal = [{ at: T(2026, 11, 20, 15), country: 'USD', title: 'Revised UoM Consumer Sentiment', impact: 'Medium', forecast: '51.7', previous: '51.0' }];
-  const w = D.worldReport({ fc: { regime: {} }, vet: null, cal, now }), sec = w.sections.find((x) => x.h === 'The next six days').lines;
-  assert.equal(sec[0], 'Wed 25 Nov 13:30 · United States · PCE (Personal Income and Outlays) · from the desk\'s own schedule (the calendar\'s consensus is not out yet)');
+  const w = D.worldReport({ fc: { regime: {} }, vet: null, cal, now }), sec = w.sections.find((x) => x.h === 'Later this week').lines;
+  assert.equal(sec[0], 'Wed 25 Nov 13:30 · United States · PCE (Personal Income and Outlays) (from the council\'s release schedule; no consensus yet)');
   assert.match(sec[1], /^United States · Thanksgiving Day \(Thu 26 Nov\): US stocks closed, gold and currencies trade a short, thin session that still counts as a daily close\.$/);
   assert.ok(!sec.some((l) => /^No high-impact/.test(l)));
   // a release the calendar already holds is not listed twice
   const cal2 = cal.concat([{ at: T(2026, 11, 25, 13, 30), country: 'USD', title: 'Core PCE Price Index m/m', impact: 'High', forecast: '0.3%', previous: '0.2%' }]);
-  const sec2 = D.worldReport({ fc: { regime: {} }, vet: null, cal: cal2, now }).sections.find((x) => x.h === 'The next six days').lines;
+  const sec2 = D.worldReport({ fc: { regime: {} }, vet: null, cal: cal2, now }).sections.find((x) => x.h === 'Later this week').lines;
   assert.equal(sec2.filter((l) => /PCE/.test(l)).length, 1); assert.match(sec2[0], /Core PCE Price Index m\/m · expected 0\.3%/);
   // a quiet week still says so
-  const q = D.worldReport({ fc: { regime: {} }, vet: null, cal: [], now: T(2026, 11, 13, 6, 3) }).sections.find((x) => x.h === 'The next six days').lines;
+  const q = D.worldReport({ fc: { regime: {} }, vet: null, cal: [], now: T(2026, 11, 13, 6, 3) }).sections.find((x) => x.h === 'Later this week').lines;
   assert.deepEqual(q, ['No high-impact release is on the calendar for the next six days.']);
 });
 
