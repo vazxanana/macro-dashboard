@@ -135,6 +135,42 @@ export function recordOf(rf, type) {
   return { name: s.name, n: st.n, absMed: st.absMed, upShare: st.upShare, lines, prep: (s.prep || []).filter((l) => /know the side|chase/i.test(l)).slice(0, 1) };
 }
 
+// How big a day to expect (20 Nov 2026, owner: plan and size the week): a normal day's gold range = the strategist's expected
+// move (fc.assets.gold.expMovePct, ± %) of its last price, in $; on a day with a US release of a Red folder type, the median
+// absolute gold day move on past releases of that type (n >= RANGE_MIN_N; the biggest of the day's types). Descriptive: a
+// range for planning, never a forecast of direction.
+export const RANGE_MIN_N = 8;
+const medOf = (a) => { const s = a.slice().sort((x, y) => x - y), n = s.length; return n ? (n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2) : null; };
+function absMedOf(s) {
+  const st = s && s.stats;
+  if (st && Number.isFinite(st.absMed) && Number.isFinite(st.n)) return { pct: st.absMed, n: st.n };
+  const g = ((s && s.rows) || []).map((r) => r.goldDay).filter(Number.isFinite).map(Math.abs);
+  return g.length ? { pct: Math.round(medOf(g) * 100) / 100, n: g.length } : null;
+}
+export function dayRange(fc, day, rf) {
+  const G = fc && fc.assets && fc.assets.gold, p = G ? Number(G.expMovePct) : NaN, px = G ? Number(G.last) : NaN;
+  if (!Number.isFinite(p) || !(p > 0)) return null;
+  const usd = (x) => (Number.isFinite(px) && px > 0 ? x / 100 * px : null);
+  const say = (pc, us, n) => us != null ? `±$${Math.round(us).toLocaleString('en-US')} (±${pc.toFixed(1)}%${n ? `, n ${n}` : ''})` : `±${pc.toFixed(1)}%${n ? ` (n ${n})` : ''}`;
+  const out = { normalPct: p, normalUsd: usd(p) }, parts = [`Normal day about ${say(p, out.normalUsd)}.`];
+  let best = null;
+  for (const r of (day && day.releases) || []) {
+    if (!r.type || r.country !== 'USD') continue;
+    const s = rf && rf.study && rf.study[r.type], m = absMedOf(s);
+    if (m && m.n >= RANGE_MIN_N && Number.isFinite(m.pct) && (!best || m.pct > best.pct)) best = { ...m, type: r.type, name: (s && s.name) || r.type };
+  }
+  if (best) {
+    Object.assign(out, { eventPct: best.pct, eventUsd: usd(best.pct), type: best.type, n: best.n });
+    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}.`);
+  }
+  const mk = day && day.market;
+  if (mk && mk.kind === 'holiday') parts.push('US markets closed: thin trading, moves can be jumpy and fade.');
+  else if (mk && mk.kind === 'early') parts.push('Early close: thin trading later in the day.');
+  parts.push('A range for planning, not a forecast of direction.');
+  out.text = parts.join(' ');
+  return out;
+}
+
 const money = (x) => '$' + Math.round(x).toLocaleString('en-US');
 // The frame of the week: one place for the numbers the desk already shows elsewhere.
 export function frameOf(fc, v) {
@@ -207,7 +243,7 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
     const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules, fed };
-    day.line = dayLine(day); days.push(day);
+    day.line = dayLine(day); day.range = dayRange(fc, day, rf); days.push(day);
   }
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
   if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }

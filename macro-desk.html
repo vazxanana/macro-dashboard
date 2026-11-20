@@ -1487,6 +1487,7 @@
     $('wa-lines').innerHTML = (A.lines || []).concat(A.calNote ? [A.calNote] : []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
     $('wa-days').innerHTML = A.days.map(function (d) {
       var h = '<div class="wa-day"><h3>' + esc(d.dow) + ' ' + esc(WA_DAY(d.day)) + ' <small>· ' + esc(d.line) + '</small></h3>';
+      if (d.range && d.range.text) h += '<p class="wa-quiet wa-rg">' + esc(d.range.text) + '</p>';
       if (d.market) h += '<p class="wa-mk">' + esc(d.market.text) + '</p>';
       if ((d.releases || []).length) h += '<ul>' + d.releases.map(function (r) {
         var iso = new Date(r.t * 1000).toISOString();

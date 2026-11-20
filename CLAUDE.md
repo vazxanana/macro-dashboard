@@ -2974,7 +2974,11 @@ is listed as "Tested: failed" so it is not chased; a pass is never called an edg
 not a sell), regime, the veteran's levels and month call, the rule book's readings that are on, and the week's dated calls once
 issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
-`tests/week-ahead.test.mjs`.
+`tests/week-ahead.test.mjs`. **How big a day** (20 Nov 2026, `dayRange` → `d.range`, a quiet line `.wa-rg` under each day
+heading): a normal gold day = the strategist's `fc.assets.gold.expMovePct` of its `last` price, in $ and %; on a day with a US Red
+folder release, that type's median absolute day move (`stats.absMed`, else from its rows) only with n >= `RANGE_MIN_N` 8; thin-
+trading words on holidays and early closes; "a range for planning, not a forecast of direction"; no forecast = no range. Test:
+`tests/week-ahead-range.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
