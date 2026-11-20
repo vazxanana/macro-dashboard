@@ -327,7 +327,7 @@ test('the page: the system lists a guest is cut by are unchanged (history stays 
   assert.equal(none.find((r) => r.id === 'mer-gtl-live').status, 'live', 'without the rule in the config the page changes nothing');
   // the Systems pane says which systems are live, since when, and that financing is in the costs
   const card = PAGE.slice(PAGE.indexOf('id="ms-sys-book"'), PAGE.indexOf('id="ms-edge"'));
-  assert.match(card, /Which systems trade live · since 11 Nov 2026/); assert.match(card, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle \(not a tested edge/);   // 12 Nov: the Mosha cycle named (owner's choice of 11 Nov)
+  assert.match(card, /Which systems trade live · since 11 Nov 2026/); assert.match(card, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\) and Gold daily engulf\./); assert.match(card, /since 14 Nov the Mosha cycle \(your decision 54/);   // 12 Nov: the Mosha cycle named (owner's choice of 11 Nov)
   for (const n of ['Gold replica', 'Gold momentum pullback', 'NQ New York open run', 'Gold H4 trendline', 'Mosha BO']) assert.ok(card.includes(n), n);
   assert.match(card, /stays in the main record as the live trade it was/); assert.match(card, /none reaches t 2 after costs/);
   assert.match(card, /Costs now include overnight financing<\/b> on gold buys: 0\.0148% of the price/); assert.match(card, /trades closed before keep the cost they were recorded with/);

@@ -76,3 +76,14 @@ test('wiring: veteran.json carries summary, calibration and changes; the desk sh
   for (const f of ['summary', 'sentence', 'bias', 'meter', 'confidence', 'calibration', 'bins', 'changes', 'items']) assert.ok(html.includes(f), f);
   assert.match(html, /Public data only/);
 });
+
+test('price past every level on file: the next $50 round number beyond it, said so (19 Nov 2026)', () => {
+  const g = lv(3740.23, [[3800, 'Round number', 'round'], [3720, '13-week low', 'range'], [3700, 'Round number', 'round']]);
+  g.asOf = '2026-11-18'; G.markLevels(g, { now: Date.parse('2026-11-19T23:45:00Z') / 1000, mark: { px: 3600.635, at: '2026-11-19T23:40:37.000Z' } });
+  const w = G.watchLevels({ briefing: { levels: { gold: g } } });
+  assert.equal(w.below.price, 3600); assert.equal(w.below.made, true); assert.match(w.below.label, /under every level he tracks/);
+  assert.equal(w.above.price, 3700); assert.equal(w.above.crossed, true);
+  assert.equal(g.list.some((l) => l.made), false);   // the list a hypothesis reads is untouched
+  const none = lv(4070, [[4100, 'Round number', 'round'], [4000, 'Round number', 'round']]);
+  assert.equal(G.watchLevels({ briefing: { levels: { gold: none } } }).below.price, 4000);   // no later price: as before
+});

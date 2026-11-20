@@ -172,12 +172,13 @@ test('drawing rail on the left and a floating favourites bar (19 Nov 2026)', () 
   const i = PAGE.indexOf('// ─── Drawing rail on the left and a floating favourites bar'), blk = PAGE.slice(i, PAGE.indexOf('window.msRailFav = toggleFav;', i));
   assert.ok(i > 0, 'the rail block is in the page');
   assert.match(blk, /const wide = window\.matchMedia\('\(min-width: 641px\)'\);/, 'wider than 640 px only: a phone keeps "Draw"');
-  assert.match(blk, /rail\.prepend\(DB\); DB\.after\(CO\);/, 'the drawing tools and the chart tools move into the rail');
-  assert.match(blk, /ph\.db\.after\(DB\); ph\.co\.after\(CO\);/, 'and back to the toolbar on a phone');
+  assert.match(blk, /rail\.prepend\(DB\); CO\.after\(favBtn\);/, 'the drawing tools move into the rail; the chart tools and the favourites star stay in the top toolbar (20 Nov 2026, owner)');
+  assert.match(blk, /ph\.db\.after\(DB\); favBtn\.remove\(\);/, 'and back to the toolbar on a phone');
+  assert.doesNotMatch(PAGE, /ch-tv"|'\.ch-tv'/, 'no Open on TradingView button (removed 20 Nov 2026, owner)');
   assert.match(blk, /const FK = 'ms-dr-fav'/, 'favourites are kept on this device');
   assert.match(blk, /const b = btnOf\(f\.dataset\.fk\); if \(b\) \{ b\.click\(\);/, 'a favourite presses the rail\'s own button: no tool works differently');
-  assert.match(blk, /rail\.addEventListener\('click', \(e\) => \{ const s = e\.target\.closest && e\.target\.closest\('\.rl-star'\); if \(!s\) return; e\.preventDefault\(\); e\.stopPropagation\(\);/, 'the star does not press the tool');
-  assert.match(blk, /rail\.addEventListener\('contextmenu'/, 'right-click or long press adds a favourite');
+  assert.match(blk, /el\.addEventListener\('click', \(e\) => \{ const s = e\.target\.closest && e\.target\.closest\('\.rl-star'\); if \(!s\) return; e\.preventDefault\(\); e\.stopPropagation\(\);/, 'the star does not press the tool');
+  assert.match(blk, /el\.addEventListener\('contextmenu'/, 'right-click or long press adds a favourite');
   assert.doesNotMatch(blk, /fetch\(|\.stop = /, 'display only');
   // the star refresh must not set an attribute it watches to the same value (that looped and froze the page once)
   assert.match(blk, /if \(favBtn\.getAttribute\('aria-pressed'\) !== pr\) favBtn\.setAttribute\('aria-pressed', pr\);/);

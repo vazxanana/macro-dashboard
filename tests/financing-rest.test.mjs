@@ -192,8 +192,8 @@ test('no page or owner document calls the Academy\'s seven edges "live systems";
   for (const f of files) assert.doesNotMatch(rd(f), /seven live|7 live (systems|edges)|eight live|8 live systems/i, f);
   assert.match(rd('docs/academy/ARCHITECTURE.md'), /live until 11 Nov 2026/); assert.match(rd('academy/edges.mjs'), /all live on paper until 11 Nov 2026/);
   const mx = rd('MERIDIAN-X.md'); assert.match(mx, /two\s+trade live on paper: \*\*Gold trend\*\* \(the 20-day breakout\) and \*\*Gold daily engulf\*\*/); assert.match(mx, /the seven that traded live until 11 Nov 2026/);
-  assert.match(html, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\), Gold daily engulf and, since 11 Nov by your choice, the Mosha cycle/);   // 12 Nov: the owner's main paper system named
-  assert.match(mx, /Also live on paper, by your own choice of 11 Nov \(kept on 12 Nov\): the \*\*Mosha cycle\*\*/);
+  assert.match(html, /<b>Live on paper:<\/b> Gold trend \(20-day breakout\) and Gold daily engulf\./); assert.match(html, /since 14 Nov the Mosha cycle \(your decision 54/);   // 12 Nov: the owner's main paper system named
+  assert.match(mx, /The \*\*Mosha cycle\*\*[^.]*traded live on paper by your own choice from 11 Nov; since 14 Nov\s+it is a paper shadow too/);
   assert.deepEqual(SYSTEMS.filter((s) => !s.shadow).map((s) => s.id), ['gtrend', 'geg', 'ict-a']);
   // the Academy still has the same seven edges
   assert.deepEqual(EDGES.map((e) => e.id), ['replica', 'mosha-bo', 'gtrend', 'gtl', 'geg', 'gmp', 'nq-open']);
