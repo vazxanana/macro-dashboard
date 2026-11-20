@@ -5117,6 +5117,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   filled, month t 3.11; OANDA mid +0.153R before costs; entry slippage 0.012R). Cautions: the ten best trades carry 75 %, buys
   +0.277R vs sells +0.028R (2005-26 mid: buys +0.148R, sells +0.001R): part may be USD/JPY's drift. In-sample years; the forward
   record judges. Nothing live changed.
+- `fx-majors-vb-early` (pre-registered 20 Nov 2026): T1 on the five majors other than USD/JPY (EUR/USD, GBP/USD, AUD/USD,
+  USD/CAD, USD/CHF) on 2005-2015, years no study had read for them; same rule, cost and placebo. **FAIL**: pooled +0.013R a trade
+  net (n 10,699, month t 0.93; gross +0.038R; 2x cost −0.013R; 2005-10 +0.025R, 2011-15 −0.002R; 40 of 40 placebos beaten); no
+  market clears its checks (best USD/CHF +0.051R, t 1.86, Holm p 0.157; USD/CAD −0.045R). A faint tilt before costs, not an edge:
+  USD/JPY stands alone among the six majors in both decades. Nothing live changed.
 - `energy-vol-breakout` (pre-registered 20 Nov 2026): T1 on WTI, Brent and natural gas, OANDA M5 2016 → now, 0.1 % of price a
   round trip. **FAIL**: pooled −0.014R a trade net (n 5,221, month t −0.85); before costs +0.059R, so the verdict rests on the
   assumed cost (the demo's energy spreads are not measured). Nothing live changed.
