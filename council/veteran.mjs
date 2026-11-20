@@ -36,6 +36,7 @@ import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs'
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
 import { build as redfolder, loadInputs as rfInputs, capturedFrom as rfCaptured } from './redfolder.mjs';
 import { build as weekAhead } from './week-ahead.mjs';
+import { updateFile as prepUpdate } from './prep-record.mjs';
 import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan, cpiBenchmark, consensusGate, gdpCase } from './research-watch.mjs';
 
 const DAY = 86400;
@@ -607,7 +608,12 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
       calendar: cal.map((e) => ({ title: e.title, country: e.country, at: new Date(+e.at * 1000).toISOString(), forecast: e.forecast, previous: e.previous })), gold, dxy: dx, now });
     w('redfolder.json', RF); } catch (e) { log('Red folder study skipped: ' + (e && e.message || e)); }
   // 20 Nov 2026: the Week ahead plan (council/week-ahead.mjs), day by day, from the files above; a failure writes nothing
-  try { w('week-ahead.json', weekAhead({ now, cal: (cache && cache.cal) || [], rf: rd(path.join(M, 'redfolder.json'), null), fc, v, hd: rd(path.join(M, 'hard-data.json'), null), cot, dataDir: dir })); }
+  try { const hd = rd(path.join(M, 'hard-data.json'), null);
+    const WA = weekAhead({ now, cal: (cache && cache.cal) || [], rf: rd(path.join(M, 'redfolder.json'), null), fc, v, hd, cot, dataDir: dir });
+    // the nowcast-against-consensus forward record (council/prep-record.mjs): append-only macro/prep-record.json, its score on the plan
+    try { const PR = prepUpdate(path.join(M, 'prep-record.json'), WA, hd, now); if (PR.error) log('Prep record: ' + PR.error); else WA.prepRecord = PR.score; }
+    catch (e) { log('Prep record skipped: ' + (e && e.message || e)); }
+    w('week-ahead.json', WA); }
   catch (e) { log('Week ahead skipped: ' + (e && e.message || e)); }
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
