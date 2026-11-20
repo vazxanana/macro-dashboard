@@ -3779,6 +3779,7 @@ html[data-role="public"] .hdr-sw { display: none; }
 #v-profile .pf-nt-a { display: flex; align-items: center; gap: 10px; } #v-profile .pf-nt-l { list-style: none; margin: 12px 0 0; padding: 0 20px 18px; display: grid; gap: 8px; } #v-profile .pf-nt-l li { display: flex; gap: 10px; align-items: start; font-size: 13px; border-top: 1px solid var(--line-soft, var(--line)); padding-top: 8px; } #v-profile .pf-nt-l li div { flex: 1; } #v-profile .pf-nt-l small { color: var(--ink-faint); display: block; }
 .nt-bell { position: relative; width: 38px; height: 38px; display: inline-grid; place-items: center; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); cursor: pointer; margin-right: 6px; } .nt-bell:hover { color: var(--ink); background: var(--panel-hover, rgba(127,127,127,.08)); }
 .nt-bell svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nt-go { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; color: var(--au-accent, var(--accent)); text-decoration: none; } .nt-go:hover { text-decoration: underline; }
 .nt-n { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--sell, #f2576f); color: #fff; font: 700 11px/18px Figtree, system-ui, sans-serif; text-align: center; box-shadow: 0 0 0 2px var(--bg, #0b0d12); }
 .nt-pop { position: fixed; z-index: 1200; top: 64px; right: 16px; width: min(380px, calc(100vw - 32px)); max-height: min(70vh, 560px); overflow: auto; border-radius: 16px; border: 1px solid var(--line); background: var(--panel, #111318); color: var(--ink); box-shadow: 0 24px 60px rgba(0,0,0,.4); }
 .nt-pop header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 8px; } .nt-pop header b { font-size: 15px; } .nt-pop header button { border: 0; background: none; color: var(--accent, #5b8cff); font: 600 12.5px inherit; cursor: pointer; }
@@ -15368,6 +15369,9 @@ function msNextSetup(bars, A) {
 (function () {
   var $ = function (id) { return document.getElementById(id); }, API = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) ? '/api/notify' : null;
   var bell = $('nt-bell'); if (!bell || !API) return;
+  // a notice may carry a link inside the site (the daily reports, 19 Nov 2026) and a body of several lines
+  var body = function (x) { return esc(x.body).replace(/\n/g, '<br>'); };
+  var go = function (x) { return x.link && /^\/[\w\-./#?=&]*$/.test(x.link) ? '<a class="nt-go" href="' + esc(x.link) + '">Open the reports</a>' : ''; };
   var items = [], pop = null, esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var who = function () { var A = window.MS_ACCT; return A && A.u ? A.u : window.MS_WHO === 'owner' ? 'owner' : null; };
   var key = function () { return 'ms-nt-seen-' + who(); }, seen = function () { try { return localStorage.getItem(key()) || ''; } catch (e) { return ''; } };
@@ -15380,7 +15384,7 @@ function msNextSetup(bars, A) {
     try { if (navigator.setAppBadge) { if (n) navigator.setAppBadge(n).catch(function () {}); else navigator.clearAppBadge().catch(function () {}); } } catch (e) {} }
   function closePop() { if (pop) { pop.remove(); pop = null; bell.setAttribute('aria-expanded', 'false'); } }
   function openPop() { closePop(); var s = seen(); pop = document.createElement('div'); pop.className = 'nt-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Notifications');
-    pop.innerHTML = '<header><b>Notifications</b>' + (unread().length ? '<button type="button" data-all>Mark all read</button>' : '') + '</header>' + (items.length ? '<ul>' + items.map(function (x) { return '<li class="' + (x.at > s ? 'new' : '') + '"><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + esc(x.body) + '</p>' : '') + '<small>' + esc(when(x.at)) + '</small></li>'; }).join('') + '</ul>' : '<div class="nt-empty">Nothing yet. Messages from the desk show up here.</div>');
+    pop.innerHTML = '<header><b>Notifications</b>' + (unread().length ? '<button type="button" data-all>Mark all read</button>' : '') + '</header>' + (items.length ? '<ul>' + items.map(function (x) { return '<li class="' + (x.at > s ? 'new' : '') + '"><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + body(x) + '</p>' : '') + go(x) + '<small>' + esc(when(x.at)) + '</small></li>'; }).join('') + '</ul>' : '<div class="nt-empty">Nothing yet. Messages from the desk show up here.</div>');
     document.body.appendChild(pop); bell.setAttribute('aria-expanded', 'true');
     var all = pop.querySelector('[data-all]'); if (all) all.addEventListener('click', function () { markAll(); openPop(); bell.focus(); }); }
   bell.addEventListener('click', function (e) { e.stopPropagation(); if (pop) closePop(); else openPop(); });
@@ -15389,7 +15393,7 @@ function msNextSetup(bars, A) {
   // new ones slide onto the screen, oldest first, one card at a time
   function slideIn() { var u = unread().slice().reverse(); if (!u.length || document.querySelector('.nt-in') || document.documentElement.dataset.gate) return; var x = u[0], c = document.createElement('div');
     c.className = 'nt-in'; c.setAttribute('role', 'alertdialog'); c.setAttribute('aria-live', 'assertive');
-    c.innerHTML = '<h3><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>From the desk' + (u.length > 1 ? ' · 1 of ' + u.length : '') + '</h3><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + esc(x.body) + '</p>' : '') + '<div class="nt-act">' + (u.length > 1 ? '<button type="button" data-skip>Mark all read</button>' : '') + '<button type="button" class="pri" data-ok>' + (u.length > 1 ? 'Next' : 'Got it') + '</button></div>';
+    c.innerHTML = '<h3><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/></svg>From the desk' + (u.length > 1 ? ' · 1 of ' + u.length : '') + '</h3><b>' + esc(x.title) + '</b>' + (x.body ? '<p>' + body(x) + '</p>' : '') + go(x) + '<div class="nt-act">' + (u.length > 1 ? '<button type="button" data-skip>Mark all read</button>' : '') + '<button type="button" class="pri" data-ok>' + (u.length > 1 ? 'Next' : 'Got it') + '</button></div>';
     // focus (11 Nov): the card never takes the keyboard from someone typing or from an open dialog (Space or Enter then closed it
     // unread), and the last card hands focus back to where it was instead of dropping it
     var prev = document.activeElement, typing = prev && (/^(INPUT|TEXTAREA|SELECT)$/.test(prev.tagName) || prev.isContentEditable || document.querySelector('dialog[open]'));
