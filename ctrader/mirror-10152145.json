@@ -14271,7 +14271,7 @@
    "startBalance": 10406.4
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10437.89 · 8 open",
+  "status": "ok · demo Fusion Markets · balance 10437.89 · 8 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xrp-rswing-1795003393": "none of XRPUSD found at the broker",
@@ -14281,17 +14281,34 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "xau-m30m1-1795139075": {
+    "orderId": "34501042",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "limitPrice": 3573.47,
+    "stop": 3591.467375,
+    "t1": 3537.475249999999,
+    "placedAt": "2026-11-20T01:45:41.000Z",
+    "expires": "2026-11-20T07:44:35.000Z",
+    "riskCash": 18,
+    "margin": 7.16,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10437.89,
-  "lastRun": "2026-11-20T01:43:10.000Z"
+  "lastRun": "2026-11-20T01:45:41.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T13:55:18.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 426.97, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T13:57:46.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 425.74, 4.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -15786,6 +15803,11 @@
    "at": "2026-11-20T01:31:29.000Z",
    "msg": "limit filled: XAUUSD position 50411446 at the broker",
    "trade": "xau-m30m1-1795137841"
+  },
+  {
+   "at": "2026-11-20T01:45:41.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3573.47 (council m30m1, valid to 2026-11-20T07:44Z)",
+   "trade": "xau-m30m1-1795139075"
   }
  ],
  "limits": {
