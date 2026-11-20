@@ -110,3 +110,12 @@ test('the Week ahead adds the moves to the frame and the biggest odds move to th
   const B = WA.build({ now, cal: [], rf: null, fc: null, v: null, hd: { ...hd, hist: run([[now, {}]]) } });
   assert.ok(!B.frame.moves && !B.lines.some((l) => /Over the week/.test(l)));
 });
+
+test('fileText: the same data back, the history one reading a line', () => {
+  const out = { v: 1, at: '2026-11-20T10:00:00Z', odds: { line: 'x "__hist__" y' }, hist: [{ at: '2026-11-20T09:00:00Z', k: [{ label: 'Hike 25bps', p: 92 }] }, { at: '2026-11-20T10:00:00Z', g: { quarter: '2026 Q4', value: 3.2 } }] };
+  const t = H.fileText(out);
+  assert.deepEqual(JSON.parse(t), out);
+  assert.equal(t.split('\n').filter((l) => l.includes('"at":"2026-11-20T')).length, 2, 'one line a reading');
+  assert.deepEqual(JSON.parse(H.fileText({ v: 1, hist: [] })), { v: 1, hist: [] });
+  assert.deepEqual(JSON.parse(H.fileText({ v: 1 })), { v: 1 });
+});

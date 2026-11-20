@@ -311,11 +311,18 @@ export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = f
   return out;
 }
 
+// The file as text: readable, with the history one reading a line (pretty-printed it was most of the file's 190 KB). Pure.
+export function fileText(out) {
+  const H = Array.isArray(out && out.hist) ? out.hist : null, MARK = '"__hist__"';
+  if (!H) return JSON.stringify(out, null, 1);
+  return JSON.stringify({ ...out, hist: '__hist__' }, null, 1).replace(MARK, () => (H.length ? `[\n${H.map((h) => '  ' + JSON.stringify(h)).join(',\n')}\n ]` : '[]'));
+}
+
 export async function main(dir = 'data') {
   const M = path.join(dir, 'macro'); fs.mkdirSync(M, { recursive: true });
   const f = path.join(M, 'hard-data.json'); let prev = null; try { prev = JSON.parse(fs.readFileSync(f, 'utf8')); } catch (e) {}
   const out = await collect({ prev, log: console.log });
-  const tmp = f + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(out, null, 1)); fs.renameSync(tmp, f);
+  const tmp = f + '.tmp'; fs.writeFileSync(tmp, fileText(out)); fs.renameSync(tmp, f);
   console.log('Hard data:', Object.entries(out.sources).map(([k, v]) => `${k} ${v}`).join(' · '));
   if (out.odds && out.odds.line) console.log(out.odds.line);
 }
