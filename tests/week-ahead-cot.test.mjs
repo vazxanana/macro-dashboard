@@ -58,3 +58,9 @@ test('veteran.mjs hands macro/cot.json to the Week ahead', () => {
   assert.match(src, /cot = rd\(path\.join\(M, 'cot\.json'\), null\)/);
   assert.match(src, /weekAhead\(\{[^\n]*\bcot, dataDir: dir \}\)/);
 });
+
+test('a net long at the bottom of its range is "the least long", not "crowded short" (silver, 20 Nov 2026)', () => {
+  const [p] = WA.positioningOf({ markets: [mk('silver', { pct: 4, net: 3615 })] });
+  assert.match(p.text, /the least long in 3 years \(4th percentile, still net long\)/);
+  assert.doesNotMatch(p.text, /crowded short/);
+});

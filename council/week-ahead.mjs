@@ -162,7 +162,9 @@ export function dayRange(fc, day, rf) {
   }
   if (best) {
     Object.assign(out, { eventPct: best.pct, eventUsd: usd(best.pct), type: best.type, n: best.n });
-    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}.`);
+    // past release days are measured in their own years' volatility: when they sit under today's normal day, say so
+    // (20 Nov 2026: core PCE days ±0.5% against a ±1.4% normal day now) instead of implying the release is the smaller risk
+    parts.push(`On past ${best.name} days the median move was ${say(best.pct, out.eventUsd, best.n)}${best.pct < p ? ', smaller than today\'s normal day because gold moves more now than in most of those years: plan on today\'s range' : ''}.`);
   }
   const mk = day && day.market;
   if (mk && mk.kind === 'holiday') parts.push('US markets closed: thin trading, moves can be jumpy and fade.');
@@ -212,7 +214,10 @@ export function positioningOf(cot) {
     if (!crowd && !big) continue;
     const yen = k === 'jpy', fut = yen ? ' yen futures' : '', who = m.who ? m.who.charAt(0).toUpperCase() + m.who.slice(1) : 'Speculators';
     const parts = [];
-    if (crowd) parts.push(`crowded ${crowd}${fut} (${ord(pct)} percentile of 3 years)`);
+    // a net LONG at the bottom of its range is not a crowded short (20 Nov 2026: silver net +3,615 at the 4th percentile)
+    if (crowd) parts.push(crowd === 'short' && m.net > 0 ? `the least long in 3 years${fut} (${ord(pct)} percentile, still net long)`
+      : crowd === 'long' && m.net < 0 ? `the least short in 3 years${fut} (${ord(pct)} percentile, still net short)`
+      : `crowded ${crowd}${fut} (${ord(pct)} percentile of 3 years)`);
     if (big) parts.push(`${z > 0 ? 'big buying' : 'big selling'}${yen ? ' of yen' : ''} this week (${Number.isFinite(m.chg1) ? `${m.chg1 >= 0 ? '+' : '−'}${Math.abs(Math.round(m.chg1)).toLocaleString('en-US')} contracts, ` : ''}${z > 0 ? '+' : '−'}${Math.abs(z)} standard deviations)`);
     let text = `${name}: ${who} ${parts.join(', ')}; net ${fmtN(m.net)} contracts${m.asOf ? `, as of the ${m.asOf} report` : ''}${m.late ? ' (published late)' : ''}.`;
     if (yen) text += ` The yen futures are yen against the dollar: a long there is a bet that USD/JPY falls${crowd ? `, so crowded ${crowd} yen means crowded ${crowd === 'long' ? 'short' : 'long'} USD/JPY` : ''}.`;

@@ -57,3 +57,8 @@ test('the Macro desk draws the range as text under each day heading', () => {
   assert.ok(block.includes("'<p class=\"wa-quiet wa-rg\">' + esc(d.range.text) + '</p>'"));
   assert.ok(block.indexOf('wa-rg') > block.indexOf('<h3>'));
 });
+
+test('a release-day median under today\'s normal day says to plan on today\'s range (20 Nov 2026)', () => {
+  const src = fs.readFileSync(new URL('../council/week-ahead.mjs', import.meta.url), 'utf8');
+  assert.ok(src.includes("smaller than today\\'s normal day because gold moves more now than in most of those years: plan on today\\'s range"));
+});
