@@ -2975,6 +2975,10 @@ not a sell), regime, the veteran's levels and month call, the rule book's readin
 issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
 `tests/week-ahead.test.mjs`.
+**Browser pass (20 Nov 2026)**, display only: the frame's parts ran together on one line (`.wa .wa-r` is a block now), the
+study links were 16 px tall on touch (`a.wa-st`, 44 px on a coarse pointer), and a study link / verdict from the file reached an
+`href` / class unchecked (`WA_HREF`: only `/<page>.html#<anchor>` of this site; a class only for pass / fail / inc). Checked at
+390 px touch and 1440 px in three themes: no text under 12 px or under AA, no sideways scroll. Test: `tests/macro-ahead-ui.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):

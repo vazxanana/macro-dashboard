@@ -525,7 +525,9 @@
   .wa-day ul { list-style: none; margin: 6px 0 0; padding: 0; }
   .wa-day li { padding: 6px 0; border-top: 1px solid var(--line); font: 400 var(--fs-sm, 13px)/1.5 var(--sans); color: var(--ink-dim); }
   .wa-day li b { color: var(--ink); }
-  .wa-day li .wa-r { display: block; }
+  .wa-day li .wa-r, .wa .wa-r { display: block; }
+  /* 20 Nov 2026 quality pass: a study link is a 44 px target on touch */
+  @media (pointer: coarse) { .wa a.wa-st { display: inline-flex; align-items: center; min-height: 44px; } }
   .wa-chip { display: inline-block; padding: 0 7px; margin-right: 6px; border-radius: 999px; font: 600 12px/1.6 var(--sans); border: 1px solid var(--line); color: var(--ink-dim); }
   .wa-chip.pass { color: var(--buy); border-color: currentColor; } .wa-chip.fail { color: var(--sell); border-color: currentColor; }
   .wa-nc { color: var(--ink); }
@@ -1481,6 +1483,8 @@
   // 20 Nov 2026: the Week ahead plan (macro/week-ahead.json, council/week-ahead.mjs); display only
   var WA_DAY = function (ymd) { var d = new Date(ymd + 'T12:00:00Z'); return d.getUTCDate() + ' ' + MONS[d.getUTCMonth()]; };
   var WA_V = { pass: 'Passed its test', fail: 'Tested: failed', inc: 'Inconclusive' };
+  // a study link stays on this site: a page of the site and an optional anchor, never another host (20 Nov 2026)
+  var WA_HREF = function (l) { l = String(l || '').replace(/^\/+/, ''); return /^[\w-]+\.html(#[\w-]+)?$/.test(l) ? '/' + l : ''; };
   function renderAhead(A) {
     var sec = $('c-ahead'); if (!A || !Array.isArray(A.days) || !A.days.length) { sec.hidden = true; $('one-s-ahead').innerHTML = ''; return; } sec.hidden = false;
     $('wa-sub').textContent = (A.next ? 'next week' : 'the rest of this week') + ', ' + WA_DAY(A.from) + ' to ' + WA_DAY(A.to) + ' · paper only';
@@ -1498,8 +1502,8 @@
       if ((d.fed || []).length) h += '<ul>' + d.fed.map(function (e) { return '<li><b>Fed: ' + esc(e.title) + '</b>' + (e.time ? ' · ' + esc(e.time) + ' New York' : '') + (e.topic ? '<span class="wa-r">' + esc(e.topic) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
       if ((d.rules || []).length) h += '<ul>' + d.rules.map(function (r) {
         var f = r.forward && r.forward.verdict && r.forward.verdict !== r.headline ? '<span class="wa-r">Forward record: ' + esc(r.forward.verdict) + '</span>' : '';
-        return '<li><span class="wa-chip ' + esc(r.verdict) + '">' + esc(WA_V[r.verdict] || r.verdict) + '</span><b>' + esc(r.what) + '</b> <small>(' + esc(r.when) + ')</small>'
-          + '<span class="wa-r">' + esc(r.headline) + '</span>' + f + '<span class="wa-r"><a href="/' + esc(r.link) + '">The study</a></span></li>'; }).join('') + '</ul>';
+        return '<li><span class="wa-chip' + (WA_V[r.verdict] ? ' ' + r.verdict : '') + '">' + esc(WA_V[r.verdict] || r.verdict) + '</span><b>' + esc(r.what) + '</b> <small>(' + esc(r.when) + ')</small>'
+          + '<span class="wa-r">' + esc(r.headline) + '</span>' + f + (WA_HREF(r.link) ? '<span class="wa-r"><a class="wa-st" href="' + esc(WA_HREF(r.link)) + '">The study</a></span>' : '') + '</li>'; }).join('') + '</ul>';
       return h + '</div>'; }).join('');
     var F = A.frame || {}, fb = (F.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; });
     (F.rulebook || []).forEach(function (r) { fb.push('<li><b>Your rule book:</b> ' + esc(r.text) + (r.caveat ? ' <span class="wa-r">' + esc(r.caveat) + '</span>' : '') + '</li>'); });
