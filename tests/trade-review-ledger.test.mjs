@@ -12,7 +12,8 @@ const src = (f) => fs.readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
 const copy = () => { const d = fs.mkdtempSync(path.join(os.tmpdir(), 'trl-')); fs.cpSync(FX, d, { recursive: true }); return d; };
 const row = (t, o = {}) => ({ t, R: o.net ?? 0, net: o.net ?? 0, side: 'sell', session: 'asia', mfe: null, ...o });
 const entry = (o = {}) => ({ id: 's|shadow#x', stream: 's|shadow', kind: 'weak-side', field: 'side', value: 'sell', recordedAt: 1000, evidence: { n: 40, mean: -0.2, t: -3 }, ...o });
-const mk = (n, f) => Array.from({ length: n }, (_, i) => row(2000 + i, f(i)));
+// one trade every 5 hours: the rows span many UTC days ("held" needs the by-day t too since 20 Nov 2026)
+const mk = (n, f) => Array.from({ length: n }, (_, i) => row(2000 + i * 18000, f(i)));
 
 test('ledger: the forward check reads only trades closed AFTER the entry was recorded (no look-ahead, no reuse)', () => {
   const before = [], after = [];
@@ -20,7 +21,7 @@ test('ledger: the forward check reads only trades closed AFTER the entry was rec
   for (let i = 0; i < 40; i++) before.push(row(500 + i, { side: i % 2 ? 'buy' : 'sell', net: i % 2 ? -5 : 5 }));
   before.push(row(1000, { side: 'sell', net: 50 }));   // closed exactly when it was recorded: not after it
   before.push(row(undefined, { side: 'sell', net: 50 }));   // no close time: never counted
-  for (let i = 0; i < 60; i++) after.push(row(1001 + i, { side: i % 2 ? 'buy' : 'sell', net: (i % 2 ? 1 : -1) + (i % 3) * 0.1 }));
+  for (let i = 0; i < 60; i++) after.push(row(1001 + i * 18000, { side: i % 2 ? 'buy' : 'sell', net: (i % 2 ? 1 : -1) + (i % 3) * 0.1 }));
   const f = T.forwardCheck(entry(), before.concat(after));
   assert.equal(f.n, 30); assert.equal(f.rest.n, 30); assert.ok(f.t < -2); assert.equal(f.status, 'held');
   assert.ok(f.mean < 0 && f.mean > -1.1, 'the mean of the new sells only');

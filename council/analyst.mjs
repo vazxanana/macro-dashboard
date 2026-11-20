@@ -207,43 +207,59 @@ export function postMortem(tr, { events = null } = {}) {
   const fill = tr.filled || tr.opened, closed = tr.closed, mfe = Math.max(0, +tr.mfe || 0), lossR = Math.abs(tr.R != null ? +tr.R : -1);
   const tags = new Set(), lines = [], ev = { mfeR: +r2(mfe), maeR: +r2(Math.max(lossR, +tr.mae || 0)), toStopMin: Math.round((closed - fill) / 60) };
   const finds = [];   // [rank, title]: the lowest rank is the headline
+  // 20 Nov 2026 audit. (a) A loss closed by its TIME limit (maxHold: the daily engulf's 240 h, the replica's 48 h, the Mosha
+  // cycle's 72 h) was never stopped: it used to be written up as "stopped", could be tagged a stop hunt or "stop inside noise",
+  // and a release near the exit read as "news during the trade". No stop was hit, so no stop is judged. (b) Where the stop sat:
+  // "how far past the stop" was read as the worst price minus 1R, right only for a stop still at its opening distance; a stop
+  // that a trail or break-even step had moved sat nearer the entry (a loss of −0.3R at a trailed stop that price then passed by
+  // 0.5R read as "0R past it": a stop hunt by mistake). The stop's distance at the exit is now measured in the opening risk.
+  const timed = tr.exitKind === 'time' || /^\d+(\.\d+)? h$/.test(String(tr.exit || ''));
+  const r0 = +tr.r0 > 0 ? +tr.r0 : 0, moved = !!(tr.trailMoved || tr.beMoved);
+  const stopR = moved && r0 && Number.isFinite(tr.entry) && Number.isFinite(tr.stop) ? Math.min(1, Math.max(0, s * (tr.entry - tr.stop) / r0)) : 1;
+  if (timed) ev.exit = 'time'; else if (stopR !== 1) ev.stopAtR = +r2(stopR);
   // 1. after the entry
-  lines.push(`After the entry: best +${r2(mfe)}R (MFE), worst −${r2(ev.maeR)}R (MAE); stopped ${dur(closed - fill)} after the fill.`);
+  lines.push(`After the entry: best +${r2(mfe)}R (MFE), worst −${r2(ev.maeR)}R (MAE); ${timed ? `closed by its time limit ${dur(closed - fill)} after the fill at −${r2(lossR)}R, not by its stop` : `stopped ${dur(closed - fill)} after the fill`}.`);
+  if (!timed && stopR !== 1) lines.push(`The stop had been moved: it sat ${r2(stopR)}R from the entry when it was hit.`);
   const gap = +tr.gapR || +pm.gap || 0;
   if (gap > 0) { ev.gapR = gap; lines.push(`The stop candle gapped: filled ${r2(gap)}R past the stop.`); }
   if (Number.isFinite(tr.Rnet) && tr.Rnet !== tr.R) ev.Rnet = tr.Rnet;
-  if (mfe >= 1) finds.push([4.2, `Was +${r2(mfe)}R, then stopped`]);
+  if (timed) finds.push([5, 'Closed at a loss by its time limit']);
+  if (mfe >= 1) finds.push([4.2, timed ? `Was +${r2(mfe)}R, then closed at a loss by the time limit` : `Was +${r2(mfe)}R, then stopped`]);
   // 2. after the stop: did price come back to the target?
   if (a) {
     const watch = (pm.until || closed) - closed;
     ev.after = { bestR: a.best, worstR: a.worst, watchH: +(watch / 3600).toFixed(1), hitT1: a.hitT1 || null };
-    if (a.hitT1 != null) {
-      const past = Math.max(0, (a.worstPre != null ? a.worstPre : a.worst) - 1);
+    if (a.hitT1 != null && timed) {
+      ev.after.toTargetH = +((a.hitT1 - closed) / 3600).toFixed(1);
+      lines.push(`Price reached the target ${dur(a.hitT1 - closed)} after the time exit: the time limit, not the stop, ended the trade, so stop placement is not judged.`);
+    } else if (a.hitT1 != null) {
+      const past = Math.max(0, (a.worstPre != null ? a.worstPre : a.worst) - stopR);
       ev.after.pastStopR = +r2(past); ev.after.toTargetH = +((a.hitT1 - closed) / 3600).toFixed(1);
       if (past <= 0.6) {
         tags.add('hunt'); finds.push([1, 'Stop swept, then the target']);
         lines.push(`After the stop price went only ${r2(past)}R past it, then reached the target ${dur(a.hitT1 - closed)} later: the direction was right and the stop sat where the market swept (stop too tight or too obvious).`);
       } else lines.push(`Price reached the target ${dur(a.hitT1 - closed)} after the stop, but only after going ${r2(past)}R past the stop: a stop wide enough to survive that would have shrunk the trade a lot, so this is not tagged a stop hunt.`);
     } else {
-      lines.push(`In the ${dur(watch)} after the stop price did not reach the target (best +${r2(a.best)}R, worst −${r2(a.worst)}R from the entry).`);
-      if (mfe < 0.3 && a.worst >= 2) { finds.push([6, 'Wrong direction; the stop did its job']); lines.push('It never went for the trade and carried on 2R+ against it: the read of direction was wrong, not the stop.'); }
+      lines.push(`In the ${dur(watch)} after the ${timed ? 'exit' : 'stop'} price did not reach the target (best +${r2(a.best)}R, worst −${r2(a.worst)}R from the entry).`);
+      if (!timed && mfe < 0.3 && a.worst >= 2) { finds.push([6, 'Wrong direction; the stop did its job']); lines.push('It never went for the trade and carried on 2R+ against it: the read of direction was wrong, not the stop.'); }
     }
-  } else lines.push('What price did after the stop was not recorded, so stop placement is not judged.');
+  } else lines.push(`What price did after the ${timed ? 'exit' : 'stop'} was not recorded, so stop placement is not judged.`);
   // 3. timing: session opens and news
   const oE = opensNear(fill)[0], oS = opensNear(closed)[0];
   ev.opens = [oE && { at: 'entry', name: oE.name, mins: oE.mins }, oS && { at: 'stop', name: oS.name, mins: oS.mins }].filter(Boolean);
-  if (oE || oS) lines.push([oE && relOpen(oE, 'Entry'), oS && relOpen(oS, oE ? 'stopped' : 'Stopped')].filter(Boolean).join('; ') + '.');
+  if (oE || oS) lines.push([oE && relOpen(oE, 'Entry'), oS && relOpen(oS, timed ? (oE ? 'closed' : 'Closed') : oE ? 'stopped' : 'Stopped')].filter(Boolean).join('; ') + '.');
   else lines.push('No session open within 30 min of the entry or the stop.');
   const news = Array.isArray(events) ? events.filter((e) => (!e.impact || e.impact === 'High') && e.t >= fill - 1800 && e.t <= closed + 300) : newsAround(tr, fill - 1800, closed + 300);
   if (news && news.length) {
     ev.news = news.map((e) => ({ t: e.t, title: `${e.country ? e.country + ' ' : ''}${e.title}` }));
     // tagged only when the stop came within 2 h of a major release (tier 2 calendar items, ISM / jobless claims, are listed only)
-    const hit = news.filter((e) => e.tier !== 2 && e.t >= fill - 1800 && e.t <= closed && closed - e.t <= 7200);
+    const hit = timed ? [] : news.filter((e) => e.tier !== 2 && e.t >= fill - 1800 && e.t <= closed && closed - e.t <= 7200);
     if (hit.length) { tags.add('news'); finds.push([2, 'News during the trade']); }
-    lines.push(`High-impact news: ${news.map((e) => `${e.country ? e.country + ' ' : ''}${e.title} at ${hm(e.t)} UTC (${e.t <= closed ? `${dur(closed - e.t)} before the stop` : 'after the stop'})`).join('; ')}${hit.length ? '' : '; no major release within 2 h before the stop, so it is not tagged news'}.`);
-  } else lines.push('No high-impact news for its currencies from 30 min before the fill to the stop.');
+    lines.push(`High-impact news: ${news.map((e) => `${e.country ? e.country + ' ' : ''}${e.title} at ${hm(e.t)} UTC (${e.t <= closed ? `${dur(closed - e.t)} before the ${timed ? 'exit' : 'stop'}` : `after the ${timed ? 'exit' : 'stop'}`})`).join('; ')}${hit.length ? '' : timed ? '; the trade ended on its time limit, so it is not tagged news' : '; no major release within 2 h before the stop, so it is not tagged news'}.`);
+  } else lines.push(`No high-impact news for its currencies from 30 min before the fill to the ${timed ? 'exit' : 'stop'}.`);
   // 4. stop size and entry timing
-  if ((c.stopAtr != null && c.stopAtr < 0.5) || (c.stopSpreads != null && c.stopSpreads < 5)) { tags.add('noise'); finds.push([3, 'Stop inside normal noise']); lines.push(`The stop was ${c.stopAtr}× ATR (${c.stopSpreads} spreads) from the entry: inside one normal candle.`); }
+  if (timed) { if (c.stopAtr != null) lines.push(`The stop was ${c.stopAtr}× ATR from the entry and was not hit.`); }
+  else if ((c.stopAtr != null && c.stopAtr < 0.5) || (c.stopSpreads != null && c.stopSpreads < 5)) { tags.add('noise'); finds.push([3, 'Stop inside normal noise']); lines.push(`The stop was ${c.stopAtr}× ATR (${c.stopSpreads} spreads) from the entry: inside one normal candle.`); }
   else if (c.stopAtr != null) lines.push(`The stop was ${c.stopAtr}× ATR from the entry, outside normal candle noise.`);
   if (pm.slip != null && pm.slip < -0.25) { tags.add('late'); finds.push([4, 'Late entry']); lines.push(`Filled ${r2(-pm.slip)}R worse than the planned entry: the move had started without it.`); }
   else if (c.sigAge != null && c.sigAge > 8) { tags.add('late'); finds.push([4, 'Late entry']); lines.push(`The signal was ${c.sigAge} candles old at the entry.`); }
@@ -272,7 +288,7 @@ export function analystReviews({ trades = [], prev = {}, now = Math.floor(Date.n
   let changed = false;
   for (const [id, r] of Object.entries(P)) if (!ids.has(id)) out[id] = r;
   for (const x of trades) {
-    if (!x || x.shadow || x.replay || x.status !== 'loss' || !x.closed) continue;
+    if (!x || x.shadow || x.replay || x.void || x.status !== 'loss' || !x.closed) continue;   // a void record is never a loss to explain
     const p = P[x.id];
     if (!((x.pm && x.pm.phase === 'done') || (!x.pm && now - x.closed > 5 * 86400))) { if (p) out[x.id] = p; continue; }
     const r = postMortem(x, { events });
