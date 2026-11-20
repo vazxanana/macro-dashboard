@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-20T18:04:26.000Z",
+ "at": "2026-11-20T18:07:54.000Z",
  "rule": "proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.",
  "inSample": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.",
  "windows": {
@@ -14,9 +14,11 @@
   "streamN": 10,
   "strongN": 30,
   "fastStopS": 1800,
-  "splitTests": 107,
-  "holmAlpha": 0.05
+  "splitTests": 100,
+  "holmAlpha": 0.05,
+  "dayN": 5
  },
+ "byDay": "Beside each per-trade t: a by-day t, trades filled the same UTC day counted together (cluster-robust; null under 5 days = too few days to judge). A proposal is strong only when both agree.",
  "totals": {
   "live": {
    "d7": {
@@ -34,6 +36,27 @@
     "net": -26.97,
     "gross": -21.53
    }
+  },
+  "liveNow": {
+   "d7": {
+    "n": 0,
+    "net": 0,
+    "gross": 0
+   },
+   "d30": {
+    "n": 4,
+    "net": -1.11,
+    "gross": -1
+   },
+   "all": {
+    "n": 4,
+    "net": -1.11,
+    "gross": -1
+   },
+   "streams": [
+    "replica|live",
+    "geg|live"
+   ]
   },
   "shadow": {
    "d30": {
@@ -60,6 +83,17 @@
    "ownerShadow": false,
    "retired": true,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "xau",
+    "xrp"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -67,6 +101,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -75,7 +110,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -90,6 +130,7 @@
      "losses": 12,
      "flat": 3,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -12,
       "mean": -0.8,
@@ -98,7 +139,12 @@
      "net": {
       "sum": -14.13,
       "mean": -0.942,
-      "t": -8.25
+      "t": -8.25,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 15,
@@ -113,6 +159,7 @@
      "losses": 12,
      "flat": 3,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -12,
       "mean": -0.8,
@@ -121,7 +168,12 @@
      "net": {
       "sum": -14.13,
       "mean": -0.942,
-      "t": -8.25
+      "t": -8.25,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 15,
@@ -164,7 +216,12 @@
      "n": 15,
      "mean": 0.467,
      "t": 2.43,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 3,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -442,7 +499,7 @@
     "scalp|live|exit-lock1R"
    ],
    "review": {
-    "head": "Scalp (live, no longer trades live): 15 closed, 0% won, −12.00R before costs, −14.13R after (t −8.25); last 30 days −14.13R on 15, last 7 days 0.00R on 0.",
+    "head": "Scalp (live, no longer trades live): 15 closed, 0% won, −12.00R before costs, −14.13R after (t −8.25, too few days (3) for a by-day t); last 30 days −14.13R on 15, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
      "after costs −14.13R on 15 trades (−0.94R a trade, t −8.25)",
@@ -611,6 +668,14 @@
    "ownerShadow": false,
    "retired": true,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "btc",
+    "eurusd",
+    "gbpusd",
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -618,6 +683,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -626,7 +692,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -641,6 +712,7 @@
      "losses": 5,
      "flat": 1,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -5,
       "mean": -0.833,
@@ -649,7 +721,12 @@
      "net": {
       "sum": -7.45,
       "mean": -1.242,
-      "t": -8.4
+      "t": -8.4,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 6,
@@ -664,6 +741,7 @@
      "losses": 5,
      "flat": 1,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -5,
       "mean": -0.833,
@@ -672,7 +750,12 @@
      "net": {
       "sum": -7.45,
       "mean": -1.242,
-      "t": -8.4
+      "t": -8.4,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 6,
@@ -715,7 +798,12 @@
      "n": 5,
      "mean": 1,
      "t": 2.24,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 3,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 2,
@@ -931,10 +1019,10 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Retrace scalp (live, no longer trades live): 6 closed, 0% won, −5.00R before costs, −7.45R after (t −8.40); last 30 days −7.45R on 6, last 7 days 0.00R on 0.",
+    "head": "Retrace scalp (live, no longer trades live): 6 closed, 0% won, −5.00R before costs, −7.45R after (too few to judge); last 30 days −7.45R on 6, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "after costs −7.45R on 6 trades (−1.24R a trade, t −8.40)",
+     "after costs −7.45R on 6 trades (−1.24R a trade, too few to judge)",
      "stop exits −6.91R on 5",
      "breakeven exits −0.54R on 1",
      "costs −2.45R (+0.41R a trade)",
@@ -1029,6 +1117,14 @@
    "ownerShadow": false,
    "retired": true,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "eth",
+    "usdchf",
+    "xrp"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -1036,6 +1132,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -1044,7 +1141,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -1059,6 +1161,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.4,
+     "days": 2,
      "gross": {
       "sum": 2.05,
       "mean": 0.41,
@@ -1067,7 +1170,12 @@
      "net": {
       "sum": 1.7,
       "mean": 0.34,
-      "t": 0.39
+      "t": 0.39,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 5,
@@ -1082,6 +1190,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.4,
+     "days": 2,
      "gross": {
       "sum": 2.05,
       "mean": 0.41,
@@ -1090,7 +1199,12 @@
      "net": {
       "sum": 1.7,
       "mean": 0.34,
-      "t": 0.39
+      "t": 0.39,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 5,
@@ -1126,14 +1240,19 @@
     },
     "giveback": {
      "n": 4,
-     "mean": 1.468,
+     "mean": 1.588,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 5,
      "mean": 0.19,
      "t": 0.24,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 2,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 1,
@@ -1325,9 +1444,9 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Intraday (live, no longer trades live): 5 closed, 40% won, +2.05R before costs, +1.70R after (t 0.39); last 30 days +1.70R on 5, last 7 days 0.00R on 0.",
+    "head": "Intraday (live, no longer trades live): 5 closed, 40% won, +2.05R before costs, +1.70R after (too few to judge); last 30 days +1.70R on 5, last 7 days 0.00R on 0.",
     "working": [
-     "after costs +1.70R on 5 trades (+0.34R a trade, t 0.39)",
+     "after costs +1.70R on 5 trades (+0.34R a trade, too few to judge)",
      "target exits +4.88R on 2"
     ],
     "losing": [
@@ -1410,6 +1529,12 @@
    "ownerShadow": false,
    "retired": true,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "btc",
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -1417,6 +1542,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -1425,7 +1551,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -1440,6 +1571,7 @@
      "losses": 4,
      "flat": 1,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -4,
       "mean": -0.8,
@@ -1448,7 +1580,12 @@
      "net": {
       "sum": -4.35,
       "mean": -0.87,
-      "t": -4.19
+      "t": -4.19,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 5,
@@ -1463,6 +1600,7 @@
      "losses": 4,
      "flat": 1,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -4,
       "mean": -0.8,
@@ -1471,7 +1609,12 @@
      "net": {
       "sum": -4.35,
       "mean": -0.87,
-      "t": -4.19
+      "t": -4.19,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 5,
@@ -1514,7 +1657,12 @@
      "n": 5,
      "mean": 0.6,
      "t": 1.5,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 3,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 1,
@@ -1667,10 +1815,10 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Retrace intraday (live, no longer trades live): 5 closed, 0% won, −4.00R before costs, −4.35R after (t −4.19); last 30 days −4.35R on 5, last 7 days 0.00R on 0.",
+    "head": "Retrace intraday (live, no longer trades live): 5 closed, 0% won, −4.00R before costs, −4.35R after (too few to judge); last 30 days −4.35R on 5, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "after costs −4.35R on 5 trades (−0.87R a trade, t −4.19)",
+     "after costs −4.35R on 5 trades (−0.87R a trade, too few to judge)",
      "stop exits −4.31R on 4"
     ]
    },
@@ -1748,6 +1896,11 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -1755,6 +1908,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -1763,7 +1917,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -1778,6 +1937,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0.5,
+     "days": 1,
      "gross": {
       "sum": 1,
       "mean": 0.5,
@@ -1786,7 +1946,12 @@
      "net": {
       "sum": 0.95,
       "mean": 0.475,
-      "t": 0.32
+      "t": 0.32,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 2,
@@ -1801,6 +1966,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0.5,
+     "days": 1,
      "gross": {
       "sum": 1,
       "mean": 0.5,
@@ -1809,7 +1975,12 @@
      "net": {
       "sum": 0.95,
       "mean": 0.475,
-      "t": 0.32
+      "t": 0.32,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 2,
@@ -1845,14 +2016,19 @@
     },
     "giveback": {
      "n": 1,
-     "mean": -0.01,
+     "mean": 0,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 2,
      "mean": -0.5,
      "t": -1,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -1970,9 +2146,9 @@
    },
    "flags": [],
    "review": {
-    "head": "Replica (live): 2 closed, 50% won, +1.00R before costs, +0.95R after (t 0.32); last 30 days +0.95R on 2, last 7 days 0.00R on 0.",
+    "head": "Replica (live): 2 closed, 50% won, +1.00R before costs, +0.95R after (too few to judge); last 30 days +0.95R on 2, last 7 days 0.00R on 0.",
     "working": [
-     "after costs +0.95R on 2 trades (+0.47R a trade, t 0.32)",
+     "after costs +0.95R on 2 trades (+0.47R a trade, too few to judge)",
      "target exits +1.98R on 1"
     ],
     "losing": [
@@ -2018,6 +2194,11 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -2025,6 +2206,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -2033,7 +2215,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -2048,6 +2235,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2,
       "mean": -1,
@@ -2056,7 +2244,12 @@
      "net": {
       "sum": -2.06,
       "mean": -1.03,
-      "t": -34.33
+      "t": -34.33,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 2,
@@ -2071,6 +2264,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2,
       "mean": -1,
@@ -2079,7 +2273,12 @@
      "net": {
       "sum": -2.06,
       "mean": -1.03,
-      "t": -34.33
+      "t": -34.33,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 2,
@@ -2118,7 +2317,12 @@
      "n": 2,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 2,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -2231,10 +2435,10 @@
    },
    "flags": [],
    "review": {
-    "head": "Gold daily engulf (live): 2 closed, 0% won, −2.00R before costs, −2.06R after (t −34.33); last 30 days −2.06R on 2, last 7 days 0.00R on 0.",
+    "head": "Gold daily engulf (live): 2 closed, 0% won, −2.00R before costs, −2.06R after (too few to judge); last 30 days −2.06R on 2, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "after costs −2.06R on 2 trades (−1.03R a trade, t −34.33)",
+     "after costs −2.06R on 2 trades (−1.03R a trade, too few to judge)",
      "stop exits −2.06R on 2",
      "loss reasons written: news 1 (of 2 reviewed)"
     ]
@@ -2277,6 +2481,11 @@
    "ownerShadow": false,
    "retired": true,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "eurusd"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -2284,6 +2493,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -2292,7 +2502,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -2307,6 +2522,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 0.03,
       "mean": 0.03,
@@ -2315,7 +2531,12 @@
      "net": {
       "sum": 0.03,
       "mean": 0.03,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -2330,6 +2551,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 0.03,
       "mean": 0.03,
@@ -2338,7 +2560,12 @@
      "net": {
       "sum": 0.03,
       "mean": 0.03,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -2377,7 +2604,12 @@
      "n": 1,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -2452,9 +2684,9 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Position (live, no longer trades live): 1 closed, 100% won, +0.03R before costs, +0.03R after (t 0.00); last 30 days +0.03R on 1, last 7 days 0.00R on 0.",
+    "head": "Position (live, no longer trades live): 1 closed, 100% won, +0.03R before costs, +0.03R after (too few to judge); last 30 days +0.03R on 1, last 7 days 0.00R on 0.",
     "working": [
-     "after costs +0.03R on 1 trades (+0.03R a trade, t 0.00)"
+     "after costs +0.03R on 1 trades (+0.03R a trade, too few to judge)"
     ],
     "losing": []
    },
@@ -2484,6 +2716,11 @@
    "ownerShadow": false,
    "retired": true,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "usdchf"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -2491,6 +2728,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -2499,7 +2737,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -2514,6 +2757,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 0.44,
       "mean": 0.44,
@@ -2522,7 +2766,12 @@
      "net": {
       "sum": 0.41,
       "mean": 0.41,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -2537,6 +2786,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 0.44,
       "mean": 0.44,
@@ -2545,7 +2795,12 @@
      "net": {
       "sum": 0.41,
       "mean": 0.41,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -2584,7 +2839,12 @@
      "n": 1,
      "mean": 0.56,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -2659,9 +2919,9 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Swing (live, no longer trades live): 1 closed, 100% won, +0.44R before costs, +0.41R after (t 0.00); last 30 days +0.41R on 1, last 7 days 0.00R on 0.",
+    "head": "Swing (live, no longer trades live): 1 closed, 100% won, +0.44R before costs, +0.41R after (too few to judge); last 30 days +0.41R on 1, last 7 days 0.00R on 0.",
     "working": [
-     "after costs +0.41R on 1 trades (+0.41R a trade, t 0.00)"
+     "after costs +0.41R on 1 trades (+0.41R a trade, too few to judge)"
     ],
     "losing": []
    },
@@ -2691,6 +2951,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": "2026-11-11",
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -2698,6 +2963,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -2706,7 +2972,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -2721,6 +2992,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -2729,7 +3001,12 @@
      "net": {
       "sum": -1.02,
       "mean": -1.02,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -2744,6 +3021,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -2752,7 +3030,12 @@
      "net": {
       "sum": -1.02,
       "mean": -1.02,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -2791,7 +3074,12 @@
      "n": 1,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -2880,10 +3168,10 @@
    },
    "flags": [],
    "review": {
-    "head": "Gold H4 trendline (live): 1 closed, 0% won, −1.00R before costs, −1.02R after (t 0.00); last 30 days −1.02R on 1, last 7 days 0.00R on 0.",
+    "head": "Gold H4 trendline (live, a paper shadow by the owner's rule since 2026-11-11: its new trades are shadows): 1 closed, 0% won, −1.00R before costs, −1.02R after (too few to judge); last 30 days −1.02R on 1, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "after costs −1.02R on 1 trades (−1.02R a trade, t 0.00)",
+     "after costs −1.02R on 1 trades (−1.02R a trade, too few to judge)",
      "stop exits −1.02R on 1",
      "loss reasons written: news 1 (of 1 reviewed)"
     ]
@@ -2914,6 +3202,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": "2026-11-11",
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -2921,6 +3214,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -2929,7 +3223,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -2944,6 +3243,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1.05,
       "mean": -1.05,
@@ -2952,7 +3252,12 @@
      "net": {
       "sum": -1.05,
       "mean": -1.05,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -2967,6 +3272,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1.05,
       "mean": -1.05,
@@ -2975,7 +3281,12 @@
      "net": {
       "sum": -1.05,
       "mean": -1.05,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -3014,7 +3325,12 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -3101,10 +3417,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ New York open run · nyflip (live): 1 closed, 0% won, −1.05R before costs, no cost on record (t 0.00 before costs); last 30 days −1.05R on 1, last 7 days 0.00R on 0.",
+    "head": "NQ New York open run · nyflip (live, a paper shadow by the owner's rule since 2026-11-11: its new trades are shadows): 1 closed, 0% won, −1.05R before costs, no cost on record (too few to judge); last 30 days −1.05R on 1, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "before costs (none on record) −1.05R on 1 trades (−1.05R a trade, t 0.00)",
+     "before costs (none on record) −1.05R on 1 trades (−1.05R a trade, too few to judge)",
      "stop exits −1.05R on 1"
     ]
    },
@@ -3134,6 +3450,54 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": true,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf",
+    "xau",
+    "xrp"
+   ],
+   "regime": {
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 10,
+     "withMove": 10
+    },
+    "with": {
+     "n": 314,
+     "mean": 0.214
+    },
+    "against": {
+     "n": 181,
+     "mean": -0.327
+    },
+    "diff": 0.54,
+    "t": 3.02,
+    "byDay": {
+     "days": 11,
+     "t": 2.03,
+     "p": 0.07
+    },
+    "sides": {
+     "buy": {
+      "n": 249,
+      "against": 154
+     },
+     "sell": {
+      "n": 246,
+      "against": 27
+     }
+    },
+    "note": "the move of a market = its last fill price against its first in this record; known only afterwards: a reading of the split, not a rule"
+   },
    "windows": {
     "d7": {
      "n": 0,
@@ -3141,6 +3505,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -3149,7 +3514,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -3164,6 +3534,7 @@
      "losses": 326,
      "flat": 3,
      "winRate": 0.335,
+     "days": 11,
      "gross": {
       "sum": 114.2,
       "mean": 0.231,
@@ -3172,7 +3543,12 @@
      "net": {
       "sum": 7.89,
       "mean": 0.016,
-      "t": 0.17
+      "t": 0.17,
+      "byDay": {
+       "days": 11,
+       "t": 0.11,
+       "p": 0.914
+      }
      },
      "cost": {
       "known": 495,
@@ -3187,6 +3563,7 @@
      "losses": 326,
      "flat": 3,
      "winRate": 0.335,
+     "days": 11,
      "gross": {
       "sum": 114.2,
       "mean": 0.231,
@@ -3195,7 +3572,12 @@
      "net": {
       "sum": 7.89,
       "mean": 0.016,
-      "t": 0.17
+      "t": 0.17,
+      "byDay": {
+       "days": 11,
+       "t": 0.11,
+       "p": 0.914
+      }
      },
      "cost": {
       "known": 495,
@@ -3229,20 +3611,25 @@
     },
     "reached1R": {
      "withMfe": 486,
-     "n": 260,
+     "n": 272,
      "closedAtLoss": 105,
      "lossNet": -132.36
     },
     "giveback": {
-     "n": 260,
-     "mean": 1.004,
+     "n": 272,
+     "mean": 1.144,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 486,
-     "mean": -0.092,
-     "t": -1.13,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "mean": -0.119,
+     "t": -1.45,
+     "byDay": {
+      "days": 12,
+      "t": -0.9,
+      "p": 0.386
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 52,
@@ -3266,7 +3653,12 @@
        "diff": -0.5,
        "t": -2.52,
        "df": 196.73,
-       "p": 0.013
+       "p": 0.013,
+       "byDay": {
+        "days": 12,
+        "t": -2.74,
+        "p": 0.019
+       }
       }
      },
      {
@@ -3283,7 +3675,12 @@
        "diff": 0.058,
        "t": 0.19,
        "df": 68.81,
-       "p": 0.854
+       "p": 0.854,
+       "byDay": {
+        "days": 11,
+        "t": 0.18,
+        "p": 0.861
+       }
       }
      },
      {
@@ -3300,7 +3697,12 @@
        "diff": 0.397,
        "t": 1.61,
        "df": 204.01,
-       "p": 0.109
+       "p": 0.109,
+       "byDay": {
+        "days": 11,
+        "t": 1.52,
+        "p": 0.16
+       }
       }
      },
      {
@@ -3317,7 +3719,12 @@
        "diff": -0.117,
        "t": -0.52,
        "df": 129.01,
-       "p": 0.607
+       "p": 0.607,
+       "byDay": {
+        "days": 12,
+        "t": -0.31,
+        "p": 0.766
+       }
       }
      },
      {
@@ -3334,7 +3741,12 @@
        "diff": 0.028,
        "t": 0.14,
        "df": 241.83,
-       "p": 0.889
+       "p": 0.889,
+       "byDay": {
+        "days": 11,
+        "t": 0.12,
+        "p": 0.903
+       }
       }
      }
     ],
@@ -3353,7 +3765,12 @@
        "diff": -0.56,
        "t": -2.74,
        "df": 109.19,
-       "p": 0.007
+       "p": 0.007,
+       "byDay": {
+        "days": 11,
+        "t": -2.99,
+        "p": 0.014
+       }
       }
      },
      {
@@ -3370,7 +3787,12 @@
        "diff": 0.279,
        "t": 0.8,
        "df": 80.17,
-       "p": 0.424
+       "p": 0.424,
+       "byDay": {
+        "days": 11,
+        "t": 0.91,
+        "p": 0.385
+       }
       }
      },
      {
@@ -3387,7 +3809,12 @@
        "diff": 0.229,
        "t": 0.87,
        "df": 155.39,
-       "p": 0.388
+       "p": 0.388,
+       "byDay": {
+        "days": 11,
+        "t": 0.83,
+        "p": 0.424
+       }
       }
      },
      {
@@ -3404,7 +3831,12 @@
        "diff": 0.023,
        "t": 0.12,
        "df": 250.01,
-       "p": 0.905
+       "p": 0.905,
+       "byDay": {
+        "days": 11,
+        "t": 0.1,
+        "p": 0.922
+       }
       }
      },
      {
@@ -3421,7 +3853,12 @@
        "diff": -0.113,
        "t": -0.47,
        "df": 81.79,
-       "p": 0.641
+       "p": 0.641,
+       "byDay": {
+        "days": 12,
+        "t": -0.35,
+        "p": 0.733
+       }
       }
      },
      {
@@ -3438,7 +3875,12 @@
        "diff": -0.056,
        "t": -0.21,
        "df": 113.22,
-       "p": 0.831
+       "p": 0.831,
+       "byDay": {
+        "days": 11,
+        "t": -0.16,
+        "p": 0.875
+       }
       }
      }
     ],
@@ -3457,7 +3899,12 @@
        "diff": -0.272,
        "t": -1.41,
        "df": 424.19,
-       "p": 0.159
+       "p": 0.159,
+       "byDay": {
+        "days": 12,
+        "t": -0.92,
+        "p": 0.378
+       }
       }
      },
      {
@@ -3474,7 +3921,12 @@
        "diff": 0.272,
        "t": 1.41,
        "df": 424.19,
-       "p": 0.159
+       "p": 0.159,
+       "byDay": {
+        "days": 12,
+        "t": 0.92,
+        "p": 0.378
+       }
       }
      }
     ],
@@ -3493,7 +3945,12 @@
        "diff": -0.502,
        "t": -2.54,
        "df": 152.36,
-       "p": 0.012
+       "p": 0.012,
+       "byDay": {
+        "days": 11,
+        "t": -1.44,
+        "p": 0.18
+       }
       }
      },
      {
@@ -3510,7 +3967,12 @@
        "diff": 0.958,
        "t": 1.28,
        "df": 25.78,
-       "p": 0.212
+       "p": 0.212,
+       "byDay": {
+        "days": 11,
+        "t": 1.16,
+        "p": 0.271
+       }
       }
      },
      {
@@ -3527,7 +3989,12 @@
        "diff": -0.164,
        "t": -0.41,
        "df": 21.51,
-       "p": 0.688
+       "p": 0.688,
+       "byDay": {
+        "days": 11,
+        "t": -0.32,
+        "p": 0.754
+       }
       }
      },
      {
@@ -3544,7 +4011,12 @@
        "diff": 0.093,
        "t": 0.32,
        "df": 58.08,
-       "p": 0.753
+       "p": 0.753,
+       "byDay": {
+        "days": 11,
+        "t": 0.32,
+        "p": 0.755
+       }
       }
      },
      {
@@ -3561,7 +4033,12 @@
        "diff": -0.251,
        "t": -1.12,
        "df": 104.99,
-       "p": 0.267
+       "p": 0.267,
+       "byDay": {
+        "days": 12,
+        "t": -1.01,
+        "p": 0.332
+       }
       }
      },
      {
@@ -3578,7 +4055,12 @@
        "diff": -1.047,
        "t": -4.5,
        "df": 32.96,
-       "p": 0
+       "p": 0,
+       "byDay": {
+        "days": 12,
+        "t": -3.72,
+        "p": 0.003
+       }
       }
      },
      {
@@ -3595,7 +4077,12 @@
        "diff": -0.176,
        "t": -0.74,
        "df": 78.19,
-       "p": 0.46
+       "p": 0.46,
+       "byDay": {
+        "days": 11,
+        "t": -0.56,
+        "p": 0.591
+       }
       }
      },
      {
@@ -3612,7 +4099,12 @@
        "diff": 0.407,
        "t": 1.54,
        "df": 96.24,
-       "p": 0.127
+       "p": 0.127,
+       "byDay": {
+        "days": 12,
+        "t": 1.09,
+        "p": 0.299
+       }
       }
      },
      {
@@ -3629,7 +4121,12 @@
        "diff": -0.157,
        "t": -0.5,
        "df": 88,
-       "p": 0.618
+       "p": 0.618,
+       "byDay": {
+        "days": 12,
+        "t": -0.42,
+        "p": 0.681
+       }
       }
      },
      {
@@ -3646,7 +4143,12 @@
        "diff": 0.969,
        "t": 2.12,
        "df": 47,
-       "p": 0.039
+       "p": 0.039,
+       "byDay": {
+        "days": 11,
+        "t": 2.44,
+        "p": 0.035
+       }
       }
      }
     ],
@@ -3691,19 +4193,19 @@
     "scalp|shadow|strong-market:xrp"
    ],
    "review": {
-    "head": "Scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 495 closed, 34% won, +114.20R before costs, +7.89R after (t 0.17); last 30 days +7.89R on 495, last 7 days 0.00R on 0.",
+    "head": "Scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 495 closed, 34% won, +114.20R before costs, +7.89R after (t 0.17, by day t 0.11 over 11 days); last 30 days +7.89R on 495, last 7 days 0.00R on 0.",
     "working": [
      "after costs +7.89R on 495 trades (+0.02R a trade, t 0.17)",
      "target exits +415.70R on 166",
      "demo copies filled 0.01R a trade better than paper (n 204, t −0.75)",
-     "XRP: 44 trades at +0.90R a trade against −0.07R for the other 451 (difference +0.97R, t 2.12)"
+     "XRP: 44 trades at +0.90R a trade after costs against −0.07R for the other 451 (difference +0.97R, t 2.12). By day (trades of the same UTC day counted together): t 2.44 over 11 days"
     ],
     "losing": [
      "stop exits −407.11R on 326",
      "breakeven exits −0.70R on 3",
      "costs −106.31R (+0.21R a trade, 24% of the gross wins)",
      "121 of 326 losses stopped within 30 minutes of the fill (−158.69R)",
-     "105 of 260 trades that reached +1R closed at a loss (−132.36R)",
+     "105 of 272 trades that reached +1R closed at a loss (−132.36R)",
      "52 losses saw the target reached after the stop",
      "loss reasons written: hunt 2 (of 2 reviewed)"
     ]
@@ -3866,6 +4368,54 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": true,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf",
+    "xau",
+    "xrp"
+   ],
+   "regime": {
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 7,
+     "withMove": 6
+    },
+    "with": {
+     "n": 113,
+     "mean": 0
+    },
+    "against": {
+     "n": 163,
+     "mean": -0.567
+    },
+    "diff": 0.567,
+    "t": 2.64,
+    "byDay": {
+     "days": 13,
+     "t": 1.78,
+     "p": 0.101
+    },
+    "sides": {
+     "buy": {
+      "n": 138,
+      "against": 128
+     },
+     "sell": {
+      "n": 138,
+      "against": 35
+     }
+    },
+    "note": "the move of a market = its last fill price against its first in this record; known only afterwards: a reading of the split, not a rule"
+   },
    "windows": {
     "d7": {
      "n": 0,
@@ -3873,6 +4423,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -3881,7 +4432,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -3896,6 +4452,7 @@
      "losses": 171,
      "flat": 0,
      "winRate": 0.38,
+     "days": 12,
      "gross": {
       "sum": -29.85,
       "mean": -0.108,
@@ -3904,7 +4461,12 @@
      "net": {
       "sum": -92.42,
       "mean": -0.335,
-      "t": -3.41
+      "t": -3.41,
+      "byDay": {
+       "days": 13,
+       "t": -2.14,
+       "p": 0.053
+      }
      },
      "cost": {
       "known": 276,
@@ -3919,6 +4481,7 @@
      "losses": 171,
      "flat": 0,
      "winRate": 0.38,
+     "days": 12,
      "gross": {
       "sum": -29.85,
       "mean": -0.108,
@@ -3927,7 +4490,12 @@
      "net": {
       "sum": -92.42,
       "mean": -0.335,
-      "t": -3.41
+      "t": -3.41,
+      "byDay": {
+       "days": 13,
+       "t": -2.14,
+       "p": 0.053
+      }
      },
      "cost": {
       "known": 276,
@@ -3957,20 +4525,25 @@
     },
     "reached1R": {
      "withMfe": 261,
-     "n": 81,
+     "n": 87,
      "closedAtLoss": 43,
      "lossNet": -55.77
     },
     "giveback": {
-     "n": 81,
-     "mean": 1.501,
+     "n": 87,
+     "mean": 1.479,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 261,
-     "mean": 0.049,
-     "t": 0.58,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "mean": 0.046,
+     "t": 0.54,
+     "byDay": {
+      "days": 12,
+      "t": 0.39,
+      "p": 0.707
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 41,
@@ -3994,7 +4567,12 @@
        "diff": 0.228,
        "t": 0.89,
        "df": 64.68,
-       "p": 0.378
+       "p": 0.378,
+       "byDay": {
+        "days": 12,
+        "t": 0.88,
+        "p": 0.4
+       }
       }
      },
      {
@@ -4011,7 +4589,12 @@
        "diff": 0.2,
        "t": 0.7,
        "df": 33.45,
-       "p": 0.487
+       "p": 0.487,
+       "byDay": {
+        "days": 12,
+        "t": 0.91,
+        "p": 0.381
+       }
       }
      },
      {
@@ -4028,7 +4611,12 @@
        "diff": -0.139,
        "t": -0.64,
        "df": 134.97,
-       "p": 0.525
+       "p": 0.525,
+       "byDay": {
+        "days": 13,
+        "t": -0.63,
+        "p": 0.539
+       }
       }
      },
      {
@@ -4045,7 +4633,12 @@
        "diff": 0.102,
        "t": 0.37,
        "df": 87.26,
-       "p": 0.71
+       "p": 0.71,
+       "byDay": {
+        "days": 13,
+        "t": 0.23,
+        "p": 0.823
+       }
       }
      },
      {
@@ -4062,7 +4655,12 @@
        "diff": -0.219,
        "t": -1.07,
        "df": 131.99,
-       "p": 0.288
+       "p": 0.288,
+       "byDay": {
+        "days": 12,
+        "t": -0.74,
+        "p": 0.473
+       }
       }
      }
     ],
@@ -4081,7 +4679,12 @@
        "diff": 0.434,
        "t": 1.44,
        "df": 37.39,
-       "p": 0.158
+       "p": 0.158,
+       "byDay": {
+        "days": 12,
+        "t": 1.38,
+        "p": 0.194
+       }
       }
      },
      {
@@ -4098,7 +4701,12 @@
        "diff": -0.44,
        "t": -1.63,
        "df": 36.08,
-       "p": 0.111
+       "p": 0.111,
+       "byDay": {
+        "days": 12,
+        "t": -1.29,
+        "p": 0.224
+       }
       }
      },
      {
@@ -4115,7 +4723,12 @@
        "diff": 0.003,
        "t": 0.01,
        "df": 94.77,
-       "p": 0.988
+       "p": 0.988,
+       "byDay": {
+        "days": 13,
+        "t": 0.01,
+        "p": 0.99
+       }
       }
      },
      {
@@ -4132,7 +4745,12 @@
        "diff": -0.158,
        "t": -0.75,
        "df": 125.26,
-       "p": 0.452
+       "p": 0.452,
+       "byDay": {
+        "days": 12,
+        "t": -0.49,
+        "p": 0.631
+       }
       }
      },
      {
@@ -4149,7 +4767,12 @@
        "diff": 0.055,
        "t": 0.18,
        "df": 70.19,
-       "p": 0.857
+       "p": 0.857,
+       "byDay": {
+        "days": 13,
+        "t": 0.11,
+        "p": 0.911
+       }
       }
      },
      {
@@ -4166,7 +4789,12 @@
        "diff": 0.133,
        "t": 0.55,
        "df": 56.19,
-       "p": 0.584
+       "p": 0.584,
+       "byDay": {
+        "days": 12,
+        "t": 0.66,
+        "p": 0.52
+       }
       }
      }
     ],
@@ -4185,7 +4813,12 @@
        "diff": -0.373,
        "t": -1.91,
        "df": 237.84,
-       "p": 0.057
+       "p": 0.057,
+       "byDay": {
+        "days": 13,
+        "t": -1.34,
+        "p": 0.204
+       }
       }
      },
      {
@@ -4202,7 +4835,12 @@
        "diff": 0.373,
        "t": 1.91,
        "df": 237.84,
-       "p": 0.057
+       "p": 0.057,
+       "byDay": {
+        "days": 13,
+        "t": 1.34,
+        "p": 0.204
+       }
       }
      }
     ],
@@ -4221,7 +4859,12 @@
        "diff": -0.27,
        "t": -1.47,
        "df": 55.86,
-       "p": 0.147
+       "p": 0.147,
+       "byDay": {
+        "days": 13,
+        "t": -0.87,
+        "p": 0.402
+       }
       }
      },
      {
@@ -4238,7 +4881,12 @@
        "diff": 0.152,
        "t": 0.43,
        "df": 28.69,
-       "p": 0.668
+       "p": 0.668,
+       "byDay": {
+        "days": 12,
+        "t": 0.35,
+        "p": 0.729
+       }
       }
      },
      {
@@ -4255,7 +4903,12 @@
        "diff": -0.263,
        "t": -0.67,
        "df": 16.11,
-       "p": 0.51
+       "p": 0.51,
+       "byDay": {
+        "days": 12,
+        "t": -0.58,
+        "p": 0.574
+       }
       }
      },
      {
@@ -4272,7 +4925,12 @@
        "diff": -0.393,
        "t": -1.78,
        "df": 42.12,
-       "p": 0.082
+       "p": 0.082,
+       "byDay": {
+        "days": 12,
+        "t": -2.23,
+        "p": 0.048
+       }
       }
      },
      {
@@ -4289,7 +4947,12 @@
        "diff": -0.26,
        "t": -0.85,
        "df": 34.47,
-       "p": 0.402
+       "p": 0.402,
+       "byDay": {
+        "days": 13,
+        "t": -0.96,
+        "p": 0.355
+       }
       }
      },
      {
@@ -4306,7 +4969,12 @@
        "diff": -0.398,
        "t": -0.95,
        "df": 20.27,
-       "p": 0.355
+       "p": 0.355,
+       "byDay": {
+        "days": 13,
+        "t": -0.85,
+        "p": 0.412
+       }
       }
      },
      {
@@ -4323,7 +4991,12 @@
        "diff": 0.151,
        "t": 0.4,
        "df": 23.24,
-       "p": 0.694
+       "p": 0.694,
+       "byDay": {
+        "days": 13,
+        "t": 0.33,
+        "p": 0.749
+       }
       }
      },
      {
@@ -4340,7 +5013,12 @@
        "diff": 0.08,
        "t": 0.3,
        "df": 32.64,
-       "p": 0.762
+       "p": 0.762,
+       "byDay": {
+        "days": 13,
+        "t": 0.42,
+        "p": 0.685
+       }
       }
      },
      {
@@ -4357,7 +5035,12 @@
        "diff": 0.469,
        "t": 1.4,
        "df": 63.98,
-       "p": 0.168
+       "p": 0.168,
+       "byDay": {
+        "days": 13,
+        "t": 0.83,
+        "p": 0.422
+       }
       }
      },
      {
@@ -4374,7 +5057,12 @@
        "diff": 0.123,
        "t": 0.55,
        "df": 59.95,
-       "p": 0.583
+       "p": 0.583,
+       "byDay": {
+        "days": 12,
+        "t": 0.46,
+        "p": 0.656
+       }
       }
      }
     ],
@@ -4408,7 +5096,7 @@
     "rscalp|shadow|losing"
    ],
    "review": {
-    "head": "Retrace scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 276 closed, 38% won, −29.85R before costs, −92.42R after (t −3.41); last 30 days −92.42R on 276, last 7 days 0.00R on 0.",
+    "head": "Retrace scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 276 closed, 38% won, −29.85R before costs, −92.42R after (t −3.41, by day t −2.14 over 13 days); last 30 days −92.42R on 276, last 7 days 0.00R on 0.",
     "working": [
      "target exits +125.14R on 105",
      "demo copies filled 0.02R a trade worse than paper (n 102, t 0.67)"
@@ -4418,7 +5106,7 @@
      "stop exits −217.56R on 171",
      "costs −62.57R (+0.23R a trade, 44% of the gross wins)",
      "70 of 171 losses stopped within 30 minutes of the fill (−93.29R)",
-     "43 of 81 trades that reached +1R closed at a loss (−55.77R)",
+     "43 of 87 trades that reached +1R closed at a loss (−55.77R)",
      "41 losses saw the target reached after the stop"
     ]
    },
@@ -4580,6 +5268,54 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": true,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf",
+    "xau",
+    "xrp"
+   ],
+   "regime": {
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 0,
+     "withMove": 0
+    },
+    "with": {
+     "n": 74,
+     "mean": 0.759
+    },
+    "against": {
+     "n": 22,
+     "mean": -0.356
+    },
+    "diff": 1.115,
+    "t": 2.9,
+    "byDay": {
+     "days": 14,
+     "t": 2.48,
+     "p": 0.028
+    },
+    "sides": {
+     "buy": {
+      "n": 29,
+      "against": 11
+     },
+     "sell": {
+      "n": 67,
+      "against": 11
+     }
+    },
+    "note": "the move of a market = its last fill price against its first in this record; known only afterwards: a reading of the split, not a rule"
+   },
    "windows": {
     "d7": {
      "n": 5,
@@ -4587,6 +5323,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 2,
      "gross": {
       "sum": 10.22,
       "mean": 2.044,
@@ -4595,7 +5332,12 @@
      "net": {
       "sum": 10.08,
       "mean": 2.016,
-      "t": 67.73
+      "t": 67.73,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 5,
@@ -4610,6 +5352,7 @@
      "losses": 49,
      "flat": 0,
      "winRate": 0.49,
+     "days": 11,
      "gross": {
       "sum": 56.07,
       "mean": 0.584,
@@ -4618,7 +5361,12 @@
      "net": {
       "sum": 48.3,
       "mean": 0.503,
-      "t": 2.86
+      "t": 2.86,
+      "byDay": {
+       "days": 14,
+       "t": 2.09,
+       "p": 0.057
+      }
      },
      "cost": {
       "known": 96,
@@ -4633,6 +5381,7 @@
      "losses": 49,
      "flat": 0,
      "winRate": 0.49,
+     "days": 11,
      "gross": {
       "sum": 56.07,
       "mean": 0.584,
@@ -4641,7 +5390,12 @@
      "net": {
       "sum": 48.3,
       "mean": 0.503,
-      "t": 2.86
+      "t": 2.86,
+      "byDay": {
+       "days": 14,
+       "t": 2.09,
+       "p": 0.057
+      }
      },
      "cost": {
       "known": 96,
@@ -4671,20 +5425,25 @@
     },
     "reached1R": {
      "withMfe": 96,
-     "n": 53,
+     "n": 57,
      "closedAtLoss": 10,
      "lossNet": -11.06
     },
     "giveback": {
-     "n": 53,
-     "mean": 0.407,
+     "n": 57,
+     "mean": 0.478,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 96,
-     "mean": -0.354,
-     "t": -3.11,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "mean": -0.397,
+     "t": -3.47,
+     "byDay": {
+      "days": 14,
+      "t": -3.39,
+      "p": 0.005
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 3,
@@ -4708,7 +5467,12 @@
        "diff": -0.653,
        "t": -1.7,
        "df": 41.21,
-       "p": 0.096
+       "p": 0.096,
+       "byDay": {
+        "days": 11,
+        "t": -1.46,
+        "p": 0.175
+       }
       }
      },
      {
@@ -4737,7 +5501,12 @@
        "diff": -0.25,
        "t": -0.59,
        "df": 32.73,
-       "p": 0.556
+       "p": 0.556,
+       "byDay": {
+        "days": 14,
+        "t": -0.36,
+        "p": 0.727
+       }
       }
      },
      {
@@ -4754,7 +5523,12 @@
        "diff": -0.112,
        "t": -0.24,
        "df": 18.51,
-       "p": 0.816
+       "p": 0.816,
+       "byDay": {
+        "days": 11,
+        "t": -0.27,
+        "p": 0.796
+       }
       }
      },
      {
@@ -4771,7 +5545,12 @@
        "diff": 0.539,
        "t": 1.39,
        "df": 53.77,
-       "p": 0.171
+       "p": 0.171,
+       "byDay": {
+        "days": 14,
+        "t": 1.06,
+        "p": 0.309
+       }
       }
      }
     ],
@@ -4790,7 +5569,12 @@
        "diff": -0.536,
        "t": -1.15,
        "df": 18.73,
-       "p": 0.265
+       "p": 0.265,
+       "byDay": {
+        "days": 14,
+        "t": -0.81,
+        "p": 0.431
+       }
       }
      },
      {
@@ -4807,7 +5591,12 @@
        "diff": -0.388,
        "t": -0.85,
        "df": 20.64,
-       "p": 0.406
+       "p": 0.406,
+       "byDay": {
+        "days": 11,
+        "t": -0.68,
+        "p": 0.511
+       }
       }
      },
      {
@@ -4824,7 +5613,12 @@
        "diff": -0.069,
        "t": -0.15,
        "df": 23.27,
-       "p": 0.884
+       "p": 0.884,
+       "byDay": {
+        "days": 14,
+        "t": -0.08,
+        "p": 0.934
+       }
       }
      },
      {
@@ -4841,7 +5635,12 @@
        "diff": 0.625,
        "t": 1.6,
        "df": 51.09,
-       "p": 0.116
+       "p": 0.116,
+       "byDay": {
+        "days": 14,
+        "t": 1.18,
+        "p": 0.258
+       }
       }
      },
      {
@@ -4870,7 +5669,12 @@
        "diff": 0.155,
        "t": 0.28,
        "df": 15.33,
-       "p": 0.782
+       "p": 0.782,
+       "byDay": {
+        "days": 14,
+        "t": 0.22,
+        "p": 0.83
+       }
       }
      }
     ],
@@ -4889,7 +5693,12 @@
        "diff": -0.644,
        "t": -1.72,
        "df": 54.62,
-       "p": 0.091
+       "p": 0.091,
+       "byDay": {
+        "days": 14,
+        "t": -1.5,
+        "p": 0.157
+       }
       }
      },
      {
@@ -4906,7 +5715,12 @@
        "diff": 0.644,
        "t": 1.72,
        "df": 54.62,
-       "p": 0.091
+       "p": 0.091,
+       "byDay": {
+        "days": 14,
+        "t": 1.5,
+        "p": 0.157
+       }
       }
      }
     ],
@@ -4925,7 +5739,12 @@
        "diff": 0.353,
        "t": 0.78,
        "df": 20.83,
-       "p": 0.446
+       "p": 0.446,
+       "byDay": {
+        "days": 11,
+        "t": 0.63,
+        "p": 0.543
+       }
       }
      },
      {
@@ -5002,7 +5821,12 @@
        "diff": 0.385,
        "t": 0.72,
        "df": 16.87,
-       "p": 0.481
+       "p": 0.481,
+       "byDay": {
+        "days": 14,
+        "t": 0.57,
+        "p": 0.577
+       }
       }
      },
      {
@@ -5019,7 +5843,12 @@
        "diff": -0.204,
        "t": -0.39,
        "df": 18.34,
-       "p": 0.703
+       "p": 0.703,
+       "byDay": {
+        "days": 14,
+        "t": -0.37,
+        "p": 0.715
+       }
       }
      },
      {
@@ -5048,7 +5877,12 @@
        "diff": 0.65,
        "t": 1.67,
        "df": 30.75,
-       "p": 0.104
+       "p": 0.104,
+       "byDay": {
+        "days": 11,
+        "t": 1.44,
+        "p": 0.18
+       }
       }
      }
     ],
@@ -5083,7 +5917,7 @@
     "intraday|shadow|exit-runs"
    ],
    "review": {
-    "head": "Intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 96 closed, 49% won, +56.07R before costs, +48.30R after (t 2.86); last 30 days +48.30R on 96, last 7 days +10.08R on 5.",
+    "head": "Intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 96 closed, 49% won, +56.07R before costs, +48.30R after (t 2.86, by day t 2.09 over 14 days); last 30 days +48.30R on 96, last 7 days +10.08R on 5.",
     "working": [
      "after costs +48.30R on 96 trades (+0.50R a trade, t 2.86)",
      "target exits +102.41R on 47",
@@ -5093,7 +5927,7 @@
      "stop exits −54.11R on 49",
      "costs −7.77R (+0.08R a trade, 7% of the gross wins)",
      "7 of 49 losses stopped within 30 minutes of the fill (−8.15R)",
-     "10 of 53 trades that reached +1R closed at a loss (−11.06R)",
+     "10 of 57 trades that reached +1R closed at a loss (−11.06R)",
      "3 losses saw the target reached after the stop"
     ]
    },
@@ -5255,6 +6089,45 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": {
+    "markets": 1,
+    "up": 0,
+    "down": 1,
+    "betterSide": {
+     "markets": 1,
+     "withMove": 1
+    },
+    "with": {
+     "n": 33,
+     "mean": 0.626
+    },
+    "against": {
+     "n": 16,
+     "mean": -0.861
+    },
+    "diff": 1.487,
+    "t": 3.72,
+    "byDay": {
+     "days": 11,
+     "t": 2.98,
+     "p": 0.014
+    },
+    "sides": {
+     "buy": {
+      "n": 16,
+      "against": 16
+     },
+     "sell": {
+      "n": 33,
+      "against": 0
+     }
+    },
+    "note": "the move of a market = its last fill price against its first in this record; known only afterwards: a reading of the split, not a rule"
+   },
    "windows": {
     "d7": {
      "n": 33,
@@ -5262,6 +6135,7 @@
      "losses": 21,
      "flat": 0,
      "winRate": 0.364,
+     "days": 5,
      "gross": {
       "sum": 2.68,
       "mean": 0.081,
@@ -5270,7 +6144,12 @@
      "net": {
       "sum": 1.96,
       "mean": 0.059,
-      "t": 0.23
+      "t": 0.23,
+      "byDay": {
+       "days": 5,
+       "t": 0.11,
+       "p": 0.92
+      }
      },
      "cost": {
       "known": 33,
@@ -5285,6 +6164,7 @@
      "losses": 32,
      "flat": 0,
      "winRate": 0.347,
+     "days": 11,
      "gross": {
       "sum": 8.39,
       "mean": 0.171,
@@ -5293,7 +6173,12 @@
      "net": {
       "sum": 6.89,
       "mean": 0.141,
-      "t": 0.53
+      "t": 0.53,
+      "byDay": {
+       "days": 11,
+       "t": 0.3,
+       "p": 0.77
+      }
      },
      "cost": {
       "known": 49,
@@ -5308,6 +6193,7 @@
      "losses": 32,
      "flat": 0,
      "winRate": 0.347,
+     "days": 11,
      "gross": {
       "sum": 8.39,
       "mean": 0.171,
@@ -5316,7 +6202,12 @@
      "net": {
       "sum": 6.89,
       "mean": 0.141,
-      "t": 0.53
+      "t": 0.53,
+      "byDay": {
+       "days": 11,
+       "t": 0.3,
+       "p": 0.77
+      }
      },
      "cost": {
       "known": 49,
@@ -5346,20 +6237,25 @@
     },
     "reached1R": {
      "withMfe": 46,
-     "n": 28,
+     "n": 29,
      "closedAtLoss": 12,
      "lossNet": -12.71
     },
     "giveback": {
-     "n": 28,
-     "mean": 1,
+     "n": 29,
+     "mean": 1.1,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 46,
-     "mean": 0.01,
+     "mean": 0.009,
      "t": 0.04,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 11,
+      "t": 0.03,
+      "p": 0.975
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 13,
@@ -5383,7 +6279,12 @@
        "diff": 0.245,
        "t": 0.47,
        "df": 37.25,
-       "p": 0.641
+       "p": 0.641,
+       "byDay": {
+        "days": 11,
+        "t": 0.51,
+        "p": 0.618
+       }
       }
      },
      {
@@ -5424,7 +6325,12 @@
        "diff": 0.321,
        "t": 0.56,
        "df": 23.29,
-       "p": 0.582
+       "p": 0.582,
+       "byDay": {
+        "days": 11,
+        "t": 0.44,
+        "p": 0.667
+       }
       }
      },
      {
@@ -5455,7 +6361,12 @@
        "diff": 1.137,
        "t": 2.14,
        "df": 23.34,
-       "p": 0.043
+       "p": 0.043,
+       "byDay": {
+        "days": 11,
+        "t": 3.41,
+        "p": 0.007
+       }
       }
      },
      {
@@ -5534,7 +6445,12 @@
        "diff": -1.487,
        "t": -3.72,
        "df": 45.14,
-       "p": 0.001
+       "p": 0.001,
+       "byDay": {
+        "days": 11,
+        "t": -2.98,
+        "p": 0.014
+       }
       }
      },
      {
@@ -5551,7 +6467,12 @@
        "diff": 1.487,
        "t": 3.72,
        "df": 45.14,
-       "p": 0.001
+       "p": 0.001,
+       "byDay": {
+        "days": 11,
+        "t": 2.98,
+        "p": 0.014
+       }
       }
      }
     ],
@@ -5588,20 +6509,21 @@
     "m30m1|shadow|strong-side:sell"
    ],
    "review": {
-    "head": "M30 → M1 scalp (shadow): 49 closed, 35% won, +8.39R before costs, +6.89R after (t 0.53); last 30 days +6.89R on 49, last 7 days +1.96R on 33.",
+    "head": "M30 → M1 scalp (shadow): 49 closed, 35% won, +8.39R before costs, +6.89R after (t 0.53, by day t 0.30 over 11 days); last 30 days +6.89R on 49, last 7 days +1.96R on 33.",
     "working": [
      "after costs +6.89R on 49 trades (+0.14R a trade, t 0.53)",
      "target exits +40.31R on 17",
      "demo copies filled 0.14R a trade better than paper (n 47, t −2.76)",
-     "00-04 UTC: 12 trades at +1.00R a trade against −0.14R for the other 37 (difference +1.14R, t 2.14)",
-     "sells: 33 trades at +0.63R a trade against −0.86R for the other 16 (difference +1.49R, t 3.72)"
+     "00-04 UTC: 12 trades at +1.00R a trade after costs against −0.14R for the other 37 (difference +1.14R, t 2.14). By day (trades of the same UTC day counted together): t 3.41 over 11 days",
+     "sells: 33 trades at +0.63R a trade after costs against −0.86R for the other 16 (difference +1.49R, t 3.72). By day (trades of the same UTC day counted together): t 2.98 over 11 days"
     ],
     "losing": [
      "stop exits −33.42R on 32",
      "costs −1.50R (+0.03R a trade, 4% of the gross wins)",
      "14 of 32 losses stopped within 30 minutes of the fill (−14.90R)",
-     "12 of 28 trades that reached +1R closed at a loss (−12.71R)",
-     "13 losses saw the target reached after the stop"
+     "12 of 29 trades that reached +1R closed at a loss (−12.71R)",
+     "13 losses saw the target reached after the stop",
+     "Regime note: 1 of 1 market fell and 0 rose over this record (first to last fill price), and 100% of the buys traded against their market's own move. With the move +0.63R a trade (n 33), against it −0.86R (n 16), t 3.72; the better side was the side of the move in 1 of 1 market. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards"
     ]
    },
    "recent": [
@@ -5762,6 +6684,20 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": true,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf",
+    "xau",
+    "xrp"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -5769,6 +6705,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -5777,7 +6714,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -5792,6 +6734,7 @@
      "losses": 23,
      "flat": 2,
      "winRate": 0.444,
+     "days": 11,
      "gross": {
       "sum": 9.21,
       "mean": 0.205,
@@ -5800,7 +6743,12 @@
      "net": {
       "sum": -0.44,
       "mean": -0.01,
-      "t": -0.03
+      "t": -0.03,
+      "byDay": {
+       "days": 10,
+       "t": -0.02,
+       "p": 0.982
+      }
      },
      "cost": {
       "known": 45,
@@ -5815,6 +6763,7 @@
      "losses": 23,
      "flat": 2,
      "winRate": 0.444,
+     "days": 11,
      "gross": {
       "sum": 9.21,
       "mean": 0.205,
@@ -5823,7 +6772,12 @@
      "net": {
       "sum": -0.44,
       "mean": -0.01,
-      "t": -0.03
+      "t": -0.03,
+      "byDay": {
+       "days": 10,
+       "t": -0.02,
+       "p": 0.982
+      }
      },
      "cost": {
       "known": 45,
@@ -5857,20 +6811,25 @@
     },
     "reached1R": {
      "withMfe": 41,
-     "n": 14,
+     "n": 15,
      "closedAtLoss": 5,
      "lossNet": -6.15
     },
     "giveback": {
-     "n": 14,
-     "mean": 1.795,
+     "n": 15,
+     "mean": 1.741,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 41,
-     "mean": -0.183,
-     "t": -0.65,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "mean": -0.184,
+     "t": -0.66,
+     "byDay": {
+      "days": 11,
+      "t": -0.61,
+      "p": 0.553
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 3,
@@ -5894,7 +6853,12 @@
        "diff": 0.681,
        "t": 0.66,
        "df": 13.28,
-       "p": 0.521
+       "p": 0.521,
+       "byDay": {
+        "days": 10,
+        "t": 0.76,
+        "p": 0.464
+       }
       }
      },
      {
@@ -5923,7 +6887,12 @@
        "diff": 0.145,
        "t": 0.21,
        "df": 18.77,
-       "p": 0.836
+       "p": 0.836,
+       "byDay": {
+        "days": 10,
+        "t": 0.16,
+        "p": 0.874
+       }
       }
      },
      {
@@ -5966,7 +6935,12 @@
        "diff": -0.575,
        "t": -0.74,
        "df": 19.5,
-       "p": 0.471
+       "p": 0.471,
+       "byDay": {
+        "days": 11,
+        "t": -0.69,
+        "p": 0.508
+       }
       }
      },
      {
@@ -6045,7 +7019,12 @@
        "diff": -1.085,
        "t": -1.25,
        "df": 16.02,
-       "p": 0.228
+       "p": 0.228,
+       "byDay": {
+        "days": 10,
+        "t": -0.99,
+        "p": 0.348
+       }
       }
      },
      {
@@ -6062,7 +7041,12 @@
        "diff": 1.085,
        "t": 1.25,
        "df": 16.02,
-       "p": 0.228
+       "p": 0.228,
+       "byDay": {
+        "days": 10,
+        "t": 0.99,
+        "p": 0.348
+       }
       }
      }
     ],
@@ -6081,7 +7065,12 @@
        "diff": -1.883,
        "t": -3.08,
        "df": 23.45,
-       "p": 0.005
+       "p": 0.005,
+       "byDay": {
+        "days": 11,
+        "t": -3.5,
+        "p": 0.006
+       }
       }
      },
      {
@@ -6182,7 +7171,12 @@
        "diff": 1.638,
        "t": 1.6,
        "df": 10.75,
-       "p": 0.139
+       "p": 0.139,
+       "byDay": {
+        "days": 10,
+        "t": 1.31,
+        "p": 0.222
+       }
       }
      },
      {
@@ -6238,7 +7232,7 @@
     "rintra|shadow|weak-market:audusd"
    ],
    "review": {
-    "head": "Retrace intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 45 closed, 44% won, +9.21R before costs, −0.44R after (t −0.03); last 30 days −0.44R on 45, last 7 days 0.00R on 0.",
+    "head": "Retrace intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 45 closed, 44% won, +9.21R before costs, −0.44R after (t −0.03, by day t −0.02 over 10 days); last 30 days −0.44R on 45, last 7 days 0.00R on 0.",
     "working": [
      "target exits +30.76R on 20",
      "demo copies filled 0.06R a trade better than paper (n 18, t −1.26)"
@@ -6248,7 +7242,7 @@
      "stop exits −31.09R on 23",
      "costs −9.65R (+0.21R a trade, 30% of the gross wins)",
      "5 of 23 losses stopped within 30 minutes of the fill (−10.93R)",
-     "5 of 14 trades that reached +1R closed at a loss (−6.15R)",
+     "5 of 15 trades that reached +1R closed at a loss (−6.15R)",
      "3 losses saw the target reached after the stop",
      "loss reasons written: market 1, htf 1, late 1 (of 3 reviewed)"
     ]
@@ -6411,6 +7405,17 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf",
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 20,
@@ -6418,6 +7423,7 @@
      "losses": 6,
      "flat": 0,
      "winRate": 0.7,
+     "days": 10,
      "gross": {
       "sum": 26.6,
       "mean": 1.33,
@@ -6426,7 +7432,12 @@
      "net": {
       "sum": 25.98,
       "mean": 1.299,
-      "t": 3.39
+      "t": 3.39,
+      "byDay": {
+       "days": 5,
+       "t": 1.74,
+       "p": 0.157
+      }
      },
      "cost": {
       "known": 20,
@@ -6441,6 +7452,7 @@
      "losses": 10,
      "flat": 0,
      "winRate": 0.615,
+     "days": 12,
      "gross": {
       "sum": 26.63,
       "mean": 1.024,
@@ -6449,7 +7461,12 @@
      "net": {
       "sum": 25.6,
       "mean": 0.985,
-      "t": 2.87
+      "t": 2.87,
+      "byDay": {
+       "days": 8,
+       "t": 1.63,
+       "p": 0.146
+      }
      },
      "cost": {
       "known": 26,
@@ -6464,6 +7481,7 @@
      "losses": 10,
      "flat": 0,
      "winRate": 0.615,
+     "days": 12,
      "gross": {
       "sum": 26.63,
       "mean": 1.024,
@@ -6472,7 +7490,12 @@
      "net": {
       "sum": 25.6,
       "mean": 0.985,
-      "t": 2.87
+      "t": 2.87,
+      "byDay": {
+       "days": 8,
+       "t": 1.63,
+       "p": 0.146
+      }
      },
      "cost": {
       "known": 26,
@@ -6508,14 +7531,19 @@
     },
     "giveback": {
      "n": 19,
-     "mean": 0.132,
+     "mean": 0.362,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 26,
      "mean": -0.563,
      "t": -2.29,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 8,
+      "t": -1.5,
+      "p": 0.177
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 1,
@@ -6675,7 +7703,12 @@
        "diff": -1.622,
        "t": -2.63,
        "df": 17.21,
-       "p": 0.017
+       "p": 0.017,
+       "byDay": {
+        "days": 8,
+        "t": -2.03,
+        "p": 0.082
+       }
       }
      },
      {
@@ -6692,7 +7725,12 @@
        "diff": 1.622,
        "t": 2.63,
        "df": 17.21,
-       "p": 0.017
+       "p": 0.017,
+       "byDay": {
+        "days": 8,
+        "t": 2.03,
+        "p": 0.082
+       }
       }
      }
     ],
@@ -6815,11 +7853,11 @@
     "position|shadow|exit-runs"
    ],
    "review": {
-    "head": "Position (shadow): 26 closed, 62% won, +26.63R before costs, +25.60R after (t 2.87); last 30 days +25.60R on 26, last 7 days +25.98R on 20.",
+    "head": "Position (shadow): 26 closed, 62% won, +26.63R before costs, +25.60R after (t 2.87, by day t 1.63 over 8 days); last 30 days +25.60R on 26, last 7 days +25.98R on 20.",
     "working": [
      "after costs +25.60R on 26 trades (+0.98R a trade, t 2.87)",
      "target exits +36.10R on 16",
-     "sells: 13 trades at +1.79R a trade against +0.17R for the other 13 (difference +1.62R, t 2.63)"
+     "sells: 13 trades at +1.79R a trade after costs against +0.17R for the other 13 (difference +1.62R, t 2.63). By day (trades of the same UTC day counted together): t 2.03 over 8 days"
     ],
     "losing": [
      "stop exits −10.50R on 10",
@@ -6986,6 +8024,18 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 8,
@@ -6993,6 +8043,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0.75,
+     "days": 5,
      "gross": {
       "sum": 18.76,
       "mean": 2.345,
@@ -7001,7 +8052,12 @@
      "net": {
       "sum": 18.51,
       "mean": 2.314,
-      "t": 1.72
+      "t": 1.72,
+      "byDay": {
+       "days": 4,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 8,
@@ -7016,6 +8072,7 @@
      "losses": 5,
      "flat": 0,
      "winRate": 0.643,
+     "days": 7,
      "gross": {
       "sum": 22.27,
       "mean": 1.591,
@@ -7024,7 +8081,12 @@
      "net": {
       "sum": 21.85,
       "mean": 1.561,
-      "t": 1.87
+      "t": 1.87,
+      "byDay": {
+       "days": 7,
+       "t": 1.58,
+       "p": 0.165
+      }
      },
      "cost": {
       "known": 14,
@@ -7039,6 +8101,7 @@
      "losses": 5,
      "flat": 0,
      "winRate": 0.643,
+     "days": 7,
      "gross": {
       "sum": 22.27,
       "mean": 1.591,
@@ -7047,7 +8110,12 @@
      "net": {
       "sum": 21.85,
       "mean": 1.561,
-      "t": 1.87
+      "t": 1.87,
+      "byDay": {
+       "days": 7,
+       "t": 1.58,
+       "p": 0.165
+      }
      },
      "cost": {
       "known": 14,
@@ -7083,14 +8151,19 @@
     },
     "giveback": {
      "n": 9,
-     "mean": -0.04,
+     "mean": 0,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 14,
      "mean": -1.305,
      "t": -1.87,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 9,
+      "t": -1.74,
+      "p": 0.12
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 2,
@@ -7387,7 +8460,7 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Swing (shadow): 14 closed, 64% won, +22.27R before costs, +21.85R after (t 1.87); last 30 days +21.85R on 14, last 7 days +18.51R on 8.",
+    "head": "Swing (shadow): 14 closed, 64% won, +22.27R before costs, +21.85R after (t 1.87, by day t 1.58 over 7 days); last 30 days +21.85R on 14, last 7 days +18.51R on 8.",
     "working": [
      "after costs +21.85R on 14 trades (+1.56R a trade, t 1.87)",
      "target exits +27.02R on 9",
@@ -7555,6 +8628,18 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eurusd",
+    "gbpusd",
+    "usdcad",
+    "usdchf",
+    "xau",
+    "xrp"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 6,
@@ -7562,6 +8647,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.5,
+     "days": 3,
      "gross": {
       "sum": -1.95,
       "mean": -0.325,
@@ -7570,7 +8656,12 @@
      "net": {
       "sum": -2.06,
       "mean": -0.343,
-      "t": -1.12
+      "t": -1.12,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 6,
@@ -7585,6 +8676,7 @@
      "losses": 4,
      "flat": 1,
      "winRate": 0.545,
+     "days": 7,
      "gross": {
       "sum": -1.4,
       "mean": -0.127,
@@ -7593,7 +8685,12 @@
      "net": {
       "sum": -1.6,
       "mean": -0.145,
-      "t": -0.64
+      "t": -0.64,
+      "byDay": {
+       "days": 7,
+       "t": -0.44,
+       "p": 0.673
+      }
      },
      "cost": {
       "known": 11,
@@ -7608,6 +8705,7 @@
      "losses": 4,
      "flat": 1,
      "winRate": 0.545,
+     "days": 7,
      "gross": {
       "sum": -1.4,
       "mean": -0.127,
@@ -7616,7 +8714,12 @@
      "net": {
       "sum": -1.6,
       "mean": -0.145,
-      "t": -0.64
+      "t": -0.64,
+      "byDay": {
+       "days": 7,
+       "t": -0.44,
+       "p": 0.673
+      }
      },
      "cost": {
       "known": 11,
@@ -7646,20 +8749,25 @@
     },
     "reached1R": {
      "withMfe": 10,
-     "n": 0,
+     "n": 1,
      "closedAtLoss": 0,
      "lossNet": 0
     },
     "giveback": {
-     "n": 0,
+     "n": 1,
      "mean": 0,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 10,
-     "mean": 0,
-     "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "mean": -0.003,
+     "t": -1,
+     "byDay": {
+      "days": 6,
+      "t": -0.91,
+      "p": 0.403
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -7920,7 +9028,7 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Retrace swing (shadow): 11 closed, 55% won, −1.40R before costs, −1.60R after (t −0.64); last 30 days −1.60R on 11, last 7 days −2.06R on 6.",
+    "head": "Retrace swing (shadow): 11 closed, 55% won, −1.40R before costs, −1.60R after (t −0.64, by day t −0.44 over 7 days); last 30 days −1.60R on 11, last 7 days −2.06R on 6.",
     "working": [
      "target exits +2.51R on 7",
      "demo copies filled 0.03R a trade better than paper (n 8, t −1.63)"
@@ -8076,6 +9184,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 1,
@@ -8083,6 +9196,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 1.9,
       "mean": 1.9,
@@ -8091,7 +9205,12 @@
      "net": {
       "sum": 1.9,
       "mean": 1.9,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -8106,6 +9225,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0.667,
+     "days": 2,
      "gross": {
       "sum": 3.06,
       "mean": 1.02,
@@ -8114,7 +9234,12 @@
      "net": {
       "sum": 3.05,
       "mean": 1.017,
-      "t": 1.36
+      "t": 1.36,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 3,
@@ -8129,6 +9254,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0.667,
+     "days": 2,
      "gross": {
       "sum": 3.06,
       "mean": 1.02,
@@ -8137,7 +9263,12 @@
      "net": {
       "sum": 3.05,
       "mean": 1.017,
-      "t": 1.36
+      "t": 1.36,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 3,
@@ -8180,7 +9311,12 @@
      "n": 3,
      "mean": -0.51,
      "t": -1.91,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 2,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -8296,9 +9432,9 @@
    },
    "flags": [],
    "review": {
-    "head": "Gold momentum pullback (shadow): 3 closed, 67% won, +3.06R before costs, +3.05R after (t 1.36); last 30 days +3.05R on 3, last 7 days +1.90R on 1.",
+    "head": "Gold momentum pullback (shadow): 3 closed, 67% won, +3.06R before costs, +3.05R after (too few to judge); last 30 days +3.05R on 3, last 7 days +1.90R on 1.",
     "working": [
-     "after costs +3.05R on 3 trades (+1.02R a trade, t 1.36)",
+     "after costs +3.05R on 3 trades (+1.02R a trade, too few to judge)",
      "trail exits +3.52R on 2"
     ],
     "losing": []
@@ -8353,6 +9489,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 2,
@@ -8360,6 +9501,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2.2,
       "mean": -1.1,
@@ -8368,7 +9510,12 @@
      "net": {
       "sum": -2.2,
       "mean": -1.1,
-      "t": -11
+      "t": -11,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -8383,6 +9530,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -3.25,
       "mean": -1.083,
@@ -8391,7 +9539,12 @@
      "net": {
       "sum": -3.25,
       "mean": -1.083,
-      "t": -18.03
+      "t": -18.03,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -8406,6 +9559,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -3.25,
       "mean": -1.083,
@@ -8414,7 +9568,12 @@
      "net": {
       "sum": -3.25,
       "mean": -1.083,
-      "t": -18.03
+      "t": -18.03,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -8453,7 +9612,12 @@
      "n": 1,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -8552,10 +9716,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ open run, trend-on only · nyflip-trend (shadow): 3 closed, 0% won, −3.25R before costs, no cost on record (t −18.03 before costs); last 30 days −3.25R on 3, last 7 days −2.20R on 2.",
+    "head": "NQ open run, trend-on only · nyflip-trend (shadow): 3 closed, 0% won, −3.25R before costs, no cost on record (too few to judge); last 30 days −3.25R on 3, last 7 days −2.20R on 2.",
     "working": [],
     "losing": [
-     "before costs (none on record) −3.25R on 3 trades (−1.08R a trade, t −18.03)",
+     "before costs (none on record) −3.25R on 3 trades (−1.08R a trade, too few to judge)",
      "stop exits −3.25R on 3",
      "3 of 3 losses stopped within 30 minutes of the fill (−3.25R)"
     ]
@@ -8610,6 +9774,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 2,
@@ -8617,6 +9786,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2.2,
       "mean": -1.1,
@@ -8625,7 +9795,12 @@
      "net": {
       "sum": -2.2,
       "mean": -1.1,
-      "t": -11
+      "t": -11,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -8640,6 +9815,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2.2,
       "mean": -1.1,
@@ -8648,7 +9824,12 @@
      "net": {
       "sum": -2.2,
       "mean": -1.1,
-      "t": -11
+      "t": -11,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -8663,6 +9844,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2.2,
       "mean": -1.1,
@@ -8671,7 +9853,12 @@
      "net": {
       "sum": -2.2,
       "mean": -1.1,
-      "t": -11
+      "t": -11,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -8710,7 +9897,12 @@
      "n": 1,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -8809,10 +10001,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ New York open run · nyflip (shadow): 2 closed, 0% won, −2.20R before costs, no cost on record (t −11.00 before costs); last 30 days −2.20R on 2, last 7 days −2.20R on 2.",
+    "head": "NQ New York open run · nyflip (shadow): 2 closed, 0% won, −2.20R before costs, no cost on record (too few to judge); last 30 days −2.20R on 2, last 7 days −2.20R on 2.",
     "working": [],
     "losing": [
-     "before costs (none on record) −2.20R on 2 trades (−1.10R a trade, t −11.00)",
+     "before costs (none on record) −2.20R on 2 trades (−1.10R a trade, too few to judge)",
      "stop exits −2.20R on 2"
     ]
    },
@@ -8854,6 +10046,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 1,
@@ -8861,6 +10058,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -8869,7 +10067,12 @@
      "net": {
       "sum": -1.02,
       "mean": -1.02,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -8884,6 +10087,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -8892,7 +10096,12 @@
      "net": {
       "sum": -1.02,
       "mean": -1.02,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -8907,6 +10116,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -8915,7 +10125,12 @@
      "net": {
       "sum": -1.02,
       "mean": -1.02,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 1,
@@ -8954,7 +10169,12 @@
      "n": 1,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 1,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -9029,10 +10249,10 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Mosha cycle (pullback) (shadow): 1 closed, 0% won, −1.00R before costs, −1.02R after (t 0.00); last 30 days −1.02R on 1, last 7 days −1.02R on 1.",
+    "head": "Mosha cycle (pullback) (shadow): 1 closed, 0% won, −1.00R before costs, −1.02R after (too few to judge); last 30 days −1.02R on 1, last 7 days −1.02R on 1.",
     "working": [],
     "losing": [
-     "after costs −1.02R on 1 trades (−1.02R a trade, t 0.00)",
+     "after costs −1.02R on 1 trades (−1.02R a trade, too few to judge)",
      "stop exits −1.02R on 1"
     ]
    },
@@ -9055,13 +10275,61 @@
    "key": "replica|research",
    "id": "replica",
    "k": "replica",
-   "name": "USD/CAD replica",
+   "name": "Replica",
    "book": "research",
    "src": "research",
    "variant": null,
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "audusd",
+    "btc",
+    "eth",
+    "eurusd",
+    "gbpusd",
+    "sol",
+    "usdcad",
+    "usdchf",
+    "xau",
+    "xrp"
+   ],
+   "regime": {
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 10,
+     "withMove": 10
+    },
+    "with": {
+     "n": 652,
+     "mean": 0.376
+    },
+    "against": {
+     "n": 735,
+     "mean": -0.459
+    },
+    "diff": 0.835,
+    "t": 11.26,
+    "byDay": {
+     "days": 17,
+     "t": 5.03,
+     "p": 0
+    },
+    "sides": {
+     "buy": {
+      "n": 708,
+      "against": 597
+     },
+     "sell": {
+      "n": 679,
+      "against": 138
+     }
+    },
+    "note": "the move of a market = its last fill price against its first in this record; known only afterwards: a reading of the split, not a rule"
+   },
    "windows": {
     "d7": {
      "n": 639,
@@ -9069,6 +10337,7 @@
      "losses": 436,
      "flat": 0,
      "winRate": 0.318,
+     "days": 9,
      "gross": {
       "sum": -61.98,
       "mean": -0.097,
@@ -9077,7 +10346,12 @@
      "net": {
       "sum": -61.98,
       "mean": -0.097,
-      "t": -1.67
+      "t": -1.67,
+      "byDay": {
+       "days": 9,
+       "t": -2.25,
+       "p": 0.055
+      }
      },
      "cost": {
       "known": 0,
@@ -9087,20 +10361,26 @@
      }
     },
     "d30": {
-     "n": 1389,
-     "wins": 448,
-     "losses": 941,
+     "n": 1387,
+     "wins": 447,
+     "losses": 940,
      "flat": 0,
-     "winRate": 0.323,
+     "winRate": 0.322,
+     "days": 18,
      "gross": {
-      "sum": -91.2,
+      "sum": -92.2,
       "mean": -0.066,
-      "t": -1.72
+      "t": -1.74
      },
      "net": {
-      "sum": -91.2,
+      "sum": -92.2,
       "mean": -0.066,
-      "t": -1.72
+      "t": -1.74,
+      "byDay": {
+       "days": 18,
+       "t": -2.28,
+       "p": 0.036
+      }
      },
      "cost": {
       "known": 0,
@@ -9110,20 +10390,26 @@
      }
     },
     "all": {
-     "n": 1389,
-     "wins": 448,
-     "losses": 941,
+     "n": 1387,
+     "wins": 447,
+     "losses": 940,
      "flat": 0,
-     "winRate": 0.323,
+     "winRate": 0.322,
+     "days": 18,
      "gross": {
-      "sum": -91.2,
+      "sum": -92.2,
       "mean": -0.066,
-      "t": -1.72
+      "t": -1.74
      },
      "net": {
-      "sum": -91.2,
+      "sum": -92.2,
       "mean": -0.066,
-      "t": -1.72
+      "t": -1.74,
+      "byDay": {
+       "days": 18,
+       "t": -2.28,
+       "p": 0.036
+      }
      },
      "cost": {
       "known": 0,
@@ -9136,12 +10422,12 @@
    "whereR": {
     "exits": {
      "target": {
-      "n": 425,
-      "net": 850.02
+      "n": 424,
+      "net": 848.02
      },
      "stop": {
-      "n": 931,
-      "net": -953.8
+      "n": 930,
+      "net": -952.8
      },
      "time": {
       "n": 33,
@@ -9150,7 +10436,7 @@
     },
     "fastStops": {
      "n": 174,
-     "ofLosses": 941,
+     "ofLosses": 940,
      "share": 0.185,
      "net": -176.7,
      "within": "30 minutes of the fill"
@@ -9170,11 +10456,16 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
-     "ofLosses": 941,
+     "ofLosses": 940,
      "note": "losses whose target was reached after the stop (post-mortem)"
     }
    },
@@ -9182,19 +10473,24 @@
     "session": [
      {
       "v": "asia",
-      "n": 437,
-      "mean": -0.015,
-      "sum": -6.73,
-      "t": -0.23,
+      "n": 435,
+      "mean": -0.018,
+      "sum": -7.73,
+      "t": -0.26,
       "rest": {
        "n": 952,
        "mean": -0.089
       },
       "vsRest": {
-       "diff": 0.073,
-       "t": 0.9,
-       "df": 863.7,
-       "p": 0.37
+       "diff": 0.071,
+       "t": 0.87,
+       "df": 858.81,
+       "p": 0.386,
+       "byDay": {
+        "days": 18,
+        "t": 0.68,
+        "p": 0.506
+       }
       }
      },
      {
@@ -9204,14 +10500,19 @@
       "sum": -22.63,
       "t": -1.35,
       "rest": {
-       "n": 1238,
-       "mean": -0.055
+       "n": 1236,
+       "mean": -0.056
       },
       "vsRest": {
        "diff": -0.094,
-       "t": -0.8,
-       "df": 192.47,
-       "p": 0.426
+       "t": -0.79,
+       "df": 192.52,
+       "p": 0.431,
+       "byDay": {
+        "days": 17,
+        "t": -0.64,
+        "p": 0.532
+       }
       }
      },
      {
@@ -9221,14 +10522,19 @@
       "sum": -18.4,
       "t": -0.73,
       "rest": {
-       "n": 1062,
-       "mean": -0.069
+       "n": 1060,
+       "mean": -0.07
       },
       "vsRest": {
-       "diff": 0.012,
-       "t": 0.14,
-       "df": 557.68,
-       "p": 0.89
+       "diff": 0.013,
+       "t": 0.15,
+       "df": 557.99,
+       "p": 0.88,
+       "byDay": {
+        "days": 18,
+        "t": 0.11,
+        "p": 0.911
+       }
       }
      },
      {
@@ -9238,14 +10544,19 @@
       "sum": -29.21,
       "t": -1.21,
       "rest": {
-       "n": 1162,
-       "mean": -0.053
+       "n": 1160,
+       "mean": -0.054
       },
       "vsRest": {
-       "diff": -0.075,
-       "t": -0.66,
-       "df": 296.61,
-       "p": 0.508
+       "diff": -0.074,
+       "t": -0.65,
+       "df": 296.69,
+       "p": 0.513,
+       "byDay": {
+        "days": 17,
+        "t": -0.52,
+        "p": 0.613
+       }
       }
      },
      {
@@ -9255,50 +10566,65 @@
       "sum": -14.23,
       "t": -0.65,
       "rest": {
-       "n": 1142,
-       "mean": -0.067
+       "n": 1140,
+       "mean": -0.068
       },
       "vsRest": {
-       "diff": 0.01,
-       "t": 0.1,
-       "df": 368.93,
-       "p": 0.92
+       "diff": 0.011,
+       "t": 0.11,
+       "df": 369.1,
+       "p": 0.912,
+       "byDay": {
+        "days": 17,
+        "t": 0.07,
+        "p": 0.945
+       }
       }
      }
     ],
     "hours": [
      {
       "v": "00-04",
-      "n": 251,
-      "mean": 0.207,
-      "sum": 51.98,
-      "t": 2.24,
+      "n": 250,
+      "mean": 0.212,
+      "sum": 52.98,
+      "t": 2.28,
       "rest": {
-       "n": 1138,
-       "mean": -0.126
+       "n": 1137,
+       "mean": -0.128
       },
       "vsRest": {
-       "diff": 0.333,
-       "t": 3.28,
-       "df": 359.06,
-       "p": 0.001
+       "diff": 0.34,
+       "t": 3.33,
+       "df": 357,
+       "p": 0.001,
+       "byDay": {
+        "days": 18,
+        "t": 2.46,
+        "p": 0.025
+       }
       }
      },
      {
       "v": "04-08",
-      "n": 270,
-      "mean": -0.284,
-      "sum": -76.77,
-      "t": -3.65,
+      "n": 269,
+      "mean": -0.293,
+      "sum": -78.77,
+      "t": -3.77,
       "rest": {
-       "n": 1119,
-       "mean": -0.013
+       "n": 1118,
+       "mean": -0.012
       },
       "vsRest": {
-       "diff": -0.271,
-       "t": -3.04,
-       "df": 452.84,
-       "p": 0.002
+       "diff": -0.281,
+       "t": -3.15,
+       "df": 452.34,
+       "p": 0.002,
+       "byDay": {
+        "days": 17,
+        "t": -2.76,
+        "p": 0.014
+       }
       }
      },
      {
@@ -9308,14 +10634,19 @@
       "sum": -0.34,
       "t": -0.02,
       "rest": {
-       "n": 1146,
-       "mean": -0.079
+       "n": 1144,
+       "mean": -0.08
       },
       "vsRest": {
-       "diff": 0.078,
-       "t": 0.78,
-       "df": 355.62,
-       "p": 0.436
+       "diff": 0.079,
+       "t": 0.79,
+       "df": 355.77,
+       "p": 0.43,
+       "byDay": {
+        "days": 17,
+        "t": 0.6,
+        "p": 0.555
+       }
       }
      },
      {
@@ -9325,14 +10656,19 @@
       "sum": -14.23,
       "t": -0.65,
       "rest": {
-       "n": 1142,
-       "mean": -0.067
+       "n": 1140,
+       "mean": -0.068
       },
       "vsRest": {
-       "diff": 0.01,
-       "t": 0.1,
-       "df": 368.93,
-       "p": 0.92
+       "diff": 0.011,
+       "t": 0.11,
+       "df": 369.1,
+       "p": 0.912,
+       "byDay": {
+        "days": 17,
+        "t": 0.07,
+        "p": 0.945
+       }
       }
      },
      {
@@ -9342,14 +10678,19 @@
       "sum": -13.01,
       "t": -0.68,
       "rest": {
-       "n": 1205,
-       "mean": -0.065
+       "n": 1203,
+       "mean": -0.066
       },
       "vsRest": {
-       "diff": -0.006,
-       "t": -0.05,
-       "df": 243.03,
-       "p": 0.959
+       "diff": -0.005,
+       "t": -0.04,
+       "df": 243.11,
+       "p": 0.965,
+       "byDay": {
+        "days": 18,
+        "t": -0.04,
+        "p": 0.972
+       }
       }
      },
      {
@@ -9359,50 +10700,65 @@
       "sum": -38.83,
       "t": -1.75,
       "rest": {
-       "n": 1195,
-       "mean": -0.044
+       "n": 1193,
+       "mean": -0.045
       },
       "vsRest": {
-       "diff": -0.156,
-       "t": -1.29,
-       "df": 243.93,
-       "p": 0.198
+       "diff": -0.155,
+       "t": -1.28,
+       "df": 243.99,
+       "p": 0.2,
+       "byDay": {
+        "days": 17,
+        "t": -1.09,
+        "p": 0.294
+       }
       }
      }
     ],
     "side": [
      {
       "v": "buy",
-      "n": 709,
-      "mean": -0.389,
-      "sum": -275.47,
-      "t": -8.45,
+      "n": 708,
+      "mean": -0.392,
+      "sum": -277.47,
+      "t": -8.53,
       "rest": {
-       "n": 680,
-       "mean": 0.271
+       "n": 679,
+       "mean": 0.273
       },
       "vsRest": {
-       "diff": -0.66,
-       "t": -8.81,
-       "df": 1295.06,
-       "p": 0
+       "diff": -0.665,
+       "t": -8.88,
+       "df": 1291.8,
+       "p": 0,
+       "byDay": {
+        "days": 17,
+        "t": -4.3,
+        "p": 0.001
+       }
       }
      },
      {
       "v": "sell",
-      "n": 680,
-      "mean": 0.271,
-      "sum": 184.27,
-      "t": 4.59,
+      "n": 679,
+      "mean": 0.273,
+      "sum": 185.27,
+      "t": 4.61,
       "rest": {
-       "n": 709,
-       "mean": -0.389
+       "n": 708,
+       "mean": -0.392
       },
       "vsRest": {
-       "diff": 0.66,
-       "t": 8.81,
-       "df": 1295.06,
-       "p": 0
+       "diff": 0.665,
+       "t": 8.88,
+       "df": 1291.8,
+       "p": 0,
+       "byDay": {
+        "days": 17,
+        "t": 4.3,
+        "p": 0.001
+       }
       }
      }
     ],
@@ -9414,14 +10770,19 @@
       "sum": -34.29,
       "t": -2.23,
       "rest": {
-       "n": 1252,
-       "mean": -0.045
+       "n": 1250,
+       "mean": -0.046
       },
       "vsRest": {
-       "diff": -0.205,
-       "t": -1.72,
-       "df": 173.7,
-       "p": 0.088
+       "diff": -0.204,
+       "t": -1.71,
+       "df": 173.75,
+       "p": 0.089,
+       "byDay": {
+        "days": 17,
+        "t": -1.81,
+        "p": 0.09
+       }
       }
      },
      {
@@ -9431,14 +10792,19 @@
       "sum": 14.65,
       "t": 0.82,
       "rest": {
-       "n": 1235,
-       "mean": -0.086
+       "n": 1233,
+       "mean": -0.087
       },
       "vsRest": {
-       "diff": 0.181,
+       "diff": 0.182,
        "t": 1.48,
-       "df": 192.51,
-       "p": 0.142
+       "df": 192.56,
+       "p": 0.14,
+       "byDay": {
+        "days": 18,
+        "t": 1.91,
+        "p": 0.073
+       }
       }
      },
      {
@@ -9448,14 +10814,19 @@
       "sum": 4.36,
       "t": 0.24,
       "rest": {
-       "n": 1221,
-       "mean": -0.078
+       "n": 1219,
+       "mean": -0.079
       },
       "vsRest": {
-       "diff": 0.104,
-       "t": 0.89,
-       "df": 216.62,
-       "p": 0.372
+       "diff": 0.105,
+       "t": 0.9,
+       "df": 216.68,
+       "p": 0.368,
+       "byDay": {
+        "days": 17,
+        "t": 1.04,
+        "p": 0.315
+       }
       }
      },
      {
@@ -9465,14 +10836,19 @@
       "sum": -15.02,
       "t": -1.06,
       "rest": {
-       "n": 1279,
+       "n": 1277,
        "mean": -0.06
       },
       "vsRest": {
-       "diff": -0.077,
-       "t": -0.57,
-       "df": 130.98,
-       "p": 0.569
+       "diff": -0.076,
+       "t": -0.56,
+       "df": 131,
+       "p": 0.574,
+       "byDay": {
+        "days": 17,
+        "t": -0.73,
+        "p": 0.477
+       }
       }
      },
      {
@@ -9482,14 +10858,19 @@
       "sum": -28.66,
       "t": -1.89,
       "rest": {
-       "n": 1271,
-       "mean": -0.049
+       "n": 1269,
+       "mean": -0.05
       },
       "vsRest": {
-       "diff": -0.194,
-       "t": -1.44,
-       "df": 140.8,
-       "p": 0.152
+       "diff": -0.193,
+       "t": -1.43,
+       "df": 140.83,
+       "p": 0.154,
+       "byDay": {
+        "days": 18,
+        "t": -2.04,
+        "p": 0.057
+       }
       }
      },
      {
@@ -9499,14 +10880,19 @@
       "sum": -11.11,
       "t": -0.6,
       "rest": {
-       "n": 1209,
-       "mean": -0.066
+       "n": 1207,
+       "mean": -0.067
       },
       "vsRest": {
        "diff": 0.005,
-       "t": 0.04,
-       "df": 241.01,
-       "p": 0.967
+       "t": 0.05,
+       "df": 241.09,
+       "p": 0.961,
+       "byDay": {
+        "days": 18,
+        "t": 0.05,
+        "p": 0.957
+       }
       }
      },
      {
@@ -9516,14 +10902,19 @@
       "sum": 8.86,
       "t": 0.56,
       "rest": {
-       "n": 1271,
-       "mean": -0.079
+       "n": 1269,
+       "mean": -0.08
       },
       "vsRest": {
-       "diff": 0.154,
-       "t": 1.09,
-       "df": 138.17,
-       "p": 0.277
+       "diff": 0.155,
+       "t": 1.1,
+       "df": 138.19,
+       "p": 0.274,
+       "byDay": {
+        "days": 17,
+        "t": 1.1,
+        "p": 0.288
+       }
       }
      },
      {
@@ -9533,31 +10924,41 @@
       "sum": -18.01,
       "t": -0.91,
       "rest": {
-       "n": 1258,
-       "mean": -0.058
+       "n": 1256,
+       "mean": -0.059
       },
       "vsRest": {
-       "diff": -0.079,
-       "t": -0.51,
-       "df": 148.19,
-       "p": 0.611
+       "diff": -0.078,
+       "t": -0.5,
+       "df": 148.21,
+       "p": 0.615,
+       "byDay": {
+        "days": 18,
+        "t": -0.5,
+        "p": 0.622
+       }
       }
      },
      {
       "v": "xau",
-      "n": 121,
-      "mean": -0.08,
-      "sum": -9.74,
-      "t": -0.65,
+      "n": 119,
+      "mean": -0.09,
+      "sum": -10.74,
+      "t": -0.72,
       "rest": {
        "n": 1268,
        "mean": -0.064
       },
       "vsRest": {
-       "diff": -0.016,
-       "t": -0.12,
-       "df": 146.46,
-       "p": 0.901
+       "diff": -0.026,
+       "t": -0.2,
+       "df": 143.75,
+       "p": 0.843,
+       "byDay": {
+        "days": 17,
+        "t": -0.25,
+        "p": 0.803
+       }
       }
      },
      {
@@ -9567,27 +10968,32 @@
       "sum": -2.24,
       "t": -0.13,
       "rest": {
-       "n": 1237,
-       "mean": -0.072
+       "n": 1235,
+       "mean": -0.073
       },
       "vsRest": {
-       "diff": 0.057,
-       "t": 0.47,
-       "df": 191.68,
-       "p": 0.636
+       "diff": 0.058,
+       "t": 0.48,
+       "df": 191.73,
+       "p": 0.631,
+       "byDay": {
+        "days": 17,
+        "t": 0.53,
+        "p": 0.6
+       }
       }
      }
     ],
     "exit": [
      {
       "v": "target",
-      "n": 425,
-      "sum": 850.02
+      "n": 424,
+      "sum": 848.02
      },
      {
       "v": "stop",
-      "n": 931,
-      "sum": -953.8
+      "n": 930,
+      "sum": -952.8
      },
      {
       "v": "time",
@@ -9604,10 +11010,8 @@
     "note": "fill minus the council entry in R, positive = worse"
    },
    "reviews": {
-    "reviewed": 1,
-    "tags": {
-     "htf": 1
-    }
+    "reviewed": 0,
+    "tags": {}
    },
    "decay": {
     "status": "healthy",
@@ -9630,19 +11034,19 @@
     "replica|research|strong-side:sell"
    ],
    "review": {
-    "head": "USD/CAD replica (research): 1389 closed, 32% won, −91.20R before costs, no cost on record (t −1.72 before costs); last 30 days −91.20R on 1389, last 7 days −61.98R on 639.",
+    "head": "Replica (research): 1387 closed, 32% won, −92.20R before costs, no cost on record (t −1.74, by day t −2.28 over 18 days before costs); last 30 days −92.20R on 1387, last 7 days −61.98R on 639.",
     "working": [
      "time exits +12.58R on 33",
-     "target exits +850.02R on 425",
-     "00-04 UTC: 251 trades at +0.21R a trade against −0.13R for the other 1138 (difference +0.33R, t 3.28)",
-     "sells: 680 trades at +0.27R a trade against −0.39R for the other 709 (difference +0.66R, t 8.81)"
+     "target exits +848.02R on 424",
+     "00-04 UTC: 250 trades at +0.21R a trade before costs (no cost on record) against −0.13R for the other 1137 (difference +0.34R, t 3.33). By day (trades of the same UTC day counted together): t 2.46 over 18 days",
+     "sells: 679 trades at +0.27R a trade before costs (no cost on record) against −0.39R for the other 708 (difference +0.67R, t 8.88). By day (trades of the same UTC day counted together): t 4.30 over 17 days"
     ],
     "losing": [
-     "before costs (none on record) −91.20R on 1389 trades (−0.07R a trade, t −1.72)",
-     "stop exits −953.80R on 931",
-     "174 of 941 losses stopped within 30 minutes of the fill (−176.70R)",
+     "before costs (none on record) −92.20R on 1387 trades (−0.07R a trade, t −1.74)",
+     "stop exits −952.80R on 930",
+     "174 of 940 losses stopped within 30 minutes of the fill (−176.70R)",
      "demo copies filled 0.05R a trade worse than paper (n 183, t 2.70)",
-     "loss reasons written: htf 1 (of 1 reviewed)"
+     "Regime note: 8 of 10 markets fell and 2 rose over this record (first to last fill price), and 84% of the buys traded against their market's own move. With the move +0.38R a trade (n 652), against it −0.46R (n 735), t 11.26; the better side was the side of the move in 10 of 10 markets. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards"
     ]
    },
    "recent": [
@@ -9803,6 +11207,14 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "btc",
+    "eth",
+    "sol",
+    "xrp"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 8,
@@ -9810,6 +11222,7 @@
      "losses": 4,
      "flat": 0,
      "winRate": 0.5,
+     "days": 5,
      "gross": {
       "sum": 3.61,
       "mean": 0.451,
@@ -9818,7 +11231,12 @@
      "net": {
       "sum": 3.61,
       "mean": 0.451,
-      "t": 0.72
+      "t": 0.72,
+      "byDay": {
+       "days": 5,
+       "t": 0.59,
+       "p": 0.589
+      }
      },
      "cost": {
       "known": 0,
@@ -9833,6 +11251,7 @@
      "losses": 16,
      "flat": 0,
      "winRate": 0.304,
+     "days": 12,
      "gross": {
       "sum": 0.61,
       "mean": 0.027,
@@ -9841,7 +11260,12 @@
      "net": {
       "sum": 0.61,
       "mean": 0.027,
-      "t": 0.08
+      "t": 0.08,
+      "byDay": {
+       "days": 12,
+       "t": 0.06,
+       "p": 0.95
+      }
      },
      "cost": {
       "known": 0,
@@ -9856,6 +11280,7 @@
      "losses": 16,
      "flat": 0,
      "winRate": 0.304,
+     "days": 12,
      "gross": {
       "sum": 0.61,
       "mean": 0.027,
@@ -9864,7 +11289,12 @@
      "net": {
       "sum": 0.61,
       "mean": 0.027,
-      "t": 0.08
+      "t": 0.08,
+      "byDay": {
+       "days": 12,
+       "t": 0.06,
+       "p": 0.95
+      }
      },
      "cost": {
       "known": 0,
@@ -9911,7 +11341,12 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -10057,7 +11492,7 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Daily Cycle (research): 23 closed, 30% won, +0.61R before costs, no cost on record (t 0.08 before costs); last 30 days +0.61R on 23, last 7 days +3.61R on 8.",
+    "head": "Daily Cycle (research): 23 closed, 30% won, +0.61R before costs, no cost on record (t 0.08, by day t 0.06 over 12 days before costs); last 30 days +0.61R on 23, last 7 days +3.61R on 8.",
     "working": [
      "before costs (none on record) +0.61R on 23 trades (+0.03R a trade, t 0.08)",
      "time exits +1.61R on 2",
@@ -10226,6 +11661,11 @@
    "ownerShadow": false,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 3,
@@ -10233,6 +11673,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0,
+     "days": 3,
      "gross": {
       "sum": -3,
       "mean": -1,
@@ -10241,7 +11682,12 @@
      "net": {
       "sum": -3,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -10256,6 +11702,7 @@
      "losses": 6,
      "flat": 0,
      "winRate": 0,
+     "days": 6,
      "gross": {
       "sum": -6,
       "mean": -1,
@@ -10264,7 +11711,12 @@
      "net": {
       "sum": -6,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 6,
+       "t": 0,
+       "p": 1
+      }
      },
      "cost": {
       "known": 0,
@@ -10279,6 +11731,7 @@
      "losses": 6,
      "flat": 0,
      "winRate": 0,
+     "days": 6,
      "gross": {
       "sum": -6,
       "mean": -1,
@@ -10287,7 +11740,12 @@
      "net": {
       "sum": -6,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 6,
+       "t": 0,
+       "p": 1
+      }
      },
      "cost": {
       "known": 0,
@@ -10326,7 +11784,12 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -10413,10 +11876,10 @@
    "expect": null,
    "flags": [],
    "review": {
-    "head": "Gold New York open run (research): 6 closed, 0% won, −6.00R before costs, no cost on record (t 0.00 before costs); last 30 days −6.00R on 6, last 7 days −3.00R on 3.",
+    "head": "Gold New York open run (research): 6 closed, 0% won, −6.00R before costs, no cost on record (too few to judge); last 30 days −6.00R on 6, last 7 days −3.00R on 3.",
     "working": [],
     "losing": [
-     "before costs (none on record) −6.00R on 6 trades (−1.00R a trade, t 0.00)",
+     "before costs (none on record) −6.00R on 6 trades (−1.00R a trade, too few to judge)",
      "stop exits −6.00R on 6",
      "4 of 6 losses stopped within 30 minutes of the fill (−4.00R)"
     ]
@@ -10507,6 +11970,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 2,
@@ -10514,6 +11982,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0.5,
+     "days": 2,
      "gross": {
       "sum": -0.38,
       "mean": -0.19,
@@ -10522,7 +11991,12 @@
      "net": {
       "sum": -0.38,
       "mean": -0.19,
-      "t": -0.23
+      "t": -0.23,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -10537,6 +12011,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.4,
+     "days": 5,
      "gross": {
       "sum": 1.34,
       "mean": 0.268,
@@ -10545,7 +12020,12 @@
      "net": {
       "sum": 1.34,
       "mean": 0.268,
-      "t": 0.29
+      "t": 0.29,
+      "byDay": {
+       "days": 5,
+       "t": 0.29,
+       "p": 0.785
+      }
      },
      "cost": {
       "known": 0,
@@ -10560,6 +12040,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.4,
+     "days": 5,
      "gross": {
       "sum": 1.34,
       "mean": 0.268,
@@ -10568,7 +12049,12 @@
      "net": {
       "sum": 1.34,
       "mean": 0.268,
-      "t": 0.29
+      "t": 0.29,
+      "byDay": {
+       "days": 5,
+       "t": 0.29,
+       "p": 0.785
+      }
      },
      "cost": {
       "known": 0,
@@ -10604,14 +12090,19 @@
     },
     "giveback": {
      "n": 2,
-     "mean": 1.145,
+     "mean": 1.18,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 5,
      "mean": -0.144,
      "t": -0.19,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 5,
+      "t": -0.19,
+      "p": 0.857
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -10727,9 +12218,9 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ 2 SD IFVG fade · sd2ifvg (research): 5 closed, 40% won, +1.34R before costs, no cost on record (t 0.29 before costs); last 30 days +1.34R on 5, last 7 days −0.38R on 2.",
+    "head": "NQ 2 SD IFVG fade · sd2ifvg (research): 5 closed, 40% won, +1.34R before costs, no cost on record (too few to judge); last 30 days +1.34R on 5, last 7 days −0.38R on 2.",
     "working": [
-     "before costs (none on record) +1.34R on 5 trades (+0.27R a trade, t 0.29)",
+     "before costs (none on record) +1.34R on 5 trades (+0.27R a trade, too few to judge)",
      "target exits +4.34R on 2"
     ],
     "losing": [
@@ -10811,6 +12302,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 2,
@@ -10818,6 +12314,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0.5,
+     "days": 2,
      "gross": {
       "sum": -0.42,
       "mean": -0.21,
@@ -10826,7 +12323,12 @@
      "net": {
       "sum": -0.42,
       "mean": -0.21,
-      "t": -0.27
+      "t": -0.27,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -10841,6 +12343,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.4,
+     "days": 5,
      "gross": {
       "sum": -0.42,
       "mean": -0.084,
@@ -10849,7 +12352,12 @@
      "net": {
       "sum": -0.42,
       "mean": -0.084,
-      "t": -0.14
+      "t": -0.14,
+      "byDay": {
+       "days": 5,
+       "t": -0.14,
+       "p": 0.896
+      }
      },
      "cost": {
       "known": 0,
@@ -10864,6 +12372,7 @@
      "losses": 3,
      "flat": 0,
      "winRate": 0.4,
+     "days": 5,
      "gross": {
       "sum": -0.42,
       "mean": -0.084,
@@ -10872,7 +12381,12 @@
      "net": {
       "sum": -0.42,
       "mean": -0.084,
-      "t": -0.14
+      "t": -0.14,
+      "byDay": {
+       "days": 5,
+       "t": -0.14,
+       "p": 0.896
+      }
      },
      "cost": {
       "known": 0,
@@ -10912,14 +12426,19 @@
     },
     "giveback": {
      "n": 2,
-     "mean": 0.575,
+     "mean": 0.595,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
      "n": 4,
      "mean": -0.145,
      "t": -0.48,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 4,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -11028,13 +12547,13 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ open run, midnight open behind (skipped) · nyflip-x (research): 5 closed, 40% won, −0.42R before costs, no cost on record (t −0.14 before costs); last 30 days −0.42R on 5, last 7 days −0.42R on 2.",
+    "head": "NQ open run, midnight open behind (skipped) · nyflip-x (research): 5 closed, 40% won, −0.42R before costs, no cost on record (too few to judge); last 30 days −0.42R on 5, last 7 days −0.42R on 2.",
     "working": [
      "other win exits +0.58R on 1",
      "target exits +2.00R on 1"
     ],
     "losing": [
-     "before costs (none on record) −0.42R on 5 trades (−0.08R a trade, t −0.14)",
+     "before costs (none on record) −0.42R on 5 trades (−0.08R a trade, too few to judge)",
      "stop exits −3.00R on 3",
      "3 of 3 losses stopped within 30 minutes of the fill (−3.00R)"
     ]
@@ -11113,6 +12632,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -11120,6 +12644,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -11128,7 +12653,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11143,6 +12673,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -1.32,
       "mean": -0.66,
@@ -11151,7 +12682,12 @@
      "net": {
       "sum": -1.32,
       "mean": -0.66,
-      "t": -1.94
+      "t": -1.94,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11166,6 +12702,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -1.32,
       "mean": -0.66,
@@ -11174,7 +12711,12 @@
      "net": {
       "sum": -1.32,
       "mean": -0.66,
-      "t": -1.94
+      "t": -1.94,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11213,7 +12755,12 @@
      "n": 2,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 2,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -11324,10 +12871,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ 80% rule (value area) · 80pct (research): 2 closed, 0% won, −1.32R before costs, no cost on record (t −1.94 before costs); last 30 days −1.32R on 2, last 7 days 0.00R on 0.",
+    "head": "NQ 80% rule (value area) · 80pct (research): 2 closed, 0% won, −1.32R before costs, no cost on record (too few to judge); last 30 days −1.32R on 2, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "before costs (none on record) −1.32R on 2 trades (−0.66R a trade, t −1.94)",
+     "before costs (none on record) −1.32R on 2 trades (−0.66R a trade, too few to judge)",
      "stop exits −1.32R on 2"
     ]
    },
@@ -11369,6 +12916,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 1,
@@ -11376,6 +12928,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -11384,7 +12937,12 @@
      "net": {
       "sum": -1,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11399,6 +12957,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2,
       "mean": -1,
@@ -11407,7 +12966,12 @@
      "net": {
       "sum": -2,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11422,6 +12986,7 @@
      "losses": 2,
      "flat": 0,
      "winRate": 0,
+     "days": 2,
      "gross": {
       "sum": -2,
       "mean": -1,
@@ -11430,7 +12995,12 @@
      "net": {
       "sum": -2,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11469,7 +13039,12 @@
      "n": 2,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 2,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -11580,10 +13155,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ 3 SD momentum · sd3mom (research): 2 closed, 0% won, −2.00R before costs, no cost on record (t 0.00 before costs); last 30 days −2.00R on 2, last 7 days −1.00R on 1.",
+    "head": "NQ 3 SD momentum · sd3mom (research): 2 closed, 0% won, −2.00R before costs, no cost on record (too few to judge); last 30 days −2.00R on 2, last 7 days −1.00R on 1.",
     "working": [],
     "losing": [
-     "before costs (none on record) −2.00R on 2 trades (−1.00R a trade, t 0.00)",
+     "before costs (none on record) −2.00R on 2 trades (−1.00R a trade, too few to judge)",
      "stop exits −2.00R on 2"
     ]
    },
@@ -11625,6 +13200,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -11632,6 +13212,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -11640,7 +13221,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11655,6 +13241,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -11663,7 +13250,12 @@
      "net": {
       "sum": -1,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11678,6 +13270,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -11686,7 +13279,12 @@
      "net": {
       "sum": -1,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11725,7 +13323,12 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -11812,10 +13415,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ NY open sweep (research): 1 closed, 0% won, −1.00R before costs, no cost on record (t 0.00 before costs); last 30 days −1.00R on 1, last 7 days 0.00R on 0.",
+    "head": "NQ NY open sweep (research): 1 closed, 0% won, −1.00R before costs, no cost on record (too few to judge); last 30 days −1.00R on 1, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "before costs (none on record) −1.00R on 1 trades (−1.00R a trade, t 0.00)",
+     "before costs (none on record) −1.00R on 1 trades (−1.00R a trade, too few to judge)",
      "stop exits −1.00R on 1"
     ]
    },
@@ -11845,6 +13448,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -11852,6 +13460,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -11860,7 +13469,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11875,6 +13489,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -11883,7 +13498,12 @@
      "net": {
       "sum": -1,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11898,6 +13518,7 @@
      "losses": 1,
      "flat": 0,
      "winRate": 0,
+     "days": 1,
      "gross": {
       "sum": -1,
       "mean": -1,
@@ -11906,7 +13527,12 @@
      "net": {
       "sum": -1,
       "mean": -1,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -11945,7 +13571,12 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -12032,10 +13663,10 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ London sweep before NY · london (research): 1 closed, 0% won, −1.00R before costs, no cost on record (t 0.00 before costs); last 30 days −1.00R on 1, last 7 days 0.00R on 0.",
+    "head": "NQ London sweep before NY · london (research): 1 closed, 0% won, −1.00R before costs, no cost on record (too few to judge); last 30 days −1.00R on 1, last 7 days 0.00R on 0.",
     "working": [],
     "losing": [
-     "before costs (none on record) −1.00R on 1 trades (−1.00R a trade, t 0.00)",
+     "before costs (none on record) −1.00R on 1 trades (−1.00R a trade, too few to judge)",
      "stop exits −1.00R on 1"
     ]
    },
@@ -12065,6 +13696,11 @@
    "ownerShadow": true,
    "retired": false,
    "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
    "windows": {
     "d7": {
      "n": 0,
@@ -12072,6 +13708,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": null,
+     "days": 0,
      "gross": {
       "sum": 0,
       "mean": 0,
@@ -12080,7 +13717,12 @@
      "net": {
       "sum": 0,
       "mean": 0,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 0,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -12095,6 +13737,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 2,
       "mean": 2,
@@ -12103,7 +13746,12 @@
      "net": {
       "sum": 2,
       "mean": 2,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -12118,6 +13766,7 @@
      "losses": 0,
      "flat": 0,
      "winRate": 1,
+     "days": 1,
      "gross": {
       "sum": 2,
       "mean": 2,
@@ -12126,7 +13775,12 @@
      "net": {
       "sum": 2,
       "mean": 2,
-      "t": 0
+      "t": 0,
+      "byDay": {
+       "days": 1,
+       "t": null,
+       "p": null
+      }
      },
      "cost": {
       "known": 0,
@@ -12165,7 +13819,12 @@
      "n": 0,
      "mean": 0,
      "t": 0,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+     "byDay": {
+      "days": 0,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
     },
     "targetAfterStop": {
      "n": 0,
@@ -12252,9 +13911,9 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ swing sweep before NY · swing (research): 1 closed, 100% won, +2.00R before costs, no cost on record (t 0.00 before costs); last 30 days +2.00R on 1, last 7 days 0.00R on 0.",
+    "head": "NQ swing sweep before NY · swing (research): 1 closed, 100% won, +2.00R before costs, no cost on record (too few to judge); last 30 days +2.00R on 1, last 7 days 0.00R on 0.",
     "working": [
-     "before costs (none on record) +2.00R on 1 trades (+2.00R a trade, t 0.00)",
+     "before costs (none on record) +2.00R on 1 trades (+2.00R a trade, too few to judge)",
      "target exits +2.00R on 1"
     ],
     "losing": []
@@ -12287,7 +13946,12 @@
    "n": 276,
    "mean": -0.335,
    "t": -3.41,
-   "text": "276 closed trades at −0.34R a trade after costs (t −3.41): it loses."
+   "byDay": {
+    "days": 13,
+    "t": -2.14
+   },
+   "robust": true,
+   "text": "276 closed trades at −0.34R a trade after costs (t −3.41): it loses. By day (trades of the same UTC day counted together): t −2.14 over 13 days."
   },
   {
    "id": "scalp|live|losing",
@@ -12300,7 +13964,12 @@
    "n": 15,
    "mean": -0.942,
    "t": -8.25,
-   "text": "15 closed trades at −0.94R a trade after costs (t −8.25): it loses."
+   "byDay": {
+    "days": 3,
+    "t": null
+   },
+   "robust": false,
+   "text": "15 closed trades at −0.94R a trade after costs (t −8.25): it loses. By day: too few days to judge (3)."
   },
   {
    "id": "scalp|live|exit-lock1R",
@@ -12313,7 +13982,12 @@
    "n": 15,
    "mean": 0.467,
    "t": 2.43,
-   "text": "Closing at +1R once a trade reached +1R would have added +0.47R a trade over 15 trades (t 2.43; approximate, from the recorded MFE): the exit gives back profit.",
+   "byDay": {
+    "days": 3,
+    "t": null
+   },
+   "robust": false,
+   "text": "Closing at +1R once a trade reached +1R would have added +0.47R a trade over 15 trades (t 2.43; approximate, from the recorded MFE): the exit gives back profit. By day: too few days to judge (3).",
    "split": true,
    "p": 0.029,
    "holm": false
@@ -12329,7 +14003,12 @@
    "n": 45,
    "mean": -0.01,
    "t": -0.03,
-   "text": "Before costs +0.20R a trade (t 0.68), after costs −0.01R (t −0.03): costs of +0.21R a trade turn it negative.",
+   "byDay": {
+    "days": 10,
+    "t": -0.02
+   },
+   "robust": false,
+   "text": "Before costs +0.20R a trade (t 0.68), after costs −0.01R (t −0.03): costs of +0.21R a trade turn it negative. By day (trades of the same UTC day counted together): t −0.02 over 10 days.",
    "gross": {
     "mean": 0.205,
     "t": 0.68
@@ -12352,12 +14031,17 @@
     "n": 34,
     "mean": 0.451
    },
-   "text": "AUD/USD: 11 trades at −1.43R a trade against +0.45R for the other 34 (difference −1.88R, t −3.08).",
+   "byDay": {
+    "days": 11,
+    "t": -3.5
+   },
+   "robust": true,
+   "text": "AUD/USD: 11 trades at −1.43R a trade after costs against +0.45R for the other 34 (difference −1.88R, t −3.08). By day (trades of the same UTC day counted together): t −3.50 over 11 days.",
    "split": true,
    "own": {
     "t": -2.98
    },
-   "holm": true
+   "holm": false
   },
   {
    "id": "scalp|shadow|weak-session:asia",
@@ -12375,7 +14059,12 @@
     "n": 398,
     "mean": 0.114
    },
-   "text": "the Asia (22:00-07:00 UTC) session: 97 trades at −0.39R a trade against +0.11R for the other 398 (difference −0.50R, t −2.52).",
+   "byDay": {
+    "days": 12,
+    "t": -2.74
+   },
+   "robust": true,
+   "text": "the Asia (22:00-07:00 UTC) session: 97 trades at −0.39R a trade after costs against +0.11R for the other 398 (difference −0.50R, t −2.52). By day (trades of the same UTC day counted together): t −2.74 over 12 days.",
    "split": true,
    "own": {
     "t": -2.36
@@ -12398,7 +14087,12 @@
     "n": 435,
     "mean": 0.084
    },
-   "text": "00-04 UTC: 60 trades at −0.48R a trade against +0.08R for the other 435 (difference −0.56R, t −2.74).",
+   "byDay": {
+    "days": 11,
+    "t": -2.99
+   },
+   "robust": true,
+   "text": "00-04 UTC: 60 trades at −0.48R a trade after costs against +0.08R for the other 435 (difference −0.56R, t −2.74). By day (trades of the same UTC day counted together): t −2.99 over 11 days.",
    "split": true,
    "own": {
     "t": -2.73
@@ -12421,7 +14115,12 @@
     "n": 418,
     "mean": 0.094
    },
-   "text": "AUD/USD: 77 trades at −0.41R a trade against +0.09R for the other 418 (difference −0.50R, t −2.54).",
+   "byDay": {
+    "days": 11,
+    "t": -1.44
+   },
+   "robust": false,
+   "text": "AUD/USD: 77 trades at −0.41R a trade after costs against +0.09R for the other 418 (difference −0.50R, t −2.54). By day (trades of the same UTC day counted together): t −1.44 over 11 days.",
    "split": true,
    "own": {
     "t": -2.47
@@ -12444,7 +14143,12 @@
     "n": 472,
     "mean": 0.065
    },
-   "text": "SOL: 23 trades at −0.98R a trade against +0.07R for the other 472 (difference −1.05R, t −4.50).",
+   "byDay": {
+    "days": 12,
+    "t": -3.72
+   },
+   "robust": true,
+   "text": "SOL: 23 trades at −0.98R a trade after costs against +0.07R for the other 472 (difference −1.05R, t −4.50). By day (trades of the same UTC day counted together): t −3.72 over 12 days.",
    "split": true,
    "own": {
     "t": -4.67
@@ -12467,7 +14171,12 @@
     "n": 451,
     "mean": -0.07
    },
-   "text": "XRP: 44 trades at +0.90R a trade against −0.07R for the other 451 (difference +0.97R, t 2.12).",
+   "byDay": {
+    "days": 11,
+    "t": 2.44
+   },
+   "robust": true,
+   "text": "XRP: 44 trades at +0.90R a trade after costs against −0.07R for the other 451 (difference +0.97R, t 2.12). By day (trades of the same UTC day counted together): t 2.44 over 11 days.",
    "split": true,
    "own": {
     "t": 2.01
@@ -12485,7 +14194,12 @@
    "n": 96,
    "mean": 0.503,
    "t": 2.86,
-   "text": "96 closed trades at +0.50R a trade after costs (t 2.86): positive so far, a forward record, not a proven edge."
+   "byDay": {
+    "days": 14,
+    "t": 2.09
+   },
+   "robust": true,
+   "text": "96 closed trades at +0.50R a trade after costs (t 2.86): positive so far on a short forward record, which proves nothing yet. By day (trades of the same UTC day counted together): t 2.09 over 14 days."
   },
   {
    "id": "intraday|shadow|exit-runs",
@@ -12496,12 +14210,17 @@
    "field": "exit",
    "value": null,
    "n": 96,
-   "mean": -0.354,
-   "t": -3.11,
-   "text": "Letting trades run past +1R paid: a +1R close would have cost +0.35R a trade over 96 trades (t −3.11).",
+   "mean": -0.397,
+   "t": -3.47,
+   "byDay": {
+    "days": 14,
+    "t": -3.39
+   },
+   "robust": true,
+   "text": "Letting trades run past +1R paid: a +1R close would have cost +0.40R a trade over 96 trades (t −3.47). By day (trades of the same UTC day counted together): t −3.39 over 14 days.",
    "split": true,
-   "p": 0.002,
-   "holm": true
+   "p": 0.001,
+   "holm": false
   },
   {
    "id": "position|shadow|positive",
@@ -12514,7 +14233,12 @@
    "n": 26,
    "mean": 0.985,
    "t": 2.87,
-   "text": "26 closed trades at +0.98R a trade after costs (t 2.87): positive so far, a forward record, not a proven edge."
+   "byDay": {
+    "days": 8,
+    "t": 1.63
+   },
+   "robust": false,
+   "text": "26 closed trades at +0.98R a trade after costs (t 2.87): positive so far on a short forward record, which proves nothing yet. By day (trades of the same UTC day counted together): t 1.63 over 8 days."
   },
   {
    "id": "position|shadow|weak-side:buy",
@@ -12532,7 +14256,12 @@
     "n": 13,
     "mean": 1.795
    },
-   "text": "buys: 13 trades at +0.17R a trade against +1.79R for the other 13 (difference −1.62R, t −2.63).",
+   "byDay": {
+    "days": 8,
+    "t": -2.03
+   },
+   "robust": true,
+   "text": "buys: 13 trades at +0.17R a trade after costs against +1.79R for the other 13 (difference −1.62R, t −2.63). By day (trades of the same UTC day counted together): t −2.03 over 8 days.",
    "split": true,
    "own": {
     "t": 0.31
@@ -12555,7 +14284,12 @@
     "n": 13,
     "mean": 0.174
    },
-   "text": "sells: 13 trades at +1.79R a trade against +0.17R for the other 13 (difference +1.62R, t 2.63).",
+   "byDay": {
+    "days": 8,
+    "t": 2.03
+   },
+   "robust": true,
+   "text": "sells: 13 trades at +1.79R a trade after costs against +0.17R for the other 13 (difference +1.62R, t 2.63). By day (trades of the same UTC day counted together): t 2.03 over 8 days.",
    "split": true,
    "own": {
     "t": 6.75
@@ -12573,7 +14307,12 @@
    "n": 26,
    "mean": -0.563,
    "t": -2.29,
-   "text": "Letting trades run past +1R paid: a +1R close would have cost +0.56R a trade over 26 trades (t −2.29).",
+   "byDay": {
+    "days": 8,
+    "t": -1.5
+   },
+   "robust": false,
+   "text": "Letting trades run past +1R paid: a +1R close would have cost +0.56R a trade over 26 trades (t −2.29). By day (trades of the same UTC day counted together): t −1.50 over 8 days.",
    "split": true,
    "p": 0.031,
    "holm": false
@@ -12594,7 +14333,12 @@
     "n": 37,
     "mean": -0.138
    },
-   "text": "00-04 UTC: 12 trades at +1.00R a trade against −0.14R for the other 37 (difference +1.14R, t 2.14).",
+   "byDay": {
+    "days": 11,
+    "t": 3.41
+   },
+   "robust": true,
+   "text": "00-04 UTC: 12 trades at +1.00R a trade after costs against −0.14R for the other 37 (difference +1.14R, t 2.14). By day (trades of the same UTC day counted together): t 3.41 over 11 days.",
    "split": true,
    "own": {
     "t": 2.32
@@ -12617,12 +14361,43 @@
     "n": 33,
     "mean": 0.626
    },
-   "text": "buys: 16 trades at −0.86R a trade against +0.63R for the other 33 (difference −1.49R, t −3.72).",
+   "byDay": {
+    "days": 11,
+    "t": -2.98
+   },
+   "robust": true,
+   "text": "buys: 16 trades at −0.86R a trade after costs against +0.63R for the other 33 (difference −1.49R, t −3.72). By day (trades of the same UTC day counted together): t −2.98 over 11 days.",
    "split": true,
    "own": {
     "t": -4.54
    },
-   "holm": true
+   "regime": {
+    "confounded": true,
+    "share": 1,
+    "with": {
+     "n": 33,
+     "mean": 0.626
+    },
+    "against": {
+     "n": 16,
+     "mean": -0.861
+    },
+    "t": 3.72,
+    "byDay": {
+     "days": 11,
+     "t": 2.98,
+     "p": 0.014
+    },
+    "markets": 1,
+    "up": 0,
+    "down": 1,
+    "betterSide": {
+     "markets": 1,
+     "withMove": 1
+    },
+    "text": "Regime note: 1 of 1 market fell and 0 rose over this record (first to last fill price), and 100% of the buys traded against their market's own move. With the move +0.63R a trade (n 33), against it −0.86R (n 16), t 3.72; the better side was the side of the move in 1 of 1 market. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards."
+   },
+   "holm": false
   },
   {
    "id": "m30m1|shadow|strong-side:sell",
@@ -12640,12 +14415,43 @@
     "n": 16,
     "mean": -0.861
    },
-   "text": "sells: 33 trades at +0.63R a trade against −0.86R for the other 16 (difference +1.49R, t 3.72).",
+   "byDay": {
+    "days": 11,
+    "t": 2.98
+   },
+   "robust": true,
+   "text": "sells: 33 trades at +0.63R a trade after costs against −0.86R for the other 16 (difference +1.49R, t 3.72). By day (trades of the same UTC day counted together): t 2.98 over 11 days.",
    "split": true,
    "own": {
     "t": 1.78
    },
-   "holm": true
+   "regime": {
+    "confounded": true,
+    "share": 1,
+    "with": {
+     "n": 33,
+     "mean": 0.626
+    },
+    "against": {
+     "n": 16,
+     "mean": -0.861
+    },
+    "t": 3.72,
+    "byDay": {
+     "days": 11,
+     "t": 2.98,
+     "p": 0.014
+    },
+    "markets": 1,
+    "up": 0,
+    "down": 1,
+    "betterSide": {
+     "markets": 1,
+     "withMove": 1
+    },
+    "text": "Regime note: 1 of 1 market fell and 0 rose over this record (first to last fill price), and 100% of the sells traded with their market's own move. With the move +0.63R a trade (n 33), against it −0.86R (n 16), t 3.72; the better side was the side of the move in 1 of 1 market. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards."
+   },
+   "holm": false
   },
   {
    "id": "replica|research|strong-hours:00-04",
@@ -12655,20 +14461,25 @@
    "kind": "strong-hours",
    "field": "hours",
    "value": "00-04",
-   "n": 251,
-   "mean": 0.207,
-   "t": 3.28,
+   "n": 250,
+   "mean": 0.212,
+   "t": 3.33,
    "p": 0.001,
    "rest": {
-    "n": 1138,
-    "mean": -0.126
+    "n": 1137,
+    "mean": -0.128
    },
-   "text": "00-04 UTC: 251 trades at +0.21R a trade against −0.13R for the other 1138 (difference +0.33R, t 3.28).",
+   "byDay": {
+    "days": 18,
+    "t": 2.46
+   },
+   "robust": true,
+   "text": "00-04 UTC: 250 trades at +0.21R a trade before costs (no cost on record) against −0.13R for the other 1137 (difference +0.34R, t 3.33). By day (trades of the same UTC day counted together): t 2.46 over 18 days.",
    "split": true,
    "own": {
-    "t": 2.24
+    "t": 2.28
    },
-   "holm": true
+   "holm": false
   },
   {
    "id": "replica|research|weak-hours:04-08",
@@ -12678,20 +14489,25 @@
    "kind": "weak-hours",
    "field": "hours",
    "value": "04-08",
-   "n": 270,
-   "mean": -0.284,
-   "t": -3.04,
+   "n": 269,
+   "mean": -0.293,
+   "t": -3.15,
    "p": 0.002,
    "rest": {
-    "n": 1119,
-    "mean": -0.013
+    "n": 1118,
+    "mean": -0.012
    },
-   "text": "04-08 UTC: 270 trades at −0.28R a trade against −0.01R for the other 1119 (difference −0.27R, t −3.04).",
+   "byDay": {
+    "days": 17,
+    "t": -2.76
+   },
+   "robust": true,
+   "text": "04-08 UTC: 269 trades at −0.29R a trade before costs (no cost on record) against −0.01R for the other 1118 (difference −0.28R, t −3.15). By day (trades of the same UTC day counted together): t −2.76 over 17 days.",
    "split": true,
    "own": {
-    "t": -3.65
+    "t": -3.77
    },
-   "holm": true
+   "holm": false
   },
   {
    "id": "replica|research|weak-side:buy",
@@ -12701,18 +14517,49 @@
    "kind": "weak-side",
    "field": "side",
    "value": "buy",
-   "n": 709,
-   "mean": -0.389,
-   "t": -8.81,
+   "n": 708,
+   "mean": -0.392,
+   "t": -8.88,
    "p": 0,
    "rest": {
-    "n": 680,
-    "mean": 0.271
+    "n": 679,
+    "mean": 0.273
    },
-   "text": "buys: 709 trades at −0.39R a trade against +0.27R for the other 680 (difference −0.66R, t −8.81).",
+   "byDay": {
+    "days": 17,
+    "t": -4.3
+   },
+   "robust": true,
+   "text": "buys: 708 trades at −0.39R a trade before costs (no cost on record) against +0.27R for the other 679 (difference −0.67R, t −8.88). By day (trades of the same UTC day counted together): t −4.30 over 17 days.",
    "split": true,
    "own": {
-    "t": -8.45
+    "t": -8.53
+   },
+   "regime": {
+    "confounded": true,
+    "share": 0.843,
+    "with": {
+     "n": 652,
+     "mean": 0.376
+    },
+    "against": {
+     "n": 735,
+     "mean": -0.459
+    },
+    "t": 11.26,
+    "byDay": {
+     "days": 17,
+     "t": 5.03,
+     "p": 0
+    },
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 10,
+     "withMove": 10
+    },
+    "text": "Regime note: 8 of 10 markets fell and 2 rose over this record (first to last fill price), and 84% of the buys traded against their market's own move. With the move +0.38R a trade (n 652), against it −0.46R (n 735), t 11.26; the better side was the side of the move in 10 of 10 markets. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards."
    },
    "holm": true
   },
@@ -12724,87 +14571,109 @@
    "kind": "strong-side",
    "field": "side",
    "value": "sell",
-   "n": 680,
-   "mean": 0.271,
-   "t": 8.81,
+   "n": 679,
+   "mean": 0.273,
+   "t": 8.88,
    "p": 0,
    "rest": {
-    "n": 709,
-    "mean": -0.389
+    "n": 708,
+    "mean": -0.392
    },
-   "text": "sells: 680 trades at +0.27R a trade against −0.39R for the other 709 (difference +0.66R, t 8.81).",
+   "byDay": {
+    "days": 17,
+    "t": 4.3
+   },
+   "robust": true,
+   "text": "sells: 679 trades at +0.27R a trade before costs (no cost on record) against −0.39R for the other 708 (difference +0.67R, t 8.88). By day (trades of the same UTC day counted together): t 4.30 over 17 days.",
    "split": true,
    "own": {
-    "t": 4.59
+    "t": 4.61
+   },
+   "regime": {
+    "confounded": true,
+    "share": 0.797,
+    "with": {
+     "n": 652,
+     "mean": 0.376
+    },
+    "against": {
+     "n": 735,
+     "mean": -0.459
+    },
+    "t": 11.26,
+    "byDay": {
+     "days": 17,
+     "t": 5.03,
+     "p": 0
+    },
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 10,
+     "withMove": 10
+    },
+    "text": "Regime note: 8 of 10 markets fell and 2 rose over this record (first to last fill price), and 80% of the sells traded with their market's own move. With the move +0.38R a trade (n 652), against it −0.46R (n 735), t 11.26; the better side was the side of the move in 10 of 10 markets. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards."
    },
    "holm": true
   }
  ],
  "proposals": [
   {
-   "id": "p:replica|research|weak-hours:04-08",
-   "flag": "replica|research|weak-hours:04-08",
-   "system": "replica",
-   "book": "research",
-   "name": "USD/CAD replica",
-   "action": "skip hours",
-   "change": "Skip entries between 04-08 UTC for USD/CAD replica (research)",
-   "why": "04-08 UTC: 270 trades at −0.28R a trade against −0.01R for the other 1119 (difference −0.27R, t −3.04).",
-   "evidence": {
-    "n": 270,
-    "mean": -0.284,
-    "t": -3.04,
-    "p": 0.002,
-    "rest": {
-     "n": 1119,
-     "mean": -0.013
-    },
-    "holm": true,
-    "inSample": true,
-    "warning": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it."
-   },
-   "test": {
-    "question": "Do USD/CAD replica's entries between 04-08 UTC lose after costs against its other hours?",
-    "data": "2020-01-01 → now",
-    "split": "in sample 2020-2023, out of sample 2024 → now",
-    "costs": "net of the council cost model (council/fills.mjs: spread, slippage, commission, overnight financing on gold buys)",
-    "bar": "out of sample: n ≥ 100, mean R a trade > 0 after costs in both halves, t ≥ 2 on calendar-month sums after Holm over every test named in the pre-registration",
-    "how": "PREREGISTRATION.md pushed first in research/edge/<topic>/, then run.mjs, RESULT.md, result.json; the owner approves any live change"
-   },
-   "strong": true,
-   "forward": {
-    "status": "unclear",
-    "n": 56,
-    "t": -1.32,
-    "recorded": "2026-11-17T22:50:23.000Z",
-    "text": "not clear yet on the trades closed since it was recorded: 56 trades against 271, −0.24R a trade, t −1.32 (recorded with t −2.73)."
-   },
-   "prereg": "# Pre-registration (draft): Skip entries between 04-08 UTC for USD/CAD replica (research)\n\nDraft written by council/trade-review.mjs on 2026-11-17 from proposal p:replica|research|weak-hours:04-08. It is not a study: it becomes one only when the owner approves it and this file is committed ALONE in research/edge/<topic>/ before any code is run. Nothing changes live on a pass (absolute rule 3): a pass is put to the owner as a proposal.\n\n## Why it is asked\n04-08 UTC: 270 trades at −0.28R a trade against −0.01R for the other 1119 (difference −0.27R, t −3.04). Found on the forward record: n 270, −0.28R a trade, t −3.04, p 0.002, survives Holm over the review's split tests. In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it. Those trades are not evidence for this test and are not reused in it; trades closed after the proposal was recorded are the review ledger's forward check (research/trade-review-ledger.json), reported apart.\n\n## Hypothesis\n- H1: USD/CAD replica's entries filled between 04-08 UTC make less R a trade after costs than its entries at other hours.\n- H0: no difference.\n- Variant: the rule as it is, with no entry filled between 04-08 UTC.\n\n## Data\n- 2020-01-01 → now: the council's research candles for USD/CAD replica's markets (HistData M1 read through council/histdata.mjs, OANDA where HistData has none), replayed by the rule's own code (council/trader.mjs and council/fills.mjs, imported, not copied), the last complete calendar month as the end.\n- In sample 2020-01-01 to 2023-12-31; out of sample 2024-01-01 to the end. Nothing is tuned on the out-of-sample years; every parameter above is fixed now.\n\n## Costs\n- Net of the council cost model (council/fills.mjs: spread, slippage, commission, overnight financing on gold buys). The same model for the rule and the variant.\n- Every trade keeps its stop (absolute rule 1); paper only.\n\n## Test statistic\n- Per calendar month, R summed after costs of the variant minus the rule as it is (the same signals, paired); t of those monthly sums, in sample and out of sample.\n- Holm over every test named in this file (here one; the count rises if the owner approves several drafts as one study, and all are then corrected together).\n\n## Pass bar\n- Out of sample: n ≥ 100, mean R a trade > 0 after costs in both halves, t ≥ 2 on calendar-month sums after Holm over every test named in the pre-registration.\n- And the paired difference positive in both halves.\n- Reported whatever the result: n, mean R, t, by year, in sample and out of sample.\n"
-  },
-  {
    "id": "p:replica|research|weak-side:buy",
    "flag": "replica|research|weak-side:buy",
    "system": "replica",
    "book": "research",
-   "name": "USD/CAD replica",
+   "name": "Replica",
    "action": "one side only",
-   "change": "Take only sells in USD/CAD replica (research)",
-   "why": "buys: 709 trades at −0.39R a trade against +0.27R for the other 680 (difference −0.66R, t −8.81).",
+   "change": "Take only sells in Replica (research)",
+   "why": "buys: 708 trades at −0.39R a trade before costs (no cost on record) against +0.27R for the other 679 (difference −0.67R, t −8.88). By day (trades of the same UTC day counted together): t −4.30 over 17 days. Regime note: 8 of 10 markets fell and 2 rose over this record (first to last fill price), and 84% of the buys traded against their market's own move. With the move +0.38R a trade (n 652), against it −0.46R (n 735), t 11.26; the better side was the side of the move in 10 of 10 markets. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards.",
    "evidence": {
-    "n": 709,
-    "mean": -0.389,
-    "t": -8.81,
+    "n": 708,
+    "mean": -0.392,
+    "t": -8.88,
     "p": 0,
     "rest": {
-     "n": 680,
-     "mean": 0.271
+     "n": 679,
+     "mean": 0.273
     },
     "holm": true,
+    "byDay": {
+     "days": 17,
+     "t": -4.3
+    },
+    "robust": true,
     "inSample": true,
     "warning": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it."
    },
+   "regime": {
+    "confounded": true,
+    "share": 0.843,
+    "with": {
+     "n": 652,
+     "mean": 0.376
+    },
+    "against": {
+     "n": 735,
+     "mean": -0.459
+    },
+    "t": 11.26,
+    "byDay": {
+     "days": 17,
+     "t": 5.03,
+     "p": 0
+    },
+    "markets": 10,
+    "up": 2,
+    "down": 8,
+    "betterSide": {
+     "markets": 10,
+     "withMove": 10
+    },
+    "text": "Regime note: 8 of 10 markets fell and 2 rose over this record (first to last fill price), and 84% of the buys traded against their market's own move. With the move +0.38R a trade (n 652), against it −0.46R (n 735), t 11.26; the better side was the side of the move in 10 of 10 markets. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards."
+   },
    "test": {
-    "question": "Do USD/CAD replica's buys lose after costs against its sells?",
+    "question": "Do Replica's buys lose after costs against its sells?",
     "data": "2020-01-01 → now",
     "split": "in sample 2020-2023, out of sample 2024 → now",
     "costs": "net of the council cost model (council/fills.mjs: spread, slippage, commission, overnight financing on gold buys)",
@@ -12813,11 +14682,11 @@
    },
    "strong": false,
    "forward": {
-    "status": "held",
+    "status": "unclear",
     "n": 163,
     "t": -4.68,
     "recorded": "2026-11-17T22:50:23.000Z",
-    "text": "held on the trades closed since it was recorded: 163 trades against 164, −0.38R a trade, t −4.68 (recorded with t −7.46)."
+    "text": "not clear yet on the trades closed since it was recorded: 163 trades against 164, −0.38R a trade, t −4.68 (recorded with t −7.46). The new trades show the same market direction (most of this side traded against, or with, its market's own move): that is the regime again, not evidence for the rule. Not counted as held: the new trades span 4 days only (5 needed)."
    },
    "studied": {
     "study": "replica-sides",
@@ -12834,7 +14703,7 @@
    "name": "M30 → M1 scalp",
    "action": "one side only",
    "change": "Take only sells in M30 → M1 scalp (shadow)",
-   "why": "buys: 16 trades at −0.86R a trade against +0.63R for the other 33 (difference −1.49R, t −3.72).",
+   "why": "buys: 16 trades at −0.86R a trade after costs against +0.63R for the other 33 (difference −1.49R, t −3.72). By day (trades of the same UTC day counted together): t −2.98 over 11 days. Regime note: 1 of 1 market fell and 0 rose over this record (first to last fill price), and 100% of the buys traded against their market's own move. With the move +0.63R a trade (n 33), against it −0.86R (n 16), t 3.72; the better side was the side of the move in 1 of 1 market. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards.",
    "evidence": {
     "n": 16,
     "mean": -0.861,
@@ -12844,9 +14713,40 @@
      "n": 33,
      "mean": 0.626
     },
-    "holm": true,
+    "holm": false,
+    "byDay": {
+     "days": 11,
+     "t": -2.98
+    },
+    "robust": true,
     "inSample": true,
     "warning": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it."
+   },
+   "regime": {
+    "confounded": true,
+    "share": 1,
+    "with": {
+     "n": 33,
+     "mean": 0.626
+    },
+    "against": {
+     "n": 16,
+     "mean": -0.861
+    },
+    "t": 3.72,
+    "byDay": {
+     "days": 11,
+     "t": 2.98,
+     "p": 0.014
+    },
+    "markets": 1,
+    "up": 0,
+    "down": 1,
+    "betterSide": {
+     "markets": 1,
+     "withMove": 1
+    },
+    "text": "Regime note: 1 of 1 market fell and 0 rose over this record (first to last fill price), and 100% of the buys traded against their market's own move. With the move +0.63R a trade (n 33), against it −0.86R (n 16), t 3.72; the better side was the side of the move in 1 of 1 market. The side split may be the markets' direction over these days, not the rule; the direction is known only afterwards."
    },
    "test": {
     "question": "Do M30 → M1 scalp's buys lose after costs against its sells?",
@@ -12866,29 +14766,34 @@
    }
   },
   {
-   "id": "p:position|shadow|weak-side:buy",
-   "flag": "position|shadow|weak-side:buy",
-   "system": "position",
-   "book": "shadow",
-   "name": "Position",
-   "action": "one side only",
-   "change": "Take only sells in Position (shadow)",
-   "why": "buys: 13 trades at +0.17R a trade against +1.79R for the other 13 (difference −1.62R, t −2.63).",
+   "id": "p:replica|research|weak-hours:04-08",
+   "flag": "replica|research|weak-hours:04-08",
+   "system": "replica",
+   "book": "research",
+   "name": "Replica",
+   "action": "skip hours",
+   "change": "Skip entries between 04-08 UTC for Replica (research)",
+   "why": "04-08 UTC: 269 trades at −0.29R a trade before costs (no cost on record) against −0.01R for the other 1118 (difference −0.28R, t −3.15). By day (trades of the same UTC day counted together): t −2.76 over 17 days.",
    "evidence": {
-    "n": 13,
-    "mean": 0.174,
-    "t": -2.63,
-    "p": 0.017,
+    "n": 269,
+    "mean": -0.293,
+    "t": -3.15,
+    "p": 0.002,
     "rest": {
-     "n": 13,
-     "mean": 1.795
+     "n": 1118,
+     "mean": -0.012
     },
     "holm": false,
+    "byDay": {
+     "days": 17,
+     "t": -2.76
+    },
+    "robust": true,
     "inSample": true,
     "warning": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it."
    },
    "test": {
-    "question": "Do Position's buys lose after costs against its sells?",
+    "question": "Do Replica's entries between 04-08 UTC lose after costs against its other hours?",
     "data": "2020-01-01 → now",
     "split": "in sample 2020-2023, out of sample 2024 → now",
     "costs": "net of the council cost model (council/fills.mjs: spread, slippage, commission, overnight financing on gold buys)",
@@ -12897,11 +14802,11 @@
    },
    "strong": false,
    "forward": {
-    "status": "too few",
-    "n": 2,
-    "t": 0,
-    "recorded": "2026-11-20T05:51:49.000Z",
-    "text": "too few new trades to judge yet: 2 trades against 0, −1.03R a trade, t 0.00 (recorded with t −2.03)."
+    "status": "unclear",
+    "n": 56,
+    "t": -1.32,
+    "recorded": "2026-11-17T22:50:23.000Z",
+    "text": "not clear yet on the trades closed since it was recorded: 56 trades against 271, −0.24R a trade, t −1.32 (recorded with t −2.73)."
    }
   }
  ],
@@ -12917,17 +14822,18 @@
   "n": 6,
   "counts": {
    "too few": 2,
-   "held": 1,
+   "held": 0,
    "faded": 2,
-   "unclear": 1
+   "unclear": 2
   },
   "thresholds": {
    "N": 20,
    "REST_N": 10,
    "HELD_T": 2,
-   "FADE_T": 1
+   "FADE_T": 1,
+   "DAYS": 5
   },
-  "rule": "Each proposal is re-measured only on trades closed after it was recorded, never on the trades that suggested it. Too few: under 20 new trades. Held: the same sign and |t| ≥ 2. Faded: the sign turned or |t| < 1. A faded proposal is not offered as strong. Held is a second small sample, not an edge.",
+  "rule": "Each proposal is re-measured only on trades closed after it was recorded, never on the trades that suggested it. Too few: under 20 new trades. Held: the same sign and |t| ≥ 2, per trade AND by day (trades filled the same UTC day counted together, at least 5 days). Faded: the sign turned or |t| < 1. A faded proposal is not offered as strong. Held is a second small sample and proves nothing by itself.",
   "items": [
    {
     "id": "replica|research#replica|research|weak-hours:04-08",
@@ -12959,8 +14865,12 @@
      },
      "diff": -0.258,
      "t": -1.32,
+     "byDay": {
+      "days": 4,
+      "t": null
+     },
      "status": "unclear",
-     "basis": "hours 04-08 against the rest, R after costs (Welch t)",
+     "basis": "hours 04-08 against the rest, R before costs (no cost on record) (Welch t)",
      "text": "not clear yet on the trades closed since it was recorded: 56 trades against 271, −0.24R a trade, t −1.32 (recorded with t −2.73)."
     }
    },
@@ -12994,9 +14904,14 @@
      },
      "diff": -0.706,
      "t": -4.68,
-     "status": "held",
-     "basis": "side buy against the rest, R after costs (Welch t)",
-     "text": "held on the trades closed since it was recorded: 163 trades against 164, −0.38R a trade, t −4.68 (recorded with t −7.46)."
+     "byDay": {
+      "days": 4,
+      "t": null
+     },
+     "regime": true,
+     "status": "unclear",
+     "basis": "side buy against the rest, R before costs (no cost on record) (Welch t)",
+     "text": "not clear yet on the trades closed since it was recorded: 163 trades against 164, −0.38R a trade, t −4.68 (recorded with t −7.46). The new trades show the same market direction (most of this side traded against, or with, its market's own move): that is the regime again, not evidence for the rule. Not counted as held: the new trades span 4 days only (5 needed)."
     }
    },
    {
@@ -13029,6 +14944,10 @@
      },
      "diff": -1.578,
      "t": 0,
+     "byDay": {
+      "days": 3,
+      "t": null
+     },
      "status": "too few",
      "basis": "side buy against the rest, R after costs (Welch t)",
      "text": "too few new trades to judge yet: 1 trade against 18, −1.02R a trade, t 0.00 (recorded with t −2.23)."
@@ -13054,8 +14973,12 @@
      "n": 254,
      "mean": 0.028,
      "t": 0.31,
+     "byDay": {
+      "days": 3,
+      "t": null
+     },
      "status": "faded",
-     "basis": "R a trade after costs (t against zero)",
+     "basis": "R before costs (no cost on record) a trade (t against zero)",
      "text": "faded on the trades closed since it was recorded: 254 trades, +0.03R a trade, t 0.31 (recorded with t −2.04)."
     }
    },
@@ -13089,8 +15012,12 @@
      },
      "diff": 0.006,
      "t": 0.02,
+     "byDay": {
+      "days": 3,
+      "t": null
+     },
      "status": "faded",
-     "basis": "market audusd against the rest, R after costs (Welch t)",
+     "basis": "market audusd against the rest, R before costs (no cost on record) (Welch t)",
      "text": "faded on the trades closed since it was recorded: 29 trades against 213, +0.03R a trade, t 0.02 (recorded with t −2.05)."
     }
    },
@@ -13124,6 +15051,10 @@
      },
      "diff": null,
      "t": 0,
+     "byDay": {
+      "days": 2,
+      "t": null
+     },
      "status": "too few",
      "basis": "side buy against the rest, R after costs (Welch t)",
      "text": "too few new trades to judge yet: 2 trades against 0, −1.03R a trade, t 0.00 (recorded with t −2.03)."
@@ -13131,5 +15062,5 @@
    }
   ]
  },
- "hash": "b866bc401a6698e4"
+ "hash": "cb621eb77e812fd7"
 }
