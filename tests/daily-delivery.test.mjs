@@ -43,7 +43,7 @@ test("the email: a summary only when there is one, never called AI, glance tiles
     markets: { ...rep.markets, sections: [{ h: 'Where markets stand', lines: ['Gold 3,547.8: 51% chance of closing the day higher (usual 53%); a normal day ±1.44% (3,496.7 to 3,598.9).', 'S&P 500 7,145.6: 50% chance of closing the day higher (usual 54%); a normal day ±1.12% (7,065.6 to 7,225.6); moving 1.8x its usual.'] }, { h: 'Risk and rates', lines: ['VIX 24.6 (elevated), its curve inverted (stress).'] }] } };
   assert.deepEqual(D.glance(R2), [{ name: 'Gold', px: '3,547.8', p: 51, base: 53, move: '1.44', fast: null }, { name: 'S&P 500', px: '7,145.6', p: 50, base: 54, move: '1.12', fast: '1.8' }, { name: 'VIX', px: '24.6', note: 'elevated' }]);
   assert.deepEqual(D.agenda(R2), [{ at: '07:00', where: 'United Kingdom', what: 'Retail Sales m/m', more: 'expected 0.0%, previous -0.4%' }]);
-  const h = D.emailOf(R2, null).html; assert.ok(h.includes('At a glance') && h.includes('On the calendar today') && h.includes('Retail Sales m/m'));
+  const h = D.emailOf(R2, null).html; assert.ok(h.includes('Prices this morning') && h.includes('Coming out today') && h.includes('Fear gauge (VIX)') && h.includes('Retail Sales m/m'));
 });
 
 test('the summary may carry a headline and 3-5 points, each checked like the paragraphs; it never talks of itself', () => {
@@ -53,6 +53,9 @@ test('the summary may carry a headline and 3-5 points, each checked like the par
   assert.match(D.parseBrief(JSON.stringify({ ...base, points: ['VIX at 31.9 keeps us in stress mode.', 'Gold near 3,627.'] }), rep).why, /point 1: the figure 31\.9/);
   assert.match(D.parseBrief(JSON.stringify({ ...base, headline: 'As an AI, here is the morning picture.' }), rep).why, /headline/);
   assert.match(D.parseBrief(JSON.stringify({ ...base, points: ['You should buy gold before 07:00 today.', 'Gold near 3,627.'] }), rep).why, /point 1/);
+  assert.match(D.SYSTEM, /everyday words/);
+  const gl = D.glossary(rep, null).map((x) => x.w); assert.ok(gl.includes('VIX (the fear gauge)') && gl.includes('Dollar Smile') && gl.includes('m/m') && !gl.includes('Gold Macro Score'));
+  const em = D.emailOf(rep, null); assert.ok(em.html.includes('What the words mean') && em.text.includes('WHAT THE WORDS MEAN'));
   assert.match(D.SYSTEM, /first person plural/); assert.ok(!/AI summary/.test(fs.readFileSync(new URL('../macro-desk.html', import.meta.url), 'utf8')));
 });
 

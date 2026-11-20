@@ -24,7 +24,10 @@ const facts = (r) => [r.title + ': ' + r.lead, ...(r.sections || []).flatMap((s)
 // ---- the summary (written by the language model from the report's facts; shown as "Summary", owner 20 Nov 2026: "it needs to act
 // like a person writes it") ----
 const SYSTEM = 'You are the senior analyst of a small macro desk writing the morning note your colleagues read at 06:30 London before the open. '
-  + 'Write like a person, not a machine: first person plural ("we"), short direct sentences, plain words, no filler, no hedging boilerplate, no headings, '
+  + 'Write like a person, not a machine: first person plural ("we"), short direct sentences, no filler, no hedging boilerplate, no headings, '
+  + 'and in everyday words that someone who has never traded understands (owner, 20 Nov 2026: "normal people should be able to understand"): '
+  + 'no jargon; when you must name a market term, say in a few plain words what it means (the VIX is "the fear gauge"; a "real yield" is "interest after inflation"); '
+  + 'say why it matters, not only what it is. '
   + 'never mention AI, a model, a report, data files or "the facts". '
   + 'Use ONLY the facts you are given: every number you write must appear in them, written the same way. '
   + 'Give odds only as the facts give them, with their usual rate. '
@@ -56,7 +59,7 @@ function parseBrief(text, rep) {
 
 // ---- the email (20 Nov 2026, owner: "more professional … with highlights and bullet points … Summary, not AI summary") ----
 const SITE = 'https://aureumdesk.co.uk/', LOGO = SITE + 'icons/email-logo.png', F = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-const NOTE = 'You get this because the Macro desk is on for your account. Paper trading only: odds come with their usual rate; nothing here is a tested edge or advice.';
+const NOTE = 'You get this because the Macro desk is on for your account. We trade on paper only. The chances shown are estimates, not promises, and nothing here is advice to buy or sell.';
 const LINES = 4;   // lines a detail section shows in the email; the rest is on the Macro desk
 const INK = '#16181b', INK2 = '#454b55', INK3 = '#6b717b', LINE = '#e3e6ea', WELL = '#f4f6f8', UP = '#067a64', DN = '#c8243f';
 const secOf = (r, re) => ((r && r.sections) || []).find((s) => re.test(s.h));
@@ -76,17 +79,37 @@ function agenda(rep) {
   const s = secOf(rep.world, /^Today/);
   return ((s && s.lines) || []).map((l) => { const p = l.split(' · '); return /^\d\d:\d\d$/.test(p[0]) ? { at: p[0], where: p[1] || '', what: p[2] || '', more: p.slice(3).join(' · ') } : null; }).filter(Boolean).slice(0, 8);
 }
+// plain words for the VIX tile's note, and a short "What the words mean" box for the market terms the email uses
+const plainNote = (n) => (/elevated|high/i.test(n || '') ? 'higher than usual: markets are nervous' : /low|calm/i.test(n || '') ? 'low: markets are calm' : n || '');
+const WORDS = [
+  [/\bVIX\b/, 'VIX (the fear gauge)', 'How big a move investors expect in US shares. Above about 20 means people are nervous.'],
+  [/Dollar Smile/, 'Dollar Smile', 'The dollar tends to rise both when the world is scared and when the US is booming, and to fall in between. "Left side" = the scared side.'],
+  [/real yield/i, 'Real yield', 'The interest a US government bond pays after inflation. When it rises, gold (which pays no interest) usually has a harder time.'],
+  [/2-year/, '2-year rate', 'The interest on two-year US government debt; it moves with what traders expect the central bank to do.'],
+  [/curve/i, 'Yield curve / inverted', 'Long-term rates against short-term ones. "Inverted" means short-term is higher, a sign of worry.'],
+  [/dollar index/i, 'Dollar index', 'The US dollar measured against a basket of other major currencies.'],
+  [/funding/i, 'Funding stress', 'When banks and big investors find it hard to borrow dollars. It turns a scare into a real squeeze.'],
+  [/percentile|CFTC|Speculators/, 'Positioning (CFTC)', 'A weekly US report on how big traders are betting. "Bottom of the 3-year range" = they hold fewer bets on it rising than at almost any time in three years.'],
+  [/Macro Score/, 'Gold Macro Score', 'Our own score of whether interest rates and the dollar are helping gold. Only above +0.25 does it count as help.'],
+  [/m\/m/, 'm/m', 'Change from the month before.'],
+  [/basis point|\bbp\b/, 'bp (basis point)', 'One hundredth of a percent: 80 bp = 0.80%.'],
+];
+function glossary(rep, brief) {
+  const all = JSON.stringify([rep.world, rep.markets, brief || null]);
+  return WORDS.filter(([re]) => re.test(all)).map(([, w, m]) => ({ w, m }));
+}
 function emailOf(rep, brief, o = {}) {
   const day = dayLabel(rep), link = SITE + 'macro-desk#s-daily', test = o.test ? 'Test · ' : '';
   const subject = `${test}Morning note · ${day}`;
   const G = glance(rep), A = agenda(rep);
-  const lean = (g) => (g.p == null ? '' : g.p > g.base ? 'leans up' : g.p < g.base ? 'leans down' : 'no lean');
+  const lean = (g) => (g.p == null ? '' : g.p > g.base ? 'a little more likely up than usual' : g.p < g.base ? 'a little less likely up than usual' : 'as likely up as usual');
+  const nameOf = (g) => (g.name === 'VIX' ? 'Fear gauge (VIX)' : g.name);
   // ---- plain text ----
   const sec = (r) => (r.sections || []).map((s) => `${s.h}\n${(s.lines || []).map((l) => '  • ' + l).join('\n')}`).join('\n\n');
   const sumT = brief ? `SUMMARY\n${brief.headline ? brief.headline + '\n' : ''}${(brief.points || [brief.world, brief.markets]).map((x) => '  • ' + x).join('\n')}\n\n` : '';
-  const glT = G.length ? `AT A GLANCE\n${G.map((g) => `  • ${g.name} ${g.px}${g.move ? ` · normal day ±${g.move}% · ${g.p}% up (usual ${g.base}%)` : g.note ? ` (${g.note})` : ''}`).join('\n')}\n\n` : '';
-  const agT = A.length ? `ON THE CALENDAR TODAY (London)\n${A.map((e) => `  • ${e.at}  ${e.where}: ${e.what}${e.more ? ' (' + e.more + ')' : ''}`).join('\n')}\n\n` : '';
-  const text = `${subject}\n\n${sumT}${glT}${agT}WORLD ECONOMY\n${rep.world.lead}\n\n${sec(rep.world)}\n\nMARKETS\n${rep.markets.lead}\n\n${sec(rep.markets)}\n\nThe full notes on the Macro desk: ${link}\n\nThe Aureum Desk\n\n${NOTE}`;
+  const glT = G.length ? `PRICES THIS MORNING\n${G.map((g) => `  • ${nameOf(g)} ${g.px}${g.move ? ` · usually moves about ${g.move}% a day · ${g.p}% chance it ends today higher (normally ${g.base}%)` : g.note ? ` (${plainNote(g.note)})` : ''}`).join('\n')}\n\n` : '';
+  const agT = A.length ? `COMING OUT TODAY (London time)\n${A.map((e) => `  • ${e.at}  ${e.where}: ${e.what}${e.more ? ' (' + e.more + ')' : ''}`).join('\n')}\n\n` : '';
+  const text = `${subject}\n\n${sumT}${glT}${agT}WORLD ECONOMY\n${rep.world.lead}\n\n${sec(rep.world)}\n\nMARKETS\n${rep.markets.lead}\n\n${sec(rep.markets)}${glossary(rep, brief).length ? '\n\nWHAT THE WORDS MEAN\n' + glossary(rep, brief).map((x) => `  • ${x.w}: ${x.m}`).join('\n') : ''}\n\nThe full notes on the Macro desk: ${link}\n\nThe Aureum Desk\n\n${NOTE}`;
   // ---- HTML (tables and inline styles only: mail apps) ----
   const label = (t, st = '') => `<p style="margin:0 0 10px;font:700 11px/1.4 ${F};color:${INK3};letter-spacing:.08em;text-transform:uppercase;${st}">${esc(t)}</p>`;
   const bullets = (xs, st = '') => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${xs.map((x) => `<tr><td valign="top" width="18" style="padding:0 0 9px;font:700 15px/1.55 ${F};color:${INK}">&bull;</td><td style="padding:0 0 9px;font:15px/1.55 ${F};color:${INK};${st}">${esc(x)}</td></tr>`).join('')}</table>`;
@@ -95,18 +118,21 @@ function emailOf(rep, brief, o = {}) {
     + (brief.points ? bullets(brief.points) : `<p style="margin:0 0 10px;font:15px/1.6 ${F};color:${INK}">${esc(brief.world)}</p><p style="margin:0;font:15px/1.6 ${F};color:${INK}">${esc(brief.markets)}</p>`)
     + `</td></tr>` : '';
   const tile = (g) => `<td width="33%" valign="top" style="padding:4px"><div style="background:${WELL};border-radius:10px;padding:12px 12px 11px">`
-    + `<div style="font:600 12px/1.3 ${F};color:${INK3}">${esc(g.name)}</div>`
+    + `<div style="font:600 12px/1.3 ${F};color:${INK3}">${esc(nameOf(g))}</div>`
     + `<div style="margin:4px 0 3px;font:700 18px/1.2 ${F};color:${INK}">${esc(g.px)}</div>`
-    + (g.move ? `<div style="font:12px/1.4 ${F};color:${INK2}">±${esc(g.move)}% normal day</div><div style="font:600 12px/1.4 ${F};color:${g.p > g.base ? UP : g.p < g.base ? DN : INK3}">${g.p}% up · ${esc(lean(g))}</div>`
-      : `<div style="font:600 12px/1.4 ${F};color:${/stress|elevated|high/i.test(g.note) ? DN : INK2}">${esc(g.note || ' ')}</div>`)
+    + (g.move ? `<div style="font:12px/1.4 ${F};color:${INK2}">Moves about ${esc(g.move)}% a day</div><div style="font:600 12px/1.4 ${F};color:${g.p > g.base ? UP : g.p < g.base ? DN : INK3}">${g.p}% chance up today</div><div style="font:12px/1.4 ${F};color:${INK3}">normally ${g.base}%</div>`
+      : `<div style="font:600 12px/1.4 ${F};color:${/stress|elevated|high/i.test(g.note) ? DN : INK2}">${esc(plainNote(g.note))}</div>`)
     + `</div></td>`;
   const rows = []; for (let i = 0; i < G.length; i += 3) rows.push(`<tr>${G.slice(i, i + 3).map(tile).join('')}${'<td width="33%"></td>'.repeat(Math.max(0, 3 - G.slice(i, i + 3).length))}</tr>`);
-  const glH = G.length ? `<tr><td style="padding:0 0 24px">${label('At a glance')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 -4px">${rows.join('')}</table>`
-    + `<p style="margin:8px 0 0;font:12px/1.5 ${F};color:${INK3}">"% up" is the chance of a higher close today; "leans" compares it with the usual rate.</p></td></tr>` : '';
-  const agH = A.length ? `<tr><td style="padding:0 0 26px">${label('On the calendar today · London time')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
+  const glH = G.length ? `<tr><td style="padding:0 0 24px">${label('Prices this morning')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 -4px">${rows.join('')}</table>`
+    + `<p style="margin:8px 0 0;font:12px/1.5 ${F};color:${INK3}">"Chance up" is how likely the price is to end today higher than it started; "normally" is how often that happens on an ordinary day. Green: a bit more likely than usual; red: a bit less.</p></td></tr>` : '';
+  const agH = A.length ? `<tr><td style="padding:0 0 26px">${label('Coming out today · London time')}<table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
     + A.map((e) => `<tr><td valign="top" width="62" style="padding:0 0 10px"><span style="display:inline-block;padding:3px 8px;border-radius:6px;background:${INK};font:700 12px/1.4 ${F};color:#ffffff">${esc(e.at)}</span></td>`
       + `<td style="padding:1px 0 10px;font:14px/1.5 ${F};color:${INK}"><b>${esc(e.what)}</b> <span style="color:${INK3}">· ${esc(e.where)}</span>${e.more ? `<br><span style="font-size:13px;color:${INK2}">${esc(e.more)}</span>` : ''}</td></tr>`).join('')
     + `</table></td></tr>` : '';
+  const W = glossary(rep, brief);
+  const wordsH = W.length ? `<tr><td style="padding:22px 0 0;border-top:1px solid ${LINE}">${label('What the words mean')}`
+    + W.map((x) => `<p style="margin:0 0 9px;font:14px/1.5 ${F};color:${INK2}"><b style="color:${INK}">${esc(x.w)}</b> &mdash; ${esc(x.m)}</p>`).join('') + `</td></tr>` : '';
   const skip = (s) => /^Today/.test(s.h) || /^Where markets stand/.test(s.h);   // shown above already
   const part = (r) => `<tr><td style="padding:22px 0 0;border-top:1px solid ${LINE}">`
     + `<h2 style="margin:0 0 6px;font:700 17px/1.3 ${F};color:${INK}">${esc(r.title)}</h2>`
@@ -122,7 +148,7 @@ function emailOf(rep, brief, o = {}) {
     + `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">`
     + `<tr><td style="padding:0 0 22px">${label(test + 'Morning note', 'margin-bottom:6px')}<h1 style="margin:0;font:700 24px/1.25 ${F};color:${INK}">${esc(day)}</h1>`
     + `<p style="margin:6px 0 0;font:14px/1.4 ${F};color:${INK3}">06:30 London · world economy and markets</p></td></tr>`
-    + summary + glH + agH + part(rep.world) + part(rep.markets)
+    + summary + glH + agH + part(rep.world) + part(rep.markets) + wordsH
     + `<tr><td style="padding:24px 0 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:10px;background:${INK}"><a href="${link}" style="display:inline-block;padding:14px 24px;font:600 15px/1 ${F};color:#ffffff;text-decoration:none;border-radius:10px">Open the Macro desk&nbsp;&nbsp;&rarr;</a></td></tr></table>`
     + `<p style="margin:22px 0 0;font:15px/1.5 ${F};color:${INK}">Have a good session,<br><b>The Aureum Desk</b></p></td></tr>`
     + `</table></td></tr><tr><td style="padding:16px 8px 0;font:12px/1.6 ${F};color:#8a9099">${esc(NOTE)}</td></tr>`
@@ -131,4 +157,4 @@ function emailOf(rep, brief, o = {}) {
   return { subject, text, html };
 }
 
-module.exports = { recipients, briefRequest, parseBrief, emailOf, glance, agenda, MAX_TO, SYSTEM, mail };
+module.exports = { recipients, briefRequest, parseBrief, emailOf, glance, agenda, glossary, MAX_TO, SYSTEM, mail };
