@@ -98,14 +98,15 @@ export function nextScheduled(now, days = 8) {
 // US market holidays and early closes from `from` to `to` (YYYY-MM-DD, inclusive), from the CME calendar the ICT desk uses.
 // `closes` says what the day means for a dated call: spot gold and the currencies print a daily close on a US holiday that only
 // shortens the CME session (Thanksgiving), so it counts as a session; on a full closure (Good Friday, Christmas, New Year) there
-// is no normal session and a call due that day is scored on the last close before it (outlook.mjs resolveCall).
+// is no normal session and a call due that day is scored on the last close on file by then (outlook.mjs resolveCall): OANDA
+// prints a thin stub candle on 25 Dec and 1 Jan, none on Good Friday.
 export function holidaysBetween(from, to) {
   const out = []; if (!/^\d{4}-\d\d-\d\d$/.test(String(from || '')) || !/^\d{4}-\d\d-\d\d$/.test(String(to || ''))) return out;
   for (let t = dayT(from); t <= dayT(to); t += DAY) { const d = isoD(t), w = new Date(t * 1000).getUTCDay(); if (w === 0 || w === 6) continue;
     const Y = cmeYear(+d.slice(0, 4)), full = Y.full.get(d), early = Y.early.get(d); if (!full && !early) continue;
     const name = full || early.name, stocksShut = !!full || !/eve|after thanksgiving/i.test(name);
     out.push({ day: d, dow: WD[w], name, kind: full ? 'closed' : stocksShut ? 'holiday' : 'early', session: !full,
-      text: full ? `${name} (${WD[w]} ${dShort(d)}): markets closed, no normal session; a call due that day is scored on the last close before it`
+      text: full ? `${name} (${WD[w]} ${dShort(d)}): markets closed, no normal session; a call due that day is scored on the last close on file by then (the day's stub candle when the feed prints one, as it does at Christmas and New Year; else the close before)`
         : stocksShut ? `${name} (${WD[w]} ${dShort(d)}): US stocks closed, gold and currencies trade a short, thin session that still counts as a daily close`
           : `${name} (${WD[w]} ${dShort(d)}): US markets close early; a thin session that still counts as a daily close` }); }
   return out;

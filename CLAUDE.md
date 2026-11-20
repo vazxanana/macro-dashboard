@@ -3067,7 +3067,7 @@ Additions (display only):
   sentence ("Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov"),
   `outlook.holidays` for the calls' window with `due`. `session` says what a day is for a dated call: a shortened CME day prints a
   daily close and counts (Thanksgiving); on a full closure (Good Friday, Christmas, New Year) a call due that day is scored on the
-  last close before it (what `resolveCall` does). `addSessions` still counts weekdays: the week calls of 19 Dec fall due on 25 Dec.
+  last close on file by then (what `resolveCall` does: the feed's thin stub candle on 25 Dec and 1 Jan, the close before on Good Friday). `addSessions` still counts weekdays: the week calls of 19 Dec fall due on 25 Dec.
 - **A consistency guard** (`glance.mjs` `consistency`, `summary.check { ok, issues }`): a level "above" not above the price (or
   below not below), a lean that contradicts its own odds, odds quoted without their level once the price is 2 % away, a month call
   whose date has passed, a release named beside "no release", a macro SELL. A failed check withholds the sentence ("Summary

@@ -83,7 +83,7 @@ test('glance: no event in 72 hours is not "no release this week": the next top-t
   // which holidays are a session for a dated call: Thanksgiving prints a daily close, Christmas and Good Friday do not
   const H = G.holidaysBetween('2026-12-21', '2027-01-04');
   assert.deepEqual(H.map((h) => [h.day, h.kind, h.session]), [['2026-12-24', 'early', true], ['2026-12-25', 'closed', false], ['2027-01-01', 'closed', false]]);
-  assert.match(H[1].text, /a call due that day is scored on the last close before it/);
+  assert.match(H[1].text, /a call due that day is scored on the last close on file by then \(the day's stub candle when the feed prints one/);
   assert.equal(G.holidaysBetween('2026-04-01', '2026-04-06')[0].name, 'Good Friday');
 });
 
