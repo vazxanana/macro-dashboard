@@ -1517,7 +1517,7 @@
     var C = A.calls || {}; if ((C.list || []).length) fb.push('<li><b>The veteran\'s calls for the week:</b>' + C.list.map(function (c) { return '<span class="wa-r">' + esc(c.claim) + ': ' + Math.round(c.p * 100) + '% (base ' + Math.round(c.base * 100) + '%)</span>'; }).join('') + '</li>');
     else if (C.note) fb.push('<li>' + esc(C.note) + '</li>');
     $('wa-frame-b').innerHTML = '<ul class="pl-list nx-bl">' + fb.join('') + '</ul>';
-    $('wa-note').textContent = A.label || '';
+    $('wa-note').textContent = (A.label || '') + (A.prepRecord && A.prepRecord.text ? ' ' + A.prepRecord.text : '');
     var top = A.days.filter(function (d) { return d.releases.some(function (r) { return r.impact === 'high'; }) || d.market; });
     $('one-s-ahead').innerHTML = esc(WA_DAY(A.from) + ' to ' + WA_DAY(A.to)) + (top.length ? ': ' + top.slice(0, 3).map(function (d) { return '<b>' + esc(d.dow) + '</b> ' + esc(d.line); }).join(' · ') : '');
   }

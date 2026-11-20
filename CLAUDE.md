@@ -3040,6 +3040,8 @@ file keeps three months, so a print not read within about two months is never re
 on the first read after the release. No page shows it yet; no rule, call or trade reads it. `datahealth.mjs` lists the file
 (no staleness). Test: `tests/prep-record.test.mjs`.
 
+`prepFor` gives no prep to a year-on-year title (the nowcast is month on month); the Macro desk shows the record's one line in the Week ahead's note (`#wa-note`).
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss

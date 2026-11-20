@@ -47,3 +47,7 @@ test('the day\'s gold range is labelled, in the readable ink, and the auctions s
   assert.match(css, /\.wa-rg \{[^}]*var\(--fs-sm, 13px\)/);
   assert.ok(block.includes("'<ul class=\"wa-auc\">' + d.auctions.map(function (a) { return '<li><b>' + esc(a.text) + '</b>"));
 });
+
+test('the nowcast-against-consensus forward record is one line of text in the section note', () => {
+  assert.ok(md.includes("$('wa-note').textContent = (A.label || '') + (A.prepRecord && A.prepRecord.text ? ' ' + A.prepRecord.text : '');"));
+});

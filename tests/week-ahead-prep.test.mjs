@@ -85,3 +85,9 @@ test('build: each prepared release carries prep and gets one top line', () => {
   assert.ok(noCons.days.flatMap((d) => d.releases).every((x) => x.prep == null));
   assert.ok(!noCons.lines.some((l) => /^Before Wednesday's/.test(l)));
 });
+
+test('a year-on-year title gets no prep: the nowcast is month on month', () => {
+  const nc = { core: 0.27, head: 0.31 };
+  assert.equal(WA.prepFor({ title: 'CPI y/y', exp: '3.0%', type: 'cpi' }, nc, null), null);
+  assert.ok(WA.prepFor({ title: 'Core CPI m/m', exp: '0.2%', type: 'cpi' }, nc, null));
+});

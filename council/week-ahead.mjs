@@ -277,6 +277,7 @@ export function parseExp(x) {
 }
 export function prepFor(r, nc, record) {
   if (!r || !nc) return null;
+  if (/\by\/y\b|year/i.test(r.title || '')) return null;   // the nowcast is month on month: never beside a yearly consensus
   const cons = parseExp(r.exp); if (cons == null) return null;
   const core = /\bcore\b/i.test(r.title || '');
   const fig = core ? nc.core : nc.head; if (fig == null || !Number.isFinite(fig)) return null;
