@@ -5136,6 +5136,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   gold's next 20 sessions (OANDA daily, 1,013 weeks 2007-26). **FAIL, 0 of 2**: yen strong t 0.96 (gold +0.9 % vs +0.5 % on all
   weeks), yen weak t −0.91; both the claimed way, halves agree in sign, neither close. A faint lean at most; the Gold Macro Score
   and the driver stack's carry row are unchanged. Nothing live changed.
+- `audjpy-leads` (pre-registered 20 Nov 2026): the macro skill's "AUD/JPY turns before equities" on S&P 500 and Nasdaq 100
+  (OANDA daily, 1,012 weeks 2007-26). **FAIL, 0 of 4**: AUD/JPY up first finds nothing (t −0.05 / 0.32); AUD/JPY down while the
+  index rose was followed by weaker indices (t −2.12 / −2.26, same sign in both halves) but Holm p 0.10: a near miss on data now
+  read. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
