@@ -5112,6 +5112,9 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   to 5m, 2018 → Oct 2026. **PASS**: +0.086R a trade net (n 1,582, month t 2.91); OANDA mid on the same window +0.073R (t 2.48);
   same side on 100 % of the 1,575 days both traded, daily R correlation 0.98. Not an artefact of OANDA's candles; same years as
   `fx-vol-breakout` (a feed check, not new evidence). Nothing live changed.
+- Two breakouts as one book (20 Nov 2026, accounting, `research/proposals/2026-11-20-two-breakouts.md`): gold T1 (C1) + USD/JPY
+  T1 at 1R each from the forward baselines, Jan 2021 - Oct 2026 (in sample): monthly correlation 0.03, book month t 3.47 (gold
+  2.70, USD/JPY 2.28), +35.8R a year, worst drawdown 42.9R. No verdict; the forward records judge.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
