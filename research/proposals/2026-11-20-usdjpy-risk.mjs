@@ -24,9 +24,12 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const B = JSON.parse(fs.readFileSync(path.join(ROOT, 'research/edge/usdjpy-vol-breakout-forward/baseline.json'), 'utf8'));
   const P = profile(B.rows), yrs = Object.keys(P.years).length;
   const risk = [0.1, 0.25, 0.5, 1].map((pc) => ({ riskPct: pc, perYearPct: r2((P.totalR / yrs) * pc), maxDDPct: r2(P.maxDD * pc) }));
+  const byDay = (rows) => { const wd = {}; for (const [d, r] of rows) { const w = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(d + 'T00:00:00Z').getUTCDay()]; (wd[w] = wd[w] || []).push(r); }
+    return Object.fromEntries(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((w) => { const a = wd[w] || [], m = a.reduce((x, v) => x + v, 0) / a.length, sd = Math.sqrt(a.reduce((x, v) => x + (v - m) ** 2, 0) / (a.length - 1)); return [w, { n: a.length, meanR: Math.round(m * 1000) / 1000, t: r2(m / (sd / Math.sqrt(a.length))) }]; })); };
+  const goldWeekday = byDay(JSON.parse(fs.readFileSync(path.join(ROOT, 'research/edge/gold-vol-breakout-forward/baseline.json'), 'utf8')).rows);
   const wd = {}; for (const [d, r] of B.rows) { const w = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][new Date(d + 'T00:00:00Z').getUTCDay()]; (wd[w] = wd[w] || []).push(r); }
   const weekday = Object.fromEntries(['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map((w) => { const a = wd[w] || [], m = a.reduce((x, v) => x + v, 0) / a.length, sd = Math.sqrt(a.reduce((x, v) => x + (v - m) ** 2, 0) / (a.length - 1)); return [w, { n: a.length, meanR: Math.round(m * 1000) / 1000, t: r2(m / (sd / Math.sqrt(a.length))) }]; }));
-  const out = { built: '2026-11-20', source: 'research/edge/usdjpy-vol-breakout-forward/baseline.json', window: B.window, profile: P, risk, weekday, note: 'In-sample years for the rule; simple %, no compounding; before slippage beyond what the study charged.' };
+  const out = { built: '2026-11-20', source: 'research/edge/usdjpy-vol-breakout-forward/baseline.json', window: B.window, profile: P, risk, weekday, goldWeekday, note: 'In-sample years for the rule; simple %, no compounding; before slippage beyond what the study charged.' };
   fs.writeFileSync(path.join(HERE, '2026-11-20-usdjpy-risk.json'), JSON.stringify(out, null, 1) + '\n');
   console.log(JSON.stringify(out, null, 1));
 }

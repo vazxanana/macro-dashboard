@@ -24,3 +24,5 @@ months cannot tell a working rule from a broken one; the forward study's bands (
 Wednesday +0.144R (n 440, t 2.26), Thursday +0.153R (n 421, t 2.20), Friday −0.009R (n 410, t −0.15). The gain sits in the middle
 of the week. A weekday filter chosen from this table would be fitted to it: it is not a rule and would need its own
 pre-registration on data no study has read (there is none left on OANDA; the forward record will show whether the pattern holds).
+Gold's breakout over 2021-26 (its forward baseline) shows the opposite: Monday strongest (+0.256R a trade, t 2.75), Wednesday
+negative (−0.051R). Two markets, two different "best days": read the weekday splits as noise.
