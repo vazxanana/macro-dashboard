@@ -3089,6 +3089,19 @@ trading words on holidays and early closes; "a range for planning, not a forecas
 `tests/week-ahead-range.test.mjs`.
 **A normal day now** (20 Nov 2026): `normalDays(fc)` → `frame.normalDays` = one line per market of forecast.json `assets` (gold $, EUR/USD and USD/JPY pips, NQ / ES points, from `expMovePct` x `last`; `volRatio` >= 1.3 "1.4x its usual", <= 0.75 "quieter than usual"), drawn as ONE frame item with "A range for planning, not a forecast of direction." Test: `tests/week-ahead-normal.test.mjs`.
 
+## Week in review (20 Nov 2026, owner: "Lets make an area for week review of the market")
+`council/week-review.mjs` (pure, no imports; run from `veteran.mjs` `run()` after the Week ahead → council-data `macro/week-review.json`;
+a failure writes nothing; `datahealth.mjs` warns at 150 min). The counterpart of the Week ahead: what the markets the desk follows DID.
+The week = Monday to Friday (UTC days) of the last gold close on file: "so far" until Friday's close is in (`complete`), so on a Monday
+before any close it still shows the week just ended. Per market (`MARKETS`: gold with traded high / low, the dollar index, EUR/USD,
+USD/JPY, S&P 500, Nasdaq 100; rows `{ t, c }` or `{ t, v }`, weekend stubs and the forming day left out): the move from the last close
+before the week, each day's move, the week's high / low, `times` = the move against a normal week (median absolute weekly move of up
+to 52 complete weeks before, n/a under 12), the run of weeks the same way, the last 8 weeks. Also: day by day gold and the dollar with
+that day's red-folder releases (expected / printed, from `macro/redfolder.json`), the veteran's dated calls that came due and are
+scored (hits against the sum of his odds), the Gold Macro Score against a week before, and plain `lines`. Macro desk section
+`#s-review` "Week in review" after Week ahead (TOC chip, folds on the phone; `renderReview`, every value as text; styles "Week in
+review" beside the Week ahead's, tokens only). Descriptive: no rule, size, call or trade reads it. Test: `tests/week-review.test.mjs`.
+
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
 keyless public sources, each checked from a GitHub runner first (`scripts/macro-probe.mjs` + `.github/workflows/macro-probe.yml`, runs

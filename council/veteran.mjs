@@ -36,6 +36,7 @@ import { playbooks, playbookLine, P_BAND as EVENT_P_BAND } from './playbook.mjs'
 import { loadBatch, facts as newsFacts, contextFor, ahead as newsAhead, calendarOf } from './news-context.mjs';
 import { build as redfolder, loadInputs as rfInputs, capturedFrom as rfCaptured } from './redfolder.mjs';
 import { build as weekAhead } from './week-ahead.mjs';
+import { build as weekReview } from './week-review.mjs';
 import { updateFile as prepUpdate } from './prep-record.mjs';
 import { updateFile as sourceUpdate } from './game-plan.mjs';
 import { loadDocs, watch as researchWatch, hypothesesFor, cpiPlan, cpiBenchmark, consensusGate, gdpCase } from './research-watch.mjs';
@@ -659,6 +660,11 @@ export function run({ dir = 'data', now = Math.floor(Date.now() / 1000), log = c
     try { const SR = sourceUpdate(path.join(M, 'source-record.json'), WA, hd, now); if (SR.error) log('Source record: ' + SR.error); else WA.sources = SR.score; } catch (e) { log('Source record failed: ' + ((e && e.message) || e)); }
     w('week-ahead.json', WA); }
   catch (e) { log('Week ahead skipped: ' + (e && e.message || e)); }
+  // 20 Nov 2026: the week in review (council/week-review.mjs): what the markets did, from the closes and files above; a failure writes nothing
+  try { const WR = weekReview({ now, series: { gold: goldBars || gold, dxy: dx, eurusd: tradingDays(daily.eurusd), usdjpy: tradingDays(daily.usdjpy), spx, nas: tradingDays(dailyRows(day('nas100'))) },
+      rf: rd(path.join(M, 'redfolder.json'), null), calls: CL, fc });
+    if (WR) w('week-review.json', WR); }
+  catch (e) { log('Week review skipped: ' + (e && e.message || e)); }
   try { const fA = path.join(dir, 'analysis', 'latest.md');
     if (fs.existsSync(fA)) { const md = fs.readFileSync(fA, 'utf8'), nx = injectSection(md, veteranSection(v), VET_START, VET_END); if (nx !== md) fs.writeFileSync(fA, nx); } } catch (e) { log('veteran: analysis section skipped:', e.message); }
   log(v.brief);
