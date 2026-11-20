@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { writeAtomic } from './jsonio.mjs';
 import { typeOf, nowcastFor } from './week-ahead.mjs';
+import { moves } from './hard-data.mjs';
 import { nyParts } from '../ict/calendar.mjs';
 const nyDay = (t) => nyParts(t).ymd;
 
@@ -83,6 +84,8 @@ export function worldReport({ fc, vet, cal, now, hd = null }) {
   const gs = fc && fc.goldScore; if (gs && gs.ok && Number.isFinite(gs.score)) lines.expect.push(`Gold Macro Score ${gs.score > 0 ? '+' : ''}${gs.score.toFixed(2)}: ${gs.score > 0.25 ? 'leans to gold rising over the next four weeks (the score\'s tested side)' : 'no macro edge for gold (the score only ever points up, above +0.25)'}.`);
   if (hd && hd.odds && hd.odds.line) lines.expect.push(clean(hd.odds.line, 300));
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) lines.expect.push(`Atlanta Fed GDPNow for ${clean(hd.gdpnow.quarter, 12)}: ${hd.gdpnow.value}% a year, a model's running estimate of growth.`);
+  // how those readings moved over the day and the week (hard-data.mjs hist): a change in what a model or traders say, never a signal
+  for (const m of (hd ? moves(hd, now) : []).slice(0, 4)) lines.expect.push(clean(m.text, 300));
   for (const it of (((vet && vet.research) || {}).items || []).slice(0, 6)) if (it && it.text && !/^No |off:|no regime/i.test(it.text)) lines.expect.push(clean(it.text, 220));
   const sections = [['The picture', lines.picture], ['What happened (last 30 hours)', lines.happened], [`Today, ${dayName(now)} (London time)`, lines.today], ['Later this week', lines.week], ['What we expect', lines.expect]]
     .filter(([, l]) => l.length).map(([h, l]) => ({ h, lines: l }));

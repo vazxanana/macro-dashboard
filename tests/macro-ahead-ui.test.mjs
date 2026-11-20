@@ -34,3 +34,7 @@ test('a verdict from the file becomes a class only when it is one of the three k
 test('Week ahead text sizes stay at 12 px or more', () => {
   for (const m of css.matchAll(/(\d+(?:\.\d+)?)px\/[\d.]+ var\(--sans\)|font-size: (\d+(?:\.\d+)?)px/g)) assert.ok(+(m[1] || m[2]) >= 12, m[0]);
 });
+
+test('a release\'s nowcast-beside-consensus line is drawn as text', () => {
+  assert.ok(md.includes("(r.prep && r.prep.text ? '<span class=\"wa-r wa-nc\"><b>Nowcast beside the consensus:</b> ' + esc(r.prep.text)"));
+});

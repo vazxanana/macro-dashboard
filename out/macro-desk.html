@@ -1515,6 +1515,7 @@
         return '<li><b>' + esc((r.country ? r.country + ' ' : '') + r.title) + '</b> · ' + esc(utcWhen(iso)) + ' <small>(your time ' + esc(locWhen(iso)) + ')</small>'
           + (r.exp || r.prev ? '<span class="wa-r">Expected <b>' + esc(r.exp || NA) + '</b>, previous ' + esc(r.prev || NA) + '</span>' : r.src === 'schedule' ? '<span class="wa-r">From the council\'s release schedule: the consensus appears once the week\'s calendar lists it.</span>' : '')
           + (r.nowcast ? '<span class="wa-r wa-nc"><b>Nowcast:</b> ' + esc(r.nowcast.text) + '</span>' : '')
+          + (r.prep && r.prep.text ? '<span class="wa-r wa-nc"><b>Nowcast beside the consensus:</b> ' + esc(r.prep.text) + '</span>' : '')
           + (r.record ? r.record.lines.map(function (l) { return '<span class="wa-r">' + esc(l) + '</span>'; }).join('') : '') + '</li>'; }).join('') + '</ul>';
       else h += '<p class="wa-quiet">No major release on the files read so far.</p>';
       if ((d.fed || []).length) h += '<ul>' + d.fed.map(function (e) { return '<li><b>Fed: ' + esc(e.title) + '</b>' + (e.time ? ' · ' + esc(e.time) + ' New York' : '') + (e.topic ? '<span class="wa-r">' + esc(e.topic) + '</span>' : '') + '</li>'; }).join('') + '</ul>';

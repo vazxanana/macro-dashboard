@@ -34,3 +34,10 @@ test('without the file the report is as before, and a printed month shows no now
 });
 import { createRequire } from 'node:module';
 const require_ = createRequire(import.meta.url);
+
+test('what we expect: how the odds moved over the week (hard-data hist), never more than four lines', () => {
+  const now = T('2026-11-25T06:30:00Z'), h = (t, p) => ({ at: new Date(t * 1000).toISOString(), odds: { meeting: '2026-12-09', top: [{ label: 'Hike 25bps', p }] } });
+  const w = DR.worldReport({ fc: {}, vet: null, cal, now, hd: { ...hd, hist: [h(now - 7 * 86400, 0.85), h(now - 86400, 0.9), h(now - 1800, 0.92)] } });
+  const exp = w.sections.find((s) => s.h === 'What we expect').lines;
+  assert.ok(exp.some((l) => /^Kalshi odds of .*: 92% now, 90% a day ago, 85% a week ago\. What traders pay, not a forecast of ours\.$/.test(l)), exp.join('\n'));
+});
