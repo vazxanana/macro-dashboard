@@ -4956,7 +4956,12 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   Tuesday's close or the study's stop) for weeks after 12 Nov 2026, the study's own functions (sha256-pinned), cost
   `MARKETS.nas100.cost`, DGS2 frozen at the study's last value; against a single-trade bootstrap of its 81 out-of-sample trades
   (2016-26, +0.098R). Too few under 10, checkpoints 20 and 40; the first crossing stands. Rebuilds the study's 2 Nov 2026 trade
-  exactly (+0.129R). First reading: 1 trade (16 Nov, −0.135R). Paper research only.
+  exactly (+0.129R). First reading: 1 trade (16 Nov, −0.135R). `vb-forward.yml` writes council-data
+  `research/forward/turnaround-tuesday.json`. Paper research only.
+- `gold-pre-holiday-forward` (pre-registered 20 Nov 2026): `gold-pre-holiday` T1's forward record on NYSE holidays after
+  31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
+  its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`
+  writes council-data `research/forward/gold-pre-holiday.json`. First event: Thanksgiving (25 Nov 2026). Nothing trades.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
