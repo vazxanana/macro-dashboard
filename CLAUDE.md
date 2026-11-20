@@ -3020,8 +3020,8 @@ meeting / month / quarter only; nothing without an earlier reading); the Week ah
 **Treasury auctions** (20 Nov 2026): `auctions` = the notes, bonds, TIPS, FRNs and 52-week bill announced for yesterday to +14 days
 (`parseAuctions`, `auctionText`; other bills left out), from TreasuryDirect `TA_WS/securities/announced?format=json`, then
 `…/upcoming`, then the stale Fiscal Data file (the first with auctions in the window wins; all failing keeps the last copy); the
-Week ahead puts them on their day (`d.auctions`, text) and in the day line. Shapes not yet seen from a runner: the probe workflow
-prints them. Test: `tests/hard-data-auctions.test.mjs`.
+Week ahead puts them on their day (`d.auctions`, text) and in the day line. Checked from a runner on 20 Nov 2026: TreasuryDirect's rows carry no `auctionDate` key, so the
+parser takes any "auction ... date" key; first read: 2-year $69bn (23 Nov), 5-year $70bn + 2-year FRN + 52-week bill (24 Nov), 7-year $44bn (25 Nov). Test: `tests/hard-data-auctions.test.mjs`.
 
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
