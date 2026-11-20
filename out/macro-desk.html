@@ -667,7 +667,7 @@
     <article class="card daily" id="c-daily" hidden>
       <div class="dr-top"><div class="pl-tabs" role="tablist" aria-label="Report" id="dr-tabs"><button type="button" role="tab" data-dr="world" id="dr-t-world" aria-controls="dr-body" aria-selected="true">World economy</button><button type="button" role="tab" data-dr="markets" id="dr-t-markets" aria-controls="dr-body" aria-selected="false" tabindex="-1">Markets</button></div>
         <label class="dr-day">Day <select id="dr-day"></select></label></div>
-      <div class="dr-ai" id="dr-ai" hidden><b>AI summary</b><p id="dr-ai-t"></p><small>A language model's reading of the facts below; every figure in it is checked against the report. Not advice.</small></div>
+      <div class="dr-ai" id="dr-ai" hidden><b>Summary</b><p id="dr-ai-t"></p><small>Every figure in it is checked against the report below. Not advice.</small></div>
       <p class="c-take" id="dr-lead" aria-live="polite"></p>
       <div id="dr-body" role="tabpanel"></div>
       <p class="note" id="dr-note"></p>
@@ -1416,7 +1416,7 @@
   }
   // 19 Nov 2026: the two daily reports (macro/daily-report.json, council/daily-report.mjs); display only
   var DR = null, DRK = 'world', DRD = 0, DRB = null;
-  // the AI summary lives on the site's server (api/daily.js), not in council-data; asked once per load
+  // the summary lives on the site's server (api/daily.js), not in council-data; asked once per load
   function loadBrief() { fetch('/api/daily?brief=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { DRB = j && j.brief ? j : null; if (DR) renderDaily(DR); }).catch(function () {}); }
   try { DRK = localStorage.getItem('mdDaily') === 'markets' ? 'markets' : 'world'; } catch (e) {}
   function renderDaily(D) {

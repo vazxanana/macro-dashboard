@@ -144,7 +144,14 @@ most 60), through the sign-up senders (`signup.js` `mailer`); `daily/state.json`
 page; `?test=email[&to=]` (the owner's session, 5 in 10 min) sends the latest report now, marked "Test". **Page**: Macro desk
 section `#s-daily` first (TOC "Daily reports"), the AI summary box `#dr-ai` above each report, tabs World economy / Markets
 (localStorage `mdDaily`, a display preference), a day picker; a report shows only from its publish time. Build rule: the first
-file is built at once; a report built before 06:00 London is built again from 06:00. `datahealth.mjs` warns after 27 h. Tests:
+file is built at once; a report built before 06:00 London is built again from 06:00. `datahealth.mjs` warns after 27 h. **The email as a morning note** (20 Nov 2026, owner: "more professional … highlights and bullet points … just Summary, not AI
+summary … like a person writes it"): subject "Morning note · <day>"; "Summary" (never "AI") = the model's `headline` and 3-5
+`points` (optional fields, each checked by `parseBrief` like the paragraphs; an older stored summary shows its two paragraphs);
+`SYSTEM` asks for the desk analyst's own voice ("we", short sentences, never naming a model or a report) and `parseBrief` refuses
+text that talks of itself; "At a glance" tiles (`glance`: price, normal day, today's odds against the usual rate, from "Where
+markets stand", + the VIX); "On the calendar today" (`agenda`, from the world report's "Today" section); then both reports with
+at most `LINES` 4 bullets a section ("n more on the Macro desk"); signed "The Aureum Desk". The Macro desk's box reads "Summary".
+`?test=email&fresh=1` (owner) writes the day's summary again first (one call; a refused rewrite keeps the good one). Tests:
 `tests/daily-report.test.mjs`, `tests/daily-delivery.test.mjs`.
 
 ## London Strategic Edge data, owner only (19 Nov 2026, owner: "build option 1")
