@@ -4907,6 +4907,11 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**A third start, from the council loop (20 Nov 2026)**: the 20 Nov deploy log says `skip GH_DISPATCH_TOKEN (no repository secret)`,
+so the Worker's timer cannot start the job. After each round `council/gotobi-due.mjs` (read only; the Worker's `decide` and window,
+plus the study's calendar) answers yes on a gotobi weekday 00:25-00:49 UTC with no gotobi run active or started within the hour,
+and `council.yml` dispatches main's `gotobi.yml` with the loop's own `actions: write` (never fails the round). Test:
+`tests/gotobi-due.test.mjs`.
 **20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
 `GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
 website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
