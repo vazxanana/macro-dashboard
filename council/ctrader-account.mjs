@@ -28,10 +28,10 @@ export async function accountSnapshots({ env, tokens = null, cfg = null, WS = gl
   const accounts = await lib.readAccounts(WS, accessToken, env);
   const env2 = { ...env, CTRADER_CLIENT_ID: String(env.CTRADER_CLIENT_ID).trim(), CTRADER_CLIENT_SECRET: String(env.CTRADER_CLIENT_SECRET).trim() };
   const base = String(env.CTRADER_ACCOUNT_ID).trim(), { groups } = accountsFor(env, cfg);
-  const order = [...groups].sort((a, b) => (a.account === base ? -1 : b.account === base ? 1 : BOOKS.indexOf(a.books[0]) - BOOKS.indexOf(b.books[0])));
+  const order = [...groups].sort((a, b) => (a.account === base ? -1 : b.account === base ? 1 : (a.drain ? 99 : BOOKS.indexOf(a.books[0])) - (b.drain ? 99 : BOOKS.indexOf(b.books[0]))));
   const out = [];
   for (const g of order) {
-    const head = { books: g.books, label: labelOf(g.books), base: g.account === base, at: new Date(now).toISOString() };
+    const head = { books: g.books, label: g.drain ? 'Old shadows (draining)' : labelOf(g.books), ...(g.drain ? { drain: true } : {}), base: g.account === base, at: new Date(now).toISOString() };
     const acc = accounts.find((a) => a.id === g.account) || accounts.find((a) => a.login === g.account);
     if (!acc) { out.push({ ...head, error: 'account not found for this token' }); continue; }
     if (acc.live) { out.push({ ...head, error: 'refused: not a demo account' }); continue; }
@@ -58,7 +58,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-account.mjs')) {
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
   const scrub = scrubber(process.env);
   try {
-    const all = await accountSnapshots({ env: process.env, tokens, cfg: { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } } });
+    const all = await accountSnapshots({ env: process.env, tokens, cfg: { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: accFile.drain } });
     if (!all) process.exit(0);
     fs.mkdirSync(CD, { recursive: true });
     const snap = all.find((a) => a.base) || all[0];

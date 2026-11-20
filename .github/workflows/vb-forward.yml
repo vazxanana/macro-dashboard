@@ -1,8 +1,8 @@
 name: Forward records (research)
 
-# Weekdays, free: the forward records of gold-vol-breakout's T1, gold-pre-holiday's T1 and turnaround-tuesday's R2 on NAS100 (their PREREGISTRATION.md under
+# Weekdays, free: the forward records of gold-vol-breakout's T1, gold-pre-holiday's T1, turnaround-tuesday's R2 on NAS100 and T1 on USD/JPY (their PREREGISTRATION.md under
 # research/edge/*-forward) on OANDA mid M5 / H1 candles, saved to
-# council-data research/forward/gold-vol-breakout.json, gold-pre-holiday.json and turnaround-tuesday.json. Paper research only: nothing is traded,
+# council-data research/forward/gold-vol-breakout.json, gold-pre-holiday.json, turnaround-tuesday.json and usdjpy-vol-breakout.json. Paper research only: nothing is traded,
 # alerted or copied and no council member reads the files. The previous file is read back so the first crossing of a
 # checkpoint stands.
 on:
@@ -66,6 +66,11 @@ jobs:
         run: |
           node research/edge/turnaround-tuesday-forward/run.mjs fetch "$RUNNER_TEMP/t"
           node research/edge/turnaround-tuesday-forward/run.mjs run "$RUNNER_TEMP/t" data/research/forward/turnaround-tuesday.json
+
+      - name: USD/JPY breakout, the forward record
+        run: |
+          node research/edge/usdjpy-vol-breakout-forward/run.mjs fetch "$RUNNER_TEMP/u"
+          node research/edge/usdjpy-vol-breakout-forward/run.mjs run "$RUNNER_TEMP/u" data/research/forward/usdjpy-vol-breakout.json
 
       - name: Save
         run: |

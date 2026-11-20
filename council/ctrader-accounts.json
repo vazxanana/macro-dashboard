@@ -1,4 +1,13 @@
 {
- "note": "Demo account numbers per book (not secrets). Empty = that book trades on CTRADER_ACCOUNT_ID. Books: council (live Meridian systems), ict (ICT A-setups), shadow (paper shadow streams), lit (LIT paper shadow), replica (the owner's replica stream). Same cTrader ID for all, so the one token covers them. Owner, 8 Nov 2026.",
- "mirrorAccounts": { "council": "", "ict": "10152144", "shadow": "10152145", "lit": "10152146", "replica": "10152148" }
+ "note": "Demo account numbers per book (not secrets). Empty = that book trades on CTRADER_ACCOUNT_ID. Books: council (live Meridian systems), ict (ICT A-setups), shadow (paper shadow streams), lit (LIT paper shadow), replica (the owner's replica stream). Same cTrader ID for all, so the one token covers them. Owner, 8 Nov 2026. 20 Nov 2026 (owner): the shadow book moved to the idle LIT account 10152146 (shared with lit and the gotobi job); the old Shadows account 10152145 is drained: it opens nothing and keeps managing its open copies until none is left.",
+ "mirrorAccounts": {
+  "council": "",
+  "ict": "10152144",
+  "shadow": "10152146",
+  "lit": "10152146",
+  "replica": "10152148"
+ },
+ "drain": [
+  "10152145"
+ ]
 }
