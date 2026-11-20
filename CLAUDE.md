@@ -568,6 +568,14 @@ so both phone views are the page as they were (390 px: same blocks, numbers and 
 The shell's desktop order rules now read `#v-home .hs-more-b > …`. First screen as the owner at 1440 px: 13 blocks / 64 numbers
 before, 4 / 15 after (1024 px: 11 / 52 → 4 / 15); load CLS about 0.01-0.03. Test: `tests/home-simple.test.mjs`.
 
+## Last seen on the Users page (20 Nov 2026, owner: "when last time users been online")
+`api/_seen.js`: `touch(env, key, now)` writes `{ <account key>: ISO time }` to the private store file `presence/seen.json`
+(overwritten in place, read with `cache=0`; at most one write an account per 5 minutes per instance; every failure swallowed, so
+sign-in and pages never wait on it). Called by `/api/me` (each page load of a signed-in member) and `/api/login` after the account
+is checked. Only the owner's `GET /api/users` returns `seen` (null = unreadable). Stores the account key and a time only: no IP,
+device or page. Page: `window.msSeenText` under each name (`.u-nm` / `.u-seen`): "Online now" (under 5 min), "Last seen 3 h ago
+(20 Nov, 07:22)", or "Not seen since 20 Nov 2026" (nothing recorded before this feature). Test: `tests/last-seen.test.mjs`.
+
 ## Users page (6 Nov 2026)
 
 Owner-only view `#users` (sidebar "Users"): lists the built-in accounts (server side, `api/_accounts.js`; their public records
@@ -3060,6 +3068,15 @@ Macro desk tab "COT positioning". Tests: `tests/cot.test.mjs`. Paper only. Retur
 profitable close; red vignette + shake + a WebAudio-synthesized falling "faaaah" voice on a losing one. No audio files. Speaker
 button `#snd-btn` toggles sound (`btLab:sound`). Reduced motion: no confetti or shake. Chart: dotted crosshair, kinetic scroll.
 
+## The shadow book on the former LIT demo account (20 Nov 2026, owner: "one demo account … no trades with 10k USD … LIT replace it with the shadow")
+`council/ctrader-accounts.json`: `shadow` → 10152146 (the LIT account, idle since the LIT stream stopped on 17 Nov; it keeps the `lit`
+book, so `council/gotobi.mjs` still finds it as the gotobi account) and `drain: ['10152145']` (the old Shadows account). `accountsFor`
+adds a drain account as a group with no books (`drain: true`): its round opens nothing (`openBooks` empty) and keeps managing the
+copies it holds (stop guard, stop moves, closes, cancels); the CLI runs it only while `stillHolds(state)` (an open copy or a resting
+order), and `copiedIds` keeps any other account from copying those trades again. `mirror-accounts.json` lists it with `drain: true`
+while it runs; `ctrader/accounts.json` labels it "Old shadows (draining)". Owner's choice of three: move the shadows and let the old
+account run its 6 open copies out. Remove the `drain` entry once that account holds nothing. Test: `tests/mirror-drain.test.mjs`.
+
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
 1. After a market fill whose fill event shows no stop, the mirror waits `slWaitMs` (1.5 s) and reads the position back
@@ -5086,6 +5103,15 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   2x cost +0.050R; 40 of 40 placebos). With 2016-26 (+0.063R, t 2.50) it holds in both stretches of OANDA history. Limits:
   today's demo cost charged on old years, OANDA mid candles (not broker ticks), drawdowns of 20-42R. A candidate for a forward
   paper record only (its own pre-registration); never a live rule without the owner. Nothing live changed.
+- `yen-crosses-vol-breakout` (pre-registered 20 Nov 2026): is USD/JPY's T1 result a yen effect? T1 on EUR/JPY, GBP/JPY, AUD/JPY,
+  CAD/JPY, CHF/JPY 2005 → now, same cost. **FAIL** on the pool: +0.021R a trade net (n 21,088, month t 1.64; 2x cost −0.004R),
+  positive in both windows and 40 of 40 placebos beaten, so a faint tilt, not an edge. GBP/JPY alone clears its checks (+0.050R,
+  t 2.63, Holm p 0.020), CHF/JPY loses. By the pre-registered reading USD/JPY's result stands alone (one market of eleven); its
+  forward record is the judge. Nothing live changed.
+- `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
+  USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
+  +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
+  `research/forward/usdjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0).
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).

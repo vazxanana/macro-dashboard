@@ -1279,6 +1279,16 @@ window.msMergeUsers = function (remote) { var m = {}, k; for (k in window.MS_USE
 // the account list lives in a private Blob store behind /api/users (7 Nov); since 9 Nov it answers signed-in accounts only and
 // never carries password hashes (the owner gets every member, a member only their own record)
 window.MS_USERS_API = window.MS_API ? window.MS_API + 'users' : null;
+// "Last seen" on the Users page (20 Nov 2026): the server's presence/seen.json through GET /api/users (owner only). Pure.
+window.msSeenText = function (seen, k, now) {
+  if (seen === null) return 'Last seen: could not be read';
+  if (!seen || typeof seen !== 'object') return '';
+  var t = Date.parse(seen[k]); if (!isFinite(t)) return 'Not seen since 20 Nov 2026';
+  var m = Math.max(0, Math.round(((now || Date.now()) - t) / 60000));
+  var ago = m < 5 ? 'online now' : m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' h ago' : Math.round(m / 1440) + ' days ago';
+  var d = new Date(t), when = d.toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return m < 5 ? 'Online now' : 'Last seen ' + ago + ' (' + when + ')';
+};
 window.msFetchUsers = function () {
   if (!window.MS_USERS_API) return Promise.resolve(null);
   return fetch(window.MS_USERS_API, { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; })
@@ -1642,6 +1652,7 @@ h1, .h-head { text-wrap: balance; }
 /* polish 14: users table, initials avatar and calmer name type */
 .u-who { display: inline-flex; align-items: center; gap: 10px; }
 .u-who b { font: 600 13.5px var(--sans); color: var(--ink); }
+.u-nm { display: flex; flex-direction: column; min-width: 0; } .u-seen { margin-top: 2px; font: 400 12px var(--sans); color: var(--ink-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .u-seen:empty { display: none; }
 .u-av { width: 28px; height: 28px; flex: none; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--sans); color: #16181B; background: linear-gradient(135deg, #F4F5F7 0%, #B9BEC6 55%, #8A9099 100%); box-shadow: inset 0 -2px 4px rgba(0,0,0,.18); }
 .u-off .u-av { filter: grayscale(1); opacity: .5; }
 
@@ -9530,14 +9541,14 @@ function msNextSetup(bars, A) {
     const row = [...body.rows].find((r) => r.dataset.u === fk[0]), t = (row && (row.querySelector(`[data-act="${fk[1]}"]`) || row.querySelector('button, select'))) || body.querySelector('button, select') || document.getElementById('ms-u-name'); if (t) t.focus({ preventScroll: true }); }
   async function renderUsers(skipFetch) {
     const body = document.getElementById('ms-u-body'); if (!body || document.documentElement.dataset.role !== 'owner') return;
-    if (!skipFetch) { renderSignups(); US.remote = await window.msFetchUsers(); }
+    if (!skipFetch) { renderSignups(); US.remote = await window.msFetchUsers(); if (US.remote && 'seen' in US.remote) US.seen = US.remote.seen; }
     const sync = document.getElementById('ms-u-sync'); if (sync) sync.textContent = window.MS_USERS_API ? 'Saved on the server · your owner session saves changes' : 'Account changes are made on aureumdesk.co.uk';
     const rem = (US.remote && US.remote.users) || {}, keys = [...new Set(Object.keys(window.MS_USERS).concat(Object.keys(rem)))];
     // keyboard focus survives the redraw (11 Nov): it fell back to the top of the page after every save
     const ae = document.activeElement; if (ae && body.contains(ae) && ae.closest('tr')) US.fk = [ae.closest('tr').dataset.u, ae.dataset.act || '']; setTimeout(uRefocus, 0);
     body.innerHTML = keys.map((k) => {
       const u = rem[k] || window.MS_USERS[k], off = !!(rem[k] && rem[k].disabled), src = window.MS_USERS[k] ? (rem[k] ? 'built-in, changed here' : 'built-in') : 'added here';
-      return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(u.name || k).trim().charAt(0).toUpperCase())}</span><b>${esc(u.name || k)}</b></span>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select><div class="u-perm-row"><span class="u-chips">${permChips(u, k)}</span><button type="button" data-act="perms" class="u-perm-btn">Permissions…</button></div>`}</td><td><small>${esc(src)}</small></td>`
+      return `<tr class="${off ? 'u-off' : ''}" data-u="${esc(k)}"><td><span class="u-who"><span class="u-av" aria-hidden="true">${esc(String(u.name || k).trim().charAt(0).toUpperCase())}</span><span class="u-nm"><b>${esc(u.name || k)}</b><small class="u-seen">${esc(window.msSeenText(US.seen, k))}</small></span></span>${off ? ' <small>removed</small>' : ''}</td><td>${off ? '—' : `<select data-act="role" aria-label="Access for ${esc(u.name || k)}">${Object.entries(ROLE_NAME).map(([r, l]) => `<option value="${r}"${u.role === r ? ' selected' : ''}>${l}</option>`).join('')}</select><div class="u-perm-row"><span class="u-chips">${permChips(u, k)}</span><button type="button" data-act="perms" class="u-perm-btn">Permissions…</button></div>`}</td><td><small>${esc(src)}</small></td>`
         + `<td class="n u-acts">${off ? '<button type="button" data-act="restore">Restore</button>' : '<button type="button" data-act="pw">New password</button><button type="button" data-act="del" class="u-del">Remove</button>'}</td></tr>`;
     }).join('') || '<tr><td colspan="4" class="empty">No users yet.</td></tr>';
   }

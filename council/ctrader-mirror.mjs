@@ -353,7 +353,14 @@ export function accountsFor(env, cfg) {
   for (const b of BOOKS) if (!out[b]) out[b] = base;
   // group the books by account: one session and one state per account
   const groups = new Map(); for (const b of BOOKS) { if (!out[b]) continue; const g = groups.get(out[b]) || { account: out[b], books: [] }; g.books.push(b); groups.set(out[b], g); }
+  // drain (owner, 20 Nov 2026): an account no book points at any more still gets a round with no books, so it opens nothing and
+  // keeps managing (stop moves, closes, cancels) the copies it already holds; the CLI drops it once it holds none
+  for (const a of (cfg && Array.isArray(cfg.drain) ? cfg.drain : [])) { const id = String(a || '').trim(); if (id && !groups.has(id)) groups.set(id, { account: id, books: [], drain: true }); }
   return { byBook: out, groups: [...groups.values()] };
+}
+// a drain account is run while its state still holds an open copy or a resting order
+export function stillHolds(state) {
+  return Object.values((state && state.map) || {}).some((m) => m && m.status === 'open') || Object.keys((state && state.orders) || {}).length > 0;
 }
 // relative stop/target for a market order: in 1/100000 of the price, a multiple of the symbol's smallest step
 export function relative(dist, digits = 5) {
@@ -849,12 +856,14 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // account numbers: council/ctrader-accounts.json on main (owner gives the numbers in chat, a PR records them; no secrets), then
   // council-data config.json mirrorAccounts, then the env CTRADER_ACCOUNTS
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
-  const { groups, byBook } = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) } }), allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
+  const acc = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: accFile.drain }), byBook = acc.byBook, allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
   // the replica's research trades are copied only while the replica book has a demo account of its own: without one they
   // would land on the council's account (a book without a number trades on the base account)
   const replicaOwn = replicaHasOwnAccount(byBook);
   const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
+  const fileOf0 = (a) => (a === base ? 'mirror.json' : `mirror-${a}.json`);
+  const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));
   // what each account has copied (any status, resting orders too; after the owner's reset, if one applies): another account never
   // opens the same trade
   const fileOf = (acc) => (acc === base ? 'mirror.json' : `mirror-${acc}.json`), held = new Map();
@@ -868,13 +877,13 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
     const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks, openBooks: g.books, exclude });
     if (r.tokens) tokens = r.tokens;
     writeAtomic(path.join(CD, file), JSON.stringify({ account: g.account, books: g.books, state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
-    summaryLines.push(`${g.books.join('+')} (${g.account}): ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
+    summaryLines.push(`${g.drain ? 'drain' : g.books.join('+')} (${g.account}): ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);
     // a burst (the catch-up round, or many closes at once) goes as one summary instead of a phone message per position
     if (r.alerts.length > 6) { const n = r.alerts.length, opens = r.alerts.filter((a) => a.kind === 'open').length, closes = r.alerts.filter((a) => a.kind === 'close').length;
       r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
-    for (const a of r.alerts) allAlerts.push(groups.length > 1 ? { ...a, book: g.books.join('+') } : a);
+    for (const a of r.alerts) allAlerts.push(groups.length > 1 ? { ...a, book: g.drain ? 'old shadow account' : g.books.join('+') } : a);
   }
-  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
+  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, ...(g.drain ? { drain: true } : {}), file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
   if (tokens && JSON.stringify(tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(tokens);
   console.log(`cTrader mirror: ${summaryLines.join(' | ')}`);
   const r = { alerts: allAlerts };
