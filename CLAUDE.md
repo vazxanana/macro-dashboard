@@ -5053,6 +5053,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   2x cost +0.050R; 40 of 40 placebos). With 2016-26 (+0.063R, t 2.50) it holds in both stretches of OANDA history. Limits:
   today's demo cost charged on old years, OANDA mid candles (not broker ticks), drawdowns of 20-42R. A candidate for a forward
   paper record only (its own pre-registration); never a live rule without the owner. Nothing live changed.
+- `yen-crosses-vol-breakout` (pre-registered 20 Nov 2026): is USD/JPY's T1 result a yen effect? T1 on EUR/JPY, GBP/JPY, AUD/JPY,
+  CAD/JPY, CHF/JPY 2005 → now, same cost. **FAIL** on the pool: +0.021R a trade net (n 21,088, month t 1.64; 2x cost −0.004R),
+  positive in both windows and 40 of 40 placebos beaten, so a faint tilt, not an edge. GBP/JPY alone clears its checks (+0.050R,
+  t 2.63, Holm p 0.020), CHF/JPY loses. By the pre-registered reading USD/JPY's result stands alone (one market of eleven); its
+  forward record is the judge. Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
