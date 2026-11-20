@@ -14,6 +14,7 @@ import { EVENTS } from './events.mjs';
 import { cmeYear, nyParts } from '../ict/calendar.mjs';
 import { isGotobi } from './gotobi-calendar.mjs';
 import { readStudy, studyRow, EDGE_DIR } from './research-ledger.mjs';
+import { moves, bigOddsMove } from './hard-data.mjs';
 
 const DAY = 86400;
 const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -212,12 +213,17 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);
   if (hd && hd.odds && hd.odds.line) { frame.odds = { meeting: hd.odds.meeting, kalshi: (hd.odds.kalshi || []).slice(0, 3), polymarket: hd.odds.polymarket ? hd.odds.polymarket.markets.slice(0, 3) : [], at: hd.odds.at }; }
   if (hd && hd.gdpnow && Number.isFinite(hd.gdpnow.value)) frame.lines.push(`Atlanta Fed GDPNow for ${hd.gdpnow.quarter}: ${hd.gdpnow.value}% annualized${Number.isFinite(hd.gdpnow.prev) ? ` (the quarter before: ${hd.gdpnow.prev}%)` : ''}.`);
+  // How the expectations moved (macro/hard-data.json `hist`): a day and a week back, only where both readings exist.
+  const mv = hd ? moves(hd, now) : [];
+  if (mv.length) { frame.moves = mv; for (const m of mv) frame.lines.push(m.text); }
   const usHi = days.flatMap((d) => d.releases.filter((r) => r.impact === 'high' && r.country === 'USD').map((r) => ({ ...r, dow: d.dow })));
   const busiest = days.slice().sort((a, b) => b.releases.filter((r) => r.impact === 'high').length - a.releases.filter((r) => r.impact === 'high').length)[0];
   const lines = [];
   const closed = days.filter((d) => d.market && d.market.kind === 'holiday'), early = days.filter((d) => d.market && d.market.kind === 'early');
   if (closed.length || early.length) lines.push(`A short week: ${[...closed.map((d) => `US markets closed ${d.dow}`), ...early.map((d) => `early close ${d.dow}`)].join(', ')}. Expect thin trading around ${closed.length ? 'the holiday' : 'the early close'}.`);
   if (frame.odds) lines.push(hd.odds.line);
+  const big = hd ? bigOddsMove(hd, now) : null;
+  if (big) lines.push(big.text);
   const nc = days.flatMap((d) => d.releases.filter((r) => r.nowcast).map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${d.dow}): ${r.nowcast.text}`));
   if (nc.length) lines.push(`Before the print: ${nc.join('; ')}.`);
   if (usHi.length) lines.push(`The US data that move gold most: ${usHi.map((r) => `${r.title.replace(/\s*\(.*\)$/, '')} (${r.dow})`).filter((x, i, a) => a.indexOf(x) === i).join(', ')}.`);

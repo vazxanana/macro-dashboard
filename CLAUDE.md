@@ -2992,6 +2992,13 @@ rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Ka
 +0.27%, headline +0.31%; GDPNow Q4 3.2%. Not usable from a runner on 20 Nov: GLD holdings (the CSV URL now serves a PDF), CME gold
 stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
 `tests/hard-data.test.mjs`.
+**Memory** (20 Nov 2026): the file keeps `hist` (`histEntry` / `addHist`): one compact reading per UTC hour (a second run that hour
+merges), 14 days (`HIST_DAYS`): Kalshi's top 3 `{ label, p }` with the meeting, each nowcast month still waiting for a print (printed
+series null), GDPNow `{ quarter, value }`; only parts read fresh that run (a kept copy is never recorded again). `moves(hd, now)` =
+plain lines "92% now, 90% a day ago, 85% a week ago" (newest reading at most 6 h old; day = 20-30 h back, week = 6-8 days; same
+meeting / month / quarter only; nothing without an earlier reading); the Week ahead puts them in `frame.lines` (`frame.moves`) and
+`bigOddsMove` (5 points or more over a week) on top. A change in what a model or traders say, never a signal. Test:
+`tests/hard-data-history.test.mjs`.
 
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus

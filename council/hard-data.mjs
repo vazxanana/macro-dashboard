@@ -108,6 +108,119 @@ export function oddsLine(o) {
   return `Prediction markets on the ${when} Fed decision: ${[k && `Kalshi ${k}`, p && `Polymarket ${p}`].filter(Boolean).join(', ')}. What traders pay, not a forecast of ours.`;
 }
 
+// History (20 Nov 2026, owner: see how expectations MOVED during the week). Each run adds one compact reading to `hist`, carried
+// from the previous file: at most one entry per UTC hour (a second run in the same hour merges into it), the last `HIST_DAYS`
+// days. Only a part read fresh this run is recorded (a failed source's kept copy is never written in again as if new):
+//  odds    = { meeting, top: Kalshi's three leading outcomes [{ label, p }] },
+//  nowcast = [{ month, corePce, pce, coreCpi, cpi }] for each nowcast month still waiting for at least one print (a series already
+//            printed is null), so the release of the coming week (October's PCE after October's CPI is out) keeps its record,
+//  gdpnow  = { quarter, value } (a value is compared only within its quarter).
+export const HIST_DAYS = 14;
+const NC = ['corePce', 'pce', 'coreCpi', 'cpi'];
+export function histEntry(out) {
+  const ok = (k) => out && out.sources && out.sources[k] === 'ok' && out[k];
+  const e = { at: out.at };
+  if (ok('odds') && Array.isArray(out.odds.kalshi) && out.odds.kalshi.length) {
+    e.odds = { meeting: out.odds.meeting, top: out.odds.kalshi.slice(0, 3).map((m) => ({ label: m.label, p: m.p })) };
+  }
+  if (ok('nowcast') && Array.isArray(out.nowcast.months)) {
+    const ms = [];
+    for (const m of out.nowcast.months) {
+      const row = { month: m.month }; let any = false;
+      for (const k of NC) { const printed = m.actual && m.actual[k] != null, v = m.now && m.now[k]; row[k] = !printed && Number.isFinite(v) ? v : null; if (row[k] != null) any = true; }
+      if (any) ms.push(row);
+    }
+    if (ms.length) e.nowcast = ms;
+  }
+  if (ok('gdpnow') && Number.isFinite(out.gdpnow.value)) e.gdpnow = { quarter: out.gdpnow.quarter, value: out.gdpnow.value };
+  return e.odds || e.nowcast || e.gdpnow ? e : null;
+}
+const secOf = (at) => Math.floor(Date.parse(at) / 1000);
+export function addHist(prev, entry, now) {
+  const cut = now - HIST_DAYS * 86400;
+  const h = (Array.isArray(prev) ? prev : []).filter((x) => x && typeof x.at === 'string' && Number.isFinite(secOf(x.at)) && secOf(x.at) >= cut && secOf(x.at) <= now)
+    .map((x) => ({ ...x })).sort((a, b) => secOf(a.at) - secOf(b.at));
+  if (entry) {
+    const hour = Math.floor(secOf(entry.at) / 3600), last = h[h.length - 1];
+    if (last && Math.floor(secOf(last.at) / 3600) === hour) h[h.length - 1] = { ...last, ...entry };
+    else h.push(entry);
+  }
+  return h;
+}
+
+// What moved: the newest reading (at most 6 hours old) against the one nearest a day ago (20 to 30 hours back) and a week ago (6 to
+// 8 days back). One plain line per item, only when the newest reading and at least one earlier one exist; nothing otherwise. A
+// change in what a model or the traders say, never a signal of ours.
+const NCNAME = { corePce: 'core PCE', pce: 'PCE', coreCpi: 'core CPI', cpi: 'CPI' };
+export function outcomeWords(label) {
+  const s = String(label || '');
+  const n = /(\d+)\s*bps?/i.exec(s), up = /hike|increase|raise/i.test(s), dn = /cut|decrease|lower/i.test(s);
+  if (n && (up || dn)) return `a ${n[1]} bp ${up ? 'hike' : 'cut'}`;
+  if (/maintain|no change|hold|unchanged/i.test(s)) return 'no change';
+  return s;
+}
+function refs(hist, now, has) {
+  const H = (Array.isArray(hist) ? hist : []).filter((x) => x && has(x)).map((x) => ({ x, t: secOf(x.at) })).filter((y) => Number.isFinite(y.t) && y.t <= now);
+  const cur = H.filter((y) => y.t >= now - 6 * 3600).sort((a, b) => b.t - a.t)[0];
+  if (!cur) return null;
+  const near = (lo, hi, target) => H.filter((y) => y.t >= now - hi && y.t <= now - lo && y.t < cur.t).sort((a, b) => Math.abs(a.t - target) - Math.abs(b.t - target))[0];
+  const d = near(20 * 3600, 30 * 3600, now - 86400), w = near(6 * 86400, 8 * 86400, now - 7 * 86400);
+  return { cur: cur.x, day: d ? d.x : null, week: w ? w.x : null };
+}
+const dayWord = (ymd) => { const d = new Date(ymd + 'T12:00:00Z'); return Number.isFinite(d.getTime()) ? `${d.getUTCDate()} ${MONTH[d.getUTCMonth()].slice(0, 3)}` : ymd; };
+const pctP = (p) => `${Math.round(p * 100)}%`;
+const pctNc = (x) => (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2) + '%';
+function said(cur, day, week, f) {
+  const parts = [`${f(cur)} now`];
+  if (day != null) parts.push(`${f(day)} a day ago`);
+  if (week != null) parts.push(`${f(week)} a week ago`);
+  return parts.length > 1 ? parts.join(', ') : null;
+}
+const dif = (a, b) => b == null ? null : r2(a - b);
+// [{ kind: 'odds' | 'nowcast' | 'gdpnow', text, day, week }] (day / week = the change, null when that reading is missing).
+export function moves(hd, now) {
+  const hist = hd && hd.hist, out = [];
+  const R = refs(hist, now, (x) => x.odds && Array.isArray(x.odds.top) && x.odds.top.length);
+  if (R) {
+    const lead = R.cur.odds.top[0];
+    const pick = (x) => { if (!x || x.odds.meeting !== R.cur.odds.meeting) return null; const m = x.odds.top.find((y) => y.label === lead.label); return m ? m.p : null; };
+    const d = pick(R.day), w = pick(R.week), s = said(lead.p, d, w, pctP);
+    if (s) out.push({ kind: 'odds', label: lead.label, day: dif(lead.p, d), week: dif(lead.p, w),
+      text: `Kalshi odds of ${outcomeWords(lead.label)} at the ${dayWord(R.cur.odds.meeting)} Fed meeting: ${s}. What traders pay, not a forecast of ours.` });
+  }
+  const N = refs(hist, now, (x) => Array.isArray(x.nowcast) && x.nowcast.length);
+  if (N) {
+    for (const m of N.cur.nowcast) {
+      for (const k of NC) {
+        if (m[k] == null) continue;
+        const pick = (x) => { const y = x && x.nowcast.find((z) => z.month === m.month); return y && y[k] != null ? y[k] : null; };
+        const d = pick(N.day), w = pick(N.week), s = said(m[k], d, w, pctNc);
+        if (s) out.push({ kind: 'nowcast', month: m.month, series: k, day: dif(m[k], d), week: dif(m[k], w),
+          text: `Cleveland Fed ${NCNAME[k]} nowcast for ${MONTH[+m.month.slice(5) - 1]}: ${s} (a model's estimate, month on month).` });
+      }
+    }
+  }
+  const G = refs(hist, now, (x) => x.gdpnow && Number.isFinite(x.gdpnow.value));
+  if (G) {
+    const q = G.cur.gdpnow.quarter, v = G.cur.gdpnow.value, pick = (x) => x && x.gdpnow.quarter === q ? x.gdpnow.value : null;
+    const d = pick(G.day), w = pick(G.week), s = said(v, d, w, (x) => `${x}%`);
+    if (s) out.push({ kind: 'gdpnow', day: dif(v, d), week: dif(v, w), text: `Atlanta Fed GDPNow for ${q}: ${s} (annualized).` });
+  }
+  return out;
+}
+// The biggest one-week move of any of Kalshi's leading outcomes for the same meeting, when it is `min` (5 points) or more; else null.
+export function bigOddsMove(hd, now, min = 0.05) {
+  const R = refs(hd && hd.hist, now, (x) => x.odds && Array.isArray(x.odds.top) && x.odds.top.length);
+  if (!R || !R.week || R.week.odds.meeting !== R.cur.odds.meeting) return null;
+  let best = null;
+  for (const m of R.cur.odds.top) {
+    const o = R.week.odds.top.find((y) => y.label === m.label); if (!o) continue;
+    const d = m.p - o.p; if (!best || Math.abs(d) > Math.abs(best.d)) best = { label: m.label, from: o.p, to: m.p, d };
+  }
+  if (!best || Math.abs(best.d) < min - 1e-9) return null;
+  return { ...best, d: r2(best.d), text: `Over the week the Kalshi odds of ${outcomeWords(best.label)} at the ${dayWord(R.cur.odds.meeting)} Fed meeting moved from ${pctP(best.from)} to ${pctP(best.to)}: what traders pay, not a forecast of ours.` };
+}
+
 async function getText(fetchFn, url, ms = 30000) {
   const ac = new AbortController(), to = setTimeout(() => ac.abort(), ms);
   try { const r = await fetchFn(url, { headers: UA, signal: ac.signal }); if (!r.ok) throw new Error('HTTP ' + r.status); return await r.text(); } finally { clearTimeout(to); }
@@ -132,6 +245,7 @@ export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = f
     if (!o.kalshi && !o.polymarket) return null;
     o.line = oddsLine(o); return o;
   });
+  out.hist = addHist(P.hist, histEntry(out), now);
   return out;
 }
 
