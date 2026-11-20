@@ -114,7 +114,7 @@ dialog.ms-chgd::backdrop { background: rgba(0,0,0,.45); }
   .chg-nav { display: none; }
   .chg-foot .chg-dots { display: none; }
 }
-@media (pointer: coarse) { .ch-help, .chg-foot button, .chg-x, .chg-nav button { min-height: 44px; } }
+@media (pointer: coarse) { .ch-help, .chg-foot button, .chg-x, .chg-nav button { min-height: 44px; } .chg-x { min-width: 44px; } }
 @media (prefers-reduced-motion: reduce) { .chg-hl { transition: none; } }`;
 
   let dlg = null, cur = 0;
