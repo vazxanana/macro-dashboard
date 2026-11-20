@@ -23,6 +23,7 @@ import { createRequire } from 'node:module';
 import { unseal, scrubber, normName } from './ctrader-mirror.mjs';
 import { HISTORY, EVENTS } from './events.mjs';
 import { decodeTicks } from './ctrader-symbols.mjs';
+import { isGotobi } from './gotobi-calendar.mjs';
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
@@ -31,6 +32,17 @@ export const HOUR_DAYS = 60, HOUR_WIN = 120;          // seconds read at the top
 export const EV_FROM = -600, EV_TO = 3900;           // T-10 min .. T+65 min
 export const EV_TYPES = ['CPI', 'NFP', 'FOMC'];
 export const MAX_PAGES = 40, GAP_MS = 260;
+// gotobi (20 Nov 2026, research/edge/gotobi-exec): the bid and ask at 00:55:00 and 06:00:00 UTC of every gotobi day inside the
+// history (council/gotobi-calendar.mjs, the demo job's calendar), with the median quoted spread in +-GOTOBI_HALF seconds
+export const GOTOBI_MARKS = [55 * 60, 6 * 3600], GOTOBI_HALF = 60;
+export const PARTS = ['depth', 'hours', 'events', 'gotobi'];
+// "USDJPY:depth,gotobi" -> { name, parts }; a bare name reads depth, hours and events
+export function parseName(arg) { const [name, p] = String(arg).split(':'); const parts = p ? p.split(',').filter((x) => PARTS.includes(x)) : ['depth', 'hours', 'events']; if (!parts.includes('depth')) parts.unshift('depth'); return { name, parts }; }
+// the gotobi days (UTC dates) from `from` (unix sec) to now whose 06:00 mark has passed, oldest first
+export function gotobiDays(from, nowSec) {
+  const o = []; for (let d = Math.floor(from / 86400) * 86400; d + GOTOBI_MARKS[1] + GOTOBI_HALF < nowSec; d += 86400) { const ymd = new Date(d * 1000).toISOString().slice(0, 10); if (isGotobi(ymd)) o.push({ day: ymd, t: d }); }
+  return o;
+}
 
 const med = (a) => { const v = a.slice().sort((x, y) => x - y), n = v.length; return n ? (n % 2 ? v[n >> 1] : (v[n / 2 - 1] + v[n / 2]) / 2) : null; };
 const pct = (a, p) => { const v = a.slice().sort((x, y) => x - y); return v.length ? v[Math.min(v.length - 1, Math.floor(p * (v.length - 1) + 0.5))] : null; };
@@ -117,7 +129,8 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], WS = globa
     const list = await s.send(P.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid });
     const light = new Map((list.symbol || []).filter((x) => x.enabled !== false).map((x) => [normName(x.symbolName), x]));
     const send = (q) => s.send(P.GET_TICKDATA_REQ, q);
-    for (const name of names) {
+    for (const arg of names) {
+      const { name, parts } = parseName(arg);
       const L = light.get(normName(name)); if (!L) { out[name] = { error: 'not listed by the broker' }; continue; }
       const sid = Number(L.symbolId), errors = [];
       const window = async (fromS, toS) => {
@@ -132,7 +145,7 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], WS = globa
       log(`${name}: history reaches about ${reach} days back`);
       // hours (inside the reach only)
       const hours = [];
-      for (const t of hourMarks(nowSec, Math.min(HOUR_DAYS, reach || 1))) {
+      if (parts.includes('hours')) for (const t of hourMarks(nowSec, Math.min(HOUR_DAYS, reach || 1))) {
         const w = await window(t, t + HOUR_WIN); if (!w) continue;
         const sp = spreadsOf(w.qp), mid = w.qp.length ? med(w.qp.map((q) => (q[1] + q[2]) / 2)) : null;
         hours.push({ t, n: sp.length, median: sp.length ? r6(med(sp)) : null, max: sp.length ? r6(Math.max(...sp)) : null, mid: r6(mid) });
@@ -140,13 +153,22 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], WS = globa
       log(`${name}: ${hours.length} hour windows`);
       // events (inside the reach only)
       const events = [];
-      for (const e of eventList(reach ? nowSec - reach * 86400 : nowSec, nowSec)) {
+      if (parts.includes('events')) for (const e of eventList(reach ? nowSec - reach * 86400 : nowSec, nowSec)) {
         const w = await window(e.t + EV_FROM, e.t + EV_TO); if (!w) continue;
         const marks = eventMarks(e.t), mins = []; for (let s0 = EV_FROM; s0 < EV_TO; s0 += 60) mins.push(e.t + s0);
         events.push({ ...e, ticks: w.qp.length, partial: w.partial || undefined, marks: marks.map((m) => m - e.t), quotes: marksAt(w.qp, marks), widest: widest(w.qp, mins) });
       }
       log(`${name}: ${events.length} events`);
-      out[name] = { symbolId: sid, digits: L.digits ?? null, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, errors };
+      const gotobi = [];
+      if (parts.includes('gotobi')) for (const g of gotobiDays(reach ? nowSec - reach * 86400 : nowSec, nowSec)) {
+        const row = { day: g.day };
+        for (const m of GOTOBI_MARKS) { const t = g.t + m, w = await window(t - GOTOBI_HALF, t + GOTOBI_HALF); if (!w) continue;
+          const before = w.qp.filter((q) => q[0] <= t * 1000), last = before[before.length - 1], sp = spreadsOf(w.qp);
+          row[m === GOTOBI_MARKS[0] ? 'entry' : 'exit'] = { bid: last ? r6(last[1]) : null, ask: last ? r6(last[2]) : null, ageS: last ? Math.round(t - last[0] / 1000) : null, spread: sp.length ? r6(med(sp)) : null, n: sp.length }; }
+        gotobi.push(row);
+      }
+      if (parts.includes('gotobi')) log(`${name}: ${gotobi.length} gotobi days`);
+      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), errors };
     }
   } finally { s.close(); }
   return { at: new Date(now).toISOString(), source: 'council/tick-probe.mjs', broker: acc.broker || null, symbols: out };

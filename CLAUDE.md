@@ -4910,4 +4910,4 @@ far back the history goes: ticks in a 2-minute window 1-1095 days back), `hours`
 research/proposals/2026-11-14-gold-vol-breakout.md) and `events` (the last bid and ask at T-10 to T+65 minutes, each minute plus
 T+5 / 15 / 30 s, and the widest spread of each minute, for every US CPI, payrolls and FOMC statement of council/events.mjs inside
 the depth: the executable prices the owner's news register asks for first). Research data only, no council member reads it.
-Test: `tests/tick-probe.test.mjs` (fake broker).
+A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).

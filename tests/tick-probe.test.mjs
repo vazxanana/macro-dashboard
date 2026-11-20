@@ -69,3 +69,17 @@ test('probe: read only, demo only, and the file shape', async () => {
   assert.ok(!/NEW_ORDER|CLOSE_POSITION|AMEND|CANCEL_ORDER|ctrader-mirror\.mjs['"];?\s*$/m.test(src.replace(/import \{ unseal, scrubber, normName \} from '\.\/ctrader-mirror\.mjs';/, '')));
   assert.match(src, /lib\.session\(WS, lib\.HOSTS\.demo\)/);
 });
+
+test('gotobi part: parts parsing, the gotobi days, entry and exit quotes', async () => {
+  const { parseName, gotobiDays, probe } = await import('../council/tick-probe.mjs');
+  assert.deepEqual(parseName('USDJPY:gotobi'), { name: 'USDJPY', parts: ['depth', 'gotobi'] });
+  assert.deepEqual(parseName('XAUUSD').parts, ['depth', 'hours', 'events']);
+  const now = Date.parse('2026-11-20T07:00:00Z') / 1000, days = gotobiDays(now - 30 * 86400, now).map((g) => g.day);
+  assert.ok(days.includes('2026-11-20') && days.includes('2026-11-10') && !days.includes('2026-11-11'));
+  const env = { CTRADER_CLIENT_ID: 'a', CTRADER_CLIENT_SECRET: 'b', CTRADER_ACCESS_TOKEN: 'c', CTRADER_ACCOUNT_ID: '7', CTRADER_ENV: 'demo' };
+  const lib = fakeBroker([]), base = lib.session();
+  lib.session = () => ({ ...base, send: async (type, q) => (type === 3 ? { symbol: [{ symbolName: 'USDJPY', symbolId: 4, digits: 3 }] } : base.send(type, q)) });
+  const r = await probe({ env, lib, names: ['USDJPY:gotobi'], now: now * 1000, sleep: async () => {} });
+  const x = r.symbols.USDJPY; assert.equal(x.hours.length, 0); assert.equal(x.events.length, 0); assert.ok(x.gotobi.length > 60);
+  const g = x.gotobi.find((d) => d.day === '2026-11-20'); assert.ok(g.entry && g.exit); assert.ok(Math.abs(g.entry.ask - g.entry.bid - 0.07) < 1e-6); assert.ok(g.entry.ageS >= 0 && g.entry.ageS <= 10);
+});
