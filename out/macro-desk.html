@@ -527,6 +527,14 @@
   .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
   .nx-bl li, .res-l li { display: block; }
     .rf-tabs { flex-wrap: wrap; margin-bottom: var(--s3, 12px); }
+    /* daily reports (19 Nov 2026) */
+    .dr-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2, 8px); margin-bottom: var(--s3, 12px); }
+    .dr-day { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs, 12px); color: var(--ink-dim); }
+    .dr-day select { min-height: 36px; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; }
+    .dr-sec { margin-top: var(--s3, 12px); } .dr-sec h4 { margin: 0 0 4px; font-size: 14px; } .dr-sec ul { margin: 0; padding-left: 18px; } .dr-sec li { margin: 3px 0; line-height: 1.5; }
+    @media (pointer: coarse) { .dr-day select { min-height: 44px; } }
+    .dr-ai { margin: 0 0 var(--s3, 12px); padding: 12px 14px; border-left: 3px solid var(--accent); background: var(--well, rgba(127,127,127,.06)); border-radius: 8px; }
+    .dr-ai b { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-ink, var(--accent)); } .dr-ai p { margin: 4px 0 6px; line-height: 1.55; } .dr-ai small { font-size: 12px; color: var(--ink-dim); }
     .rf-next { padding: 12px 14px; border-radius: 10px; background: var(--well, rgba(127,127,127,.08)); margin-bottom: var(--s3, 12px); }
     .rf-next .lab { display: block; font-size: var(--fs-xs, 12px); opacity: .8; }
     .rf-wrap { overflow-x: auto; }
@@ -650,8 +658,21 @@
     <p class="stamp" id="stamp" role="status"><span class="sd" aria-hidden="true"></span><span id="stamp-t">Loading…</span></p>
   </div>
   <nav class="toc" id="toc" aria-label="Sections on this page">
-    <a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-red">Red folders</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
+    <a href="#s-daily">Daily reports</a><a href="#s-week">This week</a><a href="#s-plan">Your read</a><a href="#s-next">Next release</a><a href="#s-red">Red folders</a><a href="#s-why">Why</a><a href="#s-price">Where price sits</a><a href="#s-expect">What he expects</a><a href="#s-track">Track record</a><a href="#s-deep">The detail</a>
   </nav>
+
+  <!-- 0. Daily reports (19 Nov 2026, owner): council/daily-report.mjs → macro/daily-report.json, built from 06:00 London and announced at 06:30 -->
+  <section class="story" id="s-daily" aria-labelledby="dr-h">
+    <header class="st-h"><h2 id="dr-h">Daily reports</h2><small class="st-m" id="dr-sub"></small></header>
+    <article class="card daily" id="c-daily" hidden>
+      <div class="dr-top"><div class="pl-tabs" role="tablist" aria-label="Report" id="dr-tabs"><button type="button" role="tab" data-dr="world" id="dr-t-world" aria-controls="dr-body" aria-selected="true">World economy</button><button type="button" role="tab" data-dr="markets" id="dr-t-markets" aria-controls="dr-body" aria-selected="false" tabindex="-1">Markets</button></div>
+        <label class="dr-day">Day <select id="dr-day"></select></label></div>
+      <div class="dr-ai" id="dr-ai" hidden><b>AI summary</b><p id="dr-ai-t"></p><small>A language model's reading of the facts below; every figure in it is checked against the report. Not advice.</small></div>
+      <p class="c-take" id="dr-lead" aria-live="polite"></p>
+      <div id="dr-body" role="tabpanel"></div>
+      <p class="note" id="dr-note"></p>
+    </article>
+  </section>
 
   <!-- 1. This week: council/glance.mjs → veteran.json.summary; what changed (veteran.json.changes) folded under it -->
   <section class="story" id="s-week" aria-labelledby="g-h">
@@ -1393,6 +1414,28 @@
       return h + '<br><small class="res-doc">Source: ' + esc(x.doc) + (x.also ? ', ' + esc(x.also) : '') + (x.asOf ? ' (' + esc(x.asOf) + ')' : '') + '</small></li>'; }).join('');
     $('res-note').textContent = R.label + (R.register ? ' Your news-trading register (' + R.register.n + ' hypotheses) is shown on each release it covers.' : '');
   }
+  // 19 Nov 2026: the two daily reports (macro/daily-report.json, council/daily-report.mjs); display only
+  var DR = null, DRK = 'world', DRD = 0, DRB = null;
+  // the AI summary lives on the site's server (api/daily.js), not in council-data; asked once per load
+  function loadBrief() { fetch('/api/daily?brief=1', { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { DRB = j && j.brief ? j : null; if (DR) renderDaily(DR); }).catch(function () {}); }
+  try { DRK = localStorage.getItem('mdDaily') === 'markets' ? 'markets' : 'world'; } catch (e) {}
+  function renderDaily(D) {
+    DR = D; var card = $('c-daily'), reps = (D && D.reports) || [], now = Date.now();
+    reps = reps.filter(function (r) { return r && r.world && r.markets && Date.parse(r.publishAt) <= now + 30 * 60e3; });
+    if (!reps.length) { card.hidden = true; return; } card.hidden = false; if (DRD >= reps.length) DRD = 0;
+    var r = reps[DRD], rep = r[DRK], d = new Date(Date.parse(r.publishAt));
+    $('dr-sub').textContent = 'published ' + d.toLocaleDateString('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' }) + ', 06:30 London';
+    $('dr-day').innerHTML = reps.map(function (x, i) { return '<option value="' + i + '"' + (i === DRD ? ' selected' : '') + '>' + esc(new Date(Date.parse(x.publishAt)).toLocaleDateString('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short' })) + (i === 0 ? ' (latest)' : '') + '</option>'; }).join('');
+    document.querySelectorAll('#dr-tabs [data-dr]').forEach(function (b) { var on = b.dataset.dr === DRK; b.setAttribute('aria-selected', on); if (on) b.removeAttribute('tabindex'); else b.setAttribute('tabindex', '-1'); });
+    $('dr-body').setAttribute('aria-labelledby', 'dr-t-' + DRK);
+    $('dr-lead').textContent = rep.lead || '';
+    var ai = DRB && DRB.brief && DRB.day === r.day ? DRB.brief[DRK] : null; $('dr-ai').hidden = !ai; $('dr-ai-t').textContent = ai || '';
+    $('dr-body').innerHTML = (rep.sections || []).map(function (s) { return '<div class="dr-sec"><h4>' + esc(s.h) + '</h4><ul>' + (s.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('') + '</ul></div>'; }).join('');
+    $('dr-note').textContent = (r.note || '') + (r.builtAt ? ' Built ' + new Date(Date.parse(r.builtAt)).toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' }) + ' London.' : '');
+  }
+  $('dr-tabs').addEventListener('click', function (e) { var b = e.target.closest('button[data-dr]'); if (!b) return; DRK = b.dataset.dr; try { localStorage.setItem('mdDaily', DRK); } catch (x) {} renderDaily(DR); });
+  $('dr-tabs').addEventListener('keydown', function (e) { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; DRK = DRK === 'world' ? 'markets' : 'world'; renderDaily(DR); var b = document.querySelector('#dr-tabs [aria-selected="true"]'); if (b) b.focus(); });
+  $('dr-day').addEventListener('change', function () { DRD = +this.value || 0; renderDaily(DR); });
   // 19 Nov 2026: the Red folder study (macro/redfolder.json, council/redfolder.mjs); display only
   var RF = null, RFK = null;
   function rfPct(x, sign) { if (x == null) return NA; return (sign && x > 0 ? '+' : '') + x + '%'; }
@@ -1720,12 +1763,12 @@
   $('toc').addEventListener('click', function (e) { var a = e.target.closest('a'); if (!a) return; var t = document.querySelector(a.getAttribute('href')); if (t && t.id === 's-deep') $('deep').open = true; });
   $('g-event').addEventListener('click', function (e) { if (e.target.closest('a[href="#s-next"]')) foldSet($('s-next'), true); });   // the glance's link into a folded section opens it
   function load() {
-    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json'), get('macro/redfolder.json')]).then(function (x) {
-      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4], rf = x[5];
+    Promise.all([get('macro/forecast.json'), get('macro/veteran.json'), get('macro/cache.json'), get('macro/veteran-ledger.json'), get('macro/cot.json'), get('macro/redfolder.json'), get('macro/daily-report.json')]).then(function (x) {
+      var fc = x[0], v = x[1], cache = x[2], L = x[3], cot = x[4], rf = x[5], dr = x[6];
       ((v && v.events) || []).forEach(function (e) { (e.scenarios || []).forEach(function (c) { var m = /^>\s*(.+?)\s+and\s+<\s*(.+)$/.exec(String(c.when || '')); if (m && m[1] === m[2]) c.when = 'at ' + m[1] + ' (one reporting step)'; }); });
       $('when').textContent = fc && fc.at ? 'strategist ' + ago(fc.at) + (v && v.at ? ' · veteran ' + ago(v.at) : '') : 'No macro data yet';
       LAST = { fc: fc, v: v }; renderStamp();
-      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot); renderRed(rf);
+      renderGlance(v); renderNext(v); renderScore(fc); renderLadder(v); renderChanges(v); renderCalib(v); renderStrip(fc, v); renderStrat(fc); renderVet(v); renderDebate(v); renderInsights(fc, v, cache); renderResearch(v); renderSource(fc, cache); renderLedger(v, L); renderCalls(v); renderBrief(v); renderCot(cot); renderPlan(fc, v, cot); renderRed(rf); renderDaily(dr); loadBrief();
       syncStory(); syncOne();
       // the story is display:none while main[data-loading] is set, so a chart drawn above had no width and stayed blank until a
       // resize or the 5-minute reload (the score path, the level ladder, the expectation scale): show the story, then draw

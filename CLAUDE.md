@@ -122,6 +122,31 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## Daily reports at 06:30 London (19 Nov 2026, owner: "daily reports every 6:30 am … (those who got macro activated), 2 reports: the world economy … and the markets")
+`council/daily-report.mjs` (council.yml, every round, `timeout 30`; builds once a London day from 06:00, `--force` rebuilds) reads
+the files the council already wrote (macro/forecast.json: regime, assets, central-bank `news`, Gold Macro Score; macro/cache.json
+`cal` = the week's economic calendar; macro/veteran.json: summary, levels, week calls, research items; macro/cot.json; snapshot.json
+prices) and writes council-data `macro/daily-report.json` (`reports[]`, last 14 London days: `day`, `publishAt` = 06:30 London in
+UTC, `world` and `markets` = `{ title, lead, sections: [{ h, lines }] }`, `note`). Deterministic text, fetches nothing, no language
+model, no system, trade or rule names, no third-party licensed data (London Strategic Edge's licence forbids showing it to members).
+**Delivery** (`api/daily.js`, `?job=daily` in the Worker's `CHAINED` 10-minute chain, Bearer CRON_SECRET), only inside the publish
+window (06:30 London to 3 h later, so a late build never wakes everyone), once each per day: (1) the **AI summary** (owner: "use AI
+to do the daily brief"): the shared language-model adapter (`api/_academy-llm.js`; model `DAILY_LLM_MODEL` else `ACADEMY_LLM_MODEL` else `CHRONOS_LLM_MODEL`; key `DAILY_LLM_KEY`, `ACADEMY_LLM_KEY`, else (owner, 20 Nov 2026: "re use from other variable") `ANTHROPIC_API_KEY` / `CLAUDE_API_KEY`, which bring the provider's messages address and format when none is set;
+own budgets `DAILY_LLM_DAILY_USD` 0.5 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 2; `DAILY_AI=off` stops it; off without
+`ACADEMY_LLM_KEY`) writes two short paragraphs from the report's facts only; `api/_daily.js` `parseBrief` refuses any figure not in
+the report (small whole numbers apart), advice, stops and claims of certainty; stored `daily/brief-<day>.json` (a refused billed
+answer too, never paid twice); (2) the **bell notice** (`notify.js` `dailyNotice`: `id daily-<day>`, `perm: 'macro'`, `link`);
+notify GET shows a `perm` notice only to the owner and accounts whose `perms.macro` is not false (`allowed`); the bell and the
+slide-in card draw the body's lines and an "Open the reports" link (same-site paths only); (3) the **email** (owner: "add the 6:30
+email too") to the owner (`OWNER_EMAIL`, else `GMAIL_USER`) and every stored member with an email and macro on (`recipients`, at
+most 60), through the sign-up senders (`signup.js` `mailer`); `daily/state.json` marks the day BEFORE sending (never twice);
+`DAILY_EMAIL=off` stops it; addresses are never logged or returned. `?brief=1` (a member with macro) = the day's summary for the
+page; `?test=email[&to=]` (the owner's session, 5 in 10 min) sends the latest report now, marked "Test". **Page**: Macro desk
+section `#s-daily` first (TOC "Daily reports"), the AI summary box `#dr-ai` above each report, tabs World economy / Markets
+(localStorage `mdDaily`, a display preference), a day picker; a report shows only from its publish time. Build rule: the first
+file is built at once; a report built before 06:00 London is built again from 06:00. `datahealth.mjs` warns after 27 h. Tests:
+`tests/daily-report.test.mjs`, `tests/daily-delivery.test.mjs`.
+
 ## London Strategic Edge data, owner only (19 Nov 2026, owner: "build option 1")
 `api/lse.js` (routed in `cloudflare/src/worker.mjs`), key = the Worker secret `LSE_API_KEY` (set by the owner in Cloudflare; host
 `download.londonstrategicedge.com`, header `X-API-Key`, free plan: 60 calls a minute, 12.5 GiB a week, 12.5 M rows a day).

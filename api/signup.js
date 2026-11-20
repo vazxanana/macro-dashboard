@@ -277,4 +277,5 @@ module.exports.useSmtp = useSmtp;
 module.exports.useEmailMessage = useEmailMessage;
 module.exports.lastMailError = () => LAST_MAIL_ERROR;
 module.exports.useMail = useMail;
+module.exports.mailer = mailer;   // the daily reports' email (api/daily.js) uses the same senders
 module.exports._t = { html, originOf, keyOf, userOf, RESERVED, blobStore, PENDING, RESETS, OFF, SENT, FORGOT, AGAIN };
