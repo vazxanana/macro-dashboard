@@ -1,0 +1,64 @@
+name: Tick probe (cTrader demo, read only)
+
+# council/tick-probe.mjs: reads the DEMO broker's past bid / ask ticks once (how far back they go, the spread at every UTC
+# hour, executable prices around US CPI, payrolls and FOMC) and saves council-data research/probe/ticks-<SYMBOL>.json for the
+# research (the gold breakout's cost question, the news register's step 1). Read only: api/ctrader-link.js's read session, a
+# demo account. Started by hand only.
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: 'Broker symbols, space separated'
+        required: false
+        default: 'XAUUSD'
+      marks:
+        description: 'For the marks part: a JSON file in the repository, { SYMBOL: [unix sec, ...] }'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tick-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            council
+            api
+            research/edge
+
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'   # built-in WebSocket for the cTrader demo session
+
+      - name: Read the broker's tick history
+        env:
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID || vars.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET || vars.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN || vars.CTRADER_ACCESS_TOKEN }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
+          CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
+          CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
+          SYMS: ${{ inputs.symbols }}
+          PROBE_MARKS: ${{ inputs.marks }}
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          node council/tick-probe.mjs data $SYMS
+          node council/datasync.mjs data save "Tick probe $(date -u +%Y-%m-%dT%H:%MZ)" research/probe

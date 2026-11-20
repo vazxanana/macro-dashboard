@@ -7,6 +7,12 @@ keeps the desk on paper and demo until at least November 2027). No study was run
 from a committed study, named with its branch and pull request. **All twelve pull requests are still open** (not on
 `main`): if one of them changes before it is merged, this page follows it, not the other way round.
 
+**Update 20 Nov 2026 (`gold-vol-breakout-hourcost`):** the cost question is answered for today's demo account. The broker's
+own quotes at every UTC hour (44 weekdays) put gold's spread at $0.07-0.10 in Asian hours as in every other hour (1.7-2.6 ×
+10⁻⁵ of price), plus 0.000024 of commission: about 0.02R a trade. At that cost with 0.05 × M of stop slippage, T1 makes
++0.105R a trade on 2021-26 (month t 2.79) and +0.139R pooled 2007-26 (t 6.47; past years charged today's relative spread).
+What a forward demo record would now measure first is the stop-order slippage, the one cost still assumed.
+
 ## In plain words
 
 1. **One gold rule replicated.** Of the 44 gold studies of 13-14 Nov, this intraday breakout is the only rule that is

@@ -67,7 +67,7 @@ assets with their cache headers, the manifest's type, the security headers, `/cd
    live one; `OANDA_ACCOUNT_ID` optional, lets the live price stream skip OANDA's account lookup), `CRON_SECRET`, `SESSION_SECRET`, `CTRADER_LINK_KEY`,
    `CTRADER_CLIENT_ID`, `CTRADER_CLIENT_SECRET`, `CTRADER_REDIRECT_URI`, `GH_TOKEN`, `GH_READ_TOKEN`, `GH_MCP_TOKEN`,
    `GH_DISPATCH_TOKEN`, `BLOB_READ_WRITE_TOKEN`, `STORE`, `STORE_MIRROR`, `MCP_KEYS`, `MCP_ORIGINS`,
-   `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
+   `MOSHA_ASSISTANT_KEY`, `MOSHA_READER`, `MOSHA_READER_SALT`, `LSE_API_KEY` (owner-only London Strategic Edge reads, `api/lse.js`), `OWNER_EMAIL`, `DAILY_LLM_*`, `DAILY_AI`, `DAILY_EMAIL` (the daily reports, `api/daily.js`), `ACADEMY_CONNECTOR*`, `ACADEMY_LLM_*`, `EDGE_LLM_*`,
    `EDGE_ANALYST`, `TRADE_REVIEW*`, `CHRONOS_*`, and (new on the Worker, 17 Nov 2026, sign-up emails) `GMAIL_USER`,
    `GMAIL_APP_PASSWORD`, `MAIL_FROM`, `OWNER_EMAIL`. Only those set on Vercel need copying. (17 Nov 2026: `EDGE_CONFIG`, `VAPID_*`,
    `TV_WEBHOOK_KEY` and `RUN_MODE` went with their functions; the alert channels `TELEGRAM_*`, `NTFY_TOPIC` and

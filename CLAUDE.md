@@ -122,6 +122,41 @@ Worker (its /tmp lasts one request). The two custom domains are wrangler.jsonc `
 on. `/api/og` stays the icon: the pinned @vercel/og's Worker build fetches its font at module scope, which stops the Worker
 from starting (tried locally); the alternatives add two packages and about 2 MB of wasm (`docs/cloudflare.md`, stage 3).
 
+## Daily reports at 06:30 London (19 Nov 2026, owner: "daily reports every 6:30 am … (those who got macro activated), 2 reports: the world economy … and the markets")
+`council/daily-report.mjs` (council.yml, every round, `timeout 30`; builds once a London day from 06:00, `--force` rebuilds) reads
+the files the council already wrote (macro/forecast.json: regime, assets, central-bank `news`, Gold Macro Score; macro/cache.json
+`cal` = the week's economic calendar; macro/veteran.json: summary, levels, week calls, research items; macro/cot.json; snapshot.json
+prices) and writes council-data `macro/daily-report.json` (`reports[]`, last 14 London days: `day`, `publishAt` = 06:30 London in
+UTC, `world` and `markets` = `{ title, lead, sections: [{ h, lines }] }`, `note`). Deterministic text, fetches nothing, no language
+model, no system, trade or rule names, no third-party licensed data (London Strategic Edge's licence forbids showing it to members).
+**Delivery** (`api/daily.js`, `?job=daily` in the Worker's `CHAINED` 10-minute chain, Bearer CRON_SECRET), only inside the publish
+window (06:30 London to 3 h later, so a late build never wakes everyone), once each per day: (1) the **AI summary** (owner: "use AI
+to do the daily brief"): the shared language-model adapter (`api/_academy-llm.js`; model `DAILY_LLM_MODEL` else `ACADEMY_LLM_MODEL` else `CHRONOS_LLM_MODEL`; key `DAILY_LLM_KEY`, `ACADEMY_LLM_KEY`, else (owner, 20 Nov 2026: "re use from other variable") `ANTHROPIC_API_KEY` / `CLAUDE_API_KEY`, which bring the provider's messages address and format when none is set;
+own budgets `DAILY_LLM_DAILY_USD` 0.5 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 2; `DAILY_AI=off` stops it; off without
+`ACADEMY_LLM_KEY`) writes two short paragraphs from the report's facts only; `api/_daily.js` `parseBrief` refuses any figure not in
+the report (small whole numbers apart), advice, stops and claims of certainty; stored `daily/brief-<day>.json` (a refused billed
+answer too, never paid twice); (2) the **bell notice** (`notify.js` `dailyNotice`: `id daily-<day>`, `perm: 'macro'`, `link`);
+notify GET shows a `perm` notice only to the owner and accounts whose `perms.macro` is not false (`allowed`); the bell and the
+slide-in card draw the body's lines and an "Open the reports" link (same-site paths only); (3) the **email** (owner: "add the 6:30
+email too") to the owner (`OWNER_EMAIL`, else `GMAIL_USER`) and every stored member with an email and macro on (`recipients`, at
+most 60), through the sign-up senders (`signup.js` `mailer`); `daily/state.json` marks the day BEFORE sending (never twice);
+`DAILY_EMAIL=off` stops it; addresses are never logged or returned. `?brief=1` (a member with macro) = the day's summary for the
+page; `?test=email[&to=]` (the owner's session, 5 in 10 min) sends the latest report now, marked "Test". **Page**: Macro desk
+section `#s-daily` first (TOC "Daily reports"), the AI summary box `#dr-ai` above each report, tabs World economy / Markets
+(localStorage `mdDaily`, a display preference), a day picker; a report shows only from its publish time. Build rule: the first
+file is built at once; a report built before 06:00 London is built again from 06:00. `datahealth.mjs` warns after 27 h. Tests:
+`tests/daily-report.test.mjs`, `tests/daily-delivery.test.mjs`.
+
+## London Strategic Edge data, owner only (19 Nov 2026, owner: "build option 1")
+`api/lse.js` (routed in `cloudflare/src/worker.mjs`), key = the Worker secret `LSE_API_KEY` (set by the owner in Cloudflare; host
+`download.londonstrategicedge.com`, header `X-API-Key`, free plan: 60 calls a minute, 12.5 GiB a week, 12.5 M rows a day).
+**Their licence**: the owner's own research, backtesting and trading are allowed; showing their data to anyone else (members,
+guests, a page, a public repository, the council-data branch, a bot post) is distribution and needs their Enterprise licence. So
+the endpoint answers the owner's session only, GET only, `private, no-store`, previews and lists only (ops `usage`, `refs`, `ref`,
+`macro`, `series`; parameters allowlisted and checked, never an export), stores nothing, never returns the key. Studies may use
+the data from a folder outside git and publish results only (n, t, verdict), never the rows. Never show it on the Desk, the Macro
+desk or any member page without the owner buying a licence. Test: `tests/lse.test.mjs`.
+
 ## The 18 Nov 2026 outage and what the deploy now does (owner: "make it all you can")
 At 23:54 UTC on 17 Nov a Workers Builds deploy on the `aureum` Worker (the site; `meridianx` is deleted) published the pages
 alone and the Worker lost its code AND every secret: /api and /md answered 404, then "OANDA_TOKEN not set"; the council ran on
@@ -4854,6 +4889,11 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
+`GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
+website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
+OANDA_TOKEN repository secret; the website only without it), a candle failure is an `error` record for the day (it crashed
+before), the deploy copies `GH_DISPATCH_TOKEN`, and `/api/status?job=watchdog` falls back to `GH_TOKEN`.
 
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
@@ -4865,3 +4905,22 @@ VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `O
 `OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
 `scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
 (a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
+
+## Tick probe: the demo broker's own bid / ask history (20 Nov 2026, for the cost questions)
+`council/tick-probe.mjs` + `.github/workflows/tick-probe.yml` (dispatch only, input `symbols`, default XAUUSD): reads the DEMO
+broker's past ticks of both sides once through api/ctrader-link.js's read session (READ_ONLY allowlist, demo host, an account
+with isLive false; nothing traded, sized or alerted) and writes council-data `research/probe/ticks-<SYMBOL>.json`: `depth` (how
+far back the history goes: ticks in a 2-minute window 1-1095 days back), `hours` + `hourProfile` (the quoted spread in the first
+2 minutes of every UTC hour of the last 60 weekdays: what the gold breakout really pays at 00:00-07:00 UTC,
+research/proposals/2026-11-14-gold-vol-breakout.md) and `events` (the last bid and ask at T-10 to T+65 minutes, each minute plus
+T+5 / 15 / 30 s, and the widest spread of each minute, for every US CPI, payrolls and FOMC statement of council/events.mjs inside
+the depth: the executable prices the owner's news register asks for first). Research data only, no council member reads it.
+A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
+## Gold breakout at measured hourly spreads (20 Nov 2026, `research/edge/gold-vol-breakout-hourcost`)
+Accounting, no rule tested, nothing live changed. The tick probe's first XAUUSD run (council-data `research/probe/ticks-XAUUSD.json`,
+history reaching at least 1,095 days) puts the demo's quoted gold spread at $0.07-0.10 in EVERY UTC hour, Asian hours included
+(1.7-2.6 × 10⁻⁵ of price; commission 0.000024): about 0.02R a trade for `gold-vol-breakout` T1 (the studies charged $0.60). At
+that cost + 0.05 × M stop slippage T1 nets +0.105R a trade on 2021-26 (n 1,121, month t 2.79) and +0.139R pooled 2007-26 (t 6.47;
+past years charged today's relative spread). The owner's decision is still the 14 Nov proposal (a forward paper / demo record,
+whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hourcost.test.mjs`.
+`marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
