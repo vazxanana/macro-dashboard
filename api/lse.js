@@ -27,7 +27,7 @@ const CHECK = {
 const PER_MIN = 30, hits = [];
 
 function target(query) {
-  const op = OPS[query.op]; if (!op) return { error: 'op must be one of ' + Object.keys(OPS).join(', ') };
+  const op = Object.hasOwn(OPS, String(query.op)) ? OPS[query.op] : null; if (!op) return { error: 'op must be one of ' + Object.keys(OPS).join(', ') };
   const u = new URL(BASE + op.path);
   for (const k of op.params) { const v = query[k]; if (v == null || v === '') continue;
     if (!CHECK[k].test(String(v))) return { error: `bad ${k}` }; u.searchParams.set(k, String(v)); }
