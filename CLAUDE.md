@@ -5126,6 +5126,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   long and short random entries on EVERY tradable day, no day or side chosen by the breakout. **PASS**: T1's buys +0.148R a trade
   (n 1,998) vs long at a random time +0.026R, 40 of 40 seeds, both halves; sells +0.001R vs short −0.056R (reported). The breakout
   entry adds about 0.06-0.12R a trade beyond USD/JPY's drift. Nothing live changed.
+- `energy-vol-breakout-hourcost` (pre-registered 20 Nov 2026): the energy T1 trades at the demo's measured hourly spreads (tick
+  probe; broker names XTIUSD / XBRUSD / XNGUSD; WTI and Brent about 0.03 % of price, gas about 0.24 %). **FAIL**: pooled −0.003R a
+  trade net (month t −0.17); gas −0.088R (t −3.24) sinks it. WTI +0.031R (t 1.33) and Brent +0.047R (t 1.71) are positive in both
+  windows but not significant; picking them after this is not a test. Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
