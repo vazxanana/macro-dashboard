@@ -661,6 +661,12 @@
    "by": "user",
    "change": "LIT paper shadow stream (owner, 17 Nov): no new LIT orders are recorded; LIT trades already open or pending run to their exits with their stops",
    "why": "Owner, 17 Nov 2026: the simplification list (\"All\"). The LIT study stays INCONCLUSIVE (#597) and the stream had rarely filled; it is switched off rather than kept running."
+  },
+  {
+   "at": "2026-11-20T10:25:56.000Z",
+   "by": "user",
+   "change": "Gold replica (owner, 20 Nov): new trades are live paper trades again (alerted, main book, council demo account); same rule and stops; open shadow trades run to their exits",
+   "why": "Owner request of 20 Nov 2026. Said with it: the replica has no out-of-sample edge on record (replica-oos 2017-22 -0.05R a trade, n 115; replica-sides FAIL) and its forward record is too short to judge; paper and demo only."
   }
  ],
  "btAt": "2026-11-20T08:55:33.224Z",
@@ -714,7 +720,8 @@
   "mosha-cycle",
   "shadow-best",
   "mcycle-shadow",
-  "lit-off"
+  "lit-off",
+  "replica-live-again"
  ],
  "target": {
   "scalp": "t2"
@@ -729,11 +736,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-20T10:24:07.000Z",
+   "at": "2026-11-20T10:25:56.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-20T10:24:07.000Z",
+   "at": "2026-11-20T10:25:56.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -884,7 +891,6 @@
  },
  "litShadow": false,
  "ownerShadow": {
-  "replica": 1794434536,
   "mosha-bo": 1794434536,
   "gtl": 1794434536,
   "gmp": 1794434536,
