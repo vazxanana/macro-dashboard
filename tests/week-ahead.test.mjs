@@ -90,5 +90,5 @@ test('the Macro desk reads macro/week-ahead.json and writes it as text', () => {
   const block = md.slice(md.indexOf('function renderAhead'), md.indexOf('function renderNext'));
   assert.ok(!/innerHTML\s*=\s*[^;]*\b(r|d|l|c)\.(title|text|headline|claim|line)\b(?!\))/.test(block.replace(/esc\([^)]*\)/g, '')));
   const vet = fs.readFileSync(new URL('../council/veteran.mjs', import.meta.url), 'utf8');
-  assert.ok(vet.includes("w('week-ahead.json', weekAhead("));
+  assert.ok(vet.includes('const WA = weekAhead(') && vet.includes("w('week-ahead.json', WA)"));   // 20 Nov 2026: the prep record's score is put on the plan before it is written
 });

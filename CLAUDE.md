@@ -3023,6 +3023,23 @@ meeting / month / quarter only; nothing without an earlier reading); the Week ah
 Week ahead puts them on their day (`d.auctions`, text) and in the day line. Checked from a runner on 20 Nov 2026: TreasuryDirect's rows carry no `auctionDate` key, so the
 parser takes any "auction ... date" key; first read: 2-year $69bn (23 Nov), 5-year $70bn + 2-year FRN + 52-week bill (24 Nov), 7-year $44bn (25 Nov). Test: `tests/hard-data-auctions.test.mjs`.
 
+## Nowcast against consensus: a forward record (20 Nov 2026)
+`council/prep-record.mjs` (pure + `updateFile`; run by `veteran.mjs` `run()` right after the Week ahead is built → council-data
+`macro/prep-record.json` `{ v, label, records }`, append-only, written only on a change; a file that does not parse is never
+overwritten and nothing is recorded that run). The question: did the Cleveland Fed nowcast point the right way against the calendar
+consensus? `capture(prev, wa, now)`: one record per CPI / PCE release of the plan that has `prep` and is still to come (`r.t > now`;
+a year-on-year title is skipped, the nowcast is month on month), id `<type>:<nowcast month>:<core|headline>`, with `capturedAt`,
+`nowcast`, `consensus`, `gap`, `side`; the first capture is never edited, a later pre-release reading goes to `last` only.
+`resolve(records, hd, now)`: after the release time, once `hard-data.json` `nowcast.months[].actual` has that series, attach once
+`actual`, `print` (one decimal, as published), `actualSide` (the Week ahead's 0.05 threshold against the captured consensus), `hit`
+(`side === actualSide`; null when the capture was in line), `resolvedAt`; never rewritten. `score(records)` → `week-ahead.json`
+`prepRecord` (`captured`, `resolved`, `judged`, `hits`, `text`): under `MIN_JUDGE` 20 judged "too few to judge (n X)", else the hit
+rate with a two-sided exact binomial p against 50% and "a forward record, not a tested edge". About two releases a month are
+captured (core and headline of one release are not independent), so 20 judged takes most of a year. Limits, said plainly: the nowcast
+file keeps three months, so a print not read within about two months is never resolved; the "actual" is whatever that file shows
+on the first read after the release. No page shows it yet; no rule, call or trade reads it. `datahealth.mjs` lists the file
+(no staleness). Test: `tests/prep-record.test.mjs`.
+
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
 history, gold's first hour after US core CPI (2018 to Apr 2025, n 48) and payrolls (2022 to Apr 2025, n 35) split by the miss
