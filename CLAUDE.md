@@ -131,7 +131,7 @@ UTC, `world` and `markets` = `{ title, lead, sections: [{ h, lines }] }`, `note`
 model, no system, trade or rule names, no third-party licensed data (London Strategic Edge's licence forbids showing it to members).
 **Delivery** (`api/daily.js`, `?job=daily` in the Worker's `CHAINED` 10-minute chain, Bearer CRON_SECRET), only inside the publish
 window (06:30 London to 3 h later, so a late build never wakes everyone), once each per day: (1) the **AI summary** (owner: "use AI
-to do the daily brief"): the shared language-model adapter (`api/_academy-llm.js`; model `DAILY_LLM_MODEL` else `ACADEMY_LLM_MODEL`;
+to do the daily brief"): the shared language-model adapter (`api/_academy-llm.js`; model `DAILY_LLM_MODEL` else `ACADEMY_LLM_MODEL` else `CHRONOS_LLM_MODEL`; key `DAILY_LLM_KEY`, `ACADEMY_LLM_KEY`, else (owner, 20 Nov 2026: "re use from other variable") `ANTHROPIC_API_KEY` / `CLAUDE_API_KEY`, which bring the provider's messages address and format when none is set;
 own budgets `DAILY_LLM_DAILY_USD` 0.5 / `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 2; `DAILY_AI=off` stops it; off without
 `ACADEMY_LLM_KEY`) writes two short paragraphs from the report's facts only; `api/_daily.js` `parseBrief` refuses any figure not in
 the report (small whole numbers apart), advice, stops and claims of certainty; stored `daily/brief-<day>.json` (a refused billed

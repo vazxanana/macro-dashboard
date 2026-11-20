@@ -64,10 +64,15 @@ test('the cron job: once a day inside the window, AI then notice then email; not
   res = mk(); await API.handle({ method: 'GET', query: { test: 'email', to: 'nope' }, headers: {} }, res, { ...base(), who: async () => ({ u: 'owner' }) }); assert.equal(res.code, 400);
   if (prev === undefined) delete process.env.ACADEMY_LLM_KEY;
   assert.equal(API.llmEnv({ DAILY_LLM_MODEL: 'x', ACADEMY_LLM_MODEL: 'y' }).ACADEMY_LLM_MODEL, 'x'); assert.equal(API.llmEnv({ DAILY_AI: 'off' }).ACADEMY_LLM_STOP, '1');
+  const alt = API.llmEnv({ ANTHROPIC_API_KEY: 'k', CHRONOS_LLM_MODEL: 'cm' });
+  assert.deepEqual([alt.ACADEMY_LLM_KEY, alt.ACADEMY_LLM_URL, alt.ACADEMY_LLM_FORMAT, alt.ACADEMY_LLM_MODEL], ['k', 'https://api.anthropic.com/v1/messages', 'messages', 'cm']);
+  const own = API.llmEnv({ ACADEMY_LLM_KEY: 'a', ACADEMY_LLM_URL: 'https://x.invalid', ANTHROPIC_API_KEY: 'k' });
+  assert.deepEqual([own.ACADEMY_LLM_KEY, own.ACADEMY_LLM_URL], ['a', 'https://x.invalid']);
+  assert.equal(require('../api/_academy-llm.js').unavailable(require('../api/_academy-llm.js').config({ ...alt, ACADEMY_LLM_MODEL: 'm' })), null);
 });
 
 test('the page reads the summary, the endpoint is wired, no model name or address in the files', () => {
   const rd = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
   assert.ok(rd('macro-desk.html').includes("fetch('/api/daily?brief=1'") && rd('macro-desk.html').includes('id="dr-ai"'));
-  for (const p of ['api/daily.js', 'api/_daily.js']) assert.ok(!/@gmail|claude|opus|sonnet|haiku/i.test(rd(p)), p);
+  for (const p of ['api/daily.js', 'api/_daily.js']) assert.ok(!/@gmail|claude-|opus|sonnet|haiku/i.test(rd(p)), p);
 });

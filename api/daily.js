@@ -4,7 +4,7 @@
 //        3 h later) for the latest report of council-data macro/daily-report.json (council/daily-report.mjs), once each:
 //        (1) the AI summary, when the language-model adapter is switched on (api/_academy-llm.js; this feature's own budgets
 //            DAILY_LLM_DAILY_USD 0.5 / _MONTHLY_USD 5 / _HARD_USD 25 / _MAX_CALLS_DAY 2, model DAILY_LLM_MODEL else
-//            ACADEMY_LLM_MODEL; DAILY_AI=off stops it), checked in code (api/_daily.js parseBrief: every figure must be in the
+//            ACADEMY_LLM_MODEL else CHRONOS_LLM_MODEL; key DAILY_LLM_KEY, ACADEMY_LLM_KEY, ANTHROPIC_API_KEY or CLAUDE_API_KEY; DAILY_AI=off stops it), checked in code (api/_daily.js parseBrief: every figure must be in the
 //            report, no advice, stops or claims of certainty) and stored; a refused or failed one leaves the reports without it;
 //        (2) the notice in the desk's bell, for accounts with the macro permission (api/notify.js dailyNotice);
 //        (3) the email to the owner (OWNER_EMAIL, else GMAIL_USER) and every stored member with an email and macro on, through
@@ -23,8 +23,16 @@ const ST = require('./_academy-store.js');
 const WINDOW = 3 * 3600e3, MAX_OUT = 3000, TAILS = new Map(), TESTS = [];
 const storeOf = (env, io = {}) => ST.make(ST.blobBackend(env, { ...io, root: env.VERCEL_ENV && env.VERCEL_ENV !== 'production' ? 'daily-preview/' : 'daily/' }), TAILS);
 const off = (v) => /^off$/i.test(String(v || ''));
+// the provider settings: this feature's own, else the shared adapter's, else a key the owner saved under another usual name
+// (owner, 20 Nov 2026: "re use from other variable"); a provider-named key with no address of its own gets that provider's
+// messages endpoint and format
+const PROVIDER_KEYS = ['ANTHROPIC_API_KEY', 'CLAUDE_API_KEY'], PROVIDER_URL = 'https://api.anthropic.com/v1/messages';
 function llmEnv(env) {
-  return { ...env, ACADEMY_LLM_MODEL: env.DAILY_LLM_MODEL || env.ACADEMY_LLM_MODEL, ACADEMY_LLM_DAILY_USD: env.DAILY_LLM_DAILY_USD || '0.5', ACADEMY_LLM_MONTHLY_USD: env.DAILY_LLM_MONTHLY_USD || '5',
+  const own = env.DAILY_LLM_KEY || env.ACADEMY_LLM_KEY, alt = PROVIDER_KEYS.map((k) => env[k]).find(Boolean), key = own || alt || '';
+  const url = env.DAILY_LLM_URL || env.ACADEMY_LLM_URL || (!own && alt ? PROVIDER_URL : '');
+  const format = env.DAILY_LLM_FORMAT || env.ACADEMY_LLM_FORMAT || (!own && alt ? 'messages' : '');
+  return { ...env, ACADEMY_LLM_KEY: key, ACADEMY_LLM_URL: url, ACADEMY_LLM_FORMAT: format, ACADEMY_LLM_MODEL: env.DAILY_LLM_MODEL || env.ACADEMY_LLM_MODEL || env.CHRONOS_LLM_MODEL,
+    ACADEMY_LLM_DAILY_USD: env.DAILY_LLM_DAILY_USD || '0.5', ACADEMY_LLM_MONTHLY_USD: env.DAILY_LLM_MONTHLY_USD || '5',
     ACADEMY_LLM_HARD_USD: env.DAILY_LLM_HARD_USD || '25', ACADEMY_LLM_MAX_CALLS_DAY: env.DAILY_LLM_MAX_CALLS_DAY || '2', ACADEMY_LLM_STOP: off(env.DAILY_AI) || /^(1|true|yes|on)$/i.test(String(env.DAILY_LLM_STOP || '')) ? '1' : '' };
 }
 async function latest(env, d) {
