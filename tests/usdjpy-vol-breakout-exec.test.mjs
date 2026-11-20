@@ -27,3 +27,9 @@ test('usdjpy exec: queries and the broker trade (fill on the ask, stop on the bi
   assert.equal(brokerTrade(tr, new Map([['2025-01-06|e', ['2025-01-06|e', null]]]), null).filled, false);
   assert.equal(verdictOf({ n: 200, net: 1, monthT: 5 }), 'TOO FEW (200 filled)'); assert.equal(verdictOf({ n: 400, net: 0.1, monthT: 2.1 }), 'PASS'); assert.equal(verdictOf({ n: 400, net: 0.1, monthT: 1.9 }), 'FAIL');
 });
+
+test('usdjpy exec: the report matches result.json and keeps the cautions', () => {
+  const R = JSON.parse(fs.readFileSync(new URL('result.json', DIR), 'utf8')), md = fs.readFileSync(new URL('RESULT.md', DIR), 'utf8');
+  assert.ok(md.includes(`**Verdict: ${R.verdict}**`)); assert.equal(R.verdict.split(':')[0], verdictOf(R.stats));
+  assert.match(md, /ten best trades carry/); assert.match(md, /not new evidence that it works/);
+});

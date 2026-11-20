@@ -5112,6 +5112,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
   `research/forward/usdjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0).
+- `usdjpy-vol-breakout-exec` (pre-registered 20 Nov 2026): USD/JPY T1 filled at the demo broker's own ticks (tick probe `fills` /
+  `marks`, files `ticks-USDJPY-exec-a/-b.json`), 24 Nov 2023 - 19 Nov 2026. **PASS**: +0.148R a trade after commission (n 564
+  filled, month t 3.11; OANDA mid +0.153R before costs; entry slippage 0.012R). Cautions: the ten best trades carry 75 %, buys
+  +0.277R vs sells +0.028R (2005-26 mid: buys +0.148R, sells +0.001R): part may be USD/JPY's drift. In-sample years; the forward
+  record judges. Nothing live changed.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
