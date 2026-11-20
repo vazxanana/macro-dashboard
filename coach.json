@@ -57,7 +57,7 @@
   }
  ],
  "decay": {
-  "at": "2026-11-20T12:01:08.000Z",
+  "at": "2026-11-20T18:00:37.000Z",
   "v": 1,
   "baseAt": "2026-11-11T22:19:46.138Z",
   "financing": {
@@ -409,44 +409,44 @@
     "live": false,
     "shadowSince": "2026-11-11",
     "base": "council replay 2022-12-27 to 2026-11-03, session nyflip",
-    "n": 301,
-    "nLive": 2,
+    "n": 302,
+    "nLive": 3,
     "nReplay": 299,
     "nHist": 0,
     "from": 1672243200,
-    "to": 1795099320,
+    "to": 1795187940,
     "ref": 0.331,
     "sd": 1.561,
     "fwd": {
-     "n": 2,
-     "exp": -1.12,
-     "R": -2.25
+     "n": 3,
+     "exp": -1.08,
+     "R": -3.25
     },
     "roll": {
      "n": 30,
      "W": 30,
      "exp": 0.08,
      "t": 0.32,
-     "R": 2.48
+     "R": 2.49
     },
     "cusRef": {
-     "s": 3.16,
+     "s": 3.91,
      "h": 12.73,
      "max": 8.29
     },
     "cusZero": {
-     "s": 2.31,
+     "s": 2.85,
      "h": 12.73
     },
     "dd": {
-     "cur": 4.27,
+     "cur": 5.27,
      "max": 9.02,
      "limit": 20,
      "hist": 20
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.16 of 12.73"
+     "in line with its backtest: last 30 trades +0.08R a trade, CUSUM 3.91 of 12.73"
     ]
    },
    {
@@ -455,44 +455,44 @@
     "desk": "ICT",
     "live": true,
     "base": "ICT A-setups 2018-26 rebuild, GC/NQ/ES/YM (#526; record in research/edge/sizing/inputs.json)",
-    "n": 246,
-    "nLive": 10,
+    "n": 248,
+    "nLive": 12,
     "nReplay": 236,
     "nHist": 0,
     "from": 1754596800,
-    "to": 1795102800,
+    "to": 1795193400,
     "ref": 0.093,
     "sd": 1.517,
     "fwd": {
-     "n": 10,
-     "exp": -0.41,
-     "R": -4.11
+     "n": 12,
+     "exp": -0.51,
+     "R": -6.16
     },
     "roll": {
      "n": 30,
      "W": 30,
-     "exp": 0.65,
-     "t": 1.69,
-     "R": 19.55
+     "exp": 0.5,
+     "t": 1.3,
+     "R": 15.12
     },
     "cusRef": {
-     "s": 3.78,
+     "s": 5.05,
      "h": 16.52,
      "max": 6.33
     },
     "cusZero": {
-     "s": 3.23,
+     "s": 4.37,
      "h": 16.52
     },
     "dd": {
-     "cur": 6.26,
+     "cur": 8.3,
      "max": 11.13,
      "limit": 53.14,
      "hist": 31.32
     },
     "status": "healthy",
     "why": [
-     "in line with its backtest: last 30 trades +0.65R a trade, CUSUM 3.78 of 16.52"
+     "in line with its backtest: last 30 trades +0.50R a trade, CUSUM 5.05 of 16.52"
     ]
    },
    {
@@ -545,14 +545,14 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-20T12"
+  "slot": "2026-11-20T18"
  },
  "book": {
-  "at": "2026-11-20T12:01:08.000Z",
+  "at": "2026-11-20T18:00:37.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
-  "to": "2026-11-19",
+  "to": "2026-11-20",
   "rule": "Paper comparison only. The live book is traded as it is; the proposed weights are applied to the same closed trades after the fact. Nothing here changes a rule, a size, a filter or a trade: the owner decides.",
   "budget": {
    "M": 9,
@@ -578,27 +578,27 @@
    "note": "Expect the clean-half numbers, not the 2018-26 ones: a Sharpe of about 0.3 a year and drawdowns of about 81-189R at this book's budget of 9R (9-21R per 1R of budget)."
   },
   "cost": "after costs: trades.json Rnet; ICT the CME micro round trip (digest.mjs merNet / ictNet)",
-  "nTrades": 39,
-  "nDays": 10,
+  "nTrades": 43,
+  "nDays": 11,
   "ictReplay": 8,
-  "ictForward": 10,
+  "ictForward": 12,
   "live": {
-   "R": 7.91,
-   "dd": 8.96,
-   "ddCur": 8.96,
+   "R": 3.87,
+   "dd": 13.01,
+   "ddCur": 13.01,
    "sharpe": null,
-   "worstDay": -2.67,
+   "worstDay": -4.05,
    "bestDay": 9.02
   },
   "proposed": {
-   "R": 19.7,
-   "dd": 15.05,
-   "ddCur": 15.05,
+   "R": 12.42,
+   "dd": 22.33,
+   "ddCur": 22.33,
    "sharpe": null,
-   "worstDay": -4.81,
+   "worstDay": -7.28,
    "bestDay": 16.23
   },
-  "diff": 11.79,
+  "diff": 8.55,
   "corr": 0.99,
   "byIdea": [
    {
@@ -679,11 +679,11 @@
     "desk": "Meridian",
     "gold": false,
     "streams": 1,
-    "n": 11,
+    "n": 13,
     "w": 0.2,
     "m": 1.8,
-    "live": -1.03,
-    "prop": -1.85
+    "live": -3.03,
+    "prop": -5.45
    },
    {
     "id": "ict-a",
@@ -691,11 +691,11 @@
     "desk": "ICT",
     "gold": false,
     "streams": 1,
-    "n": 18,
+    "n": 20,
     "w": 0.2,
     "m": 1.8,
-    "live": 13.74,
-    "prop": 24.74
+    "live": 11.7,
+    "prop": 21.05
    },
    {
     "id": "other",
@@ -790,12 +790,20 @@
     "prop": -0.918,
     "cumLive": 7.912,
     "cumProp": 19.705
+   },
+   {
+    "d": "2026-11-20",
+    "n": 4,
+    "live": -4.046,
+    "prop": -7.282,
+    "cumLive": 3.866,
+    "cumProp": 12.422
    }
   ],
-  "slot": "2026-11-20T12"
+  "slot": "2026-11-20T18"
  },
  "expect": {
-  "at": "2026-11-20T12:01:08.000Z",
+  "at": "2026-11-20T18:00:37.000Z",
   "v": 1,
   "baseAt": "2026-11-12T09:34:49.973Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
@@ -1374,15 +1382,15 @@
     },
     "regime": "regime-bound: made nothing 2004-22 (−0.02R a trade over 1,560, nine flat years 2014-22); +0.32R a trade since 2023; no observable on/off signal (#511)",
     "forward": {
-     "n": 2,
-     "exp": -1.12,
-     "R": -2.25,
-     "lo": -1.57,
-     "hi": 1.53,
+     "n": 3,
+     "exp": -1.08,
+     "R": -3.25,
+     "lo": -1.28,
+     "hi": 1.25,
      "judged": false,
      "out": null
     },
-    "line": "Expect −0.02R a trade (−0.07 to +0.04R) over about 82 trades a year, so −21 to +18R in a year; plan for a drawdown of −17 to −61R. Forward so far −1.12R a trade over 2: too few to place. Verdict: 89 trades (about 14 months) if it repeats its backtest (+0.33R a trade); an edge of −0.02R a trade out of sample cannot be proven."
+    "line": "Expect −0.02R a trade (−0.07 to +0.04R) over about 82 trades a year, so −21 to +18R in a year; plan for a drawdown of −17 to −61R. Forward so far −1.08R a trade over 3: too few to place. Verdict: 89 trades (about 14 months) if it repeats its backtest (+0.33R a trade); an edge of −0.02R a trade out of sample cannot be proven."
    },
    {
     "id": "ict-a",
@@ -1443,15 +1451,15 @@
     },
     "regime": "fails out of sample: −0.01R a trade on 2008-17 (2,235 A-setups, GC/NQ/ES/YM; index sells against a bull market lost); +0.09R on 2018-26 (#526)",
     "forward": {
-     "n": 10,
-     "exp": -0.41,
-     "R": -4.11,
-     "lo": -0.73,
-     "hi": 0.7,
+     "n": 12,
+     "exp": -0.51,
+     "R": -6.16,
+     "lo": -0.66,
+     "hi": 0.64,
      "judged": true,
      "out": null
     },
-    "line": "Expect −0.01R a trade (−0.06 to +0.04R) over about 223 trades a year, so −37 to +31R in a year; plan for a drawdown of −53 to −83R. Forward so far −0.41R a trade over 10: inside the band −0.73 to +0.70R. Verdict: no verdict within 2 years: an edge of −0.01R a trade out of sample cannot be proven; even its backtest edge (+0.09R) would need 1,065 trades, about 5.3 years."
+    "line": "Expect −0.01R a trade (−0.06 to +0.04R) over about 223 trades a year, so −37 to +31R in a year; plan for a drawdown of −53 to −83R. Forward so far −0.51R a trade over 12: inside the band −0.66 to +0.64R. Verdict: no verdict within 2 years: an edge of −0.01R a trade out of sample cannot be proven; even its backtest edge (+0.09R) would need 1,065 trades, about 5.3 years."
    },
    {
     "id": "trend",
@@ -1517,10 +1525,10 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-20T12"
+  "slot": "2026-11-20T18"
  },
  "forward": {
-  "at": "2026-11-20T12:01:08.000Z",
+  "at": "2026-11-20T18:00:37.000Z",
   "v": 1,
   "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
   "decision": 43,
@@ -1564,7 +1572,7 @@
    "ddMarked": 1,
    "firstAt": 1794491160,
    "lastAt": 1794491160,
-   "months": 0.28,
+   "months": 0.29,
    "from": "2026-11-12",
    "path": [
     [
@@ -1574,10 +1582,10 @@
    ]
   },
   "band": {
-   "months": 0.2792866377671306,
-   "p5": -0.34,
+   "months": 0.28748840215986005,
+   "p5": -0.35,
    "p50": 0.06,
-   "p95": 0.8,
+   "p95": 0.82,
    "clamp": false,
    "where": "below",
    "show": 12
@@ -1708,7 +1716,7 @@
    "foreign": []
   },
   "alerts": [],
-  "slot": "2026-11-20T12"
+  "slot": "2026-11-20T18"
  },
  "ledger": [
   {
@@ -2591,7 +2599,7 @@
    }
   }
  ],
- "ledgerSlot": "2026-11-20T12",
+ "ledgerSlot": "2026-11-20T18",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
  "date": "2026-11-20",
  "at": "2026-11-20T00:02:27.000Z",
@@ -2797,7 +2805,7 @@
    "Against the D1 trend (134×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-20T12",
+ "fslot": "2026-11-20T18",
  "notes": [
   "No change today: not enough evidence to move a rule."
  ],
