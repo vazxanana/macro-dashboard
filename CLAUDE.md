@@ -2493,6 +2493,9 @@ bar (`#ms-cfs-css` now reads `.ch-row` / `#v-charts:fullscreen .ms-grid4`). The 
 only beside the rail) and its chapters say where the tools are and how favourites work. Never set an attribute the rail's observer
 watches to the value it already has (it looped once and froze the page). `window.msRail()` is the read-only view. Test:
 `tests/desk-draw.test.mjs`.
+**20 Nov 2026 (owner's marked screenshot)**: only the drawing tools stay in the rail; the chart tools `#ms-ch-one` (timeframe,
+position, measure, replay, image, fit, full screen) and the favourites star `#ms-rail-fav` sit in the top toolbar after Clean
+(`order: 3`), with their stars there too. The "Open on TradingView" button (`.ch-tv`) is gone from every chart.
 
 ## Fibonacci, arrow and text drawings (19 Nov 2026, owner: "add more drawing tools like fibonacci and text")
 Display only. Three shapes join ChronosTrade's drawing types in `assets/backtest-engine.js` (`DRAW_TYPES`, so `drawNorm`,

@@ -3670,16 +3670,20 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .ch-rail .ch-one .ch-one-tf { padding: 2px 0 4px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); text-align: center; }
       .ch-rail :is(.dr-bar button, .ch-one .ch-b) { position: relative; width: 34px; height: 34px; min-width: 0; margin: 0; border-radius: 8px; flex: none; }
       .ch-rail :is(.dr-bar, .ch-one) :is(button, .ch-b):is([aria-pressed="true"], .on) { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 2px 0 0 var(--au-accent, var(--accent)); }
-      .ch-rail .rl-star { position: absolute; right: -1px; top: -1px; width: 13px; height: 13px; display: none; border-radius: 50%; cursor: pointer;
+      :is(.ch-rail, #ms-ch-one) .rl-star { position: absolute; right: -1px; top: -1px; width: 13px; height: 13px; display: none; border-radius: 50%; cursor: pointer;
         background: var(--au-surface, var(--panel)); -webkit-mask: none; }
-      .ch-rail .rl-star::before { content: ""; position: absolute; inset: 1px; background: var(--au-ink-3, var(--ink-faint));
+      :is(.ch-rail, #ms-ch-one) .rl-star::before { content: ""; position: absolute; inset: 1px; background: var(--au-ink-3, var(--ink-faint));
         clip-path: polygon(50% 0, 63% 35%, 100% 38%, 71% 61%, 80% 100%, 50% 78%, 20% 100%, 29% 61%, 0 38%, 37% 35%); }
-      .ch-rail .rl-star.on::before { background: var(--au-warn, #d7a03b); }
-      .ch-rail :is(button, .ch-b):hover > .rl-star, .ch-rail .rl-star.on { display: block; }
-      .ch-rail .rl-fav { width: 34px; height: 34px; margin-top: 4px; display: grid; place-items: center; border: 0; border-top: 1px solid var(--au-line, var(--line)); border-radius: 0; background: none; color: var(--au-ink-3, var(--ink-faint)); cursor: pointer; padding: 0; }
-      .ch-rail .rl-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
-      .ch-rail .rl-fav[aria-pressed="true"] { color: var(--au-warn, #d7a03b); } .ch-rail .rl-fav[aria-pressed="true"] svg { fill: currentColor; }
-      .ch-rail .rl-fav:hover { color: var(--au-ink, var(--ink)); }
+      :is(.ch-rail, #ms-ch-one) .rl-star.on::before { background: var(--au-warn, #d7a03b); }
+      :is(.ch-rail, #ms-ch-one) :is(button, .ch-b):hover > .rl-star, :is(.ch-rail, #ms-ch-one) .rl-star.on { display: block; }
+      #ms-ch-one .ch-b { position: relative; }
+      /* chart tools and the favourites star sit in the top toolbar after Clean (20 Nov 2026, owner); the rail keeps the drawing tools */
+      #v-charts.has-rail .sec-h > .ch-one.ch-one, #v-charts.has-rail .sec-h > .rl-fav { order: 3; }
+      #v-charts.has-rail .sec-h > .ch-one.ch-one { flex: none; width: auto; border-left: 1px solid var(--au-line, var(--line)) !important; padding-left: 6px !important; margin-left: 4px; }
+      #v-charts .rl-fav { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--au-ink-3, var(--ink-faint)); cursor: pointer; padding: 0; }
+      #v-charts .rl-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+      #v-charts .rl-fav[aria-pressed="true"] { color: var(--au-warn, #d7a03b); } #v-charts .rl-fav[aria-pressed="true"] svg { fill: currentColor; }
+      #v-charts .rl-fav:hover { color: var(--au-ink, var(--ink)); }
       #v-charts.has-rail .sec-h > .ch-tools-tog { display: none !important; }
       #v-charts.has-rail .sec-h > .ch-help.ch-help { order: 4; margin-left: auto; width: 38px; padding: 0; justify-content: center; }
       @media (min-width: 1440px) { #v-charts.has-rail .sec-h > #ms-sty.sty { margin-left: 0; } }
@@ -3695,7 +3699,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .ms-fav button[aria-pressed="true"] { background: var(--au-surface-2, var(--panel-2)); color: var(--au-ink, var(--ink)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
       .ms-fav svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .ms-fav small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--au-accent, var(--accent)); } .ms-fav small:empty { display: none; }
-      @media (pointer: coarse) { #v-charts.has-rail .ch-rail { width: 52px; } .ch-rail :is(.dr-bar button, .ch-one .ch-b), .ch-rail .rl-fav, .ms-fav button { width: 44px; height: 44px; } .ms-fav .fv-grip { width: 20px; } }
+      @media (pointer: coarse) { #v-charts.has-rail .ch-rail { width: 52px; } .ch-rail :is(.dr-bar button, .ch-one .ch-b), #v-charts .rl-fav, .ms-fav button { width: 44px; height: 44px; } .ms-fav .fv-grip { width: 20px; } }
       </style>
       <style id="ms-pp-css">/* The paper trading account on the Charts (18 Nov 2026, assets/ms-paper.js): one bar above the charts, stats and history behind a button */
   html[data-role="public"] #ms-pp, html[data-role="public"] #hs-pp, html[data-deny~="charts"] #hs-pp { display: none !important; }
@@ -5698,7 +5702,7 @@ function msNextSetup(bars, A) {
         // phones (7 Nov loop): the toolbar scrolls sideways inside the header; a fade shows there is more until the end is reached
         { const ovf = () => { const o = tl.scrollWidth > tl.clientWidth + 1; tl.classList.toggle('ovf', o); tl.classList.toggle('end', o && tl.scrollLeft + tl.clientWidth >= tl.scrollWidth - 2); };
           tl.addEventListener('scroll', ovf, { passive: true }); if (window.ResizeObserver) new ResizeObserver(ovf).observe(tl); setTimeout(ovf, 0); }
-        tl.innerHTML = `<a class="ch-b ch-tv" target="_blank" rel="noopener" title="Open this chart on TradingView" aria-label="Open on TradingView"></a><button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
+        tl.innerHTML = `<button type="button" class="ch-b ch-hl" title="Draw a horizontal line: click the chart to place it, click a line again to remove it (saved for this market)" aria-label="Draw horizontal lines" aria-pressed="false"></button><button type="button" class="ch-b ch-tl" title="Trend line: click two points (extends to the latest candle); click the button twice quickly to remove this chart's trend lines" aria-label="Draw a trend line" aria-pressed="false"></button><button type="button" class="ch-b ch-pos" title="Position tool: click the entry, then the stop; the target is drawn at 2R with the size for your risk (click again to remove)" aria-label="Plan a position (entry, stop, 2R target)" aria-pressed="false"></button><button type="button" class="ch-b ch-fib" title="Fibonacci retracement: click the swing start, then the swing end (click again to remove it; saved for this chart)" aria-label="Draw a Fibonacci retracement" aria-pressed="false"></button><button type="button" class="ch-b ch-ruler" title="Measure: drag on the chart (or hold Shift and drag)" aria-label="Measure price and time on the chart" aria-pressed="false"></button><button type="button" class="ch-b ch-rp" title="Replay: hide the future and step through the candles (← → keys)" aria-label="Bar replay" aria-pressed="false"></button><button type="button" class="ch-b ch-snap" title="Save this chart as an image" aria-label="Save the chart as a PNG image"></button><button type="button" class="ch-b ch-fit" title="Fit the chart (double-click the chart)" aria-label="Fit the ${tf.label} chart"></button><button type="button" class="ch-b ch-fs" title="Full screen" aria-label="Show the ${tf.label} chart full screen"></button>`;
         ph.appendChild(tl);
         tl.querySelector('.ch-fit').addEventListener('click', () => P.fit());
         tl.querySelector('.ch-snap').addEventListener('click', () => P.snapshot());
@@ -5708,7 +5712,6 @@ function msNextSetup(bars, A) {
         tl.querySelector('.ch-pos').addEventListener('click', () => P.posTool && P.posTool());
         tl.querySelector('.ch-fib').addEventListener('click', () => P.fibTool && P.fibTool());
         tl.querySelector('.ch-hl').addEventListener('click', (e) => { const on = !P.hlOn; P.hlOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on || !!P.measureOn); });
-        { const tv = tl.querySelector('.ch-tv'); tv.href = tvUrl(CUR, tf); tv.addEventListener('click', () => { tv.href = tvUrl(CUR, tf); window.msTrack && msTrack('Open TradingView', { tf: tf.id }); }); }
         tl.querySelector('.ch-ruler').addEventListener('click', (e) => { const on = !P.measureOn; P.measureOn = on; e.currentTarget.classList.toggle('on', on); e.currentTarget.setAttribute('aria-pressed', String(on)); el.classList.toggle('measuring', on); if (!on) P.clearMeasure(); });
         tl.querySelector('.ch-fs').addEventListener('click', () => { const vc = document.getElementById('v-charts') || pane; if (document.fullscreenElement) document.exitFullscreen(); else if (vc.requestFullscreen) vc.requestFullscreen().catch(() => {}); });   // the whole Charts view: the layout, split and tools as they are (18 Nov 2026)
       }
@@ -7988,7 +7991,7 @@ function msNextSetup(bars, A) {
   // ─── One chart toolbar (19 Nov 2026): the tools act on the chart last touched, in every layout (All, Split, Layout, one chart) ───
   { const bar = document.getElementById('ms-ch-one'), VCH0 = document.getElementById('v-charts');
     // the ChronosTrade strip next to it already draws horizontal and trend lines, so those two are not repeated here (H / T keys still work)
-    const TOOLS = ['.ch-pos', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-tv', '.ch-fs'];
+    const TOOLS = ['.ch-pos', '.ch-ruler', '.ch-rp', '.ch-snap', '.ch-fit', '.ch-fs'];   // TradingView link removed 20 Nov 2026 (owner)
     let ACT = null, MO = null, built = false;
     const shown = () => [...document.querySelectorAll('#v-charts .ms-pane')].filter((x) => x.offsetParent && x.querySelector('.ch-tools'));
     const active = () => { const v = shown(); return ACT && v.includes(ACT) ? ACT : (KB_PANE && v.includes(KB_PANE) ? KB_PANE : v[0] || null); };
@@ -8000,8 +8003,7 @@ function msNextSetup(bars, A) {
       const tf = bar.querySelector('.ch-one-tf'), lab = pn && pn.querySelector('.ms-ph b');
       if (tf) tf.textContent = lab ? lab.textContent.trim() : '';
       bar.querySelectorAll('[data-t]').forEach((b) => { const src = pn && pn.querySelector('.ch-tools ' + b.dataset.t);
-        const on = !!(src && src.classList.contains('on')); b.classList.toggle('on', on); if (b.tagName === 'BUTTON' && b.dataset.t !== '.ch-snap' && b.dataset.t !== '.ch-fit' && b.dataset.t !== '.ch-fs') b.setAttribute('aria-pressed', String(on));
-        if (b.dataset.t === '.ch-tv' && src) b.href = src.href; });
+        const on = !!(src && src.classList.contains('on')); b.classList.toggle('on', on); if (b.tagName === 'BUTTON' && b.dataset.t !== '.ch-snap' && b.dataset.t !== '.ch-fit' && b.dataset.t !== '.ch-fs') b.setAttribute('aria-pressed', String(on)); });
       if (MO) MO.disconnect(); if (pn && window.MutationObserver) { MO = new MutationObserver(sync); MO.observe(pn.querySelector('.ch-tools'), { subtree: true, attributes: true, attributeFilter: ['class', 'href'] }); }
     };
     function build(pn) {
@@ -8012,7 +8014,6 @@ function msNextSetup(bars, A) {
         b.setAttribute('title', (o.getAttribute('title') || '').replace('this chart', 'the chart you last touched'));
         b.setAttribute('aria-label', (o.getAttribute('aria-label') || '').replace(/ the \S+ chart/, ' the chart'));
         b.addEventListener('click', (e) => { const p = active(), t = p && p.querySelector('.ch-tools ' + sel); if (!t) return;
-          if (sel === '.ch-tv') { b.href = t.href; t.dispatchEvent(new MouseEvent('click')); return; }
           e.preventDefault(); t.click(); sync(); });
         if (sel === '.ch-tl') b.addEventListener('dblclick', () => { const t = active() && active().querySelector('.ch-tools .ch-tl'); if (t) t.dispatchEvent(new MouseEvent('dblclick')); });
         bar.appendChild(b); });
@@ -8064,10 +8065,10 @@ function msNextSetup(bars, A) {
       const btnOf = (k) => k === 'mag' ? DB.querySelector('[data-mag]') : k.startsWith('dt:') ? DB.querySelector(`[data-dt="${k.slice(3)}"]`) : CO.querySelector(`[data-t="${k.slice(3)}"]`);
       const nameOf = (b) => (b.getAttribute('aria-label') || b.title || '').replace(/ \(.*/, '');
       const wide = window.matchMedia('(min-width: 641px)');
-      function place() { if (wide.matches) { if (DB.parentNode !== rail) { rail.prepend(DB); DB.after(CO); rail.appendChild(favBtn); } VC.classList.add('has-rail'); }
-        else { if (DB.parentNode === rail) { ph.db.after(DB); ph.co.after(CO); favBtn.remove(); } VC.classList.remove('has-rail'); } stars(); fav(); }
+      function place() { if (wide.matches) { if (DB.parentNode !== rail) { rail.prepend(DB); CO.after(favBtn); } VC.classList.add('has-rail'); }
+        else { if (DB.parentNode === rail) { ph.db.after(DB); favBtn.remove(); } VC.classList.remove('has-rail'); } stars(); fav(); }
       // a star on every tool of the rail (a span inside the button; the capture listener below keeps its click from pressing the tool)
-      function stars() { rail.querySelectorAll('.dr-bar button, .ch-one [data-t]').forEach((b) => { const k = keyOf(b); if (!k) return;
+      function stars() { [...rail.querySelectorAll('.dr-bar button'), ...CO.querySelectorAll('[data-t]')].forEach((b) => { const k = keyOf(b); if (!k) return;
           let s = b.querySelector(':scope > .rl-star'); if (!s) { s = document.createElement('span'); s.className = 'rl-star'; s.setAttribute('aria-hidden', 'true'); b.appendChild(s); }
           const on = F.tools.includes(k); if (s.classList.contains('on') !== on) s.classList.toggle('on', on); if (b.classList.contains('is-fav') !== on) b.classList.toggle('is-fav', on); });
         const n = F.tools.length;
@@ -8075,8 +8076,8 @@ function msNextSetup(bars, A) {
         favBtn.setAttribute('aria-label', n ? (F.on ? 'Hide the favourites bar' : 'Show the favourites bar') : 'Favourites bar: no favourites yet');
         const pr = String(!!(n && F.on)); if (favBtn.getAttribute('aria-pressed') !== pr) favBtn.setAttribute('aria-pressed', pr); }
       function toggleFav(k) { if (!k) return; const i = F.tools.indexOf(k); if (i >= 0) F.tools.splice(i, 1); else { F.tools.push(k); F.on = true; } wr(); stars(); fav(); }
-      rail.addEventListener('click', (e) => { const s = e.target.closest && e.target.closest('.rl-star'); if (!s) return; e.preventDefault(); e.stopPropagation(); toggleFav(keyOf(s.closest('button, a'))); }, true);
-      rail.addEventListener('contextmenu', (e) => { const b = e.target.closest && e.target.closest('.dr-bar button, .ch-one [data-t]'); if (!b) return; e.preventDefault(); toggleFav(keyOf(b)); });
+      [rail, CO].forEach((el) => { el.addEventListener('click', (e) => { const s = e.target.closest && e.target.closest('.rl-star'); if (!s) return; e.preventDefault(); e.stopPropagation(); toggleFav(keyOf(s.closest('button, a'))); }, true);
+        el.addEventListener('contextmenu', (e) => { if (!wide.matches) return; const b = e.target.closest && e.target.closest('.dr-bar button, .ch-one [data-t]'); if (!b) return; e.preventDefault(); toggleFav(keyOf(b)); }); });
       favBtn.addEventListener('click', () => { if (!F.tools.length) { const n = document.getElementById('ms-dr-note'); if (n) { n.textContent = 'Hover a tool on the left and tap its star (or right-click it) to add it to your favourites.'; setTimeout(() => { if (n.textContent.startsWith('Hover a tool')) n.textContent = ''; }, 5000); } return; }
         F.on = !F.on; wr(); stars(); fav(); });
       // the floating favourites bar
@@ -8111,7 +8112,7 @@ function msNextSetup(bars, A) {
       if (wide.addEventListener) wide.addEventListener('change', place); else if (wide.addListener) wide.addListener(place);
       place();
       window.msRail = () => ({ inRail: DB.parentNode === rail, favs: F.tools.slice(), on: !!F.on, bar: !FB.hidden, at: FB.hidden ? null : { x: parseFloat(FB.style.left), y: parseFloat(FB.style.top) },
-        tools: [...rail.querySelectorAll('.dr-bar button, .ch-one [data-t]')].map(keyOf).filter(Boolean) });
+        tools: [...rail.querySelectorAll('.dr-bar button'), ...CO.querySelectorAll('[data-t]')].map(keyOf).filter(Boolean), top: CO.parentNode && CO.parentNode.classList.contains('sec-h') });
       window.msRailFav = toggleFav;
     }
   }
