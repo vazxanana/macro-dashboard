@@ -1,8 +1,9 @@
-# One-off probe of keyless macro sources (20 Nov 2026); prints only, writes nothing, no secrets.
+# Probe of keyless macro sources (20 Nov 2026): prints what the sources return and what council/hard-data.mjs would write;
+# writes nothing to the repository or council-data, no secrets.
 name: Macro sources probe
 on:
   pull_request:
-    paths: ['scripts/macro-probe.mjs', '.github/workflows/macro-probe.yml']
+    paths: ['scripts/macro-probe.mjs', 'council/hard-data.mjs', '.github/workflows/macro-probe.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -12,7 +13,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with: { sparse-checkout: scripts }
+        with: { sparse-checkout: "scripts\ncouncil" }
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: node scripts/macro-probe.mjs
+      - run: node council/hard-data.mjs "$RUNNER_TEMP/d" && head -c 6000 "$RUNNER_TEMP/d/macro/hard-data.json"
