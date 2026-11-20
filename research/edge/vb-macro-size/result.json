@@ -1,0 +1,148 @@
+{
+ "study": "vb-macro-size",
+ "title": "Gold breakout T1 sized by the Gold Macro Score",
+ "built": "2026-11-20",
+ "params": {
+  "FROM": "2007-01-01",
+  "TO": "2026-11-12",
+  "SPLIT": "2017-01-01",
+  "BUY": 0.25
+ },
+ "gate": {
+  "n": 3713,
+  "grossR": 0.155,
+  "ok": true
+ },
+ "weeks": 1005,
+ "verdict": "FAIL: H1 (longs above +0.25 better) fails, difference +0.149R (t +1.93); H2 (shorts above +0.25 worse) fails, difference −0.067R (t −0.88)",
+ "deviation": "The plan named `GGO_TO=2026-11-13` for the candle download. The loader drops the last calendar day of a file, so candles ending at midnight on 13 Nov left 12 Nov out and the gate missed by one trade (3,712 against 3,713). The candles of 12-13 Nov were added (a second download, `GGO_FROM=2026-11-12`, merged by time) so that the plan's own window, days to 2026-11-12, and its gate hold. No trade was looked at before the gate passed.",
+ "reading": "Longs taken with the score above +0.25 did better (+0.268R against +0.119R a trade, positive in both halves), but by a margin the test cannot separate from luck (t +1.93, Holm p 0.054); counted by calendar months it is nil (t −0.07). Shorts above +0.25 were not worse in a way that counts (t −0.88). Sized the book's way, T1 earns +0.155R per unit of risk against +0.140R flat, with the same month t and drawdown: no reason to size T1 by the score. T1's forward record stays flat 1R.",
+ "n": 3713,
+ "unscored": 120,
+ "H1": {
+  "above": {
+   "n": 388,
+   "netR": 0.268,
+   "grossR": 0.285,
+   "win": 0.518
+  },
+  "atOrBelow": {
+   "n": 1397,
+   "netR": 0.119,
+   "grossR": 0.135,
+   "win": 0.437
+  },
+  "diff": 0.149,
+  "t": 1.93,
+  "p": 0.027,
+  "halves": [
+   {
+    "d": 0.262,
+    "t": 1.79,
+    "nAbove": 132,
+    "nBelow": 684
+   },
+   {
+    "d": 0.113,
+    "t": 1.25,
+    "nAbove": 256,
+    "nBelow": 713
+   }
+  ],
+  "gross": 1.94,
+  "monthSum": {
+   "months": 63,
+   "t": -0.07
+  },
+  "holm": 0.054,
+  "pass": false
+ },
+ "H2": {
+  "above": {
+   "n": 364,
+   "netR": 0.075,
+   "grossR": 0.09,
+   "win": 0.409
+  },
+  "atOrBelow": {
+   "n": 1444,
+   "netR": 0.142,
+   "grossR": 0.158,
+   "win": 0.437
+  },
+  "diff": -0.067,
+  "t": -0.88,
+  "p": 0.189,
+  "halves": [
+   {
+    "d": -0.046,
+    "t": -0.37,
+    "nAbove": 126,
+    "nBelow": 775
+   },
+   {
+    "d": -0.066,
+    "t": -0.69,
+    "nAbove": 238,
+    "nBelow": 669
+   }
+  ],
+  "gross": -0.9,
+  "monthSum": {
+   "months": 60,
+   "t": 1.19
+  },
+  "holm": 0.189,
+  "pass": false
+ },
+ "sizing": {
+  "pooled": {
+   "flat": {
+    "total": 503.5,
+    "risk": 3593,
+    "perRisk": 0.14,
+    "monthT": 6.34,
+    "maxDD": -28.27
+   },
+   "book": {
+    "total": 392.69,
+    "risk": 2530.5,
+    "perRisk": 0.155,
+    "monthT": 6.28,
+    "maxDD": -29.19
+   }
+  },
+  "first": {
+   "flat": {
+    "total": 313.16,
+    "risk": 1717,
+    "perRisk": 0.182,
+    "monthT": 5.45,
+    "maxDD": -19.45
+   },
+   "book": {
+    "total": 240.26,
+    "risk": 1249,
+    "perRisk": 0.192,
+    "monthT": 4.99,
+    "maxDD": -16.02
+   }
+  },
+  "second": {
+   "flat": {
+    "total": 190.33,
+    "risk": 1876,
+    "perRisk": 0.101,
+    "monthT": 3.5,
+    "maxDD": -28.27
+   },
+   "book": {
+    "total": 152.43,
+    "risk": 1281.5,
+    "perRisk": 0.119,
+    "monthT": 3.84,
+    "maxDD": -29.19
+   }
+  }
+ }
+}

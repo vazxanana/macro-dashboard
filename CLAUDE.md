@@ -1284,6 +1284,10 @@ problem: n files", 2 checks in a row, 12 h reminder) unless the issue is `quiet`
 state, mt5 csv, ICT, health.json); warn shows; note is a standing gap listed only. The loop's data check flags a watchdog.json older
 than 3 h (pages at 12 h), so loop and watchdog watch each other. Thresholds are monitoring only, never trading rules. Tests:
 `tests/datahealth.test.mjs`.
+**20 Nov 2026**: an open trade whose stop has moved past its entry (break-even, trail) is judged against the risk it opened with
+(`r0`): a stop further from the entry than `r0` is flagged ("further from the entry than the opening risk", rule 1); the plain
+"stop not over / under the entry" check stays for pending orders and trades without `r0` (it flagged a Mosha BO shadow sell whose
+trail had locked profit).
 
 ## council-data sync and safe writes (9 Nov 2026, reliability audit)
 Every pull / save of council-data in council.yml (round, quick pass, account minute) and watchdog.yml goes through
@@ -4914,6 +4918,11 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**A third start, from the council loop (20 Nov 2026)**: the 20 Nov deploy log says `skip GH_DISPATCH_TOKEN (no repository secret)`,
+so the Worker's timer cannot start the job. After each round `council/gotobi-due.mjs` (read only; the Worker's `decide` and window,
+plus the study's calendar) answers yes on a gotobi weekday 00:25-00:49 UTC with no gotobi run active or started within the hour,
+and `council.yml` dispatches main's `gotobi.yml` with the loop's own `actions: write` (never fails the round). Test:
+`tests/gotobi-due.test.mjs`.
 **20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
 `GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
 website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
@@ -4934,6 +4943,9 @@ VPS live runner's `startProxy` since 8 Nov); `council.yml` starts it when the `O
 `OANDA_ENV` only for a live OANDA account) as GitHub repository secrets. `backtest.yml` and `macro-gold.yml` start the same service through
 `scripts/own-candles.sh` (writes MD_BASE / ICT_MD_BARS to $GITHUB_ENV only once it answers). `daily-cache.yml` stays keyless
 (a test pins it): it reads the website's proxy, weekly. The ICT replay does not use the proxy (CNBC and its fill files). Tests: `tests/md-proxy.test.mjs`.
+**20 Nov 2026**: `backtest.yml` (the council's 30-day replay) and `macro-gold.yml` checked out only part of the repository without
+`scripts/` and `api/`, so `sh scripts/own-candles.sh` failed and the daily replay had not run since 19 Nov (data health: "Daily
+replay … not updated for 44 h"); both now check out `scripts`, `council` and `api` (`tests/own-candles-checkout.test.mjs`).
 
 ## Tick probe: the demo broker's own bid / ask history (20 Nov 2026, for the cost questions)
 `council/tick-probe.mjs` + `.github/workflows/tick-probe.yml` (dispatch only, input `symbols`, default XAUUSD): reads the DEMO
@@ -4997,6 +5009,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
   its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`
   writes council-data `research/forward/gold-pre-holiday.json`. First event: Thanksgiving (25 Nov 2026). Nothing trades.
-- `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
+- `vb-macro-size` (pre-registered 20 Nov 2026): the rule book's "size by the Gold Macro Score, never short above +0.25" on T1
+  (2007-26, 3,713 trades, C1 cost, gate reproduced). **FAIL**: longs above +0.25 +0.268R vs +0.119R a trade (t 1.93, Holm p 0.054;
+  month-sum t −0.07), shorts above +0.25 not worse (t −0.88); sized the book's way +0.155R per unit of risk vs +0.140R flat, same
+  month t and drawdown. T1 stays flat 1R. Local reruns of research fetch scripts need `MD_BASE=https://aureumdesk.co.uk/md/`
+  (their default meridianx.dev answers 402 since the Vercel project went).
+ the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).

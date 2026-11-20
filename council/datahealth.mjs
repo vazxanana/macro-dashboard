@@ -162,7 +162,12 @@ function tradesCheck(j, c) {
   const broken = { live: [], shadow: [] };
   for (const x of j) {
     if (!x || (x.status !== 'open' && x.status !== 'pending')) continue;
-    const why = !(x.entry > 0 && x.stop > 0) ? 'no entry / stop' : x.side === 'buy' && !(x.stop < x.entry) ? 'buy stop not under the entry' : x.side === 'sell' && !(x.stop > x.entry) ? 'sell stop not over the entry'
+    // an open trade whose stop has moved (break-even, trail: 20 Nov 2026, xau-moshabo-1794987900) may sit past its entry: judged
+    // against the risk it OPENED with (r0), and a stop further away than that is the real fault (rule 1: never loosened)
+    const r0 = x.status === 'open' && +x.r0 > 0 ? +x.r0 : 0, away = x.side === 'buy' ? x.entry - x.stop : x.stop - x.entry;
+    const why = !(x.entry > 0 && x.stop > 0) ? 'no entry / stop'
+      : r0 && away > r0 * 1.001 + 1e-9 ? `stop ${x.stop} is further from the entry than the opening risk ${+r0.toFixed(6)}`
+      : !r0 && x.side === 'buy' && !(x.stop < x.entry) ? 'buy stop not under the entry' : !r0 && x.side === 'sell' && !(x.stop > x.entry) ? 'sell stop not over the entry'
       : M[x.market] && M[x.market].price > 0 && pct(x.entry, M[x.market].price) > 30 ? `entry ${x.entry} is ${pct(x.entry, M[x.market].price).toFixed(0)}% from the price ${M[x.market].price}` : null;
     if (why) broken[x.shadow ? 'shadow' : 'live'].push(`${x.id}: ${why}`);
   }

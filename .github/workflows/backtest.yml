@@ -41,7 +41,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          sparse-checkout: council
+          # scripts/own-candles.sh starts council/md-proxy.mjs, which serves api/bars.js (19 Nov 2026: without scripts and api
+          # here every run failed at "cannot open scripts/own-candles.sh")
+          sparse-checkout: |
+            council
+            scripts
+            api
 
       - name: Checkout council data
         uses: actions/checkout@v4
