@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-19T23:30:14.000Z",
+ "at": "2026-11-20T00:29:30.000Z",
  "rule": "proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.",
  "inSample": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.",
  "windows": {
@@ -37,14 +37,14 @@
   },
   "shadow": {
    "d30": {
-    "n": 1005,
-    "net": 7.99,
-    "gross": 197.23
+    "n": 1006,
+    "net": 9.89,
+    "gross": 199.13
    },
    "all": {
-    "n": 1005,
-    "net": 7.99,
-    "gross": 197.23
+    "n": 1006,
+    "net": 9.89,
+    "gross": 199.13
    }
   }
  },
@@ -8053,80 +8053,80 @@
    "stopped": false,
    "windows": {
     "d7": {
-     "n": 1,
-     "wins": 0,
+     "n": 2,
+     "wins": 1,
      "losses": 1,
      "flat": 0,
-     "winRate": 0,
+     "winRate": 0.5,
      "gross": {
-      "sum": -0.47,
-      "mean": -0.47,
-      "t": 0
+      "sum": 1.43,
+      "mean": 0.715,
+      "t": 0.6
      },
      "net": {
-      "sum": -0.47,
-      "mean": -0.47,
-      "t": 0
+      "sum": 1.43,
+      "mean": 0.715,
+      "t": 0.6
      },
      "cost": {
-      "known": 1,
+      "known": 2,
       "sum": 0,
       "perTrade": 0,
-      "shareOfGrossWins": null
+      "shareOfGrossWins": 0
      }
     },
     "d30": {
-     "n": 2,
-     "wins": 1,
+     "n": 3,
+     "wins": 2,
      "losses": 1,
      "flat": 0,
-     "winRate": 0.5,
+     "winRate": 0.667,
      "gross": {
-      "sum": 1.16,
-      "mean": 0.58,
-      "t": 0.55
+      "sum": 3.06,
+      "mean": 1.02,
+      "t": 1.36
      },
      "net": {
-      "sum": 1.15,
-      "mean": 0.575,
-      "t": 0.55
+      "sum": 3.05,
+      "mean": 1.017,
+      "t": 1.36
      },
      "cost": {
-      "known": 2,
+      "known": 3,
       "sum": 0.01,
-      "perTrade": 0.005,
-      "shareOfGrossWins": 0.006
+      "perTrade": 0.003,
+      "shareOfGrossWins": 0.003
      }
     },
     "all": {
-     "n": 2,
-     "wins": 1,
+     "n": 3,
+     "wins": 2,
      "losses": 1,
      "flat": 0,
-     "winRate": 0.5,
+     "winRate": 0.667,
      "gross": {
-      "sum": 1.16,
-      "mean": 0.58,
-      "t": 0.55
+      "sum": 3.06,
+      "mean": 1.02,
+      "t": 1.36
      },
      "net": {
-      "sum": 1.15,
-      "mean": 0.575,
-      "t": 0.55
+      "sum": 3.05,
+      "mean": 1.017,
+      "t": 1.36
      },
      "cost": {
-      "known": 2,
+      "known": 3,
       "sum": 0.01,
-      "perTrade": 0.005,
-      "shareOfGrossWins": 0.006
+      "perTrade": 0.003,
+      "shareOfGrossWins": 0.003
      }
     }
    },
    "whereR": {
     "exits": {
      "trail": {
-      "n": 1,
-      "net": 1.62
+      "n": 2,
+      "net": 3.52
      },
      "time": {
       "n": 1,
@@ -8141,20 +8141,20 @@
      "within": "30 minutes of the fill"
     },
     "reached1R": {
-     "withMfe": 2,
-     "n": 1,
+     "withMfe": 3,
+     "n": 2,
      "closedAtLoss": 0,
      "lossNet": 0
     },
     "giveback": {
-     "n": 1,
+     "n": 2,
      "mean": 1,
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
-     "n": 2,
-     "mean": -0.315,
-     "t": -1,
+     "n": 3,
+     "mean": -0.51,
+     "t": -1.91,
      "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
     },
     "targetAfterStop": {
@@ -8172,17 +8172,17 @@
       "sum": 1.62,
       "t": 0,
       "rest": {
-       "n": 1,
-       "mean": -0.47
+       "n": 2,
+       "mean": 0.715
       },
       "vsRest": null
      },
      {
       "v": "newyork",
-      "n": 1,
-      "mean": -0.47,
-      "sum": -0.47,
-      "t": 0,
+      "n": 2,
+      "mean": 0.715,
+      "sum": 1.43,
+      "t": 0.6,
       "rest": {
        "n": 1,
        "mean": 1.62
@@ -8198,17 +8198,17 @@
       "sum": 1.62,
       "t": 0,
       "rest": {
-       "n": 1,
-       "mean": -0.47
+       "n": 2,
+       "mean": 0.715
       },
       "vsRest": null
      },
      {
       "v": "16-20",
-      "n": 1,
-      "mean": -0.47,
-      "sum": -0.47,
-      "t": 0,
+      "n": 2,
+      "mean": 0.715,
+      "sum": 1.43,
+      "t": 0.6,
       "rest": {
        "n": 1,
        "mean": 1.62
@@ -8219,10 +8219,10 @@
     "side": [
      {
       "v": "sell",
-      "n": 2,
-      "mean": 0.575,
-      "sum": 1.15,
-      "t": 0.55,
+      "n": 3,
+      "mean": 1.017,
+      "sum": 3.05,
+      "t": 1.36,
       "rest": {
        "n": 0,
        "mean": 0
@@ -8234,8 +8234,8 @@
     "exit": [
      {
       "v": "trail",
-      "n": 1,
-      "sum": 1.62
+      "n": 2,
+      "sum": 3.52
      },
      {
       "v": "time",
@@ -8245,10 +8245,10 @@
     ]
    },
    "slippage": {
-    "n": 2,
-    "mean": -0.043,
-    "t": -3.91,
-    "worse": 0,
+    "n": 3,
+    "mean": -0.009,
+    "t": -0.25,
+    "worse": 1,
     "note": "fill minus the council entry in R, positive = worse"
    },
    "reviews": {
@@ -8271,10 +8271,10 @@
    },
    "flags": [],
    "review": {
-    "head": "Gold momentum pullback (shadow): 2 closed, 50% won, +1.16R before costs, +1.15R after (t 0.55); last 30 days +1.15R on 2, last 7 days −0.47R on 1.",
+    "head": "Gold momentum pullback (shadow): 3 closed, 67% won, +3.06R before costs, +3.05R after (t 1.36); last 30 days +3.05R on 3, last 7 days +1.43R on 2.",
     "working": [
-     "after costs +1.15R on 2 trades (+0.57R a trade, t 0.55)",
-     "trail exits +1.62R on 1"
+     "after costs +3.05R on 3 trades (+1.02R a trade, t 1.36)",
+     "trail exits +3.52R on 2"
     ],
     "losing": []
    },
@@ -8301,6 +8301,18 @@
      "net": -0.47,
      "exit": "time",
      "mfe": 0.14,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-gmp-1795100400",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795107676,
+     "t": 1795133400,
+     "R": 1.9,
+     "net": 1.9,
+     "exit": "trail",
+     "mfe": 2.9,
      "session": "newyork"
     }
    ]
@@ -8978,20 +8990,20 @@
    "stopped": false,
    "windows": {
     "d7": {
-     "n": 628,
+     "n": 626,
      "wins": 196,
-     "losses": 432,
+     "losses": 430,
      "flat": 0,
-     "winRate": 0.312,
+     "winRate": 0.313,
      "gross": {
-      "sum": -72,
-      "mean": -0.115,
-      "t": -1.96
+      "sum": -70,
+      "mean": -0.112,
+      "t": -1.91
      },
      "net": {
-      "sum": -72,
-      "mean": -0.115,
-      "t": -1.96
+      "sum": -70,
+      "mean": -0.112,
+      "t": -1.91
      },
      "cost": {
       "known": 0,
@@ -9544,7 +9556,7 @@
     "replica|research|strong-side:sell"
    ],
    "review": {
-    "head": "AUD/USD replica (research): 1292 closed, 32% won, −93.20R before costs, no cost on record (t −1.82 before costs); last 30 days −93.20R on 1292, last 7 days −72.00R on 628.",
+    "head": "AUD/USD replica (research): 1292 closed, 32% won, −93.20R before costs, no cost on record (t −1.82 before costs); last 30 days −93.20R on 1292, last 7 days −70.00R on 626.",
     "working": [
      "time exits +12.58R on 33",
      "target exits +784.02R on 392",
@@ -12840,5 +12852,5 @@
    }
   ]
  },
- "hash": "351b25ebce82cefc"
+ "hash": "c9cd5839f4395fa2"
 }
