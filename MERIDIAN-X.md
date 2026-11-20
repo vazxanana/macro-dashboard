@@ -62,9 +62,9 @@ ticket): Gold replica, Gold momentum pullback, the NQ New York open run, Gold H4
 and "Crypto trend" have been shadows since 7 Nov. A trade one of them took live before its date stays in the record as the
 live trade it was. None of the nine has proven an edge on data it was not built on; the two that stay live are the nearest
 (positive on 2006-17, not yet beyond luck). The old scalp engine was retired on 4 Nov after it showed no edge.
-Also live on paper, by your own choice of 11 Nov (kept on 12 Nov): the **Mosha cycle** (H4 move, H1 ChoCh, M15 / M5 entry).
-It is not a tested edge and has no study to measure it against, so it has no row in the edge-decay and "What to expect" cards
-and is not part of the forward-test book.
+The **Mosha cycle** (H4 move, H1 ChoCh, M15 / M5 entry) traded live on paper by your own choice from 11 Nov; since 14 Nov
+it is a paper shadow too (your decision 54: both studies of its code lose after costs, 2020-26 and the untouched 2007-19).
+It is not part of the forward-test book.
 
 **The forward-test protocol** (adopted by you on 12 Nov 2026, `docs/owner-decisions.md` item 43). Gold trend and Gold daily
 engulf are measured against lines fixed in advance (the Forward record card on Council → Systems). If one stop line is

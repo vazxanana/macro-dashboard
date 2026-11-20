@@ -149,7 +149,7 @@ test('page: the card reads only fields forward.mjs writes, says the protocol is 
   // right under "Which systems trade live", in the Systems pane
   const sys = html.indexOf('id="ms-sys-book"'), fwd = html.indexOf('id="ms-fwd"'), edge = html.indexOf('id="ms-edge"'); assert.ok(sys < fwd && fwd < edge);
   assert.match(card, /Protocol adopted · 12 Nov 2026/); assert.match(card, /your decision 43<\/a>: “Yes to all”/); assert.doesNotMatch(card, /not adopted|proposed protocol/i);
-  assert.match(card, /The Mosha cycle, a main paper system since 11 Nov by your choice, is not part of the protocol's book and is not counted here\./);
+  assert.match(card, /The Mosha cycle \(live on paper 11-14 Nov by your choice, a paper shadow since\) is not part of the protocol's book and is not counted here\./);
   assert.match(js, /first one comes with the next Coach rebuild/);
   // every field the card reads exists in a reading
   const fw = buildForward({ trades: [T({})], snapshot: { markets: { xau: { price: 4000 } } }, mirrors: [], accounts: null, protocol: P }, { now: START + 2 * DAY });
