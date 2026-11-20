@@ -2974,7 +2974,11 @@ is listed as "Tested: failed" so it is not chased; a pass is never called an edg
 not a sell), regime, the veteran's levels and month call, the rule book's readings that are on, and the week's dated calls once
 issued. Macro desk section `#s-ahead` "Week ahead" (after Daily reports, TOC chip, folds on the phone), `renderAhead`, every string
 as text. Display only: no rule, size, call or trade reads it. Add a calendar rule only with a committed study. Test:
-`tests/week-ahead.test.mjs`.
+`tests/week-ahead.test.mjs`. **Nowcast beside the consensus** (20 Nov 2026, `prepFor`, `parseExp`): a CPI / PCE release with a
+calendar consensus and a Cleveland nowcast gets `prep` (core nowcast for a "Core" title, else headline; `side` above / below / in line
+under `IN_LINE` 0.05 points) with the Red folder study's average gold day move on past prints above / below consensus (only with
+`MIN_PREP` 6+ a side) and the caveats "a model's estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a
+tested edge"; one top line "Before <day>'s …" each. Test: `tests/week-ahead-prep.test.mjs`.
 
 ## Hard-to-find data (20 Nov 2026, owner: "Hard to find information will play a big role here, try to get it")
 `council/hard-data.mjs` (council.yml every 6th round, right BEFORE the veteran, `timeout 120`; → council-data `macro/hard-data.json`):
