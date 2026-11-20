@@ -1,8 +1,8 @@
-name: Gold forward records (research)
+name: Forward records (research)
 
-# Weekdays, free: the forward records of gold-vol-breakout's T1 and gold-pre-holiday's T1 (their PREREGISTRATION.md under
-# research/edge/gold-vol-breakout-forward and research/edge/gold-pre-holiday-forward) on OANDA mid M5 / H1 gold, saved to
-# council-data research/forward/gold-vol-breakout.json and gold-pre-holiday.json. Paper research only: nothing is traded,
+# Weekdays, free: the forward records of gold-vol-breakout's T1, gold-pre-holiday's T1 and turnaround-tuesday's R2 on NAS100 (their PREREGISTRATION.md under
+# research/edge/*-forward) on OANDA mid M5 / H1 candles, saved to
+# council-data research/forward/gold-vol-breakout.json, gold-pre-holiday.json and turnaround-tuesday.json. Paper research only: nothing is traded,
 # alerted or copied and no council member reads the files. The previous file is read back so the first crossing of a
 # checkpoint stands.
 on:
@@ -52,7 +52,9 @@ jobs:
           GGO_FROM: '2026-10-01T00:00:00Z'
         run: |
           mkdir -p "$RUNNER_TEMP/c" data/research/forward
-          node research/edge/gold-gap-open/fetch.mjs "$RUNNER_TEMP/c"
+          # up to now, not to midnight: a day counts once a later day has candles (PREREGISTRATION.md); stopping at midnight
+          # left the last complete day out (the 20 Nov run read through 18 Nov)
+          GGO_TO="$(date -u +%Y-%m-%dT%H:%M:%SZ)" node research/edge/gold-gap-open/fetch.mjs "$RUNNER_TEMP/c"
           node research/edge/gold-vol-breakout-forward/run.mjs "$RUNNER_TEMP/c" data/research/forward/gold-vol-breakout.json
 
       - name: Gold before US holidays, the forward record
@@ -60,10 +62,15 @@ jobs:
           node research/edge/gold-pre-holiday-forward/run.mjs fetch "$RUNNER_TEMP/h"
           node research/edge/gold-pre-holiday-forward/run.mjs run "$RUNNER_TEMP/h" data/research/forward/gold-pre-holiday.json
 
+      - name: Turnaround Tuesday on NAS100, the forward record
+        run: |
+          node research/edge/turnaround-tuesday-forward/run.mjs fetch "$RUNNER_TEMP/t"
+          node research/edge/turnaround-tuesday-forward/run.mjs run "$RUNNER_TEMP/t" data/research/forward/turnaround-tuesday.json
+
       - name: Save
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git -C data add research/forward
-          git -C data commit -q -m "Gold breakout forward record $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
+          git -C data commit -q -m "Forward records $(date -u +%Y-%m-%dT%H:%MZ)" || exit 0
           for j in 1 2 3 4 5; do git -C data pull -q --rebase origin council-data && git -C data push -q origin HEAD:council-data && break; sleep 7; done
