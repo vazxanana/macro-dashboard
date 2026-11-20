@@ -158,7 +158,7 @@ export function pricedLines(priced) {
   if (prints.length) out.push(`Priced for the next prints (Kalshi): ${prints.join('; ')}. ${PRICED_TAIL}`);
   const fed = (P.fed || []).filter((x) => x.likely);
   if (fed.length) out.push(`Priced for the Fed's target rate, upper bound (Kalshi): ${fed.map((x) => `after ${x.period ? x.period.replace(/\s20\d\d$/, '') : 'the meeting'} ${x.likely[0].v.toFixed(2)}% (${pct(x.likely[0].p)})`).join(', ')}. ${PRICED_TAIL}`);
-  const rest = [...(P.recession || []), one('gold')].filter(Boolean).map((x) => x.text);
+  const rest = [...(P.recession || []).filter((x) => x.p >= 0.05), one('gold')].filter(Boolean).map((x) => x.text);
   if (rest.length) out.push(`Also priced (Kalshi): ${rest.join('; ')}. ${PRICED_TAIL}`);
   return out;
 }
@@ -287,7 +287,7 @@ export function plumbingOf({ rates, rrp, tga, walcl, reserves, iorb }) {
   }
   return Object.keys(out).length ? out : null;
 }
-const bn = (v) => `$${Math.abs(v) >= 1000 ? (v / 1000).toFixed(2) + ' trillion' : Math.round(v) + ' billion'}`;
+const bn = (v) => `$${Math.abs(v) >= 1000 ? (v / 1000).toFixed(2) + ' trillion' : (Math.abs(v) < 10 ? (Math.round(v * 10) / 10) : Math.round(v)) + ' billion'}`;
 const chg = (v) => `${v >= 0 ? 'up' : 'down'} ${bn(Math.abs(v))}`;
 export function plumbingLines(p) {
   if (!p) return [];
@@ -417,7 +417,7 @@ export function board(hd, { goldPx = null } = {}) {
     const one = (k) => (P.items[k] || [])[0];
     const prints = ['coreCpi', 'cpi', 'corePce', 'payrolls', 'u3', 'gdp'].map(one).filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
     const fed = (P.items.fed || []).filter((x) => x.likely).map((x) => `The Fed's target rate after ${x.period}: most likely ${x.likely[0].v.toFixed(2)}% upper bound (${pct(x.likely[0].p)})${x.likely[1] && x.likely[1].p >= 0.1 ? `, then ${x.likely[1].v.toFixed(2)}% (${pct(x.likely[1].p)})` : ''}.`);
-    const rest = [...(P.items.recession || []), one('gold')].filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
+    const rest = [...(P.items.recession || []).filter((x) => x.p >= 0.05), one('gold')].filter(Boolean).map((x) => x.text.replace(/^./, (c) => c.toUpperCase()) + '.');
     add('priced', 'What traders price for the next prints', 'Kalshi prediction market', P, [...prints, ...fed, ...rest, PRICED_TAIL]);
   }
   const A = hd.auctionResults;

@@ -3119,6 +3119,35 @@ meeting / month / quarter only; nothing without an earlier reading); the Week ah
 Week ahead puts them on their day (`d.auctions`, text) and in the day line. Checked from a runner on 20 Nov 2026: TreasuryDirect's rows carry no `auctionDate` key, so the
 parser takes any "auction ... date" key; first read: 2-year $69bn (23 Nov), 5-year $70bn + 2-year FRN + 52-week bill (24 Nov), 7-year $44bn (25 Nov). Test: `tests/hard-data-auctions.test.mjs`.
 
+## Hard-to-find data, second batch (20 Nov 2026, owner: "More focus and effort on Hard-to-find data info and sources")
+`council/hard-sources.mjs` (no imports; pure parsers + `collectMore`, called at the end of `hard-data.mjs` `collect`, each part failing
+alone and keeping its last copy). About 80 candidate keyless sources were read once from a GitHub runner first (probe 3, taken out
+after use); what answered and is read every macro round into `macro/hard-data.json`:
+- `priced` (Kalshi `events?series_ticker=X&with_nested_markets=true`, `LADDERS`: KXCPICORE, KXCPI, KXPCECORE, KXPAYROLLS, KXU3, KXGDP,
+  KXFED (3 meetings), KXRECSSNBER, KXGOLDMON; 700 ms between calls, a runner got 429 after about 13 in a row): an "Above x" ladder
+  (`ladderOf`: price = middle of a bid / ask at most `WIDE` 0.15 apart, else the last trade; never rising with x) becomes the most
+  likely print and its chance where the print has a grid (`buckets`, step 0.1; the Fed's upper bound 0.25), else the ladder's middle
+  (`quantile`); fewer than `MIN_RUNGS` 3 priced rungs = not read. Always "what traders pay: not a consensus survey and not a forecast of ours".
+- `auctionResults` (TreasuryDirect `auctioned?days=150`; the day is `competitiveAuctionCloseDate`, shares from the
+  `indirectBiddersCompetitiveParAwarded`, `directBidders...` and `primaryDealers...` fields): notes, bonds, TIPS, FRNs of the last 10
+  days, each against the earlier auctions of its original tenor (`tenorOf`: a "9-Year 10-Month" reopening is a 10-year), "softer /
+  stronger" at `SOFT_BTC` 0.1 either way.
+- `plumbing` (NY Fed `rates/all/latest.json` and reverse-repo operations, Fiscal Data `operating_cash_balance` (the closing balance
+  sits in `open_today_bal`), FRED WALCL / WRESBAL / IORB): SOFR against the rate on reserves (5 bp or more over = "reserves getting
+  tighter"), net liquidity = balance sheet - Treasury cash - reverse repo, with its 4-week change. "A rough gauge, not a signal."
+- `vol` (Cboe `daily_prices/<ID>_History.csv`: GVZ, VIX1D, VIX9D, SKEW, VVIX, OVX; the OFR Financial Stress Index csv): GVZ as a
+  one-day move (divided by the square root of 252) with its place in the last 252 readings. "The size traders pay for, not a direction."
+- `under` (FRED: trimmed-mean PCE, sticky CPI, median CPI, wage tracker, one-year expected inflation, claims, WEI, term premium).
+`board(hd, { goldPx })` = titled groups `[{ k, title, src, at, lines }]` -> `week-ahead.json` `hard`, drawn by the Macro desk in the Week
+ahead as the fold `#wa-hard` (text, each group with its source and read time). `pricedFor(hd, type, t)` puts a ladder on its own
+release (same type, closing within 36 h) -> the release's `priced` and one top line; the morning report adds two priced lines and
+gold's implied day under "What we expect" and yesterday's / today's auction results under what happened. `hist` records the leading
+print and its chance (`priced`) and GVZ; `moves` says how that chance changed over a day and a week (kind `priced`). Answered 403 or
+unusable from a runner: Cboe delayed quotes and put/call, LBMA prices, GLD holdings (PDF / xlsx), iShares (HTML), the Atlanta Fed
+tracker (404). Answered but not used yet: BLS `bls.ics` and BEA `release_dates.json` (official release times), Polymarket economy
+tags, NY Fed primary-dealer and SOMA files, the 5-7 MB Cleveland year / quarter nowcast files. Context only: no rule, call or trade
+reads any of it. Tests: `tests/hard-sources.test.mjs`, `tests/hard-board.test.mjs`.
+
 ## Nowcast against consensus: a forward record (20 Nov 2026)
 `council/prep-record.mjs` (pure + `updateFile`; run by `veteran.mjs` `run()` right after the Week ahead is built → council-data
 `macro/prep-record.json` `{ v, label, records }`, append-only, written only on a change; a file that does not parse is never
