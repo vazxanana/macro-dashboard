@@ -612,8 +612,8 @@
     if (state.rendered) document.querySelectorAll('.row').forEach(function (r) { r.style.animation = 'none'; });
     decorate(); applySort(); applyFilter();
     state.rendered = true;
-    deepLink();
     forwardLive();
+    deepLink();
   }
 
   // a forward record (topic "<study>-forward") is refreshed every weekday into council-data research/forward/<study>.json; the

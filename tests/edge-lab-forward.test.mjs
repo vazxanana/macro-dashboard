@@ -13,7 +13,7 @@ test('the page reads research/forward/<study>.json only after /api/me names a me
   assert.match(block, /'\/cdata\/research\/forward\/' \+ f \+ '\.json'/);
   assert.match(block, /esc\(j\.verdict\)/, 'the verdict is escaped');
   assert.doesNotMatch(block, /localStorage|sessionStorage/);
-  assert.match(page, /deepLink\(\);\n {4}forwardLive\(\);/);
+  assert.match(page, /forwardLive\(\);\n {4}deepLink\(\);\n {2}\}/, 'render still ends with the deep link');
 });
 
 test('every forward-record study is refreshed by the workflow under the file name the page asks for', () => {
