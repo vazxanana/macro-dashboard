@@ -2449,6 +2449,40 @@ reads the block `// ---- split charts move together and share drawings` for orde
   640px)`), so the menu with Sync still opens on the screen at 360-430 px. Run with `MD_ORIGIN=https://aureumdesk.co.uk` while the
   workers.dev origin answers "OANDA_TOKEN not set" (17 Nov 2026).
 
+## ChronosTrade design pass (20 Nov 2026, the newer panels against the older ones)
+Display only, `backtest.html`: no engine, order, stop, account or replay code changed. Found on screenshots at 1440, 768 (touch) and
+390 px (touch, Simple and Full) in dark / light / midnight with a script that lists text under 12 px, touch targets under 44 px,
+text under AA and boxes past the screen. One CSS block `/* Design pass (20 Nov 2026)` … `/* end Design pass (20 Nov 2026) */`
+(after the right-click menu's rules, before the simple view's block; it never names `data-phone` or `.ps-`), three rules in the
+simple view's block, and two display lines of script. What was wrong, and the rule that keeps it right:
+- **The open-trades strip covered the quick Buy / Sell bar's prices** (and the toolbar once the live coach strip was on, and the
+  legend on a phone): it had a fixed `top` while the bar is placed by `drawOverlay`. That statement now also sets `--qt` on
+  `.chartc`; `.qpos { top: calc(var(--qt) + var(--qh)) }` (`--qh` = the bar's height + 5 px per pointer, `--qp` = the strip's).
+  **Never give `.qpos` a fixed top.** The legend ends before the bar from 701 px (it ran under it on a tablet; O / H / L go
+  under 830 px of card) and drops under the strip on a phone while a trade is open.
+- **Session plan**: three columns ran into each other in the Trade card; one row a limit (label, 96 px field).
+- **"Debrief" was a bare browser button** (`.lnk` had a style only inside `.qdef` and `.rules`): `.cr-score .lnk`. A new text
+  button needs its parent's `.lnk` rule (the test lists them).
+- **Dialogs**: `.hkd { max-width: 460px }` capped the report (760), debrief (640), battle (640) and teach (620) dialogs, so the
+  report cut "Max drawdown" short: each now sets its own `max-width`. Help ran 70 px past a phone's right edge with Close out of
+  reach: up to 520 px a `dialog.hkd` fits the screen and scrolls, and Help's keys stack in two columns. Actions keep an 8 px gap.
+  The battle dialog's Join is primary only once a code is typed (one primary a view).
+- **Full screen**: the live coach sat under the trade dock; from 701 px it stands at the lower left. A floating toolbar starts
+  clear of the legend and the drawing strip (default x 72 with the strip, y chart + 64; a saved position is untouched).
+- **Toasts** covered Sell / Buy of the Trade card at the bottom right: bottom centre from 761 px, `pointer-events: none`
+  (phones keep their one line over the header).
+- **Phone session line** (simple view): the title ran under the Battle button; it ends in an ellipsis and Battle is its icon (the
+  word stays in the button for assistive technology).
+- **Tokens and sizes**: the lens box is a well (`--au-well`; it was a dark slab in light); `<small>` in the position card, the
+  report head, the draft's fold and the heat-map legend was 10-11.7 px (12 now); key hints on Sell / Buy and Cancel at AA; the
+  risk field is level with Sell / Buy; the report head's rule is a hairline.
+- **Touch**: one `(pointer: coarse)` block gives 44 px to what the earlier passes missed: the draft form, risk chips, position
+  card, challenge card, journal filters / cells / sort heads, statistics chips and Monte Carlo fields, calendar arrows, export
+  buttons, every dialog button, tabs, the on-chart draft and position tags, the quick bar on a tablet, fold headings, the
+  header's Desk link. Left: the header switch (28 px high; the dots' width budget on a phone).
+- Audit note: an element or `fullPage` screenshot drops Playwright's touch emulation (`pointer: coarse` turns fine), so a touch
+  run takes viewport screenshots only. Tests: `tests/backtest-design-pass.test.mjs` (10).
+
 ## ChronosTrade battles, seconds charts, compact order bar (18 Nov 2026, owner: "make it more professional and easier … add 30s chart and 15s chart … allow battle with someone … max 4 people … live same chart … see the % profit"; then "the user can invite and the other player can accept")
 Paper only: no order, broker, council or ICT file is touched; no stop is ever moved further away.
 - **15 s and 30 s charts**: `api/bars.js` `TF` `15s` / `30s` (OANDA `S15` / `S30`), page `TFS` / `XLBL` / `XNAME` and the session form (a "Seconds" group), `BT.TF_SECS` starts at 15 (a 1m candle cut at :30 forms from 30 s candles; nothing finer than 15 s). A seconds session loads at most `DAYMAX` 2 days (15 s) / 4 days (30 s). Tests: `tests/oanda-symbols.test.mjs`, `tests/backtest.test.mjs` ("seconds charts").

@@ -635,6 +635,54 @@
 .cmenu button.danger span{color:var(--sell)}.cmenu button[disabled]{opacity:.45;cursor:default}
 @media (pointer:coarse){.cmenu button{min-height:44px}}
 @media (prefers-reduced-motion:reduce){.cmenu{animation:none}}
+  /* Design pass (20 Nov 2026): the newer panels (quick bar strip, live coach, coach for results, edge lens, plan, battle) set
+     against the older ones. Display only: no order, stop, account or replay code reads any of it. Rules to keep: the open-trades
+     strip is placed from the quick bar (--qt, --qh), never at a fixed top; a text button (.lnk) is always styled; on touch every
+     control of the page is 44 px (the one coarse block below); nothing here names the simple phone view. */
+  /* 1. the open-trades strip sits under the quick Buy / Sell bar wherever the bar is (--qt = the bar's top, set where the bar
+     is placed; --qh = the bar's height and a 5 px gap). It was at a fixed top and covered the bar's prices. */
+  .chartc { --qh: 44px; --qp: 34px; } @media (pointer: coarse) { .chartc { --qh: 53px; --qp: 52px; } .qtr .qb { min-height: 46px; } .qtr .qdrag { min-width: 44px; } }
+  .qpos { top: calc(var(--qt, 60px) + var(--qh)); width: max-content; max-width: calc(100% - 16px); white-space: nowrap; } .qpos button { flex: none; white-space: nowrap; }
+  /* 2. the legend ends before the quick bar (it ran under it from 701 to about 830 px of card), and on a phone it drops under
+     the open-trades strip while the strip shows */
+  @media (min-width: 701px) { body:not(.fs) .chartc:not(.nodata) .legend { max-width: max(150px, calc(100% - 418px - var(--mr, 0px))); }
+    @container cc (max-width: 830px) { body:not(.fs) .chartc:not(.nodata) .legend .lg-o > span:nth-child(-n+3) { display: none; } } }
+  @media (max-width: 700px) { body:not(.fs) .chartc:has(.qpos:not([hidden])) .legend { margin-top: calc(var(--qh) + var(--qp) + 8px); } }
+  /* 3. the session plan: one row a limit (three columns ran into each other in the Trade card) */
+  .pl-f > label:not(.full) { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr) 96px; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink); } .pl-f input:not([type="checkbox"]) { width: 100%; min-width: 0; }
+  .pl-f { padding-top: 2px; } .pl > summary { margin: 0; color: var(--ink); } .pl > summary small { font-weight: 500; }
+  /* 4. text buttons are styled wherever they stand ("Debrief" was a bare browser button) */
+  .cr-score .lnk { background: none; border: 0; padding: 2px 0; color: var(--au-accent); font-weight: 600; cursor: pointer; } .cr-score .lnk:hover { text-decoration: underline; } .cr-score .lnk.offer:hover { text-decoration: none; }
+  /* 5. the lens box and the plan are wells like the older inner cards; the leak card keeps a gap under the headline numbers */
+  .ln { background: var(--au-well); border-radius: 10px; } .lk { margin-top: 12px; }
+  /* 6. nothing under 12 px: <small> inherits "smaller" unless told */
+  .pos-h small, .rp-h small, .dr-more summary small, .bv-leg small { font-size: 12px; }
+  /* 7. key hints on filled buttons at AA */
+  .qb kbd { opacity: 1; } .qb .btn.buy kbd, .qb .btn.sell kbd { opacity: 1; background: rgba(0,0,0,.18); border-color: rgba(255,255,255,.5); }
+  .riskl input { min-height: 44px; }   /* level with Sell / Buy */
+  /* 8. dialog actions keep a gap; a dialog never leaves a phone's screen (Help ran 70 px past the right edge) */
+  .hkd .own-acts { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; } .deb .own-acts { margin-top: 12px; }
+  /* the wider dialogs get the width they ask for (.hkd capped every one at 460 px: the report cut "Max drawdown" short) */
+  .repd { max-width: min(96vw, 760px); } .deb { max-width: min(96vw, 640px); } .btd { max-width: min(640px, calc(100vw - 32px)); } .teachd { max-width: min(94vw, 620px); }
+  .rp-h { border-bottom: 1px solid var(--line-strong); }   /* a hairline, not a coloured rule */
+  .btd input:placeholder-shown + #bt-join { background: transparent; border-color: var(--line-strong); color: var(--ink); }   /* one primary a view: Join is primary once a code is typed */
+  @media (max-width: 520px) { dialog.hkd { box-sizing: border-box; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; }
+    #hk table, #hk tbody { display: block; } #hk tr { display: grid; grid-template-columns: 112px minmax(0, 1fr); column-gap: 10px; } #hk td:nth-child(odd) { white-space: normal; } #hk td[colspan] { grid-column: 1 / -1; } }
+  /* 9. full screen: the live coach stands at the lower left (the trade dock on the right covered it) */
+  @media (min-width: 701px) { body.fs .lc { right: auto; left: 64px; } }
+  /* 10. toasts at the bottom centre from 761 px: at the bottom right they covered Sell / Buy of the Trade card; taps pass through */
+  @media (min-width: 761px) { #toasts { right: auto; left: 50%; transform: translateX(-50%); width: max-content; max-width: min(440px, calc(100vw - 36px)); justify-items: center; pointer-events: none; } }
+  /* 11. a mouse on a narrow chart card: "Skip to the next day" in More is one line */
+  @container cc (max-width: 640px) { .tb.more-open .tb-ovf .tb-skip2 .ib.il { width: auto; padding: 0 10px 0 9px; gap: 6px; display: inline-flex; align-items: center; white-space: nowrap; } }
+  /* 12. touch: every control of the cards, tabs and dialogs is 44 px (the toolbar, the session form and the coach panels had it) */
+  @media (pointer: coarse) {
+    .tk input, .tk select, .tk .btn, #draft .btn.sm, #riskq .btn.sm, .pos-l input, .pos-l b, .pos-a .btn.sm, .pf-head select, .pf-head .btn, .pf-rules input, .pf-rules select,
+    .chips button, .jf input, .lk .btn.sm, .mc-f input, .mc-f select, .mc-f .btn, #tab-cal .mo .btn, #tab-data .btn, .hkd .btn, .tabs button, .tabs .rep-btn, .dchip button, .ptag button,
+    .jt td input, .jt td select, .jt th[data-k] button, .jgo, .shot-add, .qdef .lnk, .rules .lnk, .top a.back { min-height: 44px; }
+    .ptag button, .dchip button, #tab-cal .mo .btn, .jgo, .shot-add, .jt th[data-k] button, .qp .btn.sm, .pos-a .btn.sm, .pl-grade .chips button, .dchip .dgr button { min-width: 44px; } .jgo, .jt th[data-k] button { justify-content: center; } .top a.back { display: inline-flex; align-items: center; }
+    #how > summary, #acctcard details > summary, #pfcard details > summary, .vfold > summary, .allnum > summary { padding-block: 13px; margin-block: 0; } .dr-more summary { padding-block: 12px; }
+  }
+  /* end Design pass (20 Nov 2026) */
   /* Simple phone view (11 Nov 2026, owner: "On the mobile there's too much, we need a simpler version for the phone").
      The default on screens up to 640 px: html[data-phone="simple"], set in the head (localStorage ms-phone = "full" switches
      it off on that device). The chart, the replay row and Buy / Sell are the screen; the session is one line; the last
@@ -658,6 +706,8 @@
     html[data-phone="simple"] #sess.folded .sess-sum { flex: 1 1 0; min-width: 0; flex-wrap: nowrap; }
     html[data-phone="simple"] #sess.folded .sess-sum b { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     html[data-phone="simple"] #sess.folded .sess-sum .hint, html[data-phone="simple"] #sess.folded #strip-k { display: none; }
+    html[data-phone="simple"] #sess.folded .sess-sum b { max-width: 100%; }   /* 20 Nov 2026: the title ends in an ellipsis instead of running under Battle */
+    html[data-phone="simple"] #sess.folded .bt-open { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0; font-size: 0; } html[data-phone="simple"] #sess.folded .bt-open svg { width: 18px; height: 18px; margin: 0; } html[data-phone="simple"] #sess.folded .bt-open .dot { margin-left: 3px; }
     html[data-phone="simple"] #sess.folded #sess-toggle { min-height: 44px; border: 0; background: none; color: var(--ps-link); white-space: nowrap; }
     html[data-phone="simple"] #sess.folded .strip { margin: 0 8px 0 0; } html[data-phone="simple"] #sess.folded .prog { height: 3px; }
     html[data-phone="simple"] #sess:not(.ps-more) .ps-x { display: none !important; }
@@ -875,7 +925,7 @@
 
   // ---- toolbar position (owner, 8 Nov: "the play buttons should be at the top or movable"): top, floating (drag the grip), bottom ----
   function tbPlace(mode, save) { const tb = $('tb'), card = tb.parentElement, ch = $('chart'); mode = ['top', 'float', 'bottom'].includes(mode) ? mode : 'top'; tb.dataset.dock = mode; $('tb-dock').dataset.dock = mode; tb.classList.toggle('float', mode === 'float');
-    const pn = $('panes'); if (mode === 'top') card.insertBefore(tb, pn); else if (mode === 'bottom') card.insertBefore(tb, card.querySelector('details.how')); else { card.insertBefore(tb, pn); let pos = null; try { pos = JSON.parse(localStorage.getItem('btLab:tbPos') || 'null'); } catch (e) {} tbMove(pos ? pos.x : 24, pos ? pos.y : ch.offsetTop + 44); }
+    const pn = $('panes'); if (mode === 'top') card.insertBefore(tb, pn); else if (mode === 'bottom') card.insertBefore(tb, card.querySelector('details.how')); else { card.insertBefore(tb, pn); let pos = null; try { pos = JSON.parse(localStorage.getItem('btLab:tbPos') || 'null'); } catch (e) {} tbMove(pos ? pos.x : ($('dstrip').offsetWidth ? 72 : 24), pos ? pos.y : ch.offsetTop + 64); }
     if (mode !== 'float') { tb.style.left = ''; tb.style.top = ''; } $('tb-dock').title = `Toolbar: ${mode === 'top' ? 'top of the chart' : mode === 'bottom' ? 'under the chart' : 'floating, drag the dots'} · click to change`;
     if (save) { try { localStorage.setItem('btLab:tbDock', mode); } catch (e) {} } setTimeout(() => { overlay(); }, 0); }
   function tbMove(x, y) { const tb = $('tb'), card = tb.parentElement, mx = Math.max(8, card.clientWidth - tb.offsetWidth - 8), my = Math.max(8, card.clientHeight - tb.offsetHeight - 8); x = Math.min(Math.max(8, x), mx); y = Math.min(Math.max(8, y), my); tb.style.left = x + 'px'; tb.style.top = y + 'px'; return { x, y }; }
@@ -1102,7 +1152,7 @@
   const ov = $('ov'); let ovQ = false; const overlay = () => { if (ovQ) return; ovQ = true; requestAnimationFrame(drawOverlay); };
   const OG = { k: '', sw: 0 }, OVS = { conn: 0, lbl: 0, handles: 0, sess: 0, dh: 0 }; let OVW = 0, HL = null, HS = -1, SEL = -1; // HL: the draggable line under the pointer; HS / SEL: the drawing hovered / selected
   function drawOverlay() { ovQ = false; const host = $('chart'), W = chart.timeScale().width(), Hh = host.clientHeight; if (!W) return; const ct = host.offsetTop, cl = host.offsetLeft, dpr = devicePixelRatio, gk = [W, Hh, ct, cl, dpr, !!S.bars.length].join();
-    if (gk !== OG.k) { OG.k = gk; ov.style.top = ct + 'px'; ov.style.left = cl + 'px'; $('legend').style.top = (ct + 6) + 'px'; $('legend').style.left = (cl + 8) + 'px'; ov.style.width = W + 'px'; ov.style.height = Hh + 'px'; ov.width = W * dpr; ov.height = Hh * dpr; $('qtr').style.top = (ct + 10) + 'px'; $('pnlpill').style.right = Math.max(0, host.parentElement.clientWidth - cl - W + 6) + 'px'; watermark();
+    if (gk !== OG.k) { OG.k = gk; ov.style.top = ct + 'px'; ov.style.left = cl + 'px'; $('legend').style.top = (ct + 6) + 'px'; $('legend').style.left = (cl + 8) + 'px'; ov.style.width = W + 'px'; ov.style.height = Hh + 'px'; ov.width = W * dpr; ov.height = Hh * dpr; $('qtr').style.top = (ct + 10) + 'px'; host.closest('.chartc').style.setProperty('--qt', (ct + 10) + 'px'); $('pnlpill').style.right = Math.max(0, host.parentElement.clientWidth - cl - W + 6) + 'px'; watermark();
       const st = $('dstrip'); if (st) { st.style.left = (cl + 6) + 'px'; st.style.top = (ct + 54) + 'px'; OG.sw = st.offsetWidth ? st.offsetWidth + 6 : 0; } }
     const x = ov.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, Hh); OVW = W; OVS.conn = OVS.lbl = OVS.handles = OVS.sess = OVS.dh = 0;
     const ts = chart.timeScale(), y = (p) => series.priceToCoordinate(p), PH = Math.max(40, Hh - (ts.height() || 0)); if (!S.bars.length) { pnlPill(); return; }
