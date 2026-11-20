@@ -5070,6 +5070,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   2x cost +0.050R; 40 of 40 placebos). With 2016-26 (+0.063R, t 2.50) it holds in both stretches of OANDA history. Limits:
   today's demo cost charged on old years, OANDA mid candles (not broker ticks), drawdowns of 20-42R. A candidate for a forward
   paper record only (its own pre-registration); never a live rule without the owner. Nothing live changed.
+- `yen-crosses-vol-breakout` (pre-registered 20 Nov 2026): is USD/JPY's T1 result a yen effect? T1 on EUR/JPY, GBP/JPY, AUD/JPY,
+  CAD/JPY, CHF/JPY 2005 → now, same cost. **FAIL** on the pool: +0.021R a trade net (n 21,088, month t 1.64; 2x cost −0.004R),
+  positive in both windows and 40 of 40 placebos beaten, so a faint tilt, not an edge. GBP/JPY alone clears its checks (+0.050R,
+  t 2.63, Holm p 0.020), CHF/JPY loses. By the pre-registered reading USD/JPY's result stands alone (one market of eleven); its
+  forward record is the judge. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
