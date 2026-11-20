@@ -5132,6 +5132,10 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
 - USD/JPY T1's risk profile (20 Nov 2026, accounting, `research/proposals/2026-11-20-usdjpy-risk.md`, from the forward baseline,
   2016-26, in sample): +131.7R, worst drawdown 33.8R (Dec 2022 - Oct 2023), 574 days below a high, 3 losing years (2023 −15.4R).
   At 0.25 % a trade about +3 % a year with an 8.4 % drawdown. No verdict.
+- `yen-gold` (pre-registered 20 Nov 2026): the macro skill's "falling USD/JPY helps gold": a 4-week USD/JPY move over 2 %, then
+  gold's next 20 sessions (OANDA daily, 1,013 weeks 2007-26). **FAIL, 0 of 2**: yen strong t 0.96 (gold +0.9 % vs +0.5 % on all
+  weeks), yen weak t −0.91; both the claimed way, halves agree in sign, neither close. A faint lean at most; the Gold Macro Score
+  and the driver stack's carry row are unchanged. Nothing live changed.
 - `usdjpy-vol-breakout-forward` (pre-registered 20 Nov 2026): T1 on USD/JPY on days from 2026-11-20 (after every candle the two
   USD/JPY studies read), same pre-set cost, against month-block bands of the 2016-26 trades (`baseline.json`, gated n 2,079 /
   +0.063R) with the gold forward record's readings, checkpoints 120 / 240 (first crossing stands). `vb-forward.yml` writes council-data
