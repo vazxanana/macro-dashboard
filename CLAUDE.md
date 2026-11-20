@@ -1277,6 +1277,10 @@ problem: n files", 2 checks in a row, 12 h reminder) unless the issue is `quiet`
 state, mt5 csv, ICT, health.json); warn shows; note is a standing gap listed only. The loop's data check flags a watchdog.json older
 than 3 h (pages at 12 h), so loop and watchdog watch each other. Thresholds are monitoring only, never trading rules. Tests:
 `tests/datahealth.test.mjs`.
+**20 Nov 2026**: an open trade whose stop has moved past its entry (break-even, trail) is judged against the risk it opened with
+(`r0`): a stop further from the entry than `r0` is flagged ("further from the entry than the opening risk", rule 1); the plain
+"stop not over / under the entry" check stays for pending orders and trades without `r0` (it flagged a Mosha BO shadow sell whose
+trail had locked profit).
 
 ## council-data sync and safe writes (9 Nov 2026, reliability audit)
 Every pull / save of council-data in council.yml (round, quick pass, account minute) and watchdog.yml goes through
