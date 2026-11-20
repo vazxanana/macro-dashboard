@@ -3044,6 +3044,19 @@ on the first read after the release. No page shows it yet; no rule, call or trad
 
 `prepFor` gives no prep to a year-on-year title (the nowcast is month on month); the Macro desk shows the record's one line in the Week ahead's note (`#wa-note`).
 
+## Nowcast against consensus on 2022-24 (20 Nov 2026, `research/edge/nowcast-vs-consensus`, pre-registered)
+The question the forward record needs a year for, asked offline on the 36 US CPI releases of 2022-24: the veteran batch's
+first-print ledger with the Cleveland nowcast dated the day before each release (`cpi-model-benchmark-inputs-2022-2024.json`,
+`forecasts.C`; NOT an authenticated real-time vintage: `model_original_delivery_authenticated` false on all 36) joined by release
+date to `council/consensus-history.json`. Lean = nowcast against consensus with `IN_LINE` 0.05; print to one decimal; a print on
+the consensus is not judged; exact two-sided binomial against 50%; bar: 20+ judged, p < 0.05, above 50% in both 18-release
+halves. A direction-of-surprise test, not a trade (no costs). **INCONCLUSIVE**: core CPI 8 of 13 judged (62%, p 0.58; halves
+5 of 8 and 3 of 5); the nowcast leaned on 19 of 36 releases and 6 of those printed on the consensus. Headline (secondary, no
+verdict) 5 of 12 (p 0.77). The lean was one-sided: 17 of 19 core leans were ABOVE the consensus, so "above" was the usual
+state in those years, not that month's signal. `council/week-ahead.mjs` `PREP_STUDY` (a constant; the test compares it with
+result.json) adds the study's sentence to the prep text of a core CPI row and `prep.study`; never on headline CPI or PCE rows.
+Nothing live changed. Never quote 8 of 13 as the nowcast "working". Test: `tests/nowcast-vs-consensus.test.mjs`.
+
 ## Review of the 20 Nov macro work (20 Nov 2026)
 A read-only review of the day's diff found six defects of wording or scoring, none a crash; all fixed. (1) `prep-record.mjs`: a
 print ON the consensus is not judged (`hit: null`; core PCE printed on it in about half of past releases, so counting it a miss

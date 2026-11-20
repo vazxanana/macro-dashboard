@@ -293,6 +293,11 @@ export function nowcastFor(hd, r) {
 // the consensus (left out under MIN_PREP releases on either side). A model's estimate against a calendar consensus: no forecast,
 // no call, no rule reads it.
 export const IN_LINE = 0.05, MIN_PREP = 6;
+// The pre-registered look-back (research/edge/nowcast-vs-consensus, 20 Nov 2026, INCONCLUSIVE): on the 36 CPI releases of 2022-24,
+// did the core print land on the side the nowcast leaned to? Shown on the core CPI row only (the study's primary measure).
+// A constant so the bundle needs no file; tests/nowcast-vs-consensus.test.mjs compares it with the study's result.json.
+export const PREP_STUDY = { study: 'nowcast-vs-consensus', verdict: 'INCONCLUSIVE', hits: 8, n: 13, p: 0.58,
+  text: "In 2022-24 the nowcast's side matched the print on 8 of 13 judged core CPI releases (two-sided binomial p 0.58): too few judged releases to say." };
 export function parseExp(x) {
   if (x == null) return null;
   const m = String(x).replace(/−/g, '-').match(/^\s*([+-]?\d+(?:\.\d+)?)\s*%?\s*$/);
@@ -315,9 +320,11 @@ export function prepFor(r, nc, record) {
   // the Red folder study sorts its above / below days by the CORE figure's surprise: shown on the core row only
   const hist = core && A && B && A.n >= MIN_PREP && B.n >= MIN_PREP && Number.isFinite(A.gold) && Number.isFinite(B.gold)
     ? ` On past ${kind} releases that printed above consensus gold averaged ${sg(A.gold)} on the day (n ${A.n}); below, ${sg(B.gold)} (n ${B.n}).` : '';
-  const text = lead + hist + ' A model\'s estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a tested edge.';
+  const study = core && r.type === 'CPI' ? PREP_STUDY : null;
+  const text = lead + hist + (study ? ' ' + study.text : '') + ' A model\'s estimate, not a forecast; a calendar consensus, not a survey; descriptive, not a tested edge.';
   const short = side === 'in line' ? `nowcast ${sg(fig)} in line with the ${r.exp} consensus` : `nowcast ${sg(fig)} ${side} the ${r.exp} consensus`;
-  return { core, nowcast: fig, consensus: cons, gap, side, record: hist ? { above: { n: A.n, gold: A.gold }, below: { n: B.n, gold: B.gold } } : null, text, short };
+  return { core, nowcast: fig, consensus: cons, gap, side, record: hist ? { above: { n: A.n, gold: A.gold }, below: { n: B.n, gold: B.gold } } : null,
+    study: study ? { study: study.study, verdict: study.verdict, hits: study.hits, n: study.n, p: study.p } : null, text, short };
 }
 
 // The plan: { at, from, to, next, days: [...], frame, calls, lines, note }.
