@@ -525,6 +525,9 @@ async function startServer(port = PORT, flags = []) {
     // ---- 11g. Session training: notes on a missed opportunity and a right wait, verdicts, save, resume, end ----
     const ms0 = reqs.length; await tab('session', '#ss-start'); await p.waitForFunction(() => /train setups? in this range/.test(document.getElementById('ss-count').textContent), null, { timeout: 15000 });
     const lastDay = iso(cands[cands.length - 1].t), dayCands = cands.filter((c) => iso(c.t) === lastDay);
+    // the saved-sessions list is filled by its own API call after the count line appears (20 Nov 2026: read too early, the
+    // check failed twice in one CI run while its message, read a moment later, showed the right text)
+    await p.waitForFunction(() => document.getElementById('ss-saved').textContent.trim().length > 0, null, { timeout: 15000 });
     check('Session: the default range is the day of the latest setup; an empty list of saved sessions says when one appears', (await p.inputValue('#ss-from')) === lastDay && (await p.inputValue('#ss-to')) === lastDay && (await txt(p, '#ss-count')).startsWith(`${dayCands.length} train setup`) && /No saved session yet/.test(await txt(p, '#ss-saved')), `${await p.inputValue('#ss-from')}..${await p.inputValue('#ss-to')} (want ${lastDay}, ${dayCands.length}) ${await txt(p, '#ss-count')} | saved: ${(await txt(p, '#ss-saved')).slice(0, 160)}`);
     await p.selectOption('#ss-speed', '100'); await p.click('#ss-start'); await p.waitForSelector('#ss-live:not([hidden])', { timeout: 60000 });
     check('Session: the replay is ready, paused at the start, with the running thesis', await vis(p, '#ss-chart canvas') && (await txt(p, '#ss-state')) === 'paused' && /^Bias \w+\. Expecting /.test(await txt(p, '#ss-thesis-line')) && /0 decisions/.test(await txt(p, '#ss-summary-text')), await txt(p, '#ss-thesis-line'));
