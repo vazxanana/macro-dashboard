@@ -174,3 +174,7 @@ the 2007-15 pass as a money machine.
 
 Sources: `research/edge/<topic>/RESULT.md` and `result.json` on each branch named above (PRs #1046, #1049, #1051,
 #1056-#1062, #1067, #1068), as of 14 Nov 2026.
+
+**Update, 20 Nov 2026.** The rule's forward record now runs on its own (`research/edge/gold-vol-breakout-forward`, pre-registered,
+research only): every weekday's T1 trade from 13 Nov 2026 on, after the measured cost, against a band fixed in advance, read at
+120 and 240 trades. It trades nothing; the choice above (item 62) is still yours.
