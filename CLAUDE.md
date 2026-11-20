@@ -4939,6 +4939,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   21:00 UTC), 24 Nov 2023 - 12 Nov 2026: **PASS**, +0.184R a trade after commission, n 572, month t 3.54 (OANDA mid +0.192R before
   costs); entry slippage $0.07 median, 0.011R. In-sample years (not new evidence); the ten best trades carry 55 %, 2024 +0.07R.
   21:00 UTC is gold's daily break on US summer-time days: the probe's marks take `PROBE_MARKS_BACK` (workflow input `marks_back`).
+- `gold-vol-breakout-forward` (pre-registered 20 Nov 2026): T1's forward record on days from 13 Nov 2026 (after every candle
+  any study read), cost = hourcost's C1 frozen, against a month-block band from the 2021-26 C1 trades (`baseline.json`, gated
+  n 1121 / +0.105R / t 2.79). Readings: too few under 20, below the measured range (A p5), ahead of a no-edge rule (B p95);
+  checkpoints at 120 (fails / holds so far) and 240 trades (confirmed / fails / not shown); the first crossing stands.
+  `vb-forward.yml` (Tue-Sat 04:41 UTC) writes council-data `research/forward/gold-vol-breakout.json`. Nothing trades.
 - `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
