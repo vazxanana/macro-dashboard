@@ -32,7 +32,7 @@ export function charge(t, sE, sX, slipPips = 0) {
   return { net: t.R - cost / t.r0, costPips: cost / pip };
 }
 export function statsOf(T) {
-  const net = T.map((x) => x.net), months = monthSums(T.map((x) => ({ F: x.F, net: x.net })));
+  const net = T.map((x) => x.net), months = [...monthSums(T.map((x) => ({ F: x.F, net: x.net }))).values()];   // the frozen stats' convention: the months that hold a trade
   return { n: T.length, net: r4(mean(net)), gross: r4(mean(T.map((x) => x.R))), tTrades: r4(tOf(net)), tMonth: r4(tOf(months)), months: months.length, won: r4(T.filter((x) => x.net > 0).length / (T.length || 1)) };
 }
 

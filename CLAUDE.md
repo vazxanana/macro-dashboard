@@ -4919,3 +4919,14 @@ that cost + 0.05 × M stop slippage T1 nets +0.105R a trade on 2021-26 (n 1,121,
 past years charged today's relative spread). The owner's decision is still the 14 Nov proposal (a forward paper / demo record,
 whose first job is the stop-order slippage). Test: `tests/gold-vol-breakout-hourcost.test.mjs`.
 `marks` (fx-weekend-gap-exec) = the quote at given moments from a JSON file named by the workflow input `marks` (`PROBE_MARKS`, { SYMBOL: [unix sec] }, at most 600 a symbol). A symbol may name its parts (`USDJPY:gotobi`; depth is always read): `gotobi` = the bid, ask and spread at 00:55:00 and 06:00:00 UTC of every gotobi day inside the history (`council/gotobi-calendar.mjs`), for `research/edge/gotobi-exec`. Test: `tests/tick-probe.test.mjs` (fake broker).
+
+## Measured-cost studies of 20 Nov 2026 (tick probe)
+Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live changed. Results, each pre-registered before its data:
+- `gold-release-quotes`: gold's spread at T+5 s after US CPI / payrolls / FOMC is about 18× normal ($1.48 median), the widest
+  in minute T $6.71 (p90 $19); the news register's N4 continuation / reversal from T+5 to T+60 both FAIL (n 93).
+- `silver-vol-breakout-hourcost`: the demo quotes silver at about $0.02 (20× gold's relative cost); the failed silver breakout
+  holds in 0 of 4 checks.
+- `gotobi-exec`: USD/JPY at the fix costs 0.81 pip a round trip with commission (assumed 2.0); on executable quotes T2 made
+  +0.163R a trade over 211 gotobi days, month t 1.80 (FAIL on its bar; the cost no longer threatens the study's result).
+- `fx-weekend-gap-exec`: the Sunday reopen costs about 11 pips of spread at Rule G's entry minute, and on 237 of 488 weekends
+  this broker was not quoting yet; on the rest Rule G nets +0.165R (month t 1.52, FAIL). Not tradable as written on this account.
