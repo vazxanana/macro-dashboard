@@ -81,14 +81,14 @@ test('recordOf: the replay up to the first forward trade, then the forward recor
 });
 
 test('buildDecay: one row per system from the baseline file; decaying / watch list only live systems; inputs untouched', () => {
-  // 11 Nov 2026 (owner, supported-book): the replica is a paper shadow like crypto trend; Gold trend is one of the two live systems
+  // 11 Nov 2026 (owner, supported-book): the replica became a paper shadow; 20 Nov 2026 (owner, replica-live) it is live again
   const base = { at: 'x', systems: { replica: { ...B, src: 'test' }, gtrend: { ...B, src: 'test' }, trend: { ...B, src: 'test' } } };
   const bad = []; for (const k of ['replica', 'gtrend', 'trend']) for (let i = 0; i < 40; i++) bad.push(rp(k, i, -1));
   const D = { trades: [], research: [], ictTrades: [], replay: { trades: bad }, ictReplay: null }, before = JSON.stringify(D);
   const out = buildDecay(D, { now: T0 + 100 * DAY, base });
   assert.equal(JSON.stringify(D), before, 'the monitor writes nothing back into the records');
-  assert.deepEqual(out.systems.map((s) => [s.id, s.status, s.live, s.shadowSince || null]), [['replica', 'decaying', false, '2026-11-11'], ['gtrend', 'decaying', true, null], ['trend', 'decaying', false, '2026-11-07']]);
-  assert.deepEqual(out.decaying, ['gtrend'], 'the replica and crypto trend are shadows: shown, not alerted');
+  assert.deepEqual(out.systems.map((s) => [s.id, s.status, s.live, s.shadowSince || null]), [['replica', 'decaying', true, null], ['gtrend', 'decaying', true, null], ['trend', 'decaying', false, '2026-11-07']]);
+  assert.deepEqual(out.decaying, ['replica', 'gtrend'], 'crypto trend is a shadow: shown, not alerted');
   assert.match(out.rule, /never changes a rule/);
   assert.match(buildDecay(D, { base: null }).error, /no baseline/);
 });
