@@ -2992,6 +2992,11 @@ rule, call or trade. First readings (20 Nov 2026): 9 Dec FOMC hike 25 bp 92% (Ka
 +0.27%, headline +0.31%; GDPNow Q4 3.2%. Not usable from a runner on 20 Nov: GLD holdings (the CSV URL now serves a PDF), CME gold
 stocks (binary .xls), the Treasury's upcoming-auctions API (stale), Forex Factory's next-week file before the weekend (404). Test:
 `tests/hard-data.test.mjs`.
+**Treasury auctions** (20 Nov 2026): `auctions` = the notes, bonds, TIPS, FRNs and 52-week bill announced for yesterday to +14 days
+(`parseAuctions`, `auctionText`; other bills left out), from TreasuryDirect `TA_WS/securities/announced?format=json`, then
+`…/upcoming`, then the stale Fiscal Data file (the first with auctions in the window wins; all failing keeps the last copy); the
+Week ahead puts them on their day (`d.auctions`, text) and in the day line. Shapes not yet seen from a runner: the probe workflow
+prints them. Test: `tests/hard-data-auctions.test.mjs`.
 
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus

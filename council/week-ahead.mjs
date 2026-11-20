@@ -14,6 +14,7 @@ import { EVENTS } from './events.mjs';
 import { cmeYear, nyParts } from '../ict/calendar.mjs';
 import { isGotobi } from './gotobi-calendar.mjs';
 import { readStudy, studyRow, EDGE_DIR } from './research-ledger.mjs';
+import { auctionText } from './hard-data.mjs';
 
 const DAY = 86400;
 const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -175,6 +176,7 @@ function dayLine(d) {
   else if (d.market && d.market.kind === 'early') parts.push('early close');
   if (us.length) parts.push(us.map((r) => r.title.replace(/\s*\(.*\)$/, '')).filter((x, i, a) => a.indexOf(x) === i).slice(0, 3).join(', '));
   else if (hi.length) parts.push(hi.slice(0, 2).map((r) => `${r.country} ${r.title}`).join(', '));
+  if ((d.auctions || []).some((a) => a.type !== 'Bill')) parts.push(`Treasury ${d.auctions.filter((a) => a.type !== 'Bill').map((a) => `${a.term}${a.type === 'TIPS' ? ' TIPS' : a.type === 'FRN' ? ' FRN' : ''}`).join(', ')} auction`);
   if (!parts.length) parts.push('no major release scheduled');
   return parts.join(' · ');
 }
@@ -206,7 +208,9 @@ export function build({ now, cal, rf, fc, v, hd = null, dataDir = null, edgeDir 
     const rules = [];
     for (const R of RULES) { const why = R.when(d); if (!why) continue; const rr = rec(R); if (rr) rules.push({ topic: R.topic, when: why, what: R.what, ...rr }); }
     const fed = hd && hd.fed && Array.isArray(hd.fed.events) ? hd.fed.events.filter((e) => e.day === d).slice(0, 6) : [];
-    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules, fed };
+    // 20 Nov 2026: the US Treasury's announced auctions of that day (hard-data.mjs `auctions`), as plain text
+    const auctions = hd && hd.auctions && Array.isArray(hd.auctions.list) ? hd.auctions.list.filter((a) => a.day === d).slice(0, 6).map((a) => ({ ...a, text: auctionText(a) })) : [];
+    const day = { day: d, dow: DOW[dowOf(d)], market: marketNote(d), releases, rules, fed, auctions };
     day.line = dayLine(day); days.push(day);
   }
   const frame = frameOf(fc, v), calls = callsOf(v, W.from, W.to);

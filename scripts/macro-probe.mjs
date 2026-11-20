@@ -27,3 +27,14 @@ try { const { t } = await get('https://gamma-api.polymarket.com/public-search?q=
   for (const e of (J.events || []).slice(0, 6)) console.log('  poly', e.slug, '|', e.title, '| end', e.endDate, '| markets', (e.markets || []).map((m) => `${m.groupItemTitle || m.question}=${m.outcomePrices}`).join(' ; ').slice(0, 400)); } catch (e) { console.log('poly ERR', e.message); }
 try { const { t } = await get('https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/upcoming_auctions?sort=-auction_date&page[size]=15');
   const J = JSON.parse(t); console.log('== auctions', J.data.map((d) => `${d.auction_date} ${d.security_type} ${d.security_term} ${d.offering_amt}`).join(' | ')); } catch (e) { console.log('auction ERR', e.message); }
+// 20 Nov 2026: the Treasury auction sources council/hard-data.mjs reads (SRC.auctions): raw shape and what the parser keeps.
+{
+  const { SRC, parseAuctions } = await import('../council/hard-data.mjs');
+  const from = new Date(Date.now() - 86400e3).toISOString().slice(0, 10), to = new Date(Date.now() + 14 * 86400e3).toISOString().slice(0, 10);
+  for (const u of SRC.auctions) {
+    try { const { s, t } = await get(u); const J = JSON.parse(t.replace(/^﻿/, '')); const rows = Array.isArray(J) ? J : (J.data || []);
+      console.log('== auctions', u, s, 'rows', rows.length, 'first', JSON.stringify(rows[0] || null).slice(0, 600));
+      console.log('   kept', JSON.stringify(parseAuctions(J, from, to)).slice(0, 1500));
+    } catch (e) { console.log('auctions ERR', u, e.message); }
+  }
+}
