@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-20T02:33:28.000Z",
+ "at": "2026-11-20T03:31:41.000Z",
  "rule": "proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.",
  "inSample": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.",
  "windows": {
@@ -37,14 +37,14 @@
   },
   "shadow": {
    "d30": {
-    "n": 1010,
-    "net": 17.85,
-    "gross": 207.13
+    "n": 1011,
+    "net": 16.83,
+    "gross": 206.13
    },
    "all": {
-    "n": 1010,
-    "net": 17.85,
-    "gross": 207.13
+    "n": 1011,
+    "net": 16.83,
+    "gross": 206.13
    }
   }
  },
@@ -3136,26 +3136,26 @@
    "stopped": true,
    "windows": {
     "d7": {
-     "n": 5,
-     "wins": 3,
+     "n": 3,
+     "wins": 1,
      "losses": 2,
      "flat": 0,
-     "winRate": 0.6,
+     "winRate": 0.333,
      "gross": {
-      "sum": 3.89,
-      "mean": 0.778,
-      "t": 1.07
+      "sum": 0,
+      "mean": 0,
+      "t": 0
      },
      "net": {
-      "sum": 3.56,
-      "mean": 0.712,
-      "t": 0.96
+      "sum": -0.24,
+      "mean": -0.08,
+      "t": -0.08
      },
      "cost": {
-      "known": 5,
-      "sum": 0.33,
-      "perTrade": 0.066,
-      "shareOfGrossWins": 0.056
+      "known": 3,
+      "sum": 0.24,
+      "perTrade": 0.08,
+      "shareOfGrossWins": 0.12
      }
     },
     "d30": {
@@ -3691,7 +3691,7 @@
     "scalp|shadow|strong-market:xrp"
    ],
    "review": {
-    "head": "Scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 495 closed, 34% won, +114.20R before costs, +7.89R after (t 0.17); last 30 days +7.89R on 495, last 7 days +3.56R on 5.",
+    "head": "Scalp (shadow, no longer recorded since the shadow cut of 12 Nov): 495 closed, 34% won, +114.20R before costs, +7.89R after (t 0.17); last 30 days +7.89R on 495, last 7 days −0.24R on 3.",
     "working": [
      "after costs +7.89R on 495 trades (+0.02R a trade, t 0.17)",
      "target exits +415.70R on 166",
@@ -4582,26 +4582,26 @@
    "stopped": true,
    "windows": {
     "d7": {
-     "n": 9,
-     "wins": 9,
+     "n": 8,
+     "wins": 8,
      "losses": 0,
      "flat": 0,
      "winRate": 1,
      "gross": {
-      "sum": 18.27,
-      "mean": 2.03,
-      "t": 74.54
+      "sum": 16.41,
+      "mean": 2.051,
+      "t": 106.21
      },
      "net": {
-      "sum": 18.02,
-      "mean": 2.002,
-      "t": 68.48
+      "sum": 16.2,
+      "mean": 2.025,
+      "t": 97.41
      },
      "cost": {
-      "known": 9,
-      "sum": 0.25,
-      "perTrade": 0.028,
-      "shareOfGrossWins": 0.014
+      "known": 8,
+      "sum": 0.21,
+      "perTrade": 0.026,
+      "shareOfGrossWins": 0.013
      }
     },
     "d30": {
@@ -5083,7 +5083,7 @@
     "intraday|shadow|exit-runs"
    ],
    "review": {
-    "head": "Intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 96 closed, 49% won, +56.07R before costs, +48.30R after (t 2.86); last 30 days +48.30R on 96, last 7 days +18.02R on 9.",
+    "head": "Intraday (shadow, no longer recorded since the shadow cut of 12 Nov): 96 closed, 49% won, +56.07R before costs, +48.30R after (t 2.86); last 30 days +48.30R on 96, last 7 days +16.20R on 8.",
     "working": [
      "after costs +48.30R on 96 trades (+0.50R a trade, t 2.86)",
      "target exits +102.41R on 47",
@@ -5241,6 +5241,506 @@
      "exit": "target",
      "mfe": 0.74,
      "session": "overlap"
+    }
+   ]
+  },
+  {
+   "key": "m30m1|shadow",
+   "id": "m30m1",
+   "k": "m30m1",
+   "name": "M30 → M1 scalp",
+   "book": "shadow",
+   "src": "trades",
+   "variant": null,
+   "ownerShadow": false,
+   "retired": false,
+   "stopped": false,
+   "windows": {
+    "d7": {
+     "n": 30,
+     "wins": 11,
+     "losses": 19,
+     "flat": 0,
+     "winRate": 0.367,
+     "gross": {
+      "sum": 2.68,
+      "mean": 0.089,
+      "t": 0.32
+     },
+     "net": {
+      "sum": 1.98,
+      "mean": 0.066,
+      "t": 0.24
+     },
+     "cost": {
+      "known": 30,
+      "sum": 0.7,
+      "perTrade": 0.023,
+      "shareOfGrossWins": 0.032
+     }
+    },
+    "d30": {
+     "n": 46,
+     "wins": 16,
+     "losses": 30,
+     "flat": 0,
+     "winRate": 0.348,
+     "gross": {
+      "sum": 8.39,
+      "mean": 0.182,
+      "t": 0.66
+     },
+     "net": {
+      "sum": 6.91,
+      "mean": 0.15,
+      "t": 0.54
+     },
+     "cost": {
+      "known": 46,
+      "sum": 1.48,
+      "perTrade": 0.032,
+      "shareOfGrossWins": 0.038
+     }
+    },
+    "all": {
+     "n": 46,
+     "wins": 16,
+     "losses": 30,
+     "flat": 0,
+     "winRate": 0.348,
+     "gross": {
+      "sum": 8.39,
+      "mean": 0.182,
+      "t": 0.66
+     },
+     "net": {
+      "sum": 6.91,
+      "mean": 0.15,
+      "t": 0.54
+     },
+     "cost": {
+      "known": 46,
+      "sum": 1.48,
+      "perTrade": 0.032,
+      "shareOfGrossWins": 0.038
+     }
+    }
+   },
+   "whereR": {
+    "exits": {
+     "target": {
+      "n": 16,
+      "net": 38.31
+     },
+     "stop": {
+      "n": 30,
+      "net": -31.4
+     }
+    },
+    "fastStops": {
+     "n": 14,
+     "ofLosses": 30,
+     "share": 0.467,
+     "net": -14.9,
+     "within": "30 minutes of the fill"
+    },
+    "reached1R": {
+     "withMfe": 43,
+     "n": 25,
+     "closedAtLoss": 10,
+     "lossNet": -10.69
+    },
+    "giveback": {
+     "n": 25,
+     "mean": 0.954,
+     "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
+    },
+    "lock1R": {
+     "n": 43,
+     "mean": -0.059,
+     "t": -0.24,
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
+    },
+    "targetAfterStop": {
+     "n": 13,
+     "ofLosses": 30,
+     "note": "losses whose target was reached after the stop (post-mortem)"
+    }
+   },
+   "splits": {
+    "session": [
+     {
+      "v": "asia",
+      "n": 13,
+      "mean": 0.378,
+      "sum": 4.91,
+      "t": 0.86,
+      "rest": {
+       "n": 33,
+       "mean": 0.061
+      },
+      "vsRest": {
+       "diff": 0.317,
+       "t": 0.57,
+       "df": 27.66,
+       "p": 0.575
+      }
+     },
+     {
+      "v": "late",
+      "n": 5,
+      "mean": 0.404,
+      "sum": 2.02,
+      "t": 0.46,
+      "rest": {
+       "n": 41,
+       "mean": 0.119
+      },
+      "vsRest": null
+     },
+     {
+      "v": "london",
+      "n": 6,
+      "mean": 0.39,
+      "sum": 2.34,
+      "t": 0.27,
+      "rest": {
+       "n": 40,
+       "mean": 0.114
+      },
+      "vsRest": null
+     },
+     {
+      "v": "newyork",
+      "n": 13,
+      "mean": 0.376,
+      "sum": 4.89,
+      "t": 0.79,
+      "rest": {
+       "n": 33,
+       "mean": 0.061
+      },
+      "vsRest": {
+       "diff": 0.315,
+       "t": 0.54,
+       "df": 24.64,
+       "p": 0.596
+      }
+     },
+     {
+      "v": "overlap",
+      "n": 9,
+      "mean": -0.806,
+      "sum": -7.25,
+      "t": -3.49,
+      "rest": {
+       "n": 37,
+       "mean": 0.383
+      },
+      "vsRest": null
+     }
+    ],
+    "hours": [
+     {
+      "v": "00-04",
+      "n": 9,
+      "mean": 1.334,
+      "sum": 12.01,
+      "t": 2.98,
+      "rest": {
+       "n": 37,
+       "mean": -0.138
+      },
+      "vsRest": null
+     },
+     {
+      "v": "04-08",
+      "n": 5,
+      "mean": -1.022,
+      "sum": -5.11,
+      "t": -139.08,
+      "rest": {
+       "n": 41,
+       "mean": 0.293
+      },
+      "vsRest": null
+     },
+     {
+      "v": "08-12",
+      "n": 6,
+      "mean": 0.39,
+      "sum": 2.34,
+      "t": 0.27,
+      "rest": {
+       "n": 40,
+       "mean": 0.114
+      },
+      "vsRest": null
+     },
+     {
+      "v": "12-16",
+      "n": 9,
+      "mean": -0.806,
+      "sum": -7.25,
+      "t": -3.49,
+      "rest": {
+       "n": 37,
+       "mean": 0.383
+      },
+      "vsRest": null
+     },
+     {
+      "v": "16-20",
+      "n": 9,
+      "mean": 0.142,
+      "sum": 1.28,
+      "t": 0.24,
+      "rest": {
+       "n": 37,
+       "mean": 0.152
+      },
+      "vsRest": null
+     },
+     {
+      "v": "20-24",
+      "n": 8,
+      "mean": 0.455,
+      "sum": 3.64,
+      "t": 0.73,
+      "rest": {
+       "n": 38,
+       "mean": 0.086
+      },
+      "vsRest": null
+     }
+    ],
+    "side": [
+     {
+      "v": "buy",
+      "n": 16,
+      "mean": -0.861,
+      "sum": -13.77,
+      "t": -4.54,
+      "rest": {
+       "n": 30,
+       "mean": 0.689
+      },
+      "vsRest": {
+       "diff": -1.55,
+       "t": -3.67,
+       "df": 40.5,
+       "p": 0.001
+      }
+     },
+     {
+      "v": "sell",
+      "n": 30,
+      "mean": 0.689,
+      "sum": 20.68,
+      "t": 1.83,
+      "rest": {
+       "n": 16,
+       "mean": -0.861
+      },
+      "vsRest": {
+       "diff": 1.55,
+       "t": 3.67,
+       "df": 40.5,
+       "p": 0.001
+      }
+     }
+    ],
+    "market": [],
+    "exit": [
+     {
+      "v": "target",
+      "n": 16,
+      "sum": 38.31
+     },
+     {
+      "v": "stop",
+      "n": 30,
+      "sum": -31.4
+     }
+    ]
+   },
+   "slippage": {
+    "n": 44,
+    "mean": -0.146,
+    "t": -2.75,
+    "worse": 5,
+    "note": "fill minus the council entry in R, positive = worse"
+   },
+   "reviews": {
+    "reviewed": 0,
+    "tags": {}
+   },
+   "decay": null,
+   "expect": null,
+   "flags": [
+    "m30m1|shadow|weak-side:buy",
+    "m30m1|shadow|strong-side:sell"
+   ],
+   "review": {
+    "head": "M30 → M1 scalp (shadow): 46 closed, 35% won, +8.39R before costs, +6.91R after (t 0.54); last 30 days +6.91R on 46, last 7 days +1.98R on 30.",
+    "working": [
+     "after costs +6.91R on 46 trades (+0.15R a trade, t 0.54)",
+     "target exits +38.31R on 16",
+     "demo copies filled 0.15R a trade better than paper (n 44, t −2.75)",
+     "sells: 30 trades at +0.69R a trade against −0.86R for the other 16 (difference +1.55R, t 3.67)"
+    ],
+    "losing": [
+     "stop exits −31.40R on 30",
+     "costs −1.48R (+0.03R a trade, 4% of the gross wins)",
+     "14 of 30 losses stopped within 30 minutes of the fill (−14.90R)",
+     "10 of 25 trades that reached +1R closed at a loss (−10.69R)",
+     "13 losses saw the target reached after the stop"
+    ]
+   },
+   "recent": [
+    {
+     "id": "xau-m30m1-1795029098",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795029120,
+     "t": 1795044300,
+     "R": -1,
+     "net": -1.01,
+     "exit": "stop",
+     "mfe": 0.57,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-m30m1-1795023727",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795023780,
+     "t": 1795048920,
+     "R": -1,
+     "net": -1.02,
+     "exit": "stop",
+     "mfe": 1.95,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-m30m1-1795051665",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795052340,
+     "t": 1795056960,
+     "R": 2.13,
+     "net": 2.12,
+     "exit": "target",
+     "mfe": 2.09,
+     "session": "asia"
+    },
+    {
+     "id": "xau-m30m1-1795097554",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795097640,
+     "t": 1795102140,
+     "R": 1.05,
+     "net": 1.04,
+     "exit": "target",
+     "mfe": 0.91,
+     "session": "overlap"
+    },
+    {
+     "id": "xau-m30m1-1795120266",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795120320,
+     "t": 1795121820,
+     "R": 1.16,
+     "net": 1.13,
+     "exit": "target",
+     "mfe": 1.16,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-m30m1-1795121023",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795121040,
+     "t": 1795123020,
+     "R": 2,
+     "net": 1.96,
+     "exit": "target",
+     "mfe": 1.79,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-m30m1-1795119844",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795119900,
+     "t": 1795123080,
+     "R": 2,
+     "net": 1.97,
+     "exit": "target",
+     "mfe": 1.97,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-m30m1-1795131359",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795133400,
+     "t": 1795135800,
+     "R": 2,
+     "net": 1.99,
+     "exit": "target",
+     "mfe": 1.96,
+     "session": "late"
+    },
+    {
+     "id": "xau-m30m1-1795139075",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795139160,
+     "t": 1795140720,
+     "R": 2,
+     "net": 1.99,
+     "exit": "target",
+     "mfe": 1.84,
+     "session": "asia"
+    },
+    {
+     "id": "xau-m30m1-1795137841",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795138200,
+     "t": 1795140960,
+     "R": 2,
+     "net": 1.99,
+     "exit": "target",
+     "mfe": 1.96,
+     "session": "asia"
+    },
+    {
+     "id": "xau-m30m1-1795139635",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795139640,
+     "t": 1795141800,
+     "R": 2,
+     "net": 1.99,
+     "exit": "target",
+     "mfe": 1.78,
+     "session": "asia"
+    },
+    {
+     "id": "xau-m30m1-1795142115",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795142115,
+     "t": 1795142160,
+     "R": -1,
+     "net": -1.02,
+     "exit": "stop",
+     "mfe": null,
+     "session": "asia"
     }
    ]
   },
@@ -5894,506 +6394,6 @@
    ]
   },
   {
-   "key": "m30m1|shadow",
-   "id": "m30m1",
-   "k": "m30m1",
-   "name": "M30 → M1 scalp",
-   "book": "shadow",
-   "src": "trades",
-   "variant": null,
-   "ownerShadow": false,
-   "retired": false,
-   "stopped": false,
-   "windows": {
-    "d7": {
-     "n": 29,
-     "wins": 11,
-     "losses": 18,
-     "flat": 0,
-     "winRate": 0.379,
-     "gross": {
-      "sum": 3.68,
-      "mean": 0.127,
-      "t": 0.45
-     },
-     "net": {
-      "sum": 3,
-      "mean": 0.103,
-      "t": 0.36
-     },
-     "cost": {
-      "known": 29,
-      "sum": 0.68,
-      "perTrade": 0.023,
-      "shareOfGrossWins": 0.031
-     }
-    },
-    "d30": {
-     "n": 45,
-     "wins": 16,
-     "losses": 29,
-     "flat": 0,
-     "winRate": 0.356,
-     "gross": {
-      "sum": 9.39,
-      "mean": 0.209,
-      "t": 0.75
-     },
-     "net": {
-      "sum": 7.93,
-      "mean": 0.176,
-      "t": 0.63
-     },
-     "cost": {
-      "known": 45,
-      "sum": 1.46,
-      "perTrade": 0.032,
-      "shareOfGrossWins": 0.038
-     }
-    },
-    "all": {
-     "n": 45,
-     "wins": 16,
-     "losses": 29,
-     "flat": 0,
-     "winRate": 0.356,
-     "gross": {
-      "sum": 9.39,
-      "mean": 0.209,
-      "t": 0.75
-     },
-     "net": {
-      "sum": 7.93,
-      "mean": 0.176,
-      "t": 0.63
-     },
-     "cost": {
-      "known": 45,
-      "sum": 1.46,
-      "perTrade": 0.032,
-      "shareOfGrossWins": 0.038
-     }
-    }
-   },
-   "whereR": {
-    "exits": {
-     "target": {
-      "n": 16,
-      "net": 38.31
-     },
-     "stop": {
-      "n": 29,
-      "net": -30.38
-     }
-    },
-    "fastStops": {
-     "n": 13,
-     "ofLosses": 29,
-     "share": 0.448,
-     "net": -13.88,
-     "within": "30 minutes of the fill"
-    },
-    "reached1R": {
-     "withMfe": 43,
-     "n": 25,
-     "closedAtLoss": 10,
-     "lossNet": -10.69
-    },
-    "giveback": {
-     "n": 25,
-     "mean": 0.954,
-     "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
-    },
-    "lock1R": {
-     "n": 43,
-     "mean": -0.059,
-     "t": -0.24,
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE"
-    },
-    "targetAfterStop": {
-     "n": 13,
-     "ofLosses": 29,
-     "note": "losses whose target was reached after the stop (post-mortem)"
-    }
-   },
-   "splits": {
-    "session": [
-     {
-      "v": "asia",
-      "n": 12,
-      "mean": 0.494,
-      "sum": 5.93,
-      "t": 1.08,
-      "rest": {
-       "n": 33,
-       "mean": 0.061
-      },
-      "vsRest": {
-       "diff": 0.434,
-       "t": 0.75,
-       "df": 24.39,
-       "p": 0.458
-      }
-     },
-     {
-      "v": "late",
-      "n": 5,
-      "mean": 0.404,
-      "sum": 2.02,
-      "t": 0.46,
-      "rest": {
-       "n": 40,
-       "mean": 0.148
-      },
-      "vsRest": null
-     },
-     {
-      "v": "london",
-      "n": 6,
-      "mean": 0.39,
-      "sum": 2.34,
-      "t": 0.27,
-      "rest": {
-       "n": 39,
-       "mean": 0.143
-      },
-      "vsRest": null
-     },
-     {
-      "v": "newyork",
-      "n": 13,
-      "mean": 0.376,
-      "sum": 4.89,
-      "t": 0.79,
-      "rest": {
-       "n": 32,
-       "mean": 0.095
-      },
-      "vsRest": {
-       "diff": 0.281,
-       "t": 0.48,
-       "df": 25.21,
-       "p": 0.639
-      }
-     },
-     {
-      "v": "overlap",
-      "n": 9,
-      "mean": -0.806,
-      "sum": -7.25,
-      "t": -3.49,
-      "rest": {
-       "n": 36,
-       "mean": 0.422
-      },
-      "vsRest": null
-     }
-    ],
-    "hours": [
-     {
-      "v": "00-04",
-      "n": 8,
-      "mean": 1.629,
-      "sum": 13.03,
-      "t": 4.25,
-      "rest": {
-       "n": 37,
-       "mean": -0.138
-      },
-      "vsRest": null
-     },
-     {
-      "v": "04-08",
-      "n": 5,
-      "mean": -1.022,
-      "sum": -5.11,
-      "t": -139.08,
-      "rest": {
-       "n": 40,
-       "mean": 0.326
-      },
-      "vsRest": null
-     },
-     {
-      "v": "08-12",
-      "n": 6,
-      "mean": 0.39,
-      "sum": 2.34,
-      "t": 0.27,
-      "rest": {
-       "n": 39,
-       "mean": 0.143
-      },
-      "vsRest": null
-     },
-     {
-      "v": "12-16",
-      "n": 9,
-      "mean": -0.806,
-      "sum": -7.25,
-      "t": -3.49,
-      "rest": {
-       "n": 36,
-       "mean": 0.422
-      },
-      "vsRest": null
-     },
-     {
-      "v": "16-20",
-      "n": 9,
-      "mean": 0.142,
-      "sum": 1.28,
-      "t": 0.24,
-      "rest": {
-       "n": 36,
-       "mean": 0.185
-      },
-      "vsRest": null
-     },
-     {
-      "v": "20-24",
-      "n": 8,
-      "mean": 0.455,
-      "sum": 3.64,
-      "t": 0.73,
-      "rest": {
-       "n": 37,
-       "mean": 0.116
-      },
-      "vsRest": null
-     }
-    ],
-    "side": [
-     {
-      "v": "buy",
-      "n": 16,
-      "mean": -0.861,
-      "sum": -13.77,
-      "t": -4.54,
-      "rest": {
-       "n": 29,
-       "mean": 0.748
-      },
-      "vsRest": {
-       "diff": -1.609,
-       "t": -3.74,
-       "df": 38.93,
-       "p": 0.001
-      }
-     },
-     {
-      "v": "sell",
-      "n": 29,
-      "mean": 0.748,
-      "sum": 21.7,
-      "t": 1.94,
-      "rest": {
-       "n": 16,
-       "mean": -0.861
-      },
-      "vsRest": {
-       "diff": 1.609,
-       "t": 3.74,
-       "df": 38.93,
-       "p": 0.001
-      }
-     }
-    ],
-    "market": [],
-    "exit": [
-     {
-      "v": "target",
-      "n": 16,
-      "sum": 38.31
-     },
-     {
-      "v": "stop",
-      "n": 29,
-      "sum": -30.38
-     }
-    ]
-   },
-   "slippage": {
-    "n": 43,
-    "mean": -0.138,
-    "t": -2.58,
-    "worse": 5,
-    "note": "fill minus the council entry in R, positive = worse"
-   },
-   "reviews": {
-    "reviewed": 0,
-    "tags": {}
-   },
-   "decay": null,
-   "expect": null,
-   "flags": [
-    "m30m1|shadow|weak-side:buy",
-    "m30m1|shadow|strong-side:sell"
-   ],
-   "review": {
-    "head": "M30 → M1 scalp (shadow): 45 closed, 36% won, +9.39R before costs, +7.93R after (t 0.63); last 30 days +7.93R on 45, last 7 days +3.00R on 29.",
-    "working": [
-     "after costs +7.93R on 45 trades (+0.18R a trade, t 0.63)",
-     "target exits +38.31R on 16",
-     "demo copies filled 0.14R a trade better than paper (n 43, t −2.58)",
-     "sells: 29 trades at +0.75R a trade against −0.86R for the other 16 (difference +1.61R, t 3.74)"
-    ],
-    "losing": [
-     "stop exits −30.38R on 29",
-     "costs −1.46R (+0.03R a trade, 4% of the gross wins)",
-     "13 of 29 losses stopped within 30 minutes of the fill (−13.88R)",
-     "10 of 25 trades that reached +1R closed at a loss (−10.69R)",
-     "13 losses saw the target reached after the stop"
-    ]
-   },
-   "recent": [
-    {
-     "id": "xau-m30m1-1795038214",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795038214,
-     "t": 1795043220,
-     "R": -1,
-     "net": -1.02,
-     "exit": "stop",
-     "mfe": 0.1,
-     "session": "late"
-    },
-    {
-     "id": "xau-m30m1-1795029098",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795029120,
-     "t": 1795044300,
-     "R": -1,
-     "net": -1.01,
-     "exit": "stop",
-     "mfe": 0.57,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-m30m1-1795023727",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795023780,
-     "t": 1795048920,
-     "R": -1,
-     "net": -1.02,
-     "exit": "stop",
-     "mfe": 1.95,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-m30m1-1795051665",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795052340,
-     "t": 1795056960,
-     "R": 2.13,
-     "net": 2.12,
-     "exit": "target",
-     "mfe": 2.09,
-     "session": "asia"
-    },
-    {
-     "id": "xau-m30m1-1795097554",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795097640,
-     "t": 1795102140,
-     "R": 1.05,
-     "net": 1.04,
-     "exit": "target",
-     "mfe": 0.91,
-     "session": "overlap"
-    },
-    {
-     "id": "xau-m30m1-1795120266",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795120320,
-     "t": 1795121820,
-     "R": 1.16,
-     "net": 1.13,
-     "exit": "target",
-     "mfe": 1.16,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-m30m1-1795121023",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795121040,
-     "t": 1795123020,
-     "R": 2,
-     "net": 1.96,
-     "exit": "target",
-     "mfe": 1.79,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-m30m1-1795119844",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795119900,
-     "t": 1795123080,
-     "R": 2,
-     "net": 1.97,
-     "exit": "target",
-     "mfe": 1.97,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-m30m1-1795131359",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795133400,
-     "t": 1795135800,
-     "R": 2,
-     "net": 1.99,
-     "exit": "target",
-     "mfe": 1.96,
-     "session": "late"
-    },
-    {
-     "id": "xau-m30m1-1795139075",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795139160,
-     "t": 1795140720,
-     "R": 2,
-     "net": 1.99,
-     "exit": "target",
-     "mfe": 1.84,
-     "session": "asia"
-    },
-    {
-     "id": "xau-m30m1-1795137841",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795138200,
-     "t": 1795140960,
-     "R": 2,
-     "net": 1.99,
-     "exit": "target",
-     "mfe": 1.96,
-     "session": "asia"
-    },
-    {
-     "id": "xau-m30m1-1795139635",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795139640,
-     "t": 1795141800,
-     "R": 2,
-     "net": 1.99,
-     "exit": "target",
-     "mfe": 1.78,
-     "session": "asia"
-    }
-   ]
-  },
-  {
    "key": "position|shadow",
    "id": "position",
    "k": "position",
@@ -6406,26 +6406,26 @@
    "stopped": false,
    "windows": {
     "d7": {
-     "n": 17,
-     "wins": 14,
+     "n": 16,
+     "wins": 13,
      "losses": 3,
      "flat": 0,
-     "winRate": 0.824,
+     "winRate": 0.813,
      "gross": {
-      "sum": 29.63,
-      "mean": 1.743,
-      "t": 4.78
+      "sum": 27.6,
+      "mean": 1.725,
+      "t": 4.45
      },
      "net": {
-      "sum": 28.95,
-      "mean": 1.703,
-      "t": 4.61
+      "sum": 26.98,
+      "mean": 1.686,
+      "t": 4.29
      },
      "cost": {
-      "known": 17,
-      "sum": 0.68,
-      "perTrade": 0.04,
-      "shareOfGrossWins": 0.021
+      "known": 16,
+      "sum": 0.62,
+      "perTrade": 0.039,
+      "shareOfGrossWins": 0.02
      }
     },
     "d30": {
@@ -6796,7 +6796,7 @@
     "position|shadow|exit-runs"
    ],
    "review": {
-    "head": "Position (shadow): 21 closed, 71% won, +28.63R before costs, +27.76R after (t 3.60); last 30 days +27.76R on 21, last 7 days +28.95R on 17.",
+    "head": "Position (shadow): 21 closed, 71% won, +28.63R before costs, +27.76R after (t 3.60); last 30 days +27.76R on 21, last 7 days +26.98R on 16.",
     "working": [
      "after costs +27.76R on 21 trades (+1.32R a trade, t 3.60)",
      "target exits +34.10R on 15"
@@ -8986,7 +8986,7 @@
    "key": "replica|research",
    "id": "replica",
    "k": "replica",
-   "name": "XRP/USD replica",
+   "name": "USD/CHF replica",
    "book": "research",
    "src": "research",
    "variant": null,
@@ -8995,20 +8995,20 @@
    "stopped": false,
    "windows": {
     "d7": {
-     "n": 623,
-     "wins": 192,
-     "losses": 431,
+     "n": 619,
+     "wins": 187,
+     "losses": 432,
      "flat": 0,
-     "winRate": 0.308,
+     "winRate": 0.302,
      "gross": {
-      "sum": -79,
-      "mean": -0.127,
-      "t": -2.17
+      "sum": -90,
+      "mean": -0.145,
+      "t": -2.49
      },
      "net": {
-      "sum": -79,
-      "mean": -0.127,
-      "t": -2.17
+      "sum": -90,
+      "mean": -0.145,
+      "t": -2.49
      },
      "cost": {
       "known": 0,
@@ -9018,20 +9018,20 @@
      }
     },
     "d30": {
-     "n": 1306,
-     "wins": 418,
-     "losses": 888,
+     "n": 1311,
+     "wins": 419,
+     "losses": 892,
      "flat": 0,
      "winRate": 0.32,
      "gross": {
-      "sum": -98.2,
-      "mean": -0.075,
-      "t": -1.91
+      "sum": -100.2,
+      "mean": -0.076,
+      "t": -1.94
      },
      "net": {
-      "sum": -98.2,
-      "mean": -0.075,
-      "t": -1.91
+      "sum": -100.2,
+      "mean": -0.076,
+      "t": -1.94
      },
      "cost": {
       "known": 0,
@@ -9041,20 +9041,20 @@
      }
     },
     "all": {
-     "n": 1306,
-     "wins": 418,
-     "losses": 888,
+     "n": 1311,
+     "wins": 419,
+     "losses": 892,
      "flat": 0,
      "winRate": 0.32,
      "gross": {
-      "sum": -98.2,
-      "mean": -0.075,
-      "t": -1.91
+      "sum": -100.2,
+      "mean": -0.076,
+      "t": -1.94
      },
      "net": {
-      "sum": -98.2,
-      "mean": -0.075,
-      "t": -1.91
+      "sum": -100.2,
+      "mean": -0.076,
+      "t": -1.94
      },
      "cost": {
       "known": 0,
@@ -9067,12 +9067,12 @@
    "whereR": {
     "exits": {
      "target": {
-      "n": 395,
-      "net": 790.02
+      "n": 396,
+      "net": 792.02
      },
      "stop": {
-      "n": 878,
-      "net": -900.8
+      "n": 882,
+      "net": -904.8
      },
      "time": {
       "n": 33,
@@ -9081,8 +9081,8 @@
     },
     "fastStops": {
      "n": 171,
-     "ofLosses": 888,
-     "share": 0.193,
+     "ofLosses": 892,
+     "share": 0.192,
      "net": -173.7,
      "within": "30 minutes of the fill"
     },
@@ -9105,7 +9105,7 @@
     },
     "targetAfterStop": {
      "n": 0,
-     "ofLosses": 888,
+     "ofLosses": 892,
      "note": "losses whose target was reached after the stop (post-mortem)"
     }
    },
@@ -9113,36 +9113,36 @@
     "session": [
      {
       "v": "asia",
-      "n": 407,
-      "mean": -0.024,
-      "sum": -9.73,
-      "t": -0.34,
+      "n": 411,
+      "mean": -0.026,
+      "sum": -10.73,
+      "t": -0.38,
       "rest": {
-       "n": 899,
-       "mean": -0.098
+       "n": 900,
+       "mean": -0.099
       },
       "vsRest": {
-       "diff": 0.075,
-       "t": 0.88,
-       "df": 801.67,
-       "p": 0.377
+       "diff": 0.073,
+       "t": 0.87,
+       "df": 812.3,
+       "p": 0.383
       }
      },
      {
       "v": "late",
-      "n": 150,
-      "mean": -0.144,
-      "sum": -21.63,
-      "t": -1.29,
+      "n": 151,
+      "mean": -0.15,
+      "sum": -22.63,
+      "t": -1.35,
       "rest": {
-       "n": 1156,
-       "mean": -0.066
+       "n": 1160,
+       "mean": -0.067
       },
       "vsRest": {
-       "diff": -0.078,
-       "t": -0.65,
-       "df": 193.71,
-       "p": 0.515
+       "diff": -0.083,
+       "t": -0.7,
+       "df": 195.33,
+       "p": 0.486
       }
      },
      {
@@ -9152,14 +9152,14 @@
       "sum": -11.4,
       "t": -0.47,
       "rest": {
-       "n": 1007,
-       "mean": -0.086
+       "n": 1012,
+       "mean": -0.088
       },
       "vsRest": {
-       "diff": 0.048,
-       "t": 0.52,
-       "df": 499.1,
-       "p": 0.604
+       "diff": 0.05,
+       "t": 0.54,
+       "df": 497.87,
+       "p": 0.592
       }
      },
      {
@@ -9169,14 +9169,14 @@
       "sum": -33.21,
       "t": -1.4,
       "rest": {
-       "n": 1084,
-       "mean": -0.06
+       "n": 1089,
+       "mean": -0.062
       },
       "vsRest": {
-       "diff": -0.09,
-       "t": -0.78,
-       "df": 293.5,
-       "p": 0.436
+       "diff": -0.088,
+       "t": -0.77,
+       "df": 293.09,
+       "p": 0.444
       }
      },
      {
@@ -9186,32 +9186,32 @@
       "sum": -22.23,
       "t": -1.07,
       "rest": {
-       "n": 1078,
-       "mean": -0.07
+       "n": 1083,
+       "mean": -0.072
       },
       "vsRest": {
-       "diff": -0.027,
-       "t": -0.27,
-       "df": 341.1,
-       "p": 0.789
+       "diff": -0.026,
+       "t": -0.25,
+       "df": 340.42,
+       "p": 0.8
       }
      }
     ],
     "hours": [
      {
       "v": "00-04",
-      "n": 234,
-      "mean": 0.192,
-      "sum": 44.98,
-      "t": 2.01,
+      "n": 238,
+      "mean": 0.185,
+      "sum": 43.98,
+      "t": 1.95,
       "rest": {
-       "n": 1072,
+       "n": 1073,
        "mean": -0.134
       },
       "vsRest": {
-       "diff": 0.326,
-       "t": 3.1,
-       "df": 333.96,
+       "diff": 0.319,
+       "t": 3.07,
+       "df": 341.56,
        "p": 0.002
       }
      },
@@ -9222,13 +9222,13 @@
       "sum": -69.77,
       "t": -3.43,
       "rest": {
-       "n": 1055,
-       "mean": -0.027
+       "n": 1060,
+       "mean": -0.029
       },
       "vsRest": {
-       "diff": -0.251,
-       "t": -2.71,
-       "df": 416.82,
+       "diff": -0.249,
+       "t": -2.7,
+       "df": 415.82,
        "p": 0.007
       }
      },
@@ -9239,14 +9239,14 @@
       "sum": 3.66,
       "t": 0.17,
       "rest": {
-       "n": 1085,
-       "mean": -0.094
+       "n": 1090,
+       "mean": -0.095
       },
       "vsRest": {
-       "diff": 0.11,
-       "t": 1.06,
-       "df": 317.74,
-       "p": 0.292
+       "diff": 0.112,
+       "t": 1.07,
+       "df": 317.16,
+       "p": 0.286
       }
      },
      {
@@ -9256,14 +9256,14 @@
       "sum": -22.23,
       "t": -1.07,
       "rest": {
-       "n": 1078,
-       "mean": -0.07
+       "n": 1083,
+       "mean": -0.072
       },
       "vsRest": {
-       "diff": -0.027,
-       "t": -0.27,
-       "df": 341.1,
-       "p": 0.789
+       "diff": -0.026,
+       "t": -0.25,
+       "df": 340.42,
+       "p": 0.8
       }
      },
      {
@@ -9273,66 +9273,66 @@
       "sum": -13.01,
       "t": -0.68,
       "rest": {
-       "n": 1125,
-       "mean": -0.076
+       "n": 1130,
+       "mean": -0.077
       },
       "vsRest": {
-       "diff": 0.004,
-       "t": 0.03,
-       "df": 242.19,
-       "p": 0.973
+       "diff": 0.005,
+       "t": 0.05,
+       "df": 241.83,
+       "p": 0.963
       }
      },
      {
       "v": "20-24",
-      "n": 191,
-      "mean": -0.219,
-      "sum": -41.83,
-      "t": -1.91,
+      "n": 192,
+      "mean": -0.223,
+      "sum": -42.83,
+      "t": -1.96,
       "rest": {
-       "n": 1115,
+       "n": 1119,
        "mean": -0.051
       },
       "vsRest": {
-       "diff": -0.168,
-       "t": -1.38,
-       "df": 243.11,
-       "p": 0.169
+       "diff": -0.172,
+       "t": -1.41,
+       "df": 244.68,
+       "p": 0.159
       }
      }
     ],
     "side": [
      {
       "v": "buy",
-      "n": 673,
-      "mean": -0.369,
-      "sum": -248.47,
-      "t": -7.73,
+      "n": 676,
+      "mean": -0.372,
+      "sum": -251.47,
+      "t": -7.82,
       "rest": {
-       "n": 633,
-       "mean": 0.237
+       "n": 635,
+       "mean": 0.238
       },
       "vsRest": {
-       "diff": -0.607,
-       "t": -7.81,
-       "df": 1213.2,
+       "diff": -0.61,
+       "t": -7.88,
+       "df": 1216.12,
        "p": 0
       }
      },
      {
       "v": "sell",
-      "n": 633,
-      "mean": 0.237,
-      "sum": 150.27,
-      "t": 3.88,
+      "n": 635,
+      "mean": 0.238,
+      "sum": 151.27,
+      "t": 3.9,
       "rest": {
-       "n": 673,
-       "mean": -0.369
+       "n": 676,
+       "mean": -0.372
       },
       "vsRest": {
-       "diff": 0.607,
-       "t": 7.81,
-       "df": 1213.2,
+       "diff": 0.61,
+       "t": 7.88,
+       "df": 1216.12,
        "p": 0
       }
      }
@@ -9340,19 +9340,19 @@
     "market": [
      {
       "v": "audusd",
-      "n": 128,
-      "mean": -0.244,
-      "sum": -31.29,
-      "t": -2.1,
+      "n": 130,
+      "mean": -0.256,
+      "sum": -33.29,
+      "t": -2.23,
       "rest": {
-       "n": 1178,
+       "n": 1181,
        "mean": -0.057
       },
       "vsRest": {
-       "diff": -0.188,
-       "t": -1.52,
-       "df": 161.61,
-       "p": 0.131
+       "diff": -0.199,
+       "t": -1.63,
+       "df": 165.03,
+       "p": 0.105
       }
      },
      {
@@ -9362,14 +9362,14 @@
       "sum": 13.65,
       "t": 0.8,
       "rest": {
-       "n": 1163,
-       "mean": -0.096
+       "n": 1168,
+       "mean": -0.097
       },
       "vsRest": {
-       "diff": 0.192,
-       "t": 1.51,
-       "df": 178.08,
-       "p": 0.133
+       "diff": 0.193,
+       "t": 1.52,
+       "df": 177.88,
+       "p": 0.131
       }
      },
      {
@@ -9379,14 +9379,14 @@
       "sum": 1.36,
       "t": 0.08,
       "rest": {
-       "n": 1147,
-       "mean": -0.087
+       "n": 1152,
+       "mean": -0.088
       },
       "vsRest": {
-       "diff": 0.095,
-       "t": 0.8,
-       "df": 205.73,
-       "p": 0.425
+       "diff": 0.097,
+       "t": 0.81,
+       "df": 205.46,
+       "p": 0.418
       }
      },
      {
@@ -9396,31 +9396,31 @@
       "sum": -10.02,
       "t": -0.72,
       "rest": {
-       "n": 1204,
-       "mean": -0.073
+       "n": 1209,
+       "mean": -0.075
       },
       "vsRest": {
-       "diff": -0.025,
-       "t": -0.18,
-       "df": 120.45,
-       "p": 0.86
+       "diff": -0.024,
+       "t": -0.17,
+       "df": 120.35,
+       "p": 0.868
       }
      },
      {
       "v": "gbpusd",
-      "n": 111,
-      "mean": -0.249,
-      "sum": -27.66,
-      "t": -1.88,
+      "n": 112,
+      "mean": -0.256,
+      "sum": -28.66,
+      "t": -1.95,
       "rest": {
-       "n": 1195,
-       "mean": -0.059
+       "n": 1199,
+       "mean": -0.06
       },
       "vsRest": {
-       "diff": -0.19,
-       "t": -1.37,
-       "df": 132.25,
-       "p": 0.173
+       "diff": -0.196,
+       "t": -1.42,
+       "df": 133.73,
+       "p": 0.157
       }
      },
      {
@@ -9430,14 +9430,14 @@
       "sum": -15.11,
       "t": -0.85,
       "rest": {
-       "n": 1134,
-       "mean": -0.073
+       "n": 1139,
+       "mean": -0.075
       },
       "vsRest": {
-       "diff": -0.015,
-       "t": -0.13,
-       "df": 232.53,
-       "p": 0.897
+       "diff": -0.013,
+       "t": -0.12,
+       "df": 232.18,
+       "p": 0.907
       }
      },
      {
@@ -9447,48 +9447,48 @@
       "sum": 7.86,
       "t": 0.52,
       "rest": {
-       "n": 1199,
-       "mean": -0.088
+       "n": 1204,
+       "mean": -0.09
       },
       "vsRest": {
-       "diff": 0.162,
-       "t": 1.09,
-       "df": 124.3,
-       "p": 0.276
+       "diff": 0.163,
+       "t": 1.1,
+       "df": 124.2,
+       "p": 0.272
       }
      },
      {
       "v": "usdchf",
-      "n": 120,
-      "mean": -0.158,
-      "sum": -19.01,
-      "t": -0.99,
+      "n": 121,
+      "mean": -0.165,
+      "sum": -20.01,
+      "t": -1.05,
       "rest": {
-       "n": 1186,
+       "n": 1190,
        "mean": -0.067
       },
       "vsRest": {
-       "diff": -0.092,
-       "t": -0.56,
-       "df": 134.66,
-       "p": 0.578
+       "diff": -0.098,
+       "t": -0.6,
+       "df": 135.97,
+       "p": 0.549
       }
      },
      {
       "v": "xau",
-      "n": 118,
-      "mean": -0.108,
-      "sum": -12.74,
-      "t": -0.87,
+      "n": 119,
+      "mean": -0.09,
+      "sum": -10.74,
+      "t": -0.72,
       "rest": {
-       "n": 1188,
-       "mean": -0.072
+       "n": 1192,
+       "mean": -0.075
       },
       "vsRest": {
-       "diff": -0.036,
-       "t": -0.27,
-       "df": 144.41,
-       "p": 0.784
+       "diff": -0.015,
+       "t": -0.12,
+       "df": 145.39,
+       "p": 0.908
       }
      },
      {
@@ -9498,27 +9498,27 @@
       "sum": -5.24,
       "t": -0.31,
       "rest": {
-       "n": 1160,
-       "mean": -0.08
+       "n": 1165,
+       "mean": -0.082
       },
       "vsRest": {
-       "diff": 0.044,
-       "t": 0.36,
-       "df": 185.52,
-       "p": 0.719
+       "diff": 0.046,
+       "t": 0.37,
+       "df": 185.3,
+       "p": 0.71
       }
      }
     ],
     "exit": [
      {
       "v": "target",
-      "n": 395,
-      "sum": 790.02
+      "n": 396,
+      "sum": 792.02
      },
      {
       "v": "stop",
-      "n": 878,
-      "sum": -900.8
+      "n": 882,
+      "sum": -904.8
      },
      {
       "v": "time",
@@ -9528,10 +9528,10 @@
     ]
    },
    "slippage": {
-    "n": 180,
+    "n": 181,
     "mean": 0.051,
-    "t": 2.67,
-    "worse": 93,
+    "t": 2.68,
+    "worse": 94,
     "note": "fill minus the council entry in R, positive = worse"
    },
    "reviews": {
@@ -9561,82 +9561,22 @@
     "replica|research|strong-side:sell"
    ],
    "review": {
-    "head": "XRP/USD replica (research): 1306 closed, 32% won, −98.20R before costs, no cost on record (t −1.91 before costs); last 30 days −98.20R on 1306, last 7 days −79.00R on 623.",
+    "head": "USD/CHF replica (research): 1311 closed, 32% won, −100.20R before costs, no cost on record (t −1.94 before costs); last 30 days −100.20R on 1311, last 7 days −90.00R on 619.",
     "working": [
      "time exits +12.58R on 33",
-     "target exits +790.02R on 395",
-     "00-04 UTC: 234 trades at +0.19R a trade against −0.13R for the other 1072 (difference +0.33R, t 3.10)",
-     "sells: 633 trades at +0.24R a trade against −0.37R for the other 673 (difference +0.61R, t 7.81)"
+     "target exits +792.02R on 396",
+     "00-04 UTC: 238 trades at +0.18R a trade against −0.13R for the other 1073 (difference +0.32R, t 3.07)",
+     "sells: 635 trades at +0.24R a trade against −0.37R for the other 676 (difference +0.61R, t 7.88)"
     ],
     "losing": [
-     "before costs (none on record) −98.20R on 1306 trades (−0.07R a trade, t −1.91)",
-     "stop exits −900.80R on 878",
-     "171 of 888 losses stopped within 30 minutes of the fill (−173.70R)",
-     "demo copies filled 0.05R a trade worse than paper (n 180, t 2.67)",
+     "before costs (none on record) −100.20R on 1311 trades (−0.08R a trade, t −1.94)",
+     "stop exits −904.80R on 882",
+     "171 of 892 losses stopped within 30 minutes of the fill (−173.70R)",
+     "demo copies filled 0.05R a trade worse than paper (n 181, t 2.68)",
      "loss reasons written: htf 1 (of 1 reviewed)"
     ]
    },
    "recent": [
-    {
-     "id": "gbpusd-replica-1795129808-s",
-     "market": "gbpusd",
-     "side": "sell",
-     "e": 1795129808,
-     "t": 1795136400,
-     "R": -1,
-     "net": -1,
-     "exit": "stop",
-     "mfe": null,
-     "session": "late"
-    },
-    {
-     "id": "usdchf-replica-1795134098-s",
-     "market": "usdchf",
-     "side": "sell",
-     "e": 1795134098,
-     "t": 1795136400,
-     "R": 2,
-     "net": 2,
-     "exit": "target",
-     "mfe": null,
-     "session": "asia"
-    },
-    {
-     "id": "sol-replica-1795135821-s",
-     "market": "sol",
-     "side": "sell",
-     "e": 1795135821,
-     "t": 1795136820,
-     "R": -1,
-     "net": -1,
-     "exit": "stop",
-     "mfe": null,
-     "session": "asia"
-    },
-    {
-     "id": "xrp-replica-1795136231-s",
-     "market": "xrp",
-     "side": "sell",
-     "e": 1795136231,
-     "t": 1795136820,
-     "R": -1,
-     "net": -1,
-     "exit": "stop",
-     "mfe": null,
-     "session": "asia"
-    },
-    {
-     "id": "eurusd-replica-1795133669-b",
-     "market": "eurusd",
-     "side": "buy",
-     "e": 1795133669,
-     "t": 1795138920,
-     "R": -1,
-     "net": -1,
-     "exit": "stop",
-     "mfe": null,
-     "session": "asia"
-    },
     {
      "id": "btc-replica-1795134098-b",
      "market": "btc",
@@ -9720,6 +9660,66 @@
      "exit": "target",
      "mfe": null,
      "session": "newyork"
+    },
+    {
+     "id": "audusd-replica-1795131881-b",
+     "market": "audusd",
+     "side": "buy",
+     "e": 1795131881,
+     "t": 1795144140,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": null,
+     "session": "late"
+    },
+    {
+     "id": "gbpusd-replica-1795139075-s",
+     "market": "gbpusd",
+     "side": "sell",
+     "e": 1795139075,
+     "t": 1795144140,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": null,
+     "session": "asia"
+    },
+    {
+     "id": "audusd-replica-1795136379-b",
+     "market": "audusd",
+     "side": "buy",
+     "e": 1795136379,
+     "t": 1795144200,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": null,
+     "session": "asia"
+    },
+    {
+     "id": "usdchf-replica-1795140070-b",
+     "market": "usdchf",
+     "side": "buy",
+     "e": 1795140070,
+     "t": 1795144200,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": null,
+     "session": "asia"
+    },
+    {
+     "id": "xau-replica-1795135521-s",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795135521,
+     "t": 1795145040,
+     "R": 2,
+     "net": 2,
+     "exit": "target",
+     "mfe": null,
+     "session": "asia"
     }
    ]
   },
@@ -12412,13 +12412,13 @@
    "value": "buy",
    "n": 16,
    "mean": -0.861,
-   "t": -3.74,
+   "t": -3.67,
    "p": 0.001,
    "rest": {
-    "n": 29,
-    "mean": 0.748
+    "n": 30,
+    "mean": 0.689
    },
-   "text": "buys: 16 trades at −0.86R a trade against +0.75R for the other 29 (difference −1.61R, t −3.74).",
+   "text": "buys: 16 trades at −0.86R a trade against +0.69R for the other 30 (difference −1.55R, t −3.67).",
    "split": true,
    "own": {
     "t": -4.54
@@ -12433,18 +12433,18 @@
    "kind": "strong-side",
    "field": "side",
    "value": "sell",
-   "n": 29,
-   "mean": 0.748,
-   "t": 3.74,
+   "n": 30,
+   "mean": 0.689,
+   "t": 3.67,
    "p": 0.001,
    "rest": {
     "n": 16,
     "mean": -0.861
    },
-   "text": "sells: 29 trades at +0.75R a trade against −0.86R for the other 16 (difference +1.61R, t 3.74).",
+   "text": "sells: 30 trades at +0.69R a trade against −0.86R for the other 16 (difference +1.55R, t 3.67).",
    "split": true,
    "own": {
-    "t": 1.94
+    "t": 1.83
    },
    "holm": true
   },
@@ -12456,18 +12456,18 @@
    "kind": "strong-hours",
    "field": "hours",
    "value": "00-04",
-   "n": 234,
-   "mean": 0.192,
-   "t": 3.1,
+   "n": 238,
+   "mean": 0.185,
+   "t": 3.07,
    "p": 0.002,
    "rest": {
-    "n": 1072,
+    "n": 1073,
     "mean": -0.134
    },
-   "text": "00-04 UTC: 234 trades at +0.19R a trade against −0.13R for the other 1072 (difference +0.33R, t 3.10).",
+   "text": "00-04 UTC: 238 trades at +0.18R a trade against −0.13R for the other 1073 (difference +0.32R, t 3.07).",
    "split": true,
    "own": {
-    "t": 2.01
+    "t": 1.95
    },
    "holm": true
   },
@@ -12481,13 +12481,13 @@
    "value": "04-08",
    "n": 251,
    "mean": -0.278,
-   "t": -2.71,
+   "t": -2.7,
    "p": 0.007,
    "rest": {
-    "n": 1055,
-    "mean": -0.027
+    "n": 1060,
+    "mean": -0.029
    },
-   "text": "04-08 UTC: 251 trades at −0.28R a trade against −0.03R for the other 1055 (difference −0.25R, t −2.71).",
+   "text": "04-08 UTC: 251 trades at −0.28R a trade against −0.03R for the other 1060 (difference −0.25R, t −2.70).",
    "split": true,
    "own": {
     "t": -3.43
@@ -12502,18 +12502,18 @@
    "kind": "weak-side",
    "field": "side",
    "value": "buy",
-   "n": 673,
-   "mean": -0.369,
-   "t": -7.81,
+   "n": 676,
+   "mean": -0.372,
+   "t": -7.88,
    "p": 0,
    "rest": {
-    "n": 633,
-    "mean": 0.237
+    "n": 635,
+    "mean": 0.238
    },
-   "text": "buys: 673 trades at −0.37R a trade against +0.24R for the other 633 (difference −0.61R, t −7.81).",
+   "text": "buys: 676 trades at −0.37R a trade against +0.24R for the other 635 (difference −0.61R, t −7.88).",
    "split": true,
    "own": {
-    "t": -7.73
+    "t": -7.82
    },
    "holm": true
   },
@@ -12525,18 +12525,18 @@
    "kind": "strong-side",
    "field": "side",
    "value": "sell",
-   "n": 633,
-   "mean": 0.237,
-   "t": 7.81,
+   "n": 635,
+   "mean": 0.238,
+   "t": 7.88,
    "p": 0,
    "rest": {
-    "n": 673,
-    "mean": -0.369
+    "n": 676,
+    "mean": -0.372
    },
-   "text": "sells: 633 trades at +0.24R a trade against −0.37R for the other 673 (difference +0.61R, t 7.81).",
+   "text": "sells: 635 trades at +0.24R a trade against −0.37R for the other 676 (difference +0.61R, t 7.88).",
    "split": true,
    "own": {
-    "t": 3.88
+    "t": 3.9
    },
    "holm": true
   }
@@ -12547,25 +12547,25 @@
    "flag": "replica|research|weak-side:buy",
    "system": "replica",
    "book": "research",
-   "name": "XRP/USD replica",
+   "name": "USD/CHF replica",
    "action": "one side only",
-   "change": "Take only sells in XRP/USD replica (research)",
-   "why": "buys: 673 trades at −0.37R a trade against +0.24R for the other 633 (difference −0.61R, t −7.81).",
+   "change": "Take only sells in USD/CHF replica (research)",
+   "why": "buys: 676 trades at −0.37R a trade against +0.24R for the other 635 (difference −0.61R, t −7.88).",
    "evidence": {
-    "n": 673,
-    "mean": -0.369,
-    "t": -7.81,
+    "n": 676,
+    "mean": -0.372,
+    "t": -7.88,
     "p": 0,
     "rest": {
-     "n": 633,
-     "mean": 0.237
+     "n": 635,
+     "mean": 0.238
     },
     "holm": true,
     "inSample": true,
     "warning": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it."
    },
    "test": {
-    "question": "Do XRP/USD replica's buys lose after costs against its sells?",
+    "question": "Do USD/CHF replica's buys lose after costs against its sells?",
     "data": "2020-01-01 → now",
     "split": "in sample 2020-2023, out of sample 2024 → now",
     "costs": "net of the council cost model (council/fills.mjs: spread, slippage, commission, overnight financing on gold buys)",
@@ -12575,10 +12575,10 @@
    "strong": false,
    "forward": {
     "status": "held",
-    "n": 127,
-    "t": -2.48,
+    "n": 130,
+    "t": -2.64,
     "recorded": "2026-11-17T22:50:23.000Z",
-    "text": "held on the trades closed since it was recorded: 127 trades against 117, −0.28R a trade, t −2.48 (recorded with t −7.46)."
+    "text": "held on the trades closed since it was recorded: 130 trades against 119, −0.29R a trade, t −2.64 (recorded with t −7.46)."
    },
    "studied": {
     "study": "replica-sides",
@@ -12595,15 +12595,15 @@
    "name": "M30 → M1 scalp",
    "action": "one side only",
    "change": "Take only sells in M30 → M1 scalp (shadow)",
-   "why": "buys: 16 trades at −0.86R a trade against +0.75R for the other 29 (difference −1.61R, t −3.74).",
+   "why": "buys: 16 trades at −0.86R a trade against +0.69R for the other 30 (difference −1.55R, t −3.67).",
    "evidence": {
     "n": 16,
     "mean": -0.861,
-    "t": -3.74,
+    "t": -3.67,
     "p": 0.001,
     "rest": {
-     "n": 29,
-     "mean": 0.748
+     "n": 30,
+     "mean": 0.689
     },
     "holm": true,
     "inSample": true,
@@ -12623,7 +12623,7 @@
     "n": 1,
     "t": 0,
     "recorded": "2026-11-18T06:33:22.000Z",
-    "text": "too few new trades to judge yet: 1 trade against 14, −1.02R a trade, t 0.00 (recorded with t −2.23)."
+    "text": "too few new trades to judge yet: 1 trade against 15, −1.02R a trade, t 0.00 (recorded with t −2.23)."
    }
   },
   {
@@ -12631,25 +12631,25 @@
    "flag": "replica|research|weak-hours:04-08",
    "system": "replica",
    "book": "research",
-   "name": "XRP/USD replica",
+   "name": "USD/CHF replica",
    "action": "skip hours",
-   "change": "Skip entries between 04-08 UTC for XRP/USD replica (research)",
-   "why": "04-08 UTC: 251 trades at −0.28R a trade against −0.03R for the other 1055 (difference −0.25R, t −2.71).",
+   "change": "Skip entries between 04-08 UTC for USD/CHF replica (research)",
+   "why": "04-08 UTC: 251 trades at −0.28R a trade against −0.03R for the other 1060 (difference −0.25R, t −2.70).",
    "evidence": {
     "n": 251,
     "mean": -0.278,
-    "t": -2.71,
+    "t": -2.7,
     "p": 0.007,
     "rest": {
-     "n": 1055,
-     "mean": -0.027
+     "n": 1060,
+     "mean": -0.029
     },
     "holm": true,
     "inSample": true,
     "warning": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it."
    },
    "test": {
-    "question": "Do XRP/USD replica's entries between 04-08 UTC lose after costs against its other hours?",
+    "question": "Do USD/CHF replica's entries between 04-08 UTC lose after costs against its other hours?",
     "data": "2020-01-01 → now",
     "split": "in sample 2020-2023, out of sample 2024 → now",
     "costs": "net of the council cost model (council/fills.mjs: spread, slippage, commission, overnight financing on gold buys)",
@@ -12660,9 +12660,9 @@
    "forward": {
     "status": "faded",
     "n": 37,
-    "t": -0.54,
+    "t": -0.51,
     "recorded": "2026-11-17T22:50:23.000Z",
-    "text": "faded on the trades closed since it was recorded: 37 trades against 207, −0.18R a trade, t −0.54 (recorded with t −2.73)."
+    "text": "faded on the trades closed since it was recorded: 37 trades against 212, −0.18R a trade, t −0.51 (recorded with t −2.73)."
    },
    "fadedForward": true
   }
@@ -12716,14 +12716,14 @@
      "n": 37,
      "mean": -0.176,
      "rest": {
-      "n": 207,
-      "mean": -0.046
+      "n": 212,
+      "mean": -0.054
      },
-     "diff": -0.131,
-     "t": -0.54,
+     "diff": -0.122,
+     "t": -0.51,
      "status": "faded",
      "basis": "hours 04-08 against the rest, R after costs (Welch t)",
-     "text": "faded on the trades closed since it was recorded: 37 trades against 207, −0.18R a trade, t −0.54 (recorded with t −2.73)."
+     "text": "faded on the trades closed since it was recorded: 37 trades against 212, −0.18R a trade, t −0.51 (recorded with t −2.73)."
     }
    },
    {
@@ -12748,17 +12748,17 @@
     },
     "strongAtRecord": true,
     "forward": {
-     "n": 127,
-     "mean": -0.277,
+     "n": 130,
+     "mean": -0.294,
      "rest": {
-      "n": 117,
-      "mean": 0.164
+      "n": 119,
+      "mean": 0.17
      },
-     "diff": -0.441,
-     "t": -2.48,
+     "diff": -0.464,
+     "t": -2.64,
      "status": "held",
      "basis": "side buy against the rest, R after costs (Welch t)",
-     "text": "held on the trades closed since it was recorded: 127 trades against 117, −0.28R a trade, t −2.48 (recorded with t −7.46)."
+     "text": "held on the trades closed since it was recorded: 130 trades against 119, −0.29R a trade, t −2.64 (recorded with t −7.46)."
     }
    },
    {
@@ -12786,14 +12786,14 @@
      "n": 1,
      "mean": -1.02,
      "rest": {
-      "n": 14,
-      "mean": 0.791
+      "n": 15,
+      "mean": 0.671
      },
-     "diff": -1.811,
+     "diff": -1.691,
      "t": 0,
      "status": "too few",
      "basis": "side buy against the rest, R after costs (Welch t)",
-     "text": "too few new trades to judge yet: 1 trade against 14, −1.02R a trade, t 0.00 (recorded with t −2.23)."
+     "text": "too few new trades to judge yet: 1 trade against 15, −1.02R a trade, t 0.00 (recorded with t −2.23)."
     }
    },
    {
@@ -12813,12 +12813,12 @@
     },
     "strongAtRecord": true,
     "forward": {
-     "n": 171,
-     "mean": 0,
-     "t": 0,
+     "n": 176,
+     "mean": -0.011,
+     "t": -0.11,
      "status": "faded",
      "basis": "R a trade after costs (t against zero)",
-     "text": "faded on the trades closed since it was recorded: 171 trades, 0.00R a trade, t 0.00 (recorded with t −2.04)."
+     "text": "faded on the trades closed since it was recorded: 176 trades, −0.01R a trade, t −0.11 (recorded with t −2.04)."
     }
    },
    {
@@ -12843,20 +12843,20 @@
     },
     "strongAtRecord": false,
     "forward": {
-     "n": 20,
-     "mean": 0.2,
+     "n": 22,
+     "mean": 0.091,
      "rest": {
-      "n": 139,
-      "mean": -0.028
+      "n": 142,
+      "mean": -0.027
      },
-     "diff": 0.228,
-     "t": 0.64,
+     "diff": 0.118,
+     "t": 0.35,
      "status": "faded",
      "basis": "market audusd against the rest, R after costs (Welch t)",
-     "text": "faded on the trades closed since it was recorded: 20 trades against 139, +0.20R a trade, t 0.64 (recorded with t −2.05)."
+     "text": "faded on the trades closed since it was recorded: 22 trades against 142, +0.09R a trade, t 0.35 (recorded with t −2.05)."
     }
    }
   ]
  },
- "hash": "103cbdebd3b3c1fc"
+ "hash": "abbe566ac59a4be0"
 }
