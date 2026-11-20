@@ -377,6 +377,14 @@ const USER_RULES = [
   { id: 'replica-mirror-gold-only', apply: (c) => { c.mirrorReplica = { markets: ['xau'], since: Math.floor(Date.now() / 1000), until: { n: 200, grossR: 0, text: 'forex and crypto replica paper trades closed since the rule: 200 or more, total R before costs above zero; then the owner decides' } }; },
     change: 'Demo mirror: no new copies of the replica\'s forex and crypto paper trades on the Replica demo account until that stream is positive before costs over 200 trades; gold replica copies and positions already copied are unchanged',
     why: 'Edge review of 11 Nov: the replica\'s forward paper trades on ten markets since 3 Nov made -0.08R a trade before costs (n 568, t -1.3), and the Replica demo account fills 0.08R worse than paper on every copy (n 121, t 3.9). Owner approved.' },
+  // 20 Nov 2026, owner: "And mine replica shadow to live". The gold replica's NEW trades are live paper trades again (alerted,
+  // in the main book, the council demo account): ownerShadow.replica is removed, nothing else. Same rule, stops and gates
+  // (config.replicaLive still decides which markets trade). Trades open as owner-shadow run to their exits as they are.
+  // replica-mirror-gold-only is unchanged: the replica's forex and crypto RESEARCH trades are still not copied to the demo.
+  // Undo: a user rule setting ownerShadow.replica again.
+  { id: 'replica-live-again', apply: (c) => { if (c.ownerShadow && c.ownerShadow.replica) { const { replica, ...rest } = c.ownerShadow; c.ownerShadow = rest; } },
+    change: 'Gold replica (owner, 20 Nov): new trades are live paper trades again (alerted, main book, council demo account); same rule and stops; open shadow trades run to their exits',
+    why: 'Owner request of 20 Nov 2026. Said with it: the replica has no out-of-sample edge on record (replica-oos 2017-22 -0.05R a trade, n 115; replica-sides FAIL) and its forward record is too short to judge; paper and demo only.' },
 ];
 config.userRules = config.userRules || [];
 // supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote

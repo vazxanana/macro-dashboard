@@ -42,7 +42,9 @@ export const DK = {
 // ownStream: its live trades from before and the owner-shadow trades the same rule takes after), so its history is kept.
 export const SHADOW_11NOV = '2026-11-11';
 export const SYSTEMS = [
-  { id: 'replica', name: 'Gold replica', desk: 'Meridian', k: 'replica', shadow: true, since: SHADOW_11NOV },
+  // live again from 20 Nov 2026 (owner: "replica shadow to live", user rule replica-live); its record stays one continuous own
+  // stream (live before 11 Nov, owner-shadow 11-20 Nov, live after), read through ownStream like a shadowed system's
+  { id: 'replica', name: 'Gold replica', desk: 'Meridian', k: 'replica', ownStream: true, liveAgain: '2026-11-20' },
   { id: 'mosha-bo', name: 'Mosha BO', desk: 'Meridian', k: 'mosha-bo', shadow: true, since: SHADOW_11NOV },
   { id: 'gtrend', name: 'Gold trend', desk: 'Meridian', k: 'gtrend' },
   { id: 'gtrend5', name: 'Gold trend fast', desk: 'Meridian', k: 'gtrend5', shadow: true, since: '2026-11-07' },   // owner moved to shadow 7 Nov (#530): shown, never alerted
@@ -169,7 +171,7 @@ export function recordOf(sys, D, b = {}) {
   const mine = (x) => x.k === sys.k && (!sys.session || x.session === sys.session);
   const rp = ((D.replay && D.replay.trades) || []).filter((x) => mine(x) && closed(x));
   const fwd = sys.session ? (Array.isArray(D.research) ? D.research : []) : (Array.isArray(D.trades) ? D.trades : []);
-  const lv = fwd.filter((x) => mine(x) && closed(x) && (sys.shadow ? ownStream(x) : !x.shadow));
+  const lv = fwd.filter((x) => mine(x) && closed(x) && (sys.shadow || sys.ownStream ? ownStream(x) : !x.shadow));
   return joinRecord(fold(rp, replayNet), fold(lv, merNet), hist);
 }
 
