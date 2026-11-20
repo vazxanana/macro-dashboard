@@ -16,6 +16,10 @@ on:
         description: 'For the marks part: a JSON file in the repository, { SYMBOL: [unix sec, ...] }'
         required: false
         default: ''
+      tag:
+        description: 'Optional suffix of the output file (ticks-<SYMBOL>-<tag>.json), a-z 0-9 -'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -57,6 +61,7 @@ jobs:
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
           SYMS: ${{ inputs.symbols }}
           PROBE_MARKS: ${{ inputs.marks }}
+          PROBE_TAG: ${{ inputs.tag }}
         run: |
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"

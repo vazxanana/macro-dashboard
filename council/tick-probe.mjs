@@ -208,7 +208,7 @@ if (process.argv[1] && process.argv[1].endsWith('tick-probe.mjs')) {
     const OD = path.join(dir, 'research', 'probe'); fs.mkdirSync(OD, { recursive: true });
     for (const [n, v] of Object.entries(r.symbols)) {
       if (v.errors) v.errors = v.errors.map(scrub);
-      fs.writeFileSync(path.join(OD, `ticks-${n}.json`), JSON.stringify({ at: r.at, source: r.source, broker: r.broker, symbol: n, ...v }));
+      fs.writeFileSync(path.join(OD, `ticks-${n}${/^[a-z0-9-]{1,20}$/.test(process.env.PROBE_TAG || '') ? '-' + process.env.PROBE_TAG : ''}.json`), JSON.stringify({ at: r.at, source: r.source, broker: r.broker, symbol: n, ...v }));
       console.log(`tick probe ${n}: reach ${v.reachDays ?? '?'} days, ${(v.hours || []).length} hours, ${(v.events || []).length} events${v.errors && v.errors.length ? `, ${v.errors.length} errors` : ''}`);
     }
   } catch (e) { console.log(`tick probe failed: ${scrub(e.message || e)}`); process.exit(1); }
