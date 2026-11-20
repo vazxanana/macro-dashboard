@@ -102,7 +102,8 @@ export async function run({ env = process.env, dir = 'data', WS = globalThis.Web
   // 1) enter at 00:55:00 UTC
   if (!rec) {
     if (now() > P.entryAt + LATE_S) { rec = { day: P.ymd, status: 'missed', why: `the run started at ${new Date(now() * 1000).toISOString()}, after 00:56` }; J.trades.push(rec); write(J); log('gotobi: too late to enter'); return { skipped: 'late', rec }; }
-    const bars = await barsFn(P.ymd); const D = stopDistance(bars, P.ymd);
+    let bars; try { bars = await barsFn(P.ymd); } catch (e) { rec = { day: P.ymd, status: 'error', why: 'candles: ' + scrub(String((e && e.message) || e)).slice(0, 120) }; J.trades.push(rec); write(J); log('gotobi: ' + rec.why); return { error: rec.why, rec }; }
+    const D = stopDistance(bars, P.ymd);
     if (!(D > 0)) { rec = { day: P.ymd, status: 'no-stop', why: 'fewer than 15 of the 20 days before have both prices' }; J.trades.push(rec); write(J); return { skipped: 'nostop', rec }; }
     await until(P.entryAt - 40); pull();   // the council may have refreshed the cTrader token since the job started
     let s = null, ctid;
