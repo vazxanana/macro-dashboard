@@ -4990,6 +4990,11 @@ Read the demo broker's own bid / ask (council/tick-probe.mjs). Nothing live chan
   31 Oct 2026 (the study's own functions, sha256-pinned; reproduces its 2026 trades to the cent), against an event bootstrap of
   its 92 out-of-sample trades (+0.133R). Too few under 10; checkpoints at 20 (~2 years) and 40 events. The same `vb-forward.yml`
   writes council-data `research/forward/gold-pre-holiday.json`. First event: Thanksgiving (25 Nov 2026). Nothing trades.
-- `index-vol-breakout-hourcost`: the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
+- `vb-macro-size` (pre-registered 20 Nov 2026): the rule book's "size by the Gold Macro Score, never short above +0.25" on T1
+  (2007-26, 3,713 trades, C1 cost, gate reproduced). **FAIL**: longs above +0.25 +0.268R vs +0.119R a trade (t 1.93, Holm p 0.054;
+  month-sum t −0.07), shorts above +0.25 not worse (t −0.88); sized the book's way +0.155R per unit of risk vs +0.140R flat, same
+  month t and drawdown. T1 stays flat 1R. Local reruns of research fetch scripts need `MD_BASE=https://aureumdesk.co.uk/md/`
+  (their default meridianx.dev answers 402 since the Vercel project went).
+ the failed index breakout at the demo's measured hourly spreads (NAS100 2.7 × 10⁻⁵ of price in
   every hour, US500 3.9-4.7 × 10⁻⁵, no commission; the original charged 3 / 1 points): **FAIL, 0 of 2**. NAS100 +0.043R a trade
   (n 2,040, month t 2.01, Holm 0.044) fails only the placebo (35 of 40 random entries beaten, 38 needed); SPX500 +0.015R (t 0.69).
