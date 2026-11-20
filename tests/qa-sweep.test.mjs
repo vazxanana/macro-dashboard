@@ -970,3 +970,19 @@ test('trade review (20 Nov 2026): no t under 10 closed trades, a retired setup i
   assert.match(P, /retired from live<\/span>/); assert.doesNotMatch(P, />no longer live<\/span>/);
   assert.match(P, /#ms-ea, #ms-tr \{ align-self: start; \}/);
 });
+
+test('Council research (20 Nov 2026): the Analyst brief and the AI review fold by section, Ready right now shows six then a button', () => {
+  const P = fs.readFileSync('market-structure.html', 'utf8');
+  const src = P.slice(P.indexOf('  function mdFold('), P.indexOf("  document.addEventListener('toggle'"));
+  const esc = (x) => String(x).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const MDF = new Set(['an|Two']);
+  const mdFold = new Function('esc', 'MDF', src + '; return mdFold;')(esc, MDF);
+  const out = mdFold('<h3>T</h3><p>lead</p><h4>One</h4><p>a</p><h4>Two</h4><ul><li>b</li></ul>', 'an');
+  assert.match(out, /^<h3>T<\/h3><p>lead<\/p><details class="c-mdf" data-mdf="an\|One"><summary><h4>One<\/h4><\/summary><div class="c-mdf-b"><p>a<\/p><\/div><\/details>/);
+  assert.match(out, /<details class="c-mdf" data-mdf="an\|Two" open>/);
+  assert.equal(mdFold('<p>no sections</p>', 'an'), '<p>no sections</p>');
+  assert.match(P, /set\('ms-c-analysis', C\.analysis \? mdFold\(md\(C\.analysis\), 'an'\)/);
+  assert.match(P, /set\('ms-c-review', C\.review \? mdFold\(md\(C\.review\), 'rv'\)/);
+  assert.match(P, /#ms-c-ready:not\(\[data-all\]\) > li\.c-rx \{ display: none; \}/);
+  assert.match(P, /details\.c-mdf > summary \{[^}]*min-height: 44px/);
+});

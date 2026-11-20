@@ -8147,6 +8147,21 @@ function msNextSetup(bars, A) {
     endTbl(); if (list) out.push('</ul>');
     return out.join('');
   }
+  // The Analyst's brief and the Coach's AI review ran to about 14,000 px on Council → Research (20 Nov 2026): each "## " section of
+  // the rendered markdown folds to its heading (details.c-mdf); the title and the lines before the first section stay open.
+  // Open state is kept in memory for the visit only (MDF, by box id and heading).
+  const MDF = new Set();
+  // "Ready right now" lists every Ready market (20 on 20 Nov 2026): the first six show, the rest behind one button (memory only)
+  let RDY_ALL = false;
+  document.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('#ms-c-ready .c-rbtn'); if (!b) return; RDY_ALL = !RDY_ALL;
+    const u = b.closest('ul'); u.toggleAttribute('data-all', RDY_ALL); b.setAttribute('aria-expanded', String(RDY_ALL)); b.textContent = RDY_ALL ? 'Show fewer' : `Show all ${u.querySelectorAll('li:not(.c-rmore)').length}`; });
+  function mdFold(html, box) {
+    const parts = String(html).split('<h4>'); if (parts.length < 2) return html;
+    return parts[0] + parts.slice(1).map((p) => { const i = p.indexOf('</h4>'), h = p.slice(0, i), body = p.slice(i + 5);
+      const k = box + '|' + h.replace(/<[^>]+>/g, '');
+      return `<details class="c-mdf" data-mdf="${esc(k)}"${MDF.has(k) ? ' open' : ''}><summary><h4>${h}</h4></summary><div class="c-mdf-b">${body}</div></details>`; }).join('');
+  }
+  document.addEventListener('toggle', (e) => { const d = e.target; if (!d.matches || !d.matches('details.c-mdf')) return; d.open ? MDF.add(d.dataset.mdf) : MDF.delete(d.dataset.mdf); }, true);
   const ago = (t) => { const d = Date.now() / 1000 - t; return d < 90 ? 'just now' : d < 3600 ? `${Math.round(d / 60)} min ago` : d < 86400 ? `${Math.round(d / 3600)} h ago` : `${Math.round(d / 86400)} d ago`; };
   async function loadCouncil() {
     if (!document.getElementById('v-council') || window.msBootGate) return;   // under the first-load sign-in card the app sleeps
@@ -8887,8 +8902,9 @@ function msNextSetup(bars, A) {
     renderBacktest(C.backtest, C.config || {});
     // Analyst
     const ready = C.snap ? Object.entries(C.snap.markets || {}).flatMap(([k, m]) => m.setups.filter((t) => t.state === 'READY').map((t) => ({ k, m, t }))) : [];
-    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }) => `<li><a href="?s=${k}#setup"><b>${esc(m.label)}</b> <em class="sd ${t.side === 'sell' ? 's' : 'b'}">${t.side === 'sell' ? 'Sell' : 'Buy'}</em> ${esc(t.name)} <small>${esc(t.pair)}</small></a><span title="Planned reward for 1R of risk, not a result">target ${(+t.rr).toFixed(2)}R</span></li>`).join('') : '<li class="empty">No market is Ready at the last Trader run.</li>');
-    set('ms-c-analysis', C.analysis ? md(C.analysis) : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
+    set('ms-c-ready', ready.length ? ready.map(({ k, m, t }, i) => `<li${i >= 6 ? ' class="c-rx"' : ''}><a href="?s=${k}#setup"><b>${esc(m.label)}</b> <em class="sd ${t.side === 'sell' ? 's' : 'b'}">${t.side === 'sell' ? 'Sell' : 'Buy'}</em> ${esc(t.name)} <small>${esc(t.pair)}</small></a><span title="Planned reward for 1R of risk, not a result">target ${(+t.rr).toFixed(2)}R</span></li>`).join('') + (ready.length > 6 ? `<li class="c-rmore"><button type="button" class="c-rbtn" aria-expanded="false">Show all ${ready.length}</button></li>` : '') : '<li class="empty">No market is Ready at the last Trader run.</li>');
+    { const u = document.getElementById('ms-c-ready'); if (u) { u.toggleAttribute('data-all', !!RDY_ALL); const bt = u.querySelector('.c-rbtn'); if (bt) { bt.setAttribute('aria-expanded', String(!!RDY_ALL)); bt.textContent = RDY_ALL ? 'Show fewer' : `Show all ${ready.length}`; } } }
+    set('ms-c-analysis', C.analysis ? mdFold(md(C.analysis), 'an') : '<p class="ms-note">The Analyst writes the weekly brief every Monday morning: bias per market, key levels, likely setups and the week\'s news.</p>');
     // Coach
     const cf = C.config || { buf: CFG.buf, minRR: CFG.minRR, paused: {}, history: [] };
     const paused = Object.entries(cf.paused || {});
@@ -8900,7 +8916,7 @@ function msNextSetup(bars, A) {
     set('ms-c-shadow-sum', sh.length ? `Shadow trades (blocked by rules) closed: ${sh.length}, ${shR >= 0 ? '+' : ''}${shR.toFixed(1)}R. ${shR > 0 ? 'Blocked trades are winning: the Coach will loosen the rule that blocks them.' : 'The rules are keeping you out of losing trades.'}` : 'Blocked setups are followed as shadow trades so the Coach can check every rule it adds.');
     set('ms-c-notes', C.coach ? (C.coach.notes || []).map((n) => `<li>${esc(n)}</li>`).join('') : '<li>The statistical Coach runs once a day with the Trader.</li>');
     set('ms-c-hist', (cf.history || []).slice(-8).reverse().map((h) => `<li class="${/^user|owner/i.test(String(h.by)) ? 'by-you' : 'by-coach'}"><span>${esc(String(h.at).slice(0, 10))} · ${/^user|owner/i.test(String(h.by)) ? 'you' : esc(h.by)}</span><b>${mnTxt(esc(h.change))}</b><em>${mnTxt(esc(h.why))}</em></li>`).join('') || '<li class="empty">No rule changes yet.</li>');
-    set('ms-c-review', C.review ? md(C.review) : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
+    set('ms-c-review', C.review ? mdFold(md(C.review), 'rv') : '<p class="ms-note">The AI Coach writes a review after each trading day: what worked, what didn\'t, and any rule it changed.</p>');
     });
     renderHome();
     const m1p = panes['1m']; councilHere(m1p && m1p.bars ? m1p.bars[m1p.bars.length - 1].close : null);
@@ -11521,6 +11537,18 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #v-council .c-md h3 { font-size: 17px; margin: 22px 0 8px; padding-top: 16px; border-top: 1px solid var(--line-soft); text-wrap: balance; }
 #v-council .c-md > h3:first-child { margin-top: 4px; padding-top: 0; border-top: 0; }
 #v-council .c-md h4, #v-council .c-md h5 { font-size: 14px; margin: 18px 0 6px; }
+#v-council .c-md details.c-mdf { border-top: 1px solid var(--line-soft); }
+#v-council .c-md details.c-mdf > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; min-height: 44px; }
+#v-council .c-md details.c-mdf > summary::-webkit-details-marker { display: none; }
+#v-council .c-md details.c-mdf > summary::before { content: ""; width: 7px; height: 7px; border-right: 2px solid var(--ink-dim); border-bottom: 2px solid var(--ink-dim); transform: rotate(-45deg); transition: transform .15s; flex: none; }
+#v-council .c-md details.c-mdf[open] > summary::before { transform: rotate(45deg); }
+#v-council .c-md details.c-mdf > summary h4 { margin: 0; }
+#v-council .c-md details.c-mdf > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+#v-council .c-md .c-mdf-b { padding: 0 0 10px 15px; }
+#ms-c-ready:not([data-all]) > li.c-rx { display: none; }
+#ms-c-ready > li.c-rmore { border: 0; background: none; padding: 0; }
+#ms-c-ready .c-rbtn { min-height: 44px; padding: 0 4px; border: 0; background: none; color: var(--accent-ink, var(--accent)); font: inherit; font-weight: 600; cursor: pointer; }
+#ms-c-ready .c-rbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 #v-council .c-md .c-md-tw { margin: 6px 0 14px; border: 1px solid var(--line); border-radius: var(--r-sm, 6px); }
 #v-council .c-md table { font-size: 12.5px; }
 #v-council .c-md th { background: var(--panel-raised); font-size: 12px; white-space: nowrap; }

@@ -866,6 +866,13 @@ switch (`setMode` and its click handler) matched every `[data-mk]` button, inclu
 (`data-mk="all|xau|nq|pairs"`): the calendar never showed its selected market and a tap on "Gold" there reset the chart markup to
 Meridian; both are now scoped to `.mk-mode`. The veteran discussion's "STRATEGIST" label no longer runs into its text.
 
+## Council → Research, folded (20 Nov 2026)
+Display only. The Analyst's weekly brief (`analysis/latest.md`) and the Coach's latest AI review (`reviews/latest.md`) were drawn open
+and made the Research pane about 17,000 px tall at 1440 px. `mdFold(html, box)` (next to `md()`) wraps each `## ` section of the
+rendered markdown in `details.c-mdf` (summary = the heading, 44 px; the title and the lines before the first section stay open);
+open state is kept in memory for the visit (`MDF`). "Ready right now" (`#ms-c-ready`) shows six rows and "Show all n" (`.c-rbtn`,
+`RDY_ALL`, memory only). Research pane 17,094 → about 5,000 px; the Analyst card 13,791 → 1,245 px. Test: `tests/qa-sweep.test.mjs`.
+
 ## Home and Council reading pass (11 Nov 2026, quality round)
 Display only, `market-structure.html` Home and Council panes; no council member computes anything differently. Found by using
 the panes as owner, reviewer and viewer at 390 px touch and 1440 px in the three themes, each figure checked against council-data.
