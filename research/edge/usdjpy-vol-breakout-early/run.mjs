@@ -6,14 +6,32 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
-import { buildDays, summary } from '../index-vol-breakout/original.mjs';
-import { trades, placeboTrades, SEEDS } from '../fx-vol-breakout/run.mjs';
+import { buildDays, daySkip, vbTrade, placeboTrade, rng, summary } from '../index-vol-breakout/original.mjs';
+import { charge, K, SEEDS, PLACEBO } from '../fx-vol-breakout/run.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const W = { ALL: ['2005-01-04', '2015-12-31'], H1: ['2005-01-04', '2010-12-31'], H2: ['2011-01-01', '2015-12-31'] };
 export const FETCH = { from: '2004-12-01T00:00:00Z', to: '2016-01-08T00:00:00Z' }, MIN_N = 1000;
 const inW = (day, [a, b]) => day >= a && day <= b;
 const mean = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : NaN);
+// fx-vol-breakout's trades / placeboTrades, without its 2016 → now day filter (that study's window): same calls, same order
+export function trades(k, days) {
+  const tr = [];
+  for (const d of days.filter((x) => !daySkip(x))) {
+    const x = vbTrade(d.bars, { k: K, sides: 'both', prevRange: d.prevRange, cost: 0 }); if (x.skip) continue;
+    tr.push({ day: d.day, mk: k, ...charge(k, x) });
+  }
+  return tr;
+}
+export function placeboTrades(k, days, seed) {
+  const P = days.filter((x) => !daySkip(x)), grid = (PLACEBO.to - PLACEBO.from) / 300 + 1, rand = rng(seed), tr = [];
+  for (const d of P) {
+    const startT = d.d0 + PLACEBO.from + 300 * Math.floor(rand() * grid), side = rand() < 0.5 ? 1 : -1;
+    const x = placeboTrade(d.bars, { startT, side, dist: K * d.prevRange, cost: 0 }); if (!x) continue;
+    tr.push(charge(k, x));
+  }
+  return tr;
+}
 const sg = (v, d = 3) => (v == null || !Number.isFinite(v) ? '—' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d));
 
 // the window starts at the first complete month with candles (pre-registered)
@@ -38,6 +56,7 @@ export function report(R) {
     '| Window | n | Win | Net R/trade | Gross R/trade | Net 2x cost | Month t | Max DD R |', '|---|---|---|---|---|---|---|---|',
     row(`${R.window[0]} → ${R.window[1]}`, d.all), row(`→ 2010`, d.h1), row('2011-2015', d.h2), '',
     `Placebo (40 seeds): the rule beats ${d.beaten} of 40 (38 needed). Checks: ${Object.entries(d.checks).map(([k, v]) => `${k} ${v ? 'yes' : 'no'}`).join(', ') || 'none (too few)'}.`, '',
+    '**Reading.** ' + (R.decision.pass ? 'A PASS on years `fx-vol-breakout` never read: USD/JPY T1 is a candidate for a forward paper record (its own pre-registration), never a live rule without the owner. Limits: today\'s demo cost is charged on 2005-15 (spreads were wider then; the 2x-cost line is the check), OANDA mid candles, not the broker\'s ticks; drawdowns of 20-42R. Code note: the first run counted 0 trades because `fx-vol-breakout` `trades` keeps only 2016 → now days; this study loops over the window\'s days with the same `vbTrade`, `charge` and placebo calls.' : 'The USD/JPY lead ends here.'), '',
     `Data: OANDA mid M5 usdjpy ${R.data.first} → ${R.data.last}, ${R.data.candles} candles. Cost: 0.000045 of the entry + 0.005 a round trip.`, ''].join('\n');
 }
 
