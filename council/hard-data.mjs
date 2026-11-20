@@ -6,7 +6,9 @@
 //  - the Atlanta Fed's GDPNow for the current quarter (FRED series GDPNOW);
 //  - the market-implied odds of the next Fed decision from two prediction markets (Kalshi's KXFEDDECISION event, Polymarket's
 //    "Fed decision in <month>" event): what traders are paying, not a forecast of ours;
-//  - the Fed's own calendar of speeches, testimony and releases (federalreserve.gov/json/calendar.json).
+//  - the Fed's own calendar of speeches, testimony and releases (federalreserve.gov/json/calendar.json);
+//  - the US Treasury's announced note and bond auctions (TreasuryDirect TA_WS, 20 Nov 2026; the Fiscal Data upcoming-auctions
+//    file, stale from a runner on 20 Nov, only as the last fallback).
 // A source that fails keeps its last good copy (with its own `at`); nothing here is a rule, a call or a trade.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,6 +21,11 @@ export const SRC = {
   fedcal: 'https://www.federalreserve.gov/json/calendar.json',
   kalshi: (ev) => `https://api.elections.kalshi.com/trade-api/v2/markets?event_ticker=${ev}`,
   poly: (q) => `https://gamma-api.polymarket.com/public-search?q=${encodeURIComponent(q)}`,
+  auctions: [
+    'https://www.treasurydirect.gov/TA_WS/securities/announced?format=json',
+    'https://www.treasurydirect.gov/TA_WS/securities/upcoming?format=json',
+    'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/upcoming_auctions?sort=-auction_date&page[size]=100',
+  ],
 };
 const MON = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const MONTH = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -68,6 +75,46 @@ export function parseFedCal(J, from, to) {
   }
   const t = (x) => { const m = /(\d{1,2}):(\d{2})\s*([ap])/i.exec(x.time || ''); return m ? ((+m[1] % 12) + (/p/i.test(m[3]) ? 12 : 0)) * 60 + +m[2] : 0; };
   return out.sort((a, b) => a.day.localeCompare(b.day) || t(a) - t(b));
+}
+
+// US Treasury auctions with an auction date in [from, to] ('YYYY-MM-DD'): notes, bonds, TIPS and FRNs (labelled), and the
+// 52-week bill; other bills are left out (many a week, little macro weight). Tolerant of two shapes: TreasuryDirect's array of
+// { securityType, securityTerm, auctionDate '2026-11-24T00:00:00', offeringAmount, cusip, tips, floatingRate, reopening } and
+// Fiscal Data's { data: [{ security_type, security_term, auction_date, offering_amt, cusip, reopening }] }. Amount in billions.
+const pick = (o, ks) => { for (const k of ks) if (o[k] != null && o[k] !== '') return o[k]; return null; };
+const yes = (x) => x === true || /^(yes|y|true)$/i.test(String(x == null ? '' : x).trim());
+export function parseAuctions(J, from, to) {
+  const rows = Array.isArray(J) ? J : J && Array.isArray(J.data) ? J.data : J && Array.isArray(J.securities) ? J.securities : [];
+  const out = [], seen = new Set();
+  for (const r of rows) {
+    if (!r || typeof r !== 'object') continue;
+    const dRaw = String(pick(r, ['auctionDate', 'auction_date', 'AuctionDate']) || '');
+    let day = (/^(\d{4}-\d{2}-\d{2})/.exec(dRaw) || [])[1] || null;
+    if (!day) { const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(dRaw); if (m) day = `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`; }
+    if (!day || !(day >= from && day <= to)) continue;
+    const st = String(pick(r, ['securityType', 'security_type']) || '').trim(), kind = String(r.type || '');
+    const term = String(pick(r, ['securityTerm', 'security_term']) || '').trim().slice(0, 30);
+    const tips = yes(r.tips) || /TIPS/i.test(st + ' ' + kind), frn = yes(r.floatingRate) || /FRN|floating/i.test(st + ' ' + kind);
+    let type = /bond/i.test(st) ? 'Bond' : /note/i.test(st) ? 'Note' : /bill/i.test(st) ? 'Bill' : tips ? 'TIPS' : frn ? 'FRN' : null;
+    if (!type || !term) continue;
+    if (type === 'Bill' && !/52-week|1-year|364-day/i.test(term)) continue;
+    if (type !== 'Bill' && tips) type = 'TIPS';
+    else if (type !== 'Bill' && frn) type = 'FRN';
+    const v = num(pick(r, ['offeringAmount', 'offering_amt', 'offeringAmt']));
+    const amount = v == null || v <= 0 ? null : r2(v >= 1e8 ? v / 1e9 : v >= 1000 ? v / 1000 : v);
+    const cusip = String(pick(r, ['cusip', 'CUSIP']) || '').trim().slice(0, 12) || null, key = `${day}|${term}|${type}`;
+    if (seen.has(key)) continue; seen.add(key);
+    const a = { day, term, type, amount, reopening: yes(r.reopening) };
+    if (cusip) a.cusip = cusip;
+    out.push(a);
+  }
+  const ord = (x) => { const m = /(\d+)-(Year|Week)/i.exec(x.term); return m ? +m[1] * (/week/i.test(m[2]) ? 1 / 52 : 1) : 99; };
+  return out.sort((a, b) => a.day.localeCompare(b.day) || ord(a) - ord(b));
+}
+// One plain text for an auction: "US Treasury 7-Year Note auction, $44 billion".
+export function auctionText(a) {
+  const amt = Number.isFinite(a.amount) ? `, $${Number.isInteger(a.amount) ? a.amount : a.amount.toFixed(1).replace(/\.0$/, '')} billion` : '';
+  return `US Treasury ${a.term} ${a.type} auction${a.reopening ? ' (reopening)' : ''}${amt}`;
 }
 
 // The next FOMC decision from the council's schedule (council/events.mjs).
@@ -229,13 +276,23 @@ async function getText(fetchFn, url, ms = 30000) {
 // Fetch everything; a failed part keeps `prev`'s copy of it. `now` in unix seconds.
 export async function collect({ now = Math.floor(Date.now() / 1000), fetchFn = fetch, prev = null, log = () => {} } = {}) {
   const P = prev || {}, out = { v: 1, at: new Date(now * 1000).toISOString().replace(/\.\d+Z$/, 'Z'), sources: {},
-    label: 'Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision and the Fed\'s own calendar. Context, not a forecast of ours; paper only.' };
+    label: 'Hard-to-find public data: the Cleveland Fed inflation nowcast, the Atlanta Fed GDPNow, prediction-market odds of the next Fed decision, the Fed\'s own calendar and the US Treasury\'s note and bond auctions. Context, not a forecast of ours; paper only.' };
   const part = async (k, fn) => { try { out[k] = await fn(); if (out[k] == null) throw new Error('nothing parsed'); out.sources[k] = 'ok'; }
     catch (e) { out[k] = P[k] || null; out.sources[k] = 'failed: ' + String(e && e.message || e).slice(0, 80) + (P[k] ? ' (last good copy kept)' : ''); log(`hard data ${k}: ${out.sources[k]}`); } };
   await part('nowcast', async () => { const n = parseNowcast(JSON.parse(await getText(fetchFn, SRC.nowcast, 60000))); return n && { ...n, at: out.at }; });
   await part('gdpnow', async () => { const g = parseGdpNow(await getText(fetchFn, SRC.gdpnow)); return g && { ...g, at: out.at }; });
   const from = new Date((now - 2 * 86400) * 1000).toISOString().slice(0, 10), to = new Date((now + 14 * 86400) * 1000).toISOString().slice(0, 10);
   await part('fed', async () => { const t = await getText(fetchFn, SRC.fedcal); return { at: out.at, events: parseFedCal(JSON.parse(t.replace(/^﻿/, '')), from, to) }; });
+  await part('auctions', async () => {
+    const af = new Date((now - 86400) * 1000).toISOString().slice(0, 10), why = [];
+    // each address in order; the first that holds auctions in the window is used (an empty answer falls through to the next)
+    for (const u of SRC.auctions) {
+      const host = new URL(u).host;
+      try { const list = parseAuctions(JSON.parse((await getText(fetchFn, u)).replace(/^\uFEFF/, '')), af, to); if (list.length) return { at: out.at, src: host, list }; why.push(host + ' none in the window'); }
+      catch (e) { why.push(host + ' ' + String(e && e.message || e).slice(0, 30)); }
+    }
+    throw new Error(why.join('; '));
+  });
   const M = nextFomc(now);
   await part('odds', async () => {
     if (!M) return null;

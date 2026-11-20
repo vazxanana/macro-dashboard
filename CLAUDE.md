@@ -3017,6 +3017,11 @@ plain lines "92% now, 90% a day ago, 85% a week ago" (newest reading at most 6 h
 meeting / month / quarter only; nothing without an earlier reading); the Week ahead puts them in `frame.lines` (`frame.moves`) and
 `bigOddsMove` (5 points or more over a week) on top. A change in what a model or traders say, never a signal. Test:
 `tests/hard-data-history.test.mjs`.
+**Treasury auctions** (20 Nov 2026): `auctions` = the notes, bonds, TIPS, FRNs and 52-week bill announced for yesterday to +14 days
+(`parseAuctions`, `auctionText`; other bills left out), from TreasuryDirect `TA_WS/securities/announced?format=json`, then
+`…/upcoming`, then the stale Fiscal Data file (the first with auctions in the window wins; all failing keeps the last copy); the
+Week ahead puts them on their day (`d.auctions`, text) and in the day line. Shapes not yet seen from a runner: the probe workflow
+prints them. Test: `tests/hard-data-auctions.test.mjs`.
 
 ## Red folder surprise study (19 Nov 2026, from the owner's red-folder research note, test B)
 `research/edge/red-folder-surprise/` (PREREGISTRATION.md committed first; `run.mjs`, RESULT.md, result.json). With the consensus
