@@ -1261,3 +1261,14 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
 - **Judged how.** A forward record in council-data `gotobi/trades.json`, against the study's figures; nothing is called an edge
   until the forward record says so (about 70 trades a year; a first look at 30).
 - **To stop.** A user rule or edit setting `config.gotobi = { on: false }`, or disable the workflow.
+
+### [ ] 62. Run the gold volatility breakout (T1) as a forward paper / demo stream?
+
+- **Status (20 Nov 2026): open.** Proposed in `research/proposals/2026-11-14-gold-vol-breakout.md` (its three choices). Every
+  cost question it raised is now measured on the demo broker: spreads at every UTC hour about $0.07-0.10
+  (`gold-vol-breakout-hourcost`) and the stop order's own slippage $0.07 median (`gold-vol-breakout-exec`). Filled at the broker's
+  ticks over the last three years, T1 made +0.184R a trade after commission (n 572, month t 3.54).
+- **Why it is still your decision.** Those three years are in sample for the rule (found on 2007-26), the ten best trades carry
+  55 % of the result, and 2024 was close to flat (+0.07R). Only a forward record says whether it still pays. Nothing is built:
+  a stream would need a Trader block (or a job like the gotobi one) on a demo account, a stop on every trade, paper only.
+- **If nothing is decided.** Nothing runs; the studies stay as evidence.
