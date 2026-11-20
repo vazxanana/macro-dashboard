@@ -76,6 +76,8 @@ export function report(R) {
     '## The book\'s sizing applied to T1 (reported, not tested)', '',
     '| Window | Flat total R | Flat month t | Flat max DD | Sized total R | Risk units | Sized R per unit | Sized month t | Sized max DD |', '|---|---|---|---|---|---|---|---|---|',
     s('2007-26', R.sizing.pooled), s('2007-16', R.sizing.first), s('2017-26', R.sizing.second), '',
+    '## Deviation from the pre-registration (stated)', '', R.deviation, '',
+    '## Reading', '', R.reading, '',
     '## Limits', '', '- The score and the rule book were written knowing 2007-26; T1 was found on 2016-26. The split t counts trades of the same week as independent (the month-sum t beside it is post hoc).', '- Today\'s cost profile is charged for every year.', ''].join('\n');
 }
 
@@ -91,7 +93,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const trades = tr.map((x, i) => ({ day: x.day, side: x.side > 0 ? 'buy' : 'sell', R: x.R, net: net[i].net }));
   const D = load(dataDir), A = analyse(trades, D.scoreAt);
   const verdict = (A.H1.pass || A.H2.pass ? 'PASS' : 'FAIL') + `: H1 (longs above +0.25 better) ${A.H1.pass ? 'passes' : 'fails'}, difference ${sg(A.H1.diff)}R (t ${sg(A.H1.t, 2)}); H2 (shorts above +0.25 worse) ${A.H2.pass ? 'passes' : 'fails'}, difference ${sg(A.H2.diff)}R (t ${sg(A.H2.t, 2)})`;
-  const res = { study: 'vb-macro-size', title: 'Gold breakout T1 sized by the Gold Macro Score', built: '2026-11-20', params: P, gate, weeks: D.weeks, verdict, ...A };
+  const deviation = 'The plan named `GGO_TO=2026-11-13` for the candle download. The loader drops the last calendar day of a file, so candles ending at midnight on 13 Nov left 12 Nov out and the gate missed by one trade (3,712 against 3,713). The candles of 12-13 Nov were added (a second download, `GGO_FROM=2026-11-12`, merged by time) so that the plan\'s own window, days to 2026-11-12, and its gate hold. No trade was looked at before the gate passed.';
+  const reading = `Longs taken with the score above +0.25 did better (${sg(A.H1.above.netR)}R against ${sg(A.H1.atOrBelow.netR)}R a trade, positive in both halves), but by a margin the test cannot separate from luck (t ${sg(A.H1.t, 2)}, Holm p ${A.H1.holm}); counted by calendar months it is nil (t ${sg(A.H1.monthSum.t, 2)}). Shorts above +0.25 were not worse in a way that counts (t ${sg(A.H2.t, 2)}). Sized the book's way, T1 earns ${sg(A.sizing.pooled.book.perRisk)}R per unit of risk against ${sg(A.sizing.pooled.flat.perRisk)}R flat, with the same month t and drawdown: no reason to size T1 by the score. T1's forward record stays flat 1R.`;
+  const res = { study: 'vb-macro-size', title: 'Gold breakout T1 sized by the Gold Macro Score', built: '2026-11-20', params: P, gate, weeks: D.weeks, verdict, deviation, reading, ...A };
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(res, null, 1) + '\n');
   fs.writeFileSync(path.join(HERE, 'RESULT.md'), report(res));
   console.log(verdict); console.log(JSON.stringify({ H1: A.H1, H2: A.H2, sizing: A.sizing.pooled }));
