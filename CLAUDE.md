@@ -4884,6 +4884,10 @@ label). Demo host, `isLive === false`, the mirror's message allowlist; council-d
 costs = (fill - exit) / D). `config.gotobi = { on: false }` stops it. Never call it an edge before its forward record says so.
 Not checked live: the dispatch token's Actions: write, and the first real gotobi morning (20 Nov 2026). Tests:
 `tests/gotobi-demo.test.mjs`.
+**The cost at the fix, measured (20 Nov 2026, `research/edge/gotobi-exec`)**: the demo broker's own USD/JPY quotes at 00:55 and 06:00
+UTC on 211 gotobi days (Nov 2023 → Nov 2026) put a round trip at 0.81 pip median with commission (p90 0.96, worst 1.49; the study
+assumed 2.0, break-even 3.73): the cost no longer threatens T2. On those executable quotes the fade made +0.163R a trade (month t
+1.80, short of the pre-registered 2; per-trade t 2.01). Slippage beyond the quote is still unmeasured (the demo job's fills will show it).
 
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
