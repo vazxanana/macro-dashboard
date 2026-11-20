@@ -5025,6 +5025,20 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   recorded / open / closed with R, and "Too few to judge" under 20 closed, else "a forward record, not a tested edge". The note says
   both are paper shadows whose studies failed. Hidden for the teacher (CSS beside `#mo-rules`) and never drawn for a guest; folds on
   the simple phone view like the other cards. Display only. Test: `tests/mosha-systems.test.mjs`.
+- **The method, replayed on the last two weeks** (20 Nov 2026, owner: "try to replicate the last 2 weeks", "show the trades like the
+  council and logs"): card `#mo-sopr` after `#mo-sys`, `assets/mosha-sop.js` (`window.MS_MOSHA_SOP`: `sopTrades`, `barrierTrades`,
+  `outcome`, `summary`). When the desk opens it reads gold candles from `/md/bars` (D1 to M1, 13 requests) and walks the last 14
+  days one closed candle at a time with the page's own `msAnalyze` / `msMosha` / `msZones` / `msInternal`: (1) **BO, VR, CF** on
+  the documents' ladder (`LADDER`: D1→H4, H4→H1, H1→M30, M30→M15, M15→M5), entry on the EG after the pullback, target the VR's
+  extreme; (2) **barrier entry**: a fresh H1 or M15 zone, first return of price, a QM (BO Structure) on M1 with the barrier, entry at
+  that close, stop $0.30 past the extreme made at the barrier, target `BARRIER_R` 3R (the replay's own choice, said in the log).
+  One row per entry like the council's table, "Log" opens its steps with their times, "Chart" opens it in the replay chart
+  (`msMoshaReplayTrade`). Summary a kind: entries, reached target / stopped, R before costs, "Too few to judge" under 20 closed, else
+  "two weeks of one reading, not a tested rule". First run (7-20 Nov): the sequence 5 entries, +7.1R; the barrier entry 56 entries,
+  −4R (it takes EVERY fresh barrier; the method says to mark the best one). It found two of Luxus's three trades of 18-20 Nov within a
+  dollar (not shown or stored anywhere: his trades are never committed). Display only: no storage, no council file, no API call,
+  nothing traded; hidden for the teacher and guests. Never call it a record or an edge. Test: `tests/mosha-sop.test.mjs` (a seeded
+  market: stops on the losing side, logs in time order, no look-ahead by cutting and by changing every later price).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
