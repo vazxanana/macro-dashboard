@@ -31,6 +31,9 @@ export function headersOf(request) {
   for (const [k, v] of request.headers) h[k.toLowerCase()] = v;
   const ip = request.headers.get('cf-connecting-ip');
   delete h['x-vercel-forwarded-for'];
+  // 20 Nov 2026 review: nor a forwarded host. Vercel set that header itself; here it would be the client's own words, and
+  // api/signup.js builds the links it emails (confirm, reset) from it. The Host header is the address the request came to.
+  delete h['x-forwarded-host'];
   if (ip) { h['x-real-ip'] = ip; h['x-forwarded-for'] = ip; } else { delete h['x-real-ip']; delete h['x-forwarded-for']; }
   return h;
 }

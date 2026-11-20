@@ -1,0 +1,80 @@
+{
+ "study": "yen-gold",
+ "built": "2026-11-20",
+ "span": [
+  "2007-01-05",
+  "2026-10-16"
+ ],
+ "verdict": "S USD/JPY down > 2 % in 4 weeks → gold higher FAIL (t 0.96, Holm 0.6741, halves t 0.87 / 0.72); W USD/JPY up > 2 % → gold lower FAIL (t -0.91, Holm 0.6741, halves t -0.16 / -1.07)",
+ "tests": {
+  "S": {
+   "want": 1,
+   "all": {
+    "n": 1013,
+    "nX": 180,
+    "slope": 0.0043,
+    "t": 0.96
+   },
+   "first": {
+    "n": 515,
+    "nX": 107,
+    "slope": 0.0061,
+    "t": 0.87
+   },
+   "second": {
+    "n": 498,
+    "nX": 73,
+    "slope": 0.0033,
+    "t": 0.72
+   },
+   "holm": 0.6741,
+   "pass": false
+  },
+  "W": {
+   "want": -1,
+   "all": {
+    "n": 1013,
+    "nX": 186,
+    "slope": -0.0036,
+    "t": -0.91
+   },
+   "first": {
+    "n": 515,
+    "nX": 108,
+    "slope": -0.0009,
+    "t": -0.16
+   },
+   "second": {
+    "n": 498,
+    "nX": 78,
+    "slope": -0.0061,
+    "t": -1.07
+   },
+   "holm": 0.6741,
+   "pass": false
+  }
+ },
+ "classes": {
+  "strong": {
+   "n": 180,
+   "fwd": 0.009,
+   "upShare": 0.617
+  },
+  "flat": {
+   "n": 647,
+   "fwd": 0.0053,
+   "upShare": 0.539
+  },
+  "weak": {
+   "n": 186,
+   "fwd": 0.0025,
+   "upShare": 0.516
+  },
+  "all": {
+   "n": 1013,
+   "fwd": 0.0054
+  }
+ },
+ "coincidentCorr": -0.3447,
+ "weeks": 1013
+}

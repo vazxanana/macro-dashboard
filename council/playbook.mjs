@@ -101,7 +101,7 @@ export function scenarios(g, stats) {
     NFP: ['Labour strong: cuts priced out; 2Y up', 'Path unchanged; score the unemployment change, not the headline', 'Labour soft: cuts priced in; 2Y down'],
     FOMC: ['Hawkish guidance (statement bias, vote split, dots): 2Y up', 'As priced: the press conference decides', 'Dovish guidance: 2Y down'] }[g.type] ||
     [`${cb}: hawkish repricing`, `${cb}: path unchanged`, `${cb}: dovish repricing`];
-  const act = { hot: `Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction's direction, at ¼ starter size. A gold short is never a macro call: it needs this hawkish surprise and a bearish reaction (rule G); if gold closes up anyway, cancel any sell bias.`,
+  const act = { hot: `Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction's direction, at ¼ starter size. A gold short is never a macro call: it needs this hawkish surprise and a bearish reaction (rule G). The rule book's "gold closing up anyway cancels the sell bias" failed its test (research/edge/rulebook-stress C5: after such days gold fell more, n 12, t −1.04), so an up-close is not read as an all-clear.`,
     inline: 'No event trade. Volatility runs about an hour even on an in-line print; after it, the desks\' own setups decide.',
     cool: 'Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction\'s direction, at ¼ starter size; full size only once price confirms (rule G).' };
   return [
