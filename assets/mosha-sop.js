@@ -35,11 +35,12 @@
   var word = function (d) { return d > 0 ? 'buy' : 'sell'; };
 
   // where a trade ended on the finest candles: the stop first when one candle holds both
-  function outcome(tr, bars, after) {
+  function outcome(tr, bars, after, limit) {
     var d = tr.side, r0 = Math.abs(tr.entry - tr.stop), o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 };
     if (!(r0 > 0)) return o;
     for (var i = 0; i < bars.length; i++) { var b = bars[i]; if (b.time < after) continue;
       if (d > 0 ? b.low <= tr.stop : b.high >= tr.stop) { o.status = 'stopped'; o.R = -1; o.endT = b.time; o.exit = tr.stop; return o; }
+      if (limit && b.time === after) continue;   // a limit fills inside its candle: only the stop counts on that candle, never the target or the best-so-far
       if (d > 0 ? b.high >= tr.target : b.low <= tr.target) { o.status = 'target'; o.R = Math.abs(tr.target - tr.entry) / r0; o.endT = b.time; o.exit = tr.target; return o; }
       o.mfe = Math.max(o.mfe, (d > 0 ? b.high - tr.entry : tr.entry - b.low) / r0); }
     if (bars.length) { var c = bars[bars.length - 1].close; o.float = (d > 0 ? c - tr.entry : tr.entry - c) / r0; }
@@ -124,7 +125,7 @@
     });
     rows.sort(function (a, b) { return a.t - b.t; });
     var keep = []; rows.forEach(function (r) { if (!keep.some(function (k) { return k.side === r.side && Math.abs(k.t - r.t) < 1200; })) keep.push(r); });   // barriers of two timeframes often overlap: one entry
-    keep.forEach(function (tr) { delete tr._f; finish(tr, outcome(tr, fine, tr.t)); });
+    keep.forEach(function (tr) { delete tr._f; finish(tr, outcome(tr, fine, tr.t, true)); });
     return keep;
   }
   function finish(tr, oc) {

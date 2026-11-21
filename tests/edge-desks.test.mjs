@@ -140,3 +140,14 @@ test('every desk record carries the key levels its reading used as chart marks',
   for (const l of ['Daily EG zone', 'H4 EG zone', 'M15 EG zone', 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'H4 BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
     assert.ok(src.includes(l), 'mark: ' + l);
 });
+
+test('a limit entry: on its fill candle only the stop counts, never the target, the best-so-far or the trail', () => {
+  // a buy limit at 100, stop 99, target 102: the fill candle's high (103) came before the fill and must not be a win or a run
+  const bars = [{ time: 0, open: 103, high: 103, low: 99.9, close: 100.2 }, { time: 300, open: 100.2, high: 100.4, low: 98.9, close: 99 }];
+  const a = G.outcome(bars, 0, 1, 100, 99, 102, 1e9); assert.deepEqual([a.status, a.R, a.endT, a.mfe], ['stopped', -1, 300, 0]);
+  const b = E.egOutcome({ side: 1, entry: 100, stop: 99, target: 110, r0: 1 }, bars, 0, 1e9); assert.deepEqual([b.status, b.R, b.mfe], ['stopped', -1, 0], 'the trail was not armed by the fill candle\'s high');
+  const c = SOP.outcome({ side: 1, entry: 100, stop: 99, target: 102 }, bars, 0, true); assert.deepEqual([c.status, c.R, c.mfe], ['stopped', -1, 0]);
+  const m = SOP.outcome({ side: 1, entry: 100, stop: 99, target: 102 }, bars, 0); assert.equal(m.status, 'target', 'a market entry at the candle\'s open is read as before');
+  // the stop still counts on the fill candle
+  const s = G.outcome([{ time: 0, open: 101, high: 101, low: 98.5, close: 99 }], 0, 1, 100, 99, 102, 1e9); assert.equal(s.status, 'stopped');
+});

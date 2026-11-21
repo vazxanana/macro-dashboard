@@ -48,6 +48,7 @@ export function outcome(M5, fi, d, entry, stop, target, until) {
   for (let k = fi; k < M5.length; k++) { const b = M5[k];
     if (k > fi && b.time >= until) { o.status = 'time'; o.exit = b.open; o.R = d * (b.open - entry) / r0; o.endT = b.time; return o; }
     if (d > 0 ? b.low <= stop : b.high >= stop) { o.status = 'stopped'; o.exit = stop; o.R = -1; o.endT = b.time; return o; }
+    if (k === fi) continue;   // a limit fills inside its candle: that candle's favourable extreme may have come before the fill, so only the stop counts on it
     if (d > 0 ? b.high >= target : b.low <= target) { o.status = 'target'; o.exit = target; o.R = d * (target - entry) / r0; o.endT = b.time; return o; }
     o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - entry) / r0); }
   if (M5.length) o.float = d * (M5[M5.length - 1].close - entry) / r0; return o;

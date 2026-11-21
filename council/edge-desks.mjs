@@ -40,6 +40,9 @@ export function egOutcome(tr, m5, fillI, until) {
   for (let i = fillI; i < m5.length; i++) { const b = m5[i];
     if (b.time >= until) { o.status = 'time'; o.exit = b.open; o.R = d * (b.open - tr.entry) / r0; o.endT = b.time; return o; }
     if (d > 0 ? b.low <= stop : b.high >= stop) { o.status = moved ? 'trail' : 'stopped'; o.exit = stop; o.R = d * (stop - tr.entry) / r0; o.endT = b.time; return o; }
+    // a limit fills INSIDE its candle, and that candle's favourable extreme may have come before the fill: on the fill candle only
+    // the stop counts (the worst case), never the target, the best-so-far or the trail
+    if (i === fillI) continue;
     if (d > 0 ? b.high >= tr.target : b.low <= tr.target) { o.status = 'target'; o.exit = tr.target; o.R = EG.target; o.endT = b.time; return o; }
     o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - tr.entry) / r0);
     if (o.mfe >= EG.trail[0]) { const ns = tr.entry + d * (o.mfe - EG.trail[1]) * r0; if (d > 0 ? ns > stop : ns < stop) { stop = ns; moved = true; } } }
