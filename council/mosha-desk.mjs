@@ -112,12 +112,13 @@ export function settle(records, freshIds, M5, market = 'xau', feed = 'OANDA') {
   return records.map((r) => {
     if (r.R != null || r.status !== 'open' || (r.market || 'xau') !== market || freshIds.has(r.id) || feedOf(r) !== feed || !(r.t >= M5[0].time)) return r;
     const d = r.side, r0 = Math.abs(r.entry - r.stop); if (!(r0 > 0) || r.target == null) return r;
-    for (const b of M5) { if (b.time < r.t) continue;
-      const gap = b.time > r.t && (d > 0 ? b.open <= r.stop : b.open >= r.stop), hitS = gap || (d > 0 ? b.low <= r.stop : b.high >= r.stop), hitT = !hitS && (d > 0 ? b.high >= r.target : b.low <= r.target);
+    for (const b of M5) { if (b.time + 300 <= r.t) continue;
+      // the candle that holds the fill can only stop the trade: its other extreme may have come before the fill
+      const first = b.time <= r.t, gap = !first && (d > 0 ? b.open <= r.stop : b.open >= r.stop), hitS = gap || (d > 0 ? b.low <= r.stop : b.high >= r.stop), hitT = !hitS && !first && (d > 0 ? b.high >= r.target : b.low <= r.target);
       if (!hitS && !hitT) continue;
       const px = gap ? b.open : hitS ? r.stop : r.target, R = d * (px - r.entry) / r0, { float: _f, ...rest } = r;
-      return { ...rest, status: hitS ? 'stopped' : 'target', R, exit: px, endT: b.time + 300, settled: true,
-        log: (r.log || []).filter((x) => x.t != null).concat({ t: b.time + 300, text: `${SETTLE_NOTE} ${hitS ? 'Stopped' : 'Target reached'}: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }) }; }
+      return { ...rest, status: hitS ? 'stopped' : 'target', R, exit: px, endT: b.time, settled: true,
+        log: (r.log || []).filter((x) => x.t != null).concat({ t: b.time, text: `${SETTLE_NOTE} ${hitS ? 'Stopped' : 'Target reached'}: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }) }; }
     return r; });
 }
 

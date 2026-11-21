@@ -144,7 +144,7 @@ test('an open record the run no longer reads is settled on the candles at its st
   const quiet = [bar(900, 100, 100.5, 99.5, 100), bar(1200, 100, 101, 99, 100), bar(1500, 100, 101.5, 98, 99)];
   assert.equal(M.settle([r], none, quiet)[0].status, 'open', 'neither level reached: still open');
   const stop = M.settle([r], none, quiet.concat(bar(1800, 99, 102.5, 93, 95)))[0];
-  assert.equal(stop.status, 'stopped'); assert.equal(stop.R, -1); assert.equal(stop.endT, 2100); assert.equal(stop.float, undefined); assert.ok(stop.settled, 'the stop first when one candle holds both');
+  assert.equal(stop.status, 'stopped'); assert.equal(stop.R, -1); assert.equal(stop.endT, 1800); assert.equal(stop.float, undefined); assert.ok(stop.settled, 'the stop first when one candle holds both');
   assert.match(stop.log.at(-1).text, /no longer reads this trade again/); assert.ok(stop.log.every((x) => x.t != null));
   const tgt = M.settle([r], none, quiet.concat(bar(1800, 99, 99.5, 93.5, 94)))[0]; assert.equal(tgt.status, 'target'); assert.equal(tgt.R, 3);
   const gap = M.settle([r], none, quiet.concat(bar(1800, 103, 103.5, 102.5, 103)))[0]; assert.equal(gap.exit, 103); assert.equal(gap.R, -1.5, 'a gap through the stop exits at the open');
@@ -153,6 +153,10 @@ test('an open record the run no longer reads is settled on the candles at its st
   assert.equal(M.settle([{ ...r, market: 'eurusd' }], none, all)[0].status, 'open', 'another market\'s candles settle nothing');
   assert.equal(M.settle([{ ...r, feed: 'Kraken' }], none, all)[0].status, 'open', 'another feed\'s record is left alone');
   assert.equal(M.settle([{ ...r, t: 600 }], none, all)[0].status, 'open', 'a record from before the candles on file is left alone');
+  // the candle that holds the fill can only stop the trade (review, 21 Nov 2026)
+  const mid = { ...r, t: 1380 }, pre = [bar(900, 100, 100.5, 99.5, 100)];
+  assert.equal(M.settle([mid], none, pre.concat(bar(1200, 100, 102.5, 99, 100), bar(1500, 99, 99.5, 93, 94)))[0].status, 'stopped', 'a stop touched in the fill\'s own 5-minute candle is read');
+  assert.equal(M.settle([r], none, pre.concat(bar(1200, 100, 100.5, 93, 99), bar(1500, 99, 100, 98, 99)))[0].status, 'open', 'the fill candle reaching the target is not a target');
   const closed = { ...r, status: 'target', R: 3 }; assert.equal(M.settle([closed], none, all)[0], closed, 'a closed record is frozen');
   assert.match(rd('council/edge-desks.mjs'), /settle\(merge\(records, fresh, now\)/); assert.match(rd('council/mosha-desk.mjs'), /settle\(merge\(prev && prev\.records, fresh, now, feed\)/);
 });
