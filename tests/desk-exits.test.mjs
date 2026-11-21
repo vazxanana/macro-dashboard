@@ -55,7 +55,7 @@ test('the report says what result.json says', () => {
   const r = JSON.parse(fs.readFileSync(url, 'utf8')), md = fs.readFileSync(new URL('../research/edge/desk-exits/RESULT.md', import.meta.url), 'utf8');
   // the report's headline line says what happened (21 Nov 2026): the pre-registration set no study-level verdict and the one
   // comparison that cleared the bar still loses after costs, so the report does not print result.json's `verdict` word as a pass
-  assert.ok(md.includes(r.headline), 'the headline figures are the json\'s'); assert.ok(!/\*\*Verdict: PASS/.test(md)); assert.match(md, /\*\*Result, not a pass for the study:\*\*/); assert.match(md, /no exit that clears the bar makes its group profitable\./);
+  assert.ok(md.includes(r.headline), 'the headline figures are the json\'s'); assert.ok(!/\*\*Verdict: PASS/.test(md)); assert.match(md, /\*\*Verdict: 1 of 60 comparisons cleared the bar and it is still a loss after costs; not a pass for the study\.\*\*/); assert.match(md, /no exit that clears the bar makes its group profitable\./);
   assert.equal(r.tests.length, Object.keys(r.groups).length * 4);
   for (const t of r.tests) assert.ok(['better', 'worse', 'no better'].includes(t.verdict));
 });
