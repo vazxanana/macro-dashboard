@@ -4933,8 +4933,14 @@ function msSides(bars, closedN, from, N = 3) {
   const sell = side(-1), buy = side(1), cf = [sell, buy].filter((x) => x && x.state === 'cf').sort((a, b) => b.cf.i - a.cf.i);
   return { sell, buy, pick: cf.length ? cf[0].dir : 0, i0 };
 }
-function msMosha(htf, ltf, buf) {
+// o.near (21 Nov 2026, owner's reading, used by the desk's replay): the VR box runs from the extreme to the NEAREST internal swing
+// before it (3 candles a side, the swing low under a buy BO's extreme, the swing high over a sell BO's, inside the leg from the
+// BO and confirmed by the time the VR formed), instead of to the level the VR's QM broke; only a swing between that level and
+// the extreme is taken, else the box is as before. The VR still forms at that QM, the CF and its cases read the (smaller) box.
+// The charts' storyline layer passes no o and keeps the protected-swing box.
+function msMosha(htf, ltf, buf, o) {
   if (!htf || !htf.dir || !ltf || !ltf.bars || !ltf.bars.length) return null;
+  o = o || {};
   const d = htf.dir, s = -d, L = htf.level, B = ltf.bars, ev = (ltf.events || []).filter((e) => e && e.t > htf.t), b0 = buf || 0;
   const out = { dir: d, side: d, htf, barrier: L, state: 'wait-vr' };
   // 21 Nov 2026 (owner: "not following the strategy rigorously"): the VR and the CF must each be a BO Structure (a QM: the
@@ -4946,7 +4952,12 @@ function msMosha(htf, ltf, buf) {
   if (!span.length) return out;
   const x = d < 0 ? Math.min(...span.map((b) => b.low)) : Math.max(...span.map((b) => b.high));
   const xt = span.find((b) => (d < 0 ? b.low : b.high) === x).time;
-  out.vr = { level: V.level, t: V.t, fromT: Math.min(V.fromT, xt), ext: x, extT: xt, lo: Math.min(x, V.level), hi: Math.max(x, V.level) };
+  let vl = V.level;
+  if (o.near) { const xi = B.findIndex((b) => b.time === xt), i0 = B.findIndex((b) => b.time >= htf.t), N = 3;
+    for (let j = xi - 1; i0 >= 0 && j >= Math.max(i0, N); j--) { if (j + N >= B.length || B[j + N].time > V.t) continue; let ok = true;
+      for (let k = 1; k <= N && ok; k++) if (d > 0 ? B[j - k].low < B[j].low || B[j + k].low <= B[j].low : B[j - k].high > B[j].high || B[j + k].high >= B[j].high) ok = false;
+      if (ok) { const p = d > 0 ? B[j].low : B[j].high; if (d > 0 ? p > V.level && p < x : p < V.level && p > x) vl = p; break; } } }
+  out.vr = { level: vl, t: V.t, fromT: Math.min(V.fromT, xt), ext: x, extT: xt, lo: Math.min(x, vl), hi: Math.max(x, vl), near: vl !== V.level };
   out.state = 'wait-cf';
   if (isFinite(htf.far)) { out.p50 = (htf.far + x) / 2; const since = B.filter((b) => b.time > xt); out.deep = since.some((b) => (d > 0 ? b.low <= out.p50 : b.high >= out.p50)); }
   // price traded back to the VR's extreme after the VR formed, before any CF or entry: the move is done (a wick counts)
@@ -12557,6 +12568,12 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
 .mo-tut h2 { font-weight: 650; letter-spacing: -.02em; }
 /* light theme: green and red text at AA on the cards, the wells and the buy / sell chips (the desk's light --buy was 4.2-4.5:1 here) */
 :root[data-theme="light"] #v-mosha, :root[data-theme="light"] .mo-tut, :root[data-theme="light"] .mo-lv-dlg { --buy: #067a64; --sell: #c8243f; }
+/* QA of the paper desks (21 Nov 2026), light theme: the buy / sell chips read the badge inks (text on a tint of its own colour was 4.3-4.5:1),
+   and a calendar day's date and trade count sit on its green / red tint (--ink-dim there was 4.2-4.5:1) */
+:root[data-theme="light"] #v-mosha .chip.buy { color: var(--buy-ink, #075c40); } :root[data-theme="light"] #v-mosha .chip.sell { color: var(--sell-ink, #951c16); }
+:root[data-theme="light"] #v-mosha .mo-cal-d:is(.up, .dn) :is(.d, small) { color: color-mix(in srgb, var(--ink-dim) 55%, var(--ink)); }
+/* touch: the desk switch's short names (ICT, LIT) were 34-37 px wide, and the studies' links in "What the fixed rules said" 15 px tall */
+@media (pointer: coarse) { .desk-sw a { min-width: 44px; justify-content: center; } #v-mosha #mo-rules td a { display: inline-flex; align-items: center; min-height: 44px; } }
 </style>
 <style id="ms-guest5-css">
 /* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */

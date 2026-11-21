@@ -27,7 +27,7 @@ const U = require('./users.js');
 
 const PENDING = 'signups/pending.json', RESETS = 'signups/resets.json';
 const VERIFY_MS = 24 * 3600e3, RESET_MS = 3600e3, KEEP_VERIFIED_MS = 30 * 86400e3, CAP = 200, COOL_MS = 10 * 60e3;
-const HOSTS = ['aureumdesk.co.uk', 'www.aureumdesk.co.uk', 'meridianx.meridianx-cloudflare.workers.dev', 'localhost', '127.0.0.1'];
+const HOSTS = ['aureumdesk.co.uk', 'www.aureumdesk.co.uk', 'aureum.meridianx-cloudflare.workers.dev', 'localhost', '127.0.0.1'];
 const OFF = 'Sign-ups are not open yet.', OFF_RESET = 'Password reset by email is not open yet.';
 const SENT = 'Check your email for a link to confirm it. The link works for 24 hours.';
 const FORGOT = 'If that email belongs to an account, a link to choose a new password is on its way. It works for one hour.';

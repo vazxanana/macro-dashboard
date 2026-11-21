@@ -5263,6 +5263,13 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     over H1, H1 over M15; none for a D1 barrier; `dirAt`, candles closed when price came back) and records `withDir`
     (true / false; kept by `clean`), names it in the label ("· with H4" / "· against H4") and the log; the desk's rows say so
     and "By entry type" lists the two apart. Entry, stop and the 3R target are unchanged (the method gives no other target).
+  - **The CF as a barrier** (21 Nov 2026, the pages give the sequence's entry as the BARRIER entry "before or after the CF"; the
+    EG entry stays as the owner's own choice of 12 Nov): `sopTrades(…, { cfOut })` hands over each clean CF zone (never a CF
+    inside the VR) once, at the candle that first shows it; `barrierTrades(…, { extra })` reads it like any barrier (return on
+    the finest candles, a QM on the table's confirmation timeframe, the pullback limit at the broken level, stop past the
+    extreme made there). Only CF zones on H4, H1 and M15 have a confirmation timeframe in the table. Target: the VR's extreme
+    when it is 1R or more away on the winning side (the sequence's own target), else the replay's 3R. Record: `kind: 'barrier'`,
+    id `bar-cf-<tf>-<fill>`, label "H1 CF barrier · H4 BO". Without `extra` nothing changes (`desk-rigor` passes none).
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
@@ -5276,6 +5283,31 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     plan −28.0R → −52.0R; LIT already refused such a candle. `desk-rigor` was run again (RESULT.md "After the result": every
     limit reading worse, no verdict changed); `desk-slices` T1 / T2 (the engulf reading) were measured with the flaw and failed
     anyway. Every desk total before this fix was flattered: never quote one.
+  - **Every page rule applied, second pass** (21 Nov 2026, owner: "apply the edge to the detail", "recheck all the documents"; a
+    read-only page-by-page recheck found nothing that contradicts a page). Mosha (`assets/mosha-sop.js`): the **Janda** entry (after
+    the QM at a barrier, the next normal BO the same way, limit at its level; `bar-j-…`, "· Janda"; H4 / H1 barriers also on M1,
+    "· Janda (M1)"), the **VR box as a barrier** (handed over with its clean CF, target the CF zone's near side when 1R or more, else
+    3R), **internal BOs run the whole sequence** (`sop-i-…`, `o.ibo: false` turns it off), a CF is handed over only on the candle that
+    made it and never after it failed or the VR extreme was reached, and a CF barrier takes no entry once price reached the VR extreme.
+    Gold plan (`council/eg-methods.mjs`): the **second entry type, a QM** on M15 / M30 (`qmSetups`, kind `msnr-qm`; the shape is read
+    from a sketch, `QM.wait` 20 candles is the desk's), Daily **open-close levels** (two same-colour candles) in `snrSides` and as
+    kind `oc` in `direction()`. Direct entry: **no target, the stop trails** to the far edge of each failed opposite M5 zone
+    (`efTrail`, status `trail`, `stopNow`; `clean` keeps `stopNow` and a null target, which it used to store as 0; `settle` settles at
+    `stopNow`). Not coded, owner / Luxus questions: entry at the broken level vs the confirming leg's origin zone; a target for a
+    barrier against the direction ("only a rejection", no size); the M30 steps of the ladder; the repeat of the SOP inside the CF and
+    trading a failed CF; QM required vs preferred; "strong" H4 BO; "the best barrier".
+  - **The owner's four readings** (21 Nov 2026, after comparing the desk with his five example trades; owner chose each): (1) every
+    simple-QM barrier is recorded twice, at the broken level and at the zone's near side ("· at the zone", id `-z-`); (2) H4 and
+    M15 barriers are also confirmed on M5 ("· M5 confirm", `-m5-`, `M5_ALT`); (3) a swept swing (3 a side; the first candle beyond
+    it closes back inside) is a barrier from the level to the wick ("sweep barrier", `sw-`, `sweepsOf`), and a zone is used again on
+    each later visit (left by a closed candle wholly outside, not broken; "· second visit", `-v<n>-`); (4) the desk's VR runs from the
+    extreme to the nearest internal swing confirmed by then (`msMosha(…, o)` `o.near`, the desk's default; the charts' layer keeps the
+    old box). Old readings are unchanged (pinned by hash); a new reading is deduplicated only against its own kind, and `merge`'s
+    near-duplicate rule applies only within one reading. Of the five examples, 2 Nov buy and 2 Nov sell are now caught; 10 Nov is
+    found at his level but entered earlier; 28 Oct (an M5 box at the pullback's spike) and 29 Oct (an M5 break zone) are not. The
+    record is about four times larger (30 days: 3,136 records, 4.7 MB); `KEEP` 14000 now holds about four months.
+  - **Settling reads the fill's candle** (21 Nov 2026): `settle` starts at the 5-minute candle that holds the fill, which can only stop
+    the trade; `endT` is that candle's open. After-costs figures were added and taken out the same day (owner: "forget the costs").
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

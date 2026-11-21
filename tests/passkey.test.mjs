@@ -99,7 +99,9 @@ test('DER signatures become raw r || s (leading zero bytes and short integers)',
 });
 test('RP ID: one passkey for aureumdesk.co.uk and www; the workers.dev host and localhost as themselves; others refused', () => {
   assert.equal(P.rpFor('aureumdesk.co.uk'), 'aureumdesk.co.uk'); assert.equal(P.rpFor('www.aureumdesk.co.uk'), 'aureumdesk.co.uk');
-  assert.equal(P.rpFor('meridianx.meridianx-cloudflare.workers.dev'), 'meridianx.meridianx-cloudflare.workers.dev');
+  assert.equal(P.rpFor('aureum.meridianx-cloudflare.workers.dev'), 'aureum.meridianx-cloudflare.workers.dev');
+  // 21 Nov 2026: the deleted meridianx Worker's host is refused (left by the 20 Nov API review)
+  assert.equal(P.rpFor('meridianx.meridianx-cloudflare.workers.dev'), null);
   assert.equal(P.rpFor('localhost:8793'), 'localhost'); assert.equal(P.rpFor('evil.test'), null); assert.equal(P.rpFor('127.0.0.1'), null);
   assert.equal(P.rpFor('preview.test', { PASSKEY_HOSTS: 'preview.test' }), 'preview.test');
   assert.ok(P.originOk('https://www.aureumdesk.co.uk', 'www.aureumdesk.co.uk')); assert.ok(!P.originOk('https://aureumdesk.co.uk', 'www.aureumdesk.co.uk'));

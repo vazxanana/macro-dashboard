@@ -67,6 +67,16 @@ export function digestDue(now) {
 // before, never once the day has started): the most recent weekday that has started.
 export function historyDue(now) { for (let k = 0; k < 7; k++) { const d = isoDay(now - k * DAY), w = new Date(dayT(d) * 1000).getUTCDay(); if (w >= 1 && w <= 5) return d; } return null; }
 
+// The desks' stored trade records (mosha/desk.json by council/mosha-desk.mjs; lit/, eg/, msnr/desk.json by council/edge-desks.mjs):
+// a records list, and every record with a stop on the losing side of its entry (absolute rule 1): side +1 / -1, finite entry and
+// stop, a buy's stop under its entry, a sell's above. A null record or a non-number counts too. Names the first one and the count.
+export function deskCheck(j, c) {
+  if (!j || !Array.isArray(j.records)) return c.add('parse', 'warn', 'no records list');
+  const okStop = (r) => r && (r.side === 1 || r.side === -1) && Number.isFinite(+r.entry) && Number.isFinite(+r.stop) && r.entry !== '' && r.stop !== ''
+    && (r.side > 0 ? +r.stop < +r.entry : +r.stop > +r.entry);
+  const badR = j.records.filter((r) => !okStop(r));
+  if (badR.length) c.add('stop', 'bad', `${badR.length} record${badR.length > 1 ? 's' : ''} without a stop on the losing side of its entry (first: ${String(badR[0]?.id ?? 'a null record').slice(0, 60)})`);
+}
 // ─── the inventory ───
 // Each entry: file (or dir + match for a family), label, who writes it and how often (`every`, shown in the message), `need`
 // (missing = bad), `type` json | text, `at(j, text)` → last update (any time format), `clock` 'wall' | 'cme', `warn` / `bad` minutes
@@ -103,10 +113,10 @@ export const FILES = [
   { file: 'macro/events.json', label: 'Macro release log', every: 'each macro run', check: listCheck },
   { file: 'macro/cache.json', label: 'Macro source cache', every: 'each macro run', check: (j, c) => { if (!j || typeof j !== 'object' || !j.fred) c.add('parse', 'warn', 'no FRED cache inside'); } },
   { file: 'research/trade-review.json', label: 'Trade review', every: 'every 6th round (~70 min), re-stamped at least every 6 h', at: (j) => j.at, warn: 12 * H, bad: 48 * H, check: (j, c) => { if (!j || !Array.isArray(j.systems)) c.add('parse', 'warn', 'no systems list'); } },
-  { file: 'mosha/desk.json', label: 'Mosha desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: (j, c) => { if (!j || !Array.isArray(j.records)) c.add('parse', 'warn', 'no records list'); else if (j.records.some((r) => !(r.side > 0 ? r.stop < r.entry : r.stop > r.entry))) c.add('stop', 'bad', 'a record without a stop on the losing side of its entry'); } },
-  { file: 'lit/desk.json', label: 'LIT desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: (j, c) => { if (!j || !Array.isArray(j.records)) c.add('parse', 'warn', 'no records list'); else if (j.records.some((r) => !(r.side > 0 ? r.stop < r.entry : r.stop > r.entry))) c.add('stop', 'bad', 'a record without a stop on the losing side of its entry'); } },
-  { file: 'eg/desk.json', label: 'Engulfing desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: (j, c) => { if (!j || !Array.isArray(j.records)) c.add('parse', 'warn', 'no records list'); else if (j.records.some((r) => !(r.side > 0 ? r.stop < r.entry : r.stop > r.entry))) c.add('stop', 'bad', 'a record without a stop on the losing side of its entry'); } },
-  { file: 'msnr/desk.json', label: 'MSNR desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: (j, c) => { if (!j || !Array.isArray(j.records)) c.add('parse', 'warn', 'no records list'); else if (j.records.some((r) => !(r.side > 0 ? r.stop < r.entry : r.stop > r.entry))) c.add('stop', 'bad', 'a record without a stop on the losing side of its entry'); } },
+  { file: 'mosha/desk.json', label: 'Mosha desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
+  { file: 'lit/desk.json', label: 'LIT desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
+  { file: 'eg/desk.json', label: 'Engulfing desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
+  { file: 'msnr/desk.json', label: 'MSNR desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'research/trade-review-ledger.json', label: 'Trade review ledger', every: 'append-only, when the trade review records a new proposal', check: (j, c) => { if (!j || !Array.isArray(j.entries)) c.add('parse', 'warn', 'no entries list (the review leaves the file as it is and records nothing new)'); } },
   { file: 'coach.json', label: 'Coach (daily review + 6-hourly decay)', every: 'daily; decay every 6 h', need: true, at: (j) => j.at, warn: 26 * H, bad: 30 * H, check: coachCheck },
   { file: 'digest.json', label: 'Daily owner digest', every: '21:15 UTC Mon-Fri + Sunday preview', check: digestCheck },

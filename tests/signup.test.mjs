@@ -355,3 +355,14 @@ test('the email (19 Nov 2026): a short fallback link that opens the whole addres
   assert.ok(shown.length < 40, `shown short: ${shown}`);
   assert.ok(!h.includes(`>${link}<`), 'the long token is never printed');
 });
+
+// 21 Nov 2026 (left by the 20 Nov API review): the deleted `meridianx` Worker's workers.dev host is no longer one of the site's
+// own: a link asked for on it is built on the site's domain; the live hosts keep their own address.
+test('emailed links: the deleted meridianx workers.dev host is not the site', () => {
+  const o = (host) => signup._t.originOf({ headers: { host } });
+  assert.equal(o('meridianx.meridianx-cloudflare.workers.dev'), 'https://aureumdesk.co.uk');
+  assert.equal(o('aureumdesk.co.uk'), 'https://aureumdesk.co.uk'); assert.equal(o('www.aureumdesk.co.uk'), 'https://www.aureumdesk.co.uk');
+  assert.equal(o('aureum.meridianx-cloudflare.workers.dev'), 'https://aureum.meridianx-cloudflare.workers.dev');
+  assert.equal(o('localhost:8793'), 'http://localhost:8793');
+  assert.doesNotMatch(fs.readFileSync(new URL('../api/signup.js', import.meta.url), 'utf8'), /meridianx\.meridianx-cloudflare/);
+});

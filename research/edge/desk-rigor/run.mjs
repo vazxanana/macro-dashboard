@@ -48,7 +48,7 @@ function market(mk, dir) {
   lap('sequence');
   const D1 = foldWeekend(B['1d']); let dn = 0, dA = null;
   const dTrend = (t) => { let n = dn; while (n < D1.length && D1[n].time + 86400 <= t) n++; if (n !== dn || !dA) { dn = n; dA = n > 30 ? F.msAnalyze(D1.slice(Math.max(0, n - 1500), n), 6) : null; } return dA ? dA.trend : 0; };
-  for (const r of SOP.barrierTrades(B, F, { from, market: mk }).sort((a, b) => a.t - b.t)) put('R2', r, { bo: /· BO origin$/.test(r.label), h: r.h, withD: dTrend(r.t) === r.side });
+  for (const r of SOP.barrierTrades(B, F, { from, market: mk }).sort((a, b) => a.t - b.t)) put('R2', r, { bo: /· BO origin/.test(r.label), h: r.h, withD: dTrend(r.t) === r.side });
   lap('barrier');
   for (const r of methodTrades(B, { from, market: mk })) put(r.kind === 'eg-plan' ? 'R3' : r.kind === 'eg-simple' ? 'R4' : 'R5', r);
   lap('engulf methods');
