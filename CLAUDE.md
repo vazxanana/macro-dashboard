@@ -5065,6 +5065,15 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   `assets/mosha-replay.js` `specOfTrade`: the window starts 3 h before the first mark (at most 6 days back, 15-minute candles
   over 2.5 days), the log's lines are the replay's steps, the card's heading reads "This trade, on the chart", and the
   result is found on the candles (no hand exit). A logged trade without marks opens as before. The table shows 30 rows first.
+  **More markets** (21 Nov 2026, owner: "more trades", twice): the SAME reading on silver, EUR/USD, GBP/USD and the Nasdaq 100
+  (`MS_MOSHA_SOP.MARKETS`, tracker `OTHER`; main price source only, one market failing leaves the rest). No new entry rule: on
+  another market the stop buffer, the risk limits and the smallest barrier are the same share of price as gold's dollar figures
+  near $4,000 (`sizes`, the desk's own choice, said on the card); gold's figures are unchanged. A record of another market
+  carries `market`, an id prefixed `<market>:` and six decimals; the card has a market filter and the chart's price scale takes
+  the market's decimals. `KEEP` 4000. The 90-day file: 2,186 records, all closed, before costs: gold −22.7R (473), silver −62.8R
+  (416), EUR/USD +39.8R (421), GBP/USD +19.5R (459), Nasdaq −40.1R (417); −66.3R in all. A paper record of one reading before
+  costs: never call a market's plus an edge. **Do not put a file of over 600 records into council-data before main's tracker
+  has `KEEP` 4000** (the older tracker cuts the file to its newest 600 on its next run).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
