@@ -157,6 +157,10 @@ test('an open record the run no longer reads is settled on the candles at its st
   const mid = { ...r, t: 1380 }, pre = [bar(900, 100, 100.5, 99.5, 100)];
   assert.equal(M.settle([mid], none, pre.concat(bar(1200, 100, 102.5, 99, 100), bar(1500, 99, 99.5, 93, 94)))[0].status, 'stopped', 'a stop touched in the fill\'s own 5-minute candle is read');
   assert.equal(M.settle([r], none, pre.concat(bar(1200, 100, 100.5, 93, 99), bar(1500, 99, 100, 98, 99)))[0].status, 'open', 'the fill candle reaching the target is not a target');
+  // a direct entry with no target and a trailed stop settles at the stop it stood at, R from the opening risk
+  const tr = M.settle([{ ...r, target: null, stopNow: 99, r0: 2 }], none, pre.concat(bar(1200, 100, 100.5, 99.5, 100), bar(1500, 98.5, 99.4, 98, 99)))[0];
+  assert.equal(tr.status, 'trail'); assert.equal(tr.exit, 99); assert.equal(tr.R, 0.5);
+  const kept = M.clean(rec({ target: null, stopNow: 99 })); assert.equal(kept.target, null, 'no target stays no target (not 0)'); assert.equal(kept.stopNow, 99);
   const closed = { ...r, status: 'target', R: 3 }; assert.equal(M.settle([closed], none, all)[0], closed, 'a closed record is frozen');
   assert.match(rd('council/edge-desks.mjs'), /settle\(merge\(records, fresh, now\)/); assert.match(rd('council/mosha-desk.mjs'), /settle\(merge\(prev && prev\.records, fresh, now, feed\)/);
 });

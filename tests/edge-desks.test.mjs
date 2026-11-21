@@ -19,7 +19,8 @@ function market(days, seed, px = 4000, step = 1.6) {
   return B;
 }
 const B = market(60, 11), END = B['5m'].at(-1).time + 300, from = END - 30 * 86400;
-const stopOk = (r) => (r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry);
+// a direct entry has no target (its document trails the stop with the M5 EF): its stop must still be on the losing side
+const stopOk = (r) => (r.side > 0 ? r.stop < r.entry && (r.target == null ? r.kind === 'eg-direct' : r.target > r.entry) : r.stop > r.entry && (r.target == null ? r.kind === 'eg-direct' : r.target < r.entry));
 
 test('Engulfing: every trade has its stop on the losing side, one order a zone, and results follow the rule', () => {
   const eg = E.egTrades(B, { from, market: 'xau' });
@@ -90,11 +91,12 @@ test('engulf zones: a zone is the engulfed candle, known at the engulfing close,
   const z = G.zones(C, '15m').filter((x) => x.dir > 0)[0]; assert.deepEqual([z.top, z.bot, z.base, z.at], [10, 9, 0, 1800], 'a body engulf: the zone runs from the wick to the engulfed candle\'s open'); assert.equal(z.touch, 3600, 'the first later candle that trades into it'); assert.equal(z.fail, 4500, 'a close through its far side');
   assert.equal(G.zones([{ time: 0, open: 10, high: 11, low: 9, close: 9.5 }, { time: 900, open: 9.5, high: 10.4, low: 9.4, close: 9.9 }], '15m').length, 0, 'a close short of the previous open is no engulf');
 });
-test('the three methods: a fixed stop on the losing side, a 2R target, one position at a time, no look-ahead', () => {
+test('the three methods: a fixed stop on the losing side, a 2R target (the direct entry: none, a trailed stop), one position at a time, no look-ahead', () => {
   const all = G.methodTrades(B15, { from: 0, market: 'xau' }); assert.ok(all.length >= 5, 'entries: ' + all.length);
   let busy = -Infinity;
-  for (const r of all) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^eg-(plan|simple|direct)$/); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips on gold'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.EGM.rr) < 1e-9);
-    assert.ok(r.t > busy, 'one at a time'); busy = r.endT || Infinity; assert.ok(r.log.every((x, i, a) => !x.t || !i || !a[i - 1].t || x.t >= a[i - 1].t), 'the log runs forward'); assert.ok(r.marks.every((m) => m.at <= r.t), 'every mark was known by the fill'); }
+  for (const r of all) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^eg-(plan|simple|direct)$/); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips on gold');
+    if (r.kind === 'eg-direct') { assert.equal(r.target, null); assert.ok(['stopped', 'trail', 'open'].includes(r.status)); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); } else assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.EGM.rr) < 1e-9);
+    assert.ok(r.t > busy, 'one at a time'); busy = r.endT || Infinity; assert.ok(r.log.every((x, i, a) => !x.t || !i || !a[i - 1].t || x.t >= a[i - 1].t), 'the log runs forward'); assert.ok(r.marks.every((m) => m.at <= r.t || (m.label === 'M5 EF · trailed stop' && m.at <= r.endT)), 'every mark was known by the fill (the trailed stop\'s EF by the exit)'); }
   // cutting the candles after a closed trade's end changes nothing about it (a trade far enough in for the shorter history to hold enough candles)
   const one = all.find((r) => r.endT && r.endT < END - 5 * 86400 && r.t > B['5m'][0].time + 15 * 86400); const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
   const again = G.methodTrades(cut, { from: 0, market: 'xau' }).find((r) => r.id === one.id); assert.ok(again); assert.deepEqual([again.entry, again.stop, again.R, again.endT], [one.entry, one.stop, one.R, one.endT]);
@@ -109,7 +111,7 @@ test('MSNR desk: entries with the call only, the study\'s own functions and cons
   const src = rd('council/edge-desks.mjs'); assert.match(src, /from '\.\.\/research\/edge\/msnr-entry\/run\.mjs'/); assert.match(src, /finally \{ MS\.P\.PAD = keep\.PAD; MS\.P\.MIN_R0 = keep\.MIN_R0; \}/);
   E.msnrTrades(Object.fromEntries(Object.entries(b15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open / 3000, high: b.high / 3000, low: b.low / 3000, close: b.close / 3000 }))])), { from: fr, market: 'eurusd' });
   const P = require('node:module'); void P; 
-  const sn = G.snrTrades(b15, { from: fr, market: 'xau' }); for (const r of sn) { assert.ok(stopOk(r)); assert.equal(r.kind, 'msnr-sop'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.SNR.rr) < 1e-9); }
+  const sn = G.snrTrades(b15, { from: fr, market: 'xau' }); for (const r of sn) { assert.ok(stopOk(r)); assert.match(r.kind, /^msnr-(sop|qm)$/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.SNR.rr) < 1e-9); }
   const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay, 'at most two a day'); }
   assert.deepEqual(G.snrTrades(b15, { from: fr, market: 'eurusd' }), [], 'the plan is for gold');
   const egSrc = rd('council/eg-methods.mjs'); assert.doesNotMatch(egSrc, /ctrader|alerts\.mjs|trader\.mjs|sendAlerts|fetch\(/, 'a paper reading: no order, alert, network or Trader code');
@@ -125,7 +127,7 @@ test('the direction reading: every switch names a tapped key level of the timefr
   assert.ok(D.events.length >= 5, 'switches: ' + D.events.length);
   let prev = 0;
   for (const e of D.events) {
-    assert.ok(['v', 'a', 'eg', 'ef', 'dom'].includes(e.kind)); assert.ok(e.top > e.bottom);
+    assert.ok(['v', 'a', 'oc', 'eg', 'ef', 'dom'].includes(e.kind)); assert.ok(e.kind === 'oc' ? e.top >= e.bottom : e.top > e.bottom);
     assert.ok(e.zoneAt <= e.tapT + 14400 && e.tapT <= e.t, 'the zone is known and tapped before the break'); assert.ok(e.levelT < e.tapT, 'the level existed before the tap: external');
     assert.ok(e.s > 0 ? H4[e.i].close > e.level : H4[e.i].close < e.level, 'a close beyond the level'); assert.notEqual(e.s, prev); prev = e.s;
     assert.equal(D.call[e.i], e.s); assert.equal(D.events[D.last[e.i]], e);
@@ -224,11 +226,80 @@ test('the documents, page by page: a failed H4 zone is a zone too, the trigger i
   let ef = 0, m30 = 0, direct = 0, snr30 = 0;
   for (const seed of [11, 5, 23, 31, 47]) { const X = market(120, seed), Y = { ...X, '15m': m15of(X['5m']) };
     const all = G.methodTrades(Y, { from: 0, market: 'xau' }), sn = G.snrTrades(Y, { from: 0, market: 'xau' });
-    for (const r of all.concat(sn)) { assert.ok(stopOk(r)); assert.ok(['target', 'stopped', 'open'].includes(r.status), 'no time exit: ' + r.status); assert.ok(!/24 hours/.test(r.log.map((x) => x.text).join(' '))); }
+    for (const r of all.concat(sn)) { assert.ok(stopOk(r)); assert.ok(['target', 'stopped', 'open'].concat(r.kind === 'eg-direct' ? ['trail'] : []).includes(r.status), 'no time exit: ' + r.status); assert.ok(!/24 hours/.test(r.log.map((x) => x.text).join(' '))); }
     for (const r of all) { if (r.marks.some((m) => m.label === 'H4 EF (zone failed)')) ef++; if (r.marks.some((m) => m.label === 'M30 EG zone')) m30++;
       if (r.kind === 'eg-direct') { direct++; const [h4, h1, m15] = r.marks; assert.ok(h1.top <= h4.top && h1.bot >= h4.bot && m15.top <= h1.top && m15.bot >= h1.bot, 'each fresh zone lies inside the one above'); } }
     const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay); if (/-30$/.test(r.id)) { snr30++; assert.equal(r.l, '30m'); } }
     assert.equal(new Set(sn.map((r) => r.id)).size, sn.length); }
   assert.ok(ef >= 1, 'entries in a failed H4 zone: ' + ef); assert.ok(m30 >= 1, 'entries on an M30 engulf: ' + m30);
   const src = rd('council/eg-methods.mjs'); assert.match(src, /a\.top <= b\.top && a\.bot >= b\.bot/); assert.ok(!/EGM\.hold\)/.test(src), 'no 24-hour exit is passed any more');
+});
+
+// ─── 21 Nov 2026: what the documents define that the desks did not apply yet ───
+test('direct entry: the stop is trailed with the M5 EF, only tightens, only from zones failed after the fill, no target', () => {
+  const bar = (i, o, h, l, c) => ({ time: i * 300, open: o, high: h, low: l, close: c });
+  const M5 = [bar(0, 101, 101.2, 99.9, 100.5), bar(1, 100.5, 102, 100.4, 101.8), bar(2, 101.8, 104, 101.7, 103.9), bar(3, 103.9, 104.2, 103, 103.2), bar(4, 103.2, 103.3, 101.4, 101.5)];
+  // sell zones (dir -1): one failed before the fill closed (ignored), one failed at 900 (the close of candle 2): the stop moves to its bottom 101.6
+  const Z = [{ dir: -1, top: 99.5, bot: 99, fail: 0, base: -600 }, { dir: -1, top: 102.5, bot: 101.6, fail: 900, base: 300 }, { dir: -1, top: 98, bot: 96, fail: 900, base: 0 }, { dir: 1, top: 103, bot: 102, fail: 900, base: 0 }];
+  const o = G.efTrail(M5, Z, 0, 1, 100, 97);
+  assert.equal(o.status, 'trail'); assert.equal(o.stop, 101.6, 'the tighter EF only; a looser one and a buy zone do not move it'); assert.equal(o.moves, 1);
+  assert.equal(o.endT, 1200); assert.ok(Math.abs(o.R - 1.6 / 3) < 1e-9, 'R from the opening risk');
+  // no zone failed after the fill: the opening stop, -1R; the fill candle never moves or arms anything
+  const s = G.efTrail([bar(0, 100.5, 100.6, 99.9, 100.2), bar(1, 100.2, 100.3, 96.5, 96.8)], [{ dir: -1, top: 99.8, bot: 99.5, fail: 0, base: 0 }], 0, 1, 100, 97);
+  assert.deepEqual([s.status, s.R, s.moves], ['stopped', -1, 0]);
+  // a sell mirrors it
+  const neg = (b) => ({ time: b.time, open: -b.open, high: -b.low, low: -b.high, close: -b.close });
+  const m = G.efTrail(M5.map(neg), Z.map((z) => ({ ...z, dir: -z.dir, top: -z.bot, bot: -z.top })), 0, -1, -100, -97);
+  assert.equal(m.status, 'trail'); assert.equal(m.stop, -101.6); assert.ok(Math.abs(m.R - o.R) < 1e-9);
+  // in the desk: every direct trade has no target, a trailed exit books what its stop gave, cutting the candles after its end changes nothing
+  let n = 0, tr = 0;
+  for (const seed of [11, 5, 23, 31, 47, 61]) { const X = market(120, seed), Y = { ...X, '15m': m15of(X['5m']) };
+    for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind === 'eg-direct')) { n++; assert.equal(r.target, null); assert.ok(stopOk(r));
+      if (r.status === 'trail') { tr++; assert.ok(r.stopNow != null && (r.side > 0 ? r.stopNow > r.stop : r.stopNow < r.stop), 'the trailed stop is tighter'); assert.ok(r.marks.some((k) => k.label === 'M5 EF · trailed stop')); }
+      if (r.endT && r.endT < X['5m'].at(-1).time - 2 * 86400) { const again = G.methodTrades(cutAt(Y, r.endT + 3600), { from: 0, market: 'xau' }).find((x) => x.id === r.id);
+        if (again) assert.deepEqual([again.entry, again.stop, again.R, again.endT, again.status], [r.entry, r.stop, r.R, r.endT, r.status], 'no look-ahead: ' + r.id); } } }
+  assert.ok(n >= 1, 'direct entries: ' + n);
+});
+
+test('gold plan, second entry type: a QM on the closes (shoulder, high, lower head, close beyond the high), limit at the shoulder', () => {
+  const cl = [12, 11, 9, 10, 10.5, 11, 10, 8, 9, 10, 11.5, 12, 12.5], T0 = 1790553600;
+  const C = cl.map((c, i) => ({ time: T0 + i * 900, open: i ? cl[i - 1] : c, high: Math.max(c, i ? cl[i - 1] : c) + 0.2, low: Math.min(c, i ? cl[i - 1] : c) - 0.2, close: c }));
+  const q = G.qmSetups(C).filter((x) => x.tf === '15m');
+  assert.equal(q.length, 1); assert.deepEqual([q[0].dir, q[0].level, q[0].mid, q[0].at, q[0].head.close], [1, 9, 11, C[10].time + 900, 8]);
+  assert.ok(q[0].top === 9 && q[0].bot < 9, 'the zone is the shoulder candle, from its close to its wick');
+  assert.equal(G.qmSetups(C.slice(0, 10)).filter((x) => x.tf === '15m').length, 0, 'not before the close beyond the high');
+  // a break of the high before the head is a known turn is not this shape
+  const early = cl.slice(); early[8] = 11.5; const E2 = early.map((c, i) => ({ ...C[i], close: c, open: i ? early[i - 1] : c, high: Math.max(c, i ? early[i - 1] : c) + 0.2, low: Math.min(c, i ? early[i - 1] : c) - 0.2 }));
+  assert.equal(G.qmSetups(E2).filter((x) => x.tf === '15m' && x.level === 9).length, 0);
+  // a sell mirrors it
+  const S = C.map((b) => ({ time: b.time, open: 30 - b.open, high: 30 - b.low, low: 30 - b.high, close: 30 - b.close })), qs = G.qmSetups(S).filter((x) => x.tf === '15m');
+  assert.equal(qs.length, 1); assert.deepEqual([qs[0].dir, qs[0].level, qs[0].mid], [-1, 21, 19]);
+  // in the desk: QM entries, a 30-pip stop on the losing side, a 3R target, entry at a shoulder; found with the candles cut just after the fill
+  let n = 0;
+  for (const seed of [11, 4, 5, 23]) { const X = seed === 11 ? B : market(90, seed), Y = { ...X, '15m': m15of(X['5m']) }, sn = G.snrTrades(Y, { from: 0 }), shoulders = new Set(G.qmSetups(Y['15m']).map((x) => x.level));
+    for (const r of sn.filter((x) => x.kind === 'msnr-qm')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - 3) < 1e-9); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.SNR.rr) < 1e-9); assert.ok(shoulders.has(r.entry));
+      assert.match(r.id, /^msnr-qm-[bs]-\d+(-30)?$/); assert.ok(r.marks.some((m) => / QM zone · entry$/.test(m.label)));
+      if (n <= 12 && r.t > X['5m'][0].time + 35 * 86400) assert.ok(G.snrTrades(cutAt(Y, r.t + 300), { from: 0 }).some((e) => e.id === r.id && e.entry === r.entry && e.stop === r.stop), 'no look-ahead: ' + r.id); }
+    const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay, 'two a day over both entry types'); } }
+  assert.ok(n >= 1, 'QM entries: ' + n);
+});
+
+test('open-close levels: a Daily level type of the gold plan, and a key level of the direction reading', () => {
+  // the gold plan: a Daily rejection of an OC level (two candles of one colour; the level where the first closed)
+  let oc = 0;
+  for (const seed of [11, 4, 5, 23, 31]) { const X = seed === 11 ? B : market(120, seed), D1 = X['1d'].filter((b) => { const w = new Date(b.time * 1000).getUTCDay(); return w && w < 6; });
+    for (const s of G.snrSides(D1, X['4h'])) { if (s.key.kind !== 'OC') continue; oc++; const j = D1.findIndex((b) => b.time === s.key.t) - 1, a = D1[j], b = D1[j + 1];
+      assert.equal(a.close, s.key.p); assert.ok((a.close > a.open) === (b.close > b.open), 'two candles of one colour'); assert.ok(s.key.t < s.day, 'the level existed before the rejecting candle'); } }
+  assert.ok(oc >= 1, 'rejections of an OC level: ' + oc);
+  // the direction: an OC level is a key level; two up candles that are not a dominant pair give a buy level at the junction
+  const day = (t) => Math.floor(t / 86400) * 86400;
+  const src = rd('council/eg-methods.mjs'); assert.match(src, /add\(1, 'oc', Math\.min\(p\.close, c\.open\), Math\.max\(p\.close, c\.open\)/); assert.match(src, /!domU\) add/);
+  // across a long random path every OC switch names a same-colour pair of the timeframe above that is not a dominant pair
+  let s = 77; const rnd = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; const P = []; let p = 4000, drift = 0;
+  for (let i = 0, t = 1767571200; i < 4000; i++, t += 14400) { if (new Date(t * 1000).getUTCDay() % 6 === 0) continue; if (i % 40 === 0) drift = (rnd() - 0.5) * 12; const o = p, c = o + drift + (rnd() - 0.5) * 30; P.push({ time: t, open: o, high: Math.max(o, c) + rnd() * 8, low: Math.min(o, c) - rnd() * 8, close: c }); p = c; }
+  const R = G.direction(P, day, 86400), days = []; for (const b of P) { const k = day(b.time), q = days[days.length - 1]; if (q && q.time === k) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else days.push({ time: k, open: b.open, high: b.high, low: b.low, close: b.close }); }
+  const ocs = R.events.filter((e) => e.kind === 'oc'); assert.ok(ocs.length >= 1, 'switches on an OC level: ' + ocs.length);
+  for (const e of ocs) { const j = days.findIndex((d) => d.time === e.zoneT), a = days[j], b = days[j + 1], up = e.s > 0;
+    assert.ok(up ? a.close > a.open && b.close > b.open : a.close < a.open && b.close < b.open); assert.ok(!(up ? b.close > a.high : b.close < a.low), 'not a dominant pair');
+    assert.ok(e.bottom <= a.close && a.close <= e.top); assert.ok(e.zoneAt === b.time + 86400 && e.zoneAt <= e.tapT + 14400); }
 });

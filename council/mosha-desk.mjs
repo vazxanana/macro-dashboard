@@ -75,7 +75,7 @@ const mark = (m, d = 3) => { const k = ['level', 'vr', 'bvr', 'zone'].includes(m
 export function clean(r) {
   const side = r.side > 0 ? 1 : -1, entry = +r.entry, stop = +r.stop, mk = SOP.ALL[r.market] ? r.market : 'xau', d = mk === 'xau' ? 3 : 6;
   if (!(Number.isFinite(entry) && Number.isFinite(stop)) || !(side > 0 ? stop < entry : stop > entry)) return null;
-  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit|msnr)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 56) } : {}), h: r.h, l: r.l, case: r.case || null, ...(r.deep == null ? {} : { deep: !!r.deep }), ...(r.withDir == null ? {} : { withDir: !!r.withDir }), side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: num(r.target, d), r0: num(Math.abs(entry - stop), d),
+  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit|msnr)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 56) } : {}), h: r.h, l: r.l, case: r.case || null, ...(r.deep == null ? {} : { deep: !!r.deep }), ...(r.withDir == null ? {} : { withDir: !!r.withDir }), side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: r.target == null ? null : num(r.target, d), ...(r.stopNow != null && Number.isFinite(+r.stopNow) ? { stopNow: num(r.stopNow, d) } : {}), r0: num(Math.abs(entry - stop), d),
     status: r.status || 'open', R: r.R == null ? null : num(r.R), endT: r.endT || null, exit: r.exit == null ? null : num(r.exit, d), mfe: num(r.mfe), float: r.float == null ? null : num(r.float),
     log: (r.log || []).slice(0, 12).map((x) => ({ t: x.t || null, text: String(x.text || '').slice(0, 240) })),
     marks: (r.marks || []).slice(0, 8).map((m) => mark(m, d)).filter(Boolean) };
@@ -111,13 +111,14 @@ export function settle(records, freshIds, M5, market = 'xau', feed = 'OANDA') {
   if (!M5 || !M5.length) return records;
   return records.map((r) => {
     if (r.R != null || r.status !== 'open' || (r.market || 'xau') !== market || freshIds.has(r.id) || feedOf(r) !== feed || !(r.t >= M5[0].time)) return r;
-    const d = r.side, r0 = Math.abs(r.entry - r.stop); if (!(r0 > 0) || r.target == null) return r;
+    // a trailed stop (the direct entry's, no target) settles at the stop it stood at; R is always from the opening risk
+    const d = r.side, r0 = r.r0 > 0 ? r.r0 : Math.abs(r.entry - r.stop), sp = r.stopNow != null ? r.stopNow : r.stop, tg = r.target; if (!(r0 > 0) || !isFinite(sp)) return r;
     for (const b of M5) { if (b.time + 300 <= r.t) continue;
       // the candle that holds the fill can only stop the trade: its other extreme may have come before the fill
-      const first = b.time <= r.t, gap = !first && (d > 0 ? b.open <= r.stop : b.open >= r.stop), hitS = gap || (d > 0 ? b.low <= r.stop : b.high >= r.stop), hitT = !hitS && !first && (d > 0 ? b.high >= r.target : b.low <= r.target);
+      const first = b.time <= r.t, gap = !first && (d > 0 ? b.open <= sp : b.open >= sp), hitS = gap || (d > 0 ? b.low <= sp : b.high >= sp), hitT = !hitS && !first && tg != null && (d > 0 ? b.high >= tg : b.low <= tg);
       if (!hitS && !hitT) continue;
-      const px = gap ? b.open : hitS ? r.stop : r.target, R = d * (px - r.entry) / r0, { float: _f, ...rest } = r;
-      return { ...rest, status: hitS ? 'stopped' : 'target', R, exit: px, endT: b.time, settled: true,
+      const px = gap ? b.open : hitS ? sp : tg, R = d * (px - r.entry) / r0, { float: _f, ...rest } = r;
+      return { ...rest, status: hitS ? (sp !== r.stop ? 'trail' : 'stopped') : 'target', R, exit: px, endT: b.time, settled: true,
         log: (r.log || []).filter((x) => x.t != null).concat({ t: b.time, text: `${SETTLE_NOTE} ${hitS ? 'Stopped' : 'Target reached'}: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }) }; }
     return r; });
 }
