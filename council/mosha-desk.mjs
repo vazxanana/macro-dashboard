@@ -43,7 +43,7 @@ export async function bars(tf, now, get = fetch, days = SOP.DAYS, sym = 'xau') {
 // the council Trader's own fallback for gold. It trades at the weekend and a few dollars from spot, and Kraken serves only its
 // last 720 candles a timeframe, so: weekend candles are dropped, a fallback run never touches a record read on OANDA, and it
 // adds only entries of the last FALLBACK_NEW_S (what is happening now), never a replay of history on another price basis.
-export const OTHER = Object.keys(SOP.MARKETS).filter((k) => k !== 'xau');
+export const OTHER = SOP.MOSHA.filter((k) => k !== 'xau');   // owner, 21 Nov 2026: gold, EUR/USD and GBP/USD only
 export const FALLBACK_NEW_S = 2 * 3600;
 const KR = { '1m': 1, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '4h': 240, '1d': 1440 };
 export const spotShut = (t) => { const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };
@@ -135,7 +135,14 @@ export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market =
   const records = settle(merge(prev && prev.records, fresh, now, feed), new Set(fresh.map((r) => r.id)), B['5m'], market, feed), s = SOP.summary(records);
   return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', markets: [...new Set(records.map((r) => r.market || 'xau'))], feed: market === 'xau' ? feed : (prev && prev.feed) || feed, through: market === 'xau' || !(prev && prev.through) ? B['5m'][B['5m'].length - 1].time + 300 : prev.through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },
-    note: 'A paper record of the desk\'s reading of the Mosha method on gold and four more markets: nothing is traded, results are before costs, and it is not a tested rule.', records };
+    note: 'A paper record of the desk\'s reading of the Mosha method on gold, EUR/USD and GBP/USD: nothing is traded, results are before costs, and it is not a tested rule.', records };
+}
+
+// only the desk's own markets are kept (owner, 21 Nov 2026: silver and the Nasdaq 100 left the Mosha desk; their records go)
+export function keepMarkets(out) {
+  const records = out.records.filter((r) => SOP.MOSHA.includes(r.market || 'xau')), s = SOP.summary(records);
+  return { ...out, markets: [...new Set(records.map((r) => r.market || 'xau'))], since: records.length ? records[records.length - 1].t : null,
+    counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length }, records };
 }
 
 // `--days N` (or MOSHA_DAYS) reads N days back once, to fill the record's history; the loop's own runs read the last 14
@@ -147,6 +154,7 @@ export async function main(dir, now = Math.floor(Date.now() / 1000), days = SOP.
   // the other markets (21 Nov 2026, owner: "more trades"): the same reading, main price source only; one failing leaves the rest
   for (const m of OTHER) { try { const Bm = {}; for (const tf of Object.keys(SOP.BACK)) Bm[tf] = await bars(tf, now, fetch, days, m);
       if (Bm['5m'].length) out = build(Bm, F, out, now, 'OANDA', days, m); } catch (e) { console.log(`Mosha desk: ${m} skipped (${e && e.message || e})`); } }
+  out = keepMarkets(out);
   writeDesk(dir, 'mosha', out);
   console.log(`Mosha desk [${feed}]: ${out.counts.n} records (${out.counts.open} open, ${out.counts.live} seen live), through ${new Date(out.through * 1000).toISOString()}`);
   return out;

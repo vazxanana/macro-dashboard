@@ -5355,6 +5355,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     touch, stop past that CF box (`sop-vc-`); target the last low before the touch (high for a buy). A close past the VR's top
     ends it. No minimum R (not answered). `retest: false` turns it off. EUR/USD 20 Nov: the 13:20 buy is gone, a sell at
     1.09914 (stop 1.1011, target 1.09569) instead. Not tested: a reading, not an edge.
+  - **The Mosha desk keeps gold, EUR/USD and GBP/USD** (21 Nov 2026, owner: "mosha keep gold and eurusd and gbpusd"):
+    `MS_MOSHA_SOP.MOSHA` (`MARKETS` stays the Engulfing desk's five); the tracker reads `OTHER` = EUR/USD and GBP/USD and drops
+    every other market's records before it writes (`keepMarkets`); the card shows only those three markets. Silver and the Nasdaq 100
+    records (about 5,300 in the 21 Nov rebuild) leave the file on the first run of the merged code.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
