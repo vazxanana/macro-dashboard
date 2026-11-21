@@ -4965,6 +4965,8 @@ function msMosha(htf, ltf, buf) {
   for (let k = 0; k < after.length; k++) { const b = after[k];
     if (F && b.time === F.time) {   // CF failed before any entry: no trade; back toward the BO level until a new CF forms
       out.state = 'cf-failed'; out.failT = F.time; out.expect = { side: s, from: F.close, fromT: F.time, to: L, failed: true }; return out; }
+    // price reached the VR's extreme (the target) before any entry: the move is done, repeat the SOP (21 Nov 2026)
+    if (d > 0 ? b.high >= x : b.low <= x) { out.state = 'vr-broken'; return out; }
     if (k0 < 0) { if (d > 0 ? b.low <= zh : b.high >= zl) k0 = k; else continue; }
     const opp = d > 0 ? b.close < b.open : b.close > b.open;
     if (base && (d > 0 ? b.close > base.high : b.close < base.low)) { eg = { k, b, base }; break; }

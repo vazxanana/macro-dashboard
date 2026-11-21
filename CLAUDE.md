@@ -5178,6 +5178,9 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     rejection by a close beyond the last H4 swing of the WICKS; it is the last H4 A level (V for a sell), a turn of the
     closes, like every level on these desks; mark "H4 A level · BO buy". On gold 2020-25 after costs: in sample -0.047R
     -> -0.050R a trade (n 1,452), out of sample +0.073R -> +0.058R (n 780, trade t 0.91): nothing changes in `desk-rigor`.
+  - **Mosha sequence: no entry once the target was reached** (21 Nov 2026, same check): `msMosha` took an EG after price had
+    already traded to the VR's extreme (the target) and come back; that move is done (`vr-broken`, repeat the SOP). Gold
+    2025: 266 -> 249 sequence entries, the 17 dropped summed +0.14R, so the record barely moves.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
