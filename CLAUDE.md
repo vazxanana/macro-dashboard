@@ -5109,6 +5109,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     month grid (Monday first) of closed R by the UTC day a trade ended, arrows to the months that have a close, a tint by size,
     a day opens its trades with "Chart"; it follows the card's filters; open trades are never added in; before costs. Styles
     `.mo-cal*` in `#ms-mosha-css`.
+  - **A desk's trade opens over the page** (21 Nov 2026, owner: "the chart should open before and after like council, I don't like
+    this thing going down to the chart"): `msMoshaReplayDialog(trade, host)` in `assets/mosha-replay.js` moves the page's one replay
+    card `#mo-replay` into `<dialog id="mo-rp-dlg">` made INSIDE the desk's own view (so the desk's styles still reach it; a
+    placeholder `#mo-replay-dlg-home` holds its height, the page behind does not move) and puts it back on close. Header: the
+    trade's name, **Before** (the chart as it stood at the entry) / **After** (the whole trade, the default), Close; Escape and a
+    click outside close. Every "Chart" button, Open now card and calendar day row of the three desks uses it (a day's row is
+    clickable as a whole); the Mosha examples' picker stays on the desk. The trade history was rebuilt from 1 Jan 2026 the same
+    day (`KEEP` 14,000): Mosha 7,618 records, Engulfing 5,326, LIT 604; paper records before costs, never evidence.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

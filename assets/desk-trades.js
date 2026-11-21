@@ -96,9 +96,9 @@
     if (b.hasAttribute('data-dk-src')) { S.src = b.getAttribute('data-dk-src'); S.all = false; draw(k); return; }
     var id = b.getAttribute('data-dk-log') || b.getAttribute('data-dk-chart'), r = (S.rows || []).filter(function (x) { return x.id === id; })[0]; if (!r) return;
     if (b.hasAttribute('data-dk-log')) { S.open[id] = !S.open[id]; draw(k); var nb = $('v-' + k).querySelector('[data-dk-log="' + (root.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); if (nb) nb.focus(); return; }
-    if (typeof root.msMoshaReplayTrade === 'function' && borrowChart(k)) {
-      root.msMoshaReplayTrade({ replayed: true, name: (r.label || r.kind) + ' · ' + nm(r), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mk(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R });
-      var rp = $('mo-replay'); if (rp && rp.scrollIntoView) rp.scrollIntoView({ block: 'start' }); }
+    var T = { replayed: true, name: (r.label || r.kind) + ' · ' + nm(r), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mk(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R };
+    // the chart opens over the page (the replay card in a dialog inside this desk's view), never by scrolling down to it
+    if (typeof root.msMoshaReplayDialog === 'function') root.msMoshaReplayDialog(T, $('v-' + k)); else if (typeof root.msMoshaReplayTrade === 'function' && borrowChart(k)) root.msMoshaReplayTrade(T);
   });
   // the Mosha desk's styles serve these desks too: its sheet is copied once with the view's id in place of #v-mosha
   function styles() { if ($('ms-dk2-css')) return; var src = $('ms-mosha-css'); if (!src) return; var el = document.createElement('style'); el.id = 'ms-dk2-css';
