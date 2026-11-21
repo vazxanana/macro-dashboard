@@ -31,6 +31,10 @@
 //     (id "bar-sop-", label "· repeat SOP"; o.rsop: false leaves it out). At the sequence's own CF zone the repeat is the
 //     other page's: after the CF with NO QM first, a VR and then a CF one timeframe lower whose zone sits inside the parent
 //     CF zone (id "bar-sop-cf-", flag nested).
+// Review of 21 Nov 2026: one order (same market, side, fill, entry and stop) is recorded once (uniq, with its fixed priority);
+// an entry at a close whose next candle opens beyond the stop books that gap (outcome); a sequence whose CF sits inside the VR
+// is recorded as its own reading ("sop-c2-", case2) instead of being skipped; every sequence record carries two tags that
+// change no trade (withWeekly, er20: dayTags).
 // DISPLAY ONLY. A replay on past candles: no order, no stored trade, no council file, nothing sent anywhere. It is not
 // Luxus's record and not a tested rule; the mechanical Mosha studies failed (CLAUDE.md "Mosha level reversal study").
 (function (root) {
@@ -630,7 +634,7 @@
   // a stored record keeps its id and a label cut to 56 characters: the owner's readings of 21 Nov 2026 are read from the id
   function kindText(r) {
     var lb = r.label || '', g = readings(r);
-    if (r.kind === 'sop') return NAME[r.h] + (r.ibo || / iBO /.test(lb) ? ' iBO → ' : ' BO → ') + NAME[r.l] + ' VR, CF';
+    if (r.kind === 'sop') return NAME[r.h] + (r.ibo || / iBO /.test(lb) ? ' iBO → ' : ' BO → ') + NAME[r.l] + ' VR, CF' + (isC2(r) || r['case'] === 2 ? ' · CF inside the VR' : '');
     if (r.nested || (/bar-sop-cf-/.test(String(r.id)) && r.l === DOWN[r.h])) return NAME[r.h] + ' CF → ' + NAME[r.l] + ' VR, CF inside it (repeat SOP)' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
     return NAME[r.h] + (/CF barrier/.test(lb) ? ' CF barrier → ' : /VR barrier/.test(lb) ? ' VR barrier → ' : g.sweep ? ' sweep barrier → ' : ' barrier → ') + NAME[r.l] + (g.rsop ? ' QM, repeat SOP' : r.janda || / · Janda/.test(lb) ? ' QM, Janda' : ' QM') +
       (g.m5 ? ' · M5 confirm' : '') + (g.alt ? ' · ' + NAME[g.alt] + ' confirm' : '') + (g.visit > 1 ? (g.visit === 2 ? ' · second visit' : ' · visit ' + g.visit) : '') + (g.atZone ? ' · at the zone' : '') + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
@@ -638,7 +642,7 @@
   var isC2 = function (r) { return !!r.case2 || /(^|:)sop-c2-/.test(String(r.id || '')); };
   function rowHTML(r) {
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
-    var op = !!S.open[r.id], kind = kindText(r) + (r.kind === 'sop' && r['case'] === 2 ? ' · CF inside the VR' : '');
+    var op = !!S.open[r.id], kind = kindText(r);
     return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(kind) + ' · ' + esc(ALL[mkR(r)].name) + '</small></td>' +
       '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span>' + (r.src ? ' <small class="mo-sop-src">' + (r.src === 'live' ? 'live' : 'replay') + '</small>' : '') + '</td>' +
       '<td class="n" data-l="Entry">' + fP(r, r.entry) + '</td><td class="n" data-l="Stop">' + fP(r, r.stop) + '</td><td class="n" data-l="Target">' + fP(r, r.target) + '</td>' +
