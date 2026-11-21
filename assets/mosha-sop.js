@@ -303,7 +303,18 @@
     var id = String(r.id || ''), v = /-v(\d+)-/.exec(id);
     return { sweep: !!r.sweep || /bar-(j-)?sw-/.test(id), m5: !!r.m5 || /-m5-/.test(id), atZone: !!r.atZone || /-z-[bs]?\d+$/.test(id), visit: r.visit > 1 ? r.visit : v ? +v[1] : 1 };
   }
-  var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  // a stored record's log and chart marks live in one file per UTC day of its entry (council/desk-store.mjs, 21 Nov 2026):
+  // read only when a trade's log or chart is opened. A record that already carries them (an older file, a browser replay) is
+  // handed back as it is; a day file that cannot be read leaves them empty and says so.
+  function withDetail(detail, r) {
+    if (!r || r.log) return Promise.resolve(r);
+    if (!detail || !detail.dir) { r.log = []; r.marks = r.marks || []; return Promise.resolve(r); }
+    var D = root.msData, day = new Date(r.t * 1000).toISOString().slice(0, 10);
+    if (!D || typeof D.json !== 'function') { r.log = []; r.marks = []; return Promise.resolve(r); }
+    return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
+      function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
+  }
+  var API = { withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -331,7 +342,7 @@
   function run(force) {
     if (S.state === 'busy') return; S.state = 'busy'; S.err = ''; draw();
     stored().then(function (j) {
-      if (j && !force) { S.rows = j.records.slice().sort(function (a, b) { return b.t - a.t; }); S.file = { at: j.at, through: j.through, since: j.since }; S.state = 'done'; S.at = Date.now(); draw(); return; }
+      if (j && !force) { S.rows = j.records.slice().sort(function (a, b) { return b.t - a.t; }); S.file = { at: j.at, through: j.through, since: j.since, detail: j.detail || null }; S.state = 'done'; S.at = Date.now(); draw(); return; }
       S.file = null; S.state = 'idle'; replay();
     });
   }
@@ -366,7 +377,7 @@
       '<td class="n" data-l="Entry">' + fP(r, r.entry) + '</td><td class="n" data-l="Stop">' + fP(r, r.stop) + '</td><td class="n" data-l="Target">' + fP(r, r.target) + '</td>' +
       '<td class="mo-c-res"><div class="mo-ex">' + res + '<small>' + (r.endT ? 'ended ' + utc(r.endT) + ' · ' : '') + 'risk ' + unit(mkR(r)) + fP(r, r.r0) + '</small></div>' +
       '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-sop-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></div>' +
-      (op ? '<ol class="mo-sop-log">' + r.log.map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') + '</ol>' : '') + '</td></tr>';
+      (op ? '<ol class="mo-sop-log">' + (r.log ? (r.noDetail ? '<li>The log of this trade could not be read.</li>' : '') + r.log.map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') : '<li>Reading the log…</li>') + '</ol>' : '') + '</td></tr>';
   }
   // Open now (21 Nov 2026, owner: "the same panel with active trades like ict desk"): one card per open paper trade of the
   // tracker's record, every market, whatever filter the table below is on. R now is the tracker's last reading, not a live quote.
@@ -439,9 +450,13 @@
     if (b.hasAttribute('data-sop-all')) { S.all = true; draw(); return; }
     if (b.hasAttribute('data-sop-flt')) { S.flt = b.getAttribute('data-sop-flt'); S.all = false; draw(); return; }
     var id = b.getAttribute('data-sop-log') || b.getAttribute('data-sop-chart'), r = byId(id); if (!r) return;
-    if (b.hasAttribute('data-sop-log')) { S.open[id] = !S.open[id]; draw(); var nb = document.querySelector('#mo-sopr [data-sop-log="' + id + '"]'); if (nb) nb.focus(); return; }
+    var fileD = S.file && S.file.detail;
+    if (b.hasAttribute('data-sop-log')) { S.open[id] = !S.open[id]; var refocus = function () { draw(); var nb = document.querySelector('#mo-sopr [data-sop-log="' + id + '"]'); if (nb) nb.focus(); };
+      refocus(); if (S.open[id] && !r.log) withDetail(fileD, r).then(refocus); return; }
+    withDetail(fileD, r).then(function (r) {
     var T = { replayed: true, name: kindText(r), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mkR(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R, how: r.status };
     if (typeof root.msMoshaReplayDialog === 'function') root.msMoshaReplayDialog(T, document.getElementById('v-mosha')); else if (typeof root.msMoshaReplayTrade === 'function') root.msMoshaReplayTrade(T);
+    });
   });
   function go() { var v = $('v-mosha'); if (!v || v.hidden) return; if (API.visible(document.documentElement.dataset) && S.state === 'idle') run(); else draw(); }
   var prev = root.renderMosha;
