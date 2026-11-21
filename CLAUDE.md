@@ -5346,6 +5346,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     "close above the HIGH"): `council/eg-methods.mjs` `zones` (it was a body engulf, a close beyond the other's open). Affects the
     Engulf plan / short method / direct entry, the MSNR gold plan and the direction's Daily EG levels. The stored desk records
     from before it are as booked under the old rule until the histories are rebuilt.
+  - **A turned chart sells the VR retest** (21 Nov 2026, owner on two EUR/USD buys: "this should be a sell"; chose "Both", "the
+    last low", "the top of vr or entry on new cf made once touch and cf box high is the sl"): in `sopTrades`, once the chart
+    under the BO has its newest internal break (3 candles a side) the other way after the BO (`turnAt`, kept for that BO), the
+    BO gives no more entries; instead the VR level is traded the other way once price has gone 1R (VR top to level) past it and
+    comes back: entry A at the level, stop past the VR's top (`sop-vr-`), or entry B on a new CF (BO Structure) after the
+    touch, stop past that CF box (`sop-vc-`); target the last low before the touch (high for a buy). A close past the VR's top
+    ends it. No minimum R (not answered). `retest: false` turns it off. EUR/USD 20 Nov: the 13:20 buy is gone, a sell at
+    1.09914 (stop 1.1011, target 1.09569) instead. Not tested: a reading, not an edge.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

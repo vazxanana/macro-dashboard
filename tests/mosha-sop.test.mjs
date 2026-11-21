@@ -316,3 +316,16 @@ test('the VR from the nearest swing (msMosha o.near): the box ends at the last i
     for (const r of a) { const q = b.find((x) => x.id === r.id); assert.ok(q, 'the older entry remains: ' + r.id); assert.deepEqual([q.entry, q.stop, q.target], [r.entry, r.stop, r.target]); }
     assert.ok(b.every((r) => r['case'] !== 2 && rule1(r))); }
 });
+
+// 21 Nov 2026 (owner, on two EUR/USD buys: "this should be a sell"): once the chart under the BO has turned the other way on its
+// small swings, the BO gives no more entries; the VR level is traded the other way on its retest (at the level, stop past the
+// VR's top; or a new CF after the touch, stop past the CF box), target the last low.
+test('after a turn the VR is retested the other way: a stop on the losing side, the last low as target, no hindsight; off with retest: false', () => {
+  let n = 0;
+  for (const seed of [3, 7, 11, 23, 31, 47]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, s = M.sopTrades(X, F, { from: fr }), R = s.filter((r) => r.retest);
+    assert.ok(M.sopTrades(X, F, { from: fr, retest: false }).every((r) => !r.retest));
+    for (const r of R) { n++; assert.ok(rule1(r), 'rule 1: ' + r.id); assert.match(r.id, /sop-v[rc]-/); assert.match(r.label, / turned → .* VR retest/);
+      assert.ok(r.log.every((x, i) => !i || x.t >= r.log[i - 1].t), 'log in time order: ' + r.id);
+      const c = M.sopTrades(cut(X, r.t + 7 * 60), F, { from: fr }); assert.ok(c.map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); } }
+  assert.ok(n >= 1, 'VR retest entries on these candles: ' + n);
+});
