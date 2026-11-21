@@ -73,9 +73,9 @@ const mark = (m, d = 3) => { const k = ['level', 'vr', 'bvr', 'zone'].includes(m
   if (!k || !Number.isFinite(o.a)) return null; if (k === 'level') { o.p = num(m.p, d); if (o.p == null) return null; if (m.under) o.under = true; } else { o.top = num(m.top, d); o.bot = num(m.bot, d); if (o.top == null || o.bot == null) return null; } return o; };
 // one record as stored: plain values only, and never without a stop on the losing side
 export function clean(r) {
-  const side = r.side > 0 ? 1 : -1, entry = +r.entry, stop = +r.stop, mk = SOP.MARKETS[r.market] ? r.market : 'xau', d = mk === 'xau' ? 3 : 6;
+  const side = r.side > 0 ? 1 : -1, entry = +r.entry, stop = +r.stop, mk = SOP.ALL[r.market] ? r.market : 'xau', d = mk === 'xau' ? 3 : 6;
   if (!(Number.isFinite(entry) && Number.isFinite(stop)) || !(side > 0 ? stop < entry : stop > entry)) return null;
-  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : 'barrier', h: r.h, l: r.l, case: r.case || null, side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: num(r.target, d), r0: num(Math.abs(entry - stop), d),
+  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 40) } : {}), h: r.h, l: r.l, case: r.case || null, side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: num(r.target, d), r0: num(Math.abs(entry - stop), d),
     status: r.status || 'open', R: r.R == null ? null : num(r.R), endT: r.endT || null, exit: r.exit == null ? null : num(r.exit, d), mfe: num(r.mfe), float: r.float == null ? null : num(r.float),
     log: (r.log || []).slice(0, 12).map((x) => ({ t: x.t || null, text: String(x.text || '').slice(0, 240) })),
     marks: (r.marks || []).slice(0, 6).map((m) => mark(m, d)).filter(Boolean) };

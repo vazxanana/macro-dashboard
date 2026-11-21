@@ -929,7 +929,7 @@ test('17 Nov: the decay monitor and what to expect sit in one closed "Decay and 
   for (const id of ['ms-decay', 'ms-expect']) { const i = DESK.indexOf(`id="${id}"`); assert.ok(i > dex && i < end, id + ' inside the disclosure'); }
   assert.doesNotMatch(DESK.slice(dex, DESK.indexOf('>', dex)), /\bopen\b/, 'closed by default');
   assert.match(PS_JS, /!c\.closest\('details\.c-dex'\)/, 'the simple phone view does not fold the cards inside it a second time');
-  for (const gone of ['id="v-gold"', 'id="v-lit"', 'id="v-sdv"', 'id="v-crypto"', 'id="ms-pb"', 'id="ms-book"', 'id="ms-cp-macro"', 'id="ms-notice"', '/_vercel/', '/api/og']) assert.ok(!DESK.includes(gone), gone);
+  for (const gone of ['id="v-gold"', 'id="v-sdv"', 'id="v-crypto"', 'id="ms-pb"', 'id="ms-book"', 'id="ms-cp-macro"', 'id="ms-notice"', '/_vercel/', '/api/og']) assert.ok(!DESK.includes(gone), gone);
 });
 
 test('Home (18 Nov 2026): one line on the live book against its plan, owner and reviewers only, linking to the forward card; the same reading', () => {

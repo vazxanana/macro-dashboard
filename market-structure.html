@@ -42,6 +42,7 @@
 <script src="/assets/mosha-systems.js" defer></script>
 <script src="/assets/mosha-sop.js" defer></script>
 <script src="/assets/mosha-replay.js" defer></script>
+<script src="/assets/desk-trades.js" defer></script>
 <script src="/assets/mosha-i18n.js" defer></script>
 <script src="/assets/mosha-tutor.js" defer></script>
 <script src="/assets/mosha-teach.js" defer></script>
@@ -4266,7 +4267,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
     </div>
   </section>
   <section class="view ictx" id="v-ict" aria-label="ICT desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#eg" data-dsw="eg" class="adm">Engulfing</a></nav>
     <div class="v-head ict-head">
       <div class="ict-title"><h1 class="h-head">ICT desk <span class="ict-tag">Paper desk</span></h1><p class="dk-ans" id="ict-ans" aria-live="polite">Loading the desk…</p><p class="ms-note">US index futures and gold · H1 iFVG reversal (sweep → inversion → trail from +2R). A separate edge from the council. <span id="ict-run"></span></p></div>
       <div class="ict-hr"><div class="ict-me" id="ict-me"></div>
@@ -4371,7 +4372,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   <!-- Mosha desk (10 Nov, owner: "And a place to mosha"): the owner's own Mosha trades, written down with their stop and measured.
        Five pre-registered studies found no fixed rule of it that makes money, so the desk measures the owner's selection instead. -->
   <section class="view adm" id="v-mosha" aria-label="Mosha desk" hidden>
-    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a></nav>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#eg" data-dsw="eg" class="adm">Engulfing</a></nav>
     <div class="v-head cx-head">
       <div><h1 class="h-head">Mosha desk <span class="mo-tag mo-own">Your own trades</span><span class="mo-tag mo-tch" data-tr>You teach here</span><span class="mo-tag mo-rdr">Read only</span></h1>
         <p class="ms-note mo-own">Your Mosha trading, measured the only way left: the trades you choose, written down with their stop while they are still open. Tested as fixed rules it is not an edge (five studies, below), so this desk counts what the rules cannot see, your selection. A log only: nothing here places, copies or changes a trade.</p>
@@ -4471,6 +4472,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
       <div class="card mo-wide" id="mo-list"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">Loading the log…</div></div>
       <div class="card mo-wide" id="mo-sys"><div class="ms-k"><span>The council's Mosha systems</span></div><div class="ct-empty">Loading the council's trades…</div></div>
+      <div class="card mo-wide mo-open-c" id="mo-open"><div class="ms-k"><span>Open now</span><small id="mo-open-n"></small></div><ul class="mo-open" id="mo-open-l"><li class="empty">Loading…</li></ul></div>
       <div class="card mo-wide" id="mo-sopr"><div class="ms-k"><span>Replayed trades</span></div><div class="ct-empty">The replay starts when the desk opens.</div></div>
       <div class="card mo-wide" id="mo-rules"><div class="ms-k"><span>What the fixed rules said</span><small>spot gold, after costs · 10 Nov 2026</small></div>
         <div class="ct-tw"><table class="ct-t"><thead><tr><th>Reading, taken every time</th><th>Data</th><th class="n">Trades</th><th class="n">R a trade</th><th class="n">t</th><th>Verdict</th></tr></thead><tbody>
@@ -4483,6 +4485,28 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         </tbody></table></div>
         <p class="ms-note">The pattern prints about five times a trading day, and taken every time it loses. Your example trades were winners picked from thousands of look-alikes, so the open question is your choice of which ones to take. That is what the record above measures. It needs 20 closed trades before it says anything, and a t of 2 or more before it is called more than luck.</p>
       </div>
+    </div>
+  </section>
+  <!-- LIT desk (21 Nov 2026): stored paper trades with an Open now panel, drawn by assets/desk-trades.js -->
+  <section class="view adm" id="v-lit" aria-label="LIT desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#eg" data-dsw="eg" class="adm">Engulfing</a></nav>
+    <div class="v-head cx-head"><div><h1 class="h-head">LIT desk <span class="mo-tag">Paper record</span></h1>
+      <p class="ms-note">What the LIT detector marks on eleven markets, kept as paper trades by the desk's tracker. A record to study: nothing here places, copies or changes a trade, and it is not a tested rule.</p></div></div>
+    <div class="mo-grid">
+      <div class="card mo-wide mo-open-c" data-dk="open"><div class="ms-k"><span>Open now</span><small></small></div><ul class="mo-open"><li class="empty">Loading…</li></ul></div>
+      <div class="card mo-wide" data-dk="trades"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">The trades load when the desk opens.</div></div>
+      <div class="mo-wide" data-dk="chart"></div>
+    </div>
+  </section>
+  <!-- Engulfing desk (21 Nov 2026): stored paper trades with an Open now panel, drawn by assets/desk-trades.js -->
+  <section class="view adm" id="v-eg" aria-label="Engulfing desk" hidden>
+    <nav class="desk-sw" aria-label="Desk"><a href="#ict" data-dsw="ict" class="ictx">ICT</a><a href="#mosha" data-dsw="mosha" class="adm">Mosha</a><a href="#lit" data-dsw="lit" class="adm">LIT</a><a href="#eg" data-dsw="eg" class="adm">Engulfing</a></nav>
+    <div class="v-head cx-head"><div><h1 class="h-head">Engulfing desk <span class="mo-tag">Paper record</span></h1>
+      <p class="ms-note">What the engulf rule marks on the D1, H4 and H1 candles of five markets, kept as paper trades by the desk's tracker. A record to study: nothing here places, copies or changes a trade, and it is not a tested rule.</p></div></div>
+    <div class="mo-grid">
+      <div class="card mo-wide mo-open-c" data-dk="open"><div class="ms-k"><span>Open now</span><small></small></div><ul class="mo-open"><li class="empty">Loading…</li></ul></div>
+      <div class="card mo-wide" data-dk="trades"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">The trades load when the desk opens.</div></div>
+      <div class="mo-wide" data-dk="chart"></div>
     </div>
   </section>
   <!-- Profile (8 Nov, owner: "make the cTrader accounts a page inside the profile so it is more organised") -->
@@ -9744,7 +9768,7 @@ function msNextSetup(bars, A) {
   if (document.getElementById('v-council')) { councilReady = window.msBootGate ? window.msBootGate.then(loadCouncil) : loadCouncil(); setInterval(loadCouncil, 5 * 60e3); }
 
   // ─── Sections: a home page of cards, each section on its own page ───
-  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'guest', 'users', 'ict', 'profile', 'mosha'];
+  const VIEWS = ['home', 'setup', 'charts', 'scanner', 'council', 'guest', 'users', 'ict', 'profile', 'lit', 'eg', 'mosha'];
   // Council sections (6 Nov renovation): Overview · Trades · Systems · Review · Research · Macro (7 Nov) · This week (8 Nov); deep links #council/<section>
   const CPANES = ['overview', 'trades', 'systems', 'review', 'research', 'week'], CPUB = ['overview', 'trades'];
   const CPANE = { cur: 'overview' };
@@ -9777,7 +9801,7 @@ function msNextSetup(bars, A) {
       ev.preventDefault(); bs[j].focus(); bs[j].click();
     }); }
   // which permission key a view needs (owner 8 Nov: per-member permissions); the owner is never denied
-  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', mosha: 'mosha', ict: 'ict', home: 'desk', setup: 'desk', council: 'desk' };
+  const VIEW_PERM = { charts: 'charts', scanner: 'scanner', lit: 'desks', eg: 'desks', mosha: 'mosha', ict: 'ict', home: 'desk', setup: 'desk', council: 'desk' };
   function msDenied(view) { const k = VIEW_PERM[view]; if (!k || document.documentElement.dataset.role === 'owner') return false; const E = window.MS_PERMS || {}; return !E[k]; }
   // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
   // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
@@ -9789,6 +9813,7 @@ function msNextSetup(bars, A) {
     if (v === 'ict' && window.renderIct) setTimeout(window.renderIct, 0);
     if (v === 'profile' && window.msProfile) setTimeout(window.msProfile, 0);
     if (v === 'mosha' && window.renderMosha) setTimeout(window.renderMosha, 0);
+    if ((v === 'lit' || v === 'eg') && window.renderEdgeDesk) setTimeout(() => window.renderEdgeDesk(v), 0);
     if (v === 'users' && window.renderUsers) window.renderUsers();   // guests only get the H4 chart (owner, 6 Nov)
     // a pane this account may not open (#council/trades for a viewer) shows the overview: the address says so too (12 Nov 2026;
     // it kept the refused pane's name), as for a refused view above
@@ -9799,7 +9824,7 @@ function msNextSetup(bars, A) {
     document.querySelectorAll('[data-go]').forEach((a) => { if (a.dataset.go === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
     // ICT, Gold and Crypto share one entry (8 Nov, owner: "all in the same page, just a switch"): it lights for any of them and
     // opens the desk used last; the switch at the top of each desk marks the current one
-    { const DESKS = ['ict', 'mosha'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
+    { const DESKS = ['ict', 'mosha', 'lit', 'eg'], on = DESKS.includes(v); if (on) try { localStorage.setItem('ms-desk', v); } catch (e) {}
       let last = 'ict'; try { last = localStorage.getItem('ms-desk') || 'ict'; } catch (e) {}
       const allowed = (k) => (k === 'ict' ? !!document.documentElement.dataset.ict : !PUB && !msDenied(k)), pick = allowed(last) ? last : DESKS.find(allowed) || 'ict';
       document.querySelectorAll('[data-desks]').forEach((a) => { a.setAttribute('href', '#' + pick); if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
@@ -12290,9 +12315,47 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-lux { display: no
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-sys { display: none; }
 /* The method, replayed (20 Nov 2026, assets/mosha-sop.js): the desk's reading on past candles, trades with their logs; never put to the teacher. */
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-sopr { display: none; }
+html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-open { display: none; }
+/* Open now (21 Nov 2026, owner: "the same panel with active trades like ict desk"): the tracker's open paper trades, one card each */
+html:not([data-mosha="teach"]) #v-mosha #mo-open, html[data-role="owner"] #v-mosha #mo-open { order: -11; }
+#v-mosha .mo-open-c:has(li[data-sop-chart]) { border-color: var(--mo-accent, var(--au-accent, var(--accent))); }
+#v-mosha .mo-open { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); }
+#v-mosha .mo-open li { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px; cursor: pointer; background: var(--mo-well, var(--au-well, var(--panel-2))); min-width: 0; }
+#v-mosha .mo-open li:hover, #v-mosha .mo-open li:focus-visible { border-color: var(--mo-accent, var(--au-accent, var(--accent))); outline: none; }
+#v-mosha .mo-open li.empty { cursor: default; background: none; border-style: dashed; padding: 16px; color: var(--ink-dim); font-size: 13px; line-height: 1.5; grid-column: 1 / -1; }
+#v-mosha .mo-open .r1 { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; font-size: 13px; }
+#v-mosha .mo-open .r1 .mk { font-size: 15px; font-weight: 700; color: var(--ink); }
+#v-mosha .mo-open .r1 .pl { font-size: 12px; color: var(--ink-dim); border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; }
+#v-mosha .mo-open .r1 .live { margin-left: auto; display: grid; justify-items: end; line-height: 1.15; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+#v-mosha .mo-open .r1 .live.pos { color: var(--buy); } #v-mosha .mo-open .r1 .live.neg { color: var(--sell); }
+#v-mosha .mo-open .r1 .live small { font-size: 12px; font-weight: 500; color: var(--ink-dim); }
+#v-mosha .mo-open .trk { position: relative; height: 6px; border-radius: 3px; background: var(--line); }
+#v-mosha .mo-open .trk i { position: absolute; top: 0; bottom: 0; border-radius: 3px; } #v-mosha .mo-open .trk i.up { background: var(--buy); } #v-mosha .mo-open .trk i.dn { background: var(--sell); }
+#v-mosha .mo-open .trk span { position: absolute; top: -3px; width: 2px; height: 12px; background: var(--ink-faint); }
+#v-mosha .mo-open .trk-l { position: relative; height: 16px; font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-open .trk-l span { position: absolute; white-space: nowrap; } #v-mosha .mo-open .trk-l span:last-child { transform: translateX(-100%); }
+#v-mosha .mo-open dl { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px 10px; }
+#v-mosha .mo-open dt { font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-open dd { margin: 0; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); overflow-wrap: anywhere; }
+#v-mosha .mo-open .nt { margin: 0; font-size: 12px; color: var(--ink-dim); }
+@media (max-width: 520px) { #v-mosha .mo-open dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 #v-mosha #mo-sopr a { color: inherit; text-decoration: underline; }
 /* The replay leads the desk for the owner and readers (20 Nov 2026, owner: "like normal desk showing the replay trades"); the chart it opens comes right after. */
 html:not([data-mosha="teach"]) #v-mosha #mo-sopr, html[data-role="owner"] #v-mosha #mo-sopr { order: -10; } html:not([data-mosha="teach"]) #v-mosha #mo-replay, html[data-role="owner"] #v-mosha #mo-replay { order: -9; }
+/* P&L calendar (21 Nov 2026, owner: "Calendar as well"): a month of closed R by day, like the ICT desk's; the LIT and Engulfing desks get it through the copied sheet */
+#v-mosha .mo-cal-k { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; } #v-mosha .mo-cal-nav { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+#v-mosha .mo-cal-nav b { min-width: 230px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink); } #v-mosha .mo-cal-nav small { margin-left: 6px; font-weight: 600; font-variant-numeric: tabular-nums; } #v-mosha .mo-cal-nav small.pos { color: var(--buy); } #v-mosha .mo-cal-nav small.neg { color: var(--sell); }
+#v-mosha .mo-cal-nav .mo-sop-b { min-width: 36px; font-size: 16px; } #v-mosha .mo-cal-nav .mo-sop-b[disabled] { opacity: .35; cursor: default; }
+#v-mosha .mo-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+#v-mosha .mo-cal-h { font-size: 12px; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
+#v-mosha .mo-cal-d { all: unset; box-sizing: border-box; min-height: 64px; border-radius: 10px; border: 1px solid var(--line); padding: 6px 8px; display: grid; align-content: start; gap: 2px; cursor: pointer; min-width: 0; }
+#v-mosha .mo-cal-d[disabled] { cursor: default; } #v-mosha .mo-cal-d.we:not(.up):not(.dn) { border-style: dashed; }
+#v-mosha .mo-cal-d .d { font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-cal-d b { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; } #v-mosha .mo-cal-d small { font-size: 12px; color: var(--ink-dim); }
+#v-mosha .mo-cal-d.up { background: color-mix(in srgb, var(--buy) calc(7% + var(--heat) * 22%), transparent); border-color: color-mix(in srgb, var(--buy) 35%, var(--line)); }
+#v-mosha .mo-cal-d.dn { background: color-mix(in srgb, var(--sell) calc(7% + var(--heat) * 20%), transparent); border-color: color-mix(in srgb, var(--sell) 35%, var(--line)); }
+#v-mosha .mo-cal-d.today .d { font-weight: 700; color: var(--ink); } #v-mosha .mo-cal-d.sel, #v-mosha .mo-cal-d:focus-visible { outline: 2px solid var(--mo-accent, var(--au-accent, var(--accent))); outline-offset: 1px; }
+#v-mosha .mo-cal-day { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; } #v-mosha .mo-cal-day li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+#v-mosha .mo-cal-day b { font-variant-numeric: tabular-nums; } #v-mosha .mo-cal-day b.pos { color: var(--buy); } #v-mosha .mo-cal-day b.neg { color: var(--sell); } #v-mosha .mo-cal-day small { font-size: 12px; color: var(--ink-dim); margin-left: auto; }
+@media (max-width: 600px) { #v-mosha .mo-cal { gap: 3px; } #v-mosha .mo-cal-d { min-height: 50px; padding: 4px 2px; } #v-mosha .mo-cal-d b { font-size: 12px; letter-spacing: -.02em; } #v-mosha .mo-cal-d small { display: none; } #v-mosha .mo-cal-nav { margin-left: 0; width: 100%; justify-content: space-between; } #v-mosha .mo-cal-nav b { min-width: 0; } }
+@media (pointer: coarse) { #v-mosha .mo-cal-nav .mo-sop-b { min-width: 44px; min-height: 44px; } }
 #v-mosha .mo-sop-ans { margin: 4px 0 10px; font-size: 15px; font-weight: 600; color: var(--ink); }
 #v-mosha .mo-sop-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 10px 0 4px; }
 #v-mosha .mo-sop-tile { background: var(--mo-well, var(--au-well, var(--panel-2))); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
@@ -15042,7 +15105,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
      cards were drawn open and folded a moment later. Until the script has run (html[data-ps-ready]) this rule holds back the
      same cards the script folds; the script then takes over (rows, open state). */
   html[data-phone="simple"]:not([data-ps-ready]) #v-ict .card.ict-card:not(.ict-open-c):not(#ict-sig) { display: none !important; }
-  html[data-phone="simple"]:not([data-ps-ready]) #v-mosha .card:not(#mo-teach):not(#mo-lessons):not(#mo-todo):not(#mo-rec):not(#mo-sopr) { display: none !important; }
+  html[data-phone="simple"]:not([data-ps-ready]) #v-mosha .card:not(#mo-teach):not(#mo-lessons):not(#mo-todo):not(#mo-rec):not(#mo-sopr):not(#mo-open) { display: none !important; }
   html[data-phone="simple"][data-mosha="teach"]:not([data-role="owner"]):not([data-ps-ready]) #mo-rec { display: none !important; }
 
   /* ── second pass (11 Nov, owner: "Need more"): Charts, the other Council panes, Setup, Scanner and the remaining desks ── */
@@ -15706,7 +15769,7 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
   // or of the Full view is the page as it was. A card the account may not see (its own gate hides it) gets no row.
   var DESKS = [
     { v: 'v-ict', sel: '.card.ict-card', keep: function (c) { return c.classList.contains('ict-open-c') || c.id === 'ict-sig'; } },
-    { v: 'v-mosha', sel: '.card', keep: function (c) { var teach = R.dataset.mosha === 'teach' && R.dataset.role !== 'owner'; return c.id === 'mo-teach' || c.id === 'mo-lessons' || c.id === 'mo-todo' || (!teach && (c.id === 'mo-rec' || c.id === 'mo-sopr')); } },
+    { v: 'v-mosha', sel: '.card', keep: function (c) { var teach = R.dataset.mosha === 'teach' && R.dataset.role !== 'owner'; return c.id === 'mo-teach' || c.id === 'mo-lessons' || c.id === 'mo-todo' || (!teach && (c.id === 'mo-rec' || c.id === 'mo-sopr' || c.id === 'mo-open')); } },
     { v: 'v-profile', sel: '.card', keep: function (c, i) { return i === 0; } },
     // second pass. Council panes: a row has two lines (heading, one line of what the card holds)
     { v: 'ms-cp-systems', sel: '.card', two: 1, keep: function (c) { return c.id === 'ms-sys-book'; } },   // which systems trade live: open and first

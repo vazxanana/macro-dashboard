@@ -83,7 +83,7 @@ test('the replay leads the desk: closed R by day, and the card comes first for t
   assert.match(html, /#v-mosha #mo-sopr \{ order: -10; \}/); assert.match(html, /#v-mosha #mo-replay \{ order: -9; \}/);
   assert.match(html, /c\.id === 'mo-rec' \|\| c\.id === 'mo-sopr'/);
   const js = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8');
-  for (const k of ['mo-sop-ans', 'mo-sop-tiles', 'Open now', 'Closed R by day', 'Too few']) assert.ok(js.includes(k), k);
+  for (const k of ['mo-sop-ans', 'mo-sop-tiles', 'Open now', 'P&amp;L calendar', 'Too few']) assert.ok(js.includes(k), k);
 });
 
 test('another market gets the same reading at the same share of price: gold candles scaled to a forex price give the same trades, scaled', () => {

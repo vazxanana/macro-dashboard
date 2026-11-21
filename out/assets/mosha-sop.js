@@ -19,9 +19,12 @@
   // (stop buffer, smallest and largest risk, smallest barrier) were written in dollars near REF; another market takes the
   // same share of its own price. Gold keeps its dollar figures exactly.
   var MARKETS = { xau: { name: 'Gold', dec: 2 }, xag: { name: 'Silver', dec: 3 }, eurusd: { name: 'EUR/USD', dec: 5 }, gbpusd: { name: 'GBP/USD', dec: 5 }, nas100: { name: 'Nasdaq 100', dec: 1 } };
-  var REF = 4000, mkOf = function (k) { return MARKETS[k] ? k : 'xau'; };
+  // every market a desk tracker may record (the LIT desk reads more than the Mosha five); MARKETS stays the Mosha tracker's list
+  var ALL = { xau: MARKETS.xau, xag: MARKETS.xag, eurusd: MARKETS.eurusd, gbpusd: MARKETS.gbpusd, nas100: MARKETS.nas100, usdjpy: { name: 'USD/JPY', dec: 3 }, audusd: { name: 'AUD/USD', dec: 5 }, usdcad: { name: 'USD/CAD', dec: 5 },
+    spx500: { name: 'S&P 500', dec: 1 }, us30: { name: 'Dow 30', dec: 1 }, de40: { name: 'DAX 40', dec: 1 } };
+  var REF = 4000, mkOf = function (k) { return ALL[k] ? k : 'xau'; };
   var sizes = function (k, px) { var q = mkOf(k) === 'xau' ? 1 : px / REF; return { buf: BUF * q, rmin: 0.8 * q, rmax: 25 * q, zmin: 0.5 * q }; };
-  var fmt = function (k) { var d = MARKETS[mkOf(k)].dec; return function (v) { return (+v).toFixed(d); }; };
+  var fmt = function (k) { var d = ALL[mkOf(k)].dec; return function (v) { return (+v).toFixed(d); }; };
   var unit = function (k) { return mkOf(k) === 'xau' ? '$' : ''; };
   var utc = function (s) { return s ? new Date(s * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC' : '—'; };
   var word = function (d) { return d > 0 ? 'buy' : 'sell'; };
@@ -122,7 +125,33 @@
     var m = {}; rows.forEach(function (r) { if (r.R == null || !r.endT) return; var d = new Date(r.endT * 1000).toISOString().slice(0, 10), x = m[d] || (m[d] = { day: d, n: 0, R: 0 }); x.n++; x.R += r.R; });
     return Object.keys(m).sort().map(function (k) { return m[k]; });
   }
-  var API = { MARKETS: MARKETS, sizes: sizes, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  // P&L calendar (21 Nov 2026, owner: "Calendar as well"): one month of closed R by the UTC day a trade ended, like the ICT desk's.
+  // calMonth is pure; calHTML writes the month grid, its arrows and the chosen day's trades (chartAttr = the desk's own "Chart" hook).
+  function calMonth(rows, ym) {
+    var days = byDay(rows), by = {}, months = []; days.forEach(function (d) { by[d.day] = d; var m = d.day.slice(0, 7); if (months.indexOf(m) < 0) months.push(m); });
+    if (!months.length) return { ym: null, months: [], cells: [], n: 0, R: 0 };
+    if (months.indexOf(ym) < 0) ym = months[months.length - 1];
+    var y = +ym.slice(0, 4), mo = +ym.slice(5, 7), first = new Date(Date.UTC(y, mo - 1, 1)), len = new Date(Date.UTC(y, mo, 0)).getUTCDate(), lead = (first.getUTCDay() + 6) % 7, cells = [], n = 0, R = 0, max = 0, i;
+    for (i = 0; i < lead; i++) cells.push(null);
+    for (i = 1; i <= len; i++) { var key = ym + '-' + (i < 10 ? '0' : '') + i, d = by[key], wd = new Date(Date.UTC(y, mo - 1, i)).getUTCDay(); cells.push({ day: key, d: i, n: d ? d.n : 0, R: d ? d.R : 0, we: wd === 0 || wd === 6 }); if (d) { n += d.n; R += d.R; max = Math.max(max, Math.abs(d.R)); } }
+    var at = months.indexOf(ym);
+    return { ym: ym, label: first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }), months: months, prev: at > 0 ? months[at - 1] : null, next: at < months.length - 1 ? months[at + 1] : null, cells: cells, n: n, R: R, max: max };
+  }
+  function calHTML(rows, st, chartAttr, nameOf) {
+    var e = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+    var r2 = function (v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; }, rc = function (v) { var a = Math.abs(v); return (v > 0 ? '+' : v < 0 ? '−' : '') + (a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a.toFixed(2)); };
+    var M = calMonth(rows, st.calM); if (!M.ym) return ''; st.calM = M.ym; var today = new Date().toISOString().slice(0, 10);
+    var nav = '<span class="mo-cal-nav"><button type="button" class="mo-sop-b" data-cal-m="' + (M.prev || '') + '"' + (M.prev ? '' : ' disabled') + ' aria-label="Previous month">‹</button><b aria-live="polite">' + e(M.label) + ' <small class="' + (M.R > 0 ? 'pos' : M.R < 0 ? 'neg' : '') + '">' + (M.n ? r2(M.R) + ' · ' + M.n + (M.n === 1 ? ' trade' : ' trades') : 'no closed trades') + '</small></b><button type="button" class="mo-sop-b" data-cal-m="' + (M.next || '') + '"' + (M.next ? '' : ' disabled') + ' aria-label="Next month">›</button></span>';
+    var grid = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (d) { return '<span class="mo-cal-h">' + d + '</span>'; }).join('') + M.cells.map(function (c) {
+      if (!c) return '<span></span>';
+      return '<button type="button" class="mo-cal-d' + (c.n ? (c.R > 0 ? ' up' : c.R < 0 ? ' dn' : '') : '') + (c.we ? ' we' : '') + (c.day === today ? ' today' : '') + (st.calDay === c.day ? ' sel' : '') + '"' + (c.n ? ' data-cal-day="' + c.day + '" style="--heat:' + (M.max ? Math.min(1, Math.abs(c.R) / M.max).toFixed(2) : 0) + '"' : ' disabled') +
+        ' aria-label="' + e(c.day + (c.n ? ': ' + r2(c.R) + ' on ' + c.n + (c.n === 1 ? ' trade' : ' trades') : ': no closed trade')) + '"><span class="d">' + c.d + '</span>' + (c.n ? '<b>' + rc(c.R) + '</b><small>' + c.n + (c.n === 1 ? ' trade' : ' trades') + '</small>' : '') + '</button>'; }).join('');
+    var list = '';
+    if (st.calDay && st.calDay.slice(0, 7) === M.ym) { var day = rows.filter(function (r) { return r.R != null && r.endT && new Date(r.endT * 1000).toISOString().slice(0, 10) === st.calDay; }).sort(function (a, b) { return a.endT - b.endT; });
+      list = '<ul class="mo-cal-day">' + day.map(function (r) { return '<li><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><span>' + e(nameOf ? nameOf(r) : '') + '</span><b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + r2(r.R) + '</b><small>ended ' + utc(r.endT) + '</small><button type="button" class="mo-sop-b" ' + chartAttr + '="' + e(r.id) + '">Chart</button></li>'; }).join('') + '</ul>'; }
+    return '<h3 class="mo-sop-h mo-cal-k">P&amp;L calendar <small>closed R by the UTC day each trade ended · open trades not added in · before costs</small>' + nav + '</h3><div class="mo-cal">' + grid + '</div>' + list;
+  }
+  var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -172,15 +201,40 @@
   function rowHTML(r) {
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
     var op = !!S.open[r.id], kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' + (r['case'] === 2 ? ' · CF inside the VR' : '') : NAME[r.h] + ' barrier → ' + NAME[r.l] + ' QM';
-    return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(kind) + ' · ' + esc(MARKETS[mkR(r)].name) + '</small></td>' +
+    return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(kind) + ' · ' + esc(ALL[mkR(r)].name) + '</small></td>' +
       '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span>' + (r.src ? ' <small class="mo-sop-src">' + (r.src === 'live' ? 'live' : 'replay') + '</small>' : '') + '</td>' +
       '<td class="n" data-l="Entry">' + fP(r, r.entry) + '</td><td class="n" data-l="Stop">' + fP(r, r.stop) + '</td><td class="n" data-l="Target">' + fP(r, r.target) + '</td>' +
       '<td class="mo-c-res"><div class="mo-ex">' + res + '<small>' + (r.endT ? 'ended ' + utc(r.endT) + ' · ' : '') + 'risk ' + unit(mkR(r)) + fP(r, r.r0) + '</small></div>' +
       '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-sop-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></div>' +
       (op ? '<ol class="mo-sop-log">' + r.log.map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') + '</ol>' : '') + '</td></tr>';
   }
+  // Open now (21 Nov 2026, owner: "the same panel with active trades like ict desk"): one card per open paper trade of the
+  // tracker's record, every market, whatever filter the table below is on. R now is the tracker's last reading, not a live quote.
+  function openCard(r) {
+    var m = mkR(r), tR = Math.abs(r.target - r.entry) / (r.r0 || Math.abs(r.entry - r.stop)), fl = r['float'], hi = Math.max(3, Math.ceil(tR)), lo = -1;
+    var pc = function (v) { return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100)).toFixed(1); }, z = pc(0);
+    var fill = fl == null ? '' : '<i class="' + (fl >= 0 ? 'up' : 'dn') + '" style="left:' + (fl >= 0 ? z : pc(fl)) + '%;width:' + Math.abs(pc(fl) - z).toFixed(1) + '%"></i>';
+    var kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' : NAME[r.h] + ' barrier → ' + NAME[r.l] + ' QM';
+    return '<li data-sop-chart="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(word(r.side) + ' ' + ALL[m].name + ', ' + (fl == null ? 'no reading yet' : fR(fl) + ' at the last reading') + ', open, view the chart') + '">' +
+      '<div class="r1"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><b class="mk">' + esc(ALL[m].name) + '</b><span class="pl">' + esc(kind) + '</span>' + (r.src ? '<span class="pl">' + (r.src === 'live' ? 'live' : 'replay') + '</span>' : '') +
+      '<span class="live ' + (fl == null ? '' : fl >= 0 ? 'pos' : 'neg') + '">' + (fl == null ? '<small>no reading yet</small>' : fR(fl) + '<small>at the last reading</small>') + '</span></div>' +
+      '<div class="trk" aria-hidden="true">' + fill + '<span style="left:' + z + '%"></span><span style="left:' + pc(Math.min(hi, tR)) + '%"></span></div>' +
+      '<div class="trk-l" aria-hidden="true"><span style="left:0">−1R stop</span><span style="left:' + z + '%">0</span><span style="left:100%">' + (tR <= hi ? 'target ' : '') + '+' + hi + 'R</span></div>' +
+      '<dl><div><dt>Entry</dt><dd>' + fP(r, r.entry) + '</dd></div><div><dt>Stop</dt><dd>' + fP(r, r.stop) + '</dd></div><div><dt>Target</dt><dd>' + fP(r, r.target) + ' · ' + tR.toFixed(1) + 'R</dd></div><div><dt>Best so far</dt><dd>' + (r.mfe != null ? '+' + (+r.mfe).toFixed(2) + 'R' : '—') + '</dd></div></dl>' +
+      '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + unit(m) + fP(r, r.r0) + '</p></li>';
+  }
+  function openPanel(open) {
+    var box = $('mo-open'), l = $('mo-open-l'), n = $('mo-open-n'); if (!box || !l) return;
+    var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
+    if (S.state !== 'done') { l.innerHTML = '<li class="empty">' + (S.state === 'failed' ? 'The open trades could not be read.' : 'Reading the open trades…') + '</li>'; if (n) n.textContent = ''; return; }
+    open = open.slice().sort(function (a, b) { return b.t - a.t; });
+    if (n) n.textContent = open.length ? open.length + ' open · paper only' + (S.file && S.file.at ? ' · last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') : '';
+    l.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. ' + (S.file ? 'The tracker reads gold, silver, EUR/USD, GBP/USD and the Nasdaq 100 about every 35 minutes' + (S.file.at ? ' (last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) + ')' : '') + '; a new entry shows here until its stop or target.' : 'A new entry shows here until its stop or target.') + '</li>';
+  }
+  API.openCard = openCard;
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
+    if (S.state !== 'done') openPanel([]);
     var head = '<div class="ms-k"><span>Mosha trades</span><small>the method as the course documents write it, on gold and four more markets · recorded by the desk\'s tracker like the ICT desk · paper only · each trade with its log</small></div>';
     if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading the trades…' : 'The trades load when the desk opens.') + '</div>'; return; }
     if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The tracker has no stored trades yet and the candles could not be read, so there is nothing to show. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
@@ -188,12 +242,12 @@
     var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : all, shown = S.all ? list : list.slice(0, 30);
     var chip = function (k, t, n) { return '<button type="button" class="mo-sop-b" data-sop-flt="' + k + '" aria-pressed="' + (S.flt === k) + '">' + t + ' (' + n + ')</button>'; };
     var sm = summary(list), open = all.filter(function (r) { return r.R == null; }), last = all[0];
-    var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + MARKETS[mkR(last)].name + ' ' + word(last.side) + ' at ' + fP(last, last.entry) + ', ' + utc(last.t) + '.' : '');
+    var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + ALL[mkR(last)].name + ' ' + word(last.side) + ' at ' + fP(last, last.entry) + ', ' + utc(last.t) + '.' : '');
     var tile = function (k, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + k + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
     var tiles = '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Reached target', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
       tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
-    var openHTML = open.length ? '<h3 class="mo-sop-h">Open now</h3><ul class="mo-sop-open">' + open.map(function (r) { return '<li><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span> ' + esc(MARKETS[mkR(r)].name) + ' <b>' + fP(r, r.entry) + '</b> · stop ' + fP(r, r.stop) + ' · target ' + fP(r, r.target) + (r['float'] != null ? ' · <b class="' + (r['float'] >= 0 ? 'pos' : 'neg') + '">' + fR(r['float']) + ' now</b>' : '') + ' <small>since ' + utc(r.t) + '</small> <button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></li>'; }).join('') + '</ul>' : '';
-    var days = byDay(list), cal = days.length ? '<h3 class="mo-sop-h">Closed R by day <small>the UTC day each trade ended · open trades not added in</small></h3><div class="mo-sop-cal">' + days.map(function (d) { return '<div class="mo-sop-day ' + (d.R > 0 ? 'pos' : d.R < 0 ? 'neg' : '') + '"><small>' + esc(new Date(d.day + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) + '</small><b>' + fR(d.R) + '</b><span>' + d.n + (d.n === 1 ? ' trade' : ' trades') + '</span></div>'; }).join('') + '</div>' : '';
+    var openHTML = ''; openPanel(every.filter(function (r) { return r.R == null; }));
+    var cal = calHTML(list, S, 'data-sop-chart', function (r) { return ALL[mkR(r)].name + ' · ' + (r.kind === 'sop' ? NAME[r.h] + ' BO, ' + NAME[r.l] + ' VR and CF' : NAME[r.h] + ' barrier, ' + NAME[r.l] + ' QM'); });
     box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
       '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + (S.file ? '<span class="mo-sop-sep" aria-hidden="true"></span>' + ['both', 'live', 'replay'].map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-src="' + k + '" aria-pressed="' + (S.src === k) + '">' + (k === 'both' ? 'Both' : k === 'live' ? 'Live (' + nLive + ')' : 'Replay (' + (every.length - nLive) + ')') + '</button>'; }).join('') : '') +
       '<button type="button" class="mo-sop-b" data-sop-run>Refresh</button></div>' +
@@ -208,8 +262,11 @@
       '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. On a market other than gold the stop buffer and the size limits are the same share of price as on gold: the desk\'s own choice. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
+  document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('#mo-open li[data-sop-chart]')) { e.preventDefault(); e.target.click(); } });
   document.addEventListener('click', function (e) {
-    var b = e.target && e.target.closest ? e.target.closest('#mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-mk], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
+    var b = e.target && e.target.closest ? e.target.closest('#mo-open [data-sop-chart], #mo-sopr [data-cal-m], #mo-sopr [data-cal-day], #mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-mk], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
+    if (b.hasAttribute('data-cal-m')) { if (b.getAttribute('data-cal-m')) { S.calM = b.getAttribute('data-cal-m'); S.calDay = null; draw(); } return; }
+    if (b.hasAttribute('data-cal-day')) { var cd = b.getAttribute('data-cal-day'); S.calDay = S.calDay === cd ? null : cd; draw(); var nd = document.querySelector('#mo-sopr [data-cal-day="' + cd + '"]'); if (nd) nd.focus(); return; }
     if (b.hasAttribute('data-sop-src')) { S.src = b.getAttribute('data-sop-src'); S.all = false; draw(); return; }
     if (b.hasAttribute('data-sop-mk')) { S.mk = b.getAttribute('data-sop-mk'); S.all = false; draw(); return; }
     if (b.hasAttribute('data-sop-run')) { S.all = false; run(); return; }

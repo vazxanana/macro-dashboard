@@ -5074,6 +5074,41 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   (416), EUR/USD +39.8R (421), GBP/USD +19.5R (459), Nasdaq −40.1R (417); −66.3R in all. A paper record of one reading before
   costs: never call a market's plus an edge. **Do not put a file of over 600 records into council-data before main's tracker
   has `KEEP` 4000** (the older tracker cuts the file to its newest 600 on its next run).
+  **Open now** (21 Nov 2026, owner: "the same panel with active trades like ict desk"): card `#mo-open` first on the desk (before
+  `#mo-sopr`; hidden for the teacher, kept open in the simple phone view): one card per OPEN record of the tracker's file, every
+  market, whatever filter the table is on (`openPanel` / `openCard` in `assets/mosha-sop.js`): side, market, entry type, R at the
+  tracker's last reading (never a live quote: said on the card), a −1R to target bar, entry / stop / target / best so far, open
+  since; a card opens the trade on the chart. No open trade = one dashed line saying so. Display only.
+- **LIT desk and Engulfing desk** (21 Nov 2026, owner: "The same for LIT and the same for engulfing. Plenty of trades and same panel
+  like ict"). The desk switch is **ICT | Mosha | LIT | Engulfing** (`#lit` / `#v-lit`, `#eg` / `#v-eg`, class `adm`, permission
+  `desks`; `tests/qa-sweep.test.mjs` no longer lists `v-lit` as removed: this LIT desk is new, the 8 Nov one stays gone).
+  - **Trackers** `council/edge-desks.mjs` (council.yml every 3rd round after the Mosha tracker, `timeout 150`, never fails the
+    round; `--days N`, `--only lit|eg`) → council-data `lit/desk.json`, `eg/desk.json`, in the Mosha file's shape (it shares
+    `bars`, `clean` and `merge` of `council/mosha-desk.mjs`; a record carries `label`, kinds `eg-<tf>` / `lit-<set>`).
+    **Engulfing** (`egTrades`): the live Gold daily engulf rule (close beyond the last opposite candle of the 3 before, right
+    side of the 20-candle average; limit at that candle's edge, stop past its far edge, 10R, 1R trail from +2R, out after 10
+    candles; a close through the zone or 20 candles cancels) on D1 (trading days, `foldWeekend`), H4 and H1 of the Mosha five
+    markets, buys AND mirrored sells, one order a zone, the Trader's cap of 3 not applied. The H4 / H1 readings, the sells and the
+    other markets are the desk's own choice. **LIT** (`litTrades`): `council/lit.mjs` `fbosCandidates` on eleven markets
+    (`MS_MOSHA_SOP.ALL`), the first of `LIT_SETS` that fills: `rule` (the pre-registered execution), `loose` and `break` (the
+    8 Nov replay's study executions, restored from the removed `council/lit-replay.mjs`), managed by the LIT study's own
+    `managePosition` (break-even after two swing breaks, out at the New York day's end), one position at a time a market.
+    Sizes on a market other than gold are the same share of price as gold's (`sizes`). No costs are charged.
+  - **Page** `assets/desk-trades.js` (`renderEdgeDesk(k)`, `MS_EDGE_DESKS`): per desk the Open now panel (`[data-dk="open"]`),
+    then the trades card (filters by entry type, market and Live / Replay, tiles, 30 rows then "Show all", closed R by day, "What
+    this is"). Reads only the stored file through `msData` (no browser replay). The Mosha desk's style sheet is copied once at
+    run time with `#v-lit` / `#v-eg` in place of `#v-mosha` (`#ms-dk2-css`), so both desks look like it with no second sheet.
+    "Chart" LENDS the page's one replay chart: `#mo-replay` is moved into the desk (`borrowChart`; the Mosha examples' picker and
+    legend hidden there) and put back when the Mosha desk opens (`returnChart`, a marker `#mo-replay-home`).
+  - First files: Engulfing 1,503 records over 90 days (+57.7R before costs: H1 1,171 trades +36.0R, H4 284 +5.0R, D1 48 +16.7R);
+    LIT 348 over 180 days (+6.9R: loose 311 −14.5R, break 20 +25.2R, rule 17 −3.5R). PAPER RECORDS of one reading with NO costs
+    (an H1 engulf's stop is a few pips, so costs would take a large share): never call either total an edge; the LIT study was
+    inconclusive and the engulf's book study failed its bar. Tests: `tests/edge-desks.test.mjs`.
+  - **P&L calendar on the three desks** (21 Nov 2026, owner: "Calendar as well"): `MS_MOSHA_SOP.calMonth` (pure) / `calHTML` in
+    `assets/mosha-sop.js`, used by the Mosha trades card and by `assets/desk-trades.js` in place of the "Closed R by day" tiles: a
+    month grid (Monday first) of closed R by the UTC day a trade ended, arrows to the months that have a close, a tint by size,
+    a day opens its trades with "Chart"; it follows the card's filters; open trades are never added in; before costs. Styles
+    `.mo-cal*` in `#ms-mosha-css`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
