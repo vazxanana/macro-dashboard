@@ -60,6 +60,32 @@
     "positionId": "50661044",
     "volume": 1000,
     "status": "open"
+   },
+   "eth-rswing-1795243694": {
+    "symbol": "ETHUSD",
+    "side": "buy",
+    "setup": "rswing",
+    "openedAt": "2026-11-21T07:02:55.000Z",
+    "councilEntry": 1629.51,
+    "stop": 1531.2363214285715,
+    "t1": 1675.76,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1629.51,
+    "digits": 2,
+    "lots": 0.02,
+    "riskCash": 2,
+    "margin": 3.23,
+    "shadow": true,
+    "fillPrice": 1629.45,
+    "slipR": -0.001,
+    "lagSec": 115,
+    "positionId": "50661738",
+    "volume": 2,
+    "status": "open"
    }
   },
   "day": {
@@ -67,7 +93,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000 · 2 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10000 · 3 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -78,31 +104,10 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "eth-rswing-1795243694": {
-    "orderId": "34613251",
-    "symbol": "ETHUSD",
-    "side": "buy",
-    "volume": 2,
-    "lots": 0.02,
-    "digits": 2,
-    "setup": "rswing",
-    "limitPrice": 1629.51,
-    "stop": 1531.2363214285715,
-    "t1": 1675.76,
-    "placedAt": "2026-11-21T06:48:51.000Z",
-    "expires": "2026-11-23T06:48:14.000Z",
-    "riskCash": 2,
-    "margin": 3.23,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10000,
-  "lastRun": "2026-11-21T07:00:56.000Z"
+  "lastRun": "2026-11-21T07:02:55.000Z"
  },
  "log": [
   {
@@ -191,6 +196,11 @@
    "at": "2026-11-21T06:48:51.000Z",
    "msg": "placed buy limit ETHUSD 0.02 lot at 1629.51 (council rswing, valid to 2026-11-23T06:48Z)",
    "trade": "eth-rswing-1795243694"
+  },
+  {
+   "at": "2026-11-21T07:02:55.000Z",
+   "msg": "limit filled: ETHUSD position 50661738 at the broker",
+   "trade": "eth-rswing-1795243694"
   }
  ],
  "limits": {
@@ -269,15 +279,19 @@
   ]
  },
  "execution": {
-  "n": 2,
-  "meanSlipR": 0.004,
-  "medianSlipR": 0.004,
+  "n": 3,
+  "meanSlipR": 0.003,
+  "medianSlipR": 0,
   "worstSlipR": 0.009,
-  "medianLagSec": 124.5,
+  "medianLagSec": 115,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
     "meanSlipR": 0.004
+   },
+   "ETHUSD": {
+    "n": 1,
+    "meanSlipR": -0.001
    }
   }
  }
