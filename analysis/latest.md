@@ -18,7 +18,7 @@ Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 | BTC/USD | down (Kraken) | no (not live, asia session) | READY sell (blocked: wrong side) | 27 trades, 30% won, +0.24R a trade |
 | ETH/USD | down (Kraken) | no (not live, asia session) | READY sell (blocked: wrong side) | 17 trades, 29% won, −0.28R a trade |
 | SOL/USD | down (Kraken) | no (not live, asia session) | READY sell (blocked: wrong side) | 17 trades, 18% won, −0.57R a trade |
-| XRP/USD | down (Kraken) | no (not live, asia session) | IN ORIGIN sell | 41 trades, 46% won, +0.37R a trade |
+| XRP/USD | down (Kraken) | no (not live, asia session) | READY sell (blocked: wrong side) | 41 trades, 46% won, +0.37R a trade |
 | EUR/USD | down (OANDA) | no (not live, asia session) | READY buy | 34 trades, 12% won, −0.79R a trade |
 | GBP/USD | down (OANDA) | no (not live, asia session) | IN ORIGIN sell | 35 trades, 23% won, −0.49R a trade |
 | AUD/USD | down (OANDA) | no (not live, rule skips AUD/USD, asia session) | IN ORIGIN sell | 25 trades, 36% won, −0.06R a trade |
@@ -49,7 +49,7 @@ Built by the Trader at 2026-11-21 06:14 UTC. ICT desk: the last 7 days; mirror: 
 
 **Dip-buy candidate (NQ/ES, paper only):** 3 signals in 7 days, 3 closed −1.51R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-21 06:12 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-21 06:14 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
