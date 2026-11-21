@@ -12557,6 +12557,12 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
 .mo-tut h2 { font-weight: 650; letter-spacing: -.02em; }
 /* light theme: green and red text at AA on the cards, the wells and the buy / sell chips (the desk's light --buy was 4.2-4.5:1 here) */
 :root[data-theme="light"] #v-mosha, :root[data-theme="light"] .mo-tut, :root[data-theme="light"] .mo-lv-dlg { --buy: #067a64; --sell: #c8243f; }
+/* QA of the paper desks (21 Nov 2026), light theme: the buy / sell chips read the badge inks (text on a tint of its own colour was 4.3-4.5:1),
+   and a calendar day's date and trade count sit on its green / red tint (--ink-dim there was 4.2-4.5:1) */
+:root[data-theme="light"] #v-mosha .chip.buy { color: var(--buy-ink, #075c40); } :root[data-theme="light"] #v-mosha .chip.sell { color: var(--sell-ink, #951c16); }
+:root[data-theme="light"] #v-mosha .mo-cal-d:is(.up, .dn) :is(.d, small) { color: color-mix(in srgb, var(--ink-dim) 55%, var(--ink)); }
+/* touch: the desk switch's short names (ICT, LIT) were 34-37 px wide, and the studies' links in "What the fixed rules said" 15 px tall */
+@media (pointer: coarse) { .desk-sw a { min-width: 44px; justify-content: center; } #v-mosha #mo-rules td a { display: inline-flex; align-items: center; min-height: 44px; } }
 </style>
 <style id="ms-guest5-css">
 /* guests: two screens only, Daily and H1 (8 Nov 2026, owner). The view segment goes; the two panes share the row; both stay tall. */
