@@ -5037,8 +5037,20 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   "two weeks of one reading, not a tested rule". First run (7-20 Nov): the sequence 5 entries, +7.1R; the barrier entry 56 entries,
   −4R (it takes EVERY fresh barrier; the method says to mark the best one). It found two of Luxus's three trades of 18-20 Nov within a
   dollar (not shown or stored anywhere: his trades are never committed). Display only: no storage, no council file, no API call,
-  nothing traded; hidden for the teacher and guests. Never call it a record or an edge. Test: `tests/mosha-sop.test.mjs` (a seeded
+  nothing traded; hidden for the teacher and guests. Never call it a record or an edge. **The card leads the desk** (20 Nov 2026, owner: "mosha desk must be like normal desk showing the replay trades"): for the owner and readers `#mo-sopr` is first and the chart `#mo-replay` second (CSS `order`, the DOM stays), laid out like the ICT desk: one answer line (`.mo-sop-ans`), tiles (entries, reached target, total before costs, "Too few" under 20 closed else "Not a test"), Open now, the trades, closed R by UTC exit day (`byDay`, open trades never added in), and the per-type lines and the caveat in a fold; kept open in the simple phone view; a trade opened on the chart is labelled "From the replay" (`replayed: true`). Test: `tests/mosha-sop.test.mjs` (a seeded
   market: stops on the losing side, logs in time order, no look-ahead by cutting and by changing every later price).
+- **The Mosha tracker: trades stored like the ICT desk's** (21 Nov 2026, owner: "do the mosha edge the same as ict with the trades").
+  `council/mosha-desk.mjs` (council.yml every 3rd round beside the ICT tracker, `timeout 120`, never fails the round; `assets` is in
+  the loop's sparse checkout for it) runs the SAME reading as the card (`assets/mosha-sop.js` on the page's own functions, lifted
+  from market-structure.html by `loadFns`) on gold candles from `MD_BASE` and writes council-data `mosha/desk.json`
+  (`{ at, through, since, counts, records }`, 600 kept). `merge`: a closed record is frozen as booked, an open one is followed, a new
+  one is stamped `first` and `src` (`live` = recorded within `LIVE_S` 1 h of its entry, else `replay`), the same trade re-read
+  under another id within 20 min is not added twice, a record out of the run's 14-day window is kept; `clean` stores nothing
+  without a stop on the losing side. The card (`#mo-sopr`, now "Mosha trades") reads that file through `msData` first (Both / Live /
+  Replay switch, "last run", "trades since"), so it shows trades when the candle service is down and keeps them past two weeks;
+  only without the file does it replay in the browser. PAPER RECORD ONLY: no order, alert, mirror copy or Trader read; not a
+  tested rule, never "an edge" (the barrier entry still takes every fresh barrier). `datahealth.mjs` lists the file (warn 6 h).
+  Tests: `tests/mosha-tracker.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

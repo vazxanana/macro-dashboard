@@ -45,9 +45,9 @@
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
-<script src="/assets/mosha-sop.js?v=4dbbc53c9b" defer></script>
-<script src="/assets/mosha-replay.js?v=b24a682057" defer></script>
-<script src="/assets/mosha-i18n.js?v=55f8bf7d3e" defer></script>
+<script src="/assets/mosha-sop.js?v=667fc36511" defer></script>
+<script src="/assets/mosha-replay.js?v=a453deccd5" defer></script>
+<script src="/assets/mosha-i18n.js?v=bad32e2787" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
 <script src="/assets/mosha-teach.js?v=83db733259" defer></script>
 <style>
@@ -4049,6 +4049,21 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-sys { display: no
 /* The method, replayed (20 Nov 2026, assets/mosha-sop.js): the desk's reading on past candles, trades with their logs; never put to the teacher. */
 html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-sopr { display: none; }
 #v-mosha #mo-sopr a { color: inherit; text-decoration: underline; }
+/* The replay leads the desk for the owner and readers (20 Nov 2026, owner: "like normal desk showing the replay trades"); the chart it opens comes right after. */
+html:not([data-mosha="teach"]) #v-mosha #mo-sopr, html[data-role="owner"] #v-mosha #mo-sopr { order: -10; } html:not([data-mosha="teach"]) #v-mosha #mo-replay, html[data-role="owner"] #v-mosha #mo-replay { order: -9; }
+#v-mosha .mo-sop-ans { margin: 4px 0 10px; font-size: 15px; font-weight: 600; color: var(--ink); }
+#v-mosha .mo-sop-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 10px 0 4px; }
+#v-mosha .mo-sop-tile { background: var(--mo-well, var(--au-well, var(--panel-2))); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }
+#v-mosha .mo-sop-tile small, #v-mosha .mo-sop-tile span, #v-mosha .mo-sop-day small, #v-mosha .mo-sop-day span { font-size: 12px; color: var(--ink-dim); }
+#v-mosha .mo-sop-tile b { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+#v-mosha .mo-sop-h { margin: 16px 0 6px; font-size: 13px; font-weight: 650; color: var(--ink); } #v-mosha .mo-sop-h small { font-size: 12px; font-weight: 400; color: var(--ink-dim); margin-left: 6px; }
+#v-mosha .mo-sop-open { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; } #v-mosha .mo-sop-open li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13px; font-variant-numeric: tabular-nums; } #v-mosha .mo-sop-open small { font-size: 12px; color: var(--ink-dim); }
+#v-mosha .mo-sop-cal { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 6px; }
+#v-mosha .mo-sop-day { background: var(--mo-well, var(--au-well, var(--panel-2))); border-radius: 8px; padding: 8px 10px; display: grid; gap: 1px; } #v-mosha .mo-sop-day b { font-size: 14px; font-variant-numeric: tabular-nums; }
+#v-mosha .mo-sop-tile b.pos, #v-mosha .mo-sop-day.pos b, #v-mosha .mo-sop-open b.pos { color: var(--buy); } #v-mosha .mo-sop-tile b.neg, #v-mosha .mo-sop-day.neg b, #v-mosha .mo-sop-open b.neg { color: var(--sell); }
+#v-mosha .mo-sop-sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 4px; } #v-mosha .mo-sop-src { font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-sop-st { margin: 8px 0 0; }
+#v-mosha .mo-sop-more { margin-top: 14px; } #v-mosha .mo-sop-more summary { cursor: pointer; font-size: 13px; color: var(--ink-dim); min-height: 44px; display: flex; align-items: center; }
+@media (max-width: 640px) { #v-mosha .mo-sop-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 #v-mosha .mo-sop-a { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; } #v-mosha .mo-sop-f { margin: 0 0 10px; }
 #v-mosha .mo-sop-b { font: inherit; font-size: 12.5px; padding: 5px 10px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
 #v-mosha .mo-sop-b:hover, #v-mosha .mo-sop-b[aria-pressed="true"], #v-mosha .mo-sop-b[aria-expanded="true"] { background: var(--panel-hover, var(--line)); }
@@ -5159,7 +5174,7 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
      cards were drawn open and folded a moment later. Until the script has run (html[data-ps-ready]) this rule holds back the
      same cards the script folds; the script then takes over (rows, open state). */
   html[data-phone="simple"]:not([data-ps-ready]) #v-ict .card.ict-card:not(.ict-open-c):not(#ict-sig) { display: none !important; }
-  html[data-phone="simple"]:not([data-ps-ready]) #v-mosha .card:not(#mo-teach):not(#mo-lessons):not(#mo-todo):not(#mo-rec) { display: none !important; }
+  html[data-phone="simple"]:not([data-ps-ready]) #v-mosha .card:not(#mo-teach):not(#mo-lessons):not(#mo-todo):not(#mo-rec):not(#mo-sopr) { display: none !important; }
   html[data-phone="simple"][data-mosha="teach"]:not([data-role="owner"]):not([data-ps-ready]) #mo-rec { display: none !important; }
 
   /* ── second pass (11 Nov, owner: "Need more"): Charts, the other Council panes, Setup, Scanner and the remaining desks ── */
@@ -7065,7 +7080,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       </div>
       <div class="card mo-wide" id="mo-list"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">Loading the log…</div></div>
       <div class="card mo-wide" id="mo-sys"><div class="ms-k"><span>The council's Mosha systems</span></div><div class="ct-empty">Loading the council's trades…</div></div>
-      <div class="card mo-wide" id="mo-sopr"><div class="ms-k"><span>The method, replayed on the last two weeks</span></div><div class="ct-empty">The replay starts when the desk opens.</div></div>
+      <div class="card mo-wide" id="mo-sopr"><div class="ms-k"><span>Replayed trades</span></div><div class="ct-empty">The replay starts when the desk opens.</div></div>
       <div class="card mo-wide" id="mo-rules"><div class="ms-k"><span>What the fixed rules said</span><small>spot gold, after costs · 10 Nov 2026</small></div>
         <div class="ct-tw"><table class="ct-t"><thead><tr><th>Reading, taken every time</th><th>Data</th><th class="n">Trades</th><th class="n">R a trade</th><th class="n">t</th><th>Verdict</th></tr></thead><tbody>
           <tr><td><a href="/edge-lab.html#mosha-level">Tap of an H4 level, M5 breaks, limit at the zone</a></td><td>2020 to Oct 2026</td><td class="n">365</td><td class="n"><b class="neg">−0.35R</b></td><td class="n">−3.10</td><td>Fail</td></tr>
@@ -15700,7 +15715,7 @@ function msNextSetup(bars, A) {
   // or of the Full view is the page as it was. A card the account may not see (its own gate hides it) gets no row.
   var DESKS = [
     { v: 'v-ict', sel: '.card.ict-card', keep: function (c) { return c.classList.contains('ict-open-c') || c.id === 'ict-sig'; } },
-    { v: 'v-mosha', sel: '.card', keep: function (c) { var teach = R.dataset.mosha === 'teach' && R.dataset.role !== 'owner'; return c.id === 'mo-teach' || c.id === 'mo-lessons' || c.id === 'mo-todo' || (!teach && c.id === 'mo-rec'); } },
+    { v: 'v-mosha', sel: '.card', keep: function (c) { var teach = R.dataset.mosha === 'teach' && R.dataset.role !== 'owner'; return c.id === 'mo-teach' || c.id === 'mo-lessons' || c.id === 'mo-todo' || (!teach && (c.id === 'mo-rec' || c.id === 'mo-sopr')); } },
     { v: 'v-profile', sel: '.card', keep: function (c, i) { return i === 0; } },
     // second pass. Council panes: a row has two lines (heading, one line of what the card holds)
     { v: 'ms-cp-systems', sel: '.card', two: 1, keep: function (c) { return c.id === 'ms-sys-book'; } },   // which systems trade live: open and first

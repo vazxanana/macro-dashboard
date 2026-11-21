@@ -171,7 +171,7 @@
   // a logged trade as a chart spec (levels only)
   function specOfTrade(t, now) {
     var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400);
-    return { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, label: 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
+    return { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, rp: !!t.replayed, label: t.replayed ? 'From the replay' : 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
       from: t.at - 12 * 3600, to: Math.max(end, t.at + 3600), fillFrom: t.at - 300, exit: t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
       yours: t.status === 'closed' && t.R != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'still open',
       steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before the entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
@@ -286,7 +286,7 @@
     var ours = !v ? L('the entry price was not traded on our candles at that time') : oc.kind === 'target' ? L('filled {f}, target reached {x} ({r}), worst point {w}R against', v)
       : oc.kind === 'stop' ? L('filled {f}, stop touched {x}', v) : oc.kind === 'hand' ? L('filled {f}, closed {x} ({r}), worst point {w}R against', v) : L('filled {f}, neither stop nor target by the end of the window', v);
     // whose figure the first one is: the lesson's, the log's, or the one written on the screenshot (never "you": every reader sees this card)
-    el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? L('The lesson:') : sp.log ? L('In the log:') : L('On the screenshot:')) + ' ' + esc(yoursOf(sp)) + '. ' + L('On our candles:') + ' ' + esc(ours) + '.</small>';
+    el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? L('The lesson:') : sp.rp ? L('In the replay:') : sp.log ? L('In the log:') : L('On the screenshot:')) + ' ' + esc(yoursOf(sp)) + '. ' + L('On our candles:') + ' ' + esc(ours) + '.</small>';
   }
   // the first figure in the reader's language: a fixed phrase is looked up, "+1.20R, closed at 3891" is put together
   function yoursOf(sp) { var y = sp.yours || '—', m = /^(.*R), closed at (.+)$/.exec(y); return m && (sp.log || sp.lesson) ? L('{r}, closed at {p}', { r: m[1], p: m[2] }) : L(y); }

@@ -346,6 +346,8 @@
     'On our candles:': 'Sur nos bougies :',
     'On the screenshot:': 'Sur la capture :',
     'In the log:': 'Dans le journal :',
+    'In the replay:': 'Dans le replay :',
+    'From the replay': 'Du replay',
     'The lesson:': 'La leçon :',
     'the candle it points at is not in the feed': 'la bougie qu\'elle désigne n\'est pas dans le flux',
     'the {t} candle closed at {px}. After it price went {w} up at most, then {b} down, to {bp} at {bt}': 'la bougie de {t} a clôturé à {px}. Ensuite le prix est monté de {w} au plus, puis a baissé de {b}, jusqu\'à {bp} à {bt}',
