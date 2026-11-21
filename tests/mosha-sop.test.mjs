@@ -140,7 +140,7 @@ test('a barrier trade says whether it is with or against the direction of the ti
 
 test('the CF as a barrier: the sequence hands its clean CF zones over, and the barrier entry reads them without hindsight', () => {
   let n = 0;
-  for (const seed of [7, 11, 23, 31, 47]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, cfz = [];
+  for (const seed of [3, 7, 11, 23, 31]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, cfz = [];
     M.sopTrades(X, F, { from: fr, cfOut: cfz });
     assert.ok(cfz.every((z) => (z.kind === 'cf' || z.kind === 'vr') && z.hi > z.lo && z.known > 0 && (z.dir === 1 || z.dir === -1)));
     assert.equal(new Set(cfz.map((z) => z.tf + '|' + z.lo + '|' + z.hi + '|' + z.known)).size, cfz.length, 'each CF zone once');
@@ -405,7 +405,7 @@ test('the VR and the CF are breaks of the chart\'s small swings (3 a side): the 
     assert.ok(a.every(rule1) && b.every(rule1)); if (JSON.stringify(a.map(keyOf)) !== JSON.stringify(b.map(keyOf))) d++;
     for (const r of a.filter((x) => !x.retest).slice(0, 3)) assert.ok(M.sopTrades(cut(X, r.t + 7 * 60), F, { from: fr }).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); }
   assert.ok(d >= 1, 'the two readings differ on these candles');
-  assert.match(src, /o\.vr === 'major'/); assert.ok(src.includes("o.qm === 'internal' ? F.msInternal(W, W.length, 3) : swingEv(F, W)"), 'the QM at a barrier reads the same swings'); assert.match(src, /o.qm === 'internal' ? F.msInternal(W, W.length, 3) : swingEv(F, W)/, 'the QM at a barrier reads the same swings');
+  assert.match(src, /o\.vr === 'major'/); assert.ok(src.includes("o.qm === 'internal' ? F.msInternal(W, W.length, 3) : swingEv(F, W)"), 'the QM at a barrier reads the same swings');
 });
 
 test('the second confirmation table: an H4 barrier also on M30, an H1 barrier on M15, an M30 barrier on M5; M30 built from M15 where none is handed in; no hindsight', () => {

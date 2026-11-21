@@ -337,7 +337,7 @@
           if (!e.structure && (d > 0 ? e.level > sig.level : e.level < sig.level)) { jan = { i: i, level: e.level, t: c.time + SEC[ctf] };
             // the engulf zone inside this second BO's leg (the pages: "the engulfing candle within the 2nd BO"): the PAIR, the last
             // candle against the break at or before the leg's pullback extreme (out to that extreme) and the first candle after
-            // it that closes beyond its far edge (the candle that engulfs it); the limit rests at the pair's near side, which
+            // it that closes beyond its far side (the candle that engulfs it); the limit rests at the pair's near side, which
             // must lie on the pullback side of the BO candle's close (no pair, or price already in it at the BO: no Janda)
             if (o.janda !== 'level') { var jz = F.msZones(W, [{ dir: d, fromIdx: e.fromIdx, breakIdx: e.breakIdx }], W.length)[0], jl = NaN, jh = NaN, je = -1, jq;
               if (jz) for (jq = jz.i + 1; jq <= e.breakIdx; jq++) if (d < 0 ? W[jq].close < W[jz.i].low : W[jq].close > W[jz.i].high) { je = jq; break; }

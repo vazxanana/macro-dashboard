@@ -1,8 +1,10 @@
 // Three engulfing methods on the Engulfing desk (21 Nov 2026, owner: "improve the engulfing, learn from these documents").
 // The owner's three private documents are read here in the desk's OWN words and are never copied into the repository:
 //   plan    the Daily's last engulf gives the side; an H4 engulf zone of that side, or an opposite H4 zone that failed (it
-//           turns); with price in the zone a 15- or 30-minute engulf the same way; then on 5-minute candles an opposite engulf zone FAILS (a close through it) and the entry is a limit
-//           at the 5-minute engulf zone behind that failure.
+//           turns, until an H4 candle closes back through it); a 15- or 30-minute engulf the same way whose zone lies wholly INSIDE
+//           the H4 zone; then on 5-minute candles an opposite engulf zone FAILS (a close through it, which may come inside the
+//           candle that completes the trigger) and the entry is a limit at the 5-minute engulf that same close completed (else
+//           the last one behind the failure), at a price inside the H4 zone.
 //   simple  the same entry in an H4 zone whose side is not the Daily's (the documents' short method names no Daily filter).
 //   direct  a fresh H4 engulf zone that price leaves alone for the next two H4 candles, a fresh H1 zone INSIDE it (wholly),
 //           a fresh 15-minute zone inside that: a limit at the 15-minute zone. Its document names no target: the stop is
@@ -191,9 +193,10 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null } = {}
 
 // ─── the gold plan with Daily levels (the MSNR desk; the owner's fourth document, read in the desk's own words) ───
 // Side: a Daily candle REJECTS a Daily level (a turn of the Daily CLOSES in the last 60 trading days, 2 candles a side: a V level
-// at a low turn, an A level at a high turn, as on a line chart): it trades through the level and closes back on the other side; then, from the tap of that level until 3 days after the rejection day, an H4
-// candle closes beyond the last H4 A / V level (a turn of the H4 closes) that stood before the tap, the same way. That side holds until the opposite pair completes. Zones: H4 engulf
-// zones of that side, and opposite H4 zones that failed (they turn). Entry, either type: (1) with price in such a zone a 15- or
+// at a low turn, an A level at a high turn, as on a line chart) that is still FRESH (no wick on it since it formed, see `snrSides`): it trades through the level and closes back on the other side; then, from the tap of that level until 3 TRADING days after the rejection day, an H4
+// candle closes beyond the last H4 A / V level (a turn of the H4 closes, complete by the close of the tap candle) that stood before the tap, the same way. That side holds until the opposite pair completes. Zones: H4 engulf
+// zones of that side, and opposite H4 zones that failed (they turn, until an H4 candle closes back through them). ONE entry a
+// visit of price to such a zone (the first order that fills; see `snrTrades`). Entry, either type: (1) with price in such a zone a 15- or
 // 30-minute engulf the same way, a limit at that engulf's zone for two hours; (2) a 15- or 30-minute QM whose head is in such a
 // zone, a limit at its left shoulder for two hours (kind 'msnr-qm', see `qmSetups`). The Daily levels are V, A and OC levels
 // (`snrSides`). "Strong" H4 BO: the plan shows it in a picture only, so any close beyond the last H4 A / V level counts. Stop 30 pips ($3.00), target 90 pips (3R), at most 2 entries a UTC day; a trade ends at its stop
