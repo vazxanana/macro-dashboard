@@ -5327,6 +5327,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     file and one day file only when a trade's Log or Chart is opened (`MS_MOSHA_SOP.withDetail`; "Reading the log…", and "could
     not be read" when the day file fails). Never publish a light file to council-data while main's trackers predate the store
     (they would read it as records without logs and write them back so).
+  - **Exits tested on the desks' own trades** (21 Nov 2026, owner: "check how will look if u target 1/2/3 rr or tralling stop on
+    all edges"; `research/edge/desk-exits/`, PREREGISTRATION.md committed first; `run.mjs fetch|run <dir>`). 30,904 closed 2026
+    records of the four desks, each run alone on OANDA 5m from its own fill and opening stop with a 1R / 2R / 3R target or a
+    trailing stop 1R behind the best price from +1R (5-day cap), against the booked R; before and after the desk-rigor costs;
+    paired month t, Holm over 60. **1 of 60 better on the bar**: Engulf short method with the trailing stop, −0.156 -> −0.060R a
+    trade after costs (t 3.42), STILL A LOSS. The trailing stop is the least bad exit on most losing groups (Engulf plan, MSNR,
+    LIT loose); 1R targets are the worst almost everywhere; no exit makes a losing group profitable after costs. The comparison
+    with the booked R also carries harness differences (5m fills, the 5-day cap). In sample: no exit is changed on any desk.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
