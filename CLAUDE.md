@@ -5074,6 +5074,11 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   (416), EUR/USD +39.8R (421), GBP/USD +19.5R (459), Nasdaq −40.1R (417); −66.3R in all. A paper record of one reading before
   costs: never call a market's plus an edge. **Do not put a file of over 600 records into council-data before main's tracker
   has `KEEP` 4000** (the older tracker cuts the file to its newest 600 on its next run).
+  **Open now** (21 Nov 2026, owner: "the same panel with active trades like ict desk"): card `#mo-open` first on the desk (before
+  `#mo-sopr`; hidden for the teacher, kept open in the simple phone view): one card per OPEN record of the tracker's file, every
+  market, whatever filter the table is on (`openPanel` / `openCard` in `assets/mosha-sop.js`): side, market, entry type, R at the
+  tracker's last reading (never a live quote: said on the card), a −1R to target bar, entry / stop / target / best so far, open
+  since; a card opens the trade on the chart. No open trade = one dashed line saying so. Display only.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

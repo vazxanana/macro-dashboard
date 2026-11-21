@@ -97,3 +97,14 @@ test('more markets: a record of another market keeps its market and its decimals
   const src = rd('council/mosha-desk.mjs'); assert.match(src, /for \(const m of OTHER\) \{ try \{/); assert.match(src, /skipped/);
   const page = rd('assets/mosha-sop.js'); assert.match(page, /data-sop-mk/); assert.match(page, /market: mkR\(r\)/);
 });
+
+test('Open now: the desk has its own panel of open trades, first on the desk, hidden for the teacher, kept on the phone', () => {
+  const page = rd('market-structure.html'), js = rd('assets/mosha-sop.js');
+  assert.ok(page.indexOf('id="mo-open"') > 0 && page.indexOf('id="mo-open"') < page.indexOf('id="mo-sopr"'));
+  assert.match(page, /html\[data-mosha="teach"\]:not\(\[data-role="owner"\]\) #v-mosha #mo-open \{ display: none; \}/);
+  assert.match(page, /#v-mosha #mo-open \{ order: -11; \}/); assert.match(page, /:not\(#mo-sopr\):not\(#mo-open\)/); assert.match(page, /c\.id === 'mo-open'/);
+  assert.match(js, /openPanel\(every\.filter\(function \(r\) \{ return r\.R == null; \}\)\)/, 'every open record, whatever the filter');
+  assert.match(js, /at the last reading/); assert.match(js, /No trade is open now\./); assert.match(js, /#mo-open \[data-sop-chart\]/);
+  const block = js.slice(js.indexOf('function openCard'), js.indexOf('function draw()'));
+  assert.doesNotMatch(block, /fetch\(|localStorage|\.stop\s*=[^=]/, 'display only');
+});

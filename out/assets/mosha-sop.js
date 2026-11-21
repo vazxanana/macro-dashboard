@@ -179,8 +179,33 @@
       '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-sop-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></div>' +
       (op ? '<ol class="mo-sop-log">' + r.log.map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') + '</ol>' : '') + '</td></tr>';
   }
+  // Open now (21 Nov 2026, owner: "the same panel with active trades like ict desk"): one card per open paper trade of the
+  // tracker's record, every market, whatever filter the table below is on. R now is the tracker's last reading, not a live quote.
+  function openCard(r) {
+    var m = mkR(r), tR = Math.abs(r.target - r.entry) / (r.r0 || Math.abs(r.entry - r.stop)), fl = r['float'], hi = Math.max(3, Math.ceil(tR)), lo = -1;
+    var pc = function (v) { return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100)).toFixed(1); }, z = pc(0);
+    var fill = fl == null ? '' : '<i class="' + (fl >= 0 ? 'up' : 'dn') + '" style="left:' + (fl >= 0 ? z : pc(fl)) + '%;width:' + Math.abs(pc(fl) - z).toFixed(1) + '%"></i>';
+    var kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' : NAME[r.h] + ' barrier → ' + NAME[r.l] + ' QM';
+    return '<li data-sop-chart="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(word(r.side) + ' ' + MARKETS[m].name + ', ' + (fl == null ? 'no reading yet' : fR(fl) + ' at the last reading') + ', open, view the chart') + '">' +
+      '<div class="r1"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><b class="mk">' + esc(MARKETS[m].name) + '</b><span class="pl">' + esc(kind) + '</span>' + (r.src ? '<span class="pl">' + (r.src === 'live' ? 'live' : 'replay') + '</span>' : '') +
+      '<span class="live ' + (fl == null ? '' : fl >= 0 ? 'pos' : 'neg') + '">' + (fl == null ? '<small>no reading yet</small>' : fR(fl) + '<small>at the last reading</small>') + '</span></div>' +
+      '<div class="trk" aria-hidden="true">' + fill + '<span style="left:' + z + '%"></span><span style="left:' + pc(Math.min(hi, tR)) + '%"></span></div>' +
+      '<div class="trk-l" aria-hidden="true"><span style="left:0">−1R stop</span><span style="left:' + z + '%">0</span><span style="left:100%">' + (tR <= hi ? 'target ' : '') + '+' + hi + 'R</span></div>' +
+      '<dl><div><dt>Entry</dt><dd>' + fP(r, r.entry) + '</dd></div><div><dt>Stop</dt><dd>' + fP(r, r.stop) + '</dd></div><div><dt>Target</dt><dd>' + fP(r, r.target) + ' · ' + tR.toFixed(1) + 'R</dd></div><div><dt>Best so far</dt><dd>' + (r.mfe != null ? '+' + (+r.mfe).toFixed(2) + 'R' : '—') + '</dd></div></dl>' +
+      '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + unit(m) + fP(r, r.r0) + '</p></li>';
+  }
+  function openPanel(open) {
+    var box = $('mo-open'), l = $('mo-open-l'), n = $('mo-open-n'); if (!box || !l) return;
+    var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
+    if (S.state !== 'done') { l.innerHTML = '<li class="empty">' + (S.state === 'failed' ? 'The open trades could not be read.' : 'Reading the open trades…') + '</li>'; if (n) n.textContent = ''; return; }
+    open = open.slice().sort(function (a, b) { return b.t - a.t; });
+    if (n) n.textContent = open.length ? open.length + ' open · paper only' + (S.file && S.file.at ? ' · last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') : '';
+    l.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. ' + (S.file ? 'The tracker reads gold, silver, EUR/USD, GBP/USD and the Nasdaq 100 about every 35 minutes' + (S.file.at ? ' (last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) + ')' : '') + '; a new entry shows here until its stop or target.' : 'A new entry shows here until its stop or target.') + '</li>';
+  }
+  API.openCard = openCard;
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
+    if (S.state !== 'done') openPanel([]);
     var head = '<div class="ms-k"><span>Mosha trades</span><small>the method as the course documents write it, on gold and four more markets · recorded by the desk\'s tracker like the ICT desk · paper only · each trade with its log</small></div>';
     if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading the trades…' : 'The trades load when the desk opens.') + '</div>'; return; }
     if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The tracker has no stored trades yet and the candles could not be read, so there is nothing to show. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
@@ -192,7 +217,7 @@
     var tile = function (k, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + k + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
     var tiles = '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Reached target', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
       tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
-    var openHTML = open.length ? '<h3 class="mo-sop-h">Open now</h3><ul class="mo-sop-open">' + open.map(function (r) { return '<li><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span> ' + esc(MARKETS[mkR(r)].name) + ' <b>' + fP(r, r.entry) + '</b> · stop ' + fP(r, r.stop) + ' · target ' + fP(r, r.target) + (r['float'] != null ? ' · <b class="' + (r['float'] >= 0 ? 'pos' : 'neg') + '">' + fR(r['float']) + ' now</b>' : '') + ' <small>since ' + utc(r.t) + '</small> <button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></li>'; }).join('') + '</ul>' : '';
+    var openHTML = ''; openPanel(every.filter(function (r) { return r.R == null; }));
     var days = byDay(list), cal = days.length ? '<h3 class="mo-sop-h">Closed R by day <small>the UTC day each trade ended · open trades not added in</small></h3><div class="mo-sop-cal">' + days.map(function (d) { return '<div class="mo-sop-day ' + (d.R > 0 ? 'pos' : d.R < 0 ? 'neg' : '') + '"><small>' + esc(new Date(d.day + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) + '</small><b>' + fR(d.R) + '</b><span>' + d.n + (d.n === 1 ? ' trade' : ' trades') + '</span></div>'; }).join('') + '</div>' : '';
     box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
       '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + (S.file ? '<span class="mo-sop-sep" aria-hidden="true"></span>' + ['both', 'live', 'replay'].map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-src="' + k + '" aria-pressed="' + (S.src === k) + '">' + (k === 'both' ? 'Both' : k === 'live' ? 'Live (' + nLive + ')' : 'Replay (' + (every.length - nLive) + ')') + '</button>'; }).join('') : '') +
@@ -208,8 +233,9 @@
       '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. On a market other than gold the stop buffer and the size limits are the same share of price as on gold: the desk\'s own choice. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
+  document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('#mo-open li[data-sop-chart]')) { e.preventDefault(); e.target.click(); } });
   document.addEventListener('click', function (e) {
-    var b = e.target && e.target.closest ? e.target.closest('#mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-mk], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
+    var b = e.target && e.target.closest ? e.target.closest('#mo-open [data-sop-chart], #mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-mk], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
     if (b.hasAttribute('data-sop-src')) { S.src = b.getAttribute('data-sop-src'); S.all = false; draw(); return; }
     if (b.hasAttribute('data-sop-mk')) { S.mk = b.getAttribute('data-sop-mk'); S.all = false; draw(); return; }
     if (b.hasAttribute('data-sop-run')) { S.all = false; run(); return; }
