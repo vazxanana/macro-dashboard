@@ -68,3 +68,28 @@ While the charts were being checked a flaw was found: on a LIMIT entry the fill 
 | R7 | MSNR gold plan | +0.079 | +0.073 | 1.31 | 1.24 |
 
 R1, R2 and R6 do not change (a market entry, or a target too far for the fill candle). No condition changes its verdict (C5 +0.010 → +0.026, t 0.40). On the desks 2026 paper record the same fix turns the engulf plan from +112.7R to −106.3R (804 trades) and the simple method from +61.1R to −104.9R: gold 5-minute candles of 2026 are often wider than the 30-pip stop and 60-pip target, so the fill candle decided many trades.
+
+## After the result (2): the independent audit of the desks code, corrected (not pre-registered)
+
+Later the same day two independent reviews of the desks code and a look at real charts found more defects (CLAUDE.md, "Independent audit"): Mosha entries found after the fact, an entry after the target was already reached, barriers that were not fresh, a barrier confirmation read before price was at the barrier; on EUR/USD and GBP/USD the MSNR stops and exits rounded to three decimals (the R6 forex figures above are wrong for that reason); the gold plan booked out of fill order; a gap through a stop booked at exactly −1R; the direction losing a level tapped just before the break the other way. The same candles run again with the corrected code:
+
+| | Reading | OOS n, as run | corrected | OOS net R, as run | corrected | month t, as run | corrected |
+|---|---|---|---|---|---|---|---|
+| R1 | Mosha sequence (BO, VR, CF, pullback, EG) | 978 | 846 | −0.172 | −0.256 | -2.22 | -2.82 |
+| R2 | Mosha barrier entry (D1, H4, H1 barriers) | 2112 | 2154 | −0.113 | −0.061 | -2.12 | -1.11 |
+| R3 | Engulf plan (with the Daily) | 893 | 905 | −0.069 | −0.102 | -1.52 | -2.68 |
+| R4 | Engulf simple (not with the Daily) | 1008 | 1028 | −0.068 | −0.081 | -1.44 | -1.92 |
+| R5 | Engulf direct entry (fresh zones) | 97 | 97 | −0.075 | −0.171 | -0.53 | -1.22 |
+| R6 | MSNR: with the direction | 3957 | 4102 | −0.300 | −0.164 | -11.87 | -9.79 |
+| R7 | MSNR gold plan | 775 | 787 | +0.079 | +0.047 | 1.31 | 0.76 |
+
+Conditions (OOS difference in net R a trade, preferred minus the rest, as run → corrected, with the corrected t):
+
+- C1 R1: the pullback reached 50% before the CF, against not: −0.229 → −0.295 (t -1.85).
+- C2 R1: CF clear of the VR (case 1), against inside it (case 2): −0.015 → −0.012 (t -0.07).
+- C3 R2: barrier is the origin of a major BO, against an internal BO: +0.010 → −0.042 (t -0.51).
+- C4 R2: entry with the Daily structure, against not with it: −0.068 → −0.079 (t -0.85).
+- C5 Engulf plan (R3) against the simple method (R4): +0.010 → −0.013 (t -0.21).
+- C6 MSNR with the direction (R6) against the same entry against it: +0.051 → −0.025 (t -0.96).
+
+**Still FAIL (0 of 13).** Passing with the corrected code: 0 of 13. The pre-registered verdict above is the one of record; this section only says the defects did not hide an edge. The barrier entry is close to zero before costs with the corrected code and still loses after them; the forex MSNR entries lose about half of what the rounded figures said, and still lose.
