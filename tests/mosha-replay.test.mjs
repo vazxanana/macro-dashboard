@@ -126,3 +126,11 @@ test('the bigger pictures hand over to ChronosTrade too, and the page offers the
   assert.match(JS, /\[14400, 'H4'\]/); assert.match(JS, /sec === 14400 \? R\.spec\.h4off : 0/);
   const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-profile"')); assert.match(sec, /"The bigger picture" holds the higher-timeframe views/); assert.match(sec, /<i class="bv"><\/i><span data-tr>A range, the green box<\/span>/);
 });
+
+test('a desk trade\'s chart: the window is the trade\'s, far marks stay off the scale and no tag covers another', () => {
+  const src = fs.readFileSync(new URL('../assets/mosha-replay.js', import.meta.url), 'utf8');
+  assert.match(src, /a >= t\.at - 36 \* 3600/, 'older marks do not zoom the chart out');
+  assert.match(src, /var reach = \(hi - lo\) \* \.5/, 'a mark far from the candles is kept out of the price scale');
+  assert.match(src, /u25B2 ' : '\\u25BC '\) \+ L\(m\.label\)/, 'and is named at the chart\'s edge with its prices');
+  assert.match(src, /placed\.push\(\{ x: px, y: py, w: w \}\)/, 'tags step away from each other');
+});

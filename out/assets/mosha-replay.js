@@ -178,8 +178,10 @@
     // a trade of the desk's own replay brings what it was built from: its marks (BO level, VR, CF zone, barrier) and its log as the steps
     var mk = (t.marks || []).filter(function (m) { return m && isFinite(m.a) && (m.kind === 'level' ? isFinite(m.p) : isFinite(m.top) && isFinite(m.bot)); }).slice(0, 8);
     if (mk.length) {
-      var first = Math.min.apply(null, mk.map(function (m) { return m.a; }));
-      sp.from = Math.max(t.at - 6 * 86400, Math.min(t.at - 8 * 3600, first - 3 * 3600)); sp.fillFrom = t.at - 60;
+      // the window is the TRADE's: it opens before the first mark made in the 36 hours before the entry. An older mark (a Daily
+      // or H4 level or zone) is not zoomed out to: it is drawn from the window's left edge, so the entry stays readable
+      var near = mk.map(function (m) { return m.a; }).filter(function (a) { return a >= t.at - 36 * 3600; }), first = near.length ? Math.min.apply(null, near) : t.at - 8 * 3600;
+      sp.from = Math.max(t.at - 36 * 3600, Math.min(t.at - 8 * 3600, first - 3 * 3600)); sp.fillFrom = t.at - 60;
       if (sp.to - sp.from > 2.5 * 86400) { sp.base = '15m'; sp.tfs = [900, 3600, 14400]; sp.h4off = usSummer(sp.from) ? 3600 : 7200; sp.fillFrom = t.at - 900; }
       sp.marks = mk.map(function (m) { var c = {}; for (var k in m) c[k] = m[k]; c.a = Math.max(m.a, sp.from); c.b = sp.to; if (c.at == null) c.at = m.a; return c; });
       if (t.name) sp.label = 'From the replay · ' + t.name;
@@ -247,13 +249,23 @@
     var X = function (t) { var i = barAt(R.bars, t); if (i < 0) i = 0; var v = ts.logicalToCoordinate(i); return v == null ? null : v; }, Y = function (p) { var v = R.series.priceToCoordinate(p); return v == null ? null : v; };
     x.save(); x.beginPath(); x.rect(0, 0, plotW, plotH); x.clip(); x.font = '600 12px ' + css('--sans', 'system-ui, sans-serif'); x.textBaseline = 'middle';
     var narrow = plotW < 520;   // a phone: only the labels that carry the trade
-    var tag = function (txt, px, py, col) { var w = x.measureText(txt).width + 10; px = Math.max(2, Math.min(px, plotW - w - 2)); py = Math.max(10, Math.min(py, plotH - 10)); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
+    // no tag is drawn over another: one that would cover an earlier tag steps away from it, 20 px at a time, below then above
+    var placed = [];
+    var tag = function (txt, px, py, col) { var w = x.measureText(txt).width + 10; px = Math.max(2, Math.min(px, plotW - w - 2)); py = Math.max(10, Math.min(py, plotH - 10));
+      var hit = function (yy) { return placed.some(function (q) { return px < q.x + q.w + 2 && px + w + 2 > q.x && Math.abs(yy - q.y) < 19; }); };
+      if (hit(py)) { for (var k = 1; k <= 8; k++) { var d = Math.ceil(k / 2) * 20 * (k % 2 ? 1 : -1), yy = py + d; if (yy >= 10 && yy <= plotH - 10 && !hit(yy)) { py = yy; break; } } }
+      placed.push({ x: px, y: py, w: w }); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
+    var edge = { up: 0, dn: 0 }, pf = function (v) { var d = Math.abs(v) < 20 ? 5 : Math.abs(v) < 2000 ? 2 : 2; return (+v).toFixed(d); };
     marksAt(sp, now).forEach(function (m) {
       var x1 = X(m.a), x2 = X(m.b); if (x1 == null || x2 == null) return; if (x2 < x1 + 2) x2 = x1 + 2;
+      // off the price scale (kept out of it on purpose, setTf): one tag at that edge, with the mark's own prices
+      var yA = Y(m.p != null ? m.p : m.top), yB = Y(m.p != null ? m.p : m.bot);
+      if (yA != null && yB != null && (Math.max(yA, yB) < 0 || Math.min(yA, yB) > plotH)) { var up = Math.max(yA, yB) < 0, n = up ? edge.up++ : edge.dn++;
+        if (!narrow || n < 1) tag((up ? '\u25B2 ' : '\u25BC ') + L(m.label) + ' ' + (m.p != null ? pf(m.p) : pf(m.bot) + ' \u2013 ' + pf(m.top)), 6, up ? 12 + n * 20 : plotH - 12 - n * 20, C.level); return; }
       if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(L(m.label), m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), C.level); return; }
       var yt = Y(m.top), yb = Y(m.bot); if (yt == null || yb == null) return;
       if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); if (!(narrow && x2 - x1 < 30)) tag(L(m.label), (x1 + x2) / 2 - 16, yt - 11, col); }
-      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) tag(L(m.label), x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); }
+      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) { var lw = x.measureText(L(m.label)).width + 10, small = Math.abs(yb - yt) < 20 || x2 - x1 < lw + 12; tag(L(m.label), small && x1 - lw - 6 > 2 ? x1 - lw - 6 : x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); } }
       else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(L(m.label), x1 + 6, (yt + yb) / 2, C.level); }
     });
     // the position: red band entry to stop, grey band entry to target, from the fill to the exit (or to now)
@@ -283,7 +295,11 @@
   function setTf(sec, keep) {
     var t = keep && R.bars ? R.bars[R.cur].time : null; R.tf = sec; R.bars = aggBars(R.base, sec, sec === 14400 ? R.spec.h4off : 0);
     var lo = Infinity, hi = -Infinity; R.bars.forEach(function (b) { if (b.low < lo) lo = b.low; if (b.high > hi) hi = b.high; });
-    [R.spec.entry, R.spec.stop, R.spec.target].concat((R.spec.marks || []).filter(function (m) { return m.kind !== 'htf'; }).map(function (m) { return m.p != null ? m.p : m.top; })).forEach(function (p) { if (p == null) return; if (p < lo) lo = p; if (p > hi) hi = p; });
+    // a mark far from the candles (a Daily level or zone well above or below them) must not flatten the candles: the scale takes
+    // a mark only within half the candles' own range of them; a farther one is named at the chart's edge with its prices (paint)
+    var reach = (hi - lo) * .5, cLo = lo - reach, cHi = hi + reach;
+    [R.spec.entry, R.spec.stop, R.spec.target].forEach(function (p) { if (p == null) return; if (p < lo) lo = p; if (p > hi) hi = p; });
+    (R.spec.marks || []).filter(function (m) { return m.kind !== 'htf'; }).forEach(function (m) { var a = m.p != null ? m.p : m.bot, b = m.p != null ? m.p : m.top; if (!(isFinite(a) && isFinite(b)) || a < cLo || b > cHi) return; if (a < lo) lo = a; if (b > hi) hi = b; });
     var pad = (hi - lo) * .04; R.lo = lo - pad; R.hi = hi + pad;
     var sl = $('mo-rp-slider'); if (sl) sl.max = R.bars.length - 1;
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-tf button'), function (b) { b.setAttribute('aria-pressed', String(+b.dataset.tf === sec)); });

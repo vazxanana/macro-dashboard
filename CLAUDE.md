@@ -5168,6 +5168,11 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     the engulf methods are about zero. The M15 barrier on M1 was not tested (no one-minute history). The desks stay paper
     records of one way to read each method; none of these conditions is made a requirement; do not look at them again on
     these years. Test: `tests/desk-rigor.test.mjs`.
+  - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
+    first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
+    the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
+    and named at the top or bottom edge with its prices ("▲ Daily EF zone 4103.52 – 4141.60"); a small zone's label sits to
+    its left; no tag is drawn over another (`placed`, 20 px steps). Test: `tests/mosha-replay.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
