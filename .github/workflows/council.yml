@@ -150,8 +150,8 @@ jobs:
             if [ $((i % 3)) -eq 1 ]; then node ict/tracker.mjs data/ict || echo "ICT round $i failed"; node council/ctrader-mirror.mjs data || echo "cTrader mirror (ICT) round $i failed"; fi
             # The Mosha desk's tracker (council/mosha-desk.mjs): a paper record of the desk's reading on gold, no order and no alert.
             if [ $((i % 3)) -eq 1 ]; then timeout 120 node council/mosha-desk.mjs data || echo "Mosha desk round $i failed"; fi
-            # The LIT and Engulfing desks' trackers (council/edge-desks.mjs): paper records of two readings, no order and no alert.
-            if [ $((i % 3)) -eq 1 ]; then timeout 150 node council/edge-desks.mjs data || echo "Edge desks round $i failed"; fi
+            # The LIT, Engulfing and MSNR desks' trackers (council/edge-desks.mjs): paper records of two readings, no order and no alert.
+            if [ $((i % 3)) -eq 1 ]; then timeout 280 node council/edge-desks.mjs data || echo "Edge desks round $i failed"; fi
             # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
             # (~25 min), capped at 3 min; a failure never stops the loop.
             if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi

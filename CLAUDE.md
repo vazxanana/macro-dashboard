@@ -5117,6 +5117,28 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     click outside close. Every "Chart" button, Open now card and calendar day row of the three desks uses it (a day's row is
     clickable as a whole); the Mosha examples' picker stays on the desk. The trade history was rebuilt from 1 Jan 2026 the same
     day (`KEEP` 14,000): Mosha 7,618 records, Engulfing 5,326, LIT 604; paper records before costs, never evidence.
+  - **MSNR desk, and three zone methods on the Engulfing desk** (21 Nov 2026, owner: "do the edge desk for msnr", "improve the
+    engulfing, learn from these documents"; four private documents and the direction skill, read in the desk's own words and
+    NEVER copied or named in the repository: a test bans the identifying words). The desk switch is **ICT | Mosha | LIT |
+    Engulfing | MSNR** (`#msnr` / `#v-msnr`, permission `desks`; `assets/desk-trades.js` `DESKS.msnr`, file `msnr/desk.json`).
+    `council/eg-methods.mjs` (pure): `zones(C, tf)` (an engulf = a candle closing beyond the high / low of the opposite candle
+    before it; the zone is that candle's range; `touch`, `fail`, `end`: a zone still alive at the newest candle has no end),
+    `methodTrades` = kinds `eg-plan` (the Daily's last engulf gives the side; price in an H4 zone of that side, a 15-minute
+    engulf, then on M5 an opposite zone fails and a limit rests at the M5 zone behind it), `eg-simple` (the same entry where
+    the Daily is not on that side) and `eg-direct` (a fresh H4 zone left alone for two H4 candles, a fresh H1 zone inside it,
+    a fresh M15 zone inside that, a limit at the M15 zone): stop 30 pips ($3.00 on gold; the same share of price elsewhere),
+    target 2R (the direct entry's target is the desk's choice), out after 24 h, one position at a time a market.
+    `snrTrades` (gold only, kind `msnr-sop`): a Daily candle rejects a Daily level and an H4 candle breaks its last swing the
+    same way within 3 days = the side; in an H4 zone of that side (or an opposite zone that failed) a 15-minute engulf, a limit
+    at its zone, stop 30 pips, target 90 pips, at most 2 a UTC day; the plan's second entry type is not written.
+    `council/edge-desks.mjs` `msnrTrades` (kinds `msnr-main` 12-16 UTC / `msnr-other`): the `msnr-entry` study's own
+    `candidates` / `calls` / `simulate` (imported; `P.PAD` / `P.MIN_R0` scaled for another market inside a try / finally), the
+    call from hourly candles grouped into the study's UTC 4-hour buckets (`extra: { '1h': 170 }` days of history), entries
+    WITH the call only, 1.5R, 12 h. `DESKS` = eg, msnr, lit; the loop's step is `timeout 280`. First files from 1 Jan 2026,
+    before costs: Engulfing 6,172 records (H1 4,051 +119.8R, H4 1,093 +21.3R, D1 182 +22.9R, plan 408 +32.8R, simple 396
+    +22.0R, direct 42 −6.0R); MSNR 6,912 (other hours 5,208 −191.6R, 12-16 UTC 1,416 −64.1R, gold plan 288 −48.0R).
+    PAPER RECORDS of readings with no costs: never an edge (`desk-slices` showed the engulf reading is zero before costs on
+    2020-26 and loses after them; `msnr-entry` FAILED). Tests: `tests/edge-desks.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

@@ -22,6 +22,8 @@ import { foldWeekend } from './fills.mjs';
 import { bars, merge } from './mosha-desk.mjs';
 import { P, cleanBars, agg15, series, fbosCandidates, XAU } from './lit.mjs';
 import { managePosition } from '../research/edge/lit/run.mjs';
+import * as MS from '../research/edge/msnr-entry/run.mjs';
+import { methodTrades, snrTrades } from './eg-methods.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
@@ -152,9 +154,50 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS } = {}) {
   return keep;
 }
 
+// ─── MSNR ───
+// The direction call of the desk's own MSNR study (research/edge/msnr-entry, its functions imported and not edited): on H4
+// candles, a close beyond the last swing level that stood before price first touched a live Daily key level turns the call.
+// The entry is that study's: a 15-minute body engulf, then within 45 minutes a 5-minute body engulf the same way, market at
+// the next 5-minute open, stop a buffer past the trigger pair, target 1.5R, out after 12 hours. Only entries WITH the call are
+// recorded, one position at a time a market. On a market other than gold the buffer and the smallest stop are the same share
+// of price as gold's (the desk's own choice). The study FAILED after costs (0 of 3): a paper record, never an edge.
+export const MSNR = { rr: 1.5, main: [12, 16] };
+export function msnrTrades(B, { from, market = 'xau' } = {}) {
+  const raw = B['5m'] || [], H1 = B['1h'] || []; if (raw.length < 50 || H1.length < 200) return [];
+  const M5 = raw.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), f = fx(market), lastT = M5[M5.length - 1].time;
+  const q = market === 'xau' ? 1 : M5[M5.length - 1].close / 4000, keep = { PAD: MS.P.PAD, MIN_R0: MS.P.MIN_R0 }; let cand;
+  try { MS.P.PAD = keep.PAD * q; MS.P.MIN_R0 = keep.MIN_R0 * q; cand = MS.candidates(M5).cand; } finally { MS.P.PAD = keep.PAD; MS.P.MIN_R0 = keep.MIN_R0; }
+  // the call from a long H4 history (hourly candles grouped into the study's own UTC 4-hour buckets), as known at the trigger's close
+  const H4 = MS.group(H1.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), MS.bucket(MS.P.H4)), dir = MS.calls(H4, MS.dayKey).call;
+  const out = []; let h = -1, busy = -Infinity;
+  for (const c of cand) {
+    while (h + 1 < H4.length && H4[h + 1].time + MS.P.H4 <= c.trig + MS.P.M5) h++;
+    const call = h >= 0 ? dir[h] : 0; if (!call || c.side !== call || c.t <= busy) continue;
+    const d = c.side, r0 = d * (c.entry - c.stop); if (!(r0 > 0)) continue;
+    const o = MS.simulate(M5, { ...c, r0 }, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
+    busy = o ? o.closed : Infinity; if (c.t < from) continue;
+    let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);
+    const status = !o ? 'open' : o.exit === 'target' ? 'target' : o.exit === 'time' ? 'time' : 'stopped', R = o ? d * (o.exitPx - c.entry) / r0 : null, fl = o ? undefined : d * (M5[M5.length - 1].close - c.entry) / r0;
+    const tr = { id: `${market === 'xau' ? '' : market + ':'}msnr-${d > 0 ? 'b' : 's'}-${c.t}`, market, kind: main ? 'msnr-main' : 'msnr-other', label: main ? 'MSNR · 12-16 UTC' : 'MSNR · other hours', h: '4h', l: '5m', side: d, t: c.t,
+      entry: c.entry, stop: c.stop, target, r0, status, R, endT: o ? o.closed : null, exit: o ? o.exitPx : null, mfe, float: fl };
+    tr.log = [
+      { t: H4[h].time + MS.P.H4, text: `Direction call on H4 with the Daily key levels: ${word(d)} (as known at the close of the last H4 candle).` },
+      { t: c.setup, text: `A 15-minute body engulf ${word(d)} closed: the entry is armed for 45 minutes.` },
+      { t: c.trig + MS.P.M5, text: `A 5-minute body engulf ${word(d)} closed inside that time. ${d > 0 ? 'Buy' : 'Sell'} at the next 5-minute open ${f(c.entry)}, stop ${f(c.stop)} (risk ${f(r0)}), target ${f(target)} (${MSNR.rr}R), out after 12 hours.` },
+      !o ? { t: null, text: 'Still open on the last candle read' + (fl != null ? ` (${fl >= 0 ? '+' : '−'}${Math.abs(fl).toFixed(2)}R now).` : '.') }
+        : status === 'target' ? { t: o.closed, text: `Target reached: +${MSNR.rr.toFixed(2)}R.` }
+          : status === 'time' ? { t: o.closed, text: `Time limit: closed at ${f(o.exitPx)}, ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }
+            : { t: o.closed, text: `Stopped: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R` + (mfe >= 1 ? ` after running +${mfe.toFixed(1)}R first.` : '.') }];
+    const i0 = c.i - 1, hi = Math.max(M5[i0].high, M5[i0 - 1].high), lo = Math.min(M5[i0].low, M5[i0 - 1].low);
+    tr.marks = [{ kind: 'zone', top: hi, bot: lo, a: M5[i0 - 1].time, at: c.trig + MS.P.M5, label: 'M5 engulf' }];
+    out.push(tr); }
+  return out;
+}
+
 // ─── the files ───
 export const DESKS = {
-  eg: { tfs: ['1d', '4h', '1h', '5m'], markets: MARKETS, read: egTrades, note: 'A paper record of the desk\'s reading of the engulf rule on D1, H4 and H1 candles of five markets, buys and sells: nothing is traded, results are before costs, and it is not a tested rule.' },
+  eg: { tfs: ['1d', '4h', '1h', '15m', '5m'], markets: MARKETS, read: (B, o) => egTrades(B, o).concat(methodTrades(B, o)), note: 'A paper record of the desk\'s readings of the engulf on five markets, buys and sells: the engulf rule on D1, H4 and H1 candles, and three zone methods (the plan with the Daily, the short method in an H4 zone, the direct entry on fresh zones) with a 30-pip stop and a 2R target. Nothing is traded, results are before costs, and none is a tested rule.' },
+  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: Object.keys(SOP.ALL), read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only (the desk\'s own study of this rule failed after costs). On gold: the plan with a Daily level rejection and an H4 break for the side, H4 zones, a 15-minute engulf entry, a 30-pip stop and a 90-pip target. Nothing is traded and results are before costs.' },
   lit: { tfs: ['5m'], markets: Object.keys(SOP.ALL), read: litTrades, note: 'A paper record of the LIT detector on eleven markets, with the rule\'s execution where it gives an order and two looser study executions otherwise: nothing is traded, results are before costs, and it is not a tested rule.' } };
 export function buildDesk(name, perMarket, prev, now, days) {
   let records = (prev && prev.records) || [], through = (prev && prev.through) || 0; const read = [];
@@ -171,7 +214,7 @@ export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SO
     const file = path.join(dir, name, 'desk.json'); let prev = null;
     if (fs.existsSync(file)) { try { prev = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { console.log(`${name}/desk.json does not parse: left as it is`); continue; } }
     const per = [];
-    for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await bars(tf, now, get, days, m); per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
+    for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await bars(tf, now, get, days + ((DESKS[name].extra || {})[tf] || 0), m); per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
     if (!per.length) { console.log(`${name} desk: no candles, file left as it is`); continue; }
     const o = out[name] = buildDesk(name, per, prev, now, days);
     fs.mkdirSync(path.dirname(file), { recursive: true }); writeAtomic(file, JSON.stringify(o));

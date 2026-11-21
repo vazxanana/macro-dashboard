@@ -63,16 +63,51 @@ test('the files: markets are joined into one record, nothing without a stop is s
   assert.ok(f.records.every((r) => (r.side > 0 ? r.stop < r.entry : r.stop > r.entry))); assert.ok(f.records.some((r) => r.market === 'eurusd' && /^eurusd:eg-/.test(r.id) && r.label));
   assert.equal(f.counts.n, f.records.length); assert.ok(f.records.every((r) => r.src === 'live' || r.src === 'replay'));
   const again = E.buildDesk('eg', [['xau', B]], f, now + 2100, 30); assert.equal(again.records.length, f.records.length, 'a second run adds nothing and keeps the other market');
-  assert.deepEqual(Object.keys(E.DESKS), ['eg', 'lit']); assert.equal(E.DESKS.lit.markets.length, Object.keys(SOP.ALL).length); assert.deepEqual(E.DESKS.eg.markets, Object.keys(SOP.MARKETS));
+  assert.deepEqual(Object.keys(E.DESKS), ['eg', 'msnr', 'lit']); assert.equal(E.DESKS.lit.markets.length, Object.keys(SOP.ALL).length); assert.deepEqual(E.DESKS.eg.markets, Object.keys(SOP.MARKETS));
 });
 
 test('wiring: the loop runs the trackers, data health lists the files, and the page has both desks with an Open now panel', () => {
   const yml = rd('.github/workflows/council.yml'), dh = rd('council/datahealth.mjs'), page = rd('market-structure.html'), js = rd('assets/desk-trades.js'), src = rd('council/edge-desks.mjs');
-  assert.match(yml, /timeout 150 node council\/edge-desks\.mjs data \|\| echo/); assert.match(dh, /file: 'lit\/desk\.json'/); assert.match(dh, /file: 'eg\/desk\.json'/);
-  for (const k of ['lit', 'eg']) { assert.match(page, new RegExp(`<section class="view adm" id="v-${k}"`)); assert.match(page, new RegExp(`${k}: 'desks'`)); assert.match(js, new RegExp(`${k}/desk\\.json`)); }
-  assert.match(page, /const VIEWS = \[[^\]]*'lit', 'eg'/); assert.equal(page.split('data-dk="open"').length - 1, 2); assert.ok(page.includes('<script src="/assets/desk-trades.js" defer></script>'));
-  assert.equal(page.split('<a href="#eg" data-dsw="eg" class="adm">Engulfing</a>').length - 1, 4, 'the switch on every desk');
+  assert.match(yml, /timeout 280 node council\/edge-desks\.mjs data \|\| echo/); assert.match(dh, /file: 'lit\/desk\.json'/); assert.match(dh, /file: 'eg\/desk\.json'/);
+  assert.match(dh, /file: 'msnr\/desk\.json'/);
+  for (const k of ['lit', 'eg', 'msnr']) { assert.match(page, new RegExp(`<section class="view adm" id="v-${k}"`)); assert.match(page, new RegExp(`${k}: 'desks'`)); assert.match(js, new RegExp(`${k}/desk\\.json`)); }
+  assert.match(page, /const VIEWS = \[[^\]]*'lit', 'eg'/); assert.equal(page.split('data-dk="open"').length - 1, 3); assert.ok(page.includes('<script src="/assets/desk-trades.js" defer></script>'));
+  assert.equal(page.split('<a href="#eg" data-dsw="eg" class="adm">Engulfing</a>').length - 1, 5, 'the switch on every desk');
   assert.doesNotMatch(js, /localStorage|sessionStorage|fetch\(|\.stop\s*=[^=]/, 'the page code only reads the stored record and writes text');
   assert.doesNotMatch(src, /ctrader|alerts\.mjs|trader\.mjs|sendAlerts/, 'a paper record: no order, alert or Trader code');
   assert.match(js, /No trade is open now\./); assert.match(js, /at the last reading/); assert.match(js, /not a tested rule/);
+});
+
+// ─── the three zone methods on the Engulfing desk, and the MSNR desk (21 Nov 2026) ───
+import * as G from '../council/eg-methods.mjs';
+const B15 = (() => { const o = { ...B }, sec = 900, out = []; for (const b of B['5m']) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } o['15m'] = out; return o; })();
+
+test('engulf zones: a zone is the engulfed candle, known at the engulfing close, touched and failed only by later candles', () => {
+  const C = [{ time: 0, open: 10, high: 11, low: 9, close: 9.5 }, { time: 900, open: 9.5, high: 12, low: 9.4, close: 11.5 }, { time: 1800, open: 11.5, high: 12.5, low: 11.2, close: 12 }, { time: 2700, open: 12, high: 12.1, low: 10.5, close: 10.8 }, { time: 3600, open: 10.8, high: 10.9, low: 8, close: 8.5 }];
+  const z = G.zones(C, '15m').filter((x) => x.dir > 0)[0]; assert.deepEqual([z.top, z.bot, z.base, z.at], [11, 9, 0, 1800]); assert.equal(z.touch, 2700, 'the first later candle that trades into it'); assert.equal(z.fail, 4500, 'a close through its far side');
+});
+test('the three methods: a fixed stop on the losing side, a 2R target, one position at a time, no look-ahead', () => {
+  const all = G.methodTrades(B15, { from: 0, market: 'xau' }); assert.ok(all.length >= 5, 'entries: ' + all.length);
+  let busy = -Infinity;
+  for (const r of all) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^eg-(plan|simple|direct)$/); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips on gold'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.EGM.rr) < 1e-9);
+    assert.ok(r.t > busy, 'one at a time'); busy = r.endT || Infinity; assert.ok(r.log.every((x, i, a) => !x.t || !i || !a[i - 1].t || x.t >= a[i - 1].t), 'the log runs forward'); assert.ok(r.marks.every((m) => m.at <= r.t), 'every mark was known by the fill'); }
+  // cutting the candles after a closed trade's end changes nothing about it
+  const one = all.find((r) => r.endT && r.endT < END - 5 * 86400); const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
+  const again = G.methodTrades(cut, { from: 0, market: 'xau' }).find((r) => r.id === one.id); assert.ok(again); assert.deepEqual([again.entry, again.stop, again.R, again.endT], [one.entry, one.stop, one.R, one.endT]);
+  const fxB = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 }))]));
+  const fxT = G.methodTrades(fxB, { from: 0, market: 'eurusd' }); assert.ok(fxT.length && fxT.every((r) => stopOk(r) && /^eurusd:eg-/.test(r.id) && Math.abs(r.r0 / r.entry - G.EGM.pips / 4000) < 2e-4), 'another market: the same share of price');
+});
+test('MSNR desk: entries with the call only, the study\'s own functions and constants put back, the gold plan on gold only', () => {
+  const big = market(140, 5), b15 = { ...big }; { const out = []; for (const b of big['5m']) { const t = b.time - (b.time % 900), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } b15['15m'] = out; }
+  const end = big['5m'].at(-1).time + 300, fr = end - 60 * 86400, ms = E.msnrTrades(b15, { from: fr, market: 'xau' });
+  assert.ok(ms.length >= 5, 'entries: ' + ms.length); let busy = -Infinity;
+  for (const r of ms) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^msnr-(main|other)$/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - E.MSNR.rr) < 1e-6); assert.ok(r.t > busy); busy = r.endT || Infinity; assert.ok(r.t >= fr); }
+  const src = rd('council/edge-desks.mjs'); assert.match(src, /from '\.\.\/research\/edge\/msnr-entry\/run\.mjs'/); assert.match(src, /finally \{ MS\.P\.PAD = keep\.PAD; MS\.P\.MIN_R0 = keep\.MIN_R0; \}/);
+  E.msnrTrades(Object.fromEntries(Object.entries(b15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open / 3000, high: b.high / 3000, low: b.low / 3000, close: b.close / 3000 }))])), { from: fr, market: 'eurusd' });
+  const P = require('node:module'); void P; 
+  const sn = G.snrTrades(b15, { from: fr, market: 'xau' }); for (const r of sn) { assert.ok(stopOk(r)); assert.equal(r.kind, 'msnr-sop'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.SNR.rr) < 1e-9); }
+  const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay, 'at most two a day'); }
+  assert.deepEqual(G.snrTrades(b15, { from: fr, market: 'eurusd' }), [], 'the plan is for gold');
+  const egSrc = rd('council/eg-methods.mjs'); assert.doesNotMatch(egSrc, /ctrader|alerts\.mjs|trader\.mjs|sendAlerts|fetch\(/, 'a paper reading: no order, alert, network or Trader code');
+  assert.doesNotMatch(egSrc + src, /L3XUS|LEXUS|t\.me\//i, 'the documents are read in the desk\'s own words, never named or copied');
 });
