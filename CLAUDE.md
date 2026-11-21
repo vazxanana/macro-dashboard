@@ -5230,6 +5230,11 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     stored one has not ended is the same trade. (5) the one unescaped record field on the desk rows. Known, left: a
     `--days` backfill of barriers is not exactly what the loop would have recorded (zones read the whole history given); an
     open record the run no longer reads stays open (not seen in practice: the longest ran 5.8 days of a 14-day window).
+  - **A stop does not change between two reads** (21 Nov 2026): on a market other than gold the LIT buffer and the MSNR
+    buffer / smallest stop scaled from the NEWEST candle's price, so a later read gave the same trade another stop (an open
+    record's stop moved; a rebuild differed from the loop). They scale from the trade's own price now (LIT: the sweep's
+    extreme, `stopExtra(atr5, px)`; MSNR: the entry, the study's candidates listed with `PAD` / `MIN_R0` 0 and both applied
+    in `msnrTrades`). Gold is unchanged; stored closed records are frozen as booked. Test in `tests/edge-desks.test.mjs`.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

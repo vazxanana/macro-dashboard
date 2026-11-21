@@ -121,7 +121,7 @@ export function litOrder(S5, cd, M, set) {
   // market on the break: at the close of the candle after the break, and never before the M15 sweep itself is confirmed
   // (the M5 break can come first; until 21 Nov 2026 the entry was then taken up to 20 minutes before the sweep was known)
   const mk = Math.min(n - 1, Math.max(b + 1, j0 - 1));
-  const entry = set.entry === 'market' ? c[mk] : o[ob], stop = MX + M.stopExtra(atr[jA - 1]), risk = stop - entry; if (!(risk > 0)) return null;
+  const entry = set.entry === 'market' ? c[mk] : o[ob], stop = MX + M.stopExtra(atr[jA - 1], MX), risk = stop - entry; if (!(risk > 0)) return null;
   const target = cd.accLow, rr = (entry - target) / risk; if (!(rr > set.minRR)) return null;
   if (set.cap && !(risk <= P.capFrac * Math.abs(entry))) return null;
   return { jA, entry, stop, target, risk, rr, MX, b, ob, mxIdx, level, mk, market: set.entry === 'market' };
@@ -139,8 +139,9 @@ export function litFill(S5, M, ord, set) {
     if (h[k] > ord.MX || l[k] <= ord.target) return null; }
   return null;
 }
-const litM = (market, px) => { const q = market === 'xau' ? 1 : px / 4000, dec = SOP.ALL[market].dec;
-  return market === 'xau' ? { ...XAU, cost: () => 0 } : { key: market, sym: market, tick: Math.pow(10, -dec), stopExtra: (atr5) => 0.30 * q + Math.max(0.1 * atr5, 0.30 * q), skip: XAU.skip, cost: () => 0 }; };
+// the buffer scales from the trade's OWN price (the sweep's extreme), not the newest candle's: a stop must not change between two reads
+const litM = (market) => { const dec = SOP.ALL[market].dec;
+  return market === 'xau' ? { ...XAU, cost: () => 0 } : { key: market, sym: market, tick: Math.pow(10, -dec), stopExtra: (atr5, px) => { const q = Math.abs(px) / 4000; return 0.30 * q + Math.max(0.1 * atr5, 0.30 * q); }, skip: XAU.skip, cost: () => 0 }; };
 const LEVEL = { pd: "the previous day's", pw: "the previous week's", acc: "the accumulation's own", eqh: 'equal', ASIA: "the Asia session's", LONDON: "the London session's", NY_AM: "the New York morning's" };
 // Each execution is its OWN stream (21 Nov 2026): every candidate is tried with every execution, one position at a time per
 // execution. Until then a candidate was recorded under the first execution that filled, so "market on the break" held only the
@@ -148,7 +149,7 @@ const LEVEL = { pd: "the previous day's", pw: "the previous week's", acc: "the a
 // `first: true` is that old reading, kept only so the desk-slices study still reproduces.
 export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = false } = {}) {
   const raw = B['5m'] || []; if (!raw.length) return [];
-  const M = litM(market, raw[raw.length - 1].close), b5 = cleanBars(raw, M), m15 = agg15(b5), f = fx(market), out = [], lastT = b5.length ? b5[b5.length - 1].t : 0;
+  const M = litM(market), b5 = cleanBars(raw, M), m15 = agg15(b5), f = fx(market), out = [], lastT = b5.length ? b5[b5.length - 1].t : 0;
   for (const dir of ['short', 'long']) { const mirror = dir === 'long', S15 = series(m15, mirror, M.tick), S5 = series(b5, mirror, M.tick), sg = S5.sign, d = dir === 'short' ? -1 : 1;
     for (const cd of fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900;
       const gots = [];
@@ -196,9 +197,10 @@ function msnrSim(M5, c, r0, rr) { const s = c.side, target = c.entry + s * rr * 
 export function msnrTrades(B, { from, market = 'xau', against = false } = {}) {   // against: research only, the entries opposite to the direction
   const raw = B['5m'] || [], H1 = B['1h'] || []; if (raw.length < 50 || H1.length < 200) return [];
   const M5 = raw.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), f = fx(market), lastT = M5[M5.length - 1].time;
-  const q = market === 'xau' ? 1 : M5[M5.length - 1].close / 4000, keep = { PAD: MS.P.PAD, MIN_R0: MS.P.MIN_R0 }; let cand;
-  const pad = keep.PAD * q;
-  try { MS.P.PAD = keep.PAD * q; MS.P.MIN_R0 = keep.MIN_R0 * q; cand = MS.candidates(M5).cand; } finally { MS.P.PAD = keep.PAD; MS.P.MIN_R0 = keep.MIN_R0; }
+  // the buffer and the smallest stop scale from each trade's OWN entry price (not the newest candle's: a stop must not change
+  // between two reads), so the study's candidates are listed without either and both are applied below
+  const keep = { PAD: MS.P.PAD, MIN_R0: MS.P.MIN_R0 }, qOf = (px) => (market === 'xau' ? 1 : px / 4000); let cand;
+  try { MS.P.PAD = 0; MS.P.MIN_R0 = 0; cand = MS.candidates(M5).cand; } finally { MS.P.PAD = keep.PAD; MS.P.MIN_R0 = keep.MIN_R0; }
   // the call from a long H4 history (hourly candles grouped into the study's own UTC 4-hour buckets), as known at the trigger's close
   const H4 = MS.group(H1.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), MS.bucket(MS.P.H4)), D = direction(H4, MS.dayKey, 86400), dir = D.call;
   const M15g = MS.group(M5, MS.bucket(MS.P.M15)), lower15 = (t) => { let lo = 0, hi = M15g.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (M15g[m].time <= t) lo = m; else hi = m - 1; } return lo; };
@@ -209,7 +211,7 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
     const ev = D.last[h] >= 0 ? D.events[D.last[h]] : null;
     // the stop and the result are worked out here at full precision: the study's own code rounds prices to 3 decimals (it was
     // written for gold), which on a 5-decimal market put every stop on a 0.001 grid and booked "target" trades at odd R
-    const d = c.side, a = M5[c.i - 1], b0 = M5[c.i - 2], stop = d > 0 ? Math.min(a.low, b0.low) - pad : Math.max(a.high, b0.high) + pad, r0 = d * (c.entry - stop); if (!(r0 > 0)) continue; c.stop = stop;
+    const d = c.side, a = M5[c.i - 1], b0 = M5[c.i - 2], pad = keep.PAD * qOf(c.entry), stop = d > 0 ? Math.min(a.low, b0.low) - pad : Math.max(a.high, b0.high) + pad, r0 = d * (c.entry - stop); if (!(r0 >= keep.MIN_R0 * qOf(c.entry))) continue; c.stop = stop;
     const o = msnrSim(M5, c, r0, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
     let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);

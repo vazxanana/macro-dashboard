@@ -206,3 +206,16 @@ test('audit: the direction: a zone tapped just before the BO the other way still
   const src = rd('council/eg-methods.mjs'); assert.match(src, /if \(st === -q\.s\) q\.opp = true;/); assert.match(src, /if \(!q\.opp\) continue;/); assert.match(src, /zoneAt: q\.zone\.known/);
   assert.match(src, /pipOf = \(entry\) =>/);
 });
+
+test('a stop does not change between two reads: on another market the sizes scale from the trade\'s own price, not the newest candle\'s', () => {
+  // the same candles, then two more weeks in which the price doubles: every trade closed before must keep its stop
+  const X = market(40, 5, 1.15, 0.0005), T = X['5m'].at(-1).time, far = { '5m': X['5m'].slice() }; let p = X['5m'].at(-1).close;
+  for (let i = 1; i <= 14 * 288; i++) { const t = T + i * 300, wd = new Date(t * 1000).getUTCDay(); if (wd === 0 || wd === 6) continue; const c = p * 1.0002; far['5m'].push({ time: t, open: p, high: c * 1.00005, low: p * 0.99995, close: c }); p = c; }
+  for (const tf of ['1h', '4h', '1d']) { const sec = SOP.SEC[tf], out = []; for (const b of far['5m']) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } far[tf] = out; }
+  assert.ok(far['5m'].at(-1).close > 1.5 * X['5m'].at(-1).close);
+  for (const [name, fn] of [['msnr', E.msnrTrades], ['lit', E.litTrades]]) {
+    const a = fn(X, { from: 0, market: 'eurusd' }).filter((r) => r.endT != null && r.endT < T - 86400), b = new Map(fn(far, { from: 0, market: 'eurusd' }).map((r) => [r.id, r]));
+    assert.ok(a.length >= 5, name + ' trades: ' + a.length);
+    for (const r of a) { const q = b.get(r.id); assert.ok(q, name + ': the trade is still read: ' + r.id); assert.ok(Math.abs(q.stop - r.stop) < 1e-12 && Math.abs(q.entry - r.entry) < 1e-12, name + ': same stop: ' + r.id); }
+  }
+});
