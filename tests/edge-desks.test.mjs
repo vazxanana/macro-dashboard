@@ -144,7 +144,7 @@ test('the direction reading: every switch names a tapped key level of the timefr
 
 test('every desk record carries the key levels its reading used as chart marks', () => {
   const src = fs.readFileSync(new URL('../council/eg-methods.mjs', import.meta.url), 'utf8') + fs.readFileSync(new URL('../council/edge-desks.mjs', import.meta.url), 'utf8');
-  for (const l of ['Daily EG zone', 'H4 EG zone', "tn + ' EG zone'", 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
+  for (const l of ['Daily EG zone', 'H4 EG zone', "tn + zw(m)", 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
     assert.ok(src.includes(l), 'mark: ' + l);
 });
 
@@ -335,9 +335,19 @@ test('an EG closes beyond the other candle\'s HIGH (a buy) or LOW (a sell); a bo
 test('plan and simple: the failed M5 zone touches the H4 zone or the M15 / M30 engulf zone', () => {
   let n = 0;
   for (const r of G.methodTrades(B15, { from: 0, market: 'xau' }).filter((x) => x.kind === 'eg-plan' || x.kind === 'eg-simple')) { n++;
-    const ef = r.marks.find((k) => k.label === 'M5 EF (zone failed)'), zs = r.marks.filter((k) => /^H4 E[GF]|^M(15|30) EG zone$/.test(k.label));
+    const ef = r.marks.find((k) => k.label === 'M5 EF (zone failed)'), zs = r.marks.filter((k) => /^H4 E[GF]|^M(15|30) (EG zone|EF \(zone failed\))$/.test(k.label));
     assert.ok(ef && zs.length >= 2, r.id); const lo = Math.min(...zs.map((z) => z.bot)), hi = Math.max(...zs.map((z) => z.top));
     assert.ok(ef.bot <= hi && ef.top >= lo, 'the failed M5 zone is away from the zone: ' + r.id); }
   assert.ok(n >= 1, 'plan / simple entries on these candles: ' + n);
   assert.match(rd('council/eg-methods.mjs'), /\|\| !atZone\(z\)\) continue;/);
+});
+
+// 21 Nov 2026 (owner: "the fail is the same logic as entry for other timeframes"): an EF counts like an EG on every timeframe
+test('an EF counts like an EG: a failed opposite M15 / M30 zone triggers, an earlier M5 EF can be the entry; stops hold; no hindsight', () => {
+  const all = G.methodTrades(B15, { from: 0, market: 'xau' }), plan = all.filter((r) => r.kind === 'eg-plan' || r.kind === 'eg-simple');
+  const efTrig = plan.filter((r) => r.marks.some((k) => /^M(15|30) EF \(zone failed\)$/.test(k.label))), efEntry = plan.filter((r) => r.marks.some((k) => k.label === 'M5 EF zone · entry'));
+  assert.ok(efTrig.length >= 1, 'entries on a failed M15 / M30 zone: ' + efTrig.length); assert.ok(efEntry.length >= 1, 'entries at an earlier M5 EF: ' + efEntry.length);
+  for (const r of efTrig.concat(efEntry)) { assert.ok(stopOk(r), r.id); assert.match(r.log[0].text, /engulf (zone failed|[a-z]+ closed)/);
+    const one = G.methodTrades(cutAt(B15, r.t + 900), { from: 0, market: 'xau' }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.equal(one.entry, r.entry); }
+  const sn = G.snrTrades(B15, { from: 0, market: 'xau' }); assert.ok(sn.filter((r) => /-ef$/.test(r.id)).every((r) => stopOk(r) && r.marks.some((k) => / EF zone · entry$/.test(k.label))));
 });
