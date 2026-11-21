@@ -170,11 +170,23 @@
   }
   // a logged trade as a chart spec (levels only)
   function specOfTrade(t, now) {
-    var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400);
-    return { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, rp: !!t.replayed, label: t.replayed ? 'From the replay' : 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
-      from: t.at - 12 * 3600, to: Math.max(end, t.at + 3600), fillFrom: t.at - 300, exit: t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
+    var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400), to = Math.max(end, t.at + 3600);
+    var sp = { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, rp: !!t.replayed, label: t.replayed ? 'From the replay' : 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
+      from: t.at - 12 * 3600, to: to, fillFrom: t.at - 300, exit: !t.replayed && t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
       yours: t.status === 'closed' && t.R != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'still open',
       steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before the entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
+    // a trade of the desk's own replay brings what it was built from: its marks (BO level, VR, CF zone, barrier) and its log as the steps
+    var mk = (t.marks || []).filter(function (m) { return m && isFinite(m.a) && (m.kind === 'level' ? isFinite(m.p) : isFinite(m.top) && isFinite(m.bot)); }).slice(0, 8);
+    if (mk.length) {
+      var first = Math.min.apply(null, mk.map(function (m) { return m.a; }));
+      sp.from = Math.max(t.at - 6 * 86400, Math.min(t.at - 8 * 3600, first - 3 * 3600)); sp.fillFrom = t.at - 60;
+      if (sp.to - sp.from > 2.5 * 86400) { sp.base = '15m'; sp.tfs = [900, 3600, 14400]; sp.h4off = usSummer(sp.from) ? 3600 : 7200; sp.fillFrom = t.at - 900; }
+      sp.marks = mk.map(function (m) { var c = {}; for (var k in m) c[k] = m[k]; c.a = Math.max(m.a, sp.from); c.b = sp.to; if (c.at == null) c.at = m.a; return c; });
+      if (t.name) sp.label = 'From the replay · ' + t.name;
+    }
+    var st = (t.steps || []).filter(function (x) { return x && isFinite(x.t) && x.text; }).map(function (x) { return { t: Math.max(x.t, sp.from), text: String(x.text) }; });
+    if (st.length) sp.steps = st;
+    return sp;
   }
   // A lesson as a chart: the desk's own reading when it has drawn one (its marks and steps, checked by the server), else the
   // teacher's levels alone. null when the lesson has neither. H4 candles start at 17:00 New York (21:00 or 22:00 UTC).
@@ -299,6 +311,8 @@
     var card = $('mo-replay'); if (!card) return; stop(); R.spec = spec; var tk = ++R.token, msg = $('mo-rp-msg');
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-pick button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.ex === spec.id)); });
     $('mo-rp-label').textContent = labelOf(spec);
+    // a trade of the desk's own record is not one of the screenshot examples: the card says which it is showing
+    var hd = card.querySelector('.ms-k'); if (hd) { if (!hd.dataset.h0) hd.dataset.h0 = hd.innerHTML; if (spec.rp) hd.innerHTML = '<span>This trade, on the chart</span><small>what the desk read, step by step, on our candles · times in UTC</small>'; else if (hd.innerHTML !== hd.dataset.h0) { hd.innerHTML = hd.dataset.h0; var I = root.MS_MOSHA_I18N; if (I && I.apply) I.apply(hd); } }
     if (scroll) card.scrollIntoView({ block: 'start', behavior: 'smooth' });
     if (!root.LightweightCharts) { msg.hidden = false; msg.textContent = L('The chart library did not load. Reload the page.'); return; }
     var done = function (m5) { if (tk !== R.token) return; if (!m5 || m5.length < 20) { msg.hidden = false; msg.textContent = L('No candles came back for that time. Check the connection and open the trade again.'); return; }

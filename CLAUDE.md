@@ -5057,6 +5057,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   `merge(…, 'Kraken')` adds only entries of the last `FALLBACK_NEW_S` 2 h (stamped `feed: 'Kraken'`, a log line says the prices
   sit a few dollars from spot) and never updates a record read on OANDA; back on OANDA a Kraken record is left as it stands
   (an open one stays open: known, not solved). Not checked against the live exchange (not reachable from the build sandbox).
+  **More history, and the trade on the chart** (21 Nov 2026, owner: "we need more trades, and fix the see trades on chart"):
+  `node council/mosha-desk.mjs <dir> --days N` (or `MOSHA_DAYS`; the loop's own runs stay at 14) reads N days back once to fill
+  the record (`KEEP` 1500); the first 90-day file: 473 records from 24 Aug 2026, 422 barrier entries −18.0R and 51 sequence
+  entries −4.7R before costs (a paper record of one reading; never call it an edge). Each record carries `marks` (the BO level,
+  the VR box, the CF zone; the barrier and the QM level; `clean` keeps six, checked) and "Chart" hands them and the log to
+  `assets/mosha-replay.js` `specOfTrade`: the window starts 3 h before the first mark (at most 6 days back, 15-minute candles
+  over 2.5 days), the log's lines are the replay's steps, the card's heading reads "This trade, on the chart", and the
+  result is found on the candles (no hand exit). A logged trade without marks opens as before. The table shows 30 rows first.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

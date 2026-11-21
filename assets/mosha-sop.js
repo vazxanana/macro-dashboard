@@ -53,6 +53,10 @@
           { t: M.vr.t + SEC[l], text: NAME[l] + ' VR: the first break against the BO. The VR runs ' + f2(M.vr.lo) + ' to ' + f2(M.vr.hi) + '; its extreme ' + f2(M.vr.ext) + ' is the target.' },
           { t: M.cf.t + SEC[l], text: NAME[l] + ' CF' + (M.cf.again ? ' (a new one, after the first failed)' : '') + ': the break back with the BO. The CF zone is ' + f2(M.cf.lo) + ' to ' + f2(M.cf.hi) + (M['case'] === 2 ? ', inside the VR: the kind that often fails.' : ', clear of the VR.') },
           { t: tr.t, text: 'Price pulled back into the CF zone and an EG closed with the BO: ' + word(tr.side) + ' ' + f2(tr.entry) + ', stop ' + f2(tr.stop) + ' ($' + f2(BUF) + ' past the pullback\'s extreme, risk $' + f2(tr.r0) + '), target ' + f2(tr.target) + ' (' + (Math.abs(tr.target - tr.entry) / tr.r0).toFixed(1) + 'R).' }];
+        // what the chart draws for this trade (assets/mosha-replay.js): the BO level, the VR box, the CF zone, each from the moment it was known
+        tr.marks = [{ kind: 'level', p: mv.level, a: boT, at: boT + SEC[h], label: NAME[h] + ' BO' },
+          { kind: A.trend > 0 ? 'vr' : 'bvr', top: M.vr.hi, bot: M.vr.lo, a: M.vr.t, at: M.vr.t + SEC[l], label: NAME[l] + ' VR' },
+          { kind: 'zone', top: M.cf.hi, bot: M.cf.lo, a: M.cf.t, at: M.cf.t + SEC[l], label: 'CF zone' }];
         out.push(tr);
       }
     });
@@ -85,6 +89,8 @@
         { t: z.known, text: NAME[z.tf] + ' barrier: a fresh ' + (d < 0 ? 'supply' : 'demand') + ' zone ' + f2(z.lo) + ' to ' + f2(z.hi) + ', left by ' + (z.kind === 'bo' ? 'a BO' : 'an internal BO') + ' ' + word(d) + '.' },
         { t: t0, text: 'Price came back to the barrier for the first time.' },
         { t: tr.t, text: NAME[ctf] + ' QM with the barrier: a BO Structure ' + word(d) + ' through ' + f2(sig.level) + '. ' + (d < 0 ? 'Sell ' : 'Buy ') + f2(entry) + ', stop ' + f2(stop) + ' ($' + f2(BUF) + ' past the extreme ' + f2(x) + ' made at the barrier, risk $' + f2(r0) + '), target ' + f2(tr.target) + ' (' + BARRIER_R + 'R: the replay\'s own choice, the method names no fixed target here).' }];
+      tr.marks = [{ kind: 'zone', top: z.hi, bot: z.lo, a: z.known - SEC[z.tf], at: z.known, label: NAME[z.tf] + ' barrier' },
+        { kind: 'level', p: sig.level, a: t0, at: tr.t, label: 'QM', under: d < 0 }];
       rows.push(tr);
     });
     rows.sort(function (a, b) { return a.t - b.t; });
@@ -152,7 +158,7 @@
   function line(name, rows, extra) {
     var s = summary(rows), parts = [s.n + (s.n === 1 ? ' entry' : ' entries')];
     if (s.closed) parts.push(s.wins + ' reached target, ' + (s.closed - s.wins) + ' stopped', fR(s.total) + ' before costs'); if (s.open) parts.push(s.open + ' still open');
-    return '<p class="mo-sys-l"><b>' + esc(name) + '</b>: ' + esc(parts.join(' · ')) + '. ' + (s.closed < MIN_JUDGE ? 'Too few to judge (' + s.closed + ' of ' + MIN_JUDGE + ' closed).' : 'Two weeks of one reading, not a tested rule (t ' + (s.t == null ? 'n/a' : s.t.toFixed(2)) + ').') + (extra ? ' ' + esc(extra) : '') + '</p>';
+    return '<p class="mo-sys-l"><b>' + esc(name) + '</b>: ' + esc(parts.join(' · ')) + '. ' + (s.closed < MIN_JUDGE ? 'Too few to judge (' + s.closed + ' of ' + MIN_JUDGE + ' closed).' : 'One reading on past candles, not a tested rule (t ' + (s.t == null ? 'n/a' : s.t.toFixed(2)) + ').') + (extra ? ' ' + esc(extra) : '') + '</p>';
   }
   function rowHTML(r) {
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
@@ -170,7 +176,7 @@
     if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading the trades…' : 'The trades load when the desk opens.') + '</div>'; return; }
     if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The tracker has no stored trades yet and the candles could not be read, so there is nothing to show. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
     var every = S.rows || [], nLive = every.filter(function (r) { return r.src === 'live'; }).length, all = S.file && S.src !== 'both' ? every.filter(function (r) { return (r.src === 'live') === (S.src === 'live'); }) : every, sop = all.filter(function (r) { return r.kind === 'sop'; }), bar = all.filter(function (r) { return r.kind === 'barrier'; });
-    var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : all, shown = S.all ? list : list.slice(0, 12);
+    var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : all, shown = S.all ? list : list.slice(0, 30);
     var chip = function (k, t, n) { return '<button type="button" class="mo-sop-b" data-sop-flt="' + k + '" aria-pressed="' + (S.flt === k) + '">' + t + ' (' + n + ')</button>'; };
     var sm = summary(list), open = all.filter(function (r) { return r.R == null; }), last = all[0];
     var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + word(last.side) + ' at ' + f2(last.entry) + ', ' + utc(last.t) + '.' : '');
@@ -189,7 +195,7 @@
         (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') +
       cal +
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop) + line('Barrier entry', bar, 'It takes every fresh H1 and M15 barrier; the method says to mark the best one, and that choice is not in the replay.') +
-      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. These are not Luxus\'s trades and not the council\'s, nothing was traded, and two weeks cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
+      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
   document.addEventListener('click', function (e) {
@@ -200,7 +206,7 @@
     if (b.hasAttribute('data-sop-flt')) { S.flt = b.getAttribute('data-sop-flt'); S.all = false; draw(); return; }
     var id = b.getAttribute('data-sop-log') || b.getAttribute('data-sop-chart'), r = byId(id); if (!r) return;
     if (b.hasAttribute('data-sop-log')) { S.open[id] = !S.open[id]; draw(); var nb = document.querySelector('#mo-sopr [data-sop-log="' + id + '"]'); if (nb) nb.focus(); return; }
-    if (typeof root.msMoshaReplayTrade === 'function') { root.msMoshaReplayTrade({ replayed: true, id: r.id, market: 'xau', side: word(r.side), at: r.t, entry: +f2(r.entry), stop: +f2(r.stop), target: +f2(r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +f2(r.exit) : null, exitAt: r.endT, R: r.R });
+    if (typeof root.msMoshaReplayTrade === 'function') { root.msMoshaReplayTrade({ replayed: true, name: (r.kind === 'sop' ? NAME[r.h] + ' BO, ' + NAME[r.l] + ' VR and CF' : NAME[r.h] + ' barrier, ' + NAME[r.l] + ' QM'), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: 'xau', side: word(r.side), at: r.t, entry: +f2(r.entry), stop: +f2(r.stop), target: +f2(r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +f2(r.exit) : null, exitAt: r.endT, R: r.R });
       var rp = $('mo-replay'); if (rp && rp.scrollIntoView) rp.scrollIntoView({ block: 'start' }); }
   });
   function go() { var v = $('v-mosha'); if (!v || v.hidden) return; if (API.visible(document.documentElement.dataset) && S.state === 'idle') run(); else draw(); }

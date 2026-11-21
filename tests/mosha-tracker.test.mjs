@@ -68,3 +68,19 @@ test('second source: Kraken when OANDA fails, never a mix; it adds only what is 
   const b = M.merge(m, [rec({ id: 'o', t: now - 9000, status: 'stopped', R: -1 }), rec({ id: 'new', t: now - 900, side: 1, stop: 98, target: 106, status: 'target', R: 3 })], now + 600);
   assert.equal(b.find((r) => r.id === 'o').R, -1); assert.equal(b.find((r) => r.id === 'new').R, null);
 });
+
+test('a record keeps the marks its chart draws, and the chart opens it with them and its log as the steps', async () => {
+  const c = M.clean(rec({ marks: [{ kind: 'zone', top: 105, bot: 101, a: 500, at: 600, label: 'M15 barrier', junk: 1 }, { kind: 'level', p: 99, a: 900, label: 'QM', under: true }, { kind: 'x', a: 1 }, { kind: 'level', p: NaN, a: 2 }] }));
+  assert.deepEqual(c.marks, [{ kind: 'zone', a: 500, at: 600, label: 'M15 barrier', top: 105, bot: 101 }, { kind: 'level', a: 900, at: 900, label: 'QM', p: 99, under: true }]);
+  const RP = (await import('../assets/mosha-replay.js')).default, at = 1e9;
+  const sp = RP.specOfTrade({ replayed: true, name: 'M15 barrier, M1 QM', id: 'a', market: 'xau', side: 'sell', at, entry: 100, stop: 102, target: 94, status: 'closed', exit: 102, exitAt: at + 3600, R: -1,
+    marks: [{ kind: 'zone', top: 105, bot: 101, a: at - 86400, at: at - 86000, label: 'M15 barrier' }], steps: [{ t: at - 86000, text: 'barrier' }, { t: at, text: 'entry' }] }, at + 9e5);
+  assert.equal(sp.marks.length, 1); assert.equal(sp.marks[0].b, sp.to); assert.ok(sp.from <= at - 86400 - 3 * 3600 && sp.from >= at - 6 * 86400);
+  assert.equal(sp.steps.length, 2); assert.equal(sp.exit, null); assert.match(sp.label, /M15 barrier, M1 QM/);
+  // a logged trade without marks is drawn as before
+  const lg = RP.specOfTrade({ id: 'b', market: 'xau', side: 'buy', at, entry: 100, stop: 98, target: 104, status: 'open' }, at + 100);
+  assert.equal(lg.from, at - 12 * 3600); assert.equal(lg.steps.length, 3); assert.equal(lg.marks.length, 0);
+  // the history option reads further back
+  const seen = []; await M.bars('1h', 2e9, async (u) => { seen.push(+/from=(\d+)/.exec(u)[1]); return { ok: true, json: async () => ({ bars: [] }) }; }, 90);
+  assert.ok(Math.min(...seen) <= 2e9 - (90 + 76) * 86400);
+});
