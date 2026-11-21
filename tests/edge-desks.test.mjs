@@ -84,7 +84,8 @@ const B15 = (() => { const o = { ...B }, sec = 900, out = []; for (const b of B[
 
 test('engulf zones: a zone is the engulfed candle, known at the engulfing close, touched and failed only by later candles', () => {
   const C = [{ time: 0, open: 10, high: 11, low: 9, close: 9.5 }, { time: 900, open: 9.5, high: 12, low: 9.4, close: 11.5 }, { time: 1800, open: 11.5, high: 12.5, low: 11.2, close: 12 }, { time: 2700, open: 12, high: 12.1, low: 10.5, close: 10.8 }, { time: 3600, open: 10.8, high: 10.9, low: 8, close: 8.5 }];
-  const z = G.zones(C, '15m').filter((x) => x.dir > 0)[0]; assert.deepEqual([z.top, z.bot, z.base, z.at], [11, 9, 0, 1800]); assert.equal(z.touch, 2700, 'the first later candle that trades into it'); assert.equal(z.fail, 4500, 'a close through its far side');
+  const z = G.zones(C, '15m').filter((x) => x.dir > 0)[0]; assert.deepEqual([z.top, z.bot, z.base, z.at], [10, 9, 0, 1800], 'a body engulf: the zone runs from the wick to the engulfed candle\'s open'); assert.equal(z.touch, 3600, 'the first later candle that trades into it'); assert.equal(z.fail, 4500, 'a close through its far side');
+  assert.equal(G.zones([{ time: 0, open: 10, high: 11, low: 9, close: 9.5 }, { time: 900, open: 9.5, high: 10.4, low: 9.4, close: 9.9 }], '15m').length, 0, 'a close short of the previous open is no engulf');
 });
 test('the three methods: a fixed stop on the losing side, a 2R target, one position at a time, no look-ahead', () => {
   const all = G.methodTrades(B15, { from: 0, market: 'xau' }); assert.ok(all.length >= 5, 'entries: ' + all.length);
@@ -92,7 +93,7 @@ test('the three methods: a fixed stop on the losing side, a 2R target, one posit
   for (const r of all) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^eg-(plan|simple|direct)$/); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips on gold'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.EGM.rr) < 1e-9);
     assert.ok(r.t > busy, 'one at a time'); busy = r.endT || Infinity; assert.ok(r.log.every((x, i, a) => !x.t || !i || !a[i - 1].t || x.t >= a[i - 1].t), 'the log runs forward'); assert.ok(r.marks.every((m) => m.at <= r.t), 'every mark was known by the fill'); }
   // cutting the candles after a closed trade's end changes nothing about it
-  const one = all.find((r) => r.endT && r.endT < END - 5 * 86400); const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
+  const one = all.find((r) => r.endT && r.endT < END - 5 * 86400 && r.t > B['5m'][0].time + 15 * 86400);   // far enough in for the shorter history to hold enough candles const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
   const again = G.methodTrades(cut, { from: 0, market: 'xau' }).find((r) => r.id === one.id); assert.ok(again); assert.deepEqual([again.entry, again.stop, again.R, again.endT], [one.entry, one.stop, one.R, one.endT]);
   const fxB = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 }))]));
   const fxT = G.methodTrades(fxB, { from: 0, market: 'eurusd' }); assert.ok(fxT.length && fxT.every((r) => stopOk(r) && /^eurusd:eg-/.test(r.id) && Math.abs(r.r0 / r.entry - G.EGM.pips / 4000) < 2e-4), 'another market: the same share of price');

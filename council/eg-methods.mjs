@@ -8,8 +8,8 @@
 //           15-minute zone inside that: a limit at the 15-minute zone.
 // Every entry has a fixed stop of 30 pips on gold ($3.00) on the losing side and a target of 60 pips (2R; for the direct
 // entry the 2R target is the desk's own choice: its document trails the stop by hand). On another market the 30 pips are the
-// same share of price as gold's near $4,000 (the desk's choice). An engulf here = a candle that closes beyond the high (low)
-// of the opposite candle before it; its zone is that candle's range. PAPER RECORD of one reading, before costs: not a tested
+// same share of price as gold's near $4,000 (the desk's choice). An engulf here = a BODY engulf: the candle opens at or beyond the
+// previous close and closes at or beyond the previous open, the other way; its zone runs from the pair's wick to that open. PAPER RECORD of one reading, before costs: not a tested
 // rule, never an edge. No order, alert, mirror copy or Trader read.
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -29,8 +29,12 @@ const lower = (C, t) => { let lo = 0, hi = C.length; while (lo < hi) { const m =
 export function zones(C, tf) {
   const sec = SEC[tf], life = EGM.life[tf] || 120, out = [];
   for (let i = 1; i < C.length; i++) { const p = C[i - 1], c = C[i];
-    const dir = p.close < p.open && c.close > c.open && c.close > p.high ? 1 : p.close > p.open && c.close < c.open && c.close < p.low ? -1 : 0; if (!dir) continue;
-    const z = { tf, dir, top: p.high, bot: p.low, base: p.time, at: c.time + sec, touch: null, fail: null, i };
+    // a BODY engulf (the method's own definition): the candle opens at or beyond the previous close and closes at or beyond the
+    // previous open, the other way. The zone is the engulfed candle from the pair's wick extreme to its OPEN (the body's far edge).
+    const tol = 0.1 * Math.abs(p.open - p.close);   // a feed's open sits a tick either side of the previous close: a tenth of the body is allowed
+    const dir = p.open > p.close && c.close > c.open && c.open <= p.close + tol && c.close >= p.open ? 1 : p.open < p.close && c.close < c.open && c.open >= p.close - tol && c.close <= p.open ? -1 : 0; if (!dir) continue;
+    const z = dir > 0 ? { tf, dir, top: p.open, bot: Math.min(p.low, c.low), base: p.time, at: c.time + sec, touch: null, fail: null, i }
+      : { tf, dir, top: Math.max(p.high, c.high), bot: p.open, base: p.time, at: c.time + sec, touch: null, fail: null, i };
     for (let j = i + 1; j < C.length && j <= i + life; j++) { const b = C[j];
       if (z.touch == null && (dir > 0 ? b.low <= z.top : b.high >= z.bot)) z.touch = b.time;
       if (dir > 0 ? b.close < z.bot : b.close > z.top) { z.fail = b.time + sec; break; } }
@@ -99,8 +103,8 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
 }
 
 // ─── the gold plan with Daily levels (the MSNR desk; the owner's fourth document, read in the desk's own words) ───
-// Side: a Daily candle REJECTS a Daily level (a swing low or high of the last 60 trading days, 2 candles a side, or the body
-// edge of that swing candle): it trades through the level and closes back on the other side; then, within 3 days, an H4
+// Side: a Daily candle REJECTS a Daily level (a turn of the Daily CLOSES in the last 60 trading days, 2 candles a side: a V level
+// at a low turn, an A level at a high turn, as on a line chart): it trades through the level and closes back on the other side; then, within 3 days, an H4
 // candle closes beyond the last H4 swing the same way. That side holds until the opposite pair completes. Zones: H4 engulf
 // zones of that side, and opposite H4 zones that failed (they turn). Entry (the plan's first type only; its second, a
 // 15-minute "QM" zone, is not written here): with price in such a zone a 15-minute engulf the same way, a limit at that
@@ -110,8 +114,8 @@ export function snrSides(D1, H4) {
   const ev = [], k = SNR.piv;
   for (let i = 2 * k + 1; i < D1.length; i++) { const c = D1[i], lv = [];
     for (let j = Math.max(k, i - SNR.look); j + k < i; j++) { const b = D1[j]; let lo = true, hi = true;
-      for (let q = 1; q <= k; q++) { if (!(b.low < D1[j - q].low && b.low < D1[j + q].low)) lo = false; if (!(b.high > D1[j - q].high && b.high > D1[j + q].high)) hi = false; }
-      if (lo) lv.push(b.low, Math.min(b.open, b.close)); if (hi) lv.push(b.high, Math.max(b.open, b.close)); }
+      for (let q = 1; q <= k; q++) { if (!(b.close < D1[j - q].close && b.close < D1[j + q].close)) lo = false; if (!(b.close > D1[j - q].close && b.close > D1[j + q].close)) hi = false; }
+      if (lo || hi) lv.push(b.close); }   // a V level (a low turn) or an A level (a high turn) of the CLOSES, as on a line chart
     const up = lv.some((L) => c.low <= L && c.close > L && c.open > L), dn = lv.some((L) => c.high >= L && c.close < L && c.open < L);
     if (up !== dn) ev.push({ t: c.time + 86400, dir: up ? 1 : -1, day: c.time }); }
   // the H4 break that confirms a rejection: a close beyond the last H4 swing (2 a side) formed before it
