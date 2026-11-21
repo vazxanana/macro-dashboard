@@ -1126,5 +1126,89 @@
    },
    "verdict": "FAIL"
   }
+ },
+ "afterTheResult": {
+  "what": "Not pre-registered. After the run a flaw was found in the desks own code: on a LIMIT entry the fill candle counted its favourable extreme (which may have come before the fill) toward the target and the best-so-far. Fixed (only the stop counts on the fill candle) and every reading run again on the same candles. The verdicts above are the pre-registered run; these are the corrected figures.",
+  "tests": {
+   "R1": {
+    "oosN": 978,
+    "oosGross": -0.0595,
+    "oosNet": -0.1718,
+    "t": -2.22,
+    "isNet": -0.0822
+   },
+   "R2": {
+    "oosN": 2112,
+    "oosGross": -0.0436,
+    "oosNet": -0.1128,
+    "t": -2.12,
+    "isNet": -0.1259
+   },
+   "R3": {
+    "oosN": 892,
+    "oosGross": 0.0053,
+    "oosNet": -0.0818,
+    "t": -1.86,
+    "isNet": -0.1043
+   },
+   "R4": {
+    "oosN": 1008,
+    "oosGross": -0.0092,
+    "oosNet": -0.0976,
+    "t": -2.2,
+    "isNet": -0.1554
+   },
+   "R5": {
+    "oosN": 97,
+    "oosGross": -0.052,
+    "oosNet": -0.1368,
+    "t": -0.96,
+    "isNet": -0.1844
+   },
+   "R6": {
+    "oosN": 3957,
+    "oosGross": -0.0382,
+    "oosNet": -0.2999,
+    "t": -11.87,
+    "isNet": -0.3194
+   },
+   "R7": {
+    "oosN": 775,
+    "oosGross": 0.1214,
+    "oosNet": 0.0734,
+    "t": 1.24,
+    "isNet": -0.0469
+   },
+   "C1": {
+    "oosDiff": -0.2292,
+    "t": -1.51,
+    "isDiff": 0.1332
+   },
+   "C2": {
+    "oosDiff": -0.0153,
+    "t": -0.08,
+    "isDiff": -0.0051
+   },
+   "C3": {
+    "oosDiff": 0.0098,
+    "t": 0.13,
+    "isDiff": 0.0248
+   },
+   "C4": {
+    "oosDiff": -0.0679,
+    "t": -0.82,
+    "isDiff": 0.0303
+   },
+   "C5": {
+    "oosDiff": 0.0258,
+    "t": 0.4,
+    "isDiff": 0.0416
+   },
+   "C6": {
+    "oosDiff": 0.0506,
+    "t": 1.51,
+    "isDiff": -0.0245
+   }
+  }
  }
 }

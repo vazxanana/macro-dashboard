@@ -5173,6 +5173,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
     and named at the top or bottom edge with its prices ("▲ Daily EF zone 4103.52 – 4141.60"); a small zone's label sits to
     its left; no tag is drawn over another (`placed`, 20 px steps). Test: `tests/mosha-replay.test.mjs`.
+  - **A limit's fill candle: only the stop counts** (21 Nov 2026, found on the charts). `egOutcome` (`council/edge-desks.mjs`),
+    `outcome` (`council/eg-methods.mjs`) and the Mosha barrier (`assets/mosha-sop.js` `outcome(tr, bars, after, limit)`) counted
+    the fill candle's favourable extreme toward the target, the best-so-far and the trail, though it may have come BEFORE the
+    fill. Now that candle can only stop the trade (the worst case). On the 2026 paper record: engulf plan +112.7R → −106.3R
+    (804 trades), simple +61.1R → −104.9R, direct +4.0R → −20.0R, H1 engulf +118.0R → +82.1R, H4 +21.3R → +5.5R, MSNR gold
+    plan −28.0R → −52.0R; LIT already refused such a candle. `desk-rigor` was run again (RESULT.md "After the result": every
+    limit reading worse, no verdict changed); `desk-slices` T1 / T2 (the engulf reading) were measured with the flaw and failed
+    anyway. Every desk total before this fix was flattered: never quote one.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

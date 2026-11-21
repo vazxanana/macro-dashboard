@@ -52,3 +52,19 @@ R a trade; in sample 2020-2023, out of sample 2024-2025; t on calendar-month sum
 | R5 | −4.5 (32) | +1.7 (30) | −11.5 (55) | −9.5 (45) | −12.2 (42) | +4.9 (55) |
 | R6 | −543.4 (1403) | −326.0 (1171) | −576.1 (2245) | −707.9 (1924) | −520.9 (1746) | −665.9 (2211) |
 | R7 | +12.0 (349) | −42.9 (362) | −13.9 (381) | −15.9 (340) | +47.3 (398) | +13.6 (377) |
+
+## After the result: a flaw in the desks own code, corrected (not pre-registered)
+
+While the charts were being checked a flaw was found: on a LIMIT entry the fill candle counted its favourable extreme toward the target and the best-so-far, although that extreme may have come BEFORE the fill. It flattered every reading that enters by limit. Fixed (on the fill candle only the stop counts) and run again on the same candles. The verdicts above stand as pre-registered; the corrected figures are worse, never better:
+
+| | Reading | OOS net R, as run | corrected | month t, as run | corrected |
+|---|---|---|---|---|---|
+| R1 | Mosha sequence (BO, VR, CF, pullback, EG) | −0.172 | −0.172 | -2.22 | -2.22 |
+| R2 | Mosha barrier entry (D1, H4, H1 barriers) | −0.113 | −0.113 | -2.12 | -2.12 |
+| R3 | Engulf plan (with the Daily) | −0.069 | −0.082 | -1.52 | -1.86 |
+| R4 | Engulf simple (not with the Daily) | −0.068 | −0.098 | -1.44 | -2.2 |
+| R5 | Engulf direct entry (fresh zones) | −0.075 | −0.137 | -0.53 | -0.96 |
+| R6 | MSNR: with the direction | −0.300 | −0.300 | -11.87 | -11.87 |
+| R7 | MSNR gold plan | +0.079 | +0.073 | 1.31 | 1.24 |
+
+R1, R2 and R6 do not change (a market entry, or a target too far for the fill candle). No condition changes its verdict (C5 +0.010 → +0.026, t 0.40). On the desks 2026 paper record the same fix turns the engulf plan from +112.7R to −106.3R (804 trades) and the simple method from +61.1R to −104.9R: gold 5-minute candles of 2026 are often wider than the 30-pip stop and 60-pip target, so the fill candle decided many trades.
