@@ -312,7 +312,7 @@
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-pick button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.ex === spec.id)); });
     $('mo-rp-label').textContent = labelOf(spec);
     // the price scale's decimals follow the market (a forex pair needs five)
-    var dp = ({ eurusd: 5, gbpusd: 5, xag: 3, nas100: 1 })[spec.market] || 2, fitDp = function () { if (R.series && R.series.applyOptions) R.series.applyOptions({ priceFormat: { type: 'price', precision: dp, minMove: Math.pow(10, -dp) } }); };
+    var dpA = root.MS_MOSHA_SOP && root.MS_MOSHA_SOP.ALL && root.MS_MOSHA_SOP.ALL[spec.market], dp = dpA ? dpA.dec : ({ eurusd: 5, gbpusd: 5, xag: 3, nas100: 1 })[spec.market] || 2, fitDp = function () { if (R.series && R.series.applyOptions) R.series.applyOptions({ priceFormat: { type: 'price', precision: dp, minMove: Math.pow(10, -dp) } }); };
     // a trade of the desk's own record is not one of the screenshot examples: the card says which it is showing
     var hd = card.querySelector('.ms-k'); if (hd) { if (!hd.dataset.h0) hd.dataset.h0 = hd.innerHTML; if (spec.rp) hd.innerHTML = '<span>This trade, on the chart</span><small>what the desk read, step by step, on our candles · times in UTC</small>'; else if (hd.innerHTML !== hd.dataset.h0) { hd.innerHTML = hd.dataset.h0; var I = root.MS_MOSHA_I18N; if (I && I.apply) I.apply(hd); } }
     if (scroll) card.scrollIntoView({ block: 'start', behavior: 'smooth' });
