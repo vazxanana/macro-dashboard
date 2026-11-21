@@ -130,7 +130,8 @@
     "t1": 60593.35,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 59362.2,
@@ -145,7 +146,11 @@
     "lagSec": 134,
     "positionId": "50662695",
     "volume": 1,
-    "status": "open"
+    "status": "closed by council",
+    "closedAt": "2026-11-21T13:37:04.000Z",
+    "exitPrice": 60224.83,
+    "councilExit": 60593.35,
+    "councilR": 0.28
    }
   },
   "day": {
@@ -153,7 +158,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000.72 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 10000.72 · 3 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -167,7 +172,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10000.72,
-  "lastRun": "2026-11-21T13:35:10.000Z"
+  "lastRun": "2026-11-21T13:37:04.000Z"
  },
  "log": [
   {
@@ -314,6 +319,11 @@
   {
    "at": "2026-11-21T13:26:14.000Z",
    "msg": "limit filled: BTCUSD position 50662695 at the broker",
+   "trade": "btc-rswing-1795267415"
+  },
+  {
+   "at": "2026-11-21T13:37:04.000Z",
+   "msg": "closed BTCUSD position 50662695 (council: win)",
    "trade": "btc-rswing-1795267415"
   }
  ],
