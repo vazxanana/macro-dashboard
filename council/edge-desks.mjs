@@ -23,7 +23,7 @@ import { bars, merge } from './mosha-desk.mjs';
 import { P, cleanBars, agg15, series, fbosCandidates, XAU } from './lit.mjs';
 import { managePosition } from '../research/edge/lit/run.mjs';
 import * as MS from '../research/edge/msnr-entry/run.mjs';
-import { methodTrades, snrTrades } from './eg-methods.mjs';
+import { methodTrades, snrTrades, direction, KEY_NAME } from './eg-methods.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
@@ -168,11 +168,13 @@ export function msnrTrades(B, { from, market = 'xau' } = {}) {
   const q = market === 'xau' ? 1 : M5[M5.length - 1].close / 4000, keep = { PAD: MS.P.PAD, MIN_R0: MS.P.MIN_R0 }; let cand;
   try { MS.P.PAD = keep.PAD * q; MS.P.MIN_R0 = keep.MIN_R0 * q; cand = MS.candidates(M5).cand; } finally { MS.P.PAD = keep.PAD; MS.P.MIN_R0 = keep.MIN_R0; }
   // the call from a long H4 history (hourly candles grouped into the study's own UTC 4-hour buckets), as known at the trigger's close
-  const H4 = MS.group(H1.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), MS.bucket(MS.P.H4)), dir = MS.calls(H4, MS.dayKey).call;
+  const H4 = MS.group(H1.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), MS.bucket(MS.P.H4)), D = direction(H4, MS.dayKey, 86400), dir = D.call;
+  const M15g = MS.group(M5, MS.bucket(MS.P.M15)), lower15 = (t) => { let lo = 0, hi = M15g.length - 1; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (M15g[m].time <= t) lo = m; else hi = m - 1; } return lo; };
   const out = []; let h = -1, busy = -Infinity;
   for (const c of cand) {
     while (h + 1 < H4.length && H4[h + 1].time + MS.P.H4 <= c.trig + MS.P.M5) h++;
     const call = h >= 0 ? dir[h] : 0; if (!call || c.side !== call || c.t <= busy) continue;
+    const ev = D.last[h] >= 0 ? D.events[D.last[h]] : null;
     const d = c.side, r0 = d * (c.entry - c.stop); if (!(r0 > 0)) continue;
     const o = MS.simulate(M5, { ...c, r0 }, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
@@ -181,7 +183,10 @@ export function msnrTrades(B, { from, market = 'xau' } = {}) {
     const tr = { id: `${market === 'xau' ? '' : market + ':'}msnr-${d > 0 ? 'b' : 's'}-${c.t}`, market, kind: main ? 'msnr-main' : 'msnr-other', label: main ? 'MSNR · 12-16 UTC' : 'MSNR · other hours', h: '4h', l: '5m', side: d, t: c.t,
       entry: c.entry, stop: c.stop, target, r0, status, R, endT: o ? o.closed : null, exit: o ? o.exitPx : null, mfe, float: fl };
     tr.log = [
-      { t: H4[h].time + MS.P.H4, text: `Direction call on H4 with the Daily key levels: ${word(d)} (as known at the close of the last H4 candle).` },
+      ...(ev ? [{ t: ev.zoneAt, text: `Daily ${d > 0 ? 'buy' : 'sell'}-side key level: ${KEY_NAME[ev.kind]} ${f(ev.bottom)} to ${f(ev.top)}.` },
+        { t: ev.tapT, text: `Price tapped it while H4 was still breaking ${d > 0 ? 'down' : 'up'}. The last H4 ${d > 0 ? 'A' : 'V'} level before the tap, ${f(ev.level)}, is the external one.` },
+        { t: ev.t + MS.P.H4, text: `An H4 candle closed ${d > 0 ? 'above' : 'below'} ${f(ev.level)}: an external BO ${word(d)} after a tapped Daily level. Direction ${word(d)}.` }]
+        : [{ t: H4[h].time + MS.P.H4, text: `Direction ${word(d)} on H4 with the Daily key levels (as known at the close of the last H4 candle).` }]),
       { t: c.setup, text: `A 15-minute body engulf ${word(d)} closed: the entry is armed for 45 minutes.` },
       { t: c.trig + MS.P.M5, text: `A 5-minute body engulf ${word(d)} closed inside that time. ${d > 0 ? 'Buy' : 'Sell'} at the next 5-minute open ${f(c.entry)}, stop ${f(c.stop)} (risk ${f(r0)}), target ${f(target)} (${MSNR.rr}R), out after 12 hours.` },
       !o ? { t: null, text: 'Still open on the last candle read' + (fl != null ? ` (${fl >= 0 ? '+' : '−'}${Math.abs(fl).toFixed(2)}R now).` : '.') }
@@ -189,7 +194,11 @@ export function msnrTrades(B, { from, market = 'xau' } = {}) {
           : status === 'time' ? { t: o.closed, text: `Time limit: closed at ${f(o.exitPx)}, ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }
             : { t: o.closed, text: `Stopped: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R` + (mfe >= 1 ? ` after running +${mfe.toFixed(1)}R first.` : '.') }];
     const i0 = c.i - 1, hi = Math.max(M5[i0].high, M5[i0 - 1].high), lo = Math.min(M5[i0].low, M5[i0 - 1].low);
-    tr.marks = [{ kind: 'zone', top: hi, bot: lo, a: M5[i0 - 1].time, at: c.trig + MS.P.M5, label: 'M5 engulf' }];
+    const j15 = lower15(c.setup - MS.P.M15), e15 = j15 > 0 ? [M15g[j15 - 1], M15g[j15]] : null;
+    tr.marks = (ev ? [{ kind: 'zone', top: ev.top, bot: ev.bottom, a: ev.zoneT, at: ev.zoneAt, label: 'Daily ' + ({ v: 'V level', a: 'A level', eg: 'EG zone', ef: 'EF zone', dom: 'DOM zone' })[ev.kind] },
+      { kind: 'level', p: ev.level, a: ev.levelT, at: ev.t + MS.P.H4, label: `H4 ${d > 0 ? 'A' : 'V'} level · BO ${word(d)}`, under: d < 0 }] : [])
+      .concat(e15 && e15[1].time === c.setup - MS.P.M15 ? [{ kind: 'zone', top: Math.max(e15[0].high, e15[1].high), bot: Math.min(e15[0].low, e15[1].low), a: e15[0].time, at: c.setup, label: 'M15 EG' }] : [],
+        [{ kind: 'zone', top: hi, bot: lo, a: M5[i0 - 1].time, at: c.trig + MS.P.M5, label: 'M5 EG' }]);
     out.push(tr); }
   return out;
 }

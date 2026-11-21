@@ -32,8 +32,8 @@ test('the replay finds entries of both kinds, each with a stop on its losing sid
     const ts = r.log.map((x) => x.t).filter(Boolean); assert.deepEqual(ts, ts.slice().sort((a, b) => a - b), 'the log runs in time order');
     if (r.status === 'stopped') assert.equal(r.R, -1); if (r.status === 'target') assert.ok(r.R > 0); if (r.status === 'open') assert.equal(r.R, null);
   }
-  for (const r of sop) { assert.match(r.log[0].text, /BO (buy|sell)/); assert.match(r.log[1].text, / VR: the first break against the BO/); assert.match(r.log[2].text, / CF.*break back with the BO/); }
-  for (const r of bar) { assert.match(r.log[0].text, /barrier: a fresh (supply|demand) zone/); assert.match(r.log[2].text, /QM with the barrier/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - M.BARRIER_R) < 1e-9); }
+  for (const r of sop) { assert.match(r.log[0].text, /BO (buy|sell)/); assert.match(r.log[1].text, / VR: the first BO Structure \(QM\) against the BO/); assert.match(r.log[2].text, / CF.*BO Structure \(QM\) back with the BO/); assert.ok(r.deep === null || typeof r.deep === 'boolean'); }
+  for (const r of bar) { assert.match(r.log[0].text, /barrier: a fresh (supply|demand) zone/); assert.match(r.log[2].text, / CF: a QM \(BO Structure\)/); assert.match(r.log[3].text, /pulled back to the level/); assert.deepEqual([r.h, r.l], M.BARRIER.find((p) => p[0] === r.h), 'the confirmation timeframe of the method\'s table'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - M.BARRIER_R) < 1e-9); }
 });
 
 test('no look-ahead: an entry found with the candles cut at a moment is the entry found with everything after it', () => {

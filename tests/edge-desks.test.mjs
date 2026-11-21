@@ -112,3 +112,31 @@ test('MSNR desk: entries with the call only, the study\'s own functions and cons
   const egSrc = rd('council/eg-methods.mjs'); assert.doesNotMatch(egSrc, /ctrader|alerts\.mjs|trader\.mjs|sendAlerts|fetch\(/, 'a paper reading: no order, alert, network or Trader code');
   assert.doesNotMatch(egSrc + src, /L3XUS|LEXUS|t\.me\//i, 'the documents are read in the desk\'s own words, never named or copied');
 });
+
+test('the direction reading: every switch names a tapped key level of the timeframe above and the external level it broke, nothing reads ahead', () => {
+  let s = 77; const rnd = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+  const H4 = []; let p = 4000, drift = 0;
+  for (let i = 0, t = 1767571200; i < 2400; i++, t += 14400) { if (new Date(t * 1000).getUTCDay() % 6 === 0) continue; if (i % 40 === 0) drift = (rnd() - 0.5) * 12;
+    const o = p, c = o + drift + (rnd() - 0.5) * 30, h = Math.max(o, c) + rnd() * 8, l = Math.min(o, c) - rnd() * 8; H4.push({ time: t, open: o, high: h, low: l, close: c }); p = c; }
+  const day = (t) => Math.floor(t / 86400) * 86400, D = G.direction(H4, day, 86400);
+  assert.ok(D.events.length >= 5, 'switches: ' + D.events.length);
+  let prev = 0;
+  for (const e of D.events) {
+    assert.ok(['v', 'a', 'eg', 'ef', 'dom'].includes(e.kind)); assert.ok(e.top > e.bottom);
+    assert.ok(e.zoneAt <= e.tapT + 14400 && e.tapT <= e.t, 'the zone is known and tapped before the break'); assert.ok(e.levelT < e.tapT, 'the level existed before the tap: external');
+    assert.ok(e.s > 0 ? H4[e.i].close > e.level : H4[e.i].close < e.level, 'a close beyond the level'); assert.notEqual(e.s, prev); prev = e.s;
+    assert.equal(D.call[e.i], e.s); assert.equal(D.events[D.last[e.i]], e); }
+  for (let i = 1; i < H4.length; i++) if (D.call[i] !== D.call[i - 1]) assert.ok(D.events.some((e) => e.i === i), 'the direction changes only at a switch');
+  // cut at a candle: the reading up to it is unchanged; and with every later price moved, unchanged too
+  const N = 1100, cut = G.direction(H4.slice(0, N), day, 86400), moved = G.direction(H4.map((b, i) => (i < N ? b : { time: b.time, open: b.open + 500, high: b.high + 500, low: b.low + 500, close: b.close + 500 })), day, 86400);
+  for (let i = 0; i < N; i++) { assert.equal(cut.call[i], D.call[i]); assert.equal(moved.call[i], D.call[i]); }
+  // an A level is a turn of the closes, not a wick
+  const src = fs.readFileSync(new URL('../council/eg-methods.mjs', import.meta.url), 'utf8');
+  assert.match(src, /lastA = \{ p: x\.close/); assert.match(src, /add\(1, 'v', x\.low, x\.close/); assert.match(src, /add\(-z\.s, 'ef'/);
+});
+
+test('every desk record carries the key levels its reading used as chart marks', () => {
+  const src = fs.readFileSync(new URL('../council/eg-methods.mjs', import.meta.url), 'utf8') + fs.readFileSync(new URL('../council/edge-desks.mjs', import.meta.url), 'utf8');
+  for (const l of ['Daily EG zone', 'H4 EG zone', 'M15 EG zone', 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'H4 BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
+    assert.ok(src.includes(l), 'mark: ' + l);
+});

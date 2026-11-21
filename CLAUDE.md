@@ -5139,6 +5139,24 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     +22.0R, direct 42 −6.0R); MSNR 6,912 (other hours 5,208 −191.6R, 12-16 UTC 1,416 −64.1R, gold plan 288 −48.0R).
     PAPER RECORDS of readings with no costs: never an edge (`desk-slices` showed the engulf reading is zero before costs on
     2020-26 and loses after them; `msnr-entry` FAILED). Tests: `tests/edge-desks.test.mjs`.
+  - **Marking audit: the desks follow the methods' own definitions** (21 Nov 2026, owner: "make sure you are marking the key levels
+    such as V level, engulfing, EG fail, BO, VR, CF … some of them you are not following the strategy rigorously"). Checked
+    against the owner's private documents (never copied) and fixed: (1) **Mosha sequence**: the VR and the CF must each be a BO
+    Structure (a QM, `e.structure !== false` in `msMosha`; `sopTrades` now hands the flag over), never a continuation break; a
+    record carries `deep` (did the pullback reach 50% of the range before the CF: recorded, not required, by the owner's 13 Nov
+    reading) and a "50% of the range" mark. (2) **Barrier entry** (`assets/mosha-sop.js` `BARRIER`): the method's own table, D1
+    barrier confirmed on H1, H4 on M15, H1 on M5, M15 on M1 (it was H1 and M15 barriers both on M1); the CF is a QM on that
+    timeframe within `BARRIER_WATCH` 60 candles of the first touch, and the entry is the PULLBACK to the level it broke (a limit
+    for `BARRIER_FILL` 12 candles, read on the finest candles; it was a market entry at the QM close); label "H4 barrier · BO
+    origin" / "iBO origin". (3) **Engulf zones** are BODY engulfs, zone from the pair's wick to the engulfed candle's open
+    (`zones`); **A / V levels are turns of the CLOSES** (line chart), never wicks. (4) **MSNR direction** is the desk's own
+    `council/eg-methods.mjs` `direction(work, keyOf, htfSec)` (the failed study's detector is no longer used for the call):
+    Daily key levels = V / A levels, EG zones, EF (an EG zone that failed, turned) and the dominant pair; a switch needs a
+    tapped Daily level and an H4 close beyond the last A / V level that existed BEFORE the tap (external); `events[]` carries
+    the zone, the tap and the level. (5) **Every record's chart marks name its key levels** ("Daily V level", "Daily EG zone",
+    "H4 A level · BO buy", "H4 EF (zone failed)", "M15 EG zone", "M5 EF (zone failed)", "M5 EG zone · entry", "M5 VR",
+    "M5 CF zone", "M15 CF (QM)"; `clean` keeps 8 marks). Not written, said on the desks: open-close levels, the gold plan's
+    second entry type, "mark the BEST barrier" (every fresh BO / iBO origin is taken). These are readings, not tested rules.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

@@ -45,7 +45,7 @@
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
-<script src="/assets/mosha-sop.js?v=3bc2cc8662" defer></script>
+<script src="/assets/mosha-sop.js?v=bbdd234c68" defer></script>
 <script src="/assets/mosha-replay.js?v=824d934fc4" defer></script>
 <script src="/assets/desk-trades.js?v=f332e9398a" defer></script>
 <script src="/assets/mosha-i18n.js?v=bad32e2787" defer></script>
@@ -7593,7 +7593,10 @@ function msMosha(htf, ltf, buf) {
   if (!htf || !htf.dir || !ltf || !ltf.bars || !ltf.bars.length) return null;
   const d = htf.dir, s = -d, L = htf.level, B = ltf.bars, ev = (ltf.events || []).filter((e) => e && e.t > htf.t), b0 = buf || 0;
   const out = { dir: d, side: d, htf, barrier: L, state: 'wait-vr' };
-  const vi = ev.findIndex((e) => e.dir === s);
+  // 21 Nov 2026 (owner: "not following the strategy rigorously"): the VR and the CF must each be a BO Structure (a QM: the
+  // break that turns this chart's own structure), never a continuation break. An event with no flag (hand-made) is taken as given.
+  const qm = (e) => e.structure !== false;
+  const vi = ev.findIndex((e) => e.dir === s && qm(e));
   if (vi < 0) return out;
   const V = ev[vi], span = B.filter((b) => b.time >= htf.t && b.time <= V.t);
   if (!span.length) return out;
@@ -7603,7 +7606,7 @@ function msMosha(htf, ltf, buf) {
   out.state = 'wait-cf';
   if (isFinite(htf.far)) { out.p50 = (htf.far + x) / 2; const since = B.filter((b) => b.time > xt); out.deep = since.some((b) => (d > 0 ? b.low <= out.p50 : b.high >= out.p50)); }
   const past = (e) => (d > 0 ? e.level >= x : e.level <= x), withBo = ev.slice(vi + 1).filter((e) => e.dir === d);
-  const cands = []; for (const e of withBo) { if (past(e)) break; cands.push(e); }
+  const cands = []; for (const e of withBo) { if (past(e)) break; if (qm(e)) cands.push(e); }
   const gone = withBo.find(past);
   if (!cands.length) { if (gone) out.state = 'bo-on'; return out; }   // closed beyond the VR's extreme with no CF: the BO goes on
   const failOf = (C) => { const zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot); const f = B.find((b) => b.time > C.t && (d > 0 ? b.close < zl : b.close > zh)); return f || null; };
