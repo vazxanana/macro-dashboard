@@ -42,7 +42,7 @@
       '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + SOP.unit(mk(r)) + fP(r, r.r0) + '</p></li>';
   }
   function rowHTML(S, r) {
-    var res = r.R == null ? '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '') : '<b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + fR(r.R) + '</b> · ' + (EXIT[r.status] || r.status);
+    var res = r.R == null ? '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '') : '<b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + fR(r.R) + '</b> · ' + (EXIT[r.status] || esc(r.status));
     var op = !!S.open[r.id];
     return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(r.label || r.kind) + ' · ' + esc(nm(r)) + '</small></td>' +
       '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span>' + (r.src ? ' <small class="mo-sop-src">' + (r.src === 'live' ? 'live' : 'replay') + '</small>' : '') + '</td>' +
@@ -98,7 +98,7 @@
     if (b.hasAttribute('data-dk-src')) { S.src = b.getAttribute('data-dk-src'); S.all = false; draw(k); return; }
     var id = b.getAttribute('data-dk-log') || b.getAttribute('data-dk-chart'), r = (S.rows || []).filter(function (x) { return x.id === id; })[0]; if (!r) return;
     if (b.hasAttribute('data-dk-log')) { S.open[id] = !S.open[id]; draw(k); var nb = $('v-' + k).querySelector('[data-dk-log="' + (root.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); if (nb) nb.focus(); return; }
-    var T = { replayed: true, name: (r.label || r.kind) + ' · ' + nm(r), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mk(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R };
+    var T = { replayed: true, name: (r.label || r.kind) + ' · ' + nm(r), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mk(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R, how: r.status };
     // the chart opens over the page (the replay card in a dialog inside this desk's view), never by scrolling down to it
     if (typeof root.msMoshaReplayDialog === 'function') root.msMoshaReplayDialog(T, $('v-' + k)); else if (typeof root.msMoshaReplayTrade === 'function' && borrowChart(k)) root.msMoshaReplayTrade(T);
   });

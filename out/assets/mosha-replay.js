@@ -144,6 +144,13 @@
   function outcome(spec, bars) {
     var s = spec.side === 'sell' ? -1 : 1, r0 = Math.abs(spec.entry - spec.stop), i, fi = -1;
     if (!(r0 > 0) || !bars || !bars.length) return { fill: null };
+    // a trade of a desk's own record is SHOWN as it was booked: its fill candle, its exit price and time, its R and how it ended
+    // (a trailing stop, a time limit, break-even, the day's end, a gap). The chart never works a second result out for it.
+    if (spec.stored) { var st = spec.stored, f0 = barAt(bars, st.at); if (f0 < 0 || bars[f0].time + 300 <= st.at - 300) return { fill: null };
+      var o2 = { fill: bars[f0].time, fillI: f0, exit: null, exitI: null, kind: 'open', R: null, worst: 0, how: st.how || '' }, x0 = st.exitAt != null ? Math.max(f0, barAt(bars, st.exitAt)) : -1;
+      if (st.exitAt != null && st.R != null && bars[bars.length - 1].time + 300 > st.exitAt) { o2.exit = bars[x0].time; o2.exitI = x0; o2.kind = 'stored'; o2.px = st.exit; o2.R = +(+st.R).toFixed(2); }
+      for (i = f0 + 1; i <= (o2.exitI != null ? o2.exitI : bars.length - 1); i++) { var w2 = (s < 0 ? bars[i].high - spec.entry : spec.entry - bars[i].low) / r0; if (w2 > o2.worst) o2.worst = w2; }
+      o2.worst = +Math.max(0, Math.min(o2.worst, o2.R != null && o2.R < 0 ? Math.max(1, -o2.R) : o2.worst)).toFixed(2); return o2; }
     for (i = 0; i < bars.length; i++) if (bars[i].time >= spec.fillFrom && bars[i].low <= spec.entry && bars[i].high >= spec.entry) { fi = i; break; }
     if (fi < 0) return { fill: null };
     var out = { fill: bars[fi].time, fillI: fi, exit: null, exitI: null, kind: 'open', R: null, worst: 0 };
@@ -172,7 +179,7 @@
   function specOfTrade(t, now) {
     var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400), to = Math.max(end, t.at + 3600);
     var sp = { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, rp: !!t.replayed, label: t.replayed ? 'From the replay' : 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
-      from: t.at - 12 * 3600, to: to, fillFrom: t.at - 300, exit: !t.replayed && t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
+      from: t.at - 12 * 3600, to: to, fillFrom: t.at - 300, stored: t.replayed ? { at: t.at, exit: t.exit, exitAt: t.status === 'closed' ? t.exitAt : null, R: t.status === 'closed' ? t.R : null, how: t.how || '' } : null, exit: !t.replayed && t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
       yours: t.status === 'closed' && t.R != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'still open',
       steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before the entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
     // a trade of the desk's own replay brings what it was built from: its marks (BO level, VR, CF zone, barrier) and its log as the steps
@@ -245,7 +252,7 @@
     var cv = $('mo-rp-ov'), host = $('mo-rp-chart'); if (!cv || !host || !R.chart || !R.bars || !R.spec) return;
     var dpr = Math.min(root.devicePixelRatio || 1, 2), W = host.clientWidth, H = host.clientHeight; if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
     var x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
-    var ts = R.chart.timeScale(), plotW = ts.width(), plotH = H - 26, C = COL(), now = R.bars[R.cur].time + R.tf - 1, sp = R.spec;
+    var ts = R.chart.timeScale(), plotW = ts.width(), plotH = H - 26, C = COL(), now = nowOf(), sp = R.spec;
     var X = function (t) { var i = barAt(R.bars, t); if (i < 0) i = 0; var v = ts.logicalToCoordinate(i); return v == null ? null : v; }, Y = function (p) { var v = R.series.priceToCoordinate(p); return v == null ? null : v; };
     x.save(); x.beginPath(); x.rect(0, 0, plotW, plotH); x.clip(); x.font = '600 12px ' + css('--sans', 'system-ui, sans-serif'); x.textBaseline = 'middle';
     var narrow = plotW < 520;   // a phone: only the labels that carry the trade
@@ -269,29 +276,32 @@
       else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(L(m.label), x1 + 6, (yt + yb) / 2, C.level); }
     });
     // the position: red band entry to stop, grey band entry to target, from the fill to the exit (or to now)
-    var oc = R.oc; if (oc && oc.fill != null && oc.fill <= now) {
-      var a = X(oc.fill), b = X(oc.exit != null && oc.exit <= now ? oc.exit : now), ye = Y(sp.entry), ys = Y(sp.stop), yg = sp.target != null ? Y(sp.target) : null;
+    var oc = R.oc; if (oc && oc.fill != null && (oc.fill <= now || R.before)) {
+      var a = R.before ? X(R.bars[R.cur].time) : X(oc.fill), b = R.before ? (a == null ? null : a + 90) : X(oc.exit != null && oc.exit <= now ? oc.exit : now), ye = Y(sp.entry), ys = Y(sp.stop), yg = sp.target != null ? Y(sp.target) : null;
       if (a != null && b != null && ye != null && ys != null) { if (b < a + 6) b = a + 6;
         x.fillStyle = C.stop; x.fillRect(a, Math.min(ye, ys), b - a, Math.abs(ys - ye)); if (yg != null) { x.fillStyle = C.tgt; x.fillRect(a, Math.min(ye, yg), b - a, Math.abs(yg - ye)); }
         x.strokeStyle = C.ink; x.lineWidth = 1; x.beginPath(); x.moveTo(a, ye + .5); x.lineTo(b, ye + .5); x.stroke();
         if (b - a >= 200) tag('Stop ' + sp.stop, b - 96, ys + (sp.side === 'sell' ? 11 : -11), light() ? '#c2185b' : '#ff8fab'); else if (!narrow) tag('Stop ' + sp.stop, b + 6, ys, light() ? '#c2185b' : '#ff8fab');   /* a position too narrow on screen for its tags: the stop's goes beside it (on a phone the line above the chart names it) */ tag((sp.side === 'sell' ? 'Sell ' : 'Buy ') + sp.entry, a + 4, ye + (sp.side === 'sell' ? -11 : 11), C.ink); if (yg != null) tag('Target ' + sp.target, b - 108, yg + (sp.side === 'sell' ? -11 : 11), C.ink);
-        if (oc.exit != null && oc.exit <= now && oc.px != null) { var yx = Y(oc.px); if (yx != null) { x.fillStyle = oc.R > 0 ? css('--buy', '#089981') : css('--sell', '#f23645'); x.beginPath(); x.arc(b, yx, 5, 0, 7); x.fill(); } } }
+        if (!R.before && oc.exit != null && oc.exit <= now && oc.px != null) { var yx = Y(oc.px); if (yx != null) { x.fillStyle = oc.R > 0 ? css('--buy', '#089981') : css('--sell', '#f23645'); x.beginPath(); x.arc(b, yx, 5, 0, 7); x.fill(); } } }
     }
     x.restore();
   }
   function caption() {
     if (!R.bars || !R.bars.length) return;
-    var now = R.bars[R.cur].time + R.tf - 1, k = stepAt(R.steps, now), box = $('mo-rp-cap'), st = $('mo-rp-steps');
+    var now = nowOf(), k = stepAt(R.steps, now), box = $('mo-rp-cap'), st = $('mo-rp-steps');
     if (box) { var txt = k < 0 ? L('Press play, or step through.') : L('{a} of {b}', { a: k + 1, b: R.steps.length }) + ' · ' + L(R.steps[k].text); if (box.textContent !== txt) box.textContent = txt; }
     if (st) Array.prototype.forEach.call(st.children, function (b, i) { b.setAttribute('aria-current', i === k ? 'step' : 'false'); b.classList.toggle('done', i < k); });
     var clock = $('mo-rp-clock'); if (clock) clock.textContent = utc(R.bars[R.cur].time); var sl = $('mo-rp-slider'); if (sl && +sl.value !== R.cur) sl.value = R.cur;
     var pl = $('mo-rp-play'); if (pl) { pl.textContent = R.timer ? L('Pause') : R.cur >= R.bars.length - 1 ? L('Play again') : L('Play'); pl.setAttribute('aria-pressed', R.timer ? 'true' : 'false'); }
   }
-  function show(i) { if (!R.bars) return; R.cur = Math.max(0, Math.min(R.bars.length - 1, i)); R.series.setData(R.bars.slice(0, R.cur + 1)); caption(); requestAnimationFrame(paint); }
+  // the moment the chart stands at: the end of its last candle; in Before, the entry itself (what was known when the trade was
+  // entered: a level confirmed by the close of the last candle is there, the outcome is not)
+  function nowOf() { var n = R.bars[R.cur].time + R.tf - 1; return R.before && R.spec && R.spec.stored ? Math.max(n, R.spec.stored.at) : n; }
+  function show(i) { if (!R.bars) return; var wasB = R.before; R.before = false; if (wasB) result(); R.cur = Math.max(0, Math.min(R.bars.length - 1, i)); R.series.setData(R.bars.slice(0, R.cur + 1)); caption(); requestAnimationFrame(paint); }
   function stop() { if (R.timer) { clearInterval(R.timer); R.timer = 0; } caption(); }
   function play() { if (!R.bars) return; if (R.timer) return stop(); if (R.cur >= R.bars.length - 1) show(0);
     var ms = (SPEEDS.filter(function (s) { return s[0] === R.speed; })[0] || SPEEDS[0])[1] * (R.tf <= 300 ? 1 : R.tf <= 900 ? 1.6 : 2.4);
-    R.timer = setInterval(function () { if (R.cur >= R.bars.length - 1 || !$('mo-rp-chart') || $('v-mosha').hidden) return stop(); show(R.cur + 1); }, ms); caption(); }
+    R.timer = setInterval(function () { if (R.cur >= R.bars.length - 1 || !$('mo-rp-chart') || !$('mo-rp-chart').offsetParent) return stop();   /* the card is on screen wherever it sits: on the Mosha desk or lent to another desk's dialog */ show(R.cur + 1); }, ms); caption(); }
   function setTf(sec, keep) {
     var t = keep && R.bars ? R.bars[R.cur].time : null; R.tf = sec; R.bars = aggBars(R.base, sec, sec === 14400 ? R.spec.h4off : 0);
     var lo = Infinity, hi = -Infinity; R.bars.forEach(function (b) { if (b.low < lo) lo = b.low; if (b.high > hi) hi = b.high; });
@@ -305,13 +315,18 @@
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-tf button'), function (b) { b.setAttribute('aria-pressed', String(+b.dataset.tf === sec)); });
     show(t != null ? Math.max(0, barAt(R.bars, t)) : R.bars.length - 1); R.chart.timeScale().setVisibleLogicalRange({ from: -1, to: R.bars.length + 3 });
   }
+  // how a desk's stored trade ended, in words (the stored status)
+  var HOW = { target: 'target reached', stopped: 'stopped', trail: 'trailing stop', time: 'time limit', breakeven: 'stopped at break-even', dayend: 'closed at the day\'s end' };
   function result() {
     var el = $('mo-rp-res'), oc = R.oc, sp = R.spec; if (!el) return;
+    // Before: the chart as it stood at the entry says nothing of how the trade went
+    if (R.before && sp.entry != null) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + L('Before: the chart as it stood at the entry. The result is under After.') + '</small>'; return; }
     if (sp.entry == null && !sp.watch) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + L('marks only, no position') + '<small>' + esc(L(sp.label || '')) + '.</small>'; return; }   // a lesson the desk marked without a trade
     if (sp.entry == null) { var f = follow(sp, R.base), dn = sp.side === 'sell';   // a picture without a position
       el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + L('no position is drawn on this screenshot') + '<small>' + L('On our candles:') + ' ' + esc(!f ? L('the candle it points at is not in the feed') : L(dn ? 'the {t} candle closed at {px}. After it price went {w} up at most, then {b} down, to {bp} at {bt}' : 'the {t} candle closed at {px}. After it price went {w} down at most, then {b} up, to {bp} at {bt}', { t: utc(f.t), px: f.px.toFixed(1), w: f.worst.toFixed(1), b: f.best.toFixed(1), bp: f.bestPx.toFixed(1), bt: utc(f.bestT) })) + '.</small>'; return; }
     var v = oc && oc.fill != null ? { f: utc(oc.fill), x: oc.exit != null ? utc(oc.exit) : '', r: fR(oc.R), w: oc.worst.toFixed(2) } : null;
     var ours = !v ? L('the entry price was not traded on our candles at that time') : oc.kind === 'target' ? L('filled {f}, target reached {x} ({r}), worst point {w}R against', v)
+      : oc.kind === 'stored' ? L('filled {f}, {h} {x} ({r}), worst point {w}R against', { f: v.f, x: v.x, r: v.r, w: v.w, h: L(HOW[oc.how] || 'closed') })
       : oc.kind === 'stop' ? L('filled {f}, stop touched {x}', v) : oc.kind === 'hand' ? L('filled {f}, closed {x} ({r}), worst point {w}R against', v) : L('filled {f}, neither stop nor target by the end of the window', v);
     // whose figure the first one is: the lesson's, the log's, or the one written on the screenshot (never "you": every reader sees this card)
     el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? L('The lesson:') : sp.rp ? L('In the replay:') : sp.log ? L('In the log:') : L('On the screenshot:')) + ' ' + esc(yoursOf(sp)) + '. ' + L('On our candles:') + ' ' + esc(ours) + '.</small>';
@@ -374,7 +389,9 @@
   // Before = the chart as it stood at the entry; After = the whole trade. Display only.
   var HOME = null;
   function dlgAt(which) { if (!R.bars || !R.spec) return; stop(); var t0 = R.oc && R.oc.fill != null ? R.oc.fill : R.spec.fillFrom != null ? R.spec.fillFrom + 300 : R.bars[0].time;
-    show(which === 'before' ? Math.max(0, barAt(R.bars, t0)) : R.bars.length - 1);
+    // Before ends at the last candle that had CLOSED when the trade was entered: the candle that holds the fill is not drawn
+    if (which === 'before') { var em = R.spec.stored ? R.spec.stored.at : t0, fb = barAt(R.bars, em); while (fb >= 0 && R.bars[fb].time + R.tf > em) fb--; show(Math.max(0, fb)); R.before = true; result(); caption(); requestAnimationFrame(paint); }
+    else show(R.bars.length - 1);
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-dlg [data-rpd="before"], #mo-rp-dlg [data-rpd="after"]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-rpd') === which)); }); }
   function dlgBack() { stop(); var card = $('mo-replay'); if (card && HOME && HOME.parentNode && card.previousSibling !== HOME) HOME.parentNode.insertBefore(card, HOME.nextSibling); if (HOME) { HOME.hidden = true; HOME.style.cssText = ''; } R.onReady = null; if (R.bars) requestAnimationFrame(paint); }
   root.msMoshaReplayDialog = function (t, host) {

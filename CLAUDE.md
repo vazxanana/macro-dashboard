@@ -5217,6 +5217,19 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     just before the working chart's BO the other way now counts (`q.opp`: a BO the other way at the tap or after it), and a
     switch's zone is marked from when it was known (`known`). Left: `merge`'s 20-minute near-duplicate rule; the LIT and
     MSNR size scale still reads the newest price; engulf life and hold are calendar time (as the live rule).
+  - **Third independent audit: the store and the chart** (21 Nov 2026). The store held up (closed records frozen, no
+    record lost or stuck on the Engulfing and LIT desks over 1,235 rolling runs; tiles, calendar and filters equal the
+    records). Fixed: (1) **a desk trade's chart shows the trade as BOOKED** (`spec.stored`, `how` = the stored status):
+    the chart used to work a second result out from the first stop and target, so a trailing-stop win read "neither stop nor
+    target", a time exit "stop touched", a stored loss on a limit's fill candle "target reached"; now "filled …, trailing
+    stop … (+1.07R)". The owner's own log and the examples are still worked out on the candles. (2) **Before** ends at the
+    last candle CLOSED at the entry (it drew the fill candle and sometimes the exit), shows the planned entry / stop /
+    target and the marks known by then (`nowOf`), and its line says nothing of the result. (3) **Play** stopped at once on
+    the LIT, Engulfing and MSNR dialogs (it tested the Mosha view): it follows the card. (4) `merge` `near()` dropped a real
+    re-entry within 20 minutes of a closed trade (3 of about 270 MSNR records): only a record at the same price while the
+    stored one has not ended is the same trade. (5) the one unescaped record field on the desk rows. Known, left: a
+    `--days` backfill of barriers is not exactly what the loop would have recorded (zones read the whole history given); an
+    open record the run no longer reads stays open (not seen in practice: the longest ran 5.8 days of a 14-day window).
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

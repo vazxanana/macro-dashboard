@@ -85,7 +85,10 @@ export function clean(r) {
 // stamped with when the tracker first saw it (`first`) and whether that was while it was live (`src`).
 export function merge(prev, fresh, now, feed = 'OANDA') {
   const old = new Map((prev || []).map((r) => [r.id, r])), out = [];
-  const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S);
+  const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S
+    // the SAME trade re-read under another id: its entry sits where the stored one's does, and the stored one had not already ended
+    // before it (a re-entry after a close is a new trade: until 21 Nov 2026 it was dropped)
+    && !(p.endT != null && p.endT <= r.t) && Math.abs(p.entry - r.entry) <= 0.5 * Math.abs(r.entry - r.stop));
   const seen = new Set();
   for (const f of fresh) { const c = clean(f); if (!c || seen.has(c.id)) continue; seen.add(c.id);
     const p = old.get(c.id);

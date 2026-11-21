@@ -304,7 +304,7 @@
     if (b.hasAttribute('data-sop-flt')) { S.flt = b.getAttribute('data-sop-flt'); S.all = false; draw(); return; }
     var id = b.getAttribute('data-sop-log') || b.getAttribute('data-sop-chart'), r = byId(id); if (!r) return;
     if (b.hasAttribute('data-sop-log')) { S.open[id] = !S.open[id]; draw(); var nb = document.querySelector('#mo-sopr [data-sop-log="' + id + '"]'); if (nb) nb.focus(); return; }
-    var T = { replayed: true, name: (r.kind === 'sop' ? NAME[r.h] + ' BO, ' + NAME[r.l] + ' VR and CF' : NAME[r.h] + ' barrier, ' + NAME[r.l] + ' QM'), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mkR(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R };
+    var T = { replayed: true, name: (r.kind === 'sop' ? NAME[r.h] + ' BO, ' + NAME[r.l] + ' VR and CF' : NAME[r.h] + ' barrier, ' + NAME[r.l] + ' QM'), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mkR(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R, how: r.status };
     if (typeof root.msMoshaReplayDialog === 'function') root.msMoshaReplayDialog(T, document.getElementById('v-mosha')); else if (typeof root.msMoshaReplayTrade === 'function') root.msMoshaReplayTrade(T);
   });
   function go() { var v = $('v-mosha'); if (!v || v.hidden) return; if (API.visible(document.documentElement.dataset) && S.state === 'idle') run(); else draw(); }

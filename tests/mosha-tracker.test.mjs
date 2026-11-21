@@ -125,3 +125,15 @@ test('P&L calendar: a month of closed R by the UTC exit day, open trades never a
   const page = rd('market-structure.html'), sop = rd('assets/mosha-sop.js'), dk = rd('assets/desk-trades.js');
   assert.match(page, /#v-mosha \.mo-cal \{ display: grid; grid-template-columns: repeat\(7/); assert.match(sop, /calHTML\(list, S, 'data-sop-chart'/); assert.match(dk, /SOP\.calHTML\(list, S, 'data-dk-chart'/);
 });
+
+test('a re-entry after a close is a new trade; only the same trade re-read under another id is left out', () => {
+  const now = 1795000000, r = (o) => ({ id: 'x', kind: 'msnr-main', side: 1, t: now - 5000, entry: 100, stop: 98, target: 103, status: 'stopped', R: -1, endT: now - 4700, exit: 98, log: [], marks: [], ...o });
+  const prev = M.merge([], [r({ id: 'a' })], now - 4000);
+  // 10 minutes later, after the first was stopped, at another price: a new trade
+  const next = M.merge(prev, [r({ id: 'a' }), r({ id: 'b', t: now - 4400, entry: 99.2, stop: 97.2, target: 102.2, status: 'open', R: null, endT: null, exit: null })], now);
+  assert.deepEqual(next.map((x) => x.id).sort(), ['a', 'b']);
+  // the same order read under another id while the stored one is still open, at the same price: not stored twice
+  const open = M.merge([], [r({ id: 'c', status: 'open', R: null, endT: null, exit: null })], now - 4000);
+  const twin = M.merge(open, [r({ id: 'c', status: 'open', R: null, endT: null, exit: null }), r({ id: 'c2', t: now - 4700, entry: 100.1, status: 'open', R: null, endT: null, exit: null })], now);
+  assert.deepEqual(twin.map((x) => x.id), ['c']);
+});
