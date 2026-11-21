@@ -5306,6 +5306,13 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     near-duplicate rule applies only within one reading. Of the five examples, 2 Nov buy and 2 Nov sell are now caught; 10 Nov is
     found at his level but entered earlier; 28 Oct (an M5 box at the pullback's spike) and 29 Oct (an M5 break zone) are not. The
     record is about four times larger (30 days: 3,136 records, 4.7 MB); `KEEP` 14000 now holds about four months.
+  - **Review of the second pass** (21 Nov 2026, independent read-only review; each fix has a test that failed first): (1) `settle`
+    applied a trailed stop from the fill on: a record now carries `stopAt` (when the trail moved; `clean` keeps it) and `settle` uses
+    `stopNow` only from that candle (without it, the opening stop); (2) `qmSetups` gave the same QM twice when two heads sat under one
+    shoulder and break (the copy took one of the gold plan's two slots a day): one per tf / side / shoulder / break; (3) a limit placed
+    before the 5-minute candles on file filled at their first candle: skipped; (4) the plan's hour and the gold plan's two hours are
+    clock time (they counted candles, so a window ran over the daily break or a weekend); (5) a stop that gapped books worse than −1R
+    and the log now says so.
   - **Settling reads the fill's candle** (21 Nov 2026): `settle` starts at the 5-minute candle that holds the fill, which can only stop
     the trade; `endT` is that candle's open. After-costs figures were added and taken out the same day (owner: "forget the costs").
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,

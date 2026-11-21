@@ -92,15 +92,15 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
   const rec = (kind, label, d, fi, entry, T0, log, marks, trail = false) => { const pip = pipOf(entry), stop = entry - d * pip, target = trail ? null : entry + d * EGM.rr * pip, fillT = M5[fi].time;
     const oc = trail ? efTrail(M5, Z5, fi, d, entry, stop) : outcome(M5, fi, d, entry, stop, target, Infinity), sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
     const tr = { id: `${pre}${kind}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind, label, h: '4h', l: '5m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
-    if (trail && oc.moves) tr.stopNow = oc.stop;   // the trailed stop in force (the record's `stop` stays the opening stop: 1R is the opening risk)
+    if (trail && oc.moves) { tr.stopNow = oc.stop; tr.stopAt = oc.movedAt; }   // and WHEN it moved there: a settle must not apply it to candles before   // the trailed stop in force (the record's `stop` stays the opening stop: 1R is the opening risk)
     tr.log = log.concat([{ t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips on gold's scale), ` + (trail ? 'no target: the stop is trailed with the M5 EF.' : `target ${f(target)} (${EGM.rr}R).`) }],
       trail && oc.moves ? [{ t: oc.movedAt, text: `The stop was trailed ${oc.moves} time${oc.moves > 1 ? 's' : ''} with the M5 EF; the last M5 ${word(-d)} zone that failed, ${f(oc.ef.bot)} to ${f(oc.ef.top)}, put it at ${f(oc.stop)}.` }] : [],
-      [oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${EGM.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: 'Stopped: −1.00R' + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+      [oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${EGM.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'trail' ? { t: oc.endT, text: `Trailed stop hit at ${f(oc.exit)}: ${sg(oc.R)}.` }
         : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${sg(oc.R)}.` } : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now).` : '.') }]);
     tr.marks = marks.concat(trail && oc.moves && oc.status !== 'open' ? [{ kind: 'zone', top: oc.ef.top, bot: oc.ef.bot, a: oc.ef.base, at: oc.ef.fail, label: 'M5 EF · trailed stop' }] : []); out.push(tr); };
   // a limit at `entry`, valid over candles [i0, i1): the index of the candle that fills it, or -1
-  const fillAt = (d, entry, i0, i1) => { for (let k = i0; k < Math.min(M5.length, i1); k++) if (d > 0 ? M5[k].low <= entry : M5[k].high >= entry) return k; return -1; };
+  const fillAt = (d, entry, i0, i1, tEnd = Infinity) => { for (let k = i0; k < Math.min(M5.length, i1) && M5[k].time < tEnd; k++) if (d > 0 ? M5[k].low <= entry : M5[k].high >= entry) return k; return -1; };
 
   // plan / simple: H4 zone, M15 engulf inside it, then the M5 failure and the M5 zone behind it
   const used = new Set();
@@ -111,7 +111,8 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
     if (!F) continue;
     let E = null; for (const z of Z5) { if (z.at > F.fail) break; if (z.dir === d && z.at >= F.fail - EGM.egBack && (z.fail == null || z.fail > F.fail)) E = z; }
     if (!E) continue; const key = d + ':' + E.base; if (used.has(key)) continue; used.add(key);
-    const entry = d > 0 ? E.top : E.bot, i0 = lower(M5, F.fail), fi = fillAt(d, entry, i0, i0 + EGM.fill); if (fi < 0) continue;
+    if (F.fail < M5[0].time) continue;   // placed before the 5-minute candles on file: its window cannot be read
+    const entry = d > 0 ? E.top : E.bot, i0 = lower(M5, F.fail), fi = fillAt(d, entry, i0, i0 + EGM.fill, F.fail + EGM.fill * 300); if (fi < 0) continue;   // an hour of clock time (12 candles could run over the daily break or a weekend)
     const dz = dailyZone(DZ, T), ds = dz ? dz.dir : 0, plan = ds === d;
     rec(plan ? 'eg-plan' : 'eg-simple', plan ? 'Plan · with the Daily' : 'Simple EG · H4 zone', d, fi, entry, E.base, [
       { t: T, text: (plan ? `The Daily's last engulf is a ${word(d)}. ` : `The Daily's last engulf is ${ds ? 'a ' + word(ds) : 'not on file'}, so this is the short method without the Daily. `) + `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and a ${tn} engulf ${word(d)} closed.` },
@@ -125,6 +126,7 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
     const win = (z) => z.dir === d && z.at <= tc && z.at >= Z.base - SEC['4h'] && (z.touch == null || z.touch >= tc);
     const h1 = Z1.filter((z) => win(z) && inside(z, Z)).pop(); if (!h1) continue;
     const m15 = Z15.filter((z) => win(z) && inside(z, h1)).pop(); if (!m15) continue;
+    if (tc < M5[0].time) continue;
     const entry = d > 0 ? m15.top : m15.bot, i0 = lower(M5, tc), iEnd = lower(M5, Math.min(Z.fail != null ? Z.fail : Infinity, tc + EGM.directWait)), fi = fillAt(d, entry, i0, iEnd); if (fi < 0) continue;
     rec('eg-direct', 'Direct entry · M5 EF trail', d, fi, entry, Z.base, [
       { t: tc, text: `A fresh H4 ${word(d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} was left alone for the next two H4 candles. Inside it: a fresh H1 zone ${f(h1.bot)} to ${f(h1.top)} and a fresh M15 zone ${f(m15.bot)} to ${f(m15.top)}. A ${word(d)} limit rests at ${f(entry)}.` }],
@@ -190,7 +192,8 @@ export function qmSetups(M15) {
       if (!(d > 0 ? head.close < L && M > L : head.close > L && M < L)) continue;
       let bo = -1; for (let i = mid.m + 1; i < C.length && i <= H.m + QM.wait; i++) { if (d > 0 ? C[i].close > M : C[i].close < M) { bo = i; break; } }
       if (bo < H.m + k) continue;   // broken before the head was a known turn (or never): not this shape
-      const s = C[sh.m]; out.push({ tf, dir: d, at: C[bo].time + sec, level: L, mid: M, midT: C[mid.m].time, head, base: s.time, top: d > 0 ? L : s.high, bot: d > 0 ? s.low : L }); } }
+      const s = C[sh.m]; if (out.some((x) => x.tf === tf && x.dir === d && x.base === s.time && x.at === C[bo].time + sec)) continue;   // the same QM again (two heads, one shoulder and break)
+      out.push({ tf, dir: d, at: C[bo].time + sec, level: L, mid: M, midT: C[mid.m].time, head, base: s.time, top: d > 0 ? L : s.high, bot: d > 0 ? s.low : L }); } }
   return out.sort((a, b) => a.at - b.at);
 }
 export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
@@ -205,13 +208,15 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
   for (const m of triggers(M15)) { const d = m.dir, T = m.at, S = sideAt(T); if (!S || S.dir !== d) continue; const c = m.c;
     const inZ = (z) => (d > 0 ? c.low <= z.top && c.close >= z.bot : c.high >= z.bot && c.close <= z.top);
     const Z = Z4.filter((z) => z.at >= S.t - 20 * 86400 && inZ(z) && ((z.dir === d && z.at <= T && z.end > T) || (z.dir === -d && z.fail != null && z.fail <= T && T - z.fail < 20 * 86400))).pop(); if (!Z) continue;
-    const entry = d > 0 ? m.top : m.bot, i0 = lower(M5, T); let fi = -1; for (let q = i0; q < Math.min(M5.length, i0 + SNR.wait); q++) if (d > 0 ? M5[q].low <= entry : M5[q].high >= entry) { fi = q; break; }
+    if (T < M5[0].time) continue;
+    const entry = d > 0 ? m.top : m.bot, i0 = lower(M5, T); let fi = -1; for (let q = i0; q < Math.min(M5.length, i0 + SNR.wait) && M5[q].time < T + SNR.wait * 300; q++) if (d > 0 ? M5[q].low <= entry : M5[q].high >= entry) { fi = q; break; }
     if (fi >= 0) cands.push({ m, d, T, S, Z, entry, fi }); }
   // the plan's SECOND entry type: a 15- or 30-minute QM zone (see `qmSetups`), its head in an H4 zone of the side
   for (const q of qmSetups(M15)) { const d = q.dir, T = q.at, S = sideAt(T); if (!S || S.dir !== d) continue; const h = q.head;
     const Z = Z4.filter((z) => z.at >= S.t - 20 * 86400 && (d > 0 ? h.low <= z.top && h.close >= z.bot : h.high >= z.bot && h.close <= z.top)
       && ((z.dir === d && z.at <= h.time + SEC[q.tf] && z.end > T) || (z.dir === -d && z.fail != null && z.fail <= T && T - z.fail < 20 * 86400))).pop(); if (!Z) continue;
-    const entry = q.level, i0 = lower(M5, T); let fi = -1; for (let k = i0; k < Math.min(M5.length, i0 + SNR.wait); k++) if (d > 0 ? M5[k].low <= entry : M5[k].high >= entry) { fi = k; break; }
+    if (T < M5[0].time) continue;
+    const entry = q.level, i0 = lower(M5, T); let fi = -1; for (let k = i0; k < Math.min(M5.length, i0 + SNR.wait) && M5[k].time < T + SNR.wait * 300; k++) if (d > 0 ? M5[k].low <= entry : M5[k].high >= entry) { fi = k; break; }
     if (fi >= 0) cands.push({ m: q, d, T, S, Z, entry, fi, qm: true }); }
   cands.sort((x, y) => x.fi - y.fi || x.T - y.T);
   // the plan's own limits: 2 trades a day, a stop and a target (no one-at-a-time rule and no time exit: both were the desk's until 21 Nov 2026)
@@ -222,7 +227,7 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
       qm ? { t: T, text: `${NAME[m.tf]} QM ${word(d)}: shoulder ${f(m.level)}, ${d > 0 ? 'high' : 'low'} ${f(m.mid)}, head ${f(m.head.close)} in the H4 ${turned ? 'EF' : 'EG'} zone ${f(Z.bot)} to ${f(Z.top)}, then a close ${d > 0 ? 'above' : 'below'} ${f(m.mid)}: a ${word(d)} limit at the shoulder, ${f(entry)}, for two hours.` }
         : { t: T, text: `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and a ${NAME[m.tf]} engulf ${word(d)} closed: a ${word(d)} limit rests at its zone, ${f(entry)}, for two hours.` },
       { t: fillT, text: `Filled: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), target ${f(target)} (90 pips, ${SNR.rr}R).` },
-      oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${SNR.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: 'Stopped: −1.00R' + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+      oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${SNR.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` } : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now).` : '.') }];
     tr.marks = [{ kind: 'level', p: S.key.p, a: S.key.t, at: S.day + 86400, label: `Daily ${S.key.kind} level`, under: d > 0 }, { kind: 'level', p: S.level, a: S.t - 14400, at: S.t, label: `H4 ${d > 0 ? 'A' : 'V'} level · BO ${word(d)}`, under: d < 0 },
       { kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }]

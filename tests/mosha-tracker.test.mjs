@@ -158,8 +158,13 @@ test('an open record the run no longer reads is settled on the candles at its st
   assert.equal(M.settle([mid], none, pre.concat(bar(1200, 100, 102.5, 99, 100), bar(1500, 99, 99.5, 93, 94)))[0].status, 'stopped', 'a stop touched in the fill\'s own 5-minute candle is read');
   assert.equal(M.settle([r], none, pre.concat(bar(1200, 100, 100.5, 93, 99), bar(1500, 99, 100, 98, 99)))[0].status, 'open', 'the fill candle reaching the target is not a target');
   // a direct entry with no target and a trailed stop settles at the stop it stood at, R from the opening risk
-  const tr = M.settle([{ ...r, target: null, stopNow: 99, r0: 2 }], none, pre.concat(bar(1200, 100, 100.5, 99.5, 100), bar(1500, 98.5, 99.4, 98, 99)))[0];
+  const tr = M.settle([{ ...r, target: null, stopNow: 99, stopAt: 1500, r0: 2 }], none, pre.concat(bar(1200, 100, 100.5, 99.5, 100), bar(1500, 98.5, 99.4, 98, 99)))[0];
   assert.equal(tr.status, 'trail'); assert.equal(tr.exit, 99); assert.equal(tr.R, 0.5);
+  // review 21 Nov 2026: the trailed stop does not exist before it moved, so a candle before `stopAt` is read at the opening stop
+  const early = M.settle([{ ...r, target: null, stopNow: 99, stopAt: 1800, r0: 2 }], none, pre.concat(bar(1200, 100, 100.5, 99.5, 100), bar(1500, 98.5, 99.4, 98, 99)))[0];
+  assert.equal(early.status, 'open', 'the stop at 99 is not in force before 1800');
+  assert.equal(M.settle([{ ...r, target: null, stopNow: 99, r0: 2 }], none, pre.concat(bar(1200, 100, 100.5, 99.5, 100), bar(1500, 98.5, 99.4, 98, 99)))[0].status, 'open', 'no move time: the opening stop');
+  assert.equal(M.clean(rec({ target: null, stopNow: 99, stopAt: 1800 })).stopAt, 1800, 'clean keeps the move time');
   const kept = M.clean(rec({ target: null, stopNow: 99 })); assert.equal(kept.target, null, 'no target stays no target (not 0)'); assert.equal(kept.stopNow, 99);
   const closed = { ...r, status: 'target', R: 3 }; assert.equal(M.settle([closed], none, all)[0], closed, 'a closed record is frozen');
   assert.match(rd('council/edge-desks.mjs'), /settle\(merge\(records, fresh, now\)/); assert.match(rd('council/mosha-desk.mjs'), /settle\(merge\(prev && prev\.records, fresh, now, feed\)/);
