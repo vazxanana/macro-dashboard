@@ -392,12 +392,12 @@ test('an engulf: the base candle wick to wick, completed by the first close beyo
   assert.doesNotMatch(rd('council/eg-methods.mjs'), /An engulf here = a BODY engulf|body-engulf zones/);
 });
 
-test('plan and simple: the 15- / 30-minute engulf zone reaches into the H4 zone, the M5 entry zone is at the zone, and the limit is on the base candle\'s wick', () => {
+test('plan and simple: the 15- / 30-minute engulf zone lies inside the H4 zone, the M5 entry zone is at the zone, and the limit is on the base candle\'s wick', () => {
   let n = 0;
   for (const seed of [11, 5, 23, 31, 47]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) }, m5 = new Map(Y['5m'].map((b) => [b.time, b]));
     for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind !== 'eg-direct')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips from the entry');
       const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), en = r.marks.find((k) => k.label === 'M5 EG zone · entry');
-      assert.ok(trg.bot <= h4.top && trg.top >= h4.bot, 'the trigger zone is away from the H4 zone: ' + r.id);
+      assert.ok(trg.bot >= h4.bot && trg.top <= h4.top, 'the trigger zone is not wholly inside the H4 zone: ' + r.id);
       assert.ok(en.bot <= Math.max(h4.top, trg.top) && en.top >= Math.min(h4.bot, trg.bot), 'the entry zone is away from the zone: ' + r.id);
       const base = m5.get(en.a); assert.deepEqual([en.top, en.bot], [base.high, base.low], 'the entry zone is its base candle, wick to wick'); assert.equal(r.entry, r.side > 0 ? base.high : base.low); } }
   assert.ok(n >= 10, 'plan / simple entries: ' + n);
@@ -405,19 +405,21 @@ test('plan and simple: the 15- / 30-minute engulf zone reaches into the H4 zone,
   let cuts = 0; for (const r of G.methodTrades(B15, { from: 0, market: 'xau' }).filter((x) => x.t > B['5m'][0].time + 30 * 86400).filter((_, i) => i % 4 === 0).slice(0, 10)) { cuts++;
     const one = G.methodTrades(cutAt(B15, r.t + 300), { from: 0, market: 'xau' }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.deepEqual([one.entry, one.stop, one.t], [r.entry, r.stop, r.t]); }
   assert.ok(cuts >= 5, 'entries checked against a cut: ' + cuts);
-  const src = rd('council/eg-methods.mjs'); assert.match(src, /m\.bot <= z\.top && m\.top >= z\.bot/); assert.match(src, /&& atZone\(z\)\) E = z;/);
+  const src = rd('council/eg-methods.mjs'); assert.match(src, /m\.bot >= z\.bot && m\.top <= z\.top/); assert.match(src, /&& atZone\(z\)\) E = z;/);
 });
 
+// the close of the n-th weekday after a day (the gold plan's break window counts trading days)
+const tradeEnd = (day, n) => { let t = day, k = 0; while (k < n) { t += 86400; const w = new Date(t * 1000).getUTCDay(); if (w !== 0 && w !== 6) k++; } return t + 86400; };
 test('gold plan: the H4 break is of the level that stood before the Daily level was tapped, and a break on the rejection day counts', () => {
   let n = 0, sameDay = 0, cuts = 0;
   for (const seed of [11, 4, 5, 23, 31]) { const X = seed === 11 ? B : market(120, seed), D1 = X['1d'], H4 = X['4h'], ix = new Map(H4.map((b, i) => [b.time, i]));
     for (const s of G.snrSides(D1, H4)) { n++; const tap = ix.get(s.tapT), lj = ix.get(s.levelT), bo = ix.get(s.boT - 14400), up = s.dir > 0;
       assert.ok(s.tapT >= s.day && s.tapT < s.day + 86400 && (up ? H4[tap].low <= s.key.p : H4[tap].high >= s.key.p), 'the tap: an H4 candle of the rejecting day that trades to the Daily level');
       for (let q = s.day / 14400; q * 14400 < s.tapT; q++) { const b = H4[ix.get(q * 14400)]; if (b) assert.ok(up ? b.low > s.key.p : b.high < s.key.p, 'the first such candle'); }
-      assert.equal(H4[lj].close, s.level); assert.ok(lj + G.SNR.piv < tap, 'the level was a known turn before the tap: external');
+      assert.equal(H4[lj].close, s.level); assert.ok(lj + G.SNR.piv <= tap, 'the level was a known turn by the close of the tap candle: external');
       for (let q = 1; q <= G.SNR.piv; q++) assert.ok(up ? H4[lj].close > H4[lj - q].close && H4[lj].close > H4[lj + q].close : H4[lj].close < H4[lj - q].close && H4[lj].close < H4[lj + q].close, 'a turn of the closes');
       assert.ok(bo >= tap, 'the break is not before the tap'); for (let q = lj + 1; q < bo; q++) assert.ok(up ? !(H4[q].close > s.level) : !(H4[q].close < s.level), 'the first close beyond the level');
-      assert.ok(up ? H4[bo].close > s.level : H4[bo].close < s.level); assert.ok(s.boT <= s.day + 86400 + G.SNR.boDays * 86400);
+      assert.ok(up ? H4[bo].close > s.level : H4[bo].close < s.level); assert.ok(s.boT <= tradeEnd(s.day, G.SNR.boDays), 'inside the trading-day window');
       assert.equal(s.t, Math.max(s.boT, s.day + 86400), 'known at the later of the break and the Daily close'); if (s.boT <= s.day + 86400) sameDay++;
       // nothing after the moment the side is known is read
       if (cuts++ < 40) { const one = G.snrSides(D1.filter((b) => b.time + 86400 <= s.t), H4.filter((b) => b.time + 14400 <= s.t)).find((x) => x.day === s.day && x.dir === s.dir); assert.ok(one, 'found with the candles cut at the side'); assert.deepEqual([one.t, one.level, one.boT], [s.t, s.level, s.boT]); } } }

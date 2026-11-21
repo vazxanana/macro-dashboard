@@ -177,6 +177,8 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
 }
 
 // ─── MSNR ───
+// Kinds msnr-main / msnr-other are the owner's earlier scalp method (direction call + M15 / M5 engulf), the entry of the desk's
+// own MSNR study: not an entry of any of the owner's documents (the gold plan's entries are kinds msnr-sop / msnr-qm).
 // The direction call of the desk's own MSNR study (research/edge/msnr-entry, its functions imported and not edited): on H4
 // candles, a close beyond the last swing level that stood before price first touched a live Daily key level turns the call.
 // The entry is that study's: a 15-minute body engulf, then within 45 minutes a 5-minute body engulf the same way, market at
@@ -215,7 +217,7 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
     let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);
     const status = !o ? 'open' : o.exit === 'target' ? 'target' : o.exit === 'time' ? 'time' : 'stopped', R = o ? d * (o.exitPx - c.entry) / r0 : null, fl = o ? undefined : d * (M5[M5.length - 1].close - c.entry) / r0;
-    const tr = { id: `${market === 'xau' ? '' : market + ':'}msnr-${d > 0 ? 'b' : 's'}-${c.t}`, market, kind: main ? 'msnr-main' : 'msnr-other', label: main ? 'MSNR · 12-16 UTC' : 'MSNR · other hours', h: '4h', l: '5m', side: d, t: c.t,
+    const tr = { id: `${market === 'xau' ? '' : market + ':'}msnr-${d > 0 ? 'b' : 's'}-${c.t}`, market, kind: main ? 'msnr-main' : 'msnr-other', label: main ? 'Earlier scalp method · 12-16 UTC' : 'Earlier scalp method · other hours', h: '4h', l: '5m', side: d, t: c.t,
       entry: c.entry, stop: c.stop, target, r0, status, R, endT: o ? o.closed : null, exit: o ? o.exitPx : null, mfe, float: fl };
     tr.log = [
       ...(ev ? [{ t: ev.zoneAt, text: `Daily ${d > 0 ? 'buy' : 'sell'}-side key level: ${KEY_NAME[ev.kind]} ${f(ev.bottom)} to ${f(ev.top)}.` },
@@ -241,7 +243,7 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
 // ─── the files ───
 export const DESKS = {
   eg: { tfs: ['1d', '4h', '1h', '15m', '5m'], markets: MARKETS, read: (B, o) => egTrades(B, o).concat(methodTrades(B, o)), note: 'A paper record of the desk\'s readings of the engulf on five markets, buys and sells: the engulf rule on D1, H4 and H1 candles, and three zone methods (the plan with the Daily, the short method in an H4 zone, the direct entry on fresh zones) with a 30-pip stop; the plan and the short method have a 2R target, the direct entry none: its stop is trailed with the 5-minute engulf zones that fail. Nothing is traded, results are before costs, and none is a tested rule.' },
-  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: Object.keys(SOP.ALL), read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only (the desk\'s own study of this rule failed after costs). On gold: the plan with a Daily level rejection (V, A or open-close level) and an H4 break for the side, H4 zones, a 15- or 30-minute engulf entry or a 15- or 30-minute QM entry at its left shoulder, a 30-pip stop and a 90-pip target. Nothing is traded and results are before costs.' },
+  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: Object.keys(SOP.ALL), read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the owner\'s earlier scalp method (direction call + M15 / M5 engulf): the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only; it is not an entry of the plan documents, and the desk\'s own study of it failed after costs. On gold: the plan with a fresh Daily level rejected (V, A or open-close level) and an H4 break within three trading days for the side, H4 zones, a 15- or 30-minute engulf entry or a 15- or 30-minute QM entry at its left shoulder, one entry a visit to a zone, a 30-pip stop and a 90-pip target. Nothing is traded and results are before costs.' },
   lit: { tfs: ['5m'], markets: Object.keys(SOP.ALL), read: litTrades, note: 'A paper record of the LIT detector on eleven markets, with the rule\'s execution where it gives an order and two looser study executions otherwise: nothing is traded, results are before costs, and it is not a tested rule.' } };
 export function buildDesk(name, perMarket, prev, now, days) {
   let records = (prev && prev.records) || [], through = (prev && prev.through) || 0; const read = [];
