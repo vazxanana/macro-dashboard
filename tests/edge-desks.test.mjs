@@ -139,7 +139,7 @@ test('the direction reading: every switch names a tapped key level of the timefr
 
 test('every desk record carries the key levels its reading used as chart marks', () => {
   const src = fs.readFileSync(new URL('../council/eg-methods.mjs', import.meta.url), 'utf8') + fs.readFileSync(new URL('../council/edge-desks.mjs', import.meta.url), 'utf8');
-  for (const l of ['Daily EG zone', 'H4 EG zone', 'M15 EG zone', 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'H4 BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
+  for (const l of ['Daily EG zone', 'H4 EG zone', 'M15 EG zone', 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
     assert.ok(src.includes(l), 'mark: ' + l);
 });
 

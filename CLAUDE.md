@@ -5174,6 +5174,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     market move, 2019-26). Checked and left: A / V levels on closes, the dominant pair, EF from a failed EG zone, the level
     fixed at the first tap, no switch without a tapped level. The desk's own choices stay `DIR` (2-candle turns, a level's
     life 60 candles, 10 candles from tap to break) and the opposite structure at the tap.
+  - **Gold plan: the H4 break reads an A / V level of the closes** (21 Nov 2026, same check): `snrSides` confirmed a Daily
+    rejection by a close beyond the last H4 swing of the WICKS; it is the last H4 A level (V for a sell), a turn of the
+    closes, like every level on these desks; mark "H4 A level · BO buy". On gold 2020-25 after costs: in sample -0.047R
+    -> -0.050R a trade (n 1,452), out of sample +0.073R -> +0.058R (n 780, trade t 0.91): nothing changes in `desk-rigor`.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

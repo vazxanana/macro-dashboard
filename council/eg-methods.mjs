@@ -107,7 +107,7 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
 // ─── the gold plan with Daily levels (the MSNR desk; the owner's fourth document, read in the desk's own words) ───
 // Side: a Daily candle REJECTS a Daily level (a turn of the Daily CLOSES in the last 60 trading days, 2 candles a side: a V level
 // at a low turn, an A level at a high turn, as on a line chart): it trades through the level and closes back on the other side; then, within 3 days, an H4
-// candle closes beyond the last H4 swing the same way. That side holds until the opposite pair completes. Zones: H4 engulf
+// candle closes beyond the last H4 A / V level (a turn of the H4 closes) the same way. That side holds until the opposite pair completes. Zones: H4 engulf
 // zones of that side, and opposite H4 zones that failed (they turn). Entry (the plan's first type only; its second, a
 // 15-minute "QM" zone, is not written here): with price in such a zone a 15-minute engulf the same way, a limit at that
 // engulf's zone for two hours. Stop 30 pips ($3.00), target 90 pips (3R), at most 2 entries a UTC day, one at a time. Gold only.
@@ -120,11 +120,12 @@ export function snrSides(D1, H4) {
       if (lo || hi) lv.push({ p: b.close, t: b.time, kind: lo ? 'V' : 'A' }); }   // a V level (a low turn) or an A level (a high turn) of the CLOSES, as on a line chart
     const upL = lv.filter((L) => c.low <= L.p && c.close > L.p && c.open > L.p).pop(), dnL = lv.filter((L) => c.high >= L.p && c.close < L.p && c.open < L.p).pop();
     if (!upL !== !dnL) ev.push({ t: c.time + 86400, dir: upL ? 1 : -1, day: c.time, key: upL || dnL }); }
-  // the H4 break that confirms a rejection: a close beyond the last H4 swing (2 a side) formed before it
+  // the H4 break that confirms a rejection: a close beyond the last H4 A level (V level for a sell) formed before it:
+  // a turn of the H4 CLOSES, 2 candles a side, as every A / V level on these desks (it read the wicks until 21 Nov 2026)
   const sides = [];
   for (const e of ev) { let i0 = lower(H4, e.t); const end = e.t + SNR.boDays * 86400;
     for (let i = i0; i < H4.length && H4[i].time < end; i++) { let L = null;
-      for (let j = i - k - 1; j >= k && j > i - 60; j--) { const b = H4[j]; let ok = true; for (let q = 1; q <= k; q++) if (e.dir > 0 ? !(b.high > H4[j - q].high && b.high > H4[j + q].high) : !(b.low < H4[j - q].low && b.low < H4[j + q].low)) ok = false; if (ok) { L = e.dir > 0 ? b.high : b.low; break; } }
+      for (let j = i - k - 1; j >= k && j > i - 60; j--) { const b = H4[j]; let ok = true; for (let q = 1; q <= k; q++) if (e.dir > 0 ? !(b.close > H4[j - q].close && b.close > H4[j + q].close) : !(b.close < H4[j - q].close && b.close < H4[j + q].close)) ok = false; if (ok) { L = b.close; break; } }
       if (L != null && (e.dir > 0 ? H4[i].close > L : H4[i].close < L)) { sides.push({ t: H4[i].time + 14400, dir: e.dir, day: e.day, level: L, key: e.key }); break; } } }
   return sides.sort((a, b) => a.t - b.t);
 }
@@ -140,12 +141,12 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
     if (fi < 0) continue; const fillT = M5[fi].time, dk = Math.floor(fillT / 86400); if ((perDay[dk] || 0) >= SNR.perDay) continue; perDay[dk] = (perDay[dk] || 0) + 1;
     const stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, fillT + EGM.hold); busy = oc.endT || Infinity; if (fillT < from) continue;
     const turned = Z.dir !== d, tr = { id: `msnr-sop-${d > 0 ? 'b' : 's'}-${m.base}`, market, kind: 'msnr-sop', label: 'EG x SNR · gold plan', h: '4h', l: '15m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
-    tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected the Daily ${S.key.kind} level ${f(S.key.p)} (a turn of the Daily closes), and an H4 candle then closed ${d > 0 ? 'above' : 'below'} the last H4 swing ${f(S.level)}.` },
+    tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected the Daily ${S.key.kind} level ${f(S.key.p)} (a turn of the Daily closes), and an H4 candle then closed ${d > 0 ? 'above' : 'below'} the last H4 ${d > 0 ? 'A' : 'V'} level ${f(S.level)} (a turn of the H4 closes).` },
       { t: T, text: `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and a 15-minute engulf ${word(d)} closed: a ${word(d)} limit rests at its zone, ${f(entry)}, for two hours.` },
       { t: fillT, text: `Filled: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), target ${f(target)} (90 pips, ${SNR.rr}R), out after 24 hours.` },
       oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${SNR.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: 'Stopped: −1.00R' + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` } : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now).` : '.') }];
-    tr.marks = [{ kind: 'level', p: S.key.p, a: S.key.t, at: S.day + 86400, label: `Daily ${S.key.kind} level`, under: d > 0 }, { kind: 'level', p: S.level, a: S.t - 14400, at: S.t, label: `H4 BO ${word(d)}`, under: d < 0 },
+    tr.marks = [{ kind: 'level', p: S.key.p, a: S.key.t, at: S.day + 86400, label: `Daily ${S.key.kind} level`, under: d > 0 }, { kind: 'level', p: S.level, a: S.t - 14400, at: S.t, label: `H4 ${d > 0 ? 'A' : 'V'} level · BO ${word(d)}`, under: d < 0 },
       { kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: 'M15 EG zone · entry' }];
     out.push(tr); }
   return out;
