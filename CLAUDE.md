@@ -5283,6 +5283,21 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     plan −28.0R → −52.0R; LIT already refused such a candle. `desk-rigor` was run again (RESULT.md "After the result": every
     limit reading worse, no verdict changed); `desk-slices` T1 / T2 (the engulf reading) were measured with the flaw and failed
     anyway. Every desk total before this fix was flattered: never quote one.
+  - **Every page rule applied, second pass** (21 Nov 2026, owner: "apply the edge to the detail", "recheck all the documents"; a
+    read-only page-by-page recheck found nothing that contradicts a page). Mosha (`assets/mosha-sop.js`): the **Janda** entry (after
+    the QM at a barrier, the next normal BO the same way, limit at its level; `bar-j-…`, "· Janda"; H4 / H1 barriers also on M1,
+    "· Janda (M1)"), the **VR box as a barrier** (handed over with its clean CF, target the CF zone's near side when 1R or more, else
+    3R), **internal BOs run the whole sequence** (`sop-i-…`, `o.ibo: false` turns it off), a CF is handed over only on the candle that
+    made it and never after it failed or the VR extreme was reached, and a CF barrier takes no entry once price reached the VR extreme.
+    Gold plan (`council/eg-methods.mjs`): the **second entry type, a QM** on M15 / M30 (`qmSetups`, kind `msnr-qm`; the shape is read
+    from a sketch, `QM.wait` 20 candles is the desk's), Daily **open-close levels** (two same-colour candles) in `snrSides` and as
+    kind `oc` in `direction()`. Direct entry: **no target, the stop trails** to the far edge of each failed opposite M5 zone
+    (`efTrail`, status `trail`, `stopNow`; `clean` keeps `stopNow` and a null target, which it used to store as 0; `settle` settles at
+    `stopNow`). Not coded, owner / Luxus questions: entry at the broken level vs the confirming leg's origin zone; a target for a
+    barrier against the direction ("only a rejection", no size); the M30 steps of the ladder; the repeat of the SOP inside the CF and
+    trading a failed CF; QM required vs preferred; "strong" H4 BO; "the best barrier".
+  - **Settling reads the fill's candle** (21 Nov 2026): `settle` starts at the 5-minute candle that holds the fill, which can only stop
+    the trade; `endT` is that candle's open. After-costs figures were added and taken out the same day (owner: "forget the costs").
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
