@@ -23,7 +23,7 @@ import { bars, merge, settle } from './mosha-desk.mjs';
 import { P, cleanBars, agg15, series, fbosCandidates, XAU } from './lit.mjs';
 import { managePosition } from '../research/edge/lit/run.mjs';
 import * as MS from '../research/edge/msnr-entry/run.mjs';
-import { methodTrades, snrTrades, direction, KEY_NAME } from './eg-methods.mjs';
+import { methodTrades, snrTrades, direction, engulfAt, KEY_NAME } from './eg-methods.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
@@ -61,8 +61,7 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
       const d = last.close > last.open ? 1 : last.close < last.open ? -1 : 0; if (!d) continue;
       let sma = 0; for (let j = m + 1 - EG.sma; j <= m; j++) sma += C[j].close; sma /= EG.sma;
       if (d > 0 ? !(last.close > sma) : !(last.close < sma)) continue;
-      let base = null;
-      for (let j = m - 1; j >= m - EG.k && j >= 0; j--) { const b = C[j]; if (d > 0 ? b.open > b.close : b.open < b.close) { if (d > 0 ? last.close > b.high : last.close < b.low) base = b; break; } }
+      const eg = engulfAt(C, m, EG.k), base = eg ? C[eg.j] : null;   // the one engulf definition (council/eg-methods.mjs), with the live rule's look-back of EG.k candles
       if (!base) continue;
       if (seen.has(d + '|' + base.time)) continue; seen.add(d + '|' + base.time);   // one order a zone: a second candle closing beyond the same candle adds nothing
       if (T0 < lo) continue;
