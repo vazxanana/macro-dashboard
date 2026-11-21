@@ -186,6 +186,9 @@ test('the Janda: a QM at the barrier, then the next break the same way is a norm
       assert.ok(ez, 'the engulf zone is named: ' + r.id); assert.ok(Math.abs(r.entry - Number(r.side > 0 ? ez[2] : ez[1])) < 0.006, 'the limit is the zone\'s near side');
       const boC = X[r.l].find((b) => b.time + M.SEC[r.l] === r.log[3].t); assert.ok(boC && (r.side > 0 ? r.entry < boC.close : r.entry > boC.close), 'the limit waits on the pullback side of the BO candle\'s close: ' + r.id);
       const zm = r.marks.find((m) => / Janda EG zone$/.test(m.label)); assert.ok(zm && zm.top > zm.bot && zm.a <= r.log[3].t, 'the zone is on the chart, from a candle closed by the BO');
+      // the zone is the PAIR: the candle against the break and the first candle after it that closes beyond its far edge, both closed by the BO
+      const C1 = X[r.l], i0 = C1.findIndex((b) => b.time === zm.a), i1 = C1.findIndex((b, q) => q > i0 && b.time + M.SEC[r.l] <= r.log[3].t && (r.side < 0 ? b.close < C1[i0].low : b.close > C1[i0].high));
+      assert.ok(i0 >= 0 && i1 > i0, 'the engulfing candle exists: ' + r.id); assert.ok(Math.abs(r.entry - (r.side < 0 ? Math.min(C1[i0].low, C1[i1].low) : Math.max(C1[i0].high, C1[i1].high))) < 1e-9, 'the near side is the pair\'s, not only the engulfed candle\'s');
       assert.ok(r.log[2].t <= r.log[3].t && r.log[3].t <= r.t, 'QM, then the BO, then the fill');
       const T = knownAt(r) + 37 * 60; if (T > e || ++cuts > 2) continue; assert.ok(allOf(X, fr, T).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); } }
   assert.ok(n >= 1, 'Janda entries on these candles: ' + n);
@@ -241,8 +244,8 @@ test('the older records still appear exactly as before, and every new reading is
   for (const seed of [7, 11]) { const X = seed === 7 ? B : market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 14 * 86400, bars = M.barrierTrades(X, F, { from: fr });
     // the pages applied to the detail (21 Nov 2026) changed three rules on purpose: the VR and CF read the small swings, a barrier's
     // box runs from the broken level to the origin extreme, the Janda's limit rests at the engulf zone. Each keeps an option that
-    // reads it the older way (vr 'major', box 'candle', janda 'level'): with them the older records are exactly the pinned ones.
-    const olds = M.barrierTrades(X, F, { from: fr, box: 'candle', janda: 'level' });
+    // reads it the older way (vr 'major', box 'candle', janda 'level', and qm 'internal' for the QM at a barrier): with them the older records are exactly the pinned ones.
+    const olds = M.barrierTrades(X, F, { from: fr, box: 'candle', janda: 'level', qm: 'internal' });
     const old = M.sopTrades(X, F, { from: fr, near: false, retest: false, vr: 'major' }).concat(olds).filter((r) => !isNew(r)).map(key).sort();
     // review 21 Nov 2026: a buy and a sell filled in one minute are two records (the side is in the id), and no id twice
     assert.equal(new Set(bars.map((r) => r.id)).size, bars.length, 'no barrier id twice, seed ' + seed); assert.ok(bars.every((r) => /-[bs]\d+$/.test(r.id)), 'the side is in the id');
@@ -374,14 +377,25 @@ test('a barrier\'s box runs from the swing level the break took to the origin ex
 });
 
 test('the VR and the CF are breaks of the chart\'s small swings (3 a side): the VR is the close through the small swing right before the extreme; vr "major" reads the protected swing', () => {
-  // a rise with one small pullback (swing low 105.5, 3 candles a side) right before the extreme 112.5, then a close under that swing
-  const p = [100, 101, 102, 104, 106, 108, 107, 106, 107, 109, 111, 112, 110, 108, 104], W = p.map((x, i) => ({ time: (i + 1) * 300, open: x, high: x + 0.5, low: x - 0.5, close: x }));
-  // before it, a fall, so the chart's first small break is up and the break down after it is a BO Structure
-  const pre = [110, 108, 106, 107, 108, 107, 104, 102, 100, 99, 98, 99].map((x, i) => ({ time: (i - 12) * 300, open: x, high: x + 0.5, low: x - 0.5, close: x }));
-  const ev = M.smallEv(F, pre.concat(W)), last = ev.at(-1);
-  assert.deepEqual([last.dir, last.structure, last.level, last.top, last.t], [-1, true, 105.5, 112.5, 15 * 300], 'the break of the small swing low before the extreme, its box up to the extreme');
-  const m = F.msMosha({ dir: 1, level: 99, t: 0, ext: NaN, far: 97.5 }, { events: ev, bars: pre.concat(W) }, 0.3, { near: true });
-  assert.deepEqual([m.vr.lo, m.vr.hi, m.vr.t], [105.5, 112.5, 15 * 300], 'the VR box: the small swing to the extreme, formed at that close');
+  // a BO above 110, a higher low 113.8, the top 130.2, then a shallow dip (123.8) and a lower high (128.2) UNDER the top, then the fall.
+  // The swing the last leg to the top came from is 113.8: its break is the BO Structure and the VR runs 113.8 to 130.2. The dip
+  // formed after the extreme is not a level (until 21 Nov 2026 the first small-swing reading took it: VR 123.8 to 130.2).
+  const leg = (a, b, n) => Array.from({ length: n }, (_, i) => a + (b - a) * (i + 1) / n); let p = [100]; const go = (to, n) => { p = p.concat(leg(p.at(-1), to, n)); };
+  go(110, 5); go(104, 5); go(120, 6); go(114, 4); go(130, 6); go(124, 4); go(128, 4); go(118, 5); go(121, 4); go(108, 6); go(112, 4); go(104, 5); go(116, 6); go(111, 3); go(125, 6);
+  const W = p.slice(1).map((b, i) => ({ time: (i + 1) * 3600, open: p[i], close: b, high: Math.max(p[i], b) + 0.2, low: Math.min(p[i], b) - 0.2 })), r1 = (v) => Math.round(v * 10) / 10;
+  const sw = M.swingEv(F, W), qms = sw.filter((e) => e.structure);
+  assert.deepEqual(qms.map((e) => [e.dir, r1(e.level), r1(e.dir < 0 ? e.hi : e.lo)]), [[-1, 113.8, 130.2], [1, 112.2, 103.8]], 'the QM down breaks the last swing before the top; the QM up the last swing high before the low; each box reaches the extreme');
+  assert.ok(F.msInternal(W, W.length, 3).some((e) => e.structure && r1(e.level) === 123.8), 'the page\'s internal breaks do take the dip after the top: not what the sequence reads');
+  assert.ok(sw.every((e) => r1(e.level) !== 123.8 && r1(e.level) !== 128.2), 'no level from a pivot formed after the extreme');
+  const ev = M.smallEv(F, W), bo = sw.find((e) => e.dir > 0 && r1(e.level) === 110.2);
+  const m = F.msMosha({ dir: 1, level: 110.2, t: W[bo.breakIdx].time, ext: NaN, far: 103.8 }, { events: ev, bars: W }, 0.3, { near: true });
+  assert.deepEqual([r1(m.vr.lo), r1(m.vr.hi), r1(m.cf.lo), r1(m.cf.hi), m['case']], [113.8, 130.2, 103.8, 112.2, 1], 'the VR box: the last swing before the extreme to the extreme; the CF zone holds the retracement low');
+  // on seeded candles: every QM's swing was made before the extreme of the move it ends
+  for (const seed of [7, 11]) { const L = market(8, seed)['15m'], E = M.swingEv(F, L); let n = 0;
+    for (const [k, e] of E.entries()) { if (!e.structure) continue; n++; let xi = E[k - 1].breakIdx; for (let q = xi; q <= e.breakIdx; q++) if (e.dir < 0 ? L[q].high > L[xi].high : L[q].low < L[xi].low) xi = q;
+      assert.ok(e.fromIdx <= xi || (e.dir < 0 ? L[e.fromIdx].low === e.level : L[e.fromIdx].high === e.level) && L.slice(e.fromIdx, e.breakIdx).every((b) => (e.dir < 0 ? b.close >= e.level : b.close <= e.level)), 'a QM breaks the swing before the extreme (or that level moved to a wick that swept it)');
+      if (e.fromIdx > xi) assert.ok(E.slice(0, k).some((q) => q.dir !== e.dir), 'only a swept level sits after the extreme'); }
+    assert.ok(n >= 5, 'QMs checked: ' + n); }
   // an event at a candle reads nothing after it: the same events with later candles cut away
   for (const seed of [7, 11]) { const L = market(8, seed)['5m'], all = M.smallEv(F, L), k = L.length - 400, part = M.smallEv(F, L.slice(0, k));
     assert.deepEqual(part, all.filter((e) => e.t <= L[k - 1].time), 'small breaks do not change when later candles arrive'); assert.ok(all.every((e) => e.top > e.bot && (e.dir > 0 ? e.top === e.level : e.bot === e.level))); }
@@ -391,7 +405,7 @@ test('the VR and the CF are breaks of the chart\'s small swings (3 a side): the 
     assert.ok(a.every(rule1) && b.every(rule1)); if (JSON.stringify(a.map(keyOf)) !== JSON.stringify(b.map(keyOf))) d++;
     for (const r of a.filter((x) => !x.retest).slice(0, 3)) assert.ok(M.sopTrades(cut(X, r.t + 7 * 60), F, { from: fr }).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); }
   assert.ok(d >= 1, 'the two readings differ on these candles');
-  assert.match(src, /o\.vr === 'major'/);
+  assert.match(src, /o\.vr === 'major'/); assert.match(src, /o.qm === 'internal' ? F.msInternal(W, W.length, 3) : swingEv(F, W)/, 'the QM at a barrier reads the same swings');
 });
 
 test('the second confirmation table: an H4 barrier also on M30, an H1 barrier on M15, an M30 barrier on M5; M30 built from M15 where none is handed in; no hindsight', () => {
