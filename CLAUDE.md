@@ -5319,6 +5319,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     time (`…-b<time>` / `…-s<time>`), since a buy and a sell can fill in one minute and the store kept only one.
   - **Settling reads the fill's candle** (21 Nov 2026): `settle` starts at the 5-minute candle that holds the fill, which can only stop
     the trade; `endT` is that candle's open. After-costs figures were added and taken out the same day (owner: "forget the costs").
+  - **The desk files are light** (21 Nov 2026; mosha/desk.json had reached 20 MB, three quarters of it logs and chart marks):
+    `council/desk-store.mjs` `writeDesk` writes `<desk>/desk.json` WITHOUT `log` / `marks` (+ `detail: { dir, by: 'day' }`) and
+    `<desk>/detail/<YYYY-MM-DD>.json` = `{ <id>: { log, marks } }` by the UTC day of the entry (written only when it changes; a
+    day no record points at is removed AFTER desk.json is written); `readDesk` joins them back for the trackers (a desk.json or
+    day file that does not parse stops the run; an older desk.json with logs inside is read as it is). The page reads the light
+    file and one day file only when a trade's Log or Chart is opened (`MS_MOSHA_SOP.withDetail`; "Reading the log…", and "could
+    not be read" when the day file fails). Never publish a light file to council-data while main's trackers predate the store
+    (they would read it as records without logs and write them back so).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

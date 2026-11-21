@@ -1,7 +1,7 @@
 // The Mosha desk's tracker (21 Nov 2026, owner: "do the mosha edge the same as ict with the trades"). Like the ICT desk's
 // tracker, it runs inside the council loop and RECORDS what the desk's reading of the Mosha method marks on gold, so the
 // desk shows stored trades (and keeps them) instead of working them out in the browser from live candles each visit.
-//   node council/mosha-desk.mjs <council-data dir>      -> writes <dir>/mosha/desk.json
+//   node council/mosha-desk.mjs <council-data dir>      -> writes <dir>/mosha/desk.json (+ the logs in mosha/detail/, council/desk-store.mjs)
 // The reading itself is the page's own: assets/mosha-sop.js (the BO, VR, CF sequence and the barrier entry) on the page's own
 // msAnalyze / msMosha / msZones / msInternal, lifted from market-structure.html (as the digest lifts the scoreboard).
 // PAPER RECORD ONLY: no order, no alert, no broker, no mirror; nothing of the Trader reads this file. Every record has a stop
@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { writeAtomic } from './jsonio.mjs';
+import { readDesk, writeDesk } from './desk-store.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
@@ -140,15 +140,14 @@ export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market =
 
 // `--days N` (or MOSHA_DAYS) reads N days back once, to fill the record's history; the loop's own runs read the last 14
 export async function main(dir, now = Math.floor(Date.now() / 1000), days = SOP.DAYS) {
-  const file = path.join(dir, 'mosha', 'desk.json'); let prev = null;
-  if (fs.existsSync(file)) { try { prev = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { throw new Error('mosha/desk.json does not parse: left as it is'); } }
+  const prev = readDesk(dir, 'mosha');   // throws when desk.json or a day file does not parse: nothing is written then
   const F = loadFns(), { feed, B, why } = await candles(now, fetch, undefined, days);
   if (why) console.log(`Mosha desk: main price source failed (${why}); reading Kraken's gold token instead`);
   let out = build(B, F, prev, now, feed, feed === 'OANDA' ? days : SOP.DAYS);
   // the other markets (21 Nov 2026, owner: "more trades"): the same reading, main price source only; one failing leaves the rest
   for (const m of OTHER) { try { const Bm = {}; for (const tf of Object.keys(SOP.BACK)) Bm[tf] = await bars(tf, now, fetch, days, m);
       if (Bm['5m'].length) out = build(Bm, F, out, now, 'OANDA', days, m); } catch (e) { console.log(`Mosha desk: ${m} skipped (${e && e.message || e})`); } }
-  fs.mkdirSync(path.dirname(file), { recursive: true }); writeAtomic(file, JSON.stringify(out));
+  writeDesk(dir, 'mosha', out);
   console.log(`Mosha desk [${feed}]: ${out.counts.n} records (${out.counts.open} open, ${out.counts.live} seen live), through ${new Date(out.through * 1000).toISOString()}`);
   return out;
 }

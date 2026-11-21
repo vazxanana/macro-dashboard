@@ -26,7 +26,7 @@
   function load(k) {
     var S = st(k), D = root.msData; if (S.state === 'busy') return; S.state = 'busy'; draw(k);
     Promise.resolve(D && D.json ? D.json(DESKS[k].file) : null).then(function (j) {
-      if (j && Array.isArray(j.records)) { S.rows = j.records.slice().sort(function (a, b) { return b.t - a.t; }); S.file = { at: j.at, since: j.since }; S.state = 'done'; } else S.state = 'failed';
+      if (j && Array.isArray(j.records)) { S.rows = j.records.slice().sort(function (a, b) { return b.t - a.t; }); S.file = { at: j.at, since: j.since, detail: j.detail || null }; S.state = 'done'; } else S.state = 'failed';
     }, function () { S.state = 'failed'; }).then(function () { draw(k); });
   }
   function openCard(r) {
@@ -49,7 +49,7 @@
       '<td class="n" data-l="Entry">' + fP(r, r.entry) + '</td><td class="n" data-l="Stop">' + fP(r, r.stop) + '</td><td class="n" data-l="Target">' + (r.target == null ? '—' : fP(r, r.target)) + '</td>' +
       '<td class="mo-c-res"><div class="mo-ex">' + res + '<small>' + (r.endT ? 'ended ' + utc(r.endT) + ' · ' : '') + 'risk ' + SOP.unit(mk(r)) + fP(r, r.r0) + '</small></div>' +
       '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-dk-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-dk-chart="' + esc(r.id) + '">Chart</button></div>' +
-      (op ? '<ol class="mo-sop-log">' + (r.log || []).map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') + '</ol>' : '') + '</td></tr>';
+      (op ? '<ol class="mo-sop-log">' + (r.log ? (r.noDetail ? '<li>The log of this trade could not be read.</li>' : '') + r.log.map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') : '<li>Reading the log…</li>') + '</ol>' : '') + '</td></tr>';
   }
   function draw(k) {
     var S = st(k), D = DESKS[k], view = $('v-' + k); if (!view) return;
@@ -97,10 +97,14 @@
     if (b.hasAttribute('data-dk-mk')) { S.mk = b.getAttribute('data-dk-mk'); S.all = false; draw(k); return; }
     if (b.hasAttribute('data-dk-src')) { S.src = b.getAttribute('data-dk-src'); S.all = false; draw(k); return; }
     var id = b.getAttribute('data-dk-log') || b.getAttribute('data-dk-chart'), r = (S.rows || []).filter(function (x) { return x.id === id; })[0]; if (!r) return;
-    if (b.hasAttribute('data-dk-log')) { S.open[id] = !S.open[id]; draw(k); var nb = $('v-' + k).querySelector('[data-dk-log="' + (root.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); if (nb) nb.focus(); return; }
+    var fileD = S.file && S.file.detail;
+    if (b.hasAttribute('data-dk-log')) { S.open[id] = !S.open[id]; var refocus = function () { draw(k); var nb = $('v-' + k).querySelector('[data-dk-log="' + (root.CSS && CSS.escape ? CSS.escape(id) : id) + '"]'); if (nb) nb.focus(); };
+      refocus(); if (S.open[id] && !r.log) SOP.withDetail(fileD, r).then(refocus); return; }
+    SOP.withDetail(fileD, r).then(function (r) {
     var T = { replayed: true, name: (r.label || r.kind) + ' · ' + nm(r), marks: r.marks || [], steps: (r.log || []).filter(function (x) { return x.t; }), id: r.id, market: mk(r), side: word(r.side), at: r.t, entry: +fP(r, r.entry), stop: +fP(r, r.stop), target: r.target == null ? null : +fP(r, r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +fP(r, r.exit) : null, exitAt: r.endT, R: r.R, how: r.status };
     // the chart opens over the page (the replay card in a dialog inside this desk's view), never by scrolling down to it
     if (typeof root.msMoshaReplayDialog === 'function') root.msMoshaReplayDialog(T, $('v-' + k)); else if (typeof root.msMoshaReplayTrade === 'function' && borrowChart(k)) root.msMoshaReplayTrade(T);
+    });
   });
   // the Mosha desk's styles serve these desks too: its sheet is copied once with the view's id in place of #v-mosha
   function styles() { if ($('ms-dk2-css')) return; var src = $('ms-mosha-css'); if (!src) return; var el = document.createElement('style'); el.id = 'ms-dk2-css';

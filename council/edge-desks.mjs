@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { writeAtomic } from './jsonio.mjs';
+import { readDesk, writeDesk } from './desk-store.mjs';
 import { foldWeekend } from './fills.mjs';
 import { bars, merge, settle } from './mosha-desk.mjs';
 import { P, cleanBars, agg15, series, fbosCandidates, XAU } from './lit.mjs';
@@ -256,13 +256,12 @@ export function buildDesk(name, perMarket, prev, now, days) {
 export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SOP.DAYS, only = null, get = fetch } = {}) {
   const out = {};
   for (const name of Object.keys(DESKS)) { if (only && only !== name) continue;
-    const file = path.join(dir, name, 'desk.json'); let prev = null;
-    if (fs.existsSync(file)) { try { prev = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { console.log(`${name}/desk.json does not parse: left as it is`); continue; } }
+    let prev = null; try { prev = readDesk(dir, name); } catch (e) { console.log(e.message); continue; }   // the logs live in <name>/detail/ (council/desk-store.mjs)
     const per = [];
     for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await bars(tf, now, get, days + ((DESKS[name].extra || {})[tf] || 0), m); per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
     if (!per.length) { console.log(`${name} desk: no candles, file left as it is`); continue; }
     const o = out[name] = buildDesk(name, per, prev, now, days);
-    fs.mkdirSync(path.dirname(file), { recursive: true }); writeAtomic(file, JSON.stringify(o));
+    writeDesk(dir, name, o);
     console.log(`${name} desk: ${o.counts.n} records (${o.counts.open} open, ${o.counts.live} seen live), ${o.read.length} markets read`); }
   return out;
 }
