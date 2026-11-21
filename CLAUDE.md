@@ -5051,6 +5051,12 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   only without the file does it replay in the browser. PAPER RECORD ONLY: no order, alert, mirror copy or Trader read; not a
   tested rule, never "an edge" (the barrier entry still takes every fresh barrier). `datahealth.mjs` lists the file (warn 6 h).
   Tests: `tests/mosha-tracker.test.mjs`.
+  **Second source** (21 Nov 2026, owner: "if mosha cannot use oanda use something different"; OANDA answered 520 from the 20 Nov
+  close on): `candles()` reads every timeframe from OANDA or, when any fails, every timeframe from Kraken's gold token (PAXG/USD,
+  the Trader's own gold fallback; weekend candles dropped, `spotShut`), never a mix; the file says `feed`. On the fallback
+  `merge(…, 'Kraken')` adds only entries of the last `FALLBACK_NEW_S` 2 h (stamped `feed: 'Kraken'`, a log line says the prices
+  sit a few dollars from spot) and never updates a record read on OANDA; back on OANDA a Kraken record is left as it stands
+  (an open one stays open: known, not solved). Not checked against the live exchange (not reachable from the build sandbox).
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

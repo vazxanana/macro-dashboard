@@ -39,6 +39,33 @@ export async function bars(tf, now, get = fetch) {
   return [...out.values()].sort((a, b) => a.time - b.time).filter((b) => b.time + sec <= now);
 }
 
+// The second source (21 Nov 2026, owner: "if mosha cannot use oanda use something different"): Kraken's gold token (PAXG/USD),
+// the council Trader's own fallback for gold. It trades at the weekend and a few dollars from spot, and Kraken serves only its
+// last 720 candles a timeframe, so: weekend candles are dropped, a fallback run never touches a record read on OANDA, and it
+// adds only entries of the last FALLBACK_NEW_S (what is happening now), never a replay of history on another price basis.
+export const FALLBACK_NEW_S = 2 * 3600;
+const KR = { '1m': 1, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '4h': 240, '1d': 1440 };
+export const spotShut = (t) => { const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };
+export async function krakenBars(tf, now, get = fetch) {
+  const r = await get(`https://api.kraken.com/0/public/OHLC?pair=PAXGUSD&interval=${KR[tf]}`, { signal: AbortSignal.timeout(20000) });
+  if (!r.ok) throw new Error(`Kraken ${tf}: HTTP ${r.status}`);
+  const j = await r.json(); if (j.error && j.error.length) throw new Error(`Kraken ${tf}: ${j.error[0]}`);
+  const key = Object.keys(j.result || {}).find((k) => k !== 'last'); if (!key) throw new Error(`Kraken ${tf}: no candles`);
+  const sec = SOP.SEC[tf];
+  return j.result[key].map((k) => ({ time: +k[0], open: +k[1], high: +k[2], low: +k[3], close: +k[4], volume: +k[6] || 0 }))
+    .filter((b) => b.time + sec <= now && (tf === '1d' || !spotShut(b.time))).sort((a, b) => a.time - b.time);
+}
+// every timeframe from OANDA, or (any one missing) every timeframe from Kraken: never a mix
+export async function candles(now, get = fetch, wait = (ms) => new Promise((r) => setTimeout(r, ms))) {
+  const B = {};
+  try { for (const tf of Object.keys(SOP.BACK)) B[tf] = await bars(tf, now, get); if (B['5m'].length) return { feed: 'OANDA', B }; throw new Error('no candles'); }
+  catch (e) { const why = String(e && e.message || e);
+    try { const K = {}; for (const tf of Object.keys(SOP.BACK)) { K[tf] = await krakenBars(tf, now, get); await wait(1200); } return { feed: 'Kraken', B: K, why }; }
+    catch (e2) { throw new Error(`${why}; second source: ${e2 && e2.message || e2}`); } }
+}
+const feedOf = (r) => r.feed || 'OANDA';
+const KR_NOTE = 'Read on Kraken gold-token candles while the main price source was down: its prices sit a few dollars from spot gold.';
+
 const num = (v) => (Number.isFinite(+v) ? +(+v).toFixed(3) : null);
 // one record as stored: plain values only, and never without a stop on the losing side
 export function clean(r) {
@@ -51,26 +78,28 @@ export function clean(r) {
 
 // join this run's reading onto the stored record. A closed record is never changed; an open one is updated; a new one is
 // stamped with when the tracker first saw it (`first`) and whether that was while it was live (`src`).
-export function merge(prev, fresh, now) {
+export function merge(prev, fresh, now, feed = 'OANDA') {
   const old = new Map((prev || []).map((r) => [r.id, r])), out = [];
   const near = (r) => (prev || []).some((p) => p.id !== r.id && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S);
   const seen = new Set();
   for (const f of fresh) { const c = clean(f); if (!c || seen.has(c.id)) continue; seen.add(c.id);
     const p = old.get(c.id);
-    if (p && p.R != null) { out.push(p); continue; }                                   // closed: frozen as booked
-    if (p) { out.push({ ...c, first: p.first, src: p.src }); continue; }                // open: follow it
+    if (p && (p.R != null || feedOf(p) !== feed)) { out.push(p); continue; }           // closed: frozen as booked; another feed's record: only its own feed follows it
+    if (p) { out.push({ ...c, first: p.first, src: p.src, ...(p.feed ? { feed: p.feed } : {}) }); continue; }   // open: follow it
     if (near(c)) continue;
+    if (feed !== 'OANDA') { if (now - c.t > FALLBACK_NEW_S) continue;                   // the second source adds only what is happening now
+      out.push({ ...c, log: c.log.concat({ t: null, text: KR_NOTE }), first: now, src: now - c.t <= LIVE_S ? 'live' : 'replay', feed }); continue; }
     out.push({ ...c, first: now, src: now - c.t <= LIVE_S ? 'live' : 'replay' }); }
   for (const p of prev || []) if (!seen.has(p.id)) out.push(p);                         // out of this run's window: kept as it was
   return out.sort((a, b) => b.t - a.t).slice(0, KEEP);
 }
 
-export function build(B, F, prev, now) {
+export function build(B, F, prev, now, feed = 'OANDA') {
   if (!B['5m'] || !B['5m'].length) throw new Error('no candles');
   const from = B['5m'][B['5m'].length - 1].time - SOP.DAYS * 86400;
   const fresh = SOP.sopTrades(B, F, { from }).concat(SOP.barrierTrades(B, F, { from }));
-  const records = merge(prev && prev.records, fresh, now), s = SOP.summary(records);
-  return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', through: B['5m'][B['5m'].length - 1].time + 300, days: SOP.DAYS,
+  const records = merge(prev && prev.records, fresh, now, feed), s = SOP.summary(records);
+  return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', feed, through: B['5m'][B['5m'].length - 1].time + 300, days: SOP.DAYS,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },
     note: 'A paper record of the desk\'s reading of the Mosha method on gold: nothing is traded, results are before costs, and it is not a tested rule.', records };
 }
@@ -78,11 +107,11 @@ export function build(B, F, prev, now) {
 export async function main(dir, now = Math.floor(Date.now() / 1000)) {
   const file = path.join(dir, 'mosha', 'desk.json'); let prev = null;
   if (fs.existsSync(file)) { try { prev = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { throw new Error('mosha/desk.json does not parse: left as it is'); } }
-  const F = loadFns(), B = {};
-  for (const tf of Object.keys(SOP.BACK)) B[tf] = await bars(tf, now);
-  const out = build(B, F, prev, now);
+  const F = loadFns(), { feed, B, why } = await candles(now);
+  if (why) console.log(`Mosha desk: main price source failed (${why}); reading Kraken's gold token instead`);
+  const out = build(B, F, prev, now, feed);
   fs.mkdirSync(path.dirname(file), { recursive: true }); writeAtomic(file, JSON.stringify(out));
-  console.log(`Mosha desk: ${out.counts.n} records (${out.counts.open} open, ${out.counts.live} seen live), through ${new Date(out.through * 1000).toISOString()}`);
+  console.log(`Mosha desk [${feed}]: ${out.counts.n} records (${out.counts.open} open, ${out.counts.live} seen live), through ${new Date(out.through * 1000).toISOString()}`);
   return out;
 }
 
