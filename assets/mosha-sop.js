@@ -19,11 +19,13 @@
 //     the barrier's timeframe wholly outside it, on the side price came from) and came back, before it was broken: one entry per
 //     visit, labelled "· second visit" (visit 3 and later "· visit n").
 // The method's pages applied to the detail (21 Nov 2026, owner: "build"; each has an option that reads it the older way):
-//   - the VR and the CF are breaks of the chart's SMALL swings (3 candles a side, msInternal): the VR is the close through the
-//     small swing right before the extreme, as the pages draw it (o.vr: 'major' reads the 6-a-side protected swing as before);
+//   - the VR, the CF and the QM at a barrier are breaks of the chart's SMALL swings (3 candles a side): a QM is the close through
+//     the last swing BEFORE the extreme (the swing the last leg came from), as the pages draw it, never a pivot formed after
+//     the extreme (o.vr: 'major' reads the 6-a-side protected swing as before; o.qm: 'internal' the barrier QM as before);
 //   - a barrier's BOX runs from the swing level the break took to the origin extreme of the leg (o.box: 'candle' = the last
 //     opposite candle at the origin, the charts' own zone);
-//   - the JANDA's limit rests at the engulf zone inside the second BO's leg (o.janda: 'level' = at the level that BO broke);
+//   - the JANDA's limit rests at the engulf zone (the engulfed candle and the candle that engulfs it) inside the second BO's
+//     leg (o.janda: 'level' = at the level that BO broke);
 //   - the second confirmation table: H4 on M30, H1 on M15, M30 barriers on M5 (M15 on M5 was already read: "· M5 confirm");
 //   - REPEAT THE SOP: after the QM at a barrier, a VR and its CF one timeframe lower are a confirmation of their own
 //     (id "bar-sop-", label "· repeat SOP"; o.rsop: false leaves it out).
@@ -60,12 +62,23 @@
   var utc = function (s) { return s ? new Date(s * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC' : '—'; };
   var word = function (d) { return d > 0 ? 'buy' : 'sell'; };
 
-  // the chart's small-swing breaks (3 candles a side) in the shape msMosha reads: `structure` = a BO Structure (the first break
-  // against the break before it); the break's box runs from the level it took to the extreme of the leg behind it. An event at
-  // candle i reads candles up to i only (a swing is used once its third candle after it has closed).
+  // The chart's small-swing breaks (3 candles a side). A BO Structure (QM) is the close through the swing the LAST leg to the
+  // extreme came from: that level moves only when a new extreme is made (a continuation break), never to a pivot that forms
+  // after the extreme (a dip and a lower high under a top do not give a new level; the pages draw the VR from the extreme to
+  // the last swing BEFORE it, and that swing is the one broken). This is the page's protected-swing reading (msAnalyze) at 3 a
+  // side; only what an event carries at its own candle is read (level, swing, break, structure), never what msAnalyze adds later.
+  // The box of a break: from the level it took to the extreme behind it (for a QM, the extreme of the move it ends: the
+  // highest high or lowest low since the break before it). An event at candle i reads candles up to i only.
+  function swingEv(F, W) {
+    var ev = F.msAnalyze(W, 3).events, out = [];
+    for (var k = 0; k < ev.length; k++) { var e = ev[k], a = e.structure && k ? Math.min(e.fromIdx, ev[k - 1].breakIdx) : e.fromIdx, lo = Infinity, hi = -Infinity;
+      for (var q = a; q <= e.breakIdx; q++) { lo = Math.min(lo, W[q].low); hi = Math.max(hi, W[q].high); }
+      out.push({ dir: e.dir, level: e.level, structure: !!e.structure, fromIdx: e.fromIdx, breakIdx: e.breakIdx, lo: lo, hi: hi }); }
+    return out;
+  }
+  // the same breaks in the shape msMosha reads
   function smallEv(F, W) {
-    return F.msInternal(W, W.length, 3).map(function (e) { var lo = Infinity, hi = -Infinity; for (var q = e.fromIdx; q <= e.breakIdx; q++) { lo = Math.min(lo, W[q].low); hi = Math.max(hi, W[q].high); }
-      return { dir: e.dir, level: e.level, structure: e.structure, t: W[e.breakIdx].time, fromT: W[e.fromIdx].time, top: e.dir > 0 ? e.level : hi, bot: e.dir > 0 ? lo : e.level }; });
+    return swingEv(F, W).map(function (e) { return { dir: e.dir, level: e.level, structure: e.structure, t: W[e.breakIdx].time, fromT: W[e.fromIdx].time, top: e.dir > 0 ? e.level : e.hi, bot: e.dir > 0 ? e.lo : e.level }; });
   }
   // M30 candles from M15 ones, where a caller hands none: only whole half hours (both quarters closed)
   function m30of(A) {
@@ -315,17 +328,22 @@
         var lim = start + BARRIER_WATCH * SEC[ctf], x = z.x0 != null ? z.x0 : d < 0 ? -Infinity : Infinity, sig = null, jan = null, xs = null;
         for (i = at(C, start - SEC[ctf] + 1); i < C.length && C[i].time < lim; i++) { var c = C[i]; if (o.until && c.time + SEC[ctf] > o.until) break; x = d < 0 ? Math.max(x, c.high) : Math.min(x, c.low);
           if (d < 0 ? c.close > z.hi + h : c.close < z.lo - h) break;                                  // closed well through the barrier: it did not hold
-          var W = C.slice(Math.max(0, i - 240), i + 1), ev = F.msInternal(W, W.length, 3), e = ev[ev.length - 1];
+          // the QM is the break of the swing the last leg came from (swingEv); o.qm 'internal' = any newer small pivot, as before
+          var W = C.slice(Math.max(0, i - 240), i + 1), ev = o.qm === 'internal' ? F.msInternal(W, W.length, 3) : swingEv(F, W), e = ev[ev.length - 1];
           if (!e || e.breakIdx !== W.length - 1) continue;
           if (!sig) { if (e.dir === d && e.structure && W[e.fromIdx].time >= t0 - 30 * SEC[ctf]) { sig = { i: i, level: e.level, t: c.time + SEC[ctf], close: c.close }; xs = x; } continue; }
           // after the QM: the next break the same way that is NOT another QM is the Janda's BO; a break the other way ends it
           if (e.dir !== d) break;
           if (!e.structure && (d > 0 ? e.level > sig.level : e.level < sig.level)) { jan = { i: i, level: e.level, t: c.time + SEC[ctf] };
-            // the engulf zone inside this second BO's leg (the pages: "the engulfing candle within the 2nd BO"): the last candle
-            // against the break at or before the leg's pullback extreme, out to that extreme; the limit rests at its near side,
-            // which must lie on the pullback side of the BO candle's close
-            if (o.janda !== 'level') { var jz = F.msZones(W, [{ dir: d, fromIdx: e.fromIdx, breakIdx: e.breakIdx }], W.length)[0], jp = jz ? (d < 0 ? jz.lo : jz.hi) : NaN;
-              jan.zone = jz && (d < 0 ? jp > c.close : jp < c.close) ? { lo: jz.lo, hi: jz.hi, px: jp, t: W[jz.i].time } : null; }
+            // the engulf zone inside this second BO's leg (the pages: "the engulfing candle within the 2nd BO"): the PAIR, the last
+            // candle against the break at or before the leg's pullback extreme (out to that extreme) and the first candle after
+            // it that closes beyond its far edge (the candle that engulfs it); the limit rests at the pair's near side, which
+            // must lie on the pullback side of the BO candle's close (no pair, or price already in it at the BO: no Janda)
+            if (o.janda !== 'level') { var jz = F.msZones(W, [{ dir: d, fromIdx: e.fromIdx, breakIdx: e.breakIdx }], W.length)[0], jl = NaN, jh = NaN, je = -1, jq;
+              if (jz) for (jq = jz.i + 1; jq <= e.breakIdx; jq++) if (d < 0 ? W[jq].close < W[jz.i].low : W[jq].close > W[jz.i].high) { je = jq; break; }
+              if (je >= 0) { jl = Math.min(jz.lo, W[je].low); jh = Math.max(jz.hi, W[je].high); }
+              var jp = d < 0 ? jl : jh;
+              jan.zone = je >= 0 && (d < 0 ? jp > c.close : jp < c.close) ? { lo: jl, hi: jh, px: jp, t: W[jz.i].time } : null; }
             break; } }
         if (!sig) return;
         var cf = z.kind === 'cf', vr = z.kind === 'vr', sw = z.kind === 'sweep', src = z.kind === 'bo' ? 'BO' : 'iBO', up = UP[zt], ud = up ? dirAt(up, t0) : 0, wd = ud ? ud === d : null, vn = z.visit || 1;
@@ -485,7 +503,7 @@
     return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
       function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
   }
-  var API = { MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, smallEv: smallEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  var API = { MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
