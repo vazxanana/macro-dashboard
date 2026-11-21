@@ -85,3 +85,20 @@ test('the replay leads the desk: closed R by day, and the card comes first for t
   const js = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8');
   for (const k of ['mo-sop-ans', 'mo-sop-tiles', 'Open now', 'Closed R by day', 'Too few']) assert.ok(js.includes(k), k);
 });
+
+test('another market gets the same reading at the same share of price: gold candles scaled to a forex price give the same trades, scaled', () => {
+  const q = 1.15 / 4000, Bq = Object.fromEntries(Object.entries(B).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open * q, high: b.high * q, low: b.low * q, close: b.close * q }))]));
+  // gold's own sizes are dollars written near 4,000; at exactly that share of price the two readings must agree
+  const g = M.sopTrades(B, F, { from, buf: undefined }).concat(M.barrierTrades(B, F, { from }));
+  const e = M.sopTrades(Bq, F, { from, market: 'eurusd' }).concat(M.barrierTrades(Bq, F, { from, market: 'eurusd' }));
+  assert.ok(e.length >= 3, 'entries on the scaled market: ' + e.length);
+  for (const r of e) { assert.equal(r.market, 'eurusd'); assert.match(r.id, /^eurusd:(sop|bar)-/);
+    assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1: ' + r.id);
+    const z = M.sizes('eurusd', r.entry); assert.ok(r.r0 > 0 && r.r0 <= z.rmax * 1.0001 || r.kind === 'sop', 'risk within the scaled limit: ' + r.id);
+    assert.doesNotMatch(r.log.map((x) => x.text).join(' '), /\$/, 'no dollar sign on a forex price'); }
+  const same = e.filter((r) => g.some((x) => r.id === 'eurusd:' + x.id && x.side === r.side && Math.abs(x.entry * q - r.entry) < 1e-9));
+  assert.ok(same.length >= Math.floor(0.8 * Math.max(e.length, g.length)), `same trades on both: ${same.length} of ${e.length} / ${g.length}`);
+  for (const r of g) { assert.equal(r.market, 'xau'); assert.doesNotMatch(r.id, /:/); }
+  assert.deepEqual(M.sizes('xau', 9999), { buf: 0.3, rmin: 0.8, rmax: 25, zmin: 0.5 }, 'gold keeps its dollar figures at any price');
+  assert.deepEqual(Object.keys(M.MARKETS), ['xau', 'xag', 'eurusd', 'gbpusd', 'nas100']);
+});

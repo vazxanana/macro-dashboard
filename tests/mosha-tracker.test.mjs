@@ -84,3 +84,16 @@ test('a record keeps the marks its chart draws, and the chart opens it with them
   const seen = []; await M.bars('1h', 2e9, async (u) => { seen.push(+/from=(\d+)/.exec(u)[1]); return { ok: true, json: async () => ({ bars: [] }) }; }, 90);
   assert.ok(Math.min(...seen) <= 2e9 - (90 + 76) * 86400);
 });
+
+test('more markets: a record of another market keeps its market and its decimals, and is never taken for a gold trade re-read', () => {
+  const fx = M.clean(rec({ id: 'eurusd:bar-15m-1000', market: 'eurusd', entry: 1.152345, stop: 1.153012, target: 1.150344 }));
+  assert.equal(fx.market, 'eurusd'); assert.equal(fx.entry, 1.152345); assert.equal(fx.stop, 1.153012);
+  assert.equal(M.clean(rec({})).market, undefined, 'a gold record is stored as before');
+  assert.equal(M.clean(rec({ market: 'nope' })).market, undefined);
+  assert.equal(M.clean(rec({ id: 'eurusd:x', market: 'eurusd', entry: 1.15, stop: 1.14 })), null, 'rule 1 on every market');
+  const out = M.merge([M.clean(rec({}))], [rec({ id: 'eurusd:bar-15m-1000', market: 'eurusd', entry: 1.1523, stop: 1.1530, target: 1.1502 })], 1500);
+  assert.equal(out.length, 2, 'same kind, side and minute on another market is another trade');
+  assert.deepEqual(M.OTHER, ['xag', 'eurusd', 'gbpusd', 'nas100']);
+  const src = rd('council/mosha-desk.mjs'); assert.match(src, /for \(const m of OTHER\) \{ try \{/); assert.match(src, /skipped/);
+  const page = rd('assets/mosha-sop.js'); assert.match(page, /data-sop-mk/); assert.match(page, /market: mkR\(r\)/);
+});

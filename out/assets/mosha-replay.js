@@ -311,12 +311,14 @@
     var card = $('mo-replay'); if (!card) return; stop(); R.spec = spec; var tk = ++R.token, msg = $('mo-rp-msg');
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-pick button'), function (b) { b.setAttribute('aria-pressed', String(b.dataset.ex === spec.id)); });
     $('mo-rp-label').textContent = labelOf(spec);
+    // the price scale's decimals follow the market (a forex pair needs five)
+    var dp = ({ eurusd: 5, gbpusd: 5, xag: 3, nas100: 1 })[spec.market] || 2, fitDp = function () { if (R.series && R.series.applyOptions) R.series.applyOptions({ priceFormat: { type: 'price', precision: dp, minMove: Math.pow(10, -dp) } }); };
     // a trade of the desk's own record is not one of the screenshot examples: the card says which it is showing
     var hd = card.querySelector('.ms-k'); if (hd) { if (!hd.dataset.h0) hd.dataset.h0 = hd.innerHTML; if (spec.rp) hd.innerHTML = '<span>This trade, on the chart</span><small>what the desk read, step by step, on our candles · times in UTC</small>'; else if (hd.innerHTML !== hd.dataset.h0) { hd.innerHTML = hd.dataset.h0; var I = root.MS_MOSHA_I18N; if (I && I.apply) I.apply(hd); } }
     if (scroll) card.scrollIntoView({ block: 'start', behavior: 'smooth' });
     if (!root.LightweightCharts) { msg.hidden = false; msg.textContent = L('The chart library did not load. Reload the page.'); return; }
     var done = function (m5) { if (tk !== R.token) return; if (!m5 || m5.length < 20) { msg.hidden = false; msg.textContent = L('No candles came back for that time. Check the connection and open the trade again.'); return; }
-      msg.hidden = true; build(); R.base = m5; R.oc = outcome(spec, m5); R.steps = stepsOf(spec, R.oc);
+      msg.hidden = true; build(); fitDp(); R.base = m5; R.oc = outcome(spec, m5); R.steps = stepsOf(spec, R.oc);
       var list = tfsOf(spec); if (spec.view && R.viewOf !== spec.id) R.tf = spec.view; if (list.indexOf(R.tf) < 0) R.tf = list[0]; R.viewOf = spec.id;   // a bigger picture opens on its own candle size
       $('mo-rp-tf').innerHTML = TFS.filter(function (t) { return list.indexOf(t[0]) >= 0; }).map(function (t) { return '<button type="button" data-tf="' + t[0] + '" aria-pressed="' + (t[0] === R.tf) + '">' + t[1] + '</button>'; }).join('');
       $('mo-rp-steps').innerHTML = stepsHTML();
