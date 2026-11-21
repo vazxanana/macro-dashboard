@@ -5263,6 +5263,13 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     over H1, H1 over M15; none for a D1 barrier; `dirAt`, candles closed when price came back) and records `withDir`
     (true / false; kept by `clean`), names it in the label ("· with H4" / "· against H4") and the log; the desk's rows say so
     and "By entry type" lists the two apart. Entry, stop and the 3R target are unchanged (the method gives no other target).
+  - **The CF as a barrier** (21 Nov 2026, the pages give the sequence's entry as the BARRIER entry "before or after the CF"; the
+    EG entry stays as the owner's own choice of 12 Nov): `sopTrades(…, { cfOut })` hands over each clean CF zone (never a CF
+    inside the VR) once, at the candle that first shows it; `barrierTrades(…, { extra })` reads it like any barrier (return on
+    the finest candles, a QM on the table's confirmation timeframe, the pullback limit at the broken level, stop past the
+    extreme made there). Only CF zones on H4, H1 and M15 have a confirmation timeframe in the table. Target: the VR's extreme
+    when it is 1R or more away on the winning side (the sequence's own target), else the replay's 3R. Record: `kind: 'barrier'`,
+    id `bar-cf-<tf>-<fill>`, label "H1 CF barrier · H4 BO". Without `extra` nothing changes (`desk-rigor` passes none).
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

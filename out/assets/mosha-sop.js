@@ -50,7 +50,7 @@
 
   // 1. the sequence, every step of the ladder. B = { tf: closed candles, oldest first }, F = the page's own functions.
   function sopTrades(B, F, o) {
-    o = o || {}; var from = o.from, piv = o.pivot || PIVOT, win = o.win || WIN, fine = B['5m'] || [], map = {}, out = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
+    o = o || {}; var from = o.from, piv = o.pivot || PIVOT, win = o.win || WIN, fine = B['5m'] || [], map = {}, cfSeen = {}, out = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
     LADDER.forEach(function (p) {
       var h = p[0], l = p[1], H = B[h], L = B[l]; if (!H || !L || !H.length || !L.length) return;
       var hN = -1, HA = null, Hw = null, n = 0;
@@ -64,6 +64,10 @@
           { events: LA.events.map(function (e) { return { dir: e.dir, level: e.level, structure: e.structure, t: Lw[e.breakIdx] ? Lw[e.breakIdx].time : Infinity, fromT: Lw[e.fromIdx] ? Lw[e.fromIdx].time : 0, top: e.top, bot: e.bot }; }), bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf);
         // a trade is recorded only AT the candle whose close is its EG, as the chart read then: the window slides, so a later
         // look could re-read an old stretch and "find" an entry days after the fact (21 Nov 2026, independent audit)
+        // the method's own entry at the CF is the BARRIER entry (the pages: "before CF or after CF, using the barrier entry"):
+        // each clean CF zone is handed over once, at the candle that first shows it, for barrierTrades to read as a barrier
+        if (o.cfOut && M && M.cf && M.vr && M['case'] !== 2 && !cfSeen[l + '|' + M.cf.t]) { cfSeen[l + '|' + M.cf.t] = 1;
+          o.cfOut.push({ tf: l, dir: A.trend, lo: M.cf.lo, hi: M.cf.hi, kind: 'cf', known: L[i].time + SEC[l], of: NAME[h], tgt: M.vr.ext }); }
         if (!M || !M.trade || M.trade.fillT !== L[i].time || !(M.trade.fillT + SEC[l] >= from)) continue;
         // a CF INSIDE the VR is the method's "likely to fail" case: wait, do not enter (21 Nov 2026, the documents checked page by page)
         if (M['case'] === 2 && !o.case2) continue;
@@ -108,7 +112,11 @@
     var dirAt = function (tf, t) { var H = B[tf] || [], n = at(H, t - SEC[tf] + 1), k = tf + n; if (!(k in dirMemo)) { var Hw = H.slice(Math.max(0, n - WIN), n), A = Hw.length > 20 ? F.msAnalyze(Hw, PIVOT) : null; dirMemo[k] = A && A.trend ? A.trend : 0; } return dirMemo[k]; };
     BARRIER.forEach(function (pair) {
       var zt = pair[0], ctf = pair[1], C = B[ctf] || []; if (!C.length || !(B[zt] || []).length) return;
-      zonesOf(zt, B, F).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
+      // the CF zones the sequence handed over (o.extra): the first candle after the zone was known that trades into it is its return
+      var own = (o.extra || []).filter(function (z) { return z.tf === zt; }).map(function (z) { var Z = B[zt], q = at(Z, z.known), tch = null;
+        for (; q < Z.length; q++) if (z.dir < 0 ? Z[q].high >= z.lo : Z[q].low <= z.hi) { tch = Z[q].time; break; }
+        return { tf: zt, dir: z.dir, lo: z.lo, hi: z.hi, kind: 'cf', known: z.known, touch: tch, of: z.of, tgt: z.tgt }; });
+      zonesOf(zt, B, F).concat(own).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
         var d = z.dir, t0 = z.touch, x = d < 0 ? -Infinity : Infinity, sig = null, h = z.hi - z.lo, i;
         // z.touch is the OPEN time of the barrier-timeframe candle that came back: the moment itself is read on the finest candles
         // that reach back to it, and the confirmation is looked for from the candle that holds that moment, never before it
@@ -129,14 +137,16 @@
           x = d < 0 ? Math.max(x, b.high) : Math.min(x, b.low); }
         if (fi < 0 || !(fine[fi].time >= from)) return;
         var entry = sig.level, Z0 = sizes(mk, entry), stop = d < 0 ? x + Z0.buf : x - Z0.buf, r0 = Math.abs(entry - stop); if (!(r0 > Z0.rmin) || r0 > Z0.rmax || (d < 0 ? stop <= entry : stop >= entry)) return;
-        var src = z.kind === 'bo' ? 'BO' : 'iBO', up = UP[zt], ud = up ? dirAt(up, t0) : 0, wd = ud ? ud === d : null;
-        var tr = { id: pre + 'bar-' + zt + '-' + fine[fi].time, market: mk, kind: 'barrier', label: NAME[zt] + ' barrier · ' + src + ' origin' + (wd == null ? '' : wd ? ' · with ' + NAME[up] : ' · against ' + NAME[up]), withDir: wd, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BARRIER_R * r0 : entry + BARRIER_R * r0, r0: r0, zone: z };
+        var cf = z.kind === 'cf', src = z.kind === 'bo' ? 'BO' : 'iBO', up = UP[zt], ud = up ? dirAt(up, t0) : 0, wd = ud ? ud === d : null;
+        var tr = { id: pre + 'bar-' + (cf ? 'cf-' : '') + zt + '-' + fine[fi].time, market: mk, kind: 'barrier', label: (cf ? NAME[zt] + ' CF barrier · ' + z.of + ' BO' : NAME[zt] + ' barrier · ' + src + ' origin') + (wd == null ? '' : wd ? ' · with ' + NAME[up] : ' · against ' + NAME[up]), withDir: wd, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BARRIER_R * r0 : entry + BARRIER_R * r0, r0: r0, zone: z };
+        // a CF barrier keeps the sequence's own target, the VR's extreme, when that is at least 1R away on the winning side
+        var vrT = cf && isFinite(z.tgt) && d * (z.tgt - entry) >= r0; if (vrT) tr.target = z.tgt;
         tr.log = [
-          { t: z.known, text: NAME[zt] + ' barrier: a fresh ' + (d < 0 ? 'supply' : 'demand') + ' zone ' + f2(z.lo) + ' to ' + f2(z.hi) + ', the origin of ' + (z.kind === 'bo' ? 'a BO' : 'an internal BO') + ' ' + word(d) + '.' },
+          { t: z.known, text: NAME[zt] + ' barrier: a fresh ' + (d < 0 ? 'supply' : 'demand') + ' zone ' + f2(z.lo) + ' to ' + f2(z.hi) + (cf ? ', the CF zone of the ' + z.of + ' BO ' + word(d) + ' (the sequence\'s own entry, taken as a barrier).' : ', the origin of ' + (z.kind === 'bo' ? 'a BO' : 'an internal BO') + ' ' + word(d) + '.') },
           { t: t0, text: 'Price came back to the barrier for the first time. Its confirmation is read on ' + NAME[ctf] + '.' + (wd == null ? '' : wd ? ' The barrier is with the ' + NAME[up] + ' direction (' + word(ud) + ').' : ' The barrier is AGAINST the ' + NAME[up] + ' direction (' + word(ud) + '): the method expects only a rejection from it.') },
           { t: sig.t, text: NAME[ctf] + ' CF: a QM (BO Structure) ' + word(d) + ', a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '. A ' + word(d) + ' limit rests at that level for the pullback.' },
-          { t: tr.t, text: 'Price pulled back to the level: ' + word(d) + ' ' + f2(entry) + ', stop ' + f2(stop) + ' (' + U + f2(Z0.buf) + ' past the extreme ' + f2(x) + ' made at the barrier, risk ' + U + f2(r0) + '), target ' + f2(tr.target) + ' (' + BARRIER_R + 'R: the replay\'s own choice, the method names no fixed target here).' }];
-        tr.marks = [{ kind: 'zone', top: z.hi, bot: z.lo, a: z.known - SEC[zt], at: z.known, label: NAME[zt] + ' barrier' },
+          { t: tr.t, text: 'Price pulled back to the level: ' + word(d) + ' ' + f2(entry) + ', stop ' + f2(stop) + ' (' + U + f2(Z0.buf) + ' past the extreme ' + f2(x) + ' made at the barrier, risk ' + U + f2(r0) + '), target ' + f2(tr.target) + (vrT ? ' (the VR\'s extreme, ' + (Math.abs(tr.target - entry) / r0).toFixed(1) + 'R).' : ' (' + BARRIER_R + 'R: the replay\'s own choice, the method names no fixed target here).') }];
+        tr.marks = [{ kind: 'zone', top: z.hi, bot: z.lo, a: z.known - SEC[zt], at: z.known, label: NAME[zt] + (cf ? ' CF zone (barrier)' : ' barrier') },
           { kind: 'level', p: sig.level, a: t0, at: sig.t, label: NAME[ctf] + ' CF (QM)', under: d < 0 },
           { kind: 'level', p: x, a: t0, at: sig.t, label: 'Extreme at the barrier', under: d > 0 }];
         tr._f = fi; rows.push(tr);
@@ -227,8 +237,8 @@
     Object.keys(BACK).forEach(function (tf) { p = p.then(function () { return bars(tf, now).then(function (a) { B[tf] = a; }); }); });
     p.then(function () { return new Promise(function (ok) { setTimeout(ok, 30); }); }).then(function () {
       if (!B['5m'].length) throw new Error('no candles');
-      var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400, a = sopTrades(B, F, { from: from });
-      return new Promise(function (ok) { setTimeout(function () { ok(a.concat(barrierTrades(B, F, { from: from }))); }, 30); });
+      var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400, cfz = [], a = sopTrades(B, F, { from: from, cfOut: cfz });
+      return new Promise(function (ok) { setTimeout(function () { ok(a.concat(barrierTrades(B, F, { from: from, extra: cfz }))); }, 30); });
     }).then(function (rows) { S.rows = rows.sort(function (a, b) { return b.t - a.t; }); S.state = 'done'; S.at = Date.now(); }, function (e) { S.state = 'failed'; S.err = String(e && e.message || e); }).then(draw);
   }
   function line(name, rows, extra) {
@@ -238,7 +248,7 @@
   }
   function rowHTML(r) {
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
-    var op = !!S.open[r.id], kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' + (r['case'] === 2 ? ' · CF inside the VR' : '') : NAME[r.h] + ' barrier → ' + NAME[r.l] + ' QM' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
+    var op = !!S.open[r.id], kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' + (r['case'] === 2 ? ' · CF inside the VR' : '') : NAME[r.h] + (/CF barrier/.test(r.label || '') ? ' CF barrier → ' : ' barrier → ') + NAME[r.l] + ' QM' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
     return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(kind) + ' · ' + esc(ALL[mkR(r)].name) + '</small></td>' +
       '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span>' + (r.src ? ' <small class="mo-sop-src">' + (r.src === 'live' ? 'live' : 'replay') + '</small>' : '') + '</td>' +
       '<td class="n" data-l="Entry">' + fP(r, r.entry) + '</td><td class="n" data-l="Stop">' + fP(r, r.stop) + '</td><td class="n" data-l="Target">' + fP(r, r.target) + '</td>' +
@@ -252,7 +262,7 @@
     var m = mkR(r), tR = Math.abs(r.target - r.entry) / (r.r0 || Math.abs(r.entry - r.stop)), fl = r['float'], hi = Math.max(3, Math.ceil(tR)), lo = -1;
     var pc = function (v) { return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100)).toFixed(1); }, z = pc(0);
     var fill = fl == null ? '' : '<i class="' + (fl >= 0 ? 'up' : 'dn') + '" style="left:' + (fl >= 0 ? z : pc(fl)) + '%;width:' + Math.abs(pc(fl) - z).toFixed(1) + '%"></i>';
-    var kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' : NAME[r.h] + ' barrier → ' + NAME[r.l] + ' QM' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
+    var kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' : NAME[r.h] + (/CF barrier/.test(r.label || '') ? ' CF barrier → ' : ' barrier → ') + NAME[r.l] + ' QM' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
     return '<li data-sop-chart="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(word(r.side) + ' ' + ALL[m].name + ', ' + (fl == null ? 'no reading yet' : fR(fl) + ' at the last reading') + ', open, view the chart') + '">' +
       '<div class="r1"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><b class="mk">' + esc(ALL[m].name) + '</b><span class="pl">' + esc(kind) + '</span>' + (r.src ? '<span class="pl">' + (r.src === 'live' ? 'live' : 'replay') + '</span>' : '') +
       '<span class="live ' + (fl == null ? '' : fl >= 0 ? 'pos' : 'neg') + '">' + (fl == null ? '<small>no reading yet</small>' : fR(fl) + '<small>at the last reading</small>') + '</span></div>' +

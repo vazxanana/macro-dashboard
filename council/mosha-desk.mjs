@@ -124,7 +124,8 @@ export function settle(records, freshIds, M5, market = 'xau', feed = 'OANDA') {
 export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market = 'xau') {
   if (!B['5m'] || !B['5m'].length) throw new Error('no candles');
   const from = B['5m'][B['5m'].length - 1].time - days * 86400;
-  const fresh = SOP.sopTrades(B, F, { from, market }).concat(SOP.barrierTrades(B, F, { from, market }));
+  const cfz = [], seq = SOP.sopTrades(B, F, { from, market, cfOut: cfz });   // the sequence's clean CF zones are barriers too (the method's own entry at the CF)
+  const fresh = seq.concat(SOP.barrierTrades(B, F, { from, market, extra: cfz }));
   const records = settle(merge(prev && prev.records, fresh, now, feed), new Set(fresh.map((r) => r.id)), B['5m'], market, feed), s = SOP.summary(records);
   return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', markets: [...new Set(records.map((r) => r.market || 'xau'))], feed: market === 'xau' ? feed : (prev && prev.feed) || feed, through: market === 'xau' || !(prev && prev.through) ? B['5m'][B['5m'].length - 1].time + 300 : prev.through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },

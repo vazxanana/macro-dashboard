@@ -137,3 +137,19 @@ test('a barrier trade says whether it is with or against the direction of the ti
       const again = M.barrierTrades(cut(X, r.endT ? r.endT + 60 : e), F, { from: e - 20 * 86400 }).find((q) => q.id === r.id); if (again) assert.equal(again.withDir, r.withDir); } }
   assert.ok(w >= 1 && a >= 1, 'both kinds occur: ' + w + ' / ' + a);
 });
+
+test('the CF as a barrier: the sequence hands its clean CF zones over, and the barrier entry reads them without hindsight', () => {
+  let n = 0;
+  for (const seed of [7, 11, 23, 31, 47]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, cfz = [];
+    M.sopTrades(X, F, { from: fr, cfOut: cfz });
+    assert.ok(cfz.every((z) => z.kind === 'cf' && z.hi > z.lo && z.known > 0 && (z.dir === 1 || z.dir === -1)));
+    assert.equal(new Set(cfz.map((z) => z.tf + '|' + z.lo + '|' + z.hi + '|' + z.known)).size, cfz.length, 'each CF zone once');
+    const plain = M.barrierTrades(X, F, { from: fr }), all = M.barrierTrades(X, F, { from: fr, extra: cfz }), cf = all.filter((r) => /CF barrier/.test(r.label));
+    assert.ok(plain.every((r) => !/CF barrier/.test(r.label)), 'without the hand-over nothing changes');
+    for (const r of cf) { n++; assert.match(r.id, /bar-cf-/); assert.equal(r.kind, 'barrier'); assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1');
+      assert.ok(Math.abs(r.target - r.entry) / r.r0 >= 1 - 1e-9); assert.ok(r.log[0].t <= r.log[1].t && r.log[1].t <= r.log[2].t && r.log[2].t <= r.t, 'known, then the return, then the QM, then the fill');
+      // cut just after the fill: the same entry is already there
+      const c2 = cut(X, r.t + 120), z2 = []; M.sopTrades(c2, F, { from: fr, cfOut: z2 });
+      const again = M.barrierTrades(c2, F, { from: fr, extra: z2 }).find((q) => q.id === r.id); assert.ok(again, 'found when cut: ' + r.id); assert.deepEqual([again.entry, again.stop, again.target], [r.entry, r.stop, r.target]); } }
+  assert.ok(n >= 1, 'CF barrier entries on these candles: ' + n);
+});
