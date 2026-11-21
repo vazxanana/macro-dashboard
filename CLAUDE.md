@@ -5335,6 +5335,17 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     trade after costs (t 3.42), STILL A LOSS. The trailing stop is the least bad exit on most losing groups (Engulf plan, MSNR,
     LIT loose); 1R targets are the worst almost everywhere; no exit makes a losing group profitable after costs. The comparison
     with the booked R also carries harness differences (5m fills, the 5-day cap). In sample: no exit is changed on any desk.
+  - **Half at +1R, the rest left to run** (21 Nov 2026, owner: "plenty of them could be winner", "yes"; `research/edge/desk-partial/`,
+    PREREGISTRATION.md first, amended before any result when the EG rule changed). PT = half closed at +1R, the rest trailed 1R behind
+    the best price from the entry; P3 = half at +1R, the rest to 3R with its stop at the entry. Stage A (the desks' 2026 records,
+    descriptive) and stage B (the desks' code on gold, EUR/USD, GBP/USD 2020-2025, 116,330 trades, out of sample 2024-2025, after
+    the desk-rigor costs). **FAIL, 0 of 30**: no group is profitable out of sample with either exit, and neither beats the desk's
+    own exit on the bar. Out of sample every group loses after costs whatever the exit; the plain trailing stop is the least bad
+    on most. Stage B's Mosha sequence ran before the owner's 21 Nov "M15 turned sell / sell the VR retest" change.
+  - **EG = a close beyond the opposite candle's HIGH (buy) / LOW (sell)** (21 Nov 2026, owner: "u marking the eg wrong", chose
+    "close above the HIGH"): `council/eg-methods.mjs` `zones` (it was a body engulf, a close beyond the other's open). Affects the
+    Engulf plan / short method / direct entry, the MSNR gold plan and the direction's Daily EG levels. The stored desk records
+    from before it are as booked under the old rule until the histories are rebuilt.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
