@@ -99,7 +99,7 @@ async function verifySig(alg, jwk, sig, data) {
 }
 
 // ---- RP ID and origin: one passkey for aureumdesk.co.uk and www; the Worker's own host and localhost as themselves ----
-const SITE = 'aureumdesk.co.uk', HOSTS = ['meridianx.meridianx-cloudflare.workers.dev', 'localhost'];
+const SITE = 'aureumdesk.co.uk', HOSTS = ['aureum.meridianx-cloudflare.workers.dev', 'localhost'];
 function hostOf(req) { return String((req && req.headers && req.headers.host) || '').toLowerCase().trim(); }
 function rpFor(host, env = {}) {
   const h = String(host || '').toLowerCase().replace(/:\d+$/, '');

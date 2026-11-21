@@ -186,3 +186,26 @@ test('datacheck main: in a council-data checkout health.json gets feeds.files an
     assert.equal(h2.feeds.files, undefined);
   } finally { fs.rmSync(dir, { recursive: true, force: true }); }
 });
+
+// 21 Nov 2026: every desk file the site reads (Mosha, LIT, Engulfing, MSNR: written every 3rd round, ~35 min) is watched with
+// the same staleness, and a record without a stop on the losing side of its entry (absolute rule 1) is bad, null records and
+// non-numbers included, naming the record.
+test('desk files: listed, 6 h staleness, every record has a stop on the losing side', () => {
+  const H = 60, now = NOW, desks = ['mosha/desk.json', 'lit/desk.json', 'eg/desk.json', 'msnr/desk.json'];
+  for (const f of desks) { const s = spec(f); assert.ok(s, `${f} listed`); assert.equal(s.warn, 6 * H, f); assert.equal(s.bad, 72 * H, f); assert.ok(!s.need, f); }
+  const ok = { at: iso(now - 600), records: [{ id: 'a', side: 1, entry: 100, stop: 99 }, { id: 'b', side: -1, entry: 100, stop: 101 }] };
+  const over = (recs, at = iso(now - 600)) => Object.fromEntries(desks.map((f) => [f, { at, records: recs }]));
+  let r = checkFiles(world(now, Object.fromEntries(desks.map((f) => [f, ok]))), now);
+  for (const f of desks) assert.equal(r.files[f].status, 'ok', f);
+  const bad = [[{ id: 'x1', side: 1, entry: 100, stop: 101 }], [{ id: 'x2', side: -1, entry: 100 }], [null], [{ id: 'x4', side: 1, entry: 'a', stop: 99 }],
+    [{ id: 'x5', side: 0, entry: 100, stop: 99 }], [{ id: 'x6', side: 1, entry: 100, stop: 100 }]];
+  for (const recs of bad) {
+    r = checkFiles(world(now, over(recs.concat(ok.records))), now);
+    for (const f of desks) { const x = r.files[f]; assert.equal(x.status, 'bad', `${f} ${JSON.stringify(recs)}`);
+      const i = x.issues.find((y) => y.kind === 'stop'); assert.ok(i, f); assert.match(i.detail, /^1 record /); if (recs[0]) assert.match(i.detail, new RegExp(recs[0].id)); }
+  }
+  r = checkFiles(world(now, over(ok.records, iso(now - 7 * 3600))), now);
+  for (const f of desks) assert.equal(r.files[f].status, 'warn', f);
+  r = checkFiles(world(now, Object.fromEntries(desks.map((f) => [f, { at: iso(now - 600) }]))), now);
+  for (const f of desks) assert.equal(r.files[f].status, 'warn', f);
+});

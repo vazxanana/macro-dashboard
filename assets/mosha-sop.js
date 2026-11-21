@@ -199,8 +199,49 @@
       list = '<ul class="mo-cal-day">' + day.map(function (r) { return '<li ' + chartAttr + '="' + e(r.id) + '" title="Open this trade on the chart"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><span>' + e(nameOf ? nameOf(r) : '') + '</span><b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + r2(r.R) + '</b><small>ended ' + utc(r.endT) + '</small><button type="button" class="mo-sop-b" ' + chartAttr + '="' + e(r.id) + '">Chart</button></li>'; }).join('') + '</ul>'; }
     return '<h3 class="mo-sop-h mo-cal-k">P&amp;L calendar <small>closed R by the UTC day each trade ended · open trades not added in · before costs</small>' + nav + '</h3><div class="mo-cal">' + grid + '</div>' + list;
   }
-  var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  // Costs, display only (21 Nov 2026): the desks' records are before costs; the same figures after costs are shown beside them.
+  // A round trip as a share of price (rate) plus a fixed spread in price (pip x 0.5), as the desk studies pre-registered it:
+  // the desk-rigor study (gold, EUR/USD, GBP/USD) and the desk-slices study's PREREGISTRATION.md "Costs" (the rest), both
+  // under the research studies folder:
+  // forex = the demo's measured raw-spread commission 0.000045 of price + 0.5 pip (fx-vol-breakout); gold 0.00005 of price
+  // (gold-vol-breakout-hourcost); silver 0.0005 (silver-vol-breakout-hourcost); NAS100 0.000027 and S&P 500 0.000047
+  // (index-vol-breakout-hourcost); Dow 30 and DAX 40 0.00005, ASSUMED there (not measured on the demo). No financing is charged.
+  // A market not in this table has no cost on record: its trades are left out of every after-costs figure, never guessed.
+  var COSTS = {
+    xau: { rate: 0.00005, src: 'gold-vol-breakout-hourcost' }, xag: { rate: 0.0005, src: 'silver-vol-breakout-hourcost' },
+    eurusd: { rate: 0.000045, pip: 0.0001, src: 'fx-vol-breakout' }, gbpusd: { rate: 0.000045, pip: 0.0001, src: 'fx-vol-breakout' },
+    usdjpy: { rate: 0.000045, pip: 0.01, src: 'fx-vol-breakout' }, audusd: { rate: 0.000045, pip: 0.0001, src: 'fx-vol-breakout' },
+    usdcad: { rate: 0.000045, pip: 0.0001, src: 'fx-vol-breakout' },
+    nas100: { rate: 0.000027, src: 'index-vol-breakout-hourcost' }, spx500: { rate: 0.000047, src: 'index-vol-breakout-hourcost' },
+    us30: { rate: 0.00005, src: 'desk-slices (assumed)', assumed: true }, de40: { rate: 0.00005, src: 'desk-slices (assumed)', assumed: true } };
+  // round-trip cost in price at price px, or null when the market has no cost on record
+  function costPx(k, px) { var c = COSTS[k || 'xau']; if (!c || !(px > 0)) return null; return c.rate * px + (c.pip ? 0.5 * c.pip : 0); }
+  // the cost of one record in R: round trip / the risk it opened with (r0, else |entry - stop|); null = no cost on record
+  function costR(r) {
+    if (!r) return null; var px = costPx(r.market || 'xau', +r.entry); if (px == null) return null;
+    var risk = r.r0 > 0 ? +r.r0 : Math.abs(r.entry - r.stop); return risk > 0 && isFinite(risk) ? px / risk : null;
+  }
+  // after-costs figures of the closed rows that carry a cost; rows of a market with no cost on record are counted apart
+  function summaryNet(rows) {
+    var cl = rows.filter(function (r) { return r.R != null; }), net = [], gross = 0, cost = 0, none = 0;
+    cl.forEach(function (r) { var c = costR(r); if (c == null) { none++; return; } net.push(r.R - c); gross += r.R; cost += c; });
+    var n = net.length, sum = net.reduce(function (s, v) { return s + v; }, 0), m = n ? sum / n : null, t = null;
+    if (n > 1) { var v = net.reduce(function (s, x) { return s + (x - m) * (x - m); }, 0) / (n - 1); t = v > 0 ? m / Math.sqrt(v / n) : null; }
+    return { closed: cl.length, costed: n, noCost: none, gross: gross, cost: cost, total: sum, mean: m, costMean: n ? cost / n : null, wins: net.filter(function (v) { return v > 0; }).length, t: t };
+  }
+  var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay, COSTS: COSTS, costPx: costPx, costR: costR, summaryNet: summaryNet,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
+  // display text shared by the four desks' cards: the after-costs tile's value and line, and a per-type line's clause
+  var fRx = function (v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; };
+  API.netTile = function (rows) {
+    var n = summaryNet(rows), sub;
+    if (!n.closed) return { v: '—', sub: 'none closed', cls: '' };
+    if (!n.costed) return { v: '—', sub: 'no cost on record for these markets', cls: '' };
+    sub = fRx(n.mean) + ' a trade · costs ' + n.costMean.toFixed(2) + 'R a trade' + (n.noCost ? ' · ' + n.noCost + ' closed with no cost on record left out' : '');
+    return { v: fRx(n.total), sub: sub, cls: n.total > 0 ? 'pos' : n.total < 0 ? 'neg' : '' };
+  };
+  API.netClause = function (rows) { var n = summaryNet(rows); return !n.closed ? '' : n.costed ? fRx(n.total) + ' after costs (' + fRx(n.mean) + ' a trade' + (n.noCost ? ', ' + n.noCost + ' with no cost on record left out' : '') + ')' : 'no cost on record'; };
+  API.COST_NOTE = 'After costs: each closed trade pays one round trip at the costs the desk studies pre-registered (gold 0.005% of price; silver 0.05%; forex 0.0045% of price plus half a pip; Nasdaq 100 0.0027%; S&P 500 0.0047%; Dow 30 and DAX 40 0.005%, assumed, not measured), divided by the risk the trade opened with. No financing is charged. The calendar stays before costs.';
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
   if (typeof document === 'undefined') return;
@@ -243,7 +284,7 @@
   }
   function line(name, rows, extra) {
     var s = summary(rows), parts = [s.n + (s.n === 1 ? ' entry' : ' entries')];
-    if (s.closed) parts.push(s.wins + ' reached target, ' + (s.closed - s.wins) + ' stopped', fR(s.total) + ' before costs'); if (s.open) parts.push(s.open + ' still open');
+    if (s.closed) parts.push(s.wins + ' reached target, ' + (s.closed - s.wins) + ' stopped', fR(s.total) + ' before costs', API.netClause(rows)); if (s.open) parts.push(s.open + ' still open');
     return '<p class="mo-sys-l"><b>' + esc(name) + '</b>: ' + esc(parts.join(' · ')) + '. ' + (s.closed < MIN_JUDGE ? 'Too few to judge (' + s.closed + ' of ' + MIN_JUDGE + ' closed).' : 'One reading on past candles, not a tested rule (t ' + (s.t == null ? 'n/a' : s.t.toFixed(2)) + ').') + (extra ? ' ' + esc(extra) : '') + '</p>';
   }
   function rowHTML(r) {
@@ -293,7 +334,7 @@
     var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + ALL[mkR(last)].name + ' ' + word(last.side) + ' at ' + fP(last, last.entry) + ', ' + utc(last.t) + '.' : '');
     var tile = function (k, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + k + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
     var tiles = '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Reached target', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
-      tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
+      tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + (function (x) { return tile('Total, after costs', x.v, x.sub, x.cls); })(API.netTile(list)) + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
     var openHTML = ''; openPanel(every.filter(function (r) { return r.R == null; }));
     var cal = calHTML(list, S, 'data-sop-chart', function (r) { return ALL[mkR(r)].name + ' · ' + (r.kind === 'sop' ? NAME[r.h] + ' BO, ' + NAME[r.l] + ' VR and CF' : NAME[r.h] + ' barrier, ' + NAME[r.l] + ' QM'); });
     box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
@@ -308,7 +349,7 @@
       cal +
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop) + line('Barrier entry', bar, 'It takes every fresh barrier; the method says to mark the best one, and that choice is not in the replay.') +
       (bar.some(function (r) { return r.withDir != null; }) ? line('Barrier with the direction of the timeframe above', bar.filter(function (r) { return r.withDir === true; })) + line('Barrier against it', bar.filter(function (r) { return r.withDir === false; }), 'The method expects only a rejection from a barrier against the direction; the replay gives both the same 3R target, so the two are shown apart.') : '') +
-      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. On a market other than gold the stop buffer and the size limits are the same share of price as on gold: the desk\'s own choice. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
+      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs unless marked after costs, a stop is counted first when one candle holds both. ' + esc(API.COST_NOTE) + ' On a market other than gold the stop buffer and the size limits are the same share of price as on gold: the desk\'s own choice. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('#mo-open li[data-sop-chart]')) { e.preventDefault(); e.target.click(); } });
