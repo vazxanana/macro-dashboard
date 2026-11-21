@@ -97,8 +97,15 @@
     BARRIER.forEach(function (pair) {
       var zt = pair[0], ctf = pair[1], C = B[ctf] || []; if (!C.length || !(B[zt] || []).length) return;
       zonesOf(zt, B, F).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
-        var d = z.dir, t0 = z.touch, lim = t0 + BARRIER_WATCH * SEC[ctf], x = d < 0 ? -Infinity : Infinity, sig = null, h = z.hi - z.lo, i;
-        for (i = at(C, t0); i < C.length && C[i].time < lim; i++) { var c = C[i]; if (o.until && c.time + SEC[ctf] > o.until) break; x = d < 0 ? Math.max(x, c.high) : Math.min(x, c.low);
+        var d = z.dir, t0 = z.touch, x = d < 0 ? -Infinity : Infinity, sig = null, h = z.hi - z.lo, i;
+        // z.touch is the OPEN time of the barrier-timeframe candle that came back: the moment itself is read on the finest candles
+        // that reach back to it, and the confirmation is looked for from the candle that holds that moment, never before it
+        // (until 21 Nov 2026 a QM that closed earlier inside that candle, before price was at the barrier, was taken)
+        var TF = fine.length && fine[0].time <= t0 ? fine : (B['5m'] || []), q = at(TF, t0), hit = -1;
+        for (; q < TF.length && TF[q].time < t0 + SEC[zt]; q++) if (d < 0 ? TF[q].high >= z.lo : TF[q].low <= z.hi) { hit = q; break; }
+        if (hit < 0) return; t0 = TF[hit].time;
+        var lim = t0 + BARRIER_WATCH * SEC[ctf];
+        for (i = at(C, t0 - SEC[ctf] + 1); i < C.length && C[i].time < lim; i++) { var c = C[i]; if (o.until && c.time + SEC[ctf] > o.until) break; x = d < 0 ? Math.max(x, c.high) : Math.min(x, c.low);
           if (d < 0 ? c.close > z.hi + h : c.close < z.lo - h) break;                                  // closed well through the barrier: it did not hold
           var W = C.slice(Math.max(0, i - 240), i + 1), ev = F.msInternal(W, W.length, 3), e = ev[ev.length - 1];
           if (e && e.dir === d && e.structure && e.breakIdx === W.length - 1 && W[e.fromIdx].time >= t0 - 30 * SEC[ctf]) { sig = { i: i, level: e.level, t: c.time + SEC[ctf] }; break; } }

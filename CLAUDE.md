@@ -5185,6 +5185,12 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     execution that filled, so "market on the break" held only sweeps whose limit orders later did not fill (the look-ahead
     by selection `desk-slices` T3 named). Now every sweep is tried with every execution (`rule`, `loose`, `break`), one
     position at a time per execution and market; `first: true` is the old reading, used only by the desk-slices study.
+  - **Barrier entry: the confirmation starts when price is AT the barrier** (21 Nov 2026, found on a chart): the zone's
+    `touch` is the OPEN time of the barrier-timeframe candle that came back (an H4 candle for an H4 barrier), and the QM was
+    looked for from that time, so a QM that closed hours before price reached the barrier inside that candle was taken
+    (knowing the candle would touch: look-ahead). The return is now the first of the finest candles that trades into the
+    zone, and the confirmation is read from the candle holding that moment. Gold 2025, D1 / H4 / H1 barriers: 460 -> 462
+    entries, 23 changed, +4.0R -> +18.0R before costs.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
