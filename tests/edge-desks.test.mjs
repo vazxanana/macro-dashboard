@@ -92,8 +92,8 @@ test('the three methods: a fixed stop on the losing side, a 2R target, one posit
   let busy = -Infinity;
   for (const r of all) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^eg-(plan|simple|direct)$/); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips on gold'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.EGM.rr) < 1e-9);
     assert.ok(r.t > busy, 'one at a time'); busy = r.endT || Infinity; assert.ok(r.log.every((x, i, a) => !x.t || !i || !a[i - 1].t || x.t >= a[i - 1].t), 'the log runs forward'); assert.ok(r.marks.every((m) => m.at <= r.t), 'every mark was known by the fill'); }
-  // cutting the candles after a closed trade's end changes nothing about it
-  const one = all.find((r) => r.endT && r.endT < END - 5 * 86400 && r.t > B['5m'][0].time + 15 * 86400);   // far enough in for the shorter history to hold enough candles const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
+  // cutting the candles after a closed trade's end changes nothing about it (a trade far enough in for the shorter history to hold enough candles)
+  const one = all.find((r) => r.endT && r.endT < END - 5 * 86400 && r.t > B['5m'][0].time + 15 * 86400); const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
   const again = G.methodTrades(cut, { from: 0, market: 'xau' }).find((r) => r.id === one.id); assert.ok(again); assert.deepEqual([again.entry, again.stop, again.R, again.endT], [one.entry, one.stop, one.R, one.endT]);
   const fxB = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 }))]));
   const fxT = G.methodTrades(fxB, { from: 0, market: 'eurusd' }); assert.ok(fxT.length && fxT.every((r) => stopOk(r) && /^eurusd:eg-/.test(r.id) && Math.abs(r.r0 / r.entry - G.EGM.pips / 4000) < 2e-4), 'another market: the same share of price');
