@@ -19,7 +19,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { writeAtomic } from './jsonio.mjs';
 import { foldWeekend } from './fills.mjs';
-import { bars, merge } from './mosha-desk.mjs';
+import { bars, merge, settle } from './mosha-desk.mjs';
 import { P, cleanBars, agg15, series, fbosCandidates, XAU } from './lit.mjs';
 import { managePosition } from '../research/edge/lit/run.mjs';
 import * as MS from '../research/edge/msnr-entry/run.mjs';
@@ -248,7 +248,7 @@ export function buildDesk(name, perMarket, prev, now, days) {
   let records = (prev && prev.records) || [], through = (prev && prev.through) || 0; const read = [];
   for (const [market, B] of perMarket) { if (!B['5m'] || !B['5m'].length) continue;
     const last = B['5m'][B['5m'].length - 1].time + 300, from = last - days * 86400;
-    records = merge(records, DESKS[name].read(B, { from, market }), now); read.push(market); through = Math.max(through, last); }
+    const fresh = DESKS[name].read(B, { from, market }); records = settle(merge(records, fresh, now), new Set(fresh.map((r) => r.id)), B['5m'], market); read.push(market); through = Math.max(through, last); }
   const s = SOP.summary(records);
   return { v: 1, desk: name, at: new Date(now * 1000).toISOString(), markets: [...new Set(records.map((r) => r.market || 'xau'))], read, feed: 'OANDA', through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length }, note: DESKS[name].note, records };

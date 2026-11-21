@@ -102,11 +102,30 @@ export function merge(prev, fresh, now, feed = 'OANDA') {
   return out.sort((a, b) => b.t - a.t).slice(0, KEEP);
 }
 
+// An OPEN stored record this run did not read again, although its market's candles cover it (the reading no longer gives it:
+// a window that slid, an id that moved), would stay open for good. It is settled on the 5-minute candles after its entry at
+// its STORED stop and target: the stop first in one candle, a candle opening beyond the stop exits at its open; neither reached
+// = still open. Never a record of another feed, never one the run read, never one from before the candles on file.
+export const SETTLE_NOTE = 'The tracker no longer reads this trade again: settled on the 5-minute candles at its stored stop and target.';
+export function settle(records, freshIds, M5, market = 'xau', feed = 'OANDA') {
+  if (!M5 || !M5.length) return records;
+  return records.map((r) => {
+    if (r.R != null || r.status !== 'open' || (r.market || 'xau') !== market || freshIds.has(r.id) || feedOf(r) !== feed || !(r.t >= M5[0].time)) return r;
+    const d = r.side, r0 = Math.abs(r.entry - r.stop); if (!(r0 > 0) || r.target == null) return r;
+    for (const b of M5) { if (b.time < r.t) continue;
+      const gap = b.time > r.t && (d > 0 ? b.open <= r.stop : b.open >= r.stop), hitS = gap || (d > 0 ? b.low <= r.stop : b.high >= r.stop), hitT = !hitS && (d > 0 ? b.high >= r.target : b.low <= r.target);
+      if (!hitS && !hitT) continue;
+      const px = gap ? b.open : hitS ? r.stop : r.target, R = d * (px - r.entry) / r0, { float: _f, ...rest } = r;
+      return { ...rest, status: hitS ? 'stopped' : 'target', R, exit: px, endT: b.time + 300, settled: true,
+        log: (r.log || []).filter((x) => x.t != null).concat({ t: b.time + 300, text: `${SETTLE_NOTE} ${hitS ? 'Stopped' : 'Target reached'}: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }) }; }
+    return r; });
+}
+
 export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market = 'xau') {
   if (!B['5m'] || !B['5m'].length) throw new Error('no candles');
   const from = B['5m'][B['5m'].length - 1].time - days * 86400;
   const fresh = SOP.sopTrades(B, F, { from, market }).concat(SOP.barrierTrades(B, F, { from, market }));
-  const records = merge(prev && prev.records, fresh, now, feed), s = SOP.summary(records);
+  const records = settle(merge(prev && prev.records, fresh, now, feed), new Set(fresh.map((r) => r.id)), B['5m'], market, feed), s = SOP.summary(records);
   return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', markets: [...new Set(records.map((r) => r.market || 'xau'))], feed: market === 'xau' ? feed : (prev && prev.feed) || feed, through: market === 'xau' || !(prev && prev.through) ? B['5m'][B['5m'].length - 1].time + 300 : prev.through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },
     note: 'A paper record of the desk\'s reading of the Mosha method on gold and four more markets: nothing is traded, results are before costs, and it is not a tested rule.', records };

@@ -5235,6 +5235,12 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     record's stop moved; a rebuild differed from the loop). They scale from the trade's own price now (LIT: the sweep's
     extreme, `stopExtra(atr5, px)`; MSNR: the entry, the study's candidates listed with `PAD` / `MIN_R0` 0 and both applied
     in `msnrTrades`). Gold is unchanged; stored closed records are frozen as booked. Test in `tests/edge-desks.test.mjs`.
+  - **An open record the run no longer reads is settled** (21 Nov 2026): `council/mosha-desk.mjs` `settle(records, freshIds,
+    M5, market, feed)`, run after `merge` by both trackers: an OPEN stored record of the market just read that the run did not
+    give again (a slid window, a moved id) is closed on the 5-minute candles after its entry at its STORED stop and target
+    (stop first in one candle, a gap at the open), marked `settled: true` with a log line; neither reached = still open.
+    Never a record the run read, of another feed or market, or from before the candles on file. It stayed open for good
+    before. A plain settlement: it does not apply a reading's trail or time exit. Test in `tests/mosha-tracker.test.mjs`.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

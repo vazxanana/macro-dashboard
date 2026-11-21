@@ -137,3 +137,22 @@ test('a re-entry after a close is a new trade; only the same trade re-read under
   const twin = M.merge(open, [r({ id: 'c', status: 'open', R: null, endT: null, exit: null }), r({ id: 'c2', t: now - 4700, entry: 100.1, status: 'open', R: null, endT: null, exit: null })], now);
   assert.deepEqual(twin.map((x) => x.id), ['c']);
 });
+
+test('an open record the run no longer reads is settled on the candles at its stored stop and target, never guessed', () => {
+  const bar = (t, o, h, l, c) => ({ time: t, open: o, high: h, low: l, close: c }), r = M.clean(rec({ t: 1200, float: -0.2 })), none = new Set();
+  // a sell at 100, stop 102, target 94
+  const quiet = [bar(900, 100, 100.5, 99.5, 100), bar(1200, 100, 101, 99, 100), bar(1500, 100, 101.5, 98, 99)];
+  assert.equal(M.settle([r], none, quiet)[0].status, 'open', 'neither level reached: still open');
+  const stop = M.settle([r], none, quiet.concat(bar(1800, 99, 102.5, 93, 95)))[0];
+  assert.equal(stop.status, 'stopped'); assert.equal(stop.R, -1); assert.equal(stop.endT, 2100); assert.equal(stop.float, undefined); assert.ok(stop.settled, 'the stop first when one candle holds both');
+  assert.match(stop.log.at(-1).text, /no longer reads this trade again/); assert.ok(stop.log.every((x) => x.t != null));
+  const tgt = M.settle([r], none, quiet.concat(bar(1800, 99, 99.5, 93.5, 94)))[0]; assert.equal(tgt.status, 'target'); assert.equal(tgt.R, 3);
+  const gap = M.settle([r], none, quiet.concat(bar(1800, 103, 103.5, 102.5, 103)))[0]; assert.equal(gap.exit, 103); assert.equal(gap.R, -1.5, 'a gap through the stop exits at the open');
+  const all = quiet.concat(bar(1800, 99, 102.5, 93, 95));
+  assert.equal(M.settle([r], new Set([r.id]), all)[0].status, 'open', 'a record the run read is the run\'s to follow');
+  assert.equal(M.settle([{ ...r, market: 'eurusd' }], none, all)[0].status, 'open', 'another market\'s candles settle nothing');
+  assert.equal(M.settle([{ ...r, feed: 'Kraken' }], none, all)[0].status, 'open', 'another feed\'s record is left alone');
+  assert.equal(M.settle([{ ...r, t: 600 }], none, all)[0].status, 'open', 'a record from before the candles on file is left alone');
+  const closed = { ...r, status: 'target', R: 3 }; assert.equal(M.settle([closed], none, all)[0], closed, 'a closed record is frozen');
+  assert.match(rd('council/edge-desks.mjs'), /settle\(merge\(records, fresh, now\)/); assert.match(rd('council/mosha-desk.mjs'), /settle\(merge\(prev && prev\.records, fresh, now, feed\)/);
+});
