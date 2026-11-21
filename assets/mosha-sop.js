@@ -68,7 +68,7 @@
     o = o || {}; var from = o.from, piv = o.pivot || PIVOT, win = o.win || WIN, fine = B['5m'] || [], map = {}, cfSeen = {}, rt = {}, out = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
     LADDER.forEach(function (p) {
       var h = p[0], l = p[1], H = B[h], L = B[l]; if (!H || !H.length || !L || !L.length) return;
-      var hN = -1, HA = null, Hw = null, HI = null, n = 0, LE = null, turnT = null, turnAt = {};
+      var hN = -1, HA = null, Hw = null, HI = null, HT = null, n = 0, LE = null, turnT = null, turnAt = {};
       // the VR retest (owner, 21 Nov 2026: "the top of vr or entry on new cf made once touch and cf box high is the sl"; target
       // "the last low"). Once the upper timeframe has turned against the BO, the VR's level (the low the VR broke, for a buy BO)
       // is sold when price first comes back to it: (A) a limit AT the level, stop past the VR's top (its extreme); (B) after that
@@ -78,44 +78,46 @@
       function retest(S0, M, i) {
         var D = S0.dir, E = -D, boT = Hw[S0.idx].time, vr = M.vr, vrK = vr.t + SEC[l], key = h + '|' + boT + '|' + vr.t, st = rt[key] || (rt[key] = { touch: null, ext: null, dead: false, a: false, b: false });
         var c = L[i], lvl = vr.level, top = vr.ext, buf = o.buf == null ? sizes(mk, c.close).buf : o.buf;
-        if (st.dead || c.time < vrK) return;
+        if (o.retest === false || st.dead || c.time < vrK) return false;
+        // the last low so far: the lowest low from the VR's candle to the candle before this one (closed candles, kept as the
+        // clock moves); a close past the VR's top in between ends the idea (the BO goes on)
+        if (st.j == null) { st.j = i; while (st.j > 0 && L[st.j - 1].time >= vr.t) st.j--; }
+        for (; st.j < i; st.j++) { var b = L[st.j];
+          if (E < 0 ? b.close > top : b.close < top) { st.dead = true; return false; }
+          st.run = st.run == null ? (E < 0 ? b.low : b.high) : (E < 0 ? Math.min(st.run, b.low) : Math.max(st.run, b.high)); }
+        // ARMED once price has gone at least 1R (the VR's top to its level) beyond the level: from then the old BO gives no more
+        // entries (a normal pullback also breaks small swings of the chart above, so the turn alone does not stop them)
+        var armed = st.run != null && (E < 0 ? st.run < lvl : st.run > lvl) && Math.abs(st.run - lvl) >= Math.abs(top - lvl);
+        if (!armed) return false;
         if (st.touch == null) {
-          if (!(c.time >= turnT && (E < 0 ? c.high >= lvl : c.low <= lvl))) return;
-          // the last low: the lowest low from the VR's candle to the candle before the touch; a close past the VR's top in between ends it
-          var ext = null; for (var j = i - 1; j >= 0 && L[j].time >= vr.t; j--) { var b = L[j];
-            if (E < 0 ? b.close > top : b.close < top) { st.dead = true; return; }
-            ext = ext == null ? (E < 0 ? b.low : b.high) : (E < 0 ? Math.min(ext, b.low) : Math.max(ext, b.high)); }
-          // a retest counts once price has gone at least 1R (the VR's top to its level) beyond the level first; a return before
-          // that is the VR still forming, so the desk keeps waiting for a later one
-          if (ext == null || Math.abs(ext - lvl) < Math.abs(top - lvl) || (E < 0 ? !(ext < lvl) : !(ext > lvl))) return;
-          st.ext = ext;
+          if (!(c.time >= turnT && (E < 0 ? c.high >= lvl : c.low <= lvl))) return true;
+          st.ext = st.run;
           var fi = -1; for (var q = 0; q < fine.length; q++) { var fb = fine[q]; if (fb.time < c.time) continue; if (fb.time >= c.time + SEC[l]) break; if (E < 0 ? fb.high >= lvl : fb.low <= lvl) { fi = q; break; } }
-          st.touch = c.time; if (fi < 0) return;
+          st.touch = c.time; if (fi < 0) return true;
           var stopA = E < 0 ? top + buf : top - buf, fT = fine[fi].time;
-          if (!(fT + SEC['5m'] >= from) || map['vr|' + key]) return;
+          if (!(fT + SEC['5m'] >= from) || map['vr|' + key]) return true;
           var trA = map['vr|' + key] = { id: pre + 'sop-vr-' + l + '-' + (E > 0 ? 'b' : 's') + fT, market: mk, kind: 'sop', h: h, l: l, side: E, t: fT, entry: lvl, stop: stopA, target: st.ext, r0: Math.abs(lvl - stopA), retest: 'level', label: NAME[h] + ' turned → ' + NAME[l] + ' VR retest' };
           trA.log = retestLog(S0, M, trA, 'A ' + word(E) + ' limit at the VR level ' + f2(lvl) + ' filled as price came back to it: stop ' + f2(stopA) + ' (past the VR\'s top ' + f2(top) + '), target the last low ' + f2(st.ext) + ' (' + (Math.abs(st.ext - lvl) / trA.r0).toFixed(1) + 'R).');
           trA.marks = retestMarks(S0, M, trA, st.ext);
-          finish(trA, outcome(trA, fine, fT, true)); out.push(trA); return;
+          finish(trA, outcome(trA, fine, fT, true)); out.push(trA); return true;
         }
-        if (st.b) return;
-        if (E < 0 ? c.close > top : c.close < top) { st.dead = true; return; }
+        if (st.b) return true;
         var e = null; for (var k = LE.length - 1; k >= 0; k--) { var x = LE[k]; if (x.t === c.time && x.dir === E && x.structure !== false && x.t > st.touch) { e = x; break; } }
-        if (!e) return;
+        if (!e) return true;
         st.b = true;
         var boxHi = E < 0 ? e.top : e.bot, stopB = E < 0 ? boxHi + buf : boxHi - buf, entB = c.close, tB = c.time + SEC[l];
-        if (!(E < 0 ? st.ext < entB && stopB > entB : st.ext > entB && stopB < entB) || !(tB >= from)) return;
+        if (!(E < 0 ? st.ext < entB && stopB > entB : st.ext > entB && stopB < entB) || !(tB >= from)) return true;
         var trB = { id: pre + 'sop-vc-' + l + '-' + (E > 0 ? 'b' : 's') + tB, market: mk, kind: 'sop', h: h, l: l, side: E, t: tB, entry: entB, stop: stopB, target: st.ext, r0: Math.abs(entB - stopB), retest: 'cf', label: NAME[h] + ' turned → ' + NAME[l] + ' VR retest, new CF' };
         trB.log = retestLog(S0, M, trB, 'After the touch, a new ' + NAME[l] + ' CF ' + word(E) + ' (a BO Structure, a candle closed ' + (E < 0 ? 'below ' : 'above ') + f2(e.level) + '): ' + word(E) + ' ' + f2(entB) + ' at its close, stop ' + f2(stopB) + ' (past the CF box ' + (E < 0 ? 'high ' : 'low ') + f2(boxHi) + '), target the last low ' + f2(st.ext) + ' (' + (Math.abs(st.ext - entB) / trB.r0).toFixed(1) + 'R).');
         trB.marks = retestMarks(S0, M, trB, st.ext).concat([{ kind: 'zone', top: Math.max(e.top, e.bot), bot: Math.min(e.top, e.bot), a: e.fromT || e.t, at: tB, label: NAME[l] + ' new CF' }]);
-        finish(trB, outcome(trB, fine, tB)); out.push(trB);
+        finish(trB, outcome(trB, fine, tB)); out.push(trB); return true;
       }
       function retestLog(S0, M, tr, last) {
         var D = S0.dir, boT = Hw[S0.idx].time;
         return [{ t: boT + SEC[h], text: NAME[h] + ' BO ' + word(D) + ': a candle closed ' + (D > 0 ? 'above ' : 'below ') + f2(S0.level) + '.' },
           { t: M.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure against the BO, through ' + f2(M.vr.level) + ' (its extreme ' + f2(M.vr.ext) + ').' },
           { t: turnT, text: NAME[h] + ' turned ' + word(-D) + ': its newest break (3 candles a side) is the other way, so the ' + word(D) + ' BO gives no more entries; the VR level is ' + (D > 0 ? 'sold' : 'bought') + ' on the retest.' },
-          { t: tr.t, text: last }];
+          { t: tr.t, text: last }].sort(function (a, b) { return a.t - b.t; });
       }
       function retestMarks(S0, M, tr, ext) {
         var boT = Hw[S0.idx].time;
@@ -126,7 +128,7 @@
       }
       for (var i = 0; i < L.length; i++) { var t = L[i].time + SEC[l]; if (t < from) continue; if (o.until && t > o.until) break;
         while (n < H.length && H[n].time + SEC[h] <= t) n++;
-        if (n !== hN) { Hw = H.slice(Math.max(0, n - win), n); HA = Hw.length ? F.msAnalyze(Hw, piv) : null; HI = o.ibo === false || !Hw.length ? [] : F.msInternal(Hw, Hw.length, 3); hN = n; }
+        if (n !== hN) { Hw = H.slice(Math.max(0, n - win), n); HA = Hw.length ? F.msAnalyze(Hw, piv) : null; HT = Hw.length ? F.msInternal(Hw, Hw.length, 3) : []; HI = o.ibo === false ? [] : HT; hN = n; }
         if (!HA) continue;
         var A = HA, Lw = null, LE = null, srcs = [];
         var mv = A.trend ? (A.last && A.last.dir === A.trend ? A.last : A.events.slice().reverse().find(function (e) { return e.dir === A.trend; })) : null;
@@ -139,13 +141,13 @@
         // VR level is sold (bought) on the retest instead (retest(), below)
         // once turned it stays turned for that BO (a later small break back is a pullback, not a turn back); only a close past the
         // VR's top (the retest's stop) ends it, in retest(). A new major BO starts afresh.
-        var tk = mv ? h + '|' + Hw[mv.breakIdx].time : null;
-        if (mv && ie && ie.breakIdx > mv.breakIdx && ie.dir !== mv.dir && !turnAt[tk]) turnAt[tk] = Hw[ie.breakIdx].time + SEC[h];
+        var tk = mv ? h + '|' + Hw[mv.breakIdx].time : null, te = HT.length ? HT[HT.length - 1] : null;
+        if (mv && te && te.breakIdx > mv.breakIdx && te.dir !== mv.dir && !turnAt[tk]) turnAt[tk] = Hw[te.breakIdx].time + SEC[h];
         var turned = !!(tk && turnAt[tk]); turnT = turned ? turnAt[tk] : null;
         for (var si = 0; si < srcs.length; si++) { var S0 = srcs[si], D = S0.dir, boT = Hw[S0.idx].time, tag = S0.ibo ? 'iBO' : 'BO';
           if (!Lw) { Lw = L.slice(Math.max(0, i + 1 - win), i + 1); var LA = F.msAnalyze(Lw, piv); LE = LA.events.map(function (e) { return { dir: e.dir, level: e.level, structure: e.structure, t: Lw[e.breakIdx] ? Lw[e.breakIdx].time : Infinity, fromT: Lw[e.fromIdx] ? Lw[e.fromIdx].time : 0, top: e.top, bot: e.bot }; }); }
           var M = F.msMosha({ dir: D, level: S0.level, t: boT, ext: S0.ext, far: S0.far }, { events: LE, bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf, { near: o.near !== false });
-          if (!S0.ibo && turned) { if (o.retest !== false && M && M.vr) retest(S0, M, i); continue; }
+          if (!S0.ibo && turned && M && M.vr && retest(S0, M, i)) continue;
           // the method's own entry at the CF is the BARRIER entry (the pages: "before CF or after CF, using the barrier entry"):
           // each clean CF zone is handed over once, ON the candle whose close made it (a CF from before the window is never handed
           // over with a later moment), and never once that CF has failed or the move reached the VR's extreme. Its VR box goes
