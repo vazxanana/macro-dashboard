@@ -5355,6 +5355,23 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     touch, stop past that CF box (`sop-vc-`); target the last low before the touch (high for a buy). A close past the VR's top
     ends it. No minimum R (not answered). `retest: false` turns it off. EUR/USD 20 Nov: the 13:20 buy is gone, a sell at
     1.09914 (stop 1.1011, target 1.09569) instead. Not tested: a reading, not an edge.
+  - **The Mosha desk keeps gold, EUR/USD and GBP/USD** (21 Nov 2026, owner: "mosha keep gold and eurusd and gbpusd"):
+    `MS_MOSHA_SOP.MOSHA` (`MARKETS` stays the Engulfing desk's five); the tracker reads `OTHER` = EUR/USD and GBP/USD and drops
+    every other market's records before it writes (`keepMarkets`); the card shows only those three markets. Silver and the Nasdaq 100
+    records (about 5,300 in the 21 Nov rebuild) leave the file on the first run of the merged code.
+  - **Plan / short method: the failed M5 zone must be at the zone** (21 Nov 2026, owner on a EUR/USD plan buy of 17 Nov: "stupid
+    loss, there is no eg sell fail on m5 to enter buy"; its "M5 EF" was a 1.4-pip sell engulf above the H4 and M15 zones, the
+    engulfing skill: "the EF that counts = the close through the last opposite engulf formed into or at the zone"): in
+    `methodTrades` the opposite M5 zone that fails must touch the H4 zone or the M15 / M30 engulf zone (`atZone`). On the 2026
+    record (five markets, before costs): plan 998 -> 714 trades, -40.9R -> -13.9R; short method 966 -> 692, -86.6R -> -22.9R.
+    Still losing; a reading, not an edge.
+  - **An EF counts like an EG, on the MSNR gold plan** (21 Nov 2026, owner: "the fail is the same logic as entry for other
+    timeframes", chose "EF counts like an EG"; then "keep the msnr"): `triggers(M15, true)` (the gold plan only) adds the opposite
+    15- / 30-minute zones that FAILED as triggers the other way (`efsOf`, `ef: true`, from the close that broke them, their own box
+    as the zone; `zones` keeps the fail candle `fi`; id suffix `-ef`, mark "M15 EF zone · entry"). Tried on the Engulfing plan and
+    short method too (EF triggers and M5 EF entries): plan 714 -> 1,373 trades, -13.9R -> -159.9R; short method 692 -> 1,278,
+    -22.9R -> -92.6R, so they keep EG triggers. Gold plan 2026 before costs: 233 -> 299 trades, -11.0R -> +13.0R (EF triggers
+    133 trades, +19.0R). A paper reading, not an edge.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

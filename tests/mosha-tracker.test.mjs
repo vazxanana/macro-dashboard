@@ -95,7 +95,7 @@ test('more markets: a record of another market keeps its market and its decimals
   assert.equal(M.clean(rec({ id: 'eurusd:x', market: 'eurusd', entry: 1.15, stop: 1.14 })), null, 'rule 1 on every market');
   const out = M.merge([M.clean(rec({}))], [rec({ id: 'eurusd:bar-15m-1000', market: 'eurusd', entry: 1.1523, stop: 1.1530, target: 1.1502 })], 1500);
   assert.equal(out.length, 2, 'same kind, side and minute on another market is another trade');
-  assert.deepEqual(M.OTHER, ['xag', 'eurusd', 'gbpusd', 'nas100']);
+  assert.deepEqual(M.OTHER, ['eurusd', 'gbpusd']);
   const src = rd('council/mosha-desk.mjs'); assert.match(src, /for \(const m of OTHER\) \{ try \{/); assert.match(src, /skipped/);
   const page = rd('assets/mosha-sop.js'); assert.match(page, /data-sop-mk/); assert.match(page, /market: mkR\(r\)/);
 });
@@ -168,4 +168,11 @@ test('an open record the run no longer reads is settled on the candles at its st
   const kept = M.clean(rec({ target: null, stopNow: 99 })); assert.equal(kept.target, null, 'no target stays no target (not 0)'); assert.equal(kept.stopNow, 99);
   const closed = { ...r, status: 'target', R: 3 }; assert.equal(M.settle([closed], none, all)[0], closed, 'a closed record is frozen');
   assert.match(rd('council/edge-desks.mjs'), /settle\(merge\(records, fresh, now\)/); assert.match(rd('council/mosha-desk.mjs'), /settle\(merge\(prev && prev\.records, fresh, now, feed\)/);
+});
+
+test('the Mosha desk keeps gold, EUR/USD and GBP/USD only (owner, 21 Nov 2026): other markets\' records go', () => {
+  const rec = (id, market) => ({ id, t: 1795000000 + id.length, side: 1, entry: 1, stop: 0.9, target: 1.2, status: 'stopped', R: -1, kind: 'barrier', ...(market ? { market } : {}) });
+  const out = M.keepMarkets({ records: [rec('a'), rec('xag:b', 'xag'), rec('eurusd:c', 'eurusd'), rec('nas100:d', 'nas100'), rec('gbpusd:e', 'gbpusd')], counts: {} });
+  assert.deepEqual(out.records.map((r) => r.id), ['a', 'eurusd:c', 'gbpusd:e']);
+  assert.deepEqual(out.markets.sort(), ['eurusd', 'gbpusd', 'xau']); assert.equal(out.counts.n, 3);
 });

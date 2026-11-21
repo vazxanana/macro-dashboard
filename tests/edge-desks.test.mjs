@@ -144,7 +144,7 @@ test('the direction reading: every switch names a tapped key level of the timefr
 
 test('every desk record carries the key levels its reading used as chart marks', () => {
   const src = fs.readFileSync(new URL('../council/eg-methods.mjs', import.meta.url), 'utf8') + fs.readFileSync(new URL('../council/edge-desks.mjs', import.meta.url), 'utf8');
-  for (const l of ['Daily EG zone', 'H4 EG zone', "tn + ' EG zone'", 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
+  for (const l of ['Daily EG zone', 'H4 EG zone', "tn + zw(m)", 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
     assert.ok(src.includes(l), 'mark: ' + l);
 });
 
@@ -328,4 +328,29 @@ test('an EG closes beyond the other candle\'s HIGH (a buy) or LOW (a sell); a bo
   assert.equal(zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.8, 98.7)], '1h').length, 0);
   const s = zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.2, 98.4)], '1h');
   assert.equal(s.length, 1); assert.equal(s[0].dir, -1); assert.equal(s[0].bot, 99); assert.equal(s[0].top, 100.5);
+});
+
+// 21 Nov 2026 (owner, on a EUR/USD plan buy: "there is no eg sell fail on m5 to enter buy"): the M5 engulf that failed must be
+// formed into or at the zone, so its range touches the H4 zone or the M15 / M30 engulf zone of the trade
+test('plan and simple: the failed M5 zone touches the H4 zone or the M15 / M30 engulf zone', () => {
+  let n = 0;
+  for (const r of G.methodTrades(B15, { from: 0, market: 'xau' }).filter((x) => x.kind === 'eg-plan' || x.kind === 'eg-simple')) { n++;
+    const ef = r.marks.find((k) => k.label === 'M5 EF (zone failed)'), zs = r.marks.filter((k) => /^H4 E[GF]|^M(15|30) (EG zone|EF \(zone failed\))$/.test(k.label));
+    assert.ok(ef && zs.length >= 2, r.id); const lo = Math.min(...zs.map((z) => z.bot)), hi = Math.max(...zs.map((z) => z.top));
+    assert.ok(ef.bot <= hi && ef.top >= lo, 'the failed M5 zone is away from the zone: ' + r.id); }
+  assert.ok(n >= 1, 'plan / simple entries on these candles: ' + n);
+  assert.match(rd('council/eg-methods.mjs'), /\|\| !atZone\(z\)\) continue;/);
+});
+
+// 21 Nov 2026 (owner: "the fail is the same logic as entry for other timeframes", then "keep the msnr"): an EF counts like an EG
+// on the MSNR gold plan only; the Engulfing plan and short method keep EG triggers and the M5 EG zone as the entry
+test('an EF counts like an EG on the gold plan only: its EF triggers keep their stops and are found without hindsight', () => {
+  const plan = G.methodTrades(B15, { from: 0, market: 'xau' }).filter((r) => r.kind === 'eg-plan' || r.kind === 'eg-simple');
+  assert.ok(plan.length && plan.every((r) => !r.marks.some((k) => /^M(15|30) EF|M5 EF zone/.test(k.label))), 'the Engulfing plan takes no EF trigger or EF entry');
+  let n = 0, cuts = 0;
+  for (const seed of [11, 4, 5]) { const X = seed === 11 ? B : market(90, seed), Y = { ...X, '15m': m15of(X['5m']) };
+    for (const r of G.snrTrades(Y, { from: 0 }).filter((x) => /-ef$/.test(x.id))) { n++; assert.ok(stopOk(r), r.id); assert.ok(r.marks.some((k) => / EF zone · entry$/.test(k.label))); assert.match(r.log[1].text, /engulf zone failed/);
+      // the gold plan reads its side from about 35 days of history: only later trades are checked against a cut (as above)
+      if (r.t > X['5m'][0].time + 35 * 86400 && cuts++ < 8) { const one = G.snrTrades(cutAt(Y, r.t + 300), { from: 0 }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.equal(one.entry, r.entry); } } }
+  assert.ok(n >= 1 && cuts >= 1, 'gold-plan entries on a failed M15 / M30 zone: ' + n + ', checked against a cut: ' + cuts);
 });
