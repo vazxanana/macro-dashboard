@@ -315,3 +315,17 @@ test('open-close levels: a Daily level type of the gold plan, and a key level of
     assert.ok(up ? a.close > a.open && b.close > b.open : a.close < a.open && b.close < b.open); assert.ok(!(up ? b.close > a.high : b.close < a.low), 'not a dominant pair');
     assert.ok(e.bottom <= a.close && a.close <= e.top); assert.ok(e.zoneAt === b.time + 86400 && e.zoneAt <= e.tapT + 14400); }
 });
+
+test('an EG closes beyond the other candle\'s HIGH (a buy) or LOW (a sell); a body engulf alone is not one (owner, 21 Nov 2026)', async () => {
+  const { zones } = await import('../council/eg-methods.mjs');
+  const c = (i, o, h, l, cl) => ({ time: 1_780_000_000 + i * 3600, open: o, high: h, low: l, close: cl });
+  // red 100 -> 99 with a wick to 101; green closes 100.5: above the red's open (a body engulf) but under its high
+  assert.equal(zones([c(0, 100, 101, 98.5, 99), c(1, 99, 100.8, 98.8, 100.5)], '1h').length, 0);
+  // the same green closing 101.2, above the high: an EG, whatever it opened at
+  const z = zones([c(0, 100, 101, 98.5, 99), c(1, 99.6, 101.5, 99.2, 101.2)], '1h');
+  assert.equal(z.length, 1); assert.equal(z[0].dir, 1); assert.equal(z[0].top, 100); assert.equal(z[0].bot, 98.5);
+  // a sell mirrors it: green, then red closing under the green's LOW
+  assert.equal(zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.8, 98.7)], '1h').length, 0);
+  const s = zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.2, 98.4)], '1h');
+  assert.equal(s.length, 1); assert.equal(s[0].dir, -1); assert.equal(s[0].bot, 99); assert.equal(s[0].top, 100.5);
+});

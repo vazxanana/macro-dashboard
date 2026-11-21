@@ -1,0 +1,3782 @@
+{
+ "study": "desk-exits",
+ "built": "2026-11-21",
+ "system": "The Mosha, Engulfing, MSNR and LIT desks' own entries of 2026 with 1R / 2R / 3R targets or a trailing stop, against each desk's own exit; OANDA mid 5m; before and after the desk-rigor cost model; in sample.",
+ "verdict": "PASS",
+ "headline": "1 of 60 exit-group comparisons better than the desk's own exit after costs on the pre-registered bar (Engulf short method, Trailing stop (1R behind from +1R): −0.060R a trade after costs, still a loss); 1 worse. A better exit is not a profitable one: read the after-costs column.",
+ "n": 30904,
+ "left": {
+  "sop": 1,
+  "eg-4h": 1,
+  "msnr-other": 1
+ },
+ "groups": {
+  "sop": {
+   "desk": "mosha",
+   "kind": "sop",
+   "name": "Mosha sequence",
+   "n": 125,
+   "from": 1784901600,
+   "to": 1795185900,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 125,
+      "win": 22.4,
+      "mean": 0.0436,
+      "total": 5.45,
+      "dd": 23.32,
+      "months": 5,
+      "tMonth": 0.27
+     },
+     "net": {
+      "n": 125,
+      "win": 22.4,
+      "mean": -0.0287,
+      "total": -3.58,
+      "dd": 30.2,
+      "months": 5,
+      "tMonth": -0.17
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 125,
+      "win": 52.8,
+      "mean": 0.0484,
+      "total": 6.06,
+      "dd": 8,
+      "months": 5,
+      "tMonth": 0.46
+     },
+     "net": {
+      "n": 125,
+      "win": 52.8,
+      "mean": -0.0238,
+      "total": -2.98,
+      "dd": 11.98,
+      "months": 5,
+      "tMonth": -0.23
+     },
+     "hows": {
+      "target": 65,
+      "stop": 58,
+      "trail": 0,
+      "gap": 1,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "sop",
+      "exit": "X1",
+      "diff": 0.0607,
+      "months": 5,
+      "tMonth": 0.39,
+      "p": 0.6965,
+      "halves": [
+       0.1764,
+       -0.164
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 125,
+      "win": 37.6,
+      "mean": 0.1124,
+      "total": 14.06,
+      "dd": 9,
+      "months": 5,
+      "tMonth": 1.35
+     },
+     "net": {
+      "n": 125,
+      "win": 37.6,
+      "mean": 0.0402,
+      "total": 5.02,
+      "dd": 11.19,
+      "months": 5,
+      "tMonth": 0.59
+     },
+     "hows": {
+      "target": 46,
+      "stop": 77,
+      "trail": 0,
+      "gap": 1,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "sop",
+      "exit": "X2",
+      "diff": 0.1042,
+      "months": 5,
+      "tMonth": 0.7,
+      "p": 0.4839,
+      "halves": [
+       0.2893,
+       -0.1482
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 125,
+      "win": 27.2,
+      "mean": 0.0434,
+      "total": 5.43,
+      "dd": 12.43,
+      "months": 5,
+      "tMonth": 0.55
+     },
+     "net": {
+      "n": 125,
+      "win": 27.2,
+      "mean": -0.0289,
+      "total": -3.61,
+      "dd": 18.94,
+      "months": 5,
+      "tMonth": -0.34
+     },
+     "hows": {
+      "target": 32,
+      "stop": 90,
+      "trail": 0,
+      "gap": 1,
+      "time": 2
+     },
+     "vsBooked": {
+      "group": "sop",
+      "exit": "X3",
+      "diff": 0.0506,
+      "months": 5,
+      "tMonth": 0.55,
+      "p": 0.5823,
+      "halves": [
+       0.1017,
+       -0.1005
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 125,
+      "win": 52.8,
+      "mean": 0.0288,
+      "total": 3.61,
+      "dd": 6.34,
+      "months": 5,
+      "tMonth": 0.71
+     },
+     "net": {
+      "n": 125,
+      "win": 51.2,
+      "mean": -0.0434,
+      "total": -5.43,
+      "dd": 11.73,
+      "months": 5,
+      "tMonth": -1.03
+     },
+     "hows": {
+      "target": 0,
+      "stop": 58,
+      "trail": 63,
+      "gap": 3,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "sop",
+      "exit": "XT",
+      "diff": 0.0752,
+      "months": 5,
+      "tMonth": 0.44,
+      "p": 0.6599,
+      "halves": [
+       0.2027,
+       -0.2288
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "barrier": {
+   "desk": "mosha",
+   "kind": "barrier",
+   "name": "Mosha barrier entry",
+   "n": 13040,
+   "from": 1784844060,
+   "to": 1795208460,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 13040,
+      "win": 25.2,
+      "mean": 0.0046,
+      "total": 59.79,
+      "dd": 350.43,
+      "months": 5,
+      "tMonth": 0.15
+     },
+     "net": {
+      "n": 13040,
+      "win": 25.2,
+      "mean": -0.0835,
+      "total": -1089.41,
+      "dd": 1095.43,
+      "months": 5,
+      "tMonth": -2.83
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 13040,
+      "win": 48.4,
+      "mean": -0.0339,
+      "total": -442.19,
+      "dd": 450.19,
+      "months": 5,
+      "tMonth": -2.37
+     },
+     "net": {
+      "n": 13040,
+      "win": 48.4,
+      "mean": -0.122,
+      "total": -1591.39,
+      "dd": 1594.51,
+      "months": 5,
+      "tMonth": -5.24
+     },
+     "hows": {
+      "target": 6311,
+      "stop": 6672,
+      "trail": 0,
+      "gap": 46,
+      "time": 11
+     },
+     "vsBooked": {
+      "group": "barrier",
+      "exit": "X1",
+      "diff": -0.0251,
+      "months": 5,
+      "tMonth": -0.82,
+      "p": 0.4122,
+      "halves": [
+       -0.0236,
+       -0.0534
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 13040,
+      "win": 32.8,
+      "mean": -0.0221,
+      "total": -288.02,
+      "dd": 307.33,
+      "months": 5,
+      "tMonth": -1.03
+     },
+     "net": {
+      "n": 13040,
+      "win": 32.8,
+      "mean": -0.1102,
+      "total": -1437.22,
+      "dd": 1437.22,
+      "months": 5,
+      "tMonth": -4.44
+     },
+     "hows": {
+      "target": 4250,
+      "stop": 8694,
+      "trail": 0,
+      "gap": 61,
+      "time": 35
+     },
+     "vsBooked": {
+      "group": "barrier",
+      "exit": "X2",
+      "diff": -0.0189,
+      "months": 5,
+      "tMonth": -0.93,
+      "p": 0.3524,
+      "halves": [
+       -0.0115,
+       -0.0418
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 13040,
+      "win": 25.2,
+      "mean": -0.0028,
+      "total": -37.08,
+      "dd": 393.63,
+      "months": 5,
+      "tMonth": -0.09
+     },
+     "net": {
+      "n": 13040,
+      "win": 25.2,
+      "mean": -0.091,
+      "total": -1186.28,
+      "dd": 1192.3,
+      "months": 5,
+      "tMonth": -3
+     },
+     "hows": {
+      "target": 3237,
+      "stop": 9667,
+      "trail": 0,
+      "gap": 73,
+      "time": 63
+     },
+     "vsBooked": {
+      "group": "barrier",
+      "exit": "X3",
+      "diff": -0.0084,
+      "months": 5,
+      "tMonth": -4.05,
+      "p": 0.0001,
+      "halves": [
+       -0.0063,
+       -0.0085
+      ],
+      "holm": 0.0031,
+      "verdict": "worse"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 13040,
+      "win": 47.8,
+      "mean": 0.0036,
+      "total": 46.73,
+      "dd": 208.21,
+      "months": 5,
+      "tMonth": 0.18
+     },
+     "net": {
+      "n": 13040,
+      "win": 44,
+      "mean": -0.0845,
+      "total": -1102.46,
+      "dd": 1107.21,
+      "months": 5,
+      "tMonth": -3.36
+     },
+     "hows": {
+      "target": 0,
+      "stop": 6672,
+      "trail": 5853,
+      "gap": 497,
+      "time": 18
+     },
+     "vsBooked": {
+      "group": "barrier",
+      "exit": "XT",
+      "diff": 0.0139,
+      "months": 5,
+      "tMonth": 0.58,
+      "p": 0.5619,
+      "halves": [
+       0.0124,
+       -0.0144
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "eg-1d": {
+   "desk": "eg",
+   "kind": "eg-1d",
+   "name": "Engulf D1",
+   "n": 182,
+   "from": 1766387700,
+   "to": 1794879600,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 182,
+      "win": 43.4,
+      "mean": 0.1347,
+      "total": 24.51,
+      "dd": 12.25,
+      "months": 12,
+      "tMonth": 1.31
+     },
+     "net": {
+      "n": 182,
+      "win": 43.4,
+      "mean": 0.125,
+      "total": 22.75,
+      "dd": 12.49,
+      "months": 12,
+      "tMonth": 1.22
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 182,
+      "win": 51.6,
+      "mean": 0.0313,
+      "total": 5.7,
+      "dd": 12.13,
+      "months": 12,
+      "tMonth": 0.49
+     },
+     "net": {
+      "n": 182,
+      "win": 51.1,
+      "mean": 0.0216,
+      "total": 3.94,
+      "dd": 12.52,
+      "months": 12,
+      "tMonth": 0.34
+     },
+     "hows": {
+      "target": 72,
+      "stop": 63,
+      "trail": 0,
+      "gap": 2,
+      "time": 45
+     },
+     "vsBooked": {
+      "group": "eg-1d",
+      "exit": "X1",
+      "diff": -0.1724,
+      "months": 12,
+      "tMonth": -1.91,
+      "p": 0.0561,
+      "halves": [
+       -0.1118,
+       -0.095
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 182,
+      "win": 44.5,
+      "mean": 0.0327,
+      "total": 5.95,
+      "dd": 15.24,
+      "months": 12,
+      "tMonth": 0.36
+     },
+     "net": {
+      "n": 182,
+      "win": 44,
+      "mean": 0.023,
+      "total": 4.19,
+      "dd": 15.62,
+      "months": 12,
+      "tMonth": 0.25
+     },
+     "hows": {
+      "target": 28,
+      "stop": 70,
+      "trail": 0,
+      "gap": 2,
+      "time": 82
+     },
+     "vsBooked": {
+      "group": "eg-1d",
+      "exit": "X2",
+      "diff": -0.1474,
+      "months": 12,
+      "tMonth": -2.76,
+      "p": 0.0058,
+      "halves": [
+       -0.12,
+       -0.0839
+      ],
+      "holm": 0.3295,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 182,
+      "win": 44,
+      "mean": 0.0918,
+      "total": 16.7,
+      "dd": 15.89,
+      "months": 12,
+      "tMonth": 0.78
+     },
+     "net": {
+      "n": 182,
+      "win": 43.4,
+      "mean": 0.0821,
+      "total": 14.94,
+      "dd": 16.28,
+      "months": 12,
+      "tMonth": 0.7
+     },
+     "hows": {
+      "target": 17,
+      "stop": 71,
+      "trail": 0,
+      "gap": 2,
+      "time": 92
+     },
+     "vsBooked": {
+      "group": "eg-1d",
+      "exit": "X3",
+      "diff": -0.0937,
+      "months": 12,
+      "tMonth": -1.36,
+      "p": 0.1738,
+      "halves": [
+       -0.0912,
+       0.0054
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 182,
+      "win": 51.1,
+      "mean": 0.1015,
+      "total": 18.47,
+      "dd": 14.9,
+      "months": 12,
+      "tMonth": 1.11
+     },
+     "net": {
+      "n": 182,
+      "win": 50.5,
+      "mean": 0.0918,
+      "total": 16.71,
+      "dd": 15.3,
+      "months": 12,
+      "tMonth": 1.01
+     },
+     "hows": {
+      "target": 0,
+      "stop": 63,
+      "trail": 49,
+      "gap": 4,
+      "time": 66
+     },
+     "vsBooked": {
+      "group": "eg-1d",
+      "exit": "XT",
+      "diff": -0.0752,
+      "months": 12,
+      "tMonth": -1.15,
+      "p": 0.2501,
+      "halves": [
+       -0.0524,
+       -0.014
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "eg-4h": {
+   "desk": "eg",
+   "kind": "eg-4h",
+   "name": "Engulf H4",
+   "n": 1091,
+   "from": 1767125700,
+   "to": 1795177800,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 1091,
+      "win": 36.2,
+      "mean": 0.0017,
+      "total": 1.86,
+      "dd": 50.89,
+      "months": 12,
+      "tMonth": 0.04
+     },
+     "net": {
+      "n": 1091,
+      "win": 36.1,
+      "mean": -0.0288,
+      "total": -31.46,
+      "dd": 68.84,
+      "months": 12,
+      "tMonth": -0.62
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 1091,
+      "win": 48.4,
+      "mean": -0.0373,
+      "total": -40.72,
+      "dd": 59.68,
+      "months": 12,
+      "tMonth": -0.8
+     },
+     "net": {
+      "n": 1091,
+      "win": 48.4,
+      "mean": -0.0679,
+      "total": -74.04,
+      "dd": 84.5,
+      "months": 12,
+      "tMonth": -1.47
+     },
+     "hows": {
+      "target": 523,
+      "stop": 554,
+      "trail": 0,
+      "gap": 7,
+      "time": 7
+     },
+     "vsBooked": {
+      "group": "eg-4h",
+      "exit": "X1",
+      "diff": -0.0606,
+      "months": 12,
+      "tMonth": -1.64,
+      "p": 0.101,
+      "halves": [
+       0.0038,
+       -0.0818
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 1091,
+      "win": 33.9,
+      "mean": -0.0106,
+      "total": -11.58,
+      "dd": 66.88,
+      "months": 12,
+      "tMonth": -0.19
+     },
+     "net": {
+      "n": 1091,
+      "win": 33.9,
+      "mean": -0.0412,
+      "total": -44.9,
+      "dd": 84.2,
+      "months": 12,
+      "tMonth": -0.75
+     },
+     "hows": {
+      "target": 351,
+      "stop": 699,
+      "trail": 0,
+      "gap": 17,
+      "time": 24
+     },
+     "vsBooked": {
+      "group": "eg-4h",
+      "exit": "X2",
+      "diff": -0.0201,
+      "months": 12,
+      "tMonth": -0.87,
+      "p": 0.3843,
+      "halves": [
+       -0.0098,
+       -0.0148
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 1091,
+      "win": 26.9,
+      "mean": -0.0083,
+      "total": -9.04,
+      "dd": 60.94,
+      "months": 12,
+      "tMonth": -0.15
+     },
+     "net": {
+      "n": 1091,
+      "win": 26.9,
+      "mean": -0.0388,
+      "total": -42.36,
+      "dd": 89.32,
+      "months": 12,
+      "tMonth": -0.69
+     },
+     "hows": {
+      "target": 248,
+      "stop": 767,
+      "trail": 0,
+      "gap": 21,
+      "time": 55
+     },
+     "vsBooked": {
+      "group": "eg-4h",
+      "exit": "X3",
+      "diff": -0.0504,
+      "months": 12,
+      "tMonth": -0.77,
+      "p": 0.4413,
+      "halves": [
+       0.0129,
+       -0.0328
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 1091,
+      "win": 48.2,
+      "mean": -0.0159,
+      "total": -17.3,
+      "dd": 68.35,
+      "months": 12,
+      "tMonth": -0.24
+     },
+     "net": {
+      "n": 1091,
+      "win": 47,
+      "mean": -0.0464,
+      "total": -50.62,
+      "dd": 95.76,
+      "months": 12,
+      "tMonth": -0.71
+     },
+     "hows": {
+      "target": 0,
+      "stop": 554,
+      "trail": 505,
+      "gap": 20,
+      "time": 12
+     },
+     "vsBooked": {
+      "group": "eg-4h",
+      "exit": "XT",
+      "diff": -0.0187,
+      "months": 12,
+      "tMonth": -0.69,
+      "p": 0.4902,
+      "halves": [
+       0.0228,
+       -0.0578
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "eg-1h": {
+   "desk": "eg",
+   "kind": "eg-1h",
+   "name": "Engulf H1",
+   "n": 4053,
+   "from": 1767123900,
+   "to": 1795187700,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 4053,
+      "win": 36.8,
+      "mean": 0.0137,
+      "total": 55.64,
+      "dd": 96.38,
+      "months": 12,
+      "tMonth": 0.52
+     },
+     "net": {
+      "n": 4053,
+      "win": 36.4,
+      "mean": -0.0419,
+      "total": -169.64,
+      "dd": 241.27,
+      "months": 12,
+      "tMonth": -1.51
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 4053,
+      "win": 50.7,
+      "mean": 0.0062,
+      "total": 25.29,
+      "dd": 63.79,
+      "months": 12,
+      "tMonth": 0.34
+     },
+     "net": {
+      "n": 4053,
+      "win": 50.7,
+      "mean": -0.0493,
+      "total": -199.99,
+      "dd": 226.74,
+      "months": 12,
+      "tMonth": -2.59
+     },
+     "hows": {
+      "target": 2053,
+      "stop": 1971,
+      "trail": 0,
+      "gap": 28,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "eg-1h",
+      "exit": "X1",
+      "diff": -0.0054,
+      "months": 12,
+      "tMonth": -0.3,
+      "p": 0.7642,
+      "halves": [
+       0.0064,
+       -0.0214
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 4053,
+      "win": 33.7,
+      "mean": -0.0025,
+      "total": -10.22,
+      "dd": 106.56,
+      "months": 12,
+      "tMonth": -0.1
+     },
+     "net": {
+      "n": 4053,
+      "win": 33.7,
+      "mean": -0.0581,
+      "total": -235.49,
+      "dd": 287.06,
+      "months": 12,
+      "tMonth": -2.2
+     },
+     "hows": {
+      "target": 1359,
+      "stop": 2648,
+      "trail": 0,
+      "gap": 40,
+      "time": 6
+     },
+     "vsBooked": {
+      "group": "eg-1h",
+      "exit": "X2",
+      "diff": -0.0442,
+      "months": 12,
+      "tMonth": -1.39,
+      "p": 0.1645,
+      "halves": [
+       -0.0173,
+       -0.0152
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 4053,
+      "win": 25.4,
+      "mean": -0.0069,
+      "total": -28.15,
+      "dd": 174.88,
+      "months": 12,
+      "tMonth": -0.2
+     },
+     "net": {
+      "n": 4053,
+      "win": 25.4,
+      "mean": -0.0625,
+      "total": -253.43,
+      "dd": 370.76,
+      "months": 12,
+      "tMonth": -1.71
+     },
+     "hows": {
+      "target": 1003,
+      "stop": 2977,
+      "trail": 0,
+      "gap": 45,
+      "time": 28
+     },
+     "vsBooked": {
+      "group": "eg-1h",
+      "exit": "X3",
+      "diff": -0.0276,
+      "months": 12,
+      "tMonth": -1.56,
+      "p": 0.1188,
+      "halves": [
+       -0.0224,
+       -0.0189
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 4053,
+      "win": 50.2,
+      "mean": 0.0143,
+      "total": 57.81,
+      "dd": 77.49,
+      "months": 12,
+      "tMonth": 0.51
+     },
+     "net": {
+      "n": 4053,
+      "win": 47.7,
+      "mean": -0.0413,
+      "total": -167.47,
+      "dd": 226.85,
+      "months": 12,
+      "tMonth": -1.44
+     },
+     "hows": {
+      "target": 0,
+      "stop": 1971,
+      "trail": 1973,
+      "gap": 107,
+      "time": 2
+     },
+     "vsBooked": {
+      "group": "eg-1h",
+      "exit": "XT",
+      "diff": -0.0119,
+      "months": 12,
+      "tMonth": -0.73,
+      "p": 0.4654,
+      "halves": [
+       0.0001,
+       0.001
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "eg-plan": {
+   "desk": "eg",
+   "kind": "eg-plan",
+   "name": "Engulf plan (with the Daily)",
+   "n": 2149,
+   "from": 1767172200,
+   "to": 1795187400,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 2149,
+      "win": 31.1,
+      "mean": -0.0737,
+      "total": -158.4,
+      "dd": 172.4,
+      "months": 12,
+      "tMonth": -3.03
+     },
+     "net": {
+      "n": 2149,
+      "win": 31.1,
+      "mean": -0.1537,
+      "total": -330.38,
+      "dd": 341.52,
+      "months": 12,
+      "tMonth": -5
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 2149,
+      "win": 43.4,
+      "mean": -0.1369,
+      "total": -294.1,
+      "dd": 297.1,
+      "months": 12,
+      "tMonth": -4.22
+     },
+     "net": {
+      "n": 2149,
+      "win": 43.4,
+      "mean": -0.2169,
+      "total": -466.09,
+      "dd": 468.42,
+      "months": 12,
+      "tMonth": -5.68
+     },
+     "hows": {
+      "target": 933,
+      "stop": 1208,
+      "trail": 0,
+      "gap": 8,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-plan",
+      "exit": "X1",
+      "diff": -0.1135,
+      "months": 12,
+      "tMonth": -2.27,
+      "p": 0.0232,
+      "halves": [
+       -0.1126,
+       -0.0137
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 2149,
+      "win": 31.1,
+      "mean": -0.0737,
+      "total": -158.39,
+      "dd": 172.39,
+      "months": 12,
+      "tMonth": -3.03
+     },
+     "net": {
+      "n": 2149,
+      "win": 31.1,
+      "mean": -0.1537,
+      "total": -330.38,
+      "dd": 341.52,
+      "months": 12,
+      "tMonth": -5
+     },
+     "hows": {
+      "target": 669,
+      "stop": 1469,
+      "trail": 0,
+      "gap": 11,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-plan",
+      "exit": "X2",
+      "diff": 0,
+      "months": 12,
+      "tMonth": 1.71,
+      "p": 0.0873,
+      "halves": [
+       0,
+       0
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 2149,
+      "win": 23.9,
+      "mean": -0.0509,
+      "total": -109.39,
+      "dd": 122.39,
+      "months": 12,
+      "tMonth": -1.31
+     },
+     "net": {
+      "n": 2149,
+      "win": 23.9,
+      "mean": -0.1309,
+      "total": -281.38,
+      "dd": 289.12,
+      "months": 12,
+      "tMonth": -3.05
+     },
+     "hows": {
+      "target": 514,
+      "stop": 1624,
+      "trail": 0,
+      "gap": 11,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-plan",
+      "exit": "X3",
+      "diff": 0.0074,
+      "months": 12,
+      "tMonth": 0.28,
+      "p": 0.7795,
+      "halves": [
+       0.0335,
+       0.0121
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 2149,
+      "win": 41.4,
+      "mean": 0.0354,
+      "total": 76.03,
+      "dd": 42.78,
+      "months": 12,
+      "tMonth": 1.04
+     },
+     "net": {
+      "n": 2149,
+      "win": 39.2,
+      "mean": -0.0447,
+      "total": -95.96,
+      "dd": 112.77,
+      "months": 12,
+      "tMonth": -1.39
+     },
+     "hows": {
+      "target": 0,
+      "stop": 1208,
+      "trail": 702,
+      "gap": 239,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-plan",
+      "exit": "XT",
+      "diff": 0.0556,
+      "months": 12,
+      "tMonth": 1.15,
+      "p": 0.2501,
+      "halves": [
+       0.101,
+       0.1172
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "eg-simple": {
+   "desk": "eg",
+   "kind": "eg-simple",
+   "name": "Engulf short method",
+   "n": 2146,
+   "from": 1767141900,
+   "to": 1795185000,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 2146,
+      "win": 31,
+      "mean": -0.075,
+      "total": -160.86,
+      "dd": 188.86,
+      "months": 12,
+      "tMonth": -3.04
+     },
+     "net": {
+      "n": 2146,
+      "win": 31,
+      "mean": -0.1563,
+      "total": -335.45,
+      "dd": 350.05,
+      "months": 12,
+      "tMonth": -5.35
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 2146,
+      "win": 43.2,
+      "mean": -0.1388,
+      "total": -297.86,
+      "dd": 307.86,
+      "months": 12,
+      "tMonth": -4.16
+     },
+     "net": {
+      "n": 2146,
+      "win": 43.2,
+      "mean": -0.2202,
+      "total": -472.46,
+      "dd": 479.08,
+      "months": 12,
+      "tMonth": -5.66
+     },
+     "hows": {
+      "target": 926,
+      "stop": 1215,
+      "trail": 0,
+      "gap": 5,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-simple",
+      "exit": "X1",
+      "diff": -0.0847,
+      "months": 12,
+      "tMonth": -2.8,
+      "p": 0.0051,
+      "halves": [
+       -0.0941,
+       -0.0336
+      ],
+      "holm": 0.2964,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 2146,
+      "win": 30.9,
+      "mean": -0.0764,
+      "total": -163.86,
+      "dd": 190.86,
+      "months": 12,
+      "tMonth": -3.16
+     },
+     "net": {
+      "n": 2146,
+      "win": 30.9,
+      "mean": -0.1577,
+      "total": -338.45,
+      "dd": 353.05,
+      "months": 12,
+      "tMonth": -5.46
+     },
+     "hows": {
+      "target": 664,
+      "stop": 1476,
+      "trail": 0,
+      "gap": 6,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-simple",
+      "exit": "X2",
+      "diff": -0.0011,
+      "months": 12,
+      "tMonth": -1,
+      "p": 0.3173,
+      "halves": [
+       0,
+       -0.0028
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 2146,
+      "win": 23.6,
+      "mean": -0.0636,
+      "total": -136.47,
+      "dd": 217.47,
+      "months": 12,
+      "tMonth": -1.61
+     },
+     "net": {
+      "n": 2146,
+      "win": 23.6,
+      "mean": -0.1449,
+      "total": -311.06,
+      "dd": 349.45,
+      "months": 12,
+      "tMonth": -3.33
+     },
+     "hows": {
+      "target": 506,
+      "stop": 1633,
+      "trail": 0,
+      "gap": 7,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-simple",
+      "exit": "X3",
+      "diff": 0.0468,
+      "months": 12,
+      "tMonth": 1.24,
+      "p": 0.215,
+      "halves": [
+       -0.0015,
+       0.0242
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 2146,
+      "win": 41.1,
+      "mean": 0.0216,
+      "total": 46.27,
+      "dd": 77.39,
+      "months": 12,
+      "tMonth": 0.97
+     },
+     "net": {
+      "n": 2146,
+      "win": 39.1,
+      "mean": -0.0598,
+      "total": -128.32,
+      "dd": 174.62,
+      "months": 12,
+      "tMonth": -2.52
+     },
+     "hows": {
+      "target": 0,
+      "stop": 1215,
+      "trail": 708,
+      "gap": 223,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-simple",
+      "exit": "XT",
+      "diff": 0.1329,
+      "months": 12,
+      "tMonth": 3.42,
+      "p": 0.0006,
+      "halves": [
+       0.107,
+       0.0861
+      ],
+      "holm": 0.037,
+      "verdict": "better"
+     }
+    }
+   }
+  },
+  "eg-direct": {
+   "desk": "eg",
+   "kind": "eg-direct",
+   "name": "Engulf direct entry",
+   "n": 41,
+   "from": 1767573300,
+   "to": 1793607000,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 41,
+      "win": 14.6,
+      "mean": 0.0706,
+      "total": 2.89,
+      "dd": 25.99,
+      "months": 11,
+      "tMonth": 0.12
+     },
+     "net": {
+      "n": 41,
+      "win": 14.6,
+      "mean": -0.0117,
+      "total": -0.48,
+      "dd": 28.27,
+      "months": 11,
+      "tMonth": -0.02
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 41,
+      "win": 26.8,
+      "mean": -0.4634,
+      "total": -19,
+      "dd": 22,
+      "months": 11,
+      "tMonth": -2.38
+     },
+     "net": {
+      "n": 41,
+      "win": 26.8,
+      "mean": -0.5457,
+      "total": -22.37,
+      "dd": 24.78,
+      "months": 11,
+      "tMonth": -2.73
+     },
+     "hows": {
+      "target": 11,
+      "stop": 30,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-direct",
+      "exit": "X1",
+      "diff": -0.5375,
+      "months": 11,
+      "tMonth": -1.19,
+      "p": 0.234,
+      "halves": [
+       -0.6347,
+       -0.438
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 41,
+      "win": 22,
+      "mean": -0.3415,
+      "total": -14,
+      "dd": 23,
+      "months": 11,
+      "tMonth": -1.3
+     },
+     "net": {
+      "n": 41,
+      "win": 22,
+      "mean": -0.4238,
+      "total": -17.37,
+      "dd": 25.6,
+      "months": 11,
+      "tMonth": -1.6
+     },
+     "hows": {
+      "target": 9,
+      "stop": 32,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-direct",
+      "exit": "X2",
+      "diff": -0.4451,
+      "months": 11,
+      "tMonth": -0.97,
+      "p": 0.332,
+      "halves": [
+       -0.2847,
+       -0.5333
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 41,
+      "win": 19.5,
+      "mean": -0.2195,
+      "total": -9,
+      "dd": 20,
+      "months": 11,
+      "tMonth": -0.73
+     },
+     "net": {
+      "n": 41,
+      "win": 19.5,
+      "mean": -0.3018,
+      "total": -12.37,
+      "dd": 22.6,
+      "months": 11,
+      "tMonth": -0.99
+     },
+     "hows": {
+      "target": 8,
+      "stop": 33,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-direct",
+      "exit": "X3",
+      "diff": -0.3345,
+      "months": 11,
+      "tMonth": -0.7,
+      "p": 0.4839,
+      "halves": [
+       -0.1347,
+       -0.438
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 41,
+      "win": 26.8,
+      "mean": -0.1248,
+      "total": -5.12,
+      "dd": 20.53,
+      "months": 11,
+      "tMonth": -0.37
+     },
+     "net": {
+      "n": 41,
+      "win": 24.4,
+      "mean": -0.2071,
+      "total": -8.49,
+      "dd": 22.81,
+      "months": 11,
+      "tMonth": -0.61
+     },
+     "hows": {
+      "target": 0,
+      "stop": 30,
+      "trail": 8,
+      "gap": 3,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "eg-direct",
+      "exit": "XT",
+      "diff": -0.2237,
+      "months": 11,
+      "tMonth": -0.71,
+      "p": 0.4777,
+      "halves": [
+       -0.1024,
+       -0.2839
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "msnr-main": {
+   "desk": "msnr",
+   "kind": "msnr-main",
+   "name": "MSNR with the direction, 12-16 UTC",
+   "n": 1459,
+   "from": 1767186300,
+   "to": 1795190100,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 1459,
+      "win": 40.1,
+      "mean": 0.0017,
+      "total": 2.47,
+      "dd": 36.23,
+      "months": 12,
+      "tMonth": 0.07
+     },
+     "net": {
+      "n": 1459,
+      "win": 40,
+      "mean": -0.0899,
+      "total": -131.11,
+      "dd": 152.75,
+      "months": 12,
+      "tMonth": -3.34
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 1459,
+      "win": 48,
+      "mean": -0.0416,
+      "total": -60.69,
+      "dd": 81.69,
+      "months": 12,
+      "tMonth": -1.87
+     },
+     "net": {
+      "n": 1459,
+      "win": 48,
+      "mean": -0.1332,
+      "total": -194.28,
+      "dd": 210.84,
+      "months": 12,
+      "tMonth": -4.97
+     },
+     "hows": {
+      "target": 699,
+      "stop": 755,
+      "trail": 0,
+      "gap": 4,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "msnr-main",
+      "exit": "X1",
+      "diff": -0.0609,
+      "months": 12,
+      "tMonth": -2.73,
+      "p": 0.0063,
+      "halves": [
+       -0.0159,
+       -0.0706
+      ],
+      "holm": 0.3547,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 1459,
+      "win": 34.5,
+      "mean": 0.0279,
+      "total": 40.73,
+      "dd": 34.72,
+      "months": 12,
+      "tMonth": 0.81
+     },
+     "net": {
+      "n": 1459,
+      "win": 34.5,
+      "mean": -0.0636,
+      "total": -92.86,
+      "dd": 127.86,
+      "months": 12,
+      "tMonth": -1.79
+     },
+     "hows": {
+      "target": 503,
+      "stop": 947,
+      "trail": 0,
+      "gap": 8,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "msnr-main",
+      "exit": "X2",
+      "diff": 0.0467,
+      "months": 12,
+      "tMonth": 1.8,
+      "p": 0.0719,
+      "halves": [
+       0.0082,
+       0.0442
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 1459,
+      "win": 26.4,
+      "mean": 0.0443,
+      "total": 64.56,
+      "dd": 54.73,
+      "months": 12,
+      "tMonth": 1.02
+     },
+     "net": {
+      "n": 1459,
+      "win": 26.4,
+      "mean": -0.0473,
+      "total": -69.02,
+      "dd": 132.73,
+      "months": 12,
+      "tMonth": -1.04
+     },
+     "hows": {
+      "target": 383,
+      "stop": 1065,
+      "trail": 0,
+      "gap": 9,
+      "time": 2
+     },
+     "vsBooked": {
+      "group": "msnr-main",
+      "exit": "X3",
+      "diff": 0.106,
+      "months": 12,
+      "tMonth": 1.58,
+      "p": 0.1141,
+      "halves": [
+       0.0451,
+       0.0401
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 1459,
+      "win": 46.7,
+      "mean": 0.0285,
+      "total": 41.57,
+      "dd": 45.77,
+      "months": 12,
+      "tMonth": 0.77
+     },
+     "net": {
+      "n": 1459,
+      "win": 43.5,
+      "mean": -0.0631,
+      "total": -92.02,
+      "dd": 140.81,
+      "months": 12,
+      "tMonth": -1.56
+     },
+     "hows": {
+      "target": 0,
+      "stop": 755,
+      "trail": 605,
+      "gap": 98,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "msnr-main",
+      "exit": "XT",
+      "diff": 0.105,
+      "months": 12,
+      "tMonth": 1.37,
+      "p": 0.1707,
+      "halves": [
+       0.0262,
+       0.0273
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "msnr-other": {
+   "desk": "msnr",
+   "kind": "msnr-other",
+   "name": "MSNR with the direction, other hours",
+   "n": 5440,
+   "from": 1767139500,
+   "to": 1795209300,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 5440,
+      "win": 40.8,
+      "mean": 0.0067,
+      "total": 36.65,
+      "dd": 102.67,
+      "months": 12,
+      "tMonth": 0.46
+     },
+     "net": {
+      "n": 5440,
+      "win": 40.8,
+      "mean": -0.1067,
+      "total": -580.54,
+      "dd": 587.66,
+      "months": 12,
+      "tMonth": -6.05
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 5440,
+      "win": 50,
+      "mean": -0.0132,
+      "total": -71.68,
+      "dd": 87.4,
+      "months": 12,
+      "tMonth": -1.31
+     },
+     "net": {
+      "n": 5440,
+      "win": 50,
+      "mean": -0.1266,
+      "total": -688.87,
+      "dd": 691.39,
+      "months": 12,
+      "tMonth": -8.11
+     },
+     "hows": {
+      "target": 2721,
+      "stop": 2682,
+      "trail": 0,
+      "gap": 37,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-other",
+      "exit": "X1",
+      "diff": -0.0231,
+      "months": 12,
+      "tMonth": -2.16,
+      "p": 0.0308,
+      "halves": [
+       -0.0133,
+       -0.0265
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 5440,
+      "win": 35,
+      "mean": 0.0302,
+      "total": 164.51,
+      "dd": 81.69,
+      "months": 12,
+      "tMonth": 1.77
+     },
+     "net": {
+      "n": 5440,
+      "win": 35,
+      "mean": -0.0832,
+      "total": -452.68,
+      "dd": 467.11,
+      "months": 12,
+      "tMonth": -4.31
+     },
+     "hows": {
+      "target": 1903,
+      "stop": 3483,
+      "trail": 0,
+      "gap": 53,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "msnr-other",
+      "exit": "X2",
+      "diff": 0.0369,
+      "months": 12,
+      "tMonth": 2.38,
+      "p": 0.0173,
+      "halves": [
+       0.0105,
+       0.0365
+      ],
+      "holm": 0.9349,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 5440,
+      "win": 26.5,
+      "mean": 0.0353,
+      "total": 191.98,
+      "dd": 79.05,
+      "months": 12,
+      "tMonth": 1.81
+     },
+     "net": {
+      "n": 5440,
+      "win": 26.5,
+      "mean": -0.0782,
+      "total": -425.21,
+      "dd": 447.38,
+      "months": 12,
+      "tMonth": -3.77
+     },
+     "hows": {
+      "target": 1439,
+      "stop": 3938,
+      "trail": 0,
+      "gap": 62,
+      "time": 1
+     },
+     "vsBooked": {
+      "group": "msnr-other",
+      "exit": "X3",
+      "diff": 0.0204,
+      "months": 12,
+      "tMonth": 1.52,
+      "p": 0.1285,
+      "halves": [
+       0.0287,
+       0.0284
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 5440,
+      "win": 49,
+      "mean": 0.0495,
+      "total": 269.06,
+      "dd": 51.96,
+      "months": 12,
+      "tMonth": 2.06
+     },
+     "net": {
+      "n": 5440,
+      "win": 44.8,
+      "mean": -0.064,
+      "total": -348.13,
+      "dd": 365.16,
+      "months": 12,
+      "tMonth": -2.51
+     },
+     "hows": {
+      "target": 0,
+      "stop": 2682,
+      "trail": 2414,
+      "gap": 344,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-other",
+      "exit": "XT",
+      "diff": 0.0535,
+      "months": 12,
+      "tMonth": 2.73,
+      "p": 0.0063,
+      "halves": [
+       0.0605,
+       0.0249
+      ],
+      "holm": 0.3547,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "msnr-sop": {
+   "desk": "msnr",
+   "kind": "msnr-sop",
+   "name": "MSNR gold plan",
+   "n": 351,
+   "from": 1767140100,
+   "to": 1794909600,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 351,
+      "win": 17.7,
+      "mean": -0.2991,
+      "total": -104.97,
+      "dd": 109.97,
+      "months": 12,
+      "tMonth": -3.06
+     },
+     "net": {
+      "n": 351,
+      "win": 17.7,
+      "mean": -0.3735,
+      "total": -131.09,
+      "dd": 135.64,
+      "months": 12,
+      "tMonth": -3.79
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 351,
+      "win": 33.9,
+      "mean": -0.3275,
+      "total": -114.97,
+      "dd": 119.97,
+      "months": 12,
+      "tMonth": -4.88
+     },
+     "net": {
+      "n": 351,
+      "win": 33.9,
+      "mean": -0.402,
+      "total": -141.09,
+      "dd": 145.35,
+      "months": 12,
+      "tMonth": -5.56
+     },
+     "hows": {
+      "target": 119,
+      "stop": 231,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-sop",
+      "exit": "X1",
+      "diff": 0.0785,
+      "months": 12,
+      "tMonth": 0.66,
+      "p": 0.5093,
+      "halves": [
+       -0.1143,
+       0.0568
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 351,
+      "win": 24.5,
+      "mean": -0.2706,
+      "total": -94.97,
+      "dd": 99.97,
+      "months": 12,
+      "tMonth": -3.49
+     },
+     "net": {
+      "n": 351,
+      "win": 24.5,
+      "mean": -0.345,
+      "total": -121.09,
+      "dd": 125.64,
+      "months": 12,
+      "tMonth": -4.33
+     },
+     "hows": {
+      "target": 86,
+      "stop": 264,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-sop",
+      "exit": "X2",
+      "diff": 0.0441,
+      "months": 12,
+      "tMonth": 1.04,
+      "p": 0.2983,
+      "halves": [
+       0.0457,
+       0.0114
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 351,
+      "win": 17.7,
+      "mean": -0.2991,
+      "total": -104.97,
+      "dd": 109.97,
+      "months": 12,
+      "tMonth": -3.06
+     },
+     "net": {
+      "n": 351,
+      "win": 17.7,
+      "mean": -0.3735,
+      "total": -131.09,
+      "dd": 135.64,
+      "months": 12,
+      "tMonth": -3.79
+     },
+     "hows": {
+      "target": 62,
+      "stop": 288,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-sop",
+      "exit": "X3",
+      "diff": 0,
+      "months": 12,
+      "tMonth": -1,
+      "p": 0.3173,
+      "halves": [
+       0,
+       0
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 351,
+      "win": 32.2,
+      "mean": -0.184,
+      "total": -64.59,
+      "dd": 88.41,
+      "months": 12,
+      "tMonth": -2.69
+     },
+     "net": {
+      "n": 351,
+      "win": 31.1,
+      "mean": -0.2584,
+      "total": -90.71,
+      "dd": 112.25,
+      "months": 12,
+      "tMonth": -3.71
+     },
+     "hows": {
+      "target": 0,
+      "stop": 231,
+      "trail": 80,
+      "gap": 40,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-sop",
+      "exit": "XT",
+      "diff": 0.1749,
+      "months": 12,
+      "tMonth": 1.89,
+      "p": 0.0588,
+      "halves": [
+       0.1353,
+       0.0949
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "msnr-qm": {
+   "desk": "msnr",
+   "kind": "msnr-qm",
+   "name": "MSNR gold plan, QM entry",
+   "n": 42,
+   "from": 1767576600,
+   "to": 1794359400,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 42,
+      "win": 28.6,
+      "mean": 0.1429,
+      "total": 6,
+      "dd": 7,
+      "months": 11,
+      "tMonth": 0.57
+     },
+     "net": {
+      "n": 42,
+      "win": 28.6,
+      "mean": 0.068,
+      "total": 2.85,
+      "dd": 9.66,
+      "months": 11,
+      "tMonth": 0.27
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 42,
+      "win": 42.9,
+      "mean": -0.1429,
+      "total": -6,
+      "dd": 11,
+      "months": 11,
+      "tMonth": -1.15
+     },
+     "net": {
+      "n": 42,
+      "win": 42.9,
+      "mean": -0.2177,
+      "total": -9.15,
+      "dd": 13.64,
+      "months": 11,
+      "tMonth": -1.66
+     },
+     "hows": {
+      "target": 18,
+      "stop": 24,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-qm",
+      "exit": "X1",
+      "diff": -0.4411,
+      "months": 11,
+      "tMonth": -1.62,
+      "p": 0.1052,
+      "halves": [
+       -0.2,
+       -0.3636
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 42,
+      "win": 31,
+      "mean": -0.0714,
+      "total": -3,
+      "dd": 13,
+      "months": 11,
+      "tMonth": -0.37
+     },
+     "net": {
+      "n": 42,
+      "win": 31,
+      "mean": -0.1463,
+      "total": -6.15,
+      "dd": 15.58,
+      "months": 11,
+      "tMonth": -0.73
+     },
+     "hows": {
+      "target": 13,
+      "stop": 29,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-qm",
+      "exit": "X2",
+      "diff": -0.2465,
+      "months": 11,
+      "tMonth": -1.62,
+      "p": 0.1052,
+      "halves": [
+       -0.1,
+       -0.3182
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 42,
+      "win": 28.6,
+      "mean": 0.1429,
+      "total": 6,
+      "dd": 7,
+      "months": 11,
+      "tMonth": 0.57
+     },
+     "net": {
+      "n": 42,
+      "win": 28.6,
+      "mean": 0.068,
+      "total": 2.85,
+      "dd": 9.66,
+      "months": 11,
+      "tMonth": 0.27
+     },
+     "hows": {
+      "target": 12,
+      "stop": 30,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-qm",
+      "exit": "X3",
+      "diff": 0,
+      "months": 11,
+      "tMonth": null,
+      "p": 2,
+      "halves": [
+       0,
+       0
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 42,
+      "win": 42.9,
+      "mean": 0.1137,
+      "total": 4.77,
+      "dd": 11.22,
+      "months": 11,
+      "tMonth": 0.42
+     },
+     "net": {
+      "n": 42,
+      "win": 40.5,
+      "mean": 0.0388,
+      "total": 1.63,
+      "dd": 13.55,
+      "months": 11,
+      "tMonth": 0.14
+     },
+     "hows": {
+      "target": 0,
+      "stop": 24,
+      "trail": 14,
+      "gap": 4,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "msnr-qm",
+      "exit": "XT",
+      "diff": -0.0568,
+      "months": 11,
+      "tMonth": -0.32,
+      "p": 0.749,
+      "halves": [
+       -0.0862,
+       0.0226
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "lit-rule": {
+   "desk": "lit",
+   "kind": "lit-rule",
+   "name": "LIT, the rule's execution",
+   "n": 45,
+   "from": 1767364800,
+   "to": 1794844500,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 45,
+      "win": 24.4,
+      "mean": 0.2629,
+      "total": 11.83,
+      "dd": 6.17,
+      "months": 11,
+      "tMonth": 1.13
+     },
+     "net": {
+      "n": 45,
+      "win": 24.4,
+      "mean": 0.0935,
+      "total": 4.21,
+      "dd": 10.31,
+      "months": 11,
+      "tMonth": 0.4
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 45,
+      "win": 44.4,
+      "mean": -0.1111,
+      "total": -5,
+      "dd": 8,
+      "months": 11,
+      "tMonth": -0.73
+     },
+     "net": {
+      "n": 45,
+      "win": 44.4,
+      "mean": -0.2805,
+      "total": -12.62,
+      "dd": 15.16,
+      "months": 11,
+      "tMonth": -1.59
+     },
+     "hows": {
+      "target": 20,
+      "stop": 25,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-rule",
+      "exit": "X1",
+      "diff": -0.4176,
+      "months": 11,
+      "tMonth": -1.17,
+      "p": 0.242,
+      "halves": [
+       -0.6562,
+       -0.1041
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 45,
+      "win": 40,
+      "mean": 0.2,
+      "total": 9,
+      "dd": 5,
+      "months": 11,
+      "tMonth": 1.11
+     },
+     "net": {
+      "n": 45,
+      "win": 40,
+      "mean": 0.0306,
+      "total": 1.38,
+      "dd": 8.14,
+      "months": 11,
+      "tMonth": 0.16
+     },
+     "hows": {
+      "target": 18,
+      "stop": 27,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-rule",
+      "exit": "X2",
+      "diff": -0.0666,
+      "months": 11,
+      "tMonth": -0.2,
+      "p": 0.8415,
+      "halves": [
+       -0.1562,
+       0.0263
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 45,
+      "win": 31.1,
+      "mean": 0.2212,
+      "total": 9.95,
+      "dd": 7.05,
+      "months": 11,
+      "tMonth": 1.3
+     },
+     "net": {
+      "n": 45,
+      "win": 31.1,
+      "mean": 0.0518,
+      "total": 2.33,
+      "dd": 11.18,
+      "months": 11,
+      "tMonth": 0.3
+     },
+     "hows": {
+      "target": 14,
+      "stop": 30,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-rule",
+      "exit": "X3",
+      "diff": -0.1756,
+      "months": 11,
+      "tMonth": -1.27,
+      "p": 0.2041,
+      "halves": [
+       -0.0199,
+       -0.0627
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 45,
+      "win": 44.4,
+      "mean": 0.1769,
+      "total": 7.96,
+      "dd": 5,
+      "months": 11,
+      "tMonth": 0.78
+     },
+     "net": {
+      "n": 45,
+      "win": 40,
+      "mean": 0.0075,
+      "total": 0.34,
+      "dd": 8.5,
+      "months": 11,
+      "tMonth": 0.03
+     },
+     "hows": {
+      "target": 0,
+      "stop": 25,
+      "trail": 18,
+      "gap": 2,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-rule",
+      "exit": "XT",
+      "diff": -0.2512,
+      "months": 11,
+      "tMonth": -0.71,
+      "p": 0.4777,
+      "halves": [
+       -0.121,
+       -0.0526
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "lit-loose": {
+   "desk": "lit",
+   "kind": "lit-loose",
+   "name": "LIT, loose limit",
+   "n": 576,
+   "from": 1767169800,
+   "to": 1795203300,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 576,
+      "win": 20.8,
+      "mean": -0.046,
+      "total": -26.51,
+      "dd": 92.09,
+      "months": 12,
+      "tMonth": -0.48
+     },
+     "net": {
+      "n": 576,
+      "win": 20.8,
+      "mean": -0.1486,
+      "total": -85.57,
+      "dd": 133.29,
+      "months": 12,
+      "tMonth": -1.48
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 576,
+      "win": 46,
+      "mean": -0.0799,
+      "total": -46,
+      "dd": 66,
+      "months": 12,
+      "tMonth": -1.21
+     },
+     "net": {
+      "n": 576,
+      "win": 46,
+      "mean": -0.1824,
+      "total": -105.06,
+      "dd": 112.91,
+      "months": 12,
+      "tMonth": -2.54
+     },
+     "hows": {
+      "target": 265,
+      "stop": 311,
+      "trail": 0,
+      "gap": 0,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-loose",
+      "exit": "X1",
+      "diff": -0.0394,
+      "months": 12,
+      "tMonth": -0.41,
+      "p": 0.6818,
+      "halves": [
+       -0.1236,
+       0.0559
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 576,
+      "win": 31.9,
+      "mean": -0.046,
+      "total": -26.47,
+      "dd": 60.47,
+      "months": 12,
+      "tMonth": -0.72
+     },
+     "net": {
+      "n": 576,
+      "win": 31.9,
+      "mean": -0.1485,
+      "total": -85.53,
+      "dd": 104.53,
+      "months": 12,
+      "tMonth": -2.19
+     },
+     "hows": {
+      "target": 184,
+      "stop": 391,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-loose",
+      "exit": "X2",
+      "diff": -0.0124,
+      "months": 12,
+      "tMonth": -0.2,
+      "p": 0.8415,
+      "halves": [
+       -0.0333,
+       0.0334
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 576,
+      "win": 24.7,
+      "mean": -0.02,
+      "total": -11.52,
+      "dd": 75.52,
+      "months": 12,
+      "tMonth": -0.26
+     },
+     "net": {
+      "n": 576,
+      "win": 24.7,
+      "mean": -0.1225,
+      "total": -70.58,
+      "dd": 108.48,
+      "months": 12,
+      "tMonth": -1.54
+     },
+     "hows": {
+      "target": 142,
+      "stop": 432,
+      "trail": 0,
+      "gap": 2,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-loose",
+      "exit": "X3",
+      "diff": 0.0146,
+      "months": 12,
+      "tMonth": 0.22,
+      "p": 0.8259,
+      "halves": [
+       0.05,
+       0.002
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 576,
+      "win": 45.1,
+      "mean": 0.0376,
+      "total": 21.66,
+      "dd": 28.19,
+      "months": 12,
+      "tMonth": 0.63
+     },
+     "net": {
+      "n": 576,
+      "win": 41.5,
+      "mean": -0.0649,
+      "total": -37.4,
+      "dd": 65.12,
+      "months": 12,
+      "tMonth": -1.03
+     },
+     "hows": {
+      "target": 0,
+      "stop": 311,
+      "trail": 225,
+      "gap": 40,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-loose",
+      "exit": "XT",
+      "diff": 0.0651,
+      "months": 12,
+      "tMonth": 0.7,
+      "p": 0.4839,
+      "halves": [
+       -0.0299,
+       0.1972
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  },
+  "lit-break": {
+   "desk": "lit",
+   "kind": "lit-break",
+   "name": "LIT, market on the break",
+   "n": 164,
+   "from": 1767205500,
+   "to": 1795201500,
+   "exits": {
+    "booked": {
+     "gross": {
+      "n": 164,
+      "win": 25.6,
+      "mean": -0.0442,
+      "total": -7.24,
+      "dd": 19.67,
+      "months": 12,
+      "tMonth": -0.47
+     },
+     "net": {
+      "n": 164,
+      "win": 25.6,
+      "mean": -0.1114,
+      "total": -18.27,
+      "dd": 29.56,
+      "months": 12,
+      "tMonth": -1.19
+     },
+     "hows": null
+    },
+    "X1": {
+     "gross": {
+      "n": 164,
+      "win": 47,
+      "mean": -0.0715,
+      "total": -11.73,
+      "dd": 21.73,
+      "months": 12,
+      "tMonth": -1.26
+     },
+     "net": {
+      "n": 164,
+      "win": 47,
+      "mean": -0.1388,
+      "total": -22.76,
+      "dd": 27.95,
+      "months": 12,
+      "tMonth": -2.34
+     },
+     "hows": {
+      "target": 77,
+      "stop": 86,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-break",
+      "exit": "X1",
+      "diff": -0.0033,
+      "months": 12,
+      "tMonth": -0.04,
+      "p": 0.9681,
+      "halves": [
+       0.0328,
+       -0.0876
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X2": {
+     "gross": {
+      "n": 164,
+      "win": 29.9,
+      "mean": -0.1142,
+      "total": -18.73,
+      "dd": 21.73,
+      "months": 12,
+      "tMonth": -1.3
+     },
+     "net": {
+      "n": 164,
+      "win": 29.9,
+      "mean": -0.1815,
+      "total": -29.76,
+      "dd": 31.76,
+      "months": 12,
+      "tMonth": -2.07
+     },
+     "hows": {
+      "target": 49,
+      "stop": 114,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-break",
+      "exit": "X2",
+      "diff": -0.0645,
+      "months": 12,
+      "tMonth": -0.83,
+      "p": 0.4065,
+      "halves": [
+       -0.0038,
+       -0.1364
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "X3": {
+     "gross": {
+      "n": 164,
+      "win": 22,
+      "mean": -0.1325,
+      "total": -21.73,
+      "dd": 27.73,
+      "months": 12,
+      "tMonth": -1.13
+     },
+     "net": {
+      "n": 164,
+      "win": 22,
+      "mean": -0.1998,
+      "total": -32.76,
+      "dd": 33.97,
+      "months": 12,
+      "tMonth": -1.69
+     },
+     "hows": {
+      "target": 36,
+      "stop": 127,
+      "trail": 0,
+      "gap": 1,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-break",
+      "exit": "X3",
+      "diff": -0.069,
+      "months": 12,
+      "tMonth": -0.86,
+      "p": 0.3898,
+      "halves": [
+       0.0328,
+       -0.2095
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    },
+    "XT": {
+     "gross": {
+      "n": 164,
+      "win": 46.3,
+      "mean": -0.0735,
+      "total": -12.05,
+      "dd": 27.86,
+      "months": 12,
+      "tMonth": -0.79
+     },
+     "net": {
+      "n": 164,
+      "win": 43.9,
+      "mean": -0.1407,
+      "total": -23.08,
+      "dd": 32.75,
+      "months": 12,
+      "tMonth": -1.47
+     },
+     "hows": {
+      "target": 0,
+      "stop": 86,
+      "trail": 70,
+      "gap": 8,
+      "time": 0
+     },
+     "vsBooked": {
+      "group": "lit-break",
+      "exit": "XT",
+      "diff": -0.0108,
+      "months": 12,
+      "tMonth": -0.14,
+      "p": 0.8887,
+      "halves": [
+       0.1334,
+       -0.192
+      ],
+      "holm": 1,
+      "verdict": "no better"
+     }
+    }
+   }
+  }
+ },
+ "tests": [
+  {
+   "group": "sop",
+   "exit": "X1",
+   "diff": 0.0607,
+   "months": 5,
+   "tMonth": 0.39,
+   "p": 0.6965,
+   "halves": [
+    0.1764,
+    -0.164
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "sop",
+   "exit": "X2",
+   "diff": 0.1042,
+   "months": 5,
+   "tMonth": 0.7,
+   "p": 0.4839,
+   "halves": [
+    0.2893,
+    -0.1482
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "sop",
+   "exit": "X3",
+   "diff": 0.0506,
+   "months": 5,
+   "tMonth": 0.55,
+   "p": 0.5823,
+   "halves": [
+    0.1017,
+    -0.1005
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "sop",
+   "exit": "XT",
+   "diff": 0.0752,
+   "months": 5,
+   "tMonth": 0.44,
+   "p": 0.6599,
+   "halves": [
+    0.2027,
+    -0.2288
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "barrier",
+   "exit": "X1",
+   "diff": -0.0251,
+   "months": 5,
+   "tMonth": -0.82,
+   "p": 0.4122,
+   "halves": [
+    -0.0236,
+    -0.0534
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "barrier",
+   "exit": "X2",
+   "diff": -0.0189,
+   "months": 5,
+   "tMonth": -0.93,
+   "p": 0.3524,
+   "halves": [
+    -0.0115,
+    -0.0418
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "barrier",
+   "exit": "X3",
+   "diff": -0.0084,
+   "months": 5,
+   "tMonth": -4.05,
+   "p": 0.0001,
+   "halves": [
+    -0.0063,
+    -0.0085
+   ],
+   "holm": 0.0031,
+   "verdict": "worse"
+  },
+  {
+   "group": "barrier",
+   "exit": "XT",
+   "diff": 0.0139,
+   "months": 5,
+   "tMonth": 0.58,
+   "p": 0.5619,
+   "halves": [
+    0.0124,
+    -0.0144
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1d",
+   "exit": "X1",
+   "diff": -0.1724,
+   "months": 12,
+   "tMonth": -1.91,
+   "p": 0.0561,
+   "halves": [
+    -0.1118,
+    -0.095
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1d",
+   "exit": "X2",
+   "diff": -0.1474,
+   "months": 12,
+   "tMonth": -2.76,
+   "p": 0.0058,
+   "halves": [
+    -0.12,
+    -0.0839
+   ],
+   "holm": 0.3295,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1d",
+   "exit": "X3",
+   "diff": -0.0937,
+   "months": 12,
+   "tMonth": -1.36,
+   "p": 0.1738,
+   "halves": [
+    -0.0912,
+    0.0054
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1d",
+   "exit": "XT",
+   "diff": -0.0752,
+   "months": 12,
+   "tMonth": -1.15,
+   "p": 0.2501,
+   "halves": [
+    -0.0524,
+    -0.014
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-4h",
+   "exit": "X1",
+   "diff": -0.0606,
+   "months": 12,
+   "tMonth": -1.64,
+   "p": 0.101,
+   "halves": [
+    0.0038,
+    -0.0818
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-4h",
+   "exit": "X2",
+   "diff": -0.0201,
+   "months": 12,
+   "tMonth": -0.87,
+   "p": 0.3843,
+   "halves": [
+    -0.0098,
+    -0.0148
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-4h",
+   "exit": "X3",
+   "diff": -0.0504,
+   "months": 12,
+   "tMonth": -0.77,
+   "p": 0.4413,
+   "halves": [
+    0.0129,
+    -0.0328
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-4h",
+   "exit": "XT",
+   "diff": -0.0187,
+   "months": 12,
+   "tMonth": -0.69,
+   "p": 0.4902,
+   "halves": [
+    0.0228,
+    -0.0578
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1h",
+   "exit": "X1",
+   "diff": -0.0054,
+   "months": 12,
+   "tMonth": -0.3,
+   "p": 0.7642,
+   "halves": [
+    0.0064,
+    -0.0214
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1h",
+   "exit": "X2",
+   "diff": -0.0442,
+   "months": 12,
+   "tMonth": -1.39,
+   "p": 0.1645,
+   "halves": [
+    -0.0173,
+    -0.0152
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1h",
+   "exit": "X3",
+   "diff": -0.0276,
+   "months": 12,
+   "tMonth": -1.56,
+   "p": 0.1188,
+   "halves": [
+    -0.0224,
+    -0.0189
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-1h",
+   "exit": "XT",
+   "diff": -0.0119,
+   "months": 12,
+   "tMonth": -0.73,
+   "p": 0.4654,
+   "halves": [
+    0.0001,
+    0.001
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-plan",
+   "exit": "X1",
+   "diff": -0.1135,
+   "months": 12,
+   "tMonth": -2.27,
+   "p": 0.0232,
+   "halves": [
+    -0.1126,
+    -0.0137
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-plan",
+   "exit": "X2",
+   "diff": 0,
+   "months": 12,
+   "tMonth": 1.71,
+   "p": 0.0873,
+   "halves": [
+    0,
+    0
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-plan",
+   "exit": "X3",
+   "diff": 0.0074,
+   "months": 12,
+   "tMonth": 0.28,
+   "p": 0.7795,
+   "halves": [
+    0.0335,
+    0.0121
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-plan",
+   "exit": "XT",
+   "diff": 0.0556,
+   "months": 12,
+   "tMonth": 1.15,
+   "p": 0.2501,
+   "halves": [
+    0.101,
+    0.1172
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-simple",
+   "exit": "X1",
+   "diff": -0.0847,
+   "months": 12,
+   "tMonth": -2.8,
+   "p": 0.0051,
+   "halves": [
+    -0.0941,
+    -0.0336
+   ],
+   "holm": 0.2964,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-simple",
+   "exit": "X2",
+   "diff": -0.0011,
+   "months": 12,
+   "tMonth": -1,
+   "p": 0.3173,
+   "halves": [
+    0,
+    -0.0028
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-simple",
+   "exit": "X3",
+   "diff": 0.0468,
+   "months": 12,
+   "tMonth": 1.24,
+   "p": 0.215,
+   "halves": [
+    -0.0015,
+    0.0242
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-simple",
+   "exit": "XT",
+   "diff": 0.1329,
+   "months": 12,
+   "tMonth": 3.42,
+   "p": 0.0006,
+   "halves": [
+    0.107,
+    0.0861
+   ],
+   "holm": 0.037,
+   "verdict": "better"
+  },
+  {
+   "group": "eg-direct",
+   "exit": "X1",
+   "diff": -0.5375,
+   "months": 11,
+   "tMonth": -1.19,
+   "p": 0.234,
+   "halves": [
+    -0.6347,
+    -0.438
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-direct",
+   "exit": "X2",
+   "diff": -0.4451,
+   "months": 11,
+   "tMonth": -0.97,
+   "p": 0.332,
+   "halves": [
+    -0.2847,
+    -0.5333
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-direct",
+   "exit": "X3",
+   "diff": -0.3345,
+   "months": 11,
+   "tMonth": -0.7,
+   "p": 0.4839,
+   "halves": [
+    -0.1347,
+    -0.438
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "eg-direct",
+   "exit": "XT",
+   "diff": -0.2237,
+   "months": 11,
+   "tMonth": -0.71,
+   "p": 0.4777,
+   "halves": [
+    -0.1024,
+    -0.2839
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-main",
+   "exit": "X1",
+   "diff": -0.0609,
+   "months": 12,
+   "tMonth": -2.73,
+   "p": 0.0063,
+   "halves": [
+    -0.0159,
+    -0.0706
+   ],
+   "holm": 0.3547,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-main",
+   "exit": "X2",
+   "diff": 0.0467,
+   "months": 12,
+   "tMonth": 1.8,
+   "p": 0.0719,
+   "halves": [
+    0.0082,
+    0.0442
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-main",
+   "exit": "X3",
+   "diff": 0.106,
+   "months": 12,
+   "tMonth": 1.58,
+   "p": 0.1141,
+   "halves": [
+    0.0451,
+    0.0401
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-main",
+   "exit": "XT",
+   "diff": 0.105,
+   "months": 12,
+   "tMonth": 1.37,
+   "p": 0.1707,
+   "halves": [
+    0.0262,
+    0.0273
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-other",
+   "exit": "X1",
+   "diff": -0.0231,
+   "months": 12,
+   "tMonth": -2.16,
+   "p": 0.0308,
+   "halves": [
+    -0.0133,
+    -0.0265
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-other",
+   "exit": "X2",
+   "diff": 0.0369,
+   "months": 12,
+   "tMonth": 2.38,
+   "p": 0.0173,
+   "halves": [
+    0.0105,
+    0.0365
+   ],
+   "holm": 0.9349,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-other",
+   "exit": "X3",
+   "diff": 0.0204,
+   "months": 12,
+   "tMonth": 1.52,
+   "p": 0.1285,
+   "halves": [
+    0.0287,
+    0.0284
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-other",
+   "exit": "XT",
+   "diff": 0.0535,
+   "months": 12,
+   "tMonth": 2.73,
+   "p": 0.0063,
+   "halves": [
+    0.0605,
+    0.0249
+   ],
+   "holm": 0.3547,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-sop",
+   "exit": "X1",
+   "diff": 0.0785,
+   "months": 12,
+   "tMonth": 0.66,
+   "p": 0.5093,
+   "halves": [
+    -0.1143,
+    0.0568
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-sop",
+   "exit": "X2",
+   "diff": 0.0441,
+   "months": 12,
+   "tMonth": 1.04,
+   "p": 0.2983,
+   "halves": [
+    0.0457,
+    0.0114
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-sop",
+   "exit": "X3",
+   "diff": 0,
+   "months": 12,
+   "tMonth": -1,
+   "p": 0.3173,
+   "halves": [
+    0,
+    0
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-sop",
+   "exit": "XT",
+   "diff": 0.1749,
+   "months": 12,
+   "tMonth": 1.89,
+   "p": 0.0588,
+   "halves": [
+    0.1353,
+    0.0949
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-qm",
+   "exit": "X1",
+   "diff": -0.4411,
+   "months": 11,
+   "tMonth": -1.62,
+   "p": 0.1052,
+   "halves": [
+    -0.2,
+    -0.3636
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-qm",
+   "exit": "X2",
+   "diff": -0.2465,
+   "months": 11,
+   "tMonth": -1.62,
+   "p": 0.1052,
+   "halves": [
+    -0.1,
+    -0.3182
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-qm",
+   "exit": "X3",
+   "diff": 0,
+   "months": 11,
+   "tMonth": null,
+   "p": 2,
+   "halves": [
+    0,
+    0
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "msnr-qm",
+   "exit": "XT",
+   "diff": -0.0568,
+   "months": 11,
+   "tMonth": -0.32,
+   "p": 0.749,
+   "halves": [
+    -0.0862,
+    0.0226
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-rule",
+   "exit": "X1",
+   "diff": -0.4176,
+   "months": 11,
+   "tMonth": -1.17,
+   "p": 0.242,
+   "halves": [
+    -0.6562,
+    -0.1041
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-rule",
+   "exit": "X2",
+   "diff": -0.0666,
+   "months": 11,
+   "tMonth": -0.2,
+   "p": 0.8415,
+   "halves": [
+    -0.1562,
+    0.0263
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-rule",
+   "exit": "X3",
+   "diff": -0.1756,
+   "months": 11,
+   "tMonth": -1.27,
+   "p": 0.2041,
+   "halves": [
+    -0.0199,
+    -0.0627
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-rule",
+   "exit": "XT",
+   "diff": -0.2512,
+   "months": 11,
+   "tMonth": -0.71,
+   "p": 0.4777,
+   "halves": [
+    -0.121,
+    -0.0526
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-loose",
+   "exit": "X1",
+   "diff": -0.0394,
+   "months": 12,
+   "tMonth": -0.41,
+   "p": 0.6818,
+   "halves": [
+    -0.1236,
+    0.0559
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-loose",
+   "exit": "X2",
+   "diff": -0.0124,
+   "months": 12,
+   "tMonth": -0.2,
+   "p": 0.8415,
+   "halves": [
+    -0.0333,
+    0.0334
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-loose",
+   "exit": "X3",
+   "diff": 0.0146,
+   "months": 12,
+   "tMonth": 0.22,
+   "p": 0.8259,
+   "halves": [
+    0.05,
+    0.002
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-loose",
+   "exit": "XT",
+   "diff": 0.0651,
+   "months": 12,
+   "tMonth": 0.7,
+   "p": 0.4839,
+   "halves": [
+    -0.0299,
+    0.1972
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-break",
+   "exit": "X1",
+   "diff": -0.0033,
+   "months": 12,
+   "tMonth": -0.04,
+   "p": 0.9681,
+   "halves": [
+    0.0328,
+    -0.0876
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-break",
+   "exit": "X2",
+   "diff": -0.0645,
+   "months": 12,
+   "tMonth": -0.83,
+   "p": 0.4065,
+   "halves": [
+    -0.0038,
+    -0.1364
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-break",
+   "exit": "X3",
+   "diff": -0.069,
+   "months": 12,
+   "tMonth": -0.86,
+   "p": 0.3898,
+   "halves": [
+    0.0328,
+    -0.2095
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  },
+  {
+   "group": "lit-break",
+   "exit": "XT",
+   "diff": -0.0108,
+   "months": 12,
+   "tMonth": -0.14,
+   "p": 0.8887,
+   "halves": [
+    0.1334,
+    -0.192
+   ],
+   "holm": 1,
+   "verdict": "no better"
+  }
+ ]
+}

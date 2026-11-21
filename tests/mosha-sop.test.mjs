@@ -32,7 +32,7 @@ test('the replay finds entries of both kinds, each with a stop on its losing sid
     const ts = r.log.map((x) => x.t).filter(Boolean); assert.deepEqual(ts, ts.slice().sort((a, b) => a - b), 'the log runs in time order');
     if (r.status === 'stopped') assert.equal(r.R, -1); if (r.status === 'target') assert.ok(r.R > 0); if (r.status === 'open') assert.equal(r.R, null);
   }
-  for (const r of sop) { assert.match(r.log[0].text, /BO (buy|sell)/); assert.match(r.log[1].text, / VR: the first BO Structure \(QM\) against the BO/); assert.match(r.log[2].text, / CF.*BO Structure \(QM\) back with the BO/); assert.ok(r.deep === null || typeof r.deep === 'boolean'); }
+  for (const r of sop.filter((x) => !x.retest)) { assert.match(r.log[0].text, /BO (buy|sell)/); assert.match(r.log[1].text, / VR: the first BO Structure \(QM\) against the BO/); assert.match(r.log[2].text, / CF.*BO Structure \(QM\) back with the BO/); assert.ok(r.deep === null || typeof r.deep === 'boolean'); }
   // the return to the barrier is a moment on the finest candles, and the confirmation closes after it (never a QM from before price was there)
   for (const r of bar) { const z = r.marks[0], t0 = r.log[1].t, fine = B['1m'] && B['1m'].length && B['1m'][0].time <= t0 ? B['1m'] : B['5m'], c = fine.find((b) => b.time === t0);
     assert.ok(c, 'the return is a fine candle: ' + r.id); assert.ok(r.side < 0 ? c.high >= z.bot : c.low <= z.top, 'that candle trades into the barrier'); assert.ok(r.log[2].t > t0, 'the CF closes after the return'); }
@@ -230,7 +230,7 @@ test('the older records still appear exactly as before, and every new reading is
   // pins = the code of 495073158 with an M1 Janda counted as its own reading (review, 21 Nov 2026)
   const PIN = { 7: [55, 'bb53a8ed7f0db3e3'], 11: [52, 'b6d7de54ab81d515'] }, seen = { m5: 0, atZone: 0, sweep: 0, visit: 0 };
   for (const seed of [7, 11]) { const X = seed === 7 ? B : market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 14 * 86400, bars = M.barrierTrades(X, F, { from: fr });
-    const old = M.sopTrades(X, F, { from: fr, near: false }).concat(bars).filter((r) => !isNew(r)).map(key).sort();
+    const old = M.sopTrades(X, F, { from: fr, near: false, retest: false }).concat(bars).filter((r) => !isNew(r)).map(key).sort();
     // review 21 Nov 2026: a buy and a sell filled in one minute are two records (the side is in the id), and no id twice
     assert.equal(new Set(bars.map((r) => r.id)).size, bars.length, 'no barrier id twice, seed ' + seed); assert.ok(bars.every((r) => /-[bs]\d+$/.test(r.id)), 'the side is in the id');
     assert.deepEqual([old.length, createHash('sha256').update(old.join('\n')).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed + ': the older records changed');
@@ -312,7 +312,24 @@ test('the VR from the nearest swing (msMosha o.near): the box ends at the last i
   assert.equal(F.msMosha(htf, { events: [{ ...V, t: 9 * 300 }], bars: q }, 0.3, { near: true }).vr.lo, 100);
   assert.equal(F.msMosha(htf, { events: [{ ...V, t: 10 * 300 }], bars: q }, 0.3, { near: true }).vr.lo, 103.5, 'once confirmed it is taken');
   // the sequence uses it by default; the older reading's entries all remain (a smaller box only turns a CF inside the VR into a clean one) with the same levels
-  for (const seed of [7, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, a = M.sopTrades(X, F, { from: fr, near: false }), b = M.sopTrades(X, F, { from: fr });
+  for (const seed of [7, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, a = M.sopTrades(X, F, { from: fr, near: false, retest: false }), b = M.sopTrades(X, F, { from: fr, retest: false });
     for (const r of a) { const q = b.find((x) => x.id === r.id); assert.ok(q, 'the older entry remains: ' + r.id); assert.deepEqual([q.entry, q.stop, q.target], [r.entry, r.stop, r.target]); }
     assert.ok(b.every((r) => r['case'] !== 2 && rule1(r))); }
+});
+
+// 21 Nov 2026 (owner, on two EUR/USD buys: "this should be a sell"): once the chart under the BO has turned the other way on its
+// small swings, the BO gives no more entries; the VR level is traded the other way on its retest (at the level, stop past the
+// VR's top; or a new CF after the touch, stop past the CF box), target the last low.
+test('after a turn the VR is retested the other way: a stop on the losing side, the last low as target, no hindsight; off with retest: false', () => {
+  let n = 0;
+  for (const seed of [3, 7, 11, 23, 31, 47]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, s = M.sopTrades(X, F, { from: fr }), R = s.filter((r) => r.retest);
+    assert.ok(M.sopTrades(X, F, { from: fr, retest: false }).every((r) => !r.retest));
+    // a retest needs price to have gone 1R past the VR level first; the old BO's entries stop only from then
+    assert.ok(R.every((r) => r.log.some((x) => / turned (buy|sell)/.test(x.text))));
+    for (const r of R) { n++; assert.ok(rule1(r), 'rule 1: ' + r.id); assert.match(r.id, /sop-v[rc]-/); assert.match(r.label, / turned → .* VR retest/);
+      assert.ok(r.log.every((x, i) => !i || x.t >= r.log[i - 1].t), 'log in time order: ' + r.id);
+      // a limit at the level rests from the touch candle's open and is seen once that candle closed; a new CF at its close
+      const T = r.retest === 'level' ? r.t - (r.t % M.SEC[r.l]) + M.SEC[r.l] : r.t + 7 * 60;
+      const c = M.sopTrades(cut(X, T), F, { from: fr }); assert.ok(c.map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); } }
+  assert.ok(n >= 1, 'VR retest entries on these candles: ' + n);
 });
