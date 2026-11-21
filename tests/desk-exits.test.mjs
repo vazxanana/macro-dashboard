@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { exitR, firstAt, compare, CAP_S } from '../research/edge/desk-exits/run.mjs';
+import { classify, studyVerdict } from '../research/edge/verdict.mjs';
 
 const T0 = 1_780_000_200;
 const bar = (i, o, h, l, c) => ({ time: T0 + i * 300, open: o, high: h, low: l, close: c });
