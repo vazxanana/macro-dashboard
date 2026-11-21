@@ -47,7 +47,8 @@ export function outcome(M5, fi, d, entry, stop, target, until) {
   const r0 = Math.abs(entry - stop), o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 };
   for (let k = fi; k < M5.length; k++) { const b = M5[k];
     if (k > fi && b.time >= until) { o.status = 'time'; o.exit = b.open; o.R = d * (b.open - entry) / r0; o.endT = b.time; return o; }
-    if (d > 0 ? b.low <= stop : b.high >= stop) { o.status = 'stopped'; o.exit = stop; o.R = -1; o.endT = b.time; return o; }
+    if (d > 0 ? b.low <= stop : b.high >= stop) { const px = k > fi && (d > 0 ? b.open < stop : b.open > stop) ? b.open : stop;   // a candle that opens beyond the stop exits at its open
+      o.status = 'stopped'; o.exit = px; o.R = d * (px - entry) / r0; o.endT = b.time; return o; }
     if (k === fi) continue;   // a limit fills inside its candle: that candle's favourable extreme may have come before the fill, so only the stop counts on it
     if (d > 0 ? b.high >= target : b.low <= target) { o.status = 'target'; o.exit = target; o.R = d * (target - entry) / r0; o.endT = b.time; return o; }
     o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - entry) / r0); }
@@ -58,9 +59,9 @@ function dailyZone(DZ, t) { let s = null; for (const z of DZ) { if (z.at > t) br
 
 export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H1 = num(B['1h'] || []), H4 = num(B['4h'] || []); if (M5.length < 100 || M15.length < 50 || H4.length < 20) return [];
-  const D1 = foldWeekend(num(B['1d'] || [])), dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), px = M5[M5.length - 1].close, pip = EGM.pips * (market === 'xau' ? 1 : px / 4000);
+  const D1 = foldWeekend(num(B['1d'] || [])), dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pipOf = (entry) => EGM.pips * (market === 'xau' ? 1 : entry / 4000);   // 30 pips on gold's scale, from the trade's own price (not the newest: a stop must not change between two reads)
   const Z4 = zones(H4, '4h'), Z1 = zones(H1, '1h'), Z15 = zones(M15, '15m'), Z5 = zones(M5, '5m'), DZ = zones(D1, '1d'), pre = market === 'xau' ? '' : market + ':', out = [];
-  const rec = (kind, label, d, fi, entry, T0, log, marks) => { const stop = entry - d * pip, target = entry + d * EGM.rr * pip, fillT = M5[fi].time;
+  const rec = (kind, label, d, fi, entry, T0, log, marks) => { const pip = pipOf(entry), stop = entry - d * pip, target = entry + d * EGM.rr * pip, fillT = M5[fi].time;
     const oc = outcome(M5, fi, d, entry, stop, target, fillT + EGM.hold);
     const tr = { id: `${pre}${kind}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind, label, h: '4h', l: '5m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
     tr.log = log.concat([{ t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips on gold's scale), target ${f(target)} (${EGM.rr}R), out after 24 hours.` },
@@ -120,13 +121,14 @@ export function snrSides(D1, H4) {
       if (lo || hi) lv.push({ p: b.close, t: b.time, kind: lo ? 'V' : 'A' }); }   // a V level (a low turn) or an A level (a high turn) of the CLOSES, as on a line chart
     const upL = lv.filter((L) => c.low <= L.p && c.close > L.p && c.open > L.p).pop(), dnL = lv.filter((L) => c.high >= L.p && c.close < L.p && c.open < L.p).pop();
     if (!upL !== !dnL) ev.push({ t: c.time + 86400, dir: upL ? 1 : -1, day: c.time, key: upL || dnL }); }
+  // (the candle that TAKES the level: the one before it had not closed beyond it)
   // the H4 break that confirms a rejection: a close beyond the last H4 A level (V level for a sell) formed before it:
   // a turn of the H4 CLOSES, 2 candles a side, as every A / V level on these desks (it read the wicks until 21 Nov 2026)
   const sides = [];
   for (const e of ev) { let i0 = lower(H4, e.t); const end = e.t + SNR.boDays * 86400;
     for (let i = i0; i < H4.length && H4[i].time < end; i++) { let L = null;
       for (let j = i - k - 1; j >= k && j > i - 60; j--) { const b = H4[j]; let ok = true; for (let q = 1; q <= k; q++) if (e.dir > 0 ? !(b.close > H4[j - q].close && b.close > H4[j + q].close) : !(b.close < H4[j - q].close && b.close < H4[j + q].close)) ok = false; if (ok) { L = b.close; break; } }
-      if (L != null && (e.dir > 0 ? H4[i].close > L : H4[i].close < L)) { sides.push({ t: H4[i].time + 14400, dir: e.dir, day: e.day, level: L, key: e.key }); break; } } }
+      if (L != null && (e.dir > 0 ? H4[i].close > L && !(H4[i - 1].close > L) : H4[i].close < L && !(H4[i - 1].close < L))) { sides.push({ t: H4[i].time + 14400, dir: e.dir, day: e.day, level: L, key: e.key }); break; } } }
   return sides.sort((a, b) => a.t - b.t);
 }
 export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
@@ -134,11 +136,17 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H4 = num(B['4h'] || []), D1 = foldWeekend(num(B['1d'] || [])); if (M5.length < 100 || M15.length < 50 || H4.length < 30 || D1.length < 20) return [];
   const f = (v) => (+v).toFixed(2), pip = EGM.pips, sides = snrSides(D1, H4), Z4 = zones(H4, '4h'), Z15 = zones(M15, '15m'), out = [], perDay = {}; let busy = -Infinity;
   const sideAt = (t) => { let s = null; for (const x of sides) { if (x.t > t) break; s = x; } return s; };
-  for (const m of Z15) { const d = m.dir, T = m.at, S = sideAt(T); if (!S || S.dir !== d || T <= busy) continue; const c = M15[m.i];
+  // every order that fills, then the book in the order of the FILLS: one position at a time and 2 a UTC day are decided when
+  // an order fills, on what had filled before it (until 21 Nov 2026 a signal was dropped because an earlier signal's limit
+  // would fill later: a look ahead)
+  const cands = [];
+  for (const m of Z15) { const d = m.dir, T = m.at, S = sideAt(T); if (!S || S.dir !== d) continue; const c = M15[m.i];
     const inZ = (z) => (d > 0 ? c.low <= z.top && c.close >= z.bot : c.high >= z.bot && c.close <= z.top);
     const Z = Z4.filter((z) => z.at >= S.t - 20 * 86400 && inZ(z) && ((z.dir === d && z.at <= T && z.end > T) || (z.dir === -d && z.fail != null && z.fail <= T && T - z.fail < 20 * 86400))).pop(); if (!Z) continue;
     const entry = d > 0 ? m.top : m.bot, i0 = lower(M5, T); let fi = -1; for (let q = i0; q < Math.min(M5.length, i0 + SNR.wait); q++) if (d > 0 ? M5[q].low <= entry : M5[q].high >= entry) { fi = q; break; }
-    if (fi < 0) continue; const fillT = M5[fi].time, dk = Math.floor(fillT / 86400); if ((perDay[dk] || 0) >= SNR.perDay) continue; perDay[dk] = (perDay[dk] || 0) + 1;
+    if (fi >= 0) cands.push({ m, d, T, S, Z, entry, fi }); }
+  cands.sort((x, y) => x.fi - y.fi || x.T - y.T);
+  for (const { m, d, T, S, Z, entry, fi } of cands) { const fillT = M5[fi].time, dk = Math.floor(fillT / 86400); if (fillT <= busy || (perDay[dk] || 0) >= SNR.perDay) continue; perDay[dk] = (perDay[dk] || 0) + 1;
     const stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, fillT + EGM.hold); busy = oc.endT || Infinity; if (fillT < from) continue;
     const turned = Z.dir !== d, tr = { id: `msnr-sop-${d > 0 ? 'b' : 's'}-${m.base}`, market, kind: 'msnr-sop', label: 'EG x SNR · gold plan', h: '4h', l: '15m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
     tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected the Daily ${S.key.kind} level ${f(S.key.p)} (a turn of the Daily closes), and an H4 candle then closed ${d > 0 ? 'above' : 'below'} the last H4 ${d > 0 ? 'A' : 'V'} level ${f(S.level)} (a turn of the H4 closes).` },
@@ -159,8 +167,10 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
 //   zones    on the timeframe above: A / V levels, body-engulf zones (wick to the engulfed candle's open), an engulf zone that
 //            FAILED (a close through it: it turns and serves the other side, "EF") and the dominant pair (two candles of one
 //            colour, the second beyond the first's extreme and closing beyond it: the first candle's body).
-//   switch   while the working chart's last break is DOWN, price taps a buy-side zone of the timeframe above; the last A level
-//            that existed BEFORE the tap is the external one; a working candle closing above it, within DIR.WAIT candles of the
+//   switch   price taps a buy-side zone of the timeframe above; the last A level that existed BEFORE the tap and is still
+//            unbroken is the external one. The working chart must have made a BO DOWN (its last break down at the tap, or a
+//            close below its last V level after it: "a BO sell, then the BO buy"; until 21 Nov 2026 only the state AT the
+//            tap counted, so a zone tapped just before that BO sell was lost); a working candle closing above it, within DIR.WAIT candles of the
 //            timeframe above, turns the direction to BUY. Mirrored for a sell. A break of a level formed after the tap is
 //            internal and changes nothing; without a tapped zone the direction stays what it was.
 // Not written: the open-close levels (no mechanical definition). events[] carries what the chart must show for each switch.
@@ -169,7 +179,7 @@ export const KEY_NAME = { v: 'V level', a: 'A level', eg: 'engulf zone', ef: 'en
 export function direction(work, keyOf, htfSec) {
   const K = DIR.K, n = work.length, call = new Int8Array(n), last = new Int32Array(n).fill(-1), events = [];
   const H = []; let cur = null, zones = [], pend = [], lastA = null, lastV = null, st = 0, dir = 0;
-  const add = (s, kind, bottom, top, t) => { if (top > bottom) zones.push({ s, kind, bottom, top, t, born: H.length, tapped: false, dead: false }); };
+  const add = (s, kind, bottom, top, t) => { if (top > bottom) zones.push({ s, kind, bottom, top, t, known: H[H.length - 1].time + htfSec, born: H.length, tapped: false, dead: false }); };
   const onClose = () => {
     const c = H[H.length - 1], flips = [];
     for (const z of zones) { if (z.dead) continue;
@@ -195,12 +205,13 @@ export function direction(work, keyOf, htfSec) {
     // the tap first: a candle that taps the level and closes beyond the swing is the breakout candle itself
     for (const z of zones) { if (z.tapped || b.low > z.top || b.high < z.bottom) continue;
       z.tapped = true; const L = z.s > 0 ? lastA : lastV;
-      if (st === -z.s && L && !L.broken) pend.push({ s: z.s, zone: z, level: L.p, levelT: L.t, tapT: b.time, tapH: H.length }); }
+      if (L && !L.broken) pend.push({ opp: st === -z.s, s: z.s, zone: z, level: L.p, levelT: L.t, tapT: b.time, tapH: H.length }); }
     if (pend.length) { const keep = [];
       for (const q of pend) {
         if (q.zone.dead || H.length - q.tapH > DIR.WAIT) continue;
-        if (q.s > 0 ? b.close > q.level : b.close < q.level) {
-          if (dir !== q.s) events.push({ i, t: b.time, s: q.s, kind: q.zone.kind, bottom: q.zone.bottom, top: q.zone.top, zoneT: q.zone.t, zoneAt: q.zone.t + htfSec, tapT: q.tapT, level: q.level, levelT: q.levelT });
+        if (st === -q.s) q.opp = true;   // a BO the other way, at the tap or after it: "a BO sell, then the BO buy"
+        if (q.s > 0 ? b.close > q.level : b.close < q.level) { if (!q.opp) continue;   // a break with no BO the other way before it is a continuation: the level is spent
+          if (dir !== q.s) events.push({ i, t: b.time, s: q.s, kind: q.zone.kind, bottom: q.zone.bottom, top: q.zone.top, zoneT: q.zone.t, zoneAt: q.zone.known, tapT: q.tapT, level: q.level, levelT: q.levelT });
           dir = q.s; }
         else keep.push(q); }
       pend = keep; }

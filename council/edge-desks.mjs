@@ -39,7 +39,8 @@ export function egOutcome(tr, m5, fillI, until) {
   const d = tr.side, r0 = tr.r0, o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 }; let stop = tr.stop, moved = false;
   for (let i = fillI; i < m5.length; i++) { const b = m5[i];
     if (b.time >= until) { o.status = 'time'; o.exit = b.open; o.R = d * (b.open - tr.entry) / r0; o.endT = b.time; return o; }
-    if (d > 0 ? b.low <= stop : b.high >= stop) { o.status = moved ? 'trail' : 'stopped'; o.exit = stop; o.R = d * (stop - tr.entry) / r0; o.endT = b.time; return o; }
+    if (d > 0 ? b.low <= stop : b.high >= stop) { const px = i > fillI && (d > 0 ? b.open < stop : b.open > stop) ? b.open : stop;   // a candle that OPENS beyond the stop exits at its open, worse than the stop
+      o.status = moved ? 'trail' : 'stopped'; o.exit = px; o.R = d * (px - tr.entry) / r0; o.endT = b.time; return o; }
     // a limit fills INSIDE its candle, and that candle's favourable extreme may have come before the fill: on the fill candle only
     // the stop counts (the worst case), never the target, the best-so-far or the trail
     if (i === fillI) continue;
@@ -52,7 +53,11 @@ export function egOutcome(tr, m5, fillI, until) {
 export function egTrades(B, { from, market = 'xau' } = {}) {
   const m5 = B['5m'] || [], out = [], f = fx(market), end = m5.length ? m5[m5.length - 1].time + 300 : 0;
   for (const tf of EG.tfs) { const seen = new Set(), sec = SEC[tf], C = tf === '1d' ? foldWeekend(B[tf] || []) : (B[tf] || []);
-    for (let m = EG.sma + EG.k; m < C.length; m++) { const last = C[m], T0 = last.time + sec; if (T0 < from || T0 > end) continue;
+    // signals are read from before the window: an order lives EG.life candles and a trade EG.hold more, so a D1 order placed
+    // before `from` can still fill or close inside it (it was dropped, and its open record then stayed open for good); EG.k
+    // further back only to know which zones already had their order
+    const lo = from - (EG.life + EG.hold) * sec;
+    for (let m = EG.sma + EG.k; m < C.length; m++) { const last = C[m], T0 = last.time + sec; if (T0 < lo - EG.k * sec || T0 > end) continue;
       const d = last.close > last.open ? 1 : last.close < last.open ? -1 : 0; if (!d) continue;
       let sma = 0; for (let j = m + 1 - EG.sma; j <= m; j++) sma += C[j].close; sma /= EG.sma;
       if (d > 0 ? !(last.close > sma) : !(last.close < sma)) continue;
@@ -60,6 +65,7 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
       for (let j = m - 1; j >= m - EG.k && j >= 0; j--) { const b = C[j]; if (d > 0 ? b.open > b.close : b.open < b.close) { if (d > 0 ? last.close > b.high : last.close < b.low) base = b; break; } }
       if (!base) continue;
       if (seen.has(d + '|' + base.time)) continue; seen.add(d + '|' + base.time);   // one order a zone: a second candle closing beyond the same candle adds nothing
+      if (T0 < lo) continue;
       const Z = SOP.sizes(market, last.close), entry = d > 0 ? base.high : base.low, stop = d > 0 ? base.low - Z.buf : base.high + Z.buf, r0 = Math.abs(entry - stop);
       if (!(r0 > Z.rmin) || (d > 0 ? stop >= entry : stop <= entry)) continue;
       // the order's life: a close through the zone's far edge cancels it, and it expires after EG.life candles
@@ -70,6 +76,7 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
       const fillT = m5[fi].time, tr = { id: `${market === 'xau' ? '' : market + ':'}eg-${tf}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind: 'eg-' + tf, label: `${NAME[tf]} engulf zone`, h: tf, l: '5m', side: d, t: fillT,
         entry, stop, target: entry + d * EG.target * r0, r0 };
       const oc = egOutcome(tr, m5, fi, fillT + EG.hold * sec);
+      if (T0 < from && oc.endT != null && oc.endT < from) continue;   // an older order that also ended before the window
       Object.assign(tr, { status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float });
       tr.log = [
         { t: T0, text: `${NAME[tf]} engulf ${word(d)}: the candle closed ${d > 0 ? 'above the high' : 'below the low'} of the last ${d > 0 ? 'red' : 'green'} candle (${f(base.low)} to ${f(base.high)}) and ${d > 0 ? 'above' : 'below'} its 20-candle average ${f(sma)}. A ${word(d)} limit rests at ${f(entry)}, stop ${f(stop)}.` },
@@ -111,17 +118,24 @@ export function litOrder(S5, cd, M, set) {
   if (ob < 0) for (let k = Math.max(mxIdx, d - 3); k <= d - 1; k++) if (ob < 0 || body[k] < body[ob]) ob = k;
   if (ob < 0) return null;
   const jA = Math.max(j0, b + 2); if (jA >= n) return null;
-  const entry = set.entry === 'market' ? c[Math.min(n - 1, b + 1)] : o[ob], stop = MX + M.stopExtra(atr[jA - 1]), risk = stop - entry; if (!(risk > 0)) return null;
+  // market on the break: at the close of the candle after the break, and never before the M15 sweep itself is confirmed
+  // (the M5 break can come first; until 21 Nov 2026 the entry was then taken up to 20 minutes before the sweep was known)
+  const mk = Math.min(n - 1, Math.max(b + 1, j0 - 1));
+  const entry = set.entry === 'market' ? c[mk] : o[ob], stop = MX + M.stopExtra(atr[jA - 1]), risk = stop - entry; if (!(risk > 0)) return null;
   const target = cd.accLow, rr = (entry - target) / risk; if (!(rr > set.minRR)) return null;
   if (set.cap && !(risk <= P.capFrac * Math.abs(entry))) return null;
-  return { jA, entry, stop, target, risk, rr, MX, b, ob, mxIdx, level, market: set.entry === 'market' };
+  return { jA, entry, stop, target, risk, rr, MX, b, ob, mxIdx, level, mk, market: set.entry === 'market' };
 }
 // the fill (a touch of the limit, or at once for a market order) and the study's own management of the position
 export function litFill(S5, M, ord, set) {
   const { h, l, o, ny, n } = S5;
-  if (ord.market) { const k = Math.min(n - 1, ord.b + 1); return ny[k].hm === 930 ? null : managePosition(S5, M, ord, ord.entry, k); }
+  if (ord.market) { const k = ord.mk; for (let q = ord.b + 1; q <= k; q++) if (h[q] > ord.MX || l[q] <= ord.target) return null;   // the sweep's extreme or the target went while waiting for the confirmation
+    return ny[k].hm === 930 ? null : managePosition(S5, M, ord, ord.entry, k); }
   for (let k = ord.jA; k < Math.min(n, ord.jA + set.expiryBars); k++) {
-    if (ny[k].hm !== 930 && h[k] >= ord.entry) { if (l[k] <= ord.target && !(h[k] >= ord.stop)) return null; return managePosition(S5, M, ord, Math.max(ord.entry, o[k]), k); }
+    if (ny[k].hm !== 930 && h[k] >= ord.entry) { if (l[k] <= ord.target && !(h[k] >= ord.stop)) return null; const fp = Math.max(ord.entry, o[k]);
+      // the fill candle also reaches the stop: stopped in that candle (the study's management starts a candle later and never saw it)
+      if (h[k] >= ord.stop) { const risk = ord.stop - fp; return risk > 0 ? { filled: true, k, exitIdx: k, end: k, t: S5.t[k], tExit: S5.t[k], fp: S5.sign * fp, exit: S5.sign * ord.stop, risk, kind: 'stop', R: -1 } : null; }
+      return managePosition(S5, M, ord, fp, k); }
     if (h[k] > ord.MX || l[k] <= ord.target) return null; }
   return null;
 }
@@ -139,10 +153,11 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
     for (const cd of fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900;
       const gots = [];
       for (const set of sets) { const od = litOrder(S5, cd, M, set); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { gots.push({ set, od, sim }); if (first) break; } }
-      for (const { set, od, sim } of gots) { const fillT = sim.t + 300; if (fillT < from) continue;
+      for (const { set, od, sim } of gots) { const fillT = sim.t + 300;
       const entry = sim.fp, stop = sg * od.stop, target = sg * od.target, r0 = Math.abs(entry - stop); if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
-      const open = sim.kind === 'dataEnd' && sim.tExit >= lastT, status = open ? 'open' : sim.kind === 'target' ? 'target' : sim.kind === 'stop' ? 'stopped' : sim.kind === 'be' ? 'breakeven' : 'dayend';
-      let mfe = 0; for (let q = sim.k; q <= sim.exitIdx; q++) mfe = Math.max(mfe, (od.entry - S5.l[q]) / od.risk);
+      // the study's management calls the last candle read the "day's end": a trade whose exit is that candle is still OPEN
+      const open = (sim.kind === 'dataEnd' || sim.kind === 'dayEnd') && sim.tExit >= lastT, status = open ? 'open' : sim.kind === 'target' ? 'target' : sim.kind === 'stop' ? 'stopped' : sim.kind === 'be' ? 'breakeven' : 'dayend';
+      let mfe = 0; for (let q = sim.k + (od.market ? 0 : 1); q <= sim.exitIdx; q++) mfe = Math.max(mfe, (od.entry - S5.l[q]) / od.risk);
       const tr = { id: `${market === 'xau' ? '' : market + ':'}lit-${set.id}-${dir === 'short' ? 's' : 'b'}-${S5.t[od.jA]}`, market, kind: 'lit-' + set.id, label: set.label, h: '15m', l: '5m', side: d, t: fillT, entry, stop, target, r0,
         status, R: open ? null : sim.R, endT: open ? null : sim.tExit + 300, exit: open ? null : sim.exit, mfe, float: open ? sim.R : undefined };
       const lv = sg * cd.L, aLo = Math.min(sg * cd.accLow, sg * cd.accHigh), aHi = Math.max(sg * cd.accLow, sg * cd.accHigh), mx = sg * od.MX, obLo = Math.min(sg * S5.h[od.ob], sg * S5.l[od.ob]), obHi = Math.max(sg * S5.h[od.ob], sg * S5.l[od.ob]);
@@ -157,7 +172,7 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
       out.push(tr); } } }
   // one position at a time on a market per execution: a later entry inside an earlier trade's life is left out
   out.sort((a, b) => a.t - b.t); const keep = [], busy = {};
-  for (const r of out) { const k = first ? '' : r.kind; if (r.t < (busy[k] || 0)) continue; keep.push(r); busy[k] = r.endT || Infinity; }
+  for (const r of out) { const k = first ? '' : r.kind; if (r.t < (busy[k] || 0)) continue; busy[k] = r.endT || Infinity; if (r.t >= from) keep.push(r); }   // a trade from before the window still blocks
   return keep;
 }
 
@@ -169,10 +184,20 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
 // recorded, one position at a time a market. On a market other than gold the buffer and the smallest stop are the same share
 // of price as gold's (the desk's own choice). The study FAILED after costs (0 of 3): a paper record, never an edge.
 export const MSNR = { rr: 1.5, main: [12, 16] };
+// the study's own simulate at full precision: a gap through the stop exits at the open, the stop before the target in one
+// candle, the first candle opening 12 hours or more after the entry exits at its open; null = still open
+function msnrSim(M5, c, r0, rr) { const s = c.side, target = c.entry + s * rr * r0;
+  for (let k = c.i; k < M5.length; k++) { const b = M5[k];
+    if (k > c.i && b.time >= c.t + MS.P.HOLD) return { closed: b.time, exitPx: b.open, exit: 'time' };
+    if (k > c.i && (s > 0 ? b.open <= c.stop : b.open >= c.stop)) return { closed: b.time, exitPx: b.open, exit: 'stop' };
+    if (s > 0 ? b.low <= c.stop : b.high >= c.stop) return { closed: b.time, exitPx: c.stop, exit: 'stop' };
+    if (s > 0 ? b.high >= target : b.low <= target) return { closed: b.time, exitPx: target, exit: 'target' }; }
+  return null; }
 export function msnrTrades(B, { from, market = 'xau', against = false } = {}) {   // against: research only, the entries opposite to the direction
   const raw = B['5m'] || [], H1 = B['1h'] || []; if (raw.length < 50 || H1.length < 200) return [];
   const M5 = raw.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), f = fx(market), lastT = M5[M5.length - 1].time;
   const q = market === 'xau' ? 1 : M5[M5.length - 1].close / 4000, keep = { PAD: MS.P.PAD, MIN_R0: MS.P.MIN_R0 }; let cand;
+  const pad = keep.PAD * q;
   try { MS.P.PAD = keep.PAD * q; MS.P.MIN_R0 = keep.MIN_R0 * q; cand = MS.candidates(M5).cand; } finally { MS.P.PAD = keep.PAD; MS.P.MIN_R0 = keep.MIN_R0; }
   // the call from a long H4 history (hourly candles grouped into the study's own UTC 4-hour buckets), as known at the trigger's close
   const H4 = MS.group(H1.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), MS.bucket(MS.P.H4)), D = direction(H4, MS.dayKey, 86400), dir = D.call;
@@ -182,8 +207,10 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
     while (h + 1 < H4.length && H4[h + 1].time + MS.P.H4 <= c.trig + MS.P.M5) h++;
     const call = h >= 0 ? dir[h] : 0; if (!call || c.side !== (against ? -call : call) || c.t <= busy) continue;
     const ev = D.last[h] >= 0 ? D.events[D.last[h]] : null;
-    const d = c.side, r0 = d * (c.entry - c.stop); if (!(r0 > 0)) continue;
-    const o = MS.simulate(M5, { ...c, r0 }, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
+    // the stop and the result are worked out here at full precision: the study's own code rounds prices to 3 decimals (it was
+    // written for gold), which on a 5-decimal market put every stop on a 0.001 grid and booked "target" trades at odd R
+    const d = c.side, a = M5[c.i - 1], b0 = M5[c.i - 2], stop = d > 0 ? Math.min(a.low, b0.low) - pad : Math.max(a.high, b0.high) + pad, r0 = d * (c.entry - stop); if (!(r0 > 0)) continue; c.stop = stop;
+    const o = msnrSim(M5, c, r0, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
     let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);
     const status = !o ? 'open' : o.exit === 'target' ? 'target' : o.exit === 'time' ? 'time' : 'stopped', R = o ? d * (o.exitPx - c.entry) / r0 : null, fl = o ? undefined : d * (M5[M5.length - 1].close - c.entry) / r0;

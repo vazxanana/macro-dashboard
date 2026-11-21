@@ -39,7 +39,8 @@
     var d = tr.side, r0 = Math.abs(tr.entry - tr.stop), o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 };
     if (!(r0 > 0)) return o;
     for (var i = 0; i < bars.length; i++) { var b = bars[i]; if (b.time < after) continue;
-      if (d > 0 ? b.low <= tr.stop : b.high >= tr.stop) { o.status = 'stopped'; o.R = -1; o.endT = b.time; o.exit = tr.stop; return o; }
+      if (d > 0 ? b.low <= tr.stop : b.high >= tr.stop) { var px = b.time > after && (d > 0 ? b.open < tr.stop : b.open > tr.stop) ? b.open : tr.stop;   // a candle that opens beyond the stop exits at its open
+        o.status = 'stopped'; o.R = (d > 0 ? px - tr.entry : tr.entry - px) / r0; o.endT = b.time; o.exit = px; return o; }
       if (limit && b.time === after) continue;   // a limit fills inside its candle: only the stop counts on that candle, never the target or the best-so-far
       if (d > 0 ? b.high >= tr.target : b.low <= tr.target) { o.status = 'target'; o.R = Math.abs(tr.target - tr.entry) / r0; o.endT = b.time; o.exit = tr.target; return o; }
       o.mfe = Math.max(o.mfe, (d > 0 ? b.high - tr.entry : tr.entry - b.low) / r0); }

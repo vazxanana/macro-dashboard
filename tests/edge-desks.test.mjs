@@ -26,9 +26,9 @@ test('Engulfing: every trade has its stop on the losing side, one order a zone, 
   assert.ok(eg.length >= 20, 'entries: ' + eg.length);
   const ids = new Set();
   for (const r of eg) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.ok(r.r0 > 0); assert.ok(!ids.has(r.id)); ids.add(r.id);
-    assert.match(r.kind, /^eg-(1d|4h|1h)$/); assert.ok(r.t >= from && r.t <= END); assert.ok(r.log.length >= 3 && r.marks.length === 2);
+    assert.match(r.kind, /^eg-(1d|4h|1h)$/); assert.ok(r.t <= END && (r.t >= from || r.endT == null || r.endT >= from), 'inside the window, or an older order still alive in it'); assert.ok(r.log.length >= 3 && r.marks.length === 2);
     assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - E.EG.target) < 1e-9, 'the target is 10R');
-    if (r.status === 'stopped') assert.equal(r.R, -1); if (r.status === 'target') assert.equal(r.R, E.EG.target);
+    if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9, 'a stop is -1R, or worse when a candle opened beyond it'); if (r.status === 'target') assert.equal(r.R, E.EG.target);
     if (r.status === 'trail') assert.ok(r.R >= E.EG.trail[0] - E.EG.trail[1] - 1e-9, 'a trailed stop never books under +1R'); if (r.status === 'open') assert.equal(r.R, null); }
   const zones = eg.map((r) => r.kind + '|' + r.side + '|' + r.marks[0].a); assert.equal(new Set(zones).size, zones.length, 'one order a zone');
   assert.ok(eg.some((r) => r.side > 0) && eg.some((r) => r.side < 0), 'buys and the mirrored sells');
@@ -155,4 +155,54 @@ test('a limit entry: on its fill candle only the stop counts, never the target, 
   const m = SOP.outcome({ side: 1, entry: 100, stop: 99, target: 102 }, bars, 0); assert.equal(m.status, 'target', 'a market entry at the candle\'s open is read as before');
   // the stop still counts on the fill candle
   const s = G.outcome([{ time: 0, open: 101, high: 101, low: 98.5, close: 99 }], 0, 1, 100, 99, 102, 1e9); assert.equal(s.status, 'stopped');
+});
+
+// ─── the independent audit of 21 Nov 2026: each defect it confirmed, pinned ───
+const G2 = await import('../council/eg-methods.mjs');
+const m15of = (m5) => { const out = []; for (const b of m5) { const t = b.time - (b.time % 900), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ ...b, time: t }); } return out; };
+const cutAt = (X, T) => Object.fromEntries(Object.entries(X).map(([tf, a]) => [tf, a.filter((b) => b.time + ({ ...SOP.SEC, '15m': 900 })[tf] <= T)]));
+
+test('audit: a candle that opens beyond the stop exits at its open, worse than -1R', () => {
+  const gap = [{ time: 0, open: 100, high: 100.5, low: 99.5, close: 100 }, { time: 300, open: 96, high: 96.5, low: 95, close: 95.5 }];
+  const a = E.egOutcome({ side: 1, entry: 100, stop: 99, target: 110, r0: 1 }, gap, 0, 1e9); assert.equal(a.status, 'stopped'); assert.equal(a.exit, 96); assert.equal(a.R, -4);
+  const b = G2.outcome(gap, 0, 1, 100, 99, 102, 1e9); assert.equal(b.exit, 96); assert.equal(b.R, -4);
+  const c = SOP.outcome({ side: 1, entry: 100, stop: 99, target: 103 }, gap, 0); assert.equal(c.exit, 96); assert.equal(c.R, -4);
+  // a stop traded inside the candle is still the stop
+  assert.equal(E.egOutcome({ side: 1, entry: 100, stop: 99, target: 110, r0: 1 }, [gap[0], { time: 300, open: 99.6, high: 99.8, low: 98, close: 98.5 }], 0, 1e9).R, -1);
+});
+
+test('audit: MSNR on a 5-decimal market keeps full precision (a stop is the trigger pair\'s extreme and the pad, a target is 1.5R)', () => {
+  const X = market(60, 5, 1.15, 0.0005), rows = E.msnrTrades(X, { from: 0, market: 'eurusd' }); assert.ok(rows.length >= 10, 'entries: ' + rows.length);
+  const grid = rows.filter((r) => Math.abs(r.stop * 1000 - Math.round(r.stop * 1000)) < 1e-9).length; assert.ok(grid < rows.length / 4, 'stops are not on a 0.001 grid: ' + grid + ' of ' + rows.length);
+  for (const r of rows) { assert.ok(stopOk(r)); if (r.status === 'target') assert.ok(Math.abs(r.R - E.MSNR.rr) < 1e-9, 'a target books 1.5R: ' + r.R); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); }
+});
+
+test('audit: the gold plan books in the order of the fills (cut just after an entry, the entry is already there) and an H4 break is a break', () => {
+  let seen = 0;
+  // entries from the 35th day on: the reading needs 20 closed days first
+  for (const seed of [11, 4]) { const X = seed === 11 ? B : market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, full = G2.snrTrades(Y, { from: 0 });
+    for (const r of full.filter((x) => x.t > X['5m'][0].time + 35 * 86400).slice(0, 30)) { const T = r.t + 300, early = G2.snrTrades(cutAt(Y, T), { from: 0 }); seen++;
+      assert.ok(early.some((e) => e.id === r.id && e.entry === r.entry && e.stop === r.stop), 'seed ' + seed + ': found only with later candles: ' + r.id); }
+    const H4 = X['4h']; for (const s of G2.snrSides(X['1d'], H4)) { const i = H4.findIndex((b) => b.time + 14400 === s.t); assert.ok(s.dir > 0 ? H4[i].close > s.level && !(H4[i - 1].close > s.level) : H4[i].close < s.level && !(H4[i - 1].close < s.level), 'the candle that takes the level'); } }
+  assert.ok(seen >= 10, 'entries checked: ' + seen);
+});
+
+test('audit: LIT: a trade still running on the last candle read is open, a market entry never comes before the sweep is confirmed, a fill candle that reaches the stop is stopped', () => {
+  const src = rd('council/edge-desks.mjs');
+  assert.match(src, /\(sim\.kind === 'dataEnd' \|\| sim\.kind === 'dayEnd'\) && sim\.tExit >= lastT/); assert.match(src, /Math\.max\(b \+ 1, j0 - 1\)/); assert.match(src, /if \(h\[k\] >= ord\.stop\) \{ const risk = ord\.stop - fp;/);
+  for (const seed of [5, 9, 21]) { const X = market(120, seed), lit = E.litTrades(X, { from: 0, market: 'xau' }), lastT = X['5m'].at(-1).time;
+    for (const r of lit) { if (r.status !== 'open') assert.ok(r.endT - 300 < lastT || r.status !== 'dayend', 'a day-end on the last candle read is an open trade: ' + r.id);
+      if (r.kind === 'lit-break') assert.ok(r.t >= r.log[0].t, 'the market entry is not before the sweep is known: ' + r.id); } }
+});
+
+test('audit: a daily order placed before the window that is still alive in it is kept, and the zone keeps its one order', () => {
+  const X = market(90, 11), end = X['5m'].at(-1).time + 300, wide = E.egTrades(X, { from: end - 60 * 86400, market: 'xau' }), near = E.egTrades(X, { from: end - 14 * 86400, market: 'xau' });
+  const live = wide.filter((r) => r.endT == null || r.endT >= end - 14 * 86400);
+  for (const r of live) assert.ok(near.some((n) => n.id === r.id), 'dropped at the window edge: ' + r.id);
+  for (const n of near) assert.ok(wide.some((r) => r.id === n.id), 'a second order on a zone at the window edge: ' + n.id);
+});
+
+test('audit: the direction: a zone tapped just before the BO the other way still counts, a break with no BO the other way does not; a zone is marked from when it was known', () => {
+  const src = rd('council/eg-methods.mjs'); assert.match(src, /if \(st === -q\.s\) q\.opp = true;/); assert.match(src, /if \(!q\.opp\) continue;/); assert.match(src, /zoneAt: q\.zone\.known/);
+  assert.match(src, /pipOf = \(entry\) =>/);
 });

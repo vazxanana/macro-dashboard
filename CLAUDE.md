@@ -5199,6 +5199,24 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     EARLIEST break of its origin candle and a later BO never makes a visited barrier fresh again. Test: "no hindsight"
     (unaligned cuts, three markets, every full-replay entry must exist when cut just after it). Gold 2025 before costs:
     sequence 249 -> 231 entries, -15.7R -> -5.4R; barriers 462 -> 466, +18.0R -> +30.0R.
+  - **Independent audit of the Engulfing / MSNR / LIT trackers** (21 Nov 2026, a second read-only review; each confirmed
+    defect fixed and pinned by an "audit:" test in `tests/edge-desks.test.mjs` that fails on the code before):
+    (1) LIT: a trade still running on the last candle read was booked "day end" and frozen (the study's management calls
+    the last candle the day's end): it is open now; (2) MSNR on 5-decimal markets: the failed study's code rounds stops and
+    exits to 3 decimals (written for gold), so every forex stop sat on a 0.001 grid and "target" trades booked odd R; the
+    desk now works the stop and the result out itself at full precision (`msnrSim`); **every MSNR figure on a forex pair
+    before this is wrong, `desk-rigor` R6 on EUR/USD and GBP/USD included**; (3) LIT "market on the break" entered up to
+    20 minutes before the M15 sweep was confirmed: the entry is the later of the candle after the break and the candle
+    that closes with the confirmation (`mk`); (4) a LIT limit's fill candle that also reaches the stop is stopped; (5)
+    `egTrades` reads signals from `EG.life + EG.hold` candles before the window, so a daily order placed earlier still
+    fills and closes (its record stayed open for good) and a zone keeps its one order at the window's edge; (6) the gold
+    plan books in the order of the FILLS (a signal was dropped because an earlier signal's limit would fill later); (7) a
+    candle that opens beyond the stop exits at its open, worse than -1R (`egOutcome`, `outcome`, the Mosha `outcome`);
+    (8) `snrSides`: the H4 candle must TAKE the level (the one before had not closed beyond it); (9) a method trade's 30
+    pips scale from its own entry price, not the newest price (a stop changed between two reads). Direction: a zone tapped
+    just before the working chart's BO the other way now counts (`q.opp`: a BO the other way at the tap or after it), and a
+    switch's zone is marked from when it was known (`known`). Left: `merge`'s 20-minute near-duplicate rule; the LIT and
+    MSNR size scale still reads the newest price; engulf life and hold are calendar time (as the live rule).
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
