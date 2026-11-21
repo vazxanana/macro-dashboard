@@ -12340,6 +12340,22 @@ html:not([data-mosha="teach"]) #v-mosha #mo-open, html[data-role="owner"] #v-mos
 #v-mosha #mo-sopr a { color: inherit; text-decoration: underline; }
 /* The replay leads the desk for the owner and readers (20 Nov 2026, owner: "like normal desk showing the replay trades"); the chart it opens comes right after. */
 html:not([data-mosha="teach"]) #v-mosha #mo-sopr, html[data-role="owner"] #v-mosha #mo-sopr { order: -10; } html:not([data-mosha="teach"]) #v-mosha #mo-replay, html[data-role="owner"] #v-mosha #mo-replay { order: -9; }
+/* P&L calendar (21 Nov 2026, owner: "Calendar as well"): a month of closed R by day, like the ICT desk's; the LIT and Engulfing desks get it through the copied sheet */
+#v-mosha .mo-cal-k { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; } #v-mosha .mo-cal-nav { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+#v-mosha .mo-cal-nav b { min-width: 230px; text-align: center; font-size: 13px; font-weight: 600; color: var(--ink); } #v-mosha .mo-cal-nav small { margin-left: 6px; font-weight: 600; font-variant-numeric: tabular-nums; } #v-mosha .mo-cal-nav small.pos { color: var(--buy); } #v-mosha .mo-cal-nav small.neg { color: var(--sell); }
+#v-mosha .mo-cal-nav .mo-sop-b { min-width: 36px; font-size: 16px; } #v-mosha .mo-cal-nav .mo-sop-b[disabled] { opacity: .35; cursor: default; }
+#v-mosha .mo-cal { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+#v-mosha .mo-cal-h { font-size: 12px; color: var(--ink-dim); text-align: center; padding-bottom: 2px; }
+#v-mosha .mo-cal-d { all: unset; box-sizing: border-box; min-height: 64px; border-radius: 10px; border: 1px solid var(--line); padding: 6px 8px; display: grid; align-content: start; gap: 2px; cursor: pointer; min-width: 0; }
+#v-mosha .mo-cal-d[disabled] { cursor: default; } #v-mosha .mo-cal-d.we:not(.up):not(.dn) { border-style: dashed; }
+#v-mosha .mo-cal-d .d { font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-cal-d b { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; } #v-mosha .mo-cal-d small { font-size: 12px; color: var(--ink-dim); }
+#v-mosha .mo-cal-d.up { background: color-mix(in srgb, var(--buy) calc(7% + var(--heat) * 22%), transparent); border-color: color-mix(in srgb, var(--buy) 35%, var(--line)); }
+#v-mosha .mo-cal-d.dn { background: color-mix(in srgb, var(--sell) calc(7% + var(--heat) * 20%), transparent); border-color: color-mix(in srgb, var(--sell) 35%, var(--line)); }
+#v-mosha .mo-cal-d.today .d { font-weight: 700; color: var(--ink); } #v-mosha .mo-cal-d.sel, #v-mosha .mo-cal-d:focus-visible { outline: 2px solid var(--mo-accent, var(--au-accent, var(--accent))); outline-offset: 1px; }
+#v-mosha .mo-cal-day { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; } #v-mosha .mo-cal-day li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+#v-mosha .mo-cal-day b { font-variant-numeric: tabular-nums; } #v-mosha .mo-cal-day b.pos { color: var(--buy); } #v-mosha .mo-cal-day b.neg { color: var(--sell); } #v-mosha .mo-cal-day small { font-size: 12px; color: var(--ink-dim); margin-left: auto; }
+@media (max-width: 600px) { #v-mosha .mo-cal { gap: 3px; } #v-mosha .mo-cal-d { min-height: 50px; padding: 4px 2px; } #v-mosha .mo-cal-d b { font-size: 12px; letter-spacing: -.02em; } #v-mosha .mo-cal-d small { display: none; } #v-mosha .mo-cal-nav { margin-left: 0; width: 100%; justify-content: space-between; } #v-mosha .mo-cal-nav b { min-width: 0; } }
+@media (pointer: coarse) { #v-mosha .mo-cal-nav .mo-sop-b { min-width: 44px; min-height: 44px; } }
 #v-mosha .mo-sop-ans { margin: 4px 0 10px; font-size: 15px; font-weight: 600; color: var(--ink); }
 #v-mosha .mo-sop-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 10px 0 4px; }
 #v-mosha .mo-sop-tile { background: var(--mo-well, var(--au-well, var(--panel-2))); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; min-width: 0; }

@@ -66,7 +66,7 @@
     ol.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. The tracker reads these markets about every 35 minutes' + (at ? ' (last reading ' + at + ')' : '') + '; a new entry shows here until it closes.</li>';
     var btn = function (attr, v, t, n, cur) { return '<button type="button" class="mo-sop-b" ' + attr + '="' + esc(v) + '" aria-pressed="' + (cur === v) + '">' + esc(t) + ' (' + n + ')</button>'; };
     var sm = SOP.summary(list), tile = function (a, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + a + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
-    var days = SOP.byDay(list).slice(-60), cal = days.length ? '<h3 class="mo-sop-h">Closed R by day <small>the UTC day each trade ended · the last ' + days.length + ' days with a close · open trades not added in</small></h3><div class="mo-sop-cal">' + days.map(function (d) { return '<div class="mo-sop-day ' + (d.R > 0 ? 'pos' : d.R < 0 ? 'neg' : '') + '"><small>' + esc(new Date(d.day + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) + '</small><b>' + fR(d.R) + '</b><span>' + d.n + (d.n === 1 ? ' trade' : ' trades') + '</span></div>'; }).join('') + '</div>' : '';
+    var cal = SOP.calHTML(list, S, 'data-dk-chart', function (r) { return nm(r) + ' · ' + (r.label || r.kind); });
     tb.innerHTML = head + '<p class="mo-sop-ans">' + esc((open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + nm(last) + ' ' + word(last.side) + ' at ' + fP(last, last.entry) + ', ' + utc(last.t) + '.' : '')) + '</p>' +
       '<div class="mo-sop-a mo-sop-f">' + btn('data-dk-kind', 'all', 'All', byMk.length, S.kind === 'all' || kinds.indexOf(S.kind) < 0 ? 'all' : S.kind) + kinds.map(function (kd) { return btn('data-dk-kind', kd, kl(kd), byMk.filter(function (r) { return r.kind === kd; }).length, S.kind); }).join('') +
       '<span class="mo-sop-sep" aria-hidden="true"></span>' + btn('data-dk-src', 'both', 'Both', every.length, S.src) + btn('data-dk-src', 'live', 'Live', nLive, S.src) + btn('data-dk-src', 'replay', 'Replay', every.length - nLive, S.src) + '<button type="button" class="mo-sop-b" data-dk-run>Refresh</button></div>' +
@@ -86,7 +86,9 @@
   function deskOf(el) { var v = el.closest ? el.closest('#v-lit, #v-eg') : null; return v ? v.id.slice(2) : null; }
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('li[data-dk-chart]')) { e.preventDefault(); e.target.click(); } });
   document.addEventListener('click', function (e) {
-    var b = e.target && e.target.closest ? e.target.closest('[data-dk-log], [data-dk-chart], [data-dk-kind], [data-dk-mk], [data-dk-src], [data-dk-run], [data-dk-all]') : null; if (!b) return; var k = deskOf(b); if (!k) return; var S = st(k);
+    var b = e.target && e.target.closest ? e.target.closest('[data-cal-m], [data-cal-day], [data-dk-log], [data-dk-chart], [data-dk-kind], [data-dk-mk], [data-dk-src], [data-dk-run], [data-dk-all]') : null; if (!b) return; var k = deskOf(b); if (!k) return; var S = st(k);
+    if (b.hasAttribute('data-cal-m')) { if (b.getAttribute('data-cal-m')) { S.calM = b.getAttribute('data-cal-m'); S.calDay = null; draw(k); } return; }
+    if (b.hasAttribute('data-cal-day')) { var cd = b.getAttribute('data-cal-day'); S.calDay = S.calDay === cd ? null : cd; draw(k); var nd = $('v-' + k).querySelector('[data-cal-day="' + cd + '"]'); if (nd) nd.focus(); return; }
     if (b.hasAttribute('data-dk-run')) { S.all = false; S.state = 'idle'; load(k); return; }
     if (b.hasAttribute('data-dk-all')) { S.all = true; draw(k); return; }
     if (b.hasAttribute('data-dk-kind')) { S.kind = b.getAttribute('data-dk-kind'); S.all = false; draw(k); return; }

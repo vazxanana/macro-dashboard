@@ -4,6 +4,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as M from '../council/mosha-desk.mjs';
+import { createRequire } from 'node:module';
+const SOPX = createRequire(import.meta.url)('../assets/mosha-sop.js');
 
 const rd = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 const rec = (o) => ({ id: 'bar-15m-1000', kind: 'barrier', h: '15m', l: '1m', side: -1, t: 1000, entry: 100, stop: 102, target: 94, status: 'open', R: null, log: [{ t: 990, text: 'x' }], ...o });
@@ -107,4 +109,19 @@ test('Open now: the desk has its own panel of open trades, first on the desk, hi
   assert.match(js, /at the last reading/); assert.match(js, /No trade is open now\./); assert.match(js, /#mo-open \[data-sop-chart\]/);
   const block = js.slice(js.indexOf('function openCard'), js.indexOf('function draw()'));
   assert.doesNotMatch(block, /fetch\(|localStorage|\.stop\s*=[^=]/, 'display only');
+});
+
+test('P&L calendar: a month of closed R by the UTC exit day, open trades never added in, on all three desks', () => {
+  const SOP = SOPX, day = (s) => Date.parse(s + 'Z') / 1000;
+  const rows = [{ id: 'a', side: 1, R: 2, endT: day('2026-11-18T10:00:00') }, { id: 'b', side: -1, R: -1, endT: day('2026-11-18T15:00:00') }, { id: 'c', side: 1, R: -1, endT: day('2026-11-02T09:00:00') },
+    { id: 'd', side: 1, R: 3, endT: day('2026-10-30T09:00:00') }, { id: 'e', side: 1, R: null, endT: null, float: 5 }];
+  const M = SOP.calMonth(rows, null); assert.equal(M.ym, '2026-11', 'the latest month with a close'); assert.equal(M.n, 3); assert.equal(M.R, 0); assert.equal(M.prev, '2026-10'); assert.equal(M.next, null);
+  assert.equal(M.cells.filter(Boolean).length, 30); assert.equal(M.cells.findIndex(Boolean), 6, '1 Nov 2026 is a Sunday: six empty cells before it (Monday first)');
+  const d18 = M.cells.find((c) => c && c.day === '2026-11-18'); assert.equal(d18.n, 2); assert.equal(d18.R, 1);
+  assert.equal(SOP.calMonth(rows, '2026-10').R, 3); assert.equal(SOP.calMonth(rows, '2031-01').ym, '2026-11', 'an unknown month falls back'); assert.equal(SOP.calMonth([], null).ym, null);
+  const st = { calM: null, calDay: '2026-11-18' }, html = SOP.calHTML(rows, st, 'data-x-chart', (r) => 'Gold ' + r.id);
+  assert.match(html, /P&amp;L calendar/); assert.match(html, /November 2026/); assert.match(html, /data-cal-day="2026-11-18"/); assert.match(html, /data-x-chart="a"/); assert.doesNotMatch(html, /data-x-chart="e"/, 'an open trade is not in a day');
+  assert.match(html, /before costs/); assert.equal(st.calM, '2026-11');
+  const page = rd('market-structure.html'), sop = rd('assets/mosha-sop.js'), dk = rd('assets/desk-trades.js');
+  assert.match(page, /#v-mosha \.mo-cal \{ display: grid; grid-template-columns: repeat\(7/); assert.match(sop, /calHTML\(list, S, 'data-sop-chart'/); assert.match(dk, /SOP\.calHTML\(list, S, 'data-dk-chart'/);
 });

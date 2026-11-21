@@ -5104,6 +5104,11 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     LIT 348 over 180 days (+6.9R: loose 311 −14.5R, break 20 +25.2R, rule 17 −3.5R). PAPER RECORDS of one reading with NO costs
     (an H1 engulf's stop is a few pips, so costs would take a large share): never call either total an edge; the LIT study was
     inconclusive and the engulf's book study failed its bar. Tests: `tests/edge-desks.test.mjs`.
+  - **P&L calendar on the three desks** (21 Nov 2026, owner: "Calendar as well"): `MS_MOSHA_SOP.calMonth` (pure) / `calHTML` in
+    `assets/mosha-sop.js`, used by the Mosha trades card and by `assets/desk-trades.js` in place of the "Closed R by day" tiles: a
+    month grid (Monday first) of closed R by the UTC day a trade ended, arrows to the months that have a close, a tint by size,
+    a day opens its trades with "Chart"; it follows the card's filters; open trades are never added in; before costs. Styles
+    `.mo-cal*` in `#ms-mosha-css`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display
