@@ -51,7 +51,7 @@ export function egOutcome(tr, m5, fillI, until) {
   o.stopNow = stop; return o;
 }
 export function egTrades(B, { from, market = 'xau' } = {}) {
-  const m5 = B['5m'] || [], out = [], f = fx(market), end = m5.length ? m5[m5.length - 1].time + 300 : 0;
+  const m5 = B['5m'] || [], out = [], f = fx(market), end = m5.length ? m5[m5.length - 1].time + 300 : 0, one = new Set();
   for (const tf of EG.tfs) { const seen = new Set(), sec = SEC[tf], C = tf === '1d' ? foldWeekend(B[tf] || []) : (B[tf] || []);
     // signals are read from before the window: an order lives EG.life candles and a trade EG.hold more, so a D1 order placed
     // before `from` can still fill or close inside it (it was dropped, and its open record then stayed open for good); EG.k
@@ -86,6 +86,9 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
               : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` }
                 : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now` + (oc.stopNow !== stop ? `, stop trailed to ${f(oc.stopNow)}` : '') + ').' : '.') }];
       tr.marks = [{ kind: 'zone', top: base.high, bot: base.low, a: base.time, at: T0, label: `${NAME[tf]} engulf zone` }, { kind: 'level', p: sma, a: C[m + 1 - EG.sma].time, at: T0, label: '20-candle average', under: d > 0 }];
+      // ONE order is recorded once (21 Nov 2026): when a base candle of a lower timeframe has the same high and low as the higher
+      // one's, both readings are the same order (side, fill candle, entry, stop, target). The higher timeframe is read first and kept.
+      const ok = [d, fillT, entry, stop, tr.target].join('|'); if (one.has(ok)) continue; one.add(ok);
       out.push(tr); } }
   return out.sort((a, b) => a.t - b.t);
 }

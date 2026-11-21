@@ -75,7 +75,7 @@ const mark = (m, d = 3) => { const k = ['level', 'vr', 'bvr', 'zone'].includes(m
 export function clean(r) {
   const side = r.side > 0 ? 1 : -1, entry = +r.entry, stop = +r.stop, mk = SOP.ALL[r.market] ? r.market : 'xau', d = mk === 'xau' ? 3 : 6;
   if (!(Number.isFinite(entry) && Number.isFinite(stop)) || !(side > 0 ? stop < entry : stop > entry)) return null;
-  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit|msnr)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 56) } : {}), h: r.h, l: r.l, case: r.case || null, ...(r.deep == null ? {} : { deep: !!r.deep }), ...(r.withDir == null ? {} : { withDir: !!r.withDir }), side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: r.target == null ? null : num(r.target, d), ...(r.stopNow != null && Number.isFinite(+r.stopNow) ? { stopNow: num(r.stopNow, d), ...(Number.isFinite(+r.stopAt) ? { stopAt: +r.stopAt } : {}) } : {}), r0: num(Math.abs(entry - stop), d),
+  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit|msnr)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 56) } : {}), h: r.h, l: r.l, case: r.case || null, ...(r.case2 ? { case2: true } : {}), ...(r.deep == null ? {} : { deep: !!r.deep }), ...(r.withWeekly == null ? {} : { withWeekly: !!r.withWeekly }), ...(r.er20 != null && Number.isFinite(+r.er20) ? { er20: num(r.er20, 2) } : {}), ...(r.withDir == null ? {} : { withDir: !!r.withDir }), side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: r.target == null ? null : num(r.target, d), ...(r.stopNow != null && Number.isFinite(+r.stopNow) ? { stopNow: num(r.stopNow, d), ...(Number.isFinite(+r.stopAt) ? { stopAt: +r.stopAt } : {}) } : {}), r0: num(Math.abs(entry - stop), d),
     status: r.status || 'open', R: r.R == null ? null : num(r.R), endT: r.endT || null, exit: r.exit == null ? null : num(r.exit, d), mfe: num(r.mfe), float: r.float == null ? null : num(r.float),
     log: (r.log || []).slice(0, 12).map((x) => ({ t: x.t || null, text: String(x.text || '').slice(0, 240) })),
     marks: (r.marks || []).slice(0, 8).map((m) => mark(m, d)).filter(Boolean) };
@@ -86,7 +86,8 @@ export function clean(r) {
 export function merge(prev, fresh, now, feed = 'OANDA') {
   const old = new Map((prev || []).map((r) => [r.id, r])), out = [];
   // the owner's barrier readings of 21 Nov 2026 (at the zone, M5 confirm, sweep, a later visit) are other orders, never a re-read of an older one
-  const rd = (x) => (x.kind === 'barrier' ? JSON.stringify(SOP.readings(x)) : '');
+  // a CF-inside-the-VR sequence record ("sop-c2-") is its own reading too
+  const rd = (x) => (x.kind === 'barrier' ? JSON.stringify(SOP.readings(x)) : x.case2 || /(^|:)sop-c2-/.test(String(x.id)) ? 'c2' : '');
   const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S && rd(p) === rd(r)
     // the SAME trade re-read under another id: its entry sits where the stored one's does, and the stored one had not already ended
     // before it (a re-entry after a close is a new trade: until 21 Nov 2026 it was dropped)
@@ -131,7 +132,9 @@ export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market =
   if (!B['5m'] || !B['5m'].length) throw new Error('no candles');
   const from = B['5m'][B['5m'].length - 1].time - days * 86400;
   const cfz = [], seq = SOP.sopTrades(B, F, { from, market, cfOut: cfz });   // the sequence's clean CF zones are barriers too (the method's own entry at the CF)
-  const fresh = seq.concat(SOP.barrierTrades(B, F, { from, market, extra: cfz }));
+  // one order (same market, side, fill, entry and stop) under two ids is recorded once: the sequence's record is the one kept
+  // over the repeat of the SOP at a barrier (SOP.uniq, the fixed priority written there)
+  const fresh = SOP.uniq(seq.concat(SOP.barrierTrades(B, F, { from, market, extra: cfz })));
   const records = settle(merge(prev && prev.records, fresh, now, feed), new Set(fresh.map((r) => r.id)), B['5m'], market, feed), s = SOP.summary(records);
   return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', markets: [...new Set(records.map((r) => r.market || 'xau'))], feed: market === 'xau' ? feed : (prev && prev.feed) || feed, through: market === 'xau' || !(prev && prev.through) ? B['5m'][B['5m'].length - 1].time + 300 : prev.through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },

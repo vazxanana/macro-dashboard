@@ -541,6 +541,7 @@ test('gold plan: one entry a visit to an H4 zone on one side (the first order th
     const out = (z, a, b) => M15.some((c) => c.time >= a - a % 900 + 900 && c.time + 900 <= b && (c.low > z.top || c.high < z.bot)), last = new Map(), perDay = {};
     for (let i = 1; i < o.length; i++) assert.ok(o[i].t >= o[i - 1].t, 'decided in the order of the fills');
     for (const x of o) { const k = x.side + ':' + x.zone.dir + ':' + x.zone.base, pv = last.get(k);
+      if (x.took === 'same') { if (pv == null || out(x.zone, pv, x.t)) last.set(k, x.t); continue; }   // the order another trigger already gave: no second record, but its own zone's entry of this visit
       if (x.took === 'visit') { visits++; assert.ok(pv != null && !out(x.zone, pv, x.t), 'refused although price had left the zone since the visit\'s entry: ' + x.id); continue; }
       if (pv != null) { again++; assert.ok(out(x.zone, pv, x.t), 'a second entry in one visit: ' + x.id); }
       last.set(k, x.t); const d = Math.floor(x.t / 86400); if (x.took === 'trade') { perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay); } else assert.ok(x.took === 'day' && perDay[d] >= G.SNR.perDay, 'refused by the day\'s limit only when the day is full'); }
@@ -644,4 +645,68 @@ test('LIT desk: no look-ahead after the fixes: a trade is found, with the same e
       const one = E.litTrades({ '5m': X['5m'].filter((b) => b.time < r.t + 600) }, { from: 0 }).find((x) => x.id === r.id);
       assert.ok(one, 'found when cut after the fill: ' + r.id); assert.equal(one.entry, r.entry); assert.equal(one.stop, r.stop); assert.equal(one.target, r.target); assert.equal(one.t, r.t); assert.equal(one.log[1].text, r.log[1].text); cuts++; } }
   assert.ok(cuts >= 15, 'cuts: ' + cuts);
+});
+
+// ─── 21 Nov 2026, the independent review of the build: one order is one record, two CLOSED H4 candles, zones handed out in the order the setups were known ───
+import crypto from 'node:crypto';
+const sameOrder = (rows) => { const m = new Map(), out = []; for (const r of rows) { const k = [r.market, r.side, r.t, r.entry, r.stop].join('|'); if (m.has(k)) out.push(m.get(k) + ' = ' + r.id); else m.set(k, r.id); } return out; };
+
+test('review: gold plan: a 15- and a 30-minute trigger that give ONE order are one record and use one of the day\'s two entries', () => {
+  let same = 0, n = 0;
+  for (const seed of [4, 3, 22]) { const X = market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, o = [], tr = G.snrTrades(Y, { from: 0, market: 'xau', orders: o }); n += tr.length;
+    assert.deepEqual(sameOrder(tr), [], 'one order recorded twice (seed ' + seed + ')');
+    const taken = new Map(tr.map((r) => [r.side + '|' + r.t + '|' + r.entry, r.id])), perDay = {};
+    for (const x of o.filter((q) => q.took === 'same')) { same++; const first = o.find((q) => q.took !== 'same' && q.t === x.t && q.side === x.side && q !== x); assert.ok(first && first.took !== 'visit', 'the order it repeats was taken (or refused by the day): ' + x.id); assert.ok(!tr.some((r) => r.id === x.id)); }
+    for (const r of tr) { assert.ok(stopOk(r)); const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay); }
+    assert.equal(taken.size, tr.length); }
+  assert.ok(same >= 3 && n >= 50, `repeats of an order already taken: ${same}, trades ${n}`);
+});
+
+test('review: direct entry: "left alone for two H4 candles" counts two CLOSED H4 candles, not eight hours of clock time', () => {
+  let n = 0, weekend = 0;
+  for (const seed of [1, 6, 7, 21, 11]) { const X = market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, H4 = X['4h'];
+    for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind === 'eg-direct')) { n++; const z = r.marks[0], tc = r.log[0].t; assert.equal(z.label, 'Fresh H4 EG zone');
+      const quiet = H4.filter((b) => b.time >= z.at && b.time + 14400 <= tc); assert.equal(quiet.length, G.EGM.quiet, 'H4 candles closed between the zone and the order: ' + r.id);
+      for (const b of quiet) assert.ok(r.side > 0 ? b.low > z.top : b.high < z.bot, 'a quiet candle traded into the zone: ' + r.id);
+      assert.ok(r.t >= tc && stopOk(r)); if (tc - z.at > G.EGM.quiet * 14400) weekend++; } }
+  assert.ok(n >= 8 && weekend >= 1, `direct entries ${n}, over a weekend ${weekend}`);
+});
+
+test('review: plan and simple: an M5 zone goes to the setup that was known first; an order that rested and filled does not vanish with later candles', () => {
+  // seed 5: a 15- and a 30-minute trigger close together and choose the same M5 entry zone; the 30-minute one's M5 failure came first
+  let checked = 0, late = 0;
+  for (const seed of [5, 35, 50]) { const X = market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, full = []; G.methodTrades(Y, { from: 0, market: 'xau', orders: full });
+    const keys = new Set(full.map((x) => [x.side, x.base, x.placed, x.entry, x.fillT].join('|')));
+    assert.equal(new Set(full.map((x) => x.side + ':' + x.base)).size, full.length, 'one order a zone');
+    // every order of the full run, read again on the candles cut one candle after its fill
+    // and on the candles cut just before each order was placed (where the other trigger's order had rested and could have filled)
+    for (const T of full.filter((q) => q.placed > X['5m'][0].time + 12 * 86400).flatMap((q) => (q.fillT != null ? [q.placed - 300, q.fillT + 300] : [q.placed - 300]))) { const o = []; G.methodTrades(cutAt(Y, T), { from: 0, market: 'xau', orders: o }); checked++;
+      for (const y of o.filter((q) => q.fillT != null)) { if (!keys.has([y.side, y.base, y.placed, y.entry, y.fillT].join('|'))) late++; } } }
+  assert.ok(checked >= 20, 'cuts: ' + checked); assert.equal(late, 0, 'orders that filled on the cut candles and are missing, or placed later, with every candle');
+});
+
+// the D1 / H4 / H1 engulf rule: a hand-made Friday where the H4 base candle and its last H1 candle have the same high and low
+function twinDay() { const T0 = 1790553600, m5 = []; let p = 4000;   // Monday 00:00 UTC; five rising days, every hour green
+  const add = (o, h, l, c) => { m5.push({ time: T0 + m5.length * 300, open: o, high: h, low: l, close: c }); p = c; }, up = (n, step) => { for (let i = 0; i < n; i++) add(p, p + step + 0.02, p - 0.02, p + step); };
+  up(4 * 288 + 48, 0.05);                       // to Friday 04:00
+  const O = p; up(36, 0.008);                   // three small green hours inside the H4 candle
+  add(p, O + 3, p - 0.1, O + 2.5); for (let i = 0; i < 10; i++) add(p, p + 0.05, p - 0.75, p - 0.7); add(p, p + 0.05, O - 5, O - 4.5);   // the fourth hour: red, the H4 candle's whole range
+  for (let i = 0; i < 11; i++) add(p, p + 0.8, p - 0.02, p + 0.75); add(p, O + 4.1, p - 0.02, O + 4);   // 08:00 hour: green, closes above the base's high
+  up(36, 0.05);                                 // stays above the zone until the H4 candle has closed
+  add(p, p + 0.1, O + 2.9, p + 0.05); up(47, 0.05);   // 12:00: back to the zone, both limits fill on this candle
+  const X = { '5m': m5 }; for (const tf of ['1h', '4h', '1d']) { const sec = SOP.SEC[tf], out = []; for (const b of m5) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } X[tf] = out; }
+  return X; }
+const perTf = (X, o) => { const tfs = E.EG.tfs, out = []; try { for (const tf of tfs) { E.EG.tfs = [tf]; out.push(...E.egTrades(X, o)); } } finally { E.EG.tfs = tfs; } return out; };
+test('review: the engulf rule: an H4 and an H1 reading that are the same order are one record (the higher timeframe); every other record is as it was', () => {
+  const X = twinDay(), each = perTf(X, { from: 0, market: 'xau' }), all = E.egTrades(X, { from: 0, market: 'xau' });
+  assert.deepEqual(each.map((r) => r.kind), ['eg-4h', 'eg-1h'], 'read alone, each timeframe gives the order'); const [a, b] = each;
+  assert.deepEqual([b.side, b.t, b.entry, b.stop, b.target], [a.side, a.t, a.entry, a.stop, a.target], 'the same order'); assert.ok(stopOk(a) && a.side > 0);
+  assert.equal(all.length, 1); assert.deepEqual(all[0], a, 'kept: the H4 reading, unchanged');
+  // seeded markets: the output is byte for byte what the function gave before this rule (hashes taken on the code before it),
+  // and it is the timeframes read one by one, less only a lower timeframe's copy of an order
+  const PIN = { 11: [134, '51184a386d7c76a3'], 4: [153, 'e79be8a21b48ce47'], 7: [136, 'a25a1bb7bc5957ab'] };
+  for (const seed of [11, 4, 7]) { const Y = seed === 11 ? B : market(60, seed), r = E.egTrades(Y, { from: 0, market: 'xau' });
+    assert.deepEqual([r.length, crypto.createHash('sha256').update(JSON.stringify(r)).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed);
+    const one = new Set(), exp = perTf(Y, { from: 0, market: 'xau' }).filter((x) => { const k = [x.side, x.t, x.entry, x.stop, x.target].join('|'); if (one.has(k)) return false; one.add(k); return true; }).sort((p, q) => p.t - q.t);
+    assert.deepEqual(r.map((x) => JSON.stringify(x)).sort(), exp.map((x) => JSON.stringify(x)).sort()); assert.deepEqual(sameOrder(r), []); }
 });

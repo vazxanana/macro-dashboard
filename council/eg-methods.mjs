@@ -136,7 +136,7 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null } = {}
   const fillAt = (d, entry, i0, i1, tEnd = Infinity) => { for (let k = i0; k < Math.min(M5.length, i1) && M5[k].time < tEnd; k++) if (d > 0 ? M5[k].low <= entry : M5[k].high >= entry) return k; return -1; };
 
   // plan / simple: H4 zone, M15 engulf inside it, then the M5 failure and the M5 zone behind it
-  const used = new Set(), at5 = new Map(Z5.map((z) => [z.dir + ':' + z.at, z]));
+  const used = new Set(), sets = [], at5 = new Map(Z5.map((z) => [z.dir + ':' + z.at, z]));
   for (const m of triggers(M15)) { const d = m.dir, T = m.at, tn = NAME[m.tf], t0 = m.c.time;   // t0: the open of the candle that completed the 15- / 30-minute engulf
     // the 15- / 30-minute engulf is made INSIDE the H4 zone: its own zone (the base candle) lies wholly inside it, as each box of
     // the methods' pictures lies inside the one above (21 Nov 2026, second pass; until then reaching into the zone was enough)
@@ -161,21 +161,29 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null } = {}
     else for (const z of Z5) { if (z.at > F.fail) break; if (z.dir === d && z.at >= F.fail - EGM.egBack && (z.fail == null || z.fail > F.fail) && atZone(z)) E = z; }
     if (!E || (E.fail != null && E.fail <= K)) continue;   // closed through before the setup was known: no zone to rest an order at
     const entry = d > 0 ? E.top : E.bot; if (entry < Z.bot || entry > Z.top) continue;   // the entry price is INSIDE the H4 zone: the methods buy FROM the zone (21 Nov 2026, second pass)
-    const key = d + ':' + E.base; if (used.has(key)) continue; used.add(key);
-    if (K < M5[0].time) continue;   // placed before the 5-minute candles on file: its window cannot be read
+    // One order a zone, given to the setup that was KNOWN first (21 Nov 2026): the setups are collected here and the zone is
+    // handed out below in the order of K. Until then it went to the trigger that closed first, whenever its own M5 failure came:
+    // a trigger whose failure came late took the zone from one whose failure had come early, so an order that had already
+    // rested (and could have filled) was never placed: a look ahead, shown by cutting the candles between the two.
+    sets.push({ K, key: d + ':' + E.base, go: () => {
+    if (K < M5[0].time) return;   // placed before the 5-minute candles on file: its window cannot be read
     const i0 = lower(M5, K), fi = fillAt(d, entry, i0, i0 + EGM.fill, K + EGM.fill * 300);   // an hour of clock time (12 candles could run over the daily break or a weekend)
     const dz = dailyZone(DZ, T), ds = dz ? dz.dir : 0, plan = ds === d;
     if (orders) orders.push({ kind: plan ? 'eg-plan' : 'eg-simple', side: d, base: E.base, entry, stop: entry - d * pipOf(entry), target: entry + d * EGM.rr * pipOf(entry), placed: K, until: K + EGM.fill * 300, fillT: fi < 0 ? null : M5[fi].time });
-    if (fi < 0) continue;
+    if (fi < 0) return;
     rec(plan ? 'eg-plan' : 'eg-simple', plan ? 'Plan · with the Daily' : 'Simple EG · H4 zone', d, fi, entry, E.base, [
       { t: T, text: (plan ? `The Daily's last engulf is a ${word(d)}. ` : `The Daily's last engulf is ${ds ? 'a ' + word(ds) : 'not on file'}, so this is the short method without the Daily. `) + `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and ` + (m.ef ? `a ${tn} ${word(-d)} engulf zone failed (a close through it).` : `a ${tn} engulf ${word(d)} closed.`) },
       { t: K, text: `On M5 the ${word(-d)} engulf zone ${f(F.bot)} to ${f(F.top)} failed (a close through it). The M5 ${word(d)} engulf zone behind it is ${f(E.bot)} to ${f(E.top)}: a ${word(d)} limit rests at ${f(entry)} for an hour.` }],
     (plan && dz ? [{ kind: 'zone', top: dz.top, bot: dz.bot, a: dz.base, at: dz.at, label: 'Daily EG zone' }] : []).concat([{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: tn + zw(m) },
-      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 EG zone · entry' }])); }
+      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 EG zone · entry' }])); } }); }
+  sets.sort((a, b) => a.K - b.K);   // a stable sort: setups known at the same close keep the triggers' order
+  for (const x of sets) { if (used.has(x.key)) continue; used.add(x.key); x.go(); }
 
   // direct: a fresh H4 zone left alone for two H4 candles, a fresh H1 zone inside it, a fresh M15 zone inside that
   const inside = (a, b) => a.top <= b.top && a.bot >= b.bot;   // INSIDE the zone above (until 21 Nov 2026 an overlap was enough)
-  for (const Z of Z4) { const d = Z.dir, tc = Z.at + EGM.quiet * SEC['4h']; if (Z.touch != null && Z.touch < tc) continue; if (Z.fail != null && Z.fail <= tc) continue;
+  // "left alone for the next two H4 candles" counts two CLOSED H4 candles after the one that made the zone, not 8 hours of clock
+  // time (until 21 Nov 2026: over a weekend or a missing candle no H4 candle, or one, had traded and the zone still counted)
+  for (const Z of Z4) { const d = Z.dir, qc = H4[Z.i + EGM.quiet]; if (!qc) continue; const tc = qc.time + SEC['4h']; if (Z.touch != null && Z.touch < tc) continue; if (Z.fail != null && Z.fail <= tc) continue;
     const win = (z) => z.dir === d && z.at <= tc && z.at >= Z.base - SEC['4h'] && (z.touch == null || z.touch >= tc);
     const h1 = Z1.filter((z) => win(z) && inside(z, Z)).pop(); if (!h1) continue;
     const m15 = Z15.filter((z) => win(z) && inside(z, h1)).pop(); if (!m15) continue;
@@ -272,7 +280,7 @@ export function qmSetups(M15) {
   return out.sort((a, b) => a.at - b.at);
 }
 // `orders`: an array handed in is filled with every order that filled and what became of it ({ id, t, side, took: 'trade' |
-// 'visit' (not the first of its visit) | 'day' (the 2-a-day limit) }): a read-out for tests and counts, it changes nothing.
+// 'visit' (not the first of its visit) | 'day' (the 2-a-day limit) | 'same' (the order another trigger already gave) }): a read-out for tests and counts, it changes nothing.
 export function snrTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
   if (market !== 'xau') return [];
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H4 = num(B['4h'] || []), D1 = foldWeekend(num(B['1d'] || [])); if (M5.length < 100 || M15.length < 50 || H4.length < 30 || D1.length < 20) return [];
@@ -301,10 +309,15 @@ export function snrTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
   // price to an H4 zone on one side only the FIRST order that fills is a trade, whatever its type (M15 EG, M30 EG, EF, QM). A
   // visit ends when a closed 15-minute candle lies wholly outside the zone. Decided in the order of the fills, on what had
   // filled before; the 2-a-day limit is applied after it (an entry the limit refuses was still its visit's entry).
-  const visit = new Map(), left = (Z, a, b) => { for (let q = lower(M15, a - a % 900 + 900); q < M15.length && M15[q].time + 900 <= b; q++) if (M15[q].low > Z.top || M15[q].high < Z.bot) return true; return false; };
+  const visit = new Map(), took = new Set(), left = (Z, a, b) => { for (let q = lower(M15, a - a % 900 + 900); q < M15.length && M15[q].time + 900 <= b; q++) if (M15[q].low > Z.top || M15[q].high < Z.bot) return true; return false; };
   for (const { m, d, T, S, Z, entry, fi, qm } of cands) { const fillT = M5[fi].time, vk = d + ':' + Z.dir + ':' + Z.base, pv = visit.get(vk), oid = `msnr-${qm ? 'qm' : 'sop'}-${d > 0 ? 'b' : 's'}-${m.base}${m.tf === '30m' ? '-30' : ''}${m.ef ? '-ef' : ''}`;
     const note = (took) => { if (orders) orders.push({ id: oid, t: fillT, side: d, zone: { base: Z.base, dir: Z.dir, top: Z.top, bot: Z.bot }, took }); };
-    if (pv != null && !left(Z, pv, fillT)) { note('visit'); continue; } visit.set(vk, fillT);
+    // ONE order is recorded once and counts once (21 Nov 2026): a 15-minute and a 30-minute trigger (or an EG and an EF) can give
+    // the same order (side, entry, so stop and target, and fill candle) and pick different H4 zones, so the visit rule did not
+    // see it and the pair used both of the day's entries. The later one is the order already taken: it is its own zone's
+    // entry of this visit too, and nothing more.
+    const ok = d + '|' + fillT + '|' + entry; if (took.has(ok)) { note('same'); if (pv == null || left(Z, pv, fillT)) visit.set(vk, fillT); continue; }
+    if (pv != null && !left(Z, pv, fillT)) { note('visit'); continue; } visit.set(vk, fillT); took.add(ok);
     const dk = Math.floor(fillT / 86400); if ((perDay[dk] || 0) >= SNR.perDay) { note('day'); continue; } perDay[dk] = (perDay[dk] || 0) + 1; note('trade');
     const stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, Infinity); if (fillT < from) continue;
     const turned = Z.dir !== d, tr = { id: oid, market, kind: qm ? 'msnr-qm' : 'msnr-sop', label: qm ? 'EG x SNR · gold plan, QM' : 'EG x SNR · gold plan', h: '4h', l: m.tf, side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };

@@ -58,4 +58,6 @@ test('the report says what result.json says', () => {
   assert.ok(md.includes(r.headline), 'the headline figures are the json\'s'); assert.ok(!/\*\*Verdict: PASS/.test(md)); assert.match(md, /\*\*Verdict: 1 of 60 comparisons cleared the bar and it is still a loss after costs; not a pass for the study\.\*\*/); assert.match(md, /no exit that clears the bar makes its group profitable\./);
   assert.equal(r.tests.length, Object.keys(r.groups).length * 4);
   for (const t of r.tests) assert.ok(['better', 'worse', 'no better'].includes(t.verdict));
+  // the ledger and the Edge lab read result.json's `verdict` first: it must not class this study as a pass (every row loses after costs)
+  assert.equal(classify(r.verdict), 'fail'); assert.equal(studyVerdict(r, md).verdict, 'fail');
 });
