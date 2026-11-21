@@ -126,3 +126,14 @@ test('a CF inside the VR is the "likely to fail" case: the sequence waits and re
     n2 += b.filter((r) => r['case'] === 2).length; }
   assert.ok(n2 >= 1, 'the case does occur on these candles: ' + n2);
 });
+
+test('a barrier trade says whether it is with or against the direction of the timeframe above, read on candles closed at the return', () => {
+  let w = 0, a = 0;
+  for (const seed of [7, 11, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, rows = M.barrierTrades(X, F, { from: e - 20 * 86400 });
+    for (const r of rows) { if (r.h === '1d') { assert.equal(r.withDir, null); continue; }
+      if (r.withDir == null) { assert.ok(!/with |against /.test(r.label)); continue; }
+      r.withDir ? w++ : a++; assert.match(r.label, r.withDir ? / · with (D1|H4|H1)$/ : / · against (D1|H4|H1)$/); assert.ok(r.log.some((x) => /direction/.test(x.text)));
+      // the same answer with every candle after the return cut away
+      const again = M.barrierTrades(cut(X, r.endT ? r.endT + 60 : e), F, { from: e - 20 * 86400 }).find((q) => q.id === r.id); if (again) assert.equal(again.withDir, r.withDir); } }
+  assert.ok(w >= 1 && a >= 1, 'both kinds occur: ' + w + ' / ' + a);
+});

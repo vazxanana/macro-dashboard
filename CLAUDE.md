@@ -5258,6 +5258,11 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     below H1 (the pages keep direction on Daily / H4 / H1); "strong" H4 BO in the gold plan undefined; trailing the direct
     entry's stop with the M5 EF. The direction procedure is on no page (it is the direction skill's text, checked earlier).
     `research/edge/desk-rigor` was run on the code BEFORE these five changes: its result stands as the record of that code.
+  - **Barriers with and against the direction** (21 Nov 2026, the pages: a barrier with the direction runs, one against it
+    "only gives a rejection"): `barrierTrades` reads the structure of the timeframe above the barrier's (`UP`: D1 over H4, H4
+    over H1, H1 over M15; none for a D1 barrier; `dirAt`, candles closed when price came back) and records `withDir`
+    (true / false; kept by `clean`), names it in the label ("· with H4" / "· against H4") and the log; the desk's rows say so
+    and "By entry type" lists the two apart. Entry, stop and the 3R target are unchanged (the method gives no other target).
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
