@@ -125,7 +125,9 @@ test('the direction reading: every switch names a tapped key level of the timefr
     assert.ok(['v', 'a', 'eg', 'ef', 'dom'].includes(e.kind)); assert.ok(e.top > e.bottom);
     assert.ok(e.zoneAt <= e.tapT + 14400 && e.tapT <= e.t, 'the zone is known and tapped before the break'); assert.ok(e.levelT < e.tapT, 'the level existed before the tap: external');
     assert.ok(e.s > 0 ? H4[e.i].close > e.level : H4[e.i].close < e.level, 'a close beyond the level'); assert.notEqual(e.s, prev); prev = e.s;
-    assert.equal(D.call[e.i], e.s); assert.equal(D.events[D.last[e.i]], e); }
+    assert.equal(D.call[e.i], e.s); assert.equal(D.events[D.last[e.i]], e);
+    // the switch is the FIRST close beyond the level from the tap candle on (a candle that taps and closes beyond is the breakout candle)
+    for (let j = H4.findIndex((x) => x.time === e.tapT); j < e.i; j++) assert.ok(e.s > 0 ? !(H4[j].close > e.level) : !(H4[j].close < e.level), 'no earlier close beyond the level'); }
   for (let i = 1; i < H4.length; i++) if (D.call[i] !== D.call[i - 1]) assert.ok(D.events.some((e) => e.i === i), 'the direction changes only at a switch');
   // cut at a candle: the reading up to it is unchanged; and with every later price moved, unchanged too
   const N = 1100, cut = G.direction(H4.slice(0, N), day, 86400), moved = G.direction(H4.map((b, i) => (i < N ? b : { time: b.time, open: b.open + 500, high: b.high + 500, low: b.low + 500, close: b.close + 500 })), day, 86400);

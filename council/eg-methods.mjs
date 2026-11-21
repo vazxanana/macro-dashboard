@@ -191,6 +191,10 @@ export function direction(work, keyOf, htfSec) {
     const b = work[i], k = keyOf(b.time);
     if (!cur || cur.time !== k) { if (cur) { H.push(cur); onClose(); } cur = { time: k, open: b.open, high: b.high, low: b.low, close: b.close }; }
     else { if (b.high > cur.high) cur.high = b.high; if (b.low < cur.low) cur.low = b.low; cur.close = b.close; }
+    // the tap first: a candle that taps the level and closes beyond the swing is the breakout candle itself
+    for (const z of zones) { if (z.tapped || b.low > z.top || b.high < z.bottom) continue;
+      z.tapped = true; const L = z.s > 0 ? lastA : lastV;
+      if (st === -z.s && L && !L.broken) pend.push({ s: z.s, zone: z, level: L.p, levelT: L.t, tapT: b.time, tapH: H.length }); }
     if (pend.length) { const keep = [];
       for (const q of pend) {
         if (q.zone.dead || H.length - q.tapH > DIR.WAIT) continue;
@@ -199,9 +203,6 @@ export function direction(work, keyOf, htfSec) {
           dir = q.s; }
         else keep.push(q); }
       pend = keep; }
-    for (const z of zones) { if (z.tapped || b.low > z.top || b.high < z.bottom) continue;
-      z.tapped = true; const L = z.s > 0 ? lastA : lastV;
-      if (st === -z.s && L && !L.broken) pend.push({ s: z.s, zone: z, level: L.p, levelT: L.t, tapT: b.time, tapH: H.length }); }
     if (lastA && !lastA.broken && b.close > lastA.p) { lastA.broken = true; st = 1; }
     if (lastV && !lastV.broken && b.close < lastV.p) { lastV.broken = true; st = -1; }
     const m = i - K;

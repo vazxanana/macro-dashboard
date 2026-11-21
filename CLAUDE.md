@@ -5168,6 +5168,12 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     the engulf methods are about zero. The M15 barrier on M1 was not tested (no one-minute history). The desks stay paper
     records of one way to read each method; none of these conditions is made a requirement; do not look at them again on
     these years. Test: `tests/desk-rigor.test.mjs`.
+  - **Direction: the tap candle can be the breakout candle** (21 Nov 2026, point-by-point check of `direction()` against the
+    direction procedure): a working candle that tapped the key level AND closed beyond the external level was read one candle
+    late, or at a later re-break; the tap is now read before the break in the same candle (about 6-10 of 163 switches a
+    market move, 2019-26). Checked and left: A / V levels on closes, the dominant pair, EF from a failed EG zone, the level
+    fixed at the first tap, no switch without a tapped level. The desk's own choices stay `DIR` (2-candle turns, a level's
+    life 60 candles, 10 candles from tap to break) and the opposite structure at the tap.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
