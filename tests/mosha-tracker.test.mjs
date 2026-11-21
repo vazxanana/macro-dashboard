@@ -176,3 +176,42 @@ test('the Mosha desk keeps gold, EUR/USD and GBP/USD only (owner, 21 Nov 2026): 
   assert.deepEqual(out.records.map((r) => r.id), ['a', 'eurusd:c', 'gbpusd:e']);
   assert.deepEqual(out.markets.sort(), ['eurusd', 'gbpusd', 'xau']); assert.equal(out.counts.n, 3);
 });
+
+test('the readings of 21 Nov 2026 (second table, M30 barriers, repeat of the SOP) are read back from a stored id, and are never taken for a re-read of another order', () => {
+  const g = (id) => SOPX.readings({ id });
+  assert.deepEqual([g('bar-4h-c30-s1000').alt, g('bar-1h-c15-z-b1000').alt, g('bar-1h-s1000').alt], ['30m', '15m', null]);
+  assert.deepEqual([g('bar-sop-1h-m5-b1000').rsop, g('bar-sop-sw-4h-c30-v2-s1000').rsop, g('bar-j-1h-s1000').rsop], [true, true, false]);
+  assert.equal(g('bar-sop-sw-4h-c30-v2-s1000').sweep, true); assert.equal(g('bar-sop-sw-4h-c30-v2-s1000').visit, 2);
+  assert.deepEqual([g('bar-30m-s1000').m30, g('bar-j-cf-30m-b1000').m30, g('eurusd:bar-sop-vr-30m-s1000').m30, g('bar-15m-s1000').m30, g('bar-sw-4h-c30-s1000').m30], [true, true, true, false, false]);
+  // a stored record keeps no flag: the same reading must come back from the cleaned record
+  const c = M.clean(rec({ id: 'bar-sop-1h-c15-s1000', h: '1h', l: '15m', alt: '15m', rsop: true, label: 'H1 barrier · BO origin · repeat SOP · M15 confirm · with H4' }));
+  assert.deepEqual(SOPX.readings(c), SOPX.readings({ id: c.id, alt: '15m', rsop: true }));
+  // an order at the same price and minute under another reading is its own record
+  const prev = [{ ...M.clean(rec({ id: 'bar-1h-s1000', h: '1h', l: '5m' })), first: 1, src: 'replay' }];
+  const out = M.merge(prev, [rec({ id: 'bar-1h-s1000', h: '1h', l: '5m' }), rec({ id: 'bar-sop-1h-s1300', h: '1h', l: '5m', t: 1300 }), rec({ id: 'bar-1h-c15-s1000', h: '1h', l: '15m' })], 5000);
+  assert.deepEqual(out.map((r) => r.id).sort(), ['bar-1h-c15-s1000', 'bar-1h-s1000', 'bar-sop-1h-s1300']);
+});
+
+// 21 Nov 2026 (independent review): one order under two ids was stored twice; the tags that change no trade are kept
+test('one order is stored once: where the tracker joins the sequence and the barrier lists the sequence\'s record is kept; a CF-inside-the-VR record is its own reading', () => {
+  const o = { market: 'xau', side: 1, t: 1795000300, entry: 4397.57, stop: 4393.99, target: 4403.87, status: 'open', R: null, log: [], marks: [] };
+  const seq = [{ ...o, id: 'sop-5m-1795000000', kind: 'sop', h: '15m', l: '5m' }], bars = [{ ...o, id: 'bar-sop-1h-b1795000300', kind: 'barrier', h: '1h', l: '5m', rsop: true }, { ...o, id: 'bar-1h-b1795000900', kind: 'barrier', h: '1h', l: '5m', t: 1795000900 }];
+  const m5 = Array.from({ length: 12 }, (_, i) => ({ time: 1795000000 + i * 300, open: 4397, high: 4398, low: 4396, close: 4397 }));
+  const keep = [SOPX.sopTrades, SOPX.barrierTrades];
+  try { SOPX.sopTrades = () => seq.map((r) => ({ ...r })); SOPX.barrierTrades = () => bars.map((r) => ({ ...r }));
+    const out = M.build({ '5m': m5 }, {}, null, 1795004000);
+    assert.deepEqual(out.records.map((r) => r.id).sort(), ['bar-1h-b1795000900', 'sop-5m-1795000000'], 'the repeat-SOP twin of the sequence\'s order is not stored');
+    assert.equal(new Set(out.records.map((r) => [r.side, r.t, r.entry, r.stop].join('|'))).size, out.records.length);
+  } finally { [SOPX.sopTrades, SOPX.barrierTrades] = keep; }
+  assert.match(rd('council/mosha-desk.mjs'), /SOP\.uniq\(seq\.concat\(SOP\.barrierTrades\(/);
+  // clean keeps the new fields, and only where a record has them
+  const c = M.clean(rec({ id: 'sop-c2-i-30m-1000', kind: 'sop', h: '1h', l: '30m', case: 2, case2: true, withWeekly: false, er20: 0.3149, label: 'H1 iBO → M30 VR, CF · CF inside the VR' }));
+  assert.deepEqual([c.case2, c.withWeekly, c.er20, c.case, c.label], [true, false, 0.31, 2, 'H1 iBO → M30 VR, CF · CF inside the VR']);
+  assert.equal(M.clean(rec({ kind: 'sop', withWeekly: true, er20: 0 })).withWeekly, true); assert.equal(M.clean(rec({ kind: 'sop', withWeekly: true, er20: 0 })).er20, 0);
+  const plain = M.clean(rec({ kind: 'sop', withWeekly: null, er20: null })); assert.ok(!('case2' in plain) && !('withWeekly' in plain) && !('er20' in plain), 'no tag where none is known');
+  // a CF-inside-the-VR record beside a clean sequence record of the same minute and price is another reading, never a re-read
+  const prev = [{ ...M.clean(rec({ id: 'sop-30m-1000', kind: 'sop', h: '1h', l: '30m' })), first: 1, src: 'replay' }];
+  const out = M.merge(prev, [rec({ id: 'sop-30m-1000', kind: 'sop', h: '1h', l: '30m' }), rec({ id: 'sop-c2-30m-1300', kind: 'sop', h: '1h', l: '30m', t: 1300, case: 2, case2: true })], 5000);
+  assert.deepEqual(out.map((r) => r.id).sort(), ['sop-30m-1000', 'sop-c2-30m-1300']);
+  assert.equal(M.merge(out, [rec({ id: 'sop-c2-30m-1600', kind: 'sop', h: '1h', l: '30m', t: 1600, case: 2, case2: true })], 6000).length, 2, 'the same c2 trade re-read under another id is still left out');
+});

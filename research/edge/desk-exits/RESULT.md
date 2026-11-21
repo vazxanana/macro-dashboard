@@ -2,7 +2,7 @@
 
 Pre-registered (PREREGISTRATION.md, committed first). The desks' own entries of 2026, each run alone on OANDA mid 5-minute candles with a target of 1R, 2R or 3R, or a trailing stop 1R behind the best price from +1R, against the exit each desk books. Mean R a trade, before costs and after the desk-rigor cost model. In sample: a "better" here is a hypothesis for the 2020-2025 harness, never a rule.
 
-**Verdict: PASS.** 1 of 60 exit-group comparisons better than the desk's own exit after costs on the pre-registered bar (Engulf short method, Trailing stop (1R behind from +1R): −0.060R a trade after costs, still a loss); 1 worse. A better exit is not a profitable one: read the after-costs column.
+**Verdict: 1 of 60 comparisons cleared the bar and it is still a loss after costs; not a pass for the study.** The pre-registration set a bar for each of the 60 comparisons and no pass / fail for the study as a whole (result.json's `verdict` field says so; it read "PASS" until 21 Nov 2026 only because one comparison cleared its bar). 1 of 60 exit-group comparisons better than the desk's own exit after costs on the pre-registered bar (Engulf short method, Trailing stop (1R behind from +1R): −0.060R a trade after costs, still a loss); 1 worse. A better exit is not a profitable one: read the after-costs column. The one exit that cleared the bar still loses after costs; no exit that clears the bar makes its group profitable.
 
 Trades: 30904 closed records (3 left out: their candles ended before an exit, or no candle at the fill).
 

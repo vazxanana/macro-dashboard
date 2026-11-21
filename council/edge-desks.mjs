@@ -20,10 +20,10 @@ import { fileURLToPath } from 'node:url';
 import { readDesk, writeDesk } from './desk-store.mjs';
 import { foldWeekend } from './fills.mjs';
 import { bars, merge, settle } from './mosha-desk.mjs';
-import { P, cleanBars, agg15, series, fbosCandidates, XAU } from './lit.mjs';
+import { P, cleanBars, agg15, series, fbosCandidates, XAU, SESS_TRADE, nyInfo } from './lit.mjs';
 import { managePosition } from '../research/edge/lit/run.mjs';
 import * as MS from '../research/edge/msnr-entry/run.mjs';
-import { methodTrades, snrTrades, direction, KEY_NAME } from './eg-methods.mjs';
+import { methodTrades, snrTrades, direction, engulfAt, KEY_NAME } from './eg-methods.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
@@ -51,7 +51,7 @@ export function egOutcome(tr, m5, fillI, until) {
   o.stopNow = stop; return o;
 }
 export function egTrades(B, { from, market = 'xau' } = {}) {
-  const m5 = B['5m'] || [], out = [], f = fx(market), end = m5.length ? m5[m5.length - 1].time + 300 : 0;
+  const m5 = B['5m'] || [], out = [], f = fx(market), end = m5.length ? m5[m5.length - 1].time + 300 : 0, one = new Set();
   for (const tf of EG.tfs) { const seen = new Set(), sec = SEC[tf], C = tf === '1d' ? foldWeekend(B[tf] || []) : (B[tf] || []);
     // signals are read from before the window: an order lives EG.life candles and a trade EG.hold more, so a D1 order placed
     // before `from` can still fill or close inside it (it was dropped, and its open record then stayed open for good); EG.k
@@ -61,8 +61,7 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
       const d = last.close > last.open ? 1 : last.close < last.open ? -1 : 0; if (!d) continue;
       let sma = 0; for (let j = m + 1 - EG.sma; j <= m; j++) sma += C[j].close; sma /= EG.sma;
       if (d > 0 ? !(last.close > sma) : !(last.close < sma)) continue;
-      let base = null;
-      for (let j = m - 1; j >= m - EG.k && j >= 0; j--) { const b = C[j]; if (d > 0 ? b.open > b.close : b.open < b.close) { if (d > 0 ? last.close > b.high : last.close < b.low) base = b; break; } }
+      const eg = engulfAt(C, m, EG.k), base = eg ? C[eg.j] : null;   // the one engulf definition (council/eg-methods.mjs), with the live rule's look-back of EG.k candles
       if (!base) continue;
       if (seen.has(d + '|' + base.time)) continue; seen.add(d + '|' + base.time);   // one order a zone: a second candle closing beyond the same candle adds nothing
       if (T0 < lo) continue;
@@ -87,27 +86,74 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
               : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` }
                 : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now` + (oc.stopNow !== stop ? `, stop trailed to ${f(oc.stopNow)}` : '') + ').' : '.') }];
       tr.marks = [{ kind: 'zone', top: base.high, bot: base.low, a: base.time, at: T0, label: `${NAME[tf]} engulf zone` }, { kind: 'level', p: sma, a: C[m + 1 - EG.sma].time, at: T0, label: '20-candle average', under: d > 0 }];
+      // ONE order is recorded once (21 Nov 2026): when a base candle of a lower timeframe has the same high and low as the higher
+      // one's, both readings are the same order (side, fill candle, entry, stop, target). The higher timeframe is read first and kept.
+      const ok = [d, fillT, entry, stop, tr.target].join('|'); if (one.has(ok)) continue; one.add(ok);
       out.push(tr); } }
   return out.sort((a, b) => a.t - b.t);
 }
 
 // ─── LIT ───
+// The two study executions (21 Nov 2026): when price runs past the sweep's extreme they no longer just follow it. A new extreme is a
+// NEW sweep of the same level (`resweep`): the sweep tests are run again on its M15 candles (litResweep), at most LIT_RESWEEPS times,
+// inside the one waiting period counted from the FIRST extreme, and the break level is the swing known at the new extreme. Both skip
+// a stop nearer than LIT_MIN_STOP of the price (the method's smallest stop; a skip, never a wider or missing stop).
+export const LIT_MIN_STOP = 0.00014, LIT_RESWEEPS = 2;
 export const LIT_SETS = [
   { id: 'rule', label: 'LIT · the rule', mxReanchor: false, quality: true, minRR: P.minRR, cap: true, entry: 'limit', expiryBars: P.expiryBars },
-  { id: 'loose', label: 'LIT · loose limit', mxReanchor: true, quality: false, minRR: 1.5, cap: false, entry: 'limit', expiryBars: 48 },
-  { id: 'break', label: 'LIT · market on the break', mxReanchor: true, quality: false, minRR: 1.5, cap: false, entry: 'market' }];
+  { id: 'loose', label: 'LIT · loose limit', mxReanchor: true, resweep: true, minStop: LIT_MIN_STOP, quality: false, minRR: 1.5, cap: false, entry: 'limit', expiryBars: 48 },
+  { id: 'break', label: 'LIT · market on the break', mxReanchor: true, resweep: true, minStop: LIT_MIN_STOP, quality: false, minRR: 1.5, cap: false, entry: 'market' }];
+// the same two executions as they were until 21 Nov 2026 (the extreme followed with no test, no smallest stop): `first: true` reads
+// them, so the desk-slices study still reproduces; nothing on the desk does
+export const litOldSet = (x) => ({ ...x, resweep: false, minStop: 0 });
+// A sweep of the Asia session's own high (low) alone is not a level to fade: it counts only when the same move (the sweep candle to
+// the candle that closed back, up to its extreme) also trades through structure from BEFORE that day's Asia session that was still
+// untaken: a confirmed M15 swing high, or an earlier trading day's high, of the last LIT_ASIA_LOOK candles. A filter on the detector's
+// candidates (the detector itself is the pre-registered one and is not changed). S15: the sign-normalised M15 series; true = Asia alone.
+export const LIT_ASIA_LOOK = 960;
+export function litAsiaAlone(S15, cd) {
+  if (cd.kind !== 'ASIA') return false;
+  const { h, ny, pivH, tick } = S15, day = ny[cd.s].day, lo = Math.max(0, cd.s - LIT_ASIA_LOOK), dayHi = new Map();
+  for (let k = cd.s - 1; k >= lo; k--) { const dk = ny[k].day; if (dk !== day && !(dayHi.get(dk) >= h[k])) dayHi.set(dk, h[k]); }
+  let rm = -Infinity;   // the highest high between the older candle and the sweep candle
+  for (let k = cd.s - 1; k >= lo && rm < cd.MX; k--) {
+    if (ny[k].day !== day && (pivH[k] || dayHi.get(ny[k].day) === h[k]) && rm < h[k] + tick && cd.MX >= h[k] + tick) return false;
+    rm = Math.max(rm, h[k]); }
+  return true;
+}
+// the detector's own sweep tests (council/lit.mjs `advance`, repeated here because that port is pinned) on a later M15 candle i0 that
+// ran past the first sweep's extreme: in London or the New York morning and not the 09:30 candle, a close back inside the level within
+// 3 candles, never two closes beyond it, no higher high after the close back, a vector within two candles either side. Returns
+// { s, r, conf, MX } once the confirming candle is in (nothing later is read), else null.
+export function litResweep(S15, cd, i0) {
+  const { h, c, vec, ny, n } = S15; if (!(i0 > cd.conf && i0 < n) || !SESS_TRADE.includes(ny[i0].sess) || ny[i0].hm === 930) return null;
+  let MX = -Infinity, above = 0, r = null;
+  for (let i = i0; i < n; i++) {
+    if (r == null) { if (i - i0 >= P.rejectBars) return null; MX = Math.max(MX, h[i]); if (c[i] < cd.L) r = i; else if (++above >= 2) return null; if (r == null) continue; }
+    else if (h[i] > MX) return null;
+    for (let j = Math.max(0, i0 - P.vecWindow); j <= Math.min(i, r + P.vecWindow); j++) if (vec[j]) return { s: i0, r, conf: i, MX };
+    if (i >= r + P.vecWindow) return null; }
+  return null;
+}
 const lowerBound = (arr, v) => { let lo = 0, hi = arr.length; while (lo < hi) { const m = (lo + hi) >> 1; if (arr[m] < v) lo = m + 1; else hi = m; } return lo; };
 // an order from an M15 candidate on the (sign-normalised, short-side) M5 series: council/lit.mjs buildOrder with the study's switches
-export function litOrder(S5, cd, M, set) {
+export function litOrder(S5, cd, M, set, S15 = null) {
   const { h, l, c, o, t, vec, pivL, atr, body, n } = S5;
-  const j0 = lowerBound(t, cd.confEnd), sIdx = lowerBound(t, cd.t), rEnd = lowerBound(t, cd.rEnd); if (j0 >= n || sIdx >= rEnd) return null;
+  let j0 = lowerBound(t, cd.confEnd); const sIdx = lowerBound(t, cd.t), rEnd = lowerBound(t, cd.rEnd); if (j0 >= n || sIdx >= rEnd) return null;
   let mxIdx = sIdx; for (let k = sIdx; k < rEnd; k++) if (h[k] > h[mxIdx]) mxIdx = k;
   let MX = h[mxIdx];
   const swingBefore = (upto) => { for (let k = upto - 1; k >= Math.max(0, upto - 288); k--) if (pivL[k] && k + P.pivot < j0) return k; return -1; };
-  const p = swingBefore(mxIdx); if (p < 0) return null;
-  let level = l[p], b = -1;
-  for (let k = mxIdx + 1; k <= Math.min(n - 2, mxIdx + P.rbosWait); k++) {
-    if (h[k] > MX) { if (!set.mxReanchor) return null; MX = h[k]; mxIdx = k; const p2 = swingBefore(k); if (p2 >= 0) level = l[p2]; continue; }
+  let p = swingBefore(mxIdx); if (p < 0) return null;
+  let level = l[p], b = -1, res = 0; const dead = mxIdx + P.rbosWait;   // the one waiting period, from the first extreme
+  for (let k = mxIdx + 1; k <= Math.min(n - 2, set.resweep ? dead : mxIdx + P.rbosWait); k++) {
+    if (h[k] > MX) { if (!set.mxReanchor) return null;
+      if (set.resweep) {   // a new extreme is a new sweep of the same level: tested like the first, its own confirmation, the swing known by then
+        if (!S15 || ++res > LIT_RESWEEPS) return null;
+        const rs = litResweep(S15, cd, lowerBound(S15.t, Math.floor(t[k] / 900) * 900)); if (!rs) return null;
+        j0 = lowerBound(t, S15.t[rs.conf] + 900); if (j0 >= n) return null;
+        const e = lowerBound(t, S15.t[rs.r] + 900); mxIdx = k; for (let q = k; q < e; q++) if (h[q] > h[mxIdx]) mxIdx = q;
+        MX = h[mxIdx]; p = swingBefore(mxIdx); if (p < 0) return null; level = l[p]; k = mxIdx; continue; }
+      MX = h[k]; mxIdx = k; const p2 = swingBefore(k); if (p2 >= 0) level = l[p2]; continue; }
     if (l[k] <= level) { b = k; break; } }
   if (b < 0) return null;
   if (set.quality) { if (!(vec[b] || b - mxIdx <= P.rbosFast)) return null;
@@ -124,7 +170,8 @@ export function litOrder(S5, cd, M, set) {
   const entry = set.entry === 'market' ? c[mk] : o[ob], stop = MX + M.stopExtra(atr[jA - 1], MX), risk = stop - entry; if (!(risk > 0)) return null;
   const target = cd.accLow, rr = (entry - target) / risk; if (!(rr > set.minRR)) return null;
   if (set.cap && !(risk <= P.capFrac * Math.abs(entry))) return null;
-  return { jA, entry, stop, target, risk, rr, MX, b, ob, mxIdx, level, mk, market: set.entry === 'market' };
+  if (set.minStop && !(risk >= set.minStop * Math.abs(entry))) return null;   // nearer than the method's smallest stop: no trade
+  return { jA, entry, stop, target, risk, rr, MX, b, ob, mxIdx, level, mk, res, j0, p, market: set.entry === 'market' };
 }
 // the fill (a touch of the limit, or at once for a market order) and the study's own management of the position
 export function litFill(S5, M, ord, set) {
@@ -146,16 +193,24 @@ const LEVEL = { pd: "the previous day's", pw: "the previous week's", acc: "the a
 // Each execution is its OWN stream (21 Nov 2026): every candidate is tried with every execution, one position at a time per
 // execution. Until then a candidate was recorded under the first execution that filled, so "market on the break" held only the
 // candidates whose limit orders later did not fill: chosen with knowledge of the future (desk-slices T3, INVALID).
-// `first: true` is that old reading, kept only so the desk-slices study still reproduces.
-export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = false } = {}) {
+// `first: true` is that old reading, kept only so the desk-slices study still reproduces (with the old executions, no Asia filter
+// and no daily limits).
+// The method's daily limits (21 Nov 2026; `limits`), on every execution, each its own stream: at most one fill from a London sweep
+// and one from a New York-morning sweep a trading day (18:00 to 17:00 New York), no new trade that day after a win or once the
+// day's closed result is at or under -1.5R. They are risk rules of the method, not of one execution, so the two study executions
+// take them too. `asia`: a sweep of the Asia session's extreme alone gives no trade (litAsiaAlone).
+export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = false, limits = !first, asia = !first } = {}) {
+  if (first) sets = sets.map(litOldSet);
   const raw = B['5m'] || []; if (!raw.length) return [];
-  const M = litM(market), b5 = cleanBars(raw, M), m15 = agg15(b5), f = fx(market), out = [], lastT = b5.length ? b5[b5.length - 1].t : 0;
+  const M = litM(market), b5 = cleanBars(raw, M), m15 = agg15(b5), f = fx(market), out = [], lastT = b5.length ? b5[b5.length - 1].t : 0, meta = new Map();
   for (const dir of ['short', 'long']) { const mirror = dir === 'long', S15 = series(m15, mirror, M.tick), S5 = series(b5, mirror, M.tick), sg = S5.sign, d = dir === 'short' ? -1 : 1;
     for (const cd of fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900;
+      if (asia && litAsiaAlone(S15, cd)) continue;
       const gots = [];
-      for (const set of sets) { const od = litOrder(S5, cd, M, set); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { gots.push({ set, od, sim }); if (first) break; } }
+      for (const set of sets) { const od = litOrder(S5, cd, M, set, S15); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { gots.push({ set, od, sim }); if (first) break; } }
       for (const { set, od, sim } of gots) { const fillT = sim.t + 300;
       const entry = sim.fp, stop = sg * od.stop, target = sg * od.target, r0 = Math.abs(entry - stop); if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
+      if (set.minStop && !(r0 >= set.minStop * Math.abs(entry))) continue;   // a limit filled through a gap, nearer its stop than the smallest stop
       // the study's management calls the last candle read the "day's end": a trade whose exit is that candle is still OPEN
       const open = (sim.kind === 'dataEnd' || sim.kind === 'dayEnd') && sim.tExit >= lastT, status = open ? 'open' : sim.kind === 'target' ? 'target' : sim.kind === 'stop' ? 'stopped' : sim.kind === 'be' ? 'breakeven' : 'dayend';
       let mfe = 0; for (let q = sim.k + (od.market ? 0 : 1); q <= sim.exitIdx; q++) mfe = Math.max(mfe, (od.entry - S5.l[q]) / od.risk);
@@ -164,20 +219,26 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
       const lv = sg * cd.L, aLo = Math.min(sg * cd.accLow, sg * cd.accHigh), aHi = Math.max(sg * cd.accLow, sg * cd.accHigh), mx = sg * od.MX, obLo = Math.min(sg * S5.h[od.ob], sg * S5.l[od.ob]), obHi = Math.max(sg * S5.h[od.ob], sg * S5.l[od.ob]);
       tr.log = [
         { t: cd.t + 900, text: `M15 sweep: price ran ${d < 0 ? 'above' : 'below'} ${LEVEL[cd.kind] || cd.kind} ${d < 0 ? 'high' : 'low'} ${f(lv)} out of an accumulation of ${cd.accN} candles (${f(aLo)} to ${f(aHi)}) and closed back inside.` },
-        { t: S5.t[od.b] + 300, text: `M5 break ${word(d)}: the extreme of the sweep is ${f(mx)}; the order block is ${f(obLo)} to ${f(obHi)}.` },
+        { t: S5.t[od.b] + 300, text: `M5 break ${word(d)}: the extreme of the sweep is ${f(mx)}` + (od.res ? ` (the level was swept again ${od.res === 1 ? 'once' : od.res + ' times'}, each time closing back inside)` : '') + `; the order block is ${f(obLo)} to ${f(obHi)}.` },
         { t: fillT, text: `${set.entry === 'market' ? 'Market entry on the candle after the break' : 'The limit at the order block filled'}: ${word(d)} ${f(entry)}, stop ${f(stop)} (risk ${f(r0)}), target ${f(target)} (${(Math.abs(target - entry) / r0).toFixed(1)}R, the accumulation's far side).` + (set.id === 'rule' ? '' : ' A looser execution than the rule: for study.') },
         open ? { t: null, text: `Still open on the last candle read (${sim.R >= 0 ? '+' : '−'}${Math.abs(sim.R).toFixed(2)}R now).` }
           : { t: sim.tExit + 300, text: (status === 'target' ? 'Target reached' : status === 'stopped' ? 'Stopped' : status === 'breakeven' ? 'Stopped at break-even after two swing breaks' : 'Closed at the end of the New York day') + `: ${sim.R >= 0 ? '+' : '−'}${Math.abs(sim.R).toFixed(2)}R.` }];
       tr.marks = [{ kind: 'zone', top: aHi, bot: aLo, a: S15.t[Math.max(0, cd.s - cd.accN)], at: cd.t, label: 'Accumulation' }, { kind: 'level', p: lv, a: cd.t, at: cd.t + 900, label: 'Swept level', under: d > 0 },
         { kind: 'level', p: mx, a: S5.t[od.mxIdx], at: S5.t[od.b] + 300, label: 'MX', under: d > 0 }, { kind: d < 0 ? 'vr' : 'bvr', top: obHi, bot: obLo, a: S5.t[od.ob], at: S5.t[od.b] + 300, label: 'Order block' }];
-      out.push(tr); } } }
+      meta.set(tr, { sess: cd.sess, day: nyInfo(sim.t).day }); out.push(tr); } } }
   // one position at a time on a market per execution: a later entry inside an earlier trade's life is left out
-  out.sort((a, b) => a.t - b.t); const keep = [], busy = {};
-  for (const r of out) { const k = first ? '' : r.kind; if (r.t < (busy[k] || 0)) continue; busy[k] = r.endT || Infinity; if (r.t >= from) keep.push(r); }   // a trade from before the window still blocks
+  out.sort((a, b) => a.t - b.t); const keep = [], busy = {}, days = {}, ids = new Set();
+  for (const r of out) { const k = first ? '' : r.kind; if (r.t < (busy[k] || 0) || (!first && ids.has(r.id))) continue;
+    if (limits) { const m = meta.get(r), dk = k + '|' + m.day, ds = days[dk] || (days[dk] = { fills: {}, R: 0, won: false });
+      if (ds.won || ds.R <= P.dayCapR || ds.fills[m.sess]) continue;   // the day is done, or that session has had its trade
+      ds.fills[m.sess] = 1; if (r.R != null) { ds.R += r.R; if (r.R > 0) ds.won = true; } }   // an earlier trade is closed before a later one starts (one at a time)
+    busy[k] = r.endT || Infinity; ids.add(r.id); if (r.t >= from) keep.push(r); }   // a trade from before the window still blocks
   return keep;
 }
 
 // ─── MSNR ───
+// Kinds msnr-main / msnr-other are the owner's earlier scalp method (direction call + M15 / M5 engulf), the entry of the desk's
+// own MSNR study: not an entry of any of the owner's documents (the gold plan's entries are kinds msnr-sop / msnr-qm).
 // The direction call of the desk's own MSNR study (research/edge/msnr-entry, its functions imported and not edited): on H4
 // candles, a close beyond the last swing level that stood before price first touched a live Daily key level turns the call.
 // The entry is that study's: a 15-minute body engulf, then within 45 minutes a 5-minute body engulf the same way, market at
@@ -216,7 +277,7 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
     let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);
     const status = !o ? 'open' : o.exit === 'target' ? 'target' : o.exit === 'time' ? 'time' : 'stopped', R = o ? d * (o.exitPx - c.entry) / r0 : null, fl = o ? undefined : d * (M5[M5.length - 1].close - c.entry) / r0;
-    const tr = { id: `${market === 'xau' ? '' : market + ':'}msnr-${d > 0 ? 'b' : 's'}-${c.t}`, market, kind: main ? 'msnr-main' : 'msnr-other', label: main ? 'MSNR · 12-16 UTC' : 'MSNR · other hours', h: '4h', l: '5m', side: d, t: c.t,
+    const tr = { id: `${market === 'xau' ? '' : market + ':'}msnr-${d > 0 ? 'b' : 's'}-${c.t}`, market, kind: main ? 'msnr-main' : 'msnr-other', label: main ? 'Earlier scalp method · 12-16 UTC' : 'Earlier scalp method · other hours', h: '4h', l: '5m', side: d, t: c.t,
       entry: c.entry, stop: c.stop, target, r0, status, R, endT: o ? o.closed : null, exit: o ? o.exitPx : null, mfe, float: fl };
     tr.log = [
       ...(ev ? [{ t: ev.zoneAt, text: `Daily ${d > 0 ? 'buy' : 'sell'}-side key level: ${KEY_NAME[ev.kind]} ${f(ev.bottom)} to ${f(ev.top)}.` },
@@ -242,7 +303,7 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
 // ─── the files ───
 export const DESKS = {
   eg: { tfs: ['1d', '4h', '1h', '15m', '5m'], markets: MARKETS, read: (B, o) => egTrades(B, o).concat(methodTrades(B, o)), note: 'A paper record of the desk\'s readings of the engulf on five markets, buys and sells: the engulf rule on D1, H4 and H1 candles, and three zone methods (the plan with the Daily, the short method in an H4 zone, the direct entry on fresh zones) with a 30-pip stop; the plan and the short method have a 2R target, the direct entry none: its stop is trailed with the 5-minute engulf zones that fail. Nothing is traded, results are before costs, and none is a tested rule.' },
-  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: Object.keys(SOP.ALL), read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only (the desk\'s own study of this rule failed after costs). On gold: the plan with a Daily level rejection (V, A or open-close level) and an H4 break for the side, H4 zones, a 15- or 30-minute engulf entry or a 15- or 30-minute QM entry at its left shoulder, a 30-pip stop and a 90-pip target. Nothing is traded and results are before costs.' },
+  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: Object.keys(SOP.ALL), read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the owner\'s earlier scalp method (direction call + M15 / M5 engulf): the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only; it is not an entry of the plan documents, and the desk\'s own study of it failed after costs. On gold: the plan with a fresh Daily level rejected (V, A or open-close level) and an H4 break within three trading days for the side, H4 zones, a 15- or 30-minute engulf entry or a 15- or 30-minute QM entry at its left shoulder, one entry a visit to a zone, a 30-pip stop and a 90-pip target. Nothing is traded and results are before costs.' },
   lit: { tfs: ['5m'], markets: Object.keys(SOP.ALL), read: litTrades, note: 'A paper record of the LIT detector on eleven markets, with the rule\'s execution where it gives an order and two looser study executions otherwise: nothing is traded, results are before costs, and it is not a tested rule.' } };
 export function buildDesk(name, perMarket, prev, now, days) {
   let records = (prev && prev.records) || [], through = (prev && prev.through) || 0; const read = [];

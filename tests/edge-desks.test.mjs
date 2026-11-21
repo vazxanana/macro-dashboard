@@ -88,7 +88,7 @@ const B15 = (() => { const o = { ...B }, sec = 900, out = []; for (const b of B[
 
 test('engulf zones: a zone is the engulfed candle, known at the engulfing close, touched and failed only by later candles', () => {
   const C = [{ time: 0, open: 10, high: 11, low: 9, close: 9.5 }, { time: 900, open: 9.5, high: 12, low: 9.4, close: 11.5 }, { time: 1800, open: 11.5, high: 12.5, low: 11.2, close: 12 }, { time: 2700, open: 12, high: 12.1, low: 10.5, close: 10.8 }, { time: 3600, open: 10.8, high: 10.9, low: 8, close: 8.5 }];
-  const z = G.zones(C, '15m').filter((x) => x.dir > 0)[0]; assert.deepEqual([z.top, z.bot, z.base, z.at], [10, 9, 0, 1800], 'a body engulf: the zone runs from the wick to the engulfed candle\'s open'); assert.equal(z.touch, 3600, 'the first later candle that trades into it'); assert.equal(z.fail, 4500, 'a close through its far side');
+  const z = G.zones(C, '15m').filter((x) => x.dir > 0)[0]; assert.deepEqual([z.top, z.bot, z.base, z.at], [11, 9, 0, 1800], 'the zone is the engulfed candle, wick to wick'); assert.equal(z.touch, 2700, 'the first later candle that trades into it'); assert.equal(z.fail, 4500, 'a close through its far side');
   assert.equal(G.zones([{ time: 0, open: 10, high: 11, low: 9, close: 9.5 }, { time: 900, open: 9.5, high: 10.4, low: 9.4, close: 9.9 }], '15m').length, 0, 'a close short of the previous open is no engulf');
 });
 test('the three methods: a fixed stop on the losing side, a 2R target (the direct entry: none, a trailed stop), one position at a time, no look-ahead', () => {
@@ -185,7 +185,7 @@ test('audit: the gold plan books in the order of the fills (cut just after an en
   for (const seed of [11, 4]) { const X = seed === 11 ? B : market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, full = G2.snrTrades(Y, { from: 0 });
     for (const r of full.filter((x) => x.t > X['5m'][0].time + 35 * 86400).slice(0, 30)) { const T = r.t + 300, early = G2.snrTrades(cutAt(Y, T), { from: 0 }); seen++;
       assert.ok(early.some((e) => e.id === r.id && e.entry === r.entry && e.stop === r.stop), 'seed ' + seed + ': found only with later candles: ' + r.id); }
-    const H4 = X['4h']; for (const s of G2.snrSides(X['1d'], H4)) { const i = H4.findIndex((b) => b.time + 14400 === s.t); assert.ok(s.dir > 0 ? H4[i].close > s.level && !(H4[i - 1].close > s.level) : H4[i].close < s.level && !(H4[i - 1].close < s.level), 'the candle that takes the level'); } }
+    const H4 = X['4h']; for (const s of G2.snrSides(X['1d'], H4)) { const i = H4.findIndex((b) => b.time + 14400 === s.boT); assert.ok(s.dir > 0 ? H4[i].close > s.level && !(H4[i - 1].close > s.level) : H4[i].close < s.level && !(H4[i - 1].close < s.level), 'the candle that takes the level'); } }
   assert.ok(seen >= 10, 'entries checked: ' + seen);
 });
 
@@ -268,9 +268,13 @@ test('gold plan, second entry type: a QM on the closes (shoulder, high, lower he
   assert.equal(q.length, 1); assert.deepEqual([q[0].dir, q[0].level, q[0].mid, q[0].at, q[0].head.close], [1, 9, 11, C[10].time + 900, 8]);
   assert.ok(q[0].top === 9 && q[0].bot < 9, 'the zone is the shoulder candle, from its close to its wick');
   assert.equal(G.qmSetups(C.slice(0, 10)).filter((x) => x.tf === '15m').length, 0, 'not before the close beyond the high');
-  // a break of the high before the head is a known turn is not this shape
+  // a break of the high right after the head counts (21 Nov 2026; it was dropped): the QM is known once the head is a known turn
   const early = cl.slice(); early[8] = 11.5; const E2 = early.map((c, i) => ({ ...C[i], close: c, open: i ? early[i - 1] : c, high: Math.max(c, i ? early[i - 1] : c) + 0.2, low: Math.min(c, i ? early[i - 1] : c) - 0.2 }));
-  assert.equal(G.qmSetups(E2).filter((x) => x.tf === '15m' && x.level === 9).length, 0);
+  const qe = G.qmSetups(E2).filter((x) => x.tf === '15m' && x.level === 9); assert.equal(qe.length, 1); assert.equal(qe[0].at, C[9].time + 900, 'dated at the close that makes the head a known turn, not at the break before it');
+  assert.equal(G.qmSetups(E2.slice(0, 9)).filter((x) => x.tf === '15m' && x.level === 9).length, 0, 'not while the head is not yet a known turn');
+  // a close above the high BEFORE the head is not this shape
+  const pre = cl.slice(); pre[6] = 11.6; const E3 = pre.map((c, i) => ({ ...C[i], close: c, open: i ? pre[i - 1] : c, high: Math.max(c, i ? pre[i - 1] : c) + 0.2, low: Math.min(c, i ? pre[i - 1] : c) - 0.2 }));
+  assert.equal(G.qmSetups(E3).filter((x) => x.tf === '15m' && x.level === 9 && x.mid === 11).length, 0);
   // a sell mirrors it
   const S = C.map((b) => ({ time: b.time, open: 30 - b.open, high: 30 - b.low, low: 30 - b.high, close: 30 - b.close })), qs = G.qmSetups(S).filter((x) => x.tf === '15m');
   assert.equal(qs.length, 1); assert.deepEqual([qs[0].dir, qs[0].level, qs[0].mid], [-1, 21, 19]);
@@ -323,11 +327,11 @@ test('an EG closes beyond the other candle\'s HIGH (a buy) or LOW (a sell); a bo
   assert.equal(zones([c(0, 100, 101, 98.5, 99), c(1, 99, 100.8, 98.8, 100.5)], '1h').length, 0);
   // the same green closing 101.2, above the high: an EG, whatever it opened at
   const z = zones([c(0, 100, 101, 98.5, 99), c(1, 99.6, 101.5, 99.2, 101.2)], '1h');
-  assert.equal(z.length, 1); assert.equal(z[0].dir, 1); assert.equal(z[0].top, 100); assert.equal(z[0].bot, 98.5);
+  assert.equal(z.length, 1); assert.equal(z[0].dir, 1); assert.equal(z[0].top, 101); assert.equal(z[0].bot, 98.5);
   // a sell mirrors it: green, then red closing under the green's LOW
   assert.equal(zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.8, 98.7)], '1h').length, 0);
   const s = zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.2, 98.4)], '1h');
-  assert.equal(s.length, 1); assert.equal(s[0].dir, -1); assert.equal(s[0].bot, 99); assert.equal(s[0].top, 100.5);
+  assert.equal(s.length, 1); assert.equal(s[0].dir, -1); assert.equal(s[0].bot, 98.6); assert.equal(s[0].top, 100.5);
 });
 
 // 21 Nov 2026 (owner, on a EUR/USD plan buy: "there is no eg sell fail on m5 to enter buy"): the M5 engulf that failed must be
@@ -353,4 +357,356 @@ test('an EF counts like an EG on the gold plan only: its EF triggers keep their 
       // the gold plan reads its side from about 35 days of history: only later trades are checked against a cut (as above)
       if (r.t > X['5m'][0].time + 35 * 86400 && cuts++ < 8) { const one = G.snrTrades(cutAt(Y, r.t + 300), { from: 0 }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.equal(one.entry, r.entry); } } }
   assert.ok(n >= 1 && cuts >= 1, 'gold-plan entries on a failed M15 / M30 zone: ' + n + ', checked against a cut: ' + cuts);
+});
+
+// ─── 21 Nov 2026: the engulf as the methods draw it (owner: "build"; an engulf may take "as many [candles] as it needs") ───
+test('an engulf: the base candle wick to wick, completed by the first close beyond it however many candles later; a newer opposite candle or a close through the other side ends a pending base', () => {
+  const c = (i, o, h, l, cl) => ({ time: 1_780_000_000 + i * 900, open: o, high: h, low: l, close: cl }), T = (i) => 1_780_000_000 + i * 900;
+  // red base (high 101, low 98.5), an up candle that stays under its high, a doji, then the close above the high
+  const C = [c(0, 100, 101, 98.5, 99), c(1, 99, 100.6, 98.9, 100.4), c(2, 100.4, 100.7, 100.1, 100.4), c(3, 100.4, 102, 100.2, 101.6), c(4, 101.6, 103, 101.5, 102.8)];
+  const z = G.zones(C, '15m'); assert.equal(z.length, 1, 'one zone a base: the first close beyond it');
+  assert.deepEqual([z[0].dir, z[0].top, z[0].bot, z[0].base, z[0].at, z[0].i], [1, 101, 98.5, T(0), T(4), 3], 'the base candle wick to wick, known from the completing close');
+  for (let n = 1; n <= 3; n++) assert.equal(G.zones(C.slice(0, n), '15m').length, 0, 'no zone before the completing candle has closed');
+  assert.deepEqual(G.engulfAt(C, 3), { dir: 1, j: 0 }); assert.equal(G.engulfAt(C, 1), null); assert.equal(G.engulfAt(C, 2), null, 'a doji completes nothing');
+  assert.equal(G.engulfAt(C, 3, 2), null, 'the D1 / H4 / H1 engulf rule keeps its own look-back');
+  // a newer red candle takes the base's place: the close must be beyond ITS high, and the older base is never completed
+  const N = [c(0, 100, 101, 98.5, 99), c(1, 99, 99.8, 98.9, 99.6), c(2, 99.6, 99.9, 99.1, 99.3), c(3, 99.3, 100.5, 99.2, 100.3), c(4, 100.3, 101.8, 100.2, 101.5)];
+  const zn = G.zones(N, '15m'); assert.equal(zn.length, 1); assert.deepEqual([zn[0].base, zn[0].top, zn[0].bot, zn[0].at], [T(2), 99.9, 99.1, T(4)]);
+  // a close through the base's other side before the completing close cancels it
+  const X = [c(0, 100, 101, 98.5, 99), c(1, 98, 98.4, 97.8, 98.3), c(2, 98.3, 101.9, 98.2, 101.5)];
+  assert.equal(G.zones(X, '15m').length, 0);
+  // a sell mirrors it
+  const S = C.map((b) => ({ time: b.time, open: 200 - b.open, high: 200 - b.low, low: 200 - b.high, close: 200 - b.close })), zs = G.zones(S, '15m');
+  assert.equal(zs.length, 1); assert.deepEqual([zs[0].dir, zs[0].top, zs[0].bot, zs[0].at], [-1, 101.5, 99, T(4)]);
+  // on a long path: every zone is its base candle, the run between is never of the base's colour, many take more than one candle,
+  // and nothing known at a cut changes with the candles after it
+  const M = B15['15m'], Z = G.zones(M, '15m'), at = new Map(M.map((b, i) => [b.time, i])); let multi = 0;
+  for (const q of Z) { const j = at.get(q.base), b = M[j]; assert.deepEqual([q.top, q.bot], [b.high, b.low]); assert.ok(q.dir > 0 ? b.open > b.close && M[q.i].close > b.high : b.open < b.close && M[q.i].close < b.low);
+    for (let x = j + 1; x < q.i; x++) assert.ok(q.dir > 0 ? !(M[x].open > M[x].close) && !(M[x].close > b.high) : !(M[x].open < M[x].close) && !(M[x].close < b.low)); if (q.i > j + 1) multi++;
+    assert.equal(q.at, M[q.i].time + 900); assert.ok(q.touch == null || q.touch >= q.at); assert.ok(q.fail == null || q.fail > q.at); }
+  assert.ok(multi >= 20, 'engulfs that take more than one candle: ' + multi);
+  const cutI = Math.floor(M.length / 2), Tc = M[cutI].time, early = G.zones(M.slice(0, cutI), '15m'), key = (q) => [q.dir, q.base, q.at, q.top, q.bot].join('|');
+  assert.deepEqual(early.map(key), Z.filter((q) => q.at <= Tc).map(key));
+  // the D1 / H4 / H1 engulf rule reads the same definition, with its own look-back
+  assert.match(rd('council/edge-desks.mjs'), /engulfAt\(C, m, EG\.k\)/);
+  assert.doesNotMatch(rd('council/eg-methods.mjs'), /An engulf here = a BODY engulf|body-engulf zones/);
+});
+
+test('plan and simple: the 15- / 30-minute engulf zone lies inside the H4 zone, the M5 entry zone is at the zone, and the limit is on the base candle\'s wick', () => {
+  let n = 0;
+  for (const seed of [11, 5, 23, 31, 47]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) }, m5 = new Map(Y['5m'].map((b) => [b.time, b]));
+    for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind !== 'eg-direct')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips from the entry');
+      const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), en = r.marks.find((k) => k.label === 'M5 EG zone · entry');
+      assert.ok(trg.bot >= h4.bot && trg.top <= h4.top, 'the trigger zone is not wholly inside the H4 zone: ' + r.id);
+      assert.ok(en.bot <= Math.max(h4.top, trg.top) && en.top >= Math.min(h4.bot, trg.bot), 'the entry zone is away from the zone: ' + r.id);
+      const base = m5.get(en.a); assert.deepEqual([en.top, en.bot], [base.high, base.low], 'the entry zone is its base candle, wick to wick'); assert.equal(r.entry, r.side > 0 ? base.high : base.low); } }
+  assert.ok(n >= 10, 'plan / simple entries: ' + n);
+  // no look-ahead: an entry is found, the same, with the candles cut just after its fill
+  let cuts = 0; for (const r of G.methodTrades(B15, { from: 0, market: 'xau' }).filter((x) => x.t > B['5m'][0].time + 30 * 86400).filter((_, i) => i % 4 === 0).slice(0, 10)) { cuts++;
+    const one = G.methodTrades(cutAt(B15, r.t + 300), { from: 0, market: 'xau' }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.deepEqual([one.entry, one.stop, one.t], [r.entry, r.stop, r.t]); }
+  assert.ok(cuts >= 5, 'entries checked against a cut: ' + cuts);
+  const src = rd('council/eg-methods.mjs'); assert.match(src, /m\.bot >= z\.bot && m\.top <= z\.top/); assert.match(src, /&& atZone\(z\)\) E = z;/);
+});
+
+// the close of the n-th weekday after a day (the gold plan's break window counts trading days)
+const tradeEnd = (day, n) => { let t = day, k = 0; while (k < n) { t += 86400; const w = new Date(t * 1000).getUTCDay(); if (w !== 0 && w !== 6) k++; } return t + 86400; };
+test('gold plan: the H4 break is of the level that stood before the Daily level was tapped, and a break on the rejection day counts', () => {
+  let n = 0, sameDay = 0, cuts = 0;
+  for (const seed of [11, 4, 5, 23, 31]) { const X = seed === 11 ? B : market(120, seed), D1 = X['1d'], H4 = X['4h'], ix = new Map(H4.map((b, i) => [b.time, i]));
+    for (const s of G.snrSides(D1, H4)) { n++; const tap = ix.get(s.tapT), lj = ix.get(s.levelT), bo = ix.get(s.boT - 14400), up = s.dir > 0;
+      assert.ok(s.tapT >= s.day && s.tapT < s.day + 86400 && (up ? H4[tap].low <= s.key.p : H4[tap].high >= s.key.p), 'the tap: an H4 candle of the rejecting day that trades to the Daily level');
+      for (let q = s.day / 14400; q * 14400 < s.tapT; q++) { const b = H4[ix.get(q * 14400)]; if (b) assert.ok(up ? b.low > s.key.p : b.high < s.key.p, 'the first such candle'); }
+      assert.equal(H4[lj].close, s.level); assert.ok(lj + G.SNR.piv <= tap, 'the level was a known turn by the close of the tap candle: external');
+      for (let q = 1; q <= G.SNR.piv; q++) assert.ok(up ? H4[lj].close > H4[lj - q].close && H4[lj].close > H4[lj + q].close : H4[lj].close < H4[lj - q].close && H4[lj].close < H4[lj + q].close, 'a turn of the closes');
+      assert.ok(bo >= tap, 'the break is not before the tap'); for (let q = lj + 1; q < bo; q++) assert.ok(up ? !(H4[q].close > s.level) : !(H4[q].close < s.level), 'the first close beyond the level');
+      assert.ok(up ? H4[bo].close > s.level : H4[bo].close < s.level); assert.ok(s.boT <= tradeEnd(s.day, G.SNR.boDays), 'inside the trading-day window');
+      assert.equal(s.t, Math.max(s.boT, s.day + 86400), 'known at the later of the break and the Daily close'); if (s.boT <= s.day + 86400) sameDay++;
+      // nothing after the moment the side is known is read
+      if (cuts++ < 40) { const one = G.snrSides(D1.filter((b) => b.time + 86400 <= s.t), H4.filter((b) => b.time + 14400 <= s.t)).find((x) => x.day === s.day && x.dir === s.dir); assert.ok(one, 'found with the candles cut at the side'); assert.deepEqual([one.t, one.level, one.boT], [s.t, s.level, s.boT]); } } }
+  assert.ok(n >= 10 && sameDay >= 1, 'sides: ' + n + ', broken on the rejection day itself: ' + sameDay);
+});
+
+test('the direction\'s engulf zones of the timeframe above follow the same definition: a close beyond the base\'s high / low, the base candle wick to wick', () => {
+  let s = 77; const rnd = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; const P = []; let p = 4000, drift = 0;
+  for (let i = 0, t = 1767571200; i < 6000; i++, t += 14400) { if (new Date(t * 1000).getUTCDay() % 6 === 0) continue; if (i % 40 === 0) drift = (rnd() - 0.5) * 12; const o = p, c = o + drift + (rnd() - 0.5) * 30; P.push({ time: t, open: o, high: Math.max(o, c) + rnd() * 8, low: Math.min(o, c) - rnd() * 8, close: c }); p = c; }
+  const day = (t) => Math.floor(t / 86400) * 86400, R = G.direction(P, day, 86400), days = []; for (const b of P) { const k = day(b.time), q = days[days.length - 1]; if (q && q.time === k) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else days.push({ time: k, open: b.open, high: b.high, low: b.low, close: b.close }); }
+  const DZ = G.zones(days, '1d'), egs = R.events.filter((e) => e.kind === 'eg' || e.kind === 'ef'); assert.ok(egs.filter((e) => e.kind === 'eg').length >= 2, 'switches on a Daily engulf zone: ' + egs.length);
+  for (const e of egs) { const z = e.kind === 'eg' ? DZ.find((q) => q.base === e.zoneT && q.dir === e.s) : DZ.find((q) => q.dir === -e.s && q.fail === e.zoneAt && q.bot === e.bottom && q.top === e.top); assert.ok(z, 'the zone is one of zones(): ' + e.kind + ' ' + e.zoneT);
+    assert.deepEqual([e.bottom, e.top], [z.bot, z.top]); assert.equal(e.zoneAt, e.kind === 'eg' ? z.at : z.fail); }
+  assert.match(rd('council/eg-methods.mjs'), /const eg = engulfAt\(H, H\.length - 1\);/);
+});
+
+// ─── 21 Nov 2026, second pass against the documents: what each page shows that the desks did not apply yet ───
+const rows = (a) => a.map(([time, open, high, low, close]) => ({ time, open, high, low, close }));
+const closedBack = (H4, mark, d, T) => H4.some((b) => b.time + 14400 > mark.at && b.time + 14400 <= T && (d > 0 ? b.close < mark.bot : b.close > mark.top));
+
+test('plan and simple: the trigger zone is wholly inside the H4 zone, the entry price is inside it, and a turned H4 zone is dead once an H4 candle closes back through it', () => {
+  let n = 0, turned = 0, cuts = 0;
+  for (const seed of [11, 5, 23, 31, 47]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) }, all = G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind !== 'eg-direct');
+    for (const r of all) { n++; assert.ok(stopOk(r));
+      const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), T = r.log[0].t;
+      assert.ok(trg.bot >= h4.bot && trg.top <= h4.top, 'the 15- / 30-minute engulf zone pokes out of the H4 zone: ' + r.id);
+      assert.ok(r.entry >= h4.bot && r.entry <= h4.top, 'the entry price is outside the H4 zone: ' + r.id);
+      if (h4.label === 'H4 EF (zone failed)') { turned++; assert.ok(!closedBack(X['4h'], h4, r.side, T), 'a turned H4 zone an H4 candle had closed back through: ' + r.id); } }
+    // no look-ahead: found the same with the candles cut just after the fill
+    for (const r of all.filter((x) => x.t > X['5m'][0].time + 30 * 86400).filter((_, i) => i % 5 === 0).slice(0, 6)) { cuts++;
+      const one = G.methodTrades(cutAt(Y, r.t + 300), { from: 0, market: 'xau' }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.deepEqual([one.entry, one.stop, one.t], [r.entry, r.stop, r.t]); } }
+  assert.ok(n >= 10 && turned >= 1 && cuts >= 5, `entries ${n}, in a turned zone ${turned}, cut checks ${cuts}`);
+});
+
+// Real candles of 1 May 2024 (OANDA mid, UTC), the morning one of the methods draws as its own example: the 5-minute candle of
+// 05:00 completes the M5 buy engulf of the 04:55 candle AND closes through the M5 sell zone above it, inside the 15-minute
+// candle (05:00 to 05:15) that completes the trigger. Until this pass a failure before the trigger candle had closed was
+// thrown away, and the limit at that M5 engulf (the example's entry, stop and target to a cent) was never placed.
+test('plan and simple: the M5 failure may come inside the candle that completes the trigger, and the entry zone is the M5 engulf that same candle completed (the short method\'s own example)', () => {
+  const F = JSON.parse(rd('tests/fixtures/xau-oanda-2024-05-01.json')), X = Object.fromEntries(['1d', '4h', '1h', '15m', '5m'].map((tf) => [tf, rows(F[tf])]));
+  const U = (h, m) => Date.UTC(2024, 4, 1, h, m) / 1000, find = (o) => o.find((x) => x.base === U(4, 55) && x.side === 1);
+  const o = []; G.methodTrades(X, { from: 0, market: 'xau', orders: o }); const x = find(o);
+  assert.ok(x, 'the order at the 04:55 M5 engulf'); assert.equal(x.kind, 'eg-simple', 'the Daily\'s last engulf is a sell: the short method');
+  assert.deepEqual([x.entry, +x.stop.toFixed(2), +x.target.toFixed(2)], [2284.33, 2281.33, 2290.33]); assert.equal(x.placed, U(5, 15), 'it rests only from the close of the trigger candle, not from the M5 close inside it');
+  const base = X['5m'].find((b) => b.time === U(4, 55)); assert.equal(x.entry, base.high); assert.ok(base.close < base.open);
+  // the desk's one-hour limit (an open owner question) ends before price comes back at 07:40, so no trade is booked from it
+  assert.equal(x.until, U(6, 15)); assert.equal(x.fillT, null);
+  const i = X['5m'].findIndex((b) => b.time >= x.placed && b.low <= x.entry); assert.equal(X['5m'][i].time, U(7, 40), 'the first return to the limit');
+  const oc = G.outcome(X['5m'], i, 1, x.entry, x.stop, x.target, Infinity); assert.equal(oc.status, 'target', 'from that return the example\'s target comes before its stop');
+  // with a limit that lives until then, the order fills at that candle (the life is the only thing changed)
+  const keep = G.EGM.fill; try { G.EGM.fill = 30; const o2 = []; G.methodTrades(X, { from: 0, market: 'xau', orders: o2 }); assert.equal(find(o2).fillT, U(7, 40)); } finally { G.EGM.fill = keep; }
+  // nothing after the trigger's close is needed to place it
+  const o3 = []; G.methodTrades(cutAt(X, U(5, 15)), { from: 0, market: 'xau', orders: o3 }); assert.deepEqual([find(o3).entry, find(o3).placed], [x.entry, x.placed]);
+  // every order names an engulf completed by the failing close when there is one
+  const src = rd('council/eg-methods.mjs'); assert.match(src, /z\.fail <= t0 \|\|/); assert.match(src, /const P = at5\.get\(d \+ ':' \+ F\.fail\)/);
+});
+
+// the gold plan's own pictures, typed in as candles: an open-close level at 100 made by two up days; a later day wicks to 99 and
+// closes back above; on H4 the last A level before the drop to the level has ONE candle between it and the tap candle
+const planCase = ({ wick = false, body = false, boDay = 1, start = 20000 } = {}) => {   // day 20000 is a Friday
+  const days = []; for (let d = start; days.length < 24; d++) { const w = new Date(d * 86400000).getUTCDay(); if (w !== 0 && w !== 6) days.push(d * 86400); }
+  const D = [], dd = (o, h, l, c) => D.push({ time: days[D.length], open: o, high: h, low: l, close: c });
+  dd(90, 93, 89, 92); dd(92, 96, 91, 95); dd(95, 96, 90, 91); dd(91, 95, 90, 94); dd(94, 101, 93, 100); dd(100, 110, 98.5, 109);   // the level: 100; the second candle of its pair wicks through it
+  if (wick) dd(109, 110, 99.5, 105.2); else dd(109, 110, 104, 105.2);                                    // a later WICK on the level
+  if (body) { dd(105.2, 106, 97, 98); dd(98, 104.9, 97.5, 104.7); }                                     // then a body down through it and a body back up: fresh again
+  const rej = D.length; dd(104.5, 106.6, 99, 105.3);
+  for (let q = 0; q < boDay - 1; q++) dd(105, 105.4, 104.6, 105);                                       // quiet days under the H4 level
+  dd(105, 125, 104.8, 124); dd(124, 130, 122, 128); dd(128, 131, 126, 130);
+  const H = [], h = (di, k, o, hi, lo, c) => H.push({ time: days[di] + k * 14400, open: o, high: hi, low: lo, close: c });
+  const flat = (di) => { const x = D[di]; for (let k = 0; k < 6; k++) { const a = x.open + (x.close - x.open) * k / 6, b = x.open + (x.close - x.open) * (k + 1) / 6; h(di, k, a, Math.max(a, b) + 0.2, Math.min(a, b) - 0.2, b); } };
+  for (let di = 0; di < rej - 1; di++) flat(di);
+  const p = rej - 1; h(p, 0, 109, 110, 108.5, 109.6); h(p, 1, 109.6, 109.8, 107, 107.5); h(p, 2, 107.5, 107.8, 106, 106.3); h(p, 3, 106.3, 106.5, 104.4, 104.6); h(p, 4, 104.6, 105, 104.2, 104.6); h(p, 5, 104.6, 105.2, 104.4, 105);
+  // the rejection day: W closes 105.5 (the A level), one down candle, the tap candle, the engulf, two small candles under the level
+  h(rej, 0, 104.5, 106.6, 104.2, 105.5); h(rej, 1, 105.5, 105.6, 102.5, 102.8); h(rej, 2, 102.8, 103.3, 99, 100.4); h(rej, 3, 100.4, 104.5, 100.2, 104.3); h(rej, 4, 104.3, 105.5, 103.5, 104.2); h(rej, 5, 104.2, 105.5, 103.8, 105);
+  for (let q = 1; q < boDay; q++) for (let k = 0; k < 6; k++) h(rej + q, k, 105, 105.4, 104.6, 105);
+  const b = rej + boDay; h(b, 0, 105, 105.5, 104.8, 105.2); h(b, 1, 105.2, 105.4, 104.8, 105); h(b, 2, 105, 107.8, 104.9, 107.5); h(b, 3, 107.5, 112, 107, 111.5); h(b, 4, 111.5, 119, 111, 118); h(b, 5, 118, 125, 117, 124);
+  for (let di = b + 1; di < D.length; di++) flat(di);
+  return { D, H, rej: D[rej].time, W: days[rej], tap: days[rej] + 2 * 14400, bo: days[b] + 3 * 14400 };
+};
+const sideOf = (c) => G.snrSides(c.D, c.H).find((s) => s.day === c.rej);
+
+test('gold plan: an H4 A / V turn completed by the tap candle\'s close is the level that is broken (the plan\'s own example)', () => {
+  const c = planCase(), s = sideOf(c); assert.ok(s, 'the side of the example');
+  assert.deepEqual([s.dir, s.key.kind, s.key.p], [1, 'OC', 100]); assert.equal(s.tapT, c.tap);
+  assert.equal(s.level, 105.5, 'the A level right before the drop to the Daily level, not the older peak (109.6)'); assert.equal(s.levelT, c.W);
+  assert.equal(s.boT, c.bo, 'the first close above 105.5: the large candle of the next day'); assert.equal(s.t, c.bo);
+  // known without any later candle
+  const one = G.snrSides(c.D.filter((b) => b.time + 86400 <= s.t), c.H.filter((b) => b.time + 14400 <= s.t)).find((x) => x.day === c.rej); assert.deepEqual([one.level, one.boT], [s.level, s.boT]);
+});
+
+test('gold plan: the rejected Daily level must be fresh: a wick since it formed spends it, a body through it makes it fresh again, the second candle of its own pair does not count', () => {
+  assert.ok(sideOf(planCase()), 'only the second candle of the pair wicked through the level: fresh');
+  assert.equal(sideOf(planCase({ wick: true })), undefined, 'a later Daily candle put a wick on the level: not fresh, no rejection of it');
+  const c = planCase({ wick: true, body: true }), s = sideOf(c); assert.ok(s, 'a body through the level after that wick: fresh again'); assert.equal(s.key.p, 100);
+  // on generated markets: every side's level is fresh by the rule, read only from candles before the rejecting one
+  let n = 0;
+  for (const seed of [11, 4, 5, 23, 31]) { const X = seed === 11 ? B : market(120, seed), D1 = X['1d'], ix = new Map(D1.map((b, i) => [b.time, i]));
+    for (const s of G.snrSides(D1, X['4h'])) { n++; const i = ix.get(s.day), p = s.key.p; let f = D1.findIndex((b, j) => j < i && b.close === p && (s.key.kind === 'OC' ? D1[j + 1].time === s.key.t : b.time === s.key.t)); assert.ok(f >= 0, 'the level\'s own candle');
+      let fresh = true; for (let q = f + 2; q < i; q++) { const b = D1[q]; if (b.low > p || b.high < p) continue; fresh = (b.open < p && b.close > p) || (b.open > p && b.close < p); }
+      assert.ok(fresh, 'a side on a level a wick had spent'); } }
+  assert.ok(n >= 5, 'sides checked: ' + n);
+});
+
+test('gold plan: the H4 break has three TRADING days after the rejection day, whatever the weekday', () => {
+  // day 20000 is a Friday: the first weekday of the case; the rejection day is its 7th weekday
+  const wd = (c) => new Date(c.rej * 1000).getUTCDay();
+  for (const start of [20000, 20003, 20004, 20005, 20006]) {   // rejection on a Monday, Tuesday, Wednesday, Thursday, Friday
+    const c3 = planCase({ boDay: 3, start }), c4 = planCase({ boDay: 4, start }), s = sideOf(c3);
+    assert.ok(s, 'a break on the third trading day counts, rejection on weekday ' + wd(c3)); assert.equal(s.boT, c3.bo); assert.ok(s.boT <= tradeEnd(c3.rej, 3));
+    assert.equal(sideOf(c4), undefined, 'a break on the fourth trading day does not, rejection on weekday ' + wd(c4)); }
+  assert.deepEqual([20000, 20003, 20004, 20005, 20006].map((start) => wd(planCase({ start }))).sort(), [1, 2, 3, 4, 5]);
+  assert.equal(G.SNR.boDays, 3);
+});
+
+test('gold plan: one entry a visit to an H4 zone on one side (the first order that fills, whatever its type); a visit ends with a closed M15 candle wholly outside the zone; the 2-a-day limit after it', () => {
+  let visits = 0, again = 0, cuts = 0;
+  for (const seed of [11, 4, 5, 23, 31]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) }, M15 = Y['15m'], o = [], tr = G.snrTrades(Y, { from: 0, market: 'xau', orders: o });
+    assert.deepEqual(o.filter((x) => x.took === 'trade').map((x) => x.id), tr.map((r) => r.id), 'the trades are the orders that were taken');
+    const out = (z, a, b) => M15.some((c) => c.time >= a - a % 900 + 900 && c.time + 900 <= b && (c.low > z.top || c.high < z.bot)), last = new Map(), perDay = {};
+    for (let i = 1; i < o.length; i++) assert.ok(o[i].t >= o[i - 1].t, 'decided in the order of the fills');
+    for (const x of o) { const k = x.side + ':' + x.zone.dir + ':' + x.zone.base, pv = last.get(k);
+      if (x.took === 'same') { if (pv == null || out(x.zone, pv, x.t)) last.set(k, x.t); continue; }   // the order another trigger already gave: no second record, but its own zone's entry of this visit
+      if (x.took === 'visit') { visits++; assert.ok(pv != null && !out(x.zone, pv, x.t), 'refused although price had left the zone since the visit\'s entry: ' + x.id); continue; }
+      if (pv != null) { again++; assert.ok(out(x.zone, pv, x.t), 'a second entry in one visit: ' + x.id); }
+      last.set(k, x.t); const d = Math.floor(x.t / 86400); if (x.took === 'trade') { perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay); } else assert.ok(x.took === 'day' && perDay[d] >= G.SNR.perDay, 'refused by the day\'s limit only when the day is full'); }
+    for (const r of tr) { assert.ok(stopOk(r)); const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)); if (h4.label === 'H4 EF (zone failed)') assert.ok(!closedBack(X['4h'], h4, r.side, r.log[1].t), 'a turned H4 zone an H4 candle had closed back through: ' + r.id); }
+    // no look-ahead (the sides need about 35 days of candles first)
+    for (const r of tr.filter((x) => x.t > X['5m'][0].time + 35 * 86400).filter((_, i) => i % 4 === 0).slice(0, 6)) { cuts++; assert.ok(G.snrTrades(cutAt(Y, r.t + 300), { from: 0 }).some((e) => e.id === r.id && e.entry === r.entry && e.stop === r.stop), 'found only with later candles: ' + r.id); } }
+  assert.ok(visits >= 1 && again >= 1 && cuts >= 5, `orders refused as a visit's second entry ${visits}, entries on a later visit ${again}, cut checks ${cuts}`);
+});
+
+test('the MSNR desk says what kinds msnr-main / msnr-other are: the owner\'s earlier scalp method, not an entry of the documents', () => {
+  const phrase = 'the owner\'s earlier scalp method (direction call + m15 / m5 engulf)', text = (p) => rd(p).replace(/\\'/g, '\'').toLowerCase();
+  assert.ok(text('assets/desk-trades.js').includes(phrase)); assert.ok(text('council/edge-desks.mjs').includes(phrase));
+  const r = E.msnrTrades({ ...B, '15m': m15of(B['5m']) }, { from: 0, market: 'xau' })[0]; if (r) assert.match(r.label, /^Earlier scalp method · /);
+});
+
+// ─── LIT desk fixes (21 Nov 2026): daily limits, the Asia session's extreme alone, re-sweeps tested, a smallest stop ───
+const LM = await import('../council/lit.mjs');
+const lbT = (a, v) => { let lo = 0, hi = a.length; while (lo < hi) { const m = (lo + hi) >> 1; if (a[m] < v) lo = m + 1; else hi = m; } return lo; };
+// the detector's candidates of one seeded market, both sides, with the series they were read on
+function litCands(X) { const b5 = LM.cleanBars(X['5m']), m15 = LM.agg15(b5), out = [];
+  for (const dir of ['short', 'long']) { const S15 = LM.series(m15, dir === 'long', LM.XAU.tick), S5 = LM.series(b5, dir === 'long', LM.XAU.tick);
+    for (const cd of LM.fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900; out.push({ cd, S15, S5, dir }); } }
+  return out; }
+const litM5 = { ...LM.XAU, cost: () => 0 };
+
+test('LIT desk: the daily limits hold on every execution (one London and one New York-morning fill a day, a win ends the day, stop at -1.5R)', () => {
+  let cut = 0, seen = 0;
+  for (const seed of [5, 9, 3]) { const X = market(120, seed), lit = E.litTrades(X, { from: 0 }), free = E.litTrades(X, { from: 0, limits: false });
+    for (const kind of ['lit-rule', 'lit-loose', 'lit-break']) { const days = new Map();
+      for (const r of lit.filter((x) => x.kind === kind)) { seen++;
+        const day = LM.nyInfo(r.t - 300).day, sess = LM.nyInfo(r.log[0].t - 900).sess, ds = days.get(day) || { fills: {}, R: 0, won: false }; days.set(day, ds);
+        assert.ok(['LONDON', 'NY_AM'].includes(sess), 'a sweep in London or the New York morning: ' + r.id);
+        assert.ok(!ds.won, 'no trade after a win that day: ' + r.id); assert.ok(ds.R > LM.P.dayCapR, 'no trade once the day is at -1.5R: ' + r.id); assert.ok(!ds.fills[sess], 'one fill a session: ' + r.id);
+        ds.fills[sess] = 1; if (r.R != null) { ds.R += r.R; if (r.R > 0) ds.won = true; } } }
+    cut += free.length - lit.length;
+    assert.equal(new Set(lit.map((r) => r.id)).size, lit.length, 'ids are unique');
+    // the old reading (the desk-slices study) keeps no limits
+    assert.deepEqual(E.litTrades(X, { from: 0, first: true }).map((r) => r.id), E.litTrades(X, { from: 0, first: true, limits: false, asia: false }).map((r) => r.id)); }
+  assert.ok(seen >= 60 && cut >= 3, 'the limits removed trades on these candles: ' + cut + ' of ' + seen);
+});
+
+test('LIT desk: a sweep of the Asia session\'s extreme alone gives no trade; with older untaken structure taken in the same move it does', () => {
+  // hand-made M15 highs: an older swing high (the day before), Asia's high, then the sweep candle
+  const mk = (older, asiaHi, mx) => { const h = [4000, older, 4000, 3999, 4001, asiaHi, 4002, mx], ny = h.map((_, i) => ({ day: i < 4 ? 1 : 2 })), pivH = h.map((_, i) => (i === 1 ? 1 : 0));
+    return [{ h, ny, pivH, tick: 0.01 }, { kind: 'ASIA', s: 7, MX: mx }]; };
+  assert.equal(E.litAsiaAlone(...mk(4010, 4005, 4006)), true, 'only the Asia high went');
+  assert.equal(E.litAsiaAlone(...mk(4010, 4005, 4010.01)), false, 'the older swing high went too');
+  assert.equal(E.litAsiaAlone(...mk(4010, 4005, 4010)), true, 'a touch is not a sweep (one tick beyond)');
+  assert.equal(E.litAsiaAlone(...mk(4004, 4005, 4006)), true, 'an older high Asia had already taken is not new structure');
+  { const [S, cd] = mk(4010, 4005, 4011); assert.equal(E.litAsiaAlone(S, { ...cd, kind: 'pd' }), false, 'another level is not filtered'); S.pivH[1] = 0; assert.equal(E.litAsiaAlone(S, cd), false, 'an earlier day\'s high counts without being a swing'); }
+  let alone = 0, asia = 0, removed = 0;
+  for (const seed of [5, 21, 7]) { const X = market(120, seed), C = litCands(X), on = E.litTrades(X, { from: 0, limits: false }), off = E.litTrades(X, { from: 0, limits: false, asia: false });
+    removed += off.length - on.length;
+    for (const { cd, S15 } of C) { if (cd.kind !== 'ASIA') continue; asia++; const a = E.litAsiaAlone(S15, cd); if (a) alone++;
+      // no look-ahead: the same answer on the candles up to the candle that closed back
+      const n = cd.r + 1, cutS = { h: S15.h.slice(0, n), ny: S15.ny.slice(0, n), pivH: S15.pivH.slice(0, n), tick: S15.tick }; for (let k = Math.max(0, n - LM.P.pivot); k < n; k++) cutS.pivH[k] = 0;
+      assert.equal(E.litAsiaAlone(cutS, cd), a); }
+    // every Asia-level trade left on the desk comes from a candidate that also took older structure
+    for (const r of on) { if (!/the Asia session's/.test(r.log[0].text)) continue;
+      const hit = C.filter(({ cd, dir }) => cd.kind === 'ASIA' && cd.t + 900 === r.log[0].t && (dir === 'short') === (r.side < 0)); assert.ok(hit.length && hit.some(({ cd, S15 }) => !E.litAsiaAlone(S15, cd)), r.id); } }
+  assert.ok(asia >= 20 && alone >= 15 && alone < asia && removed >= 3, `Asia candidates ${asia}, alone ${alone}, trades removed ${removed}`);
+});
+
+test('LIT desk: the study executions test a new extreme as a new sweep: one waiting period, the swing known by then, at most two re-sweeps, a smallest stop', () => {
+  assert.equal(E.LIT_MIN_STOP, 0.00014); assert.equal(E.LIT_RESWEEPS, 2);
+  for (const s of E.LIT_SETS) assert.equal(!!s.resweep, s.id !== 'rule', 'the rule is the pre-registered one: a break of the extreme voids it');
+  let res = 0, fresh = 0, refused = 0, oldLate = 0, n = 0;
+  for (const seed of [5, 9]) for (const { cd, S15, S5 } of litCands(market(120, seed))) for (const set of E.LIT_SETS.slice(1)) {
+    const od = E.litOrder(S5, cd, litM5, set, S15), old = E.litOrder(S5, cd, litM5, E.litOldSet(set), S15);
+    const a0 = lbT(S5.t, cd.t), e0 = lbT(S5.t, cd.rEnd), j00 = lbT(S5.t, cd.confEnd); let m0 = a0; for (let k = a0; k < e0; k++) if (S5.h[k] > S5.h[m0]) m0 = k;
+    if (old && old.b > m0 + LM.P.rbosWait) oldLate++; if (old && !od) refused++;
+    if (!od) continue; n++;
+    assert.ok(od.b <= m0 + LM.P.rbosWait, 'the break comes inside the one waiting period from the first extreme'); assert.ok(od.res <= E.LIT_RESWEEPS);
+    assert.ok(od.stop > od.entry && od.risk >= E.LIT_MIN_STOP * Math.abs(od.entry), 'a stop on the losing side, not nearer than the smallest stop');
+    // the break level: the last M5 swing low before the extreme that was confirmed when this sweep was
+    assert.ok(S5.pivL[od.p] && od.p < od.mxIdx && od.p + LM.P.pivot < od.j0 && od.level === S5.l[od.p]); for (let k = od.p + 1; k < od.mxIdx; k++) assert.ok(!(S5.pivL[k] && k + LM.P.pivot < od.j0), 'no later known swing was passed over');
+    assert.ok(od.jA >= od.j0 && od.mk >= od.j0 - 1, 'no order or market entry before the sweep in force is confirmed');
+    if (!od.res) { assert.equal(od.mxIdx, m0); assert.equal(od.j0, j00); continue; }
+    res++; if (od.p + LM.P.pivot >= j00) fresh++;
+    // the sweep tests again at the new extreme, on its M15 candles
+    const i0 = lbT(S15.t, Math.floor(S5.t[od.mxIdx] / 900) * 900);
+    const rs = [i0, i0 - 1, i0 - 2].map((i) => E.litResweep(S15, cd, i)).find((x) => x && x.MX === od.MX && od.j0 === lbT(S5.t, S15.t[x.conf] + 900)); assert.ok(rs, 'the new extreme passed the sweep tests');
+    assert.ok(LM.SESS_TRADE.includes(S15.ny[rs.s].sess) && S15.ny[rs.s].hm !== 930 && rs.r - rs.s < LM.P.rejectBars && S15.c[rs.r] < cd.L);
+    let above = 0; for (let i = rs.s; i < rs.r; i++) if (S15.c[i] >= cd.L) above++; assert.ok(above < 2, 'never two closes beyond the level');
+    let vec = false; for (let j = Math.max(0, rs.s - LM.P.vecWindow); j <= Math.min(rs.conf, rs.r + LM.P.vecWindow); j++) if (S15.vec[j]) vec = true; assert.ok(vec, 'a vector at the re-sweep');
+    // no look-ahead: the same answer with the M15 candles cut at the confirming candle, none one candle earlier
+    const cutS = (m) => ({ h: S15.h.slice(0, m), c: S15.c.slice(0, m), vec: S15.vec.slice(0, m), ny: S15.ny.slice(0, m), n: m });
+    assert.deepEqual(E.litResweep(cutS(rs.conf + 1), cd, rs.s), rs); assert.equal(E.litResweep(cutS(rs.conf), cd, rs.s), null); }
+  assert.ok(n >= 60 && res >= 10 && fresh >= 5 && refused >= 20 && oldLate >= 10, `orders ${n}, re-swept ${res}, on a swing made after the first sweep ${fresh}, refused ${refused}, old reading past the waiting period ${oldLate}`);
+  // the smallest stop: a quiet market whose buffer is almost nothing gives stops under it, which are skipped (never widened)
+  const tiny = { ...litM5, stopExtra: () => 0.0001 }; let small = 0, kept = 0;
+  for (const X of [market(120, 5, 4000, 0.15), market(120, 5)]) for (const { cd, S15, S5 } of litCands(X)) for (const set of E.LIT_SETS.slice(1)) { const noFloor = E.litOrder(S5, cd, tiny, { ...set, minStop: 0 }, S15), od = E.litOrder(S5, cd, tiny, set, S15);
+    if (noFloor && noFloor.risk < E.LIT_MIN_STOP * Math.abs(noFloor.entry)) { small++; assert.equal(od, null); } else if (noFloor) { kept++; assert.equal(od.stop, noFloor.stop); } }
+  assert.ok(small >= 1 && kept >= 1, `stops under the smallest stop ${small}, others ${kept}`);
+});
+
+test('LIT desk: no look-ahead after the fixes: a trade is found, with the same entry, stop and target, on the candles cut just after its fill', () => {
+  let cuts = 0;
+  for (const seed of [5, 9]) { const X = market(120, seed), lit = E.litTrades(X, { from: 0 }); const per = {};
+    for (const r of lit) { if ((per[r.kind] = (per[r.kind] || 0) + 1) % 3 !== 1 || r.endT == null) continue;
+      const one = E.litTrades({ '5m': X['5m'].filter((b) => b.time < r.t + 600) }, { from: 0 }).find((x) => x.id === r.id);
+      assert.ok(one, 'found when cut after the fill: ' + r.id); assert.equal(one.entry, r.entry); assert.equal(one.stop, r.stop); assert.equal(one.target, r.target); assert.equal(one.t, r.t); assert.equal(one.log[1].text, r.log[1].text); cuts++; } }
+  assert.ok(cuts >= 15, 'cuts: ' + cuts);
+});
+
+// ─── 21 Nov 2026, the independent review of the build: one order is one record, two CLOSED H4 candles, zones handed out in the order the setups were known ───
+import crypto from 'node:crypto';
+const sameOrder = (rows) => { const m = new Map(), out = []; for (const r of rows) { const k = [r.market, r.side, r.t, r.entry, r.stop].join('|'); if (m.has(k)) out.push(m.get(k) + ' = ' + r.id); else m.set(k, r.id); } return out; };
+
+test('review: gold plan: a 15- and a 30-minute trigger that give ONE order are one record and use one of the day\'s two entries', () => {
+  let same = 0, n = 0;
+  for (const seed of [4, 3, 22]) { const X = market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, o = [], tr = G.snrTrades(Y, { from: 0, market: 'xau', orders: o }); n += tr.length;
+    assert.deepEqual(sameOrder(tr), [], 'one order recorded twice (seed ' + seed + ')');
+    const taken = new Map(tr.map((r) => [r.side + '|' + r.t + '|' + r.entry, r.id])), perDay = {};
+    for (const x of o.filter((q) => q.took === 'same')) { same++; const first = o.find((q) => q.took !== 'same' && q.t === x.t && q.side === x.side && q !== x); assert.ok(first && first.took !== 'visit', 'the order it repeats was taken (or refused by the day): ' + x.id); assert.ok(!tr.some((r) => r.id === x.id)); }
+    for (const r of tr) { assert.ok(stopOk(r)); const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay); }
+    assert.equal(taken.size, tr.length); }
+  assert.ok(same >= 3 && n >= 50, `repeats of an order already taken: ${same}, trades ${n}`);
+});
+
+test('review: direct entry: "left alone for two H4 candles" counts two CLOSED H4 candles, not eight hours of clock time', () => {
+  let n = 0, weekend = 0;
+  for (const seed of [1, 6, 7, 21, 11]) { const X = market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, H4 = X['4h'];
+    for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind === 'eg-direct')) { n++; const z = r.marks[0], tc = r.log[0].t; assert.equal(z.label, 'Fresh H4 EG zone');
+      const quiet = H4.filter((b) => b.time >= z.at && b.time + 14400 <= tc); assert.equal(quiet.length, G.EGM.quiet, 'H4 candles closed between the zone and the order: ' + r.id);
+      for (const b of quiet) assert.ok(r.side > 0 ? b.low > z.top : b.high < z.bot, 'a quiet candle traded into the zone: ' + r.id);
+      assert.ok(r.t >= tc && stopOk(r)); if (tc - z.at > G.EGM.quiet * 14400) weekend++; } }
+  assert.ok(n >= 8 && weekend >= 1, `direct entries ${n}, over a weekend ${weekend}`);
+});
+
+test('review: plan and simple: an M5 zone goes to the setup that was known first; an order that rested and filled does not vanish with later candles', () => {
+  // seed 5: a 15- and a 30-minute trigger close together and choose the same M5 entry zone; the 30-minute one's M5 failure came first
+  let checked = 0, late = 0;
+  for (const seed of [5, 35, 50]) { const X = market(60, seed), Y = { ...X, '15m': m15of(X['5m']) }, full = []; G.methodTrades(Y, { from: 0, market: 'xau', orders: full });
+    const keys = new Set(full.map((x) => [x.side, x.base, x.placed, x.entry, x.fillT].join('|')));
+    assert.equal(new Set(full.map((x) => x.side + ':' + x.base)).size, full.length, 'one order a zone');
+    // every order of the full run, read again on the candles cut one candle after its fill
+    // and on the candles cut just before each order was placed (where the other trigger's order had rested and could have filled)
+    for (const T of full.filter((q) => q.placed > X['5m'][0].time + 12 * 86400).flatMap((q) => (q.fillT != null ? [q.placed - 300, q.fillT + 300] : [q.placed - 300]))) { const o = []; G.methodTrades(cutAt(Y, T), { from: 0, market: 'xau', orders: o }); checked++;
+      for (const y of o.filter((q) => q.fillT != null)) { if (!keys.has([y.side, y.base, y.placed, y.entry, y.fillT].join('|'))) late++; } } }
+  assert.ok(checked >= 20, 'cuts: ' + checked); assert.equal(late, 0, 'orders that filled on the cut candles and are missing, or placed later, with every candle');
+});
+
+// the D1 / H4 / H1 engulf rule: a hand-made Friday where the H4 base candle and its last H1 candle have the same high and low
+function twinDay() { const T0 = 1790553600, m5 = []; let p = 4000;   // Monday 00:00 UTC; five rising days, every hour green
+  const add = (o, h, l, c) => { m5.push({ time: T0 + m5.length * 300, open: o, high: h, low: l, close: c }); p = c; }, up = (n, step) => { for (let i = 0; i < n; i++) add(p, p + step + 0.02, p - 0.02, p + step); };
+  up(4 * 288 + 48, 0.05);                       // to Friday 04:00
+  const O = p; up(36, 0.008);                   // three small green hours inside the H4 candle
+  add(p, O + 3, p - 0.1, O + 2.5); for (let i = 0; i < 10; i++) add(p, p + 0.05, p - 0.75, p - 0.7); add(p, p + 0.05, O - 5, O - 4.5);   // the fourth hour: red, the H4 candle's whole range
+  for (let i = 0; i < 11; i++) add(p, p + 0.8, p - 0.02, p + 0.75); add(p, O + 4.1, p - 0.02, O + 4);   // 08:00 hour: green, closes above the base's high
+  up(36, 0.05);                                 // stays above the zone until the H4 candle has closed
+  add(p, p + 0.1, O + 2.9, p + 0.05); up(47, 0.05);   // 12:00: back to the zone, both limits fill on this candle
+  const X = { '5m': m5 }; for (const tf of ['1h', '4h', '1d']) { const sec = SOP.SEC[tf], out = []; for (const b of m5) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } X[tf] = out; }
+  return X; }
+const perTf = (X, o) => { const tfs = E.EG.tfs, out = []; try { for (const tf of tfs) { E.EG.tfs = [tf]; out.push(...E.egTrades(X, o)); } } finally { E.EG.tfs = tfs; } return out; };
+test('review: the engulf rule: an H4 and an H1 reading that are the same order are one record (the higher timeframe); every other record is as it was', () => {
+  const X = twinDay(), each = perTf(X, { from: 0, market: 'xau' }), all = E.egTrades(X, { from: 0, market: 'xau' });
+  assert.deepEqual(each.map((r) => r.kind), ['eg-4h', 'eg-1h'], 'read alone, each timeframe gives the order'); const [a, b] = each;
+  assert.deepEqual([b.side, b.t, b.entry, b.stop, b.target], [a.side, a.t, a.entry, a.stop, a.target], 'the same order'); assert.ok(stopOk(a) && a.side > 0);
+  assert.equal(all.length, 1); assert.deepEqual(all[0], a, 'kept: the H4 reading, unchanged');
+  // seeded markets: the output is byte for byte what the function gave before this rule (hashes taken on the code before it),
+  // and it is the timeframes read one by one, less only a lower timeframe's copy of an order
+  const PIN = { 11: [134, '51184a386d7c76a3'], 4: [153, 'e79be8a21b48ce47'], 7: [136, 'a25a1bb7bc5957ab'] };
+  for (const seed of [11, 4, 7]) { const Y = seed === 11 ? B : market(60, seed), r = E.egTrades(Y, { from: 0, market: 'xau' });
+    assert.deepEqual([r.length, crypto.createHash('sha256').update(JSON.stringify(r)).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed);
+    const one = new Set(), exp = perTf(Y, { from: 0, market: 'xau' }).filter((x) => { const k = [x.side, x.t, x.entry, x.stop, x.target].join('|'); if (one.has(k)) return false; one.add(k); return true; }).sort((p, q) => p.t - q.t);
+    assert.deepEqual(r.map((x) => JSON.stringify(x)).sort(), exp.map((x) => JSON.stringify(x)).sort()); assert.deepEqual(sameOrder(r), []); }
 });

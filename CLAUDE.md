@@ -6075,3 +6075,53 @@ side, Welch t >= 2, Holm. Power arithmetic: ICT A-setup per-unit R sd 1.69R (n 2
 for an even chance of t 2, +0.5R about 92. Proposal for the owner (nothing built): `research/proposals/2026-11-20-discretion.md`
 (a take / skip + reason + confidence stamped by the server before the outcome on every signal, "taken by a person" beside "all
 signals"). Never quote picked examples as evidence of discretion. Test: `tests/discretion.test.mjs`.
+
+## Desks re-read against the documents and skills (21 Nov 2026, owner: "re check now the documents and trades … with the skills together", then "build", "keep going")
+Fourteen read-only reviews (every page of the owner's private documents, every installed skill; never copied or named in the repository)
+were set against the desk code, then built in three rounds and checked by an independent reviewer. PAPER RECORDS of one reading of
+each method: none of this is a tested edge, and every stricter rule so far gives fewer trades and smaller losses, not profits.
+Owner's answers: an engulf may take "as many candles as it needs"; keep the msnr-main / msnr-other records; "the VR is specified in the pdf".
+- **One engulf definition** `council/eg-methods.mjs` `engulfAt` (used by `zones`, `direction`, `egTrades`): the base is the last candle of
+  the other colour; ANY later candle closing beyond its high (buy) / low (sell) completes it; a newer candle of the base's colour
+  replaces the base, a close through the base's other side cancels it; a doji is never a base. The zone is the base candle wick to
+  wick, known only from the completing close. `egTrades` output is unchanged except that an H4 and an H1 reading that are the same
+  order are recorded once (the H4 one).
+- **Engulfing plan / short method** (`methodTrades`): the M15 / M30 trigger zone is WHOLLY inside the H4 zone; the entry price is
+  inside the H4 zone; the M5 entry zone must be at the zone (`atZone`) and is the M5 engulf completed by the candle that fails the
+  opposite M5 zone when there is one (a failure inside the trigger's completing candle counts); a turned (EF) H4 zone dies once H4
+  closes back through it (`turnBack`, also the gold plan's zones); setups are sorted by when they become known before the
+  one-position rule (the old order was hindsight: an order could vanish with later candles). Direct entry: "left alone" = two CLOSED
+  H4 candles. The short-method document's own example order is placed to the cent (fixture `tests/fixtures/xau-oanda-2024-05-01.json`)
+  but not filled: the one-hour order life is an open owner question.
+- **MSNR gold plan**: `snrSides` breaks the last H4 A / V turn that stood before the tap (a turn completed by the tap candle counts,
+  walking back to the most recent unbroken one), searched from the tap, the window `SNR.boDays` 3 in TRADING days; the rejected Daily
+  level must be fresh (a wick spends it, a body through refreshes it); Daily engulf zones in `direction()` use `engulfAt`; a QM break
+  right after the head is kept; `snrTrades` takes ONE entry per visit of price to an H4 zone and side (a visit ends when a closed M15
+  candle is wholly outside), then the 2-a-day cap; one order found by a 15- and a 30-minute trigger is one trade and one slot.
+  msnr-main / msnr-other are labelled "Earlier scalp method" (the owner's own earlier pipeline, not a document's entry).
+- **Mosha desk** (`assets/mosha-sop.js`; old behaviour by option for the pinned tests: `vr: 'major'`, `qm: 'internal'`, `box: 'candle'`,
+  `janda: 'level'`, `table2: false`, `rsop: false`, `case2: false`): the VR, CF and barrier QM break the last 3-a-side swing BEFORE the
+  extreme (`swingEv` / `smallEv`; the level moves only on a new extreme); a barrier's box runs from the broken level to the leg's
+  origin extreme (`boxesOf`; the Charts layer's `msZones` is untouched); the Janda limit rests at the near side of the engulf pair
+  inside the second BO's leg (stop unchanged); the second barrier table (H4→M30 `-c30-`, H1→M15 `-c15-`, M30→M5; M30 built from M15);
+  "repeat SOP": after a barrier's QM a VR and CF one timeframe lower (`bar-sop-`), and inside the sequence's own CF zone a nested VR
+  and CF with no QM first (`bar-sop-cf-`); one order under two ids is recorded once (`uniq` / `orderKey`: sequence over barrier, major
+  BO over internal, higher timeframe first); a market entry whose next candle gaps past the stop books the gap; a CF inside the VR is
+  its OWN reading (`sop-c2-`, `case2: true`, never mixed into the other kinds); every `sop-*` record carries `withWeekly` (last
+  completed week's close against the week before) and `er20` (20-day efficiency ratio of Daily closes), tags only.
+- **LIT desk** (`litTrades`, desk only; `council/lit.mjs` untouched): the method's daily limits on all three executions (one London and
+  one New York-morning fill a day per market, a win ends the day, stop at −1.5R); a plain Asia high / low alone is not faded
+  (`litAsiaAlone`); a re-sweep in `loose` / `break` is judged by the detector's own sweep tests, at most 2 inside one waiting period,
+  smallest stop 0.014 % of price (skip, never widen); a repeated id is recorded once. `first: true` keeps the old reading for the
+  desk-slices study, whose "every candidate" figure no longer reproduces on the new `break` set.
+- **`research/edge/desk-exits`** is classed FAIL as a study (its "PASS" came from 1 of 60 comparisons that still loses after costs).
+- **Found sound by the independent review** (cut tests on seeded and real candles): no look-ahead in zones, sides, barrier boxes, the
+  small-swing VR or the VR retest; no record without a stop or with a stop on the winning side (about 12,700 records).
+- **Open with the owner (not built; each changes the trades)**: the 30-pip stop at today's gold price (literal, share of price, or past
+  the zone); the H4 candle clock (the documents' charts open H4 at 18:00 New York, the desk at midnight UTC: on the charts' clock the
+  direct entry reproduces its document's zones to the cent); the turned-chart rule replacing the BO's CF entries (one document's main
+  setup) or being added beside them; order lives (plan / short method, QM); which day the gold plan's 2-a-day cap counts on; one
+  trade per H4 zone after a stop; a bad CF = overlap with the VR or any CF before price is back at the origin; the 50 % pullback;
+  what ends a Janda; M30 or M15 under H1; a single holdout on 2007-2019 (draft pre-registration kept outside the repository; 2020-26
+  has been read under too many definitions on 21 Nov to judge anything). Never present a desk total as evidence.
+- Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`, `tests/mosha-tracker.test.mjs`, `tests/desk-exits.test.mjs`.
