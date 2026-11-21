@@ -5594,6 +5594,31 @@ UTC on 211 gotobi days (Nov 2023 → Nov 2026) put a round trip at 0.81 pip medi
 assumed 2.0, break-even 3.73): the cost no longer threatens T2. On those executable quotes the fade made +0.163R a trade (month t
 1.80, short of the pre-registered 2; per-trade t 2.01). Slippage beyond the quote is still unmeasured (the demo job's fills will show it).
 
+## Desk slices tested, and the two breakouts on a demo account (21 Nov 2026, owner: "3 and 4 but show before merge")
+- **`research/edge/desk-slices/`** (PREREGISTRATION.md committed alone first; `run.mjs fetch|run <dir>`, RESULT.md, result.json):
+  the three slices that looked good on the desks' 90-day records, on OANDA candles 2020 → 22 Aug 2026 with the desks' own code
+  (`council/edge-desks.mjs`), net of pre-registered costs, month-sum t, Holm. **FAIL, 0 of 3 (two fail, one invalid)**: the
+  engulf reading on EUR/USD −0.136R a trade out of sample (n 3,205, t −4.80) and on GBP/USD −0.094R (n 3,255, t −2.92), both
+  zero before costs on 16,000 trades. T3 (LIT "market on the break" as the desk records it: +0.738R, n 109, t 4.27) passes
+  its checks and is **INVALID**: the desk records that execution only when neither limit order filled, which is known after
+  the market entry (look-ahead by selection). The same entry on every candidate: n 468, month t 0.76, one +299R trade carries
+  it (median −1R). **Never quote the LIT desk's "market on the break" rows as an entry rule; the desks' totals are not
+  evidence.** `litTrades` takes `sets` (default `LIT_SETS`) for that check. Test: `tests/desk-slices.test.mjs`.
+- **`council/vb-demo.mjs`** (council.yml: each round after the mirror and each quick pass, `timeout 45`, never fails the
+  round): the studies' T1 on a cTrader DEMO account for gold and USD/JPY (labels `vb-xau`, `vb-usdjpy`; the mirror ignores
+  them). In the first 20 minutes of a weekday (UTC) it places a buy STOP at O + 0.5 x the previous trading day's range and a
+  sell STOP at O − 0.5 x it (`levels`, the study's `buildDays`), each WITH `stopLoss` = O and a 21:00 UTC expiry, only when
+  neither level has traded yet (else `missed`); later passes cancel the other order once one filled, read the fill back
+  (no stop at the broker: amend, else close at once), book a broker stop-out as −1R, and at 21:00 UTC cancel and close. Risk
+  0.25 % of the balance (`config.vb.risk`); under the broker's smallest volume the smallest is used only while a stop-out
+  costs at most 1 %. Account: `config.vb.account`, else the gotobi job's (`accountFor`: the former LIT / shadow demo account).
+  Demo host, `CTRADER_ENV=demo`, `isLive === false` (gotobi's `connect`, now exported). Record: council-data
+  `vb/trades.json` (statuses placed / open / closed / nofill / missed / skip / error; R before costs from the broker's
+  fills). `config.vb = { on: false }` stops it. With nothing due it does not connect. A forward demo record, never an edge by
+  itself. Not checked against the real broker (a STOP order carrying an absolute stopLoss, the cancel answers). Also fixed:
+  `council/gotobi.mjs` treated a REFUSED stop amend as done (now `amendStep`, so a refusal closes the position). Tests:
+  `tests/vb-demo.test.mjs` (fake broker).
+
 ## The council's own OANDA candles (15 Nov 2026, found during the Vercel outage)
 `MD_BASE` (Trader, data check, macro strategist, replay) and `ICT_MD_BARS` (the ICT desk's silver shadow) defaulted to the
 website's proxy (meridianx.dev/md/; aureumdesk.co.uk since 16 Nov). When Vercel blocked the account at 10:21 UTC on 15 Nov, every gold and forex market fell to

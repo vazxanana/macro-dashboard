@@ -59,7 +59,8 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
       if (!(r0 > Z.rmin) || (d > 0 ? stop >= entry : stop <= entry)) continue;
       // the order's life: a close through the zone's far edge cancels it, and it expires after EG.life candles
       let dead = T0 + EG.life * sec; for (let j = m + 1; j < C.length; j++) { if (C[j].time + sec >= dead) break; if (d > 0 ? C[j].close < base.low : C[j].close > base.high) { dead = C[j].time + sec; break; } }
-      let fi = -1; for (let i = 0; i < m5.length; i++) { const b = m5[i]; if (b.time < T0) continue; if (b.time >= dead) break; if (d > 0 ? b.low <= entry : b.high >= entry) { fi = i; break; } }
+      let fi = -1, i0 = 0; { let lo = 0, hi = m5.length; while (lo < hi) { const q = (lo + hi) >> 1; if (m5[q].time < T0) lo = q + 1; else hi = q; } i0 = lo; }   // the first 5-minute candle at or after the order (a long history is searched, not walked)
+      for (let i = i0; i < m5.length; i++) { const b = m5[i]; if (b.time >= dead) break; if (d > 0 ? b.low <= entry : b.high >= entry) { fi = i; break; } }
       if (fi < 0) continue;
       const fillT = m5[fi].time, tr = { id: `${market === 'xau' ? '' : market + ':'}eg-${tf}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind: 'eg-' + tf, label: `${NAME[tf]} engulf zone`, h: tf, l: '5m', side: d, t: fillT,
         entry, stop, target: entry + d * EG.target * r0, r0 };
@@ -122,13 +123,13 @@ export function litFill(S5, M, ord, set) {
 const litM = (market, px) => { const q = market === 'xau' ? 1 : px / 4000, dec = SOP.ALL[market].dec;
   return market === 'xau' ? { ...XAU, cost: () => 0 } : { key: market, sym: market, tick: Math.pow(10, -dec), stopExtra: (atr5) => 0.30 * q + Math.max(0.1 * atr5, 0.30 * q), skip: XAU.skip, cost: () => 0 }; };
 const LEVEL = { pd: "the previous day's", pw: "the previous week's", acc: "the accumulation's own", eqh: 'equal', ASIA: "the Asia session's", LONDON: "the London session's", NY_AM: "the New York morning's" };
-export function litTrades(B, { from, market = 'xau' } = {}) {
+export function litTrades(B, { from, market = 'xau', sets = LIT_SETS } = {}) {
   const raw = B['5m'] || []; if (!raw.length) return [];
   const M = litM(market, raw[raw.length - 1].close), b5 = cleanBars(raw, M), m15 = agg15(b5), f = fx(market), out = [], lastT = b5.length ? b5[b5.length - 1].t : 0;
   for (const dir of ['short', 'long']) { const mirror = dir === 'long', S15 = series(m15, mirror, M.tick), S5 = series(b5, mirror, M.tick), sg = S5.sign, d = dir === 'short' ? -1 : 1;
     for (const cd of fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900;
       let got = null;
-      for (const set of LIT_SETS) { const od = litOrder(S5, cd, M, set); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { got = { set, od, sim }; break; } }
+      for (const set of sets) { const od = litOrder(S5, cd, M, set); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { got = { set, od, sim }; break; } }
       if (!got) continue; const { set, od, sim } = got, fillT = sim.t + 300; if (fillT < from) continue;
       const entry = sim.fp, stop = sg * od.stop, target = sg * od.target, r0 = Math.abs(entry - stop); if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
       const open = sim.kind === 'dataEnd' && sim.tExit >= lastT, status = open ? 'open' : sim.kind === 'target' ? 'target' : sim.kind === 'stop' ? 'stopped' : sim.kind === 'be' ? 'breakeven' : 'dayend';
