@@ -99,7 +99,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000.72 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 10000.72 · 2 open · 2 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -110,10 +110,53 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "btc-position-1795267415": {
+    "orderId": "34614881",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "position",
+    "limitPrice": 59362.2,
+    "stop": 54957.65214285714,
+    "t1": 87446.7,
+    "placedAt": "2026-11-21T13:24:16.000Z",
+    "expires": "2026-11-26T13:23:35.000Z",
+    "riskCash": 44.05,
+    "margin": 59.13,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   },
+   "btc-rswing-1795267415": {
+    "orderId": "34614882",
+    "symbol": "BTCUSD",
+    "side": "buy",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "rswing",
+    "limitPrice": 59362.2,
+    "stop": 54957.65214285714,
+    "t1": 60593.35,
+    "placedAt": "2026-11-21T13:24:16.000Z",
+    "expires": "2026-11-23T13:23:35.000Z",
+    "riskCash": 44.05,
+    "margin": 59.13,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10000.72,
-  "lastRun": "2026-11-21T13:22:16.000Z"
+  "lastRun": "2026-11-21T13:24:16.000Z"
  },
  "log": [
   {
@@ -241,6 +284,16 @@
    "at": "2026-11-21T12:38:51.000Z",
    "msg": "closed ETHUSD position 50661738 (council: win)",
    "trade": "eth-rswing-1795243694"
+  },
+  {
+   "at": "2026-11-21T13:24:16.000Z",
+   "msg": "placed buy limit BTCUSD 0.01 lot at 59362.2 (council position, valid to 2026-11-26T13:23Z)",
+   "trade": "btc-position-1795267415"
+  },
+  {
+   "at": "2026-11-21T13:24:16.000Z",
+   "msg": "placed buy limit BTCUSD 0.01 lot at 59362.2 (council rswing, valid to 2026-11-23T13:23Z)",
+   "trade": "btc-rswing-1795267415"
   }
  ],
  "limits": {

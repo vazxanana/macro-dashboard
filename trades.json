@@ -93490,7 +93490,7 @@
   "pm": {
    "phase": "watch",
    "until": 1795379520,
-   "checked": 1795267320,
+   "checked": 1795267440,
    "after": {
     "best": 0,
     "worst": 1.32,
@@ -95549,7 +95549,7 @@
   "rr": 2.05,
   "buf": 0.15,
   "opened": 1795127267,
-  "checked": 1795267260,
+  "checked": 1795267380,
   "status": "open",
   "R": null,
   "feat": {
@@ -96480,7 +96480,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1795206762,
-  "checked": 1795267320,
+  "checked": 1795267440,
   "status": "open",
   "R": null,
   "feat": {
@@ -96534,7 +96534,7 @@
   "rr": 2.01,
   "buf": 0.15,
   "opened": 1795206921,
-  "checked": 1795267320,
+  "checked": 1795267440,
   "status": "open",
   "R": null,
   "feat": {
@@ -96571,7 +96571,7 @@
   "r0": 8.473035714285714,
   "drift": -0.002,
   "mfe": 0.31,
-  "mae": 0.27
+  "mae": 0.28
  },
  {
   "id": "xrp-swing-1795209727",
@@ -96589,7 +96589,7 @@
   "rr": 2.01,
   "buf": 0.15,
   "opened": 1795209727,
-  "checked": 1795267320,
+  "checked": 1795267440,
   "status": "open",
   "R": null,
   "feat": {
@@ -96647,7 +96647,7 @@
   "rr": 2,
   "buf": 0.15,
   "opened": 1795231964,
-  "checked": 1795267320,
+  "checked": 1795267440,
   "status": "open",
   "R": null,
   "feat": {
@@ -96683,7 +96683,7 @@
   "filled": 1795243440,
   "r0": 8.519178571428569,
   "mfe": 0.09,
-  "mae": 0.27
+  "mae": 0.28
  },
  {
   "id": "eth-rswing-1795243694",
@@ -96744,7 +96744,7 @@
   "pm": {
    "phase": "watch",
    "until": 1795437300,
-   "checked": 1795267260,
+   "checked": 1795267380,
    "after": {
     "best": 0.48,
     "worst": 0,
@@ -96764,5 +96764,105 @@
   "costR": 0.034,
   "costSrc": "quotes+mirror",
   "Rnet": 0.44
+ },
+ {
+  "id": "btc-position-1795267415",
+  "market": "btc",
+  "label": "BTC/USD",
+  "dec": 1,
+  "k": "position",
+  "name": "Position",
+  "pair": "D1 → H1",
+  "h": "1d",
+  "side": "buy",
+  "entry": 59362.2,
+  "stop": 54957.65214285714,
+  "t1": 87446.7,
+  "rr": 6.38,
+  "buf": 0.15,
+  "opened": 1795267415,
+  "checked": 1795267415,
+  "status": "pending",
+  "R": null,
+  "feat": {
+   "d1": "with",
+   "struct": "main",
+   "session": "overlap",
+   "cf": "choch",
+   "choch": "yes",
+   "m15c": "no",
+   "newsT1": null,
+   "newsMin": null
+  },
+  "shadow": true,
+  "blockedBy": [
+   "off",
+   "focus"
+  ],
+  "feed": "kraken",
+  "note": "Shadow (rule: position is switched off, focus: only none trades live)",
+  "ctx": {
+   "atr": 948.99,
+   "stopAtr": 4.64,
+   "spread": 11.88852,
+   "stopSpreads": 370.5,
+   "planned": 59362.2,
+   "sigAge": 0,
+   "trend": {
+    "1d": 1,
+    "4h": -1,
+    "1h": 1
+   }
+  }
+ },
+ {
+  "id": "btc-rswing-1795267415",
+  "market": "btc",
+  "label": "BTC/USD",
+  "dec": 1,
+  "k": "rswing",
+  "name": "Retrace",
+  "pair": "H4 → H1",
+  "h": "4h",
+  "side": "buy",
+  "entry": 59362.2,
+  "stop": 54957.65214285714,
+  "t1": 60593.35,
+  "rr": 0.28,
+  "buf": 0.15,
+  "opened": 1795267415,
+  "checked": 1795267415,
+  "status": "pending",
+  "R": null,
+  "feat": {
+   "d1": "with",
+   "struct": "n/a",
+   "session": "overlap",
+   "cf": "choch",
+   "choch": "yes",
+   "m15c": "no",
+   "newsT1": null,
+   "newsMin": null
+  },
+  "shadow": true,
+  "blockedBy": [
+   "minRR",
+   "focus"
+  ],
+  "feed": "kraken",
+  "note": "Shadow (reward:risk 0.28 under 1.2, focus: only none trades live)",
+  "ctx": {
+   "atr": 948.99,
+   "stopAtr": 4.64,
+   "spread": 11.88852,
+   "stopSpreads": 370.5,
+   "planned": 59362.2,
+   "sigAge": 0,
+   "trend": {
+    "1d": 1,
+    "4h": -1,
+    "1h": 1
+   }
+  }
  }
 ]
