@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-21T02:59:41.000Z",
+ "at": "2026-11-21T04:02:33.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-21T02:59:16.000Z",
+ "strategistAt": "2026-11-21T04:02:06.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -64,7 +64,7 @@
   {
    "k": "pos",
    "name": "Investment flows and positioning",
-   "obs": "COT managed money 103k net, −1k over 4 weeks, 34th percentile of the last 60 weeks (positions as of 2026-11-17)",
+   "obs": "COT managed money 103k net, −1k over 4 weeks, 21st percentile of 3 years (positions as of 2026-11-17)",
    "lean": 0,
    "asOf": "2026-11-17",
    "stale": false,
@@ -134,7 +134,7 @@
   {
    "topic": "Positioning",
    "macro": "103k net, −1k in 4 weeks, 34th pct, week of 2026-11-17 (vote flat)",
-   "veteran": "COT managed money 103k net, −1k over 4 weeks, 34th percentile of the last 60 weeks (positions as of 2026-11-17)",
+   "veteran": "COT managed money 103k net, −1k over 4 weeks, 21st percentile of 3 years (positions as of 2026-11-17)",
    "stance": "agree",
    "why": "COT is crowding and fragility context on a Tuesday snapshot of reportable futures; the 2007-26 test found no 4-week edge in positioning, so it sizes and times, it never directs.",
    "m": null,
@@ -799,7 +799,7 @@
    "list": [
     {
      "src": "CFTC Commitments of Traders",
-     "read": "COT managed money 103k net, −1k over 4 weeks, 34th percentile of the last 60 weeks (positions as of 2026-11-17)",
+     "read": "COT managed money 103k net, −1k over 4 weeks, 21st percentile of 3 years (positions as of 2026-11-17)",
      "says": "neutral for gold. Not crowded either way",
      "limit": "COT is a Tuesday snapshot of reportable futures, published Friday: crowding and fragility context, not direction. ETF tonnage and options dealer positioning are not observed by the council."
     },
@@ -1296,7 +1296,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 47% on average, came true 36%."
  },
  "briefing": {
-  "at": "2026-11-21T02:59:41.000Z",
+  "at": "2026-11-21T04:02:33.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1367,6 +1367,23 @@
    },
    {
     "rank": 4,
+    "lean": 0,
+    "fx": null,
+    "k": "pos",
+    "score": 1.14,
+    "title": "Speculators' gold length is middle of its range (21st percentile of 3 years)",
+    "evidence": [
+     {
+      "text": "managed money net 103k, −9.4k on the week, −1.3k over 4 weeks (−1.24 sd)",
+      "asOf": "2026-11-17 (positions; published about 2026-11-20)",
+      "source": "CFTC Disaggregated COT"
+     }
+    ],
+    "why": "Positioning is not stretched either way: it neither amplifies nor cushions a surprise. COT sizes and times; it never sets direction (no 4-week edge in the 2007-26 test).",
+    "change": "the next COT (Friday) moving net length into the top or bottom 20% of its 3-year range"
+   },
+   {
+    "rank": 5,
     "lean": -1,
     "fx": "Falling US real yields usually weigh on the dollar (EUR/USD up, USD/JPY down) unless risk-off demand for dollars dominates.",
     "k": "real",
@@ -1383,7 +1400,7 @@
     "change": "10Y TIPS back above 3.03% (+15 bp)"
    },
    {
-    "rank": 5,
+    "rank": 6,
     "lean": -1,
     "fx": "DXY up 4 weeks means EUR/USD down, the majors against the USD softer.",
     "k": "usd",
@@ -1398,23 +1415,6 @@
     ],
     "why": "Gold is priced in dollars: a weaker DXY lifts it mechanically and through foreign demand. EUR is 57.6% of the DXY, so EUR/USD is its mirror.",
     "change": "DXY through 102.28 (−1.5%) would turn the dollar channel"
-   },
-   {
-    "rank": 6,
-    "lean": 0,
-    "fx": null,
-    "k": "pos",
-    "score": 0.78,
-    "title": "Speculators' gold length is middle of its range (33rd percentile of 3 years)",
-    "evidence": [
-     {
-      "text": "managed money net 112k, +8.7k on the week, +5.3k over 4 weeks (+1.17 sd)",
-      "asOf": "2026-11-10 (positions; published about 2026-11-13)",
-      "source": "CFTC Disaggregated COT"
-     }
-    ],
-    "why": "Positioning is not stretched either way: it neither amplifies nor cushions a surprise. COT sizes and times; it never sets direction (no 4-week edge in the 2007-26 test).",
-    "change": "the next COT (Friday) moving net length into the top or bottom 20% of its 3-year range"
    }
   ],
   "hypotheses": [
@@ -3295,7 +3295,7 @@
    "issues": []
   }
  },
- "brief": "Macro veteran, 2026-11-21 02:59 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 5 agree, 1 qualify, 0 disagree; qualified: Direction for gold. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.03% (+15 bp from 2.88%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.83 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 28, curve inverted), funding still calm | 2. Gold below its 10-week average (−13.5%); Gold Macro Score −0.95 (AUCTION) | 3. The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 56%) | H1 (41%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-11-27 before any close below $3,503 | H2 (63%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-11-27 | H3 (56%): DXY closes 2026-12-18 below 103.83 (the 2026-11-20 close) At a glance: This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release in the next 72 hours; next on the schedule: US PCE (Wed 25 Nov, 13:30 UTC). Watch $3,600 above and $3,503 below. Levels as of the 20 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
+ "brief": "Macro veteran, 2026-11-21 04:02 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 5 agree, 1 qualify, 0 disagree; qualified: Direction for gold. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.03% (+15 bp from 2.88%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.83 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 28, curve inverted), funding still calm | 2. Gold below its 10-week average (−13.5%); Gold Macro Score −0.95 (AUCTION) | 3. The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 56%) | H1 (41%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-11-27 before any close below $3,503 | H2 (63%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-11-27 | H3 (56%): DXY closes 2026-12-18 below 103.83 (the 2026-11-20 close) At a glance: This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release in the next 72 hours; next on the schedule: US PCE (Wed 25 Nov, 13:30 UTC). Watch $3,600 above and $3,503 below. Levels as of the 20 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
@@ -3403,6 +3403,11 @@
     "dir": -1
    },
    {
+    "area": "insight",
+    "text": "Moved up to #4 (from #6): Speculators' gold length is middle of its range (21st percentile of 3 years)",
+    "dir": 0
+   },
+   {
     "area": "level",
     "text": "200-day average $4,418 → $4,411 (−0.2%)",
     "dir": -1
@@ -3459,6 +3464,6 @@
    }
   ],
   "first": false,
-  "line": "8 changes since the briefing of 2026-11-20."
+  "line": "9 changes since the briefing of 2026-11-20."
  }
 }
