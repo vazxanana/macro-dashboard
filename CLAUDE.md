@@ -5191,6 +5191,14 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     (knowing the candle would touch: look-ahead). The return is now the first of the finest candles that trades into the
     zone, and the confirmation is read from the candle holding that moment. Gold 2025, D1 / H4 / H1 barriers: 460 -> 462
     entries, 23 changed, +4.0R -> +18.0R before costs.
+  - **Independent audit of the Mosha replay** (21 Nov 2026, a separate read-only review; three confirmed defects fixed):
+    (1) a sequence entry is recorded only AT the candle whose close is its EG (`M.trade.fillT !== L[i].time`): the
+    1,500-candle window slides, so a later look could re-read an old stretch and record an entry days after the fact (one
+    such row was +20.95R on the test market); (2) `msMosha`: a wick back to the VR's extreme between the VR and the CF also
+    ends the move (`xHit`), not only a candle after the CF; (3) `zonesOf` lists breaks by time, so a zone belongs to the
+    EARLIEST break of its origin candle and a later BO never makes a visited barrier fresh again. Test: "no hindsight"
+    (unaligned cuts, three markets, every full-replay entry must exist when cut just after it). Gold 2025 before costs:
+    sequence 249 -> 231 entries, -15.7R -> -5.4R; barriers 462 -> 466, +18.0R -> +30.0R.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

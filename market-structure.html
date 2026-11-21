@@ -4949,6 +4949,8 @@ function msMosha(htf, ltf, buf) {
   out.vr = { level: V.level, t: V.t, fromT: Math.min(V.fromT, xt), ext: x, extT: xt, lo: Math.min(x, V.level), hi: Math.max(x, V.level) };
   out.state = 'wait-cf';
   if (isFinite(htf.far)) { out.p50 = (htf.far + x) / 2; const since = B.filter((b) => b.time > xt); out.deep = since.some((b) => (d > 0 ? b.low <= out.p50 : b.high >= out.p50)); }
+  // price traded back to the VR's extreme after the VR formed, before any CF or entry: the move is done (a wick counts)
+  const xHit = B.find((b) => b.time > V.t && (d > 0 ? b.high >= x : b.low <= x));
   const past = (e) => (d > 0 ? e.level >= x : e.level <= x), withBo = ev.slice(vi + 1).filter((e) => e.dir === d);
   const cands = []; for (const e of withBo) { if (past(e)) break; if (qm(e)) cands.push(e); }
   const gone = withBo.find(past);
@@ -4956,6 +4958,7 @@ function msMosha(htf, ltf, buf) {
   const failOf = (C) => { const zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot); const f = B.find((b) => b.time > C.t && (d > 0 ? b.close < zl : b.close > zh)); return f || null; };
   let C = null, F = null, n0 = 0;
   for (const c of cands) { if (C && !(F && c.t > F.time)) continue; if (C) n0++; C = c; F = failOf(c); }
+  if (xHit && xHit.time <= C.t) { out.state = 'vr-broken'; return out; }
   const zl = Math.min(C.top, C.bot), zh = Math.max(C.top, C.bot);
   out.cf = { level: C.level, t: C.t, fromT: C.fromT, lo: zl, hi: zh, again: n0 > 0 };
   out.case = zh >= out.vr.lo && zl <= out.vr.hi ? 2 : 1;

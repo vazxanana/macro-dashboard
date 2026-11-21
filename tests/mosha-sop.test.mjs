@@ -51,6 +51,17 @@ test('no look-ahead: an entry found with the candles cut at a moment is the entr
   for (const k of early) assert.ok(moved.has(k), 'depends on later prices: ' + k);
 });
 
+test('no hindsight: every entry of the full replay already exists when the candles are cut just after it (unaligned cuts, three markets)', () => {
+  const key = (r) => [r.id, r.side, r.entry.toFixed(4), r.stop.toFixed(4), r.target.toFixed(4)].join('|'); let seen = 0;
+  for (const seed of [3, 7, 11]) { const Bx = seed === 7 ? B : market(26, seed), full = M.sopTrades(Bx, F, { from }).concat(M.barrierTrades(Bx, F, { from }));
+    for (const T of [END - 6 * 86400 + 37 * 60, END - 2 * 86400 - 11 * 60]) { const Bc = cut(Bx, T), early = new Set(M.sopTrades(Bc, F, { from }).concat(M.barrierTrades(Bc, F, { from })).map(key));
+      // a sequence entry is known at its EG's close; a barrier entry once the barrier-timeframe candle of the return has closed (the replay reads that candle whole)
+      for (const r of full) { const known = r.kind === 'sop' ? r.t : Math.max(r.t + 300, r.log[1].t - (r.log[1].t % M.SEC[r.h]) + M.SEC[r.h]); if (known > T) continue; seen++;
+        assert.ok(early.has(key(r)), `seed ${seed}: found only with later candles: ${r.id}`); } } }
+  assert.ok(seen >= 20, 'entries checked: ' + seen);
+  assert.match(src, /M\.trade\.fillT !== L\[i\]\.time/); assert.match(src, /sort\(function \(x, y\) \{ return x\.breakIdx - y\.breakIdx; \}\)/);
+});
+
 test('outcome: the stop first when one candle holds both, a target in R, an open trade has no result', () => {
   const tr = { side: -1, entry: 100, stop: 104, target: 88 };
   assert.deepEqual(M.outcome(tr, [{ time: 10, high: 105, low: 87, close: 90 }], 10), { status: 'stopped', R: -1, endT: 10, exit: 104, mfe: 0 });

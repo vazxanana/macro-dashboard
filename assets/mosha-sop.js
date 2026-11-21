@@ -61,7 +61,9 @@
         var Lw = L.slice(Math.max(0, i + 1 - win), i + 1), LA = F.msAnalyze(Lw, piv), boT = Hw[mv.breakIdx].time;
         var M = F.msMosha({ dir: A.trend, level: mv.level, t: boT, ext: A.ext ? A.ext.p : NaN, far: A.trend > 0 ? mv.bot : mv.top },
           { events: LA.events.map(function (e) { return { dir: e.dir, level: e.level, structure: e.structure, t: Lw[e.breakIdx] ? Lw[e.breakIdx].time : Infinity, fromT: Lw[e.fromIdx] ? Lw[e.fromIdx].time : 0, top: e.top, bot: e.bot }; }), bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf);
-        if (!M || !M.trade || !(M.trade.fillT + SEC[l] >= from)) continue;
+        // a trade is recorded only AT the candle whose close is its EG, as the chart read then: the window slides, so a later
+        // look could re-read an old stretch and "find" an entry days after the fact (21 Nov 2026, independent audit)
+        if (!M || !M.trade || M.trade.fillT !== L[i].time || !(M.trade.fillT + SEC[l] >= from)) continue;
         var k = h + '|' + boT + '|' + M.trade.fillT; if (map[k]) continue;
         var tr = map[k] = { id: pre + 'sop-' + l + '-' + M.trade.fillT, market: mk, kind: 'sop', h: h, l: l, side: M.trade.side, t: M.trade.fillT + SEC[l], entry: M.trade.entry, stop: M.trade.stop, target: M.trade.target,
           r0: Math.abs(M.trade.entry - M.trade.stop), 'case': M['case'], again: !!(M.cf && M.cf.again), deep: M.deep == null ? null : !!M.deep };
@@ -86,7 +88,8 @@
   function zonesOf(tf, B, F) {
     var H = B[tf]; if (!H || !H.length) return [];
     var A = F.msAnalyze(H, PIVOT), brk = A.events.map(function (e) { return { dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'bo' }; })
-      .concat(F.msInternal(H, H.length, 3).map(function (e) { return { dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'ibo' }; }));
+      .concat(F.msInternal(H, H.length, 3).map(function (e) { return { dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'ibo' }; }))
+      .sort(function (x, y) { return x.breakIdx - y.breakIdx; });   // msZones keeps one zone a candle, the first listed: the EARLIEST break of an origin, so a later BO never makes a visited zone fresh again
     return F.msZones(H, brk, H.length).map(function (z) { return { tf: tf, dir: z.dir, lo: z.lo, hi: z.hi, kind: z.kind, known: H[z.breakIdx].time + SEC[tf], touch: z.touchIdx != null ? H[z.touchIdx].time : null }; });
   }
   // 2. the barrier entry. A zone's box is drawn from candles up to its break only; `touch` says when price came back, never which zone.
