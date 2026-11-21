@@ -107,7 +107,11 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
   for (const m of triggers(M15)) { const d = m.dir, T = m.at, c = m.c, tn = NAME[m.tf];
     const Z = Z4.filter((z) => h4Zone(z, d, T) && (d > 0 ? c.low <= z.top && c.close >= z.bot : c.high >= z.bot && c.close <= z.top)).pop(); if (!Z) continue; const turned = Z.dir !== d;
     // the first opposite M5 zone that fails after the M15 engulf, inside the arming time
-    let F = null; for (const z of Z5) { if (z.at > T + EGM.arm) break; if (z.dir !== -d || z.at < T - EGM.efBack || z.fail == null || z.fail <= T || z.fail > T + EGM.arm) continue; if (!F || z.fail < F.fail) F = z; }
+    // it must be formed INTO or AT the zone (owner, 21 Nov 2026, on a EUR/USD buy whose "M5 EF" was a 1.4-pip sell engulf above
+    // the H4 and M15 zones: "there is no eg sell fail on m5"; the method: the EF that counts is the close through the last opposite
+    // engulf formed into or at the zone): its range touches the H4 zone or the M15 / M30 engulf zone
+    const lo = Math.min(Z.bot, m.bot), hi = Math.max(Z.top, m.top), atZone = (z) => z.bot <= hi && z.top >= lo;
+    let F = null; for (const z of Z5) { if (z.at > T + EGM.arm) break; if (z.dir !== -d || z.at < T - EGM.efBack || z.fail == null || z.fail <= T || z.fail > T + EGM.arm || !atZone(z)) continue; if (!F || z.fail < F.fail) F = z; }
     if (!F) continue;
     let E = null; for (const z of Z5) { if (z.at > F.fail) break; if (z.dir === d && z.at >= F.fail - EGM.egBack && (z.fail == null || z.fail > F.fail)) E = z; }
     if (!E) continue; const key = d + ':' + E.base; if (used.has(key)) continue; used.add(key);

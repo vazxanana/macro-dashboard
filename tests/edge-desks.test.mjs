@@ -329,3 +329,15 @@ test('an EG closes beyond the other candle\'s HIGH (a buy) or LOW (a sell); a bo
   const s = zones([c(0, 99, 100.5, 98.6, 100), c(1, 100, 100.2, 98.2, 98.4)], '1h');
   assert.equal(s.length, 1); assert.equal(s[0].dir, -1); assert.equal(s[0].bot, 99); assert.equal(s[0].top, 100.5);
 });
+
+// 21 Nov 2026 (owner, on a EUR/USD plan buy: "there is no eg sell fail on m5 to enter buy"): the M5 engulf that failed must be
+// formed into or at the zone, so its range touches the H4 zone or the M15 / M30 engulf zone of the trade
+test('plan and simple: the failed M5 zone touches the H4 zone or the M15 / M30 engulf zone', () => {
+  let n = 0;
+  for (const r of G.methodTrades(B15, { from: 0, market: 'xau' }).filter((x) => x.kind === 'eg-plan' || x.kind === 'eg-simple')) { n++;
+    const ef = r.marks.find((k) => k.label === 'M5 EF (zone failed)'), zs = r.marks.filter((k) => /^H4 E[GF]|^M(15|30) EG zone$/.test(k.label));
+    assert.ok(ef && zs.length >= 2, r.id); const lo = Math.min(...zs.map((z) => z.bot)), hi = Math.max(...zs.map((z) => z.top));
+    assert.ok(ef.bot <= hi && ef.top >= lo, 'the failed M5 zone is away from the zone: ' + r.id); }
+  assert.ok(n >= 1, 'plan / simple entries on these candles: ' + n);
+  assert.match(rd('council/eg-methods.mjs'), /\|\| !atZone\(z\)\) continue;/);
+});
