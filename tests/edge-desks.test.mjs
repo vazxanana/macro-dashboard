@@ -142,7 +142,7 @@ test('the direction reading: every switch names a tapped key level of the timefr
 
 test('every desk record carries the key levels its reading used as chart marks', () => {
   const src = fs.readFileSync(new URL('../council/eg-methods.mjs', import.meta.url), 'utf8') + fs.readFileSync(new URL('../council/edge-desks.mjs', import.meta.url), 'utf8');
-  for (const l of ['Daily EG zone', 'H4 EG zone', 'M15 EG zone', 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
+  for (const l of ['Daily EG zone', 'H4 EG zone', "tn + ' EG zone'", 'M5 EF (zone failed)', 'M5 EG zone · entry', 'H4 EF (zone failed)', 'Daily ${S.key.kind} level', 'level · BO ${word(d)}', "ef: 'EF zone'", "v: 'V level'", 'M15 EG', 'M5 EG'])
     assert.ok(src.includes(l), 'mark: ' + l);
 });
 
@@ -218,4 +218,17 @@ test('a stop does not change between two reads: on another market the sizes scal
     assert.ok(a.length >= 5, name + ' trades: ' + a.length);
     for (const r of a) { const q = b.get(r.id); assert.ok(q, name + ': the trade is still read: ' + r.id); assert.ok(Math.abs(q.stop - r.stop) < 1e-12 && Math.abs(q.entry - r.entry) < 1e-12, name + ': same stop: ' + r.id); }
   }
+});
+
+test('the documents, page by page: a failed H4 zone is a zone too, the trigger is an M15 or an M30 engulf, "inside" is inside, exits are the stop or the target', () => {
+  let ef = 0, m30 = 0, direct = 0, snr30 = 0;
+  for (const seed of [11, 5, 23, 31, 47]) { const X = market(120, seed), Y = { ...X, '15m': m15of(X['5m']) };
+    const all = G.methodTrades(Y, { from: 0, market: 'xau' }), sn = G.snrTrades(Y, { from: 0, market: 'xau' });
+    for (const r of all.concat(sn)) { assert.ok(stopOk(r)); assert.ok(['target', 'stopped', 'open'].includes(r.status), 'no time exit: ' + r.status); assert.ok(!/24 hours/.test(r.log.map((x) => x.text).join(' '))); }
+    for (const r of all) { if (r.marks.some((m) => m.label === 'H4 EF (zone failed)')) ef++; if (r.marks.some((m) => m.label === 'M30 EG zone')) m30++;
+      if (r.kind === 'eg-direct') { direct++; const [h4, h1, m15] = r.marks; assert.ok(h1.top <= h4.top && h1.bot >= h4.bot && m15.top <= h1.top && m15.bot >= h1.bot, 'each fresh zone lies inside the one above'); } }
+    const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay); if (/-30$/.test(r.id)) { snr30++; assert.equal(r.l, '30m'); } }
+    assert.equal(new Set(sn.map((r) => r.id)).size, sn.length); }
+  assert.ok(ef >= 1, 'entries in a failed H4 zone: ' + ef); assert.ok(m30 >= 1, 'entries on an M30 engulf: ' + m30);
+  const src = rd('council/eg-methods.mjs'); assert.match(src, /a\.top <= b\.top && a\.bot >= b\.bot/); assert.ok(!/EGM\.hold\)/.test(src), 'no 24-hour exit is passed any more');
 });

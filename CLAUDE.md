@@ -5241,6 +5241,23 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     (stop first in one candle, a gap at the open), marked `settled: true` with a log line; neither reached = still open.
     Never a record the run read, of another feed or market, or from before the candles on file. It stayed open for good
     before. A plain settlement: it does not apply a reading's trail or time exit. Test in `tests/mosha-tracker.test.mjs`.
+  - **The documents checked page by page by an independent reader** (21 Nov 2026, owner: "make sure everything you understand
+    from the documents, and how to apply"; every page image read against the code). Fixed, each with a test: (1) **Mosha
+    sequence: a CF inside the VR is the method's "likely to fail" case**: `sopTrades` records no entry (`case === 2`; `o.case2`
+    brings them back for research only); (2) **plan / short method: a FAILED opposite H4 zone is a zone too** (`h4Zone`, as the
+    gold plan already read it), mark "H4 EF (zone failed)"; (3) **the trigger is a 15- OR a 30-minute engulf** (`triggers`,
+    `m30of`: 30-minute candles from the 15-minute ones; plan, short method and gold plan; a gold-plan record on M30 has id
+    suffix `-30` and `l: '30m'`); (4) **direct entry: "inside" is wholly inside** the zone above (an overlap was enough);
+    (5) **exits are the stop or the target** on the three engulf methods and the gold plan (the 24-hour exit was the desk's),
+    and the gold plan has no one-at-a-time rule (its own limit is 2 a day). Left and said to the owner (need the teacher's
+    or the owner's wording, or are the owner's own earlier choices): the sequence's EG entry, $0.30 stop and VR-extreme target
+    (owner, 12 Nov: "i want eg as entry"); the 50% pullback not required (owner, 13 Nov); a QM required for the VR and CF (the
+    page can also be read "preferred"); the barrier entry at the broken LEVEL (the pictures suggest the origin zone of the
+    confirming leg); the second-BO barrier entry (not coded); VR and CF boxes as barriers and barriers against the direction
+    "only give a rejection" (every barrier gets 3R); internal breakouts traded with the same sequence; the sequence's ladder
+    below H1 (the pages keep direction on Daily / H4 / H1); "strong" H4 BO in the gold plan undefined; trailing the direct
+    entry's stop with the M5 EF. The direction procedure is on no page (it is the direction skill's text, checked earlier).
+    `research/edge/desk-rigor` was run on the code BEFORE these five changes: its result stands as the record of that code.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

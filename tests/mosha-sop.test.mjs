@@ -116,3 +116,13 @@ test('another market gets the same reading at the same share of price: gold cand
   assert.deepEqual(M.sizes('xau', 9999), { buf: 0.3, rmin: 0.8, rmax: 25, zmin: 0.5 }, 'gold keeps its dollar figures at any price');
   assert.deepEqual(Object.keys(M.MARKETS), ['xau', 'xag', 'eurusd', 'gbpusd', 'nas100']);
 });
+
+test('a CF inside the VR is the "likely to fail" case: the sequence waits and records no entry', () => {
+  let n2 = 0;
+  for (const seed of [7, 11, 23, 31]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400;
+    const a = M.sopTrades(X, F, { from: fr }), b = M.sopTrades(X, F, { from: fr, case2: true });
+    assert.ok(a.every((r) => r['case'] !== 2), 'no entry on a CF inside the VR');
+    assert.deepEqual(a.map((r) => r.id), b.filter((r) => r['case'] !== 2).map((r) => r.id), 'the other entries are untouched');
+    n2 += b.filter((r) => r['case'] === 2).length; }
+  assert.ok(n2 >= 1, 'the case does occur on these candles: ' + n2);
+});

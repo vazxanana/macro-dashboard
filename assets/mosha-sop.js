@@ -65,6 +65,8 @@
         // a trade is recorded only AT the candle whose close is its EG, as the chart read then: the window slides, so a later
         // look could re-read an old stretch and "find" an entry days after the fact (21 Nov 2026, independent audit)
         if (!M || !M.trade || M.trade.fillT !== L[i].time || !(M.trade.fillT + SEC[l] >= from)) continue;
+        // a CF INSIDE the VR is the method's "likely to fail" case: wait, do not enter (21 Nov 2026, the documents checked page by page)
+        if (M['case'] === 2 && !o.case2) continue;
         var k = h + '|' + boT + '|' + M.trade.fillT; if (map[k]) continue;
         var tr = map[k] = { id: pre + 'sop-' + l + '-' + M.trade.fillT, market: mk, kind: 'sop', h: h, l: l, side: M.trade.side, t: M.trade.fillT + SEC[l], entry: M.trade.entry, stop: M.trade.stop, target: M.trade.target,
           r0: Math.abs(M.trade.entry - M.trade.stop), 'case': M['case'], again: !!(M.cf && M.cf.again), deep: M.deep == null ? null : !!M.deep };
