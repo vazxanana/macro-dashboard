@@ -33,6 +33,33 @@
     ],
     "stopCheckedAt": "2026-11-20T20:36:37.000Z",
     "brokerStop": 75.786
+   },
+   "sol-position-1795231964": {
+    "symbol": "SOLUSD",
+    "side": "sell",
+    "setup": "position",
+    "openedAt": "2026-11-21T06:46:53.000Z",
+    "councilEntry": 67.37,
+    "stop": 75.88917857142857,
+    "t1": 50.33164285714287,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 67.37,
+    "digits": 3,
+    "lots": 0.01,
+    "riskCash": 85.19,
+    "margin": 67.28,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 67.373,
+    "slipR": 0,
+    "lagSec": 173,
+    "positionId": "50661044",
+    "volume": 1000,
+    "status": "open"
    }
   },
   "day": {
@@ -40,7 +67,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000 · 1 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10000 · 2 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -51,32 +78,10 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "sol-position-1795231964": {
-    "orderId": "34611778",
-    "symbol": "SOLUSD",
-    "side": "sell",
-    "volume": 1000,
-    "lots": 0.01,
-    "digits": 3,
-    "setup": "position",
-    "limitPrice": 67.37,
-    "stop": 75.88917857142857,
-    "t1": 50.33164285714287,
-    "placedAt": "2026-11-21T03:33:31.000Z",
-    "expires": "2026-11-26T03:32:44.000Z",
-    "riskCash": 85.19,
-    "margin": 67.28,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10000,
-  "lastRun": "2026-11-21T06:44:26.000Z"
+  "lastRun": "2026-11-21T06:46:53.000Z"
  },
  "log": [
   {
@@ -155,6 +160,11 @@
   {
    "at": "2026-11-21T05:11:17.000Z",
    "msg": "error: could not reach the cTrader demo server"
+  },
+  {
+   "at": "2026-11-21T06:46:53.000Z",
+   "msg": "limit filled: SOLUSD position 50661044 at the broker",
+   "trade": "sol-position-1795231964"
   }
  ],
  "limits": {
@@ -233,15 +243,15 @@
   ]
  },
  "execution": {
-  "n": 1,
-  "meanSlipR": 0.009,
-  "medianSlipR": 0.009,
+  "n": 2,
+  "meanSlipR": 0.004,
+  "medianSlipR": 0.004,
   "worstSlipR": 0.009,
-  "medianLagSec": 76,
+  "medianLagSec": 124.5,
   "bySymbol": {
    "SOLUSD": {
-    "n": 1,
-    "meanSlipR": 0.009
+    "n": 2,
+    "meanSlipR": 0.004
    }
   }
  }
