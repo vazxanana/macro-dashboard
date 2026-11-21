@@ -118,7 +118,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
   var fR = function (v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; };
-  var S = { state: 'idle', rows: null, at: 0, err: '', open: {}, flt: 'all', all: false };
+  var S = { state: 'idle', rows: null, at: 0, err: '', open: {}, flt: 'all', src: 'both', all: false, file: null };
   function fns() { return typeof root.msAnalyze === 'function' && typeof root.msMosha === 'function' && typeof root.msZones === 'function' && typeof root.msInternal === 'function' ? { msAnalyze: root.msAnalyze, msMosha: root.msMosha, msZones: root.msZones, msInternal: root.msInternal } : null; }
   function bars(tf, now) {
     var from = now - BACK[tf] * 86400, wins = [], to = now; while (to > from) { var f = Math.max(from, to - 4000 * SEC[tf]); wins.push([f, to]); to = f; }
@@ -127,8 +127,20 @@
       .then(function (j) { (j.bars || j || []).forEach(function (b) { out[b.time] = b; }); }); }); });
     return p.then(function () { return Object.keys(out).map(function (k) { return out[k]; }).sort(function (a, b) { return a.time - b.time; }).filter(function (b) { return b.time + SEC[tf] <= now; }); });
   }
-  function run() {
-    var F = fns(); if (S.state === 'busy' || !F) return; S.state = 'busy'; S.err = ''; draw();
+  // the tracker's stored record (council/mosha-desk.mjs -> council-data mosha/desk.json), as the ICT desk reads its own
+  function stored() {
+    var D = root.msData; if (!D || typeof D.json !== 'function') return Promise.resolve(null);
+    return Promise.resolve(D.json('mosha/desk.json')).then(function (j) { return j && Array.isArray(j.records) && j.records.length ? j : null; }, function () { return null; });
+  }
+  function run(force) {
+    if (S.state === 'busy') return; S.state = 'busy'; S.err = ''; draw();
+    stored().then(function (j) {
+      if (j && !force) { S.rows = j.records.slice().sort(function (a, b) { return b.t - a.t; }); S.file = { at: j.at, through: j.through, since: j.since }; S.state = 'done'; S.at = Date.now(); draw(); return; }
+      S.file = null; S.state = 'idle'; replay();
+    });
+  }
+  function replay() {
+    var F = fns(); if (S.state === 'busy') return; if (!F) { S.state = 'failed'; S.err = 'no page functions'; draw(); return; } S.state = 'busy'; S.err = ''; draw();
     var now = Math.floor(Date.now() / 1000), B = {}, p = Promise.resolve();
     Object.keys(BACK).forEach(function (tf) { p = p.then(function () { return bars(tf, now).then(function (a) { B[tf] = a; }); }); });
     p.then(function () { return new Promise(function (ok) { setTimeout(ok, 30); }); }).then(function () {
@@ -146,7 +158,7 @@
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
     var op = !!S.open[r.id], kind = r.kind === 'sop' ? NAME[r.h] + ' BO → ' + NAME[r.l] + ' VR, CF' + (r['case'] === 2 ? ' · CF inside the VR' : '') : NAME[r.h] + ' barrier → ' + NAME[r.l] + ' QM';
     return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(kind) + ' · gold</small></td>' +
-      '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span></td>' +
+      '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span>' + (r.src ? ' <small class="mo-sop-src">' + (r.src === 'live' ? 'live' : 'replay') + '</small>' : '') + '</td>' +
       '<td class="n" data-l="Entry">' + f2(r.entry) + '</td><td class="n" data-l="Stop">' + f2(r.stop) + '</td><td class="n" data-l="Target">' + f2(r.target) + '</td>' +
       '<td class="mo-c-res"><div class="mo-ex">' + res + '<small>' + (r.endT ? 'ended ' + utc(r.endT) + ' · ' : '') + 'risk $' + f2(r.r0) + '</small></div>' +
       '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-sop-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></div>' +
@@ -154,32 +166,35 @@
   }
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
-    var head = '<div class="ms-k"><span>Replayed trades</span><small>the method as the course documents write it, on the last two weeks of gold candles · each trade with its log</small></div>';
-    if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading two weeks of candles and replaying them…' : 'The replay starts when the desk opens.') + '</div>'; return; }
-    if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The candles could not be read, so nothing was replayed. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
-    var all = S.rows || [], sop = all.filter(function (r) { return r.kind === 'sop'; }), bar = all.filter(function (r) { return r.kind === 'barrier'; });
+    var head = '<div class="ms-k"><span>Mosha trades</span><small>the method as the course documents write it, on gold · recorded by the desk\'s tracker like the ICT desk · paper only · each trade with its log</small></div>';
+    if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading the trades…' : 'The trades load when the desk opens.') + '</div>'; return; }
+    if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The tracker has no stored trades yet and the candles could not be read, so there is nothing to show. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
+    var every = S.rows || [], nLive = every.filter(function (r) { return r.src === 'live'; }).length, all = S.file && S.src !== 'both' ? every.filter(function (r) { return (r.src === 'live') === (S.src === 'live'); }) : every, sop = all.filter(function (r) { return r.kind === 'sop'; }), bar = all.filter(function (r) { return r.kind === 'barrier'; });
     var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : all, shown = S.all ? list : list.slice(0, 12);
     var chip = function (k, t, n) { return '<button type="button" class="mo-sop-b" data-sop-flt="' + k + '" aria-pressed="' + (S.flt === k) + '">' + t + ' (' + n + ')</button>'; };
     var sm = summary(list), open = all.filter(function (r) { return r.R == null; }), last = all[0];
-    var ans = (open.length ? open.length + (open.length === 1 ? ' replayed trade is' : ' replayed trades are') + ' open now. ' : 'No replayed trade is open now. ') + (last ? 'Latest entry: ' + word(last.side) + ' at ' + f2(last.entry) + ', ' + utc(last.t) + '.' : '');
+    var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + word(last.side) + ' at ' + f2(last.entry) + ', ' + utc(last.t) + '.' : '');
     var tile = function (k, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + k + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
     var tiles = '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Reached target', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
-      tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · two weeks') + '</div>';
+      tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
     var openHTML = open.length ? '<h3 class="mo-sop-h">Open now</h3><ul class="mo-sop-open">' + open.map(function (r) { return '<li><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span> <b>' + f2(r.entry) + '</b> · stop ' + f2(r.stop) + ' · target ' + f2(r.target) + (r['float'] != null ? ' · <b class="' + (r['float'] >= 0 ? 'pos' : 'neg') + '">' + fR(r['float']) + ' now</b>' : '') + ' <small>since ' + utc(r.t) + '</small> <button type="button" class="mo-sop-b" data-sop-chart="' + esc(r.id) + '">Chart</button></li>'; }).join('') + '</ul>' : '';
     var days = byDay(list), cal = days.length ? '<h3 class="mo-sop-h">Closed R by day <small>the UTC day each trade ended · open trades not added in</small></h3><div class="mo-sop-cal">' + days.map(function (d) { return '<div class="mo-sop-day ' + (d.R > 0 ? 'pos' : d.R < 0 ? 'neg' : '') + '"><small>' + esc(new Date(d.day + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })) + '</small><b>' + fR(d.R) + '</b><span>' + d.n + (d.n === 1 ? ' trade' : ' trades') + '</span></div>'; }).join('') + '</div>' : '';
     box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
-      '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + '<button type="button" class="mo-sop-b" data-sop-run>Replay again</button></div>' +
+      '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + (S.file ? '<span class="mo-sop-sep" aria-hidden="true"></span>' + ['both', 'live', 'replay'].map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-src="' + k + '" aria-pressed="' + (S.src === k) + '">' + (k === 'both' ? 'Both' : k === 'live' ? 'Live (' + nLive + ')' : 'Replay (' + (every.length - nLive) + ')') + '</button>'; }).join('') : '') +
+      '<button type="button" class="mo-sop-b" data-sop-run>Refresh</button></div>' +
+      '<p class="ms-note mo-sop-st">' + (S.file ? 'Recorded by the tracker in the council loop, about every 35 minutes' + (S.file.at ? ' · last run ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') + (S.file.since ? ' · trades since ' + utc(S.file.since).slice(0, 10) : '') + '. Live = the tracker recorded it within an hour of its entry; Replay = worked out afterwards from the same closed candles.' : 'The tracker has no stored trades yet, so these were worked out in this browser from the last two weeks of candles.') + '</p>' +
       tiles + openHTML +
       '<h3 class="mo-sop-h">Trades</h3>' +
       (shown.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="Replayed trades of the Mosha reading"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result and log</th></tr></thead><tbody>' + shown.map(rowHTML).join('') + '</tbody></table></div>' +
-        (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No entry in the last two weeks.</div>') +
+        (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') +
       cal +
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop) + line('Barrier entry', bar, 'It takes every fresh H1 and M15 barrier; the method says to mark the best one, and that choice is not in the replay.') +
       '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. These are not Luxus\'s trades and not the council\'s, nothing was traded, and two weeks cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
   document.addEventListener('click', function (e) {
-    var b = e.target && e.target.closest ? e.target.closest('#mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
+    var b = e.target && e.target.closest ? e.target.closest('#mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
+    if (b.hasAttribute('data-sop-src')) { S.src = b.getAttribute('data-sop-src'); S.all = false; draw(); return; }
     if (b.hasAttribute('data-sop-run')) { S.all = false; run(); return; }
     if (b.hasAttribute('data-sop-all')) { S.all = true; draw(); return; }
     if (b.hasAttribute('data-sop-flt')) { S.flt = b.getAttribute('data-sop-flt'); S.all = false; draw(); return; }
@@ -188,7 +203,7 @@
     if (typeof root.msMoshaReplayTrade === 'function') { root.msMoshaReplayTrade({ replayed: true, id: r.id, market: 'xau', side: word(r.side), at: r.t, entry: +f2(r.entry), stop: +f2(r.stop), target: +f2(r.target), status: r.R != null ? 'closed' : 'open', exit: r.exit != null ? +f2(r.exit) : null, exitAt: r.endT, R: r.R });
       var rp = $('mo-replay'); if (rp && rp.scrollIntoView) rp.scrollIntoView({ block: 'start' }); }
   });
-  function go() { var v = $('v-mosha'); if (!v || v.hidden) return; if (API.visible(document.documentElement.dataset) && S.state === 'idle' && fns()) run(); else draw(); }
+  function go() { var v = $('v-mosha'); if (!v || v.hidden) return; if (API.visible(document.documentElement.dataset) && S.state === 'idle') run(); else draw(); }
   var prev = root.renderMosha;
   root.renderMosha = function () { if (prev) prev(); go(); };
   root.msMoshaSop = go;
