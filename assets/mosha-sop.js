@@ -296,7 +296,10 @@
         for (; q < Z.length; q++) if (z.dir < 0 ? Z[q].high >= z.lo : Z[q].low <= z.hi) { tch = Z[q].time; break; }
         return { tf: zt, dir: z.dir, lo: z.lo, hi: z.hi, kind: z.kind === 'vr' ? 'vr' : 'cf', known: z.known, touch: tch, of: z.of, tgt: z.tgt }; });
       var zs = []; zonesOf(zt, B, F, o).forEach(function (z) { zs.push(z); (z.visits || []).forEach(function (t, n) { var v = {}; for (var key in z) v[key] = z[key]; v.touch = t; v.visit = n + 2; zs.push(v); }); });
-      zs.concat(sweepsOf(zt, B), own).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
+      // a CF zone or VR box the sequence handed over is often the very box of this chart's small break (the same level, the same
+      // extreme): it is read first, so of two records of one order the one that says what the zone is (and keeps the
+      // sequence's own target) is the one kept. With box 'candle' the order is as it was.
+      (o.box === 'candle' ? zs.concat(sweepsOf(zt, B), own) : own.concat(zs, sweepsOf(zt, B))).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
         var d = z.dir, t0 = z.touch, h = z.hi - z.lo, i;
         // z.touch is the OPEN time of the barrier-timeframe candle that came back: the moment itself is read on the finest candles
         // that reach back to it, and the confirmation is looked for from the candle that holds that moment, never before it
