@@ -118,5 +118,65 @@
    "t": 1794528000,
    "close": 3884.685
   }
+ },
+ {
+  "record_id": "vet-2026-11-21-issued",
+  "forecast_id": "xau-4w-2026-11-21",
+  "record_type": "issued",
+  "recorded_at_utc": "2026-11-21T00:54:36.000Z",
+  "previous_record_id": null,
+  "week": "2026-11-21",
+  "forecast": {
+   "issued_at_utc": "2026-11-21T00:54:36.000Z",
+   "information_cutoff_utc": "2026-11-21T00:54:36.000Z",
+   "target": {
+    "variable": "XAU/USD daily close",
+    "instrument_or_population": "council daily gold candles (OANDA spot mid), research/daily/xau.json",
+    "unit": "USD per troy ounce",
+    "outcome_description": "The daily close 20 trading days after 2026-11-20 is above 3538.30 (the close of 2026-11-20)",
+    "observation_start_utc": "2026-11-20T00:00:00.000Z",
+    "deadline_utc": "2026-12-20T00:00:00.000Z",
+    "timezone_note": "UTC day candles; the deadline is the 20th trading-day close, about 28-30 calendar days on"
+   },
+   "horizon": "20 trading days",
+   "resolution_rule": {
+    "publisher": "council-data",
+    "dataset_or_instrument": "research/daily/xau.json",
+    "field_or_price_convention": "row close (index 4)",
+    "rule": "true if close[t0 + 20 rows] > close[t0], rows = weekday candles (the Sunday reopen stub is not a trading day)",
+    "revision_policy": "candles are not revised; a missing day leaves the record unresolved until the next close",
+    "specified_vintage": "2026-11-20"
+   },
+   "distribution": {
+    "kind": "binary_event",
+    "event_probability": 0.526
+   },
+   "comparator": {
+    "type": "model_rule",
+    "description": "Gold Macro Score rule: score −0.95 → tested 4-week up rate",
+    "probability_or_value": 0.52,
+    "sample_size": 1069,
+    "captured_at_utc": "2026-11-21T00:54:36.000Z",
+    "source_url": null,
+    "limitations": "tested hit rates are in-sample averages over 2007-26, not a live probability"
+   },
+   "base_rate": {
+    "probability": 0.566,
+    "description": "unconditional 20-day up rate, 2016-11-24..2026-11-20, n 2574"
+   },
+   "rationale": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size.",
+   "disconfirming_evidence": "10Y TIPS real yield above 3.03% (+15 bp from 2.88%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it",
+   "method_version": "veteran-1",
+   "author_or_model": "council/veteran.mjs (code port of gptmacro_v.1)",
+   "tags": [
+    "gold",
+    "paper-only",
+    "auction"
+   ]
+  },
+  "anchor": {
+   "t": 1795132800,
+   "close": 3538.305
+  }
  }
 ]
