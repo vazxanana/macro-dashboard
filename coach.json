@@ -57,7 +57,7 @@
   }
  ],
  "decay": {
-  "at": "2026-11-20T18:00:37.000Z",
+  "at": "2026-11-21T00:02:24.000Z",
   "v": 1,
   "baseAt": "2026-11-11T22:19:46.138Z",
   "financing": {
@@ -545,10 +545,10 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-20T18"
+  "slot": "2026-11-21T00"
  },
  "book": {
-  "at": "2026-11-20T18:00:37.000Z",
+  "at": "2026-11-21T00:02:24.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
@@ -800,10 +800,10 @@
     "cumProp": 12.422
    }
   ],
-  "slot": "2026-11-20T18"
+  "slot": "2026-11-21T00"
  },
  "expect": {
-  "at": "2026-11-20T18:00:37.000Z",
+  "at": "2026-11-21T00:02:24.000Z",
   "v": 1,
   "baseAt": "2026-11-12T09:34:49.973Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
@@ -1525,10 +1525,10 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-20T18"
+  "slot": "2026-11-21T00"
  },
  "forward": {
-  "at": "2026-11-20T18:00:37.000Z",
+  "at": "2026-11-21T00:02:24.000Z",
   "v": 1,
   "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
   "decision": 43,
@@ -1572,7 +1572,7 @@
    "ddMarked": 1,
    "firstAt": 1794491160,
    "lastAt": 1794491160,
-   "months": 0.29,
+   "months": 0.3,
    "from": "2026-11-12",
    "path": [
     [
@@ -1582,10 +1582,10 @@
    ]
   },
   "band": {
-   "months": 0.28748840215986005,
-   "p5": -0.35,
+   "months": 0.2957426420260096,
+   "p5": -0.36,
    "p50": 0.06,
-   "p95": 0.82,
+   "p95": 0.85,
    "clamp": false,
    "where": "below",
    "show": 12
@@ -1716,7 +1716,7 @@
    "foreign": []
   },
   "alerts": [],
-  "slot": "2026-11-20T18"
+  "slot": "2026-11-21T00"
  },
  "ledger": [
   {
@@ -2599,10 +2599,10 @@
    }
   }
  ],
- "ledgerSlot": "2026-11-20T18",
+ "ledgerSlot": "2026-11-21T00",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
- "date": "2026-11-20",
- "at": "2026-11-20T00:02:27.000Z",
+ "date": "2026-11-21",
+ "at": "2026-11-21T00:02:24.000Z",
  "stats": {
   "rscalp": {
    "n": 6,
@@ -2676,10 +2676,10 @@
   "exp": -1
  },
  "lessons": {
-  "n": 1070,
-  "losses": 643,
-  "system": 328,
-  "market": 315,
+  "n": 1087,
+  "losses": 651,
+  "system": 330,
+  "market": 321,
   "byCause": {
    "retrace-fail": {
     "n": 60,
@@ -2700,13 +2700,13 @@
     "shadow": 52
    },
    "leftmoney": {
-    "n": 227,
-    "R": 537.23,
+    "n": 237,
+    "R": 569.89,
     "verdict": "system",
     "title": "Target left money on the table",
     "lesson": "Consider holding part of the position for the next target.",
     "live": 2,
-    "shadow": 225
+    "shadow": 235
    },
    "reversal": {
     "n": 56,
@@ -2718,13 +2718,13 @@
     "shadow": 55
    },
    "clean": {
-    "n": 170,
-    "R": 326.42,
+    "n": 169,
+    "R": 311.68,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
     "live": 4,
-    "shadow": 166
+    "shadow": 165
    },
    "becost": {
     "n": 3,
@@ -2736,13 +2736,13 @@
     "shadow": 1
    },
    "normal": {
-    "n": 124,
-    "R": -123.53,
+    "n": 127,
+    "R": -126.53,
     "verdict": "market",
     "title": "Normal loss",
     "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
     "live": 4,
-    "shadow": 120
+    "shadow": 123
    },
    "late": {
     "n": 11,
@@ -2772,13 +2772,13 @@
     "shadow": 127
    },
    "gaveback": {
-    "n": 140,
-    "R": -140.05,
+    "n": 142,
+    "R": -142.05,
     "verdict": "system",
     "title": "Gave back the profit",
     "lesson": "Move the stop to break-even or take a partial at +1R.",
     "live": 3,
-    "shadow": 137
+    "shadow": 139
    },
    "gap": {
     "n": 31,
@@ -2790,24 +2790,23 @@
     "shadow": 31
    },
    "news": {
-    "n": 54,
-    "R": -54,
+    "n": 57,
+    "R": -57,
     "verdict": "market",
     "title": "News spike",
     "lesson": "Avoid holding scalps and intraday trades through high-impact news: check the calendar before entering.",
     "live": 7,
-    "shadow": 47
+    "shadow": 50
    }
   },
   "top": [
-   "Target left money on the table (227×): Consider holding part of the position for the next target.",
-   "Gave back the profit (140×): Move the stop to break-even or take a partial at +1R.",
+   "Target left money on the table (237×): Consider holding part of the position for the next target.",
+   "Gave back the profit (142×): Move the stop to break-even or take a partial at +1R.",
    "Against the D1 trend (134×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-20T18",
+ "fslot": "2026-11-21T00",
  "notes": [
   "No change today: not enough evidence to move a rule."
- ],
- "proposalsBt": "2026-11-20T11:56:49.546Z"
+ ]
 }
