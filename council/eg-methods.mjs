@@ -39,10 +39,10 @@ const lower = (C, t) => { let lo = 0, hi = C.length; while (lo < hi) { const m =
 export function zones(C, tf) {
   const sec = SEC[tf], life = EGM.life[tf] || 120, out = [];
   for (let i = 1; i < C.length; i++) { const p = C[i - 1], c = C[i];
-    // a BODY engulf (the method's own definition): the candle opens at or beyond the previous close and closes at or beyond the
-    // previous open, the other way. The zone is the engulfed candle from the pair's wick extreme to its OPEN (the body's far edge).
-    const tol = 0.1 * Math.abs(p.open - p.close);   // a feed's open sits a tick either side of the previous close: a tenth of the body is allowed
-    const dir = p.open > p.close && c.close > c.open && c.open <= p.close + tol && c.close >= p.open ? 1 : p.open < p.close && c.close < c.open && c.open >= p.close - tol && c.close <= p.open ? -1 : 0; if (!dir) continue;
+    // an EG (owner, 21 Nov 2026: "close above the HIGH"): after a candle of the other colour, a candle CLOSES beyond that
+    // candle's HIGH (a buy) or LOW (a sell); where it opened does not matter. The zone is the engulfed candle from the pair's
+    // wick extreme to its OPEN (the body's far edge). Before 21 Nov 2026 it was a body engulf (a close beyond the other's open).
+    const dir = p.open > p.close && c.close > c.open && c.close > p.high ? 1 : p.open < p.close && c.close < c.open && c.close < p.low ? -1 : 0; if (!dir) continue;
     const z = dir > 0 ? { tf, dir, top: p.open, bot: Math.min(p.low, c.low), base: p.time, at: c.time + sec, touch: null, fail: null, i }
       : { tf, dir, top: Math.max(p.high, c.high), bot: p.open, base: p.time, at: c.time + sec, touch: null, fail: null, i };
     for (let j = i + 1; j < C.length && j <= i + life; j++) { const b = C[j];

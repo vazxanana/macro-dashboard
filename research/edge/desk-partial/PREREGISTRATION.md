@@ -47,3 +47,11 @@ paired month t, Holm over 30 (15 x 2). Descriptive: stage A gives no verdict.
 - Three markets only in stage B (gold, EUR/USD, GBP/USD); 5-minute candles (an M1-confirmed barrier is read on 5m fills).
 - A PASS is a candidate for a forward paper record of its own, never a live rule without the owner, and never "an edge" before
   that record. Nothing live changes from this study.
+
+## Amendment before any result (21 Nov 2026, same session)
+
+The owner, while the plan above was being coded: "u marking the eg wrong" (a buy EG is a candle that closes above the HIGH of
+the opposite candle before it, wherever it opened; the desks had used a close beyond that candle's open). `council/eg-methods.mjs`
+`zones` was changed to the owner's rule before stage B was run; stage B runs on that corrected code (it affects the Engulf plan,
+short method and direct entry, the MSNR gold plan and the MSNR direction's Daily EG levels). Stage A stays on the desks' stored
+2026 records as they were booked (old rule for those groups), and says so. No exit result had been computed when this was written.
