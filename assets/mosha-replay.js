@@ -144,6 +144,13 @@
   function outcome(spec, bars) {
     var s = spec.side === 'sell' ? -1 : 1, r0 = Math.abs(spec.entry - spec.stop), i, fi = -1;
     if (!(r0 > 0) || !bars || !bars.length) return { fill: null };
+    // a trade of a desk's own record is SHOWN as it was booked: its fill candle, its exit price and time, its R and how it ended
+    // (a trailing stop, a time limit, break-even, the day's end, a gap). The chart never works a second result out for it.
+    if (spec.stored) { var st = spec.stored, f0 = barAt(bars, st.at); if (f0 < 0 || bars[f0].time + 300 <= st.at - 300) return { fill: null };
+      var o2 = { fill: bars[f0].time, fillI: f0, exit: null, exitI: null, kind: 'open', R: null, worst: 0, how: st.how || '' }, x0 = st.exitAt != null ? Math.max(f0, barAt(bars, st.exitAt)) : -1;
+      if (st.exitAt != null && st.R != null && bars[bars.length - 1].time + 300 > st.exitAt) { o2.exit = bars[x0].time; o2.exitI = x0; o2.kind = 'stored'; o2.px = st.exit; o2.R = +(+st.R).toFixed(2); }
+      for (i = f0 + 1; i <= (o2.exitI != null ? o2.exitI : bars.length - 1); i++) { var w2 = (s < 0 ? bars[i].high - spec.entry : spec.entry - bars[i].low) / r0; if (w2 > o2.worst) o2.worst = w2; }
+      o2.worst = +Math.max(0, Math.min(o2.worst, o2.R != null && o2.R < 0 ? Math.max(1, -o2.R) : o2.worst)).toFixed(2); return o2; }
     for (i = 0; i < bars.length; i++) if (bars[i].time >= spec.fillFrom && bars[i].low <= spec.entry && bars[i].high >= spec.entry) { fi = i; break; }
     if (fi < 0) return { fill: null };
     var out = { fill: bars[fi].time, fillI: fi, exit: null, exitI: null, kind: 'open', R: null, worst: 0 };
@@ -172,14 +179,16 @@
   function specOfTrade(t, now) {
     var end = t.status === 'closed' && t.exitAt ? t.exitAt + 2 * 3600 : Math.min(now, t.at + 3 * 86400), to = Math.max(end, t.at + 3600);
     var sp = { id: 'log-' + t.id, title: (t.side === 'sell' ? 'Sell' : 'Buy') + ' of ' + new Date(t.at * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC', log: true, rp: !!t.replayed, label: t.replayed ? 'From the replay' : 'From the log', market: t.market, side: t.side, entry: t.entry, stop: t.stop, target: t.target,
-      from: t.at - 12 * 3600, to: to, fillFrom: t.at - 300, exit: !t.replayed && t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
+      from: t.at - 12 * 3600, to: to, fillFrom: t.at - 300, stored: t.replayed ? { at: t.at, exit: t.exit, exitAt: t.status === 'closed' ? t.exitAt : null, R: t.status === 'closed' ? t.R : null, how: t.how || '' } : null, exit: !t.replayed && t.status === 'closed' && t.exit != null ? { p: t.exit, t: t.exitAt } : null, marks: [],
       yours: t.status === 'closed' && t.R != null ? (t.R > 0 ? '+' : t.R < 0 ? '−' : '') + Math.abs(t.R).toFixed(2) + 'R, closed at ' + t.exit : 'still open',
       steps: [{ t: t.at - 12 * 3600, text: 'The twelve hours before the entry.' }, { t: 'fill', text: (t.side === 'sell' ? 'Sell ' : 'Buy ') + t.entry + ', stop ' + t.stop + (t.target != null ? ', target ' + t.target : '') + '.' }, { t: 'exit', text: 'The trade ends here.' }] };
     // a trade of the desk's own replay brings what it was built from: its marks (BO level, VR, CF zone, barrier) and its log as the steps
     var mk = (t.marks || []).filter(function (m) { return m && isFinite(m.a) && (m.kind === 'level' ? isFinite(m.p) : isFinite(m.top) && isFinite(m.bot)); }).slice(0, 8);
     if (mk.length) {
-      var first = Math.min.apply(null, mk.map(function (m) { return m.a; }));
-      sp.from = Math.max(t.at - 6 * 86400, Math.min(t.at - 8 * 3600, first - 3 * 3600)); sp.fillFrom = t.at - 60;
+      // the window is the TRADE's: it opens before the first mark made in the 36 hours before the entry. An older mark (a Daily
+      // or H4 level or zone) is not zoomed out to: it is drawn from the window's left edge, so the entry stays readable
+      var near = mk.map(function (m) { return m.a; }).filter(function (a) { return a >= t.at - 36 * 3600; }), first = near.length ? Math.min.apply(null, near) : t.at - 8 * 3600;
+      sp.from = Math.max(t.at - 36 * 3600, Math.min(t.at - 8 * 3600, first - 3 * 3600)); sp.fillFrom = t.at - 60;
       if (sp.to - sp.from > 2.5 * 86400) { sp.base = '15m'; sp.tfs = [900, 3600, 14400]; sp.h4off = usSummer(sp.from) ? 3600 : 7200; sp.fillFrom = t.at - 900; }
       sp.marks = mk.map(function (m) { var c = {}; for (var k in m) c[k] = m[k]; c.a = Math.max(m.a, sp.from); c.b = sp.to; if (c.at == null) c.at = m.a; return c; });
       if (t.name) sp.label = 'From the replay · ' + t.name;
@@ -243,59 +252,81 @@
     var cv = $('mo-rp-ov'), host = $('mo-rp-chart'); if (!cv || !host || !R.chart || !R.bars || !R.spec) return;
     var dpr = Math.min(root.devicePixelRatio || 1, 2), W = host.clientWidth, H = host.clientHeight; if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
     var x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
-    var ts = R.chart.timeScale(), plotW = ts.width(), plotH = H - 26, C = COL(), now = R.bars[R.cur].time + R.tf - 1, sp = R.spec;
+    var ts = R.chart.timeScale(), plotW = ts.width(), plotH = H - 26, C = COL(), now = nowOf(), sp = R.spec;
     var X = function (t) { var i = barAt(R.bars, t); if (i < 0) i = 0; var v = ts.logicalToCoordinate(i); return v == null ? null : v; }, Y = function (p) { var v = R.series.priceToCoordinate(p); return v == null ? null : v; };
     x.save(); x.beginPath(); x.rect(0, 0, plotW, plotH); x.clip(); x.font = '600 12px ' + css('--sans', 'system-ui, sans-serif'); x.textBaseline = 'middle';
     var narrow = plotW < 520;   // a phone: only the labels that carry the trade
-    var tag = function (txt, px, py, col) { var w = x.measureText(txt).width + 10; px = Math.max(2, Math.min(px, plotW - w - 2)); py = Math.max(10, Math.min(py, plotH - 10)); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
+    // no tag is drawn over another: one that would cover an earlier tag steps away from it, 20 px at a time, below then above
+    var placed = [];
+    var tag = function (txt, px, py, col) { var w = x.measureText(txt).width + 10; px = Math.max(2, Math.min(px, plotW - w - 2)); py = Math.max(10, Math.min(py, plotH - 10));
+      var hit = function (yy) { return placed.some(function (q) { return px < q.x + q.w + 2 && px + w + 2 > q.x && Math.abs(yy - q.y) < 19; }); };
+      if (hit(py)) { for (var k = 1; k <= 8; k++) { var d = Math.ceil(k / 2) * 20 * (k % 2 ? 1 : -1), yy = py + d; if (yy >= 10 && yy <= plotH - 10 && !hit(yy)) { py = yy; break; } } }
+      placed.push({ x: px, y: py, w: w }); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
+    var edge = { up: 0, dn: 0 }, pf = function (v) { var d = Math.abs(v) < 20 ? 5 : Math.abs(v) < 2000 ? 2 : 2; return (+v).toFixed(d); };
     marksAt(sp, now).forEach(function (m) {
       var x1 = X(m.a), x2 = X(m.b); if (x1 == null || x2 == null) return; if (x2 < x1 + 2) x2 = x1 + 2;
+      // off the price scale (kept out of it on purpose, setTf): one tag at that edge, with the mark's own prices
+      var yA = Y(m.p != null ? m.p : m.top), yB = Y(m.p != null ? m.p : m.bot);
+      if (yA != null && yB != null && (Math.max(yA, yB) < 0 || Math.min(yA, yB) > plotH)) { var up = Math.max(yA, yB) < 0, n = up ? edge.up++ : edge.dn++;
+        if (!narrow || n < 1) tag((up ? '\u25B2 ' : '\u25BC ') + L(m.label) + ' ' + (m.p != null ? pf(m.p) : pf(m.bot) + ' \u2013 ' + pf(m.top)), 6, up ? 12 + n * 20 : plotH - 12 - n * 20, C.level); return; }
       if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(L(m.label), m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), C.level); return; }
       var yt = Y(m.top), yb = Y(m.bot); if (yt == null || yb == null) return;
       if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); if (!(narrow && x2 - x1 < 30)) tag(L(m.label), (x1 + x2) / 2 - 16, yt - 11, col); }
-      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) tag(L(m.label), x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); }
+      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) { var lw = x.measureText(L(m.label)).width + 10, small = Math.abs(yb - yt) < 20 || x2 - x1 < lw + 12; tag(L(m.label), small && x1 - lw - 6 > 2 ? x1 - lw - 6 : x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); } }
       else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(L(m.label), x1 + 6, (yt + yb) / 2, C.level); }
     });
     // the position: red band entry to stop, grey band entry to target, from the fill to the exit (or to now)
-    var oc = R.oc; if (oc && oc.fill != null && oc.fill <= now) {
-      var a = X(oc.fill), b = X(oc.exit != null && oc.exit <= now ? oc.exit : now), ye = Y(sp.entry), ys = Y(sp.stop), yg = sp.target != null ? Y(sp.target) : null;
+    var oc = R.oc; if (oc && oc.fill != null && (oc.fill <= now || R.before)) {
+      var a = R.before ? X(R.bars[R.cur].time) : X(oc.fill), b = R.before ? (a == null ? null : a + 90) : X(oc.exit != null && oc.exit <= now ? oc.exit : now), ye = Y(sp.entry), ys = Y(sp.stop), yg = sp.target != null ? Y(sp.target) : null;
       if (a != null && b != null && ye != null && ys != null) { if (b < a + 6) b = a + 6;
         x.fillStyle = C.stop; x.fillRect(a, Math.min(ye, ys), b - a, Math.abs(ys - ye)); if (yg != null) { x.fillStyle = C.tgt; x.fillRect(a, Math.min(ye, yg), b - a, Math.abs(yg - ye)); }
         x.strokeStyle = C.ink; x.lineWidth = 1; x.beginPath(); x.moveTo(a, ye + .5); x.lineTo(b, ye + .5); x.stroke();
         if (b - a >= 200) tag('Stop ' + sp.stop, b - 96, ys + (sp.side === 'sell' ? 11 : -11), light() ? '#c2185b' : '#ff8fab'); else if (!narrow) tag('Stop ' + sp.stop, b + 6, ys, light() ? '#c2185b' : '#ff8fab');   /* a position too narrow on screen for its tags: the stop's goes beside it (on a phone the line above the chart names it) */ tag((sp.side === 'sell' ? 'Sell ' : 'Buy ') + sp.entry, a + 4, ye + (sp.side === 'sell' ? -11 : 11), C.ink); if (yg != null) tag('Target ' + sp.target, b - 108, yg + (sp.side === 'sell' ? -11 : 11), C.ink);
-        if (oc.exit != null && oc.exit <= now && oc.px != null) { var yx = Y(oc.px); if (yx != null) { x.fillStyle = oc.R > 0 ? css('--buy', '#089981') : css('--sell', '#f23645'); x.beginPath(); x.arc(b, yx, 5, 0, 7); x.fill(); } } }
+        if (!R.before && oc.exit != null && oc.exit <= now && oc.px != null) { var yx = Y(oc.px); if (yx != null) { x.fillStyle = oc.R > 0 ? css('--buy', '#089981') : css('--sell', '#f23645'); x.beginPath(); x.arc(b, yx, 5, 0, 7); x.fill(); } } }
     }
     x.restore();
   }
   function caption() {
     if (!R.bars || !R.bars.length) return;
-    var now = R.bars[R.cur].time + R.tf - 1, k = stepAt(R.steps, now), box = $('mo-rp-cap'), st = $('mo-rp-steps');
+    var now = nowOf(), k = stepAt(R.steps, now), box = $('mo-rp-cap'), st = $('mo-rp-steps');
     if (box) { var txt = k < 0 ? L('Press play, or step through.') : L('{a} of {b}', { a: k + 1, b: R.steps.length }) + ' · ' + L(R.steps[k].text); if (box.textContent !== txt) box.textContent = txt; }
     if (st) Array.prototype.forEach.call(st.children, function (b, i) { b.setAttribute('aria-current', i === k ? 'step' : 'false'); b.classList.toggle('done', i < k); });
     var clock = $('mo-rp-clock'); if (clock) clock.textContent = utc(R.bars[R.cur].time); var sl = $('mo-rp-slider'); if (sl && +sl.value !== R.cur) sl.value = R.cur;
     var pl = $('mo-rp-play'); if (pl) { pl.textContent = R.timer ? L('Pause') : R.cur >= R.bars.length - 1 ? L('Play again') : L('Play'); pl.setAttribute('aria-pressed', R.timer ? 'true' : 'false'); }
   }
-  function show(i) { if (!R.bars) return; R.cur = Math.max(0, Math.min(R.bars.length - 1, i)); R.series.setData(R.bars.slice(0, R.cur + 1)); caption(); requestAnimationFrame(paint); }
+  // the moment the chart stands at: the end of its last candle; in Before, the entry itself (what was known when the trade was
+  // entered: a level confirmed by the close of the last candle is there, the outcome is not)
+  function nowOf() { var n = R.bars[R.cur].time + R.tf - 1; return R.before && R.spec && R.spec.stored ? Math.max(n, R.spec.stored.at) : n; }
+  function show(i) { if (!R.bars) return; var wasB = R.before; R.before = false; if (wasB) result(); R.cur = Math.max(0, Math.min(R.bars.length - 1, i)); R.series.setData(R.bars.slice(0, R.cur + 1)); caption(); requestAnimationFrame(paint); }
   function stop() { if (R.timer) { clearInterval(R.timer); R.timer = 0; } caption(); }
   function play() { if (!R.bars) return; if (R.timer) return stop(); if (R.cur >= R.bars.length - 1) show(0);
     var ms = (SPEEDS.filter(function (s) { return s[0] === R.speed; })[0] || SPEEDS[0])[1] * (R.tf <= 300 ? 1 : R.tf <= 900 ? 1.6 : 2.4);
-    R.timer = setInterval(function () { if (R.cur >= R.bars.length - 1 || !$('mo-rp-chart') || $('v-mosha').hidden) return stop(); show(R.cur + 1); }, ms); caption(); }
+    R.timer = setInterval(function () { if (R.cur >= R.bars.length - 1 || !$('mo-rp-chart') || !$('mo-rp-chart').offsetParent) return stop();   /* the card is on screen wherever it sits: on the Mosha desk or lent to another desk's dialog */ show(R.cur + 1); }, ms); caption(); }
   function setTf(sec, keep) {
     var t = keep && R.bars ? R.bars[R.cur].time : null; R.tf = sec; R.bars = aggBars(R.base, sec, sec === 14400 ? R.spec.h4off : 0);
     var lo = Infinity, hi = -Infinity; R.bars.forEach(function (b) { if (b.low < lo) lo = b.low; if (b.high > hi) hi = b.high; });
-    [R.spec.entry, R.spec.stop, R.spec.target].concat((R.spec.marks || []).filter(function (m) { return m.kind !== 'htf'; }).map(function (m) { return m.p != null ? m.p : m.top; })).forEach(function (p) { if (p == null) return; if (p < lo) lo = p; if (p > hi) hi = p; });
+    // a mark far from the candles (a Daily level or zone well above or below them) must not flatten the candles: the scale takes
+    // a mark only within half the candles' own range of them; a farther one is named at the chart's edge with its prices (paint)
+    var reach = (hi - lo) * .5, cLo = lo - reach, cHi = hi + reach;
+    [R.spec.entry, R.spec.stop, R.spec.target].forEach(function (p) { if (p == null) return; if (p < lo) lo = p; if (p > hi) hi = p; });
+    (R.spec.marks || []).filter(function (m) { return m.kind !== 'htf'; }).forEach(function (m) { var a = m.p != null ? m.p : m.bot, b = m.p != null ? m.p : m.top; if (!(isFinite(a) && isFinite(b)) || a < cLo || b > cHi) return; if (a < lo) lo = a; if (b > hi) hi = b; });
     var pad = (hi - lo) * .04; R.lo = lo - pad; R.hi = hi + pad;
     var sl = $('mo-rp-slider'); if (sl) sl.max = R.bars.length - 1;
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-tf button'), function (b) { b.setAttribute('aria-pressed', String(+b.dataset.tf === sec)); });
     show(t != null ? Math.max(0, barAt(R.bars, t)) : R.bars.length - 1); R.chart.timeScale().setVisibleLogicalRange({ from: -1, to: R.bars.length + 3 });
   }
+  // how a desk's stored trade ended, in words (the stored status)
+  var HOW = { target: 'target reached', stopped: 'stopped', trail: 'trailing stop', time: 'time limit', breakeven: 'stopped at break-even', dayend: 'closed at the day\'s end' };
   function result() {
     var el = $('mo-rp-res'), oc = R.oc, sp = R.spec; if (!el) return;
+    // Before: the chart as it stood at the entry says nothing of how the trade went
+    if (R.before && sp.entry != null) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + L('Before: the chart as it stood at the entry. The result is under After.') + '</small>'; return; }
     if (sp.entry == null && !sp.watch) { el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + L('marks only, no position') + '<small>' + esc(L(sp.label || '')) + '.</small>'; return; }   // a lesson the desk marked without a trade
     if (sp.entry == null) { var f = follow(sp, R.base), dn = sp.side === 'sell';   // a picture without a position
       el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + L('no position is drawn on this screenshot') + '<small>' + L('On our candles:') + ' ' + esc(!f ? L('the candle it points at is not in the feed') : L(dn ? 'the {t} candle closed at {px}. After it price went {w} up at most, then {b} down, to {bp} at {bt}' : 'the {t} candle closed at {px}. After it price went {w} down at most, then {b} up, to {bp} at {bt}', { t: utc(f.t), px: f.px.toFixed(1), w: f.worst.toFixed(1), b: f.best.toFixed(1), bp: f.bestPx.toFixed(1), bt: utc(f.bestT) })) + '.</small>'; return; }
     var v = oc && oc.fill != null ? { f: utc(oc.fill), x: oc.exit != null ? utc(oc.exit) : '', r: fR(oc.R), w: oc.worst.toFixed(2) } : null;
     var ours = !v ? L('the entry price was not traded on our candles at that time') : oc.kind === 'target' ? L('filled {f}, target reached {x} ({r}), worst point {w}R against', v)
+      : oc.kind === 'stored' ? L('filled {f}, {h} {x} ({r}), worst point {w}R against', { f: v.f, x: v.x, r: v.r, w: v.w, h: L(HOW[oc.how] || 'closed') })
       : oc.kind === 'stop' ? L('filled {f}, stop touched {x}', v) : oc.kind === 'hand' ? L('filled {f}, closed {x} ({r}), worst point {w}R against', v) : L('filled {f}, neither stop nor target by the end of the window', v);
     // whose figure the first one is: the lesson's, the log's, or the one written on the screenshot (never "you": every reader sees this card)
     el.innerHTML = '<b>' + esc(sp.title) + '</b> · ' + (sp.side === 'sell' ? 'sell ' : 'buy ') + esc(sp.entry) + ' · stop ' + esc(sp.stop) + (sp.target != null ? ' · target ' + esc(sp.target) : '') + '<small>' + (sp.lesson ? L('The lesson:') : sp.rp ? L('In the replay:') : sp.log ? L('In the log:') : L('On the screenshot:')) + ' ' + esc(yoursOf(sp)) + '. ' + L('On our candles:') + ' ' + esc(ours) + '.</small>';
@@ -358,7 +389,9 @@
   // Before = the chart as it stood at the entry; After = the whole trade. Display only.
   var HOME = null;
   function dlgAt(which) { if (!R.bars || !R.spec) return; stop(); var t0 = R.oc && R.oc.fill != null ? R.oc.fill : R.spec.fillFrom != null ? R.spec.fillFrom + 300 : R.bars[0].time;
-    show(which === 'before' ? Math.max(0, barAt(R.bars, t0)) : R.bars.length - 1);
+    // Before ends at the last candle that had CLOSED when the trade was entered: the candle that holds the fill is not drawn
+    if (which === 'before') { var em = R.spec.stored ? R.spec.stored.at : t0, fb = barAt(R.bars, em); while (fb >= 0 && R.bars[fb].time + R.tf > em) fb--; show(Math.max(0, fb)); R.before = true; result(); caption(); requestAnimationFrame(paint); }
+    else show(R.bars.length - 1);
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-dlg [data-rpd="before"], #mo-rp-dlg [data-rpd="after"]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-rpd') === which)); }); }
   function dlgBack() { stop(); var card = $('mo-replay'); if (card && HOME && HOME.parentNode && card.previousSibling !== HOME) HOME.parentNode.insertBefore(card, HOME.nextSibling); if (HOME) { HOME.hidden = true; HOME.style.cssText = ''; } R.onReady = null; if (R.bars) requestAnimationFrame(paint); }
   root.msMoshaReplayDialog = function (t, host) {

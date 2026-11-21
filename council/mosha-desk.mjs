@@ -75,7 +75,7 @@ const mark = (m, d = 3) => { const k = ['level', 'vr', 'bvr', 'zone'].includes(m
 export function clean(r) {
   const side = r.side > 0 ? 1 : -1, entry = +r.entry, stop = +r.stop, mk = SOP.ALL[r.market] ? r.market : 'xau', d = mk === 'xau' ? 3 : 6;
   if (!(Number.isFinite(entry) && Number.isFinite(stop)) || !(side > 0 ? stop < entry : stop > entry)) return null;
-  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit|msnr)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 40) } : {}), h: r.h, l: r.l, case: r.case || null, ...(r.deep == null ? {} : { deep: !!r.deep }), side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: num(r.target, d), r0: num(Math.abs(entry - stop), d),
+  return { id: String(r.id), ...(mk === 'xau' ? {} : { market: mk }), kind: r.kind === 'sop' ? 'sop' : /^(eg|lit|msnr)-[a-z0-9-]{1,20}$/.test(r.kind) ? r.kind : 'barrier', ...(r.label ? { label: String(r.label).slice(0, 56) } : {}), h: r.h, l: r.l, case: r.case || null, ...(r.deep == null ? {} : { deep: !!r.deep }), ...(r.withDir == null ? {} : { withDir: !!r.withDir }), side, t: r.t, entry: num(entry, d), stop: num(stop, d), target: num(r.target, d), r0: num(Math.abs(entry - stop), d),
     status: r.status || 'open', R: r.R == null ? null : num(r.R), endT: r.endT || null, exit: r.exit == null ? null : num(r.exit, d), mfe: num(r.mfe), float: r.float == null ? null : num(r.float),
     log: (r.log || []).slice(0, 12).map((x) => ({ t: x.t || null, text: String(x.text || '').slice(0, 240) })),
     marks: (r.marks || []).slice(0, 8).map((m) => mark(m, d)).filter(Boolean) };
@@ -85,7 +85,10 @@ export function clean(r) {
 // stamped with when the tracker first saw it (`first`) and whether that was while it was live (`src`).
 export function merge(prev, fresh, now, feed = 'OANDA') {
   const old = new Map((prev || []).map((r) => [r.id, r])), out = [];
-  const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S);
+  const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S
+    // the SAME trade re-read under another id: its entry sits where the stored one's does, and the stored one had not already ended
+    // before it (a re-entry after a close is a new trade: until 21 Nov 2026 it was dropped)
+    && !(p.endT != null && p.endT <= r.t) && Math.abs(p.entry - r.entry) <= 0.5 * Math.abs(r.entry - r.stop));
   const seen = new Set();
   for (const f of fresh) { const c = clean(f); if (!c || seen.has(c.id)) continue; seen.add(c.id);
     const p = old.get(c.id);
@@ -99,11 +102,30 @@ export function merge(prev, fresh, now, feed = 'OANDA') {
   return out.sort((a, b) => b.t - a.t).slice(0, KEEP);
 }
 
+// An OPEN stored record this run did not read again, although its market's candles cover it (the reading no longer gives it:
+// a window that slid, an id that moved), would stay open for good. It is settled on the 5-minute candles after its entry at
+// its STORED stop and target: the stop first in one candle, a candle opening beyond the stop exits at its open; neither reached
+// = still open. Never a record of another feed, never one the run read, never one from before the candles on file.
+export const SETTLE_NOTE = 'The tracker no longer reads this trade again: settled on the 5-minute candles at its stored stop and target.';
+export function settle(records, freshIds, M5, market = 'xau', feed = 'OANDA') {
+  if (!M5 || !M5.length) return records;
+  return records.map((r) => {
+    if (r.R != null || r.status !== 'open' || (r.market || 'xau') !== market || freshIds.has(r.id) || feedOf(r) !== feed || !(r.t >= M5[0].time)) return r;
+    const d = r.side, r0 = Math.abs(r.entry - r.stop); if (!(r0 > 0) || r.target == null) return r;
+    for (const b of M5) { if (b.time < r.t) continue;
+      const gap = b.time > r.t && (d > 0 ? b.open <= r.stop : b.open >= r.stop), hitS = gap || (d > 0 ? b.low <= r.stop : b.high >= r.stop), hitT = !hitS && (d > 0 ? b.high >= r.target : b.low <= r.target);
+      if (!hitS && !hitT) continue;
+      const px = gap ? b.open : hitS ? r.stop : r.target, R = d * (px - r.entry) / r0, { float: _f, ...rest } = r;
+      return { ...rest, status: hitS ? 'stopped' : 'target', R, exit: px, endT: b.time + 300, settled: true,
+        log: (r.log || []).filter((x) => x.t != null).concat({ t: b.time + 300, text: `${SETTLE_NOTE} ${hitS ? 'Stopped' : 'Target reached'}: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }) }; }
+    return r; });
+}
+
 export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market = 'xau') {
   if (!B['5m'] || !B['5m'].length) throw new Error('no candles');
   const from = B['5m'][B['5m'].length - 1].time - days * 86400;
   const fresh = SOP.sopTrades(B, F, { from, market }).concat(SOP.barrierTrades(B, F, { from, market }));
-  const records = merge(prev && prev.records, fresh, now, feed), s = SOP.summary(records);
+  const records = settle(merge(prev && prev.records, fresh, now, feed), new Set(fresh.map((r) => r.id)), B['5m'], market, feed), s = SOP.summary(records);
   return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', markets: [...new Set(records.map((r) => r.market || 'xau'))], feed: market === 'xau' ? feed : (prev && prev.feed) || feed, through: market === 'xau' || !(prev && prev.through) ? B['5m'][B['5m'].length - 1].time + 300 : prev.through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },
     note: 'A paper record of the desk\'s reading of the Mosha method on gold and four more markets: nothing is traded, results are before costs, and it is not a tested rule.', records };

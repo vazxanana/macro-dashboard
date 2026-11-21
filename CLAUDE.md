@@ -5157,6 +5157,125 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     "H4 A level · BO buy", "H4 EF (zone failed)", "M15 EG zone", "M5 EF (zone failed)", "M5 EG zone · entry", "M5 VR",
     "M5 CF zone", "M15 CF (QM)"; `clean` keeps 8 marks). Not written, said on the desks: open-close levels, the gold plan's
     second entry type, "mark the BEST barrier" (every fresh BO / iBO origin is taken). These are readings, not tested rules.
+  - **The readings after the audit, tested** (21 Nov 2026, owner: "do a study in how to improve each edge";
+    `research/edge/desk-rigor/`, PREREGISTRATION.md committed alone first; `run.mjs fetch|market <key>|report <dir>`). The desks'
+    own code on gold, EUR/USD and GBP/USD, OANDA M5, in sample 2020-23, out of sample 2024-25 (nothing of 2026), net of costs,
+    month-sum t, Holm over 13 tests. **FAIL, 0 of 13.** Readings, out of sample, R a trade after costs: Mosha sequence −0.172
+    (n 978, t −2.22), Mosha barrier −0.113 (n 2,112, t −2.12), engulf plan −0.069 (n 893), simple −0.068 (n 1,008), direct
+    −0.075 (n 97, too few), MSNR with the direction −0.300 (n 3,957, t −11.87), MSNR gold plan +0.079 (n 775, t 1.31, and
+    −0.042 in sample). Conditions the methods name (50% pullback before the CF, CF clear of the VR, a major-BO barrier, with the
+    Daily structure, plan against simple, with against the direction): none picks better trades (largest t 1.51). Before costs
+    the engulf methods are about zero. The M15 barrier on M1 was not tested (no one-minute history). The desks stay paper
+    records of one way to read each method; none of these conditions is made a requirement; do not look at them again on
+    these years. Test: `tests/desk-rigor.test.mjs`.
+  - **Direction: the tap candle can be the breakout candle** (21 Nov 2026, point-by-point check of `direction()` against the
+    direction procedure): a working candle that tapped the key level AND closed beyond the external level was read one candle
+    late, or at a later re-break; the tap is now read before the break in the same candle (about 6-10 of 163 switches a
+    market move, 2019-26). Checked and left: A / V levels on closes, the dominant pair, EF from a failed EG zone, the level
+    fixed at the first tap, no switch without a tapped level. The desk's own choices stay `DIR` (2-candle turns, a level's
+    life 60 candles, 10 candles from tap to break) and the opposite structure at the tap.
+  - **Gold plan: the H4 break reads an A / V level of the closes** (21 Nov 2026, same check): `snrSides` confirmed a Daily
+    rejection by a close beyond the last H4 swing of the WICKS; it is the last H4 A level (V for a sell), a turn of the
+    closes, like every level on these desks; mark "H4 A level · BO buy". On gold 2020-25 after costs: in sample -0.047R
+    -> -0.050R a trade (n 1,452), out of sample +0.073R -> +0.058R (n 780, trade t 0.91): nothing changes in `desk-rigor`.
+  - **Mosha sequence: no entry once the target was reached** (21 Nov 2026, same check): `msMosha` took an EG after price had
+    already traded to the VR's extreme (the target) and come back; that move is done (`vr-broken`, repeat the SOP). Gold
+    2025: 266 -> 249 sequence entries, the 17 dropped summed +0.14R, so the record barely moves.
+  - **LIT desk: each execution is its own stream** (21 Nov 2026, same check): `litTrades` recorded a sweep under the FIRST
+    execution that filled, so "market on the break" held only sweeps whose limit orders later did not fill (the look-ahead
+    by selection `desk-slices` T3 named). Now every sweep is tried with every execution (`rule`, `loose`, `break`), one
+    position at a time per execution and market; `first: true` is the old reading, used only by the desk-slices study.
+  - **Barrier entry: the confirmation starts when price is AT the barrier** (21 Nov 2026, found on a chart): the zone's
+    `touch` is the OPEN time of the barrier-timeframe candle that came back (an H4 candle for an H4 barrier), and the QM was
+    looked for from that time, so a QM that closed hours before price reached the barrier inside that candle was taken
+    (knowing the candle would touch: look-ahead). The return is now the first of the finest candles that trades into the
+    zone, and the confirmation is read from the candle holding that moment. Gold 2025, D1 / H4 / H1 barriers: 460 -> 462
+    entries, 23 changed, +4.0R -> +18.0R before costs.
+  - **Independent audit of the Mosha replay** (21 Nov 2026, a separate read-only review; three confirmed defects fixed):
+    (1) a sequence entry is recorded only AT the candle whose close is its EG (`M.trade.fillT !== L[i].time`): the
+    1,500-candle window slides, so a later look could re-read an old stretch and record an entry days after the fact (one
+    such row was +20.95R on the test market); (2) `msMosha`: a wick back to the VR's extreme between the VR and the CF also
+    ends the move (`xHit`), not only a candle after the CF; (3) `zonesOf` lists breaks by time, so a zone belongs to the
+    EARLIEST break of its origin candle and a later BO never makes a visited barrier fresh again. Test: "no hindsight"
+    (unaligned cuts, three markets, every full-replay entry must exist when cut just after it). Gold 2025 before costs:
+    sequence 249 -> 231 entries, -15.7R -> -5.4R; barriers 462 -> 466, +18.0R -> +30.0R.
+  - **Independent audit of the Engulfing / MSNR / LIT trackers** (21 Nov 2026, a second read-only review; each confirmed
+    defect fixed and pinned by an "audit:" test in `tests/edge-desks.test.mjs` that fails on the code before):
+    (1) LIT: a trade still running on the last candle read was booked "day end" and frozen (the study's management calls
+    the last candle the day's end): it is open now; (2) MSNR on 5-decimal markets: the failed study's code rounds stops and
+    exits to 3 decimals (written for gold), so every forex stop sat on a 0.001 grid and "target" trades booked odd R; the
+    desk now works the stop and the result out itself at full precision (`msnrSim`); **every MSNR figure on a forex pair
+    before this is wrong, `desk-rigor` R6 on EUR/USD and GBP/USD included**; (3) LIT "market on the break" entered up to
+    20 minutes before the M15 sweep was confirmed: the entry is the later of the candle after the break and the candle
+    that closes with the confirmation (`mk`); (4) a LIT limit's fill candle that also reaches the stop is stopped; (5)
+    `egTrades` reads signals from `EG.life + EG.hold` candles before the window, so a daily order placed earlier still
+    fills and closes (its record stayed open for good) and a zone keeps its one order at the window's edge; (6) the gold
+    plan books in the order of the FILLS (a signal was dropped because an earlier signal's limit would fill later); (7) a
+    candle that opens beyond the stop exits at its open, worse than -1R (`egOutcome`, `outcome`, the Mosha `outcome`);
+    (8) `snrSides`: the H4 candle must TAKE the level (the one before had not closed beyond it); (9) a method trade's 30
+    pips scale from its own entry price, not the newest price (a stop changed between two reads). Direction: a zone tapped
+    just before the working chart's BO the other way now counts (`q.opp`: a BO the other way at the tap or after it), and a
+    switch's zone is marked from when it was known (`known`). Left: `merge`'s 20-minute near-duplicate rule; the LIT and
+    MSNR size scale still reads the newest price; engulf life and hold are calendar time (as the live rule).
+  - **Third independent audit: the store and the chart** (21 Nov 2026). The store held up (closed records frozen, no
+    record lost or stuck on the Engulfing and LIT desks over 1,235 rolling runs; tiles, calendar and filters equal the
+    records). Fixed: (1) **a desk trade's chart shows the trade as BOOKED** (`spec.stored`, `how` = the stored status):
+    the chart used to work a second result out from the first stop and target, so a trailing-stop win read "neither stop nor
+    target", a time exit "stop touched", a stored loss on a limit's fill candle "target reached"; now "filled …, trailing
+    stop … (+1.07R)". The owner's own log and the examples are still worked out on the candles. (2) **Before** ends at the
+    last candle CLOSED at the entry (it drew the fill candle and sometimes the exit), shows the planned entry / stop /
+    target and the marks known by then (`nowOf`), and its line says nothing of the result. (3) **Play** stopped at once on
+    the LIT, Engulfing and MSNR dialogs (it tested the Mosha view): it follows the card. (4) `merge` `near()` dropped a real
+    re-entry within 20 minutes of a closed trade (3 of about 270 MSNR records): only a record at the same price while the
+    stored one has not ended is the same trade. (5) the one unescaped record field on the desk rows. Known, left: a
+    `--days` backfill of barriers is not exactly what the loop would have recorded (zones read the whole history given); an
+    open record the run no longer reads stays open (not seen in practice: the longest ran 5.8 days of a 14-day window).
+  - **A stop does not change between two reads** (21 Nov 2026): on a market other than gold the LIT buffer and the MSNR
+    buffer / smallest stop scaled from the NEWEST candle's price, so a later read gave the same trade another stop (an open
+    record's stop moved; a rebuild differed from the loop). They scale from the trade's own price now (LIT: the sweep's
+    extreme, `stopExtra(atr5, px)`; MSNR: the entry, the study's candidates listed with `PAD` / `MIN_R0` 0 and both applied
+    in `msnrTrades`). Gold is unchanged; stored closed records are frozen as booked. Test in `tests/edge-desks.test.mjs`.
+  - **An open record the run no longer reads is settled** (21 Nov 2026): `council/mosha-desk.mjs` `settle(records, freshIds,
+    M5, market, feed)`, run after `merge` by both trackers: an OPEN stored record of the market just read that the run did not
+    give again (a slid window, a moved id) is closed on the 5-minute candles after its entry at its STORED stop and target
+    (stop first in one candle, a gap at the open), marked `settled: true` with a log line; neither reached = still open.
+    Never a record the run read, of another feed or market, or from before the candles on file. It stayed open for good
+    before. A plain settlement: it does not apply a reading's trail or time exit. Test in `tests/mosha-tracker.test.mjs`.
+  - **The documents checked page by page by an independent reader** (21 Nov 2026, owner: "make sure everything you understand
+    from the documents, and how to apply"; every page image read against the code). Fixed, each with a test: (1) **Mosha
+    sequence: a CF inside the VR is the method's "likely to fail" case**: `sopTrades` records no entry (`case === 2`; `o.case2`
+    brings them back for research only); (2) **plan / short method: a FAILED opposite H4 zone is a zone too** (`h4Zone`, as the
+    gold plan already read it), mark "H4 EF (zone failed)"; (3) **the trigger is a 15- OR a 30-minute engulf** (`triggers`,
+    `m30of`: 30-minute candles from the 15-minute ones; plan, short method and gold plan; a gold-plan record on M30 has id
+    suffix `-30` and `l: '30m'`); (4) **direct entry: "inside" is wholly inside** the zone above (an overlap was enough);
+    (5) **exits are the stop or the target** on the three engulf methods and the gold plan (the 24-hour exit was the desk's),
+    and the gold plan has no one-at-a-time rule (its own limit is 2 a day). Left and said to the owner (need the teacher's
+    or the owner's wording, or are the owner's own earlier choices): the sequence's EG entry, $0.30 stop and VR-extreme target
+    (owner, 12 Nov: "i want eg as entry"); the 50% pullback not required (owner, 13 Nov); a QM required for the VR and CF (the
+    page can also be read "preferred"); the barrier entry at the broken LEVEL (the pictures suggest the origin zone of the
+    confirming leg); the second-BO barrier entry (not coded); VR and CF boxes as barriers and barriers against the direction
+    "only give a rejection" (every barrier gets 3R); internal breakouts traded with the same sequence; the sequence's ladder
+    below H1 (the pages keep direction on Daily / H4 / H1); "strong" H4 BO in the gold plan undefined; trailing the direct
+    entry's stop with the M5 EF. The direction procedure is on no page (it is the direction skill's text, checked earlier).
+    `research/edge/desk-rigor` was run on the code BEFORE these five changes: its result stands as the record of that code.
+  - **Barriers with and against the direction** (21 Nov 2026, the pages: a barrier with the direction runs, one against it
+    "only gives a rejection"): `barrierTrades` reads the structure of the timeframe above the barrier's (`UP`: D1 over H4, H4
+    over H1, H1 over M15; none for a D1 barrier; `dirAt`, candles closed when price came back) and records `withDir`
+    (true / false; kept by `clean`), names it in the label ("· with H4" / "· against H4") and the log; the desk's rows say so
+    and "By entry type" lists the two apart. Entry, stop and the 3R target are unchanged (the method gives no other target).
+  - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
+    first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
+    the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)
+    and named at the top or bottom edge with its prices ("▲ Daily EF zone 4103.52 – 4141.60"); a small zone's label sits to
+    its left; no tag is drawn over another (`placed`, 20 px steps). Test: `tests/mosha-replay.test.mjs`.
+  - **A limit's fill candle: only the stop counts** (21 Nov 2026, found on the charts). `egOutcome` (`council/edge-desks.mjs`),
+    `outcome` (`council/eg-methods.mjs`) and the Mosha barrier (`assets/mosha-sop.js` `outcome(tr, bars, after, limit)`) counted
+    the fill candle's favourable extreme toward the target, the best-so-far and the trail, though it may have come BEFORE the
+    fill. Now that candle can only stop the trade (the worst case). On the 2026 paper record: engulf plan +112.7R → −106.3R
+    (804 trades), simple +61.1R → −104.9R, direct +4.0R → −20.0R, H1 engulf +118.0R → +82.1R, H4 +21.3R → +5.5R, MSNR gold
+    plan −28.0R → −52.0R; LIT already refused such a candle. `desk-rigor` was run again (RESULT.md "After the result": every
+    limit reading worse, no verdict changed); `desk-slices` T1 / T2 (the engulf reading) were measured with the flaw and failed
+    anyway. Every desk total before this fix was flattered: never quote one.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

@@ -126,3 +126,29 @@ test('the bigger pictures hand over to ChronosTrade too, and the page offers the
   assert.match(JS, /\[14400, 'H4'\]/); assert.match(JS, /sec === 14400 \? R\.spec\.h4off : 0/);
   const sec = PAGE.slice(PAGE.indexOf('id="v-mosha"'), PAGE.indexOf('id="v-profile"')); assert.match(sec, /"The bigger picture" holds the higher-timeframe views/); assert.match(sec, /<i class="bv"><\/i><span data-tr>A range, the green box<\/span>/);
 });
+
+test('a desk trade\'s chart: the window is the trade\'s, far marks stay off the scale and no tag covers another', () => {
+  const src = fs.readFileSync(new URL('../assets/mosha-replay.js', import.meta.url), 'utf8');
+  assert.match(src, /a >= t\.at - 36 \* 3600/, 'older marks do not zoom the chart out');
+  assert.match(src, /var reach = \(hi - lo\) \* \.5/, 'a mark far from the candles is kept out of the price scale');
+  assert.match(src, /u25B2 ' : '\\u25BC '\) \+ L\(m\.label\)/, 'and is named at the chart\'s edge with its prices');
+  assert.match(src, /placed\.push\(\{ x: px, y: py, w: w \}\)/, 'tags step away from each other');
+});
+
+test('a desk trade is shown as it was booked: its own exit, R and way of ending, never a second result worked out by the chart', () => {
+  const t0 = U('2026-11-18T09:30'), bars = []; for (let i = 0; i < 60; i++) bars.push(bar(t0 - 1500 + i * 300, 100, 100.6 + (i > 20 ? 3 : 0), 99.4, 100));   // after candle 20 the highs run to 103.6: a 1R trail would have left the original stop untouched
+  const T = { replayed: true, id: 'eg-1h-b-1', market: 'xau', side: 'buy', at: t0, entry: 100, stop: 99, target: 110, status: 'closed', exit: 102.6, exitAt: t0 + 40 * 300, R: 2.6, how: 'trail', marks: [], steps: [] };
+  const sp = R.specOfTrade(T, t0 + 86400), oc = R.outcome(sp, bars);
+  assert.deepEqual(sp.stored, { at: t0, exit: 102.6, exitAt: t0 + 40 * 300, R: 2.6, how: 'trail' });
+  assert.equal(oc.kind, 'stored'); assert.equal(oc.how, 'trail'); assert.equal(oc.R, 2.6); assert.equal(oc.px, 102.6); assert.equal(oc.exit, t0 + 40 * 300); assert.equal(oc.fill, t0);
+  // a stored -1R whose fill candle also reaches the target stays the stored stop (the chart used to say "target reached")
+  const lim = R.outcome(R.specOfTrade({ ...T, exit: 99, exitAt: t0, R: -1, how: 'stopped', target: 100.5 }, t0 + 86400), bars); assert.equal(lim.R, -1); assert.equal(lim.how, 'stopped'); assert.equal(lim.px, 99);
+  // an open trade has no result, and a trade of the owner's own log is still worked out on the candles
+  assert.equal(R.outcome(R.specOfTrade({ ...T, status: 'open', exit: null, exitAt: null, R: null, how: 'open' }, t0 + 86400), bars).kind, 'open');
+  assert.equal(R.specOfTrade({ ...T, replayed: false }, t0 + 86400).stored, null);
+  for (const w of ['target reached', 'stopped', 'trailing stop', 'time limit', 'stopped at break-even', "closed at the day\\'s end"]) assert.ok(JS.includes("'" + w + "'"), w);
+  // Before: ends at the last candle closed at the entry, says nothing of the result, draws no exit; Play runs wherever the card sits
+  assert.match(JS, /while \(fb >= 0 && R\.bars\[fb\]\.time \+ R\.tf > em\) fb--;/); assert.match(JS, /Before: the chart as it stood at the entry\. The result is under After\./);
+  assert.match(JS, /if \(!R\.before && oc\.exit != null/); assert.doesNotMatch(JS, /\$\('v-mosha'\)\.hidden\) return stop\(\)/);
+  assert.match(rd('../assets/desk-trades.js'), /how: r\.status \}/); assert.match(rd('../assets/mosha-sop.js'), /how: r\.status \}/); assert.match(rd('../assets/desk-trades.js'), /EXIT\[r\.status\] \|\| esc\(r\.status\)/);
+});

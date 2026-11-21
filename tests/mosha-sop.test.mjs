@@ -33,6 +33,9 @@ test('the replay finds entries of both kinds, each with a stop on its losing sid
     if (r.status === 'stopped') assert.equal(r.R, -1); if (r.status === 'target') assert.ok(r.R > 0); if (r.status === 'open') assert.equal(r.R, null);
   }
   for (const r of sop) { assert.match(r.log[0].text, /BO (buy|sell)/); assert.match(r.log[1].text, / VR: the first BO Structure \(QM\) against the BO/); assert.match(r.log[2].text, / CF.*BO Structure \(QM\) back with the BO/); assert.ok(r.deep === null || typeof r.deep === 'boolean'); }
+  // the return to the barrier is a moment on the finest candles, and the confirmation closes after it (never a QM from before price was there)
+  for (const r of bar) { const z = r.marks[0], t0 = r.log[1].t, fine = B['1m'] && B['1m'].length && B['1m'][0].time <= t0 ? B['1m'] : B['5m'], c = fine.find((b) => b.time === t0);
+    assert.ok(c, 'the return is a fine candle: ' + r.id); assert.ok(r.side < 0 ? c.high >= z.bot : c.low <= z.top, 'that candle trades into the barrier'); assert.ok(r.log[2].t > t0, 'the CF closes after the return'); }
   for (const r of bar) { assert.match(r.log[0].text, /barrier: a fresh (supply|demand) zone/); assert.match(r.log[2].text, / CF: a QM \(BO Structure\)/); assert.match(r.log[3].text, /pulled back to the level/); assert.deepEqual([r.h, r.l], M.BARRIER.find((p) => p[0] === r.h), 'the confirmation timeframe of the method\'s table'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - M.BARRIER_R) < 1e-9); }
 });
 
@@ -46,6 +49,17 @@ test('no look-ahead: an entry found with the candles cut at a moment is the entr
   const B2 = Object.fromEntries(Object.entries(B).map(([tf, a]) => [tf, a.map((b) => b.time + M.SEC[tf] <= T ? b : { time: b.time, open: b.open + 300, high: b.high + 300, low: b.low + 300, close: b.close + 300 })]));
   const moved = new Set(M.sopTrades(B2, F, { from }).concat(M.barrierTrades(B2, F, { from })).map(key));
   for (const k of early) assert.ok(moved.has(k), 'depends on later prices: ' + k);
+});
+
+test('no hindsight: every entry of the full replay already exists when the candles are cut just after it (unaligned cuts, three markets)', () => {
+  const key = (r) => [r.id, r.side, r.entry.toFixed(4), r.stop.toFixed(4), r.target.toFixed(4)].join('|'); let seen = 0;
+  for (const seed of [3, 7, 11]) { const Bx = seed === 7 ? B : market(26, seed), full = M.sopTrades(Bx, F, { from }).concat(M.barrierTrades(Bx, F, { from }));
+    for (const T of [END - 6 * 86400 + 37 * 60, END - 2 * 86400 - 11 * 60]) { const Bc = cut(Bx, T), early = new Set(M.sopTrades(Bc, F, { from }).concat(M.barrierTrades(Bc, F, { from })).map(key));
+      // a sequence entry is known at its EG's close; a barrier entry once the barrier-timeframe candle of the return has closed (the replay reads that candle whole)
+      for (const r of full) { const known = r.kind === 'sop' ? r.t : Math.max(r.t + 300, r.log[1].t - (r.log[1].t % M.SEC[r.h]) + M.SEC[r.h]); if (known > T) continue; seen++;
+        assert.ok(early.has(key(r)), `seed ${seed}: found only with later candles: ${r.id}`); } } }
+  assert.ok(seen >= 20, 'entries checked: ' + seen);
+  assert.match(src, /M\.trade\.fillT !== L\[i\]\.time/); assert.match(src, /sort\(function \(x, y\) \{ return x\.breakIdx - y\.breakIdx; \}\)/);
 });
 
 test('outcome: the stop first when one candle holds both, a target in R, an open trade has no result', () => {
@@ -101,4 +115,25 @@ test('another market gets the same reading at the same share of price: gold cand
   for (const r of g) { assert.equal(r.market, 'xau'); assert.doesNotMatch(r.id, /:/); }
   assert.deepEqual(M.sizes('xau', 9999), { buf: 0.3, rmin: 0.8, rmax: 25, zmin: 0.5 }, 'gold keeps its dollar figures at any price');
   assert.deepEqual(Object.keys(M.MARKETS), ['xau', 'xag', 'eurusd', 'gbpusd', 'nas100']);
+});
+
+test('a CF inside the VR is the "likely to fail" case: the sequence waits and records no entry', () => {
+  let n2 = 0;
+  for (const seed of [7, 11, 23, 31]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400;
+    const a = M.sopTrades(X, F, { from: fr }), b = M.sopTrades(X, F, { from: fr, case2: true });
+    assert.ok(a.every((r) => r['case'] !== 2), 'no entry on a CF inside the VR');
+    assert.deepEqual(a.map((r) => r.id), b.filter((r) => r['case'] !== 2).map((r) => r.id), 'the other entries are untouched');
+    n2 += b.filter((r) => r['case'] === 2).length; }
+  assert.ok(n2 >= 1, 'the case does occur on these candles: ' + n2);
+});
+
+test('a barrier trade says whether it is with or against the direction of the timeframe above, read on candles closed at the return', () => {
+  let w = 0, a = 0;
+  for (const seed of [7, 11, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, rows = M.barrierTrades(X, F, { from: e - 20 * 86400 });
+    for (const r of rows) { if (r.h === '1d') { assert.equal(r.withDir, null); continue; }
+      if (r.withDir == null) { assert.ok(!/with |against /.test(r.label)); continue; }
+      r.withDir ? w++ : a++; assert.match(r.label, r.withDir ? / · with (D1|H4|H1)$/ : / · against (D1|H4|H1)$/); assert.ok(r.log.some((x) => /direction/.test(x.text)));
+      // the same answer with every candle after the return cut away
+      const again = M.barrierTrades(cut(X, r.endT ? r.endT + 60 : e), F, { from: e - 20 * 86400 }).find((q) => q.id === r.id); if (again) assert.equal(again.withDir, r.withDir); } }
+  assert.ok(w >= 1 && a >= 1, 'both kinds occur: ' + w + ' / ' + a);
 });
