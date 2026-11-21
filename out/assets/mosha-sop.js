@@ -7,6 +7,17 @@
 //      on the method's own confirmation timeframe (D1 on H1, H4 on M15, H1 on M5, M15 on M1), entry on the pullback to the
 //      level that CF broke, stop past the extreme made at the barrier; the target (3R) is the replay's own choice.
 // In the sequence the VR and the CF must each be a BO Structure (a QM), never a continuation break (21 Nov 2026).
+// The owner's four readings (21 Nov 2026, after comparing the desk with his own example trades), each recorded under its own label:
+//   - the VR box runs from the extreme to the NEAREST internal swing before it (msMosha o.near; on by default here, o.near: false
+//     reads the protected swing as before); the CF and its cases read that box;
+//   - entry AT THE ZONE: besides the limit at the level the QM broke, a second limit at the barrier zone's near side (the bottom
+//     of a supply zone, the top of a demand zone), placed only when the QM's candle closed outside the zone ("· at the zone");
+//   - M5 CONFIRM: H4 and M15 barriers are also confirmed on M5 (the table's own timeframe for H1), "· M5 confirm";
+//   - SWEEP barrier: a swing high (low) of 3 candles a side that a later candle trades beyond and then CLOSES back at or below
+//     (at or above) it; the zone runs from the swing to the sweep's wick, the confirmation is read once that candle has closed;
+//     a close beyond the swing is a break, not a sweep. SECOND VISIT: a zone taken again after price left it (a closed candle of
+//     the barrier's timeframe wholly outside it, on the side price came from) and came back, before it was broken: one entry per
+//     visit, labelled "· second visit" (visit 3 and later "· visit n").
 // DISPLAY ONLY. A replay on past candles: no order, no stored trade, no council file, nothing sent anywhere. It is not
 // Luxus's record and not a tested rule; the mechanical Mosha studies failed (CLAUDE.md "Mosha level reversal study").
 (function (root) {
@@ -70,7 +81,7 @@
           srcs.push({ ibo: true, dir: ie.dir, level: ie.level, idx: ie.breakIdx, far: ie.dir > 0 ? lo : hi, ext: NaN }); }
         for (var si = 0; si < srcs.length; si++) { var S0 = srcs[si], D = S0.dir, boT = Hw[S0.idx].time, tag = S0.ibo ? 'iBO' : 'BO';
           if (!Lw) { Lw = L.slice(Math.max(0, i + 1 - win), i + 1); var LA = F.msAnalyze(Lw, piv); LE = LA.events.map(function (e) { return { dir: e.dir, level: e.level, structure: e.structure, t: Lw[e.breakIdx] ? Lw[e.breakIdx].time : Infinity, fromT: Lw[e.fromIdx] ? Lw[e.fromIdx].time : 0, top: e.top, bot: e.bot }; }); }
-          var M = F.msMosha({ dir: D, level: S0.level, t: boT, ext: S0.ext, far: S0.far }, { events: LE, bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf);
+          var M = F.msMosha({ dir: D, level: S0.level, t: boT, ext: S0.ext, far: S0.far }, { events: LE, bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf, { near: o.near !== false });
           // the method's own entry at the CF is the BARRIER entry (the pages: "before CF or after CF, using the barrier entry"):
           // each clean CF zone is handed over once, ON the candle whose close made it (a CF from before the window is never handed
           // over with a later moment), and never once that CF has failed or the move reached the VR's extreme. Its VR box goes
@@ -87,11 +98,11 @@
           if (M['case'] === 2 && !o.case2) continue;
           var k = (S0.ibo ? 'i|' : '') + h + '|' + boT + '|' + M.trade.fillT; if (map[k]) continue;
           var tr = map[k] = { id: pre + (S0.ibo ? 'sop-i-' : 'sop-') + l + '-' + M.trade.fillT, market: mk, kind: 'sop', h: h, l: l, side: M.trade.side, t: M.trade.fillT + SEC[l], entry: M.trade.entry, stop: M.trade.stop, target: M.trade.target,
-            r0: Math.abs(M.trade.entry - M.trade.stop), 'case': M['case'], again: !!(M.cf && M.cf.again), deep: M.deep == null ? null : !!M.deep };
+            r0: Math.abs(M.trade.entry - M.trade.stop), 'case': M['case'], near: !!M.vr.near, again: !!(M.cf && M.cf.again), deep: M.deep == null ? null : !!M.deep };
           if (S0.ibo) { tr.ibo = true; tr.label = NAME[h] + ' iBO → ' + NAME[l] + ' VR, CF'; }
           tr.log = [
             { t: boT + SEC[h], text: NAME[h] + ' ' + tag + ' ' + word(D) + ': a candle closed ' + (D > 0 ? 'above ' : 'below ') + f2(S0.level) + (S0.ibo ? ' (an internal break: the pages enter it with the same BO, VR, CF).' : '.') },
-            { t: M.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure (QM) against the BO. The VR runs ' + f2(M.vr.lo) + ' to ' + f2(M.vr.hi) + '; its extreme ' + f2(M.vr.ext) + ' is the target.' },
+            { t: M.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure (QM) against the BO. The VR runs ' + f2(M.vr.lo) + ' to ' + f2(M.vr.hi) + (M.vr.near ? ' (from the extreme to the nearest swing before it)' : '') + '; its extreme ' + f2(M.vr.ext) + ' is the target.' },
             { t: M.cf.t + SEC[l], text: NAME[l] + ' CF' + (M.cf.again ? ' (a new one, after the first failed)' : '') + ': the BO Structure (QM) back with the BO' + (M.p50 != null ? (M.deep ? ', after the pullback reached 50% of the range (' + f2(M.p50) + ')' : ', before the pullback reached 50% of the range (' + f2(M.p50) + ')') : '') + '. The CF zone is ' + f2(M.cf.lo) + ' to ' + f2(M.cf.hi) + (M['case'] === 2 ? ', inside the VR: the kind that often fails.' : ', clear of the VR.') },
             { t: tr.t, text: 'Price pulled back into the CF zone and an EG closed with the BO: ' + word(tr.side) + ' ' + f2(tr.entry) + ', stop ' + f2(tr.stop) + ' (' + U + f2(sizes(mk, tr.entry).buf) + ' past the pullback\'s extreme, risk ' + U + f2(tr.r0) + '), target ' + f2(tr.target) + ' (' + (Math.abs(tr.target - tr.entry) / tr.r0).toFixed(1) + 'R).' }];
           // what the chart draws for this trade (assets/mosha-replay.js): the BO level, the VR box, the CF zone, each from the moment it was known
@@ -107,13 +118,38 @@
     return out.sort(function (a, b) { return a.t - b.t; });
   }
 
-  // every barrier of one timeframe with the moment it was known and the moment price first came back to it
+  // every barrier of one timeframe with the moment it was known and the moment price first came back to it; `visits` = the
+  // later returns (price left the zone, a closed candle wholly outside it on the side it came from, and traded back into it),
+  // each before the zone was broken (a close through its far side) and read on candles closed by then only
   function zonesOf(tf, B, F) {
     var H = B[tf]; if (!H || !H.length) return [];
     var A = F.msAnalyze(H, PIVOT), brk = A.events.map(function (e) { return { dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'bo' }; })
       .concat(F.msInternal(H, H.length, 3).map(function (e) { return { dir: e.dir, fromIdx: e.fromIdx, breakIdx: e.breakIdx, kind: 'ibo' }; }))
       .sort(function (x, y) { return x.breakIdx - y.breakIdx; });   // msZones keeps one zone a candle, the first listed: the EARLIEST break of an origin, so a later BO never makes a visited zone fresh again
-    return F.msZones(H, brk, H.length).map(function (z) { return { tf: tf, dir: z.dir, lo: z.lo, hi: z.hi, kind: z.kind, known: H[z.breakIdx].time + SEC[tf], touch: z.touchIdx != null ? H[z.touchIdx].time : null }; });
+    return F.msZones(H, brk, H.length).map(function (z) {
+      var vis = [];
+      if (z.touchIdx != null) { var end = z.brokenIdx != null ? z.brokenIdx : H.length - 1, out = false;
+        for (var k = z.touchIdx + 1; k <= end && k < H.length; k++) { var b = H[k];
+          if (!out) { if (z.dir < 0 ? b.high < z.lo : b.low > z.hi) out = true; continue; }
+          if (z.dir < 0 ? b.high >= z.lo : b.low <= z.hi) { vis.push(b.time); out = false; } } }
+      return { tf: tf, dir: z.dir, lo: z.lo, hi: z.hi, kind: z.kind, known: H[z.breakIdx].time + SEC[tf], touch: z.touchIdx != null ? H[z.touchIdx].time : null, visits: vis };
+    });
+  }
+  // swept swings of one timeframe as barriers: a swing high (3 candles a side) that a later candle trades above and then closes
+  // at or below is a sell barrier from the swing to that wick (a swing low mirrored, a buy barrier); the first candle beyond it
+  // decides: a close beyond is a break, not a sweep. Known as a level once the swing is confirmed; the confirmation is read only
+  // from the close of the sweeping candle (`wait`), and the extreme made at the barrier starts at its wick (`x0`).
+  var SWEEP_N = 3;
+  function sweepsOf(tf, B) {
+    var H = B[tf] || [], out = [], N = SWEEP_N;
+    for (var j = N; j + N < H.length; j++) for (var s = -1; s <= 1; s += 2) {
+      var hi = s < 0, ok = true, p = hi ? H[j].high : H[j].low;
+      for (var k = 1; k <= N && ok; k++) if (hi ? H[j - k].high > p || H[j + k].high >= p : H[j - k].low < p || H[j + k].low <= p) ok = false;
+      if (!ok) continue;
+      for (var q = j + N + 1; q < H.length; q++) { var b = H[q]; if (hi ? !(b.high > p) : !(b.low < p)) continue;
+        if (hi ? b.close <= p : b.close >= p) out.push({ tf: tf, dir: s, lo: hi ? p : b.low, hi: hi ? b.high : p, kind: 'sweep', level: p, known: H[j + N].time + SEC[tf], touch: b.time, wait: b.time + SEC[tf], x0: hi ? b.high : b.low });
+        break; } }
+    return out;
   }
   // 2. the barrier entry. A zone's box is drawn from candles up to its break only; `touch` says when price came back, never which zone.
   // Two confirmations, both from the pages, each its own record:
@@ -121,6 +157,9 @@
   //   Janda (21 Nov 2026): after that QM, the NEXT break the same way, a normal BO (continuation, not another QM); a limit at the
   //     level that second BO broke. A break the other way in between ends it. Id "bar-j-", label "… · Janda".
   // Zones handed over by the sequence (o.extra): kind 'cf' (the CF zone, with the BO) and kind 'vr' (the VR box, against it).
+  // The owner's readings of 21 Nov 2026 (see the top of the file) are each their own record with their own id part and label:
+  // "sw-" sweep barrier, "-m5-" M5 confirm, "-v<n>-" a later visit, "-z-" the limit at the zone's near side.
+  var M5_ALT = { '4h': '5m', '15m': '5m' };
   function barrierTrades(B, F, o) {
     o = o || {}; var from = o.from, rows = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
     var fk = B['1m'] && B['1m'].length ? '1m' : '5m', fine = B[fk] || [];
@@ -132,12 +171,13 @@
     var UP = { '4h': '1d', '1h': '4h', '15m': '1h' }, dirMemo = {};
     var dirAt = function (tf, t) { var H = B[tf] || [], n = at(H, t - SEC[tf] + 1), k = tf + n; if (!(k in dirMemo)) { var Hw = H.slice(Math.max(0, n - WIN), n), A = Hw.length > 20 ? F.msAnalyze(Hw, PIVOT) : null; dirMemo[k] = A && A.trend ? A.trend : 0; } return dirMemo[k]; };
     BARRIER.forEach(function (pair) {
-      var zt = pair[0], ctf = pair[1], C = B[ctf] || []; if (!C.length || !(B[zt] || []).length) return;
+      var zt = pair[0], ctf = pair[1], C = B[ctf] || []; if (!(B[zt] || []).length) return;
       // the zones the sequence handed over (o.extra): the first candle after the zone was known that trades into it is its return
       var own = (o.extra || []).filter(function (z) { return z.tf === zt; }).map(function (z) { var Z = B[zt], q = at(Z, z.known), tch = null;
         for (; q < Z.length; q++) if (z.dir < 0 ? Z[q].high >= z.lo : Z[q].low <= z.hi) { tch = Z[q].time; break; }
         return { tf: zt, dir: z.dir, lo: z.lo, hi: z.hi, kind: z.kind === 'vr' ? 'vr' : 'cf', known: z.known, touch: tch, of: z.of, tgt: z.tgt }; });
-      zonesOf(zt, B, F).concat(own).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
+      var zs = []; zonesOf(zt, B, F).forEach(function (z) { zs.push(z); (z.visits || []).forEach(function (t, n) { var v = {}; for (var key in z) v[key] = z[key]; v.touch = t; v.visit = n + 2; zs.push(v); }); });
+      zs.concat(sweepsOf(zt, B), own).filter(function (z) { return z.touch && z.touch + SEC[zt] > from - BARRIER_WATCH * SEC[ctf] && z.hi - z.lo > sizes(mk, z.hi).zmin && (!o.until || z.touch < o.until); }).forEach(function (z) {
         var d = z.dir, t0 = z.touch, h = z.hi - z.lo, i;
         // z.touch is the OPEN time of the barrier-timeframe candle that came back: the moment itself is read on the finest candles
         // that reach back to it, and the confirmation is looked for from the candle that holds that moment, never before it
@@ -145,57 +185,76 @@
         var TF = fine.length && fine[0].time <= t0 ? fine : (B['5m'] || []), q = at(TF, t0), hit = -1;
         for (; q < TF.length && TF[q].time < t0 + SEC[zt]; q++) if (d < 0 ? TF[q].high >= z.lo : TF[q].low <= z.hi) { hit = q; break; }
         if (hit < 0) return; t0 = TF[hit].time;
-        // the Janda's own table also lets an H4 barrier confirm on M1 (besides M15) and an H1 barrier on M1 (besides M5): `alt`
-        var run = function (ctf, C, alt) {
-        var lim = t0 + BARRIER_WATCH * SEC[ctf], x = d < 0 ? -Infinity : Infinity, sig = null, jan = null, xs = null;
-        for (i = at(C, t0 - SEC[ctf] + 1); i < C.length && C[i].time < lim; i++) { var c = C[i]; if (o.until && c.time + SEC[ctf] > o.until) break; x = d < 0 ? Math.max(x, c.high) : Math.min(x, c.low);
+        var start = Math.max(t0, z.wait || 0);   // a sweep is a sweep only once its candle closed back inside: the confirmation starts there
+        // mode 'table' = the method's table (simple CF and Janda); 'm1' = the Janda's own M1 alternative (Janda only);
+        // 'm5' = the owner's M5 confirmation of H4 and M15 barriers (simple CF and Janda)
+        var run = function (ctf, C, mode) {
+        var alt = mode === 'm1', m5 = mode === 'm5';
+        var lim = start + BARRIER_WATCH * SEC[ctf], x = z.x0 != null ? z.x0 : d < 0 ? -Infinity : Infinity, sig = null, jan = null, xs = null;
+        for (i = at(C, start - SEC[ctf] + 1); i < C.length && C[i].time < lim; i++) { var c = C[i]; if (o.until && c.time + SEC[ctf] > o.until) break; x = d < 0 ? Math.max(x, c.high) : Math.min(x, c.low);
           if (d < 0 ? c.close > z.hi + h : c.close < z.lo - h) break;                                  // closed well through the barrier: it did not hold
           var W = C.slice(Math.max(0, i - 240), i + 1), ev = F.msInternal(W, W.length, 3), e = ev[ev.length - 1];
           if (!e || e.breakIdx !== W.length - 1) continue;
-          if (!sig) { if (e.dir === d && e.structure && W[e.fromIdx].time >= t0 - 30 * SEC[ctf]) { sig = { i: i, level: e.level, t: c.time + SEC[ctf] }; xs = x; } continue; }
+          if (!sig) { if (e.dir === d && e.structure && W[e.fromIdx].time >= t0 - 30 * SEC[ctf]) { sig = { i: i, level: e.level, t: c.time + SEC[ctf], close: c.close }; xs = x; } continue; }
           // after the QM: the next break the same way that is NOT another QM is the Janda's BO; a break the other way ends it
           if (e.dir !== d) break;
           if (!e.structure && (d > 0 ? e.level > sig.level : e.level < sig.level)) { jan = { i: i, level: e.level, t: c.time + SEC[ctf] }; break; } }
         if (!sig) return;
-        var cf = z.kind === 'cf', vr = z.kind === 'vr', src = z.kind === 'bo' ? 'BO' : 'iBO', up = UP[zt], ud = up ? dirAt(up, t0) : 0, wd = ud ? ud === d : null;
+        var cf = z.kind === 'cf', vr = z.kind === 'vr', sw = z.kind === 'sweep', src = z.kind === 'bo' ? 'BO' : 'iBO', up = UP[zt], ud = up ? dirAt(up, t0) : 0, wd = ud ? ud === d : null, vn = z.visit || 1;
+        // the limits: at the level the confirmation broke and, for the simple CF, at the barrier zone's near side (the owner's
+        // reading): placed only when the QM's candle closed outside the zone, never the same price as the level's limit
+        var nearPx = d < 0 ? z.lo : z.hi, legs = [];
         (alt ? [] : [{ j: false, s: sig, x: xs }]).concat([{ j: true, s: jan, x: x }]).forEach(function (m) {
-          if (!m.s) return;
-          // the pullback entry: a limit at the level the confirmation broke, for the next BARRIER_FILL confirmation candles, read on the finest candles
+          if (!m.s) return; legs.push({ m: m, px: m.s.level, zn: false });
+          if (!m.j && (d < 0 ? sig.close < nearPx : sig.close > nearPx) && Math.abs(nearPx - m.s.level) > 1e-9 * Math.abs(nearPx)) legs.push({ m: m, px: nearPx, zn: true }); });
+        legs.forEach(function (lg) { var m = lg.m, px = lg.px, zn = lg.zn;
+          // the pullback entry: a limit for the next BARRIER_FILL confirmation candles, read on the finest candles
           var xx = m.x, end = m.s.t + BARRIER_FILL * SEC[ctf], fi = -1, k;
           for (k = at(fine, m.s.t); k < fine.length && fine[k].time < end; k++) { var b = fine[k]; if (o.until && b.time + SEC[fk] > o.until) break;
-            if (d < 0 ? b.high >= m.s.level : b.low <= m.s.level) { fi = k; break; }
+            if (d < 0 ? b.high >= px : b.low <= px) { fi = k; break; }
             xx = d < 0 ? Math.max(xx, b.high) : Math.min(xx, b.low); }
           if (fi < 0 || !(fine[fi].time >= from)) return;
           // the sequence's own rule for its CF: no entry once price has reached the VR's extreme (the target) since the CF was
           // known; the move is done (read on the finest candles before the fill)
           if (cf && isFinite(z.tgt)) { for (k = at(fine, z.known); k < fi; k++) if (d > 0 ? fine[k].high >= z.tgt : fine[k].low <= z.tgt) return; }
-          var entry = m.s.level, Z0 = sizes(mk, entry), stop = d < 0 ? xx + Z0.buf : xx - Z0.buf, r0 = Math.abs(entry - stop); if (!(r0 > Z0.rmin) || r0 > Z0.rmax || (d < 0 ? stop <= entry : stop >= entry)) return;
-          var name = cf ? NAME[zt] + ' CF barrier · ' + z.of : vr ? NAME[zt] + ' VR barrier · ' + z.of : NAME[zt] + ' barrier · ' + src + ' origin';
-          var tr = { id: pre + 'bar-' + (m.j ? 'j-' : '') + (cf ? 'cf-' : vr ? 'vr-' : '') + zt + '-' + (alt ? '1m-' : '') + fine[fi].time, market: mk, kind: 'barrier', label: name + (m.j ? ' · Janda' + (alt ? ' (M1)' : '') : '') + (wd == null ? '' : wd ? ' · with ' + NAME[up] : ' · against ' + NAME[up]), withDir: wd, janda: m.j, jandaM1: !!alt, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BARRIER_R * r0 : entry + BARRIER_R * r0, r0: r0, zone: z };
+          var entry = px, Z0 = sizes(mk, entry), stop = d < 0 ? xx + Z0.buf : xx - Z0.buf, r0 = Math.abs(entry - stop); if (!(r0 > Z0.rmin) || r0 > Z0.rmax || (d < 0 ? stop <= entry : stop >= entry)) return;
+          var name = cf ? NAME[zt] + ' CF barrier · ' + z.of : vr ? NAME[zt] + ' VR barrier · ' + z.of : sw ? NAME[zt] + ' sweep barrier · swing ' + (d < 0 ? 'high ' : 'low ') + f2(z.level) : NAME[zt] + ' barrier · ' + src + ' origin';
+          var tr = { id: pre + 'bar-' + (m.j ? 'j-' : '') + (cf ? 'cf-' : vr ? 'vr-' : sw ? 'sw-' : '') + zt + '-' + (alt ? '1m-' : '') + (m5 ? 'm5-' : '') + (vn > 1 ? 'v' + vn + '-' : '') + (zn ? 'z-' : '') + fine[fi].time, market: mk, kind: 'barrier',
+            label: name + (m.j ? ' · Janda' + (alt ? ' (M1)' : '') : '') + (m5 ? ' · M5 confirm' : '') + (vn > 1 ? (vn === 2 ? ' · second visit' : ' · visit ' + vn) : '') + (zn ? ' · at the zone' : '') + (wd == null ? '' : wd ? ' · with ' + NAME[up] : ' · against ' + NAME[up]),
+            withDir: wd, janda: m.j, jandaM1: !!alt, m5: m5, sweep: sw, visit: vn, atZone: zn, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BARRIER_R * r0 : entry + BARRIER_R * r0, r0: r0, zone: z };
           // a CF barrier keeps the sequence's own target, the VR's extreme; a VR barrier the CF zone's near side (the other side
           // of the range): each only when at least 1R away on the winning side, else the replay's 3R
           var own1 = (cf || vr) && isFinite(z.tgt) && d * (z.tgt - entry) >= r0; if (own1) tr.target = z.tgt;
           tr.log = [
-            { t: z.known, text: NAME[zt] + ' barrier: a fresh ' + (d < 0 ? 'supply' : 'demand') + ' zone ' + f2(z.lo) + ' to ' + f2(z.hi) + (cf ? ', the CF zone of the ' + z.of + ' ' + word(d) + ' (the sequence\'s own entry, taken as a barrier).' : vr ? ', the VR box of the ' + z.of + ' ' + word(-d) + ', a range once its CF formed: a barrier the other way.' : ', the origin of ' + (z.kind === 'bo' ? 'a BO' : 'an internal BO') + ' ' + word(d) + '.') },
-            { t: t0, text: 'Price came back to the barrier for the first time. Its confirmation is read on ' + NAME[ctf] + '.' + (wd == null ? '' : wd ? ' The barrier is with the ' + NAME[up] + ' direction (' + word(ud) + ').' : ' The barrier is AGAINST the ' + NAME[up] + ' direction (' + word(ud) + '): the method expects only a rejection from it.') },
-            { t: sig.t, text: NAME[ctf] + ' CF: a QM (BO Structure) ' + word(d) + ', a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '.' + (m.j ? '' : ' A ' + word(d) + ' limit rests at that level for the pullback.') }];
+            { t: z.known, text: NAME[zt] + ' barrier: ' + (sw ? 'the swing ' + (d < 0 ? 'high ' : 'low ') + f2(z.level) + ' (a ' + word(d) + ' barrier once swept).' : 'a fresh ' + (d < 0 ? 'supply' : 'demand') + ' zone ' + f2(z.lo) + ' to ' + f2(z.hi) + (cf ? ', the CF zone of the ' + z.of + ' ' + word(d) + ' (the sequence\'s own entry, taken as a barrier).' : vr ? ', the VR box of the ' + z.of + ' ' + word(-d) + ', a range once its CF formed: a barrier the other way.' : ', the origin of ' + (z.kind === 'bo' ? 'a BO' : 'an internal BO') + ' ' + word(d) + '.')) },
+            { t: t0, text: (sw ? 'Price swept the swing: a wick ' + (d < 0 ? 'above ' : 'below ') + f2(z.level) + ' to ' + f2(d < 0 ? z.hi : z.lo) + ', and the ' + NAME[zt] + ' candle closed back ' + (d < 0 ? 'at or below' : 'at or above') + ' it. The sweep barrier runs ' + f2(z.lo) + ' to ' + f2(z.hi) + '.' : vn > 1 ? 'Price left the barrier and came back to it (visit ' + vn + ').' : 'Price came back to the barrier for the first time.') + ' Its confirmation is read on ' + NAME[ctf] + (m5 ? ' (the owner\'s M5 confirmation, besides the table\'s ' + NAME[pair[1]] + ')' : '') + '.' + (wd == null ? '' : wd ? ' The barrier is with the ' + NAME[up] + ' direction (' + word(ud) + ').' : ' The barrier is AGAINST the ' + NAME[up] + ' direction (' + word(ud) + '): the method expects only a rejection from it.') },
+            { t: sig.t, text: NAME[ctf] + ' CF: a QM (BO Structure) ' + word(d) + ', a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '.' + (m.j ? '' : zn ? ' A ' + word(d) + ' limit rests at the barrier zone\'s near side ' + f2(entry) + ' for the pullback.' : ' A ' + word(d) + ' limit rests at that level for the pullback.') }];
           if (m.j) tr.log.push({ t: m.s.t, text: NAME[ctf] + ' Janda: the next break ' + word(d) + ' is a normal BO, a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(m.s.level) + '. A ' + word(d) + ' limit rests at that level for the pullback.' });
-          tr.log.push({ t: tr.t, text: 'Price pulled back to the level: ' + word(d) + ' ' + f2(entry) + ', stop ' + f2(stop) + ' (' + U + f2(Z0.buf) + ' past the extreme ' + f2(xx) + ' made at the barrier, risk ' + U + f2(r0) + '), target ' + f2(tr.target) + (own1 ? (cf ? ' (the VR\'s extreme, ' : ' (the CF zone, the other side of the range, ') + (Math.abs(tr.target - entry) / r0).toFixed(1) + 'R).' : ' (' + BARRIER_R + 'R: the replay\'s own choice, the method names no fixed target here).') });
-          tr.marks = [{ kind: 'zone', top: z.hi, bot: z.lo, a: z.known - SEC[zt], at: z.known, label: NAME[zt] + (cf ? ' CF zone (barrier)' : vr ? ' VR box (barrier)' : ' barrier') },
+          tr.log.push({ t: tr.t, text: 'Price pulled back to the ' + (zn ? 'zone\'s near side' : 'level') + ': ' + word(d) + ' ' + f2(entry) + ', stop ' + f2(stop) + ' (' + U + f2(Z0.buf) + ' past the extreme ' + f2(xx) + ' made at the barrier, risk ' + U + f2(r0) + '), target ' + f2(tr.target) + (own1 ? (cf ? ' (the VR\'s extreme, ' : ' (the CF zone, the other side of the range, ') + (Math.abs(tr.target - entry) / r0).toFixed(1) + 'R).' : ' (' + BARRIER_R + 'R: the replay\'s own choice, the method names no fixed target here).') });
+          tr.marks = [{ kind: 'zone', top: z.hi, bot: z.lo, a: z.known - SEC[zt], at: z.wait || z.known, label: NAME[zt] + (cf ? ' CF zone (barrier)' : vr ? ' VR box (barrier)' : sw ? ' sweep barrier' : ' barrier') },
             { kind: 'level', p: sig.level, a: t0, at: sig.t, label: NAME[ctf] + ' CF (QM)', under: d < 0 }];
           if (m.j) tr.marks.push({ kind: 'level', p: m.s.level, a: sig.t, at: m.s.t, label: NAME[ctf] + ' Janda BO', under: d < 0 });
+          if (zn) tr.marks.push({ kind: 'level', p: entry, a: sig.t, at: sig.t, label: 'Zone\'s near side · entry', under: d > 0 });
           tr.marks.push({ kind: 'level', p: xx, a: t0, at: m.s.t, label: 'Extreme at the barrier', under: d > 0 });
           rows.push(tr);
         });
         };
-        run(ctf, C, false); if (JANDA_ALT[zt] && (B['1m'] || []).length) run('1m', B['1m'], true);
+        if (C.length) { run(ctf, C, 'table'); if (JANDA_ALT[zt] && (B['1m'] || []).length) run('1m', B['1m'], 'm1'); }
+        if (M5_ALT[zt] && (B['5m'] || []).length) run('5m', B['5m'], 'm5');
       });
     });
     rows.sort(function (a, b) { return a.t - b.t; });
-    // barriers of two timeframes often overlap: one entry a side within 20 minutes, per confirmation (a simple CF and a Janda are two entries)
-    var keep = []; rows.forEach(function (r) { if (!keep.some(function (k) { return k.side === r.side && k.janda === r.janda && !!k.jandaM1 === !!r.jandaM1 && Math.abs(k.t - r.t) < 1200; })) keep.push(r); });
-    keep.forEach(function (tr) { finish(tr, outcome(tr, fine, tr.t, true)); });
-    return keep;
+    // barriers of two timeframes often overlap: one entry a side within 20 minutes, per reading (a simple CF and a Janda are two
+    // entries; so is each of the owner's readings of 21 Nov 2026, compared only with its own kind, so the older records stay as they were)
+    var sigOf = function (r) { return [r.janda, !!r.jandaM1, !!r.m5, !!r.atZone, (r.visit || 1) > 1, !!r.sweep].join('|'); };
+    var isNew = function (r) { return !!(r.m5 || r.atZone || (r.visit || 1) > 1 || r.sweep); };
+    var keep = []; rows.forEach(function (r) { if (!keep.some(function (k) { return k.side === r.side && sigOf(k) === sigOf(r) && Math.abs(k.t - r.t) < 1200; })) keep.push(r); });
+    // and a new reading that gives exactly an order already recorded (same side, price and fill) is not recorded twice
+    var olds = keep.filter(function (r) { return !isNew(r); }), out = olds.slice();
+    keep.filter(isNew).forEach(function (r) { if (!out.some(function (k) { return k.side === r.side && k.t === r.t && Math.abs(k.entry - r.entry) <= 1e-9 * Math.abs(r.entry); })) out.push(r); });
+    out.sort(function (a, b) { return a.t - b.t; });
+    out.forEach(function (tr) { finish(tr, outcome(tr, fine, tr.t, true)); });
+    return out;
   }
   function finish(tr, oc) {
     tr.status = oc.status; tr.R = oc.R; tr.endT = oc.endT; tr.exit = oc.exit; tr.mfe = oc.mfe; tr['float'] = oc['float'];
@@ -239,7 +298,12 @@
       list = '<ul class="mo-cal-day">' + day.map(function (r) { return '<li ' + chartAttr + '="' + e(r.id) + '" title="Open this trade on the chart"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><span>' + e(nameOf ? nameOf(r) : '') + '</span><b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + r2(r.R) + '</b><small>ended ' + utc(r.endT) + '</small><button type="button" class="mo-sop-b" ' + chartAttr + '="' + e(r.id) + '">Chart</button></li>'; }).join('') + '</ul>'; }
     return '<h3 class="mo-sop-h mo-cal-k">P&amp;L calendar <small>closed R by the UTC day each trade ended · open trades not added in · before costs</small>' + nav + '</h3><div class="mo-cal">' + grid + '</div>' + list;
   }
-  var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  // which of the owner's readings of 21 Nov 2026 a barrier record is, from its flags or, for a stored record, from its id
+  function readings(r) {
+    var id = String(r.id || ''), v = /-v(\d+)-/.exec(id);
+    return { sweep: !!r.sweep || /bar-(j-)?sw-/.test(id), m5: !!r.m5 || /-m5-/.test(id), atZone: !!r.atZone || /-z-\d+$/.test(id), visit: r.visit > 1 ? r.visit : v ? +v[1] : 1 };
+  }
+  var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -287,10 +351,12 @@
     return '<p class="mo-sys-l"><b>' + esc(name) + '</b>: ' + esc(parts.join(' · ')) + '. ' + (s.closed < MIN_JUDGE ? 'Too few to judge (' + s.closed + ' of ' + MIN_JUDGE + ' closed).' : 'One reading on past candles, not a tested rule (t ' + (s.t == null ? 'n/a' : s.t.toFixed(2)) + ').') + (extra ? ' ' + esc(extra) : '') + '</p>';
   }
   // what kind of entry a row is: the sequence (major or internal BO), or the barrier with its kind and its confirmation
+  // a stored record keeps its id and a label cut to 56 characters: the owner's readings of 21 Nov 2026 are read from the id
   function kindText(r) {
-    var lb = r.label || '';
+    var lb = r.label || '', g = readings(r);
     if (r.kind === 'sop') return NAME[r.h] + (r.ibo || / iBO /.test(lb) ? ' iBO → ' : ' BO → ') + NAME[r.l] + ' VR, CF';
-    return NAME[r.h] + (/CF barrier/.test(lb) ? ' CF barrier → ' : /VR barrier/.test(lb) ? ' VR barrier → ' : ' barrier → ') + NAME[r.l] + (r.janda || / · Janda/.test(lb) ? ' QM, Janda' : ' QM') + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
+    return NAME[r.h] + (/CF barrier/.test(lb) ? ' CF barrier → ' : /VR barrier/.test(lb) ? ' VR barrier → ' : g.sweep ? ' sweep barrier → ' : ' barrier → ') + NAME[r.l] + (r.janda || / · Janda/.test(lb) ? ' QM, Janda' : ' QM') +
+      (g.m5 ? ' · M5 confirm' : '') + (g.visit > 1 ? (g.visit === 2 ? ' · second visit' : ' · visit ' + g.visit) : '') + (g.atZone ? ' · at the zone' : '') + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
   }
   function rowHTML(r) {
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
@@ -353,8 +419,13 @@
         (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') +
       cal +
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop) + line('Barrier entry', bar, 'It takes every fresh barrier; the method says to mark the best one, and that choice is not in the replay.') +
+      line('Barrier, limit at the level the QM broke', bar.filter(function (r) { return !readings(r).atZone; })) +
+      line('Barrier, limit at the zone\'s near side', bar.filter(function (r) { return readings(r).atZone; }), 'The owner\'s reading: a second limit at the barrier zone\'s near side, recorded beside the one at the broken level.') +
+      line('Barrier confirmed on M5 (H4 and M15 barriers)', bar.filter(function (r) { return readings(r).m5; }), 'The owner\'s reading, besides the table\'s own timeframe (H4 on M15, M15 on M1).') +
+      line('Sweep barrier', bar.filter(function (r) { return readings(r).sweep; }), 'A swing high or low that a candle traded beyond and closed back inside; read once that candle closed.') +
+      line('Second and later visits', bar.filter(function (r) { return readings(r).visit > 1; }), 'A zone taken again after price left it and came back, before it was broken.') +
       (bar.some(function (r) { return r.withDir != null; }) ? line('Barrier with the direction of the timeframe above', bar.filter(function (r) { return r.withDir === true; })) + line('Barrier against it', bar.filter(function (r) { return r.withDir === false; }), 'The method expects only a rejection from a barrier against the direction; the replay gives both the same 3R target, so the two are shown apart.') : '') +
-      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. On a market other than gold the stop buffer and the size limits are the same share of price as on gold: the desk\'s own choice. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/edge-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
+      '<p class="ms-note">A replay on past candles of how the desk reads the method: every step uses closed candles only and nothing after a candle decides it. Results are before costs, a stop is counted first when one candle holds both. On a market other than gold the stop buffer and the size limits are the same share of price as on gold: the desk\'s own choice. These are not Luxus\'s trades and not the council\'s, nothing was traded, and a replay of one reading cannot show whether a rule makes money: the fixed-rule studies of this method failed (<a href="/nearPx-lab.html#mosha-sweep">the sweep study</a>).</p></details>';
   }
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('#mo-open li[data-sop-chart]')) { e.preventDefault(); e.target.click(); } });

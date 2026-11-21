@@ -5296,6 +5296,16 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     `stopNow`). Not coded, owner / Luxus questions: entry at the broken level vs the confirming leg's origin zone; a target for a
     barrier against the direction ("only a rejection", no size); the M30 steps of the ladder; the repeat of the SOP inside the CF and
     trading a failed CF; QM required vs preferred; "strong" H4 BO; "the best barrier".
+  - **The owner's four readings** (21 Nov 2026, after comparing the desk with his five example trades; owner chose each): (1) every
+    simple-QM barrier is recorded twice, at the broken level and at the zone's near side ("· at the zone", id `-z-`); (2) H4 and
+    M15 barriers are also confirmed on M5 ("· M5 confirm", `-m5-`, `M5_ALT`); (3) a swept swing (3 a side; the first candle beyond
+    it closes back inside) is a barrier from the level to the wick ("sweep barrier", `sw-`, `sweepsOf`), and a zone is used again on
+    each later visit (left by a closed candle wholly outside, not broken; "· second visit", `-v<n>-`); (4) the desk's VR runs from the
+    extreme to the nearest internal swing confirmed by then (`msMosha(…, o)` `o.near`, the desk's default; the charts' layer keeps the
+    old box). Old readings are unchanged (pinned by hash); a new reading is deduplicated only against its own kind, and `merge`'s
+    near-duplicate rule applies only within one reading. Of the five examples, 2 Nov buy and 2 Nov sell are now caught; 10 Nov is
+    found at his level but entered earlier; 28 Oct (an M5 box at the pullback's spike) and 29 Oct (an M5 break zone) are not. The
+    record is about four times larger (30 days: 3,136 records, 4.7 MB); `KEEP` 14000 now holds about four months.
   - **Settling reads the fill's candle** (21 Nov 2026): `settle` starts at the 5-minute candle that holds the fill, which can only stop
     the trade; `endT` is that candle's open. After-costs figures were added and taken out the same day (owner: "forget the costs").
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,

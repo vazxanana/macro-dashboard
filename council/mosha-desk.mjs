@@ -85,7 +85,9 @@ export function clean(r) {
 // stamped with when the tracker first saw it (`first`) and whether that was while it was live (`src`).
 export function merge(prev, fresh, now, feed = 'OANDA') {
   const old = new Map((prev || []).map((r) => [r.id, r])), out = [];
-  const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S
+  // the owner's barrier readings of 21 Nov 2026 (at the zone, M5 confirm, sweep, a later visit) are other orders, never a re-read of an older one
+  const rd = (x) => (x.kind === 'barrier' ? JSON.stringify(SOP.readings(x)) : '');
+  const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S && rd(p) === rd(r)
     // the SAME trade re-read under another id: its entry sits where the stored one's does, and the stored one had not already ended
     // before it (a re-entry after a close is a new trade: until 21 Nov 2026 it was dropped)
     && !(p.endT != null && p.endT <= r.t) && Math.abs(p.entry - r.entry) <= 0.5 * Math.abs(r.entry - r.stop));
