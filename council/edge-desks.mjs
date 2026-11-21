@@ -162,7 +162,7 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS } = {}) {
 // recorded, one position at a time a market. On a market other than gold the buffer and the smallest stop are the same share
 // of price as gold's (the desk's own choice). The study FAILED after costs (0 of 3): a paper record, never an edge.
 export const MSNR = { rr: 1.5, main: [12, 16] };
-export function msnrTrades(B, { from, market = 'xau' } = {}) {
+export function msnrTrades(B, { from, market = 'xau', against = false } = {}) {   // against: research only, the entries opposite to the direction
   const raw = B['5m'] || [], H1 = B['1h'] || []; if (raw.length < 50 || H1.length < 200) return [];
   const M5 = raw.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), f = fx(market), lastT = M5[M5.length - 1].time;
   const q = market === 'xau' ? 1 : M5[M5.length - 1].close / 4000, keep = { PAD: MS.P.PAD, MIN_R0: MS.P.MIN_R0 }; let cand;
@@ -173,7 +173,7 @@ export function msnrTrades(B, { from, market = 'xau' } = {}) {
   const out = []; let h = -1, busy = -Infinity;
   for (const c of cand) {
     while (h + 1 < H4.length && H4[h + 1].time + MS.P.H4 <= c.trig + MS.P.M5) h++;
-    const call = h >= 0 ? dir[h] : 0; if (!call || c.side !== call || c.t <= busy) continue;
+    const call = h >= 0 ? dir[h] : 0; if (!call || c.side !== (against ? -call : call) || c.t <= busy) continue;
     const ev = D.last[h] >= 0 ? D.events[D.last[h]] : null;
     const d = c.side, r0 = d * (c.entry - c.stop); if (!(r0 > 0)) continue;
     const o = MS.simulate(M5, { ...c, r0 }, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
