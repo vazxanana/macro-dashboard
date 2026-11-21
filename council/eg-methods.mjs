@@ -53,7 +53,7 @@ export function outcome(M5, fi, d, entry, stop, target, until) {
   if (M5.length) o.float = d * (M5[M5.length - 1].close - entry) / r0; return o;
 }
 // the Daily's side at time t: the last Daily engulf known by then (trading days: weekend candles folded)
-function dailySide(DZ, t) { let s = 0; for (const z of DZ) { if (z.at > t) break; s = z.dir; } return s; }
+function dailyZone(DZ, t) { let s = null; for (const z of DZ) { if (z.at > t) break; s = z; } return s; }
 
 export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H1 = num(B['1h'] || []), H4 = num(B['4h'] || []); if (M5.length < 100 || M15.length < 50 || H4.length < 20) return [];
@@ -79,11 +79,12 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
     let E = null; for (const z of Z5) { if (z.at > F.fail) break; if (z.dir === d && z.at >= F.fail - EGM.egBack && (z.fail == null || z.fail > F.fail)) E = z; }
     if (!E) continue; const key = d + ':' + E.base; if (used.has(key)) continue; used.add(key);
     const entry = d > 0 ? E.top : E.bot, i0 = lower(M5, F.fail), fi = fillAt(d, entry, i0, i0 + EGM.fill); if (fi < 0) continue;
-    const ds = dailySide(DZ, T), plan = ds === d;
+    const dz = dailyZone(DZ, T), ds = dz ? dz.dir : 0, plan = ds === d;
     rec(plan ? 'eg-plan' : 'eg-simple', plan ? 'Plan · with the Daily' : 'Simple EG · H4 zone', d, fi, entry, E.base, [
       { t: T, text: (plan ? `The Daily's last engulf is a ${word(d)}. ` : `The Daily's last engulf is ${ds ? 'a ' + word(ds) : 'not on file'}, so this is the short method without the Daily. `) + `Price is in the H4 ${word(d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} and a 15-minute engulf ${word(d)} closed.` },
       { t: F.fail, text: `On M5 the ${word(-d)} engulf zone ${f(F.bot)} to ${f(F.top)} failed (a close through it). The M5 ${word(d)} engulf zone behind it is ${f(E.bot)} to ${f(E.top)}: a ${word(d)} limit rests at ${f(entry)} for an hour.` }],
-    [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'H4 engulf zone' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 engulf zone' }, { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.at, label: 'M5 zone that failed' }]); }
+    (plan && dz ? [{ kind: 'zone', top: dz.top, bot: dz.bot, a: dz.base, at: dz.at, label: 'Daily EG zone' }] : []).concat([{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'H4 EG zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: 'M15 EG zone' },
+      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 EG zone · entry' }])); }
 
   // direct: a fresh H4 zone left alone for two H4 candles, a fresh H1 zone inside it, a fresh M15 zone inside that
   const inside = (a, b) => a.top >= b.bot && a.bot <= b.top;
@@ -94,7 +95,7 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
     const entry = d > 0 ? m15.top : m15.bot, i0 = lower(M5, tc), iEnd = lower(M5, Math.min(Z.fail != null ? Z.fail : Infinity, tc + EGM.directWait)), fi = fillAt(d, entry, i0, iEnd); if (fi < 0) continue;
     rec('eg-direct', 'Direct entry · fresh zones', d, fi, entry, Z.base, [
       { t: tc, text: `A fresh H4 ${word(d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} was left alone for the next two H4 candles. Inside it: a fresh H1 zone ${f(h1.bot)} to ${f(h1.top)} and a fresh M15 zone ${f(m15.bot)} to ${f(m15.top)}. A ${word(d)} limit rests at ${f(entry)}.` }],
-    [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'Fresh H4 zone' }, { kind: 'zone', top: h1.top, bot: h1.bot, a: h1.base, at: h1.at, label: 'Fresh H1 zone' }, { kind: 'zone', top: m15.top, bot: m15.bot, a: m15.base, at: m15.at, label: 'Fresh M15 zone' }]); }
+    [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'Fresh H4 EG zone' }, { kind: 'zone', top: h1.top, bot: h1.bot, a: h1.base, at: h1.at, label: 'Fresh H1 EG zone' }, { kind: 'zone', top: m15.top, bot: m15.bot, a: m15.base, at: m15.at, label: 'Fresh M15 EG · entry' }]); }
 
   // one position at a time a market over the three methods; only entries inside the window are kept
   out.sort((a, b) => a.t - b.t); const keep = []; let busy = -Infinity;
@@ -115,15 +116,15 @@ export function snrSides(D1, H4) {
   for (let i = 2 * k + 1; i < D1.length; i++) { const c = D1[i], lv = [];
     for (let j = Math.max(k, i - SNR.look); j + k < i; j++) { const b = D1[j]; let lo = true, hi = true;
       for (let q = 1; q <= k; q++) { if (!(b.close < D1[j - q].close && b.close < D1[j + q].close)) lo = false; if (!(b.close > D1[j - q].close && b.close > D1[j + q].close)) hi = false; }
-      if (lo || hi) lv.push(b.close); }   // a V level (a low turn) or an A level (a high turn) of the CLOSES, as on a line chart
-    const up = lv.some((L) => c.low <= L && c.close > L && c.open > L), dn = lv.some((L) => c.high >= L && c.close < L && c.open < L);
-    if (up !== dn) ev.push({ t: c.time + 86400, dir: up ? 1 : -1, day: c.time }); }
+      if (lo || hi) lv.push({ p: b.close, t: b.time, kind: lo ? 'V' : 'A' }); }   // a V level (a low turn) or an A level (a high turn) of the CLOSES, as on a line chart
+    const upL = lv.filter((L) => c.low <= L.p && c.close > L.p && c.open > L.p).pop(), dnL = lv.filter((L) => c.high >= L.p && c.close < L.p && c.open < L.p).pop();
+    if (!upL !== !dnL) ev.push({ t: c.time + 86400, dir: upL ? 1 : -1, day: c.time, key: upL || dnL }); }
   // the H4 break that confirms a rejection: a close beyond the last H4 swing (2 a side) formed before it
   const sides = [];
   for (const e of ev) { let i0 = lower(H4, e.t); const end = e.t + SNR.boDays * 86400;
     for (let i = i0; i < H4.length && H4[i].time < end; i++) { let L = null;
       for (let j = i - k - 1; j >= k && j > i - 60; j--) { const b = H4[j]; let ok = true; for (let q = 1; q <= k; q++) if (e.dir > 0 ? !(b.high > H4[j - q].high && b.high > H4[j + q].high) : !(b.low < H4[j - q].low && b.low < H4[j + q].low)) ok = false; if (ok) { L = e.dir > 0 ? b.high : b.low; break; } }
-      if (L != null && (e.dir > 0 ? H4[i].close > L : H4[i].close < L)) { sides.push({ t: H4[i].time + 14400, dir: e.dir, day: e.day, level: L }); break; } } }
+      if (L != null && (e.dir > 0 ? H4[i].close > L : H4[i].close < L)) { sides.push({ t: H4[i].time + 14400, dir: e.dir, day: e.day, level: L, key: e.key }); break; } } }
   return sides.sort((a, b) => a.t - b.t);
 }
 export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
@@ -138,12 +139,76 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
     if (fi < 0) continue; const fillT = M5[fi].time, dk = Math.floor(fillT / 86400); if ((perDay[dk] || 0) >= SNR.perDay) continue; perDay[dk] = (perDay[dk] || 0) + 1;
     const stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, fillT + EGM.hold); busy = oc.endT || Infinity; if (fillT < from) continue;
     const turned = Z.dir !== d, tr = { id: `msnr-sop-${d > 0 ? 'b' : 's'}-${m.base}`, market, kind: 'msnr-sop', label: 'EG x SNR · gold plan', h: '4h', l: '15m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
-    tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected a Daily level, and an H4 candle then closed ${d > 0 ? 'above' : 'below'} the last H4 swing ${f(S.level)}.` },
+    tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected the Daily ${S.key.kind} level ${f(S.key.p)} (a turn of the Daily closes), and an H4 candle then closed ${d > 0 ? 'above' : 'below'} the last H4 swing ${f(S.level)}.` },
       { t: T, text: `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and a 15-minute engulf ${word(d)} closed: a ${word(d)} limit rests at its zone, ${f(entry)}, for two hours.` },
       { t: fillT, text: `Filled: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), target ${f(target)} (90 pips, ${SNR.rr}R), out after 24 hours.` },
       oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${SNR.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: 'Stopped: −1.00R' + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` } : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now).` : '.') }];
-    tr.marks = [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: turned ? 'H4 zone, turned' : 'H4 engulf zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: 'M15 engulf zone' }, { kind: 'level', p: S.level, a: S.t - 14400, at: S.t, label: 'H4 break', under: d < 0 }];
+    tr.marks = [{ kind: 'level', p: S.key.p, a: S.key.t, at: S.day + 86400, label: `Daily ${S.key.kind} level`, under: d > 0 }, { kind: 'level', p: S.level, a: S.t - 14400, at: S.t, label: `H4 BO ${word(d)}`, under: d < 0 },
+      { kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: 'M15 EG zone · entry' }];
     out.push(tr); }
   return out;
+}
+
+// ─── the direction reading of the MSNR desk (21 Nov 2026, owner: "make sure you are marking the key levels … V level, engulfing,
+// EG fail, BO"). The desk's own words of the direction procedure, candle by candle, nothing at a candle reads a later one:
+//   levels   an A level is a HIGH turn of the CLOSES (a peak on the line chart), a V level a LOW turn, DIR.K candles a side, known
+//            once the last of those candles has closed. A level on the timeframe above is a zone from that close to its wick.
+//   zones    on the timeframe above: A / V levels, body-engulf zones (wick to the engulfed candle's open), an engulf zone that
+//            FAILED (a close through it: it turns and serves the other side, "EF") and the dominant pair (two candles of one
+//            colour, the second beyond the first's extreme and closing beyond it: the first candle's body).
+//   switch   while the working chart's last break is DOWN, price taps a buy-side zone of the timeframe above; the last A level
+//            that existed BEFORE the tap is the external one; a working candle closing above it, within DIR.WAIT candles of the
+//            timeframe above, turns the direction to BUY. Mirrored for a sell. A break of a level formed after the tap is
+//            internal and changes nothing; without a tapped zone the direction stays what it was.
+// Not written: the open-close levels (no mechanical definition). events[] carries what the chart must show for each switch.
+export const DIR = { K: 2, AGE: 60, WAIT: 10 };
+export const KEY_NAME = { v: 'V level', a: 'A level', eg: 'engulf zone', ef: 'engulf zone that failed (EF)', dom: 'dominant zone' };
+export function direction(work, keyOf, htfSec) {
+  const K = DIR.K, n = work.length, call = new Int8Array(n), last = new Int32Array(n).fill(-1), events = [];
+  const H = []; let cur = null, zones = [], pend = [], lastA = null, lastV = null, st = 0, dir = 0;
+  const add = (s, kind, bottom, top, t) => { if (top > bottom) zones.push({ s, kind, bottom, top, t, born: H.length, tapped: false, dead: false }); };
+  const onClose = () => {
+    const c = H[H.length - 1], flips = [];
+    for (const z of zones) { if (z.dead) continue;
+      if (z.s > 0 ? c.close < z.bottom : c.close > z.top) { z.dead = true; if (z.kind === 'eg') flips.push(z); }
+      else if (H.length - z.born >= DIR.AGE) z.dead = true; }
+    zones = zones.filter((z) => !z.dead);
+    for (const z of flips) add(-z.s, 'ef', z.bottom, z.top, c.time);
+    const m = H.length - 1 - K;
+    if (m >= K) { const x = H[m]; let lo = true, hi = true;
+      for (let j = 1; j <= K; j++) { if (!(x.close < H[m - j].close && x.close < H[m + j].close)) lo = false; if (!(x.close > H[m - j].close && x.close > H[m + j].close)) hi = false; }
+      if (lo) add(1, 'v', x.low, x.close, x.time);
+      if (hi) add(-1, 'a', x.close, x.high, x.time); }
+    if (H.length >= 2) { const p = H[H.length - 2], up = (b) => b.close > b.open, dn = (b) => b.close < b.open, tol = 0.1 * Math.abs(p.open - p.close);
+      if (dn(p) && up(c) && c.open <= p.close + tol && c.close >= p.open) add(1, 'eg', Math.min(p.low, c.low), p.open, p.time);
+      if (up(p) && dn(c) && c.open >= p.close - tol && c.close <= p.open) add(-1, 'eg', p.open, Math.max(p.high, c.high), p.time);
+      if (up(c) && up(p) && c.high > p.high && c.close > p.high) add(1, 'dom', p.open, p.close, p.time);
+      if (dn(c) && dn(p) && c.low < p.low && c.close < p.low) add(-1, 'dom', p.close, p.open, p.time); }
+  };
+  for (let i = 0; i < n; i++) {
+    const b = work[i], k = keyOf(b.time);
+    if (!cur || cur.time !== k) { if (cur) { H.push(cur); onClose(); } cur = { time: k, open: b.open, high: b.high, low: b.low, close: b.close }; }
+    else { if (b.high > cur.high) cur.high = b.high; if (b.low < cur.low) cur.low = b.low; cur.close = b.close; }
+    if (pend.length) { const keep = [];
+      for (const q of pend) {
+        if (q.zone.dead || H.length - q.tapH > DIR.WAIT) continue;
+        if (q.s > 0 ? b.close > q.level : b.close < q.level) {
+          if (dir !== q.s) events.push({ i, t: b.time, s: q.s, kind: q.zone.kind, bottom: q.zone.bottom, top: q.zone.top, zoneT: q.zone.t, zoneAt: q.zone.t + htfSec, tapT: q.tapT, level: q.level, levelT: q.levelT });
+          dir = q.s; }
+        else keep.push(q); }
+      pend = keep; }
+    for (const z of zones) { if (z.tapped || b.low > z.top || b.high < z.bottom) continue;
+      z.tapped = true; const L = z.s > 0 ? lastA : lastV;
+      if (st === -z.s && L && !L.broken) pend.push({ s: z.s, zone: z, level: L.p, levelT: L.t, tapT: b.time, tapH: H.length }); }
+    if (lastA && !lastA.broken && b.close > lastA.p) { lastA.broken = true; st = 1; }
+    if (lastV && !lastV.broken && b.close < lastV.p) { lastV.broken = true; st = -1; }
+    const m = i - K;
+    if (m >= K) { const x = work[m]; let lo = true, hi = true;
+      for (let j = 1; j <= K; j++) { if (!(x.close < work[m - j].close && x.close < work[m + j].close)) lo = false; if (!(x.close > work[m - j].close && x.close > work[m + j].close)) hi = false; }
+      if (hi) lastA = { p: x.close, t: x.time, broken: false };
+      if (lo) lastV = { p: x.close, t: x.time, broken: false }; }
+    call[i] = dir; last[i] = events.length - 1;
+  }
+  return { call, last, events };
 }
