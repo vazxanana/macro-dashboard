@@ -555,3 +555,93 @@ test('the MSNR desk says what kinds msnr-main / msnr-other are: the owner\'s ear
   assert.ok(text('assets/desk-trades.js').includes(phrase)); assert.ok(text('council/edge-desks.mjs').includes(phrase));
   const r = E.msnrTrades({ ...B, '15m': m15of(B['5m']) }, { from: 0, market: 'xau' })[0]; if (r) assert.match(r.label, /^Earlier scalp method · /);
 });
+
+// ─── LIT desk fixes (21 Nov 2026): daily limits, the Asia session's extreme alone, re-sweeps tested, a smallest stop ───
+const LM = await import('../council/lit.mjs');
+const lbT = (a, v) => { let lo = 0, hi = a.length; while (lo < hi) { const m = (lo + hi) >> 1; if (a[m] < v) lo = m + 1; else hi = m; } return lo; };
+// the detector's candidates of one seeded market, both sides, with the series they were read on
+function litCands(X) { const b5 = LM.cleanBars(X['5m']), m15 = LM.agg15(b5), out = [];
+  for (const dir of ['short', 'long']) { const S15 = LM.series(m15, dir === 'long', LM.XAU.tick), S5 = LM.series(b5, dir === 'long', LM.XAU.tick);
+    for (const cd of LM.fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900; out.push({ cd, S15, S5, dir }); } }
+  return out; }
+const litM5 = { ...LM.XAU, cost: () => 0 };
+
+test('LIT desk: the daily limits hold on every execution (one London and one New York-morning fill a day, a win ends the day, stop at -1.5R)', () => {
+  let cut = 0, seen = 0;
+  for (const seed of [5, 9, 3]) { const X = market(120, seed), lit = E.litTrades(X, { from: 0 }), free = E.litTrades(X, { from: 0, limits: false });
+    for (const kind of ['lit-rule', 'lit-loose', 'lit-break']) { const days = new Map();
+      for (const r of lit.filter((x) => x.kind === kind)) { seen++;
+        const day = LM.nyInfo(r.t - 300).day, sess = LM.nyInfo(r.log[0].t - 900).sess, ds = days.get(day) || { fills: {}, R: 0, won: false }; days.set(day, ds);
+        assert.ok(['LONDON', 'NY_AM'].includes(sess), 'a sweep in London or the New York morning: ' + r.id);
+        assert.ok(!ds.won, 'no trade after a win that day: ' + r.id); assert.ok(ds.R > LM.P.dayCapR, 'no trade once the day is at -1.5R: ' + r.id); assert.ok(!ds.fills[sess], 'one fill a session: ' + r.id);
+        ds.fills[sess] = 1; if (r.R != null) { ds.R += r.R; if (r.R > 0) ds.won = true; } } }
+    cut += free.length - lit.length;
+    assert.equal(new Set(lit.map((r) => r.id)).size, lit.length, 'ids are unique');
+    // the old reading (the desk-slices study) keeps no limits
+    assert.deepEqual(E.litTrades(X, { from: 0, first: true }).map((r) => r.id), E.litTrades(X, { from: 0, first: true, limits: false, asia: false }).map((r) => r.id)); }
+  assert.ok(seen >= 60 && cut >= 3, 'the limits removed trades on these candles: ' + cut + ' of ' + seen);
+});
+
+test('LIT desk: a sweep of the Asia session\'s extreme alone gives no trade; with older untaken structure taken in the same move it does', () => {
+  // hand-made M15 highs: an older swing high (the day before), Asia's high, then the sweep candle
+  const mk = (older, asiaHi, mx) => { const h = [4000, older, 4000, 3999, 4001, asiaHi, 4002, mx], ny = h.map((_, i) => ({ day: i < 4 ? 1 : 2 })), pivH = h.map((_, i) => (i === 1 ? 1 : 0));
+    return [{ h, ny, pivH, tick: 0.01 }, { kind: 'ASIA', s: 7, MX: mx }]; };
+  assert.equal(E.litAsiaAlone(...mk(4010, 4005, 4006)), true, 'only the Asia high went');
+  assert.equal(E.litAsiaAlone(...mk(4010, 4005, 4010.01)), false, 'the older swing high went too');
+  assert.equal(E.litAsiaAlone(...mk(4010, 4005, 4010)), true, 'a touch is not a sweep (one tick beyond)');
+  assert.equal(E.litAsiaAlone(...mk(4004, 4005, 4006)), true, 'an older high Asia had already taken is not new structure');
+  { const [S, cd] = mk(4010, 4005, 4011); assert.equal(E.litAsiaAlone(S, { ...cd, kind: 'pd' }), false, 'another level is not filtered'); S.pivH[1] = 0; assert.equal(E.litAsiaAlone(S, cd), false, 'an earlier day\'s high counts without being a swing'); }
+  let alone = 0, asia = 0, removed = 0;
+  for (const seed of [5, 21, 7]) { const X = market(120, seed), C = litCands(X), on = E.litTrades(X, { from: 0, limits: false }), off = E.litTrades(X, { from: 0, limits: false, asia: false });
+    removed += off.length - on.length;
+    for (const { cd, S15 } of C) { if (cd.kind !== 'ASIA') continue; asia++; const a = E.litAsiaAlone(S15, cd); if (a) alone++;
+      // no look-ahead: the same answer on the candles up to the candle that closed back
+      const n = cd.r + 1, cutS = { h: S15.h.slice(0, n), ny: S15.ny.slice(0, n), pivH: S15.pivH.slice(0, n), tick: S15.tick }; for (let k = Math.max(0, n - LM.P.pivot); k < n; k++) cutS.pivH[k] = 0;
+      assert.equal(E.litAsiaAlone(cutS, cd), a); }
+    // every Asia-level trade left on the desk comes from a candidate that also took older structure
+    for (const r of on) { if (!/the Asia session's/.test(r.log[0].text)) continue;
+      const hit = C.filter(({ cd, dir }) => cd.kind === 'ASIA' && cd.t + 900 === r.log[0].t && (dir === 'short') === (r.side < 0)); assert.ok(hit.length && hit.some(({ cd, S15 }) => !E.litAsiaAlone(S15, cd)), r.id); } }
+  assert.ok(asia >= 20 && alone >= 15 && alone < asia && removed >= 3, `Asia candidates ${asia}, alone ${alone}, trades removed ${removed}`);
+});
+
+test('LIT desk: the study executions test a new extreme as a new sweep: one waiting period, the swing known by then, at most two re-sweeps, a smallest stop', () => {
+  assert.equal(E.LIT_MIN_STOP, 0.00014); assert.equal(E.LIT_RESWEEPS, 2);
+  for (const s of E.LIT_SETS) assert.equal(!!s.resweep, s.id !== 'rule', 'the rule is the pre-registered one: a break of the extreme voids it');
+  let res = 0, fresh = 0, refused = 0, oldLate = 0, n = 0;
+  for (const seed of [5, 9]) for (const { cd, S15, S5 } of litCands(market(120, seed))) for (const set of E.LIT_SETS.slice(1)) {
+    const od = E.litOrder(S5, cd, litM5, set, S15), old = E.litOrder(S5, cd, litM5, E.litOldSet(set), S15);
+    const a0 = lbT(S5.t, cd.t), e0 = lbT(S5.t, cd.rEnd), j00 = lbT(S5.t, cd.confEnd); let m0 = a0; for (let k = a0; k < e0; k++) if (S5.h[k] > S5.h[m0]) m0 = k;
+    if (old && old.b > m0 + LM.P.rbosWait) oldLate++; if (old && !od) refused++;
+    if (!od) continue; n++;
+    assert.ok(od.b <= m0 + LM.P.rbosWait, 'the break comes inside the one waiting period from the first extreme'); assert.ok(od.res <= E.LIT_RESWEEPS);
+    assert.ok(od.stop > od.entry && od.risk >= E.LIT_MIN_STOP * Math.abs(od.entry), 'a stop on the losing side, not nearer than the smallest stop');
+    // the break level: the last M5 swing low before the extreme that was confirmed when this sweep was
+    assert.ok(S5.pivL[od.p] && od.p < od.mxIdx && od.p + LM.P.pivot < od.j0 && od.level === S5.l[od.p]); for (let k = od.p + 1; k < od.mxIdx; k++) assert.ok(!(S5.pivL[k] && k + LM.P.pivot < od.j0), 'no later known swing was passed over');
+    assert.ok(od.jA >= od.j0 && od.mk >= od.j0 - 1, 'no order or market entry before the sweep in force is confirmed');
+    if (!od.res) { assert.equal(od.mxIdx, m0); assert.equal(od.j0, j00); continue; }
+    res++; if (od.p + LM.P.pivot >= j00) fresh++;
+    // the sweep tests again at the new extreme, on its M15 candles
+    const i0 = lbT(S15.t, Math.floor(S5.t[od.mxIdx] / 900) * 900);
+    const rs = [i0, i0 - 1, i0 - 2].map((i) => E.litResweep(S15, cd, i)).find((x) => x && x.MX === od.MX && od.j0 === lbT(S5.t, S15.t[x.conf] + 900)); assert.ok(rs, 'the new extreme passed the sweep tests');
+    assert.ok(LM.SESS_TRADE.includes(S15.ny[rs.s].sess) && S15.ny[rs.s].hm !== 930 && rs.r - rs.s < LM.P.rejectBars && S15.c[rs.r] < cd.L);
+    let above = 0; for (let i = rs.s; i < rs.r; i++) if (S15.c[i] >= cd.L) above++; assert.ok(above < 2, 'never two closes beyond the level');
+    let vec = false; for (let j = Math.max(0, rs.s - LM.P.vecWindow); j <= Math.min(rs.conf, rs.r + LM.P.vecWindow); j++) if (S15.vec[j]) vec = true; assert.ok(vec, 'a vector at the re-sweep');
+    // no look-ahead: the same answer with the M15 candles cut at the confirming candle, none one candle earlier
+    const cutS = (m) => ({ h: S15.h.slice(0, m), c: S15.c.slice(0, m), vec: S15.vec.slice(0, m), ny: S15.ny.slice(0, m), n: m });
+    assert.deepEqual(E.litResweep(cutS(rs.conf + 1), cd, rs.s), rs); assert.equal(E.litResweep(cutS(rs.conf), cd, rs.s), null); }
+  assert.ok(n >= 60 && res >= 10 && fresh >= 5 && refused >= 20 && oldLate >= 10, `orders ${n}, re-swept ${res}, on a swing made after the first sweep ${fresh}, refused ${refused}, old reading past the waiting period ${oldLate}`);
+  // the smallest stop: a quiet market whose buffer is almost nothing gives stops under it, which are skipped (never widened)
+  const tiny = { ...litM5, stopExtra: () => 0.0001 }; let small = 0, kept = 0;
+  for (const X of [market(120, 5, 4000, 0.15), market(120, 5)]) for (const { cd, S15, S5 } of litCands(X)) for (const set of E.LIT_SETS.slice(1)) { const noFloor = E.litOrder(S5, cd, tiny, { ...set, minStop: 0 }, S15), od = E.litOrder(S5, cd, tiny, set, S15);
+    if (noFloor && noFloor.risk < E.LIT_MIN_STOP * Math.abs(noFloor.entry)) { small++; assert.equal(od, null); } else if (noFloor) { kept++; assert.equal(od.stop, noFloor.stop); } }
+  assert.ok(small >= 1 && kept >= 1, `stops under the smallest stop ${small}, others ${kept}`);
+});
+
+test('LIT desk: no look-ahead after the fixes: a trade is found, with the same entry, stop and target, on the candles cut just after its fill', () => {
+  let cuts = 0;
+  for (const seed of [5, 9]) { const X = market(120, seed), lit = E.litTrades(X, { from: 0 }); const per = {};
+    for (const r of lit) { if ((per[r.kind] = (per[r.kind] || 0) + 1) % 3 !== 1 || r.endT == null) continue;
+      const one = E.litTrades({ '5m': X['5m'].filter((b) => b.time < r.t + 600) }, { from: 0 }).find((x) => x.id === r.id);
+      assert.ok(one, 'found when cut after the fill: ' + r.id); assert.equal(one.entry, r.entry); assert.equal(one.stop, r.stop); assert.equal(one.target, r.target); assert.equal(one.t, r.t); assert.equal(one.log[1].text, r.log[1].text); cuts++; } }
+  assert.ok(cuts >= 15, 'cuts: ' + cuts);
+});
