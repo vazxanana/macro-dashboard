@@ -5302,7 +5302,7 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     it closes back inside) is a barrier from the level to the wick ("sweep barrier", `sw-`, `sweepsOf`), and a zone is used again on
     each later visit (left by a closed candle wholly outside, not broken; "· second visit", `-v<n>-`); (4) the desk's VR runs from the
     extreme to the nearest internal swing confirmed by then (`msMosha(…, o)` `o.near`, the desk's default; the charts' layer keeps the
-    old box). Old readings are unchanged (pinned by hash); a new reading is deduplicated only against its own kind, and `merge`'s
+    old box). The older BARRIER readings are unchanged (pinned by hash on the code before them, `near: false`, no CF / VR hand-over); the sequence, CF and VR barriers do change with the nearest-swing VR, which is the desk's default (review, 21 Nov 2026); a new reading is deduplicated only against its own kind, and `merge`'s
     near-duplicate rule applies only within one reading. Of the five examples, 2 Nov buy and 2 Nov sell are now caught; 10 Nov is
     found at his level but entered earlier; 28 Oct (an M5 box at the pullback's spike) and 29 Oct (an M5 break zone) are not. The
     record is about four times larger (30 days: 3,136 records, 4.7 MB); `KEEP` 14000 now holds about four months.
@@ -5313,6 +5313,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     before the 5-minute candles on file filled at their first candle: skipped; (4) the plan's hour and the gold plan's two hours are
     clock time (they counted candles, so a window ran over the daily break or a weekend); (5) a stop that gapped books worse than −1R
     and the log now says so.
+  - **Review of the Mosha readings** (21 Nov 2026, independent read-only review): an M1 Janda of an H1 / H4 barrier gave exactly
+    the order of the M15 barrier's own Janda (same side, entry, stop, fill minute) and both were stored, each −1R counted twice: an
+    M1 Janda is a reading of its own now (`isNew`), dropped when it repeats an order; a barrier id carries its side before the fill
+    time (`…-b<time>` / `…-s<time>`), since a buy and a sell can fill in one minute and the store kept only one.
   - **Settling reads the fill's candle** (21 Nov 2026): `settle` starts at the 5-minute candle that holds the fill, which can only stop
     the trade; `endT` is that candle's open. After-costs figures were added and taken out the same day (owner: "forget the costs").
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,

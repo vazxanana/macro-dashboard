@@ -223,13 +223,16 @@ test('the Janda\'s second table: an H4 barrier may also confirm on M1 and an H1 
 
 // 21 Nov 2026: the owner's four readings, decided after comparing the desk with his own example trades. Each is its own record
 // beside the older ones (the older records are pinned below exactly as the code before gave them).
-const isNew = (r) => !!(r.m5 || r.atZone || r.visit > 1 || r.sweep);
+const isNew = (r) => !!(r.jandaM1 || r.m5 || r.atZone || r.visit > 1 || r.sweep);
 test('the older records still appear exactly as before, and every new reading is recorded beside them', async () => {
-  const { createHash } = await import('node:crypto'), key = (r) => [r.id, r.side, r.entry.toFixed(4), r.stop.toFixed(4), r.target.toFixed(4), r.status].join('|');
+  const { createHash } = await import('node:crypto'), key = (r) => [r.id.replace(/-[bs](\d+)$/, '-$1'), r.side, r.entry.toFixed(4), r.stop.toFixed(4), r.target.toFixed(4), r.status].join('|');
   // hashes of the code before these readings (the sequence with the protected-swing VR, the barriers without the new readings)
-  const PIN = { 7: [57, '03a7a93eddf5961f'], 11: [57, 'e325ea5c4a32bd73'] }, seen = { m5: 0, atZone: 0, sweep: 0, visit: 0 };
+  // pins = the code of 495073158 with an M1 Janda counted as its own reading (review, 21 Nov 2026)
+  const PIN = { 7: [55, 'bb53a8ed7f0db3e3'], 11: [52, 'b6d7de54ab81d515'] }, seen = { m5: 0, atZone: 0, sweep: 0, visit: 0 };
   for (const seed of [7, 11]) { const X = seed === 7 ? B : market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 14 * 86400, bars = M.barrierTrades(X, F, { from: fr });
     const old = M.sopTrades(X, F, { from: fr, near: false }).concat(bars).filter((r) => !isNew(r)).map(key).sort();
+    // review 21 Nov 2026: a buy and a sell filled in one minute are two records (the side is in the id), and no id twice
+    assert.equal(new Set(bars.map((r) => r.id)).size, bars.length, 'no barrier id twice, seed ' + seed); assert.ok(bars.every((r) => /-[bs]\d+$/.test(r.id)), 'the side is in the id');
     assert.deepEqual([old.length, createHash('sha256').update(old.join('\n')).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed + ': the older records changed');
     for (const r of bars.filter(isNew)) { if (r.m5) seen.m5++; if (r.atZone) seen.atZone++; if (r.sweep) seen.sweep++; if (r.visit > 1) seen.visit++;
       assert.ok(rule1(r), 'rule 1: ' + r.id); const g = M.readings({ id: r.id }); assert.deepEqual([g.m5, g.atZone, g.sweep, g.visit], [!!r.m5, !!r.atZone, !!r.sweep, r.visit], 'the reading is read back from the id alone: ' + r.id);
@@ -241,7 +244,7 @@ test('the older records still appear exactly as before, and every new reading is
 test('entry at the zone: a second limit at the barrier zone\'s near side, only when the QM closed outside it; stop on the losing side; no hindsight', () => {
   let n = 0;
   for (const seed of [7, 11, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, full = allOf(X, fr), Z = full.filter((r) => r.atZone);
-    let cuts = 0; for (const r of Z) { n++; assert.match(r.id, /-z-\d+$/); assert.match(r.label, / · at the zone/); assert.ok(!r.janda, 'the simple CF only'); assert.ok(rule1(r), 'rule 1: ' + r.id);
+    let cuts = 0; for (const r of Z) { n++; assert.match(r.id, /-z-[bs]\d+$/); assert.match(r.label, / · at the zone/); assert.ok(!r.janda, 'the simple CF only'); assert.ok(rule1(r), 'rule 1: ' + r.id);
       assert.equal(r.entry, r.side < 0 ? r.zone.lo : r.zone.hi, 'the limit sits at the near side of the barrier');
       const qm = M.SEC[r.l], c = X[r.l].find((b) => b.time + qm === r.log[2].t); assert.ok(c && (r.side < 0 ? c.close < r.entry : c.close > r.entry), 'the QM candle closed outside the zone');
       assert.ok(r.log[2].t <= r.t, 'placed at the QM, filled after');
