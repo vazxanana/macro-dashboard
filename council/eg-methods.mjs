@@ -26,12 +26,12 @@ const SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m
 // 30-minute candles from the 15-minute ones (a candle with only one half on file is left out), and the trigger zones of both:
 // the methods name the 15- or the 30-minute engulf as the trigger (21 Nov 2026, the documents checked page by page)
 const m30of = (M15) => { const out = []; for (let i = 1; i < M15.length; i++) { const a = M15[i - 1], b = M15[i]; if (a.time % 1800 === 0 && b.time === a.time + 900) out.push({ time: a.time, open: a.open, high: Math.max(a.high, b.high), low: Math.min(a.low, b.low), close: b.close }); } return out; };
-// An EF counts like an EG on every timeframe (owner, 21 Nov 2026: "the fail is the same logic as entry for other timeframes"):
-// an opposite 15- or 30-minute zone that FAILED (a close through it) triggers the other way, from the close that broke it, with
-// its own box as the zone (`ef: true`)
+// An EF counts like an EG (owner, 21 Nov 2026: "the fail is the same logic as entry for other timeframes"; then "keep the msnr":
+// the gold plan only, the Engulfing plan and short method keep EG triggers): an opposite 15- or 30-minute zone that FAILED (a
+// close through it) triggers the other way, from the close that broke it, with its own box as the zone (`ef: true`)
 const efsOf = (Z, C) => Z.filter((z) => z.fail != null).map((z) => ({ ...z, dir: -z.dir, at: z.fail, c: C[z.fi], ef: true }));
-const triggers = (M15) => { const M30 = m30of(M15), Z15 = zones(M15, '15m'), Z30 = zones(M30, '30m');
-  return Z15.map((z) => ({ ...z, c: M15[z.i] })).concat(Z30.map((z) => ({ ...z, c: M30[z.i] })), efsOf(Z15, M15), efsOf(Z30, M30)).sort((x, y) => x.at - y.at || (x.tf === '15m' ? -1 : 1) || (x.ef ? 1 : -1)); };
+const triggers = (M15, ef = false) => { const M30 = m30of(M15), Z15 = zones(M15, '15m'), Z30 = zones(M30, '30m');
+  return Z15.map((z) => ({ ...z, c: M15[z.i] })).concat(Z30.map((z) => ({ ...z, c: M30[z.i] })), ef ? efsOf(Z15, M15).concat(efsOf(Z30, M30)) : []).sort((x, y) => x.at - y.at || (x.tf === '15m' ? -1 : 1) || (x.ef ? 1 : -1)); };
 const zw = (m) => (m.ef ? ' EF (zone failed)' : ' EG zone');
 // an H4 zone of side d as the methods mark it: an engulf zone of that side still standing, or a zone of the other side that
 // FAILED (a close through it) and so turned
@@ -119,19 +119,16 @@ export function methodTrades(B, { from = 0, market = 'xau' } = {}) {
     const lo = Math.min(Z.bot, m.bot), hi = Math.max(Z.top, m.top), atZone = (z) => z.bot <= hi && z.top >= lo;
     let F = null; for (const z of Z5) { if (z.at > T + EGM.arm) break; if (z.dir !== -d || z.at < T - EGM.efBack || z.fail == null || z.fail <= T || z.fail > T + EGM.arm || !atZone(z)) continue; if (!F || z.fail < F.fail) F = z; }
     if (!F) continue;
-    // the M5 zone behind the failure: an engulf zone of the side, or (an EF counts like an EG) an earlier opposite zone that failed
-    let E = null, Et = -Infinity; for (const z of Z5) { if (z.at > F.fail) break;
-      if (z.dir === d && z.at >= F.fail - EGM.egBack && (z.fail == null || z.fail > F.fail) && z.at > Et) { E = z; Et = z.at; }
-      else if (z !== F && z.dir === -d && z.fail != null && z.fail <= F.fail && z.fail >= F.fail - EGM.egBack && z.fail > Et) { E = { ...z, dir: d, ef: true }; Et = z.fail; } }
+    let E = null; for (const z of Z5) { if (z.at > F.fail) break; if (z.dir === d && z.at >= F.fail - EGM.egBack && (z.fail == null || z.fail > F.fail)) E = z; }
     if (!E) continue; const key = d + ':' + E.base; if (used.has(key)) continue; used.add(key);
     if (F.fail < M5[0].time) continue;   // placed before the 5-minute candles on file: its window cannot be read
     const entry = d > 0 ? E.top : E.bot, i0 = lower(M5, F.fail), fi = fillAt(d, entry, i0, i0 + EGM.fill, F.fail + EGM.fill * 300); if (fi < 0) continue;   // an hour of clock time (12 candles could run over the daily break or a weekend)
     const dz = dailyZone(DZ, T), ds = dz ? dz.dir : 0, plan = ds === d;
     rec(plan ? 'eg-plan' : 'eg-simple', plan ? 'Plan · with the Daily' : 'Simple EG · H4 zone', d, fi, entry, E.base, [
       { t: T, text: (plan ? `The Daily's last engulf is a ${word(d)}. ` : `The Daily's last engulf is ${ds ? 'a ' + word(ds) : 'not on file'}, so this is the short method without the Daily. `) + `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and ` + (m.ef ? `a ${tn} ${word(-d)} engulf zone failed (a close through it).` : `a ${tn} engulf ${word(d)} closed.`) },
-      { t: F.fail, text: `On M5 the ${word(-d)} engulf zone ${f(F.bot)} to ${f(F.top)} failed (a close through it). The M5 ${E.ef ? word(-d) + ' zone that failed earlier' : word(d) + ' engulf zone'} behind it is ${f(E.bot)} to ${f(E.top)}: a ${word(d)} limit rests at ${f(entry)} for an hour.` }],
+      { t: F.fail, text: `On M5 the ${word(-d)} engulf zone ${f(F.bot)} to ${f(F.top)} failed (a close through it). The M5 ${word(d)} engulf zone behind it is ${f(E.bot)} to ${f(E.top)}: a ${word(d)} limit rests at ${f(entry)} for an hour.` }],
     (plan && dz ? [{ kind: 'zone', top: dz.top, bot: dz.bot, a: dz.base, at: dz.at, label: 'Daily EG zone' }] : []).concat([{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: tn + zw(m) },
-      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.ef ? E.fail : E.at, label: E.ef ? 'M5 EF zone · entry' : 'M5 EG zone · entry' }])); }
+      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 EG zone · entry' }])); }
 
   // direct: a fresh H4 zone left alone for two H4 candles, a fresh H1 zone inside it, a fresh M15 zone inside that
   const inside = (a, b) => a.top <= b.top && a.bot >= b.bot;   // INSIDE the zone above (until 21 Nov 2026 an overlap was enough)
@@ -218,7 +215,7 @@ export function snrTrades(B, { from = 0, market = 'xau' } = {}) {
   // an order fills, on what had filled before it (until 21 Nov 2026 a signal was dropped because an earlier signal's limit
   // would fill later: a look ahead)
   const cands = [];
-  for (const m of triggers(M15)) { const d = m.dir, T = m.at, S = sideAt(T); if (!S || S.dir !== d) continue; const c = m.c;
+  for (const m of triggers(M15, true)) { const d = m.dir, T = m.at, S = sideAt(T); if (!S || S.dir !== d) continue; const c = m.c;
     const inZ = (z) => (d > 0 ? c.low <= z.top && c.close >= z.bot : c.high >= z.bot && c.close <= z.top);
     const Z = Z4.filter((z) => z.at >= S.t - 20 * 86400 && inZ(z) && ((z.dir === d && z.at <= T && z.end > T) || (z.dir === -d && z.fail != null && z.fail <= T && T - z.fail < 20 * 86400))).pop(); if (!Z) continue;
     if (T < M5[0].time) continue;

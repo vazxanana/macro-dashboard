@@ -342,12 +342,15 @@ test('plan and simple: the failed M5 zone touches the H4 zone or the M15 / M30 e
   assert.match(rd('council/eg-methods.mjs'), /\|\| !atZone\(z\)\) continue;/);
 });
 
-// 21 Nov 2026 (owner: "the fail is the same logic as entry for other timeframes"): an EF counts like an EG on every timeframe
-test('an EF counts like an EG: a failed opposite M15 / M30 zone triggers, an earlier M5 EF can be the entry; stops hold; no hindsight', () => {
-  const all = G.methodTrades(B15, { from: 0, market: 'xau' }), plan = all.filter((r) => r.kind === 'eg-plan' || r.kind === 'eg-simple');
-  const efTrig = plan.filter((r) => r.marks.some((k) => /^M(15|30) EF \(zone failed\)$/.test(k.label))), efEntry = plan.filter((r) => r.marks.some((k) => k.label === 'M5 EF zone · entry'));
-  assert.ok(efTrig.length >= 1, 'entries on a failed M15 / M30 zone: ' + efTrig.length); assert.ok(efEntry.length >= 1, 'entries at an earlier M5 EF: ' + efEntry.length);
-  for (const r of efTrig.concat(efEntry)) { assert.ok(stopOk(r), r.id); assert.match(r.log[0].text, /engulf (zone failed|[a-z]+ closed)/);
-    const one = G.methodTrades(cutAt(B15, r.t + 900), { from: 0, market: 'xau' }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.equal(one.entry, r.entry); }
-  const sn = G.snrTrades(B15, { from: 0, market: 'xau' }); assert.ok(sn.filter((r) => /-ef$/.test(r.id)).every((r) => stopOk(r) && r.marks.some((k) => / EF zone · entry$/.test(k.label))));
+// 21 Nov 2026 (owner: "the fail is the same logic as entry for other timeframes", then "keep the msnr"): an EF counts like an EG
+// on the MSNR gold plan only; the Engulfing plan and short method keep EG triggers and the M5 EG zone as the entry
+test('an EF counts like an EG on the gold plan only: its EF triggers keep their stops and are found without hindsight', () => {
+  const plan = G.methodTrades(B15, { from: 0, market: 'xau' }).filter((r) => r.kind === 'eg-plan' || r.kind === 'eg-simple');
+  assert.ok(plan.length && plan.every((r) => !r.marks.some((k) => /^M(15|30) EF|M5 EF zone/.test(k.label))), 'the Engulfing plan takes no EF trigger or EF entry');
+  let n = 0, cuts = 0;
+  for (const seed of [11, 4, 5]) { const X = seed === 11 ? B : market(90, seed), Y = { ...X, '15m': m15of(X['5m']) };
+    for (const r of G.snrTrades(Y, { from: 0 }).filter((x) => /-ef$/.test(x.id))) { n++; assert.ok(stopOk(r), r.id); assert.ok(r.marks.some((k) => / EF zone · entry$/.test(k.label))); assert.match(r.log[1].text, /engulf zone failed/);
+      // the gold plan reads its side from about 35 days of history: only later trades are checked against a cut (as above)
+      if (r.t > X['5m'][0].time + 35 * 86400 && cuts++ < 8) { const one = G.snrTrades(cutAt(Y, r.t + 300), { from: 0 }).find((x) => x.id === r.id); assert.ok(one, 'found when cut just after the fill: ' + r.id); assert.equal(one.entry, r.entry); } } }
+  assert.ok(n >= 1 && cuts >= 1, 'gold-plan entries on a failed M15 / M30 zone: ' + n + ', checked against a cut: ' + cuts);
 });
