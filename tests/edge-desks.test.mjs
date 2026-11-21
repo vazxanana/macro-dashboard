@@ -284,6 +284,18 @@ test('gold plan, second entry type: a QM on the closes (shoulder, high, lower he
   assert.ok(n >= 1, 'QM entries: ' + n);
 });
 
+test('review 21 Nov 2026: one QM per shape, no fill before the 5-minute history, a stop text that says the booked R', () => {
+  for (const seed of [11, 4, 5, 23, 31, 47]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) };
+    const q = G.qmSetups(Y['15m']), keys = q.map((x) => [x.tf, x.dir, x.base, x.at].join(':'));
+    assert.equal(new Set(keys).size, keys.length, 'no QM twice (two heads under one shoulder and break), seed ' + seed);
+    const sn = G.snrTrades(Y, { from: 0 }); assert.equal(new Set(sn.map((r) => r.id)).size, sn.length, 'no id twice, seed ' + seed);
+    // the 5-minute candles start 13 days after the 15-minute ones: no order placed before them fills at their first candle
+    const late = { ...Y, '5m': Y['5m'].filter((b) => b.time >= Y['5m'][0].time + 13 * 86400) }, first = late['5m'][0].time;
+    for (const r of G.snrTrades(late, { from: 0 })) { const placed = r.log[1].t; assert.ok(placed >= first, 'placed after the 5-minute history starts: ' + r.id); assert.ok(r.t - placed <= 2 * 3600 + 300, 'filled inside its two hours: ' + r.id); }
+    for (const r of G.methodTrades({ ...late, '15m': Y['15m'] }, { from: 0, market: 'xau' })) assert.ok(r.t >= first, r.id); }
+  const src = rd('council/eg-methods.mjs'); assert.doesNotMatch(src, /'Stopped: −1\.00R'/, 'a gap at the open books worse than −1R: the text says the booked R');
+});
+
 test('open-close levels: a Daily level type of the gold plan, and a key level of the direction reading', () => {
   // the gold plan: a Daily rejection of an OC level (two candles of one colour; the level where the first closed)
   let oc = 0;

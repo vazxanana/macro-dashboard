@@ -219,7 +219,7 @@
           if (cf && isFinite(z.tgt)) { for (k = at(fine, z.known); k < fi; k++) if (d > 0 ? fine[k].high >= z.tgt : fine[k].low <= z.tgt) return; }
           var entry = px, Z0 = sizes(mk, entry), stop = d < 0 ? xx + Z0.buf : xx - Z0.buf, r0 = Math.abs(entry - stop); if (!(r0 > Z0.rmin) || r0 > Z0.rmax || (d < 0 ? stop <= entry : stop >= entry)) return;
           var name = cf ? NAME[zt] + ' CF barrier · ' + z.of : vr ? NAME[zt] + ' VR barrier · ' + z.of : sw ? NAME[zt] + ' sweep barrier · swing ' + (d < 0 ? 'high ' : 'low ') + f2(z.level) : NAME[zt] + ' barrier · ' + src + ' origin';
-          var tr = { id: pre + 'bar-' + (m.j ? 'j-' : '') + (cf ? 'cf-' : vr ? 'vr-' : sw ? 'sw-' : '') + zt + '-' + (alt ? '1m-' : '') + (m5 ? 'm5-' : '') + (vn > 1 ? 'v' + vn + '-' : '') + (zn ? 'z-' : '') + fine[fi].time, market: mk, kind: 'barrier',
+          var tr = { id: pre + 'bar-' + (m.j ? 'j-' : '') + (cf ? 'cf-' : vr ? 'vr-' : sw ? 'sw-' : '') + zt + '-' + (alt ? '1m-' : '') + (m5 ? 'm5-' : '') + (vn > 1 ? 'v' + vn + '-' : '') + (zn ? 'z-' : '') + (d > 0 ? 'b' : 's') + fine[fi].time, market: mk, kind: 'barrier',
             label: name + (m.j ? ' · Janda' + (alt ? ' (M1)' : '') : '') + (m5 ? ' · M5 confirm' : '') + (vn > 1 ? (vn === 2 ? ' · second visit' : ' · visit ' + vn) : '') + (zn ? ' · at the zone' : '') + (wd == null ? '' : wd ? ' · with ' + NAME[up] : ' · against ' + NAME[up]),
             withDir: wd, janda: m.j, jandaM1: !!alt, m5: m5, sweep: sw, visit: vn, atZone: zn, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BARRIER_R * r0 : entry + BARRIER_R * r0, r0: r0, zone: z };
           // a CF barrier keeps the sequence's own target, the VR's extreme; a VR barrier the CF zone's near side (the other side
@@ -247,7 +247,7 @@
     // barriers of two timeframes often overlap: one entry a side within 20 minutes, per reading (a simple CF and a Janda are two
     // entries; so is each of the owner's readings of 21 Nov 2026, compared only with its own kind, so the older records stay as they were)
     var sigOf = function (r) { return [r.janda, !!r.jandaM1, !!r.m5, !!r.atZone, (r.visit || 1) > 1, !!r.sweep].join('|'); };
-    var isNew = function (r) { return !!(r.m5 || r.atZone || (r.visit || 1) > 1 || r.sweep); };
+    var isNew = function (r) { return !!(r.jandaM1 || r.m5 || r.atZone || (r.visit || 1) > 1 || r.sweep); };   // an M1 Janda is a reading of its own too
     var keep = []; rows.forEach(function (r) { if (!keep.some(function (k) { return k.side === r.side && sigOf(k) === sigOf(r) && Math.abs(k.t - r.t) < 1200; })) keep.push(r); });
     // and a new reading that gives exactly an order already recorded (same side, price and fill) is not recorded twice
     var olds = keep.filter(function (r) { return !isNew(r); }), out = olds.slice();
@@ -301,7 +301,7 @@
   // which of the owner's readings of 21 Nov 2026 a barrier record is, from its flags or, for a stored record, from its id
   function readings(r) {
     var id = String(r.id || ''), v = /-v(\d+)-/.exec(id);
-    return { sweep: !!r.sweep || /bar-(j-)?sw-/.test(id), m5: !!r.m5 || /-m5-/.test(id), atZone: !!r.atZone || /-z-\d+$/.test(id), visit: r.visit > 1 ? r.visit : v ? +v[1] : 1 };
+    return { sweep: !!r.sweep || /bar-(j-)?sw-/.test(id), m5: !!r.m5 || /-m5-/.test(id), atZone: !!r.atZone || /-z-[bs]?\d+$/.test(id), visit: r.visit > 1 ? r.visit : v ? +v[1] : 1 };
   }
   var API = { calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
