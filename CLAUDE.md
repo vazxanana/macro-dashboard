@@ -5181,6 +5181,10 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   - **Mosha sequence: no entry once the target was reached** (21 Nov 2026, same check): `msMosha` took an EG after price had
     already traded to the VR's extreme (the target) and come back; that move is done (`vr-broken`, repeat the SOP). Gold
     2025: 266 -> 249 sequence entries, the 17 dropped summed +0.14R, so the record barely moves.
+  - **LIT desk: each execution is its own stream** (21 Nov 2026, same check): `litTrades` recorded a sweep under the FIRST
+    execution that filled, so "market on the break" held only sweeps whose limit orders later did not fill (the look-ahead
+    by selection `desk-slices` T3 named). Now every sweep is tried with every execution (`rule`, `loose`, `break`), one
+    position at a time per execution and market; `first: true` is the old reading, used only by the desk-slices study.
   - **A desk trade's chart stays readable** (21 Nov 2026, `assets/mosha-replay.js`, display only): the window opens before the
     first mark made in the 36 hours before the entry (an older Daily / H4 mark is drawn from the left edge, it no longer zooms
     the chart out six days); a mark more than half the candles' range away from them is kept out of the price scale (`setTf`)

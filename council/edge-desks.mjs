@@ -128,14 +128,18 @@ export function litFill(S5, M, ord, set) {
 const litM = (market, px) => { const q = market === 'xau' ? 1 : px / 4000, dec = SOP.ALL[market].dec;
   return market === 'xau' ? { ...XAU, cost: () => 0 } : { key: market, sym: market, tick: Math.pow(10, -dec), stopExtra: (atr5) => 0.30 * q + Math.max(0.1 * atr5, 0.30 * q), skip: XAU.skip, cost: () => 0 }; };
 const LEVEL = { pd: "the previous day's", pw: "the previous week's", acc: "the accumulation's own", eqh: 'equal', ASIA: "the Asia session's", LONDON: "the London session's", NY_AM: "the New York morning's" };
-export function litTrades(B, { from, market = 'xau', sets = LIT_SETS } = {}) {
+// Each execution is its OWN stream (21 Nov 2026): every candidate is tried with every execution, one position at a time per
+// execution. Until then a candidate was recorded under the first execution that filled, so "market on the break" held only the
+// candidates whose limit orders later did not fill: chosen with knowledge of the future (desk-slices T3, INVALID).
+// `first: true` is that old reading, kept only so the desk-slices study still reproduces.
+export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = false } = {}) {
   const raw = B['5m'] || []; if (!raw.length) return [];
   const M = litM(market, raw[raw.length - 1].close), b5 = cleanBars(raw, M), m15 = agg15(b5), f = fx(market), out = [], lastT = b5.length ? b5[b5.length - 1].t : 0;
   for (const dir of ['short', 'long']) { const mirror = dir === 'long', S15 = series(m15, mirror, M.tick), S5 = series(b5, mirror, M.tick), sg = S5.sign, d = dir === 'short' ? -1 : 1;
     for (const cd of fbosCandidates(S15)) { cd.confEnd = S15.t[cd.conf] + 900; cd.rEnd = S15.t[cd.r] + 900;
-      let got = null;
-      for (const set of sets) { const od = litOrder(S5, cd, M, set); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { got = { set, od, sim }; break; } }
-      if (!got) continue; const { set, od, sim } = got, fillT = sim.t + 300; if (fillT < from) continue;
+      const gots = [];
+      for (const set of sets) { const od = litOrder(S5, cd, M, set); if (!od) continue; const sim = litFill(S5, M, od, set); if (sim && sim.filled) { gots.push({ set, od, sim }); if (first) break; } }
+      for (const { set, od, sim } of gots) { const fillT = sim.t + 300; if (fillT < from) continue;
       const entry = sim.fp, stop = sg * od.stop, target = sg * od.target, r0 = Math.abs(entry - stop); if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
       const open = sim.kind === 'dataEnd' && sim.tExit >= lastT, status = open ? 'open' : sim.kind === 'target' ? 'target' : sim.kind === 'stop' ? 'stopped' : sim.kind === 'be' ? 'breakeven' : 'dayend';
       let mfe = 0; for (let q = sim.k; q <= sim.exitIdx; q++) mfe = Math.max(mfe, (od.entry - S5.l[q]) / od.risk);
@@ -150,10 +154,10 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS } = {}) {
           : { t: sim.tExit + 300, text: (status === 'target' ? 'Target reached' : status === 'stopped' ? 'Stopped' : status === 'breakeven' ? 'Stopped at break-even after two swing breaks' : 'Closed at the end of the New York day') + `: ${sim.R >= 0 ? '+' : '−'}${Math.abs(sim.R).toFixed(2)}R.` }];
       tr.marks = [{ kind: 'zone', top: aHi, bot: aLo, a: S15.t[Math.max(0, cd.s - cd.accN)], at: cd.t, label: 'Accumulation' }, { kind: 'level', p: lv, a: cd.t, at: cd.t + 900, label: 'Swept level', under: d > 0 },
         { kind: 'level', p: mx, a: S5.t[od.mxIdx], at: S5.t[od.b] + 300, label: 'MX', under: d > 0 }, { kind: d < 0 ? 'vr' : 'bvr', top: obHi, bot: obLo, a: S5.t[od.ob], at: S5.t[od.b] + 300, label: 'Order block' }];
-      out.push(tr); } }
-  // one position at a time on a market: a later entry inside an earlier trade's life is left out
-  out.sort((a, b) => a.t - b.t); const keep = []; let busy = 0;
-  for (const r of out) { if (r.t < busy) continue; keep.push(r); busy = r.endT || Infinity; }
+      out.push(tr); } } }
+  // one position at a time on a market per execution: a later entry inside an earlier trade's life is left out
+  out.sort((a, b) => a.t - b.t); const keep = [], busy = {};
+  for (const r of out) { const k = first ? '' : r.kind; if (r.t < (busy[k] || 0)) continue; keep.push(r); busy[k] = r.endT || Infinity; }
   return keep;
 }
 

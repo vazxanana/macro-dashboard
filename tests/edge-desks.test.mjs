@@ -52,7 +52,10 @@ test('the trail only ever tightens, and a stop is counted first when one candle 
 test('LIT: trades come from the council\'s own detector, one position at a time, stops on the losing side', () => {
   const lit = E.litTrades(market(120, 5), { from: 0, market: 'xau' });
   for (const r of lit) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^lit-(rule|loose|break)$/); assert.ok(r.log.length === 4 && r.marks.length === 4); assert.ok(['target', 'stopped', 'breakeven', 'dayend', 'open'].includes(r.status)); }
-  for (let i = 1; i < lit.length; i++) assert.ok(lit[i].t >= (lit[i - 1].endT || Infinity) || lit[i - 1].endT == null, 'no entry inside an earlier trade');
+  for (const k of ['lit-rule', 'lit-loose', 'lit-break']) { const x = lit.filter((r) => r.kind === k); for (let i = 1; i < x.length; i++) assert.ok(x[i].t >= (x[i - 1].endT || Infinity) || x[i - 1].endT == null, 'no entry inside an earlier trade of the same execution'); }
+  // each execution is its own stream: a stream equals the detector run with that execution alone (no pick by what filled later)
+  for (const set of E.LIT_SETS) assert.deepEqual(lit.filter((r) => r.kind === 'lit-' + set.id).map((r) => r.id), E.litTrades(market(120, 5), { from: 0, market: 'xau', sets: [set] }).map((r) => r.id));
+  const old = E.litTrades(market(120, 5), { from: 0, market: 'xau', first: true }); for (let i = 1; i < old.length; i++) assert.ok(old[i].t >= (old[i - 1].endT || Infinity) || old[i - 1].endT == null);
   assert.deepEqual(E.LIT_SETS.map((s) => s.id), ['rule', 'loose', 'break'], 'the rule first, then the two study executions');
   const src = rd('council/edge-desks.mjs'); assert.match(src, /from '\.\/lit\.mjs'/); assert.match(src, /managePosition/);
 });
