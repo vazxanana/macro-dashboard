@@ -176,3 +176,18 @@ test('the Mosha desk keeps gold, EUR/USD and GBP/USD only (owner, 21 Nov 2026): 
   assert.deepEqual(out.records.map((r) => r.id), ['a', 'eurusd:c', 'gbpusd:e']);
   assert.deepEqual(out.markets.sort(), ['eurusd', 'gbpusd', 'xau']); assert.equal(out.counts.n, 3);
 });
+
+test('the readings of 21 Nov 2026 (second table, M30 barriers, repeat of the SOP) are read back from a stored id, and are never taken for a re-read of another order', () => {
+  const g = (id) => SOPX.readings({ id });
+  assert.deepEqual([g('bar-4h-c30-s1000').alt, g('bar-1h-c15-z-b1000').alt, g('bar-1h-s1000').alt], ['30m', '15m', null]);
+  assert.deepEqual([g('bar-sop-1h-m5-b1000').rsop, g('bar-sop-sw-4h-c30-v2-s1000').rsop, g('bar-j-1h-s1000').rsop], [true, true, false]);
+  assert.equal(g('bar-sop-sw-4h-c30-v2-s1000').sweep, true); assert.equal(g('bar-sop-sw-4h-c30-v2-s1000').visit, 2);
+  assert.deepEqual([g('bar-30m-s1000').m30, g('bar-j-cf-30m-b1000').m30, g('eurusd:bar-sop-vr-30m-s1000').m30, g('bar-15m-s1000').m30, g('bar-sw-4h-c30-s1000').m30], [true, true, true, false, false]);
+  // a stored record keeps no flag: the same reading must come back from the cleaned record
+  const c = M.clean(rec({ id: 'bar-sop-1h-c15-s1000', h: '1h', l: '15m', alt: '15m', rsop: true, label: 'H1 barrier · BO origin · repeat SOP · M15 confirm · with H4' }));
+  assert.deepEqual(SOPX.readings(c), SOPX.readings({ id: c.id, alt: '15m', rsop: true }));
+  // an order at the same price and minute under another reading is its own record
+  const prev = [{ ...M.clean(rec({ id: 'bar-1h-s1000', h: '1h', l: '5m' })), first: 1, src: 'replay' }];
+  const out = M.merge(prev, [rec({ id: 'bar-1h-s1000', h: '1h', l: '5m' }), rec({ id: 'bar-sop-1h-s1300', h: '1h', l: '5m', t: 1300 }), rec({ id: 'bar-1h-c15-s1000', h: '1h', l: '15m' })], 5000);
+  assert.deepEqual(out.map((r) => r.id).sort(), ['bar-1h-c15-s1000', 'bar-1h-s1000', 'bar-sop-1h-s1300']);
+});

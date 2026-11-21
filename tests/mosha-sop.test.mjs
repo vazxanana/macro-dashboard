@@ -36,7 +36,7 @@ test('the replay finds entries of both kinds, each with a stop on its losing sid
   // the return to the barrier is a moment on the finest candles, and the confirmation closes after it (never a QM from before price was there)
   for (const r of bar) { const z = r.marks[0], t0 = r.log[1].t, fine = B['1m'] && B['1m'].length && B['1m'][0].time <= t0 ? B['1m'] : B['5m'], c = fine.find((b) => b.time === t0);
     assert.ok(c, 'the return is a fine candle: ' + r.id); assert.ok(r.side < 0 ? c.high >= z.bot : c.low <= z.top, 'that candle trades into the barrier'); assert.ok(r.log[2].t > t0, 'the CF closes after the return'); }
-  for (const r of bar) { assert.match(r.log[0].text, r.sweep ? /barrier: the swing (high|low)/ : /barrier: a fresh (supply|demand) zone/); assert.match(r.log[2].text, / CF: a QM \(BO Structure\)/); assert.match(r.log[r.janda ? 4 : 3].text, r.atZone ? /pulled back to the zone's near side/ : /pulled back to the level/); if (r.janda) assert.match(r.log[3].text, / Janda: the next break (buy|sell) is a normal BO/); assert.deepEqual([r.h, r.l], r.jandaM1 ? [r.h, M.JANDA_ALT[r.h]] : r.m5 ? [r.h, M.M5_ALT[r.h]] : M.BARRIER.find((p) => p[0] === r.h), 'the confirmation timeframe of the method\'s table (or the owner\'s M5)'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - M.BARRIER_R) < 1e-9); }
+  for (const r of bar) { assert.match(r.log[0].text, r.sweep ? /barrier: the swing (high|low)/ : /barrier: a fresh (supply|demand) zone/); assert.match(r.log[2].text, / CF: a QM \(BO Structure\)/); assert.match(r.log[r.rsop ? 5 : r.janda ? 4 : 3].text, r.rsop ? /pulled back into the CF zone and an EG closed/ : r.janda ? /pulled back to the engulf zone/ : r.atZone ? /pulled back to the zone's near side/ : /pulled back to the level/); if (r.janda) assert.match(r.log[3].text, / Janda: the next break (buy|sell) is a normal BO/); assert.deepEqual([r.h, r.l], r.jandaM1 ? [r.h, M.JANDA_ALT[r.h]] : r.m5 ? [r.h, M.M5_ALT[r.h]] : M.BARRIER.find((p) => p[0] === r.h), 'the confirmation timeframe of the method\'s table (or the owner\'s M5)'); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - M.BARRIER_R) < 1e-9); }
 });
 
 test('no look-ahead: an entry found with the candles cut at a moment is the entry found with everything after it', () => {
@@ -146,7 +146,7 @@ test('the CF as a barrier: the sequence hands its clean CF zones over, and the b
     assert.equal(new Set(cfz.map((z) => z.tf + '|' + z.lo + '|' + z.hi + '|' + z.known)).size, cfz.length, 'each CF zone once');
     const plain = M.barrierTrades(X, F, { from: fr }), all = M.barrierTrades(X, F, { from: fr, extra: cfz }), cf = all.filter((r) => /CF barrier/.test(r.label));
     assert.ok(plain.every((r) => !/(CF|VR) barrier/.test(r.label)), 'without the hand-over nothing changes');
-    for (const r of cf) { n++; assert.match(r.id, /bar-(j-)?cf-/); assert.equal(r.kind, 'barrier'); assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1');
+    for (const r of cf) { n++; assert.match(r.id, /bar-(j-|sop-)?cf-/); assert.equal(r.kind, 'barrier'); assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1');
       assert.ok(Math.abs(r.target - r.entry) / r.r0 >= 1 - 1e-9); assert.ok(r.log[0].t <= r.log[1].t && r.log[1].t <= r.log[2].t && r.log[2].t <= r.t, 'known, then the return, then the QM, then the fill');
       // the sequence's rule: no entry once price reached the VR's extreme after the CF was known
       const fine = X['1m'], tg = r.zone.tgt; if (isFinite(tg)) assert.ok(!fine.some((b) => b.time >= r.zone.known && b.time < r.t && (r.side > 0 ? b.high >= tg : b.low <= tg)), 'no entry after the VR extreme was reached: ' + r.id);
@@ -176,14 +176,22 @@ test('the CF hand-over: only on the candle whose close made the CF, never a CF f
   assert.ok(n >= 4, 'zones handed over: ' + n);
 });
 
-test('the Janda: a QM at the barrier, then the next break the same way is a normal BO; the limit at that BO\'s level, a stop on the losing side, no hindsight', () => {
+test('the Janda: a QM at the barrier, then the next break the same way is a normal BO; the limit at the engulf zone inside that BO\'s leg, a stop on the losing side, no hindsight', () => {
   let n = 0;
   for (const seed of [7, 11, 23, 31]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, full = allOf(X, fr), J = full.filter((r) => r.janda);
     let cuts = 0; for (const r of J) { n++; assert.match(r.id, /bar-j-/); assert.match(r.label, / · Janda/); assert.ok(rule1(r), 'rule 1: ' + r.id);
-      assert.ok(r.side > 0 ? r.entry > Number(/closed above ([0-9]+\.[0-9]+)/.exec(r.log[2].text)[1]) : r.entry < Number(/closed below ([0-9]+\.[0-9]+)/.exec(r.log[2].text)[1]), 'the Janda BO is beyond the QM');
+      const qmL = Number(/closed (?:above|below) ([0-9]+\.[0-9]+)/.exec(r.log[2].text)[1]), boL = Number(/closed (?:above|below) ([0-9]+\.[0-9]+)/.exec(r.log[3].text)[1]), ez = /engulf zone inside that BO's leg runs ([0-9.]+) to ([0-9.]+)/.exec(r.log[3].text);
+      assert.ok(r.side > 0 ? boL > qmL : boL < qmL, 'the Janda BO is beyond the QM');
+      // 21 Nov 2026: the limit rests at the near side of the engulf zone inside the second BO's leg, on the pullback side of that BO's level, never at the level itself
+      assert.ok(ez, 'the engulf zone is named: ' + r.id); assert.ok(Math.abs(r.entry - Number(r.side > 0 ? ez[2] : ez[1])) < 0.006, 'the limit is the zone\'s near side');
+      assert.ok(r.side > 0 ? r.entry < boL : r.entry > boL, 'the zone lies behind the level the BO broke: ' + r.id);
+      const zm = r.marks.find((m) => / Janda EG zone$/.test(m.label)); assert.ok(zm && zm.top > zm.bot && zm.a <= r.log[3].t, 'the zone is on the chart, from a candle closed by the BO');
       assert.ok(r.log[2].t <= r.log[3].t && r.log[3].t <= r.t, 'QM, then the BO, then the fill');
       const T = knownAt(r) + 37 * 60; if (T > e || ++cuts > 2) continue; assert.ok(allOf(X, fr, T).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); } }
   assert.ok(n >= 1, 'Janda entries on these candles: ' + n);
+  // the older reading on request: the limit at the level the second BO broke
+  const X = market(26, 7), e = X['1m'].at(-1).time + 60, old = M.barrierTrades(X, F, { from: e - 20 * 86400, janda: 'level' }).filter((r) => r.janda);
+  assert.ok(old.length >= 1); for (const r of old) { assert.equal(r.entry.toFixed(2), /closed (?:above|below) ([0-9]+\.[0-9]+)/.exec(r.log[3].text)[1]); assert.ok(!r.marks.some((m) => /EG zone/.test(m.label))); }
 });
 
 test('the VR box as a barrier the other way, from the moment its CF made a range; a stop on the losing side, no hindsight', () => {
@@ -192,7 +200,7 @@ test('the VR box as a barrier the other way, from the moment its CF made a range
     M.sopTrades(X, F, { from: fr, cfOut: z });
     for (const v of z.filter((q) => q.kind === 'vr')) { const c = z.find((q) => q.kind === 'cf' && q.known === v.known && q.tf === v.tf); assert.ok(c && c.dir === -v.dir, 'a VR goes with its CF, the other way'); }
     const V = allOf(X, fr).filter((r) => /VR barrier/.test(r.label));
-    let cuts = 0; for (const r of V) { n++; assert.match(r.id, /bar-(j-)?vr-/); assert.ok(rule1(r), 'rule 1: ' + r.id);
+    let cuts = 0; for (const r of V) { n++; assert.match(r.id, /bar-(j-|sop-)?vr-/); assert.ok(rule1(r), 'rule 1: ' + r.id);
       const T = knownAt(r) + 37 * 60; if (T > e || ++cuts > 2) continue; assert.ok(allOf(X, fr, T).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); } }
   assert.ok(n >= 1, 'VR barrier entries on these candles: ' + n);
 });
@@ -217,25 +225,30 @@ test('the Janda\'s second table: an H4 barrier may also confirm on M1 and an H1 
     // no one-minute candles: no M1 alternative, and the simple CF never uses it
     const no1 = { ...X }; delete no1['1m']; const z = []; M.sopTrades(no1, F, { from: fr, cfOut: z });
     assert.ok(M.barrierTrades(no1, F, { from: fr, extra: z }).every((r) => !r.jandaM1));
-    assert.ok(full.filter((r) => r.kind === 'barrier' && !r.janda && !r.m5).every((r) => r.l === M.BARRIER.find((p) => p[0] === r.h)[1])); }
+    assert.ok(full.filter((r) => r.kind === 'barrier' && !r.janda && !r.m5 && !r.alt).every((r) => r.l === M.BARRIER.concat(M.BARRIER30).find((p) => p[0] === r.h)[1])); }
   assert.ok(n >= 1, 'M1 Janda entries on these candles: ' + n);
 });
 
 // 21 Nov 2026: the owner's four readings, decided after comparing the desk with his own example trades. Each is its own record
 // beside the older ones (the older records are pinned below exactly as the code before gave them).
-const isNew = (r) => !!(r.jandaM1 || r.m5 || r.atZone || r.visit > 1 || r.sweep);
+// 21 Nov 2026 (later): the second table's confirmations (r.alt, M30 barriers) and the repeat of the SOP (r.rsop) are new readings too
+const isNew = (r) => !!(r.jandaM1 || r.m5 || r.atZone || r.visit > 1 || r.sweep || r.alt || r.rsop || r.h === '30m');
 test('the older records still appear exactly as before, and every new reading is recorded beside them', async () => {
   const { createHash } = await import('node:crypto'), key = (r) => [r.id.replace(/-[bs](\d+)$/, '-$1'), r.side, r.entry.toFixed(4), r.stop.toFixed(4), r.target.toFixed(4), r.status].join('|');
   // hashes of the code before these readings (the sequence with the protected-swing VR, the barriers without the new readings)
   // pins = the code of 495073158 with an M1 Janda counted as its own reading (review, 21 Nov 2026)
   const PIN = { 7: [55, 'bb53a8ed7f0db3e3'], 11: [52, 'b6d7de54ab81d515'] }, seen = { m5: 0, atZone: 0, sweep: 0, visit: 0 };
   for (const seed of [7, 11]) { const X = seed === 7 ? B : market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 14 * 86400, bars = M.barrierTrades(X, F, { from: fr });
-    const old = M.sopTrades(X, F, { from: fr, near: false, retest: false }).concat(bars).filter((r) => !isNew(r)).map(key).sort();
+    // the pages applied to the detail (21 Nov 2026) changed three rules on purpose: the VR and CF read the small swings, a barrier's
+    // box runs from the broken level to the origin extreme, the Janda's limit rests at the engulf zone. Each keeps an option that
+    // reads it the older way (vr 'major', box 'candle', janda 'level'): with them the older records are exactly the pinned ones.
+    const olds = M.barrierTrades(X, F, { from: fr, box: 'candle', janda: 'level' });
+    const old = M.sopTrades(X, F, { from: fr, near: false, retest: false, vr: 'major' }).concat(olds).filter((r) => !isNew(r)).map(key).sort();
     // review 21 Nov 2026: a buy and a sell filled in one minute are two records (the side is in the id), and no id twice
     assert.equal(new Set(bars.map((r) => r.id)).size, bars.length, 'no barrier id twice, seed ' + seed); assert.ok(bars.every((r) => /-[bs]\d+$/.test(r.id)), 'the side is in the id');
     assert.deepEqual([old.length, createHash('sha256').update(old.join('\n')).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed + ': the older records changed');
     for (const r of bars.filter(isNew)) { if (r.m5) seen.m5++; if (r.atZone) seen.atZone++; if (r.sweep) seen.sweep++; if (r.visit > 1) seen.visit++;
-      assert.ok(rule1(r), 'rule 1: ' + r.id); const g = M.readings({ id: r.id }); assert.deepEqual([g.m5, g.atZone, g.sweep, g.visit], [!!r.m5, !!r.atZone, !!r.sweep, r.visit], 'the reading is read back from the id alone: ' + r.id);
+      assert.ok(rule1(r), 'rule 1: ' + r.id); const g = M.readings({ id: r.id }); assert.deepEqual([g.m5, g.atZone, g.sweep, g.visit, g.alt, g.rsop, g.m30], [!!r.m5, !!r.atZone, !!r.sweep, r.visit, r.alt || null, !!r.rsop, r.h === '30m'], 'the reading is read back from the id alone: ' + r.id);
       // a new reading never repeats an order already recorded (same side, price and fill)
       assert.ok(!bars.some((q) => q !== r && !isNew(q) && q.side === r.side && q.t === r.t && Math.abs(q.entry - r.entry) < 1e-9), 'a duplicate order: ' + r.id); } }
   for (const k of Object.keys(seen)) assert.ok(seen[k] >= 1, k + ' records on these candles: ' + seen[k]);
@@ -273,7 +286,7 @@ test('sweep barrier: a swing that a candle trades beyond and closes back inside;
   // seeded: every sweep record's barrier candle took the swing and closed back, and its confirmation closed after that candle
   let n = 0;
   for (const seed of [7, 11, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, S = allOf(X, fr).filter((r) => r.sweep);
-    let cuts = 0; for (const r of S) { n++; assert.match(r.id, /bar-(j-)?sw-/); assert.match(r.label, /sweep barrier · swing (high|low)/); assert.ok(rule1(r), 'rule 1: ' + r.id);
+    let cuts = 0; for (const r of S) { n++; assert.match(r.id, /bar-(j-|sop-)?sw-/); assert.match(r.label, /sweep barrier · swing (high|low)/); assert.ok(rule1(r), 'rule 1: ' + r.id);
       const H = X[r.h], k = H.findIndex((b) => b.time === r.zone.touch), b = H[k], p = r.zone.level;
       assert.ok(r.side < 0 ? b.high > p && b.close <= p : b.low < p && b.close >= p, 'swept and closed back: ' + r.id);
       assert.ok(r.log[2].t >= r.zone.wait + M.SEC[r.l], 'the QM closed after the sweeping candle closed');
@@ -312,7 +325,7 @@ test('the VR from the nearest swing (msMosha o.near): the box ends at the last i
   assert.equal(F.msMosha(htf, { events: [{ ...V, t: 9 * 300 }], bars: q }, 0.3, { near: true }).vr.lo, 100);
   assert.equal(F.msMosha(htf, { events: [{ ...V, t: 10 * 300 }], bars: q }, 0.3, { near: true }).vr.lo, 103.5, 'once confirmed it is taken');
   // the sequence uses it by default; the older reading's entries all remain (a smaller box only turns a CF inside the VR into a clean one) with the same levels
-  for (const seed of [7, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, a = M.sopTrades(X, F, { from: fr, near: false, retest: false }), b = M.sopTrades(X, F, { from: fr, retest: false });
+  for (const seed of [7, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, a = M.sopTrades(X, F, { from: fr, near: false, retest: false, vr: 'major' }), b = M.sopTrades(X, F, { from: fr, retest: false, vr: 'major' });
     for (const r of a) { const q = b.find((x) => x.id === r.id); assert.ok(q, 'the older entry remains: ' + r.id); assert.deepEqual([q.entry, q.stop, q.target], [r.entry, r.stop, r.target]); }
     assert.ok(b.every((r) => r['case'] !== 2 && rule1(r))); }
 });
@@ -332,4 +345,103 @@ test('after a turn the VR is retested the other way: a stop on the losing side, 
       const T = r.retest === 'level' ? r.t - (r.t % M.SEC[r.l]) + M.SEC[r.l] : r.t + 7 * 60;
       const c = M.sopTrades(cut(X, T), F, { from: fr }); assert.ok(c.map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); } }
   assert.ok(n >= 1, 'VR retest entries on these candles: ' + n);
+});
+
+// 21 Nov 2026 (owner: "build", after the page-by-page review): the method's pictures and tables applied to the detail. Three
+// are rule changes with an option that reads the older way (vr 'major', box 'candle', janda 'level'); two add records of their
+// own (the second confirmation table, the repeat of the SOP at a barrier).
+test('a barrier\'s box runs from the swing level the break took to the origin extreme of the leg; box "candle" keeps the charts\' one-candle zone', () => {
+  // hand-made M15 candles: a swing high 105 (3 a side), a pullback to 101, a close above 105: the demand box is 101 (the leg's low) to 105 (the level)
+  const px = [100, 102, 103, 105, 104, 103, 102, 101.5, 103, 104, 106, 107], H = px.map((p, i) => ({ time: i * 900, open: p - 0.4, high: p, low: i === 7 ? 101 : p - 0.8, close: p - 0.2 }));
+  const F1 = { msAnalyze: () => ({ events: [] }), msInternal: () => [{ dir: 1, level: 105, fromIdx: 3, breakIdx: 10 }], msZones: F.msZones };
+  const z = M.zonesOf('15m', { '15m': H }, F1), zc = M.zonesOf('15m', { '15m': H }, F1, { box: 'candle' });
+  assert.deepEqual([z.length, z[0].dir, z[0].lo, z[0].hi, z[0].known, z[0].touch], [1, 1, 101, 105, 11 * 900, null], 'level to the origin low, known at the break candle\'s close');
+  assert.equal(zc.length, 1); assert.ok(zc[0].hi < 105 && zc[0].lo === 101, 'the charts\' zone is the last opposite candle at the origin: ' + zc[0].lo + ' to ' + zc[0].hi);
+  // price back at the level touches the box at once; a close under the origin low breaks it
+  const back = H.concat([{ time: 12 * 900, open: 106.5, high: 107, low: 104.9, close: 106 }]);
+  assert.equal(M.zonesOf('15m', { '15m': back }, F1)[0].touch, 12 * 900); assert.equal(M.zonesOf('15m', { '15m': back }, F1, { box: 'candle' })[0].touch, null, 'the one-candle zone is not reached yet');
+  // seeded: every box has the break candle closing beyond its near side, and no candle of the leg beyond its far side; the same box with later candles cut
+  let n = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60;
+    for (const tf of ['4h', '1h', '15m']) { const Hx = X[tf], zs = M.zonesOf(tf, X, F), T = e - 6 * 86400, cz = M.zonesOf(tf, cut(X, T), F);
+      for (const q of zs) { n++; assert.ok(q.hi > q.lo && (q.kind === 'bo' || q.kind === 'ibo'));
+        const bi = Hx.findIndex((b) => b.time + M.SEC[tf] === q.known), b = Hx[bi]; assert.ok(q.dir > 0 ? b.close > q.hi : b.close < q.lo, 'the break candle closed beyond the level');
+        let oi = bi - 1; while (oi > 0 && (q.dir > 0 ? Hx[oi].low !== q.lo : Hx[oi].high !== q.hi)) oi--;
+        assert.ok(Hx.slice(oi, bi).every((c) => q.dir > 0 ? c.low >= q.lo : c.high <= q.hi), 'the far side is the leg\'s extreme');
+        if (q.known <= T) { const c = cz.find((p) => p.known === q.known && p.dir === q.dir && p.lo === q.lo && p.hi === q.hi); assert.ok(c, 'the same box when later candles are cut'); if (q.touch && q.touch + M.SEC[tf] <= T) assert.equal(c.touch, q.touch); } }
+      assert.equal(new Set(zs.map((q) => q.dir + '|' + q.lo + '|' + q.hi + '|' + q.known)).size, zs.length, 'no box twice'); } }
+  assert.ok(n >= 50, 'boxes checked: ' + n);
+});
+
+test('the VR and the CF are breaks of the chart\'s small swings (3 a side): the VR is the close through the small swing right before the extreme; vr "major" reads the protected swing', () => {
+  // a rise with one small pullback (swing low 105.5, 3 candles a side) right before the extreme 112.5, then a close under that swing
+  const p = [100, 101, 102, 104, 106, 108, 107, 106, 107, 109, 111, 112, 110, 108, 104], W = p.map((x, i) => ({ time: (i + 1) * 300, open: x, high: x + 0.5, low: x - 0.5, close: x }));
+  // before it, a fall, so the chart's first small break is up and the break down after it is a BO Structure
+  const pre = [110, 108, 106, 107, 108, 107, 104, 102, 100, 99, 98, 99].map((x, i) => ({ time: (i - 12) * 300, open: x, high: x + 0.5, low: x - 0.5, close: x }));
+  const ev = M.smallEv(F, pre.concat(W)), last = ev.at(-1);
+  assert.deepEqual([last.dir, last.structure, last.level, last.top, last.t], [-1, true, 105.5, 112.5, 15 * 300], 'the break of the small swing low before the extreme, its box up to the extreme');
+  const m = F.msMosha({ dir: 1, level: 99, t: 0, ext: NaN, far: 97.5 }, { events: ev, bars: pre.concat(W) }, 0.3, { near: true });
+  assert.deepEqual([m.vr.lo, m.vr.hi, m.vr.t], [105.5, 112.5, 15 * 300], 'the VR box: the small swing to the extreme, formed at that close');
+  // an event at a candle reads nothing after it: the same events with later candles cut away
+  for (const seed of [7, 11]) { const L = market(8, seed)['5m'], all = M.smallEv(F, L), k = L.length - 400, part = M.smallEv(F, L.slice(0, k));
+    assert.deepEqual(part, all.filter((e) => e.t <= L[k - 1].time), 'small breaks do not change when later candles arrive'); assert.ok(all.every((e) => e.top > e.bot && (e.dir > 0 ? e.top === e.level : e.bot === e.level))); }
+  // the sequence reads them by default; the older reading on request
+  let d = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, a = M.sopTrades(X, F, { from: fr }), b = M.sopTrades(X, F, { from: fr, vr: 'major' });
+    assert.ok(a.every(rule1) && b.every(rule1)); if (JSON.stringify(a.map(keyOf)) !== JSON.stringify(b.map(keyOf))) d++;
+    for (const r of a.filter((x) => !x.retest).slice(0, 3)) assert.ok(M.sopTrades(cut(X, r.t + 7 * 60), F, { from: fr }).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); }
+  assert.ok(d >= 1, 'the two readings differ on these candles');
+  assert.match(src, /o\.vr === 'major'/);
+});
+
+test('the second confirmation table: an H4 barrier also on M30, an H1 barrier on M15, an M30 barrier on M5; M30 built from M15 where none is handed in; no hindsight', () => {
+  assert.deepEqual(M.ALT2, { '4h': '30m', '1h': '15m' }); assert.deepEqual(M.BARRIER30, [['30m', '5m']]);
+  assert.deepEqual(M.BARRIER, [['1d', '1h'], ['4h', '15m'], ['1h', '5m'], ['15m', '1m']], 'the first table is unchanged');
+  // M30 from M15: whole half hours only
+  const q = [0, 900, 1800, 2700, 3600].map((t, i) => ({ time: t, open: 10 + i, high: 12 + i, low: 9 + i, close: 11 + i }));
+  assert.deepEqual(M.m30of(q), [{ time: 0, open: 10, high: 13, low: 9, close: 12 }, { time: 1800, open: 12, high: 15, low: 11, close: 14 }], 'the half hour whose second quarter has not closed is left out');
+  let na = 0, n30 = 0;
+  for (const seed of [7, 11, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, full = allOf(X, fr), A = full.filter((r) => r.alt), T30 = full.filter((r) => r.h === '30m');
+    let cuts = 0; for (const r of A) { na++; assert.ok((r.h === '4h' && r.l === '30m' && r.alt === '30m') || (r.h === '1h' && r.l === '15m' && r.alt === '15m'), r.id); assert.match(r.id, r.l === '30m' ? /-c30-/ : /-c15-/); assert.match(r.label, r.l === '30m' ? / · M30 confirm/ : / · M15 confirm/); assert.ok(rule1(r), 'rule 1: ' + r.id);
+      assert.match(r.log[1].text, /the second table's M(30|15), besides the first table's M(15|5)/);
+      const T = knownAt(r) + 37 * 60; if (T > e || ++cuts > 2) continue; assert.ok(allOf(X, fr, T).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); }
+    cuts = 0; for (const r of T30) { n30++; assert.equal(r.l, r.janda && r.jandaM1 ? '1m' : '5m'); assert.match(r.id, /bar-(j-|sop-)?((cf|vr|sw)-)?30m-/); assert.match(r.label, /^M30 /); assert.ok(rule1(r), 'rule 1: ' + r.id); assert.ok(r.withDir == null || / · (with|against) H1$/.test(r.label));
+      const T = knownAt(r) + 37 * 60; if (T > e || ++cuts > 2) continue; assert.ok(allOf(X, fr, T).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); }
+    if (seed !== 7) continue;
+    // without the second table every other record is what it was; without M30 candles they are built from M15 and nothing changes
+    const z = []; M.sopTrades(X, F, { from: fr, cfOut: z }); const withT = M.barrierTrades(X, F, { from: fr, extra: z }), noT = M.barrierTrades(X, F, { from: fr, extra: z, table2: false });
+    assert.ok(noT.every((r) => !r.alt && r.h !== '30m')); assert.deepEqual(noT.map(keyOf), withT.filter((r) => !r.alt && r.h !== '30m').map(keyOf), 'the other records are untouched');
+    const no30 = { ...X }; delete no30['30m']; assert.deepEqual(M.barrierTrades(no30, F, { from: fr, extra: z }).map(keyOf), withT.map(keyOf), 'M30 built from M15 gives the same records'); assert.equal(no30['30m'], undefined, 'the caller\'s candles are not changed');
+    // M5 for an M15 barrier is the second table's own; for an H4 barrier it is the owner's reading
+    for (const r of withT.filter((x) => x.m5)) assert.match(r.log[1].text, r.h === '15m' ? /the second table's M5/ : /the owner's M5 confirmation/); }
+  assert.ok(na >= 1 && n30 >= 1, 'second-table entries: ' + na + ', M30 barrier entries: ' + n30);
+});
+
+test('repeat the SOP at a barrier: after the QM, a VR and its CF one timeframe lower, the sequence\'s own entry; a stop on the losing side; off with rsop: false; no hindsight', () => {
+  assert.deepEqual(M.LOWER, { '1h': '30m', '30m': '15m', '15m': '5m', '5m': '1m' });
+  let n = 0;
+  for (const seed of [7, 11, 23]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60, fr = e - 20 * 86400, full = allOf(X, fr), R = full.filter((r) => r.rsop);
+    let cuts = 0; for (const r of R) { n++; const low = M.LOWER[r.l]; assert.ok(low && r.ll === low, r.id); assert.match(r.id, /bar-sop-/); assert.match(r.label, / · repeat SOP/); assert.ok(!r.janda && !r.atZone && r.kind === 'barrier'); assert.ok(rule1(r), 'rule 1: ' + r.id);
+      assert.ok(r.log.slice(0, 6).every((x, i) => !i || x.t >= r.log[i - 1].t), 'the barrier, the return, the QM, the VR, the CF, the entry: in time order');
+      assert.match(r.log[2].text, / CF: a QM \(BO Structure\).*The SOP is repeated one timeframe lower/); assert.match(r.log[3].text, / VR: the first BO Structure \(QM\) against the /); assert.match(r.log[4].text, / CF.*back with the .* clear of the VR/); assert.notEqual(r['case'], 2);
+      assert.ok(r.log[3].t > r.log[2].t, 'the VR forms after the QM closed'); assert.ok(X[low].some((b) => b.time + M.SEC[low] === r.t), 'the entry is the close of a lower-timeframe candle (its EG)');
+      // the target is the VR's extreme and the trade starts after its entry candle
+      const vr = r.marks.find((m) => m.kind === 'vr' || m.kind === 'bvr'); assert.ok(vr && Math.abs(r.target - (r.side > 0 ? vr.top : vr.bot)) < 1e-9, 'target = the VR\'s extreme');
+      if (r.endT) assert.ok(r.endT >= r.t);
+      const T = knownAt(r) + 37 * 60; if (T > e || ++cuts > 3) continue; assert.ok(allOf(X, fr, T).map(keyOf).includes(keyOf(r)), 'found only with later candles: ' + r.id); }
+    if (seed !== 7) continue;
+    const z = []; M.sopTrades(X, F, { from: fr, cfOut: z }); const a = M.barrierTrades(X, F, { from: fr, extra: z }), b = M.barrierTrades(X, F, { from: fr, extra: z, rsop: false });
+    assert.ok(b.every((r) => !r.rsop)); assert.deepEqual(b.map(keyOf), a.filter((r) => !r.rsop).map(keyOf), 'every other record is untouched');
+    assert.equal(new Set(a.map((r) => r.id)).size, a.length, 'no id twice'); }
+  assert.ok(n >= 3, 'repeat-SOP entries on these candles: ' + n);
+  assert.doesNotMatch(src.slice(src.indexOf('REPEAT THE SOP (21 Nov 2026'), src.indexOf("if (C.length) { run(ctf, C, 'table')")), /Lc\[kk \+ 1\]|Lc\.slice\(a0\)\b/, 'the walk reads candles up to its own only');
+});
+
+test('the VR retest of a BUY is worded as a buy: the VR\'s bottom and the last high, never "top" and "last low"', () => {
+  let b = 0, s = 0;
+  for (const seed of [3, 7, 11, 23, 31, 47]) { const X = market(26, seed), e = X['1m'].at(-1).time + 60;
+    for (const r of M.sopTrades(X, F, { from: e - 20 * 86400 }).filter((x) => x.retest)) { const txt = r.log.map((x) => x.text).join(' '), tm = r.marks.find((m) => / · target$/.test(m.label));
+      if (r.side > 0) { b++; assert.match(txt, /target the last high /); assert.doesNotMatch(txt, /last low|VR's top/); assert.equal(tm.label, 'Last high · target'); if (r.retest === 'level') assert.match(txt, /past the VR's bottom /); else assert.match(txt, /past the CF box low /); assert.ok(r.target > r.entry && r.stop < r.entry); }
+      else { s++; assert.match(txt, /target the last low /); assert.doesNotMatch(txt, /last high|VR's bottom/); assert.equal(tm.label, 'Last low · target'); } } }
+  assert.ok(b >= 1 && s >= 1, 'buy and sell retests on these candles: ' + b + ' / ' + s);
 });
