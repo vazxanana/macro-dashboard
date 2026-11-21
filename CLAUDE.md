@@ -5157,6 +5157,17 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
     "H4 A level · BO buy", "H4 EF (zone failed)", "M15 EG zone", "M5 EF (zone failed)", "M5 EG zone · entry", "M5 VR",
     "M5 CF zone", "M15 CF (QM)"; `clean` keeps 8 marks). Not written, said on the desks: open-close levels, the gold plan's
     second entry type, "mark the BEST barrier" (every fresh BO / iBO origin is taken). These are readings, not tested rules.
+  - **The readings after the audit, tested** (21 Nov 2026, owner: "do a study in how to improve each edge";
+    `research/edge/desk-rigor/`, PREREGISTRATION.md committed alone first; `run.mjs fetch|market <key>|report <dir>`). The desks'
+    own code on gold, EUR/USD and GBP/USD, OANDA M5, in sample 2020-23, out of sample 2024-25 (nothing of 2026), net of costs,
+    month-sum t, Holm over 13 tests. **FAIL, 0 of 13.** Readings, out of sample, R a trade after costs: Mosha sequence −0.172
+    (n 978, t −2.22), Mosha barrier −0.113 (n 2,112, t −2.12), engulf plan −0.069 (n 893), simple −0.068 (n 1,008), direct
+    −0.075 (n 97, too few), MSNR with the direction −0.300 (n 3,957, t −11.87), MSNR gold plan +0.079 (n 775, t 1.31, and
+    −0.042 in sample). Conditions the methods name (50% pullback before the CF, CF clear of the VR, a major-BO barrier, with the
+    Daily structure, plan against simple, with against the direction): none picks better trades (largest t 1.51). Before costs
+    the engulf methods are about zero. The M15 barrier on M1 was not tested (no one-minute history). The desks stay paper
+    records of one way to read each method; none of these conditions is made a requirement; do not look at them again on
+    these years. Test: `tests/desk-rigor.test.mjs`.
 - Tests: `tests/mosha-desk.test.mjs` (permissions, the stop rule, R on the server, `pre`, the locks, statistics, the candle check,
   CSV, page wiring, the studies' figures). The page smoke test opens `#mosha`.
 - **Graphite look** (16-17 Nov 2026, `docs/design/aureum-theme.md`; the owner rejected black-and-gold for graphite grey): display

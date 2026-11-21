@@ -1,0 +1,1130 @@
+{
+ "study": "desk-rigor",
+ "built": "2026-11-21",
+ "verdict": "FAIL (0 of 13)",
+ "system": "The Mosha, Engulfing and MSNR desks' readings after the marking audit of 21 Nov 2026, and six conditions the methods themselves name; gold, EUR/USD, GBP/USD; OANDA mid M5; in sample 2020-2023, out of sample 2024-2025; net of costs.",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd"
+ ],
+ "windows": {
+  "is": [
+   "2020-01-01",
+   "2023-12-31"
+  ],
+  "oos": [
+   "2024-01-01",
+   "2025-12-31"
+  ]
+ },
+ "trades": 38562,
+ "tests": {
+  "R1": {
+   "kind": "reading",
+   "what": "Mosha sequence (BO, VR, CF, pullback, EG)",
+   "is": {
+    "gross": {
+     "n": 1967,
+     "win": 30.9,
+     "mean": 0.0159,
+     "total": 31.32,
+     "dd": 94.38,
+     "months": 48,
+     "tMonth": 0.27
+    },
+    "net": {
+     "n": 1967,
+     "win": 29.8,
+     "mean": -0.0822,
+     "total": -161.77,
+     "dd": 188.78,
+     "months": 48,
+     "tMonth": -1.36
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 978,
+     "win": 27.6,
+     "mean": -0.0595,
+     "total": -58.18,
+     "dd": 122.9,
+     "months": 24,
+     "tMonth": -0.8
+    },
+    "net": {
+     "n": 978,
+     "win": 26.5,
+     "mean": -0.1718,
+     "total": -168.06,
+     "dd": 191.54,
+     "months": 24,
+     "tMonth": -2.22
+    },
+    "net2": {
+     "n": 978,
+     "win": 26,
+     "mean": -0.2842,
+     "total": -277.93,
+     "dd": 298.31,
+     "months": 24,
+     "tMonth": -3.53
+    },
+    "costR": 0.1123
+   },
+   "byYear": {
+    "2020": {
+     "n": 499,
+     "net": -42.81
+    },
+    "2021": {
+     "n": 479,
+     "net": -33.02
+    },
+    "2022": {
+     "n": 535,
+     "net": 10.09
+    },
+    "2023": {
+     "n": 454,
+     "net": -96.03
+    },
+    "2024": {
+     "n": 482,
+     "net": -122.56
+    },
+    "2025": {
+     "n": 496,
+     "net": -45.5
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 292,
+     "mean": -0.0702,
+     "total": -20.5
+    },
+    "eurusd": {
+     "n": 342,
+     "mean": -0.2292,
+     "total": -78.4
+    },
+    "gbpusd": {
+     "n": 344,
+     "mean": -0.2011,
+     "total": -69.16
+    }
+   },
+   "t": -2.22,
+   "p": 0.9868,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "oosPositive": false,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": false
+   },
+   "verdict": "FAIL"
+  },
+  "R2": {
+   "kind": "reading",
+   "what": "Mosha barrier entry (D1, H4, H1 barriers)",
+   "is": {
+    "gross": {
+     "n": 4437,
+     "win": 23.3,
+     "mean": -0.0678,
+     "total": -301,
+     "dd": 376,
+     "months": 48,
+     "tMonth": -2.42
+    },
+    "net": {
+     "n": 4437,
+     "win": 23.3,
+     "mean": -0.1259,
+     "total": -558.42,
+     "dd": 585.55,
+     "months": 48,
+     "tMonth": -4.49
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 2112,
+     "win": 23.9,
+     "mean": -0.0436,
+     "total": -92,
+     "dd": 190,
+     "months": 24,
+     "tMonth": -0.8
+    },
+    "net": {
+     "n": 2112,
+     "win": 23.9,
+     "mean": -0.1128,
+     "total": -238.31,
+     "dd": 286.86,
+     "months": 24,
+     "tMonth": -2.12
+    },
+    "net2": {
+     "n": 2112,
+     "win": 23.9,
+     "mean": -0.1821,
+     "total": -384.63,
+     "dd": 410.3,
+     "months": 24,
+     "tMonth": -3.47
+    },
+    "costR": 0.0693
+   },
+   "byYear": {
+    "2020": {
+     "n": 1066,
+     "net": -202.95
+    },
+    "2021": {
+     "n": 1134,
+     "net": -235.83
+    },
+    "2022": {
+     "n": 1139,
+     "net": -88.69
+    },
+    "2023": {
+     "n": 1098,
+     "net": -30.95
+    },
+    "2024": {
+     "n": 1064,
+     "net": -120.4
+    },
+    "2025": {
+     "n": 1048,
+     "net": -117.92
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 580,
+     "mean": 0.0538,
+     "total": 31.18
+    },
+    "eurusd": {
+     "n": 774,
+     "mean": -0.2558,
+     "total": -197.96
+    },
+    "gbpusd": {
+     "n": 758,
+     "mean": -0.0944,
+     "total": -71.54
+    }
+   },
+   "t": -2.12,
+   "p": 0.983,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "oosPositive": false,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": false
+   },
+   "verdict": "FAIL"
+  },
+  "R3": {
+   "kind": "reading",
+   "what": "Engulf plan (with the Daily)",
+   "is": {
+    "gross": {
+     "n": 1395,
+     "win": 33.5,
+     "mean": -0.0058,
+     "total": -8.11,
+     "dd": 59.09,
+     "months": 48,
+     "tMonth": -0.14
+    },
+    "net": {
+     "n": 1395,
+     "win": 33.4,
+     "mean": -0.0893,
+     "total": -124.51,
+     "dd": 158.32,
+     "months": 48,
+     "tMonth": -2.04
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 893,
+     "win": 34,
+     "mean": 0.0176,
+     "total": 15.73,
+     "dd": 43.22,
+     "months": 24,
+     "tMonth": 0.39
+    },
+    "net": {
+     "n": 893,
+     "win": 34,
+     "mean": -0.0694,
+     "total": -62,
+     "dd": 85.18,
+     "months": 24,
+     "tMonth": -1.52
+    },
+    "net2": {
+     "n": 893,
+     "win": 33.9,
+     "mean": -0.1565,
+     "total": -139.72,
+     "dd": 157.69,
+     "months": 24,
+     "tMonth": -3.39
+    },
+    "costR": 0.087
+   },
+   "byYear": {
+    "2020": {
+     "n": 347,
+     "net": -34.1
+    },
+    "2021": {
+     "n": 281,
+     "net": -23.2
+    },
+    "2022": {
+     "n": 382,
+     "net": -43.18
+    },
+    "2023": {
+     "n": 385,
+     "net": -24.03
+    },
+    "2024": {
+     "n": 395,
+     "net": -29.79
+    },
+    "2025": {
+     "n": 498,
+     "net": -32.21
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 331,
+     "mean": -0.0056,
+     "total": -1.85
+    },
+    "eurusd": {
+     "n": 248,
+     "mean": -0.0557,
+     "total": -13.81
+    },
+    "gbpusd": {
+     "n": 314,
+     "mean": -0.1476,
+     "total": -46.34
+    }
+   },
+   "t": -1.52,
+   "p": 0.9357,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "oosPositive": false,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": false
+   },
+   "verdict": "FAIL"
+  },
+  "R4": {
+   "kind": "reading",
+   "what": "Engulf simple (not with the Daily)",
+   "is": {
+    "gross": {
+     "n": 1754,
+     "win": 31.9,
+     "mean": -0.059,
+     "total": -103.52,
+     "dd": 139.02,
+     "months": 48,
+     "tMonth": -1.83
+    },
+    "net": {
+     "n": 1754,
+     "win": 31.8,
+     "mean": -0.144,
+     "total": -252.54,
+     "dd": 268.61,
+     "months": 48,
+     "tMonth": -4.22
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 1008,
+     "win": 34.3,
+     "mean": 0.0205,
+     "total": 20.69,
+     "dd": 70.88,
+     "months": 24,
+     "tMonth": 0.42
+    },
+    "net": {
+     "n": 1008,
+     "win": 34.2,
+     "mean": -0.0678,
+     "total": -68.36,
+     "dd": 112.4,
+     "months": 24,
+     "tMonth": -1.44
+    },
+    "net2": {
+     "n": 1008,
+     "win": 34.1,
+     "mean": -0.1562,
+     "total": -157.41,
+     "dd": 176.51,
+     "months": 24,
+     "tMonth": -3.37
+    },
+    "costR": 0.0883
+   },
+   "byYear": {
+    "2020": {
+     "n": 432,
+     "net": -38.48
+    },
+    "2021": {
+     "n": 339,
+     "net": -43.63
+    },
+    "2022": {
+     "n": 537,
+     "net": -107.91
+    },
+    "2023": {
+     "n": 446,
+     "net": -62.52
+    },
+    "2024": {
+     "n": 447,
+     "net": -69.01
+    },
+    "2025": {
+     "n": 561,
+     "net": 0.65
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 354,
+     "mean": 0.0333,
+     "total": 11.8
+    },
+    "eurusd": {
+     "n": 331,
+     "mean": -0.0221,
+     "total": -7.33
+    },
+    "gbpusd": {
+     "n": 323,
+     "mean": -0.2255,
+     "total": -72.83
+    }
+   },
+   "t": -1.44,
+   "p": 0.9251,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "oosPositive": false,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": false
+   },
+   "verdict": "FAIL"
+  },
+  "R5": {
+   "kind": "reading",
+   "what": "Engulf direct entry (fresh zones)",
+   "is": {
+    "gross": {
+     "n": 162,
+     "win": 30.9,
+     "mean": -0.0667,
+     "total": -10.81,
+     "dd": 27,
+     "months": 47,
+     "tMonth": -0.59
+    },
+    "net": {
+     "n": 162,
+     "win": 30.9,
+     "mean": -0.1473,
+     "total": -23.87,
+     "dd": 35.9,
+     "months": 47,
+     "tMonth": -1.28
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 97,
+     "win": 34,
+     "mean": 0.0099,
+     "total": 0.96,
+     "dd": 18,
+     "months": 24,
+     "tMonth": 0.07
+    },
+    "net": {
+     "n": 97,
+     "win": 34,
+     "mean": -0.0749,
+     "total": -7.27,
+     "dd": 21.16,
+     "months": 24,
+     "tMonth": -0.53
+    },
+    "net2": {
+     "n": 97,
+     "win": 34,
+     "mean": -0.1597,
+     "total": -15.49,
+     "dd": 27.47,
+     "months": 24,
+     "tMonth": -1.14
+    },
+    "costR": 0.0848
+   },
+   "byYear": {
+    "2020": {
+     "n": 32,
+     "net": -4.52
+    },
+    "2021": {
+     "n": 30,
+     "net": 1.67
+    },
+    "2022": {
+     "n": 55,
+     "net": -11.53
+    },
+    "2023": {
+     "n": 45,
+     "net": -9.5
+    },
+    "2024": {
+     "n": 42,
+     "net": -12.2
+    },
+    "2025": {
+     "n": 55,
+     "net": 4.93
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 40,
+     "mean": -0.0749,
+     "total": -3
+    },
+    "eurusd": {
+     "n": 27,
+     "mean": 0.1817,
+     "total": 4.91
+    },
+    "gbpusd": {
+     "n": 30,
+     "mean": -0.306,
+     "total": -9.18
+    }
+   },
+   "t": -0.53,
+   "p": 0.7019,
+   "holm": 1,
+   "checks": {
+    "n100": false,
+    "oosPositive": false,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": false
+   },
+   "verdict": "FAIL (too few to judge)"
+  },
+  "R6": {
+   "kind": "reading",
+   "what": "MSNR: with the direction",
+   "is": {
+    "gross": {
+     "n": 6743,
+     "win": 35.5,
+     "mean": -0.0926,
+     "total": -624.46,
+     "dd": 639.87,
+     "months": 48,
+     "tMonth": -5.34
+    },
+    "net": {
+     "n": 6743,
+     "win": 35.4,
+     "mean": -0.3194,
+     "total": -2153.45,
+     "dd": 2155.99,
+     "months": 48,
+     "tMonth": -13.96
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 3957,
+     "win": 36.8,
+     "mean": -0.0382,
+     "total": -151.3,
+     "dd": 180.14,
+     "months": 24,
+     "tMonth": -1.74
+    },
+    "net": {
+     "n": 3957,
+     "win": 36.8,
+     "mean": -0.2999,
+     "total": -1186.8,
+     "dd": 1190.47,
+     "months": 24,
+     "tMonth": -11.87
+    },
+    "net2": {
+     "n": 3957,
+     "win": 36.7,
+     "mean": -0.5616,
+     "total": -2222.3,
+     "dd": 2225.84,
+     "months": 24,
+     "tMonth": -17.91
+    },
+    "costR": 0.2617
+   },
+   "byYear": {
+    "2020": {
+     "n": 1403,
+     "net": -543.4
+    },
+    "2021": {
+     "n": 1171,
+     "net": -326.01
+    },
+    "2022": {
+     "n": 2245,
+     "net": -576.15
+    },
+    "2023": {
+     "n": 1924,
+     "net": -707.9
+    },
+    "2024": {
+     "n": 1746,
+     "net": -520.9
+    },
+    "2025": {
+     "n": 2211,
+     "net": -665.9
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 1198,
+     "mean": -0.0702,
+     "total": -84.05
+    },
+    "eurusd": {
+     "n": 1329,
+     "mean": -0.4406,
+     "total": -585.54
+    },
+    "gbpusd": {
+     "n": 1430,
+     "mean": -0.3617,
+     "total": -517.22
+    }
+   },
+   "t": -11.87,
+   "p": 1,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "oosPositive": false,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": false
+   },
+   "verdict": "FAIL"
+  },
+  "R7": {
+   "kind": "reading",
+   "what": "MSNR gold plan",
+   "is": {
+    "gross": {
+     "n": 1432,
+     "win": 25.6,
+     "mean": -0.0119,
+     "total": -17.1,
+     "dd": 81.29,
+     "months": 48,
+     "tMonth": -0.28
+    },
+    "net": {
+     "n": 1432,
+     "win": 25.6,
+     "mean": -0.0424,
+     "total": -60.74,
+     "dd": 112.47,
+     "months": 48,
+     "tMonth": -0.99
+    }
+   },
+   "oos": {
+    "gross": {
+     "n": 775,
+     "win": 28.5,
+     "mean": 0.1266,
+     "total": 98.11,
+     "dd": 29,
+     "months": 24,
+     "tMonth": 2.11
+    },
+    "net": {
+     "n": 775,
+     "win": 28.5,
+     "mean": 0.0785,
+     "total": 60.86,
+     "dd": 32.93,
+     "months": 24,
+     "tMonth": 1.31
+    },
+    "net2": {
+     "n": 775,
+     "win": 28.5,
+     "mean": 0.0305,
+     "total": 23.61,
+     "dd": 43.48,
+     "months": 24,
+     "tMonth": 0.51
+    },
+    "costR": 0.0481
+   },
+   "byYear": {
+    "2020": {
+     "n": 349,
+     "net": 11.99
+    },
+    "2021": {
+     "n": 362,
+     "net": -42.9
+    },
+    "2022": {
+     "n": 381,
+     "net": -13.89
+    },
+    "2023": {
+     "n": 340,
+     "net": -15.94
+    },
+    "2024": {
+     "n": 398,
+     "net": 47.31
+    },
+    "2025": {
+     "n": 377,
+     "net": 13.55
+    }
+   },
+   "oosByMarket": {
+    "xau": {
+     "n": 775,
+     "mean": 0.0785,
+     "total": 60.86
+    }
+   },
+   "t": 1.31,
+   "p": 0.0951,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "oosPositive": true,
+    "tAfterHolm": false,
+    "inSamplePositive": false,
+    "positiveAt2xCosts": true
+   },
+   "verdict": "FAIL"
+  },
+  "C1": {
+   "kind": "condition",
+   "what": "R1: the pullback reached 50% before the CF, against not",
+   "is": {
+    "preferred": {
+     "n": 1622,
+     "win": 28.7,
+     "mean": -0.0681,
+     "total": -110.41,
+     "dd": 139.7,
+     "months": 48,
+     "tMonth": -1.04
+    },
+    "rest": {
+     "n": 345,
+     "win": 34.8,
+     "mean": -0.1489,
+     "total": -51.36,
+     "dd": 64.59,
+     "months": 48,
+     "tMonth": -1.7
+    },
+    "months": 48,
+    "diff": 0.1332,
+    "t": 1.39
+   },
+   "oos": {
+    "preferred": {
+     "n": 813,
+     "win": 24.8,
+     "mean": -0.1998,
+     "total": -162.44,
+     "dd": 186.19,
+     "months": 24,
+     "tMonth": -2.28
+    },
+    "rest": {
+     "n": 165,
+     "win": 34.5,
+     "mean": -0.034,
+     "total": -5.61,
+     "dd": 22.16,
+     "months": 24,
+     "tMonth": -0.26
+    },
+    "months": 24,
+    "diff": -0.2292,
+    "t": -1.51
+   },
+   "t": -1.51,
+   "p": 0.9345,
+   "holm": 1,
+   "checks": {
+    "n50EachSide": true,
+    "oosDifferencePositive": false,
+    "tAfterHolm": false,
+    "inSampleDifferencePositive": true
+   },
+   "verdict": "FAIL"
+  },
+  "C2": {
+   "kind": "condition",
+   "what": "R1: CF clear of the VR (case 1), against inside it (case 2)",
+   "is": {
+    "preferred": {
+     "n": 781,
+     "win": 19.8,
+     "mean": -0.0989,
+     "total": -77.21,
+     "dd": 88.67,
+     "months": 48,
+     "tMonth": -0.93
+    },
+    "rest": {
+     "n": 1186,
+     "win": 36.3,
+     "mean": -0.0713,
+     "total": -84.56,
+     "dd": 133.02,
+     "months": 48,
+     "tMonth": -1.12
+    },
+    "months": 48,
+    "diff": -0.0051,
+    "t": -0.04
+   },
+   "oos": {
+    "preferred": {
+     "n": 383,
+     "win": 16.7,
+     "mean": -0.2506,
+     "total": -95.96,
+     "dd": 128.21,
+     "months": 24,
+     "tMonth": -1.64
+    },
+    "rest": {
+     "n": 595,
+     "win": 32.8,
+     "mean": -0.1212,
+     "total": -72.09,
+     "dd": 89.7,
+     "months": 24,
+     "tMonth": -1.32
+    },
+    "months": 24,
+    "diff": -0.0153,
+    "t": -0.08
+   },
+   "t": -0.08,
+   "p": 0.5319,
+   "holm": 1,
+   "checks": {
+    "n50EachSide": true,
+    "oosDifferencePositive": false,
+    "tAfterHolm": false,
+    "inSampleDifferencePositive": false
+   },
+   "verdict": "FAIL"
+  },
+  "C3": {
+   "kind": "condition",
+   "what": "R2: barrier is the origin of a major BO, against an internal BO",
+   "is": {
+    "preferred": {
+     "n": 1539,
+     "win": 23.5,
+     "mean": -0.1147,
+     "total": -176.53,
+     "dd": 200.23,
+     "months": 48,
+     "tMonth": -2.27
+    },
+    "rest": {
+     "n": 2898,
+     "win": 23.2,
+     "mean": -0.1318,
+     "total": -381.89,
+     "dd": 416.44,
+     "months": 48,
+     "tMonth": -3.52
+    },
+    "months": 48,
+    "diff": 0.0248,
+    "t": 0.39
+   },
+   "oos": {
+    "preferred": {
+     "n": 720,
+     "win": 23.3,
+     "mean": -0.1337,
+     "total": -96.28,
+     "dd": 172.23,
+     "months": 24,
+     "tMonth": -1.44
+    },
+    "rest": {
+     "n": 1392,
+     "win": 24.2,
+     "mean": -0.102,
+     "total": -142.03,
+     "dd": 148.15,
+     "months": 24,
+     "tMonth": -2.13
+    },
+    "months": 24,
+    "diff": 0.0098,
+    "t": 0.13
+   },
+   "t": 0.13,
+   "p": 0.4483,
+   "holm": 1,
+   "checks": {
+    "n50EachSide": true,
+    "oosDifferencePositive": true,
+    "tAfterHolm": false,
+    "inSampleDifferencePositive": true
+   },
+   "verdict": "FAIL"
+  },
+  "C4": {
+   "kind": "condition",
+   "what": "R2: entry with the Daily structure, against not with it",
+   "is": {
+    "preferred": {
+     "n": 2243,
+     "win": 23.5,
+     "mean": -0.1163,
+     "total": -260.76,
+     "dd": 316.25,
+     "months": 48,
+     "tMonth": -2.65
+    },
+    "rest": {
+     "n": 2194,
+     "win": 23.1,
+     "mean": -0.1357,
+     "total": -297.66,
+     "dd": 321.76,
+     "months": 48,
+     "tMonth": -3.54
+    },
+    "months": 48,
+    "diff": 0.0303,
+    "t": 0.49
+   },
+   "oos": {
+    "preferred": {
+     "n": 1082,
+     "win": 23,
+     "mean": -0.1471,
+     "total": -159.13,
+     "dd": 198.54,
+     "months": 24,
+     "tMonth": -2.1
+    },
+    "rest": {
+     "n": 1030,
+     "win": 24.9,
+     "mean": -0.0769,
+     "total": -79.18,
+     "dd": 111.89,
+     "months": 24,
+     "tMonth": -1.17
+    },
+    "months": 24,
+    "diff": -0.0679,
+    "t": -0.82
+   },
+   "t": -0.82,
+   "p": 0.7939,
+   "holm": 1,
+   "checks": {
+    "n50EachSide": true,
+    "oosDifferencePositive": false,
+    "tAfterHolm": false,
+    "inSampleDifferencePositive": true
+   },
+   "verdict": "FAIL"
+  },
+  "C5": {
+   "kind": "condition",
+   "what": "Engulf plan (R3) against the simple method (R4)",
+   "is": {
+    "preferred": {
+     "n": 1395,
+     "win": 33.4,
+     "mean": -0.0893,
+     "total": -124.51,
+     "dd": 158.32,
+     "months": 48,
+     "tMonth": -2.04
+    },
+    "rest": {
+     "n": 1754,
+     "win": 31.8,
+     "mean": -0.144,
+     "total": -252.54,
+     "dd": 268.61,
+     "months": 48,
+     "tMonth": -4.22
+    },
+    "months": 48,
+    "diff": 0.0435,
+    "t": 0.76
+   },
+   "oos": {
+    "preferred": {
+     "n": 893,
+     "win": 34,
+     "mean": -0.0694,
+     "total": -62,
+     "dd": 85.18,
+     "months": 24,
+     "tMonth": -1.52
+    },
+    "rest": {
+     "n": 1008,
+     "win": 34.2,
+     "mean": -0.0678,
+     "total": -68.36,
+     "dd": 112.4,
+     "months": 24,
+     "tMonth": -1.44
+    },
+    "months": 24,
+    "diff": 0.0097,
+    "t": 0.15
+   },
+   "t": 0.15,
+   "p": 0.4404,
+   "holm": 1,
+   "checks": {
+    "n50EachSide": true,
+    "oosDifferencePositive": true,
+    "tAfterHolm": false,
+    "inSampleDifferencePositive": true
+   },
+   "verdict": "FAIL"
+  },
+  "C6": {
+   "kind": "condition",
+   "what": "MSNR with the direction (R6) against the same entry against it",
+   "is": {
+    "preferred": {
+     "n": 6743,
+     "win": 35.4,
+     "mean": -0.3194,
+     "total": -2153.45,
+     "dd": 2155.99,
+     "months": 48,
+     "tMonth": -13.96
+    },
+    "rest": {
+     "n": 7017,
+     "win": 37,
+     "mean": -0.2855,
+     "total": -2003.2,
+     "dd": 2014.89,
+     "months": 48,
+     "tMonth": -15.02
+    },
+    "months": 48,
+    "diff": -0.0245,
+    "t": -1.09
+   },
+   "oos": {
+    "preferred": {
+     "n": 3957,
+     "win": 36.8,
+     "mean": -0.2999,
+     "total": -1186.8,
+     "dd": 1190.47,
+     "months": 24,
+     "tMonth": -11.87
+    },
+    "rest": {
+     "n": 3835,
+     "win": 36.7,
+     "mean": -0.3428,
+     "total": -1314.6,
+     "dd": 1324.78,
+     "months": 24,
+     "tMonth": -15.03
+    },
+    "months": 24,
+    "diff": 0.0506,
+    "t": 1.51
+   },
+   "t": 1.51,
+   "p": 0.0655,
+   "holm": 0.8518,
+   "checks": {
+    "n50EachSide": true,
+    "oosDifferencePositive": true,
+    "tAfterHolm": false,
+    "inSampleDifferencePositive": false
+   },
+   "verdict": "FAIL"
+  }
+ }
+}
