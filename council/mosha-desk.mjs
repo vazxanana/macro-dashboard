@@ -15,7 +15,7 @@ import { writeAtomic } from './jsonio.mjs';
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
 
-export const KEEP = 4000;           // records kept
+export const KEEP = 14000;          // records kept
 export const LIVE_S = 60 * 60;      // recorded within this of its entry = seen live by the tracker (it runs about every 35 min)
 export const NEAR_S = 20 * 60;      // a new record this near an old one of the same kind and side is the same trade re-read
 const MD = () => (process.env.MD_BASE || 'https://aureumdesk.co.uk/md/').replace(/\/?$/, '/');

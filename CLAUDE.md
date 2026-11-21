@@ -5070,7 +5070,7 @@ studies' figures (linked to the Edge lab; a test compares them with the result f
   another market the stop buffer, the risk limits and the smallest barrier are the same share of price as gold's dollar figures
   near $4,000 (`sizes`, the desk's own choice, said on the card); gold's figures are unchanged. A record of another market
   carries `market`, an id prefixed `<market>:` and six decimals; the card has a market filter and the chart's price scale takes
-  the market's decimals. `KEEP` 4000. The 90-day file: 2,186 records, all closed, before costs: gold −22.7R (473), silver −62.8R
+  the market's decimals. `KEEP` 4000 (14,000 since the January 2026 backfill, 21 Nov). The 90-day file: 2,186 records, all closed, before costs: gold −22.7R (473), silver −62.8R
   (416), EUR/USD +39.8R (421), GBP/USD +19.5R (459), Nasdaq −40.1R (417); −66.3R in all. A paper record of one reading before
   costs: never call a market's plus an edge. **Do not put a file of over 600 records into council-data before main's tracker
   has `KEEP` 4000** (the older tracker cuts the file to its newest 600 on its next run).
