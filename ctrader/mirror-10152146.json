@@ -72,7 +72,8 @@
     "adopted": false,
     "alerted": [
      "open",
-     "closefail"
+     "closefail",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 1629.51,
@@ -86,7 +87,11 @@
     "lagSec": 115,
     "positionId": "50661738",
     "volume": 2,
-    "status": "open"
+    "status": "closed by council",
+    "closedAt": "2026-11-21T12:38:51.000Z",
+    "exitPrice": 1665.45,
+    "councilExit": 1675.76,
+    "councilR": 0.47
    }
   },
   "day": {
@@ -94,7 +99,7 @@
    "startBalance": 10000
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10000 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 10000 · 2 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -108,7 +113,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10000,
-  "lastRun": "2026-11-21T12:36:55.000Z"
+  "lastRun": "2026-11-21T12:38:51.000Z"
  },
  "log": [
   {
@@ -230,6 +235,11 @@
   {
    "at": "2026-11-21T12:36:55.000Z",
    "msg": "close ETHUSD 50661738 failed: ORDER_CANCELLED",
+   "trade": "eth-rswing-1795243694"
+  },
+  {
+   "at": "2026-11-21T12:38:51.000Z",
+   "msg": "closed ETHUSD position 50661738 (council: win)",
    "trade": "eth-rswing-1795243694"
   }
  ],
