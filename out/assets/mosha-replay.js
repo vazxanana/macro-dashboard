@@ -322,7 +322,7 @@
       var list = tfsOf(spec); if (spec.view && R.viewOf !== spec.id) R.tf = spec.view; if (list.indexOf(R.tf) < 0) R.tf = list[0]; R.viewOf = spec.id;   // a bigger picture opens on its own candle size
       $('mo-rp-tf').innerHTML = TFS.filter(function (t) { return list.indexOf(t[0]) >= 0; }).map(function (t) { return '<button type="button" data-tf="' + t[0] + '" aria-pressed="' + (t[0] === R.tf) + '">' + t[1] + '</button>'; }).join('');
       $('mo-rp-steps').innerHTML = stepsHTML();
-      result(); setTf(R.tf); };
+      result(); setTf(R.tf); if (R.onReady) { var rdy = R.onReady; R.onReady = null; rdy(); } };
     var ck = spec.id + ':' + spec.from + ':' + spec.to + ':' + (spec.base || '5m');   // a lesson's chart can change: the candles are kept per window
     if (R.cache[ck]) return done(R.cache[ck]);
     msg.hidden = false; msg.textContent = L('Loading the candles…');
@@ -352,6 +352,31 @@
   }
   root.msMoshaReplay = function () { wire(); if (!R.spec) open(EXAMPLES[0]); else requestAnimationFrame(paint); };
   root.msMoshaReplayTrade = function (t) { wire(); open(specOfTrade(t, Math.floor(Date.now() / 1000)), true); };
+  // A desk's trade opens in a dialog over the page, like the Council's trade chart (21 Nov 2026, owner: "the chart should open
+  // before and after like council, I don't like this thing going down to the chart"): the page's one replay card is moved into a
+  // <dialog> made inside the desk's own view (so the desk's styles still reach it) and put back where it was when it closes.
+  // Before = the chart as it stood at the entry; After = the whole trade. Display only.
+  var HOME = null;
+  function dlgAt(which) { if (!R.bars || !R.spec) return; stop(); var t0 = R.oc && R.oc.fill != null ? R.oc.fill : R.spec.fillFrom != null ? R.spec.fillFrom + 300 : R.bars[0].time;
+    show(which === 'before' ? Math.max(0, barAt(R.bars, t0)) : R.bars.length - 1);
+    Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-dlg [data-rpd="before"], #mo-rp-dlg [data-rpd="after"]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-rpd') === which)); }); }
+  function dlgBack() { stop(); var card = $('mo-replay'); if (card && HOME && HOME.parentNode && card.previousSibling !== HOME) HOME.parentNode.insertBefore(card, HOME.nextSibling); if (HOME) { HOME.hidden = true; HOME.style.cssText = ''; } R.onReady = null; if (R.bars) requestAnimationFrame(paint); }
+  root.msMoshaReplayDialog = function (t, host) {
+    var card = $('mo-replay'); host = host || (card && card.closest('.view, section, main')) || document.body;
+    if (!card || typeof HTMLDialogElement === 'undefined' || !HTMLDialogElement.prototype.showModal) { root.msMoshaReplayTrade(t); return false; }
+    wire(); var d = $('mo-rp-dlg');
+    if (!d) { d = document.createElement('dialog'); d.id = 'mo-rp-dlg'; d.className = 'mo-rp-dlg'; d.setAttribute('aria-labelledby', 'mo-rpd-t');
+      d.innerHTML = '<div class="mo-rpd-h"><b id="mo-rpd-t"></b><span class="mo-rpd-ba" role="group" aria-label="The chart before the trade, or after it"><button type="button" data-rpd="before" aria-pressed="false">Before</button><button type="button" data-rpd="after" aria-pressed="true">After</button></span><button type="button" class="mo-rpd-x" data-rpd="close" aria-label="Close">×</button></div><div class="mo-rpd-b"></div>';
+      d.addEventListener('click', function (ev) { var b = ev.target.closest ? ev.target.closest('[data-rpd]') : null; if (ev.target === d || (b && b.getAttribute('data-rpd') === 'close')) { d.close(); return; } if (b) dlgAt(b.getAttribute('data-rpd')); });
+      d.addEventListener('close', dlgBack); }
+    if (d.parentNode !== host) host.appendChild(d);
+    if (!HOME) { HOME = document.createElement('div'); HOME.id = 'mo-replay-dlg-home'; HOME.setAttribute('aria-hidden', 'true'); card.parentNode.insertBefore(HOME, card); }
+    if (card.previousSibling === HOME) { HOME.style.cssText = 'height:' + card.offsetHeight + 'px;order:' + (getComputedStyle(card).order || 0) + ';grid-column:1/-1'; HOME.hidden = false; }   // the card's place is held while it is away, so the page behind does not move
+    $('mo-rpd-t').textContent = t.name || 'Trade';
+    d.querySelector('.mo-rpd-b').appendChild(card); if (!d.open) d.showModal();
+    R.onReady = function () { dlgAt('after'); };
+    open(specOfTrade(t, Math.floor(Date.now() / 1000)), false); return true;
+  };
   root.msMoshaReplayLesson = function (l) { var sp = specOfLesson(l, Math.floor(Date.now() / 1000)); if (!sp) return false; wire(); open(sp, true); return true; };
   root.msMoshaReplayStop = stop; root.msMoshaReplayLang = relang;
   { var v0 = $('v-mosha'); if (v0 && !v0.hidden) root.msMoshaReplay(); }   // the desk was already open when this file ran

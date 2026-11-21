@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { isGotobi, isTokyoBusinessDay, addD } from './gotobi-calendar.mjs';
-import { PT, session, scrubber, unseal, relative, orderStep } from './ctrader-mirror.mjs';
+import { PT, session, scrubber, unseal, relative, orderStep, amendStep } from './ctrader-mirror.mjs';
 
 export const RULE = { pair: 'usdjpy', symbol: 'USDJPY', side: 'sell', entry: 55 * 60, exit: 6 * 3600, K: 1.5, LOOKBACK: 20, MIN_LOOK: 15, EXIT_GRACE: 900 };
 export const LABEL = 'gotobi';
@@ -58,7 +58,7 @@ export function accountFor(dir, env, cfg) {   // config.gotobi.account, else env
   return null;
 }
 
-async function connect({ env, dir, account, WS, scrub }) {
+export async function connect({ env, dir, account, WS, scrub }) {
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN };
   try { const tf = path.join(dir, 'ctrader', 'tokens.json'); if (fs.existsSync(tf)) { const t = unseal(JSON.parse(fs.readFileSync(tf, 'utf8')), env); if (t && t.accessToken) { scrub.add(t.accessToken, t.refreshToken); tok = t; } } } catch (e) {}
   const s = session(WS, scrub);
@@ -125,7 +125,7 @@ export async function run({ env = process.env, dir = 'data', WS = globalThis.Web
       await pause(1500);
       const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), p = (rc.position || []).find((x) => String(x.positionId) === rec.positionId);
       if (p && !(+p.stopLoss > 0)) {
-        try { await s.send(PT.AMEND_POSITION_SLTP_REQ, { ctidTraderAccountId: ctid, positionId: Number(rec.positionId), stopLoss: rec.stop }, PT.EXECUTION_EVENT); rec.stopSetBy = 'amend'; }
+        try { await s.send(PT.AMEND_POSITION_SLTP_REQ, { ctidTraderAccountId: ctid, positionId: Number(rec.positionId), stopLoss: rec.stop }, PT.EXECUTION_EVENT, amendStep); rec.stopSetBy = 'amend'; }
         catch (e) { await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(rec.positionId), volume }, PT.EXECUTION_EVENT, orderStep); Object.assign(rec, { status: 'closed', exitAt: new Date(now() * 1000).toISOString(), how: 'closed at once: the broker took no stop' }); }
       } else if (p) rec.brokerStop = +p.stopLoss;
       J.trades.push(rec); write(J); log(`gotobi: sold USDJPY at ${fill} stop ${rec.stop} volume ${volume}`);
