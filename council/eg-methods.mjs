@@ -237,7 +237,9 @@ export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
   const dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pre = market === 'xau' ? '' : market + ':', t0 = M1[0].time, out = [];
   const Z1 = zones(M1, '1m'), sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
   for (const Z of zones(M15, '15m')) { const d = Z.dir; if (Z.at < t0) continue;
-    const In = Z1.filter((q) => q.dir === -d && q.at > Z.at && q.at <= Z.end && q.top <= Z.top && q.bot >= Z.bot);
+    // Z1 is in the order its zones became known: only the stretch inside this zone's life is read (a year of one-minute candles otherwise takes hours)
+    const In = []; let lo = 0, hi = Z1.length; while (lo < hi) { const m = (lo + hi) >> 1; if (Z1[m].at <= Z.at) lo = m + 1; else hi = m; }
+    for (let k = lo; k < Z1.length && Z1[k].at <= Z.end; k++) { const q = Z1[k]; if (q.dir === -d && q.top <= Z.top && q.bot >= Z.bot) In.push(q); }
     for (const q of In.filter((a) => a.fail != null && a.fail <= Z.end && !In.some((b) => b.at > a.at && b.at <= a.fail && (b.fail == null || b.fail > a.fail)))) {
     const fi = q.fi, bi = lower(M1, q.base), c = M1[fi], entry = c.close; let ext = d > 0 ? Infinity : -Infinity;
     for (let k = bi; k <= fi; k++) ext = d > 0 ? Math.min(ext, M1[k].low) : Math.max(ext, M1[k].high);
