@@ -45,8 +45,8 @@
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
-<script src="/assets/mosha-sop.js?v=e161eaeec4" defer></script>
-<script src="/assets/mosha-replay.js?v=d2c9a47ca0" defer></script>
+<script src="/assets/mosha-sop.js?v=c5ed4526b6" defer></script>
+<script src="/assets/mosha-replay.js?v=a255722d26" defer></script>
 <script src="/assets/desk-trades.js?v=bf20fac61c" defer></script>
 <script src="/assets/mosha-i18n.js?v=22ed49dcd7" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
@@ -4217,6 +4217,11 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
 .mo-rp-dlg .mo-rpd-h { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--panel); border-bottom: 1px solid var(--line); } .mo-rp-dlg .mo-rpd-h b { flex: 1; min-width: 0; font: 650 14px var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mo-rp-dlg .mo-rpd-ba { display: inline-flex; gap: 4px; flex: none; } .mo-rp-dlg .mo-rpd-ba button, .mo-rp-dlg .mo-rpd-x { font: 600 12.5px var(--sans); min-height: 34px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); cursor: pointer; }
 .mo-rp-dlg .mo-rpd-ba button[aria-pressed="true"] { background: var(--panel-hover); color: var(--ink); border-color: var(--line-strong); box-shadow: inset 0 -2px 0 var(--accent); } .mo-rp-dlg .mo-rpd-x { font-size: 18px; line-height: 1; padding: 4px 11px; }
+/* the trade chart can be made bigger (22 Nov 2026): its lower edge drags, and "Bigger chart" fills the screen */
+.mo-rp-dlg #mo-replay .mo-rp-wrap { resize: vertical; min-height: 260px; max-height: none; height: clamp(360px, 58dvh, 640px); }
+.mo-rp-dlg.big { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; border: 0; } .mo-rp-dlg.big #mo-replay .mo-rp-wrap { height: calc(100dvh - 310px); }
+.mo-rp-dlg .mo-rpd-big { font: 600 12.5px var(--sans); min-height: 34px; padding: 5px 12px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink-dim); cursor: pointer; flex: none; } .mo-rp-dlg .mo-rpd-big[aria-pressed="true"] { background: var(--panel-hover); color: var(--ink); border-color: var(--line-strong); }
+@media (pointer: coarse) { .mo-rp-dlg .mo-rpd-big { min-height: 44px; } } @media (max-width: 640px) { .mo-rp-dlg .mo-rpd-big { display: none; } .mo-rp-dlg #mo-replay .mo-rp-wrap { height: 56dvh; } }
 .mo-rp-dlg .mo-rpd-b { padding: 4px 12px 12px; } .mo-rp-dlg #mo-replay { border: 0; box-shadow: none; margin: 0; padding: 8px 0 0; background: transparent; } .mo-rp-dlg #mo-replay > .ms-k, .mo-rp-dlg :is(#mo-rp-pick, .mo-rp-leg, .mo-rp-leg ~ .ms-note) { display: none !important; }
 @media (pointer: coarse) { .mo-rp-dlg .mo-rpd-ba button, .mo-rp-dlg .mo-rpd-x { min-height: 44px; min-width: 44px; } }
 @media (max-width: 640px) { .mo-rp-dlg { width: 100vw; max-height: 100dvh; height: 100dvh; border-radius: 0; border: 0; } .mo-rp-dlg .mo-rpd-h { flex-wrap: wrap; } .mo-rp-dlg .mo-rpd-h b { flex: 1 1 60%; } .mo-rp-dlg .mo-rpd-ba { order: 3; flex: 1 1 100%; } .mo-rp-dlg .mo-rpd-ba button { flex: 1; } }

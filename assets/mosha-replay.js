@@ -225,7 +225,12 @@
   var L = function (s, v) { var I = root.MS_MOSHA_I18N; s = I ? I.tr(s) : s; return v ? s.replace(/\{(\w+)\}/g, function (m, k) { return v[k] != null ? v[k] : m; }) : s; };
   var $ = function (id) { return document.getElementById(id); };
   var esc = function (v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
-  var TFS = [[300, 'M5'], [900, 'M15'], [3600, 'H1'], [14400, 'H4']], SPEEDS = [[1, 420], [3, 140], [10, 40]];
+  var TFS = [[60, 'M1'], [300, 'M5'], [900, 'M15'], [1800, 'M30'], [3600, 'H1'], [14400, 'H4'], [86400, 'D1']],
+  // A trade opened from a desk (22 Nov 2026, owner: "i want timeframes from 1minute m5 m15 m30 h1 h4 daily") offers all seven.
+  // M15, M30 and H1 are built from the window's own candles; the others are that timeframe's own candles, read when first
+  // chosen: M1 (and M5 where the window is on 15-minute candles) for a day and a half around the entry, H4 for the 40 days and
+  // D1 for the 200 days up to the window's end, so a higher timeframe shows where the trade sits and not three candles.
+  DESK_TFS = [60, 300, 900, 1800, 3600, 14400, 86400], TF_KEY = { 60: '1m', 300: '5m', 14400: '4h', 86400: '1d' }, SPEEDS = [[1, 420], [3, 140], [10, 40]];
   var R = { spec: null, base: null, bars: null, oc: null, steps: [], tf: 300, cur: 0, timer: 0, speed: 1, chart: null, series: null, cache: {}, lo: 0, hi: 0, token: 0 };
   var fR = function (v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; };
   var utc = function (t) { return new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC'; };
@@ -302,8 +307,23 @@
   function play() { if (!R.bars) return; if (R.timer) return stop(); if (R.cur >= R.bars.length - 1) show(0);
     var ms = (SPEEDS.filter(function (s) { return s[0] === R.speed; })[0] || SPEEDS[0])[1] * (R.tf <= 300 ? 1 : R.tf <= 900 ? 1.6 : 2.4);
     R.timer = setInterval(function () { if (R.cur >= R.bars.length - 1 || !$('mo-rp-chart') || !$('mo-rp-chart').offsetParent) return stop();   /* the card is on screen wherever it sits: on the Mosha desk or lent to another desk's dialog */ show(R.cur + 1); }, ms); caption(); }
+  // the timeframe's own candles for the trade on screen, once read (null: built from the window's candles)
+  function ownKey(sec) { return R.spec ? R.spec.id + ':' + R.spec.from + ':' + R.spec.to + ':own' + sec : ''; }
+  function ownBars(sec) { return R.cache[ownKey(sec)] || null; }
+  function needsOwn(sec) { var b = BASE[R.spec.base] || 300; return !!TF_KEY[sec] && (sec < b || sec >= 14400) && (R.spec.rp || R.spec.log) && !ownBars(sec); }
+  function pickTf(sec) {
+    if (!needsOwn(sec)) return setTf(sec, true);
+    var sp = R.spec, tk = R.token, msg = $('mo-rp-msg'), at = sp.stored ? sp.stored.at : sp.fillFrom != null ? sp.fillFrom : sp.from, key = ownKey(sec);
+    var from = sec <= 300 ? Math.max(sp.from, at - 12 * 3600) : sp.to - (sec === 14400 ? 40 : 200) * 86400, to = sec <= 300 ? Math.min(sp.to, at + 24 * 3600) : sp.to;
+    msg.hidden = false; msg.textContent = L('Loading the candles…');
+    fetch('/md/bars?sym=' + encodeURIComponent(sp.market) + '&tf=' + TF_KEY[sec] + '&from=' + from + '&to=' + to, { cache: 'force-cache' }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { var bars = j && Array.isArray(j.bars) ? j.bars.filter(function (b) { return !b.live; }).map(function (b) { return { time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }; }) : null;
+        if (tk !== R.token) return; if (!bars || bars.length < 5) { msg.textContent = L('No candles came back for that time. Check the connection and open the trade again.'); return; }
+        msg.hidden = true; R.cache[key] = bars; setTf(sec, true); })
+      .catch(function () { if (tk === R.token) msg.textContent = L('No candles came back for that time. Check the connection and open the trade again.'); });
+  }
   function setTf(sec, keep) {
-    var t = keep && R.bars ? R.bars[R.cur].time : null; R.tf = sec; R.bars = aggBars(R.base, sec, sec === 14400 ? R.spec.h4off : 0);
+    var t = keep && R.bars && R.cur < R.bars.length - 1 ? R.bars[R.cur].time + R.tf - 1 : null; R.tf = sec;   /* the place in the replay is kept (the end of the candle on screen); at the last candle the new timeframe opens at its last too */ R.bars = ownBars(sec) || aggBars(R.base, sec, sec === 14400 ? R.spec.h4off : 0);
     var lo = Infinity, hi = -Infinity; R.bars.forEach(function (b) { if (b.low < lo) lo = b.low; if (b.high > hi) hi = b.high; });
     // a mark far from the candles (a Daily level or zone well above or below them) must not flatten the candles: the scale takes
     // a mark only within half the candles' own range of them; a farther one is named at the chart's edge with its prices (paint)
@@ -350,7 +370,7 @@
     if (!root.LightweightCharts) { msg.hidden = false; msg.textContent = L('The chart library did not load. Reload the page.'); return; }
     var done = function (m5) { if (tk !== R.token) return; if (!m5 || m5.length < 20) { msg.hidden = false; msg.textContent = L('No candles came back for that time. Check the connection and open the trade again.'); return; }
       msg.hidden = true; build(); fitDp(); R.base = m5; R.oc = outcome(spec, m5); R.steps = stepsOf(spec, R.oc);
-      var list = tfsOf(spec); if (spec.view && R.viewOf !== spec.id) R.tf = spec.view; if (list.indexOf(R.tf) < 0) R.tf = list[0]; R.viewOf = spec.id;   // a bigger picture opens on its own candle size
+      var list = spec.rp || spec.log ? DESK_TFS : tfsOf(spec); if (spec.view && R.viewOf !== spec.id) R.tf = spec.view; if (list.indexOf(R.tf) < 0 || needsOwn(R.tf)) R.tf = BASE[spec.base] || 300; R.viewOf = spec.id;   // a bigger picture opens on its own candle size
       $('mo-rp-tf').innerHTML = TFS.filter(function (t) { return list.indexOf(t[0]) >= 0; }).map(function (t) { return '<button type="button" data-tf="' + t[0] + '" aria-pressed="' + (t[0] === R.tf) + '">' + t[1] + '</button>'; }).join('');
       $('mo-rp-steps').innerHTML = stepsHTML();
       result(); setTf(R.tf); if (R.onReady) { var rdy = R.onReady; R.onReady = null; rdy(); } };
@@ -368,7 +388,7 @@
     card.addEventListener('click', function (ev) {
       var b = ev.target.closest('button'); if (!b) return;
       if (b.dataset.ex) open(ALL.filter(function (e) { return e.id === b.dataset.ex; })[0]);
-      else if (b.dataset.tf) { if (R.base) { stop(); setTf(+b.dataset.tf, true); } }
+      else if (b.dataset.tf) { if (R.base) { stop(); pickTf(+b.dataset.tf); } }
       else if (b.dataset.sp) { R.speed = +b.dataset.sp; Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-speed button'), function (x) { x.setAttribute('aria-pressed', String(+x.dataset.sp === R.speed)); }); if (R.timer) { stop(); play(); } }
       else if (b.dataset.step != null) { if (R.bars) { stop(); show(Math.max(0, barAt(R.bars, R.steps[+b.dataset.step].t))); } }
       else if (b.id === 'mo-rp-play') play();
@@ -399,8 +419,9 @@
     if (!card || typeof HTMLDialogElement === 'undefined' || !HTMLDialogElement.prototype.showModal) { root.msMoshaReplayTrade(t); return false; }
     wire(); var d = $('mo-rp-dlg');
     if (!d) { d = document.createElement('dialog'); d.id = 'mo-rp-dlg'; d.className = 'mo-rp-dlg'; d.setAttribute('aria-labelledby', 'mo-rpd-t');
-      d.innerHTML = '<div class="mo-rpd-h"><b id="mo-rpd-t"></b><span class="mo-rpd-ba" role="group" aria-label="The chart before the trade, or after it"><button type="button" data-rpd="before" aria-pressed="false">Before</button><button type="button" data-rpd="after" aria-pressed="true">After</button></span><button type="button" class="mo-rpd-x" data-rpd="close" aria-label="Close">×</button></div><div class="mo-rpd-b"></div>';
-      d.addEventListener('click', function (ev) { var b = ev.target.closest ? ev.target.closest('[data-rpd]') : null; if (ev.target === d || (b && b.getAttribute('data-rpd') === 'close')) { d.close(); return; } if (b) dlgAt(b.getAttribute('data-rpd')); });
+      d.innerHTML = '<div class="mo-rpd-h"><b id="mo-rpd-t"></b><span class="mo-rpd-ba" role="group" aria-label="The chart before the trade, or after it"><button type="button" data-rpd="before" aria-pressed="false">Before</button><button type="button" data-rpd="after" aria-pressed="true">After</button></span><button type="button" class="mo-rpd-big" data-rpd="big" aria-pressed="false" title="Fill the screen with the chart, or back to the smaller one. The lower edge of the chart can also be dragged.">Bigger chart</button><button type="button" class="mo-rpd-x" data-rpd="close" aria-label="Close">×</button></div><div class="mo-rpd-b"></div>';
+      d.addEventListener('click', function (ev) { var b = ev.target.closest ? ev.target.closest('[data-rpd]') : null; if (ev.target === d || (b && b.getAttribute('data-rpd') === 'close')) { d.close(); return; } if (b && b.getAttribute('data-rpd') === 'big') { var on = !d.classList.contains('big'); d.classList.toggle('big', on); b.setAttribute('aria-pressed', String(on)); b.textContent = on ? 'Smaller chart' : 'Bigger chart'; var w = d.querySelector('.mo-rp-wrap'); if (w) w.style.height = ''; requestAnimationFrame(paint); return; }
+        if (b) dlgAt(b.getAttribute('data-rpd')); });
       d.addEventListener('close', dlgBack); }
     if (d.parentNode !== host) host.appendChild(d);
     if (!HOME) { HOME = document.createElement('div'); HOME.id = 'mo-replay-dlg-home'; HOME.setAttribute('aria-hidden', 'true'); card.parentNode.insertBefore(HOME, card); }

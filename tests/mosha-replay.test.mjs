@@ -77,7 +77,9 @@ test('page wiring: the chart card on the Mosha desk, members only, nothing that 
   assert.match(DESK, /data-mo-replay=/); assert.match(DESK, /if \(root\.msMoshaReplay\) root\.msMoshaReplay\(\)/); assert.match(JS, /root\.msMoshaReplayTrade = function/);
   assert.match(JS, /addEventListener\('input', function \(ev\) \{ var v = \+ev\.target\.value; stop\(\); show\(v\); \}\)/, 'the slider reads its value before the replay stops (stop redraws it at the old place)');
   assert.ok(!/require\(|import /.test(JS)); assert.ok(!/prompt\(|confirm\(|alert\(/.test(JS)); assert.ok(!/api\/(mosha|run|ctrader|bridge)/.test(JS), 'the chart reads candles only');
-  assert.deepEqual([...JS.matchAll(/fetch\('([^']+)'/g)].map((m) => m[1]), ['/md/bars?sym=']);
+  assert.deepEqual([...JS.matchAll(/fetch\('([^']+)'/g)].map((m) => m[1]), ['/md/bars?sym=', '/md/bars?sym='], 'candles only: the window, and a chosen timeframe\'s own candles');
+  // a desk trade offers the seven timeframes, and its chart can be made bigger
+  assert.match(JS, /DESK_TFS = \[60, 300, 900, 1800, 3600, 14400, 86400\]/); assert.match(JS, /data-rpd="big"/); assert.match(rd('../market-structure.html'), /\.mo-rp-dlg #mo-replay \.mo-rp-wrap \{ resize: vertical;/);
   // the owner's light-mode candles stay grey up / black down here too
   assert.match(JS, /light\(\) \? \{ upColor: '#c9ccd2', downColor: '#131722'/);
 });

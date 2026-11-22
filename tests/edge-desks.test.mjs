@@ -101,7 +101,8 @@ test('the three methods: a fixed stop on the losing side, a 2R target (the direc
   const one = all.find((r) => r.endT && r.endT < END - 5 * 86400 && r.t > B['5m'][0].time + 15 * 86400); const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
   const again = G.methodTrades(cut, { from: 0, market: 'xau' }).find((r) => r.id === one.id); assert.ok(again); assert.deepEqual([again.entry, again.stop, again.R, again.endT], [one.entry, one.stop, one.R, one.endT]);
   const fxB = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 }))]));
-  const fxT = G.methodTrades(fxB, { from: 0, market: 'eurusd' }); assert.ok(fxT.length && fxT.every((r) => stopOk(r) && /^eurusd:eg-/.test(r.id) && Math.abs(r.r0 / r.entry - G.EGM.pips / 4000) < 2e-4), 'another market: the same share of price');
+  const fxT = G.methodTrades(fxB, { from: 0, market: 'eurusd' }); assert.ok(fxT.length && fxT.every((r) => stopOk(r) && /^eurusd:eg-/.test(r.id) && Math.abs(r.r0 - 0.0030) < 1e-9), 'another market: 30 of its own pips (EUR/USD 0.0030)');
+  assert.deepEqual(['xau', 'xag', 'eurusd', 'usdjpy', 'nas100'].map((m) => +G.stopSize(m).toFixed(5)), [3, 0.3, 0.003, 0.3, 30], '30 pips in points: gold 300 points ($3.00), silver $0.30, EUR/USD 0.0030, USD/JPY 0.30, an index 30 points');
 });
 test('MSNR desk: entries with the call only, the study\'s own functions and constants put back, the gold plan on gold only', () => {
   const big = market(140, 5), b15 = { ...big }; { const out = []; for (const b of big['5m']) { const t = b.time - (b.time % 900), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } b15['15m'] = out; }
@@ -206,7 +207,7 @@ test('audit: a daily order placed before the window that is still alive in it is
 
 test('audit: the direction: a zone tapped just before the BO the other way still counts, a break with no BO the other way does not; a zone is marked from when it was known', () => {
   const src = rd('council/eg-methods.mjs'); assert.match(src, /if \(st === -q\.s\) q\.opp = true;/); assert.match(src, /if \(!q\.opp\) continue;/); assert.match(src, /zoneAt: q\.zone\.known/);
-  assert.match(src, /pipOf = \(entry\) =>/);
+  assert.match(src, /pipOf = \(\) => stopSize\(market\)/);   // the stop is 30 of the market's own pips, the same on every read
 });
 
 test('a stop does not change between two reads: on another market the sizes scale from the trade\'s own price, not the newest candle\'s', () => {
@@ -709,4 +710,16 @@ test('review: the engulf rule: an H4 and an H1 reading that are the same order a
     assert.deepEqual([r.length, crypto.createHash('sha256').update(JSON.stringify(r)).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed);
     const one = new Set(), exp = perTf(Y, { from: 0, market: 'xau' }).filter((x) => { const k = [x.side, x.t, x.entry, x.stop, x.target].join('|'); if (one.has(k)) return false; one.add(k); return true; }).sort((p, q) => p.t - q.t);
     assert.deepEqual(r.map((x) => JSON.stringify(x)).sort(), exp.map((x) => JSON.stringify(x)).sort()); assert.deepEqual(sameOrder(r), []); }
+});
+
+test('both engulfs side by side: the next-candle reading is its own kinds, every zone it uses is a next-candle engulf, no direct entry, the any-candle reading unchanged', () => {
+  const C = B15['15m'], zn = G.zones(C, '15m', 1), za = G.zones(C, '15m'), idx = new Map(C.map((b, i) => [b.time, i]));
+  assert.ok(zn.length > 20 && zn.length < za.length, 'fewer zones with the next-candle engulf: ' + zn.length + ' of ' + za.length);
+  for (const z of zn) assert.equal(z.i - idx.get(z.base), 1, 'the base is the candle right before the completing one');
+  const any = G.methodTrades(B15, { from: 0, market: 'xau' }), nx = G.methodTrades(B15, { from: 0, market: 'xau', span: 'next' });
+  assert.ok(nx.length >= 1, 'next-candle trades on these candles: ' + nx.length);
+  for (const r of nx) { assert.match(r.kind, /^eg-(plan|simple)-n$/); assert.match(r.id, /^eg-(plan|simple)-n-[bs]-/); assert.match(r.label, / · next-candle EG$/); assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1: ' + r.id); assert.ok(Math.abs(r.r0 - 3) < 1e-9, '30 pips on gold'); }
+  assert.ok(any.every((r) => /^eg-(plan|simple|direct)$/.test(r.kind)), 'the any-candle reading keeps its kinds');
+  const ids = new Set(any.map((r) => r.id)); assert.ok(nx.every((r) => !ids.has(r.id)), 'no id shared between the two readings');
+  assert.match(rd('council/edge-desks.mjs'), /methodTrades\(B, \{ \.\.\.o, span: 'next' \}\)/);
 });
