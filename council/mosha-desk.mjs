@@ -87,7 +87,7 @@ export function merge(prev, fresh, now, feed = 'OANDA') {
   const old = new Map((prev || []).map((r) => [r.id, r])), out = [];
   // the owner's barrier readings of 21 Nov 2026 (at the zone, M5 confirm, sweep, a later visit) are other orders, never a re-read of an older one
   // a CF-inside-the-VR sequence record ("sop-c2-") is its own reading too, and so is each leg of a SOP inside the SOP ("sop-nv-", "sop-nc-")
-  const rd = (x) => (x.kind === 'barrier' ? JSON.stringify(SOP.readings(x)) : x.case2 || /(^|:)sop-c2-/.test(String(x.id)) ? 'c2' : (/(^|:)sop-n([vc])-/.exec(String(x.id)) || [])[2] ? 'n' + /(^|:)sop-n([vc])-/.exec(String(x.id))[2] : '');
+  const rd = (x) => (x.kind === 'barrier' ? JSON.stringify(SOP.readings(x)) : x.case2 || /(^|:)sop-c2-/.test(String(x.id)) ? 'c2' : /(^|:)sop-l-/.test(String(x.id)) ? 'lim' : (/(^|:)sop-n([vc])-/.exec(String(x.id)) || [])[2] ? 'n' + /(^|:)sop-n([vc])-/.exec(String(x.id))[2] : '');
   const near = (r) => (prev || []).some((p) => p.id !== r.id && (p.market || 'xau') === (r.market || 'xau') && p.kind === r.kind && p.side === r.side && Math.abs(p.t - r.t) <= NEAR_S && rd(p) === rd(r)
     // the SAME trade re-read under another id: its entry sits where the stored one's does, and the stored one had not already ended
     // before it (a re-entry after a close is a new trade: until 21 Nov 2026 it was dropped)

@@ -6323,3 +6323,19 @@ the SOP inside the VR one step under the VR's timeframe, the SOP inside the CF o
 last row (M5 → M1 → M1) is NOT a ladder step: `LADDER` still ends at M15 → M5. The tracker already reads every timeframe the
 table needs (`BACK`: M1 16 days for a 14-day window), nothing changed there. A reading, not a tested rule. Test: "the CF one
 timeframe under the VR".
+**"Both": where the CF may form, and a limit at the CF line** (same day, owner on the method's own drawing of the sequence: BO,
+the VR at the extreme, price back near where the BO broke, the CF there, then "pullback & entry" at the CF line; asked which
+of the two readings, he answered "Both"). (B) A CF counts only once price, after the VR, has traded back to the level the BO
+broke (a buy BO: a low at or below it), on closed candles up to the CF's own candle (`backEv`; an earlier break with the BO is
+handed to `msMosha` as a continuation break, a later one can still be the CF). Every sequence record carries `back: true` and its
+log says so; the nested legs read the same rule on their own BO (the VR / CF break they start from). `cfBack: false` = as before.
+(A) Beside the EG entry, a plain limit at the CF line (the level the CF's break took): id `sop-l-[i-]<l>-<b|s><fill>`,
+`cfLimit: true`, label "… CF · limit at the CF line", `known` = the close of the CF-timeframe candle of the fill. It rests from
+the CF candle's close until price reaches the VR's extreme, a CF-timeframe candle closes through the CF zone's far side, or
+`CF_LIMIT` 24 CF-timeframe candles pass (the desk's choice). Stop past the CF zone's far side by the desk's buffer, target the
+VR's extreme; the fill is the first 5-minute (M1 for an M1 CF) candle that reaches the line and can only stop the trade; the
+sequence's size checks; never for a CF inside the VR. Its own reading in `uniq` (`orderKey`) and in the tracker's `merge`.
+Only where the CF is read on its own timeframe (none with `cf: 'same'`). `cfLimit: false` leaves it out. The desk lists "BO, VR,
+CF: entry on the EG" and "BO, VR, CF: limit at the CF line" apart. Readings, not tested rules: never quote either record as an
+edge. The research scripts that call `sopTrades` (`desk-rigor`, `desk-partial`) were run on the reading before; a re-run reads
+the new defaults. Test: '"Both"' (the older tests pin `nest: false, cf: 'same', cfBack: false, cfLimit: false`).
