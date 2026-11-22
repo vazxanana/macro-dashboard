@@ -6511,3 +6511,12 @@ one canvas above the chart's, `pointer-events: none`, clipped to the price pane;
 (as Open now) and never built for a guest; not a `.card`, so the simple phone view keeps it open. Nothing stored (no browser
 storage), nothing written. No live ticks yet (the page's tick stream is the Charts market only). `MS_DESK_LIVE.state(k)` is the
 audit's read-only view. Test: `tests/desk-live-chart.test.mjs`.
+
+## Box zone, the owner's box rule, tested (22 Nov 2026, owner: "the box is the high and low", "same process in lower timeframe", "no trend filter")
+`research/edge/box-zone/` (PREREGISTRATION.md committed alone first; `run.mjs fetch|run <dir>`, RESULT.md, result.json). A box = the
+high and low of the candles since the last close out of a box, following price until a close outside it (every timeframe). A
+Daily box that turns (breaks the other way from the break before) is a zone; price leaves and comes back; on H4 a box breaks
+against it (the test), then a box breaks with it: enter at that close, stop the other side of that H4 box, target the other
+side of the test box; no trend filter. OANDA 2010-2019, five markets, after the demo's costs: **FAIL, 1 of 4**: 1,029 trades,
+72 % won, -0.007R a trade (month t -0.29); before costs +0.006R; median target 0.35R. The 2020-26 look before it was in sample.
+Not a judgement of the owner's own choice of zones and boxes. Nothing live changed. Test: `tests/box-zone.test.mjs`.
