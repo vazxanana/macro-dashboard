@@ -126,3 +126,35 @@ what a coin gives (50 / 33 / 20 %). A half stop does not pick better trades; it 
 (gold: a $2.50 stop against about $0.15-0.30 a round trip is 0.06-0.12R a trade, more than any line above earns).
 On the other desks the 5-minute candles on file cannot judge a half stop fairly (a 5-minute candle is often wider than
 the stop), so no figure is given for them. Nothing changed on the desks.
+
+## 7. Lower-timeframe structure, the documents' way (owner, 22 Nov 2026: "you are not marking market structure on the lower timeframe")
+
+Section 2 used a simple structure (a close beyond the last three-candle swing). A sixth reader then went through every document
+and skill for how structure is marked on H1 to M1: a break is a body close, a structural swing is the one that produced a break,
+external = the two ends of the last BO leg, and a structure shift = a close through the swing the last extreme came from. That is
+what the page's own `msAnalyze` reads. The same 49,153 closed 2026 trades were tagged again with `msAnalyze` (6 candles a side)
+on M5, M15, H1 and H4 at each entry. Before costs, in sample, thirteen cuts on four desks: a lean, not a result.
+
+| All four desks | n | R a trade | t | t by day |
+|---|---|---|---|---|
+| with the H4 structure | 25,377 | +0.005 | 0.59 | 0.32 |
+| against the H4 structure | 23,776 | -0.027 | -3.21 | -1.74 |
+| M5 and M15 both against the trade (no lower shift) | 17,925 | -0.021 | -2.16 | -1.33 |
+| M5 shifted the trade's way in the last 2 hours | 5,791 | +0.018 | 1.09 | 0.72 |
+| with H1, M15 shifted the trade's way in the last 6 hours, M5 with | 1,835 | +0.070 | 2.09 | 1.41 |
+
+With the documents' structure the sign turns the owner's way: against the H4 structure loses, and the one stack the documents
+describe (higher timeframe with the trade, the timeframe below has just shifted back with it, the entry timeframe agrees) is the
+best cut on the Mosha barriers (+0.123R, n 856, t 3.00, t by day 1.84) and on the scalp method at 12-16 UTC (+0.875R, n 40). It is
+flat on the Engulfing desk (-0.008R, n 796) and negative on the scalp method at other hours. Size: a few hundredths of an R before
+costs, on about one trade in twenty-seven.
+
+What the reader found missing, by how many sources require it: (1) the D1 / H4 / H1 engulf rule enters on the raw touch, with no
+lower-timeframe shift at the zone first (10 sources); (2) the M1 EF entry takes any M15 zone, not one inside an H1 or H4 zone of
+the direction (8); (3) the scalp method's trigger is not required inside an H4 zone of the direction (5); (4) the Mosha sequence
+does not check that the CF forms in the BO's origin zone or at a barrier (4); (5) Mosha barriers against the higher direction are
+tagged, not skipped or given a nearer target (4). The plan, short method, direct entry and gold plan match their own documents.
+
+Recommended next step (the owner decides): one pre-registered test on 2020-2025 with the desks' own code (gold, EUR/USD, GBP/USD,
+net of the desk-rigor costs): "with H1 structure, M15 shifted the trade's way within 6 hours, M5 with" as an entry permission on
+the Mosha barrier and the engulf rule, against the same trades without it. Until it passes, never quote the table above as an edge.
