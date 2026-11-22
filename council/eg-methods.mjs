@@ -276,7 +276,7 @@ export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
 // visit of price to such a zone (the first order that fills; see `snrTrades`). Entry, either type: (1) with price in such a zone a 15- or
 // 30-minute engulf the same way, a limit at that engulf's zone for two hours; (2) a 15- or 30-minute QM whose head is in such a
 // zone, a limit at its left shoulder for two hours (kind 'msnr-qm', see `qmSetups`). The Daily levels are V, A and OC levels
-// (`snrSides`). "Strong" H4 BO: the plan shows it in a picture only, so any close beyond the last H4 A / V level counts. Stop 30 pips ($3.00), target 90 pips (3R), at most 2 entries a UTC day; a trade ends at its stop
+// (`snrSides`). "Strong" H4 BO: the plan shows it in a picture only, so any close beyond the last H4 A / V level counts. Stop 30 pips ($3.00), target 60 pips (2R, `RR`: the owner's pick of 22 Nov 2026; the plan's own figure is 90 pips), at most 2 entries a UTC day; a trade ends at its stop
 // or its target (no one-at-a-time rule and no time exit: the plan names neither). Gold only.
 export const SNR = { rr: 3, piv: 2, look: 60, boDays: 3, wait: 24, perDay: 2 };
 export function snrSides(D1, H4) {

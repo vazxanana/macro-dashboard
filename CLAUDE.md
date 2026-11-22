@@ -6233,3 +6233,14 @@ Display only, `assets/mosha-replay.js` (`HUES`, `hueKey`, `hueOf`): on a desk tr
 label: EF red, the entry zone blue, CF green, VR orange (its own box as before), the 50 % line grey, a Daily level purple, H4
 amber, H1 teal, M30 / M15 pink, M5 / M1 cyan, a BO or plain level brown; two shades, for dark and light. The position's stop
 and target bands are unchanged.
+
+## The four desks part by part: keep / drop (22 Nov 2026, owner: "recheck every part of the edges … find what to drop and what to keep", "follow market structure")
+`research/proposals/2026-11-22-desks-keep-drop.md` (a proposal; no desk rule changed). The desks' 50,049 closed 2026 paper
+records split after the fact, before costs: every desk is at zero (Mosha -0.010R, Engulfing -0.011R, MSNR +0.007R, LIT
+-0.053R a trade). Trading WITH the M15 / H1 / H4 / D1 structure was not better than against it, alone or stacked (with H4
+-0.030R, against +0.012R, n 49,880): the owner's hypothesis does not hold on these records. The one consistent difference:
+the next-candle engulf beats the four-candle engulf on the plan and the short method. A half-size stop with a 1R / 2R target
+(M1 EF entry, 30 days on one-minute candles, n 1,271) is inside noise of zero and doubles the cost in R. The document
+differences five independent readers found are listed there as 21 owner questions (their notes stay outside the repository).
+Same day: the desk notes that still named the older targets and "any number of candles" were corrected (text only).
+In-sample splits: never quote one as an edge.
