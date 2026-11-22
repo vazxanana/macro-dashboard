@@ -674,17 +674,19 @@ test('a failed QM at a barrier against the direction: no repeat-SOP entry after 
 
 // 22 Nov 2026 (owner: "when tap he could wait M1 BO buy to take the trade, SL at M1 BO low")
 test('M1 BO at the tap of a barrier: a market entry at the M1 close, the stop past the M1 BO\'s low, its own id and reading, no hindsight', () => {
-  let n = 0, c = 0;
+  let n = 0, c = 0, h1 = 0;
   for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), z = ALL(seed).z, all = BT(X, F, { from: fr, extra: z }), t = all.filter((r) => r.tap); n += t.length;
     assert.ok(BT(X, F, { from: fr, extra: z, tap: false }).every((r) => !r.tap), 'tap: false leaves it out');
     assert.deepEqual(BT(X, F, { from: fr, extra: z, tap: false }).map(keyOf), all.filter((r) => !r.tap).map(keyOf), 'no other record changes');
     assert.equal(new Set(t.map((r) => r.id)).size, t.length);
-    for (const r of t) { assert.match(r.id, /bar-tap-/); assert.equal(r.l, '1m'); assert.ok(M.readings({ id: r.id }).tap); assert.match(r.label, / · M1 BO at the tap/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) at the tap/);
+    for (const r of t) { assert.match(r.id, /bar-tap-/); assert.equal(r.l, '1m'); assert.ok(M.readings({ id: r.id }).tap); if (r.h === '1h') { h1++; assert.match(r.label, / · M15 BO, pullback, M1 BO/); assert.match(r.log.at(-3).text, /^M15 BO (buy|sell): a QM/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) with the barrier/); assert.ok(r.log.at(-3).t < r.t, 'the M15 BO comes before the M1 entry'); }
+      else { assert.match(r.label, / · M1 BO at the tap/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) at the tap/); }
       assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry);
       const bar = X['1m'].find((b) => b.time + 60 === r.t); assert.ok(bar && bar.close === r.entry, 'the entry is the close of the M1 candle that ended at its time'); }
     for (const r of t.slice(0, 4)) { const T = cutFor(seed, r.t + 60); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
       assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); c++; } }
   assert.ok(n > 0 && c > 0, 'tap entries: ' + n + ', checked against a cut: ' + c);
+  console.log('H1 barrier entries after an M15 BO and a pullback: ' + h1);
 });
 
 test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the BO and the CF one with it; a stop on the losing side; off with nest: false; no hindsight', async () => {
