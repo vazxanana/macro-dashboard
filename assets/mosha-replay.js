@@ -245,7 +245,7 @@
     var host = $('mo-rp-chart'); if (!host || R.chart || !root.LightweightCharts) return !!R.chart;
     var LW = root.LightweightCharts, ink = css('--ink-dim', '#9aa3b2'), line = css('--line', 'rgba(128,128,128,.2)');
     R.chart = LW.createChart(host, { autoSize: true, layout: { background: { color: 'transparent' }, textColor: ink, fontSize: 12 }, grid: { vertLines: { color: 'transparent' }, horzLines: { color: line } },
-      rightPriceScale: { borderColor: line }, timeScale: { borderColor: line, timeVisible: true, secondsVisible: false, rightOffset: 2 }, crosshair: { mode: 0 }, handleScale: { axisPressedMouseMove: false } });
+      rightPriceScale: { borderColor: line }, timeScale: { borderColor: line, timeVisible: true, secondsVisible: false, rightOffset: 2 }, crosshair: { mode: 0 } }); // the price and time axes drag to stretch the candles (owner, 22 Nov 2026); a double-click on an axis puts it back
     R.series = R.chart.addCandlestickSeries(Object.assign({ priceLineVisible: false, lastValueVisible: true, autoscaleInfoProvider: function () { return R.hi > R.lo ? { priceRange: { minValue: R.lo, maxValue: R.hi } } : null; } }, candleCols()));
     R.chart.timeScale().subscribeVisibleLogicalRangeChange(function () { paint(); });
     if (root.ResizeObserver) new ResizeObserver(function () { paint(); }).observe(host);
@@ -333,7 +333,7 @@
     var pad = (hi - lo) * .04; R.lo = lo - pad; R.hi = hi + pad;
     var sl = $('mo-rp-slider'); if (sl) sl.max = R.bars.length - 1;
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-tf button'), function (b) { b.setAttribute('aria-pressed', String(+b.dataset.tf === sec)); });
-    show(t != null ? Math.max(0, barAt(R.bars, t)) : R.bars.length - 1); R.chart.timeScale().setVisibleLogicalRange({ from: -1, to: R.bars.length + 3 });
+    show(t != null ? Math.max(0, barAt(R.bars, t)) : R.bars.length - 1); R.chart.timeScale().setVisibleLogicalRange({ from: -1, to: R.bars.length + 3 }); R.chart.priceScale('right').applyOptions({ autoScale: true });
   }
   // how a desk's stored trade ended, in words (the stored status)
   var HOW = { target: 'target reached', stopped: 'stopped', trail: 'trailing stop', time: 'time limit', breakeven: 'stopped at break-even', dayend: 'closed at the day\'s end' };
