@@ -67,6 +67,7 @@
     var open = every.filter(function (r) { return r.R == null; }), last = every[0], at = S.file && S.file.at ? utc(Math.floor(Date.parse(S.file.at) / 1000)) : '';
     on.textContent = open.length ? open.length + ' open · paper only' + (at ? ' · last reading ' + at : '') : '';
     ol.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. The tracker reads these markets about every 35 minutes' + (at ? ' (last reading ' + at + ')' : '') + '; a new entry shows here until it closes.</li>';
+    if (SOP.openMore) SOP.openMore(ob, open.length);
     var btn = function (attr, v, t, n, cur) { return '<button type="button" class="mo-sop-b" ' + attr + '="' + esc(v) + '" aria-pressed="' + (cur === v) + '">' + esc(t) + ' (' + n + ')</button>'; };
     var sm = SOP.summary(list), tile = function (a, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + a + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
     var cal = SOP.calHTML(list, S, 'data-dk-chart', function (r) { return nm(r) + ' · ' + (r.label || r.kind); });

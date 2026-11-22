@@ -932,6 +932,23 @@
       '<dl><div><dt>Entry</dt><dd>' + fP(r, r.entry) + '</dd></div><div><dt>Stop</dt><dd>' + fP(r, r.stop) + '</dd></div><div><dt>Target</dt><dd>' + fP(r, r.target) + ' · ' + tR.toFixed(1) + 'R</dd></div><div><dt>Best so far</dt><dd>' + (r.mfe != null ? '+' + (+r.mfe).toFixed(2) + 'R' : '—') + '</dd></div></dl>' +
       '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + unit(m) + fP(r, r.r0) + '</p></li>';
   }
+  // On a phone (22 Nov 2026, owner: "organise better the open trades or put like a dropdown, it is long going all the way down to
+  // see the calendar"): the cards are one line each and only the first OPEN_PHONE show, with a button for the rest. Display only.
+  var OPEN_PHONE = 3;
+  function openMore(card, n) {
+    if (!card) return; var b = card.querySelector('.mo-open-more');
+    if (n <= OPEN_PHONE) { if (b) b.remove(); card.removeAttribute('data-all'); return; }
+    if (!b) { b = document.createElement('button'); b.type = 'button'; b.className = 'mo-sop-b mo-open-more'; card.appendChild(b); }
+    var all = card.hasAttribute('data-all'); b.setAttribute('aria-expanded', String(all));
+    b.textContent = all ? 'Show fewer' : 'Show all ' + n + ' open trades';
+  }
+  if (typeof document !== 'undefined') document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('.mo-open-more') : null; if (!b) return;
+    var card = b.closest('.mo-open-c'); if (!card) return;
+    if (card.hasAttribute('data-all')) card.removeAttribute('data-all'); else card.setAttribute('data-all', '');
+    openMore(card, card.querySelectorAll('.mo-open li:not(.empty)').length);
+    if (!card.hasAttribute('data-all') && card.getBoundingClientRect().top < 0) card.scrollIntoView({ block: 'start' });
+  });
   function openPanel(open) {
     var box = $('mo-open'), l = $('mo-open-l'), n = $('mo-open-n'); if (!box || !l) return;
     var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
@@ -939,8 +956,9 @@
     open = open.slice().sort(function (a, b) { return b.t - a.t; });
     if (n) n.textContent = open.length ? open.length + ' open · paper only' + (S.file && S.file.at ? ' · last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') : '';
     l.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. ' + (S.file ? 'The tracker reads gold, EUR/USD and GBP/USD about every 35 minutes' + (S.file.at ? ' (last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) + ')' : '') + '; a new entry shows here until its stop or target.' : 'A new entry shows here until its stop or target.') + '</li>';
+    openMore(box, open.length);
   }
-  API.openCard = openCard;
+  API.openCard = openCard; API.openMore = openMore; API.OPEN_PHONE = OPEN_PHONE;
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
     if (S.state !== 'done') openPanel([]);

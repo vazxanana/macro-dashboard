@@ -773,3 +773,13 @@ test('scalp / intraday / swing tag by the top timeframe (display only)', () => {
   assert.equal(S({ h: '15m', up: '4h' }), 'intraday', 'a SOP inside the SOP takes the main BO\'s timeframe');
   assert.equal(S({}), '');
 });
+
+test('Open now on a phone: one line a trade, the first three, then a button for the rest (22 Nov 2026)', () => {
+  const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  const sop = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8'), dt = fs.readFileSync(new URL('../assets/desk-trades.js', import.meta.url), 'utf8');
+  assert.match(html, /#v-mosha \.mo-open-c:not\(\[data-all\]\) \.mo-open li:not\(\.empty\):nth-child\(n\+4\) \{ display: none; \}/);
+  assert.match(html, /#v-mosha \.mo-open-more \{ display: none; \}\n@media \(max-width: 640px\)/);
+  assert.match(sop, /openMore\(box, open\.length\)/);
+  assert.match(dt, /SOP\.openMore\(ob, open\.length\)/);
+  assert.match(sop, /var OPEN_PHONE = 3;/);
+});
