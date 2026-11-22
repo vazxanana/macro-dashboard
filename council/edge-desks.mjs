@@ -253,7 +253,7 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
 // rr / hold: the study's 1.5R and 12 hours until 22 Nov 2026. Owner ("keep the best rr for each individual one"): 4R in the
 // 12-16 UTC window and 3R at other hours did best on the method's own closed 2026 records (1R-4R, each trade alone for up to
 // 5 days, before costs), so those are the targets and the time limit is 5 days. Picked in sample, not a tested result.
-export const MSNR = { rr: 1.5, rrMain: 4, rrOther: 3, hold: 120 * 3600, main: [12, 16] };
+export const MSNR = { rr: 1.5, rrMain: 6, rrOther: 3, hold: 120 * 3600, main: [12, 16] };
 // the study's own simulate at full precision: a gap through the stop exits at the open, the stop before the target in one
 // candle, the first candle opening 12 hours or more after the entry exits at its open; null = still open
 function msnrSim(M5, c, r0, rr, hold = MS.P.HOLD) { const s = c.side, target = c.entry + s * rr * r0;
