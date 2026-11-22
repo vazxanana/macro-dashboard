@@ -576,13 +576,27 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       { const m0 = (await st(q)).mom; await q.click('#skipday'); await q.waitForTimeout(300); const z = await st(q); check('after the challenge has ended, Skip day still goes to the next day', BTN.dayKey(z.mom - 300) !== BTN.dayKey(m0 - 300) && z.mom > m0 + 600, JSON.stringify([m0, z.mom])); }
       await q.screenshot({ path: OUT + 'ct-polish-ftmo-breach.png' }); await cx.close(); }
     { const { cx, q } = await open(); for (let i = 0; i < 4; i++) await q.keyboard.press('ArrowRight'); await startCh(q, 'ts50'); const t0 = await st(q), A0 = await full(q), { acc, ch } = refStart(A0, t0), C = {}, candles = async (tf) => (C[tf] = C[tf] || await raw(q, tf, t0.mom - 86400, t0.to));
-      let bad = null, steps = 0, formed = 0, n = 0; const days = new Set(), plan = [['5m', 7], ['15m', 30], ['1m', 9], ['1h', 30], ['5m', 5], ['4h', 8], ['15m', 20], ['1d', 2], ['5m', 10]];
-      for (const [tf, cnt] of plan) { if (bad) break; const z = await sw(q, tf); if (z.tf !== tf) bad = 'switch to ' + tf;
-        for (let i = 0; i < cnt && !bad; i++) { if (ch.status === 'live' && !acc.positions.length && n % 6 === 0) { await q.keyboard.press(n % 12 === 0 ? 'Shift+B' : 'Shift+S'); await q.waitForTimeout(120); await q.fill('#o-risk', '0.6'); await q.waitForTimeout(60); await q.click('#place'); await q.waitForTimeout(150); await mirror(q, acc); } n++;
-          const a = await st(q); await q.keyboard.press('ArrowRight'); await q.waitForTimeout(50); const z2 = await st(q), g = a.forming ? tfOf(a.forming.g) : a.tf; if (a.forming) formed++;
-          BTN.advance(acc, ch, (await candles(g)).filter((x) => x.time >= a.mom && x.time < z2.mom)); steps++; Object.keys(ch.days).forEach((d) => days.add(d)); const A = await full(q), x = proj(A.acct, A.ch), y = proj(acc, ch); if (x !== y) bad = `${tf} #${i}${a.forming ? ' (rest of a forming candle on ' + g + ')' : ''}: ` + diff(x, y); } }
+      // The trades are blind (a buy, then a sell, every sixth step while flat), so their results are whatever the market did that day.
+      // At 0.6 % each, seven losses in a row breached the 4 % trailing loss on the FIRST firm day (22 Nov 2026: a session starting
+      // 12 Nov failed at 18:00 UTC), no second day was ever recorded and the check failed with nothing wrong on the page. Until two
+      // firm days are on record a trade risks RISK1 = 0.12 %: the plan has at most 133 steps, so at most 23 trades, 2.8 % at the very worst,
+      // which cannot reach the 4 % floor; the challenge cannot pass on its first day either (2 minimum days); and the only gap of
+      // that stretch (the daily break, or the weekend after a Friday start) is the firm-day roll itself, where the new day is put on
+      // record before any rule is judged. From the second day on the trades risk 0.6 % as before: a breach or a pass there is
+      // compared field by field like every other step.
+      const RISK1 = '0.12'; let bad = null, steps = 0, formed = 0, n = 0; const days = new Set(), plan = [['5m', 7], ['15m', 30], ['1m', 9], ['1h', 30], ['5m', 5], ['4h', 8], ['15m', 20], ['1d', 2], ['5m', 10]];
+      const one = async (tf, tag) => { if (ch.status === 'live' && !acc.positions.length && n % 6 === 0) { await q.keyboard.press(n % 12 === 0 ? 'Shift+B' : 'Shift+S'); await q.waitForTimeout(120); await q.fill('#o-risk', days.size >= 2 ? '0.6' : RISK1); await q.waitForTimeout(60); await q.click('#place'); await q.waitForTimeout(150); await mirror(q, acc); } n++;
+        const a = await st(q); await q.keyboard.press('ArrowRight'); await q.waitForTimeout(50); const z2 = await st(q), g = a.forming ? tfOf(a.forming.g) : a.tf; if (a.forming) formed++;
+        BTN.advance(acc, ch, (await candles(g)).filter((x) => x.time >= a.mom && x.time < z2.mom)); steps++; Object.keys(ch.days).forEach((d) => days.add(d)); const A = await full(q), x = proj(A.acct, A.ch), y = proj(acc, ch); if (x !== y) bad = `${tf} ${tag}${a.forming ? ' (rest of a forming candle on ' + g + ')' : ''}: ` + diff(x, y); };
+      // going up a timeframe is meant to land inside a candle (a forming one). Where the moment happens to sit on that timeframe's own
+      // boundary (it depends on where the session's first candle fell: a Sunday start put the 15m switch on a quarter hour), the audit
+      // goes back, takes one more compared step on the finer timeframe and switches again, so the count does not depend on the date
+      let cur = '5m';
+      for (const [tf, cnt] of plan) { if (bad) break; let z = await sw(q, tf);
+        for (let r = 0; r < 3 && !bad && z.tf === tf && SEC[tf] > SEC[cur] && !z.forming; r++) { await sw(q, cur); await one(cur, 'extra step'); z = await sw(q, tf); }
+        if (z.tf !== tf) bad = 'switch to ' + tf; for (let i = 0; i < cnt && !bad; i++) await one(tf, '#' + i); cur = tf; }
       const A = await full(q);
-      check(`Topstep challenge, ${steps} steps over ${plan.length} timeframes (${formed} completing a forming candle), ${days.size} firm days: account, day records, trailing floor and status equal the engine fed each step's own candles once`, !bad && formed >= 3 && days.size >= 2 && steps >= 100, bad || JSON.stringify([formed, days.size, steps]));
+      check(`Topstep challenge, ${steps} steps over ${plan.length} timeframes (${formed} completing a forming candle), ${days.size} firm days: account, day records, trailing floor and status equal the engine fed each step's own candles once`, !bad && formed >= 3 && days.size >= 2 && steps >= 100, bad || JSON.stringify([formed, days.size, steps, ch.status, ch.reason, ch.failedAt ? iso(ch.failedAt) : iso(t0.mom)]));
       check('…every trade of that session had its stop, and the trailing floor is where the end-of-day balances put it', A.acct.closed.length > 0 && A.acct.closed.concat(A.acct.positions).every((x) => x.stop > 0) && A.ch.eodHigh === ch.eodHigh && A.ch.progress.floor === Math.min(A.ch.start, BTN.r2(A.ch.eodHigh - A.ch.firm.maxLoss * A.ch.start)), JSON.stringify([A.ch.eodHigh, A.ch.progress && A.ch.progress.floor]));
       await q.screenshot({ path: OUT + 'ct-polish-topstep.png' }); await cx.close(); }
     // 33. the phone toolbar as a whole at 360, 390 and 430 px (touch): one row of 44 px controls (timeframe, undo, next, play, skip

@@ -4183,6 +4183,17 @@ any audit change:
   the one in the file's header). ChronosTrade's "closing a trade takes under 150 ms" is the middle of five closes.
 - Tests: `tests/audit-shared.test.mjs` (the helper on a fake page and a fake fetch, the 0s rule on every page, the Desk's handler).
 - **14 Nov 2026, ChronosTrade 7d** ("a limit the price already passed fills at market"): from 00:00 UTC on 14 Nov it failed on every run. Cause: the quick start's day (now − 30 days, 07:00 UTC) became 15 Oct, when gold only rose for 120 candles, so a buy limit 0.3 under the price was never reached. The check now looks ahead with →, goes back with ← (Undo), and drafts a buy limit under the price if it fell or a sell limit over it if it rose. A move under 0.3 either way in 60 candles fails with a message.
+- **22 Nov 2026, ChronosTrade 32 (B), the Topstep challenge** ("… firm days: account, day records, trailing floor and status equal
+  the engine …") failed twice with `[4,1,121]`: no mismatch, one firm day. Cause: not the weekday. The block's blind trades risked
+  0.6 % each and seven lost in a row on 12 Nov, so the 4 % trailing loss ended the challenge at 18:00 UTC of its FIRST firm day
+  and no second day was recorded (reproduced with that start; the day before the market was kinder). Now a trade risks `RISK1`
+  0.12 % until two firm days are on record (at most 23 trades = 2.8 %, under the 4 % floor; no pass on day one, 2 minimum days;
+  the only gap of that stretch is the firm-day roll itself, which records the new day before any rule is judged), then 0.6 % as
+  before: a later breach or pass is compared like every step. Also date-dependent, found on a Sunday start: a switch up that
+  lands on the higher timeframe's own boundary forms no candle (3 of the needed 3); the audit then goes back, takes one more
+  compared step on the finer timeframe and switches again. The failure detail names the challenge's status and reason. Checked
+  with the block run alone on session starts of 6-12 Nov (Friday to Thursday, each 4-7 firm days, 4 forming candles) and with a
+  reference that skips candles (fails at that step).
 ## Badge inks (11 Nov 2026, quality round: status badges, chips and pills on Charts and Scanner)
 Measured with a script (real contrast of every visible text against its composited background; every role, guest charts, 390 and
 1440 px): light had ~490-530 texts under AA on Charts / Scanner / the macro pane (the count moves with the live scanner states),
