@@ -6259,17 +6259,17 @@ Welch t for "with beats without" is 0.23; the placebo passes nowhere. The 2026 s
 timeframes' structure does not pick the better trades of these readings. One run, no variants: the question is closed on
 2020-2025 (no other timeframes, look-backs or freshness windows). Nothing live changed. Test: `tests/ltf-structure.test.mjs`.
 
-## The older barrier reading, kept beside the current one (22 Nov 2026, owner: "add the old barrier as different separate")
-`assets/mosha-sop.js` `oldBarrierTrades(B, F, { from, market })` (`OLD_BARRIER` = `{ box: 'candle', qm: 'internal', janda: 'level',
-table2: false, rsop: false, rr: 3 }`, no CF / VR hand-over): the Mosha barrier as the desk read it before the 21 Nov re-read of the
-documents (a one-candle zone at a BO / iBO origin, no EG barriers, any small break as the QM, the Janda limit at the level its BO
-broke, the first confirmation table only, no repeat of the SOP, a 3R target; the owner's 21 Nov readings "at the zone", M5 confirm,
-sweep and later visits are still in it). A reading of its own: ids `bar-old-…`, flag `old`, label "· older reading", `readings(r).old`
-(read back from a stored id); its own `uniq`, joined AFTER the current list in the tracker (`council/mosha-desk.mjs` `build`) and
-the browser replay, so an older-reading record never replaces or is replaced by a current one, and the 20-minute rule compares it
-only with its own reading. Desk: chip "Barrier, older reading", its own line under "By entry type"; "Barrier entry" and every
-barrier split count the current reading only. The current reading's records are unchanged (test). The tracker adds it for its
-14-day window; older history needs a `--days` rebuild. A paper reading before costs, never an edge. Test: `tests/mosha-sop.test.mjs`.
+## The barrier with its older 3R target, kept beside the current one (22 Nov 2026, owner: "add the old barrier as different separate", "the old barrier I mean is the one with higher R")
+`assets/mosha-sop.js` `oldBarrierTrades(B, F, { from, market, extra })` (`OLD_BARRIER` = `{ rr: 3 }`): the SAME barrier entries as
+the current reading (zones, confirmations, entry, stop; the tap entry included) with the 3R target the desk used until 22 Nov 2026
+instead of 1R. Entries whose target is not the fixed one (a CF / VR barrier's structural target, the repeat of the SOP, a failed
+QM) are the same trade under both and are not recorded twice. A reading of its own: ids `bar-old-…`, flag `old`, label "· 3R
+target", `readings(r).old` (read back from a stored id); joined AFTER the current list in the tracker (`council/mosha-desk.mjs`
+`build`) and the browser replay, so it never replaces a current record, and the 20-minute rule compares it only with its own
+reading. Desk: chip "Barrier, 3R target", its own line under "By entry type"; "Barrier entry" and every barrier split count the
+current reading only. It about doubles the barrier records on file. The tracker adds it for its 14-day window; older history
+needs a `--days` rebuild. A paper reading before costs, never an edge. (A first version the same day read the barrier the way the
+code did before the 21 Nov re-read; the owner meant the target.) Test: `tests/mosha-sop.test.mjs`.
 
 ## A failed QM at a barrier against the direction is traded with the direction (22 Nov 2026, owner on a GBP/USD buy of 20 Nov: "this should be a sell not buy", "there is no new BO, the recent high closed below, remember BO, VR, CF / repeat SOP", "stop above VR, target last low")
 `assets/mosha-sop.js` `barrierTrades`, the repeat of the SOP at a barrier, only where the barrier is AGAINST the direction of the

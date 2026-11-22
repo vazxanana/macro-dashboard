@@ -608,25 +608,23 @@ test('an engulf (EG) zone is a barrier too: the desks\' one engulf definition, i
   assert.ok(n >= 2);
 });
 
-// 22 Nov 2026 (owner: "add the old barrier as different separate"): the older barrier reading is recorded beside the current
-// one under its own ids, never mixed into it
-test('the older barrier reading is a reading of its own: its own ids and flag, the 3R target, a stop on the losing side, the current records untouched', () => {
-  const seed = 7, X = market(26, seed), fr = fr20(seed);
-  const old = M.oldBarrierTrades(X, F, { from: fr }), cur = ALL(seed).bar;
-  assert.ok(old.length > 0, 'the seeded market gives older-reading entries');
-  assert.equal(new Set(old.map((r) => r.id)).size, old.length);
-  for (const r of old) { assert.match(r.id, /^bar-old-/); assert.equal(r.kind, 'barrier'); assert.equal(r.old, true); assert.ok(M.readings(r).old); assert.ok(M.readings({ id: r.id }).old, 'read back from a stored id');
-    assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, 'a stop on the losing side'); assert.match(r.label, / · older reading$/);
+// 22 Nov 2026 (owner: "add the old barrier as different separate", "the one with higher R"): the barrier with its older 3R
+// target is recorded beside the current one under its own ids, never mixed into it
+test('the barrier with the older 3R target is a reading of its own: the current entries and stops, a 3R target, its own ids and flag', () => {
+  const seed = 7, X = market(26, seed), fr = fr20(seed), z = ALL(seed).z;
+  const old = M.oldBarrierTrades(X, F, { from: fr, extra: z }), all = BT(X, F, { from: fr, extra: z }), by = new Map(all.map((r) => [r.id, r]));
+  assert.ok(old.length > 0); assert.equal(new Set(old.map((r) => r.id)).size, old.length); assert.deepEqual(M.OLD_BARRIER, { rr: 3 });
+  let same = 0;
+  for (const r of old) { assert.match(r.id, /^bar-old-/); assert.equal(r.kind, 'barrier'); assert.equal(r.old, true); assert.ok(M.readings({ id: r.id }).old, 'read back from a stored id'); assert.match(r.label, / · 3R target$/);
+    assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, 'a stop on the losing side');
     assert.ok(Math.abs(Math.abs(r.target - r.entry) / Math.abs(r.entry - r.stop) - 3) < 1e-6, 'the 3R target');
-    assert.ok(!/bar-old-(sop|eg|cf|vr)-/.test(r.id) && !/-c(30|15)-/.test(r.id), 'no repeat SOP, EG / CF / VR barrier or second table'); }
-  // the same orders as the options read alone, and the flags of a stored id are the ones of the plain id
-  const plain = M.uniq(M.barrierTrades(X, F, { from: fr, ...M.OLD_BARRIER }));
-  assert.deepEqual(old.map((r) => r.id.replace('bar-old-', 'bar-')), plain.map((r) => r.id));
-  for (const r of old.slice(0, 40)) { const a = M.readings({ id: r.id }), b = M.readings({ id: r.id.replace('bar-old-', 'bar-') }); assert.deepEqual({ ...a, old: false }, b); }
-  assert.ok(cur.every((r) => !M.readings(r).old), 'no current record reads as old');
-  assert.deepEqual(M.barrierTrades(X, F, { from: fr, extra: ALL(seed).z }).map(keyOf), cur.map(keyOf), 'the current reading is unchanged');
+    const c = by.get(r.id.replace('bar-old-', 'bar-')); if (c) { same++; assert.equal(c.entry, r.entry); assert.equal(c.stop, r.stop); assert.equal(c.side, r.side); assert.equal(c.t, r.t);
+      assert.ok(Math.abs(Math.abs(c.target - c.entry) / c.r0 - M.BARRIER_R) < 1e-6, 'its current twin has the current target'); }
+    const a = M.readings({ id: r.id }), b = M.readings({ id: r.id.replace('bar-old-', 'bar-') }); assert.deepEqual({ ...a, old: false }, b); }
+  assert.ok(same >= old.length * 0.8, 'the 3R records are the current entries: ' + same + ' of ' + old.length);
+  assert.ok(all.every((r) => !M.readings(r).old), 'no current record reads as old');
   const src = fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8');
-  assert.match(src, /\.concat\(SOP\.oldBarrierTrades\(B, F, \{ from, market \}\)\)/);
+  assert.match(src, /\.concat\(SOP\.oldBarrierTrades\(B, F, \{ from, market, extra: cfz \}\)\)/);
 });
 
 // 22 Nov 2026 (owner on a GBP/USD buy: "this should be a sell", "there is no new BO"): at a barrier against the direction a QM
