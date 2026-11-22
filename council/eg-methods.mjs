@@ -32,7 +32,7 @@ export const pipOfMarket = (market) => PIP[market] || (SOP.ALL[market] ? Math.po
 export const stopSize = (market) => EGM.stopPips * pipOfMarket(market);
 export const EGM = { pips: 3.0, stopPips: 30, rr: 2, arm: 3 * 3600, efBack: 6 * 3600, egBack: 2 * 3600, fill: 12, hold: 86400, quiet: 2, directWait: 5 * 86400,
   life: { '4h': 120, '1h': 120, '30m': 200, '15m': 200, '5m': 150 } };
-const SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300 }, NAME = { '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5' };
+const SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300, '1m': 60 }, NAME = { '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
 // 30-minute candles from the 15-minute ones (a candle with only one half on file is left out), and the trigger zones of both:
 // the methods name the 15- or the 30-minute engulf as the trigger (21 Nov 2026, the documents checked page by page)
 const m30of = (M15) => { const out = []; for (let i = 1; i < M15.length; i++) { const a = M15[i - 1], b = M15[i]; if (a.time % 1800 === 0 && b.time === a.time + 900) out.push({ time: a.time, open: a.open, high: Math.max(a.high, b.high), low: Math.min(a.low, b.low), close: b.close }); } return out; };
