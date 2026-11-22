@@ -637,6 +637,24 @@ test('the barrier with the older 3R target is a reading of its own: the current 
   assert.match(src, /SOP\.deskTrades\(B, F, \{ from, market \}\)/);
 });
 
+// 22 Nov 2026 (owner: "Yes add the 6r target"): the same barrier entries with a 6R target, a reading of its own
+test('the barrier with a 6R target is a reading of its own: the current entries and stops, a 6R target, its own ids and flag', () => {
+  const seed = 7, X = market(26, seed), fr = fr20(seed), z = ALL(seed).z;
+  const r6 = M.r6BarrierTrades(X, F, { from: fr, extra: z }), old = M.oldBarrierTrades(X, F, { from: fr, extra: z }), all = BT(X, F, { from: fr, extra: z }), by = new Map(all.map((r) => [r.id, r]));
+  assert.ok(r6.length > 0); assert.equal(new Set(r6.map((r) => r.id)).size, r6.length); assert.deepEqual(M.R6_BARRIER, { rr: 6 });
+  let same = 0;
+  for (const r of r6) { assert.match(r.id, /^bar-r6-/); assert.equal(r.r6, true); const g = M.readings({ id: r.id }); assert.ok(g.r6 && !g.old, 'read back from a stored id'); assert.match(r.label, / · 6R target$/);
+    assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'stop on the losing side, target on the winning side');
+    assert.ok(Math.abs(Math.abs(r.target - r.entry) / Math.abs(r.entry - r.stop) - 6) < 1e-6, 'the 6R target');
+    const c = by.get(r.id.replace('bar-r6-', 'bar-')); if (c) { same++; assert.equal(c.entry, r.entry); assert.equal(c.stop, r.stop); assert.equal(c.t, r.t); }
+    assert.deepEqual({ ...g, r6: false }, M.readings({ id: r.id.replace('bar-r6-', 'bar-') })); }
+  assert.ok(same >= r6.length * 0.8, 'the 6R records are the current entries: ' + same + ' of ' + r6.length);
+  assert.ok(all.concat(old).every((r) => !M.readings(r).r6), 'no other record reads as 6R');
+  assert.equal(M.sixCandle({ id: 'bar-r6-h4-b1' }), false, 'read on the one-candle structure, like the 3R reading');
+  const src = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8');
+  assert.match(src, /tag\(API\.r6BarrierTrades\(B, F1, w\(\{ extra: c1 \}\)\), ONE_N\)/);
+});
+
 // 22 Nov 2026 (owner on a GBP/USD buy: "this should be a sell", "there is no new BO"): at a barrier against the direction a QM
 // that price closed back through gives no repeat-SOP entry; the trade is taken with the direction instead
 test('a failed QM at a barrier against the direction: no repeat-SOP entry after it, a trade with the direction with its stop past the VR, no hindsight', () => {

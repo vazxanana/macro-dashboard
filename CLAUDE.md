@@ -6301,6 +6301,24 @@ current reading only. It about doubles the barrier records on file. The tracker 
 needs a `--days` rebuild. A paper reading before costs, never an edge. (A first version the same day read the barrier the way the
 code did before the 21 Nov re-read; the owner meant the target.) Test: `tests/mosha-sop.test.mjs`.
 
+## The barrier with a 6R target, a third reading (22 Nov 2026, owner: "check if the mosha 3r barrier on 4r 5r 6r", then "Yes add the 6r target")
+On the 60 days to 21 Nov 2026 (gold, EUR/USD, GBP/USD, before costs) the barrier entries with a 3R / 4R / 5R / 6R target made
++0.044 / +0.075 / +0.088 / +0.112R a trade (about 9,900 trades; 26 / 22 / 18 / 16 % reached the target; GBP/USD near flat at every
+target). `assets/mosha-sop.js` `r6BarrierTrades` (`R6_BARRIER` = `{ rr: 6 }`) records the same entries and stops with a 6R target
+beside the 1R and 3R readings: ids `bar-r6-…`, flag `r6`, label "· 6R target", `readings(r).r6` from the id, one-candle structure
+(`sixCandle` false), its own reading in the 20-minute rule; desk chip "Barrier, 6R target" and its own line. Picked after looking at
+one 60-day stretch before costs: never quote it as an edge. Test: `tests/mosha-sop.test.mjs`.
+
+## 5R and 6R on the other desks (22 Nov 2026, owner: "Any of these changes can improve the other edges?", then "the changes you think are best")
+The desks' closed 2026 records (the 22 Nov 03:04 files) were replayed alone from their fill and opening stop on 5-minute candles
+at 1R to 6R (stop first in one candle, 5-day limit, before costs). Only one reading rose steadily with the target: the earlier
+scalp method in its 12-16 UTC window (`msnr-main`, n 551): +23 / +45 / +57 / +68 / +70 / +102R at 1R-6R. Its target is now 6R
+(`council/edge-desks.mjs` `MSNR.rrMain` 4 -> 6); other hours stay 3R. Not changed: the engulf rule on D1 / H4 (4R; 6R was
++28R against +26R / +0R, not steady), H1 (its trail), the plan / short method / M1 EF / LIT / gold plan readings (lose at every
+target or no steady rise). The same replay on the OLDER Mosha barrier records was best at 1R and worst at 5-6R, against the
+60-day run on the current code where 6R did best: the barrier's best target is not stable; the 6R barrier stays a separate
+reading so its record can show it. Picked in sample, before costs: never quote as an edge.
+
 ## A failed QM at a barrier against the direction is traded with the direction (22 Nov 2026, owner on a GBP/USD buy of 20 Nov: "this should be a sell not buy", "there is no new BO, the recent high closed below, remember BO, VR, CF / repeat SOP", "stop above VR, target last low")
 `assets/mosha-sop.js` `barrierTrades`, the repeat of the SOP at a barrier, only where the barrier is AGAINST the direction of the
 timeframe above (`wd === false`): once a candle of the confirmation timeframe, after the lower-timeframe VR, closes back through the
