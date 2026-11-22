@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-22T05:23:58.000Z",
+ "at": "2026-11-22T06:23:21.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-22T05:23:36.000Z",
+ "strategistAt": "2026-11-22T06:23:00.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -124,8 +124,8 @@
   },
   {
    "topic": "Inflation and the next release",
-   "macro": "2.15%, −9 bp a week (vote down)",
-   "veteran": "10Y breakeven 2.15%, −9 bp on the week. No red-folder event within 72 hours.",
+   "macro": "2.15%, −9 bp a week (vote down); playbook: CPI m/m 2026-11-25 00:30 UTC",
+   "veteran": "10Y breakeven 2.15%, −9 bp on the week. A red-folder event lands within 72 hours (CPI m/m): the view is conditional and the plan is to read real yields and the dollar after the print, not before.",
    "stance": "agree",
    "why": "A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.",
    "m": -1,
@@ -153,7 +153,7 @@
  "verdict": {
   "bias": "AUCTION",
   "conviction": null,
-  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size.",
+  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI m/m): the bias is conditional until the print.",
   "agree": 5,
   "qualify": 1,
   "disagree": 0,
@@ -162,20 +162,24 @@
    "DXY above 105.4 (+1.5%) says the dollar is still rising against gold",
    "gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it"
   ],
-  "eventWithin72h": null
+  "eventWithin72h": {
+   "title": "CPI m/m",
+   "at": "2026-11-25T00:30:00.000Z",
+   "consensus": "0.4%"
+  }
  },
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
   "claimType": "descriptive association",
   "shock": "Risk-off / de-risking, funding still calm",
-  "surprise": "No scheduled red-folder release inside 72 hours; the week's moves are judged against their own 1-week windows",
+  "surprise": "Pending: CPI m/m at 2026-11-25 00:30 UTC against the calendar expectation captured before it (0.4%); print minus previous is not a surprise",
   "observed": "VIX/VIX3M 1.052 · HY +32 bp on the week · SOFR−EFFR 3 bp · DXY +0.37%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
   "alternative": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
   "falsifier": "10Y TIPS real yield above 3.03% (+15 bp from 2.88%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it",
-  "nextReview": "Friday close (the score is weekly)",
+  "nextReview": "after CPI m/m",
   "forecastId": "xau-4w-2026-11-21",
   "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-25..2026-11-20, n 2573)"
  },
@@ -271,6 +275,169 @@
  },
  "releases": [
   {
+   "event": "Core PCE Price Index m/m",
+   "country": "USD",
+   "scheduledUtc": "2026-11-25T13:30:00.000Z",
+   "consensus": "0.3%",
+   "previous": "0.3%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.3% captured 2026-11-22 06:23 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association"
+  },
+  {
+   "event": "Prelim GDP q/q",
+   "country": "USD",
+   "scheduledUtc": "2026-11-25T13:30:00.000Z",
+   "consensus": "3.5%",
+   "previous": "3.4%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 3.5% captured 2026-11-22 06:23 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association"
+  },
+  {
+   "event": "CPI m/m",
+   "country": "AUD",
+   "scheduledUtc": "2026-11-25T00:30:00.000Z",
+   "consensus": "0.4%",
+   "previous": "0.8%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.4% captured 2026-11-22 06:23 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association",
+   "rates": {
+    "study": "On 2022-24 CPI days the 10Y real yield moved 6.11 bp on average (absolute) vs 4.06 bp on matched days; 20 of 36 events above their controls. A daily association, not causality or a gold result.",
+    "observedBp": null,
+    "read": "pending the print",
+    "claim": "descriptive association"
+   }
+  },
+  {
+   "event": "CPI y/y",
+   "country": "AUD",
+   "scheduledUtc": "2026-11-25T00:30:00.000Z",
+   "consensus": "4.8%",
+   "previous": "4.3%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 4.8% captured 2026-11-22 06:23 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association",
+   "rates": {
+    "study": "On 2022-24 CPI days the 10Y real yield moved 6.11 bp on average (absolute) vs 4.06 bp on matched days; 20 of 36 events above their controls. A daily association, not causality or a gold result.",
+    "observedBp": null,
+    "read": "pending the print",
+    "claim": "descriptive association"
+   }
+  },
+  {
+   "event": "Trimmed Mean CPI m/m",
+   "country": "AUD",
+   "scheduledUtc": "2026-11-25T00:30:00.000Z",
+   "consensus": "0.3%",
+   "previous": "0.3%",
+   "firstPrint": null,
+   "checks": [
+    {
+     "k": "expectation",
+     "ok": true,
+     "text": "expectation 0.3% captured 2026-11-22 06:23 UTC, before the release (calendar consensus, not a verified survey)"
+    },
+    {
+     "k": "clock",
+     "ok": null,
+     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
+    },
+    {
+     "k": "vintage",
+     "ok": null,
+     "text": "no print yet"
+    }
+   ],
+   "trusted": false,
+   "surprise": null,
+   "surpriseNote": "pending",
+   "claim": "descriptive association",
+   "rates": {
+    "study": "On 2022-24 CPI days the 10Y real yield moved 6.11 bp on average (absolute) vs 4.06 bp on matched days; 20 of 36 events above their controls. A daily association, not causality or a gold result.",
+    "observedBp": null,
+    "read": "pending the print",
+    "claim": "descriptive association"
+   }
+  },
+  {
    "event": "Employment Change",
    "country": "AUD",
    "scheduledUtc": "2026-11-19T00:30:00.000Z",
@@ -356,157 +523,6 @@
    "surprise": null,
    "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
    "claim": "descriptive association"
-  },
-  {
-   "event": "BOE Gov Bailey Speaks",
-   "country": "GBP",
-   "scheduledUtc": "2026-11-18T15:00:00.000Z",
-   "consensus": null,
-   "previous": null,
-   "firstPrint": null,
-   "checks": [
-    {
-     "k": "expectation",
-     "ok": false,
-     "text": "no expectation captured: print minus previous is not a surprise"
-    },
-    {
-     "k": "clock",
-     "ok": null,
-     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
-    },
-    {
-     "k": "vintage",
-     "ok": null,
-     "text": "no print yet"
-    }
-   ],
-   "trusted": false,
-   "surprise": null,
-   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
-   "claim": "descriptive association"
-  },
-  {
-   "event": "BOE Gov Bailey Speaks",
-   "country": "GBP",
-   "scheduledUtc": "2026-11-18T07:30:00.000Z",
-   "consensus": null,
-   "previous": null,
-   "firstPrint": null,
-   "checks": [
-    {
-     "k": "expectation",
-     "ok": false,
-     "text": "no expectation captured: print minus previous is not a surprise"
-    },
-    {
-     "k": "clock",
-     "ok": null,
-     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
-    },
-    {
-     "k": "vintage",
-     "ok": null,
-     "text": "no print yet"
-    }
-   ],
-   "trusted": false,
-   "surprise": null,
-   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
-   "claim": "descriptive association"
-  },
-  {
-   "event": "CPI y/y",
-   "country": "GBP",
-   "scheduledUtc": "2026-11-18T07:00:00.000Z",
-   "consensus": "3.6%",
-   "previous": "3.5%",
-   "firstPrint": null,
-   "checks": [
-    {
-     "k": "expectation",
-     "ok": true,
-     "text": "expectation 3.6% captured 2026-11-15 05:57 UTC, before the release (calendar consensus, not a verified survey)"
-    },
-    {
-     "k": "clock",
-     "ok": null,
-     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
-    },
-    {
-     "k": "vintage",
-     "ok": null,
-     "text": "no print yet"
-    }
-   ],
-   "trusted": false,
-   "surprise": null,
-   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
-   "claim": "descriptive association",
-   "rates": {
-    "study": "On 2022-24 CPI days the 10Y real yield moved 6.11 bp on average (absolute) vs 4.06 bp on matched days; 20 of 36 events above their controls. A daily association, not causality or a gold result.",
-    "observedBp": 1,
-    "read": "10Y TIPS moved 1 bp on the release day (no more than a normal day)",
-    "claim": "descriptive association"
-   }
-  },
-  {
-   "event": "Core Retail Sales m/m",
-   "country": "USD",
-   "scheduledUtc": "2026-11-17T13:30:00.000Z",
-   "consensus": "0.4%",
-   "previous": "0.9%",
-   "firstPrint": null,
-   "checks": [
-    {
-     "k": "expectation",
-     "ok": true,
-     "text": "expectation 0.4% captured 2026-11-15 05:57 UTC, before the release (calendar consensus, not a verified survey)"
-    },
-    {
-     "k": "clock",
-     "ok": null,
-     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
-    },
-    {
-     "k": "vintage",
-     "ok": null,
-     "text": "no print yet"
-    }
-   ],
-   "trusted": false,
-   "surprise": null,
-   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
-   "claim": "descriptive association"
-  },
-  {
-   "event": "Retail Sales m/m",
-   "country": "USD",
-   "scheduledUtc": "2026-11-17T13:30:00.000Z",
-   "consensus": "0.2%",
-   "previous": "0.8%",
-   "firstPrint": null,
-   "checks": [
-    {
-     "k": "expectation",
-     "ok": true,
-     "text": "expectation 0.2% captured 2026-11-15 05:57 UTC, before the release (calendar consensus, not a verified survey)"
-    },
-    {
-     "k": "clock",
-     "ok": null,
-     "text": "the scheduled time is the announced time, not verified first availability (May 2024: part of the CPI files were public about 31 minutes early, DOL OIG 17-26-001-11-001)"
-    },
-    {
-     "k": "vintage",
-     "ok": null,
-     "text": "no print yet"
-    }
-   ],
-   "trusted": false,
-   "surprise": null,
-   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
-   "claim": "descriptive association"
   }
  ],
  "cpiRateStudy": {
@@ -557,13 +573,13 @@
    "list": [
     {
      "claim": "Gold closes 2026-11-27 above $3,538 (the 2026-11-20 close)",
-     "p": 0.54,
+     "p": 0.55,
      "baseP": 0.561,
      "asset": "gold",
      "kind": "closeAbove",
      "level": 3538.305,
      "by": "2026-11-27",
-     "pRaw": 0.54,
+     "pRaw": 0.55,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -585,13 +601,13 @@
     },
     {
      "claim": "Gold closes at or above $3,630 on some day by 2026-11-27 (stretch)",
-     "p": 0.13,
+     "p": 0.14,
      "baseP": 0.145,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3630,
      "by": "2026-11-27",
-     "pRaw": 0.13,
+     "pRaw": 0.14,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -599,13 +615,13 @@
     },
     {
      "claim": "Gold closes at or below $3,520 on some day by 2026-11-27",
-     "p": 0.54,
+     "p": 0.53,
      "baseP": 0.522,
      "asset": "gold",
      "kind": "touchDown",
      "level": 3520,
      "by": "2026-11-27",
-     "pRaw": 0.54,
+     "pRaw": 0.53,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -626,13 +642,13 @@
      }
     },
     {
-     "claim": "Gold's 2026-11-27 close lands between $3,494 and $3,605",
+     "claim": "Gold's 2026-11-27 close lands between $3,492 and $3,604",
      "p": 0.6,
      "baseP": 0.6,
      "asset": "gold",
      "kind": "range",
-     "lo": 3493.8764,
-     "hi": 3605.0983,
+     "lo": 3492.3783,
+     "hi": 3604.0693,
      "by": "2026-11-27",
      "pRaw": 0.6,
      "status": {
@@ -680,13 +696,13 @@
    "list": [
     {
      "claim": "Gold closes 2026-12-18 above $3,538 (the 2026-11-20 close)",
-     "p": 0.53,
+     "p": 0.55,
      "baseP": 0.567,
      "asset": "gold",
      "kind": "closeAbove",
      "level": 3538.305,
      "by": "2026-12-18",
-     "pRaw": 0.53,
+     "pRaw": 0.55,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -694,13 +710,13 @@
     },
     {
      "claim": "Gold closes at or above $3,630 on some day by 2026-12-18",
-     "p": 0.46,
+     "p": 0.48,
      "baseP": 0.492,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3630,
      "by": "2026-12-18",
-     "pRaw": 0.46,
+     "pRaw": 0.48,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -708,13 +724,13 @@
     },
     {
      "claim": "Gold closes at or above $3,770 on some day by 2026-12-18 (stretch)",
-     "p": 0.12,
+     "p": 0.14,
      "baseP": 0.153,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3770,
      "by": "2026-12-18",
-     "pRaw": 0.12,
+     "pRaw": 0.14,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -722,13 +738,13 @@
     },
     {
      "claim": "Gold closes at or below $3,480 on some day by 2026-12-18",
-     "p": 0.52,
+     "p": 0.5,
      "baseP": 0.489,
      "asset": "gold",
      "kind": "touchDown",
      "level": 3480,
      "by": "2026-12-18",
-     "pRaw": 0.52,
+     "pRaw": 0.5,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
@@ -736,26 +752,26 @@
     },
     {
      "claim": "Gold closes at or below $3,380 on some day by 2026-12-18 (stretch)",
-     "p": 0.18,
+     "p": 0.17,
      "baseP": 0.152,
      "asset": "gold",
      "kind": "touchDown",
      "level": 3380,
      "by": "2026-12-18",
-     "pRaw": 0.18,
+     "pRaw": 0.17,
      "status": {
       "state": "open",
       "text": "no daily close since it was issued"
      }
     },
     {
-     "claim": "Gold's 2026-12-18 close lands between $3,467 and $3,705",
+     "claim": "Gold's 2026-12-18 close lands between $3,464 and $3,699",
      "p": 0.6,
      "baseP": 0.6,
      "asset": "gold",
      "kind": "range",
-     "lo": 3467.2617,
-     "hi": 3704.7304,
+     "lo": 3463.5104,
+     "hi": 3698.7459,
      "by": "2026-12-18",
      "pRaw": 0.6,
      "status": {
@@ -794,7 +810,7 @@
     }
    ]
   },
-  "tilt": -0.04,
+  "tilt": -0.02,
   "digest": {
    "list": [
     {
@@ -859,7 +875,7 @@
   },
   "record": {
    "n": 28,
-   "open": 51,
+   "open": 53,
    "brier": 0.3304,
    "expected": 0.45,
    "hitRate": 0.32,
@@ -1302,11 +1318,46 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 45% on average, came true 32%."
  },
  "briefing": {
-  "at": "2026-11-22T05:23:58.000Z",
+  "at": "2026-11-22T06:23:21.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
     "rank": 1,
+    "lean": 0,
+    "fx": "Hot → EUR/USD mixed (DXY down), USD/JPY mixed; cool the reverse.",
+    "k": "event",
+    "score": 2.51,
+    "event": {
+     "title": "CPI m/m",
+     "country": "AUD",
+     "at": "2026-11-25T00:30:00.000Z",
+     "consensus": "0.4%",
+     "previous": "0.8%",
+     "goldMovePct": 1.5
+    },
+    "title": "AUD CPI m/m on Wed, 25 Nov is the week's pivot",
+    "evidence": [
+     {
+      "text": "CPI m/m at 2026-11-25 00:30 UTC: consensus 0.4%, previous 0.8%",
+      "asOf": "2026-11-22 06:23 UTC (captured before the release)",
+      "source": "economic calendar (Forex Factory feed via the strategist); veteran-expectations.json"
+     },
+     {
+      "text": "typical gold day move 1.5% (naive: mean absolute move of the last 20 days)",
+      "asOf": "2026-11-22",
+      "source": "macro/forecast.json playbook"
+     },
+     {
+      "text": "also this week: CPI y/y, Trimmed Mean CPI m/m, Core PCE Price Index m/m, Prelim GDP q/q",
+      "asOf": "2026-11-22",
+      "source": "calendar"
+     }
+    ],
+    "why": "Hot (above 0.4%) → gold mixed; cool → gold mixed. The path runs through real yields and the dollar: a hot print helps gold only if real yields do not reprice higher.",
+    "change": "the print against the captured 0.4% and the release-day 10Y TIPS move against the 6.11 bp typical CPI day (2022-24 study)"
+   },
+   {
+    "rank": 2,
     "lean": 0,
     "fx": "Dollar Smile left side: the USD tends to be bid in stress, so gold and the DXY can rise together.",
     "k": "stress",
@@ -1333,7 +1384,7 @@
     "change": "VIX/VIX3M back below 1 ends the stress read; SOFR − EFFR above 15 bp would make it a funding squeeze (gold sold for cash)"
    },
    {
-    "rank": 2,
+    "rank": 3,
     "lean": -1,
     "fx": null,
     "k": "price",
@@ -1355,7 +1406,7 @@
     "change": "a weekly close above the 10-week average 4089, or the score crossing +0.25"
    },
    {
-    "rank": 3,
+    "rank": 4,
     "lean": 1,
     "fx": null,
     "k": "analogs",
@@ -1372,7 +1423,7 @@
     "change": "a week that moves the fingerprint (real yields, the dollar or gold's place in its range) changes the analog set"
    },
    {
-    "rank": 4,
+    "rank": 5,
     "lean": 0,
     "fx": null,
     "k": "pos",
@@ -1389,7 +1440,7 @@
     "change": "the next COT (Friday) moving net length into the top or bottom 20% of its 3-year range"
    },
    {
-    "rank": 5,
+    "rank": 6,
     "lean": -1,
     "fx": "Falling US real yields usually weigh on the dollar (EUR/USD up, USD/JPY down) unless risk-off demand for dollars dominates.",
     "k": "real",
@@ -1404,23 +1455,6 @@
     ],
     "why": "Real yields are gold's opportunity cost: a falling 4-week change is the strongest single input of the tested Gold Macro Score (2007-26). A high level caps the upside; the change sets the near-term lean.",
     "change": "10Y TIPS back above 3.03% (+15 bp)"
-   },
-   {
-    "rank": 6,
-    "lean": -1,
-    "fx": "DXY up 4 weeks means EUR/USD down, the majors against the USD softer.",
-    "k": "usd",
-    "score": 0.94,
-    "title": "Dollar firmer over 4 weeks (DXY 103.83, +2.02%)",
-    "evidence": [
-     {
-      "text": "DXY 103.83, +2.02% over 4 weeks (z +0.9)",
-      "asOf": "2026-11-20",
-      "source": "ICE DXY formula on the council's OANDA daily FX closes"
-     }
-    ],
-    "why": "Gold is priced in dollars: a weaker DXY lifts it mechanically and through foreign demand. EUR is 57.6% of the DXY, so EUR/USD is its mirror.",
-    "change": "DXY through 102.28 (−1.5%) would turn the dollar channel"
    }
   ],
   "hypotheses": [
@@ -1440,15 +1474,21 @@
      "n": 20,
      "all": 0.29
     },
-    "invalid": "a daily close below $3,503 before the target; and watch: VIX/VIX3M back below 1 ends the stress read; SOFR − EFFR above 15 bp would make it a funding squeeze (gold sold for cash)",
-    "why": "Of 20 analogs, 10 (50%) made this move first within 5 sessions vs 29% of all 1015 weeks since 2007-03-16; the analogs favour this side, council tilt −2 pts applied.",
+    "invalid": "a daily close below $3,503 before the target",
+    "why": null,
     "src": "veteran hypothesis",
     "claimType": "prospective prediction",
     "pRaw": 0.41,
     "lo": null,
     "hi": null,
     "issued": "2026-11-21",
-    "hit": null
+    "hit": null,
+    "live": {
+     "claim": "If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-11-27 before any close below $3,503",
+     "p": 0.42,
+     "why": "Of 20 analogs, 10 (50%) made this move first within 5 sessions vs 29% of all 1015 weeks since 2007-03-16; the analogs favour this side, council tilt −1 pts applied.",
+     "invalid": "a daily close below $3,503 before the target; and watch: the print against the captured 0.4% and the release-day 10Y TIPS move against the 6.11 bp typical CPI day (2022-24 study)"
+    }
    },
    {
     "id": "hyp:2026-11-21:H2",
@@ -1582,11 +1622,11 @@
       "near": 0
      },
      {
-      "price": 3704.7,
+      "price": 3698.7,
       "label": "Month call: 60% range high (2026-12-18)",
       "kind": "range60",
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends below this.",
-      "dist": 4.7,
+      "dist": 4.53,
       "side": "above",
       "near": 0
      },
@@ -1600,11 +1640,11 @@
       "near": 0
      },
      {
-      "price": 3605.1,
+      "price": 3604.1,
       "label": "Week call: 60% range high (2026-11-27)",
       "kind": "range60",
       "why": "The veteran's week call: the middle 60% of past 5-session outcomes ends below this.",
-      "dist": 1.89,
+      "dist": 1.86,
       "side": "above",
       "near": 1
      },
@@ -1654,20 +1694,20 @@
       "near": 3
      },
      {
-      "price": 3493.9,
+      "price": 3492.4,
       "label": "Week call: 60% range low (2026-11-27)",
       "kind": "range60",
       "why": "The veteran's week call: the middle 60% of past 5-session outcomes ends above this.",
-      "dist": -1.25,
+      "dist": -1.3,
       "side": "below",
       "near": 1
      },
      {
-      "price": 3467.3,
+      "price": 3463.5,
       "label": "Month call: 60% range low (2026-12-18)",
       "kind": "range60",
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends above this.",
-      "dist": -2.01,
+      "dist": -2.11,
       "side": "below",
       "near": 0
      }
@@ -3047,16 +3087,120 @@
    }
   ]
  },
- "events": [],
+ "events": [
+  {
+   "key": "2026-11-25T00:30|AUD",
+   "title": "CPI m/m",
+   "country": "AUD",
+   "at": "2026-11-25T00:30:00.000Z",
+   "type": null,
+   "released": false,
+   "titles": [
+    "CPI m/m",
+    "CPI y/y",
+    "Trimmed Mean CPI m/m"
+   ],
+   "expMovePct": 1.5,
+   "note": null,
+   "bands": {
+    "cool": 0.3,
+    "hot": 0.5
+   },
+   "expectations": [
+    {
+     "title": "CPI m/m",
+     "consensus": "0.4%",
+     "previous": "0.8%",
+     "captured": "2026-11-22T06:23:21.000Z",
+     "source": "captured before the release from the strategist's calendar (not a verified survey)",
+     "range": null,
+     "rangeNote": "n/a: the calendar publishes no forecast range",
+     "actual": null,
+     "cluster": []
+    },
+    {
+     "title": "CPI y/y",
+     "consensus": "4.8%",
+     "previous": "4.3%",
+     "captured": "2026-11-22T06:23:21.000Z",
+     "source": "captured before the release from the strategist's calendar (not a verified survey)",
+     "range": null,
+     "rangeNote": "n/a: the calendar publishes no forecast range",
+     "actual": null,
+     "cluster": []
+    },
+    {
+     "title": "Trimmed Mean CPI m/m",
+     "consensus": "0.3%",
+     "previous": "0.3%",
+     "captured": "2026-11-22T06:23:21.000Z",
+     "source": "captured before the release from the strategist's calendar (not a verified survey)",
+     "range": null,
+     "rangeNote": "n/a: the calendar publishes no forecast range",
+     "actual": null,
+     "cluster": []
+    }
+   ],
+   "scenarios": [
+    {
+     "k": "hot",
+     "name": "Hot",
+     "when": "≥ 0.5%",
+     "path": "RBA: hawkish repricing",
+     "usd": "AUD up",
+     "gold": "Little direct effect (strategist: mixed)",
+     "action": "Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction's direction, at ¼ starter size. A gold short is never a macro call: it needs this hawkish surprise and a bearish reaction (rule G). The rule book's \"gold closing up anyway cancels the sell bias\" failed its test (research/edge/rulebook-stress C5: after such days gold fell more, n 12, t −1.04), so an up-close is not read as an all-clear.",
+     "history": null
+    },
+    {
+     "k": "inline",
+     "name": "In line",
+     "when": "> 0.3% and < 0.5%",
+     "path": "RBA: path unchanged",
+     "usd": "Little; the trend resumes",
+     "gold": "Little; the prevailing trend resumes",
+     "action": "No event trade. Volatility runs about an hour even on an in-line print; after it, the desks' own setups decide.",
+     "history": null
+    },
+    {
+     "k": "cool",
+     "name": "Cool",
+     "when": "≤ 0.3%",
+     "path": "RBA: dovish repricing",
+     "usd": "AUD down",
+     "gold": "Little direct effect (strategist: mixed)",
+     "action": "Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction's direction, at ¼ starter size; full size only once price confirms (rule G).",
+     "history": null
+    }
+   ],
+   "stats": null,
+   "call": null,
+   "callNote": "No release history for this event in the repository: no call.",
+   "label": "Descriptive, not a tested edge.",
+   "publicOnly": true,
+   "paperOnly": true,
+   "gate": {
+    "doc": "news-expectation-source-and-timing-gates-2026-11-19.md",
+    "state": "context",
+    "text": "Consensus captured 66 h before the release from the Forex Factory calendar: usable as context. It is below your gate for a scored surprise (no licensed point-in-time snapshot, fetch clock or hash).",
+    "nowcast": "For a nowcast baseline, use the Cleveland Fed value from before 08:30 ET; its 10:00 ET update the same day is after the release."
+   }
+  }
+ ],
  "newsAhead": {
   "label": "From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.",
   "items": [
    {
+    "kind": "NFP",
+    "title": "ADP Weekly Employment Change",
+    "at": "2026-11-24T13:15:00.000Z",
+    "point": "The prior two months get revised with this report: in 2022-24 the revisions were negative in 22 of 35 releases (median size 71k, average −16k). Read the headline with them."
+   },
+   {
     "kind": "PCE",
-    "title": "PCE (Personal Income and Outlays)",
+    "title": "Core PCE Price Index m/m",
     "at": "2026-11-25T13:30:00.000Z",
-    "point": "Core CPI for October printed 0.30% m/m (the Cleveland Fed's file of actual prints, read 2026-11-20). On the 2022-24 record a core CPI of 0.3% went with core PCE near 0.24% (fit on 36 months, typical miss ±0.07 pp): a descriptive fit on past months, not a forecast on the record.",
-    "src": "schedule"
+    "point": "Core CPI for October printed 0.30% m/m (the Cleveland Fed's file of actual prints, read 2026-11-20). On the 2022-24 record a core CPI of 0.3% went with core PCE near 0.24% (fit on 36 months, typical miss ±0.07 pp): a descriptive fit on past months, not a forecast on the record."
    }
   ]
  },
@@ -3152,7 +3296,7 @@
     "also": "china-local-fiscal-pulse-2026-09.md",
     "asOf": "2026-09",
     "text": "China, Jan-Sep 2026 (your NBS and MOF briefs, year on year): property investment −20.6%, developer funds −21.6% (domestic loans the steepest fall); new-home sales area −13.2% while resale area +10.7%: a shift between channels, not proof of higher demand; local land-sale revenue −27.9% and government-fund revenue −22.3%, local spending +0.2%. The briefs read this as a strained property-linked local revenue base, not a measure of home demand.",
-    "watch": "A newer release should be out by now (Jan-Oct): these September figures may be stale; refresh the brief before relying on them. No China release on the calendar in the next two weeks.",
+    "watch": "A newer release should be out by now (Jan-Oct): these September figures may be stale; refresh the brief before relying on them. Next China release on the calendar: Foreign Direct Investment ytd/y, 2026-11-24 07:02 UTC.",
     "caveat": "Cumulative nominal figures, not seasonally adjusted; a land-transfer receipt is not a home sale, and sales value divided by area is not a price (your briefs' own limits)."
    },
    {
@@ -3278,18 +3422,18 @@
   }
  },
  "summary": {
-  "sentence": "This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release in the next 72 hours; next on the schedule: US PCE (Wed 25 Nov, 13:30 UTC). Watch $3,600 above and $3,503 below. Levels as of the 20 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
+  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 18 Dec, base 57%). AUD CPI m/m (Wed 25 Nov, 00:30 UTC) is the event that matters most. Watch $3,600 above and $3,503 below. Levels as of the 20 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
   "bias": {
-   "lean": "against",
-   "p": 0.53,
+   "lean": "neutral",
+   "p": 0.55,
    "base": 0.57,
-   "tilt": -0.037,
+   "tilt": -0.017,
    "by": "2026-12-18",
    "src": "month call",
    "level": 3538.305,
    "from": "2026-11-20",
    "confidence": "low",
-   "meter": -0.24666666666666615,
+   "meter": -0.1133333333333327,
    "channels": {
     "up": 0,
     "down": 4,
@@ -3300,13 +3444,14 @@
    "why": "The tested Gold Macro Score shows no edge, so the odds stay near the base rate.",
    "gapPct": 0
   },
-  "event": null,
-  "next": {
-   "title": "PCE",
-   "country": "USD",
-   "at": "2026-11-25T13:30:00.000Z",
-   "when": "Wed 25 Nov, 13:30 UTC",
-   "src": "schedule"
+  "event": {
+   "title": "CPI m/m",
+   "country": "AUD",
+   "at": "2026-11-25T00:30:00.000Z",
+   "consensus": "0.4%",
+   "previous": "0.8%",
+   "goldMovePct": 1.5,
+   "when": "Wed 25 Nov, 00:30 UTC"
   },
   "levels": {
    "px": 3538.305,
@@ -3359,7 +3504,7 @@
    "issues": []
   }
  },
- "brief": "Macro veteran, 2026-11-22 05:23 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 5 agree, 1 qualify, 0 disagree; qualified: Direction for gold. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 3.03% (+15 bp from 2.88%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.83 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 28, curve inverted), funding still calm | 2. Gold below its 10-week average (−13.5%); Gold Macro Score −0.95 (AUCTION) | 3. The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 56%) | H1 (41%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-11-27 before any close below $3,503 | H2 (63%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-11-27 | H3 (56%): DXY closes 2026-12-18 below 103.83 (the 2026-11-20 close) At a glance: This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release in the next 72 hours; next on the schedule: US PCE (Wed 25 Nov, 13:30 UTC). Watch $3,600 above and $3,503 below. Levels as of the 20 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
+ "brief": "Macro veteran, 2026-11-22 06:23 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 5 agree, 1 qualify, 0 disagree; qualified: Direction for gold. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (CPI m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 3.03% (+15 bp from 2.88%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4089: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.83 vs ry hit 52%, t 1.02; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t -0.08 vs dxymom hit 49%, t -0.44. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. AUD CPI m/m on Wed, 25 Nov is the week's pivot | 2. Stress gauges are lit (VIX 28, curve inverted), funding still calm | 3. Gold below its 10-week average (−13.5%); Gold Macro Score −0.95 (AUCTION) | H1 (42%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-11-27 before any close below $3,503 | H2 (63%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-11-27 | H3 (56%): DXY closes 2026-12-18 below 103.83 (the 2026-11-20 close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 18 Dec, base 57%). AUD CPI m/m (Wed 25 Nov, 00:30 UTC) is the event that matters most. Watch $3,600 above and $3,503 below. Levels as of the 20 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov. Event playbook: AUD CPI m/m 2026-11-25 00:30 UTC: consensus 0.4% (previous 0.8%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
@@ -3458,8 +3603,8 @@
   "items": [
    {
     "area": "bias",
-    "text": "Bias unchanged: against (53%)",
-    "dir": 0
+    "text": "Bias against → neutral (53% → 55% chance gold is higher in 20 sessions)",
+    "dir": 1
    },
    {
     "area": "price",
@@ -3468,7 +3613,12 @@
    },
    {
     "area": "insight",
-    "text": "Moved up to #4 (from #6): Speculators' gold length is middle of its range (21st percentile of 3 years)",
+    "text": "New: AUD CPI m/m on Wed, 25 Nov is the week's pivot",
+    "dir": 0
+   },
+   {
+    "area": "insight",
+    "text": "Dropped: Dollar firmer over 4 weeks (DXY 103.96, +2.32%)",
     "dir": 0
    },
    {
@@ -3528,6 +3678,6 @@
    }
   ],
   "first": false,
-  "line": "9 changes since the briefing of 2026-11-20."
+  "line": "10 changes since the briefing of 2026-11-20."
  }
 }
