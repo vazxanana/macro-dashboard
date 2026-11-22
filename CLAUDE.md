@@ -6157,3 +6157,47 @@ Old and new code were run on the same candles (three markets, 2026) with one cha
   kinds are unchanged. The MSNR gold plan keeps the any-candle engulf only.
 - Open with the owner: a 2007-2019 holdout before anything is called better. Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`
   ("an engulf (EG) zone is a barrier too"), `tests/mosha-replay.test.mjs`.
+
+## The best part of each desk as one rule, tested on 2007-2019 (22 Nov 2026, owner: "check the trades from all edges, and get the best of each one", "test it", "run")
+`research/edge/h4-zone-trail/` (PREREGISTRATION.md committed alone first; `fetch.mjs`, `run.mjs`, RESULT.md, result.json). The
+desks' 31,500 closed 2026 paper records were split part by part (direction, key level, confirmation, entry, stop, target,
+hours; before costs, about 200 comparisons). What looked best: a Daily / H4 level, no lower-timeframe confirmation and no
+direction filter, a stop past the zone, no target with a trailed stop (the ICT desk's exit), no entries 17:00-24:00 UTC. The one
+rule those give (an H4 next-candle engulf zone, limit at its near edge, stop past the far edge, trail 1R behind from +2R, out
+after 40 hourly candles; gold, EUR/USD, GBP/USD) on OANDA H1 2007-2019, net of the desk-rigor costs: **FAIL**, pooled -0.027R a
+trade (n 6,253, month t -1.33; +0.014R before costs); gold +0.035R (t 0.98), EUR/USD -0.067R, GBP/USD -0.048R. The trail loses
+less than a fixed 2R target (-0.067R) and skipping the late hours a little less, neither enough. The question is closed: no
+variant of this rule on 2007-2019, and never build a rule from the desks' best-looking splits without a holdout. Nothing live
+changed. Test: `tests/h4-zone-trail.test.mjs`.
+
+## The earlier scalp method: an EG is two candles, the zone is the first one (22 Nov 2026, owner on a GBP/USD sell of 20 Nov: "u marking eg wrong, next candle needs to close, remember eg is a 2 candle pattern that the second (right) engulfs the first candle (left)")
+`council/edge-desks.mjs` `msnrTrades` (kinds `msnr-main` / `msnr-other`): the chart's "M15 EG" and "M5 EG" boxes were the range of
+BOTH candles of the pair, so the box looked like the second candle; each is now the FIRST (left) candle, wick to wick. And the
+study's candidates (body engulfs) are taken only when the second candle of the 15-minute pair and of the 5-minute pair closes
+beyond the first one's high (buy) / low (sell) (`eg2`), the owner's rule of 21 Nov. Stop, target and the 45-minute arming are
+unchanged. Stored closed records keep their old marks until the MSNR history is rebuilt. Open with the owner: whether a later
+engulf that forms INSIDE an earlier EG zone still alive counts (his example: 13:45 / 14:00 yes, 14:15 / 14:30 no, though the
+14:30 candle did close below the 14:15 low), and whether the Engulfing desk's any-number-of-candles reading should go now
+that an EG is two candles. A paper reading, not an edge. Test: `tests/edge-desks.test.mjs`.
+
+## An engulf completes within four candles (22 Nov 2026, owner: "the next 3 max 4 candles we must have a eg, more than that not"; on 35 marked examples of four charts: "yes all right")
+`council/eg-methods.mjs` `EG_SPAN` 4, the default of `engulfAt`, `zones`, `triggers` and `methodTrades` (it was any number of
+candles, the owner's 21 Nov answer): the first candle is the last candle of the other colour, a candle at most four candles after
+it that closes beyond its high (buy) / low (sell) completes the EG, the zone is the first candle wick to wick. Every reader
+follows: the Engulfing plan / short method / direct entry, the MSNR gold plan and the direction's Daily EG levels, and the Mosha
+desk's EG barriers (`assets/mosha-sop.js` `egBoxes`, the page copy, same span; a test compares). The Engulfing desk's
+`-n` kinds (next candle only) stay beside them. The earlier scalp method still takes two neighbouring candles only (`eg2`), a
+subset. The owner's 14:15 / 14:30 "no" of that day was the box drawn over both candles, not the pair: with the box on the first
+candle he passed it. Stored records keep the older rule until the histories are rebuilt. Readings, not tested edges.
+Same day, owner: "the less candles the better": a zone carries `n` (candles the engulf took) and the entry zone's chart label says it ("M5 EG zone · entry · 1 candle", `egN`). Shown, not a filter.
+
+## M1 EF entry inside an entry zone (22 Nov 2026, owner: "inside the entry zone i want m1 buy eg to become ef to entry for sells, for buy i want in the entry area a sell m1 eg to fail thats my moment to entry"; on six marked examples: "example 3 use the recent one and the rest is perfect")
+`council/eg-methods.mjs` `m1Trades(B, { from, market })` (`M1E`), a fifth reading on the Engulfing desk (kind `eg-m1`, label "M15 EG
+zone · M1 EF entry", `l: '1m'`; `DESKS.eg.tfs` now reads `'1m'`, 16 days): the entry zone is an alive 15-minute engulf zone of the
+trade's side; wholly inside it, formed after it, a one-minute engulf of the OTHER side; a one-minute close through that engulf's far
+side (it failed: an EF on the trade's side) is the entry, at that close. Of several such engulfs only the MOST RECENT counts (an
+older one failing while a newer one still stands is no entry). A zone can give several entries (the owner's first example is a
+second visit); one position at a time a market. The desk's own choices, shown on the examples and not the owner's words: stop past
+the extreme made between the engulf's first candle and the failing candle by 0.01 % of price, target 2R; read on the one-minute
+candles from the candle after the entry. The M15 zone only (M5 / H4 entry zones were not asked for). A paper reading, not a tested
+rule. Test: `tests/edge-desks.test.mjs` ("M1 EF entry").

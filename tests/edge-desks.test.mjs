@@ -397,7 +397,7 @@ test('plan and simple: the 15- / 30-minute engulf zone lies inside the H4 zone, 
   let n = 0;
   for (const seed of [11, 5, 23, 31, 47]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) }, m5 = new Map(Y['5m'].map((b) => [b.time, b]));
     for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind !== 'eg-direct')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips from the entry');
-      const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), en = r.marks.find((k) => k.label === 'M5 EG zone · entry');
+      const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), en = r.marks.find((k) => k.label.startsWith('M5 EG zone · entry'));
       assert.ok(trg.bot >= h4.bot && trg.top <= h4.top, 'the trigger zone is not wholly inside the H4 zone: ' + r.id);
       assert.ok(en.bot <= Math.max(h4.top, trg.top) && en.top >= Math.min(h4.bot, trg.bot), 'the entry zone is away from the zone: ' + r.id);
       const base = m5.get(en.a); assert.deepEqual([en.top, en.bot], [base.high, base.low], 'the entry zone is its base candle, wick to wick'); assert.equal(r.entry, r.side > 0 ? base.high : base.low); } }
@@ -722,4 +722,56 @@ test('both engulfs side by side: the next-candle reading is its own kinds, every
   assert.ok(any.every((r) => /^eg-(plan|simple|direct)$/.test(r.kind)), 'the any-candle reading keeps its kinds');
   const ids = new Set(any.map((r) => r.id)); assert.ok(nx.every((r) => !ids.has(r.id)), 'no id shared between the two readings');
   assert.match(rd('council/edge-desks.mjs'), /methodTrades\(B, \{ \.\.\.o, span: 'next' \}\)/);
+});
+
+test('the earlier scalp method: an EG is two candles, the second closes beyond the first, and the zone drawn is the first candle', () => {
+  assert.equal(E.eg2({ open: 2, close: 1, high: 2.1, low: 0.9 }, { open: 1, close: 2.2, high: 2.3, low: 1 }, 1), true);
+  assert.equal(E.eg2({ open: 2, close: 1, high: 2.1, low: 0.9 }, { open: 1, close: 2.05, high: 2.3, low: 1 }, 1), false, 'a close inside the first candle\'s wick is no engulf');
+  assert.equal(E.eg2({ open: 1, close: 2, high: 2.1, low: 0.9 }, { open: 2, close: 0.8, high: 2, low: 0.7 }, -1), true);
+  assert.equal(E.eg2({ open: 1, close: 2, high: 2.1, low: 0.9 }, { open: 2, close: 0.8, high: 2, low: 0.7 }, 1), false);
+  const X = market(60, 5, 1.15, 0.0005), rows = E.msnrTrades(X, { from: 0, market: 'eurusd' }); assert.ok(rows.length >= 5, 'entries: ' + rows.length);
+  const M5 = X['5m'], at = new Map(M5.map((b, i) => [b.time, i]));
+  for (const r of rows) { const z = r.marks.find((m) => m.label === 'M5 EG'), i = at.get(z.a), p = M5[i], c = M5[i + 1];
+    assert.ok(z.top === p.high && z.bot === p.low, 'the M5 zone is the first candle, wick to wick: ' + r.id);
+    assert.ok(E.eg2(p, c, r.side), 'the second candle closes beyond the first: ' + r.id);
+    const z15 = r.marks.find((m) => m.label === 'M15 EG'); if (z15) { const k = M5.filter((b) => b.time >= z15.a && b.time < z15.a + 900); assert.ok(Math.abs(z15.top - Math.max(...k.map((b) => b.high))) < 1e-12 && Math.abs(z15.bot - Math.min(...k.map((b) => b.low))) < 1e-12, 'the M15 zone is the first 15-minute candle: ' + r.id); } }
+});
+
+test('an engulf completes within four candles of its first candle, never later (owner, 22 Nov 2026)', () => {
+  const c = (o, cl, h, l) => ({ open: o, close: cl, high: h ?? Math.max(o, cl) + 0.1, low: l ?? Math.min(o, cl) - 0.1 }), red = c(10, 9), in1 = c(9, 9.4, 9.5, 8.95), up = c(9.4, 10.5);
+  const at = (n) => { const C = [red, ...Array.from({ length: n - 1 }, () => ({ open: 9.2, close: 9.2, high: 9.5, low: 8.95 })), up].map((b, i) => ({ ...b, time: i * 900 })); return G.engulfAt(C, C.length - 1); };
+  assert.equal(G.EG_SPAN, 4);
+  for (const n of [1, 2, 3, 4]) assert.deepEqual(at(n), { dir: 1, j: 0 }, 'completed by candle ' + n + ' after');
+  assert.equal(at(5), null, 'the fifth candle after is too late');
+  assert.match(rd('assets/mosha-sop.js'), /var EG_SPAN = 4;[\s\S]*j >= i - EG_SPAN/, 'the page copy uses the same span');
+});
+
+// 22 Nov 2026, owner: "inside the entry zone i want m1 buy eg to become ef to entry for sells, for buy i want in the entry area a
+// sell m1 eg to fail"; on six marked examples: "example 3 use the recent one and the rest is perfect"
+test('M1 EF entry: inside a 15-minute zone the most recent one-minute engulf of the other side fails, the entry is that close', async () => {
+  const G = await import('../council/eg-methods.mjs');
+  // a seeded one-minute walk, grouped into 15-minute candles
+  const m1of = (n, seed, px, step) => { let s = seed >>> 0; const rnd = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; const out = []; let p = px, drift = 0;
+    for (let i = 0; i < n; i++) { if (i % 90 === 0) drift = (rnd() - 0.5) * step * 0.4; const o = p, c = o + drift + (rnd() - 0.5) * step * 2, h = Math.max(o, c) + rnd() * step, l = Math.min(o, c) - rnd() * step; out.push({ time: 1790553600 + i * 60, open: o, high: h, low: l, close: c }); p = c; } return out; };
+  const group = (C, sec) => { const out = []; for (const b of C) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } return out; };
+  let n = 0;
+  for (const seed of [3, 17, 29]) { const M1 = m1of(6000, seed, 4000, 0.5), X = { '1m': M1, '15m': group(M1, 900) }, all = G.m1Trades(X, { market: 'xau' }), Z15 = G.zones(X['15m'], '15m'), Z1 = G.zones(M1, '1m');
+    let busy = -Infinity;
+    for (const r of all) { n++; assert.equal(r.kind, 'eg-m1'); assert.equal(r.l, '1m');
+      assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'a stop on the losing side, the target on the winning side');
+      assert.ok(Math.abs(Math.abs(r.target - r.entry) - 2 * r.r0) < 1e-9 && Math.abs(Math.abs(r.entry - r.stop) - r.r0) < 1e-9, '2R, 1R = the opening risk');
+      assert.ok(r.t > busy, 'one position at a time'); busy = r.endT || Infinity;
+      const [zm, qm] = r.marks, Z = Z15.find((z) => z.dir === r.side && z.base === zm.a && z.top === zm.top), q = Z1.find((z) => z.dir === -r.side && z.base === qm.a && z.fail === r.t);
+      assert.ok(Z && q, 'the entry zone is a 15-minute engulf of the trade\'s side, the trigger a one-minute engulf of the other side that failed at the entry');
+      assert.ok(q.top <= Z.top && q.bot >= Z.bot && q.at > Z.at && r.t <= Z.end, 'the one-minute engulf is wholly inside the zone, formed after it, and fails while the zone is alive');
+      const c = M1.find((b) => b.time + 60 === r.t); assert.equal(r.entry, c.close); assert.ok(r.side > 0 ? c.close > q.top : c.close < q.bot, 'entry = the close through its far side');
+      // the most recent one: no newer one-minute engulf of that side, inside the zone, still stood at the entry
+      assert.ok(!Z1.some((b) => b.dir === -r.side && b.at > Z.at && b.top <= Z.top && b.bot >= Z.bot && b.at > q.at && b.at <= r.t && (b.fail == null || b.fail > r.t)), 'no newer engulf was still standing');
+      if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); if (r.status === 'target') assert.equal(r.R, 2); assert.ok(r.endT == null || r.endT > r.t - 60); }
+    // no look-ahead: a trade closed before a cut is the same when the candles end at the cut
+    const done = all.filter((r) => r.endT != null); if (done.length > 2) { const cut = done[Math.floor(done.length / 2)].endT + 60, M1c = M1.filter((b) => b.time + 60 <= cut), part = G.m1Trades({ '1m': M1c, '15m': group(M1c, 900) }, { market: 'xau' });
+      for (const r of done.filter((x) => x.endT + 60 <= cut)) { const p = part.find((x) => x.id === r.id); assert.ok(p, 'a closed trade exists when cut just after it: ' + r.id); assert.deepEqual([p.entry, p.stop, p.target, p.status, p.R], [r.entry, r.stop, r.target, r.status, r.R]); } } }
+  assert.ok(n > 20, 'the seeded markets give entries: ' + n);
+  assert.ok(E.DESKS.eg.tfs.includes('1m'), 'the Engulfing desk reads one-minute candles');
+  assert.ok(E.DESKS.eg.read({ '5m': [], '15m': [], '1m': [] }, { from: 0, market: 'xau' }).length === 0);
 });

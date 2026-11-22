@@ -32,7 +32,7 @@ export const pipOfMarket = (market) => PIP[market] || (SOP.ALL[market] ? Math.po
 export const stopSize = (market) => EGM.stopPips * pipOfMarket(market);
 export const EGM = { pips: 3.0, stopPips: 30, rr: 2, arm: 3 * 3600, efBack: 6 * 3600, egBack: 2 * 3600, fill: 12, hold: 86400, quiet: 2, directWait: 5 * 86400,
   life: { '4h': 120, '1h': 120, '30m': 200, '15m': 200, '5m': 150 } };
-const SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300 }, NAME = { '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5' };
+const SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300, '1m': 60 }, NAME = { '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
 // 30-minute candles from the 15-minute ones (a candle with only one half on file is left out), and the trigger zones of both:
 // the methods name the 15- or the 30-minute engulf as the trigger (21 Nov 2026, the documents checked page by page)
 const m30of = (M15) => { const out = []; for (let i = 1; i < M15.length; i++) { const a = M15[i - 1], b = M15[i]; if (a.time % 1800 === 0 && b.time === a.time + 900) out.push({ time: a.time, open: a.open, high: Math.max(a.high, b.high), low: Math.min(a.low, b.low), close: b.close }); } return out; };
@@ -40,9 +40,11 @@ const m30of = (M15) => { const out = []; for (let i = 1; i < M15.length; i++) { 
 // the gold plan only, the Engulfing plan and short method keep EG triggers): an opposite 15- or 30-minute zone that FAILED (a
 // close through it) triggers the other way, from the close that broke it, with its own box as the zone (`ef: true`)
 const efsOf = (Z, C) => Z.filter((z) => z.fail != null).map((z) => ({ ...z, dir: -z.dir, at: z.fail, c: C[z.fi], ef: true }));
-const triggers = (M15, ef = false, back = Infinity) => { const M30 = m30of(M15), Z15 = zones(M15, '15m', back), Z30 = zones(M30, '30m', back);
+const triggers = (M15, ef = false, back = EG_SPAN) => { const M30 = m30of(M15), Z15 = zones(M15, '15m', back), Z30 = zones(M30, '30m', back);
   return Z15.map((z) => ({ ...z, c: M15[z.i] })).concat(Z30.map((z) => ({ ...z, c: M30[z.i] })), ef ? efsOf(Z15, M15).concat(efsOf(Z30, M30)) : []).sort((x, y) => x.at - y.at || (x.tf === '15m' ? -1 : 1) || (x.ef ? 1 : -1)); };
 const zw = (m) => (m.ef ? ' EF (zone failed)' : ' EG zone');
+// how many candles the engulf took, for the chart label (fewer is the better engulf; shown, not a filter)
+export const egN = (z) => (z && z.n ? ` · ${z.n} candle${z.n === 1 ? '' : 's'}` : '');
 // an H4 zone of side d as the methods mark it: an engulf zone of that side still standing, or a zone of the other side that
 // FAILED (a close through it) and so turned
 // A turned zone stops counting once an H4 candle closes BACK through it (the other side from the one it failed on): by the
@@ -64,7 +66,12 @@ const lower = (C, t) => { let lo = 0, hi = C.length; while (lo < hi) { const m =
 // "an opposite candle cancels it"): a NEWER candle of the base's colour takes its place (the base is always the LAST opposite
 // candle, so an older base can no longer be completed), and (`zones`) a close through the base's other side before the
 // completing close cancels it. No candle count ends it. Returns { dir, j (the base's index) } or null.
-export function engulfAt(C, i, back = Infinity) {
+// THE ENGULF COMPLETES WITHIN FOUR CANDLES (owner, 22 Nov 2026: "the next 3 max 4 candles we must have a eg, more than that
+// not"; he checked 35 marked examples on four charts: "yes all right"). The base (first candle) is the last candle of the other
+// colour; a candle at most EG_SPAN candles after it that closes beyond its high (buy) / low (sell) completes the EG; later than
+// that there is no EG. The zone is the first candle, wick to wick. Until then any later candle could complete it.
+export const EG_SPAN = 4;
+export function engulfAt(C, i, back = EG_SPAN) {
   const c = C[i], dir = c.close > c.open ? 1 : c.close < c.open ? -1 : 0; if (!dir) return null;
   for (let j = i - 1; j >= 0 && j >= i - back; j--) { const b = C[j];
     if (dir > 0 ? b.open > b.close : b.open < b.close) return (dir > 0 ? c.close > b.high : c.close < b.low) ? { dir, j } : null; }
@@ -76,14 +83,14 @@ export function engulfAt(C, i, back = Infinity) {
 // complete it). One zone a base: the FIRST close beyond it.
 // touch = the start of the first later candle that trades into the zone; fail = the close time of the first that closes through it
 // `back`: how many candles back the base may be (1 = only the candle right before the completing one: the next-candle engulf)
-export function zones(C, tf, back = Infinity) {
+export function zones(C, tf, back = EG_SPAN) {
   const sec = SEC[tf], life = EGM.life[tf] || 120, out = [];
   for (let i = 1; i < C.length; i++) { const e = engulfAt(C, i, back); if (!e) continue; const dir = e.dir, p = C[e.j], c = C[i];
     // the candles between the base and this one: an earlier one of this colour that closed beyond the base already made the zone;
     // a close through the base's other side cancelled the base
     let gone = false; for (let q = e.j + 1; q < i && !gone; q++) { const b = C[q]; gone = dir > 0 ? (b.close > b.open && b.close > p.high) || b.close < p.low : (b.close < b.open && b.close < p.low) || b.close > p.high; }
     if (gone) continue;
-    const z = { tf, dir, top: p.high, bot: p.low, base: p.time, at: c.time + sec, touch: null, fail: null, i };
+    const z = { tf, dir, top: p.high, bot: p.low, base: p.time, at: c.time + sec, touch: null, fail: null, i, n: i - e.j };   // n: candles the engulf took (owner: "the less candles the better")
     for (let j = i + 1; j < C.length && j <= i + life; j++) { const b = C[j];
       if (z.touch == null && (dir > 0 ? b.low <= z.top : b.high >= z.bot)) z.touch = b.time;
       if (dir > 0 ? b.close < z.bot : b.close > z.top) { z.fail = b.time + sec; z.fi = j; break; } }
@@ -132,7 +139,7 @@ function dailyZone(DZ, t) { let s = null; for (const z of DZ) { if (z.at > t) br
 // next-candle reading made a fifth of the trades and about a fifteenth of the loss (100 / -10R against 523 / -148R, plan):
 // the desk shows the two apart so their forward records can be compared. Neither is a tested edge.
 export function methodTrades(B, { from = 0, market = 'xau', orders = null, span = 'any' } = {}) {
-  const back = span === 'next' ? 1 : Infinity, sfx = span === 'next' ? '-n' : '', lab = span === 'next' ? ' · next-candle EG' : '';
+  const back = span === 'next' ? 1 : EG_SPAN, sfx = span === 'next' ? '-n' : '', lab = span === 'next' ? ' · next-candle EG' : '';
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H1 = num(B['1h'] || []), H4 = num(B['4h'] || []); if (M5.length < 100 || M15.length < 50 || H4.length < 20) return [];
   const D1 = foldWeekend(num(B['1d'] || [])), dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pipOf = () => stopSize(market);   // 30 pips on gold's scale, from the trade's own price (not the newest: a stop must not change between two reads)
   const Z4 = turnBack(H4, zones(H4, '4h', back), SEC['4h']), Z1 = zones(H1, '1h', back), Z15 = zones(M15, '15m', back), Z5 = zones(M5, '5m', back), DZ = zones(D1, '1d', back), pre = market === 'xau' ? '' : market + ':', out = [];
@@ -190,7 +197,7 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null, span 
       { t: T, text: (plan ? `The Daily's last engulf is a ${word(d)}. ` : `The Daily's last engulf is ${ds ? 'a ' + word(ds) : 'not on file'}, so this is the short method without the Daily. `) + `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and ` + (m.ef ? `a ${tn} ${word(-d)} engulf zone failed (a close through it).` : `a ${tn} engulf ${word(d)} closed.`) },
       { t: K, text: `On M5 the ${word(-d)} engulf zone ${f(F.bot)} to ${f(F.top)} failed (a close through it). The M5 ${word(d)} engulf zone behind it is ${f(E.bot)} to ${f(E.top)}: a ${word(d)} limit rests at ${f(entry)} for an hour.` }],
     (plan && dz ? [{ kind: 'zone', top: dz.top, bot: dz.bot, a: dz.base, at: dz.at, label: 'Daily EG zone' }] : []).concat([{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: tn + zw(m) },
-      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 EG zone · entry' }])); } }); }
+      { kind: 'zone', top: F.top, bot: F.bot, a: F.base, at: F.fail, label: 'M5 EF (zone failed)' }, { kind: 'zone', top: E.top, bot: E.bot, a: E.base, at: E.at, label: 'M5 EG zone · entry' + egN(E) }])); } }); }
   sets.sort((a, b) => a.K - b.K);   // a stable sort: setups known at the same close keep the triggers' order
   for (const x of sets) { if (used.has(x.key)) continue; used.add(x.key); x.go(); }
 
@@ -209,6 +216,46 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null, span 
     [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'Fresh H4 EG zone' }, { kind: 'zone', top: h1.top, bot: h1.bot, a: h1.base, at: h1.at, label: 'Fresh H1 EG zone' }, { kind: 'zone', top: m15.top, bot: m15.bot, a: m15.base, at: m15.at, label: 'Fresh M15 EG · entry' }], true); }
 
   // one position at a time a market over the three methods; only entries inside the window are kept
+  out.sort((a, b) => a.t - b.t); const keep = []; let busy = -Infinity;
+  for (const r of out) { if (r.t <= busy) continue; busy = r.endT || Infinity; if (r.t >= from) keep.push(r); }
+  return keep;
+}
+
+// ─── the M1 EF entry inside an entry zone (22 Nov 2026, owner: "inside the entry zone i want m1 buy eg to become ef to entry for
+// sells, for buy i want in the entry area a sell m1 eg to fail thats my moment to entry"; six marked examples passed, with one
+// correction: "use the recent one") ───
+// Entry zone: a 15-minute engulf zone of the trade's side, alive. Inside it (wholly, and formed after the zone is known) a
+// one-minute engulf of the OTHER side; when a one-minute candle closes through that engulf's far side it has failed (an EF on
+// the trade's side): enter at that close. Of several such one-minute engulfs the MOST RECENT one is the one that counts: an older
+// one failing while a newer one still stands is no entry. A zone can give more than one entry (the owner's first example is a second visit); one position at a time a market.
+// The desk's own choices, shown on the six examples and not the owner's words: the stop sits past the extreme made between the
+// one-minute engulf's first candle and the failing candle, by 0.01 % of price; the target is 2R; results are read on the
+// one-minute candles from the candle after the entry (stop first when one candle holds both, a gap books at the open).
+export const M1E = { rr: 2, pad: 0.0001 };
+export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
+  const M1 = num(B['1m'] || []), M15 = num(B['15m'] || []); if (M1.length < 100 || M15.length < 50) return [];
+  const dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pre = market === 'xau' ? '' : market + ':', t0 = M1[0].time, out = [];
+  const Z1 = zones(M1, '1m'), sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
+  for (const Z of zones(M15, '15m')) { const d = Z.dir; if (Z.at < t0) continue;
+    const In = Z1.filter((q) => q.dir === -d && q.at > Z.at && q.at <= Z.end && q.top <= Z.top && q.bot >= Z.bot);
+    for (const q of In.filter((a) => a.fail != null && a.fail <= Z.end && !In.some((b) => b.at > a.at && b.at <= a.fail && (b.fail == null || b.fail > a.fail)))) {
+    const fi = q.fi, bi = lower(M1, q.base), c = M1[fi], entry = c.close; let ext = d > 0 ? Infinity : -Infinity;
+    for (let k = bi; k <= fi; k++) ext = d > 0 ? Math.min(ext, M1[k].low) : Math.max(ext, M1[k].high);
+    const stop = ext - d * entry * M1E.pad, r0 = Math.abs(entry - stop), target = entry + d * M1E.rr * r0; if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
+    const o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 };
+    for (let k = fi + 1; k < M1.length; k++) { const b = M1[k];
+      if (d > 0 ? b.low <= stop : b.high >= stop) { const px = (d > 0 ? b.open < stop : b.open > stop) ? b.open : stop; o.status = 'stopped'; o.exit = px; o.R = d * (px - entry) / r0; o.endT = b.time; break; }
+      if (d > 0 ? b.high >= target : b.low <= target) { o.status = 'target'; o.exit = target; o.R = M1E.rr; o.endT = b.time; break; }
+      o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - entry) / r0); }
+    if (o.status === 'open') o.float = d * (M1[M1.length - 1].close - entry) / r0;
+    const tr = { id: `${pre}eg-m1-${d > 0 ? 'b' : 's'}-${q.fail}`, market, kind: 'eg-m1', label: 'M15 EG zone · M1 EF entry', h: '15m', l: '1m', side: d, t: q.fail, entry, stop, target, r0, status: o.status, R: o.R, endT: o.endT, exit: o.exit, mfe: o.mfe, float: o.float };
+    tr.log = [{ t: Z.at, text: `A 15-minute ${word(d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} is the entry zone.` },
+      { t: q.at, text: `Inside it a one-minute ${word(-d)} engulf formed (${f(q.bot)} to ${f(q.top)}), the most recent one before the entry.` },
+      { t: q.fail, text: `A one-minute candle closed through it: it failed (EF). ${d > 0 ? 'Buy' : 'Sell'} at that close ${f(entry)}, stop ${f(stop)} past the extreme made since the engulf, target ${f(target)} (2R; the stop and target are the desk's own choice).` }];
+    if (o.status !== 'open') tr.log.push({ t: o.endT, text: `${o.status === 'target' ? 'Target reached' : 'Stopped'}: ${sg(o.R)}.` });
+    tr.marks = [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'M15 EG zone · entry zone' + egN(Z) }, { kind: 'zone', top: q.top, bot: q.bot, a: q.base, at: q.fail, label: `M1 ${word(-d)} EG that failed (EF)` }];
+    out.push(tr); } }
+  // one order found in two overlapping 15-minute zones is one trade; one position at a time a market
   out.sort((a, b) => a.t - b.t); const keep = []; let busy = -Infinity;
   for (const r of out) { if (r.t <= busy) continue; busy = r.endT || Infinity; if (r.t >= from) keep.push(r); }
   return keep;
@@ -345,7 +392,7 @@ export function snrTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
     tr.marks = [{ kind: 'level', p: S.key.p, a: S.key.t, at: S.day + 86400, label: `Daily ${S.key.kind} level`, under: d > 0 }, { kind: 'level', p: S.level, a: S.levelT, at: S.t, label: `H4 ${d > 0 ? 'A' : 'V'} level · BO ${word(d)}`, under: d < 0 },
       { kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }]
       .concat(qm ? [{ kind: 'level', p: m.mid, a: m.midT, at: m.at, label: `${NAME[m.tf]} QM · BO ${word(d)}`, under: d < 0 }, { kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: NAME[m.tf] + ' QM zone · entry' }]
-        : [{ kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: NAME[m.tf] + (m.ef ? ' EF zone · entry' : ' EG zone · entry') }]);
+        : [{ kind: 'zone', top: m.top, bot: m.bot, a: m.base, at: m.at, label: NAME[m.tf] + (m.ef ? ' EF zone · entry' : ' EG zone · entry' + egN(m)) }]);
     out.push(tr); }
   return out;
 }
