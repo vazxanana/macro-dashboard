@@ -5494,7 +5494,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-20T20:52:53.000Z",
     "councilEntry": 3524.1,
     "stop": 3499.5,
@@ -5508,10 +5508,12 @@
     "slipR": 0.157,
     "lagSec": 62,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-20T20:52:53.000Z",
-    "brokerStop": 3503.35
+    "brokerStop": 3503.35,
+    "closedAt": "2026-11-22T23:02:55.000Z"
    }
   },
   "day": {
@@ -5519,7 +5521,7 @@
    "startBalance": 12653.89
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12653.89 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 12703.04 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5527,15 +5529,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12653.89,
-  "lastRun": "2026-11-22T23:00:51.000Z"
+  "balance": 12703.04,
+  "lastRun": "2026-11-22T23:02:55.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T09:51:07.000Z",
-   "msg": "opened buy GBPUSD 0.02 lot (council replica)",
-   "trade": "gbpusd-replica-1794390602-b"
-  },
   {
    "at": "2026-11-11T10:02:02.000Z",
    "msg": "opened buy BTCUSD 0.01 lot (council replica)",
@@ -7024,6 +7021,11 @@
   {
    "at": "2026-11-21T09:03:07.000Z",
    "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
+  },
+  {
+   "at": "2026-11-22T23:02:55.000Z",
+   "msg": "XAUUSD position 50650513 closed at the broker",
+   "trade": "xau-replica-1795207911-b"
   }
  ],
  "limits": {
