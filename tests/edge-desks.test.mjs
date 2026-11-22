@@ -723,3 +723,16 @@ test('both engulfs side by side: the next-candle reading is its own kinds, every
   const ids = new Set(any.map((r) => r.id)); assert.ok(nx.every((r) => !ids.has(r.id)), 'no id shared between the two readings');
   assert.match(rd('council/edge-desks.mjs'), /methodTrades\(B, \{ \.\.\.o, span: 'next' \}\)/);
 });
+
+test('the earlier scalp method: an EG is two candles, the second closes beyond the first, and the zone drawn is the first candle', () => {
+  assert.equal(E.eg2({ open: 2, close: 1, high: 2.1, low: 0.9 }, { open: 1, close: 2.2, high: 2.3, low: 1 }, 1), true);
+  assert.equal(E.eg2({ open: 2, close: 1, high: 2.1, low: 0.9 }, { open: 1, close: 2.05, high: 2.3, low: 1 }, 1), false, 'a close inside the first candle\'s wick is no engulf');
+  assert.equal(E.eg2({ open: 1, close: 2, high: 2.1, low: 0.9 }, { open: 2, close: 0.8, high: 2, low: 0.7 }, -1), true);
+  assert.equal(E.eg2({ open: 1, close: 2, high: 2.1, low: 0.9 }, { open: 2, close: 0.8, high: 2, low: 0.7 }, 1), false);
+  const X = market(60, 5, 1.15, 0.0005), rows = E.msnrTrades(X, { from: 0, market: 'eurusd' }); assert.ok(rows.length >= 5, 'entries: ' + rows.length);
+  const M5 = X['5m'], at = new Map(M5.map((b, i) => [b.time, i]));
+  for (const r of rows) { const z = r.marks.find((m) => m.label === 'M5 EG'), i = at.get(z.a), p = M5[i], c = M5[i + 1];
+    assert.ok(z.top === p.high && z.bot === p.low, 'the M5 zone is the first candle, wick to wick: ' + r.id);
+    assert.ok(E.eg2(p, c, r.side), 'the second candle closes beyond the first: ' + r.id);
+    const z15 = r.marks.find((m) => m.label === 'M15 EG'); if (z15) { const k = M5.filter((b) => b.time >= z15.a && b.time < z15.a + 900); assert.ok(Math.abs(z15.top - Math.max(...k.map((b) => b.high))) < 1e-12 && Math.abs(z15.bot - Math.min(...k.map((b) => b.low))) < 1e-12, 'the M15 zone is the first 15-minute candle: ' + r.id); } }
+});

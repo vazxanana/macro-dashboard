@@ -6157,3 +6157,14 @@ Old and new code were run on the same candles (three markets, 2026) with one cha
   kinds are unchanged. The MSNR gold plan keeps the any-candle engulf only.
 - Open with the owner: a 2007-2019 holdout before anything is called better. Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`
   ("an engulf (EG) zone is a barrier too"), `tests/mosha-replay.test.mjs`.
+
+## The earlier scalp method: an EG is two candles, the zone is the first one (22 Nov 2026, owner on a GBP/USD sell of 20 Nov: "u marking eg wrong, next candle needs to close, remember eg is a 2 candle pattern that the second (right) engulfs the first candle (left)")
+`council/edge-desks.mjs` `msnrTrades` (kinds `msnr-main` / `msnr-other`): the chart's "M15 EG" and "M5 EG" boxes were the range of
+BOTH candles of the pair, so the box looked like the second candle; each is now the FIRST (left) candle, wick to wick. And the
+study's candidates (body engulfs) are taken only when the second candle of the 15-minute pair and of the 5-minute pair closes
+beyond the first one's high (buy) / low (sell) (`eg2`), the owner's rule of 21 Nov. Stop, target and the 45-minute arming are
+unchanged. Stored closed records keep their old marks until the MSNR history is rebuilt. Open with the owner: whether a later
+engulf that forms INSIDE an earlier EG zone still alive counts (his example: 13:45 / 14:00 yes, 14:15 / 14:30 no, though the
+14:30 candle did close below the 14:15 low), and whether the Engulfing desk's any-number-of-candles reading should go now
+that an EG is two candles. A paper reading, not an edge. Test: `tests/edge-desks.test.mjs`.
+

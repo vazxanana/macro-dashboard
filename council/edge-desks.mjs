@@ -255,6 +255,8 @@ function msnrSim(M5, c, r0, rr) { const s = c.side, target = c.entry + s * rr * 
     if (s > 0 ? b.low <= c.stop : b.high >= c.stop) return { closed: b.time, exitPx: c.stop, exit: 'stop' };
     if (s > 0 ? b.high >= target : b.low <= target) return { closed: b.time, exitPx: target, exit: 'target' }; }
   return null; }
+// a two-candle engulf: p is the first (left) candle, c the second; c is of the other colour and closes beyond p's high / low
+export const eg2 = (p, c, d) => !!p && !!c && (d > 0 ? p.close < p.open && c.close > c.open && c.close > p.high : p.close > p.open && c.close < c.open && c.close < p.low);
 export function msnrTrades(B, { from, market = 'xau', against = false } = {}) {   // against: research only, the entries opposite to the direction
   const raw = B['5m'] || [], H1 = B['1h'] || []; if (raw.length < 50 || H1.length < 200) return [];
   const M5 = raw.map((b) => ({ time: b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close })), f = fx(market), lastT = M5[M5.length - 1].time;
@@ -273,6 +275,12 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
     // the stop and the result are worked out here at full precision: the study's own code rounds prices to 3 decimals (it was
     // written for gold), which on a 5-decimal market put every stop on a 0.001 grid and booked "target" trades at odd R
     const d = c.side, a = M5[c.i - 1], b0 = M5[c.i - 2], pad = keep.PAD * qOf(c.entry), stop = d > 0 ? Math.min(a.low, b0.low) - pad : Math.max(a.high, b0.high) + pad, r0 = d * (c.entry - stop); if (!(r0 >= keep.MIN_R0 * qOf(c.entry))) continue; c.stop = stop;
+    // AN EG IS TWO CANDLES (owner, 22 Nov 2026: "eg is a 2 candle pattern that the second (right) engulfs the first candle (left)",
+    // "next candle needs to close"): the second candle is of the other colour and CLOSES beyond the first one's high (buy) / low
+    // (sell). The study's candidates are body engulfs; one whose 15-minute pair or 5-minute pair does not close beyond the first
+    // candle is not taken. The zone drawn is the FIRST candle, wick to wick (it was the range of both candles).
+    const j15 = lower15(c.setup - MS.P.M15), e15 = j15 > 0 && M15g[j15].time === c.setup - MS.P.M15 ? [M15g[j15 - 1], M15g[j15]] : null;
+    if (!eg2(b0, a, d) || (e15 && !eg2(e15[0], e15[1], d))) continue;
     const o = msnrSim(M5, c, r0, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
     let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);
@@ -284,18 +292,17 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
         { t: ev.tapT, text: `Price tapped it while H4 was still breaking ${d > 0 ? 'down' : 'up'}. The last H4 ${d > 0 ? 'A' : 'V'} level before the tap, ${f(ev.level)}, is the external one.` },
         { t: ev.t + MS.P.H4, text: `An H4 candle closed ${d > 0 ? 'above' : 'below'} ${f(ev.level)}: an external BO ${word(d)} after a tapped Daily level. Direction ${word(d)}.` }]
         : [{ t: H4[h].time + MS.P.H4, text: `Direction ${word(d)} on H4 with the Daily key levels (as known at the close of the last H4 candle).` }]),
-      { t: c.setup, text: `A 15-minute body engulf ${word(d)} closed: the entry is armed for 45 minutes.` },
-      { t: c.trig + MS.P.M5, text: `A 5-minute body engulf ${word(d)} closed inside that time. ${d > 0 ? 'Buy' : 'Sell'} at the next 5-minute open ${f(c.entry)}, stop ${f(c.stop)} (risk ${f(r0)}), target ${f(target)} (${MSNR.rr}R), out after 12 hours.` },
+      { t: c.setup, text: `A 15-minute engulf ${word(d)} closed (the second candle closed ${d > 0 ? 'above the high' : 'below the low'} of the first): the entry is armed for 45 minutes.` },
+      { t: c.trig + MS.P.M5, text: `A 5-minute engulf ${word(d)} closed inside that time. ${d > 0 ? 'Buy' : 'Sell'} at the next 5-minute open ${f(c.entry)}, stop ${f(c.stop)} (risk ${f(r0)}), target ${f(target)} (${MSNR.rr}R), out after 12 hours.` },
       !o ? { t: null, text: 'Still open on the last candle read' + (fl != null ? ` (${fl >= 0 ? '+' : '−'}${Math.abs(fl).toFixed(2)}R now).` : '.') }
         : status === 'target' ? { t: o.closed, text: `Target reached: +${MSNR.rr.toFixed(2)}R.` }
           : status === 'time' ? { t: o.closed, text: `Time limit: closed at ${f(o.exitPx)}, ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }
             : { t: o.closed, text: `Stopped: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R` + (mfe >= 1 ? ` after running +${mfe.toFixed(1)}R first.` : '.') }];
-    const i0 = c.i - 1, hi = Math.max(M5[i0].high, M5[i0 - 1].high), lo = Math.min(M5[i0].low, M5[i0 - 1].low);
-    const j15 = lower15(c.setup - MS.P.M15), e15 = j15 > 0 ? [M15g[j15 - 1], M15g[j15]] : null;
+    const i0 = c.i - 1;
     tr.marks = (ev ? [{ kind: 'zone', top: ev.top, bot: ev.bottom, a: ev.zoneT, at: ev.zoneAt, label: 'Daily ' + ({ v: 'V level', a: 'A level', eg: 'EG zone', ef: 'EF zone', dom: 'DOM zone', oc: 'OC level' })[ev.kind] },
       { kind: 'level', p: ev.level, a: ev.levelT, at: ev.t + MS.P.H4, label: `H4 ${d > 0 ? 'A' : 'V'} level · BO ${word(d)}`, under: d < 0 }] : [])
-      .concat(e15 && e15[1].time === c.setup - MS.P.M15 ? [{ kind: 'zone', top: Math.max(e15[0].high, e15[1].high), bot: Math.min(e15[0].low, e15[1].low), a: e15[0].time, at: c.setup, label: 'M15 EG' }] : [],
-        [{ kind: 'zone', top: hi, bot: lo, a: M5[i0 - 1].time, at: c.trig + MS.P.M5, label: 'M5 EG' }]);
+      .concat(e15 ? [{ kind: 'zone', top: e15[0].high, bot: e15[0].low, a: e15[0].time, at: c.setup, label: 'M15 EG' }] : [],
+        [{ kind: 'zone', top: M5[i0 - 1].high, bot: M5[i0 - 1].low, a: M5[i0 - 1].time, at: c.trig + MS.P.M5, label: 'M5 EG' }]);
     out.push(tr); }
   return out;
 }
