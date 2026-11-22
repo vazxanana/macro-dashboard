@@ -987,7 +987,17 @@
     l.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. ' + (S.file ? 'The tracker reads gold, EUR/USD and GBP/USD about every 35 minutes' + (S.file.at ? ' (last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) + ')' : '') + '; a new entry shows here until its stop or target.' : 'A new entry shows here until its stop or target.') + '</li>';
     openMore(box, open.length);
   }
-  API.openCard = openCard; API.openMore = openMore; API.OPEN_PHONE = OPEN_PHONE;
+  // the trade history as one dropdown (22 Nov 2026, owner: "and the trades history"): closed by default; its open state is kept
+  // in memory on the desk's state (S.hist) so a redraw (a filter, a new reading) leaves it as the person left it. Display only.
+  function histOpen(st, n) {
+    return '<details class="mo-hist" data-hist' + (st && st.hist ? ' open' : '') + '><summary>Trade history <small>' + n + (n === 1 ? ' trade' : ' trades') + ', newest first</small></summary>';
+  }
+  if (typeof document !== 'undefined') document.addEventListener('toggle', function (e) {
+    var d = e.target; if (!d || !d.matches || !d.matches('details[data-hist]')) return;
+    var v = d.closest('[id^="v-"]'); if (!v) return;
+    if (v.id === 'v-mosha') S.hist = d.open; else if (root.MS_EDGE_DESKS && root.MS_EDGE_DESKS.hist) root.MS_EDGE_DESKS.hist(v.id.slice(2), d.open);
+  }, true);
+  API.openCard = openCard; API.openMore = openMore; API.OPEN_PHONE = OPEN_PHONE; API.histOpen = histOpen;
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
     if (S.state !== 'done') openPanel([]);
@@ -1010,9 +1020,9 @@
       (mks.length > 1 ? '<div class="mo-sop-a mo-sop-f">' + ['all'].concat(mks).map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-mk="' + k + '" aria-pressed="' + ((S.mk === k) || (k === 'all' && mks.indexOf(S.mk) < 0)) + '">' + (k === 'all' ? 'All markets' : esc(MARKETS[k].name)) + ' (' + (k === 'all' ? bySrc.length : bySrc.filter(function (r) { return mkR(r) === k; }).length) + ')</button>'; }).join('') + '</div>' : '') +
       '<p class="ms-note mo-sop-st">' + (S.file ? 'Recorded by the tracker in the council loop, about every 35 minutes' + (S.file.at ? ' · last run ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') + (S.file.since ? ' · trades since ' + utc(S.file.since).slice(0, 10) : '') + '. Live = the tracker recorded it within an hour of its entry; Replay = worked out afterwards from the same closed candles.' : 'The tracker has no stored trades yet, so these were worked out in this browser from the last two weeks of candles.') + '</p>' +
       tiles + openHTML +
-      '<h3 class="mo-sop-h">Trades</h3>' +
+      histOpen(S, list.length) +
       (shown.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="Replayed trades of the Mosha reading"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result and log</th></tr></thead><tbody>' + shown.map(rowHTML).join('') + '</tbody></table></div>' +
-        (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') +
+        (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') + '</details>' +
       cal +
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF: entry on the EG', sop.filter(function (r) { return !isC2(r) && !isNest(r) && !isLim(r); })) + line('BO, VR, CF: limit at the CF line', sop.filter(isLim), 'The owner\'s reading of 22 Nov 2026: a plain limit at the level the CF\'s break took, stop past the CF zone, recorded beside the EG entry so the two can be compared.') + line('BO, VR, CF with the CF inside the VR', sop.filter(isC2), 'The method calls this CF likely to fail and waits; it is recorded apart so the record can show the case.') +
       line('SOP inside the VR (against the BO)', sop.filter(function (r) { return isNest(r) === 'vr'; }), 'The owner\'s reading of 22 Nov 2026: the VR\'s break is read as a BO one timeframe lower and a whole BO, VR, CF is traded there, against the first BO, until the CF forms.') +

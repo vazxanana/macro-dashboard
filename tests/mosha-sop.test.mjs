@@ -797,10 +797,22 @@ test('Open now on a phone: one line a trade, the first three, then a button for 
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
   const sop = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8'), dt = fs.readFileSync(new URL('../assets/desk-trades.js', import.meta.url), 'utf8');
   assert.match(html, /#v-mosha \.mo-open-c:not\(\[data-all\]\) \.mo-open li:not\(\.empty\):nth-child\(n\+4\) \{ display: none; \}/);
-  assert.match(html, /#v-mosha \.mo-open-more \{ display: none; \}\n@media \(max-width: 640px\)/);
+  // since the owner's "use dropdown" (22 Nov 2026) the first three and the button are at every width, not only on a phone
+  const blk = html.slice(html.indexOf('/* Open now (22 Nov 2026'), html.indexOf('@media (max-width: 640px) {', html.indexOf('/* Open now (22 Nov 2026')));
+  assert.match(blk, /nth-child\(n\+4\) \{ display: none; \}/); assert.match(blk, /\.mo-open-more \{ display: block;/);
   assert.match(sop, /openMore\(box, open\.length\)/);
   assert.match(dt, /SOP\.openMore\(ob, open\.length\)/);
   assert.match(sop, /var OPEN_PHONE = 3;/);
+});
+
+test('the trade history is one dropdown, closed by default and kept open across redraws (22 Nov 2026)', () => {
+  const sop = fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8'), dt = fs.readFileSync(new URL('../assets/desk-trades.js', import.meta.url), 'utf8');
+  // the page part of the file is not loaded in Node, so the function is lifted from its text and run
+  const f = new Function('return ' + sop.slice(sop.indexOf('function histOpen('), sop.indexOf('  if (typeof document', sop.indexOf('function histOpen('))))();
+  assert.equal(f({}, 3), '<details class="mo-hist" data-hist><summary>Trade history <small>3 trades, newest first</small></summary>');
+  assert.match(f({ hist: true }, 1), /data-hist open><summary>Trade history <small>1 trade,/);
+  for (const src of [sop, dt]) { assert.match(src, /histOpen\(S, list\.length\)/); assert.match(src, /No trade to show\.<\/div>'\) \+ '<\/details>'/); }
+  assert.match(dt, /hist: function \(k, v\) \{ if \(DESKS\[k\]\) st\(k\)\.hist = !!v; \}/);
 });
 
 test('a desk trade\'s chart window shows its chart in the phone\'s simple view (22 Nov 2026)', () => {
