@@ -6151,6 +6151,9 @@ Old and new code were run on the same candles (three markets, 2026) with one cha
   M15 / M30 / H1 from the window's candles; M1, H4 and D1 are their own candles read when first chosen: a day and a half around the
   entry, 40 days, 200 days; `pickTf`, `ownBars`); "Bigger chart" (`[data-rpd="big"]`, `.mo-rp-dlg.big`) fills the screen and the
   chart's lower edge drags (`resize: vertical`). Before still ends at the last candle closed at the entry on every timeframe.
-- Open with the owner: keep the any-number-of-candles engulf on gold or go back to the next candle only (the one change that
-  mattered); a 2007-2019 holdout before anything is called better. Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`
+- **Both engulfs, side by side** (owner, 22 Nov 2026: "Keep both"): `methodTrades(B, { span: 'next' })` reads the plan and the short
+  method with the next-candle engulf on every timeframe (`zones(C, tf, 1)`): kinds `eg-plan-n` / `eg-simple-n`, label "… · next-candle
+  EG", their own one-position rule, no direct entry; the Engulfing desk records both readings (`DESKS.eg.read`). The any-candle
+  kinds are unchanged. The MSNR gold plan keeps the any-candle engulf only.
+- Open with the owner: a 2007-2019 holdout before anything is called better. Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`
   ("an engulf (EG) zone is a barrier too"), `tests/mosha-replay.test.mjs`.

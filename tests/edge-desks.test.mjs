@@ -711,3 +711,15 @@ test('review: the engulf rule: an H4 and an H1 reading that are the same order a
     const one = new Set(), exp = perTf(Y, { from: 0, market: 'xau' }).filter((x) => { const k = [x.side, x.t, x.entry, x.stop, x.target].join('|'); if (one.has(k)) return false; one.add(k); return true; }).sort((p, q) => p.t - q.t);
     assert.deepEqual(r.map((x) => JSON.stringify(x)).sort(), exp.map((x) => JSON.stringify(x)).sort()); assert.deepEqual(sameOrder(r), []); }
 });
+
+test('both engulfs side by side: the next-candle reading is its own kinds, every zone it uses is a next-candle engulf, no direct entry, the any-candle reading unchanged', () => {
+  const C = B15['15m'], zn = G.zones(C, '15m', 1), za = G.zones(C, '15m'), idx = new Map(C.map((b, i) => [b.time, i]));
+  assert.ok(zn.length > 20 && zn.length < za.length, 'fewer zones with the next-candle engulf: ' + zn.length + ' of ' + za.length);
+  for (const z of zn) assert.equal(z.i - idx.get(z.base), 1, 'the base is the candle right before the completing one');
+  const any = G.methodTrades(B15, { from: 0, market: 'xau' }), nx = G.methodTrades(B15, { from: 0, market: 'xau', span: 'next' });
+  assert.ok(nx.length >= 1, 'next-candle trades on these candles: ' + nx.length);
+  for (const r of nx) { assert.match(r.kind, /^eg-(plan|simple)-n$/); assert.match(r.id, /^eg-(plan|simple)-n-[bs]-/); assert.match(r.label, / · next-candle EG$/); assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1: ' + r.id); assert.ok(Math.abs(r.r0 - 3) < 1e-9, '30 pips on gold'); }
+  assert.ok(any.every((r) => /^eg-(plan|simple|direct)$/.test(r.kind)), 'the any-candle reading keeps its kinds');
+  const ids = new Set(any.map((r) => r.id)); assert.ok(nx.every((r) => !ids.has(r.id)), 'no id shared between the two readings');
+  assert.match(rd('council/edge-desks.mjs'), /methodTrades\(B, \{ \.\.\.o, span: 'next' \}\)/);
+});
