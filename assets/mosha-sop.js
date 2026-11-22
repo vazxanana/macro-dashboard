@@ -591,11 +591,21 @@
       list = '<ul class="mo-cal-day">' + day.map(function (r) { return '<li ' + chartAttr + '="' + e(r.id) + '" title="Open this trade on the chart"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><span>' + e(nameOf ? nameOf(r) : '') + '</span><b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + r2(r.R) + '</b><small>ended ' + utc(r.endT) + '</small><button type="button" class="mo-sop-b" ' + chartAttr + '="' + e(r.id) + '">Chart</button></li>'; }).join('') + '</ul>'; }
     return '<h3 class="mo-sop-h mo-cal-k">P&amp;L calendar <small>closed R by the UTC day each trade ended · open trades not added in · before costs</small>' + nav + '</h3><div class="mo-cal">' + grid + '</div>' + list;
   }
+  // The OLDER barrier reading, kept as a reading of its own beside the current one (owner, 22 Nov 2026: "add the old barrier as
+  // different separate"): the barrier as the desk read it before the 21 Nov re-read of the documents: the one-candle zone at a
+  // BO / iBO origin (no EG barriers), a QM = any newer small pivot, the Janda limit at the level its BO broke, the first
+  // confirmation table only, no repeat of the SOP, no CF / VR barriers, and the 3R target. Ids "bar-old-…", label "· older
+  // reading", flag `old`; never compared with a current record (its own uniq, its own reading in the 20-minute rule).
+  var OLD_BARRIER = { box: 'candle', qm: 'internal', janda: 'level', table2: false, rsop: false, rr: 3 };
+  function oldBarrierTrades(B, F, o) {
+    o = o || {}; var q = { from: o.from, market: o.market, until: o.until }, k; for (k in OLD_BARRIER) q[k] = OLD_BARRIER[k];
+    return uniq(barrierTrades(B, F, q)).map(function (r) { r.id = String(r.id).replace('bar-', 'bar-old-'); r.old = true; r.label = (r.label || '') + ' · older reading'; return r; });
+  }
   // which of the owner's readings of 21 Nov 2026 a barrier record is, from its flags or, for a stored record, from its id
   function readings(r) {
-    var id = String(r.id || ''), v = /-v(\d+)-/.exec(id);
+    var id0 = String(r.id || ''), old = !!r.old || /(^|:)bar-old-/.test(id0), id = id0.replace('bar-old-', 'bar-'), v = /-v(\d+)-/.exec(id);
     var c = /-c(30|15)-/.exec(id);
-    return { sweep: !!r.sweep || /bar-(j-|sop-)?sw-/.test(id), eg: !!r.eg || /bar-(j-|sop-)?eg-/.test(id), m5: !!r.m5 || /-m5-/.test(id), atZone: !!r.atZone || /-z-[bs]?\d+$/.test(id), visit: r.visit > 1 ? r.visit : v ? +v[1] : 1,
+    return { old: old, sweep: !!r.sweep || /bar-(j-|sop-)?sw-/.test(id), eg: !!r.eg || /bar-(j-|sop-)?eg-/.test(id), m5: !!r.m5 || /-m5-/.test(id), atZone: !!r.atZone || /-z-[bs]?\d+$/.test(id), visit: r.visit > 1 ? r.visit : v ? +v[1] : 1,
       alt: r.alt || (c ? c[1] + 'm' : null), rsop: !!r.rsop || /bar-sop-/.test(id), m30: r.h === '30m' || /bar-(j-|sop-)?((cf|vr|sw|eg)-)?30m-/.test(id) };
   }
   // a stored record's log and chart marks live in one file per UTC day of its entry (council/desk-store.mjs, 21 Nov 2026):
@@ -609,7 +619,7 @@
     return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
       function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
   }
-  var API = { egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  var API = { egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -648,7 +658,7 @@
     p.then(function () { return new Promise(function (ok) { setTimeout(ok, 30); }); }).then(function () {
       if (!B['5m'].length) throw new Error('no candles');
       var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400, cfz = [], a = sopTrades(B, F, { from: from, cfOut: cfz });
-      return new Promise(function (ok) { setTimeout(function () { ok(uniq(a.concat(barrierTrades(B, F, { from: from, extra: cfz })))); }, 30); });
+      return new Promise(function (ok) { setTimeout(function () { ok(uniq(a.concat(barrierTrades(B, F, { from: from, extra: cfz }))).concat(oldBarrierTrades(B, F, { from: from }))); }, 30); });
     }).then(function (rows) { S.rows = rows.sort(function (a, b) { return b.t - a.t; }); S.state = 'done'; S.at = Date.now(); }, function (e) { S.state = 'failed'; S.err = String(e && e.message || e); }).then(draw);
   }
   function line(name, rows, extra) {
@@ -663,7 +673,7 @@
     if (r.kind === 'sop') return NAME[r.h] + (r.ibo || / iBO /.test(lb) ? ' iBO → ' : ' BO → ') + NAME[r.l] + ' VR, CF' + (isC2(r) || r['case'] === 2 ? ' · CF inside the VR' : '');
     if (r.nested || (/bar-sop-cf-/.test(String(r.id)) && r.l === DOWN[r.h])) return NAME[r.h] + ' CF → ' + NAME[r.l] + ' VR, CF inside it (repeat SOP)' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
     return NAME[r.h] + (/CF barrier/.test(lb) ? ' CF barrier → ' : /VR barrier/.test(lb) ? ' VR barrier → ' : g.sweep ? ' sweep barrier → ' : ' barrier → ') + NAME[r.l] + (g.rsop ? ' QM, repeat SOP' : r.janda || / · Janda/.test(lb) ? ' QM, Janda' : ' QM') +
-      (g.m5 ? ' · M5 confirm' : '') + (g.alt ? ' · ' + NAME[g.alt] + ' confirm' : '') + (g.visit > 1 ? (g.visit === 2 ? ' · second visit' : ' · visit ' + g.visit) : '') + (g.atZone ? ' · at the zone' : '') + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
+      (g.m5 ? ' · M5 confirm' : '') + (g.alt ? ' · ' + NAME[g.alt] + ' confirm' : '') + (g.visit > 1 ? (g.visit === 2 ? ' · second visit' : ' · visit ' + g.visit) : '') + (g.atZone ? ' · at the zone' : '') + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction') + (g.old ? ' · older reading' : '');
   }
   var isC2 = function (r) { return !!r.case2 || /(^|:)sop-c2-/.test(String(r.id || '')); };
   function rowHTML(r) {
@@ -706,8 +716,8 @@
     var head = '<div class="ms-k"><span>Mosha trades</span><small>the method as the course documents write it, on gold, EUR/USD and GBP/USD · recorded by the desk\'s tracker like the ICT desk · paper only · each trade with its log</small></div>';
     if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading the trades…' : 'The trades load when the desk opens.') + '</div>'; return; }
     if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The tracker has no stored trades yet and the candles could not be read, so there is nothing to show. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
-    var every = S.rows || [], nLive = every.filter(function (r) { return r.src === 'live'; }).length, bySrc = S.file && S.src !== 'both' ? every.filter(function (r) { return (r.src === 'live') === (S.src === 'live'); }) : every, mks = MOSHA.filter(function (k) { return bySrc.some(function (r) { return mkR(r) === k; }); }), all = S.mk === 'all' || mks.indexOf(S.mk) < 0 ? bySrc : bySrc.filter(function (r) { return mkR(r) === S.mk; }), sop = all.filter(function (r) { return r.kind === 'sop'; }), bar = all.filter(function (r) { return r.kind === 'barrier'; });
-    var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : all, shown = S.all ? list : list.slice(0, 30);
+    var every = S.rows || [], nLive = every.filter(function (r) { return r.src === 'live'; }).length, bySrc = S.file && S.src !== 'both' ? every.filter(function (r) { return (r.src === 'live') === (S.src === 'live'); }) : every, mks = MOSHA.filter(function (k) { return bySrc.some(function (r) { return mkR(r) === k; }); }), all = S.mk === 'all' || mks.indexOf(S.mk) < 0 ? bySrc : bySrc.filter(function (r) { return mkR(r) === S.mk; }), sop = all.filter(function (r) { return r.kind === 'sop'; }), barAll = all.filter(function (r) { return r.kind === 'barrier'; }), bar = barAll.filter(function (r) { return !readings(r).old; }), barOld = barAll.filter(function (r) { return readings(r).old; });
+    var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : S.flt === 'old' ? barOld : all, shown = S.all ? list : list.slice(0, 30);
     var chip = function (k, t, n) { return '<button type="button" class="mo-sop-b" data-sop-flt="' + k + '" aria-pressed="' + (S.flt === k) + '">' + t + ' (' + n + ')</button>'; };
     var sm = summary(list), open = all.filter(function (r) { return r.R == null; }), last = all[0];
     var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + ALL[mkR(last)].name + ' ' + word(last.side) + ' at ' + fP(last, last.entry) + ', ' + utc(last.t) + '.' : '');
@@ -717,7 +727,7 @@
     var openHTML = ''; openPanel(every.filter(function (r) { return r.R == null; }));
     var cal = calHTML(list, S, 'data-sop-chart', function (r) { return ALL[mkR(r)].name + ' · ' + kindText(r); });
     box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
-      '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + (S.file ? '<span class="mo-sop-sep" aria-hidden="true"></span>' + ['both', 'live', 'replay'].map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-src="' + k + '" aria-pressed="' + (S.src === k) + '">' + (k === 'both' ? 'Both' : k === 'live' ? 'Live (' + nLive + ')' : 'Replay (' + (every.length - nLive) + ')') + '</button>'; }).join('') : '') +
+      '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + chip('old', 'Barrier, older reading', barOld.length) + (S.file ? '<span class="mo-sop-sep" aria-hidden="true"></span>' + ['both', 'live', 'replay'].map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-src="' + k + '" aria-pressed="' + (S.src === k) + '">' + (k === 'both' ? 'Both' : k === 'live' ? 'Live (' + nLive + ')' : 'Replay (' + (every.length - nLive) + ')') + '</button>'; }).join('') : '') +
       '<button type="button" class="mo-sop-b" data-sop-run>Refresh</button></div>' +
       (mks.length > 1 ? '<div class="mo-sop-a mo-sop-f">' + ['all'].concat(mks).map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-mk="' + k + '" aria-pressed="' + ((S.mk === k) || (k === 'all' && mks.indexOf(S.mk) < 0)) + '">' + (k === 'all' ? 'All markets' : esc(MARKETS[k].name)) + ' (' + (k === 'all' ? bySrc.length : bySrc.filter(function (r) { return mkR(r) === k; }).length) + ')</button>'; }).join('') + '</div>' : '') +
       '<p class="ms-note mo-sop-st">' + (S.file ? 'Recorded by the tracker in the council loop, about every 35 minutes' + (S.file.at ? ' · last run ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') + (S.file.since ? ' · trades since ' + utc(S.file.since).slice(0, 10) : '') + '. Live = the tracker recorded it within an hour of its entry; Replay = worked out afterwards from the same closed candles.' : 'The tracker has no stored trades yet, so these were worked out in this browser from the last two weeks of candles.') + '</p>' +
@@ -727,6 +737,7 @@
         (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') +
       cal +
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop.filter(function (r) { return !isC2(r); })) + line('BO, VR, CF with the CF inside the VR', sop.filter(isC2), 'The method calls this CF likely to fail and waits; it is recorded apart so the record can show the case.') + line('Barrier entry', bar, 'It takes every fresh barrier; the method says to mark the best one, and that choice is not in the replay.') +
+      line('Barrier, older reading', barOld, 'The barrier as the desk read it before the 21 Nov 2026 re-read: a one-candle zone at a BO or iBO origin, any small break as the QM, the first confirmation table only, a 3R target. Recorded beside the current reading, never mixed into it.') +
       line('Barrier, limit at the level the QM broke', bar.filter(function (r) { return !readings(r).atZone; })) +
       line('Barrier, limit at the zone\'s near side', bar.filter(function (r) { return readings(r).atZone; }), 'The owner\'s reading: a second limit at the barrier zone\'s near side, recorded beside the one at the broken level.') +
       line('Barrier confirmed on M5 (H4 and M15 barriers)', bar.filter(function (r) { return readings(r).m5; }), 'M15 on M5 is in the method\'s second table; H4 on M5 is the owner\'s reading.') +

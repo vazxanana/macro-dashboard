@@ -6258,3 +6258,15 @@ barrier entry −0.090R with (n 584) and −0.090R without; no group reaches a p
 Welch t for "with beats without" is 0.23; the placebo passes nowhere. The 2026 split did not repeat: agreeing with the lower
 timeframes' structure does not pick the better trades of these readings. One run, no variants: the question is closed on
 2020-2025 (no other timeframes, look-backs or freshness windows). Nothing live changed. Test: `tests/ltf-structure.test.mjs`.
+
+## The older barrier reading, kept beside the current one (22 Nov 2026, owner: "add the old barrier as different separate")
+`assets/mosha-sop.js` `oldBarrierTrades(B, F, { from, market })` (`OLD_BARRIER` = `{ box: 'candle', qm: 'internal', janda: 'level',
+table2: false, rsop: false, rr: 3 }`, no CF / VR hand-over): the Mosha barrier as the desk read it before the 21 Nov re-read of the
+documents (a one-candle zone at a BO / iBO origin, no EG barriers, any small break as the QM, the Janda limit at the level its BO
+broke, the first confirmation table only, no repeat of the SOP, a 3R target; the owner's 21 Nov readings "at the zone", M5 confirm,
+sweep and later visits are still in it). A reading of its own: ids `bar-old-…`, flag `old`, label "· older reading", `readings(r).old`
+(read back from a stored id); its own `uniq`, joined AFTER the current list in the tracker (`council/mosha-desk.mjs` `build`) and
+the browser replay, so an older-reading record never replaces or is replaced by a current one, and the 20-minute rule compares it
+only with its own reading. Desk: chip "Barrier, older reading", its own line under "By entry type"; "Barrier entry" and every
+barrier split count the current reading only. The current reading's records are unchanged (test). The tracker adds it for its
+14-day window; older history needs a `--days` rebuild. A paper reading before costs, never an edge. Test: `tests/mosha-sop.test.mjs`.

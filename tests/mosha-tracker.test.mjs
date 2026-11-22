@@ -197,12 +197,12 @@ test('one order is stored once: where the tracker joins the sequence and the bar
   const o = { market: 'xau', side: 1, t: 1795000300, entry: 4397.57, stop: 4393.99, target: 4403.87, status: 'open', R: null, log: [], marks: [] };
   const seq = [{ ...o, id: 'sop-5m-1795000000', kind: 'sop', h: '15m', l: '5m' }], bars = [{ ...o, id: 'bar-sop-1h-b1795000300', kind: 'barrier', h: '1h', l: '5m', rsop: true }, { ...o, id: 'bar-1h-b1795000900', kind: 'barrier', h: '1h', l: '5m', t: 1795000900 }];
   const m5 = Array.from({ length: 12 }, (_, i) => ({ time: 1795000000 + i * 300, open: 4397, high: 4398, low: 4396, close: 4397 }));
-  const keep = [SOPX.sopTrades, SOPX.barrierTrades];
-  try { SOPX.sopTrades = () => seq.map((r) => ({ ...r })); SOPX.barrierTrades = () => bars.map((r) => ({ ...r }));
+  const keep = [SOPX.sopTrades, SOPX.barrierTrades, SOPX.oldBarrierTrades];
+  try { SOPX.sopTrades = () => seq.map((r) => ({ ...r })); SOPX.barrierTrades = () => bars.map((r) => ({ ...r })); SOPX.oldBarrierTrades = () => [];
     const out = M.build({ '5m': m5 }, {}, null, 1795004000);
     assert.deepEqual(out.records.map((r) => r.id).sort(), ['bar-1h-b1795000900', 'sop-5m-1795000000'], 'the repeat-SOP twin of the sequence\'s order is not stored');
     assert.equal(new Set(out.records.map((r) => [r.side, r.t, r.entry, r.stop].join('|'))).size, out.records.length);
-  } finally { [SOPX.sopTrades, SOPX.barrierTrades] = keep; }
+  } finally { [SOPX.sopTrades, SOPX.barrierTrades, SOPX.oldBarrierTrades] = keep; }
   assert.match(rd('council/mosha-desk.mjs'), /SOP\.uniq\(seq\.concat\(SOP\.barrierTrades\(/);
   // clean keeps the new fields, and only where a record has them
   const c = M.clean(rec({ id: 'sop-c2-i-30m-1000', kind: 'sop', h: '1h', l: '30m', case: 2, case2: true, withWeekly: false, er20: 0.3149, label: 'H1 iBO → M30 VR, CF · CF inside the VR' }));

@@ -134,7 +134,8 @@ export function build(B, F, prev, now, feed = 'OANDA', days = SOP.DAYS, market =
   const cfz = [], seq = SOP.sopTrades(B, F, { from, market, cfOut: cfz });   // the sequence's clean CF zones are barriers too (the method's own entry at the CF)
   // one order (same market, side, fill, entry and stop) under two ids is recorded once: the sequence's record is the one kept
   // over the repeat of the SOP at a barrier (SOP.uniq, the fixed priority written there)
-  const fresh = SOP.uniq(seq.concat(SOP.barrierTrades(B, F, { from, market, extra: cfz })));
+  // the older barrier reading is recorded beside the current one as a reading of its own (owner, 22 Nov 2026), never compared with it
+  const fresh = SOP.uniq(seq.concat(SOP.barrierTrades(B, F, { from, market, extra: cfz }))).concat(SOP.oldBarrierTrades(B, F, { from, market }));
   const records = settle(merge(prev && prev.records, fresh, now, feed), new Set(fresh.map((r) => r.id)), B['5m'], market, feed), s = SOP.summary(records);
   return { v: 1, at: new Date(now * 1000).toISOString(), market: 'xau', markets: [...new Set(records.map((r) => r.market || 'xau'))], feed: market === 'xau' ? feed : (prev && prev.feed) || feed, through: market === 'xau' || !(prev && prev.through) ? B['5m'][B['5m'].length - 1].time + 300 : prev.through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length },
