@@ -783,3 +783,9 @@ test('Open now on a phone: one line a trade, the first three, then a button for 
   assert.match(dt, /SOP\.openMore\(ob, open\.length\)/);
   assert.match(sop, /var OPEN_PHONE = 3;/);
 });
+
+test('a desk trade\'s chart window shows its chart in the phone\'s simple view (22 Nov 2026)', () => {
+  const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  const hide = html.indexOf('html[data-phone="simple"] [data-ps]:not([data-ps-open]) { display: none !important; }'), show = html.indexOf('html[data-phone="simple"] #mo-rp-dlg #mo-replay[data-ps] { display: block !important; }');
+  assert.ok(hide > 0 && show > hide);   // the folded chart card is the one the window borrows: it must be open there
+});

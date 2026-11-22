@@ -5169,6 +5169,8 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
 
   html[data-phone="simple"] .ps-only:not([hidden]):not(.ps-sw) { display: block; }
   html[data-phone="simple"] [data-ps]:not([data-ps-open]) { display: none !important; }
+  /* a desk trade's chart window (22 Nov 2026): the chart card folded on the page is the card the window borrows, so it is always open there */
+  html[data-phone="simple"] #mo-rp-dlg #mo-replay[data-ps] { display: block !important; }
 
   /* ── Home: the answer, what is open, what waits, where to go ── */
   html[data-phone="simple"] #v-home .h-quick { display: none; }
