@@ -248,6 +248,14 @@
       rightPriceScale: { borderColor: line }, timeScale: { borderColor: line, timeVisible: true, secondsVisible: false, rightOffset: 2 }, crosshair: { mode: 0 } }); // the price and time axes drag to stretch the candles (owner, 22 Nov 2026); a double-click on an axis puts it back
     R.series = R.chart.addCandlestickSeries(Object.assign({ priceLineVisible: false, lastValueVisible: true, autoscaleInfoProvider: function () { return R.hi > R.lo ? { priceRange: { minValue: R.lo, maxValue: R.hi } } : null; } }, candleCols()));
     R.chart.timeScale().subscribeVisibleLogicalRangeChange(function () { paint(); });
+    // The marks follow the candles on EVERY move (owner, 22 Nov 2026: the boxes stayed put while the chart moved): a drag of the
+    // price axis or an up / down pan changes no time range, so nothing told the overlay. Each frame, while the chart is on
+    // screen, where the scale puts two prices and the time range is compared with the last frame; a change repaints at once.
+    (function watch() { var last = '';
+      (function tick() { if (R.chart && R.series && host.offsetParent !== null) { var k = '';
+          try { var lr = R.chart.timeScale().getVisibleLogicalRange(), a = R.series.priceToCoordinate(R.lo || 1), b = R.series.priceToCoordinate(R.hi || 2); k = (lr ? lr.from + ':' + lr.to : '') + '|' + a + '|' + b; } catch (e) {}
+          if (k !== last) { last = k; paint(); } }
+        requestAnimationFrame(tick); })(); })();
     if (root.ResizeObserver) new ResizeObserver(function () { paint(); }).observe(host);
     new MutationObserver(function () { if (!R.chart) return; R.series.applyOptions(candleCols()); R.chart.applyOptions({ layout: { textColor: css('--ink-dim', '#9aa3b2') }, grid: { horzLines: { color: css('--line', 'rgba(128,128,128,.2)') } } }); paint(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     return true;
