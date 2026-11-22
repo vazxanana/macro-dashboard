@@ -6451,5 +6451,7 @@ choice, not a tested result; never quote it as an edge. A run takes about twice 
 `assets/mosha-sop.js` `TAP_FIRST` = `{ '1h': '15m' }`: at an H1 barrier the tap entry (`bar-tap-`, and its 3R / 6R copies) first
 needs an M15 BO Structure with the barrier (the table's QM test), then the first M1 BO Structure with the barrier whose leg starts
 after the M15 BO candle closed (the pullback); entry at that M1 close, stop past the pullback's extreme by the desk's buffer, the
-reading's target. A close past the extreme made at the barrier, or no M1 BO within 12 M15 candles, gives no trade. Label "· M15 BO,
-pullback, M1 BO"; `tapFirst: false` reads it as before. Other barriers keep the M1 BO at the tap. A reading, not a tested rule.
+reading's target. A close past the extreme made at the barrier, or no M1 BO within 12 M15 candles, gives no trade. Label "· M15+M1 BO"
+(short, so "with / against H4" still fits the stored 56 characters); `tapFirst: false` (also through `deskTrades`) reads it as before. Other barriers keep the M1 BO at the tap; an M15 / M30 barrier's tap entry that was the same order as the old H1 one
+comes back under its own name (`uniq` kept the H1 record before). 60 days before costs: H1 tap entries 971 -> 204 across gold,
+EUR/USD and GBP/USD; gold worse, EUR/USD better, GBP/USD mixed. A reading, not a tested rule.

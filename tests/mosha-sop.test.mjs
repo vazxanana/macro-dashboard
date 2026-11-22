@@ -679,7 +679,7 @@ test('M1 BO at the tap of a barrier: a market entry at the M1 close, the stop pa
     assert.ok(BT(X, F, { from: fr, extra: z, tap: false }).every((r) => !r.tap), 'tap: false leaves it out');
     assert.deepEqual(BT(X, F, { from: fr, extra: z, tap: false }).map(keyOf), all.filter((r) => !r.tap).map(keyOf), 'no other record changes');
     assert.equal(new Set(t.map((r) => r.id)).size, t.length);
-    for (const r of t) { assert.match(r.id, /bar-tap-/); assert.equal(r.l, '1m'); assert.ok(M.readings({ id: r.id }).tap); if (r.h === '1h') { h1++; assert.match(r.label, / · M15 BO, pullback, M1 BO/); assert.match(r.log.at(-3).text, /^M15 BO (buy|sell): a QM/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) with the barrier/); assert.ok(r.log.at(-3).t < r.t, 'the M15 BO comes before the M1 entry'); }
+    for (const r of t) { assert.match(r.id, /bar-tap-/); assert.equal(r.l, '1m'); assert.ok(M.readings({ id: r.id }).tap); if (r.h === '1h') { h1++; assert.match(r.label, / · M15\+M1 BO/); assert.match(r.log.at(-3).text, /^M15 BO (buy|sell): a QM/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) with the barrier/); assert.ok(r.log.at(-3).t < r.t, 'the M15 BO comes before the M1 entry'); }
       else { assert.match(r.label, / · M1 BO at the tap/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) at the tap/); }
       assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry);
       const bar = X['1m'].find((b) => b.time + 60 === r.t); assert.ok(bar && bar.close === r.entry, 'the entry is the close of the M1 candle that ended at its time'); }

@@ -60,11 +60,11 @@
   // (BO → VR → CF: D1 → H4 → H1, H4 → H1 → M15, H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1; M1 stays M1). CFTF: the VR's timeframe → the CF's.
   // Owner, 22 Nov 2026, later: "one of them is h4 h1 m15 (not m30)": under an H1 VR the CF is read on M15.
   var CFTF = { '4h': '1h', '1h': '15m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' };
-  var JANDA_ALT = { '4h': '1m', '1h': '1m' };
+  var JANDA_ALT = { '4h': '1m', '1h': '1m' };   // the Janda's own table: H4 on M15 or M1, H1 on M5 or M1 (the simple CF keeps the one timeframe)
   // 22 Nov 2026 (owner: "H1 barrier → M1 BO at the tap ... m1 is only entry to confirm the trade, h1 barrier we need m15 bo
   // pullback then m1 bo entry"): at an H1 barrier the tap entry first needs an M15 BO Structure with the barrier; then price
   // pulls back and the first M1 BO Structure with the barrier whose leg starts after the M15 BO is the entry.
-  var TAP_FIRST = { '1h': '15m' };   // the Janda's own table: H4 on M15 or M1, H1 on M5 or M1 (the simple CF keeps the one timeframe)
+  var TAP_FIRST = { '1h': '15m' };
   var f2 = function (v) { return (+v).toFixed(2); };
   // More markets (21 Nov 2026, owner: "more trades"): the SAME reading on other markets, no new entry rule. The gold sizes
   // (stop buffer, smallest and largest risk, smallest barrier) were written in dollars near REF; another market takes the
@@ -146,7 +146,7 @@
     if (/^sop-nv-/.test(id)) return true; if (/^sop-(l|c2|vr|vc|nc)-/.test(id)) return false; if (/^sop-/.test(id)) return true;
     return /^bar-/.test(id) && !/^bar-(old|r6|tap|sop)-/.test(id); }
   function deskTrades(B, F, o) {
-    o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market };
+    o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market, tapFirst: o.tapFirst };
     var w = function (x) { var r = {}; for (var k in base) if (base[k] !== undefined) r[k] = base[k]; for (var k2 in x) r[k2] = x[k2]; return r; };
     // through API so a caller (the tracker's tests) can swap a reading in
     var s6 = API.sopTrades(B, F, w({ cfOut: c6 })).filter(sixCandle), s1 = API.sopTrades(B, F1, w({ cfOut: c1 })).filter(function (r) { return !sixCandle(r); });
@@ -701,7 +701,7 @@
           tapHi = hb; sig = { t: mb.t, level: mb.level, close: mb.close }; xs = mb.x; }
         if (mode === 'tap') { var Zt = sizes(mk, sig.close), et = sig.close, st_ = d < 0 ? xs + Zt.buf : xs - Zt.buf, rt = Math.abs(et - st_);
           if (!(sig.t >= from) || !(rt > Zt.rmin) || rt > Zt.rmax || (d < 0 ? st_ <= et : st_ >= et)) return;
-          var tt = { id: pre + 'bar-tap-' + idK + (d > 0 ? 'b' : 's') + sig.t, market: mk, kind: 'barrier', label: name + (tapHi ? ' · M15 BO, pullback, M1 BO' : ' · M1 BO at the tap') + labK + labD,
+          var tt = { id: pre + 'bar-tap-' + idK + (d > 0 ? 'b' : 's') + sig.t, market: mk, kind: 'barrier', label: name + (tapHi ? ' · M15+M1 BO' : ' · M1 BO at the tap') + labK + labD,
             withDir: wd, janda: false, jandaM1: false, m5: false, alt: null, tap: true, mkt: true, sweep: sw, eg: eg, visit: vn, atZone: false, h: zt, l: ctf, side: d, t: sig.t, entry: et, stop: st_, target: d < 0 ? et - BR * rt : et + BR * rt, r0: rt, zone: z };
           tt.log = head().concat((tapHi ? [{ t: tapHi.t, text: NAME[TAP_FIRST[zt]] + ' BO ' + word(d) + ': a QM (BO Structure), a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(tapHi.level) + '. Now a pullback and an M1 BO are waited for.' }] : []).concat([{ t: sig.t, text: (tapHi ? 'After the pullback, the ' : '') + 'M1 BO ' + word(d) + (tapHi ? ' with the barrier: a candle closed ' : ' at the tap: a candle closed ') + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '. ' + word(d).charAt(0).toUpperCase() + word(d).slice(1) + ' at that close ' + f2(et) + ', stop ' + f2(st_) + ' (' + U + f2(Zt.buf) + ' past the M1 BO\'s ' + (d > 0 ? 'low ' : 'high ') + f2(xs) + ', risk ' + U + f2(rt) + '), target ' + f2(tt.target) + ' (' + BR + 'R: the replay\'s own choice, no target was named).' }]));
           tt.marks = [zoneMark].concat(tapHi ? [{ kind: 'level', p: tapHi.level, a: t0, at: tapHi.t, label: NAME[TAP_FIRST[zt]] + ' BO', under: d < 0 }] : []).concat([{ kind: 'level', p: sig.level, a: t0, at: sig.t, label: 'M1 BO', under: d < 0 }, { kind: 'level', p: xs, a: t0, at: sig.t, label: 'M1 BO ' + (d > 0 ? 'low' : 'high') + ' · stop', under: d > 0 }]);
@@ -865,7 +865,7 @@
   // with a current record (joined after the current list, its own reading in the 20-minute rule).
   var OLD_BARRIER = { rr: 3 };
   function oldBarrierTrades(B, F, o) {
-    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: OLD_BARRIER.rr };
+    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: OLD_BARRIER.rr, tapFirst: o.tapFirst };
     return uniq(barrierTrades(B, F, q)).filter(function (r) { return Math.abs(Math.abs(r.target - r.entry) / r.r0 - OLD_BARRIER.rr) < 1e-6; })
       .map(function (r) { r.id = String(r.id).replace('bar-', 'bar-old-'); r.old = true; r.label = (r.label || '') + ' · 3R target'; return r; });
   }
@@ -874,7 +874,7 @@
   // "· 6R target", flag `r6`; a reading of its own beside the 1R and 3R ones, never compared with them in the 20-minute rule.
   var R6_BARRIER = { rr: 6 };
   function r6BarrierTrades(B, F, o) {
-    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: R6_BARRIER.rr };
+    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: R6_BARRIER.rr, tapFirst: o.tapFirst };
     return uniq(barrierTrades(B, F, q)).filter(function (r) { return Math.abs(Math.abs(r.target - r.entry) / r.r0 - R6_BARRIER.rr) < 1e-6; })
       .map(function (r) { r.id = String(r.id).replace('bar-', 'bar-r6-'); r.r6 = true; r.label = (r.label || '') + ' · 6R target'; return r; });
   }
