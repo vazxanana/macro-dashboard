@@ -24,7 +24,10 @@ const BT = M.barrierTrades; M.barrierTrades = (B, Fx, o) => BT(B, Fx, o).filter(
 // 22 Nov 2026: a SOP inside the SOP (the VR and the CF each start a lower-timeframe sequence) has its own shape and its own
 // test at the end of this file; every older test reads the sequence list without it (ST = the whole list). nest: false is
 // the same list as the whole one less the nested records (that test compares the two), and does not run their walk.
-const ST = M.sopTrades; M.sopTrades = (B, Fx, o) => ST(B, Fx, { nest: false, ...(o || {}) }).filter((r) => !r.nest);
+// Same day: the CF is read one timeframe under the VR (the method's table); cf: 'same' is the reading until then, which the
+// older tests pin. Its own test is at the end too.
+const OLDWAY = { nest: false, cf: 'same' };
+const ST = M.sopTrades; M.sopTrades = (B, Fx, o) => ST(B, Fx, { ...OLDWAY, ...(o || {}) }).filter((r) => !r.nest);
 // Every market and every replay is worked out ONCE and shared by the tests below (21 Nov 2026: the file had grown to about a
 // quarter of an hour, most of it the same replay run again by each test). A replay is keyed by its candles, its cut and its
 // options; nothing a test asserts was dropped for it.
@@ -666,6 +669,7 @@ test('M1 BO at the tap of a barrier: a market entry at the M1 close, the stop pa
 test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the BO and the CF one with it; a stop on the losing side; off with nest: false; no hindsight', async () => {
   let nv = 0, nc = 0, cuts = 0;
   for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), all = ST(X, F, { from: fr }), n = all.filter((r) => r.nest), off = ST(X, F, { from: fr, nest: false });
+    for (const q of [{ cf: 'same' }]) { const a2 = ST(X, F, { from: fr, ...q }); assert.deepEqual(a2.filter((r) => !r.nest).map(keyOf), sopOf(seed, fr).map(keyOf), 'with the CF on the VR timeframe the main list is the pinned one'); assert.ok(a2.filter((r) => r.nest).every((r) => r.l === (M.LOWER[r.h] || M.DOWN[r.h]))); }
     assert.ok(n.some((r) => r.nest === 'vr') && n.some((r) => r.nest === 'cf'), `seed ${seed}: both legs give records`);
     assert.equal(off.filter((r) => r.nest).length, 0);
     assert.deepEqual(all.filter((r) => !r.nest).map(keyOf), off.map(keyOf), 'the main sequence is unchanged: nest false is the old list');
@@ -674,7 +678,7 @@ test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the
       assert.equal(r.kind, 'sop'); assert.ok(rule1(r), 'a stop on the losing side, a target on the winning side: ' + r.id);
       assert.ok(r.of === 1 || r.of === -1); assert.equal(r.side, v ? -r.of : r.of, 'the VR leg trades against the first BO, the CF leg with it');
       assert.match(r.id, v ? /^sop-nv-(1h|30m|15m|5m|1m)-[bs]\d+$/ : /^sop-nc-(1h|30m|15m|5m|1m)-[bs]\d+$/); assert.equal(r.id.endsWith((r.side > 0 ? 'b' : 's') + r.t), true);
-      assert.equal(r.l, M.LOWER[r.h] || M.DOWN[r.h], 'one timeframe lower'); assert.match(r.label, v ? / VR → M?\w+ SOP inside the VR$/ : / CF → M?\w+ SOP inside the CF$/);
+      assert.equal(r.l, M.LOWER[r.h] || M.DOWN[r.h] || r.h, 'one timeframe lower (M1 stays M1)'); if (!v) assert.ok(['1h', '30m', '15m', '5m', '1m'].includes(r.h), 'the SOP inside the CF starts from the CF timeframe'); assert.match(r.label, v ? / VR → M?\w+ SOP inside the VR$/ : / CF → M?\w+ SOP inside the CF$/);
       assert.ok(r.t >= fr && r.r0 > 0 && r.log.length >= (v ? 5 : 6) && r.marks.length >= (v ? 4 : 5));
       const ts = r.log.filter((x) => x.t != null).map((x) => x.t); assert.deepEqual(ts, ts.slice().sort((a, b) => a - b), 'the log is in time order');
       assert.ok(r.log.slice(0, -1).every((x) => x.t <= r.t), 'nothing in the log before the result is later than the entry');
@@ -686,7 +690,7 @@ test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the
         const k = ST(cut(X, T), F, { from: fr }).find((q) => q.id === r.id); assert.ok(k, `seed ${seed}: found only with later candles: ${r.id}`);
         assert.deepEqual([k.side, k.entry, k.stop, k.target, k.of], [r.side, r.entry, r.stop, r.target, r.of]); }
       assert.equal(ST(cut(X, r.t - 1), F, { from: fr }).some((q) => q.id === r.id), false, 'not before its EG candle closed: ' + r.id); cuts++; } }
-  assert.ok(nv >= 4 && nc >= 2 && cuts >= 12, `VR legs ${nv}, CF legs ${nc}, cuts ${cuts}`);
+  assert.ok(nv >= 2 && nc >= 2 && cuts >= 12, `VR legs ${nv}, CF legs ${nc}, cuts ${cuts}`);
   // an order another reading already gave is recorded once, under the other reading's id
   const a = { id: 'sop-5m-1', kind: 'sop', h: '15m', side: 1, t: 100, entry: 4000, stop: 3998 }, b = { ...a, id: 'bar-sop-x', kind: 'barrier' }, c = { ...a, id: 'sop-nc-1m-b100', h: '5m', nest: 'cf' };
   assert.deepEqual(M.uniq([c, b]).map((r) => r.id), ['bar-sop-x']); assert.deepEqual(M.uniq([c, a, b]).map((r) => r.id), ['sop-5m-1']); assert.deepEqual(M.uniq([c]).map((r) => r.id), ['sop-nc-1m-b100']);
@@ -698,4 +702,28 @@ test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the
   assert.equal(TK.merge(mg, [rec({ id: 'sop-nv-1m-s1300', t: 1300 })], 6000).length, 3, 'the same nested trade re-read under another id is still left out');
   // the desk names them and lists them apart from the plain sequence
   assert.match(src, /SOP inside the VR \(against the BO\)/); assert.match(src, /SOP inside the CF \(with the BO\)/); assert.match(src, /line\('BO, VR, CF', sop\.filter\(function \(r\) \{ return !isC2\(r\) && !isNest\(r\); \}\)\)/);
+});
+
+test('the CF one timeframe under the VR (the method\'s table): the CF, the EG and the fill are on that timeframe, the VR is unchanged; cf "same" is the reading before; no hindsight', () => {
+  assert.deepEqual(M.CFTF, { '4h': '1h', '1h': '30m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' });
+  let n = 0, cuts = 0; const tfs = new Set();
+  for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), all = ST(X, F, { from: fr, nest: false }), seq = all.filter((r) => !r.retest), old = sopOf(seed, fr);
+    assert.deepEqual(ST(X, F, { from: fr, nest: false, cf: 'same' }).map(keyOf), old.map(keyOf), 'cf "same" gives exactly the list before');
+    assert.equal(new Set(all.map((r) => r.id)).size, all.length); assert.ok(seq.length >= 10);
+    for (const r of seq) { n++; tfs.add(r.l + '>' + r.ll);
+      assert.equal(r.ll, M.CFTF[r.l], 'the CF timeframe is the table\'s: ' + r.id); assert.ok(rule1(r), r.id);
+      const c = X[r.ll].find((b) => b.time + M.SEC[r.ll] === r.t); assert.ok(c && Math.abs(c.close - r.entry) < 1e-9, 'entered at the close of a candle of the CF timeframe: ' + r.id);
+      assert.match(r.label, new RegExp('^\\S+ i?BO → \\S+ VR → ' + ({ '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5', '1m': 'M1' })[r.ll] + ' CF'));
+      // the VR is the VR timeframe's own: its box is closed by a candle of that timeframe, and the target is its extreme
+      const vm = r.marks.find((m) => m.kind === 'vr' || m.kind === 'bvr'), zm = r.marks.find((m) => m.kind === 'zone'); assert.equal(vm.at - vm.a, M.SEC[r.l]); assert.equal(zm.at - zm.a, M.SEC[r.ll]);
+      assert.ok(Math.abs(r.target - (r.side > 0 ? vm.top : vm.bot)) < 1e-9, 'target the VR\'s extreme'); assert.ok(zm.at <= r.t && vm.at <= zm.at);
+      const ts = r.log.filter((x) => x.t != null).map((x) => x.t); assert.deepEqual(ts, ts.slice().sort((a, b) => a - b)); }
+    // NO HINDSIGHT: a minute after its EG closed the record is there with the same levels; a second before, it is not
+    for (const r of [seq[0], seq[Math.floor(seq.length / 2)], seq.at(-1)]) { cuts++;
+      const k = ST(cut(X, r.t + 60), F, { from: fr, nest: false }).find((q) => q.id === r.id); assert.ok(k, `seed ${seed}: found only with later candles: ${r.id}`); assert.deepEqual([k.side, k.entry, k.stop, k.target, k.case2], [r.side, r.entry, r.stop, r.target, r.case2]);
+      assert.equal(ST(cut(X, r.t - 1), F, { from: fr, nest: false }).some((q) => q.id === r.id), false, 'not before its EG candle closed'); } }
+  assert.ok(n >= 40 && cuts >= 6 && tfs.has('5m>1m') && tfs.has('15m>5m'), [...tfs].join(' '));
+  // with no candles of the CF timeframe the CF is read on the VR's, as before, and the log says so
+  const X = { ...market(26, 7) }; delete X['1m']; const fb = ST(X, F, { from: fr20(7), nest: false }).filter((r) => r.l === '5m' && !r.retest);
+  const was = new Set(sopOf(7, fr20(7)).map(keyOf)); assert.ok(fb.length >= 5 && fb.every((r) => was.has(keyOf(r)) && r.ll == null), 'the M5 records are the ones of the reading before (one that is the very order of a higher step is recorded once, there)'); assert.ok(fb.every((r) => /no M1 candles on file: the CF is read on M5/.test(r.log[2].text)));
 });

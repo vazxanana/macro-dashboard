@@ -6310,3 +6310,16 @@ with the main sequence as the last closed l candle left it, and the entry is tak
 lists "SOP inside the VR (against the BO)" / "SOP inside the CF (with the BO)" apart from "BO, VR, CF". A reading, not a tested
 rule: never quote its record as an edge. Test: `tests/mosha-sop.test.mjs` ("a SOP inside the SOP"; the older tests read the list
 with `nest: false`, `ST` is the whole one).
+**The CF one timeframe under the VR** (same day, owner sent the method's own timeframe table for BO / VR / CF): D1 → H4 → H1,
+H4 → H1 → M30, H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1 (`CFTF`: the VR's timeframe → the CF's; M1 stays M1). The BO on h and
+the VR on l are read as before (the same VR event, box and extreme); the CF, the pullback into its zone, the EG, the stop and the
+fill are read on the CF timeframe by a walker per sequence (`walkAdd` / `walkRun`: `msMosha`, untouched, gets the l timeframe's
+VR as its first event and the CF timeframe's small breaks after it, one closed candle at a time; the "CF inside the VR" case
+and the target are judged against the l timeframe's VR). Records keep their id shape (`sop-<l>-<EG candle>`), carry `ll` = the
+CF timeframe and the label "H4 BO → H1 VR → M30 CF". `cf: 'same'` reads the CF on l as before (the older tests pin it); with no
+candles of the CF timeframe the CF is read on l and the log says so. The CF zones handed to the barrier entry (`cfOut`) are on
+the CF timeframe now (an M5 or M1 CF zone has no barrier table, so it gives no barrier entry). The nested legs follow the table:
+the SOP inside the VR one step under the VR's timeframe, the SOP inside the CF one step under the CF's (M1 on M1). The table's
+last row (M5 → M1 → M1) is NOT a ladder step: `LADDER` still ends at M15 → M5. The tracker already reads every timeframe the
+table needs (`BACK`: M1 16 days for a 14-day window), nothing changed there. A reading, not a tested rule. Test: "the CF one
+timeframe under the VR".
