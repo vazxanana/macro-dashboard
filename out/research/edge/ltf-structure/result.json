@@ -1,0 +1,1928 @@
+{
+ "study": "ltf-structure",
+ "built": "2026-11-22",
+ "system": "Lower-timeframe structure (H1, a fresh M15 structure shift and M5 all with the trade) as an entry permission on the paper desks' own trades; gold, EUR/USD, GBP/USD 2020-2025 (out of sample 2024-2025); OANDA mid 5m; after the desk-rigor costs.",
+ "verdict": "FAIL",
+ "headline": "0 of 13 groups pass. Pool out of sample with the condition: −0.167R a trade after costs (n 1261, month t -2.77); without it −0.102R (n 35614); difference −0.065R (Welch t -1.49).",
+ "n": 112330,
+ "left": 4,
+ "kept": {
+  "all": 3.6,
+  "is": 3.7,
+  "oos": 3.4
+ },
+ "causal": {
+  "cuts": 1800,
+  "mismatches": 0,
+  "method": "once over each whole series (the check passed)"
+ },
+ "groups": [
+  {
+   "group": "sop",
+   "name": "Mosha sequence",
+   "is": {
+    "n": 976,
+    "share": 14.3,
+    "with": {
+     "n": 140,
+     "mean": 0.0108,
+     "gross": 0.0714,
+     "win": 25.7,
+     "months": 44,
+     "tMonth": 0.06
+    },
+    "without": {
+     "n": 836,
+     "mean": -0.1545,
+     "gross": -0.0473,
+     "win": 20.3,
+     "months": 48,
+     "tMonth": -1.63
+    },
+    "diff": {
+     "diff": 0.1653,
+     "t": 0.8
+    },
+    "month": {
+     "months": 44,
+     "diff": 0.3493,
+     "t": 1.23
+    }
+   },
+   "oos": {
+    "n": 487,
+    "share": 11.9,
+    "with": {
+     "n": 58,
+     "mean": -0.3388,
+     "gross": -0.2662,
+     "win": 24.1,
+     "months": 21,
+     "tMonth": -1.6
+    },
+    "without": {
+     "n": 429,
+     "mean": -0.3218,
+     "gross": -0.1952,
+     "win": 18.6,
+     "months": 24,
+     "tMonth": -2.47
+    },
+    "diff": {
+     "diff": -0.017,
+     "t": -0.07
+    },
+    "month": {
+     "months": 21,
+     "diff": 0.0348,
+     "t": 0.08
+    }
+   },
+   "pA": 0.10959858260917754,
+   "pB": 0.9362371222485086,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "barrier",
+   "name": "Mosha barrier entry",
+   "is": {
+    "n": 44883,
+    "share": 2.9,
+    "with": {
+     "n": 1294,
+     "mean": -0.0792,
+     "gross": -0.0226,
+     "win": 24,
+     "months": 48,
+     "tMonth": -1.02
+    },
+    "without": {
+     "n": 43589,
+     "mean": -0.06,
+     "gross": 0.0144,
+     "win": 25.4,
+     "months": 48,
+     "tMonth": -4.07
+    },
+    "diff": {
+     "diff": -0.0192,
+     "t": -0.38
+    },
+    "month": {
+     "months": 48,
+     "diff": 0.0077,
+     "t": 0.1
+    }
+   },
+   "oos": {
+    "n": 21458,
+    "share": 2.7,
+    "with": {
+     "n": 584,
+     "mean": -0.0898,
+     "gross": -0.023,
+     "win": 24.8,
+     "months": 24,
+     "tMonth": -0.97
+    },
+    "without": {
+     "n": 20874,
+     "mean": -0.0905,
+     "gross": -0.0057,
+     "win": 24.9,
+     "months": 24,
+     "tMonth": -4.85
+    },
+    "diff": {
+     "diff": 0.0007,
+     "t": 0.01
+    },
+    "month": {
+     "months": 24,
+     "diff": 0.01,
+     "t": 0.1
+    }
+   },
+   "pA": 0.33204648837531825,
+   "pB": 0.9203442112056606,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-1d",
+   "name": "Engulf D1",
+   "is": {
+    "n": 470,
+    "share": 0.9,
+    "with": {
+     "n": 4,
+     "mean": 1.3993,
+     "gross": 1.412,
+     "win": 50,
+     "months": 4,
+     "tMonth": 1.03
+    },
+    "without": {
+     "n": 466,
+     "mean": 0.0551,
+     "gross": 0.0661,
+     "win": 38.8,
+     "months": 48,
+     "tMonth": 0.75
+    },
+    "diff": {
+     "diff": 1.3441,
+     "t": 0.99
+    },
+    "month": {
+     "months": 4,
+     "diff": 1.2987,
+     "t": 1.11
+    }
+   },
+   "oos": {
+    "n": 251,
+    "share": 1.6,
+    "with": {
+     "n": 4,
+     "mean": -0.0511,
+     "gross": -0.0362,
+     "win": 25,
+     "months": 3,
+     "tMonth": -0.05
+    },
+    "without": {
+     "n": 247,
+     "mean": -0.0645,
+     "gross": -0.0506,
+     "win": 33.2,
+     "months": 24,
+     "tMonth": -0.83
+    },
+    "diff": {
+     "diff": 0.0134,
+     "t": 0.01
+    },
+    "month": {
+     "months": 3,
+     "diff": 0.7385,
+     "t": 0.64
+    }
+   },
+   "pA": 0.960122253874987,
+   "pB": 0.5221724793090818,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": true,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-4h",
+   "name": "Engulf H4",
+   "is": {
+    "n": 2929,
+    "share": 5.8,
+    "with": {
+     "n": 171,
+     "mean": 0.0927,
+     "gross": 0.1288,
+     "win": 41.5,
+     "months": 47,
+     "tMonth": 0.73
+    },
+    "without": {
+     "n": 2758,
+     "mean": -0.031,
+     "gross": 0.009,
+     "win": 35.8,
+     "months": 48,
+     "tMonth": -0.96
+    },
+    "diff": {
+     "diff": 0.1236,
+     "t": 1.07
+    },
+    "month": {
+     "months": 47,
+     "diff": 0.0778,
+     "t": 0.57
+    }
+   },
+   "oos": {
+    "n": 1366,
+    "share": 6.1,
+    "with": {
+     "n": 83,
+     "mean": -0.1731,
+     "gross": -0.1342,
+     "win": 32.5,
+     "months": 23,
+     "tMonth": -1.36
+    },
+    "without": {
+     "n": 1283,
+     "mean": -0.0308,
+     "gross": 0.0152,
+     "win": 36.9,
+     "months": 24,
+     "tMonth": -0.59
+    },
+    "diff": {
+     "diff": -0.1423,
+     "t": -1
+    },
+    "month": {
+     "months": 23,
+     "diff": -0.1703,
+     "t": -1.21
+    }
+   },
+   "pA": 0.17383004706193395,
+   "pB": 0.22627902472334172,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-1h",
+   "name": "Engulf H1",
+   "is": {
+    "n": 11474,
+    "share": 4.8,
+    "with": {
+     "n": 553,
+     "mean": -0.187,
+     "gross": -0.1233,
+     "win": 34.4,
+     "months": 48,
+     "tMonth": -3.1
+    },
+    "without": {
+     "n": 10921,
+     "mean": -0.0786,
+     "gross": -0.0065,
+     "win": 36.1,
+     "months": 48,
+     "tMonth": -5.2
+    },
+    "diff": {
+     "diff": -0.1085,
+     "t": -2.04
+    },
+    "month": {
+     "months": 48,
+     "diff": -0.0548,
+     "t": -0.96
+    }
+   },
+   "oos": {
+    "n": 5636,
+    "share": 4.2,
+    "with": {
+     "n": 238,
+     "mean": -0.1658,
+     "gross": -0.0959,
+     "win": 33.2,
+     "months": 24,
+     "tMonth": -1.79
+    },
+    "without": {
+     "n": 5398,
+     "mean": -0.0898,
+     "gross": -0.0078,
+     "win": 35.3,
+     "months": 24,
+     "tMonth": -3.7
+    },
+    "diff": {
+     "diff": -0.076,
+     "t": -0.88
+    },
+    "month": {
+     "months": 24,
+     "diff": -0.0752,
+     "t": -0.75
+    }
+   },
+   "pA": 0.07345381057892464,
+   "pB": 0.4532545689439824,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-plan",
+   "name": "Engulf plan (with the Daily)",
+   "is": {
+    "n": 2597,
+    "share": 4.6,
+    "with": {
+     "n": 119,
+     "mean": -0.1328,
+     "gross": -0.0446,
+     "win": 32.8,
+     "months": 40,
+     "tMonth": -0.8
+    },
+    "without": {
+     "n": 2478,
+     "mean": -0.0498,
+     "gross": 0.0394,
+     "win": 34.7,
+     "months": 48,
+     "tMonth": -1.92
+    },
+    "diff": {
+     "diff": -0.0831,
+     "t": -0.61
+    },
+    "month": {
+     "months": 40,
+     "diff": 0.0869,
+     "t": 0.53
+    }
+   },
+   "oos": {
+    "n": 1144,
+    "share": 3,
+    "with": {
+     "n": 34,
+     "mean": -0.4821,
+     "gross": -0.3827,
+     "win": 20.6,
+     "months": 17,
+     "tMonth": -2.06
+    },
+    "without": {
+     "n": 1110,
+     "mean": -0.1075,
+     "gross": -0.0152,
+     "win": 32.9,
+     "months": 24,
+     "tMonth": -2.67
+    },
+    "diff": {
+     "diff": -0.3746,
+     "t": -1.73
+    },
+    "month": {
+     "months": 17,
+     "diff": -0.3819,
+     "t": -1.47
+    }
+   },
+   "pA": 0.03939840847845966,
+   "pB": 0.14156183001801548,
+   "pAHolm": 0.9062,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-simple",
+   "name": "Engulf short method",
+   "is": {
+    "n": 2640,
+    "share": 4.4,
+    "with": {
+     "n": 117,
+     "mean": -0.0886,
+     "gross": -0.0022,
+     "win": 33.3,
+     "months": 45,
+     "tMonth": -0.63
+    },
+    "without": {
+     "n": 2523,
+     "mean": -0.1453,
+     "gross": -0.0542,
+     "win": 31.6,
+     "months": 48,
+     "tMonth": -5.23
+    },
+    "diff": {
+     "diff": 0.0567,
+     "t": 0.42
+    },
+    "month": {
+     "months": 45,
+     "diff": -0.0368,
+     "t": -0.25
+    }
+   },
+   "oos": {
+    "n": 1204,
+    "share": 3.7,
+    "with": {
+     "n": 45,
+     "mean": -0.0984,
+     "gross": -0.0083,
+     "win": 33.3,
+     "months": 20,
+     "tMonth": -0.5
+    },
+    "without": {
+     "n": 1159,
+     "mean": -0.1167,
+     "gross": -0.0254,
+     "win": 32.5,
+     "months": 24,
+     "tMonth": -2.99
+    },
+    "diff": {
+     "diff": 0.0183,
+     "t": 0.08
+    },
+    "month": {
+     "months": 20,
+     "diff": 0.1381,
+     "t": 0.52
+    }
+   },
+   "pA": 0.6170750745520124,
+   "pB": 0.603063551016024,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": true,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-main",
+   "name": "MSNR with the direction, 12-16 UTC",
+   "is": {
+    "n": 1466,
+    "share": 5.9,
+    "with": {
+     "n": 86,
+     "mean": -0.2809,
+     "gross": -0.1713,
+     "win": 33.7,
+     "months": 39,
+     "tMonth": -1.83
+    },
+    "without": {
+     "n": 1380,
+     "mean": -0.171,
+     "gross": -0.0639,
+     "win": 37.6,
+     "months": 48,
+     "tMonth": -5.15
+    },
+    "diff": {
+     "diff": -0.1099,
+     "t": -0.83
+    },
+    "month": {
+     "months": 39,
+     "diff": -0.0034,
+     "t": -0.02
+    }
+   },
+   "oos": {
+    "n": 836,
+    "share": 6.1,
+    "with": {
+     "n": 51,
+     "mean": -0.3517,
+     "gross": -0.2157,
+     "win": 31.4,
+     "months": 21,
+     "tMonth": -2.31
+    },
+    "without": {
+     "n": 785,
+     "mean": -0.1271,
+     "gross": 0.0041,
+     "win": 40.4,
+     "months": 24,
+     "tMonth": -2.79
+    },
+    "diff": {
+     "diff": -0.2246,
+     "t": -1.33
+    },
+    "month": {
+     "months": 21,
+     "diff": -0.2365,
+     "t": -1.21
+    }
+   },
+   "pA": 0.020888101295961303,
+   "pB": 0.22627902472334172,
+   "pAHolm": 0.5222,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-other",
+   "name": "MSNR with the direction, other hours",
+   "is": {
+    "n": 5649,
+    "share": 4.3,
+    "with": {
+     "n": 241,
+     "mean": -0.1209,
+     "gross": 0.0264,
+     "win": 41.1,
+     "months": 48,
+     "tMonth": -1.3
+    },
+    "without": {
+     "n": 5408,
+     "mean": -0.1938,
+     "gross": -0.0325,
+     "win": 38.8,
+     "months": 48,
+     "tMonth": -8.95
+    },
+    "diff": {
+     "diff": 0.073,
+     "t": 0.89
+    },
+    "month": {
+     "months": 48,
+     "diff": 0.0752,
+     "t": 0.68
+    }
+   },
+   "oos": {
+    "n": 3290,
+    "share": 4.4,
+    "with": {
+     "n": 145,
+     "mean": -0.3056,
+     "gross": -0.1396,
+     "win": 34.5,
+     "months": 24,
+     "tMonth": -2.15
+    },
+    "without": {
+     "n": 3145,
+     "mean": -0.1797,
+     "gross": -0.0087,
+     "win": 39.7,
+     "months": 24,
+     "tMonth": -8.18
+    },
+    "diff": {
+     "diff": -0.1259,
+     "t": -1.25
+    },
+    "month": {
+     "months": 24,
+     "diff": -0.0771,
+     "t": -0.59
+    }
+   },
+   "pA": 0.03155510261828687,
+   "pB": 0.5551905609360899,
+   "pAHolm": 0.7573,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-sop",
+   "name": "MSNR gold plan",
+   "is": {
+    "n": 1177,
+    "share": 2.3,
+    "with": {
+     "n": 27,
+     "mean": 0.154,
+     "gross": 0.1848,
+     "win": 29.6,
+     "months": 14,
+     "tMonth": 0.42
+    },
+    "without": {
+     "n": 1150,
+     "mean": -0.0405,
+     "gross": -0.0101,
+     "win": 24.8,
+     "months": 48,
+     "tMonth": -0.74
+    },
+    "diff": {
+     "diff": 0.1945,
+     "t": 0.54
+    },
+    "month": {
+     "months": 14,
+     "diff": 0.0044,
+     "t": 0.01
+    }
+   },
+   "oos": {
+    "n": 575,
+    "share": 1.7,
+    "with": {
+     "n": 10,
+     "mean": -0.2458,
+     "gross": -0.2,
+     "win": 20,
+     "months": 10,
+     "tMonth": -0.46
+    },
+    "without": {
+     "n": 565,
+     "mean": -0.1206,
+     "gross": -0.0726,
+     "win": 23.2,
+     "months": 24,
+     "tMonth": -1.85
+    },
+    "diff": {
+     "diff": -0.1252,
+     "t": -0.23
+    },
+    "month": {
+     "months": 10,
+     "diff": -0.1112,
+     "t": -0.21
+    }
+   },
+   "pA": 0.645516260754605,
+   "pB": 0.8336677371695206,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-qm",
+   "name": "MSNR gold plan, QM entry",
+   "is": {
+    "n": 268,
+    "share": 3.4,
+    "with": {
+     "n": 9,
+     "mean": -0.5857,
+     "gross": -0.5556,
+     "win": 11.1,
+     "months": 6,
+     "tMonth": -1.47
+    },
+    "without": {
+     "n": 259,
+     "mean": 0.0045,
+     "gross": 0.0347,
+     "win": 25.9,
+     "months": 47,
+     "tMonth": 0.04
+    },
+    "diff": {
+     "diff": -0.5902,
+     "t": -1.29
+    },
+    "month": {
+     "months": 6,
+     "diff": -0.5856,
+     "t": -1.88
+    }
+   },
+   "oos": {
+    "n": 149,
+    "share": 4.7,
+    "with": {
+     "n": 7,
+     "mean": 0.096,
+     "gross": 0.1429,
+     "win": 28.6,
+     "months": 5,
+     "tMonth": 0.12
+    },
+    "without": {
+     "n": 142,
+     "mean": -0.0633,
+     "gross": -0.0141,
+     "win": 24.6,
+     "months": 23,
+     "tMonth": -0.38
+    },
+    "diff": {
+     "diff": 0.1594,
+     "t": 0.21
+    },
+    "month": {
+     "months": 5,
+     "diff": 0.6662,
+     "t": 0.52
+    }
+   },
+   "pA": 0.9044830622991076,
+   "pB": 0.603063551016024,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "lit-loose",
+   "name": "LIT, loose limit",
+   "is": {
+    "n": 628,
+    "share": 1.3,
+    "with": {
+     "n": 8,
+     "mean": -1.0848,
+     "gross": -1,
+     "win": 0,
+     "months": 7,
+     "tMonth": -7.71
+    },
+    "without": {
+     "n": 620,
+     "mean": -0.0066,
+     "gross": 0.1163,
+     "win": 28.7,
+     "months": 48,
+     "tMonth": -0.09
+    },
+    "diff": {
+     "diff": -1.0782,
+     "t": -12.82
+    },
+    "month": {
+     "months": 7,
+     "diff": -0.7142,
+     "t": -4.16
+    }
+   },
+   "oos": {
+    "n": 319,
+    "share": 0.6,
+    "with": {
+     "n": 2,
+     "mean": 0.0592,
+     "gross": 0.1976,
+     "win": 50,
+     "months": 2,
+     "tMonth": 0.05
+    },
+    "without": {
+     "n": 317,
+     "mean": -0.1976,
+     "gross": -0.0351,
+     "win": 26.5,
+     "months": 24,
+     "tMonth": -2.37
+    },
+    "diff": {
+     "diff": 0.2568,
+     "t": 0.23
+    },
+    "month": {
+     "months": 2,
+     "diff": -0.0078,
+     "t": -0.01
+    }
+   },
+   "pA": 0.960122253874987,
+   "pB": 0.9920212412010472,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "pool",
+   "name": "Pool: every trade",
+   "is": {
+    "n": 75455,
+    "share": 3.7,
+    "with": {
+     "n": 2774,
+     "mean": -0.0981,
+     "gross": -0.0293,
+     "win": 29.8,
+     "months": 48,
+     "tMonth": -1.77
+    },
+    "without": {
+     "n": 72681,
+     "mean": -0.0758,
+     "gross": 0.0047,
+     "win": 29.2,
+     "months": 48,
+     "tMonth": -7.35
+    },
+    "diff": {
+     "diff": -0.0223,
+     "t": -0.72
+    },
+    "month": {
+     "months": 48,
+     "diff": 0.0134,
+     "t": 0.25
+    }
+   },
+   "oos": {
+    "n": 36875,
+    "share": 3.4,
+    "with": {
+     "n": 1261,
+     "mean": -0.1672,
+     "gross": -0.0858,
+     "win": 28.5,
+     "months": 24,
+     "tMonth": -2.77
+    },
+    "without": {
+     "n": 35614,
+     "mean": -0.1021,
+     "gross": -0.0098,
+     "win": 29.1,
+     "months": 24,
+     "tMonth": -7.81
+    },
+    "diff": {
+     "diff": -0.0652,
+     "t": -1.49
+    },
+    "month": {
+     "months": 24,
+     "diff": -0.0541,
+     "t": -0.91
+    }
+   },
+   "pA": 0.005605744449635908,
+   "pB": 0.3628224588926574,
+   "pAHolm": 0.1457,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  }
+ ],
+ "placebo": [
+  {
+   "group": "sop",
+   "name": "Mosha sequence",
+   "is": {
+    "n": 976,
+    "share": 0.1,
+    "with": {
+     "n": 1,
+     "mean": -1.0255,
+     "gross": -1,
+     "win": 0,
+     "months": 1,
+     "tMonth": null
+    },
+    "without": {
+     "n": 975,
+     "mean": -0.1299,
+     "gross": -0.0293,
+     "win": 21.1,
+     "months": 48,
+     "tMonth": -1.47
+    },
+    "diff": {
+     "diff": -0.8956,
+     "t": null
+    },
+    "month": {
+     "months": 1,
+     "diff": null,
+     "t": null
+    }
+   },
+   "oos": {
+    "n": 487,
+    "share": 0,
+    "with": {
+     "n": 0,
+     "mean": null,
+     "gross": null,
+     "win": null,
+     "months": 0,
+     "tMonth": null
+    },
+    "without": {
+     "n": 487,
+     "mean": -0.3238,
+     "gross": -0.2037,
+     "win": 19.3,
+     "months": 24,
+     "tMonth": -2.8
+    },
+    "diff": {
+     "diff": null,
+     "t": null
+    },
+    "month": {
+     "months": 0,
+     "diff": null,
+     "t": null
+    }
+   },
+   "pA": 1,
+   "pB": 1,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "barrier",
+   "name": "Mosha barrier entry",
+   "is": {
+    "n": 44883,
+    "share": 4.9,
+    "with": {
+     "n": 2185,
+     "mean": -0.0856,
+     "gross": -0.0161,
+     "win": 24.9,
+     "months": 48,
+     "tMonth": -1.63
+    },
+    "without": {
+     "n": 42698,
+     "mean": -0.0592,
+     "gross": 0.0149,
+     "win": 25.4,
+     "months": 48,
+     "tMonth": -3.91
+    },
+    "diff": {
+     "diff": -0.0264,
+     "t": -0.69
+    },
+    "month": {
+     "months": 48,
+     "diff": -0.0277,
+     "t": -0.47
+    }
+   },
+   "oos": {
+    "n": 21458,
+    "share": 4.4,
+    "with": {
+     "n": 948,
+     "mean": -0.0976,
+     "gross": -0.0211,
+     "win": 24.5,
+     "months": 24,
+     "tMonth": -0.9
+    },
+    "without": {
+     "n": 20510,
+     "mean": -0.0902,
+     "gross": -0.0055,
+     "win": 24.9,
+     "months": 24,
+     "tMonth": -4.82
+    },
+    "diff": {
+     "diff": -0.0074,
+     "t": -0.13
+    },
+    "month": {
+     "months": 24,
+     "diff": -0.0333,
+     "t": -0.35
+    }
+   },
+   "pA": 0.36812019225978143,
+   "pB": 0.7263388279859394,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-1d",
+   "name": "Engulf D1",
+   "is": {
+    "n": 470,
+    "share": 9.4,
+    "with": {
+     "n": 44,
+     "mean": 0.3393,
+     "gross": 0.3499,
+     "win": 52.3,
+     "months": 31,
+     "tMonth": 1.28
+    },
+    "without": {
+     "n": 426,
+     "mean": 0.0384,
+     "gross": 0.0494,
+     "win": 37.6,
+     "months": 48,
+     "tMonth": 0.47
+    },
+    "diff": {
+     "diff": 0.3009,
+     "t": 1.26
+    },
+    "month": {
+     "months": 31,
+     "diff": 0.2793,
+     "t": 0.99
+    }
+   },
+   "oos": {
+    "n": 251,
+    "share": 4.4,
+    "with": {
+     "n": 11,
+     "mean": -0.5016,
+     "gross": -0.4879,
+     "win": 18.2,
+     "months": 8,
+     "tMonth": -1.52
+    },
+    "without": {
+     "n": 240,
+     "mean": -0.0442,
+     "gross": -0.0303,
+     "win": 33.8,
+     "months": 24,
+     "tMonth": -0.53
+    },
+    "diff": {
+     "diff": -0.4573,
+     "t": -1.35
+    },
+    "month": {
+     "months": 8,
+     "diff": -0.3814,
+     "t": -0.92
+    }
+   },
+   "pA": 0.1285110234275384,
+   "pB": 0.35757271601734064,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-4h",
+   "name": "Engulf H4",
+   "is": {
+    "n": 2929,
+    "share": 3,
+    "with": {
+     "n": 89,
+     "mean": -0.0941,
+     "gross": -0.0565,
+     "win": 33.7,
+     "months": 41,
+     "tMonth": -0.52
+    },
+    "without": {
+     "n": 2840,
+     "mean": -0.0216,
+     "gross": 0.0182,
+     "win": 36.2,
+     "months": 48,
+     "tMonth": -0.62
+    },
+    "diff": {
+     "diff": -0.0726,
+     "t": -0.46
+    },
+    "month": {
+     "months": 41,
+     "diff": -0.1884,
+     "t": -1.06
+    }
+   },
+   "oos": {
+    "n": 1366,
+    "share": 2,
+    "with": {
+     "n": 27,
+     "mean": 0.0065,
+     "gross": 0.0537,
+     "win": 37,
+     "months": 17,
+     "tMonth": 0.04
+    },
+    "without": {
+     "n": 1339,
+     "mean": -0.0404,
+     "gross": 0.0051,
+     "win": 36.6,
+     "months": 24,
+     "tMonth": -0.77
+    },
+    "diff": {
+     "diff": 0.047,
+     "t": 0.18
+    },
+    "month": {
+     "months": 17,
+     "diff": 0.1018,
+     "t": 0.43
+    }
+   },
+   "pA": 0.9680930023907278,
+   "pB": 0.6671957123489153,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-1h",
+   "name": "Engulf H1",
+   "is": {
+    "n": 11474,
+    "share": 1.3,
+    "with": {
+     "n": 146,
+     "mean": 0.0697,
+     "gross": 0.1342,
+     "win": 43.2,
+     "months": 46,
+     "tMonth": 0.63
+    },
+    "without": {
+     "n": 11328,
+     "mean": -0.0858,
+     "gross": -0.014,
+     "win": 35.9,
+     "months": 48,
+     "tMonth": -5.73
+    },
+    "diff": {
+     "diff": 0.1554,
+     "t": 1.46
+    },
+    "month": {
+     "months": 46,
+     "diff": 0.1149,
+     "t": 0.98
+    }
+   },
+   "oos": {
+    "n": 5636,
+    "share": 1.2,
+    "with": {
+     "n": 68,
+     "mean": 0.0584,
+     "gross": 0.1299,
+     "win": 41.2,
+     "months": 24,
+     "tMonth": 0.34
+    },
+    "without": {
+     "n": 5568,
+     "mean": -0.0949,
+     "gross": -0.0132,
+     "win": 35.1,
+     "months": 24,
+     "tMonth": -4.01
+    },
+    "diff": {
+     "diff": 0.1532,
+     "t": 0.84
+    },
+    "month": {
+     "months": 24,
+     "diff": 0.3136,
+     "t": 1.4
+    }
+   },
+   "pA": 0.7338566618397739,
+   "pB": 0.16151342759899356,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": true,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-plan",
+   "name": "Engulf plan (with the Daily)",
+   "is": {
+    "n": 2597,
+    "share": 3.3,
+    "with": {
+     "n": 85,
+     "mean": -0.2751,
+     "gross": -0.1882,
+     "win": 27.1,
+     "months": 38,
+     "tMonth": -1.75
+    },
+    "without": {
+     "n": 2512,
+     "mean": -0.0461,
+     "gross": 0.0431,
+     "win": 34.9,
+     "months": 48,
+     "tMonth": -1.7
+    },
+    "diff": {
+     "diff": -0.229,
+     "t": -1.53
+    },
+    "month": {
+     "months": 38,
+     "diff": -0.2556,
+     "t": -1.47
+    }
+   },
+   "oos": {
+    "n": 1144,
+    "share": 4,
+    "with": {
+     "n": 46,
+     "mean": -0.1148,
+     "gross": -0.0217,
+     "win": 32.6,
+     "months": 19,
+     "tMonth": -0.45
+    },
+    "without": {
+     "n": 1098,
+     "mean": -0.1188,
+     "gross": -0.0263,
+     "win": 32.5,
+     "months": 24,
+     "tMonth": -2.87
+    },
+    "diff": {
+     "diff": 0.004,
+     "t": 0.02
+    },
+    "month": {
+     "months": 19,
+     "diff": 0.16,
+     "t": 0.58
+    }
+   },
+   "pA": 0.6527104913928108,
+   "pB": 0.5619145371691614,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "eg-simple",
+   "name": "Engulf short method",
+   "is": {
+    "n": 2640,
+    "share": 4.2,
+    "with": {
+     "n": 110,
+     "mean": -0.1707,
+     "gross": -0.0727,
+     "win": 30.9,
+     "months": 40,
+     "tMonth": -1.4
+    },
+    "without": {
+     "n": 2530,
+     "mean": -0.1415,
+     "gross": -0.051,
+     "win": 31.7,
+     "months": 48,
+     "tMonth": -4.74
+    },
+    "diff": {
+     "diff": -0.0291,
+     "t": -0.21
+    },
+    "month": {
+     "months": 40,
+     "diff": 0.0636,
+     "t": 0.38
+    }
+   },
+   "oos": {
+    "n": 1204,
+    "share": 2.8,
+    "with": {
+     "n": 34,
+     "mean": -0.3893,
+     "gross": -0.2941,
+     "win": 23.5,
+     "months": 18,
+     "tMonth": -2.18
+    },
+    "without": {
+     "n": 1170,
+     "mean": -0.1081,
+     "gross": -0.0169,
+     "win": 32.8,
+     "months": 24,
+     "tMonth": -2.77
+    },
+    "diff": {
+     "diff": -0.2812,
+     "t": -1.25
+    },
+    "month": {
+     "months": 18,
+     "diff": -0.4084,
+     "t": -1.99
+    }
+   },
+   "pA": 0.02925735866017498,
+   "pB": 0.046590797086471514,
+   "pAHolm": 0.7607,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-main",
+   "name": "MSNR with the direction, 12-16 UTC",
+   "is": {
+    "n": 1466,
+    "share": 5.3,
+    "with": {
+     "n": 78,
+     "mean": -0.3085,
+     "gross": -0.1987,
+     "win": 32.1,
+     "months": 35,
+     "tMonth": -2.02
+    },
+    "without": {
+     "n": 1388,
+     "mean": -0.17,
+     "gross": -0.0629,
+     "win": 37.7,
+     "months": 48,
+     "tMonth": -4.78
+    },
+    "diff": {
+     "diff": -0.1385,
+     "t": -1.01
+    },
+    "month": {
+     "months": 35,
+     "diff": -0.2091,
+     "t": -1.26
+    }
+   },
+   "oos": {
+    "n": 836,
+    "share": 4.3,
+    "with": {
+     "n": 36,
+     "mean": -0.0548,
+     "gross": 0.0716,
+     "win": 44.4,
+     "months": 15,
+     "tMonth": -0.27
+    },
+    "without": {
+     "n": 800,
+     "mean": -0.1447,
+     "gross": -0.0129,
+     "win": 39.6,
+     "months": 24,
+     "tMonth": -3.33
+    },
+    "diff": {
+     "diff": 0.0899,
+     "t": 0.43
+    },
+    "month": {
+     "months": 15,
+     "diff": 0.0519,
+     "t": 0.2
+    }
+   },
+   "pA": 0.7871603784080516,
+   "pB": 0.8414806307510496,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-other",
+   "name": "MSNR with the direction, other hours",
+   "is": {
+    "n": 5649,
+    "share": 3.4,
+    "with": {
+     "n": 192,
+     "mean": -0.3447,
+     "gross": -0.1983,
+     "win": 32.3,
+     "months": 46,
+     "tMonth": -4.05
+    },
+    "without": {
+     "n": 5457,
+     "mean": -0.1853,
+     "gross": -0.0241,
+     "win": 39.2,
+     "months": 48,
+     "tMonth": -8.57
+    },
+    "diff": {
+     "diff": -0.1594,
+     "t": -1.85
+    },
+    "month": {
+     "months": 46,
+     "diff": -0.1487,
+     "t": -1.44
+    }
+   },
+   "oos": {
+    "n": 3290,
+    "share": 2.3,
+    "with": {
+     "n": 76,
+     "mean": -0.0692,
+     "gross": 0.1026,
+     "win": 44.7,
+     "months": 24,
+     "tMonth": -0.48
+    },
+    "without": {
+     "n": 3214,
+     "mean": -0.188,
+     "gross": -0.0172,
+     "win": 39.4,
+     "months": 24,
+     "tMonth": -8.64
+    },
+    "diff": {
+     "diff": 0.1188,
+     "t": 0.82
+    },
+    "month": {
+     "months": 24,
+     "diff": 0.1112,
+     "t": 0.68
+    }
+   },
+   "pA": 0.631227411749313,
+   "pB": 0.49650432646310105,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-sop",
+   "name": "MSNR gold plan",
+   "is": {
+    "n": 1177,
+    "share": 3.1,
+    "with": {
+     "n": 37,
+     "mean": -0.1655,
+     "gross": -0.1351,
+     "win": 21.6,
+     "months": 22,
+     "tMonth": -0.56
+    },
+    "without": {
+     "n": 1140,
+     "mean": -0.0318,
+     "gross": -0.0014,
+     "win": 25,
+     "months": 48,
+     "tMonth": -0.56
+    },
+    "diff": {
+     "diff": -0.1337,
+     "t": -0.48
+    },
+    "month": {
+     "months": 22,
+     "diff": 0.083,
+     "t": 0.22
+    }
+   },
+   "oos": {
+    "n": 575,
+    "share": 3.8,
+    "with": {
+     "n": 22,
+     "mean": 0.403,
+     "gross": 0.4545,
+     "win": 36.4,
+     "months": 12,
+     "tMonth": 0.99
+    },
+    "without": {
+     "n": 553,
+     "mean": -0.1437,
+     "gross": -0.0958,
+     "win": 22.6,
+     "months": 24,
+     "tMonth": -2.08
+    },
+    "diff": {
+     "diff": 0.5467,
+     "t": 1.28
+    },
+    "month": {
+     "months": 12,
+     "diff": 0.8708,
+     "t": 1.52
+    }
+   },
+   "pA": 0.3221741310424957,
+   "pB": 0.1285110234275384,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "msnr-qm",
+   "name": "MSNR gold plan, QM entry",
+   "is": {
+    "n": 268,
+    "share": 1.1,
+    "with": {
+     "n": 3,
+     "mean": 0.3034,
+     "gross": 0.3333,
+     "win": 33.3,
+     "months": 3,
+     "tMonth": 0.23
+    },
+    "without": {
+     "n": 265,
+     "mean": -0.0189,
+     "gross": 0.0113,
+     "win": 25.3,
+     "months": 47,
+     "tMonth": -0.16
+    },
+    "diff": {
+     "diff": 0.3223,
+     "t": 0.24
+    },
+    "month": {
+     "months": 3,
+     "diff": -0.6702,
+     "t": -0.37
+    }
+   },
+   "oos": {
+    "n": 149,
+    "share": 1.3,
+    "with": {
+     "n": 2,
+     "mean": 2.9612,
+     "gross": 3,
+     "win": 100,
+     "months": 1,
+     "tMonth": null
+    },
+    "without": {
+     "n": 147,
+     "mean": -0.0969,
+     "gross": -0.0476,
+     "win": 23.8,
+     "months": 23,
+     "tMonth": -0.63
+    },
+    "diff": {
+     "diff": 3.0581,
+     "t": 21.68
+    },
+    "month": {
+     "months": 1,
+     "diff": null,
+     "t": null
+    }
+   },
+   "pA": 1,
+   "pB": 1,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": true,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "lit-loose",
+   "name": "LIT, loose limit",
+   "is": {
+    "n": 628,
+    "share": 4.8,
+    "with": {
+     "n": 30,
+     "mean": 0.0522,
+     "gross": 0.1704,
+     "win": 33.3,
+     "months": 18,
+     "tMonth": 0.16
+    },
+    "without": {
+     "n": 598,
+     "mean": -0.024,
+     "gross": 0.0986,
+     "win": 28.1,
+     "months": 48,
+     "tMonth": -0.33
+    },
+    "diff": {
+     "diff": 0.0761,
+     "t": 0.21
+    },
+    "month": {
+     "months": 18,
+     "diff": 0.092,
+     "t": 0.2
+    }
+   },
+   "oos": {
+    "n": 319,
+    "share": 6,
+    "with": {
+     "n": 19,
+     "mean": -0.4245,
+     "gross": -0.2617,
+     "win": 26.3,
+     "months": 11,
+     "tMonth": -1.22
+    },
+    "without": {
+     "n": 300,
+     "mean": -0.1815,
+     "gross": -0.0192,
+     "win": 26.7,
+     "months": 24,
+     "tMonth": -2.09
+    },
+    "diff": {
+     "diff": -0.243,
+     "t": -0.74
+    },
+    "month": {
+     "months": 11,
+     "diff": -0.0391,
+     "t": -0.09
+    }
+   },
+   "pA": 0.22246500858166096,
+   "pB": 0.9282870894170112,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": true,
+    "diffBoth": false,
+    "enough": false
+   },
+   "pass": false
+  },
+  {
+   "group": "pool",
+   "name": "Pool: every trade",
+   "is": {
+    "n": 75455,
+    "share": 4,
+    "with": {
+     "n": 3032,
+     "mean": -0.0983,
+     "gross": -0.0231,
+     "win": 27.5,
+     "months": 48,
+     "tMonth": -2.31
+    },
+    "without": {
+     "n": 72423,
+     "mean": -0.0758,
+     "gross": 0.0046,
+     "win": 29.3,
+     "months": 48,
+     "tMonth": -6.82
+    },
+    "diff": {
+     "diff": -0.0225,
+     "t": -0.74
+    },
+    "month": {
+     "months": 48,
+     "diff": -0.0277,
+     "t": -0.58
+    }
+   },
+   "oos": {
+    "n": 36875,
+    "share": 3.5,
+    "with": {
+     "n": 1302,
+     "mean": -0.089,
+     "gross": -0.0043,
+     "win": 28,
+     "months": 24,
+     "tMonth": -1.06
+    },
+    "without": {
+     "n": 35573,
+     "mean": -0.1049,
+     "gross": -0.0127,
+     "win": 29.1,
+     "months": 24,
+     "tMonth": -8.1
+    },
+    "diff": {
+     "diff": 0.0158,
+     "t": 0.34
+    },
+    "month": {
+     "months": 24,
+     "diff": 0.004,
+     "t": 0.05
+    }
+   },
+   "pA": 0.28914466290063356,
+   "pB": 0.960122253874987,
+   "pAHolm": 1,
+   "pBHolm": 1,
+   "checks": {
+    "oosProfit": false,
+    "isProfit": false,
+    "diffBoth": false,
+    "enough": true
+   },
+   "pass": false
+  }
+ ],
+ "placeboPass": [],
+ "reading": [
+  "Out of sample the trades with P are net positive in 2 of 13 groups; 0 reach month t >= 2 after Holm.",
+  "With P beats without P in both windows in 2 of 13 groups (trade-level difference of means); the largest out-of-sample Welch t is 0.23.",
+  "Mosha barrier entry, the group the 2026 split pointed at: out of sample −0.090R with P (n 584) against −0.090R without.",
+  "The question is closed on these years: no variant of the condition is run on 2020-2025."
+ ]
+}

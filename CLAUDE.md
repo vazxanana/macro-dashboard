@@ -6244,3 +6244,17 @@ the next-candle engulf beats the four-candle engulf on the plan and the short me
 differences five independent readers found are listed there as 21 owner questions (their notes stay outside the repository).
 Same day: the desk notes that still named the older targets and "any number of candles" were corrected (text only).
 In-sample splits: never quote one as an edge.
+
+## Lower-timeframe structure as an entry permission, tested (22 Nov 2026, owner: "you are not marking market structure on the lower timeframe")
+`research/edge/ltf-structure/` (PREREGISTRATION.md committed alone first; `run.mjs run <trades dir> <candles dir>`, RESULT.md,
+result.json). The one condition that looked best on the desks' 2026 records (+0.070R a trade, n 1,835, in sample, before costs):
+at the entry the last H1 break is with the trade, the last M15 break is a structure shift with the trade known at most 6 hours
+before, and the last M5 break is with the trade (the page's `msAnalyze(bars, 6)`, candles closed by the entry only; whole-series
+reading checked against cut series on 1,800 random cuts, 0 mismatches). On the desks' own 112,330 trades of 2020-2025 (gold,
+EUR/USD, GBP/USD, the desk-partial files), after the desk-rigor costs, IS 2020-23 / OOS 2024-25, 12 groups and the pool, Holm
+over 26 tests, placebo = the structure against the trade. **FAIL, 0 of 13**: the condition keeps 3.6 % of trades; pool out of
+sample −0.167R a trade with it (n 1,261, month t −2.77) against −0.102R without (difference −0.065R, Welch t −1.49); Mosha
+barrier entry −0.090R with (n 584) and −0.090R without; no group reaches a positive month t of 2, the largest out-of-sample
+Welch t for "with beats without" is 0.23; the placebo passes nowhere. The 2026 split did not repeat: agreeing with the lower
+timeframes' structure does not pick the better trades of these readings. One run, no variants: the question is closed on
+2020-2025 (no other timeframes, look-backs or freshness windows). Nothing live changed. Test: `tests/ltf-structure.test.mjs`.
