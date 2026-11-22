@@ -245,9 +245,17 @@
     var host = $('mo-rp-chart'); if (!host || R.chart || !root.LightweightCharts) return !!R.chart;
     var LW = root.LightweightCharts, ink = css('--ink-dim', '#9aa3b2'), line = css('--line', 'rgba(128,128,128,.2)');
     R.chart = LW.createChart(host, { autoSize: true, layout: { background: { color: 'transparent' }, textColor: ink, fontSize: 12 }, grid: { vertLines: { color: 'transparent' }, horzLines: { color: line } },
-      rightPriceScale: { borderColor: line }, timeScale: { borderColor: line, timeVisible: true, secondsVisible: false, rightOffset: 2 }, crosshair: { mode: 0 }, handleScale: { axisPressedMouseMove: false } });
+      rightPriceScale: { borderColor: line }, timeScale: { borderColor: line, timeVisible: true, secondsVisible: false, rightOffset: 2 }, crosshair: { mode: 0 } }); // the price and time axes drag to stretch the candles (owner, 22 Nov 2026); a double-click on an axis puts it back
     R.series = R.chart.addCandlestickSeries(Object.assign({ priceLineVisible: false, lastValueVisible: true, autoscaleInfoProvider: function () { return R.hi > R.lo ? { priceRange: { minValue: R.lo, maxValue: R.hi } } : null; } }, candleCols()));
     R.chart.timeScale().subscribeVisibleLogicalRangeChange(function () { paint(); });
+    // The marks follow the candles on EVERY move (owner, 22 Nov 2026: the boxes stayed put while the chart moved): a drag of the
+    // price axis or an up / down pan changes no time range, so nothing told the overlay. Each frame, while the chart is on
+    // screen, where the scale puts two prices and the time range is compared with the last frame; a change repaints at once.
+    (function watch() { var last = '';
+      (function tick() { if (R.chart && R.series && host.offsetParent !== null) { var k = '';
+          try { var lr = R.chart.timeScale().getVisibleLogicalRange(), a = R.series.priceToCoordinate(R.lo || 1), b = R.series.priceToCoordinate(R.hi || 2); k = (lr ? lr.from + ':' + lr.to : '') + '|' + a + '|' + b; } catch (e) {}
+          if (k !== last) { last = k; paint(); } }
+        requestAnimationFrame(tick); })(); })();
     if (root.ResizeObserver) new ResizeObserver(function () { paint(); }).observe(host);
     new MutationObserver(function () { if (!R.chart) return; R.series.applyOptions(candleCols()); R.chart.applyOptions({ layout: { textColor: css('--ink-dim', '#9aa3b2') }, grid: { horzLines: { color: css('--line', 'rgba(128,128,128,.2)') } } }); paint(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     return true;
@@ -333,7 +341,7 @@
     var pad = (hi - lo) * .04; R.lo = lo - pad; R.hi = hi + pad;
     var sl = $('mo-rp-slider'); if (sl) sl.max = R.bars.length - 1;
     Array.prototype.forEach.call(document.querySelectorAll('#mo-rp-tf button'), function (b) { b.setAttribute('aria-pressed', String(+b.dataset.tf === sec)); });
-    show(t != null ? Math.max(0, barAt(R.bars, t)) : R.bars.length - 1); R.chart.timeScale().setVisibleLogicalRange({ from: -1, to: R.bars.length + 3 });
+    show(t != null ? Math.max(0, barAt(R.bars, t)) : R.bars.length - 1); R.chart.timeScale().setVisibleLogicalRange({ from: -1, to: R.bars.length + 3 }); R.chart.priceScale('right').applyOptions({ autoScale: true });
   }
   // how a desk's stored trade ended, in words (the stored status)
   var HOW = { target: 'target reached', stopped: 'stopped', trail: 'trailing stop', time: 'time limit', breakeven: 'stopped at break-even', dayend: 'closed at the day\'s end' };
