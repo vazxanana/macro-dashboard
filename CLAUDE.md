@@ -6270,3 +6270,14 @@ the browser replay, so an older-reading record never replaces or is replaced by 
 only with its own reading. Desk: chip "Barrier, older reading", its own line under "By entry type"; "Barrier entry" and every
 barrier split count the current reading only. The current reading's records are unchanged (test). The tracker adds it for its
 14-day window; older history needs a `--days` rebuild. A paper reading before costs, never an edge. Test: `tests/mosha-sop.test.mjs`.
+
+## A failed QM at a barrier against the direction is traded with the direction (22 Nov 2026, owner on a GBP/USD buy of 20 Nov: "this should be a sell not buy", "there is no new BO, the recent high closed below, remember BO, VR, CF / repeat SOP", "stop above VR, target last low")
+`assets/mosha-sop.js` `barrierTrades`, the repeat of the SOP at a barrier, only where the barrier is AGAINST the direction of the
+timeframe above (`wd === false`): once a candle of the confirmation timeframe, after the lower-timeframe VR, closes back through the
+QM level, the QM made no new BO: the repeat gives no entry (it used to take a later CF), and that close is the CF with the
+direction: a market entry at that close the other way, stop past the VR's extreme (the top the rejection made) by the desk's
+buffer, target the last low (high for a buy) since price came back to the barrier; no minimum R (not answered: some targets are a
+few pips). Record: id `bar-sop-f-…`, flags `rsop`, `qmFail`, `withDir: true`, label "… · QM failed · with H4"; `readings(r).qmFail`
+is read back from the id; its own reading in the 20-minute rule. `fail: false` reads it as before. Barriers with the direction are
+unchanged (there a pullback through the QM level is the sequence's own). On GBP/USD 18-20 Nov: 2 buys gone (−2R), 10 entries
+added (+1.4R before costs). A reading, not a tested rule. Test: `tests/mosha-sop.test.mjs`.

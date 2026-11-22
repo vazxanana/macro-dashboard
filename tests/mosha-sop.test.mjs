@@ -18,6 +18,9 @@ function makeMarket(days, seed) {
   for (const tf of ['5m', '15m', '30m', '1h', '4h', '1d']) { const sec = M.SEC[tf], out = []; for (const b of m1) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } B[tf] = out; }
   return B;
 }
+// 22 Nov 2026: the failed-QM entries (a trade with the direction at a barrier against it) have their own shape and their own
+// test at the end of this file; every older test reads the barrier list without them (BT = the whole list).
+const BT = M.barrierTrades; M.barrierTrades = (B, Fx, o) => BT(B, Fx, o).filter((r) => !r.qmFail);
 // Every market and every replay is worked out ONCE and shared by the tests below (21 Nov 2026: the file had grown to about a
 // quarter of an hour, most of it the same replay run again by each test). A replay is keyed by its candles, its cut and its
 // options; nothing a test asserts was dropped for it.
@@ -624,4 +627,21 @@ test('the older barrier reading is a reading of its own: its own ids and flag, t
   assert.deepEqual(M.barrierTrades(X, F, { from: fr, extra: ALL(seed).z }).map(keyOf), cur.map(keyOf), 'the current reading is unchanged');
   const src = fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8');
   assert.match(src, /\.concat\(SOP\.oldBarrierTrades\(B, F, \{ from, market \}\)\)/);
+});
+
+// 22 Nov 2026 (owner on a GBP/USD buy: "this should be a sell", "there is no new BO"): at a barrier against the direction a QM
+// that price closed back through gives no repeat-SOP entry; the trade is taken with the direction instead
+test('a failed QM at a barrier against the direction: no repeat-SOP entry after it, a trade with the direction with its stop past the VR, no hindsight', () => {
+  let n = 0, c = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), z = ALL(seed).z, all = BT(X, F, { from: fr, extra: z }), was = BT(X, F, { from: fr, extra: z, fail: false });
+    const f = all.filter((r) => M.readings(r).qmFail); n += f.length;
+    for (const r of f) { assert.match(r.id, /bar-sop-f-/); assert.equal(r.withDir, true); assert.equal(r.qmFail, true); assert.ok(M.readings({ id: r.id }).qmFail);
+      assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'stop on the losing side, target on the winning side'); assert.match(r.label, /QM failed · with /); assert.match(r.log.at(-2).text, /No new BO (buy|sell)/); }
+    assert.ok(was.every((r) => !M.readings(r).qmFail), 'fail: false reads it as before');
+    const ids = new Set(all.map((r) => r.id)), gone = was.filter((r) => !ids.has(r.id));
+    assert.ok(gone.every((r) => r.rsop && r.withDir === false), 'only repeat-SOP entries at barriers against the direction are dropped, seed ' + seed);
+    // no hindsight: the record exists, with the same levels, on the candles closed just after its entry
+    for (const r of f.slice(0, 4)) { const T = cutFor(seed, r.t + 3600); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
+      assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); assert.equal(k.target, r.target); c++; } }
+  assert.ok(n > 0 && c > 0, 'failed-QM entries: ' + n + ', checked against a cut: ' + c);
 });
