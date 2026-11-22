@@ -5,7 +5,7 @@
 //      with the BO), the pullback into the CF zone, an EG, stop past the pullback's extreme, target the VR's extreme;
 //   2. the barrier entry: a fresh D1, H4, H1 or M15 barrier, price comes to it, the CF is a QM (BO Structure) with the barrier
 //      on the method's own confirmation timeframe (D1 on H1, H4 on M15, H1 on M5, M15 on M1), entry on the pullback to the
-//      level that CF broke, stop past the extreme made at the barrier; the target (3R) is the replay's own choice.
+//      level that CF broke, stop past the extreme made at the barrier; the target (1R since 22 Nov 2026, the owner's choice; 3R before) is the replay's own.
 // In the sequence the VR and the CF must each be a BO Structure (a QM), never a continuation break (21 Nov 2026).
 // The owner's four readings (21 Nov 2026, after comparing the desk with his own example trades), each recorded under its own label:
 //   - the VR box runs from the extreme to the NEAREST internal swing before it (msMosha o.near; on by default here, o.near: false
@@ -43,7 +43,9 @@
   var NAME = { '1d': 'D1', '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
   var LADDER = [['1d', '4h'], ['4h', '1h'], ['1h', '30m'], ['30m', '15m'], ['15m', '5m']];   // the VR forms exactly one timeframe lower
   var BACK = { '1d': 1500, '4h': 260, '1h': 90, '30m': 60, '15m': 40, '5m': 24, '1m': 16 };  // days of candles each timeframe needs
-  var DAYS = 14, PIVOT = 6, WIN = 1500, BUF = 0.3, BARRIER_R = 3, MIN_JUDGE = 20;
+  // BARRIER_R: 3 until 22 Nov 2026. Owner ("keep the best rr for each individual one"): a 1R target did best on the barrier
+  // entries' own closed 2026 records (1R-4R, each replayed alone on 5-minute candles, before costs). Picked in sample, not a tested result.
+  var DAYS = 14, PIVOT = 6, WIN = 1500, BUF = 0.3, BARRIER_R = 1, MIN_JUDGE = 20;
   // the barrier entry's confirmation timeframe (21 Nov 2026, the method's own table: D1 on H1, H4 on M15, H1 on M5, M15 on M1);
   // the CF is watched for BARRIER_WATCH confirmation candles from the first touch and its pullback for BARRIER_FILL more
   var BARRIER = [['1d', '1h'], ['4h', '15m'], ['1h', '5m'], ['15m', '1m']], BARRIER_WATCH = 60, BARRIER_FILL = 12;
@@ -361,6 +363,7 @@
     if (!(B['30m'] || []).length && (B['15m'] || []).length) B['30m'] = m30of(B['15m']);
     var from = o.from, rows = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
     var fk = B['1m'] && B['1m'].length ? '1m' : '5m', fine = B[fk] || [];
+    var BR = o.rr > 0 ? +o.rr : BARRIER_R;   // rr: 3 reads the target the older way (the pinned tests)
     var at = function (A, t) { var lo = 0, hi = A.length; while (lo < hi) { var m = (lo + hi) >> 1; if (A[m].time < t) lo = m + 1; else hi = m; } return lo; };
     // The method: a barrier WITH the direction runs, one against it "only gives a rejection". The direction here is the
     // structure of the timeframe above the barrier's (D1 over H4, H4 over H1, H1 over M15; a D1 barrier has none), read on its
@@ -479,14 +482,14 @@
           var entry = px, Z0 = sizes(mk, entry), stop = d < 0 ? xx + Z0.buf : xx - Z0.buf, r0 = Math.abs(entry - stop); if (!(r0 > Z0.rmin) || r0 > Z0.rmax || (d < 0 ? stop <= entry : stop >= entry)) return;
           var tr = { id: pre + 'bar-' + (m.j ? 'j-' : '') + idK + (zn ? 'z-' : '') + (d > 0 ? 'b' : 's') + fine[fi].time, market: mk, kind: 'barrier',
             label: name + (m.j ? ' · Janda' + (alt ? ' (M1)' : '') : '') + labK + (zn ? ' · at the zone' : '') + labD,
-            withDir: wd, janda: m.j, jandaM1: !!alt, m5: m5, alt: a2 ? ctf : null, sweep: sw, eg: eg, visit: vn, atZone: zn, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BARRIER_R * r0 : entry + BARRIER_R * r0, r0: r0, zone: z };
+            withDir: wd, janda: m.j, jandaM1: !!alt, m5: m5, alt: a2 ? ctf : null, sweep: sw, eg: eg, visit: vn, atZone: zn, h: zt, l: ctf, side: d, t: fine[fi].time, entry: entry, stop: stop, target: d < 0 ? entry - BR * r0 : entry + BR * r0, r0: r0, zone: z };
           // a CF barrier keeps the sequence's own target, the VR's extreme; a VR barrier the CF zone's near side (the other side
-          // of the range): each only when at least 1R away on the winning side, else the replay's 3R
+          // of the range): each only when at least 1R away on the winning side, else the replay's BR
           var own1 = (cf || vr) && isFinite(z.tgt) && d * (z.tgt - entry) >= r0; if (own1) tr.target = z.tgt;
           tr.log = head().concat([
             { t: sig.t, text: NAME[ctf] + ' CF: a QM (BO Structure) ' + word(d) + ', a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '.' + (m.j ? '' : zn ? ' A ' + word(d) + ' limit rests at the barrier zone\'s near side ' + f2(entry) + ' for the pullback.' : ' A ' + word(d) + ' limit rests at that level for the pullback.') }]);
           if (m.j) tr.log.push({ t: m.s.t, text: NAME[ctf] + ' Janda: the next break ' + word(d) + ' is a normal BO, a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(m.s.level) + '. ' + (jz ? 'The engulf zone inside that BO\'s leg runs ' + f2(jz.lo) + ' to ' + f2(jz.hi) + ': a ' + word(d) + ' limit rests at its near side ' + f2(entry) + ' for the pullback.' : 'A ' + word(d) + ' limit rests at that level for the pullback.') });
-          tr.log.push({ t: tr.t, text: 'Price pulled back to the ' + (jz ? 'engulf zone' : zn ? 'zone\'s near side' : 'level') + ': ' + word(d) + ' ' + f2(entry) + ', stop ' + f2(stop) + ' (' + U + f2(Z0.buf) + ' past the extreme ' + f2(xx) + ' made at the barrier, risk ' + U + f2(r0) + '), target ' + f2(tr.target) + (own1 ? (cf ? ' (the VR\'s extreme, ' : ' (the CF zone, the other side of the range, ') + (Math.abs(tr.target - entry) / r0).toFixed(1) + 'R).' : ' (' + BARRIER_R + 'R: the replay\'s own choice, the method names no fixed target here).') });
+          tr.log.push({ t: tr.t, text: 'Price pulled back to the ' + (jz ? 'engulf zone' : zn ? 'zone\'s near side' : 'level') + ': ' + word(d) + ' ' + f2(entry) + ', stop ' + f2(stop) + ' (' + U + f2(Z0.buf) + ' past the extreme ' + f2(xx) + ' made at the barrier, risk ' + U + f2(r0) + '), target ' + f2(tr.target) + (own1 ? (cf ? ' (the VR\'s extreme, ' : ' (the CF zone, the other side of the range, ') + (Math.abs(tr.target - entry) / r0).toFixed(1) + 'R).' : ' (' + BR + 'R: the replay\'s own choice, the method names no fixed target here).') });
           tr.marks = [zoneMark,
             { kind: 'level', p: sig.level, a: t0, at: sig.t, label: NAME[ctf] + ' CF (QM)', under: d < 0 }];
           if (m.j) tr.marks.push({ kind: 'level', p: m.s.level, a: sig.t, at: m.s.t, label: NAME[ctf] + ' Janda BO', under: d < 0 });

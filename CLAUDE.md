@@ -6201,3 +6201,23 @@ second visit); one position at a time a market. The desk's own choices, shown on
 the extreme made between the engulf's first candle and the failing candle by 0.01 % of price, target 2R; read on the one-minute
 candles from the candle after the entry. The M15 zone only (M5 / H4 entry zones were not asked for). A paper reading, not a tested
 rule. Test: `tests/edge-desks.test.mjs` ("M1 EF entry").
+
+## Each reading keeps its best target (22 Nov 2026, owner: "check how will be if i target 1r 2r 3r 4r", "i meant all edges", "base on that keep the best rr for each individual one")
+Every closed 2026 record of the Mosha, Engulfing, MSNR and LIT desks was replayed alone from its own fill and opening stop on
+5-minute candles with a plain 1R / 2R / 3R / 4R target (stop first in one candle, a 5-day limit, before costs) and set beside the
+desk's own booked exit. No desk total is positive at any target, and the share of trades reaching the target sits at break-even
+(about 49 / 32 / 24 / 19 %) on every desk. The owner chose to keep, per reading, the best of the five. PICKED IN SAMPLE on one
+year before costs: a choice, not a tested result; never quote the rebuilt totals as evidence.
+- **Changed**: Mosha barrier 3R -> 1R (`assets/mosha-sop.js` `BARRIER_R`; `barrierTrades(…, { rr: 3 })` reads it the older way for the
+  pinned tests; CF / VR barriers keep their structural target when it is 1R or more away). Engulf rule on D1 and H4: a 4R target,
+  no trail, 5-day limit (`council/edge-desks.mjs` `EG.fixed`; an H4 and an H1 reading of one zone are two trades now, two exits).
+  Engulfing plan, plan next-candle, short method: 1R; short method next-candle: 4R (`council/eg-methods.mjs` `RR`). Earlier scalp
+  method: 4R in the 12-16 UTC window, 3R at other hours, 5-day limit instead of 12 hours (`MSNR.rrMain` / `rrOther` / `hold`).
+  MSNR gold plan: 2R (60 pips; 90 before).
+- **Kept, their own exit was best or equal**: Mosha sequence, Engulf H1 (10R with the trail), the M1 EF entry (2R), the gold plan's
+  QM entry (3R), LIT rule and LIT loose. **Kept on purpose**: the direct entry (its document's exit; 4R was 4.6R better on 44 trades)
+  and LIT market on the break (its structural target; 1R and 3R tied 4.6R better on 138 trades): both differences are noise.
+- The one group that rose steadily with the target is the scalp method at 12-16 UTC (+22.6R at 1R to +68.1R at 4R, n 551, before
+  costs): one of eighteen groups, picked after looking, and the same method failed its after-costs study on earlier years. A
+  hypothesis for a pre-registered test on other years, never an edge.
+Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`.

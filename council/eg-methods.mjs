@@ -71,6 +71,11 @@ const lower = (C, t) => { let lo = 0, hi = C.length; while (lo < hi) { const m =
 // colour; a candle at most EG_SPAN candles after it that closes beyond its high (buy) / low (sell) completes the EG; later than
 // that there is no EG. The zone is the first candle, wick to wick. Until then any later candle could complete it.
 export const EG_SPAN = 4;
+// The target of each reading, in R (owner, 22 Nov 2026: "keep the best rr for each individual one"): the best of a 1R / 2R / 3R / 4R
+// target on that reading's own closed 2026 records, each replayed alone on 5-minute candles before costs. Picked in sample on one
+// year: a choice of the owner's, not a tested result. A reading whose own exit was best keeps it and is not listed here; the
+// direct entry keeps its document's exit (no target, the stop trailed with the M5 EF): 4R was 4.6R better on 44 trades, which is noise.
+export const RR = { 'eg-plan': 1, 'eg-plan-n': 1, 'eg-simple': 1, 'eg-simple-n': 4, 'eg-m1': 2, 'msnr-sop': 2, 'msnr-qm': 3 };
 export function engulfAt(C, i, back = EG_SPAN) {
   const c = C[i], dir = c.close > c.open ? 1 : c.close < c.open ? -1 : 0; if (!dir) return null;
   for (let j = i - 1; j >= 0 && j >= i - back; j--) { const b = C[j];
@@ -144,13 +149,13 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null, span 
   const D1 = foldWeekend(num(B['1d'] || [])), dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pipOf = () => stopSize(market);   // 30 pips on gold's scale, from the trade's own price (not the newest: a stop must not change between two reads)
   const Z4 = turnBack(H4, zones(H4, '4h', back), SEC['4h']), Z1 = zones(H1, '1h', back), Z15 = zones(M15, '15m', back), Z5 = zones(M5, '5m', back), DZ = zones(D1, '1d', back), pre = market === 'xau' ? '' : market + ':', out = [];
   // the methods give a stop and a target only: no time exit (24 hours until 21 Nov 2026)
-  const rec = (kind, label, d, fi, entry, T0, log, marks, trail = false) => { const pip = pipOf(entry), stop = entry - d * pip, target = trail ? null : entry + d * EGM.rr * pip, fillT = M5[fi].time;
+  const rec = (kind, label, d, fi, entry, T0, log, marks, trail = false) => { const rr = RR[kind] || EGM.rr, pip = pipOf(entry), stop = entry - d * pip, target = trail ? null : entry + d * rr * pip, fillT = M5[fi].time;
     const oc = trail ? efTrail(M5, Z5, fi, d, entry, stop) : outcome(M5, fi, d, entry, stop, target, Infinity), sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
     const tr = { id: `${pre}${kind}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind, label, h: '4h', l: '5m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
     if (trail && oc.moves) { tr.stopNow = oc.stop; tr.stopAt = oc.movedAt; }   // and WHEN it moved there: a settle must not apply it to candles before   // the trailed stop in force (the record's `stop` stays the opening stop: 1R is the opening risk)
-    tr.log = log.concat([{ t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), ` + (trail ? 'no target: the stop is trailed with the M5 EF.' : `target ${f(target)} (${EGM.rr}R).`) }],
+    tr.log = log.concat([{ t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), ` + (trail ? 'no target: the stop is trailed with the M5 EF.' : `target ${f(target)} (${rr}R).`) }],
       trail && oc.moves ? [{ t: oc.movedAt, text: `The stop was trailed ${oc.moves} time${oc.moves > 1 ? 's' : ''} with the M5 EF; the last M5 ${word(-d)} zone that failed, ${f(oc.ef.bot)} to ${f(oc.ef.top)}, put it at ${f(oc.stop)}.` }] : [],
-      [oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${EGM.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+      [oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'trail' ? { t: oc.endT, text: `Trailed stop hit at ${f(oc.exit)}: ${sg(oc.R)}.` }
         : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${sg(oc.R)}.` } : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now).` : '.') }]);
     tr.marks = marks.concat(trail && oc.moves && oc.status !== 'open' ? [{ kind: 'zone', top: oc.ef.top, bot: oc.ef.bot, a: oc.ef.base, at: oc.ef.fail, label: 'M5 EF · trailed stop' }] : []); out.push(tr); };
@@ -191,7 +196,7 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null, span 
     if (K < M5[0].time) return;   // placed before the 5-minute candles on file: its window cannot be read
     const i0 = lower(M5, K), fi = fillAt(d, entry, i0, i0 + EGM.fill, K + EGM.fill * 300);   // an hour of clock time (12 candles could run over the daily break or a weekend)
     const dz = dailyZone(DZ, T), ds = dz ? dz.dir : 0, plan = ds === d;
-    if (orders) orders.push({ kind: (plan ? 'eg-plan' : 'eg-simple') + sfx, side: d, base: E.base, entry, stop: entry - d * pipOf(entry), target: entry + d * EGM.rr * pipOf(entry), placed: K, until: K + EGM.fill * 300, fillT: fi < 0 ? null : M5[fi].time });
+    if (orders) orders.push({ kind: (plan ? 'eg-plan' : 'eg-simple') + sfx, side: d, base: E.base, entry, stop: entry - d * pipOf(entry), target: entry + d * (RR[(plan ? 'eg-plan' : 'eg-simple') + sfx] || EGM.rr) * pipOf(entry), placed: K, until: K + EGM.fill * 300, fillT: fi < 0 ? null : M5[fi].time });
     if (fi < 0) return;
     rec((plan ? 'eg-plan' : 'eg-simple') + sfx, (plan ? 'Plan · with the Daily' : 'Simple EG · H4 zone') + lab, d, fi, entry, E.base, [
       { t: T, text: (plan ? `The Daily's last engulf is a ${word(d)}. ` : `The Daily's last engulf is ${ds ? 'a ' + word(ds) : 'not on file'}, so this is the short method without the Daily. `) + `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and ` + (m.ef ? `a ${tn} ${word(-d)} engulf zone failed (a close through it).` : `a ${tn} engulf ${word(d)} closed.`) },
@@ -243,17 +248,17 @@ export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
     for (const q of In.filter((a) => a.fail != null && a.fail <= Z.end && !In.some((b) => b.at > a.at && b.at <= a.fail && (b.fail == null || b.fail > a.fail)))) {
     const fi = q.fi, bi = lower(M1, q.base), c = M1[fi], entry = c.close; let ext = d > 0 ? Infinity : -Infinity;
     for (let k = bi; k <= fi; k++) ext = d > 0 ? Math.min(ext, M1[k].low) : Math.max(ext, M1[k].high);
-    const stop = ext - d * entry * M1E.pad, r0 = Math.abs(entry - stop), target = entry + d * M1E.rr * r0; if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
+    const stop = ext - d * entry * M1E.pad, r0 = Math.abs(entry - stop), target = entry + d * RR['eg-m1'] * r0; if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
     const o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 };
     for (let k = fi + 1; k < M1.length; k++) { const b = M1[k];
       if (d > 0 ? b.low <= stop : b.high >= stop) { const px = (d > 0 ? b.open < stop : b.open > stop) ? b.open : stop; o.status = 'stopped'; o.exit = px; o.R = d * (px - entry) / r0; o.endT = b.time; break; }
-      if (d > 0 ? b.high >= target : b.low <= target) { o.status = 'target'; o.exit = target; o.R = M1E.rr; o.endT = b.time; break; }
+      if (d > 0 ? b.high >= target : b.low <= target) { o.status = 'target'; o.exit = target; o.R = RR['eg-m1']; o.endT = b.time; break; }
       o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - entry) / r0); }
     if (o.status === 'open') o.float = d * (M1[M1.length - 1].close - entry) / r0;
     const tr = { id: `${pre}eg-m1-${d > 0 ? 'b' : 's'}-${q.fail}`, market, kind: 'eg-m1', label: 'M15 EG zone · M1 EF entry', h: '15m', l: '1m', side: d, t: q.fail, entry, stop, target, r0, status: o.status, R: o.R, endT: o.endT, exit: o.exit, mfe: o.mfe, float: o.float };
     tr.log = [{ t: Z.at, text: `A 15-minute ${word(d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} is the entry zone.` },
       { t: q.at, text: `Inside it a one-minute ${word(-d)} engulf formed (${f(q.bot)} to ${f(q.top)}), the most recent one before the entry.` },
-      { t: q.fail, text: `A one-minute candle closed through it: it failed (EF). ${d > 0 ? 'Buy' : 'Sell'} at that close ${f(entry)}, stop ${f(stop)} past the extreme made since the engulf, target ${f(target)} (2R; the stop and target are the desk's own choice).` }];
+      { t: q.fail, text: `A one-minute candle closed through it: it failed (EF). ${d > 0 ? 'Buy' : 'Sell'} at that close ${f(entry)}, stop ${f(stop)} past the extreme made since the engulf, target ${f(target)} (${RR['eg-m1']}R; the stop and target are the desk's own choice).` }];
     if (o.status !== 'open') tr.log.push({ t: o.endT, text: `${o.status === 'target' ? 'Target reached' : 'Stopped'}: ${sg(o.R)}.` });
     tr.marks = [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'M15 EG zone · entry zone' + egN(Z) }, { kind: 'zone', top: q.top, bot: q.bot, a: q.base, at: q.fail, label: `M1 ${word(-d)} EG that failed (EF)` }];
     out.push(tr); } }
@@ -383,13 +388,13 @@ export function snrTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
     const ok = d + '|' + fillT + '|' + entry; if (took.has(ok)) { note('same'); if (pv == null || left(Z, pv, fillT)) visit.set(vk, fillT); continue; }
     if (pv != null && !left(Z, pv, fillT)) { note('visit'); continue; } visit.set(vk, fillT); took.add(ok);
     const dk = Math.floor(fillT / 86400); if ((perDay[dk] || 0) >= SNR.perDay) { note('day'); continue; } perDay[dk] = (perDay[dk] || 0) + 1; note('trade');
-    const pip = stopSize('xau'), stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, Infinity); if (fillT < from) continue;
+    const rr = RR[qm ? 'msnr-qm' : 'msnr-sop'], pip = stopSize('xau'), stop = entry - d * pip, target = entry + d * rr * pip, oc = outcome(M5, fi, d, entry, stop, target, Infinity); if (fillT < from) continue;
     const turned = Z.dir !== d, tr = { id: oid, market, kind: qm ? 'msnr-qm' : 'msnr-sop', label: qm ? 'EG x SNR · gold plan, QM' : 'EG x SNR · gold plan', h: '4h', l: m.tf, side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
     tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected the Daily ${S.key.kind} level ${f(S.key.p)} (${S.key.kind === 'OC' ? 'where two Daily candles of one colour met' : 'a turn of the Daily closes'}), and an H4 candle closed ${d > 0 ? 'above' : 'below'} ${f(S.level)}, the last H4 ${d > 0 ? 'A' : 'V'} level (a turn of the H4 closes) that stood before price tapped the Daily level.` },
       qm ? { t: T, text: `${NAME[m.tf]} QM ${word(d)}: shoulder ${f(m.level)}, ${d > 0 ? 'high' : 'low'} ${f(m.mid)}, head ${f(m.head.close)} in the H4 ${turned ? 'EF' : 'EG'} zone ${f(Z.bot)} to ${f(Z.top)}, then a close ${d > 0 ? 'above' : 'below'} ${f(m.mid)}: a ${word(d)} limit at the shoulder, ${f(entry)}, for two hours.` }
         : { t: T, text: `Price is in the H4 ${turned ? 'zone that failed and turned' : word(d) + ' engulf zone'} ${f(Z.bot)} to ${f(Z.top)} and ` + (m.ef ? `a ${NAME[m.tf]} ${word(-d)} engulf zone failed (a close through it)` : `a ${NAME[m.tf]} engulf ${word(d)} closed`) + `: a ${word(d)} limit rests at its zone, ${f(entry)}, for two hours.` },
-      { t: fillT, text: `Filled: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), target ${f(target)} (90 pips, ${SNR.rr}R).` },
-      oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${SNR.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+      { t: fillT, text: `Filled: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), target ${f(target)} (${30 * rr} pips, ${rr}R).` },
+      oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` } : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${oc.float >= 0 ? '+' : '−'}${Math.abs(oc.float).toFixed(2)}R now).` : '.') }];
     tr.marks = [{ kind: 'level', p: S.key.p, a: S.key.t, at: S.day + 86400, label: `Daily ${S.key.kind} level`, under: d > 0 }, { kind: 'level', p: S.level, a: S.levelT, at: S.t, label: `H4 ${d > 0 ? 'A' : 'V'} level · BO ${word(d)}`, under: d < 0 },
       { kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: turned ? Z.fail : Z.at, label: turned ? 'H4 EF (zone failed)' : 'H4 EG zone' }]

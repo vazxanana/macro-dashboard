@@ -28,8 +28,8 @@ test('Engulfing: every trade has its stop on the losing side, one order a zone, 
   const ids = new Set();
   for (const r of eg) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.ok(r.r0 > 0); assert.ok(!ids.has(r.id)); ids.add(r.id);
     assert.match(r.kind, /^eg-(1d|4h|1h)$/); assert.ok(r.t <= END && (r.t >= from || r.endT == null || r.endT >= from), 'inside the window, or an older order still alive in it'); assert.ok(r.log.length >= 3 && r.marks.length === 2);
-    assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - E.EG.target) < 1e-9, 'the target is 10R');
-    if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9, 'a stop is -1R, or worse when a candle opened beyond it'); if (r.status === 'target') assert.equal(r.R, E.EG.target);
+    const fx4 = E.EG.fixed[r.h], tR = fx4 ? fx4.rr : E.EG.target; assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - tR) < 1e-9, 'the target is 10R (4R on D1 and H4 since 22 Nov 2026, the owner\'s choice)');
+    if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9, 'a stop is -1R, or worse when a candle opened beyond it'); if (r.status === 'target') assert.equal(r.R, tR); if (fx4) assert.notEqual(r.status, 'trail', 'a fixed target has no trail');
     if (r.status === 'trail') assert.ok(r.R >= E.EG.trail[0] - E.EG.trail[1] - 1e-9, 'a trailed stop never books under +1R'); if (r.status === 'open') assert.equal(r.R, null); }
   const zones = eg.map((r) => r.kind + '|' + r.side + '|' + r.marks[0].a); assert.equal(new Set(zones).size, zones.length, 'one order a zone');
   assert.ok(eg.some((r) => r.side > 0) && eg.some((r) => r.side < 0), 'buys and the mirrored sells');
@@ -95,7 +95,7 @@ test('the three methods: a fixed stop on the losing side, a 2R target (the direc
   const all = G.methodTrades(B15, { from: 0, market: 'xau' }); assert.ok(all.length >= 5, 'entries: ' + all.length);
   let busy = -Infinity;
   for (const r of all) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^eg-(plan|simple|direct)$/); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips on gold');
-    if (r.kind === 'eg-direct') { assert.equal(r.target, null); assert.ok(['stopped', 'trail', 'open'].includes(r.status)); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); } else assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.EGM.rr) < 1e-9);
+    if (r.kind === 'eg-direct') { assert.equal(r.target, null); assert.ok(['stopped', 'trail', 'open'].includes(r.status)); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); } else assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - (G.RR[r.kind] || G.EGM.rr)) < 1e-9, 'each reading has its own target (owner, 22 Nov 2026)');
     assert.ok(r.t > busy, 'one at a time'); busy = r.endT || Infinity; assert.ok(r.log.every((x, i, a) => !x.t || !i || !a[i - 1].t || x.t >= a[i - 1].t), 'the log runs forward'); assert.ok(r.marks.every((m) => m.at <= r.t || (m.label === 'M5 EF · trailed stop' && m.at <= r.endT)), 'every mark was known by the fill (the trailed stop\'s EF by the exit)'); }
   // cutting the candles after a closed trade's end changes nothing about it (a trade far enough in for the shorter history to hold enough candles)
   const one = all.find((r) => r.endT && r.endT < END - 5 * 86400 && r.t > B['5m'][0].time + 15 * 86400); const cut = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + SOP.SEC[tf] <= one.endT + 3600)]));
@@ -108,11 +108,11 @@ test('MSNR desk: entries with the call only, the study\'s own functions and cons
   const big = market(140, 5), b15 = { ...big }; { const out = []; for (const b of big['5m']) { const t = b.time - (b.time % 900), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } b15['15m'] = out; }
   const end = big['5m'].at(-1).time + 300, fr = end - 60 * 86400, ms = E.msnrTrades(b15, { from: fr, market: 'xau' });
   assert.ok(ms.length >= 5, 'entries: ' + ms.length); let busy = -Infinity;
-  for (const r of ms) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^msnr-(main|other)$/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - E.MSNR.rr) < 1e-6); assert.ok(r.t > busy); busy = r.endT || Infinity; assert.ok(r.t >= fr); }
+  for (const r of ms) { assert.ok(stopOk(r), 'rule 1: ' + r.id); assert.match(r.kind, /^msnr-(main|other)$/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - (r.kind === 'msnr-main' ? E.MSNR.rrMain : E.MSNR.rrOther)) < 1e-6, '4R in the 12-16 UTC window, 3R at other hours (owner, 22 Nov 2026)'); assert.ok(r.t > busy); busy = r.endT || Infinity; assert.ok(r.t >= fr); }
   const src = rd('council/edge-desks.mjs'); assert.match(src, /from '\.\.\/research\/edge\/msnr-entry\/run\.mjs'/); assert.match(src, /finally \{ MS\.P\.PAD = keep\.PAD; MS\.P\.MIN_R0 = keep\.MIN_R0; \}/);
   E.msnrTrades(Object.fromEntries(Object.entries(b15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open / 3000, high: b.high / 3000, low: b.low / 3000, close: b.close / 3000 }))])), { from: fr, market: 'eurusd' });
   const P = require('node:module'); void P; 
-  const sn = G.snrTrades(b15, { from: fr, market: 'xau' }); for (const r of sn) { assert.ok(stopOk(r)); assert.match(r.kind, /^msnr-(sop|qm)$/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.SNR.rr) < 1e-9); }
+  const sn = G.snrTrades(b15, { from: fr, market: 'xau' }); for (const r of sn) { assert.ok(stopOk(r)); assert.match(r.kind, /^msnr-(sop|qm)$/); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.RR[r.kind]) < 1e-9, 'the gold plan: 2R, its QM entry 3R (owner, 22 Nov 2026)'); }
   const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay, 'at most two a day'); }
   assert.deepEqual(G.snrTrades(b15, { from: fr, market: 'eurusd' }), [], 'the plan is for gold');
   const egSrc = rd('council/eg-methods.mjs'); assert.doesNotMatch(egSrc, /ctrader|alerts\.mjs|trader\.mjs|sendAlerts|fetch\(/, 'a paper reading: no order, alert, network or Trader code');
@@ -177,7 +177,7 @@ test('audit: a candle that opens beyond the stop exits at its open, worse than -
 test('audit: MSNR on a 5-decimal market keeps full precision (a stop is the trigger pair\'s extreme and the pad, a target is 1.5R)', () => {
   const X = market(60, 5, 1.15, 0.0005), rows = E.msnrTrades(X, { from: 0, market: 'eurusd' }); assert.ok(rows.length >= 10, 'entries: ' + rows.length);
   const grid = rows.filter((r) => Math.abs(r.stop * 1000 - Math.round(r.stop * 1000)) < 1e-9).length; assert.ok(grid < rows.length / 4, 'stops are not on a 0.001 grid: ' + grid + ' of ' + rows.length);
-  for (const r of rows) { assert.ok(stopOk(r)); if (r.status === 'target') assert.ok(Math.abs(r.R - E.MSNR.rr) < 1e-9, 'a target books 1.5R: ' + r.R); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); }
+  for (const r of rows) { assert.ok(stopOk(r)); if (r.status === 'target') assert.ok(Math.abs(r.R - (r.kind === 'msnr-main' ? E.MSNR.rrMain : E.MSNR.rrOther)) < 1e-9, 'a target books its own R: ' + r.R); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); }
 });
 
 test('audit: the gold plan books in the order of the fills (cut just after an entry, the entry is already there) and an H4 break is a break', () => {
@@ -282,7 +282,7 @@ test('gold plan, second entry type: a QM on the closes (shoulder, high, lower he
   // in the desk: QM entries, a 30-pip stop on the losing side, a 3R target, entry at a shoulder; found with the candles cut just after the fill
   let n = 0;
   for (const seed of [11, 4, 5, 23]) { const X = seed === 11 ? B : market(90, seed), Y = { ...X, '15m': m15of(X['5m']) }, sn = G.snrTrades(Y, { from: 0 }), shoulders = new Set(G.qmSetups(Y['15m']).map((x) => x.level));
-    for (const r of sn.filter((x) => x.kind === 'msnr-qm')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - 3) < 1e-9); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.SNR.rr) < 1e-9); assert.ok(shoulders.has(r.entry));
+    for (const r of sn.filter((x) => x.kind === 'msnr-qm')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - 3) < 1e-9); assert.ok(Math.abs(Math.abs(r.target - r.entry) / r.r0 - G.RR['msnr-qm']) < 1e-9); assert.ok(shoulders.has(r.entry));
       assert.match(r.id, /^msnr-qm-[bs]-\d+(-30)?$/); assert.ok(r.marks.some((m) => / QM zone · entry$/.test(m.label)));
       if (n <= 12 && r.t > X['5m'][0].time + 35 * 86400) assert.ok(G.snrTrades(cutAt(Y, r.t + 300), { from: 0 }).some((e) => e.id === r.id && e.entry === r.entry && e.stop === r.stop), 'no look-ahead: ' + r.id); }
     const perDay = {}; for (const r of sn) { const d = Math.floor(r.t / 86400); perDay[d] = (perDay[d] || 0) + 1; assert.ok(perDay[d] <= G.SNR.perDay, 'two a day over both entry types'); } }
@@ -464,7 +464,7 @@ test('plan and simple: the M5 failure may come inside the candle that completes 
   const U = (h, m) => Date.UTC(2024, 4, 1, h, m) / 1000, find = (o) => o.find((x) => x.base === U(4, 55) && x.side === 1);
   const o = []; G.methodTrades(X, { from: 0, market: 'xau', orders: o }); const x = find(o);
   assert.ok(x, 'the order at the 04:55 M5 engulf'); assert.equal(x.kind, 'eg-simple', 'the Daily\'s last engulf is a sell: the short method');
-  assert.deepEqual([x.entry, +x.stop.toFixed(2), +x.target.toFixed(2)], [2284.33, 2281.33, 2290.33]); assert.equal(x.placed, U(5, 15), 'it rests only from the close of the trigger candle, not from the M5 close inside it');
+  assert.deepEqual([x.entry, +x.stop.toFixed(2), +x.target.toFixed(2)], [2284.33, 2281.33, 2287.33]);   // the short method's target is 1R since 22 Nov 2026 (the owner's choice; 2R = 2290.33 before) assert.equal(x.placed, U(5, 15), 'it rests only from the close of the trigger candle, not from the M5 close inside it');
   const base = X['5m'].find((b) => b.time === U(4, 55)); assert.equal(x.entry, base.high); assert.ok(base.close < base.open);
   // the desk's one-hour limit (an open owner question) ends before price comes back at 07:40, so no trade is booked from it
   assert.equal(x.until, U(6, 15)); assert.equal(x.fillT, null);
@@ -699,6 +699,11 @@ function twinDay() { const T0 = 1790553600, m5 = []; let p = 4000;   // Monday 0
   return X; }
 const perTf = (X, o) => { const tfs = E.EG.tfs, out = []; try { for (const tf of tfs) { E.EG.tfs = [tf]; out.push(...E.egTrades(X, o)); } } finally { E.EG.tfs = tfs; } return out; };
 test('review: the engulf rule: an H4 and an H1 reading that are the same order are one record (the higher timeframe); every other record is as it was', () => {
+  // the H4 reading has its own 4R target since 22 Nov 2026 (the owner's choice), so an H4 and an H1 reading of one zone are two
+  // trades with two exits; with that put back (EG.fixed empty) they are the same order and everything is as pinned
+  { const X = twinDay(), now = E.egTrades(X, { from: 0, market: 'xau' }); assert.deepEqual(now.map((r) => r.kind).sort(), ['eg-1h', 'eg-4h']); const h4 = now.find((r) => r.kind === 'eg-4h'), h1 = now.find((r) => r.kind === 'eg-1h');
+    assert.deepEqual([h4.side, h4.t, h4.entry, h4.stop], [h1.side, h1.t, h1.entry, h1.stop]); assert.ok(Math.abs((h4.target - h4.entry) / h4.r0 - 4) < 1e-9 && Math.abs((h1.target - h1.entry) / h1.r0 - 10) < 1e-9); }
+  const fixed = E.EG.fixed; E.EG.fixed = {}; try {
   const X = twinDay(), each = perTf(X, { from: 0, market: 'xau' }), all = E.egTrades(X, { from: 0, market: 'xau' });
   assert.deepEqual(each.map((r) => r.kind), ['eg-4h', 'eg-1h'], 'read alone, each timeframe gives the order'); const [a, b] = each;
   assert.deepEqual([b.side, b.t, b.entry, b.stop, b.target], [a.side, a.t, a.entry, a.stop, a.target], 'the same order'); assert.ok(stopOk(a) && a.side > 0);
@@ -710,6 +715,7 @@ test('review: the engulf rule: an H4 and an H1 reading that are the same order a
     assert.deepEqual([r.length, crypto.createHash('sha256').update(JSON.stringify(r)).digest('hex').slice(0, 16)], PIN[seed], 'seed ' + seed);
     const one = new Set(), exp = perTf(Y, { from: 0, market: 'xau' }).filter((x) => { const k = [x.side, x.t, x.entry, x.stop, x.target].join('|'); if (one.has(k)) return false; one.add(k); return true; }).sort((p, q) => p.t - q.t);
     assert.deepEqual(r.map((x) => JSON.stringify(x)).sort(), exp.map((x) => JSON.stringify(x)).sort()); assert.deepEqual(sameOrder(r), []); }
+  } finally { E.EG.fixed = fixed; }
 });
 
 test('both engulfs side by side: the next-candle reading is its own kinds, every zone it uses is a next-candle engulf, no direct entry, the any-candle reading unchanged', () => {
