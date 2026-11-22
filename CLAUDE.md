@@ -6446,3 +6446,10 @@ the SOP inside the VR and the barrier with its 1R target. Records carry `structN
 choice, not a tested result; never quote it as an edge. A run takes about twice as long: `council.yml` gives the tracker
 `timeout 240` (was 120). Tests: `tests/mosha-sop.test.mjs` (the test file wraps `M.sopTrades` with older options: compare with
 `ST`, the unwrapped one).
+
+## H1 barrier: M15 BO, pullback, then the M1 BO (22 Nov 2026, owner: "m1 is only entry to confirm the trade, h1 barrier we need m15 bo pullback then m1 bo entry")
+`assets/mosha-sop.js` `TAP_FIRST` = `{ '1h': '15m' }`: at an H1 barrier the tap entry (`bar-tap-`, and its 3R / 6R copies) first
+needs an M15 BO Structure with the barrier (the table's QM test), then the first M1 BO Structure with the barrier whose leg starts
+after the M15 BO candle closed (the pullback); entry at that M1 close, stop past the pullback's extreme by the desk's buffer, the
+reading's target. A close past the extreme made at the barrier, or no M1 BO within 12 M15 candles, gives no trade. Label "· M15 BO,
+pullback, M1 BO"; `tapFirst: false` reads it as before. Other barriers keep the M1 BO at the tap. A reading, not a tested rule.
