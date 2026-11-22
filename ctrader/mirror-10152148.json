@@ -5440,7 +5440,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-20T15:16:39.000Z",
     "councilEntry": 3556.42,
     "stop": 3587.53,
@@ -5454,10 +5454,15 @@
     "slipR": 0.09,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-20T15:16:39.000Z",
-    "brokerStop": 3584.74
+    "brokerStop": 3584.74,
+    "closedAt": "2026-11-22T23:06:40.000Z",
+    "exitPrice": 3571.26,
+    "councilExit": null,
+    "councilR": -0.66
    },
    "xau-replica-1795201241-b": {
     "positionId": "50622567",
@@ -5467,7 +5472,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-20T19:01:47.000Z",
     "councilEntry": 3535.68,
     "stop": 3499.5,
@@ -5481,10 +5486,15 @@
     "slipR": -0.106,
     "lagSec": 66,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-20T19:01:47.000Z",
-    "brokerStop": 3495.68
+    "brokerStop": 3495.68,
+    "closedAt": "2026-11-22T23:06:40.000Z",
+    "exitPrice": 3571.13,
+    "councilExit": null,
+    "councilR": 1.14
    },
    "xau-replica-1795207911-b": {
     "positionId": "50650513",
@@ -5521,7 +5531,7 @@
    "startBalance": 12653.89
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12703.04 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12703.04 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5530,19 +5540,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12703.04,
-  "lastRun": "2026-11-22T23:04:02.000Z"
+  "lastRun": "2026-11-22T23:06:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T10:02:02.000Z",
-   "msg": "opened buy BTCUSD 0.01 lot (council replica)",
-   "trade": "btc-replica-1794391250-b"
-  },
-  {
-   "at": "2026-11-11T10:02:02.000Z",
-   "msg": "opened buy ETHUSD 0.17 lot (council replica)",
-   "trade": "eth-replica-1794391250-b"
-  },
   {
    "at": "2026-11-11T10:02:02.000Z",
    "msg": "opened sell USDCHF 0.03 lot (council replica)",
@@ -7026,6 +7026,16 @@
    "at": "2026-11-22T23:02:55.000Z",
    "msg": "XAUUSD position 50650513 closed at the broker",
    "trade": "xau-replica-1795207911-b"
+  },
+  {
+   "at": "2026-11-22T23:06:40.000Z",
+   "msg": "closed XAUUSD position 50568415 (council: loss)",
+   "trade": "xau-replica-1795187726-s"
+  },
+  {
+   "at": "2026-11-22T23:06:40.000Z",
+   "msg": "closed XAUUSD position 50622567 (council: win)",
+   "trade": "xau-replica-1795201241-b"
   }
  ],
  "limits": {
