@@ -61,6 +61,10 @@
   // Owner, 22 Nov 2026, later: "one of them is h4 h1 m15 (not m30)": under an H1 VR the CF is read on M15.
   var CFTF = { '4h': '1h', '1h': '15m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' };
   var JANDA_ALT = { '4h': '1m', '1h': '1m' };   // the Janda's own table: H4 on M15 or M1, H1 on M5 or M1 (the simple CF keeps the one timeframe)
+  // 22 Nov 2026 (owner: "H1 barrier → M1 BO at the tap ... m1 is only entry to confirm the trade, h1 barrier we need m15 bo
+  // pullback then m1 bo entry"): at an H1 barrier the tap entry first needs an M15 BO Structure with the barrier; then price
+  // pulls back and the first M1 BO Structure with the barrier whose leg starts after the M15 BO is the entry.
+  var TAP_FIRST = { '1h': '15m' };
   var f2 = function (v) { return (+v).toFixed(2); };
   // More markets (21 Nov 2026, owner: "more trades"): the SAME reading on other markets, no new entry rule. The gold sizes
   // (stop buffer, smallest and largest risk, smallest barrier) were written in dollars near REF; another market takes the
@@ -68,7 +72,7 @@
   var MARKETS = { xau: { name: 'Gold', dec: 2 }, xag: { name: 'Silver', dec: 3 }, eurusd: { name: 'EUR/USD', dec: 5 }, gbpusd: { name: 'GBP/USD', dec: 5 }, nas100: { name: 'Nasdaq 100', dec: 1 } };
   // every market a desk tracker may record (the LIT desk reads more than the Mosha five); MARKETS stays the Mosha tracker's list
   // the Mosha desk's own markets (owner, 21 Nov 2026: "mosha keep gold and eurusd and gbpusd"); MARKETS stays the Engulfing desk's five
-  var MOSHA = ['xau', 'eurusd', 'gbpusd'];
+  var MOSHA = ['xau'];   // owner, 22 Nov 2026: "mosha drop GU keep only gold" (EUR/USD and GBP/USD leave the Mosha desk)
   var ALL = { xau: MARKETS.xau, xag: MARKETS.xag, eurusd: MARKETS.eurusd, gbpusd: MARKETS.gbpusd, nas100: MARKETS.nas100, usdjpy: { name: 'USD/JPY', dec: 3 }, audusd: { name: 'AUD/USD', dec: 5 }, usdcad: { name: 'USD/CAD', dec: 5 },
     spx500: { name: 'S&P 500', dec: 1 }, us30: { name: 'Dow 30', dec: 1 }, de40: { name: 'DAX 40', dec: 1 } };
   var REF = 4000, mkOf = function (k) { return ALL[k] ? k : 'xau'; };
@@ -142,7 +146,7 @@
     if (/^sop-nv-/.test(id)) return true; if (/^sop-(l|c2|vr|vc|nc)-/.test(id)) return false; if (/^sop-/.test(id)) return true;
     return /^bar-/.test(id) && !/^bar-(old|r6|tap|sop)-/.test(id); }
   function deskTrades(B, F, o) {
-    o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market };
+    o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market, tapFirst: o.tapFirst };
     var w = function (x) { var r = {}; for (var k in base) if (base[k] !== undefined) r[k] = base[k]; for (var k2 in x) r[k2] = x[k2]; return r; };
     // through API so a caller (the tracker's tests) can swap a reading in
     var s6 = API.sopTrades(B, F, w({ cfOut: c6 })).filter(sixCandle), s1 = API.sopTrades(B, F1, w({ cfOut: c1 })).filter(function (r) { return !sixCandle(r); });
@@ -659,7 +663,7 @@
               var jp = d < 0 ? jl : jh;
               jan.zone = je >= 0 && (d < 0 ? jp > c.close : jp < c.close) ? { lo: jl, hi: jh, px: jp, t: W[jz.i].time } : null; }
             break; } }
-        if (!sig) return;
+        if (!sig && !(mode === 'tap' && TAP_FIRST[zt] && o.tapFirst !== false)) return;
         var cf = z.kind === 'cf', vr = z.kind === 'vr', sw = z.kind === 'sweep', eg = z.kind === 'eg', src = z.kind === 'bo' ? 'BO' : 'iBO', up = UP[zt], ud = up ? dirAt(up, t0) : 0, wd = ud ? ud === d : null, vn = z.visit || 1;
         // what every record of this barrier and confirmation timeframe shares: its name, the id and label parts, the first two log lines
         var name = cf ? NAME[zt] + ' CF barrier · ' + z.of : vr ? NAME[zt] + ' VR barrier · ' + z.of : sw ? NAME[zt] + ' sweep barrier · swing ' + (d < 0 ? 'high ' : 'low ') + f2(z.level) : eg ? NAME[zt] + ' EG barrier' : NAME[zt] + ' barrier · ' + src + ' origin';
@@ -677,12 +681,30 @@
         // tap of a barrier, the first M1 BO Structure with the barrier is the entry, at that candle's close (a market entry, no
         // pullback limit); stop past the low (high for a sell) the BO came from, the extreme made at the barrier; target the
         // desk's barrier target (the owner named none). A reading of its own: id "bar-tap-", label "· M1 BO at the tap".
+        var tapHi = null;
+        if (mode === 'tap' && TAP_FIRST[zt] && o.tapFirst !== false) {
+          // the M15 BO first (the same QM test as the table's confirmation), then the pullback, then the M1 BO
+          var hc = TAP_FIRST[zt], H = B[hc] || [], hb = null, hx = d < 0 ? -Infinity : Infinity;
+          for (var hi_ = at(H, start - SEC[hc] + 1); hi_ < H.length && H[hi_].time < start + BARRIER_WATCH * SEC[hc]; hi_++) { var hcn = H[hi_]; if (o.until && hcn.time + SEC[hc] > o.until) break;
+            hx = d < 0 ? Math.max(hx, hcn.high) : Math.min(hx, hcn.low);
+            if (d < 0 ? hcn.close > z.hi + h : hcn.close < z.lo - h) break;
+            var HW = H.slice(Math.max(0, hi_ - 240), hi_ + 1), hev = swingEv(F, HW), he = hev[hev.length - 1];
+            if (he && he.breakIdx === HW.length - 1 && he.dir === d && he.structure && HW[he.fromIdx].time >= t0 - 30 * SEC[hc]) { hb = { t: hcn.time + SEC[hc], level: he.level, x: hx }; break; } }
+          if (!hb) return;
+          var M = C, pe = d < 0 ? -Infinity : Infinity, mb = null;
+          for (i = at(M, hb.t); i < M.length && M[i].time < hb.t + BARRIER_FILL * SEC[hc]; i++) { var mc = M[i]; if (o.until && mc.time + 60 > o.until) break;
+            pe = d < 0 ? Math.max(pe, mc.high) : Math.min(pe, mc.low);
+            if (d < 0 ? mc.close > hb.x : mc.close < hb.x) break;                    // closed past the extreme made at the barrier: no trade
+            var MW = M.slice(Math.max(0, i - 240), i + 1), mev = swingEv(F, MW), me = mev[mev.length - 1];
+            if (me && me.breakIdx === MW.length - 1 && me.dir === d && me.structure && MW[me.fromIdx].time >= hb.t) { mb = { t: mc.time + 60, level: me.level, close: mc.close, x: pe }; break; } }
+          if (!mb) return;
+          tapHi = hb; sig = { t: mb.t, level: mb.level, close: mb.close }; xs = mb.x; }
         if (mode === 'tap') { var Zt = sizes(mk, sig.close), et = sig.close, st_ = d < 0 ? xs + Zt.buf : xs - Zt.buf, rt = Math.abs(et - st_);
           if (!(sig.t >= from) || !(rt > Zt.rmin) || rt > Zt.rmax || (d < 0 ? st_ <= et : st_ >= et)) return;
-          var tt = { id: pre + 'bar-tap-' + idK + (d > 0 ? 'b' : 's') + sig.t, market: mk, kind: 'barrier', label: name + ' · M1 BO at the tap' + labK + labD,
+          var tt = { id: pre + 'bar-tap-' + idK + (d > 0 ? 'b' : 's') + sig.t, market: mk, kind: 'barrier', label: name + (tapHi ? ' · M15+M1 BO' : ' · M1 BO at the tap') + labK + labD,
             withDir: wd, janda: false, jandaM1: false, m5: false, alt: null, tap: true, mkt: true, sweep: sw, eg: eg, visit: vn, atZone: false, h: zt, l: ctf, side: d, t: sig.t, entry: et, stop: st_, target: d < 0 ? et - BR * rt : et + BR * rt, r0: rt, zone: z };
-          tt.log = head().concat([{ t: sig.t, text: 'M1 BO ' + word(d) + ' at the tap: a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '. ' + word(d).charAt(0).toUpperCase() + word(d).slice(1) + ' at that close ' + f2(et) + ', stop ' + f2(st_) + ' (' + U + f2(Zt.buf) + ' past the M1 BO\'s ' + (d > 0 ? 'low ' : 'high ') + f2(xs) + ', risk ' + U + f2(rt) + '), target ' + f2(tt.target) + ' (' + BR + 'R: the replay\'s own choice, no target was named).' }]);
-          tt.marks = [zoneMark, { kind: 'level', p: sig.level, a: t0, at: sig.t, label: 'M1 BO', under: d < 0 }, { kind: 'level', p: xs, a: t0, at: sig.t, label: 'M1 BO ' + (d > 0 ? 'low' : 'high') + ' · stop', under: d > 0 }];
+          tt.log = head().concat((tapHi ? [{ t: tapHi.t, text: NAME[TAP_FIRST[zt]] + ' BO ' + word(d) + ': a QM (BO Structure), a candle closed ' + (d > 0 ? 'above ' : 'below ') + f2(tapHi.level) + '. Now a pullback and an M1 BO are waited for.' }] : []).concat([{ t: sig.t, text: (tapHi ? 'After the pullback, the ' : '') + 'M1 BO ' + word(d) + (tapHi ? ' with the barrier: a candle closed ' : ' at the tap: a candle closed ') + (d > 0 ? 'above ' : 'below ') + f2(sig.level) + '. ' + word(d).charAt(0).toUpperCase() + word(d).slice(1) + ' at that close ' + f2(et) + ', stop ' + f2(st_) + ' (' + U + f2(Zt.buf) + ' past the M1 BO\'s ' + (d > 0 ? 'low ' : 'high ') + f2(xs) + ', risk ' + U + f2(rt) + '), target ' + f2(tt.target) + ' (' + BR + 'R: the replay\'s own choice, no target was named).' }]));
+          tt.marks = [zoneMark].concat(tapHi ? [{ kind: 'level', p: tapHi.level, a: t0, at: tapHi.t, label: NAME[TAP_FIRST[zt]] + ' BO', under: d < 0 }] : []).concat([{ kind: 'level', p: sig.level, a: t0, at: sig.t, label: 'M1 BO', under: d < 0 }, { kind: 'level', p: xs, a: t0, at: sig.t, label: 'M1 BO ' + (d > 0 ? 'low' : 'high') + ' · stop', under: d > 0 }]);
           rows.push(tt); return; }
         var nearPx = d < 0 ? z.lo : z.hi, legs = [];
         (alt ? [] : [{ j: false, s: sig, x: xs }]).concat([{ j: true, s: jan, x: x }]).forEach(function (m) {
@@ -843,7 +865,7 @@
   // with a current record (joined after the current list, its own reading in the 20-minute rule).
   var OLD_BARRIER = { rr: 3 };
   function oldBarrierTrades(B, F, o) {
-    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: OLD_BARRIER.rr };
+    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: OLD_BARRIER.rr, tapFirst: o.tapFirst };
     return uniq(barrierTrades(B, F, q)).filter(function (r) { return Math.abs(Math.abs(r.target - r.entry) / r.r0 - OLD_BARRIER.rr) < 1e-6; })
       .map(function (r) { r.id = String(r.id).replace('bar-', 'bar-old-'); r.old = true; r.label = (r.label || '') + ' · 3R target'; return r; });
   }
@@ -852,7 +874,7 @@
   // "· 6R target", flag `r6`; a reading of its own beside the 1R and 3R ones, never compared with them in the 20-minute rule.
   var R6_BARRIER = { rr: 6 };
   function r6BarrierTrades(B, F, o) {
-    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: R6_BARRIER.rr };
+    o = o || {}; var q = { from: o.from, market: o.market, until: o.until, extra: o.extra, rr: R6_BARRIER.rr, tapFirst: o.tapFirst };
     return uniq(barrierTrades(B, F, q)).filter(function (r) { return Math.abs(Math.abs(r.target - r.entry) / r.r0 - R6_BARRIER.rr) < 1e-6; })
       .map(function (r) { r.id = String(r.id).replace('bar-', 'bar-r6-'); r.r6 = true; r.label = (r.label || '') + ' · 6R target'; return r; });
   }

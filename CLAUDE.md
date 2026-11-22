@@ -2575,6 +2575,39 @@ menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analy
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
+## Structure assistant on Charts (22 Nov 2026, owner: "build an ai assistant for the dashboard that he will focus is direction/market structure and cycle")
+A language model's READING of direction, market structure and the market cycle, from the structure the Desk's charts already
+compute. Display only: it places, changes or refuses no order, moves no stop, keeps nothing in the browser, and no council member
+reads it. Not advice, not a tested edge (the page and the system text say so).
+- **Facts** (`window.msStructFacts`, inside the main script right after `cycleStrip`): for D1, H4, H1, M15, M5 the panes' own
+  `P.A` (msAnalyze on CLOSED candles: the slice `A.n`), its trend, last break (BO / ChoCh), the last 6 breaks, the protected swing,
+  the move's extreme, the last 4 iBOs (`msInternal`) and the internal leg (`msInternalLeg`); the cycle rows of `cycleNow()` with
+  `msStage` / `msPath` (move / pullback / continuation, 50 %, origin, extreme, the ChoCh, the path); the alignment count. Times in
+  UTC (the panes' times carry `TZ`). Fetches nothing.
+- **`api/_structure-assistant.js`** (pure): `buildRequest(body, nowS)` whitelists and caps everything (timeframes D1-M5 only, levels
+  finite and positive, rounded to `dec`, times not after the reading's `at`, `at` within the last hour, strings 200, question 300,
+  6 breaks / 4 iBOs a timeframe, 4 cycle rows, 2 path legs) and writes the facts as plain lines. `parseAnswer(text, q)`: JSON
+  `{ summary, timeframes: [{ tf, direction: up|down|sideways|unclear, why }], cycle, watch: [{ level, what }], question? }`; a
+  timeframe must be in the facts, a watch level must be one of the facts' levels (to half the last decimal), and every figure in the
+  text must be in the FACTS text (the person's question is not a fact; timeframe names, 50 / 100 and whole numbers up to 10 apart),
+  the rule of `api/_daily.js` `parseBrief`; refused: trade instructions, any talk of stops, "proven / tested edge / guaranteed",
+  a forecast stated as fact (a "will" sentence without if / could / would …), talk of itself.
+- **`api/structure-assistant.js`**: GET (signed-in member) `{ enabled, reason, perDay, leftToday, cost }`; POST same origin, a
+  signed-in member, `{ market, label?, tf?, question?, facts, stream? }`, streamed like the ChronosTrade coach (`start`, `text`,
+  then `done` = the CHECKED result). Store `structure-assistant/answers.json` (+ the adapter's `cost.json` / `llm-cache.json`;
+  `-preview/` off production): an answered or billed-and-refused question is answered from it, never paid twice. Key
+  `STRUCT_LLM_KEY` else `ACADEMY_LLM_KEY` else `ANTHROPIC_API_KEY` / `CLAUDE_API_KEY` (which bring the provider's messages address
+  and format, the daily brief's rule); model `STRUCT_LLM_MODEL` else `ACADEMY_LLM_MODEL`; budgets `STRUCT_LLM_DAILY_USD` 0.5 /
+  `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 60; `STRUCT_LLM_MAX_TOKENS` 3000; `STRUCT_ASSISTANT_PER_DAY` 20 an account a
+  UTC day (memory, per instance); `STRUCT_ASSISTANT=off` or `STRUCT_LLM_STOP=1` stops it. Routed in `cloudflare/src/worker.mjs`
+  (`'structure-assistant'`) and `vercel.json` functions.
+- **Page** (`<style id="ms-sa-css">` + `<script id="ms-sa-js">` at the end of the Desk): a "Structure" button in the Charts
+  toolbar (`#ms-sa-btn`, placed after Style with Style's own CSS order; icon only on a phone), a side panel `#ms-sa` (a bottom sheet
+  up to 640 px): "AI reading, not advice, not a tested edge", the state from GET ("The assistant is off." with the buttons off),
+  "Looking at" (all / D1-M5), "Read this market", a free question, the streamed summary then the checked answer drawn as text,
+  and "The facts sent" in a fold. Hidden and not run for guests. `window.msStructAssistant()` is a read-only view.
+- Tests: `tests/structure-assistant.test.mjs` (7). Not checked against a real provider (no key in the build sandbox).
+
 ## Charts bug hunt (20 Nov 2026: the chart features of 18-20 Nov, used in a browser)
 Every drawing tool, the paper account, the volume profile, Layout, Markets side by side, Split, any timeframe, full screen and the
 live ticks were driven with Playwright (1440 px mouse, 390 px touch; owner and guest; live candles). Twelve defects, each
@@ -6446,3 +6479,35 @@ the SOP inside the VR and the barrier with its 1R target. Records carry `structN
 choice, not a tested result; never quote it as an edge. A run takes about twice as long: `council.yml` gives the tracker
 `timeout 240` (was 120). Tests: `tests/mosha-sop.test.mjs` (the test file wraps `M.sopTrades` with older options: compare with
 `ST`, the unwrapped one).
+
+## H1 barrier: M15 BO, pullback, then the M1 BO (22 Nov 2026, owner: "m1 is only entry to confirm the trade, h1 barrier we need m15 bo pullback then m1 bo entry")
+`assets/mosha-sop.js` `TAP_FIRST` = `{ '1h': '15m' }`: at an H1 barrier the tap entry (`bar-tap-`, and its 3R / 6R copies) first
+needs an M15 BO Structure with the barrier (the table's QM test), then the first M1 BO Structure with the barrier whose leg starts
+after the M15 BO candle closed (the pullback); entry at that M1 close, stop past the pullback's extreme by the desk's buffer, the
+reading's target. A close past the extreme made at the barrier, or no M1 BO within 12 M15 candles, gives no trade. Label "· M15+M1 BO"
+(short, so "with / against H4" still fits the stored 56 characters); `tapFirst: false` (also through `deskTrades`) reads it as before. Other barriers keep the M1 BO at the tap; an M15 / M30 barrier's tap entry that was the same order as the old H1 one
+comes back under its own name (`uniq` kept the H1 record before). 60 days before costs: H1 tap entries 971 -> 204 across gold,
+EUR/USD and GBP/USD; gold worse, EUR/USD better, GBP/USD mixed. A reading, not a tested rule.
+
+## The Mosha desk is gold only (22 Nov 2026, owner: "mosha drop GU keep only gold")
+`assets/mosha-sop.js` `MOSHA` = `['xau']`: the card shows gold only and `council/mosha-desk.mjs` `OTHER` is empty, so the tracker
+reads no other market and `keepMarkets` drops the stored EUR/USD and GBP/USD records on its next run. `MARKETS` (the Engulfing
+desk's five) is unchanged.
+## A live chart on each edge desk (22 Nov 2026, owner: "live chart with markups on each edge ... like we done in Charts but on the edge page for each edge")
+Display only, `assets/desk-live.js` (`window.MS_DESK_LIVE`, pure pieces also `module.exports`; loaded with `defer` after
+`assets/desk-trades.js`). It puts a card `.dl-card` "Live chart" FIRST in the `.mo-grid` of `#v-mosha`, `#v-lit`, `#v-eg`, `#v-msnr`
+(its own host; the `data-dk="chart"` slot stays desk-trades.js's borrowed replay card). Market picker = the markets the desk's file
+holds (Mosha: `MS_MOSHA_SOP.MOSHA`), timeframes M1 M5 M15 M30 H1 H4 D1, OANDA candles from `/md/bars?sym=&tf=&n=500`, then the
+newest 5 every `POLL[tf]` s (3 s on M1 to 120 s on D1; a minute while the newest candle is old: a shut market), only while the
+desk's view is shown and the tab visible. Trades from the desk's file through `msData` (re-read at most every 90 s), log and
+marks through `MS_MOSHA_SOP.withDetail`: every OPEN record of the market and the 10 latest closed ones the candles reach
+(`pick`). The chosen trade (the newest at first; a tap on its row or marker chooses another, and the time scale frames it) shows
+its stored marks (zones, VR / order-block boxes, levels, coloured by kind as `assets/mosha-replay.js` `HUES`; a test compares),
+entry / stop (its trailed `stopNow` when open) / target from the fill to its end with risk and reward bands, and labels; the
+others show their entry line faintly; entry and exit markers on every trade (`setMarkers`, ids `<id>:e` / `<id>:x`). Overlay =
+one canvas above the chart's, `pointer-events: none`, clipped to the price pane; times map to a fractional bar index
+(`logicalOf`) and through `l2x` (the chart library places whole indexes only). The price scale holds the chosen trade's levels
+(`autoscaleInfoProvider`). "Chart" on a row opens `msMoshaReplayDialog` (Before / After). Hidden for the Mosha desk's teacher
+(as Open now) and never built for a guest; not a `.card`, so the simple phone view keeps it open. Nothing stored (no browser
+storage), nothing written. No live ticks yet (the page's tick stream is the Charts market only). `MS_DESK_LIVE.state(k)` is the
+audit's read-only view. Test: `tests/desk-live-chart.test.mjs`.
