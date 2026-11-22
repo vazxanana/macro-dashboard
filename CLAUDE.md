@@ -6190,3 +6190,14 @@ desk's EG barriers (`assets/mosha-sop.js` `egBoxes`, the page copy, same span; a
 subset. The owner's 14:15 / 14:30 "no" of that day was the box drawn over both candles, not the pair: with the box on the first
 candle he passed it. Stored records keep the older rule until the histories are rebuilt. Readings, not tested edges.
 Same day, owner: "the less candles the better": a zone carries `n` (candles the engulf took) and the entry zone's chart label says it ("M5 EG zone · entry · 1 candle", `egN`). Shown, not a filter.
+
+## M1 EF entry inside an entry zone (22 Nov 2026, owner: "inside the entry zone i want m1 buy eg to become ef to entry for sells, for buy i want in the entry area a sell m1 eg to fail thats my moment to entry"; on six marked examples: "example 3 use the recent one and the rest is perfect")
+`council/eg-methods.mjs` `m1Trades(B, { from, market })` (`M1E`), a fifth reading on the Engulfing desk (kind `eg-m1`, label "M15 EG
+zone · M1 EF entry", `l: '1m'`; `DESKS.eg.tfs` now reads `'1m'`, 16 days): the entry zone is an alive 15-minute engulf zone of the
+trade's side; wholly inside it, formed after it, a one-minute engulf of the OTHER side; a one-minute close through that engulf's far
+side (it failed: an EF on the trade's side) is the entry, at that close. Of several such engulfs only the MOST RECENT counts (an
+older one failing while a newer one still stands is no entry). A zone can give several entries (the owner's first example is a
+second visit); one position at a time a market. The desk's own choices, shown on the examples and not the owner's words: stop past
+the extreme made between the engulf's first candle and the failing candle by 0.01 % of price, target 2R; read on the one-minute
+candles from the candle after the entry. The M15 zone only (M5 / H4 entry zones were not asked for). A paper reading, not a tested
+rule. Test: `tests/edge-desks.test.mjs` ("M1 EF entry").

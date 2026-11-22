@@ -221,6 +221,46 @@ export function methodTrades(B, { from = 0, market = 'xau', orders = null, span 
   return keep;
 }
 
+// ─── the M1 EF entry inside an entry zone (22 Nov 2026, owner: "inside the entry zone i want m1 buy eg to become ef to entry for
+// sells, for buy i want in the entry area a sell m1 eg to fail thats my moment to entry"; six marked examples passed, with one
+// correction: "use the recent one") ───
+// Entry zone: a 15-minute engulf zone of the trade's side, alive. Inside it (wholly, and formed after the zone is known) a
+// one-minute engulf of the OTHER side; when a one-minute candle closes through that engulf's far side it has failed (an EF on
+// the trade's side): enter at that close. Of several such one-minute engulfs the MOST RECENT one is the one that counts: an older
+// one failing while a newer one still stands is no entry. A zone can give more than one entry (the owner's first example is a second visit); one position at a time a market.
+// The desk's own choices, shown on the six examples and not the owner's words: the stop sits past the extreme made between the
+// one-minute engulf's first candle and the failing candle, by 0.01 % of price; the target is 2R; results are read on the
+// one-minute candles from the candle after the entry (stop first when one candle holds both, a gap books at the open).
+export const M1E = { rr: 2, pad: 0.0001 };
+export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
+  const M1 = num(B['1m'] || []), M15 = num(B['15m'] || []); if (M1.length < 100 || M15.length < 50) return [];
+  const dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pre = market === 'xau' ? '' : market + ':', t0 = M1[0].time, out = [];
+  const Z1 = zones(M1, '1m'), sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
+  for (const Z of zones(M15, '15m')) { const d = Z.dir; if (Z.at < t0) continue;
+    const In = Z1.filter((q) => q.dir === -d && q.at > Z.at && q.at <= Z.end && q.top <= Z.top && q.bot >= Z.bot);
+    for (const q of In.filter((a) => a.fail != null && a.fail <= Z.end && !In.some((b) => b.at > a.at && b.at <= a.fail && (b.fail == null || b.fail > a.fail)))) {
+    const fi = q.fi, bi = lower(M1, q.base), c = M1[fi], entry = c.close; let ext = d > 0 ? Infinity : -Infinity;
+    for (let k = bi; k <= fi; k++) ext = d > 0 ? Math.min(ext, M1[k].low) : Math.max(ext, M1[k].high);
+    const stop = ext - d * entry * M1E.pad, r0 = Math.abs(entry - stop), target = entry + d * M1E.rr * r0; if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;
+    const o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 };
+    for (let k = fi + 1; k < M1.length; k++) { const b = M1[k];
+      if (d > 0 ? b.low <= stop : b.high >= stop) { const px = (d > 0 ? b.open < stop : b.open > stop) ? b.open : stop; o.status = 'stopped'; o.exit = px; o.R = d * (px - entry) / r0; o.endT = b.time; break; }
+      if (d > 0 ? b.high >= target : b.low <= target) { o.status = 'target'; o.exit = target; o.R = M1E.rr; o.endT = b.time; break; }
+      o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - entry) / r0); }
+    if (o.status === 'open') o.float = d * (M1[M1.length - 1].close - entry) / r0;
+    const tr = { id: `${pre}eg-m1-${d > 0 ? 'b' : 's'}-${q.fail}`, market, kind: 'eg-m1', label: 'M15 EG zone · M1 EF entry', h: '15m', l: '1m', side: d, t: q.fail, entry, stop, target, r0, status: o.status, R: o.R, endT: o.endT, exit: o.exit, mfe: o.mfe, float: o.float };
+    tr.log = [{ t: Z.at, text: `A 15-minute ${word(d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} is the entry zone.` },
+      { t: q.at, text: `Inside it a one-minute ${word(-d)} engulf formed (${f(q.bot)} to ${f(q.top)}), the most recent one before the entry.` },
+      { t: q.fail, text: `A one-minute candle closed through it: it failed (EF). ${d > 0 ? 'Buy' : 'Sell'} at that close ${f(entry)}, stop ${f(stop)} past the extreme made since the engulf, target ${f(target)} (2R; the stop and target are the desk's own choice).` }];
+    if (o.status !== 'open') tr.log.push({ t: o.endT, text: `${o.status === 'target' ? 'Target reached' : 'Stopped'}: ${sg(o.R)}.` });
+    tr.marks = [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: Z.at, label: 'M15 EG zone · entry zone' + egN(Z) }, { kind: 'zone', top: q.top, bot: q.bot, a: q.base, at: q.fail, label: `M1 ${word(-d)} EG that failed (EF)` }];
+    out.push(tr); } }
+  // one order found in two overlapping 15-minute zones is one trade; one position at a time a market
+  out.sort((a, b) => a.t - b.t); const keep = []; let busy = -Infinity;
+  for (const r of out) { if (r.t <= busy) continue; busy = r.endT || Infinity; if (r.t >= from) keep.push(r); }
+  return keep;
+}
+
 // ─── the gold plan with Daily levels (the MSNR desk; the owner's fourth document, read in the desk's own words) ───
 // Side: a Daily candle REJECTS a Daily level (a turn of the Daily CLOSES in the last 60 trading days, 2 candles a side: a V level
 // at a low turn, an A level at a high turn, as on a line chart) that is still FRESH (no wick on it since it formed, see `snrSides`): it trades through the level and closes back on the other side; then, from the tap of that level until 3 TRADING days after the rejection day, an H4
