@@ -293,7 +293,11 @@ export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
 export const SOP3 = { wait: 24, fill: 24, rr: 2,
   chains: [{ tfs: ['1d', '4h', '1h'], style: 'swing' }, { tfs: ['4h', '1h', '15m'], style: 'intraday' }, { tfs: ['1h', '15m', '5m'], style: 'scalp' }] };
 const NAME3 = { ...NAME, '1d': 'D1' };
-export function sopTrades3(B, { from = 0, market = 'xau' } = {}) {
+// Variants for the owner's comparison (22 Nov 2026; the defaults are the desk's reading and change nothing): conf 'inside' = the
+// confirmation zone wholly inside the engulf's zone (default 'touch'); stop 'conf' = past the confirmation zone's far side, 'pips' =
+// 30 pips from the entry (default 'eg' = past the engulf zone); target 'zone' = the near side of the nearest opposite engulf-timeframe
+// zone alive ahead of the entry when it is 1R or more away (else rr), default 'rr'; rr = the R multiple (default SOP3.rr).
+export function sopTrades3(B, { from = 0, market = 'xau', conf = 'touch', stop: stopAt = 'eg', target: tgtAt = 'rr', rr = SOP3.rr } = {}) {
   const M5 = num(B['5m'] || []); if (M5.length < 100) return [];
   const dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pre = market === 'xau' ? '' : market + ':', sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`, pl = (n) => `${n} candle${n === 1 ? '' : 's'}`, out = [];
   const C = {}, Z = {}; for (const tf of ['1d', '4h', '1h', '15m', '5m']) { C[tf] = tf === '5m' ? M5 : tf === '1d' ? foldWeekend(num(B[tf] || [])) : num(B[tf] || []); Z[tf] = zones(C[tf], tf); }
@@ -307,13 +311,14 @@ export function sopTrades3(B, { from = 0, market = 'xau' } = {}) {
     // step 3: the confirmation, one order a confirmation zone
     for (const c of Z[ct]) { const d = c.dir, K = c.at; let X = null;
       const t0 = c.i >= SOP3.wait ? CC[c.i - SOP3.wait].time : -Infinity; let q0 = 0, q1 = egs.length; while (q0 < q1) { const m = (q0 + q1) >> 1; if (egs[m].e.at <= t0) q0 = m + 1; else q1 = m; }   // engulfs older than the wait cannot count
-      for (let q = q0; q < egs.length && egs[q].e.at < K; q++) { const x = egs[q], e = x.e; if (e.dir !== d || !(e.at < K) || !(e.end > K) || !(x.M.z.end > K) || !touch(c, e)) continue;
+      for (let q = q0; q < egs.length && egs[q].e.at < K; q++) { const x = egs[q], e = x.e; if (e.dir !== d || !(e.at < K) || !(e.end > K) || !(x.M.z.end > K) || !(conf === 'inside' ? c.top <= e.top && c.bot >= e.bot : touch(c, e))) continue;
         if (c.i >= lower(CC, e.at) + SOP3.wait) continue;   // within SOP3.wait confirmation candles of the engulf
         if (!X || e.at > X.e.at) X = x; }
       if (!X || K < M5[0].time) continue;   // an order placed before the 5-minute candles on file cannot be read
-      const e = X.e, MZ = X.M.z, entry = (c.top + c.bot) / 2, far = d > 0 ? e.bot : e.top, buf = SOP.sizes(market, far).buf, stop = far - d * buf, r0 = Math.abs(entry - stop);
+      const e = X.e, MZ = X.M.z, entry = (c.top + c.bot) / 2, fz = stopAt === 'conf' ? c : e, far = d > 0 ? fz.bot : fz.top, buf = SOP.sizes(market, far).buf, stop = stopAt === 'pips' ? entry - d * stopSize(market) : far - d * buf, r0 = Math.abs(entry - stop);
       if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;   // never a record without a stop on the losing side
-      const target = entry + d * SOP3.rr * r0;
+      let target = entry + d * rr * r0;
+      if (tgtAt === 'zone') { let nz = null; for (const o of Z[et]) if (o.dir === -d && o.at <= K && o.end > K) { const p = d > 0 ? o.bot : o.top; if ((p - entry) * d >= r0 && (!nz || (p - entry) * d < (nz - entry) * d)) nz = p; } if (nz != null) target = nz; }
       // the order's life: SOP3.fill confirmation candles, or a confirmation candle closing through the engulf zone's far side
       let dead = CC[c.i + SOP3.fill] ? CC[c.i + SOP3.fill].time + secC : Infinity;
       for (let j = c.i + 1; j < CC.length && CC[j].time + secC <= dead; j++) if (d > 0 ? CC[j].close < e.bot : CC[j].close > e.top) { dead = CC[j].time + secC; break; }
@@ -326,7 +331,7 @@ export function sopTrades3(B, { from = 0, market = 'xau' } = {}) {
         { t: e.at, text: `At the zone a ${en} engulf ${word(d)} closed, completed in ${pl(e.n)} (3 at most): its zone is ${f(e.bot)} to ${f(e.top)}.` },
         { t: K, text: `Confirmation: a ${cn} engulf ${word(d)} closed at the ${en} zone, completed in ${pl(c.n)} (zone ${f(c.bot)} to ${f(c.top)}). A ${word(d)} limit rests at its middle ${f(entry)} for ${SOP3.fill} ${cn} candles; stop ${f(stop)} past the ${en} zone, target ${f(target)} (${SOP3.rr}R; desk's choice).` },
         { t: fillT, text: `The limit filled: ${word(d)} ${f(entry)}, risk ${f(r0)}.` },
-        oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${SOP3.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${sg(oc.R)}` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+        oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${(Math.abs(target - entry) / r0).toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${sg(oc.R)}` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
           : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${sg(oc.float)} now).` : '.') }];
       tr.marks = [{ kind: 'zone', top: MZ.top, bot: MZ.bot, a: MZ.base, at: MZ.at, label: zn + ' EG zone' }, { kind: 'zone', top: e.top, bot: e.bot, a: e.base, at: e.at, label: en + ' EG zone' + egN(e) },
         { kind: 'zone', top: c.top, bot: c.bot, a: c.base, at: c.at, label: cn + ' EG zone · entry' }, { kind: 'level', p: entry, a: c.base, at: c.at, label: '50 % · limit' }];

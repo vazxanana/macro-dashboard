@@ -866,3 +866,10 @@ test('three-timeframe SOP on the seeded market: stops on the losing side, each s
   const page = rd('assets/desk-trades.js'); assert.match(page, /'eg-sop3': 'Three-timeframe SOP'/); assert.match(page, /three-timeframe SOP is listed apart/i); assert.match(page, /The desk\\'s own choices there/);
   assert.match(E.DESKS.eg.note, /three-timeframe SOP/); assert.match(rd('council/eg-methods.mjs'), /PAPER READING of the owner's table, before costs: not a tested rule, never an edge/);
 });
+
+test('three-timeframe SOP: the comparison options leave the desk reading as it was, and keep every stop on the losing side', () => {
+  const B = sop3Case().B, base = G.sopTrades3(B, { market: 'xau' });
+  assert.deepEqual(G.sopTrades3(B, { market: 'xau', conf: 'touch', stop: 'eg', target: 'rr', rr: G.SOP3.rr }), base);
+  for (const o of [{ conf: 'inside' }, { stop: 'conf' }, { stop: 'pips' }, { rr: 1 }, { target: 'zone' }])
+    for (const r of G.sopTrades3(B, { market: 'xau', ...o })) assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, JSON.stringify(o));
+});

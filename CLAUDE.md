@@ -6342,6 +6342,12 @@ kinds (`-n`) and the earlier scalp method's two-candle rule are unchanged; store
 histories are rebuilt. On the test's seeded market: plan 26 -> 22 trades, short method 30 -> 27, direct entry 2 -> 2.
 A paper reading of the owner's table before costs, not a tested rule: never call its total an edge. Tests:
 `tests/edge-desks.test.mjs` ("three-timeframe SOP": three tests; "an engulf completes within three candles").
+**Three fixes measured, none adopted** (22 Nov 2026, after the owner's 2-loss / 1-win charts): `sopTrades3` takes comparison options
+(`conf: 'inside'` the confirmation zone wholly inside the engulf's; `stop: 'conf'` past the confirmation zone / `'pips'` 30 pips;
+`target: 'zone'` the nearest opposite engulf-timeframe zone 1R or more ahead; `rr`); the defaults are the desk's reading (test). On the
+last 60 days of the five markets, before costs, no option or mix makes the H4 or H1 chain positive (best H4 −11.4R on 254 trades with
+the stop past the confirmation zone; every H1 variant −30.8R or worse); the D1 chain is 18-76 trades in any variant. In sample and
+picked after looking: nothing changes on the desk without the owner, and never quote these as evidence.
 
 ## ChronosTrade audit: the Topstep check and a first-day failure (22 Nov 2026)
 The audit's "Topstep challenge, 121 steps over 9 timeframes … firm days" check failed on every run from 22 Nov 00:00 UTC (main
