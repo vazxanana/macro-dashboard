@@ -6157,3 +6157,15 @@ Old and new code were run on the same candles (three markets, 2026) with one cha
   kinds are unchanged. The MSNR gold plan keeps the any-candle engulf only.
 - Open with the owner: a 2007-2019 holdout before anything is called better. Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`
   ("an engulf (EG) zone is a barrier too"), `tests/mosha-replay.test.mjs`.
+
+## The best part of each desk as one rule, tested on 2007-2019 (22 Nov 2026, owner: "check the trades from all edges, and get the best of each one", "test it", "run")
+`research/edge/h4-zone-trail/` (PREREGISTRATION.md committed alone first; `fetch.mjs`, `run.mjs`, RESULT.md, result.json). The
+desks' 31,500 closed 2026 paper records were split part by part (direction, key level, confirmation, entry, stop, target,
+hours; before costs, about 200 comparisons). What looked best: a Daily / H4 level, no lower-timeframe confirmation and no
+direction filter, a stop past the zone, no target with a trailed stop (the ICT desk's exit), no entries 17:00-24:00 UTC. The one
+rule those give (an H4 next-candle engulf zone, limit at its near edge, stop past the far edge, trail 1R behind from +2R, out
+after 40 hourly candles; gold, EUR/USD, GBP/USD) on OANDA H1 2007-2019, net of the desk-rigor costs: **FAIL**, pooled -0.027R a
+trade (n 6,253, month t -1.33; +0.014R before costs); gold +0.035R (t 0.98), EUR/USD -0.067R, GBP/USD -0.048R. The trail loses
+less than a fixed 2R target (-0.067R) and skipping the late hours a little less, neither enough. The question is closed: no
+variant of this rule on 2007-2019, and never build a rule from the desks' best-looking splits without a holdout. Nothing live
+changed. Test: `tests/h4-zone-trail.test.mjs`.
