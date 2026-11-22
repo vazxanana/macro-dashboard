@@ -12,8 +12,8 @@
 //           (until 21 Nov 2026 a 2R target, the desk's own choice).
 // A trade ends at its stop or its target (the documents give no time exit; the desk closed at 24 hours until 21 Nov 2026).
 // Every entry has a fixed stop of 30 pips on gold ($3.00) on the losing side; plan and simple have a target of 60 pips (2R).
-// On another market the 30 pips are the
-// same share of price as gold's near $4,000 (the desk's choice). An engulf here (see `engulfAt` and `zones`) = a candle CLOSES
+// On another market the stop is 30 of ITS OWN pips (`stopSize`; until 22 Nov 2026 gold's $3.00 as a share of price):
+// EUR/USD 0.0030, silver $0.30, an index 30 points. An engulf here (see `engulfAt` and `zones`) = a candle CLOSES
 // beyond the HIGH (a buy) or the LOW (a sell) of the last candle of the other colour before it, however many candles that takes;
 // its zone is that base candle, wick to wick. PAPER RECORD of one reading, before costs: not a tested
 // rule, never an edge. No order, alert, mirror copy or Trader read.
@@ -23,7 +23,14 @@ import { foldWeekend } from './fills.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
-export const EGM = { pips: 3.0, rr: 2, arm: 3 * 3600, efBack: 6 * 3600, egBack: 2 * 3600, fill: 12, hold: 86400, quiet: 2, directWait: 5 * 86400,
+// THE STOP IS 30 PIPS IN THE MARKET'S OWN PIP (owner, 22 Nov 2026: "the stop is not 3$ but 30 pips so convert it to points").
+// Until then every other market took gold's $3.00 as a share of its price (EUR/USD: about 8 pips). A pip here is ten points
+// (the last-but-one decimal the market is quoted to): gold 0.10 (30 pips = 300 points = $3.00; the teacher's own "2000 pips"
+// for a $200 move), silver 0.01, a five-decimal pair 0.0001 (30 pips = 0.0030), a yen pair 0.01, an index one index point.
+export const PIP = { xau: 0.1, xag: 0.01, nas100: 1, spx500: 1, us30: 1, de40: 1 };
+export const pipOfMarket = (market) => PIP[market] || (SOP.ALL[market] ? Math.pow(10, 1 - SOP.ALL[market].dec) : 0.1);
+export const stopSize = (market) => EGM.stopPips * pipOfMarket(market);
+export const EGM = { pips: 3.0, stopPips: 30, rr: 2, arm: 3 * 3600, efBack: 6 * 3600, egBack: 2 * 3600, fill: 12, hold: 86400, quiet: 2, directWait: 5 * 86400,
   life: { '4h': 120, '1h': 120, '30m': 200, '15m': 200, '5m': 150 } };
 const SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300 }, NAME = { '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5' };
 // 30-minute candles from the 15-minute ones (a candle with only one half on file is left out), and the trigger zones of both:
@@ -119,14 +126,14 @@ function dailyZone(DZ, t) { let s = null; for (const z of DZ) { if (z.at > t) br
 // target, placed, until, fillT (null: it expired) }), before the one-position rule: a read-out for tests and counts, it changes nothing.
 export function methodTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H1 = num(B['1h'] || []), H4 = num(B['4h'] || []); if (M5.length < 100 || M15.length < 50 || H4.length < 20) return [];
-  const D1 = foldWeekend(num(B['1d'] || [])), dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pipOf = (entry) => EGM.pips * (market === 'xau' ? 1 : entry / 4000);   // 30 pips on gold's scale, from the trade's own price (not the newest: a stop must not change between two reads)
+  const D1 = foldWeekend(num(B['1d'] || [])), dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pipOf = () => stopSize(market);   // 30 pips on gold's scale, from the trade's own price (not the newest: a stop must not change between two reads)
   const Z4 = turnBack(H4, zones(H4, '4h'), SEC['4h']), Z1 = zones(H1, '1h'), Z15 = zones(M15, '15m'), Z5 = zones(M5, '5m'), DZ = zones(D1, '1d'), pre = market === 'xau' ? '' : market + ':', out = [];
   // the methods give a stop and a target only: no time exit (24 hours until 21 Nov 2026)
   const rec = (kind, label, d, fi, entry, T0, log, marks, trail = false) => { const pip = pipOf(entry), stop = entry - d * pip, target = trail ? null : entry + d * EGM.rr * pip, fillT = M5[fi].time;
     const oc = trail ? efTrail(M5, Z5, fi, d, entry, stop) : outcome(M5, fi, d, entry, stop, target, Infinity), sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
     const tr = { id: `${pre}${kind}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind, label, h: '4h', l: '5m', side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
     if (trail && oc.moves) { tr.stopNow = oc.stop; tr.stopAt = oc.movedAt; }   // and WHEN it moved there: a settle must not apply it to candles before   // the trailed stop in force (the record's `stop` stays the opening stop: 1R is the opening risk)
-    tr.log = log.concat([{ t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips on gold's scale), ` + (trail ? 'no target: the stop is trailed with the M5 EF.' : `target ${f(target)} (${EGM.rr}R).`) }],
+    tr.log = log.concat([{ t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (30 pips), ` + (trail ? 'no target: the stop is trailed with the M5 EF.' : `target ${f(target)} (${EGM.rr}R).`) }],
       trail && oc.moves ? [{ t: oc.movedAt, text: `The stop was trailed ${oc.moves} time${oc.moves > 1 ? 's' : ''} with the M5 EF; the last M5 ${word(-d)} zone that failed, ${f(oc.ef.bot)} to ${f(oc.ef.top)}, put it at ${f(oc.stop)}.` }] : [],
       [oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${EGM.rr.toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
         : oc.status === 'trail' ? { t: oc.endT, text: `Trailed stop hit at ${f(oc.exit)}: ${sg(oc.R)}.` }
@@ -284,7 +291,7 @@ export function qmSetups(M15) {
 export function snrTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
   if (market !== 'xau') return [];
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H4 = num(B['4h'] || []), D1 = foldWeekend(num(B['1d'] || [])); if (M5.length < 100 || M15.length < 50 || H4.length < 30 || D1.length < 20) return [];
-  const f = (v) => (+v).toFixed(2), pip = EGM.pips, sides = snrSides(D1, H4), Z4 = turnBack(H4, zones(H4, '4h'), SEC['4h']), out = [], perDay = {};
+  const f = (v) => (+v).toFixed(2), sides = snrSides(D1, H4), Z4 = turnBack(H4, zones(H4, '4h'), SEC['4h']), out = [], perDay = {};
   const sideAt = (t) => { let s = null; for (const x of sides) { if (x.t > t) break; s = x; } return s; };
   // every order that fills, then the book in the order of the FILLS: one position at a time and 2 a UTC day are decided when
   // an order fills, on what had filled before it (until 21 Nov 2026 a signal was dropped because an earlier signal's limit
@@ -319,7 +326,7 @@ export function snrTrades(B, { from = 0, market = 'xau', orders = null } = {}) {
     const ok = d + '|' + fillT + '|' + entry; if (took.has(ok)) { note('same'); if (pv == null || left(Z, pv, fillT)) visit.set(vk, fillT); continue; }
     if (pv != null && !left(Z, pv, fillT)) { note('visit'); continue; } visit.set(vk, fillT); took.add(ok);
     const dk = Math.floor(fillT / 86400); if ((perDay[dk] || 0) >= SNR.perDay) { note('day'); continue; } perDay[dk] = (perDay[dk] || 0) + 1; note('trade');
-    const stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, Infinity); if (fillT < from) continue;
+    const pip = stopSize('xau'), stop = entry - d * pip, target = entry + d * SNR.rr * pip, oc = outcome(M5, fi, d, entry, stop, target, Infinity); if (fillT < from) continue;
     const turned = Z.dir !== d, tr = { id: oid, market, kind: qm ? 'msnr-qm' : 'msnr-sop', label: qm ? 'EG x SNR · gold plan, QM' : 'EG x SNR · gold plan', h: '4h', l: m.tf, side: d, t: fillT, entry, stop, target, r0: pip, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
     tr.log = [{ t: S.t, text: `Side ${word(d)}: the Daily candle of ${new Date(S.day * 1000).toISOString().slice(0, 10)} rejected the Daily ${S.key.kind} level ${f(S.key.p)} (${S.key.kind === 'OC' ? 'where two Daily candles of one colour met' : 'a turn of the Daily closes'}), and an H4 candle closed ${d > 0 ? 'above' : 'below'} ${f(S.level)}, the last H4 ${d > 0 ? 'A' : 'V'} level (a turn of the H4 closes) that stood before price tapped the Daily level.` },
       qm ? { t: T, text: `${NAME[m.tf]} QM ${word(d)}: shoulder ${f(m.level)}, ${d > 0 ? 'high' : 'low'} ${f(m.mid)}, head ${f(m.head.close)} in the H4 ${turned ? 'EF' : 'EG'} zone ${f(Z.bot)} to ${f(Z.top)}, then a close ${d > 0 ? 'above' : 'below'} ${f(m.mid)}: a ${word(d)} limit at the shoulder, ${f(entry)}, for two hours.` }

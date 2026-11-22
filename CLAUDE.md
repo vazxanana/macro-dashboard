@@ -6125,3 +6125,32 @@ Owner's answers: an engulf may take "as many candles as it needs"; keep the msnr
   what ends a Janda; M30 or M15 under H1; a single holdout on 2007-2019 (draft pre-registration kept outside the repository; 2020-26
   has been read under too many definitions on 21 Nov to judge anything). Never present a desk total as evidence.
 - Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`, `tests/mosha-tracker.test.mjs`, `tests/desk-exits.test.mjs`.
+
+## Why the desk totals fell, 30 pips in each market's own pip, EG barriers, the trade chart (22 Nov 2026, owner: "find why the before that were positive became negative and find a solutin, plus a barrier can be an eg aswell"; "the stop is not 3$ but 30 pips so convert it to points"; "i would like to resize ... and i want timeframes from 1minute m5 m15 m30 h1 h4 daily")
+Old and new code were run on the same candles (three markets, 2026) with one change at a time. PAPER READINGS before costs: none is a tested edge.
+- **Engulfing plan / short method**: the fall is gold (and silver / Nasdaq), not forex (EUR/USD and GBP/USD stayed about zero). Two causes:
+  (1) the any-number-of-candles engulf (the owner's answer of 21 Nov) made about five times as many gold trades, winning 24 % at a 2R
+  target (33 % breaks even): gold plan 100 trades / −10R with the next-candle engulf against 523 / −148R; (2) on gold the stop sits
+  INSIDE the zone the order rests at: 30 pips = $3.00, the M5 entry zone's median width is $3.92, the mean M5 candle $4.65 (the gold
+  plan's M15 zone is wider than the stop on 98 of 100 trades). Entry edge (wick / body / middle), stop past the zone and the trigger's
+  span were tried: no setting makes gold positive. The earlier "positive" totals were within noise of zero (gold plan +5R on 157).
+- **Mosha barriers**: no single change is the cause. Win rate 26 % before and 25 % after at a 3R target (25 % breaks even); each change
+  alone on gold since August stays about where the old code was (old 996 / +78R, box 1,271 / +167R, QM 447 / +35R, Janda 880 / +50R).
+  The published −35R is GBP/USD (−126R) and month-to-month noise.
+- **The stop is 30 pips in the market's own pip** (`council/eg-methods.mjs` `PIP`, `pipOfMarket`, `stopSize`; plan, short method, direct
+  entry, gold plan): a pip is ten points: gold 0.10 (300 points = $3.00), silver 0.01, a five-decimal pair 0.0001 (0.0030), a yen pair
+  0.01, an index one point. Until then other markets took gold's $3.00 as a share of price (EUR/USD about 8 pips). Gold is unchanged.
+  On 2026: EUR/USD plan 56 / +13R, short method 71 / +10R; GBP/USD 104 / +25R and 67 / +8R (fewer, longer trades; not evidence).
+- **An engulf (EG) zone is a barrier** (`assets/mosha-sop.js` `egBoxes`, a page copy of `engulfAt` / `zones` compared by a test;
+  `zonesOf` adds them after the BO origins; `eg: false` or `box: 'candle'` leaves them out): id part `eg-`, label "H4 EG barrier",
+  flag `eg`, read back by `readings()`; the same confirmations, stop and 3R as any barrier; a reading of its own in the 20-minute
+  rule, and an order a BO origin already gave is not recorded twice. Gold since August: about 420 more entries, 25 % winners.
+- **Fixed**: a barrier trade from before the one-minute candles on file was settled on their first candle (weeks later, tens of R):
+  it is read on the 5-minute candles (`barrierTrades`, the outcome line). The live tracker's window was not affected.
+- **Trade chart** (`assets/mosha-replay.js`, dialog `#mo-rp-dlg`): a desk trade offers M1, M5, M15, M30, H1, H4, D1 (`DESK_TFS`;
+  M15 / M30 / H1 from the window's candles; M1, H4 and D1 are their own candles read when first chosen: a day and a half around the
+  entry, 40 days, 200 days; `pickTf`, `ownBars`); "Bigger chart" (`[data-rpd="big"]`, `.mo-rp-dlg.big`) fills the screen and the
+  chart's lower edge drags (`resize: vertical`). Before still ends at the last candle closed at the entry on every timeframe.
+- Open with the owner: keep the any-number-of-candles engulf on gold or go back to the next candle only (the one change that
+  mattered); a 2007-2019 holdout before anything is called better. Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`
+  ("an engulf (EG) zone is a barrier too"), `tests/mosha-replay.test.mjs`.
