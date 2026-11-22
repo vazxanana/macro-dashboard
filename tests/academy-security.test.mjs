@@ -72,7 +72,7 @@ const validBodies = (ids) => ({
   'session.save': { action: 'session.save', session: { edge: 'gmp', state: {} } }, seen: { action: 'seen', edge: 'gmp', id: 'gmp-1715932200b', mode: 'train' }, 'exam.result': { action: 'exam.result', result: { edge: 'gmp', candidateId: EXAM2.id, lessonIds: [], withLessons: { action: 'WAIT' }, withoutLessons: { action: 'WAIT' } } },
   'blind.submit': { action: 'blind.submit', blind: { edge: 'gmp', candidateId: 'gmp-1715694000b', action: 'WAIT', text: 'x' } }, miss: { action: 'miss', miss: { edge: 'gmp', t: T0, kind: 'right-wait' } },
   'notebook.add': { action: 'notebook.add', note: { title: 'n2', hypothesis: 'h', dataset: 'd', method: 'm', validation: 'hypothesis' } }, 'model.register': { action: 'model.register', model: { name: 'scorer', version: '2' } },
-  'model.promote': { action: 'model.promote', id: ids.model, confirm: true }, 'model.rollback': { action: 'model.rollback', confirm: true }, explain: { action: 'explain', question: 'why?' },
+  'example.note': { action: 'example.note', id: 'xau:sop-m15-b1763000000', text: 'Wait for the retest.' }, 'model.promote': { action: 'model.promote', id: ids.model, confirm: true }, 'model.rollback': { action: 'model.rollback', confirm: true }, explain: { action: 'explain', question: 'why?' },
   analyse: { action: 'analyse', edge: 'gmp', candidateId: 'gmp-1715009700s', attemptId: ids.attempt, snapshot: { t: T0, hash: 'h', bars: {} }, features: { session: 'overlap' }, deterministic: { action: 'WAIT', gates: [] } },
 });
 const getQuery = (name, ids) => ({ get: name, edge: 'gmp', id: name === 'session' ? ids.session : name === 'research' ? '' : CAND.id, cand: CAND.id, t: String(T0), month: '2026-11' });

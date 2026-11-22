@@ -38,7 +38,7 @@ test('the page functions are lifted from the page, and the script is a paper rec
   const src = rd('council/mosha-desk.mjs');
   assert.doesNotMatch(src, /ctrader|sendAlerts|alerts\.mjs|trader\.mjs|NEW_ORDER|method:\s*'POST'/i);
   const yml = rd('.github/workflows/council.yml');
-  assert.match(yml, /timeout 120 node council\/mosha-desk\.mjs data \|\| echo/); assert.match(yml, /\n {12}assets\n/);
+  assert.match(yml, /timeout 240 node council\/mosha-desk\.mjs data \|\| echo/); assert.match(yml, /\n {12}assets\n/);
   assert.match(rd('council/datahealth.mjs'), /file: 'mosha\/desk\.json'/);
 });
 
@@ -203,7 +203,7 @@ test('one order is stored once: where the tracker joins the sequence and the bar
     assert.deepEqual(out.records.map((r) => r.id).sort(), ['bar-1h-b1795000900', 'sop-5m-1795000000'], 'the repeat-SOP twin of the sequence\'s order is not stored');
     assert.equal(new Set(out.records.map((r) => [r.side, r.t, r.entry, r.stop].join('|'))).size, out.records.length);
   } finally { [SOPX.sopTrades, SOPX.barrierTrades, SOPX.oldBarrierTrades] = keep; }
-  assert.match(rd('council/mosha-desk.mjs'), /SOP\.uniq\(seq\.concat\(SOP\.barrierTrades\(/);
+  assert.match(rd('council/mosha-desk.mjs'), /SOP\.deskTrades\(B, F, \{ from, market \}\)/);
   // clean keeps the new fields, and only where a record has them
   const c = M.clean(rec({ id: 'sop-c2-i-30m-1000', kind: 'sop', h: '1h', l: '30m', case: 2, case2: true, withWeekly: false, er20: 0.3149, label: 'H1 iBO → M30 VR, CF · CF inside the VR' }));
   assert.deepEqual([c.case2, c.withWeekly, c.er20, c.case, c.label], [true, false, 0.31, 2, 'H1 iBO → M30 VR, CF · CF inside the VR']);

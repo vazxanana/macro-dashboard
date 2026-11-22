@@ -4702,7 +4702,7 @@ function msEntryZones(bars, closedN, iv, zones) {
   }
   return out.sort((a, b) => (sell ? a.lo - b.lo : b.hi - a.hi)).slice(0, 2);
 }
-function msAnalyze(bars, N) {
+function msAnalyze(bars, N, NB) {   // NB: candles that confirm a new high / low of a running move (default N; the Mosha desk's one-candle readings pass 1)
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
   const minIn = (a,b) => { let m=Infinity, k=a; for (let j=a;j<=b;j++) if (L[j]<m){m=L[j];k=j;} return [m,k]; };
@@ -4766,7 +4766,7 @@ function msAnalyze(bars, N) {
       if (H[i] > prot.p) sweepProt(-1, i);   // traded above the protected high without a close above: that high is the new one
       if (!ext.fixed) {
         if (L[i] < ext.p) ext = { i, p: L[i], fixed: false };
-        else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
+        else if (i - ext.i >= (NB || N)) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
       }
       if (ext.fixed && C[i] < ext.p) {
         const e = makeEvent(-1, ext.p, ext.i, i, false);
@@ -4783,7 +4783,7 @@ function msAnalyze(bars, N) {
       if (L[i] < prot.p) sweepProt(1, i);   // traded below the protected low without a close below: that low is the new one
       if (!ext.fixed) {
         if (H[i] > ext.p) ext = { i, p: H[i], fixed: false };
-        else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
+        else if (i - ext.i >= (NB || N)) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
       }
       if (ext.fixed && C[i] > ext.p) {
         const e = makeEvent(1, ext.p, ext.i, i, false);
@@ -12367,6 +12367,19 @@ html:not([data-mosha="teach"]) #v-mosha #mo-open, html[data-role="owner"] #v-mos
 #v-mosha .mo-open dt { font-size: 12px; color: var(--ink-dim); } #v-mosha .mo-open dd { margin: 0; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); overflow-wrap: anywhere; }
 #v-mosha .mo-open .nt { margin: 0; font-size: 12px; color: var(--ink-dim); }
 @media (max-width: 520px) { #v-mosha .mo-open dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Open now on a phone (22 Nov 2026): one line a trade, the first three, then "Show all n open trades" */
+#v-mosha .mo-open-more { display: none; }
+@media (max-width: 640px) {
+  #v-mosha .mo-open { gap: 6px; }
+  #v-mosha .mo-open li:not(.empty) { padding: 10px 12px; gap: 0; min-height: 44px; align-content: center; }
+  #v-mosha .mo-open li:not(.empty) :is(.trk, .trk-l, dl, .nt) { display: none; }
+  #v-mosha .mo-open .r1 { flex-wrap: nowrap; min-width: 0; }
+  #v-mosha .mo-open .r1 .pl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  #v-mosha .mo-open .r1 .pl + .pl { display: none; }
+  #v-mosha .mo-open .r1 .live { font-size: 15px; flex: none; }
+  #v-mosha .mo-open-c:not([data-all]) .mo-open li:not(.empty):nth-child(n+4) { display: none; }
+  #v-mosha .mo-open-more { display: block; width: 100%; min-height: 44px; margin-top: 8px; }
+}
 #v-mosha #mo-sopr a { color: inherit; text-decoration: underline; }
 /* The replay leads the desk for the owner and readers (20 Nov 2026, owner: "like normal desk showing the replay trades"); the chart it opens comes right after. */
 html:not([data-mosha="teach"]) #v-mosha #mo-sopr, html[data-role="owner"] #v-mosha #mo-sopr { order: -10; } html:not([data-mosha="teach"]) #v-mosha #mo-replay, html[data-role="owner"] #v-mosha #mo-replay { order: -9; }
@@ -15078,6 +15091,8 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
 
   html[data-phone="simple"] .ps-only:not([hidden]):not(.ps-sw) { display: block; }
   html[data-phone="simple"] [data-ps]:not([data-ps-open]) { display: none !important; }
+  /* a desk trade's chart window (22 Nov 2026): the chart card folded on the page is the card the window borrows, so it is always open there */
+  html[data-phone="simple"] #mo-rp-dlg #mo-replay[data-ps] { display: block !important; }
 
   /* ── Home: the answer, what is open, what waits, where to go ── */
   html[data-phone="simple"] #v-home .h-quick { display: none; }

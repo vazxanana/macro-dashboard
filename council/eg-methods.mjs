@@ -70,7 +70,10 @@ const lower = (C, t) => { let lo = 0, hi = C.length; while (lo < hi) { const m =
 // not"; he checked 35 marked examples on four charts: "yes all right"). The base (first candle) is the last candle of the other
 // colour; a candle at most EG_SPAN candles after it that closes beyond its high (buy) / low (sell) completes the EG; later than
 // that there is no EG. The zone is the first candle, wick to wick. Until then any later candle could complete it.
-export const EG_SPAN = 4;
+// THREE CANDLES ON EVERY DESK (owner, 22 Nov 2026, later the same day: "Change to 3 candles"): the 1st, 2nd or 3rd candle after the
+// first candle completes the engulf, the 4th no longer does. The next-candle kinds (span 1) and the earlier scalp method's
+// two-candle rule are unchanged. Stored records keep the older rule until the histories are rebuilt.
+export const EG_SPAN = 3;
 // The target of each reading, in R (owner, 22 Nov 2026: "keep the best rr for each individual one"): the best of a 1R / 2R / 3R / 4R
 // target on that reading's own closed 2026 records, each replayed alone on 5-minute candles before costs. Picked in sample on one
 // year: a choice of the owner's, not a tested result. A reading whose own exit was best keeps it and is not listed here; the
@@ -266,6 +269,77 @@ export function m1Trades(B, { from = 0, market = 'xau' } = {}) {
   out.sort((a, b) => a.t - b.t); const keep = []; let busy = -Infinity;
   for (const r of out) { if (r.t <= busy) continue; busy = r.endT || Infinity; if (r.t >= from) keep.push(r); }
   return keep;
+}
+
+// ─── the three-timeframe SOP (22 Nov 2026; the owner's table: marking zone / engulf at the zone / confirmation = Daily / H4 /
+// H1, H4 / H1 / M15, H1 / M15 / M5, and three pictures of an engulf completed by the 1st, 2nd or 3rd candle) ───
+// An engulf completes within THREE candles (EG_SPAN, the same on every desk since the owner's "Change to 3 candles"): the first candle is the last
+// candle of the other colour and the 1st, 2nd or 3rd candle after it closes beyond its high (a buy) / low (a sell); the zone is the
+// first candle, wick to wick. For each chain [zone, engulf, confirmation]:
+//   1. marking zone: an engulf zone on the zone timeframe, still alive (not closed through, within its life). Its side is the trade's.
+//   2. price comes back into it (a candle of the engulf timeframe trades into it after the zone is known); from that candle's close
+//      on, an engulf of the SAME side completes on the engulf timeframe while the marking zone is alive, its zone touching the
+//      marking zone (an overlap, the file's "at the zone" test).
+//   3. confirmation: after that engulf is known, an engulf of the same side completes on the confirmation timeframe, its zone
+//      touching the engulf's zone, while both higher zones are alive, within SOP3.wait confirmation candles (the desk's choice).
+// Entry: a limit at the MIDDLE (50 %) of the confirmation engulf's zone, alive for SOP3.fill confirmation candles (the desk's
+// choice), cancelled when a confirmation candle closes through the far side of the engulf's zone. On its fill candle only the
+// stop counts. Stop: past the far side of the ENGULF timeframe's zone (never just past the confirmation zone) by the desk's
+// buffer ($0.30 on gold, the same share of price elsewhere, from the zone's own price). Target SOP3.rr = 2R (the method's
+// minimum; taking exactly 2R is the desk's choice). A trade ends at its stop or its target. One order a confirmation zone (the
+// most recent engulf zone behind it, then the most recent marking zone); one position at a time per chain and market: a fill
+// while one is open is passed over, and of two fills in one candle the order known first wins. Every step reads candles closed
+// by that step's time. PAPER READING of the owner's table, before costs: not a tested rule, never an edge.
+export const SOP3 = { wait: 24, fill: 24, rr: 2,
+  chains: [{ tfs: ['1d', '4h', '1h'], style: 'swing' }, { tfs: ['4h', '1h', '15m'], style: 'intraday' }, { tfs: ['1h', '15m', '5m'], style: 'scalp' }] };
+const NAME3 = { ...NAME, '1d': 'D1' };
+// Variants for the owner's comparison (22 Nov 2026; the defaults are the desk's reading and change nothing): conf 'inside' = the
+// confirmation zone wholly inside the engulf's zone (default 'touch'); stop 'conf' = past the confirmation zone's far side, 'pips' =
+// 30 pips from the entry (default 'eg' = past the engulf zone); target 'zone' = the near side of the nearest opposite engulf-timeframe
+// zone alive ahead of the entry when it is 1R or more away (else rr), default 'rr'; rr = the R multiple (default SOP3.rr).
+export function sopTrades3(B, { from = 0, market = 'xau', conf = 'touch', stop: stopAt = 'eg', target: tgtAt = 'rr', rr = SOP3.rr } = {}) {
+  const M5 = num(B['5m'] || []); if (M5.length < 100) return [];
+  const dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pre = market === 'xau' ? '' : market + ':', sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`, pl = (n) => `${n} candle${n === 1 ? '' : 's'}`, out = [];
+  const C = {}, Z = {}; for (const tf of ['1d', '4h', '1h', '15m', '5m']) { C[tf] = tf === '5m' ? M5 : tf === '1d' ? foldWeekend(num(B[tf] || [])) : num(B[tf] || []); Z[tf] = zones(C[tf], tf); }
+  const touch = (a, b) => a.bot <= b.top && a.top >= b.bot;
+  for (const ch of SOP3.chains) { const [zt, et, ct] = ch.tfs, CE = C[et], CC = C[ct], secE = SEC[et], secC = SEC[ct], got = [];
+    if (!Z[zt].length || !Z[et].length || !Z[ct].length) continue;
+    // step 1 and the return of step 2, per marking zone: ret = the close of the first engulf-timeframe candle that trades into it
+    const marks = Z[zt].map((z) => { let ret = null; for (let k = lower(CE, z.at); k < CE.length && CE[k].time + secE <= z.end; k++) if (z.dir > 0 ? CE[k].low <= z.top : CE[k].high >= z.bot) { ret = CE[k].time + secE; break; } return { z, ret }; }).filter((m) => m.ret != null);
+    // step 2: the engulf at the marking zone (the most recent marking zone that fits), known at e.at
+    const egs = []; for (const e of Z[et]) { let M = null; for (const m of marks) if (m.z.dir === e.dir && m.ret <= e.at && m.z.end > e.at && touch(e, m.z) && (!M || m.z.at > M.z.at)) M = m; if (M) egs.push({ e, M }); }
+    // step 3: the confirmation, one order a confirmation zone
+    for (const c of Z[ct]) { const d = c.dir, K = c.at; let X = null;
+      const t0 = c.i >= SOP3.wait ? CC[c.i - SOP3.wait].time : -Infinity; let q0 = 0, q1 = egs.length; while (q0 < q1) { const m = (q0 + q1) >> 1; if (egs[m].e.at <= t0) q0 = m + 1; else q1 = m; }   // engulfs older than the wait cannot count
+      for (let q = q0; q < egs.length && egs[q].e.at < K; q++) { const x = egs[q], e = x.e; if (e.dir !== d || !(e.at < K) || !(e.end > K) || !(x.M.z.end > K) || !(conf === 'inside' ? c.top <= e.top && c.bot >= e.bot : touch(c, e))) continue;
+        if (c.i >= lower(CC, e.at) + SOP3.wait) continue;   // within SOP3.wait confirmation candles of the engulf
+        if (!X || e.at > X.e.at) X = x; }
+      if (!X || K < M5[0].time) continue;   // an order placed before the 5-minute candles on file cannot be read
+      const e = X.e, MZ = X.M.z, entry = (c.top + c.bot) / 2, fz = stopAt === 'conf' ? c : e, far = d > 0 ? fz.bot : fz.top, buf = SOP.sizes(market, far).buf, stop = stopAt === 'pips' ? entry - d * stopSize(market) : far - d * buf, r0 = Math.abs(entry - stop);
+      if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;   // never a record without a stop on the losing side
+      let target = entry + d * rr * r0;
+      if (tgtAt === 'zone') { let nz = null; for (const o of Z[et]) if (o.dir === -d && o.at <= K && o.end > K) { const p = d > 0 ? o.bot : o.top; if ((p - entry) * d >= r0 && (!nz || (p - entry) * d < (nz - entry) * d)) nz = p; } if (nz != null) target = nz; }
+      // the order's life: SOP3.fill confirmation candles, or a confirmation candle closing through the engulf zone's far side
+      let dead = CC[c.i + SOP3.fill] ? CC[c.i + SOP3.fill].time + secC : Infinity;
+      for (let j = c.i + 1; j < CC.length && CC[j].time + secC <= dead; j++) if (d > 0 ? CC[j].close < e.bot : CC[j].close > e.top) { dead = CC[j].time + secC; break; }
+      let fi = -1; for (let k = lower(M5, K); k < M5.length && M5[k].time + 300 <= dead; k++) if (d > 0 ? M5[k].low <= entry : M5[k].high >= entry) { fi = k; break; }
+      if (fi < 0) continue;
+      const fillT = M5[fi].time, oc = outcome(M5, fi, d, entry, stop, target, Infinity), zn = NAME3[zt], en = NAME3[et], cn = NAME3[ct];
+      const tr = { id: `${pre}eg3-${zt}-${d > 0 ? 'b' : 's'}${K}`, market, kind: 'eg-sop3', label: `${zn} zone → ${en} EG → ${cn} CF`, style: ch.style, h: zt, l: ct, side: d, t: fillT, K, entry, stop, target, r0, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
+      tr.log = [{ t: MZ.at, text: `Marking zone: a ${zn} ${word(d)} engulf zone ${f(MZ.bot)} to ${f(MZ.top)} (the engulf took ${pl(MZ.n)}).` },
+        { t: X.M.ret, text: `Price came back into the ${zn} zone (a closed ${en} candle traded into it).` },
+        { t: e.at, text: `At the zone a ${en} engulf ${word(d)} closed, completed in ${pl(e.n)} (3 at most): its zone is ${f(e.bot)} to ${f(e.top)}.` },
+        { t: K, text: `Confirmation: a ${cn} engulf ${word(d)} closed at the ${en} zone, completed in ${pl(c.n)} (zone ${f(c.bot)} to ${f(c.top)}). A ${word(d)} limit rests at its middle ${f(entry)} for ${SOP3.fill} ${cn} candles; stop ${f(stop)} past the ${en} zone, target ${f(target)} (${SOP3.rr}R; desk's choice).` },
+        { t: fillT, text: `The limit filled: ${word(d)} ${f(entry)}, risk ${f(r0)}.` },
+        oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${(Math.abs(target - entry) / r0).toFixed(2)}R.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${sg(oc.R)}` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+          : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${sg(oc.float)} now).` : '.') }];
+      tr.marks = [{ kind: 'zone', top: MZ.top, bot: MZ.bot, a: MZ.base, at: MZ.at, label: zn + ' EG zone' }, { kind: 'zone', top: e.top, bot: e.bot, a: e.base, at: e.at, label: en + ' EG zone' + egN(e) },
+        { kind: 'zone', top: c.top, bot: c.bot, a: c.base, at: c.at, label: cn + ' EG zone · entry' }, { kind: 'level', p: entry, a: c.base, at: c.at, label: '50 % · limit' }];
+      got.push(tr); }
+    // one position at a time per chain and market: by fill time, the order known first when two fill in one candle
+    got.sort((a, b) => a.t - b.t || a.K - b.K); let busy = -Infinity;
+    for (const r of got) { if (r.t <= busy) continue; busy = r.endT || Infinity; delete r.K; if (r.t >= from) out.push(r); } }
+  return out.sort((a, b) => a.t - b.t);
 }
 
 // ─── the gold plan with Daily levels (the MSNR desk; the owner's fourth document, read in the desk's own words) ───

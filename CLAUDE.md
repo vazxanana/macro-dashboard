@@ -4395,6 +4395,36 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   keeps chart, account, decision, verdict). Levels are one strip (`.kv.lvl`), the decision's folds one grouped list, entry / stop
   / target appear only for a changed trade (`.choices + .lv`), a chosen verdict reads in its colour. The verdict card is "Your
   verdict" (small: "on attempt N"; the audit's correction check reads that). No decision, lesson, API or storage change.
+- **Desk examples** (22 Nov 2026, owner: "put 4 trades examples for each one of the edges … into the academy, 2 loss 2 wins …
+  i will guide you and write and do drawing on the same chart what u should had done"). A section of the Academy (tab `examples`,
+  after Blind arena; on the phone's simple view a row of its own under the five sections and "More", one tap): for every reading
+  of the Mosha and Engulfing desks, four stored paper trades (two that won, two that lost) on a chart with the record's own
+  marks, entry / stop / target and log; timeframes M1 to D1 (a window around the trade for each, `windowFor`; opens on M5, or
+  the first timeframe that holds the whole trade), Before (only candles closed at the entry; marks and log known by then) /
+  After. The owner writes "What should have been done" (2,000 characters), ticks quick verdicts (`CHIPS`) and DRAWS on the same
+  chart: select, trend line, level, box, arrow, text; move, resize by handles, colours, Delete; press-drag or click-click, touch
+  too. The geometry is the replay lab's own (`BT.drawGeom` / `drawHit` / `drawResize` / `drawMove`, `tfLogical` / `tfTimeAt`):
+  a shape is [UTC seconds, price] points, so it stays in place on every timeframe. "Copy for the assistant" / "Copy all my
+  notes" give plain text (id, reading, trade, result, verdict, the note, each drawing as its kind, points and text);
+  "Download chart image" a PNG of chart and overlay.
+  - Files: `assets/academy-examples.js` (`window.MXAX`, pure pieces first, tested in Node), styles in ONE block of
+    `assets/academy.css` right before the phone's simple view (which must close the file), `TABS` in `assets/academy-ui.js`.
+  - Data: council-data `academy/desk-examples.json`, read at `/cdata/academy/desk-examples.json` (owner session), written by
+    `council/desk-examples.mjs` **run by hand after a desk rebuild, never in the loop**, so the set stays the same while he
+    writes on it. No file yet = "No examples yet: they are written after the next desk rebuild."
+  - Notes: `api/academy.js` `GET ?get=example-notes` → `{ notes: { <example id>: { text, chips, draw, at } } }` and `POST
+    { action: 'example.note', id, text?, chips?, draw? }` (owner only, same origin, an audit row; a note is replaced as a whole,
+    an empty one removes it). Store file `examples/notes.json` (`{ v, notes }`, 400 notes at most: the next is a 409; a failed
+    read or a file of another shape is a 503 and is never overwritten). Checked on the server: id `[a-z0-9:._-]` up to 80, text
+    up to 2,000, chips from `EX_CHIPS`, at most 60 shapes of type t / h / r / a / x, each rebuilt field by field (finite
+    numbers, a text of 120 characters). The assistant connector (`api/academy-mcp.js`) does NOT read them: do not widen it.
+  - Nothing is kept in the browser (the storage allowlist did not grow): an unsaved note lives in the page's memory, the shared
+    leave guard asks once, a failed save keeps everything and offers "Try again".
+  - Display and notes only: no rule, desk record or trade is changed by it. The examples are PICKED (two winners, two losers
+    a reading): they show what a reading did, never how often it wins; never quote them as evidence.
+  - Tests: `tests/academy-examples.test.mjs`; changed on purpose: `tests/academy-ui.test.mjs` (the tab list, the page's
+    sections and scripts), `tests/academy-security.test.mjs` (a body for the new POST action). The audit opens the tab on its
+    empty state (the dev server has no examples file).
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
@@ -6290,3 +6320,108 @@ for a buy) by the desk's buffer; target the desk's barrier target (`BARRIER_R`, 
 flags `tap`, `mkt`, `l: '1m'`, label "… · M1 BO at the tap"; `readings(r).tap` from the id; its own reading in the 20-minute rule.
 No other record changes (test). On GBP/USD 18-20 Nov: 45 entries, 27 reached target, +10R before costs (three days of one
 market: not evidence; an M1 stop is a few pips, so costs take a large share). Test: `tests/mosha-sop.test.mjs`.
+
+## Three-timeframe SOP on the Engulfing desk; an engulf completes within three candles (22 Nov 2026, owner's table: marking zone / engulf at the zone / confirmation = Daily / H4 / H1, H4 / H1 / M15, H1 / M15 / M5, with three pictures of an engulf completed by the 1st, 2nd or 3rd candle; then "Change to 3 candles")
+`council/eg-methods.mjs` `sopTrades3(B, { from, market })` (`SOP3`), a sixth reading on the Engulfing desk (`DESKS.eg.read`; kind
+`eg-sop3`, id `<market:>eg3-<zone timeframe>-<b|s><order time>`, label "D1 zone → H4 EG → H1 CF", `h` = the zone timeframe, `l` =
+the confirmation timeframe, tag `style` swing / intraday / scalp, which `council/mosha-desk.mjs` `clean` now keeps). Per chain:
+(1) a marking engulf zone on the first timeframe, still alive, gives the side; (2) price comes back into it (a closed candle of the
+second timeframe trades into it) and an engulf of the same side then completes on the second timeframe, its zone touching the
+marking zone; (3) an engulf of the same side then completes on the third timeframe, its zone touching the second one's, both higher
+zones alive. Entry: a limit at the MIDDLE (50 %) of the third zone; stop past the far side of the SECOND timeframe's zone by the
+desk's buffer ($0.30 on gold, the same share of price elsewhere); target 2R; a trade ends at its stop or its target; on a
+limit's fill candle only the stop counts. One order a confirmation zone (the most recent engulf zone behind it), one position at a
+time per chain and market (by fill time; of two fills in one candle the order known first). The desk's own choices, said in the
+code and on the desk: the confirmation within 24 candles of its timeframe, the order alive 24 such candles and cancelled by a
+close through the second zone's far side, exactly 2R, the one-position rule. Read on the candles the desk already had (no new
+timeframe; an order placed before the 5-minute candles on file is not read). Page (`assets/desk-trades.js`): the filter chip
+"Three-timeframe SOP" (`KN`), the style beside each row's label, the "What this is" text.
+**An engulf completes within three candles on every desk** (owner, 22 Nov 2026: "Change to 3 candles"; it was four, the owner's
+earlier "3 max 4"): `EG_SPAN` 3 in `council/eg-methods.mjs` and in the page copy `assets/mosha-sop.js` `egBoxes`. The next-candle
+kinds (`-n`) and the earlier scalp method's two-candle rule are unchanged; stored records keep the older rule until the
+histories are rebuilt. On the test's seeded market: plan 26 -> 22 trades, short method 30 -> 27, direct entry 2 -> 2.
+A paper reading of the owner's table before costs, not a tested rule: never call its total an edge. Tests:
+`tests/edge-desks.test.mjs` ("three-timeframe SOP": three tests; "an engulf completes within three candles").
+**Three fixes measured, none adopted** (22 Nov 2026, after the owner's 2-loss / 1-win charts): `sopTrades3` takes comparison options
+(`conf: 'inside'` the confirmation zone wholly inside the engulf's; `stop: 'conf'` past the confirmation zone / `'pips'` 30 pips;
+`target: 'zone'` the nearest opposite engulf-timeframe zone 1R or more ahead; `rr`); the defaults are the desk's reading (test). On the
+last 60 days of the five markets, before costs, no option or mix makes the H4 or H1 chain positive (best H4 −11.4R on 254 trades with
+the stop past the confirmation zone; every H1 variant −30.8R or worse); the D1 chain is 18-76 trades in any variant. In sample and
+picked after looking: nothing changes on the desk without the owner, and never quote these as evidence.
+
+## ChronosTrade audit: the Topstep check and a first-day failure (22 Nov 2026)
+The audit's "Topstep challenge, 121 steps over 9 timeframes … firm days" check failed on every run from 22 Nov 00:00 UTC (main
+passed through 21 Nov 23:50). The page and the engine were right. Cause: the Nasdaq quick start opens 10 days back, on 22 Nov
+that is 12 Nov 07:00 UTC, and the check's blind trades (buy, sell, buy … at 0.6 % each) were stopped seven times in a row, so
+the Combine failed on its 4 % maximum loss at 18:00 UTC of its FIRST firm day; an ended challenge records no further day, and
+the check needs a day change (2+ firm days). Fix (`scripts/audit/chronostrade.cjs` only): the risk a trade is worked out from
+the firm's own rules (0.11 %: 21 trades at most, all stopped = 60 % of the maximum loss, all at their 2R target = 90 % of the
+profit target), so the challenge stays live through the steps on any date; if it still ends on day one the check fails and says
+why. Run with the page's clock set to 16, 21 and 22 Nov: 6, 7 and 6 firm days.
+
+## A SOP inside the SOP: the VR and the CF each start a lower-timeframe sequence (22 Nov 2026, owner: "on mosha you need to repeat sop inside sop. Bo1 vr ( start new low time frame sop bo vr cf for sells if bo1 is bullish, and buys if bo1 is bearish), CF (start new low time frame sop bo vr cf for buys and main structure as well)")
+`assets/mosha-sop.js` `sopTrades` (`nestAdd`, `nestRun`). The main sequence (BO on h, VR and CF on l, the EG entry) is unchanged
+and recorded as before. Beside it, each of its two breaks is read as a BO one timeframe lower (`LOWER[l] || DOWN[l]`: H4 → H1,
+H1 → M30, M30 → M15, M15 → M5, M5 → M1; M30 built from M15 where none is handed in; no candles = nothing) and a whole BO, VR, CF
+is waited for there with `msMosha`: the **VR leg** (id `sop-nv-<tf>-<b|s><t>`, `nest: 'vr'`) against the first BO (sells under a
+bullish BO, buys under a bearish one), read until the main CF forms or a lower candle closes back beyond the main VR's extreme;
+the **CF leg** (`sop-nc-`, `nest: 'cf'`) with the first BO, read until a lower candle closes through the CF zone's far side; a
+main CF inside its VR (the "likely to fail" case) starts one too, said in its log (`cfIn: true`; `case2: false` leaves it out). A
+leg first seen late (its break known only once the BO's candle closed) takes no entry from before it was seen. Both at most `BARRIER_WATCH` candles of
+l. Entry, stop and target are `msMosha`'s own (EG close, stop past the pullback's extreme, target the nested VR's extreme; the
+repeat SOP's size and losing-side checks; a nested CF inside its VR is skipped); one record a main sequence and leg. Record:
+`kind: 'sop'`, `h` = l, `l` = the lower timeframe, `up` = h, `of` = the first BO's side, label "H4 BO → H1 VR → M30 SOP inside
+the VR". No hindsight: a leg is registered at the candle whose close shows its break, walked one closed lower candle at a time
+with the main sequence as the last closed l candle left it, and the entry is taken only at the candle whose close is its EG.
+`o.nest === false` leaves them out. `uniq` ranks them last (an order another reading already gave keeps the other id);
+`council/mosha-desk.mjs` `merge` reads each leg as its own reading from the id; the desk names them (`isNest`, `kindText`) and
+lists "SOP inside the VR (against the BO)" / "SOP inside the CF (with the BO)" apart from "BO, VR, CF". A reading, not a tested
+rule: never quote its record as an edge. Test: `tests/mosha-sop.test.mjs` ("a SOP inside the SOP"; the older tests read the list
+with `nest: false`, `ST` is the whole one).
+**The CF one timeframe under the VR** (same day, owner sent the method's own timeframe table for BO / VR / CF): D1 → H4 → H1,
+H4 → H1 → M15 (owner, same day: "one of them is h4 h1 m15 (not m30)"), H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1 (`CFTF`: the VR's timeframe → the CF's; M1 stays M1). The BO on h and
+the VR on l are read as before (the same VR event, box and extreme); the CF, the pullback into its zone, the EG, the stop and the
+fill are read on the CF timeframe by a walker per sequence (`walkAdd` / `walkRun`: `msMosha`, untouched, gets the l timeframe's
+VR as its first event and the CF timeframe's small breaks after it, one closed candle at a time; the "CF inside the VR" case
+and the target are judged against the l timeframe's VR). Records keep their id shape (`sop-<l>-<EG candle>`), carry `ll` = the
+CF timeframe and the label "H4 BO → H1 VR → M30 CF". `cf: 'same'` reads the CF on l as before (the older tests pin it); with no
+candles of the CF timeframe the CF is read on l and the log says so. The CF zones handed to the barrier entry (`cfOut`) are on
+the CF timeframe now (an M5 or M1 CF zone has no barrier table, so it gives no barrier entry). The nested legs follow the table:
+the SOP inside the VR one step under the VR's timeframe, the SOP inside the CF one step under the CF's (M1 on M1). The table's
+last row (M5 → M1 → M1) is NOT a ladder step: `LADDER` still ends at M15 → M5. The tracker already reads every timeframe the
+table needs (`BACK`: M1 16 days for a 14-day window), nothing changed there. A reading, not a tested rule. Test: "the CF one
+timeframe under the VR".
+**"Both": where the CF may form, and a limit at the CF line** (same day, owner on the method's own drawing of the sequence: BO,
+the VR at the extreme, price back near where the BO broke, the CF there, then "pullback & entry" at the CF line; asked which
+of the two readings, he answered "Both"). (B) A CF counts only once price, after the VR, has traded back to the level the BO
+broke (a buy BO: a low at or below it), on closed candles up to the CF's own candle (`backEv`; an earlier break with the BO is
+handed to `msMosha` as a continuation break, a later one can still be the CF). Every sequence record carries `back: true` and its
+log says so; the nested legs read the same rule on their own BO (the VR / CF break they start from). `cfBack: false` = as before.
+(A) Beside the EG entry, a plain limit at the CF line (the level the CF's break took): id `sop-l-[i-]<l>-<b|s><fill>`,
+`cfLimit: true`, label "… CF · limit at the CF line", `known` = the close of the CF-timeframe candle of the fill. It rests from
+the CF candle's close until price reaches the VR's extreme, a CF-timeframe candle closes through the CF zone's far side, or
+`CF_LIMIT` 24 CF-timeframe candles pass (the desk's choice). Stop past the CF zone's far side by the desk's buffer, target the
+VR's extreme; the fill is the first 5-minute (M1 for an M1 CF) candle that reaches the line and can only stop the trade; the
+sequence's size checks; never for a CF inside the VR. Its own reading in `uniq` (`orderKey`) and in the tracker's `merge`.
+Only where the CF is read on its own timeframe (none with `cf: 'same'`). `cfLimit: false` leaves it out. The desk lists "BO, VR,
+CF: entry on the EG" and "BO, VR, CF: limit at the CF line" apart. Readings, not tested rules: never quote either record as an
+edge. The research scripts that call `sopTrades` (`desk-rigor`, `desk-partial`) were run on the reading before; a re-run reads
+the new defaults. Test: '"Both"' (the older tests pin `nest: false, cf: 'same', cfBack: false, cfLimit: false`).
+**Scalp / intraday / swing on the Mosha desk** (22 Nov 2026, the owner's "Yrs" to the Engulfing table's tag): `MS_MOSHA_SOP.styleOf(r)`
+reads the trade's TOP timeframe (`r.up || r.h`: the BO's for a sequence, the main BO's for a SOP inside the SOP, the barrier's for
+a barrier): D1 swing, H4 intraday, H1 and lower scalp (the Engulfing chains' split). Shown on each row and Open now card, and three
+lines under "By entry type". A label from stored fields, nothing stored, no rule reads it. Test: `tests/mosha-sop.test.mjs`.
+
+## The Mosha desk: each reading on the structure it did best with (22 Nov 2026, owner: "test the results of the market structure i told u", then "keep the good ones and replace the bad ones")
+The owner's marked H1 chart (29-30 Oct): in a running move a new low (high) counts once ONE candle has closed after it, and a
+close beyond it is a BO; the page waited six (`msAnalyze`'s extreme fixed after N candles). `msAnalyze(bars, N, NB)` takes the
+number of confirming candles as a third argument (default N: the Charts page and every other caller are unchanged).
+`assets/mosha-sop.js` `deskTrades(B, F, { from, market })` (used by the tracker's `build` and the browser replay) runs the
+readings twice and keeps, per reading, the structure that did better on the last 60 days of gold, EUR/USD and GBP/USD:
+one-candle (`oneCandle(F)`, `ONE_N` 1) for the CF limit, the CF inside the VR, the VR retest, the SOP inside the CF, the
+barrier with its 3R target, the M1 BO at the tap and the repeat of the SOP; six-candle (`sixCandle(r)` true) for the EG entry,
+the SOP inside the VR and the barrier with its 1R target. Records carry `structN`. 60 days before costs: today -36.7R on
+13,617 trades, one-candle everywhere +539.7R on 21,226, mixed +667.9R on 18,846. PICKED ON THOSE 60 DAYS, BEFORE COSTS: a
+choice, not a tested result; never quote it as an edge. A run takes about twice as long: `council.yml` gives the tracker
+`timeout 240` (was 120). Tests: `tests/mosha-sop.test.mjs` (the test file wraps `M.sopTrades` with older options: compare with
+`ST`, the unwrapped one).

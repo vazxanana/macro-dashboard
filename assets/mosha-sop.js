@@ -41,6 +41,10 @@
   'use strict';
   var SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300, '1m': 60 };
   var NAME = { '1d': 'D1', '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
+  // scalp / intraday / swing (owner, 22 Nov 2026: "Yrs" to the engulfing table's tag): by the trade's TOP timeframe, the BO's for a
+  // sequence (the main BO's for a SOP inside the SOP) and the barrier's for a barrier; D1 swing, H4 intraday, H1 and lower scalp,
+  // the same split as the Engulfing desk's three chains. A label only: read from h / up, nothing stored, no rule reads it.
+  var styleOf = function (r) { var t = (r && (r.up || r.h)) || ''; return t === '1d' ? 'swing' : t === '4h' ? 'intraday' : t ? 'scalp' : ''; };
   var LADDER = [['1d', '4h'], ['4h', '1h'], ['1h', '30m'], ['30m', '15m'], ['15m', '5m']];   // the VR forms exactly one timeframe lower
   var BACK = { '1d': 1500, '4h': 260, '1h': 90, '30m': 60, '15m': 40, '5m': 24, '1m': 16 };  // days of candles each timeframe needs
   // BARRIER_R: 3 until 22 Nov 2026. Owner ("keep the best rr for each individual one"): a 1R target did best on the barrier
@@ -48,10 +52,14 @@
   var DAYS = 14, PIVOT = 6, WIN = 1500, BUF = 0.3, BARRIER_R = 1, MIN_JUDGE = 20;
   // the barrier entry's confirmation timeframe (21 Nov 2026, the method's own table: D1 on H1, H4 on M15, H1 on M5, M15 on M1);
   // the CF is watched for BARRIER_WATCH confirmation candles from the first touch and its pullback for BARRIER_FILL more
-  var BARRIER = [['1d', '1h'], ['4h', '15m'], ['1h', '5m'], ['15m', '1m']], BARRIER_WATCH = 60, BARRIER_FILL = 12;
+  var BARRIER = [['1d', '1h'], ['4h', '15m'], ['1h', '5m'], ['15m', '1m']], BARRIER_WATCH = 60, BARRIER_FILL = 12, CF_LIMIT = 24;   // CF_LIMIT: candles of the CF timeframe a limit at the CF line rests (the desk's choice)
   // the second table (21 Nov 2026): an H4 barrier is also confirmed on M30 and an H1 barrier on M15 (ALT2), an M30 barrier on M5
   // (BARRIER30); M15 on M5 is M5_ALT below. LOWER = one step down the ladder, for the repeat of the SOP at a barrier.
   var ALT2 = { '4h': '30m', '1h': '15m' }, BARRIER30 = [['30m', '5m']], DOWN = { '4h': '1h', '1h': '30m', '30m': '15m', '15m': '5m' }, LOWER = { '1h': '30m', '30m': '15m', '15m': '5m', '5m': '1m' };
+  // the method's own timeframe table for the sequence (owner, 22 Nov 2026): the CF is read ONE TIMEFRAME LOWER than the VR
+  // (BO → VR → CF: D1 → H4 → H1, H4 → H1 → M15, H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1; M1 stays M1). CFTF: the VR's timeframe → the CF's.
+  // Owner, 22 Nov 2026, later: "one of them is h4 h1 m15 (not m30)": under an H1 VR the CF is read on M15.
+  var CFTF = { '4h': '1h', '1h': '15m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' };
   var JANDA_ALT = { '4h': '1m', '1h': '1m' };   // the Janda's own table: H4 on M15 or M1, H1 on M5 or M1 (the simple CF keeps the one timeframe)
   var f2 = function (v) { return (+v).toFixed(2); };
   // More markets (21 Nov 2026, owner: "more trades"): the SAME reading on other markets, no new entry rule. The gold sizes
@@ -118,10 +126,32 @@
   //   2. the major-BO sequence before the internal-BO one ("sop-" before "sop-i-");
   //   3. the higher upper timeframe before the lower (the M30 → M15 VR retest before the M15 → M5 one);
   //   4. else the order the rows came in.
-  // A CF-inside-the-VR record ("sop-c2-") is its own reading: compared only with its own kind.
-  function orderKey(r) { return [mkOf(r.market), r.case2 ? 'c2' : '', r.side, r.t, (+r.entry).toPrecision(10), (+r.stop).toPrecision(10)].join('|'); }
+  // A CF-inside-the-VR record ("sop-c2-") is its own reading: compared only with its own kind. So is the limit at the CF line ("sop-l-").
+  // A SOP inside the SOP ("sop-nv-", "sop-nc-", 22 Nov 2026) comes last of all: when it is the very order another reading
+  // already gave, the other record is kept.
+  function orderKey(r) { return [mkOf(r.market), r.case2 ? 'c2' : r.cfLimit ? 'lim' : '', r.side, r.t, (+r.entry).toPrecision(10), (+r.stop).toPrecision(10)].join('|'); }
+  // The structure each reading uses (22 Nov 2026, owner: "keep the good ones and replace the bad ones"). The owner's own marks
+  // count a new high / low of a running move once ONE candle has closed after it (msAnalyze's third argument); the desk read it
+  // after six. Both were run on the last 60 days of gold, EUR/USD and GBP/USD: the one-candle structure is kept where it did
+  // better (the CF limit, the CF inside the VR, the VR retest, the SOP inside the CF, the barrier with its 3R target, the M1 BO
+  // at the tap, the repeat of the SOP) and the six-candle one where it did worse (the EG entry, the SOP inside the VR, the
+  // barrier with its 1R target). Picked on those 60 days, before costs: a choice, not a tested result.
+  var ONE_N = 1;
+  function oneCandle(F) { var o = {}; for (var k in F) o[k] = F[k]; o.msAnalyze = function (b, N) { return F.msAnalyze(b, N, ONE_N); }; return o; }
+  function sixCandle(r) { var id = String(r.id || '').replace(/^[a-z0-9]+:/, '');
+    if (/^sop-nv-/.test(id)) return true; if (/^sop-(l|c2|vr|vc|nc)-/.test(id)) return false; if (/^sop-/.test(id)) return true;
+    return /^bar-/.test(id) && !/^bar-(old|tap|sop)-/.test(id); }
+  function deskTrades(B, F, o) {
+    o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market };
+    var w = function (x) { var r = {}; for (var k in base) if (base[k] !== undefined) r[k] = base[k]; for (var k2 in x) r[k2] = x[k2]; return r; };
+    // through API so a caller (the tracker's tests) can swap a reading in
+    var s6 = API.sopTrades(B, F, w({ cfOut: c6 })).filter(sixCandle), s1 = API.sopTrades(B, F1, w({ cfOut: c1 })).filter(function (r) { return !sixCandle(r); });
+    var b6 = API.barrierTrades(B, F, w({ extra: c6 })).filter(sixCandle), b1 = API.barrierTrades(B, F1, w({ extra: c1 })).filter(function (r) { return !sixCandle(r); });
+    var tag = function (rows, n) { rows.forEach(function (r) { r.structN = n; }); return rows; };
+    return uniq(tag(s6, 6).concat(tag(s1, ONE_N), tag(b6, 6), tag(b1, ONE_N))).concat(tag(API.oldBarrierTrades(B, F1, w({ extra: c1 })), ONE_N));
+  }
   function uniq(rows) {
-    var idx = rows.map(function (r, i) { return i; }), rk = function (r) { return (r.kind === 'sop' ? 0 : 4e9) + (r.ibo ? 2e9 : 0) + (1e6 - (SEC[r.h] || 0)); }, seen = {}, keep = {};
+    var idx = rows.map(function (r, i) { return i; }), rk = function (r) { return (r.kind === 'sop' ? 0 : 4e9) + (r.ibo ? 2e9 : 0) + (r.nest ? 8e9 : 0) + (1e6 - (SEC[r.h] || 0)); }, seen = {}, keep = {};
     idx.sort(function (a, b) { return rk(rows[a]) - rk(rows[b]) || a - b; });
     idx.forEach(function (i) { var k = orderKey(rows[i]); if (!seen[k]) { seen[k] = 1; keep[i] = 1; } });
     return rows.filter(function (r, i) { return keep[i]; });
@@ -146,11 +176,176 @@
   // The pages enter internal breaks the same way as external ones ("BO, VR, CF" for both, 21 Nov 2026): with o.ibo !== false a
   // newer internal BO (msInternal, 3 a side) of the upper timeframe than its last major BO starts its own sequence, recorded
   // apart (id "sop-i-", label "… iBO → …").
+  // WHERE THE CF MAY FORM (22 Nov 2026, owner: "Both", on the method's own drawing: BO, the VR at the extreme, price comes back
+  // near where the BO broke, the CF forms there): a CF counts only once price, after the VR, has traded back to the level the BO
+  // broke (a buy BO: a low at or below it), on closed candles up to the CF's own candle. An earlier break with the BO is not a
+  // CF (it is handed to msMosha as a continuation break, so a close past the VR's extreme still ends the move); a later one,
+  // after price got back there, is. E = the chart's breaks, W its candles, d and level the BO's, t0 its time. o.cfBack false =
+  // as before.
+  function backEv(E, W, d, level, t0) {
+    var V = null, i; for (i = 0; i < E.length; i++) { var e = E[i]; if (e.t > t0 && e.dir === -d && e.structure !== false) { V = e; break; } }
+    if (!V) return { ev: E, backT: null };
+    var backT = null; for (i = 0; i < W.length; i++) { var b = W[i]; if (b.time > V.t && (d > 0 ? b.low <= level : b.high >= level)) { backT = b.time; break; } }
+    return { backT: backT, ev: E.map(function (x) { return x.dir === d && x.t > V.t && x.structure !== false && !(backT != null && backT <= x.t) ? { dir: x.dir, level: x.level, structure: false, t: x.t, fromT: x.fromT, top: x.top, bot: x.bot } : x; }) };
+  }
+  var notCf = function (x) { return { dir: x.dir, level: x.level, structure: false, t: x.t, fromT: x.fromT, top: x.top, bot: x.bot }; };
+  // A SECOND ENTRY, A LIMIT AT THE CF LINE (same day, "Both"): beside the EG entry, a plain limit at the level the CF's break took
+  // ("sop-l-", cfLimit: true), known when the CF candle closes. It rests until price reaches the VR's extreme (the move is done),
+  // a candle of the CF timeframe closes through the CF zone's far side (the CF failed) or CF_LIMIT such candles pass. Stop: past
+  // the CF zone's far side by the buffer; target the VR's extreme. The fill is the first finer candle that reaches the line; that
+  // candle can only stop the trade. Not for a CF inside the VR. Only where the CF is read on its own timeframe (not with
+  // cf 'same'). o.cfLimit false leaves it out.
+  // A SOP INSIDE THE SOP (22 Nov 2026, owner: "you need to repeat sop inside sop"): the VR and the CF of the sequence are each
+  // read as a BO one timeframe lower (H4 → H1, H1 → M30, M30 → M15, M15 → M5, M5 → M1), and a whole BO, VR, CF is waited for there:
+  //   the VR leg ("sop-nv-", nest 'vr'): the VR's break is against BO1, so its sequence SELLS under a bullish BO1 and BUYS under
+  //     a bearish one. Read until the main CF forms, or a lower candle closes back beyond the main VR's extreme;
+  //   the CF leg ("sop-nc-", nest 'cf'): the CF's break is with BO1, so its sequence trades with BO1. Read until a lower candle
+  //     closes through the CF zone's far side. A CF inside the VR (the "likely to fail" case) starts one too, said in its log
+  //     (cfIn: true); o.case2 false leaves those out, as it leaves that case out of the main sequence.
+  // Both are read for at most BARRIER_WATCH candles of the sequence's own timeframe. Entry, stop and target are the sequence's
+  // own (the pullback into the nested CF zone, then an EG; stop past the pullback's extreme; target the nested VR's extreme); a
+  // nested CF inside its VR is skipped. The main sequence is unchanged. One record a main sequence and leg. No hindsight: a leg
+  // starts at the candle whose close shows its VR (CF), is walked one closed lower candle at a time with the main sequence as it
+  // stood at the last closed candle of its timeframe, and the entry is taken only AT the candle whose close is its EG.
+  // o.nest false leaves them out.
   function sopTrades(B, F, o) {
-    o = o || {}; var from = o.from, piv = o.pivot || PIVOT, win = o.win || WIN, fine = B['5m'] || [], map = {}, cfSeen = {}, rt = {}, out = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
+    o = o || {}; var at = function (A, t) { var lo = 0, hi = A.length; while (lo < hi) { var m = (lo + hi) >> 1; if (A[m].time < t) lo = m + 1; else hi = m; } return lo; };
+    var from = o.from, piv = o.pivot || PIVOT, win = o.win || WIN, fine = B['5m'] || [], map = {}, cfSeen = {}, rt = {}, out = [], mk = mkOf(o.market), f2 = fmt(mk), U = unit(mk), pre = mk === 'xau' ? '' : mk + ':';
     LADDER.forEach(function (p) {
       var h = p[0], l = p[1], H = B[h], L = B[l]; if (!H || !H.length || !L || !L.length) return;
       var hN = -1, HA = null, Hw = null, HI = null, HT = null, n = 0, LE = null, turnT = null, turnAt = {};
+      var tfBars = function (tf) { return B[tf] && B[tf].length ? B[tf] : tf === '30m' ? m30of(B['15m']) : []; };
+      var low = LOWER[l] || DOWN[l], Lc = o.nest === false || !low ? [] : tfBars(low), legs = [], legAt = {};
+      // THE CF ONE TIMEFRAME LOWER (22 Nov 2026, the method's own table, CFTF): the BO on h and the VR on l are read as before
+      // (the same VR event, the same box, the same extreme), and the CF, the pullback into its zone, the EG, the stop and the
+      // fill are read on the timeframe under l. o.cf 'same' reads the CF on l, as until then; with no candles of that
+      // timeframe the CF is read on l too and the log says so. Each sequence with a VR gets a WALKER over the CF timeframe's
+      // closed candles: msMosha is handed the VR as its first event and the CF timeframe's small breaks after it; the entry is
+      // taken only AT the candle whose close is its EG. The walker reads the candles closed by each closed l candle with the
+      // sequence as the l candle before left it (which BO is the last, whether the chart has turned), then the rest.
+      var ctf = o.cf === 'same' ? l : (CFTF[l] || l), Cc = ctf === l ? L : tfBars(ctf), cfFall = false;
+      if (!Cc.length) { cfFall = ctf !== l; ctf = l; Cc = L; }
+      var split = ctf !== l, lowC = LOWER[ctf] || DOWN[ctf] || ctf, LcC = !split || o.nest === false ? [] : lowC === ctf ? Cc : tfBars(lowC), walkers = [], wAt = {};
+      function walkAdd(S0, M0, now) {
+        var boT = Hw[S0.idx].time, key = (S0.ibo ? 'i|' : '') + boT + '|' + M0.vr.t; if (wAt[key]) return wAt[key];
+        var v = M0.vr, k0 = at(Cc, v.t + SEC[l]);
+        var w = wAt[key] = { dir: S0.dir, ibo: !!S0.ibo, boT: boT, level: S0.level, far: S0.far, ext: S0.ext, reg: now, k: k0, k0: k0, b0: Math.max(0, at(Cc, boT) - 1), done: false, blocked: false, seen: -1, cfs: {}, lims: [], backT: null, evs: [], ei: 0, EV: null, evEnd: 0,
+          vr: { level: v.level, t: v.t, fromT: v.fromT, ext: v.ext, extT: v.extT, lo: v.lo, hi: v.hi, near: !!v.near },
+          V: { dir: -S0.dir, level: v.level, structure: true, t: v.t + SEC[l] - SEC[ctf], fromT: v.fromT, top: v.hi, bot: v.lo } };
+        walkers.push(w); return w;
+      }
+      function walkRun(w, T) {
+        if (w.done) return; var D = w.dir, tag = w.ibo ? 'iBO' : 'BO', lim = o.until ? Math.min(T, o.until) : T;
+        for (; w.k < Cc.length; w.k++) { var c = Cc[w.k], tc = c.time + SEC[ctf]; if (tc > lim) break;
+          // the CF timeframe's small breaks, read in blocks from 240 candles before the VR (an event at a candle reads nothing after it)
+          if (w.k >= w.evEnd) { var a0 = Math.max(0, w.k0 - 240); w.evEnd = w.k + 400; w.EV = smallEv(F, Cc.slice(a0, w.evEnd)); }
+          if (w.backT == null && (D > 0 ? c.low <= w.level : c.high >= w.level)) w.backT = c.time;   // price back at the level the BO broke, after the VR
+          while (w.ei < w.EV.length && w.EV[w.ei].t <= c.time) { var e0 = w.EV[w.ei++]; if (e0.t > w.V.t) w.evs.push(o.cfBack !== false && e0.dir === D && e0.structure !== false && w.backT == null ? notCf(e0) : e0); }
+          // the limits resting at a CF line: the first finer candle that reaches the line fills; the VR's extreme first, a close
+          // through the CF zone's far side or CF_LIMIT candles end the wait
+          for (var li = 0; li < w.lims.length; li++) { var p = w.lims[li]; if (p.done) continue;
+            var FB = ctf === '1m' ? Cc : fine, fT = null;
+            for (var fi = at(FB, c.time); fi < FB.length && FB[fi].time < tc; fi++) { var fb = FB[fi];
+              if (D > 0 ? fb.low <= p.entry : fb.high >= p.entry) { fT = fb.time; break; }
+              if (D > 0 ? fb.high >= p.target : fb.low <= p.target) { p.done = true; break; } }
+            if (fT == null) { if (!p.done && ((D > 0 ? c.close < p.far : c.close > p.far) || ++p.n >= CF_LIMIT)) p.done = true; continue; }
+            p.done = true; var lid = pre + 'sop-l-' + (w.ibo ? 'i-' : '') + l + '-' + (D > 0 ? 'b' : 's') + fT;
+            if (!(tc >= w.reg) || w.blocked || !(fT + (ctf === '1m' ? 60 : SEC['5m']) >= from) || map[lid]) continue;
+            var tl = map[lid] = { id: lid, market: mk, kind: 'sop', h: h, l: l, ll: ctf, side: D, t: fT, known: tc, entry: p.entry, stop: p.stop, target: p.target, r0: Math.abs(p.entry - p.stop), 'case': 1, cfLimit: true, near: !!w.vr.near, again: p.again, deep: p.deep,
+              label: NAME[h] + ' ' + tag + ' → ' + NAME[l] + ' VR → ' + NAME[ctf] + ' CF · limit at the CF line' };
+            if (w.ibo) tl.ibo = true; if (o.cfBack !== false) tl.back = true;
+            tl.log = [
+              { t: w.boT + SEC[h], text: NAME[h] + ' ' + tag + ' ' + word(D) + ': a candle closed ' + (D > 0 ? 'above ' : 'below ') + f2(w.level) + '.' },
+              { t: w.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure (QM) against the BO. The VR runs ' + f2(w.vr.lo) + ' to ' + f2(w.vr.hi) + '; its extreme ' + f2(w.vr.ext) + ' is the target.' },
+              { t: p.known, text: NAME[ctf] + ' CF, one timeframe under the VR\'s: the BO Structure (QM) back with the BO' + (o.cfBack !== false ? ', after price came back to the BO level ' + f2(w.level) : '') + '. The CF zone is ' + f2(p.lo) + ' to ' + f2(p.hi) + ', clear of the VR; a ' + word(D) + ' limit rests at the CF line ' + f2(p.entry) + '.' },
+              { t: fT, text: 'Price pulled back to the CF line: the limit filled, ' + word(D) + ' ' + f2(p.entry) + ', stop ' + f2(p.stop) + ' (' + U + f2(Math.abs(p.stop - p.far)) + ' past the CF zone\'s far side ' + f2(p.far) + ', risk ' + U + f2(tl.r0) + '), target ' + f2(p.target) + ' (the VR\'s extreme, ' + (Math.abs(p.target - p.entry) / tl.r0).toFixed(1) + 'R).' }];
+            tl.marks = [{ kind: 'level', p: w.level, a: w.boT, at: w.boT + SEC[h], label: NAME[h] + ' ' + tag },
+              { kind: D > 0 ? 'vr' : 'bvr', top: w.vr.hi, bot: w.vr.lo, a: w.vr.t, at: w.vr.t + SEC[l], label: NAME[l] + ' VR' },
+              { kind: 'zone', top: p.hi, bot: p.lo, a: p.cfT, at: p.known, label: NAME[ctf] + ' CF zone' },
+              { kind: 'level', p: p.entry, a: p.cfT, at: p.known, label: 'CF line · entry', under: D < 0 }];
+            finish(tl, outcome(tl, FB, fT, true)); out.push(tl); }
+          var M = F.msMosha({ dir: D, level: w.level, t: w.boT, ext: w.ext, far: w.far }, { events: [w.V].concat(w.evs), bars: Cc.slice(w.b0, w.k + 1) }, o.buf == null ? sizes(mk, c.close).buf : o.buf, { near: false });
+          if (!M || !M.vr) continue;
+          // the VR is the l timeframe's own: its box, its extreme and the "CF inside the VR" case are judged against that one
+          M.vr = w.vr; if (M.cf) M['case'] = M.cf.hi >= w.vr.lo && M.cf.lo <= w.vr.hi ? 2 : 1;
+          var live = tc >= w.reg && !w.blocked;   // a walker first seen late takes nothing from before it was seen; a turned chart gives no entry the old way
+          if (M.cf && M.cf.t === c.time && !w.cfs[M.cf.t]) { w.cfs[M.cf.t] = 1;
+            var gv = legAt['vr|' + (w.ibo ? 'i|' : '') + w.boT + '|' + w.vr.t]; if (gv && gv.endT === Infinity) gv.endT = tc;   // the SOP inside the VR ends with the CF
+            if (live && o.cfOut && M['case'] !== 2 && M.state !== 'cf-failed' && M.state !== 'vr-broken' && !cfSeen[ctf + '|' + M.cf.t + '|' + D]) { cfSeen[ctf + '|' + M.cf.t + '|' + D] = 1;
+              var of = NAME[h] + (w.ibo ? ' iBO' : ' BO');
+              o.cfOut.push({ tf: ctf, dir: D, lo: M.cf.lo, hi: M.cf.hi, kind: 'cf', known: tc, of: of, tgt: w.vr.ext });
+              o.cfOut.push({ tf: l, dir: -D, lo: w.vr.lo, hi: w.vr.hi, kind: 'vr', known: tc, of: of, tgt: D > 0 ? M.cf.hi : M.cf.lo }); }
+            if (live && o.cfLimit !== false && M['case'] !== 2 && M.state !== 'cf-failed' && M.state !== 'vr-broken') { var Zl = sizes(mk, M.cf.level), bl = o.buf == null ? Zl.buf : o.buf, farL = D > 0 ? M.cf.lo : M.cf.hi, stL = D > 0 ? farL - bl : farL + bl, rl = Math.abs(M.cf.level - stL);
+              if (rl > Zl.rmin && rl <= Zl.rmax && (D > 0 ? stL < M.cf.level && w.vr.ext > M.cf.level : stL > M.cf.level && w.vr.ext < M.cf.level))
+                w.lims.push({ cfT: M.cf.t, known: tc, entry: M.cf.level, far: farL, stop: stL, target: w.vr.ext, lo: M.cf.lo, hi: M.cf.hi, n: 0, done: false, again: !!M.cf.again, deep: M.deep == null ? null : !!M.deep }); }
+            if (live && LcC.length && !(M['case'] === 2 && o.case2 === false)) nestAdd('cf', w, w.vr, { t: M.cf.t, level: M.cf.level, lo: M.cf.lo, hi: M.cf.hi, c2: M['case'] === 2 }, tc, ctf, lowC, LcC); }
+          if (M.state === 'bo-on' || M.state === 'vr-broken') { w.done = true; return; }   // the move is done: nothing more comes of this VR
+          if (!live || !M.trade || M.trade.fillT !== c.time || !(tc >= from)) continue;
+          if (M['case'] === 2 && o.case2 === false) continue;
+          var c2 = M['case'] === 2 && o.case2 !== true, k = (c2 ? 'c2|' : '') + (w.ibo ? 'i|' : '') + h + '|' + w.boT + '|' + M.trade.fillT; if (map[k]) continue;
+          var tr = map[k] = { id: pre + (c2 ? 'sop-c2-' : 'sop-') + (w.ibo ? 'i-' : '') + l + '-' + M.trade.fillT, market: mk, kind: 'sop', h: h, l: l, ll: ctf, side: M.trade.side, t: tc, entry: M.trade.entry, stop: M.trade.stop, target: M.trade.target,
+            r0: Math.abs(M.trade.entry - M.trade.stop), 'case': M['case'], near: !!w.vr.near, again: !!M.cf.again, deep: M.deep == null ? null : !!M.deep,
+            label: NAME[h] + ' ' + tag + ' → ' + NAME[l] + ' VR → ' + NAME[ctf] + ' CF' + (c2 ? ' · CF inside the VR' : '') };
+          if (w.ibo) tr.ibo = true; if (c2) tr.case2 = true; if (o.cfBack !== false) tr.back = true;
+          tr.log = [
+            { t: w.boT + SEC[h], text: NAME[h] + ' ' + tag + ' ' + word(D) + ': a candle closed ' + (D > 0 ? 'above ' : 'below ') + f2(w.level) + (w.ibo ? ' (an internal break: the pages enter it with the same BO, VR, CF).' : '.') },
+            { t: w.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure (QM) against the BO. The VR runs ' + f2(w.vr.lo) + ' to ' + f2(w.vr.hi) + (w.vr.near ? ' (from the extreme to the nearest swing before it)' : '') + '; its extreme ' + f2(w.vr.ext) + ' is the target.' },
+            { t: M.cf.t + SEC[ctf], text: NAME[ctf] + ' CF' + (M.cf.again ? ' (a new one, after the first failed)' : '') + ', one timeframe under the VR\'s: the BO Structure (QM) back with the BO' + (o.cfBack !== false ? ', after price came back to the BO level ' + f2(w.level) : '') + (M.p50 != null ? (M.deep ? ', after the pullback reached 50% of the range (' + f2(M.p50) + ')' : ', before the pullback reached 50% of the range (' + f2(M.p50) + ')') : '') + '. The CF zone is ' + f2(M.cf.lo) + ' to ' + f2(M.cf.hi) + (M['case'] === 2 ? ', inside the VR: the kind that often fails.' : ', clear of the VR.') },
+            { t: tr.t, text: 'Price pulled back into the CF zone and an EG closed with the BO on ' + NAME[ctf] + ': ' + word(tr.side) + ' ' + f2(tr.entry) + ', stop ' + f2(tr.stop) + ' (' + U + f2(sizes(mk, tr.entry).buf) + ' past the pullback\'s extreme, risk ' + U + f2(tr.r0) + '), target ' + f2(tr.target) + ' (' + (Math.abs(tr.target - tr.entry) / tr.r0).toFixed(1) + 'R).' }];
+          tr.marks = [{ kind: 'level', p: w.level, a: w.boT, at: w.boT + SEC[h], label: NAME[h] + ' ' + tag },
+            { kind: D > 0 ? 'vr' : 'bvr', top: w.vr.hi, bot: w.vr.lo, a: w.vr.t, at: w.vr.t + SEC[l], label: NAME[l] + ' VR' },
+            { kind: 'zone', top: M.cf.hi, bot: M.cf.lo, a: M.cf.t, at: M.cf.t + SEC[ctf], label: NAME[ctf] + ' CF zone' }];
+          if (M.p50 != null) tr.marks.push({ kind: 'level', p: M.p50, a: w.boT, at: w.vr.t + SEC[l], label: '50% of the range', under: D > 0 });
+          finish(tr, outcome(tr, ctf === '1m' ? Cc : fine, tc)); out.push(tr);
+        }
+      }
+      // a leg of the SOP inside the SOP, registered the first time the main sequence shows its VR (CF); what it reads is frozen then
+      function nestAdd(leg, S0, vr, cf, now, par, lowX, LcX) {
+        var D = S0.dir, boT = S0.boT, brk = leg === 'vr' ? vr.t : cf.t, key = leg + '|' + (S0.ibo ? 'i|' : '') + boT + '|' + brk;
+        if (!LcX || !LcX.length) return null; if (legAt[key]) return legAt[key];
+        var known = brk + SEC[par], k0 = at(LcX, known);
+        var g = legAt[key] = { leg: leg, d: leg === 'vr' ? -D : D, D: D, ibo: !!S0.ibo, boT: boT, boLevel: S0.level, level: leg === 'vr' ? vr.level : cf.level, xs: leg === 'vr' ? vr.ext : D > 0 ? cf.lo : cf.hi,
+          par: par, low: lowX, Lc: LcX, t0: known - SEC[lowX], known: known, k: k0, k0: k0, endT: Infinity, capT: known + BARRIER_WATCH * SEC[l], reg: now, done: false,
+          vr: { t: vr.t, level: vr.level, ext: vr.ext, lo: vr.lo, hi: vr.hi }, cf: leg === 'cf' ? { t: cf.t, level: cf.level, lo: cf.lo, hi: cf.hi, c2: !!cf.c2 } : null };
+        legs.push(g); return g;
+      }
+      // walk a leg over the lower candles closed by T (and by its own end): the repeat of the SOP's own no-hindsight walk
+      function nestRun(g, T) {
+        if (g.done) return;
+        var lim = Math.min(T, g.endT, g.capT); if (o.until) lim = Math.min(lim, o.until);
+        if (!g.EV) { var a0 = Math.max(0, g.k0 - 240); g.b0 = Math.max(a0, g.k0 - 9); g.EV = smallEv(F, g.Lc.slice(a0, at(g.Lc, g.capT))); g.ei = 0; g.evs = []; }
+        var d = g.d;
+        for (; g.k < g.Lc.length; g.k++) { var lc = g.Lc[g.k], tq = lc.time + SEC[g.low]; if (tq > lim) break;
+          if (d > 0 ? lc.close < g.xs : lc.close > g.xs) { g.done = true; return; }   // a close back through the extreme (the zone's far side) the break was made from
+          if (g.Vt != null && g.backT == null && lc.time > g.Vt && (d > 0 ? lc.low <= g.level : lc.high >= g.level)) g.backT = lc.time;   // price back at the level this leg's BO broke
+          while (g.ei < g.EV.length && g.EV[g.ei].t <= lc.time) { var ne = g.EV[g.ei++];
+            if (ne.t > g.t0 && ne.structure !== false) { if (g.Vt == null) { if (ne.dir === -d) g.Vt = ne.t; } else if (o.cfBack !== false && ne.dir === d && !(g.backT != null && g.backT <= ne.t)) ne = notCf(ne); }
+            g.evs.push(ne); }
+          var Mq = F.msMosha({ dir: d, level: g.level, t: g.t0, ext: NaN, far: g.xs }, { events: g.evs, bars: g.Lc.slice(g.b0, g.k + 1) }, o.buf == null ? sizes(mk, lc.close).buf : o.buf, { near: o.near !== false });
+          if (!Mq || !Mq.vr) continue;
+          if (Mq.state === 'bo-on' || Mq.state === 'vr-broken') { g.done = true; return; }   // the move went on past the nested VR with no entry
+          if (!Mq.trade || Mq.trade.fillT !== lc.time || Mq['case'] === 2) continue;
+          g.done = true;
+          var q = Mq.trade, Zq = sizes(mk, q.entry), rq = Math.abs(q.entry - q.stop), tag = g.ibo ? 'iBO' : 'BO', D = g.D, v = g.leg === 'vr';
+          // a leg first seen late (its break is known only once the candle that made the BO, or a new CF, has closed) takes no entry from before it was seen
+          if (!(tq >= g.reg) || !(tq >= from) || !(rq > Zq.rmin) || rq > Zq.rmax || (d < 0 ? q.stop <= q.entry || q.target >= q.entry : q.stop >= q.entry || q.target <= q.entry)) return;
+          var tr = { id: pre + (v ? 'sop-nv-' : 'sop-nc-') + g.low + '-' + (d > 0 ? 'b' : 's') + tq, market: mk, kind: 'sop', h: g.par, l: g.low, up: h, side: d, of: D, nest: g.leg, t: tq, entry: q.entry, stop: q.stop, target: q.target, r0: rq, 'case': Mq['case'],
+            label: NAME[h] + ' ' + tag + ' → ' + NAME[g.par] + (v ? ' VR → ' : ' CF → ') + NAME[g.low] + ' SOP inside the ' + (v ? 'VR' : 'CF') };
+          if (g.ibo) tr.ibo = true; if (!v && g.cf.c2) tr.cfIn = true; if (o.cfBack !== false) tr.back = true;
+          tr.log = [{ t: g.boT + SEC[h], text: NAME[h] + ' ' + tag + ' ' + word(D) + ': a candle closed ' + (D > 0 ? 'above ' : 'below ') + f2(g.boLevel) + '.' },
+            { t: g.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure (QM) against the ' + tag + ', through ' + f2(g.vr.level) + ' (its extreme ' + f2(g.vr.ext) + ').' + (v ? ' That break is read as a BO ' + word(d) + ' one timeframe lower: a VR and its CF on ' + NAME[g.low] + ' are waited for, against the ' + NAME[h] + ' ' + tag + '.' : '') }];
+          if (!v) tr.log.push({ t: g.cf.t + SEC[g.par], text: NAME[g.par] + ' CF: the BO Structure (QM) back with the ' + tag + '; the CF zone is ' + f2(g.cf.lo) + ' to ' + f2(g.cf.hi) + (g.cf.c2 ? ', inside the VR: the kind that often fails' : '') + '. That break is read as a BO ' + word(d) + ' one timeframe lower: a VR and its CF on ' + NAME[g.low] + ' are waited for, with the ' + NAME[h] + ' ' + tag + '.' });
+          tr.log.push({ t: Mq.vr.t + SEC[g.low], text: NAME[g.low] + ' VR: the first BO Structure (QM) against the ' + NAME[g.par] + (v ? ' VR' : ' CF') + '. It runs ' + f2(Mq.vr.lo) + ' to ' + f2(Mq.vr.hi) + '; its extreme ' + f2(Mq.vr.ext) + ' is the target.' },
+            { t: Mq.cf.t + SEC[g.low], text: NAME[g.low] + ' CF' + (Mq.cf.again ? ' (a new one, after the first failed)' : '') + ': the BO Structure (QM) back the ' + word(d) + ' way' + (o.cfBack !== false ? ', after price came back to the level ' + f2(g.level) + ' that BO broke' : '') + '. The CF zone is ' + f2(Mq.cf.lo) + ' to ' + f2(Mq.cf.hi) + ', clear of the VR.' },
+            { t: tq, text: 'Price pulled back into the ' + NAME[g.low] + ' CF zone and an EG closed ' + word(d) + ': ' + word(d) + ' ' + f2(q.entry) + ', stop ' + f2(q.stop) + ' (' + U + f2(Zq.buf) + ' past the pullback\'s extreme, risk ' + U + f2(rq) + '), target ' + f2(q.target) + ' (the ' + NAME[g.low] + ' VR\'s extreme, ' + (Math.abs(q.target - q.entry) / rq).toFixed(1) + 'R).' });
+          tr.marks = [{ kind: 'level', p: g.boLevel, a: g.boT, at: g.boT + SEC[h], label: NAME[h] + ' ' + tag },
+            { kind: D > 0 ? 'vr' : 'bvr', top: g.vr.hi, bot: g.vr.lo, a: g.vr.t, at: g.vr.t + SEC[l], label: NAME[l] + ' VR' }];
+          if (!v) tr.marks.push({ kind: 'zone', top: g.cf.hi, bot: g.cf.lo, a: g.cf.t, at: g.cf.t + SEC[g.par], label: NAME[g.par] + ' CF zone' });
+          tr.marks.push({ kind: d > 0 ? 'vr' : 'bvr', top: Mq.vr.hi, bot: Mq.vr.lo, a: Mq.vr.t, at: Mq.vr.t + SEC[g.low], label: NAME[g.low] + ' VR (inside)' },
+            { kind: 'zone', top: Mq.cf.hi, bot: Mq.cf.lo, a: Mq.cf.t, at: Mq.cf.t + SEC[g.low], label: NAME[g.low] + ' CF zone · entry' });
+          finish(tr, outcome(tr, g.low === '1m' ? g.Lc : fine, tq)); out.push(tr); return; }
+        if (g.k < g.Lc.length && g.Lc[g.k].time + SEC[g.low] > Math.min(g.endT, g.capT)) g.done = true;
+      }
       // the VR retest (owner, 21 Nov 2026: "the top of vr or entry on new cf made once touch and cf box high is the sl"; target
       // "the last low"). Once the upper timeframe has turned against the BO, the VR's level (the low the VR broke, for a buy BO)
       // is sold when price first comes back to it: (A) a limit AT the level, stop past the VR's top (its extreme); (B) after that
@@ -211,6 +406,9 @@
       for (var i = 0; i < L.length; i++) { var t = L[i].time + SEC[l]; if (t < from) continue; if (o.until && t > o.until) break;
         while (n < H.length && H[n].time + SEC[h] <= t) n++;
         if (n !== hN) { Hw = H.slice(Math.max(0, n - win), n); HA = Hw.length ? F.msAnalyze(Hw, piv) : null; HT = Hw.length ? F.msInternal(Hw, Hw.length, 3) : []; HI = o.ibo === false ? [] : HT; hN = n; }
+        // the legs of the SOP inside the SOP read the lower candles closed by now FIRST, with the main sequence as the candle before left it
+        if (walkers.length) { for (var wi = 0; wi < walkers.length; wi++) walkRun(walkers[wi], t); }
+        if (legs.length) { for (var gi = 0; gi < legs.length; gi++) nestRun(legs[gi], t); legs = legs.filter(function (g) { return !g.done; }); }
         if (!HA) continue;
         var A = HA, Lw = null, LE = null, srcs = [];
         var mv = A.trend ? (A.last && A.last.dir === A.trend ? A.last : A.events.slice().reverse().find(function (e) { return e.dir === A.trend; })) : null;
@@ -231,8 +429,14 @@
             // extreme); o.vr 'major' reads the protected swing (6 a side), as the replay did until 21 Nov 2026
             if (o.vr === 'major') { var LA = F.msAnalyze(Lw, piv); LE = LA.events.map(function (e) { return { dir: e.dir, level: e.level, structure: e.structure, t: Lw[e.breakIdx] ? Lw[e.breakIdx].time : Infinity, fromT: Lw[e.fromIdx] ? Lw[e.fromIdx].time : 0, top: e.top, bot: e.bot }; }); }
             else LE = smallEv(F, Lw); }
-          var M = F.msMosha({ dir: D, level: S0.level, t: boT, ext: S0.ext, far: S0.far }, { events: LE, bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf, { near: o.near !== false });
+          var M = F.msMosha({ dir: D, level: S0.level, t: boT, ext: S0.ext, far: S0.far }, { events: o.cfBack === false ? LE : backEv(LE, Lw, D, S0.level, boT).ev, bars: Lw }, o.buf == null ? sizes(mk, L[i].close).buf : o.buf, { near: o.near !== false });
+          var SN = { dir: D, ibo: S0.ibo, boT: boT, level: S0.level };
+          if (Lc.length && M && M.vr) { var gv = nestAdd('vr', SN, M.vr, null, t, l, low, Lc); if (gv && !split && M.cf && gv.endT === Infinity) gv.endT = M.cf.t + SEC[l]; if (gv) nestRun(gv, t); }
+          if (split) {   // the CF, the entry and the hand-over are the walker's, on the CF timeframe
+            if (M && M.vr) { var ww = walkAdd(S0, M, t); ww.seen = i; ww.blocked = !!(!S0.ibo && turned && retest(S0, M, i)); walkRun(ww, t); }
+            continue; }
           if (!S0.ibo && turned && M && M.vr && retest(S0, M, i)) continue;
+          if (Lc.length && M && M.vr && M.cf && !(M['case'] === 2 && o.case2 === false)) { var gc = nestAdd('cf', SN, M.vr, { t: M.cf.t, level: M.cf.level, lo: M.cf.lo, hi: M.cf.hi, c2: M['case'] === 2 }, t, l, low, Lc); if (gc) nestRun(gc, t); }
           // the method's own entry at the CF is the BARRIER entry (the pages: "before CF or after CF, using the barrier entry"):
           // each clean CF zone is handed over once, ON the candle whose close made it (a CF from before the window is never handed
           // over with a later moment), and never once that CF has failed or the move reached the VR's extreme. Its VR box goes
@@ -253,12 +457,13 @@
           var k = (c2 ? 'c2|' : '') + (S0.ibo ? 'i|' : '') + h + '|' + boT + '|' + M.trade.fillT; if (map[k]) continue;
           var tr = map[k] = { id: pre + (c2 ? 'sop-c2-' : 'sop-') + (S0.ibo ? 'i-' : '') + l + '-' + M.trade.fillT, market: mk, kind: 'sop', h: h, l: l, side: M.trade.side, t: M.trade.fillT + SEC[l], entry: M.trade.entry, stop: M.trade.stop, target: M.trade.target,
             r0: Math.abs(M.trade.entry - M.trade.stop), 'case': M['case'], near: !!M.vr.near, again: !!(M.cf && M.cf.again), deep: M.deep == null ? null : !!M.deep };
+          if (o.cfBack !== false) tr.back = true;
           if (S0.ibo) { tr.ibo = true; tr.label = NAME[h] + ' iBO → ' + NAME[l] + ' VR, CF'; }
           if (c2) { tr.case2 = true; tr.label = NAME[h] + ' ' + tag + ' → ' + NAME[l] + ' VR, CF · CF inside the VR'; }
           tr.log = [
             { t: boT + SEC[h], text: NAME[h] + ' ' + tag + ' ' + word(D) + ': a candle closed ' + (D > 0 ? 'above ' : 'below ') + f2(S0.level) + (S0.ibo ? ' (an internal break: the pages enter it with the same BO, VR, CF).' : '.') },
             { t: M.vr.t + SEC[l], text: NAME[l] + ' VR: the first BO Structure (QM) against the BO. The VR runs ' + f2(M.vr.lo) + ' to ' + f2(M.vr.hi) + (M.vr.near ? ' (from the extreme to the nearest swing before it)' : '') + '; its extreme ' + f2(M.vr.ext) + ' is the target.' },
-            { t: M.cf.t + SEC[l], text: NAME[l] + ' CF' + (M.cf.again ? ' (a new one, after the first failed)' : '') + ': the BO Structure (QM) back with the BO' + (M.p50 != null ? (M.deep ? ', after the pullback reached 50% of the range (' + f2(M.p50) + ')' : ', before the pullback reached 50% of the range (' + f2(M.p50) + ')') : '') + '. The CF zone is ' + f2(M.cf.lo) + ' to ' + f2(M.cf.hi) + (M['case'] === 2 ? ', inside the VR: the kind that often fails.' : ', clear of the VR.') },
+            { t: M.cf.t + SEC[l], text: NAME[l] + ' CF' + (M.cf.again ? ' (a new one, after the first failed)' : '') + (cfFall ? ' (no ' + NAME[CFTF[l]] + ' candles on file: the CF is read on ' + NAME[l] + ')' : '') + ': the BO Structure (QM) back with the BO' + (o.cfBack !== false ? ', after price came back to the BO level ' + f2(S0.level) : '') + (M.p50 != null ? (M.deep ? ', after the pullback reached 50% of the range (' + f2(M.p50) + ')' : ', before the pullback reached 50% of the range (' + f2(M.p50) + ')') : '') + '. The CF zone is ' + f2(M.cf.lo) + ' to ' + f2(M.cf.hi) + (M['case'] === 2 ? ', inside the VR: the kind that often fails.' : ', clear of the VR.') },
             { t: tr.t, text: 'Price pulled back into the CF zone and an EG closed with the BO: ' + word(tr.side) + ' ' + f2(tr.entry) + ', stop ' + f2(tr.stop) + ' (' + U + f2(sizes(mk, tr.entry).buf) + ' past the pullback\'s extreme, risk ' + U + f2(tr.r0) + '), target ' + f2(tr.target) + ' (' + (Math.abs(tr.target - tr.entry) / tr.r0).toFixed(1) + 'R).' }];
           // what the chart draws for this trade (assets/mosha-replay.js): the BO level, the VR box, the CF zone, each from the moment it was known
           tr.marks = [{ kind: 'level', p: S0.level, a: boT, at: boT + SEC[h], label: NAME[h] + ' ' + tag },
@@ -267,7 +472,12 @@
           if (M.p50 != null) tr.marks.push({ kind: 'level', p: M.p50, a: boT, at: M.vr.t + SEC[l], label: '50% of the range', under: D > 0 });
           out.push(tr);
         }
+        // a sequence the chart no longer reads (a newer BO took its place) gives nothing more
+        if (walkers.length) { walkers = walkers.filter(function (w) { if (w.seen !== i) w.done = true; return !w.done; });
+          for (var gj = 0; gj < legs.length; gj++) nestRun(legs[gj], t); }   // a leg the walker started on this candle
       }
+      walkers.forEach(function (w) { walkRun(w, Infinity); });
+      legs.forEach(function (g) { nestRun(g, Infinity); });   // the lower candles closed after the last closed candle of this timeframe
     });
     out = uniq(out);   // one order under two ids (the BO's and the iBO's sequence, the VR retest of two ladder steps) is recorded once
     out.forEach(function (tr) { if (tr.status == null) finish(tr, outcome(tr, fine, tr.t));
@@ -301,7 +511,7 @@
   // the two): the base is the last candle of the other colour; the FIRST later coloured candle that closes beyond its high (a
   // buy) or its low (a sell) completes it; a close through the base's other side before that cancels it; a doji is never a base.
   // The box is the base candle wick to wick, known from the completing candle's close; first touch and break as the other boxes.
-  var EG_SPAN = 4;   // the engulf completes within four candles of its first candle (owner, 22 Nov 2026), as council/eg-methods.mjs
+  var EG_SPAN = 3;   // the engulf completes within three candles of its first candle (owner, 22 Nov 2026: "Change to 3 candles"), as council/eg-methods.mjs
   function egBoxes(H) {
     var out = [], i, j, q, k;
     for (i = 1; i < H.length; i++) { var c = H[i], dir = c.close > c.open ? 1 : c.close < c.open ? -1 : 0, p = null; if (!dir) continue;
@@ -655,7 +865,7 @@
     return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
       function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
   }
-  var API = { egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  var API = { deskTrades: deskTrades, sixCandle: sixCandle, oneCandle: oneCandle, ONE_N: ONE_N, styleOf: styleOf, backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -693,8 +903,8 @@
     Object.keys(BACK).forEach(function (tf) { p = p.then(function () { return bars(tf, now).then(function (a) { B[tf] = a; }); }); });
     p.then(function () { return new Promise(function (ok) { setTimeout(ok, 30); }); }).then(function () {
       if (!B['5m'].length) throw new Error('no candles');
-      var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400, cfz = [], a = sopTrades(B, F, { from: from, cfOut: cfz });
-      return new Promise(function (ok) { setTimeout(function () { ok(uniq(a.concat(barrierTrades(B, F, { from: from, extra: cfz }))).concat(oldBarrierTrades(B, F, { from: from, extra: cfz }))); }, 30); });
+      var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400;
+      return new Promise(function (ok) { setTimeout(function () { ok(deskTrades(B, F, { from: from })); }, 30); });
     }).then(function (rows) { S.rows = rows.sort(function (a, b) { return b.t - a.t; }); S.state = 'done'; S.at = Date.now(); }, function (e) { S.state = 'failed'; S.err = String(e && e.message || e); }).then(draw);
   }
   function line(name, rows, extra) {
@@ -706,11 +916,16 @@
   // a stored record keeps its id and a label cut to 56 characters: the owner's readings of 21 Nov 2026 are read from the id
   function kindText(r) {
     var lb = r.label || '', g = readings(r);
+    if (isNest(r)) return /SOP inside/.test(lb) ? lb : NAME[r.h] + (isNest(r) === 'vr' ? ' VR → ' : ' CF → ') + NAME[r.l] + ' SOP inside the ' + (isNest(r) === 'vr' ? 'VR' : 'CF');
+    if (r.kind === 'sop' && /^\S+ i?BO → \S+ VR → \S+ CF/.test(lb)) return lb;
     if (r.kind === 'sop') return NAME[r.h] + (r.ibo || / iBO /.test(lb) ? ' iBO → ' : ' BO → ') + NAME[r.l] + ' VR, CF' + (isC2(r) || r['case'] === 2 ? ' · CF inside the VR' : '');
     if (r.nested || (/bar-sop-cf-/.test(String(r.id)) && r.l === DOWN[r.h])) return NAME[r.h] + ' CF → ' + NAME[r.l] + ' VR, CF inside it (repeat SOP)' + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction');
     return NAME[r.h] + (/CF barrier/.test(lb) ? ' CF barrier → ' : /VR barrier/.test(lb) ? ' VR barrier → ' : g.sweep ? ' sweep barrier → ' : ' barrier → ') + NAME[r.l] + (g.tap ? ' BO at the tap' : g.qmFail ? ' QM failed, trade with the direction' : g.rsop ? ' QM, repeat SOP' : r.janda || / · Janda/.test(lb) ? ' QM, Janda' : ' QM') +
       (g.m5 ? ' · M5 confirm' : '') + (g.alt ? ' · ' + NAME[g.alt] + ' confirm' : '') + (g.visit > 1 ? (g.visit === 2 ? ' · second visit' : ' · visit ' + g.visit) : '') + (g.atZone ? ' · at the zone' : '') + (r.withDir == null ? '' : r.withDir ? ' · with the direction' : ' · against the direction') + (g.old ? ' · 3R target' : '');
   }
+  // a SOP inside the SOP, read from the id (a stored record keeps no flag): 'vr', 'cf' or ''
+  var isNest = function (r) { var m = /(^|:)sop-n([vc])-/.exec(String(r.id || '')); return m ? (m[2] === 'v' ? 'vr' : 'cf') : ''; };
+  var isLim = function (r) { return !!r.cfLimit || /(^|:)sop-l-/.test(String(r.id || '')); };
   var isC2 = function (r) { return !!r.case2 || /(^|:)sop-c2-/.test(String(r.id || '')); };
   function rowHTML(r) {
     var res = r.status === 'target' ? '<b class="pos">' + fR(r.R) + '</b> · target' : r.status === 'stopped' ? '<b class="neg">' + fR(r.R) + '</b> · stopped' : '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '');
@@ -737,6 +952,23 @@
       '<dl><div><dt>Entry</dt><dd>' + fP(r, r.entry) + '</dd></div><div><dt>Stop</dt><dd>' + fP(r, r.stop) + '</dd></div><div><dt>Target</dt><dd>' + fP(r, r.target) + ' · ' + tR.toFixed(1) + 'R</dd></div><div><dt>Best so far</dt><dd>' + (r.mfe != null ? '+' + (+r.mfe).toFixed(2) + 'R' : '—') + '</dd></div></dl>' +
       '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + unit(m) + fP(r, r.r0) + '</p></li>';
   }
+  // On a phone (22 Nov 2026, owner: "organise better the open trades or put like a dropdown, it is long going all the way down to
+  // see the calendar"): the cards are one line each and only the first OPEN_PHONE show, with a button for the rest. Display only.
+  var OPEN_PHONE = 3;
+  function openMore(card, n) {
+    if (!card) return; var b = card.querySelector('.mo-open-more');
+    if (n <= OPEN_PHONE) { if (b) b.remove(); card.removeAttribute('data-all'); return; }
+    if (!b) { b = document.createElement('button'); b.type = 'button'; b.className = 'mo-sop-b mo-open-more'; card.appendChild(b); }
+    var all = card.hasAttribute('data-all'); b.setAttribute('aria-expanded', String(all));
+    b.textContent = all ? 'Show fewer' : 'Show all ' + n + ' open trades';
+  }
+  if (typeof document !== 'undefined') document.addEventListener('click', function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('.mo-open-more') : null; if (!b) return;
+    var card = b.closest('.mo-open-c'); if (!card) return;
+    if (card.hasAttribute('data-all')) card.removeAttribute('data-all'); else card.setAttribute('data-all', '');
+    openMore(card, card.querySelectorAll('.mo-open li:not(.empty)').length);
+    if (!card.hasAttribute('data-all') && card.getBoundingClientRect().top < 0) card.scrollIntoView({ block: 'start' });
+  });
   function openPanel(open) {
     var box = $('mo-open'), l = $('mo-open-l'), n = $('mo-open-n'); if (!box || !l) return;
     var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
@@ -744,8 +976,9 @@
     open = open.slice().sort(function (a, b) { return b.t - a.t; });
     if (n) n.textContent = open.length ? open.length + ' open · paper only' + (S.file && S.file.at ? ' · last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') : '';
     l.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. ' + (S.file ? 'The tracker reads gold, EUR/USD and GBP/USD about every 35 minutes' + (S.file.at ? ' (last reading ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) + ')' : '') + '; a new entry shows here until its stop or target.' : 'A new entry shows here until its stop or target.') + '</li>';
+    openMore(box, open.length);
   }
-  API.openCard = openCard;
+  API.openCard = openCard; API.openMore = openMore; API.OPEN_PHONE = OPEN_PHONE;
   function draw() {
     var box = $('mo-sopr'); if (!box) return; var ok = API.visible(document.documentElement.dataset); box.hidden = !ok; if (!ok) return;
     if (S.state !== 'done') openPanel([]);
@@ -772,7 +1005,10 @@
       (shown.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="Replayed trades of the Mosha reading"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result and log</th></tr></thead><tbody>' + shown.map(rowHTML).join('') + '</tbody></table></div>' +
         (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-sop-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') +
       cal +
-      '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF', sop.filter(function (r) { return !isC2(r); })) + line('BO, VR, CF with the CF inside the VR', sop.filter(isC2), 'The method calls this CF likely to fail and waits; it is recorded apart so the record can show the case.') + line('Barrier entry', bar, 'It takes every fresh barrier; the method says to mark the best one, and that choice is not in the replay.') +
+      '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF: entry on the EG', sop.filter(function (r) { return !isC2(r) && !isNest(r) && !isLim(r); })) + line('BO, VR, CF: limit at the CF line', sop.filter(isLim), 'The owner\'s reading of 22 Nov 2026: a plain limit at the level the CF\'s break took, stop past the CF zone, recorded beside the EG entry so the two can be compared.') + line('BO, VR, CF with the CF inside the VR', sop.filter(isC2), 'The method calls this CF likely to fail and waits; it is recorded apart so the record can show the case.') +
+      line('SOP inside the VR (against the BO)', sop.filter(function (r) { return isNest(r) === 'vr'; }), 'The owner\'s reading of 22 Nov 2026: the VR\'s break is read as a BO one timeframe lower and a whole BO, VR, CF is traded there, against the first BO, until the CF forms.') +
+      line('SOP inside the CF (with the BO)', sop.filter(function (r) { return isNest(r) === 'cf'; }), 'The CF\'s break is read as a BO one timeframe lower and a whole BO, VR, CF is traded there, with the first BO; the main sequence is recorded beside it.') + line('Barrier entry', bar, 'It takes every fresh barrier; the method says to mark the best one, and that choice is not in the replay.') +
+      ['swing', 'intraday', 'scalp'].map(function (st) { return line(st === 'swing' ? 'Swing (D1 top timeframe)' : st === 'intraday' ? 'Intraday (H4 top timeframe)' : 'Scalp (H1 and lower top timeframe)', all.filter(function (r) { return styleOf(r) === st; })); }).join('') +
       line('Barrier with the older 3R target', barOld, 'The same barrier entries and stops as the current reading, with the 3R target the desk used until 22 Nov 2026 instead of 1R. Recorded beside the current reading, never mixed into it.') +
       line('Barrier, limit at the level the QM broke', bar.filter(function (r) { return !readings(r).atZone; })) +
       line('Barrier, limit at the zone\'s near side', bar.filter(function (r) { return readings(r).atZone; }), 'The owner\'s reading: a second limit at the barrier zone\'s near side, recorded beside the one at the broken level.') +
