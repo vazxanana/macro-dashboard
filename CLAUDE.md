@@ -6312,3 +6312,13 @@ kinds (`-n`) and the earlier scalp method's two-candle rule are unchanged; store
 histories are rebuilt. On the test's seeded market: plan 26 -> 22 trades, short method 30 -> 27, direct entry 2 -> 2.
 A paper reading of the owner's table before costs, not a tested rule: never call its total an edge. Tests:
 `tests/edge-desks.test.mjs` ("three-timeframe SOP": three tests; "an engulf completes within three candles").
+
+## ChronosTrade audit: the Topstep check and a first-day failure (22 Nov 2026)
+The audit's "Topstep challenge, 121 steps over 9 timeframes … firm days" check failed on every run from 22 Nov 00:00 UTC (main
+passed through 21 Nov 23:50). The page and the engine were right. Cause: the Nasdaq quick start opens 10 days back, on 22 Nov
+that is 12 Nov 07:00 UTC, and the check's blind trades (buy, sell, buy … at 0.6 % each) were stopped seven times in a row, so
+the Combine failed on its 4 % maximum loss at 18:00 UTC of its FIRST firm day; an ended challenge records no further day, and
+the check needs a day change (2+ firm days). Fix (`scripts/audit/chronostrade.cjs` only): the risk a trade is worked out from
+the firm's own rules (0.11 %: 21 trades at most, all stopped = 60 % of the maximum loss, all at their 2R target = 90 % of the
+profit target), so the challenge stays live through the steps on any date; if it still ends on day one the check fails and says
+why. Run with the page's clock set to 16, 21 and 22 Nov: 6, 7 and 6 firm days.
