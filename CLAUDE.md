@@ -6227,3 +6227,9 @@ Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`.
 and the 1R barriers 14,000 records held only about six months, so the Mosha and Engulfing histories started in May. The light
 `desk.json` the page reads grows with it (about 0.35 KB a record). Never publish a file of over 14,000 records to council-data
 before main's tracker has this limit (the older tracker cuts the file on its next run).
+
+## Chart marks, one colour a kind (22 Nov 2026, owner: "use different color on the markins when u mark")
+Display only, `assets/mosha-replay.js` (`HUES`, `hueKey`, `hueOf`): on a desk trade's chart each mark takes a colour from its
+label: EF red, the entry zone blue, CF green, VR orange (its own box as before), the 50 % line grey, a Daily level purple, H4
+amber, H1 teal, M30 / M15 pink, M5 / M1 cyan, a BO or plain level brown; two shades, for dark and light. The position's stop
+and target bands are unchanged.

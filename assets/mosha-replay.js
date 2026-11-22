@@ -240,6 +240,16 @@
   var COL = function () { return light()
     ? { level: '#8e24aa', vr: '#d32f2f', vrF: 'rgba(211,47,47,.05)', bvr: '#2e7d32', bvrF: 'rgba(46,125,50,.06)', zone: 'rgba(126,87,194,.22)', zoneS: 'rgba(126,87,194,.55)', htf: 'rgba(126,87,194,.10)', stop: 'rgba(233,30,99,.20)', tgt: 'rgba(84,96,116,.22)', ink: '#131722', tag: '#ffffff' }
     : { level: '#ce93d8', vr: '#ff6b6b', vrF: 'rgba(255,107,107,.07)', bvr: '#66bb6a', bvrF: 'rgba(102,187,106,.08)', zone: 'rgba(179,157,219,.24)', zoneS: 'rgba(179,157,219,.6)', htf: 'rgba(179,157,219,.10)', stop: 'rgba(244,95,119,.24)', tgt: 'rgba(160,170,190,.20)', ink: '#e8eaf0', tag: '#12151c' }; };
+  // Each kind of mark has its own colour (owner, 22 Nov 2026: "use different color on the markins"): what a mark IS comes first
+  // (a failed zone, a CF, the entry zone), then the timeframe it was read on. Read from the mark's label; display only.
+  var HUES = { ef: ['#c62828', '#ff6b6b'], entry: ['#1565c0', '#5aa7ff'], cf: ['#2e7d32', '#5ed08a'], vr: ['#d84315', '#ff9f5a'], bo: ['#6d4c41', '#d7b899'], half: ['#546074', '#a0aabe'],
+    d1: ['#6a1b9a', '#c792ea'], h4: ['#b26a00', '#ffc857'], h1: ['#00796b', '#4dd0c4'], m30: ['#ad1457', '#ff7eb6'], m15: ['#ad1457', '#ff7eb6'], m5: ['#00838f', '#5fd3e6'], m1: ['#00838f', '#5fd3e6'] };
+  function hueKey(label) { var t = String(label || '');
+    if (/\bEF\b|failed/i.test(t)) return 'ef'; if (/entry/i.test(t)) return 'entry'; if (/\bCF\b/.test(t)) return 'cf'; if (/\bVR\b/.test(t)) return 'vr'; if (/50\s?%/.test(t)) return 'half';
+    if (/Daily|\bD1\b/.test(t)) return 'd1'; if (/\bH4\b/.test(t)) return 'h4'; if (/\bH1\b/.test(t)) return 'h1'; if (/\bM30\b/.test(t)) return 'm30'; if (/\bM15\b/.test(t)) return 'm15'; if (/\bM5\b/.test(t)) return 'm5'; if (/\bM1\b/.test(t)) return 'm1';
+    if (/\bBO\b|level/i.test(t)) return 'bo'; return null; }
+  function hueOf(m, C) { var k = hueKey(m && m.label), h = k && HUES[k]; if (!h) return null; var c = h[C.tag === '#ffffff' ? 0 : 1], n = parseInt(c.slice(1), 16), rgb = (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255);
+    return { line: c, fill: 'rgba(' + rgb + ',.18)', side: 'rgba(' + rgb + ',.75)' }; }
 
   function build() {
     var host = $('mo-rp-chart'); if (!host || R.chart || !root.LightweightCharts) return !!R.chart;
@@ -277,15 +287,15 @@
       placed.push({ x: px, y: py, w: w }); x.fillStyle = C.tag; x.globalAlpha = .85; x.fillRect(px, py - 9, w, 18); x.globalAlpha = 1; x.fillStyle = col; x.fillText(txt, px + 5, py + .5); };
     var edge = { up: 0, dn: 0 }, pf = function (v) { var d = Math.abs(v) < 20 ? 5 : Math.abs(v) < 2000 ? 2 : 2; return (+v).toFixed(d); };
     marksAt(sp, now).forEach(function (m) {
-      var x1 = X(m.a), x2 = X(m.b); if (x1 == null || x2 == null) return; if (x2 < x1 + 2) x2 = x1 + 2;
+      var hu = (m.kind === 'vr' || m.kind === 'bvr') ? null : hueOf(m, C), x1 = X(m.a), x2 = X(m.b); if (x1 == null || x2 == null) return; if (x2 < x1 + 2) x2 = x1 + 2;
       // off the price scale (kept out of it on purpose, setTf): one tag at that edge, with the mark's own prices
       var yA = Y(m.p != null ? m.p : m.top), yB = Y(m.p != null ? m.p : m.bot);
       if (yA != null && yB != null && (Math.max(yA, yB) < 0 || Math.min(yA, yB) > plotH)) { var up = Math.max(yA, yB) < 0, n = up ? edge.up++ : edge.dn++;
-        if (!narrow || n < 1) tag((up ? '\u25B2 ' : '\u25BC ') + L(m.label) + ' ' + (m.p != null ? pf(m.p) : pf(m.bot) + ' \u2013 ' + pf(m.top)), 6, up ? 12 + n * 20 : plotH - 12 - n * 20, C.level); return; }
-      if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(L(m.label), m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), C.level); return; }
+        if (!narrow || n < 1) tag((up ? '\u25B2 ' : '\u25BC ') + L(m.label) + ' ' + (m.p != null ? pf(m.p) : pf(m.bot) + ' \u2013 ' + pf(m.top)), 6, up ? 12 + n * 20 : plotH - 12 - n * 20, hu ? hu.line : C.level); return; }
+      if (m.kind === 'level') { var y = Y(m.p); if (y == null) return; x.strokeStyle = hu ? hu.line : C.level; x.lineWidth = 2; x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); if (!(narrow && m.under && !m.keep)) tag(L(m.label), m.left ? x1 - x.measureText(m.label).width - 14 : x1 + 4, m.left ? y : y + (m.under ? 12 : -12), hu ? hu.line : C.level); return; }
       var yt = Y(m.top), yb = Y(m.bot); if (yt == null || yb == null) return;
       if (m.kind === 'vr' || m.kind === 'bvr') { var col = m.kind === 'vr' ? C.vr : C.bvr; x.fillStyle = m.kind === 'vr' ? C.vrF : C.bvrF; x.fillRect(x1, yt, x2 - x1, yb - yt); x.strokeStyle = col; x.lineWidth = 1.5; x.strokeRect(x1 + .5, yt + .5, x2 - x1, yb - yt); if (!(narrow && x2 - x1 < 30)) tag(L(m.label), (x1 + x2) / 2 - 16, yt - 11, col); }
-      else if (m.kind === 'zone') { x.fillStyle = C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (!narrow || m.keep) { var lw = x.measureText(L(m.label)).width + 10, small = Math.abs(yb - yt) < 20 || x2 - x1 < lw + 12; tag(L(m.label), small && x1 - lw - 6 > 2 ? x1 - lw - 6 : x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, C.level); } }
+      else if (m.kind === 'zone') { x.fillStyle = hu ? hu.fill : C.zone; x.fillRect(x1, yt, x2 - x1, yb - yt); x.fillStyle = hu ? hu.side : C.zoneS; x.fillRect(x1, yt, 2, yb - yt); if (hu) { x.strokeStyle = hu.side; x.lineWidth = 1; x.strokeRect(x1 + .5, yt + .5, x2 - x1 - 1, yb - yt - 1); } if (!narrow || m.keep) { var lw = x.measureText(L(m.label)).width + 10, small = Math.abs(yb - yt) < 20 || x2 - x1 < lw + 12; tag(L(m.label), small && x1 - lw - 6 > 2 ? x1 - lw - 6 : x1 + 6, m.under ? yb + 11 : m.over ? yt - 11 : (yt + yb) / 2, hu ? hu.line : C.level); } }
       else { x.fillStyle = C.htf; x.fillRect(x1, yt, x2 - x1, yb - yt); tag(L(m.label), x1 + 6, (yt + yb) / 2, C.level); }
     });
     // the position: red band entry to stop, grey band entry to target, from the fill to the exit (or to now)
