@@ -6291,6 +6291,38 @@ flags `tap`, `mkt`, `l: '1m'`, label "… · M1 BO at the tap"; `readings(r).tap
 No other record changes (test). On GBP/USD 18-20 Nov: 45 entries, 27 reached target, +10R before costs (three days of one
 market: not evidence; an M1 stop is a few pips, so costs take a large share). Test: `tests/mosha-sop.test.mjs`.
 
+## Three-timeframe SOP on the Engulfing desk; an engulf completes within three candles (22 Nov 2026, owner's table: marking zone / engulf at the zone / confirmation = Daily / H4 / H1, H4 / H1 / M15, H1 / M15 / M5, with three pictures of an engulf completed by the 1st, 2nd or 3rd candle; then "Change to 3 candles")
+`council/eg-methods.mjs` `sopTrades3(B, { from, market })` (`SOP3`), a sixth reading on the Engulfing desk (`DESKS.eg.read`; kind
+`eg-sop3`, id `<market:>eg3-<zone timeframe>-<b|s><order time>`, label "D1 zone → H4 EG → H1 CF", `h` = the zone timeframe, `l` =
+the confirmation timeframe, tag `style` swing / intraday / scalp, which `council/mosha-desk.mjs` `clean` now keeps). Per chain:
+(1) a marking engulf zone on the first timeframe, still alive, gives the side; (2) price comes back into it (a closed candle of the
+second timeframe trades into it) and an engulf of the same side then completes on the second timeframe, its zone touching the
+marking zone; (3) an engulf of the same side then completes on the third timeframe, its zone touching the second one's, both higher
+zones alive. Entry: a limit at the MIDDLE (50 %) of the third zone; stop past the far side of the SECOND timeframe's zone by the
+desk's buffer ($0.30 on gold, the same share of price elsewhere); target 2R; a trade ends at its stop or its target; on a
+limit's fill candle only the stop counts. One order a confirmation zone (the most recent engulf zone behind it), one position at a
+time per chain and market (by fill time; of two fills in one candle the order known first). The desk's own choices, said in the
+code and on the desk: the confirmation within 24 candles of its timeframe, the order alive 24 such candles and cancelled by a
+close through the second zone's far side, exactly 2R, the one-position rule. Read on the candles the desk already had (no new
+timeframe; an order placed before the 5-minute candles on file is not read). Page (`assets/desk-trades.js`): the filter chip
+"Three-timeframe SOP" (`KN`), the style beside each row's label, the "What this is" text.
+**An engulf completes within three candles on every desk** (owner, 22 Nov 2026: "Change to 3 candles"; it was four, the owner's
+earlier "3 max 4"): `EG_SPAN` 3 in `council/eg-methods.mjs` and in the page copy `assets/mosha-sop.js` `egBoxes`. The next-candle
+kinds (`-n`) and the earlier scalp method's two-candle rule are unchanged; stored records keep the older rule until the
+histories are rebuilt. On the test's seeded market: plan 26 -> 22 trades, short method 30 -> 27, direct entry 2 -> 2.
+A paper reading of the owner's table before costs, not a tested rule: never call its total an edge. Tests:
+`tests/edge-desks.test.mjs` ("three-timeframe SOP": three tests; "an engulf completes within three candles").
+
+## ChronosTrade audit: the Topstep check and a first-day failure (22 Nov 2026)
+The audit's "Topstep challenge, 121 steps over 9 timeframes … firm days" check failed on every run from 22 Nov 00:00 UTC (main
+passed through 21 Nov 23:50). The page and the engine were right. Cause: the Nasdaq quick start opens 10 days back, on 22 Nov
+that is 12 Nov 07:00 UTC, and the check's blind trades (buy, sell, buy … at 0.6 % each) were stopped seven times in a row, so
+the Combine failed on its 4 % maximum loss at 18:00 UTC of its FIRST firm day; an ended challenge records no further day, and
+the check needs a day change (2+ firm days). Fix (`scripts/audit/chronostrade.cjs` only): the risk a trade is worked out from
+the firm's own rules (0.11 %: 21 trades at most, all stopped = 60 % of the maximum loss, all at their 2R target = 90 % of the
+profit target), so the challenge stays live through the steps on any date; if it still ends on day one the check fails and says
+why. Run with the page's clock set to 16, 21 and 22 Nov: 6, 7 and 6 firm days.
+
 ## A SOP inside the SOP: the VR and the CF each start a lower-timeframe sequence (22 Nov 2026, owner: "on mosha you need to repeat sop inside sop. Bo1 vr ( start new low time frame sop bo vr cf for sells if bo1 is bullish, and buys if bo1 is bearish), CF (start new low time frame sop bo vr cf for buys and main structure as well)")
 `assets/mosha-sop.js` `sopTrades` (`nestAdd`, `nestRun`). The main sequence (BO on h, VR and CF on l, the EG entry) is unchanged
 and recorded as before. Beside it, each of its two breaks is read as a BO one timeframe lower (`LOWER[l] || DOWN[l]`: H4 → H1,
