@@ -20,7 +20,7 @@ function makeMarket(days, seed) {
 }
 // 22 Nov 2026: the failed-QM entries (a trade with the direction at a barrier against it) have their own shape and their own
 // test at the end of this file; every older test reads the barrier list without them (BT = the whole list).
-const BT = M.barrierTrades; M.barrierTrades = (B, Fx, o) => BT(B, Fx, o).filter((r) => !r.qmFail);
+const BT = M.barrierTrades; M.barrierTrades = (B, Fx, o) => BT(B, Fx, o).filter((r) => !r.qmFail && !r.tap);
 // Every market and every replay is worked out ONCE and shared by the tests below (21 Nov 2026: the file had grown to about a
 // quarter of an hour, most of it the same replay run again by each test). A replay is keyed by its candles, its cut and its
 // options; nothing a test asserts was dropped for it.
@@ -644,4 +644,19 @@ test('a failed QM at a barrier against the direction: no repeat-SOP entry after 
     for (const r of f.slice(0, 4)) { const T = cutFor(seed, r.t + 3600); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
       assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); assert.equal(k.target, r.target); c++; } }
   assert.ok(n > 0 && c > 0, 'failed-QM entries: ' + n + ', checked against a cut: ' + c);
+});
+
+// 22 Nov 2026 (owner: "when tap he could wait M1 BO buy to take the trade, SL at M1 BO low")
+test('M1 BO at the tap of a barrier: a market entry at the M1 close, the stop past the M1 BO\'s low, its own id and reading, no hindsight', () => {
+  let n = 0, c = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), z = ALL(seed).z, all = BT(X, F, { from: fr, extra: z }), t = all.filter((r) => r.tap); n += t.length;
+    assert.ok(BT(X, F, { from: fr, extra: z, tap: false }).every((r) => !r.tap), 'tap: false leaves it out');
+    assert.deepEqual(BT(X, F, { from: fr, extra: z, tap: false }).map(keyOf), all.filter((r) => !r.tap).map(keyOf), 'no other record changes');
+    assert.equal(new Set(t.map((r) => r.id)).size, t.length);
+    for (const r of t) { assert.match(r.id, /bar-tap-/); assert.equal(r.l, '1m'); assert.ok(M.readings({ id: r.id }).tap); assert.match(r.label, / · M1 BO at the tap/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) at the tap/);
+      assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry);
+      const bar = X['1m'].find((b) => b.time + 60 === r.t); assert.ok(bar && bar.close === r.entry, 'the entry is the close of the M1 candle that ended at its time'); }
+    for (const r of t.slice(0, 4)) { const T = cutFor(seed, r.t + 60); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
+      assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); c++; } }
+  assert.ok(n > 0 && c > 0, 'tap entries: ' + n + ', checked against a cut: ' + c);
 });

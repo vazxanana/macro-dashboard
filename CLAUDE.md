@@ -6281,3 +6281,12 @@ few pips). Record: id `bar-sop-f-…`, flags `rsop`, `qmFail`, `withDir: true`, 
 is read back from the id; its own reading in the 20-minute rule. `fail: false` reads it as before. Barriers with the direction are
 unchanged (there a pullback through the QM level is the sequence's own). On GBP/USD 18-20 Nov: 2 buys gone (−2R), 10 entries
 added (+1.4R before costs). A reading, not a tested rule. Test: `tests/mosha-sop.test.mjs`.
+
+## M1 BO at the tap of a barrier (22 Nov 2026, owner on the same GBP/USD chart: "when tap he could wait M1 BO buy to take the trade, SL at M1 BO low")
+`assets/mosha-sop.js` `barrierTrades`, `run('1m', B['1m'], 'tap')` for every barrier visit (not in the older reading; `tap: false`
+leaves it out): the first M1 BO Structure with the barrier after price came back (the same QM test as the table's confirmation,
+read on M1) is a MARKET entry at that candle's close; stop past the extreme made at the barrier up to that close (the M1 BO's low
+for a buy) by the desk's buffer; target the desk's barrier target (`BARRIER_R`, 1R: the owner named none). Record: id `bar-tap-…`,
+flags `tap`, `mkt`, `l: '1m'`, label "… · M1 BO at the tap"; `readings(r).tap` from the id; its own reading in the 20-minute rule.
+No other record changes (test). On GBP/USD 18-20 Nov: 45 entries, 27 reached target, +10R before costs (three days of one
+market: not evidence; an M1 stop is a few pips, so costs take a large share). Test: `tests/mosha-sop.test.mjs`.
