@@ -6446,3 +6446,22 @@ the SOP inside the VR and the barrier with its 1R target. Records carry `structN
 choice, not a tested result; never quote it as an edge. A run takes about twice as long: `council.yml` gives the tracker
 `timeout 240` (was 120). Tests: `tests/mosha-sop.test.mjs` (the test file wraps `M.sopTrades` with older options: compare with
 `ST`, the unwrapped one).
+
+## A live chart on each edge desk (22 Nov 2026, owner: "live chart with markups on each edge ... like we done in Charts but on the edge page for each edge")
+Display only, `assets/desk-live.js` (`window.MS_DESK_LIVE`, pure pieces also `module.exports`; loaded with `defer` after
+`assets/desk-trades.js`). It puts a card `.dl-card` "Live chart" FIRST in the `.mo-grid` of `#v-mosha`, `#v-lit`, `#v-eg`, `#v-msnr`
+(its own host; the `data-dk="chart"` slot stays desk-trades.js's borrowed replay card). Market picker = the markets the desk's file
+holds (Mosha: `MS_MOSHA_SOP.MOSHA`), timeframes M1 M5 M15 M30 H1 H4 D1, OANDA candles from `/md/bars?sym=&tf=&n=500`, then the
+newest 5 every `POLL[tf]` s (3 s on M1 to 120 s on D1; a minute while the newest candle is old: a shut market), only while the
+desk's view is shown and the tab visible. Trades from the desk's file through `msData` (re-read at most every 90 s), log and
+marks through `MS_MOSHA_SOP.withDetail`: every OPEN record of the market and the 10 latest closed ones the candles reach
+(`pick`). The chosen trade (the newest at first; a tap on its row or marker chooses another, and the time scale frames it) shows
+its stored marks (zones, VR / order-block boxes, levels, coloured by kind as `assets/mosha-replay.js` `HUES`; a test compares),
+entry / stop (its trailed `stopNow` when open) / target from the fill to its end with risk and reward bands, and labels; the
+others show their entry line faintly; entry and exit markers on every trade (`setMarkers`, ids `<id>:e` / `<id>:x`). Overlay =
+one canvas above the chart's, `pointer-events: none`, clipped to the price pane; times map to a fractional bar index
+(`logicalOf`) and through `l2x` (the chart library places whole indexes only). The price scale holds the chosen trade's levels
+(`autoscaleInfoProvider`). "Chart" on a row opens `msMoshaReplayDialog` (Before / After). Hidden for the Mosha desk's teacher
+(as Open now) and never built for a guest; not a `.card`, so the simple phone view keeps it open. Nothing stored (no browser
+storage), nothing written. No live ticks yet (the page's tick stream is the Charts market only). `MS_DESK_LIVE.state(k)` is the
+audit's read-only view. Test: `tests/desk-live-chart.test.mjs`.
