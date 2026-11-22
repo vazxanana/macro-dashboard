@@ -144,10 +144,11 @@
   function deskTrades(B, F, o) {
     o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market };
     var w = function (x) { var r = {}; for (var k in base) if (base[k] !== undefined) r[k] = base[k]; for (var k2 in x) r[k2] = x[k2]; return r; };
-    var s6 = sopTrades(B, F, w({ cfOut: c6 })).filter(sixCandle), s1 = sopTrades(B, F1, w({ cfOut: c1 })).filter(function (r) { return !sixCandle(r); });
-    var b6 = barrierTrades(B, F, w({ extra: c6 })).filter(sixCandle), b1 = barrierTrades(B, F1, w({ extra: c1 })).filter(function (r) { return !sixCandle(r); });
+    // through API so a caller (the tracker's tests) can swap a reading in
+    var s6 = API.sopTrades(B, F, w({ cfOut: c6 })).filter(sixCandle), s1 = API.sopTrades(B, F1, w({ cfOut: c1 })).filter(function (r) { return !sixCandle(r); });
+    var b6 = API.barrierTrades(B, F, w({ extra: c6 })).filter(sixCandle), b1 = API.barrierTrades(B, F1, w({ extra: c1 })).filter(function (r) { return !sixCandle(r); });
     var tag = function (rows, n) { rows.forEach(function (r) { r.structN = n; }); return rows; };
-    return uniq(tag(s6, 6).concat(tag(s1, ONE_N), tag(b6, 6), tag(b1, ONE_N))).concat(tag(oldBarrierTrades(B, F1, w({ extra: c1 })), ONE_N));
+    return uniq(tag(s6, 6).concat(tag(s1, ONE_N), tag(b6, 6), tag(b1, ONE_N))).concat(tag(API.oldBarrierTrades(B, F1, w({ extra: c1 })), ONE_N));
   }
   function uniq(rows) {
     var idx = rows.map(function (r, i) { return i; }), rk = function (r) { return (r.kind === 'sop' ? 0 : 4e9) + (r.ibo ? 2e9 : 0) + (r.nest ? 8e9 : 0) + (1e6 - (SEC[r.h] || 0)); }, seen = {}, keep = {};

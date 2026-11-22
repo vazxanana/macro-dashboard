@@ -208,7 +208,8 @@ test('one order is recorded once: the major sequence over the internal one, the 
     for (const g of gone) { const k = u.find((r) => M.orderKey(r) === M.orderKey(g)); assert.ok(k, 'a dropped record has its kept twin'); assert.ok(k.kind === 'sop' || g.kind === 'barrier', 'never a sequence record dropped for a barrier one: ' + g.id + ' / ' + k.id);
       assert.deepEqual([k.side, k.t, k.entry, k.stop], [g.side, g.t, g.entry, g.stop]); } }
   assert.ok(drops >= 3, 'orders found under two ids on these candles: ' + drops);
-  assert.match(fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8'), /SOP\.uniq\(seq\.concat\(SOP\.barrierTrades\(/);
+  assert.match(fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8'), /SOP\.deskTrades\(B, F, \{ from, market \}\)/);
+  assert.match(src, /return uniq\(tag\(s6, 6\)\.concat\(tag\(s1, ONE_N\), tag\(b6, 6\), tag\(b1, ONE_N\)\)\)\.concat\(tag\(API\.oldBarrierTrades\(/);
 });
 
 test('two tags on every sequence record that change no trade: the weekly direction (last completed week against the one before) and the 20-day efficiency ratio, from Daily candles closed by the entry', () => {
@@ -633,7 +634,7 @@ test('the barrier with the older 3R target is a reading of its own: the current 
   assert.ok(same >= old.length * 0.8, 'the 3R records are the current entries: ' + same + ' of ' + old.length);
   assert.ok(all.every((r) => !M.readings(r).old), 'no current record reads as old');
   const src = fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8');
-  assert.match(src, /\.concat\(SOP\.oldBarrierTrades\(B, F, \{ from, market, extra: cfz \}\)\)/);
+  assert.match(src, /SOP\.deskTrades\(B, F, \{ from, market \}\)/);
 });
 
 // 22 Nov 2026 (owner on a GBP/USD buy: "this should be a sell", "there is no new BO"): at a barrier against the direction a QM
