@@ -49,7 +49,7 @@ Built by the Trader at 2026-11-22 21:55 UTC. ICT desk: the last 7 days; mirror: 
 
 **Dip-buy candidate (NQ/ES, paper only):** 3 signals in 7 days, 3 closed −1.51R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-22 21:53 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 10122.52 · 0 open (checked 2026-11-22 21:55 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
