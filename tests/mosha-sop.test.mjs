@@ -340,7 +340,7 @@ test('the older records still appear exactly as before, and every new reading is
     // box runs from the broken level to the origin extreme, the Janda's limit rests at the engulf zone. Each keeps an option that
     // reads it the older way (vr 'major', box 'candle', janda 'level', and qm 'internal' for the QM at a barrier): with them the older records are exactly the pinned ones.
     // (case2 false: a CF inside the VR was not recorded then; it is its own reading since 21 Nov 2026)
-    const olds = barOf(seed, fr, { box: 'candle', janda: 'level', qm: 'internal' });
+    const olds = barOf(seed, fr, { box: 'candle', janda: 'level', qm: 'internal', rr: 3 });   // rr 3: the barrier target until 22 Nov 2026 (1R since, the owner's choice)
     const old = sopOf(seed, fr, { near: false, retest: false, vr: 'major', case2: false }).concat(olds).filter((r) => !isNew(r)).map(key).sort();
     // review 21 Nov 2026: a buy and a sell filled in one minute are two records (the side is in the id), and no id twice
     assert.equal(new Set(bars.map((r) => r.id)).size, bars.length, 'no barrier id twice, seed ' + seed); assert.ok(bars.every((r) => /-[bs]\d+$/.test(r.id)), 'the side is in the id');

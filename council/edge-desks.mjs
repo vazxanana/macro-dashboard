@@ -33,7 +33,11 @@ const word = (d) => (d > 0 ? 'buy' : 'sell');
 const fx = (mk) => { const d = SOP.ALL[mk].dec; return (v) => (+v).toFixed(d); };
 
 // ─── Engulfing ───
-export const EG = { k: 3, life: 20, hold: 10, sma: 20, target: 10, trail: [2, 1], tfs: ['1d', '4h', '1h'] };
+export const EG = { k: 3, life: 20, hold: 10, sma: 20, target: 10, trail: [2, 1], tfs: ['1d', '4h', '1h'],
+  // owner, 22 Nov 2026 ("keep the best rr for each individual one"): on the D1 and H4 readings a plain 4R target did best on their own
+  // closed 2026 records (1R-4R, each trade replayed alone for up to 5 days, before costs), so they take a 4R target with no trail
+  // and a 5-day limit. The H1 reading's own exit (10R, the 1R trail from +2R, 10 candles) was best and stays. Picked in sample.
+  fixed: { '1d': { rr: 4, hold: 5 }, '4h': { rr: 4, hold: 30 } } };
 // one filled order on the 5-minute candles: the stop first when a candle holds both, the trail only ever tightens
 export function egOutcome(tr, m5, fillI, until) {
   const d = tr.side, r0 = tr.r0, o = { status: 'open', R: null, endT: null, exit: null, mfe: 0 }; let stop = tr.stop, moved = false;
@@ -44,9 +48,9 @@ export function egOutcome(tr, m5, fillI, until) {
     // a limit fills INSIDE its candle, and that candle's favourable extreme may have come before the fill: on the fill candle only
     // the stop counts (the worst case), never the target, the best-so-far or the trail
     if (i === fillI) continue;
-    if (d > 0 ? b.high >= tr.target : b.low <= tr.target) { o.status = 'target'; o.exit = tr.target; o.R = EG.target; o.endT = b.time; return o; }
+    if (d > 0 ? b.high >= tr.target : b.low <= tr.target) { o.status = 'target'; o.exit = tr.target; o.R = tr.rr || EG.target; o.endT = b.time; return o; }
     o.mfe = Math.max(o.mfe, d * ((d > 0 ? b.high : b.low) - tr.entry) / r0);
-    if (o.mfe >= EG.trail[0]) { const ns = tr.entry + d * (o.mfe - EG.trail[1]) * r0; if (d > 0 ? ns > stop : ns < stop) { stop = ns; moved = true; } } }
+    if (!tr.rr && o.mfe >= EG.trail[0]) { const ns = tr.entry + d * (o.mfe - EG.trail[1]) * r0; if (d > 0 ? ns > stop : ns < stop) { stop = ns; moved = true; } } }
   if (m5.length) o.float = d * (m5[m5.length - 1].close - tr.entry) / r0;
   o.stopNow = stop; return o;
 }
@@ -72,15 +76,16 @@ export function egTrades(B, { from, market = 'xau' } = {}) {
       let fi = -1, i0 = 0; { let lo = 0, hi = m5.length; while (lo < hi) { const q = (lo + hi) >> 1; if (m5[q].time < T0) lo = q + 1; else hi = q; } i0 = lo; }   // the first 5-minute candle at or after the order (a long history is searched, not walked)
       for (let i = i0; i < m5.length; i++) { const b = m5[i]; if (b.time >= dead) break; if (d > 0 ? b.low <= entry : b.high >= entry) { fi = i; break; } }
       if (fi < 0) continue;
-      const fillT = m5[fi].time, tr = { id: `${market === 'xau' ? '' : market + ':'}eg-${tf}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind: 'eg-' + tf, label: `${NAME[tf]} engulf zone`, h: tf, l: '5m', side: d, t: fillT,
-        entry, stop, target: entry + d * EG.target * r0, r0 };
-      const oc = egOutcome(tr, m5, fi, fillT + EG.hold * sec);
+      const fx4 = EG.fixed[tf] || null, fillT = m5[fi].time, tr = { id: `${market === 'xau' ? '' : market + ':'}eg-${tf}-${d > 0 ? 'b' : 's'}-${T0}`, market, kind: 'eg-' + tf, label: `${NAME[tf]} engulf zone`, h: tf, l: '5m', side: d, t: fillT,
+        entry, stop, target: entry + d * (fx4 ? fx4.rr : EG.target) * r0, r0 };
+      if (fx4) tr.rr = fx4.rr;
+      const oc = egOutcome(tr, m5, fi, fillT + (fx4 ? fx4.hold : EG.hold) * sec);
       if (T0 < from && oc.endT != null && oc.endT < from) continue;   // an older order that also ended before the window
       Object.assign(tr, { status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float });
       tr.log = [
         { t: T0, text: `${NAME[tf]} engulf ${word(d)}: the candle closed ${d > 0 ? 'above the high' : 'below the low'} of the last ${d > 0 ? 'red' : 'green'} candle (${f(base.low)} to ${f(base.high)}) and ${d > 0 ? 'above' : 'below'} its 20-candle average ${f(sma)}. A ${word(d)} limit rests at ${f(entry)}, stop ${f(stop)}.` },
-        { t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (risk ${f(r0)}), target ${f(tr.target)} (${EG.target}R), a 1R trail from +2R, out after ${EG.hold} ${NAME[tf]} candles.` },
-        oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${EG.target.toFixed(2)}R.` }
+        { t: fillT, text: `Price came back to the zone: ${word(d)} ${f(entry)}, stop ${f(stop)} (risk ${f(r0)}), target ${f(tr.target)} ` + (fx4 ? `(${fx4.rr}R), no trail, out after ${fx4.hold} ${NAME[tf]} candles.` : `(${EG.target}R), a 1R trail from +2R, out after ${EG.hold} ${NAME[tf]} candles.`) },
+        oc.status === 'target' ? { t: oc.endT, text: `Target reached: +${(fx4 ? fx4.rr : EG.target).toFixed(2)}R.` }
           : oc.status === 'stopped' ? { t: oc.endT, text: 'Stopped: −1.00R' + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
             : oc.status === 'trail' ? { t: oc.endT, text: `Trailing stop: ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R (best +${oc.mfe.toFixed(1)}R).` }
               : oc.status === 'time' ? { t: oc.endT, text: `Time limit: closed at ${f(oc.exit)}, ${oc.R >= 0 ? '+' : '−'}${Math.abs(oc.R).toFixed(2)}R.` }
@@ -245,12 +250,15 @@ export function litTrades(B, { from, market = 'xau', sets = LIT_SETS, first = fa
 // the next 5-minute open, stop a buffer past the trigger pair, target 1.5R, out after 12 hours. Only entries WITH the call are
 // recorded, one position at a time a market. On a market other than gold the buffer and the smallest stop are the same share
 // of price as gold's (the desk's own choice). The study FAILED after costs (0 of 3): a paper record, never an edge.
-export const MSNR = { rr: 1.5, main: [12, 16] };
+// rr / hold: the study's 1.5R and 12 hours until 22 Nov 2026. Owner ("keep the best rr for each individual one"): 4R in the
+// 12-16 UTC window and 3R at other hours did best on the method's own closed 2026 records (1R-4R, each trade alone for up to
+// 5 days, before costs), so those are the targets and the time limit is 5 days. Picked in sample, not a tested result.
+export const MSNR = { rr: 1.5, rrMain: 4, rrOther: 3, hold: 120 * 3600, main: [12, 16] };
 // the study's own simulate at full precision: a gap through the stop exits at the open, the stop before the target in one
 // candle, the first candle opening 12 hours or more after the entry exits at its open; null = still open
-function msnrSim(M5, c, r0, rr) { const s = c.side, target = c.entry + s * rr * r0;
+function msnrSim(M5, c, r0, rr, hold = MS.P.HOLD) { const s = c.side, target = c.entry + s * rr * r0;
   for (let k = c.i; k < M5.length; k++) { const b = M5[k];
-    if (k > c.i && b.time >= c.t + MS.P.HOLD) return { closed: b.time, exitPx: b.open, exit: 'time' };
+    if (k > c.i && b.time >= c.t + hold) return { closed: b.time, exitPx: b.open, exit: 'time' };
     if (k > c.i && (s > 0 ? b.open <= c.stop : b.open >= c.stop)) return { closed: b.time, exitPx: b.open, exit: 'stop' };
     if (s > 0 ? b.low <= c.stop : b.high >= c.stop) return { closed: b.time, exitPx: c.stop, exit: 'stop' };
     if (s > 0 ? b.high >= target : b.low <= target) return { closed: b.time, exitPx: target, exit: 'target' }; }
@@ -281,7 +289,7 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
     // candle is not taken. The zone drawn is the FIRST candle, wick to wick (it was the range of both candles).
     const j15 = lower15(c.setup - MS.P.M15), e15 = j15 > 0 && M15g[j15].time === c.setup - MS.P.M15 ? [M15g[j15 - 1], M15g[j15]] : null;
     if (!eg2(b0, a, d) || (e15 && !eg2(e15[0], e15[1], d))) continue;
-    const o = msnrSim(M5, c, r0, MSNR.rr), target = c.entry + d * MSNR.rr * r0, main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1];
+    const main = c.hour >= MSNR.main[0] && c.hour < MSNR.main[1], rr = main ? MSNR.rrMain : MSNR.rrOther, o = msnrSim(M5, c, r0, rr, MSNR.hold), target = c.entry + d * rr * r0;
     busy = o ? o.closed : Infinity; if (c.t < from) continue;
     let mfe = 0, endI = o ? M5.findIndex((b) => b.time === o.closed) : M5.length - 1; for (let k = c.i; k <= endI && k < M5.length; k++) mfe = Math.max(mfe, d * ((d > 0 ? M5[k].high : M5[k].low) - c.entry) / r0);
     const status = !o ? 'open' : o.exit === 'target' ? 'target' : o.exit === 'time' ? 'time' : 'stopped', R = o ? d * (o.exitPx - c.entry) / r0 : null, fl = o ? undefined : d * (M5[M5.length - 1].close - c.entry) / r0;
@@ -293,9 +301,9 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
         { t: ev.t + MS.P.H4, text: `An H4 candle closed ${d > 0 ? 'above' : 'below'} ${f(ev.level)}: an external BO ${word(d)} after a tapped Daily level. Direction ${word(d)}.` }]
         : [{ t: H4[h].time + MS.P.H4, text: `Direction ${word(d)} on H4 with the Daily key levels (as known at the close of the last H4 candle).` }]),
       { t: c.setup, text: `A 15-minute engulf ${word(d)} closed (the second candle closed ${d > 0 ? 'above the high' : 'below the low'} of the first): the entry is armed for 45 minutes.` },
-      { t: c.trig + MS.P.M5, text: `A 5-minute engulf ${word(d)} closed inside that time. ${d > 0 ? 'Buy' : 'Sell'} at the next 5-minute open ${f(c.entry)}, stop ${f(c.stop)} (risk ${f(r0)}), target ${f(target)} (${MSNR.rr}R), out after 12 hours.` },
+      { t: c.trig + MS.P.M5, text: `A 5-minute engulf ${word(d)} closed inside that time. ${d > 0 ? 'Buy' : 'Sell'} at the next 5-minute open ${f(c.entry)}, stop ${f(c.stop)} (risk ${f(r0)}), target ${f(target)} (${rr}R), out after 5 days.` },
       !o ? { t: null, text: 'Still open on the last candle read' + (fl != null ? ` (${fl >= 0 ? '+' : '−'}${Math.abs(fl).toFixed(2)}R now).` : '.') }
-        : status === 'target' ? { t: o.closed, text: `Target reached: +${MSNR.rr.toFixed(2)}R.` }
+        : status === 'target' ? { t: o.closed, text: `Target reached: +${rr.toFixed(2)}R.` }
           : status === 'time' ? { t: o.closed, text: `Time limit: closed at ${f(o.exitPx)}, ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R.` }
             : { t: o.closed, text: `Stopped: ${R >= 0 ? '+' : '−'}${Math.abs(R).toFixed(2)}R` + (mfe >= 1 ? ` after running +${mfe.toFixed(1)}R first.` : '.') }];
     const i0 = c.i - 1;
