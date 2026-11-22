@@ -138,6 +138,9 @@ async function serve(req, res) {
     if (url.pathname === '/api/academy') return await academy(req, res, url);
     if (url.pathname === '/api/academy-mcp' || url.pathname.startsWith('/api/academy-mcp/')) return await connector(req, res, url);
     if (url.pathname === '/md/bars') return await bars(url, res);
+    // the Desk examples section reads one generated file the live site serves; this server has none, and says so with an
+    // empty file (a 404 would be a console error on every visit of that tab): the section then shows its empty state
+    if (url.pathname === '/cdata/academy/desk-examples.json') return json(res, 200, { v: 1, at: null, note: '', groups: [] });
     if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/md/') || url.pathname.startsWith('/cdata/')) return json(res, 404, { error: 'not served by the Academy dev server' });
     if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'GET', 'text/plain; charset=utf-8');
     return file(res, url.pathname);

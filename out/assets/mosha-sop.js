@@ -53,8 +53,9 @@
   // (BARRIER30); M15 on M5 is M5_ALT below. LOWER = one step down the ladder, for the repeat of the SOP at a barrier.
   var ALT2 = { '4h': '30m', '1h': '15m' }, BARRIER30 = [['30m', '5m']], DOWN = { '4h': '1h', '1h': '30m', '30m': '15m', '15m': '5m' }, LOWER = { '1h': '30m', '30m': '15m', '15m': '5m', '5m': '1m' };
   // the method's own timeframe table for the sequence (owner, 22 Nov 2026): the CF is read ONE TIMEFRAME LOWER than the VR
-  // (BO → VR → CF: D1 → H4 → H1, H4 → H1 → M30, H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1; M1 stays M1). CFTF: the VR's timeframe → the CF's.
-  var CFTF = { '4h': '1h', '1h': '30m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' };
+  // (BO → VR → CF: D1 → H4 → H1, H4 → H1 → M15, H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1; M1 stays M1). CFTF: the VR's timeframe → the CF's.
+  // Owner, 22 Nov 2026, later: "one of them is h4 h1 m15 (not m30)": under an H1 VR the CF is read on M15.
+  var CFTF = { '4h': '1h', '1h': '15m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' };
   var JANDA_ALT = { '4h': '1m', '1h': '1m' };   // the Janda's own table: H4 on M15 or M1, H1 on M5 or M1 (the simple CF keeps the one timeframe)
   var f2 = function (v) { return (+v).toFixed(2); };
   // More markets (21 Nov 2026, owner: "more trades"): the SAME reading on other markets, no new entry rule. The gold sizes

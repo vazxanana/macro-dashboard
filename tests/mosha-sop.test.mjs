@@ -707,7 +707,7 @@ test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the
 });
 
 test('the CF one timeframe under the VR (the method\'s table): the CF, the EG and the fill are on that timeframe, the VR is unchanged; cf "same" is the reading before; no hindsight', () => {
-  assert.deepEqual(M.CFTF, { '4h': '1h', '1h': '30m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' });
+  assert.deepEqual(M.CFTF, { '4h': '1h', '1h': '15m', '30m': '15m', '15m': '5m', '5m': '1m', '1m': '1m' });
   let n = 0, cuts = 0; const tfs = new Set();
   for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), NB = { nest: false, cfBack: false, cfLimit: false }, all = ST(X, F, { from: fr, ...NB }), seq = all.filter((r) => !r.retest), old = sopOf(seed, fr);
     assert.deepEqual(ST(X, F, { from: fr, ...NB, cf: 'same' }).map(keyOf), old.map(keyOf), 'cf "same" gives exactly the list before');

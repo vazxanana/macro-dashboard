@@ -25,6 +25,7 @@
 //   sessions · session&id=                  replay session index / one session with its state
 //   progress&edge= · mistakes&edge= · exams&edge= · dataset&edge= · notebook · models · cost · audit&month=YYYY-MM
 //   connector                               the address of the owner's assistant connector (api/academy-mcp.js) and how many questions wait
+//   example-notes                           the owner's notes and drawings on the desk examples: { notes: { <example id>: { text, chips, draw, at } } }
 //   blind&edge=                             the mentor's blind answers beside the engine's stored answer (answered setups only), graded;
 //                                           recall: true when the engine had decided that setup before (memory, not a fresh read)
 //   misses&edge=[&session=]                 the mentor's session notes: "the engine should have acted here" / "right to wait"
@@ -33,6 +34,7 @@
 // POST /api/academy { action, ... }
 //   attempt · correct · lesson.save · lesson.revise · lesson.deactivate · lesson.stats · session.save · seen · exam.result ·
 //   blind.submit · miss · notebook.add · model.register · model.promote · model.rollback · explain · analyse
+//   example.note { id, text, chips, draw }  one note a desk example (replaced as a whole; an empty one removes it)
 //   correct takes engine: 'language-model' to correct an analyst attempt (same checks, the analyst's own files)
 'use strict';
 const fs = require('node:fs');
@@ -193,7 +195,7 @@ function outcomeOf(raw, id) {
 
 // ---- small helpers ------------------------------------------------------------------------------------------------------
 const K = { lessons: 'lessons.json', attempts: (e) => `attempts/${e}.json`, corrections: (e) => `corrections/${e}.json`, sessions: 'sessions/index.json', session: (id) => `sessions/${id}.json`,
-  seen: (e) => `seen/${e}.json`, exams: (e) => `exams/${e}.json`, blind: 'blind.json', misses: (e) => `misses/${e}.json`, dataset: (e) => `dataset/${e}.json`, notebook: 'notebook.json', models: 'models.json', audit: (m) => `audit/${m}.json` };
+  seen: (e) => `seen/${e}.json`, exams: (e) => `exams/${e}.json`, blind: 'blind.json', misses: (e) => `misses/${e}.json`, dataset: (e) => `dataset/${e}.json`, notebook: 'notebook.json', models: 'models.json', audit: (m) => `audit/${m}.json`, exampleNotes: 'examples/notes.json' };
 const AK = { attempts: (e) => `analyst/attempts/${e}.json`, corrections: (e) => `analyst/corrections/${e}.json`, dataset: (e) => `analyst/dataset/${e}.json`, cache: 'analyst/cache.json', queue: 'analyst/queue.json' };
 const engineOf = (v, name = 'engine') => (v == null || v === '' ? 'deterministic' : oneOf(v, ENGINES, name));
 const keysFor = (engine) => (engine === 'language-model' ? AK : K);
@@ -255,6 +257,28 @@ function context(req, d, env, acct) {
     },
   };
   return X;
+}
+
+// ---- desk examples: the owner's notes and drawings (22 Nov 2026) -----------------------------------------------------------
+// One file, examples/notes.json = { v: 1, notes: { <example id>: { text, chips, draw, at } } }. The examples themselves are a
+// generated file the page reads by itself; this API never sees them, so an id is only checked for its shape. A drawing is a list of
+// shapes in the page's own form (points are [UTC seconds, price]); each is rebuilt here field by field, nothing else is kept.
+const EX_ID = /^[a-z0-9][a-z0-9:._-]{0,79}$/, EX_MAX = 400, EX_TEXT = 2000, EX_SHAPES = 60;
+const EX_CHIPS = ['entry-right', 'wrong-side', 'entry-early', 'entry-late', 'stop-wrong', 'target-wrong', 'no-trade'];
+const EX_TYPES = ['t', 'h', 'r', 'a', 'x'], EX_COLS = ['draw', 'up', 'dn', 'gold', 'ink'];
+const emptyExNotes = () => ({ v: 1, notes: {} });
+// a stored notes file, or a 503: a file that is not a notes file is never treated as empty (the next save would wipe it)
+const exNotesOf = (doc) => (doc == null ? emptyExNotes() : isObj(doc) && isObj(doc.notes) ? doc : bad('the Academy store is unavailable: nothing was saved', 503));
+function exShape(v, name) {
+  const o = obj(v, name), type = oneOf(o.type, EX_TYPES, `${name}.type`), s = { type };
+  const time = (k) => { const n = num(o[k], `${name}.${k}`); return n > 0 && n < 1e11 ? Math.round(n) : bad(`${name}.${k} must be a time in UTC seconds`); };
+  const price = (k) => { const n = num(o[k], `${name}.${k}`); return Math.abs(n) < 1e9 ? n : bad(`${name}.${k} is out of range`); };
+  if (type === 'h') s.price = price('price'); else { s.t1 = time('t1'); s.p1 = price('p1'); if (type !== 'x') { s.t2 = time('t2'); s.p2 = price('p2'); } }
+  if (type === 'x') { if (typeof o.text !== 'string' || o.text.length > 120) bad(`${name}.text must be text of 120 characters at most`); s.text = o.text.replace(CTRL, ' ').replace(/\s+/g, ' ').trim() || bad(`${name}.text is required`); }
+  if (o.col != null && o.col !== 'draw') s.col = oneOf(o.col, EX_COLS, `${name}.col`);
+  if (o.w != null && o.w !== 1) s.w = oneOf(o.w, [2, 3], `${name}.w`);
+  if (o.ls != null && o.ls !== '') s.ls = oneOf(o.ls, ['dash'], `${name}.ls`);
+  return s;
 }
 
 // ---- GET ------------------------------------------------------------------------------------------------------------------
@@ -481,6 +505,8 @@ const GET = {
     const why = CN.unavailable(X.env); if (why) return { available: false, reason: why };
     return { available: true, url: CN.urlOf(X.env, d && d.host), pending: queueRows(await X.store.get(AK.queue, null)).length };
   },
+  // the owner's notes and drawings on the desk examples, by example id
+  async 'example-notes'(X) { return { notes: exNotesOf(await X.store.get(K.exampleNotes, null)).notes }; },
   async audit(X, q) {
     const month = q.month == null || q.month === '' ? X.iso().slice(0, 7) : /^\d{4}-(0[1-9]|1[0-2])$/.test(q.month) ? q.month : bad('month must be YYYY-MM');
     return { month, rows: (await X.store.rows(K.audit(month), true)).slice().reverse() };
@@ -718,6 +744,21 @@ const POST = {
     });
   },
 
+  // { action: 'example.note', id, text?, chips?, draw? }   the owner's note on one desk example, replaced as a whole.
+  // Nothing written, ticked or drawn = the note is removed. It changes no desk record, rule or trade: words and shapes only.
+  async 'example.note'(X, b) {
+    const id = typeof b.id === 'string' && EX_ID.test(b.id) ? b.id : bad('id is not a valid example id');
+    if (b.text != null && typeof b.text !== 'string') bad('text must be text'); if (typeof b.text === 'string' && b.text.length > EX_TEXT) bad(`text: ${EX_TEXT} characters at most`);
+    const words = text(b.text, EX_TEXT, 'text'), chips = [...new Set(list(b.chips, EX_CHIPS.length, 'chips', (v, n) => oneOf(v, EX_CHIPS, n)))], draw = list(b.draw, EX_SHAPES, 'draw', exShape);
+    const none = !words && !chips.length && !draw.length;
+    return X.write({ nt: [K.exampleNotes, emptyExNotes()] }, ({ nt }, at) => {
+      const D = exNotesOf(nt), notes = { ...D.notes }, had = Object.prototype.hasOwnProperty.call(notes, id);
+      if (none) delete notes[id];
+      else { if (!had && Object.keys(notes).length >= EX_MAX) bad(`${EX_MAX} notes at most: clear one you no longer need first`, 409); notes[id] = { text: words, chips, draw, at }; }
+      return { write: { nt: { ...D, v: 1, notes } }, result: { ok: true, id, note: none ? null : notes[id], count: Object.keys(notes).length },
+        audit: { action: 'example.note', ids: [id], summary: none ? (had ? 'note removed' : 'nothing to save') : `${words.length} characters, ${chips.length} chip${chips.length === 1 ? '' : 's'}, ${draw.length} shape${draw.length === 1 ? '' : 's'}` } };
+    });
+  },
   // { action: 'explain', question, context? }   commentary from the optional language model; never a made-up answer
   async explain(X, b, d) {
     const question = text(b.question, 2000, 'question', true), ctx = b.context == null ? null : safe(b.context, 'context');
@@ -931,4 +972,4 @@ module.exports = (req, res) => handle(req, res);
 module.exports.handle = handle;
 module.exports.connector = CONNECTOR;
 module.exports.useData = useData;
-module.exports._t = { GET, POST, CAPS, EDGE_IDS, ENGINES, AK, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite, QUEUE_MAX, QUEUE_TRIES, Bad };
+module.exports._t = { GET, POST, EX_CHIPS, EX_MAX, CAPS, EDGE_IDS, ENGINES, AK, DATASET_VERSION, fileData, weekOf, gradeR, expected, safe, decisionLite, QUEUE_MAX, QUEUE_TRIES, Bad };

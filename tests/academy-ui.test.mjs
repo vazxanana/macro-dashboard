@@ -144,7 +144,7 @@ test('candle errors are said in words the owner can act on', () => {
 test('registerTab: the hook for the sections built next', () => {
   assert.throws(() => MXAC.registerTab('progress', {}), /render/); assert.throws(() => MXAC.registerTab('Bad Id', { render() {} }), /short id/);
   assert.doesNotThrow(() => MXAC.registerTab('progress', { title: 'Progress', render() {} }));
-  assert.deepEqual(MXAC.TABS.map((t) => t[0]), ['train', 'session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']);
+  assert.deepEqual(MXAC.TABS.map((t) => t[0]), ['train', 'session', 'blind', 'examples', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']);
 });
 
 // ---- the API wrapper: the site's firewall allows 30 requests a minute on /api --------------------------------------------------
@@ -200,9 +200,9 @@ test('academy.html: owner card, the nine sections, the scripts in order, built b
   assert.match(html, /<title>Aureum Academy<\/title>/); assert.match(html, /<h1>Aureum Academy<\/h1>/);
   assert.match(html, /The Academy is for the desk owner\. Sign in on the desk\./);
   for (const [id] of MXAC.TABS) assert.match(html, new RegExp(`<section id="ac-${id}" role="tabpanel"`), id);
-  for (const id of ['session', 'blind', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty in the page: assets/academy-tabs.js fills it from stored data`);
+  for (const id of ['session', 'blind', 'examples', 'progress', 'lessons', 'research', 'models', 'costs', 'audit']) assert.match(html, new RegExp(`<section id="ac-${id}"[^>]*hidden></section>`), `${id} ships empty in the page: assets/academy-tabs.js (Desk examples: assets/academy-examples.js) fills it from stored data`);
   const scripts = [...html.matchAll(/<script src="([^"]+)"/g)].map((m) => m[1]);
-  assert.deepEqual(scripts, ['/assets/lightweight-charts-4.1.3.js', '/assets/backtest-engine.js', '/assets/academy-replay.js', '/assets/academy-core.js', '/assets/academy-risk.js', '/assets/mx-nav.js', '/assets/academy-ui.js', '/assets/academy-tabs.js', '/assets/academy-analyst.js']);
+  assert.deepEqual(scripts, ['/assets/lightweight-charts-4.1.3.js', '/assets/backtest-engine.js', '/assets/academy-replay.js', '/assets/academy-core.js', '/assets/academy-risk.js', '/assets/mx-nav.js', '/assets/academy-ui.js', '/assets/academy-tabs.js', '/assets/academy-examples.js', '/assets/academy-analyst.js']);
   assert.ok(!/\son[a-z]+="/.test(html), 'no inline event handlers');
   assert.ok(!/Coming in the next build step|\(next step\)/.test(ui + src('assets/academy-tabs.js') + html), 'no placeholder is left: a section works or says honestly what is missing');
   assert.match(ui, /if \(!me \|\| me\.u !== 'owner'\) \{ \$\('ac-gate'\)\.hidden = false; return; \}/, 'anyone but the owner gets the card and the page stops there');

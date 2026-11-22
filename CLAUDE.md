@@ -4395,6 +4395,36 @@ Read `docs/academy/ARCHITECTURE.md` (contract), `docs/academy/MODULES.md` (as bu
   keeps chart, account, decision, verdict). Levels are one strip (`.kv.lvl`), the decision's folds one grouped list, entry / stop
   / target appear only for a changed trade (`.choices + .lv`), a chosen verdict reads in its colour. The verdict card is "Your
   verdict" (small: "on attempt N"; the audit's correction check reads that). No decision, lesson, API or storage change.
+- **Desk examples** (22 Nov 2026, owner: "put 4 trades examples for each one of the edges … into the academy, 2 loss 2 wins …
+  i will guide you and write and do drawing on the same chart what u should had done"). A section of the Academy (tab `examples`,
+  after Blind arena; on the phone's simple view a row of its own under the five sections and "More", one tap): for every reading
+  of the Mosha and Engulfing desks, four stored paper trades (two that won, two that lost) on a chart with the record's own
+  marks, entry / stop / target and log; timeframes M1 to D1 (a window around the trade for each, `windowFor`; opens on M5, or
+  the first timeframe that holds the whole trade), Before (only candles closed at the entry; marks and log known by then) /
+  After. The owner writes "What should have been done" (2,000 characters), ticks quick verdicts (`CHIPS`) and DRAWS on the same
+  chart: select, trend line, level, box, arrow, text; move, resize by handles, colours, Delete; press-drag or click-click, touch
+  too. The geometry is the replay lab's own (`BT.drawGeom` / `drawHit` / `drawResize` / `drawMove`, `tfLogical` / `tfTimeAt`):
+  a shape is [UTC seconds, price] points, so it stays in place on every timeframe. "Copy for the assistant" / "Copy all my
+  notes" give plain text (id, reading, trade, result, verdict, the note, each drawing as its kind, points and text);
+  "Download chart image" a PNG of chart and overlay.
+  - Files: `assets/academy-examples.js` (`window.MXAX`, pure pieces first, tested in Node), styles in ONE block of
+    `assets/academy.css` right before the phone's simple view (which must close the file), `TABS` in `assets/academy-ui.js`.
+  - Data: council-data `academy/desk-examples.json`, read at `/cdata/academy/desk-examples.json` (owner session), written by
+    `council/desk-examples.mjs` **run by hand after a desk rebuild, never in the loop**, so the set stays the same while he
+    writes on it. No file yet = "No examples yet: they are written after the next desk rebuild."
+  - Notes: `api/academy.js` `GET ?get=example-notes` → `{ notes: { <example id>: { text, chips, draw, at } } }` and `POST
+    { action: 'example.note', id, text?, chips?, draw? }` (owner only, same origin, an audit row; a note is replaced as a whole,
+    an empty one removes it). Store file `examples/notes.json` (`{ v, notes }`, 400 notes at most: the next is a 409; a failed
+    read or a file of another shape is a 503 and is never overwritten). Checked on the server: id `[a-z0-9:._-]` up to 80, text
+    up to 2,000, chips from `EX_CHIPS`, at most 60 shapes of type t / h / r / a / x, each rebuilt field by field (finite
+    numbers, a text of 120 characters). The assistant connector (`api/academy-mcp.js`) does NOT read them: do not widen it.
+  - Nothing is kept in the browser (the storage allowlist did not grow): an unsaved note lives in the page's memory, the shared
+    leave guard asks once, a failed save keeps everything and offers "Try again".
+  - Display and notes only: no rule, desk record or trade is changed by it. The examples are PICKED (two winners, two losers
+    a reading): they show what a reading did, never how often it wins; never quote them as evidence.
+  - Tests: `tests/academy-examples.test.mjs`; changed on purpose: `tests/academy-ui.test.mjs` (the tab list, the page's
+    sections and scripts), `tests/academy-security.test.mjs` (a body for the new POST action). The audit opens the tab on its
+    empty state (the dev server has no examples file).
 - Regenerate data (candles outside the repo; delete any `*-m1.bin` / `xau_m1.bin` cache made before 10 Nov 2026 first):
   `ACADEMY_CANDLES=<dir> node academy/gen/run.mjs`, then `features.mjs`, `evaluate.mjs`,
   `research.mjs`, `calendar.mjs`. Local run: `sh scripts/build.sh && node scripts/academy-dev.mjs` (recorded candles; `--live` for the
@@ -6343,7 +6373,7 @@ lists "SOP inside the VR (against the BO)" / "SOP inside the CF (with the BO)" a
 rule: never quote its record as an edge. Test: `tests/mosha-sop.test.mjs` ("a SOP inside the SOP"; the older tests read the list
 with `nest: false`, `ST` is the whole one).
 **The CF one timeframe under the VR** (same day, owner sent the method's own timeframe table for BO / VR / CF): D1 → H4 → H1,
-H4 → H1 → M30, H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1 (`CFTF`: the VR's timeframe → the CF's; M1 stays M1). The BO on h and
+H4 → H1 → M15 (owner, same day: "one of them is h4 h1 m15 (not m30)"), H1 → M30 → M15, M30 → M15 → M5, M15 → M5 → M1 (`CFTF`: the VR's timeframe → the CF's; M1 stays M1). The BO on h and
 the VR on l are read as before (the same VR event, box and extreme); the CF, the pullback into its zone, the EG, the stop and the
 fill are read on the CF timeframe by a walker per sequence (`walkAdd` / `walkRun`: `msMosha`, untouched, gets the l timeframe's
 VR as its first event and the CF timeframe's small breaks after it, one closed candle at a time; the "CF inside the VR" case

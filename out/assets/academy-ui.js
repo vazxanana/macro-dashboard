@@ -35,7 +35,7 @@
   const HTFS = ['1h', '4h', '1d'];
   const DAY = 86400, LOOKBACK_BARS = 300, THESIS_EVERY = 12;   // candles between two no-candidate thesis updates
   const DIFFICULTY = ['beginner', 'intermediate', 'advanced', 'expert'];
-  const TABS = [['train', 'Train'], ['session', 'Session'], ['blind', 'Blind arena'], ['progress', 'Progress'], ['lessons', 'Lessons'], ['research', 'Research'], ['models', 'Models'], ['costs', 'Costs'], ['audit', 'Audit']];
+  const TABS = [['train', 'Train'], ['session', 'Session'], ['blind', 'Blind arena'], ['examples', 'Desk examples'], ['progress', 'Progress'], ['lessons', 'Lessons'], ['research', 'Research'], ['models', 'Models'], ['costs', 'Costs'], ['audit', 'Audit']];
   const REASONS = [['missing-confirmation', 'missing confirmation'], ['wrong-structure', 'wrong structure'], ['liquidity', 'liquidity'], ['htf-bias', 'higher-timeframe bias'], ['session', 'session'],
     ['volatility', 'volatility'], ['rr', 'reward to risk'], ['news', 'news'], ['late', 'too late'], ['early', 'too early'], ['other', 'other']];
   const ANNOTATIONS = [['entry', 'entry'], ['stop', 'stop'], ['target', 'target'], ['liquidity', 'liquidity'], ['structure', 'structure'], ['sr', 'support / resistance'], ['supply-demand', 'supply / demand'], ['invalidation', 'invalidation']];

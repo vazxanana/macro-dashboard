@@ -144,7 +144,7 @@ async function startServer(port = PORT, flags = []) {
     await p.goto(H + '/academy', { waitUntil: 'load' }); await setup(p, null, null);
     check('title and heading are "Aureum Academy"', (await p.title()) === 'Aureum Academy' && (await txt(p, 'h1')) === 'Aureum Academy', await p.title());
     const tabs = await p.$$eval('#ac-tabs [role=tab]', (l) => l.map((x) => x.textContent.trim()));
-    check('nine sections as tabs, Train first', tabs.length === 9 && /^Train$/.test(tabs[0]) && ['Session', 'Blind arena', 'Progress', 'Lessons', 'Research', 'Models', 'Costs', 'Audit'].every((t, i) => tabs[i + 1].startsWith(t)), tabs.join(' | '));
+    check('ten sections as tabs, Train first', tabs.length === 10 && /^Train$/.test(tabs[0]) && ['Session', 'Blind arena', 'Desk examples', 'Progress', 'Lessons', 'Research', 'Models', 'Costs', 'Audit'].every((t, i) => tabs[i + 1].startsWith(t)), tabs.join(' | '));
     check('no tab is a placeholder any more', !tabs.some((t) => /next step/.test(t)) && !/Coming in the next build step/.test(await txt(p, '#ac-app')), tabs.join(' | '));
     await p.click('#tab-progress'); await p.waitForSelector('#pg-counts', { timeout: 15000 }).catch(() => {});
     check('a fresh store: Progress shows an honest empty state that says what to do, and hides the Train tab', /Nothing is stored for this edge yet\. Run a replay in the Train tab/.test(await txt(p, '#pg-counts')) && (await txt(p, '#pg-n-attempts')).startsWith('0') && /Nothing is queued/.test(await txt(p, '#pg-queue')) && !(await vis(p, '#setup')), await txt(p, '#pg-counts'));
@@ -575,6 +575,11 @@ async function startServer(port = PORT, flags = []) {
     check('no future bar reached a decision in the blind arena or the session either', ck2.future === 0 && ck2.snapshots > ck.snapshots, JSON.stringify(ck2));
     const audit2 = [...new Set((await api(p, 'get=audit')).rows.map((r) => r.action))];
     check('the new writes are in the audit trail too', ['lesson.revise', 'lesson.deactivate', 'notebook.add', 'blind.submit', 'miss'].every((a) => audit2.includes(a)), audit2.join(','));
+
+    // ---- Desk examples: the tab opens; this server has no examples file, so it says what will appear ----
+    await p.click('#tab-examples'); await p.waitForSelector('#ex-empty', { timeout: 20000 });
+    check('Desk examples: the tab opens on its empty state in words (no examples file here), with nothing to pick and no error', /^No examples yet: they are written after the next desk rebuild\./.test(await txt(p, '#ex-empty')) && (await p.locator('#ac-examples .ac-err').count()) === 0 && await p.isHidden('#ex-main'), await txt(p, '#ac-examples'));
+    check('Desk examples: the notes are read through the real handler', typeof (await api(p, 'get=example-notes')).notes === 'object');
 
     // ---- 11h. the rate limit: a 429 is waited out calmly and the call carries on ----
     {
