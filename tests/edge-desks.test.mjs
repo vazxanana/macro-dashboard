@@ -397,7 +397,7 @@ test('plan and simple: the 15- / 30-minute engulf zone lies inside the H4 zone, 
   let n = 0;
   for (const seed of [11, 5, 23, 31, 47]) { const X = seed === 11 ? B : market(120, seed), Y = { ...X, '15m': m15of(X['5m']) }, m5 = new Map(Y['5m'].map((b) => [b.time, b]));
     for (const r of G.methodTrades(Y, { from: 0, market: 'xau' }).filter((x) => x.kind !== 'eg-direct')) { n++; assert.ok(stopOk(r)); assert.ok(Math.abs(Math.abs(r.entry - r.stop) - G.EGM.pips) < 1e-9, '30 pips from the entry');
-      const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), en = r.marks.find((k) => k.label === 'M5 EG zone · entry');
+      const h4 = r.marks.find((k) => /^H4 E[GF]/.test(k.label)), trg = r.marks.find((k) => /^M(15|30) EG zone$/.test(k.label)), en = r.marks.find((k) => k.label.startsWith('M5 EG zone · entry'));
       assert.ok(trg.bot >= h4.bot && trg.top <= h4.top, 'the trigger zone is not wholly inside the H4 zone: ' + r.id);
       assert.ok(en.bot <= Math.max(h4.top, trg.top) && en.top >= Math.min(h4.bot, trg.bot), 'the entry zone is away from the zone: ' + r.id);
       const base = m5.get(en.a); assert.deepEqual([en.top, en.bot], [base.high, base.low], 'the entry zone is its base candle, wick to wick'); assert.equal(r.entry, r.side > 0 ? base.high : base.low); } }
@@ -735,4 +735,13 @@ test('the earlier scalp method: an EG is two candles, the second closes beyond t
     assert.ok(z.top === p.high && z.bot === p.low, 'the M5 zone is the first candle, wick to wick: ' + r.id);
     assert.ok(E.eg2(p, c, r.side), 'the second candle closes beyond the first: ' + r.id);
     const z15 = r.marks.find((m) => m.label === 'M15 EG'); if (z15) { const k = M5.filter((b) => b.time >= z15.a && b.time < z15.a + 900); assert.ok(Math.abs(z15.top - Math.max(...k.map((b) => b.high))) < 1e-12 && Math.abs(z15.bot - Math.min(...k.map((b) => b.low))) < 1e-12, 'the M15 zone is the first 15-minute candle: ' + r.id); } }
+});
+
+test('an engulf completes within four candles of its first candle, never later (owner, 22 Nov 2026)', () => {
+  const c = (o, cl, h, l) => ({ open: o, close: cl, high: h ?? Math.max(o, cl) + 0.1, low: l ?? Math.min(o, cl) - 0.1 }), red = c(10, 9), in1 = c(9, 9.4, 9.5, 8.95), up = c(9.4, 10.5);
+  const at = (n) => { const C = [red, ...Array.from({ length: n - 1 }, () => ({ open: 9.2, close: 9.2, high: 9.5, low: 8.95 })), up].map((b, i) => ({ ...b, time: i * 900 })); return G.engulfAt(C, C.length - 1); };
+  assert.equal(G.EG_SPAN, 4);
+  for (const n of [1, 2, 3, 4]) assert.deepEqual(at(n), { dir: 1, j: 0 }, 'completed by candle ' + n + ' after');
+  assert.equal(at(5), null, 'the fifth candle after is too late');
+  assert.match(rd('assets/mosha-sop.js'), /var EG_SPAN = 4;[\s\S]*j >= i - EG_SPAN/, 'the page copy uses the same span');
 });

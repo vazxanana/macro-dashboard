@@ -6180,3 +6180,13 @@ engulf that forms INSIDE an earlier EG zone still alive counts (his example: 13:
 14:30 candle did close below the 14:15 low), and whether the Engulfing desk's any-number-of-candles reading should go now
 that an EG is two candles. A paper reading, not an edge. Test: `tests/edge-desks.test.mjs`.
 
+## An engulf completes within four candles (22 Nov 2026, owner: "the next 3 max 4 candles we must have a eg, more than that not"; on 35 marked examples of four charts: "yes all right")
+`council/eg-methods.mjs` `EG_SPAN` 4, the default of `engulfAt`, `zones`, `triggers` and `methodTrades` (it was any number of
+candles, the owner's 21 Nov answer): the first candle is the last candle of the other colour, a candle at most four candles after
+it that closes beyond its high (buy) / low (sell) completes the EG, the zone is the first candle wick to wick. Every reader
+follows: the Engulfing plan / short method / direct entry, the MSNR gold plan and the direction's Daily EG levels, and the Mosha
+desk's EG barriers (`assets/mosha-sop.js` `egBoxes`, the page copy, same span; a test compares). The Engulfing desk's
+`-n` kinds (next candle only) stay beside them. The earlier scalp method still takes two neighbouring candles only (`eg2`), a
+subset. The owner's 14:15 / 14:30 "no" of that day was the box drawn over both candles, not the pair: with the box on the first
+candle he passed it. Stored records keep the older rule until the histories are rebuilt. Readings, not tested edges.
+Same day, owner: "the less candles the better": a zone carries `n` (candles the engulf took) and the entry zone's chart label says it ("M5 EG zone · entry · 1 candle", `egN`). Shown, not a filter.
