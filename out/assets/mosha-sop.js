@@ -72,7 +72,7 @@
   var MARKETS = { xau: { name: 'Gold', dec: 2 }, xag: { name: 'Silver', dec: 3 }, eurusd: { name: 'EUR/USD', dec: 5 }, gbpusd: { name: 'GBP/USD', dec: 5 }, nas100: { name: 'Nasdaq 100', dec: 1 } };
   // every market a desk tracker may record (the LIT desk reads more than the Mosha five); MARKETS stays the Mosha tracker's list
   // the Mosha desk's own markets (owner, 21 Nov 2026: "mosha keep gold and eurusd and gbpusd"); MARKETS stays the Engulfing desk's five
-  var MOSHA = ['xau', 'eurusd', 'gbpusd'];
+  var MOSHA = ['xau'];   // owner, 22 Nov 2026: "mosha drop GU keep only gold" (EUR/USD and GBP/USD leave the Mosha desk)
   var ALL = { xau: MARKETS.xau, xag: MARKETS.xag, eurusd: MARKETS.eurusd, gbpusd: MARKETS.gbpusd, nas100: MARKETS.nas100, usdjpy: { name: 'USD/JPY', dec: 3 }, audusd: { name: 'AUD/USD', dec: 5 }, usdcad: { name: 'USD/CAD', dec: 5 },
     spx500: { name: 'S&P 500', dec: 1 }, us30: { name: 'Dow 30', dec: 1 }, de40: { name: 'DAX 40', dec: 1 } };
   var REF = 4000, mkOf = function (k) { return ALL[k] ? k : 'xau'; };

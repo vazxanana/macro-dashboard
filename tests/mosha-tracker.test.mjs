@@ -95,7 +95,7 @@ test('more markets: a record of another market keeps its market and its decimals
   assert.equal(M.clean(rec({ id: 'eurusd:x', market: 'eurusd', entry: 1.15, stop: 1.14 })), null, 'rule 1 on every market');
   const out = M.merge([M.clean(rec({}))], [rec({ id: 'eurusd:bar-15m-1000', market: 'eurusd', entry: 1.1523, stop: 1.1530, target: 1.1502 })], 1500);
   assert.equal(out.length, 2, 'same kind, side and minute on another market is another trade');
-  assert.deepEqual(M.OTHER, ['eurusd', 'gbpusd']);
+  assert.deepEqual(M.OTHER, [], 'gold only since 22 Nov 2026');
   const src = rd('council/mosha-desk.mjs'); assert.match(src, /for \(const m of OTHER\) \{ try \{/); assert.match(src, /skipped/);
   const page = rd('assets/mosha-sop.js'); assert.match(page, /data-sop-mk/); assert.match(page, /market: mkR\(r\)/);
 });
@@ -173,8 +173,8 @@ test('an open record the run no longer reads is settled on the candles at its st
 test('the Mosha desk keeps gold, EUR/USD and GBP/USD only (owner, 21 Nov 2026): other markets\' records go', () => {
   const rec = (id, market) => ({ id, t: 1795000000 + id.length, side: 1, entry: 1, stop: 0.9, target: 1.2, status: 'stopped', R: -1, kind: 'barrier', ...(market ? { market } : {}) });
   const out = M.keepMarkets({ records: [rec('a'), rec('xag:b', 'xag'), rec('eurusd:c', 'eurusd'), rec('nas100:d', 'nas100'), rec('gbpusd:e', 'gbpusd')], counts: {} });
-  assert.deepEqual(out.records.map((r) => r.id), ['a', 'eurusd:c', 'gbpusd:e']);
-  assert.deepEqual(out.markets.sort(), ['eurusd', 'gbpusd', 'xau']); assert.equal(out.counts.n, 3);
+  assert.deepEqual(out.records.map((r) => r.id), ['a']);
+  assert.deepEqual(out.markets, ['xau']); assert.equal(out.counts.n, 1);
 });
 
 test('the readings of 21 Nov 2026 (second table, M30 barriers, repeat of the SOP) are read back from a stored id, and are never taken for a re-read of another order', () => {

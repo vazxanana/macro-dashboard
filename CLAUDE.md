@@ -6455,3 +6455,8 @@ reading's target. A close past the extreme made at the barrier, or no M1 BO with
 (short, so "with / against H4" still fits the stored 56 characters); `tapFirst: false` (also through `deskTrades`) reads it as before. Other barriers keep the M1 BO at the tap; an M15 / M30 barrier's tap entry that was the same order as the old H1 one
 comes back under its own name (`uniq` kept the H1 record before). 60 days before costs: H1 tap entries 971 -> 204 across gold,
 EUR/USD and GBP/USD; gold worse, EUR/USD better, GBP/USD mixed. A reading, not a tested rule.
+
+## The Mosha desk is gold only (22 Nov 2026, owner: "mosha drop GU keep only gold")
+`assets/mosha-sop.js` `MOSHA` = `['xau']`: the card shows gold only and `council/mosha-desk.mjs` `OTHER` is empty, so the tracker
+reads no other market and `keepMarkets` drops the stored EUR/USD and GBP/USD records on its next run. `MARKETS` (the Engulfing
+desk's five) is unchanged.

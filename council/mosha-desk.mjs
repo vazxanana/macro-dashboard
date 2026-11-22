@@ -43,7 +43,7 @@ export async function bars(tf, now, get = fetch, days = SOP.DAYS, sym = 'xau') {
 // the council Trader's own fallback for gold. It trades at the weekend and a few dollars from spot, and Kraken serves only its
 // last 720 candles a timeframe, so: weekend candles are dropped, a fallback run never touches a record read on OANDA, and it
 // adds only entries of the last FALLBACK_NEW_S (what is happening now), never a replay of history on another price basis.
-export const OTHER = SOP.MOSHA.filter((k) => k !== 'xau');   // owner, 21 Nov 2026: gold, EUR/USD and GBP/USD only
+export const OTHER = SOP.MOSHA.filter((k) => k !== 'xau');   // owner, 22 Nov 2026: gold only (empty: no other market is read)
 export const FALLBACK_NEW_S = 2 * 3600;
 const KR = { '1m': 1, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '4h': 240, '1d': 1440 };
 export const spotShut = (t) => { const d = new Date(t * 1000), wd = d.getUTCDay(), h = d.getUTCHours(); return wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21); };
