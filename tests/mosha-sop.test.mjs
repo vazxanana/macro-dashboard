@@ -21,6 +21,10 @@ function makeMarket(days, seed) {
 // 22 Nov 2026: the failed-QM entries (a trade with the direction at a barrier against it) have their own shape and their own
 // test at the end of this file; every older test reads the barrier list without them (BT = the whole list).
 const BT = M.barrierTrades; M.barrierTrades = (B, Fx, o) => BT(B, Fx, o).filter((r) => !r.qmFail && !r.tap);
+// 22 Nov 2026: a SOP inside the SOP (the VR and the CF each start a lower-timeframe sequence) has its own shape and its own
+// test at the end of this file; every older test reads the sequence list without it (ST = the whole list). nest: false is
+// the same list as the whole one less the nested records (that test compares the two), and does not run their walk.
+const ST = M.sopTrades; M.sopTrades = (B, Fx, o) => ST(B, Fx, { nest: false, ...(o || {}) }).filter((r) => !r.nest);
 // Every market and every replay is worked out ONCE and shared by the tests below (21 Nov 2026: the file had grown to about a
 // quarter of an hour, most of it the same replay run again by each test). A replay is keyed by its candles, its cut and its
 // options; nothing a test asserts was dropped for it.
@@ -657,4 +661,41 @@ test('M1 BO at the tap of a barrier: a market entry at the M1 close, the stop pa
     for (const r of t.slice(0, 4)) { const T = cutFor(seed, r.t + 60); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
       assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); c++; } }
   assert.ok(n > 0 && c > 0, 'tap entries: ' + n + ', checked against a cut: ' + c);
+});
+
+test('a SOP inside the SOP: the VR starts a lower-timeframe sequence against the BO and the CF one with it; a stop on the losing side; off with nest: false; no hindsight', async () => {
+  let nv = 0, nc = 0, cuts = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), all = ST(X, F, { from: fr }), n = all.filter((r) => r.nest), off = ST(X, F, { from: fr, nest: false });
+    assert.ok(n.some((r) => r.nest === 'vr') && n.some((r) => r.nest === 'cf'), `seed ${seed}: both legs give records`);
+    assert.equal(off.filter((r) => r.nest).length, 0);
+    assert.deepEqual(all.filter((r) => !r.nest).map(keyOf), off.map(keyOf), 'the main sequence is unchanged: nest false is the old list');
+    assert.equal(new Set(all.map((r) => r.id)).size, all.length, 'ids are unique');
+    for (const r of n) { const v = r.nest === 'vr'; v ? nv++ : nc++;
+      assert.equal(r.kind, 'sop'); assert.ok(rule1(r), 'a stop on the losing side, a target on the winning side: ' + r.id);
+      assert.ok(r.of === 1 || r.of === -1); assert.equal(r.side, v ? -r.of : r.of, 'the VR leg trades against the first BO, the CF leg with it');
+      assert.match(r.id, v ? /^sop-nv-(1h|30m|15m|5m|1m)-[bs]\d+$/ : /^sop-nc-(1h|30m|15m|5m|1m)-[bs]\d+$/); assert.equal(r.id.endsWith((r.side > 0 ? 'b' : 's') + r.t), true);
+      assert.equal(r.l, M.LOWER[r.h] || M.DOWN[r.h], 'one timeframe lower'); assert.match(r.label, v ? / VR → M?\w+ SOP inside the VR$/ : / CF → M?\w+ SOP inside the CF$/);
+      assert.ok(r.t >= fr && r.r0 > 0 && r.log.length >= (v ? 5 : 6) && r.marks.length >= (v ? 4 : 5));
+      const ts = r.log.filter((x) => x.t != null).map((x) => x.t); assert.deepEqual(ts, ts.slice().sort((a, b) => a - b), 'the log is in time order');
+      assert.ok(r.log.slice(0, -1).every((x) => x.t <= r.t), 'nothing in the log before the result is later than the entry');
+      // the entry is the close of the EG candle of the lower timeframe
+      const c = X[r.l].find((b) => b.time + M.SEC[r.l] === r.t); assert.ok(c && Math.abs(c.close - r.entry) < 1e-9, 'entered at the close of its EG candle'); }
+    // NO HINDSIGHT: one minute after the entry (an unaligned cut) the same record is there with the same levels, and at the pool's cut too
+    const pick = n.filter((r) => r.nest === 'cf').slice(0, 1).concat(n.filter((r) => r.nest === 'vr').slice(0, 1), n.filter((r) => r.nest === 'vr').slice(-1));
+    for (const r of pick) { for (const T of [r.t + 60, cutFor(seed, r.t + 60)]) { if (!T) continue; cuts++;
+        const k = ST(cut(X, T), F, { from: fr }).find((q) => q.id === r.id); assert.ok(k, `seed ${seed}: found only with later candles: ${r.id}`);
+        assert.deepEqual([k.side, k.entry, k.stop, k.target, k.of], [r.side, r.entry, r.stop, r.target, r.of]); }
+      assert.equal(ST(cut(X, r.t - 1), F, { from: fr }).some((q) => q.id === r.id), false, 'not before its EG candle closed: ' + r.id); cuts++; } }
+  assert.ok(nv >= 4 && nc >= 2 && cuts >= 12, `VR legs ${nv}, CF legs ${nc}, cuts ${cuts}`);
+  // an order another reading already gave is recorded once, under the other reading's id
+  const a = { id: 'sop-5m-1', kind: 'sop', h: '15m', side: 1, t: 100, entry: 4000, stop: 3998 }, b = { ...a, id: 'bar-sop-x', kind: 'barrier' }, c = { ...a, id: 'sop-nc-1m-b100', h: '5m', nest: 'cf' };
+  assert.deepEqual(M.uniq([c, b]).map((r) => r.id), ['bar-sop-x']); assert.deepEqual(M.uniq([c, a, b]).map((r) => r.id), ['sop-5m-1']); assert.deepEqual(M.uniq([c]).map((r) => r.id), ['sop-nc-1m-b100']);
+  // the tracker's store: the reading survives from the id alone, and a nested record beside a plain one is never a re-read of it
+  const TK = await import('../council/mosha-desk.mjs'), rec = (o) => ({ kind: 'sop', h: '5m', l: '1m', side: -1, t: 1000, entry: 100, stop: 102, target: 94, status: 'open', R: null, log: [{ t: 990, text: 'x' }], ...o });
+  const st = TK.clean(rec({ id: 'sop-nv-1m-s1000', nest: 'vr', of: 1, label: 'M15 BO → M5 VR → M1 SOP inside the VR' })); assert.deepEqual([st.id, st.kind, st.label, 'nest' in st], ['sop-nv-1m-s1000', 'sop', 'M15 BO → M5 VR → M1 SOP inside the VR', false]);
+  const prev = [{ ...TK.clean(rec({ id: 'sop-1m-940' })), first: 1, src: 'replay' }], mg = TK.merge(prev, [rec({ id: 'sop-1m-940' }), rec({ id: 'sop-nv-1m-s1000' }), rec({ id: 'sop-nc-1m-s1000' })], 5000);
+  assert.deepEqual(mg.map((r) => r.id).sort(), ['sop-1m-940', 'sop-nc-1m-s1000', 'sop-nv-1m-s1000']);
+  assert.equal(TK.merge(mg, [rec({ id: 'sop-nv-1m-s1300', t: 1300 })], 6000).length, 3, 'the same nested trade re-read under another id is still left out');
+  // the desk names them and lists them apart from the plain sequence
+  assert.match(src, /SOP inside the VR \(against the BO\)/); assert.match(src, /SOP inside the CF \(with the BO\)/); assert.match(src, /line\('BO, VR, CF', sop\.filter\(function \(r\) \{ return !isC2\(r\) && !isNest\(r\); \}\)\)/);
 });
