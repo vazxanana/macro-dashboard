@@ -765,3 +765,11 @@ test('"Both": a CF counts only once price is back at the level the BO broke, and
   assert.deepEqual(mg.map((r) => r.id).sort(), ['sop-5m-700', 'sop-l-5m-s900']); assert.equal(TK.merge(mg, [rec({ id: 'sop-l-5m-s1200', t: 1200 })], 6000).length, 2, 'the same limit re-read under another id is still left out');
   assert.match(src, /line\('BO, VR, CF: limit at the CF line', sop\.filter\(isLim\)/);
 });
+
+test('scalp / intraday / swing tag by the top timeframe (display only)', () => {
+  const S = M.styleOf;
+  assert.equal(S({ h: '1d' }), 'swing'); assert.equal(S({ h: '4h' }), 'intraday');
+  for (const h of ['1h', '30m', '15m']) assert.equal(S({ h }), 'scalp');
+  assert.equal(S({ h: '15m', up: '4h' }), 'intraday', 'a SOP inside the SOP takes the main BO\'s timeframe');
+  assert.equal(S({}), '');
+});

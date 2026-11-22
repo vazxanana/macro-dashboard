@@ -6401,3 +6401,7 @@ Only where the CF is read on its own timeframe (none with `cf: 'same'`). `cfLimi
 CF: entry on the EG" and "BO, VR, CF: limit at the CF line" apart. Readings, not tested rules: never quote either record as an
 edge. The research scripts that call `sopTrades` (`desk-rigor`, `desk-partial`) were run on the reading before; a re-run reads
 the new defaults. Test: '"Both"' (the older tests pin `nest: false, cf: 'same', cfBack: false, cfLimit: false`).
+**Scalp / intraday / swing on the Mosha desk** (22 Nov 2026, the owner's "Yrs" to the Engulfing table's tag): `MS_MOSHA_SOP.styleOf(r)`
+reads the trade's TOP timeframe (`r.up || r.h`: the BO's for a sequence, the main BO's for a SOP inside the SOP, the barrier's for
+a barrier): D1 swing, H4 intraday, H1 and lower scalp (the Engulfing chains' split). Shown on each row and Open now card, and three
+lines under "By entry type". A label from stored fields, nothing stored, no rule reads it. Test: `tests/mosha-sop.test.mjs`.

@@ -41,6 +41,10 @@
   'use strict';
   var SEC = { '1d': 86400, '4h': 14400, '1h': 3600, '30m': 1800, '15m': 900, '5m': 300, '1m': 60 };
   var NAME = { '1d': 'D1', '4h': 'H4', '1h': 'H1', '30m': 'M30', '15m': 'M15', '5m': 'M5', '1m': 'M1' };
+  // scalp / intraday / swing (owner, 22 Nov 2026: "Yrs" to the engulfing table's tag): by the trade's TOP timeframe, the BO's for a
+  // sequence (the main BO's for a SOP inside the SOP) and the barrier's for a barrier; D1 swing, H4 intraday, H1 and lower scalp,
+  // the same split as the Engulfing desk's three chains. A label only: read from h / up, nothing stored, no rule reads it.
+  var styleOf = function (r) { var t = (r && (r.up || r.h)) || ''; return t === '1d' ? 'swing' : t === '4h' ? 'intraday' : t ? 'scalp' : ''; };
   var LADDER = [['1d', '4h'], ['4h', '1h'], ['1h', '30m'], ['30m', '15m'], ['15m', '5m']];   // the VR forms exactly one timeframe lower
   var BACK = { '1d': 1500, '4h': 260, '1h': 90, '30m': 60, '15m': 40, '5m': 24, '1m': 16 };  // days of candles each timeframe needs
   // BARRIER_R: 3 until 22 Nov 2026. Owner ("keep the best rr for each individual one"): a 1R target did best on the barrier
@@ -841,7 +845,7 @@
     return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
       function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
   }
-  var API = { backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  var API = { styleOf: styleOf, backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -966,6 +970,7 @@
       '<details class="mo-sop-more"><summary>By entry type, and what this is</summary>' + line('BO, VR, CF: entry on the EG', sop.filter(function (r) { return !isC2(r) && !isNest(r) && !isLim(r); })) + line('BO, VR, CF: limit at the CF line', sop.filter(isLim), 'The owner\'s reading of 22 Nov 2026: a plain limit at the level the CF\'s break took, stop past the CF zone, recorded beside the EG entry so the two can be compared.') + line('BO, VR, CF with the CF inside the VR', sop.filter(isC2), 'The method calls this CF likely to fail and waits; it is recorded apart so the record can show the case.') +
       line('SOP inside the VR (against the BO)', sop.filter(function (r) { return isNest(r) === 'vr'; }), 'The owner\'s reading of 22 Nov 2026: the VR\'s break is read as a BO one timeframe lower and a whole BO, VR, CF is traded there, against the first BO, until the CF forms.') +
       line('SOP inside the CF (with the BO)', sop.filter(function (r) { return isNest(r) === 'cf'; }), 'The CF\'s break is read as a BO one timeframe lower and a whole BO, VR, CF is traded there, with the first BO; the main sequence is recorded beside it.') + line('Barrier entry', bar, 'It takes every fresh barrier; the method says to mark the best one, and that choice is not in the replay.') +
+      ['swing', 'intraday', 'scalp'].map(function (st) { return line(st === 'swing' ? 'Swing (D1 top timeframe)' : st === 'intraday' ? 'Intraday (H4 top timeframe)' : 'Scalp (H1 and lower top timeframe)', all.filter(function (r) { return styleOf(r) === st; })); }).join('') +
       line('Barrier with the older 3R target', barOld, 'The same barrier entries and stops as the current reading, with the 3R target the desk used until 22 Nov 2026 instead of 1R. Recorded beside the current reading, never mixed into it.') +
       line('Barrier, limit at the level the QM broke', bar.filter(function (r) { return !readings(r).atZone; })) +
       line('Barrier, limit at the zone\'s near side', bar.filter(function (r) { return readings(r).atZone; }), 'The owner\'s reading: a second limit at the barrier zone\'s near side, recorded beside the one at the broken level.') +
