@@ -6411,3 +6411,17 @@ the new defaults. Test: '"Both"' (the older tests pin `nest: false, cf: 'same', 
 reads the trade's TOP timeframe (`r.up || r.h`: the BO's for a sequence, the main BO's for a SOP inside the SOP, the barrier's for
 a barrier): D1 swing, H4 intraday, H1 and lower scalp (the Engulfing chains' split). Shown on each row and Open now card, and three
 lines under "By entry type". A label from stored fields, nothing stored, no rule reads it. Test: `tests/mosha-sop.test.mjs`.
+
+## The Mosha desk: each reading on the structure it did best with (22 Nov 2026, owner: "test the results of the market structure i told u", then "keep the good ones and replace the bad ones")
+The owner's marked H1 chart (29-30 Oct): in a running move a new low (high) counts once ONE candle has closed after it, and a
+close beyond it is a BO; the page waited six (`msAnalyze`'s extreme fixed after N candles). `msAnalyze(bars, N, NB)` takes the
+number of confirming candles as a third argument (default N: the Charts page and every other caller are unchanged).
+`assets/mosha-sop.js` `deskTrades(B, F, { from, market })` (used by the tracker's `build` and the browser replay) runs the
+readings twice and keeps, per reading, the structure that did better on the last 60 days of gold, EUR/USD and GBP/USD:
+one-candle (`oneCandle(F)`, `ONE_N` 1) for the CF limit, the CF inside the VR, the VR retest, the SOP inside the CF, the
+barrier with its 3R target, the M1 BO at the tap and the repeat of the SOP; six-candle (`sixCandle(r)` true) for the EG entry,
+the SOP inside the VR and the barrier with its 1R target. Records carry `structN`. 60 days before costs: today -36.7R on
+13,617 trades, one-candle everywhere +539.7R on 21,226, mixed +667.9R on 18,846. PICKED ON THOSE 60 DAYS, BEFORE COSTS: a
+choice, not a tested result; never quote it as an edge. A run takes about twice as long: `council.yml` gives the tracker
+`timeout 240` (was 120). Tests: `tests/mosha-sop.test.mjs` (the test file wraps `M.sopTrades` with older options: compare with
+`ST`, the unwrapped one).

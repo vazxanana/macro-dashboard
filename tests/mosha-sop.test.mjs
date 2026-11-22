@@ -789,3 +789,27 @@ test('a desk trade\'s chart window shows its chart in the phone\'s simple view (
   const hide = html.indexOf('html[data-phone="simple"] [data-ps]:not([data-ps-open]) { display: none !important; }'), show = html.indexOf('html[data-phone="simple"] #mo-rp-dlg #mo-replay[data-ps] { display: block !important; }');
   assert.ok(hide > 0 && show > hide);   // the folded chart card is the one the window borrows: it must be open there
 });
+
+test('each reading keeps the structure it did best with: one-candle or six-candle (22 Nov 2026)', () => {
+  const six = ['sop-15m-b1', 'sop-i-15m-b1', 'sop-nv-5m-s1', 'bar-1h-b1', 'bar-eg-4h-s1', 'bar-sw-1h-b1', 'xau:bar-z-1h-b1'];
+  const one = ['sop-l-15m-b1', 'sop-l-i-15m-b1', 'sop-c2-15m-b1', 'sop-vr-15m-s1', 'sop-vc-15m-s1', 'sop-nc-5m-b1', 'bar-old-1h-b1', 'bar-tap-1h-b1', 'bar-sop-1h-b1', 'bar-sop-f-1h-s1', 'eurusd:bar-old-eg-4h-s1'];
+  for (const id of six) assert.equal(M.sixCandle({ id }), true, id);
+  for (const id of one) assert.equal(M.sixCandle({ id }), false, id);
+  const page = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
+  assert.match(page, /function msAnalyze\(bars, N, NB\)/);
+  assert.equal((page.match(/i - ext\.i >= \(NB \|\| N\)/g) || []).length, 2);   // the Charts page passes no NB: its structure is unchanged
+  const Fx = { msAnalyze: (b, N, NB) => ({ N, NB }) };
+  assert.deepEqual(M.oneCandle(Fx).msAnalyze([], 3), { N: 3, NB: 1 });
+  const desk = fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8');
+  assert.match(desk, /SOP\.deskTrades\(B, F, \{ from, market \}\)/);
+  assert.match(fs.readFileSync(new URL('../assets/mosha-sop.js', import.meta.url), 'utf8'), /ok\(deskTrades\(B, F, \{ from: from \}\)\)/);
+});
+
+test('deskTrades: every record carries the structure it was read on, and the six-candle readings equal the desk as it was', () => {
+  const B = makeMarket(8, 11), rows = M.deskTrades(B, F, { from: 0 });
+  assert.ok(rows.length > 0);
+  for (const r of rows) assert.equal(r.structN, M.sixCandle(r) ? 6 : 1, r.id);
+  const was = ST(B, F, { from: 0 }).filter(M.sixCandle).map((r) => r.id).sort();
+  const now = rows.filter((r) => r.structN === 6 && /^sop-/.test(r.id)).map((r) => r.id).sort();
+  assert.ok(now.every((id) => was.includes(id)));   // uniq may drop a twin, never invent one
+});

@@ -130,6 +130,25 @@
   // A SOP inside the SOP ("sop-nv-", "sop-nc-", 22 Nov 2026) comes last of all: when it is the very order another reading
   // already gave, the other record is kept.
   function orderKey(r) { return [mkOf(r.market), r.case2 ? 'c2' : r.cfLimit ? 'lim' : '', r.side, r.t, (+r.entry).toPrecision(10), (+r.stop).toPrecision(10)].join('|'); }
+  // The structure each reading uses (22 Nov 2026, owner: "keep the good ones and replace the bad ones"). The owner's own marks
+  // count a new high / low of a running move once ONE candle has closed after it (msAnalyze's third argument); the desk read it
+  // after six. Both were run on the last 60 days of gold, EUR/USD and GBP/USD: the one-candle structure is kept where it did
+  // better (the CF limit, the CF inside the VR, the VR retest, the SOP inside the CF, the barrier with its 3R target, the M1 BO
+  // at the tap, the repeat of the SOP) and the six-candle one where it did worse (the EG entry, the SOP inside the VR, the
+  // barrier with its 1R target). Picked on those 60 days, before costs: a choice, not a tested result.
+  var ONE_N = 1;
+  function oneCandle(F) { var o = {}; for (var k in F) o[k] = F[k]; o.msAnalyze = function (b, N) { return F.msAnalyze(b, N, ONE_N); }; return o; }
+  function sixCandle(r) { var id = String(r.id || '').replace(/^[a-z0-9]+:/, '');
+    if (/^sop-nv-/.test(id)) return true; if (/^sop-(l|c2|vr|vc|nc)-/.test(id)) return false; if (/^sop-/.test(id)) return true;
+    return /^bar-/.test(id) && !/^bar-(old|tap|sop)-/.test(id); }
+  function deskTrades(B, F, o) {
+    o = o || {}; var F1 = oneCandle(F), c6 = [], c1 = [], base = { from: o.from, market: o.market };
+    var w = function (x) { var r = {}; for (var k in base) if (base[k] !== undefined) r[k] = base[k]; for (var k2 in x) r[k2] = x[k2]; return r; };
+    var s6 = sopTrades(B, F, w({ cfOut: c6 })).filter(sixCandle), s1 = sopTrades(B, F1, w({ cfOut: c1 })).filter(function (r) { return !sixCandle(r); });
+    var b6 = barrierTrades(B, F, w({ extra: c6 })).filter(sixCandle), b1 = barrierTrades(B, F1, w({ extra: c1 })).filter(function (r) { return !sixCandle(r); });
+    var tag = function (rows, n) { rows.forEach(function (r) { r.structN = n; }); return rows; };
+    return uniq(tag(s6, 6).concat(tag(s1, ONE_N), tag(b6, 6), tag(b1, ONE_N))).concat(tag(oldBarrierTrades(B, F1, w({ extra: c1 })), ONE_N));
+  }
   function uniq(rows) {
     var idx = rows.map(function (r, i) { return i; }), rk = function (r) { return (r.kind === 'sop' ? 0 : 4e9) + (r.ibo ? 2e9 : 0) + (r.nest ? 8e9 : 0) + (1e6 - (SEC[r.h] || 0)); }, seen = {}, keep = {};
     idx.sort(function (a, b) { return rk(rows[a]) - rk(rows[b]) || a - b; });
@@ -845,7 +864,7 @@
     return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
       function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
   }
-  var API = { styleOf: styleOf, backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  var API = { deskTrades: deskTrades, sixCandle: sixCandle, oneCandle: oneCandle, ONE_N: ONE_N, styleOf: styleOf, backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -883,8 +902,8 @@
     Object.keys(BACK).forEach(function (tf) { p = p.then(function () { return bars(tf, now).then(function (a) { B[tf] = a; }); }); });
     p.then(function () { return new Promise(function (ok) { setTimeout(ok, 30); }); }).then(function () {
       if (!B['5m'].length) throw new Error('no candles');
-      var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400, cfz = [], a = sopTrades(B, F, { from: from, cfOut: cfz });
-      return new Promise(function (ok) { setTimeout(function () { ok(uniq(a.concat(barrierTrades(B, F, { from: from, extra: cfz }))).concat(oldBarrierTrades(B, F, { from: from, extra: cfz }))); }, 30); });
+      var from = B['5m'][B['5m'].length - 1].time - DAYS * 86400;
+      return new Promise(function (ok) { setTimeout(function () { ok(deskTrades(B, F, { from: from })); }, 30); });
     }).then(function (rows) { S.rows = rows.sort(function (a, b) { return b.t - a.t; }); S.state = 'done'; S.at = Date.now(); }, function (e) { S.state = 'failed'; S.err = String(e && e.message || e); }).then(draw);
   }
   function line(name, rows, extra) {

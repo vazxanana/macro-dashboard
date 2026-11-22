@@ -45,7 +45,7 @@
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
-<script src="/assets/mosha-sop.js?v=90f7e58996" defer></script>
+<script src="/assets/mosha-sop.js?v=cbd5af101e" defer></script>
 <script src="/assets/mosha-replay.js?v=01a0c50054" defer></script>
 <script src="/assets/desk-trades.js?v=50e41738b4" defer></script>
 <script src="/assets/mosha-i18n.js?v=22ed49dcd7" defer></script>
@@ -7384,7 +7384,7 @@ function msEntryZones(bars, closedN, iv, zones) {
   }
   return out.sort((a, b) => (sell ? a.lo - b.lo : b.hi - a.hi)).slice(0, 2);
 }
-function msAnalyze(bars, N) {
+function msAnalyze(bars, N, NB) {   // NB: candles that confirm a new high / low of a running move (default N; the Mosha desk's one-candle readings pass 1)
   const H = bars.map(b=>b.high), L = bars.map(b=>b.low), C = bars.map(b=>b.close), n = bars.length;
   const maxIn = (a,b) => { let m=-Infinity, k=a; for (let j=a;j<=b;j++) if (H[j]>m){m=H[j];k=j;} return [m,k]; };
   const minIn = (a,b) => { let m=Infinity, k=a; for (let j=a;j<=b;j++) if (L[j]<m){m=L[j];k=j;} return [m,k]; };
@@ -7448,7 +7448,7 @@ function msAnalyze(bars, N) {
       if (H[i] > prot.p) sweepProt(-1, i);   // traded above the protected high without a close above: that high is the new one
       if (!ext.fixed) {
         if (L[i] < ext.p) ext = { i, p: L[i], fixed: false };
-        else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
+        else if (i - ext.i >= (NB || N)) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
       }
       if (ext.fixed && C[i] < ext.p) {
         const e = makeEvent(-1, ext.p, ext.i, i, false);
@@ -7465,7 +7465,7 @@ function msAnalyze(bars, N) {
       if (L[i] < prot.p) sweepProt(1, i);   // traded below the protected low without a close below: that low is the new one
       if (!ext.fixed) {
         if (H[i] > ext.p) ext = { i, p: H[i], fixed: false };
-        else if (i - ext.i >= N) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
+        else if (i - ext.i >= (NB || N)) { ext.fixed = true; events[events.length-1].vr = { i: ext.i, p: ext.p }; }
       }
       if (ext.fixed && C[i] > ext.p) {
         const e = makeEvent(1, ext.p, ext.i, i, false);
