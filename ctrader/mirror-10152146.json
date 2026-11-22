@@ -103,7 +103,8 @@
     "t1": 87446.7,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 59362.2,
@@ -118,7 +119,8 @@
     "lagSec": 134,
     "positionId": "50662694",
     "volume": 1,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-22T22:25:08.000Z"
    },
    "btc-rswing-1795267415": {
     "symbol": "BTCUSD",
@@ -219,7 +221,7 @@
    "startBalance": 10009.54
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10009.5 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 10023.08 · 3 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -232,8 +234,8 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 10009.5,
-  "lastRun": "2026-11-22T22:20:50.000Z"
+  "balance": 10023.08,
+  "lastRun": "2026-11-22T22:25:08.000Z"
  },
  "log": [
   {
@@ -406,6 +408,11 @@
    "at": "2026-11-22T18:26:25.000Z",
    "msg": "closed ETHUSD position 50667485 (council: win)",
    "trade": "eth-rswing-1795371835"
+  },
+  {
+   "at": "2026-11-22T22:25:08.000Z",
+   "msg": "BTCUSD position 50662694 closed at the broker",
+   "trade": "btc-position-1795267415"
   }
  ],
  "limits": {
