@@ -18,6 +18,9 @@ function makeMarket(days, seed) {
   for (const tf of ['5m', '15m', '30m', '1h', '4h', '1d']) { const sec = M.SEC[tf], out = []; for (const b of m1) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ time: t, open: b.open, high: b.high, low: b.low, close: b.close }); } B[tf] = out; }
   return B;
 }
+// 22 Nov 2026: the failed-QM entries (a trade with the direction at a barrier against it) have their own shape and their own
+// test at the end of this file; every older test reads the barrier list without them (BT = the whole list).
+const BT = M.barrierTrades; M.barrierTrades = (B, Fx, o) => BT(B, Fx, o).filter((r) => !r.qmFail && !r.tap);
 // Every market and every replay is worked out ONCE and shared by the tests below (21 Nov 2026: the file had grown to about a
 // quarter of an hour, most of it the same replay run again by each test). A replay is keyed by its candles, its cut and its
 // options; nothing a test asserts was dropped for it.
@@ -603,4 +606,55 @@ test('an engulf (EG) zone is a barrier too: the desks\' one engulf definition, i
     // no hindsight: an EG barrier entry found on the whole history is found with the candles cut just after its fill
     for (const r of E.slice(0, 6)) { const T = cutFor(seed, r.t + 3600); if (!T) continue; const c = M.barrierTrades(cut(market(26, seed), T), F, { from: fr }).find((x) => x.id === r.id); assert.ok(c, 'found when cut: ' + r.id); assert.deepEqual([c.entry, c.stop, c.target], [r.entry, r.stop, r.target]); } }
   assert.ok(n >= 2);
+});
+
+// 22 Nov 2026 (owner: "add the old barrier as different separate", "the one with higher R"): the barrier with its older 3R
+// target is recorded beside the current one under its own ids, never mixed into it
+test('the barrier with the older 3R target is a reading of its own: the current entries and stops, a 3R target, its own ids and flag', () => {
+  const seed = 7, X = market(26, seed), fr = fr20(seed), z = ALL(seed).z;
+  const old = M.oldBarrierTrades(X, F, { from: fr, extra: z }), all = BT(X, F, { from: fr, extra: z }), by = new Map(all.map((r) => [r.id, r]));
+  assert.ok(old.length > 0); assert.equal(new Set(old.map((r) => r.id)).size, old.length); assert.deepEqual(M.OLD_BARRIER, { rr: 3 });
+  let same = 0;
+  for (const r of old) { assert.match(r.id, /^bar-old-/); assert.equal(r.kind, 'barrier'); assert.equal(r.old, true); assert.ok(M.readings({ id: r.id }).old, 'read back from a stored id'); assert.match(r.label, / · 3R target$/);
+    assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, 'a stop on the losing side');
+    assert.ok(Math.abs(Math.abs(r.target - r.entry) / Math.abs(r.entry - r.stop) - 3) < 1e-6, 'the 3R target');
+    const c = by.get(r.id.replace('bar-old-', 'bar-')); if (c) { same++; assert.equal(c.entry, r.entry); assert.equal(c.stop, r.stop); assert.equal(c.side, r.side); assert.equal(c.t, r.t);
+      assert.ok(Math.abs(Math.abs(c.target - c.entry) / c.r0 - M.BARRIER_R) < 1e-6, 'its current twin has the current target'); }
+    const a = M.readings({ id: r.id }), b = M.readings({ id: r.id.replace('bar-old-', 'bar-') }); assert.deepEqual({ ...a, old: false }, b); }
+  assert.ok(same >= old.length * 0.8, 'the 3R records are the current entries: ' + same + ' of ' + old.length);
+  assert.ok(all.every((r) => !M.readings(r).old), 'no current record reads as old');
+  const src = fs.readFileSync(new URL('../council/mosha-desk.mjs', import.meta.url), 'utf8');
+  assert.match(src, /\.concat\(SOP\.oldBarrierTrades\(B, F, \{ from, market, extra: cfz \}\)\)/);
+});
+
+// 22 Nov 2026 (owner on a GBP/USD buy: "this should be a sell", "there is no new BO"): at a barrier against the direction a QM
+// that price closed back through gives no repeat-SOP entry; the trade is taken with the direction instead
+test('a failed QM at a barrier against the direction: no repeat-SOP entry after it, a trade with the direction with its stop past the VR, no hindsight', () => {
+  let n = 0, c = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), z = ALL(seed).z, all = BT(X, F, { from: fr, extra: z }), was = BT(X, F, { from: fr, extra: z, fail: false });
+    const f = all.filter((r) => M.readings(r).qmFail); n += f.length;
+    for (const r of f) { assert.match(r.id, /bar-sop-f-/); assert.equal(r.withDir, true); assert.equal(r.qmFail, true); assert.ok(M.readings({ id: r.id }).qmFail);
+      assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'stop on the losing side, target on the winning side'); assert.match(r.label, /QM failed · with /); assert.match(r.log.at(-2).text, /No new BO (buy|sell)/); }
+    assert.ok(was.every((r) => !M.readings(r).qmFail), 'fail: false reads it as before');
+    const ids = new Set(all.map((r) => r.id)), gone = was.filter((r) => !ids.has(r.id));
+    assert.ok(gone.every((r) => r.rsop && r.withDir === false), 'only repeat-SOP entries at barriers against the direction are dropped, seed ' + seed);
+    // no hindsight: the record exists, with the same levels, on the candles closed just after its entry
+    for (const r of f.slice(0, 4)) { const T = cutFor(seed, r.t + 3600); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
+      assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); assert.equal(k.target, r.target); c++; } }
+  assert.ok(n > 0 && c > 0, 'failed-QM entries: ' + n + ', checked against a cut: ' + c);
+});
+
+// 22 Nov 2026 (owner: "when tap he could wait M1 BO buy to take the trade, SL at M1 BO low")
+test('M1 BO at the tap of a barrier: a market entry at the M1 close, the stop past the M1 BO\'s low, its own id and reading, no hindsight', () => {
+  let n = 0, c = 0;
+  for (const seed of [7, 11]) { const X = market(26, seed), fr = fr20(seed), z = ALL(seed).z, all = BT(X, F, { from: fr, extra: z }), t = all.filter((r) => r.tap); n += t.length;
+    assert.ok(BT(X, F, { from: fr, extra: z, tap: false }).every((r) => !r.tap), 'tap: false leaves it out');
+    assert.deepEqual(BT(X, F, { from: fr, extra: z, tap: false }).map(keyOf), all.filter((r) => !r.tap).map(keyOf), 'no other record changes');
+    assert.equal(new Set(t.map((r) => r.id)).size, t.length);
+    for (const r of t) { assert.match(r.id, /bar-tap-/); assert.equal(r.l, '1m'); assert.ok(M.readings({ id: r.id }).tap); assert.match(r.label, / · M1 BO at the tap/); assert.match(r.log.at(-2).text, /M1 BO (buy|sell) at the tap/);
+      assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry);
+      const bar = X['1m'].find((b) => b.time + 60 === r.t); assert.ok(bar && bar.close === r.entry, 'the entry is the close of the M1 candle that ended at its time'); }
+    for (const r of t.slice(0, 4)) { const T = cutFor(seed, r.t + 60); if (!T) continue; const k = BT(cut(X, T), F, { from: fr, extra: ALL(seed, T).z }).find((q) => q.id === r.id);
+      assert.ok(k, 'seen on the cut: ' + r.id); assert.equal(k.entry, r.entry); assert.equal(k.stop, r.stop); c++; } }
+  assert.ok(n > 0 && c > 0, 'tap entries: ' + n + ', checked against a cut: ' + c);
 });

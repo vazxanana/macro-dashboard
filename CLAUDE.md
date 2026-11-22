@@ -6258,3 +6258,35 @@ barrier entry −0.090R with (n 584) and −0.090R without; no group reaches a p
 Welch t for "with beats without" is 0.23; the placebo passes nowhere. The 2026 split did not repeat: agreeing with the lower
 timeframes' structure does not pick the better trades of these readings. One run, no variants: the question is closed on
 2020-2025 (no other timeframes, look-backs or freshness windows). Nothing live changed. Test: `tests/ltf-structure.test.mjs`.
+
+## The barrier with its older 3R target, kept beside the current one (22 Nov 2026, owner: "add the old barrier as different separate", "the old barrier I mean is the one with higher R")
+`assets/mosha-sop.js` `oldBarrierTrades(B, F, { from, market, extra })` (`OLD_BARRIER` = `{ rr: 3 }`): the SAME barrier entries as
+the current reading (zones, confirmations, entry, stop; the tap entry included) with the 3R target the desk used until 22 Nov 2026
+instead of 1R. Entries whose target is not the fixed one (a CF / VR barrier's structural target, the repeat of the SOP, a failed
+QM) are the same trade under both and are not recorded twice. A reading of its own: ids `bar-old-…`, flag `old`, label "· 3R
+target", `readings(r).old` (read back from a stored id); joined AFTER the current list in the tracker (`council/mosha-desk.mjs`
+`build`) and the browser replay, so it never replaces a current record, and the 20-minute rule compares it only with its own
+reading. Desk: chip "Barrier, 3R target", its own line under "By entry type"; "Barrier entry" and every barrier split count the
+current reading only. It about doubles the barrier records on file. The tracker adds it for its 14-day window; older history
+needs a `--days` rebuild. A paper reading before costs, never an edge. (A first version the same day read the barrier the way the
+code did before the 21 Nov re-read; the owner meant the target.) Test: `tests/mosha-sop.test.mjs`.
+
+## A failed QM at a barrier against the direction is traded with the direction (22 Nov 2026, owner on a GBP/USD buy of 20 Nov: "this should be a sell not buy", "there is no new BO, the recent high closed below, remember BO, VR, CF / repeat SOP", "stop above VR, target last low")
+`assets/mosha-sop.js` `barrierTrades`, the repeat of the SOP at a barrier, only where the barrier is AGAINST the direction of the
+timeframe above (`wd === false`): once a candle of the confirmation timeframe, after the lower-timeframe VR, closes back through the
+QM level, the QM made no new BO: the repeat gives no entry (it used to take a later CF), and that close is the CF with the
+direction: a market entry at that close the other way, stop past the VR's extreme (the top the rejection made) by the desk's
+buffer, target the last low (high for a buy) since price came back to the barrier; no minimum R (not answered: some targets are a
+few pips). Record: id `bar-sop-f-…`, flags `rsop`, `qmFail`, `withDir: true`, label "… · QM failed · with H4"; `readings(r).qmFail`
+is read back from the id; its own reading in the 20-minute rule. `fail: false` reads it as before. Barriers with the direction are
+unchanged (there a pullback through the QM level is the sequence's own). On GBP/USD 18-20 Nov: 2 buys gone (−2R), 10 entries
+added (+1.4R before costs). A reading, not a tested rule. Test: `tests/mosha-sop.test.mjs`.
+
+## M1 BO at the tap of a barrier (22 Nov 2026, owner on the same GBP/USD chart: "when tap he could wait M1 BO buy to take the trade, SL at M1 BO low")
+`assets/mosha-sop.js` `barrierTrades`, `run('1m', B['1m'], 'tap')` for every barrier visit (not in the older reading; `tap: false`
+leaves it out): the first M1 BO Structure with the barrier after price came back (the same QM test as the table's confirmation,
+read on M1) is a MARKET entry at that candle's close; stop past the extreme made at the barrier up to that close (the M1 BO's low
+for a buy) by the desk's buffer; target the desk's barrier target (`BARRIER_R`, 1R: the owner named none). Record: id `bar-tap-…`,
+flags `tap`, `mkt`, `l: '1m'`, label "… · M1 BO at the tap"; `readings(r).tap` from the id; its own reading in the 20-minute rule.
+No other record changes (test). On GBP/USD 18-20 Nov: 45 entries, 27 reached target, +10R before costs (three days of one
+market: not evidence; an M1 stop is a few pips, so costs take a large share). Test: `tests/mosha-sop.test.mjs`.
