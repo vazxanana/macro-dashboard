@@ -583,11 +583,17 @@ await q.click('#tb-more'); await q.waitForTimeout(120);
       // day, so the day change and the end-of-day floor this check is about were never reached. The risk is now sized from the
       // firm's own rules so that neither the maximum loss (every trade stopped, with room for gaps) nor the profit target (every
       // trade at its 2R target) can end the challenge inside these steps, on any date.
-      const F = A0.ch.firm, maxTrades = Math.ceil(plan.reduce((s, x) => s + x[1], 0) / 6), risk = Math.floor(100 * 100 * Math.min(0.6 * F.maxLoss / maxTrades, 0.9 * F.phases[0].target / (2 * maxTrades))) / 100;
-      for (const [tf, cnt] of plan) { if (bad) break; const z = await sw(q, tf); if (z.tf !== tf) bad = 'switch to ' + tf;
-        for (let i = 0; i < cnt && !bad; i++) { if (ch.status === 'live' && !acc.positions.length && n % 6 === 0) { await q.keyboard.press(n % 12 === 0 ? 'Shift+B' : 'Shift+S'); await q.waitForTimeout(120); await q.fill('#o-risk', risk.toFixed(2)); await q.waitForTimeout(60); await q.click('#place'); await q.waitForTimeout(150); await mirror(q, acc); } n++;
-          const a = await st(q); await q.keyboard.press('ArrowRight'); await q.waitForTimeout(50); const z2 = await st(q), g = a.forming ? tfOf(a.forming.g) : a.tf; if (a.forming) formed++;
-          BTN.advance(acc, ch, (await candles(g)).filter((x) => x.time >= a.mom && x.time < z2.mom)); steps++; Object.keys(ch.days).forEach((d) => days.add(d)); const A = await full(q), x = proj(A.acct, A.ch), y = proj(acc, ch); if (x !== y) bad = `${tf} #${i}${a.forming ? ' (rest of a forming candle on ' + g + ')' : ''}: ` + diff(x, y); } }
+      const F = A0.ch.firm, maxTrades = Math.ceil((plan.reduce((s, x) => s + x[1], 0) + 3 * plan.length) / 6), risk = Math.floor(100 * 100 * Math.min(0.6 * F.maxLoss / maxTrades, 0.9 * F.phases[0].target / (2 * maxTrades))) / 100;
+      const one = async (tf, tag) => { if (ch.status === 'live' && !acc.positions.length && n % 6 === 0) { await q.keyboard.press(n % 12 === 0 ? 'Shift+B' : 'Shift+S'); await q.waitForTimeout(120); await q.fill('#o-risk', risk.toFixed(2)); await q.waitForTimeout(60); await q.click('#place'); await q.waitForTimeout(150); await mirror(q, acc); } n++;
+        const a = await st(q); await q.keyboard.press('ArrowRight'); await q.waitForTimeout(50); const z2 = await st(q), g = a.forming ? tfOf(a.forming.g) : a.tf; if (a.forming) formed++;
+        BTN.advance(acc, ch, (await candles(g)).filter((x) => x.time >= a.mom && x.time < z2.mom)); steps++; Object.keys(ch.days).forEach((d) => days.add(d)); const A = await full(q), x = proj(A.acct, A.ch), y = proj(acc, ch); if (x !== y) bad = `${tf} ${tag}${a.forming ? ' (rest of a forming candle on ' + g + ')' : ''}: ` + diff(x, y); };
+      // going up a timeframe is meant to land inside a candle (a forming one). Where the moment happens to sit on that timeframe's own
+      // boundary (it depends on where the session's first candle fell: a Sunday start put the 15m switch on a quarter hour), the audit
+      // goes back, takes one more compared step on the finer timeframe and switches again, so the count does not depend on the date
+      let cur = '5m';
+      for (const [tf, cnt] of plan) { if (bad) break; let z = await sw(q, tf);
+        for (let r = 0; r < 3 && !bad && z.tf === tf && SEC[tf] > SEC[cur] && !z.forming; r++) { await sw(q, cur); await one(cur, 'extra step'); z = await sw(q, tf); }
+        if (z.tf !== tf) bad = 'switch to ' + tf; for (let i = 0; i < cnt && !bad; i++) await one(tf, '#' + i); cur = tf; }
       const A = await full(q);
       check(`Topstep challenge, ${steps} steps over ${plan.length} timeframes (${formed} completing a forming candle), ${days.size} firm days: account, day records, trailing floor and status equal the engine fed each step's own candles once`, !bad && formed >= 3 && days.size >= 2 && steps >= 100 && risk > 0, bad || (days.size < 2 && A.ch.status !== 'live' ? `the challenge ended on its first firm day (${A.ch.status}: ${A.ch.reason || 'no reason'}) at ${risk}% a trade` : JSON.stringify([formed, days.size, steps, risk])));
       check('…every trade of that session had its stop, and the trailing floor is where the end-of-day balances put it', A.acct.closed.length > 0 && A.acct.closed.concat(A.acct.positions).every((x) => x.stop > 0) && A.ch.eodHigh === ch.eodHigh && A.ch.progress.floor === Math.min(A.ch.start, BTN.r2(A.ch.eodHigh - A.ch.firm.maxLoss * A.ch.start)), JSON.stringify([A.ch.eodHigh, A.ch.progress && A.ch.progress.floor]));
