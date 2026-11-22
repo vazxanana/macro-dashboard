@@ -6322,3 +6322,23 @@ the check needs a day change (2+ firm days). Fix (`scripts/audit/chronostrade.cj
 the firm's own rules (0.11 %: 21 trades at most, all stopped = 60 % of the maximum loss, all at their 2R target = 90 % of the
 profit target), so the challenge stays live through the steps on any date; if it still ends on day one the check fails and says
 why. Run with the page's clock set to 16, 21 and 22 Nov: 6, 7 and 6 firm days.
+
+## A SOP inside the SOP: the VR and the CF each start a lower-timeframe sequence (22 Nov 2026, owner: "on mosha you need to repeat sop inside sop. Bo1 vr ( start new low time frame sop bo vr cf for sells if bo1 is bullish, and buys if bo1 is bearish), CF (start new low time frame sop bo vr cf for buys and main structure as well)")
+`assets/mosha-sop.js` `sopTrades` (`nestAdd`, `nestRun`). The main sequence (BO on h, VR and CF on l, the EG entry) is unchanged
+and recorded as before. Beside it, each of its two breaks is read as a BO one timeframe lower (`LOWER[l] || DOWN[l]`: H4 → H1,
+H1 → M30, M30 → M15, M15 → M5, M5 → M1; M30 built from M15 where none is handed in; no candles = nothing) and a whole BO, VR, CF
+is waited for there with `msMosha`: the **VR leg** (id `sop-nv-<tf>-<b|s><t>`, `nest: 'vr'`) against the first BO (sells under a
+bullish BO, buys under a bearish one), read until the main CF forms or a lower candle closes back beyond the main VR's extreme;
+the **CF leg** (`sop-nc-`, `nest: 'cf'`) with the first BO, read until a lower candle closes through the CF zone's far side; a
+main CF inside its VR (the "likely to fail" case) starts one too, said in its log (`cfIn: true`; `case2: false` leaves it out). A
+leg first seen late (its break known only once the BO's candle closed) takes no entry from before it was seen. Both at most `BARRIER_WATCH` candles of
+l. Entry, stop and target are `msMosha`'s own (EG close, stop past the pullback's extreme, target the nested VR's extreme; the
+repeat SOP's size and losing-side checks; a nested CF inside its VR is skipped); one record a main sequence and leg. Record:
+`kind: 'sop'`, `h` = l, `l` = the lower timeframe, `up` = h, `of` = the first BO's side, label "H4 BO → H1 VR → M30 SOP inside
+the VR". No hindsight: a leg is registered at the candle whose close shows its break, walked one closed lower candle at a time
+with the main sequence as the last closed l candle left it, and the entry is taken only at the candle whose close is its EG.
+`o.nest === false` leaves them out. `uniq` ranks them last (an order another reading already gave keeps the other id);
+`council/mosha-desk.mjs` `merge` reads each leg as its own reading from the id; the desk names them (`isNest`, `kindText`) and
+lists "SOP inside the VR (against the BO)" / "SOP inside the CF (with the BO)" apart from "BO, VR, CF". A reading, not a tested
+rule: never quote its record as an edge. Test: `tests/mosha-sop.test.mjs` ("a SOP inside the SOP"; the older tests read the list
+with `nest: false`, `ST` is the whole one).
