@@ -743,13 +743,13 @@ test('the earlier scalp method: an EG is two candles, the second closes beyond t
     const z15 = r.marks.find((m) => m.label === 'M15 EG'); if (z15) { const k = M5.filter((b) => b.time >= z15.a && b.time < z15.a + 900); assert.ok(Math.abs(z15.top - Math.max(...k.map((b) => b.high))) < 1e-12 && Math.abs(z15.bot - Math.min(...k.map((b) => b.low))) < 1e-12, 'the M15 zone is the first 15-minute candle: ' + r.id); } }
 });
 
-test('an engulf completes within four candles of its first candle, never later (owner, 22 Nov 2026)', () => {
+test('an engulf completes within three candles of its first candle, never later (owner, 22 Nov 2026: "Change to 3 candles"; four until then)', () => {
   const c = (o, cl, h, l) => ({ open: o, close: cl, high: h ?? Math.max(o, cl) + 0.1, low: l ?? Math.min(o, cl) - 0.1 }), red = c(10, 9), in1 = c(9, 9.4, 9.5, 8.95), up = c(9.4, 10.5);
   const at = (n) => { const C = [red, ...Array.from({ length: n - 1 }, () => ({ open: 9.2, close: 9.2, high: 9.5, low: 8.95 })), up].map((b, i) => ({ ...b, time: i * 900 })); return G.engulfAt(C, C.length - 1); };
-  assert.equal(G.EG_SPAN, 4);
-  for (const n of [1, 2, 3, 4]) assert.deepEqual(at(n), { dir: 1, j: 0 }, 'completed by candle ' + n + ' after');
-  assert.equal(at(5), null, 'the fifth candle after is too late');
-  assert.match(rd('assets/mosha-sop.js'), /var EG_SPAN = 4;[\s\S]*j >= i - EG_SPAN/, 'the page copy uses the same span');
+  assert.equal(G.EG_SPAN, 3);
+  for (const n of [1, 2, 3]) assert.deepEqual(at(n), { dir: 1, j: 0 }, 'completed by candle ' + n + ' after');
+  assert.equal(at(4), null, 'the fourth candle after is too late'); assert.equal(at(5), null);
+  assert.match(rd('assets/mosha-sop.js'), /var EG_SPAN = 3;[\s\S]*j >= i - EG_SPAN/, 'the page copy uses the same span');
 });
 
 // 22 Nov 2026, owner: "inside the entry zone i want m1 buy eg to become ef to entry for sells, for buy i want in the entry area a
@@ -780,4 +780,89 @@ test('M1 EF entry: inside a 15-minute zone the most recent one-minute engulf of 
   assert.ok(n > 20, 'the seeded markets give entries: ' + n);
   assert.ok(E.DESKS.eg.tfs.includes('1m'), 'the Engulfing desk reads one-minute candles');
   assert.ok(E.DESKS.eg.read({ '5m': [], '15m': [], '1m': [] }, { from: 0, market: 'xau' }).length === 0);
+});
+
+// ─── the three-timeframe SOP (22 Nov 2026; the owner's table: marking zone / engulf at the zone / confirmation) ───
+// hand-made candles of the H1 / M15 / M5 chain; fillers are dojis (never a first candle, never complete an engulf).
+// `gap`: dojis between the M5 first candle and the M5 candle that closes beyond it (1 = completed by the 2nd candle, 3 = the 4th);
+// `broken`: an H1 candle closes through the marking zone before the M15 engulf; `flip`: the mirrored sell
+const sop3Case = ({ gap = 1, broken = false, flip = false } = {}) => {
+  const T0 = 1790553600, m = (v) => (flip ? 200 - v : v);
+  const k = (o, c, h, l) => (flip ? { open: m(o), close: m(c), high: m(l), low: m(h) } : { open: o, close: c, high: h, low: l }), dj = (p, h = p + 0.1, l = p - 0.1) => k(p, p, h, l);
+  const stamp = (a, sec) => a.map((b, i) => ({ time: T0 + i * sec, ...b }));
+  // H1: a red candle 99.5-101.2, engulfed by the next one (the marking zone, known at T0 + 3 h); price comes back in hour 4
+  const H1 = stamp([dj(100.5), k(101, 100, 101.2, 99.5), k(100, 102, 102.2, 99.9), broken ? k(102, 99, 102.1, 98.9) : dj(102, 102.3, 101.8), dj(101.5, 102.6, 100.4), ...Array.from({ length: 8 }, () => dj(104))], 3600);
+  // M15: candle 16 trades back into the zone (red, 100.4-102.1), candle 17 closes beyond it: the engulf at the zone, known at T0 + 18 x 900
+  const M15 = stamp([...Array.from({ length: 16 }, () => dj(102, 102.2, 101.8)), k(102, 100.6, 102.1, 100.4), k(100.6, 102.5, 102.6, 100.5), ...Array.from({ length: 30 }, () => dj(103))], 900);
+  // M5: from candle 55 a red candle 101.8-102.6, `gap` dojis, a green close beyond it; then down to the middle (102.2), then up to 2R
+  const M5 = stamp([...Array.from({ length: 55 }, () => dj(102.5, 102.55, 102.45)), k(102.5, 101.9, 102.6, 101.8), ...Array.from({ length: gap }, () => dj(102, 102.2, 101.85)), k(102, 102.9, 103, 101.95),
+    dj(102.9, 103, 102.6), dj(102.5, 102.7, 102.1), dj(103), dj(104), dj(105), dj(106), dj(106.5, 106.6, 106), ...Array.from({ length: 60 }, () => dj(106.5))], 300);
+  return { B: { '1h': H1, '15m': M15, '5m': M5 }, T0, K: T0 + (55 + gap + 2) * 300, fillT: T0 + (55 + gap + 3) * 300, m };
+};
+const near9 = (a, b, msg) => assert.ok(Math.abs(a - b) < 1e-9, `${msg}: ${a} vs ${b}`);
+
+test('three-timeframe SOP: zone, engulf at the zone, confirmation; a limit at 50 % of the confirmation zone, the stop past the engulf zone, 2R (a buy and the mirrored sell)', () => {
+  for (const flip of [false, true]) { const c = sop3Case({ flip }), d = flip ? -1 : 1, all = G.sopTrades3(c.B, { market: 'xau' });
+    assert.equal(all.length, 1, 'one trade'); const r = all[0];
+    assert.equal(r.kind, 'eg-sop3'); assert.equal(r.id, `eg3-1h-${flip ? 's' : 'b'}${c.K}`); assert.equal(r.label, 'H1 zone → M15 EG → M5 CF'); assert.equal(r.style, 'scalp'); assert.equal(r.h, '1h'); assert.equal(r.l, '5m'); assert.equal(r.side, d);
+    near9(r.entry, c.m(102.2), 'the middle of the M5 zone 101.8-102.6'); near9(r.stop, c.m(100.1), 'the far side of the M15 zone (100.4) and the $0.30 buffer, not the M5 zone'); near9(r.r0, 2.1, '1R'); near9(r.target, c.m(106.4), '2R');
+    assert.equal(r.t, c.fillT); assert.equal(r.status, 'target'); assert.equal(r.R, 2);
+    assert.deepEqual(r.marks.map((x) => x.label), ['H1 EG zone', 'M15 EG zone · 1 candle', 'M5 EG zone · entry', '50 % · limit']); near9(r.marks[3].p, r.entry, 'the 50 % level');
+    assert.ok(r.marks.every((x) => x.at <= c.K), 'every mark was known when the order was placed');
+    assert.equal(r.log.length, 6); assert.match(r.log[3].text, /completed in 2 candles/); assert.ok(r.log.every((x) => x.text.length <= 240), 'a log line fits the stored length');
+    for (let i = 1; i < 5; i++) assert.ok(r.log[i].t >= r.log[i - 1].t, 'the log is in time order');
+  }
+  assert.deepEqual(G.SOP3.chains.map((x) => [x.tfs.join('/'), x.style]), [['1d/4h/1h', 'swing'], ['4h/1h/15m', 'intraday'], ['1h/15m/5m', 'scalp']]);
+  assert.equal(G.SOP3.rr, 2); assert.equal(G.SOP3.wait, 24); assert.equal(G.SOP3.fill, 24);
+});
+
+test('three-timeframe SOP: the confirmation engulf may take 3 candles, never 4; no trade once the marking zone was closed through; no hindsight on the hand-made case', () => {
+  assert.equal(G.sopTrades3(sop3Case({ gap: 2 }).B, { market: 'xau' }).length, 1, 'completed by the third candle');
+  for (const flip of [false, true]) { assert.equal(G.sopTrades3(sop3Case({ gap: 3, flip }).B, { market: 'xau' }).length, 0, 'the fourth candle is too late');
+    assert.equal(G.sopTrades3(sop3Case({ broken: true, flip }).B, { market: 'xau' }).length, 0, 'the marking zone was closed through before the engulf at it'); }
+  const c = sop3Case(), full = G.sopTrades3(c.B, { market: 'xau' })[0], sec = { '1h': 3600, '15m': 900, '5m': 300 }, cut = (T) => Object.fromEntries(Object.entries(c.B).map(([tf, a]) => [tf, a.filter((b) => b.time + sec[tf] <= T)]));
+  // the test market is short: the 100-candle floor of the 5-minute history is met by candles BEFORE the setup, so pad the front
+  const pad = (X) => ({ ...X, '5m': Array.from({ length: 100 }, (_, i) => ({ time: c.T0 - (100 - i) * 300, open: 102.5, close: 102.5, high: 102.55, low: 102.45 })).concat(X['5m']) });
+  const after = G.sopTrades3(pad(cut(c.fillT + 300)), { market: 'xau' }); assert.equal(after.length, 1, 'found with the candles cut just after the fill');
+  assert.deepEqual([after[0].id, after[0].t, after[0].entry, after[0].stop, after[0].target], [full.id, full.t, full.entry, full.stop, full.target]); assert.equal(after[0].status, 'open'); assert.equal(after[0].R, null);
+  assert.equal(G.sopTrades3(pad(cut(c.K - 300)), { market: 'xau' }).length, 0, 'absent before the confirmation engulf has closed');
+  assert.equal(G.sopTrades3(pad(cut(c.fillT)), { market: 'xau' }).length, 0, 'the order rests, unfilled, before the fill candle');
+});
+
+test('three-timeframe SOP on the seeded market: stops on the losing side, each step known in time, one position a chain, no look-ahead, the other readings untouched', async () => {
+  const before = JSON.stringify(B15), all = G.sopTrades3(B15, { from: 0, market: 'xau' }); assert.equal(JSON.stringify(B15), before, 'the candles are not changed');
+  assert.ok(all.length >= 30, 'entries: ' + all.length); assert.ok(all.some((r) => r.side > 0) && all.some((r) => r.side < 0));
+  const Zs = { '1d': G.zones(B15['1d'], '1d'), '4h': G.zones(B15['4h'], '4h'), '1h': G.zones(B15['1h'], '1h'), '15m': G.zones(B15['15m'], '15m'), '5m': G.zones(B15['5m'], '5m') }, busy = {}, ids = new Set();
+  for (const r of all) { const ch = G.SOP3.chains.find((x) => x.tfs[0] === r.h), [zt, et, ct] = ch.tfs, d = r.side;
+    assert.ok(!ids.has(r.id)); ids.add(r.id); assert.match(r.id, new RegExp(`^eg3-${zt}-${d > 0 ? 'b' : 's'}\\d+$`)); assert.equal(r.style, ch.style); assert.equal(r.l, ct);
+    assert.ok(d > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1: a stop on the losing side: ' + r.id);
+    near9(Math.abs(r.target - r.entry), 2 * r.r0, '2R'); near9(Math.abs(r.entry - r.stop), r.r0, '1R');
+    const [mz, me, mc] = r.marks, Z = Zs[zt].find((z) => z.dir === d && z.base === mz.a), e = Zs[et].find((z) => z.dir === d && z.base === me.a), c = Zs[ct].find((z) => z.dir === d && z.base === mc.a);
+    assert.ok(Z && e && c, 'the three zones are engulf zones of the trade\'s side on their timeframes'); assert.ok(Z.n <= 3 && e.n <= 3 && c.n <= 3, 'each completed within three candles');
+    const K = +r.id.match(/(\d+)$/)[1]; assert.equal(c.at, K);
+    assert.ok(Z.at <= e.at && e.at < c.at && Z.end > K && e.end > K, 'zone, then the engulf, then the confirmation, the two higher zones alive');
+    assert.ok(e.bot <= Z.top && e.top >= Z.bot && c.bot <= e.top && c.top >= e.bot, 'each zone touches the one above');
+    near9(r.entry, (c.top + c.bot) / 2, 'the limit is the middle of the confirmation zone'); near9(r.stop, d > 0 ? e.bot - 0.3 : e.top + 0.3, 'the stop is past the engulf zone');
+    assert.ok(r.t >= K, 'filled after the order was placed');
+    if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9); if (r.status === 'target') assert.equal(r.R, 2); assert.ok(['stopped', 'target', 'open'].includes(r.status), 'a trade ends at its stop or its target');
+    assert.ok(!(r.t <= (busy[zt] ?? -Infinity)), 'one position at a time a chain'); busy[zt] = r.endT || Infinity; }
+  assert.ok(new Set(all.map((r) => r.h)).size >= 2, 'more than one chain trades');
+  // no look-ahead: cut the candles at a moment; what is found then is found, the same, with everything after it, and the other way round
+  const sec = { ...SOP.SEC, '15m': 900 }, key = (r) => [r.id, r.t, r.entry, r.stop, r.target].join('|');
+  for (const back of [5, 17, 31]) { const T = END - back * 86400 - 7 * 300, part = G.sopTrades3(Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + sec[tf] <= T)])), { from: 0, market: 'xau' });
+    const fullBy = new Map(all.map((r) => [key(r), r])); assert.ok(part.length >= 3);
+    for (const p of part) { const f = fullBy.get(key(p)); assert.ok(f, 'missing with later candles: ' + p.id); if (p.R != null) assert.deepEqual([p.status, p.R, p.endT], [f.status, f.R, f.endT]); }
+    const partKeys = new Set(part.map(key)); for (const f of all) if (f.t + 300 <= T) assert.ok(partKeys.has(key(f)), 'a trade filled before the cut is found on the cut candles: ' + f.id); }
+  // the desk: the reading is added beside the others, whose output is what their own functions give
+  const o = { from, market: 'xau' }, desk = E.DESKS.eg.read(B15, o), others = E.egTrades(B15, o).concat(G.methodTrades(B15, o), G.methodTrades(B15, { ...o, span: 'next' }), G.m1Trades(B15, o));
+  assert.deepEqual(desk.filter((r) => r.kind !== 'eg-sop3'), others); assert.deepEqual(desk.filter((r) => r.kind === 'eg-sop3'), G.sopTrades3(B15, o));
+  for (const tf of ['1d', '4h', '1h', '15m', '5m']) assert.ok(E.DESKS.eg.tfs.includes(tf), 'the desk reads ' + tf);
+  // stored: the kind, the label and the style tag survive the record cleaner; another market's id carries its market
+  const { clean } = await import('../council/mosha-desk.mjs'), s = clean(all[0]); assert.equal(s.kind, 'eg-sop3'); assert.equal(s.style, all[0].style); assert.equal(s.label, all[0].label); assert.equal(s.marks.length, 4); assert.equal(s.log.length, all[0].log.length);
+  assert.equal(clean({ ...all[0], style: 'x<y' }).style, undefined, 'only a known style is stored');
+  const eur = Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 }))])), er = G.sopTrades3(eur, { from: 0, market: 'eurusd' });
+  assert.ok(er.length && er.every((r) => /^eurusd:eg3-(1d|4h|1h)-[bs]\d+$/.test(r.id) && (r.side > 0 ? r.stop < r.entry : r.stop > r.entry)));
+  // the page names the kind and says what is the desk's own choice
+  const page = rd('assets/desk-trades.js'); assert.match(page, /'eg-sop3': 'Three-timeframe SOP'/); assert.match(page, /three-timeframe SOP is listed apart/i); assert.match(page, /The desk\\'s own choices there/);
+  assert.match(E.DESKS.eg.note, /three-timeframe SOP/); assert.match(rd('council/eg-methods.mjs'), /PAPER READING of the owner's table, before costs: not a tested rule, never an edge/);
 });

@@ -301,7 +301,7 @@
   // the two): the base is the last candle of the other colour; the FIRST later coloured candle that closes beyond its high (a
   // buy) or its low (a sell) completes it; a close through the base's other side before that cancels it; a doji is never a base.
   // The box is the base candle wick to wick, known from the completing candle's close; first touch and break as the other boxes.
-  var EG_SPAN = 4;   // the engulf completes within four candles of its first candle (owner, 22 Nov 2026), as council/eg-methods.mjs
+  var EG_SPAN = 3;   // the engulf completes within three candles of its first candle (owner, 22 Nov 2026: "Change to 3 candles"), as council/eg-methods.mjs
   function egBoxes(H) {
     var out = [], i, j, q, k;
     for (i = 1; i < H.length; i++) { var c = H[i], dir = c.close > c.open ? 1 : c.close < c.open ? -1 : 0, p = null; if (!dir) continue;
