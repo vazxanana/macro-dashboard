@@ -6318,6 +6318,30 @@ function msNextSetup(bars, A) {
     el.innerHTML = `<div class="cy-row"><span class="cy-h">Market cycle</span>${CY.map(chip).join('')}</div>${say ? `<p class="cy-say">${say} <small>A reading of structure, not a tested rule.</small></p>` : ''}`;
   }
   setTimeout(cycleStrip, 3600); setInterval(cycleStrip, 10e3);
+  // The structure assistant's facts (22 Nov 2026, #ms-sa-js): what the panes already read on CLOSED candles (msAnalyze, msInternal,
+  // msInternalLeg, msCycle / msStage / msPath), with times in UTC (the panes' times carry TZ). Reads only; fetches and stores nothing.
+  window.msStructFacts = function () {
+    const nowS = Date.now() / 1000, dec = CUR && CUR.dec != null ? CUR.dec : 2, rd = (v) => (isFinite(v) ? +(+v).toFixed(dec) : null), tfs = [], ivOf = {};
+    let price = null, priceT = null;
+    for (const id of ['1d', '4h', '1h', '15m', '5m']) {
+      const P = panes[id], tf = TFS.find((t) => t.id === id), A = P && P.A; if (!A || !P.bars || !tf) continue;
+      const n = Math.min(A.n || 0, P.bars.length), B = P.bars.slice(0, n); if (n < 40) continue;
+      const ut = (i) => (B[i] ? B[i].time - TZ : null), brk = (e) => ({ dir: e.dir, level: rd(e.level), t: ut(e.breakIdx), structure: !!e.structure });
+      const ib = msInternal(B, n, PIVOT), iv = msInternalLeg(B, n, A.trend, ib.concat(A.events).sort((a, b) => a.breakIdx - b.breakIdx), PIVOT); ivOf[id] = iv;
+      tfs.push({ tf: id, trend: A.trend || 0, closedThrough: ut(n - 1) == null ? null : ut(n - 1) + tf.sec, last: A.last ? brk(A.last) : null,
+        protected: A.prot ? { level: rd(A.prot.p), t: ut(A.prot.i), swept: !!A.prot.swept } : null,
+        extreme: A.ext ? { level: rd(A.ext.p), t: ut(A.ext.i), fixed: !!A.ext.fixed } : null,
+        breaks: A.events.slice(-6).map(brk), internal: ib.slice(-4).map(brk),
+        internalLeg: iv ? { dir: iv.dir, from: rd(iv.from), to: rd(iv.to), p50: rd(iv.p50), reached: !!iv.reached } : null });
+      price = rd(B[n - 1].close); priceT = ut(n - 1) + tf.sec;
+    }
+    const cycle = cycleNow().map((r) => { const P = panes[r.parent], k = P && P.A ? Math.min(P.A.n || 0, P.bars.length) : 0, px = k ? P.bars[k - 1].close : NaN, st = msStage(r, px, fmt), path = msPath(r, px, ivOf[r.parent]);
+      return { parent: r.parent, child: r.child, dir: r.dir, phase: r.phase, p50: r.target ? rd(r.target.p50) : null, origin: r.target ? rd(r.target.origin) : null, ext: r.target ? rd(r.target.ext) : null,
+        choch: r.choch ? { level: rd(r.choch.level), t: r.choch.t - TZ } : null, resume: r.resume ? { level: rd(r.resume.level), t: r.resume.t - TZ } : null,
+        stage: st ? st.text : '', path: (path || []).map((g) => ({ to: rd(g.to), kind: g.kind })) }; });
+    const up = tfs.filter((x) => x.last && x.last.dir > 0).length, down = tfs.filter((x) => x.last && x.last.dir < 0).length;
+    return { market: instKey, label: CUR ? CUR.label : instKey, facts: { at: Math.floor(nowS), dec, price, priceT, tfs, cycle, alignment: { up, down, n: tfs.length } } };
+  };
   function mtfStrip() {
     const el = document.getElementById('ms-mtf'); if (!el) return;
     const rows = TFS.map((tf) => { const P = panes[tf.id], e = P && P.A && P.A.last; return { tf, dir: e ? (e.dir < 0 ? -1 : 1) : 0 }; }).filter((r) => panes[r.tf.id]);
@@ -16000,6 +16024,140 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
     S.addEventListener('keydown', function (e) { var m = e.target.closest && e.target.closest('.c-meta'); if (m && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); flip(m); } });
     new MutationObserver(dress).observe(S, { childList: true }); dress();
   }
+})();
+</script>
+<style id="ms-sa-css">/* The structure assistant (22 Nov 2026): a button in the Charts toolbar and a side panel (a bottom sheet on a phone). Tokens only. */
+  #ms-sa-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 6px 10px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: transparent; color: var(--au-ink-1, var(--ink)); font: 600 12.5px var(--sans); cursor: pointer; white-space: nowrap; }
+  #ms-sa-btn[aria-expanded="true"] { background: var(--au-surface-2, var(--panel-2)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
+  #ms-sa-btn:focus-visible, .sa :is(button, select, textarea, summary):focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 2px; }
+  .sa { position: fixed; z-index: 60; top: 64px; right: 16px; bottom: 16px; width: min(400px, calc(100vw - 32px)); display: flex; flex-direction: column; background: var(--au-surface, var(--panel)); color: var(--au-ink-1, var(--ink)); border: 1px solid var(--au-line, var(--line)); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,.35); font: 400 13.5px/1.45 var(--sans); }
+  .sa[hidden] { display: none; }
+  .sa-h { display: flex; align-items: center; gap: 8px; padding: 12px 14px 8px; border-bottom: 1px solid var(--au-line, var(--line)); }
+  .sa-h h3 { margin: 0; font: 650 15px var(--sans); flex: 1; }
+  .sa-x { width: 36px; height: 36px; border: 0; background: transparent; color: inherit; font-size: 20px; border-radius: 8px; cursor: pointer; }
+  .sa-b { padding: 10px 14px 14px; overflow: auto; flex: 1; display: grid; gap: 10px; align-content: start; }
+  .sa-lab { margin: 0; font-size: 12px; color: var(--au-ink-2, var(--ink-dim)); }
+  .sa-st { margin: 0; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); }
+  .sa-st.off { color: var(--au-warn, var(--warn-ink)); }
+  .sa-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .sa-row label { font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); }
+  .sa select, .sa textarea { font: inherit; color: inherit; background: var(--au-well, var(--bg)); border: 1px solid var(--au-line, var(--line)); border-radius: 8px; padding: 6px 8px; }
+  .sa textarea { width: 100%; box-sizing: border-box; resize: vertical; min-height: 56px; }
+  .sa-go, .sa-ask { min-height: 36px; padding: 6px 14px; border-radius: 8px; font: 600 13px var(--sans); cursor: pointer; border: 1px solid var(--au-line, var(--line)); background: transparent; color: inherit; }
+  .sa-go { background: var(--au-primary, var(--ink)); color: var(--au-on-primary, var(--bg)); border-color: transparent; }
+  .sa button:disabled { opacity: .55; cursor: default; }
+  .sa-out { display: grid; gap: 8px; }
+  .sa-out p { margin: 0; }
+  .sa-wait { color: var(--au-ink-2, var(--ink-dim)); }
+  .sa-sec { margin: 4px 0 0; font: 650 12.5px var(--sans); color: var(--au-ink-2, var(--ink-dim)); }
+  .sa-tf { display: grid; grid-template-columns: 44px 76px 1fr; gap: 6px; padding: 6px 8px; background: var(--au-well, var(--bg)); border-radius: 8px; }
+  .sa-tf b { font-weight: 650; } .sa-tf .up { color: var(--buy-ink, var(--buy)); } .sa-tf .down { color: var(--sell-ink, var(--sell)); }
+  .sa-w { padding: 6px 8px; background: var(--au-well, var(--bg)); border-radius: 8px; } .sa-w b { font-variant-numeric: tabular-nums; }
+  .sa-err { color: var(--au-warn, var(--warn-ink)); }
+  .sa details summary { cursor: pointer; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); min-height: 32px; display: flex; align-items: center; }
+  .sa pre { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; font: 12px/1.4 var(--mono, monospace); background: var(--au-well, var(--bg)); padding: 8px; border-radius: 8px; max-height: 260px; overflow: auto; }
+  html[data-role="public"] :is(#ms-sa-btn, #ms-sa) { display: none !important; }
+  @media (pointer: coarse) { #ms-sa-btn, .sa-go, .sa-ask, .sa-x, .sa select, .sa details summary { min-height: 44px; } .sa-x { width: 44px; } }
+  @media (max-width: 640px) {
+    #ms-sa-btn .sa-bl { display: none; }
+    .sa { top: auto; left: 0; right: 0; bottom: 0; width: auto; max-height: 78dvh; border-radius: 14px 14px 0 0; border-bottom: 0; }
+  }
+</style>
+<script id="ms-sa-js">
+// The structure assistant (22 Nov 2026, owner: "an ai assistant for the dashboard that he will focus is direction/market structure
+// and cycle"). Display only: it sends the structure the charts already read on closed candles (window.msStructFacts) to
+// /api/structure-assistant and shows the checked answer. It places, changes or refuses no order, moves no stop, and keeps nothing
+// in the browser. Members only (hidden for guests).
+(function () {
+  if (document.documentElement.dataset.role === 'public') return;
+  var API = '/api/structure-assistant', ST = { open: false, busy: false, info: null };
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  var panel = el('aside', 'sa'); panel.id = 'ms-sa'; panel.hidden = true; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-labelledby', 'ms-sa-t');
+  panel.innerHTML = '<div class="sa-h"><h3 id="ms-sa-t">Structure assistant</h3><button type="button" class="sa-x" id="ms-sa-x" aria-label="Close">×</button></div>'
+    + '<div class="sa-b"><p class="sa-lab">AI reading, not advice, not a tested edge. Direction, market structure and the cycle, from the charts\' own reading of closed candles.</p>'
+    + '<p class="sa-st" id="ms-sa-st">Checking the assistant…</p>'
+    + '<div class="sa-row"><label for="ms-sa-tf">Looking at</label><select id="ms-sa-tf"><option value="">All timeframes</option><option value="1d">D1</option><option value="4h" selected>H4</option><option value="1h">H1</option><option value="15m">M15</option><option value="5m">M5</option></select>'
+    + '<button type="button" class="sa-go" id="ms-sa-read">Read this market</button></div>'
+    + '<label class="sa-lab" for="ms-sa-q">Or ask about the structure</label><textarea id="ms-sa-q" maxlength="300" rows="2" placeholder="e.g. Is H1 pulling back inside the H4 move?"></textarea>'
+    + '<div class="sa-row"><button type="button" class="sa-ask" id="ms-sa-ask">Ask</button></div>'
+    + '<div class="sa-out" id="ms-sa-out" aria-live="polite"></div>'
+    + '<details id="ms-sa-fd"><summary>The facts sent</summary><pre id="ms-sa-facts">Nothing sent yet.</pre></details></div>';
+  document.body.appendChild(panel);
+  var $ = function (id) { return document.getElementById(id); }, out = $('ms-sa-out'), btnEl = null;
+  // the toolbar button, next to Style (the toolbar is ordered by CSS: it takes Style's own order)
+  function placeBtn() {
+    var bar = document.querySelector('#v-charts .sec-h'), sty = document.getElementById('ms-sty'); if (!bar) return;
+    if (!btnEl) { btnEl = el('button', ''); btnEl.type = 'button'; btnEl.id = 'ms-sa-btn'; btnEl.setAttribute('aria-controls', 'ms-sa'); btnEl.setAttribute('aria-expanded', 'false'); btnEl.title = 'Ask the AI about direction, market structure and the cycle';
+      btnEl.innerHTML = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg><span class="sa-bl">Structure</span>';
+      btnEl.setAttribute('aria-label', 'Ask about structure'); btnEl.addEventListener('click', function () { toggle(!ST.open); }); }
+    if (btnEl.parentNode !== bar) { if (sty && sty.parentNode === bar) bar.insertBefore(btnEl, sty.nextSibling); else bar.appendChild(btnEl); }
+    if (sty) { var o = getComputedStyle(sty).order; if (btnEl.style.order !== o) btnEl.style.order = o; }
+  }
+  placeBtn(); setTimeout(placeBtn, 1500); window.addEventListener('resize', function () { placeBtn(); });
+  function toggle(on) {
+    ST.open = on; panel.hidden = !on; if (btnEl) btnEl.setAttribute('aria-expanded', String(on));
+    if (on) { loadInfo(); $('ms-sa-read').focus(); } else if (btnEl) btnEl.focus();
+  }
+  $('ms-sa-x').addEventListener('click', function () { toggle(false); });
+  panel.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.preventDefault(); toggle(false); } });
+  window.addEventListener('hashchange', function () { if (ST.open && location.hash.indexOf('#charts') !== 0) toggle(false); });
+  function setState(text, offState) { var s = $('ms-sa-st'); s.textContent = text; s.classList.toggle('off', !!offState); }
+  function loadInfo() {
+    return fetch(API, { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (j) {
+      ST.info = j;
+      if (!j) { setState('The assistant could not be reached.', true); return; }
+      if (!j.enabled) { setState('The assistant is off.', true); ['ms-sa-read', 'ms-sa-ask'].forEach(function (id) { $(id).disabled = true; }); return; }
+      ['ms-sa-read', 'ms-sa-ask'].forEach(function (id) { $(id).disabled = ST.busy; });
+      setState(j.leftToday + ' of ' + j.perDay + ' questions left today.');
+    });
+  }
+  var num = function (v, dec) { return (+v).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }); };
+  function render(a, dec) {
+    out.textContent = '';
+    out.appendChild(el('p', '', a.summary));
+    if (a.timeframes && a.timeframes.length) { out.appendChild(el('p', 'sa-sec', 'Top-down'));
+      a.timeframes.forEach(function (t) { var r = el('div', 'sa-tf'); r.appendChild(el('b', '', t.tf)); r.appendChild(el('span', t.direction, t.direction)); r.appendChild(el('span', '', t.why)); out.appendChild(r); }); }
+    if (a.cycle) { out.appendChild(el('p', 'sa-sec', 'The cycle')); out.appendChild(el('p', '', a.cycle)); }
+    if (a.watch && a.watch.length) { out.appendChild(el('p', 'sa-sec', 'Levels that would change the reading'));
+      a.watch.forEach(function (w) { var r = el('div', 'sa-w'); r.appendChild(el('b', '', num(w.level, dec))); r.appendChild(document.createTextNode(' · ' + w.what)); out.appendChild(r); }); }
+    if (a.question) { out.appendChild(el('p', 'sa-sec', 'A question back')); out.appendChild(el('p', '', a.question)); }
+  }
+  // the summary while the JSON is still being written (shown at once; the checked answer replaces it)
+  function partial(txt) { var m = /"summary"\s*:\s*"((?:[^"\\]|\\.)*)/.exec(txt); if (!m) return ''; try { return JSON.parse('"' + m[1].replace(/\\$/, '') + '"'); } catch (e) { return m[1]; } }
+  function ask(question) {
+    if (ST.busy) return;
+    if (ST.info && !ST.info.enabled) { setState('The assistant is off.', true); return; }
+    var F = null; try { F = window.msStructFacts && window.msStructFacts(); } catch (e) { F = null; }
+    if (!F || !F.facts || !F.facts.tfs || !F.facts.tfs.length) { out.textContent = ''; out.appendChild(el('p', 'sa-err', 'The charts have not read the structure yet: wait for the candles, then try again.')); return; }
+    var body = { market: F.market, label: F.label, tf: $('ms-sa-tf').value || null, question: question || '', facts: F.facts, stream: true };
+    $('ms-sa-facts').textContent = JSON.stringify(F.facts, null, 1);
+    ST.busy = true; $('ms-sa-read').disabled = $('ms-sa-ask').disabled = true;
+    out.textContent = ''; var wait = el('p', 'sa-wait', 'Reading the structure…'); out.appendChild(wait);
+    var dec = F.facts.dec, buf = '', txt = '';
+    var done = function (j) {
+      ST.busy = false; loadInfo();
+      if (!j) { out.textContent = ''; out.appendChild(el('p', 'sa-err', 'The assistant could not be reached. Try again in a minute.')); return; }
+      if (j.state === 'ok' && j.answer) { render(j.answer, dec); if (j.cached) out.appendChild(el('p', 'sa-lab', 'Answered before: shown from the store.')); return; }
+      out.textContent = ''; out.appendChild(el('p', 'sa-err', j.state === 'off' ? 'The assistant is off.' : (j.message || j.error || 'No answer.')));
+    };
+    fetch(API, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) {
+      var ct = r.headers.get('content-type') || '';
+      if (ct.indexOf('text/event-stream') < 0 || !r.body || !r.body.getReader) return r.json().catch(function () { return null; }).then(done);
+      var rd = r.body.getReader(), dc = new TextDecoder(), last = null;
+      var pump = function () { return rd.read().then(function (x) {
+        if (x.done) { done(last || { state: 'error', message: 'The answer broke off. Try again in a minute.' }); return; }
+        buf += dc.decode(x.value, { stream: true }); var parts = buf.split('\n\n'); buf = parts.pop();
+        parts.forEach(function (p) { var line = p.replace(/^data:\s*/, ''); var o; try { o = JSON.parse(line); } catch (e) { return; }
+          if (o.t === 'text') { txt += o.d || ''; var s = partial(txt); if (s) wait.textContent = s; }
+          else if (o.t === 'done') last = o; });
+        return pump(); }); };
+      return pump();
+    }).catch(function () { done(null); });
+  }
+  $('ms-sa-read').addEventListener('click', function () { ask(''); });
+  $('ms-sa-ask').addEventListener('click', function () { var q = $('ms-sa-q').value.trim(); if (q) ask(q); else $('ms-sa-q').focus(); });
+  $('ms-sa-q').addEventListener('keydown', function (e) { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $('ms-sa-ask').click(); } });
+  window.msStructAssistant = function () { return { open: ST.open, busy: ST.busy, enabled: ST.info ? !!ST.info.enabled : null }; };
 })();
 </script>
 </body>

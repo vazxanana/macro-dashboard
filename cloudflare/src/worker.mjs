@@ -37,6 +37,7 @@ import signup from '../../api/signup.js';
 import sounds from '../../api/sounds.js';
 import status from '../../api/status.js';
 import stream from '../../api/stream.js';
+import structureAssistant from '../../api/structure-assistant.js';
 import tradeReview from '../../api/trade-review.js';
 import users from '../../api/users.js';
 import { connect } from 'cloudflare:sockets';
@@ -47,7 +48,7 @@ import './bundled.mjs';   // the files the Academy and the bridge downloads read
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, bars, battle, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, daily, data,
   'edge-analyst': edgeAnalyst, login, logout, lse, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
-  profile, signup, sounds, status, stream, 'trade-review': tradeReview, users,
+  profile, signup, sounds, status, stream, 'structure-assistant': structureAssistant, 'trade-review': tradeReview, users,
 };
 
 // Cron expression (wrangler.jsonc triggers) -> the path Vercel's cron called.
