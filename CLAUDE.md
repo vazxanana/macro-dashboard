@@ -6358,6 +6358,9 @@ the check needs a day change (2+ firm days). Fix (`scripts/audit/chronostrade.cj
 the firm's own rules (0.11 %: 21 trades at most, all stopped = 60 % of the maximum loss, all at their 2R target = 90 % of the
 profit target), so the challenge stays live through the steps on any date; if it still ends on day one the check fails and says
 why. Run with the page's clock set to 16, 21 and 22 Nov: 6, 7 and 6 firm days.
+Also date-dependent (found by a second session on a Sunday start, its pull request #1365 joined in here): a switch up that
+lands on the higher timeframe's own boundary forms no candle; the audit then goes back, takes one more compared step on the finer
+timeframe and switches again (at most 3 times; the risk sizing counts those extra steps).
 
 ## A SOP inside the SOP: the VR and the CF each start a lower-timeframe sequence (22 Nov 2026, owner: "on mosha you need to repeat sop inside sop. Bo1 vr ( start new low time frame sop bo vr cf for sells if bo1 is bullish, and buys if bo1 is bearish), CF (start new low time frame sop bo vr cf for buys and main structure as well)")
 `assets/mosha-sop.js` `sopTrades` (`nestAdd`, `nestRun`). The main sequence (BO on h, VR and CF on l, the EG entry) is unchanged
