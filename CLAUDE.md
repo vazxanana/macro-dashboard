@@ -6221,3 +6221,9 @@ year before costs: a choice, not a tested result; never quote the rebuilt totals
   costs): one of eighteen groups, picked after looking, and the same method failed its after-costs study on earlier years. A
   hypothesis for a pre-registered test on other years, never an edge.
 Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`.
+
+## The desks keep 60,000 records (22 Nov 2026, owner: "raise the limit so it goes back to january")
+`council/mosha-desk.mjs` `KEEP` 14,000 -> 60,000 (shared by the Mosha tracker and `council/edge-desks.mjs`). With the M1 EF entry
+and the 1R barriers 14,000 records held only about six months, so the Mosha and Engulfing histories started in May. The light
+`desk.json` the page reads grows with it (about 0.35 KB a record). Never publish a file of over 14,000 records to council-data
+before main's tracker has this limit (the older tracker cuts the file on its next run).
