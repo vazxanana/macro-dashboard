@@ -2575,6 +2575,39 @@ menu), the RIGHT chart (`.sp-right`, `spMarkRight`: the free chart, or the analy
 its market button, any market (`openMk`; turns "Symbol" sync off).
 Tests: `tests/desk-draw.test.mjs`.
 
+## Structure assistant on Charts (22 Nov 2026, owner: "build an ai assistant for the dashboard that he will focus is direction/market structure and cycle")
+A language model's READING of direction, market structure and the market cycle, from the structure the Desk's charts already
+compute. Display only: it places, changes or refuses no order, moves no stop, keeps nothing in the browser, and no council member
+reads it. Not advice, not a tested edge (the page and the system text say so).
+- **Facts** (`window.msStructFacts`, inside the main script right after `cycleStrip`): for D1, H4, H1, M15, M5 the panes' own
+  `P.A` (msAnalyze on CLOSED candles: the slice `A.n`), its trend, last break (BO / ChoCh), the last 6 breaks, the protected swing,
+  the move's extreme, the last 4 iBOs (`msInternal`) and the internal leg (`msInternalLeg`); the cycle rows of `cycleNow()` with
+  `msStage` / `msPath` (move / pullback / continuation, 50 %, origin, extreme, the ChoCh, the path); the alignment count. Times in
+  UTC (the panes' times carry `TZ`). Fetches nothing.
+- **`api/_structure-assistant.js`** (pure): `buildRequest(body, nowS)` whitelists and caps everything (timeframes D1-M5 only, levels
+  finite and positive, rounded to `dec`, times not after the reading's `at`, `at` within the last hour, strings 200, question 300,
+  6 breaks / 4 iBOs a timeframe, 4 cycle rows, 2 path legs) and writes the facts as plain lines. `parseAnswer(text, q)`: JSON
+  `{ summary, timeframes: [{ tf, direction: up|down|sideways|unclear, why }], cycle, watch: [{ level, what }], question? }`; a
+  timeframe must be in the facts, a watch level must be one of the facts' levels (to half the last decimal), and every figure in the
+  text must be in the FACTS text (the person's question is not a fact; timeframe names, 50 / 100 and whole numbers up to 10 apart),
+  the rule of `api/_daily.js` `parseBrief`; refused: trade instructions, any talk of stops, "proven / tested edge / guaranteed",
+  a forecast stated as fact (a "will" sentence without if / could / would …), talk of itself.
+- **`api/structure-assistant.js`**: GET (signed-in member) `{ enabled, reason, perDay, leftToday, cost }`; POST same origin, a
+  signed-in member, `{ market, label?, tf?, question?, facts, stream? }`, streamed like the ChronosTrade coach (`start`, `text`,
+  then `done` = the CHECKED result). Store `structure-assistant/answers.json` (+ the adapter's `cost.json` / `llm-cache.json`;
+  `-preview/` off production): an answered or billed-and-refused question is answered from it, never paid twice. Key
+  `STRUCT_LLM_KEY` else `ACADEMY_LLM_KEY` else `ANTHROPIC_API_KEY` / `CLAUDE_API_KEY` (which bring the provider's messages address
+  and format, the daily brief's rule); model `STRUCT_LLM_MODEL` else `ACADEMY_LLM_MODEL`; budgets `STRUCT_LLM_DAILY_USD` 0.5 /
+  `_MONTHLY_USD` 5 / `_HARD_USD` 25 / `_MAX_CALLS_DAY` 60; `STRUCT_LLM_MAX_TOKENS` 3000; `STRUCT_ASSISTANT_PER_DAY` 20 an account a
+  UTC day (memory, per instance); `STRUCT_ASSISTANT=off` or `STRUCT_LLM_STOP=1` stops it. Routed in `cloudflare/src/worker.mjs`
+  (`'structure-assistant'`) and `vercel.json` functions.
+- **Page** (`<style id="ms-sa-css">` + `<script id="ms-sa-js">` at the end of the Desk): a "Structure" button in the Charts
+  toolbar (`#ms-sa-btn`, placed after Style with Style's own CSS order; icon only on a phone), a side panel `#ms-sa` (a bottom sheet
+  up to 640 px): "AI reading, not advice, not a tested edge", the state from GET ("The assistant is off." with the buttons off),
+  "Looking at" (all / D1-M5), "Read this market", a free question, the streamed summary then the checked answer drawn as text,
+  and "The facts sent" in a fold. Hidden and not run for guests. `window.msStructAssistant()` is a read-only view.
+- Tests: `tests/structure-assistant.test.mjs` (7). Not checked against a real provider (no key in the build sandbox).
+
 ## Charts bug hunt (20 Nov 2026: the chart features of 18-20 Nov, used in a browser)
 Every drawing tool, the paper account, the volume profile, Layout, Markets side by side, Split, any timeframe, full screen and the
 live ticks were driven with Playwright (1440 px mouse, 390 px touch; owner and guest; live candles). Twelve defects, each
