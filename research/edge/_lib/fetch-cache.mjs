@@ -1,13 +1,13 @@
 // research/edge/_lib/fetch-cache.mjs - fill the edgekit candle cache (OANDA mid candles through the site candle proxy).
-// node --use-env-proxy research/edge/_lib/fetch-cache.mjs <market> <5m|1d> <firstYear> [lastYear]
+// node --use-env-proxy research/edge/_lib/fetch-cache.mjs <market> <1m|5m|1d> <firstYear> [lastYear]
 // Writes $EDGE_DATA/<market>/<tf>-<year>.json.gz ([[t,o,h,l,c]], t = candle start, unix s, UTC); a finished year is never
 // fetched again. Set EDGE_DATA (edgekit reads the same variable). Then run research/edge/data-quality/audit.mjs.
 import fs from 'node:fs'; import zlib from 'node:zlib';
 const OUT = process.env.EDGE_DATA || '/tmp/claude-0/-workspace-macro-dashboard/70c7c5c7-1744-58d1-abc7-8a850c1b63a7/scratchpad/edge-data';
 const BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/';
 const [mk, tf, Y0, Y1] = process.argv.slice(2);
-const step = tf === '5m' ? 300 : 86400;
-const span = tf === '5m' ? 16 * 86400 : 4000 * 86400;
+const step = tf === '1m' ? 60 : tf === '5m' ? 300 : 86400;
+const span = tf === '1m' ? 3 * 86400 : tf === '5m' ? 16 * 86400 : 4000 * 86400;   // under 5,000 candles a request
 const y0 = +Y0;
 const now = Math.floor(Date.now() / 1000);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -33,7 +33,7 @@ for (let y = y0; y <= yEnd; y++) {
   for (let f = a; f < b; f += span) {
     const t = Math.min(f + span, b);
     const bars = await get(f, t);
-    if (tf === '5m' && bars.length >= 4999) console.error(mk, 'window full', f);
+    if ((tf === '5m' || tf === '1m') && bars.length >= 4999) console.error(mk, 'window full', f);
     for (const x of bars) if (x.time >= a && x.time < b) map.set(x.time, [x.time, x.open, x.high, x.low, x.close]);
     await sleep(300);
   }
