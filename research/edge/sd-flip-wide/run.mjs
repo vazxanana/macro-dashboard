@@ -74,17 +74,17 @@ export function signals(F, market = '') {
       if (z.fi < 0) continue; const fi = z.fi, B = L[fi], a = AL[fi]; if (!(a > 0)) continue;
       const s = -z.d, ft = B.e, body = Math.abs(B.c - B.o) / a;
       const D0 = s < 0 ? z.bot - B.c : B.c - z.top; if (!(D0 > 0)) continue;
-      const zone = (bot, top, tag) => {
+      const zone = (bot, top, eb, et) => { // eb / et: the flipped zone's own edges, for the distance (causal for the band too)
         const end = endOf(L, fi, s, bot, top); let k = startIdx(T, ft), ext = s < 0 ? B.l : B.h;
         while (k < T.length && T[k].t < end && !(s < 0 ? T[k].h >= bot : T[k].l <= top)) { ext = s < 0 ? Math.min(ext, T[k].l) : Math.max(ext, T[k].h); k++; }
         if (k >= T.length || T[k].t >= end) return null;
-        return { k, end, dist: (s < 0 ? bot - ext : ext - top) / a, stop: s < 0 ? top + ATRK * a : bot - ATRK * a, bot, top, tag };
+        return { k, end, dist: (s < 0 ? eb - ext : ext - et) / a, stop: s < 0 ? top + ATRK * a : bot - ATRK * a, bot, top };
       };
-      const r = zone(z.bot, z.top);
+      const r = zone(z.bot, z.top, z.bot, z.top);
       if (r) emit('real', fam, s, r.k, r.bot, r.top, r.end, r.stop, { dist: r.dist, body });
       const u = 0.5 + 1.5 * K.rng(hash(`${market}|${fam}|${lv}|${fi}`))(), w = z.top - z.bot;
-      const bb = s < 0 ? B.c + u * D0 : B.c - u * D0 - w, q = zone(bb, bb + w);
-      if (q) emit('rnd', fam, s, q.k, q.bot, q.top, q.end, q.stop, { dist: r ? r.dist : q.dist, body });
+      const bb = s < 0 ? B.c + u * D0 : B.c - u * D0 - w, q = zone(bb, bb + w, z.bot, z.top);
+      if (q) emit('rnd', fam, s, q.k, q.bot, q.top, q.end, q.stop, { dist: q.dist, body });
     } });
   });
   return out;
@@ -218,7 +218,8 @@ function resultMd(o, rows) {
     'Controls: (1) **unbroken**: the same zones\' ordinary first touch before any break, traded with their own side, same entries and',
     'exits; (2) **random band**: per flip, a band of the zone\'s width on the same side of price at 0.5-2.0 times the flipped zone\'s',
     'distance from the break candle\'s close, traded exactly as the flipped zone. The random band carries the flip\'s distance and',
-    'body values; its MSNR condition is read at its own trigger (the same condition as the cell).', '',
+    'body values; its MSNR condition is read at its own trigger (the same condition as the cell). Its distance is the excursion beyond',
+    'the flipped zone\'s broken edge measured up to the band\'s own return (see Checks).', '',
     '## The bar, cell by cell', '',
     `- n >= 300 in both windows: ${cnt((r) => r.checks.n)} of 56.`,
     `- Mean R > 0 and month t >= 2 in discovery: ${cnt((r) => r.checks.disc)}; in confirmation: ${cnt((r) => r.checks.conf)}; both: ${cnt((r) => r.checks.disc && r.checks.conf)}.`,
@@ -237,6 +238,7 @@ function resultMd(o, rows) {
     for (const x of list) L.push(`| ${x.market} | ${N(x.d.n)} | ${f3(x.d.mean)} (${f2(x.d.t)}) | ${N(x.c.n)} | ${f3(x.c.mean)} (${f2(x.c.t)}) |`); L.push(''); } }
   L.push('## Checks', '',
     `- Cut test: ${o.cut.length} cuts on ${[...new Set(o.cut.map((x) => x.market))].join(', ')}: ${N(nCut)} signals (real, unbroken and random) known by the cut dates, ${bad} missing or extra when the candles are cut there.`,
+    '- One change made before the report was read, because the cut test caught it: the first run gave a random band the real zone\'s distance value, which is only known at the real zone\'s return and can come after the band\'s trigger (a few signals in 3 of 50 cuts differed). The band now measures the same excursion up to its own return; the real flips are unchanged.',
     '- Every trade has its stop on the losing side of the fill (the run throws otherwise); fills at or past the stop and trades whose risk is under the round-trip cost are no trades (every stream alike).',
     '- Exclusions: the data-quality audit\'s bad intervals (`combo-grid-2` `exclusions`).', '',
     '| Market | candles from | flip / unbroken / random signals | simulated | dropped (bad data) | past the stop | risk under cost |', '|---|---|---:|---:|---:|---:|---:|');
@@ -246,6 +248,12 @@ function resultMd(o, rows) {
   else L.push('No flip cell clears the bar: trading a broken supply / demand or engulf zone the other way on its first return does not',
     'pick trades that beat the same zones touched before any break, or a random band at a matched distance, in both windows.',
     'Do not re-test variants of these 56 cells on these years. Nothing live changed; no rule is proposed.');
+  const top = [...rows].filter((r) => r.checks.disc && r.checks.conf).sort((a, b) => b.c.t - a.c.t)[0];
+  if (top) L.push('', `**Where the tilt is.** ${rows.filter((r) => r.checks.disc && r.checks.conf).length} cells are positive before costs in both windows, all on H4 zones with`,
+    `the close-inside entry (best ${cname(top)}: ${f3(top.d.mean)}R / ${f3(top.c.mean)}R a trade, month t ${f2(top.d.t)} / ${f2(top.c.t)}). Some beat the`,
+    `unbroken first touch, but a random band at a matched distance on the same side of price does about as well (${f3(top.rnd.c.mean)}R in`,
+    `2015-26, Welch t ${f2(top.vsRnd.d)} / ${f2(top.vsRnd.c)}): the tilt belongs to buying (selling) a pull-back into ANY level near a break, the`,
+    `short-term pull-back the day's other studies found, not to the flipped zone. After costs it loses (${f3(top.c.meanNet)}R a trade in 2015-26).`);
   L.push('');
   return L.join('\n');
 }
