@@ -44,3 +44,10 @@ cache. R after the toolkit's round-trip costs unless said; t on calendar-month s
 - trades.json holds the T1 trades (T3 = its gold rows); the T2 (M5) trades are left out to keep it under 3 MB, their numbers are in result.json.
 
 Nothing live changed. Files: result.json (every number), trades.json (every trade), tests/box-touch-trend.test.mjs.
+
+## Financing not charged (23 Nov 2026, review)
+
+Gold buys held over the 22:00 UTC rollover pay overnight financing (`council/fills.mjs` `FIN.xau.long`); this study's R after
+costs does not charge it, so every gold buy's figure is a little flattered. Measured afterwards from `trades.json` with
+`financing()`: 1,737 gold buys of T1, 178 held over a 22:00 UTC rollover: on average 0.017R a gold buy (28.9R in all). No verdict changes (the study fails or is inconclusive either way); do not pool these rows with studies that
+charge financing without taking it off first.

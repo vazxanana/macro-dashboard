@@ -134,3 +134,15 @@ test('load reads the gzip cache by year and range', () => {
   assert.equal(K.load('xau', '5m', { dir, from: T0 + 1 }).length, 1);
   assert.equal(K.COSTS.xau, 0.30);
 });
+
+test('New York offset follows the pre-2007 US daylight rule before 2007 (review 23 Nov 2026)', async () => {
+  const K2 = await import('../research/edge/_lib/edgekit.mjs');
+  const at = (s) => K2.nyOffsetH(Date.parse(s) / 1000);
+  assert.equal(at('2006-03-20T12:00Z'), 5); // after the 2nd Sunday of March, before April: still winter in 2006
+  assert.equal(at('2006-04-02T08:00Z'), 4); // 1st Sunday of April 07:00 UTC on
+  assert.equal(at('2006-10-29T05:00Z'), 4);
+  assert.equal(at('2006-10-29T07:00Z'), 5); // last Sunday of October 06:00 UTC off
+  assert.equal(at('2006-11-02T12:00Z'), 5);
+  assert.equal(at('2008-03-10T12:00Z'), 4);
+  assert.equal(at('2008-11-01T12:00Z'), 4);
+});

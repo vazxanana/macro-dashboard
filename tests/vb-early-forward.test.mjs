@@ -82,3 +82,12 @@ test('vb early: the workflow runs it on the candles it already fetched', () => {
     assert.ok(b.rows.every(([d]) => d < V.START), 'no baseline day reaches the forward window');
   }
 });
+
+test('a fail at the 120-trade checkpoint is never replaced by the 240 reading (review 23 Nov 2026)', async () => {
+  const { verdictOf } = await import('../research/edge/vb-early-forward/run.mjs');
+  assert.equal(verdictOf({ 120: { reading: 'fails' }, 240: { reading: 'confirmed' } }), 'FAIL');
+  assert.equal(verdictOf({ 120: { reading: 'holds so far' }, 240: { reading: 'confirmed' } }), 'PASS');
+  assert.equal(verdictOf({ 120: { reading: 'holds so far' } }), 'INCONCLUSIVE');
+  assert.equal(verdictOf({ 120: { reading: 'holds so far' }, 240: { reading: 'not shown either way' } }), 'INCONCLUSIVE');
+  assert.equal(verdictOf({}), 'INCONCLUSIVE');
+});

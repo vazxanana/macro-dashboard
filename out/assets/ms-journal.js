@@ -90,9 +90,38 @@
       return Object.keys(m).sort().map((k) => ({ key: k, ...compare(m[k]) })); };
     return { all: compare(done), byMethod: group('method'), byConfidence: group('confidence'), resolved: done.length,
       open: (rows || []).filter((x) => x && !x.withdrawn && x.status === 'open').length, pending: (rows || []).filter((x) => x && !x.withdrawn && x.status === 'pending').length,
-      withdrawn: (rows || []).filter((x) => x && x.withdrawn).length, note: 'R before costs. A skip is scored as if it had been taken. Not a tested edge.' };
+      withdrawn: (rows || []).filter((x) => x && x.withdrawn).length,
+      // what the withdrawn calls went on to do (review, 23 Nov 2026): beside the split, never in it, so taking a call back after a
+      // bad first move is seen
+      withdrawnOut: compare((Array.isArray(rows) ? rows : []).filter((x) => x && x.withdrawn && (x.status === 'stop' || x.status === 'target') && Number.isFinite(x.R))),
+      note: 'R before costs. A skip is scored as if it had been taken. Not a tested edge.' };
   }
 
-  const api = { MARKETS, TFS, MIN_SIDE, DELETE_S, NOTE_N, check, outcome, joinBars, stats, welch, clean };
+  // Take / Skip on the desks' own signals (23 Nov 2026): an OPEN record of the Mosha, Engulfing, MSNR or LIT desk becomes the
+  // preset of a call: its own market, side, entry, stop and target, the timeframe it entered on, its kind's label as the method,
+  // and source { desk, id }. Null when the record is closed, its market is not one the journal takes, or its levels are not a
+  // call the server would accept (no stop on the losing side). A practice record only: nothing is traded.
+  const DESKS = ['mosha', 'eg', 'msnr', 'lit'];
+  const TF_OF = { '1m': 'M1', '5m': 'M5', '15m': 'M15', '30m': 'M30', '1h': 'H1', '4h': 'H4', '1d': 'D1' };
+  function fromRecord(desk, r) {
+    if (!DESKS.includes(desk) || !r || typeof r !== 'object' || r.R != null || r.endT) return null;
+    const id = clean(r.id, 80); if (!id) return null;
+    const market = String(r.market || 'xau').toLowerCase(); if (!MARKETS.includes(market)) return null;
+    const side = r.side === 'buy' || r.side > 0 ? 'buy' : r.side === 'sell' || r.side < 0 ? 'sell' : null; if (!side) return null;
+    const entry = px(r.entry), stop = px(r.stop), target = r.target == null ? null : px(r.target);
+    if (entry == null || stop == null || (side === 'buy' ? stop >= entry : stop <= entry)) return null;
+    const tgt = target != null && (side === 'buy' ? target > entry : target < entry) ? target : null;
+    return { market, side, entry, stop, target: tgt, tf: TF_OF[r.l] || TFS.find((t) => t === r.l) || null,
+      method: clean(r.method || r.label || r.kind, METHOD_N), source: { desk, id } };
+  }
+  // the account's call on that signal: the latest one, withdrawn ones included. A signal takes one call an account for good: a
+  // withdrawn call does not open it again (review, 23 Nov 2026: Take, withdraw after a bad first move, then Skip, would have
+  // hidden the first choice; the server refuses the second call the same way)
+  function findCall(calls, desk, id) {
+    return (Array.isArray(calls) ? calls : []).filter((c) => c && c.source && c.source.desk === desk && c.source.id === id)
+      .sort((a, b) => b.at - a.at)[0] || null;
+  }
+
+  const api = { MARKETS, TFS, MIN_SIDE, DELETE_S, NOTE_N, DESKS, TF_OF, check, outcome, joinBars, stats, welch, clean, fromRecord, findCall };
   if (typeof module === 'object' && module.exports) module.exports = api; else root.MS_JOURNAL = api;
 })(typeof window !== 'undefined' ? window : globalThis);

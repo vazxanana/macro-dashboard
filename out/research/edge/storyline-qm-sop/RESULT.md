@@ -32,3 +32,10 @@ timeframe, "newer break" reading or filter). Secondary tests do not pass alone; 
 
 To repeat: `node research/edge/storyline-qm-sop/run.mjs` (reads the toolkit's candle cache; about 30 s). Every trade is
 in trades.json. Test: `tests/storyline-qm-sop.test.mjs`.
+
+## Financing not charged (23 Nov 2026, review)
+
+Gold buys held over the 22:00 UTC rollover pay overnight financing (`council/fills.mjs` `FIN.xau.long`); this study's R after
+costs does not charge it, so every gold buy's figure is a little flattered. Measured afterwards from `trades.json` with
+`financing()`: 25 gold buys (T1-T3), 4 held over a rollover: on average 0.017-0.033R a gold buy (0.6R in all). No verdict changes (the study fails or is inconclusive either way); do not pool these rows with studies that
+charge financing without taking it off first.

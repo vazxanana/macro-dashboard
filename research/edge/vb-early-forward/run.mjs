@@ -77,6 +77,13 @@ export function checkAt(c, D, A, B, t, earlyMean) {
   if (c === CHECKS[1]) return D < A.p5 ? 'fails' : (D > B.p95 && t >= 2 && earlyMean > 0 ? 'confirmed' : 'not shown either way');
   return D < A.p5 ? 'fails' : 'holds so far';
 }
+// The first crossing of a checkpoint is never replaced (PREREGISTRATION.md): a 'fails' at either checkpoint is FAIL for good;
+// PASS only on 'confirmed' at the last checkpoint (review of 23 Nov 2026: the 240 reading used to replace a 120 'fails').
+export function verdictOf(crossed) {
+  const C = crossed || {};
+  if (Object.values(C).some((c) => c && c.reading === 'fails')) return 'FAIL';
+  return C[CHECKS[1]] && C[CHECKS[1]].reading === 'confirmed' ? 'PASS' : 'INCONCLUSIVE';
+}
 const side = (a) => ({ n: a.length, netR: r3(mean(a.map((x) => x.net))), grossR: r3(mean(a.map((x) => x.R))), total: r2(a.reduce((s, x) => s + x.net, 0)), monthT: a.length > 1 ? r2(monthT(a).t) : null });
 const pair = (a) => ({ early: side(a.filter(isEarly)), late: side(a.filter((x) => !isEarly(x))) });
 
@@ -88,9 +95,8 @@ export function build(tr, base, dataEnd, prev) {
   const D = w.d, earlyMean = mean(E.map((x) => x.net)), read = reading(ne, nl, D, A, B);
   const crossed = { ...((prev && prev.crossed) || {}) };
   for (const c of CHECKS) if (ne >= c && nl >= c && !crossed[c]) crossed[c] = { at: dataEnd, ne, nl, D: r3(D), t: r2(w.t), reading: checkAt(c, D, A, B, w.t, earlyMean) };
-  const last = crossed[CHECKS[1]] || crossed[CHECKS[0]];
   const tail = `forward split from ${START}: ${read}, early n ${ne}, late n ${nl}, D ${Number.isFinite(D) ? (D >= 0 ? '+' : '') + r3(D) : '—'}R`;
-  const verdict = last && last.reading === 'fails' ? `FAIL (${tail})` : last && last.reading === 'confirmed' ? `PASS (${tail})` : `INCONCLUSIVE so far (${tail})`;
+  const verdict = `${verdictOf(crossed)}${verdictOf(crossed) === 'INCONCLUSIVE' ? ' so far' : ''} (${tail})`;
   const hours = { '00-03': side(E.filter((x) => x.fillMin < 180)), '03-06': side(E.filter((x) => x.fillMin >= 180)) };
   const bySide = Object.fromEntries(['buy', 'sell'].map((s) => [s, pair(tr.filter((x) => x.side === s))]));
   return { study: 'vb-early-forward', start: START, dataEnd, D: r3(D), t: r2(w.t), early: side(E), late: side(L),

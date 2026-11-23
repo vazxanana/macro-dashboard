@@ -41,8 +41,21 @@ test('every candidate has its stop on the losing side and its target on the winn
 test('the report matches result.json', () => {
   const r = JSON.parse(fs.readFileSync(new URL('../research/edge/box-zone/result.json', import.meta.url)));
   assert.equal(r.verdict, 'FAIL');
-  assert.equal(r.pool.n, 1029);
+  assert.equal(r.pool.n, 1071);
   const md = fs.readFileSync(new URL('../research/edge/box-zone/RESULT.md', import.meta.url), 'utf8');
   assert.match(md, /FAIL, 1 of 4/);
   assert.match(md, new RegExp(r.pool.n.toLocaleString('en-US')));
+});
+
+test('a join is used only from the time it is known (review 23 Nov 2026)', () => {
+  // up box, then a down box (zone b), then a second down box overlapping b (join, known later)
+  const C = [bar(0, 1, 2, 0.9, 1), bar(1, 1, 1.5, 1, 1.2), bar(2, 1.2, 1.6, 1, 1.3), bar(3, 1.3, 2.6, 1.3, 2.5),
+    bar(4, 2.5, 2.7, 2.2, 2.4), bar(5, 2.4, 2.6, 2.3, 2.5), bar(6, 2.5, 2.5, 1.1, 1.2),
+    bar(7, 1.2, 2.3, 1.1, 1.2), bar(8, 1.2, 1.3, 1.15, 1.2), bar(9, 1.2, 1.25, 0.5, 0.6), bar(10, 0.6, 0.7, 0.5, 0.6)];
+  const Z = zones(C);
+  const first = Z.find((z) => !z.joined), j = Z.find((z) => z.joined);
+  assert.ok(first && j, 'both the lone box and the joined zone are listed');
+  assert.ok(first.known < j.known);
+  assert.ok(first.dead <= j.known, 'the lone box lives only until the join is known');
+  assert.ok(j.known >= first.dead);
 });

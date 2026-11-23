@@ -75,9 +75,11 @@ function nthSunday(y, m, n) { // m 0-based; n-th Sunday, as a UTC day start
   const d = new Date(Date.UTC(y, m, 1)); const first = (7 - d.getUTCDay()) % 7;
   return Date.UTC(y, m, 1 + first + 7 * (n - 1)) / 1000;
 }
-export function nyOffsetH(t) { // US daylight time: 2nd Sunday of March 07:00 UTC to 1st Sunday of November 06:00 UTC
+export function nyOffsetH(t) { // US daylight time: from 2007 the 2nd Sunday of March 07:00 UTC to the 1st Sunday of November
+  // 06:00 UTC; before 2007 the 1st Sunday of April 07:00 UTC to the last Sunday of October 06:00 UTC (review of 23 Nov 2026)
   const y = new Date(t * 1000).getUTCFullYear();
-  const on = nthSunday(y, 2, 2) + 7 * 3600, off = nthSunday(y, 10, 1) + 6 * 3600;
+  const on = (y < 2007 ? nthSunday(y, 3, 1) : nthSunday(y, 2, 2)) + 7 * 3600;
+  const off = (y < 2007 ? nthSunday(y, 10, 1) - 7 * 86400 : nthSunday(y, 10, 1)) + 6 * 3600;
   return t >= on && t < off ? 4 : 5;
 }
 

@@ -18,8 +18,10 @@ calendar-month sums with empty months counted as zero. The two small Holm p valu
 worse there, not better.
 
 ## In plain words
-- **Direction helps a little and is not enough.** With the Daily structure the loss halves against every fresh zone (S1), but
-  stays a loss before costs in two of three windows and after costs in all three.
+- **Direction does not help reliably.** Before costs the Daily structure cuts the out-of-sample loss by about half against
+  every fresh zone (S1: −0.045 against −0.087R a trade), but after costs it is only a little better out of sample (−0.101
+  against −0.138R) and in sample (−0.095 against −0.101R), and it is worse than no filter on 2010-2019 (−0.166 against
+  −0.151R after costs, −0.052 against −0.035R before). It stays a loss in every window after costs.
 - **A shallow turn at the zone's edge is the worst variant** (S2, −0.37R a trade out of sample). The deep turns inside the
   zone are the less bad ones.
 - **Buys before costs are at zero** (S3 +0.028R out of sample, +0.013R on 2010-19), so costs and financing make them a loss.

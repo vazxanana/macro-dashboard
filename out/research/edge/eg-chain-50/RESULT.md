@@ -47,6 +47,13 @@ on 17:00 New York days.
 - It does not test the owner's own reading of the chain: picking which zone counts, which engulf is clean, or skipping a
   messy chart. It tests one mechanical reading, once.
 - It does not say engulf zones never work: other timeframes, targets or stops were not tried and will not be on these years.
-- One market (gold), OANDA mid candles, a fixed $0.30 cost for every year; no financing charged (holds are under a day on P).
+- One market (gold), OANDA mid candles, a fixed $0.30 cost for every year; no financing charged (see the note at the end).
 - No result here should be quoted as evidence for or against the desks' Engulfing readings, which differ in entry, stop
   and target.
+
+## Financing not charged (23 Nov 2026, review)
+
+Gold buys held over the 22:00 UTC rollover pay overnight financing (`council/fills.mjs` `FIN.xau.long`); this study's R after
+costs does not charge it, so every gold buy's figure is a little flattered. Measured afterwards from `trades.json` with
+`financing()`: chain P 791 gold buys, 0.003R a buy; chain S1 220 buys, 35 held over a rollover, 0.022R a buy (4.8R); chain S2 260 buys, 0.006R a buy. No verdict changes (the study fails or is inconclusive either way); do not pool these rows with studies that
+charge financing without taking it off first.

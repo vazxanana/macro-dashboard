@@ -6577,8 +6577,9 @@ The design of `research/proposals/2026-11-20-discretion.md`: the studies say a p
 a choice stamped BEFORE the outcome can measure it. Practice and record only: nothing goes to a broker, the council or the mirror,
 no council member reads it, and nothing is kept in the browser.
 - **`api/journal.js`** (Vercel (req, res) shape, routed in `cloudflare/src/worker.mjs` `HANDLERS.journal` and `vercel.json`
-  functions; private store file `journal/decisions.json`, overwritten in place, read with `?cache=0`, a failed read throws and is
-  never saved over; `tests/blob-fresh.test.mjs` lists it). Who: the owner, and a member whose `perms.desks` is on (an explicit one
+  functions; one private store file per account, `journal/<account>.json` (review 23 Nov 2026: one shared file let two accounts'
+  writes overwrite each other), overwritten in place, read with `?cache=0`, a failed read throws and is never saved over; one
+  account's writes run one at a time per instance (`TAILS`); `tests/blob-fresh.test.mjs` lists it). Who: the owner, and a member whose `perms.desks` is on (an explicit one
   wins, else reviewers). GET = the account's OWN calls (the account key never leaves the server). POST same-origin:
   `{ call: { market (xau eurusd gbpusd usdjpy audusd nas100 xag), side, action: take | skip, entry, stop, target?, tf, method
   (<= 40), reason (<= 300), confidence 1-5, source? { desk, id } } }` → the SERVER stamps `at` (a sent `at` is ignored); a stop
@@ -6586,7 +6587,7 @@ no council member reads it, and nothing is kept in the browser.
   an `id` is refused), only `{ note: { id, text } }` (500 chars, `noteAt`); `{ remove: id }` only within `DELETE_S` 120 s of `at`,
   and it WITHDRAWS (the record stays, `withdrawn` = the time; counted apart, never in taken / skipped: the proposal's "nothing is
   deleted"). A stored file that is not a list throws (never saved over).
-  2,000 calls an account, 5,000 in all.
+  2,000 calls an account (no total cap, so members can never close it to the owner); 60 posts an account an hour (429).
 - **Rules, one copy** `assets/ms-journal.js` (pure; `window.MS_JOURNAL` on the page, re-exported by `api/_journal.js`): `check`,
   `outcome(call, bars)` = candles that START at or after `at` only (never a forming one); the entry must be REACHED by one of them
   (else `pending`, not scored: a call written with the price already past its entry cannot book a result); on the fill candle only
@@ -6603,5 +6604,16 @@ no council member reads it, and nothing is kept in the browser.
   calls with their outcome from `/md/bars` (5-minute candles for two weeks, then hourly joined after them; re-read every 2 minutes
   while open or pending), the taken-vs-skipped line, "Add a note" (styled `msAsk`) and "Withdraw" in the first 2 minutes. Graphite tokens, 12 px min, 44 px on
   touch. `window.msJournal()` is a read-only view.
-- Not built (the proposal's later steps): Take / Skip buttons on the desks' own signals (`source` is ready for them) and the
-  study's report from this file. Tests: `tests/journal.test.mjs`.
+- **Take / Skip on the desks' own signals** (23 Nov 2026): every OPEN record row and Open now card of the Mosha, Engulfing, MSNR and
+  LIT desks carries an empty slot (`span.dc[data-dc][data-dc-r]`, `MS_MOSHA_SOP.dcSlot`, used by `assets/mosha-sop.js` and
+  `assets/desk-trades.js`); `#ms-jr-js` fills it, only once GET answered `canWrite`, with Take / Skip (or "Your call: …" when this
+  account already called that signal). Both open the SAME dialog in a small form (`openDlg(pre)`, class `jr-pre`: market, side,
+  levels, timeframe and method are the record's own and not shown as fields; a one-line reason (required there) and a confidence).
+  `MS_JOURNAL.fromRecord(desk, r)` builds the preset (market the journal takes, stop on the losing side, a wrong-side target
+  dropped, timeframe from `r.l`, method = the kind label, `source { desk, id }`; null for a closed record); `findCall` = the latest
+  call, withdrawn ones included. The server refuses a second call on the same desk signal by the same account (409), a withdrawn
+  one too (review 23 Nov 2026: Take, withdraw after a bad first move, then Skip would have hidden the first choice); the slot then
+  reads "Your call (withdrawn, kept on the record)", and `stats().withdrawnOut` gives what withdrawn calls went on to do, beside the split. The click is caught in the capture phase so a button inside an Open now card does not also open the chart. The journal's
+  own rule still applies: an open record's entry is usually already past, so its call counts only once price comes back to the
+  entry. Never for guests (`span.dc` hidden for the public role; the script returns there). Practice only.
+- Not built (the proposal's later steps): the study's report from this file. Tests: `tests/journal.test.mjs`, `tests/desk-calls.test.mjs`.

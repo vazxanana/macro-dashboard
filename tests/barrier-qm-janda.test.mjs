@@ -100,3 +100,12 @@ test('RESULT.md states the result.json verdict and the primary figures', () => {
   const tr = JSON.parse(fs.readFileSync(new URL('trades.json', dir), 'utf8'));
   for (const row of tr.rows) assert.ok(row[2] * (row[4] - row[5]) > 0, 'stop on the losing side in trades.json');
 });
+
+test('the report does not claim the Daily direction halves the loss on every window (review 23 Nov 2026)', async () => {
+  const fs = await import('node:fs');
+  const md = fs.readFileSync(new URL('../research/edge/barrier-qm-janda/RESULT.md', import.meta.url), 'utf8');
+  const r = JSON.parse(fs.readFileSync(new URL('../research/edge/barrier-qm-janda/result.json', import.meta.url)));
+  assert.doesNotMatch(md, /the loss halves against every fresh zone/);
+  assert.ok(r.tests.P.REP.meanR < r.tests.S1.REP.meanR, 'on 2010-19 the direction filter is worse than none');
+  assert.match(md, /worse than no filter on 2010-2019/);
+});

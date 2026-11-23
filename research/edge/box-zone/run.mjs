@@ -34,17 +34,27 @@ export function boxes(C, sec) {
 }
 
 // Daily zones: a box (3+ candles) that breaks the other way from the break before it; joined with the next box when it breaks
-// the same way and overlaps. dead = when the first Daily close beyond its far side is known.
+// the same way and overlaps. dead = when the first Daily close beyond its far side is known. A join is known only once the next
+// box closes out, so the first box stands alone from its own known time until then (its life capped at the join's known time),
+// and the joined zone starts at the join's known time (review of 23 Nov 2026: before, the join was used from the first box's
+// known time, a look-ahead by selection).
 export function zones(D) {
   const DB = boxes(D, 86400), Z = [];
+  const deadOf = (z) => { for (let i = z.from + 1; i < D.length; i++) { const c = D[i].close; if (z.dir < 0 ? c > z.hi : c < z.lo) return D[i].time + 86400; } return Infinity; };
   for (let k = 1; k < DB.length; k++) {
     const a = DB[k - 1], b = DB[k];
     if (b.dir === a.dir || b.n < MIN_N) continue;
     const z = { dir: b.dir, hi: b.hi, lo: b.lo, known: b.known, from: b.bi };
+    z.dead = deadOf(z);
     const n = DB[k + 1];
-    if (n && n.dir === b.dir && n.n >= MIN_N && n.lo <= b.hi && n.hi >= b.lo) { z.hi = Math.max(z.hi, n.hi); z.lo = Math.min(z.lo, n.lo); z.known = n.known; z.from = n.bi; }
-    z.dead = Infinity;
-    for (let i = z.from + 1; i < D.length; i++) { const c = D[i].close; if (z.dir < 0 ? c > z.hi : c < z.lo) { z.dead = D[i].time + 86400; break; } }
+    if (n && n.dir === b.dir && n.n >= MIN_N && n.lo <= b.hi && n.hi >= b.lo) {
+      const j = { dir: b.dir, hi: Math.max(b.hi, n.hi), lo: Math.min(b.lo, n.lo), known: n.known, from: n.bi, joined: true };
+      j.dead = deadOf(j);
+      z.dead = Math.min(z.dead, n.known);
+      Z.push(z);
+      if (j.dead > j.known) Z.push(j);
+      continue;
+    }
     Z.push(z);
   }
   return Z;

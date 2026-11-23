@@ -29,26 +29,26 @@
       if (j && Array.isArray(j.records)) { S.rows = j.records.slice().sort(function (a, b) { return b.t - a.t; }); S.file = { at: j.at, since: j.since, detail: j.detail || null }; S.state = 'done'; } else S.state = 'failed';
     }, function () { S.state = 'failed'; }).then(function () { draw(k); });
   }
-  function openCard(r) {
+  function openCard(r, k) {
     var nt = r.target == null, tR = nt ? 3 : Math.abs(r.target - r.entry) / r.r0, fl = r['float'], hi = Math.max(3, Math.min(10, Math.ceil(tR))), lo = -1;
     var pc = function (v) { return Math.max(0, Math.min(100, (v - lo) / (hi - lo) * 100)).toFixed(1); }, z = pc(0);
     var fill = fl == null ? '' : '<i class="' + (fl >= 0 ? 'up' : 'dn') + '" style="left:' + (fl >= 0 ? z : pc(fl)) + '%;width:' + Math.abs(pc(fl) - z).toFixed(1) + '%"></i>';
-    return '<li data-dk-chart="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(word(r.side) + ' ' + nm(r) + ', ' + (fl == null ? 'no reading yet' : fR(fl) + ' at the last reading') + ', open, view the chart') + '">' +
+    return '<li><div class="oc-b" data-dk-chart="' + esc(r.id) + '" tabindex="0" role="button" aria-label="' + esc(word(r.side) + ' ' + nm(r) + ', ' + (fl == null ? 'no reading yet' : fR(fl) + ' at the last reading') + ', open, view the chart') + '">' +
       '<div class="r1"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><b class="mk">' + esc(nm(r)) + '</b><span class="pl">' + esc(r.label || r.kind) + '</span>' + (r.src ? '<span class="pl">' + (r.src === 'live' ? 'live' : 'replay') + '</span>' : '') +
       '<span class="live ' + (fl == null ? '' : fl >= 0 ? 'pos' : 'neg') + '">' + (fl == null ? '<small>no reading yet</small>' : fR(fl) + '<small>at the last reading</small>') + '</span></div>' +
       '<div class="trk" aria-hidden="true">' + fill + '<span style="left:' + z + '%"></span>' + (nt ? '' : '<span style="left:' + pc(Math.min(hi, tR)) + '%"></span>') + '</div>' +
       '<div class="trk-l" aria-hidden="true"><span style="left:0">' + (hi > 5 ? '−1R' : '−1R stop') + '</span><span style="left:' + z + '%">' + (hi > 5 ? '' : '0') + '</span><span style="left:100%">' + (!nt && tR <= hi ? 'target ' : '') + '+' + hi + 'R</span></div>' +
       '<dl><div><dt>Entry</dt><dd>' + fP(r, r.entry) + '</dd></div><div><dt>Stop</dt><dd>' + fP(r, r.stop) + (r.stopNow != null && r.stopNow !== r.stop ? ' · now ' + fP(r, r.stopNow) : '') + '</dd></div><div><dt>Target</dt><dd>' + (nt ? 'none · the stop trails' : fP(r, r.target) + ' · ' + tR.toFixed(1) + 'R') + '</dd></div><div><dt>Best so far</dt><dd>' + (r.mfe != null ? '+' + (+r.mfe).toFixed(2) + 'R' : '—') + '</dd></div></dl>' +
-      '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + SOP.unit(mk(r)) + fP(r, r.r0) + '</p></li>';
+      '<p class="nt">Open since ' + utc(r.t) + ' · risk ' + SOP.unit(mk(r)) + fP(r, r.r0) + '</p></div>' + (SOP.dcSlot ? SOP.dcSlot(k, r) : '') + '</li>';   // the slot outside the card's button (review, 23 Nov 2026)
   }
-  function rowHTML(S, r) {
+  function rowHTML(S, r, k) {
     var res = r.R == null ? '<b>Open</b>' + (r['float'] != null ? ' · ' + fR(r['float']) + ' now' : '') : '<b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + fR(r.R) + '</b> · ' + (EXIT[r.status] || esc(r.status));
     var op = !!S.open[r.id];
     return '<tr><td class="mo-c-time"><span class="mo-when">' + utc(r.t) + '</span><small>' + esc(r.label || r.kind) + (r.style ? ' · ' + esc(r.style) : '') + ' · ' + esc(nm(r)) + '</small></td>' +
       '<td class="mo-c-side"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span>' + (r.src ? ' <small class="mo-sop-src">' + (r.src === 'live' ? 'live' : 'replay') + '</small>' : '') + '</td>' +
       '<td class="n" data-l="Entry">' + fP(r, r.entry) + '</td><td class="n" data-l="Stop">' + fP(r, r.stop) + '</td><td class="n" data-l="Target">' + (r.target == null ? '—' : fP(r, r.target)) + '</td>' +
       '<td class="mo-c-res"><div class="mo-ex">' + res + '<small>' + (r.endT ? 'ended ' + utc(r.endT) + ' · ' : '') + 'risk ' + SOP.unit(mk(r)) + fP(r, r.r0) + '</small></div>' +
-      '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-dk-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-dk-chart="' + esc(r.id) + '">Chart</button></div>' +
+      '<div class="mo-sop-a"><button type="button" class="mo-sop-b" data-dk-log="' + esc(r.id) + '" aria-expanded="' + op + '">' + (op ? 'Hide the log' : 'Log') + '</button><button type="button" class="mo-sop-b" data-dk-chart="' + esc(r.id) + '">Chart</button></div>' + (SOP.dcSlot ? SOP.dcSlot(k, r) : '') +
       (op ? '<ol class="mo-sop-log">' + (r.log ? (r.noDetail ? '<li>The log of this trade could not be read.</li>' : '') + r.log.map(function (x) { return '<li>' + (x.t ? '<span>' + utc(x.t) + '</span> ' : '') + esc(x.text) + '</li>'; }).join('') : '<li>Reading the log…</li>') + '</ol>' : '') + '</td></tr>';
   }
   function draw(k) {
@@ -66,7 +66,7 @@
     var list = S.kind === 'all' || kinds.indexOf(S.kind) < 0 ? byMk : byMk.filter(function (r) { return r.kind === S.kind; }), shown = S.all ? list : list.slice(0, 30);
     var open = every.filter(function (r) { return r.R == null; }), last = every[0], at = S.file && S.file.at ? utc(Math.floor(Date.parse(S.file.at) / 1000)) : '';
     on.textContent = open.length ? open.length + ' open · paper only' + (at ? ' · last reading ' + at : '') : '';
-    ol.innerHTML = open.length ? open.map(openCard).join('') : '<li class="empty">No trade is open now. The tracker reads these markets about every 35 minutes' + (at ? ' (last reading ' + at + ')' : '') + '; a new entry shows here until it closes.</li>';
+    ol.innerHTML = open.length ? open.map(function (r) { return openCard(r, k); }).join('') : '<li class="empty">No trade is open now. The tracker reads these markets about every 35 minutes' + (at ? ' (last reading ' + at + ')' : '') + '; a new entry shows here until it closes.</li>';
     if (SOP.openMore) SOP.openMore(ob, open.length);
     var btn = function (attr, v, t, n, cur) { return '<button type="button" class="mo-sop-b" ' + attr + '="' + esc(v) + '" aria-pressed="' + (cur === v) + '">' + esc(t) + ' (' + n + ')</button>'; };
     var sm = SOP.summary(list), tile = function (a, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + a + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
@@ -78,7 +78,7 @@
       '<p class="ms-note mo-sop-st">Recorded by the tracker in the council loop, about every 35 minutes' + (at ? ' · last run ' + at : '') + (S.file.since ? ' · trades since ' + utc(S.file.since).slice(0, 10) : '') + '. Live = the tracker recorded it within an hour of its entry; Replay = worked out afterwards from the same closed candles.</p>' +
       '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Closed in profit', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
       tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < SOP.MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < SOP.MIN_JUDGE ? sm.closed + ' of ' + SOP.MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>' +
-      SOP.histOpen(S, list.length) + (shown.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="' + esc(D.title) + '"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result and log</th></tr></thead><tbody>' + shown.map(function (r) { return rowHTML(S, r); }).join('') + '</tbody></table></div>' +
+      SOP.histOpen(S, list.length) + (shown.length ? '<div class="ct-tw"><table class="ct-t mo-t" aria-label="' + esc(D.title) + '"><thead><tr><th>Entry time</th><th>Side</th><th class="n">Entry</th><th class="n">Stop</th><th class="n">Target</th><th>Result and log</th></tr></thead><tbody>' + shown.map(function (r) { return rowHTML(S, r, k); }).join('') + '</tbody></table></div>' +
         (list.length > shown.length ? '<p class="ms-note"><button type="button" class="mo-sop-b" data-dk-all>Show all ' + list.length + '</button></p>' : '') : '<div class="ct-empty">No trade to show.</div>') + '</details>' + cal +
       '<details class="mo-sop-more"><summary>What this is</summary><p class="ms-note">' + esc(D.what) + '</p><p class="ms-note">A paper record: every step uses closed candles only, results are before costs, a stop is counted first when one candle holds both. Nothing was traded, and a record of one reading cannot show whether a rule makes money. On a market other than gold the stop buffer and size limits are the same share of price as on gold: the desk\'s own choice.</p></details>';
   }
@@ -88,7 +88,7 @@
     if (rp.parentNode !== slot) slot.appendChild(rp); return true; }
   function returnChart() { var rp = $('mo-replay'), h = $('mo-replay-home'); if (rp && h && rp.previousSibling !== h) h.parentNode.insertBefore(rp, h.nextSibling); }
   function deskOf(el) { var v = el.closest ? el.closest('#v-lit, #v-eg, #v-msnr') : null; return v ? v.id.slice(2) : null; }
-  document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('li[data-dk-chart]')) { e.preventDefault(); e.target.click(); } });
+  document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('[data-dk-chart][role="button"]')) { e.preventDefault(); e.target.click(); } });
   document.addEventListener('click', function (e) {
     var b = e.target && e.target.closest ? e.target.closest('[data-cal-m], [data-cal-day], [data-dk-log], [data-dk-chart], [data-dk-kind], [data-dk-mk], [data-dk-src], [data-dk-run], [data-dk-all]') : null; if (!b) return; var k = deskOf(b); if (!k) return; var S = st(k);
     if (b.hasAttribute('data-cal-m')) { if (b.getAttribute('data-cal-m')) { S.calM = b.getAttribute('data-cal-m'); S.calDay = null; draw(k); } return; }

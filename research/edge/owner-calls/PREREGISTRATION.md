@@ -9,12 +9,13 @@ Does the owner's choosing add value? When the owner looks at a setup and says "t
 better than the skipped ones, and do the taken ones make money after costs? The studies so far found no mechanical rule
 that passes on untouched data; the hypothesis left is that the edge, if there is one, is in the choosing
 (`research/proposals/2026-11-20-discretion.md`, `research/edge/discretion`, which found 0 decisions stamped before their
-outcome). The journal (`api/journal.js`, rules in `assets/ms-journal.js`, private store file `journal/decisions.json`)
+outcome). The journal (`api/journal.js`, rules in `assets/ms-journal.js`, one private store file per account, `journal/<account>.json`; before any call existed the one shared
+file `journal/decisions.json` was split per account by the review of 23 Nov 2026, so two accounts' writes cannot overwrite each other)
 exists to collect those decisions. This file fixes, now, how they will be read.
 
 ## The unit
 
-- One **call** = one record of `journal/decisions.json`: market, side, action (`take` / `skip`), entry, a stop on the
+- One **call** = one record of the account's `journal/<account>.json`: market, side, action (`take` / `skip`), entry, a stop on the
   losing side, optional target, timeframe, method, reason, confidence, and `at` = the SERVER's clock at the moment the call
   was saved. The page cannot set `at`; side, levels, action, method, reason and confidence cannot change after it.
 - Only calls of the owner's account are judged here. Another account's calls, if any, are read the same way, each account

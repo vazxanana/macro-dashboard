@@ -257,7 +257,8 @@
     const view = doc.getElementById('v-charts'); if (!view) return null;
     const anchor = doc.getElementById('ms-pp') || view.querySelector('.ms-grid4'); if (!anchor || !anchor.parentNode) return null;
     box = el('details', 'mph'); box.id = 'ms-phase';
-    if (root.matchMedia && root.matchMedia('(min-width: 641px)').matches) box.open = true;
+    // closed until a person opens it (review, 23 Nov 2026: opened by default, it grew from one line to the whole table about 10 s
+    // after load and pushed the charts down a screen; the summary line already gives the reading)
     const sum = el('summary', 'mph-s');
     sum.appendChild(el('span', 'mph-t', 'Market phase'));
     sum.appendChild(el('span', 'mph-one', 'Reading the charts…'));
@@ -322,6 +323,9 @@
   }
 
   root.msPhase = () => (last ? JSON.parse(JSON.stringify(last)) : null);   // read-only view
-  const start = () => { tick(); setInterval(() => { if (!doc.hidden) tick(); }, 10e3); doc.addEventListener('ms:chart', () => setTimeout(tick, 1500)); };
+  // the panes register before this deferred script runs (their 'ms:chart' events are already gone), so read again every 1.5 s
+  // until every timeframe has its candles (at most a minute), then every 10 s (review, 23 Nov 2026)
+  const start = () => { tick(); let n = 0; const fast = setInterval(() => { if (!doc.hidden) tick(); if (last || ++n >= 40) clearInterval(fast); }, 1500);
+    setInterval(() => { if (!doc.hidden) tick(); }, 10e3); doc.addEventListener('ms:chart', () => setTimeout(tick, 1500)); };
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start); else start();
 })(typeof window !== 'undefined' ? window : globalThis);

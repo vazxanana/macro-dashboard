@@ -36,3 +36,10 @@ the swing target; S1 = T1 only with the H4 structure side; S2 = T1's entries wit
 - No variant (swing size, tolerances, windows, targets) is run after this result, as the pre-registration says.
 
 Nothing live changed. Research only, paper only.
+
+## Financing not charged (23 Nov 2026, review)
+
+Gold buys held over the 22:00 UTC rollover pay overnight financing (`council/fills.mjs` `FIN.xau.long`); this study's R after
+costs does not charge it, so every gold buy's figure is a little flattered. Measured afterwards from `trades.json` with
+`financing()`: 152 gold buys (T1, S1, S2), 34 held over a rollover: on average 0.012-0.016R a gold buy (2.1R in all). No verdict changes (the study fails or is inconclusive either way); do not pool these rows with studies that
+charge financing without taking it off first.

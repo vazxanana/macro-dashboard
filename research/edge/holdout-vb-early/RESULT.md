@@ -107,3 +107,7 @@ NZD/USD has no published breakout result, so no gate applies to it.
 - Base rule imported unchanged (gold-vol-breakout buildDays / daySkip / vbTrade, k 0.5, both sides, stop at the UTC open, out at the 20:55 candle close). Early = the first fill's candle starts before 06:00 UTC (both orders cancelled at 06:00 otherwise). Cost a round trip: max(toolkit COSTS, the market's own study cost: gold $0.60, silver $0.03, forex 0.000045 x entry + 0.5 pip); 2x reported. Month sums by exit month over each set's span (empty months 0), Set A and Set B months pooled; p one-sided from the toolkit's t. Gate: the unfiltered rule at each study's own cost against its published by-year results on the overlapping holdout years.
 - To repeat: `node research/edge/holdout-vb-early/run.mjs` (reads the toolkit cache at EDGE_DATA, kept out of git).
 
+
+## Clock correction (23 Nov 2026, review)
+
+The toolkit applied the 2007 US daylight rule to 2005-2006, so in a few weeks of each of those years the New York day ended an hour early. Re-run with the old rule before 2007 (1st Sunday of April to last Sunday of October). No figure of this report changed; the verdict stands.

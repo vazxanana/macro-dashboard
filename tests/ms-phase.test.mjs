@@ -69,3 +69,9 @@ test('page wiring: loaded with defer, styled with tokens, hidden for guests, dis
   const A = fs.readFileSync('assets/ms-phase.js', 'utf8');
   assert.doesNotMatch(A, /fetch\(|localStorage|sessionStorage|XMLHttpRequest|innerHTML/);
 });
+
+test('review 23 Nov 2026: the panel opens only on a click and reads again quickly until the candles are in (no late jump)', () => {
+  const A = fs.readFileSync('assets/ms-phase.js', 'utf8');
+  assert.doesNotMatch(A, /box\.open = true/, 'never opened by the script: it pushed the charts down after load');
+  assert.match(A, /const fast = setInterval\(\(\) => \{ if \(!doc\.hidden\) tick\(\); if \(last \|\| \+\+n >= 40\) clearInterval\(fast\); \}, 1500\)/);
+});

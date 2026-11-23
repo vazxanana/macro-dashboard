@@ -12,12 +12,12 @@ Said plainly: the pooled breakout (the base rule, every fill hour) was already r
 |---|---|---|---|
 | 1 | Set A mean R after costs > 0 | +0.049 (n 4273) | yes |
 | 2 | Set B mean R after costs > 0 | −0.028 (n 15181) | no |
-| 3 | pooled month t ≥ 2 and Holm p < 0.05 | t −1.14 (263 months), one-sided p 0.873, Holm ≤ 1 | no |
+| 3 | pooled month t ≥ 2 and Holm p < 0.05 | t −1.14 (263 months), one-sided p 0.873, Holm 1 | no |
 | 4 | ≥ 100 pooled trades | 19454 | yes |
 | 5 | pooled mean R > 0 at 2x costs | −0.063 | no |
 | gate | harness reproduces published results | 9 of 9 windows | yes |
 
-Family: not every sibling result is in yet: the bound 5 x p (Holm's largest multiplier) is used; the adjusted p can only be this or smaller.
+Family: Holm over the five primary p values.
 
 ## Kept days (the rule) against vetoed days, after costs
 
@@ -102,3 +102,7 @@ NZD/USD has no published breakout result, so no gate applies to it.
 - Base rule imported unchanged (gold-vol-breakout buildDays / daySkip / vbTrade, k 0.5, both sides, stop at the UTC open, out at the 20:55 candle close), all fill hours; per-day trade and costs = holdout-vb-early dayTrade / costOf (max(toolkit COSTS, the market's own study cost: gold $0.60, silver $0.03, forex 0.000045 x entry + 0.5 pip)); 2x reported. Veto: H1 = toolkit resample(m5, 3600) over the continuous loaded history (warm-up included), structure(H1, 3) events (BO and ChoCh); at the first fill, the last event whose candle closed at or before the fill candle's start; vetoed when its direction is against the fill side and its age (above) <= 6; the day then has no trade (the other order is cancelled). Month sums by exit month over each set's span (empty months 0), Set A and Set B months pooled; p one-sided from the toolkit's t. Gate: the unfiltered rule at each study's own cost against its published by-year results on the overlapping holdout years.
 - To repeat: `node research/edge/holdout-h1-veto/run.mjs` (reads the toolkit cache at EDGE_DATA, kept out of git).
 
+
+## Clock correction (23 Nov 2026, review)
+
+The toolkit applied the 2007 US daylight rule to 2005-2006, so in a few weeks of each of those years the New York day ended an hour early. Re-run with the old rule before 2007 (1st Sunday of April to last Sunday of October). No trade figure changed (the Holm line now uses all five primary p values); the verdict stands.

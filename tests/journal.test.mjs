@@ -6,12 +6,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const { handle, canUse } = require('../api/journal.js');
+const { handle, canUse, _reset } = require('../api/journal.js');
 const J = require('../api/_journal.js');
 const rd = (p) => fs.readFileSync(new URL(p, import.meta.url), 'utf8');
 
 const T0 = Date.UTC(2026, 10, 23, 9, 0, 0);
-const mk = () => { let db = []; return { get: async () => db, put: async (v) => { db = v; }, peek: () => db }; };
+// one file per account (review, 23 Nov 2026); peek() = every account's records in the order written
+const mk = (delay = 0) => { _reset(); const db = new Map(), order = []; const wait = () => new Promise((r) => setTimeout(r, delay));
+  return { get: async (u) => { if (delay) await wait(); return (db.get(u) || []).slice(); }, put: async (u, v) => { if (delay) await wait(); db.set(u, v); v.forEach((x) => { if (!order.includes(x.id)) order.push(x.id); }); },
+    peek: () => order.map((id) => [...db.values()].flat().find((x) => x.id === id)).filter(Boolean), of: (u) => db.get(u) || [] }; };
 const call = async (store, method, who, body, extra = {}) => { const out = {}; const res = { setHeader() {}, status: (c) => { out.code = c; return res; }, json: (b) => { out.body = b; return out; } };
   await handle({ method, body }, res, { env: {}, store, who: async () => who, sameOrigin: () => true, now: T0, ...extra }); return out; };
 const OWNER = { u: 'owner', role: 'owner' }, FRED = { u: 'fred', role: 'reviewer' }, LUXUS = { u: 'luxus', role: 'viewer' };
@@ -57,7 +60,7 @@ test('each account reads and changes only its own calls; who may use it', async 
   assert.equal((await call(s, 'GET', { ...LUXUS, perms: { desks: true } })).code, 200); assert.equal((await call(s, 'GET', { ...FRED, perms: { desks: false } })).code, 403);
   assert.equal((await call(s, 'POST', OWNER, { call: BUY }, { sameOrigin: () => false })).code, 403);
   assert.equal(canUse(OWNER), true); assert.equal(canUse(null), false);
-  const fail = { get: async () => { throw new Error('read'); }, put: async () => { throw new Error('must not write'); } };
+  _reset(); const fail = { get: async () => { throw new Error('read'); }, put: async () => { throw new Error('must not write'); } };
   assert.equal((await call(fail, 'POST', OWNER, { call: BUY })).code, 500, 'a failed read is never saved over');
 });
 
@@ -116,21 +119,53 @@ test('review: a call keeps its first two weeks\' result as it ages (5-minute can
 });
 
 test('review: a stored file of another shape is never saved over', async () => {
-  const blob = { list: async () => ({ blobs: [{ pathname: 'journal/decisions.json', url: 'https://x.invalid/journal/decisions.json' }] }), put: async () => { throw new Error('must not write'); } };
+  _reset(); const blob = { list: async ({ prefix }) => ({ blobs: [{ pathname: prefix, url: 'https://x.invalid/' + prefix }] }), put: async () => { throw new Error('must not write'); } };
   const store = require('../api/journal.js').blobStore({ BLOB_READ_WRITE_TOKEN: 't' }, { blob, fetch: async (u) => { assert.match(String(u), /cache=0/); return { ok: true, json: async () => ({ calls: [1, 2] }) }; } });
-  await assert.rejects(store.get(), /another shape/);
+  await assert.rejects(store.get('owner'), /another shape/);
   const r = await call(store, 'POST', OWNER, { call: BUY }); assert.equal(r.code, 500);
 });
 
 test('wiring: routed on the Worker and Vercel, the store read from the origin, the page button and card, no browser storage', () => {
   assert.ok(JSON.parse(rd('../vercel.json')).functions['api/journal.js']);
   assert.match(rd('../cloudflare/src/worker.mjs'), /import journal from '\.\.\/\.\.\/api\/journal\.js'/);
-  const API = rd('../api/journal.js'); assert.match(API, /journal\/decisions\.json/); assert.match(API, /searchParams\.set\('cache', '0'\)/);
+  const API = rd('../api/journal.js'); assert.match(API, /DIR = 'journal\/'/); assert.match(API, /\$\{DIR\}\$\{u\}\.json/); assert.match(API, /searchParams\.set\('cache', '0'\)/);
   const PAGE = rd('../market-structure.html'), blk = PAGE.slice(PAGE.indexOf('<script id="ms-jr-js">'), PAGE.indexOf('</script>', PAGE.indexOf('<script id="ms-jr-js">')));
   assert.match(PAGE, /<script src="\/assets\/ms-journal\.js" defer><\/script>/); assert.match(blk, /ms-jr-btn/); assert.match(blk, /My calls/); assert.match(blk, /Log a call/);
   assert.doesNotMatch(blk, /localStorage|sessionStorage|ctrader|\/api\/mosha|council\//);
-  assert.match(PAGE, /html\[data-role="public"\] :is\(#ms-jr-btn, #ms-jr, #ms-jr-card\)/);
+  assert.match(PAGE, /html\[data-role="public"\] :is\(#ms-jr-btn, #ms-jr, #ms-jr-card(, span\.dc)?\)/);
   const css = PAGE.slice(PAGE.indexOf('<style id="ms-jr-css">'), PAGE.indexOf('</style>', PAGE.indexOf('<style id="ms-jr-css">')));
   for (const m of css.matchAll(/(\d+(?:\.\d+)?)px var\(--sans\)|font-size: (\d+(?:\.\d+)?)px/g)) assert.ok(+(m[1] || m[2]) >= 12, m[0]);
   assert.match(css, /pointer: coarse[^}]*min-height: 44px/);
+});
+
+test('review: two accounts writing at the same moment both keep their call (one file per account)', async () => {
+  const s = mk(5);
+  const [a, b] = await Promise.all([call(s, 'POST', FRED, { call: BUY }), call(s, 'POST', OWNER, { call: { ...BUY, action: 'skip' } })]);
+  assert.equal(a.code, 200); assert.equal(b.code, 200);
+  assert.equal(s.of('fred').length, 1); assert.equal(s.of('owner').length, 1);
+  assert.equal(require('../api/journal.js').pathOf('fred'), 'journal/fred.json');
+});
+
+test('review: one account\'s writes run one at a time, so two calls at once are both kept and one signal takes one call', async () => {
+  const s = mk(5), sig = { ...BUY, source: { desk: 'eg', id: 'eurusd:x-1' }, market: 'xau' };
+  const [a, b] = await Promise.all([call(s, 'POST', OWNER, { call: BUY }), call(s, 'POST', OWNER, { call: { ...BUY, action: 'skip' } })]);
+  assert.equal(a.code, 200); assert.equal(b.code, 200); assert.equal(s.of('owner').length, 2);
+  const [c, d] = await Promise.all([call(s, 'POST', OWNER, { call: sig }), call(s, 'POST', OWNER, { call: { ...sig, action: 'skip' } })]);
+  assert.deepEqual([c.code, d.code].sort(), [200, 409]); assert.equal(s.of('owner').length, 3);
+});
+
+test('review: members filling their own files never close the journal to the owner; posts are limited per hour', async () => {
+  const s = mk(); const full = Array.from({ length: 2000 }, (_, i) => ({ id: 'm' + i, u: 'fred', at: 1, action: 'take' }));
+  await s.put('fred', full);
+  assert.equal((await call(s, 'POST', FRED, { call: BUY })).code, 409, 'the member\'s own cap');
+  assert.equal((await call(s, 'POST', OWNER, { call: BUY })).code, 200, 'the owner is not refused');
+  _reset(); const codes = []; for (let i = 0; i < 61; i++) codes.push((await call(s, 'POST', OWNER, { note: { id: 'none', text: 'x' } })).code);
+  assert.equal(codes.filter((c) => c === 429).length, 1); assert.equal(codes[60], 429);
+  assert.equal((await call(s, 'POST', FRED, { note: { id: 'none', text: 'x' } })).code, 404, 'another account has its own limit');
+});
+
+test('review: what withdrawn calls went on to do is reported beside the split, never in it', () => {
+  const rows = [{ action: 'take', R: 2, status: 'target' }, { action: 'take', R: -1, status: 'stop', withdrawn: 9 }, { action: 'skip', R: 2, status: 'target', withdrawn: 9 }];
+  const s = J.stats(rows); assert.equal(s.all.taken.n, 1); assert.equal(s.withdrawn, 2);
+  assert.equal(s.withdrawnOut.taken.n, 1); assert.equal(s.withdrawnOut.taken.meanR, -1); assert.equal(s.withdrawnOut.skipped.meanR, 2);
 });
