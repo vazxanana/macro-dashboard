@@ -5925,9 +5925,10 @@ Not checked live: the dispatch token's Actions: write, and the first real gotobi
 `tests/gotobi-demo.test.mjs`.
 **A third start, from the council loop (20 Nov 2026)**: the 20 Nov deploy log says `skip GH_DISPATCH_TOKEN (no repository secret)`,
 so the Worker's timer cannot start the job. After each round `council/gotobi-due.mjs` (read only; the Worker's `decide` and window,
-plus the study's calendar) answers yes on a gotobi weekday 00:25-00:49 UTC with no gotobi run active or started within the hour,
+plus the study's calendar) answers yes on a gotobi weekday 00:10-00:49 UTC (23 Nov 2026: was 00:25, only one loop round landed in it) with no gotobi run active or started within the hour,
 and `council.yml` dispatches main's `gotobi.yml` with the loop's own `actions: write` (never fails the round). Test:
 `tests/gotobi-due.test.mjs`.
+**23 Nov 2026, plumbing**: `gotobi.yml` 360 min; `connect()` closes its session on a refused connection and is retried (entry until 00:55:55, the 06:00 exit up to 6 times; never an order or a close retried); an exit that still cannot connect leaves the record open with `exitError` and the broker stop, closed by the next run. `vb-demo.mjs` writes a weekday with no order in its first 20 minutes as `missed` without connecting. `vb-forward.yml`: every record step after the first and Save run `if: !cancelled()`, so one failing record no longer throws the others away.
 **20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
 `GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
 website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
@@ -6529,6 +6530,36 @@ one canvas above the chart's, `pointer-events: none`, clipped to the price pane;
 (as Open now) and never built for a guest; not a `.card`, so the simple phone view keeps it open. Nothing stored (no browser
 storage), nothing written. No live ticks yet (the page's tick stream is the Charts market only). `MS_DESK_LIVE.state(k)` is the
 audit's read-only view. Test: `tests/desk-live-chart.test.mjs`.
+
+## H4 EF barrier to the next H4 EG, and the H4 engulf map on the live chart (23 Nov 2026, the owner's gold trade of 22-23 Nov)
+The owner's trade: the H4 sell engulf zone 3566.86-3595.29 (base 20 Nov 08:00 UTC) failed at the 04:00 H4 close of 23 Nov, so it is a
+buy barrier (an EF); price comes back into it, an M15 BO with it, long at the retest (a limit at the zone's top), stop below the zone,
+target the nearest H4 sell EG zone still standing above (3719.84-3744.55), 2R or more. A paper reading before costs, not a tested rule.
+- **Reading** `council/eg-methods.mjs` `efTrades(B, { from, market })` (`EFB`; kind `eg-ef`, label "H4 EF barrier → next H4 EG", id
+  `<market:>eg-ef-<b|s>-<zone base>`, `h` 4h, `l` 15m), the seventh reading of `DESKS.eg.read`. From `zones` (EG_SPAN 3) and
+  `turnBack` (now exported): a failed H4 zone serves the other side for 20 days and until an H4 close back through it; the return =
+  the first closed M15 candle from the fail that trades into it; the M15 BO = a 15-minute close beyond the last M15 A level (V for a
+  sell; a turn of the closes, 2 a side, known by the candle's open, not closed beyond since) AND out of the zone, within `EFB.wait` 48
+  candles and before a 15-minute close back through the far side; the order: a limit at the near side, stop past the far side by
+  `SOP.sizes().buf`, target the near side of the NEAREST H4 engulf zone of the other side standing at the order (no zone, or under
+  `EFB.minRR` 2R: no trade; a farther zone is never taken instead). Desk's choices, said in the code: the 20 days, the 48-candle BO
+  window, the order's life (`EFB.fill` 24 M15 candles, cancelled by a 15-minute close back through the zone or the target reached
+  first), one setup a barrier, one position at a time a market. On the fill candle only the stop counts. Marks (24 characters
+  stored): "H4 EF · buy barrier", "M15 A level · BO buy", "H4 sell EG · target". Page: chip "H4 EF barrier → next H4 EG" (`KN`) and the
+  "What this is" text in `assets/desk-trades.js`; the desk note. Stored records begin with the tracker's next run.
+- **The example**: `tests/fixtures/xau-ef-barrier-2026-11-23.json` = OANDA H4 from 15 Oct and 5-minute candles 20 Nov to 23 Nov 09:00
+  UTC. On them alone there is no trade: price had not come back to 3595.29 by 09:00 (the trade was still a resting idea). The test
+  adds a hand-made path (into the barrier, an M15 break, back to 3595.29, up to the target): entry 3595.29, stop 3566.56, target
+  3719.835 (4.34R), and the mirrored sell; cut tests (absent before the BO's close, unfilled before the fill candle, the same just
+  after it), a nearest opposite zone under 2R gives none, and the seeded-market checks of the other readings.
+- **H4 engulf map** (`assets/desk-live.js`, display only): on the Mosha and Engulfing desks' live chart (`DESKS[k].h4`) a toggle
+  "H4 zones" (`data-dl-h4`, on by default, not kept) draws right-extended boxes from H4 candles CLOSED by now (`h4Map(H, now)`): the
+  engulf zones still standing ("H4 sell EG zone", amber) and the failed ones still standing as a barrier ("H4 EF (failed sell → buy
+  barrier)", red), the three nearest above and below the last close and any it sits in, named at the right edge with their range. H4
+  candles: the chart's own on H4, else `/md/bars?…&tf=4h&n=300` at most once a minute. `egZones` is a page copy of `zones` +
+  `turnBack`, compared on seeded candles by `tests/desk-live-chart.test.mjs` (also the owner's zones on the fixture, closed candles
+  only); `MS_DESK_LIVE.state(k).h4` lists what is drawn. A map, not a signal.
+Tests: `tests/edge-desks.test.mjs` ("H4 EF barrier": 3), `tests/desk-live-chart.test.mjs` (3 new).
 
 ## Box zone, the owner's box rule, tested (22 Nov 2026, owner: "the box is the high and low", "same process in lower timeframe", "no trend filter")
 `research/edge/box-zone/` (PREREGISTRATION.md committed alone first; `run.mjs fetch|run <dir>`, RESULT.md, result.json). A box = the
