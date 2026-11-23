@@ -176,3 +176,6 @@ a.brand:not(.here) { font: 700 14px/1 var(--au-font-ui); text-transform: upperca
 /* 17 Nov 2026, owner: the header switch is rectangular, not a pill (Desk | Macro | ChronosTrade | Academy) */
 .hdr-sw { border-radius: 8px !important; } .hdr-sw::before, .hdr-sw::after { border-radius: inherit !important; }
 .hdr-sw a { border-radius: 6px !important; } .hdr-sw a i { border-radius: 2px !important; }
+/* Equinox link (23 Nov 2026): its dot only on a narrow screen, so the switch keeps to the screen */
+@media (max-width: 700px) { .hdr-sw a.hdr-eq span { display: none; } .hdr-sw a.hdr-eq { padding: 0 9px; } }
+@media (max-width: 430px) { .hdr-sw a.hdr-eq:not(.on) { display: none !important; } }   /* no room for a fifth dot beside the side pages' header items: the Desk's header carries the link on a phone */

@@ -37,7 +37,7 @@ test('the adapters read the studies\' own cells', () => {
   assert.equal(BIG.TFS[D2.BIG_CELL.tf], '15m'); assert.equal(BIG.KS[D2.BIG_CELL.k], 1.5);
   assert.deepEqual(FB.F1, { ch: 2, trig: 0, sess: 2, ei: 0, si: 0, x: 0 });
   const med = D2.fvgMedians(); assert.equal(Object.keys(med).length, 10); assert.ok(med.xau['1h'] > 0);
-  assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb']);
+  assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'dom']);
   for (const k of ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
   assert.deepEqual(D2.DESKS2.goldvb.markets, ['xau']); assert.deepEqual(D2.DESKS2.jpyvb.markets, ['usdjpy']);
   for (const k of Object.keys(D2.DESKS2)) assert.equal(DESKS[k], D2.DESKS2[k]);
@@ -104,7 +104,7 @@ test('gold breakout: the study\'s buildDays / vbTrade, day by day', () => {
 });
 
 test('every record: its stop on the losing side, stored by clean(), each id once', () => {
-  for (const [k, d] of Object.entries(D2.DESKS2)) { const L = d.read(B, { from: FROM, market: d.markets[0] === 'usdjpy' ? 'usdjpy' : 'xau' });
+  for (const [k, d] of Object.entries(D2.DESKS2)) { const L = d.read(B, { from: FROM, market: d.markets[0] === 'usdjpy' ? 'usdjpy' : 'xau' }); if (k !== 'jpyvb') assert.ok(L.length > 0, k + ': no trade on the test market');
     const ids = new Set();
     for (const r of L) { assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, `${k}: stop on the wrong side`); assert.ok(!ids.has(r.id), `${k}: id twice`); ids.add(r.id);
       const c = clean(r); assert.ok(c, `${k}: clean() refused a record`); assert.equal(c.kind, r.kind); assert.equal(c.id, r.id);
@@ -129,28 +129,53 @@ test('merge keeps two passing-edge trades near in time (not one re-read)', () =>
   assert.equal(two.length, 2);
 });
 
-test('page, live chart and loop wiring', () => {
+test("DOM zone: the demo job's own zones, plan and arming rule", async () => {
+  const J = await import('../council/dom-demo.mjs');
+  for (const k of ['RR', 'ATR_K', 'NEAR_ATR', 'LIFE_S', 'MAX_MARKET']) assert.equal(D2.DOM[k], J[k], k);
+  assert.deepEqual(D2.DOM_MARKETS, Object.keys(J.MARKETS));
+  const R = D2.domTrades(B, { from: FROM, market: 'xau' }); assert.ok(R.length > 3, 'no DOM trade on the test market: ' + R.length);
+  const rows = M.map((b) => [b.time, b.open, b.high, b.low, b.close]);
+  for (const r of R) {
+    // the zone and the order the job itself would give: read() on the H1 candles closed by the order's time, plan(), armable()
+    const placed = r.log[1].t, H1 = [];
+    for (const b of M) { const h = Math.floor(b.time / 3600) * 3600; if (h + 3600 > placed) break; const x = H1[H1.length - 1];
+      if (!x || x[0] !== h) H1.push([h, b.open, b.high, b.low, b.close]); else { x[2] = Math.max(x[2], b.high); x[3] = Math.min(x[3], b.low); x[4] = b.close; } }
+    const at = J.read(H1, placed), z = at.zones.find((q) => r.id.endsWith(`dom-${q.side === 'buy' ? 'b' : 's'}${q.t}`)); assert.ok(z, 'the job has no such zone');
+    const p = J.plan(z, at.atr, COSTS.xau); assert.ok(near(p.entry, r.entry) && near(p.stop, r.stop) && near(p.target, r.target), 'plan differs');
+    assert.ok(z.stands); const price = M.find((b) => b.time + 300 === placed).close;
+    assert.equal(J.armable('xau', { ...at, price }, new Set()).some((q) => q.t === z.t && q.side === z.side), true, 'the job would not arm it then');
+    assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry); assert.ok(r.t >= placed); }
+  // one order per zone, ever
+  assert.equal(new Set(R.map((r) => r.id)).size, R.length);
+});
+
+test('Equinox: its own page with the eight desks; the Desk keeps its five', () => {
+  const src = fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), keys = Object.keys(D2.DESKS2);
+  assert.deepEqual(keys, ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'dom']);
+  for (const k of keys) { const i = src.indexOf(`id="v-${k}"`); assert.ok(i > 0, k); const sec = src.slice(i, src.indexOf('</section>', i));
+    for (const dk of ['open', 'trades', 'chart']) assert.ok(sec.includes(`data-dk="${dk}"`), `${k}: ${dk}`); assert.ok(src.includes(`"k":"${k}"`) || src.includes(`"k": "${k}"`), k + ' tab'); }
+  for (const a of ['mosha-sop.js', 'mosha-replay.js', 'desk-trades.js', 'desk-live.js', 'mx-nav.js', 'lightweight-charts-4.1.3.js']) assert.ok(src.includes(a), a);
+  assert.match(src, /Sign in on the desk first/); assert.match(src, /localStorage\.setItem\('eq-desk'/);
+  // the build copies the Desk's data reader, Mosha styles and replay card into it
+  const built = fs.readFileSync(new URL('../out/equinox.html', import.meta.url), 'utf8');
+  assert.ok(built.includes('id="mo-replay"') && built.includes('id="ms-mosha-css"') && built.includes('window.msDataMake = function'));
+  assert.match(fs.readFileSync(new URL('../scripts/build.sh', import.meta.url), 'utf8'), /node scripts\/equinox-page\.mjs out/);
+  const vj = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+  assert.ok(vj.rewrites.some((r) => r.source === '/equinox' && r.destination === '/equinox.html'));
+  // the Desk: no new desk view or switch tab, one Equinox link gated on the desks permission
   const html = fs.readFileSync(new URL('../market-structure.html', import.meta.url), 'utf8');
-  const keys = Object.keys(D2.DESKS2);
-  for (const k of keys) {
-    assert.match(html, new RegExp(`<section class="view adm" id="v-${k}"`));
-    const sec = html.slice(html.indexOf(`id="v-${k}"`), html.indexOf('</section>', html.indexOf(`id="v-${k}"`)));
-    for (const dk of ['open', 'trades', 'chart']) assert.ok(sec.includes(`data-dk="${dk}"`), `${k}: ${dk}`);
-    assert.equal(html.split(`data-dsw="${k}"`).length - 1, 12, `${k}: the desk switch on every desk`);
-    assert.match(html, new RegExp(`VIEW_PERM = \\{[^}]*${k}: 'desks'`));
-  }
-  assert.match(html, /const EDGE_DESKS = \['lit', 'eg', 'msnr', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb'\]/);
-  for (const k of keys) assert.match(html, new RegExp(`const VIEWS = \\[[^\\]]*'${k}'`));
-  const dt = fs.readFileSync(new URL('../assets/desk-trades.js', import.meta.url), 'utf8');
-  for (const k of keys) { assert.ok(dt.includes(`${k}: { file: '${k}/desk.json'`), k); }
-  assert.equal((dt.match(/passing: true/g) || []).length, 7);
-  assert.doesNotMatch(dt, /#v-lit, #v-eg, #v-msnr/);
-  const dl = fs.readFileSync(new URL('../assets/desk-live.js', import.meta.url), 'utf8');
-  for (const k of keys) assert.ok(dl.includes(`${k}: { passing: true, file: '${k}/desk.json'`), k);
+  for (const k of keys) { assert.ok(!html.includes(`id="v-${k}"`), k + ' on the Desk'); assert.ok(!html.includes(`data-dsw="${k}"`)); }
+  assert.match(html, /<a href="\/equinox" class="hdr-eq adm"/); assert.match(html, /html\[data-deny~="desks"\] \.hdr-eq \{ display: none !important; \}/);
+  for (const f of ['edge-lab.html', 'macro-desk.html', 'backtest.html', 'academy.html', 'scripts/veteran-library.html']) {
+    const t = fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8'); assert.match(t, /<a href="\/equinox" class="hdr-eq" data-mx-desks hidden/, f); assert.ok(t.includes('mx-nav.js'), f); }
+  assert.match(fs.readFileSync(new URL('../assets/mx-nav.js', import.meta.url), 'utf8'), /\[data-mx-desks\]/);
+  const dt = fs.readFileSync(new URL('../assets/desk-trades.js', import.meta.url), 'utf8'), dl = fs.readFileSync(new URL('../assets/desk-live.js', import.meta.url), 'utf8');
+  for (const k of keys) { assert.ok(dt.includes(`${k}: { file: '${k}/desk.json'`), k); assert.ok(dl.includes(`${k}: { passing: true, file: '${k}/desk.json'`), k); }
+  assert.equal((dt.match(/passing: true/g) || []).length, 8); assert.doesNotMatch(dt, /#v-lit, #v-eg, #v-msnr/);
+  assert.match(dt, /dom-tick-exec: -0\.111R a filled trade, n 1,706, month t -3\.73/);
   const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   assert.match(yml, /node council\/edge-desks\.mjs data --only eg,msnr,lit/);
-  assert.match(yml, /timeout 150 node council\/edge-desks\.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb/);
-  // a paper record: the module never imports order, mirror or broker code
-  const src = fs.readFileSync(new URL('../council/edge-desks-2.mjs', import.meta.url), 'utf8');
-  assert.doesNotMatch(src, /ctrader|mirror\.mjs|trader\.mjs|placeOrder|NEW_ORDER/);
+  assert.match(yml, /timeout 150 node council\/edge-desks\.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,dom/);
+  const src2 = fs.readFileSync(new URL('../council/edge-desks-2.mjs', import.meta.url), 'utf8');
+  assert.doesNotMatch(src2, /from '\.\/(ctrader|dom-demo|gotobi|trader)|placeOrder|NEW_ORDER/);
 });

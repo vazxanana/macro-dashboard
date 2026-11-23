@@ -8,6 +8,7 @@ cp market-structure.html out/index.html
 node scripts/hoist-styles.mjs out/market-structure.html out/index.html
 cp edge-lab.html backtest.html macro-desk.html out/
 cp academy.html out/
+node scripts/equinox-page.mjs out   # equinox.html + the Desk's data reader, Mosha styles and replay card (23 Nov 2026)
 node research/edge/build.mjs out
 node scripts/veteran-index.mjs out
 node scripts/self-host-fonts.mjs out

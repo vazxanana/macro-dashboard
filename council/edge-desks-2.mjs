@@ -22,7 +22,7 @@
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as K from '../research/edge/_lib/edgekit.mjs';
-import { frames } from '../research/edge/combo-grid-3/run.mjs';
+import { frames, buildZones } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
 import { atr14, startIdx } from '../research/edge/dom-trade-through/run.mjs';
 import * as FADE from '../research/edge/grid7-wide-fade/run.mjs';
@@ -37,7 +37,7 @@ import * as JO from '../research/edge/index-vol-breakout/original.mjs';
 import { K as JPY_K } from '../research/edge/fx-vol-breakout/run.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
-const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, usdjpy: 3, audusd: 5, nzdusd: 5, usdcad: 5, usdchf: 5, eurjpy: 3 };
+const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, usdjpy: 3, audusd: 5, nzdusd: 5, usdcad: 5, usdchf: 5, eurjpy: 3, gbpjpy: 3, audjpy: 3, cadjpy: 3, eurgbp: 5, euraud: 5, nas100: 1, spx500: 1, de40: 1 };
 const fx = (m) => (v) => (+v).toFixed(DEC[m] ?? 5);
 const word = (d) => (d > 0 ? 'buy' : 'sell');
 const sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
@@ -206,6 +206,59 @@ function vbDays(Bk, O, desk, market, k, from, sec = 300) {
 export const goldTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau' ? vbDays(toK(B['5m']), GO, 'goldvb', 'xau', GOLD_T1.k, from) : []);
 export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'jpyvb', 'usdjpy', JPY_K, from) : []);
 
+
+// ─── dom: the H1 dominant-zone limit, as council/dom-demo.mjs reads it ───
+// The demo job's own constants (tests/edge-desks-2.test.mjs compares them with council/dom-demo.mjs, which is not imported here:
+// it carries the cTrader order code). Zones: combo-grid-3 buildZones('dom') on CLOSED H1 candles (the job's read()). At the close
+// of every 5-minute candle the job's arming rule is applied (the job runs about every minute): a standing zone on the right side
+// of the price whose near edge is within 1 x ATR(14) of H1, one order per zone ever, at most 3 orders + positions a market; the
+// limit at the near edge, the stop past the far side by half the round trip + 0.25 x ATR, 2R; it rests 24 h and is cancelled once
+// its zone no longer stands. A fill is read on the 5-minute candles (on the fill candle only the stop counts), then stop or target
+// (stop first in one candle), no time limit. Not modelled: the job's 20-a-account cap across markets and its stale-market pause.
+export const DOM = { RR: 2, ATR_K: 0.25, NEAR_ATR: 1, LIFE_S: 24 * 3600, MAX_MARKET: 3 };
+export const DOM_MARKETS = ['xau', 'xag', 'eurusd', 'gbpusd', 'audusd', 'nzdusd', 'usdjpy', 'usdcad', 'usdchf', 'eurjpy', 'gbpjpy', 'audjpy', 'cadjpy', 'eurgbp', 'euraud', 'nas100', 'spx500', 'de40'];
+export function domPlan(z, atr, cost) {   // the job's plan(), the same arithmetic
+  const s = z.side === 'buy' ? 1 : -1, entry = s > 0 ? z.top : z.bot, pad = cost / 2 + DOM.ATR_K * atr, stop = s > 0 ? z.bot - pad : z.top + pad, risk = Math.abs(entry - stop);
+  if (!(risk > 0)) return null;
+  return { entry, stop, target: entry + s * DOM.RR * risk, risk };
+}
+const domAtr = (L, k) => { if (k < 14) return null; let s = 0; for (let i = k - 13; i <= k; i++) s += Math.max(L[i].h - L[i].l, Math.abs(L[i].h - L[i - 1].c), Math.abs(L[i].l - L[i - 1].c)); return s / 14; };
+export function domTrades(B, { from, market = 'xau' } = {}) {
+  const M5 = toK(B['5m']); if (!M5.length || COSTS[market] == null) return [];
+  const endT = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.e <= endT), cost = COSTS[market], f = fx(market), out = [];
+  const Z = H.length >= 2 ? buildZones('dom', H).map((z) => ({ side: z.d > 0 ? 'buy' : 'sell', bot: z.bot, top: z.top, t: H[z.i - 1].t, formed: z.at, end: z.end })) : [];
+  Z.sort((a, b) => a.formed - b.formed);
+  const armed = new Set(), orders = [], live = []; let zp = 0, hk = -1; const act = [];
+  for (let i = 0; i < M5.length; i++) { const b = M5[i], T = b.e;
+    // resting orders on this candle: expiry, the zone gone, else a touch fills the limit
+    for (let q = orders.length - 1; q >= 0; q--) { const o = orders[q];
+      if (b.t >= o.expires || b.t >= o.z.end) { orders.splice(q, 1); continue; }
+      const s = o.s, hit = s > 0 ? b.l <= o.p.entry : b.h >= o.p.entry; if (!hit) continue;
+      orders.splice(q, 1); const w = walk(M5, s, i, o.p.entry, o.p.stop, o.p.target, Infinity, false); if (!w) continue;
+      live.push({ until: w.endT == null ? Infinity : w.endT + 300 });
+      if (b.t >= from) out.push({ o, i, w }); }
+    // arming at this candle's close
+    while (hk + 1 < H.length && H[hk + 1].e <= T) hk++;
+    while (zp < Z.length && Z[zp].formed <= T) act.push(Z[zp++]);
+    if (hk < 14) continue;
+    const atr = domAtr(H, hk), price = b.c; if (!(atr > 0)) continue;
+    for (let q = act.length - 1; q >= 0; q--) if (act[q].end <= T) act.splice(q, 1);
+    for (const z of act) { const id = `${z.side}-${z.t}`; if (armed.has(id)) continue;
+      if (!(z.side === 'buy' ? price > z.top && price - z.top <= DOM.NEAR_ATR * atr : price < z.bot && z.bot - price <= DOM.NEAR_ATR * atr)) continue;
+      const busy = orders.length + live.filter((x) => x.until > T).length; if (busy >= DOM.MAX_MARKET) break;
+      const p = domPlan(z, atr, cost); if (!p) continue; armed.add(id);
+      orders.push({ z, p, s: z.side === 'buy' ? 1 : -1, placed: T, expires: T + DOM.LIFE_S, atr }); } }
+  return out.map(({ o, i, w }) => { const z = o.z, s = o.s, r0 = Math.abs(o.p.entry - o.p.stop);
+    const end = w.status === 'open' ? { t: null, text: 'Still open on the last candle read' + (w.float != null ? ` (${sg(w.float)} now).` : '.') }
+      : w.status === 'target' ? { t: w.endT, text: `Target reached: ${sg(w.R)}.` } : { t: w.endT, text: `Stopped: ${sg(w.R)}` + (w.R < -1.0001 ? ' (the candle opened beyond the stop).' : '.') };
+    return { id: `${pre(market)}dom-${z.side === 'buy' ? 'b' : 's'}${z.t}`, market, kind: 'dom-h1', label: `H1 DOM ${z.side} zone`, h: '1h', l: '5m', side: s, t: M5[i].t,
+      entry: o.p.entry, stop: o.p.stop, target: o.p.target, status: w.status, R: w.R, endT: w.endT, exit: w.exit, mfe: w.mfe, float: w.float ?? null,
+      log: [{ t: z.formed, text: `Two ${s > 0 ? 'green' : 'red'} H1 candles, the second closing ${s > 0 ? 'above the high' : 'below the low'} of the first: a DOM ${z.side} zone on the first candle's body (${f(z.bot)} to ${f(z.top)}).` },
+        { t: o.placed, text: `Price ${s > 0 ? 'above' : 'below'} the zone within 1 ATR(14) of H1 (${f(o.atr)}): a ${z.side} limit at ${f(o.p.entry)}, stop ${f(o.p.stop)} (past the far side by half the round trip + 0.25 ATR, risk ${f(r0)}), target ${f(o.p.target)} (2R), good for 24 hours.` },
+        { t: M5[i].t, text: `The limit filled at ${f(o.p.entry)}.` }, end],
+      marks: [{ kind: 'zone', top: z.top, bot: z.bot, a: z.t, at: z.formed, label: `H1 DOM ${z.side} zone` }] }; });
+}
+
 // the desks, as council/edge-desks.mjs DESKS entries (only 5-minute candles are read: every higher timeframe is built from them,
 // the studies' own way)
 const PAPER = ' Nothing is traded and results are before costs; a paper record of the rule, not a trade signal.';
@@ -217,5 +270,6 @@ export const DESKS2 = {
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
+  dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };
 export const KINDS2 = Object.keys(DESKS2);

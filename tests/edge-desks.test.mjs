@@ -67,7 +67,7 @@ test('the files: markets are joined into one record, nothing without a stop is s
   assert.ok(f.records.every((r) => (r.side > 0 ? r.stop < r.entry : r.stop > r.entry))); assert.ok(f.records.some((r) => r.market === 'eurusd' && /^eurusd:eg-/.test(r.id) && r.label));
   assert.equal(f.counts.n, f.records.length); assert.ok(f.records.every((r) => r.src === 'live' || r.src === 'replay'));
   const again = E.buildDesk('eg', [['xau', B]], f, now + 2100, 30); assert.equal(again.records.length, f.records.length, 'a second run adds nothing and keeps the other market');
-  assert.deepEqual(Object.keys(E.DESKS), ['eg', 'msnr', 'lit', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb']); assert.equal(E.DESKS.lit.markets.length, 11); assert.deepEqual(E.OLD, ['eg', 'msnr', 'lit']); assert.deepEqual(E.DESKS.eg.markets, Object.keys(SOP.MARKETS));
+  assert.deepEqual(Object.keys(E.DESKS), ['eg', 'msnr', 'lit', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'dom']); assert.equal(E.DESKS.lit.markets.length, 11); assert.deepEqual(E.OLD, ['eg', 'msnr', 'lit']); assert.deepEqual(E.DESKS.eg.markets, Object.keys(SOP.MARKETS));
 });
 
 test('wiring: the loop runs the trackers, data health lists the files, and the page has both desks with an Open now panel', () => {
@@ -75,8 +75,8 @@ test('wiring: the loop runs the trackers, data health lists the files, and the p
   assert.match(yml, /timeout 280 node council\/edge-desks\.mjs data --only eg,msnr,lit \|\| echo/); assert.match(dh, /file: 'lit\/desk\.json'/); assert.match(dh, /file: 'eg\/desk\.json'/);
   assert.match(dh, /file: 'msnr\/desk\.json'/);
   for (const k of ['lit', 'eg', 'msnr']) { assert.match(page, new RegExp(`<section class="view adm" id="v-${k}"`)); assert.match(page, new RegExp(`${k}: 'desks'`)); assert.match(js, new RegExp(`${k}/desk\\.json`)); }
-  assert.match(page, /const VIEWS = \[[^\]]*'lit', 'eg'/); assert.equal(page.split('data-dk="open"').length - 1, 10); assert.ok(page.includes('<script src="/assets/desk-trades.js" defer></script>'));
-  assert.equal(page.split('<a href="#eg" data-dsw="eg" class="adm">Engulfing</a>').length - 1, 12, 'the switch on every desk');
+  assert.match(page, /const VIEWS = \[[^\]]*'lit', 'eg'/); assert.equal(page.split('data-dk="open"').length - 1, 3); assert.ok(page.includes('<script src="/assets/desk-trades.js" defer></script>'));
+  assert.equal(page.split('<a href="#eg" data-dsw="eg" class="adm">Engulfing</a>').length - 1, 5, 'the switch on every desk');
   assert.doesNotMatch(js, /localStorage|sessionStorage|fetch\(|\.stop\s*=[^=]/, 'the page code only reads the stored record and writes text');
   assert.doesNotMatch(src, /ctrader|alerts\.mjs|trader\.mjs|sendAlerts/, 'a paper record: no order, alert or Trader code');
   assert.match(js, /No trade is open now\./); assert.match(js, /at the last reading/); assert.match(js, /not a tested rule/);
