@@ -36,3 +36,9 @@ the chance rate); reported against the chance rate instead.
 Unchanged: discovery 2020-23 (n >= 100, mean R after costs > 0, month t >= 2); confirmation 2024-now (n >= 50, mean > 0,
 month t >= 2 after Holm over every discovery winner); positive at twice the cost. These years have been read by two grids
 already: a confirmation here is a hypothesis for data none of them read.
+
+## Amendment: before costs (23 Nov 2026, before this grid's run)
+
+The owner: "Forget the costs, I only want to know before costs." The same bar is applied twice: to R before costs (the
+judgement the owner asked for) and to R after costs (kept for the record). Both counts are reported; neither replaces the
+other in the file.

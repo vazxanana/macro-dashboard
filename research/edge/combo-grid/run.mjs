@@ -173,6 +173,7 @@ function qmAt(T, j) { if (!T._qm) { T._qm = new Map(); for (const q of K.qms(T, 
 export function runMarket(market, { from = '2019-03-01', to } = {}) {
   const M5 = K.load(market, '5m', { from, to }); const F = frames(M5); const cost = K.COSTS[market];
   const acc = { n: new Uint32Array(NCOMBO * 2), ms: new Float32Array(NCOMBO * NM), c2: new Float32Array(NCOMBO), // n IS/OOS; month sums; OOS cost/risk sum
+    cm: new Float32Array(NCOMBO * NM),                                                                                // month sums of cost / risk (before costs = ms + cm; owner, 23 Nov 2026)
     pms: new Float32Array(NCOMBO * NM), pn: new Uint32Array(NCOMBO * 2) };                                          // placebo: the side flipped
   const tags = {}; for (const tf of ['1d', '4h', '1h']) tags[tf] = { st: K.structure(F[tf], 3).side, up: K.structure(F[ABOVE[tf]], 3).side, ms: msnrCalls(F[tf], tf, F) };
   const d1z = egZones(F['1d'], 3).sort((a, b) => a.at - b.at);
@@ -216,7 +217,7 @@ export function runMarket(market, { from = '2019-03-01', to } = {}) {
             for (let v = 0; v < 2; v++) { if (v === 0 && sg.visit !== 1) continue;
               for (let di = 0; di < 5; di++) { if (!dirOk[di]) continue;
                 for (let x = 0; x < 7; x++) { const c = comboIndex(ch, zi, v, di, te, x), Rn = r.R[x] - cr;
-                  if (flip > 0) { acc.n[c * 2 + oos]++; acc.ms[c * NM + m] += Rn; if (oos) acc.c2[c] += cr; }
+                  if (flip > 0) { acc.n[c * 2 + oos]++; acc.ms[c * NM + m] += Rn; acc.cm[c * NM + m] += cr; if (oos) acc.c2[c] += cr; }
                   else { acc.pn[c * 2 + oos]++; acc.pms[c * NM + m] += Rn; } } } }
           }
         }
@@ -238,16 +239,18 @@ function save(dir, market, out) {
 }
 function loadBin(dir, market, k, T) { const b = fs.readFileSync(path.join(dir, `${market}.${k}.bin`)); return new T(b.buffer, b.byteOffset, b.byteLength / T.BYTES_PER_ELEMENT); }
 
-export function report(dir, markets = K.MARKETS) {
+// gross: judge before costs (owner, 23 Nov 2026: "I only want to know before costs")
+export function report(dir, markets = K.MARKETS, { gross = false } = {}) {
   const scopes = ['pool', ...markets]; const P = {};
-  for (const m of markets) P[m] = { n: loadBin(dir, m, 'n', Uint32Array), ms: loadBin(dir, m, 'ms', Float32Array), c2: loadBin(dir, m, 'c2', Float32Array),
+  for (const m of markets) P[m] = { n: loadBin(dir, m, 'n', Uint32Array), ms: loadBin(dir, m, 'ms', Float32Array), c2: loadBin(dir, m, 'c2', Float32Array), cm: gross ? loadBin(dir, m, 'cm', Float32Array) : null,
     pms: loadBin(dir, m, 'pms', Float32Array), pn: loadBin(dir, m, 'pn', Uint32Array) };
   const rows = [], prow = []; const ms = new Float64Array(NM), pms = new Float64Array(NM);
   for (const sc of scopes) { const list = sc === 'pool' ? markets : [sc];
     for (let c = 0; c < NCOMBO; c++) {
       ms.fill(0); pms.fill(0); let nI = 0, nO = 0, c2 = 0, pI = 0, pO = 0;
       for (const m of list) { const A = P[m]; nI += A.n[c * 2]; nO += A.n[c * 2 + 1]; c2 += A.c2[c]; pI += A.pn[c * 2]; pO += A.pn[c * 2 + 1];
-        for (let k = 0; k < NM; k++) { ms[k] += A.ms[c * NM + k]; pms[k] += A.pms[c * NM + k]; } }
+        for (let k = 0; k < NM; k++) { ms[k] += A.ms[c * NM + k] + (A.cm ? A.cm[c * NM + k] : 0); pms[k] += A.pms[c * NM + k]; } }
+      if (gross) c2 = 0;
       if (nI >= 100) { const a = mstat(ms, 0, IS_M), b = mstat(ms, IS_M, NM);
         rows.push({ sc, c, nI, nO, isMean: a.sum / nI, isT: a.t, oosMean: nO ? b.sum / nO : null, oosT: b.t, oos2c: nO ? (b.sum - c2) / nO : null }); }
       // the placebo of a rule with no trigger is not valid: its order is placed at the start of a candle chosen because it
@@ -273,6 +276,8 @@ export function report(dir, markets = K.MARKETS) {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [cmd, a, b] = process.argv.slice(2);
   if (cmd === 'market') { const t0 = Date.now(); const out = runMarket(a); save(b, a, out); console.log(a, out.nsig, 'signals', out.nsim, 'sims', ((Date.now() - t0) / 1000).toFixed(0) + 's'); }
+  else if (cmd === 'gross') { const R = report(a, undefined, { gross: true }); const { rows, prow, ...rest } = R; fs.writeFileSync(path.join(a, 'report-gross.json'), JSON.stringify(rest, null, 1));
+    console.log(JSON.stringify({ basis: 'before costs', tested: R.tested, discovery: R.discovery, rawOOS: R.rawOOS, confirmed: R.confirmed, expectedByChance: R.expectedByChance }, null, 1)); }
   else if (cmd === 'report') { const R = report(a); const { rows, prow, ...rest } = R; fs.writeFileSync(path.join(a, 'report-full.json'), JSON.stringify(rest, null, 1));
     console.log(JSON.stringify({ tested: R.tested, discovery: R.discovery, discoveryWithOOS: R.discoveryWithOOS, rawOOS: R.rawOOS, confirmed: R.confirmed, expectedByChance: R.expectedByChance, placebo: R.placebo }, null, 1)); }
   else console.log('usage: run.mjs market <m> <dir> | report <dir>');

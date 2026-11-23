@@ -40,3 +40,9 @@ price units, from today's prices: the forex crosses = the demo's commission (0.0
 (gbpjpy 0.014, eurgbp 0.00009, audjpy 0.010, cadjpy 0.010, euraud 0.00013; ASSUMED spreads, not measured); nas100 1.0 point
 and spx500 0.4 point (rounded up from the demo's measured hourly spreads, `index-vol-breakout-hourcost`); de40 1.5 points
 (ASSUMED). The data-quality audit is run on these eight as well before the grid's run, with the same script.
+
+## Amendment: before costs (23 Nov 2026, before this grid's run)
+
+The owner: "Forget the costs, I only want to know before costs." The same bar is applied twice: to R before costs (the
+judgement the owner asked for) and to R after costs (kept for the record). Both counts are reported; neither replaces the
+other in the file.

@@ -208,7 +208,7 @@ function atr14(B) { const a = new Float64Array(B.length); let s = 0; for (let i 
     s += tr; if (i > 14) s -= Math.max(B[i - 14].h - B[i - 14].l, Math.abs(B[i - 14].h - B[i - 15].c), Math.abs(B[i - 14].l - B[i - 15].c)); a[i] = i >= 14 ? s / 14 : 0; } return a; }
 export function runMarket(market, { from = '2019-03-01', to } = {}) {
   const M5 = K.load(market, '5m', { from, to }); const F = frames(M5); const cost = COSTS[market], pip = pipOfMarket(market);
-  const acc = { n: new Uint32Array(NCOMBO * 2), ms: new Float32Array(NCOMBO * NM), c2: new Float32Array(NCOMBO) };
+  const acc = { n: new Uint32Array(NCOMBO * 2), ms: new Float32Array(NCOMBO * NM), c2: new Float32Array(NCOMBO), cm: new Float32Array(NCOMBO * NM) }; // cm: cost / risk by month (before costs = ms + cm)
   const tags = {};
   for (const tf of KEYS) { const st = K.structure(F[tf], 3); const A = F[ABOVE[tf]];
     const sw = K.swings(A, 3).sort((x, y) => x.ct - y.ct);
@@ -270,7 +270,7 @@ export function runMarket(market, { from = '2019-03-01', to } = {}) {
           const oos = r.t >= SPLIT ? 1 : 0, cr = cost / r.risk;
           for (let di = 0; di < DIRS.length; di++) { if (!dirOk[di]) continue;
             for (let x = 0; x < NX; x++) { const R = r.R[x]; if (!Number.isFinite(R)) continue; const c = comboIndex(ch, zi, 0, di, te, x);
-              acc.n[c * 2 + oos]++; acc.ms[c * NM + m] += R - cr; if (oos) acc.c2[c] += cr; } }
+              acc.n[c * 2 + oos]++; acc.ms[c * NM + m] += R - cr; acc.cm[c * NM + m] += cr; if (oos) acc.c2[c] += cr; } }
         }
       }
       process.stderr.write(`${market} ${tfL}>${tfT} ${kind}: ${S.length} signals\n`);
@@ -290,14 +290,16 @@ function save(dir, market, out) {
 }
 function loadBin(dir, market, k, T) { const b = fs.readFileSync(path.join(dir, `${market}.${k}.bin`)); return new T(b.buffer, b.byteOffset, b.byteLength / T.BYTES_PER_ELEMENT); }
 
-export function report(dir, markets = GRID_MARKETS) {
+// gross: judge before costs (month sums + cost / risk; owner, 23 Nov 2026: "I only want to know before costs")
+export function report(dir, markets = GRID_MARKETS, { gross = false } = {}) {
   const scopes = ['pool', ...markets]; const P = {};
-  for (const m of markets) P[m] = { n: loadBin(dir, m, 'n', Uint32Array), ms: loadBin(dir, m, 'ms', Float32Array), c2: loadBin(dir, m, 'c2', Float32Array) };
+  for (const m of markets) P[m] = { n: loadBin(dir, m, 'n', Uint32Array), ms: loadBin(dir, m, 'ms', Float32Array), c2: loadBin(dir, m, 'c2', Float32Array), cm: gross ? loadBin(dir, m, 'cm', Float32Array) : null };
   const rows = []; const ms = new Float64Array(NM);
   for (const sc of scopes) { const list = sc === 'pool' ? markets : [sc];
     for (let c = 0; c < NCOMBO; c++) {
       ms.fill(0); let nI = 0, nO = 0, c2 = 0;
-      for (const m of list) { const A = P[m]; nI += A.n[c * 2]; nO += A.n[c * 2 + 1]; c2 += A.c2[c]; for (let k = 0; k < NM; k++) ms[k] += A.ms[c * NM + k]; }
+      for (const m of list) { const A = P[m]; nI += A.n[c * 2]; nO += A.n[c * 2 + 1]; c2 += A.c2[c]; for (let k = 0; k < NM; k++) ms[k] += A.ms[c * NM + k] + (A.cm ? A.cm[c * NM + k] : 0); }
+      if (gross) c2 = 0;
       if (nI >= 100) { const a = mstat(ms, 0, IS_M), b = mstat(ms, IS_M, NM);
         rows.push({ sc, c, nI, nO, isMean: a.sum / nI, isT: a.t, oosMean: nO ? b.sum / nO : null, oosT: b.t, oos2c: nO ? (b.sum - c2) / nO : null }); } } }
   const disc = rows.filter((r) => r.isMean > 0 && r.isT >= 2);
@@ -314,7 +316,9 @@ export function report(dir, markets = GRID_MARKETS) {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [cmd, a, b] = process.argv.slice(2);
   if (cmd === 'market') { const t0 = Date.now(); const out = runMarket(a); save(b, a, out); console.log(a, out.nsig, 'signals', out.nsim, 'sims', ((Date.now() - t0) / 1000).toFixed(0) + 's'); }
+  else if (cmd === 'gross') { const R = report(a, undefined, { gross: true }); const { rows, prow, ...rest } = R; fs.writeFileSync(path.join(a, 'report-gross.json'), JSON.stringify(rest, null, 1));
+    console.log(JSON.stringify({ basis: 'before costs', tested: R.tested, discovery: R.discovery, rawOOS: R.rawOOS, confirmed: R.confirmed, expectedByChance: R.expectedByChance }, null, 1)); }
   else if (cmd === 'report') { const R = report(a); const { rows, ...rest } = R; fs.writeFileSync(path.join(a, 'report-full.json'), JSON.stringify(rest, null, 1));
     console.log(JSON.stringify({ tested: R.tested, discovery: R.discovery, discoveryWithOOS: R.discoveryWithOOS, rawOOS: R.rawOOS, confirmed: R.confirmed, expectedByChance: R.expectedByChance }, null, 1)); }
-  else console.log('usage: run.mjs market <m> <dir> | report <dir>');
+  else console.log('usage: run.mjs market <m> <dir> | report <dir> | gross <dir> (the same bar before costs)');
 }
