@@ -2,7 +2,7 @@
 
 Run 23 Nov 2026 as pre-registered (`PREREGISTRATION.md`, committed alone first). Research only: nothing live changed.
 
-**Verdict: FAIL.**
+**Verdict: FAIL. -0.076R a trade after costs on USD/JPY 2005-2019 (n 4,500, month t -3.58).**
 
 The one family of rules the combination grid (`research/edge/combo-grid`) left standing in both its windows, tested once on
 years the grid did not read. Gate first: the grid's cell (`usdjpy 4h>15m dom first2 none ef mkt/zone 2R`) is reproduced
