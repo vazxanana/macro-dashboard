@@ -27,17 +27,31 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { DATA_DIR, nyOffsetH, dailyNY } from '../_lib/edgekit.mjs';
-import { histStampUtc } from '../../../council/histdata.mjs';
+import { histStampUtc, euSummer } from '../../../council/histdata.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '../../..');
 export const FOCUS = Date.UTC(2020, 0, 1) / 1000;
-export const ALL_MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
+export const ALL_MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag',
+  // added 23 Nov 2026 (2019 on, no second feed)
+  'gbpjpy', 'eurgbp', 'audjpy', 'cadjpy', 'euraud', 'nas100', 'spx500', 'de40'];
+// indices keep their own hours: the open 5-minute slots of each weekday are learned from the candles of each year (a slot
+// is open when the normal days of that weekday hold a candle there half the time or more), on the exchange's own clock
+export const INDICES = { nas100: 'ny', spx500: 'ny', de40: 'eu' };
+// market-wide events named in a gap's reason (the gap stays excluded: there are no prices to trade on)
+export const KNOWN = [
+  { from: '2020-03-08', to: '2020-03-25', markets: ['nas100', 'spx500'], why: 'March 2020: US index futures locked limit up / down, the CFD stopped quoting' },
+  { from: '2022-05-04', to: '2022-05-13', why: 'the same hole is in nearly every market of the cache: a fetch gap, not the market' },
+  { from: '2022-12-26', to: '2022-12-27', why: 'the same hole is in every forex market of the cache (HistData has prices): a fetch gap' },
+  { from: '2025-01-09', to: '2025-01-10', markets: ['nas100', 'spx500'], why: 'US national day of mourning: US stock markets shut, index futures closed early' },
+  { from: '2025-11-28', to: '2025-11-29', markets: ['nas100', 'spx500'], why: 'the CME outage of 28 Nov 2025 (trading halted for hours)' },
+];
 export const METALS = new Set(['xau', 'xag']);
 // second feed folders in council-data (HistData M1); nzdusd and eurjpy have none
 export const HIST = { xau: 'xau-histdata', xag: 'XAGUSD', eurusd: 'EURUSD', gbpusd: 'GBPUSD', usdjpy: 'USDJPY', audusd: 'AUDUSD', usdcad: 'USDCAD', usdchf: 'USDCHF' };
 // display unit of a price difference
-export const UNIT = { xau: [1, '$'], xag: [1, '$'], usdjpy: [0.01, 'pip'], eurjpy: [0.01, 'pip'] };
+export const UNIT = { xau: [1, '$'], xag: [1, '$'], usdjpy: [0.01, 'pip'], eurjpy: [0.01, 'pip'], gbpjpy: [0.01, 'pip'], audjpy: [0.01, 'pip'], cadjpy: [0.01, 'pip'],
+  nas100: [1, 'pt'], spx500: [1, 'pt'], de40: [1, 'pt'] };
 const unitOf = (m) => UNIT[m] || [0.0001, 'pip'];
 export const TH = {
   gapMin: [15, 60, 180], excludeGapMin: 60, rangeX: 15, jumpX: 10, window: 288, revertK: 3, wickFrac: 0.5,
@@ -71,9 +85,45 @@ export function holidays(metal) {
     const tg = dayKey(y, 10, nthWd(y, 10, 4, 4)); us.push(tg);
     for (const k of us) put(k, 13 * 60);
     put(tg + 1, 13 * 60); put(dayKey(y, 6, 3), 13 * 60);
-    for (const [m, d] of [[11, 25], [0, 1]]) { const w = new Date(Date.UTC(y, m, d)).getUTCDay(); if (w === 6) put(dayKey(y, m, d) - 1, 0); if (w === 0) put(dayKey(y, m, d) + 1, 0); }
+    // a fixed holiday on a weekend is observed on the Friday before or the Monday after; the market shuts the evening before
+    for (const [m, d] of [[11, 25], [0, 1]]) { const w = new Date(Date.UTC(y, m, d)).getUTCDay(); const k = dayKey(y, m, d) + (w === 6 ? -1 : w === 0 ? 1 : 0); if (w === 6 || w === 0) { put(k, 0); put(k - 1, 16 * 60 + 55); } }
   }
   return H;
+}
+// German exchange holidays (Eurex shut): New Year, Good Friday, Easter Monday, 1 May, 24-26 and 31 December
+export function holidaysDE() {
+  const H = new Map();
+  for (let y = 2004; y <= 2027; y++) {
+    const [em, ed] = easter(y); const e = dayKey(y, em, ed);
+    for (const k of [dayKey(y, 0, 1), e - 2, e + 1, dayKey(y, 4, 1), dayKey(y, 11, 24), dayKey(y, 11, 25), dayKey(y, 11, 26), dayKey(y, 11, 31)]) H.set(k, 0);
+  }
+  return H;
+}
+// local clock of an index: New York for the US indices, Central European for de40
+const euOff = (t) => (euSummer(t) ? 2 : 1);
+export const localOf = (t, clock) => (clock === 'eu' ? t + euOff(t) * 3600 : t - off(t) * 3600);
+// learn the open slots per local year and weekday from the candles: Map year -> Uint8Array(7 * 288)
+export function learnSchedule(T, clock) {
+  const perDay = new Map(); // local day key -> slots with a candle
+  for (let i = 0; i < T.length; i++) { const l = localOf(T[i], clock), k = Math.floor(l / 86400); let a = perDay.get(k); if (!a) perDay.set(k, a = []); a.push(Math.floor((l - k * 86400) / S5)); }
+  const byYW = new Map(); // year * 7 + weekday -> list of days
+  for (const [k, slots] of perDay) { const y = new Date(k * 86400e3).getUTCFullYear(), wd = (k + 4) % 7, key = y * 7 + wd; let a = byYW.get(key); if (!a) byYW.set(key, a = []); a.push(slots); }
+  const out = new Map();
+  for (const [key, days] of byYW) {
+    const y = Math.floor(key / 7), wd = key % 7; if (!out.has(y)) out.set(y, new Uint8Array(7 * 288)); const S = out.get(y);
+    const med = median(days.map((d) => d.length)); const normal = days.filter((d) => d.length >= 0.5 * med); if (normal.length < 5) continue;
+    const cnt = new Uint16Array(288); for (const d of normal) for (const sl of d) cnt[sl]++;
+    for (let sl = 0; sl < 288; sl++) if (cnt[sl] >= 0.5 * normal.length) S[wd * 288 + sl] = 1;
+  }
+  return out;
+}
+export function indexClass(t, clock, sched, hol) {
+  const l = localOf(t, clock), k = Math.floor(l / 86400), wd = (k + 4) % 7, sl = Math.floor((l - k * 86400) / S5), hm = sl * 5;
+  if (wd === 6) return 'weekend';
+  const S = sched.get(new Date(k * 86400e3).getUTCFullYear());
+  if (!S || !S[wd * 288 + sl]) return wd === 5 || wd === 0 ? 'weekend' : 'break';
+  const h = hol.get(k); if (h !== undefined && hm >= h) return 'holiday';
+  return null;
 }
 // 'weekend' | 'break' | 'holiday' | null (a slot that should hold a candle)
 export function slotClass(t, hol) {
@@ -113,7 +163,7 @@ function load5m(market, years, bad) {
       if (!(o > 0 && h > 0 && l > 0 && c > 0)) { Y.nonPositive++; bad.push({ t, why: 'non-positive price' }); }
       else if (h < Math.max(o, c) - 1e-12 || l > Math.min(o, c) + 1e-12 || h < l) { Y.ohlcBad++; bad.push({ t, why: 'high / low not around open and close' }); }
       if (new Date(t * 1000).getUTCDay() === 6) Y.saturday++;
-      if (closedNow(t)) Y.weekendClosed++;
+      if (!INDICES[market] && closedNow(t)) Y.weekendClosed++;
       if (o === h && h === l && l === c) Y.flat++;
       rows.push(x);
     }
@@ -172,32 +222,42 @@ const r4 = (x) => (x == null || !Number.isFinite(x) ? null : Math.round(x * 1e4)
 
 // ---- one market ---------------------------------------------------------------------------------------------------------
 export function auditMarket(market, { histdata = true } = {}) {
-  const t0 = Date.now(); const metal = METALS.has(market); const hol = holidays(metal); const [U, uName] = unitOf(market);
-  const years = {}; const badRows = []; const exclusions = []; const notes = [];
+  const t0 = Date.now(); const metal = METALS.has(market); const clock = INDICES[market];
+  const hol = clock === 'eu' ? holidaysDE() : holidays(metal || clock === 'ny'); const [U, uName] = unitOf(market);
+  const years = {}; const badRows = []; const exclusions = []; const notes = []; const review = [];
   const D = load5m(market, years, badRows); const { N, T, O, H, L, C } = D;
+  const sched = clock ? learnSchedule(T, clock) : null;
+  const cls = sched ? (t) => indexClass(t, clock, sched, hol) : (t) => slotClass(t, hol);
   for (const b of badRows) exclusions.push(ex(b.t, b.t + S5, 'structure', b.why));
+
+  // second feed (4), loaded first so gaps and spikes can be checked against it
+  const hd = histdata ? loadHist(market) : null; const hdIdx = hd ? idxMap(hd.T) : null;
+  const hdCount = (a, b) => { if (!hd || a < hd.T[0] || b > hd.T[hd.T.length - 1] + S5) return null; let n = 0; for (let t = a; t < b; t += S5) if (hdIdx.has(t)) n++; return n; };
 
   // 2. gaps and coverage
   const gapRuns = [];
   const runAdd = (list, s, kind) => { const r = list[list.length - 1]; if (r && r.to === s && r.kind === kind) r.to = s + S5; else list.push({ from: s, to: s + S5, kind }); };
   for (let i = 1; i < N; i++) {
-    for (let s = T[i - 1] + S5; s < T[i]; s += S5) { const k = slotClass(s, hol); if (k === null) runAdd(gapRuns, s, 'gap'); else if (k === 'holiday') runAdd(gapRuns, s, 'holiday'); }
+    for (let s = T[i - 1] + S5; s < T[i]; s += S5) { const k = cls(s); if (k === null) runAdd(gapRuns, s, 'gap'); else if (k === 'holiday') runAdd(gapRuns, s, 'holiday'); }
   }
   // expected slots per year (slots that should hold a candle) between the first and last candle
-  for (let s = T[0]; s <= T[N - 1]; s += S5) if (slotClass(s, hol) === null) { const y = yearOf(s); (years[y] || (years[y] = emptyYear())).expectedSlots++; }
-  const counted = {}; for (let i = 0; i < N; i++) if (slotClass(T[i], hol) === null) { const y = yearOf(T[i]); counted[y] = (counted[y] || 0) + 1; }
+  for (let s = T[0]; s <= T[N - 1]; s += S5) if (cls(s) === null) { const y = yearOf(s); (years[y] || (years[y] = emptyYear())).expectedSlots++; }
+  const counted = {}; for (let i = 0; i < N; i++) if (cls(T[i]) === null) { const y = yearOf(T[i]); counted[y] = (counted[y] || 0) + 1; }
   for (const [y, Y] of Object.entries(years)) Y.coverage = Y.expectedSlots ? r4((counted[y] || 0) / Y.expectedSlots) : null;
   for (const r of gapRuns) {
     const min = (r.to - r.from) / 60, Y = years[yearOf(r.from)] || (years[yearOf(r.from)] = emptyYear());
     if (r.kind === 'holiday') { Y.holidayGapMin += min; continue; }
     Y.gaps.missingMin += min; if (min > 15) Y.gaps.over15m++; if (min > 60) Y.gaps.over1h++; if (min > 180) Y.gaps.over3h++;
-    if (min >= TH.excludeGapMin) exclusions.push(ex(r.from, r.to, 'gap', `no candles for ${fmtMin(min)} on a trading weekday (outside the weekend, the 17:00 New York break and listed holidays)`));
+    if (min >= TH.excludeGapMin) {
+      const n = hdCount(r.from, r.to), slots = (r.to - r.from) / S5;
+      const second = n === null ? 'no second feed for that time' : n >= slots / 2 ? `HistData has prices in ${n} of the ${slots} 5-minute slots, so the market traded: a hole in the cache` : `HistData is nearly empty there too (${n} of ${slots} slots): the market was probably shut`;
+      const known = KNOWN.find((k) => (!k.markets || k.markets.includes(market)) && r.from < Date.parse(k.to) / 1000 && r.to > Date.parse(k.from) / 1000);
+      const hours = clock ? 'inside its learned trading hours, outside listed holidays' : 'outside the weekend, the 17:00 New York break and listed holidays';
+      exclusions.push(ex(r.from, r.to, 'gap', `no candles for ${fmtMin(min)} from ${nyText(r.from)} (${hours}); ${second}${known ? '; ' + known.why : ''}`));
+    }
   }
   const longestGaps = gapRuns.filter((r) => r.kind === 'gap' && r.from >= FOCUS).sort((a, b) => (b.to - b.from) - (a.to - a.from)).slice(0, 20)
     .map((r) => ({ from: iso(r.from), to: iso(r.to), minutes: (r.to - r.from) / 60, nyStart: nyText(r.from) }));
-
-  // 4 (part). second feed, loaded early so spikes can be checked against it
-  const hd = histdata ? loadHist(market) : null; const hdIdx = hd ? idxMap(hd.T) : null;
 
   // 3. spikes
   const rng = new Float64Array(N), ret = new Float64Array(N);
@@ -228,19 +288,22 @@ export function auditMarket(market, { histdata = true } = {}) {
     if (hit.kind === 'range') Y.rangeSpikes++; if (hit.jump) Y.jumpReverts++; if (hit.artefact) Y.artefactSpikes++;
     let confirmed = null;
     if (hdIdx && T[i] >= hd.T[0] && T[i] <= hd.T[hd.T.length - 1]) {
-      const j = hdIdx.get(T[i]);
-      if (j === undefined) confirmed = false;
-      else if (hit.kind === 'range' && !hit.jump) confirmed = hd.H[j] - hd.L[j] >= 0.5 * rng[i];
-      else { const p = hdIdx.get(T[i - 1]); const dO = C[i] - C[i - 1]; confirmed = p !== undefined && (hd.C[j] - hd.C[p]) * Math.sign(dO) >= 0.5 * Math.abs(dO); if (!confirmed) confirmed = hd.H[j] - hd.L[j] >= 0.5 * rng[i]; }
+      // the second feed decides only where it holds the candle itself (and, for a jump, the one before)
+      const j = hdIdx.get(T[i]), p = i ? hdIdx.get(T[i - 1]) : undefined;
+      if (j === undefined || (hit.jump && p === undefined)) confirmed = null;
+      else if (!hit.jump) confirmed = hd.H[j] - hd.L[j] >= 0.5 * rng[i];
+      else { const dO = C[i] - C[i - 1]; confirmed = (hd.C[j] - hd.C[p]) * Math.sign(dO) >= 0.5 * Math.abs(dO) || hd.H[j] - hd.L[j] >= 0.5 * rng[i]; }
     }
     if (confirmed) Y.spikesConfirmed++;
     const rec = { t: iso(T[i]), kind: hit.jump ? (hit.kind === 'range' ? 'range+jump' : 'jump') : 'range', x: Math.round(hit.x * 10) / 10,
       size: Math.round((hit.size / U) * 100) / 100, unit: uName, lonePart: hit.frac == null ? null : Math.round(hit.frac * 100) / 100,
       artefactLike: hit.artefact, secondFeed: confirmed === null ? 'none' : confirmed ? 'confirmed' : 'not seen' };
     spikes.push(rec);
+    // 'spike' = the second feed holds that candle and shows no such move (likely a bad print in the OANDA cache): excluded;
+    // 'spike-unchecked' = no second-feed candle there (mostly news minutes and the 17:00 rollover: may be real): `review`
     if (hit.artefact && confirmed !== true) {
-      Y.spikesExcluded++;
-      exclusions.push(ex(T[i], hit.end, 'spike', `${rec.kind === 'jump' ? 'close jump that comes back' : 'lone-wick candle'} ${rec.x}x the local median (${rec.size} ${uName}); ${confirmed === null ? 'no second feed to check' : 'not seen in HistData'}`));
+      if (confirmed === false) Y.spikesExcluded++; else Y.spikesUnchecked = (Y.spikesUnchecked || 0) + 1;
+      (confirmed === false ? exclusions : review).push(ex(T[i], hit.end, confirmed === false ? 'spike' : 'spike-unchecked', `${hit.jump ? 'close jump that comes back' : 'lone-wick candle'} ${rec.x}x the local median (${rec.size} ${uName}) at ${nyText(T[i])}; ${confirmed === null ? 'no second-feed candle to check it against' : 'the HistData candle at the same time shows no such move'}`));
     }
   }
 
@@ -256,7 +319,7 @@ export function auditMarket(market, { histdata = true } = {}) {
       const j = hdIdx.get(t); if (j === undefined) { B.oandaOnly++; if (t >= FOCUS) oOnly++; continue; }
       B.both++; if (t >= FOCUS) both++;
       const d = (C[i] - hd.C[j]) / U; B.diffs.push(d);
-      const dk = Math.floor(t / 86400); let dd = days.get(dk); if (!dd) days.set(dk, dd = []); dd.push(d);
+      const dk = Math.floor(t / 86400); let dd = days.get(dk); if (!dd) days.set(dk, dd = []); dd.push([d, (H[i] - L[i]) / U]);
       if (i && T[i - 1] === t - S5) {
         const rO = Math.log(C[i] / C[i - 1]);
         for (const L0 of [-12, -1, 0, 1, 12]) { const a = hdIdx.get(t + L0 * S5), b = hdIdx.get(t + L0 * S5 - S5); if (a !== undefined && b !== undefined) { B.ro[L0][0].push(rO); B.ro[L0][1].push(Math.log(hd.C[a] / hd.C[b])); } }
@@ -273,19 +336,29 @@ export function auditMarket(market, { histdata = true } = {}) {
         offset: r4(offY), medAbs: r4(median(abs)), p99Abs: r4(quant(abs, 0.99)), maxAbs: r4(abs.reduce((m, x) => (x > m ? x : m), 0)), lagCorr: lag, bestLag: best == null ? null : +best };
       years[y] && (years[y].histdata = perYear[y]);
     }
-    // disagreement days
-    const keys = [...days.keys()].sort((a, b) => a - b); const dayMed = new Map();
-    for (const k of keys) { const arr = days.get(k); if (arr.length < TH.feedMinCommon) continue; const y = yearOf(k * 86400); dayMed.set(k, median(arr.map((d) => Math.abs(d - (offsets[y] || 0))))); }
-    const mk = [...dayMed.keys()]; const badDays = [];
+    // disagreement days. Two readings of a day against the 61 days around it (only days with 50+ common candles):
+    //   scatter = the median of |difference - the day's own median|, divided by the day's median OANDA candle range (so a
+    //     busy day is not flagged for being busy): over 5x normal = the two feeds do not move together -> excluded;
+    //   shift = the day's median difference against the year's: over 5x normal while the scatter is normal = the whole
+    //     day sat a near-constant amount apart (a wider bid / mid gap: HistData is a bid feed) -> a note only.
+    const keys = [...days.keys()].sort((a, b) => a - b); const dayStat = new Map();
+    for (const k of keys) {
+      const arr = days.get(k); if (arr.length < TH.feedMinCommon) continue; const y = yearOf(k * 86400);
+      const dm = median(arr.map((x) => x[0])), sc = median(arr.map((x) => Math.abs(x[0] - dm))), rg = median(arr.map((x) => x[1]));
+      dayStat.set(k, { dm, sc, rg, rel: rg > 0 ? sc / rg : null, shift: Math.abs(dm - (offsets[y] || 0)), n: arr.length });
+    }
+    const mk = [...dayStat.keys()]; const badDays = [];
     for (let a = 0; a < mk.length; a++) {
-      const k = mk[a], win = []; for (let b = Math.max(0, a - TH.feedRollDays); b <= Math.min(mk.length - 1, a + TH.feedRollDays); b++) if (b !== a) win.push(dayMed.get(mk[b]));
-      const base = median(win), v = dayMed.get(k);
-      if (base > 0 && v > TH.feedDayX * base) {
-        const arr = days.get(k); const y = yearOf(k * 86400);
-        badDays.push({ day: iso(k * 86400).slice(0, 10), medAbs: r4(v), normal: r4(base), x: Math.round((v / base) * 10) / 10, common: arr.length, offsetNow: r4(median(arr)), unit: uName });
-        exclusions.push(ex(k * 86400, k * 86400 + 86400, 'feed', `OANDA and HistData closes differ ${Math.round((v / base) * 10) / 10}x their normal that day (median ${r4(v)} against ${r4(base)} ${uName}); which feed is wrong is not known`));
-        if (years[y]) years[y].feedBadDays = (years[y].feedBadDays || 0) + 1;
-      }
+      const k = mk[a], S = dayStat.get(k), wr = [], ws = [];
+      for (let b = Math.max(0, a - TH.feedRollDays); b <= Math.min(mk.length - 1, a + TH.feedRollDays); b++) if (b !== a) { const o = dayStat.get(mk[b]); if (o.rel != null) wr.push(o.rel); ws.push(o.sc); }
+      const baseRel = median(wr), baseSc = median(ws), y = yearOf(k * 86400), day = iso(k * 86400).slice(0, 10);
+      const scat = S.rel != null && baseRel > 0 && S.rel > TH.feedDayX * baseRel, shift = baseSc > 0 && S.shift > TH.feedDayX * baseSc;
+      if (!scat && !shift) continue;
+      const rec = { day, kind: scat ? 'scatter' : 'shift', holiday: hol.has(k), common: S.n, dayOffset: r4(S.dm), shiftFromYear: r4(S.shift), scatter: r4(S.sc), scatterPerRange: r4(S.rel), normalPerRange: r4(baseRel), normalScatter: r4(baseSc), unit: uName };
+      badDays.push(rec); if (years[y]) years[y].feedBadDays = (years[y].feedBadDays || 0) + 1;
+      const holi = hol.has(Math.floor((k * 86400 + 12 * 3600) / 86400)) ? ' (a listed holiday: thin trading on both feeds)' : '';
+      if (scat) exclusions.push(ex(k * 86400, k * 86400 + 86400, 'feed', `OANDA and HistData do not move together that day${holi}: scatter ${r4(S.rel)} of a candle range against ${r4(baseRel)} normally (${Math.round((S.rel / baseRel) * 10) / 10}x); which feed is wrong is not known`));
+      else notes.push({ day, note: `OANDA mid sat ${r4(S.dm)} ${uName} from the HistData bid all day (${r4(S.shift)} ${uName} more than the year's usual gap) while the candles moved together: a wider spread that day, not a broken candle` });
     }
     const focus = Object.entries(perYear).filter(([y]) => +y >= 2020).map(([, v]) => v);
     const allAbs = []; for (const [y, B] of Object.entries(byYear)) if (+y >= 2020) for (const d of B.diffs) allAbs.push(Math.abs(d - offsets[y]));
@@ -315,7 +388,8 @@ export function auditMarket(market, { histdata = true } = {}) {
       if (diffs[1] > 10 * tol || diffs[2] > 10 * tol) exclusions.push(ex(t, t + 86400, 'daily', `1d candle disagrees with its own 5m candles (high ${r4(diffs[1] / U)}, low ${r4(diffs[2] / U)} ${uName} apart)`)); }
     else S.matched++;
   }
-  for (const [k, v] of utc) { if (v[4] < 12 || d1seen.has(k)) continue; const Y = years[yearOf(k)]; if (Y && Y.d1) Y.d1.missingIn1d++; }
+  const lastD1 = d1rows.length ? d1rows[d1rows.length - 1][0] : -Infinity;
+  for (const [k, v] of utc) { if (v[4] < 12 || d1seen.has(k) || k > lastD1) continue; const Y = years[yearOf(k)]; if (Y && Y.d1) Y.d1.missingIn1d++; }
   // dailyNY against the 1d rows: information only (different day boundaries)
   const bars = []; for (let i = 0; i < N; i++) bars.push({ t: T[i], o: O[i], h: H[i], l: L[i], c: C[i] });
   const ny = dailyNY(bars); const d1byDate = new Map(d1rows.map((r) => [iso(r[0]).slice(0, 10), r]));
@@ -340,11 +414,11 @@ export function auditMarket(market, { histdata = true } = {}) {
   if (!why.length) why.push('no fault found from 2020 on');
   const spikesFocus = spikes.filter((s) => s.t >= '2020');
   return {
-    market, metal, unit: uName, first: iso(T[0]), last: iso(T[N - 1]), n5m: N, verdict, verdictWhy: why.join('; '),
+    market, metal, index: clock ? { clock: clock === 'eu' ? 'Central European' : 'New York', openHoursPerWeek: Object.fromEntries([...sched].map(([y, S]) => [y, Math.round(S.reduce((a, b) => a + b, 0) * 5 / 6) / 10])) } : null, secondFeedAvailable: !!HIST[market], unit: uName, first: iso(T[0]), last: iso(T[N - 1]), n5m: N, verdict, verdictWhy: why.join('; '),
     focus: { exclusions: exFocus.length, byKind: kinds, unexcusedGapMin: sum((v) => v.gaps.missingMin), gapsOver1h: sum((v) => v.gaps.over1h), minCoverage: r4(minCov),
-      spikes: spikesFocus.length, spikesExcluded: sum((v) => v.spikesExcluded), feedBadDays: feed ? feed.badDays.filter((d) => d.day >= '2020').length : null },
+      spikes: spikesFocus.length, spikesExcluded: sum((v) => v.spikesExcluded), spikesUnchecked: review.filter((e) => e.toT > FOCUS).length, feedBadDays: feed ? feed.badDays.filter((d) => d.day >= '2020').length : null },
     years, longestGaps, spikes: spikesFocus.sort((a, b) => b.x - a.x).slice(0, 40), spikesBefore2020: spikes.filter((s) => s.t < '2020').length,
-    feed: feed && { ...feed, badDays: feed.badDays }, exclusions, notes, seconds: Math.round((Date.now() - t0) / 1000),
+    feed, exclusions, review: review.filter((e) => e.toT > FOCUS), reviewBefore2020: review.filter((e) => e.toT <= FOCUS).length, notes, seconds: Math.round((Date.now() - t0) / 1000),
   };
 }
 function ex(fromT, toT, kind, reason) { return { from: iso(fromT), to: iso(toT), fromT, toT, kind, reason }; }
@@ -364,7 +438,7 @@ async function main() {
     res.markets[m] = r;
     console.log(`${m}: ${r.verdict} (${r.verdictWhy}); ${r.seconds} s`);
   }
-  fs.writeFileSync(out, JSON.stringify(res, null, 1) + '\n');
+  fs.writeFileSync(out, JSON.stringify(res) + '\n');
   console.log('wrote', out);
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((e) => { console.error(e); process.exit(1); });
