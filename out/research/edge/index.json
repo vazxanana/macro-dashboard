@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-22T23:12:57.173Z",
+ "generated": "2026-11-23T01:05:46.686Z",
  "topics": [
   {
    "topic": "academy-ml-review",
@@ -54,6 +54,15 @@
    "verdict": "fail",
    "headline": "FAIL, 0 of 3 variants: the AUD/NZD z-score fade is not an edge after costs. Pre-registered in PREREGISTRATION.md (committed alone first).",
    "built": "2026-11-13"
+  },
+  {
+   "topic": "barrier-qm-janda",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL (pre-registered in PREREGISTRATION.md, run 23 Nov 2026; run.mjs, result.json, trades.json).",
+   "built": "2026-11-23"
   },
   {
    "topic": "blowoff-veto",
@@ -126,6 +135,15 @@
    "verdict": "fail",
    "headline": "FAIL: within noise (no proposal, the live rule stays).",
    "built": "2026-11-11"
+  },
+  {
+   "topic": "box-touch-trend",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL. T1 (M15 boxes, five markets): −0.199R a trade after costs out of sample (n 4950, month t −7.00), −0.217R in sample (n 6729), −0.214R on untouched 2010-2019 (n 16858, month t −12.21).",
+   "built": "2026-11-23"
   },
   {
    "topic": "box-zone",
@@ -407,6 +425,15 @@
    "built": "2026-11-13"
   },
   {
+   "topic": "daily-zone-retest",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL, both tests. T1 (no filter) and T2 (with the Weekly-box direction) meet none of the five lines of the pass bar.",
+   "built": "2026-11-23"
+  },
+  {
    "topic": "decay-monitor",
    "result": true,
    "valid": true,
@@ -452,6 +479,15 @@
    "built": "2026-11-21"
   },
   {
+   "topic": "direction-chain-gate",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL (0 of 4 tests pass). Neither gate turns the plain H1 box-break entry profitable out of sample, and neither",
+   "built": "2026-11-23"
+  },
+  {
    "topic": "discretion",
    "result": true,
    "valid": true,
@@ -495,6 +531,15 @@
    "verdict": "fail",
    "headline": "FAIL. No test is positive after costs in either window.",
    "built": "2026-11-14"
+  },
+  {
+   "topic": "eg-chain-50",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL. The primary chain (H1 zone -> M15 engulf -> M5 confirmation, gold) misses all five checks of the pre-registered",
+   "built": "2026-11-23"
   },
   {
    "topic": "energy-seasonal",
@@ -2963,6 +3008,15 @@
    "built": "2026-11-08"
   },
   {
+   "topic": "h4-pullback-end",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL. T1 (five markets): +0.125R a trade after costs out of sample (n 120, month t 0.77), −0.036R in sample (n 154), +0.042R on 2010-2019 (n 411, month t 0.59).",
+   "built": "2026-11-23"
+  },
+  {
    "topic": "h4-zone-trail",
    "result": true,
    "valid": true,
@@ -4034,6 +4088,15 @@
    "built": "2026-11-07"
   },
   {
+   "topic": "regime-switch-book",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL. T1 (the regime book, 22 methods): −0.066R a trade after costs out of sample (n 2997, month t −1.59, Holm p 1.00); the same methods unfiltered −0.103R (n 13229).",
+   "built": "2026-11-23"
+  },
+  {
    "topic": "replica-oos",
    "result": true,
    "valid": true,
@@ -4185,6 +4248,15 @@
    "verdict": "fail",
    "headline": "FAIL on the pre-registered bar (PREREGISTRATION.md, committed before any number was computed).",
    "built": "2026-11-13"
+  },
+  {
+   "topic": "session-sweep",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "inc",
+   "headline": "INCONCLUSIVE",
+   "built": "2026-11-23"
   },
   {
    "topic": "setups-promote",
@@ -4367,6 +4439,24 @@
    "built": "2026-11-14"
   },
   {
+   "topic": "storyline-daily-gold",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL (pre-registered bar, PREREGISTRATION.md). 0 of 4 tests pass; every Holm p is 1.00.",
+   "built": "2026-11-23"
+  },
+  {
+   "topic": "storyline-qm-sop",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "inc",
+   "headline": "INCONCLUSIVE. The primary test T1 (gold, setup H1) has 1 out-of-sample trade, under the 30 the bar needs.",
+   "built": "2026-11-23"
+  },
+  {
    "topic": "supported-book",
    "result": true,
    "valid": true,
@@ -4437,6 +4527,15 @@
    "verdict": "fail",
    "headline": "FAIL: the Gold trend rule does not carry to other markets: 0 of 14 tests pass; pooled over thirteen markets −0.059R a position net on 2020-26 (n 827, monthly t −0.89) and −0.028R on 2005-19 (n 1,690, t −0.52), and…",
    "built": "2026-11-11"
+  },
+  {
+   "topic": "trendline-qm",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "inc",
+   "headline": "INCONCLUSIVE (by the pre-registered rule: T1 has 6 out-of-sample trades, under the 30 required). Read it as",
+   "built": "2026-11-23"
   },
   {
    "topic": "tsmom",
@@ -4617,6 +4716,15 @@
    "verdict": "fail",
    "headline": "FAIL: H1 (longs above +0.25 better) fails, difference +0.149R (t +1.93); H2 (shorts above +0.25 worse) fails, difference −0.067R (t −0.88)",
    "built": "2026-11-20"
+  },
+  {
+   "topic": "vb-structure-filter",
+   "result": true,
+   "valid": true,
+   "report": true,
+   "verdict": "fail",
+   "headline": "FAIL: out of sample 2024 → 2026-11-20, T1 gold + USD/JPY pooled: kept +0.124R a trade (n 557, month t +1.93) against unfiltered +0.143R (n 1119); kept − against-side −0.036R (Welch t −0.44); 2010 → now Welch t +1.16",
+   "built": "2026-11-23"
   },
   {
    "topic": "vix-curve",

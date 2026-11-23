@@ -6520,3 +6520,37 @@ against it (the test), then a box breaks with it: enter at that close, stop the 
 side of the test box; no trend filter. OANDA 2010-2019, five markets, after the demo's costs: **FAIL, 1 of 4**: 1,029 trades,
 72 % won, -0.007R a trade (month t -0.29); before costs +0.006R; median target 0.35R. The 2020-26 look before it was in sample.
 Not a judgement of the owner's own choice of zones and boxes. Nothing live changed. Test: `tests/box-zone.test.mjs`.
+
+## Overnight studies (23 Nov 2026, owner: "improve every aspect of the edges ... at least 5 edges profitable long term")
+Twelve pre-registered studies of direction, entries and the market cycle, built from the owner's lessons of 22 Nov (box from swing
+low to swing high and its close outside, ChoCh as the start of a reversal, the Daily zone before a breakout, BO -> VR -> CF with QM
+breaks, the box-edge touch with the H1 / H4 side, the timeframe chain). PREREGISTRATION.md of each was committed alone first
+(27f35e08a); each runs on the shared toolkit `research/edge/_lib/edgekit.mjs` (OANDA mid 5m cache outside git, shared costs, swing
+structure, boxes, QM, month-sum t, Holm; `tests/edgekit.test.mjs`), windows 2010-19 replication / 2020-23 in sample / 2024 on out of
+sample, after costs. Every study was then audited by a separate reader trying to refute it (look-ahead on cut series, costs, fills,
+the pre-registration, every figure): no defect changed a verdict. **Bottom line: 0 of 12 pass. None is an edge; nothing live changed;
+no rule is proposed.** The two passing rules of the repository stay the gold and USD/JPY volatility breakouts (forward records running).
+OOS = out of sample, R a trade after costs, t of calendar-month sums:
+- `box-touch-trend`: limit at the edge of an M15 / M5 swing box on the H1 side, stop 0.2 x box, target the far edge. FAIL (n 4,950,
+  −0.199R, t −7.00; −0.068R before costs; 2010-19 −0.214R, n 16,858).
+- `daily-zone-retest`: the Daily box before a strong breakout candle, entered on an H1 box break on the return. FAIL (n 302, −0.030R,
+  t −0.36; before costs about zero; with the Weekly box side no better).
+- `storyline-qm-sop`: BO -> VR -> CF, VR and CF QM breaks, limit in the CF zone. INCONCLUSIVE (gold H1: 12 trades in 17 years, 1 OOS).
+- `h4-pullback-end`: the end of an H1 pullback (first H1 ChoCh back) inside an H4 trend, from the right half of the range. FAIL
+  (n 120, +0.125R, t 0.77; in sample −0.036R).
+- `vb-structure-filter`: gold / USD/JPY breakout only on the side of the H4 structure. FAIL (kept n 557, +0.124R, t 1.93, against the
+  unfiltered +0.143R; kept minus dropped Welch t −0.44): the structure side adds nothing to the two breakouts.
+- `direction-chain-gate`: the Daily / H4 / H1 chain (structure sides, or key-level taps) as a gate on a plain H1 box break, five
+  markets. FAIL, 0 of 4 (n 782, −0.049R, t −1.27): "agree with the chain" did not beat "disagree".
+- `barrier-qm-janda`: gold barrier, QM, the second break, limit at its engulf. FAIL (n 311, −0.101R, t −1.08; 2010-19 −0.166R).
+- `eg-chain-50`: H1 engulf zone -> M15 engulf -> M5 confirmation, limit at the middle. FAIL (n 1,031, −0.219R, t −2.06).
+- `session-sweep`: sweep of the Asia range, then an M5 QM back inside, target the other side. INCONCLUSIVE (n 27, −0.007R).
+- `storyline-daily-gold`: Daily rejection of a fresh level + H4 external break, limit at the H1 pullback QM. FAIL (n 16, −0.333R;
+  in sample −0.312R).
+- `trendline-qm`: H1 trendline break, retest, M15 QM. INCONCLUSIVE (n 6 OOS; 2010-19 −0.190R).
+- `regime-switch-book`: 22 of the night's method streams each kept only in the H4 regime (trend / range / pullback) it did best in,
+  chosen on 2020-23. FAIL (n 2,997, −0.066R, t −1.59; unfiltered −0.103R): no market-cycle label rescues the methods.
+What it teaches: before costs these entries sit at zero, so costs decide them; agreeing with the timeframe chain or the H4 side
+did not pick better trades on any of them (as `ltf-structure` and `desk-rigor` found); the strict storyline readings are too rare to
+judge. Never call any of these an edge, do not re-test variants on these years. Owner document:
+`research/proposals/2026-11-23-overnight-edges.md`. Tests: `tests/<topic>.test.mjs` for each.
