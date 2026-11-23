@@ -83,7 +83,7 @@ function farFinder(F) {
 }
 
 // Every trade of one market. M5: 5-minute candles; M1: 1-minute candles or null. X: bad intervals [[from, to]].
-// Each trade: { etf, entry 'A'|'B', ztf, kind, visit, side, t (fill), risk, cr (cost / risk), R: [2R, 3R, far|null], X: [..] }.
+// Each trade (R before costs; cr = the cost in R): { etf, entry 'A'|'B', ztf, kind, visit, side, t (fill), risk, cr (cost / risk), R: [2R, 3R, far|null], X: [..] }.
 export function runMarket({ M5, M1 = null, cost, X = [], start = START }) {
   const F = frames(M5);
   const far = farFinder(F);
@@ -131,13 +131,16 @@ const p1 = (t, df) => { if (t == null || !(df > 0)) return 1; const p = K.pFromT
 const rnet = (x, k, c = 1) => x.R[k] - c * x.cr;
 function mean(a) { return a.length ? a.reduce((s, v) => s + v, 0) / a.length : null; }
 function sd(a) { const m = mean(a); return a.length > 1 ? Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / (a.length - 1)) : null; }
-// one window: n, mean after costs, before costs, at twice the cost, month-sum t (months a..b, empty = 0)
+// The judging basis (amendment before the run, 23 Nov 2026, owner): R BEFORE costs (cost multiplier 0).
+export const JUDGE_COST = 0;
+const mt = (xs, k, a, b, c) => { const nm = b - a; const ms = new Array(nm).fill(0);
+  for (const x of xs) ms[monthIdx(x.t) - a] += rnet(x, k, c);
+  const mm = mean(ms), msd = sd(ms); return msd > 0 ? mm / (msd / Math.sqrt(nm)) : null; };
+// one window: n, mean before costs (the judged figure), after costs, at twice the cost, month-sum t of each (empty months = 0)
 export function win(xs, k, a, b) {
-  const v = xs.map((x) => rnet(x, k)); const nm = b - a; const ms = new Array(nm).fill(0);
-  for (const x of xs) ms[monthIdx(x.t) - a] += rnet(x, k);
-  const mm = mean(ms), msd = sd(ms); const tM = msd > 0 ? mm / (msd / Math.sqrt(nm)) : null;
-  return { n: xs.length, mean: mean(v), gross: mean(xs.map((x) => x.R[k])), cost2: mean(xs.map((x) => rnet(x, k, 2))),
-    wins: v.filter((r) => r > 0).length, tMonth: tM, months: nm, p1: p1(tM, nm - 1) };
+  const v = xs.map((x) => rnet(x, k, JUDGE_COST)); const nm = b - a; const tM = mt(xs, k, a, b, JUDGE_COST);
+  return { n: xs.length, mean: mean(v), net: mean(xs.map((x) => rnet(x, k))), cost2: mean(xs.map((x) => rnet(x, k, 2))),
+    wins: v.filter((r) => r > 0).length, tMonth: tM, tNet: mt(xs, k, a, b, 1), months: nm, p1: p1(tM, nm - 1) };
 }
 export function welch(a, b) {
   const ma = mean(a), mb = mean(b), va = sd(a) ** 2, vb = sd(b) ** 2; if (!(a.length > 1 && b.length > 1)) return { diff: null, t: null, df: null };
@@ -146,7 +149,7 @@ export function welch(a, b) {
   return { diff: ma - mb, t, df, p1: p1(t, df) };
 }
 const r4 = (x) => (x == null || !Number.isFinite(x) ? null : +x.toFixed(4)), r2 = (x) => (x == null || !Number.isFinite(x) ? null : +x.toFixed(2));
-const slim = (w) => ({ n: w.n, mean: r4(w.mean), gross: r4(w.gross), cost2: r4(w.cost2), wins: w.wins, tMonth: r2(w.tMonth) });
+const slim = (w) => ({ n: w.n, mean: r4(w.mean), tMonth: r2(w.tMonth), wins: w.wins, net: r4(w.net), tNet: r2(w.tNet), cost2: r4(w.cost2) });
 
 export function judge(all, lastMonth) {
   const IS = [0, 48], OOS = [48, lastMonth + 1];
@@ -154,9 +157,9 @@ export function judge(all, lastMonth) {
     return { xs, d: xs.filter((x) => x.t < SPLIT), c: xs.filter((x) => x.t >= SPLIT) }; };
   const level = (f, k = 0) => { const s = sel(f, k); return { disc: win(s.d, k, ...IS), conf: win(s.c, k, ...OOS) }; };
   const diff = (fa, fb, k = 0) => { const A = sel(fa, k), B = sel(fb, k);
-    const one = (a, b, c = 1) => welch(a.map((x) => rnet(x, k, c)), b.map((x) => rnet(x, k, c)));
+    const one = (a, b, c = JUDGE_COST) => welch(a.map((x) => rnet(x, k, c)), b.map((x) => rnet(x, k, c)));
     return { disc: { ...one(A.d, B.d), nA: A.d.length, nB: B.d.length }, conf: { ...one(A.c, B.c), nA: A.c.length, nB: B.c.length },
-      conf2: one(A.c, B.c, 2), a: level(fa, k), b: level(fb, k) }; };
+      confNet: one(A.c, B.c, 1), discNet: one(A.d, B.d, 1), a: level(fa, k), b: level(fb, k) }; };
   const isA = (etf) => (x) => x.etf === etf && x.entry === 'A';
   const m1 = (x) => M1_MARKETS.includes(x.market);
   const T = {
@@ -168,15 +171,16 @@ export function judge(all, lastMonth) {
   const ps = [T.T1.conf.p1, T.T2.conf.p1, T.T3.conf.p1, T.T4.conf.p1]; const adj = K.holm(ps);
   const out = {};
   ['T1', 'T2'].forEach((k, i) => { const { disc: D, conf: C } = T[k];
-    const pass = D.n >= 100 && D.mean > 0 && D.tMonth >= 2 && C.n >= 50 && C.mean > 0 && C.tMonth >= 2 && adj[i] < 0.05 && C.cost2 > 0;
-    const fail = !(C.mean > 0) || !(D.mean > 0) || !(C.cost2 > 0);
+    const pass = D.n >= 100 && D.mean > 0 && D.tMonth >= 2 && C.n >= 50 && C.mean > 0 && C.tMonth >= 2 && adj[i] < 0.05;
+    const fail = !(C.mean > 0) || !(D.mean > 0);
     out[k] = { verdict: pass ? 'PASS' : fail ? 'FAIL' : 'INCONCLUSIVE', disc: slim(D), conf: slim(C), holm: +adj[i].toPrecision(3) }; });
-  ['T3', 'T4'].forEach((k, j) => { const i = j + 2, { disc: D, conf: C, conf2: C2 } = T[k];
+  ['T3', 'T4'].forEach((k, j) => { const i = j + 2, { disc: D, conf: C, confNet: CN, discNet: DN } = T[k];
     const enough = D.nA >= 100 && D.nB >= 100 && C.nA >= 50 && C.nB >= 50;
-    const pass = enough && D.diff > 0 && D.t >= 2 && C.diff > 0 && C.t >= 2 && adj[i] < 0.05 && C2.diff > 0;
-    const fail = !(C.diff > 0) || !(D.diff > 0) || !(C2.diff > 0);
+    const pass = enough && D.diff > 0 && D.t >= 2 && C.diff > 0 && C.t >= 2 && adj[i] < 0.05;
+    const fail = !(C.diff > 0) || !(D.diff > 0);
     out[k] = { verdict: pass ? 'PASS' : fail ? 'FAIL' : 'INCONCLUSIVE', holm: +adj[i].toPrecision(3),
-      disc: { diff: r4(D.diff), t: r2(D.t), nA: D.nA, nB: D.nB }, conf: { diff: r4(C.diff), t: r2(C.t), nA: C.nA, nB: C.nB }, conf2x: r4(C2.diff),
+      disc: { diff: r4(D.diff), t: r2(D.t), nA: D.nA, nB: D.nB }, conf: { diff: r4(C.diff), t: r2(C.t), nA: C.nA, nB: C.nB },
+      afterCosts: { disc: { diff: r4(DN.diff), t: r2(DN.t) }, conf: { diff: r4(CN.diff), t: r2(CN.t) } },
       lower: { disc: slim(T[k].a.disc), conf: slim(T[k].a.conf) }, higher: { disc: slim(T[k].b.disc), conf: slim(T[k].b.conf) } }; });
   // descriptive
   const desc = {};
@@ -191,7 +195,7 @@ export function judge(all, lastMonth) {
   desc.byKind = { m5: split(isA('5m'), 'kind', KINDS), m1: split(isA('1m'), 'kind', KINDS), m15: split(isA('15m'), 'kind', KINDS) };
   desc.byVisit = { m5: split(isA('5m'), 'visit', [1, 2]) };
   desc.byMarket = { m5: split(isA('5m'), 'market', markets), m15: split(isA('15m'), 'market', markets), m1: split(isA('1m'), 'market', M1_MARKETS) };
-  const byYear = {}; for (const x of all.filter(isA('5m'))) { const y = new Date(x.t * 1000).getUTCFullYear(); (byYear[y] ||= []).push(rnet(x, 0)); }
+  const byYear = {}; for (const x of all.filter(isA('5m'))) { const y = new Date(x.t * 1000).getUTCFullYear(); (byYear[y] ||= []).push(rnet(x, 0, JUDGE_COST)); }
   desc.yearT1 = Object.fromEntries(Object.entries(byYear).map(([y, v]) => [y, { n: v.length, mean: r4(mean(v)) }]));
   return { tests: out, holmInputs: ps.map((p) => +p.toPrecision(3)), desc };
 }
