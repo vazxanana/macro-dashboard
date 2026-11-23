@@ -62,3 +62,9 @@ test('the USD/JPY follow-up: gate and verdict as reported', async () => {
   const g = JSON.parse(fs.readFileSync(new URL('../research/edge/combo-grid/result.json', import.meta.url)));
   assert.equal(g.confirmed, 0); assert.equal(g.tested, 463064);
 });
+
+test('the limit fill comes first: a candle reaching the limit and closing past the stop is a fill and a stop', () => {
+  const B = [bar(0, 101, 101.2, 98.5, 98.7), bar(300, 98.7, 99, 98, 98.5)];
+  const r = multi(B, 1, 100, 99, 'lim', 0, 3600, 2, 86400);
+  assert.ok(r); assert.equal(r.R[0], -1);
+});

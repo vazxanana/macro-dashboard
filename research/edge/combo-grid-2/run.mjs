@@ -106,8 +106,10 @@ export function multi(M5, s, entry, stop, type, t0, expire, oppR, cap) {
   let i = lo, fill = null;
   if (type === 'mkt') { if (i >= M5.length) return null; fill = M5[i].o; }
   else { for (; i < M5.length; i++) { const b = M5[i]; if (b.t >= expire) return null;
-      if (s > 0 ? b.c < stop : b.c > stop) return null;           // a close past the stop before a fill cancels the order
-      if (s > 0 ? b.l <= entry : b.h >= entry) { fill = s > 0 ? Math.min(b.o, entry) : Math.max(b.o, entry); break; } }
+      // the fill first: a candle that reaches the limit fills it, even when it also closes past the stop (it is then stopped on
+      // that candle). Until 23 Nov 2026 such a candle cancelled the order, which flattered limit entries (found by the zone-use study).
+      if (s > 0 ? b.l <= entry : b.h >= entry) { fill = s > 0 ? Math.min(b.o, entry) : Math.max(b.o, entry); break; }
+      if (s > 0 ? b.c < stop : b.c > stop) return null; }
     if (fill == null) return null; }
   const risk = s * (fill - stop); if (!(risk > 0)) return null;
   const lv = [...RS, oppR], R = new Float64Array(7), done = new Uint8Array(7); let left = 7;
