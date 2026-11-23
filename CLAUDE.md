@@ -3460,6 +3460,24 @@ order), and `copiedIds` keeps any other account from copying those trades again.
 while it runs; `ctrader/accounts.json` labels it "Old shadows (draining)". Owner's choice of three: move the shadows and let the old
 account run its 6 open copies out. Remove the `drain` entry once that account holds nothing. Test: `tests/mirror-drain.test.mjs`.
 
+## Mosha 6R barrier on a demo account (23 Nov 2026, owner: "Mosha barrier 6 put it in one of the demo accounts on ctrader can be any one just swap with the one there previous")
+The old Shadows demo account 10152145 (drained since 20 Nov) is the `mosha6` book: `council/ctrader-accounts.json`
+`mirrorAccounts.mosha6`, `drain` empty. `council/ctrader-mirror.mjs` (the replica pattern): `BOOKS` + `'mosha6'`, `bookOf` = mosha6
+for ids starting `mosha6:`; `moshaCandidates(desk, nowS)` (pure) reads council-data `mosha/desk.json` `records`: the 6R barrier reading
+only (`isMosha6`: id `(^|:)bar-r6-`, the test of `assets/mosha-sop.js` `readings()`), gold only, a stop on the losing side (else
+dropped), open, or closed within `MOSHA6.keep` 2 days of its `endT` (so the copy is closed with its record); ONE record per side and
+fill time `t` (first in file order: several 6R records fill at the same second with near-identical levels, the account never doubles a
+position). Records are written once filled, so copies are market orders through the usual path (late-copy check against the snapshot
+mark with 1R = `r0`, stop-within-spread skip, `ensureStop`, every cap). Only a record the tracker first wrote (`first`) AND filled within
+`MOSHA6.fresh` 2 h may be OPENED; an older, replayed or Kraken-priced record (`feed: 'Kraken'`, PAXG levels a few dollars from spot) is
+`noCopy` with `noCopyWhy`, kept in the list so a copy made earlier follows its record. Candidates are added only while `moshaHasOwnAccount`
+(mosha6 on another account than council); a missing or unreadable desk file = none. Risk `LIMITS.risk.mosha6` 0.25 % of the balance a
+trade. The account's round still manages the old shadow copies it holds (every trade is passed to every account's round; `openBooks`
+limits only what it opens). `ctrader-account.mjs` label "Mosha 6R barrier"; `ctrader-reconcile.mjs` reads the desk file too (copies
+are not strangers; a noCopy record shows its reason). `forward.mjs` E5 reads the Council account only (unchanged). Demo only; a paper
+reading of the desk copied to a demo, not a tested edge. Tests: `tests/ctrader-mirror.test.mjs` ("Mosha 6R": 4),
+`tests/ctrader-reconcile.test.mjs`, `tests/mirror-drain.test.mjs`.
+
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
 1. After a market fill whose fill event shows no stop, the mirror waits `slWaitMs` (1.5 s) and reads the position back

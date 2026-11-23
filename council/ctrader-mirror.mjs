@@ -96,6 +96,41 @@ export const replicaCandidates = (research, have = [], markets = null) => {
 export const replicaMarkets = (cfg) => (cfg && cfg.mirrorReplica && Array.isArray(cfg.mirrorReplica.markets) ? cfg.mirrorReplica.markets : null);
 // true only while the replica book trades on a different demo account from the council book
 export const replicaHasOwnAccount = (byBook) => !!(byBook && byBook.replica && byBook.council && byBook.replica !== byBook.council);
+// The Mosha desk's 6R barrier reading on its own demo account (23 Nov 2026, owner: "Mosha barrier 6 put it in one of the demo
+// accounts on ctrader can be any one just swap with the one there previous"). Source: council-data mosha/desk.json (the Mosha
+// tracker, council/mosha-desk.mjs), records of the 6R barrier reading only (id "bar-r6-…", the test of assets/mosha-sop.js
+// readings()), gold only. A record is written once it has FILLED, so there is never a resting order: open records are copied as
+// market orders through the usual path (stop required, late-copy check against the snapshot price, stop-within-spread skip,
+// ensureStop, the caps). Several 6R records often fill at the same second with near-identical levels: ONE per side and fill
+// time is kept (the first in file order), so the account never doubles a position. Only a record the tracker first wrote within
+// MOSHA6.fresh seconds and whose fill is that recent may be OPENED; an older or replayed one stays in the list as noCopy, so a
+// position copied earlier keeps following its record to the close and is never orphaned. A record priced on the tracker's
+// Kraken fallback (PAXG, a few dollars from spot) is never opened either. Closed records stay in the list for MOSHA6.keep seconds
+// after their end, so the mirror closes the copy with them. A paper reading of the desk, not a tested edge; demo only.
+export const MOSHA6 = { fresh: 2 * 3600, keep: 2 * 86400 };
+export const isMosha6 = (id) => /(^|:)bar-r6-/.test(String(id || ''));
+export function moshaCandidates(desk, nowS = Math.floor(Date.now() / 1000)) {
+  const recs = desk && Array.isArray(desk.records) ? desk.records : [], seen = new Set(), out = [];
+  for (const r of recs) {
+    if (!r || typeof r.id !== 'string' || !isMosha6(r.id) || (r.market != null && r.market !== 'xau')) continue;
+    const side = +r.side === 1 ? 'buy' : +r.side === -1 ? 'sell' : null, entry = +r.entry, stop = +r.stop, t = +r.t;
+    if (!side || !(entry > 0) || !(stop > 0) || !Number.isFinite(t)) continue;
+    const sgn = side === 'sell' ? -1 : 1;
+    if (sgn * (entry - stop) <= 0) continue;   // absolute rule 1: a stop on the losing side or no record at all
+    const open = r.status === 'open', endT = +r.endT;
+    if (!open && !(Number.isFinite(endT) && nowS - endT <= MOSHA6.keep)) continue;
+    const key = side + '|' + t; if (seen.has(key)) continue; seen.add(key);   // one position per side and fill time
+    const tgt = +r.target, t1 = tgt > 0 && sgn * (tgt - entry) > 0 ? tgt : null;
+    const why = !open ? null : r.feed === 'Kraken' ? 'priced on the Kraken fallback, never opened' : !(nowS - (+r.first || 0) <= MOSHA6.fresh && nowS - t <= MOSHA6.fresh) ? 'recorded or filled over 2 h ago, never opened late' : null;
+    out.push({ id: 'mosha6:' + r.id, k: 'mosha6', market: 'xau', label: 'XAU/USD', name: 'Mosha 6R barrier', side, entry, stop, t1, ...(r.r0 > 0 ? { r0: +r.r0 } : {}),
+      rr: t1 != null ? +(Math.abs(t1 - entry) / Math.abs(entry - stop)).toFixed(2) : null, opened: t, filled: t, h: r.l || r.h || null,
+      status: open ? 'open' : r.status, ...(open ? {} : { R: r.R ?? null, exitPx: r.exit ?? null, closed: endT }), shadow: false, mosha: true,
+      ...(why ? { noCopy: true, noCopyWhy: 'Mosha 6R: ' + why } : {}) });
+  }
+  return out;
+}
+// true only while the mosha6 book trades on a different demo account from the council book
+export const moshaHasOwnAccount = (byBook) => !!(byBook && byBook.mosha6 && byBook.council && byBook.mosha6 !== byBook.council);
 // sizing (owner, 7 Nov: "risk-based lots, bigger demo", from research/portfolio.md): each order risks a share of the balance per 1R:
 // ICT A-setups 0.20% x the desk's size field (A+ half-size trades 0.10%), Meridian 0.02%; total open risk at most 1%.
 // The lot follows from the stop distance; below the broker's minimum lot the trade is skipped (never rounded up to more risk).
@@ -106,7 +141,7 @@ export const replicaHasOwnAccount = (byBook) => !!(byBook && byBook.replica && b
 // 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
 // minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
+  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -287,7 +322,7 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 
   const qr = quoteRate({ name, px, spec, now }), toAcc = qr && qr.rate;
   if (!toAcc) return { skip: `${name}: cannot value its quote currency${spec && spec.quote ? ` (${spec.quote})` : ''} in the account currency${spec && spec.deposit ? ` (${spec.deposit})` : ''}` };
   const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
-  let riskCash = balance * (isIct ? LIMITS.risk.ict : LIMITS.risk.council) * size;
+  let riskCash = balance * (isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
   const perLot = (lot / 100) * dist * toAcc, lots = riskCash / perLot;
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
   let v = Math.floor((lots * lot) / step + 1e-9) * step, atMin = false;   // epsilon: 0.01 lot must not floor to 0 on float noise
@@ -344,8 +379,8 @@ export const copiedIds = (state) => new Set([...Object.keys((state && state.map)
 // Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
 // not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
 // "council:123,ict:456,shadow:789,lit:321,replica:654" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
-export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica'];
-export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
+export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6'];
+export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
 export function accountsFor(env, cfg) {
   const out = {}, base = String(env.CTRADER_ACCOUNT_ID || '').trim();
   const c = (cfg && cfg.mirrorAccounts) || {}; for (const b of BOOKS) if (c[b] != null && String(c[b]).trim()) out[b] = String(c[b]).trim();
@@ -860,7 +895,9 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // the replica's research trades are copied only while the replica book has a demo account of its own: without one they
   // would land on the council's account (a book without a number trades on the base account)
   const replicaOwn = replicaHasOwnAccount(byBook);
-  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : []);
+  // the Mosha 6R barrier records (23 Nov 2026) the same way: only while the mosha6 book has a demo account of its own
+  let desk = null; try { desk = JSON.parse(fs.readFileSync(path.join(DIR, 'mosha', 'desk.json'), 'utf8')); } catch (e) {}
+  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
   const fileOf0 = (a) => (a === base ? 'mirror.json' : `mirror-${a}.json`);
   const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));
