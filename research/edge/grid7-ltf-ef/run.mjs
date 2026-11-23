@@ -225,9 +225,29 @@ function resultMd(o, rows) {
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push(`${o.passed.length} failed-engulf cells clear the pre-registered bar before costs in both decades and beat the plain fade. ${o.passedNetPositive.length ? o.passedNetPositive.length + ' stay positive after costs in both windows.' : 'None stays positive after costs in both windows: the bid / ask takes more than the tilt.'}`,
     'A before-cost tilt, not an edge. Nothing is adopted; a forward record or a live change needs the owner. One run, no variants.');
-  else L.push('No failed-engulf cell clears the bar: trading the other way after an engulf zone fails soon after it formed does not',
-    'beat the plain fade of a structure break before costs in both decades on these ten markets. Do not re-test variants of these',
-    '54 cells on these years. Nothing live changed; no rule is proposed.');
+  else {
+    const g = (n) => rows.find((r) => r.name === n);
+    const a1 = g('m15 K12 none 1R'), a2 = g('m15 K12 none 2R'), pj = A.filter((r) => r.exit === 'proj' && r.checks.n);
+    const bp = B.filter((r) => r.bars13).map((r) => r.name);
+    L.push('No failed-engulf cell clears the bar. What the cells show:', '',
+      `- **The EF side itself loses before costs at 1R and 2R.** Traded the other way after an engulf fails, the 1R / 2R cells are`,
+      `  negative in confirmation on every timeframe and K (for example m15 K12 none: 1R ${f3(a1.c.mean)}R, t ${f2(a1.c.t)}; 2R ${f3(a2.c.mean)}R,`,
+      `  t ${f2(a2.c.t)}). Their M5 / M15 1R cells "beat" the plain fade by a large Welch t only because the fade's own 1R cells are negative`,
+      '  (the stop-first booking of a 5-minute candle that holds both, with stops of a few pips); at 2R the fade is better.',
+      `- **The side-flipped check is the small tilt.** Traded WITH the failed zone (fading the failure, which is itself a break),`,
+      `  ${o.mirrorBars13A.length} cells clear bars 1-3, at about +0.01 to +0.03R a trade against a round trip of 0.09-0.16R on M5 / M15: the`,
+      '  same fraction-of-a-spread reversal of the mid quote `grid7-wide-fade` found, not a move a taker can capture.',
+      `- **The projection cells are a small, selected sample.** The 1:1 projection is 1R or more away on few failures (${pj.map((r) => N(r.c.n)).join(', ')} trades`,
+      '  in 2015-26 across the M5 / M15 proj cells with n >= 300); several are positive before costs with month t over 3 in',
+      '  confirmation, but none has discovery t >= 2 together with a Welch t >= 2 against the fade\'s swing exit in both windows,',
+      '  and after costs they are mostly negative on M5. Picking them now would be choosing after the result.',
+      `- **(b), reported only:** the engulf traded WITH it at completion loses at 1R / 2R everywhere; its mirror is the same small`,
+      `  tilt. ${bp.length ? 'Rows clearing bars 1-3 (not judged, not in Holm): ' + bp.join('; ') + '.' : ''} These are not tested here and are not`,
+      '  evidence: they would need their own pre-registration on other data.', '',
+      'Do not re-test variants of these 54 cells on these years. Nothing live changed; no rule is proposed.', '',
+      'Correction to the pre-registration\'s "Why": the plain fade\'s M15 break-candle stop, 2R cell had discovery month t 19.57',
+      '(+0.094R), not 11.4 as quoted there; the confirmation figure (+0.054R, t 12.2) was right. Nothing in the design depended on it.');
+  }
   L.push('');
   return L.join('\n');
 }
