@@ -6220,8 +6220,8 @@ order per zone ever (id `<market>-<side>-<first candle time>`, comment `dom <id>
 soon as its zone no longer stands; expired orders are not re-armed; a stale market (newest candle over 2 h old) arms nothing.
 Markets: xau xag, the 13 forex pairs of the grids, nas100 spx500 de40 (broker names by `normName`; a market the account does not
 offer is logged and held off a day, `notOffered`). Account: the Council demo account (`CTRADER_ACCOUNT_ID`, the mirror's
-'council' book); `config.json` `dom.account` overrides. Caps: 3 orders + positions a market, 10 of its own on the account (all stopped in one day = 1 %, under the mirror's 2 % daily loss stop on this account); risk
-0.1 % of the balance (`dom.risk` 0.0005-0.005; the vb minimum-volume rule, at most 1 %); `dom.markets` may narrow the list;
+'council' book); `config.json` `dom.account` overrides. Caps: 3 orders + positions a market, 20 of its own on the account; risk
+0.5 % of the balance (owner, 23 Nov 2026) (`dom.risk` 0.0005-0.005; the vb minimum-volume rule, at most 1 %); `dom.markets` may narrow the list;
 `config.dom = { on: false }` stops it. Rule 1: a fill is read back (no stop: amend, refused: closed at once) and any 'dom' position
 with no stop and no record is closed. The closing deal is not read (the mirror's allowlist has no deal list): an exit is inferred
 from the H1 candles after the fill (stop first in one candle) and marked `inferred`. Record: council-data `dom/trades.json`.

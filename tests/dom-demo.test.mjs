@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { LABEL, MAX_MARKET, LIFE_S, read, plan, armable, idOf, commentOf, inferExit, usdPer, step } from '../council/dom-demo.mjs';
+import { LABEL, MAX_MARKET, MAX_TOTAL, LIFE_S, read, plan, armable, idOf, commentOf, inferExit, usdPer, step } from '../council/dom-demo.mjs';
 import { PT } from '../council/ctrader-mirror.mjs';
 import { execChecks } from '../council/forward.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
@@ -89,8 +89,8 @@ test('an order: a LIMIT at the near edge WITH stopLoss and takeProfit, label dom
   assert.equal(o[0].orderType, 2); assert.equal(o[0].tradeSide, 1); assert.equal(o[0].limitPrice, 4002); assert.equal(o[0].stopLoss, at(P.stop)); assert.equal(o[0].takeProfit, at(P.target));
   assert.ok(o[0].stopLoss < o[0].limitPrice && o[0].takeProfit > o[0].limitPrice); assert.equal(o[0].label, LABEL); assert.equal(o[0].comment, commentOf(idOf('xau', 'buy', ZT(R))));
   assert.equal(o[0].timeInForce, 1); assert.equal(o[0].expirationTimestamp, (R.now + LIFE_S) * 1000); assert.equal(o[0].ctidTraderAccountId, 77);
-  // size: 0.1 % of $10,000 = $10 at the stop; one ounce = volume 100
-  const loss = (o[0].volume / 100) * (o[0].limitPrice - o[0].stopLoss); assert.ok(loss <= 10 + 1e-6 && loss > 9, `risks $${loss}`);
+  // size: 0.5 % of $10,000 = $50 at the stop; one ounce = volume 100
+  const loss = (o[0].volume / 100) * (o[0].limitPrice - o[0].stopLoss); assert.ok(loss <= 50 + 1e-6 && loss > 49, `risks $${loss}`);
   const J = file(dir); assert.equal(J.trades[0].status, 'placed'); assert.ok(!JSON.stringify(J).includes('49478137'), 'the account number is never written');
   await go(dir, b, { ...R, now: R.now + 60 }); assert.equal(news(b).length, 1, 'never placed twice');
   // a lost record: the order at the broker is adopted, not placed again
@@ -127,9 +127,9 @@ test('caps: at most 3 a market; config off; a live account; nothing due does not
     for (let i = 0; i < MAX_MARKET; i++) { const id = `xau-buy-${i}`; seed.push({ id, market: 'xau', side: 'buy', status: 'open', entry: 4002, stop: 3999, target: 4008, zone: { t: i } });
       b.positions.push({ positionId: 100 + i, price: 4002, stopLoss: 3999, takeProfit: 4008, tradeData: { label: 'dom', comment: commentOf(id), volume: 100, tradeSide: 1 } }); }
     const dir = setup(null, seed); await go(dir, b, R); assert.equal(news(b).length, 0, '3 already open on gold'); }
-  { const R = rows(), seed = Array.from({ length: 10 }, (_, i) => ({ id: `m${i}-buy-1`, market: 'm' + i, side: 'buy', status: 'open', entry: 1, stop: 0.5, target: 2, zone: { t: 1 } })), b = broker();
+  { const R = rows(), seed = Array.from({ length: MAX_TOTAL }, (_, i) => ({ id: `m${i}-buy-1`, market: 'm' + i, side: 'buy', status: 'open', entry: 1, stop: 0.5, target: 2, zone: { t: 1 } })), b = broker();
     for (const x of seed) b.positions.push({ positionId: x.id, price: 1, stopLoss: 0.5, tradeData: { label: 'dom', comment: commentOf(x.id), volume: 100, tradeSide: 1 } });
-    const dir = setup(null, seed); await go(dir, b, R); assert.equal(news(b).length, 0, '10 on the account'); }
+    const dir = setup(null, seed); await go(dir, b, R); assert.equal(news(b).length, 0, 'MAX_TOTAL on the account'); }
   { const R = rows(), dir = setup({ dom: { on: false } }), b = broker(); const out = await go(dir, b, R); assert.equal(out.skipped, 'off'); assert.equal(b.sent.length, 0); }
   { const R = rows(), dir = setup(), b = broker({ live: true }); await go(dir, b, R); assert.equal(news(b).length, 0, 'not a demo account: refused'); }
   { const R = rows({ formClose: 4012 }), dir = setup(), b = broker(); const out = await go(dir, b, R); assert.equal(out.skipped, 'nothing due'); assert.equal(b.sent.length, 0, 'no zone near the price, nothing resting: no connection'); }

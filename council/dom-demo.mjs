@@ -13,9 +13,8 @@
 //   1 x ATR(14) of the latest price, never traded before: one order per zone, ever (id <market>-<side>-<first candle time>).
 //   GOOD_TILL_DATE 24 h; an expired order is recorded 'expired' and never re-armed; a resting order is cancelled at once when
 //   its zone no longer stands (a closed H1 candle through its far side, or its 120 candles are over).
-// - caps: at most 3 orders + positions a market, 10 on the account (this job's own); risk 0.1 % of the balance a trade, so a
-//   day where every one stops costs at most 1 %, under the mirror's 2 % daily loss stop on this (the Council) account
-//   (config.json dom.risk, 0.0005-0.005); under the broker's smallest volume the smallest is used only while a stop-out costs
+// - caps: at most 3 orders + positions a market, 20 on the account (this job's own; owner, 23 Nov 2026: "allow 20 positions
+//   open, risk 0.5%"); risk 0.5 % of the balance a trade (config.json dom.risk, 0.0005-0.005); under the broker's smallest volume the smallest is used only while a stop-out costs
 //   at most 1 % of the balance. config.json dom = { on: false } stops it.
 //
 // Every order carries stopLoss AND takeProfit as absolute prices (absolute rule 1); after a fill the position is read back and,
@@ -37,7 +36,7 @@ import { buildZones } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
 
 export const LABEL = 'dom';
-export const RISK = 0.001, RISK_MIN = 0.0005, RISK_MAX = 0.005, MAX_RISK = 0.01, MAX_MARKET = 3, MAX_TOTAL = 10, LIFE_S = 24 * 3600, RR = 2, ATR_K = 0.25, NEAR_ATR = 1;
+export const RISK = 0.005, RISK_MIN = 0.0005, RISK_MAX = 0.005, MAX_RISK = 0.01, MAX_MARKET = 3, MAX_TOTAL = 20, LIFE_S = 24 * 3600, RR = 2, ATR_K = 0.25, NEAR_ATR = 1;
 export const STALE_S = 2 * 3600;          // a market whose newest candle is older than this is shut: nothing is armed there
 const H = 3600, DAY = 86400;
 // market -> broker names to try (normalised) and the currency its price is quoted in (for the size)
