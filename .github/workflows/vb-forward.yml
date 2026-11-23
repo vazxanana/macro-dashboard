@@ -77,6 +77,11 @@ jobs:
         # the gold and USD/JPY candles the two steps above fetched; nothing is fetched again
         run: node research/edge/vb-early-forward/run.mjs run "$RUNNER_TEMP/c" "$RUNNER_TEMP/u" data/research/forward/vb-early.json
 
+      - name: Gotobi fade (T2), the forward record
+        run: |
+          node research/edge/gotobi-forward/run.mjs fetch "$RUNNER_TEMP/g"
+          node research/edge/gotobi-forward/run.mjs run "$RUNNER_TEMP/g" data/research/forward/gotobi.json
+
       - name: Save
         run: |
           git -C data config user.name "mosha-council"
