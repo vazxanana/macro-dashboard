@@ -33,6 +33,9 @@ export const EV_FROM = -600, EV_TO = 3900;           // T-10 min .. T+65 min
 export const EV_TYPES = ['CPI', 'NFP', 'FOMC'];
 // GAP_MS: the pause before each historical tick request. The broker's API allows about 5 historical requests a second per
 // connection, so PROBE_GAP_MS (workflow input gap_ms) may lower it to 200 ms at most; 260 ms is the safe default.
+export const RETRY_WAITS = [5000, 10000, 20000, 40000, 60000, 60000];
+// the probe stops asking after PROBE_BUDGET_MIN minutes (default 100; the workflow's limit is 120) and saves what it has
+export const budgetMs = (env = {}) => { const v = Number(env.PROBE_BUDGET_MIN); return (Number.isFinite(v) && v > 0 ? Math.min(v, 115) : 100) * 60000; };
 export const MAX_PAGES = 40, GAP_MIN = 200, GAP_DEFAULT = 260;
 export const gapMs = (env = {}) => { const v = Math.round(Number(env.PROBE_GAP_MS)); return Number.isFinite(v) && v > 0 ? Math.max(GAP_MIN, Math.min(2000, v)) : GAP_DEFAULT; };
 export const GAP_MS = gapMs(typeof process !== 'undefined' ? process.env : {});
@@ -129,6 +132,7 @@ export async function readSide(send, ctid, symbolId, type, fromMs, toMs, sleep) 
 export async function probe({ env, tokens = null, names = ['XAUUSD'], marks = {}, WS = globalThis.WebSocket, now = Date.now(), lib = _t, sleep = (ms) => new Promise((r) => setTimeout(r, ms)), log = () => {} }) {
   const need = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ACCOUNT_ID', 'CTRADER_ENV'];
   if (need.some((k) => !String(env[k] || '').trim())) return { error: 'cTrader settings missing' };
+  const started = Date.now();
   if (String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') return { error: 'refused: CTRADER_ENV is not demo' };
   const env2 = { ...env, CTRADER_CLIENT_ID: String(env.CTRADER_CLIENT_ID).trim(), CTRADER_CLIENT_SECRET: String(env.CTRADER_CLIENT_SECRET).trim() };
   let accessToken = String(env.CTRADER_ACCESS_TOKEN).trim();
@@ -147,11 +151,19 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], marks = {}
     for (const arg of names) {
       const { name, parts } = parseName(arg);
       const L = light.get(normName(name)); if (!L) { out[name] = { error: 'not listed by the broker' }; continue; }
-      const sid = Number(L.symbolId), errors = [];
+      const sid = Number(L.symbolId), errors = []; let retries = 0, skipped = 0;
+      // the broker limits tick requests per ACCOUNT (per minute and in parallel): a REQUEST_FREQUENCY_EXCEEDED answer waits and
+      // tries again (RETRY_WAITS), so several runs at once slow down instead of losing queries; past the time budget nothing new
+      // is asked (out of time = null, not an error), so a run always saves what it read before the workflow's limit
       const window = async (fromS, toS) => {
-        try { const b = await readSide(send, ctid, sid, 1, fromS * 1000, toS * 1000, sleep), a = await readSide(send, ctid, sid, 2, fromS * 1000, toS * 1000, sleep);
-          return { qp: quotePath(b.ticks, a.ticks), nb: b.ticks.length, na: a.ticks.length, partial: b.partial || a.partial }; }
-        catch (e) { errors.push(String((e && e.message) || e).slice(0, 160)); return null; }
+        for (let k = 0; ; k++) {
+          if (Date.now() - started > budgetMs(env)) { skipped++; return null; }
+          try { const b = await readSide(send, ctid, sid, 1, fromS * 1000, toS * 1000, sleep), a = await readSide(send, ctid, sid, 2, fromS * 1000, toS * 1000, sleep);
+            return { qp: quotePath(b.ticks, a.ticks), nb: b.ticks.length, na: a.ticks.length, partial: b.partial || a.partial }; }
+          catch (e) { const m = String((e && e.message) || e);
+            if (/REQUEST_FREQUENCY_EXCEEDED/.test(m) && k < RETRY_WAITS.length) { retries++; await sleep(RETRY_WAITS[k]); continue; }
+            errors.push(m.slice(0, 160)); return null; }
+        }
       };
       // depth
       const depth = [];
@@ -197,7 +209,7 @@ export async function probe({ env, tokens = null, names = ['XAUUSD'], marks = {}
         fills.push(c ? [id, c[0], r6(c[1]), r6(c[2])] : [id, null]);
       }
       if (parts.includes('fills')) log(`${name}: ${fills.length} fill queries`);
-      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), ...(parts.includes('marks') ? { marks: quotes } : {}), ...(parts.includes('fills') ? { fills } : {}), errors };
+      out[name] = { symbolId: sid, digits: L.digits ?? null, parts, reachDays: reach, depth, hourProfile: hourProfile(hours), hours, events, ...(parts.includes('gotobi') ? { gotobi } : {}), ...(parts.includes('marks') ? { marks: quotes } : {}), ...(parts.includes('fills') ? { fills } : {}), errors, retries, skipped };
     }
   } finally { s.close(); }
   return { at: new Date(now).toISOString(), source: 'council/tick-probe.mjs', broker: acc.broker || null, symbols: out };

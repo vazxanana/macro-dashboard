@@ -119,3 +119,11 @@ test('the request gap: 260 ms by default, never under 200 ms (the broker allows 
   assert.equal(gapMs({ PROBE_GAP_MS: '210' }), 210); assert.equal(gapMs({ PROBE_GAP_MS: '50' }), 200);
   assert.equal(gapMs({ PROBE_GAP_MS: 'x' }), 260); assert.equal(gapMs({ PROBE_GAP_MS: '' }), 260); assert.equal(gapMs({ PROBE_GAP_MS: '99999' }), 2000);
 });
+
+test('a "too many requests" answer waits and tries again instead of losing the query; the time budget defaults to 100 minutes', async () => {
+  const { RETRY_WAITS, budgetMs } = await import('../council/tick-probe.mjs');
+  assert.ok(RETRY_WAITS.length >= 5 && RETRY_WAITS.every((w, i) => i === 0 || w >= RETRY_WAITS[i - 1]));
+  assert.equal(budgetMs({}), 100 * 60000); assert.equal(budgetMs({ PROBE_BUDGET_MIN: '30' }), 30 * 60000); assert.equal(budgetMs({ PROBE_BUDGET_MIN: '500' }), 115 * 60000);
+  const src = fs.readFileSync(new URL('../council/tick-probe.mjs', import.meta.url), 'utf8');
+  assert.match(src, /REQUEST_FREQUENCY_EXCEEDED[^\n]*RETRY_WAITS\.length[^\n]*continue/);
+});
