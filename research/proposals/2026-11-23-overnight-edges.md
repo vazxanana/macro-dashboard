@@ -53,3 +53,34 @@ Two near misses, and why they are not edges:
    before the outcome (see `research/proposals/2026-11-20-discretion.md`). About 100 such decisions a side would be needed to see
    a +0.5R difference.
 3. Do not test more variants of tonight's rules on 2010 to 2026. Those years have now been read under many definitions.
+
+## Phase 2: the untouched holdout (23 Nov 2026)
+
+The years 2010 to 2026 on gold, EUR/USD, GBP/USD, USD/JPY and AUD/USD were read by the first twelve studies. So the five best
+ideas from a scan of those trades were tested only on data nobody had used tonight:
+
+- **Set A:** the same five markets, 2005 to 2009.
+- **Set B:** NZD/USD, USD/CAD, USD/CHF, EUR/JPY and silver, 2010 to now. Their costs are assumed, not measured on the demo account.
+
+Each rule and its pass bar was written down and committed before any holdout candle was read (de6a84363). Each ran once. A
+separate reader then tried to break each result; nothing changed a verdict. Holm was taken over the five studies.
+
+**Result: 0 of 5 pass.**
+
+| Study | Rule in one line | Verdict | Holdout trades | R a trade after costs | month t |
+|---|---|---|---|---|---|
+| holdout-vb-early | Gold / USD/JPY breakout rule, fills before 06:00 UTC only | FAIL | 4,521 | +0.063 | 2.22 |
+| holdout-pullback-deep | H4 pullback end, only after the pullback passed 50 % | FAIL | 607 | −0.110 | −1.65 |
+| holdout-phase-pick | The phase reader picks among three entries | FAIL | 6,233 | −0.042 | −2.82 |
+| holdout-h1-veto | Breakout rule, skip days with a fresh H1 break against the fill | FAIL | 19,454 | −0.011 | −1.14 |
+| holdout-weekly-fade | With the Weekly, against the Daily, at a Daily level | FAIL | 3,342 | −0.007 | −0.36 |
+
+- **The nearest miss is the early breakout.** Early fills beat late fills on both sets (early minus late +0.097R a trade, Welch
+  t 3.83). But it misses the Holm line (p 0.068) and loses at twice the costs. NZD/USD, the market no breakout study had ever
+  read, made −0.043R (n 1,070). Most of the gain is Set A (+242R of the +284R total), years that earlier breakout studies had
+  already read with every fill hour pooled. Keep it as a hypothesis for the two breakout forward records: split them by fill hour.
+- **The phase reader as a chooser made the book worse** (−0.042R against −0.024R without the choice).
+- **The phase reader is now on the Charts page** as a "Market phase" panel: side, stage, place in the range and the storyline
+  step for D1, H4, H1 and M15. It is a reading of structure, not a tested rule, and it trades nothing.
+
+What this changes: nothing live. The holdout is now read too for these five ideas, so do not re-test their variants on it.

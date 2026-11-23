@@ -1,0 +1,1136 @@
+{
+ "study": "holdout-weekly-fade",
+ "built": "2026-11-23",
+ "preregistration": "research/edge/holdout-weekly-fade/PREREGISTRATION.md",
+ "planSha256": "53ac936f5c687de90bb01d2aa6f6fe3ffe0f75dab85c1a8d632cd8c8c34dfaf2",
+ "verdict": "FAIL: pooled holdout −0.007R a trade after costs (n 3342, month t −0.36, one-sided p 0.642); Set A +0.044R (n 715), Set B −0.021R (n 2627); 2x costs −0.031R; ungated control −0.016R (n 14073); lines missed: setB, t2, holm, cost2x",
+ "verdictWord": "FAIL",
+ "primary": {
+  "p": 0.6417403,
+  "t": -0.36,
+  "n": 3342,
+  "months": 264
+ },
+ "checks": {
+  "setA": true,
+  "setB": false,
+  "t2": false,
+  "holm": false,
+  "n100": true,
+  "cost2x": false
+ },
+ "family": {
+  "studies": [
+   "holdout-vb-early",
+   "holdout-pullback-deep",
+   "holdout-phase-pick",
+   "holdout-h1-veto",
+   "holdout-weekly-fade"
+  ],
+  "p": [
+   0.01361482,
+   0.9497,
+   0.9974,
+   0.8725899,
+   0.6417403
+  ],
+  "complete": true,
+  "pHolm": 1,
+  "note": "Holm over the five primary one-sided p values"
+ },
+ "pins": [
+  {
+   "file": "direction-chain-gate/run.mjs",
+   "want": "2c891e09c4bf3463",
+   "got": "2c891e09c4bf3463",
+   "ok": true
+  }
+ ],
+ "pinsOk": true,
+ "gate": {
+  "ok": true,
+  "rows": {
+   "REP": {
+    "refN": 6526,
+    "n": 6526,
+    "refMeanR": -0.0055,
+    "meanR": -0.0055,
+    "ok": true
+   },
+   "IS": {
+    "refN": 2600,
+    "n": 2600,
+    "refMeanR": -0.0029,
+    "meanR": -0.0029,
+    "ok": true
+   },
+   "OOS": {
+    "refN": 1845,
+    "n": 1845,
+    "refMeanR": -0.0412,
+    "meanR": -0.0412,
+    "ok": true
+   }
+  },
+  "note": "code check only; 2010-2026 on the five main markets is not holdout data and is not part of the verdict"
+ },
+ "params": {
+  "SWING_K": 3,
+  "ATR_N": 14,
+  "LEVELS": 40,
+  "NEAR_ATR": 0.5
+ },
+ "choices": [
+  "Set A candles are read to 2010-01-09 only so that trades ENTERED by 2009-12-31 can reach their exit (48 h at most); no entry after 2009-12-31 is taken.",
+  "Set B ends at the last complete day on file: entries on the UTC date of the last M5 candle are left out.",
+  "Warm-up: every candle on file before a set's first entry date is read for structure, swings and ATR only (Set A has no warm-up: the cache starts in 2005 / 2006, so the first weeks give a Weekly side of 0 and no trade).",
+  "Weekly / Daily side and levels are read from candles CLOSED at the breaking H1 candle's close (e <= that time); a week counts only once its last Daily candle has closed.",
+  "Daily ATR(14) = simple mean of the true range (max of high-low, |high - previous close|, |low - previous close|) of the last 14 closed days; fewer than 15 closed days = no ATR = condition 3 fails.",
+  "\"The last 40 confirmed Daily swing highs or lows\" = the 40 most recently confirmed (by confirmation time) of toolkit swings(D, 3), highs and lows together.",
+  "One open position at a time per market and stream: direction-chain-gate oneAtATime (a candidate is taken only if its fill is at or after the previous taken trade's exit), applied after the set window filter.",
+  "Month sums by exit month over the set's span (first entry month to the later of the set's last entry month and its last exit month), empty months 0; Set A and Set B month series pooled; one-sided p from the toolkit t."
+ ],
+ "costs": {
+  "xau": 0.3,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01,
+  "xag": 0.03
+ },
+ "data": "xau (Set A): 273253 M5 candles 2006-03-19 → 2010-01-08, 1045 candidates in the set window, 163 meeting all three conditions; eurusd (Set A): 382895 M5 candles 2005-01-02 → 2010-01-08, 1463 candidates in the set window, 224 meeting all three conditions; gbpusd (Set A): 381421 M5 candles 2005-01-02 → 2010-01-08, 1487 candidates in the set window, 236 meeting all three conditions; usdjpy (Set A): 382648 M5 candles 2005-01-02 → 2010-01-08, 1501 candidates in the set window, 277 meeting all three conditions; audusd (Set A): 381449 M5 candles 2005-01-02 → 2010-01-08, 1515 candidates in the set window, 209 meeting all three conditions; nzdusd (Set B): 1638858 M5 candles 2005-01-02 → 2026-11-23, 4941 candidates in the set window, 940 meeting all three conditions; usdcad (Set B): 1637270 M5 candles 2005-01-02 → 2026-11-23, 4771 candidates in the set window, 819 meeting all three conditions; usdchf (Set B): 1633086 M5 candles 2005-01-02 → 2026-11-23, 4697 candidates in the set window, 904 meeting all three conditions; eurjpy (Set B): 1646900 M5 candles 2005-01-02 → 2026-11-23, 4632 candidates in the set window, 763 meeting all three conditions; xag (Set B): 1443638 M5 candles 2006-03-19 → 2026-11-23, 3879 candidates in the set window, 657 meeting all three conditions. Source: the shared toolkit's OANDA mid M5 cache; 2010-2026 on the five main markets read only for the harness gate.",
+ "sets": {
+  "A": {
+   "name": "Set A, early years (2005-2009, the five main markets)",
+   "markets": [
+    "xau",
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd"
+   ],
+   "from": "2005-01-01",
+   "to": "2010-01-01",
+   "load": {
+    "to": "2010-01-09"
+   },
+   "span": [
+    "2005-01",
+    "2010-01"
+   ],
+   "rule": {
+    "n": 715,
+    "win": 0.471,
+    "netR": 0.044,
+    "grossR": 0.06,
+    "net2R": 0.028,
+    "total": 31.38,
+    "months": 61,
+    "t": 1.07,
+    "tRaw": 1.070845044285789,
+    "t2x": 0.67,
+    "grossT": 1.46,
+    "maxDD": -29.63,
+    "buys": {
+     "n": 389,
+     "netR": 0.039
+    },
+    "sells": {
+     "n": 326,
+     "netR": 0.05
+    },
+    "exits": {
+     "time": 415,
+     "stop": 224,
+     "target": 76
+    }
+   },
+   "control": {
+    "n": 3284,
+    "win": 0.44,
+    "netR": -0.013,
+    "grossR": 0.001,
+    "net2R": -0.028,
+    "total": -43.83,
+    "months": 61,
+    "t": -0.66,
+    "tRaw": -0.6618863474632646,
+    "t2x": -1.37,
+    "grossT": 0.05,
+    "maxDD": -93.43,
+    "buys": {
+     "n": 1710,
+     "netR": -0.02
+    },
+    "sells": {
+     "n": 1574,
+     "netR": -0.007
+    },
+    "exits": {
+     "stop": 1069,
+     "time": 1909,
+     "target": 306
+    }
+   },
+   "byYear": {
+    "2005": {
+     "n": 99,
+     "netR": 0.022,
+     "total": 2.17
+    },
+    "2006": {
+     "n": 154,
+     "netR": -0.112,
+     "total": -17.29
+    },
+    "2007": {
+     "n": 153,
+     "netR": 0.112,
+     "total": 17.19
+    },
+    "2008": {
+     "n": 154,
+     "netR": 0.082,
+     "total": 12.62
+    },
+    "2009": {
+     "n": 155,
+     "netR": 0.108,
+     "total": 16.68
+    }
+   }
+  },
+  "B": {
+   "name": "Set B, fresh markets (2010 → last complete day on file)",
+   "markets": [
+    "nzdusd",
+    "usdcad",
+    "usdchf",
+    "eurjpy",
+    "xag"
+   ],
+   "from": "2010-01-01",
+   "to": null,
+   "load": {},
+   "span": [
+    "2010-01",
+    "2026-11"
+   ],
+   "rule": {
+    "n": 2627,
+    "win": 0.437,
+    "netR": -0.021,
+    "grossR": 0.005,
+    "net2R": -0.047,
+    "total": -55.08,
+    "months": 203,
+    "t": -0.95,
+    "tRaw": -0.9475943690573818,
+    "t2x": -2.11,
+    "grossT": 0.24,
+    "maxDD": -73.85,
+    "buys": {
+     "n": 1335,
+     "netR": -0.003
+    },
+    "sells": {
+     "n": 1292,
+     "netR": -0.04
+    },
+    "exits": {
+     "stop": 894,
+     "target": 289,
+     "time": 1444
+    }
+   },
+   "control": {
+    "n": 10789,
+    "win": 0.441,
+    "netR": -0.017,
+    "grossR": 0.008,
+    "net2R": -0.041,
+    "total": -180.92,
+    "months": 203,
+    "t": -1.76,
+    "tRaw": -1.7613390914708908,
+    "t2x": -4.3,
+    "grossT": 0.82,
+    "maxDD": -216.48,
+    "buys": {
+     "n": 5504,
+     "netR": -0.014
+    },
+    "sells": {
+     "n": 5285,
+     "netR": -0.02
+    },
+    "exits": {
+     "stop": 3416,
+     "time": 6299,
+     "target": 1074
+    }
+   },
+   "byYear": {
+    "2010": {
+     "n": 160,
+     "netR": -0.069,
+     "total": -10.97
+    },
+    "2011": {
+     "n": 143,
+     "netR": -0.037,
+     "total": -5.33
+    },
+    "2012": {
+     "n": 194,
+     "netR": -0.014,
+     "total": -2.69
+    },
+    "2013": {
+     "n": 159,
+     "netR": 0.113,
+     "total": 18
+    },
+    "2014": {
+     "n": 124,
+     "netR": -0.092,
+     "total": -11.44
+    },
+    "2015": {
+     "n": 146,
+     "netR": -0.029,
+     "total": -4.22
+    },
+    "2016": {
+     "n": 153,
+     "netR": 0.075,
+     "total": 11.51
+    },
+    "2017": {
+     "n": 135,
+     "netR": -0.146,
+     "total": -19.65
+    },
+    "2018": {
+     "n": 170,
+     "netR": -0.045,
+     "total": -7.67
+    },
+    "2019": {
+     "n": 145,
+     "netR": 0.066,
+     "total": 9.51
+    },
+    "2020": {
+     "n": 134,
+     "netR": 0.055,
+     "total": 7.43
+    },
+    "2021": {
+     "n": 179,
+     "netR": 0.028,
+     "total": 5.02
+    },
+    "2022": {
+     "n": 177,
+     "netR": 0.054,
+     "total": 9.61
+    },
+    "2023": {
+     "n": 185,
+     "netR": -0.155,
+     "total": -28.7
+    },
+    "2024": {
+     "n": 170,
+     "netR": -0.163,
+     "total": -27.71
+    },
+    "2025": {
+     "n": 140,
+     "netR": 0.043,
+     "total": 6.02
+    },
+    "2026": {
+     "n": 113,
+     "netR": -0.034,
+     "total": -3.79
+    }
+   }
+  }
+ },
+ "pooled": {
+  "rule": {
+   "n": 3342,
+   "win": 0.445,
+   "netR": -0.007,
+   "grossR": 0.017,
+   "net2R": -0.031,
+   "total": -23.7,
+   "months": 264,
+   "t": -0.36,
+   "tRaw": -0.36350526458009047,
+   "t2x": -1.58,
+   "grossT": 0.88,
+   "maxDD": -73.85,
+   "buys": {
+    "n": 1724,
+    "netR": 0.007
+   },
+   "sells": {
+    "n": 1618,
+    "netR": -0.022
+   },
+   "exits": {
+    "time": 1859,
+    "stop": 1118,
+    "target": 365
+   }
+  },
+  "control": {
+   "n": 14073,
+   "win": 0.441,
+   "netR": -0.016,
+   "grossR": 0.006,
+   "net2R": -0.038,
+   "total": -224.75,
+   "months": 264,
+   "t": -1.84,
+   "tRaw": -1.843091390649283,
+   "t2x": -4.36,
+   "grossT": 0.72,
+   "maxDD": -269.99,
+   "buys": {
+    "n": 7214,
+    "netR": -0.015
+   },
+   "sells": {
+    "n": 6859,
+    "netR": -0.017
+   },
+   "exits": {
+    "stop": 4485,
+    "time": 8208,
+    "target": 1380
+   }
+  },
+  "ruleMinusControl": {
+   "diff": 0.009,
+   "t": 0.46
+  }
+ },
+ "alone": {
+  "Weekly side = trade side": {
+   "n": 9114,
+   "win": 0.44,
+   "netR": -0.015,
+   "grossR": 0.008,
+   "net2R": -0.039,
+   "total": -140.73,
+   "months": 264,
+   "t": -1.3,
+   "tRaw": -1.302070835643053,
+   "t2x": -3.26,
+   "grossT": 0.67,
+   "maxDD": -225.88,
+   "buys": {
+    "n": 4878,
+    "netR": -0.014
+   },
+   "sells": {
+    "n": 4236,
+    "netR": -0.017
+   },
+   "exits": {
+    "time": 5034,
+    "stop": 3109,
+    "target": 971
+   }
+  },
+  "Daily side against the trade": {
+   "n": 9252,
+   "win": 0.438,
+   "netR": -0.013,
+   "grossR": 0.01,
+   "net2R": -0.036,
+   "total": -119.5,
+   "months": 264,
+   "t": -1.13,
+   "tRaw": -1.1279161743905346,
+   "t2x": -3.14,
+   "grossT": 0.9,
+   "maxDD": -155.91,
+   "buys": {
+    "n": 4486,
+    "netR": 0
+   },
+   "sells": {
+    "n": 4766,
+    "netR": -0.025
+   },
+   "exits": {
+    "time": 5110,
+    "stop": 3107,
+    "target": 1035
+   }
+  },
+  "Within 0.5 ATR of a Daily swing level": {
+   "n": 12137,
+   "win": 0.442,
+   "netR": -0.018,
+   "grossR": 0.005,
+   "net2R": -0.04,
+   "total": -214.78,
+   "months": 264,
+   "t": -1.87,
+   "tRaw": -1.869111926743006,
+   "t2x": -4.21,
+   "grossT": 0.52,
+   "maxDD": -281.98,
+   "buys": {
+    "n": 6185,
+    "netR": -0.02
+   },
+   "sells": {
+    "n": 5952,
+    "netR": -0.015
+   },
+   "exits": {
+    "target": 1193,
+    "time": 7037,
+    "stop": 3907
+   }
+  },
+  "All three (the rule)": {
+   "n": 3342,
+   "win": 0.445,
+   "netR": -0.007,
+   "grossR": 0.017,
+   "net2R": -0.031,
+   "total": -23.7,
+   "months": 264,
+   "t": -0.36,
+   "tRaw": -0.36350526458009047,
+   "t2x": -1.58,
+   "grossT": 0.88,
+   "maxDD": -73.85,
+   "buys": {
+    "n": 1724,
+    "netR": 0.007
+   },
+   "sells": {
+    "n": 1618,
+    "netR": -0.022
+   },
+   "exits": {
+    "time": 1859,
+    "stop": 1118,
+    "target": 365
+   }
+  },
+  "None (ungated control)": {
+   "n": 14073,
+   "win": 0.441,
+   "netR": -0.016,
+   "grossR": 0.006,
+   "net2R": -0.038,
+   "total": -224.75,
+   "months": 264,
+   "t": -1.84,
+   "tRaw": -1.843091390649283,
+   "t2x": -4.36,
+   "grossT": 0.72,
+   "maxDD": -269.99,
+   "buys": {
+    "n": 7214,
+    "netR": -0.015
+   },
+   "sells": {
+    "n": 6859,
+    "netR": -0.017
+   },
+   "exits": {
+    "stop": 4485,
+    "time": 8208,
+    "target": 1380
+   }
+  }
+ },
+ "markets": {
+  "xau": {
+   "set": "A",
+   "rule": {
+    "n": 102,
+    "win": 0.49,
+    "netR": 0.069,
+    "grossR": 0.12,
+    "net2R": 0.019,
+    "total": 7.08,
+    "months": 61,
+    "t": 0.87,
+    "tRaw": 0.8667875842844723,
+    "t2x": 0.24,
+    "grossT": 1.42,
+    "maxDD": -6.72,
+    "buys": {
+     "n": 66,
+     "netR": 0.167
+    },
+    "sells": {
+     "n": 36,
+     "netR": -0.109
+    },
+    "exits": {
+     "time": 62,
+     "stop": 27,
+     "target": 13
+    }
+   },
+   "control": {
+    "n": 491,
+    "win": 0.468,
+    "netR": 0.041,
+    "grossR": 0.081,
+    "net2R": 0,
+    "total": 20,
+    "months": 61,
+    "t": 0.96,
+    "tRaw": 0.9633371816944472,
+    "t2x": 0.01,
+    "grossT": 1.91,
+    "maxDD": -12.27,
+    "buys": {
+     "n": 277,
+     "netR": 0.066
+    },
+    "sells": {
+     "n": 214,
+     "netR": 0.008
+    },
+    "exits": {
+     "stop": 131,
+     "time": 310,
+     "target": 50
+    }
+   }
+  },
+  "eurusd": {
+   "set": "A",
+   "rule": {
+    "n": 147,
+    "win": 0.456,
+    "netR": 0.035,
+    "grossR": 0.044,
+    "net2R": 0.026,
+    "total": 5.15,
+    "months": 61,
+    "t": 0.43,
+    "tRaw": 0.4310693125958352,
+    "t2x": 0.32,
+    "grossT": 0.54,
+    "maxDD": -8.44,
+    "buys": {
+     "n": 86,
+     "netR": 0.112
+    },
+    "sells": {
+     "n": 61,
+     "netR": -0.073
+    },
+    "exits": {
+     "stop": 43,
+     "time": 90,
+     "target": 14
+    }
+   },
+   "control": {
+    "n": 692,
+    "win": 0.428,
+    "netR": -0.026,
+    "grossR": -0.017,
+    "net2R": -0.034,
+    "total": -17.89,
+    "months": 61,
+    "t": -0.68,
+    "tRaw": -0.6831191745945068,
+    "t2x": -0.91,
+    "grossT": -0.46,
+    "maxDD": -27.57,
+    "buys": {
+     "n": 362,
+     "netR": -0.015
+    },
+    "sells": {
+     "n": 330,
+     "netR": -0.038
+    },
+    "exits": {
+     "time": 399,
+     "stop": 231,
+     "target": 62
+    }
+   }
+  },
+  "gbpusd": {
+   "set": "A",
+   "rule": {
+    "n": 161,
+    "win": 0.453,
+    "netR": 0.013,
+    "grossR": 0.022,
+    "net2R": 0.004,
+    "total": 2.05,
+    "months": 61,
+    "t": 0.17,
+    "tRaw": 0.16972489788558184,
+    "t2x": 0.05,
+    "grossT": 0.29,
+    "maxDD": -10.3,
+    "buys": {
+     "n": 78,
+     "netR": 0.047
+    },
+    "sells": {
+     "n": 83,
+     "netR": -0.019
+    },
+    "exits": {
+     "stop": 59,
+     "time": 83,
+     "target": 19
+    }
+   },
+   "control": {
+    "n": 699,
+    "win": 0.429,
+    "netR": -0.024,
+    "grossR": -0.016,
+    "net2R": -0.032,
+    "total": -16.87,
+    "months": 61,
+    "t": -0.7,
+    "tRaw": -0.6988380244390705,
+    "t2x": -0.93,
+    "grossT": -0.47,
+    "maxDD": -28.02,
+    "buys": {
+     "n": 332,
+     "netR": -0.016
+    },
+    "sells": {
+     "n": 367,
+     "netR": -0.032
+    },
+    "exits": {
+     "time": 393,
+     "stop": 238,
+     "target": 68
+    }
+   }
+  },
+  "usdjpy": {
+   "set": "A",
+   "rule": {
+    "n": 172,
+    "win": 0.5,
+    "netR": 0.081,
+    "grossR": 0.093,
+    "net2R": 0.069,
+    "total": 13.94,
+    "months": 61,
+    "t": 1.03,
+    "tRaw": 1.025954590545261,
+    "t2x": 0.87,
+    "grossT": 1.18,
+    "maxDD": -12.33,
+    "buys": {
+     "n": 103,
+     "netR": -0.05
+    },
+    "sells": {
+     "n": 69,
+     "netR": 0.277
+    },
+    "exits": {
+     "stop": 51,
+     "time": 103,
+     "target": 18
+    }
+   },
+   "control": {
+    "n": 695,
+    "win": 0.455,
+    "netR": 0.011,
+    "grossR": 0.023,
+    "net2R": -0.001,
+    "total": 7.64,
+    "months": 61,
+    "t": 0.29,
+    "tRaw": 0.28773062117500614,
+    "t2x": -0.02,
+    "grossT": 0.6,
+    "maxDD": -18.24,
+    "buys": {
+     "n": 357,
+     "netR": -0.055
+    },
+    "sells": {
+     "n": 338,
+     "netR": 0.081
+    },
+    "exits": {
+     "time": 408,
+     "stop": 217,
+     "target": 70
+    }
+   }
+  },
+  "audusd": {
+   "set": "A",
+   "rule": {
+    "n": 133,
+    "win": 0.459,
+    "netR": 0.024,
+    "grossR": 0.035,
+    "net2R": 0.012,
+    "total": 3.14,
+    "months": 61,
+    "t": 0.31,
+    "tRaw": 0.310800656486501,
+    "t2x": 0.16,
+    "grossT": 0.47,
+    "maxDD": -13.7,
+    "buys": {
+     "n": 56,
+     "netR": -0.07
+    },
+    "sells": {
+     "n": 77,
+     "netR": 0.092
+    },
+    "exits": {
+     "time": 77,
+     "stop": 44,
+     "target": 12
+    }
+   },
+   "control": {
+    "n": 707,
+    "win": 0.427,
+    "netR": -0.052,
+    "grossR": -0.041,
+    "net2R": -0.063,
+    "total": -36.71,
+    "months": 61,
+    "t": -1.47,
+    "tRaw": -1.4700926454755583,
+    "t2x": -1.78,
+    "grossT": -1.16,
+    "maxDD": -51.54,
+    "buys": {
+     "n": 382,
+     "netR": -0.056
+    },
+    "sells": {
+     "n": 325,
+     "netR": -0.047
+    },
+    "exits": {
+     "time": 399,
+     "stop": 252,
+     "target": 56
+    }
+   }
+  },
+  "nzdusd": {
+   "set": "B",
+   "rule": {
+    "n": 606,
+    "win": 0.413,
+    "netR": -0.052,
+    "grossR": -0.035,
+    "net2R": -0.07,
+    "total": -31.74,
+    "months": 203,
+    "t": -1.13,
+    "tRaw": -1.1304628780926933,
+    "t2x": -1.5,
+    "grossT": -0.75,
+    "maxDD": -32.92,
+    "buys": {
+     "n": 221,
+     "netR": -0.074
+    },
+    "sells": {
+     "n": 385,
+     "netR": -0.04
+    },
+    "exits": {
+     "stop": 235,
+     "target": 71,
+     "time": 300
+    }
+   },
+   "control": {
+    "n": 2285,
+    "win": 0.439,
+    "netR": -0.032,
+    "grossR": -0.016,
+    "net2R": -0.048,
+    "total": -72.2,
+    "months": 203,
+    "t": -1.73,
+    "tRaw": -1.7265524155620853,
+    "t2x": -2.6,
+    "grossT": -0.85,
+    "maxDD": -80.28,
+    "buys": {
+     "n": 1133,
+     "netR": -0.028
+    },
+    "sells": {
+     "n": 1152,
+     "netR": -0.035
+    },
+    "exits": {
+     "stop": 804,
+     "time": 1244,
+     "target": 237
+    }
+   }
+  },
+  "usdcad": {
+   "set": "B",
+   "rule": {
+    "n": 529,
+    "win": 0.425,
+    "netR": -0.052,
+    "grossR": -0.037,
+    "net2R": -0.067,
+    "total": -27.54,
+    "months": 203,
+    "t": -1.11,
+    "tRaw": -1.1103405789203014,
+    "t2x": -1.42,
+    "grossT": -0.8,
+    "maxDD": -40.9,
+    "buys": {
+     "n": 285,
+     "netR": -0.017
+    },
+    "sells": {
+     "n": 244,
+     "netR": -0.094
+    },
+    "exits": {
+     "stop": 189,
+     "time": 283,
+     "target": 57
+    }
+   },
+   "control": {
+    "n": 2208,
+    "win": 0.433,
+    "netR": -0.033,
+    "grossR": -0.019,
+    "net2R": -0.046,
+    "total": -72.23,
+    "months": 203,
+    "t": -1.62,
+    "tRaw": -1.6227711933685336,
+    "t2x": -2.28,
+    "grossT": -0.96,
+    "maxDD": -88.28,
+    "buys": {
+     "n": 1122,
+     "netR": -0.009
+    },
+    "sells": {
+     "n": 1086,
+     "netR": -0.057
+    },
+    "exits": {
+     "time": 1264,
+     "stop": 728,
+     "target": 216
+    }
+   }
+  },
+  "usdchf": {
+   "set": "B",
+   "rule": {
+    "n": 580,
+    "win": 0.467,
+    "netR": 0.025,
+    "grossR": 0.043,
+    "net2R": 0.007,
+    "total": 14.51,
+    "months": 203,
+    "t": 0.58,
+    "tRaw": 0.5799530694158949,
+    "t2x": 0.17,
+    "grossT": 0.99,
+    "maxDD": -24.18,
+    "buys": {
+     "n": 301,
+     "netR": 0.027
+    },
+    "sells": {
+     "n": 279,
+     "netR": 0.023
+    },
+    "exits": {
+     "time": 317,
+     "stop": 193,
+     "target": 70
+    }
+   },
+   "control": {
+    "n": 2225,
+    "win": 0.441,
+    "netR": -0.014,
+    "grossR": 0.001,
+    "net2R": -0.03,
+    "total": -32.24,
+    "months": 203,
+    "t": -0.75,
+    "tRaw": -0.7485738739163418,
+    "t2x": -1.56,
+    "grossT": 0.06,
+    "maxDD": -68.87,
+    "buys": {
+     "n": 1163,
+     "netR": -0.047
+    },
+    "sells": {
+     "n": 1062,
+     "netR": 0.021
+    },
+    "exits": {
+     "stop": 709,
+     "time": 1296,
+     "target": 220
+    }
+   }
+  },
+  "eurjpy": {
+   "set": "B",
+   "rule": {
+    "n": 476,
+    "win": 0.492,
+    "netR": 0.081,
+    "grossR": 0.095,
+    "net2R": 0.067,
+    "total": 38.62,
+    "months": 203,
+    "t": 1.87,
+    "tRaw": 1.8696256708492014,
+    "t2x": 1.54,
+    "grossT": 2.2,
+    "maxDD": -16.37,
+    "buys": {
+     "n": 266,
+     "netR": 0.093
+    },
+    "sells": {
+     "n": 210,
+     "netR": 0.066
+    },
+    "exits": {
+     "target": 55,
+     "time": 277,
+     "stop": 144
+    }
+   },
+   "control": {
+    "n": 2140,
+    "win": 0.474,
+    "netR": 0.057,
+    "grossR": 0.07,
+    "net2R": 0.043,
+    "total": 121.13,
+    "months": 203,
+    "t": 2.54,
+    "tRaw": 2.5378269215853084,
+    "t2x": 1.91,
+    "grossT": 3.16,
+    "maxDD": -21.83,
+    "buys": {
+     "n": 1092,
+     "netR": 0.065
+    },
+    "sells": {
+     "n": 1048,
+     "netR": 0.048
+    },
+    "exits": {
+     "stop": 654,
+     "time": 1239,
+     "target": 247
+    }
+   }
+  },
+  "xag": {
+   "set": "B",
+   "rule": {
+    "n": 436,
+    "win": 0.388,
+    "netR": -0.112,
+    "grossR": -0.035,
+    "net2R": -0.189,
+    "total": -48.93,
+    "months": 203,
+    "t": -2.39,
+    "tRaw": -2.3919995702583017,
+    "t2x": -3.88,
+    "grossT": -0.77,
+    "maxDD": -53.77,
+    "buys": {
+     "n": 262,
+     "netR": -0.06
+    },
+    "sells": {
+     "n": 174,
+     "netR": -0.19
+    },
+    "exits": {
+     "target": 36,
+     "stop": 133,
+     "time": 267
+    }
+   },
+   "control": {
+    "n": 1931,
+    "win": 0.417,
+    "netR": -0.065,
+    "grossR": 0.004,
+    "net2R": -0.134,
+    "total": -125.38,
+    "months": 203,
+    "t": -3.25,
+    "tRaw": -3.251649187787691,
+    "t2x": -6.54,
+    "grossT": 0.22,
+    "maxDD": -160.75,
+    "buys": {
+     "n": 994,
+     "netR": -0.051
+    },
+    "sells": {
+     "n": 937,
+     "netR": -0.079
+    },
+    "exits": {
+     "target": 154,
+     "time": 1256,
+     "stop": 521
+    }
+   }
+  }
+ },
+ "reading": "The rule does not pass the pre-registered bar (FAIL; missed: setB, t2, holm, cost2x). The rule, pooled: −0.007R a trade after costs (n 3342, gross +0.017R, month t −0.36 over 264 months). The ungated entry on the same holdout: −0.016R (n 14073, gross +0.006R, month t −1.84); rule minus control +0.009R (Welch t +0.46, the two overlap). Set A +0.044R (n 715) against its control −0.013R; Set B −0.021R (n 2627) against −0.017R. The shape was chosen from two of the owner's marked trades and an in-sample scan of 2010-2026 on the five main markets; whatever it shows here is read as the pre-registration says, never as an edge without its n and t."
+}

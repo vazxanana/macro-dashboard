@@ -6554,3 +6554,20 @@ What it teaches: before costs these entries sit at zero, so costs decide them; a
 did not pick better trades on any of them (as `ltf-structure` and `desk-rigor` found); the strict storyline readings are too rare to
 judge. Never call any of these an edge, do not re-test variants on these years. Owner document:
 `research/proposals/2026-11-23-overnight-edges.md`. Tests: `tests/<topic>.test.mjs` for each.
+**Phase 2: holdout studies and the phase reader** (23 Nov 2026). Five hypotheses picked from an in-sample scan of the night's
+trades (private notes, not in the repository) were pre-registered (de6a84363) and run once on the UNTOUCHED holdout: Set A = the
+five read markets 2005-2009, Set B = NZD/USD, USD/CAD, USD/CHF, EUR/JPY, silver 2010 on (`edgekit` `HOLDOUT`, `HOLDOUT_MARKETS`;
+Set B costs ASSUMED, not measured). Five-study Holm over the primary p values. Each audited by a separate reader: no defect changed
+a verdict. **0 of 5 pass.** Pooled holdout, R a trade after costs, month-sum t:
+- `holdout-vb-early`: the gold / USD/JPY breakout rule, fills before 06:00 UTC only. FAIL (n 4,521, +0.063R, t 2.22, one-sided p
+  0.014; Set A +0.239R, Set B +0.012R; 2x costs −0.002R; Holm p 0.068). The nearest miss: early fills beat late ones on both
+  sets (early minus late +0.097R, Welch t 3.83), but NZD/USD, the cleanest slice, was −0.043R (n 1,070) and outside gold and
+  USD/JPY it is about zero after costs. A hypothesis, not an edge.
+- `holdout-pullback-deep`: the H4 pullback end only after the pullback passed the 50 % line. FAIL (n 607, −0.110R, t −1.65).
+- `holdout-phase-pick`: the phase reader chooses among box break / zone retest / pullback end. FAIL (n 6,233, −0.042R, t −2.82;
+  control without the choice −0.024R, n 13,391): the phase choice made it worse.
+- `holdout-h1-veto`: the breakout rule skipping days with a fresh H1 break against the fill. FAIL (n 19,454, −0.011R, t −1.14).
+- `holdout-weekly-fade`: with the Weekly, against the Daily, at a Daily level. FAIL (n 3,342, −0.007R, t −0.36).
+The phase reader `research/edge/_lib/phase.mjs` (`readPhase`, closed candles only: per D1 / H4 / H1 / M15 side, stage, BO / ChoCh,
+ranges and their 50 %, box, the storyline step below; `tests/phase.test.mjs`) is shown on Charts as the "Market phase" panel
+(`assets/ms-phase.js`, a copy compared by `tests/ms-phase.test.mjs`; display only, hidden for guests). A reading, not a tested rule.

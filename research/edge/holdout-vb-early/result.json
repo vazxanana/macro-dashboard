@@ -1,0 +1,1848 @@
+{
+ "study": "holdout-vb-early",
+ "built": "2026-11-23",
+ "preregistration": "research/edge/holdout-vb-early/PREREGISTRATION.md",
+ "planSha256": "674908ee9efa8d35a6261958e01733c90319d4683385c44ab1ecf889015e40b2",
+ "verdict": "FAIL: pooled holdout early fills +0.063R a trade after costs (n 4521, month t +2.22, one-sided p 0.014); Set A +0.239R (n 1011), Set B +0.012R (n 3510); 2x costs −0.002R; lines missed: holm, cost2x",
+ "verdictWord": "FAIL",
+ "primary": {
+  "p": 0.01361482,
+  "t": 2.22,
+  "n": 4521,
+  "months": 263
+ },
+ "checks": {
+  "setA": true,
+  "setB": true,
+  "t2": true,
+  "holm": false,
+  "n100": true,
+  "cost2x": false
+ },
+ "family": {
+  "studies": [
+   "holdout-vb-early",
+   "holdout-pullback-deep",
+   "holdout-phase-pick",
+   "holdout-h1-veto",
+   "holdout-weekly-fade"
+  ],
+  "p": [
+   0.01361482,
+   0.9497,
+   0.9974,
+   0.8725899,
+   0.6417403
+  ],
+  "complete": true,
+  "pHolm": 0.06807409,
+  "note": "Holm over the five primary p values"
+ },
+ "pins": [
+  {
+   "file": "gold-vol-breakout/run.mjs",
+   "want": "afa36e031e39daab",
+   "got": "afa36e031e39daab",
+   "ok": true
+  },
+  {
+   "file": "fx-vol-breakout/run.mjs",
+   "want": "5ecca28799940b38",
+   "got": "5ecca28799940b38",
+   "ok": true
+  }
+ ],
+ "pinsOk": true,
+ "gate": [
+  {
+   "market": "xau",
+   "src": "gold-vol-breakout-replicate",
+   "w": [
+    "2007-01-01",
+    "2009-12-31"
+   ],
+   "n": 561,
+   "netR": 0.139,
+   "years": [
+    "2007",
+    "2008",
+    "2009"
+   ],
+   "got": {
+    "n": 561,
+    "netR": 0.139
+   },
+   "ok": true
+  },
+  {
+   "market": "eurusd",
+   "src": "fx-majors-vb-early",
+   "w": [
+    "2005-01-04",
+    "2009-12-31"
+   ],
+   "n": 953,
+   "netR": 0.032,
+   "years": [
+    "2005",
+    "2006",
+    "2007",
+    "2008",
+    "2009"
+   ],
+   "got": {
+    "n": 953,
+    "netR": 0.032
+   },
+   "ok": true
+  },
+  {
+   "market": "gbpusd",
+   "src": "fx-majors-vb-early",
+   "w": [
+    "2005-01-04",
+    "2009-12-31"
+   ],
+   "n": 984,
+   "netR": 0.068,
+   "years": [
+    "2005",
+    "2006",
+    "2007",
+    "2008",
+    "2009"
+   ],
+   "got": {
+    "n": 984,
+    "netR": 0.068
+   },
+   "ok": true
+  },
+  {
+   "market": "usdjpy",
+   "src": "usdjpy-vol-breakout-early",
+   "w": [
+    "2005-01-04",
+    "2009-12-31"
+   ],
+   "n": 970,
+   "netR": 0.099,
+   "years": [
+    "2005",
+    "2006",
+    "2007",
+    "2008",
+    "2009"
+   ],
+   "got": {
+    "n": 970,
+    "netR": 0.099
+   },
+   "ok": true
+  },
+  {
+   "market": "audusd",
+   "src": "fx-majors-vb-early",
+   "w": [
+    "2005-01-04",
+    "2009-12-31"
+   ],
+   "n": 992,
+   "netR": 0.017,
+   "years": [
+    "2005",
+    "2006",
+    "2007",
+    "2008",
+    "2009"
+   ],
+   "got": {
+    "n": 992,
+    "netR": 0.017
+   },
+   "ok": true
+  },
+  {
+   "market": "usdcad",
+   "src": "fx-majors-vb-early",
+   "w": [
+    "2010-01-01",
+    "2015-12-31"
+   ],
+   "n": 1171,
+   "netR": -0.054,
+   "years": [
+    "2010",
+    "2011",
+    "2012",
+    "2013",
+    "2014",
+    "2015"
+   ],
+   "got": {
+    "n": 1171,
+    "netR": -0.054
+   },
+   "ok": true
+  },
+  {
+   "market": "usdchf",
+   "src": "fx-majors-vb-early",
+   "w": [
+    "2010-01-01",
+    "2015-12-31"
+   ],
+   "n": 1157,
+   "netR": 0.039,
+   "years": [
+    "2010",
+    "2011",
+    "2012",
+    "2013",
+    "2014",
+    "2015"
+   ],
+   "got": {
+    "n": 1157,
+    "netR": 0.039
+   },
+   "ok": true
+  },
+  {
+   "market": "eurjpy",
+   "src": "yen-crosses-vol-breakout (complete years)",
+   "w": [
+    "2010-01-01",
+    "2025-12-31"
+   ],
+   "n": 3079,
+   "netR": 0.031,
+   "years": [
+    "2010",
+    "2011",
+    "2012",
+    "2013",
+    "2014",
+    "2015",
+    "2016",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025"
+   ],
+   "got": {
+    "n": 3079,
+    "netR": 0.031
+   },
+   "ok": true
+  },
+  {
+   "market": "xag",
+   "src": "silver-vol-breakout (complete years)",
+   "w": [
+    "2016-01-01",
+    "2025-12-31"
+   ],
+   "n": 1854,
+   "netR": -0.1,
+   "years": [
+    "2016",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025"
+   ],
+   "got": {
+    "n": 1854,
+    "netR": -0.1
+   },
+   "ok": true
+  }
+ ],
+ "gateOk": true,
+ "lastDay": "2026-11-20",
+ "data": "xau (Set A): 271849 M5 candles 2006-03-19 → 2009-12-31, 989 weekdays in the set, 705 base trades; eurusd (Set A): 381404 M5 candles 2005-01-02 → 2009-12-31, 1304 weekdays in the set, 953 base trades; gbpusd (Set A): 379947 M5 candles 2005-01-02 → 2009-12-31, 1304 weekdays in the set, 984 base trades; usdjpy (Set A): 381168 M5 candles 2005-01-02 → 2009-12-31, 1304 weekdays in the set, 970 base trades; audusd (Set A): 379975 M5 candles 2005-01-02 → 2009-12-31, 1304 weekdays in the set, 992 base trades; nzdusd (Set B): 1273553 M5 candles 2009-11-01 → 2026-11-23, 4399 weekdays in the set, 3263 base trades; usdcad (Set B): 1272857 M5 candles 2009-11-01 → 2026-11-23, 4399 weekdays in the set, 3259 base trades; usdchf (Set B): 1264888 M5 candles 2009-11-01 → 2026-11-23, 4399 weekdays in the set, 3305 base trades; eurjpy (Set B): 1278151 M5 candles 2009-11-01 → 2026-11-23, 4399 weekdays in the set, 3251 base trades; xag (Set B): 1191774 M5 candles 2009-11-01 → 2026-11-23, 4386 weekdays in the set, 3124 base trades. Source: the shared toolkit's OANDA mid M5 cache; 2010-2026 on the five main markets not read.",
+ "method": "Base rule imported unchanged (gold-vol-breakout buildDays / daySkip / vbTrade, k 0.5, both sides, stop at the UTC open, out at the 20:55 candle close). Early = the first fill's candle starts before 06:00 UTC (both orders cancelled at 06:00 otherwise). Cost a round trip: max(toolkit COSTS, the market's own study cost: gold $0.60, silver $0.03, forex 0.000045 x entry + 0.5 pip); 2x reported. Month sums by exit month over each set's span (empty months 0), Set A and Set B months pooled; p one-sided from the toolkit's t. Gate: the unfiltered rule at each study's own cost against its published by-year results on the overlapping holdout years.",
+ "sets": {
+  "A": {
+   "name": "Set A, early years (2005-2009, the five main markets)",
+   "markets": [
+    "xau",
+    "eurusd",
+    "gbpusd",
+    "usdjpy",
+    "audusd"
+   ],
+   "from": "2005-01-01",
+   "to": "2009-12-31",
+   "load": {
+    "from": "2004-11-01",
+    "to": "2010-01-01"
+   },
+   "span": [
+    "2005-01",
+    "2009-12"
+   ],
+   "early": {
+    "n": 1011,
+    "win": 0.449,
+    "netR": 0.239,
+    "grossR": 0.284,
+    "net2R": 0.195,
+    "total": 242.07,
+    "months": 60,
+    "t": 3.86,
+    "tRaw": 3.855531511313414,
+    "t2x": 3.14,
+    "grossT": 4.55,
+    "maxDD": -26.15,
+    "stops": 462,
+    "time": 549,
+    "buys": {
+     "n": 485,
+     "netR": 0.342
+    },
+    "sells": {
+     "n": 526,
+     "netR": 0.145
+    }
+   },
+   "late": {
+    "n": 3593,
+    "win": 0.462,
+    "netR": 0.01,
+    "grossR": 0.045,
+    "net2R": -0.026,
+    "total": 34.77,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -84.49,
+    "stops": 1052,
+    "time": 2541,
+    "buys": {
+     "n": 1825,
+     "netR": 0.055
+    },
+    "sells": {
+     "n": 1768,
+     "netR": -0.037
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.23,
+    "t": 4.12
+   },
+   "byYear": {
+    "2005": {
+     "n": 223,
+     "netR": 0.354,
+     "total": 79.04
+    },
+    "2006": {
+     "n": 192,
+     "netR": 0.327,
+     "total": 62.84
+    },
+    "2007": {
+     "n": 196,
+     "netR": 0.152,
+     "total": 29.76
+    },
+    "2008": {
+     "n": 188,
+     "netR": 0.11,
+     "total": 20.65
+    },
+    "2009": {
+     "n": 212,
+     "netR": 0.235,
+     "total": 49.77
+    }
+   }
+  },
+  "B": {
+   "name": "Set B, fresh markets (2010 → now)",
+   "markets": [
+    "nzdusd",
+    "usdcad",
+    "usdchf",
+    "eurjpy",
+    "xag"
+   ],
+   "from": "2010-01-01",
+   "to": "2099-12-31",
+   "load": {
+    "from": "2009-11-01"
+   },
+   "span": [
+    "2010-01",
+    "2026-11"
+   ],
+   "early": {
+    "n": 3510,
+    "win": 0.383,
+    "netR": 0.012,
+    "grossR": 0.082,
+    "net2R": -0.058,
+    "total": 42.19,
+    "months": 203,
+    "t": 0.39,
+    "tRaw": 0.3879261029146506,
+    "t2x": -1.89,
+    "grossT": 2.62,
+    "maxDD": -120.1,
+    "stops": 1816,
+    "time": 1694,
+    "buys": {
+     "n": 1659,
+     "netR": 0.032
+    },
+    "sells": {
+     "n": 1851,
+     "netR": -0.005
+    }
+   },
+   "late": {
+    "n": 12692,
+    "win": 0.431,
+    "netR": -0.046,
+    "grossR": 0.006,
+    "net2R": -0.099,
+    "total": -589.89,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -642.2,
+    "stops": 3920,
+    "time": 8772,
+    "buys": {
+     "n": 6388,
+     "netR": -0.035
+    },
+    "sells": {
+     "n": 6304,
+     "netR": -0.058
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.058,
+    "t": 2.06
+   },
+   "byYear": {
+    "2010": {
+     "n": 176,
+     "netR": 0.138,
+     "total": 24.35
+    },
+    "2011": {
+     "n": 189,
+     "netR": 0.036,
+     "total": 6.74
+    },
+    "2012": {
+     "n": 170,
+     "netR": -0.024,
+     "total": -4
+    },
+    "2013": {
+     "n": 203,
+     "netR": 0.022,
+     "total": 4.42
+    },
+    "2014": {
+     "n": 200,
+     "netR": 0.196,
+     "total": 39.25
+    },
+    "2015": {
+     "n": 163,
+     "netR": -0.002,
+     "total": -0.27
+    },
+    "2016": {
+     "n": 222,
+     "netR": -0.109,
+     "total": -24.2
+    },
+    "2017": {
+     "n": 194,
+     "netR": -0.101,
+     "total": -19.64
+    },
+    "2018": {
+     "n": 193,
+     "netR": 0.035,
+     "total": 6.8
+    },
+    "2019": {
+     "n": 227,
+     "netR": -0.109,
+     "total": -24.77
+    },
+    "2020": {
+     "n": 228,
+     "netR": 0.207,
+     "total": 47.21
+    },
+    "2021": {
+     "n": 177,
+     "netR": 0.085,
+     "total": 15.11
+    },
+    "2022": {
+     "n": 206,
+     "netR": -0.1,
+     "total": -20.65
+    },
+    "2023": {
+     "n": 194,
+     "netR": -0.25,
+     "total": -48.54
+    },
+    "2024": {
+     "n": 240,
+     "netR": 0.066,
+     "total": 15.9
+    },
+    "2025": {
+     "n": 274,
+     "netR": -0.061,
+     "total": -16.73
+    },
+    "2026": {
+     "n": 254,
+     "netR": 0.162,
+     "total": 41.19
+    }
+   }
+  }
+ },
+ "pooled": {
+  "early": {
+   "n": 4521,
+   "win": 0.398,
+   "netR": 0.063,
+   "grossR": 0.127,
+   "net2R": -0.002,
+   "total": 284.25,
+   "months": 263,
+   "t": 2.22,
+   "tRaw": 2.220658843139198,
+   "t2x": -0.06,
+   "grossT": 4.47,
+   "maxDD": -120.1,
+   "stops": 2278,
+   "time": 2243,
+   "buys": {
+    "n": 2144,
+    "netR": 0.102
+   },
+   "sells": {
+    "n": 2377,
+    "netR": 0.028
+   }
+  },
+  "late": {
+   "n": 16285,
+   "win": 0.438,
+   "netR": -0.034,
+   "grossR": 0.014,
+   "net2R": -0.083,
+   "total": -555.11,
+   "months": null,
+   "t": null,
+   "tRaw": null,
+   "t2x": null,
+   "grossT": null,
+   "maxDD": -642.2,
+   "stops": 4972,
+   "time": 11313,
+   "buys": {
+    "n": 8213,
+    "netR": -0.015
+   },
+   "sells": {
+    "n": 8072,
+    "netR": -0.053
+   }
+  },
+  "earlyMinusLate": {
+   "diff": 0.097,
+   "t": 3.83
+  },
+  "byYear": {
+   "2005": {
+    "n": 223,
+    "netR": 0.354,
+    "total": 79.04
+   },
+   "2006": {
+    "n": 192,
+    "netR": 0.327,
+    "total": 62.84
+   },
+   "2007": {
+    "n": 196,
+    "netR": 0.152,
+    "total": 29.76
+   },
+   "2008": {
+    "n": 188,
+    "netR": 0.11,
+    "total": 20.65
+   },
+   "2009": {
+    "n": 212,
+    "netR": 0.235,
+    "total": 49.77
+   },
+   "2010": {
+    "n": 176,
+    "netR": 0.138,
+    "total": 24.35
+   },
+   "2011": {
+    "n": 189,
+    "netR": 0.036,
+    "total": 6.74
+   },
+   "2012": {
+    "n": 170,
+    "netR": -0.024,
+    "total": -4
+   },
+   "2013": {
+    "n": 203,
+    "netR": 0.022,
+    "total": 4.42
+   },
+   "2014": {
+    "n": 200,
+    "netR": 0.196,
+    "total": 39.25
+   },
+   "2015": {
+    "n": 163,
+    "netR": -0.002,
+    "total": -0.27
+   },
+   "2016": {
+    "n": 222,
+    "netR": -0.109,
+    "total": -24.2
+   },
+   "2017": {
+    "n": 194,
+    "netR": -0.101,
+    "total": -19.64
+   },
+   "2018": {
+    "n": 193,
+    "netR": 0.035,
+    "total": 6.8
+   },
+   "2019": {
+    "n": 227,
+    "netR": -0.109,
+    "total": -24.77
+   },
+   "2020": {
+    "n": 228,
+    "netR": 0.207,
+    "total": 47.21
+   },
+   "2021": {
+    "n": 177,
+    "netR": 0.085,
+    "total": 15.11
+   },
+   "2022": {
+    "n": 206,
+    "netR": -0.1,
+    "total": -20.65
+   },
+   "2023": {
+    "n": 194,
+    "netR": -0.25,
+    "total": -48.54
+   },
+   "2024": {
+    "n": 240,
+    "netR": 0.066,
+    "total": 15.9
+   },
+   "2025": {
+    "n": 274,
+    "netR": -0.061,
+    "total": -16.73
+   },
+   "2026": {
+    "n": 254,
+    "netR": 0.162,
+    "total": 41.19
+   }
+  }
+ },
+ "primaryStats": {
+  "n": 4521,
+  "win": 0.398,
+  "netR": 0.063,
+  "grossR": 0.127,
+  "net2R": -0.002,
+  "total": 284.25,
+  "months": 263,
+  "t": 2.22,
+  "tRaw": 2.220658843139198,
+  "t2x": -0.06,
+  "grossT": 4.47,
+  "maxDD": -120.1,
+  "stops": 2278,
+  "time": 2243,
+  "buys": {
+   "n": 2144,
+   "netR": 0.102
+  },
+  "sells": {
+   "n": 2377,
+   "netR": 0.028
+  }
+ },
+ "markets": {
+  "xau": {
+   "set": "A",
+   "early": {
+    "n": 83,
+    "win": 0.446,
+    "netR": 0.413,
+    "grossR": 0.617,
+    "net2R": 0.209,
+    "total": 34.24,
+    "months": 60,
+    "t": 1.68,
+    "tRaw": 1.6788830510536952,
+    "t2x": 0.81,
+    "grossT": 2.49,
+    "maxDD": -7.12,
+    "stops": 36,
+    "time": 47,
+    "buys": {
+     "n": 39,
+     "netR": 0.491
+    },
+    "sells": {
+     "n": 44,
+     "netR": 0.343
+    }
+   },
+   "late": {
+    "n": 622,
+    "win": 0.455,
+    "netR": 0.052,
+    "grossR": 0.154,
+    "net2R": -0.049,
+    "total": 32.43,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -24.1,
+    "stops": 184,
+    "time": 438,
+    "buys": {
+     "n": 307,
+     "netR": 0.173
+    },
+    "sells": {
+     "n": 315,
+     "netR": -0.066
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.36,
+    "t": 1.44
+   },
+   "byYear": {
+    "2006": {
+     "n": 17,
+     "netR": 0.181,
+     "total": 3.07
+    },
+    "2007": {
+     "n": 23,
+     "netR": 1.07,
+     "total": 24.61
+    },
+    "2008": {
+     "n": 17,
+     "netR": 0.004,
+     "total": 0.06
+    },
+    "2009": {
+     "n": 26,
+     "netR": 0.25,
+     "total": 6.49
+    }
+   }
+  },
+  "eurusd": {
+   "set": "A",
+   "early": {
+    "n": 173,
+    "win": 0.428,
+    "netR": 0.233,
+    "grossR": 0.266,
+    "net2R": 0.2,
+    "total": 40.27,
+    "months": 60,
+    "t": 1.7,
+    "tRaw": 1.7023016394562152,
+    "t2x": 1.46,
+    "grossT": 1.94,
+    "maxDD": -14.53,
+    "stops": 89,
+    "time": 84,
+    "buys": {
+     "n": 89,
+     "netR": 0.379
+    },
+    "sells": {
+     "n": 84,
+     "netR": 0.078
+    }
+   },
+   "late": {
+    "n": 780,
+    "win": 0.46,
+    "netR": -0.013,
+    "grossR": 0.011,
+    "net2R": -0.036,
+    "total": -9.95,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -29.42,
+    "stops": 249,
+    "time": 531,
+    "buys": {
+     "n": 402,
+     "netR": 0.009
+    },
+    "sells": {
+     "n": 378,
+     "netR": -0.036
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.246,
+    "t": 1.74
+   },
+   "byYear": {
+    "2005": {
+     "n": 50,
+     "netR": 0.419,
+     "total": 20.94
+    },
+    "2006": {
+     "n": 31,
+     "netR": 0.757,
+     "total": 23.46
+    },
+    "2007": {
+     "n": 27,
+     "netR": -0.254,
+     "total": -6.84
+    },
+    "2008": {
+     "n": 32,
+     "netR": -0.075,
+     "total": -2.39
+    },
+    "2009": {
+     "n": 33,
+     "netR": 0.154,
+     "total": 5.1
+    }
+   }
+  },
+  "gbpusd": {
+   "set": "A",
+   "early": {
+    "n": 145,
+    "win": 0.407,
+    "netR": 0.231,
+    "grossR": 0.26,
+    "net2R": 0.202,
+    "total": 33.43,
+    "months": 60,
+    "t": 1.5,
+    "tRaw": 1.4961962656168883,
+    "t2x": 1.31,
+    "grossT": 1.68,
+    "maxDD": -17.22,
+    "stops": 73,
+    "time": 72,
+    "buys": {
+     "n": 71,
+     "netR": 0.539
+    },
+    "sells": {
+     "n": 74,
+     "netR": -0.066
+    }
+   },
+   "late": {
+    "n": 839,
+    "win": 0.467,
+    "netR": 0.04,
+    "grossR": 0.06,
+    "net2R": 0.02,
+    "total": 33.2,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -16.89,
+    "stops": 252,
+    "time": 587,
+    "buys": {
+     "n": 420,
+     "netR": 0.092
+    },
+    "sells": {
+     "n": 419,
+     "netR": -0.013
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.191,
+    "t": 1.21
+   },
+   "byYear": {
+    "2005": {
+     "n": 41,
+     "netR": 0.258,
+     "total": 10.59
+    },
+    "2006": {
+     "n": 23,
+     "netR": 1.416,
+     "total": 32.56
+    },
+    "2007": {
+     "n": 29,
+     "netR": -0.384,
+     "total": -11.14
+    },
+    "2008": {
+     "n": 26,
+     "netR": -0.102,
+     "total": -2.64
+    },
+    "2009": {
+     "n": 26,
+     "netR": 0.157,
+     "total": 4.07
+    }
+   }
+  },
+  "usdjpy": {
+   "set": "A",
+   "early": {
+    "n": 281,
+    "win": 0.488,
+    "netR": 0.313,
+    "grossR": 0.343,
+    "net2R": 0.284,
+    "total": 88.09,
+    "months": 60,
+    "t": 3.15,
+    "tRaw": 3.1520242359524238,
+    "t2x": 2.86,
+    "grossT": 3.44,
+    "maxDD": -10.22,
+    "stops": 112,
+    "time": 169,
+    "buys": {
+     "n": 121,
+     "netR": 0.334
+    },
+    "sells": {
+     "n": 160,
+     "netR": 0.298
+    }
+   },
+   "late": {
+    "n": 689,
+    "win": 0.47,
+    "netR": 0.012,
+    "grossR": 0.034,
+    "net2R": -0.01,
+    "total": 8.37,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -21.15,
+    "stops": 191,
+    "time": 498,
+    "buys": {
+     "n": 344,
+     "netR": 0.067
+    },
+    "sells": {
+     "n": 345,
+     "netR": -0.042
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.301,
+    "t": 2.91
+   },
+   "byYear": {
+    "2005": {
+     "n": 63,
+     "netR": 0.467,
+     "total": 29.41
+    },
+    "2006": {
+     "n": 54,
+     "netR": 0.204,
+     "total": 11
+    },
+    "2007": {
+     "n": 48,
+     "netR": 0.301,
+     "total": 14.44
+    },
+    "2008": {
+     "n": 51,
+     "netR": 0.131,
+     "total": 6.67
+    },
+    "2009": {
+     "n": 65,
+     "netR": 0.409,
+     "total": 26.56
+    }
+   }
+  },
+  "audusd": {
+   "set": "A",
+   "early": {
+    "n": 329,
+    "win": 0.447,
+    "netR": 0.14,
+    "grossR": 0.17,
+    "net2R": 0.109,
+    "total": 46.03,
+    "months": 60,
+    "t": 1.59,
+    "tRaw": 1.5904332689974794,
+    "t2x": 1.25,
+    "grossT": 1.93,
+    "maxDD": -16.34,
+    "stops": 152,
+    "time": 177,
+    "buys": {
+     "n": 165,
+     "netR": 0.208
+    },
+    "sells": {
+     "n": 164,
+     "netR": 0.071
+    }
+   },
+   "late": {
+    "n": 663,
+    "win": 0.456,
+    "netR": -0.044,
+    "grossR": -0.022,
+    "net2R": -0.066,
+    "total": -29.28,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -35.9,
+    "stops": 176,
+    "time": 487,
+    "buys": {
+     "n": 352,
+     "netR": -0.054
+    },
+    "sells": {
+     "n": 311,
+     "netR": -0.034
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.184,
+    "t": 2.13
+   },
+   "byYear": {
+    "2005": {
+     "n": 69,
+     "netR": 0.262,
+     "total": 18.1
+    },
+    "2006": {
+     "n": 67,
+     "netR": -0.108,
+     "total": -7.25
+    },
+    "2007": {
+     "n": 69,
+     "netR": 0.126,
+     "total": 8.69
+    },
+    "2008": {
+     "n": 62,
+     "netR": 0.306,
+     "total": 18.95
+    },
+    "2009": {
+     "n": 62,
+     "netR": 0.122,
+     "total": 7.54
+    }
+   }
+  },
+  "nzdusd": {
+   "set": "B",
+   "early": {
+    "n": 1070,
+    "win": 0.407,
+    "netR": -0.043,
+    "grossR": -0.007,
+    "net2R": -0.08,
+    "total": -46.54,
+    "months": 203,
+    "t": -1.11,
+    "tRaw": -1.107639967224833,
+    "t2x": -2.02,
+    "grossT": -0.19,
+    "maxDD": -70.11,
+    "stops": 516,
+    "time": 554,
+    "buys": {
+     "n": 539,
+     "netR": -0.098
+    },
+    "sells": {
+     "n": 531,
+     "netR": 0.012
+    }
+   },
+   "late": {
+    "n": 2193,
+    "win": 0.454,
+    "netR": -0.038,
+    "grossR": -0.011,
+    "net2R": -0.065,
+    "total": -83.97,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -92.03,
+    "stops": 568,
+    "time": 1625,
+    "buys": {
+     "n": 1147,
+     "netR": -0.038
+    },
+    "sells": {
+     "n": 1046,
+     "netR": -0.039
+    }
+   },
+   "earlyMinusLate": {
+    "diff": -0.005,
+    "t": -0.12
+   },
+   "byYear": {
+    "2010": {
+     "n": 53,
+     "netR": -0.064,
+     "total": -3.38
+    },
+    "2011": {
+     "n": 66,
+     "netR": -0.028,
+     "total": -1.86
+    },
+    "2012": {
+     "n": 50,
+     "netR": -0.166,
+     "total": -8.31
+    },
+    "2013": {
+     "n": 55,
+     "netR": -0.324,
+     "total": -17.84
+    },
+    "2014": {
+     "n": 65,
+     "netR": 0.276,
+     "total": 17.93
+    },
+    "2015": {
+     "n": 60,
+     "netR": 0.092,
+     "total": 5.49
+    },
+    "2016": {
+     "n": 57,
+     "netR": -0.131,
+     "total": -7.48
+    },
+    "2017": {
+     "n": 72,
+     "netR": -0.091,
+     "total": -6.56
+    },
+    "2018": {
+     "n": 65,
+     "netR": 0.093,
+     "total": 6.03
+    },
+    "2019": {
+     "n": 82,
+     "netR": -0.315,
+     "total": -25.82
+    },
+    "2020": {
+     "n": 57,
+     "netR": 0.166,
+     "total": 9.44
+    },
+    "2021": {
+     "n": 46,
+     "netR": 0.148,
+     "total": 6.79
+    },
+    "2022": {
+     "n": 58,
+     "netR": -0.01,
+     "total": -0.59
+    },
+    "2023": {
+     "n": 71,
+     "netR": -0.331,
+     "total": -23.51
+    },
+    "2024": {
+     "n": 72,
+     "netR": -0.008,
+     "total": -0.54
+    },
+    "2025": {
+     "n": 75,
+     "netR": -0.098,
+     "total": -7.34
+    },
+    "2026": {
+     "n": 66,
+     "netR": 0.167,
+     "total": 11.01
+    }
+   }
+  },
+  "usdcad": {
+   "set": "B",
+   "early": {
+    "n": 383,
+    "win": 0.355,
+    "netR": 0.005,
+    "grossR": 0.055,
+    "net2R": -0.044,
+    "total": 2.04,
+    "months": 203,
+    "t": 0.06,
+    "tRaw": 0.06001282888180676,
+    "t2x": -0.49,
+    "grossT": 0.62,
+    "maxDD": -42.56,
+    "stops": 228,
+    "time": 155,
+    "buys": {
+     "n": 196,
+     "netR": 0.053
+    },
+    "sells": {
+     "n": 187,
+     "netR": -0.044
+    }
+   },
+   "late": {
+    "n": 2876,
+    "win": 0.426,
+    "netR": -0.077,
+    "grossR": -0.044,
+    "net2R": -0.109,
+    "total": -220.54,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -233.89,
+    "stops": 1009,
+    "time": 1867,
+    "buys": {
+     "n": 1498,
+     "netR": -0.076
+    },
+    "sells": {
+     "n": 1378,
+     "netR": -0.077
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.082,
+    "t": 0.92
+   },
+   "byYear": {
+    "2010": {
+     "n": 16,
+     "netR": 0.209,
+     "total": 3.34
+    },
+    "2011": {
+     "n": 18,
+     "netR": 0.368,
+     "total": 6.62
+    },
+    "2012": {
+     "n": 15,
+     "netR": -0.166,
+     "total": -2.49
+    },
+    "2013": {
+     "n": 21,
+     "netR": 0.426,
+     "total": 8.94
+    },
+    "2014": {
+     "n": 17,
+     "netR": -0.017,
+     "total": -0.29
+    },
+    "2015": {
+     "n": 10,
+     "netR": 0.606,
+     "total": 6.06
+    },
+    "2016": {
+     "n": 21,
+     "netR": -0.097,
+     "total": -2.04
+    },
+    "2017": {
+     "n": 20,
+     "netR": -0.202,
+     "total": -4.04
+    },
+    "2018": {
+     "n": 17,
+     "netR": 0.042,
+     "total": 0.71
+    },
+    "2019": {
+     "n": 23,
+     "netR": -0.29,
+     "total": -6.67
+    },
+    "2020": {
+     "n": 39,
+     "netR": 0.677,
+     "total": 26.41
+    },
+    "2021": {
+     "n": 18,
+     "netR": 0.26,
+     "total": 4.67
+    },
+    "2022": {
+     "n": 36,
+     "netR": -0.389,
+     "total": -14.02
+    },
+    "2023": {
+     "n": 29,
+     "netR": -0.208,
+     "total": -6.03
+    },
+    "2024": {
+     "n": 24,
+     "netR": -0.071,
+     "total": -1.7
+    },
+    "2025": {
+     "n": 31,
+     "netR": -0.372,
+     "total": -11.52
+    },
+    "2026": {
+     "n": 28,
+     "netR": -0.212,
+     "total": -5.93
+    }
+   }
+  },
+  "usdchf": {
+   "set": "B",
+   "early": {
+    "n": 389,
+    "win": 0.35,
+    "netR": -0.013,
+    "grossR": 0.032,
+    "net2R": -0.059,
+    "total": -5.1,
+    "months": 203,
+    "t": -0.15,
+    "tRaw": -0.15439590193434258,
+    "t2x": -0.69,
+    "grossT": 0.38,
+    "maxDD": -25.43,
+    "stops": 231,
+    "time": 158,
+    "buys": {
+     "n": 182,
+     "netR": 0.051
+    },
+    "sells": {
+     "n": 207,
+     "netR": -0.07
+    }
+   },
+   "late": {
+    "n": 2916,
+    "win": 0.429,
+    "netR": -0.019,
+    "grossR": 0.013,
+    "net2R": -0.052,
+    "total": -56.4,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -142.35,
+    "stops": 971,
+    "time": 1945,
+    "buys": {
+     "n": 1470,
+     "netR": -0.016
+    },
+    "sells": {
+     "n": 1446,
+     "netR": -0.023
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.006,
+    "t": 0.07
+   },
+   "byYear": {
+    "2010": {
+     "n": 35,
+     "netR": -0.066,
+     "total": -2.31
+    },
+    "2011": {
+     "n": 34,
+     "netR": -0.209,
+     "total": -7.12
+    },
+    "2012": {
+     "n": 26,
+     "netR": -0.02,
+     "total": -0.53
+    },
+    "2013": {
+     "n": 21,
+     "netR": 0.172,
+     "total": 3.61
+    },
+    "2014": {
+     "n": 19,
+     "netR": -0.012,
+     "total": -0.23
+    },
+    "2015": {
+     "n": 11,
+     "netR": 0.788,
+     "total": 8.67
+    },
+    "2016": {
+     "n": 25,
+     "netR": -0.112,
+     "total": -2.81
+    },
+    "2017": {
+     "n": 29,
+     "netR": 0.049,
+     "total": 1.42
+    },
+    "2018": {
+     "n": 16,
+     "netR": -0.111,
+     "total": -1.77
+    },
+    "2019": {
+     "n": 16,
+     "netR": 0.339,
+     "total": 5.42
+    },
+    "2020": {
+     "n": 19,
+     "netR": -0.075,
+     "total": -1.42
+    },
+    "2021": {
+     "n": 17,
+     "netR": 0.427,
+     "total": 7.25
+    },
+    "2022": {
+     "n": 19,
+     "netR": -0.408,
+     "total": -7.75
+    },
+    "2023": {
+     "n": 13,
+     "netR": -0.698,
+     "total": -9.07
+    },
+    "2024": {
+     "n": 24,
+     "netR": 0.155,
+     "total": 3.72
+    },
+    "2025": {
+     "n": 35,
+     "netR": -0.072,
+     "total": -2.51
+    },
+    "2026": {
+     "n": 30,
+     "netR": 0.011,
+     "total": 0.34
+    }
+   }
+  },
+  "eurjpy": {
+   "set": "B",
+   "early": {
+    "n": 926,
+    "win": 0.393,
+    "netR": 0.089,
+    "grossR": 0.12,
+    "net2R": 0.058,
+    "total": 82.68,
+    "months": 203,
+    "t": 1.59,
+    "tRaw": 1.5873956699091494,
+    "t2x": 1.04,
+    "grossT": 2.13,
+    "maxDD": -22.76,
+    "stops": 455,
+    "time": 471,
+    "buys": {
+     "n": 403,
+     "netR": 0.177
+    },
+    "sells": {
+     "n": 523,
+     "netR": 0.022
+    }
+   },
+   "late": {
+    "n": 2325,
+    "win": 0.464,
+    "netR": 0.009,
+    "grossR": 0.033,
+    "net2R": -0.015,
+    "total": 20.23,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -43.57,
+    "stops": 608,
+    "time": 1717,
+    "buys": {
+     "n": 1135,
+     "netR": 0.051
+    },
+    "sells": {
+     "n": 1190,
+     "netR": -0.031
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.081,
+    "t": 1.37
+   },
+   "byYear": {
+    "2010": {
+     "n": 46,
+     "netR": 0.194,
+     "total": 8.93
+    },
+    "2011": {
+     "n": 45,
+     "netR": -0.01,
+     "total": -0.44
+    },
+    "2012": {
+     "n": 51,
+     "netR": 0.05,
+     "total": 2.53
+    },
+    "2013": {
+     "n": 58,
+     "netR": 0.266,
+     "total": 15.41
+    },
+    "2014": {
+     "n": 57,
+     "netR": 0.09,
+     "total": 5.15
+    },
+    "2015": {
+     "n": 44,
+     "netR": -0.116,
+     "total": -5.09
+    },
+    "2016": {
+     "n": 68,
+     "netR": 0.036,
+     "total": 2.48
+    },
+    "2017": {
+     "n": 43,
+     "netR": 0.034,
+     "total": 1.47
+    },
+    "2018": {
+     "n": 57,
+     "netR": 0.013,
+     "total": 0.76
+    },
+    "2019": {
+     "n": 63,
+     "netR": 0.153,
+     "total": 9.61
+    },
+    "2020": {
+     "n": 50,
+     "netR": 0.192,
+     "total": 9.61
+    },
+    "2021": {
+     "n": 46,
+     "netR": 0.097,
+     "total": 4.46
+    },
+    "2022": {
+     "n": 58,
+     "netR": 0.199,
+     "total": 11.56
+    },
+    "2023": {
+     "n": 44,
+     "netR": 0.016,
+     "total": 0.69
+    },
+    "2024": {
+     "n": 68,
+     "netR": 0.074,
+     "total": 5.06
+    },
+    "2025": {
+     "n": 70,
+     "netR": -0.026,
+     "total": -1.8
+    },
+    "2026": {
+     "n": 58,
+     "netR": 0.212,
+     "total": 12.3
+    }
+   }
+  },
+  "xag": {
+   "set": "B",
+   "early": {
+    "n": 742,
+    "win": 0.367,
+    "netR": 0.012,
+    "grossR": 0.204,
+    "net2R": -0.18,
+    "total": 9.11,
+    "months": 203,
+    "t": 0.18,
+    "tRaw": 0.17750505427348884,
+    "t2x": -2.52,
+    "grossT": 2.98,
+    "maxDD": -91.26,
+    "stops": 386,
+    "time": 356,
+    "buys": {
+     "n": 339,
+     "netR": 0.042
+    },
+    "sells": {
+     "n": 403,
+     "netR": -0.013
+    }
+   },
+   "late": {
+    "n": 2382,
+    "win": 0.385,
+    "netR": -0.105,
+    "grossR": 0.045,
+    "net2R": -0.255,
+    "total": -249.21,
+    "months": null,
+    "t": null,
+    "tRaw": null,
+    "t2x": null,
+    "grossT": null,
+    "maxDD": -270.18,
+    "stops": 764,
+    "time": 1618,
+    "buys": {
+     "n": 1138,
+     "netR": -0.089
+    },
+    "sells": {
+     "n": 1244,
+     "netR": -0.119
+    }
+   },
+   "earlyMinusLate": {
+    "diff": 0.117,
+    "t": 1.68
+   },
+   "byYear": {
+    "2010": {
+     "n": 26,
+     "netR": 0.684,
+     "total": 17.78
+    },
+    "2011": {
+     "n": 26,
+     "netR": 0.367,
+     "total": 9.53
+    },
+    "2012": {
+     "n": 28,
+     "netR": 0.171,
+     "total": 4.8
+    },
+    "2013": {
+     "n": 48,
+     "netR": -0.119,
+     "total": -5.69
+    },
+    "2014": {
+     "n": 42,
+     "netR": 0.398,
+     "total": 16.7
+    },
+    "2015": {
+     "n": 38,
+     "netR": -0.405,
+     "total": -15.4
+    },
+    "2016": {
+     "n": 51,
+     "netR": -0.281,
+     "total": -14.34
+    },
+    "2017": {
+     "n": 30,
+     "netR": -0.398,
+     "total": -11.93
+    },
+    "2018": {
+     "n": 38,
+     "netR": 0.028,
+     "total": 1.07
+    },
+    "2019": {
+     "n": 43,
+     "netR": -0.17,
+     "total": -7.3
+    },
+    "2020": {
+     "n": 63,
+     "netR": 0.05,
+     "total": 3.18
+    },
+    "2021": {
+     "n": 50,
+     "netR": -0.161,
+     "total": -8.07
+    },
+    "2022": {
+     "n": 35,
+     "netR": -0.282,
+     "total": -9.86
+    },
+    "2023": {
+     "n": 37,
+     "netR": -0.287,
+     "total": -10.62
+    },
+    "2024": {
+     "n": 52,
+     "netR": 0.18,
+     "total": 9.36
+    },
+    "2025": {
+     "n": 63,
+     "netR": 0.102,
+     "total": 6.44
+    },
+    "2026": {
+     "n": 72,
+     "netR": 0.326,
+     "total": 23.46
+    }
+   }
+  }
+ },
+ "unfiltered": {
+  "n": 20806,
+  "netR": -0.013,
+  "grossR": 0.039
+ },
+ "reading": "The rule does not pass the pre-registered bar (FAIL; missed: holm, cost2x). Early fills, pooled: +0.063R a trade after costs (n 4521, gross +0.127R, month t +2.22 over 263 months). Late fills of the same rule: −0.034R (n 16285); early minus late +0.097R (Welch t +3.83). NZD/USD, the cleanest slice (never in a breakout study, no verdict): early −0.043R (n 1070, month t −1.11), late −0.038R (n 2193). Gold 2006-09 early +0.413R (n 83); USD/JPY 2005-09 early +0.313R (n 281). Line 5 (2x costs) is missed whatever the four sibling studies report, so the FAIL does not wait on the family's Holm. Set A (2005-09) is strong (+0.239R, month t +3.86) and Set B (fresh markets, 2010 on) is flat (+0.012R, t +0.39): the early-fill lean held in the early years of the markets it was found on, not on markets it was never seen on. Early fills beat late fills on both sets (Welch t +4.12 and +2.06), on Set B early fills are about flat and late fills lose. The split was chosen from in-sample trades of 2010-2026 on the five main markets; whatever it shows here is read as the pre-registration says, never as an edge without its n and t."
+}

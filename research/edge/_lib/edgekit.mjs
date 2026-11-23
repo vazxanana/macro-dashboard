@@ -6,9 +6,12 @@
 // the session scratchpad below; set the environment variable EDGE_DATA to read another copy.
 // Markets: xau, eurusd, gbpusd, usdjpy, audusd. Timeframes: '5m' (2010 on), '1d' (2009 on, raw UTC days, Sunday stubs
 // included: use dailyNY on 5m candles for trading days).
+// Holdout (23 Nov 2026): the same five markets 2005-01-01 to 2009-12-31 (5m and 1d; OANDA's gold starts later, see
+// INDEX.json), and HOLDOUT_MARKETS nzdusd, usdcad, usdchf, eurjpy, xag from 2005 to now (5m and 1d). Untouched by the
+// studies of 22-23 Nov: judge anything new there. MARKETS stays the five read markets so earlier studies re-run alike.
 //
 // API (a bar is { t, o, h, l, c, e } with e = the moment it closes; every index below is into the array handed in):
-//   DATA_DIR, MARKETS, COSTS, TF                     constants (COSTS: round trip in price units, the desk's demo figures)
+//   DATA_DIR, MARKETS, HOLDOUT_MARKETS, HOLDOUT, COSTS, TF                     constants (COSTS: round trip in price units, the desk's demo figures)
 //   load(market, tf, { from, to })                   bars from the cache, sorted, t in [from, to) (unix s or 'YYYY-MM-DD')
 //   resample(bars, sec)                              UTC-aligned buckets (900 / 1800 / 3600 / 14400 ...), e = t + sec
 //   dailyNY(bars)                                    17:00 New York trading days (weekend candles folded into Monday)
@@ -37,10 +40,14 @@ import path from 'node:path';
 
 export const DATA_DIR = process.env.EDGE_DATA || '/tmp/claude-0/-workspace-macro-dashboard/70c7c5c7-1744-58d1-abc7-8a850c1b63a7/scratchpad/edge-data';
 export const MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd'];
+export const HOLDOUT_MARKETS = ['nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
+export const HOLDOUT = { early: { from: '2005-01-01', to: '2010-01-01', markets: MARKETS }, fresh: { from: '2005-01-01', markets: HOLDOUT_MARKETS } };
 export const TF = { '5m': 300, '15m': 900, '30m': 1800, '1h': 3600, '4h': 14400, '1d': 86400 };
 // Round-trip cost in price units per market: the desk's demo-account figures (spread + commission, rounded up), the same
 // for every year. Studies may charge more; never less without a measured source.
-export const COSTS = { xau: 0.30, eurusd: 0.00006, gbpusd: 0.00008, usdjpy: 0.008, audusd: 0.00006 };
+export const COSTS = { xau: 0.30, eurusd: 0.00006, gbpusd: 0.00008, usdjpy: 0.008, audusd: 0.00006,
+  // holdout markets: ASSUMED round trips (not measured on the demo account; 23 Nov 2026)
+  nzdusd: 0.00007, usdcad: 0.00007, usdchf: 0.00007, eurjpy: 0.010, xag: 0.03 };
 
 const toSec = (x) => (x == null ? null : typeof x === 'number' ? x : Math.floor(Date.parse(x + (String(x).length <= 10 ? 'T00:00:00Z' : '')) / 1000));
 
