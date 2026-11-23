@@ -253,6 +253,16 @@ function resultMd(o, rows) {
     'A before-cost tilt, not an edge; nothing is adopted; a forward record or a live change needs the owner. One run, no variants.');
   else L.push('No cell clears the bar. Opening prices as levels do not pick trades that beat the plain fade-the-break rule at the same',
     'times in both decades, before costs. Do not re-test variants of these 57 cells on these years. Nothing live changed; no rule is proposed.');
+  const b4 = rows.filter((r) => o.passBars1to4.includes(r.name));
+  if (b4.length) L.push('', `**The near misses.** ${b4.length} cell(s) clear bars 1-4 (${b4.map((r) => `${r.name} ${f3(r.c.mean)}R, t ${f2(r.c.t)}`).join('; ')}),`,
+    `but each does worse than or no better than the plain fade rule at the same times (2015-26 control ${b4.map((r) => f3(r.c.ctl)).join(' / ')}R;`,
+    `Welch t ${b4.map((r) => f2(r.c.welch)).join(' / ')}): fading a cross of an opening price is the general short-term pull-back`,
+    '`grid7-wide-fade` already measured, and the opening price adds nothing to it. After costs every one loses (about -0.35R a trade:',
+    'the stop past the cross candle is small, so the round trip is about 0.4R).');
+  if (o.flippedPass1to4.length) L.push('', `**Side flipped.** ${o.flippedPass1to4.length} flipped cells clear bars 1-4 (the "with" cells traded against the cross with a`,
+    '1 ATR stop): +0.01 to +0.02R a trade before costs, about a tenth of their round trip. Not pre-registered as cells, not a',
+    'finding: the same pull-back tilt again. The fade-at-1R cells (and their flips) are depressed by the pre-registered rule that',
+    'books a 5-minute candle holding both stop and target as the stop, which hits small stops hardest.');
   L.push('');
   return L.join('\n');
 }
