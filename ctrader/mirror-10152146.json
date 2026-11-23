@@ -221,7 +221,7 @@
    "startBalance": 10023.08
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10023.08 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 10023.08 · 3 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -232,10 +232,32 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "eurusd-position-1795437907": {
+    "orderId": "34672452",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "position",
+    "limitPrice": 1.09532,
+    "stop": 1.10073,
+    "t1": 1.0845000000000002,
+    "placedAt": "2026-11-23T12:46:19.000Z",
+    "expires": "2026-11-28T12:45:07.000Z",
+    "riskCash": 5.41,
+    "margin": 2.19,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10023.08,
-  "lastRun": "2026-11-23T12:43:40.000Z"
+  "lastRun": "2026-11-23T12:46:19.000Z"
  },
  "log": [
   {
@@ -413,6 +435,11 @@
    "at": "2026-11-22T22:25:08.000Z",
    "msg": "BTCUSD position 50662694 closed at the broker",
    "trade": "btc-position-1795267415"
+  },
+  {
+   "at": "2026-11-23T12:46:19.000Z",
+   "msg": "placed sell limit EURUSD 0.01 lot at 1.09532 (council position, valid to 2026-11-28T12:45Z)",
+   "trade": "eurusd-position-1795437907"
   }
  ],
  "limits": {
