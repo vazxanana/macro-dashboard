@@ -1,7 +1,7 @@
 // research/edge/eg-3tf-chain-2020/run.mjs - the three-timeframe engulf chain of PREREGISTRATION.md (23 Nov 2026).
 // node research/edge/eg-3tf-chain-2020/run.mjs market <market> <outDir>   one market: the desk code's trades + the close-based cut
 // node research/edge/eg-3tf-chain-2020/run.mjs report <outDir>            pool, apply the pre-registered bar, write result.json
-// node research/edge/eg-3tf-chain-2020/run.mjs cut <market> <cutISO>      no-look-ahead check: trades before the cut must not change
+// node research/edge/eg-3tf-chain-2020/run.mjs cut <market> <cutISO> <outDir>  no-look-ahead check: trades before the cut must not change
 // Research only: imports council/eg-methods.mjs (sopTrades3, zones; not edited), edgekit and combo-grid-2 (COSTS, exclusions,
 // MONTHS, mstat). Writes only to <outDir> and this folder's result.json.
 import fs from 'node:fs';
@@ -132,9 +132,10 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [cmd, a, b] = process.argv.slice(2);
   if (cmd === 'market') { const t0 = Date.now(); const out = runMarket(a); fs.mkdirSync(b, { recursive: true }); fs.writeFileSync(path.join(b, a + '.json'), JSON.stringify(out));
     console.log(a, out.rows.length, 'trades', out.open, 'open', out.dropped, 'dropped', ((Date.now() - t0) / 1000).toFixed(0) + 's'); }
-  else if (cmd === 'report') { const R = report(a); const prev = fs.existsSync(path.join(HERE, 'result.json')) ? JSON.parse(fs.readFileSync(path.join(HERE, 'result.json'), 'utf8')) : {};
-    if (prev.cutCheck) R.cutCheck = prev.cutCheck; fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(R, null, 1)); console.log(R.verdict, R.headline);
+  else if (cmd === 'report') { const R = report(a); const cf = path.join(a, 'cut.json'); if (fs.existsSync(cf)) R.cutCheck = JSON.parse(fs.readFileSync(cf, 'utf8'));
+    fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(R, null, 1)); console.log(R.verdict, R.headline);
     for (const t of R.tests) console.log(t.id, t.chain, t.target, JSON.stringify(t.disc), JSON.stringify(t.conf), 'holm', t.holm, t.verdict); }
-  else if (cmd === 'cut') { console.log(JSON.stringify(cutCheck(a, b))); }
+  else if (cmd === 'cut') { const dir = process.argv[5]; const r = cutCheck(a, b); console.log(JSON.stringify(r));
+    if (dir) { const cf = path.join(dir, 'cut.json'); const list = fs.existsSync(cf) ? JSON.parse(fs.readFileSync(cf, 'utf8')) : []; list.push(r); fs.writeFileSync(cf, JSON.stringify(list, null, 1)); } }
   else console.log('usage: run.mjs market <m> <dir> | report <dir> | cut <m> <ISO>');
 }
