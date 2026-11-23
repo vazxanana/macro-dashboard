@@ -6531,8 +6531,8 @@ one canvas above the chart's, `pointer-events: none`, clipped to the price pane;
 storage), nothing written. No live ticks yet (the page's tick stream is the Charts market only). `MS_DESK_LIVE.state(k)` is the
 audit's read-only view. Test: `tests/desk-live-chart.test.mjs`.
 
-## H4 EF barrier to the next H4 EG, and the H4 engulf map on the live chart (23 Nov 2026, the owner's gold trade of 22-23 Nov)
-The owner's trade: the H4 sell engulf zone 3566.86-3595.29 (base 20 Nov 08:00 UTC) failed at the 04:00 H4 close of 23 Nov, so it is a
+## H4 EF barrier to the next H4 EG, and the H4 engulf map on the live chart (23 Nov 2026, a gold example of 20-23 Nov)
+The example: the H4 sell engulf zone 3566.86-3595.29 (base 20 Nov 08:00 UTC) failed at the 04:00 H4 close of 23 Nov, so it is a
 buy barrier (an EF); price comes back into it, an M15 BO with it, long at the retest (a limit at the zone's top), stop below the zone,
 target the nearest H4 sell EG zone still standing above (3719.84-3744.55), 2R or more. A paper reading before costs, not a tested rule.
 - **Reading** `council/eg-methods.mjs` `efTrades(B, { from, market })` (`EFB`; kind `eg-ef`, label "H4 EF barrier → next H4 EG", id

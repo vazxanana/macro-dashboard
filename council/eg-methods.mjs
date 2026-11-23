@@ -342,7 +342,7 @@ export function sopTrades3(B, { from = 0, market = 'xau', conf = 'touch', stop: 
   return out.sort((a, b) => a.t - b.t);
 }
 
-// ─── an H4 EF barrier to the next H4 EG zone (23 Nov 2026, the owner's gold trade of 22-23 Nov) ───
+// ─── an H4 EF barrier to the next H4 EG zone (23 Nov 2026, a gold example of 20-23 Nov) ───
 // An H4 engulf zone (`zones`, completed within EG_SPAN candles) FAILS: an H4 candle closes through its far side (a sell zone: a
 // close above its top). It turns: a failed sell zone is a BUY barrier (an EF), a failed buy zone a sell barrier. Then:
 //   1. price comes back into it: a closed 15-minute candle, starting at or after the failing H4 close, trades into the zone;
@@ -358,7 +358,7 @@ export function sopTrades3(B, { from = 0, market = 'xau', conf = 'touch', stop: 
 // within EFB.wait 15-minute candles of the return, before a 15-minute close back through the zone's far side; the order lives
 // EFB.fill 15-minute candles and is cancelled by a 15-minute close through the zone's far side or by price reaching the target
 // first; one setup a barrier (its first BO); one position at a time a market. On its fill candle only the stop counts. Every step
-// reads candles closed by that step's time. PAPER READING of the owner's trade, before costs: not a tested rule, never an edge.
+// reads candles closed by that step's time. PAPER READING of an example the owner marked, before costs: not a tested rule, never an edge.
 export const EFB = { piv: 2, life: 20 * 86400, wait: 48, fill: 24, minRR: 2 };
 export function efTrades(B, { from = 0, market = 'xau' } = {}) {
   const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H4 = num(B['4h'] || []); if (M5.length < 100 || M15.length < 50 || H4.length < 20) return [];

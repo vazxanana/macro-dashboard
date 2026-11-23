@@ -76,7 +76,7 @@ test('mark colours by kind, as the trade chart', () => {
   const rp = rd('assets/mosha-replay.js'); for (const k of ['ef', 'entry', 'cf', 'vr', 'd1', 'h4', 'h1', 'm15', 'm5']) assert.ok(rp.includes(k + ": ['" + L.HUES[k][0] + "', '" + L.HUES[k][1] + "']"), 'same hue as the replay: ' + k);
 });
 
-// ─── the H4 engulf map on the Engulfing and Mosha desks' live chart (23 Nov 2026, the owner's gold trade of 22-23 Nov) ───
+// ─── the H4 engulf map on the Engulfing and Mosha desks' live chart (23 Nov 2026, a gold example of 20-23 Nov) ───
 test('the H4 engulf map: the page copy of the engulf zones equals the desks\' own (zones and turnBack), on seeded candles', async () => {
   const G = await import('../council/eg-methods.mjs'), SOP = require('../assets/mosha-sop.js');
   assert.equal(L.EG_SPAN, G.EG_SPAN); assert.equal(L.EG_LIFE, G.EGM.life['4h']);
@@ -89,7 +89,7 @@ test('the H4 engulf map: the page copy of the engulf zones equals the desks\' ow
   assert.ok(SOP.SEC['4h'] === 14400);
 });
 
-test('the H4 engulf map on the owner\'s gold candles of 23 Nov 2026: the failed sell zone is a buy barrier, the next sell EG zone above stands; closed candles only', () => {
+test('the H4 engulf map on the gold candles of 23 Nov 2026: the failed sell zone is a buy barrier, the next sell EG zone above stands; closed candles only', () => {
   const F = JSON.parse(rd('tests/fixtures/xau-ef-barrier-2026-11-23.json')), rows = (a) => a.map(([time, open, high, low, close]) => ({ time, open, high, low, close }));
   const m5 = rows(F['5m']), H = rows(F['4h']); for (const b of m5.filter((x) => x.time >= 1795392000)) { const t = b.time - (b.time % 14400), q = H[H.length - 1]; if (q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else H.push({ ...b, time: t }); }
   const at = (now) => L.h4Map(H, now), has = (m, label, bot, top) => m.some((z) => z.label === label && Math.abs(z.bot - bot) < 1e-9 && Math.abs(z.top - top) < 1e-9);

@@ -874,7 +874,7 @@ test('three-timeframe SOP: the comparison options leave the desk reading as it w
     for (const r of G.sopTrades3(B, { market: 'xau', ...o })) assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, JSON.stringify(o));
 });
 
-// ─── an H4 EF barrier to the next H4 EG zone (23 Nov 2026, the owner's gold trade of 22-23 Nov) ───
+// ─── an H4 EF barrier to the next H4 EG zone (23 Nov 2026, a gold example of 20-23 Nov) ───
 // the real OANDA candles to 23 Nov 2026 09:00 UTC (the H4 sell zone 3566.86-3595.29 failed at the 04:00 close; price had not yet
 // come back to it), then a hand-made 5-minute path: into the barrier, an M15 break up, back to the zone's top, up to the target.
 // `mir`: every price mirrored (p -> 8000 - p), so the same story is a sell.
@@ -888,7 +888,7 @@ const efCase = (pts, mir = false) => {
 };
 const EF_PATH = [[3593.5, 12], [3618, 12], [3618, 6], [3595.0, 10], [3640, 18], [3722, 40]];
 
-test('H4 EF barrier: the owner\'s gold trade of 22-23 Nov 2026 (the failed sell zone, the return, the M15 BO, long at the zone\'s top, the next H4 sell EG as target), and its mirror', () => {
+test('H4 EF barrier: a gold example of 20-23 Nov 2026 (the failed sell zone, the return, the M15 BO, long at the zone\'s top, the next H4 sell EG as target), and its mirror', () => {
   assert.equal(G.efTrades(efCase([]), { market: 'xau' }).filter((r) => r.t >= C23).length, 0, 'on the real candles alone: price has not come back to the barrier by 09:00 UTC');
   for (const mir of [false, true]) { const m = (v) => (mir ? 8000 - v : v), d = mir ? -1 : 1, all = G.efTrades(efCase(EF_PATH, mir), { market: 'xau' }).filter((r) => r.t >= C23);
     assert.equal(all.length, 1, 'one trade'); const r = all[0];
@@ -905,7 +905,7 @@ test('H4 EF barrier: the owner\'s gold trade of 22-23 Nov 2026 (the failed sell 
     assert.ok(r.log.every((x) => x.text.length <= 240), 'a log line fits the stored length'); assert.ok(r.marks.every((x) => x.label.length <= 24), 'a mark label fits the stored length'); }
 });
 
-test('H4 EF barrier: no trade when the BO never comes, when the zone is closed back through first, when the target is under 2R; no hindsight on the owner\'s example', () => {
+test('H4 EF barrier: no trade when the BO never comes, when the zone is closed back through first, when the target is under 2R; no hindsight on the example', () => {
   const n = (pts) => G.efTrades(efCase(pts), { market: 'xau' }).filter((r) => r.t >= C23).length;
   assert.equal(n([[3593.5, 12], [3600, 40]]), 0, 'back in the zone, no M15 close above the last A level and out of it');
   assert.equal(n([[3593.5, 12], [3560, 12], [3618, 12], [3618, 6], [3595.0, 10], [3722, 40]]), 0, 'a 15-minute close below the zone ends it before a BO');
@@ -915,7 +915,7 @@ test('H4 EF barrier: no trade when the BO never comes, when the zone is closed b
   const near = [[3650, 35], [3610, 19], [3616, 6], [3594, 21], [3594, 2], [3625, 12], [3595, 12], [3722, 40]], Bn = efCase(near);
   const zn = G.zones(Bn['4h'], '4h').find((z) => z.dir < 0 && z.at === C23 + 16 * 3600); assert.ok(zn && zn.bot > 3595.29 && zn.bot < 3595.29 + 2 * 28.73 && (zn.fail == null || zn.fail > C23 + 16.75 * 3600), 'a sell zone under 2R stands at the BO');
   assert.equal(G.efTrades(Bn, { market: 'xau' }).filter((r) => r.t >= C23).length, 0, 'the nearest opposite zone is under 2R: no trade');
-  const m2 = G.EFB.minRR; try { G.EFB.minRR = 5; assert.equal(n(EF_PATH), 0, 'the owner\'s trade is 4.34R: under a 5R floor it would not be taken'); } finally { G.EFB.minRR = m2; }
+  const m2 = G.EFB.minRR; try { G.EFB.minRR = 5; assert.equal(n(EF_PATH), 0, 'the example is 4.34R: under a 5R floor it would not be taken'); } finally { G.EFB.minRR = m2; }
   assert.equal(n(EF_PATH), 1);
   // cut the candles: absent before the BO's close, resting unfilled before the fill candle, found the same just after the fill
   const B0 = efCase(EF_PATH), full = G.efTrades(B0, { market: 'xau' }).filter((r) => r.t >= C23)[0], K = full.log[3].t, sec = { '4h': 14400, '15m': 900, '5m': 300 };
@@ -948,5 +948,5 @@ test('H4 EF barrier on the seeded market: stops on the losing side, a failed H4 
   assert.ok(G.efTrades({ ...B15, '5m': B15['5m'].map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 })), '15m': B15['15m'].map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 })), '4h': B15['4h'].map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 })) }, { market: 'eurusd' })
     .every((r) => /^eurusd:eg-ef-[bs]-\d+$/.test(r.id) && (r.side > 0 ? r.stop < r.entry : r.stop > r.entry)), 'another market: its id, a stop on the losing side');
   const page = rd('assets/desk-trades.js'); assert.match(page, /'eg-ef': 'H4 EF barrier → next H4 EG'/); assert.match(page, /The H4 EF barrier is listed apart too/);
-  assert.match(E.DESKS.eg.note, /A seventh reading, apart/); assert.match(rd('council/eg-methods.mjs'), /PAPER READING of the owner's trade, before costs: not a tested rule, never an edge/);
+  assert.match(E.DESKS.eg.note, /A seventh reading, apart/); assert.match(rd('council/eg-methods.mjs'), /PAPER READING of an example the owner marked, before costs: not a tested rule, never an edge/);
 });

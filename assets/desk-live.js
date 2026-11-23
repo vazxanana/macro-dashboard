@@ -40,7 +40,7 @@
   // a refreshed read of the newest candles joins the ones held (same time = replaced, newer = added)
   function mergeBars(held, fresh) { if (!held || !held.length) return (fresh || []).slice(); var out = held.slice();
     (fresh || []).forEach(function (b) { var last = out[out.length - 1]; if (b.time === last.time) out[out.length - 1] = b; else if (b.time > last.time) out.push(b); }); return out; }
-  // THE H4 ENGULF MAP (23 Nov 2026, from the owner's gold trade of 22-23 Nov: an H4 sell engulf zone failed and turned into a buy
+  // THE H4 ENGULF MAP (23 Nov 2026, from a gold example of 20-23 Nov: an H4 sell engulf zone failed and turned into a buy
   // barrier, and the next H4 sell engulf zone above was the target). `egZones` is a copy of council/eg-methods.mjs `zones` and
   // `turnBack` (the page cannot load that file; a test compares them): the base is the last candle of the other colour, a candle at
   // most EG_SPAN candles after it closes beyond its high (a buy) or low (a sell); the zone is the base candle wick to wick, known
