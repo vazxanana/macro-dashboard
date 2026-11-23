@@ -15,7 +15,7 @@
 //             widest spread of each minute. Raw executable prices, so a later pre-registered study can trade them bid / ask.
 // READ ONLY and DEMO only, like council/ctrader-symbols.mjs: api/ctrader-link.js's read session (its READ_ONLY allowlist has no
 // trading message), CTRADER_ENV=demo, an account that reports isLive:false. Nothing is traded, sized or alerted; no account
-// number, login or token is written. Historical tick requests are spaced (at most 4 a second). It writes research data only:
+// number, login or token is written. Historical tick requests are spaced (at most 4 a second by default, at most 5 with PROBE_GAP_MS 200). It writes research data only:
 // no council member reads it.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -31,7 +31,11 @@ export const DEPTH_DAYS = [1, 7, 30, 90, 180, 365, 730, 1095];
 export const HOUR_DAYS = 60, HOUR_WIN = 120;          // seconds read at the top of each hour
 export const EV_FROM = -600, EV_TO = 3900;           // T-10 min .. T+65 min
 export const EV_TYPES = ['CPI', 'NFP', 'FOMC'];
-export const MAX_PAGES = 40, GAP_MS = 260;
+// GAP_MS: the pause before each historical tick request. The broker's API allows about 5 historical requests a second per
+// connection, so PROBE_GAP_MS (workflow input gap_ms) may lower it to 200 ms at most; 260 ms is the safe default.
+export const MAX_PAGES = 40, GAP_MIN = 200, GAP_DEFAULT = 260;
+export const gapMs = (env = {}) => { const v = Math.round(Number(env.PROBE_GAP_MS)); return Number.isFinite(v) && v > 0 ? Math.max(GAP_MIN, Math.min(2000, v)) : GAP_DEFAULT; };
+export const GAP_MS = gapMs(typeof process !== 'undefined' ? process.env : {});
 // gotobi (20 Nov 2026, research/edge/gotobi-exec): the bid and ask at 00:55:00 and 06:00:00 UTC of every gotobi day inside the
 // history (council/gotobi-calendar.mjs, the demo job's calendar), with the median quoted spread in +-GOTOBI_HALF seconds
 export const GOTOBI_MARKS = [55 * 60, 6 * 3600], GOTOBI_HALF = 60;

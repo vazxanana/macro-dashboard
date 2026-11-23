@@ -112,3 +112,10 @@ test('marks look-back: PROBE_MARKS_BACK between 60 and 3600 seconds, else 60', a
   assert.equal(marksBack({}), 60); assert.equal(marksBack({ PROBE_MARKS_BACK: '' }), 60); assert.equal(marksBack({ PROBE_MARKS_BACK: '30' }), 60);
   assert.equal(marksBack({ PROBE_MARKS_BACK: '1800' }), 1800); assert.equal(marksBack({ PROBE_MARKS_BACK: '99999' }), 3600); assert.equal(marksBack({ PROBE_MARKS_BACK: 'x' }), 60);
 });
+
+test('the request gap: 260 ms by default, never under 200 ms (the broker allows about 5 historical requests a second)', async () => {
+  const { gapMs, GAP_MIN, GAP_DEFAULT } = await import('../council/tick-probe.mjs');
+  assert.equal(gapMs({}), GAP_DEFAULT); assert.equal(GAP_DEFAULT, 260); assert.equal(GAP_MIN, 200);
+  assert.equal(gapMs({ PROBE_GAP_MS: '210' }), 210); assert.equal(gapMs({ PROBE_GAP_MS: '50' }), 200);
+  assert.equal(gapMs({ PROBE_GAP_MS: 'x' }), 260); assert.equal(gapMs({ PROBE_GAP_MS: '' }), 260); assert.equal(gapMs({ PROBE_GAP_MS: '99999' }), 2000);
+});
