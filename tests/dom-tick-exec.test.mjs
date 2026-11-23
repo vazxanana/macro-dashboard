@@ -72,3 +72,10 @@ test('helpers: spans join neighbouring candles into 30-minute windows; the sampl
   assert.deepEqual(sample(L, 10, 7), sample(L, 10, 7));
   assert.ok(C.XAUUSD > 0 && C.USDJPY > 0);
 });
+
+test('RESULT.md is pinned to result.json', () => {
+  const r = JSON.parse(fs.readFileSync(new URL('result.json', HERE), 'utf8')), md = fs.readFileSync(new URL('RESULT.md', HERE), 'utf8');
+  assert.equal(r.verdict, 'FAIL'); assert.match(md.split('\n')[2], /^\*\*Verdict: FAIL\. /);
+  assert.equal(r.pool.T2.before.n, 1706); assert.ok(md.includes('-0.111') && md.includes('-3.73') && md.includes('1,706'));
+  assert.ok(Math.abs(r.pool.T2.before.mean - -0.1111) < 1e-4 && Math.abs(r.pool.mid.before - -0.0281) < 1e-4);
+});
