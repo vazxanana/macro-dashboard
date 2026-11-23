@@ -114,27 +114,50 @@ export function buildOrders(F, cost, version) {
 }
 
 const inBad = (X, t) => { let lo = 0, hi = X.length; while (lo < hi) { const m = (lo + hi) >> 1; if (X[m][0] <= t) lo = m + 1; else hi = m; } return lo > 0 && t <= X[lo - 1][1]; };
-function sim(M5, o, P0, stop, rr, cost) {
-  const risk = o.s * (o.entry - stop);
-  return K.simulate({ side: o.s, entry: o.entry, stop, target: o.entry + o.s * rr * risk, t: P0, type: 'limit', expire: o.expire, maxHold: P.hold }, M5, { cost });
+// One limit order on 5-minute candles, the edgekit.simulate rules (fill on a candle starting at or after P0 that trades to the
+// entry, at the open when it opens beyond it; on the fill candle only the stop; an open beyond stop or target exits there; a
+// candle holding both is a stop; time exit at the close of the first candle closing at or after fill + hold), with every
+// target measured FROM THE FILL (1R, 2R, 3R, 4R in one pass). A fill whose stop distance is under twice the cost (an open
+// just beyond the entry, next to or past the stop) is not a trade: status 'thin' (counted, reported).
+// Returns { status 'done'|'nofill'|'thin'|'open', fillT, risk, R: [..], exitT: [..], reason: [..] }.
+export function simLimit(M5, s, entry, stop, P0, expire, cost, rrs = P.targets, hold = P.hold) {
+  let i = lb(M5, P0), fill = null;
+  for (; i < M5.length; i++) { const b = M5[i]; if (b.t >= expire) return { status: 'nofill' };
+    if (s > 0 ? b.l <= entry : b.h >= entry) { fill = s > 0 ? Math.min(b.o, entry) : Math.max(b.o, entry); break; } }
+  if (fill == null) return { status: 'nofill' };
+  const fi = i, risk = s * (fill - stop);
+  if (!(risk >= 2 * cost)) return { status: 'thin', fillT: M5[fi].t };
+  const n = rrs.length, R = new Array(n).fill(null), X = new Array(n).fill(null), why = new Array(n).fill(null); let left = n;
+  const fin = (k, px, t, r) => { if (R[k] == null) { R[k] = (s * (px - fill)) / risk; X[k] = t; why[k] = r; left--; } };
+  const deadline = M5[fi].t + hold;
+  for (let j = fi; j < M5.length && left; j++) { const b = M5[j], first = j === fi;
+    if (!first) { if (s * (b.o - stop) <= 0) for (let k = 0; k < n; k++) fin(k, b.o, b.t, 'stop');
+      for (let k = 0; k < n; k++) if (s * (b.o - (fill + s * rrs[k] * risk)) >= 0) fin(k, b.o, b.t, 'target'); }
+    if (s > 0 ? b.l <= stop : b.h >= stop) for (let k = 0; k < n; k++) fin(k, stop, b.e, 'stop');
+    if (!first) for (let k = 0; k < n; k++) { const tg = fill + s * rrs[k] * risk; if (s > 0 ? b.h >= tg : b.l <= tg) fin(k, tg, b.e, 'target'); }
+    if (b.e >= deadline) for (let k = 0; k < n; k++) fin(k, b.c, b.e, 'time');
+  }
+  if (left) return { status: 'open', fillT: M5[fi].t };
+  return { status: 'done', fillT: M5[fi].t, fill, risk, R, exitT: X, reason: why };
 }
-// every order -> trades { market, v, s, day, t (fill), exitT, R (2R), Rnet, Rnet2, R1, R3, R4 (net), risk, rejected? }
-export function simulateAll(F, orders, cost, market, X = []) {
-  const { M5 } = F; const out = [];
+// every order -> trades { market, v, s, day, t (fill), exitT, reason, risk, R, Rnet, Rnet2 (2R), R1, R3, R4 (net), rejected? }
+export function simulateAll(F, orders, cost, market, X = [], tally = {}) {
+  const { M5 } = F; const out = []; const k2 = P.targets.indexOf(P.rr);
   for (const o of orders) {
     let P0 = o.P, stop = o.stop, guard = 0;
     while (P0 < o.expire && guard++ < 50) {
-      const r = sim(M5, o, P0, stop, P.rr, cost);
-      if (r.status === 'nofill' || r.status === 'bad' || r.status === 'open') break;
-      if (!(o.s * (r.fill - stop) > 0) && r.reason !== 'stop') break;
-      const net = (rr) => { const q = sim(M5, o, P0, stop, rr, cost); return q.Rnet ?? null; };
+      if (!(o.s * (o.entry - stop) > 0)) break; // every order has its stop on the losing side
+      const r = simLimit(M5, o.s, o.entry, stop, P0, o.expire, cost);
+      tally[r.status] = (tally[r.status] || 0) + 1;
+      if (r.status !== 'done') break;
       if (r.fillT >= START && !(X.length && inBad(X, r.fillT))) {
-        out.push({ market, v: o.v, s: o.s, day: o.day, t: r.fillT, exitT: r.exitT, reason: r.reason, risk: r.risk, R: r.R, Rnet: r.Rnet,
-          Rnet2: r.R - (2 * cost) / r.risk, R1: net(1), R3: net(3), R4: net(4), ...(o.rejected != null ? { rejected: o.rejected } : {}) });
+        const net = (k) => r.R[k] - cost / r.risk;
+        out.push({ market, v: o.v, s: o.s, day: o.day, t: r.fillT, exitT: r.exitT[k2], reason: r.reason[k2], risk: r.risk, R: r.R[k2], Rnet: net(k2),
+          Rnet2: r.R[k2] - (2 * cost) / r.risk, R1: net(0), R3: net(2), R4: net(3), ...(o.rejected != null ? { rejected: o.rejected } : {}) });
       }
-      if (o.v !== 't2' || r.reason === 'stop') break;
+      if (o.v !== 't2' || r.reason[k2] === 'stop') break;
       // T2: the next retest of the same gap, placed at the exit, the stop again beyond the extreme since the touch
-      const np = r.exitT; if (!(np > P0)) break;
+      const np = r.exitT[k2]; if (!(np > P0)) break;
       const x = extreme(M5, o.ti, np, o.s); const ns = x - o.s * cost / 2;
       if (!(o.s * (o.entry - ns) >= 2 * cost)) break;
       P0 = np; stop = ns;
@@ -194,7 +217,7 @@ function runAll(outDir) {
     const M5 = K.load(m, '5m', { from: '2019-01-01' }); const F = framesOf(M5); const cost = COSTS[m]; const X = exclusions(m);
     if (m === 'xau') cut = cutCheck(M5, cost, Date.UTC(2023, 5, 1) / 1000);
     const n = {};
-    for (const v of ['t1', 't2', 'c']) { const O = buildOrders(F, cost, v); const tr = simulateAll(F, O, cost, m, X); T[v].push(...tr); n[v] = { orders: O.length, trades: tr.length }; }
+    for (const v of ['t1', 't2', 'c']) { const tally = {}; const O = buildOrders(F, cost, v); const tr = simulateAll(F, O, cost, m, X, tally); T[v].push(...tr); n[v] = { orders: O.length, trades: tr.length, ...tally }; }
     meta[m] = { first: new Date(M5[0].t * 1000).toISOString().slice(0, 10), last: new Date(F.end * 1000).toISOString(), days: F.D.length, cost, excluded: X.length, ...n };
     process.stderr.write(`${m}: t1 ${n.t1.trades} t2 ${n.t2.trades} c ${n.c.trades} (${((Date.now() - t0) / 1000).toFixed(0)}s)\n`);
   }
