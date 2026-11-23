@@ -164,7 +164,8 @@
     "t1": 61970.3,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 60883.4,
@@ -179,9 +180,10 @@
     "lagSec": 41,
     "positionId": "50666017",
     "volume": 1,
-    "status": "open",
+    "status": "closed at broker",
     "stopCheckedAt": "2026-11-22T10:00:41.000Z",
-    "brokerStop": 58571.4
+    "brokerStop": 58571.4,
+    "closedAt": "2026-11-23T13:58:04.000Z"
    },
    "eth-rswing-1795371835": {
     "positionId": "50667485",
@@ -335,7 +337,7 @@
    "startBalance": 10023.08
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10023.08 · 7 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10034.41 · 6 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -370,8 +372,8 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 10023.08,
-  "lastRun": "2026-11-23T13:52:37.000Z"
+  "balance": 10034.41,
+  "lastRun": "2026-11-23T13:58:04.000Z"
  },
  "log": [
   {
@@ -594,6 +596,11 @@
    "at": "2026-11-23T13:08:33.000Z",
    "msg": "limit filled at once: GBPUSD position 50814724 at the broker at 1.30784",
    "trade": "gbpusd-swing-1795439248"
+  },
+  {
+   "at": "2026-11-23T13:58:04.000Z",
+   "msg": "BTCUSD position 50666017 closed at the broker",
+   "trade": "btc-rswing-1795341600"
   }
  ],
  "limits": {
