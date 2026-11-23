@@ -1,0 +1,227 @@
+{
+ "study": "dom-tick-exec",
+ "built": "2026-11-23",
+ "commit": null,
+ "probes": [
+  {
+   "file": "ticks-XAUUSD-dom-b1.json",
+   "at": "2026-11-23T15:44:58.667Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-dom-b1.json",
+   "at": "2026-11-23T15:44:58.667Z",
+   "errors": 0
+  }
+ ],
+ "skipped": {
+  "XAUUSD": {
+   "not read": 850
+  },
+  "USDJPY": {
+   "not read": 873
+  }
+ },
+ "window": [
+  "2023-11-24",
+  "2026-11-20"
+ ],
+ "pool": {
+  "orders": 677,
+  "resolved": 660,
+  "unresolvedExit": 17,
+  "tickFilled": 540,
+  "midFilled": 648,
+  "unresolvedFill": 118,
+  "fillHow": {
+   "through": 149,
+   "bracket": 391
+  },
+  "exits": {
+   "stop": 233,
+   "target": 307,
+   "time": 0
+  },
+  "T1": {
+   "before": {
+    "n": 660,
+    "mean": -0.793,
+    "monthT": -8.0283
+   },
+   "afterCommission": {
+    "n": 660,
+    "mean": -0.7784,
+    "monthT": -7.9919
+   }
+  },
+  "T2": {
+   "before": {
+    "n": 540,
+    "mean": -0.9384,
+    "monthT": -7.5257
+   },
+   "afterCommission": {
+    "n": 540,
+    "mean": -0.9875,
+    "monthT": -7.5874
+   }
+  },
+  "mid": {
+   "n": 648,
+   "before": 0.0256,
+   "after": -0.0302
+  },
+  "lenient": {
+   "n": 653,
+   "before": -0.8411,
+   "monthT": -7.6565
+  },
+  "midWinsNotFilled": 38,
+  "entrySlip": {
+   "median": 0,
+   "mean": 0.053891
+  },
+  "fillDelayS": 145.9724999666214
+ },
+ "perMarket": {
+  "XAUUSD": {
+   "orders": 350,
+   "resolved": 340,
+   "unresolvedExit": 10,
+   "tickFilled": 280,
+   "midFilled": 335,
+   "unresolvedFill": 59,
+   "fillHow": {
+    "through": 36,
+    "bracket": 244
+   },
+   "exits": {
+    "stop": 125,
+    "target": 155,
+    "time": 0
+   },
+   "T1": {
+    "before": {
+     "n": 340,
+     "mean": -0.7135,
+     "monthT": -7.2984
+    },
+    "afterCommission": {
+     "n": 340,
+     "mean": -0.7068,
+     "monthT": -7.2734
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 280,
+     "mean": -0.8627,
+     "monthT": -6.7001
+    },
+    "afterCommission": {
+     "n": 280,
+     "mean": -0.9018,
+     "monthT": -6.852
+    }
+   },
+   "mid": {
+    "n": 335,
+    "before": 0.0031,
+    "after": -0.0364
+   },
+   "lenient": {
+    "n": 337,
+    "before": -0.7674,
+    "monthT": -6.5764
+   },
+   "midWinsNotFilled": 19,
+   "entrySlip": {
+    "median": 0,
+    "mean": 0.092304
+   },
+   "fillDelayS": 163.7224999666214,
+   "verdictBefore": "TOO FEW (280 filled)",
+   "verdictAfter": "TOO FEW (280 filled)"
+  },
+  "USDJPY": {
+   "orders": 327,
+   "resolved": 320,
+   "unresolvedExit": 7,
+   "tickFilled": 260,
+   "midFilled": 313,
+   "unresolvedFill": 59,
+   "fillHow": {
+    "through": 113,
+    "bracket": 147
+   },
+   "exits": {
+    "stop": 108,
+    "target": 152,
+    "time": 0
+   },
+   "T1": {
+    "before": {
+     "n": 320,
+     "mean": -0.8775,
+     "monthT": -7.1357
+    },
+    "afterCommission": {
+     "n": 320,
+     "mean": -0.8544,
+     "monthT": -6.9642
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 260,
+     "mean": -1.02,
+     "monthT": -7.4791
+    },
+    "afterCommission": {
+     "n": 260,
+     "mean": -1.0799,
+     "monthT": -7.7717
+    }
+   },
+   "mid": {
+    "n": 313,
+    "before": 0.0498,
+    "after": -0.0235
+   },
+   "lenient": {
+    "n": 316,
+    "before": -0.9197,
+    "monthT": -7.7855
+   },
+   "midWinsNotFilled": 19,
+   "entrySlip": {
+    "median": 0,
+    "mean": 0.012523
+   },
+   "fillDelayS": 116.20899999141693,
+   "verdictBefore": "TOO FEW (260 filled)",
+   "verdictAfter": "TOO FEW (260 filled)"
+  }
+ },
+ "byYear": {
+  "2023": {
+   "n": 57,
+   "before": -1.1801
+  },
+  "2024": {
+   "n": 483,
+   "before": -0.9099
+  }
+ },
+ "bySide": {
+  "buy": {
+   "n": 262,
+   "before": -0.0585
+  },
+  "sell": {
+   "n": 278,
+   "before": -1.7677
+  }
+ },
+ "verdict": "before costs FAIL, after commission FAIL: tick -0.9384R a filled trade (n 540, month t -7.5257) against mid 0.0256R; paired tick minus mid -0.793R (month t -8.0283)"
+}
