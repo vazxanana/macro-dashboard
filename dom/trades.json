@@ -284,8 +284,12 @@
    "volume": 5200000,
    "balance": 10122.52,
    "digits": 5,
-   "status": "placed",
-   "orderId": "34687210"
+   "status": "open",
+   "orderId": "34687210",
+   "fill": 0.83659,
+   "positionId": "50836535",
+   "filledAt": "2026-11-23T15:25:55.319Z",
+   "brokerStop": 0.83585
   },
   {
    "id": "nas100-sell-1795104000",
@@ -548,12 +552,17 @@
    "volume": 1300000,
    "balance": 10122.52,
    "digits": 3,
-   "status": "open",
+   "status": "closed",
    "orderId": "34688463",
    "fill": 105.547,
    "positionId": "50838514",
    "filledAt": "2026-11-23T15:09:23.327Z",
-   "brokerStop": 104.939
+   "brokerStop": 104.939,
+   "closedSeen": "2026-11-23T15:27:35.000Z",
+   "inferred": true,
+   "exit": null,
+   "how": "closed at the broker; exit unknown (neither level on the H1 candles yet)",
+   "R": null
   },
   {
    "id": "cadjpy-sell-1795161600",
@@ -577,12 +586,17 @@
    "volume": 4000000,
    "balance": 10122.52,
    "digits": 3,
-   "status": "open",
+   "status": "closed",
    "orderId": "34688464",
    "fill": 111.017,
    "positionId": "50838516",
    "filledAt": "2026-11-23T14:46:38.799Z",
-   "brokerStop": 111.216
+   "brokerStop": 111.216,
+   "closedSeen": "2026-11-23T15:27:35.000Z",
+   "inferred": true,
+   "exit": null,
+   "how": "closed at the broker; exit unknown (neither level on the H1 candles yet)",
+   "R": null
   },
   {
    "id": "cadjpy-buy-1795388400",
@@ -606,12 +620,17 @@
    "volume": 2300000,
    "balance": 10122.52,
    "digits": 3,
-   "status": "open",
+   "status": "closed",
    "orderId": "34688466",
    "fill": 110.846,
    "positionId": "50838520",
    "filledAt": "2026-11-23T15:20:30.693Z",
-   "brokerStop": 110.508
+   "brokerStop": 110.508,
+   "closedSeen": "2026-11-23T15:27:35.000Z",
+   "inferred": true,
+   "exit": null,
+   "how": "closed at the broker; exit unknown (neither level on the H1 candles yet)",
+   "R": null
   },
   {
    "id": "cadjpy-sell-1795424400",
@@ -660,12 +679,17 @@
    "volume": 4700000,
    "balance": 10122.52,
    "digits": 5,
-   "status": "open",
+   "status": "closed",
    "orderId": "34688470",
    "fill": 1.64631,
    "positionId": "50838526",
    "filledAt": "2026-11-23T14:42:27.957Z",
-   "brokerStop": 1.64476
+   "brokerStop": 1.64476,
+   "closedSeen": "2026-11-23T15:27:35.000Z",
+   "inferred": true,
+   "exit": 1.64952,
+   "how": "target (inferred from the H1 candles)",
+   "R": 2.071
   },
   {
    "id": "nas100-sell-1795114800",
@@ -836,8 +860,12 @@
    "volume": 4300000,
    "balance": 10066.3,
    "digits": 5,
-   "status": "placed",
-   "orderId": "34692225"
+   "status": "open",
+   "orderId": "34692225",
+   "fill": 0.66325,
+   "positionId": "50848032",
+   "filledAt": "2026-11-23T15:25:55.239Z",
+   "brokerStop": 0.66439
   },
   {
    "id": "usdjpy-sell-1795132800",
@@ -863,8 +891,108 @@
    "digits": 3,
    "status": "placed",
    "orderId": "34693114"
+  },
+  {
+   "id": "usdjpy-buy-1795438800",
+   "market": "usdjpy",
+   "side": "buy",
+   "zone": {
+    "t": 1795438800,
+    "bot": 159.07,
+    "top": 159.288,
+    "formed": 1795446000
+   },
+   "atr": 0.147857,
+   "symbol": "USDJPY",
+   "placedAt": "2026-11-23T15:27:35.000Z",
+   "expiresAt": 1795534053,
+   "account": "…137",
+   "entry": 159.288,
+   "stop": 159.029,
+   "target": 159.806,
+   "risk": 0.005,
+   "volume": 3000000,
+   "balance": 10009.77,
+   "digits": 3,
+   "status": "placed",
+   "orderId": "34693719"
+  },
+  {
+   "id": "usdchf-sell-1795140000",
+   "market": "usdchf",
+   "side": "sell",
+   "zone": {
+    "t": 1795140000,
+    "bot": 0.84319,
+    "top": 0.84357,
+    "formed": 1795147200
+   },
+   "atr": 0.00135714,
+   "symbol": "USDCHF",
+   "placedAt": "2026-11-23T15:27:36.000Z",
+   "expiresAt": 1795534053,
+   "account": "…137",
+   "entry": 0.84319,
+   "stop": 0.84394,
+   "target": 0.84168,
+   "risk": 0.005,
+   "volume": 5600000,
+   "balance": 10009.77,
+   "digits": 5,
+   "status": "placed",
+   "orderId": "34693720"
+  },
+  {
+   "id": "usdchf-sell-1795143600",
+   "market": "usdchf",
+   "side": "sell",
+   "zone": {
+    "t": 1795143600,
+    "bot": 0.84278,
+    "top": 0.8432,
+    "formed": 1795150800
+   },
+   "atr": 0.00135714,
+   "symbol": "USDCHF",
+   "placedAt": "2026-11-23T15:27:36.000Z",
+   "expiresAt": 1795534053,
+   "account": "…137",
+   "entry": 0.84278,
+   "stop": 0.84357,
+   "target": 0.84119,
+   "risk": 0.005,
+   "volume": 5300000,
+   "balance": 10009.77,
+   "digits": 5,
+   "status": "placed",
+   "orderId": "34693721"
+  },
+  {
+   "id": "gbpjpy-buy-1795208400",
+   "market": "gbpjpy",
+   "side": "buy",
+   "zone": {
+    "t": 1795208400,
+    "bot": 207.338,
+    "top": 207.484,
+    "formed": 1795388400
+   },
+   "atr": 0.344286,
+   "symbol": "GBPJPY",
+   "placedAt": "2026-11-23T15:27:36.000Z",
+   "expiresAt": 1795534053,
+   "account": "…137",
+   "entry": 207.484,
+   "stop": 207.245,
+   "target": 207.962,
+   "risk": 0.005,
+   "volume": 3300000,
+   "balance": 10009.77,
+   "digits": 3,
+   "status": "placed",
+   "orderId": "34693722"
   }
  ],
  "notOffered": {},
- "at": "2026-11-23T15:22:14.000Z"
+ "at": "2026-11-23T15:27:37.000Z"
 }
