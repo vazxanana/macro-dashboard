@@ -203,6 +203,25 @@ export function cutTest(market, cuts = ['2008-06-11', '2012-03-14', '2016-09-21'
   return out;
 }
 
+// ---- post-hoc check of control (i), found after the run (not part of the bar): ladder B, turn ChoCh, trigger ChoCh, 1R. Each
+// real trade's nearest pool ChoCh (same side, not in a setup), split by whether it lies before or after the real trigger. A
+// matched control BEFORE the real trigger is chosen knowing that a real setup forms after it: selection on the future.
+export function control1Check(market) {
+  const M5 = K.load(market, '5m', { from: '2004-01-01', to: '2026-11-01' }); const F = frames(M5), cost = COSTS[market];
+  const { sig, P } = signals(F, M5); const p = P[1], TL = p.TL, real = new Set(sig.filter((g) => g.l === 1).map((g) => g.s + '|' + g.kind + '|' + g.j));
+  const out = { market, before: { n: 0, sum: 0 }, after: { n: 0, sum: 0 } };
+  for (const g of sig) { if (g.l !== 1 || g.tu !== 0 || g.tr !== 0) continue;
+    let best = null; for (const q of p.chochL[g.s]) { if (real.has(g.s + '|0|' + q)) continue; if (best == null || Math.abs(TL[q].t - g.tt) < Math.abs(TL[best].t - g.tt)) best = q; }
+    if (best == null || TL[best].t === g.tt) continue;
+    const ts = TL[best].e, im = K.closedCount(p.TM, ts) - 1, a = im >= 0 ? p.atrM[im] : 0; if (!(a > 0)) continue;
+    const ex = extreme(M5, g.s, ts - (g.ts - g.retT), ts); if (ex == null) continue;
+    const stop = ex - g.s * ATRK * a, fi = startIdx(M5, ts); if (fi >= M5.length) continue; const t = M5[fi].t; if (t < FROM || t >= TO) continue;
+    const fill = M5[fi].o, risk = g.s * (fill - stop); if (!(risk > 0) || risk < cost) continue;
+    const r = trade(M5, g.s, 'mkt', null, stop, t, Infinity, [fill + g.s * risk], LADDERS[1].cap, 0, { fi, fill }); if (!r) continue;
+    const k = TL[best].t < g.tt ? 'before' : 'after'; out[k].n++; out[k].sum += r.R[0]; }
+  return out;
+}
+
 // ---- pooled statistics and the bar ----------------------------------------------------------------------------------------
 export function pool(list, kind) { const A = newAcc(); for (const d of list) { const S = d[kind]; for (const k of Object.keys(A)) for (let i = 0; i < A[k].length; i++) A[k][i] += S[k][i]; } return A; }
 export function cellStats(A, c) {
@@ -234,6 +253,10 @@ const r2 = (v) => (v == null ? null : +v.toFixed(2));
 export function report(dir) {
   const data = MARKETS.map((m) => JSON.parse(fs.readFileSync(path.join(dir, m + '.json'), 'utf8')));
   const cut = MARKETS.flatMap((m) => { const f = path.join(dir, 'cut-' + m + '.json'); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : []; });
+  const bias = MARKETS.map((m) => { const f = path.join(dir, 'bias-' + m + '.json'); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : null; }).filter(Boolean);
+  const bsum = (k) => { const n = bias.reduce((a, x) => a + x[k].n, 0), s = bias.reduce((a, x) => a + x[k].sum, 0); return { n, mean: n ? +(s / n).toFixed(4) : null }; };
+  const control1Bias = bias.length ? { cell: 'B turn choch trig choch 1R', note: 'post-hoc check found after the run; not part of the bar', markets: bias.length,
+    before: bsum('before'), after: bsum('after') } : null;
   const rows = judge(data), pass = rows.filter((r) => r.pass), plPass = rows.filter((r) => r.plac.pass);
   const verdict = pass.length ? 'PASS' : rows.some((r) => r.checks.n) ? 'FAIL' : 'INCONCLUSIVE';
   const bestC = [...rows].sort((a, b) => b.c.t - a.c.t)[0], bestBoth = [...rows].sort((a, b) => Math.min(b.d.t, b.c.t) - Math.min(a.d.t, a.c.t))[0];
@@ -249,7 +272,7 @@ export function report(dir) {
     assumedCosts: ASSUMED, costs: Object.fromEntries(data.map((d) => [d.market, d.cost])),
     meta: data.map((d) => ({ market: d.market, first: new Date(d.first * 1000).toISOString().slice(0, 10), last: new Date(d.last * 1000).toISOString().slice(0, 10),
       signals: d.signals, rets: d.rets, trades: d.trades, ctl1: d.ctl1, ctl1None: d.ctl1None, ctl2: d.ctl2, dropped: d.dropped, bad: d.bad, small: d.small })),
-    passed: pass.map(cname), placeboPassed: plPass.map(cname), bestConfirmation: cname(bestC), bestBothWindows: cname(bestBoth), cut, cells: RW, perMarket };
+    passed: pass.map(cname), placeboPassed: plPass.map(cname), bestConfirmation: cname(bestC), bestBothWindows: cname(bestBoth), control1Bias, cut, cells: RW, perMarket };
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1) + '\n');
   fs.writeFileSync(path.join(HERE, 'RESULT.md'), resultMd(out, rows, bestBoth));
   return out;
@@ -294,11 +317,24 @@ function resultMd(o, rows, bestBoth) {
     '- Exclusions: the data-quality audit\'s bad intervals (`combo-grid-2` `exclusions`).', '',
     '| Market | candles from | signals | zone returns | trades | ctl (i) | no ctl (i) found | ctl (ii) | dropped (bad data) | past the stop | risk under cost |', '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|');
   for (const m of o.meta) L.push(`| ${m.market} | ${m.first} | ${N(m.signals)} | ${N(m.rets)} | ${N(m.trades)} | ${N(m.ctl1)} | ${N(m.ctl1None)} | ${N(m.ctl2)} | ${m.dropped} | ${m.bad} | ${N(m.small)} |`);
+  if (o.control1Bias) { const b = o.control1Bias, c = rows[cellMain(1, 0, 0, 0)];
+    L.push('', '## Control (i) is biased (found after the run)', '',
+      'Control (i) came out far above the real cells on every market (about +0.25R to +0.5R a trade on the ChoCh cells), which the',
+      'earlier fade studies make implausible for plain trigger events. The cause is in the pre-registered matching, not in the trade',
+      'code: the matched trigger is the nearest in time, and when it lies BEFORE the real trigger it is chosen because a real setup',
+      'forms after it, which tells the control that price is about to turn its way (selection on the future). A check of the cell',
+      `${b.cell} on all ten markets (\`run.mjs bias\`): matched controls before the real trigger ${f3(b.before.mean)}R a trade`,
+      `(n ${N(b.before.n)}), after it ${f3(b.after.mean)}R (n ${N(b.after.n)}); the real cell made ${f3(c.d.mean)}R / ${f3(c.c.mean)}R.`,
+      'So the Welch tests against control (i) are not a fair comparison and are reported only as computed. The verdict does not rest',
+      'on them: no cell meets bar 2 (mean R > 0 with month t >= 2) in either window, and none beats control (ii), which has no such',
+      'selection. A future matched control should only take triggers known before the real one AND chosen without reference to it.'); }
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push('A passing cell is a candidate for its own forward record and an owner decision, nothing more: it is not adopted, and never called an edge before a forward record.');
-  else L.push('No cell clears the bar: a higher engulf or failed-engulf zone with a ChoCh or EF turn one timeframe lower and the same',
-    'sign one timeframe lower again does not pick better trades than the trigger alone or than entering at the zone, on ten markets',
-    'over 22 years. Do not re-test variants of these cells on these years. Nothing live changed; no rule is proposed.');
+  else L.push('No cell clears the bar. On ten markets over 22 years, a higher engulf or failed-engulf zone with a ChoCh or EF turn one',
+    'timeframe lower and the same sign one timeframe lower again sits at about zero before costs (no cell has month t >= 2 in either',
+    'window) and loses after costs; it does not beat entering at the zone return (control (ii)), and the side-flipped trades do no',
+    'better or worse in any way that clears the bar. Do not re-test variants of these cells on these years. Nothing live changed; no',
+    'rule is proposed.');
   L.push('');
   return L.join('\n');
 }
@@ -308,6 +344,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   if (cmd === 'market') { fs.mkdirSync(b, { recursive: true }); const t0 = Date.now(); const r = runMarket(a);
     fs.writeFileSync(path.join(b, a + '.json'), JSON.stringify(r)); console.log(a, 'signals', r.signals, 'trades', r.trades, 'ctl1', r.ctl1, 'ctl2', r.ctl2, ((Date.now() - t0) / 1000).toFixed(0) + 's'); }
   else if (cmd === 'cut') { fs.mkdirSync(b, { recursive: true }); const r = cutTest(a); fs.writeFileSync(path.join(b, 'cut-' + a + '.json'), JSON.stringify(r)); console.log(JSON.stringify(r)); }
+  else if (cmd === 'bias') { fs.mkdirSync(b, { recursive: true }); const r = control1Check(a); fs.writeFileSync(path.join(b, 'bias-' + a + '.json'), JSON.stringify(r)); console.log(JSON.stringify(r)); }
   else if (cmd === 'report') { const o = report(a); console.log(o.verdict, o.headline); }
   else console.log('usage: run.mjs market <m> <dir> | cut <m> <dir> | report <dir>');
 }
