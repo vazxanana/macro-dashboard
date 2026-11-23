@@ -258,7 +258,11 @@ function resultMd(o, rows) {
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push('A passing cell is a candidate for its own forward record and an owner decision, nothing more: it is not adopted and never called an edge before a forward record.');
   else L.push('Taken at market, with no resting limit to be flattered by touch fills, the desk\'s barrier entry does not clear the bar on any of',
-    'the 36 cells over ten markets and 22 years. Do not re-test variants of these cells on these years. Nothing live changed; no rule is proposed.');
+    'the 36 cells over ten markets and 22 years. Do not re-test variants of these cells on these years. Nothing live changed; no rule is proposed.',
+    '', 'Before costs the barrier trades sit a few hundredths of an R under zero, like the bands placed at random, so the barrier picks no',
+    'better place than a random band of the same size; the side-flipped trades are only the mirror of that small loss and lose',
+    'after costs too. Silver: the desk\'s risk limits, scaled as a share of price, rule out most of its signals (column "outside risk',
+    'limits"), so silver adds few trades; the verdict rests on the other nine markets.');
   L.push('');
   return L.join('\n');
 }
