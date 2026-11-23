@@ -29,7 +29,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: tick-probe
+  # one queue per tag: batches with different tags run side by side (each its own read-only session, at most 4 tick
+  # requests a second each); the same tag never runs twice at once
+  group: tick-probe-${{ inputs.tag || 'default' }}
   cancel-in-progress: false
 
 jobs:
