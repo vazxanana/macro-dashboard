@@ -334,6 +334,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-23T13:08:33.000Z",
     "brokerStop": 1.31459
+   },
+   "usdcad-swing-1795448435": {
+    "positionId": "50854769",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "swing",
+    "status": "open",
+    "openedAt": "2026-11-23T15:41:51.000Z",
+    "councilEntry": 1.43541,
+    "stop": 1.4309700357142856,
+    "t1": 1.4453399285714286,
+    "riskCash": 3.09,
+    "margin": 2,
+    "minLot": true,
+    "shadow": true,
+    "mark": 1.43541,
+    "levelsFrom": "mark",
+    "fillPrice": 1.43553,
+    "slipR": 0.027,
+    "lagSec": 76,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-23T15:41:51.000Z",
+    "brokerStop": 1.43109
    }
   },
   "day": {
@@ -341,7 +369,7 @@
    "startBalance": 10023.08
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9857.28 · 4 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9857.28 · 5 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -375,7 +403,7 @@
   },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9857.28,
-  "lastRun": "2026-11-23T15:38:54.000Z"
+  "lastRun": "2026-11-23T15:41:51.000Z"
  },
  "log": [
   {
@@ -613,6 +641,11 @@
    "at": "2026-11-23T14:01:09.000Z",
    "msg": "SOLUSD position 50661044 closed at the broker",
    "trade": "sol-position-1795231964"
+  },
+  {
+   "at": "2026-11-23T15:41:51.000Z",
+   "msg": "opened buy USDCAD 0.01 lot (council swing)",
+   "trade": "usdcad-swing-1795448435"
   }
  ],
  "limits": {
@@ -692,8 +725,8 @@
   ]
  },
  "execution": {
-  "n": 11,
-  "meanSlipR": 0.001,
+  "n": 12,
+  "meanSlipR": 0.003,
   "medianSlipR": -0.001,
   "worstSlipR": 0.034,
   "medianLagSec": 76,
@@ -711,8 +744,8 @@
     "meanSlipR": -0.008
    },
    "USDCAD": {
-    "n": 2,
-    "meanSlipR": -0.004
+    "n": 3,
+    "meanSlipR": 0.006
    },
    "GBPUSD": {
     "n": 2,
