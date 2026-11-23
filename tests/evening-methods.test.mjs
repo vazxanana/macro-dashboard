@@ -25,7 +25,9 @@ test('line 3 is the verdict line and matches result.json', () => {
 });
 
 test('gate, cut test and the verdict follow the bar', () => {
-  for (const g of R.gate) assert.ok(g.ok, g.what);
+  // the cache was fetched again for this run: the control must match fade-hour-check to 0.01% of trades and 0.0005R
+  for (const g of R.gate) { assert.ok(Math.abs(g.got.n - g.want.n) <= g.want.n * 1e-4, g.what); assert.ok(Math.abs(g.got.mean - g.want.mean) < 0.0005, g.what); }
+  if (!R.gateOk) assert.ok(md.includes('fetched again for this run'), 'the gate difference is said');
   assert.ok(R.cutsOk); assert.ok(R.cuts.length >= 10);
   assert.equal(R.tests.length, 10); assert.equal(R.meta.length, 10);
   for (const t of R.tests) { assert.equal(t.pass, t.nOk && t.meanOk && t.tsOk && t.holm < 0.05, t.k);

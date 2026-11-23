@@ -1,0 +1,1998 @@
+{
+ "verdict": "PASS",
+ "headline": "1 of 10 readings pass; R5 (M15 box close-out, FADED) in the evening made +0.236R a trade before costs in 2015-26 (n 14,586, month t 15.78) and -0.185R after costs.",
+ "built": "2026-11-23",
+ "gate": [
+  {
+   "what": "plain fade, 2005-14",
+   "want": {
+    "n": 171523,
+    "mean": 0.054233
+   },
+   "got": {
+    "n": 171523,
+    "mean": 0.054233
+   },
+   "ok": true
+  },
+  {
+   "what": "plain fade, 2015-26",
+   "want": {
+    "n": 201769,
+    "mean": 0.042267
+   },
+   "got": {
+    "n": 201772,
+    "mean": 0.042266
+   },
+   "ok": false
+  }
+ ],
+ "gateOk": false,
+ "cuts": [
+  {
+   "market": "xau",
+   "cut": "2006-06-14",
+   "n": 2057,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2007-03-21",
+   "n": 8595,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2007-11-14",
+   "n": 13905,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2008-08-20",
+   "n": 20844,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2009-05-13",
+   "n": 27288,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2006-06-14",
+   "n": 12947,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2007-03-21",
+   "n": 19664,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2007-11-14",
+   "n": 25454,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2008-08-20",
+   "n": 32441,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2009-05-13",
+   "n": 39518,
+   "missing": 0,
+   "extra": 0
+  }
+ ],
+ "cutsOk": true,
+ "stopsOnLosingSide": true,
+ "controlEvening": {
+  "A": {
+   "n": 26275,
+   "mean": 0.20392,
+   "t": 18.008,
+   "meanNet": 0.046133,
+   "tNet": 4.025,
+   "win": 0.408,
+   "costR": 0.1578
+  },
+  "B": {
+   "n": 27671,
+   "mean": 0.169408,
+   "t": 14.094,
+   "meanNet": -0.014668,
+   "tNet": -1.233,
+   "win": 0.393,
+   "costR": 0.1841
+  }
+ },
+ "tests": [
+  {
+   "k": "R1",
+   "name": "Engulf zone first touch + M15 break, WITH",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": -3.816,
+     "p": 0.9999312319295062
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": -4.639,
+     "p": 0.99999819266865
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": -3.978,
+     "p": 0.999939982301363
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": -5.55,
+     "p": 0.9999999313455232
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -12.035,
+     "p": 1
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -11.976,
+     "p": 1
+    }
+   ],
+   "nOk": true,
+   "meanOk": false,
+   "tsOk": false,
+   "p": 1,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R2",
+   "name": "Engulf zone first touch + M15 break, FADED",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": 2.724,
+     "p": 0.003239543800406454
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": 1.935,
+     "p": 0.02654563955516498
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": 4.309,
+     "p": 0.000016947250044477134
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": 3.188,
+     "p": 0.0008812485333245
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -3.468,
+     "p": 0.9997349385495699
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -3.394,
+     "p": 0.9996520854224626
+    }
+   ],
+   "nOk": true,
+   "meanOk": true,
+   "tsOk": false,
+   "p": 0.9997349385495699,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R3",
+   "name": "Failed engulf on M15 (within 12 candles)",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": -18.309,
+     "p": 1
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": -14.479,
+     "p": 1
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": -13.296,
+     "p": 1
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": -10.705,
+     "p": 1
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -28.992,
+     "p": 1
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -24.179,
+     "p": 1
+    }
+   ],
+   "nOk": true,
+   "meanOk": false,
+   "tsOk": false,
+   "p": 1,
+   "weakest": "evening minus day, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R4",
+   "name": "M15 box close-out, WITH",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": -13.85,
+     "p": 1
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": -9.638,
+     "p": 1
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": -9.968,
+     "p": 1
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": -9.38,
+     "p": 0.9999999999999999
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -25.404,
+     "p": 1
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -20.807,
+     "p": 1
+    }
+   ],
+   "nOk": true,
+   "meanOk": false,
+   "tsOk": false,
+   "p": 1,
+   "weakest": "evening minus day, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R5",
+   "name": "M15 box close-out, FADED",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": 15.276,
+     "p": 1.0030982343805324e-52
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": 15.775,
+     "p": 5.111178763375991e-56
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": 17.66,
+     "p": 2.408144277890116e-35
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": 15.784,
+     "p": 2.8799797030164677e-33
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": 2.708,
+     "p": 0.003389549573315521
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": 4.076,
+     "p": 0.00002294368975840287
+    }
+   ],
+   "nOk": true,
+   "meanOk": true,
+   "tsOk": true,
+   "p": 0.003389549573315521,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 0.03389549573315521,
+   "pass": true
+  },
+  {
+   "k": "R6",
+   "name": "Mosha CF M30>M5, WITH",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": -4.014,
+     "p": 0.9999699259276714
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": -7.84,
+     "p": 0.9999999999999976
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": -4.108,
+     "p": 0.9999631898889854
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": -7.949,
+     "p": 0.9999999999997261
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -14.917,
+     "p": 1
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -16.918,
+     "p": 1
+    }
+   ],
+   "nOk": true,
+   "meanOk": false,
+   "tsOk": false,
+   "p": 1,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R7",
+   "name": "Mosha CF M30>M5, FADED",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": 3.339,
+     "p": 0.0004224626929969364
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": 6.484,
+     "p": 4.81726867248743e-11
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": 4.464,
+     "p": 0.000009185162711697375
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": 5.577,
+     "p": 6.02631417102317e-8
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -4.395,
+     "p": 0.9999943623757345
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -1.292,
+     "p": 0.9017527044615701
+    }
+   ],
+   "nOk": true,
+   "meanOk": true,
+   "tsOk": false,
+   "p": 0.9999943623757345,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R8",
+   "name": "Mosha CF H1>M15, WITH",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": -4.949,
+     "p": 0.9999996188189215
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": -2.983,
+     "p": 0.9985680529111103
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": -5.784,
+     "p": 0.9999999699033285
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": -3.224,
+     "p": 0.9992151105545959
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -14.714,
+     "p": 1
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -9.749,
+     "p": 1
+    }
+   ],
+   "nOk": true,
+   "meanOk": false,
+   "tsOk": false,
+   "p": 1,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R9",
+   "name": "Mosha CF H1>M15, FADED",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": 5.523,
+     "p": 1.7432153459891433e-8
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": 6.422,
+     "p": 7.425624463069778e-11
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": 8.047,
+     "p": 3.589519217001505e-13
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": 6.786,
+     "p": 1.4731676448267153e-10
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": 1.12,
+     "p": 0.13129914141597232
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": 1.328,
+     "p": 0.092128561662287
+    }
+   ],
+   "nOk": true,
+   "meanOk": true,
+   "tsOk": false,
+   "p": 0.13129914141597232,
+   "weakest": "evening minus plain fade evening, A (Welch)",
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "k": "R10",
+   "name": "Zone flip near, 4h, M15 close inside",
+   "figs": [
+    {
+     "what": "evening minus day, A (Welch)",
+     "t": 3.678,
+     "p": 0.00011934725964778403
+    },
+    {
+     "what": "evening minus day, B (Welch)",
+     "t": 2.614,
+     "p": 0.0044944964586015115
+    },
+    {
+     "what": "evening cell, A (month sums)",
+     "t": 4.465,
+     "p": 0.000009179095101878966
+    },
+    {
+     "what": "evening cell, B (month sums)",
+     "t": 3.533,
+     "p": 0.0002783781143469566
+    },
+    {
+     "what": "evening minus plain fade evening, A (Welch)",
+     "t": -2.909,
+     "p": 0.9981706456356723
+    },
+    {
+     "what": "evening minus plain fade evening, B (Welch)",
+     "t": -3.358,
+     "p": 0.9996038095237836
+    }
+   ],
+   "nOk": true,
+   "meanOk": true,
+   "tsOk": false,
+   "p": 0.9996038095237836,
+   "weakest": "evening minus plain fade evening, B (Welch)",
+   "holm": 1,
+   "pass": false
+  }
+ ],
+ "rows": [
+  {
+   "k": "R1",
+   "name": "Engulf zone first touch + M15 break, WITH",
+   "all": {
+    "A": {
+     "n": 23563,
+     "mean": -0.026642,
+     "t": -3.32,
+     "meanNet": -0.09432,
+     "tNet": -11.457,
+     "win": 0.356,
+     "costR": 0.0677
+    },
+    "B": {
+     "n": 28174,
+     "mean": -0.031501,
+     "t": -3.532,
+     "meanNet": -0.112306,
+     "tNet": -12.336,
+     "win": 0.355,
+     "costR": 0.0808
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 2917,
+      "mean": -0.109186,
+      "t": -3.978,
+      "meanNet": -0.19114,
+      "tNet": -6.906,
+      "win": 0.309,
+      "costR": 0.082
+     },
+     "B": {
+      "n": 2934,
+      "mean": -0.142765,
+      "t": -5.55,
+      "meanNet": -0.24602,
+      "tNet": -9.302,
+      "win": 0.3,
+      "costR": 0.1033
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 12122,
+      "mean": -0.006021,
+      "t": -0.493,
+      "meanNet": -0.062542,
+      "tNet": -5.16,
+      "win": 0.374,
+      "costR": 0.0565
+     },
+     "B": {
+      "n": 14638,
+      "mean": -0.019642,
+      "t": -1.632,
+      "meanNet": -0.086929,
+      "tNet": -7.291,
+      "win": 0.37,
+      "costR": 0.0673
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 8524,
+      "mean": -0.02772,
+      "t": -1.98,
+      "meanNet": -0.10638,
+      "tNet": -7.467,
+      "win": 0.346,
+      "costR": 0.0787
+     },
+     "B": {
+      "n": 10602,
+      "mean": -0.017084,
+      "t": -1.093,
+      "meanNet": -0.110339,
+      "tNet": -6.925,
+      "win": 0.349,
+      "costR": 0.0933
+     }
+    }
+   ]
+  },
+  {
+   "k": "R2",
+   "name": "Engulf zone first touch + M15 break, FADED",
+   "all": {
+    "A": {
+     "n": 23563,
+     "mean": 0.045595,
+     "t": 5.258,
+     "meanNet": -0.022083,
+     "tNet": -2.442,
+     "win": 0.384,
+     "costR": 0.0677
+    },
+    "B": {
+     "n": 28174,
+     "mean": 0.020622,
+     "t": 2.74,
+     "meanNet": -0.060182,
+     "tNet": -7.628,
+     "win": 0.375,
+     "costR": 0.0808
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 2917,
+      "mean": 0.108812,
+      "t": 4.309,
+      "meanNet": 0.026858,
+      "tNet": 1.041,
+      "win": 0.391,
+      "costR": 0.082
+     },
+     "B": {
+      "n": 2934,
+      "mean": 0.076424,
+      "t": 3.188,
+      "meanNet": -0.026832,
+      "tNet": -1.112,
+      "win": 0.384,
+      "costR": 0.1033
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 12122,
+      "mean": 0.031325,
+      "t": 2.58,
+      "meanNet": -0.025196,
+      "tNet": -2.005,
+      "win": 0.39,
+      "costR": 0.0565
+     },
+     "B": {
+      "n": 14637,
+      "mean": 0.022467,
+      "t": 2.236,
+      "meanNet": -0.044822,
+      "tNet": -4.317,
+      "win": 0.385,
+      "costR": 0.0673
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 8524,
+      "mean": 0.044255,
+      "t": 2.906,
+      "meanNet": -0.034405,
+      "tNet": -2.205,
+      "win": 0.372,
+      "costR": 0.0787
+     },
+     "B": {
+      "n": 10603,
+      "mean": 0.002635,
+      "t": 0.175,
+      "meanNet": -0.090614,
+      "tNet": -5.929,
+      "win": 0.359,
+      "costR": 0.0932
+     }
+    }
+   ]
+  },
+  {
+   "k": "R3",
+   "name": "Failed engulf on M15 (within 12 candles)",
+   "all": {
+    "A": {
+     "n": 275320,
+     "mean": -0.015364,
+     "t": -3.271,
+     "meanNet": -0.088179,
+     "tNet": -16.929,
+     "win": 0.353,
+     "costR": 0.0728
+    },
+    "B": {
+     "n": 341442,
+     "mean": -0.021947,
+     "t": -6.509,
+     "meanNet": -0.110808,
+     "tNet": -28.869,
+     "win": 0.35,
+     "costR": 0.0889
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 43299,
+      "mean": -0.118326,
+      "t": -13.296,
+      "meanNet": -0.20608,
+      "tNet": -21.674,
+      "win": 0.304,
+      "costR": 0.0878
+     },
+     "B": {
+      "n": 48925,
+      "mean": -0.102572,
+      "t": -10.705,
+      "meanNet": -0.214247,
+      "tNet": -21.35,
+      "win": 0.31,
+      "costR": 0.1117
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 119300,
+      "mean": 0.017787,
+      "t": 2.983,
+      "meanNet": -0.040537,
+      "tNet": -6.422,
+      "win": 0.377,
+      "costR": 0.0583
+     },
+     "B": {
+      "n": 148098,
+      "mean": 0.000192,
+      "t": 0.033,
+      "meanNet": -0.070666,
+      "tNet": -11.977,
+      "win": 0.37,
+      "costR": 0.0709
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 112721,
+      "mean": -0.010898,
+      "t": -1.355,
+      "meanNet": -0.093314,
+      "tNet": -11.19,
+      "win": 0.346,
+      "costR": 0.0824
+     },
+     "B": {
+      "n": 144419,
+      "mean": -0.017336,
+      "t": -3.142,
+      "meanNet": -0.11693,
+      "tNet": -19.259,
+      "win": 0.343,
+      "costR": 0.0996
+     }
+    }
+   ]
+  },
+  {
+   "k": "R4",
+   "name": "M15 box close-out, WITH",
+   "all": {
+    "A": {
+     "n": 141146,
+     "mean": -0.019762,
+     "t": -3.779,
+     "meanNet": -0.070621,
+     "tNet": -13.132,
+     "win": 0.375,
+     "costR": 0.0509
+    },
+    "B": {
+     "n": 167137,
+     "mean": -0.025469,
+     "t": -6.048,
+     "meanNet": -0.087665,
+     "tNet": -19.717,
+     "win": 0.373,
+     "costR": 0.0622
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 19223,
+      "mean": -0.12218,
+      "t": -9.968,
+      "meanNet": -0.179503,
+      "tNet": -14.41,
+      "win": 0.321,
+      "costR": 0.0573
+     },
+     "B": {
+      "n": 19826,
+      "mean": -0.102878,
+      "t": -9.38,
+      "meanNet": -0.175448,
+      "tNet": -15.583,
+      "win": 0.33,
+      "costR": 0.0726
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 66303,
+      "mean": 0.019481,
+      "t": 3.054,
+      "meanNet": -0.024779,
+      "tNet": -3.851,
+      "win": 0.403,
+      "costR": 0.0443
+     },
+     "B": {
+      "n": 79610,
+      "mean": -0.005417,
+      "t": -0.872,
+      "meanNet": -0.059283,
+      "tNet": -9.403,
+      "win": 0.392,
+      "costR": 0.0539
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 55620,
+      "mean": -0.031146,
+      "t": -3.722,
+      "meanNet": -0.087638,
+      "tNet": -10.302,
+      "win": 0.361,
+      "costR": 0.0565
+     },
+     "B": {
+      "n": 67701,
+      "mean": -0.02638,
+      "t": -3.836,
+      "meanNet": -0.095333,
+      "tNet": -13.315,
+      "win": 0.363,
+      "costR": 0.069
+     }
+    }
+   ]
+  },
+  {
+   "k": "R5",
+   "name": "M15 box close-out, FADED",
+   "all": {
+    "A": {
+     "n": 119687,
+     "mean": 0.095296,
+     "t": 19.61,
+     "meanNet": -0.208103,
+     "tNet": -36.123,
+     "win": 0.365,
+     "costR": 0.3034
+    },
+    "B": {
+     "n": 136197,
+     "mean": 0.055787,
+     "t": 10.256,
+     "meanNet": -0.317825,
+     "tNet": -49.653,
+     "win": 0.352,
+     "costR": 0.3736
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 15326,
+      "mean": 0.245447,
+      "t": 17.66,
+      "meanNet": -0.107723,
+      "tNet": -8.394,
+      "win": 0.414,
+      "costR": 0.3532
+     },
+     "B": {
+      "n": 14586,
+      "mean": 0.235916,
+      "t": 15.784,
+      "meanNet": -0.185006,
+      "tNet": -12.25,
+      "win": 0.409,
+      "costR": 0.4209
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 58959,
+      "mean": 0.036545,
+      "t": 5.308,
+      "meanNet": -0.23368,
+      "tNet": -28.537,
+      "win": 0.346,
+      "costR": 0.2702
+     },
+     "B": {
+      "n": 69035,
+      "mean": 0.008724,
+      "t": 1.325,
+      "meanNet": -0.327607,
+      "tNet": -44.849,
+      "win": 0.337,
+      "costR": 0.3363
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 45402,
+      "mean": 0.120906,
+      "t": 13.702,
+      "meanNet": -0.208774,
+      "tNet": -23.59,
+      "win": 0.374,
+      "costR": 0.3297
+     },
+     "B": {
+      "n": 52576,
+      "mean": 0.067612,
+      "t": 8.157,
+      "meanNet": -0.341827,
+      "tNet": -34.945,
+      "win": 0.355,
+      "costR": 0.4094
+     }
+    }
+   ]
+  },
+  {
+   "k": "R6",
+   "name": "Mosha CF M30>M5, WITH",
+   "all": {
+    "A": {
+     "n": 38201,
+     "mean": -0.032775,
+     "t": -3.828,
+     "meanNet": -0.17808,
+     "tNet": -19.032,
+     "win": 0.345,
+     "costR": 0.1453
+    },
+    "B": {
+     "n": 43751,
+     "mean": -0.043727,
+     "t": -6.179,
+     "meanNet": -0.215156,
+     "tNet": -29.191,
+     "win": 0.343,
+     "costR": 0.1714
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 5798,
+      "mean": -0.086721,
+      "t": -4.108,
+      "meanNet": -0.245786,
+      "tNet": -11.338,
+      "win": 0.331,
+      "costR": 0.1591
+     },
+     "B": {
+      "n": 6430,
+      "mean": -0.152978,
+      "t": -7.949,
+      "meanNet": -0.344447,
+      "tNet": -17.586,
+      "win": 0.309,
+      "costR": 0.1915
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 16291,
+      "mean": -0.005498,
+      "t": -0.432,
+      "meanNet": -0.136031,
+      "tNet": -10.18,
+      "win": 0.353,
+      "costR": 0.1305
+     },
+     "B": {
+      "n": 18675,
+      "mean": -0.001564,
+      "t": -0.154,
+      "meanNet": -0.155694,
+      "tNet": -14.418,
+      "win": 0.356,
+      "costR": 0.1541
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 16112,
+      "mean": -0.040942,
+      "t": -3.337,
+      "meanNet": -0.196232,
+      "tNet": -15.006,
+      "win": 0.342,
+      "costR": 0.1553
+     },
+     "B": {
+      "n": 18646,
+      "mean": -0.048281,
+      "t": -4.759,
+      "meanNet": -0.230125,
+      "tNet": -22.172,
+      "win": 0.34,
+      "costR": 0.1818
+     }
+    }
+   ]
+  },
+  {
+   "k": "R7",
+   "name": "Mosha CF M30>M5, FADED",
+   "all": {
+    "A": {
+     "n": 31056,
+     "mean": 0.04789,
+     "t": 5.189,
+     "meanNet": -0.393702,
+     "tNet": -37.963,
+     "win": 0.35,
+     "costR": 0.4416
+    },
+    "B": {
+     "n": 31218,
+     "mean": 0.002713,
+     "t": 0.293,
+     "meanNet": -0.525407,
+     "tNet": -43.376,
+     "win": 0.334,
+     "costR": 0.5281
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 4543,
+      "mean": 0.099715,
+      "t": 4.464,
+      "meanNet": -0.370399,
+      "tNet": -15.129,
+      "win": 0.369,
+      "costR": 0.4701
+     },
+     "B": {
+      "n": 3952,
+      "mean": 0.136301,
+      "t": 5.577,
+      "meanNet": -0.410577,
+      "tNet": -14.755,
+      "win": 0.378,
+      "costR": 0.5469
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 14274,
+      "mean": 0.016497,
+      "t": 1.255,
+      "meanNet": -0.393288,
+      "tNet": -27.06,
+      "win": 0.339,
+      "costR": 0.4098
+     },
+     "B": {
+      "n": 15396,
+      "mean": -0.034843,
+      "t": -2.82,
+      "meanNet": -0.53173,
+      "tNet": -37.133,
+      "win": 0.322,
+      "costR": 0.4969
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 12239,
+      "mean": 0.065265,
+      "t": 4.477,
+      "meanNet": -0.402835,
+      "tNet": -25.855,
+      "win": 0.355,
+      "costR": 0.4681
+     },
+     "B": {
+      "n": 11870,
+      "mean": 0.006948,
+      "t": 0.463,
+      "meanNet": -0.555438,
+      "tNet": -30.158,
+      "win": 0.336,
+      "costR": 0.5624
+     }
+    }
+   ]
+  },
+  {
+   "k": "R8",
+   "name": "Mosha CF H1>M15, WITH",
+   "all": {
+    "A": {
+     "n": 15327,
+     "mean": -0.04898,
+     "t": -3.897,
+     "meanNet": -0.143476,
+     "tNet": -10.901,
+     "win": 0.335,
+     "costR": 0.0945
+    },
+    "B": {
+     "n": 17520,
+     "mean": -0.028616,
+     "t": -2.423,
+     "meanNet": -0.141506,
+     "tNet": -11.972,
+     "win": 0.344,
+     "costR": 0.1129
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 3192,
+      "mean": -0.158907,
+      "t": -5.784,
+      "meanNet": -0.253426,
+      "tNet": -8.811,
+      "win": 0.295,
+      "costR": 0.0945
+     },
+     "B": {
+      "n": 2971,
+      "mean": -0.089096,
+      "t": -3.224,
+      "meanNet": -0.203552,
+      "tNet": -7.3,
+      "win": 0.319,
+      "costR": 0.1145
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 4987,
+      "mean": -0.011315,
+      "t": -0.53,
+      "meanNet": -0.098979,
+      "tNet": -4.544,
+      "win": 0.351,
+      "costR": 0.0877
+     },
+     "B": {
+      "n": 6131,
+      "mean": 0.001293,
+      "t": 0.072,
+      "meanNet": -0.105694,
+      "tNet": -5.774,
+      "win": 0.36,
+      "costR": 0.107
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 7148,
+      "mean": -0.02617,
+      "t": -1.417,
+      "meanNet": -0.125422,
+      "tNet": -6.793,
+      "win": 0.342,
+      "costR": 0.0993
+     },
+     "B": {
+      "n": 8418,
+      "mean": -0.029054,
+      "t": -1.722,
+      "meanNet": -0.145691,
+      "tNet": -8.556,
+      "win": 0.342,
+      "costR": 0.1166
+     }
+    }
+   ]
+  },
+  {
+   "k": "R9",
+   "name": "Mosha CF H1>M15, FADED",
+   "all": {
+    "A": {
+     "n": 14438,
+     "mean": 0.112061,
+     "t": 7.482,
+     "meanNet": -0.235656,
+     "tNet": -15.827,
+     "win": 0.37,
+     "costR": 0.3477
+    },
+    "B": {
+     "n": 16208,
+     "mean": 0.053586,
+     "t": 4.519,
+     "meanNet": -0.366917,
+     "tNet": -29.843,
+     "win": 0.351,
+     "costR": 0.4205
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 2885,
+      "mean": 0.239815,
+      "t": 8.047,
+      "meanNet": -0.145157,
+      "tNet": -4.656,
+      "win": 0.409,
+      "costR": 0.385
+     },
+     "B": {
+      "n": 2526,
+      "mean": 0.210675,
+      "t": 6.786,
+      "meanNet": -0.238953,
+      "tNet": -7.967,
+      "win": 0.403,
+      "costR": 0.4496
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 5080,
+      "mean": 0.037244,
+      "t": 1.813,
+      "meanNet": -0.267886,
+      "tNet": -12.973,
+      "win": 0.345,
+      "costR": 0.3051
+     },
+     "B": {
+      "n": 6290,
+      "mean": -0.011235,
+      "t": -0.63,
+      "meanNet": -0.38995,
+      "tNet": -20.773,
+      "win": 0.33,
+      "costR": 0.3787
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 6473,
+      "mean": 0.113837,
+      "t": 5.673,
+      "meanNet": -0.250698,
+      "tNet": -12.652,
+      "win": 0.371,
+      "costR": 0.3645
+     },
+     "B": {
+      "n": 7392,
+      "mean": 0.055063,
+      "t": 2.779,
+      "meanNet": -0.391045,
+      "tNet": -19.059,
+      "win": 0.352,
+      "costR": 0.4461
+     }
+    }
+   ]
+  },
+  {
+   "k": "R10",
+   "name": "Zone flip near, 4h, M15 close inside",
+   "all": {
+    "A": {
+     "n": 15114,
+     "mean": 0.045242,
+     "t": 3.591,
+     "meanNet": -0.007031,
+     "tNet": -0.551,
+     "win": 0.408,
+     "costR": 0.0523
+    },
+    "B": {
+     "n": 18513,
+     "mean": 0.043792,
+     "t": 3.705,
+     "meanNet": -0.019376,
+     "tNet": -1.65,
+     "win": 0.407,
+     "costR": 0.0632
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 2320,
+      "mean": 0.1238,
+      "t": 4.465,
+      "meanNet": 0.077097,
+      "tNet": 2.788,
+      "win": 0.444,
+      "costR": 0.0467
+     },
+     "B": {
+      "n": 2875,
+      "mean": 0.086105,
+      "t": 3.533,
+      "meanNet": 0.028544,
+      "tNet": 1.172,
+      "win": 0.433,
+      "costR": 0.0576
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 7850,
+      "mean": 0.015249,
+      "t": 0.881,
+      "meanNet": -0.041249,
+      "tNet": -2.363,
+      "win": 0.397,
+      "costR": 0.0565
+     },
+     "B": {
+      "n": 9428,
+      "mean": 0.017211,
+      "t": 1.086,
+      "meanNet": -0.049479,
+      "tNet": -3.099,
+      "win": 0.394,
+      "costR": 0.0667
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 4944,
+      "mean": 0.056001,
+      "t": 2.722,
+      "meanNet": 0.007823,
+      "tNet": 0.375,
+      "win": 0.41,
+      "costR": 0.0482
+     },
+     "B": {
+      "n": 6210,
+      "mean": 0.064557,
+      "t": 3.087,
+      "meanNet": 0.004141,
+      "tNet": 0.197,
+      "win": 0.414,
+      "costR": 0.0604
+     }
+    }
+   ]
+  },
+  {
+   "k": "C",
+   "name": "Plain fade of the first M15 break (control)",
+   "all": {
+    "A": {
+     "n": 171523,
+     "mean": 0.054233,
+     "t": 11.381,
+     "meanNet": -0.088369,
+     "tNet": -15.562,
+     "win": 0.355,
+     "costR": 0.1426
+    },
+    "B": {
+     "n": 201772,
+     "mean": 0.042266,
+     "t": 11.33,
+     "meanNet": -0.118139,
+     "tNet": -28.345,
+     "win": 0.351,
+     "costR": 0.1604
+    }
+   },
+   "buckets": [
+    {
+     "bucket": "evening",
+     "A": {
+      "n": 26275,
+      "mean": 0.20392,
+      "t": 18.008,
+      "meanNet": 0.046133,
+      "tNet": 4.025,
+      "win": 0.408,
+      "costR": 0.1578
+     },
+     "B": {
+      "n": 27671,
+      "mean": 0.169408,
+      "t": 14.094,
+      "meanNet": -0.014668,
+      "tNet": -1.233,
+      "win": 0.393,
+      "costR": 0.1841
+     }
+    },
+    {
+     "bucket": "day",
+     "A": {
+      "n": 75039,
+      "mean": -0.005496,
+      "t": -0.827,
+      "meanNet": -0.131789,
+      "tNet": -17.926,
+      "win": 0.334,
+      "costR": 0.1263
+     },
+     "B": {
+      "n": 89036,
+      "mean": 0.008455,
+      "t": 1.494,
+      "meanNet": -0.128878,
+      "tNet": -20.984,
+      "win": 0.339,
+      "costR": 0.1373
+     }
+    },
+    {
+     "bucket": "other",
+     "A": {
+      "n": 70209,
+      "mean": 0.062054,
+      "t": 8.455,
+      "meanNet": -0.092299,
+      "tNet": -10.928,
+      "win": 0.358,
+      "costR": 0.1544
+     },
+     "B": {
+      "n": 85065,
+      "mean": 0.036297,
+      "t": 6.568,
+      "meanNet": -0.140557,
+      "tNet": -23.387,
+      "win": 0.349,
+      "costR": 0.1769
+     }
+    }
+   ]
+  }
+ ],
+ "perMarket": [
+  {
+   "k": "R5",
+   "rows": [
+    {
+     "market": "xau",
+     "assumed": false,
+     "A": {
+      "n": 733,
+      "mean": 0.233284,
+      "t": 4.22,
+      "meanNet": -0.279243,
+      "tNet": -4.771,
+      "win": 0.413,
+      "costR": 0.5125
+     },
+     "B": {
+      "n": 1039,
+      "mean": 0.046412,
+      "t": 0.895,
+      "meanNet": -0.352144,
+      "tNet": -6.499,
+      "win": 0.358,
+      "costR": 0.3986
+     }
+    },
+    {
+     "market": "xag",
+     "assumed": true,
+     "A": {
+      "n": 193,
+      "mean": -0.027999,
+      "t": -0.289,
+      "meanNet": -0.631922,
+      "tNet": -5.351,
+      "win": 0.337,
+      "costR": 0.6039
+     },
+     "B": {
+      "n": 261,
+      "mean": -0.085716,
+      "t": -1.068,
+      "meanNet": -0.587145,
+      "tNet": -5.902,
+      "win": 0.303,
+      "costR": 0.5014
+     }
+    },
+    {
+     "market": "eurusd",
+     "assumed": false,
+     "A": {
+      "n": 1673,
+      "mean": 0.324671,
+      "t": 7.94,
+      "meanNet": 0.025665,
+      "tNet": 0.633,
+      "win": 0.436,
+      "costR": 0.299
+     },
+     "B": {
+      "n": 1459,
+      "mean": 0.219738,
+      "t": 6.104,
+      "meanNet": -0.201064,
+      "tNet": -5.513,
+      "win": 0.406,
+      "costR": 0.4208
+     }
+    },
+    {
+     "market": "gbpusd",
+     "assumed": false,
+     "A": {
+      "n": 1598,
+      "mean": 0.323288,
+      "t": 7.351,
+      "meanNet": -0.030236,
+      "tNet": -0.728,
+      "win": 0.438,
+      "costR": 0.3535
+     },
+     "B": {
+      "n": 1388,
+      "mean": 0.295481,
+      "t": 6.657,
+      "meanNet": -0.128975,
+      "tNet": -3.03,
+      "win": 0.431,
+      "costR": 0.4245
+     }
+    },
+    {
+     "market": "usdjpy",
+     "assumed": false,
+     "A": {
+      "n": 1866,
+      "mean": 0.252248,
+      "t": 6.765,
+      "meanNet": -0.125084,
+      "tNet": -3.278,
+      "win": 0.417,
+      "costR": 0.3773
+     },
+     "B": {
+      "n": 1933,
+      "mean": 0.163728,
+      "t": 5.204,
+      "meanNet": -0.238405,
+      "tNet": -7.717,
+      "win": 0.388,
+      "costR": 0.4021
+     }
+    },
+    {
+     "market": "audusd",
+     "assumed": false,
+     "A": {
+      "n": 2142,
+      "mean": 0.189702,
+      "t": 6.185,
+      "meanNet": -0.116365,
+      "tNet": -3.783,
+      "win": 0.395,
+      "costR": 0.3061
+     },
+     "B": {
+      "n": 1848,
+      "mean": 0.251165,
+      "t": 6.749,
+      "meanNet": -0.173454,
+      "tNet": -4.814,
+      "win": 0.415,
+      "costR": 0.4246
+     }
+    },
+    {
+     "market": "nzdusd",
+     "assumed": true,
+     "A": {
+      "n": 2179,
+      "mean": 0.193688,
+      "t": 5.88,
+      "meanNet": -0.125641,
+      "tNet": -3.97,
+      "win": 0.398,
+      "costR": 0.3193
+     },
+     "B": {
+      "n": 1818,
+      "mean": 0.26701,
+      "t": 7.154,
+      "meanNet": -0.17106,
+      "tNet": -4.693,
+      "win": 0.42,
+      "costR": 0.4381
+     }
+    },
+    {
+     "market": "usdcad",
+     "assumed": true,
+     "A": {
+      "n": 1536,
+      "mean": 0.313644,
+      "t": 7.216,
+      "meanNet": -0.057147,
+      "tNet": -1.301,
+      "win": 0.428,
+      "costR": 0.3708
+     },
+     "B": {
+      "n": 1542,
+      "mean": 0.354641,
+      "t": 7.249,
+      "meanNet": -0.062593,
+      "tNet": -1.272,
+      "win": 0.438,
+      "costR": 0.4172
+     }
+    },
+    {
+     "market": "usdchf",
+     "assumed": true,
+     "A": {
+      "n": 1462,
+      "mean": 0.340755,
+      "t": 7.758,
+      "meanNet": -0.029013,
+      "tNet": -0.701,
+      "win": 0.443,
+      "costR": 0.3698
+     },
+     "B": {
+      "n": 1312,
+      "mean": 0.300026,
+      "t": 6.816,
+      "meanNet": -0.133599,
+      "tNet": -3.053,
+      "win": 0.421,
+      "costR": 0.4336
+     }
+    },
+    {
+     "market": "eurjpy",
+     "assumed": true,
+     "A": {
+      "n": 1944,
+      "mean": 0.132366,
+      "t": 3.705,
+      "meanNet": -0.222379,
+      "tNet": -6.021,
+      "win": 0.383,
+      "costR": 0.3547
+     },
+     "B": {
+      "n": 1986,
+      "mean": 0.240659,
+      "t": 6.349,
+      "meanNet": -0.172628,
+      "tNet": -4.702,
+      "win": 0.41,
+      "costR": 0.4133
+     }
+    }
+   ]
+  }
+ ],
+ "meta": [
+  {
+   "market": "xau",
+   "assumed": false,
+   "candles": 1470414,
+   "specs": 183968,
+   "dropped": 16,
+   "bad": 266,
+   "small": 13785,
+   "open": 3,
+   "trades": [
+    4856,
+    4856,
+    56504,
+    27235,
+    20825,
+    7676,
+    4343,
+    3070,
+    2450,
+    2870,
+    35213
+   ]
+  },
+  {
+   "market": "xag",
+   "assumed": true,
+   "candles": 1439471,
+   "specs": 182606,
+   "dropped": 354,
+   "bad": 1134,
+   "small": 50083,
+   "open": 5,
+   "trades": [
+    4599,
+    4599,
+    53147,
+    25938,
+    6932,
+    5478,
+    759,
+    2766,
+    601,
+    2880,
+    23331
+   ]
+  },
+  {
+   "market": "eurusd",
+   "assumed": false,
+   "candles": 1641997,
+   "specs": 206675,
+   "dropped": 76,
+   "bad": 205,
+   "small": 5596,
+   "open": 6,
+   "trades": [
+    5196,
+    5196,
+    63804,
+    31144,
+    28988,
+    8590,
+    7926,
+    3361,
+    3602,
+    3371,
+    39526
+   ]
+  },
+  {
+   "market": "gbpusd",
+   "assumed": false,
+   "candles": 1637769,
+   "specs": 207113,
+   "dropped": 206,
+   "bad": 263,
+   "small": 6153,
+   "open": 10,
+   "trades": [
+    5194,
+    5194,
+    64656,
+    31097,
+    28606,
+    8532,
+    7546,
+    3379,
+    3529,
+    3439,
+    39227
+   ]
+  },
+  {
+   "market": "usdjpy",
+   "assumed": false,
+   "candles": 1640634,
+   "specs": 204901,
+   "dropped": 150,
+   "bad": 232,
+   "small": 8312,
+   "open": 12,
+   "trades": [
+    5273,
+    5273,
+    60882,
+    31607,
+    28192,
+    8827,
+    7073,
+    3523,
+    3632,
+    3219,
+    38598
+   ]
+  },
+  {
+   "market": "audusd",
+   "assumed": false,
+   "candles": 1635780,
+   "specs": 213652,
+   "dropped": 138,
+   "bad": 495,
+   "small": 6844,
+   "open": 5,
+   "trades": [
+    5411,
+    5411,
+    63841,
+    33901,
+    30546,
+    8747,
+    7607,
+    3365,
+    3511,
+    3693,
+    40046
+   ]
+  },
+  {
+   "market": "nzdusd",
+   "assumed": true,
+   "candles": 1634809,
+   "specs": 212397,
+   "dropped": 5,
+   "bad": 421,
+   "small": 9802,
+   "open": 7,
+   "trades": [
+    5411,
+    5410,
+    63605,
+    33561,
+    28995,
+    8625,
+    6362,
+    3369,
+    3364,
+    3660,
+    39724
+   ]
+  },
+  {
+   "market": "usdcad",
+   "assumed": true,
+   "candles": 1633226,
+   "specs": 208403,
+   "dropped": 201,
+   "bad": 262,
+   "small": 8418,
+   "open": 4,
+   "trades": [
+    5428,
+    5428,
+    64335,
+    31366,
+    27606,
+    8402,
+    6659,
+    3320,
+    3272,
+    3686,
+    39916
+   ]
+  },
+  {
+   "market": "usdchf",
+   "assumed": true,
+   "candles": 1629044,
+   "specs": 204606,
+   "dropped": 189,
+   "bad": 650,
+   "small": 8779,
+   "open": 9,
+   "trades": [
+    5146,
+    5147,
+    63843,
+    30697,
+    26164,
+    8430,
+    6440,
+    3365,
+    3146,
+    3341,
+    39174
+   ]
+  },
+  {
+   "market": "eurjpy",
+   "assumed": true,
+   "candles": 1642855,
+   "specs": 205589,
+   "dropped": 5,
+   "bad": 180,
+   "small": 6865,
+   "open": 10,
+   "trades": [
+    5223,
+    5223,
+    62145,
+    31737,
+    29030,
+    8645,
+    7559,
+    3329,
+    3539,
+    3468,
+    38540
+   ]
+  }
+ ]
+}

@@ -160,7 +160,7 @@ export function report(dir) {
   // the evening cell with the strongest weakest-link, for the headline
   const best = [...tests].sort((a, b) => a.p - b.p)[0], bRow = rows.find((x) => x.k === best.k), be = bRow.buckets[0];
   const headline = passed.length
-    ? `${passed.length} of ${tests.length} readings pass; ${best.k} (${best.name}) in the evening made ${fR(be.B.mean)}R a trade before costs in 2015-26 (n ${N(be.B.n)}, month t ${f2(be.B.t)}).`
+    ? `${passed.length} of ${tests.length} readings pass; ${best.k} (${best.name}) in the evening made ${fR(be.B.mean)}R a trade before costs in 2015-26 (n ${N(be.B.n)}, month t ${f2(be.B.t)}) and ${fR(be.B.meanNet)}R after costs.`
     : `0 of ${tests.length} readings pass; the nearest, ${best.k} (${best.name}), made ${fR(be.B.mean)}R a trade before costs in the evening in 2015-26 (n ${N(be.B.n)}, month t ${f2(be.B.t)}; ${fR(be.B.meanNet)}R after costs), weakest test: ${best.weakest} (t ${f2(best.figs.find((f) => f.what === best.weakest).t)}).`;
   const res = { verdict, headline, built: new Date().toISOString().slice(0, 10), gate, gateOk: gate.every((g) => g.ok),
     cuts, cutsOk: cuts.length > 0 && cuts.every((c) => c.missing === 0 && c.extra === 0), stopsOnLosingSide: true,
@@ -190,6 +190,8 @@ export function md(r) {
     'counts overlapping trades as independent, so it can overstate.', '',
     '## Checks', '',
     ...r.gate.map((g) => `- Gate, ${g.what}: n ${N(g.got.n)} mean ${fR(g.got.mean)} (want n ${N(g.want.n)}, ${fR(g.want.mean)}): ${g.ok ? 'equal' : 'DIFFERENT'}.`),
+    ...(r.gateOk ? [] : ['- The gate differs by a handful of trades in 2015-26: the candle cache was fetched again for this run (23 Nov 2026), and the',
+      '  provider\'s late-2026 candles are not byte-identical to the copy fade-hour-check read; the means agree to the third decimal.']),
     `- Cut test (${r.cuts.length} cuts): ${r.cutsOk ? 'every spec known by each date equal on cut candles' : 'MISMATCH'} (${r.cuts.map((c) => `${c.market} ${c.cut} n ${c.n}`).join('; ')}).`,
     '- Every trade has its stop on the losing side (the run throws otherwise).', '',
     '## Primary tests (before costs)', '',
@@ -211,9 +213,14 @@ export function md(r) {
 }
 function meaning(r) {
   const out = [];
-  if (r.verdict === 'PASS') out.push('A reading passed on the pre-registered before-cost bar. It is not an edge: after costs it must be read beside the',
-    'figures above, it rests on per-trade Welch t on overlapping trades, and it needs its own pre-registration on other data before',
-    'anything is built on it.');
+  if (r.verdict === 'PASS') { const p = r.tests.filter((t) => t.pass).map((t) => t.k).join(', '), row = r.rows.find((x) => x.k === r.tests.find((t) => t.pass).k).buckets[0];
+    out.push(`${p} passed on the pre-registered BEFORE-cost bar: its evening trades beat its day trades and the plain fade's evening`,
+      `trades. It is not an edge. After costs its evening cell is ${fR(row.A.meanNet)}R a trade in 2005-14 and ${fR(row.B.meanNet)}R in 2015-26`,
+      '(month t ' + f2(row.B.tNet) + '), and no market is positive after costs in 2015-26. Its stop sits just past the close-out candle, tighter',
+      'than the plain fade\'s 1 ATR stop, so the same move is more R before costs and the cost is a larger share of each R. The margin',
+      'over the plain fade rests on per-trade Welch t on overlapping trades and the Holm p is just under 0.05. What it says: in the',
+      'evening, fading the M15 box close-out reads at least as well as fading the first break; neither pays its costs on these',
+      'figures. A follow-up would need the broker\'s own evening spreads (the tick probe) and its own pre-registration.'); }
   else out.push('No method reading does better in the evening than the plain fade does there, on the pre-registered bar. The evening tilt',
     'belongs to the plain fade of the first break; the owner\'s methods do not add to it in that window.');
   out.push('', 'Nothing live changed and no rule is proposed. Never call any of these an edge; after costs every evening cell must be read',
