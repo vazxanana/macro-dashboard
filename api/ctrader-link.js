@@ -179,7 +179,7 @@ async function readAccount(env, WS, accessToken, acc, { days = 30, now = Date.no
         swap: money(p.swap, Number.isFinite(+p.moneyDigits) ? +p.moneyDigits : md), commission: money(p.commission, Number.isFinite(+p.moneyDigits) ? +p.moneyDigits : md),
         pnl: u ? u.net : null, pnlGross: u ? u.gross : null, label: t.label || null }; });
     const orders = (rc.order || []).map((o) => { const t = o.tradeData || {}; return { id: String(o.orderId), symbol: nameOf.get(String(t.symbolId)) || String(t.symbolId), side: sideOf(t.tradeSide),
-      type: o.orderType, lots: lots(t.volume, t.symbolId), price: o.limitPrice ?? o.stopPrice ?? null, sl: o.stopLoss ?? null, tp: o.takeProfit ?? null }; });
+      type: o.orderType, lots: lots(t.volume, t.symbolId), price: o.limitPrice ?? o.stopPrice ?? null, sl: o.stopLoss ?? null, tp: o.takeProfit ?? null, label: t.label || null }; });
     const history = deals.filter((d) => d.closePositionDetail).map((d) => { const c = d.closePositionDetail, cd = Number.isFinite(+c.moneyDigits) ? +c.moneyDigits : md;
       const gross = money(c.grossProfit, cd), swap = money(c.swap, cd) || 0, comm = money(c.commission, cd) || 0;
       return { id: String(d.dealId), positionId: String(d.positionId), symbol: nameOf.get(String(d.symbolId)) || String(d.symbolId), side: sideOf(d.tradeSide) === 'buy' ? 'sell' : 'buy',   // a closing deal is the opposite side

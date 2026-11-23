@@ -134,7 +134,7 @@ test('the reading, the one digest / Home line only when a line is crossed or a c
 test('wiring: the Trader writes coach.json forward on the 6-hour slot and the daily Coach rewrite carries it; financing is the Trader\'s FIN', () => {
   const tr = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
   assert.match(tr, /import \{ buildForward, loadProtocol, stopSwitch \} from '\.\/forward\.mjs'/);
-  assert.match(tr, /cj\.forward = \{ \.\.\.buildForward\(\{ trades, snapshot, mirrors, accounts: rd\('ctrader\/accounts\.json', null\), protocol: pr, prev: cj\.forward \}, \{ now \}\), slot: CC_SLOT \}/);
+  assert.match(tr, /cj\.forward = \{ \.\.\.buildForward\(\{ trades, snapshot, mirrors, accounts: rd\('ctrader\/accounts\.json', null\), protocol: pr, prev: cj\.forward, dom: rd\('dom\/trades\.json', null\) \}, \{ now \}\), slot: CC_SLOT \}/);
   assert.match(tr, /!cj\.forward \|\| cj\.forward\.slot !== CC_SLOT/);
   assert.match(tr, /expect: prev\.expect, forward: prev\.forward,/);
   assert.ok(FIN.xau.long > 0);

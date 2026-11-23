@@ -1,0 +1,1078 @@
+{
+ "study": "chart-rules-2020",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "0 of 3 tests pass; T1 confirmation -0.020R a trade (n 3354, month t -0.29), T2 confirmation -0.035R a trade (n 283, month t -0.20), T3 confirmation -0.252R a trade (n 94, month t -1.49).",
+ "window": {
+  "from": "2020-01-01",
+  "split": "2024-01-01",
+  "to": "2026-11-23"
+ },
+ "params": {
+  "atrN": 14,
+  "atrK": 0.25,
+  "life": 24,
+  "minRR": 3,
+  "window": 24,
+  "K": 3,
+  "cap": {
+   "1h": 432000,
+   "4h": 864000
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "Barrier retest, H1 boxes",
+   "net": {
+    "all": {
+     "n": 8082,
+     "won": 1693,
+     "mean": -0.06,
+     "total": -482.401,
+     "tTrade": -2.538,
+     "tMonth": -1.381,
+     "pMonth": 0.171,
+     "months": 83,
+     "maxDD": -737.58
+    },
+    "discovery": {
+     "n": 4728,
+     "won": 972,
+     "mean": -0.088,
+     "total": -415.884,
+     "tTrade": -2.913,
+     "tMonth": -1.551,
+     "pMonth": 0.128,
+     "months": 48,
+     "maxDD": -710.025
+    },
+    "confirmation": {
+     "n": 3354,
+     "won": 721,
+     "mean": -0.02,
+     "total": -66.517,
+     "tTrade": -0.53,
+     "tMonth": -0.295,
+     "pMonth": 0.769,
+     "months": 35,
+     "maxDD": -201.325
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 8082,
+     "won": 1696,
+     "mean": -0.009,
+     "total": -76.307,
+     "tTrade": -0.402,
+     "tMonth": -0.218,
+     "pMonth": 0.828,
+     "months": 83,
+     "maxDD": -540.497
+    },
+    "discovery": {
+     "n": 4728,
+     "won": 974,
+     "mean": -0.039,
+     "total": -183.156,
+     "tTrade": -1.283,
+     "tMonth": -0.682,
+     "pMonth": 0.499,
+     "months": 48,
+     "maxDD": -540.497
+    },
+    "confirmation": {
+     "n": 3354,
+     "won": 722,
+     "mean": 0.032,
+     "total": 106.849,
+     "tTrade": 0.852,
+     "tMonth": 0.474,
+     "pMonth": 0.639,
+     "months": 35,
+     "maxDD": -141.799
+    }
+   },
+   "cost2": {
+    "all": {
+     "n": 8082,
+     "won": 1690,
+     "mean": -0.11,
+     "total": -888.495,
+     "tTrade": -4.67,
+     "tMonth": -2.543,
+     "pMonth": 0.0129,
+     "months": 83,
+     "maxDD": -1091.903
+    },
+    "discovery": {
+     "n": 4728,
+     "won": 969,
+     "mean": -0.137,
+     "total": -648.612,
+     "tTrade": -4.539,
+     "tMonth": -2.42,
+     "pMonth": 0.0194,
+     "months": 48,
+     "maxDD": -879.636
+    },
+    "confirmation": {
+     "n": 3354,
+     "won": 721,
+     "mean": -0.072,
+     "total": -239.884,
+     "tTrade": -1.91,
+     "tMonth": -1.064,
+     "pMonth": 0.295,
+     "months": 35,
+     "maxDD": -310.309
+    }
+   },
+   "medianRR": 4.45,
+   "byMarket": {
+    "xau": {
+     "n": 377,
+     "mean": -0.187,
+     "tMonth": -1.439
+    },
+    "eurusd": {
+     "n": 438,
+     "mean": -0.139,
+     "tMonth": -1.029
+    },
+    "gbpusd": {
+     "n": 498,
+     "mean": 0.119,
+     "tMonth": 0.765
+    },
+    "usdjpy": {
+     "n": 407,
+     "mean": -0.141,
+     "tMonth": -1.126
+    },
+    "audusd": {
+     "n": 445,
+     "mean": -0.224,
+     "tMonth": -1.848
+    },
+    "nzdusd": {
+     "n": 591,
+     "mean": -0.025,
+     "tMonth": -0.156
+    },
+    "usdcad": {
+     "n": 567,
+     "mean": 0.045,
+     "tMonth": 0.293
+    },
+    "usdchf": {
+     "n": 500,
+     "mean": -0.196,
+     "tMonth": -1.316
+    },
+    "eurjpy": {
+     "n": 340,
+     "mean": 0.309,
+     "tMonth": 1.552
+    },
+    "xag": {
+     "n": 381,
+     "mean": -0.285,
+     "tMonth": -1.97
+    },
+    "gbpjpy": {
+     "n": 467,
+     "mean": -0.243,
+     "tMonth": -1.742
+    },
+    "eurgbp": {
+     "n": 400,
+     "mean": -0.181,
+     "tMonth": -1.21
+    },
+    "audjpy": {
+     "n": 385,
+     "mean": 0.025,
+     "tMonth": 0.152
+    },
+    "cadjpy": {
+     "n": 472,
+     "mean": -0.242,
+     "tMonth": -1.859
+    },
+    "euraud": {
+     "n": 353,
+     "mean": 0.081,
+     "tMonth": 0.478
+    },
+    "nas100": {
+     "n": 548,
+     "mean": 0.064,
+     "tMonth": 0.371
+    },
+    "spx500": {
+     "n": 484,
+     "mean": 0.141,
+     "tMonth": 0.637
+    },
+    "de40": {
+     "n": 429,
+     "mean": -0.009,
+     "tMonth": -0.053
+    }
+   }
+  },
+  "T2": {
+   "name": "Barrier retest, H4 boxes",
+   "net": {
+    "all": {
+     "n": 780,
+     "won": 169,
+     "mean": -0.124,
+     "total": -96.994,
+     "tTrade": -1.802,
+     "tMonth": -0.943,
+     "pMonth": 0.348,
+     "months": 83,
+     "maxDD": -141.651
+    },
+    "discovery": {
+     "n": 497,
+     "won": 98,
+     "mean": -0.175,
+     "total": -87.116,
+     "tTrade": -2.026,
+     "tMonth": -0.961,
+     "pMonth": 0.341,
+     "months": 48,
+     "maxDD": -121.611
+    },
+    "confirmation": {
+     "n": 283,
+     "won": 71,
+     "mean": -0.035,
+     "total": -9.879,
+     "tTrade": -0.305,
+     "tMonth": -0.201,
+     "pMonth": 0.842,
+     "months": 35,
+     "maxDD": -33.828
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 780,
+     "won": 169,
+     "mean": -0.098,
+     "total": -76.627,
+     "tTrade": -1.423,
+     "tMonth": -0.744,
+     "pMonth": 0.459,
+     "months": 83,
+     "maxDD": -127.92
+    },
+    "discovery": {
+     "n": 497,
+     "won": 98,
+     "mean": -0.148,
+     "total": -73.685,
+     "tTrade": -1.713,
+     "tMonth": -0.811,
+     "pMonth": 0.421,
+     "months": 48,
+     "maxDD": -109.397
+    },
+    "confirmation": {
+     "n": 283,
+     "won": 71,
+     "mean": -0.01,
+     "total": -2.941,
+     "tTrade": -0.091,
+     "tMonth": -0.06,
+     "pMonth": 0.953,
+     "months": 35,
+     "maxDD": -29.457
+    }
+   },
+   "cost2": {
+    "all": {
+     "n": 780,
+     "won": 169,
+     "mean": -0.15,
+     "total": -117.362,
+     "tTrade": -2.181,
+     "tMonth": -1.143,
+     "pMonth": 0.256,
+     "months": 83,
+     "maxDD": -155.382
+    },
+    "discovery": {
+     "n": 497,
+     "won": 98,
+     "mean": -0.202,
+     "total": -100.546,
+     "tTrade": -2.339,
+     "tMonth": -1.111,
+     "pMonth": 0.272,
+     "months": 48,
+     "maxDD": -133.825
+    },
+    "confirmation": {
+     "n": 283,
+     "won": 71,
+     "mean": -0.059,
+     "total": -16.816,
+     "tTrade": -0.52,
+     "tMonth": -0.342,
+     "pMonth": 0.734,
+     "months": 35,
+     "maxDD": -38.2
+    }
+   },
+   "medianRR": 4.13,
+   "byMarket": {
+    "xau": {
+     "n": 29,
+     "mean": -0.351,
+     "tMonth": -0.746
+    },
+    "eurusd": {
+     "n": 25,
+     "mean": 0.333,
+     "tMonth": 0.535
+    },
+    "gbpusd": {
+     "n": 44,
+     "mean": -0.088,
+     "tMonth": -0.285
+    },
+    "usdjpy": {
+     "n": 32,
+     "mean": -0.306,
+     "tMonth": -1.152
+    },
+    "audusd": {
+     "n": 39,
+     "mean": -0.084,
+     "tMonth": -0.189
+    },
+    "nzdusd": {
+     "n": 64,
+     "mean": 0.346,
+     "tMonth": 0.713
+    },
+    "usdcad": {
+     "n": 50,
+     "mean": -0.059,
+     "tMonth": -0.184
+    },
+    "usdchf": {
+     "n": 43,
+     "mean": -0.456,
+     "tMonth": -1.42
+    },
+    "eurjpy": {
+     "n": 24,
+     "mean": 0.736,
+     "tMonth": 1.094
+    },
+    "xag": {
+     "n": 40,
+     "mean": -0.606,
+     "tMonth": -2.222
+    },
+    "gbpjpy": {
+     "n": 44,
+     "mean": -0.596,
+     "tMonth": -2.109
+    },
+    "eurgbp": {
+     "n": 38,
+     "mean": -0.153,
+     "tMonth": -0.606
+    },
+    "audjpy": {
+     "n": 35,
+     "mean": 0.172,
+     "tMonth": 0.359
+    },
+    "cadjpy": {
+     "n": 56,
+     "mean": -0.104,
+     "tMonth": -0.324
+    },
+    "euraud": {
+     "n": 46,
+     "mean": -0.711,
+     "tMonth": -2.352
+    },
+    "nas100": {
+     "n": 55,
+     "mean": 0.42,
+     "tMonth": 0.754
+    },
+    "spx500": {
+     "n": 62,
+     "mean": 0.128,
+     "tMonth": 0.366
+    },
+    "de40": {
+     "n": 54,
+     "mean": -0.7,
+     "tMonth": -2.159
+    }
+   }
+  },
+  "T3": {
+   "name": "Sweep reversal, H1",
+   "net": {
+    "all": {
+     "n": 251,
+     "won": 60,
+     "mean": -0.065,
+     "total": -16.209,
+     "tTrade": -0.556,
+     "tMonth": -0.572,
+     "pMonth": 0.569,
+     "months": 83,
+     "maxDD": -35.18
+    },
+    "discovery": {
+     "n": 157,
+     "won": 42,
+     "mean": 0.048,
+     "total": 7.463,
+     "tTrade": 0.311,
+     "tMonth": 0.32,
+     "pMonth": 0.751,
+     "months": 48,
+     "maxDD": -22.84
+    },
+    "confirmation": {
+     "n": 94,
+     "won": 18,
+     "mean": -0.252,
+     "total": -23.672,
+     "tTrade": -1.43,
+     "tMonth": -1.485,
+     "pMonth": 0.147,
+     "months": 35,
+     "maxDD": -26.888
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 251,
+     "won": 60,
+     "mean": -0.02,
+     "total": -5.016,
+     "tTrade": -0.172,
+     "tMonth": -0.178,
+     "pMonth": 0.859,
+     "months": 83,
+     "maxDD": -26.707
+    },
+    "discovery": {
+     "n": 157,
+     "won": 42,
+     "mean": 0.092,
+     "total": 14.455,
+     "tTrade": 0.606,
+     "tMonth": 0.624,
+     "pMonth": 0.535,
+     "months": 48,
+     "maxDD": -18.931
+    },
+    "confirmation": {
+     "n": 94,
+     "won": 18,
+     "mean": -0.207,
+     "total": -19.471,
+     "tTrade": -1.176,
+     "tMonth": -1.234,
+     "pMonth": 0.226,
+     "months": 35,
+     "maxDD": -24.419
+    }
+   },
+   "cost2": {
+    "all": {
+     "n": 251,
+     "won": 59,
+     "mean": -0.109,
+     "total": -27.402,
+     "tTrade": -0.936,
+     "tMonth": -0.957,
+     "pMonth": 0.341,
+     "months": 83,
+     "maxDD": -43.795
+    },
+    "discovery": {
+     "n": 157,
+     "won": 42,
+     "mean": 0.003,
+     "total": 0.472,
+     "tTrade": 0.02,
+     "tMonth": 0.02,
+     "pMonth": 0.984,
+     "months": 48,
+     "maxDD": -27.68
+    },
+    "confirmation": {
+     "n": 94,
+     "won": 17,
+     "mean": -0.297,
+     "total": -27.874,
+     "tTrade": -1.682,
+     "tMonth": -1.729,
+     "pMonth": 0.0928,
+     "months": 35,
+     "maxDD": -29.499
+    }
+   },
+   "medianRR": 4.23,
+   "byMarket": {
+    "xau": {
+     "n": 15,
+     "mean": -0.116,
+     "tMonth": -0.251
+    },
+    "eurusd": {
+     "n": 20,
+     "mean": 0.694,
+     "tMonth": 1.266
+    },
+    "gbpusd": {
+     "n": 16,
+     "mean": -0.072,
+     "tMonth": -0.138
+    },
+    "usdjpy": {
+     "n": 13,
+     "mean": 0.602,
+     "tMonth": 1.102
+    },
+    "audusd": {
+     "n": 10,
+     "mean": -0.321,
+     "tMonth": -0.674
+    },
+    "nzdusd": {
+     "n": 7,
+     "mean": -0.736,
+     "tMonth": -1.939
+    },
+    "usdcad": {
+     "n": 24,
+     "mean": -0.758,
+     "tMonth": -2.931
+    },
+    "usdchf": {
+     "n": 20,
+     "mean": 1.246,
+     "tMonth": 2.078
+    },
+    "eurjpy": {
+     "n": 8,
+     "mean": -0.005,
+     "tMonth": -0.008
+    },
+    "xag": {
+     "n": 18,
+     "mean": -0.826,
+     "tMonth": -2.334
+    },
+    "gbpjpy": {
+     "n": 11,
+     "mean": -0.483,
+     "tMonth": -1.043
+    },
+    "eurgbp": {
+     "n": 13,
+     "mean": -0.203,
+     "tMonth": -0.387
+    },
+    "audjpy": {
+     "n": 10,
+     "mean": 0.579,
+     "tMonth": 0.824
+    },
+    "cadjpy": {
+     "n": 14,
+     "mean": -0.866,
+     "tMonth": -3.557
+    },
+    "euraud": {
+     "n": 11,
+     "mean": -0.523,
+     "tMonth": -0.973
+    },
+    "nas100": {
+     "n": 17,
+     "mean": -0.4,
+     "tMonth": -0.835
+    },
+    "spx500": {
+     "n": 17,
+     "mean": 0.47,
+     "tMonth": 0.976
+    },
+    "de40": {
+     "n": 7,
+     "mean": 0.051,
+     "tMonth": 0.087
+    }
+   }
+  }
+ },
+ "judged": [
+  {
+   "test": "T1",
+   "pass": false,
+   "checks": {
+    "discovery": false,
+    "confirmation": false,
+    "doubleCost": false
+   },
+   "countOnly": false,
+   "holmP": 1
+  },
+  {
+   "test": "T2",
+   "pass": false,
+   "checks": {
+    "discovery": false,
+    "confirmation": false,
+    "doubleCost": false
+   },
+   "countOnly": false,
+   "holmP": 1
+  },
+  {
+   "test": "T3",
+   "pass": false,
+   "checks": {
+    "discovery": false,
+    "confirmation": false,
+    "doubleCost": false
+   },
+   "countOnly": false,
+   "holmP": 0.441
+  }
+ ],
+ "descriptive": {
+  "T1": {
+   "sameSignals2R": {
+    "n": 8082,
+    "won": 2679,
+    "mean": -0.065,
+    "total": -525.96,
+    "tTrade": -4.153,
+    "tMonth": -2.668,
+    "pMonth": 0.00919,
+    "months": 83,
+    "maxDD": -662.484
+   },
+   "sameSignals2Rconf": {
+    "n": 3354,
+    "won": 1169,
+    "mean": -0.013,
+    "total": -42.098,
+    "tTrade": -0.506,
+    "tMonth": -0.299,
+    "pMonth": 0.767,
+    "months": 35,
+    "maxDD": -126.427
+   },
+   "allSignals2R": {
+    "n": 148609,
+    "won": 51635,
+    "mean": -0.033,
+    "total": -4929.056,
+    "tTrade": -9.176,
+    "tMonth": -5.301,
+    "pMonth": 9.52e-7,
+    "months": 83,
+    "maxDD": -5599.643
+   },
+   "allSignals2Rgross": {
+    "n": 148609,
+    "won": 51696,
+    "mean": 0.005,
+    "total": 794.176,
+    "tTrade": 1.479,
+    "tMonth": 0.869,
+    "pMonth": 0.387,
+    "months": 83,
+    "maxDD": -979.546
+   }
+  },
+  "T2": {
+   "sameSignals2R": {
+    "n": 780,
+    "won": 262,
+    "mean": -0.05,
+    "total": -38.65,
+    "tTrade": -0.997,
+    "tMonth": -0.674,
+    "pMonth": 0.502,
+    "months": 83,
+    "maxDD": -84.253
+   },
+   "sameSignals2Rconf": {
+    "n": 283,
+    "won": 101,
+    "mean": 0.013,
+    "total": 3.685,
+    "tTrade": 0.156,
+    "tMonth": 0.11,
+    "pMonth": 0.913,
+    "months": 35,
+    "maxDD": -36.158
+   },
+   "allSignals2R": {
+    "n": 39981,
+    "won": 14350,
+    "mean": -0.025,
+    "total": -1002.812,
+    "tTrade": -3.732,
+    "tMonth": -2.147,
+    "pMonth": 0.0348,
+    "months": 83,
+    "maxDD": -1310.363
+   },
+   "allSignals2Rgross": {
+    "n": 39981,
+    "won": 14375,
+    "mean": -0.006,
+    "total": -254.776,
+    "tTrade": -0.948,
+    "tMonth": -0.545,
+    "pMonth": 0.587,
+    "months": 83,
+    "maxDD": -685.237
+   }
+  },
+  "T3": {
+   "sameSignals2R": {
+    "n": 251,
+    "won": 85,
+    "mean": -0.037,
+    "total": -9.398,
+    "tTrade": -0.421,
+    "tMonth": -0.436,
+    "pMonth": 0.664,
+    "months": 83,
+    "maxDD": -28.152
+   },
+   "sameSignals2Rconf": {
+    "n": 94,
+    "won": 25,
+    "mean": -0.257,
+    "total": -24.176,
+    "tTrade": -1.892,
+    "tMonth": -1.921,
+    "pMonth": 0.0632,
+    "months": 35,
+    "maxDD": -27.135
+   },
+   "allSignals2R": {
+    "n": 12088,
+    "won": 4433,
+    "mean": -0.008,
+    "total": -94.026,
+    "tTrade": -0.632,
+    "tMonth": -0.562,
+    "pMonth": 0.575,
+    "months": 83,
+    "maxDD": -319.195
+   },
+   "allSignals2Rgross": {
+    "n": 12088,
+    "won": 4445,
+    "mean": 0.021,
+    "total": 251.729,
+    "tTrade": 1.693,
+    "tMonth": 1.511,
+    "pMonth": 0.135,
+    "months": 83,
+    "maxDD": -182.624
+   }
+  }
+ },
+ "markets": {
+  "xau": {
+   "signals": {
+    "T1": 9429,
+    "T2": 2587,
+    "T3": 861
+   },
+   "dropped": 1,
+   "last": 1795431300,
+   "cost": 0.3
+  },
+  "eurusd": {
+   "signals": {
+    "T1": 10328,
+    "T2": 2647,
+    "T3": 975
+   },
+   "dropped": 5,
+   "last": 1795431300,
+   "cost": 0.00006
+  },
+  "gbpusd": {
+   "signals": {
+    "T1": 10627,
+    "T2": 2806,
+    "T3": 914
+   },
+   "dropped": 16,
+   "last": 1795431300,
+   "cost": 0.00008
+  },
+  "usdjpy": {
+   "signals": {
+    "T1": 10452,
+    "T2": 2669,
+    "T3": 959
+   },
+   "dropped": 16,
+   "last": 1795431300,
+   "cost": 0.008
+  },
+  "audusd": {
+   "signals": {
+    "T1": 11738,
+    "T2": 3280,
+    "T3": 866
+   },
+   "dropped": 31,
+   "last": 1795431300,
+   "cost": 0.00006
+  },
+  "nzdusd": {
+   "signals": {
+    "T1": 12002,
+    "T2": 3358,
+    "T3": 879
+   },
+   "dropped": 1,
+   "last": 1795431300,
+   "cost": 0.00007
+  },
+  "usdcad": {
+   "signals": {
+    "T1": 11682,
+    "T2": 3055,
+    "T3": 933
+   },
+   "dropped": 6,
+   "last": 1795431300,
+   "cost": 0.00007
+  },
+  "usdchf": {
+   "signals": {
+    "T1": 10361,
+    "T2": 2729,
+    "T3": 917
+   },
+   "dropped": 10,
+   "last": 1795431300,
+   "cost": 0.00007
+  },
+  "eurjpy": {
+   "signals": {
+    "T1": 10715,
+    "T2": 2792,
+    "T3": 866
+   },
+   "dropped": 2,
+   "last": 1795431300,
+   "cost": 0.01
+  },
+  "xag": {
+   "signals": {
+    "T1": 9041,
+    "T2": 2468,
+    "T3": 984
+   },
+   "dropped": 61,
+   "last": 1795431300,
+   "cost": 0.03
+  },
+  "gbpjpy": {
+   "signals": {
+    "T1": 10859,
+    "T2": 2920,
+    "T3": 883
+   },
+   "dropped": 0,
+   "last": 1795431300,
+   "cost": 0.014
+  },
+  "eurgbp": {
+   "signals": {
+    "T1": 9570,
+    "T2": 2576,
+    "T3": 949
+   },
+   "dropped": 4,
+   "last": 1795431300,
+   "cost": 0.00009
+  },
+  "audjpy": {
+   "signals": {
+    "T1": 11522,
+    "T2": 3171,
+    "T3": 858
+   },
+   "dropped": 0,
+   "last": 1795431300,
+   "cost": 0.01
+  },
+  "cadjpy": {
+   "signals": {
+    "T1": 11198,
+    "T2": 2981,
+    "T3": 865
+   },
+   "dropped": 0,
+   "last": 1795431300,
+   "cost": 0.01
+  },
+  "euraud": {
+   "signals": {
+    "T1": 11717,
+    "T2": 3169,
+    "T3": 870
+   },
+   "dropped": 3,
+   "last": 1795431300,
+   "cost": 0.00013
+  },
+  "nas100": {
+   "signals": {
+    "T1": 11202,
+    "T2": 3346,
+    "T3": 923
+   },
+   "dropped": 10,
+   "last": 1795431300,
+   "cost": 1
+  },
+  "spx500": {
+   "signals": {
+    "T1": 11298,
+    "T2": 3353,
+    "T3": 892
+   },
+   "dropped": 5,
+   "last": 1795431300,
+   "cost": 0.4
+  },
+  "de40": {
+   "signals": {
+    "T1": 10316,
+    "T2": 3011,
+    "T3": 743
+   },
+   "dropped": 7,
+   "last": 1795431300,
+   "cost": 1.5
+  }
+ },
+ "best": "T2",
+ "lookAhead": {
+  "eurusd": {
+   "cuts": 6,
+   "signalsChecked": 10235,
+   "mismatchedSets": 0
+  },
+  "xau": {
+   "cuts": 6,
+   "signalsChecked": 8382,
+   "mismatchedSets": 0
+  }
+ },
+ "beforeCosts": {
+  "asked": "2026-11-23, after the run: the owner asked for the judgement before costs",
+  "verdict": "FAIL",
+  "passes": 0,
+  "note": "Same bar on R before costs: discovery n>=100, mean>0, month t>=2; confirmation n>=50, mean>0, month t>=2 after Holm. No test passes.",
+  "tests": {
+   "T1": {
+    "discovery": {
+     "n": 4728,
+     "won": 974,
+     "mean": -0.039,
+     "total": -183.156,
+     "tTrade": -1.283,
+     "tMonth": -0.682,
+     "pMonth": 0.499,
+     "months": 48,
+     "maxDD": -540.497
+    },
+    "confirmation": {
+     "n": 3354,
+     "won": 722,
+     "mean": 0.032,
+     "total": 106.849,
+     "tTrade": 0.852,
+     "tMonth": 0.474,
+     "pMonth": 0.639,
+     "months": 35,
+     "maxDD": -141.799
+    }
+   },
+   "T2": {
+    "discovery": {
+     "n": 497,
+     "won": 98,
+     "mean": -0.148,
+     "total": -73.685,
+     "tTrade": -1.713,
+     "tMonth": -0.811,
+     "pMonth": 0.421,
+     "months": 48,
+     "maxDD": -109.397
+    },
+    "confirmation": {
+     "n": 283,
+     "won": 71,
+     "mean": -0.01,
+     "total": -2.941,
+     "tTrade": -0.091,
+     "tMonth": -0.06,
+     "pMonth": 0.953,
+     "months": 35,
+     "maxDD": -29.457
+    }
+   },
+   "T3": {
+    "discovery": {
+     "n": 157,
+     "won": 42,
+     "mean": 0.092,
+     "total": 14.455,
+     "tTrade": 0.606,
+     "tMonth": 0.624,
+     "pMonth": 0.535,
+     "months": 48,
+     "maxDD": -18.931
+    },
+    "confirmation": {
+     "n": 94,
+     "won": 18,
+     "mean": -0.207,
+     "total": -19.471,
+     "tTrade": -1.176,
+     "tMonth": -1.234,
+     "pMonth": 0.226,
+     "months": 35,
+     "maxDD": -24.419
+    }
+   }
+  }
+ }
+}

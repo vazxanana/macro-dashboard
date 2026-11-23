@@ -1,0 +1,1391 @@
+{
+ "study": "apex-entry-2020",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "FAIL, 0 of 4 tests pass: T1 n 2738, -0.220R, month t -6.07; T2 n 2282, -0.199R, month t -4.8; T3 n 4550, -0.299R, month t -11.04; T4 n 1207, -0.178R, month t -4.59 (2020-now, 18 markets, after costs).",
+ "window": "2020-01-01 to the last candle; discovery 2020-2023, confirmation 2024 on",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy",
+  "xag",
+  "gbpjpy",
+  "eurgbp",
+  "audjpy",
+  "cadjpy",
+  "euraud",
+  "nas100",
+  "spx500",
+  "de40"
+ ],
+ "plan": {
+  "T1": {
+   "stop": 30,
+   "tgtR": 4,
+   "bePips": 50,
+   "life": 864000,
+   "hold": 604800
+  },
+  "T2": {
+   "stop": 30,
+   "tgtR": 4,
+   "bePips": 50,
+   "life": 864000,
+   "hold": 604800
+  },
+  "T3": {
+   "stop": 20,
+   "tgtR": 2,
+   "beR": 1,
+   "life": 259200,
+   "hold": 172800
+  },
+  "T4": {
+   "stop": 30,
+   "tgtR": 3.3333333333333335,
+   "beR": 1,
+   "life": 259200,
+   "hold": 172800
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "Apex (no Daily close waited for)",
+   "net": {
+    "all": {
+     "n": 2738,
+     "wins": 411,
+     "meanR": -0.2202,
+     "total": -602.85,
+     "tTrade": -6.36,
+     "tMonth": -6.07,
+     "months": 83
+    },
+    "disc": {
+     "n": 1594,
+     "wins": 231,
+     "meanR": -0.275,
+     "total": -438.29,
+     "tTrade": -6.12,
+     "tMonth": -5.83,
+     "months": 48
+    },
+    "conf": {
+     "n": 1144,
+     "wins": 180,
+     "meanR": -0.1438,
+     "total": -164.56,
+     "tTrade": -2.65,
+     "tMonth": -2.63,
+     "months": 35
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 2738,
+     "wins": 412,
+     "meanR": -0.0351,
+     "total": -96.11,
+     "tTrade": -1.03,
+     "tMonth": -1.04,
+     "months": 83
+    },
+    "disc": {
+     "n": 1594,
+     "wins": 232,
+     "meanR": -0.071,
+     "total": -113.17,
+     "tTrade": -1.62,
+     "tMonth": -1.63,
+     "months": 48
+    },
+    "conf": {
+     "n": 1144,
+     "wins": 180,
+     "meanR": 0.0149,
+     "total": 17.06,
+     "tTrade": 0.28,
+     "tMonth": 0.28,
+     "months": 35
+    }
+   },
+   "twice": {
+    "all": {
+     "n": 2738,
+     "wins": 411,
+     "meanR": -0.4053,
+     "total": -1109.58,
+     "tTrade": -11.14,
+     "tMonth": -10.08,
+     "months": 83
+    },
+    "disc": {
+     "n": 1594,
+     "wins": 231,
+     "meanR": -0.4789,
+     "total": -763.42,
+     "tTrade": -9.99,
+     "tMonth": -9.07,
+     "months": 48
+    },
+    "conf": {
+     "n": 1144,
+     "wins": 180,
+     "meanR": -0.3026,
+     "total": -346.17,
+     "tTrade": -5.43,
+     "tMonth": -5.2,
+     "months": 35
+    }
+   },
+   "gold": {
+    "all": {
+     "n": 131,
+     "wins": 18,
+     "meanR": -0.1915,
+     "total": -25.09,
+     "tTrade": -1.28,
+     "tMonth": -1.37,
+     "months": 82
+    },
+    "disc": {
+     "n": 82,
+     "wins": 10,
+     "meanR": -0.2887,
+     "total": -23.67,
+     "tTrade": -1.58,
+     "tMonth": -1.68,
+     "months": 46
+    },
+    "conf": {
+     "n": 49,
+     "wins": 8,
+     "meanR": -0.0289,
+     "total": -1.42,
+     "tTrade": -0.11,
+     "tMonth": -0.12,
+     "months": 34
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "n": 131,
+     "meanR": -0.1915,
+     "tMonth": -1.37
+    },
+    "eurusd": {
+     "n": 166,
+     "meanR": -0.0044,
+     "tMonth": -0.03
+    },
+    "gbpusd": {
+     "n": 147,
+     "meanR": -0.2436,
+     "tMonth": -1.86
+    },
+    "usdjpy": {
+     "n": 158,
+     "meanR": -0.5298,
+     "tMonth": -4.93
+    },
+    "audusd": {
+     "n": 147,
+     "meanR": -0.1027,
+     "tMonth": -0.75
+    },
+    "nzdusd": {
+     "n": 176,
+     "meanR": -0.3466,
+     "tMonth": -2.8
+    },
+    "usdcad": {
+     "n": 142,
+     "meanR": -0.1893,
+     "tMonth": -1.57
+    },
+    "usdchf": {
+     "n": 157,
+     "meanR": -0.327,
+     "tMonth": -2.64
+    },
+    "eurjpy": {
+     "n": 132,
+     "meanR": 0.169,
+     "tMonth": 1.01
+    },
+    "xag": {
+     "n": 153,
+     "meanR": -1.5612,
+     "tMonth": -7.37
+    },
+    "gbpjpy": {
+     "n": 172,
+     "meanR": -0.2854,
+     "tMonth": -2.28
+    },
+    "eurgbp": {
+     "n": 162,
+     "meanR": -0.0357,
+     "tMonth": -0.24
+    },
+    "audjpy": {
+     "n": 148,
+     "meanR": 0.0303,
+     "tMonth": 0.17
+    },
+    "cadjpy": {
+     "n": 145,
+     "meanR": -0.1489,
+     "tMonth": -1.1
+    },
+    "euraud": {
+     "n": 175,
+     "meanR": 0.1263,
+     "tMonth": 0.79
+    },
+    "nas100": {
+     "n": 131,
+     "meanR": -0.0576,
+     "tMonth": -0.33
+    },
+    "spx500": {
+     "n": 141,
+     "meanR": -0.2258,
+     "tMonth": -1.65
+    },
+    "de40": {
+     "n": 155,
+     "meanR": 0.017,
+     "tMonth": 0.11
+    }
+   },
+   "exits": {
+    "target": 410,
+    "be": 554,
+    "stop": 1761,
+    "gap": 13
+   },
+   "exSilver": {
+    "net": {
+     "n": 2585,
+     "wins": 385,
+     "meanR": -0.1408,
+     "total": -363.99,
+     "tTrade": -4.04,
+     "tMonth": -4.07,
+     "months": 83
+    },
+    "gross": {
+     "n": 2585,
+     "wins": 386,
+     "meanR": -0.0323,
+     "total": -83.55,
+     "tTrade": -0.93,
+     "tMonth": -0.94,
+     "months": 83
+    }
+   },
+   "pConf": 0.9936,
+   "holm": 1,
+   "checks": {
+    "discN": true,
+    "discMean": false,
+    "discT": false,
+    "confN": true,
+    "confMean": false,
+    "confT": false,
+    "holm": false,
+    "twiceCost": false
+   },
+   "pass": false,
+   "judged": true
+  },
+  "T2": {
+   "name": "Low-risk apex (Daily rejection closed)",
+   "net": {
+    "all": {
+     "n": 2282,
+     "wins": 342,
+     "meanR": -0.1993,
+     "total": -454.76,
+     "tTrade": -5.34,
+     "tMonth": -4.8,
+     "months": 83
+    },
+    "disc": {
+     "n": 1341,
+     "wins": 199,
+     "meanR": -0.2413,
+     "total": -323.63,
+     "tTrade": -4.99,
+     "tMonth": -4.47,
+     "months": 48
+    },
+    "conf": {
+     "n": 941,
+     "wins": 143,
+     "meanR": -0.1394,
+     "total": -131.14,
+     "tTrade": -2.38,
+     "tMonth": -2.17,
+     "months": 35
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 2282,
+     "wins": 347,
+     "meanR": -0.0195,
+     "total": -44.43,
+     "tTrade": -0.53,
+     "tMonth": -0.49,
+     "months": 83
+    },
+    "disc": {
+     "n": 1341,
+     "wins": 202,
+     "meanR": -0.0419,
+     "total": -56.13,
+     "tTrade": -0.88,
+     "tMonth": -0.81,
+     "months": 48
+    },
+    "conf": {
+     "n": 941,
+     "wins": 145,
+     "meanR": 0.0124,
+     "total": 11.71,
+     "tTrade": 0.22,
+     "tMonth": 0.19,
+     "months": 35
+    }
+   },
+   "twice": {
+    "all": {
+     "n": 2282,
+     "wins": 339,
+     "meanR": -0.3791,
+     "total": -865.11,
+     "tTrade": -9.68,
+     "tMonth": -8.48,
+     "months": 83
+    },
+    "disc": {
+     "n": 1341,
+     "wins": 196,
+     "meanR": -0.4408,
+     "total": -591.12,
+     "tTrade": -8.57,
+     "tMonth": -7.51,
+     "months": 48
+    },
+    "conf": {
+     "n": 941,
+     "wins": 143,
+     "meanR": -0.2912,
+     "total": -273.98,
+     "tTrade": -4.82,
+     "tMonth": -4.38,
+     "months": 35
+    }
+   },
+   "gold": {
+    "all": {
+     "n": 113,
+     "wins": 18,
+     "meanR": -0.0673,
+     "total": -7.61,
+     "tTrade": -0.4,
+     "tMonth": -0.38,
+     "months": 81
+    },
+    "disc": {
+     "n": 70,
+     "wins": 8,
+     "meanR": -0.3044,
+     "total": -21.31,
+     "tTrade": -1.57,
+     "tMonth": -1.38,
+     "months": 46
+    },
+    "conf": {
+     "n": 43,
+     "wins": 10,
+     "meanR": 0.3186,
+     "total": 13.7,
+     "tTrade": 1.03,
+     "tMonth": 1.15,
+     "months": 34
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "n": 113,
+     "meanR": -0.0673,
+     "tMonth": -0.38
+    },
+    "eurusd": {
+     "n": 140,
+     "meanR": 0.0364,
+     "tMonth": 0.21
+    },
+    "gbpusd": {
+     "n": 125,
+     "meanR": -0.0956,
+     "tMonth": -0.7
+    },
+    "usdjpy": {
+     "n": 120,
+     "meanR": -0.4818,
+     "tMonth": -4.1
+    },
+    "audusd": {
+     "n": 118,
+     "meanR": -0.1666,
+     "tMonth": -1.14
+    },
+    "nzdusd": {
+     "n": 141,
+     "meanR": -0.2779,
+     "tMonth": -1.89
+    },
+    "usdcad": {
+     "n": 122,
+     "meanR": 0.0465,
+     "tMonth": 0.35
+    },
+    "usdchf": {
+     "n": 125,
+     "meanR": -0.2786,
+     "tMonth": -1.86
+    },
+    "eurjpy": {
+     "n": 122,
+     "meanR": -0.0568,
+     "tMonth": -0.33
+    },
+    "xag": {
+     "n": 118,
+     "meanR": -1.5287,
+     "tMonth": -6.67
+    },
+    "gbpjpy": {
+     "n": 127,
+     "meanR": -0.1776,
+     "tMonth": -1.19
+    },
+    "eurgbp": {
+     "n": 141,
+     "meanR": -0.0944,
+     "tMonth": -0.54
+    },
+    "audjpy": {
+     "n": 128,
+     "meanR": -0.1436,
+     "tMonth": -0.95
+    },
+    "cadjpy": {
+     "n": 111,
+     "meanR": -0.3642,
+     "tMonth": -2.32
+    },
+    "euraud": {
+     "n": 149,
+     "meanR": 0.1409,
+     "tMonth": 0.9
+    },
+    "nas100": {
+     "n": 121,
+     "meanR": -0.1176,
+     "tMonth": -0.72
+    },
+    "spx500": {
+     "n": 126,
+     "meanR": -0.3023,
+     "tMonth": -2.28
+    },
+    "de40": {
+     "n": 135,
+     "meanR": 0.1392,
+     "tMonth": 0.83
+    }
+   },
+   "exits": {
+    "be": 445,
+    "stop": 1433,
+    "target": 336,
+    "gap": 68
+   },
+   "exSilver": {
+    "net": {
+     "n": 2164,
+     "wins": 323,
+     "meanR": -0.1268,
+     "total": -274.38,
+     "tTrade": -3.37,
+     "tMonth": -3.13,
+     "months": 83
+    },
+    "gross": {
+     "n": 2164,
+     "wins": 328,
+     "meanR": -0.0186,
+     "total": -40.23,
+     "tTrade": -0.49,
+     "tMonth": -0.46,
+     "months": 83
+    }
+   },
+   "pConf": 0.9815,
+   "holm": 1,
+   "checks": {
+    "discN": true,
+    "discMean": false,
+    "discT": false,
+    "confN": true,
+    "confMean": false,
+    "confT": false,
+    "holm": false,
+    "twiceCost": false
+   },
+   "pass": false,
+   "judged": true
+  },
+  "T3": {
+   "name": "Continuation, instant limit",
+   "net": {
+    "all": {
+     "n": 4550,
+     "wins": 1085,
+     "meanR": -0.2987,
+     "total": -1358.95,
+     "tTrade": -14.4,
+     "tMonth": -11.04,
+     "months": 83
+    },
+    "disc": {
+     "n": 2647,
+     "wins": 643,
+     "meanR": -0.3106,
+     "total": -822.04,
+     "tTrade": -11.23,
+     "tMonth": -8.85,
+     "months": 48
+    },
+    "conf": {
+     "n": 1903,
+     "wins": 442,
+     "meanR": -0.2821,
+     "total": -536.91,
+     "tTrade": -9.01,
+     "tMonth": -6.59,
+     "months": 35
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 4550,
+     "wins": 1135,
+     "meanR": -0.0213,
+     "total": -96.97,
+     "tTrade": -1.11,
+     "tMonth": -0.98,
+     "months": 83
+    },
+    "disc": {
+     "n": 2647,
+     "wins": 681,
+     "meanR": -0.0061,
+     "total": -16.08,
+     "tTrade": -0.24,
+     "tMonth": -0.22,
+     "months": 48
+    },
+    "conf": {
+     "n": 1903,
+     "wins": 454,
+     "meanR": -0.0425,
+     "total": -80.89,
+     "tTrade": -1.42,
+     "tMonth": -1.2,
+     "months": 35
+    }
+   },
+   "twice": {
+    "all": {
+     "n": 4550,
+     "wins": 1062,
+     "meanR": -0.576,
+     "total": -2620.93,
+     "tTrade": -23.5,
+     "tMonth": -16.18,
+     "months": 83
+    },
+    "disc": {
+     "n": 2647,
+     "wins": 637,
+     "meanR": -0.615,
+     "total": -1628,
+     "tTrade": -18.17,
+     "tMonth": -13.29,
+     "months": 48
+    },
+    "conf": {
+     "n": 1903,
+     "wins": 425,
+     "meanR": -0.5218,
+     "total": -992.92,
+     "tTrade": -14.96,
+     "tMonth": -9.5,
+     "months": 35
+    }
+   },
+   "gold": {
+    "all": {
+     "n": 238,
+     "wins": 59,
+     "meanR": -0.1818,
+     "total": -43.27,
+     "tTrade": -2.13,
+     "tMonth": -1.81,
+     "months": 81
+    },
+    "disc": {
+     "n": 125,
+     "wins": 29,
+     "meanR": -0.2261,
+     "total": -28.27,
+     "tTrade": -2.01,
+     "tMonth": -1.94,
+     "months": 47
+    },
+    "conf": {
+     "n": 113,
+     "wins": 30,
+     "meanR": -0.1328,
+     "total": -15,
+     "tTrade": -1.02,
+     "tMonth": -0.78,
+     "months": 34
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "n": 238,
+     "meanR": -0.1818,
+     "tMonth": -1.81
+    },
+    "eurusd": {
+     "n": 273,
+     "meanR": -0.1208,
+     "tMonth": -1.5
+    },
+    "gbpusd": {
+     "n": 241,
+     "meanR": -0.1379,
+     "tMonth": -1.76
+    },
+    "usdjpy": {
+     "n": 239,
+     "meanR": 0.0099,
+     "tMonth": 0.13
+    },
+    "audusd": {
+     "n": 269,
+     "meanR": -0.1435,
+     "tMonth": -2.01
+    },
+    "nzdusd": {
+     "n": 262,
+     "meanR": -0.2377,
+     "tMonth": -3
+    },
+    "usdcad": {
+     "n": 275,
+     "meanR": -0.1359,
+     "tMonth": -1.8
+    },
+    "usdchf": {
+     "n": 235,
+     "meanR": -0.1499,
+     "tMonth": -1.74
+    },
+    "eurjpy": {
+     "n": 208,
+     "meanR": -0.0976,
+     "tMonth": -1.3
+    },
+    "xag": {
+     "n": 264,
+     "meanR": -2.2786,
+     "tMonth": -10.79
+    },
+    "gbpjpy": {
+     "n": 272,
+     "meanR": -0.1673,
+     "tMonth": -2.12
+    },
+    "eurgbp": {
+     "n": 283,
+     "meanR": -0.2191,
+     "tMonth": -2.82
+    },
+    "audjpy": {
+     "n": 245,
+     "meanR": -0.2033,
+     "tMonth": -2.44
+    },
+    "cadjpy": {
+     "n": 231,
+     "meanR": -0.2744,
+     "tMonth": -3.42
+    },
+    "euraud": {
+     "n": 277,
+     "meanR": -0.1158,
+     "tMonth": -1.16
+    },
+    "nas100": {
+     "n": 270,
+     "meanR": -0.2548,
+     "tMonth": -2.96
+    },
+    "spx500": {
+     "n": 264,
+     "meanR": -0.3062,
+     "tMonth": -3.18
+    },
+    "de40": {
+     "n": 204,
+     "meanR": -0.2651,
+     "tMonth": -2.66
+    }
+   },
+   "exits": {
+    "stop": 2403,
+    "be": 906,
+    "target": 1098,
+    "gap": 129,
+    "time": 14
+   },
+   "exSilver": {
+    "net": {
+     "n": 4286,
+     "wins": 1058,
+     "meanR": -0.1767,
+     "total": -757.4,
+     "tTrade": -9.08,
+     "tMonth": -7.58,
+     "months": 83
+    },
+    "gross": {
+     "n": 4286,
+     "wins": 1075,
+     "meanR": -0.0159,
+     "total": -68.12,
+     "tTrade": -0.82,
+     "tMonth": -0.72,
+     "months": 83
+    }
+   },
+   "pConf": 1,
+   "holm": 1,
+   "checks": {
+    "discN": true,
+    "discMean": false,
+    "discT": false,
+    "confN": true,
+    "confMean": false,
+    "confT": false,
+    "holm": false,
+    "twiceCost": false
+   },
+   "pass": false,
+   "judged": true
+  },
+  "T4": {
+   "name": "Continuation, after an H1 DC",
+   "net": {
+    "all": {
+     "n": 1207,
+     "wins": 194,
+     "meanR": -0.1776,
+     "total": -214.42,
+     "tTrade": -3.99,
+     "tMonth": -4.59,
+     "months": 83
+    },
+    "disc": {
+     "n": 695,
+     "wins": 117,
+     "meanR": -0.1222,
+     "total": -84.93,
+     "tTrade": -2.04,
+     "tMonth": -2.42,
+     "months": 48
+    },
+    "conf": {
+     "n": 512,
+     "wins": 77,
+     "meanR": -0.2529,
+     "total": -129.5,
+     "tTrade": -3.82,
+     "tMonth": -4.3,
+     "months": 35
+    }
+   },
+   "gross": {
+    "all": {
+     "n": 1207,
+     "wins": 207,
+     "meanR": 0.0024,
+     "total": 2.92,
+     "tTrade": 0.06,
+     "tMonth": 0.06,
+     "months": 83
+    },
+    "disc": {
+     "n": 695,
+     "wins": 126,
+     "meanR": 0.0637,
+     "total": 44.31,
+     "tTrade": 1.08,
+     "tMonth": 1.24,
+     "months": 48
+    },
+    "conf": {
+     "n": 512,
+     "wins": 81,
+     "meanR": -0.0808,
+     "total": -41.38,
+     "tTrade": -1.23,
+     "tMonth": -1.3,
+     "months": 35
+    }
+   },
+   "twice": {
+    "all": {
+     "n": 1207,
+     "wins": 188,
+     "meanR": -0.3577,
+     "total": -431.77,
+     "tTrade": -7.62,
+     "tMonth": -8.65,
+     "months": 83
+    },
+    "disc": {
+     "n": 695,
+     "wins": 113,
+     "meanR": -0.3081,
+     "total": -214.16,
+     "tTrade": -4.82,
+     "tMonth": -5.62,
+     "months": 48
+    },
+    "conf": {
+     "n": 512,
+     "wins": 75,
+     "meanR": -0.425,
+     "total": -217.61,
+     "tTrade": -6.2,
+     "tMonth": -6.87,
+     "months": 35
+    }
+   },
+   "gold": {
+    "all": {
+     "n": 66,
+     "wins": 14,
+     "meanR": -0.002,
+     "total": -0.13,
+     "tTrade": -0.01,
+     "tMonth": -0.01,
+     "months": 80
+    },
+    "disc": {
+     "n": 34,
+     "wins": 8,
+     "meanR": 0.0837,
+     "total": 2.85,
+     "tTrade": 0.28,
+     "tMonth": 0.33,
+     "months": 45
+    },
+    "conf": {
+     "n": 32,
+     "wins": 6,
+     "meanR": -0.0931,
+     "total": -2.98,
+     "tTrade": -0.28,
+     "tMonth": -0.25,
+     "months": 34
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "n": 66,
+     "meanR": -0.002,
+     "tMonth": -0.01
+    },
+    "eurusd": {
+     "n": 78,
+     "meanR": -0.1345,
+     "tMonth": -0.77
+    },
+    "gbpusd": {
+     "n": 61,
+     "meanR": -0.17,
+     "tMonth": -0.87
+    },
+    "usdjpy": {
+     "n": 65,
+     "meanR": 0.2748,
+     "tMonth": 1.34
+    },
+    "audusd": {
+     "n": 69,
+     "meanR": -0.015,
+     "tMonth": -0.09
+    },
+    "nzdusd": {
+     "n": 71,
+     "meanR": -0.1785,
+     "tMonth": -0.91
+    },
+    "usdcad": {
+     "n": 71,
+     "meanR": -0.0803,
+     "tMonth": -0.44
+    },
+    "usdchf": {
+     "n": 62,
+     "meanR": -0.0768,
+     "tMonth": -0.48
+    },
+    "eurjpy": {
+     "n": 68,
+     "meanR": -0.0966,
+     "tMonth": -0.54
+    },
+    "xag": {
+     "n": 69,
+     "meanR": -1.2106,
+     "tMonth": -4.92
+    },
+    "gbpjpy": {
+     "n": 70,
+     "meanR": -0.2312,
+     "tMonth": -1.23
+    },
+    "eurgbp": {
+     "n": 77,
+     "meanR": -0.1565,
+     "tMonth": -0.88
+    },
+    "audjpy": {
+     "n": 62,
+     "meanR": -0.3681,
+     "tMonth": -1.91
+    },
+    "cadjpy": {
+     "n": 64,
+     "meanR": -0.2884,
+     "tMonth": -2.17
+    },
+    "euraud": {
+     "n": 73,
+     "meanR": -0.2806,
+     "tMonth": -1.69
+    },
+    "nas100": {
+     "n": 78,
+     "meanR": -0.1915,
+     "tMonth": -1.13
+    },
+    "spx500": {
+     "n": 63,
+     "meanR": 0.0008,
+     "tMonth": 0
+    },
+    "de40": {
+     "n": 40,
+     "meanR": 0.197,
+     "tMonth": 0.78
+    }
+   },
+   "exits": {
+    "stop": 625,
+    "be": 383,
+    "time": 9,
+    "target": 183,
+    "gap": 7
+   },
+   "exSilver": {
+    "net": {
+     "n": 1138,
+     "wins": 178,
+     "meanR": -0.115,
+     "total": -130.89,
+     "tTrade": -2.57,
+     "tMonth": -2.67,
+     "months": 83
+    },
+    "gross": {
+     "n": 1138,
+     "wins": 191,
+     "meanR": -0.0085,
+     "total": -9.7,
+     "tTrade": -0.19,
+     "tMonth": -0.2,
+     "months": 83
+    }
+   },
+   "pConf": 0.9999,
+   "holm": 1,
+   "checks": {
+    "discN": true,
+    "discMean": false,
+    "discT": false,
+    "confN": true,
+    "confMean": false,
+    "confT": false,
+    "holm": false,
+    "twiceCost": false
+   },
+   "pass": false,
+   "judged": true
+  }
+ },
+ "meta": {
+  "xau": {
+   "bars": 630393,
+   "last": "2026-11-22T23:55:00.000Z",
+   "signals": {
+    "t1": 486,
+    "t2": 415,
+    "storylines": 415,
+    "candidates": 318,
+    "dc": 77,
+    "refined": 201
+   },
+   "orders": 1296,
+   "nofill": 714,
+   "open": 0,
+   "dropped": 0,
+   "trades": 548
+  },
+  "eurusd": {
+   "bars": 662563,
+   "last": "2026-11-22T23:55:00.000Z",
+   "signals": {
+    "t1": 599,
+    "t2": 485,
+    "storylines": 485,
+    "candidates": 363,
+    "dc": 87,
+    "refined": 245
+   },
+   "orders": 1534,
+   "nofill": 844,
+   "open": 0,
+   "dropped": 2,
+   "trades": 657
+  },
+  "gbpusd": {
+   "bars": 662230,
+   "last": "2026-11-22T23:55:00.000Z",
+   "signals": {
+    "t1": 535,
+    "t2": 461,
+    "storylines": 461,
+    "candidates": 318,
+    "dc": 64,
+    "refined": 228
+   },
+   "orders": 1378,
+   "nofill": 781,
+   "open": 0,
+   "dropped": 2,
+   "trades": 574
+  },
+  "usdjpy": {
+   "bars": 662795,
+   "last": "2026-11-22T23:55:00.000Z",
+   "signals": {
+    "t1": 502,
+    "t2": 412,
+    "storylines": 412,
+    "candidates": 321,
+    "dc": 79,
+    "refined": 214
+   },
+   "orders": 1314,
+   "nofill": 704,
+   "open": 0,
+   "dropped": 1,
+   "trades": 582
+  },
+  "audusd": {
+   "bars": 660311,
+   "last": "2026-11-22T23:55:00.000Z",
+   "signals": {
+    "t1": 549,
+    "t2": 481,
+    "storylines": 481,
+    "candidates": 369,
+    "dc": 76,
+    "refined": 216
+   },
+   "orders": 1475,
+   "nofill": 856,
+   "open": 0,
+   "dropped": 0,
+   "trades": 603
+  },
+  "nzdusd": {
+   "bars": 661668,
+   "last": "2026-11-23T01:15:00.000Z",
+   "signals": {
+    "t1": 569,
+    "t2": 492,
+    "storylines": 492,
+    "candidates": 359,
+    "dc": 82,
+    "refined": 209
+   },
+   "orders": 1502,
+   "nofill": 819,
+   "open": 0,
+   "dropped": 0,
+   "trades": 650
+  },
+  "usdcad": {
+   "bars": 662253,
+   "last": "2026-11-23T01:15:00.000Z",
+   "signals": {
+    "t1": 589,
+    "t2": 505,
+    "storylines": 505,
+    "candidates": 370,
+    "dc": 76,
+    "refined": 253
+   },
+   "orders": 1540,
+   "nofill": 902,
+   "open": 0,
+   "dropped": 1,
+   "trades": 610
+  },
+  "usdchf": {
+   "bars": 656332,
+   "last": "2026-11-23T01:15:00.000Z",
+   "signals": {
+    "t1": 567,
+    "t2": 472,
+    "storylines": 472,
+    "candidates": 327,
+    "dc": 70,
+    "refined": 230
+   },
+   "orders": 1436,
+   "nofill": 822,
+   "open": 0,
+   "dropped": 3,
+   "trades": 579
+  },
+  "eurjpy": {
+   "bars": 662901,
+   "last": "2026-11-23T01:15:00.000Z",
+   "signals": {
+    "t1": 474,
+    "t2": 419,
+    "storylines": 419,
+    "candidates": 294,
+    "dc": 73,
+    "refined": 201
+   },
+   "orders": 1260,
+   "nofill": 706,
+   "open": 0,
+   "dropped": 1,
+   "trades": 530
+  },
+  "xag": {
+   "bars": 622746,
+   "last": "2026-11-23T01:15:00.000Z",
+   "signals": {
+    "t1": 522,
+    "t2": 435,
+    "storylines": 435,
+    "candidates": 347,
+    "dc": 80,
+    "refined": 146
+   },
+   "orders": 1384,
+   "nofill": 743,
+   "open": 0,
+   "dropped": 10,
+   "trades": 604
+  },
+  "gbpjpy": {
+   "bars": 589231,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 545,
+    "t2": 455,
+    "storylines": 455,
+    "candidates": 369,
+    "dc": 78,
+    "refined": 237
+   },
+   "orders": 1447,
+   "nofill": 778,
+   "open": 0,
+   "dropped": 0,
+   "trades": 641
+  },
+  "eurgbp": {
+   "bars": 588545,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 614,
+    "t2": 530,
+    "storylines": 530,
+    "candidates": 389,
+    "dc": 85,
+    "refined": 275
+   },
+   "orders": 1618,
+   "nofill": 921,
+   "open": 2,
+   "dropped": 0,
+   "trades": 663
+  },
+  "audjpy": {
+   "bars": 589370,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 490,
+    "t2": 423,
+    "storylines": 423,
+    "candidates": 325,
+    "dc": 67,
+    "refined": 193
+   },
+   "orders": 1305,
+   "nofill": 702,
+   "open": 0,
+   "dropped": 0,
+   "trades": 583
+  },
+  "cadjpy": {
+   "bars": 589272,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 497,
+    "t2": 413,
+    "storylines": 413,
+    "candidates": 297,
+    "dc": 73,
+    "refined": 201
+   },
+   "orders": 1280,
+   "nofill": 706,
+   "open": 0,
+   "dropped": 0,
+   "trades": 551
+  },
+  "euraud": {
+   "bars": 588736,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 562,
+    "t2": 486,
+    "storylines": 486,
+    "candidates": 377,
+    "dc": 77,
+    "refined": 267
+   },
+   "orders": 1502,
+   "nofill": 800,
+   "open": 0,
+   "dropped": 0,
+   "trades": 674
+  },
+  "nas100": {
+   "bars": 556592,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 458,
+    "t2": 408,
+    "storylines": 408,
+    "candidates": 349,
+    "dc": 87,
+    "refined": 201
+   },
+   "orders": 1302,
+   "nofill": 681,
+   "open": 0,
+   "dropped": 0,
+   "trades": 600
+  },
+  "spx500": {
+   "bars": 555016,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 482,
+    "t2": 414,
+    "storylines": 414,
+    "candidates": 329,
+    "dc": 72,
+    "refined": 199
+   },
+   "orders": 1297,
+   "nofill": 684,
+   "open": 0,
+   "dropped": 0,
+   "trades": 594
+  },
+  "de40": {
+   "bars": 485347,
+   "last": "2026-11-23T10:30:00.000Z",
+   "signals": {
+    "t1": 531,
+    "t2": 470,
+    "storylines": 470,
+    "candidates": 291,
+    "dc": 48,
+    "refined": 168
+   },
+   "orders": 1340,
+   "nofill": 790,
+   "open": 0,
+   "dropped": 0,
+   "trades": 534
+  }
+ },
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2024-06-01",
+   "signals": 606,
+   "candidates": 205,
+   "dcs": 50,
+   "ok": true
+  },
+  {
+   "market": "eurusd",
+   "cut": "2022-03-15",
+   "signals": 359,
+   "candidates": 124,
+   "dcs": 27,
+   "ok": true
+  }
+ ]
+}

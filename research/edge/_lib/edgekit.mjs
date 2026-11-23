@@ -4,7 +4,7 @@
 // Candle cache (outside git): <EDGE_DATA>/<market>/<tf>-<year>.json.gz = [[t, o, h, l, c], ...] (t = candle start, unix
 // seconds, UTC; OANDA mid candles read through the site's candle proxy), plus <EDGE_DATA>/INDEX.json. Default EDGE_DATA is
 // the session scratchpad below; set the environment variable EDGE_DATA to read another copy.
-// Markets: xau, eurusd, gbpusd, usdjpy, audusd. Timeframes: '5m' (2010 on), '1d' (2009 on, raw UTC days, Sunday stubs
+// Markets: xau, eurusd, gbpusd, usdjpy, audusd. Timeframes: '1m' (where fetched, 2019 on; 23 Nov 2026), '5m' (2010 on), '1d' (2009 on, raw UTC days, Sunday stubs
 // included: use dailyNY on 5m candles for trading days).
 // Holdout (23 Nov 2026): the same five markets 2005-01-01 to 2009-12-31 (5m and 1d; OANDA's gold starts later, see
 // INDEX.json), and HOLDOUT_MARKETS nzdusd, usdcad, usdchf, eurjpy, xag from 2005 to now (5m and 1d). Untouched by the
@@ -42,7 +42,7 @@ export const DATA_DIR = process.env.EDGE_DATA || '/tmp/claude-0/-workspace-macro
 export const MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd'];
 export const HOLDOUT_MARKETS = ['nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
 export const HOLDOUT = { early: { from: '2005-01-01', to: '2010-01-01', markets: MARKETS }, fresh: { from: '2005-01-01', markets: HOLDOUT_MARKETS } };
-export const TF = { '5m': 300, '15m': 900, '30m': 1800, '1h': 3600, '4h': 14400, '1d': 86400 };
+export const TF = { '1m': 60, '5m': 300, '15m': 900, '30m': 1800, '1h': 3600, '4h': 14400, '1d': 86400 };
 // Round-trip cost in price units per market: the desk's demo-account figures (spread + commission, rounded up), the same
 // for every year. Studies may charge more; never less without a measured source.
 export const COSTS = { xau: 0.30, eurusd: 0.00006, gbpusd: 0.00008, usdjpy: 0.008, audusd: 0.00006,

@@ -1,0 +1,1324 @@
+{
+ "study": "mosha-weekly-er",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "FAIL, 0 of 2: weekly agrees and er20 >= 0.2 made −0.249R a trade after costs in 2020-2023 (n 224, month t -1.35) and −0.012R from 2024 (n 168, month t -0.06); the rest −0.318R and −0.013R.",
+ "system": "The Mosha desk's sequence entries (BO, VR, CF, EG entry; assets/mosha-sop.js sopTrades) with the weekly side agreeing and the 20-day efficiency ratio of Daily closes at or above 0.2 (0.35); gold, EUR/USD, GBP/USD pooled; OANDA mid M5; 2020-2023 and 2024 to the last candle; net of costs.",
+ "markets": {
+  "primary": [
+   "xau",
+   "eurusd",
+   "gbpusd"
+  ],
+  "reported": [
+   "usdjpy",
+   "audusd"
+  ]
+ },
+ "windows": {
+  "A": [
+   "2020-01-01",
+   "2023-12-31"
+  ],
+  "B": [
+   "2024-01-01",
+   "2026-11-22"
+  ]
+ },
+ "trades": {
+  "all": 2570,
+  "primary": 1484,
+  "primaryTagged": 1484,
+  "primaryUntagged": 0
+ },
+ "population": {
+  "A": {
+   "n": 857,
+   "win": 19.4,
+   "pf": 0.67,
+   "mean": -0.2998,
+   "total": -256.91,
+   "dd": 288.4,
+   "months": 48,
+   "tMonth": -3.59
+  },
+  "B": {
+   "n": 627,
+   "win": 20.4,
+   "pf": 0.99,
+   "mean": -0.0124,
+   "total": -7.75,
+   "dd": 74.82,
+   "months": 35,
+   "tMonth": -0.11
+  }
+ },
+ "tests": {
+  "F1": {
+   "what": "weekly side agrees AND er20 >= 0.2 (primary)",
+   "A": {
+    "group": {
+     "n": 224,
+     "win": 21,
+     "pf": 0.72,
+     "mean": -0.2495,
+     "total": -55.89,
+     "dd": 83.85,
+     "months": 47,
+     "tMonth": -1.35,
+     "gross": -0.1417,
+     "net2": -0.3573
+    },
+    "rest": {
+     "n": 633,
+     "win": 18.8,
+     "pf": 0.65,
+     "mean": -0.3176,
+     "total": -201.03,
+     "dd": 222.1,
+     "months": 48,
+     "tMonth": -3.4,
+     "gross": -0.2092
+    },
+    "vsRest": {
+     "diff": 0.0681,
+     "t": 0.39
+    }
+   },
+   "B": {
+    "group": {
+     "n": 168,
+     "win": 20.2,
+     "pf": 0.99,
+     "mean": -0.0116,
+     "total": -1.94,
+     "dd": 31.96,
+     "months": 32,
+     "tMonth": -0.06,
+     "gross": 0.131,
+     "net2": -0.1541
+    },
+    "rest": {
+     "n": 459,
+     "win": 20.5,
+     "pf": 0.99,
+     "mean": -0.0126,
+     "total": -5.8,
+     "dd": 79.93,
+     "months": 35,
+     "tMonth": -0.09,
+     "gross": 0.1081
+    },
+    "vsRest": {
+     "diff": 0.0011,
+     "t": 0
+    }
+   },
+   "p": 0.9115,
+   "holm": 1,
+   "checks": {
+    "n100": true,
+    "positiveA": false,
+    "positiveB": false,
+    "betterThanRestA": true,
+    "betterThanRestB": true,
+    "holm": false
+   },
+   "verdict": "FAIL"
+  },
+  "F2": {
+   "what": "weekly side agrees AND er20 >= 0.35 (secondary)",
+   "A": {
+    "group": {
+     "n": 89,
+     "win": 19.1,
+     "pf": 0.61,
+     "mean": -0.3545,
+     "total": -31.55,
+     "dd": 46.24,
+     "months": 37,
+     "tMonth": -1.53,
+     "gross": -0.242,
+     "net2": -0.467
+    },
+    "rest": {
+     "n": 768,
+     "win": 19.4,
+     "pf": 0.67,
+     "mean": -0.2934,
+     "total": -225.36,
+     "dd": 256.88,
+     "months": 48,
+     "tMonth": -3.3,
+     "gross": -0.1857
+    },
+    "vsRest": {
+     "diff": -0.0611,
+     "t": -0.29
+    }
+   },
+   "B": {
+    "group": {
+     "n": 84,
+     "win": 19,
+     "pf": 1.13,
+     "mean": 0.122,
+     "total": 10.25,
+     "dd": 17.77,
+     "months": 25,
+     "tMonth": 0.38,
+     "gross": 0.2557,
+     "net2": -0.0118
+    },
+    "rest": {
+     "n": 543,
+     "win": 20.6,
+     "pf": 0.96,
+     "mean": -0.0331,
+     "total": -17.99,
+     "dd": 85.54,
+     "months": 35,
+     "tMonth": -0.29,
+     "gross": 0.0923
+    },
+    "vsRest": {
+     "diff": 0.1551,
+     "t": 0.43
+    }
+   },
+   "p": 0.937,
+   "holm": 1,
+   "checks": {
+    "n100": false,
+    "positiveA": false,
+    "positiveB": false,
+    "betterThanRestA": false,
+    "betterThanRestB": true,
+    "holm": false
+   },
+   "verdict": "FAIL (too few to judge)",
+   "vsMid": {
+    "A": {
+     "diff": -0.1742,
+     "t": -0.6
+    },
+    "B": {
+     "diff": 0.2671,
+     "t": 0.62
+    },
+    "midA": {
+     "n": 135,
+     "win": 22.2,
+     "pf": 0.79,
+     "mean": -0.1803,
+     "total": -24.34,
+     "dd": 42.01,
+     "months": 45,
+     "tMonth": -0.78
+    },
+    "midB": {
+     "n": 84,
+     "win": 21.4,
+     "pf": 0.84,
+     "mean": -0.1451,
+     "total": -12.19,
+     "dd": 19.06,
+     "months": 26,
+     "tMonth": -0.61
+    }
+   }
+  }
+ },
+ "alone": {
+  "weeklyAgrees": {
+   "A": {
+    "group": {
+     "n": 428,
+     "win": 20.6,
+     "pf": 0.75,
+     "mean": -0.2195,
+     "total": -93.94,
+     "dd": 123.34,
+     "months": 48,
+     "tMonth": -1.57,
+     "gross": -0.1177,
+     "net2": -0.3213
+    },
+    "rest": {
+     "n": 429,
+     "win": 18.2,
+     "pf": 0.59,
+     "mean": -0.3799,
+     "total": -162.98,
+     "dd": 186.15,
+     "months": 48,
+     "tMonth": -3.66,
+     "gross": -0.2653
+    },
+    "vsRest": {
+     "diff": 0.1604,
+     "t": 1.09
+    }
+   },
+   "B": {
+    "group": {
+     "n": 341,
+     "win": 18.5,
+     "pf": 0.91,
+     "mean": -0.0871,
+     "total": -29.71,
+     "dd": 65.32,
+     "months": 35,
+     "tMonth": -0.61,
+     "gross": 0.0455,
+     "net2": -0.2197
+    },
+    "rest": {
+     "n": 286,
+     "win": 22.7,
+     "pf": 1.09,
+     "mean": 0.0768,
+     "total": 21.96,
+     "dd": 41.39,
+     "months": 34,
+     "tMonth": 0.42,
+     "gross": 0.1962
+    },
+    "vsRest": {
+     "diff": -0.1639,
+     "t": -0.76
+    }
+   }
+  },
+  "er20AtLeast0.2": {
+   "A": {
+    "group": {
+     "n": 438,
+     "win": 21,
+     "pf": 0.72,
+     "mean": -0.2434,
+     "total": -106.62,
+     "dd": 137.55,
+     "months": 47,
+     "tMonth": -2.21,
+     "gross": -0.1329,
+     "net2": -0.354
+    },
+    "rest": {
+     "n": 419,
+     "win": 17.7,
+     "pf": 0.61,
+     "mean": -0.3587,
+     "total": -150.29,
+     "dd": 159.52,
+     "months": 48,
+     "tMonth": -2.92,
+     "gross": -0.2529
+    },
+    "vsRest": {
+     "diff": 0.1153,
+     "t": 0.78
+    }
+   },
+   "B": {
+    "group": {
+     "n": 308,
+     "win": 21.8,
+     "pf": 1.09,
+     "mean": 0.0812,
+     "total": 25,
+     "dd": 34.22,
+     "months": 35,
+     "tMonth": 0.5,
+     "gross": 0.2147,
+     "net2": -0.0523
+    },
+    "rest": {
+     "n": 319,
+     "win": 19.1,
+     "pf": 0.89,
+     "mean": -0.1027,
+     "total": -32.75,
+     "dd": 75.62,
+     "months": 34,
+     "tMonth": -0.78,
+     "gross": 0.0172
+    },
+    "vsRest": {
+     "diff": 0.1838,
+     "t": 0.85
+    }
+   }
+  },
+  "er20AtLeast0.35": {
+   "A": {
+    "group": {
+     "n": 179,
+     "win": 20.1,
+     "pf": 0.68,
+     "mean": -0.2874,
+     "total": -51.44,
+     "dd": 65.42,
+     "months": 42,
+     "tMonth": -1.97,
+     "gross": -0.1726,
+     "net2": -0.4021
+    },
+    "rest": {
+     "n": 678,
+     "win": 19.2,
+     "pf": 0.66,
+     "mean": -0.3031,
+     "total": -205.47,
+     "dd": 250.67,
+     "months": 48,
+     "tMonth": -3.12,
+     "gross": -0.1966
+    },
+    "vsRest": {
+     "diff": 0.0157,
+     "t": 0.09
+    }
+   },
+   "B": {
+    "group": {
+     "n": 141,
+     "win": 22,
+     "pf": 1.4,
+     "mean": 0.3552,
+     "total": 50.08,
+     "dd": 21.3,
+     "months": 31,
+     "tMonth": 1,
+     "gross": 0.4847,
+     "net2": 0.2257
+    },
+    "rest": {
+     "n": 486,
+     "win": 20,
+     "pf": 0.87,
+     "mean": -0.119,
+     "total": -57.83,
+     "dd": 81.37,
+     "months": 35,
+     "tMonth": -1.23,
+     "gross": 0.0067
+    },
+    "vsRest": {
+     "diff": 0.4742,
+     "t": 1.58
+    }
+   }
+  }
+ },
+ "byMarket": {
+  "xau": {
+   "primary": true,
+   "F1": {
+    "A": {
+     "group": {
+      "n": 64,
+      "win": 21.9,
+      "pf": 0.56,
+      "mean": -0.3597,
+      "total": -23.02,
+      "dd": 23.4,
+      "months": 30,
+      "tMonth": -1.54,
+      "gross": -0.32,
+      "net2": -0.3994
+     },
+     "rest": {
+      "n": 207,
+      "win": 15.9,
+      "pf": 0.49,
+      "mean": -0.4525,
+      "total": -93.66,
+      "dd": 93.66,
+      "months": 47,
+      "tMonth": -3.22,
+      "gross": -0.4118
+     },
+     "vsRest": {
+      "diff": 0.0928,
+      "t": 0.39
+     }
+    },
+    "B": {
+     "group": {
+      "n": 40,
+      "win": 27.5,
+      "pf": 2.35,
+      "mean": 1.024,
+      "total": 40.96,
+      "dd": 6.32,
+      "months": 19,
+      "tMonth": 1.65,
+      "gross": 1.068,
+      "net2": 0.9799
+     },
+     "rest": {
+      "n": 145,
+      "win": 15.2,
+      "pf": 0.85,
+      "mean": -0.1338,
+      "total": -19.41,
+      "dd": 36.18,
+      "months": 31,
+      "tMonth": -0.54,
+      "gross": -0.0931
+     },
+     "vsRest": {
+      "diff": 1.1578,
+      "t": 1.84
+     }
+    }
+   },
+   "F2": {
+    "A": {
+     "group": {
+      "n": 26,
+      "win": 15.4,
+      "pf": 0.63,
+      "mean": -0.3238,
+      "total": -8.42,
+      "dd": 11.9,
+      "months": 16,
+      "tMonth": -0.8,
+      "gross": -0.2895,
+      "net2": -0.358
+     },
+     "rest": {
+      "n": 245,
+      "win": 17.6,
+      "pf": 0.49,
+      "mean": -0.4419,
+      "total": -108.26,
+      "dd": 108.26,
+      "months": 48,
+      "tMonth": -3.53,
+      "gross": -0.4008
+     },
+     "vsRest": {
+      "diff": 0.1181,
+      "t": 0.28
+     }
+    },
+    "B": {
+     "group": {
+      "n": 26,
+      "win": 38.5,
+      "pf": 3.66,
+      "mean": 1.7132,
+      "total": 44.54,
+      "dd": 3.11,
+      "months": 12,
+      "tMonth": 2.06,
+      "gross": 1.7571,
+      "net2": 1.6694
+     },
+     "rest": {
+      "n": 159,
+      "win": 14.5,
+      "pf": 0.84,
+      "mean": -0.1446,
+      "total": -22.99,
+      "dd": 43.61,
+      "months": 33,
+      "tMonth": -0.58,
+      "gross": -0.1036
+     },
+     "vsRest": {
+      "diff": 1.8578,
+      "t": 2.31
+     }
+    }
+   }
+  },
+  "eurusd": {
+   "primary": true,
+   "F1": {
+    "A": {
+     "group": {
+      "n": 74,
+      "win": 21.6,
+      "pf": 0.8,
+      "mean": -0.1845,
+      "total": -13.66,
+      "dd": 37.88,
+      "months": 31,
+      "tMonth": -0.53,
+      "gross": -0.0287,
+      "net2": -0.3404
+     },
+     "rest": {
+      "n": 219,
+      "win": 21.5,
+      "pf": 0.79,
+      "mean": -0.1901,
+      "total": -41.62,
+      "dd": 79.67,
+      "months": 47,
+      "tMonth": -0.98,
+      "gross": -0.039
+     },
+     "vsRest": {
+      "diff": 0.0055,
+      "t": 0.02
+     }
+    },
+    "B": {
+     "group": {
+      "n": 62,
+      "win": 22.6,
+      "pf": 0.95,
+      "mean": -0.0507,
+      "total": -3.14,
+      "dd": 25.96,
+      "months": 26,
+      "tMonth": -0.13,
+      "gross": 0.1366,
+      "net2": -0.2381
+     },
+     "rest": {
+      "n": 137,
+      "win": 21.2,
+      "pf": 0.85,
+      "mean": -0.1419,
+      "total": -19.45,
+      "dd": 42.88,
+      "months": 34,
+      "tMonth": -0.61,
+      "gross": 0.0272
+     },
+     "vsRest": {
+      "diff": 0.0912,
+      "t": 0.21
+     }
+    }
+   },
+   "F2": {
+    "A": {
+     "group": {
+      "n": 35,
+      "win": 14.3,
+      "pf": 0.42,
+      "mean": -0.5817,
+      "total": -20.36,
+      "dd": 26.96,
+      "months": 20,
+      "tMonth": -1.89,
+      "gross": -0.4165,
+      "net2": -0.7469
+     },
+     "rest": {
+      "n": 258,
+      "win": 22.5,
+      "pf": 0.85,
+      "mean": -0.1353,
+      "total": -34.92,
+      "dd": 92.57,
+      "months": 47,
+      "tMonth": -0.65,
+      "gross": 0.0152
+     },
+     "vsRest": {
+      "diff": -0.4464,
+      "t": -1.4
+     }
+    },
+    "B": {
+     "group": {
+      "n": 27,
+      "win": 14.8,
+      "pf": 0.66,
+      "mean": -0.3459,
+      "total": -9.34,
+      "dd": 15.59,
+      "months": 17,
+      "tMonth": -0.68,
+      "gross": -0.1503,
+      "net2": -0.5414
+     },
+     "rest": {
+      "n": 172,
+      "win": 22.7,
+      "pf": 0.92,
+      "mean": -0.077,
+      "total": -13.25,
+      "dd": 30.83,
+      "months": 35,
+      "tMonth": -0.39,
+      "gross": 0.0945
+     },
+     "vsRest": {
+      "diff": -0.2688,
+      "t": -0.44
+     }
+    }
+   }
+  },
+  "gbpusd": {
+   "primary": true,
+   "F1": {
+    "A": {
+     "group": {
+      "n": 86,
+      "win": 19.8,
+      "pf": 0.75,
+      "mean": -0.2234,
+      "total": -19.21,
+      "dd": 35.41,
+      "months": 39,
+      "tMonth": -0.86,
+      "gross": -0.1063,
+      "net2": -0.3404
+     },
+     "rest": {
+      "n": 207,
+      "win": 18.8,
+      "pf": 0.66,
+      "mean": -0.3176,
+      "total": -65.74,
+      "dd": 72.71,
+      "months": 48,
+      "tMonth": -2.2,
+      "gross": -0.1868
+     },
+     "vsRest": {
+      "diff": 0.0942,
+      "t": 0.3
+     }
+    },
+    "B": {
+     "group": {
+      "n": 66,
+      "win": 13.6,
+      "pf": 0.4,
+      "mean": -0.6024,
+      "total": -39.76,
+      "dd": 39.76,
+      "months": 25,
+      "tMonth": -3.25,
+      "gross": -0.4423,
+      "net2": -0.7625
+     },
+     "rest": {
+      "n": 177,
+      "win": 24.3,
+      "pf": 1.21,
+      "mean": 0.1867,
+      "total": 33.05,
+      "dd": 28.08,
+      "months": 35,
+      "tMonth": 0.88,
+      "gross": 0.3354
+     },
+     "vsRest": {
+      "diff": -0.7891,
+      "t": -2.75
+     }
+    }
+   },
+   "F2": {
+    "A": {
+     "group": {
+      "n": 28,
+      "win": 28.6,
+      "pf": 0.88,
+      "mean": -0.099,
+      "total": -2.77,
+      "dd": 10.86,
+      "months": 19,
+      "tMonth": -0.23,
+      "gross": 0.0203,
+      "net2": -0.2183
+     },
+     "rest": {
+      "n": 265,
+      "win": 18.1,
+      "pf": 0.67,
+      "mean": -0.3101,
+      "total": -82.18,
+      "dd": 86.83,
+      "months": 48,
+      "tMonth": -2.4,
+      "gross": -0.1825
+     },
+     "vsRest": {
+      "diff": 0.2111,
+      "t": 0.54
+     }
+    },
+    "B": {
+     "group": {
+      "n": 31,
+      "win": 6.5,
+      "pf": 0.25,
+      "mean": -0.8052,
+      "total": -24.96,
+      "dd": 27.6,
+      "months": 16,
+      "tMonth": -8.24,
+      "gross": -0.6498,
+      "net2": -0.9605
+     },
+     "rest": {
+      "n": 212,
+      "win": 23.6,
+      "pf": 1.1,
+      "mean": 0.0861,
+      "total": 18.25,
+      "dd": 38.96,
+      "months": 35,
+      "tMonth": 0.47,
+      "gross": 0.2374
+     },
+     "vsRest": {
+      "diff": -0.8912,
+      "t": -2.63
+     }
+    }
+   }
+  },
+  "usdjpy": {
+   "primary": false,
+   "F1": {
+    "A": {
+     "group": {
+      "n": 81,
+      "win": 24.7,
+      "pf": 1,
+      "mean": -0.0027,
+      "total": -0.22,
+      "dd": 25.31,
+      "months": 30,
+      "tMonth": -0.01,
+      "gross": 0.1301,
+      "net2": -0.1355
+     },
+     "rest": {
+      "n": 197,
+      "win": 15.2,
+      "pf": 0.52,
+      "mean": -0.4709,
+      "total": -92.78,
+      "dd": 94.71,
+      "months": 48,
+      "tMonth": -2.93,
+      "gross": -0.3207
+     },
+     "vsRest": {
+      "diff": 0.4682,
+      "t": 1.53
+     }
+    },
+    "B": {
+     "group": {
+      "n": 52,
+      "win": 15.4,
+      "pf": 0.34,
+      "mean": -0.6338,
+      "total": -32.96,
+      "dd": 34.5,
+      "months": 25,
+      "tMonth": -2.54,
+      "gross": -0.5024,
+      "net2": -0.7653
+     },
+     "rest": {
+      "n": 160,
+      "win": 21.9,
+      "pf": 1.83,
+      "mean": 0.725,
+      "total": 116.01,
+      "dd": 41.42,
+      "months": 35,
+      "tMonth": 1.12,
+      "gross": 0.8441
+     },
+     "vsRest": {
+      "diff": -1.3589,
+      "t": -1.95
+     }
+    }
+   },
+   "F2": {
+    "A": {
+     "group": {
+      "n": 42,
+      "win": 21.4,
+      "pf": 0.96,
+      "mean": -0.0339,
+      "total": -1.42,
+      "dd": 21.08,
+      "months": 17,
+      "tMonth": -0.08,
+      "gross": 0.1038,
+      "net2": -0.1716
+     },
+     "rest": {
+      "n": 236,
+      "win": 17.4,
+      "pf": 0.59,
+      "mean": -0.388,
+      "total": -91.57,
+      "dd": 102.34,
+      "months": 48,
+      "tMonth": -2.59,
+      "gross": -0.2415
+     },
+     "vsRest": {
+      "diff": 0.3541,
+      "t": 0.86
+     }
+    },
+    "B": {
+     "group": {
+      "n": 27,
+      "win": 14.8,
+      "pf": 0.32,
+      "mean": -0.6623,
+      "total": -17.88,
+      "dd": 21.69,
+      "months": 14,
+      "tMonth": -1.93,
+      "gross": -0.5246,
+      "net2": -0.8
+     },
+     "rest": {
+      "n": 185,
+      "win": 21.1,
+      "pf": 1.62,
+      "mean": 0.5456,
+      "total": 100.93,
+      "dd": 45.46,
+      "months": 35,
+      "tMonth": 0.98,
+      "gross": 0.6654
+     },
+     "vsRest": {
+      "diff": -1.2079,
+      "t": -1.88
+     }
+    }
+   }
+  },
+  "audusd": {
+   "primary": false,
+   "F1": {
+    "A": {
+     "group": {
+      "n": 104,
+      "win": 20.2,
+      "pf": 0.87,
+      "mean": -0.1194,
+      "total": -12.42,
+      "dd": 28.24,
+      "months": 39,
+      "tMonth": -0.59,
+      "gross": 0.0027,
+      "net2": -0.2415
+     },
+     "rest": {
+      "n": 265,
+      "win": 18.5,
+      "pf": 0.69,
+      "mean": -0.2959,
+      "total": -78.43,
+      "dd": 101.58,
+      "months": 47,
+      "tMonth": -2.01,
+      "gross": -0.1504
+     },
+     "vsRest": {
+      "diff": 0.1765,
+      "t": 0.66
+     }
+    },
+    "B": {
+     "group": {
+      "n": 50,
+      "win": 16,
+      "pf": 0.91,
+      "mean": -0.0866,
+      "total": -4.33,
+      "dd": 34.94,
+      "months": 22,
+      "tMonth": -0.19,
+      "gross": 0.0643,
+      "net2": -0.2376
+     },
+     "rest": {
+      "n": 177,
+      "win": 19.8,
+      "pf": 0.83,
+      "mean": -0.1617,
+      "total": -28.61,
+      "dd": 53.8,
+      "months": 35,
+      "tMonth": -0.78,
+      "gross": 0.0041
+     },
+     "vsRest": {
+      "diff": 0.075,
+      "t": 0.17
+     }
+    }
+   },
+   "F2": {
+    "A": {
+     "group": {
+      "n": 39,
+      "win": 20.5,
+      "pf": 0.76,
+      "mean": -0.2107,
+      "total": -8.22,
+      "dd": 11.5,
+      "months": 21,
+      "tMonth": -0.69,
+      "gross": -0.0802,
+      "net2": -0.3411
+     },
+     "rest": {
+      "n": 330,
+      "win": 18.8,
+      "pf": 0.73,
+      "mean": -0.2504,
+      "total": -82.63,
+      "dd": 114.88,
+      "months": 48,
+      "tMonth": -1.78,
+      "gross": -0.1104
+     },
+     "vsRest": {
+      "diff": 0.0397,
+      "t": 0.11
+     }
+    },
+    "B": {
+     "group": {
+      "n": 21,
+      "win": 14.3,
+      "pf": 0.74,
+      "mean": -0.2603,
+      "total": -5.47,
+      "dd": 16.56,
+      "months": 9,
+      "tMonth": -0.37,
+      "gross": -0.0966,
+      "net2": -0.4241
+     },
+     "rest": {
+      "n": 206,
+      "win": 19.4,
+      "pf": 0.86,
+      "mean": -0.1334,
+      "total": -27.48,
+      "dd": 38.2,
+      "months": 35,
+      "tMonth": -0.66,
+      "gross": 0.029
+     },
+     "vsRest": {
+      "diff": -0.1269,
+      "t": -0.2
+     }
+    }
+   }
+  }
+ },
+ "bySteps": {
+  "1d": {
+   "A": {
+    "group": {
+     "n": 4,
+     "win": 0,
+     "pf": 0,
+     "mean": -1.0462,
+     "total": -4.18,
+     "dd": 4.18,
+     "months": 4,
+     "tMonth": -36.41,
+     "gross": -1,
+     "net2": -1.0923
+    },
+    "rest": {
+     "n": 53,
+     "win": 11.3,
+     "pf": 0.57,
+     "mean": -0.3969,
+     "total": -21.03,
+     "dd": 30.96,
+     "months": 26,
+     "tMonth": -1.25,
+     "gross": -0.3545
+    },
+    "vsRest": {
+     "diff": -0.6493,
+     "t": -2.05
+    }
+   },
+   "B": {
+    "group": {
+     "n": 0
+    },
+    "rest": {
+     "n": 58,
+     "win": 12.1,
+     "pf": 0.72,
+     "mean": -0.2604,
+     "total": -15.1,
+     "dd": 18.48,
+     "months": 27,
+     "tMonth": -0.81,
+     "gross": -0.2159
+    },
+    "vsRest": {
+     "diff": null,
+     "t": null
+    }
+   }
+  },
+  "4h": {
+   "A": {
+    "group": {
+     "n": 42,
+     "win": 9.5,
+     "pf": 0.44,
+     "mean": -0.5448,
+     "total": -22.88,
+     "dd": 35.29,
+     "months": 29,
+     "tMonth": -1.54,
+     "gross": -0.4765,
+     "net2": -0.613
+    },
+    "rest": {
+     "n": 100,
+     "win": 13,
+     "pf": 0.69,
+     "mean": -0.294,
+     "total": -29.4,
+     "dd": 32.18,
+     "months": 45,
+     "tMonth": -1.07,
+     "gross": -0.2184
+    },
+    "vsRest": {
+     "diff": -0.2508,
+     "t": -0.66
+    }
+   },
+   "B": {
+    "group": {
+     "n": 37,
+     "win": 10.8,
+     "pf": 0.62,
+     "mean": -0.3809,
+     "total": -14.09,
+     "dd": 20.16,
+     "months": 20,
+     "tMonth": -0.79,
+     "gross": -0.2762,
+     "net2": -0.4856
+    },
+    "rest": {
+     "n": 80,
+     "win": 13.8,
+     "pf": 1.06,
+     "mean": 0.0532,
+     "total": 4.26,
+     "dd": 33.82,
+     "months": 31,
+     "tMonth": 0.16,
+     "gross": 0.1359
+    },
+    "vsRest": {
+     "diff": -0.4341,
+     "t": -0.84
+    }
+   }
+  },
+  "1h": {
+   "A": {
+    "group": {
+     "n": 29,
+     "win": 34.5,
+     "pf": 0.87,
+     "mean": -0.0918,
+     "total": -2.66,
+     "dd": 7.63,
+     "months": 18,
+     "tMonth": -0.23,
+     "gross": -0.0278,
+     "net2": -0.1557
+    },
+    "rest": {
+     "n": 48,
+     "win": 16.7,
+     "pf": 0.67,
+     "mean": -0.2948,
+     "total": -14.15,
+     "dd": 26.12,
+     "months": 22,
+     "tMonth": -0.86,
+     "gross": -0.23
+    },
+    "vsRest": {
+     "diff": 0.203,
+     "t": 0.42
+    }
+   },
+   "B": {
+    "group": {
+     "n": 14,
+     "win": 21.4,
+     "pf": 1.08,
+     "mean": 0.0688,
+     "total": 0.96,
+     "dd": 6.53,
+     "months": 13,
+     "tMonth": 0.08,
+     "gross": 0.146,
+     "net2": -0.0083
+    },
+    "rest": {
+     "n": 31,
+     "win": 19.4,
+     "pf": 0.68,
+     "mean": -0.2753,
+     "total": -8.53,
+     "dd": 15.58,
+     "months": 18,
+     "tMonth": -0.57,
+     "gross": -0.1934
+    },
+    "vsRest": {
+     "diff": 0.3442,
+     "t": 0.39
+    }
+   }
+  },
+  "30m": {
+   "A": {
+    "group": {
+     "n": 68,
+     "win": 14.7,
+     "pf": 0.78,
+     "mean": -0.2087,
+     "total": -14.19,
+     "dd": 28.84,
+     "months": 31,
+     "tMonth": -0.58,
+     "gross": -0.0899,
+     "net2": -0.3275
+    },
+    "rest": {
+     "n": 166,
+     "win": 16.3,
+     "pf": 0.69,
+     "mean": -0.2974,
+     "total": -49.37,
+     "dd": 75.97,
+     "months": 45,
+     "tMonth": -1.73,
+     "gross": -0.1721
+    },
+    "vsRest": {
+     "diff": 0.0887,
+     "t": 0.21
+    }
+   },
+   "B": {
+    "group": {
+     "n": 55,
+     "win": 20,
+     "pf": 1.05,
+     "mean": 0.0472,
+     "total": 2.6,
+     "dd": 11.47,
+     "months": 24,
+     "tMonth": 0.12,
+     "gross": 0.2258,
+     "net2": -0.1313
+    },
+    "rest": {
+     "n": 123,
+     "win": 22,
+     "pf": 1.11,
+     "mean": 0.0992,
+     "total": 12.2,
+     "dd": 41.39,
+     "months": 34,
+     "tMonth": 0.36,
+     "gross": 0.2421
+    },
+    "vsRest": {
+     "diff": -0.0519,
+     "t": -0.11
+    }
+   }
+  },
+  "15m": {
+   "A": {
+    "group": {
+     "n": 81,
+     "win": 28.4,
+     "pf": 0.82,
+     "mean": -0.1478,
+     "total": -11.97,
+     "dd": 30.33,
+     "months": 39,
+     "tMonth": -0.75,
+     "gross": -0.01,
+     "net2": -0.2855
+    },
+    "rest": {
+     "n": 266,
+     "win": 24.4,
+     "pf": 0.62,
+     "mean": -0.3274,
+     "total": -87.08,
+     "dd": 95.53,
+     "months": 47,
+     "tMonth": -2.51,
+     "gross": -0.1962
+    },
+    "vsRest": {
+     "diff": 0.1796,
+     "t": 0.78
+    }
+   },
+   "B": {
+    "group": {
+     "n": 62,
+     "win": 25.8,
+     "pf": 1.16,
+     "mean": 0.1385,
+     "total": 8.59,
+     "dd": 22.48,
+     "months": 28,
+     "tMonth": 0.4,
+     "gross": 0.2865,
+     "net2": -0.0094
+    },
+    "rest": {
+     "n": 167,
+     "win": 25.7,
+     "pf": 1.01,
+     "mean": 0.0083,
+     "total": 1.38,
+     "dd": 48.52,
+     "months": 35,
+     "tMonth": 0.03,
+     "gross": 0.1645
+    },
+    "vsRest": {
+     "diff": 0.1303,
+     "t": 0.31
+    }
+   }
+  }
+ }
+}

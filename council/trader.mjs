@@ -2314,7 +2314,7 @@ try { const cj = rd('coach.json', {});
 // research/) the last reading is kept, never overwritten by an error.
 try { const cj = rd('coach.json', {}), pr = (!cj.forward || cj.forward.slot !== CC_SLOT) ? loadProtocol() : null;
   if (pr) { const ma = rd('ctrader/mirror-accounts.json', { groups: [] }), mirrors = (Array.isArray(ma && ma.groups) ? ma.groups : []).map((g) => ({ account: g.account, books: g.books || [], state: (rd('ctrader/' + g.file, {}) || {}).state || {} }));
-    cj.forward = { ...buildForward({ trades, snapshot, mirrors, accounts: rd('ctrader/accounts.json', null), protocol: pr, prev: cj.forward }, { now }), slot: CC_SLOT };
+    cj.forward = { ...buildForward({ trades, snapshot, mirrors, accounts: rd('ctrader/accounts.json', null), protocol: pr, prev: cj.forward, dom: rd('dom/trades.json', null) }, { now }), slot: CC_SLOT };
     wr('coach.json', cj); }
 } catch (e) { console.log('forward tracker failed:', e.message); }
 // Book weights, paper comparison (8 Nov, council/book.mjs): the live book as traded against the portfolio-v2 proposal (equal

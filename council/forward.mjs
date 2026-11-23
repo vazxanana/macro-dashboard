@@ -115,7 +115,7 @@ function reasonOf(id, mirrors) {
 }
 const bookAccount = (accounts) => ((accounts && accounts.accounts) || []).find((a) => (a.books || []).includes('council')) || null;
 
-export function execChecks({ rows, mirrors, accounts, prev, now, start = START, fin = FIN }) {
+export function execChecks({ rows, mirrors, accounts, prev, now, start = START, fin = FIN, dom = null }) {
   const P = (prev && prev.exec) || {}, carried = P.copies || {}, A = bookAccount(accounts), win = rows.slice().sort((a, b) => fillT(a) - fillT(b)).slice(0, EXEC.n);
   const posById = new Map(); for (const p of (A && A.open) || []) posById.set(String(p.id), p);
   const dealByPos = new Map(); for (const d of (A && A.history) || []) dealByPos.set(String(d.positionId), d);
@@ -170,13 +170,18 @@ export function execChecks({ rows, mirrors, accounts, prev, now, start = START, 
     for (const m of Object.values(st.map || {})) { if (m && m.positionId != null) known.add(String(m.positionId)); if (m && m.viaLimit && m.limitPrice != null) limits.add(lk(m.symbol, m.side, m.limitPrice)); }
     for (const o of Object.values(st.orders || {})) if (o && o.orderId != null) orders.add(String(o.orderId)); }
   for (const c of Object.values(carried)) if (c && c.positionId) known.add(String(c.positionId));
-  const held = (f) => (f.kind === 'order' ? orders.has(String(f.id)) || (f.price != null && limits.has(lk(f.symbol, f.side, f.price))) : known.has(String(f.id)));
+  // The H1 dominant-zone demo job (council/dom-demo.mjs, 23 Nov 2026) trades on the same Council demo account by the owner's
+  // choice, under its own label 'dom': its positions and orders (the label, as the account file carries it) and its closing deals
+  // (no label on a deal: the position and order ids of council-data dom/trades.json) are not the mirror's and never flagged here.
+  const domIds = new Set(); for (const x of (dom && Array.isArray(dom.trades) ? dom.trades : [])) { if (x && x.positionId != null) domIds.add(String(x.positionId)); if (x && x.orderId != null) domIds.add(String(x.orderId)); }
+  const isDom = (f) => f.label === 'dom' || domIds.has(String(f.id));
+  const held = (f) => isDom(f) || (f.kind === 'order' ? orders.has(String(f.id)) || (f.price != null && limits.has(lk(f.symbol, f.side, f.price))) : known.has(String(f.id)));
   const key = (f) => (f.kind === 'order' ? 'order:' : 'pos:') + f.id;
   const foreign = (Array.isArray(P.foreign) ? P.foreign : []).filter((f) => f && !held(f)).reduce((a, f) => (a.some((x) => key(x) === key(f)) ? a : a.concat([f])), []);
   if (A) {
     const seen = new Set(foreign.map(key)), add = (f) => { if (!held(f) && !seen.has(key(f))) { seen.add(key(f)); foreign.push(f); } };
-    for (const p of A.open || []) if (Date.parse(p.openedAt) / 1000 >= start) add({ kind: 'position', id: String(p.id), symbol: p.symbol, side: p.side, lots: p.lots, at: p.openedAt });
-    for (const o of A.orders || []) add({ kind: 'order', id: String(o.id), symbol: o.symbol, side: o.side, price: o.price ?? null });
+    for (const p of A.open || []) if (Date.parse(p.openedAt) / 1000 >= start) add({ kind: 'position', id: String(p.id), symbol: p.symbol, side: p.side, lots: p.lots, at: p.openedAt, ...(p.label ? { label: p.label } : {}) });
+    for (const o of A.orders || []) add({ kind: 'order', id: String(o.id), symbol: o.symbol, side: o.side, price: o.price ?? null, ...(o.label ? { label: o.label } : {}) });
     for (const d of A.history || []) if (Date.parse(d.closedAt) / 1000 >= start) add({ kind: 'deal', id: String(d.positionId), symbol: d.symbol, side: d.side, lots: d.lots, at: d.closedAt });
   }
   checks.push({ id: 'E5', label: 'Nothing on the account the mirror did not place', state: foreign.length ? 'fail' : !A ? 'nodata' : full ? 'pass' : 'running', n: foreign.length,
@@ -185,13 +190,13 @@ export function execChecks({ rows, mirrors, accounts, prev, now, start = START, 
 }
 
 // ─── the reading ───
-export function buildForward({ trades, snapshot, mirrors, accounts, protocol, prev } = {}, { now = Date.now() / 1000, start = START } = {}) {
+export function buildForward({ trades, snapshot, mirrors, accounts, protocol, prev, dom } = {}, { now = Date.now() / 1000, start = START } = {}) {
   const at = new Date(now * 1000).toISOString();
   if (!protocol || !protocol.gates || !protocol.worlds) return { at, v: 1, error: `no protocol file (${PROTOCOL_DOC.replace(/\.md$/, '.json')})`, label: LABEL, decision: DECISION };
   const mk = (snapshot && snapshot.markets) || {}, price = (m) => (mk[m] && num(mk[m].price) ? mk[m].price : null);
   const rows = bookTrades(trades, start), rec = record(rows, price), months = Math.max(0, (now - start) / MONTH), min = minPositions(protocol);
   const b = bandAt(protocol, months), where = rec.total < b.p5 ? 'below' : rec.total > b.p95 ? 'above' : 'inside';
-  const stops = stopLines(protocol, rec, now, start), exec = execChecks({ rows, mirrors, accounts, prev, now, start });
+  const stops = stopLines(protocol, rec, now, start), exec = execChecks({ rows, mirrors, accounts, prev, now, start, dom });
   const crossed = stops.filter((s) => s.state === 'crossed'), failed = exec.checks.filter((c) => c.state === 'fail');
   const status = crossed.length ? 'stop' : rec.n < min ? 'few' : where === 'below' ? 'below' : 'ok';
   const span = rec.n ? `${rec.n} position${rec.n === 1 ? '' : 's'} closed, ${day(start)} to ${day(rec.lastAt)}` : `no position closed since ${day(start)}`;

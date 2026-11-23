@@ -6208,6 +6208,30 @@ Owner's answers: an engulf may take "as many candles as it needs"; keep the msnr
   has been read under too many definitions on 21 Nov to judge anything). Never present a desk total as evidence.
 - Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`, `tests/mosha-tracker.test.mjs`, `tests/desk-exits.test.mjs`.
 
+## H1 dominant zone on the Council demo account (23 Nov 2026, owner: "Do h1 dom (all markets) to one of the demo acc use the one with no trades active")
+`council/dom-demo.mjs` (council.yml: each round after the breakout job and each quick pass, `timeout 45`, never fails the round):
+the one family the three combination grids found before costs (`research/edge/combo-grid-3`), as a forward DEMO record. Zone = the
+grids' own `buildZones('dom')` (imported from combo-grid-3): two consecutive CLOSED H1 candles of one colour, the second closing
+beyond the first's extreme; zone = the first candle's body; it stands until a closed H1 candle closes through its far side or 120
+H1 candles pass (a forming candle never makes or ends one). Order: a LIMIT at the near edge, stop = far side -/+ (half the
+round trip of combo-grid-2 `COSTS` + 0.25 x ATR(14) of H1), target 2R, `stopLoss` and `takeProfit` absolute on the order,
+GOOD_TILL_DATE 24 h. Armed only for a standing zone on the right side of the price whose near edge is within 1 x ATR(14), one
+order per zone ever (id `<market>-<side>-<first candle time>`, comment `dom <id>`, label `dom`); a resting order is cancelled as
+soon as its zone no longer stands; expired orders are not re-armed; a stale market (newest candle over 2 h old) arms nothing.
+Markets: xau xag, the 13 forex pairs of the grids, nas100 spx500 de40 (broker names by `normName`; a market the account does not
+offer is logged and held off a day, `notOffered`). Account: the Council demo account (`CTRADER_ACCOUNT_ID`, the mirror's
+'council' book); `config.json` `dom.account` overrides. Caps: 3 orders + positions a market, 20 of its own on the account; risk
+0.5 % of the balance (owner, 23 Nov 2026) (`dom.risk` 0.0005-0.005; the vb minimum-volume rule, at most 1 %); `dom.markets` may narrow the list;
+`config.dom = { on: false }` stops it. Rule 1: a fill is read back (no stop: amend, refused: closed at once) and any 'dom' position
+with no stop and no record is closed. The closing deal is not read (the mirror's allowlist has no deal list): an exit is inferred
+from the H1 candles after the fill (stop first in one candle) and marked `inferred`. Record: council-data `dom/trades.json`.
+`council/forward.mjs` E5 leaves 'dom' out (the label on positions and orders, `api/ctrader-link.js` now carries it on orders;
+closing deals by the position / order ids of `dom/trades.json`, which the Trader passes as `dom`). The mirror manages its own
+label only. Note: the mirror's daily loss stop (`LIMITS.dayStop` 2 %) reads the account balance, so a bad day of this job on the
+Council account can hold the live book's new copies for the rest of that UTC day. A forward demo record of a before-cost tilt,
+NOT an edge (every grid failed after costs); the holdout test `research/edge/dom-zone-holdout` is pending. Test:
+`tests/dom-demo.test.mjs`.
+
 ## Why the desk totals fell, 30 pips in each market's own pip, EG barriers, the trade chart (22 Nov 2026, owner: "find why the before that were positive became negative and find a solutin, plus a barrier can be an eg aswell"; "the stop is not 3$ but 30 pips so convert it to points"; "i would like to resize ... and i want timeframes from 1minute m5 m15 m30 h1 h4 daily")
 Old and new code were run on the same candles (three markets, 2026) with one change at a time. PAPER READINGS before costs: none is a tested edge.
 - **Engulfing plan / short method**: the fall is gold (and silver / Nasdaq), not forex (EUR/USD and GBP/USD stayed about zero). Two causes:
