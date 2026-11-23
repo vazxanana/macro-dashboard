@@ -45,3 +45,12 @@ test('no look-ahead on the M30 chains (every trigger, the two-QM VR -> CF includ
     assert.deepEqual(a.map(key).sort(), b.map(key).sort(), tfL + '>' + tfT + ' ' + z); n += a.length; nq += a.filter((s) => s.trig === 5).length; }
   assert.ok(n > 100); assert.ok(nq > 0);
 });
+
+test('the grid 3 result: counts as reported', async () => {
+  const fs = await import('node:fs');
+  const r = JSON.parse(fs.readFileSync(new URL('../research/edge/combo-grid-3/result.json', import.meta.url)));
+  assert.equal(r.after.confirmed, 0); assert.equal(r.before.confirmed, 9); assert.equal(r.after.tested, 2426380);
+  assert.equal(r.before.confirmedList.filter((x) => x.zone === 'dom' && x.trig === 'none').length, 8);
+  const md = fs.readFileSync(new URL('../research/edge/combo-grid-3/RESULT.md', import.meta.url), 'utf8');
+  assert.match(md, /\| 1,740 \| 44 \|/);
+});
