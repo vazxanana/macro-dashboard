@@ -180,6 +180,8 @@ export function report(acc) {
       afterCosts: { discovery: GA.wins.length, raw: GA.raw.length, holm: GA.holm.length } },
     byDiscovery: by(G.wins), byRaw: by(G.raw), byHolm: by(G.holm),
     confirmed, bestDiscovery: best('d'), bestConfirmation: best('c'),
+    placeboConfirmed: P.holm.map((x) => ({ ...fmt(x, 'p'), holm: +x.holm_pB.toPrecision(3) })), bestPlaceboConfirmation: best('c', 'p'),
+    placeboByRaw: by(P.raw),
     rawConfirmations: G.raw.slice(0, 60).map((x) => ({ ...fmt(x), placeboPasses: confRaw(x.p) })),
   };
 }
@@ -198,7 +200,9 @@ if (main && process.argv[2] === 'market') {
 if (main && process.argv[2] === 'report') {
   const dir = process.argv[3], acc = {};
   for (const m of MARKETS) { const j = JSON.parse(fs.readFileSync(path.join(dir, m + '.json'), 'utf8')); acc[m] = { n: Uint32Array.from(j.n), b: Float64Array.from(j.b), a: Float64Array.from(j.a), rows: j.rows }; }
-  const res = report(acc); res.rows = Object.fromEntries(MARKETS.map((m) => [m, acc[m].rows]));
+  const res = report(acc), c = res.counts, b = res.bestDiscovery[0], f = (x) => (x >= 0 ? '+' : '') + x.toFixed(3);
+  res.headline = `${res.cells.toLocaleString('en-GB')} cells: ${c.discovery} discovery winners before costs, ${c.raw} raw confirmations on 2015-19 (${c.chance} expected by chance), ${c.holm} after Holm. Best pooled discovery cell (${b.chain} ${b.stage} ${b.side} ${b.event} ${b.entry}/${b.stop} ${b.exit}): ${f(b.discovery.before)}R a trade in 2010-14 (n ${b.discovery.n}, month t ${b.discovery.tB}), ${f(b.confirmation.before)}R in 2015-19 (n ${b.confirmation.n}, t ${b.confirmation.tB}). The side-flipped placebo did better (${c.placebo.discovery} discovery winners, ${c.placebo.holm} Holm).`;
+  res.rows = Object.fromEntries(MARKETS.map((m) => [m, acc[m].rows]));
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(res, null, 1) + '\n');
   console.log(JSON.stringify({ verdict: res.verdict, counts: res.counts, reach100: res.reach100, confirmed: res.confirmed.length }, null, 1));
 }
