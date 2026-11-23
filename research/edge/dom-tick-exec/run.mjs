@@ -68,7 +68,7 @@ export function orders(market, from = FROM, to = TO) {
       checked++;
       if (r.risk < cost || bad(r.t)) continue; }
     else if (p) throw new Error(`mid path filled where multi did not at ${market} ${ts}`);
-    list.push({ ts, side: d, L: entry, S: stop, T: entry + d * 2 * (entry - stop), visit: sg.visit,
+    list.push({ ts, side: d, L: entry, S: stop, T: entry + 2 * (entry - stop), visit: sg.visit,
       mid: p ? { fillT: M5[p.fi].t, fill: p.fill, risk: p.risk, R: (d * (p.px - p.fill)) / p.risk, how: p.how, exitT: M5[p.xi].t, deadT: M5[p.fi].t + CAP } : null });
   }
   return { M5, list, checked };
@@ -92,7 +92,7 @@ export function queriesOf(o, M5, sym) {
     if (s > 0 ? b.l <= o.S + near : b.h >= o.S - near) nearS.push(b.t);
     if (s > 0 ? b.h >= o.T - near : b.l <= o.T + near) nearT.push(b.t); }
   spans(nearS).forEach(([a, b], k) => q.push([`${id}|s${k}`, a, b, r6(o.S), -s]));
-  spans(nearT).forEach(([a, b], k) => q.push([`${id}|t${k}`, a, b, r6(o.T + s * c), s]));
+  spans(nearT).forEach(([a, b], k) => q.push([`${id}|u${k}`, a, b, r6(o.T + s * c), s])); // u: target queries after the 23 Nov fix (t = the first, wrong-sided ones)
   return { q, mark: o.mid && o.mid.how === 'time' ? o.mid.exitT + 300 : null, deadEnd: dc ? dc.e : null };
 }
 
@@ -110,7 +110,7 @@ export function tickOrder(o, sym, F, M, { lenient = false } = {}) {
   const dead = o.deadEnd != null ? o.deadEnd * 1000 : Infinity, ok = (ms) => ms != null && ms >= fillMs && ms <= dead;
   let stop = null, tgt = null;
   for (let k = 0; F.has(`${id}|s${k}`); k++) { const x = F.get(`${id}|s${k}`); if (ok(x[1]) && (!stop || x[1] < stop[1])) stop = x; }
-  for (let k = 0; F.has(`${id}|t${k}`); k++) { const x = F.get(`${id}|t${k}`); if (ok(x[1]) && (s > 0 ? x[2] >= o.T : x[3] <= o.T) && (!tgt || x[1] < tgt[1])) tgt = x; }
+  for (let k = 0; F.has(`${id}|u${k}`); k++) { const x = F.get(`${id}|u${k}`); if (ok(x[1]) && (s > 0 ? x[2] >= o.T : x[3] <= o.T) && (!tgt || x[1] < tgt[1])) tgt = x; }
   const r = Math.abs(o.L - o.S); let exit, ex, exitMs;
   if (stop && (!tgt || stop[1] <= tgt[1])) { exit = s > 0 ? stop[2] : stop[3]; ex = 'stop'; exitMs = stop[1]; }
   else if (tgt) { exit = o.T; ex = 'target'; exitMs = tgt[1]; }

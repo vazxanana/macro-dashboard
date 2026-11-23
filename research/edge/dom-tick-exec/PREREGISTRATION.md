@@ -80,3 +80,13 @@ Also reported: fill rate on ticks vs mid, the unresolved counts and the sensitiv
 (fill minus L, and the time from order start to fill), the share of mid wins that did not fill on ticks. These years were read by
 `combo-grid-3` / `-4` (2020 on): this prices the rule at real fills, it is not new evidence that the tilt exists, and a PASS is
 no reason to trade by itself. Deliverables: `run.mjs` (`queries`, `report`), the query files, `RESULT.md`, `result.json`.
+
+## Amendment (23 Nov 2026, 18:00 UTC): a code bug against item 5, fixed before the verdict
+
+The first query files put a SELL order's target on the wrong side of its entry (`entry + d * 2 * (entry - stop)`, where
+`entry - stop` already carries the side), against item 5 above (T = L + 2 x (L - S)). Found while checking the first probe
+batch (dom-b1): its report read -0.94R a filled trade, with "target" exits scoring -2R. The mid-candle results were not
+affected (they come from the grid's own `multi()`). Fix: `T = entry + 2 * (entry - stop)`; the target queries get new ids
+(`|u<k>`) so the wrong ones (`|t<k>`) are never read; the order sample, entries, stops and every other query are unchanged
+(the same 1,200 orders a market, checked id for id). Batch dom-b1's entry, stop and time answers are kept; everything it did
+not answer is asked again in batches dom-c1 and dom-c2. The rule, the bar and the windows are unchanged.
