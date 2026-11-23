@@ -31,3 +31,12 @@ the counts against chance and against the placebo, as in the first grid.
 
 These years are now read by the first grid as well: anything this grid confirms still needs data neither grid read before
 anyone calls it more than a hypothesis. Nothing live changes from this study.
+
+## Amendment, before any run (23 Nov 2026)
+
+Eight more markets were fetched the same way (OANDA mid 5-minute and daily candles through the site's candle proxy,
+2019 on) and join the grid, making 18: gbpjpy, eurgbp, audjpy, cadjpy, euraud, nas100, spx500, de40. Round-trip costs in
+price units, from today's prices: the forex crosses = the demo's commission (0.0045 % of price) plus half a pip of spread
+(gbpjpy 0.014, eurgbp 0.00009, audjpy 0.010, cadjpy 0.010, euraud 0.00013; ASSUMED spreads, not measured); nas100 1.0 point
+and spx500 0.4 point (rounded up from the demo's measured hourly spreads, `index-vol-breakout-hourcost`); de40 1.5 points
+(ASSUMED). The data-quality audit is run on these eight as well before the grid's run, with the same script.
