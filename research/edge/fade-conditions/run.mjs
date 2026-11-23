@@ -133,13 +133,13 @@ export function monthDiff(A, cb, cw, a, b) {
 export function judge(data) {
   const A = pool(data); const tests = [];
   for (let r = 0; r < 2; r++) for (let sp = 0; sp < SPLITS.length; sp++) {
-    const S = SPLITS[sp], lv = S.levels.map((name, l) => ({ name, l, c: r * NL + OFF[sp] + l, ...levelStats(A, r * NL + OFF[sp] + l) }));
+    const S = SPLITS[sp], lv = S.levels.map((name, l) => ({ name, l, ci: r * NL + OFF[sp] + l, ...levelStats(A, r * NL + OFF[sp] + l) }));
     const elig = lv.filter((x) => x.d.n >= MIN_PICK); if (elig.length < 2) { tests.push({ r, sp, levels: lv, best: null, worst: null, p: 1 }); continue; }
     const best = elig.reduce((a, b) => (b.d.mean > a.d.mean ? b : a)), worst = elig.reduce((a, b) => (b.d.mean < a.d.mean ? b : a));
     const W = welchDf(best.c, worst.c), diff = best.c.mean != null && worst.c.mean != null ? best.c.mean - worst.c.mean : null;
     const Wd = welchDf(best.d, worst.d);
     tests.push({ r, sp, levels: lv, best, worst, diffDisc: best.d.mean - worst.d.mean, tDisc: Wd.t, diff, t: W.t, df: W.df,
-      p: W.t == null ? 1 : p1(W.t, W.df), monthly: monthDiff(A, best.c, worst.c, DM, NM),
+      p: W.t == null ? 1 : p1(W.t, W.df), monthly: monthDiff(A, best.ci, worst.ci, DM, NM),
       diffNet: best.c.meanNet != null && worst.c.meanNet != null ? best.c.meanNet - worst.c.meanNet : null });
   }
   const H = K.holm(tests.map((x) => x.p)); tests.forEach((x, i) => { x.holm = H[i]; x.pass = x.diff != null && x.diff > 0 && H[i] < 0.05; });
@@ -166,12 +166,13 @@ export function report(dir) {
   const pass = tests.filter((x) => x.pass);
   const verdict = data.length < 8 || !gateOk ? 'INCONCLUSIVE' : pass.length ? 'PASS' : 'FAIL';
   const nm = (x) => `${RULES[x.r].key} ${SPLITS[x.sp].key}`;
+  const netLv = tests.flatMap((x) => x.levels.filter((l) => l.d.meanNet > 0 && l.c.meanNet > 0).map((l) => `${RULES[x.r].key} ${SPLITS[x.sp].key} ${l.name}`));
   const top = [...tests].filter((x) => x.t != null).sort((a, b) => a.holm - b.holm || b.t - a.t)[0];
-  const desc = (x) => `${nm(x)}: ${x.best.name} minus ${x.worst.name} ${f3(x.diff)}R a trade in 2015-26 (n ${N(x.best.c.n)} vs ${N(x.worst.c.n)}, Welch t ${f2(x.t)}, Holm p ${x.holm.toFixed(3)}; month-level t ${f2(x.monthly.t)})`;
+  const desc = (x) => `${nm(x)}: ${x.best.name} minus ${x.worst.name} ${f3(x.diff)}R a trade in 2015-26 (n ${N(x.best.c.n)} vs ${N(x.worst.c.n)}, Welch t ${f2(x.t)}, Holm p ${x.holm < 0.001 ? "< 0.001" : x.holm.toFixed(3)}; month-level t ${f2(x.monthly.t)})`;
   const headline = verdict === 'INCONCLUSIVE'
     ? (data.length < 8 ? `only ${data.length} of 10 markets loaded` : 'the gate against grid7-wide-fade failed; nothing judged')
     : verdict === 'PASS'
-      ? `${pass.length} of 10 primary tests pass before costs; strongest ${desc([...pass].sort((a, b) => b.t - a.t)[0])}; after costs every level still loses`
+      ? `${pass.length} of 10 primary tests pass before costs; strongest ${desc([...pass].sort((a, b) => b.t - a.t)[0])}; ${netLv.length ? netLv.length + ' level(s) positive after costs in both windows' : 'after costs no level is positive in both windows'}`
       : `0 of 10 primary tests pass; the nearest, ${desc(top)}`;
   const levelRows = tests.map((x) => ({ rule: RULES[x.r].cell, split: SPLITS[x.sp].key,
     levels: x.levels.map((l) => ({ level: l.name, disc: slim(l.d), conf: slim(l.c), bothPositive: l.d.mean > 0 && l.c.mean > 0, bothT2: l.d.mean > 0 && l.c.mean > 0 && l.d.t >= 2 && l.c.t >= 2 })) }));
@@ -181,7 +182,7 @@ export function report(dir) {
     p: +x.p.toExponential(4), holm: +x.holm.toExponential(4), pass: x.pass, diffNet: x.diffNet == null ? null : +x.diffNet.toFixed(6),
     monthly: x.monthly ? { months: x.monthly.months, mean: x.monthly.mean == null ? null : +x.monthly.mean.toFixed(6), t: x.monthly.t == null ? null : +x.monthly.t.toFixed(3) } : null }));
   const perMarket = {};
-  for (const x of pass) perMarket[nm(x)] = data.map((d) => { const P = pool([d]); const b = levelStats(P, x.best.c), w = levelStats(P, x.worst.c);
+  for (const x of pass) perMarket[nm(x)] = data.map((d) => { const P = pool([d]); const b = levelStats(P, x.best.ci), w = levelStats(P, x.worst.ci);
     return { market: d.market, assumed: d.assumed, best: { d: slim(b.d), c: slim(b.c) }, worst: { d: slim(w.d), c: slim(w.c) } }; });
   const out = { study: 'fade-conditions', built: '2026-11-23', verdict, headline,
     basis: 'judged before costs (Welch t on per-trade R in confirmation, Holm over 10; pre-registered); month sums and after costs beside',
@@ -249,7 +250,13 @@ function resultMd(o, tests) {
     L.push(`${o.passed.length} of the 10 fixed comparisons hold out of sample: the before-cost fade tilt is larger under one condition than another,`,
       'with the level chosen on 2005-14 and confirmed on 2015-26. That says where the tilt sits, nothing more. The after-cost column',
       `shows ${net.length ? 'a few levels stay positive after costs in both windows (listed above); they were not tested as rules and are a hypothesis for their own pre-registration' : 'that no level is positive after costs in both windows'}.`,
-      'Not an edge, nothing adopted, no live change. No other cut points or splits on these years.');
+      'Not an edge, nothing adopted, no live change. No other cut points or splits on these years.',
+      '', '**Read the hour result with care.** The 20-23 UTC block holds the 17:00 New York rollover and the thin hours after it, where',
+      'the quoted spread is several times its daytime width. The after-cost figures here charge ONE flat round trip a market at every',
+      'hour (the demo\'s daytime figure, or an assumed one), so they understate the cost exactly where the tilt is largest; and a',
+      'fade of the mid quote that "reverses" in those hours is what a widening and narrowing spread looks like, not a move a taker',
+      'can capture. The volatility, Monday and small-body results are smaller tilts of the same before-cost kind. Any follow-up',
+      'needs the broker\'s own bid / ask by hour (the tick probe) and its own pre-registration.');
   } else if (o.verdict === 'FAIL') {
     L.push('No fixed condition separates the fade tilt out of sample: where it sits in discovery does not repeat in confirmation.',
       'The tilt is spread thin over hours, regimes and candle sizes. Nothing live changed; no rule is proposed.');
