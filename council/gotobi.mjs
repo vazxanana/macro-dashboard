@@ -62,14 +62,26 @@ export async function connect({ env, dir, account, WS, scrub }) {
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN };
   try { const tf = path.join(dir, 'ctrader', 'tokens.json'); if (fs.existsSync(tf)) { const t = unseal(JSON.parse(fs.readFileSync(tf, 'utf8')), env); if (t && t.accessToken) { scrub.add(t.accessToken, t.refreshToken); tok = t; } } } catch (e) {}
   const s = session(WS, scrub);
-  await s.send(PT.APP_AUTH_REQ, { clientId: env.CTRADER_CLIENT_ID, clientSecret: env.CTRADER_CLIENT_SECRET }, PT.APP_AUTH_RES);
-  const list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES), all = list.ctidTraderAccount || [], id = Number(account);
-  const acc = all.find((a) => Number(a.ctidTraderAccountId) === id) || all.find((a) => Number(a.traderLogin) === id);
-  if (!acc) { s.close(); throw new Error('the gotobi account is not on this token'); }
-  if (acc.isLive !== false) { s.close(); throw new Error('refused: not a demo account'); }
-  const ctid = Number(acc.ctidTraderAccountId);
-  await s.send(PT.ACCOUNT_AUTH_REQ, { ctidTraderAccountId: ctid, accessToken: tok.accessToken }, PT.ACCOUNT_AUTH_RES);
-  return { s, ctid };
+  try {   // 23 Nov 2026: a refusal here left the session's heartbeat running, so the job's process never ended (it sat to its time limit)
+    await s.send(PT.APP_AUTH_REQ, { clientId: env.CTRADER_CLIENT_ID, clientSecret: env.CTRADER_CLIENT_SECRET }, PT.APP_AUTH_RES);
+    const list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES), all = list.ctidTraderAccount || [], id = Number(account);
+    const acc = all.find((a) => Number(a.ctidTraderAccountId) === id) || all.find((a) => Number(a.traderLogin) === id);
+    if (!acc) throw Object.assign(new Error('the gotobi account is not on this token'), { final: true });
+    if (acc.isLive !== false) throw Object.assign(new Error('refused: not a demo account'), { final: true });
+    const ctid = Number(acc.ctidTraderAccountId);
+    await s.send(PT.ACCOUNT_AUTH_REQ, { ctidTraderAccountId: ctid, accessToken: tok.accessToken }, PT.ACCOUNT_AUTH_RES);
+    return { s, ctid };
+  } catch (e) { s.close(); throw e; }
+}
+// the connection, tried again on a refusal or a dropped line (never a live or a missing account: `final`), up to `tries` times
+// and only while the clock is before `until` (unix s). Only connecting is retried: no order or close is ever sent twice.
+export async function connectRetry(o, { tries = 4, gap = 5000, until = Infinity, now = () => Math.floor(Date.now() / 1000), pause = (ms) => new Promise((r) => setTimeout(r, ms)), log = () => {} } = {}) {
+  let last;
+  for (let k = 1; k <= tries; k++) {
+    try { return await connect(o); }
+    catch (e) { last = e; if (e.final || k === tries || now() + gap / 1000 > until) break; log(`gotobi: connection ${k} failed (${o.scrub ? o.scrub(e.message) : e.message}), trying again`); await pause(gap); }
+  }
+  throw last;
 }
 const ours = (p, ymd) => { const td = p.tradeData || {}; return td.label === LABEL && (!ymd || String(td.comment || '').includes(ymd)); };
 
@@ -108,7 +120,7 @@ export async function run({ env = process.env, dir = 'data', WS = globalThis.Web
     await until(P.entryAt - 40); pull();   // the council may have refreshed the cTrader token since the job started
     let s = null, ctid;
     try {
-      ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
+      ({ s, ctid } = await connectRetry({ env, dir, account, WS, scrub }, { tries: 5, gap: 5000, until: P.entryAt + LATE_S - 5, now, pause, log }));
       const tr = (await s.send(PT.TRADER_REQ, { ctidTraderAccountId: ctid }, PT.TRADER_RES)).trader || {}, md = Number.isFinite(+tr.moneyDigits) ? +tr.moneyDigits : 2, balance = tr.balance != null ? Number(tr.balance) / 10 ** md : null;
       const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES), sym = (names.symbol || []).find((x) => String(x.symbolName).toUpperCase().replace(/[^A-Z]/g, '') === RULE.symbol);
       if (!sym) throw new Error('USDJPY is not offered on this account');
@@ -136,7 +148,9 @@ export async function run({ env = process.env, dir = 'data', WS = globalThis.Web
 
   // 2) out at 06:00:00 UTC
   await until(P.exitAt); pull();
-  const { s, ctid } = await connect({ env, dir, account, WS, scrub });
+  let s, ctid;
+  try { ({ s, ctid } = await connectRetry({ env, dir, account, WS, scrub }, { tries: 6, gap: 10000, now, pause, log })); }
+  catch (e) { rec.exitError = `could not connect at the exit: ${scrub(String((e && e.message) || e)).slice(0, 120)}`; write(J); log('gotobi: ' + rec.exitError + ' (left open with its stop; the next run closes it)'); return { error: rec.exitError, rec }; }
   try {
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), p = (rc.position || []).find((x) => String(x.positionId) === rec.positionId);
     if (p) { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(rec.positionId), volume: +p.tradeData.volume }, PT.EXECUTION_EVENT, orderStep);

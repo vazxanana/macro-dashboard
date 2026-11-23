@@ -2,7 +2,8 @@ name: Gotobi fade (cTrader demo)
 
 # The gotobi study's T2 on a cTrader DEMO account (council/gotobi.mjs; owner, 19 Nov 2026, docs/owner-decisions.md item 61):
 # on a gotobi day, sell USD/JPY at 00:55:00 UTC with its stop at entry + D, buy back at 06:00:00 UTC. The job starts before
-# 00:55 (GitHub's cron below, and the website's 10-minute timer through api/_gotobi-kick.js, since GitHub's cron can be late),
+# 00:55 (GitHub's cron below; the council loop after each round, council/gotobi-due.mjs, 00:10-00:49 UTC; and the website's
+# 10-minute timer through api/_gotobi-kick.js once it has a token; GitHub's cron fired 7.5 h late on 20 and 23 Nov 2026),
 # waits, places the order on time, sleeps, and closes. On any other day it ends at once. Demo only: the demo host, an account
 # that reports isLive false, the mirror's message allowlist. Its record: council-data gotobi/trades.json.
 
@@ -22,7 +23,7 @@ concurrency:
 jobs:
   fade:
     runs-on: ubuntu-latest
-    timeout-minutes: 345
+    timeout-minutes: 360   # GitHub's limit for a hosted job: a run the loop starts at 00:10 (council/gotobi-due.mjs) is still alive at 06:05
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
