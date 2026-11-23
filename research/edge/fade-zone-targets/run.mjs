@@ -78,7 +78,9 @@ export function tradeOf(M5, g, act, cost) {
     const useZ = Number.isFinite(tgt) && s * (tgt - fill) >= risk; out.zt[st] = useZ;
     const tg = [t2, useZ ? tgt : t2, swingOk ? g.opp : t2];
     for (const x of tg) if (!(s * (x - fill) > 0)) throw new Error('target on the wrong side');
-    const r = exits(M5, s, fi, stop, tg, cap); if (!r) return null;
+    // a variant still open when the data ends is closed at the last close (the trade stays in every cell: same trades)
+    let r = exits(M5, s, fi, stop, tg, cap);
+    if (!r) { r = exits(M5, s, fi, stop, tg, M5[M5.length - 1].e - M5[fi].t); out.endMark = true; } if (!r) return null;
     out.R[st] = r.R; out.risk[st] = risk; out.cr[st] = cost / risk; out.tg.push(tg);
   }
   return out;
@@ -88,6 +90,7 @@ export function runMarket(market, { to = '2026-11-01' } = {}) {
   const M5 = K.load(market, '5m', { from: '2004-01-01', to }); const F = frames(M5);
   const sigs = signals(F).filter((g) => g.tf === 1 && g.cx === 0).sort((x, y) => x.ts - y.ts);
   const L = levels(F), at = standing(L), cost = COSTS[market], X = exclusions(market);
+  let endMarked = 0;
   const rows = [];   // [t, w, m, hb, zs, zt0, zt1, sw, R00,R01,R02, R10,R11,R12, risk0/a, risk1/a, cr0, cr1]
   for (const g of sigs) {
     const act = at(g.ts);
@@ -95,11 +98,12 @@ export function runMarket(market, { to = '2026-11-01' } = {}) {
     if (X.length && inBad(X, t)) continue;
     const r = tradeOf(M5, g, act, cost); if (!r) continue;
     const hb = hourBlock(F['15m'][g.j].t);
+    if (r.endMark) endMarked++;
     rows.push([t, t < SPLIT ? 0 : 1, monthOf(t), +hb, +r.zs, +r.zt[0], +r.zt[1], +r.sw, ...r.R[0], ...r.R[1], r.risk[0] / r.a, r.risk[1] / r.a, r.cr[0], r.cr[1]]
       .map((v, i) => (i < 8 ? v : +v.toFixed(5))));
   }
   return { market, cost, assumed: ASSUMED.includes(market), first: M5.length ? M5[0].t : null, last: M5.length ? M5[M5.length - 1].t : null,
-    signals: sigs.length, levels: L.length, rows };
+    signals: sigs.length, levels: L.length, endMarked, rows };
 }
 
 // ---- cut test: signals and every stop / target level known by a cut equal the full run's -------------------------------
@@ -177,13 +181,13 @@ export function report(dir) {
   const best = [...prim].sort((a, b) => Math.min(b.d.t, b.c.t) - Math.min(a.d.t, a.c.t))[0];
   const show = pass.length ? pass.sort((a, b) => a.holm - b.holm)[0] : best;
   const headline = verdict === 'INCONCLUSIVE' ? `the gate or the cut test failed, nothing judged (${data.length} markets)`
-    : `${pass.length} of 6 key-level exits or stops beat the grid's 2R / 1-ATR fade on the same trades before costs; ${pass.length ? 'best' : 'nearest'} ${show.key} (${show.name}) ${f3(show.c.mean)}R a trade in 2015-26 (n ${N(show.c.n)}, month t ${f2(show.c.t)}; 2005-14 ${f3(show.d.mean)}R, t ${f2(show.d.t)})`;
+    : `${pass.length} of 6 key-level exits or stops beat the grid's 2R / 1-ATR fade on the same trades before costs; ${pass.length ? 'best' : 'nearest'} ${show.key} (${show.name}) ${f3(show.c.mean)}R a trade in 2015-26 (n ${N(show.c.n)}, month t ${f2(show.c.t)}; 2005-14 ${f3(show.d.mean)}R, t ${f2(show.d.t)}), only ${f3(show.atr.c.mean)} in ATR units and ${f3(show.net.c.mean)}R after costs`;
   const out = { study: 'fade-zone-targets', built: '2026-11-23', verdict, headline,
     basis: 'paired by trade against the grid exit (2R, 1-ATR stop), judged before costs on calendar-month sums; after costs beside',
     windows: { first: '2005-01-01 to 2014-12-31 (120 months)', second: '2015-01-01 to 2026-10-31 (142 months)' },
     markets: data.map((d) => d.market), assumedCosts: ASSUMED, costs: Object.fromEntries(data.map((d) => [d.market, d.cost])),
     gate, cut, cutBad,
-    meta: data.map((d) => ({ market: d.market, first: new Date(d.first * 1000).toISOString().slice(0, 10), signals: d.signals, levels: d.levels, trades: d.rows.length })),
+    meta: data.map((d) => ({ market: d.market, first: new Date(d.first * 1000).toISOString().slice(0, 10), signals: d.signals, levels: d.levels, trades: d.rows.length, endMarked: d.endMarked || 0 })),
     usage: usage.map((u) => ({ hours: u.hours, n: u.n, zoneStop: r6(u.zoneStop), zoneTargetAtrStop: r6(u.zoneTargetAtr), zoneTargetZoneStop: r6(u.zoneTargetZone), swingFallback: r6(u.swingFallback) })),
     primary: prim.map((x) => ({ key: x.key, name: x.name, exit: EXITS[x.x], stop: STOPS[x.st], hours: HOURS[x.h], first: slim(x.d), second: slim(x.c),
       atrUnits: { first: slim(x.atr.d), second: slim(x.atr.c) }, afterCosts: { first: slim(x.net.d), second: slim(x.net.c) },
@@ -212,7 +216,8 @@ function resultMd(o) {
     '## Gate and cut test', '');
   for (const g of o.gate) L.push(`- ${g.what}: n ${N(g.n)}, ${f3(g.mean)} (wanted n ${N(g.want.n)}, ${f3(g.want.mean)}): ${g.ok ? 'equal' : 'NOT EQUAL'}.`);
   L.push(`- Cut test: ${o.cut.length} cuts on ${[...new Set(o.cut.map((x) => x.market))].join(', ')}: ${N(o.cut.reduce((a, x) => a + x.n, 0))} signals with their stop and target levels known by the cut dates, ${o.cutBad} missing or extra when the candles are cut there.`,
-    '- Every stop on the losing side of its fill and every target on the winning side (the run throws otherwise).', '',
+    '- Every stop on the losing side of its fill and every target on the winning side (the run throws otherwise).',
+    `- Trades whose key-level variant was still open when the data ends (closed at the last close, so every cell keeps the same trades): ${o.meta.reduce((a, m) => a + m.endMarked, 0)}.`, '',
     '## Primary tests (paired by trade, before costs)', '',
     'Mean of R(variant) - R(2R exit, ATR stop) per trade; t of its calendar-month sums. p = the larger one-sided p of the two',
     'windows; Holm over the six. "ATR units" = the same difference in money at a fixed size per M15 ATR (R x risk / ATR).', '',
@@ -230,10 +235,16 @@ function resultMd(o) {
   L.push('', '\* cost ASSUMED.', '', '## Trades', '', '| Market | candles from | M15 signals | H1 / H4 levels | trades |', '|---|---|---:|---:|---:|');
   for (const m of o.meta) L.push(`| ${m.market} | ${m.first} | ${N(m.signals)} | ${N(m.levels)} | ${N(m.trades)} |`);
   L.push('', '## What it means', '');
-  if (o.verdict === 'PASS') L.push(`${o.passed.join(', ')} clear the pre-registered bar: on these trades, before costs, the key level as a target or stop does`,
-    'better than the grid\'s fixed 2R / 1-ATR exit in both decades. Read the "ATR units" and "after costs" columns before anything',
-    'else: a tighter stop raises R per trade without raising money at a fixed size, and the fade itself loses after costs in every',
-    'cell. Not an edge; nothing is adopted; one run, no variants on these years.');
+  if (o.verdict === 'PASS') { const P = o.primary.filter((x) => x.pass);
+    L.push(`${o.passed.join(' and ')} clear the pre-registered bar: on the grid's own trades, before costs, a key-level target together with a`,
+      'key-level stop raises R a trade over the fixed 2R / 1-ATR exit in both decades. That is all the pass says, and two columns',
+      'take most of it back:', '');
+    for (const x of P) L.push(`- **${x.key}** (${x.name}): ${f3(x.second.mean)}R a trade in 2015-26 (t ${f2(x.second.t)}), but ${f3(x.atrUnits.second.mean)} in ATR units (t ${f2(x.atrUnits.second.t)}) and ${f3(x.afterCosts.second.mean)}R after costs (t ${f2(x.afterCosts.second.tNet)}).`);
+    L.push('', 'The zone stop is tighter than the 1-ATR stop on average, so the same move is more R; at a fixed size per ATR the gain',
+      'shrinks to a few thousandths of an ATR (all hours) or turns negative (20-23 UTC), and a tighter stop pays the round trip on',
+      'a smaller risk, so every zone-stop cell is worse than the grid after costs. The zone target alone (P1, P4) adds nothing in',
+      '2015-26. The fade itself still loses after costs in every all-hours cell. Not an edge; nothing is adopted; the levels do',
+      'not make this fade tradable. One run, no variants on these years.'); }
   else if (o.verdict === 'FAIL') L.push('No key-level target or stop beats the grid\'s fixed 2R exit and 1-ATR stop on the same trades in both decades. The',
     'levels do not improve how the fade is closed or protected; the fade itself stays a before-cost tilt that loses after costs.',
     'Not an edge. Do not re-test variants of these exits on these years. Nothing live changed; no rule is proposed.');
