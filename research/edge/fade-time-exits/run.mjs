@@ -174,8 +174,8 @@ function resultMd(o) {
     'Mean of (time-exit R - other exit R) per trade, month t of the month sums. Costs are the same on both sides of a pair.', '',
     '| Exit | vs 2R 05-14 (t) | vs 2R 15-26 (t) | vs swing 05-14 (t) | vs swing 15-26 (t) |', '|---|---:|---:|---:|---:|');
   for (const r of o.timeExits) L.push(`| ${r.exit} | ${f3(r.vs2R.disc.mean)} (${f2(r.vs2R.disc.t)}) | ${f3(r.vs2R.conf.mean)} (${f2(r.vs2R.conf.t)}) | ${f3(r.vsSwing.disc.mean)} (${f2(r.vsSwing.disc.t)}) | ${f3(r.vsSwing.conf.mean)} (${f2(r.vsSwing.conf.t)}) |`);
-  L.push('', '## The curve (descriptive)', '', 'Mean R at each mark before costs (month t), after costs beside; "stopped" = share of trades already stopped is not',
-    'shown separately: a stopped trade counts at its stop at every later mark.', '');
+  L.push('', '## The curve (descriptive)', '', 'Mean R at each mark before costs (month t), after costs beside. A trade stopped before a mark counts at its stop at that',
+    'mark and every later one, so "win" (share of trades above the fill) falls as the hold grows; the 2R and swing rows are the grid\'s exits.', '');
   for (const c of o.curve) { L.push(`### ${c.tf} none atr${c.primary ? ' (the primary rule)' : ''}`, '', '| At | n 05-14 | R 05-14 (t) | net 05-14 | n 15-26 | R 15-26 (t) | net 15-26 | win 15-26 |', '|---|---:|---:|---:|---:|---:|---:|---:|');
     for (const s of c.series) L.push(`| ${s.at} | ${N(s.disc.n)} | ${f3(s.disc.mean)} (${f2(s.disc.t)}) | ${f3(s.disc.meanNet)} | ${N(s.conf.n)} | ${f3(s.conf.mean)} (${f2(s.conf.t)}) | ${f3(s.conf.meanNet)} | ${s.conf.win == null ? 'n/a' : (s.conf.win * 100).toFixed(1) + '%'} |`);
     L.push(''); }
@@ -193,9 +193,19 @@ function resultMd(o) {
     '- Exclusions: the data-quality audit\'s bad intervals (`combo-grid-2` `exclusions`). A trade counts only when every mark and the 2R exit resolve.', '',
     '| Market | candles from | signals (3 timeframes) | used | dropped (bad data) | past the stop | risk under cost | unresolved |', '|---|---|---:|---:|---:|---:|---:|---:|');
   for (const m of o.meta) L.push(`| ${m.market} | ${m.first} | ${N(m.signals)} | ${N(m.used)} | ${m.dropped} | ${N(m.bad)} | ${N(m.small)} | ${m.open} |`);
+  const cells = o.pips.flatMap((p) => p.move.map((x) => ({ m: p.market, at: x.at, k: x.pips / p.costPips })));
+  const over = cells.filter((c) => c.k >= 1), top = [...cells].sort((a, b) => b.k - a.k)[0];
+  const C15 = o.curve.find((c) => c.primary).series;
   L.push('', '## What it means', '', o.verdict === 'PASS'
-    ? `${o.passed.length} time exit(s) clear the pre-registered bar before costs in both decades. ${o.passedNetPositive.length ? 'Some stay positive after costs.' : 'None stays positive after costs: the pips table shows the move is a fraction of the spread.'} A before-cost tilt, not an edge; nothing is adopted, no live change.`
-    : 'No time exit clears the bar. Nothing is adopted, no live change, no variant on these years.');
+    ? `${o.passed.length} time exit(s) clear the pre-registered bar before costs in both decades. ${o.passedNetPositive.length ? 'Some stay positive after costs.' : 'None stays positive after costs.'} A before-cost tilt, not an edge; nothing is adopted, no live change, no variant on these years.`
+    : 'No time exit clears the bar. Nothing is adopted, no live change, no variant on these years.',
+    '', `**The shape.** On M15 the tilt starts at once (${f3(C15[0].conf.mean)}R at 5 minutes in 2015-26) and grows slowly with the hold (${f3(C15[3].conf.mean)}R at 1 hour, ${f3(C15[5].conf.mean)}R at 4 hours, ${f3(C15[6].conf.mean)}R at a day); the`,
+    'time exits do not keep it with a shorter hold: against the grid\'s 2R exit, 15 and 30 minutes are worse in both windows, 1 hour is',
+    'level and 4 hours a little better (secondary, paired). On H1 the tilt is near zero for the first hour; on M5 it peaks near 2 hours.',
+    '', `**Beside the spread.** In pips the mean move in the trade\'s direction is under the round-trip cost on ${cells.length - over.length} of ${cells.length} market x mark cells${over.length ? ' (at or over it: ' + over.map((c) => c.m + ' ' + c.at).join(', ') + ', on an ASSUMED cost)' : ''}; the largest is ${top.m} at ${top.at}, ${(top.k * 100).toFixed(0)} % of the cost`,
+    '(gold: under 2 pips, $0.19, at a day against a $0.30 round trip). The fade is a reversal of the mid quote about the size of the',
+    'bid / ask or smaller: no time exit is positive after costs pooled in either window, and in 2015-26 none is on any market (in 2005-14 only the 4-hour exit on EUR/USD, GBP/USD and USD/CAD sits at +0.001 to +0.008R, t under 0.6). Silver loses over half its',
+    'signals to the risk-under-cost rule (its cost is assumed); the other markets lose under 4 %.');
   L.push('');
   return L.join('\n');
 }

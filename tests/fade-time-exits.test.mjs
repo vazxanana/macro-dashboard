@@ -55,9 +55,9 @@ test('marks: price at the open after X minutes; a stop first counts at the stop'
   // buy at 100, stop 99: rises, then the 4th candle touches the stop
   const B = mk([[100, 100.5, 99.8, 100.4], [100.4, 101, 100.3, 100.9], [100.9, 101, 100.5, 100.6], [100.6, 100.7, 98.9, 99.2], ...Array.from({ length: 400 }, () => [99.2, 99.5, 99, 99.3])]);
   const m = marksOf(B, 1, 0, 99, [5, 15, 30]);
-  assert.equal(m.R[0], 0.4);            // open of candle 1
+  assert.ok(Math.abs(m.R[0] - 0.4) < 1e-9);   // open of candle 1
   assert.ok(Math.abs(m.R[1] - 0.6) < 1e-12);   // open of candle 3 (the stop is touched inside candle 3, after the mark)
-  assert.equal(m.R[2], -1);             // stopped in candle 3, before the 30-minute mark
+  assert.ok(Math.abs(m.R[2] + 1) < 1e-12);             // stopped in candle 3, before the 30-minute mark
   // sell at 100, stop 101, gap through the stop at the open of candle 2
   const G = mk([[100, 100.2, 99.9, 100], [100, 100.4, 99.8, 100.3], [101.5, 101.8, 101.2, 101.6], ...Array.from({ length: 300 }, () => [101.6, 101.7, 101.5, 101.6])]);
   const g = marksOf(G, -1, 0, 101, [5, 15, 1440]);
