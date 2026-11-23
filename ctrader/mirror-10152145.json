@@ -14696,6 +14696,32 @@
     ],
     "stopCheckedAt": "2026-11-23T21:03:03.000Z",
     "brokerStop": 3658.98
+   },
+   "mosha6:bar-r6-15m-b1795467480": {
+    "positionId": "50928771",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 600,
+    "lots": 0.06,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-23T21:41:57.000Z",
+    "councilEntry": 3634.61,
+    "stop": 3629.585,
+    "t1": 3664.76,
+    "riskCash": 26.46,
+    "margin": 43.61,
+    "mark": 3633.65,
+    "levelsFrom": "mark",
+    "fillPrice": 3633.48,
+    "slipR": -0.225,
+    "lagSec": 2637,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-23T21:41:57.000Z",
+    "brokerStop": 3629.41
    }
   },
   "day": {
@@ -14703,7 +14729,7 @@
    "startBalance": 10655.5
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10585.65 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 10585.65 · 10 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.685 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -14716,14 +14742,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10585.65,
-  "lastRun": "2026-11-23T21:37:55.000Z"
+  "lastRun": "2026-11-23T21:41:57.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T15:35:53.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 454.37, 4.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T15:38:32.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 454.32, 4.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -16211,6 +16232,11 @@
    "at": "2026-11-23T21:03:03.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council mosha6)",
    "trade": "mosha6:bar-r6-15m-v2-s1795464240"
+  },
+  {
+   "at": "2026-11-23T21:41:57.000Z",
+   "msg": "opened buy XAUUSD 0.06 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-15m-b1795467480"
   }
  ],
  "limits": {
@@ -16290,11 +16316,11 @@
   ]
  },
  "execution": {
-  "n": 486,
+  "n": 487,
   "meanSlipR": -0.013,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 145,
+  "medianLagSec": 147,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -16329,8 +16355,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 107,
-    "meanSlipR": -0.048
+    "n": 108,
+    "meanSlipR": -0.049
    }
   }
  }
