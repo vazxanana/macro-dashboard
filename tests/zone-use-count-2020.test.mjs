@@ -83,7 +83,8 @@ test('fill engines on hand-made candles: the same-candle close past the stop', (
   const c = (i, o, h, l, cl) => ({ t: 1000 + i * 300, o, h, l, c: cl, e: 1300 + i * 300 });
   // a buy limit at 10, stop 9: the first candle reaches 10 and closes at 8.5, past the stop
   const M = [c(0, 11, 11, 8.4, 8.5), c(1, 8.5, 9, 8, 8.2), c(2, 8.2, 13, 8.2, 12.5)];
-  assert.equal(multi(M, 1, 10, 9, 'lim', 1000, 1e9, 2, 1e6), null);          // multi cancels it
+  // the grid's multi() cancelled such an order until 23 Nov 2026 (this study found it); since the fix it fills and stops too
+  assert.equal(multi(M, 1, 10, 9, 'lim', 1000, 1e9, 2, 1e6).R[0], -1);
   assert.deepEqual(sim2R(M, 1, 10, 9, 1000, 1e9, 1e6), { t: 1000, risk: 1, R: -1 }); // a resting limit is filled and stopped
   // a clean win: fill on candle 0, target 12 on candle 1
   const W = [c(0, 11, 11, 9.8, 10.5), c(1, 10.5, 12.2, 10.4, 12.1)];
