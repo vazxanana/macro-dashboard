@@ -249,6 +249,11 @@ function resultMd(o, rows) {
     'switch candle does not do measurably better than the same triggers under an old call (or, for the fade, than the plain fade of every',
     'break): the timing of the switch adds nothing the fade or the call did not already show. Never call any of these an edge; do not',
     're-test variants of these 42 cells on these years. Nothing live changed; no rule is proposed.');
+  if (o.verdict === 'INCONCLUSIVE') { const r = rows.find((x) => x.checks.n && x.checks.disc && x.checks.conf && x.checks.holm) || rows.find((x) => !x.checks.n && x.checks.disc && x.checks.conf && x.checks.control);
+    L.push('', `INCONCLUSIVE, not a pass, by the pre-registered rule: ${r.name} clears the before-cost and Holm checks but not its control(s)`,
+      `(${r.ctl.map((k) => `${k.name} Welch t ${f2(k.vs.d)} / ${f2(k.vs.c)}`).join(', ')}). The same exit under an old call and on every break faded does`,
+      'about as well, so the result belongs to fading a lower-timeframe break with a far target, not to the switch; and after costs it',
+      `loses (${f3(r.c.meanNet)}R a trade in 2015-26).`); }
   L.push('');
   return L.join('\n');
 }
