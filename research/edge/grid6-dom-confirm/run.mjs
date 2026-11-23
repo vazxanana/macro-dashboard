@@ -155,7 +155,8 @@ export function report(all) {
   const pn = sum('pn', Uint32Array), pB = sum('pB', Float64Array), pC = sum('pC', Float64Array);
   const real = grade(n, B, C), plac = grade(pn, pB, pC);
   const verdict = real.passed.length === 0 ? 'FAIL' : plac.passed.length < real.passed.length ? 'PASS' : 'INCONCLUSIVE';
-  const row = (x) => ({ ...cellName(x.c), disc: x.disc, conf: x.conf, holm: x.holm, pass: x.pass });
+  const row = (x) => ({ ...cellName(x.c), h2010: x.disc, h2015: x.conf, holm: x.holm, pass: x.pass });
+  const byConf = (list) => Object.fromEntries(CONFS.map((k) => [k, list.filter((x) => cellName(x.c).conf === k).length]));
   // a fixed view: msnr any, session any, the whole decade, per chain x confirmation x stop, first visit, trailing exit and 2R
   const whole = (c) => { const a = half(n, B, C, c, 0), b = half(n, B, C, c, 1); const cnt = a.n + b.n; const sb = [], sa = []; let tb = 0, tc = 0;
     for (let m = 0; m < NM; m++) { sb.push(B[c * NM + m]); sa.push(B[c * NM + m] - C[c * NM + m]); tb += B[c * NM + m]; tc += C[c * NM + m]; }
@@ -167,9 +168,9 @@ export function report(all) {
   return { study: 'grid6-dom-confirm', built: '2026-11-23', basis: 'judged before costs (pre-registered); after costs beside',
     window: 'fills 2010-01-01 to 2019-12-31; discovery 2010-2014, confirmation 2015-2019', markets: MARKETS, cells: NCELL, verdict,
     real: { eligible: real.eligible, discovery: real.discovery, expectedDiscovery: +(real.eligible * 0.025).toFixed(1),
-      expectedConfirmation: +(real.discovery * 0.025).toFixed(2), passed: real.passed.length, passes: real.passed.map(row),
+      expectedConfirmation: +(real.discovery * 0.025).toFixed(2), passed: real.passed.length, passedByConf: byConf(real.passed), discoveryByConf: byConf(real.cells), passes: real.passed.map(row),
       confirmedRaw: real.cells.filter((x) => okHalf(x.conf)).length },
-    placebo: { eligible: plac.eligible, discovery: plac.discovery, passed: plac.passed.length, confirmedRaw: plac.cells.filter((x) => okHalf(x.conf)).length },
+    placebo: { eligible: plac.eligible, discovery: plac.discovery, passed: plac.passed.length, passedByConf: byConf(plac.passed), passes: plac.passed.map(row), confirmedRaw: plac.cells.filter((x) => okHalf(x.conf)).length },
     trades: Object.fromEntries(MARKETS.map((m) => [m, all[m].trades])), visits: Object.fromEntries(MARKETS.map((m) => [m, all[m].visits])),
     topDiscovery: top, view };
 }
