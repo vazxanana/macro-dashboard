@@ -2,7 +2,7 @@
  "study": "eg-methods-18-2020",
  "built": "2026-11-23",
  "verdict": "FAIL",
- "headline": "0 of 6 readings pass: pooled over the six from 2024 on 27501 trades, −0.073R a trade after costs (month t -7.97); best T3 −0.018R (n 570, t -0.29).",
+ "headline": "Before costs 0 of 6 readings pass (pooled from 2024 on 27501 trades, −0.028R a trade, month t -2.98); after costs 0 of 6 readings pass: pooled over the six from 2024 on 27501 trades, −0.073R a trade after costs (month t -7.97); best T3 −0.018R (n 570, t -0.29).",
  "system": "The Engulfing desk's zone readings (council/eg-methods.mjs methodTrades span any / next, efTrades) as the code stands on 23 Nov 2026; 18 markets; OANDA mid 5m; discovery 2020-2023, confirmation 2024 to the last candle; net of costs.",
  "markets": [
   "xau",
@@ -44,6 +44,15 @@
   "months": 35,
   "tMonth": -7.97
  },
+ "pooledConfirmationBeforeCosts": {
+  "n": 27501,
+  "mean": -0.0276,
+  "total": -758.26,
+  "win": 44.7,
+  "months": 35,
+  "tMonth": -2.98
+ },
+ "verdictBeforeCosts": "FAIL",
  "cutCheck": {
   "ok": true,
   "markets": {
@@ -414,7 +423,20 @@
     "confHolm": false,
     "twiceCostPos": false
    },
-   "verdict": "FAIL"
+   "verdict": "FAIL",
+   "beforeCosts": {
+    "holm": 1,
+    "checks": {
+     "discN100": true,
+     "discMeanPos": false,
+     "discT2": false,
+     "confN50": true,
+     "confMeanPos": false,
+     "confT2": false,
+     "confHolm": false
+    },
+    "verdict": "FAIL"
+   }
   },
   "T2": {
    "kind": "eg-simple",
@@ -662,7 +684,20 @@
     "confHolm": false,
     "twiceCostPos": false
    },
-   "verdict": "FAIL"
+   "verdict": "FAIL",
+   "beforeCosts": {
+    "holm": 1,
+    "checks": {
+     "discN100": true,
+     "discMeanPos": false,
+     "discT2": false,
+     "confN50": true,
+     "confMeanPos": false,
+     "confT2": false,
+     "confHolm": false
+    },
+    "verdict": "FAIL"
+   }
   },
   "T3": {
    "kind": "eg-direct",
@@ -910,7 +945,20 @@
     "confHolm": false,
     "twiceCostPos": false
    },
-   "verdict": "FAIL"
+   "verdict": "FAIL",
+   "beforeCosts": {
+    "holm": 1,
+    "checks": {
+     "discN100": true,
+     "discMeanPos": true,
+     "discT2": false,
+     "confN50": true,
+     "confMeanPos": true,
+     "confT2": false,
+     "confHolm": false
+    },
+    "verdict": "FAIL"
+   }
   },
   "T4": {
    "kind": "eg-plan-n",
@@ -1158,7 +1206,20 @@
     "confHolm": false,
     "twiceCostPos": false
    },
-   "verdict": "FAIL"
+   "verdict": "FAIL",
+   "beforeCosts": {
+    "holm": 1,
+    "checks": {
+     "discN100": true,
+     "discMeanPos": false,
+     "discT2": false,
+     "confN50": true,
+     "confMeanPos": true,
+     "confT2": false,
+     "confHolm": false
+    },
+    "verdict": "FAIL"
+   }
   },
   "T5": {
    "kind": "eg-simple-n",
@@ -1406,7 +1467,20 @@
     "confHolm": false,
     "twiceCostPos": false
    },
-   "verdict": "FAIL"
+   "verdict": "FAIL",
+   "beforeCosts": {
+    "holm": 1,
+    "checks": {
+     "discN100": true,
+     "discMeanPos": false,
+     "discT2": false,
+     "confN50": true,
+     "confMeanPos": false,
+     "confT2": false,
+     "confHolm": false
+    },
+    "verdict": "FAIL"
+   }
   },
   "T6": {
    "kind": "eg-ef",
@@ -1654,7 +1728,20 @@
     "confHolm": false,
     "twiceCostPos": false
    },
-   "verdict": "FAIL"
+   "verdict": "FAIL",
+   "beforeCosts": {
+    "holm": 1,
+    "checks": {
+     "discN100": true,
+     "discMeanPos": true,
+     "discT2": false,
+     "confN50": true,
+     "confMeanPos": false,
+     "confT2": false,
+     "confHolm": false
+    },
+    "verdict": "FAIL"
+   }
   }
  }
 }

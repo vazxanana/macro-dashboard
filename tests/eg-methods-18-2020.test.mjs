@@ -46,3 +46,9 @@ test('eg-methods-18-2020: the in-memory decimals give 30 of each market\'s own p
   assert.ok(Math.abs(stopSize('xau') - 3.0) < 1e-9);
   assert.ok(Math.abs(stopSize('de40') - 30) < 1e-9);
 });
+
+test('eg-methods-18-2020: the before-cost judgement (asked after the run) leads and matches result.json', () => {
+  assert.ok(md.indexOf('## Before costs') < md.indexOf('## After costs'));
+  assert.equal(R.verdictBeforeCosts, Object.values(R.tests).some((t) => t.beforeCosts.verdict === 'PASS') ? 'PASS' : 'FAIL');
+  for (const t of Object.values(R.tests)) assert.equal(t.beforeCosts.verdict === 'PASS', Object.values(t.beforeCosts.checks).every(Boolean));
+});

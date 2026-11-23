@@ -98,22 +98,34 @@ function report(dir) {
     const checks = { discN100: d.net.n >= 100, discMeanPos: (d.net.mean || 0) > 0, discT2: (d.net.tMonth || 0) >= 2, confN50: c.net.n >= 50, confMeanPos: (c.net.mean || 0) > 0,
       confT2: (c.net.tMonth || 0) >= 2, confHolm: t.holm < 0.05, twiceCostPos: (d.net2.mean || 0) > 0 && (c.net2.mean || 0) > 0 };
     const few = !checks.discN100 || !checks.confN50; t.checks = checks; t.verdict = !cutOk ? 'INVALID' : few ? 'FAIL (too few to judge)' : Object.values(checks).every(Boolean) ? 'PASS' : 'FAIL'; }
+  // BEFORE COSTS (owner, through the main session, 23 Nov 2026, after the run: "forget the costs, I only want to know before costs"):
+  // the same bar on R before costs (n, mean > 0, month t >= 2 in both windows, Holm over the six), no twice-cost check. Not pre-registered.
+  const HG = K.holm(ids.map((id) => pOne(tests[id].confirmation.gross.tMonth, tests[id].confirmation.gross.months - 1)));
+  ids.forEach((id, i) => { const t = tests[id], d = t.discovery.gross, c = t.confirmation.gross;
+    const ck = { discN100: d.n >= 100, discMeanPos: (d.mean || 0) > 0, discT2: (d.tMonth || 0) >= 2, confN50: c.n >= 50, confMeanPos: (c.mean || 0) > 0, confT2: (c.tMonth || 0) >= 2, confHolm: HG[i] < 0.05 };
+    t.beforeCosts = { holm: +HG[i].toFixed(5), checks: ck, verdict: !cutOk ? 'INVALID' : !ck.discN100 || !ck.confN50 ? 'FAIL (too few to judge)' : Object.values(ck).every(Boolean) ? 'PASS' : 'FAIL' }; });
+  const passedG = ids.filter((id) => tests[id].beforeCosts.verdict === 'PASS');
   const passed = ids.filter((id) => tests[id].verdict === 'PASS');
   const all = rows.filter((r) => r.t >= SPLIT), allS = stat(all);
   const verdict = !cutOk ? 'INVALID' : passed.length ? 'PASS' : 'FAIL';
   const best = ids.map((id) => tests[id]).sort((a, b) => (b.confirmation.net.tMonth ?? -99) - (a.confirmation.net.tMonth ?? -99))[0];
   const f = (v, d = 3) => (v == null ? 'n/a' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d));
-  const headline = passed.length ? `${passed.length} of 6 readings pass (${passed.join(', ')}).`
-    : `0 of 6 readings pass: pooled over the six from 2024 on ${allS.n} trades, ${f(allS.mean)}R a trade after costs (month t ${allS.tMonth}); best ${Object.keys(tests).find((k) => tests[k] === best)} ${f(best.confirmation.net.mean)}R (n ${best.confirmation.net.n}, t ${best.confirmation.net.tMonth}).`;
+  const allG = stat(rows.filter((r) => r.t >= SPLIT), 'gross');
+  const lead = `Before costs ${passedG.length} of 6 readings pass (pooled from 2024 on ${allG.n} trades, ${f(allG.mean)}R a trade, month t ${allG.tMonth}); after costs `;
+  const headline = lead + (passed.length ? `${passed.length} of 6 readings pass (${passed.join(', ')}).`
+    : `0 of 6 readings pass: pooled over the six from 2024 on ${allS.n} trades, ${f(allS.mean)}R a trade after costs (month t ${allS.tMonth}); best ${Object.keys(tests).find((k) => tests[k] === best)} ${f(best.confirmation.net.mean)}R (n ${best.confirmation.net.n}, t ${best.confirmation.net.tMonth}).`);
   const out = { study: 'eg-methods-18-2020', built: new Date().toISOString().slice(0, 10), verdict, headline,
     system: 'The Engulfing desk\'s zone readings (council/eg-methods.mjs methodTrades span any / next, efTrades) as the code stands on 23 Nov 2026; 18 markets; OANDA mid 5m; discovery 2020-2023, confirmation 2024 to the last candle; net of costs.',
     markets: MARKETS, lastCandle: new Date(last * 1000).toISOString().slice(0, 16), windows: { discovery: ['2020-01-01', '2023-12-31'], confirmation: ['2024-01-01', new Date(last * 1000).toISOString().slice(0, 10)] },
-    trades: rows.length, pooledConfirmation: allS, cutCheck: { ok: cutOk, markets: cuts }, meta, tests };
+    trades: rows.length, pooledConfirmation: allS, pooledConfirmationBeforeCosts: allG, verdictBeforeCosts: !cutOk ? 'INVALID' : passedG.length ? 'PASS' : 'FAIL', cutCheck: { ok: cutOk, markets: cuts }, meta, tests };
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1) + '\n');
   const L = ['# The Engulfing desk\'s zone readings on 18 markets, 2020 to now', '', `**Verdict: ${verdict}. ${headline}**`, '',
     `Built ${out.built}. Pre-registered (PREREGISTRATION.md, committed alone before any trade was computed). Paper research only: nothing live changed.`,
     `The desk's own code (\`council/eg-methods.mjs\`, imported, not edited) on 18 markets, OANDA mid 5-minute candles to ${out.lastCandle} UTC; discovery 2020-2023, confirmation 2024 on; R a trade after the round-trip costs of \`combo-grid-2\`; t on calendar-month sums. ${rows.length} closed trades.`, '',
-    '## The six readings', '', '| | Reading | Disc. n | Disc. net R | Disc. t | Conf. n | Conf. before costs | Conf. net R | Conf. t | Holm p | Conf. at 2x cost | Verdict |', '|---|---|---|---|---|---|---|---|---|---|---|---|'];
+    '## Before costs (asked by the owner after the run; not pre-registered)', '', 'The same bar on R before costs: n, mean > 0 and month-sum t ≥ 2 in both windows, Holm over the six; no twice-cost check.', '',
+    '| | Reading | Disc. n | Disc. R | Disc. t | Conf. n | Conf. R | Conf. t | Holm p | Verdict before costs |', '|---|---|---|---|---|---|---|---|---|---|',
+    ...ids.map((id) => { const t = tests[id], d = t.discovery.gross, c = t.confirmation.gross; return `| ${id} | ${t.what} | ${d.n} | ${f(d.mean)} | ${d.tMonth ?? 'n/a'} | ${c.n} | ${f(c.mean)} | ${c.tMonth ?? 'n/a'} | ${t.beforeCosts.holm} | ${t.beforeCosts.verdict} |`; }), '',
+    '## After costs (the pre-registered verdict)', '', '| | Reading | Disc. n | Disc. net R | Disc. t | Conf. n | Conf. before costs | Conf. net R | Conf. t | Holm p | Conf. at 2x cost | Verdict |', '|---|---|---|---|---|---|---|---|---|---|---|---|'];
   for (const id of ids) { const t = tests[id], d = t.discovery, c = t.confirmation;
     L.push(`| ${id} | ${t.what} | ${d.net.n} | ${f(d.net.mean)} | ${d.net.tMonth ?? 'n/a'} | ${c.net.n} | ${f(c.gross.mean)} | ${f(c.net.mean)} | ${c.net.tMonth ?? 'n/a'} | ${t.holm} | ${f(c.net2.mean)} | ${t.verdict} |`); }
   L.push('', `Look-ahead check (three cuts on ${Object.keys(cuts).join(', ') || 'none'}): ${cutOk ? 'every trade closed before a cut is the same in the cut run and the full run' : 'DIFFERENCES FOUND'}.`, '',
