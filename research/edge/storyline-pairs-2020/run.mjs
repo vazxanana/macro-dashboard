@@ -87,7 +87,7 @@ export function storylines(F, pair) {
   const out = [];
   for (const lv of HL) {
     if (!lv.closedTouch) continue;
-    const r = H[lv.tH]; const s = -lv.side; // a rejected A gives a sell
+    const r = H[lv.tH]; const s = lv.side; // a rejected A (side -1) gives a sell (-1)
     const rejected = lv.side < 0 ? r.c < lv.price : r.c > lv.price;
     if (!rejected) continue;
     const touchT = lv.tT;
@@ -112,8 +112,8 @@ export function storylines(F, pair) {
     let air = null; const bc = L[bk].c;
     for (const o of HL) {
       if (o.side !== (s < 0 ? 1 : -1) || o.known > start || !(o.tT >= start)) continue;
-      if (!(s * (o.price - bc) < 0)) continue;
-      if (air == null || s * (o.price - air.price) > 0) air = o;
+      if (!(s * (o.price - bc) > 0)) continue;                 // ahead of the break close
+      if (air == null || s * (o.price - air.price) < 0) air = o; // the nearest ahead
     }
     if (air && air.tT < end) end = air.tT;
     // the break leg
@@ -123,12 +123,12 @@ export function storylines(F, pair) {
     // QM: left shoulder = the most recent L level of the near kind before the head candle, known by the break close
     for (let x = lb(LL, headI, (q) => q.i) - 1; x >= 0; x--) {
       const q = LL[x]; if (q.i >= headI || q.side !== (s < 0 ? -1 : 1) || q.known > L[bk].e) continue;
-      if (s * (q.price - head) < 0 && s * (q.price - ext.price) > 0) { setups.qm = q.price; break; }
+      if (s * (q.price - head) > 0 && s * (q.price - ext.price) < 0) { setups.qm = q.price; break; } // between the external level and the head
     }
     setups.rbs = ext.price;
     for (let x = bk; x >= tk + 1; x--) {
       const a = L[x - 1], b = L[x];
-      if (s < 0 ? a.c < a.o && b.c < b.o : a.c > a.o && b.c > b.o) { if (s * (a.c - bc) > 0) setups.gap = a.c; break; }
+      if (s < 0 ? a.c < a.o && b.c < b.o : a.c > a.o && b.c > b.o) { if (s * (a.c - bc) < 0) setups.gap = a.c; break; } // behind the break close (above it for a sell)
     }
     out.push({ pair, side: s, level: lv.price, rejT: r.e, touchT, ext: ext.price, breakT: L[bk].e, start, end, head, setups, air: air ? air.price : null });
   }
