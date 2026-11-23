@@ -60,7 +60,7 @@ test('the USD/JPY follow-up: gate and verdict as reported', async () => {
   const md = fs.readFileSync(new URL('../research/edge/usdjpy-dom-ef/RESULT.md', import.meta.url), 'utf8');
   assert.match(md, /4,500 \| -0\.076 \| -3\.58/);
   const g = JSON.parse(fs.readFileSync(new URL('../research/edge/combo-grid/result.json', import.meta.url)));
-  assert.equal(g.confirmed, 0); assert.equal(g.tested, 463064);
+  assert.equal(g.confirmed, 0); assert.equal(g.tested, 466242); assert.equal(g.gross.confirmed, 0); assert.equal(g.beforeFix.tested, 463064);
 });
 
 test('the limit fill comes first: a candle reaching the limit and closing past the stop is a fill and a stop', () => {
