@@ -205,12 +205,14 @@ export function report(dir) {
   const cut = MARKETS.flatMap((m) => { const f = path.join(dir, 'cut-' + m + '.json'); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : []; });
   const rows = judge(data), pass = rows.filter((r) => r.pass), flPass = rows.filter((r) => r.flip.pass);
   const verdict = pass.length ? 'PASS' : 'FAIL';
-  const bestC = [...rows].sort((a, b) => b.c.t - a.c.t)[0], bestBoth = [...rows].sort((a, b) => Math.min(b.d.t, b.c.t) - Math.min(a.d.t, a.c.t))[0];
+  // "best" is ranked among the cells that meet the n bar (a cell of one trade has a meaningless t)
+  const big = rows.filter((r) => r.checks.n).length ? rows.filter((r) => r.checks.n) : rows;
+  const bestC = [...big].sort((a, b) => b.c.t - a.c.t)[0], bestBoth = [...big].sort((a, b) => Math.min(b.d.t, b.c.t) - Math.min(a.d.t, a.c.t))[0];
   const perMarket = {}; for (const r of pass) perMarket[r.name] = data.map((d) => { const s = cellStats(pool([d], 'real'), r.cell); return { market: d.market, d: slim(s.d), c: slim(s.c) }; });
   const allCells = rows.filter((r) => r.ctx === 'all');
   const headline = verdict === 'PASS'
     ? `${pass.length} of 54 cells pass the pre-registered bar; best ${pass[0].name}, ${f3(pass[0].c.mean)}R a trade before costs in 2015-26 (n ${N(pass[0].c.n)}, month t ${f2(pass[0].c.t)}; after costs ${f3(pass[0].c.meanNet)}R)`
-    : `0 of 54 cells pass; the best confirmation cell, ${bestC.name}, made ${f3(bestC.c.mean)}R a trade before costs in 2015-26 (n ${N(bestC.c.n)}, month t ${f2(bestC.c.t)}; discovery ${f3(bestC.d.mean)}R, t ${f2(bestC.d.t)})`;
+    : `0 of 54 cells pass; the best confirmation cell with n >= 300, ${bestC.name}, made ${f3(bestC.c.mean)}R a trade before costs in 2015-26 (n ${N(bestC.c.n)}, month t ${f2(bestC.c.t)}; discovery ${f3(bestC.d.mean)}R, t ${f2(bestC.d.t)})`;
   const RW = rows.map((r) => ({ cell: r.name, chain: r.chain, ctx: r.ctx, exit: r.exit, disc: slim(r.d), conf: slim(r.c), holm: +r.holm.toFixed(4),
     control: { disc: slim(r.ctl.d), conf: slim(r.ctl.c) }, vsControl: { d: r.vs.d == null ? null : +r.vs.d.toFixed(2), c: r.vs.c == null ? null : +r.vs.c.toFixed(2) },
     checks: r.checks, pass: r.pass, flipped: { disc: slim(r.flip.d), conf: slim(r.flip.c), holm: +r.flip.holm.toFixed(4), pass: r.flip.pass } }));
@@ -253,7 +255,7 @@ function resultMd(o, rows, bestBoth, allCells) {
     `- Beats its control (Welch t >= 2 in both windows): ${cnt((r) => r.checks.control)} of 54.`,
     `- **All four: ${o.passed.length}${o.passed.length ? ' (' + o.passed.join('; ') + ')' : ''}.**`,
     `- Side-flipped check passing bars 1-3: ${o.flippedPassed.length}${o.flippedPassed.length ? ' (' + o.flippedPassed.join('; ') + ')' : ''}.`, '',
-    `Best confirmation cell: ${o.bestConfirmation}. Best on the weaker of the two windows: ${o.bestBothWindows} (discovery`,
+    `Among the cells with n >= 300 in both windows: best confirmation cell ${o.bestConfirmation}. Best on the weaker of the two windows: ${o.bestBothWindows} (discovery`,
     `${f3(bestBoth.d.mean)}R, t ${f2(bestBoth.d.t)}; confirmation ${f3(bestBoth.c.mean)}R, t ${f2(bestBoth.c.t)}).`, '',
     '## The plain cells ("all" context) beside their controls', '',
     '| Cell | R 05-14 (t) | control 05-14 | R 15-26 (t) | control 15-26 | after costs 15-26 | vs control |', '|---|---:|---:|---:|---:|---:|---:|');
@@ -280,9 +282,17 @@ function resultMd(o, rows, bestBoth, allCells) {
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push('A passing cell is a candidate for its own forward record and an owner decision, nothing more: it is not adopted, and never',
     'called an edge before a forward record. Its after-cost figure is beside it; on five markets the costs are assumed.');
-  else L.push('Read simply and in advance, the move / pullback / break-back cycle does not pick better trades than taking the first',
-    'break of either side after the same pullbacks, on ten markets over 22 years, at any depth or with a zone. Do not re-test',
-    'variants of these 54 cells on these years. Nothing live changed; no rule is proposed.');
+  else { const a = allCells.find((r) => r.name === 'D1 all 1R'), h = allCells.find((r) => r.name === 'H4 all 1R');
+    L.push('Read this simple way, the move / pullback / break-back cycle does not pick better trades than taking the first break of',
+      'either side after the same pullbacks, on ten markets over 22 years, at any depth or with a zone. No cell is positive with',
+      `month t >= 2 in either window. The plain Daily chain at 1R made ${f3(a.d.mean)}R a trade in 2005-14 and ${f3(a.c.mean)}R in 2015-26`,
+      `(t ${f2(a.c.t)}, n ${N(a.c.n)}; its control ${f3(a.ctl.c.mean)}R), the plain H4 chain ${f3(h.d.mean)}R and ${f3(h.c.mean)}R; after costs every plain`,
+      'cell loses. Do not re-test variants of these 54 cells on these years. Nothing live changed; no rule is proposed.'); }
+  const thin = rows.filter((r) => /-zone/.test(r.ctx));
+  L.push('', `**The "-zone" cells are near empty** (${thin.map((r) => r.d.n + r.c.n).reduce((a, b) => Math.max(a, b), 0)} trades at most over both windows): an engulf or`,
+    'dominant zone of the move\'s side, on the pullback timeframe, was touched between the move\'s extreme and the trigger in almost every',
+    'pullback, since the move itself leaves such zones behind it. So the "with a zone" condition selects nearly everything and says',
+    'nothing; this follows from the design fixed in advance and is reported as found.');
   if (o.flippedPassed.length) L.push('', `The side-flipped check clears bars 1-3 in ${o.flippedPassed.length} cells: with these exits the flipped trade mirrors the real one, so this`,
     'says only that the real trades lose before costs (entering with a fresh lower-timeframe break gives some of it back, as',
     '`grid7-wide-fade` found). It is not a rule: a placebo is not a candidate, and its after-cost figures are in the table.');

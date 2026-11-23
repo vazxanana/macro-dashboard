@@ -8,7 +8,7 @@ import { exits, cellIndex, cellName, NCELL, CTX, contextsOf, depthBucket, chainS
 const DIR = new URL('../research/edge/grid7-wide-trend-pullback/', import.meta.url);
 const R = JSON.parse(fs.readFileSync(new URL('result.json', DIR), 'utf8'));
 const md = fs.readFileSync(new URL('RESULT.md', DIR), 'utf8');
-const f3 = (x) => (x >= 0 ? '+' : '-') + Math.abs(x).toFixed(3);
+const f3 = (x) => (x == null ? 'n/a' : (x >= 0 ? '+' : '-') + Math.abs(x).toFixed(3));
 
 test('pre-registration names the cells, the windows, the bar, the control and the assumed costs', () => {
   const p = fs.readFileSync(new URL('PREREGISTRATION.md', DIR), 'utf8');
