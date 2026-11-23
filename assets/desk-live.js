@@ -10,7 +10,7 @@
   var TFS = [['1m', 'M1', 60], ['5m', 'M5', 300], ['15m', 'M15', 900], ['30m', 'M30', 1800], ['1h', 'H1', 3600], ['4h', 'H4', 14400], ['1d', 'D1', 86400]];
   var POLL = { '1m': 3, '5m': 5, '15m': 10, '30m': 15, '1h': 20, '4h': 60, '1d': 120 };   // seconds between candle reads, by timeframe
   var SHUT_POLL = 60, REC_EVERY = 90, N_BARS = 500, N_CLOSED = 10, VIEW_BARS = 160, LIST_N = 4;
-  var DESKS = { mosha: { file: 'mosha/desk.json', name: 'Mosha' }, lit: { file: 'lit/desk.json', name: 'LIT' }, eg: { file: 'eg/desk.json', name: 'Engulfing' }, msnr: { file: 'msnr/desk.json', name: 'MSNR' } };
+  var DESKS = { mosha: { file: 'mosha/desk.json', name: 'Mosha', h4: true }, lit: { file: 'lit/desk.json', name: 'LIT' }, eg: { file: 'eg/desk.json', name: 'Engulfing', h4: true }, msnr: { file: 'msnr/desk.json', name: 'MSNR' } };   // h4: the card offers the H4 engulf map
   // one colour a kind of mark, as the trade chart (assets/mosha-replay.js HUES / hueKey): [light theme, dark theme]
   var HUES = { ef: ['#c62828', '#ff6b6b'], entry: ['#1565c0', '#5aa7ff'], cf: ['#2e7d32', '#5ed08a'], vr: ['#d84315', '#ff9f5a'], bo: ['#6d4c41', '#d7b899'], half: ['#546074', '#a0aabe'],
     d1: ['#6a1b9a', '#c792ea'], h4: ['#b26a00', '#ffc857'], h1: ['#00796b', '#4dd0c4'], m30: ['#ad1457', '#ff7eb6'], m15: ['#ad1457', '#ff7eb6'], m5: ['#00838f', '#5fd3e6'], m1: ['#00838f', '#5fd3e6'], other: ['#5f6b7a', '#9aa3b2'] };
@@ -40,7 +40,44 @@
   // a refreshed read of the newest candles joins the ones held (same time = replaced, newer = added)
   function mergeBars(held, fresh) { if (!held || !held.length) return (fresh || []).slice(); var out = held.slice();
     (fresh || []).forEach(function (b) { var last = out[out.length - 1]; if (b.time === last.time) out[out.length - 1] = b; else if (b.time > last.time) out.push(b); }); return out; }
-  var API = { TFS: TFS, POLL: POLL, DESKS: DESKS, HUES: HUES, hueKey: hueKey, logicalOf: logicalOf, barAt: barAt, pick: pick, marketsOf: marketsOf, mergeBars: mergeBars };
+  // THE H4 ENGULF MAP (23 Nov 2026, from the owner's gold trade of 22-23 Nov: an H4 sell engulf zone failed and turned into a buy
+  // barrier, and the next H4 sell engulf zone above was the target). `egZones` is a copy of council/eg-methods.mjs `zones` and
+  // `turnBack` (the page cannot load that file; a test compares them): the base is the last candle of the other colour, a candle at
+  // most EG_SPAN candles after it closes beyond its high (a buy) or low (a sell); the zone is the base candle wick to wick, known
+  // at the completing close; `fail` = the close of the first later candle that closes through it, `end` = the fail or the end of
+  // its life (EG_LIFE candles), `back` = once failed, the close of the first candle that closes back through it (within 20 days).
+  var EG_SPAN = 3, EG_LIFE = 120, EF_DAYS = 20 * 86400, H4S = 14400, H4_N = 300, H4_EVERY = 60, H4_SIDE = 3;
+  function egZones(C, sec, life) {
+    var out = [], i, j, q, L = life || EG_LIFE;
+    for (i = 1; i < C.length; i++) { var c = C[i], dir = c.close > c.open ? 1 : c.close < c.open ? -1 : 0, p = null; if (!dir) continue;
+      for (j = i - 1; j >= 0 && j >= i - EG_SPAN; j--) { var b0 = C[j]; if (dir > 0 ? b0.open > b0.close : b0.open < b0.close) { p = b0; break; } }
+      if (!p || !(dir > 0 ? c.close > p.high : c.close < p.low)) continue;
+      var gone = false; for (q = j + 1; q < i && !gone; q++) { var m = C[q]; gone = dir > 0 ? (m.close > m.open && m.close > p.high) || m.close < p.low : (m.close < m.open && m.close < p.low) || m.close > p.high; }
+      if (gone) continue;
+      var z = { tf: null, dir: dir, top: p.high, bot: p.low, base: p.time, at: c.time + sec, touch: null, fail: null, i: i, n: i - j };
+      for (q = i + 1; q < C.length && q <= i + L; q++) { var b = C[q];
+        if (z.touch == null && (dir > 0 ? b.low <= z.top : b.high >= z.bot)) z.touch = b.time;
+        if (dir > 0 ? b.close < z.bot : b.close > z.top) { z.fail = b.time + sec; z.fi = q; break; } }
+      z.end = z.fail != null ? z.fail : i + L < C.length ? C[i + L].time + sec : Infinity;
+      if (z.fail != null) for (q = z.fi + 1; q < C.length && C[q].time < z.fail + EF_DAYS; q++) if (z.dir > 0 ? C[q].close > z.top : C[q].close < z.bot) { z.back = C[q].time + sec; break; }
+      out.push(z); }
+    return out;
+  }
+  // what the map draws at `now`, from the H4 candles CLOSED by then only: the engulf zones still standing (not closed through, in
+  // their life) and the failed ones (EF) still standing as a barrier the other way (20 days after the fail, until a close back
+  // through), the H4_SIDE nearest above and below the last close and every one it sits in. Right-extended boxes, display only.
+  function h4Map(H, now) {
+    var C = (H || []).filter(function (b) { return b.time + H4S <= now; }); if (C.length < 3) return [];
+    var px = C[C.length - 1].close, w = function (d) { return d > 0 ? 'buy' : 'sell'; }, all = [];
+    egZones(C, H4S, EG_LIFE).forEach(function (z) {
+      if (z.fail == null) { if (z.end > now) all.push({ kind: 'eg', side: z.dir, top: z.top, bot: z.bot, a: z.base, at: z.at, label: 'H4 ' + w(z.dir) + ' EG zone' }); return; }
+      if (now - z.fail < EF_DAYS && z.back == null) all.push({ kind: 'ef', side: -z.dir, top: z.top, bot: z.bot, a: z.base, at: z.fail, label: 'H4 EF (failed ' + w(z.dir) + ' \u2192 ' + w(-z.dir) + ' barrier)' }); });
+    var dist = function (z) { return Math.abs((z.top + z.bot) / 2 - px); };
+    var up = all.filter(function (z) { return z.bot > px; }).sort(function (a, b) { return dist(a) - dist(b); }).slice(0, H4_SIDE);
+    var dn = all.filter(function (z) { return z.top < px; }).sort(function (a, b) { return dist(a) - dist(b); }).slice(0, H4_SIDE);
+    return up.concat(all.filter(function (z) { return z.bot <= px && z.top >= px; }), dn);
+  }
+  var API = { TFS: TFS, POLL: POLL, DESKS: DESKS, HUES: HUES, hueKey: hueKey, logicalOf: logicalOf, barAt: barAt, pick: pick, marketsOf: marketsOf, mergeBars: mergeBars, egZones: egZones, h4Map: h4Map, EG_SPAN: EG_SPAN, EG_LIFE: EG_LIFE };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_DESK_LIVE = API;
   if (typeof document === 'undefined') return;
@@ -55,7 +92,7 @@
   var word = function (d) { return d > 0 ? 'buy' : 'sell'; };
   var H = document.documentElement;
   var ST = {};
-  function st(k) { return ST[k] || (ST[k] = { k: k, mk: null, tf: '15m', bars: [], times: [], recs: null, detail: null, recAt: 0, shown: [], focus: null, timer: 0, gen: 0, msg: 'Reading the candles…', at: 0, chart: null, series: null, cv: null, raf: 0, key: '' }); }
+  function st(k) { return ST[k] || (ST[k] = { k: k, mk: null, tf: '15m', bars: [], times: [], recs: null, detail: null, recAt: 0, shown: [], focus: null, timer: 0, gen: 0, msg: 'Reading the candles…', at: 0, chart: null, series: null, cv: null, raf: 0, key: '', h4on: true, h4: [], h4At: 0, h4map: [] }); }
   function allowed() { if (H.dataset.role === 'public') return false; return true; }
   function teachOnly() { return H.dataset.mosha === 'teach' && H.dataset.role !== 'owner'; }
   function tok(n, f) { var v = getComputedStyle(H).getPropertyValue(n).trim(); return v || f; }
@@ -97,9 +134,11 @@
     c = document.createElement('div'); c.className = 'dl-card mo-wide'; c.setAttribute('data-dl', k); c.setAttribute('role', 'region'); c.setAttribute('aria-label', 'Live chart');
     c.innerHTML = '<div class="dl-h"><b>Live chart</b><small>' + esc(DESKS[k].name) + ' trades on live candles · the latest open and closed trades of this market with their marks · paper record, not a tested rule</small></div>' +
       '<div class="dl-bar"><select class="dl-b" data-dl-mk aria-label="Market"></select><div class="dl-seg" role="group" aria-label="Timeframe">' +
-      TFS.map(function (t) { return '<button type="button" class="dl-b" data-dl-tf="' + t[0] + '" aria-pressed="false">' + t[1] + '</button>'; }).join('') + '</div></div>' +
+      TFS.map(function (t) { return '<button type="button" class="dl-b" data-dl-tf="' + t[0] + '" aria-pressed="false">' + t[1] + '</button>'; }).join('') + '</div>' +
+      (DESKS[k].h4 ? '<button type="button" class="dl-b" data-dl-h4 aria-pressed="true" title="The H4 engulf zones still standing and the failed ones (EF) still standing as a barrier the other way">H4 zones</button>' : '') + '</div>' +
       '<div class="dl-wrap"><div class="dl-chart"></div><canvas class="dl-ov" aria-hidden="true"></canvas></div><p class="dl-st" aria-live="polite"></p><ul class="dl-list"></ul>' +
-      '<p class="dl-note">The chosen trade shows its marks, entry, stop and target as the tracker recorded them, from its fill to its end; the others show their entry line only. Tap a trade, or its marker on the chart, to choose it; "Chart" opens it Before / After.</p>';
+      '<p class="dl-note">The chosen trade shows its marks, entry, stop and target as the tracker recorded them, from its fill to its end; the others show their entry line only. Tap a trade, or its marker on the chart, to choose it; "Chart" opens it Before / After.' +
+      (DESKS[k].h4 ? ' "H4 zones" draws the H4 engulf zones still standing and the failed ones (EF) still standing as a barrier the other way, from closed H4 candles, the nearest three above and below the price: a map, not a signal.' : '') + '</p>';
     grid.insertBefore(c, grid.firstChild); return c;
   }
   function build(k) {
@@ -148,6 +187,7 @@
     var sel = c.querySelector('[data-dl-mk]'), html = mks.map(function (m) { return '<option value="' + esc(m) + '"' + (m === S.mk ? ' selected' : '') + '>' + esc(nameOf(m)) + '</option>'; }).join('');
     if (sel.innerHTML !== html) sel.innerHTML = html;
     c.querySelectorAll('[data-dl-tf]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-dl-tf') === S.tf)); });
+    var hb = c.querySelector('[data-dl-h4]'); if (hb) hb.setAttribute('aria-pressed', String(!!S.h4on));
   }
   function status(k) { var S = st(k), c = host(k); if (!c) return; var p = c.querySelector('.dl-st'), live = S.at && Date.now() - S.at < 3 * 60e3;
     p.innerHTML = '<span class="dl-dot' + (live && !S.err ? '' : ' off') + '"></span>' + esc(S.msg); }
@@ -165,6 +205,17 @@
       S.at = Date.now(); var last = S.bars[S.bars.length - 1];
       S.msg = 'Live · ' + nameOf(mk) + ' ' + labelOf(tf) + ' · last price ' + fmtOf(mk)(last.close) + ' · read ' + new Date().toISOString().slice(11, 19) + ' UTC';
     }, function () { if (gen !== S.gen) return; S.err = true; S.msg = 'The candles could not be read: no connection to the market data service.'; });
+  }
+  // the H4 candles of the engulf map: the chart's own on H4, else a read of their own at most every H4_EVERY seconds; zones from closed candles only
+  function h4bars(k) {
+    var S = st(k), mk = S.mk, gen = S.gen; if (!DESKS[k].h4 || !S.h4on) return Promise.resolve();
+    var done = function () { S.h4map = h4Map(S.h4, Date.now() / 1000); };
+    if (S.tf === '4h') { S.h4 = S.bars; done(); return Promise.resolve(); }
+    if (S.h4.length && Date.now() - S.h4At < H4_EVERY * 1000) { done(); return Promise.resolve(); }
+    S.h4At = Date.now();
+    return fetch('/md/bars?sym=' + encodeURIComponent(mk) + '&tf=4h&n=' + H4_N, { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+      if (gen !== S.gen) return; var b = j && Array.isArray(j.bars) ? j.bars.filter(function (x) { return isFinite(x.time) && isFinite(x.open) && isFinite(x.high) && isFinite(x.low) && isFinite(x.close); }).map(function (x) { return { time: x.time, open: x.open, high: x.high, low: x.low, close: x.close }; }) : null;
+      if (b && b.length) S.h4 = b; done(); }, function () { if (gen === S.gen) done(); });
   }
   function labelOf(tf) { for (var i = 0; i < TFS.length; i++) if (TFS[i][0] === tf) return TFS[i][1]; return tf; }
   function trades(k) {
@@ -200,10 +251,15 @@
     var W = wrap.clientWidth, Hh = wrap.clientHeight, pw = ts.width(), ph = Hh - ts.height(), dpr = root.devicePixelRatio || 1;
     if (S.cv.width !== Math.round(W * dpr) || S.cv.height !== Math.round(Hh * dpr)) { S.cv.width = Math.round(W * dpr); S.cv.height = Math.round(Hh * dpr); S.cv.style.width = W + 'px'; S.cv.style.height = Hh + 'px'; }
     var x = S.cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, Hh);
-    if (!S.shown.length) return; x.save(); x.beginPath(); x.rect(0, 0, pw, ph); x.clip();
+    var map = DESKS[k].h4 && S.h4on ? S.h4map : []; if (!S.shown.length && !map.length) return; x.save(); x.beginPath(); x.rect(0, 0, pw, ph); x.clip();
     var C = colours(), sec = tfSec(S.tf), right = S.times[S.times.length - 1] + sec * 4, f = fmtOf(S.mk), labels = [];
     var X = function (t) { var l = logicalOf(S.times, sec, t), v = l == null ? null : l2x(ts, l); return v == null ? null : Math.max(-2, Math.min(pw + 2, v)); };
     var Y = function (p) { var v = S.series.priceToCoordinate(p); return v == null ? null : v; };
+    // the H4 engulf map under the trades: boxes from the zone's base candle to the right edge, named at the right
+    map.forEach(function (z) { var x0 = X(Math.max(z.a, S.times[0] - sec)), yt = Y(z.top), yb = Y(z.bot); if (x0 == null || yt == null || yb == null || x0 > pw) return;
+      var top = Math.min(yt, yb), h = Math.max(1, Math.abs(yb - yt)); if (top > ph || top + h < 0) return; var col = hue(z, C);
+      x.fillStyle = rgba(col, z.kind === 'ef' ? 0.12 : 0.08); x.fillRect(x0, top, pw - x0, h); x.strokeStyle = rgba(col, 0.7); x.lineWidth = 1; x.setLineDash([4, 3]); x.strokeRect(x0 + 0.5, top + 0.5, Math.max(0, pw - x0 - 1), Math.max(0, h - 1)); x.setLineDash([]);
+      labels.push({ x: pw, y: Math.max(12, top + 12), t: z.label + ' ' + f(z.bot) + '\u2013' + f(z.top), col: col, map: true }); });
     var order = S.shown.slice().sort(function (a, b) { return (a.id === S.focus) - (b.id === S.focus); });
     order.forEach(function (r) {
       var main = S.focus === r.id, end = r.R != null && r.endT ? r.endT : right;
@@ -228,7 +284,7 @@
     // entry / stop / target first (beside their line's end, else just before it), then the marks' names; a label that would
     // cover another moves up or down a line at a time
     var used = [], OFF = [0, -15, 15, -30, 30, -45, 45];
-    labels.sort(function (a, b) { return (b.first ? 1 : 0) - (a.first ? 1 : 0); }).forEach(function (L) { var w = x.measureText(L.t).width + 8, lx = L.after ? (L.x + w <= pw - 2 ? L.x : L.x - 12 - w) : Math.min(L.x, pw - w - 2), y0 = Math.max(14, Math.min(ph - 4, L.y)), ly = y0;
+    var rank = function (L) { return L.first ? 2 : L.map ? 0 : 1; }; labels.sort(function (a, b) { return rank(b) - rank(a); }).forEach(function (L) { var w = x.measureText(L.t).width + 8, lx = L.after ? (L.x + w <= pw - 2 ? L.x : L.x - 12 - w) : Math.min(L.x, pw - w - 2), y0 = Math.max(14, Math.min(ph - 4, L.y)), ly = y0;
       var hit = function (y) { return used.some(function (u) { return Math.abs(u.y - y) < 15 && lx < u.x + u.w && lx + w > u.x; }); };
       for (var i = 0; i < OFF.length; i++) { ly = Math.max(14, Math.min(ph - 4, y0 + OFF[i])); if (!hit(ly)) break; }
       used.push({ x: lx, y: ly, w: w }); x.fillStyle = rgba(C.surface.charAt(0) === '#' ? C.surface : (C.light ? '#ffffff' : '#1a1c1f'), 0.85); x.fillRect(lx, ly - 12, w, 16); x.fillStyle = L.col; x.fillText(L.t, lx + 4, ly); });
@@ -242,16 +298,17 @@
     S.raf = requestAnimationFrame(step); }
   function cycle(k, full) {
     var S = st(k); clearTimeout(S.timer); S.timer = 0; if (!onScreen(k) || !build(k)) return;
-    records(k, false).then(function () { pickers(k); return candles(k, full); }).then(function () { return trades(k); }).then(function () { markers(k); list(k); status(k); if (S.fresh) { S.fresh = false; frame(k); } S.key = ''; paint(k); watch(k); }).then(function () {
+    records(k, false).then(function () { pickers(k); return candles(k, full); }).then(function () { return h4bars(k); }).then(function () { return trades(k); }).then(function () { markers(k); list(k); status(k); if (S.fresh) { S.fresh = false; frame(k); } S.key = ''; paint(k); watch(k); }).then(function () {
       if (!onScreen(k)) return; var last = S.bars.length ? S.bars[S.bars.length - 1].time : 0, shut = last && Date.now() / 1000 - last > tfSec(S.tf) + 900;
       S.timer = setTimeout(function () { cycle(k, false); }, (shut ? Math.max(SHUT_POLL, POLL[S.tf]) : POLL[S.tf]) * 1000); });
   }
-  function reset(k) { var S = st(k); S.gen++; S.bars = []; S.times = []; S.shown = []; S.focus = null; S.all = false; S.msg = 'Reading the candles…'; if (S.series) { S.series.setData([]); S.series.setMarkers([]); } status(k); list(k); cycle(k, true); }
+  function reset(k) { var S = st(k); S.gen++; S.bars = []; S.times = []; S.h4 = []; S.h4At = 0; S.h4map = []; S.shown = []; S.focus = null; S.all = false; S.msg = 'Reading the candles…'; if (S.series) { S.series.setData([]); S.series.setMarkers([]); } status(k); list(k); cycle(k, true); }
   function start(k) { if (!DESKS[k] || !allowed()) return; styles(); if (!host(k)) return; var S = st(k); status(k); if (!build(k)) { setTimeout(function () { start(k); }, 800); return; } if (S.timer) return; cycle(k, !S.bars.length); }
   document.addEventListener('change', function (e) { var s = e.target && e.target.closest && e.target.closest('[data-dl-mk]'); if (!s) return; var c = s.closest('.dl-card'), k = c && c.getAttribute('data-dl'); if (!k) return; st(k).mk = s.value; reset(k); });
   document.addEventListener('click', function (e) {
-    var b = e.target && e.target.closest ? e.target.closest('[data-dl-tf], [data-dl-open], [data-dl-all], [data-dl-focus]') : null; if (!b) return; var c = b.closest('.dl-card'), k = c && c.getAttribute('data-dl'); if (!k) return; var S = st(k);
+    var b = e.target && e.target.closest ? e.target.closest('[data-dl-tf], [data-dl-h4], [data-dl-open], [data-dl-all], [data-dl-focus]') : null; if (!b) return; var c = b.closest('.dl-card'), k = c && c.getAttribute('data-dl'); if (!k) return; var S = st(k);
     if (b.hasAttribute('data-dl-tf')) { if (S.tf !== b.getAttribute('data-dl-tf')) { S.tf = b.getAttribute('data-dl-tf'); pickers(k); reset(k); } return; }
+    if (b.hasAttribute('data-dl-h4')) { S.h4on = !S.h4on; pickers(k); S.key = ''; paint(k); if (S.h4on) h4bars(k).then(function () { S.key = ''; paint(k); }); return; }   // display only: the choice is not kept
     if (b.hasAttribute('data-dl-all')) { S.all = true; list(k); return; }
     if (b.hasAttribute('data-dl-open')) { e.stopPropagation(); var id = b.getAttribute('data-dl-open'), r = S.shown.filter(function (x) { return x.id === id; })[0]; if (r) openTrade(k, r); return; }
     S.focus = b.getAttribute('data-dl-focus'); markers(k); list(k); frame(k); S.series.applyOptions({}); S.key = ''; paint(k);
@@ -265,7 +322,7 @@
   // a read-only view for the browser audit: what each desk's chart holds and where the chosen trade's fill lands on screen
   API.state = function (k) { var S = ST[k]; if (!S) return null; var f = S.shown.filter(function (r) { return r.id === S.focus; })[0], ts = S.chart && S.chart.timeScale();
     var lx = f && S.times.length ? logicalOf(S.times, tfSec(S.tf), f.t) : null;
-    return { market: S.mk, tf: S.tf, bars: S.bars.length, first: S.times[0] || null, last: S.times[S.times.length - 1] || null, shown: S.shown.map(function (r) { return r.id; }), focus: S.focus, marks: f && f.marks ? f.marks.length : 0, fillLogical: lx, fillX: ts && lx != null ? l2x(ts, lx) : null, msg: S.msg }; };
+    return { market: S.mk, tf: S.tf, bars: S.bars.length, first: S.times[0] || null, last: S.times[S.times.length - 1] || null, shown: S.shown.map(function (r) { return r.id; }), focus: S.focus, marks: f && f.marks ? f.marks.length : 0, fillLogical: lx, fillX: ts && lx != null ? l2x(ts, lx) : null, msg: S.msg, h4on: !!(DESKS[k].h4 && S.h4on), h4: (S.h4map || []).map(function (z) { return { kind: z.kind, side: z.side, top: z.top, bot: z.bot, label: z.label }; }) }; };
   // run while a desk is on screen: each view's hidden attribute and the tab's visibility
   function look() { Object.keys(DESKS).forEach(function (k) { if (onScreen(k)) start(k); }); }
   if (root.MutationObserver) { var mo = new MutationObserver(function (rs) { var theme = rs.some(function (r) { return r.target === H; }); look(); if (theme) restyle(); });

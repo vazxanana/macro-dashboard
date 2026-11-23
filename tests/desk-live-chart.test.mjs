@@ -75,3 +75,38 @@ test('mark colours by kind, as the trade chart', () => {
   assert.equal(L.hueKey('Accumulation'), 'other');
   const rp = rd('assets/mosha-replay.js'); for (const k of ['ef', 'entry', 'cf', 'vr', 'd1', 'h4', 'h1', 'm15', 'm5']) assert.ok(rp.includes(k + ": ['" + L.HUES[k][0] + "', '" + L.HUES[k][1] + "']"), 'same hue as the replay: ' + k);
 });
+
+// ─── the H4 engulf map on the Engulfing and Mosha desks' live chart (23 Nov 2026, the owner's gold trade of 22-23 Nov) ───
+test('the H4 engulf map: the page copy of the engulf zones equals the desks\' own (zones and turnBack), on seeded candles', async () => {
+  const G = await import('../council/eg-methods.mjs'), SOP = require('../assets/mosha-sop.js');
+  assert.equal(L.EG_SPAN, G.EG_SPAN); assert.equal(L.EG_LIFE, G.EGM.life['4h']);
+  for (const seed of [7, 11]) { let s = seed >>> 0; const rnd = () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+    const m5 = []; let p = 4000, drift = 0; for (let i = 0; i < 40 * 288; i++) { const t = 1790553600 + i * 300, wd = new Date(t * 1000).getUTCDay(); if (wd === 0 || wd === 6) continue;
+      if (i % 72 === 0) drift = (rnd() - 0.5) * 0.8; const o = p, c = o + drift + (rnd() - 0.5) * 3.2, h = Math.max(o, c) + rnd() * 1.6, l = Math.min(o, c) - rnd() * 1.6; m5.push({ time: t, open: o, high: h, low: l, close: c }); p = c; }
+    for (const [tf, sec] of [['4h', 14400], ['1h', 3600], ['15m', 900]]) { const C = []; for (const b of m5) { const t = b.time - (b.time % sec), q = C[C.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else C.push({ ...b, time: t }); }
+      const life = G.EGM.life[tf], a = L.egZones(C, sec, life), b = G.turnBack(C, G.zones(C, tf), sec), pick = (z) => [z.dir, z.top, z.bot, z.base, z.at, z.touch, z.fail, z.end, z.n, z.back == null ? null : z.back];
+      assert.ok(a.length > 10, tf + ': ' + a.length); assert.deepEqual(a.map(pick), b.map(pick), 'seed ' + seed + ' ' + tf + ': the page copy equals council/eg-methods.mjs'); } }
+  assert.ok(SOP.SEC['4h'] === 14400);
+});
+
+test('the H4 engulf map on the owner\'s gold candles of 23 Nov 2026: the failed sell zone is a buy barrier, the next sell EG zone above stands; closed candles only', () => {
+  const F = JSON.parse(rd('tests/fixtures/xau-ef-barrier-2026-11-23.json')), rows = (a) => a.map(([time, open, high, low, close]) => ({ time, open, high, low, close }));
+  const m5 = rows(F['5m']), H = rows(F['4h']); for (const b of m5.filter((x) => x.time >= 1795392000)) { const t = b.time - (b.time % 14400), q = H[H.length - 1]; if (q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else H.push({ ...b, time: t }); }
+  const at = (now) => L.h4Map(H, now), has = (m, label, bot, top) => m.some((z) => z.label === label && Math.abs(z.bot - bot) < 1e-9 && Math.abs(z.top - top) < 1e-9);
+  const after = at(1795406400 + 3600);   // 23 Nov 05:00 UTC: the 00:00 H4 candle closed above the zone at 04:00
+  assert.ok(has(after, 'H4 EF (failed sell → buy barrier)', 3566.86, 3595.29), JSON.stringify(after));
+  assert.ok(has(after, 'H4 sell EG zone', 3719.835, 3744.545));
+  assert.ok(after.every((z) => (z.kind === 'ef' ? /^H4 EF \(failed (buy|sell) → (buy|sell) barrier\)$/ : /^H4 (buy|sell) EG zone$/).test(z.label) && z.top > z.bot));
+  assert.equal(L.hueKey('H4 EF (failed sell → buy barrier)'), 'ef'); assert.equal(L.hueKey('H4 sell EG zone'), 'h4');
+  // an hour before that close the same zone is still a sell EG zone, never an EF: the map reads only candles closed by its moment
+  const before = at(1795406400 - 3600); assert.ok(has(before, 'H4 sell EG zone', 3566.86, 3595.29) && !has(before, 'H4 EF (failed sell → buy barrier)', 3566.86, 3595.29));
+  assert.deepEqual(before, L.h4Map(H.filter((b) => b.time + 14400 <= 1795406400 - 3600), 1795406400 - 3600), 'the same map from the candles cut at that moment');
+  assert.ok(after.filter((z) => z.bot > H.filter((b) => b.time + 14400 <= 1795410000).at(-1).close).length <= 3, 'at most three above the price');
+});
+
+test('the H4 map: on the Engulfing and Mosha desks only, a toggle on the card, display only and nothing kept', () => {
+  assert.deepEqual(Object.keys(L.DESKS).filter((k) => L.DESKS[k].h4), ['mosha', 'eg']);
+  const src = rd('assets/desk-live.js');
+  assert.match(src, /data-dl-h4 aria-pressed="true"/); assert.match(src, /'&tf=4h&n=' \+ H4_N/); assert.match(src, /display only: the choice is not kept/);
+  assert.ok(!/localStorage|sessionStorage/.test(src));
+});

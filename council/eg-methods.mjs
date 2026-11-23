@@ -51,7 +51,7 @@ export const egN = (z) => (z && z.n ? ` · ${z.n} candle${z.n === 1 ? '' : 's'}`
 // methods' own rule a zone closed through is failed, and no page uses a turned zone after such a close (21 Nov 2026; until
 // then a turned zone counted for 20 days whatever happened next). `turnBack` stamps that close's time on the zone (`back`).
 const h4Zone = (z, d, T) => (z.dir === d && z.at <= T && z.end > T) || (z.dir === -d && z.fail != null && z.fail <= T && T - z.fail < 20 * 86400 && !(z.back != null && z.back <= T));
-const turnBack = (C, Z, sec) => { for (const z of Z) { if (z.fail == null) continue;
+export const turnBack = (C, Z, sec) => { for (const z of Z) { if (z.fail == null) continue;
   for (let j = z.fi + 1; j < C.length && C[j].time < z.fail + 20 * 86400; j++) if (z.dir > 0 ? C[j].close > z.top : C[j].close < z.bot) { z.back = C[j].time + sec; break; } } return Z; };
 const word = (d) => (d > 0 ? 'buy' : 'sell');
 const num = (a) => a.map((b) => ({ time: +b.time, open: +b.open, high: +b.high, low: +b.low, close: +b.close }));
@@ -340,6 +340,74 @@ export function sopTrades3(B, { from = 0, market = 'xau', conf = 'touch', stop: 
     got.sort((a, b) => a.t - b.t || a.K - b.K); let busy = -Infinity;
     for (const r of got) { if (r.t <= busy) continue; busy = r.endT || Infinity; delete r.K; if (r.t >= from) out.push(r); } }
   return out.sort((a, b) => a.t - b.t);
+}
+
+// ─── an H4 EF barrier to the next H4 EG zone (23 Nov 2026, the owner's gold trade of 22-23 Nov) ───
+// An H4 engulf zone (`zones`, completed within EG_SPAN candles) FAILS: an H4 candle closes through its far side (a sell zone: a
+// close above its top). It turns: a failed sell zone is a BUY barrier (an EF), a failed buy zone a sell barrier. Then:
+//   1. price comes back into it: a closed 15-minute candle, starting at or after the failing H4 close, trades into the zone;
+//   2. an M15 BO with the barrier: from that candle on, an M15 candle closes beyond the last M15 A level (a buy; a V level for a
+//      sell: a turn of the M15 CLOSES, EFB.piv candles a side, known by the candle's open and not closed beyond since it formed,
+//      as every A / V level on these desks) AND beyond the zone itself (the price has left the zone with the break);
+//   3. long at the retest: a buy limit at the zone's top (a sell limit at its bottom); stop past the zone's far side by the desk's
+//      buffer ($0.30 on gold, the same share of price elsewhere); target the near side of the NEAREST H4 engulf zone of the other
+//      side still standing ahead of the entry when the order is placed (a sell EG zone above a buy: not closed through, within its
+//      life), and only when that is 2R or more away (a nearer zone under 2R is a roadblock: no trade). No such zone: no trade.
+// The owner gave the zone, the return, the M15 BO, the entry, the stop and the target. The desk's own choices, said here: the
+// barrier counts for 20 days after it failed and until an H4 candle closes back through it (as `h4Zone`); the M15 BO must come
+// within EFB.wait 15-minute candles of the return, before a 15-minute close back through the zone's far side; the order lives
+// EFB.fill 15-minute candles and is cancelled by a 15-minute close through the zone's far side or by price reaching the target
+// first; one setup a barrier (its first BO); one position at a time a market. On its fill candle only the stop counts. Every step
+// reads candles closed by that step's time. PAPER READING of the owner's trade, before costs: not a tested rule, never an edge.
+export const EFB = { piv: 2, life: 20 * 86400, wait: 48, fill: 24, minRR: 2 };
+export function efTrades(B, { from = 0, market = 'xau' } = {}) {
+  const M5 = num(B['5m'] || []), M15 = num(B['15m'] || []), H4 = num(B['4h'] || []); if (M5.length < 100 || M15.length < 50 || H4.length < 20) return [];
+  const dec = SOP.ALL[market] ? SOP.ALL[market].dec : 2, f = (v) => (+v).toFixed(dec), pre = market === 'xau' ? '' : market + ':', sg = (v) => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}R`;
+  const Z4 = turnBack(H4, zones(H4, '4h'), SEC['4h']), k = EFB.piv, piv = [], got = [];
+  // the M15 turns of the closes: s 1 = an A level (a high turn), -1 = a V level (a low turn); known at the close of candle j + k
+  for (let j = k; j + k < M15.length; j++) { let lo = true, hi = true;
+    for (let q = 1; q <= k; q++) { if (!(M15[j].close < M15[j - q].close && M15[j].close < M15[j + q].close)) lo = false; if (!(M15[j].close > M15[j - q].close && M15[j].close > M15[j + q].close)) hi = false; }
+    if (hi) piv.push({ j, s: 1, p: M15[j].close, known: M15[j + k].time + 900 }); if (lo) piv.push({ j, s: -1, p: M15[j].close, known: M15[j + k].time + 900 }); }
+  // the last level of side s known by the open of candle q and not closed beyond by any candle after it and before q
+  const levelAt = (q, s) => { const t = M15[q].time; for (let n = piv.length - 1; n >= 0; n--) { const L = piv[n]; if (L.known > t || L.s !== s) continue; if (L.j < q - 400) return null;
+    let ok = true; for (let m = L.j + 1; m < q && ok; m++) if (s > 0 ? M15[m].close > L.p : M15[m].close < L.p) ok = false; if (ok) return L; } return null; };
+  for (const Z of Z4) { if (Z.fail == null) continue; const d = -Z.dir, F = Z.fail, dead = Math.min(F + EFB.life, Z.back != null ? Z.back : Infinity);
+    // 1. the return into the barrier
+    let ret = -1; for (let i = lower(M15, F); i < M15.length && M15[i].time + 900 <= dead; i++) if (d > 0 ? M15[i].low <= Z.top : M15[i].high >= Z.bot) { ret = i; break; }
+    if (ret < 0) continue;
+    // 2. the M15 BO with the barrier, before a 15-minute close back through its far side
+    let bo = -1, L = null;
+    for (let q = ret; q < M15.length && q <= ret + EFB.wait && M15[q].time + 900 <= dead; q++) { const c = M15[q]; if (d > 0 ? c.close < Z.bot : c.close > Z.top) break;
+      const lv = levelAt(q, d); if (lv && (d > 0 ? c.close > lv.p && c.close > Z.top : c.close < lv.p && c.close < Z.bot)) { bo = q; L = lv; break; } }
+    if (bo < 0) continue;
+    const K = M15[bo].time + 900; if (K < M5[0].time) continue;   // placed before the 5-minute candles on file: its window cannot be read
+    // 3. the order: entry at the barrier's near side, stop past its far side, target the nearest opposite H4 EG zone standing ahead
+    const entry = d > 0 ? Z.top : Z.bot, far = d > 0 ? Z.bot : Z.top, stop = far - d * SOP.sizes(market, far).buf, r0 = Math.abs(entry - stop);
+    if (!(r0 > 0) || (d > 0 ? stop >= entry : stop <= entry)) continue;   // never a record without a stop on the losing side
+    let T = null; for (const o of Z4) { if (o.dir !== -d || !(o.at <= K) || !(o.fail == null || o.fail > K) || !(o.end > K)) continue; const p = d > 0 ? o.bot : o.top; if ((p - entry) * d > 0 && (!T || (p - entry) * d < ((d > 0 ? T.bot : T.top) - entry) * d)) T = o; }
+    if (!T) continue; const target = d > 0 ? T.bot : T.top, rr = Math.abs(target - entry) / r0; if (rr < EFB.minRR) continue;
+    // the order's life: EFB.fill 15-minute candles, a 15-minute close through the barrier's far side, or the target reached first
+    let until = M15[bo + EFB.fill] ? M15[bo + EFB.fill].time + 900 : K + EFB.fill * 900;
+    for (let j = bo + 1; j < M15.length && M15[j].time + 900 <= until; j++) if (d > 0 ? M15[j].close < Z.bot : M15[j].close > Z.top) { until = M15[j].time + 900; break; }
+    let fi = -1; for (let q = lower(M5, K); q < M5.length && M5[q].time + 300 <= until; q++) { const b = M5[q]; if (d > 0 ? b.low <= entry : b.high >= entry) { fi = q; break; } if (d > 0 ? b.high >= target : b.low <= target) break; }
+    if (fi < 0) continue;
+    const fillT = M5[fi].time, oc = outcome(M5, fi, d, entry, stop, target, Infinity), lvN = d > 0 ? 'A' : 'V';
+    const tr = { id: `${pre}eg-ef-${d > 0 ? 'b' : 's'}-${Z.base}`, market, kind: 'eg-ef', label: 'H4 EF barrier → next H4 EG', h: '4h', l: '15m', side: d, t: fillT, K, entry, stop, target, r0, status: oc.status, R: oc.R, endT: oc.endT, exit: oc.exit, mfe: oc.mfe, float: oc.float };
+    tr.log = [{ t: Z.at, text: `An H4 ${word(-d)} engulf zone ${f(Z.bot)} to ${f(Z.top)} (the engulf took ${Z.n} candle${Z.n === 1 ? '' : 's'}).` },
+      { t: F, text: `An H4 candle closed ${d > 0 ? 'above' : 'below'} it: the zone failed (EF) and turned into a ${word(d)} barrier.` },
+      { t: M15[ret].time + 900, text: `Price came back into the EF zone (a closed M15 candle traded into it).` },
+      { t: K, text: `M15 BO ${word(d)}: a close ${d > 0 ? 'above' : 'below'} the M15 ${lvN} level ${f(L.p)} and out of the zone. A ${word(d)} limit rests at ${f(entry)} for ${EFB.fill} M15 candles; stop ${f(stop)} past the zone.` },
+      { t: K, text: `Target ${f(target)}: the near side of the next H4 ${word(-d)} EG zone still standing, ${f(T.bot)} to ${f(T.top)} (${rr.toFixed(2)}R; 2R at least).` },
+      { t: fillT, text: `The limit filled: ${word(d)} ${f(entry)}, risk ${f(r0)}.` },
+      oc.status === 'target' ? { t: oc.endT, text: `Target reached: ${sg(oc.R)}.` } : oc.status === 'stopped' ? { t: oc.endT, text: `Stopped: ${sg(oc.R)}` + (oc.mfe >= 1 ? ` after running +${oc.mfe.toFixed(1)}R first.` : '.') }
+        : { t: null, text: 'Still open on the last candle read' + (oc.float != null ? ` (${sg(oc.float)} now).` : '.') }];
+    tr.marks = [{ kind: 'zone', top: Z.top, bot: Z.bot, a: Z.base, at: F, label: `H4 EF · ${word(d)} barrier` }, { kind: 'level', p: L.p, a: M15[L.j].time, at: K, label: `M15 ${lvN} level · BO ${word(d)}`, under: d < 0 },
+      { kind: 'zone', top: T.top, bot: T.bot, a: T.base, at: T.at, label: `H4 ${word(-d)} EG · target` }];
+    got.push(tr); }
+  // one position at a time a market: by fill time, the order known first when two fill in one candle
+  got.sort((a, b) => a.t - b.t || a.K - b.K); const out = []; let busy = -Infinity;
+  for (const r of got) { if (r.t <= busy) continue; busy = r.endT || Infinity; delete r.K; if (r.t >= from) out.push(r); }
+  return out;
 }
 
 // ─── the gold plan with Daily levels (the MSNR desk; the owner's fourth document, read in the desk's own words) ───

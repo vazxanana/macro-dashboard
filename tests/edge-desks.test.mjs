@@ -855,7 +855,7 @@ test('three-timeframe SOP on the seeded market: stops on the losing side, each s
     const partKeys = new Set(part.map(key)); for (const f of all) if (f.t + 300 <= T) assert.ok(partKeys.has(key(f)), 'a trade filled before the cut is found on the cut candles: ' + f.id); }
   // the desk: the reading is added beside the others, whose output is what their own functions give
   const o = { from, market: 'xau' }, desk = E.DESKS.eg.read(B15, o), others = E.egTrades(B15, o).concat(G.methodTrades(B15, o), G.methodTrades(B15, { ...o, span: 'next' }), G.m1Trades(B15, o));
-  assert.deepEqual(desk.filter((r) => r.kind !== 'eg-sop3'), others); assert.deepEqual(desk.filter((r) => r.kind === 'eg-sop3'), G.sopTrades3(B15, o));
+  assert.deepEqual(desk.filter((r) => r.kind !== 'eg-sop3' && r.kind !== 'eg-ef'), others); assert.deepEqual(desk.filter((r) => r.kind === 'eg-sop3'), G.sopTrades3(B15, o));
   for (const tf of ['1d', '4h', '1h', '15m', '5m']) assert.ok(E.DESKS.eg.tfs.includes(tf), 'the desk reads ' + tf);
   // stored: the kind, the label and the style tag survive the record cleaner; another market's id carries its market
   const { clean } = await import('../council/mosha-desk.mjs'), s = clean(all[0]); assert.equal(s.kind, 'eg-sop3'); assert.equal(s.style, all[0].style); assert.equal(s.label, all[0].label); assert.equal(s.marks.length, 4); assert.equal(s.log.length, all[0].log.length);
@@ -872,4 +872,81 @@ test('three-timeframe SOP: the comparison options leave the desk reading as it w
   assert.deepEqual(G.sopTrades3(B, { market: 'xau', conf: 'touch', stop: 'eg', target: 'rr', rr: G.SOP3.rr }), base);
   for (const o of [{ conf: 'inside' }, { stop: 'conf' }, { stop: 'pips' }, { rr: 1 }, { target: 'zone' }])
     for (const r of G.sopTrades3(B, { market: 'xau', ...o })) assert.ok(r.side > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, JSON.stringify(o));
+});
+
+// ─── an H4 EF barrier to the next H4 EG zone (23 Nov 2026, the owner's gold trade of 22-23 Nov) ───
+// the real OANDA candles to 23 Nov 2026 09:00 UTC (the H4 sell zone 3566.86-3595.29 failed at the 04:00 close; price had not yet
+// come back to it), then a hand-made 5-minute path: into the barrier, an M15 break up, back to the zone's top, up to the target.
+// `mir`: every price mirrored (p -> 8000 - p), so the same story is a sell.
+const EFX = JSON.parse(rd('tests/fixtures/xau-ef-barrier-2026-11-23.json')), C23 = 1795392000;
+const agg = (m5, sec) => { const out = []; for (const b of m5) { const t = b.time - (b.time % sec), q = out[out.length - 1]; if (q && q.time === t) { q.high = Math.max(q.high, b.high); q.low = Math.min(q.low, b.low); q.close = b.close; } else out.push({ ...b, time: t }); } return out; };
+const efCase = (pts, mir = false) => {
+  const m5 = rows(EFX['5m']); let t = m5.at(-1).time, p = m5.at(-1).close;
+  for (const [to, n] of pts) for (let i = 1; i <= n; i++) { const c = p + (to - p) / (n - i + 1); t += 300; m5.push({ time: t, open: p, high: Math.max(p, c) + 0.2, low: Math.min(p, c) - 0.2, close: c }); p = c; }
+  const flip = (a) => (mir ? a.map((b) => ({ time: b.time, open: 8000 - b.open, close: 8000 - b.close, high: 8000 - b.low, low: 8000 - b.high })) : a), M5 = flip(m5);
+  return { '5m': M5, '15m': agg(M5, 900), '4h': flip(rows(EFX['4h'])).concat(agg(M5.filter((b) => b.time >= C23), 14400)) };
+};
+const EF_PATH = [[3593.5, 12], [3618, 12], [3618, 6], [3595.0, 10], [3640, 18], [3722, 40]];
+
+test('H4 EF barrier: the owner\'s gold trade of 22-23 Nov 2026 (the failed sell zone, the return, the M15 BO, long at the zone\'s top, the next H4 sell EG as target), and its mirror', () => {
+  assert.equal(G.efTrades(efCase([]), { market: 'xau' }).filter((r) => r.t >= C23).length, 0, 'on the real candles alone: price has not come back to the barrier by 09:00 UTC');
+  for (const mir of [false, true]) { const m = (v) => (mir ? 8000 - v : v), d = mir ? -1 : 1, all = G.efTrades(efCase(EF_PATH, mir), { market: 'xau' }).filter((r) => r.t >= C23);
+    assert.equal(all.length, 1, 'one trade'); const r = all[0];
+    assert.equal(r.kind, 'eg-ef'); assert.equal(r.label, 'H4 EF barrier → next H4 EG'); assert.equal(r.id, `eg-ef-${mir ? 's' : 'b'}-1795161600`); assert.equal(r.side, d); assert.equal(r.h, '4h'); assert.equal(r.l, '15m');
+    const [ef, bo, tg] = r.marks;
+    near9(ef.top, Math.max(m(3595.29), m(3566.86)), 'the EF zone'); near9(ef.bot, Math.min(m(3595.29), m(3566.86)), 'the EF zone'); assert.equal(ef.at, 1795406400, 'failed at the 04:00 H4 close of 23 Nov');
+    assert.equal(ef.label, `H4 EF · ${mir ? 'sell' : 'buy'} barrier`); assert.equal(bo.label, `M15 ${mir ? 'V' : 'A'} level · BO ${mir ? 'sell' : 'buy'}`); assert.equal(tg.label, `H4 ${mir ? 'buy' : 'sell'} EG · target`);
+    near9(tg.top, Math.max(m(3744.545), m(3719.835)), 'the target zone'); near9(tg.bot, Math.min(m(3744.545), m(3719.835)), 'the target zone');
+    near9(r.entry, m(3595.29), 'a limit at the zone\'s top (bottom for the sell)'); near9(r.stop, m(3566.56), 'past the far side by $0.30'); near9(r.target, m(3719.835), 'the near side of the next H4 zone of the other side');
+    assert.ok(d > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1');
+    assert.equal(r.status, 'target'); near9(r.R, 124.545 / 28.73, '4.34R');
+    const K = r.log[3].t; assert.ok(r.marks.every((x) => x.at <= K), 'every mark was known when the order was placed'); assert.ok(r.t >= K);
+    for (let i = 1; i < r.log.length; i++) assert.ok(r.log[i].t >= r.log[i - 1].t, 'the log is in time order');
+    assert.ok(r.log.every((x) => x.text.length <= 240), 'a log line fits the stored length'); assert.ok(r.marks.every((x) => x.label.length <= 24), 'a mark label fits the stored length'); }
+});
+
+test('H4 EF barrier: no trade when the BO never comes, when the zone is closed back through first, when the target is under 2R; no hindsight on the owner\'s example', () => {
+  const n = (pts) => G.efTrades(efCase(pts), { market: 'xau' }).filter((r) => r.t >= C23).length;
+  assert.equal(n([[3593.5, 12], [3600, 40]]), 0, 'back in the zone, no M15 close above the last A level and out of it');
+  assert.equal(n([[3593.5, 12], [3560, 12], [3618, 12], [3618, 6], [3595.0, 10], [3722, 40]]), 0, 'a 15-minute close below the zone ends it before a BO');
+  assert.equal(n([[3593.5, 12], [3618, 12], [3618, 6], [3640, 30]]), 0, 'the order is never filled: the price does not come back to the zone\'s top');
+  // the target is the NEAREST opposite H4 zone standing, taken only 2R or more away: on this path an H4 sell engulf made at 16:00
+  // (the 08:00 candle, 3600.51-3650.20) stands 0.18R above the entry when the M15 BO closes (16:45): no trade, the farther zone is not taken
+  const near = [[3650, 35], [3610, 19], [3616, 6], [3594, 21], [3594, 2], [3625, 12], [3595, 12], [3722, 40]], Bn = efCase(near);
+  const zn = G.zones(Bn['4h'], '4h').find((z) => z.dir < 0 && z.at === C23 + 16 * 3600); assert.ok(zn && zn.bot > 3595.29 && zn.bot < 3595.29 + 2 * 28.73 && (zn.fail == null || zn.fail > C23 + 16.75 * 3600), 'a sell zone under 2R stands at the BO');
+  assert.equal(G.efTrades(Bn, { market: 'xau' }).filter((r) => r.t >= C23).length, 0, 'the nearest opposite zone is under 2R: no trade');
+  const m2 = G.EFB.minRR; try { G.EFB.minRR = 5; assert.equal(n(EF_PATH), 0, 'the owner\'s trade is 4.34R: under a 5R floor it would not be taken'); } finally { G.EFB.minRR = m2; }
+  assert.equal(n(EF_PATH), 1);
+  // cut the candles: absent before the BO's close, resting unfilled before the fill candle, found the same just after the fill
+  const B0 = efCase(EF_PATH), full = G.efTrades(B0, { market: 'xau' }).filter((r) => r.t >= C23)[0], K = full.log[3].t, sec = { '4h': 14400, '15m': 900, '5m': 300 };
+  const cut = (T) => Object.fromEntries(Object.entries(B0).map(([tf, a]) => [tf, a.filter((b) => b.time + sec[tf] <= T)]));
+  assert.equal(G.efTrades(cut(K - 900), { market: 'xau' }).filter((r) => r.t >= C23).length, 0, 'absent before the M15 BO has closed');
+  assert.equal(G.efTrades(cut(full.t), { market: 'xau' }).filter((r) => r.t >= C23).length, 0, 'the order rests, unfilled, before the fill candle');
+  const after = G.efTrades(cut(full.t + 300), { market: 'xau' }).filter((r) => r.t >= C23); assert.equal(after.length, 1, 'found with the candles cut just after the fill');
+  assert.deepEqual([after[0].id, after[0].t, after[0].entry, after[0].stop, after[0].target], [full.id, full.t, full.entry, full.stop, full.target]); assert.equal(after[0].status, 'open'); assert.equal(after[0].R, null);
+});
+
+test('H4 EF barrier on the seeded market: stops on the losing side, a failed H4 zone of the other side as barrier, a 2R+ target zone standing, one position at a time, no look-ahead, the desk and the page', async () => {
+  const all = G.efTrades(B15, { from: 0, market: 'xau' }); assert.ok(all.length >= 3, 'entries: ' + all.length);
+  const Z4 = G.zones(B15['4h'], '4h'), ids = new Set(); let busy = -Infinity;
+  for (const r of all) { const d = r.side; assert.ok(!ids.has(r.id)); ids.add(r.id); assert.match(r.id, /^eg-ef-[bs]-\d+$/);
+    assert.ok(d > 0 ? r.stop < r.entry && r.target > r.entry : r.stop > r.entry && r.target < r.entry, 'rule 1: ' + r.id);
+    assert.ok(Math.abs(r.target - r.entry) >= G.EFB.minRR * r.r0 - 1e-9, '2R or more'); near9(Math.abs(r.entry - r.stop), r.r0, '1R');
+    const [ef, , tg] = r.marks, Z = Z4.find((z) => z.dir === -d && z.base === ef.a), T = Z4.find((z) => z.dir === -d && z.base === tg.a), K = r.log[3].t;
+    assert.ok(Z && Z.fail != null && Z.fail === ef.at && Z.fail < K, 'the barrier is an H4 zone of the other side that failed before the order');
+    near9(r.entry, d > 0 ? Z.top : Z.bot, 'a limit at the zone\'s near side'); near9(r.stop, d > 0 ? Z.bot - 0.3 : Z.top + 0.3, 'the stop past its far side');
+    assert.ok(T && T.at <= K && (T.fail == null || T.fail > K) && T.end > K, 'the target zone was standing when the order was placed'); near9(r.target, d > 0 ? T.bot : T.top, 'its near side');
+    for (const o of Z4) if (o.dir === -d && o.at <= K && (o.fail == null || o.fail > K) && o.end > K) { const p = d > 0 ? o.bot : o.top; assert.ok(!((p - r.entry) * d > 0 && (p - r.entry) * d < (r.target - r.entry) * d - 1e-9), 'the nearest such zone'); }
+    assert.ok(['stopped', 'target', 'open'].includes(r.status)); if (r.status === 'stopped') assert.ok(r.R <= -1 + 1e-9);
+    assert.ok(r.t > busy, 'one position at a time'); busy = r.endT || Infinity; }
+  const sec = { ...SOP.SEC, '15m': 900 }, key = (r) => [r.id, r.t, r.entry, r.stop, r.target].join('|'), fullBy = new Map(all.map((r) => [key(r), r]));
+  for (const back of [5, 17, 31]) { const T = END - back * 86400 - 7 * 300, part = G.efTrades(Object.fromEntries(Object.entries(B15).map(([tf, a]) => [tf, a.filter((b) => b.time + sec[tf] <= T)])), { from: 0, market: 'xau' });
+    for (const p of part) { const f = fullBy.get(key(p)); assert.ok(f, 'missing with later candles: ' + p.id); if (p.R != null) assert.deepEqual([p.status, p.R, p.endT], [f.status, f.R, f.endT]); }
+    const pk = new Set(part.map(key)); for (const f of all) if (f.t + 300 <= T) assert.ok(pk.has(key(f)), 'a trade filled before the cut is found on the cut candles: ' + f.id); }
+  const o = { from, market: 'xau' }; assert.deepEqual(E.DESKS.eg.read(B15, o).filter((r) => r.kind === 'eg-ef'), G.efTrades(B15, o));
+  const { clean } = await import('../council/mosha-desk.mjs'), s = clean(all[0]); assert.equal(s.kind, 'eg-ef'); assert.equal(s.label, all[0].label); assert.equal(s.marks.length, 3); assert.deepEqual(s.marks.map((x) => x.label), all[0].marks.map((x) => x.label));
+  assert.ok(G.efTrades({ ...B15, '5m': B15['5m'].map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 })), '15m': B15['15m'].map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 })), '4h': B15['4h'].map((b) => ({ time: b.time, open: b.open * 1.15 / 4000, high: b.high * 1.15 / 4000, low: b.low * 1.15 / 4000, close: b.close * 1.15 / 4000 })) }, { market: 'eurusd' })
+    .every((r) => /^eurusd:eg-ef-[bs]-\d+$/.test(r.id) && (r.side > 0 ? r.stop < r.entry : r.stop > r.entry)), 'another market: its id, a stop on the losing side');
+  const page = rd('assets/desk-trades.js'); assert.match(page, /'eg-ef': 'H4 EF barrier → next H4 EG'/); assert.match(page, /The H4 EF barrier is listed apart too/);
+  assert.match(E.DESKS.eg.note, /A seventh reading, apart/); assert.match(rd('council/eg-methods.mjs'), /PAPER READING of the owner's trade, before costs: not a tested rule, never an edge/);
 });
