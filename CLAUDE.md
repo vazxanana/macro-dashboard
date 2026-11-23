@@ -6571,3 +6571,37 @@ a verdict. **0 of 5 pass.** Pooled holdout, R a trade after costs, month-sum t:
 The phase reader `research/edge/_lib/phase.mjs` (`readPhase`, closed candles only: per D1 / H4 / H1 / M15 side, stage, BO / ChoCh,
 ranges and their 50 %, box, the storyline step below; `tests/phase.test.mjs`) is shown on Charts as the "Market phase" panel
 (`assets/ms-phase.js`, a copy compared by `tests/ms-phase.test.mjs`; display only, hidden for guests). A reading, not a tested rule.
+
+## Decision journal (23 Nov 2026, overnight)
+The design of `research/proposals/2026-11-20-discretion.md`: the studies say a person's edge, if any, is in the choosing, and only
+a choice stamped BEFORE the outcome can measure it. Practice and record only: nothing goes to a broker, the council or the mirror,
+no council member reads it, and nothing is kept in the browser.
+- **`api/journal.js`** (Vercel (req, res) shape, routed in `cloudflare/src/worker.mjs` `HANDLERS.journal` and `vercel.json`
+  functions; private store file `journal/decisions.json`, overwritten in place, read with `?cache=0`, a failed read throws and is
+  never saved over; `tests/blob-fresh.test.mjs` lists it). Who: the owner, and a member whose `perms.desks` is on (an explicit one
+  wins, else reviewers). GET = the account's OWN calls (the account key never leaves the server). POST same-origin:
+  `{ call: { market (xau eurusd gbpusd usdjpy audusd nas100 xag), side, action: take | skip, entry, stop, target?, tf, method
+  (<= 40), reason (<= 300), confidence 1-5, source? { desk, id } } }` → the SERVER stamps `at` (a sent `at` is ignored); a stop
+  not on the losing side (or a target not on the winning side) is refused; a call cannot be edited after its stamp (a body with
+  an `id` is refused), only `{ note: { id, text } }` (500 chars, `noteAt`); `{ remove: id }` only within `DELETE_S` 120 s of `at`,
+  and it WITHDRAWS (the record stays, `withdrawn` = the time; counted apart, never in taken / skipped: the proposal's "nothing is
+  deleted"). A stored file that is not a list throws (never saved over).
+  2,000 calls an account, 5,000 in all.
+- **Rules, one copy** `assets/ms-journal.js` (pure; `window.MS_JOURNAL` on the page, re-exported by `api/_journal.js`): `check`,
+  `outcome(call, bars)` = candles that START at or after `at` only (never a forming one); the entry must be REACHED by one of them
+  (else `pending`, not scored: a call written with the price already past its entry cannot book a result); on the fill candle only
+  the stop counts; then stop first when one candle holds both, a gap through the stop fills at the open, then the target, else open
+  marked at the last close; `joinBars` = 5-minute candles for the first 14 days, hourly only from where they end (the result of a
+  call never changes as it ages); R before costs; a skip is scored
+  the same way (the counterfactual). `stats(rows)` = resolved calls only: taken vs skipped n, mean R, Welch t, by method and by
+  confidence; "too few to judge" under `MIN_SIDE` 20 a side; never the word edge for a result.
+- **Page** (`market-structure.html`, `<style id="ms-jr-css">` + `<script id="ms-jr-js">` before the structure assistant's block):
+  "Log a call" in the Charts toolbar (`#ms-jr-btn`, Style's CSS order; shown only when GET answers, so never for guests or
+  accounts without the desks permission), dialog `#ms-jr` (market from the page, side, take / skip, entry / stop / target
+  prefilled from the last one-minute close and the 15-minute ATR(14): 1 ATR stop, 2 ATR target; method, reason, confidence),
+  and the card "My calls" `#ms-jr-card` at the END of Home (after "More on the desk", so no first screen changes): the latest 40
+  calls with their outcome from `/md/bars` (5-minute candles for two weeks, then hourly joined after them; re-read every 2 minutes
+  while open or pending), the taken-vs-skipped line, "Add a note" (styled `msAsk`) and "Withdraw" in the first 2 minutes. Graphite tokens, 12 px min, 44 px on
+  touch. `window.msJournal()` is a read-only view.
+- Not built (the proposal's later steps): Take / Skip buttons on the desks' own signals (`source` is ready for them) and the
+  study's report from this file. Tests: `tests/journal.test.mjs`.
