@@ -239,6 +239,14 @@ function resultMd(o, rows) {
     L.push(`${o.passed.length} cell(s) clear the pre-registered bar before costs in both decades and beat their control. ${o.passedNetPositive.length ? o.passedNetPositive.length + ' of them stay positive after costs in both windows.' : 'None stays positive after costs in both windows: the bid / ask takes more than the tilt.'}`,
       'A before-cost tilt is not an edge; nothing is adopted and a forward record or a live change needs the owner. One run, no',
       'variants on these years.');
+    const pr = rows.filter((r) => r.pass);
+    L.push('', '**Is it the round number?** The bar\'s control for the fade is the plain structure-break fade at the nearest time, and',
+      'the passing cells beat it. The shifted-grid column (reported, not part of the bar) asks the sharper question: the same fade of',
+      'a 15-minute close through a level of the same spacing that is NOT round. In 2015-26 the passing cells against it: ' +
+      pr.map((r) => `${r.name} ${f3(r.c.mean)}R vs ${f3(r.c.shifted.mean)}R (Welch t ${f2(r.c.shifted.welch)})`).join('; ') + '.',
+      pr.every((r) => r.c.shifted.welch != null && r.c.shifted.welch < 2)
+        ? 'Fading a close through a round number does no better than fading a close through any level of that spacing: the tilt belongs to fading a 15-minute close that moved through a fixed price grid (the same short-term pull-back `grid7-wide-fade` found), not to round numbers. After costs every cell loses.'
+        : 'Read the shifted column before drawing any conclusion about round numbers themselves. After costs every cell loses.');
   } else {
     const disc = rows.filter((r) => r.checks.disc && r.checks.conf && r.checks.holm);
     L.push(`No cell clears the whole bar. ${disc.length ? disc.length + ' cell(s) are positive before costs in both decades (Holm), but none of them does better than its control in both windows: the round number adds nothing measurable over the plain fade at the same times or over a level that is not round.' : 'No cell is positive before costs in both decades with Holm.'}`,
