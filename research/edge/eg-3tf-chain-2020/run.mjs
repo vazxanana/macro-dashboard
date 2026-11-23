@@ -70,10 +70,10 @@ export function runMarket(market, opts = {}) {
 
 // ---- pooled statistics ----------------------------------------------------------------------------------------------
 const mIdx = (t) => { let lo = 0, hi = NM; while (lo < hi) { const m = (lo + hi) >> 1; if (MONTHS[m] <= t) lo = m + 1; else hi = m; } return lo - 1; };
-export function summarize(rows, key = (r) => r.R - r.cr) {
+export function summarize(rows, key = (r) => r.R - r.cr, gkey = (r) => r.R) {
   const ms = new Float64Array(NM); let nI = 0, nO = 0, sI = 0, sO = 0, s2O = 0, s2I = 0, gO = 0, gI = 0, wO = 0;
   for (const r of rows) { const m = mIdx(r.t); if (m < 0) continue; const v = key(r); ms[m] += v;
-    if (r.t < SPLIT) { nI++; sI += v; s2I += r.R - 2 * r.cr; gI += r.R; } else { nO++; sO += v; s2O += r.R - 2 * r.cr; gO += r.R; if (v > 0) wO++; } }
+    if (r.t < SPLIT) { nI++; sI += v; s2I += gkey(r) - 2 * r.cr; gI += gkey(r); } else { nO++; sO += v; s2O += gkey(r) - 2 * r.cr; gO += gkey(r); if (v > 0) wO++; } }
   const a = mstat(ms, 0, IS_M), b = mstat(ms, IS_M, NM), f = (x, d = 4) => (x == null || !Number.isFinite(x) ? null : +x.toFixed(d));
   return { disc: { n: nI, mean: nI ? f(sI / nI) : null, t: f(a.t, 2), x2: nI ? f(s2I / nI) : null, gross: nI ? f(gI / nI) : null },
     conf: { n: nO, mean: nO ? f(sO / nO) : null, t: f(b.t, 2), x2: nO ? f(s2O / nO) : null, gross: nO ? f(gO / nO) : null, win: nO ? f(wO / nO, 3) : null } };
@@ -90,22 +90,30 @@ export function report(dir) {
   const per = MARKETS18.map((m) => JSON.parse(fs.readFileSync(path.join(dir, m + '.json'), 'utf8')));
   const all = per.flatMap((p) => p.rows);
   const tests = TESTS.map(([id, ch, tg]) => { const rs = all.filter((r) => r.ch === ch && r.tg === tg); const s = summarize(rs);
-    const desk = summarize(rs.filter((r) => r.deskR != null), (r) => r.deskR - r.cr);
+    const deskRows = rs.filter((r) => r.deskR != null), desk = summarize(deskRows, (r) => r.deskR - r.cr, (r) => r.deskR), deskG = summarize(deskRows, (r) => r.deskR, (r) => r.deskR);
     const cutShare = rs.length ? +(rs.filter((r) => r.how === 'cut').length / rs.length).toFixed(3) : null;
     const side = { buy: summarize(rs.filter((r) => r.side > 0)).conf, sell: summarize(rs.filter((r) => r.side < 0)).conf };
-    const markets = Object.fromEntries(MARKETS18.map((m) => { const q = summarize(rs.filter((r) => r.m === m)); return [m, { dn: q.disc.n, dmean: q.disc.mean, dt: q.disc.t, cn: q.conf.n, cmean: q.conf.mean, ct: q.conf.t }]; }));
+    const markets = Object.fromEntries(MARKETS18.map((m) => { const mr = rs.filter((r) => r.m === m), q = summarize(mr), g = summarize(mr, (r) => r.R); return [m, { dn: q.disc.n, dmean: q.disc.mean, dt: q.disc.t, cn: q.conf.n, cmean: q.conf.mean, ct: q.conf.t, dgross: g.disc.mean, dgt: g.disc.t, cgross: g.conf.mean, cgt: g.conf.t }]; }));
     const byYear = {}; for (const r of rs) { const y = new Date(r.t * 1000).getUTCFullYear(); const o = (byYear[y] ||= { n: 0, R: 0 }); o.n++; o.R += r.R - r.cr; }
     for (const y of Object.keys(byYear)) byYear[y] = { n: byYear[y].n, mean: +(byYear[y].R / byYear[y].n).toFixed(4) };
     const pip30 = summarize(rs.filter((r) => r.pip30)); const pip30Share = rs.length ? +(rs.filter((r) => r.pip30).length / rs.length).toFixed(3) : null;
-    const extra = { cutShare, desk: desk.conf, deskDisc: desk.disc, side, byYear, pip30Share, pip30: pip30.conf, medianRisk: null };
+    const cr = rs.map((r) => r.cr).sort((a, b) => a - b), medCostR = cr.length ? +cr[cr.length >> 1].toFixed(4) : null;
+    const extra = { cutShare, desk: desk.conf, deskDisc: desk.disc, deskGross: { disc: deskG.disc, conf: deskG.conf }, side, byYear, pip30Share, pip30: pip30.conf, medCostR };
     if (tg === 'zone') { const fb = rs.filter((r) => Math.abs(r.tgtR - 2) < 1e-9).length; extra.fallback2R = rs.length ? +(fb / rs.length).toFixed(3) : null;
       const rb2 = summarize(rs.filter((r) => r.rb != null && r.rb >= 2)); extra.roadblock2R = { disc: rb2.disc, conf: rb2.conf }; }
     return { id, chain: ch, target: tg === 'rr' ? '2R' : 'roadblock', ...s, pOne: +p1(s.conf.t, NM - IS_M - 1).toPrecision(4), markets, extra }; });
   const adj = K.holm(tests.map((t) => t.pOne)); tests.forEach((t, i) => { t.holm = +adj[i].toPrecision(4); t.verdict = judge(t, adj[i]); });
+  // BEFORE COSTS (the owner, 23 Nov 2026, after the pre-registration: "I only want to know before costs"): the same bar on R before
+  // costs, Holm over its own six p values; the twice-the-cost clause has no meaning there and is left out. A second, labelled verdict.
+  tests.forEach((t) => { const rs = all.filter((r) => r.ch === t.chain && r.tg === (t.target === '2R' ? 'rr' : 'zone')); t.gross = summarize(rs, (r) => r.R);
+    t.gross.pOne = +p1(t.gross.conf.t, NM - IS_M - 1).toPrecision(4); });
+  const gadj = K.holm(tests.map((t) => t.gross.pOne)); tests.forEach((t, i) => { const g = t.gross; g.holm = +gadj[i].toPrecision(4);
+    g.verdict = judge({ disc: g.disc, conf: { ...g.conf, x2: 1 } }, gadj[i]); });
   const verdict = tests.some((t) => t.verdict === 'PASS') ? 'PASS' : tests.every((t) => t.verdict === 'FAIL') ? 'FAIL' : 'INCONCLUSIVE';
   const best = [...tests].sort((a, b) => b.conf.t - a.conf.t)[0];
   const headline = `${tests.filter((t) => t.verdict === 'PASS').length} of 6 pass; best confirmation ${best.id} (${best.chain} ${best.target}) ${best.conf.mean >= 0 ? '+' : ''}${best.conf.mean.toFixed(3)}R a trade after costs (n ${best.conf.n}, month t ${best.conf.t}).`;
-  const out = { topic: 'eg-3tf-chain-2020', title: 'The three-timeframe engulf chain, 2020 to now', built: new Date().toISOString().slice(0, 10), verdict, headline,
+  const grossVerdict = tests.some((t) => t.gross.verdict === 'PASS') ? 'PASS' : tests.every((t) => t.gross.verdict === 'FAIL') ? 'FAIL' : 'INCONCLUSIVE';
+  const out = { topic: 'eg-3tf-chain-2020', title: 'The three-timeframe engulf chain, 2020 to now', built: new Date().toISOString().slice(0, 10), verdict, headline, grossVerdict,
     window: { from: '2020-01-01', split: '2024-01-01', last: per.map((p) => p.last).sort()[0] + ' .. ' + per.map((p) => p.last).sort().at(-1) },
     markets: MARKETS18, stopBufferKey: Object.fromEntries(MARKETS18.filter((m) => keyFor(m) !== m).map((m) => [m, keyFor(m)])),
     counts: Object.fromEntries(per.map((p) => [p.market, { rows: p.rows.length, dropped: p.dropped, open: p.open, excluded: p.excluded }])), tests };
