@@ -14,9 +14,10 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag', 'gbpjpy', 'eurgbp', 'audjpy', 'cadjpy', 'euraud', 'nas100', 'spx500', 'de40'];
 export const START = Date.UTC(2020, 0, 1) / 1000, SPLIT = Date.UTC(2024, 0, 1) / 1000;
 export const P = { stopPips: 30, rr: 3, life: 24 * 14400, cap: 30 * 86400, perDay: 2, atrN: 14, atrK: 1, t3Pad: 3 };
-// pipOfMarket falls back to 0.1 for markets the desk's list does not know (euraud, eurgbp, cadjpy); the pre-registration names
-// the pip of a five-decimal pair (0.0001) and of a yen pair (0.01), so those three take it from their quote currency.
-export const pip = (m) => (['euraud', 'eurgbp'].includes(m) ? 0.0001 : m === 'cadjpy' ? 0.01 : pipOfMarket(m));
+// The pre-registration's pip: gold 0.10, silver 0.01, indices 1, a five-decimal pair 0.0001, a yen pair 0.01. pipOfMarket
+// (council/eg-methods.mjs) gives that for the markets the desk lists, but falls back to 0.1 for eight of these (nzdusd, usdchf,
+// eurjpy, gbpjpy, audjpy, eurgbp, euraud, cadjpy); found after the first full run, those take the pre-registered pip here.
+export const pip = (m) => (['xau', 'xag', 'nas100', 'spx500', 'de40'].includes(m) ? pipOfMarket(m) : m.endsWith('jpy') ? 0.01 : 0.0001);
 const conv = (B, sec) => B.map((b) => ({ time: sec ? b.e - sec : b.t, open: b.o, high: b.h, low: b.l, close: b.c }));
 
 // Signals from closed candles only: { side, t (known), level, boT, day, strong, rejLo, rejHi }
@@ -71,11 +72,11 @@ export function win(xs, key = 'Rnet') {
   const s = K.stats(xs.map((x) => ({ t: x.t, R: x[key] })), { key: 'R', time: 't' });
   return { n: s.n, meanR: s.meanR, tMonth: s.tMonth, months: s.months, total: s.total, wins: s.wins };
 }
-export function judge(xs) {
+export function judge(xs) {   // the bar reads R before costs (amendment before the run); after costs and 2x cost reported
   const D = xs.filter((x) => x.t < SPLIT), C = xs.filter((x) => x.t >= SPLIT);
-  const d = win(D), c = win(C), d2 = win(D, 'R2'), c2 = win(C, 'R2'), g = win(xs, 'R');
+  const d = win(D, 'R'), c = win(C, 'R'), dn = win(D), cn = win(C), d2 = win(D, 'R2'), c2 = win(C, 'R2');
   const p1 = c.tMonth == null ? 1 : (c.tMonth > 0 ? K.pFromT(c.tMonth, c.months - 1) / 2 : 1 - K.pFromT(c.tMonth, c.months - 1) / 2);
-  return { disc: d, conf: c, disc2x: { meanR: d2.meanR }, conf2x: { meanR: c2.meanR }, grossAll: { n: g.n, meanR: g.meanR, tMonth: g.tMonth }, pConf: p1 };
+  return { disc: d, conf: c, discNet: dn, confNet: cn, disc2x: { meanR: d2.meanR }, conf2x: { meanR: c2.meanR }, pConf: p1 };
 }
 const r3 = (x) => (x == null ? null : +x.toFixed(3)), r2 = (x) => (x == null ? null : +x.toFixed(2));
 
@@ -85,20 +86,21 @@ export function report(dir) {
   for (const T of ['T1', 'T2', 'T3']) { const all = per.flatMap((x) => x.T[T]); tests[T] = judge(all); ps.push(tests[T].pConf); }
   const H = K.holm(ps);
   ['T1', 'T2', 'T3'].forEach((T, i) => { const j = tests[T]; j.pConfHolm = H[i];
-    const ok = j.disc.n >= 100 && j.disc.meanR > 0 && j.disc.tMonth >= 2 && j.conf.n >= 50 && j.conf.meanR > 0 && j.conf.tMonth >= 2 && H[i] <= 0.0228 && j.disc2x.meanR > 0 && j.conf2x.meanR > 0;
+    const ok = j.disc.n >= 100 && j.disc.meanR > 0 && j.disc.tMonth >= 2 && j.conf.n >= 50 && j.conf.meanR > 0 && j.conf.tMonth >= 2 && H[i] <= 0.0228;
     j.pass = ok; j.enough = j.disc.n >= 100 && j.conf.n >= 50; });
   const nPass = Object.values(tests).filter((j) => j.pass).length, enough = Object.values(tests).every((j) => j.enough);
   const verdict = nPass ? 'PASS' : enough ? 'FAIL' : 'INCONCLUSIVE';
   const rows = per.map((x) => ({ market: x.market, signals: x.nsig, ...Object.fromEntries(['T1', 'T2', 'T3'].map((T) => { const j = judge(x.T[T]);
-    return [T, { discN: j.disc.n, discR: r3(j.disc.meanR), discT: r2(j.disc.tMonth), confN: j.conf.n, confR: r3(j.conf.meanR), confT: r2(j.conf.tMonth) }]; })) }));
+    return [T, { discN: j.disc.n, discR: r3(j.disc.meanR), discT: r2(j.disc.tMonth), confN: j.conf.n, confR: r3(j.conf.meanR), confT: r2(j.conf.tMonth), discNetR: r3(j.discNet.meanR), confNetR: r3(j.confNet.meanR) }]; })) }));
   const slim = (j) => ({ disc: { n: j.disc.n, meanR: r3(j.disc.meanR), tMonth: r2(j.disc.tMonth), total: r2(j.disc.total), wins: j.disc.wins },
     conf: { n: j.conf.n, meanR: r3(j.conf.meanR), tMonth: r2(j.conf.tMonth), total: r2(j.conf.total), wins: j.conf.wins },
-    disc2x: r3(j.disc2x.meanR), conf2x: r3(j.conf2x.meanR), gross: { n: j.grossAll.n, meanR: r3(j.grossAll.meanR), tMonth: r2(j.grossAll.tMonth) },
+    discNet: { meanR: r3(j.discNet.meanR), tMonth: r2(j.discNet.tMonth) }, confNet: { meanR: r3(j.confNet.meanR), tMonth: r2(j.confNet.tMonth) },
+    disc2x: r3(j.disc2x.meanR), conf2x: r3(j.conf2x.meanR),
     pConf: r3(j.pConf), pConfHolm: r3(j.pConfHolm), pass: j.pass });
   const T1 = tests.T1;
-  const headline = `${nPass} of 3 tests pass. T1 (strong H4 body, 30-pip stop, 3R) on 18 markets: confirmation ${T1.conf.n} trades, ${r3(T1.conf.meanR)}R a trade after costs, month t ${r2(T1.conf.tMonth)} (discovery ${T1.disc.n}, ${r3(T1.disc.meanR)}R, t ${r2(T1.disc.tMonth)}).`;
+  const headline = `${nPass} of 3 tests pass. T1 (strong H4 body, 30-pip stop, 3R) on 18 markets, before costs: confirmation ${T1.conf.n} trades, ${r3(T1.conf.meanR)}R a trade, month t ${r2(T1.conf.tMonth)} (discovery ${T1.disc.n}, ${r3(T1.disc.meanR)}R, t ${r2(T1.disc.tMonth)}).`;
   const cut = fs.existsSync(path.join(dir, 'cut.json')) ? JSON.parse(fs.readFileSync(path.join(dir, 'cut.json'), 'utf8')) : null;
-  const out = { topic: 'drd-h4-2020', built: new Date().toISOString().slice(0, 10), verdict, headline, params: P, markets: MARKETS,
+  const out = { topic: 'drd-h4-2020', judgedOn: 'R before costs (amendment before the run)', built: new Date().toISOString().slice(0, 10), verdict, headline, params: P, markets: MARKETS,
     windows: { discovery: '2020-01-01..2023-12-31', confirmation: '2024-01-01..' + new Date(Math.max(...per.map((x) => x.last)) * 1000).toISOString().slice(0, 10) },
     tests: Object.fromEntries(Object.entries(tests).map(([k, j]) => [k, slim(j)])), perMarket: rows, gold: rows.find((r) => r.market === 'xau'), cutTest: cut };
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1) + '\n');
