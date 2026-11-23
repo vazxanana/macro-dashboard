@@ -2,6 +2,11 @@
 
 **Verdict: FAIL. 0 of 3 tests pass: the barrier retest on H1 boxes made -0.020R a trade after costs in 2024-2026 (n 3,354, month t -0.29), on H4 boxes -0.035R (n 283, month t -0.20), the sweep reversal -0.252R (n 94, month t -1.49).**
 
+**Before costs (the owner asked for this judgement on 23 Nov 2026, after the run): also FAIL, 0 of 3.** Same bar on R before
+costs: T1 2020-2023 -0.039R (n 4,728, month t -0.68), 2024-now +0.032R (n 3,354, t 0.47); T2 -0.148R (n 497, t -0.81) and
+-0.010R (n 283, t -0.06); T3 +0.092R (n 157, t 0.62) and -0.207R (n 94, t -1.23). No window of any test reaches t 1. The
+pre-registered verdict (after costs) stays as written above; the request came after the result, so nothing was re-chosen.
+
 Pre-registered in PREREGISTRATION.md (committed alone before any run). OANDA mid 5-minute candles of 18 markets, H1 / H4
 resampled, D1 = 17:00 New York days; trades filled 2020-01-01 to 2026-11-23; discovery 2020-2023, confirmation 2024 on; costs of
 `combo-grid-2`, data-quality exclusions applied. Target = the nearest standing H4 / D1 engulf or failed-engulf zone, 3R or more.
