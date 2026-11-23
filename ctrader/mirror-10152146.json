@@ -14,7 +14,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "position",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-20T20:36:37.000Z",
     "councilEntry": 67.39,
     "stop": 75.86303571428572,
@@ -29,10 +29,12 @@
     "slipR": 0.009,
     "lagSec": 76,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-20T20:36:37.000Z",
-    "brokerStop": 75.786
+    "brokerStop": 75.786,
+    "closedAt": "2026-11-23T14:01:09.000Z"
    },
    "sol-position-1795231964": {
     "symbol": "SOLUSD",
@@ -44,7 +46,8 @@
     "t1": 50.33164285714287,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 67.37,
@@ -59,7 +62,8 @@
     "lagSec": 173,
     "positionId": "50661044",
     "volume": 1000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-23T14:01:09.000Z"
    },
    "eth-rswing-1795243694": {
     "symbol": "ETHUSD",
@@ -337,7 +341,7 @@
    "startBalance": 10023.08
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10034.41 · 6 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9857.28 · 4 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -372,8 +376,8 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 10034.41,
-  "lastRun": "2026-11-23T13:58:04.000Z"
+  "balance": 9857.28,
+  "lastRun": "2026-11-23T14:01:09.000Z"
  },
  "log": [
   {
@@ -601,6 +605,16 @@
    "at": "2026-11-23T13:58:04.000Z",
    "msg": "BTCUSD position 50666017 closed at the broker",
    "trade": "btc-rswing-1795341600"
+  },
+  {
+   "at": "2026-11-23T14:01:09.000Z",
+   "msg": "SOLUSD position 50646165 closed at the broker",
+   "trade": "sol-position-1795206921"
+  },
+  {
+   "at": "2026-11-23T14:01:09.000Z",
+   "msg": "SOLUSD position 50661044 closed at the broker",
+   "trade": "sol-position-1795231964"
   }
  ],
  "limits": {
