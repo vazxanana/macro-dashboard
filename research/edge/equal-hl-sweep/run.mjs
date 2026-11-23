@@ -205,9 +205,17 @@ function resultMd(o, rows) {
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push(`${o.passed.length} cells clear the pre-registered bar before costs, including beating a single swing taken the same way. ${o.passedNetPositive.length ? o.passedNetPositive.length + ' stay positive after costs in both windows.' : 'None stays positive after costs in both windows: it is a before-cost tilt, not something to trade.'}`,
     'Nothing is adopted; a forward record or a live change needs the owner.');
-  else L.push('No cell clears the bar. Whatever the sweep or the break of a pool does before costs, an equal pool is not measurably',
-    'better than one swing taken the same way, in both decades, so "equal highs / lows" adds nothing to a plain swing sweep on',
-    'these readings. Do not re-test variants of these 48 cells on these years. Nothing live changed; no rule is proposed.');
+  else {
+    const sw = rows.filter((r) => r.type === 'sweep'), br = rows.filter((r) => r.type === 'break');
+    L.push(`No cell clears the bar. **Sweeps**: traded back, a swept pool makes about zero before costs and does not beat a single`,
+      `swing swept the same way (${sw.filter((r) => r.checks.control).length} of 36 sweep cells beat the control in both windows; in the M15 "other hours" cells the single`,
+      'swing does better). **Breaks**: traded with the break, an equal pool loses less than a single swing broken the same way',
+      `(${br.filter((r) => r.checks.control).length} of 12 break cells beat the control in both windows), but the pool breaks themselves are about zero or negative`,
+      'before costs (every break cell between -0.05R and +0.14R a trade, none with a month t of 2 in both windows): "loses less than the control" is not',
+      'a trade. After costs every cell loses in the confirmation window. Silver: about a third of its events had a risk under the',
+      'ASSUMED round trip and were no trades. Do not re-test variants of these 48 cells on these years. Nothing live changed; no rule',
+      'is proposed.');
+  }
   L.push('');
   return L.join('\n');
 }
