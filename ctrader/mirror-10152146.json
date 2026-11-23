@@ -299,6 +299,35 @@
     "status": "open",
     "stopCheckedAt": "2026-11-23T13:03:17.000Z",
     "brokerStop": 1.431
+   },
+   "gbpusd-swing-1795439248": {
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "setup": "swing",
+    "openedAt": "2026-11-23T13:08:33.000Z",
+    "councilEntry": 1.30783,
+    "stop": 1.3145941785714286,
+    "t1": 1.294301642857143,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.30783,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 6.76,
+    "margin": 2.62,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 1.30784,
+    "slipR": -0.001,
+    "lagSec": 65,
+    "positionId": "50814724",
+    "volume": 100000,
+    "status": "open",
+    "stopCheckedAt": "2026-11-23T13:08:33.000Z",
+    "brokerStop": 1.31459
    }
   },
   "day": {
@@ -306,7 +335,7 @@
    "startBalance": 10023.08
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 10023.08 · 6 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 10023.08 · 7 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -342,7 +371,7 @@
   },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 10023.08,
-  "lastRun": "2026-11-23T13:06:00.000Z"
+  "lastRun": "2026-11-23T13:08:33.000Z"
  },
  "log": [
   {
@@ -555,6 +584,16 @@
    "at": "2026-11-23T13:03:17.000Z",
    "msg": "limit filled at once: USDCAD position 50813606 at the broker at 1.43572",
    "trade": "usdcad-position-1795438935"
+  },
+  {
+   "at": "2026-11-23T13:08:33.000Z",
+   "msg": "placed sell limit GBPUSD 0.01 lot at 1.30783 (council swing, valid to 2026-11-25T13:07Z)",
+   "trade": "gbpusd-swing-1795439248"
+  },
+  {
+   "at": "2026-11-23T13:08:33.000Z",
+   "msg": "limit filled at once: GBPUSD position 50814724 at the broker at 1.30784",
+   "trade": "gbpusd-swing-1795439248"
   }
  ],
  "limits": {
@@ -634,11 +673,11 @@
   ]
  },
  "execution": {
-  "n": 10,
+  "n": 11,
   "meanSlipR": 0.001,
   "medianSlipR": -0.001,
   "worstSlipR": 0.034,
-  "medianLagSec": 95.5,
+  "medianLagSec": 76,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -657,7 +696,7 @@
     "meanSlipR": -0.004
    },
    "GBPUSD": {
-    "n": 1,
+    "n": 2,
     "meanSlipR": -0.001
    }
   }
