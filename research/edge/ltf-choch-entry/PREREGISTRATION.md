@@ -62,3 +62,12 @@ pre-registration on other data. Never call a pass an edge beyond its n and t; a 
 Every output uses candles closed by its moment: zones at their close, the ChoCh at its candle's close, the extreme from candles
 closed by the ChoCh close. An offline test runs the whole rule on synthetic candles, changes every price after a cut and checks
 that every trade closed before the cut is unchanged; another checks every trade's stop is on its losing side.
+
+## Amendment before the run (23 Nov 2026)
+The owner asked for the judgement BEFORE costs ("forget the costs, I only want to know before costs"). Committed before the
+full run. Every pass / fail bar above (means, month-sum t, Welch t, Holm) is applied to R **before costs**; the condition
+"positive at twice the cost" is dropped. The after-cost figures and the twice-cost figures are reported beside, with no
+verdict. Costs still set the stop's half-cost buffer and the 2 x cost size floor (the rule itself is unchanged).
+Said plainly: before this amendment one smoke run of the code was made on gold alone, with 1-minute candles for 2019-2020 only
+(to check the code runs); its pooled 2020-26 figures for gold were seen (2R before costs about +0.03R a trade on M15, +0.005R
+on M5, -0.02R on M1). No other market, window split or test statistic was computed.
