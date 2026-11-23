@@ -74,7 +74,9 @@
   // the Mosha desk's own markets (owner, 21 Nov 2026: "mosha keep gold and eurusd and gbpusd"); MARKETS stays the Engulfing desk's five
   var MOSHA = ['xau'];   // owner, 22 Nov 2026: "mosha drop GU keep only gold" (EUR/USD and GBP/USD leave the Mosha desk)
   var ALL = { xau: MARKETS.xau, xag: MARKETS.xag, eurusd: MARKETS.eurusd, gbpusd: MARKETS.gbpusd, nas100: MARKETS.nas100, usdjpy: { name: 'USD/JPY', dec: 3 }, audusd: { name: 'AUD/USD', dec: 5 }, usdcad: { name: 'USD/CAD', dec: 5 },
-    spx500: { name: 'S&P 500', dec: 1 }, us30: { name: 'Dow 30', dec: 1 }, de40: { name: 'DAX 40', dec: 1 } };
+    spx500: { name: 'S&P 500', dec: 1 }, us30: { name: 'Dow 30', dec: 1 }, de40: { name: 'DAX 40', dec: 1 },
+    // the passing-edge desks' other three markets (23 Nov 2026); the LIT and MSNR desks keep their eleven (council/edge-desks.mjs ELEVEN)
+    nzdusd: { name: 'NZD/USD', dec: 5 }, usdchf: { name: 'USD/CHF', dec: 5 }, eurjpy: { name: 'EUR/JPY', dec: 3 } };
   var REF = 4000, mkOf = function (k) { return ALL[k] ? k : 'xau'; };
   var sizes = function (k, px) { var q = mkOf(k) === 'xau' ? 1 : px / REF; return { buf: BUF * q, rmin: 0.8 * q, rmax: 25 * q, zmin: 0.5 * q }; };
   var fmt = function (k) { var d = ALL[mkOf(k)].dec; return function (v) { return (+v).toFixed(d); }; };

@@ -6208,6 +6208,40 @@ Owner's answers: an engulf may take "as many candles as it needs"; keep the msnr
   has been read under too many definitions on 21 Nov to judge anything). Never present a desk total as evidence.
 - Tests: `tests/edge-desks.test.mjs`, `tests/mosha-sop.test.mjs`, `tests/mosha-tracker.test.mjs`, `tests/desk-exits.test.mjs`.
 
+## Desks for the passing edges (23 Nov 2026, owner: "the edges that pass make their own individual desk in the website with calendar and the trades from january till now")
+Seven new desks on the EXISTING desk machinery (no second mechanism): the desk switch is ICT | Mosha | LIT | Engulfing | MSNR | Break
+fade | Big-candle fade | Round-number fade | Box fade | FVG return | Gold breakout | USD/JPY breakout (views `#fade`, `#bigfade`,
+`#roundfade`, `#boxfade`, `#fvg`, `#goldvb`, `#jpyvb`, class `adm`, permission `desks`; `EDGE_DESKS` in the page's router lists every
+desk drawn by `assets/desk-trades.js`). Each shows the Open now panel, the trades with filters, tiles, the P&L calendar, the log and
+"Chart" (Before / After), and the live chart (`assets/desk-live.js`).
+- **Tracker** `council/edge-desks-2.mjs` (`DESKS2`, spread into `council/edge-desks.mjs` `DESKS`): one adapter a desk that runs the
+  study's OWN exported signal code (imported, never edited) on the tracker's OANDA 5-minute candles (every higher timeframe is built
+  from them the studies' way) and writes the usual records (id, market, kind, label, t, entry, stop, target, status, R before costs,
+  endT, log, marks). Rules: `fade` = grid7-wide-fade cell m15 none atr 2R all; `bigfade` = big-candle-fade m15 k1.5 nobreak half;
+  `roundfade` = round-number-breaks fade other 2R; `boxfade` = fade-breaks-holdout F1; `fvg` = grid7-fvg-wide 1h mkt large 1R (the
+  "large" cut = each market's 2005-14 median from the study's result.json); `goldvb` / `jpyvb` = the T1 breakout (the hourcost /
+  index-vol-breakout copies of `vbTrade`). `walk()` manages a position with ONE target in exactly the order of the studies' `exits()`
+  / `manage()` (a test compares R trade by trade); the study's own "risk under the round-trip cost" skip is kept. Every signal is a
+  trade, as the studies counted them (several open at once); a breakout day whose 21:00 UTC has not come is read as open. Kinds
+  `fade-m15`, `bigfade-m15`, `roundfade-m15`, `boxfade-m5`, `fvg-h1`, `goldvb-t1`, `jpyvb-t1` (`council/mosha-desk.mjs` `clean` takes
+  them; `merge`'s 20-minute "same trade re-read" rule never applies to them: two of their trades near in time are two trades).
+- **Markets**: the five fade / gap desks read the studies' ten (xau xag eurusd gbpusd usdjpy audusd nzdusd usdcad usdchf eurjpy);
+  `assets/mosha-sop.js` `ALL` gained nzdusd, usdchf, eurjpy for that, and the LIT and MSNR desks are pinned to their former eleven
+  (`ELEVEN` in edge-desks.mjs) so they read nothing new.
+- **Loop**: council.yml runs them on a line of their own every 3rd round, `timeout 150` (`--only fade,…,jpyvb`; one read of a
+  market's candles serves all seven, `main`'s `cache`); the older line is now `--only eg,msnr,lit` with its 280 s unchanged.
+  `--only` takes a comma list; `--from YYYY-MM-DD` starts the records there (the backfill: `--days 330 --from 2026-01-01`).
+- **History** (council-data, pushed 23 Nov 2026, light files + `detail/<day>.json`): from 1 Jan 2026 to 23 Nov, before costs: Break
+  fade 15,582 records (+0.073R a closed trade), Big-candle fade 4,328 (+0.180R), Round-number fade 12,567 (−0.007R), Box fade
+  11,048 (+0.033R), FVG return 4,323 (+0.071R), Gold breakout 175 (+0.300R; its 16 and 18 Nov trades equal the forward record's,
+  +0.756R and +3.575R), USD/JPY breakout 158 (+0.137R).
+- **Page text** says, per desk, the rule, its study and verdict in words (the five fade / gap rules passed before costs and LOSE after
+  costs; the breakouts passed at the broker's own quotes on in-sample years and their forward records are too short) and that the
+  desk is a paper record of the rule, not a trade signal. Never call a desk total an edge. `datahealth.mjs` lists the seven files (warn 6 h). Not in the
+  decision journal's Take / Skip list (`MS_JOURNAL.DESKS`) yet.
+- PAPER RECORDS ONLY: no order, alert, broker or mirror code; a record without its stop on the losing side is never stored.
+  Tests: `tests/edge-desks-2.test.mjs` (each adapter against its study's functions on a seeded market, stops, a cut test, wiring).
+
 ## H1 dominant zone on the Council demo account (23 Nov 2026, owner: "Do h1 dom (all markets) to one of the demo acc use the one with no trades active")
 `council/dom-demo.mjs` (council.yml: each round after the breakout job and each quick pass, `timeout 45`, never fails the round):
 the one family the three combination grids found before costs (`research/edge/combo-grid-3`), as a forward DEMO record. Zone = the

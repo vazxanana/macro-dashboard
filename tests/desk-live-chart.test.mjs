@@ -13,14 +13,15 @@ const rd = (p) => fs.readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 test('the page loads the asset after the desks\' card code, and every desk view has a grid to host it', () => {
   const page = rd('market-structure.html'), a = page.indexOf('<script src="/assets/desk-trades.js" defer></script>'), b = page.indexOf('<script src="/assets/desk-live.js" defer></script>');
   assert.ok(a > 0 && b > a, 'desk-live.js loads with defer after desk-trades.js');
-  for (const k of ['mosha', 'lit', 'eg', 'msnr']) {
+  for (const k of ['mosha', 'lit', 'eg', 'msnr', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb']) {
     const i = page.indexOf('id="v-' + k + '"'), j = page.indexOf('</section>', i); assert.ok(i > 0);
     assert.ok(page.slice(i, j).includes('class="mo-grid"'), k + ' has a .mo-grid');
   }
   // the borrowed replay slot of desk-trades.js stays as it was: the live chart makes its own host
-  assert.equal(page.split('<div class="mo-wide" data-dk="chart"></div>').length - 1, 3);
-  assert.equal(Object.keys(L.DESKS).join(), 'mosha,lit,eg,msnr');
-  assert.deepEqual(Object.values(L.DESKS).map((d) => d.file), ['mosha/desk.json', 'lit/desk.json', 'eg/desk.json', 'msnr/desk.json']);
+  assert.equal(page.split('<div class="mo-wide" data-dk="chart"></div>').length - 1, 10);   // three edge desks + the seven passing-edge desks (23 Nov 2026)
+  assert.equal(Object.keys(L.DESKS).join(), 'mosha,lit,eg,msnr,fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb');
+  assert.deepEqual(Object.values(L.DESKS).map((d) => d.file), ['mosha', 'lit', 'eg', 'msnr', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb'].map((k) => k + '/desk.json'));
+  assert.equal(Object.values(L.DESKS).filter((d) => d.passing).length, 7);
 });
 
 test('the asset parses, runs in Node without a page, and is display only', () => {
