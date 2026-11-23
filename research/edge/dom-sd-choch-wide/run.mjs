@@ -296,7 +296,13 @@ function resultMd(o, rows) {
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push('A passing cell is a candidate for its own forward record and an owner decision, nothing more: it is not adopted, and never called an edge before a forward record.');
   else L.push('No zone family confirmed by a change of character beats both its controls on ten markets over 22 years before costs.',
-    'Do not re-test variants of these 48 cells on these years. Nothing live changed; no rule is proposed.');
+    'Do not re-test variants of these 48 cells on these years. Nothing live changed; no rule is proposed.', '',
+    'How to read the controls (after the result, descriptive): no cell is positive with month t >= 2 in either window, so the',
+    'control comparisons cannot rescue any. Control (ii), the touch at market, is above zero before costs in several 4h cells (the',
+    'short pull-back `dom-touch-market` found); waiting for the change of character gives that up. Control (i) moves a lot with',
+    'the family (shifting 96 candles back lands before an engulf zone fails, or before a supply / demand base forms), so its Welch',
+    't says more about the shift than about the zone. The side-flipped placebo is mostly a few hundredths of an R above zero: as in',
+    '`grid7-wide-core`, entering WITH a lower-timeframe turn gives a little back before costs. After costs every cell loses.');
   L.push('');
   return L.join('\n');
 }
