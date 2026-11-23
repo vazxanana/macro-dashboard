@@ -237,6 +237,23 @@ function resultMd(o, rows) {
   else if (o.verdict === 'FAIL') L.push('Taking these plain triggers with the direction call did not do measurably better than taking them against it, on ten',
     'markets over 22 years, in both windows. Read simply, the call does not sort these entries into better and worse ones. Do not re-test',
     'variants of these 18 cells on these years. Nothing live changed; no rule is proposed.');
+  if (o.verdict !== 'PASS') { const b = rows.find((r) => r.name === o.best);
+    L.push('', `**The nearest cell.** ${b.name}: WITH beat AGAINST by ${f3(b.d.diff)}R a trade in 2005-14 (Welch t ${f2(b.d.welch)}) and`,
+      `${f3(b.c.diff)}R in 2015-26 (t ${f2(b.c.welch)}), but the month series of the difference reached t ${f2(b.d.month.t)} / ${f2(b.c.month.t)} and the`,
+      `Holm p is ${b.holm.toFixed(3)}: with hundreds of thousands of overlapping intraday trades the trade-level t overstates the evidence.`,
+      `Both sides lose before costs (WITH ${f3(b.c.with.mean)}R, AGAINST ${f3(b.c.against.mean)}R in 2015-26) and far more after them`,
+      `(${f3(b.c.with.meanNet)}R / ${f3(b.c.against.meanNet)}R): even a real tilt of a hundredth of an R would sort losing trades from slightly`,
+      'more losing ones.', '',
+      '**The fade.** Fading the triggers (stop just past the trigger candle) is above zero before costs at 2R on several cells and below',
+      'zero at 1R. Split by the call, no fade cell differs with Welch t >= 2 in both windows (the H4 engulf fades come nearest: t 0.56 /',
+      '2.26 at 1R, 1.35 / 1.98 at 2R, the fade WITH the call a little better). After costs every fade cell loses heavily, because its',
+      'stop is small against the round trip.', '',
+      '**Call age (seen after the fact, a hypothesis only).** On the H4 ladder the YOUNG calls (age at or under the median) put WITH',
+      'ahead of AGAINST in both windows on all six cells (t 0.94-2.97 in 2005-14, 2.08-4.63 in 2015-26), while the old calls flip from',
+      'positive in 2005-14 to slightly negative in 2015-26; on the H1 ladder the young calls put WITH BEHIND against in both windows',
+      '(t -1.44 to -7.34). These are trade-level t on overlapping trades, read after the run and not part of the bar; the WITH side still',
+      'loses before costs. A fresh H4 call as a filter would need its own pre-registration on other data before anyone reads it as more',
+      'than a pattern.'); }
   else L.push('Too few trades a side to judge most cells. Nothing live changed; no rule is proposed.');
   L.push('');
   return L.join('\n');
