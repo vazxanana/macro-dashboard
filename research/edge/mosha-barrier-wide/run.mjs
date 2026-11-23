@@ -260,8 +260,8 @@ function resultMd(o, rows) {
   else L.push('Taken at market, with no resting limit to be flattered by touch fills, the desk\'s barrier entry does not clear the bar on any of',
     'the 36 cells over ten markets and 22 years. Do not re-test variants of these cells on these years. Nothing live changed; no rule is proposed.',
     '', 'Before costs the barrier trades sit a few hundredths of an R under zero, like the bands placed at random, so the barrier picks no',
-    'better place than a random band of the same size; the side-flipped trades are only the mirror of that small loss and lose',
-    'after costs too. Silver: the desk\'s risk limits, scaled as a share of price, rule out most of its signals (column "outside risk',
+    'better place than a random band of the same size; the side-flipped trades are only the mirror of that small loss: after costs 29 of',
+    '36 flipped cells lose in 2015-26 and the other 7 are within noise of zero (best +0.057R, t 1.24). Silver: the desk\'s risk limits, scaled as a share of price, rule out most of its signals (column "outside risk',
     'limits"), so silver adds few trades; the verdict rests on the other nine markets.');
   L.push('');
   return L.join('\n');
