@@ -1,0 +1,1660 @@
+{
+ "study": "eg-methods-18-2020",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "0 of 6 readings pass: pooled over the six from 2024 on 27501 trades, −0.073R a trade after costs (month t -7.97); best T3 −0.018R (n 570, t -0.29).",
+ "system": "The Engulfing desk's zone readings (council/eg-methods.mjs methodTrades span any / next, efTrades) as the code stands on 23 Nov 2026; 18 markets; OANDA mid 5m; discovery 2020-2023, confirmation 2024 to the last candle; net of costs.",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy",
+  "xag",
+  "gbpjpy",
+  "eurgbp",
+  "audjpy",
+  "cadjpy",
+  "euraud",
+  "nas100",
+  "spx500",
+  "de40"
+ ],
+ "lastCandle": "2026-11-23T11:00",
+ "windows": {
+  "discovery": [
+   "2020-01-01",
+   "2023-12-31"
+  ],
+  "confirmation": [
+   "2024-01-01",
+   "2026-11-23"
+  ]
+ },
+ "trades": 66287,
+ "pooledConfirmation": {
+  "n": 27501,
+  "mean": -0.0732,
+  "total": -2012.44,
+  "win": 44.6,
+  "months": 35,
+  "tMonth": -7.97
+ },
+ "cutCheck": {
+  "ok": true,
+  "markets": {
+   "xau": [
+    {
+     "cut": "2021-07-01",
+     "full": 1453,
+     "cutRun": 1453,
+     "onlyFull": 0,
+     "onlyCut": 0,
+     "same": true
+    },
+    {
+     "cut": "2023-03-15",
+     "full": 3087,
+     "cutRun": 3087,
+     "onlyFull": 0,
+     "onlyCut": 0,
+     "same": true
+    },
+    {
+     "cut": "2025-05-20",
+     "full": 5048,
+     "cutRun": 5048,
+     "onlyFull": 0,
+     "onlyCut": 0,
+     "same": true
+    }
+   ]
+  }
+ },
+ "meta": {
+  "xau": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  },
+  "eurusd": {
+   "last": 1795431300,
+   "open": 2,
+   "excluded": 2
+  },
+  "gbpusd": {
+   "last": 1795431300,
+   "open": 1,
+   "excluded": 2
+  },
+  "usdjpy": {
+   "last": 1795431300,
+   "open": 2,
+   "excluded": 4
+  },
+  "audusd": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 3
+  },
+  "nzdusd": {
+   "last": 1795431300,
+   "open": 1,
+   "excluded": 0
+  },
+  "usdcad": {
+   "last": 1795431300,
+   "open": 2,
+   "excluded": 9
+  },
+  "usdchf": {
+   "last": 1795431300,
+   "open": 1,
+   "excluded": 7
+  },
+  "eurjpy": {
+   "last": 1795431300,
+   "open": 1,
+   "excluded": 0
+  },
+  "xag": {
+   "last": 1795431300,
+   "open": 2,
+   "excluded": 60
+  },
+  "gbpjpy": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  },
+  "eurgbp": {
+   "last": 1795431300,
+   "open": 2,
+   "excluded": 0
+  },
+  "audjpy": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  },
+  "cadjpy": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  },
+  "euraud": {
+   "last": 1795431600,
+   "open": 0,
+   "excluded": 0
+  },
+  "nas100": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  },
+  "spx500": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  },
+  "de40": {
+   "last": 1795431300,
+   "open": 0,
+   "excluded": 0
+  }
+ },
+ "tests": {
+  "T1": {
+   "kind": "eg-plan",
+   "what": "The plan (with the Daily)",
+   "discovery": {
+    "gross": {
+     "n": 14580,
+     "mean": -0.0092,
+     "total": -134.55,
+     "win": 49.6,
+     "months": 48,
+     "tMonth": -1.33
+    },
+    "net": {
+     "n": 14580,
+     "mean": -0.0505,
+     "total": -736,
+     "win": 49.6,
+     "months": 48,
+     "tMonth": -7.07
+    },
+    "net2": {
+     "n": 14580,
+     "mean": -0.0917,
+     "total": -1337.44,
+     "win": 49.6,
+     "months": 48,
+     "tMonth": -12.21
+    }
+   },
+   "confirmation": {
+    "gross": {
+     "n": 10378,
+     "mean": -0.0312,
+     "total": -324.22,
+     "win": 48.7,
+     "months": 35,
+     "tMonth": -2.77
+    },
+    "net": {
+     "n": 10378,
+     "mean": -0.0764,
+     "total": -793.24,
+     "win": 48.7,
+     "months": 35,
+     "tMonth": -6.63
+    },
+    "net2": {
+     "n": 10378,
+     "mean": -0.1216,
+     "total": -1262.26,
+     "win": 48.7,
+     "months": 35,
+     "tMonth": -10.15
+    },
+    "costR": 0.0452
+   },
+   "p": 1,
+   "byMarket": {
+    "xau": {
+     "n": 1250,
+     "mean": -0.212,
+     "total": -265.05
+    },
+    "eurusd": {
+     "n": 406,
+     "mean": -0.0029,
+     "total": -1.18
+    },
+    "gbpusd": {
+     "n": 467,
+     "mean": -0.0329,
+     "total": -15.37
+    },
+    "usdjpy": {
+     "n": 666,
+     "mean": -0.0752,
+     "total": -50.08
+    },
+    "audusd": {
+     "n": 346,
+     "mean": -0.0404,
+     "total": -13.97
+    },
+    "nzdusd": {
+     "n": 280,
+     "mean": -0.12,
+     "total": -33.6
+    },
+    "usdcad": {
+     "n": 382,
+     "mean": 0.0445,
+     "total": 17.01
+    },
+    "usdchf": {
+     "n": 298,
+     "mean": -0.0502,
+     "total": -14.96
+    },
+    "eurjpy": {
+     "n": 704,
+     "mean": -0.0249,
+     "total": -17.53
+    },
+    "xag": {
+     "n": 645,
+     "mean": -0.1653,
+     "total": -106.65
+    },
+    "gbpjpy": {
+     "n": 843,
+     "mean": -0.0899,
+     "total": -75.77
+    },
+    "eurgbp": {
+     "n": 129,
+     "mean": 0.1328,
+     "total": 17.13
+    },
+    "audjpy": {
+     "n": 557,
+     "mean": -0.0286,
+     "total": -15.93
+    },
+    "cadjpy": {
+     "n": 531,
+     "mean": -0.0506,
+     "total": -26.85
+    },
+    "euraud": {
+     "n": 646,
+     "mean": -0.008,
+     "total": -5.19
+    },
+    "nas100": {
+     "n": 957,
+     "mean": -0.0972,
+     "total": -93.04
+    },
+    "spx500": {
+     "n": 396,
+     "mean": 0.0195,
+     "total": 7.7
+    },
+    "de40": {
+     "n": 875,
+     "mean": -0.1142,
+     "total": -99.91
+    }
+   },
+   "byYear": {
+    "2020": {
+     "n": 3936,
+     "net": -211.15
+    },
+    "2021": {
+     "n": 3098,
+     "net": -174.58
+    },
+    "2022": {
+     "n": 4133,
+     "net": -235.94
+    },
+    "2023": {
+     "n": 3413,
+     "net": -114.32
+    },
+    "2024": {
+     "n": 3142,
+     "net": -190.63
+    },
+    "2025": {
+     "n": 3934,
+     "net": -300.63
+    },
+    "2026": {
+     "n": 3302,
+     "net": -301.98
+    }
+   },
+   "describe": {
+    "xau": {
+     "discovery": {
+      "n": 1368,
+      "mean": -0.0645,
+      "total": -88.28,
+      "win": 51.8,
+      "months": 48,
+      "tMonth": -2.4
+     },
+     "confirmation": {
+      "n": 1250,
+      "mean": -0.212,
+      "total": -265.05,
+      "win": 44.5,
+      "months": 35,
+      "tMonth": -4.81
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 607,
+      "mean": 0.0385,
+      "total": 23.36,
+      "win": 53,
+      "months": 48,
+      "tMonth": 0.99
+     },
+     "confirmation": {
+      "n": 406,
+      "mean": -0.0029,
+      "total": -1.18,
+      "win": 51,
+      "months": 35,
+      "tMonth": -0.06
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 834,
+      "mean": -0.0477,
+      "total": -39.76,
+      "win": 49,
+      "months": 48,
+      "tMonth": -1.4
+     },
+     "confirmation": {
+      "n": 467,
+      "mean": -0.0329,
+      "total": -15.37,
+      "win": 49.9,
+      "months": 35,
+      "tMonth": -0.67
+     }
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "discN100": true,
+    "discMeanPos": false,
+    "discT2": false,
+    "confN50": true,
+    "confMeanPos": false,
+    "confT2": false,
+    "confHolm": false,
+    "twiceCostPos": false
+   },
+   "verdict": "FAIL"
+  },
+  "T2": {
+   "kind": "eg-simple",
+   "what": "The short method (H4 zone, not with the Daily)",
+   "discovery": {
+    "gross": {
+     "n": 12806,
+     "mean": -0.0196,
+     "total": -250.62,
+     "win": 49.1,
+     "months": 48,
+     "tMonth": -2.39
+    },
+    "net": {
+     "n": 12806,
+     "mean": -0.0618,
+     "total": -791.17,
+     "win": 49.1,
+     "months": 48,
+     "tMonth": -7.34
+    },
+    "net2": {
+     "n": 12806,
+     "mean": -0.104,
+     "total": -1331.72,
+     "win": 49.1,
+     "months": 48,
+     "tMonth": -11.8
+    }
+   },
+   "confirmation": {
+    "gross": {
+     "n": 9313,
+     "mean": -0.0329,
+     "total": -306.24,
+     "win": 48.6,
+     "months": 35,
+     "tMonth": -3.12
+    },
+    "net": {
+     "n": 9313,
+     "mean": -0.079,
+     "total": -735.64,
+     "win": 48.6,
+     "months": 35,
+     "tMonth": -7.55
+    },
+    "net2": {
+     "n": 9313,
+     "mean": -0.1251,
+     "total": -1165.04,
+     "win": 48.6,
+     "months": 35,
+     "tMonth": -11.74
+    },
+    "costR": 0.0461
+   },
+   "p": 1,
+   "byMarket": {
+    "xau": {
+     "n": 1141,
+     "mean": -0.2294,
+     "total": -261.72
+    },
+    "eurusd": {
+     "n": 322,
+     "mean": 0.0853,
+     "total": 27.46
+    },
+    "gbpusd": {
+     "n": 365,
+     "mean": -0.0623,
+     "total": -22.74
+    },
+    "usdjpy": {
+     "n": 631,
+     "mean": -0.0295,
+     "total": -18.59
+    },
+    "audusd": {
+     "n": 240,
+     "mean": 0.0375,
+     "total": 9
+    },
+    "nzdusd": {
+     "n": 213,
+     "mean": -0.1075,
+     "total": -22.9
+    },
+    "usdcad": {
+     "n": 301,
+     "mean": -0.0732,
+     "total": -22.04
+    },
+    "usdchf": {
+     "n": 261,
+     "mean": 0.0767,
+     "total": 20.01
+    },
+    "eurjpy": {
+     "n": 668,
+     "mean": -0.0805,
+     "total": -53.8
+    },
+    "xag": {
+     "n": 634,
+     "mean": -0.1409,
+     "total": -89.33
+    },
+    "gbpjpy": {
+     "n": 748,
+     "mean": -0.047,
+     "total": -35.13
+    },
+    "eurgbp": {
+     "n": 113,
+     "mean": 0.0837,
+     "total": 9.45
+    },
+    "audjpy": {
+     "n": 489,
+     "mean": -0.0998,
+     "total": -48.82
+    },
+    "cadjpy": {
+     "n": 433,
+     "mean": -0.0828,
+     "total": -35.86
+    },
+    "euraud": {
+     "n": 582,
+     "mean": -0.0248,
+     "total": -14.42
+    },
+    "nas100": {
+     "n": 1040,
+     "mean": -0.1104,
+     "total": -114.77
+    },
+    "spx500": {
+     "n": 321,
+     "mean": -0.0609,
+     "total": -19.56
+    },
+    "de40": {
+     "n": 811,
+     "mean": -0.0516,
+     "total": -41.88
+    }
+   },
+   "byYear": {
+    "2020": {
+     "n": 3330,
+     "net": -195.32
+    },
+    "2021": {
+     "n": 2604,
+     "net": -168.2
+    },
+    "2022": {
+     "n": 3857,
+     "net": -225.45
+    },
+    "2023": {
+     "n": 3015,
+     "net": -202.19
+    },
+    "2024": {
+     "n": 2855,
+     "net": -221.75
+    },
+    "2025": {
+     "n": 3408,
+     "net": -251.94
+    },
+    "2026": {
+     "n": 3050,
+     "net": -261.95
+    }
+   },
+   "describe": {
+    "xau": {
+     "discovery": {
+      "n": 1413,
+      "mean": -0.1052,
+      "total": -148.63,
+      "win": 49.8,
+      "months": 48,
+      "tMonth": -3.53
+     },
+     "confirmation": {
+      "n": 1141,
+      "mean": -0.2294,
+      "total": -261.72,
+      "win": 43.6,
+      "months": 35,
+      "tMonth": -6.75
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 531,
+      "mean": -0.0445,
+      "total": -23.63,
+      "win": 48.8,
+      "months": 48,
+      "tMonth": -1.09
+     },
+     "confirmation": {
+      "n": 322,
+      "mean": 0.0853,
+      "total": 27.46,
+      "win": 55.3,
+      "months": 35,
+      "tMonth": 1.42
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 791,
+      "mean": -0.0814,
+      "total": -64.35,
+      "win": 47.3,
+      "months": 48,
+      "tMonth": -2.16
+     },
+     "confirmation": {
+      "n": 365,
+      "mean": -0.0623,
+      "total": -22.74,
+      "win": 48.2,
+      "months": 35,
+      "tMonth": -1.15
+     }
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "discN100": true,
+    "discMeanPos": false,
+    "discT2": false,
+    "confN50": true,
+    "confMeanPos": false,
+    "confT2": false,
+    "confHolm": false,
+    "twiceCostPos": false
+   },
+   "verdict": "FAIL"
+  },
+  "T3": {
+   "kind": "eg-direct",
+   "what": "The direct entry (fresh zones, M5 EF trail)",
+   "discovery": {
+    "gross": {
+     "n": 848,
+     "mean": 0.0252,
+     "total": 21.41,
+     "win": 48.2,
+     "months": 48,
+     "tMonth": 0.7
+    },
+    "net": {
+     "n": 848,
+     "mean": -0.0143,
+     "total": -12.15,
+     "win": 46.1,
+     "months": 48,
+     "tMonth": -0.4
+    },
+    "net2": {
+     "n": 848,
+     "mean": -0.0539,
+     "total": -45.71,
+     "win": 43.4,
+     "months": 48,
+     "tMonth": -1.51
+    }
+   },
+   "confirmation": {
+    "gross": {
+     "n": 570,
+     "mean": 0.0233,
+     "total": 13.26,
+     "win": 45.6,
+     "months": 35,
+     "tMonth": 0.37
+    },
+    "net": {
+     "n": 570,
+     "mean": -0.0184,
+     "total": -10.48,
+     "win": 43.9,
+     "months": 35,
+     "tMonth": -0.29
+    },
+    "net2": {
+     "n": 570,
+     "mean": -0.0601,
+     "total": -34.23,
+     "win": 40.9,
+     "months": 35,
+     "tMonth": -0.94
+    },
+    "costR": 0.0417
+   },
+   "p": 0.61321,
+   "byMarket": {
+    "xau": {
+     "n": 51,
+     "mean": -0.1483,
+     "total": -7.56
+    },
+    "eurusd": {
+     "n": 26,
+     "mean": -0.0338,
+     "total": -0.88
+    },
+    "gbpusd": {
+     "n": 22,
+     "mean": 0.0188,
+     "total": 0.41
+    },
+    "usdjpy": {
+     "n": 33,
+     "mean": 0.2708,
+     "total": 8.94
+    },
+    "audusd": {
+     "n": 19,
+     "mean": -0.0447,
+     "total": -0.85
+    },
+    "nzdusd": {
+     "n": 21,
+     "mean": -0.0559,
+     "total": -1.17
+    },
+    "usdcad": {
+     "n": 22,
+     "mean": -0.1039,
+     "total": -2.29
+    },
+    "usdchf": {
+     "n": 17,
+     "mean": 0.1418,
+     "total": 2.41
+    },
+    "eurjpy": {
+     "n": 29,
+     "mean": -0.2702,
+     "total": -7.84
+    },
+    "xag": {
+     "n": 32,
+     "mean": -0.0134,
+     "total": -0.43
+    },
+    "gbpjpy": {
+     "n": 31,
+     "mean": -0.1067,
+     "total": -3.31
+    },
+    "eurgbp": {
+     "n": 10,
+     "mean": -0.1823,
+     "total": -1.82
+    },
+    "audjpy": {
+     "n": 30,
+     "mean": -0.0059,
+     "total": -0.18
+    },
+    "cadjpy": {
+     "n": 30,
+     "mean": 0.2191,
+     "total": 6.57
+    },
+    "euraud": {
+     "n": 37,
+     "mean": -0.0002,
+     "total": -0.01
+    },
+    "nas100": {
+     "n": 68,
+     "mean": 0.1299,
+     "total": 8.83
+    },
+    "spx500": {
+     "n": 41,
+     "mean": 0.1269,
+     "total": 5.2
+    },
+    "de40": {
+     "n": 51,
+     "mean": -0.3239,
+     "total": -16.52
+    }
+   },
+   "byYear": {
+    "2020": {
+     "n": 196,
+     "net": -9.75
+    },
+    "2021": {
+     "n": 205,
+     "net": 4.46
+    },
+    "2022": {
+     "n": 264,
+     "net": 6.77
+    },
+    "2023": {
+     "n": 183,
+     "net": -13.64
+    },
+    "2024": {
+     "n": 165,
+     "net": -8.47
+    },
+    "2025": {
+     "n": 225,
+     "net": -24.59
+    },
+    "2026": {
+     "n": 180,
+     "net": 22.57
+    }
+   },
+   "describe": {
+    "xau": {
+     "discovery": {
+      "n": 73,
+      "mean": 0.0965,
+      "total": 7.04,
+      "win": 38.4,
+      "months": 48,
+      "tMonth": 0.45
+     },
+     "confirmation": {
+      "n": 51,
+      "mean": -0.1483,
+      "total": -7.56,
+      "win": 17.6,
+      "months": 33,
+      "tMonth": -0.42
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 40,
+      "mean": -0.0107,
+      "total": -0.43,
+      "win": 55,
+      "months": 40,
+      "tMonth": -0.08
+     },
+     "confirmation": {
+      "n": 26,
+      "mean": -0.0338,
+      "total": -0.88,
+      "win": 53.8,
+      "months": 31,
+      "tMonth": -0.34
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 57,
+      "mean": -0.0056,
+      "total": -0.32,
+      "win": 54.4,
+      "months": 47,
+      "tMonth": -0.06
+     },
+     "confirmation": {
+      "n": 22,
+      "mean": 0.0188,
+      "total": 0.41,
+      "win": 45.5,
+      "months": 35,
+      "tMonth": 0.1
+     }
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "discN100": true,
+    "discMeanPos": false,
+    "discT2": false,
+    "confN50": true,
+    "confMeanPos": false,
+    "confT2": false,
+    "confHolm": false,
+    "twiceCostPos": false
+   },
+   "verdict": "FAIL"
+  },
+  "T4": {
+   "kind": "eg-plan-n",
+   "what": "The plan, next-candle engulf",
+   "discovery": {
+    "gross": {
+     "n": 4665,
+     "mean": -0.0283,
+     "total": -132.01,
+     "win": 48.7,
+     "months": 48,
+     "tMonth": -1.92
+    },
+    "net": {
+     "n": 4665,
+     "mean": -0.0692,
+     "total": -323,
+     "win": 48.7,
+     "months": 48,
+     "tMonth": -4.71
+    },
+    "net2": {
+     "n": 4665,
+     "mean": -0.1102,
+     "total": -513.99,
+     "win": 48.7,
+     "months": 48,
+     "tMonth": -7.47
+    }
+   },
+   "confirmation": {
+    "gross": {
+     "n": 3201,
+     "mean": 0.0184,
+     "total": 59.05,
+     "win": 51.1,
+     "months": 35,
+     "tMonth": 0.85
+    },
+    "net": {
+     "n": 3201,
+     "mean": -0.0246,
+     "total": -78.81,
+     "win": 51.1,
+     "months": 35,
+     "tMonth": -1.12
+    },
+    "net2": {
+     "n": 3201,
+     "mean": -0.0677,
+     "total": -216.67,
+     "win": 51.1,
+     "months": 35,
+     "tMonth": -3.06
+    },
+    "costR": 0.0431
+   },
+   "p": 0.86472,
+   "byMarket": {
+    "xau": {
+     "n": 302,
+     "mean": -0.0603,
+     "total": -18.2
+    },
+    "eurusd": {
+     "n": 131,
+     "mean": 0.0785,
+     "total": 10.29
+    },
+    "gbpusd": {
+     "n": 159,
+     "mean": 0.1431,
+     "total": 22.76
+    },
+    "usdjpy": {
+     "n": 211,
+     "mean": -0.0504,
+     "total": -10.63
+    },
+    "audusd": {
+     "n": 123,
+     "mean": 0.102,
+     "total": 12.54
+    },
+    "nzdusd": {
+     "n": 105,
+     "mean": 0.0559,
+     "total": 5.87
+    },
+    "usdcad": {
+     "n": 126,
+     "mean": 0.0084,
+     "total": 1.06
+    },
+    "usdchf": {
+     "n": 126,
+     "mean": 0.0173,
+     "total": 2.18
+    },
+    "eurjpy": {
+     "n": 227,
+     "mean": -0.0465,
+     "total": -10.57
+    },
+    "xag": {
+     "n": 210,
+     "mean": -0.1579,
+     "total": -33.17
+    },
+    "gbpjpy": {
+     "n": 242,
+     "mean": -0.123,
+     "total": -29.78
+    },
+    "eurgbp": {
+     "n": 48,
+     "mean": 0.1763,
+     "total": 8.46
+    },
+    "audjpy": {
+     "n": 180,
+     "mean": -0.0928,
+     "total": -16.7
+    },
+    "cadjpy": {
+     "n": 179,
+     "mean": -0.106,
+     "total": -18.97
+    },
+    "euraud": {
+     "n": 187,
+     "mean": 0.0583,
+     "total": 10.9
+    },
+    "nas100": {
+     "n": 299,
+     "mean": 0.0035,
+     "total": 1.03
+    },
+    "spx500": {
+     "n": 116,
+     "mean": 0.0672,
+     "total": 7.79
+    },
+    "de40": {
+     "n": 230,
+     "mean": -0.103,
+     "total": -23.69
+    }
+   },
+   "byYear": {
+    "2020": {
+     "n": 1208,
+     "net": -76.99
+    },
+    "2021": {
+     "n": 1018,
+     "net": -77.13
+    },
+    "2022": {
+     "n": 1307,
+     "net": -131.85
+    },
+    "2023": {
+     "n": 1132,
+     "net": -37.03
+    },
+    "2024": {
+     "n": 991,
+     "net": -63.14
+    },
+    "2025": {
+     "n": 1236,
+     "net": -2.36
+    },
+    "2026": {
+     "n": 974,
+     "net": -13.32
+    }
+   },
+   "describe": {
+    "xau": {
+     "discovery": {
+      "n": 436,
+      "mean": -0.1765,
+      "total": -76.95,
+      "win": 46.3,
+      "months": 48,
+      "tMonth": -3.36
+     },
+     "confirmation": {
+      "n": 302,
+      "mean": -0.0603,
+      "total": -18.2,
+      "win": 52,
+      "months": 35,
+      "tMonth": -1.1
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 201,
+      "mean": -0.0567,
+      "total": -11.39,
+      "win": 48.3,
+      "months": 48,
+      "tMonth": -0.68
+     },
+     "confirmation": {
+      "n": 131,
+      "mean": 0.0785,
+      "total": 10.29,
+      "win": 55,
+      "months": 35,
+      "tMonth": 0.86
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 256,
+      "mean": -0.1048,
+      "total": -26.83,
+      "win": 46.1,
+      "months": 48,
+      "tMonth": -1.71
+     },
+     "confirmation": {
+      "n": 159,
+      "mean": 0.1431,
+      "total": 22.76,
+      "win": 58.5,
+      "months": 35,
+      "tMonth": 1.69
+     }
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "discN100": true,
+    "discMeanPos": false,
+    "discT2": false,
+    "confN50": true,
+    "confMeanPos": false,
+    "confT2": false,
+    "confHolm": false,
+    "twiceCostPos": false
+   },
+   "verdict": "FAIL"
+  },
+  "T5": {
+   "kind": "eg-simple-n",
+   "what": "The short method, next-candle engulf",
+   "discovery": {
+    "gross": {
+     "n": 4147,
+     "mean": -0.003,
+     "total": -12.38,
+     "win": 20,
+     "months": 48,
+     "tMonth": -0.1
+    },
+    "net": {
+     "n": 4147,
+     "mean": -0.0435,
+     "total": -180.48,
+     "win": 20,
+     "months": 48,
+     "tMonth": -1.42
+    },
+    "net2": {
+     "n": 4147,
+     "mean": -0.0841,
+     "total": -348.58,
+     "win": 20,
+     "months": 48,
+     "tMonth": -2.75
+    }
+   },
+   "confirmation": {
+    "gross": {
+     "n": 2800,
+     "mean": -0.0252,
+     "total": -70.45,
+     "win": 19.6,
+     "months": 35,
+     "tMonth": -0.72
+    },
+    "net": {
+     "n": 2800,
+     "mean": -0.0686,
+     "total": -192.13,
+     "win": 19.6,
+     "months": 35,
+     "tMonth": -1.96
+    },
+    "net2": {
+     "n": 2800,
+     "mean": -0.1121,
+     "total": -313.82,
+     "win": 19.6,
+     "months": 35,
+     "tMonth": -3.2
+    },
+    "costR": 0.0435
+   },
+   "p": 0.97088,
+   "byMarket": {
+    "xau": {
+     "n": 278,
+     "mean": -0.2573,
+     "total": -71.54
+    },
+    "eurusd": {
+     "n": 117,
+     "mean": 0.0038,
+     "total": 0.45
+    },
+    "gbpusd": {
+     "n": 129,
+     "mean": -0.0964,
+     "total": -12.44
+    },
+    "usdjpy": {
+     "n": 192,
+     "mean": -0.1413,
+     "total": -27.12
+    },
+    "audusd": {
+     "n": 93,
+     "mean": -0.1601,
+     "total": -14.89
+    },
+    "nzdusd": {
+     "n": 87,
+     "mean": -0.1674,
+     "total": -14.57
+    },
+    "usdcad": {
+     "n": 112,
+     "mean": 0.4945,
+     "total": 55.39
+    },
+    "usdchf": {
+     "n": 75,
+     "mean": 0.3767,
+     "total": 28.25
+    },
+    "eurjpy": {
+     "n": 202,
+     "mean": -0.2281,
+     "total": -46.08
+    },
+    "xag": {
+     "n": 172,
+     "mean": 0.1209,
+     "total": 20.8
+    },
+    "gbpjpy": {
+     "n": 237,
+     "mean": -0.3178,
+     "total": -75.31
+    },
+    "eurgbp": {
+     "n": 41,
+     "mean": 0.0487,
+     "total": 2
+    },
+    "audjpy": {
+     "n": 160,
+     "mean": -0.0137,
+     "total": -2.2
+    },
+    "cadjpy": {
+     "n": 147,
+     "mean": -0.388,
+     "total": -57.04
+    },
+    "euraud": {
+     "n": 184,
+     "mean": -0.0785,
+     "total": -14.45
+    },
+    "nas100": {
+     "n": 251,
+     "mean": 0.1016,
+     "total": 25.5
+    },
+    "spx500": {
+     "n": 115,
+     "mean": 0.0967,
+     "total": 11.12
+    },
+    "de40": {
+     "n": 208,
+     "mean": 0.0001,
+     "total": 0.01
+    }
+   },
+   "byYear": {
+    "2020": {
+     "n": 1101,
+     "net": 1.53
+    },
+    "2021": {
+     "n": 893,
+     "net": -61.44
+    },
+    "2022": {
+     "n": 1173,
+     "net": -104.36
+    },
+    "2023": {
+     "n": 980,
+     "net": -16.21
+    },
+    "2024": {
+     "n": 917,
+     "net": -78.75
+    },
+    "2025": {
+     "n": 1031,
+     "net": -29.77
+    },
+    "2026": {
+     "n": 852,
+     "net": -83.61
+    }
+   },
+   "describe": {
+    "xau": {
+     "discovery": {
+      "n": 368,
+      "mean": -0.2314,
+      "total": -85.14,
+      "win": 17.4,
+      "months": 48,
+      "tMonth": -2.12
+     },
+     "confirmation": {
+      "n": 278,
+      "mean": -0.2573,
+      "total": -71.54,
+      "win": 16.9,
+      "months": 35,
+      "tMonth": -1.83
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 219,
+      "mean": -0.0873,
+      "total": -19.12,
+      "win": 18.7,
+      "months": 48,
+      "tMonth": -0.75
+     },
+     "confirmation": {
+      "n": 117,
+      "mean": 0.0038,
+      "total": 0.45,
+      "win": 20.5,
+      "months": 35,
+      "tMonth": 0.03
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 271,
+      "mean": 0.0204,
+      "total": 5.53,
+      "win": 21,
+      "months": 48,
+      "tMonth": 0.18
+     },
+     "confirmation": {
+      "n": 129,
+      "mean": -0.0964,
+      "total": -12.44,
+      "win": 18.6,
+      "months": 35,
+      "tMonth": -0.68
+     }
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "discN100": true,
+    "discMeanPos": false,
+    "discT2": false,
+    "confN50": true,
+    "confMeanPos": false,
+    "confT2": false,
+    "confHolm": false,
+    "twiceCostPos": false
+   },
+   "verdict": "FAIL"
+  },
+  "T6": {
+   "kind": "eg-ef",
+   "what": "H4 EF barrier to the next H4 EG",
+   "discovery": {
+    "gross": {
+     "n": 1740,
+     "mean": 0.0453,
+     "total": 78.74,
+     "win": 24.5,
+     "months": 48,
+     "tMonth": 0.97
+    },
+    "net": {
+     "n": 1740,
+     "mean": -0.0181,
+     "total": -31.47,
+     "win": 24.5,
+     "months": 48,
+     "tMonth": -0.38
+    },
+    "net2": {
+     "n": 1740,
+     "mean": -0.0814,
+     "total": -141.69,
+     "win": 24.5,
+     "months": 48,
+     "tMonth": -1.67
+    }
+   },
+   "confirmation": {
+    "gross": {
+     "n": 1239,
+     "mean": -0.1046,
+     "total": -129.66,
+     "win": 21.2,
+     "months": 35,
+     "tMonth": -2.29
+    },
+    "net": {
+     "n": 1239,
+     "mean": -0.1631,
+     "total": -202.13,
+     "win": 21.2,
+     "months": 35,
+     "tMonth": -3.55
+    },
+    "net2": {
+     "n": 1239,
+     "mean": -0.2216,
+     "total": -274.61,
+     "win": 21.2,
+     "months": 35,
+     "tMonth": -4.76
+    },
+    "costR": 0.0585
+   },
+   "p": 0.99942,
+   "byMarket": {
+    "xau": {
+     "n": 68,
+     "mean": -0.0211,
+     "total": -1.44
+    },
+    "eurusd": {
+     "n": 64,
+     "mean": -0.4006,
+     "total": -25.64
+    },
+    "gbpusd": {
+     "n": 69,
+     "mean": 0.1685,
+     "total": 11.62
+    },
+    "usdjpy": {
+     "n": 67,
+     "mean": -0.1795,
+     "total": -12.03
+    },
+    "audusd": {
+     "n": 73,
+     "mean": -0.1551,
+     "total": -11.32
+    },
+    "nzdusd": {
+     "n": 67,
+     "mean": -0.5281,
+     "total": -35.38
+    },
+    "usdcad": {
+     "n": 77,
+     "mean": 0.0027,
+     "total": 0.21
+    },
+    "usdchf": {
+     "n": 74,
+     "mean": -0.3809,
+     "total": -28.19
+    },
+    "eurjpy": {
+     "n": 72,
+     "mean": 0.2464,
+     "total": 17.74
+    },
+    "xag": {
+     "n": 76,
+     "mean": -0.6513,
+     "total": -49.5
+    },
+    "gbpjpy": {
+     "n": 65,
+     "mean": -0.4234,
+     "total": -27.52
+    },
+    "eurgbp": {
+     "n": 58,
+     "mean": -0.2332,
+     "total": -13.52
+    },
+    "audjpy": {
+     "n": 71,
+     "mean": -0.0852,
+     "total": -6.05
+    },
+    "cadjpy": {
+     "n": 62,
+     "mean": -0.2436,
+     "total": -15.1
+    },
+    "euraud": {
+     "n": 59,
+     "mean": -0.0639,
+     "total": -3.77
+    },
+    "nas100": {
+     "n": 72,
+     "mean": 0.0113,
+     "total": 0.82
+    },
+    "spx500": {
+     "n": 83,
+     "mean": -0.2176,
+     "total": -18.06
+    },
+    "de40": {
+     "n": 62,
+     "mean": 0.2419,
+     "total": 15
+    }
+   },
+   "byYear": {
+    "2020": {
+     "n": 412,
+     "net": 4.92
+    },
+    "2021": {
+     "n": 437,
+     "net": -88.86
+    },
+    "2022": {
+     "n": 415,
+     "net": 44.12
+    },
+    "2023": {
+     "n": 476,
+     "net": 8.35
+    },
+    "2024": {
+     "n": 455,
+     "net": -80.67
+    },
+    "2025": {
+     "n": 435,
+     "net": -65.9
+    },
+    "2026": {
+     "n": 349,
+     "net": -55.56
+    }
+   },
+   "describe": {
+    "xau": {
+     "discovery": {
+      "n": 98,
+      "mean": 0.1013,
+      "total": 9.93,
+      "win": 26.5,
+      "months": 48,
+      "tMonth": 0.49
+     },
+     "confirmation": {
+      "n": 68,
+      "mean": -0.0211,
+      "total": -1.44,
+      "win": 23.5,
+      "months": 35,
+      "tMonth": -0.09
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 109,
+      "mean": -0.0468,
+      "total": -5.1,
+      "win": 24.8,
+      "months": 48,
+      "tMonth": -0.3
+     },
+     "confirmation": {
+      "n": 64,
+      "mean": -0.4006,
+      "total": -25.64,
+      "win": 15.6,
+      "months": 34,
+      "tMonth": -1.89
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 104,
+      "mean": 0.1288,
+      "total": 13.4,
+      "win": 26.9,
+      "months": 48,
+      "tMonth": 0.65
+     },
+     "confirmation": {
+      "n": 69,
+      "mean": 0.1685,
+      "total": 11.62,
+      "win": 26.1,
+      "months": 35,
+      "tMonth": 0.53
+     }
+    }
+   },
+   "holm": 1,
+   "checks": {
+    "discN100": true,
+    "discMeanPos": false,
+    "discT2": false,
+    "confN50": true,
+    "confMeanPos": false,
+    "confT2": false,
+    "confHolm": false,
+    "twiceCostPos": false
+   },
+   "verdict": "FAIL"
+  }
+ }
+}
