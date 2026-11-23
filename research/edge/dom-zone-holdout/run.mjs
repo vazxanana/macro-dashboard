@@ -43,11 +43,18 @@ export function summ(rows, key) {
   return { n, before: +g.toFixed(4), tBefore: monthT(rows, key, false).t, after: +(g - c).toFixed(4), tAfter: monthT(rows, key, true).t };
 }
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const A = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd'], B = ['nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
+const A = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd'], B = ['nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
+// one market's trades to <dir>/<market>.json (run the ten side by side), then `report <dir>`
+if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === 'market') {
+  const m = process.argv[3], dir = process.argv[4]; fs.mkdirSync(dir, { recursive: true });
+  const o = A.includes(m) ? { a: trades(m, y(2010), y(2020)), b: trades(m, y(2005), y(2010)) } : { a: [], b: trades(m, y(2005), y(2020)) };
+  fs.writeFileSync(path.join(dir, m + '.json'), JSON.stringify(o)); console.log(m, o.a.length, o.b.length);
+}
+if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2] === 'report') {
+  const dir = process.argv[3];
   const setA = [], setB = [], perMarket = {};
-  for (const m of A) { const a = trades(m, y(2010), y(2020)), b = trades(m, y(2005), y(2010)); setA.push(...a); setB.push(...b); perMarket[m] = { '2010-19': summ(a, 'trail'), '2005-09': summ(b, 'trail') }; console.error(m, a.length, b.length); }
-  for (const m of B) { const b = trades(m, y(2005), y(2020)); setB.push(...b); perMarket[m] = { '2005-19': summ(b, 'trail') }; console.error(m, b.length); }
+  for (const m of A) { const { a, b } = JSON.parse(fs.readFileSync(path.join(dir, m + '.json'), 'utf8')); setA.push(...a); setB.push(...b); perMarket[m] = { '2010-19': summ(a, 'trail'), '2005-09': summ(b, 'trail') }; }
+  for (const m of B) { const { b } = JSON.parse(fs.readFileSync(path.join(dir, m + '.json'), 'utf8')); setB.push(...b); perMarket[m] = { '2005-19': summ(b, 'trail') }; }
   const A1 = setA.filter((r) => r.t < y(2015)), A2 = setA.filter((r) => r.t >= y(2015));
   const gold = setA.filter((r) => r.market === 'xau');
   const T1 = { early: summ(A1, 'trail'), late: summ(A2, 'trail') }, T2 = summ(setB, 'trail'), T3 = summ(gold, '4R');
