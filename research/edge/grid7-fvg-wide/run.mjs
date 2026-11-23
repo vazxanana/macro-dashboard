@@ -231,6 +231,20 @@ function resultMd(o, rows, bestC, bestBoth) {
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push('A passing cell is a candidate for its own holdout and forward record, nothing more: before costs only, not adopted, never called an edge',
     'before a forward record. The after-cost column is what an account would see.');
+  if (o.verdict === 'PASS') { const P = cells.filter((r) => r.pass), W = (r) => `${cname(r)} ${f3(r.c.meanNet)}R`;
+    const pm = Object.entries(o.perMarket).map(([c, l]) => `${c}: ${l.filter((x) => x.c.t >= 2).length} of 10 markets at month t >= 2 in 2015-26`);
+    L.push('', 'Read with care:', '',
+      `- Every passing cell is a market entry at the first M15 close back inside an H1 or H4 gap (${P.map(cname).join('; ')}); the`,
+      '  tilt is a few hundredths of an R before costs and it beats bands of the same height, so the gap itself adds a little.',
+      `- After costs every passing cell loses in 2015-26 (${P.map(W).join('; ')}). Nothing here can be traded at the demo`,
+      '  figures; it is the same family as the before-cost pull-back tilts of `grid7-wide-fade` and `dom-touch-market`.',
+      `- Per market (table above): ${pm.join('; ')}. Gold's H4 cells are about zero in 2015-26.`,
+      '- The trade-through limit at the gap\'s middle loses heavily on every timeframe (a candle that trades half a round trip',
+      '  through the middle of a small gap often reaches the stop in the same candle), and its random bands lose as much.',
+      `- The inverse gap traded against the gap loses; its side-flipped check (back WITH the old gap) clears bars 1-3 in ${o.flippedPassed.length}`,
+      '  cells. That is the flip of a losing rule before costs, not a tested rule, and it was not pre-registered as a cell.',
+      '- Next, if the owner wants it: the four cells on data this grid never read (other markets, a second feed), as',
+      '  `fade-new-markets` did for the fade rules. Do not re-test variants of these 54 cells on these years.'); }
   else L.push('No fair-value-gap cell clears the bar: on ten markets over 22 years, coming back to a gap, resting at its middle or',
     'trading the inverse gap does not beat random bands of the same height and distance in both windows. Do not re-test variants',
     'of these 54 cells on these years. Nothing live changed; no rule is proposed.');
