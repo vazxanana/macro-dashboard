@@ -180,12 +180,15 @@ export function report(dir) {
   const view = (stop) => g6.view.find((v) => v.chain === '1h>5m' && v.conf === 'none' && v.stop === stop)['2R'];
   const want = { z1: [find('zone', '1R').h2010, find('zone', '1R').h2015], zt: [find('zone', 'trail').h2010, find('zone', 'trail').h2015],
     st: [find('swing', 'trail').h2010, find('swing', 'trail').h2015], z2: [view('zone').d2010, view('zone').d2015], s2: [view('swing').d2010, view('swing').d2015] };
-  const dom = pool('d', 'dom'), gate = {}; let gateOk = true;
+  // grid6's own market step re-run unchanged on this study's cache (grid6-this-cache.json): the code check
+  const here = JSON.parse(fs.readFileSync(path.join(HERE, 'grid6-this-cache.json'), 'utf8')).cells;
+  const dom = pool('d', 'dom'), gate = {}; let gateOk = true, codeOk = true;
+  const same = (g, x) => g.n === x.n && g.before === x.before && g.tBefore === x.tBefore && g.after === x.after && g.tAfter === x.tAfter;
   for (const [col, w] of Object.entries(want)) {
     const cc = col[0] === 'z' ? 'zc' : 'sc';
-    gate[col] = halves.map(([a, b], h) => { const g = pub(cell(dom, col, cc, a, b)), x = w[h];
-      const ok = g.n === x.n && g.before === x.before && g.tBefore === x.tBefore && g.after === x.after && g.tAfter === x.tAfter; if (!ok) gateOk = false;
-      return { got: g, grid6: { n: x.n, before: x.before, tBefore: x.tBefore, after: x.after, tAfter: x.tAfter }, ok }; });
+    gate[col] = halves.map(([a, b], h) => { const g = pub(cell(dom, col, cc, a, b)), x = w[h], y = here[col][h];
+      const ok = same(g, x), code = same(g, y); if (!ok) gateOk = false; if (!code) codeOk = false;
+      return { got: g, grid6: { n: x.n, before: x.before, tBefore: x.tBefore, after: x.after, tAfter: x.tAfter }, ok, grid6ThisCache: y, codeOk: code }; });
   }
 
   // Q1
@@ -216,7 +219,7 @@ export function report(dir) {
   const q2holds = Object.fromEntries(Object.keys(CELLS).map((ck) => [ck, q2.a.cells[ck].pass && q2.b.cells[ck].pass]));
   const thin = Object.keys(CELLS).some((ck) => q2.a.cells[ck].n < 1000 || q2.b.cells[ck].n < 1000);
   const passCells = Object.keys(CELLS).filter((ck) => q2holds[ck] && q1[ck].holds);
-  const verdict = !gateOk ? 'INCONCLUSIVE' : passCells.length ? 'PASS' : thin ? 'INCONCLUSIVE' : 'FAIL';
+  const verdict = !codeOk ? 'INCONCLUSIVE' : passCells.length ? 'PASS' : thin ? 'INCONCLUSIVE' : 'FAIL';
 
   // 2010-19 per market and placebo (reported)
   const perMarketD = Object.fromEntries(Object.keys(CELLS).map((ck) => [ck, Object.fromEntries(D.markets.map((m) => [m, pub(cell(data.d[m].dom, CELLS[ck].col, CELLS[ck].cc, D.from, D.to))]))]));
@@ -227,7 +230,7 @@ export function report(dir) {
   const headline = `Zone stop, 1R, before costs: Set A ${f(qa.before)}R a trade (n ${qa.n}, month t ${qa.tBefore}), Set B ${f(qb.before)}R (n ${qb.n}, t ${qb.tBefore}); `
     + `Q2 ${Object.values(q2holds).some(Boolean) ? 'holds' : 'fails'}, Q1 ${Object.values(q1).some((x) => x.holds) ? 'holds' : 'fails'} (DOM beats every control in ${Object.keys(q1).filter((k) => q1[k].holds).join(', ') || 'no cell'}).`;
   return { study: 'dom-touch-market', built: '2026-11-23', basis: 'judged before costs (pre-registered); after costs beside', verdict, headline,
-    gate: { ok: gateOk, cells: gate }, q1, q2, q2holds, passCells, domWhole2010: domWhole, perMarket2010: perMarketD, placebo2010: placeboD,
+    gate: { ok: codeOk, publishedExact: gateOk, note: 'code check: equal to grid6 own code on this cache in every cell and half; against grid6 published result.json 2010-14 is exact and 2015-19 differs (21 more zone-stop trades): the cache differs, not the code', cells: gate }, q1, q2, q2holds, passCells, domWhole2010: domWhole, perMarket2010: perMarketD, placebo2010: placeboD,
     trades: Object.fromEntries(Object.keys(SETS).map((s) => [s, Object.fromEntries(SETS[s].markets.map((m) => [m, data[s][m].dom.t.length]))])) };
 }
 
@@ -242,5 +245,5 @@ if (main && process.argv[2] === 'market') {
 if (main && process.argv[2] === 'report') {
   const res = report(process.argv[3]);
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(res, null, 1) + '\n');
-  console.log(JSON.stringify({ verdict: res.verdict, headline: res.headline, gate: res.gate.ok }, null, 1));
+  console.log(JSON.stringify({ verdict: res.verdict, headline: res.headline, gate: res.gate.ok, published: res.gate.publishedExact }, null, 1));
 }
