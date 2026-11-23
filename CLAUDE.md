@@ -3460,6 +3460,24 @@ order), and `copiedIds` keeps any other account from copying those trades again.
 while it runs; `ctrader/accounts.json` labels it "Old shadows (draining)". Owner's choice of three: move the shadows and let the old
 account run its 6 open copies out. Remove the `drain` entry once that account holds nothing. Test: `tests/mirror-drain.test.mjs`.
 
+## Mosha 6R barrier on a demo account (23 Nov 2026, owner: "Mosha barrier 6 put it in one of the demo accounts on ctrader can be any one just swap with the one there previous")
+The old Shadows demo account 10152145 (drained since 20 Nov) is the `mosha6` book: `council/ctrader-accounts.json`
+`mirrorAccounts.mosha6`, `drain` empty. `council/ctrader-mirror.mjs` (the replica pattern): `BOOKS` + `'mosha6'`, `bookOf` = mosha6
+for ids starting `mosha6:`; `moshaCandidates(desk, nowS)` (pure) reads council-data `mosha/desk.json` `records`: the 6R barrier reading
+only (`isMosha6`: id `(^|:)bar-r6-`, the test of `assets/mosha-sop.js` `readings()`), gold only, a stop on the losing side (else
+dropped), open, or closed within `MOSHA6.keep` 2 days of its `endT` (so the copy is closed with its record); ONE record per side and
+fill time `t` (first in file order: several 6R records fill at the same second with near-identical levels, the account never doubles a
+position). Records are written once filled, so copies are market orders through the usual path (late-copy check against the snapshot
+mark with 1R = `r0`, stop-within-spread skip, `ensureStop`, every cap). Only a record the tracker first wrote (`first`) AND filled within
+`MOSHA6.fresh` 2 h may be OPENED; an older, replayed or Kraken-priced record (`feed: 'Kraken'`, PAXG levels a few dollars from spot) is
+`noCopy` with `noCopyWhy`, kept in the list so a copy made earlier follows its record. Candidates are added only while `moshaHasOwnAccount`
+(mosha6 on another account than council); a missing or unreadable desk file = none. Risk `LIMITS.risk.mosha6` 0.25 % of the balance a
+trade. The account's round still manages the old shadow copies it holds (every trade is passed to every account's round; `openBooks`
+limits only what it opens). `ctrader-account.mjs` label "Mosha 6R barrier"; `ctrader-reconcile.mjs` reads the desk file too (copies
+are not strangers; a noCopy record shows its reason). `forward.mjs` E5 reads the Council account only (unchanged). Demo only; a paper
+reading of the desk copied to a demo, not a tested edge. Tests: `tests/ctrader-mirror.test.mjs` ("Mosha 6R": 4),
+`tests/ctrader-reconcile.test.mjs`, `tests/mirror-drain.test.mjs`.
+
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
 1. After a market fill whose fill event shows no stop, the mirror waits `slWaitMs` (1.5 s) and reads the position back
@@ -5907,9 +5925,10 @@ Not checked live: the dispatch token's Actions: write, and the first real gotobi
 `tests/gotobi-demo.test.mjs`.
 **A third start, from the council loop (20 Nov 2026)**: the 20 Nov deploy log says `skip GH_DISPATCH_TOKEN (no repository secret)`,
 so the Worker's timer cannot start the job. After each round `council/gotobi-due.mjs` (read only; the Worker's `decide` and window,
-plus the study's calendar) answers yes on a gotobi weekday 00:25-00:49 UTC with no gotobi run active or started within the hour,
+plus the study's calendar) answers yes on a gotobi weekday 00:10-00:49 UTC (23 Nov 2026: was 00:25, only one loop round landed in it) with no gotobi run active or started within the hour,
 and `council.yml` dispatches main's `gotobi.yml` with the loop's own `actions: write` (never fails the round). Test:
 `tests/gotobi-due.test.mjs`.
+**23 Nov 2026, plumbing**: `gotobi.yml` 360 min; `connect()` closes its session on a refused connection and is retried (entry until 00:55:55, the 06:00 exit up to 6 times; never an order or a close retried); an exit that still cannot connect leaves the record open with `exitError` and the broker stop, closed by the next run. `vb-demo.mjs` writes a weekday with no order in its first 20 minutes as `missed` without connecting. `vb-forward.yml`: every record step after the first and Save run `if: !cancelled()`, so one failing record no longer throws the others away.
 **20 Nov 2026, the first gotobi morning was missed**: no run by 00:31 UTC (GitHub's cron late; the Worker's start had no
 `GH_DISPATCH_TOKEN`, which the deploy never copied), and a run started by hand at 00:31 stopped on `candles: HTTP 403` (the
 website's /md refused the runner). Now: `gotobi.yml` reads candles from its own localhost service (`scripts/own-candles.sh`, the
@@ -6511,3 +6530,139 @@ one canvas above the chart's, `pointer-events: none`, clipped to the price pane;
 (as Open now) and never built for a guest; not a `.card`, so the simple phone view keeps it open. Nothing stored (no browser
 storage), nothing written. No live ticks yet (the page's tick stream is the Charts market only). `MS_DESK_LIVE.state(k)` is the
 audit's read-only view. Test: `tests/desk-live-chart.test.mjs`.
+
+## H4 EF barrier to the next H4 EG, and the H4 engulf map on the live chart (23 Nov 2026, a gold example of 20-23 Nov)
+The example: the H4 sell engulf zone 3566.86-3595.29 (base 20 Nov 08:00 UTC) failed at the 04:00 H4 close of 23 Nov, so it is a
+buy barrier (an EF); price comes back into it, an M15 BO with it, long at the retest (a limit at the zone's top), stop below the zone,
+target the nearest H4 sell EG zone still standing above (3719.84-3744.55), 2R or more. A paper reading before costs, not a tested rule.
+- **Reading** `council/eg-methods.mjs` `efTrades(B, { from, market })` (`EFB`; kind `eg-ef`, label "H4 EF barrier → next H4 EG", id
+  `<market:>eg-ef-<b|s>-<zone base>`, `h` 4h, `l` 15m), the seventh reading of `DESKS.eg.read`. From `zones` (EG_SPAN 3) and
+  `turnBack` (now exported): a failed H4 zone serves the other side for 20 days and until an H4 close back through it; the return =
+  the first closed M15 candle from the fail that trades into it; the M15 BO = a 15-minute close beyond the last M15 A level (V for a
+  sell; a turn of the closes, 2 a side, known by the candle's open, not closed beyond since) AND out of the zone, within `EFB.wait` 48
+  candles and before a 15-minute close back through the far side; the order: a limit at the near side, stop past the far side by
+  `SOP.sizes().buf`, target the near side of the NEAREST H4 engulf zone of the other side standing at the order (no zone, or under
+  `EFB.minRR` 2R: no trade; a farther zone is never taken instead). Desk's choices, said in the code: the 20 days, the 48-candle BO
+  window, the order's life (`EFB.fill` 24 M15 candles, cancelled by a 15-minute close back through the zone or the target reached
+  first), one setup a barrier, one position at a time a market. On the fill candle only the stop counts. Marks (24 characters
+  stored): "H4 EF · buy barrier", "M15 A level · BO buy", "H4 sell EG · target". Page: chip "H4 EF barrier → next H4 EG" (`KN`) and the
+  "What this is" text in `assets/desk-trades.js`; the desk note. Stored records begin with the tracker's next run.
+- **The example**: `tests/fixtures/xau-ef-barrier-2026-11-23.json` = OANDA H4 from 15 Oct and 5-minute candles 20 Nov to 23 Nov 09:00
+  UTC. On them alone there is no trade: price had not come back to 3595.29 by 09:00 (the trade was still a resting idea). The test
+  adds a hand-made path (into the barrier, an M15 break, back to 3595.29, up to the target): entry 3595.29, stop 3566.56, target
+  3719.835 (4.34R), and the mirrored sell; cut tests (absent before the BO's close, unfilled before the fill candle, the same just
+  after it), a nearest opposite zone under 2R gives none, and the seeded-market checks of the other readings.
+- **H4 engulf map** (`assets/desk-live.js`, display only): on the Mosha and Engulfing desks' live chart (`DESKS[k].h4`) a toggle
+  "H4 zones" (`data-dl-h4`, on by default, not kept) draws right-extended boxes from H4 candles CLOSED by now (`h4Map(H, now)`): the
+  engulf zones still standing ("H4 sell EG zone", amber) and the failed ones still standing as a barrier ("H4 EF (failed sell → buy
+  barrier)", red), the three nearest above and below the last close and any it sits in, named at the right edge with their range. H4
+  candles: the chart's own on H4, else `/md/bars?…&tf=4h&n=300` at most once a minute. `egZones` is a page copy of `zones` +
+  `turnBack`, compared on seeded candles by `tests/desk-live-chart.test.mjs` (also the owner's zones on the fixture, closed candles
+  only); `MS_DESK_LIVE.state(k).h4` lists what is drawn. A map, not a signal.
+Tests: `tests/edge-desks.test.mjs` ("H4 EF barrier": 3), `tests/desk-live-chart.test.mjs` (3 new).
+
+## Box zone, the owner's box rule, tested (22 Nov 2026, owner: "the box is the high and low", "same process in lower timeframe", "no trend filter")
+`research/edge/box-zone/` (PREREGISTRATION.md committed alone first; `run.mjs fetch|run <dir>`, RESULT.md, result.json). A box = the
+high and low of the candles since the last close out of a box, following price until a close outside it (every timeframe). A
+Daily box that turns (breaks the other way from the break before) is a zone; price leaves and comes back; on H4 a box breaks
+against it (the test), then a box breaks with it: enter at that close, stop the other side of that H4 box, target the other
+side of the test box; no trend filter. OANDA 2010-2019, five markets, after the demo's costs: **FAIL, 1 of 4**: 1,029 trades,
+72 % won, -0.007R a trade (month t -0.29); before costs +0.006R; median target 0.35R. The 2020-26 look before it was in sample.
+Not a judgement of the owner's own choice of zones and boxes. Nothing live changed. Test: `tests/box-zone.test.mjs`.
+
+## Overnight studies (23 Nov 2026, owner: "improve every aspect of the edges ... at least 5 edges profitable long term")
+Twelve pre-registered studies of direction, entries and the market cycle, built from the owner's lessons of 22 Nov (box from swing
+low to swing high and its close outside, ChoCh as the start of a reversal, the Daily zone before a breakout, BO -> VR -> CF with QM
+breaks, the box-edge touch with the H1 / H4 side, the timeframe chain). PREREGISTRATION.md of each was committed alone first
+(27f35e08a); each runs on the shared toolkit `research/edge/_lib/edgekit.mjs` (OANDA mid 5m cache outside git, shared costs, swing
+structure, boxes, QM, month-sum t, Holm; `tests/edgekit.test.mjs`), windows 2010-19 replication / 2020-23 in sample / 2024 on out of
+sample, after costs. Every study was then audited by a separate reader trying to refute it (look-ahead on cut series, costs, fills,
+the pre-registration, every figure): no defect changed a verdict. **Bottom line: 0 of 12 pass. None is an edge; nothing live changed;
+no rule is proposed.** The two passing rules of the repository stay the gold and USD/JPY volatility breakouts (forward records running).
+OOS = out of sample, R a trade after costs, t of calendar-month sums:
+- `box-touch-trend`: limit at the edge of an M15 / M5 swing box on the H1 side, stop 0.2 x box, target the far edge. FAIL (n 4,950,
+  −0.199R, t −7.00; −0.068R before costs; 2010-19 −0.214R, n 16,858).
+- `daily-zone-retest`: the Daily box before a strong breakout candle, entered on an H1 box break on the return. FAIL (n 302, −0.030R,
+  t −0.36; before costs about zero; with the Weekly box side no better).
+- `storyline-qm-sop`: BO -> VR -> CF, VR and CF QM breaks, limit in the CF zone. INCONCLUSIVE (gold H1: 12 trades in 17 years, 1 OOS).
+- `h4-pullback-end`: the end of an H1 pullback (first H1 ChoCh back) inside an H4 trend, from the right half of the range. FAIL
+  (n 120, +0.125R, t 0.77; in sample −0.036R).
+- `vb-structure-filter`: gold / USD/JPY breakout only on the side of the H4 structure. FAIL (kept n 557, +0.124R, t 1.93, against the
+  unfiltered +0.143R; kept minus dropped Welch t −0.44): the structure side adds nothing to the two breakouts.
+- `direction-chain-gate`: the Daily / H4 / H1 chain (structure sides, or key-level taps) as a gate on a plain H1 box break, five
+  markets. FAIL, 0 of 4 (n 782, −0.049R, t −1.27): "agree with the chain" did not beat "disagree".
+- `barrier-qm-janda`: gold barrier, QM, the second break, limit at its engulf. FAIL (n 311, −0.101R, t −1.08; 2010-19 −0.166R).
+- `eg-chain-50`: H1 engulf zone -> M15 engulf -> M5 confirmation, limit at the middle. FAIL (n 1,031, −0.219R, t −2.06).
+- `session-sweep`: sweep of the Asia range, then an M5 QM back inside, target the other side. INCONCLUSIVE (n 27, −0.007R).
+- `storyline-daily-gold`: Daily rejection of a fresh level + H4 external break, limit at the H1 pullback QM. FAIL (n 16, −0.333R;
+  in sample −0.312R).
+- `trendline-qm`: H1 trendline break, retest, M15 QM. INCONCLUSIVE (n 6 OOS; 2010-19 −0.190R).
+- `regime-switch-book`: 22 of the night's method streams each kept only in the H4 regime (trend / range / pullback) it did best in,
+  chosen on 2020-23. FAIL (n 2,997, −0.066R, t −1.59; unfiltered −0.103R): no market-cycle label rescues the methods.
+What it teaches: before costs these entries sit at zero, so costs decide them; agreeing with the timeframe chain or the H4 side
+did not pick better trades on any of them (as `ltf-structure` and `desk-rigor` found); the strict storyline readings are too rare to
+judge. Never call any of these an edge, do not re-test variants on these years. Owner document:
+`research/proposals/2026-11-23-overnight-edges.md`. Tests: `tests/<topic>.test.mjs` for each.
+**Phase 2: holdout studies and the phase reader** (23 Nov 2026). Five hypotheses picked from an in-sample scan of the night's
+trades (private notes, not in the repository) were pre-registered (de6a84363) and run once on the UNTOUCHED holdout: Set A = the
+five read markets 2005-2009, Set B = NZD/USD, USD/CAD, USD/CHF, EUR/JPY, silver 2010 on (`edgekit` `HOLDOUT`, `HOLDOUT_MARKETS`;
+Set B costs ASSUMED, not measured). Five-study Holm over the primary p values. Each audited by a separate reader: no defect changed
+a verdict. **0 of 5 pass.** Pooled holdout, R a trade after costs, month-sum t:
+- `holdout-vb-early`: the gold / USD/JPY breakout rule, fills before 06:00 UTC only. FAIL (n 4,521, +0.063R, t 2.22, one-sided p
+  0.014; Set A +0.239R, Set B +0.012R; 2x costs −0.002R; Holm p 0.068). The nearest miss: early fills beat late ones on both
+  sets (early minus late +0.097R, Welch t 3.83), but NZD/USD, the cleanest slice, was −0.043R (n 1,070) and outside gold and
+  USD/JPY it is about zero after costs. A hypothesis, not an edge.
+- `holdout-pullback-deep`: the H4 pullback end only after the pullback passed the 50 % line. FAIL (n 607, −0.110R, t −1.65).
+- `holdout-phase-pick`: the phase reader chooses among box break / zone retest / pullback end. FAIL (n 6,233, −0.042R, t −2.82;
+  control without the choice −0.024R, n 13,391): the phase choice made it worse.
+- `holdout-h1-veto`: the breakout rule skipping days with a fresh H1 break against the fill. FAIL (n 19,454, −0.011R, t −1.14).
+- `holdout-weekly-fade`: with the Weekly, against the Daily, at a Daily level. FAIL (n 3,342, −0.007R, t −0.36).
+The phase reader `research/edge/_lib/phase.mjs` (`readPhase`, closed candles only: per D1 / H4 / H1 / M15 side, stage, BO / ChoCh,
+ranges and their 50 %, box, the storyline step below; `tests/phase.test.mjs`) is shown on Charts as the "Market phase" panel
+(`assets/ms-phase.js`, a copy compared by `tests/ms-phase.test.mjs`; display only, hidden for guests). A reading, not a tested rule.
+
+## Decision journal (23 Nov 2026, overnight)
+The design of `research/proposals/2026-11-20-discretion.md`: the studies say a person's edge, if any, is in the choosing, and only
+a choice stamped BEFORE the outcome can measure it. Practice and record only: nothing goes to a broker, the council or the mirror,
+no council member reads it, and nothing is kept in the browser.
+- **`api/journal.js`** (Vercel (req, res) shape, routed in `cloudflare/src/worker.mjs` `HANDLERS.journal` and `vercel.json`
+  functions; one private store file per account, `journal/<account>.json` (review 23 Nov 2026: one shared file let two accounts'
+  writes overwrite each other), overwritten in place, read with `?cache=0`, a failed read throws and is never saved over; one
+  account's writes run one at a time per instance (`TAILS`); `tests/blob-fresh.test.mjs` lists it). Who: the owner, and a member whose `perms.desks` is on (an explicit one
+  wins, else reviewers). GET = the account's OWN calls (the account key never leaves the server). POST same-origin:
+  `{ call: { market (xau eurusd gbpusd usdjpy audusd nas100 xag), side, action: take | skip, entry, stop, target?, tf, method
+  (<= 40), reason (<= 300), confidence 1-5, source? { desk, id } } }` → the SERVER stamps `at` (a sent `at` is ignored); a stop
+  not on the losing side (or a target not on the winning side) is refused; a call cannot be edited after its stamp (a body with
+  an `id` is refused), only `{ note: { id, text } }` (500 chars, `noteAt`); `{ remove: id }` only within `DELETE_S` 120 s of `at`,
+  and it WITHDRAWS (the record stays, `withdrawn` = the time; counted apart, never in taken / skipped: the proposal's "nothing is
+  deleted"). A stored file that is not a list throws (never saved over).
+  2,000 calls an account (no total cap, so members can never close it to the owner); 60 posts an account an hour (429).
+- **Rules, one copy** `assets/ms-journal.js` (pure; `window.MS_JOURNAL` on the page, re-exported by `api/_journal.js`): `check`,
+  `outcome(call, bars)` = candles that START at or after `at` only (never a forming one); the entry must be REACHED by one of them
+  (else `pending`, not scored: a call written with the price already past its entry cannot book a result); on the fill candle only
+  the stop counts; then stop first when one candle holds both, a gap through the stop fills at the open, then the target, else open
+  marked at the last close; `joinBars` = 5-minute candles for the first 14 days, hourly only from where they end (the result of a
+  call never changes as it ages); R before costs; a skip is scored
+  the same way (the counterfactual). `stats(rows)` = resolved calls only: taken vs skipped n, mean R, Welch t, by method and by
+  confidence; "too few to judge" under `MIN_SIDE` 20 a side; never the word edge for a result.
+- **Page** (`market-structure.html`, `<style id="ms-jr-css">` + `<script id="ms-jr-js">` before the structure assistant's block):
+  "Log a call" in the Charts toolbar (`#ms-jr-btn`, Style's CSS order; shown only when GET answers, so never for guests or
+  accounts without the desks permission), dialog `#ms-jr` (market from the page, side, take / skip, entry / stop / target
+  prefilled from the last one-minute close and the 15-minute ATR(14): 1 ATR stop, 2 ATR target; method, reason, confidence),
+  and the card "My calls" `#ms-jr-card` at the END of Home (after "More on the desk", so no first screen changes): the latest 40
+  calls with their outcome from `/md/bars` (5-minute candles for two weeks, then hourly joined after them; re-read every 2 minutes
+  while open or pending), the taken-vs-skipped line, "Add a note" (styled `msAsk`) and "Withdraw" in the first 2 minutes. Graphite tokens, 12 px min, 44 px on
+  touch. `window.msJournal()` is a read-only view.
+- **Take / Skip on the desks' own signals** (23 Nov 2026): every OPEN record row and Open now card of the Mosha, Engulfing, MSNR and
+  LIT desks carries an empty slot (`span.dc[data-dc][data-dc-r]`, `MS_MOSHA_SOP.dcSlot`, used by `assets/mosha-sop.js` and
+  `assets/desk-trades.js`); `#ms-jr-js` fills it, only once GET answered `canWrite`, with Take / Skip (or "Your call: …" when this
+  account already called that signal). Both open the SAME dialog in a small form (`openDlg(pre)`, class `jr-pre`: market, side,
+  levels, timeframe and method are the record's own and not shown as fields; a one-line reason (required there) and a confidence).
+  `MS_JOURNAL.fromRecord(desk, r)` builds the preset (market the journal takes, stop on the losing side, a wrong-side target
+  dropped, timeframe from `r.l`, method = the kind label, `source { desk, id }`; null for a closed record); `findCall` = the latest
+  call, withdrawn ones included. The server refuses a second call on the same desk signal by the same account (409), a withdrawn
+  one too (review 23 Nov 2026: Take, withdraw after a bad first move, then Skip would have hidden the first choice); the slot then
+  reads "Your call (withdrawn, kept on the record)", and `stats().withdrawnOut` gives what withdrawn calls went on to do, beside the split. The click is caught in the capture phase so a button inside an Open now card does not also open the chart. The journal's
+  own rule still applies: an open record's entry is usually already past, so its call counts only once price comes back to the
+  entry. Never for guests (`span.dc` hidden for the public role; the script returns there). Practice only.
+- Not built (the proposal's later steps): the study's report from this file. Tests: `tests/journal.test.mjs`, `tests/desk-calls.test.mjs`.

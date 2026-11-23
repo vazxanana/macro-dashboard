@@ -1,0 +1,1650 @@
+{
+ "study": "regime-switch-book",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "verdictT2": "FAIL",
+ "verdictT3": "FAIL",
+ "note": "R after each list's own costs (toolkit COSTS); t on calendar-month sums by exit month; windows by fill time; p two-sided; each kept trade 1R; before costs = the lists' R.",
+ "params": {
+  "swing": 3,
+  "knownMin": 12,
+  "boWithin": 30,
+  "minIS": 30,
+  "placebos": 200,
+  "seed": 20261123
+ },
+ "windows": {
+  "is": "2020-01-01..2023-12-31",
+  "oos": "2024-01-01..2026-11-13",
+  "repChoose": "2010-2015",
+  "repTest": "2016-2019"
+ },
+ "methods": 22,
+ "leftOut": [],
+ "regimeShare": {
+  "xau": {
+   "C": 766,
+   "T": 2001,
+   "X": 1603
+  },
+  "eurusd": {
+   "C": 805,
+   "T": 2008,
+   "X": 1568
+  },
+  "gbpusd": {
+   "C": 598,
+   "T": 2111,
+   "X": 1672
+  },
+  "usdjpy": {
+   "C": 941,
+   "T": 1773,
+   "X": 1668
+  },
+  "audusd": {
+   "C": 695,
+   "T": 1940,
+   "X": 1746
+  }
+ },
+ "T1": {
+  "book": {
+   "n": 2997,
+   "meanR": -0.0662,
+   "total": -198.291,
+   "tMonth": -1.5852,
+   "pMonth": 0.1222,
+   "months": 35,
+   "tTrade": -1.8829,
+   "maxDD": -229.039,
+   "mean2x": -0.1401,
+   "meanBefore": 0.0077
+  },
+  "isBook": {
+   "n": 3848,
+   "meanR": -0.0198,
+   "total": -76.0606,
+   "tMonth": -0.5876,
+   "pMonth": 0.5596,
+   "months": 48,
+   "tTrade": -0.7165,
+   "maxDD": -209.0395,
+   "mean2x": -0.0901,
+   "meanBefore": 0.0506
+  },
+  "unfiltered": {
+   "n": 13229,
+   "meanR": -0.1035,
+   "total": -1368.6419,
+   "tMonth": -5.4463,
+   "pMonth": 0,
+   "months": 35,
+   "tTrade": -6.2069,
+   "maxDD": -1438.767,
+   "mean2x": -0.1845,
+   "meanBefore": -0.0224
+  },
+  "dropped": {
+   "n": 10232,
+   "meanR": -0.1144,
+   "total": -1170.3509,
+   "tMonth": -5.7673,
+   "pMonth": 0,
+   "months": 35,
+   "tTrade": -6.0413,
+   "maxDD": -1217.1825,
+   "mean2x": -0.1976,
+   "meanBefore": -0.0312
+  },
+  "keptVsDropped": {
+   "t": 1.208,
+   "df": 4868.0241,
+   "p": 0.2271,
+   "diff": 0.0482,
+   "na": 2997,
+   "nb": 10232,
+   "meanA": -0.0662,
+   "meanB": -0.1144
+  },
+  "holmP": 1,
+  "placebo": {
+   "n": 200,
+   "beatShare": 0.595,
+   "p95": -0.0158,
+   "median": -0.0742,
+   "statistic": "book OOS mean R after costs"
+  },
+  "lines": {
+   "oosMean": false,
+   "oosT": false,
+   "holm": false,
+   "isMean": false,
+   "twoX": false,
+   "n30": true,
+   "keptBeatsDropped": false,
+   "aboveUnfiltered": true,
+   "placebo": false,
+   "repMean": false,
+   "repAbovePool": false
+  }
+ },
+ "T2": {
+  "book": {
+   "n": 2750,
+   "meanR": -0.0558,
+   "total": -153.4849,
+   "tMonth": -1.278,
+   "pMonth": 0.2099,
+   "months": 35,
+   "tTrade": -1.5306,
+   "maxDD": -186.5885,
+   "mean2x": -0.1312,
+   "meanBefore": 0.0196
+  },
+  "holmP": 1,
+  "anchoredFrom": "the first trade of each list"
+ },
+ "T3": {
+  "book": {
+   "n": 1325,
+   "meanR": -0.0032,
+   "total": -4.182,
+   "tMonth": -0.041,
+   "pMonth": 0.9676,
+   "months": 35,
+   "tTrade": -0.0495,
+   "maxDD": -103.664,
+   "mean2x": -0.0912,
+   "meanBefore": 0.0849
+  },
+  "unfiltered": {
+   "n": 5240,
+   "meanR": -0.0951,
+   "total": -498.0979,
+   "tMonth": -2.898,
+   "pMonth": 0.0065,
+   "months": 35,
+   "tTrade": -3.1477,
+   "maxDD": -502.1272,
+   "mean2x": -0.183,
+   "meanBefore": -0.0071
+  },
+  "holmP": 1
+ },
+ "replication": {
+  "methods": 22,
+  "book": {
+   "n": 3878,
+   "meanR": -0.139,
+   "total": -538.8633,
+   "tMonth": -4.574,
+   "pMonth": 0,
+   "months": 49,
+   "tTrade": -5.7926,
+   "maxDD": -579.1995,
+   "mean2x": -0.2253,
+   "meanBefore": -0.0526
+  },
+  "unfiltered": {
+   "n": 16109,
+   "meanR": -0.1252,
+   "total": -2017.3728,
+   "tMonth": -8.0627,
+   "pMonth": 0,
+   "months": 49,
+   "tTrade": -9.6488,
+   "maxDD": -2106.5013,
+   "mean2x": -0.2145,
+   "meanBefore": -0.0359
+  }
+ },
+ "perMethod": {
+  "barrier-qm-janda:P": {
+   "n": 1853,
+   "leftOut": 0,
+   "choice": "C",
+   "choiceT": 0.2474,
+   "choiceN": 63,
+   "isStates": {
+    "T": 203,
+    "X": 165,
+    "C": 63
+   },
+   "isAll": {
+    "n": 431,
+    "meanR": -0.0946,
+    "tMonth": -1.4011,
+    "mean2x": -0.1782,
+    "meanBefore": -0.0111
+   },
+   "isKept": {
+    "n": 63,
+    "meanR": 0.046,
+    "tMonth": 0.2474,
+    "mean2x": -0.0259,
+    "meanBefore": 0.1178
+   },
+   "oosAll": {
+    "n": 311,
+    "meanR": -0.1012,
+    "tMonth": -1.1559,
+    "mean2x": -0.1573,
+    "meanBefore": -0.0451
+   },
+   "oosKept": {
+    "n": 57,
+    "meanR": 0.1186,
+    "tMonth": 0.5682,
+    "mean2x": 0.0721,
+    "meanBefore": 0.1651
+   },
+   "oosDropped": {
+    "n": 254,
+    "meanR": -0.1505,
+    "tMonth": -1.676,
+    "mean2x": -0.2088,
+    "meanBefore": -0.0923
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "X"
+  },
+  "barrier-qm-janda:S1": {
+   "n": 3715,
+   "leftOut": 0,
+   "choice": "C",
+   "choiceT": -0.9673,
+   "choiceN": 149,
+   "isStates": {
+    "T": 392,
+    "X": 353,
+    "C": 149
+   },
+   "isAll": {
+    "n": 894,
+    "meanR": -0.101,
+    "tMonth": -2.0262,
+    "mean2x": -0.185,
+    "meanBefore": -0.017
+   },
+   "isKept": {
+    "n": 149,
+    "meanR": -0.1307,
+    "tMonth": -0.9673,
+    "mean2x": -0.2074,
+    "meanBefore": -0.0539
+   },
+   "oosAll": {
+    "n": 612,
+    "meanR": -0.1406,
+    "tMonth": -2.8715,
+    "mean2x": -0.1918,
+    "meanBefore": -0.0894
+   },
+   "oosKept": {
+    "n": 96,
+    "meanR": -0.0878,
+    "tMonth": -0.5245,
+    "mean2x": -0.1416,
+    "meanBefore": -0.034
+   },
+   "oosDropped": {
+    "n": 516,
+    "meanR": -0.1504,
+    "tMonth": -2.9037,
+    "mean2x": -0.2011,
+    "meanBefore": -0.0997
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "Tw"
+  },
+  "barrier-qm-janda:S2": {
+   "n": 629,
+   "leftOut": 0,
+   "choice": "X",
+   "choiceT": -0.5039,
+   "choiceN": 62,
+   "isStates": {
+    "T": 74,
+    "X": 62,
+    "C": 17
+   },
+   "isAll": {
+    "n": 153,
+    "meanR": -0.2067,
+    "tMonth": -1.6823,
+    "mean2x": -0.2911,
+    "meanBefore": -0.1222
+   },
+   "isKept": {
+    "n": 62,
+    "meanR": -0.1111,
+    "tMonth": -0.5039,
+    "mean2x": -0.2015,
+    "meanBefore": -0.0207
+   },
+   "oosAll": {
+    "n": 91,
+    "meanR": -0.374,
+    "tMonth": -2.7926,
+    "mean2x": -0.4167,
+    "meanBefore": -0.3313
+   },
+   "oosKept": {
+    "n": 33,
+    "meanR": -0.663,
+    "tMonth": -3.1454,
+    "mean2x": -0.7031,
+    "meanBefore": -0.6229
+   },
+   "oosDropped": {
+    "n": 58,
+    "meanR": -0.2096,
+    "tMonth": -1.1388,
+    "mean2x": -0.2538,
+    "meanBefore": -0.1655
+   },
+   "t2": {
+    "2024": "X",
+    "2025": "X",
+    "2026": "X"
+   },
+   "rep": "X"
+  },
+  "barrier-qm-janda:S3": {
+   "n": 970,
+   "leftOut": 0,
+   "choice": "C",
+   "choiceT": 0.4925,
+   "choiceN": 36,
+   "isStates": {
+    "T": 103,
+    "X": 116,
+    "C": 36
+   },
+   "isAll": {
+    "n": 255,
+    "meanR": -0.1041,
+    "tMonth": -1.1005,
+    "mean2x": -0.1914,
+    "meanBefore": -0.0168
+   },
+   "isKept": {
+    "n": 36,
+    "meanR": 0.115,
+    "tMonth": 0.4925,
+    "mean2x": 0.0461,
+    "meanBefore": 0.184
+   },
+   "oosAll": {
+    "n": 173,
+    "meanR": -0.0409,
+    "tMonth": -0.3722,
+    "mean2x": -0.1097,
+    "meanBefore": 0.028
+   },
+   "oosKept": {
+    "n": 26,
+    "meanR": 0.1183,
+    "tMonth": 0.3384,
+    "mean2x": 0.0659,
+    "meanBefore": 0.1706
+   },
+   "oosDropped": {
+    "n": 147,
+    "meanR": -0.069,
+    "tMonth": -0.5697,
+    "mean2x": -0.1408,
+    "meanBefore": 0.0028
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "Tw"
+  },
+  "box-touch-trend:T1": {
+   "n": 28537,
+   "leftOut": 0,
+   "choice": "C",
+   "choiceT": -2.2435,
+   "choiceN": 1021,
+   "isStates": {
+    "T": 3093,
+    "X": 2615,
+    "C": 1021
+   },
+   "isAll": {
+    "n": 6729,
+    "meanR": -0.2167,
+    "tMonth": -7.8744,
+    "mean2x": -0.3531,
+    "meanBefore": -0.0803
+   },
+   "isKept": {
+    "n": 1021,
+    "meanR": -0.1631,
+    "tMonth": -2.2435,
+    "mean2x": -0.3049,
+    "meanBefore": -0.0213
+   },
+   "oosAll": {
+    "n": 4950,
+    "meanR": -0.1988,
+    "tMonth": -6.9961,
+    "mean2x": -0.3298,
+    "meanBefore": -0.0679
+   },
+   "oosKept": {
+    "n": 747,
+    "meanR": -0.2552,
+    "tMonth": -2.9807,
+    "mean2x": -0.3904,
+    "meanBefore": -0.12
+   },
+   "oosDropped": {
+    "n": 4203,
+    "meanR": -0.1888,
+    "tMonth": -5.918,
+    "mean2x": -0.3191,
+    "meanBefore": -0.0586
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "C"
+  },
+  "daily-zone-retest": {
+   "n": 1876,
+   "leftOut": 0,
+   "choice": "C",
+   "choiceT": 0.2853,
+   "choiceN": 38,
+   "isStates": {
+    "T": 222,
+    "X": 157,
+    "C": 38
+   },
+   "isAll": {
+    "n": 417,
+    "meanR": -0.0079,
+    "tMonth": -0.1249,
+    "mean2x": -0.027,
+    "meanBefore": 0.0113
+   },
+   "isKept": {
+    "n": 38,
+    "meanR": 0.0561,
+    "tMonth": 0.2853,
+    "mean2x": 0.0411,
+    "meanBefore": 0.071
+   },
+   "oosAll": {
+    "n": 301,
+    "meanR": -0.0356,
+    "tMonth": -0.432,
+    "mean2x": -0.0539,
+    "meanBefore": -0.0174
+   },
+   "oosKept": {
+    "n": 39,
+    "meanR": -0.0835,
+    "tMonth": -0.3745,
+    "mean2x": -0.1013,
+    "meanBefore": -0.0656
+   },
+   "oosDropped": {
+    "n": 262,
+    "meanR": -0.0285,
+    "tMonth": -0.3239,
+    "mean2x": -0.0468,
+    "meanBefore": -0.0102
+   },
+   "t2": {
+    "2024": "T",
+    "2025": "C",
+    "2026": "X"
+   },
+   "rep": "C"
+  },
+  "direction-chain-gate": {
+   "n": 23569,
+   "leftOut": 0,
+   "choice": "Tw",
+   "choiceT": 0.1923,
+   "choiceN": 1353,
+   "isStates": {
+    "T": 2644,
+    "X": 2117,
+    "C": 824
+   },
+   "isAll": {
+    "n": 5585,
+    "meanR": -0.0228,
+    "tMonth": -1.1504,
+    "mean2x": -0.041,
+    "meanBefore": -0.0047
+   },
+   "isKept": {
+    "n": 1353,
+    "meanR": 0.0095,
+    "tMonth": 0.1923,
+    "mean2x": -0.0088,
+    "meanBefore": 0.0277
+   },
+   "oosAll": {
+    "n": 3944,
+    "meanR": -0.024,
+    "tMonth": -1.0007,
+    "mean2x": -0.0416,
+    "meanBefore": -0.0064
+   },
+   "oosKept": {
+    "n": 920,
+    "meanR": -0.0146,
+    "tMonth": -0.3101,
+    "mean2x": -0.0326,
+    "meanBefore": 0.0035
+   },
+   "oosDropped": {
+    "n": 3024,
+    "meanR": -0.0268,
+    "tMonth": -1.0437,
+    "mean2x": -0.0443,
+    "meanBefore": -0.0094
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "C"
+  },
+  "eg-chain-50:P": {
+   "n": 1545,
+   "leftOut": 0,
+   "choice": "C",
+   "choiceT": 0.7145,
+   "choiceN": 42,
+   "isStates": {
+    "T": 155,
+    "C": 42,
+    "X": 86
+   },
+   "isAll": {
+    "n": 283,
+    "meanR": -0.3992,
+    "tMonth": -2.6187,
+    "mean2x": -0.6257,
+    "meanBefore": -0.1726
+   },
+   "isKept": {
+    "n": 42,
+    "meanR": 0.4371,
+    "tMonth": 0.7145,
+    "mean2x": 0.2047,
+    "meanBefore": 0.6695
+   },
+   "oosAll": {
+    "n": 1013,
+    "meanR": -0.2377,
+    "tMonth": -2.2031,
+    "mean2x": -0.4118,
+    "meanBefore": -0.0637
+   },
+   "oosKept": {
+    "n": 178,
+    "meanR": -0.0934,
+    "tMonth": -0.3435,
+    "mean2x": -0.2745,
+    "meanBefore": 0.0878
+   },
+   "oosDropped": {
+    "n": 835,
+    "meanR": -0.2685,
+    "tMonth": -2.6692,
+    "mean2x": -0.441,
+    "meanBefore": -0.0959
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "C"
+  },
+  "eg-chain-50:S1": {
+   "n": 473,
+   "leftOut": 0,
+   "choice": "X",
+   "choiceT": 0.9522,
+   "choiceN": 48,
+   "isStates": {
+    "T": 62,
+    "X": 48,
+    "C": 34
+   },
+   "isAll": {
+    "n": 144,
+    "meanR": 0.1367,
+    "tMonth": 0.4306,
+    "mean2x": -0.0411,
+    "meanBefore": 0.3144
+   },
+   "isKept": {
+    "n": 48,
+    "meanR": 0.584,
+    "tMonth": 0.9522,
+    "mean2x": 0.4128,
+    "meanBefore": 0.7552
+   },
+   "oosAll": {
+    "n": 99,
+    "meanR": 0.2056,
+    "tMonth": 0.4992,
+    "mean2x": 0.1082,
+    "meanBefore": 0.3029
+   },
+   "oosKept": {
+    "n": 50,
+    "meanR": 0.5613,
+    "tMonth": 0.9682,
+    "mean2x": 0.4668,
+    "meanBefore": 0.6557
+   },
+   "oosDropped": {
+    "n": 49,
+    "meanR": -0.1575,
+    "tMonth": -0.2775,
+    "mean2x": -0.2577,
+    "meanBefore": -0.0572
+   },
+   "t2": {
+    "2024": "X",
+    "2025": "X",
+    "2026": "X"
+   },
+   "rep": "X"
+  },
+  "eg-chain-50:S2": {
+   "n": 477,
+   "leftOut": 0,
+   "choice": "CT",
+   "choiceT": 0.2009,
+   "choiceN": 54,
+   "isStates": {
+    "T": 46,
+    "X": 26,
+    "C": 8
+   },
+   "isAll": {
+    "n": 80,
+    "meanR": -0.0497,
+    "tMonth": -0.1947,
+    "mean2x": -0.2723,
+    "meanBefore": 0.1728
+   },
+   "isKept": {
+    "n": 54,
+    "meanR": 0.0877,
+    "tMonth": 0.2009,
+    "mean2x": -0.1383,
+    "meanBefore": 0.3137
+   },
+   "oosAll": {
+    "n": 318,
+    "meanR": -0.102,
+    "tMonth": -0.516,
+    "mean2x": -0.2788,
+    "meanBefore": 0.0748
+   },
+   "oosKept": {
+    "n": 202,
+    "meanR": -0.0268,
+    "tMonth": -0.0949,
+    "mean2x": -0.2045,
+    "meanBefore": 0.151
+   },
+   "oosDropped": {
+    "n": 116,
+    "meanR": -0.233,
+    "tMonth": -0.7605,
+    "mean2x": -0.4082,
+    "meanBefore": -0.0579
+   },
+   "t2": {
+    "2024": "T",
+    "2025": "CT",
+    "2026": "C"
+   },
+   "rep": "CX"
+  },
+  "h4-pullback-end:kept": {
+   "n": 685,
+   "leftOut": 0,
+   "choice": "CT",
+   "choiceT": 0.4978,
+   "choiceN": 97,
+   "isStates": {
+    "X": 57,
+    "T": 70,
+    "C": 27
+   },
+   "isAll": {
+    "n": 154,
+    "meanR": -0.0364,
+    "tMonth": -0.3709,
+    "mean2x": -0.0594,
+    "meanBefore": -0.0134
+   },
+   "isKept": {
+    "n": 97,
+    "meanR": 0.0746,
+    "tMonth": 0.4978,
+    "mean2x": 0.0514,
+    "meanBefore": 0.0979
+   },
+   "oosAll": {
+    "n": 120,
+    "meanR": 0.1247,
+    "tMonth": 0.7747,
+    "mean2x": 0.103,
+    "meanBefore": 0.1464
+   },
+   "oosKept": {
+    "n": 54,
+    "meanR": 0.1937,
+    "tMonth": 0.9067,
+    "mean2x": 0.1698,
+    "meanBefore": 0.2177
+   },
+   "oosDropped": {
+    "n": 66,
+    "meanR": 0.0682,
+    "tMonth": 0.3653,
+    "mean2x": 0.0484,
+    "meanBefore": 0.088
+   },
+   "t2": {
+    "2024": "C",
+    "2025": "C",
+    "2026": "C"
+   },
+   "rep": "CT"
+  },
+  "h4-pullback-end:rejected": {
+   "n": 558,
+   "leftOut": 0,
+   "choice": "X",
+   "choiceT": -0.2366,
+   "choiceN": 59,
+   "isStates": {
+    "X": 59,
+    "T": 65,
+    "C": 19
+   },
+   "isAll": {
+    "n": 143,
+    "meanR": -0.106,
+    "tMonth": -1.1492,
+    "mean2x": -0.1267,
+    "meanBefore": -0.0853
+   },
+   "isKept": {
+    "n": 59,
+    "meanR": -0.0412,
+    "tMonth": -0.2366,
+    "mean2x": -0.0616,
+    "meanBefore": -0.0207
+   },
+   "oosAll": {
+    "n": 88,
+    "meanR": -0.1251,
+    "tMonth": -0.9347,
+    "mean2x": -0.1457,
+    "meanBefore": -0.1044
+   },
+   "oosKept": {
+    "n": 37,
+    "meanR": -0.4277,
+    "tMonth": -2.1509,
+    "mean2x": -0.446,
+    "meanBefore": -0.4095
+   },
+   "oosDropped": {
+    "n": 51,
+    "meanR": 0.0945,
+    "tMonth": 0.5493,
+    "mean2x": 0.0721,
+    "meanBefore": 0.117
+   },
+   "t2": {
+    "2024": "X",
+    "2025": "X",
+    "2026": "X"
+   },
+   "rep": "CX"
+  },
+  "session-sweep": {
+   "n": 167,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": 1.0029,
+   "choiceN": 41,
+   "isStates": {
+    "C": 8,
+    "X": 14,
+    "T": 19
+   },
+   "isAll": {
+    "n": 41,
+    "meanR": 0.1946,
+    "tMonth": 1.0029,
+    "mean2x": 0.1269,
+    "meanBefore": 0.2624
+   },
+   "isKept": {
+    "n": 41,
+    "meanR": 0.1946,
+    "tMonth": 1.0029,
+    "mean2x": 0.1269,
+    "meanBefore": 0.2624
+   },
+   "oosAll": {
+    "n": 27,
+    "meanR": -0.0069,
+    "tMonth": -0.0271,
+    "mean2x": -0.0579,
+    "meanBefore": 0.0441
+   },
+   "oosKept": {
+    "n": 27,
+    "meanR": -0.0069,
+    "tMonth": -0.0271,
+    "mean2x": -0.0579,
+    "meanBefore": 0.0441
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "CX",
+    "2025": "CX",
+    "2026": "CX"
+   },
+   "rep": "CT"
+  },
+  "storyline-daily-gold:P": {
+   "n": 118,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": -0.9076,
+   "choiceN": 29,
+   "isStates": {
+    "X": 14,
+    "T": 10,
+    "C": 5
+   },
+   "isAll": {
+    "n": 29,
+    "meanR": -0.3122,
+    "tMonth": -0.9076,
+    "mean2x": -0.3606,
+    "meanBefore": -0.2638
+   },
+   "isKept": {
+    "n": 29,
+    "meanR": -0.3122,
+    "tMonth": -0.9076,
+    "mean2x": -0.3606,
+    "meanBefore": -0.2638
+   },
+   "oosAll": {
+    "n": 16,
+    "meanR": -0.333,
+    "tMonth": -0.9069,
+    "mean2x": -0.3717,
+    "meanBefore": -0.2943
+   },
+   "oosKept": {
+    "n": 16,
+    "meanR": -0.333,
+    "tMonth": -0.9069,
+    "mean2x": -0.3717,
+    "meanBefore": -0.2943
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "Tw",
+    "2025": "Tw",
+    "2026": "Tw"
+   },
+   "rep": "TX"
+  },
+  "storyline-daily-gold:S1": {
+   "n": 127,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": -1.5261,
+   "choiceN": 28,
+   "isStates": {
+    "X": 13,
+    "C": 5,
+    "T": 10
+   },
+   "isAll": {
+    "n": 28,
+    "meanR": -0.3974,
+    "tMonth": -1.5261,
+    "mean2x": -0.4418,
+    "meanBefore": -0.353
+   },
+   "isKept": {
+    "n": 28,
+    "meanR": -0.3974,
+    "tMonth": -1.5261,
+    "mean2x": -0.4418,
+    "meanBefore": -0.353
+   },
+   "oosAll": {
+    "n": 18,
+    "meanR": -0.143,
+    "tMonth": -0.3242,
+    "mean2x": -0.1756,
+    "meanBefore": -0.1104
+   },
+   "oosKept": {
+    "n": 18,
+    "meanR": -0.143,
+    "tMonth": -0.3242,
+    "mean2x": -0.1756,
+    "meanBefore": -0.1104
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "T",
+    "2025": "T",
+    "2026": "T"
+   },
+   "rep": "TX"
+  },
+  "storyline-daily-gold:S2": {
+   "n": 59,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": 0.2846,
+   "choiceN": 15,
+   "isStates": {
+    "X": 7,
+    "T": 6,
+    "C": 2
+   },
+   "isAll": {
+    "n": 15,
+    "meanR": 0.1705,
+    "tMonth": 0.2846,
+    "mean2x": 0.1203,
+    "meanBefore": 0.2207
+   },
+   "isKept": {
+    "n": 15,
+    "meanR": 0.1705,
+    "tMonth": 0.2846,
+    "mean2x": 0.1203,
+    "meanBefore": 0.2207
+   },
+   "oosAll": {
+    "n": 7,
+    "meanR": -0.3255,
+    "tMonth": -0.6705,
+    "mean2x": -0.3932,
+    "meanBefore": -0.2578
+   },
+   "oosKept": {
+    "n": 7,
+    "meanR": -0.3255,
+    "tMonth": -0.6705,
+    "mean2x": -0.3932,
+    "meanBefore": -0.2578
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "TX",
+    "2025": "TX",
+    "2026": "CT"
+   },
+   "rep": "all"
+  },
+  "storyline-daily-gold:S3": {
+   "n": 163,
+   "leftOut": 0,
+   "choice": "TX",
+   "choiceT": -1.3063,
+   "choiceN": 33,
+   "isStates": {
+    "X": 19,
+    "T": 14,
+    "C": 5
+   },
+   "isAll": {
+    "n": 38,
+    "meanR": -0.4212,
+    "tMonth": -1.8247,
+    "mean2x": -0.474,
+    "meanBefore": -0.3684
+   },
+   "isKept": {
+    "n": 33,
+    "meanR": -0.3259,
+    "tMonth": -1.3063,
+    "mean2x": -0.3791,
+    "meanBefore": -0.2727
+   },
+   "oosAll": {
+    "n": 19,
+    "meanR": -0.1007,
+    "tMonth": -0.2417,
+    "mean2x": -0.1464,
+    "meanBefore": -0.0551
+   },
+   "oosKept": {
+    "n": 15,
+    "meanR": -0.3794,
+    "tMonth": -0.943,
+    "mean2x": -0.4223,
+    "meanBefore": -0.3365
+   },
+   "oosDropped": {
+    "n": 4,
+    "meanR": 0.9443,
+    "tMonth": 0.8611,
+    "mean2x": 0.8886,
+    "meanBefore": 1
+   },
+   "t2": {
+    "2024": "X",
+    "2025": "X",
+    "2026": "X"
+   },
+   "rep": "TX"
+  },
+  "storyline-qm-sop:T1": {
+   "n": 12,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": -0.5077,
+   "choiceN": 4,
+   "isStates": {
+    "X": 2,
+    "T": 2
+   },
+   "isAll": {
+    "n": 4,
+    "meanR": -0.3471,
+    "tMonth": -0.5077,
+    "mean2x": -0.436,
+    "meanBefore": -0.2582
+   },
+   "isKept": {
+    "n": 4,
+    "meanR": -0.3471,
+    "tMonth": -0.5077,
+    "mean2x": -0.436,
+    "meanBefore": -0.2582
+   },
+   "oosAll": {
+    "n": 1,
+    "meanR": -1.0164,
+    "tMonth": null,
+    "mean2x": -1.0328,
+    "meanBefore": -1
+   },
+   "oosKept": {
+    "n": 1,
+    "meanR": -1.0164,
+    "tMonth": null,
+    "mean2x": -1.0328,
+    "meanBefore": -1
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "all",
+    "2025": "all",
+    "2026": "all"
+   },
+   "rep": "all"
+  },
+  "storyline-qm-sop:T2": {
+   "n": 25,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": -2.1562,
+   "choiceN": 5,
+   "isStates": {
+    "C": 2,
+    "T": 1,
+    "X": 2
+   },
+   "isAll": {
+    "n": 5,
+    "meanR": -0.8732,
+    "tMonth": -2.1562,
+    "mean2x": -0.9464,
+    "meanBefore": -0.8
+   },
+   "isKept": {
+    "n": 5,
+    "meanR": -0.8732,
+    "tMonth": -2.1562,
+    "mean2x": -0.9464,
+    "meanBefore": -0.8
+   },
+   "oosAll": {
+    "n": 3,
+    "meanR": -1.1171,
+    "tMonth": -1.8314,
+    "mean2x": -1.2343,
+    "meanBefore": -1
+   },
+   "oosKept": {
+    "n": 3,
+    "meanR": -1.1171,
+    "tMonth": -1.8314,
+    "mean2x": -1.2343,
+    "meanBefore": -1
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "all",
+    "2025": "all",
+    "2026": "all"
+   },
+   "rep": "all"
+  },
+  "storyline-qm-sop:T3": {
+   "n": 12,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": -0.6305,
+   "choiceN": 4,
+   "isStates": {
+    "X": 4
+   },
+   "isAll": {
+    "n": 4,
+    "meanR": -0.4453,
+    "tMonth": -0.6305,
+    "mean2x": -0.6158,
+    "meanBefore": -0.2748
+   },
+   "isKept": {
+    "n": 4,
+    "meanR": -0.4453,
+    "tMonth": -0.6305,
+    "mean2x": -0.6158,
+    "meanBefore": -0.2748
+   },
+   "oosAll": {
+    "n": 3,
+    "meanR": -1.071,
+    "tMonth": -1.8819,
+    "mean2x": -1.142,
+    "meanBefore": -1
+   },
+   "oosKept": {
+    "n": 3,
+    "meanR": -1.071,
+    "tMonth": -1.8819,
+    "mean2x": -1.142,
+    "meanBefore": -1
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "all",
+    "2025": "all",
+    "2026": "all"
+   },
+   "rep": "all"
+  },
+  "storyline-qm-sop:T4": {
+   "n": 54,
+   "leftOut": 0,
+   "choice": "all",
+   "choiceT": 0.0699,
+   "choiceN": 11,
+   "isStates": {
+    "T": 4,
+    "C": 3,
+    "X": 4
+   },
+   "isAll": {
+    "n": 11,
+    "meanR": 0.043,
+    "tMonth": 0.0699,
+    "mean2x": -0.0722,
+    "meanBefore": 0.1582
+   },
+   "isKept": {
+    "n": 11,
+    "meanR": 0.043,
+    "tMonth": 0.0699,
+    "mean2x": -0.0722,
+    "meanBefore": 0.1582
+   },
+   "oosAll": {
+    "n": 5,
+    "meanR": -1.0796,
+    "tMonth": -2.4708,
+    "mean2x": -1.1592,
+    "meanBefore": -1
+   },
+   "oosKept": {
+    "n": 5,
+    "meanR": -1.0796,
+    "tMonth": -2.4708,
+    "mean2x": -1.1592,
+    "meanBefore": -1
+   },
+   "oosDropped": null,
+   "t2": {
+    "2024": "CX",
+    "2025": "CX",
+    "2026": "CX"
+   },
+   "rep": "all"
+  },
+  "vb-structure-filter": {
+   "n": 6354,
+   "leftOut": 0,
+   "choice": "T",
+   "choiceT": 1.7604,
+   "choiceN": 656,
+   "isStates": {
+    "T": 656,
+    "X": 533,
+    "C": 319
+   },
+   "isAll": {
+    "n": 1508,
+    "meanR": 0.0505,
+    "tMonth": 1.4344,
+    "mean2x": 0.0017,
+    "meanBefore": 0.0992
+   },
+   "isKept": {
+    "n": 656,
+    "meanR": 0.1011,
+    "tMonth": 1.7604,
+    "mean2x": 0.0517,
+    "meanBefore": 0.1505
+   },
+   "oosAll": {
+    "n": 1110,
+    "meanR": 0.1385,
+    "tMonth": 3.5986,
+    "mean2x": 0.1085,
+    "meanBefore": 0.1685
+   },
+   "oosKept": {
+    "n": 463,
+    "meanR": 0.1249,
+    "tMonth": 1.9383,
+    "mean2x": 0.0967,
+    "meanBefore": 0.1532
+   },
+   "oosDropped": {
+    "n": 647,
+    "meanR": 0.1482,
+    "tMonth": 2.7542,
+    "mean2x": 0.1169,
+    "meanBefore": 0.1794
+   },
+   "t2": {
+    "2024": "CX",
+    "2025": "CX",
+    "2026": "CX"
+   },
+   "rep": "CX"
+  }
+ },
+ "perMarket": {
+  "xau": {
+   "oosKept": {
+    "n": 1325,
+    "meanR": -0.0032,
+    "tMonth": -0.041,
+    "mean2x": -0.0912,
+    "meanBefore": 0.0849
+   },
+   "oosPool": {
+    "n": 5240,
+    "meanR": -0.0951,
+    "tMonth": -2.898,
+    "mean2x": -0.183,
+    "meanBefore": -0.0071
+   },
+   "isKept": {
+    "n": 1389,
+    "meanR": -0.0144,
+    "tMonth": -0.2223,
+    "mean2x": -0.0995,
+    "meanBefore": 0.0707
+   }
+  },
+  "eurusd": {
+   "oosKept": {
+    "n": 382,
+    "meanR": -0.0851,
+    "tMonth": -1.2089,
+    "mean2x": -0.1524,
+    "meanBefore": -0.0178
+   },
+   "oosPool": {
+    "n": 1812,
+    "meanR": -0.1722,
+    "tMonth": -3.4156,
+    "mean2x": -0.2515,
+    "meanBefore": -0.0929
+   },
+   "isKept": {
+    "n": 559,
+    "meanR": -0.059,
+    "tMonth": -0.7521,
+    "mean2x": -0.1132,
+    "meanBefore": -0.0048
+   }
+  },
+  "gbpusd": {
+   "oosKept": {
+    "n": 321,
+    "meanR": -0.0507,
+    "tMonth": -0.6266,
+    "mean2x": -0.11,
+    "meanBefore": 0.0086
+   },
+   "oosPool": {
+    "n": 1811,
+    "meanR": -0.0442,
+    "tMonth": -1.0398,
+    "mean2x": -0.126,
+    "meanBefore": 0.0375
+   },
+   "isKept": {
+    "n": 562,
+    "meanR": -0.0239,
+    "tMonth": -0.335,
+    "mean2x": -0.0874,
+    "meanBefore": 0.0395
+   }
+  },
+  "usdjpy": {
+   "oosKept": {
+    "n": 585,
+    "meanR": -0.0766,
+    "tMonth": -1.2252,
+    "mean2x": -0.1307,
+    "meanBefore": -0.0225
+   },
+   "oosPool": {
+    "n": 2495,
+    "meanR": -0.0586,
+    "tMonth": -1.6755,
+    "mean2x": -0.1217,
+    "meanBefore": 0.0044
+   },
+   "isKept": {
+    "n": 812,
+    "meanR": -0.0067,
+    "tMonth": -0.0985,
+    "mean2x": -0.0667,
+    "meanBefore": 0.0533
+   }
+  },
+  "audusd": {
+   "oosKept": {
+    "n": 384,
+    "meanR": -0.2618,
+    "tMonth": -2.9413,
+    "mean2x": -0.3355,
+    "meanBefore": -0.1881
+   },
+   "oosPool": {
+    "n": 1871,
+    "meanR": -0.1775,
+    "tMonth": -3.9319,
+    "mean2x": -0.2645,
+    "meanBefore": -0.0906
+   },
+   "isKept": {
+    "n": 526,
+    "meanR": -0.008,
+    "tMonth": -0.1466,
+    "mean2x": -0.0801,
+    "meanBefore": 0.0641
+   }
+  }
+ },
+ "byYear": {
+  "2010": {
+   "pool": {
+    "n": 4571,
+    "meanR": -0.1067,
+    "tMonth": -4.4403,
+    "mean2x": -0.1831,
+    "meanBefore": -0.0302
+   },
+   "book": null
+  },
+  "2011": {
+   "pool": {
+    "n": 4601,
+    "meanR": -0.1091,
+    "tMonth": -2.9516,
+    "mean2x": -0.1836,
+    "meanBefore": -0.0346
+   },
+   "book": null
+  },
+  "2012": {
+   "pool": {
+    "n": 4296,
+    "meanR": -0.1136,
+    "tMonth": -3.9113,
+    "mean2x": -0.1954,
+    "meanBefore": -0.0319
+   },
+   "book": null
+  },
+  "2013": {
+   "pool": {
+    "n": 4316,
+    "meanR": -0.1016,
+    "tMonth": -2.0595,
+    "mean2x": -0.1836,
+    "meanBefore": -0.0196
+   },
+   "book": null
+  },
+  "2014": {
+   "pool": {
+    "n": 3729,
+    "meanR": -0.0651,
+    "tMonth": -2.4669,
+    "mean2x": -0.15,
+    "meanBefore": 0.0197
+   },
+   "book": null
+  },
+  "2015": {
+   "pool": {
+    "n": 4114,
+    "meanR": -0.1078,
+    "tMonth": -4.0333,
+    "mean2x": -0.1871,
+    "meanBefore": -0.0286
+   },
+   "book": null
+  },
+  "2016": {
+   "pool": {
+    "n": 4268,
+    "meanR": -0.0987,
+    "tMonth": -3.3065,
+    "mean2x": -0.1832,
+    "meanBefore": -0.0143
+   },
+   "book": null
+  },
+  "2017": {
+   "pool": {
+    "n": 4150,
+    "meanR": -0.1069,
+    "tMonth": -3.6312,
+    "mean2x": -0.1986,
+    "meanBefore": -0.0151
+   },
+   "book": null
+  },
+  "2018": {
+   "pool": {
+    "n": 4073,
+    "meanR": -0.1741,
+    "tMonth": -4.7509,
+    "mean2x": -0.2636,
+    "meanBefore": -0.0846
+   },
+   "book": null
+  },
+  "2019": {
+   "pool": {
+    "n": 3618,
+    "meanR": -0.1225,
+    "tMonth": -3.6421,
+    "mean2x": -0.2144,
+    "meanBefore": -0.0306
+   },
+   "book": null
+  },
+  "2020": {
+   "pool": {
+    "n": 4369,
+    "meanR": -0.0544,
+    "tMonth": -1.6289,
+    "mean2x": -0.1363,
+    "meanBefore": 0.0274
+   },
+   "book": {
+    "n": 993,
+    "meanR": 0.0142,
+    "tMonth": 0.248,
+    "mean2x": -0.0571,
+    "meanBefore": 0.0855
+   }
+  },
+  "2021": {
+   "pool": {
+    "n": 4077,
+    "meanR": -0.1166,
+    "tMonth": -3.6649,
+    "mean2x": -0.2031,
+    "meanBefore": -0.0302
+   },
+   "book": {
+    "n": 977,
+    "meanR": -0.0465,
+    "tMonth": -0.6922,
+    "mean2x": -0.1216,
+    "meanBefore": 0.0285
+   }
+  },
+  "2022": {
+   "pool": {
+    "n": 4392,
+    "meanR": -0.1268,
+    "tMonth": -4.264,
+    "mean2x": -0.2035,
+    "meanBefore": -0.0501
+   },
+   "book": {
+    "n": 965,
+    "meanR": -0.0429,
+    "tMonth": -0.5063,
+    "mean2x": -0.1123,
+    "meanBefore": 0.0266
+   }
+  },
+  "2023": {
+   "pool": {
+    "n": 4113,
+    "meanR": -0.1416,
+    "tMonth": -4.0243,
+    "mean2x": -0.2207,
+    "meanBefore": -0.0625
+   },
+   "book": {
+    "n": 913,
+    "meanR": -0.0036,
+    "tMonth": -0.0573,
+    "mean2x": -0.069,
+    "meanBefore": 0.0617
+   }
+  },
+  "2024": {
+   "pool": {
+    "n": 4098,
+    "meanR": -0.1441,
+    "tMonth": -3.567,
+    "mean2x": -0.2274,
+    "meanBefore": -0.0608
+   },
+   "book": {
+    "n": 988,
+    "meanR": -0.0517,
+    "tMonth": -0.7216,
+    "mean2x": -0.123,
+    "meanBefore": 0.0197
+   }
+  },
+  "2025": {
+   "pool": {
+    "n": 4819,
+    "meanR": -0.0771,
+    "tMonth": -2.7985,
+    "mean2x": -0.1597,
+    "meanBefore": 0.0056
+   },
+   "book": {
+    "n": 986,
+    "meanR": -0.086,
+    "tMonth": -1.2823,
+    "mean2x": -0.1603,
+    "meanBefore": -0.0117
+   }
+  },
+  "2026": {
+   "pool": {
+    "n": 4374,
+    "meanR": -0.0844,
+    "tMonth": -2.1342,
+    "mean2x": -0.1617,
+    "meanBefore": -0.0071
+   },
+   "book": {
+    "n": 1023,
+    "meanR": -0.061,
+    "tMonth": -0.7328,
+    "mean2x": -0.1369,
+    "meanBefore": 0.015
+   }
+  }
+ }
+}

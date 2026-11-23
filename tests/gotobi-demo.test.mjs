@@ -119,3 +119,33 @@ test('the website\'s timer starts the gotobi job only on a weekday between 00:25
   const wf = fs.readFileSync(new URL('../.github/workflows/gotobi.yml', import.meta.url), 'utf8');
   assert.match(wf, /node council\/gotobi\.mjs data/); assert.match(wf, /cancel-in-progress: false/); assert.doesNotMatch(wf, /CTRADER_ACCOUNT_ID/, 'never the council account by default');
 });
+
+// 23 Nov 2026: one failed connection at 00:54:20 (the cTrader server, a token refresh) made the whole morning an "error", and a
+// failed connection at 06:00 threw out of the job with the position still open (closed hours later by the next run). The
+// connection is now tried again: before the entry until 00:55:55, at the exit a few times. Only the connection is retried,
+// never an order or a close; a live account or a missing account is refused at once.
+function flaky(fail) {   // the n-th connection (1-based) is refused at its first message when fail(n) is true
+  const b = broker(), Base = b.WS; let n = 0;
+  b.WS = class extends Base { send(text) { const m = JSON.parse(text);
+    if (m.payloadType === PT.APP_AUTH_REQ && fail(++n)) { b.sent.push(m); return setTimeout(() => this.onmessage({ data: JSON.stringify({ clientMsgId: m.clientMsgId, payloadType: PT.ERROR_RES, payload: { errorCode: 'CH_ACCESS_TOKEN_INVALID' } }) }), 0); }
+    return super.send(text); } };
+  return b;
+}
+test('a refused connection is tried again before 00:55 and at 06:00: the trade is still placed and closed on time', async () => {
+  const day = '2026-11-20', cand = bars(day, 7);
+  { const dir = setup(), b = flaky((n) => n <= 2), c = clockAt(dayStart(day) + 50 * 60);   // the first two connections before the entry fail
+    const out = await run({ env: ENV, dir, WS: b.WS, ...c, bars: async () => cand, log: () => {}, pause: async () => {} });
+    assert.equal(b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 1, 'one order, never two');
+    assert.equal(out.rec.status, 'closed'); assert.equal(out.rec.how, 'time exit 06:00'); }
+  { const dir = setup(), b = flaky((n) => n === 2 || n === 3), c = clockAt(dayStart(day) + 50 * 60);   // the exit's first two connections fail
+    const out = await run({ env: ENV, dir, WS: b.WS, ...c, bars: async () => cand, log: () => {}, pause: async () => {} });
+    assert.equal(out.rec.status, 'closed'); assert.equal(out.rec.how, 'time exit 06:00');
+    assert.equal(b.sent.filter((m) => m.payloadType === PT.CLOSE_POSITION_REQ).length, 1, 'one close'); }
+  { const dir = setup(), b = flaky((n) => n >= 2), c = clockAt(dayStart(day) + 50 * 60);   // the exit never connects: no crash, the record says so
+    const out = await run({ env: ENV, dir, WS: b.WS, ...c, bars: async () => cand, log: () => {}, pause: async () => {} });
+    assert.equal(out.rec.status, 'open', 'left open with its stop at the broker: the next run closes it'); assert.match(out.rec.exitError, /could not connect at the exit/);
+    const f = JSON.parse(fs.readFileSync(path.join(dir, 'gotobi', 'trades.json'), 'utf8')).trades[0]; assert.match(f.exitError, /exit/); }
+  { const dir = setup(), b = broker({ live: true }); let tries = 0; const W = b.WS; b.WS = class extends W { constructor() { super(); tries++; } };
+    await run({ env: ENV, dir, WS: b.WS, ...clockAt(dayStart(day) + 50 * 60), bars: async () => cand, log: () => {}, pause: async () => {} });
+    assert.equal(tries, 1, 'a live account is refused once, never retried'); }
+});

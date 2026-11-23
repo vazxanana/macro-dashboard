@@ -101,7 +101,8 @@ test('a stop-out at the broker is booked -1R and the other order goes; the off-s
   { const dir = setup({ vb: { on: false } }), b = broker(); const out = await go(dir, b, T0 + 60); assert.equal(out.skipped, 'off'); assert.equal(b.sent.length, 0); }
   { const dir = setup(), b = broker({ live: true }); await go(dir, b, T0 + 60); assert.equal(news(b).length, 0, 'not a demo account: refused'); }
   { const dir = setup(), b = broker(); const out = await go(dir, b, T0 - 3 * DAY + 60); assert.equal(out.skipped, 'nothing due'); assert.equal(b.sent.length, 0); }
-  { const dir = setup(), b = broker(); const out = await go(dir, b, T0 + 1500); assert.equal(out.skipped, 'nothing due'); assert.equal(news(b).length, 0); }
+  { const dir = setup(), b = broker(); await go(dir, b, T0 + 1500); assert.equal(news(b).length, 0); assert.equal(b.sent.length, 0, 'a late start does not even connect');
+    assert.deepEqual(file(dir).map((r) => [r.market, r.status]), [['xau', 'missed'], ['usdjpy', 'missed']], 'but the day is on the record as missed'); }
   { const dir = setup(), b = broker(); const out = await step({ env: { ...ENV, CTRADER_ENV: 'live' }, dir, WS: b.WS, clock: () => (T0 + 60) * 1000, bars: feed(T0 + 60), log: () => {} }); assert.equal(out.skipped, 'config'); assert.equal(b.sent.length, 0); }
 });
 test('orders the broker already holds for the day are adopted, never placed twice (a pass whose record was lost)', async () => {
@@ -127,4 +128,19 @@ test('wiring: demo only, its own labels, the loop runs it under a timeout, and n
   assert.equal((yml.match(/timeout 45 node council\/vb-demo\.mjs data \|\| echo/g) || []).length, 2, 'the round and the quick pass');
   for (const m of src.matchAll(/PT\.NEW_ORDER_REQ, \{([^}]*)\}/g)) assert.ok(m[1].includes('...base'), 'every order carries the stop of `base`');
   assert.ok(/stopLoss: stop, label: M\.label/.test(src));
+});
+
+// 23 Nov 2026: a weekday on which no pass looked in the first twenty minutes (the loop down or handing over) left no record at
+// all, so the demo record could not be set beside the forward record day by day. Such a day is now written as "missed" (no
+// broker contact), once; a day with any record is left alone, and nothing is written at a weekend or after 21:00.
+test('a weekday with no look in the first twenty minutes is recorded once as missed, without connecting; never at a weekend', async () => {
+  const dir = setup(), b = broker();
+  await go(dir, b, T0 + 3600); await go(dir, b, T0 + 7200);
+  const r = file(dir); assert.equal(r.length, 2); assert.ok(r.every((x) => x.status === 'missed' && /first twenty minutes/.test(x.why) && x.day === '2026-11-24'));
+  assert.equal(b.sent.length, 0);
+  { const d2 = setup(), b2 = broker(); const out = await go(d2, b2, T0 - 3 * DAY + 3600); assert.equal(out.skipped, 'nothing due'); assert.ok(!fs.existsSync(path.join(d2, 'vb', 'trades.json'))); }
+  { const d3 = setup(), b3 = broker(); const out = await go(d3, b3, T0 + EXIT_S + 60); assert.equal(out.skipped, 'nothing due', 'after 21:00 the day is over'); }
+  { const d4 = setup(), b4 = broker(); await go(d4, b4, T0 + 60); const before = JSON.stringify(file(d4)); await go(d4, b4, T0 + 1500); assert.equal(JSON.stringify(file(d4).map((x) => x.status)), JSON.stringify(JSON.parse(before).map((x) => x.status)), 'a placed day stays placed'); }
+  { const d5 = setup(), b5 = broker(); const out = await step({ env: { ...ENV, CTRADER_MIRROR: 'off' }, dir: d5, WS: b5.WS, clock: () => (T0 + 3600) * 1000, bars: feed(T0 + 3600), log: () => {} });
+    assert.equal(out.skipped, 'config'); assert.ok(!fs.existsSync(path.join(d5, 'vb', 'trades.json')), 'no demo configured: nothing written'); }
 });

@@ -704,13 +704,13 @@ test('amend: a council stop / target move on an open trade is sent to the broker
 
 // ---- 8 Nov (owner): one demo account per book ---------------------------------------------------------------------------------
 test('books and accounts: every trade has one book; accounts come from config.json or CTRADER_ACCOUNTS, the base account takes the rest', () => {
-  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit', 'replica']); assert.equal(bookOf({ id: 'xau-replica-1-s', k: 'replica', shadow: true }), 'replica');
+  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6']); assert.equal(bookOf({ id: 'xau-replica-1-s', k: 'replica', shadow: true }), 'replica');
   assert.equal(bookOf({ id: 'ict:nq-b-1' }), 'ict'); assert.equal(bookOf({ id: 'xau-lit-s-1', k: 'lit', shadow: true }), 'lit'); assert.equal(bookOf({ id: 'eurusd-scalp-1', shadow: true }), 'shadow'); assert.equal(bookOf({ id: 'eurusd-scalp-1', k: 'scalp' }), 'council');
-  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242', replica: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
+  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242', replica: '4242', mosha6: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
   a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, { mirrorAccounts: { shadow: '5000', lit: '6000' } });
-  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000', replica: '4242' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict', 'replica']], ['5000', ['shadow']], ['6000', ['lit']]]);
+  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000', replica: '4242', mosha6: '4242' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict', 'replica', 'mosha6']], ['5000', ['shadow']], ['6000', ['lit']]]);
   a = accountsFor({ CTRADER_ACCOUNT_ID: '4242', CTRADER_ACCOUNTS: 'ict:7000, lit:8000,bogus:1' }, { mirrorAccounts: { lit: '6000' } });
-  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000', replica: '4242' }, 'the env wins over config.json; unknown books ignored');
+  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000', replica: '4242', mosha6: '4242' }, 'the env wins over config.json; unknown books ignored');
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', book: 'shadow', result: 'no' }, 0).title, /^Demo mirror \[shadow\]: order rejected/);
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', result: 'no' }, 0).title, /^Demo mirror: order rejected/);
 });
@@ -1056,4 +1056,67 @@ test('12 Nov 2026 (owner: count duplicates once): one order recorded under two s
   // held on another account: not opened here; a record marked duplicate is never a candidate
   b = broker(); r = await mirrorRound({ env: ENV, trades: [a, b2, { ...other, status: 'duplicate', dupOf: a.id }], state: started, WS: b.WS, now: NOW, exclude: new Set([a.id]) });
   assert.equal(b.positions.size, 0);
+});
+
+// ---- 23 Nov 2026 (owner): the Mosha desk's 6R barrier records on their own demo account (the old Shadows account) ------------
+import { moshaCandidates, moshaHasOwnAccount, isMosha6, MOSHA6 } from '../council/ctrader-mirror.mjs';
+const mrec = (o = {}) => ({ id: 'bar-r6-15m-b' + (NOW - 300), kind: 'barrier', h: '15m', l: '1m', side: 1, t: NOW - 300, entry: 3600, stop: 3594, target: 3636, r0: 6, status: 'open', R: null, endT: null, exit: null, first: NOW - 120, src: 'live', ...o });
+
+test('Mosha 6R: only the 6R barrier reading, gold only, one per side and fill time, stop on the losing side', () => {
+  assert.equal(isMosha6('bar-r6-tap-15m-b1'), true); assert.equal(isMosha6('xau:bar-r6-15m-b1'), true); assert.equal(isMosha6('bar-old-15m-b1'), false); assert.equal(isMosha6('bar-15m-b1'), false);
+  const desk = { records: [
+    mrec(), mrec({ id: 'bar-r6-tap-15m-b' + (NOW - 300), entry: 3600.4 }),           // same side and fill second: a twin, dropped
+    mrec({ id: 'bar-old-15m-b1' }), mrec({ id: 'bar-15m-b2' }), mrec({ id: 'sop-15m-3' }),   // other readings
+    mrec({ id: 'eurusd:bar-r6-15m-b9', market: 'eurusd' }),                               // not gold
+    mrec({ id: 'bar-r6-15m-s5', side: -1, t: NOW - 200, entry: 3600, stop: 3594, target: 3564 }),   // a sell with its stop BELOW: wrong side, dropped
+    mrec({ id: 'bar-r6-15m-s6', side: -1, t: NOW - 100, entry: 3600, stop: 3606, target: 3564 }),
+  ] };
+  const c = moshaCandidates(desk, NOW);
+  assert.deepEqual(c.map((x) => x.id), ['mosha6:bar-r6-15m-b' + (NOW - 300), 'mosha6:bar-r6-15m-s6']);
+  const [b, s] = c;
+  assert.equal(b.side, 'buy'); assert.equal(s.side, 'sell'); assert.equal(b.k, 'mosha6'); assert.equal(b.market, 'xau'); assert.equal(b.status, 'open');
+  assert.equal(b.stop, 3594); assert.equal(b.t1, 3636); assert.equal(b.rr, 6); assert.equal(b.opened, NOW - 300); assert.equal(b.r0, 6); assert.equal(b.shadow, false); assert.equal(b.noCopy, undefined);
+  assert.equal(bookOf(b), 'mosha6'); assert.equal(bookOf(s), 'mosha6');
+  assert.deepEqual(moshaCandidates(null, NOW), []); assert.deepEqual(moshaCandidates({ records: 'x' }, NOW), []);
+});
+
+test('Mosha 6R: an old, replayed or Kraken-priced record is never OPENED (noCopy, with a reason); a closed one stays 2 days for the close', () => {
+  const desk = { records: [
+    mrec({ id: 'bar-r6-15m-b1', t: NOW - 3 * 86400, first: NOW - 60, src: 'replay' }),     // backfilled: fill days ago
+    mrec({ id: 'bar-r6-15m-b2', t: NOW - 600, first: NOW - MOSHA6.fresh - 60 }),            // recorded over 2 h ago
+    mrec({ id: 'bar-r6-15m-b3', t: NOW - 400, feed: 'Kraken' }),
+    mrec({ id: 'bar-r6-15m-b4', t: NOW - 3600, status: 'stopped', R: -1, endT: NOW - 3000, exit: 3594 }),
+    mrec({ id: 'bar-r6-15m-b5', t: NOW - 5 * 86400, status: 'target', R: 6, endT: NOW - 3 * 86400, exit: 3636 }),   // closed long ago: out
+  ] };
+  const c = Object.fromEntries(moshaCandidates(desk, NOW).map((x) => [x.id.slice(7), x]));
+  assert.deepEqual(Object.keys(c), ['bar-r6-15m-b1', 'bar-r6-15m-b2', 'bar-r6-15m-b3', 'bar-r6-15m-b4']);
+  for (const k of ['bar-r6-15m-b1', 'bar-r6-15m-b2', 'bar-r6-15m-b3']) { assert.equal(c[k].noCopy, true, k); assert.match(c[k].noCopyWhy, /^Mosha 6R: /); }
+  assert.equal(c['bar-r6-15m-b4'].status, 'stopped'); assert.equal(c['bar-r6-15m-b4'].exitPx, 3594); assert.equal(c['bar-r6-15m-b4'].R, -1);
+});
+
+test('Mosha 6R: copied only while the mosha6 book has its own account; the repo routes it to 10152145', () => {
+  assert.equal(moshaHasOwnAccount({ council: '1', mosha6: '1' }), false); assert.equal(moshaHasOwnAccount({ council: '1', mosha6: '2' }), true); assert.equal(moshaHasOwnAccount({ council: '', mosha6: '2' }), false);
+  const ACCF = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
+  const a = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACCF.mirrorAccounts, drain: ACCF.drain });
+  assert.equal(a.byBook.mosha6, '10152145'); assert.deepEqual(a.groups.find((g) => g.account === '10152145').books, ['mosha6']);
+  const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
+  assert.match(src, /moshaHasOwnAccount\(byBook\) \? moshaCandidates\(desk\) : \[\]/);
+  assert.equal(LIMITS.risk.mosha6, 0.0025);
+});
+
+test('Mosha 6R: a fake-broker round opens one market order with its stop and target at 0.25% risk; the twin and the old record are not opened; the close follows the record', async () => {
+  const desk = { records: [mrec(), mrec({ id: 'bar-r6-eg-15m-b' + (NOW - 300), entry: 3600.2 }), mrec({ id: 'bar-r6-15m-b77', t: NOW - 3 * 86400, first: NOW - 60, src: 'replay' })] };
+  const trades = moshaCandidates(desk, NOW), b = broker();
+  let r = await mirrorRound({ env: ENV, trades, state: started, WS: b.WS, now: NOW, openBooks: ['mosha6'], marks: { xau: { price: 3601, at: NOW - 30 } } });
+  const os = orders(b); assert.equal(os.length, 1, 'one position for the one fill');
+  const o = os[0].payload; assert.equal(o.symbolId, 41); assert.equal(o.tradeSide, 1); assert.ok(o.relativeStopLoss > 0 && o.relativeTakeProfit > 0);
+  assert.match(o.comment, /mosha6:bar-r6-15m-b/);
+  const id = 'mosha6:bar-r6-15m-b' + (NOW - 300), m = r.state.map[id]; assert.equal(m.status, 'open'); assert.ok(m.riskCash > 0);
+  assert.equal(r.state.map['mosha6:bar-r6-15m-b77'], undefined);
+  // riskCash = 0.25% of the balance per 1R (or the broker minimum, never more than allowed)
+  const bal = r.state.balance; assert.ok(m.riskCash <= bal * LIMITS.risk.mosha6 + 1e-6 || m.minLot, `${m.riskCash} vs ${bal}`);
+  // the record closes: the copy is closed with it
+  const closed = moshaCandidates({ records: [mrec({ status: 'stopped', R: -1, endT: NOW + 200, exit: 3594 })] }, NOW + 240);
+  r = await mirrorRound({ env: ENV, trades: closed, state: r.state, WS: b.WS, now: NOW + 240, openBooks: ['mosha6'] });
+  assert.equal(r.state.map[id].status, 'closed by council');
 });

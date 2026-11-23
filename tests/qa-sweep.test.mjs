@@ -862,7 +862,7 @@ test('QA 12 Nov: on a phone the market-cycle strip waits behind "More" with the 
   assert.ok(rule, 'the "More" rule of the Charts simple view');
   for (const c of ['.mk-mode', '.ind-open', '.cx-tog', '.adr', '.mtf', '.cycle']) assert.ok(rule[1].split(/,\s*/).includes(c), c);
   assert.match(Q12, /<div class="cycle" id="ms-cycle"/, 'the strip is still the .cycle child of the charts toolbar');
-  assert.match(Q12, /id="ps-ch-more"[^>]*aria-label="More chart tools: markup, indicators, market context and the market cycle"/);
+  assert.match(Q12, /id="ps-ch-more"[^>]*aria-label="More chart tools: markup, indicators, market context, the market cycle and the market phase"/);
   assert.match(src('scripts/audit/smoke.cjs'), /the market-cycle strip is not behind "More"/);
 });
 

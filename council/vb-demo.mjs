@@ -60,12 +60,17 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   for (const k of Object.keys(MARKETS)) { const open = J.trades.filter((x) => x.market === k && (x.status === 'placed' || x.status === 'open'));
     for (const r of open) work.push({ k, rec: r, what: due(r, now) });
     if (!J.trades.some((x) => x.market === k && x.day === day) && due(null, now) === 'place') work.push({ k, rec: null, what: 'place' }); }
-  if (!work.length) return { skipped: 'nothing due' };
+  // a weekday whose first twenty minutes no pass looked at (the loop down or handing over) is written as missed, once, without
+  // connecting (23 Nov 2026: such a day left no record, so the demo record could not be set beside the forward record day by day)
+  const s0 = now - d0Of(now), late = weekday(now) && s0 > PLACE_UNTIL && s0 < EXIT_S ? Object.keys(MARKETS).filter((k) => !J.trades.some((x) => x.market === k && x.day === day)) : [];
+  if (!work.length && !late.length) return { skipped: 'nothing due' };
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('vb: cTrader demo not configured'); return { skipped: 'config' }; }
   const account = (cfg.vb && cfg.vb.account && String(cfg.vb.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('vb: no demo account for it'); return { skipped: 'account' }; }
   const risk = Math.min(0.01, Math.max(0.0005, +(cfg.vb && cfg.vb.risk) || RISK));
   const write = () => { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; if (J.trades.length > 2000) J.trades = J.trades.slice(-2000); fs.writeFileSync(tmp, JSON.stringify(J, null, 1)); fs.renameSync(tmp, file); save(); };
   const did = []; let s = null, ctid, dirty = false;
+  for (const k of late) { J.trades.push({ id: `${k}-${day}`, market: k, day, status: 'missed', why: 'no order was placed in the first twenty minutes of the day, 00:00-00:20 UTC (no pass looked, or the demo could not be reached)', exitAt: d0Of(now) + EXIT_S, account: `…${String(account).slice(-3)}` }); dirty = true; did.push(`${k} missed`); }
+  if (!work.length) { write(); return { did }; }
   try {
     ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), positions = rc.position || [], orders = rc.order || [];

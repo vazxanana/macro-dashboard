@@ -83,3 +83,16 @@ test('owner rule replica-mirror-gold-only (11 Nov 2026): an uncopied forex / cry
   const r2 = reconcile(data({ ...d, 'config.json': {}, 'ctrader/mirror-3.json': { state: {} } }));
   assert.match(Object.fromEntries(r2.rows.map((x) => [x.id, x]))['eurusd-replica-2-b'].issues.join(), /no copy and no recorded reason/);
 });
+
+test('Mosha 6R book (23 Nov 2026): its copies are recognised, and an old record left uncopied carries the mirror\'s reason', () => {
+  const now = Math.floor(Date.now() / 1000), rec = (o) => ({ id: 'bar-r6-15m-b' + (now - 300), kind: 'barrier', side: 1, t: now - 300, entry: 3600, stop: 3594, target: 3636, r0: 6, status: 'open', first: now - 120, src: 'live', ...o });
+  const d = base({ 'mosha/desk.json': { records: [rec(), rec({ id: 'bar-r6-15m-b1', t: now - 3 * 86400, first: now - 60, src: 'replay' })] } });
+  d['ctrader/mirror-accounts.json'] = { groups: groups.concat([{ account: '5', books: ['mosha6'], file: 'mirror-5.json' }]) };
+  const id = 'mosha6:bar-r6-15m-b' + (now - 300);
+  d['ctrader/mirror-5.json'] = { state: { map: { [id]: { positionId: '7', status: 'open', digits: 2, stop: 3594, t1: 3636, mark: 3600, levelsFrom: 'mark', fillPrice: 3600 } } } };
+  d['ctrader/accounts.json'].accounts.push({ label: 'Mosha 6R barrier', books: ['mosha6'], open: [{ id: '7', symbol: 'XAUUSD', side: 'buy', entry: 3600, sl: 3594, tp: 3636, lots: 0.01 }], orders: [], history: [] });
+  const r = reconcile(data(d));
+  const row = r.rows.find((x) => x.id === id); assert.equal(row.book, 'mosha6'); assert.equal(row.state, 'position'); assert.deepEqual(row.issues, []);
+  assert.equal(r.orphans.length, 0, 'the copy is not a stranger');
+  const old = r.rows.find((x) => x.id === 'mosha6:bar-r6-15m-b1'); assert.equal(old.state, 'not copied'); assert.match(old.why, /^Mosha 6R: /); assert.deepEqual(old.issues, []);
+});

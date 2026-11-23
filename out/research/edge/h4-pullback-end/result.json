@@ -1,0 +1,4480 @@
+{
+ "study": "h4-pullback-end",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "T1 (five markets): +0.125R a trade after costs out of sample (n 120, month t 0.77), −0.036R in sample (n 154), +0.042R on 2010-2019 (n 411, month t 0.59). Lines missed: oosT, holm, isMean. T2 (gold) fails, T3 (forex) fails, T4 (location picks better) fails.",
+ "params": {
+  "swing": 3,
+  "voidH1": 120,
+  "minR": 1,
+  "minStopCosts": 3,
+  "hold": 864000
+ },
+ "windows": {
+  "rep": [
+   1262304000,
+   1577836800
+  ],
+  "is": [
+   1577836800,
+   1704067200
+  ],
+  "oos": [
+   1704067200,
+   4102444800
+  ]
+ },
+ "costs": {
+  "xau": 0.3,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006
+ },
+ "plain": [
+  "Before costs the rule is +0.146R a trade out of sample, −0.013R in sample and +0.068R on 2010-2019; the median cost is +0.020R a trade, the median target +1.76R away.",
+  "Gold alone: +0.495R a trade after costs out of sample (n 20), −0.038R on 2010-2019 (n 76). Forex pooled: +0.051R (n 100) and +0.060R (n 335).",
+  "The location step: out of sample the kept trades made +0.125R a trade and the rejected ones −0.125R (Welch t 1.34).",
+  "External range (pullback past the 50 % line) +0.145R (n 75) against internal +0.090R (n 45) out of sample, after costs.",
+  "Exits (T1, all windows): stop 427 (−1.00R before costs), target 254 (+1.84R before costs), time 4 (+0.89R before costs).",
+  "Buys +0.080R and sells +0.159R a trade after costs out of sample."
+ ],
+ "oosEnd": "2026-11-11",
+ "tests": [
+  {
+   "id": "T1",
+   "name": "five markets pooled",
+   "windows": {
+    "rep": {
+     "net": {
+      "n": 411,
+      "wins": 156,
+      "meanR": 0.0423,
+      "total": 17.3923,
+      "tTrade": 0.5914,
+      "months": 120,
+      "tMonth": 0.5925,
+      "pMonth": 0.5546,
+      "maxDD": -14.7469
+     },
+     "net2x": {
+      "n": 411,
+      "wins": 156,
+      "meanR": 0.017,
+      "total": 6.985,
+      "tTrade": 0.2374,
+      "months": 120,
+      "tMonth": 0.2378,
+      "pMonth": 0.8125,
+      "maxDD": -16.1851
+     },
+     "gross": {
+      "n": 411,
+      "wins": 156,
+      "meanR": 0.0676,
+      "total": 27.7996,
+      "tTrade": 0.9456,
+      "months": 120,
+      "tMonth": 0.9475,
+      "pMonth": 0.3453,
+      "maxDD": -13.9609
+     }
+    },
+    "is": {
+     "net": {
+      "n": 154,
+      "wins": 53,
+      "meanR": -0.0363,
+      "total": -5.5953,
+      "tTrade": -0.3148,
+      "months": 48,
+      "tMonth": -0.3703,
+      "pMonth": 0.7129,
+      "maxDD": -24.5419
+     },
+     "net2x": {
+      "n": 154,
+      "wins": 53,
+      "meanR": -0.0593,
+      "total": -9.127,
+      "tTrade": -0.5135,
+      "months": 48,
+      "tMonth": -0.6041,
+      "pMonth": 0.5487,
+      "maxDD": -26.3321
+     },
+     "gross": {
+      "n": 154,
+      "wins": 53,
+      "meanR": -0.0134,
+      "total": -2.0635,
+      "tTrade": -0.1161,
+      "months": 48,
+      "tMonth": -0.1364,
+      "pMonth": 0.8921,
+      "maxDD": -22.7517
+     }
+    },
+    "oos": {
+     "net": {
+      "n": 120,
+      "wins": 48,
+      "meanR": 0.1247,
+      "total": 14.9635,
+      "tTrade": 0.9252,
+      "months": 35,
+      "tMonth": 0.7747,
+      "pMonth": 0.4439,
+      "maxDD": -13.0031
+     },
+     "net2x": {
+      "n": 120,
+      "wins": 48,
+      "meanR": 0.103,
+      "total": 12.3622,
+      "tTrade": 0.764,
+      "months": 35,
+      "tMonth": 0.641,
+      "pMonth": 0.5258,
+      "maxDD": -13.9656
+     },
+     "gross": {
+      "n": 120,
+      "wins": 48,
+      "meanR": 0.1464,
+      "total": 17.5648,
+      "tTrade": 1.0864,
+      "months": 35,
+      "tMonth": 0.9078,
+      "pMonth": 0.3704,
+      "maxDD": -12.604
+     }
+    }
+   },
+   "pRaw": 0.222,
+   "holmP": 0.4439,
+   "lines": {
+    "oosMean": true,
+    "oosT": false,
+    "holm": false,
+    "isMean": false,
+    "oos2x": true,
+    "n30": true,
+    "repMean": true
+   },
+   "pass": false,
+   "detail": {
+    "byMarket": {
+     "eurusd": {
+      "rep": {
+       "net": {
+        "n": 91,
+        "wins": 31,
+        "meanR": -0.0863,
+        "total": -7.8555,
+        "tTrade": -0.6105,
+        "months": 120,
+        "tMonth": -0.5729,
+        "pMonth": 0.5678,
+        "maxDD": -13.7436
+       },
+       "net2x": {
+        "n": 91,
+        "wins": 31,
+        "meanR": -0.1055,
+        "total": -9.6019,
+        "tTrade": -0.7452,
+        "months": 120,
+        "tMonth": -0.698,
+        "pMonth": 0.4865,
+        "maxDD": -14.2129
+       },
+       "gross": {
+        "n": 91,
+        "wins": 31,
+        "meanR": -0.0671,
+        "total": -6.109,
+        "tTrade": -0.4754,
+        "months": 120,
+        "tMonth": -0.4469,
+        "pMonth": 0.6558,
+        "maxDD": -13.2744
+       }
+      },
+      "is": {
+       "net": {
+        "n": 29,
+        "wins": 10,
+        "meanR": 0.0378,
+        "total": 1.0957,
+        "tTrade": 0.133,
+        "months": 48,
+        "tMonth": 0.139,
+        "pMonth": 0.8901,
+        "maxDD": -8.1522
+       },
+       "net2x": {
+        "n": 29,
+        "wins": 10,
+        "meanR": 0.0173,
+        "total": 0.5004,
+        "tTrade": 0.0607,
+        "months": 48,
+        "tMonth": 0.0634,
+        "pMonth": 0.9497,
+        "maxDD": -8.3043
+       },
+       "gross": {
+        "n": 29,
+        "wins": 10,
+        "meanR": 0.0583,
+        "total": 1.691,
+        "tTrade": 0.2051,
+        "months": 48,
+        "tMonth": 0.2146,
+        "pMonth": 0.831,
+        "maxDD": -8
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 21,
+        "wins": 7,
+        "meanR": -0.1034,
+        "total": -2.1724,
+        "tTrade": -0.3506,
+        "months": 34,
+        "tMonth": -0.4221,
+        "pMonth": 0.6757,
+        "maxDD": -8.4813
+       },
+       "net2x": {
+        "n": 21,
+        "wins": 7,
+        "meanR": -0.1263,
+        "total": -2.6528,
+        "tTrade": -0.4287,
+        "months": 34,
+        "tMonth": -0.517,
+        "pMonth": 0.6086,
+        "maxDD": -8.8741
+       },
+       "gross": {
+        "n": 21,
+        "wins": 7,
+        "meanR": -0.0806,
+        "total": -1.6919,
+        "tTrade": -0.2727,
+        "months": 34,
+        "tMonth": -0.3276,
+        "pMonth": 0.7453,
+        "maxDD": -8.0886
+       }
+      }
+     },
+     "usdjpy": {
+      "rep": {
+       "net": {
+        "n": 85,
+        "wins": 33,
+        "meanR": 0.1008,
+        "total": 8.5721,
+        "tTrade": 0.5978,
+        "months": 115,
+        "tMonth": 0.6206,
+        "pMonth": 0.5361,
+        "maxDD": -10.7092
+       },
+       "net2x": {
+        "n": 85,
+        "wins": 33,
+        "meanR": 0.0749,
+        "total": 6.3695,
+        "tTrade": 0.4438,
+        "months": 115,
+        "tMonth": 0.4605,
+        "pMonth": 0.646,
+        "maxDD": -11.568
+       },
+       "gross": {
+        "n": 85,
+        "wins": 33,
+        "meanR": 0.1268,
+        "total": 10.7748,
+        "tTrade": 0.752,
+        "months": 115,
+        "tMonth": 0.7808,
+        "pMonth": 0.4365,
+        "maxDD": -10.0018
+       }
+      },
+      "is": {
+       "net": {
+        "n": 32,
+        "wins": 13,
+        "meanR": 0.0136,
+        "total": 0.4339,
+        "tTrade": 0.0581,
+        "months": 46,
+        "tMonth": 0.0679,
+        "pMonth": 0.9461,
+        "maxDD": -5.854
+       },
+       "net2x": {
+        "n": 32,
+        "wins": 13,
+        "meanR": -0.0143,
+        "total": -0.4571,
+        "tTrade": -0.0612,
+        "months": 46,
+        "tMonth": -0.0715,
+        "pMonth": 0.9433,
+        "maxDD": -6.1739
+       },
+       "gross": {
+        "n": 32,
+        "wins": 13,
+        "meanR": 0.0414,
+        "total": 1.3249,
+        "tTrade": 0.1776,
+        "months": 46,
+        "tMonth": 0.2074,
+        "pMonth": 0.8367,
+        "maxDD": -5.5342
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 23,
+        "wins": 9,
+        "meanR": 0.0739,
+        "total": 1.6998,
+        "tTrade": 0.2496,
+        "months": 32,
+        "tMonth": 0.2496,
+        "pMonth": 0.8046,
+        "maxDD": -6.111
+       },
+       "net2x": {
+        "n": 23,
+        "wins": 9,
+        "meanR": 0.0593,
+        "total": 1.3645,
+        "tTrade": 0.2002,
+        "months": 32,
+        "tMonth": 0.2002,
+        "pMonth": 0.8426,
+        "maxDD": -6.2221
+       },
+       "gross": {
+        "n": 23,
+        "wins": 9,
+        "meanR": 0.0885,
+        "total": 2.0351,
+        "tTrade": 0.2992,
+        "months": 32,
+        "tMonth": 0.2989,
+        "pMonth": 0.767,
+        "maxDD": -6
+       }
+      }
+     },
+     "xau": {
+      "rep": {
+       "net": {
+        "n": 76,
+        "wins": 29,
+        "meanR": -0.0376,
+        "total": -2.8591,
+        "tTrade": -0.2415,
+        "months": 118,
+        "tMonth": -0.2442,
+        "pMonth": 0.8075,
+        "maxDD": -15.0704
+       },
+       "net2x": {
+        "n": 76,
+        "wins": 29,
+        "meanR": -0.0815,
+        "total": -6.196,
+        "tTrade": -0.5235,
+        "months": 118,
+        "tMonth": -0.5287,
+        "pMonth": 0.598,
+        "maxDD": -17.2676
+       },
+       "gross": {
+        "n": 76,
+        "wins": 29,
+        "meanR": 0.0063,
+        "total": 0.4779,
+        "tTrade": 0.0403,
+        "months": 118,
+        "tMonth": 0.0408,
+        "pMonth": 0.9675,
+        "maxDD": -12.8731
+       }
+      },
+      "is": {
+       "net": {
+        "n": 27,
+        "wins": 7,
+        "meanR": -0.3149,
+        "total": -8.5029,
+        "tTrade": -1.2592,
+        "months": 47,
+        "tMonth": -1.3494,
+        "pMonth": 0.1838,
+        "maxDD": -14.8117
+       },
+       "net2x": {
+        "n": 27,
+        "wins": 7,
+        "meanR": -0.3443,
+        "total": -9.2965,
+        "tTrade": -1.3779,
+        "months": 47,
+        "tMonth": -1.4707,
+        "pMonth": 0.1482,
+        "maxDD": -15.385
+       },
+       "gross": {
+        "n": 27,
+        "wins": 7,
+        "meanR": -0.2855,
+        "total": -7.7094,
+        "tTrade": -1.1406,
+        "months": 47,
+        "tMonth": -1.2265,
+        "pMonth": 0.2263,
+        "maxDD": -14.2385
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 20,
+        "wins": 10,
+        "meanR": 0.4949,
+        "total": 9.8989,
+        "tTrade": 1.313,
+        "months": 32,
+        "tMonth": 1.2003,
+        "pMonth": 0.2391,
+        "maxDD": -7.1546
+       },
+       "net2x": {
+        "n": 20,
+        "wins": 10,
+        "meanR": 0.4801,
+        "total": 9.6026,
+        "tTrade": 1.2709,
+        "months": 32,
+        "tMonth": 1.1603,
+        "pMonth": 0.2548,
+        "maxDD": -7.3092
+       },
+       "gross": {
+        "n": 20,
+        "wins": 10,
+        "meanR": 0.5098,
+        "total": 10.1952,
+        "tTrade": 1.3552,
+        "months": 32,
+        "tMonth": 1.2404,
+        "pMonth": 0.2241,
+        "maxDD": -7
+       }
+      }
+     },
+     "gbpusd": {
+      "rep": {
+       "net": {
+        "n": 84,
+        "wins": 36,
+        "meanR": 0.2283,
+        "total": 19.176,
+        "tTrade": 1.3941,
+        "months": 119,
+        "tMonth": 1.4354,
+        "pMonth": 0.1538,
+        "maxDD": -7.0774
+       },
+       "net2x": {
+        "n": 84,
+        "wins": 36,
+        "meanR": 0.2095,
+        "total": 17.5999,
+        "tTrade": 1.2801,
+        "months": 119,
+        "tMonth": 1.3202,
+        "pMonth": 0.1893,
+        "maxDD": -7.1549
+       },
+       "gross": {
+        "n": 84,
+        "wins": 36,
+        "meanR": 0.247,
+        "total": 20.7521,
+        "tTrade": 1.5079,
+        "months": 119,
+        "tMonth": 1.5498,
+        "pMonth": 0.1239,
+        "maxDD": -7
+       }
+      },
+      "is": {
+       "net": {
+        "n": 38,
+        "wins": 13,
+        "meanR": -0.0066,
+        "total": -0.2519,
+        "tTrade": -0.027,
+        "months": 42,
+        "tMonth": -0.0312,
+        "pMonth": 0.9753,
+        "maxDD": -4.4919
+       },
+       "net2x": {
+        "n": 38,
+        "wins": 13,
+        "meanR": -0.0248,
+        "total": -0.9413,
+        "tTrade": -0.1008,
+        "months": 42,
+        "tMonth": -0.1168,
+        "pMonth": 0.9076,
+        "maxDD": -4.7721
+       },
+       "gross": {
+        "n": 38,
+        "wins": 13,
+        "meanR": 0.0115,
+        "total": 0.4375,
+        "tTrade": 0.0468,
+        "months": 42,
+        "tMonth": 0.0541,
+        "pMonth": 0.9571,
+        "maxDD": -4.2466
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 28,
+        "wins": 13,
+        "meanR": 0.2795,
+        "total": 7.8252,
+        "tTrade": 0.9723,
+        "months": 34,
+        "tMonth": 0.9832,
+        "pMonth": 0.3327,
+        "maxDD": -4.0813
+       },
+       "net2x": {
+        "n": 28,
+        "wins": 13,
+        "meanR": 0.2515,
+        "total": 7.0432,
+        "tTrade": 0.8761,
+        "months": 34,
+        "tMonth": 0.8926,
+        "pMonth": 0.3785,
+        "maxDD": -4.1626
+       },
+       "gross": {
+        "n": 28,
+        "wins": 13,
+        "meanR": 0.3074,
+        "total": 8.6073,
+        "tTrade": 1.0682,
+        "months": 34,
+        "tMonth": 1.0719,
+        "pMonth": 0.2916,
+        "maxDD": -4
+       }
+      }
+     },
+     "audusd": {
+      "rep": {
+       "net": {
+        "n": 75,
+        "wins": 27,
+        "meanR": 0.0048,
+        "total": 0.3587,
+        "tTrade": 0.0277,
+        "months": 119,
+        "tMonth": 0.0267,
+        "pMonth": 0.9787,
+        "maxDD": -15.7042
+       },
+       "net2x": {
+        "n": 75,
+        "wins": 27,
+        "meanR": -0.0158,
+        "total": -1.1865,
+        "tTrade": -0.0918,
+        "months": 119,
+        "tMonth": -0.0883,
+        "pMonth": 0.9298,
+        "maxDD": -16.7601
+       },
+       "gross": {
+        "n": 75,
+        "wins": 27,
+        "meanR": 0.0254,
+        "total": 1.9038,
+        "tTrade": 0.1471,
+        "months": 119,
+        "tMonth": 0.1419,
+        "pMonth": 0.8874,
+        "maxDD": -14.6483
+       }
+      },
+      "is": {
+       "net": {
+        "n": 28,
+        "wins": 10,
+        "meanR": 0.0582,
+        "total": 1.6299,
+        "tTrade": 0.2019,
+        "months": 46,
+        "tMonth": 0.2535,
+        "pMonth": 0.801,
+        "maxDD": -3.7942
+       },
+       "net2x": {
+        "n": 28,
+        "wins": 10,
+        "meanR": 0.0381,
+        "total": 1.0675,
+        "tTrade": 0.1323,
+        "months": 46,
+        "tMonth": 0.1668,
+        "pMonth": 0.8683,
+        "maxDD": -3.9083
+       },
+       "gross": {
+        "n": 28,
+        "wins": 10,
+        "meanR": 0.0783,
+        "total": 2.1924,
+        "tTrade": 0.2713,
+        "months": 46,
+        "tMonth": 0.3394,
+        "pMonth": 0.7359,
+        "maxDD": -3.68
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 28,
+        "wins": 9,
+        "meanR": -0.0817,
+        "total": -2.2881,
+        "tTrade": -0.2995,
+        "months": 35,
+        "tMonth": -0.2593,
+        "pMonth": 0.7969,
+        "maxDD": -13.186
+       },
+       "net2x": {
+        "n": 28,
+        "wins": 9,
+        "meanR": -0.107,
+        "total": -2.9953,
+        "tTrade": -0.3919,
+        "months": 35,
+        "tMonth": -0.339,
+        "pMonth": 0.7367,
+        "maxDD": -13.6377
+       },
+       "gross": {
+        "n": 28,
+        "wins": 9,
+        "meanR": -0.0565,
+        "total": -1.5809,
+        "tTrade": -0.207,
+        "months": 35,
+        "tMonth": -0.1794,
+        "pMonth": 0.8587,
+        "maxDD": -12.7343
+       }
+      }
+     }
+    },
+    "bySide": {
+     "buy": {
+      "rep": {
+       "net": {
+        "n": 180,
+        "wins": 78,
+        "meanR": 0.1482,
+        "total": 26.6816,
+        "tTrade": 1.4234,
+        "months": 119,
+        "tMonth": 1.3655,
+        "pMonth": 0.1747,
+        "maxDD": -14.3222
+       },
+       "net2x": {
+        "n": 180,
+        "wins": 78,
+        "meanR": 0.1215,
+        "total": 21.8709,
+        "tTrade": 1.166,
+        "months": 119,
+        "tMonth": 1.1219,
+        "pMonth": 0.2642,
+        "maxDD": -15.6247
+       },
+       "gross": {
+        "n": 180,
+        "wins": 78,
+        "meanR": 0.175,
+        "total": 31.4924,
+        "tTrade": 1.681,
+        "months": 119,
+        "tMonth": 1.607,
+        "pMonth": 0.1107,
+        "maxDD": -13.0197
+       }
+      },
+      "is": {
+       "net": {
+        "n": 68,
+        "wins": 24,
+        "meanR": -0.0326,
+        "total": -2.2164,
+        "tTrade": -0.1913,
+        "months": 48,
+        "tMonth": -0.1841,
+        "pMonth": 0.8548,
+        "maxDD": -17.0337
+       },
+       "net2x": {
+        "n": 68,
+        "wins": 24,
+        "meanR": -0.054,
+        "total": -3.6694,
+        "tTrade": -0.3163,
+        "months": 48,
+        "tMonth": -0.3035,
+        "pMonth": 0.7628,
+        "maxDD": -17.6898
+       },
+       "gross": {
+        "n": 68,
+        "wins": 24,
+        "meanR": -0.0112,
+        "total": -0.7634,
+        "tTrade": -0.0659,
+        "months": 48,
+        "tMonth": -0.0636,
+        "pMonth": 0.9496,
+        "maxDD": -16.3776
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 52,
+        "wins": 22,
+        "meanR": 0.0798,
+        "total": 4.1498,
+        "tTrade": 0.4323,
+        "months": 34,
+        "tMonth": 0.3965,
+        "pMonth": 0.6943,
+        "maxDD": -10.6035
+       },
+       "net2x": {
+        "n": 52,
+        "wins": 22,
+        "meanR": 0.0575,
+        "total": 2.9883,
+        "tTrade": 0.3113,
+        "months": 34,
+        "tMonth": 0.2865,
+        "pMonth": 0.7763,
+        "maxDD": -10.9039
+       },
+       "gross": {
+        "n": 52,
+        "wins": 22,
+        "meanR": 0.1021,
+        "total": 5.3112,
+        "tTrade": 0.5533,
+        "months": 34,
+        "tMonth": 0.5056,
+        "pMonth": 0.6165,
+        "maxDD": -10.3032
+       }
+      }
+     },
+     "sell": {
+      "rep": {
+       "net": {
+        "n": 231,
+        "wins": 78,
+        "meanR": -0.0402,
+        "total": -9.2893,
+        "tTrade": -0.4106,
+        "months": 120,
+        "tMonth": -0.4246,
+        "pMonth": 0.6719,
+        "maxDD": -30.4201
+       },
+       "net2x": {
+        "n": 231,
+        "wins": 78,
+        "meanR": -0.0644,
+        "total": -14.8859,
+        "tTrade": -0.6578,
+        "months": 120,
+        "tMonth": -0.6792,
+        "pMonth": 0.4984,
+        "maxDD": -32.7962
+       },
+       "gross": {
+        "n": 231,
+        "wins": 78,
+        "meanR": -0.016,
+        "total": -3.6928,
+        "tTrade": -0.1632,
+        "months": 120,
+        "tMonth": -0.169,
+        "pMonth": 0.8661,
+        "maxDD": -28.044
+       }
+      },
+      "is": {
+       "net": {
+        "n": 86,
+        "wins": 29,
+        "meanR": -0.0393,
+        "total": -3.3788,
+        "tTrade": -0.2492,
+        "months": 48,
+        "tMonth": -0.2666,
+        "pMonth": 0.7909,
+        "maxDD": -14.3683
+       },
+       "net2x": {
+        "n": 86,
+        "wins": 29,
+        "meanR": -0.0635,
+        "total": -5.4576,
+        "tTrade": -0.403,
+        "months": 48,
+        "tMonth": -0.4319,
+        "pMonth": 0.6678,
+        "maxDD": -15.9306
+       },
+       "gross": {
+        "n": 86,
+        "wins": 29,
+        "meanR": -0.0151,
+        "total": -1.3001,
+        "tTrade": -0.0958,
+        "months": 48,
+        "tMonth": -0.1023,
+        "pMonth": 0.919,
+        "maxDD": -12.806
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 68,
+        "wins": 26,
+        "meanR": 0.159,
+        "total": 10.8137,
+        "tTrade": 0.826,
+        "months": 35,
+        "tMonth": 0.7261,
+        "pMonth": 0.4727,
+        "maxDD": -10.3971
+       },
+       "net2x": {
+        "n": 68,
+        "wins": 26,
+        "meanR": 0.1379,
+        "total": 9.3739,
+        "tTrade": 0.7156,
+        "months": 35,
+        "tMonth": 0.6307,
+        "pMonth": 0.5324,
+        "maxDD": -10.8705
+       },
+       "gross": {
+        "n": 68,
+        "wins": 26,
+        "meanR": 0.1802,
+        "total": 12.2535,
+        "tTrade": 0.9365,
+        "months": 35,
+        "tMonth": 0.8209,
+        "pMonth": 0.4174,
+        "maxDD": -9.9561
+       }
+      }
+     }
+    },
+    "byRange": {
+     "external": {
+      "rep": {
+       "net": {
+        "n": 254,
+        "wins": 90,
+        "meanR": 0.0437,
+        "total": 11.0914,
+        "tTrade": 0.4577,
+        "months": 120,
+        "tMonth": 0.4756,
+        "pMonth": 0.6352,
+        "maxDD": -13.6914
+       },
+       "net2x": {
+        "n": 254,
+        "wins": 90,
+        "meanR": 0.0211,
+        "total": 5.3539,
+        "tTrade": 0.2209,
+        "months": 120,
+        "tMonth": 0.2294,
+        "pMonth": 0.819,
+        "maxDD": -14.5459
+       },
+       "gross": {
+        "n": 254,
+        "wins": 90,
+        "meanR": 0.0663,
+        "total": 16.8289,
+        "tTrade": 0.6947,
+        "months": 120,
+        "tMonth": 0.7219,
+        "pMonth": 0.4717,
+        "maxDD": -13.1095
+       }
+      },
+      "is": {
+       "net": {
+        "n": 105,
+        "wins": 34,
+        "meanR": -0.0173,
+        "total": -1.8158,
+        "tTrade": -0.117,
+        "months": 47,
+        "tMonth": -0.1285,
+        "pMonth": 0.8983,
+        "maxDD": -19.0654
+       },
+       "net2x": {
+        "n": 105,
+        "wins": 34,
+        "meanR": -0.0394,
+        "total": -4.1367,
+        "tTrade": -0.2667,
+        "months": 47,
+        "tMonth": -0.2941,
+        "pMonth": 0.77,
+        "maxDD": -20.1933
+       },
+       "gross": {
+        "n": 105,
+        "wins": 34,
+        "meanR": 0.0048,
+        "total": 0.5051,
+        "tTrade": 0.0325,
+        "months": 47,
+        "tMonth": 0.0356,
+        "pMonth": 0.9718,
+        "maxDD": -18.1737
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 75,
+        "wins": 28,
+        "meanR": 0.1455,
+        "total": 10.9124,
+        "tTrade": 0.7983,
+        "months": 35,
+        "tMonth": 0.8394,
+        "pMonth": 0.4071,
+        "maxDD": -8.762
+       },
+       "net2x": {
+        "n": 75,
+        "wins": 28,
+        "meanR": 0.1259,
+        "total": 9.44,
+        "tTrade": 0.6903,
+        "months": 35,
+        "tMonth": 0.7279,
+        "pMonth": 0.4716,
+        "maxDD": -9.2193
+       },
+       "gross": {
+        "n": 75,
+        "wins": 28,
+        "meanR": 0.1651,
+        "total": 12.3847,
+        "tTrade": 0.9064,
+        "months": 35,
+        "tMonth": 0.9501,
+        "pMonth": 0.3488,
+        "maxDD": -8.3047
+       }
+      }
+     },
+     "internal": {
+      "rep": {
+       "net": {
+        "n": 157,
+        "wins": 66,
+        "meanR": 0.0401,
+        "total": 6.3009,
+        "tTrade": 0.3768,
+        "months": 120,
+        "tMonth": 0.3828,
+        "pMonth": 0.7025,
+        "maxDD": -12.8459
+       },
+       "net2x": {
+        "n": 157,
+        "wins": 66,
+        "meanR": 0.0104,
+        "total": 1.6311,
+        "tTrade": 0.0975,
+        "months": 120,
+        "tMonth": 0.099,
+        "pMonth": 0.9213,
+        "maxDD": -13.609
+       },
+       "gross": {
+        "n": 157,
+        "wins": 66,
+        "meanR": 0.0699,
+        "total": 10.9707,
+        "tTrade": 0.6563,
+        "months": 120,
+        "tMonth": 0.6667,
+        "pMonth": 0.5063,
+        "maxDD": -12.0847
+       }
+      },
+      "is": {
+       "net": {
+        "n": 49,
+        "wins": 19,
+        "meanR": -0.0771,
+        "total": -3.7795,
+        "tTrade": -0.4314,
+        "months": 48,
+        "tMonth": -0.4254,
+        "pMonth": 0.6725,
+        "maxDD": -15.1387
+       },
+       "net2x": {
+        "n": 49,
+        "wins": 19,
+        "meanR": -0.1018,
+        "total": -4.9903,
+        "tTrade": -0.5691,
+        "months": 48,
+        "tMonth": -0.5591,
+        "pMonth": 0.5787,
+        "maxDD": -15.8239
+       },
+       "gross": {
+        "n": 49,
+        "wins": 19,
+        "meanR": -0.0524,
+        "total": -2.5687,
+        "tTrade": -0.2933,
+        "months": 48,
+        "tMonth": -0.2903,
+        "pMonth": 0.7728,
+        "maxDD": -14.4536
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 45,
+        "wins": 20,
+        "meanR": 0.09,
+        "total": 4.0511,
+        "tTrade": 0.4626,
+        "months": 34,
+        "tMonth": 0.4154,
+        "pMonth": 0.6806,
+        "maxDD": -10.349
+       },
+       "net2x": {
+        "n": 45,
+        "wins": 20,
+        "meanR": 0.0649,
+        "total": 2.9222,
+        "tTrade": 0.3336,
+        "months": 34,
+        "tMonth": 0.3,
+        "pMonth": 0.7661,
+        "maxDD": -11.0441
+       },
+       "gross": {
+        "n": 45,
+        "wins": 20,
+        "meanR": 0.1151,
+        "total": 5.18,
+        "tTrade": 0.5917,
+        "months": 34,
+        "tMonth": 0.5302,
+        "pMonth": 0.5995,
+        "maxDD": -9.6538
+       }
+      }
+     }
+    },
+    "byReason": {
+     "stop": {
+      "n": 427,
+      "R": -427.8322,
+      "Rnet": -438.3386,
+      "meanR": -1.0019,
+      "meanRnet": -1.0266
+     },
+     "target": {
+      "n": 254,
+      "R": 467.5848,
+      "Rnet": 461.6058,
+      "meanR": 1.8409,
+      "meanRnet": 1.8173
+     },
+     "time": {
+      "n": 4,
+      "R": 3.5483,
+      "Rnet": 3.4933,
+      "meanR": 0.8871,
+      "meanRnet": 0.8733
+     }
+    },
+    "byYear": {
+     "2010": {
+      "n": 47,
+      "Rnet": 9.2094,
+      "R": 10.2309,
+      "meanRnet": 0.1959,
+      "meanR": 0.2177
+     },
+     "2011": {
+      "n": 36,
+      "Rnet": -1.789,
+      "R": -1.0852,
+      "meanRnet": -0.0497,
+      "meanR": -0.0301
+     },
+     "2012": {
+      "n": 40,
+      "Rnet": 1.1832,
+      "R": 2.2028,
+      "meanRnet": 0.0296,
+      "meanR": 0.0551
+     },
+     "2013": {
+      "n": 36,
+      "Rnet": -2.8161,
+      "R": -2.0448,
+      "meanRnet": -0.0782,
+      "meanR": -0.0568
+     },
+     "2014": {
+      "n": 40,
+      "Rnet": -2.828,
+      "R": -1.691,
+      "meanRnet": -0.0707,
+      "meanR": -0.0423
+     },
+     "2015": {
+      "n": 35,
+      "Rnet": 14.5137,
+      "R": 15.3302,
+      "meanRnet": 0.4147,
+      "meanR": 0.438
+     },
+     "2016": {
+      "n": 42,
+      "Rnet": -7.8035,
+      "R": -6.9243,
+      "meanRnet": -0.1858,
+      "meanR": -0.1649
+     },
+     "2017": {
+      "n": 53,
+      "Rnet": 3.9865,
+      "R": 5.4987,
+      "meanRnet": 0.0752,
+      "meanR": 0.1037
+     },
+     "2018": {
+      "n": 40,
+      "Rnet": 6.7868,
+      "R": 7.9604,
+      "meanRnet": 0.1697,
+      "meanR": 0.199
+     },
+     "2019": {
+      "n": 42,
+      "Rnet": -3.0508,
+      "R": -1.6781,
+      "meanRnet": -0.0726,
+      "meanR": -0.04
+     },
+     "2020": {
+      "n": 35,
+      "Rnet": -9.5133,
+      "R": -8.7285,
+      "meanRnet": -0.2718,
+      "meanR": -0.2494
+     },
+     "2021": {
+      "n": 43,
+      "Rnet": -9.9083,
+      "R": -8.7713,
+      "meanRnet": -0.2304,
+      "meanR": -0.204
+     },
+     "2022": {
+      "n": 31,
+      "Rnet": 4.4179,
+      "R": 4.9537,
+      "meanRnet": 0.1425,
+      "meanR": 0.1598
+     },
+     "2023": {
+      "n": 45,
+      "Rnet": 9.4084,
+      "R": 10.4826,
+      "meanRnet": 0.2091,
+      "meanR": 0.2329
+     },
+     "2024": {
+      "n": 46,
+      "Rnet": -1.1005,
+      "R": 0.028,
+      "meanRnet": -0.0239,
+      "meanR": 0.0006
+     },
+     "2025": {
+      "n": 31,
+      "Rnet": -5.6082,
+      "R": -5.0102,
+      "meanRnet": -0.1809,
+      "meanR": -0.1616
+     },
+     "2026": {
+      "n": 43,
+      "Rnet": 21.6722,
+      "R": 22.547,
+      "meanRnet": 0.504,
+      "meanR": 0.5243
+     }
+    },
+    "medianTargetR": 1.7633,
+    "medianCostR": 0.0204
+   }
+  },
+  {
+   "id": "T2",
+   "name": "gold alone",
+   "windows": {
+    "rep": {
+     "net": {
+      "n": 76,
+      "wins": 29,
+      "meanR": -0.0376,
+      "total": -2.8591,
+      "tTrade": -0.2415,
+      "months": 118,
+      "tMonth": -0.2442,
+      "pMonth": 0.8075,
+      "maxDD": -15.0704
+     },
+     "net2x": {
+      "n": 76,
+      "wins": 29,
+      "meanR": -0.0815,
+      "total": -6.196,
+      "tTrade": -0.5235,
+      "months": 118,
+      "tMonth": -0.5287,
+      "pMonth": 0.598,
+      "maxDD": -17.2676
+     },
+     "gross": {
+      "n": 76,
+      "wins": 29,
+      "meanR": 0.0063,
+      "total": 0.4779,
+      "tTrade": 0.0403,
+      "months": 118,
+      "tMonth": 0.0408,
+      "pMonth": 0.9675,
+      "maxDD": -12.8731
+     }
+    },
+    "is": {
+     "net": {
+      "n": 27,
+      "wins": 7,
+      "meanR": -0.3149,
+      "total": -8.5029,
+      "tTrade": -1.2592,
+      "months": 47,
+      "tMonth": -1.3494,
+      "pMonth": 0.1838,
+      "maxDD": -14.8117
+     },
+     "net2x": {
+      "n": 27,
+      "wins": 7,
+      "meanR": -0.3443,
+      "total": -9.2965,
+      "tTrade": -1.3779,
+      "months": 47,
+      "tMonth": -1.4707,
+      "pMonth": 0.1482,
+      "maxDD": -15.385
+     },
+     "gross": {
+      "n": 27,
+      "wins": 7,
+      "meanR": -0.2855,
+      "total": -7.7094,
+      "tTrade": -1.1406,
+      "months": 47,
+      "tMonth": -1.2265,
+      "pMonth": 0.2263,
+      "maxDD": -14.2385
+     }
+    },
+    "oos": {
+     "net": {
+      "n": 20,
+      "wins": 10,
+      "meanR": 0.4949,
+      "total": 9.8989,
+      "tTrade": 1.313,
+      "months": 32,
+      "tMonth": 1.2003,
+      "pMonth": 0.2391,
+      "maxDD": -7.1546
+     },
+     "net2x": {
+      "n": 20,
+      "wins": 10,
+      "meanR": 0.4801,
+      "total": 9.6026,
+      "tTrade": 1.2709,
+      "months": 32,
+      "tMonth": 1.1603,
+      "pMonth": 0.2548,
+      "maxDD": -7.3092
+     },
+     "gross": {
+      "n": 20,
+      "wins": 10,
+      "meanR": 0.5098,
+      "total": 10.1952,
+      "tTrade": 1.3552,
+      "months": 32,
+      "tMonth": 1.2404,
+      "pMonth": 0.2241,
+      "maxDD": -7
+     }
+    }
+   },
+   "pRaw": 0.1196,
+   "holmP": 0.3667,
+   "lines": {
+    "oosMean": true,
+    "oosT": false,
+    "holm": false,
+    "isMean": false,
+    "oos2x": true,
+    "n30": false,
+    "repMean": false
+   },
+   "pass": false,
+   "detail": {
+    "byMarket": {
+     "xau": {
+      "rep": {
+       "net": {
+        "n": 76,
+        "wins": 29,
+        "meanR": -0.0376,
+        "total": -2.8591,
+        "tTrade": -0.2415,
+        "months": 118,
+        "tMonth": -0.2442,
+        "pMonth": 0.8075,
+        "maxDD": -15.0704
+       },
+       "net2x": {
+        "n": 76,
+        "wins": 29,
+        "meanR": -0.0815,
+        "total": -6.196,
+        "tTrade": -0.5235,
+        "months": 118,
+        "tMonth": -0.5287,
+        "pMonth": 0.598,
+        "maxDD": -17.2676
+       },
+       "gross": {
+        "n": 76,
+        "wins": 29,
+        "meanR": 0.0063,
+        "total": 0.4779,
+        "tTrade": 0.0403,
+        "months": 118,
+        "tMonth": 0.0408,
+        "pMonth": 0.9675,
+        "maxDD": -12.8731
+       }
+      },
+      "is": {
+       "net": {
+        "n": 27,
+        "wins": 7,
+        "meanR": -0.3149,
+        "total": -8.5029,
+        "tTrade": -1.2592,
+        "months": 47,
+        "tMonth": -1.3494,
+        "pMonth": 0.1838,
+        "maxDD": -14.8117
+       },
+       "net2x": {
+        "n": 27,
+        "wins": 7,
+        "meanR": -0.3443,
+        "total": -9.2965,
+        "tTrade": -1.3779,
+        "months": 47,
+        "tMonth": -1.4707,
+        "pMonth": 0.1482,
+        "maxDD": -15.385
+       },
+       "gross": {
+        "n": 27,
+        "wins": 7,
+        "meanR": -0.2855,
+        "total": -7.7094,
+        "tTrade": -1.1406,
+        "months": 47,
+        "tMonth": -1.2265,
+        "pMonth": 0.2263,
+        "maxDD": -14.2385
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 20,
+        "wins": 10,
+        "meanR": 0.4949,
+        "total": 9.8989,
+        "tTrade": 1.313,
+        "months": 32,
+        "tMonth": 1.2003,
+        "pMonth": 0.2391,
+        "maxDD": -7.1546
+       },
+       "net2x": {
+        "n": 20,
+        "wins": 10,
+        "meanR": 0.4801,
+        "total": 9.6026,
+        "tTrade": 1.2709,
+        "months": 32,
+        "tMonth": 1.1603,
+        "pMonth": 0.2548,
+        "maxDD": -7.3092
+       },
+       "gross": {
+        "n": 20,
+        "wins": 10,
+        "meanR": 0.5098,
+        "total": 10.1952,
+        "tTrade": 1.3552,
+        "months": 32,
+        "tMonth": 1.2404,
+        "pMonth": 0.2241,
+        "maxDD": -7
+       }
+      }
+     }
+    },
+    "bySide": {
+     "buy": {
+      "rep": {
+       "net": {
+        "n": 31,
+        "wins": 14,
+        "meanR": 0.0947,
+        "total": 2.9371,
+        "tTrade": 0.4045,
+        "months": 116,
+        "tMonth": 0.382,
+        "pMonth": 0.7032,
+        "maxDD": -6.8208
+       },
+       "net2x": {
+        "n": 31,
+        "wins": 14,
+        "meanR": 0.0468,
+        "total": 1.4501,
+        "tTrade": 0.1994,
+        "months": 116,
+        "tMonth": 0.19,
+        "pMonth": 0.8497,
+        "maxDD": -7.6223
+       },
+       "gross": {
+        "n": 31,
+        "wins": 14,
+        "meanR": 0.1427,
+        "total": 4.4242,
+        "tTrade": 0.61,
+        "months": 116,
+        "tMonth": 0.5702,
+        "pMonth": 0.5696,
+        "maxDD": -6.0391
+       }
+      },
+      "is": {
+       "net": {
+        "n": 15,
+        "wins": 6,
+        "meanR": 0.075,
+        "total": 1.1245,
+        "tTrade": 0.192,
+        "months": 47,
+        "tMonth": 0.2042,
+        "pMonth": 0.8391,
+        "maxDD": -6.1894
+       },
+       "net2x": {
+        "n": 15,
+        "wins": 6,
+        "meanR": 0.0467,
+        "total": 0.7011,
+        "tTrade": 0.1197,
+        "months": 47,
+        "tMonth": 0.127,
+        "pMonth": 0.8995,
+        "maxDD": -6.4524
+       },
+       "gross": {
+        "n": 15,
+        "wins": 6,
+        "meanR": 0.1032,
+        "total": 1.5479,
+        "tTrade": 0.2644,
+        "months": 47,
+        "tMonth": 0.2817,
+        "pMonth": 0.7795,
+        "maxDD": -5.9264
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 7,
+        "wins": 5,
+        "meanR": 0.7783,
+        "total": 5.4481,
+        "tTrade": 1.6159,
+        "months": 29,
+        "tMonth": 1.4871,
+        "pMonth": 0.1482,
+        "maxDD": -2.0362
+       },
+       "net2x": {
+        "n": 7,
+        "wins": 5,
+        "meanR": 0.7665,
+        "total": 5.3656,
+        "tTrade": 1.5861,
+        "months": 29,
+        "tMonth": 1.4663,
+        "pMonth": 0.1537,
+        "maxDD": -2.0725
+       },
+       "gross": {
+        "n": 7,
+        "wins": 5,
+        "meanR": 0.7901,
+        "total": 5.5307,
+        "tTrade": 1.6459,
+        "months": 29,
+        "tMonth": 1.5076,
+        "pMonth": 0.1429,
+        "maxDD": -2
+       }
+      }
+     },
+     "sell": {
+      "rep": {
+       "net": {
+        "n": 45,
+        "wins": 15,
+        "meanR": -0.1288,
+        "total": -5.7962,
+        "tTrade": -0.6166,
+        "months": 118,
+        "tMonth": -0.6506,
+        "pMonth": 0.5166,
+        "maxDD": -10.6767
+       },
+       "net2x": {
+        "n": 45,
+        "wins": 15,
+        "meanR": -0.1699,
+        "total": -7.6461,
+        "tTrade": -0.8143,
+        "months": 118,
+        "tMonth": -0.8558,
+        "pMonth": 0.3939,
+        "maxDD": -12.0402
+       },
+       "gross": {
+        "n": 45,
+        "wins": 15,
+        "meanR": -0.0877,
+        "total": -3.9463,
+        "tTrade": -0.4192,
+        "months": 118,
+        "tMonth": -0.4438,
+        "pMonth": 0.658,
+        "maxDD": -9.3131
+       }
+      },
+      "is": {
+       "net": {
+        "n": 12,
+        "wins": 1,
+        "meanR": -0.8023,
+        "total": -9.6274,
+        "tTrade": -3.5412,
+        "months": 45,
+        "tMonth": -2.5004,
+        "pMonth": 0.0162,
+        "maxDD": -11.3171
+       },
+       "net2x": {
+        "n": 12,
+        "wins": 1,
+        "meanR": -0.8331,
+        "total": -9.9976,
+        "tTrade": -3.7094,
+        "months": 45,
+        "tMonth": -2.5628,
+        "pMonth": 0.0139,
+        "maxDD": -11.6342
+       },
+       "gross": {
+        "n": 12,
+        "wins": 1,
+        "meanR": -0.7714,
+        "total": -9.2573,
+        "tTrade": -3.3752,
+        "months": 45,
+        "tMonth": -2.435,
+        "pMonth": 0.019,
+        "maxDD": -11
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 13,
+        "wins": 5,
+        "meanR": 0.3424,
+        "total": 4.4507,
+        "tTrade": 0.6492,
+        "months": 32,
+        "tMonth": 0.6158,
+        "pMonth": 0.5425,
+        "maxDD": -5.1183
+       },
+       "net2x": {
+        "n": 13,
+        "wins": 5,
+        "meanR": 0.3259,
+        "total": 4.237,
+        "tTrade": 0.6169,
+        "months": 32,
+        "tMonth": 0.584,
+        "pMonth": 0.5635,
+        "maxDD": -5.2367
+       },
+       "gross": {
+        "n": 13,
+        "wins": 5,
+        "meanR": 0.3588,
+        "total": 4.6645,
+        "tTrade": 0.6815,
+        "months": 32,
+        "tMonth": 0.6478,
+        "pMonth": 0.5219,
+        "maxDD": -5
+       }
+      }
+     }
+    },
+    "byRange": {
+     "external": {
+      "rep": {
+       "net": {
+        "n": 44,
+        "wins": 14,
+        "meanR": -0.2052,
+        "total": -9.0276,
+        "tTrade": -1.0909,
+        "months": 110,
+        "tMonth": -1.0466,
+        "pMonth": 0.2976,
+        "maxDD": -18.4329
+       },
+       "net2x": {
+        "n": 44,
+        "wins": 14,
+        "meanR": -0.2429,
+        "total": -10.6888,
+        "tTrade": -1.2928,
+        "months": 110,
+        "tMonth": -1.2351,
+        "pMonth": 0.2194,
+        "maxDD": -19.6414
+       },
+       "gross": {
+        "n": 44,
+        "wins": 14,
+        "meanR": -0.1674,
+        "total": -7.3664,
+        "tTrade": -0.8892,
+        "months": 110,
+        "tMonth": -0.856,
+        "pMonth": 0.3939,
+        "maxDD": -17.4139
+       }
+      },
+      "is": {
+       "net": {
+        "n": 20,
+        "wins": 3,
+        "meanR": -0.5266,
+        "total": -10.5317,
+        "tTrade": -1.8468,
+        "months": 42,
+        "tMonth": -1.926,
+        "pMonth": 0.0611,
+        "maxDD": -12.3234
+       },
+       "net2x": {
+        "n": 20,
+        "wins": 3,
+        "meanR": -0.5528,
+        "total": -11.0559,
+        "tTrade": -1.9384,
+        "months": 42,
+        "tMonth": -2.0134,
+        "pMonth": 0.0507,
+        "maxDD": -12.7204
+       },
+       "gross": {
+        "n": 20,
+        "wins": 3,
+        "meanR": -0.5004,
+        "total": -10.0074,
+        "tTrade": -1.7551,
+        "months": 42,
+        "tMonth": -1.8372,
+        "pMonth": 0.0734,
+        "maxDD": -11.9264
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 11,
+        "wins": 7,
+        "meanR": 1.0926,
+        "total": 12.0185,
+        "tTrade": 1.9682,
+        "months": 31,
+        "tMonth": 1.8307,
+        "pMonth": 0.0771,
+        "maxDD": -3.0579
+       },
+       "net2x": {
+        "n": 11,
+        "wins": 7,
+        "meanR": 1.0795,
+        "total": 11.8743,
+        "tTrade": 1.9431,
+        "months": 31,
+        "tMonth": 1.8098,
+        "pMonth": 0.0804,
+        "maxDD": -3.1157
+       },
+       "gross": {
+        "n": 11,
+        "wins": 7,
+        "meanR": 1.1057,
+        "total": 12.1627,
+        "tTrade": 1.9934,
+        "months": 31,
+        "tMonth": 1.8515,
+        "pMonth": 0.074,
+        "maxDD": -3
+       }
+      }
+     },
+     "internal": {
+      "rep": {
+       "net": {
+        "n": 32,
+        "wins": 15,
+        "meanR": 0.1928,
+        "total": 6.1685,
+        "tTrade": 0.7337,
+        "months": 113,
+        "tMonth": 0.7237,
+        "pMonth": 0.4708,
+        "maxDD": -4.7033
+       },
+       "net2x": {
+        "n": 32,
+        "wins": 15,
+        "meanR": 0.1404,
+        "total": 4.4928,
+        "tTrade": 0.5335,
+        "months": 113,
+        "tMonth": 0.5284,
+        "pMonth": 0.5983,
+        "maxDD": -5.4147
+       },
+       "gross": {
+        "n": 32,
+        "wins": 15,
+        "meanR": 0.2451,
+        "total": 7.8442,
+        "tTrade": 0.9343,
+        "months": 113,
+        "tMonth": 0.9168,
+        "pMonth": 0.3612,
+        "maxDD": -4
+       }
+      },
+      "is": {
+       "net": {
+        "n": 7,
+        "wins": 4,
+        "meanR": 0.2898,
+        "total": 2.0287,
+        "tTrade": 0.6075,
+        "months": 47,
+        "tMonth": 0.6328,
+        "pMonth": 0.53,
+        "maxDD": -3.1232
+       },
+       "net2x": {
+        "n": 7,
+        "wins": 4,
+        "meanR": 0.2513,
+        "total": 1.7594,
+        "tTrade": 0.5263,
+        "months": 47,
+        "tMonth": 0.5517,
+        "pMonth": 0.5838,
+        "maxDD": -3.2463
+       },
+       "gross": {
+        "n": 7,
+        "wins": 4,
+        "meanR": 0.3283,
+        "total": 2.298,
+        "tTrade": 0.6887,
+        "months": 47,
+        "tMonth": 0.7123,
+        "pMonth": 0.4799,
+        "maxDD": -3
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 9,
+        "wins": 3,
+        "meanR": -0.2355,
+        "total": -2.1196,
+        "tTrade": -0.5927,
+        "months": 32,
+        "tMonth": -0.6092,
+        "pMonth": 0.5468,
+        "maxDD": -5.1214
+       },
+       "net2x": {
+        "n": 9,
+        "wins": 3,
+        "meanR": -0.2524,
+        "total": -2.2717,
+        "tTrade": -0.6316,
+        "months": 32,
+        "tMonth": -0.6479,
+        "pMonth": 0.5218,
+        "maxDD": -5.2428
+       },
+       "gross": {
+        "n": 9,
+        "wins": 3,
+        "meanR": -0.2186,
+        "total": -1.9675,
+        "tTrade": -0.5533,
+        "months": 32,
+        "tMonth": -0.5698,
+        "pMonth": 0.5729,
+        "maxDD": -5
+       }
+      }
+     }
+    },
+    "byReason": {
+     "stop": {
+      "n": 77,
+      "R": -77.1994,
+      "Rnet": -80.0281,
+      "meanR": -1.0026,
+      "meanRnet": -1.0393
+     },
+     "target": {
+      "n": 45,
+      "R": 79.3107,
+      "Rnet": 77.7249,
+      "meanR": 1.7625,
+      "meanRnet": 1.7272
+     },
+     "time": {
+      "n": 1,
+      "R": 0.8524,
+      "Rnet": 0.8401,
+      "meanR": 0.8524,
+      "meanRnet": 0.8401
+     }
+    },
+    "byYear": {
+     "2010": {
+      "n": 11,
+      "Rnet": -5.3677,
+      "R": -4.8791,
+      "meanRnet": -0.488,
+      "meanR": -0.4436
+     },
+     "2011": {
+      "n": 4,
+      "Rnet": -1.0875,
+      "R": -0.9803,
+      "meanRnet": -0.2719,
+      "meanR": -0.2451
+     },
+     "2012": {
+      "n": 7,
+      "Rnet": 1.0366,
+      "R": 1.3281,
+      "meanRnet": 0.1481,
+      "meanR": 0.1897
+     },
+     "2013": {
+      "n": 10,
+      "Rnet": -3.3078,
+      "R": -3.0041,
+      "meanRnet": -0.3308,
+      "meanR": -0.3004
+     },
+     "2014": {
+      "n": 9,
+      "Rnet": -2.5224,
+      "R": -2.1341,
+      "meanRnet": -0.2803,
+      "meanR": -0.2371
+     },
+     "2015": {
+      "n": 8,
+      "Rnet": -3.292,
+      "R": -2.9035,
+      "meanRnet": -0.4115,
+      "meanR": -0.3629
+     },
+     "2016": {
+      "n": 9,
+      "Rnet": -0.1517,
+      "R": 0.153,
+      "meanRnet": -0.0169,
+      "meanR": 0.017
+     },
+     "2017": {
+      "n": 7,
+      "Rnet": 6.5118,
+      "R": 6.9336,
+      "meanRnet": 0.9303,
+      "meanR": 0.9905
+     },
+     "2018": {
+      "n": 5,
+      "Rnet": 4.6863,
+      "R": 4.9891,
+      "meanRnet": 0.9373,
+      "meanR": 0.9978
+     },
+     "2019": {
+      "n": 6,
+      "Rnet": 0.6354,
+      "R": 0.9752,
+      "meanRnet": 0.1059,
+      "meanR": 0.1625
+     },
+     "2020": {
+      "n": 7,
+      "Rnet": -4.9894,
+      "R": -4.8319,
+      "meanRnet": -0.7128,
+      "meanR": -0.6903
+     },
+     "2021": {
+      "n": 7,
+      "Rnet": -3.9825,
+      "R": -3.7271,
+      "meanRnet": -0.5689,
+      "meanR": -0.5324
+     },
+     "2022": {
+      "n": 6,
+      "Rnet": -3.6654,
+      "R": -3.5114,
+      "meanRnet": -0.6109,
+      "meanR": -0.5852
+     },
+     "2023": {
+      "n": 7,
+      "Rnet": 4.1343,
+      "R": 4.3609,
+      "meanRnet": 0.5906,
+      "meanR": 0.623
+     },
+     "2024": {
+      "n": 9,
+      "Rnet": -3.1867,
+      "R": -2.986,
+      "meanRnet": -0.3541,
+      "meanR": -0.3318
+     },
+     "2025": {
+      "n": 3,
+      "Rnet": 1.814,
+      "R": 1.8524,
+      "meanRnet": 0.6047,
+      "meanR": 0.6175
+     },
+     "2026": {
+      "n": 8,
+      "Rnet": 11.2715,
+      "R": 11.3288,
+      "meanRnet": 1.4089,
+      "meanR": 1.4161
+     }
+    },
+    "medianTargetR": 1.7492,
+    "medianCostR": 0.0336
+   }
+  },
+  {
+   "id": "T3",
+   "name": "four forex pairs pooled",
+   "windows": {
+    "rep": {
+     "net": {
+      "n": 335,
+      "wins": 127,
+      "meanR": 0.0605,
+      "total": 20.2514,
+      "tTrade": 0.7517,
+      "months": 120,
+      "tMonth": 0.726,
+      "pMonth": 0.4693,
+      "maxDD": -20.114
+     },
+     "net2x": {
+      "n": 335,
+      "wins": 127,
+      "meanR": 0.0393,
+      "total": 13.181,
+      "tTrade": 0.4891,
+      "months": 120,
+      "tMonth": 0.4724,
+      "pMonth": 0.6375,
+      "maxDD": -22.0427
+     },
+     "gross": {
+      "n": 335,
+      "wins": 127,
+      "meanR": 0.0816,
+      "total": 27.3217,
+      "tTrade": 1.0144,
+      "months": 120,
+      "tMonth": 0.9795,
+      "pMonth": 0.3293,
+      "maxDD": -18.1853
+     }
+    },
+    "is": {
+     "net": {
+      "n": 127,
+      "wins": 46,
+      "meanR": 0.0229,
+      "total": 2.9077,
+      "tTrade": 0.1771,
+      "months": 48,
+      "tMonth": 0.1916,
+      "pMonth": 0.8489,
+      "maxDD": -15.4623
+     },
+     "net2x": {
+      "n": 127,
+      "wins": 46,
+      "meanR": 0.0013,
+      "total": 0.1695,
+      "tTrade": 0.0103,
+      "months": 48,
+      "tMonth": 0.0112,
+      "pMonth": 0.9911,
+      "maxDD": -16.9
+     },
+     "gross": {
+      "n": 127,
+      "wins": 46,
+      "meanR": 0.0445,
+      "total": 5.6459,
+      "tTrade": 0.3437,
+      "months": 48,
+      "tMonth": 0.3716,
+      "pMonth": 0.7119,
+      "maxDD": -14.0246
+     }
+    },
+    "oos": {
+     "net": {
+      "n": 100,
+      "wins": 38,
+      "meanR": 0.0506,
+      "total": 5.0646,
+      "tTrade": 0.3544,
+      "months": 35,
+      "tMonth": 0.2636,
+      "pMonth": 0.7937,
+      "maxDD": -15.2974
+     },
+     "net2x": {
+      "n": 100,
+      "wins": 38,
+      "meanR": 0.0276,
+      "total": 2.7596,
+      "tTrade": 0.1932,
+      "months": 35,
+      "tMonth": 0.1441,
+      "pMonth": 0.8863,
+      "maxDD": -16.1627
+     },
+     "gross": {
+      "n": 100,
+      "wins": 38,
+      "meanR": 0.0737,
+      "total": 7.3696,
+      "tTrade": 0.5155,
+      "months": 35,
+      "tMonth": 0.3822,
+      "pMonth": 0.7047,
+      "maxDD": -14.5777
+     }
+    }
+   },
+   "pRaw": 0.3969,
+   "holmP": 0.4439,
+   "lines": {
+    "oosMean": true,
+    "oosT": false,
+    "holm": false,
+    "isMean": true,
+    "oos2x": true,
+    "n30": true,
+    "repMean": true
+   },
+   "pass": false,
+   "detail": {
+    "byMarket": {
+     "eurusd": {
+      "rep": {
+       "net": {
+        "n": 91,
+        "wins": 31,
+        "meanR": -0.0863,
+        "total": -7.8555,
+        "tTrade": -0.6105,
+        "months": 120,
+        "tMonth": -0.5729,
+        "pMonth": 0.5678,
+        "maxDD": -13.7436
+       },
+       "net2x": {
+        "n": 91,
+        "wins": 31,
+        "meanR": -0.1055,
+        "total": -9.6019,
+        "tTrade": -0.7452,
+        "months": 120,
+        "tMonth": -0.698,
+        "pMonth": 0.4865,
+        "maxDD": -14.2129
+       },
+       "gross": {
+        "n": 91,
+        "wins": 31,
+        "meanR": -0.0671,
+        "total": -6.109,
+        "tTrade": -0.4754,
+        "months": 120,
+        "tMonth": -0.4469,
+        "pMonth": 0.6558,
+        "maxDD": -13.2744
+       }
+      },
+      "is": {
+       "net": {
+        "n": 29,
+        "wins": 10,
+        "meanR": 0.0378,
+        "total": 1.0957,
+        "tTrade": 0.133,
+        "months": 48,
+        "tMonth": 0.139,
+        "pMonth": 0.8901,
+        "maxDD": -8.1522
+       },
+       "net2x": {
+        "n": 29,
+        "wins": 10,
+        "meanR": 0.0173,
+        "total": 0.5004,
+        "tTrade": 0.0607,
+        "months": 48,
+        "tMonth": 0.0634,
+        "pMonth": 0.9497,
+        "maxDD": -8.3043
+       },
+       "gross": {
+        "n": 29,
+        "wins": 10,
+        "meanR": 0.0583,
+        "total": 1.691,
+        "tTrade": 0.2051,
+        "months": 48,
+        "tMonth": 0.2146,
+        "pMonth": 0.831,
+        "maxDD": -8
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 21,
+        "wins": 7,
+        "meanR": -0.1034,
+        "total": -2.1724,
+        "tTrade": -0.3506,
+        "months": 34,
+        "tMonth": -0.4221,
+        "pMonth": 0.6757,
+        "maxDD": -8.4813
+       },
+       "net2x": {
+        "n": 21,
+        "wins": 7,
+        "meanR": -0.1263,
+        "total": -2.6528,
+        "tTrade": -0.4287,
+        "months": 34,
+        "tMonth": -0.517,
+        "pMonth": 0.6086,
+        "maxDD": -8.8741
+       },
+       "gross": {
+        "n": 21,
+        "wins": 7,
+        "meanR": -0.0806,
+        "total": -1.6919,
+        "tTrade": -0.2727,
+        "months": 34,
+        "tMonth": -0.3276,
+        "pMonth": 0.7453,
+        "maxDD": -8.0886
+       }
+      }
+     },
+     "usdjpy": {
+      "rep": {
+       "net": {
+        "n": 85,
+        "wins": 33,
+        "meanR": 0.1008,
+        "total": 8.5721,
+        "tTrade": 0.5978,
+        "months": 115,
+        "tMonth": 0.6206,
+        "pMonth": 0.5361,
+        "maxDD": -10.7092
+       },
+       "net2x": {
+        "n": 85,
+        "wins": 33,
+        "meanR": 0.0749,
+        "total": 6.3695,
+        "tTrade": 0.4438,
+        "months": 115,
+        "tMonth": 0.4605,
+        "pMonth": 0.646,
+        "maxDD": -11.568
+       },
+       "gross": {
+        "n": 85,
+        "wins": 33,
+        "meanR": 0.1268,
+        "total": 10.7748,
+        "tTrade": 0.752,
+        "months": 115,
+        "tMonth": 0.7808,
+        "pMonth": 0.4365,
+        "maxDD": -10.0018
+       }
+      },
+      "is": {
+       "net": {
+        "n": 32,
+        "wins": 13,
+        "meanR": 0.0136,
+        "total": 0.4339,
+        "tTrade": 0.0581,
+        "months": 46,
+        "tMonth": 0.0679,
+        "pMonth": 0.9461,
+        "maxDD": -5.854
+       },
+       "net2x": {
+        "n": 32,
+        "wins": 13,
+        "meanR": -0.0143,
+        "total": -0.4571,
+        "tTrade": -0.0612,
+        "months": 46,
+        "tMonth": -0.0715,
+        "pMonth": 0.9433,
+        "maxDD": -6.1739
+       },
+       "gross": {
+        "n": 32,
+        "wins": 13,
+        "meanR": 0.0414,
+        "total": 1.3249,
+        "tTrade": 0.1776,
+        "months": 46,
+        "tMonth": 0.2074,
+        "pMonth": 0.8367,
+        "maxDD": -5.5342
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 23,
+        "wins": 9,
+        "meanR": 0.0739,
+        "total": 1.6998,
+        "tTrade": 0.2496,
+        "months": 32,
+        "tMonth": 0.2496,
+        "pMonth": 0.8046,
+        "maxDD": -6.111
+       },
+       "net2x": {
+        "n": 23,
+        "wins": 9,
+        "meanR": 0.0593,
+        "total": 1.3645,
+        "tTrade": 0.2002,
+        "months": 32,
+        "tMonth": 0.2002,
+        "pMonth": 0.8426,
+        "maxDD": -6.2221
+       },
+       "gross": {
+        "n": 23,
+        "wins": 9,
+        "meanR": 0.0885,
+        "total": 2.0351,
+        "tTrade": 0.2992,
+        "months": 32,
+        "tMonth": 0.2989,
+        "pMonth": 0.767,
+        "maxDD": -6
+       }
+      }
+     },
+     "gbpusd": {
+      "rep": {
+       "net": {
+        "n": 84,
+        "wins": 36,
+        "meanR": 0.2283,
+        "total": 19.176,
+        "tTrade": 1.3941,
+        "months": 119,
+        "tMonth": 1.4354,
+        "pMonth": 0.1538,
+        "maxDD": -7.0774
+       },
+       "net2x": {
+        "n": 84,
+        "wins": 36,
+        "meanR": 0.2095,
+        "total": 17.5999,
+        "tTrade": 1.2801,
+        "months": 119,
+        "tMonth": 1.3202,
+        "pMonth": 0.1893,
+        "maxDD": -7.1549
+       },
+       "gross": {
+        "n": 84,
+        "wins": 36,
+        "meanR": 0.247,
+        "total": 20.7521,
+        "tTrade": 1.5079,
+        "months": 119,
+        "tMonth": 1.5498,
+        "pMonth": 0.1239,
+        "maxDD": -7
+       }
+      },
+      "is": {
+       "net": {
+        "n": 38,
+        "wins": 13,
+        "meanR": -0.0066,
+        "total": -0.2519,
+        "tTrade": -0.027,
+        "months": 42,
+        "tMonth": -0.0312,
+        "pMonth": 0.9753,
+        "maxDD": -4.4919
+       },
+       "net2x": {
+        "n": 38,
+        "wins": 13,
+        "meanR": -0.0248,
+        "total": -0.9413,
+        "tTrade": -0.1008,
+        "months": 42,
+        "tMonth": -0.1168,
+        "pMonth": 0.9076,
+        "maxDD": -4.7721
+       },
+       "gross": {
+        "n": 38,
+        "wins": 13,
+        "meanR": 0.0115,
+        "total": 0.4375,
+        "tTrade": 0.0468,
+        "months": 42,
+        "tMonth": 0.0541,
+        "pMonth": 0.9571,
+        "maxDD": -4.2466
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 28,
+        "wins": 13,
+        "meanR": 0.2795,
+        "total": 7.8252,
+        "tTrade": 0.9723,
+        "months": 34,
+        "tMonth": 0.9832,
+        "pMonth": 0.3327,
+        "maxDD": -4.0813
+       },
+       "net2x": {
+        "n": 28,
+        "wins": 13,
+        "meanR": 0.2515,
+        "total": 7.0432,
+        "tTrade": 0.8761,
+        "months": 34,
+        "tMonth": 0.8926,
+        "pMonth": 0.3785,
+        "maxDD": -4.1626
+       },
+       "gross": {
+        "n": 28,
+        "wins": 13,
+        "meanR": 0.3074,
+        "total": 8.6073,
+        "tTrade": 1.0682,
+        "months": 34,
+        "tMonth": 1.0719,
+        "pMonth": 0.2916,
+        "maxDD": -4
+       }
+      }
+     },
+     "audusd": {
+      "rep": {
+       "net": {
+        "n": 75,
+        "wins": 27,
+        "meanR": 0.0048,
+        "total": 0.3587,
+        "tTrade": 0.0277,
+        "months": 119,
+        "tMonth": 0.0267,
+        "pMonth": 0.9787,
+        "maxDD": -15.7042
+       },
+       "net2x": {
+        "n": 75,
+        "wins": 27,
+        "meanR": -0.0158,
+        "total": -1.1865,
+        "tTrade": -0.0918,
+        "months": 119,
+        "tMonth": -0.0883,
+        "pMonth": 0.9298,
+        "maxDD": -16.7601
+       },
+       "gross": {
+        "n": 75,
+        "wins": 27,
+        "meanR": 0.0254,
+        "total": 1.9038,
+        "tTrade": 0.1471,
+        "months": 119,
+        "tMonth": 0.1419,
+        "pMonth": 0.8874,
+        "maxDD": -14.6483
+       }
+      },
+      "is": {
+       "net": {
+        "n": 28,
+        "wins": 10,
+        "meanR": 0.0582,
+        "total": 1.6299,
+        "tTrade": 0.2019,
+        "months": 46,
+        "tMonth": 0.2535,
+        "pMonth": 0.801,
+        "maxDD": -3.7942
+       },
+       "net2x": {
+        "n": 28,
+        "wins": 10,
+        "meanR": 0.0381,
+        "total": 1.0675,
+        "tTrade": 0.1323,
+        "months": 46,
+        "tMonth": 0.1668,
+        "pMonth": 0.8683,
+        "maxDD": -3.9083
+       },
+       "gross": {
+        "n": 28,
+        "wins": 10,
+        "meanR": 0.0783,
+        "total": 2.1924,
+        "tTrade": 0.2713,
+        "months": 46,
+        "tMonth": 0.3394,
+        "pMonth": 0.7359,
+        "maxDD": -3.68
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 28,
+        "wins": 9,
+        "meanR": -0.0817,
+        "total": -2.2881,
+        "tTrade": -0.2995,
+        "months": 35,
+        "tMonth": -0.2593,
+        "pMonth": 0.7969,
+        "maxDD": -13.186
+       },
+       "net2x": {
+        "n": 28,
+        "wins": 9,
+        "meanR": -0.107,
+        "total": -2.9953,
+        "tTrade": -0.3919,
+        "months": 35,
+        "tMonth": -0.339,
+        "pMonth": 0.7367,
+        "maxDD": -13.6377
+       },
+       "gross": {
+        "n": 28,
+        "wins": 9,
+        "meanR": -0.0565,
+        "total": -1.5809,
+        "tTrade": -0.207,
+        "months": 35,
+        "tMonth": -0.1794,
+        "pMonth": 0.8587,
+        "maxDD": -12.7343
+       }
+      }
+     }
+    },
+    "bySide": {
+     "buy": {
+      "rep": {
+       "net": {
+        "n": 149,
+        "wins": 64,
+        "meanR": 0.1594,
+        "total": 23.7445,
+        "tTrade": 1.3702,
+        "months": 119,
+        "tMonth": 1.276,
+        "pMonth": 0.2045,
+        "maxDD": -11.8314
+       },
+       "net2x": {
+        "n": 149,
+        "wins": 64,
+        "meanR": 0.1371,
+        "total": 20.4208,
+        "tTrade": 1.178,
+        "months": 119,
+        "tMonth": 1.1,
+        "pMonth": 0.2736,
+        "maxDD": -13.0907
+       },
+       "gross": {
+        "n": 149,
+        "wins": 64,
+        "meanR": 0.1817,
+        "total": 27.0682,
+        "tTrade": 1.5625,
+        "months": 119,
+        "tMonth": 1.4507,
+        "pMonth": 0.1495,
+        "maxDD": -11.3161
+       }
+      },
+      "is": {
+       "net": {
+        "n": 53,
+        "wins": 18,
+        "meanR": -0.063,
+        "total": -3.3409,
+        "tTrade": -0.3308,
+        "months": 45,
+        "tMonth": -0.3099,
+        "pMonth": 0.7581,
+        "maxDD": -14.105
+       },
+       "net2x": {
+        "n": 53,
+        "wins": 18,
+        "meanR": -0.0825,
+        "total": -4.3705,
+        "tTrade": -0.4321,
+        "months": 45,
+        "tMonth": -0.4043,
+        "pMonth": 0.6879,
+        "maxDD": -14.5596
+       },
+       "gross": {
+        "n": 53,
+        "wins": 18,
+        "meanR": -0.0436,
+        "total": -2.3113,
+        "tTrade": -0.2292,
+        "months": 45,
+        "tMonth": -0.2149,
+        "pMonth": 0.8308,
+        "maxDD": -13.6505
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 45,
+        "wins": 17,
+        "meanR": -0.0289,
+        "total": -1.2984,
+        "tTrade": -0.1466,
+        "months": 34,
+        "tMonth": -0.1371,
+        "pMonth": 0.8918,
+        "maxDD": -13.02
+       },
+       "net2x": {
+        "n": 45,
+        "wins": 17,
+        "meanR": -0.0528,
+        "total": -2.3773,
+        "tTrade": -0.2688,
+        "months": 34,
+        "tMonth": -0.2522,
+        "pMonth": 0.8024,
+        "maxDD": -13.5533
+       },
+       "gross": {
+        "n": 45,
+        "wins": 17,
+        "meanR": -0.0049,
+        "total": -0.2194,
+        "tTrade": -0.0247,
+        "months": 34,
+        "tMonth": -0.0231,
+        "pMonth": 0.9817,
+        "maxDD": -12.4868
+       }
+      }
+     },
+     "sell": {
+      "rep": {
+       "net": {
+        "n": 186,
+        "wins": 63,
+        "meanR": -0.0188,
+        "total": -3.4931,
+        "tTrade": -0.1694,
+        "months": 120,
+        "tMonth": -0.1701,
+        "pMonth": 0.8652,
+        "maxDD": -32.1332
+       },
+       "net2x": {
+        "n": 186,
+        "wins": 63,
+        "meanR": -0.0389,
+        "total": -7.2398,
+        "tTrade": -0.351,
+        "months": 120,
+        "tMonth": -0.3526,
+        "pMonth": 0.725,
+        "maxDD": -33.8557
+       },
+       "gross": {
+        "n": 186,
+        "wins": 63,
+        "meanR": 0.0014,
+        "total": 0.2535,
+        "tTrade": 0.0123,
+        "months": 120,
+        "tMonth": 0.0123,
+        "pMonth": 0.9902,
+        "maxDD": -30.4108
+       }
+      },
+      "is": {
+       "net": {
+        "n": 74,
+        "wins": 28,
+        "meanR": 0.0844,
+        "total": 6.2486,
+        "tTrade": 0.4806,
+        "months": 48,
+        "tMonth": 0.5321,
+        "pMonth": 0.5972,
+        "maxDD": -7.2058
+       },
+       "net2x": {
+        "n": 74,
+        "wins": 28,
+        "meanR": 0.0614,
+        "total": 4.54,
+        "tTrade": 0.3496,
+        "months": 48,
+        "tMonth": 0.3892,
+        "pMonth": 0.6989,
+        "maxDD": -7.4116
+       },
+       "gross": {
+        "n": 74,
+        "wins": 28,
+        "meanR": 0.1075,
+        "total": 7.9572,
+        "tTrade": 0.6112,
+        "months": 48,
+        "tMonth": 0.6727,
+        "pMonth": 0.5044,
+        "maxDD": -7
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 55,
+        "wins": 21,
+        "meanR": 0.1157,
+        "total": 6.363,
+        "tTrade": 0.5641,
+        "months": 35,
+        "tMonth": 0.4297,
+        "pMonth": 0.6701,
+        "maxDD": -6.8706
+       },
+       "net2x": {
+        "n": 55,
+        "wins": 21,
+        "meanR": 0.0934,
+        "total": 5.1369,
+        "tTrade": 0.4553,
+        "months": 35,
+        "tMonth": 0.3483,
+        "pMonth": 0.7298,
+        "maxDD": -7.3842
+       },
+       "gross": {
+        "n": 55,
+        "wins": 21,
+        "meanR": 0.138,
+        "total": 7.589,
+        "tTrade": 0.6728,
+        "months": 35,
+        "tMonth": 0.5103,
+        "pMonth": 0.6131,
+        "maxDD": -6.357
+       }
+      }
+     }
+    },
+    "byRange": {
+     "external": {
+      "rep": {
+       "net": {
+        "n": 210,
+        "wins": 76,
+        "meanR": 0.0958,
+        "total": 20.119,
+        "tTrade": 0.8848,
+        "months": 120,
+        "tMonth": 0.8818,
+        "pMonth": 0.3797,
+        "maxDD": -16.8517
+       },
+       "net2x": {
+        "n": 210,
+        "wins": 76,
+        "meanR": 0.0764,
+        "total": 16.0427,
+        "tTrade": 0.7055,
+        "months": 120,
+        "tMonth": 0.7031,
+        "pMonth": 0.4834,
+        "maxDD": -18.3846
+       },
+       "gross": {
+        "n": 210,
+        "wins": 76,
+        "meanR": 0.1152,
+        "total": 24.1953,
+        "tTrade": 1.064,
+        "months": 120,
+        "tMonth": 1.0604,
+        "pMonth": 0.2911,
+        "maxDD": -15.7456
+       }
+      },
+      "is": {
+       "net": {
+        "n": 85,
+        "wins": 31,
+        "meanR": 0.1025,
+        "total": 8.7159,
+        "tTrade": 0.6107,
+        "months": 47,
+        "tMonth": 0.6028,
+        "pMonth": 0.5496,
+        "maxDD": -12.7199
+       },
+       "net2x": {
+        "n": 85,
+        "wins": 31,
+        "meanR": 0.0814,
+        "total": 6.9192,
+        "tTrade": 0.4852,
+        "months": 47,
+        "tMonth": 0.4807,
+        "pMonth": 0.633,
+        "maxDD": -13.2662
+       },
+       "gross": {
+        "n": 85,
+        "wins": 31,
+        "meanR": 0.1237,
+        "total": 10.5126,
+        "tTrade": 0.7358,
+        "months": 47,
+        "tMonth": 0.7236,
+        "pMonth": 0.473,
+        "maxDD": -12.1737
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 64,
+        "wins": 21,
+        "meanR": -0.0173,
+        "total": -1.1061,
+        "tTrade": -0.0931,
+        "months": 35,
+        "tMonth": -0.0807,
+        "pMonth": 0.9361,
+        "maxDD": -14.1361
+       },
+       "net2x": {
+        "n": 64,
+        "wins": 21,
+        "meanR": -0.038,
+        "total": -2.4343,
+        "tTrade": -0.205,
+        "months": 35,
+        "tMonth": -0.1781,
+        "pMonth": 0.8597,
+        "maxDD": -14.8828
+       },
+       "gross": {
+        "n": 64,
+        "wins": 21,
+        "meanR": 0.0035,
+        "total": 0.2221,
+        "tTrade": 0.0187,
+        "months": 35,
+        "tMonth": 0.0162,
+        "pMonth": 0.9872,
+        "maxDD": -13.3894
+       }
+      }
+     },
+     "internal": {
+      "rep": {
+       "net": {
+        "n": 125,
+        "wins": 51,
+        "meanR": 0.0011,
+        "total": 0.1324,
+        "tTrade": 0.0091,
+        "months": 120,
+        "tMonth": 0.009,
+        "pMonth": 0.9928,
+        "maxDD": -14.2739
+       },
+       "net2x": {
+        "n": 125,
+        "wins": 51,
+        "meanR": -0.0229,
+        "total": -2.8617,
+        "tTrade": -0.1973,
+        "months": 120,
+        "tMonth": -0.1955,
+        "pMonth": 0.8454,
+        "maxDD": -14.8477
+       },
+       "gross": {
+        "n": 125,
+        "wins": 51,
+        "meanR": 0.025,
+        "total": 3.1265,
+        "tTrade": 0.2159,
+        "months": 120,
+        "tMonth": 0.2136,
+        "pMonth": 0.8312,
+        "maxDD": -13.7001
+       }
+      },
+      "is": {
+       "net": {
+        "n": 42,
+        "wins": 15,
+        "meanR": -0.1383,
+        "total": -5.8082,
+        "tTrade": -0.7143,
+        "months": 48,
+        "tMonth": -0.6846,
+        "pMonth": 0.497,
+        "maxDD": -13.0349
+       },
+       "net2x": {
+        "n": 42,
+        "wins": 15,
+        "meanR": -0.1607,
+        "total": -6.7497,
+        "tTrade": -0.829,
+        "months": 48,
+        "tMonth": -0.7917,
+        "pMonth": 0.4325,
+        "maxDD": -13.6162
+       },
+       "gross": {
+        "n": 42,
+        "wins": 15,
+        "meanR": -0.1159,
+        "total": -4.8667,
+        "tTrade": -0.5993,
+        "months": 48,
+        "tMonth": -0.5761,
+        "pMonth": 0.5673,
+        "maxDD": -12.4536
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 36,
+        "wins": 17,
+        "meanR": 0.1714,
+        "total": 6.1707,
+        "tTrade": 0.7701,
+        "months": 34,
+        "tMonth": 0.6737,
+        "pMonth": 0.5052,
+        "maxDD": -6.3274
+       },
+       "net2x": {
+        "n": 36,
+        "wins": 17,
+        "meanR": 0.1443,
+        "total": 5.194,
+        "tTrade": 0.6483,
+        "months": 34,
+        "tMonth": 0.5706,
+        "pMonth": 0.5721,
+        "maxDD": -6.9608
+       },
+       "gross": {
+        "n": 36,
+        "wins": 17,
+        "meanR": 0.1985,
+        "total": 7.1475,
+        "tTrade": 0.8919,
+        "months": 34,
+        "tMonth": 0.7752,
+        "pMonth": 0.4437,
+        "maxDD": -5.694
+       }
+      }
+     }
+    },
+    "byReason": {
+     "stop": {
+      "n": 350,
+      "R": -350.6329,
+      "Rnet": -358.3104,
+      "meanR": -1.0018,
+      "meanRnet": -1.0237
+     },
+     "target": {
+      "n": 209,
+      "R": 388.2741,
+      "Rnet": 383.8809,
+      "meanR": 1.8578,
+      "meanRnet": 1.8368
+     },
+     "time": {
+      "n": 3,
+      "R": 2.6959,
+      "Rnet": 2.6532,
+      "meanR": 0.8986,
+      "meanRnet": 0.8844
+     }
+    },
+    "byYear": {
+     "2010": {
+      "n": 36,
+      "Rnet": 14.5772,
+      "R": 15.11,
+      "meanRnet": 0.4049,
+      "meanR": 0.4197
+     },
+     "2011": {
+      "n": 32,
+      "Rnet": -0.7014,
+      "R": -0.1049,
+      "meanRnet": -0.0219,
+      "meanR": -0.0033
+     },
+     "2012": {
+      "n": 33,
+      "Rnet": 0.1466,
+      "R": 0.8747,
+      "meanRnet": 0.0044,
+      "meanR": 0.0265
+     },
+     "2013": {
+      "n": 26,
+      "Rnet": 0.4917,
+      "R": 0.9593,
+      "meanRnet": 0.0189,
+      "meanR": 0.0369
+     },
+     "2014": {
+      "n": 31,
+      "Rnet": -0.3055,
+      "R": 0.4432,
+      "meanRnet": -0.0099,
+      "meanR": 0.0143
+     },
+     "2015": {
+      "n": 27,
+      "Rnet": 17.8057,
+      "R": 18.2337,
+      "meanRnet": 0.6595,
+      "meanR": 0.6753
+     },
+     "2016": {
+      "n": 33,
+      "Rnet": -7.6518,
+      "R": -7.0773,
+      "meanRnet": -0.2319,
+      "meanR": -0.2145
+     },
+     "2017": {
+      "n": 46,
+      "Rnet": -2.5253,
+      "R": -1.4349,
+      "meanRnet": -0.0549,
+      "meanR": -0.0312
+     },
+     "2018": {
+      "n": 35,
+      "Rnet": 2.1005,
+      "R": 2.9713,
+      "meanRnet": 0.06,
+      "meanR": 0.0849
+     },
+     "2019": {
+      "n": 36,
+      "Rnet": -3.6862,
+      "R": -2.6533,
+      "meanRnet": -0.1024,
+      "meanR": -0.0737
+     },
+     "2020": {
+      "n": 28,
+      "Rnet": -4.5239,
+      "R": -3.8966,
+      "meanRnet": -0.1616,
+      "meanR": -0.1392
+     },
+     "2021": {
+      "n": 36,
+      "Rnet": -5.9257,
+      "R": -5.0442,
+      "meanRnet": -0.1646,
+      "meanR": -0.1401
+     },
+     "2022": {
+      "n": 25,
+      "Rnet": 8.0833,
+      "R": 8.465,
+      "meanRnet": 0.3233,
+      "meanR": 0.3386
+     },
+     "2023": {
+      "n": 38,
+      "Rnet": 5.274,
+      "R": 6.1217,
+      "meanRnet": 0.1388,
+      "meanR": 0.1611
+     },
+     "2024": {
+      "n": 37,
+      "Rnet": 2.0861,
+      "R": 3.014,
+      "meanRnet": 0.0564,
+      "meanR": 0.0815
+     },
+     "2025": {
+      "n": 28,
+      "Rnet": -7.4222,
+      "R": -6.8626,
+      "meanRnet": -0.2651,
+      "meanR": -0.2451
+     },
+     "2026": {
+      "n": 35,
+      "Rnet": 10.4007,
+      "R": 11.2182,
+      "meanRnet": 0.2972,
+      "meanR": 0.3205
+     }
+    },
+    "medianTargetR": 1.7699,
+    "medianCostR": 0.0187
+   }
+  },
+  {
+   "id": "T4",
+   "name": "rejected by the location step (comparison)",
+   "windows": {
+    "rep": {
+     "net": {
+      "n": 327,
+      "wins": 135,
+      "meanR": -0.0298,
+      "total": -9.7519,
+      "tTrade": -0.4416,
+      "months": 119,
+      "tMonth": -0.4471,
+      "pMonth": 0.6556,
+      "maxDD": -26.5597
+     },
+     "net2x": {
+      "n": 327,
+      "wins": 135,
+      "meanR": -0.0533,
+      "total": -17.4195,
+      "tTrade": -0.7887,
+      "months": 119,
+      "tMonth": -0.7959,
+      "pMonth": 0.4277,
+      "maxDD": -30.1806
+     },
+     "gross": {
+      "n": 327,
+      "wins": 135,
+      "meanR": -0.0064,
+      "total": -2.0843,
+      "tTrade": -0.0944,
+      "months": 119,
+      "tMonth": -0.0958,
+      "pMonth": 0.9238,
+      "maxDD": -22.9388
+     }
+    },
+    "is": {
+     "net": {
+      "n": 143,
+      "wins": 54,
+      "meanR": -0.106,
+      "total": -15.1546,
+      "tTrade": -1.0487,
+      "months": 48,
+      "tMonth": -1.149,
+      "pMonth": 0.2564,
+      "maxDD": -18.9814
+     },
+     "net2x": {
+      "n": 143,
+      "wins": 54,
+      "meanR": -0.1267,
+      "total": -18.1113,
+      "tTrade": -1.2535,
+      "months": 48,
+      "tMonth": -1.3726,
+      "pMonth": 0.1764,
+      "maxDD": -21.5604
+     },
+     "gross": {
+      "n": 143,
+      "wins": 54,
+      "meanR": -0.0853,
+      "total": -12.1979,
+      "tTrade": -0.8439,
+      "months": 48,
+      "tMonth": -0.9247,
+      "pMonth": 0.3598,
+      "maxDD": -16.4024
+     }
+    },
+    "oos": {
+     "net": {
+      "n": 88,
+      "wins": 32,
+      "meanR": -0.1251,
+      "total": -11.0074,
+      "tTrade": -0.9641,
+      "months": 35,
+      "tMonth": -0.9348,
+      "pMonth": 0.3565,
+      "maxDD": -12.8931
+     },
+     "net2x": {
+      "n": 88,
+      "wins": 32,
+      "meanR": -0.1458,
+      "total": -12.8276,
+      "tTrade": -1.1238,
+      "months": 35,
+      "tMonth": -1.0824,
+      "pMonth": 0.2867,
+      "maxDD": -14.531
+     },
+     "gross": {
+      "n": 88,
+      "wins": 32,
+      "meanR": -0.1044,
+      "total": -9.1872,
+      "tTrade": -0.8044,
+      "months": 35,
+      "tMonth": -0.785,
+      "pMonth": 0.4379,
+      "maxDD": -11.995
+     }
+    }
+   },
+   "pRaw": 0.0917,
+   "holmP": 0.3667,
+   "lines": {
+    "oosMean": true,
+    "oosT": false,
+    "holm": false,
+    "isMean": false,
+    "oos2x": true,
+    "n30": true,
+    "repMean": true
+   },
+   "pass": false,
+   "detail": {
+    "byMarket": {
+     "gbpusd": {
+      "rep": {
+       "net": {
+        "n": 53,
+        "wins": 19,
+        "meanR": -0.1414,
+        "total": -7.4933,
+        "tTrade": -0.8387,
+        "months": 118,
+        "tMonth": -0.81,
+        "pMonth": 0.4196,
+        "maxDD": -13.1487
+       },
+       "net2x": {
+        "n": 53,
+        "wins": 19,
+        "meanR": -0.1595,
+        "total": -8.4533,
+        "tTrade": -0.9454,
+        "months": 118,
+        "tMonth": -0.9126,
+        "pMonth": 0.3633,
+        "maxDD": -13.9347
+       },
+       "gross": {
+        "n": 53,
+        "wins": 19,
+        "meanR": -0.1233,
+        "total": -6.5333,
+        "tTrade": -0.7317,
+        "months": 118,
+        "tMonth": -0.7069,
+        "pMonth": 0.481,
+        "maxDD": -12.3626
+       }
+      },
+      "is": {
+       "net": {
+        "n": 39,
+        "wins": 14,
+        "meanR": -0.1911,
+        "total": -7.4534,
+        "tTrade": -1.0531,
+        "months": 48,
+        "tMonth": -1.0745,
+        "pMonth": 0.2881,
+        "maxDD": -8.4188
+       },
+       "net2x": {
+        "n": 39,
+        "wins": 14,
+        "meanR": -0.2091,
+        "total": -8.1543,
+        "tTrade": -1.1513,
+        "months": 48,
+        "tMonth": -1.1719,
+        "pMonth": 0.2471,
+        "maxDD": -9.0663
+       },
+       "gross": {
+        "n": 39,
+        "wins": 14,
+        "meanR": -0.1731,
+        "total": -6.7525,
+        "tTrade": -0.9548,
+        "months": 48,
+        "tMonth": -0.976,
+        "pMonth": 0.334,
+        "maxDD": -7.8502
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 25,
+        "wins": 11,
+        "meanR": 0.0066,
+        "total": 0.1647,
+        "tTrade": 0.0272,
+        "months": 33,
+        "tMonth": 0.0311,
+        "pMonth": 0.9754,
+        "maxDD": -4.2787
+       },
+       "net2x": {
+        "n": 25,
+        "wins": 11,
+        "meanR": -0.0203,
+        "total": -0.5064,
+        "tTrade": -0.0837,
+        "months": 33,
+        "tMonth": -0.095,
+        "pMonth": 0.9249,
+        "maxDD": -4.6476
+       },
+       "gross": {
+        "n": 25,
+        "wins": 11,
+        "meanR": 0.0334,
+        "total": 0.8357,
+        "tTrade": 0.1383,
+        "months": 33,
+        "tMonth": 0.1588,
+        "pMonth": 0.8749,
+        "maxDD": -3.9757
+       }
+      }
+     },
+     "xau": {
+      "rep": {
+       "net": {
+        "n": 68,
+        "wins": 30,
+        "meanR": 0.0357,
+        "total": 2.4258,
+        "tTrade": 0.2332,
+        "months": 118,
+        "tMonth": 0.2256,
+        "pMonth": 0.8219,
+        "maxDD": -13.6549
+       },
+       "net2x": {
+        "n": 68,
+        "wins": 30,
+        "meanR": -0.0034,
+        "total": -0.2317,
+        "tTrade": -0.0222,
+        "months": 118,
+        "tMonth": -0.0215,
+        "pMonth": 0.9828,
+        "maxDD": -14.9201
+       },
+       "gross": {
+        "n": 68,
+        "wins": 30,
+        "meanR": 0.0748,
+        "total": 5.0833,
+        "tTrade": 0.4894,
+        "months": 118,
+        "tMonth": 0.4725,
+        "pMonth": 0.6374,
+        "maxDD": -12.3898
+       }
+      },
+      "is": {
+       "net": {
+        "n": 27,
+        "wins": 13,
+        "meanR": 0.1226,
+        "total": 3.3112,
+        "tTrade": 0.5144,
+        "months": 47,
+        "tMonth": 0.5415,
+        "pMonth": 0.5907,
+        "maxDD": -3.3127
+       },
+       "net2x": {
+        "n": 27,
+        "wins": 13,
+        "meanR": 0.0937,
+        "total": 2.5303,
+        "tTrade": 0.3934,
+        "months": 47,
+        "tMonth": 0.4157,
+        "pMonth": 0.6796,
+        "maxDD": -3.6617
+       },
+       "gross": {
+        "n": 27,
+        "wins": 13,
+        "meanR": 0.1516,
+        "total": 4.0921,
+        "tTrade": 0.6353,
+        "months": 47,
+        "tMonth": 0.6659,
+        "pMonth": 0.5088,
+        "maxDD": -3
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 15,
+        "wins": 3,
+        "meanR": -0.5215,
+        "total": -7.8227,
+        "tTrade": -1.9581,
+        "months": 34,
+        "tMonth": -1.8344,
+        "pMonth": 0.0756,
+        "maxDD": -8.2596
+       },
+       "net2x": {
+        "n": 15,
+        "wins": 3,
+        "meanR": -0.5368,
+        "total": -8.0521,
+        "tTrade": -2.0159,
+        "months": 34,
+        "tMonth": -1.8733,
+        "pMonth": 0.0699,
+        "maxDD": -8.4459
+       },
+       "gross": {
+        "n": 15,
+        "wins": 3,
+        "meanR": -0.5062,
+        "total": -7.5934,
+        "tTrade": -1.9001,
+        "months": 34,
+        "tMonth": -1.7943,
+        "pMonth": 0.0819,
+        "maxDD": -8.0733
+       }
+      }
+     },
+     "usdjpy": {
+      "rep": {
+       "net": {
+        "n": 80,
+        "wins": 34,
+        "meanR": -0.0338,
+        "total": -2.705,
+        "tTrade": -0.2565,
+        "months": 117,
+        "tMonth": -0.2703,
+        "pMonth": 0.7874,
+        "maxDD": -6.6647
+       },
+       "net2x": {
+        "n": 80,
+        "wins": 34,
+        "meanR": -0.0586,
+        "total": -4.6858,
+        "tTrade": -0.4445,
+        "months": 117,
+        "tMonth": -0.468,
+        "pMonth": 0.6407,
+        "maxDD": -6.9892
+       },
+       "gross": {
+        "n": 80,
+        "wins": 34,
+        "meanR": -0.0091,
+        "total": -0.7242,
+        "tTrade": -0.0686,
+        "months": 117,
+        "tMonth": -0.0724,
+        "pMonth": 0.9424,
+        "maxDD": -6.3402
+       }
+      },
+      "is": {
+       "net": {
+        "n": 22,
+        "wins": 7,
+        "meanR": -0.2771,
+        "total": -6.097,
+        "tTrade": -1.1566,
+        "months": 48,
+        "tMonth": -1.0107,
+        "pMonth": 0.3173,
+        "maxDD": -9.7143
+       },
+       "net2x": {
+        "n": 22,
+        "wins": 7,
+        "meanR": -0.2988,
+        "total": -6.5743,
+        "tTrade": -1.2459,
+        "months": 48,
+        "tMonth": -1.0795,
+        "pMonth": 0.2859,
+        "maxDD": -10.1295
+       },
+       "gross": {
+        "n": 22,
+        "wins": 7,
+        "meanR": -0.2554,
+        "total": -5.6197,
+        "tTrade": -1.0669,
+        "months": 48,
+        "tMonth": -0.9402,
+        "pMonth": 0.3519,
+        "maxDD": -9.2991
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 19,
+        "wins": 7,
+        "meanR": -0.1272,
+        "total": -2.4166,
+        "tTrade": -0.4547,
+        "months": 30,
+        "tMonth": -0.4233,
+        "pMonth": 0.6752,
+        "maxDD": -5.0858
+       },
+       "net2x": {
+        "n": 19,
+        "wins": 7,
+        "meanR": -0.1406,
+        "total": -2.6713,
+        "tTrade": -0.5023,
+        "months": 30,
+        "tMonth": -0.4671,
+        "pMonth": 0.6439,
+        "maxDD": -5.1715
+       },
+       "gross": {
+        "n": 19,
+        "wins": 7,
+        "meanR": -0.1138,
+        "total": -2.1619,
+        "tTrade": -0.4071,
+        "months": 30,
+        "tMonth": -0.3792,
+        "pMonth": 0.7073,
+        "maxDD": -5
+       }
+      }
+     },
+     "eurusd": {
+      "rep": {
+       "net": {
+        "n": 68,
+        "wins": 27,
+        "meanR": -0.0711,
+        "total": -4.832,
+        "tTrade": -0.4834,
+        "months": 115,
+        "tMonth": -0.5136,
+        "pMonth": 0.6085,
+        "maxDD": -8.3467
+       },
+       "net2x": {
+        "n": 68,
+        "wins": 27,
+        "meanR": -0.0872,
+        "total": -5.9262,
+        "tTrade": -0.5928,
+        "months": 115,
+        "tMonth": -0.6296,
+        "pMonth": 0.5302,
+        "maxDD": -8.7325
+       },
+       "gross": {
+        "n": 68,
+        "wins": 27,
+        "meanR": -0.055,
+        "total": -3.7377,
+        "tTrade": -0.3739,
+        "months": 115,
+        "tMonth": -0.3974,
+        "pMonth": 0.6918,
+        "maxDD": -7.9609
+       }
+      },
+      "is": {
+       "net": {
+        "n": 29,
+        "wins": 10,
+        "meanR": -0.187,
+        "total": -5.4239,
+        "tTrade": -0.849,
+        "months": 41,
+        "tMonth": -0.9335,
+        "pMonth": 0.3562,
+        "maxDD": -9.0776
+       },
+       "net2x": {
+        "n": 29,
+        "wins": 10,
+        "meanR": -0.2051,
+        "total": -5.9473,
+        "tTrade": -0.9303,
+        "months": 41,
+        "tMonth": -1.0221,
+        "pMonth": 0.3129,
+        "maxDD": -9.5147
+       },
+       "gross": {
+        "n": 29,
+        "wins": 10,
+        "meanR": -0.169,
+        "total": -4.9005,
+        "tTrade": -0.7675,
+        "months": 41,
+        "tMonth": -0.8443,
+        "pMonth": 0.4035,
+        "maxDD": -8.6405
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 22,
+        "wins": 8,
+        "meanR": -0.0576,
+        "total": -1.2675,
+        "tTrade": -0.2003,
+        "months": 30,
+        "tMonth": -0.2005,
+        "pMonth": 0.8425,
+        "maxDD": -7.1284
+       },
+       "net2x": {
+        "n": 22,
+        "wins": 8,
+        "meanR": -0.0796,
+        "total": -1.751,
+        "tTrade": -0.2768,
+        "months": 30,
+        "tMonth": -0.276,
+        "pMonth": 0.7845,
+        "maxDD": -7.4973
+       },
+       "gross": {
+        "n": 22,
+        "wins": 8,
+        "meanR": -0.0356,
+        "total": -0.7841,
+        "tTrade": -0.1239,
+        "months": 30,
+        "tMonth": -0.1245,
+        "pMonth": 0.9018,
+        "maxDD": -6.7595
+       }
+      }
+     },
+     "audusd": {
+      "rep": {
+       "net": {
+        "n": 58,
+        "wins": 25,
+        "meanR": 0.0492,
+        "total": 2.8526,
+        "tTrade": 0.2957,
+        "months": 116,
+        "tMonth": 0.2914,
+        "pMonth": 0.7713,
+        "maxDD": -8.9513
+       },
+       "net2x": {
+        "n": 58,
+        "wins": 25,
+        "meanR": 0.0324,
+        "total": 1.8775,
+        "tTrade": 0.1946,
+        "months": 116,
+        "tMonth": 0.1915,
+        "pMonth": 0.8485,
+        "maxDD": -9.4593
+       },
+       "gross": {
+        "n": 58,
+        "wins": 25,
+        "meanR": 0.066,
+        "total": 3.8276,
+        "tTrade": 0.3968,
+        "months": 116,
+        "tMonth": 0.3916,
+        "pMonth": 0.6961,
+        "maxDD": -8.4433
+       }
+      },
+      "is": {
+       "net": {
+        "n": 26,
+        "wins": 10,
+        "meanR": 0.0196,
+        "total": 0.5085,
+        "tTrade": 0.0707,
+        "months": 47,
+        "tMonth": 0.0736,
+        "pMonth": 0.9417,
+        "maxDD": -5.3155
+       },
+       "net2x": {
+        "n": 26,
+        "wins": 10,
+        "meanR": 0.0013,
+        "total": 0.0343,
+        "tTrade": 0.0048,
+        "months": 47,
+        "tMonth": 0.005,
+        "pMonth": 0.996,
+        "maxDD": -5.4552
+       },
+       "gross": {
+        "n": 26,
+        "wins": 10,
+        "meanR": 0.0378,
+        "total": 0.9828,
+        "tTrade": 0.1365,
+        "months": 47,
+        "tMonth": 0.1417,
+        "pMonth": 0.8879,
+        "maxDD": -5.1758
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 7,
+        "wins": 3,
+        "meanR": 0.0478,
+        "total": 0.3348,
+        "tTrade": 0.0942,
+        "months": 28,
+        "tMonth": 0.0999,
+        "pMonth": 0.9212,
+        "maxDD": -3.078
+       },
+       "net2x": {
+        "n": 7,
+        "wins": 3,
+        "meanR": 0.0219,
+        "total": 0.1532,
+        "tTrade": 0.0431,
+        "months": 28,
+        "tMonth": 0.0457,
+        "pMonth": 0.9639,
+        "maxDD": -3.1561
+       },
+       "gross": {
+        "n": 7,
+        "wins": 3,
+        "meanR": 0.0738,
+        "total": 0.5165,
+        "tTrade": 0.1454,
+        "months": 28,
+        "tMonth": 0.1541,
+        "pMonth": 0.8787,
+        "maxDD": -3
+       }
+      }
+     }
+    },
+    "bySide": {
+     "buy": {
+      "rep": {
+       "net": {
+        "n": 152,
+        "wins": 57,
+        "meanR": -0.1357,
+        "total": -20.6312,
+        "tTrade": -1.4197,
+        "months": 119,
+        "tMonth": -1.4499,
+        "pMonth": 0.1497,
+        "maxDD": -25.4468
+       },
+       "net2x": {
+        "n": 152,
+        "wins": 57,
+        "meanR": -0.1587,
+        "total": -24.1164,
+        "tTrade": -1.6596,
+        "months": 119,
+        "tMonth": -1.6939,
+        "pMonth": 0.0929,
+        "maxDD": -27.3611
+       },
+       "gross": {
+        "n": 152,
+        "wins": 57,
+        "meanR": -0.1128,
+        "total": -17.146,
+        "tTrade": -1.1797,
+        "months": 119,
+        "tMonth": -1.2051,
+        "pMonth": 0.2306,
+        "maxDD": -23.5324
+       }
+      },
+      "is": {
+       "net": {
+        "n": 76,
+        "wins": 28,
+        "meanR": -0.1133,
+        "total": -8.6136,
+        "tTrade": -0.8147,
+        "months": 48,
+        "tMonth": -0.8402,
+        "pMonth": 0.405,
+        "maxDD": -14.5773
+       },
+       "net2x": {
+        "n": 76,
+        "wins": 28,
+        "meanR": -0.1334,
+        "total": -10.1406,
+        "tTrade": -0.9588,
+        "months": 48,
+        "tMonth": -0.988,
+        "pMonth": 0.3282,
+        "maxDD": -15.724
+       },
+       "gross": {
+        "n": 76,
+        "wins": 28,
+        "meanR": -0.0932,
+        "total": -7.0866,
+        "tTrade": -0.6705,
+        "months": 48,
+        "tMonth": -0.6917,
+        "pMonth": 0.4925,
+        "maxDD": -13.4306
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 39,
+        "wins": 16,
+        "meanR": -0.0547,
+        "total": -2.1334,
+        "tTrade": -0.2859,
+        "months": 33,
+        "tMonth": -0.2908,
+        "pMonth": 0.7731,
+        "maxDD": -8.4274
+       },
+       "net2x": {
+        "n": 39,
+        "wins": 16,
+        "meanR": -0.0753,
+        "total": -2.9354,
+        "tTrade": -0.3935,
+        "months": 33,
+        "tMonth": -0.4001,
+        "pMonth": 0.6917,
+        "maxDD": -8.8592
+       },
+       "gross": {
+        "n": 39,
+        "wins": 16,
+        "meanR": -0.0341,
+        "total": -1.3315,
+        "tTrade": -0.1784,
+        "months": 33,
+        "tMonth": -0.1814,
+        "pMonth": 0.8572,
+        "maxDD": -7.9955
+       }
+      }
+     },
+     "sell": {
+      "rep": {
+       "net": {
+        "n": 175,
+        "wins": 78,
+        "meanR": 0.0622,
+        "total": 10.8793,
+        "tTrade": 0.6564,
+        "months": 119,
+        "tMonth": 0.6592,
+        "pMonth": 0.5111,
+        "maxDD": -9.2299
+       },
+       "net2x": {
+        "n": 175,
+        "wins": 78,
+        "meanR": 0.0383,
+        "total": 6.6969,
+        "tTrade": 0.4039,
+        "months": 119,
+        "tMonth": 0.4053,
+        "pMonth": 0.686,
+        "maxDD": -11.0861
+       },
+       "gross": {
+        "n": 175,
+        "wins": 78,
+        "meanR": 0.0861,
+        "total": 15.0617,
+        "tTrade": 0.9092,
+        "months": 119,
+        "tMonth": 0.9132,
+        "pMonth": 0.363,
+        "maxDD": -8.056
+       }
+      },
+      "is": {
+       "net": {
+        "n": 67,
+        "wins": 26,
+        "meanR": -0.0976,
+        "total": -6.5411,
+        "tTrade": -0.659,
+        "months": 48,
+        "tMonth": -0.6631,
+        "pMonth": 0.5105,
+        "maxDD": -9.4448
+       },
+       "net2x": {
+        "n": 67,
+        "wins": 26,
+        "meanR": -0.119,
+        "total": -7.9707,
+        "tTrade": -0.8036,
+        "months": 48,
+        "tMonth": -0.8115,
+        "pMonth": 0.4212,
+        "maxDD": -9.8984
+       },
+       "gross": {
+        "n": 67,
+        "wins": 26,
+        "meanR": -0.0763,
+        "total": -5.1114,
+        "tTrade": -0.5146,
+        "months": 48,
+        "tMonth": -0.5158,
+        "pMonth": 0.6084,
+        "maxDD": -8.9912
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 49,
+        "wins": 16,
+        "meanR": -0.1811,
+        "total": -8.874,
+        "tTrade": -1.019,
+        "months": 35,
+        "tMonth": -1.0708,
+        "pMonth": 0.2918,
+        "maxDD": -11.0488
+       },
+       "net2x": {
+        "n": 49,
+        "wins": 16,
+        "meanR": -0.2019,
+        "total": -9.8922,
+        "tTrade": -1.1362,
+        "months": 35,
+        "tMonth": -1.1873,
+        "pMonth": 0.2433,
+        "maxDD": -11.9285
+       },
+       "gross": {
+        "n": 49,
+        "wins": 16,
+        "meanR": -0.1603,
+        "total": -7.8557,
+        "tTrade": -0.9017,
+        "months": 35,
+        "tMonth": -0.9528,
+        "pMonth": 0.3474,
+        "maxDD": -10.1955
+       }
+      }
+     }
+    },
+    "byRange": {
+     "external": {
+      "rep": {
+       "net": {
+        "n": 327,
+        "wins": 135,
+        "meanR": -0.0298,
+        "total": -9.7519,
+        "tTrade": -0.4416,
+        "months": 119,
+        "tMonth": -0.4471,
+        "pMonth": 0.6556,
+        "maxDD": -26.5597
+       },
+       "net2x": {
+        "n": 327,
+        "wins": 135,
+        "meanR": -0.0533,
+        "total": -17.4195,
+        "tTrade": -0.7887,
+        "months": 119,
+        "tMonth": -0.7959,
+        "pMonth": 0.4277,
+        "maxDD": -30.1806
+       },
+       "gross": {
+        "n": 327,
+        "wins": 135,
+        "meanR": -0.0064,
+        "total": -2.0843,
+        "tTrade": -0.0944,
+        "months": 119,
+        "tMonth": -0.0958,
+        "pMonth": 0.9238,
+        "maxDD": -22.9388
+       }
+      },
+      "is": {
+       "net": {
+        "n": 143,
+        "wins": 54,
+        "meanR": -0.106,
+        "total": -15.1546,
+        "tTrade": -1.0487,
+        "months": 48,
+        "tMonth": -1.149,
+        "pMonth": 0.2564,
+        "maxDD": -18.9814
+       },
+       "net2x": {
+        "n": 143,
+        "wins": 54,
+        "meanR": -0.1267,
+        "total": -18.1113,
+        "tTrade": -1.2535,
+        "months": 48,
+        "tMonth": -1.3726,
+        "pMonth": 0.1764,
+        "maxDD": -21.5604
+       },
+       "gross": {
+        "n": 143,
+        "wins": 54,
+        "meanR": -0.0853,
+        "total": -12.1979,
+        "tTrade": -0.8439,
+        "months": 48,
+        "tMonth": -0.9247,
+        "pMonth": 0.3598,
+        "maxDD": -16.4024
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 88,
+        "wins": 32,
+        "meanR": -0.1251,
+        "total": -11.0074,
+        "tTrade": -0.9641,
+        "months": 35,
+        "tMonth": -0.9348,
+        "pMonth": 0.3565,
+        "maxDD": -12.8931
+       },
+       "net2x": {
+        "n": 88,
+        "wins": 32,
+        "meanR": -0.1458,
+        "total": -12.8276,
+        "tTrade": -1.1238,
+        "months": 35,
+        "tMonth": -1.0824,
+        "pMonth": 0.2867,
+        "maxDD": -14.531
+       },
+       "gross": {
+        "n": 88,
+        "wins": 32,
+        "meanR": -0.1044,
+        "total": -9.1872,
+        "tTrade": -0.8044,
+        "months": 35,
+        "tMonth": -0.785,
+        "pMonth": 0.4379,
+        "maxDD": -11.995
+       }
+      }
+     },
+     "internal": {
+      "rep": {
+       "net": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       },
+       "net2x": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       },
+       "gross": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       }
+      },
+      "is": {
+       "net": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       },
+       "net2x": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       },
+       "gross": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       }
+      },
+      "oos": {
+       "net": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       },
+       "net2x": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       },
+       "gross": {
+        "n": 0,
+        "wins": 0,
+        "meanR": null,
+        "total": 0,
+        "tTrade": null,
+        "months": 0,
+        "tMonth": null,
+        "pMonth": null,
+        "maxDD": 0
+       }
+      }
+     }
+    },
+    "byReason": {
+     "target": {
+      "n": 220,
+      "R": 313.449,
+      "Rnet": 308.5696,
+      "meanR": 1.4248,
+      "meanRnet": 1.4026
+     },
+     "stop": {
+      "n": 337,
+      "R": -337.6716,
+      "Rnet": -345.196,
+      "meanR": -1.002,
+      "meanRnet": -1.0243
+     },
+     "time": {
+      "n": 1,
+      "R": 0.7532,
+      "Rnet": 0.7125,
+      "meanR": 0.7532,
+      "meanRnet": 0.7125
+     }
+    },
+    "byYear": {
+     "2010": {
+      "n": 30,
+      "Rnet": 1.7739,
+      "R": 2.356,
+      "meanRnet": 0.0591,
+      "meanR": 0.0785
+     },
+     "2011": {
+      "n": 21,
+      "Rnet": -5.7448,
+      "R": -5.3525,
+      "meanRnet": -0.2736,
+      "meanR": -0.2549
+     },
+     "2012": {
+      "n": 32,
+      "Rnet": -0.083,
+      "R": 0.6821,
+      "meanRnet": -0.0026,
+      "meanR": 0.0213
+     },
+     "2013": {
+      "n": 35,
+      "Rnet": 9.8236,
+      "R": 10.4566,
+      "meanRnet": 0.2807,
+      "meanR": 0.2988
+     },
+     "2014": {
+      "n": 39,
+      "Rnet": 4.8748,
+      "R": 5.8424,
+      "meanRnet": 0.125,
+      "meanR": 0.1498
+     },
+     "2015": {
+      "n": 37,
+      "Rnet": 6.1633,
+      "R": 6.8698,
+      "meanRnet": 0.1666,
+      "meanR": 0.1857
+     },
+     "2016": {
+      "n": 30,
+      "Rnet": -10.7199,
+      "R": -10.0656,
+      "meanRnet": -0.3573,
+      "meanR": -0.3355
+     },
+     "2017": {
+      "n": 33,
+      "Rnet": 2.4896,
+      "R": 3.4015,
+      "meanRnet": 0.0754,
+      "meanR": 0.1031
+     },
+     "2018": {
+      "n": 35,
+      "Rnet": -9.2564,
+      "R": -8.3401,
+      "meanRnet": -0.2645,
+      "meanR": -0.2383
+     },
+     "2019": {
+      "n": 35,
+      "Rnet": -9.073,
+      "R": -7.9346,
+      "meanRnet": -0.2592,
+      "meanR": -0.2267
+     },
+     "2020": {
+      "n": 41,
+      "Rnet": -3.936,
+      "R": -3.0856,
+      "meanRnet": -0.096,
+      "meanR": -0.0753
+     },
+     "2021": {
+      "n": 36,
+      "Rnet": -1.2192,
+      "R": -0.3917,
+      "meanRnet": -0.0339,
+      "meanR": -0.0109
+     },
+     "2022": {
+      "n": 29,
+      "Rnet": -3.654,
+      "R": -3.1454,
+      "meanRnet": -0.126,
+      "meanR": -0.1085
+     },
+     "2023": {
+      "n": 37,
+      "Rnet": -6.3454,
+      "R": -5.5752,
+      "meanRnet": -0.1715,
+      "meanR": -0.1507
+     },
+     "2024": {
+      "n": 32,
+      "Rnet": -5.539,
+      "R": -4.8294,
+      "meanRnet": -0.1731,
+      "meanR": -0.1509
+     },
+     "2025": {
+      "n": 26,
+      "Rnet": 1.4245,
+      "R": 1.9392,
+      "meanRnet": 0.0548,
+      "meanR": 0.0746
+     },
+     "2026": {
+      "n": 30,
+      "Rnet": -6.8928,
+      "R": -6.297,
+      "meanRnet": -0.2298,
+      "meanR": -0.2099
+     }
+    },
+    "medianTargetR": 1.3725,
+    "medianCostR": 0.0195
+   },
+   "welch": {
+    "t": 1.3351,
+    "df": 203.137,
+    "p": 0.0917,
+    "diff": 0.2498,
+    "na": 120,
+    "nb": 88,
+    "meanKept": 0.1247,
+    "meanRejected": -0.1251
+   }
+  }
+ ]
+}
