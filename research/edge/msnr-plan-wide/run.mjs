@@ -185,6 +185,8 @@ export function report(dir) {
   const headline = verdict === 'PASS'
     ? `${pass.length} of 54 cells pass; best ${cname(head)}, ${f3(head.c.mean)}R a trade before costs in 2015-26 (n ${N(head.c.n)}, month t ${f2(head.c.t)})`
     : `0 of 54 cells pass; the best confirmation cell, ${cname(head)}, made ${f3(head.c.mean)}R a trade before costs in 2015-26 (n ${N(head.c.n)}, month t ${f2(head.c.t)}; its control ${f3(head.ctl.c.mean)}R)`;
+  const G = data.find((d) => d.market === 'xau'), GA = pool([G], 'real'), GC = pool([G], 'ctl');
+  const gold = rows.filter((r) => r.stop === 'pips' && r.call === 'all').map((r) => { const s = cellStats(GA, r.cell), c = cellStats(GC, r.cell); return { cell: cname(r), d: slim(s.d), c: slim(s.c), ctlD: slim(c.d), ctlC: slim(c.c) }; });
   const perMarket = {}; for (const r of pass) perMarket[r.cell] = data.map((d) => { const s = cellStats(pool([d], 'real'), r.cell); return { market: d.market, d: slim(s.d), c: slim(s.c) }; });
   const out = { study: 'msnr-plan-wide', built: '2026-11-23', verdict, headline, basis: 'judged before costs on calendar-month sums (pre-registered); after costs beside',
     windows: { discovery: '2005-01-01 to 2014-12-31 (120 months)', confirmation: '2015-01-01 to 2026-10-31 (142 months)' }, markets: MARKETS, assumedCosts: ASSUMED,
@@ -194,7 +196,7 @@ export function report(dir) {
     passed: pass.map(cname), placeboPassed: plPass.map(cname), bestConfirmation: cname(bestC), cut,
     checksCount: { n: rows.filter((r) => r.checks.n).length, disc: rows.filter((r) => r.checks.disc).length, conf: rows.filter((r) => r.checks.conf).length,
       both: rows.filter((r) => r.checks.disc && r.checks.conf).length, holm: rows.filter((r) => r.checks.holm).length, control: rows.filter((r) => r.checks.control).length },
-    cells: rows.map((r) => ({ cell: cname(r), set: r.set, call: r.call, trig: r.trig, stop: r.stop, exit: r.exit, disc: slim(r.d), conf: slim(r.c), holm: +r.holm.toFixed(4),
+    gold, cells: rows.map((r) => ({ cell: cname(r), set: r.set, call: r.call, trig: r.trig, stop: r.stop, exit: r.exit, disc: slim(r.d), conf: slim(r.c), holm: +r.holm.toFixed(4),
       control: { disc: slim(r.ctl.d), conf: slim(r.ctl.c) }, vsControl: { d: r.vs.d == null ? null : +r.vs.d.toFixed(2), c: r.vs.c == null ? null : +r.vs.c.toFixed(2) },
       checks: r.checks, pass: r.pass, placebo: r.plac ? { disc: slim(r.plac.d), conf: slim(r.plac.c), holm: +r.plac.holm.toFixed(4), pass: r.plac.pass } : null })), perMarket };
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1) + '\n');
@@ -232,6 +234,10 @@ function resultMd(o, rows) {
   L.push('');
   if (o.passed.length) { L.push('## Per market, passing cells', ''); for (const [c, list] of Object.entries(o.perMarket)) { L.push(`### ${cname(rows[c])}`, '', '| Market | n 05-14 | R (t) | n 15-26 | R (t) |', '|---|---:|---:|---:|---:|');
     for (const x of list) L.push(`| ${x.market} | ${N(x.d.n)} | ${f3(x.d.mean)} (${f2(x.d.t)}) | ${N(x.c.n)} | ${f3(x.c.mean)} (${f2(x.c.t)}) |`); L.push(''); } }
+  L.push('## Gold alone (reported, not judged)', '', 'The desk plan\'s own market with its own 30-pip stop, before costs; control = the same trigger on gold anywhere at matched times.', '',
+    '| Cell | n 06-14 | R 06-14 (t) | ctl | n 15-26 | R 15-26 (t) | ctl |', '|---|---:|---:|---:|---:|---:|---:|');
+  for (const g of o.gold) L.push(`| ${g.cell} | ${N(g.d.n)} | ${f3(g.d.mean)} (${f2(g.d.t)}) | ${f3(g.ctlD.mean)} | ${N(g.c.n)} | ${f3(g.c.mean)} (${f2(g.c.t)}) | ${f3(g.ctlC.mean)} |`);
+  L.push('');
   L.push('## Checks', '',
     `- Cut test: ${o.cut.length} cuts on ${[...new Set(o.cut.map((x) => x.market))].join(', ') || 'none'}: ${N(nCut)} plan signals known by the cut dates, ${bad} missing or extra when the candles are cut there.`,
     '- Every trade has its stop on the losing side of the fill (the run throws otherwise); a fill at or past the stop, or a risk under the round trip, is no trade.',
@@ -244,7 +250,11 @@ function resultMd(o, rows) {
   else L.push('With market entries the plan\'s conditions (a Daily rejection, an H4 break, an H4 zone) do not pick triggers that beat the',
     'same triggers taken anywhere, on ten markets over 22 years. The out-of-sample gold figure of `desk-rigor` rested on resting',
     'limits; read with an entry that a touch fill cannot flatter, the plan is not an edge. Do not re-test variants of these 54',
-    'cells on these years. Nothing live changed; no rule is proposed.');
+    'cells on these years. Nothing live changed; no rule is proposed.', '',
+    `The ${o.checksCount.control} cells that "beat" their control (Welch t >= 2 in both windows) lose money themselves: the plan lost a little`,
+    'less than the same trigger taken anywhere, with a stop past the trigger zone. Before costs every market-entry cell is within',
+    'about 0.05R of zero; after costs every one of the 54 cells loses. The side-flipped trades that clear bars 1-3 are the mirror',
+    'of small losses at a 1R / 2R exit and lose after costs: not a fade rule.');
   L.push('');
   return L.join('\n');
 }
