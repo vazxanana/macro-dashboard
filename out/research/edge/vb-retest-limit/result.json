@@ -1,0 +1,328 @@
+{
+ "study": "vb-retest-limit",
+ "built": "2026-11-23",
+ "preregistration": "research/edge/vb-retest-limit/PREREGISTRATION.md",
+ "planSha256": "090c90712a10b67b8c72c2e3c7cf01e0e249e0f89aaa426dfd4677a21d9c8c5c",
+ "verdict": "FAIL",
+ "windows": {
+  "TEST": [
+   "2010-01-01",
+   "2019-12-31"
+  ],
+  "H1": [
+   "2010-01-01",
+   "2014-12-31"
+  ],
+  "H2": [
+   "2015-01-01",
+   "2019-12-31"
+  ],
+  "LATE": [
+   "2020-01-01",
+   "2099-12-31"
+  ]
+ },
+ "data": "xau 1275746 M5 candles 2009-01-01 → 2026-11-22; usdjpy 1339637 M5 candles 2009-01-01 → 2026-11-22",
+ "gate": {
+  "xau": {
+   "w": [
+    "2012-01-01",
+    "2015-12-31"
+   ],
+   "n": 728,
+   "grossR": 0.186,
+   "want": [
+    728,
+    0.186
+   ],
+   "ok": true
+  },
+  "xau2": {
+   "w": [
+    "2016-01-01",
+    "2020-12-31"
+   ],
+   "n": 935,
+   "grossR": 0.111,
+   "want": [
+    935,
+    0.111
+   ],
+   "ok": true
+  },
+  "usdjpy": {
+   "w": [
+    "2011-01-01",
+    "2015-12-31"
+   ],
+   "n": 940,
+   "grossR": 0.116,
+   "want": [
+    940,
+    0.116
+   ],
+   "ok": true
+  }
+ },
+ "judged": {
+  "tests": [
+   {
+    "test": "T1",
+    "variant": "V1",
+    "market": "xau",
+    "n": 1842,
+    "meanD": -0.032,
+    "t": -1.74,
+    "months": 120,
+    "h1": -0.026,
+    "h2": -0.037,
+    "p": 0.959,
+    "pHolm": 1,
+    "pass": false
+   },
+   {
+    "test": "T1",
+    "variant": "V1",
+    "market": "usdjpy",
+    "n": 1886,
+    "meanD": -0.019,
+    "t": -1.32,
+    "months": 120,
+    "h1": -0.017,
+    "h2": -0.021,
+    "p": 0.906,
+    "pHolm": 1,
+    "pass": false
+   },
+   {
+    "test": "T2",
+    "variant": "V2",
+    "market": "xau",
+    "n": 1842,
+    "meanD": -0.036,
+    "t": -1.62,
+    "months": 120,
+    "h1": -0.041,
+    "h2": -0.032,
+    "p": 0.947,
+    "pHolm": 1,
+    "pass": false
+   },
+   {
+    "test": "T2",
+    "variant": "V2",
+    "market": "usdjpy",
+    "n": 1886,
+    "meanD": -0.019,
+    "t": -0.91,
+    "months": 120,
+    "h1": -0.004,
+    "h2": -0.033,
+    "p": 0.818,
+    "pHolm": 1,
+    "pass": false
+   }
+  ],
+  "verdict": "FAIL"
+ },
+ "desc": {
+  "TEST": {
+   "xau": {
+    "signalDays": 1842,
+    "V0": {
+     "fills": 1842,
+     "fillRate": 1,
+     "grossR": 0.138,
+     "netR": 0.122,
+     "perDayGross": 0.138,
+     "perDayNet": 0.122,
+     "netT": 3.88,
+     "cancelStop": 0,
+     "cancelGap": 0
+    },
+    "V1": {
+     "fills": 1725,
+     "fillRate": 0.936,
+     "grossR": 0.114,
+     "netR": 0.096,
+     "perDayGross": 0.107,
+     "perDayNet": 0.089,
+     "netT": 2.81,
+     "cancelStop": 0,
+     "cancelGap": 5
+    },
+    "V2": {
+     "fills": 1497,
+     "fillRate": 0.813,
+     "grossR": 0.126,
+     "netR": 0.103,
+     "perDayGross": 0.102,
+     "perDayNet": 0.084,
+     "netT": 2.7,
+     "cancelStop": 0,
+     "cancelGap": 5
+    },
+    "V1minusV0": {
+     "gross": -0.032,
+     "grossT": -1.74,
+     "net": -0.032,
+     "netT": -1.79
+    },
+    "V2minusV0": {
+     "gross": -0.036,
+     "grossT": -1.62,
+     "net": -0.038,
+     "netT": -1.71
+    }
+   },
+   "usdjpy": {
+    "signalDays": 1886,
+    "V0": {
+     "fills": 1886,
+     "fillRate": 1,
+     "grossR": 0.08,
+     "netR": 0.046,
+     "perDayGross": 0.08,
+     "perDayNet": 0.046,
+     "netT": 1.66,
+     "cancelStop": 0,
+     "cancelGap": 0
+    },
+    "V1": {
+     "fills": 1775,
+     "fillRate": 0.941,
+     "grossR": 0.064,
+     "netR": 0.028,
+     "perDayGross": 0.061,
+     "perDayNet": 0.026,
+     "netT": 0.96,
+     "cancelStop": 0,
+     "cancelGap": 6
+    },
+    "V2": {
+     "fills": 1508,
+     "fillRate": 0.8,
+     "grossR": 0.076,
+     "netR": 0.031,
+     "perDayGross": 0.061,
+     "perDayNet": 0.025,
+     "netT": 0.91,
+     "cancelStop": 0,
+     "cancelGap": 6
+    },
+    "V1minusV0": {
+     "gross": -0.019,
+     "grossT": -1.32,
+     "net": -0.02,
+     "netT": -1.37
+    },
+    "V2minusV0": {
+     "gross": -0.019,
+     "grossT": -0.91,
+     "net": -0.021,
+     "netT": -1
+    }
+   }
+  },
+  "LATE": {
+   "xau": {
+    "signalDays": 1314,
+    "V0": {
+     "fills": 1314,
+     "fillRate": 1,
+     "grossR": 0.14,
+     "netR": 0.125,
+     "perDayGross": 0.14,
+     "perDayNet": 0.125,
+     "netT": 3.56,
+     "cancelStop": 0,
+     "cancelGap": 0
+    },
+    "V1": {
+     "fills": 1261,
+     "fillRate": 0.96,
+     "grossR": 0.15,
+     "netR": 0.133,
+     "perDayGross": 0.144,
+     "perDayNet": 0.128,
+     "netT": 3.5,
+     "cancelStop": 0,
+     "cancelGap": 0
+    },
+    "V2": {
+     "fills": 1075,
+     "fillRate": 0.818,
+     "grossR": 0.175,
+     "netR": 0.153,
+     "perDayGross": 0.143,
+     "perDayNet": 0.126,
+     "netT": 3.23,
+     "cancelStop": 0,
+     "cancelGap": 0
+    },
+    "V1minusV0": {
+     "gross": 0.004,
+     "grossT": 0.33,
+     "net": 0.003,
+     "netT": 0.25
+    },
+    "V2minusV0": {
+     "gross": 0.002,
+     "grossT": 0.11,
+     "net": 0,
+     "netT": 0.02
+    }
+   },
+   "usdjpy": {
+    "signalDays": 1313,
+    "V0": {
+     "fills": 1313,
+     "fillRate": 1,
+     "grossR": 0.121,
+     "netR": 0.089,
+     "perDayGross": 0.121,
+     "perDayNet": 0.089,
+     "netT": 2.61,
+     "cancelStop": 0,
+     "cancelGap": 0
+    },
+    "V1": {
+     "fills": 1238,
+     "fillRate": 0.943,
+     "grossR": 0.099,
+     "netR": 0.055,
+     "perDayGross": 0.093,
+     "perDayNet": 0.052,
+     "netT": 1.51,
+     "cancelStop": 0,
+     "cancelGap": 3
+    },
+    "V2": {
+     "fills": 1019,
+     "fillRate": 0.776,
+     "grossR": 0.087,
+     "netR": 0.034,
+     "perDayGross": 0.067,
+     "perDayNet": 0.026,
+     "netT": 0.72,
+     "cancelStop": 0,
+     "cancelGap": 3
+    },
+    "V1minusV0": {
+     "gross": -0.028,
+     "grossT": -1.47,
+     "net": -0.038,
+     "netT": -1.86
+    },
+    "V2minusV0": {
+     "gross": -0.053,
+     "grossT": -2,
+     "net": -0.063,
+     "netT": -2.31
+    }
+   }
+  }
+ },
+ "headline": "FAIL. A limit at the retest lost to the stop entry on 2010-19 before costs: gold −0.032R a signal day (n 1842, t −1.74), USD/JPY −0.019R a signal day (n 1886, t −1.32); the deeper limit too",
+ "reading": "Waiting for the retest misses the days that run without coming back: V1 fills 94 % of gold's and 94 % of USD/JPY's signal days, V2 81 % / 80 %. Filled trades make +0.114R (gold V1) and +0.064R (USD/JPY V1) a trade before costs against V0's +0.138R / +0.080R; per signal day +0.107R / +0.061R against +0.138R / +0.080R. The days that come back to the level are the weaker ones: at the same entry price (V1) the filled trades earn less a trade than V0, so the limit adds no price improvement and loses the days that run (adverse selection). Costs do not change the picture (paired differences after costs within 0.01R of the gross ones). The stop entry stays: no retest limit improved the signal day on the pre-registered bar. Nothing live changed."
+}
