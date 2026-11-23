@@ -14,5 +14,8 @@
     document.querySelectorAll('[data-mx-members]').forEach(function (el) { el.hidden = !me; });
     document.querySelectorAll('[data-mx-owner]').forEach(function (el) { el.hidden = !(me && me.role === 'owner'); });
     if (deny) document.querySelectorAll('[data-mx-macro]').forEach(function (el) { el.hidden = true; });
+    // Equinox (23 Nov 2026): the owner, and a member with the desks permission (an explicit perms.desks, else the reviewer default)
+    var desks = !!me && (me.role === 'owner' || (me.perms && me.perms.desks != null ? !!me.perms.desks : me.role === 'reviewer'));
+    document.querySelectorAll('[data-mx-desks]').forEach(function (el) { el.hidden = !desks; });
   });
 })();

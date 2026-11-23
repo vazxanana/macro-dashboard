@@ -1,0 +1,3043 @@
+{
+ "topic": "eg-span-holdout",
+ "title": "Next-candle engulf against the three-candle engulf, 2010-2019",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "0 of 3. Before costs in 2015-2019: plan next-candle −0.081R a trade (n 1663, month t -3.4), short method next-candle +0.002R (n 1464, t 0.04); next-candle minus three-candle at 2R −0.006R (Welch t -0.2).",
+ "basis": "before costs (after costs beside)",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "years": "2010-2019",
+ "halves": {
+  "discovery": "2010-2014",
+  "confirmation": "2015-2019"
+ },
+ "deskRR": {
+  "eg-plan": 1,
+  "eg-plan-n": 1,
+  "eg-simple": 1,
+  "eg-simple-n": 4
+ },
+ "tests": [
+  {
+   "id": "T1",
+   "what": "plan, next-candle engulf (eg-plan-n), desk target 1R",
+   "discovery": {
+    "n": 1894,
+    "meanR": -0.0447,
+    "tMonth": -2.04,
+    "meanNet": -0.0885,
+    "tMonthNet": -4.1
+   },
+   "confirmation": {
+    "n": 1663,
+    "meanR": -0.0807,
+    "tMonth": -3.4,
+    "meanNet": -0.1237,
+    "tMonthNet": -5.23
+   },
+   "placeboConfirmation": {
+    "meanR": 0.064,
+    "vsDiff": -0.1447,
+    "vsT": -4.17
+   },
+   "enough": true,
+   "conditions": false,
+   "p": 0.9994,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "id": "T2",
+   "what": "short method, next-candle engulf (eg-simple-n), desk target 4R",
+   "discovery": {
+    "n": 1738,
+    "meanR": -0.0359,
+    "tMonth": -0.8,
+    "meanNet": -0.0796,
+    "tMonthNet": -1.77
+   },
+   "confirmation": {
+    "n": 1464,
+    "meanR": 0.0024,
+    "tMonth": 0.04,
+    "meanNet": -0.0401,
+    "tMonthNet": -0.68
+   },
+   "placeboConfirmation": {
+    "meanR": 0.093,
+    "vsDiff": -0.09,
+    "vsT": -1.19
+   },
+   "enough": true,
+   "conditions": false,
+   "p": 0.4841,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "id": "T3",
+   "what": "next-candle minus three-candle, plan + short method, common 2R, pooled",
+   "discovery": {
+    "nNext": 3741,
+    "nThree": 8034,
+    "diff": -0.0279,
+    "t": -1.01,
+    "df": 7345.290214063489,
+    "diffNet": -0.0254,
+    "tNet": -0.92
+   },
+   "confirmation": {
+    "nNext": 3324,
+    "nThree": 6290,
+    "diff": -0.0061,
+    "t": -0.2,
+    "df": 6778.122312091657,
+    "diffNet": -0.0019,
+    "tNet": -0.06
+   },
+   "enough": true,
+   "conditions": false,
+   "p": 0.5793,
+   "holm": 1,
+   "pass": false
+  }
+ ],
+ "streams": {
+  "eg-plan@desk": {
+   "discovery": {
+    "n": 5739,
+    "meanR": -0.0197,
+    "tMonth": -1.36,
+    "months": 60,
+    "meanNet": -0.0628,
+    "tMonthNet": -4.41,
+    "win": 0.4907,
+    "placebo": {
+     "n": 5739,
+     "meanR": 0.0033,
+     "meanNet": -0.0399
+    },
+    "vsPlacebo": {
+     "diff": -0.023,
+     "t": -1.22,
+     "df": 11475.77516377873
+    }
+   },
+   "confirmation": {
+    "n": 4664,
+    "meanR": -0.0277,
+    "tMonth": -1.79,
+    "months": 60,
+    "meanNet": -0.0725,
+    "tMonthNet": -4.66,
+    "win": 0.4876,
+    "placebo": {
+     "n": 4664,
+     "meanR": 0.0079,
+     "meanNet": -0.0369
+    },
+    "vsPlacebo": {
+     "diff": -0.0356,
+     "t": -1.71,
+     "df": 9325.749262440486
+    }
+   },
+   "all": {
+    "n": 10403,
+    "meanR": -0.0233,
+    "tMonth": -2.22,
+    "months": 120,
+    "meanNet": -0.0672,
+    "tMonthNet": -6.42,
+    "win": 0.4893,
+    "placebo": {
+     "n": 10403,
+     "meanR": 0.0054,
+     "meanNet": -0.0385
+    },
+    "vsPlacebo": {
+     "diff": -0.0286,
+     "t": -2.05,
+     "df": 20803.52817695575
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 1496,
+      "meanR": -0.0094,
+      "tMonth": -0.36,
+      "months": 60,
+      "meanNet": -0.1094,
+      "tMonthNet": -4.3,
+      "win": 0.4953,
+      "placebo": {
+       "n": 1496,
+       "meanR": -0.025,
+       "meanNet": -0.125
+      },
+      "vsPlacebo": {
+       "diff": 0.0157,
+       "t": 0.43,
+       "df": 2989.9972905629534
+      }
+     },
+     "confirmation": {
+      "n": 1291,
+      "meanR": 0.0013,
+      "tMonth": 0.05,
+      "months": 60,
+      "meanNet": -0.0987,
+      "tMonthNet": -3.69,
+      "win": 0.5012,
+      "placebo": {
+       "n": 1291,
+       "meanR": -0.0282,
+       "meanNet": -0.1282
+      },
+      "vsPlacebo": {
+       "diff": 0.0295,
+       "t": 0.75,
+       "df": 2579.999557315783
+      }
+     },
+     "all": {
+      "n": 2787,
+      "meanR": -0.0044,
+      "tMonth": -0.24,
+      "months": 120,
+      "meanNet": -0.1044,
+      "tMonthNet": -5.68,
+      "win": 0.498,
+      "placebo": {
+       "n": 2787,
+       "meanR": -0.0265,
+       "meanNet": -0.1265
+      },
+      "vsPlacebo": {
+       "diff": 0.0221,
+       "t": 0.82,
+       "df": 5571.999479917178
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 1130,
+      "meanR": 0.028,
+      "tMonth": 1.17,
+      "months": 60,
+      "meanNet": 0.008,
+      "tMonthNet": 0.33,
+      "win": 0.5142,
+      "placebo": {
+       "n": 1130,
+       "meanR": -0.0381,
+       "meanNet": -0.0581
+      },
+      "vsPlacebo": {
+       "diff": 0.066,
+       "t": 1.57,
+       "df": 2257.9996694032034
+      }
+     },
+     "confirmation": {
+      "n": 819,
+      "meanR": -0.0689,
+      "tMonth": -1.83,
+      "months": 60,
+      "meanNet": -0.0889,
+      "tMonthNet": -2.36,
+      "win": 0.4664,
+      "placebo": {
+       "n": 819,
+       "meanR": 0.0502,
+       "meanNet": 0.0302
+      },
+      "vsPlacebo": {
+       "diff": -0.1192,
+       "t": -2.41,
+       "df": 1635.995330567492
+      }
+     },
+     "all": {
+      "n": 1949,
+      "meanR": -0.0127,
+      "tMonth": -0.6,
+      "months": 120,
+      "meanNet": -0.0327,
+      "tMonthNet": -1.53,
+      "win": 0.4941,
+      "placebo": {
+       "n": 1949,
+       "meanR": -0.001,
+       "meanNet": -0.021
+      },
+      "vsPlacebo": {
+       "diff": -0.0118,
+       "t": -0.37,
+       "df": 3895.9978775161408
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 1199,
+      "meanR": -0.0393,
+      "tMonth": -1.44,
+      "months": 60,
+      "meanNet": -0.0659,
+      "tMonthNet": -2.43,
+      "win": 0.4804,
+      "placebo": {
+       "n": 1199,
+       "meanR": 0.0266,
+       "meanNet": 0
+      },
+      "vsPlacebo": {
+       "diff": -0.0659,
+       "t": -1.6,
+       "df": 2395.523218955496
+      }
+     },
+     "confirmation": {
+      "n": 965,
+      "meanR": 0.0005,
+      "tMonth": 0.02,
+      "months": 60,
+      "meanNet": -0.0262,
+      "tMonthNet": -1.04,
+      "win": 0.5016,
+      "placebo": {
+       "n": 965,
+       "meanR": -0.0164,
+       "meanNet": -0.0431
+      },
+      "vsPlacebo": {
+       "diff": 0.0169,
+       "t": 0.37,
+       "df": 1927.4454249512048
+      }
+     },
+     "all": {
+      "n": 2164,
+      "meanR": -0.0216,
+      "tMonth": -1.15,
+      "months": 120,
+      "meanNet": -0.0482,
+      "tMonthNet": -2.56,
+      "win": 0.4898,
+      "placebo": {
+       "n": 2164,
+       "meanR": 0.0074,
+       "meanNet": -0.0192
+      },
+      "vsPlacebo": {
+       "diff": -0.029,
+       "t": -0.94,
+       "df": 4324.97210541392
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 767,
+      "meanR": -0.0338,
+      "tMonth": -0.83,
+      "months": 60,
+      "meanNet": -0.0605,
+      "tMonthNet": -1.47,
+      "win": 0.4863,
+      "placebo": {
+       "n": 767,
+       "meanR": 0.0167,
+       "meanNet": -0.01
+      },
+      "vsPlacebo": {
+       "diff": -0.0505,
+       "t": -0.97,
+       "df": 1531.9872958786461
+      }
+     },
+     "confirmation": {
+      "n": 887,
+      "meanR": -0.0694,
+      "tMonth": -2.01,
+      "months": 60,
+      "meanNet": -0.0961,
+      "tMonthNet": -2.75,
+      "win": 0.469,
+      "placebo": {
+       "n": 887,
+       "meanR": 0.0458,
+       "meanNet": 0.0191
+      },
+      "vsPlacebo": {
+       "diff": -0.1152,
+       "t": -2.39,
+       "df": 1771.9486922198746
+      }
+     },
+     "all": {
+      "n": 1654,
+      "meanR": -0.0529,
+      "tMonth": -2.01,
+      "months": 120,
+      "meanNet": -0.0796,
+      "tMonthNet": -2.98,
+      "win": 0.477,
+      "placebo": {
+       "n": 1654,
+       "meanR": 0.0323,
+       "meanNet": 0.0056
+      },
+      "vsPlacebo": {
+       "diff": -0.0852,
+       "t": -2.42,
+       "df": 3305.94258456301
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 1147,
+      "meanR": -0.0502,
+      "tMonth": -1.59,
+      "months": 60,
+      "meanNet": -0.0702,
+      "tMonthNet": -2.21,
+      "win": 0.4752,
+      "placebo": {
+       "n": 1147,
+       "meanR": 0.0475,
+       "meanNet": 0.0275
+      },
+      "vsPlacebo": {
+       "diff": -0.0977,
+       "t": -2.34,
+       "df": 2291.979139035292
+      }
+     },
+     "confirmation": {
+      "n": 702,
+      "meanR": -0.0189,
+      "tMonth": -0.43,
+      "months": 60,
+      "meanNet": -0.0389,
+      "tMonthNet": -0.87,
+      "win": 0.4915,
+      "placebo": {
+       "n": 702,
+       "meanR": 0.0106,
+       "meanNet": -0.0094
+      },
+      "vsPlacebo": {
+       "diff": -0.0296,
+       "t": -0.55,
+       "df": 1401.9898194566583
+      }
+     },
+     "all": {
+      "n": 1849,
+      "meanR": -0.0383,
+      "tMonth": -1.48,
+      "months": 120,
+      "meanNet": -0.0583,
+      "tMonthNet": -2.24,
+      "win": 0.4813,
+      "placebo": {
+       "n": 1849,
+       "meanR": 0.0335,
+       "meanNet": 0.0135
+      },
+      "vsPlacebo": {
+       "diff": -0.0718,
+       "t": -2.18,
+       "df": 3695.9680934004305
+      }
+     }
+    }
+   }
+  },
+  "eg-simple@desk": {
+   "discovery": {
+    "n": 5122,
+    "meanR": -0.0355,
+    "tMonth": -2.84,
+    "months": 60,
+    "meanNet": -0.0808,
+    "tMonthNet": -6.32,
+    "win": 0.483,
+    "placebo": {
+     "n": 5122,
+     "meanR": 0.0154,
+     "meanNet": -0.0299
+    },
+    "vsPlacebo": {
+     "diff": -0.0508,
+     "t": -2.57,
+     "df": 10241.999999349382
+    }
+   },
+   "confirmation": {
+    "n": 4203,
+    "meanR": -0.0358,
+    "tMonth": -2.45,
+    "months": 60,
+    "meanNet": -0.0807,
+    "tMonthNet": -5.51,
+    "win": 0.4837,
+    "placebo": {
+     "n": 4203,
+     "meanR": 0.0159,
+     "meanNet": -0.029
+    },
+    "vsPlacebo": {
+     "diff": -0.0518,
+     "t": -2.36,
+     "df": 8403.99994907209
+    }
+   },
+   "all": {
+    "n": 9325,
+    "meanR": -0.0356,
+    "tMonth": -3.77,
+    "months": 120,
+    "meanNet": -0.0808,
+    "tMonthNet": -8.39,
+    "win": 0.4833,
+    "placebo": {
+     "n": 9325,
+     "meanR": 0.0156,
+     "meanNet": -0.0295
+    },
+    "vsPlacebo": {
+     "diff": -0.0513,
+     "t": -3.49,
+     "df": 18647.99997066547
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 1478,
+      "meanR": -0.019,
+      "tMonth": -0.85,
+      "months": 60,
+      "meanNet": -0.119,
+      "tMonthNet": -5.04,
+      "win": 0.4912,
+      "placebo": {
+       "n": 1478,
+       "meanR": -0.0243,
+       "meanNet": -0.1243
+      },
+      "vsPlacebo": {
+       "diff": 0.0053,
+       "t": 0.14,
+       "df": 2953.9993161986163
+      }
+     },
+     "confirmation": {
+      "n": 1164,
+      "meanR": -0.0208,
+      "tMonth": -0.82,
+      "months": 60,
+      "meanNet": -0.1208,
+      "tMonthNet": -4.68,
+      "win": 0.4897,
+      "placebo": {
+       "n": 1164,
+       "meanR": -0.011,
+       "meanNet": -0.111
+      },
+      "vsPlacebo": {
+       "diff": -0.0098,
+       "t": -0.23,
+       "df": 2325.647280593951
+      }
+     },
+     "all": {
+      "n": 2642,
+      "meanR": -0.0198,
+      "tMonth": -1.18,
+      "months": 120,
+      "meanNet": -0.1198,
+      "tMonthNet": -6.88,
+      "win": 0.4905,
+      "placebo": {
+       "n": 2642,
+       "meanR": -0.0185,
+       "meanNet": -0.1185
+      },
+      "vsPlacebo": {
+       "diff": -0.0013,
+       "t": -0.05,
+       "df": 5281.856817281926
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 948,
+      "meanR": -0.0859,
+      "tMonth": -2.53,
+      "months": 60,
+      "meanNet": -0.1059,
+      "tMonthNet": -3.08,
+      "win": 0.4578,
+      "placebo": {
+       "n": 948,
+       "meanR": 0.0725,
+       "meanNet": 0.0525
+      },
+      "vsPlacebo": {
+       "diff": -0.1584,
+       "t": -3.45,
+       "df": 1893.9996780418835
+      }
+     },
+     "confirmation": {
+      "n": 701,
+      "meanR": -0.0571,
+      "tMonth": -1.38,
+      "months": 60,
+      "meanNet": -0.0771,
+      "tMonthNet": -1.85,
+      "win": 0.4765,
+      "placebo": {
+       "n": 701,
+       "meanR": 0.0379,
+       "meanNet": 0.0179
+      },
+      "vsPlacebo": {
+       "diff": -0.095,
+       "t": -1.75,
+       "df": 1399.0563526032122
+      }
+     },
+     "all": {
+      "n": 1649,
+      "meanR": -0.0737,
+      "tMonth": -2.81,
+      "months": 120,
+      "meanNet": -0.0937,
+      "tMonthNet": -3.53,
+      "win": 0.4657,
+      "placebo": {
+       "n": 1649,
+       "meanR": 0.0578,
+       "meanNet": 0.0378
+      },
+      "vsPlacebo": {
+       "diff": -0.1315,
+       "t": -3.75,
+       "df": 3295.6056223936616
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 1019,
+      "meanR": 0.0361,
+      "tMonth": 1.37,
+      "months": 60,
+      "meanNet": 0.0094,
+      "tMonthNet": 0.36,
+      "win": 0.5182,
+      "placebo": {
+       "n": 1019,
+       "meanR": -0.0443,
+       "meanNet": -0.071
+      },
+      "vsPlacebo": {
+       "diff": 0.0804,
+       "t": 1.81,
+       "df": 2035.9912700885855
+      }
+     },
+     "confirmation": {
+      "n": 960,
+      "meanR": -0.0166,
+      "tMonth": -0.44,
+      "months": 60,
+      "meanNet": -0.0432,
+      "tMonthNet": -1.15,
+      "win": 0.4948,
+      "placebo": {
+       "n": 960,
+       "meanR": 0.0007,
+       "meanNet": -0.0259
+      },
+      "vsPlacebo": {
+       "diff": -0.0173,
+       "t": -0.38,
+       "df": 1917.8184951935968
+      }
+     },
+     "all": {
+      "n": 1979,
+      "meanR": 0.0105,
+      "tMonth": 0.46,
+      "months": 120,
+      "meanNet": -0.0161,
+      "tMonthNet": -0.71,
+      "win": 0.5068,
+      "placebo": {
+       "n": 1979,
+       "meanR": -0.0225,
+       "meanNet": -0.0491
+      },
+      "vsPlacebo": {
+       "diff": 0.033,
+       "t": 1.03,
+       "df": 3955.943520661719
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 689,
+      "meanR": -0.0578,
+      "tMonth": -1.34,
+      "months": 60,
+      "meanNet": -0.0844,
+      "tMonthNet": -1.93,
+      "win": 0.4717,
+      "placebo": {
+       "n": 689,
+       "meanR": 0.0535,
+       "meanNet": 0.0268
+      },
+      "vsPlacebo": {
+       "diff": -0.1112,
+       "t": -2.06,
+       "df": 1375.9985561753144
+      }
+     },
+     "confirmation": {
+      "n": 766,
+      "meanR": -0.0658,
+      "tMonth": -1.81,
+      "months": 60,
+      "meanNet": -0.0925,
+      "tMonthNet": -2.5,
+      "win": 0.4674,
+      "placebo": {
+       "n": 766,
+       "meanR": 0.0497,
+       "meanNet": 0.023
+      },
+      "vsPlacebo": {
+       "diff": -0.1155,
+       "t": -2.25,
+       "df": 1529.6656368377198
+      }
+     },
+     "all": {
+      "n": 1455,
+      "meanR": -0.062,
+      "tMonth": -2.23,
+      "months": 120,
+      "meanNet": -0.0887,
+      "tMonthNet": -3.13,
+      "win": 0.4694,
+      "placebo": {
+       "n": 1455,
+       "meanR": 0.0515,
+       "meanNet": 0.0248
+      },
+      "vsPlacebo": {
+       "diff": -0.1135,
+       "t": -3.05,
+       "df": 2907.8431856506318
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 988,
+      "meanR": -0.0698,
+      "tMonth": -2.26,
+      "months": 60,
+      "meanNet": -0.0898,
+      "tMonthNet": -2.88,
+      "win": 0.4666,
+      "placebo": {
+       "n": 988,
+       "meanR": 0.055,
+       "meanNet": 0.035
+      },
+      "vsPlacebo": {
+       "diff": -0.1248,
+       "t": -2.77,
+       "df": 1973.991370602447
+      }
+     },
+     "confirmation": {
+      "n": 612,
+      "meanR": -0.0329,
+      "tMonth": -0.95,
+      "months": 60,
+      "meanNet": -0.0529,
+      "tMonthNet": -1.53,
+      "win": 0.4837,
+      "placebo": {
+       "n": 612,
+       "meanR": 0.0235,
+       "meanNet": 0.0035
+      },
+      "vsPlacebo": {
+       "diff": -0.0564,
+       "t": -0.98,
+       "df": 1221.984645706234
+      }
+     },
+     "all": {
+      "n": 1600,
+      "meanR": -0.0557,
+      "tMonth": -2.39,
+      "months": 120,
+      "meanNet": -0.0757,
+      "tMonthNet": -3.22,
+      "win": 0.4731,
+      "placebo": {
+       "n": 1600,
+       "meanR": 0.0429,
+       "meanNet": 0.0229
+      },
+      "vsPlacebo": {
+       "diff": -0.0986,
+       "t": -2.78,
+       "df": 3197.9999988521713
+      }
+     }
+    }
+   }
+  },
+  "eg-plan-n@desk": {
+   "discovery": {
+    "n": 1894,
+    "meanR": -0.0447,
+    "tMonth": -2.04,
+    "months": 60,
+    "meanNet": -0.0885,
+    "tMonthNet": -4.1,
+    "win": 0.4778,
+    "placebo": {
+     "n": 1894,
+     "meanR": 0.0272,
+     "meanNet": -0.0166
+    },
+    "vsPlacebo": {
+     "diff": -0.0719,
+     "t": -2.21,
+     "df": 3785.9142054398735
+    }
+   },
+   "confirmation": {
+    "n": 1663,
+    "meanR": -0.0807,
+    "tMonth": -3.4,
+    "months": 60,
+    "meanNet": -0.1237,
+    "tMonthNet": -5.23,
+    "win": 0.4606,
+    "placebo": {
+     "n": 1663,
+     "meanR": 0.064,
+     "meanNet": 0.021
+    },
+    "vsPlacebo": {
+     "diff": -0.1447,
+     "t": -4.17,
+     "df": 3323.9983972090586
+    }
+   },
+   "all": {
+    "n": 3557,
+    "meanR": -0.0616,
+    "tMonth": -3.82,
+    "months": 120,
+    "meanNet": -0.105,
+    "tMonthNet": -6.6,
+    "win": 0.4698,
+    "placebo": {
+     "n": 3557,
+     "meanR": 0.0444,
+     "meanNet": 0.001
+    },
+    "vsPlacebo": {
+     "diff": -0.106,
+     "t": -4.46,
+     "df": 7111.941455771064
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 509,
+      "meanR": -0.0806,
+      "tMonth": -1.69,
+      "months": 60,
+      "meanNet": -0.1806,
+      "tMonthNet": -3.8,
+      "win": 0.4597,
+      "placebo": {
+       "n": 509,
+       "meanR": 0.0334,
+       "meanNet": -0.0666
+      },
+      "vsPlacebo": {
+       "diff": -0.114,
+       "t": -1.82,
+       "df": 1015.9926401474982
+      }
+     },
+     "confirmation": {
+      "n": 421,
+      "meanR": -0.0261,
+      "tMonth": -0.51,
+      "months": 60,
+      "meanNet": -0.1261,
+      "tMonthNet": -2.42,
+      "win": 0.4869,
+      "placebo": {
+       "n": 421,
+       "meanR": 0.0166,
+       "meanNet": -0.0834
+      },
+      "vsPlacebo": {
+       "diff": -0.0428,
+       "t": -0.62,
+       "df": 839.9999653125368
+      }
+     },
+     "all": {
+      "n": 930,
+      "meanR": -0.0559,
+      "tMonth": -1.6,
+      "months": 120,
+      "meanNet": -0.1559,
+      "tMonthNet": -4.43,
+      "win": 0.472,
+      "placebo": {
+       "n": 930,
+       "meanR": 0.0258,
+       "meanNet": -0.0742
+      },
+      "vsPlacebo": {
+       "diff": -0.0817,
+       "t": -1.76,
+       "df": 1857.9971938939532
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 353,
+      "meanR": -0.0085,
+      "tMonth": -0.16,
+      "months": 60,
+      "meanNet": -0.0285,
+      "tMonthNet": -0.53,
+      "win": 0.4958,
+      "placebo": {
+       "n": 353,
+       "meanR": 0.008,
+       "meanNet": -0.012
+      },
+      "vsPlacebo": {
+       "diff": -0.0165,
+       "t": -0.22,
+       "df": 703.9997520243264
+      }
+     },
+     "confirmation": {
+      "n": 311,
+      "meanR": -0.1165,
+      "tMonth": -1.87,
+      "months": 60,
+      "meanNet": -0.1365,
+      "tMonthNet": -2.2,
+      "win": 0.4437,
+      "placebo": {
+       "n": 311,
+       "meanR": 0.1026,
+       "meanNet": 0.0826
+      },
+      "vsPlacebo": {
+       "diff": -0.2191,
+       "t": -2.73,
+       "df": 619.9994258654349
+      }
+     },
+     "all": {
+      "n": 664,
+      "meanR": -0.0591,
+      "tMonth": -1.45,
+      "months": 120,
+      "meanNet": -0.0791,
+      "tMonthNet": -1.94,
+      "win": 0.4714,
+      "placebo": {
+       "n": 664,
+       "meanR": 0.0523,
+       "meanNet": 0.0323
+      },
+      "vsPlacebo": {
+       "diff": -0.1114,
+       "t": -2.02,
+       "df": 1325.9997580684685
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 401,
+      "meanR": -0.0428,
+      "tMonth": -1.13,
+      "months": 60,
+      "meanNet": -0.0695,
+      "tMonthNet": -1.83,
+      "win": 0.4788,
+      "placebo": {
+       "n": 401,
+       "meanR": 0.0276,
+       "meanNet": 0.0009
+      },
+      "vsPlacebo": {
+       "diff": -0.0704,
+       "t": -0.99,
+       "df": 799.9274929892938
+      }
+     },
+     "confirmation": {
+      "n": 358,
+      "meanR": -0.0726,
+      "tMonth": -1.31,
+      "months": 60,
+      "meanNet": -0.0993,
+      "tMonthNet": -1.8,
+      "win": 0.4637,
+      "placebo": {
+       "n": 358,
+       "meanR": 0.0488,
+       "meanNet": 0.0221
+      },
+      "vsPlacebo": {
+       "diff": -0.1214,
+       "t": -1.62,
+       "df": 713.9919333917619
+      }
+     },
+     "all": {
+      "n": 759,
+      "meanR": -0.0569,
+      "tMonth": -1.74,
+      "months": 120,
+      "meanNet": -0.0835,
+      "tMonthNet": -2.56,
+      "win": 0.4717,
+      "placebo": {
+       "n": 759,
+       "meanR": 0.0376,
+       "meanNet": 0.0109
+      },
+      "vsPlacebo": {
+       "diff": -0.0944,
+       "t": -1.84,
+       "df": 1515.9344541826301
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 264,
+      "meanR": -0.0461,
+      "tMonth": -0.88,
+      "months": 60,
+      "meanNet": -0.0728,
+      "tMonthNet": -1.38,
+      "win": 0.4773,
+      "placebo": {
+       "n": 264,
+       "meanR": 0.0369,
+       "meanNet": 0.0102
+      },
+      "vsPlacebo": {
+       "diff": -0.083,
+       "t": -0.94,
+       "df": 525.853185835941
+      }
+     },
+     "confirmation": {
+      "n": 318,
+      "meanR": -0.113,
+      "tMonth": -2.23,
+      "months": 60,
+      "meanNet": -0.1396,
+      "tMonthNet": -2.77,
+      "win": 0.4465,
+      "placebo": {
+       "n": 318,
+       "meanR": 0.0943,
+       "meanNet": 0.0677
+      },
+      "vsPlacebo": {
+       "diff": -0.2073,
+       "t": -2.61,
+       "df": 633.9750180452277
+      }
+     },
+     "all": {
+      "n": 582,
+      "meanR": -0.0826,
+      "tMonth": -2.26,
+      "months": 120,
+      "meanNet": -0.1093,
+      "tMonthNet": -2.99,
+      "win": 0.4605,
+      "placebo": {
+       "n": 582,
+       "meanR": 0.0683,
+       "meanNet": 0.0416
+      },
+      "vsPlacebo": {
+       "diff": -0.1509,
+       "t": -2.56,
+       "df": 1161.9803786981429
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 367,
+      "meanR": -0.0308,
+      "tMonth": -0.61,
+      "months": 60,
+      "meanNet": -0.0508,
+      "tMonthNet": -1,
+      "win": 0.485,
+      "placebo": {
+       "n": 367,
+       "meanR": 0.03,
+       "meanNet": 0.01
+      },
+      "vsPlacebo": {
+       "diff": -0.0608,
+       "t": -0.82,
+       "df": 731.999323279894
+      }
+     },
+     "confirmation": {
+      "n": 255,
+      "meanR": -0.0984,
+      "tMonth": -1.8,
+      "months": 60,
+      "meanNet": -0.1184,
+      "tMonthNet": -2.16,
+      "win": 0.451,
+      "placebo": {
+       "n": 255,
+       "meanR": 0.0787,
+       "meanNet": 0.0587
+      },
+      "vsPlacebo": {
+       "diff": -0.1772,
+       "t": -2,
+       "df": 507.9777502492729
+      }
+     },
+     "all": {
+      "n": 622,
+      "meanR": -0.0585,
+      "tMonth": -1.57,
+      "months": 120,
+      "meanNet": -0.0785,
+      "tMonthNet": -2.1,
+      "win": 0.4711,
+      "placebo": {
+       "n": 622,
+       "meanR": 0.05,
+       "meanNet": 0.03
+      },
+      "vsPlacebo": {
+       "diff": -0.1085,
+       "t": -1.91,
+       "df": 1241.9956347049263
+      }
+     }
+    }
+   }
+  },
+  "eg-simple-n@desk": {
+   "discovery": {
+    "n": 1738,
+    "meanR": -0.0359,
+    "tMonth": -0.8,
+    "months": 60,
+    "meanNet": -0.0796,
+    "tMonthNet": -1.77,
+    "win": 0.1933,
+    "placebo": {
+     "n": 1738,
+     "meanR": -0.0018,
+     "meanNet": -0.0455
+    },
+    "vsPlacebo": {
+     "diff": -0.0341,
+     "t": -0.51,
+     "df": 3473.4108346532626
+    }
+   },
+   "confirmation": {
+    "n": 1464,
+    "meanR": 0.0024,
+    "tMonth": 0.04,
+    "months": 60,
+    "meanNet": -0.0401,
+    "tMonthNet": -0.68,
+    "win": 0.2008,
+    "placebo": {
+     "n": 1463,
+     "meanR": 0.093,
+     "meanNet": 0.0505
+    },
+    "vsPlacebo": {
+     "diff": -0.09,
+     "t": -1.19,
+     "df": 2920.094952899575
+    }
+   },
+   "all": {
+    "n": 3202,
+    "meanR": -0.0184,
+    "tMonth": -0.51,
+    "months": 120,
+    "meanNet": -0.0615,
+    "tMonthNet": -1.7,
+    "win": 0.1968,
+    "placebo": {
+     "n": 3201,
+     "meanR": 0.0416,
+     "meanNet": -0.0016
+    },
+    "vsPlacebo": {
+     "diff": -0.0596,
+     "t": -1.18,
+     "df": 6396.220135874111
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 466,
+      "meanR": -0.0574,
+      "tMonth": -0.66,
+      "months": 60,
+      "meanNet": -0.1574,
+      "tMonthNet": -1.81,
+      "win": 0.1888,
+      "placebo": {
+       "n": 466,
+       "meanR": 0.0721,
+       "meanNet": -0.0279
+      },
+      "vsPlacebo": {
+       "diff": -0.1296,
+       "t": -0.98,
+       "df": 927.9077484785855
+      }
+     },
+     "confirmation": {
+      "n": 362,
+      "meanR": -0.0764,
+      "tMonth": -0.66,
+      "months": 60,
+      "meanNet": -0.1764,
+      "tMonthNet": -1.5,
+      "win": 0.1851,
+      "placebo": {
+       "n": 362,
+       "meanR": 0.2948,
+       "meanNet": 0.1948
+      },
+      "vsPlacebo": {
+       "diff": -0.3712,
+       "t": -2.41,
+       "df": 711.4929527402732
+      }
+     },
+     "all": {
+      "n": 828,
+      "meanR": -0.0657,
+      "tMonth": -0.93,
+      "months": 120,
+      "meanNet": -0.1657,
+      "tMonthNet": -2.34,
+      "win": 0.1872,
+      "placebo": {
+       "n": 828,
+       "meanR": 0.1695,
+       "meanNet": 0.0695
+      },
+      "vsPlacebo": {
+       "diff": -0.2352,
+       "t": -2.35,
+       "df": 1642.847523616232
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 336,
+      "meanR": -0.0328,
+      "tMonth": -0.3,
+      "months": 60,
+      "meanNet": -0.0528,
+      "tMonthNet": -0.49,
+      "win": 0.1935,
+      "placebo": {
+       "n": 336,
+       "meanR": -0.0056,
+       "meanNet": -0.0256
+      },
+      "vsPlacebo": {
+       "diff": -0.0272,
+       "t": -0.18,
+       "df": 669.8975285430547
+      }
+     },
+     "confirmation": {
+      "n": 264,
+      "meanR": 0.2294,
+      "tMonth": 1.72,
+      "months": 60,
+      "meanNet": 0.2094,
+      "tMonthNet": 1.57,
+      "win": 0.2462,
+      "placebo": {
+       "n": 264,
+       "meanR": 0.0985,
+       "meanNet": 0.0785
+      },
+      "vsPlacebo": {
+       "diff": 0.131,
+       "t": 0.71,
+       "df": 525.1528432055592
+      }
+     },
+     "all": {
+      "n": 600,
+      "meanR": 0.0826,
+      "tMonth": 0.98,
+      "months": 120,
+      "meanNet": 0.0626,
+      "tMonthNet": 0.74,
+      "win": 0.2167,
+      "placebo": {
+       "n": 600,
+       "meanR": 0.0402,
+       "meanNet": 0.0202
+      },
+      "vsPlacebo": {
+       "diff": 0.0424,
+       "t": 0.36,
+       "df": 1197.7645677944226
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 355,
+      "meanR": 0.0559,
+      "tMonth": 0.57,
+      "months": 60,
+      "meanNet": 0.0292,
+      "tMonthNet": 0.3,
+      "win": 0.2113,
+      "placebo": {
+       "n": 355,
+       "meanR": -0.283,
+       "meanNet": -0.3097
+      },
+      "vsPlacebo": {
+       "diff": 0.3389,
+       "t": 2.37,
+       "df": 692.3620163851547
+      }
+     },
+     "confirmation": {
+      "n": 333,
+      "meanR": 0.036,
+      "tMonth": 0.35,
+      "months": 60,
+      "meanNet": 0.0093,
+      "tMonthNet": 0.09,
+      "win": 0.2072,
+      "placebo": {
+       "n": 333,
+       "meanR": 0.1053,
+       "meanNet": 0.0786
+      },
+      "vsPlacebo": {
+       "diff": -0.0693,
+       "t": -0.43,
+       "df": 663.4899753925685
+      }
+     },
+     "all": {
+      "n": 688,
+      "meanR": 0.0463,
+      "tMonth": 0.65,
+      "months": 120,
+      "meanNet": 0.0196,
+      "tMonthNet": 0.28,
+      "win": 0.2093,
+      "placebo": {
+       "n": 688,
+       "meanR": -0.0951,
+       "meanNet": -0.1217
+      },
+      "vsPlacebo": {
+       "diff": 0.1413,
+       "t": 1.32,
+       "df": 1370.2599567480506
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 236,
+      "meanR": -0.0385,
+      "tMonth": -0.28,
+      "months": 60,
+      "meanNet": -0.0651,
+      "tMonthNet": -0.47,
+      "win": 0.1949,
+      "placebo": {
+       "n": 236,
+       "meanR": 0.1006,
+       "meanNet": 0.0739
+      },
+      "vsPlacebo": {
+       "diff": -0.1391,
+       "t": -0.74,
+       "df": 469.34801699250824
+      }
+     },
+     "confirmation": {
+      "n": 260,
+      "meanR": -0.0823,
+      "tMonth": -0.83,
+      "months": 60,
+      "meanNet": -0.109,
+      "tMonthNet": -1.1,
+      "win": 0.1846,
+      "placebo": {
+       "n": 259,
+       "meanR": -0.0039,
+       "meanNet": -0.0305
+      },
+      "vsPlacebo": {
+       "diff": -0.0749,
+       "t": -0.43,
+       "df": 514.6404380969425
+      }
+     },
+     "all": {
+      "n": 496,
+      "meanR": -0.0614,
+      "tMonth": -0.73,
+      "months": 120,
+      "meanNet": -0.0881,
+      "tMonthNet": -1.05,
+      "win": 0.1895,
+      "placebo": {
+       "n": 495,
+       "meanR": 0.0459,
+       "meanNet": 0.0193
+      },
+      "vsPlacebo": {
+       "diff": -0.1055,
+       "t": -0.82,
+       "df": 986.0206842648018
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 345,
+      "meanR": -0.1024,
+      "tMonth": -0.89,
+      "months": 60,
+      "meanNet": -0.1224,
+      "tMonthNet": -1.06,
+      "win": 0.1797,
+      "placebo": {
+       "n": 345,
+       "meanR": 0.1215,
+       "meanNet": 0.1015
+      },
+      "vsPlacebo": {
+       "diff": -0.2239,
+       "t": -1.46,
+       "df": 682.5983270636023
+      }
+     },
+     "confirmation": {
+      "n": 245,
+      "meanR": -0.0817,
+      "tMonth": -0.66,
+      "months": 60,
+      "meanNet": -0.1017,
+      "tMonthNet": -0.82,
+      "win": 0.1837,
+      "placebo": {
+       "n": 245,
+       "meanR": -0.1252,
+       "meanNet": -0.1452
+      },
+      "vsPlacebo": {
+       "diff": 0.0435,
+       "t": 0.25,
+       "df": 487.8597372578686
+      }
+     },
+     "all": {
+      "n": 590,
+      "meanR": -0.0938,
+      "tMonth": -1.11,
+      "months": 120,
+      "meanNet": -0.1138,
+      "tMonthNet": -1.34,
+      "win": 0.1814,
+      "placebo": {
+       "n": 590,
+       "meanR": 0.019,
+       "meanNet": -0.001
+      },
+      "vsPlacebo": {
+       "diff": -0.1129,
+       "t": -0.98,
+       "df": 1175.1613379758128
+      }
+     }
+    }
+   }
+  },
+  "eg-plan@2R": {
+   "discovery": {
+    "n": 4320,
+    "meanR": -0.0254,
+    "tMonth": -1.12,
+    "months": 60,
+    "meanNet": -0.0701,
+    "tMonthNet": -3.1,
+    "win": 0.3252,
+    "placebo": {
+     "n": 4320,
+     "meanR": 0.0032,
+     "meanNet": -0.0415
+    },
+    "vsPlacebo": {
+     "diff": -0.0286,
+     "t": -0.94,
+     "df": 8637.007102376407
+    }
+   },
+   "confirmation": {
+    "n": 3309,
+    "meanR": -0.0413,
+    "tMonth": -1.64,
+    "months": 60,
+    "meanNet": -0.0873,
+    "tMonthNet": -3.47,
+    "win": 0.3212,
+    "placebo": {
+     "n": 3308,
+     "meanR": 0.0085,
+     "meanNet": -0.0374
+    },
+    "vsPlacebo": {
+     "diff": -0.0495,
+     "t": -1.42,
+     "df": 6612.728430595039
+    }
+   },
+   "all": {
+    "n": 7629,
+    "meanR": -0.0323,
+    "tMonth": -1.93,
+    "months": 120,
+    "meanNet": -0.0775,
+    "tMonthNet": -4.63,
+    "win": 0.3235,
+    "placebo": {
+     "n": 7628,
+     "meanR": 0.0055,
+     "meanNet": -0.0397
+    },
+    "vsPlacebo": {
+     "diff": -0.0377,
+     "t": -1.64,
+     "df": 15251.776024813778
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 1215,
+      "meanR": -0.0001,
+      "tMonth": 0,
+      "months": 60,
+      "meanNet": -0.1001,
+      "tMonthNet": -2.58,
+      "win": 0.3333,
+      "placebo": {
+       "n": 1215,
+       "meanR": -0.0012,
+       "meanNet": -0.1012
+      },
+      "vsPlacebo": {
+       "diff": 0.0011,
+       "t": 0.02,
+       "df": 2427.9988036636114
+      }
+     },
+     "confirmation": {
+      "n": 964,
+      "meanR": 0.0063,
+      "tMonth": 0.14,
+      "months": 60,
+      "meanNet": -0.0937,
+      "tMonthNet": -2.07,
+      "win": 0.3361,
+      "placebo": {
+       "n": 964,
+       "meanR": -0.0249,
+       "meanNet": -0.1249
+      },
+      "vsPlacebo": {
+       "diff": 0.0312,
+       "t": 0.48,
+       "df": 1925.878084940627
+      }
+     },
+     "all": {
+      "n": 2179,
+      "meanR": 0.0027,
+      "tMonth": 0.09,
+      "months": 120,
+      "meanNet": -0.0973,
+      "tMonthNet": -3.31,
+      "win": 0.3346,
+      "placebo": {
+       "n": 2179,
+       "meanR": -0.0117,
+       "meanNet": -0.1117
+      },
+      "vsPlacebo": {
+       "diff": 0.0144,
+       "t": 0.34,
+       "df": 4355.95833515031
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 841,
+      "meanR": -0.0231,
+      "tMonth": -0.42,
+      "months": 60,
+      "meanNet": -0.0431,
+      "tMonthNet": -0.78,
+      "win": 0.3258,
+      "placebo": {
+       "n": 841,
+       "meanR": -0.013,
+       "meanNet": -0.033
+      },
+      "vsPlacebo": {
+       "diff": -0.01,
+       "t": -0.15,
+       "df": 1679.9823620245509
+      }
+     },
+     "confirmation": {
+      "n": 588,
+      "meanR": -0.0584,
+      "tMonth": -1.02,
+      "months": 60,
+      "meanNet": -0.0784,
+      "tMonthNet": -1.36,
+      "win": 0.3146,
+      "placebo": {
+       "n": 588,
+       "meanR": 0.059,
+       "meanNet": 0.039
+      },
+      "vsPlacebo": {
+       "diff": -0.1174,
+       "t": -1.42,
+       "df": 1173.0004300456235
+      }
+     },
+     "all": {
+      "n": 1429,
+      "meanR": -0.0376,
+      "tMonth": -0.95,
+      "months": 120,
+      "meanNet": -0.0576,
+      "tMonthNet": -1.44,
+      "win": 0.3212,
+      "placebo": {
+       "n": 1429,
+       "meanR": 0.0166,
+       "meanNet": -0.0034
+      },
+      "vsPlacebo": {
+       "diff": -0.0542,
+       "t": -1.03,
+       "df": 2855.422640630182
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 894,
+      "meanR": -0.0578,
+      "tMonth": -1.43,
+      "months": 60,
+      "meanNet": -0.0845,
+      "tMonthNet": -2.08,
+      "win": 0.3143,
+      "placebo": {
+       "n": 894,
+       "meanR": -0.0665,
+       "meanNet": -0.0932
+      },
+      "vsPlacebo": {
+       "diff": 0.0087,
+       "t": 0.13,
+       "df": 1785.9364236624097
+      }
+     },
+     "confirmation": {
+      "n": 711,
+      "meanR": 0.0095,
+      "tMonth": 0.19,
+      "months": 60,
+      "meanNet": -0.0172,
+      "tMonthNet": -0.35,
+      "win": 0.3376,
+      "placebo": {
+       "n": 711,
+       "meanR": -0.0829,
+       "meanNet": -0.1096
+      },
+      "vsPlacebo": {
+       "diff": 0.0924,
+       "t": 1.23,
+       "df": 1419.890542940407
+      }
+     },
+     "all": {
+      "n": 1605,
+      "meanR": -0.028,
+      "tMonth": -0.89,
+      "months": 120,
+      "meanNet": -0.0547,
+      "tMonthNet": -1.73,
+      "win": 0.3246,
+      "placebo": {
+       "n": 1605,
+       "meanR": -0.0738,
+       "meanNet": -0.1005
+      },
+      "vsPlacebo": {
+       "diff": 0.0458,
+       "t": 0.92,
+       "df": 3207.9972503954114
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 524,
+      "meanR": 0.0193,
+      "tMonth": 0.3,
+      "months": 60,
+      "meanNet": -0.0073,
+      "tMonthNet": -0.11,
+      "win": 0.3416,
+      "placebo": {
+       "n": 524,
+       "meanR": 0.0192,
+       "meanNet": -0.0075
+      },
+      "vsPlacebo": {
+       "diff": 0.0001,
+       "t": 0,
+       "df": 1045.953026136643
+      }
+     },
+     "confirmation": {
+      "n": 606,
+      "meanR": -0.1322,
+      "tMonth": -2.32,
+      "months": 60,
+      "meanNet": -0.1589,
+      "tMonthNet": -2.77,
+      "win": 0.2954,
+      "placebo": {
+       "n": 605,
+       "meanR": 0.0868,
+       "meanNet": 0.0602
+      },
+      "vsPlacebo": {
+       "diff": -0.2176,
+       "t": -2.66,
+       "df": 1206.321697950816
+      }
+     },
+     "all": {
+      "n": 1130,
+      "meanR": -0.0619,
+      "tMonth": -1.43,
+      "months": 120,
+      "meanNet": -0.0886,
+      "tMonthNet": -2.03,
+      "win": 0.3168,
+      "placebo": {
+       "n": 1129,
+       "meanR": 0.0554,
+       "meanNet": 0.0288
+      },
+      "vsPlacebo": {
+       "diff": -0.1166,
+       "t": -1.94,
+       "df": 2254.9278402923114
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 846,
+      "meanR": -0.0573,
+      "tMonth": -1.11,
+      "months": 60,
+      "meanNet": -0.0773,
+      "tMonthNet": -1.49,
+      "win": 0.3144,
+      "placebo": {
+       "n": 846,
+       "meanR": 0.0895,
+       "meanNet": 0.0695
+      },
+      "vsPlacebo": {
+       "diff": -0.1468,
+       "t": -2.12,
+       "df": 1687.6124664888969
+      }
+     },
+     "confirmation": {
+      "n": 440,
+      "meanR": -0.0796,
+      "tMonth": -1.25,
+      "months": 60,
+      "meanNet": -0.0996,
+      "tMonthNet": -1.56,
+      "win": 0.3068,
+      "placebo": {
+       "n": 440,
+       "meanR": 0.0547,
+       "meanNet": 0.0347
+      },
+      "vsPlacebo": {
+       "diff": -0.1342,
+       "t": -1.41,
+       "df": 876.3480916131964
+      }
+     },
+     "all": {
+      "n": 1286,
+      "meanR": -0.0649,
+      "tMonth": -1.62,
+      "months": 120,
+      "meanNet": -0.0849,
+      "tMonthNet": -2.11,
+      "win": 0.3118,
+      "placebo": {
+       "n": 1286,
+       "meanR": 0.0776,
+       "meanNet": 0.0576
+      },
+      "vsPlacebo": {
+       "diff": -0.1425,
+       "t": -2.55,
+       "df": 2565.9711663754288
+      }
+     }
+    }
+   }
+  },
+  "eg-simple@2R": {
+   "discovery": {
+    "n": 3714,
+    "meanR": -0.0432,
+    "tMonth": -2.03,
+    "months": 60,
+    "meanNet": -0.0897,
+    "tMonthNet": -4.15,
+    "win": 0.3193,
+    "placebo": {
+     "n": 3714,
+     "meanR": -0.0041,
+     "meanNet": -0.0506
+    },
+    "vsPlacebo": {
+     "diff": -0.0391,
+     "t": -1.2,
+     "df": 7425.1384906702415
+    }
+   },
+   "confirmation": {
+    "n": 2981,
+    "meanR": -0.0318,
+    "tMonth": -1.27,
+    "months": 60,
+    "meanNet": -0.0774,
+    "tMonthNet": -3.09,
+    "win": 0.3244,
+    "placebo": {
+     "n": 2981,
+     "meanR": 0.0327,
+     "meanNet": -0.0129
+    },
+    "vsPlacebo": {
+     "diff": -0.0645,
+     "t": -1.75,
+     "df": 5958.614454690357
+    }
+   },
+   "all": {
+    "n": 6695,
+    "meanR": -0.0382,
+    "tMonth": -2.35,
+    "months": 120,
+    "meanNet": -0.0843,
+    "tMonthNet": -5.14,
+    "win": 0.3216,
+    "placebo": {
+     "n": 6695,
+     "meanR": 0.0123,
+     "meanNet": -0.0338
+    },
+    "vsPlacebo": {
+     "diff": -0.0504,
+     "t": -2.06,
+     "df": 13385.784841795466
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 1130,
+      "meanR": -0.0374,
+      "tMonth": -0.91,
+      "months": 60,
+      "meanNet": -0.1374,
+      "tMonthNet": -3.29,
+      "win": 0.3212,
+      "placebo": {
+       "n": 1130,
+       "meanR": -0.0991,
+       "meanNet": -0.1991
+      },
+      "vsPlacebo": {
+       "diff": 0.0616,
+       "t": 1.05,
+       "df": 2257.3005424816743
+      }
+     },
+     "confirmation": {
+      "n": 855,
+      "meanR": 0.0454,
+      "tMonth": 1.08,
+      "months": 60,
+      "meanNet": -0.0546,
+      "tMonthNet": -1.32,
+      "win": 0.3485,
+      "placebo": {
+       "n": 855,
+       "meanR": -0.0645,
+       "meanNet": -0.1645
+      },
+      "vsPlacebo": {
+       "diff": 0.1099,
+       "t": 1.6,
+       "df": 1707.780082767982
+      }
+     },
+     "all": {
+      "n": 1985,
+      "meanR": -0.0018,
+      "tMonth": -0.06,
+      "months": 120,
+      "meanNet": -0.1018,
+      "tMonthNet": -3.38,
+      "win": 0.333,
+      "placebo": {
+       "n": 1985,
+       "meanR": -0.0842,
+       "meanNet": -0.1842
+      },
+      "vsPlacebo": {
+       "diff": 0.0824,
+       "t": 1.85,
+       "df": 3967.085406931806
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 696,
+      "meanR": -0.1386,
+      "tMonth": -2.97,
+      "months": 60,
+      "meanNet": -0.1586,
+      "tMonthNet": -3.36,
+      "win": 0.2874,
+      "placebo": {
+       "n": 696,
+       "meanR": 0.0843,
+       "meanNet": 0.0643
+      },
+      "vsPlacebo": {
+       "diff": -0.2229,
+       "t": -2.96,
+       "df": 1384.8466464990001
+      }
+     },
+     "confirmation": {
+      "n": 507,
+      "meanR": -0.0252,
+      "tMonth": -0.38,
+      "months": 60,
+      "meanNet": -0.0452,
+      "tMonthNet": -0.67,
+      "win": 0.3294,
+      "placebo": {
+       "n": 507,
+       "meanR": 0.1228,
+       "meanNet": 0.1028
+      },
+      "vsPlacebo": {
+       "diff": -0.1481,
+       "t": -1.63,
+       "df": 1011.8407578701873
+      }
+     },
+     "all": {
+      "n": 1203,
+      "meanR": -0.0908,
+      "tMonth": -2.3,
+      "months": 120,
+      "meanNet": -0.1108,
+      "tMonthNet": -2.79,
+      "win": 0.3051,
+      "placebo": {
+       "n": 1203,
+       "meanR": 0.1006,
+       "meanNet": 0.0806
+      },
+      "vsPlacebo": {
+       "diff": -0.1914,
+       "t": -3.3,
+       "df": 2400.322798978448
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 738,
+      "meanR": 0.0973,
+      "tMonth": 1.88,
+      "months": 60,
+      "meanNet": 0.0706,
+      "tMonthNet": 1.37,
+      "win": 0.3659,
+      "placebo": {
+       "n": 738,
+       "meanR": -0.043,
+       "meanNet": -0.0697
+      },
+      "vsPlacebo": {
+       "diff": 0.1403,
+       "t": 1.89,
+       "df": 1472.5970525063096
+      }
+     },
+     "confirmation": {
+      "n": 677,
+      "meanR": -0.0781,
+      "tMonth": -1.31,
+      "months": 60,
+      "meanNet": -0.1048,
+      "tMonthNet": -1.75,
+      "win": 0.3102,
+      "placebo": {
+       "n": 677,
+       "meanR": 0.066,
+       "meanNet": 0.0393
+      },
+      "vsPlacebo": {
+       "diff": -0.1442,
+       "t": -1.87,
+       "df": 1350.9764851465663
+      }
+     },
+     "all": {
+      "n": 1415,
+      "meanR": 0.0134,
+      "tMonth": 0.33,
+      "months": 120,
+      "meanNet": -0.0133,
+      "tMonthNet": -0.33,
+      "win": 0.3392,
+      "placebo": {
+       "n": 1415,
+       "meanR": 0.0092,
+       "meanNet": -0.0175
+      },
+      "vsPlacebo": {
+       "diff": 0.0042,
+       "t": 0.08,
+       "df": 2827.950594484529
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 449,
+      "meanR": -0.0594,
+      "tMonth": -0.65,
+      "months": 60,
+      "meanNet": -0.0861,
+      "tMonthNet": -0.93,
+      "win": 0.314,
+      "placebo": {
+       "n": 449,
+       "meanR": 0.029,
+       "meanNet": 0.0023
+      },
+      "vsPlacebo": {
+       "diff": -0.0884,
+       "t": -0.94,
+       "df": 895.5849056640767
+      }
+     },
+     "confirmation": {
+      "n": 522,
+      "meanR": -0.0956,
+      "tMonth": -1.73,
+      "months": 60,
+      "meanNet": -0.1222,
+      "tMonthNet": -2.18,
+      "win": 0.3027,
+      "placebo": {
+       "n": 522,
+       "meanR": 0.0731,
+       "meanNet": 0.0465
+      },
+      "vsPlacebo": {
+       "diff": -0.1687,
+       "t": -1.93,
+       "df": 1040.2522498229555
+      }
+     },
+     "all": {
+      "n": 971,
+      "meanR": -0.0789,
+      "tMonth": -1.53,
+      "months": 120,
+      "meanNet": -0.1055,
+      "tMonthNet": -2.02,
+      "win": 0.3079,
+      "placebo": {
+       "n": 971,
+       "meanR": 0.0527,
+       "meanNet": 0.026
+      },
+      "vsPlacebo": {
+       "diff": -0.1316,
+       "t": -2.05,
+       "df": 1938.0105996551547
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 701,
+      "meanR": -0.0956,
+      "tMonth": -2.29,
+      "months": 60,
+      "meanNet": -0.1156,
+      "tMonthNet": -2.73,
+      "win": 0.3024,
+      "placebo": {
+       "n": 701,
+       "meanR": 0.0809,
+       "meanNet": 0.0609
+      },
+      "vsPlacebo": {
+       "diff": -0.1765,
+       "t": -2.34,
+       "df": 1397.290460373944
+      }
+     },
+     "confirmation": {
+      "n": 420,
+      "meanR": -0.0431,
+      "tMonth": -0.68,
+      "months": 60,
+      "meanNet": -0.0631,
+      "tMonthNet": -1,
+      "win": 0.319,
+      "placebo": {
+       "n": 420,
+       "meanR": 0.0179,
+       "meanNet": -0.0021
+      },
+      "vsPlacebo": {
+       "diff": -0.061,
+       "t": -0.63,
+       "df": 837.7054359007956
+      }
+     },
+     "all": {
+      "n": 1121,
+      "meanR": -0.0759,
+      "tMonth": -2.15,
+      "months": 120,
+      "meanNet": -0.0959,
+      "tMonthNet": -2.7,
+      "win": 0.3087,
+      "placebo": {
+       "n": 1121,
+       "meanR": 0.0573,
+       "meanNet": 0.0373
+      },
+      "vsPlacebo": {
+       "diff": -0.1332,
+       "t": -2.23,
+       "df": 2237.3180053970586
+      }
+     }
+    }
+   }
+  },
+  "eg-plan-n@2R": {
+   "discovery": {
+    "n": 1914,
+    "meanR": -0.0709,
+    "tMonth": -2.22,
+    "months": 60,
+    "meanNet": -0.114,
+    "tMonthNet": -3.56,
+    "win": 0.3098,
+    "placebo": {
+     "n": 1914,
+     "meanR": 0.0056,
+     "meanNet": -0.0376
+    },
+    "vsPlacebo": {
+     "diff": -0.0765,
+     "t": -1.68,
+     "df": 3823.9418792506594
+    }
+   },
+   "confirmation": {
+    "n": 1772,
+    "meanR": -0.0863,
+    "tMonth": -2.75,
+    "months": 60,
+    "meanNet": -0.1277,
+    "tMonthNet": -4.08,
+    "win": 0.307,
+    "placebo": {
+     "n": 1772,
+     "meanR": 0.0717,
+     "meanNet": 0.0303
+    },
+    "vsPlacebo": {
+     "diff": -0.158,
+     "t": -3.32,
+     "df": 3538.543198180995
+    }
+   },
+   "all": {
+    "n": 3686,
+    "meanR": -0.0783,
+    "tMonth": -3.51,
+    "months": 120,
+    "meanNet": -0.1206,
+    "tMonthNet": -5.4,
+    "win": 0.3085,
+    "placebo": {
+     "n": 3686,
+     "meanR": 0.0374,
+     "meanNet": -0.005
+    },
+    "vsPlacebo": {
+     "diff": -0.1157,
+     "t": -3.52,
+     "df": 7364.485870125362
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 498,
+      "meanR": -0.1205,
+      "tMonth": -1.9,
+      "months": 60,
+      "meanNet": -0.2205,
+      "tMonthNet": -3.45,
+      "win": 0.2932,
+      "placebo": {
+       "n": 498,
+       "meanR": 0.018,
+       "meanNet": -0.082
+      },
+      "vsPlacebo": {
+       "diff": -0.1386,
+       "t": -1.57,
+       "df": 992.464386625799
+      }
+     },
+     "confirmation": {
+      "n": 414,
+      "meanR": 0.0054,
+      "tMonth": 0.07,
+      "months": 60,
+      "meanNet": -0.0946,
+      "tMonthNet": -1.2,
+      "win": 0.3357,
+      "placebo": {
+       "n": 414,
+       "meanR": 0.0362,
+       "meanNet": -0.0638
+      },
+      "vsPlacebo": {
+       "diff": -0.0308,
+       "t": -0.31,
+       "df": 825.9740919514111
+      }
+     },
+     "all": {
+      "n": 912,
+      "meanR": -0.0634,
+      "tMonth": -1.28,
+      "months": 120,
+      "meanNet": -0.1634,
+      "tMonthNet": -3.25,
+      "win": 0.3125,
+      "placebo": {
+       "n": 912,
+       "meanR": 0.0263,
+       "meanNet": -0.0737
+      },
+      "vsPlacebo": {
+       "diff": -0.0896,
+       "t": -1.36,
+       "df": 1821.063392958486
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 357,
+      "meanR": -0.0924,
+      "tMonth": -1.23,
+      "months": 60,
+      "meanNet": -0.1124,
+      "tMonthNet": -1.5,
+      "win": 0.3025,
+      "placebo": {
+       "n": 357,
+       "meanR": -0.0089,
+       "meanNet": -0.0289
+      },
+      "vsPlacebo": {
+       "diff": -0.0835,
+       "t": -0.8,
+       "df": 711.5878131020949
+      }
+     },
+     "confirmation": {
+      "n": 345,
+      "meanR": -0.1203,
+      "tMonth": -1.61,
+      "months": 60,
+      "meanNet": -0.1403,
+      "tMonthNet": -1.89,
+      "win": 0.2986,
+      "placebo": {
+       "n": 345,
+       "meanR": 0.0828,
+       "meanNet": 0.0628
+      },
+      "vsPlacebo": {
+       "diff": -0.2031,
+       "t": -1.87,
+       "df": 687.3752752588022
+      }
+     },
+     "all": {
+      "n": 702,
+      "meanR": -0.1061,
+      "tMonth": -2.02,
+      "months": 120,
+      "meanNet": -0.1261,
+      "tMonthNet": -2.4,
+      "win": 0.3006,
+      "placebo": {
+       "n": 702,
+       "meanR": 0.0361,
+       "meanNet": 0.0161
+      },
+      "vsPlacebo": {
+       "diff": -0.1423,
+       "t": -1.89,
+       "df": 1400.9340262949497
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 408,
+      "meanR": -0.0151,
+      "tMonth": -0.2,
+      "months": 60,
+      "meanNet": -0.0418,
+      "tMonthNet": -0.56,
+      "win": 0.3284,
+      "placebo": {
+       "n": 408,
+       "meanR": -0.0342,
+       "meanNet": -0.0608
+      },
+      "vsPlacebo": {
+       "diff": 0.0191,
+       "t": 0.19,
+       "df": 813.9997553520814
+      }
+     },
+     "confirmation": {
+      "n": 385,
+      "meanR": -0.1585,
+      "tMonth": -2.13,
+      "months": 60,
+      "meanNet": -0.1851,
+      "tMonthNet": -2.48,
+      "win": 0.2805,
+      "placebo": {
+       "n": 385,
+       "meanR": -0.0196,
+       "meanNet": -0.0463
+      },
+      "vsPlacebo": {
+       "diff": -0.1388,
+       "t": -1.4,
+       "df": 766.4927190462556
+      }
+     },
+     "all": {
+      "n": 793,
+      "meanR": -0.0847,
+      "tMonth": -1.61,
+      "months": 120,
+      "meanNet": -0.1114,
+      "tMonthNet": -2.11,
+      "win": 0.3052,
+      "placebo": {
+       "n": 793,
+       "meanR": -0.0271,
+       "meanNet": -0.0538
+      },
+      "vsPlacebo": {
+       "diff": -0.0576,
+       "t": -0.82,
+       "df": 1583.3670465713608
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 264,
+      "meanR": -0.0233,
+      "tMonth": -0.29,
+      "months": 60,
+      "meanNet": -0.05,
+      "tMonthNet": -0.62,
+      "win": 0.3258,
+      "placebo": {
+       "n": 264,
+       "meanR": 0.0942,
+       "meanNet": 0.0675
+      },
+      "vsPlacebo": {
+       "diff": -0.1175,
+       "t": -0.94,
+       "df": 525.3081456668336
+      }
+     },
+     "confirmation": {
+      "n": 344,
+      "meanR": -0.0683,
+      "tMonth": -1.08,
+      "months": 60,
+      "meanNet": -0.095,
+      "tMonthNet": -1.49,
+      "win": 0.3169,
+      "placebo": {
+       "n": 344,
+       "meanR": 0.1948,
+       "meanNet": 0.1681
+      },
+      "vsPlacebo": {
+       "diff": -0.263,
+       "t": -2.38,
+       "df": 685.3068569430424
+      }
+     },
+     "all": {
+      "n": 608,
+      "meanR": -0.0488,
+      "tMonth": -0.98,
+      "months": 120,
+      "meanNet": -0.0754,
+      "tMonthNet": -1.51,
+      "win": 0.3207,
+      "placebo": {
+       "n": 608,
+       "meanR": 0.1511,
+       "meanNet": 0.1244
+      },
+      "vsPlacebo": {
+       "diff": -0.1998,
+       "t": -2.42,
+       "df": 1212.5828215399895
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 387,
+      "meanR": -0.0783,
+      "tMonth": -1.13,
+      "months": 60,
+      "meanNet": -0.0983,
+      "tMonthNet": -1.42,
+      "win": 0.3075,
+      "placebo": {
+       "n": 387,
+       "meanR": -0.0155,
+       "meanNet": -0.0355
+      },
+      "vsPlacebo": {
+       "diff": -0.0628,
+       "t": -0.62,
+       "df": 771.7789982998919
+      }
+     },
+     "confirmation": {
+      "n": 284,
+      "meanR": -0.1025,
+      "tMonth": -1.09,
+      "months": 60,
+      "meanNet": -0.1225,
+      "tMonthNet": -1.3,
+      "win": 0.2993,
+      "placebo": {
+       "n": 284,
+       "meanR": 0.0848,
+       "meanNet": 0.0648
+      },
+      "vsPlacebo": {
+       "diff": -0.1873,
+       "t": -1.58,
+       "df": 564.5420662176999
+      }
+     },
+     "all": {
+      "n": 671,
+      "meanR": -0.0885,
+      "tMonth": -1.58,
+      "months": 120,
+      "meanNet": -0.1085,
+      "tMonthNet": -1.93,
+      "win": 0.304,
+      "placebo": {
+       "n": 671,
+       "meanR": 0.0269,
+       "meanNet": 0.0069
+      },
+      "vsPlacebo": {
+       "diff": -0.1155,
+       "t": -1.51,
+       "df": 1338.6296637071214
+      }
+     }
+    }
+   }
+  },
+  "eg-simple-n@2R": {
+   "discovery": {
+    "n": 1827,
+    "meanR": -0.0516,
+    "tMonth": -1.58,
+    "months": 60,
+    "meanNet": -0.0946,
+    "tMonthNet": -2.91,
+    "win": 0.3169,
+    "placebo": {
+     "n": 1827,
+     "meanR": -0.0043,
+     "meanNet": -0.0473
+    },
+    "vsPlacebo": {
+     "diff": -0.0473,
+     "t": -1.01,
+     "df": 3651.452805014175
+    }
+   },
+   "confirmation": {
+    "n": 1552,
+    "meanR": 0.0067,
+    "tMonth": 0.2,
+    "months": 60,
+    "meanNet": -0.0352,
+    "tMonthNet": -1.05,
+    "win": 0.3357,
+    "placebo": {
+     "n": 1552,
+     "meanR": 0.0165,
+     "meanNet": -0.0253
+    },
+    "vsPlacebo": {
+     "diff": -0.0099,
+     "t": -0.19,
+     "df": 3101.947054510261
+    }
+   },
+   "all": {
+    "n": 3379,
+    "meanR": -0.0249,
+    "tMonth": -1.06,
+    "months": 120,
+    "meanNet": -0.0673,
+    "tMonthNet": -2.87,
+    "win": 0.3255,
+    "placebo": {
+     "n": 3379,
+     "meanR": 0.0052,
+     "meanNet": -0.0372
+    },
+    "vsPlacebo": {
+     "diff": -0.0301,
+     "t": -0.88,
+     "df": 6755.53503736343
+    }
+   },
+   "byMarket": {
+    "xau": {
+     "discovery": {
+      "n": 472,
+      "meanR": -0.1436,
+      "tMonth": -2.29,
+      "months": 60,
+      "meanNet": -0.2436,
+      "tMonthNet": -3.85,
+      "win": 0.286,
+      "placebo": {
+       "n": 472,
+       "meanR": -0.0093,
+       "meanNet": -0.1093
+      },
+      "vsPlacebo": {
+       "diff": -0.1343,
+       "t": -1.49,
+       "df": 940.5248093088958
+      }
+     },
+     "confirmation": {
+      "n": 373,
+      "meanR": -0.0044,
+      "tMonth": -0.06,
+      "months": 60,
+      "meanNet": -0.1044,
+      "tMonthNet": -1.42,
+      "win": 0.3324,
+      "placebo": {
+       "n": 373,
+       "meanR": 0.0214,
+       "meanNet": -0.0786
+      },
+      "vsPlacebo": {
+       "diff": -0.0258,
+       "t": -0.25,
+       "df": 743.9829721021433
+      }
+     },
+     "all": {
+      "n": 845,
+      "meanR": -0.0821,
+      "tMonth": -1.72,
+      "months": 120,
+      "meanNet": -0.1821,
+      "tMonthNet": -3.75,
+      "win": 0.3065,
+      "placebo": {
+       "n": 845,
+       "meanR": 0.0043,
+       "meanNet": -0.0957
+      },
+      "vsPlacebo": {
+       "diff": -0.0864,
+       "t": -1.27,
+       "df": 1687.1357568459175
+      }
+     }
+    },
+    "eurusd": {
+     "discovery": {
+      "n": 357,
+      "meanR": -0.0757,
+      "tMonth": -1.03,
+      "months": 60,
+      "meanNet": -0.0957,
+      "tMonthNet": -1.29,
+      "win": 0.3081,
+      "placebo": {
+       "n": 357,
+       "meanR": 0.006,
+       "meanNet": -0.014
+      },
+      "vsPlacebo": {
+       "diff": -0.0816,
+       "t": -0.78,
+       "df": 711.5704478012784
+      }
+     },
+     "confirmation": {
+      "n": 296,
+      "meanR": 0.0439,
+      "tMonth": 0.5,
+      "months": 60,
+      "meanNet": 0.0239,
+      "tMonthNet": 0.27,
+      "win": 0.348,
+      "placebo": {
+       "n": 296,
+       "meanR": 0.1453,
+       "meanNet": 0.1253
+      },
+      "vsPlacebo": {
+       "diff": -0.1014,
+       "t": -0.85,
+       "df": 589.7705384166078
+      }
+     },
+     "all": {
+      "n": 653,
+      "meanR": -0.0215,
+      "tMonth": -0.38,
+      "months": 120,
+      "meanNet": -0.0415,
+      "tMonthNet": -0.73,
+      "win": 0.3262,
+      "placebo": {
+       "n": 653,
+       "meanR": 0.0691,
+       "meanNet": 0.0491
+      },
+      "vsPlacebo": {
+       "diff": -0.0906,
+       "t": -1.15,
+       "df": 1303.336010293509
+      }
+     }
+    },
+    "gbpusd": {
+     "discovery": {
+      "n": 373,
+      "meanR": 0.0935,
+      "tMonth": 1.33,
+      "months": 60,
+      "meanNet": 0.0668,
+      "tMonthNet": 0.95,
+      "win": 0.3646,
+      "placebo": {
+       "n": 373,
+       "meanR": -0.1165,
+       "meanNet": -0.1432
+      },
+      "vsPlacebo": {
+       "diff": 0.21,
+       "t": 2.04,
+       "df": 741.8806644592834
+      }
+     },
+     "confirmation": {
+      "n": 353,
+      "meanR": -0.0397,
+      "tMonth": -0.56,
+      "months": 60,
+      "meanNet": -0.0664,
+      "tMonthNet": -0.93,
+      "win": 0.3201,
+      "placebo": {
+       "n": 353,
+       "meanR": 0.0611,
+       "meanNet": 0.0344
+      },
+      "vsPlacebo": {
+       "diff": -0.1008,
+       "t": -0.94,
+       "df": 703.5398140814406
+      }
+     },
+     "all": {
+      "n": 726,
+      "meanR": 0.0287,
+      "tMonth": 0.57,
+      "months": 120,
+      "meanNet": 0.0021,
+      "tMonthNet": 0.04,
+      "win": 0.343,
+      "placebo": {
+       "n": 726,
+       "meanR": -0.0302,
+       "meanNet": -0.0568
+      },
+      "vsPlacebo": {
+       "diff": 0.0589,
+       "t": 0.79,
+       "df": 1449.7231533712088
+      }
+     }
+    },
+    "usdjpy": {
+     "discovery": {
+      "n": 261,
+      "meanR": 0.0227,
+      "tMonth": 0.21,
+      "months": 60,
+      "meanNet": -0.004,
+      "tMonthNet": -0.04,
+      "win": 0.3448,
+      "placebo": {
+       "n": 261,
+       "meanR": 0.022,
+       "meanNet": -0.0047
+      },
+      "vsPlacebo": {
+       "diff": 0.0007,
+       "t": 0.01,
+       "df": 519.8530983478345
+      }
+     },
+     "confirmation": {
+      "n": 261,
+      "meanR": 0,
+      "tMonth": 0,
+      "months": 60,
+      "meanNet": -0.0267,
+      "tMonthNet": -0.36,
+      "win": 0.3333,
+      "placebo": {
+       "n": 261,
+       "meanR": -0.0435,
+       "meanNet": -0.0702
+      },
+      "vsPlacebo": {
+       "diff": 0.0435,
+       "t": 0.35,
+       "df": 519.9981413197075
+      }
+     },
+     "all": {
+      "n": 522,
+      "meanR": 0.0113,
+      "tMonth": 0.17,
+      "months": 120,
+      "meanNet": -0.0153,
+      "tMonthNet": -0.23,
+      "win": 0.3391,
+      "placebo": {
+       "n": 522,
+       "meanR": -0.0108,
+       "meanNet": -0.0374
+      },
+      "vsPlacebo": {
+       "diff": 0.0221,
+       "t": 0.25,
+       "df": 1041.9112252863272
+      }
+     }
+    },
+    "audusd": {
+     "discovery": {
+      "n": 364,
+      "meanR": -0.1108,
+      "tMonth": -1.6,
+      "months": 60,
+      "meanNet": -0.1308,
+      "tMonthNet": -1.88,
+      "win": 0.2967,
+      "placebo": {
+       "n": 364,
+       "meanR": 0.088,
+       "meanNet": 0.068
+      },
+      "vsPlacebo": {
+       "diff": -0.1989,
+       "t": -1.9,
+       "df": 723.4576097381487
+      }
+     },
+     "confirmation": {
+      "n": 269,
+      "meanR": 0.0483,
+      "tMonth": 0.64,
+      "months": 60,
+      "meanNet": 0.0283,
+      "tMonthNet": 0.37,
+      "win": 0.3494,
+      "placebo": {
+       "n": 269,
+       "meanR": -0.1321,
+       "meanNet": -0.1521
+      },
+      "vsPlacebo": {
+       "diff": 0.1803,
+       "t": 1.49,
+       "df": 534.7495349701683
+      }
+     },
+     "all": {
+      "n": 633,
+      "meanR": -0.0432,
+      "tMonth": -0.84,
+      "months": 120,
+      "meanNet": -0.0632,
+      "tMonthNet": -1.22,
+      "win": 0.3191,
+      "placebo": {
+       "n": 633,
+       "meanR": -0.0055,
+       "meanNet": -0.0255
+      },
+      "vsPlacebo": {
+       "diff": -0.0377,
+       "t": -0.48,
+       "df": 1263.6957132437994
+      }
+     }
+    }
+   }
+  }
+ },
+ "diff": {
+  "at2R": {
+   "discovery": {
+    "nNext": 3741,
+    "nThree": 8034,
+    "diff": -0.0279,
+    "t": -1.01,
+    "df": 7345.290214063489,
+    "diffNet": -0.0254,
+    "tNet": -0.92
+   },
+   "confirmation": {
+    "nNext": 3324,
+    "nThree": 6290,
+    "diff": -0.0061,
+    "t": -0.2,
+    "df": 6778.122312091657,
+    "diffNet": -0.0019,
+    "tNet": -0.06
+   },
+   "all": {
+    "nNext": 7065,
+    "nThree": 14324,
+    "diff": -0.0177,
+    "t": -0.87,
+    "df": 14123.296075969878,
+    "diffNet": -0.0145,
+    "tNet": -0.71
+   }
+  },
+  "deskTargets": {
+   "discovery": {
+    "nNext": 3632,
+    "nThree": 10861,
+    "diff": -0.0134,
+    "t": -0.49,
+    "df": 4690.57738737611,
+    "diffNet": -0.013,
+    "tNet": -0.47
+   },
+   "confirmation": {
+    "nNext": 3127,
+    "nThree": 8867,
+    "diff": -0.0103,
+    "t": -0.34,
+    "df": 4086.0585153055627,
+    "diffNet": -0.0082,
+    "tNet": -0.27
+   },
+   "all": {
+    "nNext": 6759,
+    "nThree": 19728,
+    "diff": -0.012,
+    "t": -0.59,
+    "df": 8776.629809283695,
+    "diffNet": -0.0108,
+    "tNet": -0.54
+   }
+  }
+ },
+ "skipped": {
+  "xau": {
+   "open": 1,
+   "excluded": 14
+  },
+  "eurusd": {
+   "open": 0,
+   "excluded": 14
+  },
+  "gbpusd": {
+   "open": 0,
+   "excluded": 3
+  },
+  "usdjpy": {
+   "open": 4,
+   "excluded": 11
+  },
+  "audusd": {
+   "open": 0,
+   "excluded": 23
+  }
+ }
+}

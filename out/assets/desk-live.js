@@ -10,7 +10,9 @@
   var TFS = [['1m', 'M1', 60], ['5m', 'M5', 300], ['15m', 'M15', 900], ['30m', 'M30', 1800], ['1h', 'H1', 3600], ['4h', 'H4', 14400], ['1d', 'D1', 86400]];
   var POLL = { '1m': 3, '5m': 5, '15m': 10, '30m': 15, '1h': 20, '4h': 60, '1d': 120 };   // seconds between candle reads, by timeframe
   var SHUT_POLL = 60, REC_EVERY = 90, N_BARS = 500, N_CLOSED = 10, VIEW_BARS = 160, LIST_N = 4;
-  var DESKS = { mosha: { file: 'mosha/desk.json', name: 'Mosha', h4: true }, lit: { file: 'lit/desk.json', name: 'LIT' }, eg: { file: 'eg/desk.json', name: 'Engulfing', h4: true }, msnr: { file: 'msnr/desk.json', name: 'MSNR' } };   // h4: the card offers the H4 engulf map
+  var DESKS = { mosha: { file: 'mosha/desk.json', name: 'Mosha', h4: true }, lit: { file: 'lit/desk.json', name: 'LIT' }, eg: { file: 'eg/desk.json', name: 'Engulfing', h4: true }, msnr: { file: 'msnr/desk.json', name: 'MSNR' },
+    // the passing edges' desks (23 Nov 2026)
+    fade: { passing: true, file: 'fade/desk.json', name: 'Break fade' }, bigfade: { passing: true, file: 'bigfade/desk.json', name: 'Big-candle fade' }, roundfade: { passing: true, file: 'roundfade/desk.json', name: 'Round-number fade' }, boxfade: { passing: true, file: 'boxfade/desk.json', name: 'Box fade' }, fvg: { passing: true, file: 'fvg/desk.json', name: 'FVG return' }, goldvb: { passing: true, file: 'goldvb/desk.json', name: 'Gold breakout' }, jpyvb: { passing: true, file: 'jpyvb/desk.json', name: 'USD/JPY breakout' }, dom: { passing: true, file: 'dom/desk.json', name: 'DOM zone' } };   // h4: the card offers the H4 engulf map
   // one colour a kind of mark, as the trade chart (assets/mosha-replay.js HUES / hueKey): [light theme, dark theme]
   var HUES = { ef: ['#c62828', '#ff6b6b'], entry: ['#1565c0', '#5aa7ff'], cf: ['#2e7d32', '#5ed08a'], vr: ['#d84315', '#ff9f5a'], bo: ['#6d4c41', '#d7b899'], half: ['#546074', '#a0aabe'],
     d1: ['#6a1b9a', '#c792ea'], h4: ['#b26a00', '#ffc857'], h1: ['#00796b', '#4dd0c4'], m30: ['#ad1457', '#ff7eb6'], m15: ['#ad1457', '#ff7eb6'], m5: ['#00838f', '#5fd3e6'], m1: ['#00838f', '#5fd3e6'], other: ['#5f6b7a', '#9aa3b2'] };
@@ -132,7 +134,7 @@
     var v = $('v-' + k); if (!v) return null; var c = v.querySelector('.dl-card'); if (c) return c;
     var grid = v.querySelector('.mo-grid'); if (!grid) return null;
     c = document.createElement('div'); c.className = 'dl-card mo-wide'; c.setAttribute('data-dl', k); c.setAttribute('role', 'region'); c.setAttribute('aria-label', 'Live chart');
-    c.innerHTML = '<div class="dl-h"><b>Live chart</b><small>' + esc(DESKS[k].name) + ' trades on live candles · the latest open and closed trades of this market with their marks · paper record, not a tested rule</small></div>' +
+    c.innerHTML = '<div class="dl-h"><b>Live chart</b><small>' + esc(DESKS[k].name) + ' trades on live candles · the latest open and closed trades of this market with their marks · ' + (DESKS[k].passing ? 'paper record of a rule that passed its study before costs, not a trade signal' : 'paper record, not a tested rule') + '</small></div>' +
       '<div class="dl-bar"><select class="dl-b" data-dl-mk aria-label="Market"></select><div class="dl-seg" role="group" aria-label="Timeframe">' +
       TFS.map(function (t) { return '<button type="button" class="dl-b" data-dl-tf="' + t[0] + '" aria-pressed="false">' + t[1] + '</button>'; }).join('') + '</div>' +
       (DESKS[k].h4 ? '<button type="button" class="dl-b" data-dl-h4 aria-pressed="true" title="The H4 engulf zones still standing and the failed ones (EF) still standing as a barrier the other way">H4 zones</button>' : '') + '</div>' +

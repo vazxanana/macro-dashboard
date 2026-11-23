@@ -1,0 +1,674 @@
+{
+ "study": "grid5-cycle-box",
+ "built": "2026-11-23",
+ "basis": "judged before costs (pre-registered); after costs beside",
+ "window": "fills 2010-01-01 to 2019-12-31; discovery 2010-2014, confirmation 2015-2019",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "cells": 12960,
+ "rulesPerScope": 2160,
+ "reach100": 7930,
+ "verdict": "FAIL",
+ "counts": {
+  "discovery": 99,
+  "raw": 3,
+  "chance": 2.3,
+  "holm": 0,
+  "holmNotPlacebo": 0,
+  "placebo": {
+   "discovery": 1133,
+   "raw": 186,
+   "chance": 25.8,
+   "holm": 2
+  },
+  "afterCosts": {
+   "discovery": 27,
+   "raw": 0,
+   "holm": 0
+  }
+ },
+ "byDiscovery": {
+  "scope": {
+   "xau": 29,
+   "eurusd": 8,
+   "gbpusd": 3,
+   "usdjpy": 40,
+   "audusd": 2,
+   "pooled": 17
+  },
+  "chain": {
+   "1d>4h": 1,
+   "4h>1h": 49,
+   "1h>15m": 49
+  },
+  "stage": {
+   "any": 20,
+   "continuation": 52,
+   "move": 15,
+   "pullback": 12
+  },
+  "side": {
+   "two": 3,
+   "none": 73,
+   "one": 23
+  },
+  "event": {
+   "break": 49,
+   "retest": 17,
+   "false": 33
+  },
+  "entry": {
+   "mkt": 86,
+   "lim": 13
+  },
+  "stop": {
+   "atr": 27,
+   "box": 72
+  },
+  "exit": {
+   "1R": 15,
+   "trail": 22,
+   "box": 19,
+   "2R": 21,
+   "3R": 22
+  }
+ },
+ "byRaw": {
+  "scope": {
+   "gbpusd": 1,
+   "pooled": 2
+  },
+  "chain": {
+   "4h>1h": 1,
+   "1h>15m": 2
+  },
+  "stage": {
+   "continuation": 1,
+   "any": 1,
+   "move": 1
+  },
+  "side": {
+   "one": 1,
+   "none": 2
+  },
+  "event": {
+   "break": 1,
+   "false": 2
+  },
+  "entry": {
+   "mkt": 3
+  },
+  "stop": {
+   "box": 3
+  },
+  "exit": {
+   "trail": 1,
+   "3R": 1,
+   "1R": 1
+  }
+ },
+ "byHolm": {
+  "scope": {},
+  "chain": {},
+  "stage": {},
+  "side": {},
+  "event": {},
+  "entry": {},
+  "stop": {},
+  "exit": {}
+ },
+ "confirmed": [],
+ "bestDiscovery": [
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "move",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "atr",
+   "exit": "1R",
+   "discovery": {
+    "n": 3345,
+    "before": 0.0594,
+    "tB": 3.18,
+    "after": -0.0455,
+    "tA": -2.27
+   },
+   "confirmation": {
+    "n": 3234,
+    "before": 0.0189,
+    "tB": 1,
+    "after": -0.1079,
+    "tA": -5.3
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "4h>1h",
+   "stage": "continuation",
+   "side": "none",
+   "event": "break",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "3R",
+   "discovery": {
+    "n": 2033,
+    "before": 0.0798,
+    "tB": 2.98,
+    "after": 0.0649,
+    "tA": 2.42
+   },
+   "confirmation": {
+    "n": 2046,
+    "before": 0.0318,
+    "tB": 1.09,
+    "after": 0.0128,
+    "tA": 0.43
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "move",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "1R",
+   "discovery": {
+    "n": 3321,
+    "before": 0.053,
+    "tB": 2.87,
+    "after": -0.0356,
+    "tA": -1.82
+   },
+   "confirmation": {
+    "n": 3197,
+    "before": 0.0401,
+    "tB": 2.25,
+    "after": -0.0685,
+    "tA": -3.46
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "pullback",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 3032,
+    "before": 0.0685,
+    "tB": 2.73,
+    "after": -0.037,
+    "tA": -1.42
+   },
+   "confirmation": {
+    "n": 2968,
+    "before": -0.0065,
+    "tB": -0.28,
+    "after": -0.1376,
+    "tA": -5.62
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "pullback",
+   "side": "one",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 2931,
+    "before": 0.0674,
+    "tB": 2.67,
+    "after": -0.0392,
+    "tA": -1.51
+   },
+   "confirmation": {
+    "n": 2837,
+    "before": -0.0073,
+    "tB": -0.3,
+    "after": -0.1395,
+    "tA": -5.51
+   }
+  }
+ ],
+ "bestConfirmation": [
+  {
+   "scope": "pooled",
+   "chain": "1d>4h",
+   "stage": "any",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "atr",
+   "exit": "trail",
+   "discovery": {
+    "n": 729,
+    "before": 0.0243,
+    "tB": 0.55,
+    "after": -0.0022,
+    "tA": -0.05
+   },
+   "confirmation": {
+    "n": 739,
+    "before": 0.1359,
+    "tB": 3.43,
+    "after": 0.1063,
+    "tA": 2.68
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "4h>1h",
+   "stage": "any",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "atr",
+   "exit": "box",
+   "discovery": {
+    "n": 2757,
+    "before": -0.0301,
+    "tB": -0.83,
+    "after": -0.0844,
+    "tA": -2.3
+   },
+   "confirmation": {
+    "n": 2595,
+    "before": 0.1011,
+    "tB": 3.18,
+    "after": 0.0379,
+    "tA": 1.17
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "4h>1h",
+   "stage": "move",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "2R",
+   "discovery": {
+    "n": 910,
+    "before": 0.0413,
+    "tB": 0.92,
+    "after": -0.0047,
+    "tA": -0.11
+   },
+   "confirmation": {
+    "n": 882,
+    "before": 0.1405,
+    "tB": 3.1,
+    "after": 0.0859,
+    "tA": 1.9
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1d>4h",
+   "stage": "any",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "2R",
+   "discovery": {
+    "n": 728,
+    "before": 0.045,
+    "tB": 0.93,
+    "after": 0.0219,
+    "tA": 0.45
+   },
+   "confirmation": {
+    "n": 739,
+    "before": 0.1416,
+    "tB": 3,
+    "after": 0.1131,
+    "tA": 2.4
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "4h>1h",
+   "stage": "move",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "atr",
+   "exit": "box",
+   "discovery": {
+    "n": 910,
+    "before": 0.0682,
+    "tB": 1.12,
+    "after": 0.0139,
+    "tA": 0.23
+   },
+   "confirmation": {
+    "n": 885,
+    "before": 0.1773,
+    "tB": 2.78,
+    "after": 0.117,
+    "tA": 1.84
+   }
+  }
+ ],
+ "placeboConfirmed": [
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "any",
+   "side": "none",
+   "event": "break",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 26855,
+    "before": 0.0403,
+    "tB": 5.91,
+    "after": 0.0079,
+    "tA": 1.14
+   },
+   "confirmation": {
+    "n": 25955,
+    "before": 0.0357,
+    "tB": 5.57,
+    "after": -0.0051,
+    "tA": -0.78
+   },
+   "holm": 0.000375
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "any",
+   "side": "none",
+   "event": "break",
+   "entry": "lim",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 26844,
+    "before": 0.0459,
+    "tB": 6.52,
+    "after": 0.006,
+    "tA": 0.83
+   },
+   "confirmation": {
+    "n": 25951,
+    "before": 0.0335,
+    "tB": 5.3,
+    "after": -0.0165,
+    "tA": -2.47
+   },
+   "holm": 0.00102
+  }
+ ],
+ "bestPlaceboConfirmation": [
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "any",
+   "side": "none",
+   "event": "break",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 26855,
+    "before": 0.0403,
+    "tB": 5.91,
+    "after": 0.0079,
+    "tA": 1.14
+   },
+   "confirmation": {
+    "n": 25955,
+    "before": 0.0357,
+    "tB": 5.57,
+    "after": -0.0051,
+    "tA": -0.78
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "any",
+   "side": "none",
+   "event": "break",
+   "entry": "lim",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 26844,
+    "before": 0.0459,
+    "tB": 6.52,
+    "after": 0.006,
+    "tA": 0.83
+   },
+   "confirmation": {
+    "n": 25951,
+    "before": 0.0335,
+    "tB": 5.3,
+    "after": -0.0165,
+    "tA": -2.47
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "move",
+   "side": "none",
+   "event": "break",
+   "entry": "lim",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 7998,
+    "before": 0.0251,
+    "tB": 1.73,
+    "after": -0.0114,
+    "tA": -0.76
+   },
+   "confirmation": {
+    "n": 7586,
+    "before": 0.0557,
+    "tB": 4.18,
+    "after": 0.0098,
+    "tA": 0.71
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "move",
+   "side": "none",
+   "event": "break",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "box",
+   "discovery": {
+    "n": 8003,
+    "before": 0.0158,
+    "tB": 1.37,
+    "after": -0.0127,
+    "tA": -1.07
+   },
+   "confirmation": {
+    "n": 7589,
+    "before": 0.0428,
+    "tB": 4.14,
+    "after": 0.0066,
+    "tA": 0.62
+   }
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "pullback",
+   "side": "none",
+   "event": "break",
+   "entry": "mkt",
+   "stop": "atr",
+   "exit": "1R",
+   "discovery": {
+    "n": 7841,
+    "before": 0.0459,
+    "tB": 3.92,
+    "after": -0.0668,
+    "tA": -5.53
+   },
+   "confirmation": {
+    "n": 7549,
+    "before": 0.0549,
+    "tB": 4.13,
+    "after": -0.0829,
+    "tA": -6.67
+   }
+  }
+ ],
+ "placeboByRaw": {
+  "scope": {
+   "xau": 3,
+   "eurusd": 37,
+   "gbpusd": 6,
+   "audusd": 80,
+   "pooled": 60
+  },
+  "chain": {
+   "1h>15m": 181,
+   "4h>1h": 4,
+   "1d>4h": 1
+  },
+  "stage": {
+   "any": 109,
+   "pullback": 14,
+   "move": 54,
+   "continuation": 9
+  },
+  "side": {
+   "none": 110,
+   "one": 55,
+   "two": 21
+  },
+  "event": {
+   "break": 168,
+   "retest": 15,
+   "false": 3
+  },
+  "entry": {
+   "mkt": 81,
+   "lim": 105
+  },
+  "stop": {
+   "box": 86,
+   "atr": 100
+  },
+  "exit": {
+   "trail": 38,
+   "2R": 38,
+   "3R": 27,
+   "box": 29,
+   "1R": 54
+  }
+ },
+ "rawConfirmations": [
+  {
+   "scope": "gbpusd",
+   "chain": "4h>1h",
+   "stage": "continuation",
+   "side": "one",
+   "event": "break",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "trail",
+   "discovery": {
+    "n": 289,
+    "before": 0.1222,
+    "tB": 2.01,
+    "after": 0.1107,
+    "tA": 1.83
+   },
+   "confirmation": {
+    "n": 260,
+    "before": 0.1184,
+    "tB": 2,
+    "after": 0.1057,
+    "tA": 1.79
+   },
+   "placeboPasses": false
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "any",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "3R",
+   "discovery": {
+    "n": 10449,
+    "before": 0.0396,
+    "tB": 2.2,
+    "after": -0.0611,
+    "tA": -3.27
+   },
+   "confirmation": {
+    "n": 10075,
+    "before": 0.0372,
+    "tB": 2.15,
+    "after": -0.0852,
+    "tA": -4.82
+   },
+   "placeboPasses": false
+  },
+  {
+   "scope": "pooled",
+   "chain": "1h>15m",
+   "stage": "move",
+   "side": "none",
+   "event": "false",
+   "entry": "mkt",
+   "stop": "box",
+   "exit": "1R",
+   "discovery": {
+    "n": 3321,
+    "before": 0.053,
+    "tB": 2.87,
+    "after": -0.0356,
+    "tA": -1.82
+   },
+   "confirmation": {
+    "n": 3197,
+    "before": 0.0401,
+    "tB": 2.25,
+    "after": -0.0685,
+    "tA": -3.46
+   },
+   "placeboPasses": false
+  }
+ ],
+ "headline": "12,960 cells: 99 discovery winners before costs, 3 raw confirmations on 2015-19 (2.3 expected by chance), 0 after Holm. Best pooled discovery cell (1h>15m move none false mkt/atr 1R): +0.059R a trade in 2010-14 (n 3345, month t 3.18), +0.019R in 2015-19 (n 3234, t 1). The side-flipped placebo did better (1133 discovery winners, 2 Holm).",
+ "rows": {
+  "xau": 90004,
+  "eurusd": 101345,
+  "gbpusd": 101304,
+  "usdjpy": 101372,
+  "audusd": 112935
+ }
+}

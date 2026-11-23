@@ -1,0 +1,5041 @@
+{
+ "study": "grid7-cf-engulf",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "0 of 48 cells passed (placebo 0); the best confirmation cell, against | H4>H1 | EG | pooled | 2R, made +0.084R a trade before costs in 2015-26 (n 1163, month t 1.81) after +0.048R in 2005-14 (n 1080, t 1.09).",
+ "best": "against | H4>H1 | EG | pooled | 2R",
+ "assumedCost": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "windows": {
+  "discovery": "2005-01 to 2014-12",
+  "confirmation": "2015-01 to 2026-10"
+ },
+ "passes": 0,
+ "placeboPasses": 0,
+ "sizeable": 46,
+ "cutTest": {
+  "markets": [
+   {
+    "market": "eurjpy",
+    "cuts": 10,
+    "compared": 2195,
+    "mismatches": 0
+   },
+   {
+    "market": "eurusd",
+    "cuts": 10,
+    "compared": 2365,
+    "mismatches": 0
+   },
+   {
+    "market": "xau",
+    "cuts": 10,
+    "compared": 1887,
+    "mismatches": 0
+   }
+  ],
+  "compared": 6447,
+  "mismatches": 0
+ },
+ "markets": [
+  {
+   "market": "xau",
+   "signals": 3262,
+   "flagged": {
+    "eg": 2341,
+    "ef": 2484,
+    "both": 1814
+   },
+   "trades": 6465,
+   "droppedBadData": 14,
+   "gateFail": 44,
+   "unfinished": 1
+  },
+  {
+   "market": "xag",
+   "signals": 3018,
+   "flagged": {
+    "eg": 2098,
+    "ef": 2247,
+    "both": 1596
+   },
+   "trades": 5758,
+   "droppedBadData": 47,
+   "gateFail": 231,
+   "unfinished": 0
+  },
+  {
+   "market": "eurusd",
+   "signals": 4069,
+   "flagged": {
+    "eg": 2926,
+    "ef": 3221,
+    "both": 2340
+   },
+   "trades": 8056,
+   "droppedBadData": 9,
+   "gateFail": 67,
+   "unfinished": 0
+  },
+  {
+   "market": "gbpusd",
+   "signals": 3917,
+   "flagged": {
+    "eg": 2889,
+    "ef": 3000,
+    "both": 2254
+   },
+   "trades": 7754,
+   "droppedBadData": 7,
+   "gateFail": 73,
+   "unfinished": 0
+  },
+  {
+   "market": "usdjpy",
+   "signals": 3832,
+   "flagged": {
+    "eg": 2709,
+    "ef": 2962,
+    "both": 2104
+   },
+   "trades": 7577,
+   "droppedBadData": 13,
+   "gateFail": 67,
+   "unfinished": 1
+  },
+  {
+   "market": "audusd",
+   "signals": 4832,
+   "flagged": {
+    "eg": 3410,
+    "ef": 3732,
+    "both": 2696
+   },
+   "trades": 9418,
+   "droppedBadData": 15,
+   "gateFail": 224,
+   "unfinished": 1
+  },
+  {
+   "market": "nzdusd",
+   "signals": 4758,
+   "flagged": {
+    "eg": 3310,
+    "ef": 3634,
+    "both": 2576
+   },
+   "trades": 9374,
+   "droppedBadData": 7,
+   "gateFail": 129,
+   "unfinished": 0
+  },
+  {
+   "market": "usdcad",
+   "signals": 4014,
+   "flagged": {
+    "eg": 2849,
+    "ef": 3112,
+    "both": 2263
+   },
+   "trades": 7932,
+   "droppedBadData": 8,
+   "gateFail": 87,
+   "unfinished": 1
+  },
+  {
+   "market": "usdchf",
+   "signals": 3537,
+   "flagged": {
+    "eg": 2491,
+    "ef": 2695,
+    "both": 1931
+   },
+   "trades": 6873,
+   "droppedBadData": 16,
+   "gateFail": 185,
+   "unfinished": 0
+  },
+  {
+   "market": "eurjpy",
+   "signals": 3897,
+   "flagged": {
+    "eg": 2852,
+    "ef": 2956,
+    "both": 2193
+   },
+   "trades": 7726,
+   "droppedBadData": 1,
+   "gateFail": 60,
+   "unfinished": 1
+  }
+ ],
+ "baseline": [
+  {
+   "ladder": "H4>H1",
+   "with2R": {
+    "disc": {
+     "n": 1411,
+     "meanR": -0.0139,
+     "tMonth": -0.37,
+     "netR": -0.0315,
+     "tMonthNet": -0.84
+    },
+    "conf": {
+     "n": 1497,
+     "meanR": -0.0091,
+     "tMonth": -0.28,
+     "netR": -0.0305,
+     "tMonthNet": -0.94
+    }
+   }
+  },
+  {
+   "ladder": "H1>M15",
+   "with2R": {
+    "disc": {
+     "n": 4619,
+     "meanR": -0.0223,
+     "tMonth": -1.11,
+     "netR": -0.0594,
+     "tMonthNet": -2.91
+    },
+    "conf": {
+     "n": 5365,
+     "meanR": -0.0569,
+     "tMonth": -2.89,
+     "netR": -0.1046,
+     "tMonthNet": -5.25
+    }
+   }
+  },
+  {
+   "ladder": "M30>M5",
+   "with2R": {
+    "disc": {
+     "n": 11759,
+     "meanR": -0.0743,
+     "tMonth": -6.02,
+     "netR": -0.1367,
+     "tMonthNet": -10.95
+    },
+    "conf": {
+     "n": 14351,
+     "meanR": -0.0481,
+     "tMonth": -3.91,
+     "netR": -0.1342,
+     "tMonthNet": -10.7
+    }
+   }
+  }
+ ],
+ "cells": [
+  {
+   "cell": "with | H4>H1 | EG | clear | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 419,
+    "meanR": 0.0098,
+    "tMonth": 0.2,
+    "netR": -0.008,
+    "tMonthNet": -0.16
+   },
+   "conf": {
+    "n": 480,
+    "meanR": -0.0058,
+    "tMonth": -0.13,
+    "netR": -0.028,
+    "tMonthNet": -0.65,
+    "p": 0.8968,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 124,
+     "meanR": -0.0254,
+     "welchT": 0.37
+    },
+    "conf": {
+     "n": 140,
+     "meanR": 0.0886,
+     "welchT": -1.1
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 418,
+     "meanR": 0.0516,
+     "welchT": -0.64
+    },
+    "conf": {
+     "n": 477,
+     "meanR": 0.026,
+     "welchT": -0.52
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | clear | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 419,
+    "meanR": 0.0431,
+    "tMonth": 0.67,
+    "netR": 0.0253,
+    "tMonthNet": 0.39
+   },
+   "conf": {
+    "n": 480,
+    "meanR": 0.0038,
+    "tMonth": 0.07,
+    "netR": -0.0184,
+    "tMonthNet": -0.33,
+    "p": 0.9443,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 124,
+     "meanR": -0.0718,
+     "welchT": 0.98
+    },
+    "conf": {
+     "n": 140,
+     "meanR": 0.1575,
+     "welchT": -1.36
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 418,
+     "meanR": 0.0902,
+     "welchT": -0.55
+    },
+    "conf": {
+     "n": 477,
+     "meanR": 0.0424,
+     "welchT": -0.48
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | clear | ext",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 307,
+    "meanR": 0.021,
+    "tMonth": 0.23,
+    "netR": 0.0007,
+    "tMonthNet": 0.01
+   },
+   "conf": {
+    "n": 363,
+    "meanR": -0.0136,
+    "tMonth": -0.18,
+    "netR": -0.0377,
+    "tMonthNet": -0.5,
+    "p": 0.8574,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 84,
+     "meanR": -0.1815,
+     "welchT": 1.38
+    },
+    "conf": {
+     "n": 100,
+     "meanR": 0.1232,
+     "welchT": -0.92
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 306,
+     "meanR": 0.0542,
+     "welchT": -0.3
+    },
+    "conf": {
+     "n": 361,
+     "meanR": 0.0027,
+     "welchT": -0.15
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | inside | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 655,
+    "meanR": -0.0116,
+    "tMonth": -0.26,
+    "netR": -0.0306,
+    "tMonthNet": -0.69
+   },
+   "conf": {
+    "n": 672,
+    "meanR": -0.0401,
+    "tMonth": -1.04,
+    "netR": -0.0616,
+    "tMonthNet": -1.6,
+    "p": 0.3001,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 213,
+     "meanR": -0.125,
+     "welchT": 1.56
+    },
+    "conf": {
+     "n": 205,
+     "meanR": 0.0273,
+     "welchT": -0.92
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 654,
+     "meanR": 0.1007,
+     "welchT": -2.16
+    },
+    "conf": {
+     "n": 663,
+     "meanR": 0.1115,
+     "welchT": -3
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | inside | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 655,
+    "meanR": -0.0067,
+    "tMonth": -0.11,
+    "netR": -0.0257,
+    "tMonthNet": -0.42
+   },
+   "conf": {
+    "n": 672,
+    "meanR": -0.0674,
+    "tMonth": -1.41,
+    "netR": -0.0889,
+    "tMonthNet": -1.86,
+    "p": 0.1607,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 213,
+     "meanR": -0.1142,
+     "welchT": 1.22
+    },
+    "conf": {
+     "n": 205,
+     "meanR": 0.0379,
+     "welchT": -1.15
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 654,
+     "meanR": 0.1508,
+     "welchT": -2.34
+    },
+    "conf": {
+     "n": 663,
+     "meanR": 0.1595,
+     "welchT": -3.49
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | inside | ext",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 184,
+    "meanR": -0.123,
+    "tMonth": -1.24,
+    "netR": -0.1509,
+    "tMonthNet": -1.52
+   },
+   "conf": {
+    "n": 215,
+    "meanR": 0.0002,
+    "tMonth": 0,
+    "netR": -0.0278,
+    "tMonthNet": -0.34,
+    "p": 1,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 35,
+     "meanR": -0.3663,
+     "welchT": 1.37
+    },
+    "conf": {
+     "n": 46,
+     "meanR": -0.0439,
+     "welchT": 0.22
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 184,
+     "meanR": 0.1611,
+     "welchT": -2.13
+    },
+    "conf": {
+     "n": 212,
+     "meanR": 0.0664,
+     "welchT": -0.53
+    }
+   },
+   "bar": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | clear | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 454,
+    "meanR": -0.0269,
+    "tMonth": -0.56,
+    "netR": -0.0441,
+    "tMonthNet": -0.93
+   },
+   "conf": {
+    "n": 524,
+    "meanR": -0.0046,
+    "tMonth": -0.12,
+    "netR": -0.0252,
+    "tMonthNet": -0.65,
+    "p": 0.9047,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 89,
+     "meanR": 0.1478,
+     "welchT": -1.59
+    },
+    "conf": {
+     "n": 96,
+     "meanR": 0.1256,
+     "welchT": -1.26
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 448,
+     "meanR": 0.0793,
+     "welchT": -1.7
+    },
+    "conf": {
+     "n": 518,
+     "meanR": 0.0585,
+     "welchT": -1.09
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | clear | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 454,
+    "meanR": -0.0233,
+    "tMonth": -0.4,
+    "netR": -0.0405,
+    "tMonthNet": -0.7
+   },
+   "conf": {
+    "n": 524,
+    "meanR": 0.0174,
+    "tMonth": 0.33,
+    "netR": -0.0032,
+    "tMonthNet": -0.06,
+    "p": 0.7419,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 89,
+     "meanR": 0.2215,
+     "welchT": -1.66
+    },
+    "conf": {
+     "n": 96,
+     "meanR": 0.1537,
+     "welchT": -0.97
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 448,
+     "meanR": 0.1356,
+     "welchT": -1.93
+    },
+    "conf": {
+     "n": 518,
+     "meanR": 0.0558,
+     "welchT": -0.51
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | clear | ext",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 323,
+    "meanR": -0.0624,
+    "tMonth": -0.74,
+    "netR": -0.0823,
+    "tMonthNet": -0.98
+   },
+   "conf": {
+    "n": 388,
+    "meanR": -0.0364,
+    "tMonth": -0.55,
+    "netR": -0.0593,
+    "tMonthNet": -0.89,
+    "p": 0.5832,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 68,
+     "meanR": 0.167,
+     "welchT": -1.11
+    },
+    "conf": {
+     "n": 75,
+     "meanR": 0.2869,
+     "welchT": -1.78
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 320,
+     "meanR": 0.1592,
+     "welchT": -2.06
+    },
+    "conf": {
+     "n": 383,
+     "meanR": 0.0394,
+     "welchT": -0.76
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | inside | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 659,
+    "meanR": -0.0332,
+    "tMonth": -0.8,
+    "netR": -0.0502,
+    "tMonthNet": -1.22
+   },
+   "conf": {
+    "n": 663,
+    "meanR": -0.0049,
+    "tMonth": -0.13,
+    "netR": -0.025,
+    "tMonthNet": -0.68,
+    "p": 0.8968,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 209,
+     "meanR": -0.0593,
+     "welchT": 0.35
+    },
+    "conf": {
+     "n": 214,
+     "meanR": -0.0844,
+     "welchT": 1.09
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 656,
+     "meanR": 0.1499,
+     "welchT": -3.58
+    },
+    "conf": {
+     "n": 658,
+     "meanR": 0.0695,
+     "welchT": -1.45
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | inside | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 659,
+    "meanR": -0.0139,
+    "tMonth": -0.26,
+    "netR": -0.031,
+    "tMonthNet": -0.57
+   },
+   "conf": {
+    "n": 663,
+    "meanR": -0.0096,
+    "tMonth": -0.21,
+    "netR": -0.0297,
+    "tMonthNet": -0.64,
+    "p": 0.834,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 209,
+     "meanR": -0.0936,
+     "welchT": 0.85
+    },
+    "conf": {
+     "n": 214,
+     "meanR": -0.1454,
+     "welchT": 1.53
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 656,
+     "meanR": 0.2083,
+     "welchT": -3.34
+    },
+    "conf": {
+     "n": 658,
+     "meanR": 0.0879,
+     "welchT": -1.51
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | inside | ext",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 158,
+    "meanR": -0.1108,
+    "tMonth": -1.02,
+    "netR": -0.1356,
+    "tMonthNet": -1.24
+   },
+   "conf": {
+    "n": 187,
+    "meanR": -0.023,
+    "tMonth": -0.28,
+    "netR": -0.0456,
+    "tMonthNet": -0.55,
+    "p": 0.7799,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 61,
+     "meanR": -0.2943,
+     "welchT": 1.02
+    },
+    "conf": {
+     "n": 74,
+     "meanR": 0.0316,
+     "welchT": -0.3
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 157,
+     "meanR": 0.1955,
+     "welchT": -2.22
+    },
+    "conf": {
+     "n": 186,
+     "meanR": 0.1183,
+     "welchT": -1.03
+    }
+   },
+   "bar": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | clear | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 1098,
+    "meanR": -0.0396,
+    "tMonth": -1.28,
+    "netR": -0.0769,
+    "tMonthNet": -2.47
+   },
+   "conf": {
+    "n": 1408,
+    "meanR": -0.0551,
+    "tMonth": -2.14,
+    "netR": -0.1085,
+    "tMonthNet": -4.14,
+    "p": 0.0341,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 432,
+     "meanR": -0.0713,
+     "welchT": 0.58
+    },
+    "conf": {
+     "n": 511,
+     "meanR": -0.126,
+     "welchT": 1.44
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1095,
+     "meanR": -0.0176,
+     "welchT": -0.54
+    },
+    "conf": {
+     "n": 1400,
+     "meanR": 0.0698,
+     "welchT": -3.47
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | clear | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 1098,
+    "meanR": -0.0321,
+    "tMonth": -0.8,
+    "netR": -0.0693,
+    "tMonthNet": -1.72
+   },
+   "conf": {
+    "n": 1408,
+    "meanR": -0.0435,
+    "tMonth": -1.22,
+    "netR": -0.0969,
+    "tMonthNet": -2.68,
+    "p": 0.2245,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 432,
+     "meanR": -0.0628,
+     "welchT": 0.43
+    },
+    "conf": {
+     "n": 511,
+     "meanR": -0.2113,
+     "welchT": 2.67
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1095,
+     "meanR": 0.0246,
+     "welchT": -1.04
+    },
+    "conf": {
+     "n": 1400,
+     "meanR": 0.1069,
+     "welchT": -3.06
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | clear | ext",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 819,
+    "meanR": -0.0379,
+    "tMonth": -0.59,
+    "netR": -0.0771,
+    "tMonthNet": -1.2
+   },
+   "conf": {
+    "n": 1076,
+    "meanR": -0.0592,
+    "tMonth": -1.28,
+    "netR": -0.1182,
+    "tMonthNet": -2.51,
+    "p": 0.2026,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 320,
+     "meanR": -0.1126,
+     "welchT": 0.76
+    },
+    "conf": {
+     "n": 363,
+     "meanR": -0.1999,
+     "welchT": 1.69
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 817,
+     "meanR": -0.0008,
+     "welchT": -0.49
+    },
+    "conf": {
+     "n": 1071,
+     "meanR": 0.0845,
+     "welchT": -2.23
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | inside | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 2260,
+    "meanR": -0.0248,
+    "tMonth": -1.23,
+    "netR": -0.0615,
+    "tMonthNet": -3.06
+   },
+   "conf": {
+    "n": 2558,
+    "meanR": -0.038,
+    "tMonth": -1.8,
+    "netR": -0.0862,
+    "tMonthNet": -4.08,
+    "p": 0.074,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 829,
+     "meanR": 0.0129,
+     "welchT": -0.97
+    },
+    "conf": {
+     "n": 888,
+     "meanR": -0.0191,
+     "welchT": -0.51
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2253,
+     "meanR": 0.0105,
+     "welchT": -1.25
+    },
+    "conf": {
+     "n": 2548,
+     "meanR": -0.0217,
+     "welchT": -0.61
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | inside | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 2260,
+    "meanR": -0.0225,
+    "tMonth": -0.83,
+    "netR": -0.0591,
+    "tMonthNet": -2.19
+   },
+   "conf": {
+    "n": 2558,
+    "meanR": -0.0328,
+    "tMonth": -1.18,
+    "netR": -0.081,
+    "tMonthNet": -2.92,
+    "p": 0.24,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 829,
+     "meanR": 0.012,
+     "welchT": -0.68
+    },
+    "conf": {
+     "n": 888,
+     "meanR": -0.0589,
+     "welchT": 0.55
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2253,
+     "meanR": 0.0132,
+     "welchT": -0.94
+    },
+    "conf": {
+     "n": 2548,
+     "meanR": -0.0008,
+     "welchT": -0.89
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | inside | ext",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 786,
+    "meanR": 0.009,
+    "tMonth": 0.17,
+    "netR": -0.0406,
+    "tMonthNet": -0.79
+   },
+   "conf": {
+    "n": 915,
+    "meanR": -0.0624,
+    "tMonth": -1.41,
+    "netR": -0.128,
+    "tMonthNet": -2.87,
+    "p": 0.1607,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 231,
+     "meanR": 0.0605,
+     "welchT": -0.48
+    },
+    "conf": {
+     "n": 278,
+     "meanR": -0.1806,
+     "welchT": 1.41
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 783,
+     "meanR": 0.0211,
+     "welchT": -0.18
+    },
+    "conf": {
+     "n": 914,
+     "meanR": -0.0793,
+     "welchT": 0.27
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | clear | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 1290,
+    "meanR": -0.0441,
+    "tMonth": -1.63,
+    "netR": -0.0806,
+    "tMonthNet": -2.94
+   },
+   "conf": {
+    "n": 1589,
+    "meanR": -0.0906,
+    "tMonth": -3.45,
+    "netR": -0.1421,
+    "tMonthNet": -5.33,
+    "p": 0.0007,
+    "holm": 0.0301
+   },
+   "plain": {
+    "disc": {
+     "n": 240,
+     "meanR": -0.0723,
+     "welchT": 0.42
+    },
+    "conf": {
+     "n": 330,
+     "meanR": 0.0064,
+     "welchT": -1.67
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1288,
+     "meanR": -0.0001,
+     "welchT": -1.17
+    },
+    "conf": {
+     "n": 1579,
+     "meanR": -0.0119,
+     "welchT": -2.31
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | clear | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 1290,
+    "meanR": -0.0387,
+    "tMonth": -1.1,
+    "netR": -0.0751,
+    "tMonthNet": -2.11
+   },
+   "conf": {
+    "n": 1589,
+    "meanR": -0.1107,
+    "tMonth": -3.14,
+    "netR": -0.1622,
+    "tMonthNet": -4.57,
+    "p": 0.0021,
+    "holm": 0.0819
+   },
+   "plain": {
+    "disc": {
+     "n": 240,
+     "meanR": -0.0519,
+     "welchT": 0.14
+    },
+    "conf": {
+     "n": 330,
+     "meanR": 0.0205,
+     "welchT": -1.67
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1288,
+     "meanR": 0.0003,
+     "welchT": -0.78
+    },
+    "conf": {
+     "n": 1579,
+     "meanR": 0.0175,
+     "welchT": -2.83
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | clear | ext",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 952,
+    "meanR": -0.0758,
+    "tMonth": -1.44,
+    "netR": -0.1152,
+    "tMonthNet": -2.18
+   },
+   "conf": {
+    "n": 1171,
+    "meanR": -0.1289,
+    "tMonth": -2.69,
+    "netR": -0.1865,
+    "tMonthNet": -3.84,
+    "p": 0.008,
+    "holm": 0.288
+   },
+   "plain": {
+    "disc": {
+     "n": 187,
+     "meanR": 0.027,
+     "welchT": -0.69
+    },
+    "conf": {
+     "n": 268,
+     "meanR": 0.0545,
+     "welchT": -1.87
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 952,
+     "meanR": -0.0088,
+     "welchT": -1.02
+    },
+    "conf": {
+     "n": 1163,
+     "meanR": 0.0173,
+     "welchT": -2.44
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | inside | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 2283,
+    "meanR": -0.017,
+    "tMonth": -0.79,
+    "netR": -0.0523,
+    "tMonthNet": -2.43
+   },
+   "conf": {
+    "n": 2537,
+    "meanR": -0.034,
+    "tMonth": -1.78,
+    "netR": -0.0779,
+    "tMonthNet": -4.05,
+    "p": 0.0772,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 806,
+     "meanR": -0.0081,
+     "welchT": -0.23
+    },
+    "conf": {
+     "n": 909,
+     "meanR": -0.0305,
+     "welchT": -0.1
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2275,
+     "meanR": 0.0173,
+     "welchT": -1.22
+    },
+    "conf": {
+     "n": 2527,
+     "meanR": -0.0035,
+     "welchT": -1.14
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | inside | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 2283,
+    "meanR": -0.0155,
+    "tMonth": -0.56,
+    "netR": -0.0508,
+    "tMonthNet": -1.82
+   },
+   "conf": {
+    "n": 2537,
+    "meanR": -0.0488,
+    "tMonth": -1.89,
+    "netR": -0.0927,
+    "tMonthNet": -3.56,
+    "p": 0.0608,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 806,
+     "meanR": -0.0067,
+     "welchT": -0.17
+    },
+    "conf": {
+     "n": 909,
+     "meanR": -0.0135,
+     "welchT": -0.72
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2275,
+     "meanR": 0.0354,
+     "welchT": -1.36
+    },
+    "conf": {
+     "n": 2527,
+     "meanR": 0.022,
+     "welchT": -1.99
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | inside | ext",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 673,
+    "meanR": -0.0193,
+    "tMonth": -0.33,
+    "netR": -0.0673,
+    "tMonthNet": -1.13
+   },
+   "conf": {
+    "n": 819,
+    "meanR": -0.0845,
+    "tMonth": -1.79,
+    "netR": -0.145,
+    "tMonthNet": -3.06,
+    "p": 0.0756,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 344,
+     "meanR": 0.0988,
+     "welchT": -1.29
+    },
+    "conf": {
+     "n": 374,
+     "meanR": -0.1021,
+     "welchT": 0.21
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 671,
+     "meanR": -0.025,
+     "welchT": 0.08
+    },
+    "conf": {
+     "n": 817,
+     "meanR": -0.0291,
+     "welchT": -0.86
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | clear | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 2870,
+    "meanR": -0.0383,
+    "tMonth": -1.84,
+    "netR": -0.1057,
+    "tMonthNet": -4.9
+   },
+   "conf": {
+    "n": 3875,
+    "meanR": -0.035,
+    "tMonth": -1.94,
+    "netR": -0.1277,
+    "tMonthNet": -7.04,
+    "p": 0.0544,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1406,
+     "meanR": -0.0498,
+     "welchT": 0.36
+    },
+    "conf": {
+     "n": 1684,
+     "meanR": -0.0482,
+     "welchT": 0.46
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2868,
+     "meanR": 0.0032,
+     "welchT": -1.61
+    },
+    "conf": {
+     "n": 3869,
+     "meanR": -0.0025,
+     "welchT": -1.44
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | clear | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 2870,
+    "meanR": -0.0703,
+    "tMonth": -2.73,
+    "netR": -0.1377,
+    "tMonthNet": -5.24
+   },
+   "conf": {
+    "n": 3875,
+    "meanR": -0.0531,
+    "tMonth": -2.26,
+    "netR": -0.1458,
+    "tMonthNet": -6.31,
+    "p": 0.0254,
+    "holm": 0.813
+   },
+   "plain": {
+    "disc": {
+     "n": 1406,
+     "meanR": -0.0596,
+     "welchT": -0.25
+    },
+    "conf": {
+     "n": 1684,
+     "meanR": -0.0292,
+     "welchT": -0.61
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2868,
+     "meanR": -0.0207,
+     "welchT": -1.43
+    },
+    "conf": {
+     "n": 3869,
+     "meanR": 0.0119,
+     "welchT": -2.12
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | clear | ext",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 2245,
+    "meanR": -0.1074,
+    "tMonth": -2.97,
+    "netR": -0.1813,
+    "tMonthNet": -4.93
+   },
+   "conf": {
+    "n": 3050,
+    "meanR": -0.0452,
+    "tMonth": -1.45,
+    "netR": -0.1455,
+    "tMonthNet": -4.7,
+    "p": 0.1493,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1071,
+     "meanR": -0.1108,
+     "welchT": 0.06
+    },
+    "conf": {
+     "n": 1308,
+     "meanR": -0.1036,
+     "welchT": 1.17
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2243,
+     "meanR": -0.0094,
+     "welchT": -2.14
+    },
+    "conf": {
+     "n": 3045,
+     "meanR": -0.0037,
+     "welchT": -1.01
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | inside | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 5215,
+    "meanR": -0.0689,
+    "tMonth": -5.19,
+    "netR": -0.1291,
+    "tMonthNet": -9.52
+   },
+   "conf": {
+    "n": 6289,
+    "meanR": -0.0353,
+    "tMonth": -2.59,
+    "netR": -0.1214,
+    "tMonthNet": -8.71,
+    "p": 0.0106,
+    "holm": 0.371
+   },
+   "plain": {
+    "disc": {
+     "n": 2268,
+     "meanR": -0.026,
+     "welchT": -1.75
+    },
+    "conf": {
+     "n": 2503,
+     "meanR": -0.0705,
+     "welchT": 1.51
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 5207,
+     "meanR": 0.0253,
+     "welchT": -4.96
+    },
+    "conf": {
+     "n": 6276,
+     "meanR": -0.0064,
+     "welchT": -1.65
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | inside | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 5215,
+    "meanR": -0.0904,
+    "tMonth": -5.34,
+    "netR": -0.1506,
+    "tMonthNet": -8.75
+   },
+   "conf": {
+    "n": 6289,
+    "meanR": -0.0421,
+    "tMonth": -2.33,
+    "netR": -0.1282,
+    "tMonthNet": -6.86,
+    "p": 0.0212,
+    "holm": 0.721
+   },
+   "plain": {
+    "disc": {
+     "n": 2268,
+     "meanR": -0.0513,
+     "welchT": -1.2
+    },
+    "conf": {
+     "n": 2503,
+     "meanR": -0.0679,
+     "welchT": 0.82
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 5207,
+     "meanR": 0.0502,
+     "welchT": -5.46
+    },
+    "conf": {
+     "n": 6276,
+     "meanR": 0.0324,
+     "welchT": -3.1
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | inside | ext",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 2056,
+    "meanR": -0.127,
+    "tMonth": -4.25,
+    "netR": -0.208,
+    "tMonthNet": -6.74
+   },
+   "conf": {
+    "n": 2516,
+    "meanR": -0.0857,
+    "tMonth": -2.96,
+    "netR": -0.2005,
+    "tMonthNet": -6.6,
+    "p": 0.0036,
+    "holm": 0.137
+   },
+   "plain": {
+    "disc": {
+     "n": 769,
+     "meanR": -0.0571,
+     "welchT": -1.21
+    },
+    "conf": {
+     "n": 842,
+     "meanR": -0.0647,
+     "welchT": -0.37
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2054,
+     "meanR": 0.036,
+     "welchT": -3.75
+    },
+    "conf": {
+     "n": 2515,
+     "meanR": -0.011,
+     "welchT": -1.88
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | clear | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 3466,
+    "meanR": -0.043,
+    "tMonth": -2.3,
+    "netR": -0.1072,
+    "tMonthNet": -5.63
+   },
+   "conf": {
+    "n": 4576,
+    "meanR": -0.0362,
+    "tMonth": -2.28,
+    "netR": -0.1268,
+    "tMonthNet": -7.72,
+    "p": 0.0241,
+    "holm": 0.795
+   },
+   "plain": {
+    "disc": {
+     "n": 810,
+     "meanR": -0.038,
+     "welchT": -0.13
+    },
+    "conf": {
+     "n": 983,
+     "meanR": -0.0524,
+     "welchT": 0.47
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 3458,
+     "meanR": -0.0222,
+     "welchT": -0.89
+    },
+    "conf": {
+     "n": 4564,
+     "meanR": -0.0294,
+     "welchT": -0.32
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | clear | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 3466,
+    "meanR": -0.0689,
+    "tMonth": -2.99,
+    "netR": -0.1331,
+    "tMonthNet": -5.72
+   },
+   "conf": {
+    "n": 4576,
+    "meanR": -0.0471,
+    "tMonth": -2.21,
+    "netR": -0.1378,
+    "tMonthNet": -6.43,
+    "p": 0.0287,
+    "holm": 0.89
+   },
+   "plain": {
+    "disc": {
+     "n": 810,
+     "meanR": -0.058,
+     "welchT": -0.21
+    },
+    "conf": {
+     "n": 983,
+     "meanR": -0.04,
+     "welchT": -0.15
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 3458,
+     "meanR": -0.0183,
+     "welchT": -1.6
+    },
+    "conf": {
+     "n": 4564,
+     "meanR": -0.0271,
+     "welchT": -0.71
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | clear | ext",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 2655,
+    "meanR": -0.1106,
+    "tMonth": -3.28,
+    "netR": -0.1807,
+    "tMonthNet": -5.3
+   },
+   "conf": {
+    "n": 3580,
+    "meanR": -0.0485,
+    "tMonth": -1.68,
+    "netR": -0.1476,
+    "tMonthNet": -5.07,
+    "p": 0.0952,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 661,
+     "meanR": -0.0998,
+     "welchT": -0.16
+    },
+    "conf": {
+     "n": 778,
+     "meanR": -0.128,
+     "welchT": 1.34
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 2652,
+     "meanR": 0.0062,
+     "welchT": -2.87
+    },
+    "conf": {
+     "n": 3570,
+     "meanR": -0.0202,
+     "welchT": -0.76
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | inside | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 5497,
+    "meanR": -0.0613,
+    "tMonth": -5.17,
+    "netR": -0.1164,
+    "tMonthNet": -9.45
+   },
+   "conf": {
+    "n": 6422,
+    "meanR": -0.047,
+    "tMonth": -3.36,
+    "netR": -0.1249,
+    "tMonthNet": -8.82,
+    "p": 0.001,
+    "holm": 0.042
+   },
+   "plain": {
+    "disc": {
+     "n": 1986,
+     "meanR": -0.0407,
+     "welchT": -0.81
+    },
+    "conf": {
+     "n": 2370,
+     "meanR": -0.0407,
+     "welchT": -0.27
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 5491,
+     "meanR": 0.0008,
+     "welchT": -3.35
+    },
+    "conf": {
+     "n": 6409,
+     "meanR": -0.0071,
+     "welchT": -2.3
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | inside | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 5497,
+    "meanR": -0.0851,
+    "tMonth": -5.05,
+    "netR": -0.1401,
+    "tMonthNet": -8.21
+   },
+   "conf": {
+    "n": 6422,
+    "meanR": -0.0573,
+    "tMonth": -3.17,
+    "netR": -0.1351,
+    "tMonthNet": -7.33,
+    "p": 0.0019,
+    "holm": 0.076
+   },
+   "plain": {
+    "disc": {
+     "n": 1986,
+     "meanR": -0.0605,
+     "welchT": -0.72
+    },
+    "conf": {
+     "n": 2370,
+     "meanR": -0.0281,
+     "welchT": -0.9
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 5491,
+     "meanR": 0.0272,
+     "welchT": -4.49
+    },
+    "conf": {
+     "n": 6409,
+     "meanR": 0.0129,
+     "welchT": -2.98
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | inside | ext",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 1919,
+    "meanR": -0.1056,
+    "tMonth": -3.21,
+    "netR": -0.1789,
+    "tMonthNet": -5.23
+   },
+   "conf": {
+    "n": 2321,
+    "meanR": -0.0857,
+    "tMonth": -2.8,
+    "netR": -0.1896,
+    "tMonthNet": -6,
+    "p": 0.0058,
+    "holm": 0.215
+   },
+   "plain": {
+    "disc": {
+     "n": 906,
+     "meanR": -0.1131,
+     "welchT": 0.13
+    },
+    "conf": {
+     "n": 1037,
+     "meanR": -0.0688,
+     "welchT": -0.32
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1917,
+     "meanR": 0.0083,
+     "welchT": -2.63
+    },
+    "conf": {
+     "n": 2316,
+     "meanR": -0.0015,
+     "welchT": -2.01
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EG | pooled | 1R",
+   "set": 1,
+   "l": 0,
+   "s": 0,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 1080,
+    "meanR": -0.0199,
+    "tMonth": -0.59,
+    "netR": -0.2538,
+    "tMonthNet": -6.86
+   },
+   "conf": {
+    "n": 1163,
+    "meanR": 0.0113,
+    "tMonth": 0.39,
+    "netR": -0.3588,
+    "tMonthNet": -5.74,
+    "p": 0.6971,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 342,
+     "meanR": 0.0737,
+     "welchT": -1.49
+    },
+    "conf": {
+     "n": 345,
+     "meanR": 0.0087,
+     "welchT": 0.04
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1080,
+     "meanR": -0.0195,
+     "welchT": -0.01
+    },
+    "conf": {
+     "n": 1160,
+     "meanR": -0.0943,
+     "welchT": 2.53
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EG | pooled | 2R",
+   "set": 1,
+   "l": 0,
+   "s": 0,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 1080,
+    "meanR": 0.0475,
+    "tMonth": 1.09,
+    "netR": -0.1865,
+    "tMonthNet": -4.02
+   },
+   "conf": {
+    "n": 1163,
+    "meanR": 0.0838,
+    "tMonth": 1.81,
+    "netR": -0.2863,
+    "tMonthNet": -3.99,
+    "p": 0.0724,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 342,
+     "meanR": 0.1922,
+     "welchT": -1.58
+    },
+    "conf": {
+     "n": 345,
+     "meanR": 0.0486,
+     "welchT": 0.4
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1080,
+     "meanR": 0.0484,
+     "welchT": -0.02
+    },
+    "conf": {
+     "n": 1160,
+     "meanR": -0.1012,
+     "welchT": 3.14
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EF | pooled | 1R",
+   "set": 1,
+   "l": 0,
+   "s": 1,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 1118,
+    "meanR": -0.0091,
+    "tMonth": -0.3,
+    "netR": -0.2293,
+    "tMonthNet": -6.86
+   },
+   "conf": {
+    "n": 1196,
+    "meanR": -0.0167,
+    "tMonth": -0.59,
+    "netR": -0.3427,
+    "tMonthNet": -6.17,
+    "p": 0.5561,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 304,
+     "meanR": 0.0459,
+     "welchT": -0.84
+    },
+    "conf": {
+     "n": 312,
+     "meanR": 0.1157,
+     "welchT": -2.09
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1116,
+     "meanR": 0.0039,
+     "welchT": -0.3
+    },
+    "conf": {
+     "n": 1195,
+     "meanR": -0.0709,
+     "welchT": 1.32
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EF | pooled | 2R",
+   "set": 1,
+   "l": 0,
+   "s": 1,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 1118,
+    "meanR": 0.0604,
+    "tMonth": 1.54,
+    "netR": -0.1598,
+    "tMonthNet": -3.76
+   },
+   "conf": {
+    "n": 1196,
+    "meanR": 0.0588,
+    "tMonth": 1.45,
+    "netR": -0.2672,
+    "tMonthNet": -4.33,
+    "p": 0.1493,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 304,
+     "meanR": 0.1629,
+     "welchT": -1.08
+    },
+    "conf": {
+     "n": 312,
+     "meanR": 0.1407,
+     "welchT": -0.88
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 1116,
+     "meanR": 0.0831,
+     "welchT": -0.37
+    },
+    "conf": {
+     "n": 1195,
+     "meanR": -0.0632,
+     "welchT": 2.11
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EG | pooled | 1R",
+   "set": 1,
+   "l": 1,
+   "s": 0,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 3326,
+    "meanR": -0.0782,
+    "tMonth": -4.09,
+    "netR": -0.7288,
+    "tMonthNet": -16.81
+   },
+   "conf": {
+    "n": 3948,
+    "meanR": -0.1198,
+    "tMonth": -6.69,
+    "netR": -1.4452,
+    "tMonthNet": -4.89,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 1249,
+     "meanR": -0.1115,
+     "welchT": 0.99
+    },
+    "conf": {
+     "n": 1387,
+     "meanR": -0.1018,
+     "welchT": -0.58
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 3326,
+     "meanR": -0.0535,
+     "welchT": -0.96
+    },
+    "conf": {
+     "n": 3942,
+     "meanR": -0.1413,
+     "welchT": 0.96
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EG | pooled | 2R",
+   "set": 1,
+   "l": 1,
+   "s": 0,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 3326,
+    "meanR": 0.0663,
+    "tMonth": 2.55,
+    "netR": -0.5843,
+    "tMonthNet": -12.74
+   },
+   "conf": {
+    "n": 3948,
+    "meanR": 0.0078,
+    "tMonth": 0.32,
+    "netR": -1.3175,
+    "tMonthNet": -4.48,
+    "p": 0.7494,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1249,
+     "meanR": 0.0166,
+     "welchT": 1.04
+    },
+    "conf": {
+     "n": 1387,
+     "meanR": 0.0793,
+     "welchT": -1.59
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 3326,
+     "meanR": 0.0982,
+     "welchT": -0.88
+    },
+    "conf": {
+     "n": 3942,
+     "meanR": -0.0416,
+     "welchT": 1.53
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EF | pooled | 1R",
+   "set": 1,
+   "l": 1,
+   "s": 1,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 3540,
+    "meanR": -0.0954,
+    "tMonth": -5.3,
+    "netR": -0.8893,
+    "tMonthNet": -9.78
+   },
+   "conf": {
+    "n": 4106,
+    "meanR": -0.1329,
+    "tMonth": -7.54,
+    "netR": -1.0744,
+    "tMonthNet": -11.77,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 1035,
+     "meanR": -0.0595,
+     "welchT": -1.01
+    },
+    "conf": {
+     "n": 1229,
+     "meanR": -0.0558,
+     "welchT": -2.36
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 3539,
+     "meanR": -0.0646,
+     "welchT": -1.26
+    },
+    "conf": {
+     "n": 4102,
+     "meanR": -0.1244,
+     "welchT": -0.39
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EF | pooled | 2R",
+   "set": 1,
+   "l": 1,
+   "s": 1,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 3540,
+    "meanR": 0.0401,
+    "tMonth": 1.6,
+    "netR": -0.7538,
+    "tMonthNet": -8.27
+   },
+   "conf": {
+    "n": 4106,
+    "meanR": 0.0088,
+    "tMonth": 0.35,
+    "netR": -0.9328,
+    "tMonthNet": -10.07,
+    "p": 0.7269,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1035,
+     "meanR": 0.0959,
+     "welchT": -1.09
+    },
+    "conf": {
+     "n": 1229,
+     "meanR": 0.0854,
+     "welchT": -1.64
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 3539,
+     "meanR": 0.0822,
+     "welchT": -1.22
+    },
+    "conf": {
+     "n": 4102,
+     "meanR": -0.0293,
+     "welchT": 1.22
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EG | pooled | 1R",
+   "set": 1,
+   "l": 2,
+   "s": 0,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 7793,
+    "meanR": -0.2205,
+    "tMonth": -17.38,
+    "netR": -2.0567,
+    "tMonthNet": -6.96
+   },
+   "conf": {
+    "n": 9779,
+    "meanR": -0.2542,
+    "tMonth": -18.99,
+    "netR": -2.415,
+    "tMonthNet": -12.16,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 3505,
+     "meanR": -0.1914,
+     "welchT": -1.35
+    },
+    "conf": {
+     "n": 4014,
+     "meanR": -0.2324,
+     "welchT": -1.14
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 7793,
+     "meanR": -0.2272,
+     "welchT": 0.42
+    },
+    "conf": {
+     "n": 9767,
+     "meanR": -0.2748,
+     "welchT": 1.37
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EG | pooled | 2R",
+   "set": 1,
+   "l": 2,
+   "s": 0,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 7793,
+    "meanR": -0.0389,
+    "tMonth": -2.52,
+    "netR": -1.8751,
+    "tMonthNet": -6.35
+   },
+   "conf": {
+    "n": 9779,
+    "meanR": -0.0551,
+    "tMonth": -3.26,
+    "netR": -2.216,
+    "tMonthNet": -11.2,
+    "p": 0.0014,
+    "holm": 0.0574
+   },
+   "plain": {
+    "disc": {
+     "n": 3505,
+     "meanR": -0.015,
+     "welchT": -0.8
+    },
+    "conf": {
+     "n": 4014,
+     "meanR": -0.038,
+     "welchT": -0.63
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 7793,
+     "meanR": -0.057,
+     "welchT": 0.8
+    },
+    "conf": {
+     "n": 9767,
+     "meanR": -0.1023,
+     "welchT": 2.26
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EF | pooled | 1R",
+   "set": 1,
+   "l": 2,
+   "s": 1,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 8616,
+    "meanR": -0.2188,
+    "tMonth": -16.99,
+    "netR": -2.0812,
+    "tMonthNet": -7.53
+   },
+   "conf": {
+    "n": 10566,
+    "meanR": -0.2552,
+    "tMonth": -19.49,
+    "netR": -2.471,
+    "tMonthNet": -12.25,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 2682,
+     "meanR": -0.188,
+     "welchT": -1.33
+    },
+    "conf": {
+     "n": 3227,
+     "meanR": -0.2237,
+     "welchT": -1.54
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 8614,
+     "meanR": -0.2356,
+     "welchT": 0.9
+    },
+    "conf": {
+     "n": 10557,
+     "meanR": -0.2549,
+     "welchT": -0.01
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EF | pooled | 2R",
+   "set": 1,
+   "l": 2,
+   "s": 1,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 8616,
+    "meanR": -0.0437,
+    "tMonth": -2.79,
+    "netR": -1.9061,
+    "tMonthNet": -6.89
+   },
+   "conf": {
+    "n": 10566,
+    "meanR": -0.0596,
+    "tMonth": -3.72,
+    "netR": -2.2754,
+    "tMonthNet": -11.26,
+    "p": 0.0003,
+    "holm": 0.0132
+   },
+   "plain": {
+    "disc": {
+     "n": 2682,
+     "meanR": 0.0077,
+     "welchT": -1.59
+    },
+    "conf": {
+     "n": 3227,
+     "meanR": -0.0191,
+     "welchT": -1.39
+    }
+   },
+   "noStory": {
+    "disc": {
+     "n": 8614,
+     "meanR": -0.0491,
+     "welchT": 0.22
+    },
+    "conf": {
+     "n": 10557,
+     "meanR": -0.0769,
+     "welchT": 0.66
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  }
+ ],
+ "placebo": [
+  {
+   "cell": "with | H4>H1 | EG | clear | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 419,
+    "meanR": -0.0098,
+    "tMonth": -0.2,
+    "netR": -0.0276,
+    "tMonthNet": -0.55
+   },
+   "conf": {
+    "n": 480,
+    "meanR": 0.0058,
+    "tMonth": 0.13,
+    "netR": -0.0165,
+    "tMonthNet": -0.38,
+    "p": 0.8968,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 124,
+     "meanR": 0.0254,
+     "welchT": -0.37
+    },
+    "conf": {
+     "n": 140,
+     "meanR": -0.0886,
+     "welchT": 1.1
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | clear | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 419,
+    "meanR": 0.0225,
+    "tMonth": 0.36,
+    "netR": 0.0047,
+    "tMonthNet": 0.08
+   },
+   "conf": {
+    "n": 480,
+    "meanR": 0.0789,
+    "tMonth": 1.41,
+    "netR": 0.0567,
+    "tMonthNet": 1.02,
+    "p": 0.1607,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 124,
+     "meanR": 0.0999,
+     "welchT": -0.63
+    },
+    "conf": {
+     "n": 140,
+     "meanR": -0.1527,
+     "welchT": 2.21
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | clear | ext",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 307,
+    "meanR": 0.0464,
+    "tMonth": 0.58,
+    "netR": 0.0261,
+    "tMonthNet": 0.33
+   },
+   "conf": {
+    "n": 363,
+    "meanR": 0.049,
+    "tMonth": 0.74,
+    "netR": 0.0249,
+    "tMonthNet": 0.38,
+    "p": 0.4605,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 84,
+     "meanR": 0.1687,
+     "welchT": -0.77
+    },
+    "conf": {
+     "n": 100,
+     "meanR": -0.0292,
+     "welchT": 0.5
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | inside | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 655,
+    "meanR": 0.0116,
+    "tMonth": 0.26,
+    "netR": -0.0073,
+    "tMonthNet": -0.16
+   },
+   "conf": {
+    "n": 672,
+    "meanR": 0.0371,
+    "tMonth": 0.96,
+    "netR": 0.0156,
+    "tMonthNet": 0.4,
+    "p": 0.3387,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 213,
+     "meanR": 0.125,
+     "welchT": -1.56
+    },
+    "conf": {
+     "n": 205,
+     "meanR": -0.0273,
+     "welchT": 0.88
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | inside | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 655,
+    "meanR": 0.0091,
+    "tMonth": 0.17,
+    "netR": -0.0099,
+    "tMonthNet": -0.19
+   },
+   "conf": {
+    "n": 672,
+    "meanR": 0.0745,
+    "tMonth": 1.45,
+    "netR": 0.053,
+    "tMonthNet": 1.03,
+    "p": 0.1493,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 213,
+     "meanR": 0.1441,
+     "welchT": -1.43
+    },
+    "conf": {
+     "n": 205,
+     "meanR": 0.0547,
+     "welchT": 0.21
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EG | inside | ext",
+   "set": 0,
+   "l": 0,
+   "s": 0,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 184,
+    "meanR": -0.0367,
+    "tMonth": -0.36,
+    "netR": -0.0647,
+    "tMonthNet": -0.63
+   },
+   "conf": {
+    "n": 215,
+    "meanR": -0.028,
+    "tMonth": -0.33,
+    "netR": -0.056,
+    "tMonthNet": -0.66,
+    "p": 0.7419,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 35,
+     "meanR": 0.4127,
+     "welchT": -2.09
+    },
+    "conf": {
+     "n": 46,
+     "meanR": 0.0589,
+     "welchT": -0.41
+    }
+   },
+   "bar": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | clear | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 454,
+    "meanR": 0.0269,
+    "tMonth": 0.56,
+    "netR": 0.0097,
+    "tMonthNet": 0.2
+   },
+   "conf": {
+    "n": 524,
+    "meanR": 0.0046,
+    "tMonth": 0.12,
+    "netR": -0.0159,
+    "tMonthNet": -0.41,
+    "p": 0.9047,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 89,
+     "meanR": -0.1478,
+     "welchT": 1.59
+    },
+    "conf": {
+     "n": 96,
+     "meanR": -0.1256,
+     "welchT": 1.26
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | clear | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 454,
+    "meanR": 0.0454,
+    "tMonth": 0.73,
+    "netR": 0.0282,
+    "tMonthNet": 0.45
+   },
+   "conf": {
+    "n": 524,
+    "meanR": 0.0497,
+    "tMonth": 0.94,
+    "netR": 0.0292,
+    "tMonthNet": 0.55,
+    "p": 0.3488,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 89,
+     "meanR": 0.0137,
+     "welchT": 0.22
+    },
+    "conf": {
+     "n": 96,
+     "meanR": -0.0997,
+     "welchT": 1.15
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | clear | ext",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 323,
+    "meanR": 0.0861,
+    "tMonth": 1.12,
+    "netR": 0.0663,
+    "tMonthNet": 0.86
+   },
+   "conf": {
+    "n": 388,
+    "meanR": 0.0627,
+    "tMonth": 0.94,
+    "netR": 0.0399,
+    "tMonthNet": 0.6,
+    "p": 0.3488,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 68,
+     "meanR": 0.0088,
+     "welchT": 0.4
+    },
+    "conf": {
+     "n": 75,
+     "meanR": -0.1263,
+     "welchT": 1.03
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | inside | 1R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 659,
+    "meanR": 0.0332,
+    "tMonth": 0.8,
+    "netR": 0.0161,
+    "tMonthNet": 0.39
+   },
+   "conf": {
+    "n": 663,
+    "meanR": 0.0019,
+    "tMonth": 0.05,
+    "netR": -0.0182,
+    "tMonthNet": -0.49,
+    "p": 0.9602,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 209,
+     "meanR": 0.0593,
+     "welchT": -0.35
+    },
+    "conf": {
+     "n": 214,
+     "meanR": 0.0844,
+     "welchT": -1.13
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | inside | 2R",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 659,
+    "meanR": 0.0494,
+    "tMonth": 0.96,
+    "netR": 0.0323,
+    "tMonthNet": 0.63
+   },
+   "conf": {
+    "n": 663,
+    "meanR": 0.0652,
+    "tMonth": 1.28,
+    "netR": 0.0452,
+    "tMonthNet": 0.89,
+    "p": 0.2026,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 209,
+     "meanR": 0.0196,
+     "welchT": 0.31
+    },
+    "conf": {
+     "n": 214,
+     "meanR": 0.0842,
+     "welchT": -0.2
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H4>H1 | EF | inside | ext",
+   "set": 0,
+   "l": 0,
+   "s": 1,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 158,
+    "meanR": 0.0424,
+    "tMonth": 0.39,
+    "netR": 0.0175,
+    "tMonthNet": 0.16
+   },
+   "conf": {
+    "n": 187,
+    "meanR": 0.0327,
+    "tMonth": 0.38,
+    "netR": 0.0102,
+    "tMonthNet": 0.12,
+    "p": 0.7045,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 61,
+     "meanR": 0.0162,
+     "welchT": 0.14
+    },
+    "conf": {
+     "n": 74,
+     "meanR": -0.1274,
+     "welchT": 0.93
+    }
+   },
+   "bar": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | clear | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 1098,
+    "meanR": 0.0378,
+    "tMonth": 1.22,
+    "netR": 0.0005,
+    "tMonthNet": 0.02
+   },
+   "conf": {
+    "n": 1408,
+    "meanR": 0.0522,
+    "tMonth": 2.05,
+    "netR": -0.0012,
+    "tMonthNet": -0.05,
+    "p": 0.0422,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 432,
+     "meanR": 0.0713,
+     "welchT": -0.62
+    },
+    "conf": {
+     "n": 511,
+     "meanR": 0.1182,
+     "welchT": -1.34
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | clear | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 1098,
+    "meanR": 0.0361,
+    "tMonth": 0.9,
+    "netR": -0.0011,
+    "tMonthNet": -0.03
+   },
+   "conf": {
+    "n": 1408,
+    "meanR": 0.0517,
+    "tMonth": 1.41,
+    "netR": -0.0017,
+    "tMonthNet": -0.05,
+    "p": 0.1607,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 432,
+     "meanR": 0.1783,
+     "welchT": -1.92
+    },
+    "conf": {
+     "n": 511,
+     "meanR": 0.1788,
+     "welchT": -1.88
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | clear | ext",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 819,
+    "meanR": 0.0697,
+    "tMonth": 1.3,
+    "netR": 0.0305,
+    "tMonthNet": 0.57
+   },
+   "conf": {
+    "n": 1076,
+    "meanR": 0.0322,
+    "tMonth": 0.69,
+    "netR": -0.0267,
+    "tMonthNet": -0.57,
+    "p": 0.4913,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 320,
+     "meanR": 0.1367,
+     "welchT": -0.73
+    },
+    "conf": {
+     "n": 363,
+     "meanR": 0.1719,
+     "welchT": -1.53
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | inside | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 2260,
+    "meanR": 0.023,
+    "tMonth": 1.14,
+    "netR": -0.0136,
+    "tMonthNet": -0.67
+   },
+   "conf": {
+    "n": 2558,
+    "meanR": 0.0341,
+    "tMonth": 1.63,
+    "netR": -0.0142,
+    "tMonthNet": -0.67,
+    "p": 0.1053,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 829,
+     "meanR": -0.0129,
+     "welchT": 0.93
+    },
+    "conf": {
+     "n": 888,
+     "meanR": 0.0191,
+     "welchT": 0.4
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | inside | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 2260,
+    "meanR": 0.0195,
+    "tMonth": 0.75,
+    "netR": -0.0171,
+    "tMonthNet": -0.65
+   },
+   "conf": {
+    "n": 2558,
+    "meanR": 0.0512,
+    "tMonth": 1.95,
+    "netR": 0.003,
+    "tMonthNet": 0.11,
+    "p": 0.0532,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 829,
+     "meanR": 0.0179,
+     "welchT": 0.03
+    },
+    "conf": {
+     "n": 888,
+     "meanR": 0.038,
+     "welchT": 0.27
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EG | inside | ext",
+   "set": 0,
+   "l": 1,
+   "s": 0,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 786,
+    "meanR": -0.0442,
+    "tMonth": -1,
+    "netR": -0.0938,
+    "tMonthNet": -2.13
+   },
+   "conf": {
+    "n": 915,
+    "meanR": 0.0228,
+    "tMonth": 0.52,
+    "netR": -0.0428,
+    "tMonthNet": -0.98,
+    "p": 0.6039,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 231,
+     "meanR": 0.1223,
+     "welchT": -1.7
+    },
+    "conf": {
+     "n": 278,
+     "meanR": 0.0719,
+     "welchT": -0.56
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | clear | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 1290,
+    "meanR": 0.0426,
+    "tMonth": 1.56,
+    "netR": 0.0061,
+    "tMonthNet": 0.22
+   },
+   "conf": {
+    "n": 1589,
+    "meanR": 0.0856,
+    "tMonth": 3.28,
+    "netR": 0.0342,
+    "tMonthNet": 1.31,
+    "p": 0.0013,
+    "holm": 0.0481
+   },
+   "plain": {
+    "disc": {
+     "n": 240,
+     "meanR": 0.0723,
+     "welchT": -0.44
+    },
+    "conf": {
+     "n": 330,
+     "meanR": -0.0064,
+     "welchT": 1.58
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": true,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | clear | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 1290,
+    "meanR": 0.082,
+    "tMonth": 2.2,
+    "netR": 0.0455,
+    "tMonthNet": 1.22
+   },
+   "conf": {
+    "n": 1589,
+    "meanR": 0.0938,
+    "tMonth": 2.49,
+    "netR": 0.0424,
+    "tMonthNet": 1.13,
+    "p": 0.0139,
+    "holm": 0.473
+   },
+   "plain": {
+    "disc": {
+     "n": 240,
+     "meanR": 0.0455,
+     "welchT": 0.4
+    },
+    "conf": {
+     "n": 330,
+     "meanR": 0.0459,
+     "welchT": 0.61
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | clear | ext",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 952,
+    "meanR": 0.1008,
+    "tMonth": 2.04,
+    "netR": 0.0614,
+    "tMonthNet": 1.24
+   },
+   "conf": {
+    "n": 1171,
+    "meanR": 0.0837,
+    "tMonth": 1.71,
+    "netR": 0.0261,
+    "tMonthNet": 0.53,
+    "p": 0.0895,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 187,
+     "meanR": 0.026,
+     "welchT": 0.66
+    },
+    "conf": {
+     "n": 268,
+     "meanR": -0.0035,
+     "welchT": 0.9
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | inside | 1R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 2283,
+    "meanR": 0.017,
+    "tMonth": 0.79,
+    "netR": -0.0183,
+    "tMonthNet": -0.84
+   },
+   "conf": {
+    "n": 2537,
+    "meanR": 0.0333,
+    "tMonth": 1.73,
+    "netR": -0.0106,
+    "tMonthNet": -0.55,
+    "p": 0.0858,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 806,
+     "meanR": 0.0031,
+     "welchT": 0.35
+    },
+    "conf": {
+     "n": 909,
+     "meanR": 0.0217,
+     "welchT": 0.31
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | inside | 2R",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 2283,
+    "meanR": 0.0345,
+    "tMonth": 1.23,
+    "netR": -0.0008,
+    "tMonthNet": -0.03
+   },
+   "conf": {
+    "n": 2537,
+    "meanR": 0.0546,
+    "tMonth": 2.09,
+    "netR": 0.0107,
+    "tMonthNet": 0.41,
+    "p": 0.0384,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 806,
+     "meanR": -0.0245,
+     "welchT": 1.13
+    },
+    "conf": {
+     "n": 909,
+     "meanR": 0.029,
+     "welchT": 0.51
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | H1>M15 | EF | inside | ext",
+   "set": 0,
+   "l": 1,
+   "s": 1,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 673,
+    "meanR": 0.0018,
+    "tMonth": 0.04,
+    "netR": -0.0462,
+    "tMonthNet": -1.01
+   },
+   "conf": {
+    "n": 819,
+    "meanR": 0.0263,
+    "tMonth": 0.61,
+    "netR": -0.0343,
+    "tMonthNet": -0.79,
+    "p": 0.5428,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 344,
+     "meanR": -0.0224,
+     "welchT": 0.28
+    },
+    "conf": {
+     "n": 374,
+     "meanR": 0.0515,
+     "welchT": -0.3
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | clear | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 2870,
+    "meanR": 0.0362,
+    "tMonth": 1.74,
+    "netR": -0.0313,
+    "tMonthNet": -1.52
+   },
+   "conf": {
+    "n": 3875,
+    "meanR": 0.0304,
+    "tMonth": 1.69,
+    "netR": -0.0623,
+    "tMonthNet": -3.29,
+    "p": 0.0932,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1406,
+     "meanR": 0.0484,
+     "welchT": -0.38
+    },
+    "conf": {
+     "n": 1684,
+     "meanR": 0.0447,
+     "welchT": -0.49
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | clear | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 2870,
+    "meanR": 0.0198,
+    "tMonth": 0.7,
+    "netR": -0.0476,
+    "tMonthNet": -1.69
+   },
+   "conf": {
+    "n": 3875,
+    "meanR": 0.0315,
+    "tMonth": 1.24,
+    "netR": -0.0612,
+    "tMonthNet": -2.35,
+    "p": 0.217,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1406,
+     "meanR": 0.0769,
+     "welchT": -1.3
+    },
+    "conf": {
+     "n": 1684,
+     "meanR": 0.086,
+     "welchT": -1.36
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | clear | ext",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 2245,
+    "meanR": 0.0124,
+    "tMonth": 0.33,
+    "netR": -0.0616,
+    "tMonthNet": -1.66
+   },
+   "conf": {
+    "n": 3050,
+    "meanR": 0.0437,
+    "tMonth": 1.34,
+    "netR": -0.0566,
+    "tMonthNet": -1.7,
+    "p": 0.1824,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 1071,
+     "meanR": 0.0505,
+     "welchT": -0.68
+    },
+    "conf": {
+     "n": 1308,
+     "meanR": 0.0699,
+     "welchT": -0.51
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | inside | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 5215,
+    "meanR": 0.067,
+    "tMonth": 5.1,
+    "netR": 0.0068,
+    "tMonthNet": 0.51
+   },
+   "conf": {
+    "n": 6289,
+    "meanR": 0.0312,
+    "tMonth": 2.28,
+    "netR": -0.0549,
+    "tMonthNet": -3.89,
+    "p": 0.0241,
+    "holm": 0.771
+   },
+   "plain": {
+    "disc": {
+     "n": 2268,
+     "meanR": 0.0242,
+     "welchT": 1.75
+    },
+    "conf": {
+     "n": 2501,
+     "meanR": 0.0649,
+     "welchT": -1.45
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | inside | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 5215,
+    "meanR": 0.0735,
+    "tMonth": 4.04,
+    "netR": 0.0133,
+    "tMonthNet": 0.73
+   },
+   "conf": {
+    "n": 6289,
+    "meanR": 0.0522,
+    "tMonth": 2.98,
+    "netR": -0.0339,
+    "tMonthNet": -1.9,
+    "p": 0.0034,
+    "holm": 0.119
+   },
+   "plain": {
+    "disc": {
+     "n": 2268,
+     "meanR": 0.0004,
+     "welchT": 2.2
+    },
+    "conf": {
+     "n": 2501,
+     "meanR": 0.0702,
+     "welchT": -0.56
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EG | inside | ext",
+   "set": 0,
+   "l": 2,
+   "s": 0,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 2056,
+    "meanR": 0.0552,
+    "tMonth": 1.68,
+    "netR": -0.0257,
+    "tMonthNet": -0.78
+   },
+   "conf": {
+    "n": 2516,
+    "meanR": 0.0553,
+    "tMonth": 1.91,
+    "netR": -0.0595,
+    "tMonthNet": -2.05,
+    "p": 0.0582,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 769,
+     "meanR": -0.039,
+     "welchT": 1.73
+    },
+    "conf": {
+     "n": 842,
+     "meanR": 0.0959,
+     "welchT": -0.72
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | clear | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 0,
+   "x": 0,
+   "disc": {
+    "n": 3466,
+    "meanR": 0.0419,
+    "tMonth": 2.24,
+    "netR": -0.0223,
+    "tMonthNet": -1.19
+   },
+   "conf": {
+    "n": 4576,
+    "meanR": 0.0309,
+    "tMonth": 1.96,
+    "netR": -0.0597,
+    "tMonthNet": -3.65,
+    "p": 0.052,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 810,
+     "meanR": 0.033,
+     "welchT": 0.23
+    },
+    "conf": {
+     "n": 983,
+     "meanR": 0.0524,
+     "welchT": -0.62
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | clear | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 0,
+   "x": 1,
+   "disc": {
+    "n": 3466,
+    "meanR": 0.0481,
+    "tMonth": 1.9,
+    "netR": -0.0161,
+    "tMonthNet": -0.64
+   },
+   "conf": {
+    "n": 4576,
+    "meanR": 0.0411,
+    "tMonth": 1.77,
+    "netR": -0.0495,
+    "tMonthNet": -2.08,
+    "p": 0.0789,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 810,
+     "meanR": -0.0021,
+     "welchT": 0.96
+    },
+    "conf": {
+     "n": 983,
+     "meanR": 0.0802,
+     "welchT": -0.77
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | clear | ext",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 0,
+   "x": 2,
+   "disc": {
+    "n": 2655,
+    "meanR": 0.0211,
+    "tMonth": 0.62,
+    "netR": -0.049,
+    "tMonthNet": -1.43
+   },
+   "conf": {
+    "n": 3580,
+    "meanR": 0.033,
+    "tMonth": 1.09,
+    "netR": -0.066,
+    "tMonthNet": -2.12,
+    "p": 0.2776,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 661,
+     "meanR": 0.0392,
+     "welchT": -0.27
+    },
+    "conf": {
+     "n": 778,
+     "meanR": 0.137,
+     "welchT": -1.53
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | inside | 1R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 1,
+   "x": 0,
+   "disc": {
+    "n": 5497,
+    "meanR": 0.0588,
+    "tMonth": 5,
+    "netR": 0.0038,
+    "tMonthNet": 0.32
+   },
+   "conf": {
+    "n": 6420,
+    "meanR": 0.043,
+    "tMonth": 3.08,
+    "netR": -0.0348,
+    "tMonthNet": -2.43,
+    "p": 0.0025,
+    "holm": 0.09
+   },
+   "plain": {
+    "disc": {
+     "n": 1986,
+     "meanR": 0.0407,
+     "welchT": 0.71
+    },
+    "conf": {
+     "n": 2370,
+     "meanR": 0.0348,
+     "welchT": 0.35
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | inside | 2R",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 1,
+   "x": 1,
+   "disc": {
+    "n": 5497,
+    "meanR": 0.0638,
+    "tMonth": 3.77,
+    "netR": 0.0087,
+    "tMonthNet": 0.52
+   },
+   "conf": {
+    "n": 6420,
+    "meanR": 0.0624,
+    "tMonth": 3.5,
+    "netR": -0.0155,
+    "tMonthNet": -0.85,
+    "p": 0.0006,
+    "holm": 0.0228
+   },
+   "plain": {
+    "disc": {
+     "n": 1986,
+     "meanR": 0.017,
+     "welchT": 1.34
+    },
+    "conf": {
+     "n": 2370,
+     "meanR": 0.0437,
+     "welchT": 0.57
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "with | M30>M5 | EF | inside | ext",
+   "set": 0,
+   "l": 2,
+   "s": 1,
+   "p": 1,
+   "x": 2,
+   "disc": {
+    "n": 1919,
+    "meanR": 0.0295,
+    "tMonth": 0.93,
+    "netR": -0.0439,
+    "tMonthNet": -1.42
+   },
+   "conf": {
+    "n": 2321,
+    "meanR": 0.0781,
+    "tMonth": 2.46,
+    "netR": -0.0258,
+    "tMonthNet": -0.8,
+    "p": 0.0151,
+    "holm": 0.498
+   },
+   "plain": {
+    "disc": {
+     "n": 906,
+     "meanR": 0.0299,
+     "welchT": -0.01
+    },
+    "conf": {
+     "n": 1037,
+     "meanR": 0.0374,
+     "welchT": 0.76
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EG | pooled | 1R",
+   "set": 1,
+   "l": 0,
+   "s": 0,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 1080,
+    "meanR": -0.1227,
+    "tMonth": -3.57,
+    "netR": -0.3567,
+    "tMonthNet": -9.19
+   },
+   "conf": {
+    "n": 1163,
+    "meanR": -0.1334,
+    "tMonth": -4.39,
+    "netR": -0.5035,
+    "tMonthNet": -8.02,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 342,
+     "meanR": -0.1907,
+     "welchT": 1.1
+    },
+    "conf": {
+     "n": 345,
+     "meanR": -0.1246,
+     "welchT": -0.14
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EG | pooled | 2R",
+   "set": 1,
+   "l": 0,
+   "s": 0,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 1080,
+    "meanR": -0.0831,
+    "tMonth": -1.86,
+    "netR": -0.3171,
+    "tMonthNet": -6.6
+   },
+   "conf": {
+    "n": 1163,
+    "meanR": -0.0815,
+    "tMonth": -1.84,
+    "netR": -0.4516,
+    "tMonthNet": -6.65,
+    "p": 0.0679,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 342,
+     "meanR": -0.2376,
+     "welchT": 1.87
+    },
+    "conf": {
+     "n": 345,
+     "meanR": -0.1499,
+     "welchT": 0.82
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EF | pooled | 1R",
+   "set": 1,
+   "l": 0,
+   "s": 1,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 1118,
+    "meanR": -0.1322,
+    "tMonth": -4.2,
+    "netR": -0.3524,
+    "tMonthNet": -10.12
+   },
+   "conf": {
+    "n": 1196,
+    "meanR": -0.1171,
+    "tMonth": -4.09,
+    "netR": -0.4431,
+    "tMonthNet": -7.74,
+    "p": 0.0001,
+    "holm": 0.0039
+   },
+   "plain": {
+    "disc": {
+     "n": 304,
+     "meanR": -0.1643,
+     "welchT": 0.5
+    },
+    "conf": {
+     "n": 312,
+     "meanR": -0.1862,
+     "welchT": 1.1
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H4>H1 | EF | pooled | 2R",
+   "set": 1,
+   "l": 0,
+   "s": 1,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 1118,
+    "meanR": -0.1219,
+    "tMonth": -2.95,
+    "netR": -0.342,
+    "tMonthNet": -7.71
+   },
+   "conf": {
+    "n": 1196,
+    "meanR": -0.0893,
+    "tMonth": -2.14,
+    "netR": -0.4153,
+    "tMonthNet": -6.49,
+    "p": 0.0341,
+    "holm": 1
+   },
+   "plain": {
+    "disc": {
+     "n": 304,
+     "meanR": -0.1144,
+     "welchT": -0.08
+    },
+    "conf": {
+     "n": 312,
+     "meanR": -0.1272,
+     "welchT": 0.43
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EG | pooled | 1R",
+   "set": 1,
+   "l": 1,
+   "s": 0,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 3326,
+    "meanR": -0.2453,
+    "tMonth": -12.18,
+    "netR": -0.8959,
+    "tMonthNet": -18.37
+   },
+   "conf": {
+    "n": 3948,
+    "meanR": -0.2373,
+    "tMonth": -16.12,
+    "netR": -1.5627,
+    "tMonthNet": -5.33,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 1249,
+     "meanR": -0.1991,
+     "welchT": -1.4
+    },
+    "conf": {
+     "n": 1387,
+     "meanR": -0.237,
+     "welchT": -0.01
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EG | pooled | 2R",
+   "set": 1,
+   "l": 1,
+   "s": 0,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 3326,
+    "meanR": -0.1699,
+    "tMonth": -6.55,
+    "netR": -0.8205,
+    "tMonthNet": -16.01
+   },
+   "conf": {
+    "n": 3948,
+    "meanR": -0.1307,
+    "tMonth": -6.32,
+    "netR": -1.456,
+    "tMonthNet": -4.97,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 1249,
+     "meanR": -0.1145,
+     "welchT": -1.21
+    },
+    "conf": {
+     "n": 1387,
+     "meanR": -0.1314,
+     "welchT": 0.02
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EF | pooled | 1R",
+   "set": 1,
+   "l": 1,
+   "s": 1,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 3540,
+    "meanR": -0.2317,
+    "tMonth": -11.57,
+    "netR": -1.0256,
+    "tMonthNet": -10.86
+   },
+   "conf": {
+    "n": 4106,
+    "meanR": -0.2387,
+    "tMonth": -15.11,
+    "netR": -1.1803,
+    "tMonthNet": -13.63,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 1035,
+     "meanR": -0.2362,
+     "welchT": 0.13
+    },
+    "conf": {
+     "n": 1229,
+     "meanR": -0.2322,
+     "welchT": -0.2
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | H1>M15 | EF | pooled | 2R",
+   "set": 1,
+   "l": 1,
+   "s": 1,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 3540,
+    "meanR": -0.1467,
+    "tMonth": -5.58,
+    "netR": -0.9406,
+    "tMonthNet": -9.99
+   },
+   "conf": {
+    "n": 4106,
+    "meanR": -0.1328,
+    "tMonth": -6.64,
+    "netR": -1.0743,
+    "tMonthNet": -12.49,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 1035,
+     "meanR": -0.1823,
+     "welchT": 0.74
+    },
+    "conf": {
+     "n": 1229,
+     "meanR": -0.1244,
+     "welchT": -0.19
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EG | pooled | 1R",
+   "set": 1,
+   "l": 2,
+   "s": 0,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 7793,
+    "meanR": -0.3723,
+    "tMonth": -25.44,
+    "netR": -2.2085,
+    "tMonthNet": -7.53
+   },
+   "conf": {
+    "n": 9779,
+    "meanR": -0.3921,
+    "tMonth": -29.38,
+    "netR": -2.5529,
+    "tMonthNet": -12.89,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 3505,
+     "meanR": -0.3695,
+     "welchT": -0.14
+    },
+    "conf": {
+     "n": 4014,
+     "meanR": -0.366,
+     "welchT": -1.42
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EG | pooled | 2R",
+   "set": 1,
+   "l": 2,
+   "s": 0,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 7793,
+    "meanR": -0.2249,
+    "tMonth": -13.75,
+    "netR": -2.0611,
+    "tMonthNet": -7.05
+   },
+   "conf": {
+    "n": 9779,
+    "meanR": -0.2401,
+    "tMonth": -15.57,
+    "netR": -2.4009,
+    "tMonthNet": -12.1,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 3505,
+     "meanR": -0.2807,
+     "welchT": 2.02
+    },
+    "conf": {
+     "n": 4014,
+     "meanR": -0.2047,
+     "welchT": -1.39
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EF | pooled | 1R",
+   "set": 1,
+   "l": 2,
+   "s": 1,
+   "p": -1,
+   "x": 0,
+   "disc": {
+    "n": 8616,
+    "meanR": -0.388,
+    "tMonth": -30.17,
+    "netR": -2.2503,
+    "tMonthNet": -8.17
+   },
+   "conf": {
+    "n": 10566,
+    "meanR": -0.3914,
+    "tMonth": -31.65,
+    "netR": -2.6072,
+    "tMonthNet": -13.02,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 2682,
+     "meanR": -0.3183,
+     "welchT": -3.12
+    },
+    "conf": {
+     "n": 3227,
+     "meanR": -0.362,
+     "welchT": -1.5
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "against | M30>M5 | EF | pooled | 2R",
+   "set": 1,
+   "l": 2,
+   "s": 1,
+   "p": -1,
+   "x": 1,
+   "disc": {
+    "n": 8616,
+    "meanR": -0.2546,
+    "tMonth": -16.92,
+    "netR": -2.1169,
+    "tMonthNet": -7.71
+   },
+   "conf": {
+    "n": 10566,
+    "meanR": -0.2379,
+    "tMonth": -16.25,
+    "netR": -2.4537,
+    "tMonthNet": -12.2,
+    "p": 0,
+    "holm": 0
+   },
+   "plain": {
+    "disc": {
+     "n": 2682,
+     "meanR": -0.2027,
+     "welchT": -1.71
+    },
+    "conf": {
+     "n": 3227,
+     "meanR": -0.2031,
+     "welchT": -1.28
+    }
+   },
+   "bar": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": true,
+    "control": false
+   },
+   "pass": false
+  }
+ ],
+ "perMarket": []
+}

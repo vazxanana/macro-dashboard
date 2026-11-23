@@ -1,0 +1,1361 @@
+{
+ "study": "fade-zone-targets",
+ "built": "2026-11-23",
+ "verdict": "PASS",
+ "headline": "2 of 6 key-level exits or stops beat the grid's 2R / 1-ATR fade on the same trades before costs; best P3 (zone target and zone stop - grid, all hours) +0.029R a trade in 2015-26 (n 201,769, month t 7.92; 2005-14 +0.053R, t 13.46), only +0.009 in ATR units and -0.060R after costs",
+ "basis": "paired by trade against the grid exit (2R, 1-ATR stop), judged before costs on calendar-month sums; after costs beside",
+ "windows": {
+  "first": "2005-01-01 to 2014-12-31 (120 months)",
+  "second": "2015-01-01 to 2026-10-31 (142 months)"
+ },
+ "markets": [
+  "xau",
+  "xag",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "assumedCosts": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01
+ },
+ "gate": [
+  {
+   "what": "grid 2005-14",
+   "ok": true,
+   "n": 171523,
+   "mean": 0.054233,
+   "want": {
+    "n": 171523,
+    "mean": 0.054233
+   }
+  },
+  {
+   "what": "grid 2015-26",
+   "ok": true,
+   "n": 201769,
+   "mean": 0.042267,
+   "want": {
+    "n": 201769,
+    "mean": 0.042267
+   }
+  },
+  {
+   "what": "fade-conditions 20-23, 2015-26",
+   "ok": true,
+   "n": 27671,
+   "mean": 0.169408,
+   "want": {
+    "n": 27671,
+    "mean": 0.169
+   }
+  }
+ ],
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2009-06-11",
+   "n": 5855,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2017-03-15",
+   "n": 19140,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2024-09-18",
+   "n": 31845,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2009-06-11",
+   "n": 8034,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2017-03-15",
+   "n": 22172,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2024-09-18",
+   "n": 35759,
+   "missing": 0,
+   "extra": 0
+  }
+ ],
+ "cutBad": 0,
+ "meta": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "signals": 35387,
+   "levels": 141717,
+   "trades": 35212,
+   "endMarked": 0
+  },
+  {
+   "market": "xag",
+   "first": "2006-03-19",
+   "signals": 35575,
+   "levels": 140045,
+   "trades": 23331,
+   "endMarked": 0
+  },
+  {
+   "market": "eurusd",
+   "first": "2004-01-01",
+   "signals": 39580,
+   "levels": 155589,
+   "trades": 39526,
+   "endMarked": 0
+  },
+  {
+   "market": "gbpusd",
+   "first": "2004-01-01",
+   "signals": 39311,
+   "levels": 155129,
+   "trades": 39226,
+   "endMarked": 0
+  },
+  {
+   "market": "usdjpy",
+   "first": "2004-01-01",
+   "signals": 38671,
+   "levels": 154755,
+   "trades": 38598,
+   "endMarked": 1
+  },
+  {
+   "market": "audusd",
+   "first": "2004-01-01",
+   "signals": 40108,
+   "levels": 155362,
+   "trades": 40046,
+   "endMarked": 0
+  },
+  {
+   "market": "nzdusd",
+   "first": "2004-01-01",
+   "signals": 39757,
+   "levels": 154662,
+   "trades": 39724,
+   "endMarked": 0
+  },
+  {
+   "market": "usdcad",
+   "first": "2004-01-01",
+   "signals": 39996,
+   "levels": 155186,
+   "trades": 39915,
+   "endMarked": 0
+  },
+  {
+   "market": "usdchf",
+   "first": "2004-01-01",
+   "signals": 39250,
+   "levels": 152926,
+   "trades": 39174,
+   "endMarked": 0
+  },
+  {
+   "market": "eurjpy",
+   "first": "2004-01-01",
+   "signals": 38581,
+   "levels": 154679,
+   "trades": 38540,
+   "endMarked": 0
+  }
+ ],
+ "usage": [
+  {
+   "hours": "all",
+   "n": 373292,
+   "zoneStop": 0.710886,
+   "zoneTargetAtrStop": 0.569254,
+   "zoneTargetZoneStop": 0.644911,
+   "swingFallback": 0.068801
+  },
+  {
+   "hours": "20-23",
+   "n": 53946,
+   "zoneStop": 0.616839,
+   "zoneTargetAtrStop": 0.548159,
+   "zoneTargetZoneStop": 0.587736,
+   "swingFallback": 0.04523
+  }
+ ],
+ "primary": [
+  {
+   "key": "P1",
+   "name": "zone target, ATR stop - grid, all hours",
+   "exit": "zone",
+   "stop": "atr",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.007286,
+    "t": 4.375791,
+    "meanNet": 0.007286,
+    "tNet": 4.38,
+    "median": 0,
+    "win": 0.097
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.001289,
+    "t": 0.955353,
+    "meanNet": 0.001289,
+    "tNet": 0.96,
+    "median": 0,
+    "win": 0.09
+   },
+   "atrUnits": {
+    "first": {
+     "n": 171523,
+     "mean": 0.007286,
+     "t": 4.375791,
+     "meanNet": 0.007286,
+     "tNet": 4.38,
+     "median": 0,
+     "win": 0.097
+    },
+    "second": {
+     "n": 201769,
+     "mean": 0.001289,
+     "t": 0.955353,
+     "meanNet": 0.001289,
+     "tNet": 0.96,
+     "median": 0,
+     "win": 0.09
+    }
+   },
+   "afterCosts": {
+    "first": {
+     "n": 171523,
+     "mean": 0.007286,
+     "t": 4.375791,
+     "meanNet": 0.007286,
+     "tNet": 4.38,
+     "median": 0,
+     "win": 0.097
+    },
+    "second": {
+     "n": 201769,
+     "mean": 0.001289,
+     "t": 0.955353,
+     "meanNet": 0.001289,
+     "tNet": 0.96,
+     "median": 0,
+     "win": 0.09
+    }
+   },
+   "p": 0.170517,
+   "holm": 0.341034,
+   "cond": false,
+   "pass": false,
+   "perMarket": [
+    {
+     "market": "xau",
+     "first": 0.004188,
+     "second": -0.008396,
+     "n1": 15323,
+     "n2": 19889
+    },
+    {
+     "market": "xag",
+     "first": 0.00185,
+     "second": 0.008225,
+     "n1": 10489,
+     "n2": 12842
+    },
+    {
+     "market": "eurusd",
+     "first": 0.005295,
+     "second": -0.000391,
+     "n1": 18270,
+     "n2": 21256
+    },
+    {
+     "market": "gbpusd",
+     "first": -0.002781,
+     "second": 0.003946,
+     "n1": 18265,
+     "n2": 20961
+    },
+    {
+     "market": "usdjpy",
+     "first": 0.01414,
+     "second": -0.000633,
+     "n1": 17953,
+     "n2": 20645
+    },
+    {
+     "market": "audusd",
+     "first": 0.007581,
+     "second": 0.001706,
+     "n1": 18606,
+     "n2": 21440
+    },
+    {
+     "market": "nzdusd",
+     "first": 0.006803,
+     "second": 0.001958,
+     "n1": 18282,
+     "n2": 21442
+    },
+    {
+     "market": "usdcad",
+     "first": 0.00748,
+     "second": 0.004505,
+     "n1": 18428,
+     "n2": 21487
+    },
+    {
+     "market": "usdchf",
+     "first": 0.015602,
+     "second": 0.00387,
+     "n1": 18175,
+     "n2": 20999
+    },
+    {
+     "market": "eurjpy",
+     "first": 0.010124,
+     "second": 0.000161,
+     "n1": 17732,
+     "n2": 20808
+    }
+   ]
+  },
+  {
+   "key": "P2",
+   "name": "zone stop, 2R - grid, all hours",
+   "exit": "2R",
+   "stop": "zone",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.017083,
+    "t": 5.460073,
+    "meanNet": 0.017083,
+    "tNet": 5.46,
+    "median": 0,
+    "win": 0.083
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.004367,
+    "t": 1.403581,
+    "meanNet": 0.004367,
+    "tNet": 1.4,
+    "median": 0,
+    "win": 0.08
+   },
+   "atrUnits": {
+    "first": {
+     "n": 171523,
+     "mean": 0.003892,
+     "t": 1.269047,
+     "meanNet": 0.003892,
+     "tNet": 1.27,
+     "median": 0,
+     "win": 0.401
+    },
+    "second": {
+     "n": 201769,
+     "mean": 0.003217,
+     "t": 1.130464,
+     "meanNet": 0.003217,
+     "tNet": 1.13,
+     "median": 0,
+     "win": 0.4
+    }
+   },
+   "afterCosts": {
+    "first": {
+     "n": 171523,
+     "mean": -0.057826,
+     "t": -17.157799,
+     "meanNet": -0.057826,
+     "tNet": -17.16,
+     "median": 0,
+     "win": 0.26
+    },
+    "second": {
+     "n": 201769,
+     "mean": -0.084418,
+     "t": -26.155505,
+     "meanNet": -0.084418,
+     "tNet": -26.16,
+     "median": 0,
+     "win": 0.257
+    }
+   },
+   "p": 0.081321,
+   "holm": 0.243963,
+   "cond": false,
+   "pass": false,
+   "perMarket": [
+    {
+     "market": "xau",
+     "first": 0.014793,
+     "second": -0.001737,
+     "n1": 15323,
+     "n2": 19889
+    },
+    {
+     "market": "xag",
+     "first": 0.007005,
+     "second": 0.001422,
+     "n1": 10489,
+     "n2": 12842
+    },
+    {
+     "market": "eurusd",
+     "first": 0.006894,
+     "second": 0.005482,
+     "n1": 18270,
+     "n2": 21256
+    },
+    {
+     "market": "gbpusd",
+     "first": 0.016259,
+     "second": -0.00291,
+     "n1": 18265,
+     "n2": 20961
+    },
+    {
+     "market": "usdjpy",
+     "first": 0.043548,
+     "second": 0.009636,
+     "n1": 17953,
+     "n2": 20645
+    },
+    {
+     "market": "audusd",
+     "first": 0.022031,
+     "second": 0.020588,
+     "n1": 18606,
+     "n2": 21440
+    },
+    {
+     "market": "nzdusd",
+     "first": 0.027673,
+     "second": 0.010496,
+     "n1": 18282,
+     "n2": 21442
+    },
+    {
+     "market": "usdcad",
+     "first": -0.000585,
+     "second": -0.000206,
+     "n1": 18428,
+     "n2": 21487
+    },
+    {
+     "market": "usdchf",
+     "first": 0.007458,
+     "second": -0.015094,
+     "n1": 18175,
+     "n2": 20999
+    },
+    {
+     "market": "eurjpy",
+     "first": 0.02169,
+     "second": 0.014312,
+     "n1": 17732,
+     "n2": 20808
+    }
+   ]
+  },
+  {
+   "key": "P3",
+   "name": "zone target and zone stop - grid, all hours",
+   "exit": "zone",
+   "stop": "zone",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.053199,
+    "t": 13.455722,
+    "meanNet": 0.053199,
+    "tNet": 13.46,
+    "median": 0,
+    "win": 0.15
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.028703,
+    "t": 7.924434,
+    "meanNet": 0.028703,
+    "tNet": 7.92,
+    "median": 0,
+    "win": 0.142
+   },
+   "atrUnits": {
+    "first": {
+     "n": 171523,
+     "mean": 0.014744,
+     "t": 4.959662,
+     "meanNet": 0.014744,
+     "tNet": 4.96,
+     "median": 0,
+     "win": 0.443
+    },
+    "second": {
+     "n": 201769,
+     "mean": 0.008628,
+     "t": 3.113282,
+     "meanNet": 0.008628,
+     "tNet": 3.11,
+     "median": 0,
+     "win": 0.437
+    }
+   },
+   "afterCosts": {
+    "first": {
+     "n": 171523,
+     "mean": -0.02171,
+     "t": -5.309956,
+     "meanNet": -0.02171,
+     "tNet": -5.31,
+     "median": 0,
+     "win": 0.3
+    },
+    "second": {
+     "n": 201769,
+     "mean": -0.060082,
+     "t": -16.152505,
+     "meanNet": -0.060082,
+     "tNet": -16.15,
+     "median": 0,
+     "win": 0.293
+    }
+   },
+   "p": 0,
+   "holm": 0,
+   "cond": true,
+   "pass": true,
+   "perMarket": [
+    {
+     "market": "xau",
+     "first": 0.033954,
+     "second": -0.000807,
+     "n1": 15323,
+     "n2": 19889
+    },
+    {
+     "market": "xag",
+     "first": 0.00221,
+     "second": 0.011908,
+     "n1": 10489,
+     "n2": 12842
+    },
+    {
+     "market": "eurusd",
+     "first": 0.041707,
+     "second": 0.029788,
+     "n1": 18270,
+     "n2": 21256
+    },
+    {
+     "market": "gbpusd",
+     "first": 0.057158,
+     "second": 0.023784,
+     "n1": 18265,
+     "n2": 20961
+    },
+    {
+     "market": "usdjpy",
+     "first": 0.083122,
+     "second": 0.02028,
+     "n1": 17953,
+     "n2": 20645
+    },
+    {
+     "market": "audusd",
+     "first": 0.067102,
+     "second": 0.049365,
+     "n1": 18606,
+     "n2": 21440
+    },
+    {
+     "market": "nzdusd",
+     "first": 0.066387,
+     "second": 0.030169,
+     "n1": 18282,
+     "n2": 21442
+    },
+    {
+     "market": "usdcad",
+     "first": 0.060111,
+     "second": 0.045904,
+     "n1": 18428,
+     "n2": 21487
+    },
+    {
+     "market": "usdchf",
+     "first": 0.05382,
+     "second": 0.015712,
+     "n1": 18175,
+     "n2": 20999
+    },
+    {
+     "market": "eurjpy",
+     "first": 0.041459,
+     "second": 0.052029,
+     "n1": 17732,
+     "n2": 20808
+    }
+   ]
+  },
+  {
+   "key": "P4",
+   "name": "zone target, ATR stop - grid, 20-23 UTC",
+   "exit": "zone",
+   "stop": "atr",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.010631,
+    "t": 2.387012,
+    "meanNet": 0.010631,
+    "tNet": 2.39,
+    "median": 0,
+    "win": 0.103
+   },
+   "second": {
+    "n": 27671,
+    "mean": -0.004594,
+    "t": -0.949127,
+    "meanNet": -0.004594,
+    "tNet": -0.95,
+    "median": 0,
+    "win": 0.098
+   },
+   "atrUnits": {
+    "first": {
+     "n": 26275,
+     "mean": 0.010631,
+     "t": 2.387012,
+     "meanNet": 0.010631,
+     "tNet": 2.39,
+     "median": 0,
+     "win": 0.103
+    },
+    "second": {
+     "n": 27671,
+     "mean": -0.004594,
+     "t": -0.949127,
+     "meanNet": -0.004594,
+     "tNet": -0.95,
+     "median": 0,
+     "win": 0.098
+    }
+   },
+   "afterCosts": {
+    "first": {
+     "n": 26275,
+     "mean": 0.010631,
+     "t": 2.387012,
+     "meanNet": 0.010631,
+     "tNet": 2.39,
+     "median": 0,
+     "win": 0.103
+    },
+    "second": {
+     "n": 27671,
+     "mean": -0.004594,
+     "t": -0.949127,
+     "meanNet": -0.004594,
+     "tNet": -0.95,
+     "median": 0,
+     "win": 0.098
+    }
+   },
+   "p": 0.82791,
+   "holm": 0.82791,
+   "cond": false,
+   "pass": false,
+   "perMarket": [
+    {
+     "market": "xau",
+     "first": 0.009019,
+     "second": -0.010177,
+     "n1": 2049,
+     "n2": 2133
+    },
+    {
+     "market": "xag",
+     "first": 0.036688,
+     "second": -0.007965,
+     "n1": 930,
+     "n2": 986
+    },
+    {
+     "market": "eurusd",
+     "first": 0.018161,
+     "second": -0.009648,
+     "n1": 2821,
+     "n2": 2809
+    },
+    {
+     "market": "gbpusd",
+     "first": 0.014244,
+     "second": -0.010154,
+     "n1": 2783,
+     "n2": 2648
+    },
+    {
+     "market": "usdjpy",
+     "first": 0.00403,
+     "second": -0.001208,
+     "n1": 3120,
+     "n2": 3475
+    },
+    {
+     "market": "audusd",
+     "first": 0.00683,
+     "second": 0.007023,
+     "n1": 3135,
+     "n2": 3371
+    },
+    {
+     "market": "nzdusd",
+     "first": 0.009206,
+     "second": -0.019436,
+     "n1": 3105,
+     "n2": 3431
+    },
+    {
+     "market": "usdcad",
+     "first": -0.002857,
+     "second": 0.007915,
+     "n1": 2609,
+     "n2": 2771
+    },
+    {
+     "market": "usdchf",
+     "first": 0.024274,
+     "second": 0.001786,
+     "n1": 2700,
+     "n2": 2659
+    },
+    {
+     "market": "eurjpy",
+     "first": 0.005028,
+     "second": -0.006802,
+     "n1": 3023,
+     "n2": 3388
+    }
+   ]
+  },
+  {
+   "key": "P5",
+   "name": "zone stop, 2R - grid, 20-23 UTC",
+   "exit": "2R",
+   "stop": "zone",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.022479,
+    "t": 3.221042,
+    "meanNet": 0.022479,
+    "tNet": 3.22,
+    "median": 0,
+    "win": 0.082
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.013984,
+    "t": 1.994103,
+    "meanNet": 0.013984,
+    "tNet": 1.99,
+    "median": 0,
+    "win": 0.075
+   },
+   "atrUnits": {
+    "first": {
+     "n": 26275,
+     "mean": -0.015377,
+     "t": -2.238713,
+     "meanNet": -0.015377,
+     "tNet": -2.24,
+     "median": 0,
+     "win": 0.328
+    },
+    "second": {
+     "n": 27671,
+     "mean": -0.008642,
+     "t": -1.222066,
+     "meanNet": -0.008642,
+     "tNet": -1.22,
+     "median": 0,
+     "win": 0.317
+    }
+   },
+   "afterCosts": {
+    "first": {
+     "n": 26275,
+     "mean": -0.038329,
+     "t": -5.616722,
+     "meanNet": -0.038329,
+     "tNet": -5.62,
+     "median": 0,
+     "win": 0.261
+    },
+    "second": {
+     "n": 27671,
+     "mean": -0.049067,
+     "t": -6.959571,
+     "meanNet": -0.049067,
+     "tNet": -6.96,
+     "median": 0,
+     "win": 0.263
+    }
+   },
+   "p": 0.024035,
+   "holm": 0.096139,
+   "cond": false,
+   "pass": false,
+   "perMarket": [
+    {
+     "market": "xau",
+     "first": 0.016472,
+     "second": -0.011554,
+     "n1": 2049,
+     "n2": 2133
+    },
+    {
+     "market": "xag",
+     "first": 0.049277,
+     "second": -0.020939,
+     "n1": 930,
+     "n2": 986
+    },
+    {
+     "market": "eurusd",
+     "first": 0.023508,
+     "second": 0.009647,
+     "n1": 2821,
+     "n2": 2809
+    },
+    {
+     "market": "gbpusd",
+     "first": 0.023729,
+     "second": -0.004592,
+     "n1": 2783,
+     "n2": 2648
+    },
+    {
+     "market": "usdjpy",
+     "first": 0.031379,
+     "second": 0.011978,
+     "n1": 3120,
+     "n2": 3475
+    },
+    {
+     "market": "audusd",
+     "first": 0.019155,
+     "second": 0.040247,
+     "n1": 3135,
+     "n2": 3371
+    },
+    {
+     "market": "nzdusd",
+     "first": 0.048905,
+     "second": 0.029834,
+     "n1": 3105,
+     "n2": 3431
+    },
+    {
+     "market": "usdcad",
+     "first": -0.008258,
+     "second": 0.040295,
+     "n1": 2609,
+     "n2": 2771
+    },
+    {
+     "market": "usdchf",
+     "first": 0.028132,
+     "second": -0.012012,
+     "n1": 2700,
+     "n2": 2659
+    },
+    {
+     "market": "eurjpy",
+     "first": 0.004789,
+     "second": 0.0171,
+     "n1": 3023,
+     "n2": 3388
+    }
+   ]
+  },
+  {
+   "key": "P6",
+   "name": "zone target and zone stop - grid, 20-23 UTC",
+   "exit": "zone",
+   "stop": "zone",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.075723,
+    "t": 7.691015,
+    "meanNet": 0.075723,
+    "tNet": 7.69,
+    "median": 0,
+    "win": 0.163
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.040546,
+    "t": 4.395019,
+    "meanNet": 0.040546,
+    "tNet": 4.4,
+    "median": 0,
+    "win": 0.146
+   },
+   "atrUnits": {
+    "first": {
+     "n": 26275,
+     "mean": 0.005244,
+     "t": 0.686272,
+     "meanNet": 0.005244,
+     "tNet": 0.69,
+     "median": 0,
+     "win": 0.376
+    },
+    "second": {
+     "n": 27671,
+     "mean": -0.006235,
+     "t": -0.824178,
+     "meanNet": -0.006235,
+     "tNet": -0.82,
+     "median": 0,
+     "win": 0.363
+    }
+   },
+   "afterCosts": {
+    "first": {
+     "n": 26275,
+     "mean": 0.014916,
+     "t": 1.536068,
+     "meanNet": 0.014916,
+     "tNet": 1.54,
+     "median": 0,
+     "win": 0.311
+    },
+    "second": {
+     "n": 27671,
+     "mean": -0.022506,
+     "t": -2.467044,
+     "meanNet": -0.022506,
+     "tNet": -2.47,
+     "median": 0,
+     "win": 0.303
+    }
+   },
+   "p": 0.000011,
+   "holm": 0.000054,
+   "cond": true,
+   "pass": true,
+   "perMarket": [
+    {
+     "market": "xau",
+     "first": 0.033164,
+     "second": -0.034032,
+     "n1": 2049,
+     "n2": 2133
+    },
+    {
+     "market": "xag",
+     "first": 0.077825,
+     "second": -0.011566,
+     "n1": 930,
+     "n2": 986
+    },
+    {
+     "market": "eurusd",
+     "first": 0.04326,
+     "second": 0.040602,
+     "n1": 2821,
+     "n2": 2809
+    },
+    {
+     "market": "gbpusd",
+     "first": 0.069284,
+     "second": 0.01142,
+     "n1": 2783,
+     "n2": 2648
+    },
+    {
+     "market": "usdjpy",
+     "first": 0.095663,
+     "second": 0.011515,
+     "n1": 3120,
+     "n2": 3475
+    },
+    {
+     "market": "audusd",
+     "first": 0.107143,
+     "second": 0.072419,
+     "n1": 3135,
+     "n2": 3371
+    },
+    {
+     "market": "nzdusd",
+     "first": 0.111767,
+     "second": 0.040931,
+     "n1": 3105,
+     "n2": 3431
+    },
+    {
+     "market": "usdcad",
+     "first": 0.087884,
+     "second": 0.110204,
+     "n1": 2609,
+     "n2": 2771
+    },
+    {
+     "market": "usdchf",
+     "first": 0.076114,
+     "second": 0.02644,
+     "n1": 2700,
+     "n2": 2659
+    },
+    {
+     "market": "eurjpy",
+     "first": 0.039118,
+     "second": 0.077152,
+     "n1": 3023,
+     "n2": 3388
+    }
+   ]
+  }
+ ],
+ "passed": [
+  "P3",
+  "P6"
+ ],
+ "cells": [
+  {
+   "cell": "2R exit, atr stop, all",
+   "exit": "2R",
+   "stop": "atr",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.054233,
+    "t": 11.381061,
+    "meanNet": -0.088369,
+    "tNet": -15.56,
+    "median": -1,
+    "win": 0.355
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.042267,
+    "t": 11.329637,
+    "meanNet": -0.118139,
+    "tNet": -28.34,
+    "median": -1,
+    "win": 0.351
+   }
+  },
+  {
+   "cell": "zone exit, atr stop, all",
+   "exit": "zone",
+   "stop": "atr",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.06152,
+    "t": 12.445896,
+    "meanNet": -0.081083,
+    "tNet": -14.37,
+    "median": -1,
+    "win": 0.367
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.043555,
+    "t": 11.763189,
+    "meanNet": -0.116851,
+    "tNet": -27.79,
+    "median": -1,
+    "win": 0.362
+   }
+  },
+  {
+   "cell": "swing exit, atr stop, all",
+   "exit": "swing",
+   "stop": "atr",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.054566,
+    "t": 8.852834,
+    "meanNet": -0.088037,
+    "tNet": -12.64,
+    "median": -1,
+    "win": 0.273
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.037866,
+    "t": 8.653112,
+    "meanNet": -0.12254,
+    "tNet": -25.33,
+    "median": -1,
+    "win": 0.273
+   }
+  },
+  {
+   "cell": "2R exit, zone stop, all",
+   "exit": "2R",
+   "stop": "zone",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.071316,
+    "t": 16.05332,
+    "meanNet": -0.146196,
+    "tNet": -24.32,
+    "median": -1,
+    "win": 0.36
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.046633,
+    "t": 12.770631,
+    "meanNet": -0.202558,
+    "tNet": -49.86,
+    "median": -1,
+    "win": 0.352
+   }
+  },
+  {
+   "cell": "zone exit, zone stop, all",
+   "exit": "zone",
+   "stop": "zone",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.107433,
+    "t": 17.695142,
+    "meanNet": -0.110079,
+    "tNet": -15.37,
+    "median": -1,
+    "win": 0.332
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.07097,
+    "t": 15.384792,
+    "meanNet": -0.178221,
+    "tNet": -34.93,
+    "median": -1,
+    "win": 0.325
+   }
+  },
+  {
+   "cell": "swing exit, zone stop, all",
+   "exit": "swing",
+   "stop": "zone",
+   "hours": "all",
+   "first": {
+    "n": 171523,
+    "mean": 0.113358,
+    "t": 14.028976,
+    "meanNet": -0.104154,
+    "tNet": -11.28,
+    "median": -1,
+    "win": 0.237
+   },
+   "second": {
+    "n": 201769,
+    "mean": 0.070724,
+    "t": 11.584264,
+    "meanNet": -0.178467,
+    "tNet": -27.6,
+    "median": -1,
+    "win": 0.237
+   }
+  },
+  {
+   "cell": "2R exit, atr stop, 20-23",
+   "exit": "2R",
+   "stop": "atr",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.20392,
+    "t": 18.007677,
+    "meanNet": 0.046133,
+    "tNet": 4.03,
+    "median": -1,
+    "win": 0.408
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.169408,
+    "t": 14.09383,
+    "meanNet": -0.014668,
+    "tNet": -1.23,
+    "median": -1,
+    "win": 0.393
+   }
+  },
+  {
+   "cell": "zone exit, atr stop, 20-23",
+   "exit": "zone",
+   "stop": "atr",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.21455,
+    "t": 18.141096,
+    "meanNet": 0.056764,
+    "tNet": 4.73,
+    "median": -1,
+    "win": 0.418
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.164814,
+    "t": 13.884037,
+    "meanNet": -0.019262,
+    "tNet": -1.6,
+    "median": -1,
+    "win": 0.401
+   }
+  },
+  {
+   "cell": "swing exit, atr stop, 20-23",
+   "exit": "swing",
+   "stop": "atr",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.216429,
+    "t": 13.025611,
+    "meanNet": 0.058642,
+    "tNet": 3.53,
+    "median": -1,
+    "win": 0.314
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.150774,
+    "t": 10.648709,
+    "meanNet": -0.033302,
+    "tNet": -2.34,
+    "median": -1,
+    "win": 0.31
+   }
+  },
+  {
+   "cell": "2R exit, zone stop, 20-23",
+   "exit": "2R",
+   "stop": "zone",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.226398,
+    "t": 19.544959,
+    "meanNet": 0.007804,
+    "tNet": 0.68,
+    "median": -1,
+    "win": 0.413
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.183392,
+    "t": 15.276192,
+    "meanNet": -0.063735,
+    "tNet": -5.35,
+    "median": -1,
+    "win": 0.397
+   }
+  },
+  {
+   "cell": "zone exit, zone stop, 20-23",
+   "exit": "zone",
+   "stop": "zone",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.279643,
+    "t": 19.127669,
+    "meanNet": 0.061048,
+    "tNet": 4.16,
+    "median": -1,
+    "win": 0.395
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.209954,
+    "t": 15.78062,
+    "meanNet": -0.037173,
+    "tNet": -2.76,
+    "median": -1,
+    "win": 0.378
+   }
+  },
+  {
+   "cell": "swing exit, zone stop, 20-23",
+   "exit": "swing",
+   "stop": "zone",
+   "hours": "20-23",
+   "first": {
+    "n": 26275,
+    "mean": 0.297792,
+    "t": 14.215789,
+    "meanNet": 0.079198,
+    "tNet": 3.83,
+    "median": -1,
+    "win": 0.29
+   },
+   "second": {
+    "n": 27671,
+    "mean": 0.192716,
+    "t": 10.767907,
+    "meanNet": -0.054411,
+    "tNet": -3.04,
+    "median": -1,
+    "win": 0.289
+   }
+  }
+ ]
+}

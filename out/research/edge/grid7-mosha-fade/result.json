@@ -1,0 +1,5036 @@
+{
+ "study": "grid7-mosha-fade",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "0 of 54 cells pass; 4 clear the before-cost bar but none beats its control in both windows; best confirmation cell fade M30>M5 any struct, +0.154R a trade before costs in 2015-26 (n 19,376, month t 5.15), -0.383R after costs",
+ "basis": "judged before costs on calendar-month sums and against the plain rule on the same lower timeframe (pre-registered); after costs beside",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31 (120 months)",
+  "confirmation": "2015-01-01 to 2026-10-31 (142 months)"
+ },
+ "markets": [
+  "xau",
+  "xag",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "assumedCosts": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01
+ },
+ "meta": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "last": "2026-10-30",
+   "storylines": 14969,
+   "inside": 11191,
+   "trades": 19186,
+   "ctrlTrades": 232294,
+   "dropped": 22,
+   "small": 70338,
+   "open": 3,
+   "noStruct": 8444
+  },
+  {
+   "market": "xag",
+   "first": "2006-03-19",
+   "last": "2026-10-30",
+   "storylines": 14854,
+   "inside": 11018,
+   "trades": 10815,
+   "ctrlTrades": 150448,
+   "dropped": 657,
+   "small": 148762,
+   "open": 6,
+   "noStruct": 5680
+  },
+  {
+   "market": "eurusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16308,
+   "inside": 12049,
+   "trades": 25328,
+   "ctrlTrades": 301710,
+   "dropped": 186,
+   "small": 35731,
+   "open": 6,
+   "noStruct": 10715
+  },
+  {
+   "market": "gbpusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16198,
+   "inside": 12037,
+   "trades": 24799,
+   "ctrlTrades": 297113,
+   "dropped": 377,
+   "small": 38984,
+   "open": 9,
+   "noStruct": 10661
+  },
+  {
+   "market": "usdjpy",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16868,
+   "inside": 12456,
+   "trades": 24825,
+   "ctrlTrades": 285148,
+   "dropped": 290,
+   "small": 46311,
+   "open": 8,
+   "noStruct": 10763
+  },
+  {
+   "market": "audusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16705,
+   "inside": 12180,
+   "trades": 25062,
+   "ctrlTrades": 298128,
+   "dropped": 237,
+   "small": 38243,
+   "open": 5,
+   "noStruct": 11127
+  },
+  {
+   "market": "nzdusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16613,
+   "inside": 12183,
+   "trades": 23640,
+   "ctrlTrades": 283143,
+   "dropped": 5,
+   "small": 54918,
+   "open": 7,
+   "noStruct": 10694
+  },
+  {
+   "market": "usdcad",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16079,
+   "inside": 11938,
+   "trades": 23509,
+   "ctrlTrades": 287322,
+   "dropped": 359,
+   "small": 50939,
+   "open": 3,
+   "noStruct": 10586
+  },
+  {
+   "market": "usdchf",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16130,
+   "inside": 12056,
+   "trades": 23288,
+   "ctrlTrades": 281562,
+   "dropped": 334,
+   "small": 49832,
+   "open": 7,
+   "noStruct": 10118
+  },
+  {
+   "market": "eurjpy",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "storylines": 16465,
+   "inside": 12174,
+   "trades": 24962,
+   "ctrlTrades": 291316,
+   "dropped": 12,
+   "small": 40060,
+   "open": 7,
+   "noStruct": 10933
+  }
+ ],
+ "passed": [],
+ "clearBeforeCostBar": [
+  "fade H1>M15 any 2R",
+  "fade H1>M15 inside 2R",
+  "fade M30>M5 any struct",
+  "fade M30>M5 inside struct"
+ ],
+ "flipPassed": [
+  "with M30>M5 any 1R",
+  "with M30>M5 any 2R",
+  "with M30>M5 any struct",
+  "with M30>M5 clear 2R",
+  "with M30>M5 inside 1R"
+ ],
+ "passedNetPositive": [],
+ "bestConfirmation": "fade M30>M5 any struct",
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2008-06-11",
+   "n": 1587,
+   "mismatches": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2012-03-14",
+   "n": 4449,
+   "mismatches": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2016-09-21",
+   "n": 7784,
+   "mismatches": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2021-02-17",
+   "n": 10917,
+   "mismatches": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2025-05-07",
+   "n": 13894,
+   "mismatches": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2008-06-11",
+   "n": 2572,
+   "mismatches": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2012-03-14",
+   "n": 5533,
+   "mismatches": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2016-09-21",
+   "n": 8897,
+   "mismatches": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2021-02-17",
+   "n": 12127,
+   "mismatches": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2025-05-07",
+   "n": 15206,
+   "mismatches": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2008-06-11",
+   "n": 2664,
+   "mismatches": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2012-03-14",
+   "n": 5737,
+   "mismatches": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2016-09-21",
+   "n": 9267,
+   "mismatches": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2021-02-17",
+   "n": 12673,
+   "mismatches": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2025-05-07",
+   "n": 15789,
+   "mismatches": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2008-06-11",
+   "n": 2510,
+   "mismatches": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2012-03-14",
+   "n": 5509,
+   "mismatches": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2016-09-21",
+   "n": 9092,
+   "mismatches": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2021-02-17",
+   "n": 12476,
+   "mismatches": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2025-05-07",
+   "n": 15558,
+   "mismatches": 0
+  },
+  {
+   "market": "eurjpy",
+   "cut": "2008-06-11",
+   "n": 2554,
+   "mismatches": 0
+  },
+  {
+   "market": "eurjpy",
+   "cut": "2012-03-14",
+   "n": 5499,
+   "mismatches": 0
+  },
+  {
+   "market": "eurjpy",
+   "cut": "2016-09-21",
+   "n": 8942,
+   "mismatches": 0
+  },
+  {
+   "market": "eurjpy",
+   "cut": "2021-02-17",
+   "n": 12338,
+   "mismatches": 0
+  },
+  {
+   "market": "eurjpy",
+   "cut": "2025-05-07",
+   "n": 15397,
+   "mismatches": 0
+  }
+ ],
+ "cells": [
+  {
+   "cell": "with H4>H1 any 1R",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "any",
+   "exit": "1R",
+   "disc": {
+    "n": 3834,
+    "mean": 0.006673,
+    "t": 0.4037,
+    "meanNet": -0.044511,
+    "tNet": -2.67,
+    "win": 0.503,
+    "costR": 0.0512
+   },
+   "conf": {
+    "n": 4441,
+    "mean": 0.025263,
+    "t": 1.7105,
+    "meanNet": -0.035082,
+    "tNet": -2.33,
+    "win": 0.512,
+    "costR": 0.0603
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 1R",
+    "disc": {
+     "n": 45411,
+     "mean": -0.007801,
+     "t": -1.4134,
+     "meanNet": -0.040418,
+     "tNet": -7.07,
+     "win": 0.496,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.008959,
+     "t": -1.7245,
+     "meanNet": -0.046621,
+     "tNet": -8.88,
+     "win": 0.493,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": 0.9,
+    "conf": 2.29
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3834,
+     "mean": -0.01502,
+     "t": -0.898,
+     "meanNet": -0.066204,
+     "tNet": -3.92,
+     "win": 0.492,
+     "costR": 0.0512
+    },
+    "conf": {
+     "n": 4441,
+     "mean": -0.035171,
+     "t": -2.3616,
+     "meanNet": -0.095516,
+     "tNet": -6.39,
+     "win": 0.483,
+     "costR": 0.0603
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 any 2R",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "any",
+   "exit": "2R",
+   "disc": {
+    "n": 3834,
+    "mean": 0.001676,
+    "t": 0.0802,
+    "meanNet": -0.049509,
+    "tNet": -2.36,
+    "win": 0.384,
+    "costR": 0.0512
+   },
+   "conf": {
+    "n": 4441,
+    "mean": 0.010528,
+    "t": 0.5092,
+    "meanNet": -0.049817,
+    "tNet": -2.38,
+    "win": 0.385,
+    "costR": 0.0603
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 2R",
+    "disc": {
+     "n": 45411,
+     "mean": 0.006378,
+     "t": 0.7566,
+     "meanNet": -0.026239,
+     "tNet": -3.05,
+     "win": 0.401,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.007349,
+     "t": -0.9139,
+     "meanNet": -0.045011,
+     "tNet": -5.58,
+     "win": 0.395,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": -0.22,
+    "conf": 0.9
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3834,
+     "mean": 0.007283,
+     "t": 0.2875,
+     "meanNet": -0.043901,
+     "tNet": -1.72,
+     "win": 0.387,
+     "costR": 0.0512
+    },
+    "conf": {
+     "n": 4441,
+     "mean": -0.016588,
+     "t": -0.764,
+     "meanNet": -0.076933,
+     "tNet": -3.54,
+     "win": 0.38,
+     "costR": 0.0603
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 any struct",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "any",
+   "exit": "struct",
+   "disc": {
+    "n": 1803,
+    "mean": -0.095545,
+    "t": -1.9421,
+    "meanNet": -0.172632,
+    "tNet": -3.47,
+    "win": 0.303,
+    "costR": 0.0771
+   },
+   "conf": {
+    "n": 2079,
+    "mean": -0.023,
+    "t": -0.5869,
+    "meanNet": -0.114707,
+    "tNet": -2.9,
+    "win": 0.326,
+    "costR": 0.0917
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 2R (struct)",
+    "disc": {
+     "n": 45411,
+     "mean": 0.006378,
+     "t": 0.7566,
+     "meanNet": -0.026239,
+     "tNet": -3.05,
+     "win": 0.401,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.007349,
+     "t": -0.9139,
+     "meanNet": -0.045011,
+     "tNet": -5.58,
+     "win": 0.395,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": -2.56,
+    "conf": -0.42
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 1803,
+     "mean": 0.057432,
+     "t": 1.2204,
+     "meanNet": -0.019655,
+     "tNet": -0.42,
+     "win": 0.348,
+     "costR": 0.0771
+    },
+    "conf": {
+     "n": 2079,
+     "mean": -0.005246,
+     "t": -0.1167,
+     "meanNet": -0.096953,
+     "tNet": -2.16,
+     "win": 0.323,
+     "costR": 0.0917
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 clear 1R",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "clear",
+   "exit": "1R",
+   "disc": {
+    "n": 243,
+    "mean": 0.045573,
+    "t": 0.6897,
+    "meanNet": -0.124797,
+    "tNet": -1.79,
+    "win": 0.519,
+    "costR": 0.1704
+   },
+   "conf": {
+    "n": 292,
+    "mean": -0.002775,
+    "t": -0.0485,
+    "meanNet": -0.215308,
+    "tNet": -3.44,
+    "win": 0.497,
+    "costR": 0.2125
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 1R",
+    "disc": {
+     "n": 45411,
+     "mean": -0.007801,
+     "t": -1.4134,
+     "meanNet": -0.040418,
+     "tNet": -7.07,
+     "win": 0.496,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.008959,
+     "t": -1.7245,
+     "meanNet": -0.046621,
+     "tNet": -8.88,
+     "win": 0.493,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": 0.83,
+    "conf": 0.11
+   },
+   "checks": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 243,
+     "mean": -0.136108,
+     "t": -2.0956,
+     "meanNet": -0.306479,
+     "tNet": -4.54,
+     "win": 0.436,
+     "costR": 0.1704
+    },
+    "conf": {
+     "n": 292,
+     "mean": -0.120513,
+     "t": -2.0511,
+     "meanNet": -0.333045,
+     "tNet": -5.39,
+     "win": 0.442,
+     "costR": 0.2125
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 clear 2R",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "clear",
+   "exit": "2R",
+   "disc": {
+    "n": 243,
+    "mean": 0.080937,
+    "t": 0.9106,
+    "meanNet": -0.089434,
+    "tNet": -0.99,
+    "win": 0.358,
+    "costR": 0.1704
+   },
+   "conf": {
+    "n": 292,
+    "mean": 0.068163,
+    "t": 0.8192,
+    "meanNet": -0.14437,
+    "tNet": -1.64,
+    "win": 0.356,
+    "costR": 0.2125
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 2R",
+    "disc": {
+     "n": 45411,
+     "mean": 0.006378,
+     "t": 0.7566,
+     "meanNet": -0.026239,
+     "tNet": -3.05,
+     "win": 0.401,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.007349,
+     "t": -0.9139,
+     "meanNet": -0.045011,
+     "tNet": -5.58,
+     "win": 0.395,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": 0.81,
+    "conf": 0.9
+   },
+   "checks": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 243,
+     "mean": -0.103761,
+     "t": -1.145,
+     "meanNet": -0.274131,
+     "tNet": -2.98,
+     "win": 0.309,
+     "costR": 0.1704
+    },
+    "conf": {
+     "n": 292,
+     "mean": -0.091566,
+     "t": -1.1648,
+     "meanNet": -0.304099,
+     "tNet": -3.8,
+     "win": 0.308,
+     "costR": 0.2125
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 clear struct",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "clear",
+   "exit": "struct",
+   "disc": {
+    "n": 230,
+    "mean": -0.275788,
+    "t": -1.5138,
+    "meanNet": -0.45446,
+    "tNet": -2.48,
+    "win": 0.13,
+    "costR": 0.1787
+   },
+   "conf": {
+    "n": 277,
+    "mean": -0.193625,
+    "t": -1.282,
+    "meanNet": -0.415113,
+    "tNet": -2.68,
+    "win": 0.141,
+    "costR": 0.2215
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 2R (struct)",
+    "disc": {
+     "n": 45411,
+     "mean": 0.006378,
+     "t": 0.7566,
+     "meanNet": -0.026239,
+     "tNet": -3.05,
+     "win": 0.401,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.007349,
+     "t": -0.9139,
+     "meanNet": -0.045011,
+     "tNet": -5.58,
+     "win": 0.395,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": -1.8,
+    "conf": -1.3
+   },
+   "checks": {
+    "n": false,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 230,
+     "mean": -0.048482,
+     "t": -0.2194,
+     "meanNet": -0.227153,
+     "tNet": -1.02,
+     "win": 0.13,
+     "costR": 0.1787
+    },
+    "conf": {
+     "n": 277,
+     "mean": -0.108965,
+     "t": -0.6009,
+     "meanNet": -0.330454,
+     "tNet": -1.81,
+     "win": 0.141,
+     "costR": 0.2215
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 inside 1R",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "inside",
+   "exit": "1R",
+   "disc": {
+    "n": 3591,
+    "mean": 0.004041,
+    "t": 0.2305,
+    "meanNet": -0.039078,
+    "tNet": -2.22,
+    "win": 0.502,
+    "costR": 0.0431
+   },
+   "conf": {
+    "n": 4149,
+    "mean": 0.027236,
+    "t": 1.8062,
+    "meanNet": -0.022398,
+    "tNet": -1.47,
+    "win": 0.513,
+    "costR": 0.0496
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 1R",
+    "disc": {
+     "n": 45411,
+     "mean": -0.007801,
+     "t": -1.4134,
+     "meanNet": -0.040418,
+     "tNet": -7.07,
+     "win": 0.496,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.008959,
+     "t": -1.7245,
+     "meanNet": -0.046621,
+     "tNet": -8.88,
+     "win": 0.493,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": 0.71,
+    "conf": 2.36
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3591,
+     "mean": -0.006826,
+     "t": -0.3901,
+     "meanNet": -0.049945,
+     "tNet": -2.83,
+     "win": 0.496,
+     "costR": 0.0431
+    },
+    "conf": {
+     "n": 4149,
+     "mean": -0.029165,
+     "t": -1.9181,
+     "meanNet": -0.078799,
+     "tNet": -5.17,
+     "win": 0.486,
+     "costR": 0.0496
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 inside 2R",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "inside",
+   "exit": "2R",
+   "disc": {
+    "n": 3591,
+    "mean": -0.003688,
+    "t": -0.1657,
+    "meanNet": -0.046807,
+    "tNet": -2.1,
+    "win": 0.386,
+    "costR": 0.0431
+   },
+   "conf": {
+    "n": 4149,
+    "mean": 0.006472,
+    "t": 0.3097,
+    "meanNet": -0.043162,
+    "tNet": -2.05,
+    "win": 0.387,
+    "costR": 0.0496
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 2R",
+    "disc": {
+     "n": 45411,
+     "mean": 0.006378,
+     "t": 0.7566,
+     "meanNet": -0.026239,
+     "tNet": -3.05,
+     "win": 0.401,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.007349,
+     "t": -0.9139,
+     "meanNet": -0.045011,
+     "tNet": -5.58,
+     "win": 0.395,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": -0.46,
+    "conf": 0.68
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3591,
+     "mean": 0.014797,
+     "t": 0.5779,
+     "meanNet": -0.028322,
+     "tNet": -1.1,
+     "win": 0.392,
+     "costR": 0.0431
+    },
+    "conf": {
+     "n": 4149,
+     "mean": -0.011311,
+     "t": -0.5111,
+     "meanNet": -0.060945,
+     "tNet": -2.75,
+     "win": 0.385,
+     "costR": 0.0496
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H4>H1 inside struct",
+   "side": "with",
+   "ladder": "H4>H1",
+   "place": "inside",
+   "exit": "struct",
+   "disc": {
+    "n": 1573,
+    "mean": -0.06919,
+    "t": -1.4717,
+    "meanNet": -0.131424,
+    "tNet": -2.77,
+    "win": 0.329,
+    "costR": 0.0622
+   },
+   "conf": {
+    "n": 1802,
+    "mean": 0.003228,
+    "t": 0.0817,
+    "meanNet": -0.068529,
+    "tNet": -1.74,
+    "win": 0.354,
+    "costR": 0.0718
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 1h 2R (struct)",
+    "disc": {
+     "n": 45411,
+     "mean": 0.006378,
+     "t": 0.7566,
+     "meanNet": -0.026239,
+     "tNet": -3.05,
+     "win": 0.401,
+     "costR": 0.0326
+    },
+    "conf": {
+     "n": 53120,
+     "mean": -0.007349,
+     "t": -0.9139,
+     "meanNet": -0.045011,
+     "tNet": -5.58,
+     "win": 0.395,
+     "costR": 0.0377
+    }
+   },
+   "welch": {
+    "disc": -1.93,
+    "conf": 0.29
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 1573,
+     "mean": 0.072918,
+     "t": 1.5883,
+     "meanNet": 0.010685,
+     "tNet": 0.23,
+     "win": 0.38,
+     "costR": 0.0622
+    },
+    "conf": {
+     "n": 1802,
+     "mean": 0.010697,
+     "t": 0.245,
+     "meanNet": -0.06106,
+     "tNet": -1.4,
+     "win": 0.351,
+     "costR": 0.0718
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 any 1R",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "any",
+   "exit": "1R",
+   "disc": {
+    "n": 15327,
+    "mean": -0.043459,
+    "t": -4.6519,
+    "meanNet": -0.137954,
+    "tNet": -13.66,
+    "win": 0.477,
+    "costR": 0.0945
+   },
+   "conf": {
+    "n": 17520,
+    "mean": -0.030695,
+    "t": -3.624,
+    "meanNet": -0.143585,
+    "tNet": -16.57,
+    "win": 0.485,
+    "costR": 0.1129
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 1R",
+    "disc": {
+     "n": 175986,
+     "mean": -0.027771,
+     "t": -8.2348,
+     "meanNet": -0.096084,
+     "tNet": -23.98,
+     "win": 0.485,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.027312,
+     "t": -10.5927,
+     "meanNet": -0.106755,
+     "tNet": -35.59,
+     "win": 0.485,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -1.89,
+    "conf": -0.43
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 15327,
+     "mean": 0.02767,
+     "t": 3.0805,
+     "meanNet": -0.066826,
+     "tNet": -7.52,
+     "win": 0.514,
+     "costR": 0.0945
+    },
+    "conf": {
+     "n": 17520,
+     "mean": 0.013457,
+     "t": 1.6193,
+     "meanNet": -0.099433,
+     "tNet": -11.67,
+     "win": 0.507,
+     "costR": 0.1129
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 any 2R",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "any",
+   "exit": "2R",
+   "disc": {
+    "n": 15327,
+    "mean": -0.04898,
+    "t": -3.8973,
+    "meanNet": -0.143476,
+    "tNet": -10.9,
+    "win": 0.335,
+    "costR": 0.0945
+   },
+   "conf": {
+    "n": 17520,
+    "mean": -0.028616,
+    "t": -2.4229,
+    "meanNet": -0.141506,
+    "tNet": -11.97,
+    "win": 0.344,
+    "costR": 0.1129
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 2R",
+    "disc": {
+     "n": 175986,
+     "mean": -0.026188,
+     "t": -5.0088,
+     "meanNet": -0.094501,
+     "tNet": -16.92,
+     "win": 0.354,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.03199,
+     "t": -8.2059,
+     "meanNet": -0.111433,
+     "tNet": -26.89,
+     "win": 0.352,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -2.02,
+    "conf": 0.32
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 15327,
+     "mean": 0.040682,
+     "t": 3.3449,
+     "meanNet": -0.053813,
+     "tNet": -4.51,
+     "win": 0.37,
+     "costR": 0.0945
+    },
+    "conf": {
+     "n": 17520,
+     "mean": 0.015667,
+     "t": 1.2658,
+     "meanNet": -0.097223,
+     "tNet": -7.65,
+     "win": 0.361,
+     "costR": 0.1129
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 any struct",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "any",
+   "exit": "struct",
+   "disc": {
+    "n": 7597,
+    "mean": -0.107964,
+    "t": -4.6499,
+    "meanNet": -0.241732,
+    "tNet": -10.31,
+    "win": 0.285,
+    "costR": 0.1338
+   },
+   "conf": {
+    "n": 8687,
+    "mean": -0.045166,
+    "t": -1.9674,
+    "meanNet": -0.203189,
+    "tNet": -8.8,
+    "win": 0.295,
+    "costR": 0.158
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 2R (struct)",
+    "disc": {
+     "n": 175986,
+     "mean": -0.026188,
+     "t": -5.0088,
+     "meanNet": -0.094501,
+     "tNet": -16.92,
+     "win": 0.354,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.03199,
+     "t": -8.2059,
+     "meanNet": -0.111433,
+     "tNet": -26.89,
+     "win": 0.352,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -3.69,
+    "conf": -0.64
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 7597,
+     "mean": 0.061816,
+     "t": 2.1785,
+     "meanNet": -0.071952,
+     "tNet": -2.57,
+     "win": 0.332,
+     "costR": 0.1338
+    },
+    "conf": {
+     "n": 8687,
+     "mean": 0.054041,
+     "t": 2.5629,
+     "meanNet": -0.103982,
+     "tNet": -4.81,
+     "win": 0.325,
+     "costR": 0.158
+    },
+    "holm": 0.2628,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 clear 1R",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "clear",
+   "exit": "1R",
+   "disc": {
+    "n": 812,
+    "mean": -0.129043,
+    "t": -3.6839,
+    "meanNet": -0.410381,
+    "tNet": -10.57,
+    "win": 0.436,
+    "costR": 0.2813
+   },
+   "conf": {
+    "n": 905,
+    "mean": -0.091465,
+    "t": -2.7551,
+    "meanNet": -0.429712,
+    "tNet": -11.58,
+    "win": 0.454,
+    "costR": 0.3382
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 1R",
+    "disc": {
+     "n": 175986,
+     "mean": -0.027771,
+     "t": -8.2348,
+     "meanNet": -0.096084,
+     "tNet": -23.98,
+     "win": 0.485,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.027312,
+     "t": -10.5927,
+     "meanNet": -0.106755,
+     "tNet": -35.59,
+     "win": 0.485,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -2.89,
+    "conf": -1.93
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 812,
+     "mean": -0.058149,
+     "t": -1.6018,
+     "meanNet": -0.339487,
+     "tNet": -8.44,
+     "win": 0.47,
+     "costR": 0.2813
+    },
+    "conf": {
+     "n": 905,
+     "mean": -0.100801,
+     "t": -3.0536,
+     "meanNet": -0.439048,
+     "tNet": -12.08,
+     "win": 0.45,
+     "costR": 0.3382
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 clear 2R",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "clear",
+   "exit": "2R",
+   "disc": {
+    "n": 812,
+    "mean": -0.078475,
+    "t": -1.5534,
+    "meanNet": -0.359814,
+    "tNet": -6.76,
+    "win": 0.309,
+    "costR": 0.2813
+   },
+   "conf": {
+    "n": 905,
+    "mean": -0.110366,
+    "t": -2.7085,
+    "meanNet": -0.448613,
+    "tNet": -10.02,
+    "win": 0.296,
+    "costR": 0.3382
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 2R",
+    "disc": {
+     "n": 175986,
+     "mean": -0.026188,
+     "t": -5.0088,
+     "meanNet": -0.094501,
+     "tNet": -16.92,
+     "win": 0.354,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.03199,
+     "t": -8.2059,
+     "meanNet": -0.111433,
+     "tNet": -26.89,
+     "win": 0.352,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -1.07,
+    "conf": -1.71
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 812,
+     "mean": 0.055833,
+     "t": 1.066,
+     "meanNet": -0.225505,
+     "tNet": -4.09,
+     "win": 0.352,
+     "costR": 0.2813
+    },
+    "conf": {
+     "n": 905,
+     "mean": -0.020332,
+     "t": -0.4792,
+     "meanNet": -0.358579,
+     "tNet": -8.31,
+     "win": 0.327,
+     "costR": 0.3382
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 clear struct",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "clear",
+   "exit": "struct",
+   "disc": {
+    "n": 774,
+    "mean": -0.110097,
+    "t": -0.8847,
+    "meanNet": -0.401418,
+    "tNet": -3.22,
+    "win": 0.14,
+    "costR": 0.2913
+   },
+   "conf": {
+    "n": 862,
+    "mean": -0.048843,
+    "t": -0.5189,
+    "meanNet": -0.398749,
+    "tNet": -4.26,
+    "win": 0.153,
+    "costR": 0.3499
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 2R (struct)",
+    "disc": {
+     "n": 175986,
+     "mean": -0.026188,
+     "t": -5.0088,
+     "meanNet": -0.094501,
+     "tNet": -16.92,
+     "win": 0.354,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.03199,
+     "t": -8.2059,
+     "meanNet": -0.111433,
+     "tNet": -26.89,
+     "win": 0.352,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -0.63,
+    "conf": -0.17
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 774,
+     "mean": 0.134774,
+     "t": 0.9229,
+     "meanNet": -0.156547,
+     "tNet": -1.07,
+     "win": 0.173,
+     "costR": 0.2913
+    },
+    "conf": {
+     "n": 862,
+     "mean": -0.003484,
+     "t": -0.0335,
+     "meanNet": -0.35339,
+     "tNet": -3.39,
+     "win": 0.15,
+     "costR": 0.3499
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 inside 1R",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "inside",
+   "exit": "1R",
+   "disc": {
+    "n": 14515,
+    "mean": -0.038671,
+    "t": -4.0936,
+    "meanNet": -0.122714,
+    "tNet": -11.94,
+    "win": 0.479,
+    "costR": 0.084
+   },
+   "conf": {
+    "n": 16615,
+    "mean": -0.027385,
+    "t": -3.0483,
+    "meanNet": -0.128,
+    "tNet": -13.86,
+    "win": 0.486,
+    "costR": 0.1006
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 1R",
+    "disc": {
+     "n": 175986,
+     "mean": -0.027771,
+     "t": -8.2348,
+     "meanNet": -0.096084,
+     "tNet": -23.98,
+     "win": 0.485,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.027312,
+     "t": -10.5927,
+     "meanNet": -0.106755,
+     "tNet": -35.59,
+     "win": 0.485,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -1.28,
+    "conf": -0.01
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 14515,
+     "mean": 0.032471,
+     "t": 3.5349,
+     "meanNet": -0.051573,
+     "tNet": -5.7,
+     "win": 0.517,
+     "costR": 0.084
+    },
+    "conf": {
+     "n": 16615,
+     "mean": 0.019681,
+     "t": 2.2396,
+     "meanNet": -0.080935,
+     "tNet": -9.02,
+     "win": 0.51,
+     "costR": 0.1006
+    },
+    "holm": 0.587,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 inside 2R",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "inside",
+   "exit": "2R",
+   "disc": {
+    "n": 14515,
+    "mean": -0.04733,
+    "t": -3.7063,
+    "meanNet": -0.131374,
+    "tNet": -9.81,
+    "win": 0.337,
+    "costR": 0.084
+   },
+   "conf": {
+    "n": 16615,
+    "mean": -0.024163,
+    "t": -1.9768,
+    "meanNet": -0.124779,
+    "tNet": -10.15,
+    "win": 0.347,
+    "costR": 0.1006
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 2R",
+    "disc": {
+     "n": 175986,
+     "mean": -0.026188,
+     "t": -5.0088,
+     "meanNet": -0.094501,
+     "tNet": -16.92,
+     "win": 0.354,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.03199,
+     "t": -8.2059,
+     "meanNet": -0.111433,
+     "tNet": -26.89,
+     "win": 0.352,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -1.83,
+    "conf": 0.72
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 14515,
+     "mean": 0.039835,
+     "t": 3.2162,
+     "meanNet": -0.044209,
+     "tNet": -3.65,
+     "win": 0.371,
+     "costR": 0.084
+    },
+    "conf": {
+     "n": 16615,
+     "mean": 0.017628,
+     "t": 1.3935,
+     "meanNet": -0.082987,
+     "tNet": -6.41,
+     "win": 0.362,
+     "costR": 0.1006
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with H1>M15 inside struct",
+   "side": "with",
+   "ladder": "H1>M15",
+   "place": "inside",
+   "exit": "struct",
+   "disc": {
+    "n": 6823,
+    "mean": -0.107722,
+    "t": -5.0672,
+    "meanNet": -0.223617,
+    "tNet": -10.16,
+    "win": 0.302,
+    "costR": 0.1159
+   },
+   "conf": {
+    "n": 7825,
+    "mean": -0.044761,
+    "t": -1.997,
+    "meanNet": -0.181646,
+    "tNet": -7.95,
+    "win": 0.311,
+    "costR": 0.1369
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 15m 2R (struct)",
+    "disc": {
+     "n": 175986,
+     "mean": -0.026188,
+     "t": -5.0088,
+     "meanNet": -0.094501,
+     "tNet": -16.92,
+     "win": 0.354,
+     "costR": 0.0683
+    },
+    "conf": {
+     "n": 207816,
+     "mean": -0.03199,
+     "t": -8.2059,
+     "meanNet": -0.111433,
+     "tNet": -26.89,
+     "win": 0.352,
+     "costR": 0.0794
+    }
+   },
+   "welch": {
+    "disc": -4.19,
+    "conf": -0.64
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 6823,
+     "mean": 0.05354,
+     "t": 2.1986,
+     "meanNet": -0.062355,
+     "tNet": -2.64,
+     "win": 0.35,
+     "costR": 0.1159
+    },
+    "conf": {
+     "n": 7825,
+     "mean": 0.060378,
+     "t": 2.9156,
+     "meanNet": -0.076507,
+     "tNet": -3.6,
+     "win": 0.344,
+     "costR": 0.1369
+    },
+    "holm": 0.1012,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with M30>M5 any 1R",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "any",
+   "exit": "1R",
+   "disc": {
+    "n": 38201,
+    "mean": -0.042711,
+    "t": -7.216,
+    "meanNet": -0.188016,
+    "tNet": -26.9,
+    "win": 0.476,
+    "costR": 0.1453
+   },
+   "conf": {
+    "n": 43750,
+    "mean": -0.044558,
+    "t": -8.7962,
+    "meanNet": -0.21599,
+    "tNet": -40.71,
+    "win": 0.477,
+    "costR": 0.1714
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 1R",
+    "disc": {
+     "n": 518635,
+     "mean": -0.031045,
+     "t": -13.6112,
+     "meanNet": -0.140602,
+     "tNet": -35.51,
+     "win": 0.483,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.036706,
+     "t": -19.2004,
+     "meanNet": -0.162613,
+     "tNet": -55.28,
+     "win": 0.481,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": -2.24,
+    "conf": -1.6
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 38201,
+     "mean": 0.01245,
+     "t": 2.0896,
+     "meanNet": -0.132856,
+     "tNet": -20.43,
+     "win": 0.508,
+     "costR": 0.1453
+    },
+    "conf": {
+     "n": 43750,
+     "mean": 0.01617,
+     "t": 3.2206,
+     "meanNet": -0.155262,
+     "tNet": -27.72,
+     "win": 0.508,
+     "costR": 0.1714
+    },
+    "holm": 0.0405,
+    "pass": true
+   }
+  },
+  {
+   "cell": "with M30>M5 any 2R",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "any",
+   "exit": "2R",
+   "disc": {
+    "n": 38201,
+    "mean": -0.032775,
+    "t": -3.8277,
+    "meanNet": -0.17808,
+    "tNet": -19.03,
+    "win": 0.345,
+    "costR": 0.1453
+   },
+   "conf": {
+    "n": 43750,
+    "mean": -0.043705,
+    "t": -6.1749,
+    "meanNet": -0.215137,
+    "tNet": -29.18,
+    "win": 0.343,
+    "costR": 0.1714
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 2R",
+    "disc": {
+     "n": 518635,
+     "mean": -0.037974,
+     "t": -10.4883,
+     "meanNet": -0.147531,
+     "tNet": -30.41,
+     "win": 0.349,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.046419,
+     "t": -16.5643,
+     "meanNet": -0.172326,
+     "tNet": -47.27,
+     "win": 0.348,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": 0.73,
+    "conf": 0.41
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 38201,
+     "mean": 0.030692,
+     "t": 3.6792,
+     "meanNet": -0.114614,
+     "tNet": -13.48,
+     "win": 0.375,
+     "costR": 0.1453
+    },
+    "conf": {
+     "n": 43750,
+     "mean": 0.025442,
+     "t": 3.5249,
+     "meanNet": -0.14599,
+     "tNet": -18.63,
+     "win": 0.37,
+     "costR": 0.1714
+    },
+    "holm": 0.0149,
+    "pass": true
+   }
+  },
+  {
+   "cell": "with M30>M5 any struct",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "any",
+   "exit": "struct",
+   "disc": {
+    "n": 19591,
+    "mean": -0.042665,
+    "t": -2.6996,
+    "meanNet": -0.238517,
+    "tNet": -14.14,
+    "win": 0.298,
+    "costR": 0.1959
+   },
+   "conf": {
+    "n": 21742,
+    "mean": -0.069675,
+    "t": -5.5351,
+    "meanNet": -0.300606,
+    "tNet": -22.89,
+    "win": 0.297,
+    "costR": 0.2309
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 2R (struct)",
+    "disc": {
+     "n": 518635,
+     "mean": -0.037974,
+     "t": -10.4883,
+     "meanNet": -0.147531,
+     "tNet": -30.41,
+     "win": 0.349,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.046419,
+     "t": -16.5643,
+     "meanNet": -0.172326,
+     "tNet": -47.27,
+     "win": 0.348,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": -0.33,
+    "conf": -1.87
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 19591,
+     "mean": 0.072518,
+     "t": 4.6403,
+     "meanNet": -0.123334,
+     "tNet": -7.85,
+     "win": 0.329,
+     "costR": 0.1959
+    },
+    "conf": {
+     "n": 21742,
+     "mean": 0.050541,
+     "t": 3.6587,
+     "meanNet": -0.18039,
+     "tNet": -12.41,
+     "win": 0.331,
+     "costR": 0.2309
+    },
+    "holm": 0.0095,
+    "pass": true
+   }
+  },
+  {
+   "cell": "with M30>M5 clear 1R",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "clear",
+   "exit": "1R",
+   "disc": {
+    "n": 2250,
+    "mean": -0.212748,
+    "t": -9.0621,
+    "meanNet": -0.589746,
+    "tNet": -20.97,
+    "win": 0.393,
+    "costR": 0.377
+   },
+   "conf": {
+    "n": 2178,
+    "mean": -0.218471,
+    "t": -10.0962,
+    "meanNet": -0.653749,
+    "tNet": -24.46,
+    "win": 0.391,
+    "costR": 0.4353
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 1R",
+    "disc": {
+     "n": 518635,
+     "mean": -0.031045,
+     "t": -13.6112,
+     "meanNet": -0.140602,
+     "tNet": -35.51,
+     "win": 0.483,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.036706,
+     "t": -19.2004,
+     "meanNet": -0.162613,
+     "tNet": -55.28,
+     "win": 0.481,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": -8.72,
+    "conf": -8.66
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2250,
+     "mean": -0.077029,
+     "t": -3.4189,
+     "meanNet": -0.454027,
+     "tNet": -17.53,
+     "win": 0.461,
+     "costR": 0.377
+    },
+    "conf": {
+     "n": 2178,
+     "mean": -0.062521,
+     "t": -2.5863,
+     "meanNet": -0.497799,
+     "tNet": -17.75,
+     "win": 0.468,
+     "costR": 0.4353
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with M30>M5 clear 2R",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "clear",
+   "exit": "2R",
+   "disc": {
+    "n": 2250,
+    "mean": -0.108296,
+    "t": -3.5771,
+    "meanNet": -0.485294,
+    "tNet": -14.63,
+    "win": 0.298,
+    "costR": 0.377
+   },
+   "conf": {
+    "n": 2178,
+    "mean": -0.140871,
+    "t": -5.1258,
+    "meanNet": -0.57615,
+    "tNet": -18.6,
+    "win": 0.287,
+    "costR": 0.4353
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 2R",
+    "disc": {
+     "n": 518635,
+     "mean": -0.037974,
+     "t": -10.4883,
+     "meanNet": -0.147531,
+     "tNet": -30.41,
+     "win": 0.349,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.046419,
+     "t": -16.5643,
+     "meanNet": -0.172326,
+     "tNet": -47.27,
+     "win": 0.348,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": -2.41,
+    "conf": -3.24
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2250,
+     "mean": 0.098181,
+     "t": 3.3249,
+     "meanNet": -0.278817,
+     "tNet": -9.12,
+     "win": 0.367,
+     "costR": 0.377
+    },
+    "conf": {
+     "n": 2178,
+     "mean": 0.101448,
+     "t": 3.1636,
+     "meanNet": -0.33383,
+     "tNet": -9.76,
+     "win": 0.368,
+     "costR": 0.4353
+    },
+    "holm": 0.0477,
+    "pass": true
+   }
+  },
+  {
+   "cell": "with M30>M5 clear struct",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "clear",
+   "exit": "struct",
+   "disc": {
+    "n": 2136,
+    "mean": -0.006504,
+    "t": -0.0819,
+    "meanNet": -0.395933,
+    "tNet": -5.02,
+    "win": 0.147,
+    "costR": 0.3894
+   },
+   "conf": {
+    "n": 2051,
+    "mean": -0.133511,
+    "t": -2.1842,
+    "meanNet": -0.586112,
+    "tNet": -9.55,
+    "win": 0.138,
+    "costR": 0.4526
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 2R (struct)",
+    "disc": {
+     "n": 518635,
+     "mean": -0.037974,
+     "t": -10.4883,
+     "meanNet": -0.147531,
+     "tNet": -30.41,
+     "win": 0.349,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.046419,
+     "t": -16.5643,
+     "meanNet": -0.172326,
+     "tNet": -47.27,
+     "win": 0.348,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": 0.42,
+    "conf": -1.33
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2136,
+     "mean": 0.362293,
+     "t": 4.6264,
+     "meanNet": -0.027136,
+     "tNet": -0.35,
+     "win": 0.199,
+     "costR": 0.3894
+    },
+    "conf": {
+     "n": 2051,
+     "mean": 0.179819,
+     "t": 2.4587,
+     "meanNet": -0.272782,
+     "tNet": -3.65,
+     "win": 0.198,
+     "costR": 0.4526
+    },
+    "holm": 0.341,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with M30>M5 inside 1R",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "inside",
+   "exit": "1R",
+   "disc": {
+    "n": 35951,
+    "mean": -0.032069,
+    "t": -5.2145,
+    "meanNet": -0.162874,
+    "tNet": -22.23,
+    "win": 0.481,
+    "costR": 0.1308
+   },
+   "conf": {
+    "n": 41572,
+    "mean": -0.035447,
+    "t": -6.5551,
+    "meanNet": -0.193055,
+    "tNet": -33.64,
+    "win": 0.482,
+    "costR": 0.1576
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 1R",
+    "disc": {
+     "n": 518635,
+     "mean": -0.031045,
+     "t": -13.6112,
+     "meanNet": -0.140602,
+     "tNet": -35.51,
+     "win": 0.483,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.036706,
+     "t": -19.2004,
+     "meanNet": -0.162613,
+     "tNet": -55.28,
+     "win": 0.481,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": -0.19,
+    "conf": 0.25
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 35951,
+     "mean": 0.01805,
+     "t": 2.8908,
+     "meanNet": -0.112755,
+     "tNet": -16.86,
+     "win": 0.511,
+     "costR": 0.1308
+    },
+    "conf": {
+     "n": 41572,
+     "mean": 0.020293,
+     "t": 3.7562,
+     "meanNet": -0.137316,
+     "tNet": -22.98,
+     "win": 0.51,
+     "costR": 0.1576
+    },
+    "holm": 0.0068,
+    "pass": true
+   }
+  },
+  {
+   "cell": "with M30>M5 inside 2R",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "inside",
+   "exit": "2R",
+   "disc": {
+    "n": 35951,
+    "mean": -0.028048,
+    "t": -3.1272,
+    "meanNet": -0.158853,
+    "tNet": -16.08,
+    "win": 0.348,
+    "costR": 0.1308
+   },
+   "conf": {
+    "n": 41572,
+    "mean": -0.038614,
+    "t": -5.2176,
+    "meanNet": -0.196223,
+    "tNet": -25.2,
+    "win": 0.346,
+    "costR": 0.1576
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 2R",
+    "disc": {
+     "n": 518635,
+     "mean": -0.037974,
+     "t": -10.4883,
+     "meanNet": -0.147531,
+     "tNet": -30.41,
+     "win": 0.349,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.046419,
+     "t": -16.5643,
+     "meanNet": -0.172326,
+     "tNet": -47.27,
+     "win": 0.348,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": 1.36,
+    "conf": 1.15
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 35951,
+     "mean": 0.026468,
+     "t": 2.9956,
+     "meanNet": -0.104338,
+     "tNet": -11.7,
+     "win": 0.375,
+     "costR": 0.1308
+    },
+    "conf": {
+     "n": 41572,
+     "mean": 0.02146,
+     "t": 2.7551,
+     "meanNet": -0.136149,
+     "tNet": -16.25,
+     "win": 0.37,
+     "costR": 0.1576
+    },
+    "holm": 0.1561,
+    "pass": false
+   }
+  },
+  {
+   "cell": "with M30>M5 inside struct",
+   "side": "with",
+   "ladder": "M30>M5",
+   "place": "inside",
+   "exit": "struct",
+   "disc": {
+    "n": 17455,
+    "mean": -0.04709,
+    "t": -3.0283,
+    "meanNet": -0.219253,
+    "tNet": -12.91,
+    "win": 0.316,
+    "costR": 0.1722
+   },
+   "conf": {
+    "n": 19691,
+    "mean": -0.063026,
+    "t": -4.9985,
+    "meanNet": -0.270868,
+    "tNet": -20.32,
+    "win": 0.314,
+    "costR": 0.2078
+   },
+   "holm": 1,
+   "control": {
+    "name": "with control 5m 2R (struct)",
+    "disc": {
+     "n": 518635,
+     "mean": -0.037974,
+     "t": -10.4883,
+     "meanNet": -0.147531,
+     "tNet": -30.41,
+     "win": 0.349,
+     "costR": 0.1096
+    },
+    "conf": {
+     "n": 619685,
+     "mean": -0.046419,
+     "t": -16.5643,
+     "meanNet": -0.172326,
+     "tNet": -47.27,
+     "win": 0.348,
+     "costR": 0.1259
+    }
+   },
+   "welch": {
+    "disc": -0.71,
+    "conf": -1.39
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 17455,
+     "mean": 0.037057,
+     "t": 2.4845,
+     "meanNet": -0.135106,
+     "tNet": -9.05,
+     "win": 0.345,
+     "costR": 0.1722
+    },
+    "conf": {
+     "n": 19691,
+     "mean": 0.037075,
+     "t": 2.8424,
+     "meanNet": -0.170767,
+     "tNet": -12.6,
+     "win": 0.344,
+     "costR": 0.2078
+    },
+    "holm": 0.1234,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 any 1R",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "any",
+   "exit": "1R",
+   "disc": {
+    "n": 4353,
+    "mean": 0.037051,
+    "t": 2.264,
+    "meanNet": -0.169086,
+    "tNet": -9.96,
+    "win": 0.515,
+    "costR": 0.2061
+   },
+   "conf": {
+    "n": 5068,
+    "mean": -0.0386,
+    "t": -2.4828,
+    "meanNet": -0.284013,
+    "tNet": -16.88,
+    "win": 0.48,
+    "costR": 0.2454
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h 1R",
+    "disc": {
+     "n": 43062,
+     "mean": 0.034679,
+     "t": 5.6287,
+     "meanNet": -0.154556,
+     "tNet": -20.63,
+     "win": 0.517,
+     "costR": 0.1892
+    },
+    "conf": {
+     "n": 50178,
+     "mean": -0.009239,
+     "t": -1.5943,
+     "meanNet": -0.238335,
+     "tNet": -34.95,
+     "win": 0.495,
+     "costR": 0.2291
+    }
+   },
+   "welch": {
+    "disc": 0.15,
+    "conf": -1.99
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 4353,
+     "mean": -0.129401,
+     "t": -8.2238,
+     "meanNet": -0.335537,
+     "tNet": -19.44,
+     "win": 0.439,
+     "costR": 0.2061
+    },
+    "conf": {
+     "n": 5068,
+     "mean": -0.064794,
+     "t": -4.3742,
+     "meanNet": -0.310208,
+     "tNet": -19.98,
+     "win": 0.468,
+     "costR": 0.2454
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 any 2R",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "any",
+   "exit": "2R",
+   "disc": {
+    "n": 4353,
+    "mean": 0.104914,
+    "t": 4.2764,
+    "meanNet": -0.101222,
+    "tNet": -4.03,
+    "win": 0.37,
+    "costR": 0.2061
+   },
+   "conf": {
+    "n": 5068,
+    "mean": 0.008835,
+    "t": 0.4125,
+    "meanNet": -0.236579,
+    "tNet": -10.63,
+    "win": 0.337,
+    "costR": 0.2454
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h 2R",
+    "disc": {
+     "n": 43062,
+     "mean": 0.105227,
+     "t": 12.3075,
+     "meanNet": -0.084008,
+     "tNet": -8.88,
+     "win": 0.371,
+     "costR": 0.1892
+    },
+    "conf": {
+     "n": 50178,
+     "mean": 0.040228,
+     "t": 5.1728,
+     "meanNet": -0.188868,
+     "tNet": -22.51,
+     "win": 0.348,
+     "costR": 0.2291
+    }
+   },
+   "welch": {
+    "disc": -0.01,
+    "conf": -1.5
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 4353,
+     "mean": -0.095994,
+     "t": -4.4617,
+     "meanNet": -0.302131,
+     "tNet": -13.15,
+     "win": 0.305,
+     "costR": 0.2061
+    },
+    "conf": {
+     "n": 5068,
+     "mean": -0.035281,
+     "t": -1.778,
+     "meanNet": -0.280695,
+     "tNet": -13.79,
+     "win": 0.324,
+     "costR": 0.2454
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 any struct",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "any",
+   "exit": "struct",
+   "disc": {
+    "n": 2691,
+    "mean": 0.139571,
+    "t": 1.7708,
+    "meanNet": -0.075839,
+    "tNet": -0.96,
+    "win": 0.166,
+    "costR": 0.2154
+   },
+   "conf": {
+    "n": 3109,
+    "mean": 0.053667,
+    "t": 0.8553,
+    "meanNet": -0.19767,
+    "tNet": -3.11,
+    "win": 0.157,
+    "costR": 0.2513
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h swing",
+    "disc": {
+     "n": 39710,
+     "mean": 0.156974,
+     "t": 7.9698,
+     "meanNet": -0.033301,
+     "tNet": -1.61,
+     "win": 0.145,
+     "costR": 0.1903
+    },
+    "conf": {
+     "n": 45990,
+     "mean": 0.073186,
+     "t": 3.6224,
+     "meanNet": -0.158056,
+     "tNet": -7.64,
+     "win": 0.136,
+     "costR": 0.2312
+    }
+   },
+   "welch": {
+    "disc": -0.22,
+    "conf": -0.29
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2691,
+     "mean": -0.028025,
+     "t": -0.3755,
+     "meanNet": -0.243435,
+     "tNet": -3.26,
+     "win": 0.151,
+     "costR": 0.2154
+    },
+    "conf": {
+     "n": 3109,
+     "mean": -0.067008,
+     "t": -1.1012,
+     "meanNet": -0.318344,
+     "tNet": -5.26,
+     "win": 0.146,
+     "costR": 0.2513
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 clear 1R",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "clear",
+   "exit": "1R",
+   "disc": {
+    "n": 991,
+    "mean": -0.01578,
+    "t": -0.5067,
+    "meanNet": -0.20602,
+    "tNet": -6.18,
+    "win": 0.488,
+    "costR": 0.1902
+   },
+   "conf": {
+    "n": 1207,
+    "mean": -0.025888,
+    "t": -0.869,
+    "meanNet": -0.272961,
+    "tNet": -8.55,
+    "win": 0.486,
+    "costR": 0.2471
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h 1R",
+    "disc": {
+     "n": 43062,
+     "mean": 0.034679,
+     "t": 5.6287,
+     "meanNet": -0.154556,
+     "tNet": -20.63,
+     "win": 0.517,
+     "costR": 0.1892
+    },
+    "conf": {
+     "n": 50178,
+     "mean": -0.009239,
+     "t": -1.5943,
+     "meanNet": -0.238335,
+     "tNet": -34.95,
+     "win": 0.495,
+     "costR": 0.2291
+    }
+   },
+   "welch": {
+    "disc": -1.52,
+    "conf": -0.57
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 991,
+     "mean": -0.05082,
+     "t": -1.7322,
+     "meanNet": -0.241059,
+     "tNet": -7.81,
+     "win": 0.478,
+     "costR": 0.1902
+    },
+    "conf": {
+     "n": 1207,
+     "mean": -0.088445,
+     "t": -3.0366,
+     "meanNet": -0.335518,
+     "tNet": -10.31,
+     "win": 0.457,
+     "costR": 0.2471
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 clear 2R",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "clear",
+   "exit": "2R",
+   "disc": {
+    "n": 991,
+    "mean": 0.04217,
+    "t": 0.8465,
+    "meanNet": -0.148069,
+    "tNet": -2.88,
+    "win": 0.347,
+    "costR": 0.1902
+   },
+   "conf": {
+    "n": 1207,
+    "mean": 0.056311,
+    "t": 1.4041,
+    "meanNet": -0.190762,
+    "tNet": -4.64,
+    "win": 0.354,
+    "costR": 0.2471
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h 2R",
+    "disc": {
+     "n": 43062,
+     "mean": 0.105227,
+     "t": 12.3075,
+     "meanNet": -0.084008,
+     "tNet": -8.88,
+     "win": 0.371,
+     "costR": 0.1892
+    },
+    "conf": {
+     "n": 50178,
+     "mean": 0.040228,
+     "t": 5.1728,
+     "meanNet": -0.188868,
+     "tNet": -22.51,
+     "win": 0.348,
+     "costR": 0.2291
+    }
+   },
+   "welch": {
+    "disc": -1.36,
+    "conf": 0.39
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 991,
+     "mean": 0.000664,
+     "t": 0.0159,
+     "meanNet": -0.189576,
+     "tNet": -4.49,
+     "win": 0.338,
+     "costR": 0.1902
+    },
+    "conf": {
+     "n": 1207,
+     "mean": -0.065066,
+     "t": -1.6819,
+     "meanNet": -0.312139,
+     "tNet": -7.69,
+     "win": 0.312,
+     "costR": 0.2471
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 clear struct",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "clear",
+   "exit": "struct",
+   "disc": {
+    "n": 369,
+    "mean": 0.183218,
+    "t": 0.8657,
+    "meanNet": -0.021845,
+    "tNet": -0.1,
+    "win": 0.19,
+    "costR": 0.2051
+   },
+   "conf": {
+    "n": 453,
+    "mean": 0.267534,
+    "t": 1.4827,
+    "meanNet": 0.010483,
+    "tNet": 0.06,
+    "win": 0.188,
+    "costR": 0.2571
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h swing",
+    "disc": {
+     "n": 39710,
+     "mean": 0.156974,
+     "t": 7.9698,
+     "meanNet": -0.033301,
+     "tNet": -1.61,
+     "win": 0.145,
+     "costR": 0.1903
+    },
+    "conf": {
+     "n": 45990,
+     "mean": 0.073186,
+     "t": 3.6224,
+     "meanNet": -0.158056,
+     "tNet": -7.64,
+     "win": 0.136,
+     "costR": 0.2312
+    }
+   },
+   "welch": {
+    "disc": 0.13,
+    "conf": 1.04
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 369,
+     "mean": 0.021083,
+     "t": 0.0883,
+     "meanNet": -0.18398,
+     "tNet": -0.77,
+     "win": 0.163,
+     "costR": 0.2051
+    },
+    "conf": {
+     "n": 453,
+     "mean": -0.219531,
+     "t": -1.7604,
+     "meanNet": -0.476581,
+     "tNet": -3.74,
+     "win": 0.148,
+     "costR": 0.2571
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 inside 1R",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "inside",
+   "exit": "1R",
+   "disc": {
+    "n": 3362,
+    "mean": 0.052623,
+    "t": 2.846,
+    "meanNet": -0.158199,
+    "tNet": -8.32,
+    "win": 0.523,
+    "costR": 0.2108
+   },
+   "conf": {
+    "n": 3861,
+    "mean": -0.042573,
+    "t": -2.5411,
+    "meanNet": -0.287468,
+    "tNet": -15.86,
+    "win": 0.479,
+    "costR": 0.2449
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h 1R",
+    "disc": {
+     "n": 43062,
+     "mean": 0.034679,
+     "t": 5.6287,
+     "meanNet": -0.154556,
+     "tNet": -20.63,
+     "win": 0.517,
+     "costR": 0.1892
+    },
+    "conf": {
+     "n": 50178,
+     "mean": -0.009239,
+     "t": -1.5943,
+     "meanNet": -0.238335,
+     "tNet": -34.95,
+     "win": 0.495,
+     "costR": 0.2291
+    }
+   },
+   "welch": {
+    "disc": 0.98,
+    "conf": -2
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3362,
+     "mean": -0.152564,
+     "t": -8.3878,
+     "meanNet": -0.363386,
+     "tNet": -18.18,
+     "win": 0.427,
+     "costR": 0.2108
+    },
+    "conf": {
+     "n": 3861,
+     "mean": -0.057401,
+     "t": -3.4229,
+     "meanNet": -0.302296,
+     "tNet": -16.99,
+     "win": 0.471,
+     "costR": 0.2449
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 inside 2R",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "inside",
+   "exit": "2R",
+   "disc": {
+    "n": 3362,
+    "mean": 0.123409,
+    "t": 4.428,
+    "meanNet": -0.087414,
+    "tNet": -3.07,
+    "win": 0.377,
+    "costR": 0.2108
+   },
+   "conf": {
+    "n": 3861,
+    "mean": -0.006007,
+    "t": -0.249,
+    "meanNet": -0.250902,
+    "tNet": -9.94,
+    "win": 0.332,
+    "costR": 0.2449
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h 2R",
+    "disc": {
+     "n": 43062,
+     "mean": 0.105227,
+     "t": 12.3075,
+     "meanNet": -0.084008,
+     "tNet": -8.88,
+     "win": 0.371,
+     "costR": 0.1892
+    },
+    "conf": {
+     "n": 50178,
+     "mean": 0.040228,
+     "t": 5.1728,
+     "meanNet": -0.188868,
+     "tNet": -22.51,
+     "win": 0.348,
+     "costR": 0.2291
+    }
+   },
+   "welch": {
+    "disc": 0.68,
+    "conf": -1.96
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3362,
+     "mean": -0.124486,
+     "t": -5.1938,
+     "meanNet": -0.335308,
+     "tNet": -13.13,
+     "win": 0.296,
+     "costR": 0.2108
+    },
+    "conf": {
+     "n": 3861,
+     "mean": -0.02597,
+     "t": -1.1742,
+     "meanNet": -0.270865,
+     "tNet": -11.85,
+     "win": 0.327,
+     "costR": 0.2449
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H4>H1 inside struct",
+   "side": "fade",
+   "ladder": "H4>H1",
+   "place": "inside",
+   "exit": "struct",
+   "disc": {
+    "n": 2322,
+    "mean": 0.132635,
+    "t": 1.5763,
+    "meanNet": -0.084419,
+    "tNet": -1,
+    "win": 0.162,
+    "costR": 0.2171
+   },
+   "conf": {
+    "n": 2656,
+    "mean": 0.01719,
+    "t": 0.2524,
+    "meanNet": -0.233172,
+    "tNet": -3.37,
+    "win": 0.152,
+    "costR": 0.2504
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 1h swing",
+    "disc": {
+     "n": 39710,
+     "mean": 0.156974,
+     "t": 7.9698,
+     "meanNet": -0.033301,
+     "tNet": -1.61,
+     "win": 0.145,
+     "costR": 0.1903
+    },
+    "conf": {
+     "n": 45990,
+     "mean": 0.073186,
+     "t": 3.6224,
+     "meanNet": -0.158056,
+     "tNet": -7.64,
+     "win": 0.136,
+     "costR": 0.2312
+    }
+   },
+   "welch": {
+    "disc": -0.29,
+    "conf": -0.79
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2322,
+     "mean": -0.035828,
+     "t": -0.5101,
+     "meanNet": -0.252883,
+     "tNet": -3.58,
+     "win": 0.149,
+     "costR": 0.2171
+    },
+    "conf": {
+     "n": 2656,
+     "mean": -0.040994,
+     "t": -0.5789,
+     "meanNet": -0.291356,
+     "tNet": -4.13,
+     "win": 0.145,
+     "costR": 0.2504
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 any 1R",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "any",
+   "exit": "1R",
+   "disc": {
+    "n": 14438,
+    "mean": -0.017051,
+    "t": -1.6585,
+    "meanNet": -0.364768,
+    "tNet": -35.06,
+    "win": 0.49,
+    "costR": 0.3477
+   },
+   "conf": {
+    "n": 16208,
+    "mean": -0.060577,
+    "t": -7.1131,
+    "meanNet": -0.48108,
+    "tNet": -47.81,
+    "win": 0.469,
+    "costR": 0.4205
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 15m 1R",
+    "disc": {
+     "n": 145032,
+     "mean": -0.029662,
+     "t": -8.3939,
+     "meanNet": -0.348082,
+     "tNet": -76.31,
+     "win": 0.484,
+     "costR": 0.3184
+    },
+    "conf": {
+     "n": 164557,
+     "mean": -0.053306,
+     "t": -14.5015,
+     "meanNet": -0.442735,
+     "tNet": -91,
+     "win": 0.473,
+     "costR": 0.3894
+    }
+   },
+   "welch": {
+    "disc": 1.37,
+    "conf": -0.88
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 14438,
+     "mean": -0.201262,
+     "t": -18.3421,
+     "meanNet": -0.548979,
+     "tNet": -41.36,
+     "win": 0.401,
+     "costR": 0.3477
+    },
+    "conf": {
+     "n": 16208,
+     "mean": -0.174615,
+     "t": -21.0446,
+     "meanNet": -0.595118,
+     "tNet": -61.48,
+     "win": 0.413,
+     "costR": 0.4205
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 any 2R",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "any",
+   "exit": "2R",
+   "disc": {
+    "n": 14438,
+    "mean": 0.112061,
+    "t": 7.4822,
+    "meanNet": -0.235656,
+    "tNet": -15.83,
+    "win": 0.37,
+    "costR": 0.3477
+   },
+   "conf": {
+    "n": 16208,
+    "mean": 0.053586,
+    "t": 4.5194,
+    "meanNet": -0.366917,
+    "tNet": -29.84,
+    "win": 0.351,
+    "costR": 0.4205
+   },
+   "holm": 0.0003,
+   "control": {
+    "name": "fade control 15m 2R",
+    "disc": {
+     "n": 145032,
+     "mean": 0.093619,
+     "t": 19.574,
+     "meanNet": -0.224801,
+     "tNet": -44.42,
+     "win": 0.365,
+     "costR": 0.3184
+    },
+    "conf": {
+     "n": 164557,
+     "mean": 0.054198,
+     "t": 12.1526,
+     "meanNet": -0.335231,
+     "tNet": -61.08,
+     "win": 0.352,
+     "costR": 0.3894
+    }
+   },
+   "welch": {
+    "disc": 1.42,
+    "conf": -0.05
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": true,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 14438,
+     "mean": -0.117687,
+     "t": -8.5647,
+     "meanNet": -0.465405,
+     "tNet": -30.51,
+     "win": 0.296,
+     "costR": 0.3477
+    },
+    "conf": {
+     "n": 16208,
+     "mean": -0.113495,
+     "t": -9.6369,
+     "meanNet": -0.533997,
+     "tNet": -42.31,
+     "win": 0.296,
+     "costR": 0.4205
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 any struct",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "any",
+   "exit": "struct",
+   "disc": {
+    "n": 9278,
+    "mean": 0.309612,
+    "t": 5.7061,
+    "meanNet": -0.047021,
+    "tNet": -0.88,
+    "win": 0.168,
+    "costR": 0.3566
+   },
+   "conf": {
+    "n": 10289,
+    "mean": 0.057949,
+    "t": 1.3832,
+    "meanNet": -0.374229,
+    "tNet": -9,
+    "win": 0.146,
+    "costR": 0.4322
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 15m swing",
+    "disc": {
+     "n": 135982,
+     "mean": 0.240653,
+     "t": 17.805,
+     "meanNet": -0.079063,
+     "tNet": -5.88,
+     "win": 0.146,
+     "costR": 0.3197
+    },
+    "conf": {
+     "n": 151876,
+     "mean": 0.158114,
+     "t": 15.4623,
+     "meanNet": -0.234432,
+     "tNet": -21.32,
+     "win": 0.136,
+     "costR": 0.3925
+    }
+   },
+   "welch": {
+    "disc": 1.38,
+    "conf": -2.45
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 9278,
+     "mean": -0.127999,
+     "t": -3.1685,
+     "meanNet": -0.484632,
+     "tNet": -11.85,
+     "win": 0.125,
+     "costR": 0.3566
+    },
+    "conf": {
+     "n": 10289,
+     "mean": -0.119264,
+     "t": -3.1769,
+     "meanNet": -0.551443,
+     "tNet": -14.46,
+     "win": 0.125,
+     "costR": 0.4322
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 clear 1R",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "clear",
+   "exit": "1R",
+   "disc": {
+    "n": 2931,
+    "mean": -0.040411,
+    "t": -1.907,
+    "meanNet": -0.377854,
+    "tNet": -16.35,
+    "win": 0.478,
+    "costR": 0.3374
+   },
+   "conf": {
+    "n": 3657,
+    "mean": -0.054786,
+    "t": -3.0661,
+    "meanNet": -0.466922,
+    "tNet": -22.59,
+    "win": 0.473,
+    "costR": 0.4121
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 15m 1R",
+    "disc": {
+     "n": 145032,
+     "mean": -0.029662,
+     "t": -8.3939,
+     "meanNet": -0.348082,
+     "tNet": -76.31,
+     "win": 0.484,
+     "costR": 0.3184
+    },
+    "conf": {
+     "n": 164557,
+     "mean": -0.053306,
+     "t": -14.5015,
+     "meanNet": -0.442735,
+     "tNet": -91,
+     "win": 0.473,
+     "costR": 0.3894
+    }
+   },
+   "welch": {
+    "disc": -0.56,
+    "conf": -0.09
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2931,
+     "mean": -0.169756,
+     "t": -7.9977,
+     "meanNet": -0.507199,
+     "tNet": -20.43,
+     "win": 0.417,
+     "costR": 0.3374
+    },
+    "conf": {
+     "n": 3657,
+     "mean": -0.179285,
+     "t": -10.4006,
+     "meanNet": -0.591421,
+     "tNet": -28.88,
+     "win": 0.41,
+     "costR": 0.4121
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 clear 2R",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "clear",
+   "exit": "2R",
+   "disc": {
+    "n": 2931,
+    "mean": 0.042141,
+    "t": 1.3594,
+    "meanNet": -0.295302,
+    "tNet": -9.12,
+    "win": 0.347,
+    "costR": 0.3374
+   },
+   "conf": {
+    "n": 3657,
+    "mean": 0.054164,
+    "t": 2.119,
+    "meanNet": -0.357972,
+    "tNet": -13.51,
+    "win": 0.351,
+    "costR": 0.4121
+   },
+   "holm": 0.8961,
+   "control": {
+    "name": "fade control 15m 2R",
+    "disc": {
+     "n": 145032,
+     "mean": 0.093619,
+     "t": 19.574,
+     "meanNet": -0.224801,
+     "tNet": -44.42,
+     "win": 0.365,
+     "costR": 0.3184
+    },
+    "conf": {
+     "n": 164557,
+     "mean": 0.054198,
+     "t": 12.1526,
+     "meanNet": -0.335231,
+     "tNet": -61.08,
+     "win": 0.352,
+     "costR": 0.3894
+    }
+   },
+   "welch": {
+    "disc": -1.91,
+    "conf": 0
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": true,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 2931,
+     "mean": -0.080018,
+     "t": -3.0977,
+     "meanNet": -0.41746,
+     "tNet": -15.24,
+     "win": 0.309,
+     "costR": 0.3374
+    },
+    "conf": {
+     "n": 3657,
+     "mean": -0.120285,
+     "t": -4.6214,
+     "meanNet": -0.53242,
+     "tNet": -19.73,
+     "win": 0.293,
+     "costR": 0.4121
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 clear struct",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "clear",
+   "exit": "struct",
+   "disc": {
+    "n": 1136,
+    "mean": 0.260831,
+    "t": 1.936,
+    "meanNet": -0.089175,
+    "tNet": -0.67,
+    "win": 0.165,
+    "costR": 0.35
+   },
+   "conf": {
+    "n": 1425,
+    "mean": -0.039292,
+    "t": -0.4203,
+    "meanNet": -0.462765,
+    "tNet": -4.87,
+    "win": 0.146,
+    "costR": 0.4235
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 15m swing",
+    "disc": {
+     "n": 135982,
+     "mean": 0.240653,
+     "t": 17.805,
+     "meanNet": -0.079063,
+     "tNet": -5.88,
+     "win": 0.146,
+     "costR": 0.3197
+    },
+    "conf": {
+     "n": 151876,
+     "mean": 0.158114,
+     "t": 15.4623,
+     "meanNet": -0.234432,
+     "tNet": -21.32,
+     "win": 0.136,
+     "costR": 0.3925
+    }
+   },
+   "welch": {
+    "disc": 0.15,
+    "conf": -2.07
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 1136,
+     "mean": -0.029612,
+     "t": -0.2619,
+     "meanNet": -0.379619,
+     "tNet": -3.33,
+     "win": 0.136,
+     "costR": 0.35
+    },
+    "conf": {
+     "n": 1425,
+     "mean": -0.260716,
+     "t": -3.3275,
+     "meanNet": -0.684188,
+     "tNet": -8.59,
+     "win": 0.117,
+     "costR": 0.4235
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 inside 1R",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "inside",
+   "exit": "1R",
+   "disc": {
+    "n": 11507,
+    "mean": -0.011101,
+    "t": -1.0451,
+    "meanNet": -0.361435,
+    "tNet": -33.48,
+    "win": 0.493,
+    "costR": 0.3503
+   },
+   "conf": {
+    "n": 12551,
+    "mean": -0.062265,
+    "t": -6.7389,
+    "meanNet": -0.485205,
+    "tNet": -43.79,
+    "win": 0.469,
+    "costR": 0.4229
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 15m 1R",
+    "disc": {
+     "n": 145032,
+     "mean": -0.029662,
+     "t": -8.3939,
+     "meanNet": -0.348082,
+     "tNet": -76.31,
+     "win": 0.484,
+     "costR": 0.3184
+    },
+    "conf": {
+     "n": 164557,
+     "mean": -0.053306,
+     "t": -14.5015,
+     "meanNet": -0.442735,
+     "tNet": -91,
+     "win": 0.473,
+     "costR": 0.3894
+    }
+   },
+   "welch": {
+    "disc": 1.8,
+    "conf": -0.97
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 11507,
+     "mean": -0.209287,
+     "t": -18.5967,
+     "meanNet": -0.559621,
+     "tNet": -40.38,
+     "win": 0.397,
+     "costR": 0.3503
+    },
+    "conf": {
+     "n": 12551,
+     "mean": -0.173254,
+     "t": -18.665,
+     "meanNet": -0.596195,
+     "tNet": -54.44,
+     "win": 0.414,
+     "costR": 0.4229
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 inside 2R",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "inside",
+   "exit": "2R",
+   "disc": {
+    "n": 11507,
+    "mean": 0.12987,
+    "t": 8.1758,
+    "meanNet": -0.220464,
+    "tNet": -13.97,
+    "win": 0.376,
+    "costR": 0.3503
+   },
+   "conf": {
+    "n": 12551,
+    "mean": 0.053418,
+    "t": 4.0537,
+    "meanNet": -0.369523,
+    "tNet": -26.61,
+    "win": 0.351,
+    "costR": 0.4229
+   },
+   "holm": 0.0021,
+   "control": {
+    "name": "fade control 15m 2R",
+    "disc": {
+     "n": 145032,
+     "mean": 0.093619,
+     "t": 19.574,
+     "meanNet": -0.224801,
+     "tNet": -44.42,
+     "win": 0.365,
+     "costR": 0.3184
+    },
+    "conf": {
+     "n": 164557,
+     "mean": 0.054198,
+     "t": 12.1526,
+     "meanNet": -0.335231,
+     "tNet": -61.08,
+     "win": 0.352,
+     "costR": 0.3894
+    }
+   },
+   "welch": {
+    "disc": 2.5,
+    "conf": -0.06
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": true,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 11507,
+     "mean": -0.127282,
+     "t": -8.6939,
+     "meanNet": -0.477617,
+     "tNet": -29.33,
+     "win": 0.293,
+     "costR": 0.3503
+    },
+    "conf": {
+     "n": 12551,
+     "mean": -0.111516,
+     "t": -8.7613,
+     "meanNet": -0.534457,
+     "tNet": -38.71,
+     "win": 0.297,
+     "costR": 0.4229
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade H1>M15 inside struct",
+   "side": "fade",
+   "ladder": "H1>M15",
+   "place": "inside",
+   "exit": "struct",
+   "disc": {
+    "n": 8142,
+    "mean": 0.316418,
+    "t": 5.7622,
+    "meanNet": -0.041139,
+    "tNet": -0.76,
+    "win": 0.168,
+    "costR": 0.3576
+   },
+   "conf": {
+    "n": 8864,
+    "mean": 0.073582,
+    "t": 1.5556,
+    "meanNet": -0.359996,
+    "tNet": -7.65,
+    "win": 0.146,
+    "costR": 0.4336
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 15m swing",
+    "disc": {
+     "n": 135982,
+     "mean": 0.240653,
+     "t": 17.805,
+     "meanNet": -0.079063,
+     "tNet": -5.88,
+     "win": 0.146,
+     "costR": 0.3197
+    },
+    "conf": {
+     "n": 151876,
+     "mean": 0.158114,
+     "t": 15.4623,
+     "meanNet": -0.234432,
+     "tNet": -21.32,
+     "win": 0.136,
+     "costR": 0.3925
+    }
+   },
+   "welch": {
+    "disc": 1.42,
+    "conf": -1.9
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 8142,
+     "mean": -0.141726,
+     "t": -3.4214,
+     "meanNet": -0.499283,
+     "tNet": -11.86,
+     "win": 0.124,
+     "costR": 0.3576
+    },
+    "conf": {
+     "n": 8864,
+     "mean": -0.096524,
+     "t": -2.4015,
+     "meanNet": -0.530102,
+     "tNet": -12.91,
+     "win": 0.127,
+     "costR": 0.4336
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 any 1R",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "any",
+   "exit": "1R",
+   "disc": {
+    "n": 31056,
+    "mean": -0.128383,
+    "t": -15.2118,
+    "meanNet": -0.569974,
+    "tNet": -48.22,
+    "win": 0.436,
+    "costR": 0.4416
+   },
+   "conf": {
+    "n": 31218,
+    "mean": -0.156012,
+    "t": -19.5777,
+    "meanNet": -0.684132,
+    "tNet": -54.59,
+    "win": 0.422,
+    "costR": 0.5281
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m 1R",
+    "disc": {
+     "n": 333573,
+     "mean": -0.122335,
+     "t": -21.6424,
+     "meanNet": -0.542176,
+     "tNet": -65.12,
+     "win": 0.438,
+     "costR": 0.4198
+    },
+    "conf": {
+     "n": 351129,
+     "mean": -0.139076,
+     "t": -25.9982,
+     "meanNet": -0.641628,
+     "tNet": -72.78,
+     "win": 0.43,
+     "costR": 0.5026
+    }
+   },
+   "welch": {
+    "disc": -1.02,
+    "conf": -2.88
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 31056,
+     "mean": -0.257243,
+     "t": -25.3501,
+     "meanNet": -0.698835,
+     "tNet": -44.98,
+     "win": 0.371,
+     "costR": 0.4416
+    },
+    "conf": {
+     "n": 31218,
+     "mean": -0.248562,
+     "t": -29.0637,
+     "meanNet": -0.776683,
+     "tNet": -60.53,
+     "win": 0.376,
+     "costR": 0.5281
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 any 2R",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "any",
+   "exit": "2R",
+   "disc": {
+    "n": 31056,
+    "mean": 0.04789,
+    "t": 5.1886,
+    "meanNet": -0.393702,
+    "tNet": -37.96,
+    "win": 0.35,
+    "costR": 0.4416
+   },
+   "conf": {
+    "n": 31218,
+    "mean": 0.002713,
+    "t": 0.2925,
+    "meanNet": -0.525407,
+    "tNet": -43.38,
+    "win": 0.334,
+    "costR": 0.5281
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m 2R",
+    "disc": {
+     "n": 333573,
+     "mean": 0.050136,
+     "t": 12.5173,
+     "meanNet": -0.369706,
+     "tNet": -67.33,
+     "win": 0.35,
+     "costR": 0.4198
+    },
+    "conf": {
+     "n": 351129,
+     "mean": 0.017974,
+     "t": 3.9782,
+     "meanNet": -0.484577,
+     "tNet": -67.41,
+     "win": 0.34,
+     "costR": 0.5026
+    }
+   },
+   "welch": {
+    "disc": -0.26,
+    "conf": -1.82
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 31056,
+     "mean": -0.123647,
+     "t": -13.3477,
+     "meanNet": -0.565239,
+     "tNet": -41.4,
+     "win": 0.293,
+     "costR": 0.4416
+    },
+    "conf": {
+     "n": 31218,
+     "mean": -0.123617,
+     "t": -12.3026,
+     "meanNet": -0.651737,
+     "tNet": -51.09,
+     "win": 0.292,
+     "costR": 0.5281
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 any struct",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "any",
+   "exit": "struct",
+   "disc": {
+    "n": 19451,
+    "mean": 0.210771,
+    "t": 6.3207,
+    "meanNet": -0.240139,
+    "tNet": -7.23,
+    "win": 0.171,
+    "costR": 0.4509
+   },
+   "conf": {
+    "n": 19376,
+    "mean": 0.153736,
+    "t": 5.1541,
+    "meanNet": -0.383493,
+    "tNet": -12.51,
+    "win": 0.162,
+    "costR": 0.5372
+   },
+   "holm": 0,
+   "control": {
+    "name": "fade control 5m swing",
+    "disc": {
+     "n": 317389,
+     "mean": 0.273947,
+     "t": 26.282,
+     "meanNet": -0.146804,
+     "tNet": -15.65,
+     "win": 0.156,
+     "costR": 0.4208
+    },
+    "conf": {
+     "n": 329660,
+     "mean": 0.202492,
+     "t": 23.8466,
+     "meanNet": -0.302573,
+     "tNet": -34.36,
+     "win": 0.149,
+     "costR": 0.5051
+    }
+   },
+   "welch": {
+    "disc": -2.12,
+    "conf": -1.73
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": true,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 19451,
+     "mean": -0.015007,
+     "t": -0.5508,
+     "meanNet": -0.465917,
+     "tNet": -16.77,
+     "win": 0.14,
+     "costR": 0.4509
+    },
+    "conf": {
+     "n": 19376,
+     "mean": -0.035958,
+     "t": -1.2027,
+     "meanNet": -0.573187,
+     "tNet": -18.87,
+     "win": 0.138,
+     "costR": 0.5372
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 clear 1R",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "clear",
+   "exit": "1R",
+   "disc": {
+    "n": 8488,
+    "mean": -0.144137,
+    "t": -10.3131,
+    "meanNet": -0.579827,
+    "tNet": -32.34,
+    "win": 0.428,
+    "costR": 0.4357
+   },
+   "conf": {
+    "n": 8827,
+    "mean": -0.147397,
+    "t": -13.2101,
+    "meanNet": -0.666432,
+    "tNet": -40.62,
+    "win": 0.426,
+    "costR": 0.519
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m 1R",
+    "disc": {
+     "n": 333573,
+     "mean": -0.122335,
+     "t": -21.6424,
+     "meanNet": -0.542176,
+     "tNet": -65.12,
+     "win": 0.438,
+     "costR": 0.4198
+    },
+    "conf": {
+     "n": 351129,
+     "mean": -0.139076,
+     "t": -25.9982,
+     "meanNet": -0.641628,
+     "tNet": -72.78,
+     "win": 0.43,
+     "costR": 0.5026
+    }
+   },
+   "welch": {
+    "disc": -1.95,
+    "conf": -0.78
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 8488,
+     "mean": -0.219671,
+     "t": -16.4278,
+     "meanNet": -0.65536,
+     "tNet": -33.67,
+     "win": 0.39,
+     "costR": 0.4357
+    },
+    "conf": {
+     "n": 8827,
+     "mean": -0.236879,
+     "t": -17.9694,
+     "meanNet": -0.755914,
+     "tNet": -39.34,
+     "win": 0.382,
+     "costR": 0.519
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 clear 2R",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "clear",
+   "exit": "2R",
+   "disc": {
+    "n": 8488,
+    "mean": 0.023579,
+    "t": 1.4332,
+    "meanNet": -0.412111,
+    "tNet": -22.94,
+    "win": 0.342,
+    "costR": 0.4357
+   },
+   "conf": {
+    "n": 8827,
+    "mean": 0.007391,
+    "t": 0.5172,
+    "meanNet": -0.511644,
+    "tNet": -29.55,
+    "win": 0.336,
+    "costR": 0.519
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m 2R",
+    "disc": {
+     "n": 333573,
+     "mean": 0.050136,
+     "t": 12.5173,
+     "meanNet": -0.369706,
+     "tNet": -67.33,
+     "win": 0.35,
+     "costR": 0.4198
+    },
+    "conf": {
+     "n": 351129,
+     "mean": 0.017974,
+     "t": 3.9782,
+     "meanNet": -0.484577,
+     "tNet": -67.41,
+     "win": 0.34,
+     "costR": 0.5026
+    }
+   },
+   "welch": {
+    "disc": -1.68,
+    "conf": -0.69
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 8488,
+     "mean": -0.075315,
+     "t": -4.867,
+     "meanNet": -0.511005,
+     "tNet": -26.89,
+     "win": 0.309,
+     "costR": 0.4357
+    },
+    "conf": {
+     "n": 8827,
+     "mean": -0.119371,
+     "t": -7.6051,
+     "meanNet": -0.638407,
+     "tNet": -31.68,
+     "win": 0.295,
+     "costR": 0.519
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 clear struct",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "clear",
+   "exit": "struct",
+   "disc": {
+    "n": 3307,
+    "mean": 0.072317,
+    "t": 1.2351,
+    "meanNet": -0.372945,
+    "tNet": -6.35,
+    "win": 0.165,
+    "costR": 0.4453
+   },
+   "conf": {
+    "n": 3467,
+    "mean": 0.111034,
+    "t": 1.9457,
+    "meanNet": -0.413196,
+    "tNet": -7.13,
+    "win": 0.166,
+    "costR": 0.5242
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m swing",
+    "disc": {
+     "n": 317389,
+     "mean": 0.273947,
+     "t": 26.282,
+     "meanNet": -0.146804,
+     "tNet": -15.65,
+     "win": 0.156,
+     "costR": 0.4208
+    },
+    "conf": {
+     "n": 329660,
+     "mean": 0.202492,
+     "t": 23.8466,
+     "meanNet": -0.302573,
+     "tNet": -34.36,
+     "win": 0.149,
+     "costR": 0.5051
+    }
+   },
+   "welch": {
+    "disc": -3.15,
+    "conf": -1.46
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 3307,
+     "mean": 0.07253,
+     "t": 1.1182,
+     "meanNet": -0.372733,
+     "tNet": -5.63,
+     "win": 0.157,
+     "costR": 0.4453
+    },
+    "conf": {
+     "n": 3467,
+     "mean": -0.058391,
+     "t": -1.062,
+     "meanNet": -0.582621,
+     "tNet": -10.53,
+     "win": 0.153,
+     "costR": 0.5242
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 inside 1R",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "inside",
+   "exit": "1R",
+   "disc": {
+    "n": 22568,
+    "mean": -0.122457,
+    "t": -14.3682,
+    "meanNet": -0.566269,
+    "tNet": -47.68,
+    "win": 0.439,
+    "costR": 0.4438
+   },
+   "conf": {
+    "n": 22391,
+    "mean": -0.159408,
+    "t": -17.217,
+    "meanNet": -0.69111,
+    "tNet": -50.19,
+    "win": 0.42,
+    "costR": 0.5317
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m 1R",
+    "disc": {
+     "n": 333573,
+     "mean": -0.122335,
+     "t": -21.6424,
+     "meanNet": -0.542176,
+     "tNet": -65.12,
+     "win": 0.438,
+     "costR": 0.4198
+    },
+    "conf": {
+     "n": 351129,
+     "mean": -0.139076,
+     "t": -25.9982,
+     "meanNet": -0.641628,
+     "tNet": -72.78,
+     "win": 0.43,
+     "costR": 0.5026
+    }
+   },
+   "welch": {
+    "disc": -0.02,
+    "conf": -2.96
+   },
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 22568,
+     "mean": -0.271375,
+     "t": -25.9802,
+     "meanNet": -0.715186,
+     "tNet": -45.51,
+     "win": 0.364,
+     "costR": 0.4438
+    },
+    "conf": {
+     "n": 22391,
+     "mean": -0.253168,
+     "t": -27.9546,
+     "meanNet": -0.78487,
+     "tNet": -59.11,
+     "win": 0.374,
+     "costR": 0.5317
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 inside 2R",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "inside",
+   "exit": "2R",
+   "disc": {
+    "n": 22568,
+    "mean": 0.057033,
+    "t": 5.6597,
+    "meanNet": -0.386778,
+    "tNet": -34.53,
+    "win": 0.353,
+    "costR": 0.4438
+   },
+   "conf": {
+    "n": 22391,
+    "mean": 0.000869,
+    "t": 0.0774,
+    "meanNet": -0.530833,
+    "tNet": -38,
+    "win": 0.333,
+    "costR": 0.5317
+   },
+   "holm": 1,
+   "control": {
+    "name": "fade control 5m 2R",
+    "disc": {
+     "n": 333573,
+     "mean": 0.050136,
+     "t": 12.5173,
+     "meanNet": -0.369706,
+     "tNet": -67.33,
+     "win": 0.35,
+     "costR": 0.4198
+    },
+    "conf": {
+     "n": 351129,
+     "mean": 0.017974,
+     "t": 3.9782,
+     "meanNet": -0.484577,
+     "tNet": -67.41,
+     "win": 0.34,
+     "costR": 0.5026
+    }
+   },
+   "welch": {
+    "disc": 0.7,
+    "conf": -1.74
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": false,
+    "holm": false,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 22568,
+     "mean": -0.141825,
+     "t": -13.5697,
+     "meanNet": -0.585637,
+     "tNet": -40.07,
+     "win": 0.287,
+     "costR": 0.4438
+    },
+    "conf": {
+     "n": 22391,
+     "mean": -0.12529,
+     "t": -10.6315,
+     "meanNet": -0.656992,
+     "tNet": -45.82,
+     "win": 0.292,
+     "costR": 0.5317
+    },
+    "holm": 1,
+    "pass": false
+   }
+  },
+  {
+   "cell": "fade M30>M5 inside struct",
+   "side": "fade",
+   "ladder": "M30>M5",
+   "place": "inside",
+   "exit": "struct",
+   "disc": {
+    "n": 16144,
+    "mean": 0.239133,
+    "t": 6.1569,
+    "meanNet": -0.212934,
+    "tNet": -5.49,
+    "win": 0.172,
+    "costR": 0.4521
+   },
+   "conf": {
+    "n": 15909,
+    "mean": 0.163042,
+    "t": 5.1198,
+    "meanNet": -0.37702,
+    "tNet": -11.43,
+    "win": 0.161,
+    "costR": 0.5401
+   },
+   "holm": 0,
+   "control": {
+    "name": "fade control 5m swing",
+    "disc": {
+     "n": 317389,
+     "mean": 0.273947,
+     "t": 26.282,
+     "meanNet": -0.146804,
+     "tNet": -15.65,
+     "win": 0.156,
+     "costR": 0.4208
+    },
+    "conf": {
+     "n": 329660,
+     "mean": 0.202492,
+     "t": 23.8466,
+     "meanNet": -0.302573,
+     "tNet": -34.36,
+     "win": 0.149,
+     "costR": 0.5051
+    }
+   },
+   "welch": {
+    "disc": -1.05,
+    "conf": -1.27
+   },
+   "checks": {
+    "n": true,
+    "disc": true,
+    "conf": true,
+    "holm": true,
+    "control": false
+   },
+   "pass": false,
+   "flip": {
+    "disc": {
+     "n": 16144,
+     "mean": -0.032938,
+     "t": -1.0937,
+     "meanNet": -0.485005,
+     "tNet": -15.83,
+     "win": 0.137,
+     "costR": 0.4521
+    },
+    "conf": {
+     "n": 15909,
+     "mean": -0.03107,
+     "t": -0.9499,
+     "meanNet": -0.571132,
+     "tNet": -17.27,
+     "win": 0.135,
+     "costR": 0.5401
+    },
+    "holm": 1,
+    "pass": false
+   }
+  }
+ ],
+ "controls": [
+  {
+   "name": "with control 1h 1R",
+   "disc": {
+    "n": 45411,
+    "mean": -0.007801,
+    "t": -1.4134,
+    "meanNet": -0.040418,
+    "tNet": -7.07,
+    "win": 0.496,
+    "costR": 0.0326
+   },
+   "conf": {
+    "n": 53120,
+    "mean": -0.008959,
+    "t": -1.7245,
+    "meanNet": -0.046621,
+    "tNet": -8.88,
+    "win": 0.493,
+    "costR": 0.0377
+   }
+  },
+  {
+   "name": "with control 1h 2R",
+   "disc": {
+    "n": 45411,
+    "mean": 0.006378,
+    "t": 0.7566,
+    "meanNet": -0.026239,
+    "tNet": -3.05,
+    "win": 0.401,
+    "costR": 0.0326
+   },
+   "conf": {
+    "n": 53120,
+    "mean": -0.007349,
+    "t": -0.9139,
+    "meanNet": -0.045011,
+    "tNet": -5.58,
+    "win": 0.395,
+    "costR": 0.0377
+   }
+  },
+  {
+   "name": "with control 15m 1R",
+   "disc": {
+    "n": 175986,
+    "mean": -0.027771,
+    "t": -8.2348,
+    "meanNet": -0.096084,
+    "tNet": -23.98,
+    "win": 0.485,
+    "costR": 0.0683
+   },
+   "conf": {
+    "n": 207816,
+    "mean": -0.027312,
+    "t": -10.5927,
+    "meanNet": -0.106755,
+    "tNet": -35.59,
+    "win": 0.485,
+    "costR": 0.0794
+   }
+  },
+  {
+   "name": "with control 15m 2R",
+   "disc": {
+    "n": 175986,
+    "mean": -0.026188,
+    "t": -5.0088,
+    "meanNet": -0.094501,
+    "tNet": -16.92,
+    "win": 0.354,
+    "costR": 0.0683
+   },
+   "conf": {
+    "n": 207816,
+    "mean": -0.03199,
+    "t": -8.2059,
+    "meanNet": -0.111433,
+    "tNet": -26.89,
+    "win": 0.352,
+    "costR": 0.0794
+   }
+  },
+  {
+   "name": "with control 5m 1R",
+   "disc": {
+    "n": 518635,
+    "mean": -0.031045,
+    "t": -13.6112,
+    "meanNet": -0.140602,
+    "tNet": -35.51,
+    "win": 0.483,
+    "costR": 0.1096
+   },
+   "conf": {
+    "n": 619685,
+    "mean": -0.036706,
+    "t": -19.2004,
+    "meanNet": -0.162613,
+    "tNet": -55.28,
+    "win": 0.481,
+    "costR": 0.1259
+   }
+  },
+  {
+   "name": "with control 5m 2R",
+   "disc": {
+    "n": 518635,
+    "mean": -0.037974,
+    "t": -10.4883,
+    "meanNet": -0.147531,
+    "tNet": -30.41,
+    "win": 0.349,
+    "costR": 0.1096
+   },
+   "conf": {
+    "n": 619685,
+    "mean": -0.046419,
+    "t": -16.5643,
+    "meanNet": -0.172326,
+    "tNet": -47.27,
+    "win": 0.348,
+    "costR": 0.1259
+   }
+  },
+  {
+   "name": "fade control 1h 1R",
+   "disc": {
+    "n": 43062,
+    "mean": 0.034679,
+    "t": 5.6287,
+    "meanNet": -0.154556,
+    "tNet": -20.63,
+    "win": 0.517,
+    "costR": 0.1892
+   },
+   "conf": {
+    "n": 50178,
+    "mean": -0.009239,
+    "t": -1.5943,
+    "meanNet": -0.238335,
+    "tNet": -34.95,
+    "win": 0.495,
+    "costR": 0.2291
+   }
+  },
+  {
+   "name": "fade control 1h 2R",
+   "disc": {
+    "n": 43062,
+    "mean": 0.105227,
+    "t": 12.3075,
+    "meanNet": -0.084008,
+    "tNet": -8.88,
+    "win": 0.371,
+    "costR": 0.1892
+   },
+   "conf": {
+    "n": 50178,
+    "mean": 0.040228,
+    "t": 5.1728,
+    "meanNet": -0.188868,
+    "tNet": -22.51,
+    "win": 0.348,
+    "costR": 0.2291
+   }
+  },
+  {
+   "name": "fade control 1h swing",
+   "disc": {
+    "n": 39710,
+    "mean": 0.156974,
+    "t": 7.9698,
+    "meanNet": -0.033301,
+    "tNet": -1.61,
+    "win": 0.145,
+    "costR": 0.1903
+   },
+   "conf": {
+    "n": 45990,
+    "mean": 0.073186,
+    "t": 3.6224,
+    "meanNet": -0.158056,
+    "tNet": -7.64,
+    "win": 0.136,
+    "costR": 0.2312
+   }
+  },
+  {
+   "name": "fade control 15m 1R",
+   "disc": {
+    "n": 145032,
+    "mean": -0.029662,
+    "t": -8.3939,
+    "meanNet": -0.348082,
+    "tNet": -76.31,
+    "win": 0.484,
+    "costR": 0.3184
+   },
+   "conf": {
+    "n": 164557,
+    "mean": -0.053306,
+    "t": -14.5015,
+    "meanNet": -0.442735,
+    "tNet": -91,
+    "win": 0.473,
+    "costR": 0.3894
+   }
+  },
+  {
+   "name": "fade control 15m 2R",
+   "disc": {
+    "n": 145032,
+    "mean": 0.093619,
+    "t": 19.574,
+    "meanNet": -0.224801,
+    "tNet": -44.42,
+    "win": 0.365,
+    "costR": 0.3184
+   },
+   "conf": {
+    "n": 164557,
+    "mean": 0.054198,
+    "t": 12.1526,
+    "meanNet": -0.335231,
+    "tNet": -61.08,
+    "win": 0.352,
+    "costR": 0.3894
+   }
+  },
+  {
+   "name": "fade control 15m swing",
+   "disc": {
+    "n": 135982,
+    "mean": 0.240653,
+    "t": 17.805,
+    "meanNet": -0.079063,
+    "tNet": -5.88,
+    "win": 0.146,
+    "costR": 0.3197
+   },
+   "conf": {
+    "n": 151876,
+    "mean": 0.158114,
+    "t": 15.4623,
+    "meanNet": -0.234432,
+    "tNet": -21.32,
+    "win": 0.136,
+    "costR": 0.3925
+   }
+  },
+  {
+   "name": "fade control 5m 1R",
+   "disc": {
+    "n": 333573,
+    "mean": -0.122335,
+    "t": -21.6424,
+    "meanNet": -0.542176,
+    "tNet": -65.12,
+    "win": 0.438,
+    "costR": 0.4198
+   },
+   "conf": {
+    "n": 351129,
+    "mean": -0.139076,
+    "t": -25.9982,
+    "meanNet": -0.641628,
+    "tNet": -72.78,
+    "win": 0.43,
+    "costR": 0.5026
+   }
+  },
+  {
+   "name": "fade control 5m 2R",
+   "disc": {
+    "n": 333573,
+    "mean": 0.050136,
+    "t": 12.5173,
+    "meanNet": -0.369706,
+    "tNet": -67.33,
+    "win": 0.35,
+    "costR": 0.4198
+   },
+   "conf": {
+    "n": 351129,
+    "mean": 0.017974,
+    "t": 3.9782,
+    "meanNet": -0.484577,
+    "tNet": -67.41,
+    "win": 0.34,
+    "costR": 0.5026
+   }
+  },
+  {
+   "name": "fade control 5m swing",
+   "disc": {
+    "n": 317389,
+    "mean": 0.273947,
+    "t": 26.282,
+    "meanNet": -0.146804,
+    "tNet": -15.65,
+    "win": 0.156,
+    "costR": 0.4208
+   },
+   "conf": {
+    "n": 329660,
+    "mean": 0.202492,
+    "t": 23.8466,
+    "meanNet": -0.302573,
+    "tNet": -34.36,
+    "win": 0.149,
+    "costR": 0.5051
+   }
+  }
+ ],
+ "perMarket": {}
+}

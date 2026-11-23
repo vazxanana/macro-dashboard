@@ -1,0 +1,1028 @@
+{
+ "study": "smc-sweep-fvg",
+ "built": "2026-11-23",
+ "basis": "judged before costs (owner); after costs beside",
+ "window": "2010-01-01 to 2019-12-31 (discovery 2010-2014, confirmation 2015-2019)",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "params": {
+  "k4": 3,
+  "k1": 3,
+  "k5": 2,
+  "window": 48,
+  "life": 24,
+  "cap": 86400,
+  "placeboBack": 24,
+  "oppMin": 1,
+  "oppMax": 10,
+  "oppBack": 2000
+ },
+ "tests": {
+  "T1": {
+   "name": "base model, 50 % entry, 2R",
+   "before": {
+    "all": {
+     "n": 3161,
+     "meanR": 0.0213,
+     "tMonth": 0.86,
+     "months": 120
+    },
+    "disc": {
+     "n": 1664,
+     "meanR": 0.0249,
+     "tMonth": 0.74,
+     "months": 60
+    },
+    "conf": {
+     "n": 1497,
+     "meanR": 0.0173,
+     "tMonth": 0.47,
+     "months": 60
+    },
+    "wins": 1137
+   },
+   "after": {
+    "all": {
+     "n": 3161,
+     "meanR": -0.0619,
+     "tMonth": -2.47,
+     "months": 120
+    },
+    "disc": {
+     "n": 1664,
+     "meanR": -0.0542,
+     "tMonth": -1.61,
+     "months": 60
+    },
+    "conf": {
+     "n": 1497,
+     "meanR": -0.0705,
+     "tMonth": -1.86,
+     "months": 60
+    },
+    "wins": 1132
+   },
+   "placebo": {
+    "all": {
+     "n": 2400,
+     "meanR": -0.043,
+     "tMonth": -1.52,
+     "months": 120
+    },
+    "disc": {
+     "n": 1267,
+     "meanR": -0.0459,
+     "tMonth": -1.18,
+     "months": 60
+    },
+    "conf": {
+     "n": 1133,
+     "meanR": -0.0396,
+     "tMonth": -0.95,
+     "months": 60
+    },
+    "wins": 805
+   },
+   "vsPlacebo": {
+    "diff": 0.0643,
+    "t": 1.73
+   },
+   "p": 0.39151830891208506,
+   "holm": 0.668,
+   "thin": false,
+   "pass": false
+  },
+  "T2": {
+   "name": "T1 + premium / discount",
+   "before": {
+    "all": {
+     "n": 1506,
+     "meanR": -0.0306,
+     "tMonth": -0.97,
+     "months": 120
+    },
+    "disc": {
+     "n": 812,
+     "meanR": -0.0679,
+     "tMonth": -1.6,
+     "months": 60
+    },
+    "conf": {
+     "n": 694,
+     "meanR": 0.013,
+     "tMonth": 0.28,
+     "months": 60
+    },
+    "wins": 510
+   },
+   "after": {
+    "all": {
+     "n": 1506,
+     "meanR": -0.116,
+     "tMonth": -3.61,
+     "months": 120
+    },
+    "disc": {
+     "n": 812,
+     "meanR": -0.1491,
+     "tMonth": -3.5,
+     "months": 60
+    },
+    "conf": {
+     "n": 694,
+     "meanR": -0.0773,
+     "tMonth": -1.6,
+     "months": 60
+    },
+    "wins": 508
+   },
+   "placebo": {
+    "all": {
+     "n": 1173,
+     "meanR": -0.0661,
+     "tMonth": -2,
+     "months": 120
+    },
+    "disc": {
+     "n": 640,
+     "meanR": -0.096,
+     "tMonth": -2.2,
+     "months": 60
+    },
+    "conf": {
+     "n": 533,
+     "meanR": -0.0301,
+     "tMonth": -0.6,
+     "months": 60
+    },
+    "wins": 383
+   },
+   "vsPlacebo": {
+    "diff": 0.0354,
+    "t": 0.67
+   },
+   "p": 0.33401391829609495,
+   "holm": 0.668,
+   "thin": false,
+   "pass": false
+  },
+  "T3": {
+   "name": "base model, opposite-pool target",
+   "before": {
+    "all": {
+     "n": 2942,
+     "meanR": -0.0647,
+     "tMonth": -2.26,
+     "months": 120
+    },
+    "disc": {
+     "n": 1538,
+     "meanR": -0.0563,
+     "tMonth": -1.48,
+     "months": 60
+    },
+    "conf": {
+     "n": 1404,
+     "meanR": -0.0739,
+     "tMonth": -1.71,
+     "months": 60
+    },
+    "wins": 852
+   },
+   "after": {
+    "all": {
+     "n": 2942,
+     "meanR": -0.1446,
+     "tMonth": -5,
+     "months": 120
+    },
+    "disc": {
+     "n": 1538,
+     "meanR": -0.1321,
+     "tMonth": -3.45,
+     "months": 60
+    },
+    "conf": {
+     "n": 1404,
+     "meanR": -0.1583,
+     "tMonth": -3.59,
+     "months": 60
+    },
+    "wins": 847
+   },
+   "placebo": {
+    "all": {
+     "n": 2206,
+     "meanR": -0.1021,
+     "tMonth": -3.29,
+     "months": 120
+    },
+    "disc": {
+     "n": 1157,
+     "meanR": -0.1004,
+     "tMonth": -2.35,
+     "months": 60
+    },
+    "conf": {
+     "n": 1049,
+     "meanR": -0.104,
+     "tMonth": -2.28,
+     "months": 60
+    },
+    "wins": 598
+   },
+   "vsPlacebo": {
+    "diff": 0.0374,
+    "t": 0.78
+   },
+   "p": 0.02564002180460663,
+   "holm": 0.0769,
+   "thin": false,
+   "pass": false
+  },
+  "R-edge": {
+   "name": "near-edge entry, 2R",
+   "before": {
+    "all": {
+     "n": 3392,
+     "meanR": 0.0145,
+     "tMonth": 0.64,
+     "months": 120
+    },
+    "disc": {
+     "n": 1781,
+     "meanR": 0.0101,
+     "tMonth": 0.32,
+     "months": 60
+    },
+    "conf": {
+     "n": 1611,
+     "meanR": 0.0193,
+     "tMonth": 0.58,
+     "months": 60
+    },
+    "wins": 1218
+   },
+   "after": {
+    "all": {
+     "n": 3392,
+     "meanR": -0.0615,
+     "tMonth": -2.67,
+     "months": 120
+    },
+    "disc": {
+     "n": 1781,
+     "meanR": -0.0623,
+     "tMonth": -1.98,
+     "months": 60
+    },
+    "conf": {
+     "n": 1611,
+     "meanR": -0.0606,
+     "tMonth": -1.78,
+     "months": 60
+    },
+    "wins": 1211
+   },
+   "placebo": {
+    "all": {
+     "n": 2436,
+     "meanR": -0.0503,
+     "tMonth": -1.78,
+     "months": 120
+    },
+    "disc": {
+     "n": 1285,
+     "meanR": -0.0464,
+     "tMonth": -1.21,
+     "months": 60
+    },
+    "conf": {
+     "n": 1151,
+     "meanR": -0.0546,
+     "tMonth": -1.29,
+     "months": 60
+    },
+    "wins": 818
+   },
+   "vsPlacebo": {
+    "diff": 0.0648,
+    "t": 1.76
+   },
+   "p": 0.5234029040407813
+  },
+  "R-noside": {
+   "name": "no H4 side (every sweep), 2R",
+   "before": {
+    "all": {
+     "n": 6612,
+     "meanR": 0.0344,
+     "tMonth": 2.2,
+     "months": 120
+    },
+    "disc": {
+     "n": 3488,
+     "meanR": 0.0494,
+     "tMonth": 2.33,
+     "months": 60
+    },
+    "conf": {
+     "n": 3124,
+     "meanR": 0.0176,
+     "tMonth": 0.76,
+     "months": 60
+    },
+    "wins": 2393
+   },
+   "after": {
+    "all": {
+     "n": 6612,
+     "meanR": -0.0482,
+     "tMonth": -3.04,
+     "months": 120
+    },
+    "disc": {
+     "n": 3488,
+     "meanR": -0.0285,
+     "tMonth": -1.32,
+     "months": 60
+    },
+    "conf": {
+     "n": 3124,
+     "meanR": -0.0702,
+     "tMonth": -3.03,
+     "months": 60
+    },
+    "wins": 2384
+   },
+   "placebo": {
+    "all": {
+     "n": 4967,
+     "meanR": -0.0468,
+     "tMonth": -2.63,
+     "months": 120
+    },
+    "disc": {
+     "n": 2638,
+     "meanR": -0.0425,
+     "tMonth": -1.83,
+     "months": 60
+    },
+    "conf": {
+     "n": 2329,
+     "meanR": -0.0517,
+     "tMonth": -1.88,
+     "months": 60
+    },
+    "wins": 1664
+   },
+   "vsPlacebo": {
+    "diff": 0.0812,
+    "t": 3.14
+   },
+   "p": 0.02973863043213324
+  }
+ },
+ "sessionsT1": {
+  "newyork": {
+   "before": {
+    "n": 697,
+    "meanR": 0.0304,
+    "tMonth": 0.59,
+    "months": 120
+   },
+   "after": {
+    "n": 697,
+    "meanR": -0.0346,
+    "tMonth": -0.67,
+    "months": 120
+   }
+  },
+  "other": {
+   "before": {
+    "n": 1339,
+    "meanR": 0.0062,
+    "tMonth": 0.16,
+    "months": 120
+   },
+   "after": {
+    "n": 1339,
+    "meanR": -0.0882,
+    "tMonth": -2.19,
+    "months": 120
+   }
+  },
+  "london": {
+   "before": {
+    "n": 1125,
+    "meanR": 0.0336,
+    "tMonth": 0.79,
+    "months": 120
+   },
+   "after": {
+    "n": 1125,
+    "meanR": -0.0476,
+    "tMonth": -1.12,
+    "months": 120
+   }
+  }
+ },
+ "poolsT1": {
+  "asia": {
+   "before": {
+    "n": 990,
+    "meanR": -0.0276,
+    "tMonth": -0.71,
+    "months": 120
+   },
+   "after": {
+    "n": 990,
+    "meanR": -0.1053,
+    "tMonth": -2.7,
+    "months": 120
+   }
+  },
+  "h1": {
+   "before": {
+    "n": 1561,
+    "meanR": 0.0581,
+    "tMonth": 1.65,
+    "months": 120
+   },
+   "after": {
+    "n": 1561,
+    "meanR": -0.0306,
+    "tMonth": -0.86,
+    "months": 120
+   }
+  },
+  "pd": {
+   "before": {
+    "n": 610,
+    "meanR": 0.0065,
+    "tMonth": 0.12,
+    "months": 120
+   },
+   "after": {
+    "n": 610,
+    "meanR": -0.0717,
+    "tMonth": -1.28,
+    "months": 120
+   }
+  }
+ },
+ "sideT1": {
+  "buy": {
+   "before": {
+    "n": 1549,
+    "meanR": -0.0037,
+    "tMonth": -0.11,
+    "months": 120
+   },
+   "after": {
+    "n": 1549,
+    "meanR": -0.0861,
+    "tMonth": -2.55,
+    "months": 120
+   }
+  },
+  "sell": {
+   "before": {
+    "n": 1612,
+    "meanR": 0.0454,
+    "tMonth": 1.36,
+    "months": 120
+   },
+   "after": {
+    "n": 1612,
+    "meanR": -0.0388,
+    "tMonth": -1.16,
+    "months": 120
+   }
+  }
+ },
+ "perMarket": {
+  "xau": {
+   "signals": 2202,
+   "T1": {
+    "before": {
+     "n": 577,
+     "meanR": 0.1023,
+     "tMonth": 1.8,
+     "months": 120
+    },
+    "after": {
+     "n": 577,
+     "meanR": -0.0393,
+     "tMonth": -0.68,
+     "months": 120
+    },
+    "placebo": {
+     "n": 436,
+     "meanR": 0.0135,
+     "tMonth": 0.2,
+     "months": 120
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 283,
+     "meanR": 0.1096,
+     "tMonth": 1.45,
+     "months": 120
+    },
+    "after": {
+     "n": 283,
+     "meanR": -0.0302,
+     "tMonth": -0.4,
+     "months": 120
+    },
+    "placebo": {
+     "n": 219,
+     "meanR": 0.0101,
+     "tMonth": 0.13,
+     "months": 120
+    }
+   },
+   "T3": {
+    "before": {
+     "n": 552,
+     "meanR": 0.0297,
+     "tMonth": 0.39,
+     "months": 120
+    },
+    "after": {
+     "n": 552,
+     "meanR": -0.1083,
+     "tMonth": -1.41,
+     "months": 120
+    },
+    "placebo": {
+     "n": 404,
+     "meanR": 0.0037,
+     "tMonth": 0.04,
+     "months": 120
+    }
+   },
+   "R-edge": {
+    "before": {
+     "n": 609,
+     "meanR": 0.0833,
+     "tMonth": 1.45,
+     "months": 120
+    },
+    "after": {
+     "n": 609,
+     "meanR": -0.0481,
+     "tMonth": -0.83,
+     "months": 120
+    },
+    "placebo": {
+     "n": 439,
+     "meanR": 0.0298,
+     "tMonth": 0.42,
+     "months": 120
+    }
+   },
+   "R-noside": {
+    "before": {
+     "n": 1198,
+     "meanR": 0.0784,
+     "tMonth": 2.31,
+     "months": 120
+    },
+    "after": {
+     "n": 1198,
+     "meanR": -0.0608,
+     "tMonth": -1.77,
+     "months": 120
+    },
+    "placebo": {
+     "n": 895,
+     "meanR": -0.0491,
+     "tMonth": -1.22,
+     "months": 120
+    }
+   }
+  },
+  "eurusd": {
+   "signals": 2453,
+   "T1": {
+    "before": {
+     "n": 644,
+     "meanR": 0.0693,
+     "tMonth": 1.27,
+     "months": 120
+    },
+    "after": {
+     "n": 644,
+     "meanR": 0.0111,
+     "tMonth": 0.2,
+     "months": 120
+    },
+    "placebo": {
+     "n": 480,
+     "meanR": 0.0283,
+     "tMonth": 0.46,
+     "months": 120
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 301,
+     "meanR": 0.0466,
+     "tMonth": 0.61,
+     "months": 120
+    },
+    "after": {
+     "n": 301,
+     "meanR": -0.0124,
+     "tMonth": -0.16,
+     "months": 120
+    },
+    "placebo": {
+     "n": 225,
+     "meanR": 0.0085,
+     "tMonth": 0.1,
+     "months": 120
+    }
+   },
+   "T3": {
+    "before": {
+     "n": 586,
+     "meanR": 0.0005,
+     "tMonth": 0.01,
+     "months": 120
+    },
+    "after": {
+     "n": 586,
+     "meanR": -0.0534,
+     "tMonth": -0.82,
+     "months": 120
+    },
+    "placebo": {
+     "n": 431,
+     "meanR": -0.0145,
+     "tMonth": -0.17,
+     "months": 120
+    }
+   },
+   "R-edge": {
+    "before": {
+     "n": 676,
+     "meanR": 0.0444,
+     "tMonth": 0.86,
+     "months": 120
+    },
+    "after": {
+     "n": 676,
+     "meanR": -0.0087,
+     "tMonth": -0.17,
+     "months": 120
+    },
+    "placebo": {
+     "n": 486,
+     "meanR": 0.0171,
+     "tMonth": 0.29,
+     "months": 120
+    }
+   },
+   "R-noside": {
+    "before": {
+     "n": 1318,
+     "meanR": -0.0086,
+     "tMonth": -0.23,
+     "months": 120
+    },
+    "after": {
+     "n": 1318,
+     "meanR": -0.0654,
+     "tMonth": -1.78,
+     "months": 120
+    },
+    "placebo": {
+     "n": 999,
+     "meanR": -0.06,
+     "tMonth": -1.57,
+     "months": 120
+    }
+   }
+  },
+  "gbpusd": {
+   "signals": 2486,
+   "T1": {
+    "before": {
+     "n": 664,
+     "meanR": -0.0117,
+     "tMonth": -0.22,
+     "months": 120
+    },
+    "after": {
+     "n": 664,
+     "meanR": -0.0796,
+     "tMonth": -1.46,
+     "months": 120
+    },
+    "placebo": {
+     "n": 516,
+     "meanR": -0.0722,
+     "tMonth": -1.18,
+     "months": 120
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 304,
+     "meanR": -0.0358,
+     "tMonth": -0.49,
+     "months": 119
+    },
+    "after": {
+     "n": 304,
+     "meanR": -0.1055,
+     "tMonth": -1.42,
+     "months": 119
+    },
+    "placebo": {
+     "n": 249,
+     "meanR": -0.093,
+     "tMonth": -1.05,
+     "months": 119
+    }
+   },
+   "T3": {
+    "before": {
+     "n": 610,
+     "meanR": -0.1179,
+     "tMonth": -1.67,
+     "months": 120
+    },
+    "after": {
+     "n": 610,
+     "meanR": -0.1819,
+     "tMonth": -2.55,
+     "months": 120
+    },
+    "placebo": {
+     "n": 478,
+     "meanR": -0.1481,
+     "tMonth": -1.81,
+     "months": 120
+    }
+   },
+   "R-edge": {
+    "before": {
+     "n": 710,
+     "meanR": 0.0017,
+     "tMonth": 0.03,
+     "months": 120
+    },
+    "after": {
+     "n": 710,
+     "meanR": -0.0597,
+     "tMonth": -1.17,
+     "months": 120
+    },
+    "placebo": {
+     "n": 528,
+     "meanR": -0.0554,
+     "tMonth": -1.05,
+     "months": 120
+    }
+   },
+   "R-noside": {
+    "before": {
+     "n": 1386,
+     "meanR": 0.0364,
+     "tMonth": 0.99,
+     "months": 120
+    },
+    "after": {
+     "n": 1386,
+     "meanR": -0.0296,
+     "tMonth": -0.8,
+     "months": 120
+    },
+    "placebo": {
+     "n": 1040,
+     "meanR": -0.055,
+     "tMonth": -1.32,
+     "months": 120
+    }
+   }
+  },
+  "usdjpy": {
+   "signals": 2199,
+   "T1": {
+    "before": {
+     "n": 596,
+     "meanR": -0.0251,
+     "tMonth": -0.49,
+     "months": 120
+    },
+    "after": {
+     "n": 596,
+     "meanR": -0.1167,
+     "tMonth": -2.32,
+     "months": 120
+    },
+    "placebo": {
+     "n": 455,
+     "meanR": -0.1213,
+     "tMonth": -2.17,
+     "months": 120
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 301,
+     "meanR": -0.0933,
+     "tMonth": -1.25,
+     "months": 120
+    },
+    "after": {
+     "n": 301,
+     "meanR": -0.1894,
+     "tMonth": -2.54,
+     "months": 120
+    },
+    "placebo": {
+     "n": 233,
+     "meanR": -0.0504,
+     "tMonth": -0.62,
+     "months": 120
+    }
+   },
+   "T3": {
+    "before": {
+     "n": 565,
+     "meanR": -0.1731,
+     "tMonth": -2.71,
+     "months": 120
+    },
+    "after": {
+     "n": 565,
+     "meanR": -0.2609,
+     "tMonth": -4.1,
+     "months": 120
+    },
+    "placebo": {
+     "n": 418,
+     "meanR": -0.2274,
+     "tMonth": -3,
+     "months": 120
+    }
+   },
+   "R-edge": {
+    "before": {
+     "n": 651,
+     "meanR": -0.0226,
+     "tMonth": -0.46,
+     "months": 120
+    },
+    "after": {
+     "n": 651,
+     "meanR": -0.1054,
+     "tMonth": -2.17,
+     "months": 120
+    },
+    "placebo": {
+     "n": 452,
+     "meanR": -0.1761,
+     "tMonth": -2.86,
+     "months": 120
+    }
+   },
+   "R-noside": {
+    "before": {
+     "n": 1239,
+     "meanR": 0.057,
+     "tMonth": 1.42,
+     "months": 120
+    },
+    "after": {
+     "n": 1239,
+     "meanR": -0.0358,
+     "tMonth": -0.9,
+     "months": 120
+    },
+    "placebo": {
+     "n": 920,
+     "meanR": -0.0568,
+     "tMonth": -1.3,
+     "months": 120
+    }
+   }
+  },
+  "audusd": {
+   "signals": 2486,
+   "T1": {
+    "before": {
+     "n": 680,
+     "meanR": -0.0199,
+     "tMonth": -0.36,
+     "months": 120
+    },
+    "after": {
+     "n": 680,
+     "meanR": -0.0851,
+     "tMonth": -1.52,
+     "months": 120
+    },
+    "placebo": {
+     "n": 513,
+     "meanR": -0.0587,
+     "tMonth": -1.01,
+     "months": 120
+    }
+   },
+   "T2": {
+    "before": {
+     "n": 317,
+     "meanR": -0.1647,
+     "tMonth": -2.44,
+     "months": 120
+    },
+    "after": {
+     "n": 317,
+     "meanR": -0.2315,
+     "tMonth": -3.39,
+     "months": 120
+    },
+    "placebo": {
+     "n": 247,
+     "meanR": -0.1892,
+     "tMonth": -2.41,
+     "months": 120
+    }
+   },
+   "T3": {
+    "before": {
+     "n": 629,
+     "meanR": -0.0593,
+     "tMonth": -0.84,
+     "months": 120
+    },
+    "after": {
+     "n": 629,
+     "meanR": -0.1209,
+     "tMonth": -1.7,
+     "months": 120
+    },
+    "placebo": {
+     "n": 475,
+     "meanR": -0.115,
+     "tMonth": -1.36,
+     "months": 120
+    }
+   },
+   "R-edge": {
+    "before": {
+     "n": 746,
+     "meanR": -0.0243,
+     "tMonth": -0.46,
+     "months": 120
+    },
+    "after": {
+     "n": 746,
+     "meanR": -0.0836,
+     "tMonth": -1.59,
+     "months": 120
+    },
+    "placebo": {
+     "n": 531,
+     "meanR": -0.0659,
+     "tMonth": -0.97,
+     "months": 120
+    }
+   },
+   "R-noside": {
+    "before": {
+     "n": 1471,
+     "meanR": 0.0161,
+     "tMonth": 0.45,
+     "months": 120
+    },
+    "after": {
+     "n": 1471,
+     "meanR": -0.0505,
+     "tMonth": -1.44,
+     "months": 120
+    },
+    "placebo": {
+     "n": 1113,
+     "meanR": -0.0173,
+     "tMonth": -0.4,
+     "months": 120
+    }
+   }
+  }
+ },
+ "verdict": "FAIL",
+ "headline": "FAIL, 0 of 3. T1 base model +0.021R a trade before costs (n 3161, month t 0.86); placebo difference +0.0643R (Welch t 1.73)."
+}

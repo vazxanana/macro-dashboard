@@ -1,0 +1,433 @@
+{
+ "study": "smc-ob-fvg",
+ "built": "2026-11-23",
+ "basis": "judged before costs; after costs beside",
+ "window": "2010-01-01 to 2019-12-31",
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "params": {
+  "swingK": 3,
+  "obBack": 10,
+  "life": 120,
+  "buf": 0.1,
+  "rr": 2,
+  "cap": 432000,
+  "back": 24
+ },
+ "verdict": "FAIL",
+ "passes": [
+  false,
+  false,
+  false
+ ],
+ "holm": [
+  0.427,
+  0.667,
+  0.987
+ ],
+ "fvgBeatsPlacebo": false,
+ "T1": {
+  "all": {
+   "n": 7672,
+   "win": 0.342,
+   "before": 0.0183,
+   "tBefore": 1.07,
+   "after": -0.0371,
+   "tAfter": -2.16
+  },
+  "a": {
+   "n": 3906,
+   "win": 0.348,
+   "before": 0.0377,
+   "tBefore": 1.52,
+   "after": -0.0131,
+   "tAfter": -0.54
+  },
+  "b": {
+   "n": 3766,
+   "win": 0.337,
+   "before": -0.0018,
+   "tBefore": -0.08,
+   "after": -0.062,
+   "tAfter": -2.59
+  }
+ },
+ "T2": {
+  "all": {
+   "diff": 0.0103,
+   "t": 0.43,
+   "df": 14102
+  },
+  "a": {
+   "diff": 0.0107,
+   "t": 0.32,
+   "df": 7210
+  },
+  "b": {
+   "diff": 0.0101,
+   "t": 0.3,
+   "df": 6890
+  },
+  "monthDiffT": 0.61,
+  "after": {
+   "diff": 0.0105,
+   "t": 0.44,
+   "df": 14099
+  }
+ },
+ "T3": {
+  "all": {
+   "n": 28522,
+   "win": 0.316,
+   "before": -0.0212,
+   "tBefore": -2.24,
+   "after": -0.2658,
+   "tAfter": -27.16
+  },
+  "a": {
+   "n": 14690,
+   "win": 0.311,
+   "before": -0.0356,
+   "tBefore": -2.77,
+   "after": -0.2633,
+   "tAfter": -20.89
+  },
+  "b": {
+   "n": 13832,
+   "win": 0.32,
+   "before": -0.0058,
+   "tBefore": -0.42,
+   "after": -0.2685,
+   "tAfter": -17.69
+  }
+ },
+ "fvgMinusPlacebo": {
+  "diff": -0.0067,
+  "t": -0.46,
+  "df": 38874
+ },
+ "pooled": {
+  "ob": {
+   "n": 7672,
+   "win": 0.342,
+   "before": 0.0183,
+   "tBefore": 1.07,
+   "after": -0.0371,
+   "tAfter": -2.16
+  },
+  "obPlacebo": {
+   "n": 6681,
+   "win": 0.338,
+   "before": 0.008,
+   "tBefore": 0.46,
+   "after": -0.0476,
+   "tAfter": -2.68
+  },
+  "fvg": {
+   "n": 28522,
+   "win": 0.316,
+   "before": -0.0212,
+   "tBefore": -2.24,
+   "after": -0.2658,
+   "tAfter": -27.16
+  },
+  "fvgPlacebo": {
+   "n": 19033,
+   "win": 0.309,
+   "before": -0.0145,
+   "tBefore": -1.37,
+   "after": -0.2597,
+   "tAfter": -21.67
+  }
+ },
+ "seeds": {
+  "2": {
+   "placebo": {
+    "n": 6664,
+    "win": 0.335,
+    "before": -0.0018,
+    "tBefore": -0.1,
+    "after": -0.0572,
+    "tAfter": -3.37
+   },
+   "obMinus": {
+    "diff": 0.02,
+    "t": 0.84,
+    "df": 14090
+   }
+  },
+  "3": {
+   "placebo": {
+    "n": 6677,
+    "win": 0.345,
+    "before": 0.0282,
+    "tBefore": 1.72,
+    "after": -0.0273,
+    "tAfter": -1.65
+   },
+   "obMinus": {
+    "diff": -0.0099,
+    "t": -0.41,
+    "df": 14077
+   }
+  },
+  "4": {
+   "placebo": {
+    "n": 6692,
+    "win": 0.336,
+    "before": 0.0041,
+    "tBefore": 0.23,
+    "after": -0.0513,
+    "tAfter": -2.92
+   },
+   "obMinus": {
+    "diff": 0.0142,
+    "t": 0.59,
+    "df": 14109
+   }
+  },
+  "5": {
+   "placebo": {
+    "n": 6684,
+    "win": 0.347,
+    "before": 0.0336,
+    "tBefore": 2.07,
+    "after": -0.0218,
+    "tAfter": -1.33
+   },
+   "obMinus": {
+    "diff": -0.0153,
+    "t": -0.64,
+    "df": 14077
+   }
+  }
+ },
+ "perMarket": {
+  "xau": {
+   "ob": {
+    "n": 1498,
+    "win": 0.346,
+    "before": 0.0286,
+    "tBefore": 0.8,
+    "after": -0.072,
+    "tAfter": -1.98
+   },
+   "obPlacebo": {
+    "n": 1287,
+    "win": 0.336,
+    "before": -0.0051,
+    "tBefore": -0.13,
+    "after": -0.1067,
+    "tAfter": -2.64
+   },
+   "obMinus": {
+    "diff": 0.0337,
+    "t": 0.63,
+    "df": 2738
+   },
+   "fvg": {
+    "n": 5125,
+    "win": 0.317,
+    "before": -0.017,
+    "tBefore": -0.8,
+    "after": -0.4233,
+    "tAfter": -19.75
+   },
+   "fvgPlacebo": {
+    "n": 3433,
+    "win": 0.292,
+    "before": -0.0574,
+    "tBefore": -2.04,
+    "after": -0.4643,
+    "tAfter": -15
+   },
+   "fvgMinus": {
+    "diff": 0.0404,
+    "t": 1.18,
+    "df": 6954
+   }
+  },
+  "eurusd": {
+   "ob": {
+    "n": 1452,
+    "win": 0.358,
+    "before": 0.0701,
+    "tBefore": 2.03,
+    "after": 0.0314,
+    "tAfter": 0.9
+   },
+   "obPlacebo": {
+    "n": 1270,
+    "win": 0.357,
+    "before": 0.0647,
+    "tBefore": 1.65,
+    "after": 0.0266,
+    "tAfter": 0.68
+   },
+   "obMinus": {
+    "diff": 0.0055,
+    "t": 0.1,
+    "df": 2670
+   },
+   "fvg": {
+    "n": 5771,
+    "win": 0.329,
+    "before": 0.0142,
+    "tBefore": 0.66,
+    "after": -0.1631,
+    "tAfter": -7.73
+   },
+   "fvgPlacebo": {
+    "n": 3827,
+    "win": 0.318,
+    "before": 0.0189,
+    "tBefore": 0.75,
+    "after": -0.1572,
+    "tAfter": -5.87
+   },
+   "fvgMinus": {
+    "diff": -0.0047,
+    "t": -0.14,
+    "df": 7767
+   }
+  },
+  "gbpusd": {
+   "ob": {
+    "n": 1442,
+    "win": 0.351,
+    "before": 0.0455,
+    "tBefore": 1.13,
+    "after": 0.0034,
+    "tAfter": 0.09
+   },
+   "obPlacebo": {
+    "n": 1233,
+    "win": 0.335,
+    "before": -0.0011,
+    "tBefore": -0.03,
+    "after": -0.0428,
+    "tAfter": -1.06
+   },
+   "obMinus": {
+    "diff": 0.0466,
+    "t": 0.85,
+    "df": 2621
+   },
+   "fvg": {
+    "n": 5717,
+    "win": 0.316,
+    "before": -0.0111,
+    "tBefore": -0.51,
+    "after": -0.2039,
+    "tAfter": -9.25
+   },
+   "fvgPlacebo": {
+    "n": 3820,
+    "win": 0.309,
+    "before": -0.0238,
+    "tBefore": -1.09,
+    "after": -0.2169,
+    "tAfter": -9.58
+   },
+   "fvgMinus": {
+    "diff": 0.0127,
+    "t": 0.39,
+    "df": 8042
+   }
+  },
+  "usdjpy": {
+   "ob": {
+    "n": 1543,
+    "win": 0.342,
+    "before": 0.0079,
+    "tBefore": 0.19,
+    "after": -0.0496,
+    "tAfter": -1.19
+   },
+   "obPlacebo": {
+    "n": 1363,
+    "win": 0.34,
+    "before": 0.0217,
+    "tBefore": 0.53,
+    "after": -0.0369,
+    "tAfter": -0.89
+   },
+   "obMinus": {
+    "diff": -0.0139,
+    "t": -0.26,
+    "df": 2862
+   },
+   "fvg": {
+    "n": 5791,
+    "win": 0.303,
+    "before": -0.0586,
+    "tBefore": -3.18,
+    "after": -0.3286,
+    "tAfter": -16.64
+   },
+   "fvgPlacebo": {
+    "n": 3885,
+    "win": 0.311,
+    "before": -0.0085,
+    "tBefore": -0.35,
+    "after": -0.2804,
+    "tAfter": -10.64
+   },
+   "fvgMinus": {
+    "diff": -0.0501,
+    "t": -1.52,
+    "df": 7699
+   }
+  },
+  "audusd": {
+   "ob": {
+    "n": 1737,
+    "win": 0.32,
+    "before": -0.0473,
+    "tBefore": -1.4,
+    "after": -0.0868,
+    "tAfter": -2.57
+   },
+   "obPlacebo": {
+    "n": 1528,
+    "win": 0.325,
+    "before": -0.0329,
+    "tBefore": -0.94,
+    "after": -0.0729,
+    "tAfter": -2.06
+   },
+   "obMinus": {
+    "diff": -0.0144,
+    "t": -0.29,
+    "df": 3201
+   },
+   "fvg": {
+    "n": 6118,
+    "win": 0.314,
+    "before": -0.0321,
+    "tBefore": -1.87,
+    "after": -0.2293,
+    "tAfter": -12.02
+   },
+   "fvgPlacebo": {
+    "n": 4068,
+    "win": 0.313,
+    "before": -0.0067,
+    "tBefore": -0.26,
+    "after": -0.2038,
+    "tAfter": -7.56
+   },
+   "fvgMinus": {
+    "diff": -0.0254,
+    "t": -0.83,
+    "df": 8414
+   }
+  }
+ },
+ "headline": "Before costs, 2010-2019 pooled, 2R: order block +0.018R a trade (n 7672, month t 1.07), its placebo +0.008R (n 6681; difference Welch t 0.43); FVG 50% fill -0.021R (n 28522, month t -2.24). After costs: -0.037R and -0.266R."
+}

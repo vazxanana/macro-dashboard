@@ -20,6 +20,10 @@ on:
         description: 'For the marks part: seconds before a mark to look for its quote (60-3600)'
         required: false
         default: ''
+      gap_ms:
+        description: 'Pause before each historical tick request, ms (200-2000; default 260). The broker allows about 5 a second.'
+        required: false
+        default: ''
       tag:
         description: 'Optional suffix of the output file (ticks-<SYMBOL>-<tag>.json), a-z 0-9 -'
         required: false
@@ -29,7 +33,9 @@ permissions:
   contents: write
 
 concurrency:
-  group: tick-probe
+  # one queue per tag: batches with different tags run side by side (each its own read-only session, at most 4 tick
+  # requests a second each); the same tag never runs twice at once
+  group: tick-probe-${{ inputs.tag || 'default' }}
   cancel-in-progress: false
 
 jobs:
@@ -66,6 +72,7 @@ jobs:
           SYMS: ${{ inputs.symbols }}
           PROBE_MARKS: ${{ inputs.marks }}
           PROBE_TAG: ${{ inputs.tag }}
+          PROBE_GAP_MS: ${{ inputs.gap_ms }}
           PROBE_MARKS_BACK: ${{ inputs.marks_back }}
         run: |
           git -C data config user.name "mosha-council"

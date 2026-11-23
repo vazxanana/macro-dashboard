@@ -1,0 +1,1557 @@
+{
+ "study": "fade-mtf-context",
+ "built": "2026-11-23",
+ "verdict": "FAIL",
+ "headline": "0 of 10 primary tests hold; the unsplit 2R fade made +0.042R a trade before costs in 2015-26 (n 201,769, month t 11.33); the strongest difference, h4 opposite minus h4 same, swing, +0.019R (Welch t 2.18; 2005-14 +0.007R, t 0.74)",
+ "basis": "judged before costs (pre-registered); after costs beside",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31 (120 months)",
+  "confirmation": "2015-01-01 to 2026-10-31 (142 months)"
+ },
+ "markets": [
+  "xau",
+  "xag",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "assumedCosts": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01
+ },
+ "meta": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "last": "2026-10-30",
+   "signals": 35387,
+   "sims": 35214,
+   "dropped": 3,
+   "bad": 0,
+   "small": 170,
+   "open": 2
+  },
+  {
+   "market": "xag",
+   "first": "2006-03-19",
+   "last": "2026-10-30",
+   "signals": 35575,
+   "sims": 23332,
+   "dropped": 67,
+   "bad": 0,
+   "small": 12176,
+   "open": 1
+  },
+  {
+   "market": "eurusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 39580,
+   "sims": 39527,
+   "dropped": 19,
+   "bad": 0,
+   "small": 6,
+   "open": 1
+  },
+  {
+   "market": "gbpusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 39311,
+   "sims": 39228,
+   "dropped": 49,
+   "bad": 0,
+   "small": 6,
+   "open": 2
+  },
+  {
+   "market": "usdjpy",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 38671,
+   "sims": 38598,
+   "dropped": 33,
+   "bad": 0,
+   "small": 10,
+   "open": 0
+  },
+  {
+   "market": "audusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 40108,
+   "sims": 40046,
+   "dropped": 29,
+   "bad": 0,
+   "small": 6,
+   "open": 0
+  },
+  {
+   "market": "nzdusd",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 39757,
+   "sims": 39725,
+   "dropped": 1,
+   "bad": 0,
+   "small": 5,
+   "open": 1
+  },
+  {
+   "market": "usdcad",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 39996,
+   "sims": 39916,
+   "dropped": 43,
+   "bad": 0,
+   "small": 2,
+   "open": 1
+  },
+  {
+   "market": "usdchf",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 39250,
+   "sims": 39175,
+   "dropped": 41,
+   "bad": 0,
+   "small": 3,
+   "open": 1
+  },
+  {
+   "market": "eurjpy",
+   "first": "2004-01-01",
+   "last": "2026-10-30",
+   "signals": 38581,
+   "sims": 38542,
+   "dropped": 2,
+   "bad": 0,
+   "small": 4,
+   "open": 2
+  }
+ ],
+ "primary": [
+  {
+   "id": "P1 2R",
+   "test": "h1 opposite minus h1 same, 2R",
+   "diffD": -0.007327,
+   "tD": -1.05787,
+   "diffC": -0.011872,
+   "tC": -1.829211,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": -0.018318,
+    "tD": -2.721022,
+    "diffC": -0.008793,
+    "tC": -1.392821
+   }
+  },
+  {
+   "id": "P2 2R",
+   "test": "h4 opposite minus h4 same, 2R",
+   "diffD": -0.002458,
+   "tD": -0.3554,
+   "diffC": 0.007427,
+   "tC": 1.14586,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": -0.018784,
+    "tD": -2.793882,
+    "diffC": -0.013547,
+    "tC": -2.148971
+   }
+  },
+  {
+   "id": "P3 2R",
+   "test": "stage pullback minus stage move, 2R",
+   "diffD": 0.002665,
+   "tD": 0.327046,
+   "diffC": -0.004622,
+   "tC": -0.600417,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": 0.008882,
+    "tD": 1.118745,
+    "diffC": 0.019792,
+    "tC": 2.631383
+   }
+  },
+  {
+   "id": "P4 2R",
+   "test": "counter yes minus counter no, 2R",
+   "diffD": -0.011691,
+   "tD": -1.390025,
+   "diffC": -0.014934,
+   "tC": -1.888857,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": -0.026035,
+    "tD": -3.184618,
+    "diffC": -0.007993,
+    "tC": -1.040608
+   }
+  },
+  {
+   "id": "P5 2R",
+   "test": "prior-day yes minus prior-day no, 2R",
+   "diffD": -0.014422,
+   "tD": -1.816272,
+   "diffC": -0.008388,
+   "tC": -1.132918,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": 0.027298,
+    "tD": 3.516979,
+    "diffC": 0.021094,
+    "tC": 2.900322
+   }
+  },
+  {
+   "id": "P1 swing",
+   "test": "h1 opposite minus h1 same, swing",
+   "diffD": -0.00925,
+   "tD": -0.997125,
+   "diffC": -0.018782,
+   "tC": -2.196135,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": -0.026049,
+    "tD": -2.938073,
+    "diffC": -0.014459,
+    "tC": -1.749352
+   }
+  },
+  {
+   "id": "P2 swing",
+   "test": "h4 opposite minus h4 same, swing",
+   "diffD": 0.006863,
+   "tD": 0.739682,
+   "diffC": 0.018634,
+   "tC": 2.177573,
+   "holm": 0.147189,
+   "holds": false,
+   "mirror": {
+    "diffD": -0.023571,
+    "tD": -2.656212,
+    "diffC": -0.030082,
+    "tC": -3.640917
+   }
+  },
+  {
+   "id": "P3 swing",
+   "test": "stage pullback minus stage move, swing",
+   "diffD": 0.000874,
+   "tD": 0.079978,
+   "diffC": -0.003742,
+   "tC": -0.368176,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": 0.000527,
+    "tD": 0.05037,
+    "diffC": 0.027153,
+    "tC": 2.74774
+   }
+  },
+  {
+   "id": "P4 swing",
+   "test": "counter yes minus counter no, swing",
+   "diffD": -0.012092,
+   "tD": -1.09569,
+   "diffC": -0.031571,
+   "tC": -3.094182,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": -0.036681,
+    "tD": -3.508462,
+    "diffC": -0.010955,
+    "tC": -1.101919
+   }
+  },
+  {
+   "id": "P5 swing",
+   "test": "prior-day yes minus prior-day no, swing",
+   "diffD": -0.010052,
+   "tD": -0.921476,
+   "diffC": -0.003942,
+   "tC": -0.393193,
+   "holm": 1,
+   "holds": false,
+   "mirror": {
+    "diffD": 0.035154,
+    "tD": 3.332079,
+    "diffC": 0.028023,
+    "tC": 2.861666
+   }
+  }
+ ],
+ "held": [],
+ "passedCells": [],
+ "cells": [
+  {
+   "cell": "control 2R",
+   "level": "control",
+   "exit": "2R",
+   "control": true,
+   "disc": {
+    "n": 171523,
+    "mean": 0.054233,
+    "t": 11.381061,
+    "meanNet": -0.088369,
+    "tNet": -15.56,
+    "win": 0.355,
+    "costR": 0.1426
+   },
+   "conf": {
+    "n": 201769,
+    "mean": 0.042267,
+    "t": 11.329637,
+    "meanNet": -0.118139,
+    "tNet": -28.34,
+    "win": 0.351,
+    "costR": 0.1604
+   },
+   "vsControlD": 0,
+   "vsControlC": 0,
+   "holm": null,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 171523,
+     "mean": -0.066998,
+     "t": -14.101852,
+     "meanNet": -0.209601,
+     "tNet": -34.01,
+     "win": 0.314,
+     "costR": 0.1426
+    },
+    "conf": {
+     "n": 201769,
+     "mean": -0.057431,
+     "t": -14.878464,
+     "meanNet": -0.217837,
+     "tNet": -45.61,
+     "win": 0.318,
+     "costR": 0.1604
+    }
+   }
+  },
+  {
+   "cell": "h1 same 2R",
+   "level": "h1 same",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 90394,
+    "mean": 0.057699,
+    "t": 8.610967,
+    "meanNet": -0.083622,
+    "tNet": -11.51,
+    "win": 0.357,
+    "costR": 0.1413
+   },
+   "conf": {
+    "n": 106220,
+    "mean": 0.047889,
+    "t": 8.581603,
+    "meanNet": -0.110514,
+    "tNet": -18,
+    "win": 0.352,
+    "costR": 0.1584
+   },
+   "vsControlD": 0.588685,
+   "vsControlC": 1.018972,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 90394,
+     "mean": -0.058334,
+     "t": -9.20241,
+     "meanNet": -0.199655,
+     "tNet": -26.54,
+     "win": 0.317,
+     "costR": 0.1413
+    },
+    "conf": {
+     "n": 106220,
+     "mean": -0.053267,
+     "t": -9.156734,
+     "meanNet": -0.211669,
+     "tNet": -33.92,
+     "win": 0.319,
+     "costR": 0.1584
+    }
+   }
+  },
+  {
+   "cell": "h1 opposite 2R",
+   "level": "h1 opposite",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 81129,
+    "mean": 0.050372,
+    "t": 8.239509,
+    "meanNet": -0.093659,
+    "tNet": -12.91,
+    "win": 0.353,
+    "costR": 0.144
+   },
+   "conf": {
+    "n": 95549,
+    "mean": 0.036017,
+    "t": 6.12077,
+    "meanNet": -0.126616,
+    "tNet": -20.32,
+    "win": 0.349,
+    "costR": 0.1626
+   },
+   "vsControlD": -0.63283,
+   "vsControlC": -1.093227,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 81129,
+     "mean": -0.076652,
+     "t": -13.393817,
+     "meanNet": -0.220684,
+     "tNet": -32.82,
+     "win": 0.311,
+     "costR": 0.144
+    },
+    "conf": {
+     "n": 95549,
+     "mean": -0.06206,
+     "t": -11.061639,
+     "meanNet": -0.224693,
+     "tNet": -35.39,
+     "win": 0.316,
+     "costR": 0.1626
+    }
+   }
+  },
+  {
+   "cell": "h4 same 2R",
+   "level": "h4 same",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 85995,
+    "mean": 0.055485,
+    "t": 7.805703,
+    "meanNet": -0.087464,
+    "tNet": -11.01,
+    "win": 0.356,
+    "costR": 0.1429
+   },
+   "conf": {
+    "n": 102075,
+    "mean": 0.038597,
+    "t": 6.669644,
+    "meanNet": -0.122448,
+    "tNet": -19.44,
+    "win": 0.349,
+    "costR": 0.161
+   },
+   "vsControlD": 0.209214,
+   "vsControlC": -0.656305,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 85995,
+     "mean": -0.05761,
+     "t": -8.480973,
+     "meanNet": -0.200559,
+     "tNet": -26.28,
+     "win": 0.317,
+     "costR": 0.1429
+    },
+    "conf": {
+     "n": 102075,
+     "mean": -0.050737,
+     "t": -8.689772,
+     "meanNet": -0.211782,
+     "tNet": -33.38,
+     "win": 0.32,
+     "costR": 0.161
+    }
+   }
+  },
+  {
+   "cell": "h4 opposite 2R",
+   "level": "h4 opposite",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 85521,
+    "mean": 0.053027,
+    "t": 9.473909,
+    "meanNet": -0.089194,
+    "tNet": -13.62,
+    "win": 0.354,
+    "costR": 0.1422
+   },
+   "conf": {
+    "n": 99694,
+    "mean": 0.046024,
+    "t": 8.768406,
+    "meanNet": -0.113728,
+    "tNet": -19.75,
+    "win": 0.352,
+    "costR": 0.1598
+   },
+   "vsControlD": -0.201181,
+   "vsControlC": 0.666819,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 85521,
+     "mean": -0.076395,
+     "t": -13.559594,
+     "meanNet": -0.218615,
+     "tNet": -31.52,
+     "win": 0.311,
+     "costR": 0.1422
+    },
+    "conf": {
+     "n": 99694,
+     "mean": -0.064284,
+     "t": -12.591607,
+     "meanNet": -0.224036,
+     "tNet": -38.93,
+     "win": 0.315,
+     "costR": 0.1598
+    }
+   }
+  },
+  {
+   "cell": "stage move 2R",
+   "level": "stage move",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 110237,
+    "mean": 0.052002,
+    "t": 9.251667,
+    "meanNet": -0.093268,
+    "tNet": -14.53,
+    "win": 0.354,
+    "costR": 0.1453
+   },
+   "conf": {
+    "n": 131179,
+    "mean": 0.043466,
+    "t": 10.149515,
+    "meanNet": -0.116611,
+    "tNet": -25.04,
+    "win": 0.351,
+    "costR": 0.1601
+   },
+   "vsControlD": -0.403708,
+   "vsControlC": 0.232241,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 110237,
+     "mean": -0.069149,
+     "t": -12.515659,
+     "meanNet": -0.214419,
+     "tNet": -31.58,
+     "win": 0.314,
+     "costR": 0.1453
+    },
+    "conf": {
+     "n": 131179,
+     "mean": -0.063811,
+     "t": -14.483866,
+     "meanNet": -0.223888,
+     "tNet": -39.83,
+     "win": 0.315,
+     "costR": 0.1601
+    }
+   }
+  },
+  {
+   "cell": "stage pullback 2R",
+   "level": "stage pullback",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 42793,
+    "mean": 0.054667,
+    "t": 6.671772,
+    "meanNet": -0.085357,
+    "tNet": -9.55,
+    "win": 0.355,
+    "costR": 0.14
+   },
+   "conf": {
+    "n": 49188,
+    "mean": 0.038844,
+    "t": 5.440143,
+    "meanNet": -0.120029,
+    "tNet": -15.81,
+    "win": 0.349,
+    "costR": 0.1589
+   },
+   "vsControlD": 0.056084,
+   "vsControlC": -0.467541,
+   "holm": 0.000001,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 42793,
+     "mean": -0.060267,
+     "t": -7.647159,
+     "meanNet": -0.200291,
+     "tNet": -21.74,
+     "win": 0.316,
+     "costR": 0.14
+    },
+    "conf": {
+     "n": 49188,
+     "mean": -0.044019,
+     "t": -6.066762,
+     "meanNet": -0.202891,
+     "tNet": -25.24,
+     "win": 0.323,
+     "costR": 0.1589
+    }
+   }
+  },
+  {
+   "cell": "stage range 2R",
+   "level": "stage range",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 18493,
+    "mean": 0.066534,
+    "t": 6.553745,
+    "meanNet": -0.066139,
+    "tNet": -5.75,
+    "win": 0.36,
+    "costR": 0.1327
+   },
+   "conf": {
+    "n": 21402,
+    "mean": 0.042783,
+    "t": 4.302861,
+    "meanNet": -0.123167,
+    "tNet": -10.53,
+    "win": 0.351,
+    "costR": 0.1659
+   },
+   "vsControlD": 1.106668,
+   "vsControlC": 0.049473,
+   "holm": 0.000122,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 18493,
+     "mean": -0.069755,
+     "t": -7.778946,
+     "meanNet": -0.202428,
+     "tNet": -15.26,
+     "win": 0.313,
+     "costR": 0.1327
+    },
+    "conf": {
+     "n": 21402,
+     "mean": -0.04915,
+     "t": -4.356485,
+     "meanNet": -0.215099,
+     "tNet": -14.1,
+     "win": 0.321,
+     "costR": 0.1659
+    }
+   }
+  },
+  {
+   "cell": "counter yes 2R",
+   "level": "counter yes",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 36928,
+    "mean": 0.04506,
+    "t": 6.124023,
+    "meanNet": -0.091949,
+    "tNet": -10.85,
+    "win": 0.352,
+    "costR": 0.137
+   },
+   "conf": {
+    "n": 43170,
+    "mean": 0.030528,
+    "t": 4.054528,
+    "meanNet": -0.125096,
+    "tNet": -16.41,
+    "win": 0.349,
+    "costR": 0.1556
+   },
+   "vsControlD": -1.116998,
+   "vsControlC": -1.5198,
+   "holm": 0.000207,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 36928,
+     "mean": -0.087428,
+     "t": -11.095216,
+     "meanNet": -0.224437,
+     "tNet": -26.24,
+     "win": 0.308,
+     "costR": 0.137
+    },
+    "conf": {
+     "n": 43170,
+     "mean": -0.063714,
+     "t": -8.498225,
+     "meanNet": -0.219337,
+     "tNet": -27.04,
+     "win": 0.316,
+     "costR": 0.1556
+    }
+   }
+  },
+  {
+   "cell": "counter no 2R",
+   "level": "counter no",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 134595,
+    "mean": 0.05675,
+    "t": 10.125811,
+    "meanNet": -0.087387,
+    "tNet": -13.93,
+    "win": 0.356,
+    "costR": 0.1441
+   },
+   "conf": {
+    "n": 158599,
+    "mean": 0.045462,
+    "t": 10.708475,
+    "meanNet": -0.116246,
+    "tNet": -24.56,
+    "win": 0.351,
+    "costR": 0.1617
+   },
+   "vsControlD": 0.482613,
+   "vsControlC": 0.654218,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 134595,
+     "mean": -0.061393,
+     "t": -11.522521,
+     "meanNet": -0.205531,
+     "tNet": -30.74,
+     "win": 0.316,
+     "costR": 0.1441
+    },
+    "conf": {
+     "n": 158599,
+     "mean": -0.055721,
+     "t": -12.489641,
+     "meanNet": -0.217428,
+     "tNet": -41.78,
+     "win": 0.318,
+     "costR": 0.1617
+    }
+   }
+  },
+  {
+   "cell": "prior-day yes 2R",
+   "level": "prior-day yes",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 43214,
+    "mean": 0.043445,
+    "t": 5.339413,
+    "meanNet": -0.078759,
+    "tNet": -8.99,
+    "win": 0.353,
+    "costR": 0.1222
+   },
+   "conf": {
+    "n": 51386,
+    "mean": 0.036015,
+    "t": 4.968567,
+    "meanNet": -0.105774,
+    "tNet": -13.34,
+    "win": 0.349,
+    "costR": 0.1418
+   },
+   "vsControlD": -1.404873,
+   "vsControlC": -0.874031,
+   "holm": 0.000009,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 43214,
+     "mean": -0.046578,
+     "t": -5.125975,
+     "meanNet": -0.168783,
+     "tNet": -17.19,
+     "win": 0.322,
+     "costR": 0.1222
+    },
+    "conf": {
+     "n": 51386,
+     "mean": -0.041709,
+     "t": -5.246851,
+     "meanNet": -0.183497,
+     "tNet": -22.62,
+     "win": 0.324,
+     "costR": 0.1418
+    }
+   }
+  },
+  {
+   "cell": "prior-day no 2R",
+   "level": "prior-day no",
+   "exit": "2R",
+   "control": false,
+   "disc": {
+    "n": 128309,
+    "mean": 0.057867,
+    "t": 10.775553,
+    "meanNet": -0.091606,
+    "tNet": -14.51,
+    "win": 0.356,
+    "costR": 0.1495
+   },
+   "conf": {
+    "n": 150383,
+    "mean": 0.044403,
+    "t": 9.915995,
+    "meanNet": -0.122365,
+    "tNet": -24.92,
+    "win": 0.351,
+    "costR": 0.1668
+   },
+   "vsControlD": 0.686728,
+   "vsControlC": 0.430201,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 128309,
+     "mean": -0.073876,
+     "t": -13.852177,
+     "meanNet": -0.223349,
+     "tNet": -32.9,
+     "win": 0.311,
+     "costR": 0.1495
+    },
+    "conf": {
+     "n": 150383,
+     "mean": -0.062803,
+     "t": -14.472491,
+     "meanNet": -0.22957,
+     "tNet": -43.76,
+     "win": 0.315,
+     "costR": 0.1668
+    }
+   }
+  },
+  {
+   "cell": "control swing",
+   "level": "control",
+   "exit": "swing",
+   "control": true,
+   "disc": {
+    "n": 161032,
+    "mean": 0.058834,
+    "t": 9.453658,
+    "meanNet": -0.08361,
+    "tNet": -12.04,
+    "win": 0.269,
+    "costR": 0.1424
+   },
+   "conf": {
+    "n": 186577,
+    "mean": 0.040465,
+    "t": 8.717757,
+    "meanNet": -0.119794,
+    "tNet": -23.7,
+    "win": 0.268,
+    "costR": 0.1603
+   },
+   "vsControlD": 0,
+   "vsControlC": 0,
+   "holm": null,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 161032,
+     "mean": -0.073876,
+     "t": -11.263025,
+     "meanNet": -0.216319,
+     "tNet": -28.37,
+     "win": 0.235,
+     "costR": 0.1424
+    },
+    "conf": {
+     "n": 186577,
+     "mean": -0.062915,
+     "t": -12.784792,
+     "meanNet": -0.223174,
+     "tNet": -40.45,
+     "win": 0.241,
+     "costR": 0.1603
+    }
+   }
+  },
+  {
+   "cell": "h1 same swing",
+   "level": "h1 same",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 85325,
+    "mean": 0.063183,
+    "t": 6.735735,
+    "meanNet": -0.077813,
+    "tNet": -7.9,
+    "win": 0.267,
+    "costR": 0.141
+   },
+   "conf": {
+    "n": 99209,
+    "mean": 0.049261,
+    "t": 7.056675,
+    "meanNet": -0.108846,
+    "tNet": -14.44,
+    "win": 0.266,
+    "costR": 0.1581
+   },
+   "vsControlD": 0.546416,
+   "vsControlC": 1.197555,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 85325,
+     "mean": -0.061629,
+     "t": -6.34658,
+     "meanNet": -0.202625,
+     "tNet": -19.36,
+     "win": 0.234,
+     "costR": 0.141
+    },
+    "conf": {
+     "n": 99209,
+     "mean": -0.056144,
+     "t": -7.216029,
+     "meanNet": -0.214251,
+     "tNet": -27.36,
+     "win": 0.24,
+     "costR": 0.1581
+    }
+   }
+  },
+  {
+   "cell": "h1 opposite swing",
+   "level": "h1 opposite",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 75707,
+    "mean": 0.053933,
+    "t": 6.311282,
+    "meanNet": -0.090143,
+    "tNet": -9.53,
+    "win": 0.272,
+    "costR": 0.1441
+   },
+   "conf": {
+    "n": 87368,
+    "mean": 0.030478,
+    "t": 3.675284,
+    "meanNet": -0.132225,
+    "tNet": -15.33,
+    "win": 0.27,
+    "costR": 0.1627
+   },
+   "vsControlD": -0.604431,
+   "vsControlC": -1.336888,
+   "holm": 0.000505,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 75707,
+     "mean": -0.087678,
+     "t": -12.10557,
+     "meanNet": -0.231753,
+     "tNet": -29.12,
+     "win": 0.236,
+     "costR": 0.1441
+    },
+    "conf": {
+     "n": 87368,
+     "mean": -0.070603,
+     "t": -9.453425,
+     "meanNet": -0.233307,
+     "tNet": -28.97,
+     "win": 0.242,
+     "costR": 0.1627
+    }
+   }
+  },
+  {
+   "cell": "h4 same swing",
+   "level": "h4 same",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 80804,
+    "mean": 0.055426,
+    "t": 5.461441,
+    "meanNet": -0.087315,
+    "tNet": -8.13,
+    "win": 0.268,
+    "costR": 0.1427
+   },
+   "conf": {
+    "n": 94911,
+    "mean": 0.031311,
+    "t": 4.309922,
+    "meanNet": -0.129524,
+    "tNet": -16.4,
+    "win": 0.265,
+    "costR": 0.1608
+   },
+   "vsControlD": -0.424928,
+   "vsControlC": -1.242762,
+   "holm": 0.000122,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 80804,
+     "mean": -0.062091,
+     "t": -6.464194,
+     "meanNet": -0.204832,
+     "tNet": -19.79,
+     "win": 0.237,
+     "costR": 0.1427
+    },
+    "conf": {
+     "n": 94911,
+     "mean": -0.048135,
+     "t": -6.431662,
+     "meanNet": -0.20897,
+     "tNet": -27.32,
+     "win": 0.244,
+     "costR": 0.1608
+    }
+   }
+  },
+  {
+   "cell": "h4 opposite swing",
+   "level": "h4 opposite",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 80221,
+    "mean": 0.062289,
+    "t": 7.924782,
+    "meanNet": -0.07982,
+    "tNet": -9.11,
+    "win": 0.27,
+    "costR": 0.1421
+   },
+   "conf": {
+    "n": 91666,
+    "mean": 0.049944,
+    "t": 6.152144,
+    "meanNet": -0.10972,
+    "tNet": -12.89,
+    "win": 0.271,
+    "costR": 0.1597
+   },
+   "vsControlD": 0.429187,
+   "vsControlC": 1.271678,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 80221,
+     "mean": -0.085662,
+     "t": -10.958876,
+     "meanNet": -0.227771,
+     "tNet": -26.89,
+     "win": 0.233,
+     "costR": 0.1421
+    },
+    "conf": {
+     "n": 91666,
+     "mean": -0.078218,
+     "t": -11.383258,
+     "meanNet": -0.237882,
+     "tNet": -32.66,
+     "win": 0.238,
+     "costR": 0.1597
+    }
+   }
+  },
+  {
+   "cell": "stage move swing",
+   "level": "stage move",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 103532,
+    "mean": 0.056754,
+    "t": 7.729678,
+    "meanNet": -0.088311,
+    "tNet": -11.24,
+    "win": 0.269,
+    "costR": 0.1451
+   },
+   "conf": {
+    "n": 121332,
+    "mean": 0.040924,
+    "t": 7.14578,
+    "meanNet": -0.118899,
+    "tNet": -19.57,
+    "win": 0.268,
+    "costR": 0.1598
+   },
+   "vsControlD": -0.280622,
+   "vsControlC": 0.067345,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 103532,
+     "mean": -0.073031,
+     "t": -9.692624,
+     "meanNet": -0.218097,
+     "tNet": -25.72,
+     "win": 0.236,
+     "costR": 0.1451
+    },
+    "conf": {
+     "n": 121332,
+     "mean": -0.070564,
+     "t": -12.474581,
+     "meanNet": -0.230387,
+     "tNet": -36.24,
+     "win": 0.239,
+     "costR": 0.1598
+    }
+   }
+  },
+  {
+   "cell": "stage pullback swing",
+   "level": "stage pullback",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 40191,
+    "mean": 0.057629,
+    "t": 6.132189,
+    "meanNet": -0.082384,
+    "tNet": -7.96,
+    "win": 0.267,
+    "costR": 0.14
+   },
+   "conf": {
+    "n": 45506,
+    "mean": 0.037182,
+    "t": 4.143018,
+    "meanNet": -0.121804,
+    "tNet": -13.5,
+    "win": 0.266,
+    "costR": 0.159
+   },
+   "vsControlD": -0.116207,
+   "vsControlC": -0.339517,
+   "holm": 0.000176,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 40191,
+     "mean": -0.072504,
+     "t": -6.627412,
+     "meanNet": -0.212517,
+     "tNet": -17.56,
+     "win": 0.234,
+     "costR": 0.14
+    },
+    "conf": {
+     "n": 45506,
+     "mean": -0.043411,
+     "t": -4.42314,
+     "meanNet": -0.202398,
+     "tNet": -19.05,
+     "win": 0.246,
+     "costR": 0.159
+    }
+   }
+  },
+  {
+   "cell": "stage range swing",
+   "level": "stage range",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 17309,
+    "mean": 0.074072,
+    "t": 5.417914,
+    "meanNet": -0.058334,
+    "tNet": -3.74,
+    "win": 0.274,
+    "costR": 0.1324
+   },
+   "conf": {
+    "n": 19739,
+    "mean": 0.045217,
+    "t": 3.519237,
+    "meanNet": -0.120662,
+    "tNet": -8.96,
+    "win": 0.268,
+    "costR": 0.1659
+   },
+   "vsControlD": 1.015857,
+   "vsControlC": 0.342283,
+   "holm": 0.000583,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 17309,
+     "mean": -0.082111,
+     "t": -6.32555,
+     "meanNet": -0.214517,
+     "tNet": -13.43,
+     "win": 0.232,
+     "costR": 0.1324
+    },
+    "conf": {
+     "n": 19739,
+     "mean": -0.06086,
+     "t": -4.893145,
+     "meanNet": -0.226738,
+     "tNet": -14.04,
+     "win": 0.243,
+     "costR": 0.1659
+    }
+   }
+  },
+  {
+   "cell": "counter yes swing",
+   "level": "counter yes",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 34082,
+    "mean": 0.049301,
+    "t": 4.639716,
+    "meanNet": -0.087885,
+    "tNet": -7.59,
+    "win": 0.278,
+    "costR": 0.1372
+   },
+   "conf": {
+    "n": 38719,
+    "mean": 0.015446,
+    "t": 1.472404,
+    "meanNet": -0.140398,
+    "tNet": -13.11,
+    "win": 0.275,
+    "costR": 0.1558
+   },
+   "vsControlD": -0.88717,
+   "vsControlC": -2.517212,
+   "holm": 0.07157,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 34082,
+     "mean": -0.102793,
+     "t": -10.392794,
+     "meanNet": -0.239979,
+     "tNet": -22.87,
+     "win": 0.24,
+     "costR": 0.1372
+    },
+    "conf": {
+     "n": 38719,
+     "mean": -0.071596,
+     "t": -6.988204,
+     "meanNet": -0.227441,
+     "tNet": -21.21,
+     "win": 0.248,
+     "costR": 0.1558
+    }
+   }
+  },
+  {
+   "cell": "counter no swing",
+   "level": "counter no",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 126950,
+    "mean": 0.061393,
+    "t": 8.101255,
+    "meanNet": -0.082462,
+    "tNet": -10.26,
+    "win": 0.267,
+    "costR": 0.1439
+   },
+   "conf": {
+    "n": 147858,
+    "mean": 0.047017,
+    "t": 9.285257,
+    "meanNet": -0.114398,
+    "tNet": -20.97,
+    "win": 0.266,
+    "costR": 0.1614
+   },
+   "vsControlD": 0.364224,
+   "vsControlC": 1.011916,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 126950,
+     "mean": -0.066112,
+     "t": -8.683243,
+     "meanNet": -0.209967,
+     "tNet": -24.6,
+     "win": 0.233,
+     "costR": 0.1439
+    },
+    "conf": {
+     "n": 147858,
+     "mean": -0.060642,
+     "t": -10.92676,
+     "meanNet": -0.222057,
+     "tNet": -36.98,
+     "win": 0.239,
+     "costR": 0.1614
+    }
+   }
+  },
+  {
+   "cell": "prior-day yes swing",
+   "level": "prior-day yes",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 41043,
+    "mean": 0.051344,
+    "t": 4.118712,
+    "meanNet": -0.070737,
+    "tNet": -5.47,
+    "win": 0.258,
+    "costR": 0.1221
+   },
+   "conf": {
+    "n": 48444,
+    "mean": 0.037547,
+    "t": 3.865044,
+    "meanNet": -0.104522,
+    "tNet": -10.14,
+    "win": 0.255,
+    "costR": 0.1421
+   },
+   "vsControlD": -0.706502,
+   "vsControlC": -0.299678,
+   "holm": 0.000338,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 41043,
+     "mean": -0.047682,
+     "t": -3.434301,
+     "meanNet": -0.169763,
+     "tNet": -11.99,
+     "win": 0.23,
+     "costR": 0.1221
+    },
+    "conf": {
+     "n": 48444,
+     "mean": -0.042168,
+     "t": -3.507584,
+     "meanNet": -0.184236,
+     "tNet": -15.84,
+     "win": 0.234,
+     "costR": 0.1421
+    }
+   }
+  },
+  {
+   "cell": "prior-day no swing",
+   "level": "prior-day no",
+   "exit": "swing",
+   "control": false,
+   "disc": {
+    "n": 119989,
+    "mean": 0.061396,
+    "t": 8.952164,
+    "meanNet": -0.088013,
+    "tNet": -11.36,
+    "win": 0.273,
+    "costR": 0.1494
+   },
+   "conf": {
+    "n": 138133,
+    "mean": 0.041489,
+    "t": 7.492036,
+    "meanNet": -0.12515,
+    "tNet": -20.85,
+    "win": 0.273,
+    "costR": 0.1666
+   },
+   "vsControlD": 0.363637,
+   "vsControlC": 0.157435,
+   "holm": 0,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 119989,
+     "mean": -0.082835,
+     "t": -12.296395,
+     "meanNet": -0.232244,
+     "tNet": -29.22,
+     "win": 0.236,
+     "costR": 0.1494
+    },
+    "conf": {
+     "n": 138133,
+     "mean": -0.070191,
+     "t": -13.100671,
+     "meanNet": -0.23683,
+     "tNet": -38.65,
+     "win": 0.244,
+     "costR": 0.1666
+    }
+   }
+  }
+ ],
+ "perMarket": {},
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2008-06-11",
+   "n": 4024,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2012-03-14",
+   "n": 10770,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2016-09-21",
+   "n": 18316,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2021-02-17",
+   "n": 25735,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2025-05-07",
+   "n": 32941,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2008-06-11",
+   "n": 6221,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2012-03-14",
+   "n": 13259,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2016-09-21",
+   "n": 21315,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2021-02-17",
+   "n": 29241,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2025-05-07",
+   "n": 36911,
+   "missing": 0,
+   "extra": 0
+  }
+ ],
+ "stage": [
+  {
+   "market": "xau",
+   "n": 400,
+   "same": 400
+  },
+  {
+   "market": "eurusd",
+   "n": 400,
+   "same": 400
+  }
+ ]
+}

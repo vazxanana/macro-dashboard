@@ -24,10 +24,13 @@ import { P, cleanBars, agg15, series, fbosCandidates, XAU, SESS_TRADE, nyInfo } 
 import { managePosition } from '../research/edge/lit/run.mjs';
 import * as MS from '../research/edge/msnr-entry/run.mjs';
 import { methodTrades, m1Trades, sopTrades3, efTrades, snrTrades, direction, engulfAt, KEY_NAME } from './eg-methods.mjs';
+import { DESKS2 } from './edge-desks-2.mjs';
 
 const require = createRequire(import.meta.url);
 const SOP = require(fileURLToPath(new URL('../assets/mosha-sop.js', import.meta.url)));
-export const MARKETS = Object.keys(SOP.MARKETS);   // the Engulfing desk's five; the LIT desk reads every market of SOP.ALL (its setups are rarer)
+export const MARKETS = Object.keys(SOP.MARKETS);   // the Engulfing desk's five; the LIT and MSNR desks read ELEVEN (their setups are rarer)
+// the eleven markets of the LIT and MSNR desks (SOP.ALL until 23 Nov 2026, when the passing-edge desks added three markets to it)
+export const ELEVEN = ['xau', 'xag', 'eurusd', 'gbpusd', 'nas100', 'usdjpy', 'audusd', 'usdcad', 'spx500', 'us30', 'de40'];
 const SEC = SOP.SEC, NAME = { '1d': 'D1', '4h': 'H4', '1h': 'H1', '15m': 'M15', '5m': 'M5' };
 const word = (d) => (d > 0 ? 'buy' : 'sell');
 const fx = (mk) => { const d = SOP.ALL[mk].dec; return (v) => (+v).toFixed(d); };
@@ -318,28 +321,34 @@ export function msnrTrades(B, { from, market = 'xau', against = false } = {}) { 
 // ─── the files ───
 export const DESKS = {
   eg: { tfs: ['1d', '4h', '1h', '15m', '5m', '1m'], markets: MARKETS, read: (B, o) => egTrades(B, o).concat(methodTrades(B, o), methodTrades(B, { ...o, span: 'next' }), m1Trades(B, o), sopTrades3(B, o), efTrades(B, o)), note: 'A paper record of the desk\'s readings of the engulf on five markets, buys and sells: the engulf rule on D1, H4 and H1 candles, and three zone methods (the plan with the Daily, the short method in an H4 zone, the direct entry on fresh zones) with a 30-pip stop; the plan and the short method take the target the owner picked for each on the 2026 records (1R; the short method with the next-candle engulf 4R), the direct entry none: its stop is trailed with the 5-minute engulf zones that fail. The plan and the short method are recorded twice, apart: with the engulf completed within three candles, and with the next-candle engulf only. A fifth reading, apart: inside a 15-minute engulf zone, the most recent one-minute engulf of the other side fails and the entry is that close (the stop past the extreme made since, a 2R target: the desk\'s own choice). A sixth reading, apart, the three-timeframe SOP on three chains (Daily / H4 / H1, H4 / H1 / M15, H1 / M15 / M5): an engulf zone on the first timeframe, price back in it and an engulf at it on the second, an engulf at that one on the third, each completed within three candles; a limit at the middle of the last zone, the stop past the second timeframe\'s zone, a 2R target (the order\'s life and the exact target are the desk\'s own choice). A seventh reading, apart, from a gold example of 20-23 Nov 2026: an H4 engulf zone that failed (an H4 close through it) turns into a barrier the other way (an EF); price comes back into it, an M15 BO with it (a close beyond the last M15 A / V level and out of the zone), then a limit at the zone\'s near side, the stop past its far side, the target the near side of the nearest H4 engulf zone of the other side still standing, only when it is 2R or more away (the barrier\'s 20 days, the BO\'s window and the order\'s life are the desk\'s own choice). Nothing is traded, results are before costs, and none is a tested rule.' },
-  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: Object.keys(SOP.ALL), read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the owner\'s earlier scalp method (direction call + M15 / M5 engulf): the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only; it is not an entry of the plan documents, and the desk\'s own study of it failed after costs. On gold: the plan with a fresh Daily level rejected (V, A or open-close level) and an H4 break within three trading days for the side, H4 zones, a 15- or 30-minute engulf entry or a 15- or 30-minute QM entry at its left shoulder, one entry a visit to a zone, a 30-pip stop and the target the owner picked on the 2026 records (60 pips on the engulf entry, 90 on the QM entry; the plan\'s own figure is 90). Nothing is traded and results are before costs.' },
-  lit: { tfs: ['5m'], markets: Object.keys(SOP.ALL), read: litTrades, note: 'A paper record of the LIT detector on eleven markets, with the rule\'s execution where it gives an order and two looser study executions otherwise: nothing is traded, results are before costs, and it is not a tested rule.' } };
-export function buildDesk(name, perMarket, prev, now, days) {
+  msnr: { tfs: ['1d', '4h', '1h', '15m', '5m'], extra: { '1h': 170 }, markets: ELEVEN, read: (B, o) => msnrTrades(B, o).concat(snrTrades(B, o)), note: 'A paper record of two MSNR readings. On eleven markets: the owner\'s earlier scalp method (direction call + M15 / M5 engulf): the direction call (H4, with Daily key levels) in front of an M15 then M5 engulf entry, entries with the call only; it is not an entry of the plan documents, and the desk\'s own study of it failed after costs. On gold: the plan with a fresh Daily level rejected (V, A or open-close level) and an H4 break within three trading days for the side, H4 zones, a 15- or 30-minute engulf entry or a 15- or 30-minute QM entry at its left shoulder, one entry a visit to a zone, a 30-pip stop and the target the owner picked on the 2026 records (60 pips on the engulf entry, 90 on the QM entry; the plan\'s own figure is 90). Nothing is traded and results are before costs.' },
+  lit: { tfs: ['5m'], markets: ELEVEN, read: litTrades, note: 'A paper record of the LIT detector on eleven markets, with the rule\'s execution where it gives an order and two looser study executions otherwise: nothing is traded, results are before costs, and it is not a tested rule.' },
+  // the seven desks of the passing edges (23 Nov 2026, council/edge-desks-2.mjs)
+  ...DESKS2 };
+// the desks the council loop runs on its older line; the passing-edge desks run on a line of their own (council.yml)
+export const OLD = ['eg', 'msnr', 'lit'];
+export function buildDesk(name, perMarket, prev, now, days, fromT = null) {
   let records = (prev && prev.records) || [], through = (prev && prev.through) || 0; const read = [];
   for (const [market, B] of perMarket) { if (!B['5m'] || !B['5m'].length) continue;
-    const last = B['5m'][B['5m'].length - 1].time + 300, from = last - days * 86400;
+    const last = B['5m'][B['5m'].length - 1].time + 300, from = fromT != null ? Math.max(fromT, last - days * 86400) : last - days * 86400;
     const fresh = DESKS[name].read(B, { from, market }); records = settle(merge(records, fresh, now), new Set(fresh.map((r) => r.id)), B['5m'], market); read.push(market); through = Math.max(through, last); }
   const s = SOP.summary(records);
   return { v: 1, desk: name, at: new Date(now * 1000).toISOString(), markets: [...new Set(records.map((r) => r.market || 'xau'))], read, feed: 'OANDA', through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length }, note: DESKS[name].note, records };
 }
-export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SOP.DAYS, only = null, get = fetch } = {}) {
-  const out = {};
-  for (const name of Object.keys(DESKS)) { if (only && only !== name) continue;
+export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SOP.DAYS, only = null, from = null, get = fetch } = {}) {
+  const out = {}, want = only ? String(only).split(',').map((x) => x.trim()).filter(Boolean) : null, cache = new Map();
+  // one read of a market's candles serves every desk of the run (the passing-edge desks all read the same 5-minute candles)
+  const read = (tf, m, d) => { const key = `${m}|${tf}|${d}`; if (!cache.has(key)) cache.set(key, bars(tf, now, get, d, m)); return cache.get(key); };
+  for (const name of Object.keys(DESKS)) { if (want && !want.includes(name)) continue;
     let prev = null; try { prev = readDesk(dir, name); } catch (e) { console.log(e.message); continue; }   // the logs live in <name>/detail/ (council/desk-store.mjs)
     const per = [];
-    for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await bars(tf, now, get, days + ((DESKS[name].extra || {})[tf] || 0), m); per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
+    for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await read(tf, m, days + ((DESKS[name].extra || {})[tf] || 0)); per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
     if (!per.length) { console.log(`${name} desk: no candles, file left as it is`); continue; }
-    const o = out[name] = buildDesk(name, per, prev, now, days);
+    const o = out[name] = buildDesk(name, per, prev, now, days, from);
     writeDesk(dir, name, o);
     console.log(`${name} desk: ${o.counts.n} records (${o.counts.open} open, ${o.counts.live} seen live), ${o.read.length} markets read`); }
   return out;
 }
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) { const a = process.argv, arg = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
-  main(a[2] || 'data', { days: Math.min(365, Math.max(SOP.DAYS, +(arg('--days') || process.env.DESK_DAYS) || SOP.DAYS)), only: arg('--only') }).catch((e) => { console.error('Edge desks failed: ' + (e && e.message || e)); process.exit(1); }); }
+  main(a[2] || 'data', { days: Math.min(365, Math.max(SOP.DAYS, +(arg('--days') || process.env.DESK_DAYS) || SOP.DAYS)), only: arg('--only'), from: arg('--from') ? Date.parse(arg('--from') + 'T00:00:00Z') / 1000 : null }).catch((e) => { console.error('Edge desks failed: ' + (e && e.message || e)); process.exit(1); }); }
