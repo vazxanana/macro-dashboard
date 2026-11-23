@@ -262,6 +262,22 @@ function resultMd(o, rows) {
   else L.push('No compression cell clears the bar: a close out of a tight M15 / H1 range does not behave, before costs and in both decades,',
     'unlike the ordinary first structure break in a way that the pre-registered bar can see. Do not re-test variants of these 56',
     'cells on these years. Nothing live changed; no rule is proposed.');
+  if (o.verdict !== 'PASS') {
+    const n16 = o.meta.reduce((a, m) => a + m.events.n16, 0), withNeg = cnt((r) => r.dir === 'with' && r.c.n >= 300 && r.c.mean < 0);
+    const withN = cnt((r) => r.dir === 'with' && r.c.n >= 300), fadeBoth = rows.filter((r) => r.dir === 'fade' && r.checks.disc && r.checks.conf);
+    const netPos = cnt((r) => r.c.n >= 300 && r.d.meanNet > 0 && r.c.meanNet > 0);
+    L.push('', `**What the cells show.** Traded WITH the break, a tight-range break loses before costs in ${withNeg} of the ${withN} cells with`,
+      'enough trades, and on M15 it does a little worse than the ordinary break (Welch t down to -2.7 in discovery): compression',
+      `does not turn the fading break into a following one. FADED, ${fadeBoth.length} cells clear both windows before costs, but none of them`,
+      'beats the ordinary break faded the same way (the control) in confirmation: on M15 they match it, and the H1 fades that beat',
+      'it in 2005-14 (Welch t 3.2-3.7) fall to Welch t 0.6-1.5 in 2015-26. The tilt is the one `grid7-wide-fade` found, not',
+      'something the tight range adds. The two cells that beat their control in both windows (the 1R fades on M15 and H1 n8)',
+      'do not reach month t 2 in confirmation (-0.026R and +0.022R a trade). The 1R fades sit near zero while 2R and the trail',
+      'are positive, probably because a 5-minute candle holding stop and target books the stop (the pre-registered rule).',
+      `After costs ${netPos} of the 56 cells is positive in both windows; the fades pay 0.3-0.5R a trade on M15.`,
+      '', `**n16 is empty.** Sixteen candles spanning under 1.5 ATR(14) almost never happens (${n16} events in ten markets and 22 years):`,
+      'the fixed threshold was too tight for that window, a design flaw of this pre-registration, said here and not re-run.');
+  }
   L.push('');
   return L.join('\n');
 }

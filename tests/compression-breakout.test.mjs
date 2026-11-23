@@ -50,8 +50,7 @@ test('the verdict follows the pre-registered bar', () => {
 test('RESULT.md lists every cell with its figures from result.json; the cut test is clean', () => {
   for (const c of R.cells) {
     const row = md.split('\n').find((l) => l.startsWith(`| ${c.cell} |`)); assert.ok(row, c.cell);
-    assert.ok(row.includes(f3(c.conf.mean)) && row.includes(c.conf.t.toFixed(2)), c.cell);
-    assert.ok(row.includes(f3(c.disc.mean)) && row.includes(c.disc.t.toFixed(2)), c.cell);
+    for (const w of [c.conf, c.disc]) assert.ok(row.includes(w.mean == null ? 'n/a' : f3(w.mean)) && row.includes(w.t.toFixed(2)), c.cell);
   }
   assert.ok(R.cut.length >= 5);
   for (const x of R.cut) assert.equal(x.missing + x.extra, 0, 'cut test ' + x.market + ' ' + x.cut);
@@ -84,5 +83,5 @@ test('the trade engine: stop first, gaps, targets, the trail and the time limit'
   r = sim([bar(0, 100, 100.1, 99.9, 100), bar(300, 100, 100.4, 99.6, 100.4)], 1, 0, 99, 600); assert.ok(Math.abs(r[0] - 0.4) < 1e-9);
   // a stop on the wrong side is no trade; a short mirrors
   assert.equal(sim([bar(0, 100, 100, 100, 100)], 1, 0, 101, 600), null);
-  r = sim([bar(0, 100, 100.2, 99.8, 100), bar(300, 100, 100, 97.9, 98)], -1, 0, 101, 600); assert.equal(r[0], 1); assert.equal(r[1], 1); assert.equal(r[2], 2);
+  r = sim([bar(0, 100, 100.2, 99.8, 100), bar(300, 100, 100, 97.9, 98)], -1, 0, 101, 600); assert.deepEqual(r, [1, 2, 2]);
 });
