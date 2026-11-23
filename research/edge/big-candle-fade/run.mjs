@@ -201,7 +201,16 @@ function resultMd(o, rows, plain) {
   for (const m of o.meta) L.push(`| ${m.market} | ${m.first} | ${N(m.bigSignals)} | ${N(m.big.sims)} | ${N(m.plainSignals)} | ${N(m.plain.sims)} | ${m.big.dropped + m.plain.dropped} |`);
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push(`${o.passed.length} cells clear the bar before costs in both decades and beat the plain fade. ${o.passedNetPositive.length ? o.passedNetPositive.length + ' stay positive after costs in both windows.' : 'None stays positive after costs in both windows.'}`,
-    'A before-cost tilt, not an edge: nothing is adopted; a forward record or any live change needs the owner. One run, no variants on these years.');
+    'A before-cost tilt, not an edge: nothing is adopted; a forward record or any live change needs the owner. One run, no variants on these years.',
+    '', '**Size, not the break.** Both passing cells are M15 candles that are NOT a structure break, with the "back to the 50 %" exit:',
+    'among big candles the ones that break structure fade no better than the plain fade (their Welch t is near zero or negative in',
+    'every cell), and the ones that do not break fade better. So the fade\'s tilt follows an outsized candle giving part of itself',
+    'back more than it follows the break. On H1 nothing passes, and the 1R / 2R exits lose to the plain fade everywhere: the tilt is',
+    'in the retracement toward the candle\'s middle, which is far (often several R) from a stop just past the candle\'s extreme.',
+    '', '**How far from tradable.** The passing cells pay about 0.35-0.44R a trade in costs on these small stops and are negative',
+    'after costs in both windows (see "net" and "cost R"); the tilt is smaller than one bid / ask. Cautions: trades overlap freely',
+    '(no one-at-a-time), so the per-trade Welch t overstates independence; the big candles that are breaks are also inside the plain',
+    'fade; the costs of five markets are assumed. The plain fade\'s 1R and 2R rows reproduce `grid7-wide-fade`\'s cells exactly.');
   else L.push('No cell clears the five checks. See the table: whether big candles fade at all before costs is in the "R" columns, whether they',
     'fade better than every structure break is in "vs plain". The big-candle reading does not replace the break as the trigger of the',
     'fade on this bar. Do not re-test variants of these 36 cells on these years. Nothing live changed; no rule is proposed.');
