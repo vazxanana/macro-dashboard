@@ -65,3 +65,12 @@ Gold alone and each market as descriptive rows (n, R a trade after costs, month-
 the signals and orders computed on candles cut at several moments must equal those of the whole file up to each cut.
 
 Never call a result an edge without n and t. Never quote the owner's private material.
+
+## Amendment before the run (23 Nov 2026)
+
+The owner asked, through the main session, that the study be judged BEFORE costs. The pass bar above is therefore read on R
+before costs (discovery n >= 100, mean R > 0, month-sum t >= 2; confirmation n >= 50, mean R > 0, month-sum t >= 2 after Holm
+over the three tests). The cost checks (R after costs, R at twice the cost) are reported beside it and no longer decide the
+verdict. Said plainly: before this amendment one market (eurusd) had been run once while the code was being checked, and its
+whole-window counts and after-cost means were seen (T1 n 181 −0.138R, T2 n 411 +0.017R, T3 n 182 −0.081R, cost about 0.02R a
+trade); no other market and no window split had been run. Nothing else changes.
