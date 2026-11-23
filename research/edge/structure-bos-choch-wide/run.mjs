@@ -238,6 +238,12 @@ function resultMd(o, rows) {
     L.push('No cell clears the whole bar. Naming a break BOS or ChoCh, counting the BOS of the leg, checking the next timeframe up,',
       'or waiting for the retest does not give a trade that makes money before costs in both decades AND beats simply fading every',
       'break. Do not re-test variants of these 51 cells on these years. Nothing live changed; no rule is proposed.');
+    const beat = rows.filter((r) => r.checks.control), tilt = rows.filter((r) => r.checks.n && r.checks.disc && r.checks.conf && r.checks.holm);
+    if (tilt.length) L.push('', `The only cells positive before costs in both decades (${tilt.map((r) => r.name).join('; ')}) are FADES at 2R: the`,
+      '`grid7-wide-fade` tilt again. Split by kind they are no better than fading every break (Welch t under 2 in at least one window),',
+      `and after costs they lose (${tilt.map((r) => f3(r.c.meanNet) + 'R').join(', ')} a trade in 2015-26).`);
+    if (beat.length) L.push('', `The cells that beat their control in both windows (${beat.map((r) => r.name).join('; ')}) lose money before costs`,
+      'themselves; they only lose less than fading every break at 1R does.');
   }
   L.push('');
   return L.join('\n');
