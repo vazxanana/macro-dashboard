@@ -74,3 +74,19 @@ Combinations: 4 x 2 x 4 x 3 x 2 x 5 x 4 x 3 = 11,520 cells, per market (5) and p
 - Gate: every simulated trade has risk > 0 with the stop on the losing side.
 
 Nothing of `market-structure.html`, `assets/`, `council/`, `research/edge/_lib/` or any other study is edited.
+
+## Amendment (23 Nov 2026, before any result was seen)
+
+A smoke run of the storyline counts on 2009-2010 gold (counts only, no trade result read) showed that the two break types gave
+identical storylines: in the page's `msAnalyze`, an event against the running trend is always a structure shift, so the first
+event against the BO and the next event with it are always `structure` true. The break type is therefore read with edgekit's
+own detectors instead, on every timeframe of the ladder:
+
+- `any` = `structure(bars, 3)` events of `research/edge/_lib/edgekit.mjs`: a close beyond the last confirmed 3-a-side swing high
+  or low not yet broken (each level once), known at the close of the breaking candle.
+- `qm` = `qms(bars, 3)` events: the QM structure break (a lower high, its shoulder swept, then a close above the lower high; a
+  sell mirrors it), known at the close of the breaking candle.
+- The BO of the upper timeframe = every `structure(bars, 3)` event of that timeframe, for both break types (the break type
+  applies to the VR and the CF). The storyline ends when the next upper event is known.
+
+Everything else (VR extreme x, VR leg extreme, CF zone, the factors, entries, stops, exits, the bar) is unchanged.
