@@ -111,9 +111,7 @@ function report(dir) {
   const best = ids.map((id) => tests[id]).sort((a, b) => (b.confirmation.net.tMonth ?? -99) - (a.confirmation.net.tMonth ?? -99))[0];
   const f = (v, d = 3) => (v == null ? 'n/a' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d));
   const allG = stat(rows.filter((r) => r.t >= SPLIT), 'gross');
-  const lead = `Before costs ${passedG.length} of 6 readings pass (pooled from 2024 on ${allG.n} trades, ${f(allG.mean)}R a trade, month t ${allG.tMonth}); after costs `;
-  const headline = lead + (passed.length ? `${passed.length} of 6 readings pass (${passed.join(', ')}).`
-    : `0 of 6 readings pass: pooled over the six from 2024 on ${allS.n} trades, ${f(allS.mean)}R a trade after costs (month t ${allS.tMonth}); best ${Object.keys(tests).find((k) => tests[k] === best)} ${f(best.confirmation.net.mean)}R (n ${best.confirmation.net.n}, t ${best.confirmation.net.tMonth}).`);
+  const headline = `${passedG.length} of 6 readings pass before costs and ${passed.length} of 6 after costs: from 2024 on the six made ${f(allG.mean)}R a trade before costs on ${allG.n} trades (month t ${allG.tMonth}) and ${f(allS.mean)}R after costs (month t ${allS.tMonth}).`;
   const out = { study: 'eg-methods-18-2020', built: new Date().toISOString().slice(0, 10), verdict, headline,
     system: 'The Engulfing desk\'s zone readings (council/eg-methods.mjs methodTrades span any / next, efTrades) as the code stands on 23 Nov 2026; 18 markets; OANDA mid 5m; discovery 2020-2023, confirmation 2024 to the last candle; net of costs.',
     markets: MARKETS, lastCandle: new Date(last * 1000).toISOString().slice(0, 16), windows: { discovery: ['2020-01-01', '2023-12-31'], confirmation: ['2024-01-01', new Date(last * 1000).toISOString().slice(0, 10)] },

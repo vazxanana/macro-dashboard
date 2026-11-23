@@ -21,7 +21,7 @@ test('eg-methods-18-2020: verdict on line 3 and the headline match result.json',
 
 test('eg-methods-18-2020: every row of the table is the result file', () => {
   for (const [id, t] of Object.entries(R.tests)) {
-    const row = md.split('\n').find((l) => l.startsWith(`| ${id} | ${t.what} |`));
+    const row = md.split('\n').filter((l) => l.startsWith(`| ${id} | ${t.what} |`)).pop();
     assert.ok(row, id);
     for (const s of [String(t.discovery.net.n), f(t.discovery.net.mean), String(t.confirmation.net.n), f(t.confirmation.net.mean), String(t.holm), t.verdict]) assert.ok(row.includes(s), `${id} ${s}`);
   }
