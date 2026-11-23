@@ -209,6 +209,8 @@ function resultMd(o, rows, ctrls) {
     'a hypothesis for its own holdout or forward record, never an edge. Nothing live changed.');
   else L.push('No cell clears every check. Where the storyline\'s fade looks positive before costs it is the general fade tilt of',
     '`grid7-wide-fade` (its control does as well or better), and the storyline traded with the CF does not make money before costs.',
+    `The side-flipped check points the same way: ${o.flipPassed.length} flipped cells clear bars 1-3, all of them the WITH cells turned`,
+    'against the CF (same fill, the wide VR stop mirrored), which is again a fade of the lower-timeframe break.',
     'The grid-6 placebo result is explained by the general fade of a structure break, not by the storyline. Do not re-test',
     'variants of these cells on these years. Nothing live changed; no rule is proposed.');
   L.push('');
