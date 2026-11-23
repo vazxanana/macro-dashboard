@@ -97,9 +97,16 @@ function compare(A, B) {
   return { disc: { a: one(disc(A)), b: one(disc(B)), ...w(disc(A), disc(B), 'net'), net2: w(disc(A), disc(B), 'net2'), gross: w(disc(A), disc(B), 'R') },
     conf: { a: one(conf(A)), b: one(conf(B)), ...w(conf(A), conf(B), 'net'), net2: w(conf(A), conf(B), 'net2'), gross: w(conf(A), conf(B), 'R'), month: (() => { const m = monthDiff(conf(A), conf(B), 'net'); return { months: m.months, diff: r4(m.diff), t: r2(m.t) }; })() } };
 }
+// before costs (owner, 23 Nov 2026: "I only want to know before costs"): the same comparison on R as the code books it
+function preCompare(A, B) {
+  const w = (a, b) => { const x = welch(a.map((r) => r.R), b.map((r) => r.R)); return { diff: r4(x.diff), t: r2(x.t), df: r2(x.df), p: x.p == null ? null : +x.p.toFixed(5) }; };
+  const m = (a, b) => { const x = monthDiff(a, b, 'R'); return { months: x.months, diff: r4(x.diff), t: r2(x.t) }; };
+  return { disc: { a: one(disc(A), 'R'), b: one(disc(B), 'R'), ...w(disc(A), disc(B)), month: m(disc(A), disc(B)) }, conf: { a: one(conf(A), 'R'), b: one(conf(B), 'R'), ...w(conf(A), conf(B)), month: m(conf(A), conf(B)) } };
+}
 function single(A) { return { disc: { net: one(disc(A)), net2: one(disc(A), 'net2'), gross: one(disc(A), 'R') }, conf: { net: one(conf(A)), net2: one(conf(A), 'net2'), gross: one(conf(A), 'R') } }; }
-const T1 = (rows) => compare(rows.filter((r) => r.case === 2), rows.filter((r) => r.case === 1));
-const T2 = (rows) => compare(rows.filter((r) => r.deepCF === true), rows.filter((r) => r.deepCF === false));
+const both = (A, B) => ({ ...compare(A, B), pre: preCompare(A, B) });
+const T1 = (rows) => both(rows.filter((r) => r.case === 2), rows.filter((r) => r.case === 1));
+const T2 = (rows) => both(rows.filter((r) => r.deepCF === true), rows.filter((r) => r.deepCF === false));
 const T3 = (rows) => single(rows.filter((r) => r.case === 1));
 
 function loadRows(dir, markets) {
@@ -130,12 +137,26 @@ function report(dir) {
     t.verdict = t.disc.net.n < 100 || t.conf.net.n < 50 ? 'INCONCLUSIVE (under its n)' : Object.values(t.checks).every(Boolean) ? 'PASS' : 'FAIL'; }
   const inconc = ['T1', 'T2'].some((id) => /^INCONCLUSIVE/.test(tests[id].verdict)) || /^INCONCLUSIVE/.test(tests.T3.verdict);
   const verdict = !cutT.ok ? 'INVALID' : tests.T3.verdict === 'PASS' ? 'PASS' : inconc ? 'INCONCLUSIVE' : 'FAIL';
+  // second verdict, BEFORE costs (owner's request after the pre-registration): the same bar on R as booked, the cost checks
+  // dropped, its own Holm over T1-T3; the pre-registered (after-cost) verdict above is unchanged
+  { const g3 = tests.T3.conf.gross, pp = [tests.T1.pre.conf.p ?? 1, tests.T2.pre.conf.p ?? 1, g3.tMonth == null ? 1 : g3.tMonth > 0 ? g3.pMonth / 2 : 1 - g3.pMonth / 2], HH = K.holm(pp);
+    for (const [i, id] of ['T1', 'T2'].entries()) { const x = tests[id].pre, sg = Math.sign(x.disc.diff || 0);
+      const few = x.disc.a.n < 100 || x.disc.b.n < 100 || x.conf.a.n < 50 || x.conf.b.n < 50;
+      const checks = { nDiscovery100Each: x.disc.a.n >= 100 && x.disc.b.n >= 100, discoveryAbsT2: Math.abs(x.disc.t || 0) >= 2, nConfirmation50Each: x.conf.a.n >= 50 && x.conf.b.n >= 50,
+        confirmationSameSign: sg !== 0 && Math.sign(x.conf.diff || 0) === sg, holmBelow05: HH[i] < 0.05, monthPairedSameSign: sg !== 0 && Math.sign(x.conf.month.diff || 0) === sg };
+      Object.assign(x, { p: +pp[i].toFixed(5), holm: +HH[i].toFixed(5), checks, verdict: few ? 'INCONCLUSIVE (a side under its n)' : Object.values(checks).every(Boolean) ? 'PASS' : 'FAIL' }); }
+    const g = tests.T3, d = g.disc.gross, c = g.conf.gross;
+    const checks = { nDiscovery100: d.n >= 100, discoveryMeanPositive: (d.mean || 0) > 0, discoveryTMonth2: (d.tMonth || 0) >= 2, nConfirmation50: c.n >= 50, confirmationMeanPositive: (c.mean || 0) > 0, confirmationTMonth2: (c.tMonth || 0) >= 2, holmBelow05: HH[2] < 0.05 };
+    g.pre = { p: +pp[2].toFixed(5), holm: +HH[2].toFixed(5), checks, verdict: d.n < 100 || c.n < 50 ? 'INCONCLUSIVE (under its n)' : Object.values(checks).every(Boolean) ? 'PASS' : 'FAIL' }; }
+  const preInc = ['T1', 'T2'].some((id) => /^INCONCLUSIVE/.test(tests[id].pre.verdict)) || /^INCONCLUSIVE/.test(tests.T3.pre.verdict);
+  const verdictBeforeCosts = !cutT.ok ? 'INVALID' : tests.T3.pre.verdict === 'PASS' ? 'PASS' : preInc ? 'INCONCLUSIVE' : 'FAIL';
   // reported, not tested
   const per = {}; for (const mk of ALLM) { const x = rows.filter((r) => r.market === mk); if (!meta[mk]) continue;
     const t1 = T1(x), t2 = T2(x), t3 = T3(x);
     per[mk] = { kept: x.length, case1: x.filter((r) => r.case === 1).length, case2: x.filter((r) => r.case === 2).length, deep: x.filter((r) => r.deepCF === true).length, notDeep: x.filter((r) => r.deepCF === false).length,
       T1: { disc: { diff: t1.disc.diff, t: t1.disc.t }, conf: { diff: t1.conf.diff, t: t1.conf.t } }, T2: { disc: { diff: t2.disc.diff, t: t2.disc.t }, conf: { diff: t2.conf.diff, t: t2.conf.t } },
-      T3: { disc: { n: t3.disc.net.n, mean: t3.disc.net.mean, tMonth: t3.disc.net.tMonth }, conf: { n: t3.conf.net.n, mean: t3.conf.net.mean, tMonth: t3.conf.net.tMonth } } }; }
+      T3: { disc: { n: t3.disc.net.n, mean: t3.disc.net.mean, tMonth: t3.disc.net.tMonth, pre: t3.disc.gross.mean, preT: t3.disc.gross.tMonth }, conf: { n: t3.conf.net.n, mean: t3.conf.net.mean, tMonth: t3.conf.net.tMonth, pre: t3.conf.gross.mean, preT: t3.conf.gross.tMonth } },
+      T1pre: { conf: { diff: t1.pre.conf.diff, t: t1.pre.conf.t } }, T2pre: { conf: { diff: t2.pre.conf.diff, t: t2.pre.conf.t } } }; }
   const pool18 = { T1: T1(rows), T2: T2(rows), T3: T3(rows) };
   const splitBy = (f) => { const g = {}; for (const r of P) (g[f(r)] ||= []).push(r); return Object.fromEntries(Object.entries(g).sort().map(([k, v]) => [k, { case1: one(v.filter((r) => r.case === 1)), case2: one(v.filter((r) => r.case === 2)) }])); };
   const splits = { byPair: splitBy((r) => `${r.h}>${r.l}>${r.ll}`), byBo: splitBy((r) => (r.ibo ? 'internal BO' : 'major BO')), byMarket: splitBy((r) => r.market),
@@ -144,9 +165,11 @@ function report(dir) {
     noLine: P.filter((r) => r.deepCF == null).length, allSequence: single(P) };
   const f = (v, d = 3) => (v == null ? 'n/a' : (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(d));
   const t1 = tests.T1, t2 = tests.T2, t3 = tests.T3;
-  const headline = `T1 case 2 minus case 1 ${f(t1.conf.diff)}R (confirmation n ${t1.conf.a.n} / ${t1.conf.b.n}, Welch t ${t1.conf.t}); T2 past 50 % minus not ${f(t2.conf.diff)}R (n ${t2.conf.a.n} / ${t2.conf.b.n}, t ${t2.conf.t}); T3 clear-CF sequence ${f(t3.conf.net.mean)}R a trade after costs in confirmation (n ${t3.conf.net.n}, month t ${t3.conf.net.tMonth}), ${f(t3.disc.net.mean)}R in discovery (n ${t3.disc.net.n}, month t ${t3.disc.net.tMonth})`;
+  const headline = `after costs, confirmation: T1 case 2 minus case 1 ${f(t1.conf.diff)}R (n ${t1.conf.a.n}/${t1.conf.b.n}, t ${t1.conf.t}); T2 ${f(t2.conf.diff)}R (n ${t2.conf.a.n}/${t2.conf.b.n}, t ${t2.conf.t}); clear-CF ${f(t3.conf.net.mean)}R a trade (n ${t3.conf.net.n}, month t ${t3.conf.net.tMonth}; discovery ${f(t3.disc.net.mean)}R, t ${t3.disc.net.tMonth})`;
+  const pr1 = t1.pre, pr2 = t2.pre, g3 = t3.conf.gross, gd3 = t3.disc.gross;
+  const headlineBeforeCosts = `T1 ${f(pr1.conf.diff)}R (n ${pr1.conf.a.n} / ${pr1.conf.b.n}, Welch t ${pr1.conf.t}) ${pr1.verdict}; T2 ${f(pr2.conf.diff)}R (n ${pr2.conf.a.n} / ${pr2.conf.b.n}, t ${pr2.conf.t}) ${pr2.verdict}; T3 ${f(g3.mean)}R a trade in confirmation (n ${g3.n}, month t ${g3.tMonth}), ${f(gd3.mean)}R in discovery (n ${gd3.n}, month t ${gd3.tMonth}) ${t3.pre.verdict}`;
   const lastT = Math.max(...Object.values(meta).map((m) => m.last || 0));
-  const out = { study: 'mosha-cf-cases-2020', built: new Date().toISOString().slice(0, 10), verdict, headline,
+  const out = { study: 'mosha-cf-cases-2020', built: new Date().toISOString().slice(0, 10), verdict, headline, verdictBeforeCosts, headlineBeforeCosts,
     system: 'The Mosha desk\'s sequence (BO, VR, CF, pullback, EG) as assets/mosha-sop.js sopTrades reads it on 23 Nov 2026 (six-candle structure, nest and CF-limit readings off); EG entries of the main sequence; OANDA mid 5m from the edgekit cache; after the combo-grid-2 costs.',
     markets: { primary: PRIMARY, reported: OTHERS }, windows: { discovery: ['2020-01-01', '2023-12-31'], confirmation: ['2024-01-01', new Date(lastT * 1000).toISOString().slice(0, 10)] },
     cutTest: cutT, meta, trades: { primary: P.length, all: rows.length }, tests, perMarket: per, pool18: { T1: { conf: pool18.T1.conf, disc: pool18.T1.disc }, T2: { conf: pool18.T2.conf, disc: pool18.T2.disc }, T3: pool18.T3 }, splits };
@@ -154,6 +177,16 @@ function report(dir) {
   const L = [];
   L.push('# Mosha sequence: the CF inside the VR, and the 50 % pullback before the CF', '',
     `**Verdict: ${verdict}. ${headline}.**`, '',
+    `**Before costs (the owner's request after the pre-registration; a second verdict on the same bar with the cost checks dropped, its own Holm): ${verdictBeforeCosts}. ${headlineBeforeCosts}.**`, '',
+    '## Every test before costs (R a trade as the code books it), with the after-cost figures beside it', '',
+    '| Test | Window | Side | n | R before costs | month-sum t | R after costs | month-sum t after |', '|---|---|---|---|---|---|---|---|');
+  const gl = (id, w, side, x, y) => L.push(`| ${id} | ${w} | ${side} | ${x.n} | ${f(x.mean)} | ${x.tMonth ?? 'n/a'} | ${f(y.mean)} | ${y.tMonth ?? 'n/a'} |`);
+  for (const [id, A, B] of [['T1', 'CF inside the VR', 'CF clear of the VR'], ['T2', 'past 50 % before the CF', 'not past 50 %']]) for (const [w, k] of [['discovery', 'disc'], ['confirmation', 'conf']]) {
+    const x = tests[id].pre[k], y = tests[id][k]; gl(id, w, A, x.a, y.a); gl(id, w, B, x.b, y.b);
+    L.push(`| ${id} | ${w} | difference | | ${f(x.diff)} (Welch t ${x.t ?? 'n/a'}) | ${x.month.t ?? 'n/a'} (month-paired) | ${f(y.diff)} (Welch t ${y.t ?? 'n/a'}) | |`); }
+  for (const [w, k] of [['discovery', 'disc'], ['confirmation', 'conf']]) gl('T3', w, 'clear-CF sequence', t3[k].gross, t3[k].net);
+  L.push('', `Before-cost verdicts: T1 ${pr1.verdict} (Holm p ${pr1.holm}), T2 ${pr2.verdict} (Holm p ${pr2.holm}), T3 ${t3.pre.verdict} (Holm p ${t3.pre.holm}). T3 checks before costs: ${Object.entries(t3.pre.checks).map(([k, v]) => `${k} ${v ? 'yes' : 'no'}`).join(', ')}.`, '',
+    '## After costs (the pre-registered verdict)', '',
     `Built ${out.built}. Pre-registered (PREREGISTRATION.md, committed before any trade was computed). Paper research only; nothing live changed.`,
     `Gold, EUR/USD and GBP/USD (primary); discovery 2020-2023, confirmation 2024 to ${out.windows.confirmation[1]}; R a trade after the round-trip cost; ${P.length} closed sequence entries in the primary pool, ${rows.length} on all 18 markets.`,
     `Cut test (gold, cut at 2020-06-01): ${cutT.ok ? 'passed' : 'FAILED'} (${cutT.short} records filled by the cut, identical in both runs: ${cutT.ok}).`, '',
@@ -166,8 +199,8 @@ function report(dir) {
     '## T3: the clear-CF sequence alone, against the common bar', '', '| Window | n | win % | net R a trade | month t | before costs | at 2x cost |', '|---|---|---|---|---|---|---|');
   for (const [w, x] of [['discovery', t3.disc], ['confirmation', t3.conf]]) L.push(`| ${w} | ${x.net.n} | ${x.net.win} | ${f(x.net.mean)} | ${x.net.tMonth ?? 'n/a'} | ${f(x.gross.mean)} | ${f(x.net2.mean)} |`);
   L.push('', `Holm p ${t3.holm}. Checks: ${Object.entries(t3.checks).map(([k, v]) => `${k} ${v ? 'yes' : 'no'}`).join(', ')}. Verdict ${t3.verdict}.`, '',
-    '## Reported, not tested: each market (net R a trade; confirmation unless said)', '', '| Market | kept | case 1 / case 2 | T1 diff (t) | T2 diff (t) | T3 discovery n, R, month t | T3 confirmation n, R, month t |', '|---|---|---|---|---|---|---|');
-  for (const [mk, x] of Object.entries(per)) L.push(`| ${mk} | ${x.kept} | ${x.case1} / ${x.case2} | ${f(x.T1.conf.diff)} (${x.T1.conf.t ?? 'n/a'}) | ${f(x.T2.conf.diff)} (${x.T2.conf.t ?? 'n/a'}) | ${x.T3.disc.n}, ${f(x.T3.disc.mean)}, ${x.T3.disc.tMonth ?? 'n/a'} | ${x.T3.conf.n}, ${f(x.T3.conf.mean)}, ${x.T3.conf.tMonth ?? 'n/a'} |`);
+    '## Reported, not tested: each market (R a trade; confirmation unless said; after costs, then before costs)', '', '| Market | kept | case 1 / case 2 | T1 diff (t) | T2 diff (t) | T3 discovery n, R, month t | T3 confirmation n, R, month t | before costs: T1 diff (t) | T2 diff (t) | T3 R (month t) discovery / confirmation |', '|---|---|---|---|---|---|---|---|---|---|');
+  for (const [mk, x] of Object.entries(per)) L.push(`| ${mk} | ${x.kept} | ${x.case1} / ${x.case2} | ${f(x.T1.conf.diff)} (${x.T1.conf.t ?? 'n/a'}) | ${f(x.T2.conf.diff)} (${x.T2.conf.t ?? 'n/a'}) | ${x.T3.disc.n}, ${f(x.T3.disc.mean)}, ${x.T3.disc.tMonth ?? 'n/a'} | ${x.T3.conf.n}, ${f(x.T3.conf.mean)}, ${x.T3.conf.tMonth ?? 'n/a'} | ${f(x.T1pre.conf.diff)} (${x.T1pre.conf.t ?? 'n/a'}) | ${f(x.T2pre.conf.diff)} (${x.T2pre.conf.t ?? 'n/a'}) | ${f(x.T3.disc.pre)} (${x.T3.disc.preT ?? 'n/a'}) / ${f(x.T3.conf.pre)} (${x.T3.conf.preT ?? 'n/a'}) |`);
   const q = pool18;
   L.push('', `18-market pool, descriptive: T1 confirmation ${f(q.T1.conf.diff)} (n ${q.T1.conf.a.n} / ${q.T1.conf.b.n}, t ${q.T1.conf.t}), T2 ${f(q.T2.conf.diff)} (n ${q.T2.conf.a.n} / ${q.T2.conf.b.n}, t ${q.T2.conf.t}), clear-CF sequence ${f(q.T3.conf.net.mean)}R (n ${q.T3.conf.net.n}, month t ${q.T3.conf.net.tMonth}) in confirmation and ${f(q.T3.disc.net.mean)}R (n ${q.T3.disc.net.n}, month t ${q.T3.disc.net.tMonth}) in discovery.`, '',
     '## Splits of the primary pool, descriptive (net R a trade, whole window)', '', '| Split | case 1 n | case 1 R | case 2 n | case 2 R |', '|---|---|---|---|---|');
