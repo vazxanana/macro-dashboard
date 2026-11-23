@@ -1,0 +1,547 @@
+{
+ "built": "2026-11-23",
+ "what": "Accounting only. The rules that passed a pre-registered test and committed a trade list, at 1R a trade each, after each study's own costs. Mostly in-sample years; the forward records judge.",
+ "sources": {
+  "goldVB": {
+   "name": "Gold volatility breakout T1",
+   "file": "research/edge/gold-vol-breakout-forward/baseline.json",
+   "cost": "measured hourly spread + 0.05 x M slippage (C1)",
+   "first": "2021-01-04",
+   "last": "2026-11-12",
+   "n": 1121
+  },
+  "usdjpyVB": {
+   "name": "USD/JPY volatility breakout T1",
+   "file": "research/edge/usdjpy-vol-breakout-forward/baseline.json",
+   "cost": "demo commission + 0.5 pip (pre-set)",
+   "first": "2016-01-04",
+   "last": "2026-11-19",
+   "n": 2079
+  },
+  "gotobi": {
+   "name": "Gotobi fade T2 (USD/JPY)",
+   "file": "research/edge/gotobi-exec/result.json",
+   "cost": "the demo broker's own bid / ask at 00:55 and 06:00 UTC, commission",
+   "first": "2023-11-24",
+   "last": "2026-11-13",
+   "n": 211
+  },
+  "preHoliday": {
+   "name": "Gold before a US holiday T1",
+   "file": "research/edge/gold-pre-holiday/result.json",
+   "cost": "assumed $0.60 an ounce a round trip (not measured)",
+   "first": "2006-12-29",
+   "last": "2026-09-04",
+   "n": 181
+  },
+  "turnaround": {
+   "name": "Turnaround Tuesday R2 (NAS100)",
+   "file": "research/edge/turnaround-tuesday/result.json",
+   "cost": "assumed 0.05 % of price a round trip + one night of financing (not measured)",
+   "first": "2008-01-23",
+   "last": "2026-11-03",
+   "n": 151
+  }
+ },
+ "A": {
+  "from": "2021-01-01",
+  "to": "2026-10-31",
+  "months": 70,
+  "rules": {
+   "goldVB": {
+    "trades": 1114,
+    "R": 113.918,
+    "perTrade": 0.102,
+    "perYear": 19.529,
+    "monthT": 2.698,
+    "worstMonth": -8.305,
+    "maxDD": -28.266,
+    "years": {
+     "2021": 12.913,
+     "2022": 12.09,
+     "2023": -8.175,
+     "2024": 17.172,
+     "2025": 37.775,
+     "2026": 42.143
+    },
+    "losingFullYears": 1,
+    "fullYears": 5
+   },
+   "usdjpyVB": {
+    "trades": 1113,
+    "R": 95.042,
+    "perTrade": 0.085,
+    "perYear": 16.293,
+    "monthT": 2.282,
+    "worstMonth": -7.658,
+    "maxDD": -33.756,
+    "years": {
+     "2021": 31.206,
+     "2022": 19.818,
+     "2023": -15.418,
+     "2024": 37.838,
+     "2025": 10.413,
+     "2026": 11.185
+    },
+    "losingFullYears": 1,
+    "fullYears": 5
+   },
+   "preHoliday": {
+    "trades": 55,
+    "R": 4.841,
+    "perTrade": 0.088,
+    "perYear": 0.83,
+    "monthT": 1.238,
+    "worstMonth": -1.015,
+    "maxDD": -2.831,
+    "years": {
+     "2021": 2.051,
+     "2022": 0.715,
+     "2023": 0.594,
+     "2024": 3.974,
+     "2025": -1.348,
+     "2026": -1.145
+    },
+    "losingFullYears": 1,
+    "fullYears": 5
+   },
+   "turnaround": {
+    "trades": 44,
+    "R": 2.122,
+    "perTrade": 0.048,
+    "perYear": 0.364,
+    "monthT": 1.106,
+    "worstMonth": -0.679,
+    "maxDD": -1.216,
+    "years": {
+     "2021": 0.794,
+     "2022": -0.737,
+     "2023": 0.829,
+     "2024": 0.146,
+     "2025": 0.097,
+     "2026": 0.993
+    },
+    "losingFullYears": 1,
+    "fullYears": 5
+   }
+  },
+  "monthlyCorr": {
+   "goldVB": {
+    "goldVB": 1,
+    "usdjpyVB": 0.034,
+    "preHoliday": 0.034,
+    "turnaround": 0.015
+   },
+   "usdjpyVB": {
+    "goldVB": 0.034,
+    "usdjpyVB": 1,
+    "preHoliday": 0.139,
+    "turnaround": -0.1
+   },
+   "preHoliday": {
+    "goldVB": 0.034,
+    "usdjpyVB": 0.139,
+    "preHoliday": 1,
+    "turnaround": -0.081
+   },
+   "turnaround": {
+    "goldVB": 0.015,
+    "usdjpyVB": -0.1,
+    "preHoliday": -0.081,
+    "turnaround": 1
+   }
+  },
+  "books": {
+   "core": {
+    "rules": [
+     "goldVB",
+     "usdjpyVB"
+    ],
+    "trades": 2227,
+    "R": 208.96,
+    "perTrade": 0.094,
+    "perYear": 35.822,
+    "monthT": 3.465,
+    "worstMonth": -12.113,
+    "maxDD": -42.012,
+    "years": {
+     "2021": 44.119,
+     "2022": 31.908,
+     "2023": -23.593,
+     "2024": 55.01,
+     "2025": 48.188,
+     "2026": 53.328
+    },
+    "losingFullYears": 1,
+    "fullYears": 5,
+    "risk": [
+     {
+      "pctPerTrade": 0.1,
+      "pctPerYear": 3.582,
+      "worstDDpct": -4.201,
+      "worstMonthPct": -1.211
+     },
+     {
+      "pctPerTrade": 0.25,
+      "pctPerYear": 8.956,
+      "worstDDpct": -10.503,
+      "worstMonthPct": -3.028
+     },
+     {
+      "pctPerTrade": 0.5,
+      "pctPerYear": 17.911,
+      "worstDDpct": -21.006,
+      "worstMonthPct": -6.056
+     }
+    ]
+   },
+   "coreHoliday": {
+    "rules": [
+     "goldVB",
+     "usdjpyVB",
+     "preHoliday"
+    ],
+    "trades": 2282,
+    "R": 213.801,
+    "perTrade": 0.094,
+    "perYear": 36.652,
+    "monthT": 3.511,
+    "worstMonth": -12.131,
+    "maxDD": -41.084,
+    "years": {
+     "2021": 46.17,
+     "2022": 32.623,
+     "2023": -22.999,
+     "2024": 58.984,
+     "2025": 46.84,
+     "2026": 52.183
+    },
+    "losingFullYears": 1,
+    "fullYears": 5,
+    "risk": [
+     {
+      "pctPerTrade": 0.1,
+      "pctPerYear": 3.665,
+      "worstDDpct": -4.108,
+      "worstMonthPct": -1.213
+     },
+     {
+      "pctPerTrade": 0.25,
+      "pctPerYear": 9.163,
+      "worstDDpct": -10.271,
+      "worstMonthPct": -3.033
+     },
+     {
+      "pctPerTrade": 0.5,
+      "pctPerYear": 18.326,
+      "worstDDpct": -20.542,
+      "worstMonthPct": -6.065
+     }
+    ]
+   },
+   "allFour": {
+    "rules": [
+     "goldVB",
+     "usdjpyVB",
+     "preHoliday",
+     "turnaround"
+    ],
+    "trades": 2326,
+    "R": 215.923,
+    "perTrade": 0.093,
+    "perYear": 37.015,
+    "monthT": 3.551,
+    "worstMonth": -11.638,
+    "maxDD": -40.591,
+    "years": {
+     "2021": 46.964,
+     "2022": 31.886,
+     "2023": -22.17,
+     "2024": 59.13,
+     "2025": 46.937,
+     "2026": 53.176
+    },
+    "losingFullYears": 1,
+    "fullYears": 5,
+    "risk": [
+     {
+      "pctPerTrade": 0.1,
+      "pctPerYear": 3.702,
+      "worstDDpct": -4.059,
+      "worstMonthPct": -1.164
+     },
+     {
+      "pctPerTrade": 0.25,
+      "pctPerYear": 9.254,
+      "worstDDpct": -10.148,
+      "worstMonthPct": -2.909
+     },
+     {
+      "pctPerTrade": 0.5,
+      "pctPerYear": 18.508,
+      "worstDDpct": -20.295,
+      "worstMonthPct": -5.819
+     }
+    ]
+   }
+  }
+ },
+ "B": {
+  "from": "2023-11-01",
+  "to": "2026-10-31",
+  "months": 36,
+  "rules": {
+   "goldVB": {
+    "trades": 585,
+    "R": 100.218,
+    "perTrade": 0.171,
+    "perYear": 33.406,
+    "monthT": 3.373,
+    "worstMonth": -7.852,
+    "maxDD": -15.684,
+    "years": {
+     "2023": 3.128,
+     "2024": 17.172,
+     "2025": 37.775,
+     "2026": 42.143
+    },
+    "losingFullYears": 0,
+    "fullYears": 2
+   },
+   "usdjpyVB": {
+    "trades": 570,
+    "R": 70.586,
+    "perTrade": 0.124,
+    "perYear": 23.529,
+    "monthT": 2.292,
+    "worstMonth": -5.688,
+    "maxDD": -15.168,
+    "years": {
+     "2023": 11.15,
+     "2024": 37.838,
+     "2025": 10.413,
+     "2026": 11.185
+    },
+    "losingFullYears": 0,
+    "fullYears": 2
+   },
+   "gotobi": {
+    "trades": 208,
+    "R": 34.098,
+    "perTrade": 0.164,
+    "perYear": 11.366,
+    "monthT": 1.792,
+    "worstMonth": -4.236,
+    "maxDD": -10.124,
+    "years": {
+     "2023": -0.29,
+     "2024": 18.469,
+     "2025": 24.193,
+     "2026": -8.274
+    },
+    "losingFullYears": 0,
+    "fullYears": 2
+   },
+   "preHoliday": {
+    "trades": 30,
+    "R": 1.02,
+    "perTrade": 0.034,
+    "perYear": 0.34,
+    "monthT": 0.313,
+    "worstMonth": -1.015,
+    "maxDD": -2.831,
+    "years": {
+     "2023": -0.461,
+     "2024": 3.974,
+     "2025": -1.348,
+     "2026": -1.145
+    },
+    "losingFullYears": 1,
+    "fullYears": 2
+   },
+   "turnaround": {
+    "trades": 16,
+    "R": 1.236,
+    "perTrade": 0.077,
+    "perYear": 0.412,
+    "monthT": 1.024,
+    "worstMonth": -0.47,
+    "maxDD": -0.562,
+    "years": {
+     "2024": 0.146,
+     "2025": 0.097,
+     "2026": 0.993
+    },
+    "losingFullYears": 0,
+    "fullYears": 2
+   }
+  },
+  "monthlyCorr": {
+   "goldVB": {
+    "goldVB": 1,
+    "usdjpyVB": 0,
+    "gotobi": -0.244,
+    "preHoliday": 0.097,
+    "turnaround": 0.354
+   },
+   "usdjpyVB": {
+    "goldVB": 0,
+    "usdjpyVB": 1,
+    "gotobi": 0.056,
+    "preHoliday": 0.233,
+    "turnaround": -0.169
+   },
+   "gotobi": {
+    "goldVB": -0.244,
+    "usdjpyVB": 0.056,
+    "gotobi": 1,
+    "preHoliday": 0.012,
+    "turnaround": 0.004
+   },
+   "preHoliday": {
+    "goldVB": 0.097,
+    "usdjpyVB": 0.233,
+    "gotobi": 0.012,
+    "preHoliday": 1,
+    "turnaround": -0.076
+   },
+   "turnaround": {
+    "goldVB": 0.354,
+    "usdjpyVB": -0.169,
+    "gotobi": 0.004,
+    "preHoliday": -0.076,
+    "turnaround": 1
+   }
+  },
+  "books": {
+   "core": {
+    "rules": [
+     "goldVB",
+     "usdjpyVB"
+    ],
+    "trades": 1155,
+    "R": 170.804,
+    "perTrade": 0.148,
+    "perYear": 56.935,
+    "monthT": 3.992,
+    "worstMonth": -10.069,
+    "maxDD": -21.759,
+    "years": {
+     "2023": 14.278,
+     "2024": 55.01,
+     "2025": 48.188,
+     "2026": 53.328
+    },
+    "losingFullYears": 0,
+    "fullYears": 2,
+    "risk": [
+     {
+      "pctPerTrade": 0.1,
+      "pctPerYear": 5.694,
+      "worstDDpct": -2.176,
+      "worstMonthPct": -1.007
+     },
+     {
+      "pctPerTrade": 0.25,
+      "pctPerYear": 14.234,
+      "worstDDpct": -5.44,
+      "worstMonthPct": -2.517
+     },
+     {
+      "pctPerTrade": 0.5,
+      "pctPerYear": 28.468,
+      "worstDDpct": -10.879,
+      "worstMonthPct": -5.034
+     }
+    ]
+   },
+   "candidate": {
+    "rules": [
+     "goldVB",
+     "usdjpyVB",
+     "gotobi",
+     "preHoliday"
+    ],
+    "trades": 1393,
+    "R": 205.922,
+    "perTrade": 0.148,
+    "perYear": 68.641,
+    "monthT": 4.537,
+    "worstMonth": -7.575,
+    "maxDD": -18.078,
+    "years": {
+     "2023": 13.527,
+     "2024": 77.453,
+     "2025": 71.033,
+     "2026": 43.909
+    },
+    "losingFullYears": 0,
+    "fullYears": 2,
+    "risk": [
+     {
+      "pctPerTrade": 0.1,
+      "pctPerYear": 6.864,
+      "worstDDpct": -1.808,
+      "worstMonthPct": -0.758
+     },
+     {
+      "pctPerTrade": 0.25,
+      "pctPerYear": 17.16,
+      "worstDDpct": -4.519,
+      "worstMonthPct": -1.894
+     },
+     {
+      "pctPerTrade": 0.5,
+      "pctPerYear": 34.321,
+      "worstDDpct": -9.039,
+      "worstMonthPct": -3.787
+     }
+    ]
+   },
+   "allFive": {
+    "rules": [
+     "goldVB",
+     "usdjpyVB",
+     "gotobi",
+     "preHoliday",
+     "turnaround"
+    ],
+    "trades": 1409,
+    "R": 207.158,
+    "perTrade": 0.147,
+    "perYear": 69.053,
+    "monthT": 4.549,
+    "worstMonth": -7.575,
+    "maxDD": -18.078,
+    "years": {
+     "2023": 13.527,
+     "2024": 77.599,
+     "2025": 71.13,
+     "2026": 44.902
+    },
+    "losingFullYears": 0,
+    "fullYears": 2,
+    "risk": [
+     {
+      "pctPerTrade": 0.1,
+      "pctPerYear": 6.905,
+      "worstDDpct": -1.808,
+      "worstMonthPct": -0.758
+     },
+     {
+      "pctPerTrade": 0.25,
+      "pctPerYear": 17.263,
+      "worstDDpct": -4.519,
+      "worstMonthPct": -1.894
+     },
+     {
+      "pctPerTrade": 0.5,
+      "pctPerYear": 34.527,
+      "worstDDpct": -9.039,
+      "worstMonthPct": -3.787
+     }
+    ]
+   }
+  }
+ }
+}
