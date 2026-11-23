@@ -1,6 +1,6 @@
 # The Engulfing desk's zone readings on 18 markets, 2020 to now
 
-**Verdict: FAIL. Before costs 0 of 6 readings pass (pooled from 2024 on 27501 trades, −0.028R a trade, month t -2.98); after costs 0 of 6 readings pass: pooled over the six from 2024 on 27501 trades, −0.073R a trade after costs (month t -7.97); best T3 −0.018R (n 570, t -0.29).**
+**Verdict: FAIL. 0 of 6 readings pass before costs and 0 of 6 after costs: from 2024 on the six made −0.028R a trade before costs on 27501 trades (month t -2.98) and −0.073R after costs (month t -7.97).**
 
 Built 2026-11-23. Pre-registered (PREREGISTRATION.md, committed alone before any trade was computed). Paper research only: nothing live changed.
 The desk's own code (`council/eg-methods.mjs`, imported, not edited) on 18 markets, OANDA mid 5-minute candles to 2026-11-23T11:00 UTC; discovery 2020-2023, confirmation 2024 on; R a trade after the round-trip costs of `combo-grid-2`; t on calendar-month sums. 66287 closed trades.
