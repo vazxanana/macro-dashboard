@@ -51,3 +51,14 @@ test('no look-ahead: signals before a cut do not change when every later candle 
     assert.deepEqual(a, b, tfL + '>' + tfT + ' ' + z); n += a.length; }
   assert.ok(n > 100);
 });
+
+test('the USD/JPY follow-up: gate and verdict as reported', async () => {
+  const fs = await import('node:fs');
+  const r = JSON.parse(fs.readFileSync(new URL('../research/edge/usdjpy-dom-ef/result.json', import.meta.url)));
+  assert.equal(r.gate.IS.n, 1292); assert.equal(r.gate.OOS.n, 968);
+  assert.equal(r.verdict, 'FAIL'); assert.ok(r.markets.usdjpy.all.meanR < 0);
+  const md = fs.readFileSync(new URL('../research/edge/usdjpy-dom-ef/RESULT.md', import.meta.url), 'utf8');
+  assert.match(md, /4,500 \| -0\.076 \| -3\.58/);
+  const g = JSON.parse(fs.readFileSync(new URL('../research/edge/combo-grid/result.json', import.meta.url)));
+  assert.equal(g.confirmed, 0); assert.equal(g.tested, 463064);
+});
