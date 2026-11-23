@@ -186,16 +186,24 @@ export function report(dir) {
     spreads[m] = { measured: true, at: hp.at, rows, fill2023: sub((h) => h >= 20), fill0811: sub((h) => h >= 8 && h <= 11) };
   }
 
+  // added AFTER the run, not pre-registered: is the gain booked by exits inside 21:00-22:59 UTC? (per-trade t, overlapping trades)
+  const exitStat = (v) => { const n = v.length; if (n < 2) return { n }; const m = v.reduce((a, x) => a + x[2], 0) / n, sd = Math.sqrt(v.reduce((a, x) => a + (x[2] - m) ** 2, 0) / (n - 1));
+    return { n, mean: r6(m), t: +(m / (sd / Math.sqrt(n))).toFixed(2), target: +(v.filter((x) => x[2] > 1.99).length / n).toFixed(3), stopped: +(v.filter((x) => x[2] < -0.99).length / n).toFixed(3) }; };
+  const posthoc = [];
+  for (const [feed, list, a, b] of [['OANDA 2015-26', O, DM, NM], ['HistData 2018-26', H, BM0, NM]]) for (const [bn, bf] of [['whole fade', () => true], ['20-23 block', block2023]]) {
+    const v = all(list, (x) => bf(x) && monthOf(x[0]) >= a && monthOf(x[0]) < b), rin = v.filter((x) => inRoll(x[4] - 1));
+    posthoc.push({ feed, block: bn, exitInRoll: exitStat(rin), exitOutside: exitStat(v.filter((x) => !inRoll(x[4] - 1))),
+      shareOfR: +(rin.reduce((q, x) => q + x[2], 0) / v.reduce((q, x) => q + x[2], 0)).toFixed(3) }); }
   const nm = (x) => `${x.key} ${f3(x.mean)}R (n ${N(x.n)}${x.n2 ? ' vs ' + N(x.n2) : ''}, t ${f2(x.t)})`;
   const fail = P.filter((x) => !x.pass);
   const headline = verdict === 'INCONCLUSIVE' ? (gateOk ? 'too few markets loaded' : 'the gate did not reproduce grid7-wide-fade / fade-conditions; nothing judged')
-    : verdict === 'PASS' ? `the 20-23 UTC fade holds without the rollover hours on both feeds: 20 and 23 UTC with rollover fills excluded ${f3(s2.mean)}R a trade in 2015-26 (n ${N(s2.n)}, month t ${f2(s2.t)}) and ${f3(s3.mean)}R on HistData (n ${N(s3.n)}, t ${f2(s3.t)}); before costs, ${f3(s2.meanNet)}R after costs in 2015-26`
+    : verdict === 'PASS' ? `the 20-23 UTC fade holds without the rollover hours on both feeds: 20 and 23 UTC with rollover fills excluded ${f3(s2.mean)}R a trade in 2015-26 (n ${N(s2.n)}, month t ${f2(s2.t)}) and ${f3(s3.mean)}R on HistData (n ${N(s3.n)}, t ${f2(s3.t)}), before costs; ${f3(s2.meanNet)}R a trade after costs in 2015-26`
       : `${fail.length} of 4 primary tests fail (${fail.map(nm).join('; ')})`;
   const out = { study: 'fade-hour-check', built: '2026-11-23', verdict, headline,
     basis: 'judged before costs (pre-registered); month-sum t for P1-P3, Welch t for P4, Holm over 4; after costs beside',
     rule: 'm15 none atr 2R all (grid7-wide-fade, imported)', windows: { d: '2005-01 .. 2014-12', c: '2015-01 .. 2026-10', h: 'HistData 2018-02 .. 2026-10' },
     markets: O.map((d) => d.market), histMarkets: H.map((d) => d.market), indices: I.map((d) => d.market), assumedCosts: ASSUMED,
-    gate, exitCheckMismatches: mism, primary: P, cuts: cutRows, hoursOanda: hoursO, hoursHist: hoursH, spike, spikeShare, indices: idx, indicesPool: idxPool, spreads,
+    gate, exitCheckMismatches: mism, primary: P, cuts: cutRows, hoursOanda: hoursO, hoursHist: hoursH, spike, spikeShare, indices: idx, indicesPool: idxPool, spreads, posthoc,
     meta: [...O.map((d) => ({ feed: 'oanda', ...metaOf(d) })), ...H.map((d) => ({ feed: 'hist', ...metaOf(d) })), ...I.map((d) => ({ feed: 'oanda', ...metaOf(d) }))] };
   fs.writeFileSync(path.join(HERE, 'result.json'), JSON.stringify(out, null, 1) + '\n');
   fs.writeFileSync(path.join(HERE, 'RESULT.md'), resultMd(out));
@@ -253,6 +261,12 @@ function resultMd(o) {
     for (const r of s.rows) L.push(`| ${String(r.hour).padStart(2, '0')} | ${N(r.n)} | ${r.spread} | ${r.spreadDays ?? ''} | ${r.target ?? 'n/a'} | ${r.ratio ?? 'n/a'} | ${r.costR ?? 'n/a'} | ${f3(r.mean)} | ${f3(r.meanAfterSpread)} |`);
     L.push('');
   }
+  L.push('## Added after the run (not pre-registered): where the gain is booked', '',
+    'Trades split by whether their exit (the 5-minute candle that closed them) falls inside 21:00-22:59 UTC. Per-trade t (trades',
+    'overlap, so it overstates). "Share of R" = the part of the block\'s summed R booked by those exits.', '',
+    '| Feed | Block | exits in 21-22 n | R (t) | target / stopped | exits outside n | R (t) | target / stopped | share of R |', '|---|---|---:|---:|---:|---:|---:|---:|---:|');
+  for (const x of o.posthoc) L.push(`| ${x.feed} | ${x.block} | ${N(x.exitInRoll.n)} | ${f3(x.exitInRoll.mean)} (${f2(x.exitInRoll.t)}) | ${x.exitInRoll.target} / ${x.exitInRoll.stopped} | ${N(x.exitOutside.n)} | ${f3(x.exitOutside.mean)} (${f2(x.exitOutside.t)}) | ${x.exitOutside.target} / ${x.exitOutside.stopped} | ${(x.shareOfR * 100).toFixed(0)}% |`);
+  L.push('');
   L.push('## Checks', '', '- Every trade has its stop on the losing side of the fill (the run throws otherwise); closed candles only (the signal code is',
     '  `grid7-wide-fade`\'s, whose cut test passed); the spike ratio uses only candles before the break candle and the break candle itself.', '',
     '| Feed | Market | from | to | trades | dropped (bad data) | past the stop | risk under cost | unresolved |', '|---|---|---|---|---:|---:|---:|---:|---:|');
@@ -261,7 +275,31 @@ function resultMd(o) {
   return L.join('\n');
 }
 // the reading, written after the run from the figures above (kept in the code so RESULT.md is reproducible)
-export const MEANING = (o) => o.meaning || '(see the tables)';
+export const MEANING = (o) => {
+  const p = Object.fromEntries(o.primary.map((x) => [x.key, x])), c = (n) => o.cuts.find((x) => x.name === n);
+  const nv = c('20-23 block, never open 21:00-22:59'), wn = c('whole fade, never open 21:00-22:59'), ph = o.posthoc;
+  return [
+    `**The pre-registered question is answered: yes, the tilt is still there without the rollover fills, on both feeds.** With`,
+    `breaks at 20 or 23 UTC and no fill inside 21:00-22:59 the fade made ${f3(p.P1.mean)}R a trade in 2005-14 (month t ${f2(p.P1.t)}),`,
+    `${f3(p.P2.mean)}R in 2015-26 (t ${f2(p.P2.t)}) and ${f3(p.P3.mean)}R on HistData (t ${f2(p.P3.t)}), and HistData shows the same hour`,
+    `profile as OANDA (21 UTC the largest on both). It is not a spike-candle effect either: breaks on candles of twice the usual`,
+    `range or more did no better than normal ones in the block. The three indices show no 20-23 tilt.`,
+    '',
+    '**It is not shown to be tradable, for four reasons.**',
+    `1. Both feeds are quotes, not trades (OANDA mid, HistData bid). A second feed checks OANDA's candles, not what a taker pays,`,
+    `   so it cannot fully separate a quote effect from a price reaction.`,
+    `2. Much of the fade is booked by exits inside the rollover: on the whole fade, exits in 21:00-22:59 are about 6 % of trades`,
+    `   but ${(ph[0].shareOfR * 100).toFixed(0)} % (OANDA) and ${(ph[2].shareOfR * 100).toFixed(0)} % (HistData) of its summed R; trades never open in`,
+    `   21:00-22:59 lose (whole fade ${f3(wn.c.mean)}R, t ${f2(wn.c.t)} in 2015-26), and the 20-23 block shrinks to ${f3(nv.c.mean)}R (t ${f2(nv.c.t)})`,
+    `   and ${f3(nv.h.mean)}R on HistData (t ${f2(nv.h.t)}). That cut also selects by how long a trade lasts, so it is a pointer, not a test.`,
+    `3. After one flat round trip a market every pre-registered cut is negative in 2015-26 (${f3(p.P2.meanNet)}R), and the flat cost`,
+    `   understates the rollover's width. The demo's hourly profile samples only the first two minutes of each hour, so it does`,
+    `   not see the rollover minutes themselves; on gold the 20-23 fills of 2025-26 lost before any cost.`,
+    `4. The forex majors, where most of the trades are, have no hourly spread profile on file.`,
+    '',
+    'Nothing live changed and no rule is proposed. The open question needs the broker\'s own bid / ask through 20:00-00:00 UTC',
+    '(the tick probe, a `marks` run on these fills and exits) and its own pre-registration. Never call this an edge.',
+  ].join('\n'); };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [cmd, a, b] = process.argv.slice(2); const t0 = Date.now();
