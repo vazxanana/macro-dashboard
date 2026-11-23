@@ -121,12 +121,12 @@ export function multi(M5, s, entry, stop, type, t0, expire, oppR, cap) {
 }
 
 // ---- signals of one chain and one zone kind --------------------------------------------------------------------------
-export function signalsFor(F, tfL, tfT, kind, Zcache) {
+export function signalsFor(F, tfL, tfT, kind, Zcache, start = START) {
   const L = F[tfL], T = F[tfT];
   const Z = Zcache[tfL + kind] ||= buildZones(kind, L);
   const out = [];
   for (const z of Z) {
-    if (z.at < START - 30 * 86400) continue;
+    if (z.at < start - 30 * 86400) continue;
     let k = K.closedCount(T, z.at); // first trigger-timeframe candle starting at or after the zone is known
     while (k < T.length && T[k].t < z.at) k++;
     let visit = 0;
@@ -135,7 +135,7 @@ export function signalsFor(F, tfL, tfT, kind, Zcache) {
       while (k < T.length && T[k].t < z.end && !(T[k].l <= z.top && T[k].h >= z.bot)) k++;
       if (k >= T.length || T[k].t >= z.end) break;
       visit++; const k0 = k;
-      if (T[k0].t >= START) {
+      if (T[k0].t >= start) {
         out.push({ z, visit, k0, trig: 5 }); // no trigger: a limit at the zone from the touch candle's start
         const got = new Set();
         let ext = z.d > 0 ? Infinity : -Infinity;
