@@ -158,7 +158,7 @@ export function report(dir) {
   const cut = MARKETS.flatMap((m) => { const f = path.join(dir, 'cut-' + m + '.json'); return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : []; });
   const rows = judge(data), T = rows.filter((r) => !r.isCtl), pass = T.filter((r) => r.pass), plPass = T.filter((r) => r.plac.pass);
   const verdict = verdictOf(rows);
-  const bestC = [...T].sort((a, b) => b.c.t - a.c.t)[0], bestBoth = [...T].sort((a, b) => Math.min(b.d.t, b.c.t) - Math.min(a.d.t, a.c.t))[0];
+  const bestC = [...T].sort((a, b) => b.c.t - a.c.t)[0], bestBoth = [...T].filter((r) => r.checks.n).sort((a, b) => Math.min(b.d.t, b.c.t) - Math.min(a.d.t, a.c.t))[0];
   const perMarket = {}; for (const r of pass) perMarket[r.cell] = data.map((d) => { const s = cellStats(pool([d]), r.cell); return { market: d.market, d: slim(s.d), c: slim(s.c) }; });
   const headline = verdict === 'PASS'
     ? `${pass.length} of 48 cells pass the pre-registered bar: best ${cname(pass[0])}, ${f3(pass[0].c.mean)}R a trade before costs in 2015-26 (n ${N(pass[0].c.n)}, month t ${f2(pass[0].c.t)})`
@@ -226,6 +226,12 @@ function resultMd(o, rows, bestBoth) {
     'buffer to the fill) almost by construction. The mm cells are therefore nearly empty and fail bar 1. This was seen in a code check',
     'on 2005-2008 EUR/USD candles before the full run (the only figures looked at before it); the registered definition was kept',
     'unchanged rather than amended after that look. The 1R and 2R cells decide the verdict.');
+  const fl = T.filter((r) => r.fam === 'av' && r.pat === 'ef' && r.tf === '15m' && r.exit !== 'mm');
+  if (fl.length) L.push('', '## One side-flipped reading, said plainly', '',
+    'The failed engulf at a Daily V / A turn on M15 lost in both windows, and its side-flipped trades (continuing the move into',
+    'the level) made ' + fl.map((r) => `${r.exit} ${f3(r.plac.d.mean)}R (t ${f2(r.plac.d.t)}) in 2005-14 and ${f3(r.plac.c.mean)}R (t ${f2(r.plac.c.t)}) in 2015-26, Holm ${r.plac.holm.toFixed(3)}`).join('; ') + '.',
+    'Neither clears Holm, and after costs they are ' + fl.map((r) => `${r.exit} ${f3(r.plac.c.meanNet)}R (t ${f2(r.plac.c.tNet)})`).join(' and ') + ' in 2015-26: not a',
+    'continuation rule, and not a candidate (a placebo is not a rule; it was not pre-registered as a test).');
   L.push('', '## What it means', '');
   if (o.verdict === 'PASS') L.push('A passing cell is a candidate for its own forward record and an owner decision, nothing more: it is not adopted, and never called an edge before a forward record.');
   else L.push('Read this simply, no reversal pattern at a Daily key level beats a plain structure break at the same level on ten',
