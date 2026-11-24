@@ -56,9 +56,9 @@ export function pick(act, s, fill) {
 const inBad = (X, t) => { let lo = 0, hi = X.length; while (lo < hi) { const m = (lo + hi) >> 1; if (X[m][0] <= t) lo = m + 1; else hi = m; } return lo > 0 && t <= X[lo - 1][1]; };
 
 // one trade's levels and exits; null = not in the grid's trade set
-export function tradeOf(M5, g, act, cost) {
+export function tradeOf(M5, g, act, cost, cap = CAP['15m']) {
   const fi = startIdx(M5, g.ts); if (fi >= M5.length) return null;
-  const fill = M5[fi].o, s = -g.d, a = g.a, cap = CAP['15m'];
+  const fill = M5[fi].o, s = -g.d, a = g.a;
   const stopA = fill + g.d * a, riskA = s * (fill - stopA);
   if (!(riskA > 0) || riskA < cost) return null;
   // the grid's own membership: its fade and mirror calls (1R, 2R, swing) must resolve
