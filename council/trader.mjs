@@ -391,13 +391,10 @@ const USER_RULES = [
   { id: 'dom-demo-6154', apply: (c) => { c.dom = { ...(c.dom || {}), account: '*6154', risk: 0.01 }; },
     change: 'H1 dominant-zone demo job (owner, 24 Nov): moves to the new $100 demo account (login ending 6154), 1 % of the balance a trade',
     why: 'Owner request of 24 Nov 2026. Demo only; every order carries its stop. On $100 the smallest lot often risks more than 1 % (then that order is skipped). A forward demo record of a before-cost tilt, not an edge.' },
-  // lyriac-155 (owner, 24 Nov 2026: "build as new edge called Lyriac and put it in equinox, connect the 200$ acc to it"): the
-  // Lyriac desk is the passing rules as one desk (gold breakout, USD/JPY breakout, gotobi fade). The two demo jobs that already
-  // trade exactly those rules with real stop orders (council/vb-demo.mjs, council/gotobi.mjs) move to the $200 demo account whose
-  // login ends 155. Positions and orders they hold on the earlier account run out at the broker with their own stops.
-  { id: 'lyriac-155', apply: (c) => { c.vb = { ...(c.vb || {}), account: '*155' }; c.gotobi = { ...(c.gotobi || {}), account: '*155' }; },
-    change: 'Lyriac (owner, 24 Nov): the breakout and gotobi demo jobs trade on the $200 demo account (login ending 155), 0.25 % of the balance a trade',
-    why: 'Owner request of 24 Nov 2026. Demo only; every order carries its stop. On $200 the smallest lot usually risks more than the job allows (1 % at most), so most days are skipped until the balance is larger. A forward demo record, judged against the studies; never an edge by itself.' },
+  // Lyriac (owner, 24 Nov 2026: "build as new edge called Lyriac ... connect the 200$ acc to it", then "swap to the account
+  // shadows LIT"): the Lyriac desk's rules are traded by the breakout and gotobi demo jobs (council/vb-demo.mjs,
+  // council/gotobi.mjs), which use the Shadows + LIT demo account by default (gotobi.mjs accountFor: the LIT book's account).
+  // So no rule is needed: a first rule that pointed them at the $200 account was taken out before it ever ran.
   // ict-mirror-off (owner, 24 Nov 2026: "Stop ICT copies"): the mirror opens no new ICT copy on any demo account; the ICT desk
   // stays a paper record. Its account (login ending 144) takes the Equinox desks (ctrader-accounts.json book eqx).
   { id: 'ict-mirror-off', apply: (c) => { c.mirrorIct = false; },

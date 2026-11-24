@@ -1,5 +1,5 @@
 // node --test tests/lyriac.test.mjs
-// Lyriac (24 Nov 2026): the passing rules as one Equinox desk, and its demo jobs on the $200 account.
+// Lyriac (24 Nov 2026): the passing rules as one Equinox desk, and its demo jobs on the Shadows + LIT demo account.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -46,13 +46,12 @@ test('the desk: gold and USD/JPY, the breakouts by the breakout desks\' own code
   assert.deepEqual(D2.lyriacTrades(B, { from, market: 'eurusd' }), []);
 });
 
-test('wiring: the Equinox tab, the loop line, data health, and the demo jobs on the account ending 155', () => {
+test('wiring: the Equinox tab, the loop line, data health, and the demo jobs on the Shadows + LIT account', () => {
   const page = rd('equinox.html'); assert.match(page, /id="v-lyriac"/); assert.match(page, /window\.EQ_DESKS = \[\{"k": "lyriac", "name": "Lyriac"\}/);
   assert.match(rd('assets/desk-trades.js'), /lyriac: \{ file: 'lyriac\/desk\.json', title: 'Lyriac trades'/); assert.match(rd('assets/desk-trades.js'), /describes the past and is not proof/);
   assert.match(rd('.github/workflows/council.yml'), /--only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,lyriac,dom/);
   assert.match(rd('council/datahealth.mjs'), /file: 'lyriac\/desk\.json'/);
-  const tr = rd('council/trader.mjs'), m = tr.match(/\{ id: 'lyriac-155', apply: (\(c\) => \{[^\n]*\}),\n/); assert.ok(m);
-  const c = { vb: { risk: 0.0025 }, gotobi: { on: true } }; (0, eval)(m[1])(c);
-  assert.deepEqual(c, { vb: { risk: 0.0025, account: '*155' }, gotobi: { on: true, account: '*155' } }, 'only the account moves; risk and switches stay');
+  assert.doesNotMatch(rd('council/trader.mjs'), /id: 'lyriac-155'/, 'the jobs stay on their default account');
+  assert.match(rd('council/gotobi.mjs'), /find\(\(x\) => \(x\.books \|\| \[\]\)\.includes\('lit'\)\)/, 'the default is the LIT book\'s account');
   assert.match(rd('council/vb-demo.mjs'), /cfg\.vb && cfg\.vb\.account && String\(cfg\.vb\.account\)/); assert.match(rd('council/gotobi.mjs'), /cfg\.gotobi\.account\) return String\(cfg\.gotobi\.account\)/);
 });
