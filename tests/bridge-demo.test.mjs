@@ -14,9 +14,9 @@ const ORDER_CS = /\b(ExecuteMarketOrder|PlaceLimitOrder|PlaceStopOrder|PlaceStop
 // the code line before an order call (skipping comment lines) must be the guard
 const prevCode = (src, i) => { const lines = src.slice(0, i).split('\n'); lines.pop(); while (lines.length && /^\s*(\/\/.*)?$/.test(lines[lines.length - 1])) lines.pop(); return lines[lines.length - 1] || ''; };
 
-test('every order-placing program is covered: the two bridges and the three others', () => {
+test('every order-placing program is covered: the two bridges and the four others', () => {
   assert.deepEqual(MQ.sort(), ['mt5/CouncilBridge.mq5', 'mt5/NQOpenRun.mq5']);
-  assert.deepEqual(CS.sort(), ['ctrader/CouncilBridge.cs', 'ctrader/CryptoScalper.cs', 'ctrader/CryptoTrend.cs']);
+  assert.deepEqual(CS.sort(), ['ctrader/BreakFade.cs', 'ctrader/CouncilBridge.cs', 'ctrader/CryptoScalper.cs', 'ctrader/CryptoTrend.cs']);
   for (const f of [...MQ, ...CS]) assert.ok([...rd(f).matchAll(f.endsWith('.cs') ? ORDER_CS : ORDER_MQ)].length > 0, f + ' sends orders');
 });
 
@@ -49,4 +49,12 @@ test('the READMEs say so, and the owner decision is ticked', () => {
   assert.match(rd('mt5/README.md'), /\*\*Demo accounts only \(12 Nov 2026, owner decision 45\)\.\*\*/);
   assert.match(rd('ctrader/README.md'), /\*\*Demo accounts only \(12 Nov 2026, owner decision 45\)\.\*\*/);
   assert.match(rd('docs/owner-decisions.md'), /### \[x\] 45\. /);
+});
+
+test('BreakFade.cs is the Break fade cell of the study: 3-candle swings, ATR 14, 1 ATR stop, 2R, 24 hours, dry run by default', () => {
+  const s = rd('ctrader/BreakFade.cs');
+  for (const re of [/private const int Swing = 3;/, /private const int AtrN = 14;/, /private const double StopAtr = 1\.0;/, /private const double TargetR = 2\.0;/, /private const int HoldHours = 24;/,
+    /\[Parameter\("Dry run \(log only, no orders\)", DefaultValue = true\)\]/, /var side = dir > 0 \? TradeType\.Sell : TradeType\.Buy;/, /if \(!p\.StopLoss\.HasValue\) \{ Close\(p, "it has no stop"\); continue; \}/,
+    /LOSES AFTER costs/, /TimeZone = TimeZones\.UTC/]) assert.match(s, re);
+  assert.match(rd('ctrader/README.md'), /# BreakFade\.cs/);
 });

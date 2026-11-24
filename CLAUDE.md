@@ -6974,3 +6974,13 @@ optimistic; "confirmed" at 240 trades also needs the total at TWICE the cost abo
 - `council/ctrader-account.mjs` `labelOf` names Equinox before ICT, and `shown(books, cfg)` leaves a book whose copies are
   switched off (`config.mirrorIct === false`) out of the NAME of an account it shares: the …144 row reads "Equinox". The
   account's `books` list and the mirror's mapping are unchanged (ICT copies it still holds are managed as before).
+
+## BreakFade.cs: the Equinox Break fade as a cTrader cBot (24 Nov 2026, owner: "make ctrader bot of the fade m15")
+`ctrader/BreakFade.cs` (standalone, the broker's own M15 candles, label `BF`, `TimeZone = TimeZones.UTC`): the study cell
+`m15 none atr 2R all` of `grid7-wide-fade` as the Equinox desk records it: a close beyond the last confirmed 3-a-side swing is
+faded at market when the candle closes, stop 1 x ATR(14) from the fill, 2R, closed after 24 hours. `DemoOnly()` on start, every
+poll and before the order (the fifth order-sending program; `tests/bridge-demo.test.mjs` lists it and pins its constants); dry
+run by default; a position without a stop is closed. Parameters: symbols, risk %, caps a symbol and in all, UTC hours, the
+spread limit. `BreakAt` walks the last 600 closed candles; compared with the study's `breaks()` on 5,300 seeded candles (0
+mismatches) before it was written in C#. Not compiled (no cTrader in the sandbox). **The rule loses after costs (-0.118R a
+trade 2015-26): a demo tool, never an edge.**
