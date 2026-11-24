@@ -485,7 +485,8 @@
     "t1": 3689.865,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 3623.88,
@@ -500,7 +501,8 @@
     "lagSec": 197,
     "positionId": "51019304",
     "volume": 100,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-24T08:28:16.000Z"
    }
   },
   "day": {
@@ -508,7 +510,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9829.89 · 9 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9818.98 · 8 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -541,8 +543,8 @@
    }
   },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 9829.89,
-  "lastRun": "2026-11-24T08:25:46.000Z"
+  "balance": 9818.98,
+  "lastRun": "2026-11-24T08:28:16.000Z"
  },
  "log": [
   {
@@ -834,6 +836,11 @@
   {
    "at": "2026-11-24T06:47:17.000Z",
    "msg": "limit filled: XAUUSD position 51019304 at the broker",
+   "trade": "xau-m30m1-1795502622"
+  },
+  {
+   "at": "2026-11-24T08:28:16.000Z",
+   "msg": "XAUUSD position 51019304 closed at the broker",
    "trade": "xau-m30m1-1795502622"
   }
  ],
