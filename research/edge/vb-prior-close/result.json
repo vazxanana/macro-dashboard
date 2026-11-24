@@ -1,0 +1,377 @@
+{
+ "study": "vb-prior-close",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/vb-prior-close/PREREGISTRATION.md",
+ "planSha256": "54bba9a4d686f26a88a9772ad77ce6ef400856ab3da85c982c6cefd78f7f1bab",
+ "verdict": "FAIL: T3 gold + USD/JPY pooled: confirmation with +0.067R (n 1537) vs against +0.005R (n 1507), difference +0.062R (Welch t +1.43, paired month t +1.76); discovery difference −0.035R (t −0.68)",
+ "verdictWord": "FAIL",
+ "dataEnd": "2026-11-21",
+ "data": "OANDA mid M5 (toolkit cache): xau 2006-03-19 → 2026-11-21, 3861 T1 trades; usdjpy 2005-01-02 → 2026-11-21, 4169 T1 trades (last day on file left out).",
+ "thresholds": {
+  "top": ">= 2/3",
+  "bottom": "<= 1/3"
+ },
+ "costs": {
+  "xau": "gold-vol-breakout-hourcost route C1 (profile frac, commission, 0.05 x M, long financing)",
+  "usdjpy": "0.000045 x entry + 0.005"
+ },
+ "windows": {
+  "DISC": [
+   "2005-01-01",
+   "2014-12-31"
+  ],
+  "CONF": [
+   "2015-01-01",
+   "2099-12-31"
+  ]
+ },
+ "gate": {
+  "want": {
+   "n": 1121,
+   "netR": 0.105
+  },
+  "got": {
+   "n": 1121,
+   "netR": 0.105
+  },
+  "ok": true
+ },
+ "decision": {
+  "T1": {
+   "p": 0.463,
+   "pHolm": 0.463,
+   "items": {
+    "diffBoth": false,
+    "welch2Holm": false,
+    "pairedMonthT2": false,
+    "n200": true,
+    "withNetPos": true,
+    "control95": false
+   },
+   "pass": false,
+   "verdict": "FAIL"
+  },
+  "T2": {
+   "p": 0.026,
+   "pHolm": 0.077,
+   "items": {
+    "diffBoth": false,
+    "welch2Holm": false,
+    "pairedMonthT2": true,
+    "n200": true,
+    "withNetPos": true,
+    "control95": false
+   },
+   "pass": false,
+   "verdict": "FAIL"
+  },
+  "T3": {
+   "p": 0.077,
+   "pHolm": 0.153,
+   "items": {
+    "diffBoth": false,
+    "welch2Holm": false,
+    "pairedMonthT2": false,
+    "n200": true,
+    "withNetPos": true,
+    "control95": false
+   },
+   "pass": false,
+   "verdict": "FAIL"
+  }
+ },
+ "tests": {
+  "T1": {
+   "name": "gold",
+   "DISC": {
+    "all": {
+     "n": 1611,
+     "netR": 0.189,
+     "grossR": 0.204,
+     "monthT": 5.42,
+     "buys": 769,
+     "sells": 842
+    },
+    "with": {
+     "n": 598,
+     "netR": 0.134,
+     "grossR": 0.15,
+     "monthT": 2.83,
+     "buys": 326,
+     "sells": 272
+    },
+    "against": {
+     "n": 485,
+     "netR": 0.154,
+     "grossR": 0.168,
+     "monthT": 2.64,
+     "buys": 189,
+     "sells": 296
+    },
+    "mid": {
+     "n": 528,
+     "netR": 0.283,
+     "grossR": 0.298,
+     "monthT": 3.86,
+     "buys": 254,
+     "sells": 274
+    },
+    "diff": -0.02,
+    "welchT": -0.24,
+    "diffGross": -0.018,
+    "welchTGross": -0.22,
+    "pairedMonths": 105,
+    "pairedMonthT": -0.06,
+    "control": {
+     "shuffles": 1000,
+     "beaten": 333,
+     "share": 0.333,
+     "p95": 0.164,
+     "median": 0.017
+    }
+   },
+   "CONF": {
+    "all": {
+     "n": 2250,
+     "netR": 0.098,
+     "grossR": 0.115,
+     "monthT": 3.84,
+     "buys": 1141,
+     "sells": 1109
+    },
+    "with": {
+     "n": 754,
+     "netR": 0.073,
+     "grossR": 0.089,
+     "monthT": 1.58,
+     "buys": 429,
+     "sells": 325
+    },
+    "against": {
+     "n": 734,
+     "netR": 0.067,
+     "grossR": 0.083,
+     "monthT": 1.46,
+     "buys": 328,
+     "sells": 406
+    },
+    "mid": {
+     "n": 762,
+     "netR": 0.153,
+     "grossR": 0.171,
+     "monthT": 3.28,
+     "buys": 384,
+     "sells": 378
+    },
+    "diff": 0.006,
+    "welchT": 0.09,
+    "diffGross": 0.006,
+    "welchTGross": 0.09,
+    "pairedMonths": 141,
+    "pairedMonthT": 0.45,
+    "control": {
+     "shuffles": 1000,
+     "beaten": 555,
+     "share": 0.555,
+     "p95": 0.107,
+     "median": -0.002
+    }
+   }
+  },
+  "T2": {
+   "name": "USD/JPY",
+   "DISC": {
+    "all": {
+     "n": 1894,
+     "netR": 0.092,
+     "grossR": 0.121,
+     "monthT": 3.32,
+     "buys": 884,
+     "sells": 1010
+    },
+    "with": {
+     "n": 662,
+     "netR": 0.019,
+     "grossR": 0.047,
+     "monthT": 0.44,
+     "buys": 350,
+     "sells": 312
+    },
+    "against": {
+     "n": 647,
+     "netR": 0.075,
+     "grossR": 0.102,
+     "monthT": 1.6,
+     "buys": 261,
+     "sells": 386
+    },
+    "mid": {
+     "n": 585,
+     "netR": 0.195,
+     "grossR": 0.227,
+     "monthT": 3.43,
+     "buys": 273,
+     "sells": 312
+    },
+    "diff": -0.056,
+    "welchT": -0.84,
+    "diffGross": -0.055,
+    "welchTGross": -0.82,
+    "pairedMonths": 119,
+    "pairedMonthT": -0.87,
+    "control": {
+     "shuffles": 1000,
+     "beaten": 145,
+     "share": 0.145,
+     "p95": 0.134,
+     "median": 0.012
+    }
+   },
+   "CONF": {
+    "all": {
+     "n": 2275,
+     "netR": 0.055,
+     "grossR": 0.087,
+     "monthT": 2.22,
+     "buys": 1114,
+     "sells": 1161
+    },
+    "with": {
+     "n": 783,
+     "netR": 0.061,
+     "grossR": 0.091,
+     "monthT": 1.39,
+     "buys": 444,
+     "sells": 339
+    },
+    "against": {
+     "n": 773,
+     "netR": -0.054,
+     "grossR": -0.024,
+     "monthT": -1.25,
+     "buys": 313,
+     "sells": 460
+    },
+    "mid": {
+     "n": 719,
+     "netR": 0.165,
+     "grossR": 0.202,
+     "monthT": 3.21,
+     "buys": 357,
+     "sells": 362
+    },
+    "diff": 0.115,
+    "welchT": 1.95,
+    "diffGross": 0.115,
+    "welchTGross": 1.95,
+    "pairedMonths": 143,
+    "pairedMonthT": 2.11,
+    "control": {
+     "shuffles": 1000,
+     "beaten": 915,
+     "share": 0.915,
+     "p95": 0.133,
+     "median": 0.031
+    }
+   }
+  },
+  "T3": {
+   "name": "gold + USD/JPY pooled",
+   "DISC": {
+    "all": {
+     "n": 3505,
+     "netR": 0.137,
+     "grossR": 0.159,
+     "monthT": 5.69,
+     "buys": 1653,
+     "sells": 1852
+    },
+    "with": {
+     "n": 1260,
+     "netR": 0.073,
+     "grossR": 0.096,
+     "monthT": 2.28,
+     "buys": 676,
+     "sells": 584
+    },
+    "against": {
+     "n": 1132,
+     "netR": 0.109,
+     "grossR": 0.13,
+     "monthT": 2.75,
+     "buys": 450,
+     "sells": 682
+    },
+    "mid": {
+     "n": 1113,
+     "netR": 0.237,
+     "grossR": 0.261,
+     "monthT": 4.99,
+     "buys": 527,
+     "sells": 586
+    },
+    "diff": -0.035,
+    "welchT": -0.68,
+    "diffGross": -0.034,
+    "welchTGross": -0.66,
+    "pairedMonths": 120,
+    "pairedMonthT": -0.43,
+    "control": {
+     "shuffles": 1000,
+     "beaten": 189,
+     "share": 0.189,
+     "p95": 0.112,
+     "median": 0.015
+    }
+   },
+   "CONF": {
+    "all": {
+     "n": 4525,
+     "netR": 0.076,
+     "grossR": 0.101,
+     "monthT": 3.93,
+     "buys": 2255,
+     "sells": 2270
+    },
+    "with": {
+     "n": 1537,
+     "netR": 0.067,
+     "grossR": 0.09,
+     "monthT": 1.97,
+     "buys": 873,
+     "sells": 664
+    },
+    "against": {
+     "n": 1507,
+     "netR": 0.005,
+     "grossR": 0.028,
+     "monthT": 0.15,
+     "buys": 641,
+     "sells": 866
+    },
+    "mid": {
+     "n": 1481,
+     "netR": 0.159,
+     "grossR": 0.186,
+     "monthT": 4.53,
+     "buys": 741,
+     "sells": 740
+    },
+    "diff": 0.062,
+    "welchT": 1.43,
+    "diffGross": 0.062,
+    "welchTGross": 1.43,
+    "pairedMonths": 143,
+    "pairedMonthT": 1.76,
+    "control": {
+     "shuffles": 1000,
+     "beaten": 865,
+     "share": 0.865,
+     "p95": 0.089,
+     "median": 0.011
+    }
+   }
+  }
+ },
+ "reading": "T3 pooled (the decision): FAIL (items not met: diffBoth, welch2Holm, pairedMonthT2, control95). T1 gold: FAIL (not met: diffBoth, welch2Holm, pairedMonthT2, control95). T2 USD/JPY: FAIL (not met: diffBoth, welch2Holm, control95). T1 gold: confirmation with +0.073R (n 754) vs against +0.067R (n 734), difference +0.006R (Welch t +0.09, paired month t +0.45); discovery difference −0.020R (t −0.24). T2 USD/JPY: confirmation with +0.061R (n 783) vs against −0.054R (n 773), difference +0.115R (Welch t +1.95, paired month t +2.11); discovery difference −0.056R (t −0.84). A split that does not hold in both windows and against the relabelling control is not a filter; the breakouts stay as they are."
+}
