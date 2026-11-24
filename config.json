@@ -667,6 +667,12 @@
    "by": "user",
    "change": "Gold replica (owner, 20 Nov): new trades are live paper trades again (alerted, main book, council demo account); same rule and stops; open shadow trades run to their exits",
    "why": "Owner request of 20 Nov 2026. Said with it: the replica has no out-of-sample edge on record (replica-oos 2017-22 -0.05R a trade, n 115; replica-sides FAIL) and its forward record is too short to judge; paper and demo only."
+  },
+  {
+   "at": "2026-11-24T05:46:12.000Z",
+   "by": "user",
+   "change": "H1 dominant-zone demo job (owner, 24 Nov): moves to the new $100 demo account (login ending 6154), 1 % of the balance a trade",
+   "why": "Owner request of 24 Nov 2026. Demo only; every order carries its stop. On $100 the smallest lot often risks more than 1 % (then that order is skipped). A forward demo record of a before-cost tilt, not an edge."
   }
  ],
  "btAt": "2026-11-23T13:11:53.494Z",
@@ -721,7 +727,8 @@
   "shadow-best",
   "mcycle-shadow",
   "lit-off",
-  "replica-live-again"
+  "replica-live-again",
+  "dom-demo-6154"
  ],
  "target": {
   "scalp": "t2"
@@ -736,11 +743,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-24T05:44:06.000Z",
+   "at": "2026-11-24T05:46:12.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-24T05:44:06.000Z",
+   "at": "2026-11-24T05:46:12.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -920,5 +927,9 @@
   "keep": [],
   "since": 1794526995,
   "study": "research/edge/shadow-best"
+ },
+ "dom": {
+  "account": "*6154",
+  "risk": 0.01
  }
 }
