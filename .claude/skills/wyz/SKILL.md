@@ -16,8 +16,10 @@ other edge. Figures below are before / after the desk's round-trip costs (`combo
   -0.197R after. No before-cost tilt seen on this desk (+0.03 to +0.07R a trade, typical of the fade grids) survives that.
 - Rule of thumb: **cost R above about 0.1 = the rule cannot pay the spread** however good the entry. Fix the stop or the target
   first, or drop the rule.
-- Prime suspects: any desk reading with M1/M5 stops (Mosha "M1 BO at the tap", the M1 EF entry, the earlier scalp method). Desk
-  totals are before costs; never quote them as tradable.
+- Desk audit (24 Nov 2026, `research/proposals/2026-11-24-desk-cost-audit.md`): most desk readings pay only 0.02-0.10R a trade;
+  the heavy tails are the M1 / M5-stop readings (M1 EF entry: 90th percentile 0.25R). Costs are NOT what sinks the desks: their
+  entries sit near zero before costs, and after costs no reading with 100+ trades reaches t 1.3. A wider stop will not rescue
+  an entry that makes zero. Desk totals are before costs; never quote them as tradable.
 
 ## 2. Size the stop on the WORKING chart's ATR
 
@@ -67,7 +69,7 @@ other edge. Figures below are before / after the desk's round-trip costs (`combo
 
 ## What to do next, in order
 
-1. Cost audit of every desk reading: cost R per trade from the stored desk files' stops (arithmetic, no new test).
+1. Done 24 Nov 2026: the desk cost audit (above). Re-run `research/proposals/2026-11-24-desk-cost-audit.mjs` on fresh desk files.
 2. The fade with a working-chart ATR stop, one pre-registered rule, after costs, on unread data.
 3. Only then: the H4 switch candle as a size tilt on the gold / USD/JPY breakouts (low prior: about +0.03R after costs).
 
