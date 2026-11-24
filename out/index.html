@@ -7426,6 +7426,40 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
       </section>
+      <section class="card pf-ct" id="ms-pf-eqb" aria-labelledby="ms-pf-eqb-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-eqb-t">MetaTrader 5 bridge</h2><div class="ct-sub">Follow the Equinox desks from your own MetaTrader 5 demo account</div></div></div>
+        <div class="ct-b pf-ct-b" id="ms-pf-eqb-b">
+          <p class="ms-note" style="margin:0 0 10px">A small program in your own MetaTrader 5 reads your personal address and copies the Equinox desks' paper trades, each with the desk's stop. Your broker login and password never reach this site. The desks' rules lose after costs in their studies: this is for demo accounts, not trade advice.</p>
+          <div><button type="button" class="ct-btn" id="ms-eqb-go">Show my bridge address</button></div>
+          <div class="ct-msg" id="ms-eqb-msg" role="status"></div>
+        </div>
+      </section>
+      <script id="ms-eqb-js">
+      // MetaTrader 5 bridge card (24 Nov 2026): the member's own feed address for mt5/EquinoxBridge.mq5. Display only; nothing is stored.
+      (function () {
+        const R = document.documentElement, c = document.getElementById('ms-pf-eqb'); if (!c) return;
+        const esc = (x) => String(x).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        const ok = () => R.dataset.role && R.dataset.role !== 'public' && !/(^|\s)desks(\s|$)/.test(R.dataset.deny || '') && /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
+        const sync = () => { c.hidden = !ok(); }; sync();
+        if (typeof MutationObserver === 'function') new MutationObserver(sync).observe(R, { attributes: true, attributeFilter: ['data-role', 'data-deny'] });
+        const go = document.getElementById('ms-eqb-go'), msg = document.getElementById('ms-eqb-msg'), b = document.getElementById('ms-pf-eqb-b');
+        const EA = 'https://github.com/vazxanana/macro-dashboard/blob/main/mt5/EquinoxBridge.mq5';
+        go.addEventListener('click', async () => {
+          go.disabled = true; msg.textContent = 'Checking…';
+          try {
+            const r = await fetch('/api/eqx-bridge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'mykey' }), cache: 'no-store' });
+            const j = await r.json().catch(() => ({})); if (!r.ok || !j.url) throw new Error(j.error || (r.status >= 500 ? 'The server could not answer (error ' + r.status + '). Try again in a minute.' : 'Error ' + r.status));
+            b.innerHTML = '<div class="mcp-url"><code id="ms-eqb-url">' + esc(j.url) + '</code><button type="button" class="ms-tbtn" id="ms-eqb-copy">Copy</button></div>'
+              + '<ol><li>Download <a href="' + EA + '" target="_blank" rel="noopener">EquinoxBridge.mq5</a>, open it in MetaEditor (folder MQL5/Experts) and press Compile.</li>'
+              + '<li>In MetaTrader 5: Tools → Options → Expert Advisors → tick "Allow WebRequest for listed URL" and add <b>' + esc(location.origin) + '</b>.</li>'
+              + '<li>Attach EquinoxBridge to any chart of a <b>demo</b> account and paste the address above into its first input.</li>'
+              + '<li>Leave "dry run" on first and read the Experts log; switch it off to copy trades.</li></ol>'
+              + '<p class="ms-note" style="margin:10px 0 0">The address is your key: keep it to yourself. The program refuses an account that is not a demo. Your MetaTrader must stay open for it to work.</p>';
+            document.getElementById('ms-eqb-copy').addEventListener('click', async (e) => { try { await navigator.clipboard.writeText(j.url); e.target.textContent = 'Copied'; } catch (x) { e.target.textContent = 'Select and copy'; } });
+          } catch (e) { go.disabled = false; msg.textContent = e instanceof TypeError ? (navigator.onLine === false ? 'You are offline. Connect and try again.' : 'The server could not be reached. Check your connection and try again.') : e.message; }
+        });
+      })();
+      </script>
     </div>
   </section>
 
