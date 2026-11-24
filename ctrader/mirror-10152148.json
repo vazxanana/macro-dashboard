@@ -5737,7 +5737,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-24T01:57:07.000Z",
     "councilEntry": 3660.57,
     "stop": 3680.5,
@@ -5751,10 +5751,15 @@
     "slipR": 0.126,
     "lagSec": 61,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T01:57:07.000Z",
-    "brokerStop": 3677.98
+    "brokerStop": 3677.98,
+    "closedAt": "2026-11-24T06:08:02.000Z",
+    "exitPrice": 3622.46,
+    "councilExit": null,
+    "councilR": 2
    },
    "xau-replica-1795495854-b": {
     "positionId": "50994887",
@@ -5791,7 +5796,7 @@
    "startBalance": 12741.49
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12700.86 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12700.86 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5800,14 +5805,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12700.86,
-  "lastRun": "2026-11-24T06:05:28.000Z"
+  "lastRun": "2026-11-24T06:08:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T13:03:54.000Z",
-   "msg": "ETHUSD position 48278274 closed at the broker",
-   "trade": "eth-replica-1794364852-b"
-  },
   {
    "at": "2026-11-11T13:17:48.000Z",
    "msg": "closed AUDUSD position 48398223 (council: win)",
@@ -7296,6 +7296,11 @@
    "at": "2026-11-24T06:05:28.000Z",
    "msg": "XAUUSD position 50994887 closed at the broker",
    "trade": "xau-replica-1795495854-b"
+  },
+  {
+   "at": "2026-11-24T06:08:02.000Z",
+   "msg": "closed XAUUSD position 50969519 (council: win)",
+   "trade": "xau-replica-1795485366-s"
   }
  ],
  "limits": {
