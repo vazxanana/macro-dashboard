@@ -1,0 +1,1264 @@
+{
+ "study": "vb-dollar-confirm",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/vb-dollar-confirm/PREREGISTRATION.md",
+ "planSha256": "8b5bde6470b869df83f539aaec7a416e52eff3452c5a5ccc6f2ab9851c1829d0",
+ "verdict": "FAIL, 0 of 4: confirmation 2016 → 2026-11-20, gold agree +0.049R a trade (n 593) vs disagree +0.014R (n 315, Welch t +0.43) vs none +0.154R (n 1152); USD/JPY agree +0.107R (n 444) vs disagree +0.000R (n 212, t +1.11) vs none +0.061R (n 1424)",
+ "verdictWord": "FAIL, 0 of 4",
+ "dataEnd": "2026-11-20",
+ "gate": [
+  {
+   "mk": "xau",
+   "src": "gold-vol-breakout-hourcost C1 W1",
+   "w": [
+    "2007-01-01",
+    "2011-12-31"
+   ],
+   "n": 929,
+   "netR": 0.202,
+   "got": {
+    "n": 929,
+    "netR": 0.202
+   },
+   "ok": true
+  },
+  {
+   "mk": "xau",
+   "src": "gold-vol-breakout-hourcost C1 W2",
+   "w": [
+    "2012-01-01",
+    "2015-12-31"
+   ],
+   "n": 728,
+   "netR": 0.17,
+   "got": {
+    "n": 728,
+    "netR": 0.17
+   },
+   "ok": true
+  },
+  {
+   "mk": "xau",
+   "src": "gold-vol-breakout-hourcost C1 W3",
+   "w": [
+    "2016-01-01",
+    "2020-12-31"
+   ],
+   "n": 935,
+   "netR": 0.094,
+   "got": {
+    "n": 935,
+    "netR": 0.094
+   },
+   "ok": true
+  },
+  {
+   "mk": "xau",
+   "src": "gold-vol-breakout-hourcost C1 W4",
+   "w": [
+    "2021-01-01",
+    "2026-11-12"
+   ],
+   "n": 1121,
+   "netR": 0.105,
+   "got": {
+    "n": 1121,
+    "netR": 0.105
+   },
+   "ok": true
+  },
+  {
+   "mk": "usdjpy",
+   "src": "usdjpy-vol-breakout-early 2005-2015",
+   "w": [
+    "2005-01-04",
+    "2015-12-31"
+   ],
+   "n": 2089,
+   "netR": 0.079,
+   "got": {
+    "n": 2089,
+    "netR": 0.079
+   },
+   "ok": true
+  },
+  {
+   "mk": "usdjpy",
+   "src": "fx-vol-breakout usdjpy 2016-2020",
+   "w": [
+    "2016-01-01",
+    "2020-12-31"
+   ],
+   "n": 955,
+   "netR": 0.036,
+   "got": {
+    "n": 955,
+    "netR": 0.036
+   },
+   "ok": true
+  },
+  {
+   "mk": "usdjpy",
+   "src": "fx-vol-breakout usdjpy 2021 on",
+   "w": [
+    "2021-01-01",
+    "2026-11-19"
+   ],
+   "n": 1124,
+   "netR": 0.087,
+   "got": {
+    "n": 1124,
+    "netR": 0.087
+   },
+   "ok": true
+  }
+ ],
+ "gateOk": true,
+ "windows": {
+  "DISC": [
+   "2007-01-01",
+   "2015-12-31"
+  ],
+  "CONF": [
+   "2016-01-01",
+   "2099-12-31"
+  ]
+ },
+ "tests": {
+  "T1": {
+   "market": "xau",
+   "comparison": "disagree",
+   "windows": {
+    "DISC": {
+     "range": [
+      "2007-01-01",
+      "2015-12-31"
+     ],
+     "all": {
+      "n": 1657,
+      "netR": 0.188,
+      "grossR": 0.203,
+      "net2R": 0.173,
+      "total": 311.5,
+      "months": 108,
+      "t": 5.49,
+      "tRaw": 5.490634785062384,
+      "t2x": 5.03,
+      "buys": 790,
+      "meanFillHour": 10.54
+     },
+     "agree": {
+      "n": 444,
+      "netR": 0.169,
+      "grossR": 0.183,
+      "net2R": 0.155,
+      "total": 75.22,
+      "months": 106,
+      "t": 3.05,
+      "tRaw": 3.047899027286731,
+      "t2x": 2.8,
+      "buys": 235,
+      "meanFillHour": 11.61
+     },
+     "disagree": {
+      "n": 358,
+      "netR": 0.065,
+      "grossR": 0.08,
+      "net2R": 0.05,
+      "total": 23.32,
+      "months": 103,
+      "t": 1.05,
+      "tRaw": 1.0479876113770379,
+      "t2x": 0.81,
+      "buys": 135,
+      "meanFillHour": 11.89
+     },
+     "none": {
+      "n": 855,
+      "netR": 0.249,
+      "grossR": 0.265,
+      "net2R": 0.233,
+      "total": 212.97,
+      "months": 108,
+      "t": 4.71,
+      "tRaw": 4.710248909596657,
+      "t2x": 4.39,
+      "buys": 420,
+      "meanFillHour": 9.42
+     },
+     "diff": {
+      "diff": 0.104,
+      "t": 1.14,
+      "tRaw": 1.141358832477003
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 41,
+       "otherN": 27,
+       "diff": 0.021,
+       "t": 0.04
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 155,
+       "otherN": 124,
+       "diff": 0.303,
+       "t": 1.65
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 248,
+       "otherN": 207,
+       "diff": -0.017,
+       "t": -0.19
+      }
+     ]
+    },
+    "CONF": {
+     "range": [
+      "2016-01-01",
+      "2099-12-31"
+     ],
+     "all": {
+      "n": 2060,
+      "netR": 0.102,
+      "grossR": 0.118,
+      "net2R": 0.086,
+      "total": 209.98,
+      "months": 131,
+      "t": 3.75,
+      "tRaw": 3.754345018003361,
+      "t2x": 3.14,
+      "buys": 1051,
+      "meanFillHour": 9.84
+     },
+     "agree": {
+      "n": 593,
+      "netR": 0.049,
+      "grossR": 0.065,
+      "net2R": 0.032,
+      "total": 28.79,
+      "months": 130,
+      "t": 1.04,
+      "tRaw": 1.0363691727515367,
+      "t2x": 0.69,
+      "buys": 313,
+      "meanFillHour": 10.84
+     },
+     "disagree": {
+      "n": 315,
+      "netR": 0.014,
+      "grossR": 0.03,
+      "net2R": -0.003,
+      "total": 4.32,
+      "months": 118,
+      "t": 0.21,
+      "tRaw": 0.20800464846240505,
+      "t2x": -0.04,
+      "buys": 152,
+      "meanFillHour": 11.97
+     },
+     "none": {
+      "n": 1152,
+      "netR": 0.154,
+      "grossR": 0.17,
+      "net2R": 0.137,
+      "total": 176.86,
+      "months": 131,
+      "t": 4.07,
+      "tRaw": 4.066783208725292,
+      "t2x": 3.63,
+      "buys": 586,
+      "meanFillHour": 8.75
+     },
+     "diff": {
+      "diff": 0.035,
+      "t": 0.43,
+      "tRaw": 0.4297448401851872
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 98,
+       "otherN": 37,
+       "diff": 0.003,
+       "t": 0.01
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 199,
+       "otherN": 89,
+       "diff": 0.078,
+       "t": 0.46
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 296,
+       "otherN": 189,
+       "diff": 0.016,
+       "t": 0.18
+      }
+     ]
+    }
+   }
+  },
+  "T2": {
+   "market": "xau",
+   "comparison": "none",
+   "windows": {
+    "DISC": {
+     "range": [
+      "2007-01-01",
+      "2015-12-31"
+     ],
+     "all": {
+      "n": 1657,
+      "netR": 0.188,
+      "grossR": 0.203,
+      "net2R": 0.173,
+      "total": 311.5,
+      "months": 108,
+      "t": 5.49,
+      "tRaw": 5.490634785062384,
+      "t2x": 5.03,
+      "buys": 790,
+      "meanFillHour": 10.54
+     },
+     "agree": {
+      "n": 444,
+      "netR": 0.169,
+      "grossR": 0.183,
+      "net2R": 0.155,
+      "total": 75.22,
+      "months": 106,
+      "t": 3.05,
+      "tRaw": 3.047899027286731,
+      "t2x": 2.8,
+      "buys": 235,
+      "meanFillHour": 11.61
+     },
+     "disagree": {
+      "n": 358,
+      "netR": 0.065,
+      "grossR": 0.08,
+      "net2R": 0.05,
+      "total": 23.32,
+      "months": 103,
+      "t": 1.05,
+      "tRaw": 1.0479876113770379,
+      "t2x": 0.81,
+      "buys": 135,
+      "meanFillHour": 11.89
+     },
+     "none": {
+      "n": 855,
+      "netR": 0.249,
+      "grossR": 0.265,
+      "net2R": 0.233,
+      "total": 212.97,
+      "months": 108,
+      "t": 4.71,
+      "tRaw": 4.710248909596657,
+      "t2x": 4.39,
+      "buys": 420,
+      "meanFillHour": 9.42
+     },
+     "diff": {
+      "diff": -0.08,
+      "t": -0.99,
+      "tRaw": -0.9878417523545551
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 41,
+       "otherN": 200,
+       "diff": -0.129,
+       "t": -0.39
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 155,
+       "otherN": 327,
+       "diff": 0.12,
+       "t": 0.81
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 248,
+       "otherN": 328,
+       "diff": -0.079,
+       "t": -0.96
+      }
+     ]
+    },
+    "CONF": {
+     "range": [
+      "2016-01-01",
+      "2099-12-31"
+     ],
+     "all": {
+      "n": 2060,
+      "netR": 0.102,
+      "grossR": 0.118,
+      "net2R": 0.086,
+      "total": 209.98,
+      "months": 131,
+      "t": 3.75,
+      "tRaw": 3.754345018003361,
+      "t2x": 3.14,
+      "buys": 1051,
+      "meanFillHour": 9.84
+     },
+     "agree": {
+      "n": 593,
+      "netR": 0.049,
+      "grossR": 0.065,
+      "net2R": 0.032,
+      "total": 28.79,
+      "months": 130,
+      "t": 1.04,
+      "tRaw": 1.0363691727515367,
+      "t2x": 0.69,
+      "buys": 313,
+      "meanFillHour": 10.84
+     },
+     "disagree": {
+      "n": 315,
+      "netR": 0.014,
+      "grossR": 0.03,
+      "net2R": -0.003,
+      "total": 4.32,
+      "months": 118,
+      "t": 0.21,
+      "tRaw": 0.20800464846240505,
+      "t2x": -0.04,
+      "buys": 152,
+      "meanFillHour": 11.97
+     },
+     "none": {
+      "n": 1152,
+      "netR": 0.154,
+      "grossR": 0.17,
+      "net2R": 0.137,
+      "total": 176.86,
+      "months": 131,
+      "t": 4.07,
+      "tRaw": 4.066783208725292,
+      "t2x": 3.63,
+      "buys": 586,
+      "meanFillHour": 8.75
+     },
+     "diff": {
+      "diff": -0.105,
+      "t": -1.67,
+      "tRaw": -1.6694772536360085
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 98,
+       "otherN": 356,
+       "diff": -0.307,
+       "t": -1.77
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 199,
+       "otherN": 401,
+       "diff": -0.047,
+       "t": -0.43
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 296,
+       "otherN": 395,
+       "diff": 0.038,
+       "t": 0.53
+      }
+     ]
+    }
+   }
+  },
+  "T3": {
+   "market": "usdjpy",
+   "comparison": "disagree",
+   "windows": {
+    "DISC": {
+     "range": [
+      "2007-01-01",
+      "2015-12-31"
+     ],
+     "all": {
+      "n": 1711,
+      "netR": 0.079,
+      "grossR": 0.109,
+      "net2R": 0.049,
+      "total": 135.13,
+      "months": 108,
+      "t": 2.62,
+      "tRaw": 2.6167089312082377,
+      "t2x": 1.62,
+      "buys": 777,
+      "meanFillHour": 8.58
+     },
+     "agree": {
+      "n": 258,
+      "netR": 0.062,
+      "grossR": 0.089,
+      "net2R": 0.035,
+      "total": 15.98,
+      "months": 98,
+      "t": 0.84,
+      "tRaw": 0.838919845517995,
+      "t2x": 0.47,
+      "buys": 139,
+      "meanFillHour": 12.19
+     },
+     "disagree": {
+      "n": 201,
+      "netR": -0.016,
+      "grossR": 0.014,
+      "net2R": -0.046,
+      "total": -3.19,
+      "months": 88,
+      "t": -0.21,
+      "tRaw": -0.2133990266270696,
+      "t2x": -0.61,
+      "buys": 92,
+      "meanFillHour": 12.05
+     },
+     "none": {
+      "n": 1252,
+      "netR": 0.098,
+      "grossR": 0.128,
+      "net2R": 0.068,
+      "total": 122.34,
+      "months": 108,
+      "t": 2.51,
+      "tRaw": 2.513379719695662,
+      "t2x": 1.73,
+      "buys": 546,
+      "meanFillHour": 7.27
+     },
+     "diff": {
+      "diff": 0.078,
+      "t": 0.75,
+      "tRaw": 0.7535395928536005
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 20,
+       "otherN": 15,
+       "diff": 0.568,
+       "t": 0.85
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 87,
+       "otherN": 69,
+       "diff": 0.149,
+       "t": 0.71
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 151,
+       "otherN": 117,
+       "diff": -0.028,
+       "t": -0.3
+      }
+     ]
+    },
+    "CONF": {
+     "range": [
+      "2016-01-01",
+      "2099-12-31"
+     ],
+     "all": {
+      "n": 2080,
+      "netR": 0.064,
+      "grossR": 0.097,
+      "net2R": 0.032,
+      "total": 134.15,
+      "months": 131,
+      "t": 2.54,
+      "tRaw": 2.536916327676947,
+      "t2x": 1.26,
+      "buys": 1022,
+      "meanFillHour": 8.57
+     },
+     "agree": {
+      "n": 444,
+      "netR": 0.107,
+      "grossR": 0.136,
+      "net2R": 0.078,
+      "total": 47.42,
+      "months": 128,
+      "t": 2.13,
+      "tRaw": 2.1283760658756252,
+      "t2x": 1.56,
+      "buys": 219,
+      "meanFillHour": 11.77
+     },
+     "disagree": {
+      "n": 212,
+      "netR": 0,
+      "grossR": 0.031,
+      "net2R": -0.031,
+      "total": 0,
+      "months": 99,
+      "t": 0,
+      "tRaw": -0.0001475273959573092,
+      "t2x": -0.37,
+      "buys": 110,
+      "meanFillHour": 12.31
+     },
+     "none": {
+      "n": 1424,
+      "netR": 0.061,
+      "grossR": 0.095,
+      "net2R": 0.027,
+      "total": 86.74,
+      "months": 131,
+      "t": 1.8,
+      "tRaw": 1.8006003794048466,
+      "t2x": 0.81,
+      "buys": 693,
+      "meanFillHour": 7.01
+     },
+     "diff": {
+      "diff": 0.107,
+      "t": 1.11,
+      "tRaw": 1.1120212655298858
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 52,
+       "otherN": 15,
+       "diff": -0.534,
+       "t": -0.63
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 132,
+       "otherN": 60,
+       "diff": 0.147,
+       "t": 0.92
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 260,
+       "otherN": 137,
+       "diff": 0.146,
+       "t": 1.63
+      }
+     ]
+    }
+   }
+  },
+  "T4": {
+   "market": "usdjpy",
+   "comparison": "none",
+   "windows": {
+    "DISC": {
+     "range": [
+      "2007-01-01",
+      "2015-12-31"
+     ],
+     "all": {
+      "n": 1711,
+      "netR": 0.079,
+      "grossR": 0.109,
+      "net2R": 0.049,
+      "total": 135.13,
+      "months": 108,
+      "t": 2.62,
+      "tRaw": 2.6167089312082377,
+      "t2x": 1.62,
+      "buys": 777,
+      "meanFillHour": 8.58
+     },
+     "agree": {
+      "n": 258,
+      "netR": 0.062,
+      "grossR": 0.089,
+      "net2R": 0.035,
+      "total": 15.98,
+      "months": 98,
+      "t": 0.84,
+      "tRaw": 0.838919845517995,
+      "t2x": 0.47,
+      "buys": 139,
+      "meanFillHour": 12.19
+     },
+     "disagree": {
+      "n": 201,
+      "netR": -0.016,
+      "grossR": 0.014,
+      "net2R": -0.046,
+      "total": -3.19,
+      "months": 88,
+      "t": -0.21,
+      "tRaw": -0.2133990266270696,
+      "t2x": -0.61,
+      "buys": 92,
+      "meanFillHour": 12.05
+     },
+     "none": {
+      "n": 1252,
+      "netR": 0.098,
+      "grossR": 0.128,
+      "net2R": 0.068,
+      "total": 122.34,
+      "months": 108,
+      "t": 2.51,
+      "tRaw": 2.513379719695662,
+      "t2x": 1.73,
+      "buys": 546,
+      "meanFillHour": 7.27
+     },
+     "diff": {
+      "diff": -0.036,
+      "t": -0.44,
+      "tRaw": -0.4367724080220115
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 20,
+       "otherN": 524,
+       "diff": 0.487,
+       "t": 0.92
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 87,
+       "otherN": 474,
+       "diff": 0.103,
+       "t": 0.66
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 151,
+       "otherN": 254,
+       "diff": -0.141,
+       "t": -1.71
+      }
+     ]
+    },
+    "CONF": {
+     "range": [
+      "2016-01-01",
+      "2099-12-31"
+     ],
+     "all": {
+      "n": 2080,
+      "netR": 0.064,
+      "grossR": 0.097,
+      "net2R": 0.032,
+      "total": 134.15,
+      "months": 131,
+      "t": 2.54,
+      "tRaw": 2.536916327676947,
+      "t2x": 1.26,
+      "buys": 1022,
+      "meanFillHour": 8.57
+     },
+     "agree": {
+      "n": 444,
+      "netR": 0.107,
+      "grossR": 0.136,
+      "net2R": 0.078,
+      "total": 47.42,
+      "months": 128,
+      "t": 2.13,
+      "tRaw": 2.1283760658756252,
+      "t2x": 1.56,
+      "buys": 219,
+      "meanFillHour": 11.77
+     },
+     "disagree": {
+      "n": 212,
+      "netR": 0,
+      "grossR": 0.031,
+      "net2R": -0.031,
+      "total": 0,
+      "months": 99,
+      "t": 0,
+      "tRaw": -0.0001475273959573092,
+      "t2x": -0.37,
+      "buys": 110,
+      "meanFillHour": 12.31
+     },
+     "none": {
+      "n": 1424,
+      "netR": 0.061,
+      "grossR": 0.095,
+      "net2R": 0.027,
+      "total": 86.74,
+      "months": 131,
+      "t": 1.8,
+      "tRaw": 1.8006003794048466,
+      "t2x": 0.81,
+      "buys": 693,
+      "meanFillHour": 7.01
+     },
+     "diff": {
+      "diff": 0.046,
+      "t": 0.75,
+      "tRaw": 0.7483151803247167
+     },
+     "byHour": [
+      {
+       "hours": "00-06",
+       "agreeN": 52,
+       "otherN": 647,
+       "diff": 0.15,
+       "t": 0.66
+      },
+      {
+       "hours": "06-12",
+       "agreeN": 132,
+       "otherN": 460,
+       "diff": 0.085,
+       "t": 0.84
+      },
+      {
+       "hours": "12-21",
+       "agreeN": 260,
+       "otherN": 317,
+       "diff": 0.045,
+       "t": 0.58
+      }
+     ]
+    }
+   }
+  }
+ },
+ "groups": {
+  "xau": {
+   "DISC": {
+    "range": [
+     "2007-01-01",
+     "2015-12-31"
+    ],
+    "all": {
+     "n": 1657,
+     "netR": 0.188,
+     "grossR": 0.203,
+     "net2R": 0.173,
+     "total": 311.5,
+     "months": 108,
+     "t": 5.49,
+     "tRaw": 5.490634785062384,
+     "t2x": 5.03,
+     "buys": 790,
+     "meanFillHour": 10.54
+    },
+    "agree": {
+     "n": 444,
+     "netR": 0.169,
+     "grossR": 0.183,
+     "net2R": 0.155,
+     "total": 75.22,
+     "months": 106,
+     "t": 3.05,
+     "tRaw": 3.047899027286731,
+     "t2x": 2.8,
+     "buys": 235,
+     "meanFillHour": 11.61
+    },
+    "disagree": {
+     "n": 358,
+     "netR": 0.065,
+     "grossR": 0.08,
+     "net2R": 0.05,
+     "total": 23.32,
+     "months": 103,
+     "t": 1.05,
+     "tRaw": 1.0479876113770379,
+     "t2x": 0.81,
+     "buys": 135,
+     "meanFillHour": 11.89
+    },
+    "none": {
+     "n": 855,
+     "netR": 0.249,
+     "grossR": 0.265,
+     "net2R": 0.233,
+     "total": 212.97,
+     "months": 108,
+     "t": 4.71,
+     "tRaw": 4.710248909596657,
+     "t2x": 4.39,
+     "buys": 420,
+     "meanFillHour": 9.42
+    },
+    "diff": {
+     "diff": 0.104,
+     "t": 1.14,
+     "tRaw": 1.141358832477003
+    },
+    "byHour": [
+     {
+      "hours": "00-06",
+      "agreeN": 41,
+      "otherN": 27,
+      "diff": 0.021,
+      "t": 0.04
+     },
+     {
+      "hours": "06-12",
+      "agreeN": 155,
+      "otherN": 124,
+      "diff": 0.303,
+      "t": 1.65
+     },
+     {
+      "hours": "12-21",
+      "agreeN": 248,
+      "otherN": 207,
+      "diff": -0.017,
+      "t": -0.19
+     }
+    ]
+   },
+   "CONF": {
+    "range": [
+     "2016-01-01",
+     "2099-12-31"
+    ],
+    "all": {
+     "n": 2060,
+     "netR": 0.102,
+     "grossR": 0.118,
+     "net2R": 0.086,
+     "total": 209.98,
+     "months": 131,
+     "t": 3.75,
+     "tRaw": 3.754345018003361,
+     "t2x": 3.14,
+     "buys": 1051,
+     "meanFillHour": 9.84
+    },
+    "agree": {
+     "n": 593,
+     "netR": 0.049,
+     "grossR": 0.065,
+     "net2R": 0.032,
+     "total": 28.79,
+     "months": 130,
+     "t": 1.04,
+     "tRaw": 1.0363691727515367,
+     "t2x": 0.69,
+     "buys": 313,
+     "meanFillHour": 10.84
+    },
+    "disagree": {
+     "n": 315,
+     "netR": 0.014,
+     "grossR": 0.03,
+     "net2R": -0.003,
+     "total": 4.32,
+     "months": 118,
+     "t": 0.21,
+     "tRaw": 0.20800464846240505,
+     "t2x": -0.04,
+     "buys": 152,
+     "meanFillHour": 11.97
+    },
+    "none": {
+     "n": 1152,
+     "netR": 0.154,
+     "grossR": 0.17,
+     "net2R": 0.137,
+     "total": 176.86,
+     "months": 131,
+     "t": 4.07,
+     "tRaw": 4.066783208725292,
+     "t2x": 3.63,
+     "buys": 586,
+     "meanFillHour": 8.75
+    },
+    "diff": {
+     "diff": 0.035,
+     "t": 0.43,
+     "tRaw": 0.4297448401851872
+    },
+    "byHour": [
+     {
+      "hours": "00-06",
+      "agreeN": 98,
+      "otherN": 37,
+      "diff": 0.003,
+      "t": 0.01
+     },
+     {
+      "hours": "06-12",
+      "agreeN": 199,
+      "otherN": 89,
+      "diff": 0.078,
+      "t": 0.46
+     },
+     {
+      "hours": "12-21",
+      "agreeN": 296,
+      "otherN": 189,
+      "diff": 0.016,
+      "t": 0.18
+     }
+    ]
+   }
+  },
+  "usdjpy": {
+   "DISC": {
+    "range": [
+     "2007-01-01",
+     "2015-12-31"
+    ],
+    "all": {
+     "n": 1711,
+     "netR": 0.079,
+     "grossR": 0.109,
+     "net2R": 0.049,
+     "total": 135.13,
+     "months": 108,
+     "t": 2.62,
+     "tRaw": 2.6167089312082377,
+     "t2x": 1.62,
+     "buys": 777,
+     "meanFillHour": 8.58
+    },
+    "agree": {
+     "n": 258,
+     "netR": 0.062,
+     "grossR": 0.089,
+     "net2R": 0.035,
+     "total": 15.98,
+     "months": 98,
+     "t": 0.84,
+     "tRaw": 0.838919845517995,
+     "t2x": 0.47,
+     "buys": 139,
+     "meanFillHour": 12.19
+    },
+    "disagree": {
+     "n": 201,
+     "netR": -0.016,
+     "grossR": 0.014,
+     "net2R": -0.046,
+     "total": -3.19,
+     "months": 88,
+     "t": -0.21,
+     "tRaw": -0.2133990266270696,
+     "t2x": -0.61,
+     "buys": 92,
+     "meanFillHour": 12.05
+    },
+    "none": {
+     "n": 1252,
+     "netR": 0.098,
+     "grossR": 0.128,
+     "net2R": 0.068,
+     "total": 122.34,
+     "months": 108,
+     "t": 2.51,
+     "tRaw": 2.513379719695662,
+     "t2x": 1.73,
+     "buys": 546,
+     "meanFillHour": 7.27
+    },
+    "diff": {
+     "diff": 0.078,
+     "t": 0.75,
+     "tRaw": 0.7535395928536005
+    },
+    "byHour": [
+     {
+      "hours": "00-06",
+      "agreeN": 20,
+      "otherN": 15,
+      "diff": 0.568,
+      "t": 0.85
+     },
+     {
+      "hours": "06-12",
+      "agreeN": 87,
+      "otherN": 69,
+      "diff": 0.149,
+      "t": 0.71
+     },
+     {
+      "hours": "12-21",
+      "agreeN": 151,
+      "otherN": 117,
+      "diff": -0.028,
+      "t": -0.3
+     }
+    ]
+   },
+   "CONF": {
+    "range": [
+     "2016-01-01",
+     "2099-12-31"
+    ],
+    "all": {
+     "n": 2080,
+     "netR": 0.064,
+     "grossR": 0.097,
+     "net2R": 0.032,
+     "total": 134.15,
+     "months": 131,
+     "t": 2.54,
+     "tRaw": 2.536916327676947,
+     "t2x": 1.26,
+     "buys": 1022,
+     "meanFillHour": 8.57
+    },
+    "agree": {
+     "n": 444,
+     "netR": 0.107,
+     "grossR": 0.136,
+     "net2R": 0.078,
+     "total": 47.42,
+     "months": 128,
+     "t": 2.13,
+     "tRaw": 2.1283760658756252,
+     "t2x": 1.56,
+     "buys": 219,
+     "meanFillHour": 11.77
+    },
+    "disagree": {
+     "n": 212,
+     "netR": 0,
+     "grossR": 0.031,
+     "net2R": -0.031,
+     "total": 0,
+     "months": 99,
+     "t": 0,
+     "tRaw": -0.0001475273959573092,
+     "t2x": -0.37,
+     "buys": 110,
+     "meanFillHour": 12.31
+    },
+    "none": {
+     "n": 1424,
+     "netR": 0.061,
+     "grossR": 0.095,
+     "net2R": 0.027,
+     "total": 86.74,
+     "months": 131,
+     "t": 1.8,
+     "tRaw": 1.8006003794048466,
+     "t2x": 0.81,
+     "buys": 693,
+     "meanFillHour": 7.01
+    },
+    "diff": {
+     "diff": 0.107,
+     "t": 1.11,
+     "tRaw": 1.1120212655298858
+    },
+    "byHour": [
+     {
+      "hours": "00-06",
+      "agreeN": 52,
+      "otherN": 15,
+      "diff": -0.534,
+      "t": -0.63
+     },
+     {
+      "hours": "06-12",
+      "agreeN": 132,
+      "otherN": 60,
+      "diff": 0.147,
+      "t": 0.92
+     },
+     {
+      "hours": "12-21",
+      "agreeN": 260,
+      "otherN": 137,
+      "diff": 0.146,
+      "t": 1.63
+     }
+    ]
+   }
+  }
+ },
+ "decision": {
+  "T1": {
+   "kept": "agree",
+   "p": 0.667,
+   "pHolm": 0.909,
+   "lines": {
+    "sameSign": true,
+    "welch2": false,
+    "holm": false,
+    "keptPosBoth": true,
+    "keptT2": false,
+    "n200": true,
+    "cost2x": true,
+    "placebo38": false
+   },
+   "placeboBeaten": 5,
+   "verdict": "FAIL"
+  },
+  "T2": {
+   "kept": "none",
+   "p": 0.095,
+   "pHolm": 0.38,
+   "lines": {
+    "sameSign": true,
+    "welch2": false,
+    "holm": false,
+    "keptPosBoth": true,
+    "keptT2": true,
+    "n200": true,
+    "cost2x": true,
+    "placebo38": true
+   },
+   "placeboBeaten": 40,
+   "verdict": "FAIL"
+  },
+  "T3": {
+   "kept": "agree",
+   "p": 0.266,
+   "pHolm": 0.798,
+   "lines": {
+    "sameSign": true,
+    "welch2": false,
+    "holm": false,
+    "keptPosBoth": true,
+    "keptT2": true,
+    "n200": true,
+    "cost2x": true,
+    "placebo38": false
+   },
+   "placeboBeaten": 34,
+   "verdict": "FAIL"
+  },
+  "T4": {
+   "kept": "agree",
+   "p": 0.454,
+   "pHolm": 0.909,
+   "lines": {
+    "sameSign": false,
+    "welch2": false,
+    "holm": false,
+    "keptPosBoth": true,
+    "keptT2": true,
+    "n200": true,
+    "cost2x": true,
+    "placebo38": false
+   },
+   "placeboBeaten": 34,
+   "verdict": "FAIL"
+  }
+ },
+ "reading": "T1 (gold, agree − disagree): discovery +0.104R (Welch t +1.14), confirmation +0.035R (t +0.43, Holm p 0.909); FAIL, lines not met: welch2, holm, keptT2, placebo38. T2 (gold, agree − none): discovery −0.080R (Welch t −0.99), confirmation −0.105R (t −1.67, Holm p 0.38); FAIL, lines not met: welch2, holm. T3 (USD/JPY, agree − disagree): discovery +0.078R (Welch t +0.75), confirmation +0.107R (t +1.11, Holm p 0.798); FAIL, lines not met: welch2, holm, placebo38. T4 (USD/JPY, agree − none): discovery −0.036R (Welch t −0.44), confirmation +0.046R (t +0.75, Holm p 0.909); FAIL, lines not met: sameSign, welch2, holm, placebo38. The groups split trades that the base rules already take; a profitable group says nothing by itself, only the difference between groups does. Gold's \"none\" group (no earlier USD/JPY fill) fills earliest (mean 8.75 h UTC in confirmation against 10.84 h for agree) and did best in both windows (+0.249R and +0.154R a trade): the earlier-fill pattern holdout-vb-early already reported, not a dollar confirmation (T2's difference is not significant). A dollar-consistent earlier fill did not make either breakout measurably better.",
+ "data": "gold 3861 T1 trades 2006-03-21 → 2026-11-20, USD/JPY 4169 T1 trades 2005-01-04 → 2026-11-20; the shared toolkit's OANDA mid M5 cache, the last day on file left out.",
+ "method": "Gold T1 built with the pinned hourcost copies (vbTrade k 0.5, both sides, out at 20:55 UTC), charged route C1 (measured hourly half-spreads at the fill hour and hour 20 + commission 0.000024 of price + 0.05 x the M5 median range + financing on buys). USD/JPY T1 from usdjpy-vol-breakout-early trades (out 21:00 UTC), cost 0.000045 x entry + 0.5 pip. Matched by UTC day; the other trade counts only when its fill candle started strictly before this one's. Welch t two-sided, normal p; Holm over T1-T4 on the confirmation p. Month t on calendar months with a trade. Placebo: 40 seeded random subsets of the market's confirmation trades of the better group's size."
+}
