@@ -78,8 +78,8 @@ window.msDataMake = function (W, clock) {
 <script>window.LightweightCharts || document.write('<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"><\/script>');</script>
 <script src="/assets/mosha-sop.js?v=ecd774f3c8" defer></script>
 <script src="/assets/mosha-replay.js?v=8499d92d48" defer></script>
-<script src="/assets/desk-trades.js?v=636efed028" defer></script>
-<script src="/assets/desk-live.js?v=231220360a" defer></script>
+<script src="/assets/desk-trades.js?v=1f0d0e06d2" defer></script>
+<script src="/assets/desk-live.js?v=bc7887f96f" defer></script>
 <style id="ms-mosha-css">
 /* Mosha desk (10 Nov 2026): the owner's own trades, logged and measured */
 /* QA sweep 11 Nov: with six desks the switch is wider than a 390 px phone; `width: max-content` made every desk view as wide as the
@@ -471,6 +471,15 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
   </div>
   <div id="eq-gate" hidden><p>Sign in on the desk first.</p><p><a class="btn gold" href="/#home">Go to the desk</a></p></div>
   <nav class="eq-tabs" id="eq-tabs" role="tablist" aria-label="Equinox desks" hidden></nav>
+  <section class="view eq-desk" id="v-lyriac" role="tabpanel" aria-labelledby="eq-t-lyriac" hidden>
+    <h2 class="h-head">Lyriac <span class="mo-tag">Paper record</span></h2>
+    <p class="ms-note">The rules that pass the desk's tests, as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY. Each trade has its stop; none has a target.</p>
+    <div class="mo-grid">
+      <div class="card mo-wide mo-open-c" data-dk="open"><div class="ms-k"><span>Open now</span><small></small></div><ul class="mo-open"><li class="empty">Loading…</li></ul></div>
+      <div class="card mo-wide" data-dk="trades"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">The trades load when the desk opens.</div></div>
+      <div class="mo-wide" data-dk="chart"></div>
+    </div>
+  </section>
   <section class="view eq-desk" id="v-fade" role="tabpanel" aria-labelledby="eq-t-fade" hidden>
     <h2 class="h-head">Break fade <span class="mo-tag">Paper record</span></h2>
     <p class="ms-note">Every first M15 structure break on ten markets, faded at the next 5-minute open with a 1 ATR stop and a 2R target, as its study wrote the rule.</p>
@@ -568,7 +577,7 @@ html[data-mosha="teach"]:not([data-role="owner"]) #v-mosha #mo-guide { order: -5
   </section></div>
 </main>
 <script>
-  window.EQ_DESKS = [{"k": "fade", "name": "Break fade"}, {"k": "bigfade", "name": "Big-candle fade"}, {"k": "roundfade", "name": "Round-number fade"}, {"k": "boxfade", "name": "Box fade"}, {"k": "fvg", "name": "FVG return"}, {"k": "goldvb", "name": "Gold breakout"}, {"k": "jpyvb", "name": "USD/JPY breakout"}, {"k": "dom", "name": "DOM zone"}];
+  window.EQ_DESKS = [{"k": "lyriac", "name": "Lyriac"}, {"k": "fade", "name": "Break fade"}, {"k": "bigfade", "name": "Big-candle fade"}, {"k": "roundfade", "name": "Round-number fade"}, {"k": "boxfade", "name": "Box fade"}, {"k": "fvg", "name": "FVG return"}, {"k": "goldvb", "name": "Gold breakout"}, {"k": "jpyvb", "name": "USD/JPY breakout"}, {"k": "dom", "name": "DOM zone"}];
   // Equinox: one tab a desk; the open one is remembered on this device (localStorage eq-desk, a display preference)
   (function () {
     var D = window.EQ_DESKS || [], H = document.documentElement, tabs = document.getElementById('eq-tabs');
