@@ -5855,7 +5855,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T12:11:57.000Z",
     "councilEntry": 3622.61,
     "stop": 3640.5,
@@ -5869,10 +5869,12 @@
     "slipR": -0.053,
     "lagSec": 62,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T12:11:57.000Z",
-    "brokerStop": 3641.44
+    "brokerStop": 3641.44,
+    "closedAt": "2026-11-24T12:44:23.000Z"
    }
   },
   "day": {
@@ -5880,7 +5882,7 @@
    "startBalance": 12741.49
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12727.45 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12709.48 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5888,15 +5890,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12727.45,
-  "lastRun": "2026-11-24T12:41:52.000Z"
+  "balance": 12709.48,
+  "lastRun": "2026-11-24T12:44:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T14:21:13.000Z",
-   "msg": "not mirrored yet sol-replica-1794406803-s: daily loss stop (44.8% down today) (will retry)",
-   "trade": "sol-replica-1794406803-s"
-  },
   {
    "at": "2026-11-11T14:26:13.000Z",
    "msg": "BTCUSD position 48376002 closed at the broker",
@@ -7384,6 +7381,11 @@
   {
    "at": "2026-11-24T12:11:57.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1795522255-s"
+  },
+  {
+   "at": "2026-11-24T12:44:23.000Z",
+   "msg": "XAUUSD position 51074126 closed at the broker",
    "trade": "xau-replica-1795522255-s"
   }
  ],
