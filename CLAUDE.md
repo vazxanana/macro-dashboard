@@ -6805,3 +6805,19 @@ Third pass (24 Nov 2026, "keep going"): the Macro desk's sticky section bar (`na
 written by `vb-forward.yml` since 21 Nov), in a grid of three; the early-against-late card says "no trades yet" before its first
 trade. Found by the smoke test on today's data: a long line in the Macro desk's "Your read" list (`.pl-list .d`, no wrap) widened
 the phone page to 607 px; its column now shrinks (`minmax(0, 1fr)`) and that line wraps.
+
+## FRED studies of 24 Nov 2026 (owner allowed fred.stlouisfed.org; "keep doing studies … new combinations")
+Four pre-registered studies (each PREREGISTRATION.md pushed alone first), all **FAIL**; nothing live changed, no rule proposed.
+- `fred-gauges` (0 of 7): weekly, next 20 sessions, 2007-26, Newey-West t, Holm. Net liquidity rising (WALCL − WDTGAL − RRP) → gold
+  t −0.97, S&P t 1.62; NFCI tightening → gold t −0.49, S&P t −1.76; jobless claims rising → gold t 0.20, USD/JPY t −1.50; double
+  tightening (real yield +25 bp in 4 weeks with the Baa spread wider; 40 weeks) → gold t −0.40, opposite signs in the two halves.
+- `fred-gauges-2` (0 of 5): policy-uncertainty spike → gold t 1.65 (+1.16 % against +0.34 %, both halves positive, not significant);
+  breakevens rising → gold t 0.24; St. Louis stress rising → USD/JPY t −1.64, S&P t 0.49; steepening after an inversion → gold t 1.28
+  (14 episodes).
+- `vb-fred-regime` (0 of 5): the gold and USD/JPY breakouts (T1, `vb-vol-regime`'s harness, gate reproduced) split by a gauge known
+  the day before (GVZ above its 20-day mean, policy uncertainty, real-yield moves; VIX, 2-year moves): largest Welch t 0.72.
+- `vb-rate-side` (0 of 2): a breakout WITH the rate trend against one AGAINST it: gold with falling real yields +0.065R (Welch t
+  1.14), USD/JPY with a rising 2-year −0.027R (t −0.49).
+The breakouts stay flat 1R with no macro gate; do not test another FRED gauge on these trades or these weeks without a new reason.
+Local reruns: `run.mjs fetch <dir>` (FRED + `git show` of the candle cache), then `run <dir>`. Tests: `tests/fred-gauges.test.mjs`,
+`tests/fred-gauges-2.test.mjs`.

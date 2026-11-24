@@ -1,0 +1,231 @@
+{
+ "study": "vb-fred-regime",
+ "built": "2026-11-24",
+ "verdict": "FAIL, 0 of 5. On minus off, net R a trade in the confirmation window: G1 gold, implied volatility rising +0.003R (Welch t 0.05, month t -1.82, Holm 1; discovery −0.130R); G2 gold, policy uncertainty high +0.040R (Welch t 0.72, month t -0.13, Holm 1; discovery +0.018R); G3 gold, real yields moving −0.001R (Welch t -0.01, month t -0.06, Holm 1; discovery +0.027R); J1 USD/JPY, equity volatility rising −0.013R (Welch t -0.24, month t -2.03, Holm 1; discovery +0.067R); J2 USD/JPY, US 2-year moving −0.024R (Welch t -0.45, month t -0.87, Holm 1; discovery +0.022R).",
+ "gate": {
+  "usdjpy": {
+   "got": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "want": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "ok": true
+  },
+  "xau": {
+   "got": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "want": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "ok": true
+  }
+ },
+ "tests": [
+  {
+   "id": "G1",
+   "name": "gold, implied volatility rising",
+   "series": "GVZCLS",
+   "disc": {
+    "on": {
+     "n": 623,
+     "net": 0.072,
+     "win": 0.443
+    },
+    "off": {
+     "n": 934,
+     "net": 0.203,
+     "win": 0.443
+    },
+    "diff": -0.13,
+    "welch": -1.79,
+    "monthT": -2.66,
+    "months": 97
+   },
+   "conf": {
+    "on": {
+     "n": 737,
+     "net": 0.105,
+     "win": 0.459
+    },
+    "off": {
+     "n": 1143,
+     "net": 0.102,
+     "win": 0.438
+    },
+    "diff": 0.003,
+    "welch": 0.05,
+    "monthT": -1.82,
+    "months": 106
+   },
+   "p": 0.9601,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "id": "G2",
+   "name": "gold, policy uncertainty high",
+   "series": "USEPUINDXD",
+   "disc": {
+    "on": {
+     "n": 836,
+     "net": 0.197,
+     "win": 0.467
+    },
+    "off": {
+     "n": 775,
+     "net": 0.18,
+     "win": 0.457
+    },
+    "diff": 0.018,
+    "welch": 0.24,
+    "monthT": -0.84,
+    "months": 70
+   },
+   "conf": {
+    "on": {
+     "n": 1230,
+     "net": 0.116,
+     "win": 0.444
+    },
+    "off": {
+     "n": 1020,
+     "net": 0.076,
+     "win": 0.436
+    },
+    "diff": 0.04,
+    "welch": 0.72,
+    "monthT": -0.13,
+    "months": 110
+   },
+   "p": 0.4717,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "id": "G3",
+   "name": "gold, real yields moving",
+   "series": "DFII10",
+   "disc": {
+    "on": {
+     "n": 761,
+     "net": 0.203,
+     "win": 0.473
+    },
+    "off": {
+     "n": 850,
+     "net": 0.176,
+     "win": 0.452
+    },
+    "diff": 0.027,
+    "welch": 0.38,
+    "monthT": -0.45,
+    "months": 106
+   },
+   "conf": {
+    "on": {
+     "n": 1080,
+     "net": 0.098,
+     "win": 0.444
+    },
+    "off": {
+     "n": 1170,
+     "net": 0.099,
+     "win": 0.437
+    },
+    "diff": -0.001,
+    "welch": -0.01,
+    "monthT": -0.06,
+    "months": 142
+   },
+   "p": 0.992,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "id": "J1",
+   "name": "USD/JPY, equity volatility rising",
+   "series": "VIXCLS",
+   "disc": {
+    "on": {
+     "n": 787,
+     "net": 0.132,
+     "win": 0.471
+    },
+    "off": {
+     "n": 1107,
+     "net": 0.064,
+     "win": 0.458
+    },
+    "diff": 0.067,
+    "welch": 1.13,
+    "monthT": 1.21,
+    "months": 100
+   },
+   "conf": {
+    "on": {
+     "n": 962,
+     "net": 0.048,
+     "win": 0.45
+    },
+    "off": {
+     "n": 1313,
+     "net": 0.06,
+     "win": 0.451
+    },
+    "diff": -0.013,
+    "welch": -0.24,
+    "monthT": -2.03,
+    "months": 126
+   },
+   "p": 0.8104,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "id": "J2",
+   "name": "USD/JPY, US 2-year moving",
+   "series": "DGS2",
+   "disc": {
+    "on": {
+     "n": 842,
+     "net": 0.105,
+     "win": 0.474
+    },
+    "off": {
+     "n": 1052,
+     "net": 0.083,
+     "win": 0.455
+    },
+    "diff": 0.022,
+    "welch": 0.37,
+    "monthT": 0.89,
+    "months": 119
+   },
+   "conf": {
+    "on": {
+     "n": 1075,
+     "net": 0.042,
+     "win": 0.446
+    },
+    "off": {
+     "n": 1200,
+     "net": 0.066,
+     "win": 0.455
+    },
+    "diff": -0.024,
+    "welch": -0.45,
+    "monthT": -0.87,
+    "months": 142
+   },
+   "p": 0.6528,
+   "holm": 1,
+   "pass": false
+  }
+ ]
+}
