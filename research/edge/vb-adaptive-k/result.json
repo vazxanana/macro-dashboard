@@ -1,0 +1,532 @@
+{
+ "study": "vb-adaptive-k",
+ "built": "2026-11-24",
+ "mapping": {
+  "nMed": 20,
+  "lo": 0.7,
+  "hi": 1.3,
+  "k": {
+   "narrow": 0.3,
+   "normal": 0.5,
+   "wide": 0.7
+  }
+ },
+ "windows": {
+  "disc": [
+   "2005-01-01",
+   "2014-12-31"
+  ],
+  "conf": [
+   "2015-01-01",
+   "2099-12-31"
+  ]
+ },
+ "dataEnd": {
+  "xau": "2026-11-20",
+  "usdjpy": "2026-11-20"
+ },
+ "gate": {
+  "usdjpy": {
+   "got": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "want": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "ok": true,
+   "exact": true
+  },
+  "xau": {
+   "got": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "want": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "ok": true,
+   "exact": true
+  }
+ },
+ "costs": {
+  "xau": "gold-vol-breakout-hourcost C1 (hourly median spread + commission 0.000024 + 0.05 x M) and long financing",
+  "usdjpy": "fx-vol-breakout charge (0.000045 x price + 0.5 pip)"
+ },
+ "markets": {
+  "xau": {
+   "disc": {
+    "days": 2216,
+    "kShare": {
+     "0.3": 0.176,
+     "0.5": 0.57,
+     "0.7": 0.254
+    },
+    "adaptive": {
+     "n": 1483,
+     "gross": 0.29,
+     "net": 0.272,
+     "net2": 0.253,
+     "monthT": 5.79
+    },
+    "fixed": {
+     "n": 1583,
+     "gross": 0.21,
+     "net": 0.195,
+     "net2": 0.18,
+     "monthT": 5.54
+    },
+    "diff": {
+     "meanDay": 0.043,
+     "sum": 94.27,
+     "monthT": 2.34,
+     "months": 105
+    }
+   },
+   "conf": {
+    "days": 3046,
+    "kShare": {
+     "0.3": 0.175,
+     "0.5": 0.578,
+     "0.7": 0.247
+    },
+    "adaptive": {
+     "n": 2064,
+     "gross": 0.134,
+     "net": 0.113,
+     "net2": 0.093,
+     "monthT": 3.5
+    },
+    "fixed": {
+     "n": 2235,
+     "gross": 0.113,
+     "net": 0.097,
+     "net2": 0.081,
+     "monthT": 3.77
+    },
+    "diff": {
+     "meanDay": 0.005,
+     "sum": 16.65,
+     "monthT": 0.38,
+     "months": 142
+    }
+   }
+  },
+  "usdjpy": {
+   "disc": {
+    "days": 2570,
+    "kShare": {
+     "0.3": 0.179,
+     "0.5": 0.583,
+     "0.7": 0.238
+    },
+    "adaptive": {
+     "n": 1773,
+     "gross": 0.179,
+     "net": 0.141,
+     "net2": 0.104,
+     "monthT": 3.92
+    },
+    "fixed": {
+     "n": 1881,
+     "gross": 0.118,
+     "net": 0.089,
+     "net2": 0.06,
+     "monthT": 3.21
+    },
+    "diff": {
+     "meanDay": 0.032,
+     "sum": 82.73,
+     "monthT": 2.24,
+     "months": 120
+    }
+   },
+   "conf": {
+    "days": 3082,
+    "kShare": {
+     "0.3": 0.182,
+     "0.5": 0.566,
+     "0.7": 0.252
+    },
+    "adaptive": {
+     "n": 2111,
+     "gross": 0.138,
+     "net": 0.095,
+     "net2": 0.053,
+     "monthT": 2.94
+    },
+    "fixed": {
+     "n": 2275,
+     "gross": 0.087,
+     "net": 0.055,
+     "net2": 0.023,
+     "monthT": 2.22
+    },
+    "diff": {
+     "meanDay": 0.025,
+     "sum": 76.08,
+     "monthT": 1.86,
+     "months": 143
+    }
+   }
+  }
+ },
+ "buckets": {
+  "xau": {
+   "disc": {
+    "narrow": {
+     "n": 371,
+     "gross": 0.53,
+     "net": 0.508,
+     "net2": 0.486,
+     "monthT": 4.41
+    },
+    "normal": {
+     "n": 981,
+     "gross": 0.142,
+     "net": 0.128,
+     "net2": 0.115,
+     "monthT": 3.41
+    },
+    "wide": {
+     "n": 231,
+     "gross": -0.015,
+     "net": -0.024,
+     "net2": -0.034,
+     "monthT": -0.56
+    }
+   },
+   "conf": {
+    "narrow": {
+     "n": 520,
+     "gross": 0.237,
+     "net": 0.214,
+     "net2": 0.191,
+     "monthT": 2.65
+    },
+    "normal": {
+     "n": 1362,
+     "gross": 0.083,
+     "net": 0.067,
+     "net2": 0.052,
+     "monthT": 2.21
+    },
+    "wide": {
+     "n": 353,
+     "gross": 0.05,
+     "net": 0.04,
+     "net2": 0.029,
+     "monthT": 1.08
+    }
+   }
+  },
+  "usdjpy": {
+   "disc": {
+    "narrow": {
+     "n": 429,
+     "gross": 0.385,
+     "net": 0.34,
+     "net2": 0.295,
+     "monthT": 4.08
+    },
+    "normal": {
+     "n": 1167,
+     "gross": 0.05,
+     "net": 0.024,
+     "net2": -0.003,
+     "monthT": 0.74
+    },
+    "wide": {
+     "n": 285,
+     "gross": -0.003,
+     "net": -0.019,
+     "net2": -0.035,
+     "monthT": -0.51
+    }
+   },
+   "conf": {
+    "narrow": {
+     "n": 527,
+     "gross": 0.204,
+     "net": 0.152,
+     "net2": 0.1,
+     "monthT": 1.84
+    },
+    "normal": {
+     "n": 1367,
+     "gross": 0.051,
+     "net": 0.022,
+     "net2": -0.007,
+     "monthT": 0.73
+    },
+    "wide": {
+     "n": 381,
+     "gross": 0.056,
+     "net": 0.039,
+     "net2": 0.021,
+     "monthT": 0.91
+    }
+   }
+  }
+ },
+ "tests": [
+  {
+   "test": "A1 gold",
+   "markets": [
+    "xau"
+   ],
+   "disc": {
+    "meanDay": 0.043,
+    "monthT": 2.34,
+    "months": 105,
+    "adaptive": {
+     "n": 1483,
+     "gross": 0.29,
+     "net": 0.272,
+     "net2": 0.253,
+     "monthT": 5.79
+    }
+   },
+   "conf": {
+    "meanDay": 0.005,
+    "monthT": 0.38,
+    "months": 142,
+    "adaptive": {
+     "n": 2064,
+     "gross": 0.134,
+     "net": 0.113,
+     "net2": 0.093,
+     "monthT": 3.5
+    }
+   },
+   "p": 0.353,
+   "placeboP95": 0.015,
+   "placeboMedian": 0.002,
+   "pHolm": 0.353,
+   "checks": {
+    "posBoth": true,
+    "t2Holm": false,
+    "adaptivePos": true,
+    "n200": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  {
+   "test": "A2 USD/JPY",
+   "markets": [
+    "usdjpy"
+   ],
+   "disc": {
+    "meanDay": 0.032,
+    "monthT": 2.24,
+    "months": 120,
+    "adaptive": {
+     "n": 1773,
+     "gross": 0.179,
+     "net": 0.141,
+     "net2": 0.104,
+     "monthT": 3.92
+    }
+   },
+   "conf": {
+    "meanDay": 0.025,
+    "monthT": 1.86,
+    "months": 143,
+    "adaptive": {
+     "n": 2111,
+     "gross": 0.138,
+     "net": 0.095,
+     "net2": 0.053,
+     "monthT": 2.94
+    }
+   },
+   "p": 0.033,
+   "placeboP95": 0.018,
+   "placeboMedian": 0.001,
+   "pHolm": 0.098,
+   "checks": {
+    "posBoth": true,
+    "t2Holm": false,
+    "adaptivePos": true,
+    "n200": true,
+    "placebo": true
+   },
+   "pass": false
+  },
+  {
+   "test": "A3 pooled",
+   "markets": [
+    "xau",
+    "usdjpy"
+   ],
+   "disc": {
+    "meanDay": 0.037,
+    "monthT": 2.99,
+    "months": 120,
+    "adaptive": {
+     "n": 3256,
+     "gross": 0.23,
+     "net": 0.201,
+     "net2": 0.172,
+     "monthT": 6.26
+    }
+   },
+   "conf": {
+    "meanDay": 0.015,
+    "monthT": 1.52,
+    "months": 143,
+    "adaptive": {
+     "n": 4175,
+     "gross": 0.136,
+     "net": 0.104,
+     "net2": 0.072,
+     "monthT": 4.13
+    }
+   },
+   "p": 0.066,
+   "placeboP95": 0.01,
+   "placeboMedian": 0,
+   "pHolm": 0.132,
+   "checks": {
+    "posBoth": true,
+    "t2Holm": false,
+    "adaptivePos": true,
+    "n200": true,
+    "placebo": true
+   },
+   "pass": false
+  }
+ ],
+ "placebo": {
+  "xau": [
+   0.022,
+   -0.013,
+   0.003,
+   0.005,
+   0.007,
+   -0.026,
+   -0.001,
+   0.003,
+   0.001,
+   -0.007,
+   0.015,
+   0.011,
+   0.007,
+   -0.004,
+   0.002,
+   -0.007,
+   -0.004,
+   -0.009,
+   -0.01,
+   0.004,
+   -0.006,
+   -0.013,
+   -0.004,
+   0.004,
+   -0.013,
+   0.008,
+   -0.008,
+   0.016,
+   -0.001,
+   -0.006,
+   -0.005,
+   -0.005,
+   0.01,
+   0.011,
+   0.004,
+   0.008,
+   -0.016,
+   0.004,
+   0.004,
+   0.004
+  ],
+  "usdjpy": [
+   0.011,
+   -0.015,
+   0,
+   0.007,
+   0.013,
+   0.018,
+   -0.002,
+   0.003,
+   0.014,
+   -0.006,
+   -0.009,
+   0.001,
+   -0.009,
+   -0.002,
+   0.018,
+   0.003,
+   -0.006,
+   -0.002,
+   0.011,
+   0,
+   -0.003,
+   0.008,
+   0.003,
+   -0.012,
+   0.013,
+   -0.011,
+   -0.005,
+   0.005,
+   0.008,
+   0,
+   0.018,
+   0.008,
+   0.009,
+   0.005,
+   0.001,
+   0.001,
+   0.008,
+   -0.006,
+   -0.005,
+   0.002
+  ],
+  "pooled": [
+   0.016,
+   -0.014,
+   0.002,
+   0.006,
+   0.01,
+   -0.004,
+   -0.001,
+   0.003,
+   0.008,
+   -0.006,
+   0.003,
+   0.006,
+   -0.001,
+   -0.003,
+   0.01,
+   -0.002,
+   -0.005,
+   -0.006,
+   0.001,
+   0.002,
+   -0.005,
+   -0.002,
+   -0.001,
+   -0.004,
+   0,
+   -0.002,
+   -0.007,
+   0.01,
+   0.004,
+   -0.003,
+   0.006,
+   0.002,
+   0.009,
+   0.008,
+   0.002,
+   0.004,
+   -0.004,
+   -0.001,
+   0,
+   0.003
+  ]
+ },
+ "verdict": "FAIL: 0 of 3; adaptive k minus fixed k 0.5, pooled, +0.037R a day in 2005-14 and +0.015R a day in 2015 → now (month t +1.52, Holm p 0.132); gold +0.005 (t +0.38), USD/JPY +0.025 (t +1.86); k stays 0.5"
+}
