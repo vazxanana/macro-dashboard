@@ -1,0 +1,289 @@
+{
+ "study": "vb-early-exec",
+ "built": "2026-11-24",
+ "verdict": "PASS: T1 at the demo broker's own fills, 24 Nov 2023 → Nov 2026, early (fill candle before 06:00 UTC) minus late: pooled early +0.3328R (n 387) vs late +0.0805R (n 756), difference +0.2523R, Welch t 2.4162, Holm p 0.0481; month t 2.4668",
+ "cut": "06:00 UTC",
+ "gate": {
+  "xau": {
+   "n": 572,
+   "net": 0.1838,
+   "monthT": 3.5384,
+   "published": {
+    "n": 572,
+    "net": 0.1838,
+    "monthT": 3.5384
+   },
+   "ok": true
+  },
+  "usdjpy": {
+   "n": 564,
+   "net": 0.1478,
+   "monthT": 3.1083,
+   "published": {
+    "n": 564,
+    "net": 0.1478,
+    "monthT": 3.1083
+   },
+   "ok": true
+  }
+ },
+ "tests": {
+  "pooled": {
+   "early": {
+    "n": 387,
+    "filled": 386,
+    "net": 0.3328,
+    "monthT": 3.988
+   },
+   "late": {
+    "n": 756,
+    "filled": 750,
+    "net": 0.0805,
+    "monthT": 1.9513
+   },
+   "diff": 0.2523,
+   "t": 2.4162,
+   "p": 0.016,
+   "month": {
+    "months": 37,
+    "mean": 0.2542,
+    "t": 2.4668
+   },
+   "thin": false,
+   "byYear": {
+    "2023": {
+     "early": {
+      "n": 10,
+      "net": 1.3481
+     },
+     "late": {
+      "n": 25,
+      "net": 0.1348
+     }
+    },
+    "2024": {
+     "early": {
+      "n": 107,
+      "net": 0.2244
+     },
+     "late": {
+      "n": 282,
+      "net": 0.1001
+     }
+    },
+    "2025": {
+     "early": {
+      "n": 143,
+      "net": 0.372
+     },
+     "late": {
+      "n": 250,
+      "net": 0.002
+     }
+    },
+    "2026": {
+     "early": {
+      "n": 127,
+      "net": 0.2999
+     },
+     "late": {
+      "n": 199,
+      "net": 0.1446
+     }
+    }
+   },
+   "holm": 0.0481
+  },
+  "xau": {
+   "early": {
+    "n": 180,
+    "filled": 179,
+    "net": 0.4436,
+    "monthT": 3.3253
+   },
+   "late": {
+    "n": 395,
+    "filled": 393,
+    "net": 0.0655,
+    "monthT": 1.2199
+   },
+   "diff": 0.3782,
+   "t": 2.4015,
+   "p": 0.0171,
+   "month": {
+    "months": 37,
+    "mean": 0.4372,
+    "t": 2.1264
+   },
+   "thin": false,
+   "byYear": {
+    "2023": {
+     "early": {
+      "n": 3,
+      "net": 1.0575
+     },
+     "late": {
+      "n": 15,
+      "net": 0.3387
+     }
+    },
+    "2024": {
+     "early": {
+      "n": 42,
+      "net": 0.2603
+     },
+     "late": {
+      "n": 156,
+      "net": 0.0189
+     }
+    },
+    "2025": {
+     "early": {
+      "n": 68,
+      "net": 0.6166
+     },
+     "late": {
+      "n": 122,
+      "net": -0.0301
+     }
+    },
+    "2026": {
+     "early": {
+      "n": 67,
+      "net": 0.3556
+     },
+     "late": {
+      "n": 102,
+      "net": 0.2108
+     }
+    }
+   },
+   "holm": 0.0481
+  },
+  "usdjpy": {
+   "early": {
+    "n": 207,
+    "filled": 207,
+    "net": 0.2364,
+    "monthT": 1.9743
+   },
+   "late": {
+    "n": 361,
+    "filled": 357,
+    "net": 0.097,
+    "monthT": 1.7169
+   },
+   "diff": 0.1394,
+   "t": 0.9992,
+   "p": 0.3185,
+   "month": {
+    "months": 37,
+    "mean": 0.1532,
+    "t": 0.9148
+   },
+   "thin": false,
+   "byYear": {
+    "2023": {
+     "early": {
+      "n": 7,
+      "net": 1.4727
+     },
+     "late": {
+      "n": 10,
+      "net": -0.1712
+     }
+    },
+    "2024": {
+     "early": {
+      "n": 65,
+      "net": 0.2013
+     },
+     "late": {
+      "n": 126,
+      "net": 0.2005
+     }
+    },
+    "2025": {
+     "early": {
+      "n": 75,
+      "net": 0.1502
+     },
+     "late": {
+      "n": 128,
+      "net": 0.0326
+     }
+    },
+    "2026": {
+     "early": {
+      "n": 60,
+      "net": 0.2378
+     },
+     "late": {
+      "n": 97,
+      "net": 0.0749
+     }
+    }
+   },
+   "holm": 0.3185
+  }
+ },
+ "brokerTime": {
+  "xau": {
+   "early": {
+    "n": 179,
+    "filled": 179,
+    "net": 0.4461,
+    "monthT": 3.3253
+   },
+   "late": {
+    "n": 393,
+    "filled": 393,
+    "net": 0.0658,
+    "monthT": 1.2199
+   },
+   "diff": 0.3803,
+   "t": 2.4021,
+   "moved": 0
+  },
+  "usdjpy": {
+   "early": {
+    "n": 207,
+    "filled": 207,
+    "net": 0.2364,
+    "monthT": 1.9743
+   },
+   "late": {
+    "n": 357,
+    "filled": 357,
+    "net": 0.098,
+    "monthT": 1.7169
+   },
+   "diff": 0.1383,
+   "t": 0.9895,
+   "moved": 0
+  },
+  "pooled": {
+   "early": {
+    "n": 386,
+    "filled": 386,
+    "net": 0.3336,
+    "monthT": 3.988
+   },
+   "late": {
+    "n": 750,
+    "filled": 750,
+    "net": 0.0811,
+    "monthT": 1.9513
+   },
+   "diff": 0.2525,
+   "t": 2.4104,
+   "moved": 0
+  }
+ },
+ "probes": {
+  "xau.json": "research/probe/ticks-XAUUSD.json@a00d5984d",
+  "xau-x.json": "research/probe/ticks-XAUUSD-x.json@5d2ae2dcd",
+  "uj-a.json": "research/probe/ticks-USDJPY-exec-a.json@02a36d2f9",
+  "uj-b.json": "research/probe/ticks-USDJPY-exec-b.json@00aa6bc59"
+ }
+}

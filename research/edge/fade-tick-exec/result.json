@@ -1,0 +1,728 @@
+{
+ "study": "fade-tick-exec",
+ "built": "2026-11-24",
+ "commit": null,
+ "rules": {
+  "a": {
+   "name": "m15 none atr 2R all",
+   "stop": "atr",
+   "exit": "2R"
+  },
+  "w": {
+   "name": "m15 none ext swing all",
+   "stop": "ext",
+   "exit": "swing"
+  }
+ },
+ "probes": [
+  {
+   "file": "ticks-XAUUSD-fade-1.json",
+   "at": "2026-11-23T18:52:17.610Z",
+   "errors": 1957
+  },
+  {
+   "file": "ticks-XAUUSD-fade-2.json",
+   "at": "2026-11-23T18:52:24.537Z",
+   "errors": 1980
+  },
+  {
+   "file": "ticks-XAUUSD-fade-3.json",
+   "at": "2026-11-23T18:52:21.114Z",
+   "errors": 1863
+  },
+  {
+   "file": "ticks-XAUUSD-fade-4.json",
+   "at": "2026-11-23T18:52:24.978Z",
+   "errors": 1796
+  },
+  {
+   "file": "ticks-XAUUSD-fade-5.json",
+   "at": "2026-11-23T18:55:33.387Z",
+   "errors": 1695
+  },
+  {
+   "file": "ticks-XAUUSD-fade-r1.json",
+   "at": "2026-11-23T20:56:01.932Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-XAUUSD-fade-r2.json",
+   "at": "2026-11-23T21:45:00.391Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-XAUUSD-fade-r3.json",
+   "at": "2026-11-23T22:37:05.081Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-fade-1.json",
+   "at": "2026-11-23T18:52:17.610Z",
+   "errors": 727
+  },
+  {
+   "file": "ticks-USDJPY-fade-2.json",
+   "at": "2026-11-23T18:52:24.537Z",
+   "errors": 559
+  },
+  {
+   "file": "ticks-USDJPY-fade-3.json",
+   "at": "2026-11-23T18:52:21.114Z",
+   "errors": 1075
+  },
+  {
+   "file": "ticks-USDJPY-fade-4.json",
+   "at": "2026-11-23T18:52:24.978Z",
+   "errors": 1115
+  },
+  {
+   "file": "ticks-USDJPY-fade-5.json",
+   "at": "2026-11-23T18:55:33.387Z",
+   "errors": 1222
+  },
+  {
+   "file": "ticks-USDJPY-fade-6.json",
+   "at": "2026-11-23T18:55:33.036Z",
+   "errors": 1999
+  },
+  {
+   "file": "ticks-USDJPY-fade-7.json",
+   "at": "2026-11-23T18:55:33.002Z",
+   "errors": 1859
+  },
+  {
+   "file": "ticks-USDJPY-fade-8.json",
+   "at": "2026-11-23T18:55:37.821Z",
+   "errors": 1940
+  },
+  {
+   "file": "ticks-USDJPY-fade-r1.json",
+   "at": "2026-11-23T20:56:01.932Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-fade-r2.json",
+   "at": "2026-11-23T21:45:00.391Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-fade-r3.json",
+   "at": "2026-11-23T22:37:05.081Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-fade-r4.json",
+   "at": "2026-11-23T23:35:55.312Z",
+   "errors": 0
+  }
+ ],
+ "skipped": {
+  "XAUUSD": {},
+  "USDJPY": {
+   "not read": 256
+  }
+ },
+ "window": [
+  "2023-11-24",
+  "2026-11-20"
+ ],
+ "pool": {
+  "a": {
+   "orders": 2257,
+   "entryUnresolved": 31,
+   "exitUnresolved": 621,
+   "unresolvedShare": 0.279,
+   "unresolvedWhy": {
+    "overlap": 429,
+    "windows cut": 184,
+    "past the deadline?": 6,
+    "no deadline quote": 2
+   },
+   "T2": {
+    "before": {
+     "n": 1605,
+     "mean": -0.1997,
+     "monthT": -5.3375,
+     "months": 37
+    },
+    "afterCommission": {
+     "n": 1605,
+     "mean": -0.2497,
+     "monthT": -6.5073,
+     "months": 37
+    }
+   },
+   "T1": {
+    "before": {
+     "n": 1605,
+     "mean": -0.0195,
+     "monthT": -2.7773,
+     "months": 37
+    },
+    "afterCommission": {
+     "n": 1605,
+     "mean": 0.0131,
+     "monthT": 1.788,
+     "months": 37
+    }
+   },
+   "mid": {
+    "before": -0.1803,
+    "afterCost": -0.2628
+   },
+   "exits": {
+    "stop (bracket)": {
+     "n": 1056,
+     "before": -1
+    },
+    "target (bracket)": {
+     "n": 428,
+     "before": 2
+    },
+    "stop (exact)": {
+     "n": 106,
+     "before": -1.2931
+    },
+    "time (mark)": {
+     "n": 10,
+     "before": 0.2816
+    },
+    "target (exact)": {
+     "n": 5,
+     "before": 2.7398
+    }
+   },
+   "byYear": {
+    "2023": {
+     "n": 51,
+     "before": 0.0861
+    },
+    "2024": {
+     "n": 569,
+     "before": -0.2283
+    },
+    "2025": {
+     "n": 528,
+     "before": -0.1991
+    },
+    "2026": {
+     "n": 457,
+     "before": -0.1967
+    }
+   },
+   "bySide": {
+    "sell": {
+     "n": 828,
+     "before": -0.1101
+    },
+    "buy": {
+     "n": 777,
+     "before": -0.2952
+    }
+   },
+   "entrySlipR": {
+    "median": 0.0084,
+    "mean": 0.0177
+   }
+  },
+  "w": {
+   "orders": 1955,
+   "entryUnresolved": 22,
+   "exitUnresolved": 414,
+   "unresolvedShare": 0.2142,
+   "unresolvedWhy": {
+    "overlap": 216,
+    "windows cut": 189,
+    "past the deadline?": 6,
+    "no deadline quote": 3
+   },
+   "T2": {
+    "before": {
+     "n": 1519,
+     "mean": -0.6454,
+     "monthT": -9.7715,
+     "months": 37
+    },
+    "afterCommission": {
+     "n": 1519,
+     "mean": -0.8315,
+     "monthT": -11.9054,
+     "months": 37
+    }
+   },
+   "T1": {
+    "before": {
+     "n": 1519,
+     "mean": -0.0609,
+     "monthT": -3.4362,
+     "months": 37
+    },
+    "afterCommission": {
+     "n": 1519,
+     "mean": 0.0354,
+     "monthT": 2.0011,
+     "months": 37
+    }
+   },
+   "mid": {
+    "before": -0.5845,
+    "afterCost": -0.8669
+   },
+   "exits": {
+    "stop (bracket)": {
+     "n": 1335,
+     "before": -1
+    },
+    "target (bracket)": {
+     "n": 79,
+     "before": 6.1464
+    },
+    "time (mark)": {
+     "n": 5,
+     "before": 4.5727
+    },
+    "stop (exact)": {
+     "n": 98,
+     "before": -1.7386
+    },
+    "target (exact)": {
+     "n": 2,
+     "before": 8.3001
+    }
+   },
+   "byYear": {
+    "2023": {
+     "n": 32,
+     "before": 0.1287
+    },
+    "2024": {
+     "n": 514,
+     "before": -0.7184
+    },
+    "2025": {
+     "n": 507,
+     "before": -0.6912
+    },
+    "2026": {
+     "n": 466,
+     "before": -0.5681
+    }
+   },
+   "bySide": {
+    "sell": {
+     "n": 786,
+     "before": -0.5977
+    },
+    "buy": {
+     "n": 733,
+     "before": -0.6965
+    }
+   },
+   "entrySlipR": {
+    "median": 0.0217,
+    "mean": 0.0629
+   }
+  }
+ },
+ "perMarket": {
+  "XAUUSD": {
+   "a": {
+    "orders": 1200,
+    "entryUnresolved": 12,
+    "exitUnresolved": 157,
+    "unresolvedShare": 0.1322,
+    "unresolvedWhy": {
+     "overlap": 93,
+     "windows cut": 63,
+     "past the deadline?": 1
+    },
+    "T2": {
+     "before": {
+      "n": 1031,
+      "mean": -0.0936,
+      "monthT": -1.9288,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 1031,
+      "mean": -0.1316,
+      "monthT": -2.7058,
+      "months": 37
+     }
+    },
+    "T1": {
+     "before": {
+      "n": 1031,
+      "mean": -0.0193,
+      "monthT": -1.9257,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 1031,
+      "mean": 0.0249,
+      "monthT": 2.447,
+      "months": 37
+     }
+    },
+    "mid": {
+     "before": -0.0742,
+     "afterCost": -0.1565
+    },
+    "exits": {
+     "stop (bracket)": {
+      "n": 619,
+      "before": -1
+     },
+     "target (bracket)": {
+      "n": 310,
+      "before": 2
+     },
+     "stop (exact)": {
+      "n": 89,
+      "before": -1.2561
+     },
+     "time (mark)": {
+      "n": 9,
+      "before": 0.296
+     },
+     "target (exact)": {
+      "n": 4,
+      "before": 2.9178
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 27,
+      "before": 0.2941
+     },
+     "2024": {
+      "n": 338,
+      "before": -0.0601
+     },
+     "2025": {
+      "n": 346,
+      "before": -0.1344
+     },
+     "2026": {
+      "n": 320,
+      "before": -0.1174
+     }
+    },
+    "bySide": {
+     "sell": {
+      "n": 530,
+      "before": 0.0319
+     },
+     "buy": {
+      "n": 501,
+      "before": -0.2263
+     }
+    },
+    "entrySlipR": {
+     "median": 0.0104,
+     "mean": 0.0133
+    }
+   },
+   "w": {
+    "orders": 1034,
+    "entryUnresolved": 6,
+    "exitUnresolved": 121,
+    "unresolvedShare": 0.1177,
+    "unresolvedWhy": {
+     "overlap": 61,
+     "windows cut": 58,
+     "past the deadline?": 2
+    },
+    "T2": {
+     "before": {
+      "n": 907,
+      "mean": -0.4501,
+      "monthT": -4.9569,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 907,
+      "mean": -0.5786,
+      "monthT": -6.242,
+      "months": 37
+     }
+    },
+    "T1": {
+     "before": {
+      "n": 907,
+      "mean": -0.0241,
+      "monthT": -1.274,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 907,
+      "mean": 0.1075,
+      "monthT": 5.1814,
+      "months": 37
+     }
+    },
+    "mid": {
+     "before": -0.426,
+     "afterCost": -0.6861
+    },
+    "exits": {
+     "stop (bracket)": {
+      "n": 766,
+      "before": -1
+     },
+     "target (bracket)": {
+      "n": 60,
+      "before": 6.8626
+     },
+     "time (mark)": {
+      "n": 5,
+      "before": 4.5727
+     },
+     "stop (exact)": {
+      "n": 74,
+      "before": -1.263
+     },
+     "target (exact)": {
+      "n": 2,
+      "before": 8.3001
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 13,
+      "before": 2.1041
+     },
+     "2024": {
+      "n": 275,
+      "before": -0.5046
+     },
+     "2025": {
+      "n": 309,
+      "before": -0.5625
+     },
+     "2026": {
+      "n": 310,
+      "before": -0.3968
+     }
+    },
+    "bySide": {
+     "sell": {
+      "n": 466,
+      "before": -0.3793
+     },
+     "buy": {
+      "n": 441,
+      "before": -0.525
+     }
+    },
+    "entrySlipR": {
+     "median": 0.0264,
+     "mean": 0.047
+    }
+   }
+  },
+  "USDJPY": {
+   "a": {
+    "orders": 1057,
+    "entryUnresolved": 19,
+    "exitUnresolved": 464,
+    "unresolvedShare": 0.447,
+    "unresolvedWhy": {
+     "overlap": 336,
+     "windows cut": 121,
+     "past the deadline?": 5,
+     "no deadline quote": 2
+    },
+    "T2": {
+     "before": {
+      "n": 574,
+      "mean": -0.3904,
+      "monthT": -7.0613,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 574,
+      "mean": -0.4618,
+      "monthT": -8.0747,
+      "months": 37
+     }
+    },
+    "T1": {
+     "before": {
+      "n": 574,
+      "mean": -0.0197,
+      "monthT": -1.3765,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 574,
+      "mean": -0.008,
+      "monthT": -0.565,
+      "months": 37
+     }
+    },
+    "mid": {
+     "before": -0.3707,
+     "afterCost": -0.4537
+    },
+    "exits": {
+     "stop (bracket)": {
+      "n": 437,
+      "before": -1
+     },
+     "target (bracket)": {
+      "n": 118,
+      "before": 2
+     },
+     "stop (exact)": {
+      "n": 17,
+      "before": -1.4871
+     },
+     "target (exact)": {
+      "n": 1,
+      "before": 2.0277
+     },
+     "time (mark)": {
+      "n": 1,
+      "before": 0.1528
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 24,
+      "before": -0.1479
+     },
+     "2024": {
+      "n": 231,
+      "before": -0.4745
+     },
+     "2025": {
+      "n": 182,
+      "before": -0.322
+     },
+     "2026": {
+      "n": 137,
+      "before": -0.382
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 276,
+      "before": -0.4203
+     },
+     "sell": {
+      "n": 298,
+      "before": -0.3628
+     }
+    },
+    "entrySlipR": {
+     "median": 0.0044,
+     "mean": 0.0255
+    }
+   },
+   "w": {
+    "orders": 921,
+    "entryUnresolved": 16,
+    "exitUnresolved": 293,
+    "unresolvedShare": 0.3238,
+    "unresolvedWhy": {
+     "overlap": 155,
+     "windows cut": 131,
+     "past the deadline?": 4,
+     "no deadline quote": 3
+    },
+    "T2": {
+     "before": {
+      "n": 612,
+      "mean": -0.9348,
+      "monthT": -13.6198,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 612,
+      "mean": -1.2063,
+      "monthT": -15.4403,
+      "months": 37
+     }
+    },
+    "T1": {
+     "before": {
+      "n": 612,
+      "mean": -0.1153,
+      "monthT": -3.2336,
+      "months": 37
+     },
+     "afterCommission": {
+      "n": 612,
+      "mean": -0.0714,
+      "monthT": -2.0396,
+      "months": 37
+     }
+    },
+    "mid": {
+     "before": -0.8195,
+     "afterCost": -1.135
+    },
+    "exits": {
+     "stop (bracket)": {
+      "n": 569,
+      "before": -1
+     },
+     "stop (exact)": {
+      "n": 24,
+      "before": -3.2049
+     },
+     "target (bracket)": {
+      "n": 19,
+      "before": 3.8849
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 19,
+      "before": -1.2229
+     },
+     "2024": {
+      "n": 239,
+      "before": -0.9645
+     },
+     "2025": {
+      "n": 198,
+      "before": -0.8921
+     },
+     "2026": {
+      "n": 156,
+      "before": -0.9085
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 292,
+      "before": -0.9556
+     },
+     "sell": {
+      "n": 320,
+      "before": -0.9158
+     }
+    },
+    "entrySlipR": {
+     "median": 0.0118,
+     "mean": 0.0865
+    }
+   }
+  }
+ },
+ "verdicts": {
+  "a": {
+   "p": 1,
+   "holm": 1,
+   "verdict": "INCONCLUSIVE"
+  },
+  "w": {
+   "p": 1,
+   "holm": 1,
+   "verdict": "INCONCLUSIVE"
+  }
+ },
+ "verdict": "m15 none atr 2R all: INCONCLUSIVE, tick -0.1997R a trade (n 1605, month t -5.3375; after commission -0.2497R) against mid -0.1803R; tick - mid -0.0195R (month t -2.7773). m15 none ext swing all: INCONCLUSIVE, tick -0.6454R a trade (n 1519, month t -9.7715; after commission -0.8315R) against mid -0.5845R; tick - mid -0.0609R (month t -3.4362)"
+}

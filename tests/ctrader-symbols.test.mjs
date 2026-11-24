@@ -207,19 +207,20 @@ const enc = (pts) => pts.map(([t, p]) => [t, Math.round(p * 1e5)]).map(([t, p], 
 const winTicks = (p) => { const T = p.fromTimestamp + 180e3;
   return p.type === 1 ? enc([[T - 100e3, 155.000], [T + 30e3, 155.010]]) : enc([[T - 90e3, 155.003], [T + 40e3, 155.020]]); };
 
-test('watch list: the yen pairs are recorded under `watch` (spread fields, commission, window spreads), and the mirror never sees them', async () => {
+test('watch list: the yen pairs are recorded under `watch` (spread fields, commission, window spreads), and the mirror never sees the watch-only ones', async () => {
   const light = LIGHT.concat(JPYL), b = fakeBroker({ light, full: JFULL, px: JPX, winTicks });
   const f = await run(b);
   assert.ok(b.sent.every((m) => _t.READ_ONLY.has(m.payloadType)), 'only read messages');
   assert.ok(b.sent.every((m) => m.url === _t.HOSTS.demo), 'demo host only');
-  // the mirror's view of the file is what it was: the same markets, no yen pair in `symbols`, specFor and the cost model blind to them
-  const base = await run(fakeBroker());
-  assert.deepEqual(f.markets, base.markets); assert.deepEqual(f.missing, base.missing);
-  assert.deepEqual(Object.keys(f.symbols).sort(), Object.keys(base.symbols).sort());
-  assert.ok(!Object.keys(f.symbols).some((n) => /JPY/.test(n)));
-  for (const n of ['USDJPY', 'GBPJPY', 'AUDJPY']) assert.equal(specFor(f, n), null, n);
-  assert.ok(!Object.values(SYMBOLS).flat().some((n) => /JPY/.test(n)), 'the mirror trades no yen pair');
-  assert.equal(costModel({ usdjpy: { group: 'Forex', spot: true } }, { symbols: SYMBOLS, brokerInfo: f }).usdjpy.src, 'default');
+  // the mirror's view of the file is what it was apart from the mirror's own yen markets (USD/JPY and EUR/JPY since 24 Nov 2026,
+  // the Equinox book): the watch-only pairs never reach `symbols`, specFor or the markets
+  const base = await run(fakeBroker()), mine = new Set(Object.values(SYMBOLS).flat());
+  const noJpy = (o) => (Array.isArray(o) ? o.filter((m) => !/jpy/i.test(m)) : Object.fromEntries(Object.entries(o || {}).filter(([m]) => !/jpy/i.test(m))));
+  assert.deepEqual(noJpy(f.missing), noJpy(base.missing)); assert.deepEqual(noJpy(f.markets), noJpy(base.markets));
+  assert.deepEqual(Object.keys(f.symbols).filter((n) => !/JPY/.test(n)).sort(), Object.keys(base.symbols).sort());
+  assert.ok(Object.keys(f.symbols).filter((n) => /JPY/.test(n)).every((n) => mine.has(n)), 'only the mirror\'s own yen markets');
+  for (const n of ['GBPJPY', 'AUDJPY']) assert.equal(specFor(f, n), null, n);
+  assert.ok(!['GBPJPY', 'AUDJPY', 'CADJPY', 'CHFJPY'].some((n) => mine.has(n)), 'the watch-only pairs are not mirror markets');
   // the watch entries: CADJPY not listed and CHFJPY disabled -> null
   assert.deepEqual(Object.keys(f.watch), ['USDJPY', 'GBPJPY', 'AUDJPY', 'CADJPY', 'CHFJPY']);
   assert.equal(f.watch.CADJPY, null); assert.equal(f.watch.CHFJPY, null);

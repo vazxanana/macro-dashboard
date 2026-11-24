@@ -73,10 +73,14 @@ const NEED = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKE
 // so the futures-cash basis does not matter.
 export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD'], audusd: ['AUDUSD'], usdcad: ['USDCAD'], usdchf: ['USDCHF'],
   btc: ['BTCUSD'], eth: ['ETHUSD'], sol: ['SOLUSD'], xrp: ['XRPUSD'],   // 8 Nov: the council's crypto paper trades too (CFDs at the broker)
-  nq: ['US100', 'NAS100', 'USTEC'], es: ['US500', 'SPX500', 'US500.cash'], ym: ['US30', 'DJ30', 'US30.cash'], rty: ['US2000', 'RUSSELL2000'], gc: ['XAUUSD'] };
+  nq: ['US100', 'NAS100', 'USTEC'], es: ['US500', 'SPX500', 'US500.cash'], ym: ['US30', 'DJ30', 'US30.cash'], rty: ['US2000', 'RUSSELL2000'], gc: ['XAUUSD'],
+  nzdusd: ['NZDUSD'], usdjpy: ['USDJPY'], eurjpy: ['EURJPY'], xag: ['XAGUSD'] };   // 24 Nov 2026: the Equinox desks' markets (eqx book)
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
-export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr }));
+// 24 Nov 2026 (owner: "Stop ICT copies"): with config.json mirrorIct === false no new ICT copy is opened on any account; the
+// signals stay in the list (noCopy) so a copy made before keeps following its record to the close. ICT stays paper only.
+export const ictCandidates = (ict, on = true) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr,
+  ...(on ? {} : { noCopy: true, noCopyWhy: 'ICT copies stopped by the owner (24 Nov 2026)' }) }));
 // The replica's forward paper trades (10 Nov, owner: "the mirror is not taking the replica trades"). The Trader records them in
 // research.json (k 'replica', gold, forex and crypto), never in trades.json, which holds only the live gold replica; the mirror
 // used to read trades.json and the ICT desk alone, so the Replica demo account stayed empty. They are candidates for the
@@ -129,6 +133,42 @@ export function moshaCandidates(desk, nowS = Math.floor(Date.now() / 1000)) {
   }
   return out;
 }
+// The Equinox desks on their own demo account (24 Nov 2026, owner: "Break fade / Big-candle fade / FVG return / gold breakout ...
+// running on demo account finishing 144 risking 0.25% per trade max 30 trades open at same time"). Sources: council-data
+// <desk>/desk.json of fade, bigfade, fvg and goldvb (council/edge-desks-2.mjs), records written once FILLED, so open records are
+// copied as market orders through the usual path (stop required, stop-within-spread skip, ensureStop, the caps). Only a record
+// first written within EQX.fresh seconds and filled that recently is OPENED (older = noCopy, kept so an earlier copy follows its
+// record), and not one the tracker already read more than EQX.maxFloat R from its entry either way. A record with no market is
+// gold (the desks' convention). One position per desk, market, side and fill time. At most EQX.maxOpen eqx positions at once.
+// Paper readings of rules that lose after costs on their studies; a demo record, not an edge.
+export const EQX = { desks: ['fade', 'bigfade', 'fvg', 'goldvb'], fresh: 3600, keep: 2 * 86400, maxOpen: 30, maxFloat: 0.75,
+  names: { fade: 'Break fade', bigfade: 'Big-candle fade', fvg: 'FVG return', goldvb: 'Gold breakout' } };
+export function eqxCandidates(files, nowS = Math.floor(Date.now() / 1000)) {
+  const out = [], seen = new Set();
+  for (const k of EQX.desks) {
+    const recs = files && files[k] && Array.isArray(files[k].records) ? files[k].records : [];
+    for (const r of recs) {
+      if (!r || typeof r.id !== 'string') continue;
+      const market = r.market || 'xau', side = +r.side === 1 ? 'buy' : +r.side === -1 ? 'sell' : null, entry = +r.entry, stop = +r.stop, t = +r.t;
+      if (!SYMBOLS[market] || !side || !(entry > 0) || !(stop > 0) || !Number.isFinite(t)) continue;
+      const sgn = side === 'sell' ? -1 : 1;
+      if (sgn * (entry - stop) <= 0) continue;   // absolute rule 1
+      const open = r.status === 'open', endT = +r.endT;
+      if (!open && !(Number.isFinite(endT) && nowS - endT <= EQX.keep)) continue;
+      const key = `${k}|${market}|${side}|${t}`; if (seen.has(key)) continue; seen.add(key);
+      const tgt = +r.target, t1 = tgt > 0 && sgn * (tgt - entry) > 0 ? tgt : null, fl = +r.float;
+      const why = !open ? null : r.feed === 'Kraken' ? 'priced on the Kraken fallback, never opened'
+        : !(nowS - (+r.first || 0) <= EQX.fresh && nowS - t <= EQX.fresh) ? 'recorded or filled over 1 h ago, never opened late'
+        : Number.isFinite(fl) && Math.abs(fl) > EQX.maxFloat ? `already ${fl.toFixed(2)}R from its entry at the desk's last reading` : null;
+      out.push({ id: `eqx:${k}:${r.id}`, k: 'eqx-' + k, market, name: EQX.names[k], side, entry, stop, t1, ...(r.r0 > 0 ? { r0: +r.r0 } : {}),
+        rr: t1 != null ? +(Math.abs(t1 - entry) / Math.abs(entry - stop)).toFixed(2) : null, opened: t, filled: t, h: r.l || r.h || null,
+        status: open ? 'open' : r.status, ...(open ? {} : { R: r.R ?? null, exitPx: r.exit ?? null, closed: endT }), shadow: false, eqx: true,
+        ...(why ? { noCopy: true, noCopyWhy: 'Equinox: ' + why } : {}) });
+    }
+  }
+  return out;
+}
+export const eqxHasOwnAccount = (byBook) => !!(byBook && byBook.eqx && byBook.council && byBook.eqx !== byBook.council);
 // true only while the mosha6 book trades on a different demo account from the council book
 export const moshaHasOwnAccount = (byBook) => !!(byBook && byBook.mosha6 && byBook.council && byBook.mosha6 !== byBook.council);
 // sizing (owner, 7 Nov: "risk-based lots, bigger demo", from research/portfolio.md): each order risks a share of the balance per 1R:
@@ -141,7 +181,7 @@ export const moshaHasOwnAccount = (byBook) => !!(byBook && byBook.mosha6 && byBo
 // 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
 // minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
+  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.0025 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -322,7 +362,7 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 
   const qr = quoteRate({ name, px, spec, now }), toAcc = qr && qr.rate;
   if (!toAcc) return { skip: `${name}: cannot value its quote currency${spec && spec.quote ? ` (${spec.quote})` : ''} in the account currency${spec && spec.deposit ? ` (${spec.deposit})` : ''}` };
   const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
-  let riskCash = balance * (isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
+  let riskCash = balance * (isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : String(t.id).startsWith('eqx:') ? LIMITS.risk.eqx : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
   const perLot = (lot / 100) * dist * toAcc, lots = riskCash / perLot;
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
   let v = Math.floor((lots * lot) / step + 1e-9) * step, atMin = false;   // epsilon: 0.01 lot must not floor to 0 on float noise
@@ -379,8 +419,17 @@ export const copiedIds = (state) => new Set([...Object.keys((state && state.map)
 // Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
 // not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
 // "council:123,ict:456,shadow:789,lit:321,replica:654" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
-export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6'];
-export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
+export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx'];
+export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : String(t.id).startsWith('eqx:') ? 'eqx' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
+// an account number, or "*<digits>" = the ONE demo account whose login ends with those digits (24 Nov 2026: the owner gives the
+// last digits; two matches, or only a live one, find nothing). f names the fields of the list's entries.
+export function pickAccount(list, spec, f = { id: 'ctidTraderAccountId', login: 'traderLogin', live: 'isLive' }) {
+  const L = Array.isArray(list) ? list : [], sp = String(spec || '').trim(), suf = /^\*(\d{3,})$/.exec(sp);
+  if (suf) { const m = L.filter((a) => a[f.live] === false && String(a[f.login]).endsWith(suf[1])); return m.length === 1 ? m[0] : null; }
+  const n = Number(sp); return L.find((a) => Number(a[f.id]) === n) || L.find((a) => Number(a[f.login]) === n) || null;
+}
+// the state file of an account: digits only, so every reader's mirror(-\d+)?.json pattern holds
+export const mirrorFile = (account, base) => (account === base ? 'mirror.json' : `mirror-${String(account).replace(/\D/g, '')}.json`);
 export function accountsFor(env, cfg) {
   const out = {}, base = String(env.CTRADER_ACCOUNT_ID || '').trim();
   const c = (cfg && cfg.mirrorAccounts) || {}; for (const b of BOOKS) if (c[b] != null && String(c[b]).trim()) out[b] = String(c[b]).trim();
@@ -509,7 +558,6 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
   if (missing.length) { st.status = `not configured: ${missing.join(', ')} missing`; return out; }
   if (String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { st.status = 'refused: CTRADER_ENV must be "demo"'; return out; }
   if (!WS) { st.status = 'no WebSocket in this runtime'; return out; }
-  const accountId = Number(String(env.CTRADER_ACCOUNT_ID).trim());
   if (!st.startedAt) st.startedAt = new Date(now * 1000).toISOString();   // trades before the mirror existed are never copied
 
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN, refreshToken: env.CTRADER_REFRESH_TOKEN };
@@ -533,7 +581,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES);
     }
     const all = list.ctidTraderAccount || [];
-    const acc = all.find((a) => Number(a.ctidTraderAccountId) === accountId) || all.find((a) => Number(a.traderLogin) === accountId);
+    const acc = pickAccount(all, env.CTRADER_ACCOUNT_ID);
     if (!acc) { st.status = 'refused: CTRADER_ACCOUNT_ID not found for this token'; return out; }
     if (acc.isLive !== false) { st.status = 'refused: the account is not a demo account'; say(st.status); return out; }
     const ctid = Number(acc.ctidTraderAccountId);
@@ -740,6 +788,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
         const pending = t.status === 'pending';
         if (dayDown >= LIMITS.dayStop) { later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
+        if (String(t.id).startsWith('eqx:') && Object.entries(st.map).filter(([id, m]) => id.startsWith('eqx:') && (m.status === 'open' || m.status === 'sent')).length >= EQX.maxOpen) { later(`${EQX.maxOpen} Equinox positions already open`); continue; }
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
         if (!symbolId) { skip(`none of ${SYMBOLS[t.market].join('/')} found at the broker`); continue; }
         if (st.paused[PAUSE_KEY(name, pending)]) { later(`${name} market closed (paused until ${st.paused[PAUSE_KEY(name, pending)].slice(11, 16)} UTC)`); continue; }
@@ -897,13 +946,14 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const replicaOwn = replicaHasOwnAccount(byBook);
   // the Mosha 6R barrier records (23 Nov 2026) the same way: only while the mosha6 book has a demo account of its own
   let desk = null; try { desk = JSON.parse(fs.readFileSync(path.join(DIR, 'mosha', 'desk.json'), 'utf8')); } catch (e) {}
-  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
+  const eqxFiles = {}; for (const k of EQX.desks) { try { eqxFiles[k] = JSON.parse(fs.readFileSync(path.join(DIR, k, 'desk.json'), 'utf8')); } catch (e) {} }
+  const trades = own.concat(ictCandidates(ict, cfg.mirrorIct !== false), eqxHasOwnAccount(byBook) ? eqxCandidates(eqxFiles) : [], replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
-  const fileOf0 = (a) => (a === base ? 'mirror.json' : `mirror-${a}.json`);
+  const fileOf0 = (a) => mirrorFile(a, base);
   const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));
   // what each account has copied (any status, resting orders too; after the owner's reset, if one applies): another account never
   // opens the same trade
-  const fileOf = (acc) => (acc === base ? 'mirror.json' : `mirror-${acc}.json`), held = new Map();
+  const fileOf = (acc) => mirrorFile(acc, base), held = new Map();
   for (const g of groups) { const st = (rd(fileOf(g.account), {}).state) || {}; held.set(g.account, copiedIds(applyReset(st, resetFile).state)); }
   for (const g of groups) {
     const file = fileOf(g.account), prev = rd(file, {});
@@ -920,7 +970,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
       r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
     for (const a of r.alerts) allAlerts.push(groups.length > 1 ? { ...a, book: g.drain ? 'old shadow account' : g.books.join('+') } : a);
   }
-  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, ...(g.drain ? { drain: true } : {}), file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
+  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, ...(g.drain ? { drain: true } : {}), file: mirrorFile(g.account, base) })) }, null, 1));
   if (tokens && JSON.stringify(tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(tokens);
   console.log(`cTrader mirror: ${summaryLines.join(' | ')}`);
   const r = { alerts: allAlerts };

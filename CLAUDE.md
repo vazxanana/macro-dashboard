@@ -3478,6 +3478,28 @@ are not strangers; a noCopy record shows its reason). `forward.mjs` E5 reads the
 reading of the desk copied to a demo, not a tested edge. Tests: `tests/ctrader-mirror.test.mjs` ("Mosha 6R": 4),
 `tests/ctrader-reconcile.test.mjs`, `tests/mirror-drain.test.mjs`.
 
+## The Equinox desks on the demo account ending 144, ICT copies stopped (24 Nov 2026, owner: "Break fade / Big-candle fade / FVG return / gold breakout ... running on demo account finishing 144 risking 0.25% per trade max 30 trades open at same time", "Stop ICT copies")
+`council/ctrader-mirror.mjs` book `eqx` (`council/ctrader-accounts.json` `mirrorAccounts.eqx` = 10152144, the former ICT account):
+`eqxCandidates(files)` reads council-data `fade/`, `bigfade/`, `fvg/`, `goldvb/` `desk.json` (the Equinox trackers; `EQX.desks`; DOM,
+round-number, box fade and USD/JPY breakout are NOT copied), the Mosha 6R pattern: open records are copied as market orders through
+the usual path (stop required, spread skip, `ensureStop`, caps); only a record first written and filled within `EQX.fresh` 1 h and not
+more than `EQX.maxFloat` 0.75R from its entry at the desk's last reading is OPENED (else `noCopy`, kept so an earlier copy follows its
+record); closed ones stay `EQX.keep` 2 days so the copy closes with them; no market = gold; one per desk, market, side and fill time;
+ids `eqx:<desk>:<record id>`. Risk `LIMITS.risk.eqx` 0.25 % of the balance; at most `EQX.maxOpen` 30 eqx positions at once (the
+account's 40 cap and the 2 % daily loss stop also apply). `SYMBOLS` gained nzdusd, usdjpy, eurjpy, xag (so `ctrader-symbols.mjs`
+reads their specs; USD/JPY and EUR/JPY leave the yen watch-only list's "never in symbols" rule). Copied only while `eqx` has its own
+account (`eqxHasOwnAccount`). Trader rule `ict-mirror-off` sets `config.mirrorIct = false`: `ictCandidates(ict, false)` marks every
+ICT signal `noCopy` (kept, so an old copy would still be managed); undo with a rule setting it true. `ctrader-reconcile.mjs` reads the
+same files; `ctrader-account.mjs` label "Equinox". The four rules lose after costs on their studies: a demo record, not an edge.
+Tests: `tests/ctrader-mirror.test.mjs` ("Equinox", "ICT copies stopped").
+
+**Moved to the $200 account ending 155** (24 Nov 2026, owner: "And on the 200 account mosha barrier 6r", "200$ finish with 155", risk
+0.25 % kept): `ctrader-accounts.json` `mosha6` = `"*155"` = the ONE demo account on the token whose login ends 155
+(`ctrader-mirror.mjs` `pickAccount`, also used by `ctrader-account.mjs`; two matches or only a live one = not found, nothing sent);
+its state file is `mirror-155.json` (`mirrorFile`: digits only, so the Trader's `mirror(-\d+)?.json` reader holds). 10152145 is in
+`drain`: it opens nothing and manages its open Mosha copies to their exits. On $200, 0.25 % is $0.50 a trade: most gold trades need
+more than the smallest lot allows and are skipped (`riskVolume`'s minimum-lot rule, at most 2 %).
+
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
 1. After a market fill whose fill event shows no stop, the mirror waits `slWaitMs` (1.5 s) and reads the position back
