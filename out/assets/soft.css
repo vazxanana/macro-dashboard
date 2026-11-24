@@ -54,6 +54,15 @@
   --soft-glass: rgba(255, 255, 255, .82);
 }
 }
+/* the faint ink was chosen for the solid surfaces; on the lighter see-through ones it fell under AA, so the dark themes get a
+   lighter one (light keeps its own). Not under "more contrast", where the pages set their own stronger inks. */
+@media (prefers-contrast: no-preference) {
+  :root:root:root:not([data-theme="light"]) { --au-ink-3: #A4A9B1; }
+  :root:root:root[data-theme="light"] { --au-ink-3: #5B616A; }
+}
+@media (prefers-contrast: no-preference) and (prefers-color-scheme: light) {
+  :root:root:root:not([data-theme="dark"]):not([data-theme="midnight"]) { --au-ink-3: #5B616A; }
+}
 :root:root:root[data-theme="midnight"] {
   --au-bg: #0b0c0e;
   --au-surface: rgba(30, 32, 37, .62);
@@ -168,6 +177,8 @@ html:root body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="r
 html:root body :is(.c-act li, .act-row, .tr-row, table tbody tr):hover { background-color: color-mix(in srgb, var(--au-ink) 3.5%, transparent); }
 /* tables: lighter rules between rows */
 html:root body :is(table) :is(td, th) { border-color: var(--au-line-soft) !important; }
+/* a header cell sits on the raised see-through surface, which is lighter than the solid one it was drawn for: the faint ink fell under AA there */
+html:root body table th { color: var(--au-ink-2); }
 /* chart areas: the frame around a chart is a hairline */
 html:root body :is(.ms-pane, .tv-wrap, .chart-wrap, .dl-chart) { border-color: var(--au-line-soft) !important; border-radius: 14px; }
 /* a gentle hover lift on cards you can open */
@@ -185,3 +196,7 @@ html:root body :is(.ms-pane, .tv-wrap, .chart-wrap, .dl-chart) { border-color: v
 @media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) {
   :root:root:root:not([data-theme="dark"]):not([data-theme="midnight"]) { --au-surface: #ffffff; --au-surface-2: #e7e9ec; --soft-glass: #ffffff; }
 }
+
+/* the Academy's SELL tag: the loss red on its own tint over a see-through surface was 4.46:1 in the dark themes */
+html:root:not([data-theme="light"]) body .act.sell { color: color-mix(in srgb, var(--au-loss) 82%, #fff); }
+@media (prefers-color-scheme: light) { html:root:not([data-theme="dark"]):not([data-theme="midnight"]) body .act.sell { color: var(--au-loss); } }

@@ -6916,3 +6916,14 @@ trades first, on 16 % the 50 % comes first. 30-second ChoCh, context only (gold 
 −0.115R after costs (n 1,027). The run that counts is the second: the first left out the desk's "risk under the cost is no trade"
 rule (said in RESULT.md). **A high win rate here is bought with the reward: never quote the 70 % without the −0.138R.**
 Test: `tests/bigfade-choch.test.mjs`.
+
+## Paper look on the Charts, and the faint ink in the soft look (24 Nov 2026, owner's screenshot: "want my charts with these colors")
+Display only. `market-structure.html`: `PAPER` = a light chart (#f7f8fa) with grey rising and black falling candles, black borders and
+wicks (`MONO`), on EVERY page theme. It is the chart's own colours (`ms-colors` with `mono: true`), switched on once per device
+(`ms-paper-v1`, only when the device has no colours of its own); Style → "Grey / black on white" (`#ms-sty-paper`) sets it,
+"Theme colours" goes back to the page theme's chart, "Green / red candles" clears `mono`. `chartLight()` (`window.msChartLight`) = is
+the chart itself light: the canvas inks (day lines, labels, volume, the hand-drawn level lines, the shared image) read it instead of
+the page theme; `cusLook(chart)` gives a chart with its own background its ink, grid and scale borders (panes, the free chart,
+Markets side by side). `assets/soft.css`: the dark themes' faint ink `--au-ink-3` is #A4A9B1 (the see-through surfaces are lighter
+than the solid ones #8E939B was chosen for: the Academy audit's AA checks failed), light keeps #5B616A, nothing under
+`prefers-contrast: more`; table header cells read `--au-ink-2`.

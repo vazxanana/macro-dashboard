@@ -18,5 +18,9 @@ test('one look and one default view for every chart on Charts', () => {
 });
 test('green / red candles are one tap in Style; the owner\'s light-theme default stays', () => {
   assert.match(html, /id="ms-sty-tv"[^>]*>Green \/ red candles</);
-  assert.match(html, /\$\('ms-sty-tv'\)\.addEventListener\('click', \(\) => \{ CUS = Object\.assign\(\{\}, CUS, \{ up: UPC, dn: DNC \}\)/);
+  assert.match(html, /\$\('ms-sty-tv'\)\.addEventListener\('click', \(\) => \{ CUS = Object\.assign\(\{\}, CUS, \{ up: UPC, dn: DNC, mono: false \}\)/);
+  // the paper look (24 Nov 2026): one tap too, on once per device, and its candles are the light theme's own
+  assert.match(html, /id="ms-sty-paper"[^>]*>Grey \/ black on white</);
+  assert.match(html, /const PAPER = \{ bg: '#f7f8fa', up: '#c9ccd2', dn: '#131722', mono: true \}/);
+  assert.match(html, /localStorage\.getItem\('ms-paper-v1'\)/);
 });

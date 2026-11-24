@@ -2649,7 +2649,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msThemeMeta();
 })();
 </script>
-<link rel="stylesheet" href="/assets/soft.css?v=a0db0c9f77">
+<link rel="stylesheet" href="/assets/soft.css?v=74a1850eb4">
 <style id="ms-pk-css">
 .gate-pk { margin-top: 10px; }
 .gate-pkb { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: var(--g-ink, #eceef2); font: 600 14.5px Figtree, -apple-system, sans-serif; cursor: pointer; touch-action: manipulation; }
@@ -6766,7 +6766,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Up candles <input type="color" id="ms-sty-up" value="#089981"></label>
         <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
-        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
         <div class="sty-h">Live price</div>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
@@ -7993,7 +7993,18 @@ function msNextSetup(bars, A) {
   let CUS = {}; try { CUS = JSON.parse(localStorage.getItem('ms-colors') || '{}') || {}; } catch (e) { CUS = {}; }
   const hexOk = (v) => /^#[0-9a-f]{6}$/i.test(v || '');
   const lumOf = (h) => { const n = parseInt(h.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
-  const candleCols = () => { const K = themeCols(); if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
+  // paper look (24 Nov 2026, owner's screenshot: "want my charts with these colors"): a light chart with grey rising and black
+  // falling candles, black borders and wicks, on every theme. It is the chart's own colours (ms-colors, flag mono), switched on
+  // once per device (ms-paper-v1); "Theme colours" in Style goes back to the page theme's chart. Display only.
+  const PAPER = { bg: '#f7f8fa', up: '#c9ccd2', dn: '#131722', mono: true };
+  const MONO = { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' };
+  try { if (!localStorage.getItem('ms-paper-v1')) { localStorage.setItem('ms-paper-v1', '1'); if (!localStorage.getItem('ms-colors')) { CUS = Object.assign({}, PAPER); localStorage.setItem('ms-colors', JSON.stringify(CUS)); } } } catch (e) {}
+  // is the chart itself light? (its own background when the member chose one, else the page theme)
+  const chartLight = window.msChartLight = () => hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light';
+  // a chart with its own background: that colour, an ink that reads on it, and the light grid on a light one
+  const cusLook = (chart) => { if (!chart || !hexOk(CUS.bg)) return; const lt = lumOf(CUS.bg) > 0.35; try { chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lt ? '#3b4252' : '#a7b0c2' },
+    grid: { vertLines: { color: lt ? '#e9ecf1' : TV_GRID.dark }, horzLines: { color: lt ? '#e9ecf1' : TV_GRID.dark } }, rightPriceScale: { borderColor: lt ? '#d9dde4' : '#273042' }, timeScale: { borderColor: lt ? '#d9dde4' : '#273042' } }); } catch (e) {} };
+  const candleCols = () => { const K = themeCols(); if (CUS.mono && CUS.up === PAPER.up && CUS.dn === PAPER.dn) return MONO; if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
     const u = hexOk(CUS.up) ? CUS.up : K.upColor, d = hexOk(CUS.dn) ? CUS.dn : K.downColor;
     return { upColor: u, downColor: d, borderUpColor: u, borderDownColor: d, wickUpColor: u, wickDownColor: d }; };
   const themeCols = () => G.theme === 'light'
@@ -8046,7 +8057,7 @@ function msNextSetup(bars, A) {
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
       const HH = ctx.canvas.height / (window.devicePixelRatio || 1);
-      (it.days || []).forEach((i) => { const x = X(i - 0.5); if (x === null) return; ctx.strokeStyle = G.theme === 'light' ? 'rgba(20,30,50,0.07)' : 'rgba(200,210,230,0.06)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, HH); ctx.stroke(); });
+      (it.days || []).forEach((i) => { const x = X(i - 0.5); if (x === null) return; ctx.strokeStyle = chartLight() ? 'rgba(20,30,50,0.07)' : 'rgba(200,210,230,0.06)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, HH); ctx.stroke(); });
       const vrow = []; o._vr = [];
       (it.vlines || []).forEach((v) => {
         const x = X(v.l); if (x === null) return;
@@ -8161,7 +8172,7 @@ function msNextSetup(bars, A) {
         ctx.save(); ctx.globalAlpha = 0.8; ctx.fillStyle = t.bg; ctx.beginPath();   // a soft backing so labels read over candles and zones
         if (ctx.roundRect) ctx.roundRect(x1 - 3, y - 11, w + 6, 15, 3); else ctx.rect(x1 - 3, y - 11, w + 6, 15);
         ctx.fill(); ctx.restore();
-        ctx.textAlign = 'left'; ctx.fillStyle = G.theme === 'light' && tx.color === '#9aa4b8' ? '#5d6577' : tx.color; ctx.fillText(tx.text, x1, y);
+        ctx.textAlign = 'left'; ctx.fillStyle = chartLight() && tx.color === '#9aa4b8' ? '#5d6577' : tx.color; ctx.fillText(tx.text, x1, y);
       }
     });
   }
@@ -8559,7 +8570,7 @@ function msNextSetup(bars, A) {
     // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
     const vol = L.vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
-    const vcol = L.vcol = (b) => G.theme === 'light' ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
+    const vcol = L.vcol = (b) => chartLight() ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     L.setVol = function () { const raw = src().raw, on = raw && raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
     const sessOn = (s) => ['15m', '5m', '1m'].includes(s.tf.id) && G.showShade !== false && !s.crypto;
@@ -8723,7 +8734,7 @@ function msNextSetup(bars, A) {
         out.width = c.width; out.height = c.height + pad * dpr; const x = out.getContext('2d');
         const th = THEMES[G.theme] || THEMES.dark; x.fillStyle = th.bgTop || th.bg; x.fillRect(0, 0, out.width, out.height);
         x.drawImage(c, 0, pad * dpr); x.scale(dpr, dpr);
-        const L = P.bars && P.bars[P.bars.length - 1], ink = G.theme === 'light' ? '#131722' : '#eceef2', dim = G.theme === 'light' ? '#6b7280' : '#8a94a8';
+        const L = P.bars && P.bars[P.bars.length - 1], ink = chartLight() ? '#131722' : '#eceef2', dim = chartLight() ? '#6b7280' : '#8a94a8';
         x.font = '600 15px Figtree, system-ui, sans-serif'; x.fillStyle = ink; x.fillText(`${CUR.label} · ${tf.label}`, 14, 27);
         const w1 = x.measureText(`${CUR.label} · ${tf.label}`).width;
         if (L) { x.font = '600 15px ui-monospace, monospace'; x.fillStyle = L.close >= L.open ? '#2bd4a4' : '#ff5c7a'; x.fillText(fmt(L.close), 26 + w1, 27); }
@@ -8790,7 +8801,7 @@ function msNextSetup(bars, A) {
       const btn = () => el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-tl');
       const mark = (on) => { const b = btn(); if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); } el.classList.toggle('measuring', on || !!P.measureOn || !!P.hlOn || !!P.fibOn || !!P.posOn); };
       P.drawTl = function () { P._tl.forEach((s2) => { try { chart.removeSeries(s2); } catch (e) {} }); P._tl = []; if (!P.bars || !P.bars.length || P.rp) return;
-        const idx = new Map(P.bars.map((b, i) => [b.time, i])), last = P.bars[P.bars.length - 1], col = G.theme === 'light' ? 'rgba(41,98,255,.85)' : 'rgba(94,140,255,.9)';
+        const idx = new Map(P.bars.map((b, i) => [b.time, i])), last = P.bars[P.bars.length - 1], col = chartLight() ? 'rgba(41,98,255,.85)' : 'rgba(94,140,255,.9)';
         get().forEach(([a, pa, b, pb]) => { const ta = a + TZ, tb = b + TZ, ia = idx.get(ta), ib = idx.get(tb); if (ia == null || ib == null || ia === ib) return;
           const [i1, p1, i2, p2] = ia < ib ? [ia, pa, ib, pb] : [ib, pb, ia, pa], t1 = P.bars[i1].time, t2 = P.bars[i2].time, data = [{ time: t1, value: p1 }, { time: t2, value: p2 }];
           if (last.time > t2) data.push({ time: last.time, value: p1 + (p2 - p1) * (P.bars.length - 1 - i1) / (i2 - i1) });
@@ -9036,7 +9047,7 @@ function msNextSetup(bars, A) {
   };
   function drawHLines() { const L = window.msHLines.get();
     Object.values(panes).forEach((P) => { if (!P.series) return; (P._hl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
-      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: G.theme === 'light' ? 'rgba(42,46,57,.7)' : 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
+      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: chartLight() ? 'rgba(42,46,57,.7)' : 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
   setTimeout(drawHLines, 2000);
   // range meter (7 Nov loop): today's range against the 14-day average daily range, and where price sits inside today's range
   function rangeMeter() {
@@ -9317,7 +9328,8 @@ function msNextSetup(bars, A) {
     const save = () => { try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} applyTheme(); };
     [['ms-sty-bg', 'bg'], ['ms-sty-up', 'up'], ['ms-sty-dn', 'dn'], ['ms-sty-ln', 'ln']].forEach(([id, k]) => $(id).addEventListener('input', (e) => { CUS[k] = e.target.value; save(); }));
     $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
-    $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
+    $('ms-sty-paper').addEventListener('click', () => { CUS = Object.assign({}, CUS, PAPER); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
+    $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC, mono: false }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     btn.addEventListener('click', fill); fill();
     // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on
     // 13 Nov 2026, owner: "make the charts more cleaner", then "too much labels just keep bo vr and cf": the clean look keeps the
@@ -9913,7 +9925,7 @@ function msNextSetup(bars, A) {
       p.overlay.set(p.overlay.items);
     });
     if (hexOk(CUS.bg)) { const txt = lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2';
-      Object.values(panes).forEach((p) => { try { p.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: txt } }); } catch (e) {} });
+      Object.values(panes).forEach((p) => { cusLook(p.chart); });
       document.documentElement.style.setProperty('--ms-bg', CUS.bg); } else document.documentElement.style.removeProperty('--ms-bg');
     root.dataset.chart = (hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light') ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
     // owner (7 Nov): on the white (Light) theme the candles are monochrome, like a printed chart: grey up candles and black
@@ -10298,7 +10310,7 @@ function msNextSetup(bars, A) {
   function spControls() { const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym');
     lt.value = SP.ltf; rt.value = spTf(); rt.disabled = SP.sync.tf; sy.value = spSym(); sy.disabled = SP.sync.sym; }
   function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
-    SP.chart.applyOptions(tvLook(t, G.theme)); if (hexOk(CUS.bg)) SP.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2' } });
+    SP.chart.applyOptions(tvLook(t, G.theme)); cusLook(SP.chart); if (hexOk(CUS.bg)) SP.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2' } });
     if (SP.series) SP.series.applyOptions(candleCols()); if (SP.ov) SP.ov.set(SP.ov.items); if (SP.ly) SP.ly.setVol(); }   // repaint the markups (and volume) in the new theme's colours
   window.msSplitTheme = spTheme; window.msSplitMarkup = () => { try { if (SP.on && !spPane()) spMarkup(); } catch (e) {} };
   window.msSplitLayers = () => { try { if (SP.on && !spPane() && SP.ly) SP.ly.setAll(); } catch (e) {} };
@@ -10411,7 +10423,7 @@ function msNextSetup(bars, A) {
       cell.querySelector('.mm-tf').addEventListener('change', (e) => { MM.cells[i].tf = e.target.value; mmSave(); mmLoad(C); });
       if (window.msCharts) window.msCharts.add({ id: 'mm' + i, el, chart, series, bars: () => C.bars, sec: () => (SPTFS.find((t) => t.id === MM.cells[i].tf) || TFS[2]).sec, market: () => MM.cells[i].k, TZ, dec: () => (INSTRUMENTS[MM.cells[i].k] || INST).dec ?? 2, fmt: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST), visible: () => MM.on && i < MM.n && !!el.offsetParent }); }
     MM.built = true; mmTheme(); }
-  function mmTheme() { if (!MM.built) return; const t = THEMES[G.theme] || THEMES.dark; MM.ch.forEach((C) => { C.chart.applyOptions(tvLook(t, G.theme)); C.series.applyOptions(candleCols()); }); }
+  function mmTheme() { if (!MM.built) return; const t = THEMES[G.theme] || THEMES.dark; MM.ch.forEach((C) => { C.chart.applyOptions(tvLook(t, G.theme)); cusLook(C.chart); C.series.applyOptions(candleCols()); }); }
   { const f0 = window.msSplitTheme; window.msSplitTheme = () => { try { if (f0) f0(); } finally { mmTheme(); } }; }
   function mmLay() { if (!MM.built) return; MM.host.dataset.n = MM.n; MM.host.querySelectorAll('[data-mmn]').forEach((b) => { const on = +b.dataset.mmn === MM.n; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     MM.ch.forEach((C) => { C.cell.hidden = C.i >= MM.n; if (C.i < MM.n) { const c = MM.cells[C.i]; C.cell.querySelector('.mm-k').innerHTML = mmOpts(c.k); C.cell.querySelector('.mm-tf').innerHTML = mmTfOpts(c.tf); if (C.key !== c.k + '|' + c.tf) mmLoad(C); } }); }
