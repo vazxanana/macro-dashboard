@@ -949,6 +949,33 @@
     "brokerStop": 3500.64,
     "rollsSeen": 0,
     "closedAt": "2026-11-23T19:46:48.000Z"
+   },
+   "eqx:fade:gbpusd:fade-m15-s1795543200": {
+    "positionId": "51189635",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-24T18:19:41.000Z",
+    "councilEntry": 1.3122,
+    "stop": 1.313136,
+    "t1": 1.310327,
+    "riskCash": 1.34,
+    "margin": 2.62,
+    "minLot": true,
+    "mark": 1.3118,
+    "levelsFrom": "mark",
+    "fillPrice": 1.3117,
+    "slipR": 0.534,
+    "lagSec": 1181,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T18:19:41.000Z",
+    "brokerStop": 1.31304
    }
   },
   "day": {
@@ -958,19 +985,12 @@
    "lastBalance": 500.21,
    "ids": [],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 500.21 · 0 open",
-  "skipped": {
-   "eqx:fade:usdcad:fade-m15-b1795541400": "price 1.4272 is already past the council stop 1.427311"
-  },
+  "status": "ok · demo Fusion Markets · balance 500.21 · 1 open",
+  "skipped": {},
   "wait": {
-   "eqx:fade:gbpusd:fade-m15-s1795531500": {
-    "why": "daily loss stop (95.0% down today)",
-    "n": 0,
-    "at": "2026-11-24T15:44:02.000Z"
-   },
    "eqx:fade:audusd:fade-m15-b1795535100": {
     "why": "daily loss stop (95.0% down today)",
     "n": 0,
@@ -993,7 +1013,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 500.21,
-  "lastRun": "2026-11-24T18:14:15.000Z"
+  "lastRun": "2026-11-24T18:19:41.000Z"
  },
  "log": [
   {
@@ -2373,6 +2393,11 @@
    "at": "2026-11-24T18:13:38.000Z",
    "msg": "not mirrored eqx:fade:usdcad:fade-m15-b1795541400: price 1.4272 is already past the council stop 1.427311",
    "trade": "eqx:fade:usdcad:fade-m15-b1795541400"
+  },
+  {
+   "at": "2026-11-24T18:19:41.000Z",
+   "msg": "opened sell GBPUSD 0.01 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-s1795543200"
   }
  ],
  "limits": {
@@ -2465,7 +2490,16 @@
   ]
  },
  "execution": {
-  "n": 0,
-  "medianLagSec": 24
+  "n": 1,
+  "meanSlipR": 0.534,
+  "medianSlipR": 0.534,
+  "worstSlipR": 0.534,
+  "medianLagSec": 24,
+  "bySymbol": {
+   "GBPUSD": {
+    "n": 1,
+    "meanSlipR": 0.534
+   }
+  }
  }
 }
