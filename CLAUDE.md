@@ -7029,3 +7029,21 @@ intraday rules as ONE desk (the first tab of `/equinox`):
 - The standalone `VolBreakout` bots written the same day were removed on the owner's word ("dont do it").
 - First 60-day read (before costs, not evidence): gold breakout 31 trades +18.9R, USD/JPY breakout 29 +0.2R, gotobi 11 +2.7R.
 A paper desk and a demo record of rules whose studies passed; the forward records judge. Tests: `tests/lyriac.test.mjs` (4).
+
+## Twenty combinations of the owner's methods (24 Nov 2026, owner: "use 20 agents to keep studying, do combinations of the strategies I've given")
+Twenty pre-registered studies, one combination each (PREREGISTRATION.md committed alone before each run; `research/edge/<topic>/`,
+`tests/<topic>.test.mjs`), five markets (xau, eurusd, gbpusd, usdjpy, audusd), discovery 2005-14 and confirmation 2015 to Oct
+2026, judged AFTER the shared costs on month-sum t with Holm. **19 FAIL, 1 INCONCLUSIVE, 0 PASS; nothing live changed, no rule
+proposed.** Best cell after costs in 2015-26 (R a trade, n, month t):
+`h4eg-m15-range-cf` (H4 engulf zone + M15 break / range / confirmation) −0.049 (8,855, −3.36) · `vb-msnr-side` (direction call on
+the breakouts) with the call +0.068 against it +0.121, difference t −0.96: no filter · `ifvg-daily-eg-zone` −0.012 (9,289, −0.80) ·
+`sweep-m5-engulf-limit` −0.121 (3,152, −2.56) · `d1-dom-h1-ef` −0.043 (1,535, −1.10) · `asia-sweep-ifvg` −0.080 (3,425, −2.92; the
+plain close back inside is +0.07 to +0.09 before costs) · `h1-origin-h4-range` (premium / discount) −0.063 (6,470, −3.49) ·
+`eg-chain-msnr-side` −0.107 (8,920, −2.52) · `vb-next-day-eg` −0.082 (980, −2.42) · `gap-level-engulf` −0.018 (5,250, −0.66) ·
+`pdhl-sweep-m5-shift` −0.017 (3,298, −0.70) · `h1-box-retest-engulf` −0.100 (6,443, −3.66) · `h1-qm-h4-turn-m15-eg` INCONCLUSIVE
+(n 172 / 220) · `london-reversal-ny-eg` −0.054 (1,114, −1.32) · `ef-chain-h4-h1-m15` −0.106 (3,152, −5.88) · `dom-h4-vr-overlap`
+−0.034 (17,428, −2.04) · `pair-divergence-ifvg` −0.044 (1,597, −1.22) · `h4-eg-cisd-m15` −0.061 (30,191, −6.49; inside a zone
+loses about 0.05R less than away from one) · `equal-pool-m5-confirm` +0.063 (1,056, 1.41) but −0.076 in 2005-14 · `tl3-m15-engulf`
+−0.121 (2,097, −3.99). The pattern is the one of every earlier grid: about zero before costs, the cost decides, and no key level,
+direction call, session or confluence picks the better trades. Do not re-test variants of these on these years. The agents shared
+one checkout and a three-slot run queue (4 cores); each committed only its own paths.
