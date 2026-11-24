@@ -679,6 +679,12 @@
    "by": "user",
    "change": "cTrader mirror: no new ICT copies on any demo account (owner, 24 Nov); the ICT desk stays paper only",
    "why": "Owner request of 24 Nov 2026, so its demo account can trade the Equinox desks. Copies opened before (none were open) keep following their records with their stops. Undo: a user rule setting c.mirrorIct = true."
+  },
+  {
+   "at": "2026-11-24T23:20:17.000Z",
+   "by": "user",
+   "change": "cTrader mirror: no new shadow copies on any demo account (owner, 24 Nov: \"lyriac alone\"); the Shadows + LIT account takes the Lyriac jobs only",
+   "why": "Owner request of 24 Nov 2026. Demo only. Open shadow copies run to their exits with their stops; the shadow book stays paper. The account then holds the breakout and gotobi demo jobs (Lyriac) alone."
   }
  ],
  "btAt": "2026-11-24T13:58:35.757Z",
@@ -735,7 +741,8 @@
   "lit-off",
   "replica-live-again",
   "dom-demo-6154",
-  "ict-mirror-off"
+  "ict-mirror-off",
+  "shadow-mirror-off"
  ],
  "target": {
   "scalp": "t2"
@@ -750,11 +757,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-24T23:18:20.000Z",
+   "at": "2026-11-24T23:20:17.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-24T23:18:20.000Z",
+   "at": "2026-11-24T23:20:17.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -939,5 +946,6 @@
   "account": "*6154",
   "risk": 0.01
  },
- "mirrorIct": false
+ "mirrorIct": false,
+ "mirrorShadow": false
 }
