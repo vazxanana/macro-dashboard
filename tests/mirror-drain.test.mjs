@@ -7,15 +7,15 @@ import { accountsFor, stillHolds } from '../council/ctrader-mirror.mjs';
 const ACC = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
 const MIRROR = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
 
-test('shadows go to the former LIT account (still the lit book and gotobi\'s); the old Shadows account is the Mosha 6R book since 23 Nov 2026', () => {
+test('shadows go to the former LIT account (still the lit book and gotobi\'s); the old Shadows account was the Mosha 6R book 23-24 Nov 2026 and drains since', () => {
   assert.equal(ACC.mirrorAccounts.shadow, '10152146'); assert.equal(ACC.mirrorAccounts.lit, '10152146');
-  assert.equal(ACC.mirrorAccounts.mosha6, '10152145'); assert.deepEqual(ACC.drain, []);
+  assert.equal(ACC.mirrorAccounts.mosha6, '*155'); assert.deepEqual(ACC.drain, ['10152145']);
   const { groups, byBook } = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACC.mirrorAccounts, drain: ACC.drain });
   assert.equal(byBook.shadow, '10152146');
   const g = Object.fromEntries(groups.map((x) => [x.account, x]));
   assert.deepEqual(g['10152146'].books, ['shadow', 'lit']);
-  assert.deepEqual(g['10152145'], { account: '10152145', books: ['mosha6'] }, 'a normal account again: opens the mosha6 book, manages what it holds');
-  assert.ok(!groups.some((x) => x.drain));
+  assert.deepEqual(g['*155'], { account: '*155', books: ['mosha6'] }, 'the $200 account ending 155 opens the mosha6 book');
+  assert.deepEqual(g['10152145'], { account: '10152145', books: [], drain: true }, 'drained: opens nothing, manages its open copies');
 });
 
 test('a drain entry never replaces an account a book still uses; no drain list = as before', () => {

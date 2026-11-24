@@ -1094,11 +1094,12 @@ test('Mosha 6R: an old, replayed or Kraken-priced record is never OPENED (noCopy
   assert.equal(c['bar-r6-15m-b4'].status, 'stopped'); assert.equal(c['bar-r6-15m-b4'].exitPx, 3594); assert.equal(c['bar-r6-15m-b4'].R, -1);
 });
 
-test('Mosha 6R: copied only while the mosha6 book has its own account; the repo routes it to 10152145', () => {
+test('Mosha 6R: copied only while the mosha6 book has its own account; the repo routes it to the $200 account ending 155 (24 Nov 2026)', () => {
   assert.equal(moshaHasOwnAccount({ council: '1', mosha6: '1' }), false); assert.equal(moshaHasOwnAccount({ council: '1', mosha6: '2' }), true); assert.equal(moshaHasOwnAccount({ council: '', mosha6: '2' }), false);
   const ACCF = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
   const a = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACCF.mirrorAccounts, drain: ACCF.drain });
-  assert.equal(a.byBook.mosha6, '10152145'); assert.deepEqual(a.groups.find((g) => g.account === '10152145').books, ['mosha6']);
+  assert.equal(a.byBook.mosha6, '*155'); assert.deepEqual(a.groups.find((g) => g.account === '*155').books, ['mosha6']);
+  assert.deepEqual(a.groups.find((g) => g.account === '10152145'), { account: '10152145', books: [], drain: true });
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
   assert.match(src, /moshaHasOwnAccount\(byBook\) \? moshaCandidates\(desk\) : \[\]/);
   assert.equal(LIMITS.risk.mosha6, 0.0025);
@@ -1145,4 +1146,17 @@ test('ICT copies stopped: with mirrorIct false every ICT signal is noCopy, kept 
   const ict = [{ id: 'nq-b-1', aset: true, side: 'buy', entry: 1, stop: 0.5, t1: 2, rr: 2 }];
   assert.equal(ictCandidates(ict)[0].noCopy, undefined);
   const off = ictCandidates(ict, false); assert.equal(off.length, 1); assert.equal(off[0].noCopy, true); assert.equal(off[0].id, 'ict:nq-b-1');
+});
+// 24 Nov 2026: an account given by the last digits of its login
+import { pickAccount, mirrorFile } from '../council/ctrader-mirror.mjs';
+test('pickAccount: "*155" = the one demo account whose login ends 155; two matches or a live one find nothing; file names stay digits', () => {
+  const L = [{ ctidTraderAccountId: 1, traderLogin: 10152145, isLive: false }, { ctidTraderAccountId: 2, traderLogin: 50210155, isLive: false }, { ctidTraderAccountId: 3, traderLogin: 70000155, isLive: true }];
+  assert.equal(pickAccount(L, '*155').ctidTraderAccountId, 2);
+  assert.equal(pickAccount(L, '10152145').ctidTraderAccountId, 1); assert.equal(pickAccount(L, '1').ctidTraderAccountId, 1);
+  assert.equal(pickAccount(L.concat({ ctidTraderAccountId: 4, traderLogin: 999155, isLive: false }), '*155'), null, 'two demo matches: none');
+  assert.equal(pickAccount([L[2]], '*155'), null, 'a live account is never picked');
+  assert.equal(pickAccount([{ id: '2', login: '50210155', live: false }], '*155', { id: 'id', login: 'login', live: 'live' }).id, '2');
+  assert.equal(mirrorFile('*155', '9'), 'mirror-155.json'); assert.equal(mirrorFile('9', '9'), 'mirror.json'); assert.match(mirrorFile('*155', '9'), /^mirror(-\d+)?\.json$/);
+  const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
+  assert.equal(acc.mirrorAccounts.mosha6, '*155'); assert.deepEqual(acc.drain, ['10152145']); assert.equal(acc.mirrorAccounts.eqx, '10152144');
 });

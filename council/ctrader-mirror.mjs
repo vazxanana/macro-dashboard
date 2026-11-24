@@ -421,6 +421,15 @@ export const copiedIds = (state) => new Set([...Object.keys((state && state.map)
 // "council:123,ict:456,shadow:789,lit:321,replica:654" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
 export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx'];
 export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : String(t.id).startsWith('eqx:') ? 'eqx' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
+// an account number, or "*<digits>" = the ONE demo account whose login ends with those digits (24 Nov 2026: the owner gives the
+// last digits; two matches, or only a live one, find nothing). f names the fields of the list's entries.
+export function pickAccount(list, spec, f = { id: 'ctidTraderAccountId', login: 'traderLogin', live: 'isLive' }) {
+  const L = Array.isArray(list) ? list : [], sp = String(spec || '').trim(), suf = /^\*(\d{3,})$/.exec(sp);
+  if (suf) { const m = L.filter((a) => a[f.live] === false && String(a[f.login]).endsWith(suf[1])); return m.length === 1 ? m[0] : null; }
+  const n = Number(sp); return L.find((a) => Number(a[f.id]) === n) || L.find((a) => Number(a[f.login]) === n) || null;
+}
+// the state file of an account: digits only, so every reader's mirror(-\d+)?.json pattern holds
+export const mirrorFile = (account, base) => (account === base ? 'mirror.json' : `mirror-${String(account).replace(/\D/g, '')}.json`);
 export function accountsFor(env, cfg) {
   const out = {}, base = String(env.CTRADER_ACCOUNT_ID || '').trim();
   const c = (cfg && cfg.mirrorAccounts) || {}; for (const b of BOOKS) if (c[b] != null && String(c[b]).trim()) out[b] = String(c[b]).trim();
@@ -549,7 +558,6 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
   if (missing.length) { st.status = `not configured: ${missing.join(', ')} missing`; return out; }
   if (String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { st.status = 'refused: CTRADER_ENV must be "demo"'; return out; }
   if (!WS) { st.status = 'no WebSocket in this runtime'; return out; }
-  const accountId = Number(String(env.CTRADER_ACCOUNT_ID).trim());
   if (!st.startedAt) st.startedAt = new Date(now * 1000).toISOString();   // trades before the mirror existed are never copied
 
   let tok = { accessToken: env.CTRADER_ACCESS_TOKEN, refreshToken: env.CTRADER_REFRESH_TOKEN };
@@ -573,7 +581,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES);
     }
     const all = list.ctidTraderAccount || [];
-    const acc = all.find((a) => Number(a.ctidTraderAccountId) === accountId) || all.find((a) => Number(a.traderLogin) === accountId);
+    const acc = pickAccount(all, env.CTRADER_ACCOUNT_ID);
     if (!acc) { st.status = 'refused: CTRADER_ACCOUNT_ID not found for this token'; return out; }
     if (acc.isLive !== false) { st.status = 'refused: the account is not a demo account'; say(st.status); return out; }
     const ctid = Number(acc.ctidTraderAccountId);
@@ -941,11 +949,11 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const eqxFiles = {}; for (const k of EQX.desks) { try { eqxFiles[k] = JSON.parse(fs.readFileSync(path.join(DIR, k, 'desk.json'), 'utf8')); } catch (e) {} }
   const trades = own.concat(ictCandidates(ict, cfg.mirrorIct !== false), eqxHasOwnAccount(byBook) ? eqxCandidates(eqxFiles) : [], replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
-  const fileOf0 = (a) => (a === base ? 'mirror.json' : `mirror-${a}.json`);
+  const fileOf0 = (a) => mirrorFile(a, base);
   const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));
   // what each account has copied (any status, resting orders too; after the owner's reset, if one applies): another account never
   // opens the same trade
-  const fileOf = (acc) => (acc === base ? 'mirror.json' : `mirror-${acc}.json`), held = new Map();
+  const fileOf = (acc) => mirrorFile(acc, base), held = new Map();
   for (const g of groups) { const st = (rd(fileOf(g.account), {}).state) || {}; held.set(g.account, copiedIds(applyReset(st, resetFile).state)); }
   for (const g of groups) {
     const file = fileOf(g.account), prev = rd(file, {});
@@ -962,7 +970,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
       r.alerts = [{ kind: 'summary', n, opens, closes, other: n - opens - closes, catchUp: !(prev.state && prev.state.catchUpAt) && !!r.state.catchUpAt }]; }
     for (const a of r.alerts) allAlerts.push(groups.length > 1 ? { ...a, book: g.drain ? 'old shadow account' : g.books.join('+') } : a);
   }
-  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, ...(g.drain ? { drain: true } : {}), file: g.account === base ? 'mirror.json' : `mirror-${g.account}.json` })) }, null, 1));
+  writeAtomic(path.join(CD, 'mirror-accounts.json'), JSON.stringify({ at: new Date().toISOString(), groups: groups.map((g) => ({ account: g.account, books: g.books, ...(g.drain ? { drain: true } : {}), file: mirrorFile(g.account, base) })) }, null, 1));
   if (tokens && JSON.stringify(tokens) !== JSON.stringify(rd('tokens.json', null))) saveTokens(tokens);
   console.log(`cTrader mirror: ${summaryLines.join(' | ')}`);
   const r = { alerts: allAlerts };

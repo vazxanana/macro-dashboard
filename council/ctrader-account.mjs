@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
-import { unseal, scrubber, accountsFor, BOOKS } from './ctrader-mirror.mjs';
+import { unseal, scrubber, accountsFor, BOOKS, pickAccount } from './ctrader-mirror.mjs';
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
@@ -32,7 +32,7 @@ export async function accountSnapshots({ env, tokens = null, cfg = null, WS = gl
   const out = [];
   for (const g of order) {
     const head = { books: g.books, label: g.drain ? 'Old shadows (draining)' : labelOf(g.books), ...(g.drain ? { drain: true } : {}), base: g.account === base, at: new Date(now).toISOString() };
-    const acc = accounts.find((a) => a.id === g.account) || accounts.find((a) => a.login === g.account);
+    const acc = pickAccount(accounts, g.account, { id: 'id', login: 'login', live: 'live' });
     if (!acc) { out.push({ ...head, error: 'account not found for this token' }); continue; }
     if (acc.live) { out.push({ ...head, error: 'refused: not a demo account' }); continue; }
     try {
