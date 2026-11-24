@@ -15,8 +15,8 @@ const ORDER_CS = /\b(ExecuteMarketOrder|PlaceLimitOrder|PlaceStopOrder|PlaceStop
 const prevCode = (src, i) => { const lines = src.slice(0, i).split('\n'); lines.pop(); while (lines.length && /^\s*(\/\/.*)?$/.test(lines[lines.length - 1])) lines.pop(); return lines[lines.length - 1] || ''; };
 
 test('every order-placing program is covered: the two bridges and the four others', () => {
-  assert.deepEqual(MQ.sort(), ['mt5/BreakFade.mq5', 'mt5/CouncilBridge.mq5', 'mt5/EquinoxBridge.mq5', 'mt5/NQOpenRun.mq5', 'mt5/VolBreakout.mq5']);
-  assert.deepEqual(CS.sort(), ['ctrader/BreakFade.cs', 'ctrader/CouncilBridge.cs', 'ctrader/CryptoScalper.cs', 'ctrader/CryptoTrend.cs', 'ctrader/VolBreakout.cs']);
+  assert.deepEqual(MQ.sort(), ['mt5/BreakFade.mq5', 'mt5/CouncilBridge.mq5', 'mt5/EquinoxBridge.mq5', 'mt5/NQOpenRun.mq5']);
+  assert.deepEqual(CS.sort(), ['ctrader/BreakFade.cs', 'ctrader/CouncilBridge.cs', 'ctrader/CryptoScalper.cs', 'ctrader/CryptoTrend.cs']);
   for (const f of [...MQ, ...CS]) assert.ok([...rd(f).matchAll(f.endsWith('.cs') ? ORDER_CS : ORDER_MQ)].length > 0, f + ' sends orders');
 });
 
@@ -65,14 +65,4 @@ test('BreakFade.mq5 is the same rule as the cBot: 3-candle swings, ATR 14, 1 ATR
   for (const re of [/#define BF_SWING 3\b/, /#define BF_ATRN 14\b/, /#define BF_STOP_ATR 1\.0/, /#define BF_TARGET_R 2\.0/, /#define BF_HOLD_SEC 86400/, /input bool\s+InpDryRun\s+= true;/,
     /if \(PositionGetDouble\(POSITION_SL\) <= 0\) \{ Print\([^;]*it has no stop"\); trade\.PositionClose\(t\);/, /stop = NormalizeDouble\(fill \+ dir \* dist, dg\)/, /LOSES AFTER/]) assert.match(s, re);
   assert.match(rd('mt5/README.md'), /# BreakFade\.mq5/);
-});
-
-test('VolBreakout (cTrader and MetaTrader): the T1 rule of the demo job: half the previous range, stop at the open, 21:00 UTC, first 20 minutes, dry run by default', () => {
-  const vb = rd('council/vb-demo.mjs'); assert.match(vb, /export const K = 0\.5, EXIT_S = 21 \* 3600, PLACE_FROM = 15, PLACE_UNTIL = 1200/);
-  const cs = rd('ctrader/VolBreakout.cs'), mq = rd('mt5/VolBreakout.mq5');
-  for (const re of [/private const double K = 0\.5;/, /private const int PlaceUntilMin = 20;/, /private const int ExitHour = 21;/, /DefaultValue = "XAUUSD,USDJPY"/, /\[Parameter\("Dry run \(log only, no orders\)", DefaultValue = true\)\]/,
-    /if \(hi >= buyAt \|\| lo <= sellAt\)/, /if \(!p\.StopLoss\.HasValue\) \{ Print\([^;]*it has no stop", name\); ClosePosition\(p\); \}/, /TimeZone = TimeZones\.UTC/]) assert.match(cs, re);
-  for (const re of [/#define VB_K 0\.5/, /#define VB_PLACE_UNTIL_S 1200/, /#define VB_EXIT_S 75600/, /input string InpSymbols\s+= "XAUUSD,USDJPY";/, /input bool\s+InpDryRun\s+= true;/, /if \(hi >= buyAt \|\| lo <= sellAt\)/, /stop = NormalizeDouble\(O, dg\)/,
-    /void OnTimer\(\) \{\s*if \(!DemoOnly\(\)\) return;/]) assert.match(mq, re);
-  for (const f of ['ctrader/README.md', 'mt5/README.md']) assert.match(rd(f), /# VolBreakout\./);
 });

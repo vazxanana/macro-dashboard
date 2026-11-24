@@ -7007,13 +7007,3 @@ A member's own MetaTrader 5 follows the Equinox desks; no broker login or passwo
   program on GitHub); hidden for guests and accounts without the desks; keeps nothing in the browser.
 - The desks are paper records of rules that lose after costs: a demo feed, never advice. Sending to real accounts would need the
   owner to change absolute rule 2. Tests: `tests/eqx-bridge.test.mjs` (5), `tests/bridge-demo.test.mjs`.
-
-## VolBreakout: the two passing breakouts as standalone bots (24 Nov 2026, owner: "make the ultimate edge")
-The honest answer to "the ultimate edge" is the passing rules as one book (`research/edge/passing-rules-book`: five rules at 1R,
-2016 → Nov 2026, +43.6R a year, month t 4.81, worst closed drawdown −49.8R; in-sample years, a description, not evidence), of
-which the gold and USD/JPY breakouts are about 31R a year. `ctrader/VolBreakout.cs` and `mt5/VolBreakout.mq5` trade that T1
-rule exactly as `council/vb-demo.mjs` does (K 0.5 of the previous trading day's range with weekend candles in the next weekday,
-orders in the first 20 minutes of a UTC weekday, stop at the open, a day already through a level is missed, out at 21:00 UTC;
-a test compares the constants). `DemoOnly()` before every order, dry run by default, a position without a stop is closed. Not
-compiled here. The gotobi fade, the pre-holiday and the Tuesday rules are not in the bots (they need the Tokyo and US holiday
-calendars). Never add a filter, break-even or trail to it: each was tested and failed.
