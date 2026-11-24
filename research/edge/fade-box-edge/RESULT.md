@@ -1,6 +1,6 @@
 # The box-close-out fade, made to pay its costs: three candidates on unread data (result)
 
-**Verdict: FAIL. No candidate clears its costs on both unread sets; the best, E1 (M15 box fade, stops of 8+ round trips, trailing exit), made +0.017R a trade after costs on D (n 3,085, month t 0.74) and +0.043R on E (n 4,190, t 1.86).**
+**Verdict: FAIL. No candidate clears its costs on both unread sets; the best, E1 (M15 box fade, 8+ round-trip stops, trailing exit), made +0.017R a trade after costs on D (n 3,085, t 0.74) and +0.043R on E (n 4,190, t 1.86).**
 
 Run 24 Nov 2026 as pre-registered (`PREREGISTRATION.md`, committed and pushed alone first, commit eef3f17). Research only:
 nothing live changed, nothing was placed. No candidate here is an edge.
