@@ -976,6 +976,32 @@
     ],
     "stopCheckedAt": "2026-11-24T18:19:41.000Z",
     "brokerStop": 1.31304
+   },
+   "eqx:fade:gbpusd:fade-m15-b1795554900": {
+    "positionId": "51239602",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-24T21:31:08.000Z",
+    "councilEntry": 1.31134,
+    "stop": 1.310916,
+    "t1": 1.312187,
+    "riskCash": 1.25,
+    "margin": 5.25,
+    "mark": 1.31154,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31148,
+    "slipR": 0.33,
+    "lagSec": 968,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T21:31:08.000Z",
+    "brokerStop": 1.31086
    }
   },
   "day": {
@@ -987,10 +1013,10 @@
     "51189635"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 500.21 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 500.21 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fade:audusd:fade-m15-b1795535100": {
@@ -1002,11 +1028,6 @@
     "why": "daily loss stop (95.0% down today)",
     "n": 0,
     "at": "2026-11-24T17:13:31.000Z"
-   },
-   "eqx:goldvb:goldvb-s1795536000": {
-    "why": "daily loss stop (95.0% down today)",
-    "n": 0,
-    "at": "2026-11-24T16:58:04.000Z"
    },
    "eqx:fade:fade-m15-b1795545900": {
     "why": "XAUUSD: even the minimum lot (0.01) risks 13.39, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
@@ -1025,14 +1046,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 500.21,
-  "lastRun": "2026-11-24T21:26:49.000Z"
+  "lastRun": "2026-11-24T21:31:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T12:39:39.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 12:47 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T12:47:47.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2517,6 +2533,11 @@
    "at": "2026-11-24T19:33:45.000Z",
    "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 31.24, 6.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
+  },
+  {
+   "at": "2026-11-24T21:31:08.000Z",
+   "msg": "opened buy GBPUSD 0.02 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795554900"
   }
  ],
  "limits": {
@@ -2609,15 +2630,15 @@
   ]
  },
  "execution": {
-  "n": 1,
-  "meanSlipR": 0.534,
-  "medianSlipR": 0.534,
+  "n": 2,
+  "meanSlipR": 0.432,
+  "medianSlipR": 0.432,
   "worstSlipR": 0.534,
   "medianLagSec": 24,
   "bySymbol": {
    "GBPUSD": {
-    "n": 1,
-    "meanSlipR": 0.534
+    "n": 2,
+    "meanSlipR": 0.432
    }
   }
  }
