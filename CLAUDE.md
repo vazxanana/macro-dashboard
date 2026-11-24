@@ -3496,7 +3496,7 @@ round-number, box fade and USD/JPY breakout are NOT copied), the Mosha 6R patter
 the usual path (stop required, spread skip, `ensureStop`, caps); only a record first written and filled within `EQX.fresh` 1 h and not
 more than `EQX.maxFloat` 0.75R from its entry at the desk's last reading is OPENED (else `noCopy`, kept so an earlier copy follows its
 record); closed ones stay `EQX.keep` 2 days so the copy closes with them; no market = gold; one per desk, market, side and fill time;
-ids `eqx:<desk>:<record id>`. Risk `LIMITS.risk.eqx` 0.25 % of the balance; at most `EQX.maxOpen` 30 eqx positions at once (the
+ids `eqx:<desk>:<record id>`. Risk `LIMITS.risk.eqx` 1 % of the balance (owner, 24 Nov 2026; 0.25 % before); at most `EQX.maxOpen` 30 eqx positions at once (the
 account's 40 cap and the 2 % daily loss stop also apply). `SYMBOLS` gained nzdusd, usdjpy, eurjpy, xag (so `ctrader-symbols.mjs`
 reads their specs; USD/JPY and EUR/JPY leave the yen watch-only list's "never in symbols" rule). Copied only while `eqx` has its own
 account (`eqxHasOwnAccount`). Trader rule `ict-mirror-off` sets `config.mirrorIct = false`: `ictCandidates(ict, false)` marks every
@@ -7031,6 +7031,9 @@ intraday rules as ONE desk (the first tab of `/equinox`):
   then holds the breakout and gotobi jobs only. Undo: a rule setting it true.
 - The standalone `VolBreakout` bots written the same day were removed on the owner's word ("dont do it").
 - First 60-day read (before costs, not evidence): gold breakout 31 trades +18.9R, USD/JPY breakout 29 +0.2R, gotobi 11 +2.7R.
+- **1 % a trade** (owner, 24 Nov 2026: "increase the risk of equinox to 1% and Lyriac to 1%"): Trader rule `lyriac-risk-1` sets
+  `config.vb.risk` and `config.gotobi.risk` to 0.01 (the most either job allows); the Equinox copies' `LIMITS.risk.eqx` is 0.01 too.
+  The mirror's daily loss stop is 2 % of the balance, so two Equinox stop-outs in a UTC day hold its new copies until the next day.
 A paper desk and a demo record of rules whose studies passed; the forward records judge. Tests: `tests/lyriac.test.mjs` (4).
 
 ## Twenty combinations of the owner's methods (24 Nov 2026, owner: "use 20 agents to keep studying, do combinations of the strategies I've given")

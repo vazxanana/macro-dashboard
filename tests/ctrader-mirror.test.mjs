@@ -1141,7 +1141,7 @@ test('Equinox: open, fresh records of the four desks become eqx candidates; stal
   assert.ok(by['eqx:bigfade:old'].noCopy && by['eqx:bigfade:far'].noCopy, 'late or far records are kept but never opened');
   assert.equal(by['eqx:fvg:done'].status, 'win');
   for (const t of c) { assert.equal(bookOf(t), 'eqx'); assert.ok((t.side === 'sell' ? -1 : 1) * (t.entry - t.stop) > 0, 'stop on the losing side'); }
-  assert.equal(EQX.maxOpen, 30); assert.equal(LIMITS.risk.eqx, 0.0025);
+  assert.equal(EQX.maxOpen, 30); assert.equal(LIMITS.risk.eqx, 0.01);
   assert.equal(eqxHasOwnAccount({ council: '1', eqx: '1' }), false); assert.equal(eqxHasOwnAccount({ council: '1', eqx: '2' }), true);
 });
 test('ICT copies stopped: with mirrorIct false every ICT signal is noCopy, kept in the list', () => {
