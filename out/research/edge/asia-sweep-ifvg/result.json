@@ -1,0 +1,727 @@
+{
+ "study": "asia-sweep-ifvg",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 2 judged cells pass; the best, ifvg far, made -0.080R a trade after costs in 2015-26 (n 3,425, month t -2.92; discovery -0.048R, n 2,638, t -1.64)",
+ "best": "ifvg far",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31",
+  "confirmation": "2015-01-01 to 2026-10-31"
+ },
+ "costs": {
+  "xau": 0.3,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006
+ },
+ "markets": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "last": "2026-10-30",
+   "counts": {
+    "days": 5359,
+    "notFresh": 2702,
+    "noRange": 54,
+    "sweeps": 2472,
+    "ifvg no trigger": 639,
+    "ifvg trigger": 1496,
+    "ifvg cancelled": 332,
+    "ifvg no gap": 5
+   }
+  },
+  {
+   "market": "eurusd",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "counts": {
+    "days": 5688,
+    "sweeps": 3311,
+    "ifvg trigger": 1551,
+    "ifvg cancelled": 965,
+    "notFresh": 3581,
+    "ifvg no trigger": 792,
+    "noRange": 26,
+    "ifvg no gap": 3
+   }
+  },
+  {
+   "market": "gbpusd",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "counts": {
+    "days": 5688,
+    "sweeps": 3568,
+    "ifvg trigger": 1567,
+    "notFresh": 3781,
+    "ifvg cancelled": 1250,
+    "ifvg no trigger": 748,
+    "noRange": 27,
+    "ifvg no gap": 3
+   }
+  },
+  {
+   "market": "usdjpy",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "counts": {
+    "days": 5688,
+    "sweeps": 2458,
+    "ifvg no trigger": 704,
+    "ifvg cancelled": 278,
+    "notFresh": 2481,
+    "ifvg trigger": 1468,
+    "noRange": 24,
+    "ifvg no gap": 8
+   }
+  },
+  {
+   "market": "audusd",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "counts": {
+    "days": 5688,
+    "sweeps": 2390,
+    "ifvg no trigger": 647,
+    "notFresh": 2682,
+    "ifvg cancelled": 180,
+    "ifvg trigger": 1558,
+    "noRange": 29,
+    "ifvg no gap": 5
+   }
+  }
+ ],
+ "cells": [
+  {
+   "cell": "ifvg mid",
+   "judged": true,
+   "disc": {
+    "n": 1957,
+    "win": 0.5084,
+    "before": 0.0081,
+    "after": -0.0607,
+    "tBefore": 0.3674,
+    "tAfter": -2.7218,
+    "months": 120
+   },
+   "conf": {
+    "n": 2661,
+    "win": 0.4919,
+    "before": -0.005,
+    "after": -0.0844,
+    "tBefore": -0.2249,
+    "tAfter": -3.8241,
+    "months": 142
+   },
+   "sides": {
+    "buy": {
+     "disc": {
+      "n": 923,
+      "after": -0.0768
+     },
+     "conf": {
+      "n": 1312,
+      "after": -0.0684
+     }
+    },
+    "sell": {
+     "disc": {
+      "n": 1034,
+      "after": -0.0464
+     },
+     "conf": {
+      "n": 1349,
+      "after": -0.1
+     }
+    }
+   },
+   "exits": {
+    "stop": 2262,
+    "target": 2248,
+    "time": 108
+   },
+   "skips": {
+    "target too near": 2755,
+    "excluded": 4,
+    "no next candle": 1
+   },
+   "markets": {
+    "xau": {
+     "disc": {
+      "n": 349,
+      "win": 0.4957,
+      "before": -0.0245,
+      "after": -0.1642,
+      "tBefore": -0.4233,
+      "tAfter": -2.7511,
+      "months": 120
+     },
+     "conf": {
+      "n": 548,
+      "win": 0.4745,
+      "before": -0.0342,
+      "after": -0.1462,
+      "tBefore": -0.6837,
+      "tAfter": -2.84,
+      "months": 142
+     }
+    },
+    "eurusd": {
+     "disc": {
+      "n": 322,
+      "win": 0.5186,
+      "before": -0.0059,
+      "after": -0.0458,
+      "tBefore": -0.131,
+      "tAfter": -1.0162,
+      "months": 120
+     },
+     "conf": {
+      "n": 456,
+      "win": 0.5724,
+      "before": 0.071,
+      "after": 0.0055,
+      "tBefore": 1.4183,
+      "tAfter": 0.1103,
+      "months": 142
+     }
+    },
+    "gbpusd": {
+     "disc": {
+      "n": 326,
+      "win": 0.5521,
+      "before": 0.0275,
+      "after": -0.0199,
+      "tBefore": 0.5004,
+      "tAfter": -0.3601,
+      "months": 120
+     },
+     "conf": {
+      "n": 376,
+      "win": 0.5186,
+      "before": -0.0099,
+      "after": -0.0732,
+      "tBefore": -0.1974,
+      "tAfter": -1.4711,
+      "months": 142
+     }
+    },
+    "usdjpy": {
+     "disc": {
+      "n": 468,
+      "win": 0.547,
+      "before": 0.1298,
+      "after": 0.0571,
+      "tBefore": 2.6779,
+      "tAfter": 1.1871,
+      "months": 120
+     },
+     "conf": {
+      "n": 602,
+      "win": 0.4585,
+      "before": -0.0356,
+      "after": -0.1115,
+      "tBefore": -0.7394,
+      "tAfter": -2.3247,
+      "months": 142
+     }
+    },
+    "audusd": {
+     "disc": {
+      "n": 492,
+      "win": 0.4451,
+      "before": -0.0881,
+      "after": -0.1363,
+      "tBefore": -1.8303,
+      "tAfter": -2.8081,
+      "months": 120
+     },
+     "conf": {
+      "n": 679,
+      "win": 0.4669,
+      "before": -0.0026,
+      "after": -0.077,
+      "tBefore": -0.0604,
+      "tAfter": -1.806,
+      "months": 142
+     }
+    }
+   },
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "cell": "ifvg far",
+   "judged": true,
+   "disc": {
+    "n": 2638,
+    "win": 0.37,
+    "before": 0.0184,
+    "after": -0.0483,
+    "tBefore": 0.6329,
+    "tAfter": -1.6443,
+    "months": 120
+   },
+   "conf": {
+    "n": 3425,
+    "win": 0.3492,
+    "before": -0.0044,
+    "after": -0.0804,
+    "tBefore": -0.1578,
+    "tAfter": -2.9162,
+    "months": 142
+   },
+   "sides": {
+    "buy": {
+     "disc": {
+      "n": 1280,
+      "after": -0.0652
+     },
+     "conf": {
+      "n": 1694,
+      "after": -0.0935
+     }
+    },
+    "sell": {
+     "disc": {
+      "n": 1358,
+      "after": -0.0323
+     },
+     "conf": {
+      "n": 1731,
+      "after": -0.0675
+     }
+    }
+   },
+   "exits": {
+    "stop": 3732,
+    "target": 1770,
+    "time": 561
+   },
+   "skips": {
+    "target too near": 1310,
+    "excluded": 4,
+    "no next candle": 1
+   },
+   "markets": {
+    "xau": {
+     "disc": {
+      "n": 505,
+      "win": 0.3644,
+      "before": -0.0263,
+      "after": -0.1602,
+      "tBefore": -0.3661,
+      "tAfter": -2.1808,
+      "months": 120
+     },
+     "conf": {
+      "n": 688,
+      "win": 0.3474,
+      "before": 0.0069,
+      "after": -0.1032,
+      "tBefore": 0.1103,
+      "tAfter": -1.6348,
+      "months": 142
+     }
+    },
+    "eurusd": {
+     "disc": {
+      "n": 476,
+      "win": 0.4034,
+      "before": 0.1313,
+      "after": 0.0922,
+      "tBefore": 1.9799,
+      "tAfter": 1.3927,
+      "months": 120
+     },
+     "conf": {
+      "n": 656,
+      "win": 0.3933,
+      "before": 0.0914,
+      "after": 0.0288,
+      "tBefore": 1.8105,
+      "tAfter": 0.5761,
+      "months": 142
+     }
+    },
+    "gbpusd": {
+     "disc": {
+      "n": 474,
+      "win": 0.4008,
+      "before": 0.065,
+      "after": 0.0201,
+      "tBefore": 1.0038,
+      "tAfter": 0.309,
+      "months": 120
+     },
+     "conf": {
+      "n": 567,
+      "win": 0.3439,
+      "before": -0.0674,
+      "after": -0.1275,
+      "tBefore": -1.1352,
+      "tAfter": -2.1475,
+      "months": 142
+     }
+    },
+    "usdjpy": {
+     "disc": {
+      "n": 573,
+      "win": 0.349,
+      "before": -0.0018,
+      "after": -0.0715,
+      "tBefore": -0.0299,
+      "tAfter": -1.2024,
+      "months": 120
+     },
+     "conf": {
+      "n": 720,
+      "win": 0.3264,
+      "before": -0.0738,
+      "after": -0.147,
+      "tBefore": -1.4222,
+      "tAfter": -2.8357,
+      "months": 142
+     }
+    },
+    "audusd": {
+     "disc": {
+      "n": 610,
+      "win": 0.3443,
+      "before": -0.0501,
+      "after": -0.0966,
+      "tBefore": -0.8092,
+      "tAfter": -1.5462,
+      "months": 120
+     },
+     "conf": {
+      "n": 794,
+      "win": 0.3388,
+      "before": 0.0147,
+      "after": -0.0565,
+      "tBefore": 0.2864,
+      "tAfter": -1.1054,
+      "months": 142
+     }
+    }
+   },
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "cell": "reclaim mid",
+   "judged": false,
+   "disc": {
+    "n": 4460,
+    "win": 0.3608,
+    "before": 0.0701,
+    "after": -0.0849,
+    "tBefore": 2.497,
+    "tAfter": -2.9866,
+    "months": 120
+   },
+   "conf": {
+    "n": 5518,
+    "win": 0.3478,
+    "before": 0.0672,
+    "after": -0.1125,
+    "tBefore": 2.4968,
+    "tAfter": -4.2392,
+    "months": 142
+   },
+   "sides": {
+    "buy": {
+     "disc": {
+      "n": 2248,
+      "after": -0.1091
+     },
+     "conf": {
+      "n": 2694,
+      "after": -0.122
+     }
+    },
+    "sell": {
+     "disc": {
+      "n": 2212,
+      "after": -0.0603
+     },
+     "conf": {
+      "n": 2824,
+      "after": -0.1035
+     }
+    }
+   },
+   "exits": {
+    "stop": 6422,
+    "target": 3479,
+    "time": 77
+   },
+   "skips": {
+    "no next candle": 3,
+    "target too near": 878,
+    "risk not above the cost": 18,
+    "excluded": 11
+   },
+   "markets": {
+    "xau": {
+     "disc": {
+      "n": 819,
+      "win": 0.3883,
+      "before": 0.0205,
+      "after": -0.255,
+      "tBefore": 0.388,
+      "tAfter": -4.6148,
+      "months": 120
+     },
+     "conf": {
+      "n": 1064,
+      "win": 0.3299,
+      "before": -0.0508,
+      "after": -0.293,
+      "tBefore": -0.9555,
+      "tAfter": -5.3426,
+      "months": 142
+     }
+    },
+    "eurusd": {
+     "disc": {
+      "n": 932,
+      "win": 0.3841,
+      "before": 0.0741,
+      "after": -0.0314,
+      "tBefore": 1.4925,
+      "tAfter": -0.6399,
+      "months": 120
+     },
+     "conf": {
+      "n": 1212,
+      "win": 0.3977,
+      "before": 0.1696,
+      "after": 0.0106,
+      "tBefore": 2.8179,
+      "tAfter": 0.178,
+      "months": 142
+     }
+    },
+    "gbpusd": {
+     "disc": {
+      "n": 945,
+      "win": 0.3915,
+      "before": 0.1078,
+      "after": -0.0132,
+      "tBefore": 2.0418,
+      "tAfter": -0.2467,
+      "months": 120
+     },
+     "conf": {
+      "n": 1129,
+      "win": 0.3826,
+      "before": 0.0522,
+      "after": -0.1058,
+      "tBefore": 1.0291,
+      "tAfter": -2.109,
+      "months": 142
+     }
+    },
+    "usdjpy": {
+     "disc": {
+      "n": 896,
+      "win": 0.3527,
+      "before": 0.1172,
+      "after": -0.0422,
+      "tBefore": 1.6878,
+      "tAfter": -0.607,
+      "months": 120
+     },
+     "conf": {
+      "n": 1045,
+      "win": 0.3158,
+      "before": 0.0668,
+      "after": -0.1031,
+      "tBefore": 1.0951,
+      "tAfter": -1.6999,
+      "months": 142
+     }
+    },
+    "audusd": {
+     "disc": {
+      "n": 868,
+      "win": 0.2846,
+      "before": 0.0231,
+      "after": -0.1039,
+      "tBefore": 0.3284,
+      "tAfter": -1.483,
+      "months": 120
+     },
+     "conf": {
+      "n": 1068,
+      "win": 0.3034,
+      "before": 0.0847,
+      "after": -0.0888,
+      "tBefore": 1.4111,
+      "tAfter": -1.5061,
+      "months": 142
+     }
+    }
+   }
+  },
+  {
+   "cell": "reclaim far",
+   "judged": false,
+   "disc": {
+    "n": 4634,
+    "win": 0.2346,
+    "before": 0.0749,
+    "after": -0.0768,
+    "tBefore": 2.0053,
+    "tAfter": -2.0196,
+    "months": 120
+   },
+   "conf": {
+    "n": 5712,
+    "win": 0.2271,
+    "before": 0.0914,
+    "after": -0.0847,
+    "tBefore": 2.538,
+    "tAfter": -2.3881,
+    "months": 142
+   },
+   "sides": {
+    "buy": {
+     "disc": {
+      "n": 2337,
+      "after": -0.1121
+     },
+     "conf": {
+      "n": 2791,
+      "after": -0.1197
+     }
+    },
+    "sell": {
+     "disc": {
+      "n": 2297,
+      "after": -0.0409
+     },
+     "conf": {
+      "n": 2921,
+      "after": -0.0513
+     }
+    }
+   },
+   "exits": {
+    "stop": 7899,
+    "target": 2055,
+    "time": 392
+   },
+   "skips": {
+    "no next candle": 3,
+    "target too near": 510,
+    "risk not above the cost": 18,
+    "excluded": 11
+   },
+   "markets": {
+    "xau": {
+     "disc": {
+      "n": 851,
+      "win": 0.2468,
+      "before": 0.018,
+      "after": -0.2519,
+      "tBefore": 0.2301,
+      "tAfter": -3.0982,
+      "months": 120
+     },
+     "conf": {
+      "n": 1085,
+      "win": 0.2138,
+      "before": -0.0009,
+      "after": -0.2405,
+      "tBefore": -0.0118,
+      "tAfter": -3.069,
+      "months": 142
+     }
+    },
+    "eurusd": {
+     "disc": {
+      "n": 977,
+      "win": 0.2477,
+      "before": 0.1578,
+      "after": 0.0552,
+      "tBefore": 2.1106,
+      "tAfter": 0.7468,
+      "months": 120
+     },
+     "conf": {
+      "n": 1287,
+      "win": 0.2572,
+      "before": 0.2144,
+      "after": 0.0602,
+      "tBefore": 2.6709,
+      "tAfter": 0.7542,
+      "months": 142
+     }
+    },
+    "gbpusd": {
+     "disc": {
+      "n": 998,
+      "win": 0.2465,
+      "before": 0.1162,
+      "after": -0.0015,
+      "tBefore": 1.6181,
+      "tAfter": -0.0204,
+      "months": 120
+     },
+     "conf": {
+      "n": 1205,
+      "win": 0.2382,
+      "before": 0.0839,
+      "after": -0.0681,
+      "tBefore": 1.2373,
+      "tAfter": -1.0285,
+      "months": 142
+     }
+    },
+    "usdjpy": {
+     "disc": {
+      "n": 922,
+      "win": 0.2332,
+      "before": 0.0411,
+      "after": -0.1154,
+      "tBefore": 0.4664,
+      "tAfter": -1.2991,
+      "months": 120
+     },
+     "conf": {
+      "n": 1054,
+      "win": 0.2049,
+      "before": -0.0291,
+      "after": -0.1981,
+      "tBefore": -0.3679,
+      "tAfter": -2.5134,
+      "months": 142
+     }
+    },
+    "audusd": {
+     "disc": {
+      "n": 886,
+      "win": 0.1964,
+      "before": 0.0266,
+      "after": -0.0988,
+      "tBefore": 0.2578,
+      "tAfter": -0.9549,
+      "months": 120
+     },
+     "conf": {
+      "n": 1081,
+      "win": 0.2137,
+      "before": 0.1633,
+      "after": -0.0089,
+      "tBefore": 1.8623,
+      "tAfter": -0.1023,
+      "months": 142
+     }
+    }
+   }
+  }
+ ]
+}

@@ -1,0 +1,532 @@
+{
+ "study": "vb-msnr-side",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/vb-msnr-side/PREREGISTRATION.md",
+ "planSha256": "c6b554ecdf35bf7cdc7d7ba53a893b60117e966a71bc861eff5b8e70d9e59910",
+ "verdict": "FAIL",
+ "headline": "best WITH cell xau WITH +0.068R a trade after costs in 2015-26 (n 1107, month t 1.81) against +0.121R AGAINST the call (n 1132); WITH minus AGAINST -0.054R (Welch t -0.96), 2005-14 +0.040R (t 0.55).",
+ "windows": {
+  "disc": [
+   "2005-01-01",
+   "2014-12-31"
+  ],
+  "conf": [
+   "2015-01-01",
+   "2026-10-31"
+  ]
+ },
+ "costs": {
+  "xau": "gold-vol-breakout-hourcost C1: hour spread profile + commission + 0.05 x M",
+  "usdjpy": "0.000045 of the entry + 0.5 pip a round trip"
+ },
+ "gate": [
+  {
+   "market": "xau",
+   "from": "2007-01-01",
+   "to": "2011-12-31",
+   "want": {
+    "n": 929,
+    "netR": 0.202
+   },
+   "got": {
+    "n": 929,
+    "netR": 0.202
+   },
+   "ok": true
+  },
+  {
+   "market": "xau",
+   "from": "2012-01-01",
+   "to": "2015-12-31",
+   "want": {
+    "n": 728,
+    "netR": 0.17
+   },
+   "got": {
+    "n": 728,
+    "netR": 0.17
+   },
+   "ok": true
+  },
+  {
+   "market": "xau",
+   "from": "2016-01-01",
+   "to": "2020-12-31",
+   "want": {
+    "n": 935,
+    "netR": 0.094
+   },
+   "got": {
+    "n": 935,
+    "netR": 0.094
+   },
+   "ok": true
+  },
+  {
+   "market": "xau",
+   "from": "2021-01-01",
+   "to": "2026-11-12",
+   "want": {
+    "n": 1121,
+    "netR": 0.105
+   },
+   "got": {
+    "n": 1121,
+    "netR": 0.105
+   },
+   "ok": true
+  },
+  {
+   "market": "usdjpy",
+   "from": "2005-01-04",
+   "to": "2015-12-31",
+   "want": {
+    "n": 2089,
+    "netR": 0.079
+   },
+   "got": {
+    "n": 2089,
+    "netR": 0.079
+   },
+   "ok": true
+  },
+  {
+   "market": "usdjpy",
+   "from": "2016-01-01",
+   "to": "2026-11-19",
+   "want": {
+    "n": 2079,
+    "netR": 0.063
+   },
+   "got": {
+    "n": 2079,
+    "netR": 0.063
+   },
+   "ok": true
+  }
+ ],
+ "gateOk": true,
+ "cells": [
+  {
+   "cell": "xau WITH",
+   "set": "xau",
+   "group": "WITH",
+   "disc": {
+    "n": 806,
+    "gross": 0.227,
+    "mean": 0.212,
+    "t": 4.06,
+    "months": 105
+   },
+   "conf": {
+    "n": 1107,
+    "gross": 0.084,
+    "mean": 0.068,
+    "t": 1.81,
+    "months": 142
+   },
+   "p": 0.035,
+   "holm": 0.106,
+   "profit": false,
+   "adds": false,
+   "pass": false
+  },
+  {
+   "cell": "xau AGAINST",
+   "set": "xau",
+   "group": "AGAINST",
+   "disc": {
+    "n": 795,
+    "gross": 0.187,
+    "mean": 0.172,
+    "t": 3.56,
+    "months": 105
+   },
+   "conf": {
+    "n": 1132,
+    "gross": 0.138,
+    "mean": 0.121,
+    "t": 2.99,
+    "months": 142
+   },
+   "p": 0.001,
+   "holm": 0.007,
+   "profit": true,
+   "adds": false,
+   "pass": false
+  },
+  {
+   "cell": "usdjpy WITH",
+   "set": "usdjpy",
+   "group": "WITH",
+   "disc": {
+    "n": 941,
+    "gross": 0.168,
+    "mean": 0.139,
+    "t": 3.51,
+    "months": 119
+   },
+   "conf": {
+    "n": 1150,
+    "gross": 0.089,
+    "mean": 0.056,
+    "t": 1.48,
+    "months": 142
+   },
+   "p": 0.07,
+   "holm": 0.139,
+   "profit": false,
+   "adds": false,
+   "pass": false
+  },
+  {
+   "cell": "usdjpy AGAINST",
+   "set": "usdjpy",
+   "group": "AGAINST",
+   "disc": {
+    "n": 940,
+    "gross": 0.068,
+    "mean": 0.039,
+    "t": 0.9,
+    "months": 119
+   },
+   "conf": {
+    "n": 1113,
+    "gross": 0.082,
+    "mean": 0.05,
+    "t": 1.38,
+    "months": 142
+   },
+   "p": 0.084,
+   "holm": 0.139,
+   "profit": false,
+   "adds": false,
+   "pass": false
+  },
+  {
+   "cell": "both WITH",
+   "set": "both",
+   "group": "WITH",
+   "disc": {
+    "n": 1747,
+    "gross": 0.195,
+    "mean": 0.173,
+    "t": 5.12,
+    "months": 119
+   },
+   "conf": {
+    "n": 2257,
+    "gross": 0.087,
+    "mean": 0.062,
+    "t": 2.15,
+    "months": 142
+   },
+   "p": 0.016,
+   "holm": 0.063,
+   "profit": false,
+   "adds": false,
+   "pass": false
+  },
+  {
+   "cell": "both AGAINST",
+   "set": "both",
+   "group": "AGAINST",
+   "disc": {
+    "n": 1735,
+    "gross": 0.123,
+    "mean": 0.1,
+    "t": 2.95,
+    "months": 119
+   },
+   "conf": {
+    "n": 2245,
+    "gross": 0.11,
+    "mean": 0.086,
+    "t": 3.04,
+    "months": 142
+   },
+   "p": 0.001,
+   "holm": 0.007,
+   "profit": true,
+   "adds": false,
+   "pass": false
+  }
+ ],
+ "passed": [],
+ "diffs": {
+  "xau": {
+   "disc": {
+    "diff": 0.04,
+    "t": 0.55
+   },
+   "conf": {
+    "diff": -0.054,
+    "t": -0.96
+   }
+  },
+  "usdjpy": {
+   "disc": {
+    "diff": 0.1,
+    "t": 1.72
+   },
+   "conf": {
+    "diff": 0.006,
+    "t": 0.11
+   }
+  },
+  "both": {
+   "disc": {
+    "diff": 0.072,
+    "t": 1.58
+   },
+   "conf": {
+    "diff": -0.024,
+    "t": -0.63
+   }
+  }
+ },
+ "extra": {
+  "xau": {
+   "disc": {
+    "all": {
+     "n": 1611,
+     "gross": 0.204,
+     "mean": 0.189,
+     "t": 5.42,
+     "months": 106
+    },
+    "none": {
+     "n": 10,
+     "gross": -0.308,
+     "mean": -0.318,
+     "t": -1.59,
+     "months": 2
+    },
+    "sides": {
+     "WITH buys": {
+      "n": 437,
+      "mean": 0.244
+     },
+     "WITH sells": {
+      "n": 369,
+      "mean": 0.173
+     },
+     "AGAINST buys": {
+      "n": 328,
+      "mean": 0.246
+     },
+     "AGAINST sells": {
+      "n": 467,
+      "mean": 0.12
+     }
+    },
+    "callDays": {
+     "buy": 904,
+     "sell": 697,
+     "none": 10
+    }
+   },
+   "conf": {
+    "all": {
+     "n": 2239,
+     "gross": 0.111,
+     "mean": 0.095,
+     "t": 3.72,
+     "months": 142
+    },
+    "none": {
+     "n": 0,
+     "gross": null,
+     "mean": null,
+     "t": 0,
+     "months": 0
+    },
+    "sides": {
+     "WITH buys": {
+      "n": 724,
+      "mean": 0.047
+     },
+     "WITH sells": {
+      "n": 383,
+      "mean": 0.108
+     },
+     "AGAINST buys": {
+      "n": 414,
+      "mean": 0.16
+     },
+     "AGAINST sells": {
+      "n": 718,
+      "mean": 0.099
+     }
+    },
+    "callDays": {
+     "buy": 1442,
+     "sell": 797,
+     "none": 0
+    }
+   }
+  },
+  "usdjpy": {
+   "disc": {
+    "all": {
+     "n": 1894,
+     "gross": 0.121,
+     "mean": 0.092,
+     "t": 3.32,
+     "months": 120
+    },
+    "none": {
+     "n": 13,
+     "gross": 0.559,
+     "mean": 0.538,
+     "t": 0,
+     "months": 1
+    },
+    "sides": {
+     "WITH buys": {
+      "n": 442,
+      "mean": 0.206
+     },
+     "WITH sells": {
+      "n": 499,
+      "mean": 0.08
+     },
+     "AGAINST buys": {
+      "n": 434,
+      "mean": 0.091
+     },
+     "AGAINST sells": {
+      "n": 506,
+      "mean": -0.005
+     }
+    },
+    "callDays": {
+     "buy": 948,
+     "sell": 933,
+     "none": 13
+    }
+   },
+   "conf": {
+    "all": {
+     "n": 2263,
+     "gross": 0.086,
+     "mean": 0.053,
+     "t": 2.14,
+     "months": 142
+    },
+    "none": {
+     "n": 0,
+     "gross": null,
+     "mean": null,
+     "t": 0,
+     "months": 0
+    },
+    "sides": {
+     "WITH buys": {
+      "n": 583,
+      "mean": 0.206
+     },
+     "WITH sells": {
+      "n": 567,
+      "mean": -0.098
+     },
+     "AGAINST buys": {
+      "n": 526,
+      "mean": 0.065
+     },
+     "AGAINST sells": {
+      "n": 587,
+      "mean": 0.037
+     }
+    },
+    "callDays": {
+     "buy": 1170,
+     "sell": 1093,
+     "none": 0
+    }
+   }
+  },
+  "both": {
+   "disc": {
+    "all": {
+     "n": 3505,
+     "gross": 0.159,
+     "mean": 0.137,
+     "t": 5.69,
+     "months": 120
+    },
+    "none": {
+     "n": 23,
+     "gross": 0.182,
+     "mean": 0.166,
+     "t": 0.43,
+     "months": 3
+    },
+    "sides": {
+     "WITH buys": {
+      "n": 879,
+      "mean": 0.225
+     },
+     "WITH sells": {
+      "n": 868,
+      "mean": 0.12
+     },
+     "AGAINST buys": {
+      "n": 762,
+      "mean": 0.158
+     },
+     "AGAINST sells": {
+      "n": 973,
+      "mean": 0.055
+     }
+    },
+    "callDays": {
+     "buy": 1852,
+     "sell": 1630,
+     "none": 23
+    }
+   },
+   "conf": {
+    "all": {
+     "n": 4502,
+     "gross": 0.098,
+     "mean": 0.074,
+     "t": 3.81,
+     "months": 142
+    },
+    "none": {
+     "n": 0,
+     "gross": null,
+     "mean": null,
+     "t": 0,
+     "months": 0
+    },
+    "sides": {
+     "WITH buys": {
+      "n": 1307,
+      "mean": 0.118
+     },
+     "WITH sells": {
+      "n": 950,
+      "mean": -0.015
+     },
+     "AGAINST buys": {
+      "n": 940,
+      "mean": 0.107
+     },
+     "AGAINST sells": {
+      "n": 1305,
+      "mean": 0.071
+     }
+    },
+    "callDays": {
+     "buy": 2612,
+     "sell": 1890,
+     "none": 0
+    }
+   }
+  }
+ },
+ "reading": "Cells meeting the profit bar: xau AGAINST, both AGAINST. Every cell is a subset of a rule that is already profitable at these costs, so that alone says nothing about the call. The question is the difference, WITH minus AGAINST after costs: xau: +0.040R (Welch t 0.55) in 2005-14 and -0.054R (t -0.96) in 2015-26; usdjpy: +0.100R (Welch t 1.72) in 2005-14 and +0.006R (t 0.11) in 2015-26; both: +0.072R (Welch t 1.58) in 2005-14 and -0.024R (t -0.63) in 2015-26. No market set has the difference above zero with a Welch t of 2 in both windows, so by the pre-registered reading the key-level direction call adds nothing to the breakouts that can be told from chance. The breakouts stay as they are, with no direction gate.",
+ "data": "xau: 1474565 five-minute candles 2006-03-19 to 2026-11-21, 33675 H4 candles, 518 direction switches, 3861 breakout trades; usdjpy: 1644664 five-minute candles 2005-01-02 to 2026-11-20, 36069 H4 candles, 566 direction switches, 4169 breakout trades. Source: the shared toolkit's OANDA mid 5-minute cache."
+}

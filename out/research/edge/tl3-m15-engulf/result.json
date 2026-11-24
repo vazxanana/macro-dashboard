@@ -1,0 +1,950 @@
+{
+ "study": "tl3-m15-engulf",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 2 line cells pass; the better one, line swing, made -0.154R a trade after costs in 2015-26 (n 1,821, month t -3.87; -0.066R before costs) and -0.168R in 2005-14 (n 1,382, month t -4.28)",
+ "best": "line swing",
+ "basis": "judged after costs on calendar-month sums by fill month (pre-registered); before costs beside",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31 (120 months)",
+  "confirmation": "2015-01-01 to 2026-10-31 (142 months)"
+ },
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006
+ },
+ "params": {
+  "K": 3,
+  "apart": 12,
+  "life": 150,
+  "tol": 0.1,
+  "wait": 3,
+  "span": 3,
+  "buf": 0.1,
+  "minCost": 3,
+  "swingMin": 0.5,
+  "keep": 5,
+  "cap": 172800
+ },
+ "cells": [
+  {
+   "cell": "line 2R",
+   "disc": {
+    "n": 1566,
+    "mean": -0.005301,
+    "t": -0.153173,
+    "meanNet": -0.074308,
+    "tNet": -2.133634,
+    "win": 0.3397,
+    "costR": 0.069
+   },
+   "conf": {
+    "n": 2097,
+    "mean": -0.037167,
+    "t": -1.233439,
+    "meanNet": -0.121498,
+    "tNet": -3.992487,
+    "win": 0.3338,
+    "costR": 0.0843
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "line swing",
+   "disc": {
+    "n": 1382,
+    "mean": -0.096273,
+    "t": -2.465384,
+    "meanNet": -0.16818,
+    "tNet": -4.281725,
+    "win": 0.3379,
+    "costR": 0.0719
+   },
+   "conf": {
+    "n": 1821,
+    "mean": -0.065507,
+    "t": -1.652835,
+    "meanNet": -0.153699,
+    "tNet": -3.87008,
+    "win": 0.3251,
+    "costR": 0.0882
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "control 2R",
+   "disc": {
+    "n": 456530,
+    "mean": -0.029883,
+    "t": -9.070105,
+    "meanNet": -0.102853,
+    "tNet": -26.292664,
+    "win": 0.3315,
+    "costR": 0.073
+   },
+   "conf": {
+    "n": 564056,
+    "mean": -0.023647,
+    "t": -7.738844,
+    "meanNet": -0.109041,
+    "tNet": -30.957301,
+    "win": 0.3333,
+    "costR": 0.0854
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false
+   },
+   "pass": false
+  },
+  {
+   "cell": "control swing",
+   "disc": {
+    "n": 389891,
+    "mean": -0.069837,
+    "t": -14.357574,
+    "meanNet": -0.146301,
+    "tNet": -27.703026,
+    "win": 0.3098,
+    "costR": 0.0765
+   },
+   "conf": {
+    "n": 480145,
+    "mean": -0.046925,
+    "t": -9.034404,
+    "meanNet": -0.136117,
+    "tNet": -23.747122,
+    "win": 0.3101,
+    "costR": 0.0892
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "holm": false
+   },
+   "pass": false
+  }
+ ],
+ "lineVsControl": [
+  {
+   "exit": "2R",
+   "disc": {
+    "diff": 0.028545,
+    "t": 0.8078
+   },
+   "conf": {
+    "diff": -0.012457,
+    "t": -0.4067
+   }
+  },
+  {
+   "exit": "swing",
+   "disc": {
+    "diff": -0.021879,
+    "t": -0.5531
+   },
+   "conf": {
+    "diff": -0.017582,
+    "t": -0.4391
+   }
+  }
+ ],
+ "bySide": [
+  {
+   "cell": "line 2R buys",
+   "disc": {
+    "n": 815,
+    "mean": -0.036946,
+    "t": -0.720996,
+    "meanNet": -0.107572,
+    "tNet": -2.087609,
+    "win": 0.3337,
+    "costR": 0.0706
+   },
+   "conf": {
+    "n": 1075,
+    "mean": -0.063626,
+    "t": -1.76555,
+    "meanNet": -0.146353,
+    "tNet": -4.020213,
+    "win": 0.3284,
+    "costR": 0.0827
+   }
+  },
+  {
+   "cell": "line 2R sells",
+   "disc": {
+    "n": 751,
+    "mean": 0.029041,
+    "t": 0.573359,
+    "meanNet": -0.03821,
+    "tNet": -0.752324,
+    "win": 0.3462,
+    "costR": 0.0673
+   },
+   "conf": {
+    "n": 1022,
+    "mean": -0.009336,
+    "t": -0.203437,
+    "meanNet": -0.095353,
+    "tNet": -2.065842,
+    "win": 0.3395,
+    "costR": 0.086
+   }
+  },
+  {
+   "cell": "line swing buys",
+   "disc": {
+    "n": 709,
+    "mean": -0.12904,
+    "t": -2.550047,
+    "meanNet": -0.20201,
+    "tNet": -3.966389,
+    "win": 0.3357,
+    "costR": 0.073
+   },
+   "conf": {
+    "n": 908,
+    "mean": -0.114121,
+    "t": -2.303329,
+    "meanNet": -0.201713,
+    "tNet": -4.062204,
+    "win": 0.3139,
+    "costR": 0.0876
+   }
+  },
+  {
+   "cell": "line swing sells",
+   "disc": {
+    "n": 673,
+    "mean": -0.061754,
+    "t": -1.070948,
+    "meanNet": -0.13254,
+    "tNet": -2.292496,
+    "win": 0.3403,
+    "costR": 0.0708
+   },
+   "conf": {
+    "n": 913,
+    "mean": -0.01716,
+    "t": -0.297232,
+    "meanNet": -0.105948,
+    "tNet": -1.828008,
+    "win": 0.3363,
+    "costR": 0.0888
+   }
+  }
+ ],
+ "byMarket": [
+  {
+   "market": "xau",
+   "cost": 0.3,
+   "cells": [
+    {
+     "cell": "line 2R",
+     "disc": {
+      "n": 252,
+      "mean": -0.050575,
+      "t": -0.617811,
+      "meanNet": -0.178966,
+      "tNet": -2.147029,
+      "win": 0.3135,
+      "costR": 0.1284
+     },
+     "conf": {
+      "n": 438,
+      "mean": 0.033467,
+      "t": 0.506459,
+      "meanNet": -0.073429,
+      "tNet": -1.099596,
+      "win": 0.3584,
+      "costR": 0.1069
+     }
+    },
+    {
+     "cell": "line swing",
+     "disc": {
+      "n": 228,
+      "mean": -0.143289,
+      "t": -1.487123,
+      "meanNet": -0.275441,
+      "tNet": -2.806158,
+      "win": 0.3289,
+      "costR": 0.1322
+     },
+     "conf": {
+      "n": 377,
+      "mean": -0.087929,
+      "t": -1.146221,
+      "meanNet": -0.200189,
+      "tNet": -2.583161,
+      "win": 0.3289,
+      "costR": 0.1123
+     }
+    },
+    {
+     "cell": "control 2R",
+     "disc": {
+      "n": 72975,
+      "mean": -0.018078,
+      "t": -2.47441,
+      "meanNet": -0.152971,
+      "tNet": -15.656549,
+      "win": 0.3355,
+      "costR": 0.1349
+     },
+     "conf": {
+      "n": 104244,
+      "mean": -0.000677,
+      "t": -0.114688,
+      "meanNet": -0.116671,
+      "tNet": -16.195958,
+      "win": 0.3398,
+      "costR": 0.116
+     }
+    },
+    {
+     "cell": "control swing",
+     "disc": {
+      "n": 62751,
+      "mean": -0.085947,
+      "t": -7.249476,
+      "meanNet": -0.226849,
+      "tNet": -15.961134,
+      "win": 0.3103,
+      "costR": 0.1409
+     },
+     "conf": {
+      "n": 89450,
+      "mean": -0.029671,
+      "t": -3.019626,
+      "meanNet": -0.150401,
+      "tNet": -14.184059,
+      "win": 0.3162,
+      "costR": 0.1207
+     }
+    }
+   ]
+  },
+  {
+   "market": "eurusd",
+   "cost": 0.00006,
+   "cells": [
+    {
+     "cell": "line 2R",
+     "disc": {
+      "n": 304,
+      "mean": 0.04798,
+      "t": 0.555992,
+      "meanNet": -0.000632,
+      "tNet": -0.007274,
+      "win": 0.3618,
+      "costR": 0.0486
+     },
+     "conf": {
+      "n": 388,
+      "mean": -0.027354,
+      "t": -0.365881,
+      "meanNet": -0.100072,
+      "tNet": -1.329202,
+      "win": 0.3402,
+      "costR": 0.0727
+     }
+    },
+    {
+     "cell": "line swing",
+     "disc": {
+      "n": 268,
+      "mean": 0.01781,
+      "t": 0.169864,
+      "meanNet": -0.033133,
+      "tNet": -0.315744,
+      "win": 0.3657,
+      "costR": 0.0509
+     },
+     "conf": {
+      "n": 335,
+      "mean": -0.095454,
+      "t": -0.856692,
+      "meanNet": -0.171972,
+      "tNet": -1.537454,
+      "win": 0.2925,
+      "costR": 0.0765
+     }
+    },
+    {
+     "cell": "control 2R",
+     "disc": {
+      "n": 96547,
+      "mean": -0.044061,
+      "t": -6.848864,
+      "meanNet": -0.096481,
+      "tNet": -13.929493,
+      "win": 0.327,
+      "costR": 0.0524
+     },
+     "conf": {
+      "n": 114789,
+      "mean": -0.043376,
+      "t": -7.205057,
+      "meanNet": -0.119335,
+      "tNet": -18.670845,
+      "win": 0.3271,
+      "costR": 0.076
+     }
+    },
+    {
+     "cell": "control swing",
+     "disc": {
+      "n": 82833,
+      "mean": -0.079002,
+      "t": -6.229586,
+      "meanNet": -0.134306,
+      "tNet": -10.401678,
+      "win": 0.3035,
+      "costR": 0.0553
+     },
+     "conf": {
+      "n": 98100,
+      "mean": -0.065611,
+      "t": -5.894277,
+      "meanNet": -0.14545,
+      "tNet": -12.791076,
+      "win": 0.2998,
+      "costR": 0.0798
+     }
+    }
+   ]
+  },
+  {
+   "market": "gbpusd",
+   "cost": 0.00008,
+   "cells": [
+    {
+     "cell": "line 2R",
+     "disc": {
+      "n": 315,
+      "mean": 0.067222,
+      "t": 0.882771,
+      "meanNet": 0.018454,
+      "tNet": 0.241046,
+      "win": 0.3683,
+      "costR": 0.0488
+     },
+     "conf": {
+      "n": 403,
+      "mean": -0.143121,
+      "t": -1.957329,
+      "meanNet": -0.220392,
+      "tNet": -2.988048,
+      "win": 0.2953,
+      "costR": 0.0773
+     }
+    },
+    {
+     "cell": "line swing",
+     "disc": {
+      "n": 278,
+      "mean": -0.116975,
+      "t": -1.431106,
+      "meanNet": -0.167045,
+      "tNet": -2.029089,
+      "win": 0.3417,
+      "costR": 0.0501
+     },
+     "conf": {
+      "n": 348,
+      "mean": -0.066902,
+      "t": -0.678599,
+      "meanNet": -0.14781,
+      "tNet": -1.489549,
+      "win": 0.3218,
+      "costR": 0.0809
+     }
+    },
+    {
+     "cell": "control 2R",
+     "disc": {
+      "n": 98250,
+      "mean": -0.04537,
+      "t": -7.789645,
+      "meanNet": -0.10413,
+      "tNet": -16.050509,
+      "win": 0.3269,
+      "costR": 0.0588
+     },
+     "conf": {
+      "n": 114984,
+      "mean": -0.040587,
+      "t": -6.389856,
+      "meanNet": -0.116238,
+      "tNet": -17.506473,
+      "win": 0.3282,
+      "costR": 0.0757
+     }
+    },
+    {
+     "cell": "control swing",
+     "disc": {
+      "n": 84122,
+      "mean": -0.095323,
+      "t": -9.475247,
+      "meanNet": -0.15734,
+      "tNet": -15.142571,
+      "win": 0.2973,
+      "costR": 0.062
+     },
+     "conf": {
+      "n": 98094,
+      "mean": -0.063322,
+      "t": -5.294136,
+      "meanNet": -0.142848,
+      "tNet": -11.812265,
+      "win": 0.3025,
+      "costR": 0.0795
+     }
+    }
+   ]
+  },
+  {
+   "market": "usdjpy",
+   "cost": 0.008,
+   "cells": [
+    {
+     "cell": "line 2R",
+     "disc": {
+      "n": 322,
+      "mean": -0.006585,
+      "t": -0.073304,
+      "meanNet": -0.088327,
+      "tNet": -0.97695,
+      "win": 0.3416,
+      "costR": 0.0817
+     },
+     "conf": {
+      "n": 426,
+      "mean": 0.037898,
+      "t": 0.520829,
+      "meanNet": -0.04761,
+      "tNet": -0.653993,
+      "win": 0.3592,
+      "costR": 0.0855
+     }
+    },
+    {
+     "cell": "line swing",
+     "disc": {
+      "n": 292,
+      "mean": -0.146731,
+      "t": -1.653977,
+      "meanNet": -0.231415,
+      "tNet": -2.558532,
+      "win": 0.3253,
+      "costR": 0.0847
+     },
+     "conf": {
+      "n": 376,
+      "mean": 0.001847,
+      "t": 0.020241,
+      "meanNet": -0.086908,
+      "tNet": -0.95176,
+      "win": 0.3511,
+      "costR": 0.0888
+     }
+    },
+    {
+     "cell": "control 2R",
+     "disc": {
+      "n": 93059,
+      "mean": -0.008607,
+      "t": -1.264375,
+      "meanNet": -0.089957,
+      "tNet": -12.384512,
+      "win": 0.3374,
+      "costR": 0.0814
+     },
+     "conf": {
+      "n": 114173,
+      "mean": -0.000408,
+      "t": -0.065739,
+      "meanNet": -0.082607,
+      "tNet": -12.079602,
+      "win": 0.3409,
+      "costR": 0.0822
+     }
+    },
+    {
+     "cell": "control swing",
+     "disc": {
+      "n": 79730,
+      "mean": -0.052162,
+      "t": -5.039475,
+      "meanNet": -0.136773,
+      "tNet": -12.893684,
+      "win": 0.319,
+      "costR": 0.0846
+     },
+     "conf": {
+      "n": 96705,
+      "mean": -0.038105,
+      "t": -3.465423,
+      "meanNet": -0.123617,
+      "tNet": -10.633271,
+      "win": 0.3166,
+      "costR": 0.0855
+     }
+    }
+   ]
+  },
+  {
+   "market": "audusd",
+   "cost": 0.00006,
+   "cells": [
+    {
+     "cell": "line 2R",
+     "disc": {
+      "n": 373,
+      "mean": -0.078276,
+      "t": -1.268847,
+      "meanNet": -0.129884,
+      "tNet": -2.126734,
+      "win": 0.3137,
+      "costR": 0.0516
+     },
+     "conf": {
+      "n": 442,
+      "mean": -0.091518,
+      "t": -1.461104,
+      "meanNet": -0.168983,
+      "tNet": -2.687086,
+      "win": 0.3145,
+      "costR": 0.0775
+     }
+    },
+    {
+     "cell": "line swing",
+     "disc": {
+      "n": 316,
+      "mean": -0.094268,
+      "t": -1.228537,
+      "meanNet": -0.147888,
+      "tNet": -1.950476,
+      "win": 0.3291,
+      "costR": 0.0536
+     },
+     "conf": {
+      "n": 385,
+      "mean": -0.082011,
+      "t": -1.02756,
+      "meanNet": -0.162828,
+      "tNet": -2.036827,
+      "win": 0.3273,
+      "costR": 0.0808
+     }
+    },
+    {
+     "cell": "control 2R",
+     "disc": {
+      "n": 95699,
+      "mean": -0.02937,
+      "t": -4.469651,
+      "meanNet": -0.082296,
+      "tNet": -11.649731,
+      "win": 0.3321,
+      "costR": 0.0529
+     },
+     "conf": {
+      "n": 115866,
+      "mean": -0.030854,
+      "t": -4.983332,
+      "meanNet": -0.110883,
+      "tNet": -16.631792,
+      "win": 0.3311,
+      "costR": 0.08
+     }
+    },
+    {
+     "cell": "control swing",
+     "disc": {
+      "n": 80455,
+      "mean": -0.038706,
+      "t": -3.61967,
+      "meanNet": -0.093728,
+      "tNet": -8.610626,
+      "win": 0.32,
+      "costR": 0.055
+     },
+     "conf": {
+      "n": 97796,
+      "mean": -0.036237,
+      "t": -3.725725,
+      "meanNet": -0.119301,
+      "tNet": -12.101478,
+      "win": 0.3161,
+      "costR": 0.0831
+     }
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "lines": 17048,
+  "touched": 15127,
+  "brokenBeforeTouch": 0,
+  "expired": 25,
+  "replaced": 1898,
+  "closedThrough": 9572,
+  "noEngulf": 1832,
+  "lineSignals": 3721,
+  "controlSignals": 1040784,
+  "dropped": 654,
+  "pastStop": 710,
+  "riskUnder3Cost": 18841,
+  "unresolved": 49,
+  "lineRiskUnder3Cost": 52,
+  "lineNoSwingTarget": 460
+ },
+ "meta": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "last": "2026-10-30",
+   "lines": 3180,
+   "touched": 2797,
+   "closedThrough": 1739,
+   "noEngulf": 326,
+   "brokenBefore": 0,
+   "expired": 4,
+   "replaced": 379,
+   "line": 732,
+   "ctl": 191495,
+   "dropped": 9,
+   "bad": 148,
+   "small": 14155,
+   "open": 6,
+   "lineBad": 0,
+   "lineSmall": 42,
+   "lineNoSwing": 85
+  },
+  {
+   "market": "eurusd",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "lines": 3294,
+   "touched": 2954,
+   "closedThrough": 1880,
+   "noEngulf": 377,
+   "brokenBefore": 0,
+   "expired": 4,
+   "replaced": 337,
+   "line": 696,
+   "ctl": 212491,
+   "dropped": 111,
+   "bad": 113,
+   "small": 923,
+   "open": 11,
+   "lineBad": 1,
+   "lineSmall": 3,
+   "lineNoSwing": 89
+  },
+  {
+   "market": "gbpusd",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "lines": 3250,
+   "touched": 2889,
+   "closedThrough": 1833,
+   "noEngulf": 337,
+   "brokenBefore": 0,
+   "expired": 5,
+   "replaced": 356,
+   "line": 719,
+   "ctl": 214596,
+   "dropped": 216,
+   "bad": 154,
+   "small": 983,
+   "open": 9,
+   "lineBad": 0,
+   "lineSmall": 0,
+   "lineNoSwing": 92
+  },
+  {
+   "market": "usdjpy",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "lines": 3683,
+   "touched": 3244,
+   "closedThrough": 2067,
+   "noEngulf": 421,
+   "brokenBefore": 0,
+   "expired": 9,
+   "replaced": 430,
+   "line": 756,
+   "ctl": 209567,
+   "dropped": 181,
+   "bad": 141,
+   "small": 2009,
+   "open": 12,
+   "lineBad": 0,
+   "lineSmall": 6,
+   "lineNoSwing": 80
+  },
+  {
+   "market": "audusd",
+   "first": "2005-01-02",
+   "last": "2026-10-30",
+   "lines": 3641,
+   "touched": 3243,
+   "closedThrough": 2053,
+   "noEngulf": 371,
+   "brokenBefore": 0,
+   "expired": 3,
+   "replaced": 396,
+   "line": 818,
+   "ctl": 212635,
+   "dropped": 137,
+   "bad": 154,
+   "small": 771,
+   "open": 11,
+   "lineBad": 0,
+   "lineSmall": 1,
+   "lineNoSwing": 114
+  }
+ ],
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2009-06-10",
+   "n": 28401,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2016-09-21",
+   "n": 97035,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2023-03-15",
+   "n": 157617,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2009-06-10",
+   "n": 41500,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2016-09-21",
+   "n": 114284,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2023-03-15",
+   "n": 177514,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2009-06-10",
+   "n": 42283,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2016-09-21",
+   "n": 115836,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2023-03-15",
+   "n": 179855,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2009-06-10",
+   "n": 40600,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2016-09-21",
+   "n": 111138,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2023-03-15",
+   "n": 174327,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2009-06-10",
+   "n": 39015,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2016-09-21",
+   "n": 113480,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2023-03-15",
+   "n": 178249,
+   "missing": 0,
+   "extra": 0
+  }
+ ]
+}

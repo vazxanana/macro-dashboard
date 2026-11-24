@@ -1,0 +1,689 @@
+{
+ "study": "london-reversal-ny-eg",
+ "run": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 8 cells pass; the best cell, mid lon 2R, made -0.054R a trade after costs in 2015-26 (n 1,114, month t -1.32; before costs +0.002R; 2005-14 -0.046R after costs, n 975, month t -1.03)",
+ "best": "mid lon 2R",
+ "passed": [],
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31",
+  "confirmation": "2015-01-01 to 2026-10-31"
+ },
+ "costs": {
+  "xau": 0.3,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006
+ },
+ "cells": [
+  {
+   "cell": "mid lon 1R",
+   "disc": {
+    "n": 975,
+    "mean": 0.025611,
+    "meanNet": -0.027871,
+    "t": 0.803558,
+    "tNet": -0.8603,
+    "win": 0.5087,
+    "costR": 0.0535
+   },
+   "conf": {
+    "n": 1114,
+    "mean": -0.021759,
+    "meanNet": -0.077619,
+    "t": -0.655723,
+    "tNet": -2.305817,
+    "win": 0.4901,
+    "costR": 0.0559
+   },
+   "p": 0.98871,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 4453,
+     "mean": 0.018411,
+     "meanNet": -0.040854,
+     "t": 1.211384,
+     "tNet": -2.635267,
+     "win": 0.5057,
+     "costR": 0.0593
+    },
+    "conf": {
+     "n": 5713,
+     "mean": -0.018511,
+     "meanNet": -0.082836,
+     "t": -1.243143,
+     "tNet": -5.492734,
+     "win": 0.4889,
+     "costR": 0.0643
+    }
+   },
+   "welchVsControl": {
+    "disc": 0.38,
+    "conf": 0.16
+   }
+  },
+  {
+   "cell": "mid lon 2R",
+   "disc": {
+    "n": 975,
+    "mean": 0.007473,
+    "meanNet": -0.046009,
+    "t": 0.168637,
+    "tNet": -1.025149,
+    "win": 0.3877,
+    "costR": 0.0535
+   },
+   "conf": {
+    "n": 1114,
+    "mean": 0.00205,
+    "meanNet": -0.05381,
+    "t": 0.050472,
+    "tNet": -1.317895,
+    "win": 0.3941,
+    "costR": 0.0559
+   },
+   "p": 0.905162,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 4453,
+     "mean": 0.010269,
+     "meanNet": -0.048996,
+     "t": 0.481528,
+     "tNet": -2.274734,
+     "win": 0.3811,
+     "costR": 0.0593
+    },
+    "conf": {
+     "n": 5713,
+     "mean": 0.00093,
+     "meanNet": -0.063395,
+     "t": 0.052584,
+     "tNet": -3.573775,
+     "win": 0.3749,
+     "costR": 0.0643
+    }
+   },
+   "welchVsControl": {
+    "disc": 0.07,
+    "conf": 0.23
+   }
+  },
+  {
+   "cell": "mid any 1R",
+   "disc": {
+    "n": 1445,
+    "mean": 0.003437,
+    "meanNet": -0.046387,
+    "t": 0.126337,
+    "tNet": -1.678135,
+    "win": 0.4941,
+    "costR": 0.0498
+   },
+   "conf": {
+    "n": 1650,
+    "mean": -0.038961,
+    "meanNet": -0.092054,
+    "t": -1.444164,
+    "tNet": -3.380715,
+    "win": 0.477,
+    "costR": 0.0531
+   },
+   "p": 0.999532,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 10710,
+     "mean": 0.000896,
+     "meanNet": -0.052437,
+     "t": 0.098489,
+     "tNet": -5.618683,
+     "win": 0.4968,
+     "costR": 0.0533
+    },
+    "conf": {
+     "n": 13409,
+     "mean": -0.021717,
+     "meanNet": -0.080687,
+     "t": -2.393808,
+     "tNet": -8.893093,
+     "win": 0.4865,
+     "costR": 0.059
+    }
+   },
+   "welchVsControl": {
+    "disc": 0.23,
+    "conf": -0.46
+   }
+  },
+  {
+   "cell": "mid any 2R",
+   "disc": {
+    "n": 1445,
+    "mean": -0.026007,
+    "meanNet": -0.075831,
+    "t": -0.710896,
+    "tNet": -2.043941,
+    "win": 0.382,
+    "costR": 0.0498
+   },
+   "conf": {
+    "n": 1650,
+    "mean": -0.025458,
+    "meanNet": -0.07855,
+    "t": -0.741732,
+    "tNet": -2.282687,
+    "win": 0.3861,
+    "costR": 0.0531
+   },
+   "p": 0.988028,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 10710,
+     "mean": -0.001613,
+     "meanNet": -0.054946,
+     "t": -0.128349,
+     "tNet": -4.314086,
+     "win": 0.3964,
+     "costR": 0.0533
+    },
+    "conf": {
+     "n": 13409,
+     "mean": -0.018586,
+     "meanNet": -0.077555,
+     "t": -1.735893,
+     "tNet": -7.210106,
+     "win": 0.3878,
+     "costR": 0.059
+    }
+   },
+   "welchVsControl": {
+    "disc": -0.62,
+    "conf": -0.03
+   }
+  },
+  {
+   "cell": "other lon 1R",
+   "disc": {
+    "n": 397,
+    "mean": 0.027045,
+    "meanNet": -0.021267,
+    "t": 0.620511,
+    "tNet": -0.487483,
+    "win": 0.5088,
+    "costR": 0.0483
+   },
+   "conf": {
+    "n": 453,
+    "mean": -0.100439,
+    "meanNet": -0.152836,
+    "t": -2.069969,
+    "tNet": -3.054133,
+    "win": 0.4437,
+    "costR": 0.0524
+   },
+   "p": 0.99865,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 4453,
+     "mean": 0.018411,
+     "meanNet": -0.040854,
+     "t": 1.211384,
+     "tNet": -2.635267,
+     "win": 0.5057,
+     "costR": 0.0593
+    },
+    "conf": {
+     "n": 5713,
+     "mean": -0.018511,
+     "meanNet": -0.082836,
+     "t": -1.243143,
+     "tNet": -5.492734,
+     "win": 0.4889,
+     "costR": 0.0643
+    }
+   },
+   "welchVsControl": {
+    "disc": 0.39,
+    "conf": -1.5
+   }
+  },
+  {
+   "cell": "other lon 2R",
+   "disc": {
+    "n": 397,
+    "mean": -0.078982,
+    "meanNet": -0.127293,
+    "t": -1.414615,
+    "tNet": -2.261415,
+    "win": 0.3652,
+    "costR": 0.0483
+   },
+   "conf": {
+    "n": 453,
+    "mean": -0.063517,
+    "meanNet": -0.115915,
+    "t": -1.072322,
+    "tNet": -1.918269,
+    "win": 0.3731,
+    "costR": 0.0524
+   },
+   "p": 0.971451,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 4453,
+     "mean": 0.010269,
+     "meanNet": -0.048996,
+     "t": 0.481528,
+     "tNet": -2.274734,
+     "win": 0.3811,
+     "costR": 0.0593
+    },
+    "conf": {
+     "n": 5713,
+     "mean": 0.00093,
+     "meanNet": -0.063395,
+     "t": 0.052584,
+     "tNet": -3.573775,
+     "win": 0.3749,
+     "costR": 0.0643
+    }
+   },
+   "welchVsControl": {
+    "disc": -1.26,
+    "conf": -0.89
+   }
+  },
+  {
+   "cell": "other any 1R",
+   "disc": {
+    "n": 596,
+    "mean": -0.021439,
+    "meanNet": -0.065839,
+    "t": -0.611206,
+    "tNet": -1.873031,
+    "win": 0.4799,
+    "costR": 0.0444
+   },
+   "conf": {
+    "n": 682,
+    "mean": -0.104464,
+    "meanNet": -0.153227,
+    "t": -2.596403,
+    "tNet": -3.733558,
+    "win": 0.4413,
+    "costR": 0.0488
+   },
+   "p": 0.999863,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 10710,
+     "mean": 0.000896,
+     "meanNet": -0.052437,
+     "t": 0.098489,
+     "tNet": -5.618683,
+     "win": 0.4968,
+     "costR": 0.0533
+    },
+    "conf": {
+     "n": 13409,
+     "mean": -0.021717,
+     "meanNet": -0.080687,
+     "t": -2.393808,
+     "tNet": -8.893093,
+     "win": 0.4865,
+     "costR": 0.059
+    }
+   },
+   "welchVsControl": {
+    "disc": -0.34,
+    "conf": -1.96
+   }
+  },
+  {
+   "cell": "other any 2R",
+   "disc": {
+    "n": 596,
+    "mean": -0.106204,
+    "meanNet": -0.150604,
+    "t": -2.423186,
+    "tNet": -3.393705,
+    "win": 0.3557,
+    "costR": 0.0444
+   },
+   "conf": {
+    "n": 682,
+    "mean": -0.081464,
+    "meanNet": -0.130226,
+    "t": -1.613595,
+    "tNet": -2.544774,
+    "win": 0.3739,
+    "costR": 0.0488
+   },
+   "p": 0.993994,
+   "holm": 1,
+   "pass": false,
+   "control": {
+    "disc": {
+     "n": 10710,
+     "mean": -0.001613,
+     "meanNet": -0.054946,
+     "t": -0.128349,
+     "tNet": -4.314086,
+     "win": 0.3964,
+     "costR": 0.0533
+    },
+    "conf": {
+     "n": 13409,
+     "mean": -0.018586,
+     "meanNet": -0.077555,
+     "t": -1.735893,
+     "tNet": -7.210106,
+     "win": 0.3878,
+     "costR": 0.059
+    }
+   },
+   "welchVsControl": {
+    "disc": -1.98,
+    "conf": -1.14
+   }
+  }
+ ],
+ "byMarket": [
+  {
+   "market": "xau",
+   "disc": {
+    "n": 192,
+    "mean": 0.052127,
+    "meanNet": -0.07868,
+    "t": 0.515807,
+    "tNet": -0.768561,
+    "win": 0.3698,
+    "costR": 0.1308
+   },
+   "conf": {
+    "n": 194,
+    "mean": 0.060915,
+    "meanNet": -0.041229,
+    "t": 0.656798,
+    "tNet": -0.442431,
+    "win": 0.3969,
+    "costR": 0.1021
+   }
+  },
+  {
+   "market": "eurusd",
+   "disc": {
+    "n": 247,
+    "mean": -0.032542,
+    "meanNet": -0.060792,
+    "t": -0.413146,
+    "tNet": -0.771916,
+    "win": 0.3725,
+    "costR": 0.0283
+   },
+   "conf": {
+    "n": 322,
+    "mean": -0.078885,
+    "meanNet": -0.122877,
+    "t": -1.058002,
+    "tNet": -1.644307,
+    "win": 0.3602,
+    "costR": 0.044
+   }
+  },
+  {
+   "market": "gbpusd",
+   "disc": {
+    "n": 271,
+    "mean": -0.014226,
+    "meanNet": -0.044869,
+    "t": -0.189735,
+    "tNet": -0.593655,
+    "win": 0.4059,
+    "costR": 0.0306
+   },
+   "conf": {
+    "n": 331,
+    "mean": -0.016228,
+    "meanNet": -0.055424,
+    "t": -0.256964,
+    "tNet": -0.872749,
+    "win": 0.3927,
+    "costR": 0.0392
+   }
+  },
+  {
+   "market": "usdjpy",
+   "disc": {
+    "n": 132,
+    "mean": 0.027074,
+    "meanNet": -0.025397,
+    "t": 0.238742,
+    "tNet": -0.223754,
+    "win": 0.3939,
+    "costR": 0.0525
+   },
+   "conf": {
+    "n": 124,
+    "mean": -0.002718,
+    "meanNet": -0.065366,
+    "t": -0.022961,
+    "tNet": -0.55269,
+    "win": 0.4194,
+    "costR": 0.0626
+   }
+  },
+  {
+   "market": "audusd",
+   "disc": {
+    "n": 133,
+    "mean": 0.042082,
+    "meanNet": 0.005829,
+    "t": 0.339999,
+    "tNet": 0.04719,
+    "win": 0.3985,
+    "costR": 0.0363
+   },
+   "conf": {
+    "n": 143,
+    "mean": 0.150878,
+    "meanNet": 0.098398,
+    "t": 1.278288,
+    "tNet": 0.836513,
+    "win": 0.4476,
+    "costR": 0.0525
+   }
+  }
+ ],
+ "counts": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "days": 5290,
+   "excluded": 0,
+   "mid": 886,
+   "other": 324,
+   "withZone": 841,
+   "fills": [
+    386,
+    521
+   ],
+   "small": 0,
+   "odd": 0
+  },
+  {
+   "market": "eurusd",
+   "first": "2005-01-02",
+   "days": 5653,
+   "excluded": 4,
+   "mid": 1619,
+   "other": 787,
+   "withZone": 1524,
+   "fills": [
+    569,
+    858
+   ],
+   "small": 0,
+   "odd": 0
+  },
+  {
+   "market": "gbpusd",
+   "first": "2005-01-02",
+   "days": 5651,
+   "excluded": 7,
+   "mid": 1906,
+   "other": 1020,
+   "withZone": 1795,
+   "fills": [
+    602,
+    964
+   ],
+   "small": 0,
+   "odd": 0
+  },
+  {
+   "market": "usdjpy",
+   "first": "2005-01-02",
+   "days": 5652,
+   "excluded": 6,
+   "mid": 710,
+   "other": 165,
+   "withZone": 656,
+   "fills": [
+    256,
+    365
+   ],
+   "small": 0,
+   "odd": 0
+  },
+  {
+   "market": "audusd",
+   "first": "2005-01-02",
+   "days": 5647,
+   "excluded": 4,
+   "mid": 749,
+   "other": 202,
+   "withZone": 694,
+   "fills": [
+    276,
+    387
+   ],
+   "small": 0,
+   "odd": 0
+  }
+ ],
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2008-06-11",
+   "n": 546,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2012-03-14",
+   "n": 1517,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2016-09-21",
+   "n": 2683,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2021-02-17",
+   "n": 3818,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2025-05-07",
+   "n": 4905,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2008-06-11",
+   "n": 890,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2012-03-14",
+   "n": 1866,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2016-09-21",
+   "n": 3037,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2021-02-17",
+   "n": 4177,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2025-05-07",
+   "n": 5271,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2016-09-21",
+   "n": 3038,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2016-09-21",
+   "n": 3038,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2016-09-21",
+   "n": 3036,
+   "missing": 0,
+   "extra": 0
+  }
+ ]
+}
