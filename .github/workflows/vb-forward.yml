@@ -76,6 +76,12 @@ jobs:
           node research/edge/usdjpy-vol-breakout-forward/run.mjs fetch "$RUNNER_TEMP/u"
           node research/edge/usdjpy-vol-breakout-forward/run.mjs run "$RUNNER_TEMP/u" data/research/forward/usdjpy-vol-breakout.json
 
+      - name: GBP/JPY breakout, the forward record
+        if: ${{ !cancelled() }}   # one record's failure never costs the others their save (the job still ends red)
+        run: |
+          node research/edge/gbpjpy-vol-breakout-forward/run.mjs fetch "$RUNNER_TEMP/g"
+          node research/edge/gbpjpy-vol-breakout-forward/run.mjs run "$RUNNER_TEMP/g" data/research/forward/gbpjpy-vol-breakout.json
+
       - name: Early against late fills of the two breakouts, the forward split
         if: ${{ !cancelled() }}   # one record's failure never costs the others their save (the job still ends red)
         # the gold and USD/JPY candles the two steps above fetched; nothing is fetched again

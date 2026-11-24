@@ -234,7 +234,9 @@
   var R = { spec: null, base: null, bars: null, oc: null, steps: [], tf: 300, cur: 0, timer: 0, speed: 1, chart: null, series: null, cache: {}, lo: 0, hi: 0, token: 0 };
   var fR = function (v) { return v == null ? '—' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R'; };
   var utc = function (t) { return new Date(t * 1000).toISOString().slice(5, 16).replace('T', ' ') + ' UTC'; };
-  var css = function (n, d) { var v = getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v || d; };
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  var auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  var css = function (n, d) { var v = auSolid(getComputedStyle(document.documentElement).getPropertyValue(n).trim()); return v || d; };
   var light = function () { return document.documentElement.dataset.theme === 'light'; };
   var candleCols = function () { return light() ? { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' } : { upColor: '#089981', downColor: '#f23645', borderUpColor: '#089981', borderDownColor: '#f23645', wickUpColor: '#089981', wickDownColor: '#f23645' }; };
   var COL = function () { return light()

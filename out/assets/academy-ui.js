@@ -821,7 +821,9 @@
   }
 
   // ---- charts ---------------------------------------------------------------------------------------------------------
-  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  const auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  const css = (name) => auSolid(getComputedStyle(document.documentElement).getPropertyValue(name).trim());
   const look = () => ({ layout: { background: { type: 'solid', color: 'transparent' }, textColor: css('--au-ink-3') || css('--ink-dim') || '#a4abb8', fontSize: 12, fontFamily: 'JetBrains Mono, ui-monospace, monospace' }, grid: { vertLines: { color: css('--au-line') || css('--line-soft') }, horzLines: { color: css('--au-line') || css('--line-soft') } },
     rightPriceScale: { borderColor: css('--line') }, timeScale: { borderColor: css('--line'), timeVisible: true, secondsVisible: false, rightOffset: 6 } });
   const up = () => css('--ac-up') || css('--buy'), dn = () => css('--ac-down') || css('--sell');   // the candles keep their colours whatever the theme's gain / loss ink

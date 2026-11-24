@@ -1,0 +1,169 @@
+{
+ "study": "vb-rate-side",
+ "built": "2026-11-24",
+ "verdict": "FAIL, 0 of 2. With minus against the rate trend, net R a trade in 2015 on: R1 gold with falling real yields +0.065R (with +0.134R n 1139, against +0.069R n 1065; Welch t 1.14, month t 1.04, Holm 0.5091; to 2014 +0.008R); R2 USD/JPY with a rising US 2-year −0.027R (with +0.033R n 1105, against +0.060R n 1071; Welch t -0.49, month t -0.31, Holm 0.6242; to 2014 +0.082R).",
+ "gate": {
+  "usdjpy": {
+   "got": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "ok": true
+  },
+  "xau": {
+   "got": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "ok": true
+  }
+ },
+ "tests": [
+  {
+   "id": "R1",
+   "name": "gold with falling real yields",
+   "series": "DFII10",
+   "disc": {
+    "on": {
+     "n": 824,
+     "net": 0.198,
+     "win": 0.477
+    },
+    "off": {
+     "n": 753,
+     "net": 0.19,
+     "win": 0.45
+    },
+    "diff": 0.008,
+    "welch": 0.11,
+    "monthT": 0.47,
+    "months": 106
+   },
+   "conf": {
+    "on": {
+     "n": 1139,
+     "net": 0.134,
+     "win": 0.457
+    },
+    "off": {
+     "n": 1065,
+     "net": 0.069,
+     "win": 0.428
+    },
+    "diff": 0.065,
+    "welch": 1.14,
+    "monthT": 1.04,
+    "months": 143
+   },
+   "cells": {
+    "disc:buy:up": {
+     "n": 326,
+     "net": 0.232
+    },
+    "disc:buy:down": {
+     "n": 434,
+     "net": 0.255
+    },
+    "disc:sell:up": {
+     "n": 390,
+     "net": 0.134
+    },
+    "disc:sell:down": {
+     "n": 427,
+     "net": 0.157
+    },
+    "conf:buy:up": {
+     "n": 543,
+     "net": 0.082
+    },
+    "conf:buy:down": {
+     "n": 572,
+     "net": 0.114
+    },
+    "conf:sell:up": {
+     "n": 567,
+     "net": 0.153
+    },
+    "conf:sell:down": {
+     "n": 522,
+     "net": 0.055
+    }
+   },
+   "holm": 0.5091,
+   "pass": false
+  },
+  {
+   "id": "R2",
+   "name": "USD/JPY with a rising US 2-year",
+   "series": "DGS2",
+   "disc": {
+    "on": {
+     "n": 944,
+     "net": 0.133,
+     "win": 0.474
+    },
+    "off": {
+     "n": 881,
+     "net": 0.051,
+     "win": 0.456
+    },
+    "diff": 0.082,
+    "welch": 1.39,
+    "monthT": 0.73,
+    "months": 120
+   },
+   "conf": {
+    "on": {
+     "n": 1105,
+     "net": 0.033,
+     "win": 0.433
+    },
+    "off": {
+     "n": 1071,
+     "net": 0.06,
+     "win": 0.462
+    },
+    "diff": -0.027,
+    "welch": -0.49,
+    "monthT": -0.31,
+    "months": 143
+   },
+   "cells": {
+    "disc:buy:up": {
+     "n": 428,
+     "net": 0.184
+    },
+    "disc:buy:down": {
+     "n": 425,
+     "net": 0.119
+    },
+    "disc:sell:up": {
+     "n": 456,
+     "net": -0.013
+    },
+    "disc:sell:down": {
+     "n": 516,
+     "net": 0.09
+    },
+    "conf:buy:up": {
+     "n": 606,
+     "net": 0.109
+    },
+    "conf:buy:down": {
+     "n": 459,
+     "net": 0.177
+    },
+    "conf:sell:up": {
+     "n": 612,
+     "net": -0.028
+    },
+    "conf:sell:down": {
+     "n": 499,
+     "net": -0.06
+    }
+   },
+   "holm": 0.6242,
+   "pass": false
+  }
+ ]
+}

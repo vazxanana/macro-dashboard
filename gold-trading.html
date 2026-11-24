@@ -5968,7 +5968,8 @@
   const _gxCharts = [];
   function gxAlpha(hex, a) { const m = /^#([0-9a-f]{6})$/i.exec(hex); if (!m) return hex; const n = parseInt(m[1], 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; }
   function gxPalette() {
-    const cs = getComputedStyle(document.documentElement), v = (n, d) => (cs.getPropertyValue(n) || '').trim() || d;
+    const auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+    const cs = getComputedStyle(document.documentElement), v = (n, d) => auSolid((cs.getPropertyValue(n) || '').trim()) || d;
     const dark = document.documentElement.classList.contains('dark');
     return GX_PAL = {
       dark, up: v('--gx-up', '#2fbf8f'), dn: v('--gx-dn', '#f2576f'), text: v('--au-ink-3', v('--text-secondary', '#8a92a1')), faint: v('--text-tertiary', '#8a92a1'),

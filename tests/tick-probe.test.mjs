@@ -98,6 +98,8 @@ test('fills part: the first tick that crosses a level, by side', async () => {
   const { probe, firstCross } = await import('../council/tick-probe.mjs');
   const qp = [[1000, 1.0, 1.1], [2000, 1.2, 1.3], [3000, 0.9, 1.0]];
   assert.deepEqual(firstCross(qp, 1.25, 1), [2000, 1.2, 1.3]); assert.deepEqual(firstCross(qp, 0.95, -1), [3000, 0.9, 1.0]); assert.equal(firstCross(qp, 2, 1), null);
+  // dir 2 / -2: the closing side of a target (bid >= level, ask <= level)
+  { const q2 = [[1000, 1.0, 1.1], [2000, 1.2, 1.3], [3000, 0.9, 1.0]]; assert.deepEqual(firstCross(q2, 1.15, 2), [2000, 1.2, 1.3]); assert.deepEqual(firstCross(q2, 1.05, -2), [3000, 0.9, 1.0]); assert.equal(firstCross(q2, 1.25, 2), null); assert.deepEqual(firstCross(q2, 1.05, 1), [1000, 1.0, 1.1]); }
   const env = { CTRADER_CLIENT_ID: 'a', CTRADER_CLIENT_SECRET: 'b', CTRADER_ACCESS_TOKEN: 'c', CTRADER_ACCOUNT_ID: '7', CTRADER_ENV: 'demo' };
   const lib = fakeBroker([]), base = lib.session(), now = Date.parse('2026-11-20T07:00:00Z') / 1000;
   lib.session = () => ({ ...base, send: async (type, q) => (type === 3 ? { symbol: [{ symbolName: 'XAUUSD', symbolId: 41 }] } : base.send(type, q)) });

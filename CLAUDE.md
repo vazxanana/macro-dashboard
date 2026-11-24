@@ -6805,3 +6805,162 @@ Third pass (24 Nov 2026, "keep going"): the Macro desk's sticky section bar (`na
 written by `vb-forward.yml` since 21 Nov), in a grid of three; the early-against-late card says "no trades yet" before its first
 trade. Found by the smoke test on today's data: a long line in the Macro desk's "Your read" list (`.pl-list .d`, no wrap) widened
 the phone page to 607 px; its column now shrinks (`minmax(0, 1fr)`) and that line wraps.
+
+## FRED studies of 24 Nov 2026 (owner allowed fred.stlouisfed.org; "keep doing studies … new combinations")
+Four pre-registered studies (each PREREGISTRATION.md pushed alone first), all **FAIL**; nothing live changed, no rule proposed.
+- `fred-gauges` (0 of 7): weekly, next 20 sessions, 2007-26, Newey-West t, Holm. Net liquidity rising (WALCL − WDTGAL − RRP) → gold
+  t −0.97, S&P t 1.62; NFCI tightening → gold t −0.49, S&P t −1.76; jobless claims rising → gold t 0.20, USD/JPY t −1.50; double
+  tightening (real yield +25 bp in 4 weeks with the Baa spread wider; 40 weeks) → gold t −0.40, opposite signs in the two halves.
+- `fred-gauges-2` (0 of 5): policy-uncertainty spike → gold t 1.65 (+1.16 % against +0.34 %, both halves positive, not significant);
+  breakevens rising → gold t 0.24; St. Louis stress rising → USD/JPY t −1.64, S&P t 0.49; steepening after an inversion → gold t 1.28
+  (14 episodes).
+- `vb-fred-regime` (0 of 5): the gold and USD/JPY breakouts (T1, `vb-vol-regime`'s harness, gate reproduced) split by a gauge known
+  the day before (GVZ above its 20-day mean, policy uncertainty, real-yield moves; VIX, 2-year moves): largest Welch t 0.72.
+- `vb-rate-side` (0 of 2): a breakout WITH the rate trend against one AGAINST it: gold with falling real yields +0.065R (Welch t
+  1.14), USD/JPY with a rising 2-year −0.027R (t −0.49).
+The breakouts stay flat 1R with no macro gate; do not test another FRED gauge on these trades or these weeks without a new reason.
+Local reruns: `run.mjs fetch <dir>` (FRED + `git show` of the candle cache), then `run <dir>`. Tests: `tests/fred-gauges.test.mjs`,
+`tests/fred-gauges-2.test.mjs`.
+
+## Colour faults after the soft look, and charts that use the page (24 Nov 2026, owner: "fix the website too many color errors specially with the chart", "for the charts I would like to use more of the space of the page")
+Display only. Causes found on screenshots and fixed:
+- **Canvas code got see-through tokens.** The soft look made `--au-surface`, `--panel` and friends rgba; every chart reader hands
+  them to a canvas or to a hex-only helper (`rgba(hex, a)`), so plates and labels came out black or washed. Each reader now passes
+  its tokens through `auSolid` (market-structure `auChart`, backtest `tok`, gold terminal `gxPalette`, `assets/academy-ui.js`,
+  `bt-review.js`, `desk-live.js`, `mosha-replay.js`, `ms-draw.js`): an rgba with alpha 0.4 to under 1 is flattened onto `--au-bg`
+  and returned as #rrggbb; fainter tints, grids and bands stay see-through. **A new chart reader of a token must use it.**
+- **Buy / Sell lost their fills** (ChronosTrade's quick bar and Trade card were grey): soft.css's "buttons in a card" and
+  "pressed" rules now skip `.btn`, `.qb`, `.danger`, any class containing `buy` / `sell`, and `[data-side]`.
+- **The candle countdown** takes the candle's own colour (it was the theme's softer red beside the candle-red price label).
+- **Space** (`<style id="ms-ch-space-css">` after `#ms-ch-flat-css`; phone rules in the simple view's block): from 901 px a tighter
+  toolbar and phase strip, 8 px gaps, All = two rows a screen (`clamp(320px, (100vh - 300px) / 2, 620px)`), one chart / Split /
+  Layout fill the window (`100vh - 262px`), no max width on Charts; on a phone the chart card runs edge to edge and is 36 px taller.
+
+## Members write their own indicators in Pine Script and MetaTrader code (24 Nov 2026, owner: "users … do their own indicators in pine language and metatrader language")
+Display only: a script draws lines on the Desk's charts; it never places, changes or refuses an order and no council member reads it.
+- **`assets/ms-script.js`** (`window.MS_SCRIPT`, `module.exports`; pure, no DOM): two small interpreters written here, never `eval`
+  / `Function`: the code is lexed, parsed to a tree and walked with a step budget (`BUDGET` 6e6: a loop that never ends says "takes
+  too long"), so a script cannot reach the page, the network or storage. `run(lang, code, bars)` → `{ name, overlay, plots: [{ title,
+  color, w, hist, dots, v, cols? }], hlines, notes }`; an error carries `.line`. 20,000 characters, 24 plots at most.
+  - **Pine** (v4 / v5 style), run candle by candle with a state per call site: `indicator` / `study`, `input.*` (the default is
+    used), `=`, `var`, `:=`, `+=`, history `x[n]`, `if / else if / else`, `for … to … by`, `while`, functions `f(a) => …` (one line
+    or a block), tuples, `plot`, `plotshape` (dots at the high / low), `hline`, `color.*`, `math.*`, `nz`, `na`, `fixnan`, and
+    `ta.` sma ema rma wma vwma swma hma rsi atr tr stdev dev highest lowest change mom roc rising falling macd bb stoch cci cum
+    crossover crossunder cross barssince valuewhen vwap supertrend pivothigh pivotlow linreg (bare v4 names too). Skipped with a
+    note: `fill`, `bgcolor`, `barcolor`, `alertcondition`, `label` / `line` / `box` / `table`, `strategy.*`. Refused in words:
+    `request.*`, arrays, `switch`, `x = if …`.
+  - **MetaTrader** (MQL4 and MQL5 indicators): `#property` lines (window, colours, widths, labels, types, levels), `input` /
+    `extern`, globals, functions, `OnInit` / `init`, `OnCalculate` (both forms) / `start`, `if`, `for`, `while`, `++`, compound
+    assignment, casts, `SetIndexBuffer` / `SetIndexStyle` / `SetIndexLabel` / `PlotIndexSet*`, `ArraySetAsSeries`, `Open[] … Time[]`,
+    `Bars`, `Point`, `Math*`, `iMA iRSI iATR iCCI iMomentum iStdDev iBands iMACD iStochastic` (a value with a shift in MQL4, a handle
+    read with `CopyBuffer` in MQL5), `iHighest`, `iLowest`, `iClose…`, `iMAOnArray`. MQL4 conventions (arrays newest first) unless
+    the code has `CopyBuffer`, `indicator_plots`, `PlotIndexSet` or `ArraySetAsSeries`. An array is STORED oldest first; `series`
+    only turns the index round. Not here: other symbols / timeframes, `switch`, classes, objects on the chart.
+- **Page** (`market-structure.html`): the Indicators dialog has "My indicators" (`#ms-ind-my`: Add / Edit / Delete, "Write an
+  indicator") and the editor `#ms-sc` (name, Pine Script | MetaTrader, "Load an example", "Check it" = run on the chart's candles
+  and say how many lines and where, an error selects its line; "Save and add to the charts" saves only code that runs). Scripts
+  are kept per account on this device (localStorage `ms-scripts-<account>`, 20 at most; nothing goes to the server). An indicator-
+  list entry is `{ type: 'custom' | 'customosc', sid, color }` (`IND_DEF.custom` on the price, `customosc` in a separate band, by
+  the script's own `overlay` / `#property`), drawn by the existing `indDraw` on every chart; results are cached per script and
+  candle set (`SC.cache`). `window.msScripts.list()` is a read-only view.
+- Tests: `tests/ms-script.test.mjs` (reference maths for both languages, no look-ahead, errors and their line, the budget, no
+  eval / fetch / storage in the asset, page wiring). Checked in a browser: both examples written, checked, saved and drawn.
+
+## Big-candle fade with the target 25 % further (24 Nov 2026, owner: "what if we let the trade run 25% extra of the distance between the entry and tp")
+`research/edge/bigfade-target-125/` (PREREGISTRATION.md pushed alone first; `run.mjs` imports `big-candle-fade` `signals()` and the
+shared `exits()`, gate reproduced: 47,354 / +0.307R and 54,443 / +0.193R). The Equinox Big-candle fade's own trades (m15 k1.5 nobreak,
+same fill, stop and 1-day limit) with the target at 1.25 x the distance from the fill to the candle's middle. **FAIL**: the longer
+target is better trade by trade (+0.012R in 2015-26, month t 2.02; +0.026R in 2005-14, t 4.16) but the rule still loses after
+costs with it: −0.235R a trade (n 54,443, 26 % winners) against −0.246R (30 %) with the candle's middle. Context only, not tested:
+1.5 x −0.222R, 2 x −0.209R; in 2005-14 the 2 x target is about zero after costs (−0.002R). Gold and silver are worse with the
+longer target, the forex pairs slightly better. The desk's target stays the candle's middle; the loss is the cost, not the exit.
+Test: `tests/bigfade-target-125.test.mjs`.
+
+## Big-candle fade with the target at 65 % of the candle (24 Nov 2026, owner: "Instead of 50 % tp try 65 %")
+`research/edge/bigfade-target-65/` (PREREGISTRATION.md pushed alone first; the sister study's harness with the target as a share of
+the CANDLE from its extreme, gate reproduced). **FAIL**: 65 % is better trade by trade (+0.020R in 2015-26, month t 2.92; +0.031R
+in 2005-14, t 4.44) and still a loss after costs: −0.226R a trade (n 54,443, 24 % winners) against −0.246R (30 %) at 50 %.
+Context only: 80 % −0.220R, 100 % −0.211R; in 2005-14 they are about zero after costs (−0.012R, −0.008R). No market is positive.
+The desk's target stays 50 %. Two exit variants on these trades are enough: do not test another target on these years.
+Test: `tests/bigfade-target-65.test.mjs`.
+
+## Big-candle fade: the target sweep, no sweet spot (24 Nov 2026, owner: "Find the sweet spot")
+`research/edge/bigfade-target-sweep/` (PREREGISTRATION.md pushed alone first): fifteen targets (50 % to 300 % of the candle, and
+none = the stop or the 1-day limit ends the trade) on the desk's own trades, the target CHOSEN by R after costs on 2005-14 and
+JUDGED on 2015-26. **FAIL**: the curve only rises with the distance, so the choice is "no target" (+0.066R after costs in
+2005-14); judged on 2015-26 it makes +0.332R before costs and −0.107R after (n 54,443, 5 % winners, month t −2.65), better than
+the desk's 50 % (−0.246R; +0.140R a trade, t 3.68) and still a loss. Every one of the fifteen loses after costs in 2015-26.
+By market with the discovery-chosen target: only EUR/USD is above zero (+0.138R, month t 1.34, not significant). The fade's
+winners run far (the before-cost R grows from +0.19R to +0.33R as the target goes), but a 5 % win rate at −0.107R is not a rule
+to trade. The desk keeps 50 %. **This closes the target question on these trades** (three studies).
+Test: `tests/bigfade-target-sweep.test.mjs`.
+
+## Big-candle fade with a target nearer than 50 % (24 Nov 2026, owner: "Check if less 50 %")
+`research/edge/bigfade-target-short/` (PREREGISTRATION.md pushed alone first; targets 45, 40, 35, 30, 25, 20, 10 % of the candle
+beside the desk's 50 %, chosen on 2005-14, judged on 2015-26; a target the fill has already passed closes at the fill). **FAIL**:
+50 % is the best of the eight in both windows and every nearer target loses more after costs in 2015-26: 45 % −0.260R, 40 %
+−0.283R, 30 % −0.378R, 20 % −0.549R, 10 % −0.640R (50 %: −0.246R). Winners rise to 46 % at the 25 % target but the wins shrink
+against the same cost; under 25 % the rule loses before costs too. With `bigfade-target-sweep` the whole curve is known: it
+rises with the distance from 10 % to no target and never crosses zero after costs on 2015-26. Test: `tests/bigfade-target-short.test.mjs`.
+
+## Big-candle fade entered on a 1-minute or 30-second ChoCh (24 Nov 2026, owner: "find a way to improve the win rate or add maybe m1 choch or 30s choch")
+`research/edge/bigfade-choch/` (PREREGISTRATION.md pushed alone first; OANDA 1-minute candles 2018 → Oct 2026 on xau, eurusd, gbpusd,
+usdjpy, audusd and 30-second candles 2024-26 on xau and eurusd, fetched into the shared cache; `run.mjs` `base` / `choch` / `walk`).
+The desk's signals; instead of entering at once, wait up to 60 minutes for the first 1-minute close beyond the last confirmed
+1-minute swing against the candle (five-candle swing), enter at the next open, stop past the highest high since the candle + 0.1 ATR,
+the same 50 % target. **FAIL**: the win rate does rise, 70.4 % against 29.3 % at once (2022-26, z 38), but the entry is so much
+later that the planned reward is 0.38R (median) against 3.08R: before costs it makes −0.007R a trade, after costs −0.138R (n 2,361,
+month t −9.33) against −0.212R at once. Better than entering at once (+0.074R, Welch t 2.95, month t 3.16), still a loss; 2018-21
+the same (68 % winners, −0.182R). Only 19 % of signals give a ChoCh trade: on 65 % the stop level (the candle's extreme + 0.1 ATR)
+trades first, on 16 % the 50 % comes first. 30-second ChoCh, context only (gold + EUR/USD, 2024-26): 64.6 % winners, planned 0.61R,
+−0.115R after costs (n 1,027). The run that counts is the second: the first left out the desk's "risk under the cost is no trade"
+rule (said in RESULT.md). **A high win rate here is bought with the reward: never quote the 70 % without the −0.138R.**
+Test: `tests/bigfade-choch.test.mjs`.
+
+## Paper look on the Charts, and the faint ink in the soft look (24 Nov 2026, owner's screenshot: "want my charts with these colors")
+Display only. `market-structure.html`: `PAPER` = a light chart (#f7f8fa) with grey rising and black falling candles, black borders and
+wicks (`MONO`), on EVERY page theme. It is the chart's own colours (`ms-colors` with `mono: true`), switched on once per device
+(`ms-paper-v1`, only when the device has no colours of its own); Style → "Grey / black on white" (`#ms-sty-paper`) sets it,
+"Theme colours" goes back to the page theme's chart, "Green / red candles" clears `mono`. `chartLight()` (`window.msChartLight`) = is
+the chart itself light: the canvas inks (day lines, labels, volume, the hand-drawn level lines, the shared image) read it instead of
+the page theme; `cusLook(chart)` gives a chart with its own background its ink, grid and scale borders (panes, the free chart,
+Markets side by side). `assets/soft.css`: the dark themes' faint ink `--au-ink-3` is #A4A9B1 (the see-through surfaces are lighter
+than the solid ones #8E939B was chosen for: the Academy audit's AA checks failed), light keeps #5B616A, nothing under
+`prefers-contrast: more`; table header cells read `--au-ink-2`.
+
+## Big-candle fade, only the trades whose cost is small against their risk (24 Nov 2026, owner: "there must be a way to improve the fade of m15")
+`research/edge/bigfade-cost-ratio/` (PREREGISTRATION.md pushed alone first; `bigfade-target-65` `trade()`, gate reproduced). The
+desk's own trades, kept only when the round-trip cost is at most 10 % of the risk (both known at the entry). **FAIL**: 1,794 of
+54,443 trades are kept in 2015-26 and they make +0.033R before costs, −0.041R after (month t −1.37); 2005-14 −0.040R (n 3,214).
+**The finding that closes the fade: its before-cost R lives in the tight-stop trades.** The dropped trades make +0.198R before
+costs and pay 0.45R; the trades with room for the cost make about +0.03R before it. So the "+0.19R before costs" is not an edge
+waiting for a cheaper broker: it is the arithmetic of a stop a few pips from the entry. Context only: no threshold (5-30 %) is
+positive after costs in both windows; gold alone +0.143R on 298 kept trades (t 1.47, not significant, picked after looking).
+Six studies of these trades (target x4, entry timing, cost ratio): do not test another variant on these years. The desk stays a
+paper record. Test: `tests/bigfade-cost-ratio.test.mjs`.
+
+## The other Equinox fade and gap rules, only the trades with room for the cost (24 Nov 2026, owner: "and the other edges")
+`research/edge/equinox-cost-ratio/` (PREREGISTRATION.md pushed alone first; `run.mjs market <key> <dir>` per market, then `report
+<dir>`; the trades come from the tracker's own adapters in `council/edge-desks-2.mjs`). Break fade, Round-number fade, Box fade and
+FVG return, each kept only where the round-trip cost is at most 10 % of the risk. **FAIL, 0 of 4.** After costs in 2015-26: Break
+fade −0.050R (n 72,658, month t −8.06), Round-number fade −0.059R (n 10,261), Box fade −0.012R (n 87,168, t −2.27), FVG return
+−0.009R (n 26,637, t −1.31). Unlike the Big-candle fade, their before-cost R does not vanish in the kept trades (+0.02R to +0.05R);
+it is simply about the size of the cost (0.06-0.07R). Box fade and FVG return are at zero after costs in 2005-14 (+0.003R each).
+Context only, picked after looking, no threshold adopted: FVG return at 5 % is +0.016R in 2015-26 (n 10,728, t 1.32). These five
+rules are a few hundredths of an R before costs: nothing to trade. The desks stay paper records; the two breakouts remain the only
+rules that pass at measured costs. Test: `tests/equinox-cost-ratio.test.mjs`.
+
+## FVG return with cost at most 5 % of risk, on eight unread markets (24 Nov 2026, owner: "I was expecting more studies")
+`research/edge/fvg-cost5-holdout/` (PREREGISTRATION.md pushed alone first). The one cell `equinox-cost-ratio`'s context showed above
+zero in both windows, tested where no FVG study had looked: GBP/JPY, AUD/JPY, CAD/JPY, EUR/GBP, EUR/AUD, Nasdaq 100, S&P 500, DAX,
+2020-26, "large" = over the market's own 2019 median gap, costs ASSUMED. **FAIL**: +0.043R before costs, +0.014R after (n 7,074,
+month t 0.89); 2020-22 +0.055R (t 2.46), 2023-26 −0.017R; at twice the cost −0.015R. The hint did not hold; the FVG return is
+closed with the other fade / gap rules. Test: `tests/fvg-cost5-holdout.test.mjs`.
+
+## GBP/JPY breakout, a forward record (24 Nov 2026)
+`research/edge/gbpjpy-vol-breakout-forward/` (PREREGISTRATION.md pushed alone first; a copy of the USD/JPY forward record's code).
+T1 on GBP/JPY for complete UTC weekdays from 2026-11-25, the yen-crosses study's cost, bands from its 2016 → 19 Nov 2026 trades
+(`baseline.json`, gated n 2,069 / +0.070R). GBP/JPY was the best of five yen crosses on its history, so the measured range is
+optimistic; "confirmed" at 240 trades also needs the total at TWICE the cost above zero. `vb-forward.yml` writes council-data
+`research/forward/gbpjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0). Test:
+`tests/gbpjpy-vol-breakout-forward.test.mjs`.

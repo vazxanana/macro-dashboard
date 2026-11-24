@@ -38,18 +38,19 @@
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3" defer></script>
-<script src="/assets/ms-draw.js?v=c1d7e81cf2" defer></script>
+<script src="/assets/ms-draw.js?v=715b85c043" defer></script>
 <script src="/assets/ms-paper.js?v=b052c8753d" defer></script>
 <script src="/assets/ms-vprof.js?v=b6a82cd65f" defer></script>
+<script src="/assets/ms-script.js?v=237d9fd7d7" defer></script>
 <script src="/assets/ms-phase.js?v=05b91e8028" defer></script>
 <script src="/assets/ms-charts-guide.js?v=d11de693cd" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
 <script src="/assets/mosha-sop.js?v=ecd774f3c8" defer></script>
-<script src="/assets/mosha-replay.js?v=01a0c50054" defer></script>
+<script src="/assets/mosha-replay.js?v=8499d92d48" defer></script>
 <script src="/assets/desk-trades.js?v=636efed028" defer></script>
-<script src="/assets/desk-live.js?v=ede4e8d231" defer></script>
+<script src="/assets/desk-live.js?v=231220360a" defer></script>
 <script src="/assets/ms-journal.js?v=4fc2cd90b0" defer></script>
 <script src="/assets/mosha-i18n.js?v=22ed49dcd7" defer></script>
 <script src="/assets/mosha-tutor.js?v=62df4f0315" defer></script>
@@ -2648,7 +2649,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msThemeMeta();
 })();
 </script>
-<link rel="stylesheet" href="/assets/soft.css?v=f4492d600a">
+<link rel="stylesheet" href="/assets/soft.css?v=74a1850eb4">
 <style id="ms-pk-css">
 .gate-pk { margin-top: 10px; }
 .gate-pkb { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: var(--g-ink, #eceef2); font: 600 14.5px Figtree, -apple-system, sans-serif; cursor: pointer; touch-action: manipulation; }
@@ -3446,6 +3447,31 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: co
 #ms-ind .ind-cur button { width: 32px; height: 32px; min-height: 32px; min-width: 32px; display: grid; place-items: center; padding: 0; border-color: transparent; background: transparent; color: var(--ink-dim); font-size: 18px; line-height: 1; }
 #ms-ind .ind-cur button:hover { background: var(--cx-hover); color: var(--sell); }
 #ms-ind .ind-lib { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px; padding: 12px 18px 18px; margin-top: 8px; border-top: 1px solid var(--cx-line); }
+/* members' own indicators (24 Nov 2026): the list in the Indicators dialog and the code editor */
+#ms-ind .ind-my { padding: 6px 18px 0; } #ms-ind .ind-my-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#ms-ind .ind-my ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 6px; }
+#ms-ind .ind-my li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto auto; align-items: center; gap: 8px; min-height: 44px; padding: 5px 8px 5px 10px; border: 1px solid var(--cx-line); border-radius: var(--cx-r); }
+#ms-ind .ind-my li small { color: var(--au-ink-3, var(--ink-faint)); font-size: 12px; white-space: nowrap; }
+#ms-ind .ind-my .ind-nm { font: 600 13.5px var(--sans); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#ms-ind .ind-my button { min-height: 32px; padding: 0 10px; font: 600 12.5px var(--sans); border-radius: 8px; }
+#ms-ind .ind-my .ms-note { margin: 6px 0 0; font-size: 12.5px; }
+.sc-dlg { width: min(860px, calc(100vw - 24px)); max-height: min(92dvh, 900px); padding: 0; border: 1px solid var(--au-line, var(--line)); border-radius: 16px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); }
+.sc-dlg[open] { display: flex; flex-direction: column; } .sc-dlg::backdrop { background: rgba(0, 0, 0, .45); }
+.sc-dlg .ind-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 14px 14px 10px 18px; border-bottom: 1px solid var(--au-line, var(--line)); }
+.sc-dlg .ind-h h3 { margin: 0; font: 700 16px var(--sans); } .sc-dlg .ind-h .ms-note { flex: 1 1 260px; min-width: 0; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); }
+.sc-dlg .ind-h .tv-x { width: 36px; height: 36px; min-height: 36px; padding: 0; display: grid; place-items: center; }
+.sc-row { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; padding: 12px 18px 8px; }
+.sc-row .sc-nm { display: grid; gap: 4px; flex: 1 1 180px; font: 500 12px var(--sans); color: var(--au-ink-2, var(--ink-dim)); } .sc-row input { min-height: 38px; padding: 0 10px; border-radius: 8px; font: 500 14px var(--sans); }
+.sc-lang { display: inline-flex; gap: 4px; } .sc-lang button, .sc-row > button, .sc-acts button { min-height: 38px; padding: 0 12px; border-radius: 8px; font: 600 13px var(--sans); }
+#ms-sc-code { flex: 1 1 auto; min-height: 240px; height: 42vh; margin: 0 18px; padding: 12px; box-sizing: border-box; width: calc(100% - 36px); resize: vertical; border: 1px solid var(--au-line, var(--line)); border-radius: 10px; background: var(--au-well, var(--panel)); color: var(--au-ink, var(--ink)); font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; tab-size: 4; white-space: pre; overflow: auto; }
+.sc-msg { min-height: 20px; margin: 8px 18px 0; font: 500 13px var(--sans); color: var(--buy-ink, var(--buy)); } .sc-msg.bad { color: var(--sell-ink, var(--sell)); }
+.sc-acts { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 18px 12px; }
+.sc-dlg .sc-row button, .sc-dlg .sc-acts button, #ms-ind .ind-my button { border: 1px solid var(--au-line-strong, var(--line-strong)) !important; background: transparent; color: var(--au-ink, var(--ink)); cursor: pointer; }
+.sc-dlg .sc-acts button.pri { background: var(--au-primary, var(--ink)) !important; color: var(--au-on-primary, var(--bg)) !important; border-color: transparent !important; }
+.sc-dlg button:focus-visible, #ms-sc-code:focus-visible, .sc-dlg input:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 1px; }
+.sc-help { margin: 0 18px 14px; font-size: 12.5px; color: var(--au-ink-2, var(--ink-dim)); } .sc-help summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; font-weight: 600; } .sc-help p { margin: 6px 0; line-height: 1.5; } .sc-help code { font-size: 12px; }
+@media (max-width: 640px) { .sc-dlg { width: 100vw; max-width: 100vw; max-height: 94dvh; margin: auto 0 0; border-radius: 16px 16px 0 0; } #ms-sc-code { height: 36vh; font-size: 12.5px; } #ms-ind .ind-my li { grid-template-columns: minmax(0, 1fr) auto auto auto; } #ms-ind .ind-my li small { display: none; } }
+@media (pointer: coarse) { #ms-ind .ind-my button, .sc-lang button, .sc-row > button, .sc-acts button, .sc-dlg .ind-h .tv-x, .sc-help summary { min-height: 44px; } .sc-dlg .ind-h .tv-x { width: 44px; height: 44px; } #ms-sc-code { font-size: 16px; } }
 #ms-ind .ind-g { grid-column: 1 / -1; margin: 10px 0 2px; font: 650 13px var(--sans); color: var(--au-ink-2, var(--ink-dim)); } #ms-ind .ind-g small { font-weight: 500; color: var(--au-ink-3, var(--ink-faint)); font-size: 12px; }
 #ms-ind .ind-q { display: block; box-sizing: border-box; width: calc(100% - 36px); margin: 12px 18px 0; min-height: 38px; padding: 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: var(--au-well, var(--panel)); color: var(--au-ink, var(--ink)); font: 14px var(--sans); }
 @media (pointer: coarse) { #ms-ind .ind-q { min-height: 44px; font-size: 16px; } }
@@ -5298,6 +5324,10 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"] #ms-pp .pp-set { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } html[data-phone="simple"] #ms-pp .pp-set label { display: grid; gap: 2px; } html[data-phone="simple"] #ms-pp .pp-set select { width: 100%; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
+  /* 24 Nov 2026, owner: charts use more of the page: the chart card runs edge to edge and the toolbar row is tighter */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-pane { margin-left: -16px; width: calc(100% + 32px); max-width: none; border-radius: 0; border-left: 0; border-right: 0; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h { margin-bottom: 4px; padding-bottom: 2px; border-bottom: 0; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 300px), 700px); }
 
   /* Council → Trades: the forward record in one sentence, then the latest five rows */
   .ps-t-ans { padding: 2px 2px 0; min-height: 0; }
@@ -5794,6 +5824,21 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
   #v-charts .sec-h h2 .kbd-hint { display: none !important; }
   #v-charts .sec-h > h2 { font-size: 18px; letter-spacing: -.01em; margin-right: 4px; }
   #v-charts .sec-h > .ind-open.ind-open { order: 3; margin-left: 8px; }
+}
+</style>
+<style id="ms-ch-space-css">
+/* Charts use the page (24 Nov 2026, owner: "for the charts I would like to use more of the space of the page"). Display only.
+   From 901 px: a tighter toolbar and phase strip, smaller gaps, and chart heights taken from the window: one chart (a
+   timeframe, Split, Layout, any timeframe) fills what is left under the toolbar; All shows two rows in one screen. */
+@media (min-width: 901px) {
+  html:not([data-role="public"]) #v-charts .sec-h { padding-top: 4px; padding-bottom: 4px; margin-bottom: 6px; row-gap: 4px; }
+  html:not([data-role="public"]) #v-charts #ms-phase { margin: 0 0 6px; }
+  html:not([data-role="public"]) #v-charts .ms-grid4 { gap: 8px; }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4[data-view="all"] .ms-chart { height: clamp(320px, calc((100vh - 300px) / 2), 620px); }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4:not([data-view="all"]):not([data-view="lay"]) .ms-chart { height: calc(100vh - 262px); min-height: 380px; max-height: none; }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="1"], [data-lay-n="2"]) .ms-chart { height: max(420px, calc(100vh - 262px)) !important; }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="3"], [data-lay-n="4"]) .ms-chart { height: max(240px, calc(50vh - 155px)) !important; }
+  html[data-view="charts"]:not([data-role="public"]) .ms-live.app { max-width: none; }
 }
 </style>
 <style id="ms-phase-css">/* Market phase panel on the Charts (23 Nov 2026, assets/ms-phase.js): the phase reader per timeframe, closed candles only. Display only; tokens only; 12 px minimum, 44 px on touch; never for guests. */
@@ -6721,7 +6766,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Up candles <input type="color" id="ms-sty-up" value="#089981"></label>
         <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
-        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
         <div class="sty-h">Live price</div>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
@@ -7401,7 +7446,17 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
   </nav>
   <div class="btab-more" id="ms-more" popover aria-label="More sections"><p class="btab-more-h">More sections</p><nav class="btab-more-list" id="ms-more-list" aria-label="More sections"></nav></div>
   <dialog class="ind-dlg" id="ms-ind" aria-labelledby="ms-ind-t"><div class="ind-h"><h3 id="ms-ind-t">Indicators</h3><span class="ms-note">Up to 10, on every chart. Saved for your account on this device. Order flow studies are estimated from candles: the feeds give a volume per candle, not the trades at the bid and the ask.</span><button type="button" class="tv-x" id="ms-ind-x" aria-label="Close">×</button></div>
-    <ul class="ind-cur" id="ms-ind-cur"></ul><input type="search" class="ind-q" id="ms-ind-q" placeholder="Search indicators (name or group)" aria-label="Search indicators" autocomplete="off"><div class="ind-lib" id="ms-ind-lib"></div></dialog>
+    <ul class="ind-cur" id="ms-ind-cur"></ul><div class="ind-my" id="ms-ind-my"></div><input type="search" class="ind-q" id="ms-ind-q" placeholder="Search indicators (name or group)" aria-label="Search indicators" autocomplete="off"><div class="ind-lib" id="ms-ind-lib"></div></dialog>
+  <dialog class="ind-dlg sc-dlg" id="ms-sc" aria-labelledby="ms-sc-t"><div class="ind-h"><h3 id="ms-sc-t">Your indicator</h3><span class="ms-note">Write it in Pine Script or in MetaTrader (MQL) code. It runs in your browser on the chart's candles and only draws lines: it never trades. Saved for your account on this device.</span><button type="button" class="tv-x" id="ms-sc-x" aria-label="Close">×</button></div>
+    <div class="sc-row"><label class="sc-nm">Name<input type="text" id="ms-sc-name" maxlength="40" autocomplete="off" placeholder="My indicator"></label><div class="sc-lang" role="group" aria-label="Language"><button type="button" data-sc-lang="pine" aria-pressed="true">Pine Script</button><button type="button" data-sc-lang="mql" aria-pressed="false">MetaTrader (MQL)</button></div><button type="button" id="ms-sc-ex">Load an example</button></div>
+    <textarea id="ms-sc-code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Indicator code" placeholder="Write or paste your indicator here"></textarea>
+    <p class="sc-msg" id="ms-sc-msg" role="status" aria-live="polite"></p>
+    <div class="sc-acts"><button type="button" id="ms-sc-run">Check it</button><button type="button" class="pri" id="ms-sc-save">Save and add to the charts</button></div>
+    <details class="sc-help"><summary>What works here</summary><div>
+      <p><b>Pine Script</b> (v4 and v5 style): <code>indicator()</code>, <code>input.*</code> (the default value is used), variables with <code>=</code>, <code>var</code> and <code>:=</code>, history <code>close[1]</code>, <code>if / else</code>, <code>for</code>, <code>while</code>, your own functions with <code>=&gt;</code>, <code>plot</code>, <code>plotshape</code>, <code>hline</code>, colours, <code>math.*</code>, <code>nz</code>, <code>na</code>, and the studies <code>ta.sma ema rma wma vwma hma rsi atr tr stdev highest lowest change mom roc macd bb stoch cci cum crossover crossunder barssince valuewhen vwap supertrend pivothigh pivotlow linreg</code>.</p>
+      <p><b>MetaTrader</b> (MQL4 and MQL5 indicators): <code>#property</code> lines, <code>input</code> / <code>extern</code>, buffers with <code>SetIndexBuffer</code>, <code>OnInit</code>, <code>OnCalculate</code> or <code>start</code>, <code>for</code>, <code>while</code>, <code>if</code>, your own functions, <code>Open[] High[] Low[] Close[] Volume[] Time[]</code>, <code>Bars</code>, <code>Math*</code>, and <code>iMA iRSI iATR iCCI iMomentum iStdDev iBands iMACD iStochastic iHighest iLowest iClose…</code> (as values in MQL4, as handles with <code>CopyBuffer</code> in MQL5).</p>
+      <p>Not here: other timeframes or symbols (<code>request.security</code>, a symbol or period other than the chart's), arrays and drawings in Pine (<code>label</code>, <code>line</code>, <code>box</code> are skipped), strategies and orders, classes and <code>switch</code> in MQL. A script that cannot run says which line stopped it.</p>
+    </div></details></dialog>
   <dialog class="tv" id="ms-tv" aria-labelledby="ms-tv-t"><div class="tv-h"><div><h3 id="ms-tv-t">Trade</h3><p id="ms-tv-s"></p></div><div class="tv-ba" role="group" aria-label="Prediction before, result after"><button type="button" data-ba="before">Before</button><button type="button" data-ba="after" class="on">After</button><button type="button" data-ba="save" title="Save the before and after charts as images">Save</button></div><button type="button" class="tv-x" id="ms-tv-x" aria-label="Close chart">×</button></div><div class="tv-tf" id="ms-tv-tf" role="group" aria-label="Chart timeframe"><button type="button" data-tvtf="auto" class="on" aria-pressed="true">Auto</button><button type="button" data-tvtf="1m" aria-pressed="false">M1</button><button type="button" data-tvtf="5m" aria-pressed="false">M5</button><button type="button" data-tvtf="15m" aria-pressed="false">M15</button><button type="button" data-tvtf="1h" aria-pressed="false">H1</button><button type="button" data-tvtf="4h" aria-pressed="false">H4</button><button type="button" data-tvtf="1d" aria-pressed="false">D1</button><span class="tv-tf-sp"></span><button type="button" data-tvmore="1" title="Load more candles before the trade">More history</button><span class="tv-tf-n" id="ms-tv-tfn"></span></div><div class="tv-c" id="ms-tv-c"><div class="tv-msg" id="ms-tv-m">Loading candles…</div></div><div class="tv-k" id="ms-tv-k"></div><div class="tv-nb" id="ms-tv-nb" hidden></div><div class="tv-tk" id="ms-tv-tk" hidden></div><div class="tv-rv adm" id="ms-tv-rv" hidden><div class="rv-strat" id="ms-rv-strat"></div><div class="rv-tools"><b>Draw</b><button type="button" data-tool="pen">Pen</button><button type="button" data-tool="line">Line</button><button type="button" data-tool="text">Text</button><button type="button" class="rv-c on" data-col="#f23645" style="background:#f23645" aria-label="Colour #f23645"></button><button type="button" class="rv-c" data-col="#089981" style="background:#089981" aria-label="Colour #089981"></button><button type="button" class="rv-c" data-col="#f5a623" style="background:#f5a623" aria-label="Colour #f5a623"></button><button type="button" class="rv-c" data-col="#2962ff" style="background:#2962ff" aria-label="Colour #2962ff"></button><button type="button" class="rv-c" data-col="#ffffff" style="background:#ffffff" aria-label="Colour #ffffff"></button><button type="button" data-act="undo">Undo</button><button type="button" data-act="clear">Clear</button></div><div class="rv-tags" id="ms-rv-tags" aria-label="Why it failed"></div><textarea id="ms-rv-text" rows="3" placeholder="Why did this setup fail? What did the chart show before the entry?"></textarea><textarea id="ms-rv-lesson" rows="2" placeholder="Rule idea for the council (optional), e.g. no scalp sells while H4 makes higher lows"></textarea><div class="rv-save"><button type="button" id="ms-rv-save">Save review</button><span id="ms-rv-msg"></span></div><div class="rv-council" id="ms-rv-council"></div></div></dialog>
   <button type="button" class="to-top" id="ms-to-top" aria-label="Back to top" hidden><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
   <div class="ms-toasts" id="ms-toasts" role="status" aria-live="polite"></div>
@@ -7915,7 +7970,9 @@ function msNextSetup(bars, A) {
   // graphite look (17 Nov 2026, docs/design/aureum-theme.md): when the page defines the --au- tokens the chart canvas takes its
   // background (--au-surface), text (--au-ink-3) and grid / borders (--au-line) from them; without them the table above stands.
   // Candle colours are not touched.
-  const auChart = (k) => { try { const cs = getComputedStyle(document.documentElement), v = (n) => cs.getPropertyValue(n).trim(), bg = v('--au-surface'), tx = v('--au-ink-3'), ln = v('--au-line');
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  const auSolid = window.auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  const auChart = (k) => { try { const cs = getComputedStyle(document.documentElement), v = (n) => auSolid(cs.getPropertyValue(n).trim()), bg = v('--au-surface'), tx = v('--au-ink-3'), ln = v('--au-line');
     if (bg && tx && ln && THEMES[k]) Object.assign(THEMES[k], { bg, bgTop: bg, text: tx, grid: ln, border: ln }); } catch (e) {} };
   const UPC = '#089981', DNC = '#f23645';
   // a trading-terminal look (24 Nov 2026, owner: "make the interface look more like TradingView", "the candles should display the
@@ -7936,7 +7993,18 @@ function msNextSetup(bars, A) {
   let CUS = {}; try { CUS = JSON.parse(localStorage.getItem('ms-colors') || '{}') || {}; } catch (e) { CUS = {}; }
   const hexOk = (v) => /^#[0-9a-f]{6}$/i.test(v || '');
   const lumOf = (h) => { const n = parseInt(h.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
-  const candleCols = () => { const K = themeCols(); if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
+  // paper look (24 Nov 2026, owner's screenshot: "want my charts with these colors"): a light chart with grey rising and black
+  // falling candles, black borders and wicks, on every theme. It is the chart's own colours (ms-colors, flag mono), switched on
+  // once per device (ms-paper-v1); "Theme colours" in Style goes back to the page theme's chart. Display only.
+  const PAPER = { bg: '#f7f8fa', up: '#c9ccd2', dn: '#131722', mono: true };
+  const MONO = { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' };
+  try { if (!localStorage.getItem('ms-paper-v1')) { localStorage.setItem('ms-paper-v1', '1'); if (!localStorage.getItem('ms-colors')) { CUS = Object.assign({}, PAPER); localStorage.setItem('ms-colors', JSON.stringify(CUS)); } } } catch (e) {}
+  // is the chart itself light? (its own background when the member chose one, else the page theme)
+  const chartLight = window.msChartLight = () => hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light';
+  // a chart with its own background: that colour, an ink that reads on it, and the light grid on a light one
+  const cusLook = (chart) => { if (!chart || !hexOk(CUS.bg)) return; const lt = lumOf(CUS.bg) > 0.35; try { chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lt ? '#3b4252' : '#a7b0c2' },
+    grid: { vertLines: { color: lt ? '#e9ecf1' : TV_GRID.dark }, horzLines: { color: lt ? '#e9ecf1' : TV_GRID.dark } }, rightPriceScale: { borderColor: lt ? '#d9dde4' : '#273042' }, timeScale: { borderColor: lt ? '#d9dde4' : '#273042' } }); } catch (e) {} };
+  const candleCols = () => { const K = themeCols(); if (CUS.mono && CUS.up === PAPER.up && CUS.dn === PAPER.dn) return MONO; if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
     const u = hexOk(CUS.up) ? CUS.up : K.upColor, d = hexOk(CUS.dn) ? CUS.dn : K.downColor;
     return { upColor: u, downColor: d, borderUpColor: u, borderDownColor: d, wickUpColor: u, wickDownColor: d }; };
   const themeCols = () => G.theme === 'light'
@@ -7989,7 +8057,7 @@ function msNextSetup(bars, A) {
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
       const HH = ctx.canvas.height / (window.devicePixelRatio || 1);
-      (it.days || []).forEach((i) => { const x = X(i - 0.5); if (x === null) return; ctx.strokeStyle = G.theme === 'light' ? 'rgba(20,30,50,0.07)' : 'rgba(200,210,230,0.06)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, HH); ctx.stroke(); });
+      (it.days || []).forEach((i) => { const x = X(i - 0.5); if (x === null) return; ctx.strokeStyle = chartLight() ? 'rgba(20,30,50,0.07)' : 'rgba(200,210,230,0.06)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(Math.round(x) + 0.5, 0); ctx.lineTo(Math.round(x) + 0.5, HH); ctx.stroke(); });
       const vrow = []; o._vr = [];
       (it.vlines || []).forEach((v) => {
         const x = X(v.l); if (x === null) return;
@@ -8104,7 +8172,7 @@ function msNextSetup(bars, A) {
         ctx.save(); ctx.globalAlpha = 0.8; ctx.fillStyle = t.bg; ctx.beginPath();   // a soft backing so labels read over candles and zones
         if (ctx.roundRect) ctx.roundRect(x1 - 3, y - 11, w + 6, 15, 3); else ctx.rect(x1 - 3, y - 11, w + 6, 15);
         ctx.fill(); ctx.restore();
-        ctx.textAlign = 'left'; ctx.fillStyle = G.theme === 'light' && tx.color === '#9aa4b8' ? '#5d6577' : tx.color; ctx.fillText(tx.text, x1, y);
+        ctx.textAlign = 'left'; ctx.fillStyle = chartLight() && tx.color === '#9aa4b8' ? '#5d6577' : tx.color; ctx.fillText(tx.text, x1, y);
       }
     });
   }
@@ -8502,7 +8570,7 @@ function msNextSetup(bars, A) {
     // tick-volume histogram along the bottom (OANDA counts price changes per candle; exchange feeds without volume show nothing)
     const vol = L.vol = chart.addHistogramSeries({ priceScaleId: 'vol', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false });
     chart.priceScale('vol').applyOptions({ scaleMargins: { top: 0.84, bottom: 0 }, visible: false });
-    const vcol = L.vcol = (b) => G.theme === 'light' ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
+    const vcol = L.vcol = (b) => chartLight() ? (b.close >= b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : b.close >= b.open ? 'rgba(8,153,129,.26)' : 'rgba(242,54,69,.26)';
     L.setVol = function () { const raw = src().raw, on = raw && raw.some((b) => b.volume > 0) && G.showVol !== false; vol.setData(on ? raw.map((b) => ({ time: b.time + TZ, value: b.volume || 0, color: vcol(b) })) : []); };
     // session shading (7 Nov loop): faint Asia / London / New York background bands on M15, M5 and M1 (UTC 00-07 / 07-13 / 13-21)
     const sessOn = (s) => ['15m', '5m', '1m'].includes(s.tf.id) && G.showShade !== false && !s.crypto;
@@ -8630,7 +8698,9 @@ function msNextSetup(bars, A) {
         const h = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), s2 = left % 60, p2 = (v) => String(v).padStart(2, '0');
         cd.textContent = h ? `${h}:${p2(m)}:${p2(s2)}` : `${p2(m)}:${p2(s2)}`;
         cd.style.display = ''; cd.style.width = `${w}px`; cd.style.transform = `translateY(${Math.round(y + 11)}px)`;
-        cd.classList.toggle('up', L.close >= L.open);
+        const up = L.close >= L.open; cd.classList.toggle('up', up);
+        // the pill takes the candle's own colour, as the price label above it does (it was the theme's softer red / green beside the candle's)
+        try { const K = candleCols(), c = up ? (K.borderUpColor || K.upColor) : (K.borderDownColor || K.downColor); if (hexOk(c)) { cd.style.background = c; cd.style.color = lumOf(c) > 0.4 ? '#101214' : '#fff'; cd.style.opacity = '1'; } } catch (e) {}
       };
       setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
     chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); lgSoon(Math.round(pr.logical)); } else { lgHover = false; lgSoon(undefined); } });
@@ -8664,7 +8734,7 @@ function msNextSetup(bars, A) {
         out.width = c.width; out.height = c.height + pad * dpr; const x = out.getContext('2d');
         const th = THEMES[G.theme] || THEMES.dark; x.fillStyle = th.bgTop || th.bg; x.fillRect(0, 0, out.width, out.height);
         x.drawImage(c, 0, pad * dpr); x.scale(dpr, dpr);
-        const L = P.bars && P.bars[P.bars.length - 1], ink = G.theme === 'light' ? '#131722' : '#eceef2', dim = G.theme === 'light' ? '#6b7280' : '#8a94a8';
+        const L = P.bars && P.bars[P.bars.length - 1], ink = chartLight() ? '#131722' : '#eceef2', dim = chartLight() ? '#6b7280' : '#8a94a8';
         x.font = '600 15px Figtree, system-ui, sans-serif'; x.fillStyle = ink; x.fillText(`${CUR.label} · ${tf.label}`, 14, 27);
         const w1 = x.measureText(`${CUR.label} · ${tf.label}`).width;
         if (L) { x.font = '600 15px ui-monospace, monospace'; x.fillStyle = L.close >= L.open ? '#2bd4a4' : '#ff5c7a'; x.fillText(fmt(L.close), 26 + w1, 27); }
@@ -8731,7 +8801,7 @@ function msNextSetup(bars, A) {
       const btn = () => el.closest('.ms-pane') && el.closest('.ms-pane').querySelector('.ch-tl');
       const mark = (on) => { const b = btn(); if (b) { b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); } el.classList.toggle('measuring', on || !!P.measureOn || !!P.hlOn || !!P.fibOn || !!P.posOn); };
       P.drawTl = function () { P._tl.forEach((s2) => { try { chart.removeSeries(s2); } catch (e) {} }); P._tl = []; if (!P.bars || !P.bars.length || P.rp) return;
-        const idx = new Map(P.bars.map((b, i) => [b.time, i])), last = P.bars[P.bars.length - 1], col = G.theme === 'light' ? 'rgba(41,98,255,.85)' : 'rgba(94,140,255,.9)';
+        const idx = new Map(P.bars.map((b, i) => [b.time, i])), last = P.bars[P.bars.length - 1], col = chartLight() ? 'rgba(41,98,255,.85)' : 'rgba(94,140,255,.9)';
         get().forEach(([a, pa, b, pb]) => { const ta = a + TZ, tb = b + TZ, ia = idx.get(ta), ib = idx.get(tb); if (ia == null || ib == null || ia === ib) return;
           const [i1, p1, i2, p2] = ia < ib ? [ia, pa, ib, pb] : [ib, pb, ia, pa], t1 = P.bars[i1].time, t2 = P.bars[i2].time, data = [{ time: t1, value: p1 }, { time: t2, value: p2 }];
           if (last.time > t2) data.push({ time: last.time, value: p1 + (p2 - p1) * (P.bars.length - 1 - i1) / (i2 - i1) });
@@ -8977,7 +9047,7 @@ function msNextSetup(bars, A) {
   };
   function drawHLines() { const L = window.msHLines.get();
     Object.values(panes).forEach((P) => { if (!P.series) return; (P._hl || []).forEach((l) => { try { P.series.removePriceLine(l); } catch (e) {} });
-      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: G.theme === 'light' ? 'rgba(42,46,57,.7)' : 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
+      P._hl = L.map((v) => P.series.createPriceLine({ price: v, color: chartLight() ? 'rgba(42,46,57,.7)' : 'rgba(209,212,220,.75)', lineWidth: 1, lineStyle: LW.LineStyle.Solid, axisLabelVisible: true, title: '' })); }); }
   setTimeout(drawHLines, 2000);
   // range meter (7 Nov loop): today's range against the 14-day average daily range, and where price sits inside today's range
   function rangeMeter() {
@@ -9258,7 +9328,8 @@ function msNextSetup(bars, A) {
     const save = () => { try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} applyTheme(); };
     [['ms-sty-bg', 'bg'], ['ms-sty-up', 'up'], ['ms-sty-dn', 'dn'], ['ms-sty-ln', 'ln']].forEach(([id, k]) => $(id).addEventListener('input', (e) => { CUS[k] = e.target.value; save(); }));
     $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
-    $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
+    $('ms-sty-paper').addEventListener('click', () => { CUS = Object.assign({}, CUS, PAPER); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
+    $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC, mono: false }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     btn.addEventListener('click', fill); fill();
     // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on
     // 13 Nov 2026, owner: "make the charts more cleaner", then "too much labels just keep bo vr and cf": the clean look keeps the
@@ -9854,7 +9925,7 @@ function msNextSetup(bars, A) {
       p.overlay.set(p.overlay.items);
     });
     if (hexOk(CUS.bg)) { const txt = lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2';
-      Object.values(panes).forEach((p) => { try { p.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: txt } }); } catch (e) {} });
+      Object.values(panes).forEach((p) => { cusLook(p.chart); });
       document.documentElement.style.setProperty('--ms-bg', CUS.bg); } else document.documentElement.style.removeProperty('--ms-bg');
     root.dataset.chart = (hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light') ? 'light' : 'dark'; document.documentElement.dataset.theme = G.theme;
     // owner (7 Nov): on the white (Light) theme the candles are monochrome, like a printed chart: grey up candles and black
@@ -10042,22 +10113,61 @@ function msNextSetup(bars, A) {
       return [{ v: o, title: `MFI ${x.len}`, last: true }, { v: o.map((v) => v == null ? null : 80), color: 'rgba(138,148,168,.5)', w: 1, dash: true }, { v: o.map((v) => v == null ? null : 20), color: 'rgba(138,148,168,.5)', w: 1, dash: true }]; } },
     cmf: { name: 'Chaikin Money Flow (CMF)', osc: true, flow: true, p: { len: 20 }, calc: (B, x) => { const mv = B.map((b) => { const r = b.high - b.low, w = b.volume > 0 ? b.volume : 1; return r > 0 ? ((b.close - b.low) - (b.high - b.close)) / r * w : 0; }), vol = B.map((b) => b.volume > 0 ? b.volume : 1), a = iSMA(mv, x.len), b2 = iSMA(vol, x.len);
       return [{ v: a.map((v, i) => v == null || !b2[i] ? null : v / b2[i]), hist: true, title: `CMF ${x.len}` }]; } },
+    custom: { name: 'My indicator', p: {}, calc: (B, x) => SC.calc(B, x) },   // a member's own script, drawn on the price
+    customosc: { name: 'My indicator', p: {}, osc: true, calc: (B, x) => SC.calc(B, x) },   // the same in a separate band
   };
   // the library's groups (19 Nov 2026): the dialog lists them by group and filters them by a search
-  const IND_GROUP = { sma: 'Trend', ema: 'Trend', wma: 'Trend', hma: 'Trend', kama: 'Trend', st: 'Trend', psar: 'Trend', ichi: 'Trend', bb: 'Volatility', donchian: 'Volatility', keltner: 'Volatility', atr: 'Volatility', chand: 'Volatility', rexp: 'Volatility', rsi: 'Momentum', macd: 'Momentum', stoch: 'Momentum', cci: 'Momentum', willr: 'Momentum', stochrsi: 'Momentum', ao: 'Momentum', aroon: 'Momentum', adx: 'Momentum', fisher: 'Momentum', delta: 'Volume and order flow', cvd: 'Volume and order flow', vwap: 'Volume and order flow', vprof: 'Volume and order flow', rvol: 'Volume and order flow', obv: 'Volume and order flow', mfi: 'Volume and order flow', cmf: 'Volume and order flow', pivots: 'Levels', sqz: 'Rare and statistical', chop: 'Rare and statistical', zscore: 'Rare and statistical' };
+  const IND_GROUP = { custom: 'My indicators', customosc: 'My indicators', sma: 'Trend', ema: 'Trend', wma: 'Trend', hma: 'Trend', kama: 'Trend', st: 'Trend', psar: 'Trend', ichi: 'Trend', bb: 'Volatility', donchian: 'Volatility', keltner: 'Volatility', atr: 'Volatility', chand: 'Volatility', rexp: 'Volatility', rsi: 'Momentum', macd: 'Momentum', stoch: 'Momentum', cci: 'Momentum', willr: 'Momentum', stochrsi: 'Momentum', ao: 'Momentum', aroon: 'Momentum', adx: 'Momentum', fisher: 'Momentum', delta: 'Volume and order flow', cvd: 'Volume and order flow', vwap: 'Volume and order flow', vprof: 'Volume and order flow', rvol: 'Volume and order flow', obv: 'Volume and order flow', mfi: 'Volume and order flow', cmf: 'Volume and order flow', pivots: 'Levels', sqz: 'Rare and statistical', chop: 'Rare and statistical', zscore: 'Rare and statistical' };
   const IND_GROUPS = ['Trend', 'Momentum', 'Volatility', 'Volume and order flow', 'Levels', 'Rare and statistical'];
   const IND_COLORS = ['#2962ff', '#ff9800', '#9c27b0', '#00bcd4', '#e91e63', '#4caf50', '#795548', '#607d8b', '#f44336', '#3f51b5'];
+  // Members' own indicators (24 Nov 2026, owner: "users … do their own indicators in pine language and metatrader language").
+  // The code is run by assets/ms-script.js (its own small interpreters, never eval); a script only draws lines on the charts.
+  // Kept per account on this device (localStorage ms-scripts-<account>, 20 at most); an indicator-list entry points at one by `sid`.
+  const SC = { key: () => 'ms-scripts-' + (window.MS_WHO || 'guest'), max: 20, cache: new Map(), mem: null,
+    list() { if (SC.mem) return SC.mem; try { const L = JSON.parse(localStorage.getItem(SC.key()) || '[]'); SC.mem = Array.isArray(L) ? L.filter((q) => q && typeof q.id === 'string' && typeof q.code === 'string' && q.code.length <= 20000).slice(0, SC.max) : []; } catch (e) { SC.mem = []; } return SC.mem; },
+    save(L) { SC.mem = L.slice(0, SC.max); try { localStorage.setItem(SC.key(), JSON.stringify(SC.mem)); } catch (e) {} SC.cache.clear(); },
+    get(id) { return SC.list().find((q) => q.id === id) || null; },
+    calc(B, x) { const sc = SC.get(x.sid); if (!sc || !window.MS_SCRIPT || !B.length) return []; const last = B[B.length - 1], k = [x.sid, sc.at, B.length, B[0].time, last.time, last.close].join('|'); let r = SC.cache.get(k);
+      if (!r) { try { r = window.MS_SCRIPT.run(sc.lang, sc.code, B); } catch (e) { r = { plots: [], hlines: [] }; } if (SC.cache.size > 40) SC.cache.clear(); SC.cache.set(k, r); }
+      if (r.plots.some((p) => p.v.length !== B.length)) return [];
+      const out = r.plots.map((p, i) => ({ v: p.v, title: p.dots ? '' : p.title, color: p.color || (i ? IND_COLORS[(i + 3) % IND_COLORS.length] : undefined), w: p.w, hist: p.hist, dots: p.dots, cols: p.cols || undefined, last: !p.dots && !p.hist && i === 0 }));
+      (r.hlines || []).forEach((h) => out.push({ v: B.map(() => h.price), title: h.title || '', color: h.color || 'rgba(127,127,127,.7)', w: 1, dash: true }));
+      return out; } };
+  window.msScripts = { list: () => SC.list().map((q) => ({ id: q.id, name: q.name, lang: q.lang, osc: !!q.osc })) };
   window.msInd = { key: () => 'ms-ind-' + (window.MS_WHO || 'guest'), max: 10,
-    list() { try { const L = JSON.parse(localStorage.getItem(this.key()) || '[]'); return Array.isArray(L) ? L.filter((x) => IND_DEF[x.type]).slice(0, 10) : []; } catch (e) { return []; } },
+    list() { try { const L = JSON.parse(localStorage.getItem(this.key()) || '[]'); return Array.isArray(L) ? L.filter((x) => IND_DEF[x.type] && (!/^custom/.test(x.type) || SC.get(x.sid))).slice(0, 10) : []; } catch (e) { return []; } },
     save(L) { try { localStorage.setItem(this.key(), JSON.stringify(L.slice(0, 10))); } catch (e) {} Object.values(panes).forEach((P) => P.setInd && P.setInd()); if (window.msSplitMarkup) window.msSplitMarkup(); if (window.msVprofRepaint) window.msVprofRepaint(); indRender(); } };
   function indRender() {
-    const L = window.msInd.list(), cnt = document.getElementById('ms-ind-n'); if (cnt) cnt.textContent = `${L.length}/10`;
+    const L = window.msInd.list(), cnt = document.getElementById('ms-ind-n'); if (cnt) cnt.textContent = `${L.length}/10`; scRender();
     const lib = document.getElementById('ms-ind-lib'), cur = document.getElementById('ms-ind-cur'); if (!lib || !cur) return;
     const q = (document.getElementById('ms-ind-q') || {}).value || '', ql = q.trim().toLowerCase(), item = ([k, d]) => `<button type="button" data-ind-add="${k}"${L.length >= 10 ? ' disabled' : ''}><b>${esc(d.name)}</b><small>${d.flow ? 'order flow · ' : ''}${d.osc ? 'separate band' : 'on price'}</small></button>`;
-    const E = Object.entries(IND_DEF).filter(([k, d]) => !ql || d.name.toLowerCase().includes(ql) || k.includes(ql) || (IND_GROUP[k] || '').toLowerCase().includes(ql));
+    const E = Object.entries(IND_DEF).filter(([k]) => k !== 'custom' && k !== 'customosc').filter(([k, d]) => !ql || d.name.toLowerCase().includes(ql) || k.includes(ql) || (IND_GROUP[k] || '').toLowerCase().includes(ql));
     lib.innerHTML = IND_GROUPS.map((g) => { const its = E.filter(([k]) => (IND_GROUP[k] || 'Rare and statistical') === g); return its.length ? `<h4 class="ind-g">${g} <small>${its.length}</small></h4>${its.map(item).join('')}` : ''; }).join('') || '<p class="ms-note">No indicator matches.</p>';
-    cur.innerHTML = L.length ? L.map((x, i) => { const d = IND_DEF[x.type]; return `<li><input type="color" value="${esc(x.color)}" data-ind-col="${i}" aria-label="Colour of ${esc(d.name)}"><span class="ind-nm">${esc(d.name)}</span>${Object.keys(d.p).map((pk) => `<label>${pk}<input type="number" step="${pk === 'step' || pk === 'max' ? '0.01' : ['mult', 'bb', 'kc'].includes(pk) ? '0.1' : '1'}" min="${pk === 'step' || pk === 'max' ? '0.01' : ['mult', 'bb', 'kc'].includes(pk) ? '0.1' : '1'}" value="${x[pk]}" data-ind-p="${i}" data-k="${pk}"></label>`).join('')}<button type="button" data-ind-rm="${i}" aria-label="Remove ${esc(d.name)}">×</button></li>`; }).join('') : '<li class="empty">No indicators yet. Pick up to 10 from the list.</li>';
+    cur.innerHTML = L.length ? L.map((x, i) => { const d0 = IND_DEF[x.type], d = x.sid ? { ...d0, name: (SC.get(x.sid) || {}).name || 'My indicator' } : d0; return `<li><input type="color" value="${esc(x.color)}" data-ind-col="${i}" aria-label="Colour of ${esc(d.name)}"><span class="ind-nm">${esc(d.name)}</span>${Object.keys(d.p).map((pk) => `<label>${pk}<input type="number" step="${pk === 'step' || pk === 'max' ? '0.01' : ['mult', 'bb', 'kc'].includes(pk) ? '0.1' : '1'}" min="${pk === 'step' || pk === 'max' ? '0.01' : ['mult', 'bb', 'kc'].includes(pk) ? '0.1' : '1'}" value="${x[pk]}" data-ind-p="${i}" data-k="${pk}"></label>`).join('')}<button type="button" data-ind-rm="${i}" aria-label="Remove ${esc(d.name)}">×</button></li>`; }).join('') : '<li class="empty">No indicators yet. Pick up to 10 from the list.</li>';
   }
+  function scRender() { const my = document.getElementById('ms-ind-my'); if (!my) return; const S = SC.list(), L = window.msInd.list();
+    my.innerHTML = `<div class="ind-my-h"><h4 class="ind-g">My indicators <small>${S.length}</small></h4><button type="button" data-sc-new>Write an indicator</button></div>` + (S.length ? '<ul>' + S.map((q) => { const on = L.some((x) => x.sid === q.id); return `<li><span class="ind-nm">${esc(q.name)}</span><small>${q.lang === 'mql' ? 'MetaTrader' : 'Pine Script'} · ${q.osc ? 'separate band' : 'on price'}</small><button type="button" data-sc-add="${esc(q.id)}"${on || L.length >= 10 ? ' disabled' : ''}>${on ? 'On the charts' : 'Add'}</button><button type="button" data-sc-edit="${esc(q.id)}">Edit</button><button type="button" data-sc-del="${esc(q.id)}" aria-label="Delete ${esc(q.name)}">Delete</button></li>`; }).join('') + '</ul>' : '<p class="ms-note">Write your own in Pine Script or MetaTrader (MQL) code, or paste one you already have.</p>'); }
+  { let ED = { id: null, lang: 'pine' };
+    const $ = (id) => document.getElementById(id), msg = (t, bad) => { const m = $('ms-sc-msg'); if (m) { m.textContent = t || ''; m.classList.toggle('bad', !!bad); } };
+    const barsNow = () => { const P = Object.values(panes).filter((q) => q.bars && q.bars.length > 60); const p = P.find((q) => q.vis) || P[0]; return p ? p.bars : []; };
+    const setLang = (l) => { ED.lang = l === 'mql' ? 'mql' : 'pine'; document.querySelectorAll('[data-sc-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.scLang === ED.lang))); };
+    const open = (q) => { const d = $('ms-sc'); if (!d) return; ED = { id: q ? q.id : null, lang: q ? q.lang : 'pine' }; $('ms-sc-name').value = q ? q.name : ''; $('ms-sc-code').value = q ? q.code : ''; setLang(ED.lang); msg(''); if (d.showModal && !d.open) d.showModal(); setTimeout(() => $('ms-sc-code').focus(), 30); };
+    const check = () => { if (!window.MS_SCRIPT) { msg('The indicator engine is still loading. Try again in a moment.', true); return null; } const B = barsNow(); if (B.length < 60) { msg('Open a chart with candles first, then check again.', true); return null; }
+      try { const r = window.MS_SCRIPT.run(ED.lang, $('ms-sc-code').value, B), nl = r.plots.length, nh = r.hlines.length; msg(`It runs: ${nl} line${nl === 1 ? '' : 's'}${nh ? ` and ${nh} level${nh === 1 ? '' : 's'}` : ''}, drawn ${r.overlay ? 'on the price chart' : 'in a separate band under the price'}.${r.notes && r.notes.length ? ' ' + r.notes.join(' ') : ''}`); return r; }
+      catch (e) { msg(String(e && e.message || e), true); if (e && e.line) { const ta = $('ms-sc-code'), ls = ta.value.split('\n'); let a0 = 0; for (let i = 0; i < e.line - 1 && i < ls.length; i++) a0 += ls[i].length + 1; try { ta.focus(); ta.setSelectionRange(a0, a0 + (ls[e.line - 1] || '').length); } catch (e2) {} } return null; } };
+    document.addEventListener('click', async (ev) => { const t = ev.target.closest && ev.target.closest('[data-sc-new],[data-sc-add],[data-sc-edit],[data-sc-del],[data-sc-lang],#ms-sc-x,#ms-sc-ex,#ms-sc-run,#ms-sc-save'); if (!t) return;
+      if (t.dataset.scNew != null) { if (SC.list().length >= SC.max) { window.msAlert && msAlert(`You can keep ${SC.max} indicators. Delete one first.`); return; } open(null); return; }
+      if (t.dataset.scEdit) { const q = SC.get(t.dataset.scEdit); if (q) open(q); return; }
+      if (t.dataset.scAdd) { const q = SC.get(t.dataset.scAdd), L = window.msInd.list(); if (!q || L.length >= 10 || L.some((x) => x.sid === q.id)) return; L.push({ type: q.osc ? 'customosc' : 'custom', sid: q.id, color: IND_COLORS[L.length % IND_COLORS.length] }); window.msInd.save(L); return; }
+      if (t.dataset.scDel) { const q = SC.get(t.dataset.scDel); if (!q) return; const ok = window.msConfirm ? await msConfirm(`Delete "${q.name}"? Its code is removed from this device.`, { title: 'Delete this indicator', ok: 'Delete', danger: true }) : true; if (!ok) return; window.msInd.save(window.msInd.list().filter((x) => x.sid !== q.id)); SC.save(SC.list().filter((x) => x.id !== q.id)); indRender(); return; }
+      if (t.dataset.scLang) { setLang(t.dataset.scLang); msg(''); return; }
+      if (t.id === 'ms-sc-x') { $('ms-sc').close(); return; }
+      if (t.id === 'ms-sc-ex') { const ta = $('ms-sc-code'); if (ta.value.trim() && window.msConfirm && !(await msConfirm('Replace what is written with the example?', { title: 'Load an example', ok: 'Replace' }))) return; ta.value = (window.MS_SCRIPT && MS_SCRIPT.EXAMPLES[ED.lang]) || ''; msg(''); return; }
+      if (t.id === 'ms-sc-run') { check(); return; }
+      if (t.id === 'ms-sc-save') { const r = check(); if (!r) return; const code = $('ms-sc-code').value, name = ($('ms-sc-name').value.trim() || r.name || 'My indicator').slice(0, 40), S = SC.list().slice(), id = ED.id || 's' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), rec = { id, name, lang: ED.lang, code, osc: !r.overlay, at: Date.now() }, k = S.findIndex((x) => x.id === id);
+        if (k >= 0) S[k] = rec; else S.push(rec); SC.save(S); let L = window.msInd.list().map((x) => x.sid === id ? { ...x, type: rec.osc ? 'customosc' : 'custom' } : x); if (!L.some((x) => x.sid === id) && L.length < 10) L.push({ type: rec.osc ? 'customosc' : 'custom', sid: id, color: IND_COLORS[L.length % IND_COLORS.length] }); window.msInd.save(L); $('ms-sc').close(); } });
+    document.addEventListener('input', (ev) => { if (ev.target && ev.target.id === 'ms-sc-code' && window.MS_SCRIPT && !ev.target.dataset.touched) { ev.target.dataset.touched = '1'; const g = MS_SCRIPT.guess(ev.target.value); if (ev.target.value.length > 40 && g !== ED.lang && !ED.id) setLang(g); } });
+    document.addEventListener('keydown', (ev) => { const ta = ev.target; if (!ta || ta.id !== 'ms-sc-code' || ev.key !== 'Tab' || ev.shiftKey || ev.ctrlKey || ev.metaKey || ev.altKey) return; ev.preventDefault(); const a0 = ta.selectionStart, b0 = ta.selectionEnd; ta.value = ta.value.slice(0, a0) + '    ' + ta.value.slice(b0); ta.selectionStart = ta.selectionEnd = a0 + 4; }); }
   document.addEventListener('click', (ev) => { const t = ev.target.closest && ev.target.closest('[data-ind-add],[data-ind-rm],#ms-ind-open,#ms-ind-x'); if (!t) return;
     if (t.id === 'ms-ind-open') { const d = document.getElementById('ms-ind'); indRender(); if (d && d.showModal) d.showModal(); return; }
     if (t.id === 'ms-ind-x') { document.getElementById('ms-ind').close(); return; }
@@ -10200,7 +10310,7 @@ function msNextSetup(bars, A) {
   function spControls() { const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym');
     lt.value = SP.ltf; rt.value = spTf(); rt.disabled = SP.sync.tf; sy.value = spSym(); sy.disabled = SP.sync.sym; }
   function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
-    SP.chart.applyOptions(tvLook(t, G.theme)); if (hexOk(CUS.bg)) SP.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2' } });
+    SP.chart.applyOptions(tvLook(t, G.theme)); cusLook(SP.chart); if (hexOk(CUS.bg)) SP.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2' } });
     if (SP.series) SP.series.applyOptions(candleCols()); if (SP.ov) SP.ov.set(SP.ov.items); if (SP.ly) SP.ly.setVol(); }   // repaint the markups (and volume) in the new theme's colours
   window.msSplitTheme = spTheme; window.msSplitMarkup = () => { try { if (SP.on && !spPane()) spMarkup(); } catch (e) {} };
   window.msSplitLayers = () => { try { if (SP.on && !spPane() && SP.ly) SP.ly.setAll(); } catch (e) {} };
@@ -10313,7 +10423,7 @@ function msNextSetup(bars, A) {
       cell.querySelector('.mm-tf').addEventListener('change', (e) => { MM.cells[i].tf = e.target.value; mmSave(); mmLoad(C); });
       if (window.msCharts) window.msCharts.add({ id: 'mm' + i, el, chart, series, bars: () => C.bars, sec: () => (SPTFS.find((t) => t.id === MM.cells[i].tf) || TFS[2]).sec, market: () => MM.cells[i].k, TZ, dec: () => (INSTRUMENTS[MM.cells[i].k] || INST).dec ?? 2, fmt: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST), visible: () => MM.on && i < MM.n && !!el.offsetParent }); }
     MM.built = true; mmTheme(); }
-  function mmTheme() { if (!MM.built) return; const t = THEMES[G.theme] || THEMES.dark; MM.ch.forEach((C) => { C.chart.applyOptions(tvLook(t, G.theme)); C.series.applyOptions(candleCols()); }); }
+  function mmTheme() { if (!MM.built) return; const t = THEMES[G.theme] || THEMES.dark; MM.ch.forEach((C) => { C.chart.applyOptions(tvLook(t, G.theme)); cusLook(C.chart); C.series.applyOptions(candleCols()); }); }
   { const f0 = window.msSplitTheme; window.msSplitTheme = () => { try { if (f0) f0(); } finally { mmTheme(); } }; }
   function mmLay() { if (!MM.built) return; MM.host.dataset.n = MM.n; MM.host.querySelectorAll('[data-mmn]').forEach((b) => { const on = +b.dataset.mmn === MM.n; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     MM.ch.forEach((C) => { C.cell.hidden = C.i >= MM.n; if (C.i < MM.n) { const c = MM.cells[C.i]; C.cell.querySelector('.mm-k').innerHTML = mmOpts(c.k); C.cell.querySelector('.mm-tf').innerHTML = mmTfOpts(c.tf); if (C.key !== c.k + '|' + c.tf) mmLoad(C); } }); }

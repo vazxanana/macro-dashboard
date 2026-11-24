@@ -166,7 +166,8 @@
 
   // ---- session report as an image (1200 × 675 canvas) ----
   function reportPNG(d) {
-    const cs = getComputedStyle(document.documentElement), v = (k, f) => (cs.getPropertyValue(k) || '').trim() || f;
+    const auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+    const cs = getComputedStyle(document.documentElement), v = (k, f) => auSolid((cs.getPropertyValue(k) || '').trim()) || f;
     const C = { bg: v('--panel', '#0f1116'), ink: v('--ink', '#eceef2'), dim: v('--ink-dim', '#a4abb8'), faint: v('--ink-faint', '#8a92a1'), line: v('--line-strong', '#333'), buy: v('--buy', '#2fbf8f'), sell: v('--sell', '#f2576f'), gold: v('--gold', '#e0a526') };
     const c = document.createElement('canvas'), Wd = 1200, Hd = 675; c.width = Wd; c.height = Hd; const x = c.getContext('2d'), F = 'Inter, -apple-system, Segoe UI, sans-serif', M = F;
     x.fillStyle = C.bg; x.fillRect(0, 0, Wd, Hd); x.fillStyle = C.gold; x.fillRect(0, 0, Wd, 6);
