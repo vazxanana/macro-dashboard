@@ -6938,3 +6938,14 @@ waiting for a cheaper broker: it is the arithmetic of a stop a few pips from the
 positive after costs in both windows; gold alone +0.143R on 298 kept trades (t 1.47, not significant, picked after looking).
 Six studies of these trades (target x4, entry timing, cost ratio): do not test another variant on these years. The desk stays a
 paper record. Test: `tests/bigfade-cost-ratio.test.mjs`.
+
+## The other Equinox fade and gap rules, only the trades with room for the cost (24 Nov 2026, owner: "and the other edges")
+`research/edge/equinox-cost-ratio/` (PREREGISTRATION.md pushed alone first; `run.mjs market <key> <dir>` per market, then `report
+<dir>`; the trades come from the tracker's own adapters in `council/edge-desks-2.mjs`). Break fade, Round-number fade, Box fade and
+FVG return, each kept only where the round-trip cost is at most 10 % of the risk. **FAIL, 0 of 4.** After costs in 2015-26: Break
+fade −0.050R (n 72,658, month t −8.06), Round-number fade −0.059R (n 10,261), Box fade −0.012R (n 87,168, t −2.27), FVG return
+−0.009R (n 26,637, t −1.31). Unlike the Big-candle fade, their before-cost R does not vanish in the kept trades (+0.02R to +0.05R);
+it is simply about the size of the cost (0.06-0.07R). Box fade and FVG return are at zero after costs in 2005-14 (+0.003R each).
+Context only, picked after looking, no threshold adopted: FVG return at 5 % is +0.016R in 2015-26 (n 10,728, t 1.32). These five
+rules are a few hundredths of an R before costs: nothing to trade. The desks stay paper records; the two breakouts remain the only
+rules that pass at measured costs. Test: `tests/equinox-cost-ratio.test.mjs`.
