@@ -178,6 +178,13 @@ function meaning(r) {
   if (r.verdict === 'PASS') return ['The chosen variant stayed positive after costs on five crosses it was never fitted to. That makes it a candidate for',
     'a forward paper record with its own pre-registration, NOT an edge: the holdout costs are assumed, and the evening hours',
     'include the rollover.', ...tail];
+  const h = r.holdout, miss = h.checks.filter((c) => !c.ok).map((c) => c.what);
+  if (miss.length === 1 && h.all.meanNet > 0) return [`A near miss. On the five holdout crosses the chosen variant (${r.chosen}) stayed positive after costs,`,
+    `${fR(h.all.meanNet)}R a trade (n ${N(h.all.n)}, month t ${f2(h.all.tNet)}), in both windows and in ${h.nPos} of 5 markets, but it failed one check: ${miss[0]}`,
+    `(${fR(h.x15.meanNet)}R a trade). The margin over the cost is about a third of one round trip, and 2015-26 alone is ${fR(h.B.meanNet)}R a trade:`,
+    'too thin to survive costs that are only assumed for these crosses. What made it closer than R5: a stop of 2 ATR (one round trip',
+    'is about 0.07-0.14R instead of about 0.4R), the box\'s other edge as the target, and taking only the close-outs the plain fade of',
+    'the first break agrees with. It is not an edge and nothing is built on it.', ...tail];
   return ['The variant chosen on the ten screen markets did not hold after costs on the five holdout crosses: what the screen picked',
     'was fitted to the markets it was chosen on.', ...tail];
 }
