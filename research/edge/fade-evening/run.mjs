@@ -192,7 +192,29 @@ function resultMd(o) {
   L.push('', '## What it means', '', MEANING(o), '');
   return L.join('\n');
 }
-export const MEANING = (o) => (o.meaning ? o.meaning : '(written after the run)');
+export const MEANING = (o) => {
+  const g = (n) => o.cells.find((x) => x.name === n), a = g('A 1ATR mkt all'), lim = g('A 1ATR lim all'), b2 = g('B 2ATR mkt all');
+  return [
+    '**No version of the evening fade survives costs once it stays clear of the rollover.** All 24 cells lose after costs in',
+    'every window, on both feeds and on the five crosses; the picked cell (the least bad in 2005-14) is negative in all three tests.',
+    '',
+    'What the grid shows about what was missing:',
+    `- **The rollover was most of the tilt.** With no fill and no holding in 21:00-22:59, break hours 20 and 23 at a 1 ATR stop make`,
+    `  ${f3(a.conf.mean)}R a trade before costs in 2015-26 (n ${N(a.conf.n)}) against +0.169R for the 20-23 block that held through it.`,
+    '  What is left is real on every feed (crosses ' + f3(a.cross.mean) + 'R, HistData ' + f3(a.hist.mean) + 'R before costs) but smaller than one round trip.',
+    `- **A wider stop cuts the cost in R but the edge shrinks with it** (2 ATR: ${f3(g('A 2ATR mkt all').conf.mean)}R before, ${f3(g('A 2ATR mkt all').conf.meanNet)}R after in 2015-26).`,
+    `- **A better-priced limit makes it worse** (${f3(lim.conf.mean)}R before costs at 1 ATR): the orders that fill are the ones where the`,
+    '  break kept going (adverse selection), the ones that would have worked leave without them.',
+    '- **The calm-volatility filter does not help** after costs in any window.',
+    `- **The wider evening window B is no better** (${f3(b2.conf.meanNet)}R after costs at 2 ATR in 2015-26, n ${N(b2.conf.n)}).`,
+    '- **As a complement it adds nothing**: its monthly R is uncorrelated with the gold and USD/JPY breakouts (about 0), but it',
+    '  loses on its own, so a book with it is worse than the breakouts alone (see the table).',
+    '',
+    'So the fade of the first M15 break is a small, real mean-reversion of quotes in the evening, mostly at the rollover, and too',
+    'small to pay a taker\'s spread. The one way left to test it would be paying less than the mid-to-mid move: a maker order at the',
+    'break level with the broker\'s own ticks (the tick probe), on its own pre-registration. On these candles it is closed: no more',
+    'cuts of this rule on these years. Nothing live changed; never call it an edge.',
+  ].join('\n'); };
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const [cmd, a, b] = process.argv.slice(2); const t0 = Date.now();
