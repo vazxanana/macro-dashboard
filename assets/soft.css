@@ -94,6 +94,51 @@ html:root body :is(button, select, input, textarea):not([type="checkbox"]):not([
   transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 
+
+/* ── second pass (24 Nov 2026, owner: "keep improving the theme") ──────────────────────────────────────────── */
+/* chips and side tags (BUY / SELL, shadow, status): soft tinted pills, no outline */
+html:root body :is(.chip, .ms-chip, .ms-chip-buy, .ms-chip-sell, .tag, .ms-st, .pill) {
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+/* the P&L calendars: rounder day cells, the result tint kept, the hard coloured frame gone */
+html:root body .cal-d { border-radius: 12px !important; border-color: var(--au-line-soft) !important; }
+html:root body .cal-d:is(.win, .loss) { border-color: transparent !important; }
+html:root body .cal-wk { border-radius: 12px !important; border-style: solid !important; border-color: var(--au-line-soft) !important; }
+html:root body .cal-wk:is(.win, .loss) { border-color: transparent !important; }
+html:root body .cal-nav button { border-color: transparent !important; background-color: color-mix(in srgb, var(--au-ink) 6%, transparent) !important; }
+/* the one primary button: a soft pill */
+html:root body :is(.pri, .primary, .btn.gold, .gate-go, .u-btn) { border-radius: 999px !important; }
+/* buttons, segmented switches and timeframe chips: soft filled, no hard frame; the chosen one a soft accent tint */
+html:root body :is(.seg, .tfs, .ms-tf, .mk-mode, .desk-sw, .c-nav, .ict-seg, .ict-src, .dl-tfs, .mo-seg) button,
+html:root body :is(.dl-card, .mo-card, .card) > :is(div, header) > button:not(.pri):not(.primary) {
+  border-color: transparent !important;
+  background-color: color-mix(in srgb, var(--au-ink) 5%, transparent);
+  border-radius: 10px;
+}
+html:root body :is(button, [role="tab"]):is([aria-pressed="true"], [aria-selected="true"], .on, .active):not(.pri):not(.primary):not(.btab a) {
+  background-color: color-mix(in srgb, var(--au-accent) 16%, transparent) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+/* inputs and selects: a soft well instead of a framed box */
+html:root body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+  background-color: color-mix(in srgb, var(--au-ink) 4%, transparent);
+  border-color: var(--au-line) !important;
+  border-radius: 10px;
+}
+/* rows inside lists: a soft hover instead of nothing */
+html:root body :is(.c-act li, .act-row, .tr-row, table tbody tr):hover { background-color: color-mix(in srgb, var(--au-ink) 3.5%, transparent); }
+/* tables: lighter rules between rows */
+html:root body :is(table) :is(td, th) { border-color: var(--au-line-soft) !important; }
+/* chart areas: the frame around a chart is a hairline */
+html:root body :is(.ms-pane, .tv-wrap, .chart-wrap, .dl-chart) { border-color: var(--au-line-soft) !important; border-radius: 14px; }
+/* a gentle hover lift on cards you can open */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html:root body :is(a.card, button.card, .tile-s, .hs-go a, .hq a):hover { transform: translateY(-1px); box-shadow: var(--au-shadow-pop); transition: transform .18s ease, box-shadow .18s ease; }
+}
+
 /* a reader who asks for less transparency gets solid surfaces */
 @media (prefers-reduced-transparency: reduce) {
   :root:root:root:not([data-theme="light"]) { --au-surface: #23262c; --au-surface-2: #2d3036; --soft-glass: #23262c; }

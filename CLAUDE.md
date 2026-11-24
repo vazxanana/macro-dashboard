@@ -6792,3 +6792,7 @@ so it wins over each page's own token block whatever the order. Surfaces are see
 16 px backdrop blur, header, phone tab bar and side rail are frosted glass (`color-mix` of the background at 72 %, 30 px blur; the header switch and round buttons see-through too), menus, popovers, dialogs and toasts a
 more opaque glass (`--soft-glass`) with a 22 px blur, hairlines lighter, radii 10 / 16 / 22 px, diffuse shadows, h1 / h2 weight 600.
 Text colours are unchanged. `prefers-reduced-transparency: reduce` gets solid surfaces. To undo: remove the link from the pages.
+Second pass (same day, "keep improving the theme"): chips and BUY / SELL tags are tinted pills without an outline; calendar day
+and week cells 12 px, their coloured frames gone (the result tint stays); segmented switches, timeframe chips and card buttons soft
+filled without a frame, the chosen one a soft accent tint; inputs and selects a soft well; table rules lighter; list rows a soft
+hover; primary buttons pills; clickable cards lift 1 px on hover (not with reduced motion).
