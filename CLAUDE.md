@@ -6835,3 +6835,33 @@ Display only. Causes found on screenshots and fixed:
 - **Space** (`<style id="ms-ch-space-css">` after `#ms-ch-flat-css`; phone rules in the simple view's block): from 901 px a tighter
   toolbar and phase strip, 8 px gaps, All = two rows a screen (`clamp(320px, (100vh - 300px) / 2, 620px)`), one chart / Split /
   Layout fill the window (`100vh - 262px`), no max width on Charts; on a phone the chart card runs edge to edge and is 36 px taller.
+
+## Members write their own indicators in Pine Script and MetaTrader code (24 Nov 2026, owner: "users … do their own indicators in pine language and metatrader language")
+Display only: a script draws lines on the Desk's charts; it never places, changes or refuses an order and no council member reads it.
+- **`assets/ms-script.js`** (`window.MS_SCRIPT`, `module.exports`; pure, no DOM): two small interpreters written here, never `eval`
+  / `Function`: the code is lexed, parsed to a tree and walked with a step budget (`BUDGET` 6e6: a loop that never ends says "takes
+  too long"), so a script cannot reach the page, the network or storage. `run(lang, code, bars)` → `{ name, overlay, plots: [{ title,
+  color, w, hist, dots, v, cols? }], hlines, notes }`; an error carries `.line`. 20,000 characters, 24 plots at most.
+  - **Pine** (v4 / v5 style), run candle by candle with a state per call site: `indicator` / `study`, `input.*` (the default is
+    used), `=`, `var`, `:=`, `+=`, history `x[n]`, `if / else if / else`, `for … to … by`, `while`, functions `f(a) => …` (one line
+    or a block), tuples, `plot`, `plotshape` (dots at the high / low), `hline`, `color.*`, `math.*`, `nz`, `na`, `fixnan`, and
+    `ta.` sma ema rma wma vwma swma hma rsi atr tr stdev dev highest lowest change mom roc rising falling macd bb stoch cci cum
+    crossover crossunder cross barssince valuewhen vwap supertrend pivothigh pivotlow linreg (bare v4 names too). Skipped with a
+    note: `fill`, `bgcolor`, `barcolor`, `alertcondition`, `label` / `line` / `box` / `table`, `strategy.*`. Refused in words:
+    `request.*`, arrays, `switch`, `x = if …`.
+  - **MetaTrader** (MQL4 and MQL5 indicators): `#property` lines (window, colours, widths, labels, types, levels), `input` /
+    `extern`, globals, functions, `OnInit` / `init`, `OnCalculate` (both forms) / `start`, `if`, `for`, `while`, `++`, compound
+    assignment, casts, `SetIndexBuffer` / `SetIndexStyle` / `SetIndexLabel` / `PlotIndexSet*`, `ArraySetAsSeries`, `Open[] … Time[]`,
+    `Bars`, `Point`, `Math*`, `iMA iRSI iATR iCCI iMomentum iStdDev iBands iMACD iStochastic` (a value with a shift in MQL4, a handle
+    read with `CopyBuffer` in MQL5), `iHighest`, `iLowest`, `iClose…`, `iMAOnArray`. MQL4 conventions (arrays newest first) unless
+    the code has `CopyBuffer`, `indicator_plots`, `PlotIndexSet` or `ArraySetAsSeries`. An array is STORED oldest first; `series`
+    only turns the index round. Not here: other symbols / timeframes, `switch`, classes, objects on the chart.
+- **Page** (`market-structure.html`): the Indicators dialog has "My indicators" (`#ms-ind-my`: Add / Edit / Delete, "Write an
+  indicator") and the editor `#ms-sc` (name, Pine Script | MetaTrader, "Load an example", "Check it" = run on the chart's candles
+  and say how many lines and where, an error selects its line; "Save and add to the charts" saves only code that runs). Scripts
+  are kept per account on this device (localStorage `ms-scripts-<account>`, 20 at most; nothing goes to the server). An indicator-
+  list entry is `{ type: 'custom' | 'customosc', sid, color }` (`IND_DEF.custom` on the price, `customosc` in a separate band, by
+  the script's own `overlay` / `#property`), drawn by the existing `indDraw` on every chart; results are cached per script and
+  candle set (`SC.cache`). `window.msScripts.list()` is a read-only view.
+- Tests: `tests/ms-script.test.mjs` (reference maths for both languages, no look-ahead, errors and their line, the budget, no
+  eval / fetch / storage in the asset, page wiring). Checked in a browser: both examples written, checked, saved and drawn.
