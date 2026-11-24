@@ -385,6 +385,12 @@ const USER_RULES = [
   { id: 'replica-live-again', apply: (c) => { if (c.ownerShadow && c.ownerShadow.replica) { const { replica, ...rest } = c.ownerShadow; c.ownerShadow = rest; } },
     change: 'Gold replica (owner, 20 Nov): new trades are live paper trades again (alerted, main book, council demo account); same rule and stops; open shadow trades run to their exits',
     why: 'Owner request of 20 Nov 2026. Said with it: the replica has no out-of-sample edge on record (replica-oos 2017-22 -0.05R a trade, n 115; replica-sides FAIL) and its forward record is too short to judge; paper and demo only.' },
+  // dom-demo-6154 (owner, 24 Nov 2026: "theres an account that got 100 usd put the mosha dom trading there risking 1% per trade",
+  // "Its a new account", "Ending 6154", "DOM zone"): the H1 dominant-zone demo job moves to the demo account whose login ends 6154,
+  // 1 % a trade. Its orders already on the Council account run out at the broker with their own stop, target and expiry.
+  { id: 'dom-demo-6154', apply: (c) => { c.dom = { ...(c.dom || {}), account: '*6154', risk: 0.01 }; },
+    change: 'H1 dominant-zone demo job (owner, 24 Nov): moves to the new $100 demo account (login ending 6154), 1 % of the balance a trade',
+    why: 'Owner request of 24 Nov 2026. Demo only; every order carries its stop. On $100 the smallest lot often risks more than 1 % (then that order is skipped). A forward demo record of a before-cost tilt, not an edge.' },
 ];
 config.userRules = config.userRules || [];
 // supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote
