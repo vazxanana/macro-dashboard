@@ -1,6 +1,6 @@
 # Big-candle fade with a target nearer than 50 % of the candle (result, 24 Nov 2026)
 
-**Verdict: FAIL. No target nearer than 50 % is better: on 2005-14 the desk's 50 % is the best of the eight after costs (−0.061R a trade), and on 2015-26 every nearer target loses more (50 %: −0.246R; 40 %: −0.283R; 30 %: −0.378R; 20 %: −0.549R; 10 %: −0.640R with 21 % winners). More winners, smaller wins, the same cost.**
+**Verdict: FAIL. A target nearer than 50 % is worse, not better. On 2005-14 the desk's 50 % is the best of the eight after costs (−0.061R a trade), and on 2015-26 every nearer target loses more (50 %: −0.246R; 40 %: −0.283R; 30 %: −0.378R; 20 %: −0.549R; 10 %: −0.640R with 21 % winners). More winners, smaller wins, the same cost.**
 
 Paper research only, run once as pre-registered (`PREREGISTRATION.md`, pushed alone first); gate reproduced. Nothing live changed; the desk keeps its 50 % target.
 
