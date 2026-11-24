@@ -26,6 +26,7 @@ import { frames, buildZones } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
 import { atr14, startIdx } from '../research/edge/dom-trade-through/run.mjs';
 import * as FADE from '../research/edge/grid7-wide-fade/run.mjs';
+import * as GB from '../research/edge/gotobi/run.mjs';
 import * as BIG from '../research/edge/big-candle-fade/run.mjs';
 import * as RND from '../research/edge/round-number-breaks/run.mjs';
 import * as BOX from '../research/edge/grid6-box-in-box/run.mjs';
@@ -207,6 +208,37 @@ export const goldTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau
 export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'jpyvb', 'usdjpy', JPY_K, from) : []);
 
 
+// ─── lyriac: the passing rules as one desk (24 Nov 2026, owner: "build as new edge called Lyriac and put it in equinox") ───
+// The three intraday rules of research/edge/passing-rules-book that pass their tests, each with its own study's code: the gold
+// breakout T1, the USD/JPY breakout T1 (vbDays, above) and the gotobi fade T2 on USD/JPY (research/edge/gotobi: on a gotobi day
+// sell at the 00:55 UTC open, stop 1.5 x the median absolute move of that window over the 20 Tokyo business days before, out at
+// 06:00 UTC). The book's two small rules (gold before a US holiday, the Nasdaq Tuesday) are not here: other markets and calendars.
+export function gotobiTrades(B, { from, market = 'usdjpy' } = {}) {
+  if (market !== 'usdjpy') return [];
+  const M5 = toK(B['5m']); if (!M5.length) return [];
+  const rows = M5.map((b) => [b.t, b.o, b.h, b.l, b.c]), ix = GB.index(rows), f = fx('usdjpy'), out = [], lastEnd = M5[M5.length - 1].e;
+  const moveOf = (d) => GB.windowMove(ix, 'fade', d), ymd = (t) => new Date(t * 1000).toISOString().slice(0, 10);
+  const set = GB.gotobiSet(+ymd(from).slice(0, 4), +ymd(lastEnd).slice(0, 4));
+  for (let d = ymd(from); d <= ymd(lastEnd); d = GB.addD(d, 1)) { if (!set.has(d)) continue;
+    const { entry, exit } = GB.legTimes('fade', d); if (entry < from) continue;
+    const D = GB.stopDist(moveOf, d), e = GB.entryPx(ix, entry); if (!(D > 0) || !e) continue;
+    const stop = e.px + D; let how = null, px = null, endT = null, last = null;
+    for (let i = e.i; i < rows.length && rows[i][0] < exit; i++) { const [t, o, h] = rows[i]; last = rows[i];   // the study's trade(): a gap at the open, then the stop
+      if (o >= stop) { how = 'gap'; px = o; endT = t; break; } if (h >= stop) { how = 'stop'; px = stop; endT = t; break; } }
+    if (!how) { const xp = lastEnd > exit - 1 ? GB.exitPx(ix, exit) : null; if (xp != null) { how = 'time'; px = xp; endT = exit; } }
+    if (!how && lastEnd >= exit + GB.EXIT_GRACE) continue;                                   // the exit candle never came: the study has no trade that day
+    const open = !how, R = open ? null : -(px - e.px) / D, fl = open && last ? -(last[4] - e.px) / D : null;
+    out.push({ id: `usdjpy:lyriac-g-s${entry}`, market: 'usdjpy', kind: 'lyriac-gotobi', label: 'Gotobi fade', h: '1d', l: '5m', side: -1, t: entry,
+      entry: e.px, stop, target: null, status: open ? 'open' : how === 'time' ? 'time' : 'stopped', R, endT: open ? null : endT, exit: open ? null : px, mfe: null, float: fl,
+      log: [{ t: entry, text: `${d} is a gotobi day (a Japanese settlement day). The rule sells USD/JPY at the 00:55 UTC open ${f(e.px)}, the stop ${f(stop)} (1.5 x the median move of this window over the 20 Tokyo business days before: ${f(D)}), no target, out at 06:00 UTC.` },
+        open ? { t: null, text: `Still open on the last candle read (${sg(fl)} now).` } : how === 'time' ? { t: exit, text: `Out at 06:00 UTC at ${f(px)}: ${sg(R)}.` } : { t: endT, text: `Stopped: ${sg(R)}` + (how === 'gap' ? ' (the candle opened beyond the stop).' : '.') }],
+      marks: [{ kind: 'level', p: e.px, a: entry, at: entry, label: '00:55 UTC open', under: true }] }); }
+  return out;
+}
+export const lyriacTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau' ? vbDays(toK(B['5m']), GO, 'lyriac', 'xau', GOLD_T1.k, from)
+  : market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'lyriac', 'usdjpy', JPY_K, from).concat(gotobiTrades(B, { from, market })) : []);
+
+
 // ─── dom: the H1 dominant-zone limit, as council/dom-demo.mjs reads it ───
 // The demo job's own constants (tests/edge-desks-2.test.mjs compares them with council/dom-demo.mjs, which is not imported here:
 // it carries the cTrader order code). Zones: combo-grid-3 buildZones('dom') on CLOSED H1 candles (the job's read()). At the close
@@ -270,6 +302,7 @@ export const DESKS2 = {
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
+  lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };
 export const KINDS2 = Object.keys(DESKS2);

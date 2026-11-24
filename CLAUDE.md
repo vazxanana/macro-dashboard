@@ -7007,3 +7007,26 @@ A member's own MetaTrader 5 follows the Equinox desks; no broker login or passwo
   program on GitHub); hidden for guests and accounts without the desks; keeps nothing in the browser.
 - The desks are paper records of rules that lose after costs: a demo feed, never advice. Sending to real accounts would need the
   owner to change absolute rule 2. Tests: `tests/eqx-bridge.test.mjs` (5), `tests/bridge-demo.test.mjs`.
+
+## Lyriac: the passing rules as one Equinox desk, on the $200 demo account (24 Nov 2026, owner: "build as new edge called Lyriac and put it in equinox connect the 200$ acc to it")
+The owner asked for "the ultimate edge" from everything tested. The evidence gives no new chart rule (19 of 20 combinations of
+24 Nov failed, one still running); what passes is the book of `research/edge/passing-rules-book`. Lyriac is that book's three
+intraday rules as ONE desk (the first tab of `/equinox`):
+- **Tracker** `council/edge-desks-2.mjs` `lyriacTrades` (`DESKS2.lyriac`, markets xau + usdjpy, `extra: { '5m': 40 }` days of
+  candles for the gotobi stop): the gold and USD/JPY breakout T1 through the breakout desks' own `vbDays` (kind `lyriac-t1`, the
+  same entries, stops and R as `goldvb` / `jpyvb`: a test compares), and `gotobiTrades` (kind `lyriac-gotobi`): the gotobi study's
+  own calendar, `legTimes('fade')`, `stopDist` and the order of its `trade()` (a gap at the open, then the stop, else 06:00 UTC);
+  a gotobi day cut before 06:00 UTC is an open record. `mosha-desk.mjs` `clean` takes the `lyriac-` kinds. The loop line is
+  `--only fade,…,jpyvb,lyriac,dom`; `datahealth.mjs` lists `lyriac/desk.json`. Not in it: gold before a US holiday and the Nasdaq
+  Tuesday (other markets and calendars).
+- **Page**: `equinox.html` `#v-lyriac` (first in `EQ_DESKS`), `assets/desk-trades.js` `DESKS.lyriac` (its "What this is" gives the
+  book's figures and says they describe in-sample years, not proof), `assets/desk-live.js`.
+- **The $200 account**: Trader rule `lyriac-155` sets `config.vb.account` and `config.gotobi.account` to `*155`, so the two demo
+  jobs that already trade exactly these rules with real stop orders (`council/vb-demo.mjs`, `council/gotobi.mjs`) trade on the
+  demo account whose login ends 155; risk and switches are unchanged (0.25 %, at most 1 % at the smallest volume). **On $200
+  most days are skipped**: gold's smallest volume (1 oz) risks about $25 a trade and USD/JPY's about $2.60. And on 24 Nov the
+  token did not hold an account ending 155 ("account not found for this token"): nothing trades there until the owner
+  authorises it for the cTrader app. The mosha6 book's mapping to `*155` is unchanged.
+- The standalone `VolBreakout` bots written the same day were removed on the owner's word ("dont do it").
+- First 60-day read (before costs, not evidence): gold breakout 31 trades +18.9R, USD/JPY breakout 29 +0.2R, gotobi 11 +2.7R.
+A paper desk and a demo record of rules whose studies passed; the forward records judge. Tests: `tests/lyriac.test.mjs` (4).

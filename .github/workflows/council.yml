@@ -157,7 +157,7 @@ jobs:
             if [ $((i % 3)) -eq 1 ]; then timeout 280 node council/edge-desks.mjs data --only eg,msnr,lit || echo "Edge desks round $i failed"; fi
             # The eight Equinox desks (23 Nov 2026, council/edge-desks-2.mjs, shown on /equinox): each study's own rule as a paper record, no order and no alert.
             # Own line and timeout (5-minute candles of eighteen markets, read once for the eight desks), so the older desks keep their 280 s.
-            if [ $((i % 3)) -eq 1 ]; then timeout 150 node council/edge-desks.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,dom || echo "Passing-edge desks round $i failed"; fi
+            if [ $((i % 3)) -eq 1 ]; then timeout 150 node council/edge-desks.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,lyriac,dom || echo "Passing-edge desks round $i failed"; fi
             # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
             # (~25 min), capped at 3 min; a failure never stops the loop.
             if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi
