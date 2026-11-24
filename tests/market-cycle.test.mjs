@@ -199,7 +199,7 @@ test('Style button on the charts toolbar: chart type, colours saved per device, 
   // "too much labels": while clean, one BO word and one CF word per chart, and the strips and readouts around the charts are hidden
   assert.match(html, /text: CL \? \(k === evs\.length - 1 \? 'BO' : ''\)/);
   assert.match(html, /html\[data-clean="1"\] #v-charts :is\(#ms-cycle, #ms-adr, #ms-mtf, #ms-cx-tog, \.ms-ro, \.ms-role\)/);
-  assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
+  assert.match(html, /const candleCols = \(\) => \{ const K = themeCols\(\); (if \(CUS\.mono && CUS\.up === PAPER\.up && CUS\.dn === PAPER\.dn\) return MONO; )?if \(!hexOk\(CUS\.up\) && !hexOk\(CUS\.dn\)\) return K;/);
 });
 
 // 12 Nov 2026, owner: "after iBOs and BO mark zone for entry, barrier / EG unmitigated, fresh supply or demand OB"

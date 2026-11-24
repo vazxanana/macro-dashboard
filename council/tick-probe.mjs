@@ -53,7 +53,11 @@ export const marksBack = (env) => { const v = Math.round(+(env && env.PROBE_MARK
 // "fills" object { SYMBOL: [...] }, the first broker tick in [t0, t1] (unix sec) where ask >= level (dir > 0) or bid <= level
 // (dir < 0): [id, tickMs, bid, ask], or [id, null] when none; windows of at most FILLS_SPAN seconds, at most FILLS_MAX a symbol
 export const FILLS_SPAN = 1800, FILLS_MAX = 4000;
-export function firstCross(qp, level, dir) { for (const q of qp) if (dir > 0 ? q[2] >= level : q[1] <= level) return q; return null; }
+// dir 2 / -2 (24 Nov 2026, research/edge/fade-late-tick-exec): the CLOSING side of a target, bid >= level (2: a buy's target)
+// or ask <= level (-2: a sell's target); 1 / -1 as before
+export function firstCross(qp, level, dir) {
+  const hit = dir === 2 ? (q) => q[1] >= level : dir === -2 ? (q) => q[2] <= level : dir > 0 ? (q) => q[2] >= level : (q) => q[1] <= level;
+  for (const q of qp) if (hit(q)) return q; return null; }
 // "USDJPY:depth,gotobi" -> { name, parts }; a bare name reads depth, hours and events
 export function parseName(arg) { const [name, p] = String(arg).split(':'); const parts = p ? p.split(',').filter((x) => PARTS.includes(x)) : ['depth', 'hours', 'events']; if (!parts.includes('depth')) parts.unshift('depth'); return { name, parts }; }
 // the gotobi days (UTC dates) from `from` (unix sec) to now whose 06:00 mark has passed, oldest first
