@@ -14870,6 +14870,32 @@
     ],
     "stopCheckedAt": "2026-11-24T02:27:54.000Z",
     "brokerStop": 3678.97
+   },
+   "mosha6:bar-r6-eg-15m-v2-b1795495200": {
+    "positionId": "50995488",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 200,
+    "lots": 0.02,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-24T04:59:09.000Z",
+    "councilEntry": 3628.905,
+    "stop": 3624.095,
+    "t1": 3657.765,
+    "riskCash": 26.15,
+    "margin": 14.54,
+    "mark": 3633.26,
+    "levelsFrom": "mark",
+    "fillPrice": 3632.72,
+    "slipR": 0.793,
+    "lagSec": 1149,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T04:59:09.000Z",
+    "brokerStop": 3623.55
    }
   },
   "day": {
@@ -14877,7 +14903,7 @@
    "startBalance": 10599.7
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10458.83 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 10458.83 · 7 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.685 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -14890,14 +14916,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10458.83,
-  "lastRun": "2026-11-24T04:54:55.000Z"
+  "lastRun": "2026-11-24T04:59:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T16:16:03.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 462.22, 4.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T16:17:34.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 461.11, 4.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -16385,6 +16406,11 @@
    "at": "2026-11-24T02:47:20.000Z",
    "msg": "XAUUSD position 50975059 closed at the broker",
    "trade": "mosha6:bar-r6-eg-15m-b1795486500"
+  },
+  {
+   "at": "2026-11-24T04:59:09.000Z",
+   "msg": "opened buy XAUUSD 0.02 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-eg-15m-v2-b1795495200"
   }
  ],
  "limits": {
@@ -16464,11 +16490,11 @@
   ]
  },
  "execution": {
-  "n": 492,
-  "meanSlipR": -0.014,
+  "n": 493,
+  "meanSlipR": -0.012,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 149,
+  "medianLagSec": 150,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -16503,8 +16529,8 @@
     "meanSlipR": -0.021
    },
    "XAUUSD": {
-    "n": 113,
-    "meanSlipR": -0.051
+    "n": 114,
+    "meanSlipR": -0.043
    }
   }
  }
