@@ -6956,3 +6956,11 @@ zero in both windows, tested where no FVG study had looked: GBP/JPY, AUD/JPY, CA
 2020-26, "large" = over the market's own 2019 median gap, costs ASSUMED. **FAIL**: +0.043R before costs, +0.014R after (n 7,074,
 month t 0.89); 2020-22 +0.055R (t 2.46), 2023-26 −0.017R; at twice the cost −0.015R. The hint did not hold; the FVG return is
 closed with the other fade / gap rules. Test: `tests/fvg-cost5-holdout.test.mjs`.
+
+## GBP/JPY breakout, a forward record (24 Nov 2026)
+`research/edge/gbpjpy-vol-breakout-forward/` (PREREGISTRATION.md pushed alone first; a copy of the USD/JPY forward record's code).
+T1 on GBP/JPY for complete UTC weekdays from 2026-11-25, the yen-crosses study's cost, bands from its 2016 → 19 Nov 2026 trades
+(`baseline.json`, gated n 2,069 / +0.070R). GBP/JPY was the best of five yen crosses on its history, so the measured range is
+optimistic; "confirmed" at 240 trades also needs the total at TWICE the cost above zero. `vb-forward.yml` writes council-data
+`research/forward/gbpjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0). Test:
+`tests/gbpjpy-vol-breakout-forward.test.mjs`.
