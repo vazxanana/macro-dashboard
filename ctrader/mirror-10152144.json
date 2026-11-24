@@ -1015,7 +1015,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T22:42:26.000Z",
     "councilEntry": 0.54812,
     "stop": 0.547844,
@@ -1026,25 +1026,25 @@
     "slipR": -0.616,
     "lagSec": 746,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T22:42:26.000Z",
-    "brokerStop": 0.54767
+    "brokerStop": 0.54767,
+    "closedAt": "2026-11-24T22:46:59.000Z"
    }
   },
   "day": {
    "date": "2026-11-24",
    "startBalance": 500.21,
    "reset": "2026-11-24T18:13:38.000Z",
-   "lastBalance": 499.64,
-   "ids": [
-    "51243433"
-   ],
+   "lastBalance": 497.82,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 499.64 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 497.82 · 0 open",
   "skipped": {
    "eqx:fade:eurjpy:fade-m15-s1795559400": "stop distance 0.049214 sits inside the broker spread 0.1 on EURJPY: no stop could be set"
   },
@@ -1075,15 +1075,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 499.64,
-  "lastRun": "2026-11-24T22:44:37.000Z"
+  "balance": 497.82,
+  "lastRun": "2026-11-24T22:46:59.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T13:11:46.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:13:53.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:21 UTC) (will retry)",
@@ -2567,6 +2562,11 @@
   {
    "at": "2026-11-24T22:42:26.000Z",
    "msg": "opened buy NZDUSD 0.04 lot (council eqx-fade)",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795559400"
+  },
+  {
+   "at": "2026-11-24T22:46:59.000Z",
+   "msg": "NZDUSD position 51243433 closed at the broker",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795559400"
   }
  ],
