@@ -1,6 +1,6 @@
 # FVG return with a cost of at most 5 % of the risk, on eight unread markets (result, 24 Nov 2026)
 
-**Verdict: FAIL. On eight markets no FVG study had read, the FVG return kept where cost is at most 5 % of risk made +0.043R a trade before costs and +0.014R after (n 7074, 2020-26, month t 0.89); 2020-22 +0.055R, 2023-26 −0.017R; at twice the cost −0.015R.**
+**Verdict: FAIL. The low-cost hint did not hold on eight unread markets. The FVG return kept where cost is at most 5 % of risk made +0.043R a trade before costs and +0.014R after (n 7074, 2020-26, month t 0.89); 2020-22 +0.055R, 2023-26 −0.017R; at twice the cost −0.015R.**
 
 Paper research only, run once as pre-registered (`PREREGISTRATION.md`, pushed alone first). Nothing live changed. Costs are ASSUMED on all eight markets.
 
