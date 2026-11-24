@@ -1056,6 +1056,32 @@
     ],
     "stopCheckedAt": "2026-11-24T23:16:44.000Z",
     "brokerStop": 159.316
+   },
+   "eqx:fade:eurusd:fade-m15-b1795562100": {
+    "positionId": "51247620",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-24T23:25:51.000Z",
+    "councilEntry": 1.0962,
+    "stop": 1.095949,
+    "t1": 1.096703,
+    "riskCash": 1.24,
+    "margin": 6.58,
+    "mark": 1.09628,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09628,
+    "slipR": 0.319,
+    "lagSec": 651,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T23:25:51.000Z",
+    "brokerStop": 1.09595
    }
   },
   "day": {
@@ -1067,10 +1093,10 @@
     "51246396"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 497.82 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 497.82 · 2 open",
   "skipped": {
    "eqx:fade:eurjpy:fade-m15-s1795559400": "stop distance 0.049214 sits inside the broker spread 0.1 on EURJPY: no stop could be set"
   },
@@ -1102,14 +1128,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 497.82,
-  "lastRun": "2026-11-24T23:21:34.000Z"
+  "lastRun": "2026-11-24T23:25:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T13:22:19.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:24:29.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:32 UTC) (will retry)",
@@ -2594,6 +2615,11 @@
    "at": "2026-11-24T23:16:44.000Z",
    "msg": "opened sell USDJPY 0.05 lot (council eqx-fade)",
    "trade": "eqx:fade:usdjpy:fade-m15-s1795559400"
+  },
+  {
+   "at": "2026-11-24T23:25:51.000Z",
+   "msg": "opened buy EURUSD 0.03 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795562100"
   }
  ],
  "limits": {
@@ -2686,9 +2712,9 @@
   ]
  },
  "execution": {
-  "n": 4,
-  "meanSlipR": 0.4,
-  "medianSlipR": 0.432,
+  "n": 5,
+  "meanSlipR": 0.384,
+  "medianSlipR": 0.33,
   "worstSlipR": 1.352,
   "medianLagSec": 26,
   "bySymbol": {
@@ -2703,6 +2729,10 @@
    "USDJPY": {
     "n": 1,
     "meanSlipR": 1.352
+   },
+   "EURUSD": {
+    "n": 1,
+    "meanSlipR": 0.319
    }
   }
  }
