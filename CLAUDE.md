@@ -3499,6 +3499,11 @@ Tests: `tests/ctrader-mirror.test.mjs` ("Equinox", "ICT copies stopped").
 its state file is `mirror-155.json` (`mirrorFile`: digits only, so the Trader's `mirror(-\d+)?.json` reader holds). 10152145 is in
 `drain`: it opens nothing and manages its open Mosha copies to their exits. On $200, 0.25 % is $0.50 a trade: most gold trades need
 more than the smallest lot allows and are skipped (`riskVolume`'s minimum-lot rule, at most 2 %).
+**Checked 24 Nov 2026**: the token holds no demo account whose login ends 155 (`ctrader/accounts.json`: "account not found for this
+token"; `mirror-155.json` "refused"), so nothing trades there until the owner authorises that account for the cTrader app. The
+…144 account was reset from about $10,000 to $500 after the UTC day began and the 2 % day stop then held every copy ("95 % down
+today"): a balance under `RESET_SHARE` 0.5 of the day's start is now read as an account reset and the day starts again
+(`state.day.reset`). `dom/trades.json` `conn` records a refused connection once (`{ error, acct, since }`, then `{ ok }` when back).
 
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:

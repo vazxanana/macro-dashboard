@@ -105,7 +105,10 @@ test('24 Nov 2026: the job moved to the demo account ending 6154 at 1 %: found b
   const J = file(dir); assert.equal(J.trades.find((x) => x.id === 'old-zone').status, 'placed', 'a record of the old account is not read or cancelled');
   assert.equal(J.trades.find((x) => x.id !== 'old-zone').acct, '…6154'); assert.ok(!JSON.stringify(J).includes('50116154'), 'the account number is never written');
   const b2 = broker(); b2.accounts = [{ ctidTraderAccountId: 1, traderLogin: 1116154, isLive: false }, { ctidTraderAccountId: 2, traderLogin: 2226154, isLive: false }];
-  await go(setup({ dom: { account: '*6154' } }), b2, R); assert.equal(news(b2).length, 0, 'two demo accounts with that tail: refused, nothing sent');
+  const d2 = setup({ dom: { account: '*6154' } }); await go(d2, b2, R); assert.equal(news(b2).length, 0, 'two demo accounts with that tail: refused, nothing sent');
+  const c = file(d2).conn; assert.ok(c && c.error && c.acct === '…6154', 'a refused connection is written down once, with the tag only');
+  const at = c.since; await go(d2, b2, R); assert.equal(file(d2).conn.since, at, 'the same refusal again does not rewrite the file');
+  await go(d2, b, R); assert.ok(file(d2).conn.ok, 'back once the account is found');
 });
 test('the zone fails while the order rests: cancelled at once; an order past its 24 h: expired, never re-armed', async () => {
   { const R = rows(), dir = setup(), b = broker(); await go(dir, b, R);

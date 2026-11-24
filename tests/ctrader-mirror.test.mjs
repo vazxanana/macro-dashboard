@@ -1160,3 +1160,10 @@ test('pickAccount: "*155" = the one demo account whose login ends 155; two match
   const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
   assert.equal(acc.mirrorAccounts.mosha6, '*155'); assert.deepEqual(acc.drain, ['10152145']); assert.equal(acc.mirrorAccounts.eqx, '10152144');
 });
+
+test('daily stop: a balance cut to under half the day start is an account reset, not a loss (24 Nov 2026)', async () => {
+  const b = broker(); const st = { ...started, day: { date: new Date(NOW * 1000).toISOString().slice(0, 10), startBalance: 200000 } };
+  const r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: st, WS: b.WS, now: NOW + 60 });
+  assert.equal(r.state.day.startBalance, 10000); assert.ok(r.state.day.reset);
+  assert.equal((r.state.wait || {})['eurusd-intraday-1'], undefined); assert.equal(orders(b).length, 1);
+});

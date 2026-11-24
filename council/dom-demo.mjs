@@ -125,6 +125,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   const did = []; let s = null, ctid, dirty = false;
   try {
     ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
+    if (J.conn && J.conn.error) { J.conn = { ok: true, acct: cur, since: iso() }; dirty = true; }   // back after a refusal: said once
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), positions = rc.position || [], orders = rc.order || [];
     const mine = (x) => (x.tradeData || {}).label === LABEL, byComment = (list, id) => list.find((x) => mine(x) && String((x.tradeData || {}).comment || '') === commentOf(id));
     const sideOf = (td) => (+td.tradeSide === 2 || td.tradeSide === 'SELL' ? 'sell' : 'buy');
@@ -212,7 +213,11 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           J.trades.push({ ...base, status: e.skip ? 'skip' : 'error', why }); dirty = true; did.push(`${id} ${e.skip ? 'skip' : 'error'}`); log(`dom: ${id}: ${why}`); }
       }
     }
-  } catch (e) { log('dom: ' + scrub(String((e && e.message) || e)).slice(0, 160)); return { error: true, did }; }
+  } catch (e) { const msg = scrub(String((e && e.message) || e)).slice(0, 160); log('dom: ' + msg);
+    // 24 Nov 2026: a refused connection (an account the token does not hold, say) is written down once, so the file says why
+    // nothing happens (it was only in the run's log)
+    if (!s && (!J.conn || J.conn.error !== msg || J.conn.acct !== cur)) { J.conn = { error: msg, acct: cur, since: iso() }; dirty = true; }
+    return { error: true, did }; }
   finally { if (s) s.close(); if (dirty) write(); }
   return { did };
 }

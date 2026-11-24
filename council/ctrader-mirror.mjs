@@ -180,6 +180,8 @@ export const moshaHasOwnAccount = (byBook) => !!(byBook && byBook.mosha6 && byBo
 // balance; maxLots stays only as the cap when that margin is unknown.
 // 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
 // minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
+// 24 Nov 2026: a day-start balance this many times the balance now is an account reset, not a loss (see the day stop below)
+export const RESET_SHARE = 0.5;
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
   risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.0025 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
@@ -592,6 +594,13 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const today = new Date(now * 1000).toISOString().slice(0, 10);
     if (!st.day || st.day.date !== today) st.day = { date: today, startBalance: balance };
     if (st.day.startBalance == null && balance != null) st.day.startBalance = balance;   // first readable balance of the day
+    // 24 Nov 2026: a demo account reset (the owner set …144 from about $10,000 to $500) is not a loss: with the 2 % daily
+    // stop that reads the day's start balance it held every copy all day ("95 % down today"). A fall of half the balance or
+    // more inside one day cannot come from trades sized at a fraction of a per cent with stops, so the day starts again there.
+    if (balance != null && st.day.startBalance > 0 && balance < st.day.startBalance * RESET_SHARE) {
+      say(`balance ${balance} against a day start of ${st.day.startBalance}: read as an account reset, the day starts again`);
+      st.day = { date: today, startBalance: balance, reset: new Date(now * 1000).toISOString() };
+    }
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES);
     const positions = new Map((rc.position || []).map((p) => [String(p.positionId), p]));
     const bOrders = new Map((rc.order || []).map((o) => [String(o.orderId), o]));   // pending orders resting at the broker
