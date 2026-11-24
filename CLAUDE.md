@@ -6883,3 +6883,14 @@ in 2005-14, t 4.44) and still a loss after costs: −0.226R a trade (n 54,443, 2
 Context only: 80 % −0.220R, 100 % −0.211R; in 2005-14 they are about zero after costs (−0.012R, −0.008R). No market is positive.
 The desk's target stays 50 %. Two exit variants on these trades are enough: do not test another target on these years.
 Test: `tests/bigfade-target-65.test.mjs`.
+
+## Big-candle fade: the target sweep, no sweet spot (24 Nov 2026, owner: "Find the sweet spot")
+`research/edge/bigfade-target-sweep/` (PREREGISTRATION.md pushed alone first): fifteen targets (50 % to 300 % of the candle, and
+none = the stop or the 1-day limit ends the trade) on the desk's own trades, the target CHOSEN by R after costs on 2005-14 and
+JUDGED on 2015-26. **FAIL**: the curve only rises with the distance, so the choice is "no target" (+0.066R after costs in
+2005-14); judged on 2015-26 it makes +0.332R before costs and −0.107R after (n 54,443, 5 % winners, month t −2.65), better than
+the desk's 50 % (−0.246R; +0.140R a trade, t 3.68) and still a loss. Every one of the fifteen loses after costs in 2015-26.
+By market with the discovery-chosen target: only EUR/USD is above zero (+0.138R, month t 1.34, not significant). The fade's
+winners run far (the before-cost R grows from +0.19R to +0.33R as the target goes), but a 5 % win rate at −0.107R is not a rule
+to trade. The desk keeps 50 %. **This closes the target question on these trades** (three studies).
+Test: `tests/bigfade-target-sweep.test.mjs`.
