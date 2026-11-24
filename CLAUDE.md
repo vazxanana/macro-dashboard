@@ -6949,3 +6949,10 @@ it is simply about the size of the cost (0.06-0.07R). Box fade and FVG return ar
 Context only, picked after looking, no threshold adopted: FVG return at 5 % is +0.016R in 2015-26 (n 10,728, t 1.32). These five
 rules are a few hundredths of an R before costs: nothing to trade. The desks stay paper records; the two breakouts remain the only
 rules that pass at measured costs. Test: `tests/equinox-cost-ratio.test.mjs`.
+
+## FVG return with cost at most 5 % of risk, on eight unread markets (24 Nov 2026, owner: "I was expecting more studies")
+`research/edge/fvg-cost5-holdout/` (PREREGISTRATION.md pushed alone first). The one cell `equinox-cost-ratio`'s context showed above
+zero in both windows, tested where no FVG study had looked: GBP/JPY, AUD/JPY, CAD/JPY, EUR/GBP, EUR/AUD, Nasdaq 100, S&P 500, DAX,
+2020-26, "large" = over the market's own 2019 median gap, costs ASSUMED. **FAIL**: +0.043R before costs, +0.014R after (n 7,074,
+month t 0.89); 2020-22 +0.055R (t 2.46), 2023-26 −0.017R; at twice the cost −0.015R. The hint did not hold; the FVG return is
+closed with the other fade / gap rules. Test: `tests/fvg-cost5-holdout.test.mjs`.
