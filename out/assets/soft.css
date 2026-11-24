@@ -64,11 +64,16 @@ html:root body :is(.card, .mx-card, .tile, .ict-m, .story > .card, .pos-card, .p
 
 /* the header bar and side rail: glass over the wash */
 html:root body :is(header.top, .btab, .rail, nav.side) {
-  background-color: color-mix(in srgb, var(--au-bg) 55%, transparent) !important;
+  background-color: color-mix(in srgb, var(--au-bg) 72%, transparent) !important;
   background-image: none !important;
   border-color: var(--au-line-soft) !important;
-  backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
+  backdrop-filter: blur(30px) saturate(1.5);
+  -webkit-backdrop-filter: blur(30px) saturate(1.5);
+}
+/* the Desk | Macro | … switch and the round header buttons: see-through too */
+html:root body :is(.hdr-sw, header.top .ib, header.top button.ic) {
+  background-color: color-mix(in srgb, var(--au-surface-2) 60%, transparent) !important;
+  border-color: var(--au-line-soft) !important;
 }
 
 /* floating parts: menus, popovers, dialogs, toasts. A little more opaque so text over the page stays clear */

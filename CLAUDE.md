@@ -6789,6 +6789,6 @@ Display only. `assets/soft.css`, linked right before `</head>` on every page (De
 Equinox, gold terminal, /veteran/; offline.html stays self-contained), loaded last and written with `:root:root:root` / `html:root body`
 so it wins over each page's own token block whatever the order. Surfaces are see-through (`--au-surface` rgba .58 dark / .68 light,
 `--au-surface-2` .42 / .70) over a fixed soft background wash (`--soft-wash`, three faint radial gradients), cards and panels get a
-16 px backdrop blur, header and side rail are glass (`color-mix` of the background at 55 %), menus, popovers, dialogs and toasts a
+16 px backdrop blur, header, phone tab bar and side rail are frosted glass (`color-mix` of the background at 72 %, 30 px blur; the header switch and round buttons see-through too), menus, popovers, dialogs and toasts a
 more opaque glass (`--soft-glass`) with a 22 px blur, hairlines lighter, radii 10 / 16 / 22 px, diffuse shadows, h1 / h2 weight 600.
 Text colours are unchanged. `prefers-reduced-transparency: reduce` gets solid surfaces. To undo: remove the link from the pages.
