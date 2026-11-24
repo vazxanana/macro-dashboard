@@ -96,6 +96,15 @@ html:root body :is(header.top, .btab, .rail, nav.side) {
   backdrop-filter: blur(30px) saturate(1.5);
   -webkit-backdrop-filter: blur(30px) saturate(1.5);
 }
+/* a sticky section bar (the Macro desk's numbered chips): the header's glass, as a soft rounded strip */
+html:root body nav.toc {
+  background-color: color-mix(in srgb, var(--au-bg) 64%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--au-line-soft);
+  border-radius: 16px;
+  padding: 6px 8px !important;
+}
 /* the Desk | Macro | … switch and the round header buttons: see-through too */
 html:root body :is(.hdr-sw, header.top .ib, header.top button.ic) {
   background-color: color-mix(in srgb, var(--au-surface-2) 60%, transparent) !important;

@@ -6800,3 +6800,8 @@ Rules found by the ChronosTrade audit (24 Nov 2026): light is `data-theme="light
 `dark` / `midnight` chosen (every page's own rule); dark keeps the pinned background #121315, midnight #0b0c0e; a selected
 item takes the page's ink on its accent tint; **no backdrop blur on a card that holds a chart** (`.chartc`, any card with a
 canvas): a backdrop filter makes the card the frame of its fixed-position children and broke the synced panes and drawings.
+Third pass (24 Nov 2026, "keep going"): the Macro desk's sticky section bar (`nav.toc`) is the header's glass as a rounded strip
+(it was a 90 % slab of the page colour); the Edge lab's Forward records card has a sixth record, the gotobi fade (`gotobi-forward`,
+written by `vb-forward.yml` since 21 Nov), in a grid of three; the early-against-late card says "no trades yet" before its first
+trade. Found by the smoke test on today's data: a long line in the Macro desk's "Your read" list (`.pl-list .d`, no wrap) widened
+the phone page to 607 px; its column now shrinks (`minmax(0, 1fr)`) and that line wraps.
