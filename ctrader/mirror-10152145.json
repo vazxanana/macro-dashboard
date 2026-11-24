@@ -14575,7 +14575,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "mosha6",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-23T16:06:04.000Z",
     "councilEntry": 3670.925,
     "stop": 3681.62,
@@ -14588,10 +14588,12 @@
     "slipR": 0.289,
     "lagSec": 1864,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-23T16:06:04.000Z",
-    "brokerStop": 3682.77
+    "brokerStop": 3682.77,
+    "closedAt": "2026-11-24T08:31:04.000Z"
    },
    "mosha6:bar-r6-eg-15m-z-s1795454220": {
     "positionId": "50878841",
@@ -15043,7 +15045,7 @@
    "startBalance": 10599.7
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10383.51 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 10443.62 · 5 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.685 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -15054,15 +15056,10 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
-  "balance": 10383.51,
-  "lastRun": "2026-11-24T08:28:19.000Z"
+  "balance": 10443.62,
+  "lastRun": "2026-11-24T08:31:04.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T16:45:09.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 451.12, 4.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T16:47:34.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 450.59, 4.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -16550,6 +16547,11 @@
    "at": "2026-11-24T06:36:52.000Z",
    "msg": "XAUUSD position 51017032 closed at the broker",
    "trade": "mosha6:bar-r6-eg-15m-v3-b1795500660"
+  },
+  {
+   "at": "2026-11-24T08:31:04.000Z",
+   "msg": "XAUUSD position 50860627 closed at the broker",
+   "trade": "mosha6:bar-r6-tap-eg-15m-v3-s1795448100"
   }
  ],
  "limits": {
