@@ -633,7 +633,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9768.81 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 9768.81 · 7 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -642,10 +642,32 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {},
+  "orders": {
+   "xau-m30m1-1795532506": {
+    "orderId": "34761105",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "limitPrice": 3617.88,
+    "stop": 3632.6258392857144,
+    "t1": 3588.3883214285715,
+    "placedAt": "2026-11-24T15:04:01.000Z",
+    "expires": "2026-11-24T21:01:46.000Z",
+    "riskCash": 14.75,
+    "margin": 7.26,
+    "minLot": true,
+    "shadow": true,
+    "alerted": [
+     "pending"
+    ]
+   }
+  },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9768.81,
-  "lastRun": "2026-11-24T15:00:09.000Z"
+  "lastRun": "2026-11-24T15:04:01.000Z"
  },
  "log": [
   {
@@ -1008,6 +1030,11 @@
    "at": "2026-11-24T14:38:46.000Z",
    "msg": "XAUUSD position 51109172 closed at the broker",
    "trade": "xau-m30m1-1795528789"
+  },
+  {
+   "at": "2026-11-24T15:04:01.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3617.88 (council m30m1, valid to 2026-11-24T21:01Z)",
+   "trade": "xau-m30m1-1795532506"
   }
  ],
  "limits": {

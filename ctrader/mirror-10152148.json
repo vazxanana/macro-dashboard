@@ -5911,7 +5911,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T14:41:54.000Z",
     "councilEntry": 3631.55,
     "stop": 3612.66,
@@ -5925,10 +5925,12 @@
     "slipR": -0.131,
     "lagSec": 65,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T14:41:54.000Z",
-    "brokerStop": 3610.18
+    "brokerStop": 3610.18,
+    "closedAt": "2026-11-24T15:04:05.000Z"
    }
   },
   "day": {
@@ -5936,7 +5938,7 @@
    "startBalance": 12741.49
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12709.48 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 12690.41 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5944,15 +5946,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12709.48,
-  "lastRun": "2026-11-24T15:00:10.000Z"
+  "balance": 12690.41,
+  "lastRun": "2026-11-24T15:04:05.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T14:26:13.000Z",
-   "msg": "not mirrored yet eth-replica-1794407102-s: daily loss stop (44.8% down today) (will retry)",
-   "trade": "eth-replica-1794407102-s"
-  },
   {
    "at": "2026-11-11T14:33:48.000Z",
    "msg": "not mirrored yet xrp-replica-1794407562-s: daily loss stop (44.8% down today) (will retry)",
@@ -7440,6 +7437,11 @@
   {
    "at": "2026-11-24T14:41:54.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1795531249-b"
+  },
+  {
+   "at": "2026-11-24T15:04:05.000Z",
+   "msg": "XAUUSD position 51123148 closed at the broker",
    "trade": "xau-replica-1795531249-b"
   }
  ],
