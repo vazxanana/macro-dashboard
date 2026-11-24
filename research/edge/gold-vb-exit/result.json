@@ -1,0 +1,703 @@
+{
+ "study": "gold-vb-exit",
+ "title": "Gold T1: exit time and day anchor at the measured hourly cost",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/gold-vb-exit/PREREGISTRATION.md",
+ "planSha256": "3ac9cd522b4e1628624259d9462adb33fc725249b83cf757a4884202a304e258",
+ "verdict": "BROAD: gold T1 at the measured hourly cost (C1), pooled 2007 → 2026-11-12: exit 12:00 +0.094R (t +5.06), exit 15:00 +0.129R (t +6.45), exit 18:00 +0.130R (t +6.18), day from 17:00 New York +0.086R (t +4.19), against the rule's 21:00 +0.139R (n 3713, t +6.47); net R > 0 in both windows at all four: yes, month t ≥ 2 at 4 of 4; early-fill combinations holding: 4 of 4; the rule stays as it is",
+ "reading": {
+  "posBoth": true,
+  "t2": 4,
+  "nonPos": 0,
+  "label": "BROAD"
+ },
+ "gate": {
+  "ok": true,
+  "windows": {
+   "W1": {
+    "got": {
+     "n": 929,
+     "netR": 0.202,
+     "grossR": 0.217,
+     "total": 187.48,
+     "t": 4.93,
+     "grossT": 5.33
+    },
+    "want": {
+     "n": 929,
+     "netR": 0.202,
+     "grossR": 0.217,
+     "total": 187.48,
+     "t": 4.93,
+     "grossT": 5.33
+    },
+    "ok": true
+   },
+   "W2": {
+    "got": {
+     "n": 728,
+     "netR": 0.17,
+     "grossR": 0.186,
+     "total": 124.03,
+     "t": 2.93,
+     "grossT": 3.2
+    },
+    "want": {
+     "n": 728,
+     "netR": 0.17,
+     "grossR": 0.186,
+     "total": 124.03,
+     "t": 2.93,
+     "grossT": 3.2
+    },
+    "ok": true
+   },
+   "W3": {
+    "got": {
+     "n": 935,
+     "netR": 0.094,
+     "grossR": 0.111,
+     "total": 87.57,
+     "t": 2.41,
+     "grossT": 2.87
+    },
+    "want": {
+     "n": 935,
+     "netR": 0.094,
+     "grossR": 0.111,
+     "total": 87.57,
+     "t": 2.41,
+     "grossT": 2.87
+    },
+    "ok": true
+   },
+   "W4": {
+    "got": {
+     "n": 1121,
+     "netR": 0.105,
+     "grossR": 0.121,
+     "total": 117.92,
+     "t": 2.79,
+     "grossT": 3.21
+    },
+    "want": {
+     "n": 1121,
+     "netR": 0.105,
+     "grossR": 0.121,
+     "total": 117.92,
+     "t": 2.79,
+     "grossT": 3.21
+    },
+    "ok": true
+   },
+   "POOLED": {
+    "got": {
+     "n": 3713,
+     "netR": 0.139,
+     "grossR": 0.155,
+     "total": 516.99,
+     "t": 6.47,
+     "grossT": 7.24
+    },
+    "want": {
+     "n": 3713,
+     "netR": 0.139,
+     "grossR": 0.155,
+     "total": 516.99,
+     "t": 6.47,
+     "grossT": 7.24
+    },
+    "ok": true
+   }
+  },
+  "same": 3740,
+  "of": 3740
+ },
+ "windows": {
+  "early": [
+   "2007-01-01",
+   "2015-12-31"
+  ],
+  "late": [
+   "2016-01-01",
+   "2026-11-12"
+  ]
+ },
+ "k": 0.5,
+ "cost": {
+  "from": "gold-vol-breakout-hourcost result.json (route H + 0.05 × M)",
+  "sha256": "fd5990419496374fd1d7c1791f778bd250d1b350064e7386d18de8a82b38325b",
+  "commission": 0.000024,
+  "slip": 0.05
+ },
+ "settings": [
+  {
+   "name": "exit 12:00",
+   "row": {
+    "early": {
+     "n": 874,
+     "win": 0.511,
+     "netR": 0.138,
+     "grossR": 0.153,
+     "net2R": 0.122,
+     "total": 120.18,
+     "t": 4.64,
+     "grossT": 5.17,
+     "stops": 105,
+     "time": 769,
+     "maxDD": -9.93
+    },
+    "late": {
+     "n": 1177,
+     "win": 0.477,
+     "netR": 0.062,
+     "grossR": 0.079,
+     "net2R": 0.046,
+     "total": 73.52,
+     "t": 2.63,
+     "grossT": 3.33,
+     "stops": 185,
+     "time": 992,
+     "maxDD": -14.51
+    },
+    "pooled": {
+     "n": 2051,
+     "win": 0.492,
+     "netR": 0.094,
+     "grossR": 0.111,
+     "net2R": 0.078,
+     "total": 193.7,
+     "t": 5.06,
+     "grossT": 5.93,
+     "stops": 290,
+     "time": 1761,
+     "maxDD": -14.51
+    }
+   },
+   "placebo": 40,
+   "placeboMean": -0.001
+  },
+  {
+   "name": "exit 15:00",
+   "row": {
+    "early": {
+     "n": 1395,
+     "win": 0.473,
+     "netR": 0.182,
+     "grossR": 0.198,
+     "net2R": 0.166,
+     "total": 253.75,
+     "t": 5.53,
+     "grossT": 6.04,
+     "stops": 377,
+     "time": 1018,
+     "maxDD": -11.45
+    },
+    "late": {
+     "n": 1763,
+     "win": 0.45,
+     "netR": 0.087,
+     "grossR": 0.104,
+     "net2R": 0.07,
+     "total": 153.48,
+     "t": 3.6,
+     "grossT": 4.3,
+     "stops": 503,
+     "time": 1260,
+     "maxDD": -35.52
+    },
+    "pooled": {
+     "n": 3158,
+     "win": 0.46,
+     "netR": 0.129,
+     "grossR": 0.145,
+     "net2R": 0.113,
+     "total": 407.23,
+     "t": 6.45,
+     "grossT": 7.29,
+     "stops": 880,
+     "time": 2278,
+     "maxDD": -35.52
+    }
+   },
+   "placebo": 40,
+   "placeboMean": 0.009
+  },
+  {
+   "name": "exit 18:00",
+   "row": {
+    "early": {
+     "n": 1596,
+     "win": 0.454,
+     "netR": 0.178,
+     "grossR": 0.193,
+     "net2R": 0.163,
+     "total": 284.73,
+     "t": 5.41,
+     "grossT": 5.88,
+     "stops": 507,
+     "time": 1089,
+     "maxDD": -14.41
+    },
+    "late": {
+     "n": 1955,
+     "win": 0.445,
+     "netR": 0.091,
+     "grossR": 0.107,
+     "net2R": 0.075,
+     "total": 177.82,
+     "t": 3.39,
+     "grossT": 3.99,
+     "stops": 629,
+     "time": 1326,
+     "maxDD": -28.94
+    },
+    "pooled": {
+     "n": 3551,
+     "win": 0.449,
+     "netR": 0.13,
+     "grossR": 0.146,
+     "net2R": 0.115,
+     "total": 462.55,
+     "t": 6.18,
+     "grossT": 6.93,
+     "stops": 1136,
+     "time": 2415,
+     "maxDD": -28.94
+    }
+   },
+   "placebo": 40,
+   "placeboMean": 0.009
+  },
+  {
+   "name": "exit 21:00 (rule)",
+   "row": {
+    "early": {
+     "n": 1657,
+     "win": 0.456,
+     "netR": 0.188,
+     "grossR": 0.203,
+     "net2R": 0.173,
+     "total": 311.5,
+     "t": 5.49,
+     "grossT": 5.96,
+     "stops": 552,
+     "time": 1105,
+     "maxDD": -19.45
+    },
+    "late": {
+     "n": 2056,
+     "win": 0.433,
+     "netR": 0.1,
+     "grossR": 0.116,
+     "net2R": 0.084,
+     "total": 205.49,
+     "t": 3.7,
+     "grossT": 4.32,
+     "stops": 714,
+     "time": 1342,
+     "maxDD": -28.27
+    },
+    "pooled": {
+     "n": 3713,
+     "win": 0.443,
+     "netR": 0.139,
+     "grossR": 0.155,
+     "net2R": 0.123,
+     "total": 516.99,
+     "t": 6.47,
+     "grossT": 7.24,
+     "stops": 1266,
+     "time": 2447,
+     "maxDD": -28.27
+    }
+   },
+   "placebo": 40,
+   "placeboMean": 0.012
+  },
+  {
+   "name": "day from 17:00 New York",
+   "row": {
+    "early": {
+     "n": 1559,
+     "win": 0.452,
+     "netR": 0.146,
+     "grossR": 0.162,
+     "net2R": 0.13,
+     "total": 227.36,
+     "t": 4.57,
+     "grossT": 5.08,
+     "stops": 530,
+     "time": 1029,
+     "maxDD": -19.18
+    },
+    "late": {
+     "n": 1990,
+     "win": 0.421,
+     "netR": 0.038,
+     "grossR": 0.055,
+     "net2R": 0.021,
+     "total": 76.3,
+     "t": 1.48,
+     "grossT": 2.13,
+     "stops": 702,
+     "time": 1288,
+     "maxDD": -52.33
+    },
+    "pooled": {
+     "n": 3549,
+     "win": 0.435,
+     "netR": 0.086,
+     "grossR": 0.102,
+     "net2R": 0.069,
+     "total": 303.66,
+     "t": 4.19,
+     "grossT": 5,
+     "stops": 1232,
+     "time": 2317,
+     "maxDD": -52.33
+    }
+   },
+   "placebo": null
+  },
+  {
+   "name": "day from 17:00 New York, strict open",
+   "row": {
+    "early": {
+     "n": 1341,
+     "win": 0.447,
+     "netR": 0.116,
+     "grossR": 0.131,
+     "net2R": 0.102,
+     "total": 156.2,
+     "t": 3.43,
+     "grossT": 3.85,
+     "stops": 461,
+     "time": 880,
+     "maxDD": -27.19
+    },
+    "late": {
+     "n": 1,
+     "win": 0,
+     "netR": -1.021,
+     "grossR": -1,
+     "net2R": -1.042,
+     "total": -1.02,
+     "t": 0,
+     "grossT": 0,
+     "stops": 1,
+     "time": 0,
+     "maxDD": -1.02
+    },
+    "pooled": {
+     "n": 1342,
+     "win": 0.447,
+     "netR": 0.116,
+     "grossR": 0.13,
+     "net2R": 0.101,
+     "total": 155.18,
+     "t": 3.4,
+     "grossT": 3.82,
+     "stops": 462,
+     "time": 880,
+     "maxDD": -27.19
+    }
+   },
+   "placebo": null
+  }
+ ],
+ "combos": [
+  {
+   "name": "early fills, exit 12:00",
+   "exit": "12:00",
+   "row": {
+    "early": {
+     "n": 268,
+     "win": 0.489,
+     "netR": 0.247,
+     "grossR": 0.267,
+     "net2R": 0.226,
+     "total": 66.09,
+     "t": 2.86,
+     "grossT": 3.1,
+     "stops": 71,
+     "time": 197,
+     "maxDD": -8.86
+    },
+    "late": {
+     "n": 488,
+     "win": 0.488,
+     "netR": 0.132,
+     "grossR": 0.15,
+     "net2R": 0.113,
+     "total": 64.29,
+     "t": 2.8,
+     "grossT": 3.18,
+     "stops": 135,
+     "time": 353,
+     "maxDD": -11.83
+    },
+    "pooled": {
+     "n": 756,
+     "win": 0.488,
+     "netR": 0.172,
+     "grossR": 0.192,
+     "net2R": 0.153,
+     "total": 130.38,
+     "t": 4.01,
+     "grossT": 4.44,
+     "stops": 206,
+     "time": 550,
+     "maxDD": -11.83
+    }
+   },
+   "lateRow": {
+    "n": 1295,
+    "win": 0.494,
+    "netR": 0.049,
+    "grossR": 0.063,
+    "net2R": 0.035,
+    "total": 63.32,
+    "t": 2.87,
+    "grossT": 3.71,
+    "stops": 84,
+    "time": 1211,
+    "maxDD": -11.04
+   },
+   "diff": 0.124,
+   "welchT": 2.62,
+   "pHolm": 0,
+   "holds": true
+  },
+  {
+   "name": "early fills, exit 15:00",
+   "exit": "15:00",
+   "row": {
+    "early": {
+     "n": 268,
+     "win": 0.493,
+     "netR": 0.472,
+     "grossR": 0.494,
+     "net2R": 0.451,
+     "total": 126.6,
+     "t": 4.04,
+     "grossT": 4.22,
+     "stops": 110,
+     "time": 158,
+     "maxDD": -9.75
+    },
+    "late": {
+     "n": 488,
+     "win": 0.467,
+     "netR": 0.233,
+     "grossR": 0.252,
+     "net2R": 0.214,
+     "total": 113.76,
+     "t": 3.64,
+     "grossT": 3.93,
+     "stops": 193,
+     "time": 295,
+     "maxDD": -16.62
+    },
+    "pooled": {
+     "n": 756,
+     "win": 0.476,
+     "netR": 0.318,
+     "grossR": 0.338,
+     "net2R": 0.298,
+     "total": 240.36,
+     "t": 5.43,
+     "grossT": 5.77,
+     "stops": 303,
+     "time": 453,
+     "maxDD": -16.62
+    }
+   },
+   "lateRow": {
+    "n": 2402,
+    "win": 0.455,
+    "netR": 0.069,
+    "grossR": 0.085,
+    "net2R": 0.054,
+    "total": 166.86,
+    "t": 3.45,
+    "grossT": 4.21,
+    "stops": 577,
+    "time": 1825,
+    "maxDD": -32.44
+   },
+   "diff": 0.248,
+   "welchT": 3.85,
+   "pHolm": 0,
+   "holds": true
+  },
+  {
+   "name": "early fills, exit 18:00",
+   "exit": "18:00",
+   "row": {
+    "early": {
+     "n": 268,
+     "win": 0.448,
+     "netR": 0.465,
+     "grossR": 0.486,
+     "net2R": 0.444,
+     "total": 124.61,
+     "t": 3.83,
+     "grossT": 4,
+     "stops": 125,
+     "time": 143,
+     "maxDD": -9.21
+    },
+    "late": {
+     "n": 488,
+     "win": 0.445,
+     "netR": 0.265,
+     "grossR": 0.283,
+     "net2R": 0.247,
+     "total": 129.36,
+     "t": 3.54,
+     "grossT": 3.78,
+     "stops": 212,
+     "time": 276,
+     "maxDD": -19.01
+    },
+    "pooled": {
+     "n": 756,
+     "win": 0.446,
+     "netR": 0.336,
+     "grossR": 0.355,
+     "net2R": 0.317,
+     "total": 253.97,
+     "t": 5.2,
+     "grossT": 5.48,
+     "stops": 337,
+     "time": 419,
+     "maxDD": -19.01
+    }
+   },
+   "lateRow": {
+    "n": 2795,
+    "win": 0.45,
+    "netR": 0.075,
+    "grossR": 0.089,
+    "net2R": 0.06,
+    "total": 208.58,
+    "t": 3.64,
+    "grossT": 4.36,
+    "stops": 799,
+    "time": 1996,
+    "maxDD": -30.24
+   },
+   "diff": 0.261,
+   "welchT": 3.7,
+   "pHolm": 0,
+   "holds": true
+  },
+  {
+   "name": "early fills, exit 21:00",
+   "exit": "21:00",
+   "row": {
+    "early": {
+     "n": 268,
+     "win": 0.433,
+     "netR": 0.491,
+     "grossR": 0.513,
+     "net2R": 0.47,
+     "total": 131.65,
+     "t": 3.79,
+     "grossT": 3.95,
+     "stops": 129,
+     "time": 139,
+     "maxDD": -11.77
+    },
+    "late": {
+     "n": 488,
+     "win": 0.436,
+     "netR": 0.295,
+     "grossR": 0.315,
+     "net2R": 0.276,
+     "total": 144.16,
+     "t": 3.76,
+     "grossT": 3.99,
+     "stops": 226,
+     "time": 262,
+     "maxDD": -16.8
+    },
+    "pooled": {
+     "n": 756,
+     "win": 0.435,
+     "netR": 0.365,
+     "grossR": 0.385,
+     "net2R": 0.345,
+     "total": 275.82,
+     "t": 5.34,
+     "grossT": 5.62,
+     "stops": 355,
+     "time": 401,
+     "maxDD": -16.8
+    }
+   },
+   "lateRow": {
+    "n": 2957,
+    "win": 0.445,
+    "netR": 0.082,
+    "grossR": 0.096,
+    "net2R": 0.067,
+    "total": 241.18,
+    "t": 3.85,
+    "grossT": 4.56,
+    "stops": 911,
+    "time": 2046,
+    "maxDD": -25.67
+   },
+   "diff": 0.283,
+   "welchT": 3.81,
+   "pHolm": 0,
+   "holds": true
+  }
+ ],
+ "holm": [
+  {
+   "name": "exit 12:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "exit 15:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "exit 18:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "day from 17:00 New York",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "early fills, exit 12:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "early fills, exit 15:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "early fills, exit 18:00",
+   "p": 0,
+   "pHolm": 0
+  },
+  {
+   "name": "early fills, exit 21:00",
+   "p": 0,
+   "pHolm": 0
+  }
+ ],
+ "text": "Before costs, pooled: exit 12:00 +0.111, exit 15:00 +0.145, exit 18:00 +0.146, exit 21:00 (rule) +0.155, day from 17:00 New York +0.102; C1 takes about +0.016R a trade at 21:00. Windows with net R ≤ 0: day from 17:00 New York, strict open 2016 → (−1.021R). At 2x cost pooled: exit 12:00 +0.078, exit 15:00 +0.113, exit 18:00 +0.115, exit 21:00 (rule) +0.123, day from 17:00 New York +0.069. No alternative exit nets more than the rule's own 21:00 (+0.139R a trade): on gold the later the exit the more the trade keeps (USD/JPY peaked at 15:00 in usdjpy-vb-exit); the earlier exits keep most of it in both windows, so the result does not hang on the exact exit hour. The 17:00 New York day is the weak setting: positive in both windows but only +0.038R (month t +1.48) in 2016 →, worst drawdown −52.3R, so where the day is cut matters more than when it ends (18:00 and the New York day had been seen at $0.60 in gold-vol-breakout-k, 12:00 and 15:00 had not). Early fills (before 06:00 UTC): exit 12:00 +0.172R (n 756, t +4.01, holds), exit 15:00 +0.318R (n 756, t +5.43, holds), exit 18:00 +0.336R (n 756, t +5.20, holds), exit 21:00 +0.365R (n 756, t +5.34, holds); the late fills at 21:00 +0.082R (n 2957). The early split at 21:00 had been seen (holdout-vb-early, vb-early-exec), so none of these is new evidence. The 17:00 New York day's strict open keeps 1342 trades (+0.116R), almost none after 2015, when the feed's first candle of that day starts exactly 60 minutes after the anchor (the reason the inclusive reading is the main one). The early-fill combinations hold at 4 of 4 exits; early minus late is +0.124R (Welch t +2.62), +0.248R (Welch t +3.85), +0.261R (Welch t +3.70), +0.283R (Welch t +3.81) at 12:00 / 15:00 / 18:00 / 21:00. The early split was seen before on these years, so this is a hypothesis for the forward records (vb-early-forward), not a rule. Cautions: today's relative spread is charged on every past year (in 2007 a retail gold spread was surely wider), the stop-order slippage is assumed (0.05 × M), and OANDA mid candles are not broker fills. Paper research; nothing live changes and no proposal is written.",
+ "data": "OANDA mid XAU/USD M5 from the toolkit cache (1431423 candles, 2006-11-01 → 2026-11-13; the loader drops the last, forming day: data end 2026-11-12); windows 2007-01-01 → 2015-12-31 and 2016-01-01 → 2026-11-12"
+}
