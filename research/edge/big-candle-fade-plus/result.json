@@ -1,0 +1,316 @@
+{
+ "study": "big-candle-fade-plus",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "neither rule passes after costs on the ten fresh markets; the better, B rejection wick + confirmation, made +0.012R a trade after costs (n 1,332, month t 0.32; before costs +0.048R)",
+ "basis": "judged AFTER costs on calendar-month sums, pooled over ten fresh markets (pre-registered)",
+ "markets": [
+  "eurgbp",
+  "euraud",
+  "eurchf",
+  "gbpjpy",
+  "audjpy",
+  "cadjpy",
+  "gbpaud",
+  "nas100",
+  "spx500",
+  "de40"
+ ],
+ "costs": {
+  "eurgbp": 0.00009,
+  "euraud": 0.00013,
+  "gbpjpy": 0.014,
+  "audjpy": 0.01,
+  "cadjpy": 0.01,
+  "nas100": 1,
+  "spx500": 0.4,
+  "de40": 1.5,
+  "eurchf": 0.0001,
+  "gbpaud": 0.00016
+ },
+ "assumedHere": [
+  "eurchf",
+  "gbpaud"
+ ],
+ "meta": [
+  {
+   "market": "eurgbp",
+   "cost": 0.00009,
+   "first": "2005-02-04",
+   "signals": 23744
+  },
+  {
+   "market": "euraud",
+   "cost": 0.00013,
+   "first": "2005-02-02",
+   "signals": 19448
+  },
+  {
+   "market": "eurchf",
+   "cost": 0.0001,
+   "first": "2005-02-02",
+   "signals": 24383
+  },
+  {
+   "market": "gbpjpy",
+   "cost": 0.014,
+   "first": "2005-02-02",
+   "signals": 22227
+  },
+  {
+   "market": "audjpy",
+   "cost": 0.01,
+   "first": "2005-02-02",
+   "signals": 21790
+  },
+  {
+   "market": "cadjpy",
+   "cost": 0.01,
+   "first": "2005-02-02",
+   "signals": 23073
+  },
+  {
+   "market": "gbpaud",
+   "cost": 0.00016,
+   "first": "2005-02-02",
+   "signals": 18946
+  },
+  {
+   "market": "nas100",
+   "cost": 1,
+   "first": "2005-02-02",
+   "signals": 30771
+  },
+  {
+   "market": "spx500",
+   "cost": 0.4,
+   "first": "2005-02-02",
+   "signals": 27967
+  },
+  {
+   "market": "de40",
+   "cost": 1.5,
+   "first": "2005-02-02",
+   "signals": 17638
+  }
+ ],
+ "rules": [
+  {
+   "rule": "A",
+   "name": "A overnight shock fade",
+   "n": 1939,
+   "gross": 0.16673,
+   "net": 0.004204,
+   "tNet": 0.050445,
+   "tGross": 1.981318,
+   "holm": 0.751082,
+   "windows": [
+    {
+     "n": 779,
+     "gross": 0.129896,
+     "net": -0.026787,
+     "tNet": -0.222977
+    },
+    {
+     "n": 1160,
+     "gross": 0.191467,
+     "net": 0.025015,
+     "tNet": 0.219737
+    }
+   ],
+   "net15": -0.077059,
+   "netTrim": -0.196626,
+   "median": -1.0818,
+   "top10Share": 28.961147,
+   "costR": 0.162527,
+   "checks": {
+    "n": true,
+    "net": false,
+    "t": false,
+    "robust": false
+   },
+   "pass": false,
+   "perMarket": [
+    {
+     "market": "eurgbp",
+     "n": 94,
+     "gross": 0.217183,
+     "net": -0.034982,
+     "tNet": -0.104286
+    },
+    {
+     "market": "euraud",
+     "n": 411,
+     "gross": 0.178577,
+     "net": 0.020848,
+     "tNet": 0.141917
+    },
+    {
+     "market": "eurchf",
+     "n": 144,
+     "gross": 0.537308,
+     "net": 0.290187,
+     "tNet": 1.34292
+    },
+    {
+     "market": "gbpjpy",
+     "n": 197,
+     "gross": 0.263888,
+     "net": 0.150373,
+     "tNet": 0.709102
+    },
+    {
+     "market": "audjpy",
+     "n": 395,
+     "gross": -0.003552,
+     "net": -0.161493,
+     "tNet": -1.241179
+    },
+    {
+     "market": "cadjpy",
+     "n": 163,
+     "gross": 0.575106,
+     "net": 0.440588,
+     "tNet": 1.601186
+    },
+    {
+     "market": "gbpaud",
+     "n": 372,
+     "gross": 0.115998,
+     "net": -0.039732,
+     "tNet": -0.253416
+    },
+    {
+     "market": "nas100",
+     "n": 69,
+     "gross": -0.404706,
+     "net": -0.543825,
+     "tNet": -2.823002
+    },
+    {
+     "market": "spx500",
+     "n": 70,
+     "gross": -0.093296,
+     "net": -0.277824,
+     "tNet": -0.909073
+    },
+    {
+     "market": "de40",
+     "n": 24,
+     "gross": -0.038071,
+     "net": -0.200583,
+     "tNet": -0.458087
+    }
+   ]
+  },
+  {
+   "rule": "B",
+   "name": "B rejection wick + confirmation",
+   "n": 1332,
+   "gross": 0.047978,
+   "net": 0.012124,
+   "tNet": 0.317548,
+   "tGross": 1.252412,
+   "holm": 0.751082,
+   "windows": [
+    {
+     "n": 569,
+     "gross": 0.023567,
+     "net": -0.018113,
+     "tNet": -0.327965
+    },
+    {
+     "n": 763,
+     "gross": 0.066182,
+     "net": 0.034672,
+     "tNet": 0.660649
+    }
+   ],
+   "net15": -0.005804,
+   "netTrim": -0.008214,
+   "median": -0.4879,
+   "top10Share": 1.300815,
+   "costR": 0.035855,
+   "checks": {
+    "n": true,
+    "net": false,
+    "t": false,
+    "robust": false
+   },
+   "pass": false,
+   "perMarket": [
+    {
+     "market": "eurgbp",
+     "n": 143,
+     "gross": -0.090343,
+     "net": -0.135491,
+     "tNet": -1.458712
+    },
+    {
+     "market": "euraud",
+     "n": 149,
+     "gross": 0.078772,
+     "net": 0.051818,
+     "tNet": 0.522382
+    },
+    {
+     "market": "eurchf",
+     "n": 169,
+     "gross": -0.020432,
+     "net": -0.078796,
+     "tNet": -0.918553
+    },
+    {
+     "market": "gbpjpy",
+     "n": 142,
+     "gross": 0.139726,
+     "net": 0.117888,
+     "tNet": 1.221445
+    },
+    {
+     "market": "audjpy",
+     "n": 129,
+     "gross": 0.10946,
+     "net": 0.083509,
+     "tNet": 0.899009
+    },
+    {
+     "market": "cadjpy",
+     "n": 154,
+     "gross": 0.083404,
+     "net": 0.057332,
+     "tNet": 0.569887
+    },
+    {
+     "market": "gbpaud",
+     "n": 126,
+     "gross": 0.038505,
+     "net": 0.012888,
+     "tNet": 0.121851
+    },
+    {
+     "market": "nas100",
+     "n": 99,
+     "gross": 0.022929,
+     "net": -0.029278,
+     "tNet": -0.249383
+    },
+    {
+     "market": "spx500",
+     "n": 104,
+     "gross": 0.152265,
+     "net": 0.103524,
+     "tNet": 0.798192
+    },
+    {
+     "market": "de40",
+     "n": 117,
+     "gross": -0.010433,
+     "net": -0.040293,
+     "tNet": -0.341601
+    }
+   ]
+  }
+ ],
+ "passed": []
+}
