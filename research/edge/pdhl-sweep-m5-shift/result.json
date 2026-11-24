@@ -1,0 +1,695 @@
+{
+ "study": "pdhl-sweep-m5-shift",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "passed": 0,
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "windows": {
+  "discovery": "2005-01-01..2014-12-31",
+  "confirmation": "2015-01-01..2026-10-31",
+  "months": [
+   120,
+   142
+  ]
+ },
+ "params": {
+  "backM15": 3,
+  "waitM5": 24,
+  "swingK": 3,
+  "swingBack": 48,
+  "atrK": 0.1,
+  "cap": 86400,
+  "minDay": 200,
+  "maxGap": 345600,
+  "openMinR": 1
+ },
+ "basis": "after costs, calendar-month sums of R",
+ "best": {
+  "cell": "2R all",
+  "discovery": {
+   "n": 2660,
+   "win": 0.366,
+   "grossR": -0.012,
+   "tGross": -0.458,
+   "netR": -0.06,
+   "tNet": -2.292,
+   "costR": 0.048,
+   "pNet": 0.9882
+  },
+  "confirmation": {
+   "n": 3298,
+   "win": 0.379,
+   "grossR": 0.036,
+   "tGross": 1.489,
+   "netR": -0.017,
+   "tNet": -0.703,
+   "costR": 0.053,
+   "pNet": 0.7583
+  },
+  "holm": 1,
+  "enough": true,
+  "pass": false
+ },
+ "cells": [
+  {
+   "cell": "open all",
+   "discovery": {
+    "n": 550,
+    "win": 0.305,
+    "grossR": -0.177,
+    "tGross": -2.969,
+    "netR": -0.248,
+    "tNet": -4.17,
+    "costR": 0.071,
+    "pNet": 1
+   },
+   "confirmation": {
+    "n": 625,
+    "win": 0.354,
+    "grossR": -0.043,
+    "tGross": -0.807,
+    "netR": -0.117,
+    "tNet": -2.166,
+    "costR": 0.074,
+    "pNet": 0.984
+   },
+   "holm": 1,
+   "enough": true,
+   "pass": false
+  },
+  {
+   "cell": "open london",
+   "discovery": {
+    "n": 156,
+    "win": 0.34,
+    "grossR": -0.118,
+    "tGross": -1.203,
+    "netR": -0.188,
+    "tNet": -1.898,
+    "costR": 0.071,
+    "pNet": 0.9699
+   },
+   "confirmation": {
+    "n": 171,
+    "win": 0.333,
+    "grossR": -0.116,
+    "tGross": -1.2,
+    "netR": -0.187,
+    "tNet": -1.906,
+    "costR": 0.071,
+    "pNet": 0.9707
+   },
+   "holm": 1,
+   "enough": false,
+   "pass": false
+  },
+  {
+   "cell": "open ny",
+   "discovery": {
+    "n": 139,
+    "win": 0.266,
+    "grossR": -0.301,
+    "tGross": -2.743,
+    "netR": -0.356,
+    "tNet": -3.262,
+    "costR": 0.055,
+    "pNet": 0.9993
+   },
+   "confirmation": {
+    "n": 200,
+    "win": 0.39,
+    "grossR": 0.015,
+    "tGross": 0.147,
+    "netR": -0.036,
+    "tNet": -0.344,
+    "costR": 0.051,
+    "pNet": 0.6342
+   },
+   "holm": 1,
+   "enough": false,
+   "pass": false
+  },
+  {
+   "cell": "2R all",
+   "discovery": {
+    "n": 2660,
+    "win": 0.366,
+    "grossR": -0.012,
+    "tGross": -0.458,
+    "netR": -0.06,
+    "tNet": -2.292,
+    "costR": 0.048,
+    "pNet": 0.9882
+   },
+   "confirmation": {
+    "n": 3298,
+    "win": 0.379,
+    "grossR": 0.036,
+    "tGross": 1.489,
+    "netR": -0.017,
+    "tNet": -0.703,
+    "costR": 0.053,
+    "pNet": 0.7583
+   },
+   "holm": 1,
+   "enough": true,
+   "pass": false
+  },
+  {
+   "cell": "2R london",
+   "discovery": {
+    "n": 665,
+    "win": 0.403,
+    "grossR": 0.103,
+    "tGross": 1.848,
+    "netR": 0.058,
+    "tNet": 1.045,
+    "costR": 0.045,
+    "pNet": 0.149
+   },
+   "confirmation": {
+    "n": 732,
+    "win": 0.359,
+    "grossR": -0.009,
+    "tGross": -0.19,
+    "netR": -0.057,
+    "tNet": -1.153,
+    "costR": 0.047,
+    "pNet": 0.8746
+   },
+   "holm": 1,
+   "enough": true,
+   "pass": false
+  },
+  {
+   "cell": "2R ny",
+   "discovery": {
+    "n": 585,
+    "win": 0.402,
+    "grossR": -0.016,
+    "tGross": -0.288,
+    "netR": -0.053,
+    "tNet": -0.932,
+    "costR": 0.037,
+    "pNet": 0.8235
+   },
+   "confirmation": {
+    "n": 748,
+    "win": 0.41,
+    "grossR": 0.01,
+    "tGross": 0.204,
+    "netR": -0.027,
+    "tNet": -0.581,
+    "costR": 0.037,
+    "pNet": 0.7191
+   },
+   "holm": 1,
+   "enough": true,
+   "pass": false
+  }
+ ],
+ "control": [
+  {
+   "cell": "open all",
+   "discovery": {
+    "n": 6955,
+    "win": 0.28,
+    "grossR": 0.023,
+    "tGross": 0.957,
+    "netR": -0.109,
+    "tNet": -4.355,
+    "costR": 0.132,
+    "pNet": 1
+   },
+   "confirmation": {
+    "n": 8673,
+    "win": 0.27,
+    "grossR": 0.005,
+    "tGross": 0.207,
+    "netR": -0.157,
+    "tNet": -7.053,
+    "costR": 0.161,
+    "pNet": 1
+   },
+   "holm": 1
+  },
+  {
+   "cell": "open london",
+   "discovery": {
+    "n": 1841,
+    "win": 0.258,
+    "grossR": -0.024,
+    "tGross": -0.498,
+    "netR": -0.148,
+    "tNet": -3.088,
+    "costR": 0.124,
+    "pNet": 0.9987
+   },
+   "confirmation": {
+    "n": 2171,
+    "win": 0.252,
+    "grossR": -0.027,
+    "tGross": -0.566,
+    "netR": -0.172,
+    "tNet": -3.628,
+    "costR": 0.145,
+    "pNet": 0.9998
+   },
+   "holm": 1
+  },
+  {
+   "cell": "open ny",
+   "discovery": {
+    "n": 1687,
+    "win": 0.275,
+    "grossR": -0.07,
+    "tGross": -1.615,
+    "netR": -0.169,
+    "tNet": -3.825,
+    "costR": 0.098,
+    "pNet": 0.9999
+   },
+   "confirmation": {
+    "n": 2119,
+    "win": 0.261,
+    "grossR": -0.036,
+    "tGross": -0.864,
+    "netR": -0.147,
+    "tNet": -3.465,
+    "costR": 0.11,
+    "pNet": 0.9996
+   },
+   "holm": 1
+  },
+  {
+   "cell": "2R all",
+   "discovery": {
+    "n": 9810,
+    "win": 0.36,
+    "grossR": 0.059,
+    "tGross": 4.47,
+    "netR": -0.06,
+    "tNet": -4.406,
+    "costR": 0.119,
+    "pNet": 1
+   },
+   "confirmation": {
+    "n": 12313,
+    "win": 0.348,
+    "grossR": 0.02,
+    "tGross": 1.512,
+    "netR": -0.121,
+    "tNet": -8.816,
+    "costR": 0.141,
+    "pNet": 1
+   },
+   "holm": 1
+  },
+  {
+   "cell": "2R london",
+   "discovery": {
+    "n": 2344,
+    "win": 0.343,
+    "grossR": 0.018,
+    "tGross": 0.671,
+    "netR": -0.093,
+    "tNet": -3.349,
+    "costR": 0.111,
+    "pNet": 0.9995
+   },
+   "confirmation": {
+    "n": 2791,
+    "win": 0.331,
+    "grossR": -0.018,
+    "tGross": -0.64,
+    "netR": -0.148,
+    "tNet": -5.101,
+    "costR": 0.13,
+    "pNet": 1
+   },
+   "holm": 1
+  },
+  {
+   "cell": "2R ny",
+   "discovery": {
+    "n": 2197,
+    "win": 0.349,
+    "grossR": -0.003,
+    "tGross": -0.087,
+    "netR": -0.092,
+    "tNet": -2.861,
+    "costR": 0.089,
+    "pNet": 0.9975
+   },
+   "confirmation": {
+    "n": 2817,
+    "win": 0.359,
+    "grossR": 0.011,
+    "tGross": 0.392,
+    "netR": -0.086,
+    "tNet": -3.15,
+    "costR": 0.096,
+    "pNet": 0.999
+   },
+   "holm": 1
+  }
+ ],
+ "perMarket": [
+  {
+   "market": "xau",
+   "rows": [
+    {
+     "cell": "open all",
+     "discovery": {
+      "n": 85,
+      "win": 0.353,
+      "grossR": -0.004,
+      "tGross": -0.026,
+      "netR": -0.167,
+      "tNet": -1.118,
+      "costR": 0.164,
+      "pNet": 0.8672
+     },
+     "confirmation": {
+      "n": 95,
+      "win": 0.305,
+      "grossR": -0.237,
+      "tGross": -1.989,
+      "netR": -0.331,
+      "tNet": -2.715,
+      "costR": 0.094,
+      "pNet": 0.9963
+     }
+    },
+    {
+     "cell": "2R all",
+     "discovery": {
+      "n": 448,
+      "win": 0.388,
+      "grossR": 0.061,
+      "tGross": 1.079,
+      "netR": -0.038,
+      "tNet": -0.644,
+      "costR": 0.099,
+      "pNet": 0.7396
+     },
+     "confirmation": {
+      "n": 640,
+      "win": 0.386,
+      "grossR": 0.04,
+      "tGross": 0.751,
+      "netR": -0.029,
+      "tNet": -0.551,
+      "costR": 0.069,
+      "pNet": 0.7089
+     }
+    }
+   ]
+  },
+  {
+   "market": "eurusd",
+   "rows": [
+    {
+     "cell": "open all",
+     "discovery": {
+      "n": 111,
+      "win": 0.324,
+      "grossR": -0.156,
+      "tGross": -1.274,
+      "netR": -0.204,
+      "tNet": -1.626,
+      "costR": 0.048,
+      "pNet": 0.9467
+     },
+     "confirmation": {
+      "n": 133,
+      "win": 0.436,
+      "grossR": 0.129,
+      "tGross": 1.105,
+      "netR": 0.069,
+      "tNet": 0.601,
+      "costR": 0.059,
+      "pNet": 0.2743
+     }
+    },
+    {
+     "cell": "2R all",
+     "discovery": {
+      "n": 587,
+      "win": 0.395,
+      "grossR": 0.093,
+      "tGross": 1.577,
+      "netR": 0.062,
+      "tNet": 1.039,
+      "costR": 0.032,
+      "pNet": 0.1503
+     },
+     "confirmation": {
+      "n": 661,
+      "win": 0.411,
+      "grossR": 0.127,
+      "tGross": 2.221,
+      "netR": 0.082,
+      "tNet": 1.446,
+      "costR": 0.045,
+      "pNet": 0.0752
+     }
+    }
+   ]
+  },
+  {
+   "market": "gbpusd",
+   "rows": [
+    {
+     "cell": "open all",
+     "discovery": {
+      "n": 118,
+      "win": 0.271,
+      "grossR": -0.302,
+      "tGross": -2.578,
+      "netR": -0.352,
+      "tNet": -2.967,
+      "costR": 0.05,
+      "pNet": 0.9982
+     },
+     "confirmation": {
+      "n": 136,
+      "win": 0.404,
+      "grossR": 0.023,
+      "tGross": 0.208,
+      "netR": -0.044,
+      "tNet": -0.406,
+      "costR": 0.067,
+      "pNet": 0.6572
+     }
+    },
+    {
+     "cell": "2R all",
+     "discovery": {
+      "n": 566,
+      "win": 0.355,
+      "grossR": -0.075,
+      "tGross": -1.3,
+      "netR": -0.109,
+      "tNet": -1.895,
+      "costR": 0.034,
+      "pNet": 0.9697
+     },
+     "confirmation": {
+      "n": 650,
+      "win": 0.383,
+      "grossR": 0.046,
+      "tGross": 0.824,
+      "netR": -0.001,
+      "tNet": -0.024,
+      "costR": 0.047,
+      "pNet": 0.5097
+     }
+    }
+   ]
+  },
+  {
+   "market": "usdjpy",
+   "rows": [
+    {
+     "cell": "open all",
+     "discovery": {
+      "n": 116,
+      "win": 0.259,
+      "grossR": -0.238,
+      "tGross": -1.698,
+      "netR": -0.311,
+      "tNet": -2.196,
+      "costR": 0.073,
+      "pNet": 0.985
+     },
+     "confirmation": {
+      "n": 100,
+      "win": 0.3,
+      "grossR": -0.149,
+      "tGross": -0.987,
+      "netR": -0.226,
+      "tNet": -1.469,
+      "costR": 0.076,
+      "pNet": 0.928
+     }
+    },
+    {
+     "cell": "2R all",
+     "discovery": {
+      "n": 499,
+      "win": 0.359,
+      "grossR": -0.062,
+      "tGross": -1.109,
+      "netR": -0.113,
+      "tNet": -2.034,
+      "costR": 0.051,
+      "pNet": 0.9779
+     },
+     "confirmation": {
+      "n": 595,
+      "win": 0.37,
+      "grossR": 0.013,
+      "tGross": 0.238,
+      "netR": -0.038,
+      "tNet": -0.725,
+      "costR": 0.051,
+      "pNet": 0.7653
+     }
+    }
+   ]
+  },
+  {
+   "market": "audusd",
+   "rows": [
+    {
+     "cell": "open all",
+     "discovery": {
+      "n": 120,
+      "win": 0.333,
+      "grossR": -0.136,
+      "tGross": -1.248,
+      "netR": -0.183,
+      "tNet": -1.676,
+      "costR": 0.047,
+      "pNet": 0.9518
+     },
+     "confirmation": {
+      "n": 161,
+      "win": 0.304,
+      "grossR": -0.061,
+      "tGross": -0.502,
+      "netR": -0.139,
+      "tNet": -1.131,
+      "costR": 0.078,
+      "pNet": 0.8701
+     }
+    },
+    {
+     "cell": "2R all",
+     "discovery": {
+      "n": 560,
+      "win": 0.334,
+      "grossR": -0.073,
+      "tGross": -1.397,
+      "netR": -0.11,
+      "tNet": -2.076,
+      "costR": 0.037,
+      "pNet": 0.98
+     },
+     "confirmation": {
+      "n": 752,
+      "win": 0.347,
+      "grossR": -0.037,
+      "tGross": -0.76,
+      "netR": -0.092,
+      "tNet": -1.881,
+      "costR": 0.055,
+      "pNet": 0.969
+     }
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "xau": {
+   "sweeps": 4075,
+   "confirmed": 1089,
+   "cancelled": 2058,
+   "unconfirmed": 928,
+   "dropped": 0,
+   "noTrade": 1,
+   "traded": 1088,
+   "first": "2006-03-19",
+   "cost": 0.3
+  },
+  "eurusd": {
+   "sweeps": 4560,
+   "confirmed": 1249,
+   "cancelled": 2383,
+   "unconfirmed": 928,
+   "dropped": 1,
+   "noTrade": 0,
+   "traded": 1248,
+   "first": "2005-01-02",
+   "cost": 0.00006
+  },
+  "gbpusd": {
+   "sweeps": 4605,
+   "confirmed": 1217,
+   "cancelled": 2483,
+   "unconfirmed": 905,
+   "dropped": 1,
+   "noTrade": 0,
+   "traded": 1216,
+   "first": "2005-01-02",
+   "cost": 0.00008
+  },
+  "usdjpy": {
+   "sweeps": 4371,
+   "confirmed": 1094,
+   "cancelled": 2340,
+   "unconfirmed": 937,
+   "dropped": 0,
+   "noTrade": 0,
+   "traded": 1094,
+   "first": "2005-01-02",
+   "cost": 0.008
+  },
+  "audusd": {
+   "sweeps": 4657,
+   "confirmed": 1314,
+   "cancelled": 2457,
+   "unconfirmed": 886,
+   "dropped": 1,
+   "noTrade": 1,
+   "traded": 1312,
+   "first": "2005-01-02",
+   "cost": 0.00006
+  }
+ },
+ "cutTest": [
+  {
+   "cut": "2008-06-11",
+   "n": 205,
+   "same": true
+  },
+  {
+   "cut": "2016-09-21",
+   "n": 676,
+   "same": true
+  },
+  {
+   "cut": "2025-05-07",
+   "n": 1163,
+   "same": true
+  }
+ ],
+ "headline": "**Verdict: FAIL. 0 of 6 cells pass; the best cell, 2R all, made −0.017R a trade after costs in 2015-26 (n 3,298, month t −0.70; +0.036R before costs; 2005-14 −0.060R after costs, n 2,660, month t −2.29).**"
+}

@@ -1,0 +1,373 @@
+{
+ "study": "h1-origin-h4-range",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 4 cells pass; best aligned 2R, -0.063R a trade after costs in 2015-26 (n 6,470, month t -3.49; before costs +0.008R; discovery -0.053R, n 5,599, t -2.53)",
+ "basis": "judged after costs on calendar-month sums, trades by fill time",
+ "windows": {
+  "disc": [
+   "2005-01-01",
+   "2015-01-01"
+  ],
+  "conf": [
+   "2015-01-01",
+   "2026-11-01"
+  ]
+ },
+ "markets": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "params": {
+  "K1": 3,
+  "K4": 3,
+  "back": 20,
+  "atrN": 14,
+  "buf": 0.1,
+  "minCost": 2,
+  "life": 432000,
+  "hold": 432000
+ },
+ "costs": {
+  "xau": 0.3,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006
+ },
+ "counts": {
+  "breaks": 49421,
+  "orders": 47557,
+  "fills": 40236,
+  "outside": 10993,
+  "excluded": 24
+ },
+ "passed": [],
+ "best": "aligned 2R",
+ "cells": [
+  {
+   "cell": "aligned 1R",
+   "disc": {
+    "n": 5599,
+    "win": 0.492,
+    "mean": -0.06,
+    "t": -3.74,
+    "gross": 0.005,
+    "tGross": 0.29,
+    "months": 120
+   },
+   "conf": {
+    "n": 6470,
+    "win": 0.494,
+    "mean": -0.065,
+    "t": -4.3,
+    "gross": 0.006,
+    "tGross": 0.41,
+    "months": 142
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "cell": "aligned 2R",
+   "disc": {
+    "n": 5599,
+    "win": 0.333,
+    "mean": -0.053,
+    "t": -2.53,
+    "gross": 0.012,
+    "tGross": 0.57,
+    "months": 120
+   },
+   "conf": {
+    "n": 6470,
+    "win": 0.334,
+    "mean": -0.063,
+    "t": -3.49,
+    "gross": 0.008,
+    "tGross": 0.44,
+    "months": 142
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "cell": "opposite 1R",
+   "disc": {
+    "n": 8061,
+    "win": 0.499,
+    "mean": -0.052,
+    "t": -4.23,
+    "gross": 0.014,
+    "tGross": 1.13,
+    "months": 120
+   },
+   "conf": {
+    "n": 9113,
+    "win": 0.485,
+    "mean": -0.086,
+    "t": -7.57,
+    "gross": -0.015,
+    "tGross": -1.32,
+    "months": 142
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "cell": "opposite 2R",
+   "disc": {
+    "n": 8061,
+    "win": 0.341,
+    "mean": -0.036,
+    "t": -2.01,
+    "gross": 0.03,
+    "tGross": 1.72,
+    "months": 120
+   },
+   "conf": {
+    "n": 9113,
+    "win": 0.325,
+    "mean": -0.091,
+    "t": -6.08,
+    "gross": -0.019,
+    "tGross": -1.31,
+    "months": 142
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false
+  }
+ ],
+ "alignedMinusOpposite": [
+  {
+   "target": "1R",
+   "window": "disc",
+   "diff": -0.008,
+   "welchT": -0.42
+  },
+  {
+   "target": "1R",
+   "window": "conf",
+   "diff": 0.022,
+   "welchT": 1.27
+  },
+  {
+   "target": "2R",
+   "window": "disc",
+   "diff": -0.017,
+   "welchT": -0.64
+  },
+  {
+   "target": "2R",
+   "window": "conf",
+   "diff": 0.028,
+   "welchT": 1.19
+  }
+ ],
+ "perMarket": {
+  "xau": {
+   "aligned 1R": {
+    "n": 1251,
+    "mean": -0.106
+   },
+   "aligned 2R": {
+    "n": 1251,
+    "mean": -0.105
+   },
+   "opposite 1R": {
+    "n": 1685,
+    "mean": -0.162
+   },
+   "opposite 2R": {
+    "n": 1685,
+    "mean": -0.16
+   }
+  },
+  "eurusd": {
+   "aligned 1R": {
+    "n": 1329,
+    "mean": -0.059
+   },
+   "aligned 2R": {
+    "n": 1329,
+    "mean": -0.064
+   },
+   "opposite 1R": {
+    "n": 1925,
+    "mean": -0.06
+   },
+   "opposite 2R": {
+    "n": 1925,
+    "mean": -0.03
+   }
+  },
+  "gbpusd": {
+   "aligned 1R": {
+    "n": 1423,
+    "mean": -0.05
+   },
+   "aligned 2R": {
+    "n": 1423,
+    "mean": -0.032
+   },
+   "opposite 1R": {
+    "n": 1853,
+    "mean": -0.051
+   },
+   "opposite 2R": {
+    "n": 1853,
+    "mean": -0.1
+   }
+  },
+  "usdjpy": {
+   "aligned 1R": {
+    "n": 1220,
+    "mean": -0.05
+   },
+   "aligned 2R": {
+    "n": 1220,
+    "mean": -0.061
+   },
+   "opposite 1R": {
+    "n": 1789,
+    "mean": -0.077
+   },
+   "opposite 2R": {
+    "n": 1789,
+    "mean": -0.073
+   }
+  },
+  "audusd": {
+   "aligned 1R": {
+    "n": 1247,
+    "mean": -0.06
+   },
+   "aligned 2R": {
+    "n": 1247,
+    "mean": -0.057
+   },
+   "opposite 1R": {
+    "n": 1861,
+    "mean": -0.089
+   },
+   "opposite 2R": {
+    "n": 1861,
+    "mean": -0.1
+   }
+  }
+ },
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2026-04-16T01:00",
+   "orders": 104,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2026-07-01T15:30",
+   "orders": 183,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2026-09-16T07:00",
+   "orders": 275,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2026-04-24T10:50",
+   "orders": 125,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2026-07-07T12:50",
+   "orders": 203,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2026-09-17T14:55",
+   "orders": 294,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2026-04-24T10:20",
+   "orders": 121,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2026-07-07T12:35",
+   "orders": 210,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpusd",
+   "cut": "2026-09-17T14:55",
+   "orders": 290,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2026-04-24T09:55",
+   "orders": 136,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2026-07-07T12:15",
+   "orders": 217,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2026-09-17T14:35",
+   "orders": 293,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2026-04-24T10:05",
+   "orders": 129,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2026-07-07T12:25",
+   "orders": 212,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "audusd",
+   "cut": "2026-09-17T14:40",
+   "orders": 285,
+   "missing": 0,
+   "extra": 0
+  }
+ ]
+}

@@ -66,3 +66,29 @@ Default symbols `BTCUSD,ETHUSD`; change them to your broker's names. cTrader Des
 - Added: ADA +90.9 | +22.1R, BNB +115.7 | +31.0R, LINK +13.7 | +10.7R.
 - Left out: DOGE +27.0 | +1.6R, LTC +9.1 | −12.5R, TRX −1.2 | +9.1R.
 - CryptoScalper stays BTC + ETH only. Its rule was tested on 11 more IC Markets coins (LTC, BCH, ADA, DOGE, DOT, LINK, XLM, AVAX, UNI, EOS, DASH), Binance 5m 2022-26: every one loses at a 0.1% round-trip cost (best: DOGE about flat).
+
+# BreakFade.cs — the Equinox Break fade on M15 (24 Nov 2026)
+
+The Equinox desk's "Break fade" as a standalone cBot on the broker's own 15-minute candles (study cell `m15 none atr 2R all`
+of `research/edge/grid7-wide-fade`). **Demo accounts only; it starts in dry run.**
+
+**The rule loses after costs in its study** (2015-26, ten markets: +0.042R a trade before costs, -0.118R after). It is not an
+edge. The bot exists to see the rule trade at a broker's own prices on a demo account.
+
+**Rules**
+- **Break:** a closed M15 candle closes above the last confirmed swing high not yet closed above (or below the last swing low).
+  A swing has 3 candles each side and counts once the 3 later candles have closed.
+- **Trade:** against the break, at market when the break candle closes. A break up is sold, a break down is bought.
+- **Stop:** 1 x ATR(14) of M15 from the fill. **Target:** 2R. **Time limit:** closed after 24 hours.
+- **Skips:** the spread over a set share of the stop (default 100 %), the per-symbol and total caps, a break seen over 90 s late,
+  a volume whose smallest size would risk more than the risk %.
+
+**Setup**
+1. cTrader -> Algo -> New cBot -> replace the template with `BreakFade.cs` -> Build. It needs no access rights.
+2. Add one instance to any chart. Parameters: the symbol list (your broker's names), risk % a trade (default 0.25), caps,
+   trading hours in UTC (for example 20 to 22), the spread limit, dry run.
+3. Leave **Dry run** on first: the Log shows each break and what it would do. Switch it off to trade the demo account.
+4. cTrader Desktop must stay running, or run the instance in cTrader's cloud.
+
+**Notes:** positions carry the label `BF`, so a restart is safe. A position without a stop is closed at once. To backtest it in
+cTrader, use tick data: the stop is a few pips on forex, so candle-only backtests flatter it.

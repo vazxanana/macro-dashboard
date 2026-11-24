@@ -122,6 +122,7 @@ export const FILES = [
   { file: 'boxfade/desk.json', label: 'Box fade desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'fvg/desk.json', label: 'FVG return desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'goldvb/desk.json', label: 'Gold breakout desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
+  { file: 'lyriac/desk.json', label: 'Lyriac desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'jpyvb/desk.json', label: 'USD/JPY breakout desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'dom/desk.json', label: 'DOM zone desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'eg/desk.json', label: 'Engulfing desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },

@@ -6974,3 +6974,79 @@ optimistic; "confirmed" at 240 trades also needs the total at TWICE the cost abo
 - `council/ctrader-account.mjs` `labelOf` names Equinox before ICT, and `shown(books, cfg)` leaves a book whose copies are
   switched off (`config.mirrorIct === false`) out of the NAME of an account it shares: the …144 row reads "Equinox". The
   account's `books` list and the mirror's mapping are unchanged (ICT copies it still holds are managed as before).
+
+## BreakFade.cs: the Equinox Break fade as a cTrader cBot (24 Nov 2026, owner: "make ctrader bot of the fade m15")
+`ctrader/BreakFade.cs` (standalone, the broker's own M15 candles, label `BF`, `TimeZone = TimeZones.UTC`): the study cell
+`m15 none atr 2R all` of `grid7-wide-fade` as the Equinox desk records it: a close beyond the last confirmed 3-a-side swing is
+faded at market when the candle closes, stop 1 x ATR(14) from the fill, 2R, closed after 24 hours. `DemoOnly()` on start, every
+poll and before the order (the fifth order-sending program; `tests/bridge-demo.test.mjs` lists it and pins its constants); dry
+run by default; a position without a stop is closed. Parameters: symbols, risk %, caps a symbol and in all, UTC hours, the
+spread limit. `BreakAt` walks the last 600 closed candles; compared with the study's `breaks()` on 5,300 seeded candles (0
+mismatches) before it was written in C#. Not compiled (no cTrader in the sandbox). **The rule loses after costs (-0.118R a
+trade 2015-26): a demo tool, never an edge.**
+**MetaTrader 5 too** (same day, owner: "send orders to mt5 accounts as well"): `mt5/BreakFade.mq5`, the same rule and guards
+(magic 261124, a timer every 2 s, every symbol of its list, absolute stop and target on the order). Not compiled here.
+
+## MetaTrader 5 bridge with a personal key (24 Nov 2026, owner chose "A. Personal key")
+A member's own MetaTrader 5 follows the Equinox desks; no broker login or password reaches the site, nothing is stored.
+- `api/_eqx-bridge.js` (pure) + `api/eqx-bridge.js` (routed in `cloudflare/src/worker.mjs` `'eqx-bridge'`, `vercel.json` functions).
+  Key = `<account>.<HMAC(session key, "eqx-bridge/v1:<account>")>` (`keyOf` / `whoOf`, constant time; never a session). `POST
+  { action: 'mykey' }` (signed in, same origin, the owner or a member with the desks permission: `canUse`) answers the member's
+  address `…/api/eqx-bridge?key=…` (host from the allowlist, else aureumdesk.co.uk). `GET ?key=[&desks=]` answers a CSV
+  (`# eqx-bridge v1,<unix>`, then `id,desk,market,side,entry,stop,target,filled,state`) from council-data `fade/`, `bigfade/`,
+  `fvg/`, `goldvb/` `desk.json` through `data.js` `readFile`: `open` (may be opened), `hold` (open at the desk, too late or over
+  0.75R from its entry), `closed` (ended within 2 days). The SAME choices as the demo mirror's `eqxCandidates` (a test compares
+  record by record and the constants); a record without its stop on the losing side is never written. Each read checks the account
+  as it stands (user list cached a minute; removed, a viewer or desks off = 403; unreadable = 503); a wrong key counts as a failed
+  password check; 60 reads a minute a key; `EQX_BRIDGE=off` stops it. No order, broker or storage code (test).
+- `mt5/EquinoxBridge.mq5`: polls the address (WebRequest must be allowed for the site), opens each `open` line once at market with
+  the desk's absolute stop and target unless the price is past either or over `InpMaxDriftR` 0.75R from the entry (a tag `eq:<hash>`
+  in the comment and a terminal global variable keep it to once), closes the copy on `closed`, closes a copy without a stop.
+  `DemoOnly()` on start, every poll and before the order; dry run by default; magic 261125. Not compiled here.
+- Page: Profile card `#ms-pf-eqb` + `<script id="ms-eqb-js">` ("Show my bridge address", the four setup steps, a link to the
+  program on GitHub); hidden for guests and accounts without the desks; keeps nothing in the browser.
+- The desks are paper records of rules that lose after costs: a demo feed, never advice. Sending to real accounts would need the
+  owner to change absolute rule 2. Tests: `tests/eqx-bridge.test.mjs` (5), `tests/bridge-demo.test.mjs`.
+
+## Lyriac: the passing rules as one Equinox desk, on the Shadows + LIT demo account (24 Nov 2026, owner: "build as new edge called Lyriac and put it in equinox connect the 200$ acc to it")
+The owner asked for "the ultimate edge" from everything tested. The evidence gives no new chart rule (19 of 20 combinations of
+24 Nov failed, one still running); what passes is the book of `research/edge/passing-rules-book`. Lyriac is that book's three
+intraday rules as ONE desk (the first tab of `/equinox`):
+- **Tracker** `council/edge-desks-2.mjs` `lyriacTrades` (`DESKS2.lyriac`, markets xau + usdjpy, `extra: { '5m': 40 }` days of
+  candles for the gotobi stop): the gold and USD/JPY breakout T1 through the breakout desks' own `vbDays` (kind `lyriac-t1`, the
+  same entries, stops and R as `goldvb` / `jpyvb`: a test compares), and `gotobiTrades` (kind `lyriac-gotobi`): the gotobi study's
+  own calendar, `legTimes('fade')`, `stopDist` and the order of its `trade()` (a gap at the open, then the stop, else 06:00 UTC);
+  a gotobi day cut before 06:00 UTC is an open record. `mosha-desk.mjs` `clean` takes the `lyriac-` kinds. The loop line is
+  `--only fade,…,jpyvb,lyriac,dom`; `datahealth.mjs` lists `lyriac/desk.json`. Not in it: gold before a US holiday and the Nasdaq
+  Tuesday (other markets and calendars).
+- **Page**: `equinox.html` `#v-lyriac` (first in `EQ_DESKS`), `assets/desk-trades.js` `DESKS.lyriac` (its "What this is" gives the
+  book's figures and says they describe in-sample years, not proof), `assets/desk-live.js`.
+- **The account** (owner, same day: "swap to the account shadows LIT"): Lyriac's rules are traded by the two demo jobs that
+  already trade exactly these rules with real stop orders (`council/vb-demo.mjs`, `council/gotobi.mjs`), on their default
+  account, the Shadows + LIT demo account (`gotobi.mjs` `accountFor`: the LIT book's account, 10152146), at 0.25 % a trade. No
+  Trader rule: a first rule `lyriac-155` (the $200 account ending 155, where 1 oz of gold would risk about 12 % a trade and
+  which the token did not hold) was removed before it ever ran. The shadow book's copies trade on that same account.
+- **Lyriac alone** (owner, same day): Trader rule `shadow-mirror-off` sets `config.mirrorShadow = false`: the mirror opens no new
+  shadow copy on any demo account (the shadow book has no other account); open copies are managed to their exits. The account
+  then holds the breakout and gotobi jobs only. Undo: a rule setting it true.
+- The standalone `VolBreakout` bots written the same day were removed on the owner's word ("dont do it").
+- First 60-day read (before costs, not evidence): gold breakout 31 trades +18.9R, USD/JPY breakout 29 +0.2R, gotobi 11 +2.7R.
+A paper desk and a demo record of rules whose studies passed; the forward records judge. Tests: `tests/lyriac.test.mjs` (4).
+
+## Twenty combinations of the owner's methods (24 Nov 2026, owner: "use 20 agents to keep studying, do combinations of the strategies I've given")
+Twenty pre-registered studies, one combination each (PREREGISTRATION.md committed alone before each run; `research/edge/<topic>/`,
+`tests/<topic>.test.mjs`), five markets (xau, eurusd, gbpusd, usdjpy, audusd), discovery 2005-14 and confirmation 2015 to Oct
+2026, judged AFTER the shared costs on month-sum t with Holm. **19 FAIL, 1 INCONCLUSIVE, 0 PASS; nothing live changed, no rule
+proposed.** Best cell after costs in 2015-26 (R a trade, n, month t):
+`h4eg-m15-range-cf` (H4 engulf zone + M15 break / range / confirmation) −0.049 (8,855, −3.36) · `vb-msnr-side` (direction call on
+the breakouts) with the call +0.068 against it +0.121, difference t −0.96: no filter · `ifvg-daily-eg-zone` −0.012 (9,289, −0.80) ·
+`sweep-m5-engulf-limit` −0.121 (3,152, −2.56) · `d1-dom-h1-ef` −0.043 (1,535, −1.10) · `asia-sweep-ifvg` −0.080 (3,425, −2.92; the
+plain close back inside is +0.07 to +0.09 before costs) · `h1-origin-h4-range` (premium / discount) −0.063 (6,470, −3.49) ·
+`eg-chain-msnr-side` −0.107 (8,920, −2.52) · `vb-next-day-eg` −0.082 (980, −2.42) · `gap-level-engulf` −0.018 (5,250, −0.66) ·
+`pdhl-sweep-m5-shift` −0.017 (3,298, −0.70) · `h1-box-retest-engulf` −0.100 (6,443, −3.66) · `h1-qm-h4-turn-m15-eg` INCONCLUSIVE
+(n 172 / 220) · `london-reversal-ny-eg` −0.054 (1,114, −1.32) · `ef-chain-h4-h1-m15` −0.106 (3,152, −5.88) · `dom-h4-vr-overlap`
+−0.034 (17,428, −2.04) · `pair-divergence-ifvg` −0.044 (1,597, −1.22) · `h4-eg-cisd-m15` −0.061 (30,191, −6.49; inside a zone
+loses about 0.05R less than away from one) · `equal-pool-m5-confirm` +0.063 (1,056, 1.41) but −0.076 in 2005-14 · `tl3-m15-engulf`
+−0.121 (2,097, −3.99). The pattern is the one of every earlier grid: about zero before costs, the cost decides, and no key level,
+direction call, session or confluence picks the better trades. Do not re-test variants of these on these years. The agents shared
+one checkout and a three-slot run queue (4 cores); each committed only its own paths.
