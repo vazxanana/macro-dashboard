@@ -36,7 +36,7 @@ import { buildZones } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
 
 export const LABEL = 'dom';
-export const RISK = 0.005, RISK_MIN = 0.0005, RISK_MAX = 0.005, MAX_RISK = 0.01, MAX_MARKET = 3, MAX_TOTAL = 20, LIFE_S = 24 * 3600, RR = 2, ATR_K = 0.25, NEAR_ATR = 1;
+export const RISK = 0.005, RISK_MIN = 0.0005, RISK_MAX = 0.01, MAX_RISK = 0.01, MAX_MARKET = 3, MAX_TOTAL = 20, LIFE_S = 24 * 3600, RR = 2, ATR_K = 0.25, NEAR_ATR = 1;
 export const STALE_S = 2 * 3600;          // a market whose newest candle is older than this is shut: nothing is armed there
 const H = 3600, DAY = 86400;
 // market -> broker names to try (normalised) and the currency its price is quoted in (for the size)
@@ -111,7 +111,11 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   // candles of every market (a failed market is left out of this pass)
   const R = {}, px = {};
   await Promise.all(markets.map(async (k) => { try { const rows = await barsFn(k, now); R[k] = read(rows, now); if (R[k].price > 0) px[k] = R[k].price; } catch (e) { log(`dom: ${k}: ${scrub(String(e.message || e)).slice(0, 100)}`); } }));
-  const have = new Set(J.trades.map((x) => x.id)), live = J.trades.filter(LIVE), perMarket = (k) => J.trades.filter((x) => LIVE(x) && x.market === k).length;
+  // 24 Nov 2026 (owner: the DOM job moved to a new $100 demo account): a record belongs to the account it was placed on (`acct`;
+  // a record from before has none = the default account). Records of another account are left as they are: their orders and
+  // positions carry their own stop, target and 24 h expiry at the broker, and this pass never reads or counts them.
+  const tag = (a) => '…' + String(a || '').replace('*', '').trim().slice(-4), cur = tag(account), dflt = tag(env.CTRADER_ACCOUNT_ID), here = (x) => (x.acct || dflt) === cur;   // a tag, never the account number
+  const have = new Set(J.trades.map((x) => x.id)), live = J.trades.filter((x) => LIVE(x) && here(x)), perMarket = (k) => J.trades.filter((x) => LIVE(x) && here(x) && x.market === k).length;
   const arms = [];
   for (const k of markets) { const r = R[k]; if (!r || !(r.lastT != null && now - r.lastT <= STALE_S)) continue;
     if (J.notOffered[k] && now - J.notOffered[k] < DAY) continue;
@@ -166,7 +170,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
       } catch (e) { log(`dom: ${rec.id}: ${scrub(String(e.message || e)).slice(0, 160)}`); }
     }
     // 2. any 'dom' position with no stop and no record: closed (rule 1)
-    for (const p of positions.filter(mine)) { const c = String((p.tradeData || {}).comment || ''); if (+p.stopLoss > 0 || J.trades.some((x) => commentOf(x.id) === c && x.status === 'open')) continue;
+    for (const p of positions.filter(mine)) { const c = String((p.tradeData || {}).comment || ''); if (+p.stopLoss > 0 || J.trades.some((x) => here(x) && commentOf(x.id) === c && x.status === 'open')) continue;
       try { await closePos(p); log(`dom: closed a 'dom' position without a stop and without a record (${c})`); did.push('orphan closed'); } catch (e) { log('dom: an orphan without a stop could not be closed: ' + scrub(String(e.message || e)).slice(0, 120)); } }
     // 3. new orders
     if (arms.length) {
@@ -175,7 +179,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
       const infoOf = {};
       for (const { k, z } of arms) {
         const id = idOf(k, z.side, z.t), M = MARKETS[k], r = R[k];
-        if (J.trades.filter(LIVE).length >= MAX_TOTAL) { log(`dom: ${MAX_TOTAL} orders and positions already: nothing more this pass`); break; }
+        if (J.trades.filter((x) => LIVE(x) && here(x)).length >= MAX_TOTAL) { log(`dom: ${MAX_TOTAL} orders and positions already: nothing more this pass`); break; }
         if (perMarket(k) >= MAX_MARKET) continue;
         if (J.trades.some((x) => x.id === id)) continue;
         const symName = M.names.find((n) => idOfName.has(normName(n)));
@@ -183,7 +187,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
         const symbolId = idOfName.get(normName(symName));
         // adopted: the broker already holds this zone's order or position (a pass whose record was lost): never placed twice
         const po = byComment(orders, id), pp = byComment(positions, id);
-        const P = plan(z, r.atr, COSTS[k] || 0), base = { id, market: k, side: z.side, zone: { t: z.t, bot: z.bot, top: z.top, formed: z.formed }, atr: +r.atr.toPrecision(6), symbol: symName, placedAt: iso(), expiresAt: now + LIFE_S, account: `…${String(account).slice(-3)}` };
+        const P = plan(z, r.atr, COSTS[k] || 0), base = { id, market: k, side: z.side, zone: { t: z.t, bot: z.bot, top: z.top, formed: z.formed }, atr: +r.atr.toPrecision(6), symbol: symName, placedAt: iso(), expiresAt: now + LIFE_S, account: `…${String(account).slice(-3)}`, acct: cur };
         if (po || pp) { Object.assign(base, P || {}, { status: pp ? 'open' : 'placed', adopted: true }); if (pp) { Object.assign(base, { fill: +pp.price || null, positionId: String(pp.positionId) }); await guard(base, pp); } J.trades.push(base); dirty = true; did.push(`${id} adopted`); continue; }
         try {
           if (!P) throw Object.assign(new Error('the levels leave no room'), { skip: true });

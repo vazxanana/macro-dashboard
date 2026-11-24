@@ -65,7 +65,10 @@ export async function connect({ env, dir, account, WS, scrub }) {
   try {   // 23 Nov 2026: a refusal here left the session's heartbeat running, so the job's process never ended (it sat to its time limit)
     await s.send(PT.APP_AUTH_REQ, { clientId: env.CTRADER_CLIENT_ID, clientSecret: env.CTRADER_CLIENT_SECRET }, PT.APP_AUTH_RES);
     const list = await s.send(PT.ACCOUNTS_BY_TOKEN_REQ, { accessToken: tok.accessToken }, PT.ACCOUNTS_BY_TOKEN_RES), all = list.ctidTraderAccount || [], id = Number(account);
-    const acc = all.find((a) => Number(a.ctidTraderAccountId) === id) || all.find((a) => Number(a.traderLogin) === id);
+    // '*6154' (24 Nov 2026, owner gave a new demo account by the end of its login): the ONE demo account whose login ends so
+    const suf = /^\*(\d{3,})$/.exec(String(account).trim()), tail = suf ? all.filter((a) => a.isLive === false && String(a.traderLogin).endsWith(suf[1])) : null;
+    if (tail && tail.length !== 1) throw Object.assign(new Error(`${tail.length} demo accounts on this token have a login ending ${suf[1]}`), { final: true });
+    const acc = tail ? tail[0] : all.find((a) => Number(a.ctidTraderAccountId) === id) || all.find((a) => Number(a.traderLogin) === id);
     if (!acc) throw Object.assign(new Error('the gotobi account is not on this token'), { final: true });
     if (acc.isLive !== false) throw Object.assign(new Error('refused: not a demo account'), { final: true });
     const ctid = Number(acc.ctidTraderAccountId);

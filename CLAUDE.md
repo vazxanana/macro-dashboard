@@ -6276,6 +6276,13 @@ label only. Note: the mirror's daily loss stop (`LIMITS.dayStop` 2 %) reads the 
 Council account can hold the live book's new copies for the rest of that UTC day. A forward demo record of a before-cost tilt,
 NOT an edge (every grid failed after costs); the holdout test `research/edge/dom-zone-holdout` is pending. Test:
 `tests/dom-demo.test.mjs`.
+**Moved to the new $100 demo account, 1 % a trade** (24 Nov 2026, owner: "theres an account that got 100 usd put the mosha dom trading
+there risking 1% per trade", "Its a new account", "Ending 6154", "DOM zone"): owner rule `dom-demo-6154` sets `config.dom = { account:
+'*6154', risk: 0.01 }`. `council/gotobi.mjs` `connect` takes `*<digits>` = the ONE demo account on the token whose login ends so
+(two, or only a live one: refused, nothing sent). `RISK_MAX` 0.01. A record carries `acct` (a tag `…6154`, never the number); a pass
+reads, counts and caps only its own account's records, so the orders and positions left on the Council account run out at the broker
+with their own stop, target and 24 h expiry (their records stay "placed" / "open" in the file). On $100 the smallest lot often risks
+more than 1 % (then that order is a `skip`). Before 24 Nov the job traded the Council account at 0.5 %.
 
 ## Why the desk totals fell, 30 pips in each market's own pip, EG barriers, the trade chart (22 Nov 2026, owner: "find why the before that were positive became negative and find a solutin, plus a barrier can be an eg aswell"; "the stop is not 3$ but 30 pips so convert it to points"; "i would like to resize ... and i want timeframes from 1minute m5 m15 m30 h1 h4 daily")
 Old and new code were run on the same candles (three markets, 2026) with one change at a time. PAPER READINGS before costs: none is a tested edge.

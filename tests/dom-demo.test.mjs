@@ -61,7 +61,7 @@ function broker({ live = false, refuseAmend = false, offered = ['XAUUSD'] } = {}
       const P = m.payload || {};
       switch (m.payloadType) {
         case PT.APP_AUTH_REQ: return r(PT.APP_AUTH_RES, {});
-        case PT.ACCOUNTS_BY_TOKEN_REQ: return r(PT.ACCOUNTS_BY_TOKEN_RES, { ctidTraderAccount: [{ ctidTraderAccountId: 77, traderLogin: 49478137, isLive: live }] });
+        case PT.ACCOUNTS_BY_TOKEN_REQ: return r(PT.ACCOUNTS_BY_TOKEN_RES, { ctidTraderAccount: b.accounts || [{ ctidTraderAccountId: 77, traderLogin: 49478137, isLive: live }] });
         case PT.ACCOUNT_AUTH_REQ: return r(PT.ACCOUNT_AUTH_RES, {});
         case PT.TRADER_REQ: return r(PT.TRADER_RES, { trader: { balance: 1000000, moneyDigits: 2 } });   // $10,000
         case PT.SYMBOLS_LIST_REQ: return r(PT.SYMBOLS_LIST_RES, { symbol: offered.map((n, i) => ({ symbolId: 41 + i, symbolName: n })) });
@@ -95,6 +95,17 @@ test('an order: a LIMIT at the near edge WITH stopLoss and takeProfit, label dom
   await go(dir, b, { ...R, now: R.now + 60 }); assert.equal(news(b).length, 1, 'never placed twice');
   // a lost record: the order at the broker is adopted, not placed again
   fs.rmSync(path.join(dir, 'dom', 'trades.json')); await go(dir, b, { ...R, now: R.now + 120 }); assert.equal(news(b).length, 1); assert.equal(file(dir).trades[0].adopted, true);
+});
+test('24 Nov 2026: the job moved to the demo account ending 6154 at 1 %: found by its login tail, old records of the Council account left alone', async () => {
+  const R = rows(), b = broker(); b.accounts = [{ ctidTraderAccountId: 77, traderLogin: 49478137, isLive: false }, { ctidTraderAccountId: 88, traderLogin: 50116154, isLive: false }, { ctidTraderAccountId: 99, traderLogin: 70006154, isLive: true }];
+  const old = { id: 'old-zone', market: 'xau', side: 'buy', status: 'placed', entry: 1, stop: 0.5, target: 2, zone: { t: 1, bot: 1, top: 1 }, placedAt: new Date((R.now - 600) * 1000).toISOString(), expiresAt: R.now + 3600 };
+  const dir = setup({ dom: { account: '*6154', risk: 0.01 } }, [old]); await go(dir, b, R);
+  const o = news(b); assert.equal(o.length, 1); assert.equal(o[0].ctidTraderAccountId, 88, 'the one DEMO account whose login ends 6154 (a live one with the same tail is never taken)');
+  const loss = (o[0].volume / 100) * (o[0].limitPrice - o[0].stopLoss); assert.ok(loss <= 100 + 1e-6 && loss > 99, `1 % of $10,000 = $100 at the stop, risked $${loss}`);
+  const J = file(dir); assert.equal(J.trades.find((x) => x.id === 'old-zone').status, 'placed', 'a record of the old account is not read or cancelled');
+  assert.equal(J.trades.find((x) => x.id !== 'old-zone').acct, '…6154'); assert.ok(!JSON.stringify(J).includes('50116154'), 'the account number is never written');
+  const b2 = broker(); b2.accounts = [{ ctidTraderAccountId: 1, traderLogin: 1116154, isLive: false }, { ctidTraderAccountId: 2, traderLogin: 2226154, isLive: false }];
+  await go(setup({ dom: { account: '*6154' } }), b2, R); assert.equal(news(b2).length, 0, 'two demo accounts with that tail: refused, nothing sent');
 });
 test('the zone fails while the order rests: cancelled at once; an order past its 24 h: expired, never re-armed', async () => {
   { const R = rows(), dir = setup(), b = broker(); await go(dir, b, R);
