@@ -953,11 +953,18 @@
   },
   "day": {
    "date": "2026-11-24",
-   "startBalance": 9971.21
+   "startBalance": 500.21,
+   "reset": "2026-11-24T18:13:38.000Z",
+   "lastBalance": 500.21,
+   "ids": [],
+   "oids": [],
+   "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
   "status": "ok · demo Fusion Markets · balance 500.21 · 0 open",
-  "skipped": {},
+  "skipped": {
+   "eqx:fade:usdcad:fade-m15-b1795541400": "price 1.4272 is already past the council stop 1.427311"
+  },
   "wait": {
    "eqx:fade:gbpusd:fade-m15-s1795531500": {
     "why": "daily loss stop (95.0% down today)",
@@ -978,11 +985,6 @@
     "why": "daily loss stop (95.0% down today)",
     "n": 0,
     "at": "2026-11-24T16:58:04.000Z"
-   },
-   "eqx:fade:usdcad:fade-m15-b1795541400": {
-    "why": "daily loss stop (95.0% down today)",
-    "n": 0,
-    "at": "2026-11-24T18:11:16.000Z"
    }
   },
   "paused": {},
@@ -991,7 +993,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 500.21,
-  "lastRun": "2026-11-24T18:11:16.000Z"
+  "lastRun": "2026-11-24T18:14:15.000Z"
  },
  "log": [
   {
@@ -2361,6 +2363,15 @@
   {
    "at": "2026-11-24T17:39:29.000Z",
    "msg": "not mirrored yet eqx:fade:usdcad:fade-m15-b1795541400: daily loss stop (95.0% down today) (will retry)",
+   "trade": "eqx:fade:usdcad:fade-m15-b1795541400"
+  },
+  {
+   "at": "2026-11-24T18:13:38.000Z",
+   "msg": "balance 500.21 against a day start of 9971.21: read as an account reset, the day starts again"
+  },
+  {
+   "at": "2026-11-24T18:13:38.000Z",
+   "msg": "not mirrored eqx:fade:usdcad:fade-m15-b1795541400: price 1.4272 is already past the council stop 1.427311",
    "trade": "eqx:fade:usdcad:fade-m15-b1795541400"
   }
  ],
