@@ -80,3 +80,17 @@ The same rule as `ctrader/BreakFade.cs`, for MetaTrader 5, on the broker's own 1
    caps, trading hours in UTC, the spread limit, dry run.
 3. Leave dry run on first and read the Experts log; switch it off to trade the demo account.
 4. Use a hedging account (on a netting account, overlapping trades of one symbol merge). The terminal must stay running.
+
+# EquinoxBridge.mq5 — follow the Equinox desks with your personal key (24 Nov 2026)
+
+A member's own MetaTrader 5 copies the Equinox desks' paper trades (Break fade, Big-candle fade, FVG return, Gold breakout).
+The program reads the member's personal feed address (Profile -> "MetaTrader 5 bridge" on the site) every few seconds. No broker
+login or password reaches the site. **Demo accounts only; it starts in dry run. The desks' rules lose after costs in their
+studies: not trade advice.**
+
+1. Compile `EquinoxBridge.mq5` in MetaEditor (folder `MQL5/Experts`).
+2. Tools -> Options -> Expert Advisors -> allow WebRequest for `https://aureumdesk.co.uk`.
+3. Attach it to any chart of a demo account; paste the feed address into the first input. Inputs: risk % a trade (0.25),
+   which desks, the broker's symbol suffix, the cap of open copies, how far the price may be from the desk's entry (0.75R).
+4. Each desk trade is opened once with the desk's stop and target, closed when the desk closes it, and a copy without a stop
+   is closed at once.

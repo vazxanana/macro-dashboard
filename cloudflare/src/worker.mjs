@@ -30,6 +30,7 @@ import mcp from '../../api/mcp.js';
 import me from '../../api/me.js';
 import moshaLessons from '../../api/mosha-lessons.js';
 import mosha from '../../api/mosha.js';
+import eqxBridge from '../../api/eqx-bridge.js';
 import journal from '../../api/journal.js';
 import notify from '../../api/notify.js';
 import passkey from '../../api/passkey.js';
@@ -48,7 +49,7 @@ import './bundled.mjs';   // the files the Academy and the bridge downloads read
 
 export const HANDLERS = {
   'academy-mcp': academyMcp, academy, bars, battle, bridge, 'chronos-coach': chronosCoach, 'ctrader-link': ctraderLink, daily, data,
-  'edge-analyst': edgeAnalyst, journal, login, logout, lse, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
+  'edge-analyst': edgeAnalyst, 'eqx-bridge': eqxBridge, journal, login, logout, lse, mcp, me, 'mosha-lessons': moshaLessons, mosha, notify, passkey,
   profile, signup, sounds, status, stream, 'structure-assistant': structureAssistant, 'trade-review': tradeReview, users,
 };
 

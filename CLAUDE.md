@@ -6986,3 +6986,24 @@ mismatches) before it was written in C#. Not compiled (no cTrader in the sandbox
 trade 2015-26): a demo tool, never an edge.**
 **MetaTrader 5 too** (same day, owner: "send orders to mt5 accounts as well"): `mt5/BreakFade.mq5`, the same rule and guards
 (magic 261124, a timer every 2 s, every symbol of its list, absolute stop and target on the order). Not compiled here.
+
+## MetaTrader 5 bridge with a personal key (24 Nov 2026, owner chose "A. Personal key")
+A member's own MetaTrader 5 follows the Equinox desks; no broker login or password reaches the site, nothing is stored.
+- `api/_eqx-bridge.js` (pure) + `api/eqx-bridge.js` (routed in `cloudflare/src/worker.mjs` `'eqx-bridge'`, `vercel.json` functions).
+  Key = `<account>.<HMAC(session key, "eqx-bridge/v1:<account>")>` (`keyOf` / `whoOf`, constant time; never a session). `POST
+  { action: 'mykey' }` (signed in, same origin, the owner or a member with the desks permission: `canUse`) answers the member's
+  address `…/api/eqx-bridge?key=…` (host from the allowlist, else aureumdesk.co.uk). `GET ?key=[&desks=]` answers a CSV
+  (`# eqx-bridge v1,<unix>`, then `id,desk,market,side,entry,stop,target,filled,state`) from council-data `fade/`, `bigfade/`,
+  `fvg/`, `goldvb/` `desk.json` through `data.js` `readFile`: `open` (may be opened), `hold` (open at the desk, too late or over
+  0.75R from its entry), `closed` (ended within 2 days). The SAME choices as the demo mirror's `eqxCandidates` (a test compares
+  record by record and the constants); a record without its stop on the losing side is never written. Each read checks the account
+  as it stands (user list cached a minute; removed, a viewer or desks off = 403; unreadable = 503); a wrong key counts as a failed
+  password check; 60 reads a minute a key; `EQX_BRIDGE=off` stops it. No order, broker or storage code (test).
+- `mt5/EquinoxBridge.mq5`: polls the address (WebRequest must be allowed for the site), opens each `open` line once at market with
+  the desk's absolute stop and target unless the price is past either or over `InpMaxDriftR` 0.75R from the entry (a tag `eq:<hash>`
+  in the comment and a terminal global variable keep it to once), closes the copy on `closed`, closes a copy without a stop.
+  `DemoOnly()` on start, every poll and before the order; dry run by default; magic 261125. Not compiled here.
+- Page: Profile card `#ms-pf-eqb` + `<script id="ms-eqb-js">` ("Show my bridge address", the four setup steps, a link to the
+  program on GitHub); hidden for guests and accounts without the desks; keeps nothing in the browser.
+- The desks are paper records of rules that lose after costs: a demo feed, never advice. Sending to real accounts would need the
+  owner to change absolute rule 2. Tests: `tests/eqx-bridge.test.mjs` (5), `tests/bridge-demo.test.mjs`.

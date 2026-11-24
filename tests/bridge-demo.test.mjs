@@ -15,7 +15,7 @@ const ORDER_CS = /\b(ExecuteMarketOrder|PlaceLimitOrder|PlaceStopOrder|PlaceStop
 const prevCode = (src, i) => { const lines = src.slice(0, i).split('\n'); lines.pop(); while (lines.length && /^\s*(\/\/.*)?$/.test(lines[lines.length - 1])) lines.pop(); return lines[lines.length - 1] || ''; };
 
 test('every order-placing program is covered: the two bridges and the four others', () => {
-  assert.deepEqual(MQ.sort(), ['mt5/BreakFade.mq5', 'mt5/CouncilBridge.mq5', 'mt5/NQOpenRun.mq5']);
+  assert.deepEqual(MQ.sort(), ['mt5/BreakFade.mq5', 'mt5/CouncilBridge.mq5', 'mt5/EquinoxBridge.mq5', 'mt5/NQOpenRun.mq5']);
   assert.deepEqual(CS.sort(), ['ctrader/BreakFade.cs', 'ctrader/CouncilBridge.cs', 'ctrader/CryptoScalper.cs', 'ctrader/CryptoTrend.cs']);
   for (const f of [...MQ, ...CS]) assert.ok([...rd(f).matchAll(f.endsWith('.cs') ? ORDER_CS : ORDER_MQ)].length > 0, f + ' sends orders');
 });
