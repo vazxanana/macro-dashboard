@@ -503,6 +503,33 @@
     "volume": 100,
     "status": "closed at broker",
     "closedAt": "2026-11-24T08:28:16.000Z"
+   },
+   "eurusd-position-1795437907": {
+    "symbol": "EURUSD",
+    "side": "sell",
+    "setup": "position",
+    "openedAt": "2026-11-24T11:53:18.000Z",
+    "councilEntry": 1.09532,
+    "stop": 1.10073,
+    "t1": 1.0845000000000002,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 1.09532,
+    "digits": 5,
+    "lots": 0.01,
+    "riskCash": 5.41,
+    "margin": 2.19,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 1.09542,
+    "slipR": -0.018,
+    "lagSec": 83291,
+    "positionId": "50808923",
+    "volume": 100000,
+    "status": "open"
    }
   },
   "day": {
@@ -510,7 +537,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9818.98 · 8 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9818.98 · 9 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -519,32 +546,10 @@
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
-  "orders": {
-   "eurusd-position-1795437907": {
-    "orderId": "34672452",
-    "symbol": "EURUSD",
-    "side": "sell",
-    "volume": 100000,
-    "lots": 0.01,
-    "digits": 5,
-    "setup": "position",
-    "limitPrice": 1.09532,
-    "stop": 1.10073,
-    "t1": 1.0845000000000002,
-    "placedAt": "2026-11-23T12:46:19.000Z",
-    "expires": "2026-11-28T12:45:07.000Z",
-    "riskCash": 5.41,
-    "margin": 2.19,
-    "minLot": true,
-    "shadow": true,
-    "alerted": [
-     "pending"
-    ]
-   }
-  },
+  "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9818.98,
-  "lastRun": "2026-11-24T11:51:50.000Z"
+  "lastRun": "2026-11-24T11:53:18.000Z"
  },
  "log": [
   {
@@ -842,6 +847,11 @@
    "at": "2026-11-24T08:28:16.000Z",
    "msg": "XAUUSD position 51019304 closed at the broker",
    "trade": "xau-m30m1-1795502622"
+  },
+  {
+   "at": "2026-11-24T11:53:18.000Z",
+   "msg": "limit filled: EURUSD position 50808923 at the broker",
+   "trade": "eurusd-position-1795437907"
   }
  ],
  "limits": {
@@ -934,11 +944,11 @@
   ]
  },
  "execution": {
-  "n": 17,
-  "meanSlipR": 0.002,
+  "n": 18,
+  "meanSlipR": 0.001,
   "medianSlipR": -0.001,
   "worstSlipR": 0.034,
-  "medianLagSec": 76,
+  "medianLagSec": 92.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -967,6 +977,10 @@
    "XAUUSD": {
     "n": 2,
     "meanSlipR": -0.005
+   },
+   "EURUSD": {
+    "n": 1,
+    "meanSlipR": -0.018
    }
   }
  }
