@@ -6875,3 +6875,11 @@ costs with it: −0.235R a trade (n 54,443, 26 % winners) against −0.246R (30 
 1.5 x −0.222R, 2 x −0.209R; in 2005-14 the 2 x target is about zero after costs (−0.002R). Gold and silver are worse with the
 longer target, the forex pairs slightly better. The desk's target stays the candle's middle; the loss is the cost, not the exit.
 Test: `tests/bigfade-target-125.test.mjs`.
+
+## Big-candle fade with the target at 65 % of the candle (24 Nov 2026, owner: "Instead of 50 % tp try 65 %")
+`research/edge/bigfade-target-65/` (PREREGISTRATION.md pushed alone first; the sister study's harness with the target as a share of
+the CANDLE from its extreme, gate reproduced). **FAIL**: 65 % is better trade by trade (+0.020R in 2015-26, month t 2.92; +0.031R
+in 2005-14, t 4.44) and still a loss after costs: −0.226R a trade (n 54,443, 24 % winners) against −0.246R (30 %) at 50 %.
+Context only: 80 % −0.220R, 100 % −0.211R; in 2005-14 they are about zero after costs (−0.012R, −0.008R). No market is positive.
+The desk's target stays 50 %. Two exit variants on these trades are enough: do not test another target on these years.
+Test: `tests/bigfade-target-65.test.mjs`.
