@@ -684,6 +684,34 @@
     ],
     "stopCheckedAt": "2026-11-24T15:20:20.000Z",
     "brokerStop": 1707.98
+   },
+   "xau-m30m1-1795539936": {
+    "positionId": "51171364",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "m30m1",
+    "status": "open",
+    "openedAt": "2026-11-24T17:07:41.000Z",
+    "councilEntry": 3566.465,
+    "stop": 3575.5262500000003,
+    "t1": 3542.372499999999,
+    "riskCash": 9.06,
+    "margin": 7.14,
+    "minLot": true,
+    "shadow": true,
+    "mark": 3566.465,
+    "levelsFrom": "mark",
+    "fillPrice": 3569.91,
+    "slipR": -0.38,
+    "lagSec": 125,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T17:07:41.000Z",
+    "brokerStop": 3578.97
    }
   },
   "day": {
@@ -691,7 +719,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9832.32 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 9832.32 · 8 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -703,7 +731,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9832.32,
-  "lastRun": "2026-11-24T17:05:06.000Z"
+  "lastRun": "2026-11-24T17:07:41.000Z"
  },
  "log": [
   {
@@ -1091,6 +1119,11 @@
    "at": "2026-11-24T15:20:20.000Z",
    "msg": "opened sell ETHUSD 0.04 lot (council swing)",
    "trade": "eth-swing-1795533545"
+  },
+  {
+   "at": "2026-11-24T17:07:41.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council m30m1)",
+   "trade": "xau-m30m1-1795539936"
   }
  ],
  "limits": {
@@ -1183,11 +1216,11 @@
   ]
  },
  "execution": {
-  "n": 23,
-  "meanSlipR": -0.022,
-  "medianSlipR": -0.001,
+  "n": 24,
+  "meanSlipR": -0.037,
+  "medianSlipR": -0.003,
   "worstSlipR": 0.034,
-  "medianLagSec": 79,
+  "medianLagSec": 82.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -1214,8 +1247,8 @@
     "meanSlipR": -0.018
    },
    "XAUUSD": {
-    "n": 5,
-    "meanSlipR": -0.106
+    "n": 6,
+    "meanSlipR": -0.152
    },
    "EURUSD": {
     "n": 1,
