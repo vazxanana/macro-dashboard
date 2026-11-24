@@ -1,0 +1,930 @@
+{
+ "study": "sd-complement",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 6 supply / demand tests and 0 of 2 breakout filters pass; the best test, A1 premium / discount, made +0.013R a trade before costs in 2015-26 (n 3,562, month t 0.56) and -0.007R on the holdout (n 1,934, t -0.22); breakouts away from a defended zone, 2024 on: gold +0.237R (n 34), USD/JPY +0.053R (n 36) after costs",
+ "basis": "Part A judged before costs on calendar-month sums, with an after-cost profit required; Part B after costs",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31",
+  "confirmation": "2015-01-01 to 2026-10-31",
+  "holdout": "2019-02-01 to 2026-10-31 (eight markets)"
+ },
+ "markets": {
+  "main": [
+   "xau",
+   "xag",
+   "eurusd",
+   "gbpusd",
+   "usdjpy",
+   "audusd",
+   "nzdusd",
+   "usdcad",
+   "usdchf",
+   "eurjpy"
+  ],
+  "holdout": [
+   "nas100",
+   "spx500",
+   "de40",
+   "gbpjpy",
+   "audjpy",
+   "cadjpy",
+   "eurgbp",
+   "euraud"
+  ]
+ },
+ "assumedCosts": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy",
+  "nas100",
+  "spx500",
+  "de40",
+  "gbpjpy",
+  "audjpy",
+  "cadjpy",
+  "eurgbp",
+  "euraud"
+ ],
+ "meta": [
+  {
+   "market": "xau",
+   "hold": false,
+   "first": "2006-03-19",
+   "zones": 1492,
+   "trades": 13235,
+   "dropped": 0,
+   "past": 8,
+   "small": 9,
+   "noTarget": 2950
+  },
+  {
+   "market": "xag",
+   "hold": false,
+   "first": "2006-03-19",
+   "zones": 1541,
+   "trades": 13204,
+   "dropped": 20,
+   "past": 9,
+   "small": 127,
+   "noTarget": 2921
+  },
+  {
+   "market": "eurusd",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1694,
+   "trades": 15354,
+   "dropped": 0,
+   "past": 25,
+   "small": 0,
+   "noTarget": 3430
+  },
+  {
+   "market": "gbpusd",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1662,
+   "trades": 15003,
+   "dropped": 11,
+   "past": 3,
+   "small": 1,
+   "noTarget": 3310
+  },
+  {
+   "market": "usdjpy",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1616,
+   "trades": 14811,
+   "dropped": 3,
+   "past": 27,
+   "small": 0,
+   "noTarget": 3179
+  },
+  {
+   "market": "audusd",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1704,
+   "trades": 15873,
+   "dropped": 11,
+   "past": 14,
+   "small": 0,
+   "noTarget": 3362
+  },
+  {
+   "market": "nzdusd",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1602,
+   "trades": 14437,
+   "dropped": 1,
+   "past": 22,
+   "small": 1,
+   "noTarget": 3156
+  },
+  {
+   "market": "usdcad",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1622,
+   "trades": 14852,
+   "dropped": 20,
+   "past": 5,
+   "small": 0,
+   "noTarget": 3092
+  },
+  {
+   "market": "usdchf",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1603,
+   "trades": 14549,
+   "dropped": 5,
+   "past": 10,
+   "small": 1,
+   "noTarget": 3110
+  },
+  {
+   "market": "eurjpy",
+   "hold": false,
+   "first": "2004-01-01",
+   "zones": 1681,
+   "trades": 15418,
+   "dropped": 0,
+   "past": 35,
+   "small": 1,
+   "noTarget": 3310
+  },
+  {
+   "market": "nas100",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 713,
+   "trades": 5662,
+   "dropped": 0,
+   "past": 2,
+   "small": 0,
+   "noTarget": 1251
+  },
+  {
+   "market": "spx500",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 690,
+   "trades": 5639,
+   "dropped": 4,
+   "past": 11,
+   "small": 0,
+   "noTarget": 1248
+  },
+  {
+   "market": "de40",
+   "hold": true,
+   "first": "2018-01-02",
+   "zones": 547,
+   "trades": 4694,
+   "dropped": 2,
+   "past": 23,
+   "small": 0,
+   "noTarget": 1065
+  },
+  {
+   "market": "gbpjpy",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 618,
+   "trades": 4864,
+   "dropped": 0,
+   "past": 13,
+   "small": 0,
+   "noTarget": 1195
+  },
+  {
+   "market": "audjpy",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 699,
+   "trades": 5760,
+   "dropped": 0,
+   "past": 27,
+   "small": 1,
+   "noTarget": 1374
+  },
+  {
+   "market": "cadjpy",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 666,
+   "trades": 5460,
+   "dropped": 0,
+   "past": 9,
+   "small": 1,
+   "noTarget": 1243
+  },
+  {
+   "market": "eurgbp",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 607,
+   "trades": 4689,
+   "dropped": 4,
+   "past": 19,
+   "small": 1,
+   "noTarget": 1180
+  },
+  {
+   "market": "euraud",
+   "hold": true,
+   "first": "2018-01-01",
+   "zones": 671,
+   "trades": 5723,
+   "dropped": 0,
+   "past": 10,
+   "small": 0,
+   "noTarget": 1304
+  }
+ ],
+ "partA": [
+  {
+   "test": "A1 premium / discount",
+   "disc": {
+    "n": 3098,
+    "mean": 0.020884,
+    "t": 0.858133,
+    "meanNet": -0.016706,
+    "tNet": -0.69
+   },
+   "conf": {
+    "n": 3562,
+    "mean": 0.013338,
+    "t": 0.55816,
+    "meanNet": -0.032311,
+    "tNet": -1.35
+   },
+   "hold": {
+    "n": 1934,
+    "mean": -0.007342,
+    "t": -0.219158,
+    "meanNet": -0.039229,
+    "tNet": -1.17
+   },
+   "control": {
+    "disc": {
+     "n": 8547,
+     "mean": 0.008633,
+     "t": 0.41029,
+     "meanNet": -0.027844,
+     "tNet": -1.32
+    },
+    "conf": {
+     "n": 10557,
+     "mean": -0.006555,
+     "t": -0.316184,
+     "meanNet": -0.052975,
+     "tNet": -2.54
+    },
+    "hold": {
+     "n": 5695,
+     "mean": -0.025329,
+     "t": -1.078435,
+     "meanNet": -0.057191,
+     "tNet": -2.45
+    }
+   },
+   "vsControl": [
+    0.44,
+    0.76,
+    0.53
+   ],
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "before": false,
+    "holm": false,
+    "control": false,
+    "after": false
+   },
+   "pass": false
+  },
+  {
+   "test": "A2 Daily trend",
+   "disc": {
+    "n": 3644,
+    "mean": 0.022542,
+    "t": 0.842085,
+    "meanNet": -0.015243,
+    "tNet": -0.57
+   },
+   "conf": {
+    "n": 4163,
+    "mean": -0.038293,
+    "t": -1.599334,
+    "meanNet": -0.085806,
+    "tNet": -3.62
+   },
+   "hold": {
+    "n": 2235,
+    "mean": -0.021516,
+    "t": -0.788698,
+    "meanNet": -0.05406,
+    "tNet": -1.99
+   },
+   "control": {
+    "disc": {
+     "n": 10131,
+     "mean": 0.018029,
+     "t": 0.896428,
+     "meanNet": -0.020247,
+     "tNet": -1.01
+    },
+    "conf": {
+     "n": 12475,
+     "mean": -0.03425,
+     "t": -1.940672,
+     "meanNet": -0.080773,
+     "tNet": -4.53
+    },
+    "hold": {
+     "n": 6592,
+     "mean": -0.031475,
+     "t": -1.325555,
+     "meanNet": -0.063901,
+     "tNet": -2.69
+    }
+   },
+   "vsControl": [
+    0.18,
+    -0.17,
+    0.31
+   ],
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "before": false,
+    "holm": false,
+    "control": false,
+    "after": false
+   },
+   "pass": false
+  },
+  {
+   "test": "A3 quality",
+   "disc": {
+    "n": 1687,
+    "mean": 0.008892,
+    "t": 0.267484,
+    "meanNet": -0.032215,
+    "tNet": -0.97
+   },
+   "conf": {
+    "n": 1952,
+    "mean": -0.01091,
+    "t": -0.362995,
+    "meanNet": -0.063213,
+    "tNet": -2.06
+   },
+   "hold": {
+    "n": 943,
+    "mean": -0.06665,
+    "t": -1.649013,
+    "meanNet": -0.103213,
+    "tNet": -2.55
+   },
+   "control": {
+    "disc": {
+     "n": 4811,
+     "mean": -0.008283,
+     "t": -0.318566,
+     "meanNet": -0.04986,
+     "tNet": -1.87
+    },
+    "conf": {
+     "n": 6069,
+     "mean": -0.016547,
+     "t": -0.701822,
+     "meanNet": -0.06819,
+     "tNet": -2.82
+    },
+    "hold": {
+     "n": 2849,
+     "mean": -0.068801,
+     "t": -2.348035,
+     "meanNet": -0.104455,
+     "tNet": -3.56
+    }
+   },
+   "vsControl": [
+    0.45,
+    0.16,
+    0.04
+   ],
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "before": false,
+    "holm": false,
+    "control": false,
+    "after": false
+   },
+   "pass": false
+  },
+  {
+   "test": "A4 opposite-zone target",
+   "disc": {
+    "n": 2400,
+    "mean": 0.078282,
+    "t": 1.6692,
+    "meanNet": 0.040068,
+    "tNet": 0.86
+   },
+   "conf": {
+    "n": 2876,
+    "mean": -0.025739,
+    "t": -0.650089,
+    "meanNet": -0.07383,
+    "tNet": -1.86
+   },
+   "hold": {
+    "n": 1542,
+    "mean": 0.101283,
+    "t": 1.853664,
+    "meanNet": 0.069172,
+    "tNet": 1.27
+   },
+   "control": {
+    "disc": {
+     "n": 6646,
+     "mean": 0.050073,
+     "t": 1.276039,
+     "meanNet": 0.013256,
+     "tNet": 0.34
+    },
+    "conf": {
+     "n": 8566,
+     "mean": 0.026328,
+     "t": 0.770985,
+     "meanNet": -0.021263,
+     "tNet": -0.62
+    },
+    "hold": {
+     "n": 4607,
+     "mean": -0.006798,
+     "t": -0.170089,
+     "meanNet": -0.038191,
+     "tNet": -0.95
+    }
+   },
+   "vsControl": [
+    0.53,
+    -1.2,
+    1.77
+   ],
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "before": false,
+    "holm": false,
+    "control": false,
+    "after": false
+   },
+   "pass": false
+  },
+  {
+   "test": "A5 resting order at the near line",
+   "disc": {
+    "n": 6327,
+    "mean": 0.011185,
+    "t": 0.685878,
+    "meanNet": -0.026311,
+    "tNet": -1.62
+   },
+   "conf": {
+    "n": 7235,
+    "mean": -0.027066,
+    "t": -1.677107,
+    "meanNet": -0.074234,
+    "tNet": -4.58
+   },
+   "hold": {
+    "n": 3897,
+    "mean": 0.010027,
+    "t": 0.481982,
+    "meanNet": -0.020808,
+    "tNet": -1
+   },
+   "control": {
+    "disc": {
+     "n": 17642,
+     "mean": 0.014287,
+     "t": 1.129654,
+     "meanNet": -0.023124,
+     "tNet": -1.82
+    },
+    "conf": {
+     "n": 21738,
+     "mean": -0.009771,
+     "t": -0.774599,
+     "meanNet": -0.056954,
+     "tNet": -4.44
+    },
+    "hold": {
+     "n": 11573,
+     "mean": -0.020041,
+     "t": -1.178772,
+     "meanNet": -0.051174,
+     "tNet": -3
+    }
+   },
+   "vsControl": [
+    -0.16,
+    -0.96,
+    1.16
+   ],
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "before": false,
+    "holm": false,
+    "control": false,
+    "after": false
+   },
+   "pass": false
+  },
+  {
+   "test": "A6 A1 + A2 + A3",
+   "disc": {
+    "n": 335,
+    "mean": -0.145458,
+    "t": -1.96114,
+    "meanNet": -0.188985,
+    "tNet": -2.53
+   },
+   "conf": {
+    "n": 366,
+    "mean": -0.100853,
+    "t": -1.540541,
+    "meanNet": -0.152311,
+    "tNet": -2.3
+   },
+   "hold": {
+    "n": 169,
+    "mean": 0.101467,
+    "t": 0.974846,
+    "meanNet": 0.062023,
+    "tNet": 0.6
+   },
+   "control": {
+    "disc": {
+     "n": 859,
+     "mean": -0.10785,
+     "t": -1.766247,
+     "meanNet": -0.147412,
+     "tNet": -2.38
+    },
+    "conf": {
+     "n": 1050,
+     "mean": -0.074873,
+     "t": -1.446955,
+     "meanNet": -0.128248,
+     "tNet": -2.44
+    },
+    "hold": {
+     "n": 455,
+     "mean": 0.056009,
+     "t": 0.745072,
+     "meanNet": 0.017509,
+     "tNet": 0.23
+    }
+   },
+   "vsControl": [
+    -0.46,
+    -0.33,
+    0.37
+   ],
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "before": false,
+    "holm": false,
+    "control": false,
+    "after": false
+   },
+   "pass": false
+  }
+ ],
+ "partB": {
+  "xau": {
+   "windows": {
+    "REP": {
+     "all": {
+      "n": 1842,
+      "R": 0.1385,
+      "net": 0.0435,
+      "net2": -0.0514,
+      "t": 1.37
+     },
+     "kept": {
+      "n": 159,
+      "R": 0.0898,
+      "net": 0.0043,
+      "net2": -0.0812,
+      "t": 0.04
+     },
+     "against": {
+      "n": 148,
+      "R": 0.2554,
+      "net": 0.1688,
+      "net2": 0.0822,
+      "t": 1.36
+     },
+     "neither": 1535,
+     "diff": -0.1645,
+     "welch": -1.076735644642708
+    },
+    "IS": {
+     "all": {
+      "n": 747,
+      "R": 0.0949,
+      "net": 0.0305,
+      "net2": -0.0339,
+      "t": 0.65
+     },
+     "kept": {
+      "n": 60,
+      "R": 0.1655,
+      "net": 0.1125,
+      "net2": 0.0595,
+      "t": 0.92
+     },
+     "against": {
+      "n": 50,
+      "R": 0.1314,
+      "net": 0.0729,
+      "net2": 0.0143,
+      "t": 0.34
+     },
+     "neither": 637,
+     "diff": 0.0397,
+     "welch": 0.15898131487176081
+    },
+    "OOS": {
+     "all": {
+      "n": 567,
+      "R": 0.2005,
+      "net": 0.1687,
+      "net2": 0.1368,
+      "t": 3.17
+     },
+     "kept": {
+      "n": 34,
+      "R": 0.2649,
+      "net": 0.2367,
+      "net2": 0.2086,
+      "t": 0.71
+     },
+     "against": {
+      "n": 45,
+      "R": 0.2234,
+      "net": 0.1912,
+      "net2": 0.1591,
+      "t": 1.26
+     },
+     "neither": 488,
+     "diff": 0.0455,
+     "welch": 0.14481429340936916
+    }
+   },
+   "welch2010": -0.78,
+   "holm": 0.4777,
+   "checks": {
+    "oos": false,
+    "is": true,
+    "rep": true,
+    "cost2x": true,
+    "adds": false,
+    "holm": false
+   },
+   "pass": false
+  },
+  "usdjpy": {
+   "windows": {
+    "REP": {
+     "all": {
+      "n": 1886,
+      "R": 0.0797,
+      "net": 0.0456,
+      "net2": 0.0116,
+      "t": 1.66
+     },
+     "kept": {
+      "n": 167,
+      "R": 0.0864,
+      "net": 0.0547,
+      "net2": 0.023,
+      "t": 0.55
+     },
+     "against": {
+      "n": 140,
+      "R": 0.0098,
+      "net": -0.0202,
+      "net2": -0.0503,
+      "t": -0.23
+     },
+     "neither": 1579,
+     "diff": 0.075,
+     "welch": 0.5963567364428812
+    },
+    "IS": {
+     "all": {
+      "n": 761,
+      "R": 0.1035,
+      "net": 0.0701,
+      "net2": 0.0367,
+      "t": 1.59
+     },
+     "kept": {
+      "n": 60,
+      "R": 0.0637,
+      "net": 0.0353,
+      "net2": 0.0068,
+      "t": 0.29
+     },
+     "against": {
+      "n": 68,
+      "R": 0.1628,
+      "net": 0.1352,
+      "net2": 0.1076,
+      "t": 0.85
+     },
+     "neither": 633,
+     "diff": -0.0999,
+     "welch": -0.47074797548604724
+    },
+    "OOS": {
+     "all": {
+      "n": 552,
+      "R": 0.1442,
+      "net": 0.1161,
+      "net2": 0.0881,
+      "t": 2.1
+     },
+     "kept": {
+      "n": 36,
+      "R": 0.0839,
+      "net": 0.0532,
+      "net2": 0.0225,
+      "t": 0.28
+     },
+     "against": {
+      "n": 46,
+      "R": 0.4606,
+      "net": 0.4334,
+      "net2": 0.4062,
+      "t": 2.2
+     },
+     "neither": 470,
+     "diff": -0.3802,
+     "welch": -1.4772501779086176
+    }
+   },
+   "welch2010": -0.53,
+   "holm": 0.4777,
+   "checks": {
+    "oos": false,
+    "is": true,
+    "rep": true,
+    "cost2x": true,
+    "adds": false,
+    "holm": false
+   },
+   "pass": false
+  }
+ },
+ "passedA": [],
+ "passedB": [],
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2008-06-11",
+   "n": 1570,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2012-03-14",
+   "n": 5005,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2016-09-21",
+   "n": 8698,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2021-02-17",
+   "n": 12158,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2025-05-07",
+   "n": 15881,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2008-06-11",
+   "n": 3183,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2012-03-14",
+   "n": 7059,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2016-09-21",
+   "n": 10975,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2021-02-17",
+   "n": 15196,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2025-05-07",
+   "n": 18610,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2008-06-11",
+   "n": 2343,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2012-03-14",
+   "n": 5931,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2016-09-21",
+   "n": 9882,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2021-02-17",
+   "n": 14002,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2025-05-07",
+   "n": 17751,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpjpy",
+   "cut": "2021-02-17",
+   "n": 2060,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "gbpjpy",
+   "cut": "2025-05-07",
+   "n": 5665,
+   "missing": 0,
+   "extra": 0
+  }
+ ]
+}

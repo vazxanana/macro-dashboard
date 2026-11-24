@@ -56,7 +56,7 @@ export function sdBaseZones(L, A = atr14(L)) {
     let ext = dOut > 0 ? -Infinity : Infinity; for (let j = o; j <= last; j++) ext = dOut > 0 ? Math.max(ext, L[j].h) : Math.min(ext, L[j].l);
     const shape = dIn > 0 ? (dOut > 0 ? 'RBR' : 'RBD') : (dOut > 0 ? 'DBR' : 'DBD');
     lastBase = o - 1;
-    out.push({ d: dOut, lo, hi, at: L[last].e, i: last, shape, strength: body / a, ext, a: A[last], ref: L[last].c,
+    out.push({ d: dOut, lo, hi, at: L[last].e, i: last, o, nb, shape, strength: body / a, ext, a: A[last], ref: L[last].c,
       end: last + LIFE < L.length ? L[last + LIFE].e : Infinity });
   }
   return out;
