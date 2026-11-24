@@ -6780,3 +6780,12 @@ no council member reads it, and nothing is kept in the browser.
   own rule still applies: an open record's entry is usually already past, so its call counts only once price comes back to the
   entry. Never for guests (`span.dc` hidden for the public role; the script returns there). Practice only.
 - Not built (the proposal's later steps): the study's report from this file. Tests: `tests/journal.test.mjs`, `tests/desk-calls.test.mjs`.
+
+## Soft look (24 Nov 2026, owner: "make the design and theme of the website more soft and transparent, right now looks heavy like rock")
+Display only. `assets/soft.css`, linked right before `</head>` on every page (Desk, Macro desk, ChronosTrade, Academy, Edge lab,
+Equinox, gold terminal, /veteran/; offline.html stays self-contained), loaded last and written with `:root:root:root` / `html:root body`
+so it wins over each page's own token block whatever the order. Surfaces are see-through (`--au-surface` rgba .58 dark / .68 light,
+`--au-surface-2` .42 / .70) over a fixed soft background wash (`--soft-wash`, three faint radial gradients), cards and panels get a
+16 px backdrop blur, header and side rail are glass (`color-mix` of the background at 55 %), menus, popovers, dialogs and toasts a
+more opaque glass (`--soft-glass`) with a 22 px blur, hairlines lighter, radii 10 / 16 / 22 px, diffuse shadows, h1 / h2 weight 600.
+Text colours are unchanged. `prefers-reduced-transparency: reduce` gets solid surfaces. To undo: remove the link from the pages.
