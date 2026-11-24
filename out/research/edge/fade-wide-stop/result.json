@@ -1,0 +1,2136 @@
+{
+ "study": "fade-wide-stop",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 8 wider-stop tests are positive after costs in both windows; the best, big a3 2R, made -0.044R a trade after costs in 2015-26 (n 54,429, month t -6.74; +0.002R before costs)",
+ "basis": "judged AFTER costs on calendar-month sums (pre-registered); before costs beside",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31 (120 months)",
+  "confirmation": "2015-01-01 to 2026-10-31 (142 months)"
+ },
+ "markets": [
+  "xau",
+  "xag",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "assumedCosts": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01
+ },
+ "gate": {
+  "break2R": {
+   "want": {
+    "d": {
+     "n": 171523,
+     "mean": 0.054
+    },
+    "c": {
+     "n": 201769,
+     "mean": 0.042
+    }
+   },
+   "got": {
+    "d": {
+     "n": 171470,
+     "mean": 0.0545,
+     "t": 11.44,
+     "meanNet": -0.088,
+     "tNet": -15.44,
+     "costR": 0.1426,
+     "units": 1,
+     "stop": 0.6403,
+     "tgt": 0.344,
+     "time": 0.0157
+    },
+    "c": {
+     "n": 201750,
+     "mean": 0.0423,
+     "t": 11.34,
+     "meanNet": -0.1181,
+     "tNet": -28.37,
+     "costR": 0.1604,
+     "units": 1,
+     "stop": 0.6466,
+     "tgt": 0.3412,
+     "time": 0.0121
+    }
+   }
+  },
+  "bigHalf": {
+   "want": {
+    "d": {
+     "n": 47354,
+     "mean": 0.307
+    },
+    "c": {
+     "n": 54443,
+     "mean": 0.193
+    }
+   },
+   "got": {
+    "d": {
+     "n": 47320,
+     "mean": 0.3073,
+     "t": 20.53,
+     "meanNet": -0.0615,
+     "tNet": -4.13,
+     "costR": 0.3689,
+     "units": 1,
+     "stop": 0.673,
+     "tgt": 0.3262,
+     "time": 0.0008
+    },
+    "c": {
+     "n": 54429,
+     "mean": 0.193,
+     "t": 17.69,
+     "meanNet": -0.2461,
+     "tNet": -20.3,
+     "costR": 0.4391,
+     "units": 1,
+     "stop": 0.6976,
+     "tgt": 0.3023,
+     "time": 0.0001
+    }
+   }
+  }
+ },
+ "meta": [
+  {
+   "market": "xau",
+   "cost": 0.3,
+   "assumed": false,
+   "cnt": {
+    "break": {
+     "sigs": 35387,
+     "trades": 35212,
+     "small": 167,
+     "bad": 0,
+     "open": 2,
+     "noH1": 3,
+     "dropped": 3
+    },
+    "big": {
+     "sigs": 15623,
+     "trades": 7796,
+     "small": 4425,
+     "bad": 265,
+     "open": 1,
+     "noH1": 1,
+     "nohalf": 3135,
+     "dropped": 0
+    }
+   }
+  },
+  {
+   "market": "xag",
+   "cost": 0.03,
+   "assumed": true,
+   "cnt": {
+    "break": {
+     "sigs": 35575,
+     "trades": 23321,
+     "small": 12183,
+     "bad": 0,
+     "open": 2,
+     "noH1": 2,
+     "dropped": 67
+    },
+    "big": {
+     "sigs": 18498,
+     "trades": 2081,
+     "small": 13168,
+     "bad": 1052,
+     "open": 1,
+     "noH1": 2,
+     "nohalf": 2168,
+     "dropped": 26
+    }
+   }
+  },
+  {
+   "market": "eurusd",
+   "cost": 0.00006,
+   "assumed": false,
+   "cnt": {
+    "break": {
+     "sigs": 39550,
+     "trades": 39517,
+     "small": 6,
+     "bad": 0,
+     "open": 1,
+     "noH1": 7,
+     "dropped": 19
+    },
+    "big": {
+     "sigs": 16776,
+     "trades": 11823,
+     "small": 1662,
+     "bad": 195,
+     "open": 0,
+     "noH1": 7,
+     "nohalf": 3070,
+     "dropped": 19
+    }
+   }
+  },
+  {
+   "market": "gbpusd",
+   "cost": 0.00008,
+   "assumed": false,
+   "cnt": {
+    "break": {
+     "sigs": 39283,
+     "trades": 39220,
+     "small": 6,
+     "bad": 0,
+     "open": 2,
+     "noH1": 6,
+     "dropped": 49
+    },
+    "big": {
+     "sigs": 18072,
+     "trades": 12721,
+     "small": 1882,
+     "bad": 268,
+     "open": 1,
+     "noH1": 3,
+     "nohalf": 3177,
+     "dropped": 20
+    }
+   }
+  },
+  {
+   "market": "usdjpy",
+   "cost": 0.008,
+   "assumed": false,
+   "cnt": {
+    "break": {
+     "sigs": 38639,
+     "trades": 38588,
+     "small": 10,
+     "bad": 0,
+     "open": 5,
+     "noH1": 3,
+     "dropped": 33
+    },
+    "big": {
+     "sigs": 15743,
+     "trades": 10433,
+     "small": 2007,
+     "bad": 169,
+     "open": 2,
+     "noH1": 3,
+     "nohalf": 3116,
+     "dropped": 13
+    }
+   }
+  },
+  {
+   "market": "audusd",
+   "cost": 0.00006,
+   "assumed": false,
+   "cnt": {
+    "break": {
+     "sigs": 40080,
+     "trades": 40036,
+     "small": 6,
+     "bad": 0,
+     "open": 5,
+     "noH1": 4,
+     "dropped": 29
+    },
+    "big": {
+     "sigs": 16052,
+     "trades": 11212,
+     "small": 1883,
+     "bad": 335,
+     "open": 3,
+     "noH1": 3,
+     "nohalf": 2597,
+     "dropped": 19
+    }
+   }
+  },
+  {
+   "market": "nzdusd",
+   "cost": 0.00007,
+   "assumed": true,
+   "cnt": {
+    "break": {
+     "sigs": 39730,
+     "trades": 39714,
+     "small": 5,
+     "bad": 0,
+     "open": 4,
+     "noH1": 6,
+     "dropped": 1
+    },
+    "big": {
+     "sigs": 16232,
+     "trades": 10601,
+     "small": 2720,
+     "bad": 261,
+     "open": 1,
+     "noH1": 2,
+     "nohalf": 2647,
+     "dropped": 0
+    }
+   }
+  },
+  {
+   "market": "usdcad",
+   "cost": 0.00007,
+   "assumed": true,
+   "cnt": {
+    "break": {
+     "sigs": 39960,
+     "trades": 39910,
+     "small": 2,
+     "bad": 0,
+     "open": 3,
+     "noH1": 2,
+     "dropped": 43
+    },
+    "big": {
+     "sigs": 18854,
+     "trades": 12602,
+     "small": 3037,
+     "bad": 280,
+     "open": 2,
+     "noH1": 5,
+     "nohalf": 2910,
+     "dropped": 18
+    }
+   }
+  },
+  {
+   "market": "usdchf",
+   "cost": 0.00007,
+   "assumed": true,
+   "cnt": {
+    "break": {
+     "sigs": 39218,
+     "trades": 39167,
+     "small": 3,
+     "bad": 0,
+     "open": 2,
+     "noH1": 5,
+     "dropped": 41
+    },
+    "big": {
+     "sigs": 18711,
+     "trades": 11758,
+     "small": 3049,
+     "bad": 621,
+     "open": 2,
+     "noH1": 7,
+     "nohalf": 3246,
+     "dropped": 28
+    }
+   }
+  },
+  {
+   "market": "eurjpy",
+   "cost": 0.01,
+   "assumed": true,
+   "cnt": {
+    "break": {
+     "sigs": 38548,
+     "trades": 38535,
+     "small": 4,
+     "bad": 0,
+     "open": 3,
+     "noH1": 4,
+     "dropped": 2
+    },
+    "big": {
+     "sigs": 14806,
+     "trades": 10722,
+     "small": 1497,
+     "bad": 127,
+     "open": 1,
+     "noH1": 1,
+     "nohalf": 2458,
+     "dropped": 0
+    }
+   }
+  }
+ ],
+ "tests": [
+  {
+   "id": "T1",
+   "name": "break a15 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0403,
+    "t": 9.05,
+    "meanNet": -0.0548,
+    "tNet": -10.76,
+    "costR": 0.095,
+    "units": 1.5,
+    "stop": 0.6348,
+    "tgt": 0.3312,
+    "time": 0.034
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0309,
+    "t": 8.16,
+    "meanNet": -0.076,
+    "tNet": -18.91,
+    "costR": 0.1069,
+    "units": 1.5,
+    "stop": 0.6403,
+    "tgt": 0.3292,
+    "time": 0.0304
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0542,
+     "t": -10.48,
+     "meanNet": -0.1493,
+     "tNet": -26.27,
+     "costR": 0.095,
+     "units": 1.5,
+     "stop": 0.6667,
+     "tgt": 0.3027,
+     "time": 0.0306
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0479,
+     "t": -13.33,
+     "meanNet": -0.1548,
+     "tNet": -38.02,
+     "costR": 0.1069,
+     "units": 1.5,
+     "stop": 0.666,
+     "tgt": 0.3072,
+     "time": 0.0268
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T2",
+   "name": "break a2 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0341,
+    "t": 7.99,
+    "meanNet": -0.0372,
+    "tNet": -8.2,
+    "costR": 0.0713,
+    "units": 2,
+    "stop": 0.6214,
+    "tgt": 0.3167,
+    "time": 0.062
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0254,
+    "t": 8.21,
+    "meanNet": -0.0548,
+    "tNet": -16.7,
+    "costR": 0.0802,
+    "units": 2,
+    "stop": 0.6265,
+    "tgt": 0.3144,
+    "time": 0.0591
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0377,
+     "t": -6.98,
+     "meanNet": -0.1089,
+     "tNet": -19.08,
+     "costR": 0.0713,
+     "units": 2,
+     "stop": 0.6454,
+     "tgt": 0.2962,
+     "time": 0.0584
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0378,
+     "t": -10.92,
+     "meanNet": -0.1181,
+     "tNet": -31.83,
+     "costR": 0.0802,
+     "units": 2,
+     "stop": 0.647,
+     "tgt": 0.2983,
+     "time": 0.0548
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T3",
+   "name": "break a3 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0253,
+    "t": 7.45,
+    "meanNet": -0.0222,
+    "tNet": -6.26,
+    "costR": 0.0475,
+    "units": 3,
+    "stop": 0.5732,
+    "tgt": 0.2715,
+    "time": 0.1553
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0245,
+    "t": 8.22,
+    "meanNet": -0.029,
+    "tNet": -9.34,
+    "costR": 0.0535,
+    "units": 3,
+    "stop": 0.5756,
+    "tgt": 0.2708,
+    "time": 0.1536
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0219,
+     "t": -3.92,
+     "meanNet": -0.0694,
+     "tNet": -12.23,
+     "costR": 0.0475,
+     "units": 3,
+     "stop": 0.5886,
+     "tgt": 0.259,
+     "time": 0.1524
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0245,
+     "t": -6.14,
+     "meanNet": -0.078,
+     "tNet": -19.22,
+     "costR": 0.0535,
+     "units": 3,
+     "stop": 0.5909,
+     "tgt": 0.2598,
+     "time": 0.1492
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T4",
+   "name": "break h1 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0242,
+    "t": 6.28,
+    "meanNet": -0.0476,
+    "tNet": -10.88,
+    "costR": 0.0717,
+    "units": 2.285,
+    "stop": 0.6297,
+    "tgt": 0.3186,
+    "time": 0.0517
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0242,
+    "t": 7.04,
+    "meanNet": -0.0497,
+    "tNet": -13.53,
+    "costR": 0.0739,
+    "units": 2.318,
+    "stop": 0.6321,
+    "tgt": 0.3195,
+    "time": 0.0484
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0332,
+     "t": -6.45,
+     "meanNet": -0.1049,
+     "tNet": -18.24,
+     "costR": 0.0717,
+     "units": 2.285,
+     "stop": 0.65,
+     "tgt": 0.3031,
+     "time": 0.0468
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0305,
+     "t": -7.79,
+     "meanNet": -0.1044,
+     "tNet": -25.43,
+     "costR": 0.0739,
+     "units": 2.318,
+     "stop": 0.6499,
+     "tgt": 0.3047,
+     "time": 0.0454
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T5",
+   "name": "big a15 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0422,
+    "t": 5.25,
+    "meanNet": -0.0371,
+    "tNet": -4.48,
+    "costR": 0.0793,
+    "units": 1.5,
+    "stop": 0.6434,
+    "tgt": 0.3388,
+    "time": 0.0178
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0187,
+    "t": 2.63,
+    "meanNet": -0.072,
+    "tNet": -10.07,
+    "costR": 0.0908,
+    "units": 1.5,
+    "stop": 0.6534,
+    "tgt": 0.3332,
+    "time": 0.0134
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.048,
+     "t": -6.32,
+     "meanNet": -0.1273,
+     "tNet": -16.05,
+     "costR": 0.0793,
+     "units": 1.5,
+     "stop": 0.6739,
+     "tgt": 0.3112,
+     "time": 0.0149
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0165,
+     "t": -2.35,
+     "meanNet": -0.1072,
+     "tNet": -14.91,
+     "costR": 0.0908,
+     "units": 1.5,
+     "stop": 0.6652,
+     "tgt": 0.3219,
+     "time": 0.0129
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T6",
+   "name": "big a2 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0296,
+    "t": 4.22,
+    "meanNet": -0.0298,
+    "tNet": -4.27,
+    "costR": 0.0595,
+    "units": 2,
+    "stop": 0.6372,
+    "tgt": 0.3252,
+    "time": 0.0376
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0099,
+    "t": 1.53,
+    "meanNet": -0.0582,
+    "tNet": -8.97,
+    "costR": 0.0681,
+    "units": 2,
+    "stop": 0.6453,
+    "tgt": 0.3203,
+    "time": 0.0344
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0215,
+     "t": -2.75,
+     "meanNet": -0.081,
+     "tNet": -10.2,
+     "costR": 0.0595,
+     "units": 2,
+     "stop": 0.6542,
+     "tgt": 0.311,
+     "time": 0.0348
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0066,
+     "t": -0.96,
+     "meanNet": -0.0747,
+     "tNet": -10.62,
+     "costR": 0.0681,
+     "units": 2,
+     "stop": 0.652,
+     "tgt": 0.3171,
+     "time": 0.0309
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T7",
+   "name": "big a3 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0238,
+    "t": 3.56,
+    "meanNet": -0.0158,
+    "tNet": -2.39,
+    "costR": 0.0397,
+    "units": 3,
+    "stop": 0.5979,
+    "tgt": 0.2869,
+    "time": 0.1152
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0017,
+    "t": 0.25,
+    "meanNet": -0.0437,
+    "tNet": -6.74,
+    "costR": 0.0454,
+    "units": 3,
+    "stop": 0.6061,
+    "tgt": 0.2806,
+    "time": 0.1133
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": 0.0067,
+     "t": 0.98,
+     "meanNet": -0.0329,
+     "tNet": -4.82,
+     "costR": 0.0397,
+     "units": 3,
+     "stop": 0.6037,
+     "tgt": 0.2861,
+     "time": 0.1102
+    },
+    "conf": {
+     "n": 54429,
+     "mean": 0.0135,
+     "t": 2.16,
+     "meanNet": -0.0318,
+     "tNet": -5.02,
+     "costR": 0.0454,
+     "units": 3,
+     "stop": 0.6036,
+     "tgt": 0.2874,
+     "time": 0.109
+    },
+    "separated": true
+   }
+  },
+  {
+   "id": "T8",
+   "name": "big h1 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0241,
+    "t": 3.39,
+    "meanNet": -0.0386,
+    "tNet": -4.82,
+    "costR": 0.0626,
+    "units": 2.338,
+    "stop": 0.6412,
+    "tgt": 0.3256,
+    "time": 0.0332
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0096,
+    "t": 1.37,
+    "meanNet": -0.0515,
+    "tNet": -7.39,
+    "costR": 0.0612,
+    "units": 2.34,
+    "stop": 0.6489,
+    "tgt": 0.3231,
+    "time": 0.028
+   },
+   "p": 1,
+   "holm": 1,
+   "pass": false,
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0124,
+     "t": -1.63,
+     "meanNet": -0.075,
+     "tNet": -8.71,
+     "costR": 0.0626,
+     "units": 2.338,
+     "stop": 0.6549,
+     "tgt": 0.3173,
+     "time": 0.0278
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0044,
+     "t": -0.65,
+     "meanNet": -0.0655,
+     "tNet": -9.65,
+     "costR": 0.0612,
+     "units": 2.34,
+     "stop": 0.6542,
+     "tgt": 0.3201,
+     "time": 0.0256
+    },
+    "separated": true
+   }
+  }
+ ],
+ "passed": [],
+ "cells": [
+  {
+   "name": "break p 1R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.049,
+    "t": 15.2,
+    "meanNet": -0.0936,
+    "tNet": -22.59,
+    "costR": 0.1426,
+    "units": 1,
+    "stop": 0.4732,
+    "tgt": 0.5207,
+    "time": 0.0061
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0367,
+    "t": 13.45,
+    "meanNet": -0.1237,
+    "tNet": -37.88,
+    "costR": 0.1604,
+    "units": 1,
+    "stop": 0.481,
+    "tgt": 0.5155,
+    "time": 0.0035
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0559,
+     "t": -17.33,
+     "meanNet": -0.1985,
+     "tNet": -38.27,
+     "costR": 0.1426,
+     "units": 1,
+     "stop": 0.5241,
+     "tgt": 0.4697,
+     "time": 0.0061
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0456,
+     "t": -16.49,
+     "meanNet": -0.206,
+     "tNet": -52.34,
+     "costR": 0.1604,
+     "units": 1,
+     "stop": 0.5199,
+     "tgt": 0.4765,
+     "time": 0.0035
+    }
+   }
+  },
+  {
+   "name": "break p 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0545,
+    "t": 11.44,
+    "meanNet": -0.088,
+    "tNet": -15.44,
+    "costR": 0.1426,
+    "units": 1,
+    "stop": 0.6403,
+    "tgt": 0.344,
+    "time": 0.0157
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0423,
+    "t": 11.34,
+    "meanNet": -0.1181,
+    "tNet": -28.37,
+    "costR": 0.1604,
+    "units": 1,
+    "stop": 0.6466,
+    "tgt": 0.3412,
+    "time": 0.0121
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0669,
+     "t": -14.12,
+     "meanNet": -0.2095,
+     "tNet": -34.05,
+     "costR": 0.1426,
+     "units": 1,
+     "stop": 0.6809,
+     "tgt": 0.3062,
+     "time": 0.0129
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0573,
+     "t": -14.82,
+     "meanNet": -0.2177,
+     "tNet": -45.53,
+     "costR": 0.1604,
+     "units": 1,
+     "stop": 0.6786,
+     "tgt": 0.3111,
+     "time": 0.0103
+    }
+   }
+  },
+  {
+   "name": "break a15 1R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0405,
+    "t": 11.64,
+    "meanNet": -0.0546,
+    "tNet": -13.32,
+    "costR": 0.095,
+    "units": 1.5,
+    "stop": 0.4724,
+    "tgt": 0.5114,
+    "time": 0.0162
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0323,
+    "t": 11.03,
+    "meanNet": -0.0746,
+    "tNet": -23.97,
+    "costR": 0.1069,
+    "units": 1.5,
+    "stop": 0.4786,
+    "tgt": 0.5083,
+    "time": 0.0132
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0439,
+     "t": -12.58,
+     "meanNet": -0.1389,
+     "tNet": -32.93,
+     "costR": 0.095,
+     "units": 1.5,
+     "stop": 0.5131,
+     "tgt": 0.4707,
+     "time": 0.0162
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0378,
+     "t": -12.95,
+     "meanNet": -0.1447,
+     "tNet": -41.15,
+     "costR": 0.1069,
+     "units": 1.5,
+     "stop": 0.511,
+     "tgt": 0.4758,
+     "time": 0.0132
+    }
+   }
+  },
+  {
+   "name": "break a15 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0403,
+    "t": 9.05,
+    "meanNet": -0.0548,
+    "tNet": -10.76,
+    "costR": 0.095,
+    "units": 1.5,
+    "stop": 0.6348,
+    "tgt": 0.3312,
+    "time": 0.034
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0309,
+    "t": 8.16,
+    "meanNet": -0.076,
+    "tNet": -18.91,
+    "costR": 0.1069,
+    "units": 1.5,
+    "stop": 0.6403,
+    "tgt": 0.3292,
+    "time": 0.0304
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0542,
+     "t": -10.48,
+     "meanNet": -0.1493,
+     "tNet": -26.27,
+     "costR": 0.095,
+     "units": 1.5,
+     "stop": 0.6667,
+     "tgt": 0.3027,
+     "time": 0.0306
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0479,
+     "t": -13.33,
+     "meanNet": -0.1548,
+     "tNet": -38.02,
+     "costR": 0.1069,
+     "units": 1.5,
+     "stop": 0.666,
+     "tgt": 0.3072,
+     "time": 0.0268
+    }
+   }
+  },
+  {
+   "name": "break a2 1R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0316,
+    "t": 8.97,
+    "meanNet": -0.0397,
+    "tNet": -10.38,
+    "costR": 0.0713,
+    "units": 2,
+    "stop": 0.4706,
+    "tgt": 0.5003,
+    "time": 0.029
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0266,
+    "t": 9.99,
+    "meanNet": -0.0536,
+    "tNet": -19.27,
+    "costR": 0.0802,
+    "units": 2,
+    "stop": 0.4754,
+    "tgt": 0.499,
+    "time": 0.0256
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0339,
+     "t": -9.62,
+     "meanNet": -0.1052,
+     "tNet": -26.26,
+     "costR": 0.0713,
+     "units": 2,
+     "stop": 0.5015,
+     "tgt": 0.4695,
+     "time": 0.029
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0309,
+     "t": -11.95,
+     "meanNet": -0.1111,
+     "tNet": -37.47,
+     "costR": 0.0802,
+     "units": 2,
+     "stop": 0.5011,
+     "tgt": 0.4733,
+     "time": 0.0256
+    }
+   }
+  },
+  {
+   "name": "break a2 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0341,
+    "t": 7.99,
+    "meanNet": -0.0372,
+    "tNet": -8.2,
+    "costR": 0.0713,
+    "units": 2,
+    "stop": 0.6214,
+    "tgt": 0.3167,
+    "time": 0.062
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0254,
+    "t": 8.21,
+    "meanNet": -0.0548,
+    "tNet": -16.7,
+    "costR": 0.0802,
+    "units": 2,
+    "stop": 0.6265,
+    "tgt": 0.3144,
+    "time": 0.0591
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0377,
+     "t": -6.98,
+     "meanNet": -0.1089,
+     "tNet": -19.08,
+     "costR": 0.0713,
+     "units": 2,
+     "stop": 0.6454,
+     "tgt": 0.2962,
+     "time": 0.0584
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0378,
+     "t": -10.92,
+     "meanNet": -0.1181,
+     "tNet": -31.83,
+     "costR": 0.0802,
+     "units": 2,
+     "stop": 0.647,
+     "tgt": 0.2983,
+     "time": 0.0548
+    }
+   }
+  },
+  {
+   "name": "break a3 1R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0227,
+    "t": 6.8,
+    "meanNet": -0.0248,
+    "tNet": -6.83,
+    "costR": 0.0475,
+    "units": 3,
+    "stop": 0.455,
+    "tgt": 0.4757,
+    "time": 0.0693
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0199,
+    "t": 7.83,
+    "meanNet": -0.0336,
+    "tNet": -12.75,
+    "costR": 0.0535,
+    "units": 3,
+    "stop": 0.4594,
+    "tgt": 0.4759,
+    "time": 0.0647
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0243,
+     "t": -7.27,
+     "meanNet": -0.0718,
+     "tNet": -20.81,
+     "costR": 0.0475,
+     "units": 3,
+     "stop": 0.4765,
+     "tgt": 0.4542,
+     "time": 0.0693
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0234,
+     "t": -9.35,
+     "meanNet": -0.0769,
+     "tNet": -28.94,
+     "costR": 0.0535,
+     "units": 3,
+     "stop": 0.4776,
+     "tgt": 0.4577,
+     "time": 0.0647
+    }
+   }
+  },
+  {
+   "name": "break a3 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0253,
+    "t": 7.45,
+    "meanNet": -0.0222,
+    "tNet": -6.26,
+    "costR": 0.0475,
+    "units": 3,
+    "stop": 0.5732,
+    "tgt": 0.2715,
+    "time": 0.1553
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0245,
+    "t": 8.22,
+    "meanNet": -0.029,
+    "tNet": -9.34,
+    "costR": 0.0535,
+    "units": 3,
+    "stop": 0.5756,
+    "tgt": 0.2708,
+    "time": 0.1536
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0219,
+     "t": -3.92,
+     "meanNet": -0.0694,
+     "tNet": -12.23,
+     "costR": 0.0475,
+     "units": 3,
+     "stop": 0.5886,
+     "tgt": 0.259,
+     "time": 0.1524
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0245,
+     "t": -6.14,
+     "meanNet": -0.078,
+     "tNet": -19.22,
+     "costR": 0.0535,
+     "units": 3,
+     "stop": 0.5909,
+     "tgt": 0.2598,
+     "time": 0.1492
+    }
+   }
+  },
+  {
+   "name": "break h1 1R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0304,
+    "t": 9.6,
+    "meanNet": -0.0413,
+    "tNet": -10.04,
+    "costR": 0.0717,
+    "units": 2.285,
+    "stop": 0.4729,
+    "tgt": 0.5016,
+    "time": 0.0255
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0238,
+    "t": 8.53,
+    "meanNet": -0.0501,
+    "tNet": -17.46,
+    "costR": 0.0739,
+    "units": 2.318,
+    "stop": 0.4782,
+    "tgt": 0.4997,
+    "time": 0.0221
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0341,
+     "t": -10.79,
+     "meanNet": -0.1058,
+     "tNet": -27.41,
+     "costR": 0.0717,
+     "units": 2.285,
+     "stop": 0.5035,
+     "tgt": 0.471,
+     "time": 0.0255
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0284,
+     "t": -10.25,
+     "meanNet": -0.1023,
+     "tNet": -33.54,
+     "costR": 0.0739,
+     "units": 2.318,
+     "stop": 0.502,
+     "tgt": 0.4759,
+     "time": 0.0221
+    }
+   }
+  },
+  {
+   "name": "break h1 2R",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0242,
+    "t": 6.28,
+    "meanNet": -0.0476,
+    "tNet": -10.88,
+    "costR": 0.0717,
+    "units": 2.285,
+    "stop": 0.6297,
+    "tgt": 0.3186,
+    "time": 0.0517
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0242,
+    "t": 7.04,
+    "meanNet": -0.0497,
+    "tNet": -13.53,
+    "costR": 0.0739,
+    "units": 2.318,
+    "stop": 0.6321,
+    "tgt": 0.3195,
+    "time": 0.0484
+   },
+   "mirror": {
+    "disc": {
+     "n": 171470,
+     "mean": -0.0332,
+     "t": -6.45,
+     "meanNet": -0.1049,
+     "tNet": -18.24,
+     "costR": 0.0717,
+     "units": 2.285,
+     "stop": 0.65,
+     "tgt": 0.3031,
+     "time": 0.0468
+    },
+    "conf": {
+     "n": 201750,
+     "mean": -0.0305,
+     "t": -7.79,
+     "meanNet": -0.1044,
+     "tNet": -25.43,
+     "costR": 0.0739,
+     "units": 2.318,
+     "stop": 0.6499,
+     "tgt": 0.3047,
+     "time": 0.0454
+    }
+   }
+  },
+  {
+   "name": "big p 1R",
+   "disc": {
+    "n": 47320,
+    "mean": -0.0814,
+    "t": -11.75,
+    "meanNet": -0.4502,
+    "tNet": -46.87,
+    "costR": 0.3689,
+    "units": 0.388,
+    "stop": 0.5425,
+    "tgt": 0.4571,
+    "time": 0.0005
+   },
+   "conf": {
+    "n": 54429,
+    "mean": -0.1349,
+    "t": -20.16,
+    "meanNet": -0.5741,
+    "tNet": -62.63,
+    "costR": 0.4391,
+    "units": 0.373,
+    "stop": 0.5675,
+    "tgt": 0.4325,
+    "time": 0
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.2985,
+     "t": -35.1,
+     "meanNet": -0.6674,
+     "tNet": -55.73,
+     "costR": 0.3689,
+     "units": 0.388,
+     "stop": 0.647,
+     "tgt": 0.3525,
+     "time": 0.0005
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.2784,
+     "t": -41.67,
+     "meanNet": -0.7175,
+     "tNet": -78.76,
+     "costR": 0.4391,
+     "units": 0.373,
+     "stop": 0.6391,
+     "tgt": 0.3609,
+     "time": 0
+    }
+   }
+  },
+  {
+   "name": "big p 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.1119,
+    "t": 12.23,
+    "meanNet": -0.257,
+    "tNet": -25.05,
+    "costR": 0.3689,
+    "units": 0.388,
+    "stop": 0.6301,
+    "tgt": 0.3692,
+    "time": 0.0007
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0406,
+    "t": 5.11,
+    "meanNet": -0.3985,
+    "tNet": -40.9,
+    "costR": 0.4391,
+    "units": 0.373,
+    "stop": 0.6531,
+    "tgt": 0.3469,
+    "time": 0
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.1788,
+     "t": -21.43,
+     "meanNet": -0.5477,
+     "tNet": -50.96,
+     "costR": 0.3689,
+     "units": 0.388,
+     "stop": 0.7244,
+     "tgt": 0.275,
+     "time": 0.0007
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.1539,
+     "t": -20.58,
+     "meanNet": -0.5931,
+     "tNet": -65.67,
+     "costR": 0.4391,
+     "units": 0.373,
+     "stop": 0.7176,
+     "tgt": 0.2822,
+     "time": 0.0002
+    }
+   }
+  },
+  {
+   "name": "big a15 1R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0489,
+    "t": 8.03,
+    "meanNet": -0.0304,
+    "tNet": -4.75,
+    "costR": 0.0793,
+    "units": 1.5,
+    "stop": 0.473,
+    "tgt": 0.5209,
+    "time": 0.0061
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0212,
+    "t": 4.13,
+    "meanNet": -0.0696,
+    "tNet": -13.14,
+    "costR": 0.0908,
+    "units": 1.5,
+    "stop": 0.4876,
+    "tgt": 0.5086,
+    "time": 0.0039
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0542,
+     "t": -8.79,
+     "meanNet": -0.1335,
+     "tNet": -19.84,
+     "costR": 0.0793,
+     "units": 1.5,
+     "stop": 0.5235,
+     "tgt": 0.4703,
+     "time": 0.0061
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0263,
+     "t": -5.08,
+     "meanNet": -0.117,
+     "tNet": -21.67,
+     "costR": 0.0908,
+     "units": 1.5,
+     "stop": 0.5111,
+     "tgt": 0.485,
+     "time": 0.0039
+    }
+   }
+  },
+  {
+   "name": "big a15 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0422,
+    "t": 5.25,
+    "meanNet": -0.0371,
+    "tNet": -4.48,
+    "costR": 0.0793,
+    "units": 1.5,
+    "stop": 0.6434,
+    "tgt": 0.3388,
+    "time": 0.0178
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0187,
+    "t": 2.63,
+    "meanNet": -0.072,
+    "tNet": -10.07,
+    "costR": 0.0908,
+    "units": 1.5,
+    "stop": 0.6534,
+    "tgt": 0.3332,
+    "time": 0.0134
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.048,
+     "t": -6.32,
+     "meanNet": -0.1273,
+     "tNet": -16.05,
+     "costR": 0.0793,
+     "units": 1.5,
+     "stop": 0.6739,
+     "tgt": 0.3112,
+     "time": 0.0149
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0165,
+     "t": -2.35,
+     "meanNet": -0.1072,
+     "tNet": -14.91,
+     "costR": 0.0908,
+     "units": 1.5,
+     "stop": 0.6652,
+     "tgt": 0.3219,
+     "time": 0.0129
+    }
+   }
+  },
+  {
+   "name": "big a2 1R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.027,
+    "t": 4.72,
+    "meanNet": -0.0325,
+    "tNet": -5.44,
+    "costR": 0.0595,
+    "units": 2,
+    "stop": 0.4802,
+    "tgt": 0.506,
+    "time": 0.0138
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0114,
+    "t": 2.33,
+    "meanNet": -0.0566,
+    "tNet": -11.35,
+    "costR": 0.0681,
+    "units": 2,
+    "stop": 0.4893,
+    "tgt": 0.5007,
+    "time": 0.01
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0305,
+     "t": -5.34,
+     "meanNet": -0.0899,
+     "tNet": -15.05,
+     "costR": 0.0595,
+     "units": 2,
+     "stop": 0.5077,
+     "tgt": 0.4784,
+     "time": 0.0138
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0152,
+     "t": -3.1,
+     "meanNet": -0.0832,
+     "tNet": -16.55,
+     "costR": 0.0681,
+     "units": 2,
+     "stop": 0.5025,
+     "tgt": 0.4875,
+     "time": 0.01
+    }
+   }
+  },
+  {
+   "name": "big a2 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0296,
+    "t": 4.22,
+    "meanNet": -0.0298,
+    "tNet": -4.27,
+    "costR": 0.0595,
+    "units": 2,
+    "stop": 0.6372,
+    "tgt": 0.3252,
+    "time": 0.0376
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0099,
+    "t": 1.53,
+    "meanNet": -0.0582,
+    "tNet": -8.97,
+    "costR": 0.0681,
+    "units": 2,
+    "stop": 0.6453,
+    "tgt": 0.3203,
+    "time": 0.0344
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0215,
+     "t": -2.75,
+     "meanNet": -0.081,
+     "tNet": -10.2,
+     "costR": 0.0595,
+     "units": 2,
+     "stop": 0.6542,
+     "tgt": 0.311,
+     "time": 0.0348
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0066,
+     "t": -0.96,
+     "meanNet": -0.0747,
+     "tNet": -10.62,
+     "costR": 0.0681,
+     "units": 2,
+     "stop": 0.652,
+     "tgt": 0.3171,
+     "time": 0.0309
+    }
+   }
+  },
+  {
+   "name": "big a3 1R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.01,
+    "t": 1.93,
+    "meanNet": -0.0297,
+    "tNet": -5.58,
+    "costR": 0.0397,
+    "units": 3,
+    "stop": 0.4747,
+    "tgt": 0.4831,
+    "time": 0.0422
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0014,
+    "t": 0.3,
+    "meanNet": -0.0439,
+    "tNet": -9.03,
+    "costR": 0.0454,
+    "units": 3,
+    "stop": 0.4807,
+    "tgt": 0.4816,
+    "time": 0.0377
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.012,
+     "t": -2.32,
+     "meanNet": -0.0516,
+     "tNet": -9.78,
+     "costR": 0.0397,
+     "units": 3,
+     "stop": 0.4841,
+     "tgt": 0.4738,
+     "time": 0.0422
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0035,
+     "t": -0.72,
+     "meanNet": -0.0489,
+     "tNet": -9.72,
+     "costR": 0.0454,
+     "units": 3,
+     "stop": 0.4827,
+     "tgt": 0.4796,
+     "time": 0.0377
+    }
+   }
+  },
+  {
+   "name": "big a3 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0238,
+    "t": 3.56,
+    "meanNet": -0.0158,
+    "tNet": -2.39,
+    "costR": 0.0397,
+    "units": 3,
+    "stop": 0.5979,
+    "tgt": 0.2869,
+    "time": 0.1152
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0017,
+    "t": 0.25,
+    "meanNet": -0.0437,
+    "tNet": -6.74,
+    "costR": 0.0454,
+    "units": 3,
+    "stop": 0.6061,
+    "tgt": 0.2806,
+    "time": 0.1133
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": 0.0067,
+     "t": 0.98,
+     "meanNet": -0.0329,
+     "tNet": -4.82,
+     "costR": 0.0397,
+     "units": 3,
+     "stop": 0.6037,
+     "tgt": 0.2861,
+     "time": 0.1102
+    },
+    "conf": {
+     "n": 54429,
+     "mean": 0.0135,
+     "t": 2.16,
+     "meanNet": -0.0318,
+     "tNet": -5.02,
+     "costR": 0.0454,
+     "units": 3,
+     "stop": 0.6036,
+     "tgt": 0.2874,
+     "time": 0.109
+    }
+   }
+  },
+  {
+   "name": "big h1 1R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0228,
+    "t": 3.86,
+    "meanNet": -0.0398,
+    "tNet": -5.34,
+    "costR": 0.0626,
+    "units": 2.338,
+    "stop": 0.4835,
+    "tgt": 0.5053,
+    "time": 0.0113
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0145,
+    "t": 3.04,
+    "meanNet": -0.0466,
+    "tNet": -9.66,
+    "costR": 0.0612,
+    "units": 2.34,
+    "stop": 0.4891,
+    "tgt": 0.5031,
+    "time": 0.0078
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0284,
+     "t": -4.77,
+     "meanNet": -0.091,
+     "tNet": -12.01,
+     "costR": 0.0626,
+     "units": 2.338,
+     "stop": 0.5081,
+     "tgt": 0.4807,
+     "time": 0.0113
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0178,
+     "t": -3.73,
+     "meanNet": -0.079,
+     "tNet": -16.1,
+     "costR": 0.0612,
+     "units": 2.34,
+     "stop": 0.5047,
+     "tgt": 0.4874,
+     "time": 0.0078
+    }
+   }
+  },
+  {
+   "name": "big h1 2R",
+   "disc": {
+    "n": 47320,
+    "mean": 0.0241,
+    "t": 3.39,
+    "meanNet": -0.0386,
+    "tNet": -4.82,
+    "costR": 0.0626,
+    "units": 2.338,
+    "stop": 0.6412,
+    "tgt": 0.3256,
+    "time": 0.0332
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.0096,
+    "t": 1.37,
+    "meanNet": -0.0515,
+    "tNet": -7.39,
+    "costR": 0.0612,
+    "units": 2.34,
+    "stop": 0.6489,
+    "tgt": 0.3231,
+    "time": 0.028
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0124,
+     "t": -1.63,
+     "meanNet": -0.075,
+     "tNet": -8.71,
+     "costR": 0.0626,
+     "units": 2.338,
+     "stop": 0.6549,
+     "tgt": 0.3173,
+     "time": 0.0278
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0044,
+     "t": -0.65,
+     "meanNet": -0.0655,
+     "tNet": -9.65,
+     "costR": 0.0612,
+     "units": 2.34,
+     "stop": 0.6542,
+     "tgt": 0.3201,
+     "time": 0.0256
+    }
+   }
+  },
+  {
+   "name": "big parent-stop half",
+   "disc": {
+    "n": 47320,
+    "mean": 0.3073,
+    "t": 20.53,
+    "meanNet": -0.0615,
+    "tNet": -4.13,
+    "costR": 0.3689,
+    "units": 1,
+    "stop": 0.673,
+    "tgt": 0.3262,
+    "time": 0.0008
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.193,
+    "t": 17.69,
+    "meanNet": -0.2461,
+    "tNet": -20.3,
+    "costR": 0.4391,
+    "units": 1,
+    "stop": 0.6976,
+    "tgt": 0.3023,
+    "time": 0.0001
+   },
+   "mirror": {
+    "disc": {
+     "n": 47320,
+     "mean": -0.0731,
+     "t": -6.67,
+     "meanNet": -0.4419,
+     "tNet": -35.26,
+     "costR": 0.3689,
+     "units": 1,
+     "stop": 0.7492,
+     "tgt": 0.2502,
+     "time": 0.0006
+    },
+    "conf": {
+     "n": 54429,
+     "mean": -0.0515,
+     "t": -4.97,
+     "meanNet": -0.4906,
+     "tNet": -43.22,
+     "costR": 0.4391,
+     "units": 1,
+     "stop": 0.7474,
+     "tgt": 0.2524,
+     "time": 0.0001
+    }
+   }
+  }
+ ],
+ "pairs": [
+  {
+   "name": "break a15 - p, 2R, after costs",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0333,
+    "t": 10.17
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0421,
+    "t": 14.25
+   }
+  },
+  {
+   "name": "break a2 - p, 2R, after costs",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0508,
+    "t": 12.19
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0634,
+    "t": 18.41
+   }
+  },
+  {
+   "name": "break a3 - p, 2R, after costs",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0658,
+    "t": 14.02
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0891,
+    "t": 21.96
+   }
+  },
+  {
+   "name": "break h1 - p, 2R, after costs",
+   "disc": {
+    "n": 171470,
+    "mean": 0.0405,
+    "t": 8.5
+   },
+   "conf": {
+    "n": 201750,
+    "mean": 0.0685,
+    "t": 19.39
+   }
+  },
+  {
+   "name": "big a15 - p, 2R, after costs",
+   "disc": {
+    "n": 47320,
+    "mean": 0.2199,
+    "t": 24.17
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.3265,
+    "t": 31.67
+   }
+  },
+  {
+   "name": "big a2 - p, 2R, after costs",
+   "disc": {
+    "n": 47320,
+    "mean": 0.2272,
+    "t": 23.72
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.3404,
+    "t": 32.68
+   }
+  },
+  {
+   "name": "big a3 - p, 2R, after costs",
+   "disc": {
+    "n": 47320,
+    "mean": 0.2412,
+    "t": 22.31
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.3548,
+    "t": 32.21
+   }
+  },
+  {
+   "name": "big h1 - p, 2R, after costs",
+   "disc": {
+    "n": 47320,
+    "mean": 0.2184,
+    "t": 19.75
+   },
+   "conf": {
+    "n": 54429,
+    "mean": 0.347,
+    "t": 31.47
+   }
+  }
+ ],
+ "stoppedEitherWay": [
+  {
+   "rule": "break",
+   "stop": "a15",
+   "parentStopped": 0.6437,
+   "variantStopped": 0.6378,
+   "alsoStopped": 0.8785,
+   "bothShare": 0.5655
+  },
+  {
+   "rule": "break",
+   "stop": "a2",
+   "parentStopped": 0.6437,
+   "variantStopped": 0.6241,
+   "alsoStopped": 0.8075,
+   "bothShare": 0.5198
+  },
+  {
+   "rule": "break",
+   "stop": "a3",
+   "parentStopped": 0.6437,
+   "variantStopped": 0.5745,
+   "alsoStopped": 0.7032,
+   "bothShare": 0.4527
+  },
+  {
+   "rule": "break",
+   "stop": "h1",
+   "parentStopped": 0.6437,
+   "variantStopped": 0.631,
+   "alsoStopped": 0.8119,
+   "bothShare": 0.5227
+  },
+  {
+   "rule": "big",
+   "stop": "a15",
+   "parentStopped": 0.6424,
+   "variantStopped": 0.6487,
+   "alsoStopped": 0.7496,
+   "bothShare": 0.4815
+  },
+  {
+   "rule": "big",
+   "stop": "a2",
+   "parentStopped": 0.6424,
+   "variantStopped": 0.6415,
+   "alsoStopped": 0.7193,
+   "bothShare": 0.4621
+  },
+  {
+   "rule": "big",
+   "stop": "a3",
+   "parentStopped": 0.6424,
+   "variantStopped": 0.6023,
+   "alsoStopped": 0.657,
+   "bothShare": 0.422
+  },
+  {
+   "rule": "big",
+   "stop": "h1",
+   "parentStopped": 0.6424,
+   "variantStopped": 0.6453,
+   "alsoStopped": 0.7195,
+   "bothShare": 0.4622
+  }
+ ]
+}
