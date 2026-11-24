@@ -1,0 +1,1628 @@
+{
+ "study": "fade-limit-entry",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "0 of 12 limit cells are positive after the full cost with a confirmation month t of 2; the best, R1 X0.5 A, made -0.165R a filled trade after costs in 2015-26 (n 134,406, month t -28.37; 2005-14 -0.152R, n 113,082), against the market entry's -0.118R",
+ "basis": "judged AFTER the full edgekit round trip on calendar-month sums of filled trades (pre-registered); 0.5 x cost beside as a labelled sensitivity, never the verdict",
+ "windows": {
+  "discovery": "2005-01-01 to 2014-12-31 (120 months)",
+  "confirmation": "2015-01-01 to 2026-10-31 (142 months)"
+ },
+ "rules": {
+  "R1": "grid7-wide-fade m15 none atr 2R all",
+  "R2": "big-candle-fade m15 k1.5 nobreak half"
+ },
+ "xs": [
+  0.1,
+  0.25,
+  0.5
+ ],
+ "nCandles": 4,
+ "ticks": {
+  "xau": 0.01,
+  "xag": 0.001,
+  "eurusd": 0.00001,
+  "gbpusd": 0.00001,
+  "usdjpy": 0.001,
+  "audusd": 0.00001,
+  "nzdusd": 0.00001,
+  "usdcad": 0.00001,
+  "usdchf": 0.00001,
+  "eurjpy": 0.001
+ },
+ "markets": [
+  "xau",
+  "xag",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "assumedCosts": [
+  "xag",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01
+ },
+ "gate": [
+  {
+   "rule": "R1",
+   "n": 201769,
+   "want": 201769,
+   "gross": 0.042267,
+   "wantGross": 0.042,
+   "ok": true
+  },
+  {
+   "rule": "R2",
+   "n": 54443,
+   "want": 54443,
+   "gross": 0.192932,
+   "wantGross": 0.193,
+   "ok": true
+  }
+ ],
+ "gateOk": true,
+ "meta": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "signalsR1": 35212,
+   "signalsR2": 7798,
+   "dropped": 3
+  },
+  {
+   "market": "xag",
+   "first": "2006-03-19",
+   "signalsR1": 23331,
+   "signalsR2": 2084,
+   "dropped": 93
+  },
+  {
+   "market": "eurusd",
+   "first": "2005-01-02",
+   "signalsR1": 39524,
+   "signalsR2": 11830,
+   "dropped": 38
+  },
+  {
+   "market": "gbpusd",
+   "first": "2005-01-02",
+   "signalsR1": 39226,
+   "signalsR2": 12725,
+   "dropped": 69
+  },
+  {
+   "market": "usdjpy",
+   "first": "2005-01-02",
+   "signalsR1": 38596,
+   "signalsR2": 10438,
+   "dropped": 46
+  },
+  {
+   "market": "audusd",
+   "first": "2005-01-02",
+   "signalsR1": 40045,
+   "signalsR2": 11218,
+   "dropped": 48
+  },
+  {
+   "market": "nzdusd",
+   "first": "2005-01-02",
+   "signalsR1": 39723,
+   "signalsR2": 10604,
+   "dropped": 1
+  },
+  {
+   "market": "usdcad",
+   "first": "2005-01-02",
+   "signalsR1": 39914,
+   "signalsR2": 12609,
+   "dropped": 61
+  },
+  {
+   "market": "usdchf",
+   "first": "2005-01-02",
+   "signalsR1": 39173,
+   "signalsR2": 11767,
+   "dropped": 69
+  },
+  {
+   "market": "eurjpy",
+   "first": "2005-01-02",
+   "signalsR1": 38540,
+   "signalsR2": 10724,
+   "dropped": 2
+  }
+ ],
+ "market": [
+  {
+   "rule": "R1",
+   "disc": {
+    "sig": 171515,
+    "orders": 0,
+    "noorder": 0,
+    "nofill": 0,
+    "open": 0,
+    "n": 171515,
+    "fillRate": null,
+    "gross": 0.054196,
+    "net": -0.088411,
+    "sens": -0.017107,
+    "costR": 0.142607,
+    "win": 0.35429,
+    "tNet": -15.583684,
+    "tSens": -3.446251,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 0,
+    "noorder": 0,
+    "nofill": 0,
+    "open": 0,
+    "n": 201769,
+    "fillRate": null,
+    "gross": 0.042267,
+    "net": -0.118139,
+    "sens": -0.037936,
+    "costR": 0.160406,
+    "win": 0.349846,
+    "tNet": -28.344603,
+    "tSens": -10.033552,
+    "months": 142
+   }
+  },
+  {
+   "rule": "R2",
+   "disc": {
+    "sig": 47354,
+    "orders": 0,
+    "noorder": 0,
+    "nofill": 0,
+    "open": 0,
+    "n": 47354,
+    "fillRate": null,
+    "gross": 0.3074,
+    "net": -0.061421,
+    "sens": 0.12299,
+    "costR": 0.368821,
+    "win": 0.326625,
+    "tNet": -4.129417,
+    "tSens": 8.447611,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 0,
+    "noorder": 0,
+    "nofill": 0,
+    "open": 0,
+    "n": 54443,
+    "fillRate": null,
+    "gross": 0.192932,
+    "net": -0.24622,
+    "sens": -0.026644,
+    "costR": 0.439152,
+    "win": 0.302335,
+    "tNet": -20.299673,
+    "tSens": -2.371056,
+    "months": 142
+   }
+  }
+ ],
+ "passed": [],
+ "passedButControlToo": [],
+ "best": "R1 X0.5 A",
+ "cells": [
+  {
+   "cell": "R1 X0.1 A",
+   "rule": "R1",
+   "x": 0.1,
+   "variant": "A",
+   "disc": {
+    "sig": 171515,
+    "orders": 171515,
+    "noorder": 0,
+    "nofill": 19250,
+    "open": 0,
+    "n": 152265,
+    "fillRate": 0.887765,
+    "gross": -0.012512,
+    "net": -0.154274,
+    "sens": -0.083393,
+    "costR": 0.141762,
+    "win": 0.329156,
+    "tNet": -22.971429,
+    "tSens": -14.20678,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 201769,
+    "noorder": 0,
+    "nofill": 20644,
+    "open": 1,
+    "n": 181124,
+    "fillRate": 0.89768,
+    "gross": -0.01354,
+    "net": -0.173826,
+    "sens": -0.093683,
+    "costR": 0.160287,
+    "win": 0.329012,
+    "tNet": -36.467257,
+    "tSens": -21.946811,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 171515,
+     "diff": -0.048548,
+     "tMonth": -18.212156,
+     "filledMkt": -0.105484,
+     "filledMktNet": -0.247246,
+     "nFilled": 152265,
+     "unfilledMkt": 1.317246,
+     "unfilledMktNet": 1.167959,
+     "nUnfilled": 19250,
+     "welchSel": -146.305294
+    },
+    "conf": {
+     "n": 201769,
+     "diff": -0.037901,
+     "tMonth": -18.824909,
+     "filledMkt": -0.101701,
+     "filledMktNet": -0.261988,
+     "nFilled": 181124,
+     "unfilledMkt": 1.305332,
+     "unfilledMktNet": 1.143879,
+     "nUnfilled": 20645,
+     "welchSel": -142.899246
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 171515,
+     "orders": 168874,
+     "noorder": 2641,
+     "nofill": 17653,
+     "open": 0,
+     "n": 151221,
+     "fillRate": 0.895466,
+     "gross": -0.045316,
+     "net": -0.175235,
+     "sens": -0.110276,
+     "costR": 0.129919,
+     "win": 0.319916,
+     "tNet": -34.792275,
+     "tSens": -25.911866,
+     "months": 120
+    },
+    "conf": {
+     "sig": 201769,
+     "orders": 199357,
+     "noorder": 2412,
+     "nofill": 19437,
+     "open": 4,
+     "n": 179916,
+     "fillRate": 0.902481,
+     "gross": -0.046679,
+     "net": -0.195035,
+     "sens": -0.120857,
+     "costR": 0.148356,
+     "win": 0.31971,
+     "tNet": -46.197951,
+     "tSens": -33.417521,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 4.093441,
+    "conf": 4.431744
+   }
+  },
+  {
+   "cell": "R1 X0.1 B",
+   "rule": "R1",
+   "x": 0.1,
+   "variant": "B",
+   "disc": {
+    "sig": 171515,
+    "orders": 169914,
+    "noorder": 1601,
+    "nofill": 18781,
+    "open": 0,
+    "n": 151133,
+    "fillRate": 0.889468,
+    "gross": -0.016887,
+    "net": -0.169573,
+    "sens": -0.09323,
+    "costR": 0.152686,
+    "win": 0.29662,
+    "tNet": -23.304914,
+    "tSens": -14.660822,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 200004,
+    "noorder": 1765,
+    "nofill": 20078,
+    "open": 0,
+    "n": 179926,
+    "fillRate": 0.899612,
+    "gross": -0.014745,
+    "net": -0.188895,
+    "sens": -0.10182,
+    "costR": 0.174149,
+    "win": 0.297161,
+    "tNet": -37.467012,
+    "tSens": -22.699185,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 171515,
+     "diff": -0.061011,
+     "tMonth": -24.064451,
+     "filledMkt": -0.103806,
+     "filledMktNet": -0.240673,
+     "nFilled": 151133,
+     "unfilledMkt": 1.225788,
+     "unfilledMktNet": 1.040616,
+     "nUnfilled": 20382,
+     "welchSel": -134.839396
+    },
+    "conf": {
+     "n": 201769,
+     "diff": -0.050306,
+     "tMonth": -29.612932,
+     "filledMkt": -0.099924,
+     "filledMktNet": -0.256206,
+     "nFilled": 179926,
+     "unfilledMkt": 1.213522,
+     "unfilledMktNet": 1.019145,
+     "nUnfilled": 21843,
+     "welchSel": -132.311605
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 169914,
+     "orders": 167107,
+     "noorder": 2807,
+     "nofill": 17174,
+     "open": 0,
+     "n": 149933,
+     "fillRate": 0.897228,
+     "gross": -0.051039,
+     "net": -0.19109,
+     "sens": -0.121064,
+     "costR": 0.140051,
+     "win": 0.286748,
+     "tNet": -33.957579,
+     "tSens": -25.762824,
+     "months": 120
+    },
+    "conf": {
+     "sig": 200004,
+     "orders": 197518,
+     "noorder": 2486,
+     "nofill": 19210,
+     "open": 9,
+     "n": 178299,
+     "fillRate": 0.902697,
+     "gross": -0.051104,
+     "net": -0.213401,
+     "sens": -0.132252,
+     "costR": 0.162297,
+     "win": 0.286479,
+     "tNet": -43.223532,
+     "tSens": -31.257767,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 3.855197,
+    "conf": 4.71202
+   }
+  },
+  {
+   "cell": "R1 X0.25 A",
+   "rule": "R1",
+   "x": 0.25,
+   "variant": "A",
+   "disc": {
+    "sig": 171515,
+    "orders": 171515,
+    "noorder": 0,
+    "nofill": 35117,
+    "open": 0,
+    "n": 136398,
+    "fillRate": 0.795254,
+    "gross": -0.01207,
+    "net": -0.154391,
+    "sens": -0.083231,
+    "costR": 0.142321,
+    "win": 0.330298,
+    "tNet": -25.156725,
+    "tSens": -15.750426,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 201769,
+    "noorder": 0,
+    "nofill": 39070,
+    "open": 1,
+    "n": 162698,
+    "fillRate": 0.806358,
+    "gross": -0.012321,
+    "net": -0.173266,
+    "sens": -0.092794,
+    "costR": 0.160945,
+    "win": 0.32993,
+    "tNet": -33.984795,
+    "tSens": -20.109798,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 171515,
+     "diff": -0.03437,
+     "tMonth": -11.492176,
+     "filledMkt": -0.246866,
+     "filledMktNet": -0.389187,
+     "nFilled": 136398,
+     "unfilledMkt": 1.223553,
+     "unfilledMktNet": 1.079834,
+     "nUnfilled": 35117,
+     "welchSel": -187.828416
+    },
+    "conf": {
+     "n": 201769,
+     "diff": -0.021575,
+     "tMonth": -7.571829,
+     "filledMkt": -0.239273,
+     "filledMktNet": -0.400218,
+     "nFilled": 162698,
+     "unfilledMkt": 1.214643,
+     "unfilledMktNet": 1.056482,
+     "nUnfilled": 39071,
+     "welchSel": -189.083877
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 171515,
+     "orders": 168957,
+     "noorder": 2558,
+     "nofill": 33758,
+     "open": 0,
+     "n": 135199,
+     "fillRate": 0.800198,
+     "gross": -0.039325,
+     "net": -0.169336,
+     "sens": -0.10433,
+     "costR": 0.130012,
+     "win": 0.322931,
+     "tNet": -34.369428,
+     "tSens": -25.532788,
+     "months": 120
+    },
+    "conf": {
+     "sig": 201769,
+     "orders": 199264,
+     "noorder": 2505,
+     "nofill": 38819,
+     "open": 4,
+     "n": 160441,
+     "fillRate": 0.805168,
+     "gross": -0.039228,
+     "net": -0.188074,
+     "sens": -0.113651,
+     "costR": 0.148846,
+     "win": 0.322885,
+     "tNet": -43.837992,
+     "tSens": -29.821567,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 2.756828,
+    "conf": 2.928496
+   }
+  },
+  {
+   "cell": "R1 X0.25 B",
+   "rule": "R1",
+   "x": 0.25,
+   "variant": "B",
+   "disc": {
+    "sig": 171515,
+    "orders": 167969,
+    "noorder": 3546,
+    "nofill": 34085,
+    "open": 0,
+    "n": 133884,
+    "fillRate": 0.797076,
+    "gross": -0.025358,
+    "net": -0.199737,
+    "sens": -0.112547,
+    "costR": 0.17438,
+    "win": 0.247274,
+    "tNet": -25.820864,
+    "tSens": -16.848374,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 198049,
+    "noorder": 3720,
+    "nofill": 37910,
+    "open": 0,
+    "n": 160139,
+    "fillRate": 0.808583,
+    "gross": -0.01847,
+    "net": -0.220564,
+    "sens": -0.119517,
+    "costR": 0.202094,
+    "win": 0.248278,
+    "tNet": -37.137844,
+    "tSens": -22.548754,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 171515,
+     "diff": -0.067503,
+     "tMonth": -22.419443,
+     "filledMkt": -0.243949,
+     "filledMktNet": -0.374353,
+     "nFilled": 133884,
+     "unfilledMkt": 1.11494,
+     "unfilledMktNet": 0.928917,
+     "nUnfilled": 37631,
+     "welchSel": -172.283916
+    },
+    "conf": {
+     "n": 201769,
+     "diff": -0.056916,
+     "tMonth": -21.859931,
+     "filledMkt": -0.237335,
+     "filledMktNet": -0.388356,
+     "nFilled": 160139,
+     "unfilledMkt": 1.117817,
+     "unfilledMktNet": 0.921308,
+     "nUnfilled": 41630,
+     "welchSel": -175.936708
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 167969,
+     "orders": 164807,
+     "noorder": 3162,
+     "nofill": 33244,
+     "open": 0,
+     "n": 131563,
+     "fillRate": 0.798285,
+     "gross": -0.062108,
+     "net": -0.22297,
+     "sens": -0.142539,
+     "costR": 0.160862,
+     "win": 0.238198,
+     "tNet": -31.161023,
+     "tSens": -23.08818,
+     "months": 120
+    },
+    "conf": {
+     "sig": 198049,
+     "orders": 195487,
+     "noorder": 2562,
+     "nofill": 37676,
+     "open": 2,
+     "n": 157809,
+     "fillRate": 0.807261,
+     "gross": -0.054407,
+     "net": -0.243754,
+     "sens": -0.149081,
+     "costR": 0.189348,
+     "win": 0.239853,
+     "tNet": -40.569216,
+     "tSens": -29.293174,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 3.463964,
+    "conf": 3.722966
+   }
+  },
+  {
+   "cell": "R1 X0.5 A",
+   "rule": "R1",
+   "x": 0.5,
+   "variant": "A",
+   "disc": {
+    "sig": 171515,
+    "orders": 171515,
+    "noorder": 0,
+    "nofill": 58433,
+    "open": 0,
+    "n": 113082,
+    "fillRate": 0.659313,
+    "gross": -0.008132,
+    "net": -0.151918,
+    "sens": -0.080025,
+    "costR": 0.143786,
+    "win": 0.331662,
+    "tNet": -23.449002,
+    "tSens": -14.165678,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 201769,
+    "noorder": 0,
+    "nofill": 67362,
+    "open": 1,
+    "n": 134406,
+    "fillRate": 0.666138,
+    "gross": -0.002599,
+    "net": -0.164917,
+    "sens": -0.083758,
+    "costR": 0.162319,
+    "win": 0.3325,
+    "tNet": -28.371206,
+    "tSens": -15.500868,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 171515,
+     "diff": -0.011751,
+     "tMonth": -3.022213,
+     "filledMkt": -0.480362,
+     "filledMktNet": -0.624148,
+     "nFilled": 113082,
+     "unfilledMkt": 1.088697,
+     "unfilledMktNet": 0.948371,
+     "nUnfilled": 58433,
+     "welchSel": -236.981669
+    },
+    "conf": {
+     "n": 201769,
+     "diff": 0.008282,
+     "tMonth": 2.328831,
+     "filledMkt": -0.470005,
+     "filledMktNet": -0.632324,
+     "nFilled": 134406,
+     "unfilledMkt": 1.064376,
+     "unfilledMktNet": 0.907787,
+     "nUnfilled": 67363,
+     "welchSel": -239.649657
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 171515,
+     "orders": 168918,
+     "noorder": 2597,
+     "nofill": 59639,
+     "open": 0,
+     "n": 109279,
+     "fillRate": 0.646935,
+     "gross": -0.025062,
+     "net": -0.156531,
+     "sens": -0.090797,
+     "costR": 0.131468,
+     "win": 0.327867,
+     "tNet": -26.782343,
+     "tSens": -18.286935,
+     "months": 120
+    },
+    "conf": {
+     "sig": 201769,
+     "orders": 199283,
+     "noorder": 2486,
+     "nofill": 69973,
+     "open": 5,
+     "n": 129305,
+     "fillRate": 0.648851,
+     "gross": -0.025966,
+     "net": -0.176848,
+     "sens": -0.101407,
+     "costR": 0.150882,
+     "win": 0.326577,
+     "tNet": -33.553353,
+     "tSens": -21.409567,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 0.765505,
+    "conf": 2.129221
+   }
+  },
+  {
+   "cell": "R1 X0.5 B",
+   "rule": "R1",
+   "x": 0.5,
+   "variant": "B",
+   "disc": {
+    "sig": 171515,
+    "orders": 162625,
+    "noorder": 8890,
+    "nofill": 55125,
+    "open": 0,
+    "n": 107500,
+    "fillRate": 0.66103,
+    "gross": -0.029062,
+    "net": -0.26565,
+    "sens": -0.147356,
+    "costR": 0.236588,
+    "win": 0.166316,
+    "tNet": -26.550576,
+    "tSens": -17.039442,
+    "months": 120
+   },
+   "conf": {
+    "sig": 201769,
+    "orders": 192399,
+    "noorder": 9370,
+    "nofill": 63760,
+    "open": 0,
+    "n": 128639,
+    "fillRate": 0.668605,
+    "gross": -0.022611,
+    "net": -0.304882,
+    "sens": -0.163747,
+    "costR": 0.28227,
+    "win": 0.166582,
+    "tNet": -34.411232,
+    "tSens": -20.999193,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 171515,
+     "diff": -0.07809,
+     "tMonth": -18.014784,
+     "filledMkt": -0.475818,
+     "filledMktNet": -0.593559,
+     "nFilled": 107500,
+     "unfilledMkt": 0.944246,
+     "unfilledMktNet": 0.759882,
+     "nUnfilled": 64015,
+     "welchSel": -213.941138
+    },
+    "conf": {
+     "n": 201769,
+     "diff": -0.07624,
+     "tMonth": -17.818188,
+     "filledMkt": -0.468763,
+     "filledMktNet": -0.609263,
+     "nFilled": 128639,
+     "unfilledMkt": 0.941192,
+     "unfilledMktNet": 0.745769,
+     "nUnfilled": 73130,
+     "welchSel": -221.301518
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 162625,
+     "orders": 159303,
+     "noorder": 3322,
+     "nofill": 56108,
+     "open": 0,
+     "n": 103195,
+     "fillRate": 0.647791,
+     "gross": -0.048567,
+     "net": -0.271868,
+     "sens": -0.160218,
+     "costR": 0.223301,
+     "win": 0.162915,
+     "tNet": -31.234371,
+     "tSens": -21.807493,
+     "months": 120
+    },
+    "conf": {
+     "sig": 192399,
+     "orders": 189488,
+     "noorder": 2911,
+     "nofill": 66510,
+     "open": 3,
+     "n": 122975,
+     "fillRate": 0.648986,
+     "gross": -0.043586,
+     "net": -0.313919,
+     "sens": -0.178752,
+     "costR": 0.270334,
+     "win": 0.163627,
+     "tNet": -36.214601,
+     "tSens": -24.341355,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 0.64011,
+    "conf": 1.002092
+   }
+  },
+  {
+   "cell": "R2 X0.1 A",
+   "rule": "R2",
+   "x": 0.1,
+   "variant": "A",
+   "disc": {
+    "sig": 47354,
+    "orders": 47354,
+    "noorder": 0,
+    "nofill": 4836,
+    "open": 0,
+    "n": 42518,
+    "fillRate": 0.897876,
+    "gross": -0.04364,
+    "net": -0.409774,
+    "sens": -0.226707,
+    "costR": 0.366133,
+    "win": 0.245096,
+    "tNet": -27.810867,
+    "tSens": -17.787941,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 54443,
+    "noorder": 0,
+    "nofill": 4627,
+    "open": 0,
+    "n": 49816,
+    "fillRate": 0.915012,
+    "gross": -0.078946,
+    "net": -0.515863,
+    "sens": -0.297405,
+    "costR": 0.436917,
+    "win": 0.235446,
+    "tNet": -46.045668,
+    "tSens": -29.030958,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 47354,
+     "diff": -0.306505,
+     "tMonth": -22.049129,
+     "filledMkt": -0.077151,
+     "filledMktNet": -0.443284,
+     "nFilled": 42518,
+     "unfilledMkt": 3.688362,
+     "unfilledMktNet": 3.295914,
+     "nUnfilled": 4836,
+     "welchSel": -86.677068
+    },
+    "conf": {
+     "n": 54443,
+     "diff": -0.225801,
+     "tMonth": -21.790506,
+     "filledMkt": -0.129241,
+     "filledMktNet": -0.566159,
+     "nFilled": 49816,
+     "unfilledMkt": 3.661573,
+     "unfilledMktNet": 3.198356,
+     "nUnfilled": 4627,
+     "welchSel": -92.872897
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 47354,
+     "orders": 44893,
+     "noorder": 2461,
+     "nofill": 4687,
+     "open": 0,
+     "n": 40206,
+     "fillRate": 0.895596,
+     "gross": -0.117527,
+     "net": -0.430141,
+     "sens": -0.273834,
+     "costR": 0.312614,
+     "win": 0.24081,
+     "tNet": -38.396204,
+     "tSens": -27.715458,
+     "months": 120
+    },
+    "conf": {
+     "sig": 54443,
+     "orders": 50682,
+     "noorder": 3761,
+     "nofill": 4930,
+     "open": 1,
+     "n": 45751,
+     "fillRate": 0.902707,
+     "gross": -0.097016,
+     "net": -0.472723,
+     "sens": -0.284869,
+     "costR": 0.375707,
+     "win": 0.242967,
+     "tNet": -48.264948,
+     "tSens": -31.668218,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 1.534998,
+    "conf": -3.440099
+   }
+  },
+  {
+   "cell": "R2 X0.1 B",
+   "rule": "R2",
+   "x": 0.1,
+   "variant": "B",
+   "disc": {
+    "sig": 47354,
+    "orders": 35250,
+    "noorder": 12104,
+    "nofill": 3118,
+    "open": 0,
+    "n": 32132,
+    "fillRate": 0.911546,
+    "gross": -0.023241,
+    "net": -0.426885,
+    "sens": -0.225063,
+    "costR": 0.403644,
+    "win": 0.214864,
+    "tNet": -25.678085,
+    "tSens": -14.377991,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 37725,
+    "noorder": 16718,
+    "nofill": 2733,
+    "open": 0,
+    "n": 34992,
+    "fillRate": 0.927555,
+    "gross": -0.06136,
+    "net": -0.525856,
+    "sens": -0.293608,
+    "costR": 0.464495,
+    "win": 0.210362,
+    "tNet": -38.40939,
+    "tSens": -22.778008,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 47354,
+     "diff": -0.228242,
+     "tMonth": -17.706547,
+     "filledMkt": -0.047033,
+     "filledMktNet": -0.329334,
+     "nFilled": 32132,
+     "unfilledMkt": 1.05557,
+     "unfilledMktNet": 0.504116,
+     "nUnfilled": 15222,
+     "welchSel": -41.231546
+    },
+    "conf": {
+     "n": 54443,
+     "diff": -0.091761,
+     "tMonth": -8.220006,
+     "filledMkt": -0.095113,
+     "filledMktNet": -0.426473,
+     "nFilled": 34992,
+     "unfilledMkt": 0.71112,
+     "unfilledMktNet": 0.078051,
+     "nUnfilled": 19451,
+     "welchSel": -36.794666
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 35250,
+     "orders": 32720,
+     "noorder": 2530,
+     "nofill": 3334,
+     "open": 0,
+     "n": 29386,
+     "fillRate": 0.898105,
+     "gross": -0.09133,
+     "net": -0.432121,
+     "sens": -0.261725,
+     "costR": 0.340791,
+     "win": 0.210849,
+     "tNet": -32.341102,
+     "tSens": -20.623664,
+     "months": 120
+    },
+    "conf": {
+     "sig": 37725,
+     "orders": 34261,
+     "noorder": 3464,
+     "nofill": 3408,
+     "open": 0,
+     "n": 30853,
+     "fillRate": 0.900528,
+     "gross": -0.126525,
+     "net": -0.518473,
+     "sens": -0.322499,
+     "costR": 0.391948,
+     "win": 0.21194,
+     "tNet": -41.209634,
+     "tSens": -26.883752,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": 0.298102,
+    "conf": -0.451243
+   }
+  },
+  {
+   "cell": "R2 X0.25 A",
+   "rule": "R2",
+   "x": 0.25,
+   "variant": "A",
+   "disc": {
+    "sig": 47354,
+    "orders": 47354,
+    "noorder": 0,
+    "nofill": 8368,
+    "open": 0,
+    "n": 38986,
+    "fillRate": 0.823288,
+    "gross": -0.098059,
+    "net": -0.463962,
+    "sens": -0.281011,
+    "costR": 0.365903,
+    "win": 0.237136,
+    "tNet": -31.562608,
+    "tSens": -22.12303,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 54443,
+    "noorder": 0,
+    "nofill": 8318,
+    "open": 0,
+    "n": 46125,
+    "fillRate": 0.847216,
+    "gross": -0.103069,
+    "net": -0.539988,
+    "sens": -0.321528,
+    "costR": 0.43692,
+    "win": 0.233127,
+    "tNet": -48.201765,
+    "tSens": -31.878978,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 47354,
+     "diff": -0.320554,
+     "tMonth": -20.406348,
+     "filledMkt": -0.270302,
+     "filledMktNet": -0.636205,
+     "nFilled": 38986,
+     "unfilledMkt": 2.998878,
+     "unfilledMktNet": 2.616466,
+     "nUnfilled": 8368,
+     "welchSel": -101.908135
+    },
+    "conf": {
+     "n": 54443,
+     "diff": -0.211266,
+     "tMonth": -18.735531,
+     "filledMkt": -0.3078,
+     "filledMktNet": -0.74472,
+     "nFilled": 46125,
+     "unfilledMkt": 2.969594,
+     "unfilledMktNet": 2.518061,
+     "nUnfilled": 8318,
+     "welchSel": -110.019757
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 47354,
+     "orders": 44904,
+     "noorder": 2450,
+     "nofill": 9161,
+     "open": 0,
+     "n": 35743,
+     "fillRate": 0.795987,
+     "gross": -0.090884,
+     "net": -0.405378,
+     "sens": -0.248131,
+     "costR": 0.314494,
+     "win": 0.246985,
+     "tNet": -38.606718,
+     "tSens": -26.813941,
+     "months": 120
+    },
+    "conf": {
+     "sig": 54443,
+     "orders": 50621,
+     "noorder": 3822,
+     "nofill": 9902,
+     "open": 0,
+     "n": 40719,
+     "fillRate": 0.804389,
+     "gross": -0.083075,
+     "net": -0.461057,
+     "sens": -0.272066,
+     "costR": 0.377982,
+     "win": 0.249097,
+     "tNet": -46.347481,
+     "tSens": -29.592454,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": -4.229678,
+    "conf": -6.057971
+   }
+  },
+  {
+   "cell": "R2 X0.25 B",
+   "rule": "R2",
+   "x": 0.25,
+   "variant": "B",
+   "disc": {
+    "sig": 47354,
+    "orders": 19902,
+    "noorder": 27452,
+    "nofill": 2899,
+    "open": 0,
+    "n": 17003,
+    "fillRate": 0.854336,
+    "gross": -0.082211,
+    "net": -0.50917,
+    "sens": -0.295691,
+    "costR": 0.42696,
+    "win": 0.174146,
+    "tNet": -23.084775,
+    "tSens": -14.191162,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 19826,
+    "noorder": 34617,
+    "nofill": 2551,
+    "open": 0,
+    "n": 17275,
+    "fillRate": 0.871331,
+    "gross": -0.103461,
+    "net": -0.589832,
+    "sens": -0.346646,
+    "costR": 0.486371,
+    "win": 0.175572,
+    "tNet": -29.593162,
+    "tSens": -18.23094,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 47354,
+     "diff": -0.121403,
+     "tMonth": -8.078181,
+     "filledMkt": -0.208871,
+     "filledMktNet": -0.416487,
+     "nFilled": 17003,
+     "unfilledMkt": 0.596622,
+     "unfilledMktNet": 0.137492,
+     "nUnfilled": 30351,
+     "welchSel": -44.035093
+    },
+    "conf": {
+     "n": 54443,
+     "diff": 0.059064,
+     "tMonth": 4.782322,
+     "filledMkt": -0.222559,
+     "filledMktNet": -0.464055,
+     "nFilled": 17275,
+     "unfilledMkt": 0.386045,
+     "unfilledMktNet": -0.144975,
+     "nUnfilled": 37168,
+     "welchSel": -38.175556
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 19902,
+     "orders": 18355,
+     "noorder": 1547,
+     "nofill": 3745,
+     "open": 0,
+     "n": 14610,
+     "fillRate": 0.795968,
+     "gross": -0.133567,
+     "net": -0.493729,
+     "sens": -0.313648,
+     "costR": 0.360162,
+     "win": 0.172142,
+     "tNet": -28.56057,
+     "tSens": -18.695413,
+     "months": 120
+    },
+    "conf": {
+     "sig": 19826,
+     "orders": 17844,
+     "noorder": 1982,
+     "nofill": 3554,
+     "open": 0,
+     "n": 14290,
+     "fillRate": 0.800829,
+     "gross": -0.118374,
+     "net": -0.526995,
+     "sens": -0.322684,
+     "costR": 0.408621,
+     "win": 0.180826,
+     "tNet": -27.044261,
+     "tSens": -17.326926,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": -0.600967,
+    "conf": -2.447197
+   }
+  },
+  {
+   "cell": "R2 X0.5 A",
+   "rule": "R2",
+   "x": 0.5,
+   "variant": "A",
+   "disc": {
+    "sig": 47354,
+    "orders": 47354,
+    "noorder": 0,
+    "nofill": 13477,
+    "open": 0,
+    "n": 33877,
+    "fillRate": 0.715399,
+    "gross": -0.094034,
+    "net": -0.459659,
+    "sens": -0.276847,
+    "costR": 0.365625,
+    "win": 0.23603,
+    "tNet": -33.598977,
+    "tSens": -23.254436,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 54443,
+    "noorder": 0,
+    "nofill": 14107,
+    "open": 0,
+    "n": 40336,
+    "fillRate": 0.740885,
+    "gross": -0.104466,
+    "net": -0.541611,
+    "sens": -0.323038,
+    "costR": 0.437145,
+    "win": 0.232224,
+    "tNet": -46.003353,
+    "tSens": -30.178965,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 47354,
+     "diff": -0.267419,
+     "tMonth": -16.238886,
+     "filledMkt": -0.399543,
+     "filledMktNet": -0.765168,
+     "nFilled": 33877,
+     "unfilledMkt": 2.084435,
+     "unfilledMktNet": 1.707582,
+     "nUnfilled": 13477,
+     "welchSel": -96.750602
+    },
+    "conf": {
+     "n": 54443,
+     "diff": -0.155051,
+     "tMonth": -11.936097,
+     "filledMkt": -0.425396,
+     "filledMktNet": -0.862541,
+     "nFilled": 40336,
+     "unfilledMkt": 1.960912,
+     "unfilledMktNet": 1.51602,
+     "nUnfilled": 14107,
+     "welchSel": -101.113545
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 47354,
+     "orders": 44900,
+     "noorder": 2454,
+     "nofill": 15946,
+     "open": 0,
+     "n": 28954,
+     "fillRate": 0.644855,
+     "gross": -0.071189,
+     "net": -0.389987,
+     "sens": -0.230588,
+     "costR": 0.318798,
+     "win": 0.253506,
+     "tNet": -33.100843,
+     "tSens": -21.12747,
+     "months": 120
+    },
+    "conf": {
+     "sig": 54443,
+     "orders": 50630,
+     "noorder": 3813,
+     "nofill": 18342,
+     "open": 0,
+     "n": 32288,
+     "fillRate": 0.637725,
+     "gross": -0.051523,
+     "net": -0.434708,
+     "sens": -0.243116,
+     "costR": 0.383185,
+     "win": 0.256938,
+     "tNet": -36.242547,
+     "tSens": -21.629286,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": -4.58,
+    "conf": -7.514756
+   }
+  },
+  {
+   "cell": "R2 X0.5 B",
+   "rule": "R2",
+   "x": 0.5,
+   "variant": "B",
+   "disc": {
+    "sig": 47354,
+    "orders": 5830,
+    "noorder": 41524,
+    "nofill": 1196,
+    "open": 0,
+    "n": 4634,
+    "fillRate": 0.794854,
+    "gross": -0.097264,
+    "net": -0.562096,
+    "sens": -0.32968,
+    "costR": 0.464831,
+    "win": 0.133578,
+    "tNet": -11.833629,
+    "tSens": -7.048995,
+    "months": 120
+   },
+   "conf": {
+    "sig": 54443,
+    "orders": 5201,
+    "noorder": 49242,
+    "nofill": 1104,
+    "open": 0,
+    "n": 4097,
+    "fillRate": 0.787733,
+    "gross": -0.120264,
+    "net": -0.621593,
+    "sens": -0.370928,
+    "costR": 0.501329,
+    "win": 0.133756,
+    "tNet": -13.911979,
+    "tSens": -8.42258,
+    "months": 142
+   },
+   "holm": 1,
+   "checks": {
+    "n": true,
+    "disc": false,
+    "conf": false,
+    "t": false,
+    "holm": false
+   },
+   "pass": false,
+   "paired": {
+    "disc": {
+     "n": 47354,
+     "diff": 0.006415,
+     "tMonth": 0.450471,
+     "filledMkt": -0.347771,
+     "filledMktNet": -0.498841,
+     "nFilled": 4634,
+     "unfilledMkt": 0.378469,
+     "unfilledMktNet": -0.013972,
+     "nUnfilled": 42720,
+     "welchSel": -35.414658
+    },
+    "conf": {
+     "n": 54443,
+     "diff": 0.199443,
+     "tMonth": 16.146319,
+     "filledMkt": -0.341152,
+     "filledMktNet": -0.506422,
+     "nFilled": 4097,
+     "unfilledMkt": 0.236394,
+     "unfilledMktNet": -0.225046,
+     "nUnfilled": 50346,
+     "welchSel": -28.849965
+    }
+   },
+   "control": {
+    "disc": {
+     "sig": 5830,
+     "orders": 5261,
+     "noorder": 569,
+     "nofill": 1832,
+     "open": 0,
+     "n": 3429,
+     "fillRate": 0.651777,
+     "gross": -0.057926,
+     "net": -0.445728,
+     "sens": -0.251827,
+     "costR": 0.387802,
+     "win": 0.147565,
+     "tNet": -9.929554,
+     "tSens": -5.655726,
+     "months": 120
+    },
+    "conf": {
+     "sig": 5201,
+     "orders": 4562,
+     "noorder": 639,
+     "nofill": 1646,
+     "open": 0,
+     "n": 2916,
+     "fillRate": 0.639193,
+     "gross": -0.00296,
+     "net": -0.43042,
+     "sens": -0.21669,
+     "costR": 0.42746,
+     "win": 0.158093,
+     "tNet": -8.196004,
+     "tSens": -4.206515,
+     "months": 142
+    },
+    "clears": false
+   },
+   "welchVsControl": {
+    "disc": -1.926658,
+    "conf": -2.976446
+   }
+  }
+ ]
+}
