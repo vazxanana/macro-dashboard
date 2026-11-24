@@ -94,3 +94,16 @@ studies: not trade advice.**
    which desks, the broker's symbol suffix, the cap of open copies, how far the price may be from the desk's entry (0.75R).
 4. Each desk trade is opened once with the desk's stop and target, closed when the desk closes it, and a copy without a stop
    is closed at once.
+
+# VolBreakout.mq5 — the daily volatility breakout on gold and USD/JPY (24 Nov 2026)
+
+The two rules that pass the desk's tests at measured costs, as one standalone program (MetaEditor -> MQL5/Experts -> Compile, attach to any one chart). **Demo accounts only; it starts
+in dry run.**
+
+- **Rule:** at the 00:00 UTC open O, a buy stop at O + half the previous trading day's range and a sell stop at O - half of it,
+  each with its stop at O; the first fill cancels the other; no target; out at 21:00 UTC; one trade a day a symbol.
+- **Record:** gold +0.105R a trade 2021-26 (n 1,121, month t 2.79), +0.184R at the broker's own ticks (n 572, t 3.54);
+  USD/JPY +0.079R 2005-15 (n 2,089, t 2.95), +0.063R 2016-26 (n 2,079, t 2.50). Long drawdowns (USD/JPY 33.8R over 574 days).
+- **Keep the list to XAUUSD and USDJPY:** the same rule failed on every other market tested. Add no break-even, trail or filter:
+  each was tested and lowered the result.
+- Not compiled in the build sandbox. The desk's own demo job (`council/vb-demo.mjs`) trades the same rule.

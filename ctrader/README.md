@@ -92,3 +92,16 @@ edge. The bot exists to see the rule trade at a broker's own prices on a demo ac
 
 **Notes:** positions carry the label `BF`, so a restart is safe. A position without a stop is closed at once. To backtest it in
 cTrader, use tick data: the stop is a few pips on forex, so candle-only backtests flatter it.
+
+# VolBreakout.cs — the daily volatility breakout on gold and USD/JPY (24 Nov 2026)
+
+The two rules that pass the desk's tests at measured costs, as one standalone program (cTrader -> Algo -> New cBot -> paste -> Build). **Demo accounts only; it starts
+in dry run.**
+
+- **Rule:** at the 00:00 UTC open O, a buy stop at O + half the previous trading day's range and a sell stop at O - half of it,
+  each with its stop at O; the first fill cancels the other; no target; out at 21:00 UTC; one trade a day a symbol.
+- **Record:** gold +0.105R a trade 2021-26 (n 1,121, month t 2.79), +0.184R at the broker's own ticks (n 572, t 3.54);
+  USD/JPY +0.079R 2005-15 (n 2,089, t 2.95), +0.063R 2016-26 (n 2,079, t 2.50). Long drawdowns (USD/JPY 33.8R over 574 days).
+- **Keep the list to XAUUSD and USDJPY:** the same rule failed on every other market tested. Add no break-even, trail or filter:
+  each was tested and lowered the result.
+- Not compiled in the build sandbox. The desk's own demo job (`council/vb-demo.mjs`) trades the same rule.
