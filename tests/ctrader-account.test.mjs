@@ -34,3 +34,10 @@ test('one labelled snapshot per mirror account, the base first; unknown accounts
   const s = await accountSnapshot({ env: ENV, cfg, lib: lib(false, extra) });
   assert.equal(s.label, 'Council + Mosha 6R barrier + Equinox');
 });
+
+test('a book whose copies are switched off is not named on a shared account', async () => {
+  const { labelOf, shown } = await import('../council/ctrader-account.mjs');
+  assert.equal(labelOf(shown(['ict', 'eqx'], { mirrorIct: false })), 'Equinox');
+  assert.equal(labelOf(shown(['ict', 'eqx'], {})), 'Equinox + ICT');
+  assert.equal(labelOf(shown(['ict'], { mirrorIct: false })), 'ICT');        // never an empty name
+});

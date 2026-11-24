@@ -1,0 +1,59 @@
+name: Demo test order (cTrader demo)
+
+# council/test-order.mjs: ONE resting buy limit on EUR/USD, 3 % under the price, the smallest volume, with a stop and a target,
+# on a cTrader DEMO account, for the owner to see and cancel by hand (it expires by itself after 24 hours). Started by hand
+# only. Demo only: the demo host and an account that reports isLive false.
+
+on:
+  workflow_dispatch:
+    inputs:
+      account:
+        description: 'Demo account, as "*<last digits of its login>" (default: the Equinox account)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: demo-test-order
+  cancel-in-progress: false
+
+jobs:
+  order:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            council
+            api
+            scripts
+
+      - name: Checkout council data
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Own OANDA candles
+        env:
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
+        run: sh scripts/own-candles.sh
+
+      - name: Place the test order
+        env:
+          CTRADER_CLIENT_ID: ${{ secrets.CTRADER_CLIENT_ID || vars.CTRADER_CLIENT_ID }}
+          CTRADER_CLIENT_SECRET: ${{ secrets.CTRADER_CLIENT_SECRET || vars.CTRADER_CLIENT_SECRET }}
+          CTRADER_ACCESS_TOKEN: ${{ secrets.CTRADER_ACCESS_TOKEN || vars.CTRADER_ACCESS_TOKEN }}
+          CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
+          CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
+          TEST_ACCOUNT: ${{ inputs.account }}
+        run: node council/test-order.mjs data

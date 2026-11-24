@@ -17,6 +17,9 @@ const { _t } = require('../api/ctrader-link.js');
 export const BOOK_LABEL = { council: 'Council', ict: 'ICT', shadow: 'Shadows', lit: 'LIT', replica: 'Replica', mosha6: 'Mosha 6R barrier', eqx: 'Equinox' };
 // Equinox is named before ICT on the account they share (ICT copies are stopped since 24 Nov 2026): "Equinox + ICT"
 export const labelOf = (books) => { const b = [...(books || [])], e = b.indexOf('eqx'), i = b.indexOf('ict'); if (e > i && i >= 0) { b.splice(e, 1); b.splice(i, 0, 'eqx'); } return b.map((x) => BOOK_LABEL[x] || x).join(' + '); };
+// a book whose copies are switched off is not named on an account it shares (24 Nov 2026, owner: "give equinox": with ICT copies
+// stopped, config.mirrorIct false, the shared account reads "Equinox"); the books list itself is unchanged
+export const shown = (books, cfg) => { const b = (books || []).filter((x) => !(x === 'ict' && cfg && cfg.mirrorIct === false)); return b.length ? b : books; };
 const mask = (s) => (s ? '…' + String(s).slice(-3) : null);
 
 // one snapshot per account the mirror trades on (accountsFor: council/ctrader-accounts.json, config.json, env), the base
@@ -32,7 +35,7 @@ export async function accountSnapshots({ env, tokens = null, cfg = null, WS = gl
   const order = [...groups].sort((a, b) => (a.account === base ? -1 : b.account === base ? 1 : (a.drain ? 99 : BOOKS.indexOf(a.books[0])) - (b.drain ? 99 : BOOKS.indexOf(b.books[0]))));
   const out = [];
   for (const g of order) {
-    const head = { books: g.books, label: g.drain ? 'Old shadows (draining)' : labelOf(g.books), ...(g.drain ? { drain: true } : {}), base: g.account === base, at: new Date(now).toISOString() };
+    const head = { books: g.books, label: g.drain ? 'Old shadows (draining)' : labelOf(shown(g.books, cfg)), ...(g.drain ? { drain: true } : {}), base: g.account === base, at: new Date(now).toISOString() };
     const acc = pickAccount(accounts, g.account, { id: 'id', login: 'login', live: 'live' });
     if (!acc) { out.push({ ...head, error: 'account not found for this token' }); continue; }
     if (acc.live) { out.push({ ...head, error: 'refused: not a demo account' }); continue; }
@@ -59,7 +62,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-account.mjs')) {
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
   const scrub = scrubber(process.env);
   try {
-    const all = await accountSnapshots({ env: process.env, tokens, cfg: { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: accFile.drain } });
+    const all = await accountSnapshots({ env: process.env, tokens, cfg: { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: accFile.drain, mirrorIct: cfg.mirrorIct } });
     if (!all) process.exit(0);
     fs.mkdirSync(CD, { recursive: true });
     const snap = all.find((a) => a.base) || all[0];
