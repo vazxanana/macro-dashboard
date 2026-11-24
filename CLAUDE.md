@@ -3514,7 +3514,10 @@ more than the smallest lot allows and are skipped (`riskVolume`'s minimum-lot ru
 token"; `mirror-155.json` "refused"), so nothing trades there until the owner authorises that account for the cTrader app. The
 …144 account was reset from about $10,000 to $500 after the UTC day began and the 2 % day stop then held every copy ("95 % down
 today"): a balance under `RESET_SHARE` 0.5 of the day's start is now read as an account reset and the day starts again
-(`state.day.reset`). `dom/trades.json` `conn` records a refused connection once (`{ error, acct, since }`, then `{ ok }` when back).
+(`state.day.reset`). **Withdrawals and deposits** (owner, 24 Nov 2026: "I took money from the accounts … it is not a loss"): a
+balance move of more than `CASH_SHARE` 1 % between two rounds while every position and resting order of the last round is still
+there and the mirror sent no order last round is cash, not trading: the day's start moves with it (`state.day.cash`, a log line);
+`state.day.lastBalance` / `ids` / `oids` / `sent` carry what the next round compares. `dom/trades.json` `conn` records a refused connection once (`{ error, acct, since }`, then `{ ok }` when back).
 
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
