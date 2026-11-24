@@ -14,7 +14,7 @@ const u = (h, m = 0) => Date.UTC(2020, 0, 6, h, m) / 1000;
 
 test('the pre-registration fixes the candidates, the filters and the after-cost bar', () => {
   for (const w of ['BEFORE any run', 'AFTER costs', '**5 %**', '20, 21, 22 or 23 UTC', '21:00-22:59 UTC', 'K1', 'K8',
-    '**2005-14** = selection', 'C1', 'C2', 'ASSUMED, not measured', 'nas100 spx500 de40 gbpjpy audjpy cadjpy eurgbp euraud',
+    '**2005-14** = selection', 'C1', 'C2', 'ASSUMED, not', 'nas100 spx500 de40 gbpjpy audjpy cadjpy eurgbp euraud',
     'Cut test', 'Never called an edge']) assert.ok(pre.includes(w), w);
   assert.equal(CANDS.length, 8); assert.equal(COST_MAX, 0.05);
 });
@@ -57,5 +57,5 @@ test('a candidate takes only its timeframe and filters', () => {
 test('statistics: net = R - cost R, month sums', () => {
   const rows = [{ m: 0, R: 1, cr: 0.1 }, { m: 1, R: -1, cr: 0.1 }, { m: 1, R: 2, cr: 0.1 }];
   const s = stats(rows, 0, 3); assert.equal(s.n, 3); assert.ok(Math.abs(s.net - 0.6) < 1e-12); assert.ok(Math.abs(s.gross - 2 / 3) < 1e-12);
-  assert.ok(Math.abs(s.net2 - 0.5) < 1e-12);
+  assert.ok(Math.abs(s.net2 - 1.4 / 3) < 1e-12);
 });

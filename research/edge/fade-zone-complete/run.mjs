@@ -159,6 +159,15 @@ function resultMd(o) {
   if (o.verdict === 'PASS') L.push(`${o.pick} holds after costs in the second decade and on eight new markets. That makes it a candidate for a forward paper`,
     'record and a check at the broker\'s own bid / ask ticks, not an edge: these are mid candles, and most costs are assumed. Nothing',
     'is adopted; nothing live changed.');
+  else if (o.verdict === 'FAIL' && o.pick) { const p = o.candidates.find((c) => c.key === o.pick);
+    L.push(`${o.pick} (${p.name}) was the one candidate positive after costs on 2005-14 (${f3(p.selection.net)}R a trade, n ${N(p.selection.n)}, month t ${f2(p.selection.tNet)}).`,
+      `It ${o.confirm.c1 ? 'held' : 'did not hold'} on the ten markets in 2015-26 (${f3(p.confirm1.net)}R, n ${N(p.confirm1.n)}, t ${f2(p.confirm1.tNet)}; on the five markets with measured costs ${f3(p.measuredMarkets2015.net)}R, t ${f2(p.measuredMarkets2015.tNet)})`,
+      `and ${o.confirm.c2 ? 'held' : 'did not hold'} on the eight new markets (${f3(p.confirm2.net)}R, n ${N(p.confirm2.n)}, t ${f2(p.confirm2.tNet)}, all with ASSUMED costs). Both were required, so it fails.`,
+      '', 'What this says: the H1 fade at 20-23 UTC with a stop wide enough that the round trip is a small share of it is the one',
+      'combination that pays after costs in some sets, but it is about 50 trades a year over ten markets, and on the markets whose',
+      'costs are measured the second decade is flat. The eight-market figure rests on assumed spreads at the hours when real spreads',
+      'are widest. Not an edge. The open question it leaves, if anyone wants it, is a forward paper record of this one fixed rule',
+      'and a check of 20-23 UTC spreads at the broker\'s own ticks; no further variant on these years or markets.'); }
   else if (o.verdict === 'FAIL') L.push('None of the fixed combinations makes the zone fade pay after costs in a way that holds out of sample. The hour, level and',
     'cost filters change how much of the before-cost tilt is kept and how much the round trip takes, but not enough to leave a',
     'positive, confirmed figure after costs. Not an edge. Do not re-test variants of these filters on these years or markets.',

@@ -1,0 +1,833 @@
+{
+ "study": "fade-zone-complete",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "K8 (H1 hour + cost) picked on 2005-14 (+0.197R a trade after costs, n 668, month t 3.11); 2015-26 +0.026R (n 554, t 0.39), eight new markets +0.180R (n 726, t 2.79)",
+ "basis": "after costs on calendar-month sums (pre-registered); before costs beside",
+ "windows": {
+  "selection": "ten markets, fills 2005-01-01 to 2014-12-31",
+  "confirm1": "ten markets, fills 2015-01-01 to 2026-10-31",
+  "confirm2": "eight markets, all fills 2005-01-01 to 2026-10-31 on file"
+ },
+ "ten": [
+  "xau",
+  "xag",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd",
+  "nzdusd",
+  "usdcad",
+  "usdchf",
+  "eurjpy"
+ ],
+ "eight": [
+  "nas100",
+  "spx500",
+  "de40",
+  "gbpjpy",
+  "audjpy",
+  "cadjpy",
+  "eurgbp",
+  "euraud"
+ ],
+ "measured": [
+  "xau",
+  "eurusd",
+  "gbpusd",
+  "usdjpy",
+  "audusd"
+ ],
+ "costs": {
+  "xau": 0.3,
+  "xag": 0.03,
+  "eurusd": 0.00006,
+  "gbpusd": 0.00008,
+  "usdjpy": 0.008,
+  "audusd": 0.00006,
+  "nzdusd": 0.00007,
+  "usdcad": 0.00007,
+  "usdchf": 0.00007,
+  "eurjpy": 0.01,
+  "nas100": 1,
+  "spx500": 0.4,
+  "de40": 1.5,
+  "gbpjpy": 0.014,
+  "audjpy": 0.01,
+  "cadjpy": 0.01,
+  "eurgbp": 0.00009,
+  "euraud": 0.00013
+ },
+ "gate": [
+  {
+   "what": "K1 2005-14 = fade-zone-targets",
+   "ok": true,
+   "n": 171523,
+   "mean": 0.107433,
+   "want": {
+    "n": 171523,
+    "mean": 0.107433
+   }
+  },
+  {
+   "what": "K1 2015-26 = fade-zone-targets",
+   "ok": true,
+   "n": 201769,
+   "mean": 0.07097,
+   "want": {
+    "n": 201769,
+    "mean": 0.07097
+   }
+  }
+ ],
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2009-06-11",
+   "n": 7169,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2017-03-15",
+   "n": 23864,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2024-09-18",
+   "n": 39731,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2009-06-11",
+   "n": 10114,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2017-03-15",
+   "n": 27821,
+   "missing": 0,
+   "extra": 0
+  },
+  {
+   "market": "eurusd",
+   "cut": "2024-09-18",
+   "n": 44847,
+   "missing": 0,
+   "extra": 0
+  }
+ ],
+ "cutBad": 0,
+ "pick": "K8",
+ "confirm": {
+  "c1": false,
+  "c2": true
+ },
+ "meta": [
+  {
+   "market": "xau",
+   "first": "2006-03-19",
+   "signals": 44349,
+   "trades": 44163,
+   "endMarked": 0,
+   "assumed": false
+  },
+  {
+   "market": "xag",
+   "first": "2006-03-19",
+   "signals": 44574,
+   "trades": 32019,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "eurusd",
+   "first": "2004-01-01",
+   "signals": 49724,
+   "trades": 49633,
+   "endMarked": 0,
+   "assumed": false
+  },
+  {
+   "market": "gbpusd",
+   "first": "2004-01-01",
+   "signals": 49435,
+   "trades": 49311,
+   "endMarked": 0,
+   "assumed": false
+  },
+  {
+   "market": "usdjpy",
+   "first": "2004-01-01",
+   "signals": 48700,
+   "trades": 48585,
+   "endMarked": 1,
+   "assumed": false
+  },
+  {
+   "market": "audusd",
+   "first": "2004-01-01",
+   "signals": 50388,
+   "trades": 50292,
+   "endMarked": 0,
+   "assumed": false
+  },
+  {
+   "market": "nzdusd",
+   "first": "2004-01-01",
+   "signals": 49832,
+   "trades": 49771,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "usdcad",
+   "first": "2004-01-01",
+   "signals": 50174,
+   "trades": 50049,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "usdchf",
+   "first": "2004-01-01",
+   "signals": 49243,
+   "trades": 49124,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "eurjpy",
+   "first": "2004-01-01",
+   "signals": 48668,
+   "trades": 48591,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "nas100",
+   "first": "2004-01-02",
+   "signals": 49526,
+   "trades": 44683,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "spx500",
+   "first": "2004-01-02",
+   "signals": 48826,
+   "trades": 46126,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "de40",
+   "first": "2004-01-02",
+   "signals": 33652,
+   "trades": 32634,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "gbpjpy",
+   "first": "2004-01-01",
+   "signals": 47967,
+   "trades": 47893,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "audjpy",
+   "first": "2004-05-31",
+   "signals": 48332,
+   "trades": 48291,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "cadjpy",
+   "first": "2004-05-31",
+   "signals": 48919,
+   "trades": 48874,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "eurgbp",
+   "first": "2004-01-01",
+   "signals": 47759,
+   "trades": 47656,
+   "endMarked": 0,
+   "assumed": true
+  },
+  {
+   "market": "euraud",
+   "first": "2004-05-31",
+   "signals": 48336,
+   "trades": 48308,
+   "endMarked": 0,
+   "assumed": true
+  }
+ ],
+ "candidates": [
+  {
+   "key": "K1",
+   "name": "M15 no filter",
+   "eligible": false,
+   "selection": {
+    "n": 171523,
+    "gross": 0.107433,
+    "tGross": 17.695142,
+    "net": -0.110079,
+    "tNet": -15.371497,
+    "net2": -0.327591,
+    "tNet2": -32.128897,
+    "median": -1.08145,
+    "win": 0.330883,
+    "perYear": 17152.3
+   },
+   "confirm1": {
+    "n": 201769,
+    "gross": 0.07097,
+    "tGross": 15.384792,
+    "net": -0.178221,
+    "tNet": -34.929672,
+    "net2": -0.427413,
+    "tNet2": -62.45933,
+    "median": -1.10829,
+    "win": 0.324599,
+    "perYear": 17050.901408
+   },
+   "confirm2": {
+    "n": 288544,
+    "gross": 0.053249,
+    "tGross": 12.495941,
+    "net": -0.206904,
+    "tNet": -44.793646,
+    "net2": -0.467057,
+    "tNet2": -73.255166,
+    "median": -1.11072,
+    "win": 0.321528,
+    "perYear": 13215.755725
+   },
+   "measuredMarkets2015": {
+    "n": 104191,
+    "gross": 0.055644,
+    "tGross": 9.964347,
+    "net": -0.168466,
+    "tNet": -28.484804,
+    "net2": -0.392576,
+    "tNet2": -50.209167,
+    "median": -1.10169,
+    "win": 0.318559,
+    "perYear": 8804.873239
+   }
+  },
+  {
+   "key": "K2",
+   "name": "M15 hour",
+   "eligible": false,
+   "selection": {
+    "n": 14389,
+    "gross": 0.241608,
+    "tGross": 13.628522,
+    "net": 0.017265,
+    "tNet": 0.970566,
+    "net2": -0.207077,
+    "tNet2": -10.690509,
+    "median": -1.07992,
+    "win": 0.382723,
+    "perYear": 1438.9
+   },
+   "confirm1": {
+    "n": 15341,
+    "gross": 0.144767,
+    "tGross": 8.32733,
+    "net": -0.110454,
+    "tNet": -6.132134,
+    "net2": -0.365674,
+    "tNet2": -18.791295,
+    "median": -1.11827,
+    "win": 0.36145,
+    "perYear": 1296.422535
+   },
+   "confirm2": {
+    "n": 20259,
+    "gross": 0.154202,
+    "tGross": 9.766278,
+    "net": -0.099266,
+    "tNet": -6.323735,
+    "net2": -0.352735,
+    "tNet2": -21.388113,
+    "median": -1.10943,
+    "win": 0.3591,
+    "perYear": 927.89313
+   },
+   "measuredMarkets2015": {
+    "n": 8348,
+    "gross": 0.127629,
+    "tGross": 6.224084,
+    "net": -0.116043,
+    "tNet": -5.684515,
+    "net2": -0.359714,
+    "tNet2": -17.097591,
+    "median": -1.11763,
+    "win": 0.356612,
+    "perYear": 705.464789
+   }
+  },
+  {
+   "key": "K3",
+   "name": "M15 hour + level",
+   "eligible": false,
+   "selection": {
+    "n": 9127,
+    "gross": 0.264379,
+    "tGross": 12.631721,
+    "net": 0.025826,
+    "tNet": 1.250594,
+    "net2": -0.212727,
+    "tNet2": -9.692997,
+    "median": -1.0839,
+    "win": 0.36781,
+    "perYear": 912.7
+   },
+   "confirm1": {
+    "n": 9320,
+    "gross": 0.158341,
+    "tGross": 6.927113,
+    "net": -0.121842,
+    "tNet": -5.178466,
+    "net2": -0.402025,
+    "tNet2": -16.061594,
+    "median": -1.12131,
+    "win": 0.346352,
+    "perYear": 787.605634
+   },
+   "confirm2": {
+    "n": 13376,
+    "gross": 0.167549,
+    "tGross": 8.406803,
+    "net": -0.110936,
+    "tNet": -5.578211,
+    "net2": -0.389421,
+    "tNet2": -18.85155,
+    "median": -1.113945,
+    "win": 0.344871,
+    "perYear": 612.641221
+   },
+   "measuredMarkets2015": {
+    "n": 4986,
+    "gross": 0.160206,
+    "tGross": 5.605941,
+    "net": -0.116264,
+    "tNet": -4.056442,
+    "net2": -0.392734,
+    "tNet2": -13.285302,
+    "median": -1.118455,
+    "win": 0.34657,
+    "perYear": 421.352113
+   }
+  },
+  {
+   "key": "K4",
+   "name": "M15 cost",
+   "eligible": false,
+   "selection": {
+    "n": 18097,
+    "gross": 0.048904,
+    "tGross": 3.888863,
+    "net": 0.012331,
+    "tNet": 1.027311,
+    "net2": -0.024242,
+    "tNet2": -2.018074,
+    "median": -1.02762,
+    "win": 0.36973,
+    "perYear": 1809.7
+   },
+   "confirm1": {
+    "n": 10212,
+    "gross": 0.030813,
+    "tGross": 1.850099,
+    "net": -0.007153,
+    "tNet": -0.420346,
+    "net2": -0.04512,
+    "tNet2": -2.544522,
+    "median": -1.03008,
+    "win": 0.364767,
+    "perYear": 862.985915
+   },
+   "confirm2": {
+    "n": 18070,
+    "gross": 0.000022,
+    "tGross": 0.001777,
+    "net": -0.035408,
+    "tNet": -2.718042,
+    "net2": -0.070838,
+    "tNet2": -5.026921,
+    "median": -1.02692,
+    "win": 0.350802,
+    "perYear": 827.633588
+   },
+   "measuredMarkets2015": {
+    "n": 6786,
+    "gross": 0.034985,
+    "tGross": 1.744461,
+    "net": -0.002475,
+    "tNet": -0.121504,
+    "net2": -0.039936,
+    "tNet2": -1.90608,
+    "median": -1.029315,
+    "win": 0.365606,
+    "perYear": 573.464789
+   }
+  },
+  {
+   "key": "K5",
+   "name": "M15 hour + cost",
+   "eligible": false,
+   "selection": {
+    "n": 909,
+    "gross": 0.098662,
+    "tGross": 2.038683,
+    "net": 0.061188,
+    "tNet": 1.284784,
+    "net2": 0.023713,
+    "tNet2": 0.501462,
+    "median": -1.02662,
+    "win": 0.389439,
+    "perYear": 90.9
+   },
+   "confirm1": {
+    "n": 403,
+    "gross": 0.159372,
+    "tGross": 1.592975,
+    "net": 0.121745,
+    "tNet": 1.227974,
+    "net2": 0.084119,
+    "tNet2": 0.854169,
+    "median": -1.02708,
+    "win": 0.387097,
+    "perYear": 34.056338
+   },
+   "confirm2": {
+    "n": 993,
+    "gross": -0.06742,
+    "tGross": -1.356247,
+    "net": -0.101604,
+    "tNet": -2.023266,
+    "net2": -0.135788,
+    "tNet2": -2.668351,
+    "median": -1.02572,
+    "win": 0.328298,
+    "perYear": 45.480916
+   },
+   "measuredMarkets2015": {
+    "n": 271,
+    "gross": 0.198721,
+    "tGross": 1.895321,
+    "net": 0.161459,
+    "tNet": 1.554411,
+    "net2": 0.124196,
+    "tNet2": 1.204448,
+    "median": -1.02586,
+    "win": 0.394834,
+    "perYear": 22.901408
+   }
+  },
+  {
+   "key": "K6",
+   "name": "M15 hour + level + cost",
+   "eligible": false,
+   "selection": {
+    "n": 659,
+    "gross": 0.090682,
+    "tGross": 1.71946,
+    "net": 0.053473,
+    "tNet": 1.026725,
+    "net2": 0.016264,
+    "tNet2": 0.314077,
+    "median": -1.02706,
+    "win": 0.38695,
+    "perYear": 65.9
+   },
+   "confirm1": {
+    "n": 277,
+    "gross": 0.250943,
+    "tGross": 1.963065,
+    "net": 0.213168,
+    "tNet": 1.677971,
+    "net2": 0.175393,
+    "tNet2": 1.387374,
+    "median": -1.02583,
+    "win": 0.407942,
+    "perYear": 23.408451
+   },
+   "confirm2": {
+    "n": 670,
+    "gross": -0.082355,
+    "tGross": -1.626602,
+    "net": -0.116521,
+    "tNet": -2.278963,
+    "net2": -0.150688,
+    "tNet2": -2.908596,
+    "median": -1.02587,
+    "win": 0.325373,
+    "perYear": 30.687023
+   },
+   "measuredMarkets2015": {
+    "n": 181,
+    "gross": 0.281186,
+    "tGross": 1.9846,
+    "net": 0.243846,
+    "tNet": 1.73886,
+    "net2": 0.206506,
+    "tNet2": 1.486136,
+    "median": -1.02485,
+    "win": 0.414365,
+    "perYear": 15.295775
+   }
+  },
+  {
+   "key": "K7",
+   "name": "H1 cost",
+   "eligible": false,
+   "selection": {
+    "n": 11774,
+    "gross": 0.057774,
+    "tGross": 4.32115,
+    "net": 0.025011,
+    "tNet": 1.886877,
+    "net2": -0.007751,
+    "tNet2": -0.587046,
+    "median": -1.021915,
+    "win": 0.380584,
+    "perYear": 1177.4
+   },
+   "confirm1": {
+    "n": 9121,
+    "gross": 0.009353,
+    "tGross": 0.591255,
+    "net": -0.026124,
+    "tNet": -1.652325,
+    "net2": -0.061602,
+    "tNet2": -3.876244,
+    "median": -1.02731,
+    "win": 0.359829,
+    "perYear": 770.788732
+   },
+   "confirm2": {
+    "n": 12602,
+    "gross": 0.017991,
+    "tGross": 1.303289,
+    "net": -0.015092,
+    "tNet": -1.088276,
+    "net2": -0.048175,
+    "tNet2": -3.438957,
+    "median": -1.02298,
+    "win": 0.361927,
+    "perYear": 577.19084
+   },
+   "measuredMarkets2015": {
+    "n": 5535,
+    "gross": -0.00641,
+    "tGross": -0.330485,
+    "net": -0.041352,
+    "tNet": -2.121103,
+    "net2": -0.076294,
+    "tNet2": -3.881675,
+    "median": -1.02684,
+    "win": 0.35411,
+    "perYear": 467.746479
+   }
+  },
+  {
+   "key": "K8",
+   "name": "H1 hour + cost",
+   "eligible": true,
+   "selection": {
+    "n": 668,
+    "gross": 0.229455,
+    "tGross": 3.619898,
+    "net": 0.196952,
+    "tNet": 3.11067,
+    "net2": 0.164448,
+    "tNet2": 2.597977,
+    "median": -1.01966,
+    "win": 0.431138,
+    "perYear": 66.8
+   },
+   "confirm1": {
+    "n": 554,
+    "gross": 0.05956,
+    "tGross": 0.910016,
+    "net": 0.025663,
+    "tNet": 0.392819,
+    "net2": -0.008234,
+    "tNet2": -0.126153,
+    "median": -1.025135,
+    "win": 0.370036,
+    "perYear": 46.816901
+   },
+   "confirm2": {
+    "n": 726,
+    "gross": 0.212764,
+    "tGross": 3.285751,
+    "net": 0.179713,
+    "tNet": 2.78857,
+    "net2": 0.146662,
+    "tNet2": 2.284845,
+    "median": -1.018485,
+    "win": 0.415978,
+    "perYear": 33.251908
+   },
+   "measuredMarkets2015": {
+    "n": 354,
+    "gross": 0.040937,
+    "tGross": 0.511211,
+    "net": 0.007017,
+    "tNet": 0.08753,
+    "net2": -0.026902,
+    "tNet2": -0.334913,
+    "median": -1.024715,
+    "win": 0.361582,
+    "perYear": 29.915493
+   }
+  }
+ ],
+ "perMarket": [
+  {
+   "market": "xau",
+   "n1": 20,
+   "net1": -0.010301,
+   "n2": 56,
+   "net2": 0.055261
+  },
+  {
+   "market": "xag",
+   "n1": 0,
+   "net1": null,
+   "n2": 8,
+   "net2": -0.361017
+  },
+  {
+   "market": "eurusd",
+   "n1": 102,
+   "net1": 0.41519,
+   "n2": 67,
+   "net2": -0.008016
+  },
+  {
+   "market": "gbpusd",
+   "n1": 96,
+   "net1": 0.066276,
+   "n2": 68,
+   "net2": 0.018091
+  },
+  {
+   "market": "usdjpy",
+   "n1": 51,
+   "net1": 0.204988,
+   "n2": 98,
+   "net2": -0.020216
+  },
+  {
+   "market": "audusd",
+   "n1": 107,
+   "net1": -0.036472,
+   "n2": 65,
+   "net2": 0.010424
+  },
+  {
+   "market": "nzdusd",
+   "n1": 79,
+   "net1": 0.144439,
+   "n2": 51,
+   "net2": 0.111231
+  },
+  {
+   "market": "usdcad",
+   "n1": 42,
+   "net1": -0.02656,
+   "n2": 43,
+   "net2": 0.242298
+  },
+  {
+   "market": "usdchf",
+   "n1": 55,
+   "net1": 0.308831,
+   "n2": 26,
+   "net2": -0.023637
+  },
+  {
+   "market": "eurjpy",
+   "n1": 116,
+   "net1": 0.424354,
+   "n2": 72,
+   "net2": -0.011884
+  },
+  {
+   "market": "nas100",
+   "n1": 1,
+   "net1": 1.95732,
+   "n2": 90,
+   "net2": 0.011188
+  },
+  {
+   "market": "spx500",
+   "n1": 2,
+   "net1": -1.029195,
+   "n2": 56,
+   "net2": 0.02274
+  },
+  {
+   "market": "de40",
+   "n1": 22,
+   "net1": 0.332764,
+   "n2": 34,
+   "net2": 0.095677
+  },
+  {
+   "market": "gbpjpy",
+   "n1": 81,
+   "net1": 0.38981,
+   "n2": 75,
+   "net2": -0.039581
+  },
+  {
+   "market": "audjpy",
+   "n1": 68,
+   "net1": 0.156754,
+   "n2": 44,
+   "net2": 0.089939
+  },
+  {
+   "market": "cadjpy",
+   "n1": 80,
+   "net1": 0.517699,
+   "n2": 41,
+   "net2": 0.248358
+  },
+  {
+   "market": "eurgbp",
+   "n1": 13,
+   "net1": -0.212383,
+   "n2": 17,
+   "net2": 0.202902
+  },
+  {
+   "market": "euraud",
+   "n1": 55,
+   "net1": -0.07365,
+   "n2": 47,
+   "net2": 0.558722
+  }
+ ]
+}
