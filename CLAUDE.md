@@ -6865,3 +6865,13 @@ Display only: a script draws lines on the Desk's charts; it never places, change
   candle set (`SC.cache`). `window.msScripts.list()` is a read-only view.
 - Tests: `tests/ms-script.test.mjs` (reference maths for both languages, no look-ahead, errors and their line, the budget, no
   eval / fetch / storage in the asset, page wiring). Checked in a browser: both examples written, checked, saved and drawn.
+
+## Big-candle fade with the target 25 % further (24 Nov 2026, owner: "what if we let the trade run 25% extra of the distance between the entry and tp")
+`research/edge/bigfade-target-125/` (PREREGISTRATION.md pushed alone first; `run.mjs` imports `big-candle-fade` `signals()` and the
+shared `exits()`, gate reproduced: 47,354 / +0.307R and 54,443 / +0.193R). The Equinox Big-candle fade's own trades (m15 k1.5 nobreak,
+same fill, stop and 1-day limit) with the target at 1.25 x the distance from the fill to the candle's middle. **FAIL**: the longer
+target is better trade by trade (+0.012R in 2015-26, month t 2.02; +0.026R in 2005-14, t 4.16) but the rule still loses after
+costs with it: −0.235R a trade (n 54,443, 26 % winners) against −0.246R (30 %) with the candle's middle. Context only, not tested:
+1.5 x −0.222R, 2 x −0.209R; in 2005-14 the 2 x target is about zero after costs (−0.002R). Gold and silver are worse with the
+longer target, the forex pairs slightly better. The desk's target stays the candle's middle; the loss is the cost, not the exit.
+Test: `tests/bigfade-target-125.test.mjs`.
