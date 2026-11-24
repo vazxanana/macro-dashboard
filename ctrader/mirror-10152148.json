@@ -5828,7 +5828,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T08:47:02.000Z",
     "councilEntry": 3626.64,
     "stop": 3606.4,
@@ -5842,10 +5842,12 @@
     "slipR": 0.063,
     "lagSec": 72,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T08:47:02.000Z",
-    "brokerStop": 3607.67
+    "brokerStop": 3607.67,
+    "closedAt": "2026-11-24T15:11:48.000Z"
    },
    "xau-replica-1795522255-s": {
     "positionId": "51074126",
@@ -5938,7 +5940,7 @@
    "startBalance": 12741.49
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12690.41 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12669.52 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -5946,15 +5948,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12690.41,
-  "lastRun": "2026-11-24T15:06:37.000Z"
+  "balance": 12669.52,
+  "lastRun": "2026-11-24T15:11:48.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T14:33:48.000Z",
-   "msg": "not mirrored yet xrp-replica-1794407562-s: daily loss stop (44.8% down today) (will retry)",
-   "trade": "xrp-replica-1794407562-s"
-  },
   {
    "at": "2026-11-11T15:00:41.000Z",
    "msg": "not mirrored yet usdcad-replica-1794409166-s: daily loss stop (44.8% down today) (will retry)",
@@ -7443,6 +7440,11 @@
    "at": "2026-11-24T15:04:05.000Z",
    "msg": "XAUUSD position 51123148 closed at the broker",
    "trade": "xau-replica-1795531249-b"
+  },
+  {
+   "at": "2026-11-24T15:11:48.000Z",
+   "msg": "XAUUSD position 51037897 closed at the broker",
+   "trade": "xau-replica-1795509950-b"
   }
  ],
  "limits": {
