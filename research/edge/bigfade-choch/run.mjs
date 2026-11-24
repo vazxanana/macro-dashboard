@@ -35,14 +35,15 @@ export function walk(L, i, s, stop, target, cap = DAY) {
   return null;
 }
 // BASE: at the first L candle at or after the big candle's close; the desk's rule (50 % at least 1R away)
-export function base(L, g) {
+export function base(L, g, cost = 0) {
   const i = firstAt(L, g.ts); if (i >= L.length || L[i].t - g.ts > 3600) return { skip: 'nodata' };
   const s = -g.d, stop = g.ext + g.d * ATRK * g.a, fill = L[i].o, risk = s * (fill - stop); if (!(risk > 0)) return { skip: 'bad' };
+  if (risk < cost) return { skip: 'small' };   // the desk's rule: a risk under the round-trip cost is no trade
   const plan = (s * (g.mid - fill)) / risk; if (!(plan >= 1)) return { skip: 'near' };
   const r = walk(L, i, s, stop, g.mid); return r ? { t: L[i].t, plan, ...r } : { skip: 'open' };
 }
 // CHOCH: the first L close beyond the last confirmed L swing against the candle, within `wait` seconds of its close
-export function choch(L, g, wait) {
+export function choch(L, g, wait, cost = 0) {
   const i0 = firstAt(L, g.ts); if (i0 >= L.length || L[i0].t - g.ts > 3600) return { skip: 'nodata' };
   const s = -g.d, up = g.d > 0; let ext = g.ext, lvl = null;
   // a swing against the candle: for a bullish candle the lowest low of five L candles (two each side), mirrored for a bearish one
@@ -54,7 +55,7 @@ export function choch(L, g, wait) {
     if (up ? b.h >= g.ext + ATRK * g.a : b.l <= g.ext - ATRK * g.a) return { skip: 'stopFirst' };
     if (up ? b.l <= g.mid : b.h >= g.mid) return { skip: 'targetFirst' };
     if (lvl != null && (up ? b.c < lvl : b.c > lvl)) { if (j + 1 >= L.length) return { skip: 'open' };
-      const stop = ext + g.d * ATRK * g.a, fill = L[j + 1].o, risk = s * (fill - stop); if (!(risk > 0)) return { skip: 'bad' };
+      const stop = ext + g.d * ATRK * g.a, fill = L[j + 1].o, risk = s * (fill - stop); if (!(risk > 0)) return { skip: 'bad' }; if (risk < cost) return { skip: 'small' };
       const plan = (s * (g.mid - fill)) / risk; if (!(plan > 0)) return { skip: 'past' };
       const r = walk(L, j + 1, s, stop, g.mid); return r ? { t: L[j + 1].t, plan, wait: L[j + 1].t - g.ts, lvl, ...r } : { skip: 'open' }; }
     if (piv(j - 2)) lvl = up ? L[j - 2].l : L[j - 2].h;   // its second right-hand candle (j) has now closed: it counts from the next candle
@@ -77,8 +78,8 @@ export function runMarket(market, tf) {
   const [from, to] = tf === '30s' ? WIN.s : [WIN.d[0], WIN.c[1]];
   const M5 = K.load(market, '5m', { from: '2016-01-01', to: '2026-11-01' }), L = tf === '30s' ? load30(market, from, to) : K.load(market, '1m', { from, to });
   const big = signals(frames(M5)).big.filter((g) => g.tf === 0 && !g.brk && g.ts >= sec(from) && g.ts < sec(to)), cost = COSTS[market], X = exclusions(market), rows = [], skips = {};
-  for (const g of big) { if (X.length && inBad(X, g.ts)) continue; const b = base(L, g); if (b.skip) continue;
-    const mo = new Date(b.t * 1000).toISOString().slice(0, 7), w = b.t < sec(WIN.c[0]) ? 'd' : 'c', c = choch(L, g, WAIT[tf]);
+  for (const g of big) { if (X.length && inBad(X, g.ts)) continue; const b = base(L, g, cost); if (b.skip) continue;
+    const mo = new Date(b.t * 1000).toISOString().slice(0, 7), w = b.t < sec(WIN.c[0]) ? 'd' : 'c', c = choch(L, g, WAIT[tf], cost);
     if (c.skip) skips[c.skip] = (skips[c.skip] || 0) + 1;
     rows.push({ market, w, mo, base: { mo, R: b.R, net: b.R - cost / b.risk, plan: b.plan }, choch: c.skip ? null : { mo, R: c.R, net: c.R - cost / c.risk, plan: c.plan, wait: c.wait }, skip: c.skip || null }); }
   return { rows, skips };
@@ -99,7 +100,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   const row = (name, b) => `| ${name} | ${b.signals} | ${b.base.n} | ${pc(b.base.win)} | ${b.base.plan} | ${sg(b.base.gross)} | ${sg(b.base.net)} | ${b.choch.n} | ${pc(b.choch.win)} | ${b.choch.plan} | ${sg(b.choch.gross)} | ${sg(b.choch.net)} (${b.choch.tNet}) |`;
   const skl = (b) => Object.entries(b.skips).map(([k, v]) => `${{ targetFirst: 'the 50 % came first', stopFirst: 'the stop level came first', noChoch: 'no ChoCh in time', past: 'already past the target', open: 'still open', bad: 'no risk' }[k] || k} ${v}`).join(', ');
   fs.writeFileSync(path.join(HERE, 'RESULT.md'), ['# Big-candle fade entered on a 1-minute or 30-second ChoCh (result, 24 Nov 2026)', '', `**Verdict: ${res.verdict}**`, '',
-    'Paper research only, run once as pre-registered (`PREREGISTRATION.md`, pushed alone first). Nothing live changed.', '',
+    'Paper research only, as pre-registered (`PREREGISTRATION.md`, pushed alone first). Run twice: the first run left out the desk\'s own rule that a risk under the round-trip cost is no trade (the entry at once then read −0.963R and −0.368R after costs); the rule was put in and this is the run that counts. Nothing live changed.', '',
     '| | Signals | At once: trades | winners | planned R (median) | before costs | after costs | ChoCh: trades | winners | planned R (median) | before costs | after costs (month t) |', '|---|---|---|---|---|---|---|---|---|---|---|---|',
     row('1-minute ChoCh, 2018-21, five markets', D), row('1-minute ChoCh, 2022-26, five markets', C), ...MARKETS.map((m) => row(`  ${m}, 2022-26`, res.m1[m].c)),
     ...(S ? [row('30-second ChoCh, 2024-26, gold + EUR/USD (context)', S)] : []), '',

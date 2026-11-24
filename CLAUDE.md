@@ -6902,3 +6902,17 @@ beside the desk's 50 %, chosen on 2005-14, judged on 2015-26; a target the fill 
 −0.283R, 30 % −0.378R, 20 % −0.549R, 10 % −0.640R (50 %: −0.246R). Winners rise to 46 % at the 25 % target but the wins shrink
 against the same cost; under 25 % the rule loses before costs too. With `bigfade-target-sweep` the whole curve is known: it
 rises with the distance from 10 % to no target and never crosses zero after costs on 2015-26. Test: `tests/bigfade-target-short.test.mjs`.
+
+## Big-candle fade entered on a 1-minute or 30-second ChoCh (24 Nov 2026, owner: "find a way to improve the win rate or add maybe m1 choch or 30s choch")
+`research/edge/bigfade-choch/` (PREREGISTRATION.md pushed alone first; OANDA 1-minute candles 2018 → Oct 2026 on xau, eurusd, gbpusd,
+usdjpy, audusd and 30-second candles 2024-26 on xau and eurusd, fetched into the shared cache; `run.mjs` `base` / `choch` / `walk`).
+The desk's signals; instead of entering at once, wait up to 60 minutes for the first 1-minute close beyond the last confirmed
+1-minute swing against the candle (five-candle swing), enter at the next open, stop past the highest high since the candle + 0.1 ATR,
+the same 50 % target. **FAIL**: the win rate does rise, 70.4 % against 29.3 % at once (2022-26, z 38), but the entry is so much
+later that the planned reward is 0.38R (median) against 3.08R: before costs it makes −0.007R a trade, after costs −0.138R (n 2,361,
+month t −9.33) against −0.212R at once. Better than entering at once (+0.074R, Welch t 2.95, month t 3.16), still a loss; 2018-21
+the same (68 % winners, −0.182R). Only 19 % of signals give a ChoCh trade: on 65 % the stop level (the candle's extreme + 0.1 ATR)
+trades first, on 16 % the 50 % comes first. 30-second ChoCh, context only (gold + EUR/USD, 2024-26): 64.6 % winners, planned 0.61R,
+−0.115R after costs (n 1,027). The run that counts is the second: the first left out the desk's "risk under the cost is no trade"
+rule (said in RESULT.md). **A high win rate here is bought with the reward: never quote the 70 % without the −0.138R.**
+Test: `tests/bigfade-choch.test.mjs`.
