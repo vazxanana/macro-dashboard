@@ -58,6 +58,46 @@ other edge. Figures below are before / after the desk's round-trip costs (`combo
 - Report every cell, the cut test (signals on candles cut at a date equal the full run's), stops on the losing side, and say
   which costs are assumed.
 
+## 7. Pre-flight checklist: run it on any edge before testing or tuning
+
+Stop at the first step a rule fails; each step names where the lesson came from.
+
+1. **Cost R** from the rule's own stops (`research/proposals/2026-11-24-desk-cost-audit.mjs` for desk readings; `cost / risk` for
+   a study). Median over 0.1R, or a heavy tail (90th percentile over 0.2R): widen the stop to the working chart's ATR or lengthen
+   the target BEFORE judging the entry (switch studies).
+2. **Before-cost R on 300+ trades.** Within about ±0.05R a trade: no stop, filter or exit will rescue it; drop it, do not tune
+   (desk audit: 30 readings, none reaches t 1.3 after costs).
+3. **Beat a control.** Compare with the same trigger without the special condition: an old call, a random time, every break, the
+   other side. A rule that does not beat its control IS the control, whatever its own t (`msnr-switch-fade`'s best cell,
+   `dom-placebo`, `usdjpy-vb-side-control-v2`).
+4. **Hours.** If most of the R sits at 20-23 UTC, check it on broker ticks before believing it (switch complements, `fade-hour-check`).
+5. **Direction gate.** If the rule requires the MSNR call (or the Daily side), run it without; expect no loss (four studies).
+6. **Same entries, every exit in one pass**: `grid7-wide-fade` `exits(M5, s, fi, stop, targets, cap)` books 1R / 2R / 3R / a
+   level at once, so stop and exit choices are compared on identical trades. Pick an exit on old years only; a target that looks
+   best on one stretch often is not on the next (the Mosha barrier's best target flipped between 2026 and earlier records).
+7. **Holdout once.** Select after costs on old years; judge once on markets or years the line of studies never read (section 5).
+8. **Forward paper record** before anything else; a live rule needs the owner.
+
+## 8. Adapting it, edge by edge
+
+- **Gold and USD/JPY volatility breakouts** (the two that hold after costs): costs already measured (`*-hourcost`, `*-exec`,
+  about 0.01-0.02R). Do not add filters: the H4 structure side (`vb-structure-filter`) and the macro score (`vb-macro-size`)
+  failed. The only idea left from this line is the H4 switch as a size tilt, low prior. Keep the forward records running.
+- **Engulfing desk**: the three-candle plan and short method lose after costs (-0.15R, n about 1,400 each); the next-candle
+  versions sit at zero; the Daily engulf rule is the only positive reading (+0.127R, n 187, t 1.29), and it is the live Gold daily
+  engulf family, already tested. The plan's Daily-side requirement is an MSNR-type gate (step 5).
+- **Mosha desk**: the same barrier entries swing from -0.093R (1R target) to +0.012R / +0.069R (6R, tap / Janda) after costs:
+  the target matters more than the entry there. Any target choice must be picked on old years and judged on a holdout (step 6),
+  never on the desk's own months.
+- **MSNR desk**: the gold plan loses (-0.257R, n 327); the 12-16 UTC scalp method looks positive (+0.074R) but already failed
+  on 2010-19 (`msnr-main-6r`). Do not build on the direction call (section 3).
+- **LIT desk**: small samples and the highest costs (the rule: median 0.148R); its smallest stop (0.014% of price) is the first
+  thing to widen if it is ever tested.
+- **The fade family**: the open test is a working-chart ATR stop (section 2), after costs, on unread data; check 20-23 UTC on
+  broker ticks first (step 4).
+- **ICT desk**: Fred's separate edge (absolute rule 4). The checklist's cost-R and control steps apply as ideas, but nothing
+  here touches its files, reports or rules; offer them to its owner, never mix it into a council study.
+
 ## 6. Reusable pieces
 
 - `research/edge/msnr-switch-fade/run.mjs`: `keyLevels` / `keyTarget` (nearest unbroken opposite turn of the closes one
