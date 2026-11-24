@@ -1,145 +1,160 @@
 {
- "at": "2026-11-23T13:11:55.274Z",
+ "at": "2026-11-24T13:58:38.875Z",
  "window": {
   "from": "2026-11-01T20:09:19.000Z",
-  "to": "2026-11-23T13:07:00.000Z",
-  "replayFrom": "2026-10-24T13:07:00.000Z",
-  "replayAt": "2026-11-23T13:11:53.494Z",
+  "to": "2026-11-24T13:54:00.000Z",
+  "replayFrom": "2026-10-25T13:54:00.000Z",
+  "replayAt": "2026-11-24T13:58:35.757Z",
   "firstLive": "2026-11-01T20:09:19.000Z"
  },
  "counts": {
-  "replayOpen": 78,
-  "live": 1273,
-  "liveShadow": 1231,
-  "replay": 2194,
-  "matched": 629,
-  "comparableLive": 1176,
-  "comparableReplay": 1773
+  "replayOpen": 70,
+  "live": 1285,
+  "liveShadow": 1243,
+  "replay": 2312,
+  "matched": 634,
+  "comparableLive": 1184,
+  "comparableReplay": 1880
  },
  "matchRate": {
-  "liveInReplay": 0.494,
-  "replayInLive": 0.287,
+  "liveInReplay": 0.493,
+  "replayInLive": 0.274,
   "comparable": {
    "liveInReplay": 0.535,
-   "replayInLive": 0.355
+   "replayInLive": 0.337
   }
  },
  "timing": {
-  "meanDtSec": 70.153,
-  "absMeanDtSec": 130.976,
+  "meanDtSec": 66.251,
+  "absMeanDtSec": 127.213,
   "note": "replay opened minus live opened; the replay steps every 5 min on a fixed grid"
  },
  "agreement": {
-  "pairs": 629,
+  "pairs": 634,
   "d1": {
-   "agree": 558,
-   "rate": 0.887,
+   "agree": 560,
+   "rate": 0.883,
    "table": {
-    "with→with": 280,
-    "against→against": 278,
-    "with→against": 38,
-    "against→with": 33
+    "with→with": 281,
+    "against→against": 279,
+    "with→against": 40,
+    "against→with": 34
    },
    "bySource": {
     "OANDA": {
-     "n": 380,
-     "rate": 0.813
+     "n": 383,
+     "rate": 0.807
     },
     "feed": {
-     "n": 249,
+     "n": 251,
      "rate": 1
     }
    },
    "likeForLike": {
     "n": 530,
-    "rate": 0.964,
-    "labelSourceDiffers": 99,
-    "note": "99 gold/forex pairs were opened before 2026-11-07T16:01 UTC, when live D1 still came from Kraken: left out"
+    "rate": 0.962,
+    "labelSourceDiffers": 104,
+    "note": "104 gold/forex pairs were opened before 2026-11-07T16:01 UTC, when live D1 still came from Kraken: left out"
    }
   },
   "session": {
-   "agree": 622,
-   "rate": 0.989
+   "agree": 634,
+   "rate": 1
   },
   "struct": {
    "rate": 0.975
   },
   "cf": {
-   "rate": 0.94
+   "rate": 0.937
   },
   "choch": {
-   "rate": 0.943
+   "rate": 0.938
   },
   "m15c": {
-   "rate": 0.928
+   "rate": 0.931
   },
   "fill": {
-   "judged": 600,
-   "agree": 571,
-   "rate": 0.952,
+   "judged": 603,
+   "agree": 573,
+   "rate": 0.95,
    "table": {
-    "loss→filled": 323,
-    "win→filled": 195,
+    "loss→filled": 316,
+    "win→filled": 205,
     "missed→unfilled": 35,
-    "missed→filled": 11,
+    "missed→filled": 12,
     "win→unfilled": 11,
-    "win→open (filled)": 10,
     "open→open (filled)": 9,
-    "expired→unfilled": 7,
-    "cancelled→unfilled": 7,
-    "duplicate→filled": 5,
-    "cancelled→filled": 5,
-    "loss→unfilled": 4,
-    "expired→filled": 3,
-    "duplicate→open (filled)": 2,
-    "be→filled": 1,
-    "pending→open (resting)": 1
+    "expired→unfilled": 8,
+    "win→open (filled)": 8,
+    "cancelled→unfilled": 8,
+    "duplicate→filled": 7,
+    "loss→unfilled": 5,
+    "cancelled→filled": 4,
+    "duplicate→open (filled)": 3,
+    "expired→filled": 2,
+    "be→filled": 1
    }
   },
   "outcome": {
-   "bothClosed": 519,
+   "bothClosed": 522,
    "signAgree": 501,
-   "signRate": 0.965,
-   "signRateNet": 0.96,
-   "meanLiveR": 0.113,
-   "meanReplayR": 0.089,
-   "meanReplayRNet": -0.018,
-   "meanDiffGross": 0.024,
+   "signRate": 0.96,
+   "signRateNet": 0.958,
+   "meanLiveR": 0.193,
+   "meanReplayR": 0.121,
+   "meanReplayRNet": 0.019,
+   "meanDiffGross": 0.072,
    "medianDiffGross": 0,
-   "meanAbsDiffGross": 0.155,
-   "sameSignDiffGross": 0.015,
-   "rrDiffer": 214,
+   "meanAbsDiffGross": 0.178,
+   "sameSignDiffGross": 0.054,
+   "rrDiffer": 189,
    "biggestDiffs": [
+    {
+     "id": "xrp-scalp-1793949425",
+     "liveR": 17.72,
+     "replayR": 2,
+     "liveRR": 17.72,
+     "replayRR": 2,
+     "d": 15.72
+    },
     {
      "id": "xau-rintra-1793856164",
      "liveR": 9.29,
-     "replayR": 4.04,
+     "replayR": 4.05,
      "liveRR": 9.29,
-     "replayRR": 4.04,
-     "d": 5.25
+     "replayRR": 4.05,
+     "d": 5.24
+    },
+    {
+     "id": "usdchf-rscalp-1793798916",
+     "liveR": 2.62,
+     "replayR": -1,
+     "liveRR": 2.62,
+     "replayRR": 3.25,
+     "d": 3.62
     },
     {
      "id": "xau-scalp-1793959650",
      "liveR": 7.01,
-     "replayR": 2.97,
+     "replayR": 3.5,
      "liveRR": 7.01,
-     "replayRR": 2.97,
-     "d": 4.04
+     "replayRR": 3.5,
+     "d": 3.51
     },
     {
      "id": "usdchf-scalp-1793647091",
      "liveR": 2,
-     "replayR": -1.34,
+     "replayR": -1.32,
      "liveRR": 2,
-     "replayRR": 2.14,
-     "d": 3.34
+     "replayRR": 2,
+     "d": 3.32
     },
     {
      "id": "xau-scalp-1794316864",
      "liveR": 2.29,
      "replayR": -1,
      "liveRR": 2.29,
-     "replayRR": 2.57,
+     "replayRR": 2,
      "d": 3.29
     },
     {
@@ -147,39 +162,23 @@
      "liveR": 2.25,
      "replayR": -1,
      "liveRR": 2.25,
-     "replayRR": 2,
+     "replayRR": 2.77,
      "d": 3.25
     },
     {
-     "id": "usdchf-scalp-1793649751",
-     "liveR": 2,
-     "replayR": -1,
-     "liveRR": 2,
-     "replayRR": 2.15,
-     "d": 3
-    },
-    {
-     "id": "usdchf-scalp-1793689102",
+     "id": "audusd-scalp-1793909498",
      "liveR": -1,
-     "replayR": 2,
+     "replayR": 2.17,
      "liveRR": 2,
-     "replayRR": 2,
-     "d": -3
-    },
-    {
-     "id": "usdcad-scalp-1793734667",
-     "liveR": -1,
-     "replayR": 2,
-     "liveRR": 2,
-     "replayRR": 2,
-     "d": -3
+     "replayRR": 2.17,
+     "d": -3.17
     }
    ],
-   "meanDiffNet": 0.131,
-   "exactR": 429,
+   "meanDiffNet": 0.174,
+   "exactR": 443,
    "liveBeMoved": {
     "n": 2,
-    "signRateVsBe1": 0.5
+    "signRateVsBe1": 1
    },
    "flips": [
     {
@@ -193,12 +192,12 @@
      "liveExit": null,
      "beMoved": true,
      "replayR": -1,
-     "replayR_be1": -1,
-     "cost": 0.027,
-     "dt": -209,
+     "replayR_be1": 0,
+     "cost": 0.028,
+     "dt": -89,
      "liveEntry": 94.4,
      "liveRR": 2.98,
-     "replayRR": 2.84
+     "replayRR": 2.98
     },
     {
      "id": "audusd-rscalp-1793621427",
@@ -213,7 +212,7 @@
      "replayR": -1,
      "replayR_be1": -1,
      "cost": 0.2,
-     "dt": 393,
+     "dt": 213,
      "liveEntry": 0.70094,
      "liveRR": 0.5,
      "replayRR": 1.44
@@ -231,10 +230,28 @@
      "replayR": -1,
      "replayR_be1": -1,
      "cost": 0.044,
-     "dt": -426,
+     "dt": -306,
      "liveEntry": 1.25385,
      "liveRR": 0.08,
      "replayRR": 0.23
+    },
+    {
+     "id": "usdchf-swing-1793632492",
+     "market": "usdchf",
+     "setup": "swing",
+     "side": "sell",
+     "opened": "2026-11-02T15:14:52.000Z",
+     "liveStatus": "win",
+     "liveR": 0.44,
+     "liveExit": "retired",
+     "beMoved": false,
+     "replayR": -1,
+     "replayR_be1": 0,
+     "cost": 0.017,
+     "dt": -52,
+     "liveEntry": 0.82021,
+     "liveRR": 2.23,
+     "replayRR": 2.31
     },
     {
      "id": "usdchf-scalp-1793647091",
@@ -246,13 +263,13 @@
      "liveR": 2,
      "liveExit": null,
      "beMoved": false,
-     "replayR": -1.34,
-     "replayR_be1": -1.34,
-     "cost": 0.116,
-     "dt": -71,
+     "replayR": -1.32,
+     "replayR_be1": -1.32,
+     "cost": 0.111,
+     "dt": -251,
      "liveEntry": 0.81851,
      "liveRR": 2,
-     "replayRR": 2.14
+     "replayRR": 2
     },
     {
      "id": "usdchf-scalp-1793649751",
@@ -266,11 +283,29 @@
      "beMoved": false,
      "replayR": -1,
      "replayR_be1": -1,
-     "cost": 0.128,
-     "dt": 269,
+     "cost": 0.122,
+     "dt": 89,
      "liveEntry": 0.8183,
      "liveRR": 2,
-     "replayRR": 2.15
+     "replayRR": 2
+    },
+    {
+     "id": "usdchf-intraday-1793686566",
+     "market": "usdchf",
+     "setup": "intraday",
+     "side": "sell",
+     "opened": "2026-11-03T06:16:06.000Z",
+     "liveStatus": "loss",
+     "liveR": -1,
+     "liveExit": null,
+     "beMoved": false,
+     "replayR": 2,
+     "replayR_be1": 2,
+     "cost": 0.071,
+     "dt": -126,
+     "liveEntry": 0.81856,
+     "liveRR": 2.56,
+     "replayRR": 2
     },
     {
      "id": "usdchf-scalp-1793689102",
@@ -285,7 +320,7 @@
      "replayR": 2,
      "replayR_be1": 2,
      "cost": 0.139,
-     "dt": 518,
+     "dt": 38,
      "liveEntry": 0.81837,
      "liveRR": 2,
      "replayRR": 2
@@ -303,7 +338,7 @@
      "replayR": 0.48,
      "replayR_be1": 0.48,
      "cost": 0.156,
-     "dt": 67,
+     "dt": 187,
      "liveEntry": 1.40059,
      "liveRR": 4.48,
      "replayRR": 0.48
@@ -321,10 +356,28 @@
      "replayR": 2,
      "replayR_be1": 2,
      "cost": 0.2,
-     "dt": -47,
+     "dt": 73,
      "liveEntry": 1.40093,
      "liveRR": 2,
      "replayRR": 2
+    },
+    {
+     "id": "audusd-scalp-1793793229",
+     "market": "audusd",
+     "setup": "scalp",
+     "side": "buy",
+     "opened": "2026-11-04T11:53:49.000Z",
+     "liveStatus": "win",
+     "liveR": 2.13,
+     "liveExit": null,
+     "beMoved": false,
+     "replayR": -1,
+     "replayR_be1": 0,
+     "cost": 0.189,
+     "dt": 311,
+     "liveEntry": 0.7014,
+     "liveRR": 2.13,
+     "replayRR": 1.96
     },
     {
      "id": "xau-scalp-1793795439",
@@ -339,10 +392,28 @@
      "replayR": -1,
      "replayR_be1": -1,
      "cost": 0.021,
-     "dt": 81,
+     "dt": -99,
      "liveEntry": 4046.2400000000002,
      "liveRR": 2,
      "replayRR": 2
+    },
+    {
+     "id": "usdchf-rscalp-1793798916",
+     "market": "usdchf",
+     "setup": "rscalp",
+     "side": "buy",
+     "opened": "2026-11-04T13:28:36.000Z",
+     "liveStatus": "win",
+     "liveR": 2.62,
+     "liveExit": null,
+     "beMoved": false,
+     "replayR": -1,
+     "replayR_be1": -1,
+     "cost": 0.182,
+     "dt": 24,
+     "liveEntry": 0.81577,
+     "liveRR": 2.62,
+     "replayRR": 3.25
     },
     {
      "id": "audusd-scalp-1793907102",
@@ -357,28 +428,10 @@
      "replayR": 2,
      "replayR_be1": 0,
      "cost": 0.093,
-     "dt": 18,
+     "dt": 138,
      "liveEntry": 0.69411,
      "liveRR": 2,
      "replayRR": 2
-    },
-    {
-     "id": "audusd-rscalp-1793908468",
-     "market": "audusd",
-     "setup": "rscalp",
-     "side": "buy",
-     "opened": "2026-11-05T19:54:28.000Z",
-     "liveStatus": "loss",
-     "liveR": -1,
-     "liveExit": null,
-     "beMoved": false,
-     "replayR": 0.08,
-     "replayR_be1": 0.08,
-     "cost": 0.084,
-     "dt": -148,
-     "liveEntry": 0.69479,
-     "liveRR": 4.06,
-     "replayRR": 0.08
     },
     {
      "id": "audusd-scalp-1793909498",
@@ -390,31 +443,13 @@
      "liveR": -1,
      "liveExit": null,
      "beMoved": false,
-     "replayR": 2,
+     "replayR": 2.17,
      "replayR_be1": 0,
-     "cost": 0.076,
-     "dt": 22,
+     "cost": 0.08,
+     "dt": 142,
      "liveEntry": 0.69393,
      "liveRR": 2,
-     "replayRR": 2
-    },
-    {
-     "id": "audusd-scalp-1793911248",
-     "market": "audusd",
-     "setup": "scalp",
-     "side": "sell",
-     "opened": "2026-11-05T20:40:48.000Z",
-     "liveStatus": "loss",
-     "liveR": -1,
-     "liveExit": null,
-     "beMoved": false,
-     "replayR": 2,
-     "replayR_be1": 2,
-     "cost": 0.2,
-     "dt": -528,
-     "liveEntry": 0.69354,
-     "liveRR": 3.29,
-     "replayRR": 2
+     "replayRR": 2.17
     },
     {
      "id": "usdcad-scalp-1793969658",
@@ -426,13 +461,13 @@
      "liveR": -1,
      "liveExit": null,
      "beMoved": false,
-     "replayR": 1.48,
-     "replayR_be1": 1.48,
-     "cost": 0.082,
-     "dt": -138,
+     "replayR": 1.42,
+     "replayR_be1": 1.42,
+     "cost": 0.08,
+     "dt": -318,
      "liveEntry": 1.40721,
      "liveRR": 1.57,
-     "replayRR": 1.48
+     "replayRR": 1.42
     },
     {
      "id": "xau-scalp-1794316864",
@@ -446,11 +481,11 @@
      "beMoved": false,
      "replayR": -1,
      "replayR_be1": -1,
-     "cost": 0.046,
-     "dt": 56,
+     "cost": 0.038,
+     "dt": -124,
      "liveEntry": 4072.985,
      "liveRR": 2.29,
-     "replayRR": 2.57
+     "replayRR": 2
     },
     {
      "id": "usdcad-scalp-1794317055",
@@ -464,11 +499,29 @@
      "beMoved": false,
      "replayR": -1,
      "replayR_be1": -1,
-     "cost": 0.097,
-     "dt": -135,
+     "cost": 0.122,
+     "dt": -15,
      "liveEntry": 1.41376,
      "liveRR": 2.25,
-     "replayRR": 2
+     "replayRR": 2.77
+    },
+    {
+     "id": "xau-rscalp-1794443505",
+     "market": "xau",
+     "setup": "rscalp",
+     "side": "buy",
+     "opened": "2026-11-12T00:31:45.000Z",
+     "liveStatus": "win",
+     "liveR": 0.03,
+     "liveExit": null,
+     "beMoved": false,
+     "replayR": 0.13,
+     "replayR_be1": 0.13,
+     "cost": 0.024,
+     "dt": -165,
+     "liveEntry": 3982.235,
+     "liveRR": 0.03,
+     "replayRR": 0.13
     },
     {
      "id": "usdcad-rintra-1794479019",
@@ -483,50 +536,50 @@
      "replayR": -1,
      "replayR_be1": 0,
      "cost": 0.052,
-     "dt": 201,
+     "dt": 21,
      "liveEntry": 1.4247,
      "liveRR": 1.26,
      "replayRR": 1.26
     },
     {
-     "id": "usdcad-scalp-1794485725",
-     "market": "usdcad",
-     "setup": "scalp",
-     "side": "sell",
-     "opened": "2026-11-12T12:15:25.000Z",
+     "id": "gbpusd-rscalp-1794492192",
+     "market": "gbpusd",
+     "setup": "rscalp",
+     "side": "buy",
+     "opened": "2026-11-12T14:03:12.000Z",
      "liveStatus": "win",
-     "liveR": 2,
+     "liveR": 0.01,
      "liveExit": null,
      "beMoved": false,
-     "replayR": -1,
-     "replayR_be1": -1,
-     "cost": 0.132,
-     "dt": 95,
-     "liveEntry": 1.42457,
-     "liveRR": 2,
-     "replayRR": 2.04
+     "replayR": 0.25,
+     "replayR_be1": 0.25,
+     "cost": 0.078,
+     "dt": 348,
+     "liveEntry": 1.32664,
+     "liveRR": 0.01,
+     "replayRR": 0.25
     }
    ]
   }
  },
  "sameFeed": {
-  "live": 742,
+  "live": 750,
   "liveMatched": 530,
-  "liveInReplay": 0.714,
+  "liveInReplay": 0.707,
   "pairs": 530,
-  "d1Rate": 0.964,
-  "bothClosed": 438,
-  "signRate": 0.986,
-  "signRateNet": 0.979,
-  "meanLiveR": 0.137,
-  "meanReplayR": 0.116,
-  "meanReplayRNet": 0.008,
-  "gapGross": 0.021,
-  "gapNet": 0.129,
-  "sumLiveR": 60.18,
-  "sumReplayR": 50.96,
-  "sumReplayRNet": 3.62,
-  "feedDiffersPairs": 99,
+  "d1Rate": 0.962,
+  "bothClosed": 439,
+  "signRate": 0.984,
+  "signRateNet": 0.982,
+  "meanLiveR": 0.231,
+  "meanReplayR": 0.17,
+  "meanReplayRNet": 0.068,
+  "gapGross": 0.06,
+  "gapNet": 0.163,
+  "sumLiveR": 101.39,
+  "sumReplayR": 74.84,
+  "sumReplayRNet": 29.7,
+  "feedDiffersPairs": 104,
   "markets": [
    "audusd",
    "btc",
@@ -544,216 +597,216 @@
  "perSetup": {
   "rscalp": {
    "live": 327,
-   "liveMatched": 176,
-   "replay": 441,
-   "replayMatched": 176,
-   "liveRate": 0.538,
-   "replayRate": 0.399
+   "liveMatched": 174,
+   "replay": 472,
+   "replayMatched": 174,
+   "liveRate": 0.532,
+   "replayRate": 0.369
   },
   "scalp": {
    "live": 572,
    "liveMatched": 323,
-   "replay": 891,
+   "replay": 956,
    "replayMatched": 323,
    "liveRate": 0.565,
-   "replayRate": 0.363
+   "replayRate": 0.338
   },
   "intraday": {
    "live": 117,
-   "liveMatched": 59,
-   "replay": 226,
-   "replayMatched": 59,
-   "liveRate": 0.504,
-   "replayRate": 0.261
+   "liveMatched": 57,
+   "replay": 224,
+   "replayMatched": 57,
+   "liveRate": 0.487,
+   "replayRate": 0.254
   },
   "rintra": {
    "live": 66,
-   "liveMatched": 26,
-   "replay": 114,
-   "replayMatched": 26,
-   "liveRate": 0.394,
-   "replayRate": 0.228
+   "liveMatched": 25,
+   "replay": 121,
+   "replayMatched": 25,
+   "liveRate": 0.379,
+   "replayRate": 0.207
   },
   "position": {
-   "live": 45,
-   "liveMatched": 21,
-   "replay": 39,
-   "replayMatched": 21,
-   "liveRate": 0.467,
-   "replayRate": 0.538
+   "live": 47,
+   "liveMatched": 23,
+   "replay": 40,
+   "replayMatched": 23,
+   "liveRate": 0.489,
+   "replayRate": 0.575
   },
   "rswing": {
-   "live": 21,
+   "live": 22,
    "liveMatched": 11,
    "replay": 23,
    "replayMatched": 11,
-   "liveRate": 0.524,
+   "liveRate": 0.5,
    "replayRate": 0.478
   },
   "swing": {
-   "live": 28,
-   "liveMatched": 13,
-   "replay": 39,
-   "replayMatched": 13,
-   "liveRate": 0.464,
-   "replayRate": 0.333
+   "live": 33,
+   "liveMatched": 21,
+   "replay": 44,
+   "replayMatched": 21,
+   "liveRate": 0.636,
+   "replayRate": 0.477
   }
  },
  "perMarket": {
   "xau": {
    "live": 180,
-   "liveMatched": 59,
-   "replay": 167,
-   "replayMatched": 59,
-   "liveRate": 0.328,
-   "replayRate": 0.353,
+   "liveMatched": 63,
+   "replay": 179,
+   "replayMatched": 63,
+   "liveRate": 0.35,
+   "replayRate": 0.352,
    "replayFeed": "OANDA",
    "krakenCache": null,
    "liveFeeds": {
     "Kraken": 123,
     "OANDA": 57
    },
-   "pairs": 59,
-   "d1Rate": 0.661,
-   "bothClosed": 52,
-   "signRate": 0.962,
-   "signRateNet": 0.962,
-   "meanLiveR": 0.2,
-   "meanReplayR": -0.128,
-   "meanReplayRNet": -0.167,
-   "gapGross": 0.328,
-   "gapNet": 0.367,
-   "sumLiveR": 10.41,
-   "sumReplayR": -6.66,
-   "sumReplayRNet": -8.68,
+   "pairs": 63,
+   "d1Rate": 0.635,
+   "bothClosed": 50,
+   "signRate": 0.94,
+   "signRateNet": 0.94,
+   "meanLiveR": 0.138,
+   "meanReplayR": -0.203,
+   "meanReplayRNet": -0.241,
+   "gapGross": 0.341,
+   "gapNet": 0.38,
+   "sumLiveR": 6.91,
+   "sumReplayR": -10.13,
+   "sumReplayRNet": -12.07,
    "sameFeed": {
     "live": 57,
-    "liveMatched": 39,
-    "liveRate": 0.684,
-    "pairs": 39,
+    "liveMatched": 40,
+    "liveRate": 0.702,
+    "pairs": 40,
     "d1Rate": 1,
-    "bothClosed": 33,
-    "signRate": 0.97,
-    "signRateNet": 0.97,
-    "meanLiveR": -0.186,
-    "meanReplayR": -0.31,
-    "meanReplayRNet": -0.35,
-    "gapGross": 0.124,
-    "gapNet": 0.164,
-    "sumLiveR": -6.13,
-    "sumReplayR": -10.22,
-    "sumReplayRNet": -11.55
+    "bothClosed": 31,
+    "signRate": 0.935,
+    "signRateNet": 0.935,
+    "meanLiveR": -0.182,
+    "meanReplayR": -0.296,
+    "meanReplayRNet": -0.338,
+    "gapGross": 0.114,
+    "gapNet": 0.156,
+    "sumLiveR": -5.65,
+    "sumReplayR": -9.17,
+    "sumReplayRNet": -10.47
    }
   },
   "btc": {
-   "live": 82,
+   "live": 83,
    "liveMatched": 62,
-   "replay": 134,
+   "replay": 149,
    "replayMatched": 62,
-   "liveRate": 0.756,
-   "replayRate": 0.463,
+   "liveRate": 0.747,
+   "replayRate": 0.416,
    "replayFeed": "Kraken",
    "krakenCache": {
-    "from": "2026-10-23",
-    "need": "2026-10-24T01:07",
+    "from": "2026-10-24",
+    "need": "2026-10-25T01:54",
     "covers": true,
-    "calls": 15,
+    "calls": 16,
     "cached": 31,
     "fetched": 1
    },
    "liveFeeds": {
-    "Kraken": 82
+    "Kraken": 83
    },
    "pairs": 62,
    "d1Rate": 1,
-   "bothClosed": 50,
+   "bothClosed": 53,
    "signRate": 1,
    "signRateNet": 1,
-   "meanLiveR": 0.381,
-   "meanReplayR": 0.406,
-   "meanReplayRNet": 0.277,
-   "gapGross": -0.026,
-   "gapNet": 0.104,
-   "sumLiveR": 19.04,
-   "sumReplayR": 20.32,
-   "sumReplayRNet": 13.84,
+   "meanLiveR": 0.422,
+   "meanReplayR": 0.447,
+   "meanReplayRNet": 0.332,
+   "gapGross": -0.025,
+   "gapNet": 0.09,
+   "sumLiveR": 22.37,
+   "sumReplayR": 23.71,
+   "sumReplayRNet": 17.62,
    "sameFeed": {
-    "live": 82,
+    "live": 83,
     "liveMatched": 62,
-    "liveRate": 0.756,
+    "liveRate": 0.747,
     "pairs": 62,
     "d1Rate": 1,
-    "bothClosed": 50,
+    "bothClosed": 53,
     "signRate": 1,
     "signRateNet": 1,
-    "meanLiveR": 0.381,
-    "meanReplayR": 0.406,
-    "meanReplayRNet": 0.277,
-    "gapGross": -0.026,
-    "gapNet": 0.104,
-    "sumLiveR": 19.04,
-    "sumReplayR": 20.32,
-    "sumReplayRNet": 13.84
+    "meanLiveR": 0.422,
+    "meanReplayR": 0.447,
+    "meanReplayRNet": 0.332,
+    "gapGross": -0.025,
+    "gapNet": 0.09,
+    "sumLiveR": 22.37,
+    "sumReplayR": 23.71,
+    "sumReplayRNet": 17.62
    }
   },
   "eth": {
-   "live": 51,
-   "liveMatched": 44,
-   "replay": 113,
-   "replayMatched": 44,
-   "liveRate": 0.863,
-   "replayRate": 0.389,
+   "live": 54,
+   "liveMatched": 46,
+   "replay": 136,
+   "replayMatched": 46,
+   "liveRate": 0.852,
+   "replayRate": 0.338,
    "replayFeed": "Kraken",
    "krakenCache": {
-    "from": "2026-10-23",
-    "need": "2026-10-24T01:07",
+    "from": "2026-10-24",
+    "need": "2026-10-25T01:54",
     "covers": true,
     "calls": 5,
     "cached": 31,
     "fetched": 1
    },
    "liveFeeds": {
-    "Kraken": 51
+    "Kraken": 54
    },
-   "pairs": 44,
+   "pairs": 46,
    "d1Rate": 1,
-   "bothClosed": 41,
+   "bothClosed": 42,
    "signRate": 1,
    "signRateNet": 1,
-   "meanLiveR": 0.02,
-   "meanReplayR": 0.017,
-   "meanReplayRNet": -0.061,
-   "gapGross": 0.003,
-   "gapNet": 0.08,
-   "sumLiveR": 0.8,
-   "sumReplayR": 0.68,
-   "sumReplayRNet": -2.49,
+   "meanLiveR": 0.047,
+   "meanReplayR": 0.035,
+   "meanReplayRNet": -0.044,
+   "gapGross": 0.012,
+   "gapNet": 0.092,
+   "sumLiveR": 1.99,
+   "sumReplayR": 1.47,
+   "sumReplayRNet": -1.86,
    "sameFeed": {
-    "live": 51,
-    "liveMatched": 44,
-    "liveRate": 0.863,
-    "pairs": 44,
+    "live": 54,
+    "liveMatched": 46,
+    "liveRate": 0.852,
+    "pairs": 46,
     "d1Rate": 1,
-    "bothClosed": 41,
+    "bothClosed": 42,
     "signRate": 1,
     "signRateNet": 1,
-    "meanLiveR": 0.02,
-    "meanReplayR": 0.017,
-    "meanReplayRNet": -0.061,
-    "gapGross": 0.003,
-    "gapNet": 0.08,
-    "sumLiveR": 0.8,
-    "sumReplayR": 0.68,
-    "sumReplayRNet": -2.49
+    "meanLiveR": 0.047,
+    "meanReplayR": 0.035,
+    "meanReplayRNet": -0.044,
+    "gapGross": 0.012,
+    "gapNet": 0.092,
+    "sumLiveR": 1.99,
+    "sumReplayR": 1.47,
+    "sumReplayRNet": -1.86
    }
   },
   "audusd": {
    "live": 162,
    "liveMatched": 72,
-   "replay": 216,
+   "replay": 223,
    "replayMatched": 72,
    "liveRate": 0.444,
-   "replayRate": 0.333,
+   "replayRate": 0.323,
    "replayFeed": "OANDA",
    "krakenCache": null,
    "liveFeeds": {
@@ -761,189 +814,189 @@
     "OANDA": 73
    },
    "pairs": 72,
-   "d1Rate": 0.736,
-   "bothClosed": 59,
-   "signRate": 0.915,
-   "signRateNet": 0.915,
-   "meanLiveR": -0.305,
-   "meanReplayR": -0.168,
-   "meanReplayRNet": -0.315,
-   "gapGross": -0.137,
-   "gapNet": 0.01,
-   "sumLiveR": -18.02,
-   "sumReplayR": -9.94,
-   "sumReplayRNet": -18.58,
+   "d1Rate": 0.708,
+   "bothClosed": 58,
+   "signRate": 0.931,
+   "signRateNet": 0.931,
+   "meanLiveR": -0.22,
+   "meanReplayR": -0.199,
+   "meanReplayRNet": -0.337,
+   "gapGross": -0.021,
+   "gapNet": 0.117,
+   "sumLiveR": -12.77,
+   "sumReplayR": -11.57,
+   "sumReplayRNet": -19.57,
    "sameFeed": {
     "live": 73,
     "liveMatched": 45,
     "liveRate": 0.616,
     "pairs": 45,
-    "d1Rate": 0.822,
-    "bothClosed": 34,
+    "d1Rate": 0.778,
+    "bothClosed": 33,
     "signRate": 1,
     "signRateNet": 1,
-    "meanLiveR": -0.274,
-    "meanReplayR": -0.273,
-    "meanReplayRNet": -0.425,
-    "gapGross": -0.001,
-    "gapNet": 0.151,
-    "sumLiveR": -9.32,
-    "sumReplayR": -9.27,
-    "sumReplayRNet": -14.45
+    "meanLiveR": -0.218,
+    "meanReplayR": -0.213,
+    "meanReplayRNet": -0.359,
+    "gapGross": -0.005,
+    "gapNet": 0.141,
+    "sumLiveR": -7.2,
+    "sumReplayR": -7.04,
+    "sumReplayRNet": -11.84
    }
   },
   "usdchf": {
-   "live": 153,
-   "liveMatched": 61,
-   "replay": 197,
-   "replayMatched": 61,
-   "liveRate": 0.399,
-   "replayRate": 0.31,
+   "live": 155,
+   "liveMatched": 70,
+   "replay": 207,
+   "replayMatched": 70,
+   "liveRate": 0.452,
+   "replayRate": 0.338,
    "replayFeed": "OANDA",
    "krakenCache": null,
    "liveFeeds": {
     "Kraken": 75,
-    "OANDA": 78
+    "OANDA": 80
    },
-   "pairs": 61,
-   "d1Rate": 0.82,
-   "bothClosed": 48,
-   "signRate": 0.938,
-   "signRateNet": 0.938,
-   "meanLiveR": 0.351,
-   "meanReplayR": 0.276,
-   "meanReplayRNet": 0.135,
-   "gapGross": 0.075,
-   "gapNet": 0.216,
-   "sumLiveR": 16.85,
-   "sumReplayR": 13.25,
-   "sumReplayRNet": 6.46,
+   "pairs": 70,
+   "d1Rate": 0.843,
+   "bothClosed": 54,
+   "signRate": 0.889,
+   "signRateNet": 0.889,
+   "meanLiveR": 0.382,
+   "meanReplayR": 0.258,
+   "meanReplayRNet": 0.123,
+   "gapGross": 0.124,
+   "gapNet": 0.259,
+   "sumLiveR": 20.64,
+   "sumReplayR": 13.92,
+   "sumReplayRNet": 6.66,
    "sameFeed": {
-    "live": 78,
-    "liveMatched": 51,
-    "liveRate": 0.654,
-    "pairs": 51,
-    "d1Rate": 0.784,
-    "bothClosed": 42,
+    "live": 80,
+    "liveMatched": 54,
+    "liveRate": 0.675,
+    "pairs": 54,
+    "d1Rate": 0.815,
+    "bothClosed": 43,
     "signRate": 1,
     "signRateNet": 1,
-    "meanLiveR": 0.401,
-    "meanReplayR": 0.395,
-    "meanReplayRNet": 0.251,
-    "gapGross": 0.006,
-    "gapNet": 0.15,
-    "sumLiveR": 16.85,
-    "sumReplayR": 16.59,
-    "sumReplayRNet": 10.54
+    "meanLiveR": 0.479,
+    "meanReplayR": 0.448,
+    "meanReplayRNet": 0.308,
+    "gapGross": 0.031,
+    "gapNet": 0.17,
+    "sumLiveR": 20.58,
+    "sumReplayR": 19.26,
+    "sumReplayRNet": 13.26
    }
   },
   "gbpusd": {
-   "live": 131,
-   "liveMatched": 71,
-   "replay": 202,
-   "replayMatched": 71,
-   "liveRate": 0.542,
-   "replayRate": 0.351,
+   "live": 132,
+   "liveMatched": 72,
+   "replay": 210,
+   "replayMatched": 72,
+   "liveRate": 0.545,
+   "replayRate": 0.343,
    "replayFeed": "OANDA",
    "krakenCache": null,
    "liveFeeds": {
     "Kraken": 54,
-    "OANDA": 77
+    "OANDA": 78
    },
-   "pairs": 71,
+   "pairs": 72,
    "d1Rate": 1,
-   "bothClosed": 54,
-   "signRate": 1,
-   "signRateNet": 1,
-   "meanLiveR": -0.208,
-   "meanReplayR": -0.225,
-   "meanReplayRNet": -0.345,
-   "gapGross": 0.016,
-   "gapNet": 0.137,
-   "sumLiveR": -11.24,
-   "sumReplayR": -12.13,
-   "sumReplayRNet": -18.65,
+   "bothClosed": 56,
+   "signRate": 0.982,
+   "signRateNet": 0.982,
+   "meanLiveR": -0.144,
+   "meanReplayR": -0.148,
+   "meanReplayRNet": -0.273,
+   "gapGross": 0.004,
+   "gapNet": 0.129,
+   "sumLiveR": -8.04,
+   "sumReplayR": -8.28,
+   "sumReplayRNet": -15.28,
    "sameFeed": {
-    "live": 77,
-    "liveMatched": 57,
-    "liveRate": 0.74,
-    "pairs": 57,
+    "live": 78,
+    "liveMatched": 60,
+    "liveRate": 0.769,
+    "pairs": 60,
     "d1Rate": 1,
-    "bothClosed": 44,
-    "signRate": 1,
-    "signRateNet": 1,
-    "meanLiveR": -0.175,
-    "meanReplayR": -0.171,
-    "meanReplayRNet": -0.295,
-    "gapGross": -0.004,
-    "gapNet": 0.12,
-    "sumLiveR": -7.72,
-    "sumReplayR": -7.53,
-    "sumReplayRNet": -12.99
+    "bothClosed": 48,
+    "signRate": 0.979,
+    "signRateNet": 0.979,
+    "meanLiveR": -0.049,
+    "meanReplayR": -0.051,
+    "meanReplayRNet": -0.177,
+    "gapGross": 0.002,
+    "gapNet": 0.128,
+    "sumLiveR": -2.35,
+    "sumReplayR": -2.46,
+    "sumReplayRNet": -8.5
    }
   },
   "xrp": {
    "live": 122,
-   "liveMatched": 89,
-   "replay": 217,
-   "replayMatched": 89,
-   "liveRate": 0.73,
-   "replayRate": 0.41,
+   "liveMatched": 90,
+   "replay": 236,
+   "replayMatched": 90,
+   "liveRate": 0.738,
+   "replayRate": 0.381,
    "replayFeed": "Kraken",
    "krakenCache": {
-    "from": "2026-10-23",
-    "need": "2026-10-24T01:07",
+    "from": "2026-10-24",
+    "need": "2026-10-25T01:54",
     "covers": true,
-    "calls": 3,
+    "calls": 8,
     "cached": 31,
     "fetched": 1
    },
    "liveFeeds": {
     "Kraken": 122
    },
-   "pairs": 89,
+   "pairs": 90,
    "d1Rate": 1,
-   "bothClosed": 78,
+   "bothClosed": 79,
    "signRate": 0.987,
    "signRateNet": 0.987,
-   "meanLiveR": 0.566,
-   "meanReplayR": 0.584,
-   "meanReplayRNet": 0.507,
-   "gapGross": -0.017,
-   "gapNet": 0.059,
-   "sumLiveR": 44.18,
-   "sumReplayR": 45.52,
-   "sumReplayRNet": 39.58,
+   "meanLiveR": 0.707,
+   "meanReplayR": 0.487,
+   "meanReplayRNet": 0.417,
+   "gapGross": 0.22,
+   "gapNet": 0.29,
+   "sumLiveR": 55.86,
+   "sumReplayR": 38.51,
+   "sumReplayRNet": 32.97,
    "sameFeed": {
     "live": 122,
-    "liveMatched": 89,
-    "liveRate": 0.73,
-    "pairs": 89,
+    "liveMatched": 90,
+    "liveRate": 0.738,
+    "pairs": 90,
     "d1Rate": 1,
-    "bothClosed": 78,
+    "bothClosed": 79,
     "signRate": 0.987,
     "signRateNet": 0.987,
-    "meanLiveR": 0.566,
-    "meanReplayR": 0.584,
-    "meanReplayRNet": 0.507,
-    "gapGross": -0.017,
-    "gapNet": 0.059,
-    "sumLiveR": 44.18,
-    "sumReplayR": 45.52,
-    "sumReplayRNet": 39.58
+    "meanLiveR": 0.707,
+    "meanReplayR": 0.487,
+    "meanReplayRNet": 0.417,
+    "gapGross": 0.22,
+    "gapNet": 0.29,
+    "sumLiveR": 55.86,
+    "sumReplayR": 38.51,
+    "sumReplayRNet": 32.97
    }
   },
   "sol": {
    "live": 72,
-   "liveMatched": 54,
-   "replay": 150,
-   "replayMatched": 54,
-   "liveRate": 0.75,
-   "replayRate": 0.36,
+   "liveMatched": 53,
+   "replay": 157,
+   "replayMatched": 53,
+   "liveRate": 0.736,
+   "replayRate": 0.338,
    "replayFeed": "Kraken",
    "krakenCache": {
-    "from": "2026-10-23",
-    "need": "2026-10-24T01:07",
+    "from": "2026-10-24",
+    "need": "2026-10-25T01:54",
     "covers": true,
     "calls": 4,
     "cached": 31,
@@ -952,143 +1005,143 @@
    "liveFeeds": {
     "Kraken": 72
    },
-   "pairs": 54,
+   "pairs": 53,
    "d1Rate": 1,
-   "bothClosed": 42,
-   "signRate": 0.976,
-   "signRateNet": 0.976,
-   "meanLiveR": -0.221,
-   "meanReplayR": -0.22,
-   "meanReplayRNet": -0.294,
-   "gapGross": -0.001,
-   "gapNet": 0.073,
-   "sumLiveR": -9.28,
-   "sumReplayR": -9.24,
-   "sumReplayRNet": -12.36,
+   "bothClosed": 44,
+   "signRate": 0.977,
+   "signRateNet": 0.977,
+   "meanLiveR": -0.29,
+   "meanReplayR": -0.321,
+   "meanReplayRNet": -0.394,
+   "gapGross": 0.031,
+   "gapNet": 0.104,
+   "sumLiveR": -12.75,
+   "sumReplayR": -14.12,
+   "sumReplayRNet": -17.34,
    "sameFeed": {
     "live": 72,
-    "liveMatched": 54,
-    "liveRate": 0.75,
-    "pairs": 54,
+    "liveMatched": 53,
+    "liveRate": 0.736,
+    "pairs": 53,
     "d1Rate": 1,
-    "bothClosed": 42,
-    "signRate": 0.976,
-    "signRateNet": 0.976,
-    "meanLiveR": -0.221,
-    "meanReplayR": -0.22,
-    "meanReplayRNet": -0.294,
-    "gapGross": -0.001,
-    "gapNet": 0.073,
-    "sumLiveR": -9.28,
-    "sumReplayR": -9.24,
-    "sumReplayRNet": -12.36
+    "bothClosed": 44,
+    "signRate": 0.977,
+    "signRateNet": 0.977,
+    "meanLiveR": -0.29,
+    "meanReplayR": -0.321,
+    "meanReplayRNet": -0.394,
+    "gapGross": 0.031,
+    "gapNet": 0.104,
+    "sumLiveR": -12.75,
+    "sumReplayR": -14.12,
+    "sumReplayRNet": -17.34
    }
   },
   "eurusd": {
    "live": 105,
-   "liveMatched": 62,
-   "replay": 170,
-   "replayMatched": 62,
-   "liveRate": 0.59,
-   "replayRate": 0.365,
+   "liveMatched": 54,
+   "replay": 166,
+   "replayMatched": 54,
+   "liveRate": 0.514,
+   "replayRate": 0.325,
    "replayFeed": "OANDA",
    "krakenCache": null,
    "liveFeeds": {
     "Kraken": 46,
     "OANDA": 59
    },
-   "pairs": 62,
-   "d1Rate": 0.661,
-   "bothClosed": 49,
+   "pairs": 54,
+   "d1Rate": 0.648,
+   "bothClosed": 43,
    "signRate": 1,
    "signRateNet": 1,
-   "meanLiveR": 0.043,
-   "meanReplayR": 0.055,
-   "meanReplayRNet": -0.089,
-   "gapGross": -0.011,
-   "gapNet": 0.133,
-   "sumLiveR": 2.12,
-   "sumReplayR": 2.68,
-   "sumReplayRNet": -4.37,
+   "meanLiveR": 0.33,
+   "meanReplayR": 0.353,
+   "meanReplayRNet": 0.222,
+   "gapGross": -0.023,
+   "gapNet": 0.108,
+   "sumLiveR": 14.21,
+   "sumReplayR": 15.2,
+   "sumReplayRNet": 9.55,
    "sameFeed": {
     "live": 59,
-    "liveMatched": 41,
-    "liveRate": 0.695,
-    "pairs": 41,
+    "liveMatched": 35,
+    "liveRate": 0.593,
+    "pairs": 35,
     "d1Rate": 1,
-    "bothClosed": 35,
+    "bothClosed": 30,
     "signRate": 1,
     "signRateNet": 1,
-    "meanLiveR": 0.107,
-    "meanReplayR": 0.143,
-    "meanReplayRNet": -0.018,
-    "gapGross": -0.036,
-    "gapNet": 0.126,
-    "sumLiveR": 3.76,
-    "sumReplayR": 5.02,
-    "sumReplayRNet": -0.65
+    "meanLiveR": 0.392,
+    "meanReplayR": 0.427,
+    "meanReplayRNet": 0.277,
+    "gapGross": -0.035,
+    "gapNet": 0.115,
+    "sumLiveR": 11.76,
+    "sumReplayR": 12.8,
+    "sumReplayRNet": 8.3
    }
   },
   "usdcad": {
-   "live": 118,
-   "liveMatched": 55,
-   "replay": 207,
-   "replayMatched": 55,
-   "liveRate": 0.466,
-   "replayRate": 0.266,
+   "live": 119,
+   "liveMatched": 52,
+   "replay": 217,
+   "replayMatched": 52,
+   "liveRate": 0.437,
+   "replayRate": 0.24,
    "replayFeed": "OANDA",
    "krakenCache": null,
    "liveFeeds": {
     "Kraken": 47,
-    "OANDA": 71
+    "OANDA": 72
    },
-   "pairs": 55,
+   "pairs": 52,
    "d1Rate": 1,
-   "bothClosed": 46,
-   "signRate": 0.87,
-   "signRateNet": 0.804,
-   "meanLiveR": 0.08,
-   "meanReplayR": 0.038,
-   "meanReplayRNet": -0.089,
-   "gapGross": 0.042,
-   "gapNet": 0.168,
-   "sumLiveR": 3.67,
-   "sumReplayR": 1.75,
-   "sumReplayRNet": -4.07,
+   "bothClosed": 43,
+   "signRate": 0.884,
+   "signRateNet": 0.86,
+   "meanLiveR": 0.29,
+   "meanReplayR": 0.337,
+   "meanReplayRNet": 0.216,
+   "gapGross": -0.047,
+   "gapNet": 0.074,
+   "sumLiveR": 12.45,
+   "sumReplayR": 14.48,
+   "sumReplayRNet": 9.27,
    "sameFeed": {
-    "live": 71,
-    "liveMatched": 48,
-    "liveRate": 0.676,
-    "pairs": 48,
+    "live": 72,
+    "liveMatched": 45,
+    "liveRate": 0.625,
+    "pairs": 45,
     "d1Rate": 1,
-    "bothClosed": 39,
-    "signRate": 0.923,
-    "signRateNet": 0.846,
-    "meanLiveR": 0.205,
-    "meanReplayR": -0.023,
-    "meanReplayRNet": -0.15,
-    "gapGross": 0.228,
-    "gapNet": 0.355,
-    "sumLiveR": 8,
-    "sumReplayR": -0.91,
-    "sumReplayRNet": -5.85
+    "bothClosed": 36,
+    "signRate": 0.944,
+    "signRateNet": 0.917,
+    "meanLiveR": 0.466,
+    "meanReplayR": 0.33,
+    "meanReplayRNet": 0.21,
+    "gapGross": 0.136,
+    "gapNet": 0.256,
+    "sumLiveR": 16.78,
+    "sumReplayR": 11.88,
+    "sumReplayRNet": 7.56
    }
   }
  },
  "unmatchedLive": {
-  "n": 644,
+  "n": 651,
   "top": [
    {
     "k": "xau:m30m1",
-    "n": 86
+    "n": 90
    },
    {
     "k": "xau:scalp",
-    "n": 58
+    "n": 57
    },
    {
     "k": "audusd:scalp",
-    "n": 53
+    "n": 54
    },
    {
     "k": "usdchf:scalp",
@@ -1096,58 +1149,58 @@
    },
    {
     "k": "xau:rscalp",
-    "n": 41
+    "n": 39
    },
    {
     "k": "usdcad:scalp",
-    "n": 31
+    "n": 32
    },
    {
     "k": "gbpusd:scalp",
-    "n": 29
+    "n": 27
    },
    {
     "k": "usdchf:rscalp",
-    "n": 22
+    "n": 20
+   },
+   {
+    "k": "eurusd:rscalp",
+    "n": 20
    },
    {
     "k": "gbpusd:rscalp",
     "n": 19
    },
    {
-    "k": "eurusd:rscalp",
-    "n": 16
+    "k": "eurusd:scalp",
+    "n": 18
    },
    {
-    "k": "xrp:rscalp",
+    "k": "usdcad:rscalp",
     "n": 15
-   },
-   {
-    "k": "usdchf:intraday",
-    "n": 13
    }
   ],
   "reasons": [
    {
     "cls": "feed differs",
     "why": "replay saw no READY signal; replay on OANDA candles, live on Kraken",
-    "n": 259,
+    "n": 262,
     "bySetup": {
-     "rscalp": 83,
-     "intraday": 16,
-     "scalp": 143,
-     "rintra": 9,
+     "rscalp": 80,
+     "intraday": 18,
+     "scalp": 146,
+     "rintra": 10,
      "position": 5,
      "rswing": 2,
      "swing": 1
     },
     "byMarket": {
-     "xau": 86,
-     "audusd": 49,
-     "usdchf": 43,
-     "eurusd": 20,
-     "gbpusd": 30,
-     "usdcad": 31
+     "xau": 85,
+     "audusd": 51,
+     "usdchf": 44,
+     "eurusd": 22,
+     "gbpusd": 32,
+     "usdcad": 28
     },
     "examples": [
      {
@@ -1186,53 +1239,29 @@
    {
     "cls": "data feed",
     "why": "replay saw no READY signal (different candles or analysis state)",
-    "n": 163,
+    "n": 165,
     "bySetup": {
-     "rscalp": 40,
      "scalp": 62,
-     "rintra": 16,
+     "rscalp": 45,
+     "rintra": 19,
      "intraday": 20,
-     "position": 12,
-     "rswing": 5,
-     "swing": 8
+     "rswing": 4,
+     "position": 9,
+     "swing": 6
     },
     "byMarket": {
-     "btc": 15,
-     "eth": 6,
-     "xrp": 24,
-     "sol": 12,
-     "xau": 14,
-     "eurusd": 16,
-     "usdcad": 18,
-     "gbpusd": 20,
-     "usdchf": 18,
-     "audusd": 20
+     "eth": 4,
+     "btc": 14,
+     "xrp": 23,
+     "sol": 11,
+     "xau": 15,
+     "usdcad": 21,
+     "eurusd": 21,
+     "usdchf": 20,
+     "gbpusd": 14,
+     "audusd": 22
     },
     "examples": [
-     {
-      "market": "btc",
-      "setup": "rscalp",
-      "side": "buy",
-      "opened": "2026-11-01T20:59:08.000Z",
-      "status": "win",
-      "id": "btc-rscalp-1793566748",
-      "shadow": true,
-      "blockedBy": [
-       "minRR"
-      ]
-     },
-     {
-      "market": "btc",
-      "setup": "rscalp",
-      "side": "buy",
-      "opened": "2026-11-01T21:52:04.000Z",
-      "status": "loss",
-      "id": "btc-rscalp-1793569924",
-      "shadow": true,
-      "blockedBy": [
-       "minRR"
-      ]
-     },
      {
       "market": "eth",
       "setup": "scalp",
@@ -1242,15 +1271,39 @@
       "id": "eth-scalp-1793571636",
       "shadow": false,
       "blockedBy": []
+     },
+     {
+      "market": "btc",
+      "setup": "rscalp",
+      "side": "buy",
+      "opened": "2026-11-01T22:57:17.000Z",
+      "status": "win",
+      "id": "btc-rscalp-1793573837",
+      "shadow": true,
+      "blockedBy": [
+       "minRR"
+      ]
+     },
+     {
+      "market": "eth",
+      "setup": "rintra",
+      "side": "buy",
+      "opened": "2026-11-01T23:14:06.000Z",
+      "status": "win",
+      "id": "eth-rintra-1793574846",
+      "shadow": true,
+      "blockedBy": [
+       "minRR"
+      ]
      }
     ]
    },
    {
     "cls": "replay gap",
     "why": "setup not modelled in replay",
-    "n": 97,
+    "n": 101,
     "bySetup": {
-     "m30m1": 86,
+     "m30m1": 90,
      "replica": 2,
      "geg": 2,
      "gtl": 1,
@@ -1259,7 +1312,7 @@
      "mosha-bo": 1
     },
     "byMarket": {
-     "xau": 97
+     "xau": 101
     },
     "examples": [
      {
@@ -1301,53 +1354,29 @@
    {
     "cls": "data feed",
     "why": "replay fired the same signal 10-60 min apart (timing/candle-close drift)",
-    "n": 53,
+    "n": 51,
     "bySetup": {
-     "scalp": 17,
-     "rintra": 2,
-     "swing": 4,
-     "rscalp": 14,
-     "intraday": 12,
-     "position": 2,
-     "rswing": 2
+     "scalp": 16,
+     "rscalp": 16,
+     "intraday": 10,
+     "rintra": 1,
+     "swing": 2,
+     "position": 3,
+     "rswing": 3
     },
     "byMarket": {
      "xau": 7,
+     "audusd": 8,
+     "usdchf": 8,
+     "usdcad": 8,
+     "eth": 3,
      "xrp": 5,
-     "audusd": 10,
-     "usdchf": 15,
-     "usdcad": 6,
-     "btc": 1,
-     "eth": 1,
+     "eurusd": 7,
      "gbpusd": 2,
-     "eurusd": 5,
-     "sol": 1
+     "btc": 1,
+     "sol": 2
     },
     "examples": [
-     {
-      "market": "xau",
-      "setup": "scalp",
-      "side": "sell",
-      "opened": "2026-11-02T00:22:36.000Z",
-      "status": "loss",
-      "id": "xau-scalp-1793578956",
-      "shadow": true,
-      "blockedBy": [
-       "exposure"
-      ]
-     },
-     {
-      "market": "xrp",
-      "setup": "rintra",
-      "side": "buy",
-      "opened": "2026-11-02T00:27:55.000Z",
-      "status": "win",
-      "id": "xrp-rintra-1793579275",
-      "shadow": true,
-      "blockedBy": [
-       "exposure"
-      ]
-     },
      {
       "market": "xau",
       "setup": "scalp",
@@ -1359,27 +1388,55 @@
       "blockedBy": [
        "exposure"
       ]
+     },
+     {
+      "market": "audusd",
+      "setup": "scalp",
+      "side": "sell",
+      "opened": "2026-11-02T06:40:53.000Z",
+      "status": "win",
+      "id": "audusd-scalp-1793601653",
+      "shadow": true,
+      "blockedBy": [
+       "exposure",
+       "usd"
+      ]
+     },
+     {
+      "market": "usdchf",
+      "setup": "scalp",
+      "side": "sell",
+      "opened": "2026-11-02T13:43:11.000Z",
+      "status": "loss",
+      "id": "usdchf-scalp-1793626991",
+      "shadow": true,
+      "blockedBy": [
+       "paused",
+       "usd"
+      ]
      }
     ]
    },
    {
     "cls": "setup label",
     "why": "replay fired scalp instead (same side, ±10 min)",
-    "n": 16,
+    "n": 22,
     "bySetup": {
-     "intraday": 7,
+     "intraday": 8,
      "rscalp": 3,
      "rswing": 1,
-     "rintra": 2,
-     "position": 3
+     "position": 6,
+     "swing": 2,
+     "rintra": 2
     },
     "byMarket": {
-     "usdchf": 7,
-     "usdcad": 2,
-     "eurusd": 2,
+     "usdchf": 10,
+     "usdcad": 3,
+     "eurusd": 1,
      "audusd": 1,
-     "xau": 3,
-     "xrp": 1
+     "xrp": 2,
+     "gbpusd": 3,
+     "xau": 2
     },
     "examples": [
      {
@@ -1425,19 +1482,19 @@
    {
     "cls": "setup label",
     "why": "replay fired intraday instead (same side, ±10 min)",
-    "n": 15,
+    "n": 11,
     "bySetup": {
      "rscalp": 1,
-     "scalp": 10,
-     "position": 2,
-     "swing": 2
+     "scalp": 8,
+     "position": 1,
+     "swing": 1
     },
     "byMarket": {
      "xau": 1,
-     "audusd": 7,
-     "usdcad": 4,
-     "btc": 1,
-     "usdchf": 2
+     "audusd": 5,
+     "usdcad": 3,
+     "gbpusd": 1,
+     "btc": 1
     },
     "examples": [
      {
@@ -1484,18 +1541,16 @@
    {
     "cls": "setup label",
     "why": "replay fired sweep_h1 instead (same side, ±10 min)",
-    "n": 12,
+    "n": 10,
     "bySetup": {
      "scalp": 4,
-     "rintra": 6,
-     "rscalp": 2
+     "rintra": 6
     },
     "byMarket": {
      "sol": 3,
-     "xau": 3,
+     "xau": 2,
      "btc": 2,
      "usdcad": 1,
-     "xrp": 1,
      "audusd": 2
     },
     "examples": [
@@ -1536,19 +1591,42 @@
    {
     "cls": "data feed",
     "why": "replay silent on this market for ±6 h (replay feed gap / warm-up)",
-    "n": 9,
+    "n": 8,
     "bySetup": {
-     "scalp": 4,
      "rscalp": 4,
-     "intraday": 1
+     "scalp": 4
     },
     "byMarket": {
+     "btc": 2,
      "gbpusd": 4,
      "sol": 1,
-     "usdchf": 3,
      "xrp": 1
     },
     "examples": [
+     {
+      "market": "btc",
+      "setup": "rscalp",
+      "side": "buy",
+      "opened": "2026-11-01T20:59:08.000Z",
+      "status": "win",
+      "id": "btc-rscalp-1793566748",
+      "shadow": true,
+      "blockedBy": [
+       "minRR"
+      ]
+     },
+     {
+      "market": "btc",
+      "setup": "rscalp",
+      "side": "buy",
+      "opened": "2026-11-01T21:52:04.000Z",
+      "status": "loss",
+      "id": "btc-rscalp-1793569924",
+      "shadow": true,
+      "blockedBy": [
+       "minRR"
+      ]
+     },
      {
       "market": "gbpusd",
       "setup": "scalp",
@@ -1558,31 +1636,6 @@
       "id": "gbpusd-scalp-1793575800",
       "shadow": false,
       "blockedBy": []
-     },
-     {
-      "market": "gbpusd",
-      "setup": "scalp",
-      "side": "buy",
-      "opened": "2026-11-02T00:33:14.000Z",
-      "status": "loss",
-      "id": "gbpusd-scalp-1793579594",
-      "shadow": true,
-      "blockedBy": [
-       "usd"
-      ]
-     },
-     {
-      "market": "gbpusd",
-      "setup": "rscalp",
-      "side": "sell",
-      "opened": "2026-11-02T00:43:52.000Z",
-      "status": "win",
-      "id": "gbpusd-rscalp-1793580232",
-      "shadow": true,
-      "blockedBy": [
-       "minRR",
-       "exposure"
-      ]
      }
     ]
    },
@@ -1591,27 +1644,18 @@
     "why": "replay fired m15choch instead (same side, ±10 min)",
     "n": 6,
     "bySetup": {
-     "rintra": 3,
      "scalp": 1,
-     "rscalp": 2
+     "rscalp": 3,
+     "rintra": 2
     },
     "byMarket": {
-     "xau": 2,
      "sol": 1,
      "usdchf": 2,
-     "xrp": 1
+     "xau": 1,
+     "gbpusd": 1,
+     "btc": 1
     },
     "examples": [
-     {
-      "market": "xau",
-      "setup": "rintra",
-      "side": "buy",
-      "opened": "2026-11-01T23:08:49.000Z",
-      "status": "be",
-      "id": "xau-rintra-1793574529",
-      "shadow": false,
-      "blockedBy": []
-     },
      {
       "market": "sol",
       "setup": "scalp",
@@ -1635,6 +1679,19 @@
       "blockedBy": [
        "usd"
       ]
+     },
+     {
+      "market": "usdchf",
+      "setup": "rintra",
+      "side": "buy",
+      "opened": "2026-11-02T22:08:47.000Z",
+      "status": "missed",
+      "id": "usdchf-rintra-1793657327",
+      "shadow": true,
+      "blockedBy": [
+       "minRR",
+       "exposure"
+      ]
      }
     ]
    },
@@ -1643,27 +1700,17 @@
     "why": "replay fired rscalp instead (same side, ±10 min)",
     "n": 6,
     "bySetup": {
-     "rintra": 2,
-     "scalp": 3,
-     "intraday": 1
+     "scalp": 4,
+     "intraday": 1,
+     "rintra": 1
     },
     "byMarket": {
-     "btc": 1,
      "xau": 3,
      "gbpusd": 1,
+     "usdcad": 1,
      "usdchf": 1
     },
     "examples": [
-     {
-      "market": "btc",
-      "setup": "rintra",
-      "side": "buy",
-      "opened": "2026-11-01T23:40:36.000Z",
-      "status": "loss",
-      "id": "btc-rintra-1793576436",
-      "shadow": false,
-      "blockedBy": []
-     },
      {
       "market": "xau",
       "setup": "scalp",
@@ -1691,20 +1738,35 @@
        "session",
        "usd"
       ]
+     },
+     {
+      "market": "gbpusd",
+      "setup": "intraday",
+      "side": "sell",
+      "opened": "2026-11-04T05:02:35.000Z",
+      "status": "loss",
+      "id": "gbpusd-intraday-1793768555",
+      "shadow": true,
+      "blockedBy": [
+       "d1",
+       "focus"
+      ]
      }
     ]
    },
    {
     "cls": "setup label",
     "why": "replay fired sweep_m1 instead (same side, ±10 min)",
-    "n": 2,
+    "n": 4,
     "bySetup": {
      "rscalp": 1,
-     "scalp": 1
+     "scalp": 2,
+     "intraday": 1
     },
     "byMarket": {
      "xau": 1,
-     "usdcad": 1
+     "usdcad": 2,
+     "xrp": 1
     },
     "examples": [
      {
@@ -1730,6 +1792,19 @@
       "blockedBy": [
        "usd"
       ]
+     },
+     {
+      "market": "usdcad",
+      "setup": "scalp",
+      "side": "sell",
+      "opened": "2026-11-05T00:47:36.000Z",
+      "status": "loss",
+      "id": "usdcad-scalp-1793839656",
+      "shadow": true,
+      "blockedBy": [
+       "session",
+       "focus"
+      ]
      }
     ]
    },
@@ -1738,26 +1813,14 @@
     "why": "replay fired position instead (same side, ±10 min)",
     "n": 2,
     "bySetup": {
-     "scalp": 2
+     "scalp": 1,
+     "intraday": 1
     },
     "byMarket": {
-     "usdchf": 1,
-     "gbpusd": 1
+     "gbpusd": 1,
+     "sol": 1
     },
     "examples": [
-     {
-      "market": "usdchf",
-      "setup": "scalp",
-      "side": "buy",
-      "opened": "2026-11-03T12:31:53.000Z",
-      "status": "loss",
-      "id": "usdchf-scalp-1793709113",
-      "shadow": true,
-      "blockedBy": [
-       "d1",
-       "exposure"
-      ]
-     },
      {
       "market": "gbpusd",
       "setup": "scalp",
@@ -1770,44 +1833,16 @@
        "d1",
        "focus"
       ]
-     }
-    ]
-   },
-   {
-    "cls": "setup label",
-    "why": "replay fired rintra instead (same side, ±10 min)",
-    "n": 2,
-    "bySetup": {
-     "intraday": 1,
-     "scalp": 1
-    },
-    "byMarket": {
-     "gbpusd": 2
-    },
-    "examples": [
-     {
-      "market": "gbpusd",
-      "setup": "intraday",
-      "side": "sell",
-      "opened": "2026-11-04T15:16:33.000Z",
-      "status": "win",
-      "id": "gbpusd-intraday-1793805393",
-      "shadow": true,
-      "blockedBy": [
-       "d1",
-       "focus"
-      ]
      },
      {
-      "market": "gbpusd",
-      "setup": "scalp",
+      "market": "sol",
+      "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-05T21:08:34.000Z",
-      "status": "loss",
-      "id": "gbpusd-scalp-1793912914",
+      "opened": "2026-11-08T21:45:07.000Z",
+      "status": "missed",
+      "id": "sol-intraday-1794174307",
       "shadow": true,
       "blockedBy": [
-       "d1",
        "focus"
       ]
      }
@@ -1828,9 +1863,9 @@
       "market": "audusd",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-04T07:41:05.000Z",
+      "opened": "2026-11-04T08:07:38.000Z",
       "status": "win",
-      "id": "audusd-scalp-1793778065",
+      "id": "audusd-scalp-1793779658",
       "shadow": true,
       "blockedBy": [
        "d1",
@@ -1843,28 +1878,52 @@
    },
    {
     "cls": "setup label",
-    "why": "replay fired sweep_ext instead (same side, ±10 min)",
+    "why": "replay fired rintra instead (same side, ±10 min)",
     "n": 1,
     "bySetup": {
-     "rscalp": 1
+     "intraday": 1
     },
     "byMarket": {
-     "xau": 1
+     "gbpusd": 1
     },
     "examples": [
      {
-      "market": "xau",
-      "setup": "rscalp",
+      "market": "gbpusd",
+      "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-05T17:28:03.000Z",
-      "status": "missed",
-      "id": "xau-rscalp-1793899683",
+      "opened": "2026-11-04T15:16:33.000Z",
+      "status": "win",
+      "id": "gbpusd-intraday-1793805393",
+      "shadow": true,
+      "blockedBy": [
+       "d1",
+       "focus"
+      ]
+     }
+    ]
+   },
+   {
+    "cls": "live-only guard",
+    "why": "live skipped (market fill inside the minimum stop)",
+    "n": 1,
+    "bySetup": {
+     "rswing": 1
+    },
+    "byMarket": {
+     "eth": 1
+    },
+    "examples": [
+     {
+      "market": "eth",
+      "setup": "rswing",
+      "side": "buy",
+      "opened": "2026-11-23T22:38:04.000Z",
+      "status": "skipped",
+      "id": "eth-rswing-1795473484",
       "shadow": true,
       "blockedBy": [
        "minRR",
-       "rrBand",
-       "focus",
-       "replica"
+       "focus"
       ]
      }
     ]
@@ -1872,103 +1931,103 @@
   ]
  },
  "unmatchedReplay": {
-  "n": 1565,
+  "n": 1678,
   "top": [
    {
     "k": "usdcad:scalp",
-    "n": 85
+    "n": 90
    },
    {
     "k": "xrp:scalp",
-    "n": 75
-   },
-   {
-    "k": "usdchf:scalp",
-    "n": 62
+    "n": 88
    },
    {
     "k": "audusd:scalp",
-    "n": 58
+    "n": 67
    },
    {
-    "k": "xau:scalp",
-    "n": 56
+    "k": "usdchf:scalp",
+    "n": 65
    },
    {
     "k": "gbpusd:scalp",
-    "n": 55
+    "n": 61
+   },
+   {
+    "k": "xau:scalp",
+    "n": 60
    },
    {
     "k": "sol:scalp",
-    "n": 52
+    "n": 56
    },
    {
     "k": "eurusd:scalp",
-    "n": 50
+    "n": 56
    },
    {
     "k": "btc:scalp",
-    "n": 41
+    "n": 46
    },
    {
     "k": "eth:scalp",
-    "n": 34
-   },
-   {
-    "k": "audusd:rscalp",
-    "n": 34
+    "n": 44
    },
    {
     "k": "xrp:rscalp",
-    "n": 33
+    "n": 39
+   },
+   {
+    "k": "usdcad:rscalp",
+    "n": 35
    }
   ],
   "reasons": [
    {
     "cls": "live run gap",
     "why": "inside a >3 h stretch with no live run output (Actions cron gap)",
-    "n": 567,
+    "n": 626,
     "bySetup": {
-     "rscalp": 143,
-     "scalp": 288,
-     "rintra": 44,
-     "intraday": 81,
-     "rswing": 3,
+     "rscalp": 158,
+     "scalp": 327,
+     "rintra": 47,
+     "intraday": 84,
+     "rswing": 2,
      "swing": 4,
      "position": 4
     },
     "byMarket": {
-     "xau": 24,
-     "btc": 50,
-     "eth": 49,
-     "sol": 78,
-     "xrp": 88,
-     "eurusd": 48,
-     "gbpusd": 54,
-     "audusd": 60,
-     "usdcad": 49,
-     "usdchf": 67
+     "xau": 25,
+     "btc": 64,
+     "eth": 58,
+     "sol": 81,
+     "xrp": 103,
+     "eurusd": 53,
+     "gbpusd": 60,
+     "audusd": 61,
+     "usdcad": 51,
+     "usdchf": 70
     },
     "examples": [
      {
       "market": "xau",
       "setup": "rscalp",
       "side": "buy",
-      "opened": "2026-11-13T03:02:00.000Z",
+      "opened": "2026-11-13T03:04:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-16T12:42:00.000Z",
+      "opened": "2026-11-16T12:39:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "rscalp",
       "side": "buy",
-      "opened": "2026-11-17T21:42:00.000Z",
+      "opened": "2026-11-17T20:24:00.000Z",
       "status": "closed"
      }
     ]
@@ -1976,46 +2035,46 @@
    {
     "cls": "replay-only setup",
     "why": "setup not run live (replay-only research setup)",
-    "n": 421,
+    "n": 432,
     "bySetup": {
-     "m15choch": 142,
+     "m15choch": 153,
      "sweep_m1": 113,
      "sweep_vr": 49,
-     "sweep_ext": 46,
-     "sweep_h1": 71
+     "sweep_ext": 44,
+     "sweep_h1": 73
     },
     "byMarket": {
-     "xau": 39,
-     "btc": 56,
-     "eth": 35,
-     "sol": 43,
-     "xrp": 51,
-     "eurusd": 27,
-     "gbpusd": 43,
+     "xau": 44,
+     "btc": 61,
+     "eth": 32,
+     "sol": 44,
+     "xrp": 46,
+     "eurusd": 28,
+     "gbpusd": 42,
      "audusd": 60,
-     "usdcad": 34,
-     "usdchf": 33
+     "usdcad": 40,
+     "usdchf": 35
     },
     "examples": [
      {
       "market": "xau",
       "setup": "m15choch",
       "side": "buy",
-      "opened": "2026-11-01T23:17:00.000Z",
+      "opened": "2026-11-01T23:19:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "sweep_m1",
       "side": "sell",
-      "opened": "2026-11-02T19:37:00.000Z",
+      "opened": "2026-11-02T19:39:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "sweep_vr",
       "side": "sell",
-      "opened": "2026-11-02T19:37:00.000Z",
+      "opened": "2026-11-02T19:39:00.000Z",
       "status": "closed"
      }
     ]
@@ -2023,48 +2082,48 @@
    {
     "cls": "data feed",
     "why": "live saw no READY signal (different candles, D1 source or seen-state)",
-    "n": 278,
+    "n": 316,
     "bySetup": {
-     "intraday": 41,
-     "scalp": 139,
-     "rscalp": 64,
-     "rintra": 27,
-     "rswing": 2,
-     "position": 2,
-     "swing": 3
+     "intraday": 40,
+     "scalp": 155,
+     "rscalp": 84,
+     "rintra": 32,
+     "swing": 3,
+     "rswing": 1,
+     "position": 1
     },
     "byMarket": {
-     "xau": 17,
-     "btc": 19,
-     "eth": 18,
-     "sol": 15,
-     "xrp": 32,
-     "eurusd": 29,
-     "gbpusd": 43,
-     "audusd": 36,
-     "usdcad": 38,
-     "usdchf": 31
+     "xau": 21,
+     "btc": 21,
+     "eth": 24,
+     "sol": 19,
+     "xrp": 37,
+     "eurusd": 28,
+     "gbpusd": 45,
+     "audusd": 43,
+     "usdcad": 46,
+     "usdchf": 32
     },
     "examples": [
      {
       "market": "xau",
       "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-16T05:47:00.000Z",
+      "opened": "2026-11-16T05:49:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-16T15:12:00.000Z",
+      "opened": "2026-11-16T15:14:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-18T07:02:00.000Z",
+      "opened": "2026-11-18T05:09:00.000Z",
       "status": "closed"
      }
     ]
@@ -2072,22 +2131,22 @@
    {
     "cls": "feed differs",
     "why": "live saw no READY signal; replay on OANDA candles, live on Kraken",
-    "n": 122,
+    "n": 121,
     "bySetup": {
-     "scalp": 51,
-     "rscalp": 32,
-     "rintra": 10,
-     "swing": 7,
-     "intraday": 15,
-     "rswing": 5,
-     "position": 2
+     "scalp": 50,
+     "rscalp": 30,
+     "rintra": 12,
+     "swing": 8,
+     "intraday": 14,
+     "rswing": 4,
+     "position": 3
     },
     "byMarket": {
      "xau": 18,
-     "eurusd": 20,
+     "eurusd": 18,
      "gbpusd": 13,
-     "audusd": 24,
-     "usdcad": 33,
+     "audusd": 22,
+     "usdcad": 36,
      "usdchf": 14
     },
     "examples": [
@@ -2095,21 +2154,21 @@
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-03T04:37:00.000Z",
+      "opened": "2026-11-03T04:39:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-03T07:22:00.000Z",
+      "opened": "2026-11-03T07:19:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-03T08:47:00.000Z",
+      "opened": "2026-11-03T08:44:00.000Z",
       "status": "closed"
      }
     ]
@@ -2117,45 +2176,44 @@
    {
     "cls": "state cascade",
     "why": "live had the same setup+side still open (dedupe on a different earlier trade: state cascade)",
-    "n": 55,
+    "n": 56,
     "bySetup": {
-     "rscalp": 8,
-     "scalp": 35,
-     "swing": 6,
+     "rscalp": 6,
+     "scalp": 37,
      "position": 4,
-     "intraday": 2
+     "intraday": 4,
+     "swing": 5
     },
     "byMarket": {
-     "xau": 4,
-     "btc": 1,
-     "eth": 1,
-     "xrp": 2,
+     "xau": 5,
+     "eth": 3,
+     "xrp": 1,
      "eurusd": 2,
-     "gbpusd": 11,
-     "audusd": 8,
-     "usdcad": 23,
-     "usdchf": 3
+     "gbpusd": 10,
+     "audusd": 9,
+     "usdcad": 21,
+     "usdchf": 5
     },
     "examples": [
      {
       "market": "xau",
       "setup": "rscalp",
       "side": "sell",
-      "opened": "2026-11-04T12:07:00.000Z",
+      "opened": "2026-11-04T12:09:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-04T14:42:00.000Z",
+      "opened": "2026-11-04T14:44:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-04T13:42:00.000Z",
+      "opened": "2026-11-04T13:39:00.000Z",
       "status": "closed"
      }
     ]
@@ -2163,48 +2221,48 @@
    {
     "cls": "data feed",
     "why": "live fired the same signal 10-60 min apart (timing/candle-close drift)",
-    "n": 52,
+    "n": 47,
     "bySetup": {
-     "scalp": 19,
-     "intraday": 12,
-     "swing": 4,
-     "rintra": 2,
+     "scalp": 17,
+     "intraday": 10,
+     "position": 3,
      "rscalp": 11,
-     "rswing": 1,
-     "position": 3
+     "rswing": 3,
+     "swing": 2,
+     "rintra": 1
     },
     "byMarket": {
-     "xau": 7,
+     "xau": 5,
      "btc": 1,
-     "eth": 1,
+     "sol": 2,
      "xrp": 4,
-     "eurusd": 4,
+     "eurusd": 6,
      "gbpusd": 2,
-     "audusd": 13,
-     "usdcad": 5,
-     "usdchf": 13,
-     "sol": 2
+     "audusd": 10,
+     "usdcad": 7,
+     "usdchf": 7,
+     "eth": 3
     },
     "examples": [
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-02T01:02:00.000Z",
-      "status": "closed"
-     },
-     {
-      "market": "xau",
-      "setup": "scalp",
-      "side": "sell",
-      "opened": "2026-11-02T01:27:00.000Z",
+      "opened": "2026-11-02T01:29:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "intraday",
       "side": "buy",
-      "opened": "2026-11-05T03:12:00.000Z",
+      "opened": "2026-11-05T03:14:00.000Z",
+      "status": "closed"
+     },
+     {
+      "market": "xau",
+      "setup": "intraday",
+      "side": "buy",
+      "opened": "2026-11-05T16:24:00.000Z",
       "status": "closed"
      }
     ]
@@ -2212,35 +2270,35 @@
    {
     "cls": "setup label",
     "why": "live logged m30m1 instead (same side, ±10 min)",
-    "n": 30,
+    "n": 34,
     "bySetup": {
-     "scalp": 24,
-     "intraday": 4,
+     "scalp": 29,
+     "intraday": 3,
      "rscalp": 2
     },
     "byMarket": {
-     "xau": 30
+     "xau": 34
     },
     "examples": [
      {
       "market": "xau",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-04T15:57:00.000Z",
+      "opened": "2026-11-04T15:54:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "intraday",
       "side": "buy",
-      "opened": "2026-11-04T15:57:00.000Z",
+      "opened": "2026-11-04T15:54:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-17T06:22:00.000Z",
+      "opened": "2026-11-17T06:24:00.000Z",
       "status": "closed"
      }
     ]
@@ -2248,41 +2306,42 @@
    {
     "cls": "setup label",
     "why": "live logged scalp instead (same side, ±10 min)",
-    "n": 16,
+    "n": 15,
     "bySetup": {
-     "intraday": 7,
-     "rscalp": 3,
+     "intraday": 6,
+     "rscalp": 4,
      "rintra": 2,
      "rswing": 1,
-     "position": 3
+     "position": 2
     },
     "byMarket": {
-     "xau": 5,
+     "xau": 4,
      "gbpusd": 3,
      "audusd": 3,
      "usdcad": 3,
-     "usdchf": 2
+     "usdchf": 1,
+     "eth": 1
     },
     "examples": [
      {
       "market": "xau",
       "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-02T00:37:00.000Z",
+      "opened": "2026-11-02T00:34:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-02T08:22:00.000Z",
+      "opened": "2026-11-02T08:24:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "rscalp",
       "side": "buy",
-      "opened": "2026-11-03T04:12:00.000Z",
+      "opened": "2026-11-03T04:09:00.000Z",
       "status": "closed"
      }
     ]
@@ -2290,38 +2349,39 @@
    {
     "cls": "setup label",
     "why": "live logged position instead (same side, ±10 min)",
-    "n": 7,
+    "n": 11,
     "bySetup": {
-     "scalp": 4,
-     "intraday": 3
+     "scalp": 7,
+     "intraday": 4
     },
     "byMarket": {
      "xau": 2,
-     "sol": 1,
+     "sol": 2,
      "xrp": 1,
-     "usdchf": 1,
-     "eurusd": 2
+     "usdchf": 3,
+     "eurusd": 2,
+     "eth": 1
     },
     "examples": [
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-18T08:17:00.000Z",
+      "opened": "2026-11-18T08:14:00.000Z",
       "status": "closed"
      },
      {
       "market": "xau",
       "setup": "scalp",
       "side": "sell",
-      "opened": "2026-11-18T07:37:00.000Z",
+      "opened": "2026-11-18T07:39:00.000Z",
       "status": "closed"
      },
      {
       "market": "sol",
       "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-13T02:37:00.000Z",
+      "opened": "2026-11-13T02:39:00.000Z",
       "status": "closed"
      }
     ]
@@ -2329,16 +2389,18 @@
    {
     "cls": "setup label",
     "why": "live logged intraday instead (same side, ±10 min)",
-    "n": 7,
+    "n": 9,
     "bySetup": {
-     "swing": 2,
+     "swing": 1,
      "rscalp": 1,
      "rintra": 2,
-     "scalp": 2
+     "scalp": 4,
+     "rswing": 1
     },
     "byMarket": {
-     "eurusd": 2,
+     "eurusd": 1,
      "gbpusd": 3,
+     "audusd": 3,
      "usdchf": 2
     },
     "examples": [
@@ -2346,21 +2408,21 @@
       "market": "eurusd",
       "setup": "swing",
       "side": "buy",
-      "opened": "2026-11-04T12:32:00.000Z",
-      "status": "closed"
-     },
-     {
-      "market": "eurusd",
-      "setup": "swing",
-      "side": "buy",
-      "opened": "2026-11-04T10:22:00.000Z",
+      "opened": "2026-11-04T12:29:00.000Z",
       "status": "closed"
      },
      {
       "market": "gbpusd",
       "setup": "rscalp",
       "side": "sell",
-      "opened": "2026-11-04T05:07:00.000Z",
+      "opened": "2026-11-04T05:04:00.000Z",
+      "status": "closed"
+     },
+     {
+      "market": "gbpusd",
+      "setup": "rintra",
+      "side": "sell",
+      "opened": "2026-11-04T05:04:00.000Z",
       "status": "closed"
      }
     ]
@@ -2368,15 +2430,13 @@
    {
     "cls": "setup label",
     "why": "live logged rscalp instead (same side, ±10 min)",
-    "n": 5,
+    "n": 4,
     "bySetup": {
      "intraday": 1,
-     "rintra": 1,
      "scalp": 3
     },
     "byMarket": {
      "xau": 1,
-     "xrp": 1,
      "usdcad": 1,
      "usdchf": 2
     },
@@ -2385,21 +2445,21 @@
       "market": "xau",
       "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-02T19:22:00.000Z",
-      "status": "closed"
-     },
-     {
-      "market": "xrp",
-      "setup": "rintra",
-      "side": "buy",
-      "opened": "2026-11-06T14:42:00.000Z",
+      "opened": "2026-11-02T19:24:00.000Z",
       "status": "closed"
      },
      {
       "market": "usdcad",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-03T12:07:00.000Z",
+      "opened": "2026-11-03T12:09:00.000Z",
+      "status": "closed"
+     },
+     {
+      "market": "usdchf",
+      "setup": "scalp",
+      "side": "sell",
+      "opened": "2026-11-03T11:59:00.000Z",
       "status": "closed"
      }
     ]
@@ -2407,12 +2467,12 @@
    {
     "cls": "setup label",
     "why": "live logged rswing instead (same side, ±10 min)",
-    "n": 3,
+    "n": 4,
     "bySetup": {
-     "scalp": 3
+     "scalp": 4
     },
     "byMarket": {
-     "eurusd": 1,
+     "eurusd": 2,
      "gbpusd": 1,
      "btc": 1
     },
@@ -2421,21 +2481,49 @@
       "market": "eurusd",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-04T01:07:00.000Z",
+      "opened": "2026-11-04T01:14:00.000Z",
+      "status": "closed"
+     },
+     {
+      "market": "eurusd",
+      "setup": "scalp",
+      "side": "buy",
+      "opened": "2026-11-04T01:04:00.000Z",
       "status": "closed"
      },
      {
       "market": "gbpusd",
       "setup": "scalp",
       "side": "buy",
-      "opened": "2026-11-17T17:17:00.000Z",
+      "opened": "2026-11-17T17:19:00.000Z",
       "status": "closed"
+     }
+    ]
+   },
+   {
+    "cls": "setup label",
+    "why": "live logged rintra instead (same side, ±10 min)",
+    "n": 2,
+    "bySetup": {
+     "rscalp": 2
+    },
+    "byMarket": {
+     "xau": 1,
+     "usdchf": 1
+    },
+    "examples": [
+     {
+      "market": "xau",
+      "setup": "rscalp",
+      "side": "buy",
+      "opened": "2026-11-03T12:49:00.000Z",
+      "status": "unfilled"
      },
      {
-      "market": "btc",
-      "setup": "scalp",
+      "market": "usdchf",
+      "setup": "rscalp",
       "side": "buy",
-      "opened": "2026-11-22T09:52:00.000Z",
+      "opened": "2026-11-02T21:59:00.000Z",
       "status": "unfilled"
      }
     ]
@@ -2455,28 +2543,8 @@
       "market": "gbpusd",
       "setup": "intraday",
       "side": "sell",
-      "opened": "2026-11-17T13:32:00.000Z",
+      "opened": "2026-11-17T13:34:00.000Z",
       "status": "closed"
-     }
-    ]
-   },
-   {
-    "cls": "setup label",
-    "why": "live logged rintra instead (same side, ±10 min)",
-    "n": 1,
-    "bySetup": {
-     "rscalp": 1
-    },
-    "byMarket": {
-     "usdchf": 1
-    },
-    "examples": [
-     {
-      "market": "usdchf",
-      "setup": "rscalp",
-      "side": "buy",
-      "opened": "2026-11-02T22:02:00.000Z",
-      "status": "unfilled"
      }
     ]
    }
@@ -2612,6 +2680,21 @@
    "from": "2026-11-22T18:23:55.000Z",
    "to": "2026-11-23T12:45:07.000Z",
    "hours": 18.4
+  },
+  {
+   "from": "2026-11-23T15:57:37.000Z",
+   "to": "2026-11-23T22:38:04.000Z",
+   "hours": 6.7
+  },
+  {
+   "from": "2026-11-24T02:43:41.000Z",
+   "to": "2026-11-24T06:43:42.000Z",
+   "hours": 4
+  },
+  {
+   "from": "2026-11-24T06:43:42.000Z",
+   "to": "2026-11-24T12:03:25.000Z",
+   "hours": 5.3
   }
  ]
 }
