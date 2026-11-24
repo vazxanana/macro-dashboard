@@ -1006,6 +1006,30 @@
     "stopCheckedAt": "2026-11-24T21:31:08.000Z",
     "brokerStop": 1.31086,
     "closedAt": "2026-11-24T22:08:56.000Z"
+   },
+   "eqx:fade:nzdusd:fade-m15-b1795559400": {
+    "positionId": "51243433",
+    "symbol": "NZDUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-24T22:42:26.000Z",
+    "councilEntry": 0.54812,
+    "stop": 0.547844,
+    "t1": 0.548673,
+    "riskCash": 1.25,
+    "margin": 4.38,
+    "fillPrice": 0.54795,
+    "slipR": -0.616,
+    "lagSec": 746,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T22:42:26.000Z",
+    "brokerStop": 0.54767
    }
   },
   "day": {
@@ -1015,11 +1039,13 @@
    "lastBalance": 499.64,
    "ids": [],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 499.64 · 0 open",
-  "skipped": {},
+  "status": "ok · demo Fusion Markets · balance 499.64 · 1 open",
+  "skipped": {
+   "eqx:fade:eurjpy:fade-m15-s1795559400": "stop distance 0.049214 sits inside the broker spread 0.1 on EURJPY: no stop could be set"
+  },
   "wait": {
    "eqx:fade:audusd:fade-m15-b1795535100": {
     "why": "daily loss stop (95.0% down today)",
@@ -1048,19 +1074,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 499.64,
-  "lastRun": "2026-11-24T22:38:41.000Z"
+  "lastRun": "2026-11-24T22:42:26.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T12:59:53.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T13:02:02.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:09 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:11:46.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2540,6 +2556,16 @@
    "at": "2026-11-24T22:08:56.000Z",
    "msg": "GBPUSD position 51239602 closed at the broker",
    "trade": "eqx:fade:gbpusd:fade-m15-b1795554900"
+  },
+  {
+   "at": "2026-11-24T22:42:26.000Z",
+   "msg": "not mirrored eqx:fade:eurjpy:fade-m15-s1795559400: stop distance 0.049214 sits inside the broker spread 0.1 on EURJPY: no stop could be set",
+   "trade": "eqx:fade:eurjpy:fade-m15-s1795559400"
+  },
+  {
+   "at": "2026-11-24T22:42:26.000Z",
+   "msg": "opened buy NZDUSD 0.04 lot (council eqx-fade)",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795559400"
   }
  ],
  "limits": {
@@ -2632,15 +2658,19 @@
   ]
  },
  "execution": {
-  "n": 2,
-  "meanSlipR": 0.432,
-  "medianSlipR": 0.432,
+  "n": 3,
+  "meanSlipR": 0.083,
+  "medianSlipR": 0.33,
   "worstSlipR": 0.534,
-  "medianLagSec": 24,
+  "medianLagSec": 25,
   "bySymbol": {
    "GBPUSD": {
     "n": 2,
     "meanSlipR": 0.432
+   },
+   "NZDUSD": {
+    "n": 1,
+    "meanSlipR": -0.616
    }
   }
  }
