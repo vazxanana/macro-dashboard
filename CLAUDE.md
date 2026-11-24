@@ -6894,3 +6894,11 @@ By market with the discovery-chosen target: only EUR/USD is above zero (+0.138R,
 winners run far (the before-cost R grows from +0.19R to +0.33R as the target goes), but a 5 % win rate at −0.107R is not a rule
 to trade. The desk keeps 50 %. **This closes the target question on these trades** (three studies).
 Test: `tests/bigfade-target-sweep.test.mjs`.
+
+## Big-candle fade with a target nearer than 50 % (24 Nov 2026, owner: "Check if less 50 %")
+`research/edge/bigfade-target-short/` (PREREGISTRATION.md pushed alone first; targets 45, 40, 35, 30, 25, 20, 10 % of the candle
+beside the desk's 50 %, chosen on 2005-14, judged on 2015-26; a target the fill has already passed closes at the fill). **FAIL**:
+50 % is the best of the eight in both windows and every nearer target loses more after costs in 2015-26: 45 % −0.260R, 40 %
+−0.283R, 30 % −0.378R, 20 % −0.549R, 10 % −0.640R (50 %: −0.246R). Winners rise to 46 % at the 25 % target but the wins shrink
+against the same cost; under 25 % the rule loses before costs too. With `bigfade-target-sweep` the whole curve is known: it
+rises with the distance from 10 % to no target and never crosses zero after costs on 2015-26. Test: `tests/bigfade-target-short.test.mjs`.
