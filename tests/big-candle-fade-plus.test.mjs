@@ -30,7 +30,7 @@ test('the rules take the pre-registered rows, variants and exits', () => {
     row({ ...base, h: 10 }, { 'mkt|0.1': [0, 9, 0, 0.2], 'conf|0.5': [0, 0, -1, 0.1] }),
     row({ ...base, rel: 0.4 }, { 'mkt|0.1': [0, 9, 0, 0.2], 'conf|0.5': [0, 0, 9, 0.1] }),
     row({ ...base, conf: 0, wick: 0.1 }, { 'mkt|0.1': [0, -1, 0, 0.2] })];
-  assert.deepEqual(tradesOf(list, RULES.A).map((x) => x.R), [2]);
+  assert.deepEqual(tradesOf(list, RULES.A).map((x) => x.R), [2, -1]);
   assert.deepEqual(tradesOf(list, RULES.B).map((x) => x.R), [2, -1]);
   const s = stats(tradesOf(list, RULES.B)); assert.equal(s.n, 2); assert.ok(Math.abs(s.net - (0.5 - 0.1)) < 1e-9);
   const j = judge([{ market: 'x', rows: list }]); assert.equal(j.length, 2); assert.ok(j.every((r) => r.pass === false));
