@@ -2608,6 +2608,17 @@ reads it. Not advice, not a tested edge (the page and the system text say so).
   and "The facts sent" in a fold. Hidden and not run for guests. `window.msStructAssistant()` is a read-only view.
 - Tests: `tests/structure-assistant.test.mjs` (7). Not checked against a real provider (no key in the build sandbox).
 
+## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
+Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
+right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to
+`THEMES`, `window.msTvView`) opens every chart at about 8 px a candle (width / 8, at least 50 and at most 220 candles in view, a
+tenth of that as room on the right): the six panes (`P.fit`), the free chart and Markets side by side. `tvLook(t, theme)` = one solid
+background, a faint grid (`TV_GRID` per theme), dashed crosshair with dark labels, the scales' borders, kinetic scrolling, scale by
+dragging either axis; applied by `applyTheme`, `spTheme`, `mmTheme` (a member's own background still wins). Style → "Green / red
+candles" (`#ms-sty-tv`) sets the member's up / down colours to the dark themes' green / red; the owner's grey / black light-theme
+default (#686) is unchanged. Toolbar from 1024 px: one row, the key hints left to Help (the keys work), Indicators beside the
+markets switch (last rules of `#ms-ch-flat-css`). Panning measured 60 fps (p95 16.8 ms) on the panes. Test: `tests/charts-tv-look.test.mjs`.
+
 ## Charts bug hunt (20 Nov 2026: the chart features of 18-20 Nov, used in a browser)
 Every drawing tool, the paper account, the volume profile, Layout, Markets side by side, Split, any timeframe, full screen and the
 live ticks were driven with Playwright (1440 px mouse, 390 px touch; owner and guest; live candles). Twelve defects, each

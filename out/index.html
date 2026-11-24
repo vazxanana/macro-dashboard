@@ -5787,6 +5787,13 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
 #v-charts .kbd-hint kbd { font-size: 11.5px; }
 #v-charts .ch-cd { font-size: 11.5px; height: 17px; }
 @media (max-width: 700px) { #v-charts .ch-lg { font-size: 11.5px; } }
+/* A trading-terminal toolbar (24 Nov 2026, owner: "make the interface look more TradingView"): from 1024 px one row, the keyboard
+   hints left to Help (the keys still work), a quieter title, Indicators on the first row beside Style. Display only. */
+@media (min-width: 1024px) {
+  #v-charts .sec-h h2 .kbd-hint { display: none !important; }
+  #v-charts .sec-h > h2 { font-size: 18px; letter-spacing: -.01em; margin-right: 4px; }
+  #v-charts .sec-h > .ind-open.ind-open { order: 3; margin-left: 8px; }
+}
 </style>
 <style id="ms-phase-css">/* Market phase panel on the Charts (23 Nov 2026, assets/ms-phase.js): the phase reader per timeframe, closed candles only. Display only; tokens only; 12 px minimum, 44 px on touch; never for guests. */
   .mph { margin: 0 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); color: var(--au-ink-1, var(--ink)); font: 400 13px/1.45 var(--sans); }
@@ -6713,7 +6720,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Up candles <input type="color" id="ms-sty-up" value="#089981"></label>
         <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
-        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button></div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
         <div class="sty-h">Live price</div>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
@@ -7910,6 +7917,19 @@ function msNextSetup(bars, A) {
   const auChart = (k) => { try { const cs = getComputedStyle(document.documentElement), v = (n) => cs.getPropertyValue(n).trim(), bg = v('--au-surface'), tx = v('--au-ink-3'), ln = v('--au-line');
     if (bg && tx && ln && THEMES[k]) Object.assign(THEMES[k], { bg, bgTop: bg, text: tx, grid: ln, border: ln }); } catch (e) {} };
   const UPC = '#089981', DNC = '#f23645';
+  // a trading-terminal look (24 Nov 2026, owner: "make the interface look more like TradingView", "the candles should display the
+  // amount I need"): one solid background, a faint grid, dashed crosshair with dark labels, the scales' borders, smooth scrolling,
+  // and every chart opening at a readable candle width (about 8 px a candle, at least 50 and at most 220 candles in view, a few
+  // candles of room on the right) instead of all its candles squeezed into the width. Display only.
+  const TV_GRID = { light: '#f0f3fa', dark: 'rgba(255,255,255,0.045)', midnight: 'rgba(255,255,255,0.05)', pro: 'rgba(255,255,255,0.045)' };
+  const tvLook = (t, k) => ({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text, fontSize: 12 },
+    grid: { vertLines: { visible: true, color: TV_GRID[k] || TV_GRID.dark }, horzLines: { visible: true, color: TV_GRID[k] || TV_GRID.dark } },
+    crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: '#9598a1', width: 1, style: LW.LineStyle.LargeDashed, labelBackgroundColor: '#131722' }, horzLine: { color: '#9598a1', width: 1, style: LW.LineStyle.LargeDashed, labelBackgroundColor: '#131722' } },
+    rightPriceScale: { borderVisible: true, borderColor: t.border }, timeScale: { borderVisible: true, borderColor: t.border, rightOffset: 8, minBarSpacing: 0.5 },
+    kineticScroll: { mouse: true, touch: true }, handleScale: { axisPressedMouseMove: { time: true, price: true }, mouseWheel: true, pinch: true } });
+  const tvView = (chart, n) => { if (!chart || !(n > 0)) return; try { const w = chart.timeScale().width() || 600, k = Math.max(50, Math.min(220, Math.round(w / 8)));
+    chart.timeScale().setVisibleLogicalRange({ from: Math.max(-2, n - k), to: n + Math.max(6, Math.round(k * 0.1)) }); } catch (e) {} };
+  window.msTvView = tvView;
   // chart colours chosen by the member (12 Nov 2026, owner: "let me choose colour background and candle"; Style → Colours):
   // localStorage ms-colors { bg, up, dn, ln }; a missing key keeps the theme's own colour
   let CUS = {}; try { CUS = JSON.parse(localStorage.getItem('ms-colors') || '{}') || {}; } catch (e) { CUS = {}; }
@@ -8793,7 +8813,7 @@ function msNextSetup(bars, A) {
     };
     P.fit = function () {
       if (!P.bars || el.clientWidth === 0) return;
-      chart.timeScale().setVisibleLogicalRange({ from: Math.max(0, P.bars.length - 150), to: P.bars.length + 30 });
+      tvView(chart, P.bars.length);   // a readable candle width (24 Nov 2026), not every candle squeezed in
       P.fitted = true;
     };
     // ICT markup (7 Nov, owner: "don't mix the council with the ICT" — a header switch picks Meridian or ICT): fair value gaps
@@ -9237,6 +9257,7 @@ function msNextSetup(bars, A) {
     const save = () => { try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} applyTheme(); };
     [['ms-sty-bg', 'bg'], ['ms-sty-up', 'up'], ['ms-sty-dn', 'dn'], ['ms-sty-ln', 'ln']].forEach(([id, k]) => $(id).addEventListener('input', (e) => { CUS[k] = e.target.value; save(); }));
     $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
+    $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     btn.addEventListener('click', fill); fill();
     // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on
     // 13 Nov 2026, owner: "make the charts more cleaner", then "too much labels just keep bo vr and cf": the clean look keeps the
@@ -9828,7 +9849,7 @@ function msNextSetup(bars, A) {
     document.documentElement.dataset.theme = G.theme; auChart(G.theme);
     const t = THEMES[G.theme];
     Object.values(panes).forEach((p) => {
-      p.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
+      p.chart.applyOptions(tvLook(t, G.theme));
       p.overlay.set(p.overlay.items);
     });
     if (hexOk(CUS.bg)) { const txt = lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2';
@@ -10178,7 +10199,7 @@ function msNextSetup(bars, A) {
   function spControls() { const lt = document.getElementById('ms-sp-ltf'), rt = document.getElementById('ms-sp-rtf'), sy = document.getElementById('ms-sp-sym');
     lt.value = SP.ltf; rt.value = spTf(); rt.disabled = SP.sync.tf; sy.value = spSym(); sy.disabled = SP.sync.sym; }
   function spTheme() { if (!SP.chart) return; const t = THEMES[G.theme] || THEMES.dark;
-    SP.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text }, rightPriceScale: { borderVisible: false }, timeScale: { borderVisible: false } });
+    SP.chart.applyOptions(tvLook(t, G.theme)); if (hexOk(CUS.bg)) SP.chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lumOf(CUS.bg) > 0.35 ? '#3b4252' : '#a7b0c2' } });
     if (SP.series) SP.series.applyOptions(candleCols()); if (SP.ov) SP.ov.set(SP.ov.items); if (SP.ly) SP.ly.setVol(); }   // repaint the markups (and volume) in the new theme's colours
   window.msSplitTheme = spTheme; window.msSplitMarkup = () => { try { if (SP.on && !spPane()) spMarkup(); } catch (e) {} };
   window.msSplitLayers = () => { try { if (SP.on && !spPane() && SP.ly) SP.ly.setAll(); } catch (e) {} };
@@ -10236,7 +10257,7 @@ function msNextSetup(bars, A) {
       SP.bars = SP.raw.map((b) => ({ time: b.time + TZ, open: b.open + off, high: b.high + off, low: b.low + off, close: b.close + off, volume: b.volume }));   // the volume too: the volume profile and the anchored VWAP read these candles (20 Nov 2026)
       SP.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } });
       SP.series.setData(SP.bars); document.getElementById('ms-sp-src').textContent = r.src || ''; spMarkup();
-      if (!SP.solo && (SP.sync.range || SP.sync.time)) spFromLeft(); else SP.chart.timeScale().fitContent();
+      if (!SP.solo && (SP.sync.range || SP.sync.time)) spFromLeft(); else tvView(SP.chart, SP.bars.length);   // readable candles on every timeframe, seconds too (24 Nov 2026)
     } catch (e) { document.getElementById('ms-sp-src').textContent = 'no data'; }
   }
   const leftP = () => panes[SP.ltf];
@@ -10291,14 +10312,14 @@ function msNextSetup(bars, A) {
       cell.querySelector('.mm-tf').addEventListener('change', (e) => { MM.cells[i].tf = e.target.value; mmSave(); mmLoad(C); });
       if (window.msCharts) window.msCharts.add({ id: 'mm' + i, el, chart, series, bars: () => C.bars, sec: () => (SPTFS.find((t) => t.id === MM.cells[i].tf) || TFS[2]).sec, market: () => MM.cells[i].k, TZ, dec: () => (INSTRUMENTS[MM.cells[i].k] || INST).dec ?? 2, fmt: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST), visible: () => MM.on && i < MM.n && !!el.offsetParent }); }
     MM.built = true; mmTheme(); }
-  function mmTheme() { if (!MM.built) return; const t = THEMES[G.theme] || THEMES.dark; MM.ch.forEach((C) => { C.chart.applyOptions({ layout: { background: { type: 'gradient', topColor: t.bgTop || t.bg, bottomColor: t.bg }, textColor: t.text } }); C.series.applyOptions(candleCols()); }); }
+  function mmTheme() { if (!MM.built) return; const t = THEMES[G.theme] || THEMES.dark; MM.ch.forEach((C) => { C.chart.applyOptions(tvLook(t, G.theme)); C.series.applyOptions(candleCols()); }); }
   { const f0 = window.msSplitTheme; window.msSplitTheme = () => { try { if (f0) f0(); } finally { mmTheme(); } }; }
   function mmLay() { if (!MM.built) return; MM.host.dataset.n = MM.n; MM.host.querySelectorAll('[data-mmn]').forEach((b) => { const on = +b.dataset.mmn === MM.n; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); });
     MM.ch.forEach((C) => { C.cell.hidden = C.i >= MM.n; if (C.i < MM.n) { const c = MM.cells[C.i]; C.cell.querySelector('.mm-k').innerHTML = mmOpts(c.k); C.cell.querySelector('.mm-tf').innerHTML = mmTfOpts(c.tf); if (C.key !== c.k + '|' + c.tf) mmLoad(C); } }); }
   async function mmLoad(C) { const c = MM.cells[C.i], I = INSTRUMENTS[c.k], T = SPTFS.find((t) => t.id === c.tf), key = c.k + '|' + c.tf; if (!I || !T) return; C.key = key; C.bars = []; C.series.setData([]); C.vol.setData([]); C.cell.querySelector('.mm-src').textContent = 'loading…';
     C.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } }); C.chart.timeScale().applyOptions({ secondsVisible: T.sec < 60 });
     try { const r = await spFetch(T, I, 500); if (C.key !== key) return; if (!r || !r.bars || !r.bars.length) { C.cell.querySelector('.mm-src').textContent = 'no data for this timeframe'; return; }
-      mmSet(C, r.bars, true); C.cell.querySelector('.mm-src').textContent = r.src || ''; requestAnimationFrame(() => { try { const n = C.bars.length, w = C.chart.timeScale().width() || 600, k = Math.min(n, Math.max(60, Math.round(w / 7))); C.chart.timeScale().setVisibleLogicalRange({ from: n - k, to: n + 4 }); } catch (e) {} }); } catch (e) { if (C.key === key) C.cell.querySelector('.mm-src').textContent = 'no data'; } }
+      mmSet(C, r.bars, true); C.cell.querySelector('.mm-src').textContent = r.src || ''; requestAnimationFrame(() => tvView(C.chart, C.bars.length)); } catch (e) { if (C.key === key) C.cell.querySelector('.mm-src').textContent = 'no data'; } }
   function mmSet(C, raw, all) { const bars = raw.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 })); const vols = raw.map((b, i) => ({ time: b.time + TZ, value: +b.volume || 0, color: +b.close >= +b.open ? 'rgba(8,153,129,.35)' : 'rgba(242,54,69,.35)' }));
     if (all) { C.bars = bars; C.series.setData(bars); C.vol.setData(vols); }
     else bars.forEach((x, j) => { const L = C.bars[C.bars.length - 1]; if (L && x.time < L.time) return; if (L && x.time === L.time) C.bars[C.bars.length - 1] = x; else C.bars.push(x); try { C.series.update(x); C.vol.update(vols[j]); } catch (e) {} });
