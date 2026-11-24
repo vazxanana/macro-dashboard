@@ -6927,3 +6927,14 @@ the page theme; `cusLook(chart)` gives a chart with its own background its ink, 
 Markets side by side). `assets/soft.css`: the dark themes' faint ink `--au-ink-3` is #A4A9B1 (the see-through surfaces are lighter
 than the solid ones #8E939B was chosen for: the Academy audit's AA checks failed), light keeps #5B616A, nothing under
 `prefers-contrast: more`; table header cells read `--au-ink-2`.
+
+## Big-candle fade, only the trades whose cost is small against their risk (24 Nov 2026, owner: "there must be a way to improve the fade of m15")
+`research/edge/bigfade-cost-ratio/` (PREREGISTRATION.md pushed alone first; `bigfade-target-65` `trade()`, gate reproduced). The
+desk's own trades, kept only when the round-trip cost is at most 10 % of the risk (both known at the entry). **FAIL**: 1,794 of
+54,443 trades are kept in 2015-26 and they make +0.033R before costs, −0.041R after (month t −1.37); 2005-14 −0.040R (n 3,214).
+**The finding that closes the fade: its before-cost R lives in the tight-stop trades.** The dropped trades make +0.198R before
+costs and pay 0.45R; the trades with room for the cost make about +0.03R before it. So the "+0.19R before costs" is not an edge
+waiting for a cheaper broker: it is the arithmetic of a stop a few pips from the entry. Context only: no threshold (5-30 %) is
+positive after costs in both windows; gold alone +0.143R on 298 kept trades (t 1.47, not significant, picked after looking).
+Six studies of these trades (target x4, entry timing, cost ratio): do not test another variant on these years. The desk stays a
+paper record. Test: `tests/bigfade-cost-ratio.test.mjs`.
