@@ -67,3 +67,16 @@ It converts server time to New York time itself (US daylight-saving rules includ
 needed. Expectation: +0.28R a trade in 2023–26 on the cash index, +0.02R in 2018–22; the CFD's spread at the open
 is the main unknown, so compare the first fills against the council's research records (`research.json`, session
 `nyflip`) and tell me the spread you see.
+
+# BreakFade.mq5 — the Equinox Break fade on M15 (24 Nov 2026)
+
+The same rule as `ctrader/BreakFade.cs`, for MetaTrader 5, on the broker's own 15-minute candles: a close beyond the last swing
+(3 candles each side) is faded at market when the candle closes; stop 1 x ATR(14) from the fill, target 2R, closed after 24 hours.
+**Demo accounts only; it starts in dry run. The rule loses after costs in its study (-0.118R a trade, 2015-26): not an edge.**
+
+**Setup**
+1. MetaEditor -> open `BreakFade.mq5` in `MQL5/Experts` -> Compile.
+2. Attach it to any one chart, allow Algo Trading. Inputs: the symbol list (your broker's names), risk % a trade (default 0.25),
+   caps, trading hours in UTC, the spread limit, dry run.
+3. Leave dry run on first and read the Experts log; switch it off to trade the demo account.
+4. Use a hedging account (on a netting account, overlapping trades of one symbol merge). The terminal must stay running.

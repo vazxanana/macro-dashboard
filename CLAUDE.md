@@ -6984,3 +6984,5 @@ run by default; a position without a stop is closed. Parameters: symbols, risk %
 spread limit. `BreakAt` walks the last 600 closed candles; compared with the study's `breaks()` on 5,300 seeded candles (0
 mismatches) before it was written in C#. Not compiled (no cTrader in the sandbox). **The rule loses after costs (-0.118R a
 trade 2015-26): a demo tool, never an edge.**
+**MetaTrader 5 too** (same day, owner: "send orders to mt5 accounts as well"): `mt5/BreakFade.mq5`, the same rule and guards
+(magic 261124, a timer every 2 s, every symbol of its list, absolute stop and target on the order). Not compiled here.

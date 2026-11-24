@@ -15,7 +15,7 @@ const ORDER_CS = /\b(ExecuteMarketOrder|PlaceLimitOrder|PlaceStopOrder|PlaceStop
 const prevCode = (src, i) => { const lines = src.slice(0, i).split('\n'); lines.pop(); while (lines.length && /^\s*(\/\/.*)?$/.test(lines[lines.length - 1])) lines.pop(); return lines[lines.length - 1] || ''; };
 
 test('every order-placing program is covered: the two bridges and the four others', () => {
-  assert.deepEqual(MQ.sort(), ['mt5/CouncilBridge.mq5', 'mt5/NQOpenRun.mq5']);
+  assert.deepEqual(MQ.sort(), ['mt5/BreakFade.mq5', 'mt5/CouncilBridge.mq5', 'mt5/NQOpenRun.mq5']);
   assert.deepEqual(CS.sort(), ['ctrader/BreakFade.cs', 'ctrader/CouncilBridge.cs', 'ctrader/CryptoScalper.cs', 'ctrader/CryptoTrend.cs']);
   for (const f of [...MQ, ...CS]) assert.ok([...rd(f).matchAll(f.endsWith('.cs') ? ORDER_CS : ORDER_MQ)].length > 0, f + ' sends orders');
 });
@@ -32,6 +32,7 @@ test('MetaTrader 5: the guard reads ACCOUNT_TRADE_MODE == ACCOUNT_TRADE_MODE_DEM
   }
   assert.match(rd('mt5/CouncilBridge.mq5'), /void OnTimer\(\) \{\s*if \(!DemoOnly\(\)\) return;/);
   assert.match(rd('mt5/NQOpenRun.mq5'), /void OnTick\(\) \{\s*if \(!DemoOnly\(\)\) return;/);
+  assert.match(rd('mt5/BreakFade.mq5'), /void OnTimer\(\) \{\s*if \(!DemoOnly\(\)\) return;/);
 });
 
 test('cTrader: the guard reads Account.IsLive, stops the bot, OnStart and OnTimer refuse first, and every order call is guarded', () => {
@@ -57,4 +58,11 @@ test('BreakFade.cs is the Break fade cell of the study: 3-candle swings, ATR 14,
     /\[Parameter\("Dry run \(log only, no orders\)", DefaultValue = true\)\]/, /var side = dir > 0 \? TradeType\.Sell : TradeType\.Buy;/, /if \(!p\.StopLoss\.HasValue\) \{ Close\(p, "it has no stop"\); continue; \}/,
     /LOSES AFTER costs/, /TimeZone = TimeZones\.UTC/]) assert.match(s, re);
   assert.match(rd('ctrader/README.md'), /# BreakFade\.cs/);
+});
+
+test('BreakFade.mq5 is the same rule as the cBot: 3-candle swings, ATR 14, 1 ATR stop, 2R, 24 hours, dry run by default, no position without a stop', () => {
+  const s = rd('mt5/BreakFade.mq5');
+  for (const re of [/#define BF_SWING 3\b/, /#define BF_ATRN 14\b/, /#define BF_STOP_ATR 1\.0/, /#define BF_TARGET_R 2\.0/, /#define BF_HOLD_SEC 86400/, /input bool\s+InpDryRun\s+= true;/,
+    /if \(PositionGetDouble\(POSITION_SL\) <= 0\) \{ Print\([^;]*it has no stop"\); trade\.PositionClose\(t\);/, /stop = NormalizeDouble\(fill \+ dir \* dist, dg\)/, /LOSES AFTER/]) assert.match(s, re);
+  assert.match(rd('mt5/README.md'), /# BreakFade\.mq5/);
 });
