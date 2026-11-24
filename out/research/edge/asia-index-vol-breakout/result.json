@@ -1,0 +1,753 @@
+{
+ "study": "asia-index-vol-breakout",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/asia-index-vol-breakout/PREREGISTRATION.md",
+ "planSha256": "c6794680f494cb85dac1417c6293e0d21945dbba4a4da5d34b250586746fcf89",
+ "original": {
+  "file": "research/edge/index-vol-breakout/original.mjs",
+  "sha256": "afa36e031e39daabb4f88ed9231daa55246fcccb659b0a9668fda52ad022276f"
+ },
+ "rule": "gold-vol-breakout T1 unchanged: O = open of the first M5 candle 00:00-00:55 UTC; prevRange = high − low of the previous weekend-folded UTC D1; buy stop O + 0.5 × prevRange, sell stop O − 0.5 × prevRange, live 00:00-20:55 UTC, first filled wins; stop back at O (worst case in the fill candle); out at the close of the last candle before 21:00 UTC; days under 200 candles or without a 00:00-00:55 candle skipped",
+ "costs": "round trip 0.04 % of the entry price (gotobi-jp225's figure, assumed, not measured on the demo account), 2x reported; financing per 22:00 UTC rollover by index-vol-breakout's formula (DGS2 assumed 5 %): no trade crosses 22:00 UTC, so 0",
+ "data": "OANDA mid M5 through the candle proxy (edgekit cache): jp225 1246311 rows 2005-01-03T14:00 → 2026-11-24T11:45 (5670 weekdays built); au200 1102773 rows 2005-01-03T22:50 → 2026-11-24T11:50 (5587 weekdays built); trading days to 2026-11-23",
+ "dataEnd": "2026-11-23",
+ "firstDay": {
+  "jp225": "2010-05-10",
+  "au200": "2006-07-19"
+ },
+ "windows": {
+  "D": [
+   "start",
+   "2015-12-31"
+  ],
+  "C": [
+   "2016-01-01",
+   "2026-11-23"
+  ]
+ },
+ "verdict": "FAIL, 0 of 3: T1 breakout after 0.04 % costs, 2016 → now: JP225 −0.012R (n 2065, t −0.45; gross +0.050R), AU200 −0.106R (n 2044, t −4.49; gross −0.019R), Pooled −0.059R (n 4109, t −3.33; gross +0.016R)",
+ "decision": {
+  "jp225": {
+   "p": 0.674,
+   "pHolm": 1,
+   "placeboBeaten": 40,
+   "checks": {
+    "discPos": true,
+    "confPos": false,
+    "t2": false,
+    "holm": false,
+    "cost2x": false,
+    "placebo": true,
+    "n": true
+   },
+   "pass": false
+  },
+  "au200": {
+   "p": 1,
+   "pHolm": 1,
+   "placeboBeaten": 3,
+   "checks": {
+    "discPos": true,
+    "confPos": false,
+    "t2": false,
+    "holm": false,
+    "cost2x": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  },
+  "pooled": {
+   "p": 1,
+   "pHolm": 1,
+   "placeboBeaten": 27,
+   "checks": {
+    "discPos": true,
+    "confPos": false,
+    "t2": false,
+    "holm": false,
+    "cost2x": false,
+    "placebo": false,
+    "n": true
+   },
+   "pass": false
+  }
+ },
+ "stats": {
+  "jp225": {
+   "D": {
+    "n": 722,
+    "win": 0.482,
+    "netR": 0.126,
+    "grossR": 0.182,
+    "net2R": 0.07,
+    "costR": 0.056,
+    "finR": 0,
+    "total": 91.07,
+    "months": 50,
+    "t": 3.05,
+    "grossT": 4.37,
+    "t2x": 1.7,
+    "stops": 218,
+    "time": 504,
+    "maxDD": -12.57,
+    "medianStop": 111.2,
+    "buys": {
+     "n": 366,
+     "netR": 0.198
+    },
+    "sells": {
+     "n": 356,
+     "netR": 0.052
+    },
+    "byYear": {
+     "2010": {
+      "n": 4,
+      "netR": -0.125,
+      "total": -0.5
+     },
+     "2011": {
+      "n": 9,
+      "netR": 0.179,
+      "total": 1.61
+     },
+     "2012": {
+      "n": 141,
+      "netR": 0.071,
+      "total": 9.98
+     },
+     "2013": {
+      "n": 190,
+      "netR": 0.192,
+      "total": 36.5
+     },
+     "2014": {
+      "n": 183,
+      "netR": 0.118,
+      "total": 21.65
+     },
+     "2015": {
+      "n": 195,
+      "netR": 0.112,
+      "total": 21.82
+     }
+    }
+   },
+   "C": {
+    "n": 2065,
+    "win": 0.442,
+    "netR": -0.012,
+    "grossR": 0.05,
+    "net2R": -0.073,
+    "costR": 0.062,
+    "finR": 0,
+    "total": -23.84,
+    "months": 131,
+    "t": -0.45,
+    "grossT": 1.96,
+    "t2x": -2.81,
+    "stops": 679,
+    "time": 1386,
+    "maxDD": -46.54,
+    "medianStop": 194.7,
+    "buys": {
+     "n": 1006,
+     "netR": 0.067
+    },
+    "sells": {
+     "n": 1059,
+     "netR": -0.086
+    },
+    "byYear": {
+     "2016": {
+      "n": 195,
+      "netR": -0.065,
+      "total": -12.59
+     },
+     "2017": {
+      "n": 184,
+      "netR": 0.028,
+      "total": 5.23
+     },
+     "2018": {
+      "n": 194,
+      "netR": 0.048,
+      "total": 9.24
+     },
+     "2019": {
+      "n": 186,
+      "netR": -0.143,
+      "total": -26.58
+     },
+     "2020": {
+      "n": 191,
+      "netR": -0.002,
+      "total": -0.3
+     },
+     "2021": {
+      "n": 189,
+      "netR": 0.063,
+      "total": 11.95
+     },
+     "2022": {
+      "n": 186,
+      "netR": -0.129,
+      "total": -23.96
+     },
+     "2023": {
+      "n": 190,
+      "netR": 0.065,
+      "total": 12.42
+     },
+     "2024": {
+      "n": 184,
+      "netR": 0.06,
+      "total": 10.98
+     },
+     "2025": {
+      "n": 190,
+      "netR": -0.12,
+      "total": -22.89
+     },
+     "2026": {
+      "n": 176,
+      "netR": 0.072,
+      "total": 12.66
+     }
+    }
+   }
+  },
+  "au200": {
+   "D": {
+    "n": 585,
+    "win": 0.45,
+    "netR": 0.017,
+    "grossR": 0.087,
+    "net2R": -0.053,
+    "costR": 0.07,
+    "finR": 0,
+    "total": 9.99,
+    "months": 68,
+    "t": 0.41,
+    "grossT": 2.08,
+    "t2x": -1.21,
+    "stops": 176,
+    "time": 409,
+    "maxDD": -29.41,
+    "medianStop": 32.8,
+    "buys": {
+     "n": 278,
+     "netR": -0.028
+    },
+    "sells": {
+     "n": 307,
+     "netR": 0.058
+    },
+    "byYear": {
+     "2006": {
+      "n": 1,
+      "netR": -1.054,
+      "total": -1.05
+     },
+     "2007": {
+      "n": 44,
+      "netR": 0.41,
+      "total": 18.03
+     },
+     "2008": {
+      "n": 23,
+      "netR": -0.122,
+      "total": -2.81
+     },
+     "2009": {
+      "n": 31,
+      "netR": 0.027,
+      "total": 0.85
+     },
+     "2010": {
+      "n": 2,
+      "netR": 0.359,
+      "total": 0.72
+     },
+     "2011": {
+      "n": 45,
+      "netR": 0.129,
+      "total": 5.79
+     },
+     "2012": {
+      "n": 45,
+      "netR": 0.205,
+      "total": 9.2
+     },
+     "2013": {
+      "n": 51,
+      "netR": -0.024,
+      "total": -1.2
+     },
+     "2014": {
+      "n": 159,
+      "netR": -0.07,
+      "total": -11.06
+     },
+     "2015": {
+      "n": 184,
+      "netR": -0.046,
+      "total": -8.48
+     }
+    }
+   },
+   "C": {
+    "n": 2044,
+    "win": 0.409,
+    "netR": -0.106,
+    "grossR": -0.019,
+    "net2R": -0.193,
+    "costR": 0.087,
+    "finR": 0,
+    "total": -216.92,
+    "months": 131,
+    "t": -4.49,
+    "grossT": -0.84,
+    "t2x": -7.91,
+    "stops": 689,
+    "time": 1355,
+    "maxDD": -234.1,
+    "medianStop": 34.35,
+    "buys": {
+     "n": 1034,
+     "netR": -0.059
+    },
+    "sells": {
+     "n": 1010,
+     "netR": -0.154
+    },
+    "byYear": {
+     "2016": {
+      "n": 184,
+      "netR": -0.049,
+      "total": -9.02
+     },
+     "2017": {
+      "n": 171,
+      "netR": -0.194,
+      "total": -33.19
+     },
+     "2018": {
+      "n": 200,
+      "netR": -0.254,
+      "total": -50.84
+     },
+     "2019": {
+      "n": 188,
+      "netR": -0.037,
+      "total": -7.03
+     },
+     "2020": {
+      "n": 198,
+      "netR": 0.065,
+      "total": 12.79
+     },
+     "2021": {
+      "n": 190,
+      "netR": -0.255,
+      "total": -48.5
+     },
+     "2022": {
+      "n": 184,
+      "netR": -0.064,
+      "total": -11.79
+     },
+     "2023": {
+      "n": 187,
+      "netR": -0.098,
+      "total": -18.35
+     },
+     "2024": {
+      "n": 184,
+      "netR": -0.135,
+      "total": -24.8
+     },
+     "2025": {
+      "n": 190,
+      "netR": -0.093,
+      "total": -17.65
+     },
+     "2026": {
+      "n": 168,
+      "netR": -0.051,
+      "total": -8.54
+     }
+    }
+   }
+  },
+  "pooled": {
+   "D": {
+    "n": 1307,
+    "win": 0.467,
+    "netR": 0.077,
+    "grossR": 0.139,
+    "net2R": 0.015,
+    "costR": 0.062,
+    "finR": 0,
+    "total": 101.06,
+    "months": 78,
+    "t": 2.55,
+    "grossT": 4.45,
+    "t2x": 0.5,
+    "stops": 394,
+    "time": 913,
+    "maxDD": -29.41,
+    "medianStop": 66.45,
+    "buys": {
+     "n": 644,
+     "netR": 0.101
+    },
+    "sells": {
+     "n": 663,
+     "netR": 0.055
+    },
+    "byYear": {
+     "2006": {
+      "n": 1,
+      "netR": -1.054,
+      "total": -1.05
+     },
+     "2007": {
+      "n": 44,
+      "netR": 0.41,
+      "total": 18.03
+     },
+     "2008": {
+      "n": 23,
+      "netR": -0.122,
+      "total": -2.81
+     },
+     "2009": {
+      "n": 31,
+      "netR": 0.027,
+      "total": 0.85
+     },
+     "2010": {
+      "n": 6,
+      "netR": 0.037,
+      "total": 0.22
+     },
+     "2011": {
+      "n": 54,
+      "netR": 0.137,
+      "total": 7.41
+     },
+     "2012": {
+      "n": 186,
+      "netR": 0.103,
+      "total": 19.19
+     },
+     "2013": {
+      "n": 241,
+      "netR": 0.146,
+      "total": 35.31
+     },
+     "2014": {
+      "n": 342,
+      "netR": 0.031,
+      "total": 10.59
+     },
+     "2015": {
+      "n": 379,
+      "netR": 0.035,
+      "total": 13.34
+     }
+    }
+   },
+   "C": {
+    "n": 4109,
+    "win": 0.426,
+    "netR": -0.059,
+    "grossR": 0.016,
+    "net2R": -0.133,
+    "costR": 0.074,
+    "finR": 0,
+    "total": -240.76,
+    "months": 131,
+    "t": -3.33,
+    "grossT": 0.9,
+    "t2x": -7.35,
+    "stops": 1368,
+    "time": 2741,
+    "maxDD": -250.61,
+    "medianStop": 75,
+    "buys": {
+     "n": 2040,
+     "netR": 0.003
+    },
+    "sells": {
+     "n": 2069,
+     "netR": -0.119
+    },
+    "byYear": {
+     "2016": {
+      "n": 379,
+      "netR": -0.057,
+      "total": -21.61
+     },
+     "2017": {
+      "n": 355,
+      "netR": -0.079,
+      "total": -27.96
+     },
+     "2018": {
+      "n": 394,
+      "netR": -0.106,
+      "total": -41.6
+     },
+     "2019": {
+      "n": 374,
+      "netR": -0.09,
+      "total": -33.61
+     },
+     "2020": {
+      "n": 389,
+      "netR": 0.032,
+      "total": 12.48
+     },
+     "2021": {
+      "n": 379,
+      "netR": -0.096,
+      "total": -36.55
+     },
+     "2022": {
+      "n": 370,
+      "netR": -0.097,
+      "total": -35.75
+     },
+     "2023": {
+      "n": 377,
+      "netR": -0.016,
+      "total": -5.93
+     },
+     "2024": {
+      "n": 368,
+      "netR": -0.038,
+      "total": -13.82
+     },
+     "2025": {
+      "n": 380,
+      "netR": -0.107,
+      "total": -40.54
+     },
+     "2026": {
+      "n": 344,
+      "netR": 0.012,
+      "total": 4.12
+     }
+    }
+   }
+  }
+ },
+ "skips": {
+  "jp225": {
+   "noprev": 1,
+   "noopen": 1390,
+   "thin": 540,
+   "nofill": 952
+  },
+  "au200": {
+   "noprev": 1,
+   "thin": 1820,
+   "noopen": 235,
+   "nofill": 861,
+   "flatprev": 41
+  }
+ },
+ "early": {
+  "jp225": {
+   "early": {
+    "n": 1243,
+    "netR": 0.026,
+    "t": 0.68
+   },
+   "late": {
+    "n": 822,
+    "netR": -0.068,
+    "t": -2.46
+   }
+  },
+  "au200": {
+   "early": {
+    "n": 1188,
+    "netR": -0.139,
+    "t": -4
+   },
+   "late": {
+    "n": 856,
+    "netR": -0.061,
+    "t": -2.56
+   }
+  },
+  "pooled": {
+   "early": {
+    "n": 2431,
+    "netR": -0.055,
+    "t": -2.03
+   },
+   "late": {
+    "n": 1678,
+    "netR": -0.064,
+    "t": -3.23
+   }
+  }
+ },
+ "placebo": {
+  "jp225": {
+   "seeds": 40,
+   "start": "01:00-18:00 UTC",
+   "means": [
+    -0.022,
+    -0.048,
+    -0.042,
+    -0.053,
+    -0.061,
+    -0.024,
+    -0.045,
+    -0.032,
+    -0.034,
+    -0.058,
+    -0.065,
+    -0.035,
+    -0.065,
+    -0.036,
+    -0.049,
+    -0.029,
+    -0.043,
+    -0.073,
+    -0.029,
+    -0.052,
+    -0.022,
+    -0.049,
+    -0.031,
+    -0.045,
+    -0.056,
+    -0.032,
+    -0.054,
+    -0.031,
+    -0.049,
+    -0.058,
+    -0.046,
+    -0.061,
+    -0.064,
+    -0.082,
+    -0.064,
+    -0.016,
+    -0.056,
+    -0.024,
+    -0.058,
+    -0.041
+   ],
+   "min": -0.082,
+   "max": -0.016,
+   "median": -0.047,
+   "p95": -0.022
+  },
+  "au200": {
+   "seeds": 40,
+   "start": "01:00-18:00 UTC",
+   "means": [
+    -0.073,
+    -0.09,
+    -0.098,
+    -0.09,
+    -0.071,
+    -0.094,
+    -0.088,
+    -0.09,
+    -0.069,
+    -0.058,
+    -0.095,
+    -0.071,
+    -0.108,
+    -0.103,
+    -0.063,
+    -0.09,
+    -0.082,
+    -0.107,
+    -0.079,
+    -0.075,
+    -0.09,
+    -0.067,
+    -0.102,
+    -0.093,
+    -0.09,
+    -0.1,
+    -0.055,
+    -0.106,
+    -0.07,
+    -0.091,
+    -0.074,
+    -0.085,
+    -0.122,
+    -0.091,
+    -0.072,
+    -0.08,
+    -0.1,
+    -0.104,
+    -0.073,
+    -0.084
+   ],
+   "min": -0.122,
+   "max": -0.055,
+   "median": -0.09,
+   "p95": -0.063
+  },
+  "pooled": {
+   "seeds": 40,
+   "start": "01:00-18:00 UTC",
+   "means": [
+    -0.047,
+    -0.069,
+    -0.07,
+    -0.072,
+    -0.066,
+    -0.058,
+    -0.066,
+    -0.061,
+    -0.051,
+    -0.058,
+    -0.08,
+    -0.053,
+    -0.086,
+    -0.069,
+    -0.056,
+    -0.059,
+    -0.062,
+    -0.09,
+    -0.054,
+    -0.063,
+    -0.056,
+    -0.058,
+    -0.066,
+    -0.069,
+    -0.073,
+    -0.066,
+    -0.055,
+    -0.068,
+    -0.059,
+    -0.074,
+    -0.06,
+    -0.073,
+    -0.093,
+    -0.087,
+    -0.068,
+    -0.047,
+    -0.078,
+    -0.064,
+    -0.065,
+    -0.063
+   ],
+   "min": -0.093,
+   "max": -0.047,
+   "median": -0.065,
+   "p95": -0.051
+  }
+ },
+ "reading": "JP225 confirmation −0.012R net (n 2065, month t −0.45; gross +0.050R, gross t +1.96; discovery +0.126R, n 722; 2x cost −0.073R; 40 of 40 placebos beaten; failed: confPos, t2, holm, cost2x). AU200 confirmation −0.106R net (n 2044, month t −4.49; gross −0.019R, gross t −0.84; discovery +0.017R, n 585; 2x cost −0.193R; 3 of 40 placebos beaten; failed: confPos, t2, holm, cost2x, placebo). Pooled confirmation −0.059R net (n 4109, month t −3.33; gross +0.016R, gross t +0.90; discovery +0.077R, n 1307; 2x cost −0.133R; 27 of 40 placebos beaten; failed: confPos, t2, holm, cost2x, placebo). Costs take 0.074R a trade pooled in confirmation. Before costs the breakout leans the right way on JP225 and not after: a before-cost tilt is not an edge. Nothing passes: the breakout's early-hours gain on gold and USD/JPY does not carry to the Asian index CFDs on this evidence. Not an edge; nothing live changes and no proposal is written."
+}
