@@ -1032,6 +1032,30 @@
     "stopCheckedAt": "2026-11-24T22:42:26.000Z",
     "brokerStop": 0.54767,
     "closedAt": "2026-11-24T22:46:59.000Z"
+   },
+   "eqx:fade:usdjpy:fade-m15-s1795559400": {
+    "positionId": "51246396",
+    "symbol": "USDJPY",
+    "side": "sell",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-24T23:16:44.000Z",
+    "councilEntry": 159.329,
+    "stop": 159.366714,
+    "t1": 159.253571,
+    "riskCash": 1.24,
+    "margin": 10,
+    "fillPrice": 159.278,
+    "slipR": 1.352,
+    "lagSec": 2804,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T23:16:44.000Z",
+    "brokerStop": 159.316
    }
   },
   "day": {
@@ -1041,10 +1065,10 @@
    "lastBalance": 497.82,
    "ids": [],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 497.82 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 497.82 · 1 open",
   "skipped": {
    "eqx:fade:eurjpy:fade-m15-s1795559400": "stop distance 0.049214 sits inside the broker spread 0.1 on EURJPY: no stop could be set"
   },
@@ -1076,14 +1100,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 497.82,
-  "lastRun": "2026-11-24T23:12:23.000Z"
+  "lastRun": "2026-11-24T23:16:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T13:13:53.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:21 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:22:19.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2568,6 +2587,11 @@
    "at": "2026-11-24T22:46:59.000Z",
    "msg": "NZDUSD position 51243433 closed at the broker",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795559400"
+  },
+  {
+   "at": "2026-11-24T23:16:44.000Z",
+   "msg": "opened sell USDJPY 0.05 lot (council eqx-fade)",
+   "trade": "eqx:fade:usdjpy:fade-m15-s1795559400"
   }
  ],
  "limits": {
@@ -2660,11 +2684,11 @@
   ]
  },
  "execution": {
-  "n": 3,
-  "meanSlipR": 0.083,
-  "medianSlipR": 0.33,
-  "worstSlipR": 0.534,
-  "medianLagSec": 25,
+  "n": 4,
+  "meanSlipR": 0.4,
+  "medianSlipR": 0.432,
+  "worstSlipR": 1.352,
+  "medianLagSec": 26,
   "bySymbol": {
    "GBPUSD": {
     "n": 2,
@@ -2673,6 +2697,10 @@
    "NZDUSD": {
     "n": 1,
     "meanSlipR": -0.616
+   },
+   "USDJPY": {
+    "n": 1,
+    "meanSlipR": 1.352
    }
   }
  }
