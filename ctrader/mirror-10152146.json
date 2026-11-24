@@ -373,7 +373,8 @@
     "t1": 0.8586198571428572,
     "adopted": false,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "viaLimit": true,
     "limitPrice": 0.84385,
@@ -388,7 +389,8 @@
     "lagSec": 481,
     "positionId": "50858601",
     "volume": 100000,
-    "status": "open"
+    "status": "closed at broker",
+    "closedAt": "2026-11-24T14:09:36.000Z"
    },
    "xau-m30m1-1795478529": {
     "symbol": "XAUUSD",
@@ -588,6 +590,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-24T14:01:08.000Z",
     "brokerStop": 3623.75
+   },
+   "usdchf-rswing-1795529290": {
+    "positionId": "51111783",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 100000,
+    "lots": 0.01,
+    "digits": 5,
+    "setup": "rswing",
+    "status": "open",
+    "openedAt": "2026-11-24T14:09:36.000Z",
+    "councilEntry": 0.83673,
+    "stop": 0.8442474642857143,
+    "t1": 0.8285800000000001,
+    "riskCash": 8.98,
+    "margin": 2,
+    "minLot": true,
+    "shadow": true,
+    "mark": 0.83673,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83699,
+    "slipR": -0.035,
+    "lagSec": 86,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T14:09:36.000Z",
+    "brokerStop": 0.84451
    }
   },
   "day": {
@@ -595,7 +625,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9792.11 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 9783.29 · 11 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -606,8 +636,8 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 9792.11,
-  "lastRun": "2026-11-24T14:07:36.000Z"
+  "balance": 9783.29,
+  "lastRun": "2026-11-24T14:09:36.000Z"
  },
  "log": [
   {
@@ -940,6 +970,16 @@
    "at": "2026-11-24T14:01:08.000Z",
    "msg": "limit filled at once: XAUUSD position 51109172 at the broker at 3619.69",
    "trade": "xau-m30m1-1795528789"
+  },
+  {
+   "at": "2026-11-24T14:09:36.000Z",
+   "msg": "USDCHF position 50858601 closed at the broker",
+   "trade": "usdchf-position-1795449457"
+  },
+  {
+   "at": "2026-11-24T14:09:36.000Z",
+   "msg": "opened sell USDCHF 0.01 lot (council rswing)",
+   "trade": "usdchf-rswing-1795529290"
   }
  ],
  "limits": {
@@ -1032,11 +1072,11 @@
   ]
  },
  "execution": {
-  "n": 20,
+  "n": 21,
   "meanSlipR": -0.026,
-  "medianSlipR": -0.003,
+  "medianSlipR": -0.004,
   "worstSlipR": 0.034,
-  "medianLagSec": 78.5,
+  "medianLagSec": 79,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -1059,8 +1099,8 @@
     "meanSlipR": -0.001
    },
    "USDCHF": {
-    "n": 1,
-    "meanSlipR": 0
+    "n": 2,
+    "meanSlipR": -0.018
    },
    "XAUUSD": {
     "n": 4,
