@@ -56,6 +56,6 @@ test('a candidate takes only its timeframe and filters', () => {
 
 test('statistics: net = R - cost R, month sums', () => {
   const rows = [{ m: 0, R: 1, cr: 0.1 }, { m: 1, R: -1, cr: 0.1 }, { m: 1, R: 2, cr: 0.1 }];
-  const s = stats(rows, 0, 3); assert.equal(s.n, 3); assert.ok(Math.abs(s.net - 0.6) < 1e-12); assert.ok(Math.abs(s.gross - 2 / 3) < 1e-12);
+  const s = stats(rows, 0, 3); assert.equal(s.n, 3); assert.ok(Math.abs(s.net - 1.7 / 3) < 1e-12); assert.ok(Math.abs(s.gross - 2 / 3) < 1e-12);
   assert.ok(Math.abs(s.net2 - 1.4 / 3) < 1e-12);
 });
