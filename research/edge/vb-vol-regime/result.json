@@ -1,0 +1,382 @@
+{
+ "study": "vb-vol-regime",
+ "built": "2026-11-24",
+ "regime": {
+  "nRv": 20,
+  "nRank": 252,
+  "terciles": "rank < 1/3 low, > 2/3 high"
+ },
+ "windows": {
+  "disc": [
+   "2005-01-01",
+   "2014-12-31"
+  ],
+  "conf": [
+   "2015-01-01",
+   "2099-12-31"
+  ]
+ },
+ "dataEnd": {
+  "xau": "2026-11-20",
+  "usdjpy": "2026-11-20"
+ },
+ "gate": {
+  "usdjpy": {
+   "got": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "want": {
+    "n": 2089,
+    "net": 0.079
+   },
+   "ok": true
+  },
+  "xau": {
+   "got": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "want": {
+    "n": 3713,
+    "net": 0.139
+   },
+   "ok": true
+  }
+ },
+ "costs": {
+  "xau": "gold-vol-breakout-hourcost C1 (hourly median spread + commission + 0.05 x M) and long financing",
+  "usdjpy": "fx-vol-breakout charge (0.000045 x price + 0.5 pip)"
+ },
+ "terciles": {
+  "xau": {
+   "disc": {
+    "days": 1995,
+    "from": "2007-04-05",
+    "to": "2014-12-31",
+    "all": {
+     "n": 1420,
+     "gross": 0.226,
+     "net": 0.21,
+     "net2": 0.195,
+     "win": 0.467,
+     "monthT": 5.51
+    },
+    "low": {
+     "days": 812,
+     "n": 575,
+     "gross": 0.243,
+     "net": 0.227,
+     "net2": 0.21,
+     "win": 0.466,
+     "monthT": 4.05
+    },
+    "mid": {
+     "days": 504,
+     "n": 374,
+     "gross": 0.147,
+     "net": 0.131,
+     "net2": 0.114,
+     "win": 0.452,
+     "monthT": 1.87
+    },
+    "high": {
+     "days": 679,
+     "n": 471,
+     "gross": 0.266,
+     "net": 0.254,
+     "net2": 0.242,
+     "win": 0.48,
+     "monthT": 3.57
+    }
+   },
+   "conf": {
+    "days": 3065,
+    "from": "2015-01-02",
+    "to": "2026-11-20",
+    "all": {
+     "n": 2250,
+     "gross": 0.115,
+     "net": 0.098,
+     "net2": 0.082,
+     "win": 0.44,
+     "monthT": 3.84
+    },
+    "low": {
+     "days": 1060,
+     "n": 804,
+     "gross": 0.151,
+     "net": 0.133,
+     "net2": 0.114,
+     "win": 0.449,
+     "monthT": 2.81
+    },
+    "mid": {
+     "days": 946,
+     "n": 679,
+     "gross": 0.098,
+     "net": 0.081,
+     "net2": 0.065,
+     "win": 0.429,
+     "monthT": 1.58
+    },
+    "high": {
+     "days": 1059,
+     "n": 767,
+     "gross": 0.092,
+     "net": 0.077,
+     "net2": 0.063,
+     "win": 0.442,
+     "monthT": 1.83
+    }
+   }
+  },
+  "usdjpy": {
+   "disc": {
+    "days": 2319,
+    "from": "2006-01-19",
+    "to": "2014-12-31",
+    "all": {
+     "n": 1687,
+     "gross": 0.113,
+     "net": 0.084,
+     "net2": 0.055,
+     "win": 0.46,
+     "monthT": 2.86
+    },
+    "low": {
+     "days": 946,
+     "n": 692,
+     "gross": 0.076,
+     "net": 0.04,
+     "net2": 0.003,
+     "win": 0.439,
+     "monthT": 0.85
+    },
+    "mid": {
+     "days": 624,
+     "n": 468,
+     "gross": 0.11,
+     "net": 0.084,
+     "net2": 0.057,
+     "win": 0.462,
+     "monthT": 1.54
+    },
+    "high": {
+     "days": 749,
+     "n": 527,
+     "gross": 0.165,
+     "net": 0.143,
+     "net2": 0.121,
+     "win": 0.486,
+     "monthT": 2.7
+    }
+   },
+   "conf": {
+    "days": 3082,
+    "from": "2015-01-02",
+    "to": "2026-11-20",
+    "all": {
+     "n": 2275,
+     "gross": 0.087,
+     "net": 0.055,
+     "net2": 0.023,
+     "win": 0.451,
+     "monthT": 2.22
+    },
+    "low": {
+     "days": 1133,
+     "n": 872,
+     "gross": 0.186,
+     "net": 0.148,
+     "net2": 0.109,
+     "win": 0.475,
+     "monthT": 3.73
+    },
+    "mid": {
+     "days": 971,
+     "n": 711,
+     "gross": -0.025,
+     "net": -0.057,
+     "net2": -0.088,
+     "win": 0.419,
+     "monthT": -1.19
+    },
+    "high": {
+     "days": 978,
+     "n": 692,
+     "gross": 0.078,
+     "net": 0.053,
+     "net2": 0.027,
+     "win": 0.452,
+     "monthT": 1.15
+    }
+   }
+  }
+ },
+ "tests": [
+  {
+   "test": "H1 gold",
+   "market": "xau",
+   "disc": {
+    "diff": 0.027,
+    "welchT": 0.29,
+    "monthDiffMean": -0.408,
+    "monthT": -1.07,
+    "months": 15,
+    "nHigh": 471,
+    "nLow": 575,
+    "netHigh": 0.254,
+    "netLow": 0.227
+   },
+   "conf": {
+    "diff": -0.056,
+    "welchT": -0.87,
+    "monthDiffMean": -0.818,
+    "monthT": -3.42,
+    "months": 38,
+    "nHigh": 767,
+    "nLow": 804,
+    "netHigh": 0.077,
+    "netLow": 0.133
+   },
+   "p": 0.002,
+   "placeboP95": 0.13,
+   "pHolm": 0.003,
+   "better": "low",
+   "checks": {
+    "sameSign": false,
+    "t2Holm": true,
+    "betterPos": true,
+    "n200": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  {
+   "test": "H2 USD/JPY",
+   "market": "usdjpy",
+   "disc": {
+    "diff": 0.103,
+    "welchT": 1.41,
+    "monthDiffMean": -1.069,
+    "monthT": -3.04,
+    "months": 20,
+    "nHigh": 527,
+    "nLow": 692,
+    "netHigh": 0.143,
+    "netLow": 0.04
+   },
+   "conf": {
+    "diff": -0.095,
+    "welchT": -1.46,
+    "monthDiffMean": -0.244,
+    "monthT": -1.25,
+    "months": 35,
+    "nHigh": 692,
+    "nLow": 872,
+    "netHigh": 0.053,
+    "netLow": 0.148
+   },
+   "p": 0.221,
+   "placeboP95": 0.096,
+   "pHolm": 0.221,
+   "better": "low",
+   "checks": {
+    "sameSign": false,
+    "t2Holm": false,
+    "betterPos": true,
+    "n200": true,
+    "placebo": false
+   },
+   "pass": false
+  }
+ ],
+ "placebo": {
+  "xau": [
+   0.089,
+   0.001,
+   0.028,
+   0.039,
+   0.014,
+   0.055,
+   0.028,
+   0.011,
+   0.013,
+   0.003,
+   0.007,
+   0.057,
+   0.118,
+   0.13,
+   0.011,
+   0.103,
+   0.017,
+   0.11,
+   0.078,
+   0.143,
+   0.038,
+   0.01,
+   0.028,
+   0.066,
+   0.076,
+   0.034,
+   0.026,
+   0.125,
+   0,
+   0.048,
+   0.009,
+   0.084,
+   0.042,
+   0.006,
+   0.089,
+   0.011,
+   0.006,
+   0.032,
+   0.156,
+   0.019
+  ],
+  "usdjpy": [
+   0.068,
+   0.155,
+   0.031,
+   0.096,
+   0.027,
+   0.093,
+   0.044,
+   0.047,
+   0.007,
+   0.013,
+   0.006,
+   0.004,
+   0.01,
+   0.079,
+   0.003,
+   0.048,
+   0.015,
+   0.055,
+   0.043,
+   0.014,
+   0.004,
+   0.011,
+   0.016,
+   0.034,
+   0.061,
+   0.011,
+   0.086,
+   0.06,
+   0.053,
+   0.105,
+   0.061,
+   0.052,
+   0.041,
+   0.02,
+   0.017,
+   0.042,
+   0.044,
+   0.051,
+   0.012,
+   0.001
+  ]
+ },
+ "verdict": "FAIL: 0 of 2; gold high − low tercile +0.027R a trade in 2005-14 and −0.056R in 2015 → (Welch t −0.87; monthly-difference t −3.42, Holm p 0.003; placebo 95th pct 0.13R); USD/JPY high − low tercile +0.103R a trade in 2005-14 and −0.095R in 2015 → (Welch t −1.46; monthly-difference t −1.25, Holm p 0.221; placebo 95th pct 0.096R)"
+}

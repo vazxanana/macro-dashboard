@@ -1,0 +1,431 @@
+{
+ "study": "vb-pullback-fade",
+ "at": "2026-11-24",
+ "verdict": "FAIL",
+ "verdictLine": "Verdict: FAIL. 0 of 3 tests pass; WITH-breakout fades made -0.088R a trade after costs in 2016-26 (n 5178, month t -3.99; before costs +0.036R), AGAINST -0.140R (n 6895, t -7.32), the no-breakout-day control -0.007R (n 8690, t -0.42).",
+ "windows": {
+  "discovery": "2007-01..2015-12",
+  "confirmation": "2016-01..2026-10"
+ },
+ "costs": {
+  "xau": 0.3,
+  "usdjpy": 0.008
+ },
+ "markets": [
+  {
+   "market": "xau",
+   "cost": 0.3,
+   "first": 1142799900,
+   "last": 1793393700,
+   "days": {
+    "breakout": 3850,
+    "nofill": 1452
+   },
+   "m15signals": 35387,
+   "bad": 0,
+   "small": 24,
+   "open": 1,
+   "dropped": 1,
+   "cols": [
+    "fillT",
+    "set (0 with, 1 against, 2 control)",
+    "R",
+    "costR",
+    "first with of the day"
+   ]
+  },
+  {
+   "market": "usdjpy",
+   "cost": 0.008,
+   "first": 1104691500,
+   "last": 1793393700,
+   "days": {
+    "breakout": 4157,
+    "nofill": 1499
+   },
+   "m15signals": 38639,
+   "bad": 0,
+   "small": 0,
+   "open": 0,
+   "dropped": 28,
+   "cols": [
+    "fillT",
+    "set (0 with, 1 against, 2 control)",
+    "R",
+    "costR",
+    "first with of the day"
+   ]
+  }
+ ],
+ "cut": [
+  {
+   "market": "xau",
+   "cut": "2009-06-10",
+   "n": 5848,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2013-03-13",
+   "n": 12498,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2017-09-20",
+   "n": 20007,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2021-02-17",
+   "n": 25735,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "xau",
+   "cut": "2025-05-07",
+   "n": 32941,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2009-06-10",
+   "n": 8012,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2013-03-13",
+   "n": 14792,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2017-09-20",
+   "n": 22754,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2021-02-17",
+   "n": 28706,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  },
+  {
+   "market": "usdjpy",
+   "cut": "2025-05-07",
+   "n": 36082,
+   "missing": 0,
+   "extra": 0,
+   "labDiff": 0
+  }
+ ],
+ "tests": {
+  "T1": {
+   "name": "WITH fades after costs",
+   "pass": false,
+   "holm": 1
+  },
+  "T2": {
+   "name": "AGAINST fades after costs",
+   "pass": false,
+   "holm": 1
+  },
+  "T3": {
+   "name": "WITH minus CONTROL after costs",
+   "pass": false,
+   "holm": 1
+  }
+ },
+ "sets": {
+  "with": {
+   "disc": {
+    "n": 4072,
+    "R": 0.0478,
+    "net": -0.0858,
+    "costR": 0.1336,
+    "win": 0.36,
+    "tR": 1.92,
+    "t": -3.29,
+    "p": 0.9993275294835506,
+    "months": 108
+   },
+   "conf": {
+    "n": 5178,
+    "R": 0.0357,
+    "net": -0.0877,
+    "costR": 0.1234,
+    "win": 0.352,
+    "tR": 1.67,
+    "t": -3.99,
+    "p": 0.9999455951833851,
+    "months": 130
+   }
+  },
+  "against": {
+   "disc": {
+    "n": 5594,
+    "R": 0.0022,
+    "net": -0.133,
+    "costR": 0.1352,
+    "win": 0.341,
+    "tR": 0.11,
+    "t": -6.62,
+    "p": 0.9999999992709373,
+    "months": 108
+   },
+   "conf": {
+    "n": 6895,
+    "R": -0.0163,
+    "net": -0.1396,
+    "costR": 0.1232,
+    "win": 0.333,
+    "tR": -0.89,
+    "t": -7.32,
+    "p": 0.9999999999883993,
+    "months": 130
+   }
+  },
+  "control": {
+   "disc": {
+    "n": 7542,
+    "R": 0.1503,
+    "net": -0.041,
+    "costR": 0.1913,
+    "win": 0.389,
+    "tR": 9.13,
+    "t": -2.46,
+    "p": 0.9922505724897324,
+    "months": 108
+   },
+   "conf": {
+    "n": 8690,
+    "R": 0.1503,
+    "net": -0.0068,
+    "costR": 0.1571,
+    "win": 0.386,
+    "tR": 9.15,
+    "t": -0.42,
+    "p": 0.6618010838096756,
+    "months": 130
+   }
+  }
+ },
+ "firstWith": {
+  "disc": {
+   "n": 2286,
+   "R": 0.0462,
+   "net": -0.0892,
+   "costR": 0.1354,
+   "win": 0.356,
+   "tR": 1.6,
+   "t": -2.95,
+   "p": 0.9980378763325458,
+   "months": 108
+  },
+  "conf": {
+   "n": 2798,
+   "R": -0.0054,
+   "net": -0.1299,
+   "costR": 0.1245,
+   "win": 0.339,
+   "tR": -0.2,
+   "t": -4.72,
+   "p": 0.9999969292899238,
+   "months": 130
+  }
+ },
+ "T3": {
+  "disc": {
+   "diff": -0.0448,
+   "t": -1.58,
+   "p": 0.9427443736155893
+  },
+  "conf": {
+   "diff": -0.0809,
+   "t": -3.11,
+   "p": 0.9990655678623513
+  }
+ },
+ "withVsAgainst": {
+  "disc": {
+   "diff": 0.0472,
+   "t": 1.59,
+   "p": 0.05634395438016633
+  },
+  "conf": {
+   "diff": 0.0519,
+   "t": 1.94,
+   "p": 0.026227376810307585
+  }
+ },
+ "per": {
+  "xau": {
+   "with": {
+    "disc": {
+     "n": 1758,
+     "R": 0.0457,
+     "net": -0.1217,
+     "costR": 0.1674,
+     "win": 0.364,
+     "tR": 1.27,
+     "t": -3.19,
+     "p": 0.9990668582131081,
+     "months": 108
+    },
+    "conf": {
+     "n": 2390,
+     "R": 0.0609,
+     "net": -0.0829,
+     "costR": 0.1439,
+     "win": 0.364,
+     "tR": 2.2,
+     "t": -2.83,
+     "p": 0.9972675591988414,
+     "months": 130
+    }
+   },
+   "against": {
+    "disc": {
+     "n": 2534,
+     "R": 0.0135,
+     "net": -0.1565,
+     "costR": 0.1701,
+     "win": 0.343,
+     "tR": 0.49,
+     "t": -5.43,
+     "p": 0.9999998210466711,
+     "months": 108
+    },
+    "conf": {
+     "n": 3286,
+     "R": -0.0201,
+     "net": -0.1633,
+     "costR": 0.1432,
+     "win": 0.333,
+     "tR": -0.88,
+     "t": -6.69,
+     "p": 0.9999999996985752,
+     "months": 130
+    }
+   },
+   "control": {
+    "disc": {
+     "n": 3915,
+     "R": 0.1539,
+     "net": -0.0925,
+     "costR": 0.2465,
+     "win": 0.391,
+     "tR": 7.47,
+     "t": -4.05,
+     "p": 0.9999514392724587,
+     "months": 108
+    },
+    "conf": {
+     "n": 4409,
+     "R": 0.147,
+     "net": -0.0399,
+     "costR": 0.1869,
+     "win": 0.386,
+     "tR": 6.69,
+     "t": -1.73,
+     "p": 0.9567518584545346,
+     "months": 130
+    }
+   }
+  },
+  "usdjpy": {
+   "with": {
+    "disc": {
+     "n": 2314,
+     "R": 0.0495,
+     "net": -0.0585,
+     "costR": 0.108,
+     "win": 0.357,
+     "tR": 1.59,
+     "t": -1.84,
+     "p": 0.9654809078035254,
+     "months": 108
+    },
+    "conf": {
+     "n": 2788,
+     "R": 0.014,
+     "net": -0.0918,
+     "costR": 0.1058,
+     "win": 0.343,
+     "tR": 0.48,
+     "t": -3.08,
+     "p": 0.9987479139083892,
+     "months": 130
+    }
+   },
+   "against": {
+    "disc": {
+     "n": 3060,
+     "R": -0.0072,
+     "net": -0.1135,
+     "costR": 0.1063,
+     "win": 0.339,
+     "tR": -0.25,
+     "t": -3.88,
+     "p": 0.9999106374734212,
+     "months": 108
+    },
+    "conf": {
+     "n": 3609,
+     "R": -0.013,
+     "net": -0.118,
+     "costR": 0.1051,
+     "win": 0.333,
+     "tR": -0.54,
+     "t": -4.87,
+     "p": 0.9999983778965021,
+     "months": 130
+    }
+   },
+   "control": {
+    "disc": {
+     "n": 3627,
+     "R": 0.1465,
+     "net": 0.0147,
+     "costR": 0.1318,
+     "win": 0.387,
+     "tR": 5.74,
+     "t": 0.61,
+     "p": 0.2721670339307012,
+     "months": 108
+    },
+    "conf": {
+     "n": 4281,
+     "R": 0.1537,
+     "net": 0.0273,
+     "costR": 0.1264,
+     "win": 0.386,
+     "tR": 6.26,
+     "t": 1.19,
+     "p": 0.11806677153185985,
+     "months": 130
+    }
+   }
+  }
+ }
+}

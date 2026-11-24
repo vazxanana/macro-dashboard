@@ -1,0 +1,550 @@
+{
+ "study": "usdjpy-vb-manage",
+ "title": "USD/JPY T1: trade management",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/usdjpy-vb-manage/PREREGISTRATION.md",
+ "planSha256": "a4a037d1e2c82771499f127ea99839de502ca750ad482d3aeda8672e575ccd18",
+ "verdict": "FAIL: 0 of 3 managements improve USD/JPY T1 after costs; d vs the rule's exit a trade (2005-15 / 2016 → now, month t of d 2016 →): BE1 −0.023 / −0.007 (t −0.82, NO BETTER); TR1 −0.032 / −0.034 (t −2.28, WORSE); PH1 −0.025 / −0.034 (t −3.56, WORSE); rule +0.079 / +0.063R net (n 2089 / 2079)",
+ "pass": false,
+ "gate": {
+  "want": {
+   "early": {
+    "n": 2089,
+    "netR": 0.079
+   },
+   "late": {
+    "n": 2079,
+    "netR": 0.063
+   }
+  },
+  "got": {
+   "early": {
+    "n": 2089,
+    "win": 0.447,
+    "netR": 0.079,
+    "grossR": 0.109,
+    "net2R": 0.05,
+    "t": 2.95,
+    "grossT": 4.06,
+    "stops": 679,
+    "time": 1410,
+    "maxDD": -42.21,
+    "total": 165.76
+   },
+   "late": {
+    "n": 2079,
+    "win": 0.444,
+    "netR": 0.063,
+    "grossR": 0.096,
+    "net2R": 0.031,
+    "t": 2.5,
+    "grossT": 3.77,
+    "stops": 695,
+    "time": 1384,
+    "maxDD": -33.76,
+    "total": 131.7
+   }
+  },
+  "ok": true,
+  "same": 4168,
+  "of": 4168
+ },
+ "windows": {
+  "early": [
+   "2005-01-04",
+   "2015-12-31"
+  ],
+  "late": [
+   "2016-01-01",
+   "2026-11-19"
+  ]
+ },
+ "k": 0.5,
+ "byWindow": {
+  "early": {
+   "cell": {
+    "rule": {
+     "n": 2089,
+     "win": 0.447,
+     "netR": 0.079,
+     "grossR": 0.109,
+     "net2R": 0.05,
+     "t": 2.95,
+     "grossT": 4.06,
+     "stops": 679,
+     "time": 1410,
+     "maxDD": -42.21,
+     "total": 165.76
+    },
+    "BE1": {
+     "n": 2089,
+     "win": 0.387,
+     "netR": 0.057,
+     "grossR": 0.086,
+     "net2R": 0.027,
+     "t": 2.25,
+     "grossT": 3.44,
+     "stops": 847,
+     "time": 1242,
+     "maxDD": -51.61,
+     "total": 118.31
+    },
+    "TR1": {
+     "n": 2089,
+     "win": 0.503,
+     "netR": 0.047,
+     "grossR": 0.077,
+     "net2R": 0.018,
+     "t": 2.16,
+     "grossT": 3.51,
+     "stops": 1100,
+     "time": 989,
+     "maxDD": -29.53,
+     "total": 99.01
+    },
+    "PH1": {
+     "n": 2089,
+     "win": 0.468,
+     "netR": 0.055,
+     "grossR": 0.084,
+     "net2R": 0.025,
+     "t": 2.63,
+     "grossT": 4.07,
+     "stops": 679,
+     "time": 1410,
+     "maxDD": -34.97,
+     "total": 114.02
+    }
+   },
+   "diff": {
+    "rule": {
+     "n": 2089,
+     "meanD": 0,
+     "monthT": 0,
+     "months": 132
+    },
+    "BE1": {
+     "n": 2089,
+     "meanD": -0.023,
+     "monthT": -2.15,
+     "months": 132
+    },
+    "TR1": {
+     "n": 2089,
+     "meanD": -0.032,
+     "monthT": -1.95,
+     "months": 132
+    },
+    "PH1": {
+     "n": 2089,
+     "meanD": -0.025,
+     "monthT": -2.55,
+     "months": 132
+    }
+   },
+   "reached": 737
+  },
+  "late": {
+   "cell": {
+    "rule": {
+     "n": 2079,
+     "win": 0.444,
+     "netR": 0.063,
+     "grossR": 0.096,
+     "net2R": 0.031,
+     "t": 2.5,
+     "grossT": 3.77,
+     "stops": 695,
+     "time": 1384,
+     "maxDD": -33.76,
+     "total": 131.7
+    },
+    "BE1": {
+     "n": 2079,
+     "win": 0.396,
+     "netR": 0.057,
+     "grossR": 0.089,
+     "net2R": 0.024,
+     "t": 2.37,
+     "grossT": 3.73,
+     "stops": 835,
+     "time": 1244,
+     "maxDD": -27.32,
+     "total": 117.76
+    },
+    "TR1": {
+     "n": 2079,
+     "win": 0.495,
+     "netR": 0.03,
+     "grossR": 0.062,
+     "net2R": -0.003,
+     "t": 1.33,
+     "grossT": 2.8,
+     "stops": 1049,
+     "time": 1030,
+     "maxDD": -29.56,
+     "total": 61.52
+    },
+    "PH1": {
+     "n": 2079,
+     "win": 0.464,
+     "netR": 0.029,
+     "grossR": 0.062,
+     "net2R": -0.003,
+     "t": 1.49,
+     "grossT": 3.14,
+     "stops": 695,
+     "time": 1384,
+     "maxDD": -27.69,
+     "total": 61.27
+    }
+   },
+   "diff": {
+    "rule": {
+     "n": 2079,
+     "meanD": 0,
+     "monthT": 0,
+     "months": 131
+    },
+    "BE1": {
+     "n": 2079,
+     "meanD": -0.007,
+     "monthT": -0.82,
+     "months": 131
+    },
+    "TR1": {
+     "n": 2079,
+     "meanD": -0.034,
+     "monthT": -2.28,
+     "months": 131
+    },
+    "PH1": {
+     "n": 2079,
+     "meanD": -0.034,
+     "monthT": -3.56,
+     "months": 131
+    }
+   },
+   "reached": 687
+  }
+ },
+ "tests": {
+  "BE1": {
+   "c1": false,
+   "c2": false,
+   "c3": true,
+   "c4": true,
+   "p": 0.794,
+   "pHolm": 1,
+   "improves": false,
+   "label": "NO BETTER"
+  },
+  "TR1": {
+   "c1": false,
+   "c2": false,
+   "c3": false,
+   "c4": true,
+   "p": 0.989,
+   "pHolm": 1,
+   "improves": false,
+   "label": "WORSE"
+  },
+  "PH1": {
+   "c1": false,
+   "c2": false,
+   "c3": false,
+   "c4": true,
+   "p": 1,
+   "pHolm": 1,
+   "improves": false,
+   "label": "WORSE"
+  }
+ },
+ "pooledD": {
+  "BE1": -0.015,
+  "TR1": -0.033,
+  "PH1": -0.029
+ },
+ "placebo": {
+  "BE1": {
+   "median": 0.002,
+   "q05": -0.003,
+   "q95": 0.007,
+   "inside": false,
+   "seeds": [
+    0.002,
+    -0.005,
+    0.003,
+    0.005,
+    0.002,
+    -0.002,
+    -0.002,
+    0.001,
+    0.002,
+    0.006,
+    0.002,
+    0,
+    0.003,
+    -0.002,
+    0.003,
+    0.004,
+    -0.002,
+    0,
+    0,
+    0,
+    -0.003,
+    0,
+    0,
+    0.004,
+    0.006,
+    -0.003,
+    0,
+    0.008,
+    0.003,
+    0.002,
+    -0.005,
+    -0.003,
+    -0.001,
+    0.003,
+    0.004,
+    0.007,
+    0.002,
+    0.002,
+    0.008,
+    0.006
+   ]
+  },
+  "TR1": {
+   "median": -0.003,
+   "q05": -0.012,
+   "q95": 0.004,
+   "inside": false,
+   "seeds": [
+    -0.006,
+    -0.012,
+    -0.003,
+    0.004,
+    -0.002,
+    -0.007,
+    -0.004,
+    0.001,
+    -0.001,
+    0.004,
+    -0.001,
+    0,
+    0.001,
+    -0.012,
+    -0.007,
+    0.002,
+    -0.008,
+    0.001,
+    -0.003,
+    0.004,
+    -0.009,
+    -0.004,
+    -0.008,
+    -0.006,
+    0.001,
+    -0.007,
+    -0.009,
+    0.003,
+    0,
+    0.003,
+    -0.002,
+    -0.014,
+    -0.006,
+    -0.008,
+    -0.006,
+    -0.003,
+    -0.005,
+    -0.002,
+    -0.003,
+    0.003
+   ]
+  },
+  "PH1": {
+   "median": -0.008,
+   "q05": -0.012,
+   "q95": -0.003,
+   "inside": false,
+   "seeds": [
+    -0.011,
+    -0.008,
+    -0.006,
+    -0.006,
+    -0.007,
+    -0.011,
+    -0.005,
+    -0.007,
+    -0.008,
+    -0.001,
+    -0.006,
+    -0.005,
+    -0.003,
+    -0.012,
+    -0.009,
+    -0.005,
+    -0.009,
+    -0.006,
+    -0.009,
+    -0.004,
+    -0.012,
+    -0.009,
+    -0.011,
+    -0.009,
+    -0.005,
+    -0.008,
+    -0.01,
+    -0.002,
+    -0.007,
+    -0.01,
+    -0.006,
+    -0.016,
+    -0.01,
+    -0.011,
+    -0.008,
+    -0.007,
+    -0.012,
+    -0.009,
+    -0.008,
+    -0.005
+   ]
+  }
+ },
+ "byYear": {
+  "2005": {
+   "rule": 30.08,
+   "BE1": 32.24,
+   "TR1": 21.47,
+   "PH1": 27.29
+  },
+  "2006": {
+   "rule": 0.54,
+   "BE1": -4.27,
+   "TR1": -1.63,
+   "PH1": -1.72
+  },
+  "2007": {
+   "rule": 32.67,
+   "BE1": 28.08,
+   "TR1": 15.45,
+   "PH1": 25.18
+  },
+  "2008": {
+   "rule": 5.43,
+   "BE1": -0.18,
+   "TR1": 5.87,
+   "PH1": 7.79
+  },
+  "2009": {
+   "rule": 27.74,
+   "BE1": 19.22,
+   "TR1": 21.06,
+   "PH1": 23.74
+  },
+  "2010": {
+   "rule": -7.29,
+   "BE1": -10.09,
+   "TR1": -0.88,
+   "PH1": -7.1
+  },
+  "2011": {
+   "rule": -24.57,
+   "BE1": -29.89,
+   "TR1": -21.54,
+   "PH1": -19.43
+  },
+  "2012": {
+   "rule": 41.64,
+   "BE1": 35.37,
+   "TR1": 20.53,
+   "PH1": 25.59
+  },
+  "2013": {
+   "rule": 57.67,
+   "BE1": 46.84,
+   "TR1": 37.63,
+   "PH1": 39.71
+  },
+  "2014": {
+   "rule": 11.01,
+   "BE1": 11.25,
+   "TR1": 11.74,
+   "PH1": 6.02
+  },
+  "2015": {
+   "rule": -9.17,
+   "BE1": -10.27,
+   "TR1": -10.7,
+   "PH1": -13.06
+  },
+  "2016": {
+   "rule": -0.4,
+   "BE1": -2.34,
+   "TR1": -2.91,
+   "PH1": -3.07
+  },
+  "2017": {
+   "rule": 6.51,
+   "BE1": -5.33,
+   "TR1": 2.94,
+   "PH1": 2.56
+  },
+  "2018": {
+   "rule": 19.4,
+   "BE1": 13.44,
+   "TR1": 16.13,
+   "PH1": 14.33
+  },
+  "2019": {
+   "rule": -8.8,
+   "BE1": -4.01,
+   "TR1": -20.4,
+   "PH1": -14.05
+  },
+  "2020": {
+   "rule": 17.73,
+   "BE1": 8.78,
+   "TR1": 10.08,
+   "PH1": 9.03
+  },
+  "2021": {
+   "rule": 31.2,
+   "BE1": 36.08,
+   "TR1": 33.33,
+   "PH1": 23.83
+  },
+  "2022": {
+   "rule": 19.82,
+   "BE1": 23.23,
+   "TR1": 12.28,
+   "PH1": 9.16
+  },
+  "2023": {
+   "rule": -15.42,
+   "BE1": -9.12,
+   "TR1": -15.7,
+   "PH1": -16.16
+  },
+  "2024": {
+   "rule": 37.84,
+   "BE1": 39.06,
+   "TR1": 13.49,
+   "PH1": 18.84
+  },
+  "2025": {
+   "rule": 10.41,
+   "BE1": 8.23,
+   "TR1": 6.61,
+   "PH1": 6.86
+  },
+  "2026": {
+   "rule": 13.4,
+   "BE1": 9.74,
+   "TR1": 5.67,
+   "PH1": 9.94
+  }
+ },
+ "text": "The rule's own exit nets +0.079R a trade in 2005-15 (month t +2.95) and +0.063R in 2016 → now (t +2.50). BE1: stop to entry once +1R reached: +0.057R / +0.057R net (t +2.25 / +2.37), max drawdown −51.6 / −27.3R against the rule's −42.2 / −33.8R. TR1: trail 1R behind the best price from +1R: +0.047R / +0.030R net (t +2.16 / +1.33), max drawdown −29.5 / −29.6R against the rule's −42.2 / −33.8R. PH1: half at +1R, rest to the rule's exit: +0.055R / +0.029R net (t +2.63 / +1.49), max drawdown −35.0 / −27.7R against the rule's −42.2 / −33.8R. About 34 % of trades reach +1R after their fill candle. The difference with the rule is the same before and after costs (the cost depends on entry and risk only). Control: on the random-entry placebo trades the same managements change little (median d BE1 +0.002, TR1 −0.003, PH1 −0.008), while on T1 each costs more than the placebo's 5-95 % band (BE1 −0.015, TR1 −0.033, PH1 −0.029): cutting or locking in at +1R takes away the days the breakout runs to 21:00, which is where its result comes from. TR1 and PH1 lower the drawdown a little; they also about halve the net R in 2016 → now. No management meets the pre-registered bar: the rule keeps its own exit (stop at the open, out at 21:00 UTC). Paper research; nothing live changes and no proposal is written.",
+ "data": "OANDA mid M5 USD/JPY from the shared candle cache (edgekit), 2005-01-02 → 2026-11-19 (1651787 candles read); windows 2005-01-04 → 2015-12-31 and 2016-01-01 → 2026-11-19"
+}

@@ -1,0 +1,187 @@
+/* Soft look (24 Nov 2026, owner: "more soft and transparent, right now looks heavy like rock").
+   Loaded last on every page. Display only: it changes colours, transparency, borders, radii and shadows, never layout.
+   Surfaces are see-through over a soft background wash, with a blur behind cards, panels and floating parts, so the
+   page reads lighter. Text colours are unchanged; every surface stays dark (or light) enough for AA text.
+   The token rules use :root:root:root so they win over each page's own token block whatever the load order. */
+
+:root:root:root:not([data-theme="light"]) {
+  --au-bg: #121315;
+  --au-surface: rgba(44, 48, 56, .58);
+  --au-surface-2: rgba(72, 78, 90, .42);
+  --au-well: rgba(255, 255, 255, .035);
+  --au-line: rgba(255, 255, 255, .065);
+  --au-line-strong: rgba(255, 255, 255, .12);
+  --au-line-soft: rgba(255, 255, 255, .04);
+  --au-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 10px 30px -18px rgba(0, 0, 0, .45);
+  --au-shadow-pop: 0 30px 70px -28px rgba(0, 0, 0, .6), 0 1px 0 rgba(255, 255, 255, .04) inset;
+  --soft-wash:
+    radial-gradient(1100px 620px at 12% -8%, rgba(120, 150, 205, .18), transparent 60%),
+    radial-gradient(900px 560px at 100% 10%, rgba(165, 140, 215, .12), transparent 62%),
+    radial-gradient(1000px 700px at 50% 115%, rgba(90, 175, 165, .09), transparent 60%);
+  --soft-glass: rgba(34, 37, 44, .72);
+}
+:root:root:root[data-theme="light"] {
+  --au-bg: #eef0f4;
+  --au-surface: rgba(255, 255, 255, .68);
+  --au-surface-2: rgba(226, 230, 237, .7);
+  --au-well: rgba(255, 255, 255, .5);
+  --au-line: rgba(20, 24, 30, .07);
+  --au-line-strong: rgba(20, 24, 30, .14);
+  --au-line-soft: rgba(20, 24, 30, .045);
+  --au-shadow: 0 1px 2px rgba(20, 24, 30, .03), 0 10px 30px -18px rgba(20, 24, 30, .18);
+  --au-shadow-pop: 0 30px 70px -28px rgba(20, 24, 30, .28);
+  --soft-wash:
+    radial-gradient(1100px 620px at 10% -10%, rgba(120, 150, 210, .16), transparent 60%),
+    radial-gradient(900px 560px at 100% 8%, rgba(190, 160, 230, .12), transparent 62%),
+    radial-gradient(1000px 700px at 50% 115%, rgba(120, 200, 190, .10), transparent 60%);
+  --soft-glass: rgba(255, 255, 255, .82);
+}
+@media (prefers-color-scheme: light) {
+  :root:root:root:not([data-theme="dark"]):not([data-theme="midnight"]) {
+  --au-bg: #eef0f4;
+  --au-surface: rgba(255, 255, 255, .68);
+  --au-surface-2: rgba(226, 230, 237, .7);
+  --au-well: rgba(255, 255, 255, .5);
+  --au-line: rgba(20, 24, 30, .07);
+  --au-line-strong: rgba(20, 24, 30, .14);
+  --au-line-soft: rgba(20, 24, 30, .045);
+  --au-shadow: 0 1px 2px rgba(20, 24, 30, .03), 0 10px 30px -18px rgba(20, 24, 30, .18);
+  --au-shadow-pop: 0 30px 70px -28px rgba(20, 24, 30, .28);
+  --soft-wash:
+    radial-gradient(1100px 620px at 10% -10%, rgba(120, 150, 210, .16), transparent 60%),
+    radial-gradient(900px 560px at 100% 8%, rgba(190, 160, 230, .12), transparent 62%),
+    radial-gradient(1000px 700px at 50% 115%, rgba(120, 200, 190, .10), transparent 60%);
+  --soft-glass: rgba(255, 255, 255, .82);
+}
+}
+:root:root:root[data-theme="midnight"] {
+  --au-bg: #0b0c0e;
+  --au-surface: rgba(30, 32, 37, .62);
+  --au-surface-2: rgba(48, 52, 60, .45);
+  --soft-glass: rgba(22, 24, 28, .78);
+}
+:root:root:root {
+  --au-r-sm: 10px; --au-r: 16px; --au-r-lg: 22px;
+  --r: var(--au-r); --r-sm: var(--au-r-sm);
+  /* older names the side pages and the Macro desk read directly */
+  --bg: var(--au-bg); --panel: var(--au-surface); --panel-raised: var(--au-surface-2); --panel-hover: var(--au-surface-2);
+  --panel-2: var(--au-well); --well: var(--au-well);
+  --line: var(--au-line); --line-soft: var(--au-line-soft); --line-strong: var(--au-line-strong);
+  --sh-1: var(--au-shadow); --sh-2: var(--au-shadow); --sh-3: var(--au-shadow-pop);
+}
+
+/* the wash behind everything; it stays put while the page scrolls */
+html:root, html:root body {
+  background-color: var(--au-bg) !important;
+  background-image: var(--soft-wash) !important;
+  background-attachment: fixed !important;
+  min-height: 100%;
+}
+
+/* cards and panels: see-through with a blur, a hairline and a soft shadow */
+/* never on a card that holds a chart: a backdrop filter makes the card the frame of its fixed-position children,
+   which moves the chart's overlays, drawings and synced panes (ChronosTrade audit, 24 Nov 2026) */
+html:root body :is(.card, .mx-card, .tile, .ict-m, .story > .card, .pos-card, .pf-box, .tile-s):not(.chartc):not(:has(canvas)) {
+  backdrop-filter: blur(16px) saturate(1.15);
+  -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  border-color: var(--au-line) !important;
+  box-shadow: var(--au-shadow);
+}
+
+/* the header bar and side rail: glass over the wash */
+html:root body :is(header.top, .btab, .rail, nav.side) {
+  background-color: color-mix(in srgb, var(--au-bg) 72%, transparent) !important;
+  background-image: none !important;
+  border-color: var(--au-line-soft) !important;
+  backdrop-filter: blur(30px) saturate(1.5);
+  -webkit-backdrop-filter: blur(30px) saturate(1.5);
+}
+/* a sticky section bar (the Macro desk's numbered chips): the header's glass, as a soft rounded strip */
+html:root body nav.toc {
+  background-color: color-mix(in srgb, var(--au-bg) 64%, transparent) !important;
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--au-line-soft);
+  border-radius: 16px;
+  padding: 6px 8px !important;
+}
+/* the Desk | Macro | … switch and the round header buttons: see-through too */
+html:root body :is(.hdr-sw, header.top .ib, header.top button.ic) {
+  background-color: color-mix(in srgb, var(--au-surface-2) 60%, transparent) !important;
+  border-color: var(--au-line-soft) !important;
+}
+
+/* floating parts: menus, popovers, dialogs, toasts. A little more opaque so text over the page stays clear */
+html:root body :is(dialog, .msd, .ddp, .ms-fav, .ms-dsel, .ms-cmenu, #ms-cmenu, #ms-sty-pop, .pk-offer, .ms-toast, .toast, .gate-card, [role="menu"], [role="listbox"]) {
+  background-color: var(--soft-glass) !important;
+  backdrop-filter: blur(22px) saturate(1.2);
+  -webkit-backdrop-filter: blur(22px) saturate(1.2);
+  border-color: var(--au-line-strong) !important;
+  box-shadow: var(--au-shadow-pop) !important;
+}
+html:root body dialog::backdrop { background: rgba(10, 12, 16, .35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+
+/* lighter headings: the same sizes, a less heavy weight */
+html:root body :is(h1, h2) { font-weight: 600 !important; letter-spacing: -.01em; }
+
+/* softer controls */
+html:root body :is(button, select, input, textarea):not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+
+/* ── second pass (24 Nov 2026, owner: "keep improving the theme") ──────────────────────────────────────────── */
+/* chips and side tags (BUY / SELL, shadow, status): soft tinted pills, no outline */
+html:root body :is(.chip, .ms-chip, .ms-chip-buy, .ms-chip-sell, .tag, .ms-st, .pill) {
+  border-radius: 999px !important;
+  box-shadow: none !important;
+  border-color: transparent !important;
+}
+/* the P&L calendars: rounder day cells, the result tint kept, the hard coloured frame gone */
+html:root body .cal-d { border-radius: 12px !important; border-color: var(--au-line-soft) !important; }
+html:root body .cal-d:is(.win, .loss) { border-color: transparent !important; }
+html:root body .cal-wk { border-radius: 12px !important; border-style: solid !important; border-color: var(--au-line-soft) !important; }
+html:root body .cal-wk:is(.win, .loss) { border-color: transparent !important; }
+html:root body .cal-nav button { border-color: transparent !important; background-color: color-mix(in srgb, var(--au-ink) 6%, transparent) !important; }
+/* the one primary button: a soft pill */
+html:root body :is(.pri, .primary, .btn.gold, .gate-go, .u-btn) { border-radius: 999px !important; }
+/* buttons, segmented switches and timeframe chips: soft filled, no hard frame; the chosen one a soft accent tint */
+html:root body :is(.seg, .tfs, .ms-tf, .mk-mode, .desk-sw, .c-nav, .ict-seg, .ict-src, .dl-tfs, .mo-seg) button,
+html:root body :is(.dl-card, .mo-card, .card) > :is(div, header) > button:not(.pri):not(.primary) {
+  border-color: transparent !important;
+  background-color: color-mix(in srgb, var(--au-ink) 5%, transparent);
+  border-radius: 10px;
+}
+html:root body :is(button, [role="tab"]):is([aria-pressed="true"], [aria-selected="true"], .on, .active):not(.pri):not(.primary):not(.btab a) {
+  background-color: color-mix(in srgb, var(--au-accent) 16%, transparent) !important;
+  border-color: transparent !important;
+  color: var(--au-ink) !important;   /* the page's own ink: a chip that was white on a solid fill keeps AA on the tint */
+  box-shadow: none !important;
+}
+/* inputs and selects: a soft well instead of a framed box */
+html:root body :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+  background-color: color-mix(in srgb, var(--au-ink) 4%, transparent);
+  border-color: var(--au-line) !important;
+  border-radius: 10px;
+}
+/* rows inside lists: a soft hover instead of nothing */
+html:root body :is(.c-act li, .act-row, .tr-row, table tbody tr):hover { background-color: color-mix(in srgb, var(--au-ink) 3.5%, transparent); }
+/* tables: lighter rules between rows */
+html:root body :is(table) :is(td, th) { border-color: var(--au-line-soft) !important; }
+/* chart areas: the frame around a chart is a hairline */
+html:root body :is(.ms-pane, .tv-wrap, .chart-wrap, .dl-chart) { border-color: var(--au-line-soft) !important; border-radius: 14px; }
+/* a gentle hover lift on cards you can open */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  html:root body :is(a.card, button.card, .tile-s, .hs-go a, .hq a):hover { transform: translateY(-1px); box-shadow: var(--au-shadow-pop); transition: transform .18s ease, box-shadow .18s ease; }
+}
+
+/* a reader who asks for less transparency gets solid surfaces */
+@media (prefers-reduced-transparency: reduce) {
+  :root:root:root:not([data-theme="light"]) { --au-surface: #23262c; --au-surface-2: #2d3036; --soft-glass: #23262c; }
+  :root:root:root[data-theme="light"] { --au-surface: #ffffff; --au-surface-2: #e7e9ec; --soft-glass: #ffffff; }
+  :root:root:root[data-theme="midnight"] { --au-surface: #131416; --au-surface-2: #1b1d20; --soft-glass: #131416; }
+  html:root body :is(.card, .mx-card, .tile, header.top, dialog, .msd) { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (prefers-reduced-transparency: reduce) and (prefers-color-scheme: light) {
+  :root:root:root:not([data-theme="dark"]):not([data-theme="midnight"]) { --au-surface: #ffffff; --au-surface-2: #e7e9ec; --soft-glass: #ffffff; }
+}

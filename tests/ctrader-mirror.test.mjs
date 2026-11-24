@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS, feedOnlyMove, adjOf } from '../council/ctrader-mirror.mjs';
+import { CASH_SHARE, mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS, feedOnlyMove, adjOf } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -161,6 +161,7 @@ test('caps: at most LIMITS.maxOpen open, and no new order after a 2% daily loss;
   r = await mirrorRound({ env: ENV, trades: trades.map((t) => (t.id === 't0' ? { ...t, status: 'win' } : t)), state: r.state, WS: b.WS, now: NOW + 240 });
   assert.equal(b.positions.size, LIMITS.maxOpen); assert.equal(Object.keys(r.state.wait).length, 1);
   const b2 = broker({ balance: 100000 }); r = await mirrorRound({ env: ENV, trades: [], state: started, WS: b2.WS, now: NOW });
+  r.state.day.ids = ['gone'];   // a position of the last round closed: the fall is a trading loss
   b2.setBalance(97900); r = await mirrorRound({ env: ENV, trades: [tr({ id: 'late' })], state: r.state, WS: b2.WS, now: NOW + 60 });
   assert.equal(b2.positions.size, 0); assert.match(r.state.wait.late.why, /daily loss stop/);
 });
@@ -310,6 +311,7 @@ test('housekeeping: skip notes live as long as the council trade is open (never 
 test('daily stop: a day that started without a readable balance takes the first one it gets', async () => {
   const b = broker(); const st = { ...started, day: { date: new Date(NOW * 1000).toISOString().slice(0, 10), startBalance: null } };
   let r = await mirrorRound({ env: ENV, trades: [], state: st, WS: b.WS, now: NOW }); assert.equal(r.state.day.startBalance, 10000);
+  r.state.day.ids = ['gone'];   // a position of the last round closed: the fall is a trading loss
   b.setBalance(970000); r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
   assert.equal(orders(b).length, 0); assert.match(r.state.wait['eurusd-intraday-1'].why, /daily loss stop/);
 });
@@ -1159,4 +1161,30 @@ test('pickAccount: "*155" = the one demo account whose login ends 155; two match
   assert.equal(mirrorFile('*155', '9'), 'mirror-155.json'); assert.equal(mirrorFile('9', '9'), 'mirror.json'); assert.match(mirrorFile('*155', '9'), /^mirror(-\d+)?\.json$/);
   const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
   assert.equal(acc.mirrorAccounts.mosha6, '*155'); assert.deepEqual(acc.drain, ['10152145']); assert.equal(acc.mirrorAccounts.eqx, '10152144');
+});
+
+test('daily stop: a balance cut to under half the day start is an account reset, not a loss (24 Nov 2026)', async () => {
+  const b = broker(); const st = { ...started, day: { date: new Date(NOW * 1000).toISOString().slice(0, 10), startBalance: 200000 } };
+  const r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: st, WS: b.WS, now: NOW + 60 });
+  assert.equal(r.state.day.startBalance, 10000); assert.ok(r.state.day.reset);
+  assert.equal((r.state.wait || {})['eurusd-intraday-1'], undefined); assert.equal(orders(b).length, 1);
+});
+
+test('daily stop: money taken out between two rounds with no position closed is a withdrawal, not a loss (24 Nov 2026)', async () => {
+  const b = broker({ balance: 1000000 }); const day = new Date(NOW * 1000).toISOString().slice(0, 10);
+  let r = await mirrorRound({ env: ENV, trades: [], state: { ...started, day: { date: day, startBalance: 10000 } }, WS: b.WS, now: NOW });
+  assert.equal(r.state.day.lastBalance, 10000);
+  b.setBalance(700000);   // $3,000 withdrawn: 30 %, under the reset share, would read as a 30 % day loss
+  r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
+  assert.equal(r.state.day.startBalance, 7000); assert.equal(r.state.day.cash, -3000);
+  assert.equal((r.state.wait || {})['eurusd-intraday-1'], undefined); assert.equal(orders(b).length, 1);
+  assert.ok(CASH_SHARE > 0 && CASH_SHARE < 0.05);
+});
+
+test('daily stop: a fall right after the mirror sent an order is still a loss (the copy may have been stopped out in between)', async () => {
+  const b = broker({ balance: 1000000 }); const day = new Date(NOW * 1000).toISOString().slice(0, 10);
+  let r = await mirrorRound({ env: ENV, trades: [], state: { ...started, day: { date: day, startBalance: 10000 } }, WS: b.WS, now: NOW });
+  r.state.day.sent = true; b.setBalance(970000);
+  r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
+  assert.equal(r.state.day.startBalance, 10000); assert.match(r.state.wait['eurusd-intraday-1'].why, /daily loss stop/);
 });

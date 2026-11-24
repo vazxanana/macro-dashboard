@@ -1,0 +1,142 @@
+{
+ "study": "usdjpy-vb-gotobi",
+ "title": "USD/JPY T1 breakout on gotobi days",
+ "built": "2026-11-24",
+ "tests": {
+  "DISC": {
+   "G1": {
+    "gotobi": {
+     "n": 542,
+     "netR": -0.035,
+     "grossR": -0.007
+    },
+    "other": {
+     "n": 1352,
+     "netR": 0.144,
+     "grossR": 0.173
+    },
+    "diff": -0.179,
+    "welchT": -2.8,
+    "p": 0.005,
+    "month": {
+     "months": 120,
+     "t": -2.48
+    },
+    "placeboShare": 0.008
+   },
+   "G2": {
+    "gotobi": {
+     "n": 298,
+     "netR": -0.084,
+     "grossR": -0.057
+    },
+    "other": {
+     "n": 712,
+     "netR": 0.09,
+     "grossR": 0.119
+    },
+    "diff": -0.174,
+    "welchT": -2.02,
+    "p": 0.043,
+    "month": {
+     "months": 113,
+     "t": -2.94
+    },
+    "placeboShare": 0.039
+   }
+  },
+  "CONF": {
+   "G1": {
+    "gotobi": {
+     "n": 627,
+     "netR": 0.009,
+     "grossR": 0.04
+    },
+    "other": {
+     "n": 1648,
+     "netR": 0.072,
+     "grossR": 0.105
+    },
+    "diff": -0.063,
+    "welchT": -1.08,
+    "p": 0.281,
+    "month": {
+     "months": 143,
+     "t": -1.53
+    },
+    "placeboShare": 0.317
+   },
+   "G2": {
+    "gotobi": {
+     "n": 323,
+     "netR": 0.019,
+     "grossR": 0.049
+    },
+    "other": {
+     "n": 838,
+     "netR": -0.048,
+     "grossR": -0.015
+    },
+    "diff": 0.067,
+    "welchT": 0.8,
+    "p": 0.422,
+    "month": {
+     "months": 125,
+     "t": 0.71
+    },
+    "placeboShare": 0.408
+   }
+  }
+ },
+ "book": {
+  "DISC": {
+   "days": 537,
+   "corr": 0.03,
+   "t1NetR": -0.041,
+   "fadeNetR": 0.287,
+   "bookNetR": 0.246,
+   "bookMonthT": 3.15
+  },
+  "CONF": {
+   "days": 627,
+   "corr": 0.043,
+   "t1NetR": 0.009,
+   "fadeNetR": 0.181,
+   "bookNetR": 0.19,
+   "bookMonthT": 2.32
+  }
+ },
+ "decision": {
+  "G1": {
+   "holmP": 0.563,
+   "checks": {
+    "sameSign": true,
+    "t2": false,
+    "holm": false,
+    "n200": true,
+    "placebo": false
+   },
+   "pass": false
+  },
+  "G2": {
+   "holmP": 0.563,
+   "checks": {
+    "sameSign": false,
+    "t2": false,
+    "holm": false,
+    "n200": true,
+    "placebo": false,
+    "gotobiPositive": false
+   },
+   "pass": false
+  }
+ },
+ "data": {
+  "first": "2005-01-03",
+  "last": "2026-11-20",
+  "trades": 4169,
+  "candles": 1644664
+ },
+ "verdict": "NO DIFFERENCE, 0 of 2: T1 on gotobi days minus other days −0.063R a trade in 2015 on (Welch t −1.08, n 627 vs 1648), sells +0.067R (t +0.80, n 323 vs 838)",
+ "reading": "No pre-registered test passes. G1: in 2005-2014 T1 did worse on gotobi days (−0.035R against +0.144R a trade after costs, difference −0.179R, Welch t −2.80, 0.8 % of random day sets as far apart), but in 2015 on the gap shrank to −0.063R (t −1.08, Holm p 0.56, 31.7 % of random sets): the same sign, not confirmed. G2: sell fills on gotobi days were worse in 2005-2014 (−0.174R, t −2.02) and better in 2015 on (+0.067R, t 0.80): the sign flipped, so the gotobi fade does not show up as better T1 sells. T1 on gotobi days is about flat after costs in both windows (n 542 and 627). G3 (descriptive): on gotobi days T1 and the fade are nearly uncorrelated (daily net R correlation 0.03 and 0.04); the fade carries the sum (+0.29R and +0.18R a day against T1 −0.04R and +0.01R). Do not skip or add T1 trades by the gotobi calendar on this evidence; the discovery gap is a hypothesis at most, and it did not repeat. Costs: the demo commission + 0.5 pip charged on every year (2005-14 spreads were wider). Nothing live changed."
+}

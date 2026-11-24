@@ -524,7 +524,7 @@
   .tc-st.wait, .tc-st.caution { color: var(--au-warn, var(--ink)); } .tc-st.wait::before, .tc-st.caution::before { background: var(--au-warn, var(--ink)); }
   .tc-st.clear { color: var(--ink); } .tc-st.neutral { color: var(--ink-dim); }
   .pl-list { list-style: none; margin: 0; padding: 0; }
-  .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
+  .pl-list li { display: grid; grid-template-columns: minmax(120px, 170px) minmax(0, 1fr); gap: 2px 14px; padding: 9px 0; border-bottom: 1px solid var(--line); font: 400 var(--fs-sm)/1.5 var(--sans); color: var(--ink-dim); }
   .nx-bl li, .res-l li { display: block; }
   /* Week ahead (20 Nov 2026) */
   .wa-days { display: grid; gap: var(--s3); margin: var(--s3) 0; }
@@ -581,9 +581,11 @@
     .res-l li + li { margin-top: var(--s3, 12px); }
     .res-doc { color: var(--ink-faint); }
   .pl-list li > b:first-child { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .pl-list li.pl-call { grid-template-columns: 120px 1fr; } .pl-list li.pl-call > b:first-child { font-size: var(--fs-md); }
+  .pl-list li.pl-call { grid-template-columns: 120px minmax(0, 1fr); } .pl-list li.pl-call > b:first-child { font-size: var(--fs-md); }
   .pl-list li.pl-call > b .d { display: block; font-weight: 400; }
   .pl-list .d { color: var(--ink-faint); font-size: 12px; white-space: nowrap; }
+  /* a long detail line (a release that reaches five markets) wraps instead of widening the page on a phone (24 Nov 2026) */
+  .pl-list li > * { min-width: 0; } .pl-list li > span .d { white-space: normal; overflow-wrap: anywhere; }
   .pl-lv { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
   .pl-lv > div { padding: var(--s3); border-radius: var(--r-sm); background: var(--well); font: 400 var(--fs-sm)/1.45 var(--sans); color: var(--ink-dim); }
   .pl-lv > div b { display: block; color: var(--ink); font: 650 var(--fs-lg) var(--sans); font-variant-numeric: tabular-nums; }
@@ -591,7 +593,7 @@
   .pl-sc li { padding: 6px 10px; border-radius: var(--r-sm); background: var(--well); font: 400 12px/1.35 var(--sans); color: var(--ink-dim); text-align: center; }
   .pl-sc li b { display: block; color: var(--ink); font: 600 var(--fs-sm) var(--sans); font-variant-numeric: tabular-nums; }
   .pl-sc li.now { box-shadow: inset 0 0 0 1px var(--line-strong); }
-  @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: 1fr; } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } .pl-copy { float: none; width: 100%; margin: 0 0 var(--s3); } }
+  @media (max-width: 640px) { .pl-list li, .pl-list li.pl-call { grid-template-columns: minmax(0, 1fr); } .pl-lv { grid-template-columns: 1fr; } .pl-tabs { display: flex; } .pl-tabs button { flex: 1; } .pl-copy { float: none; width: 100%; margin: 0 0 var(--s3); } }
   @media (pointer: coarse) { .pl-tabs button, .pl-copy { min-height: 44px; } }
   @media (max-width: 640px) { .dr-top .pl-tabs { flex: 1 1 100%; } .dr-top .pl-tabs button { white-space: nowrap; } }   /* 20 Nov 2026: "World economy" wrapped to two lines beside the day picker */
   /* calmer (19 Nov 2026, owner: "it looks made by an AI"): the three glance columns are columns split by a hairline, not boxes
@@ -682,6 +684,7 @@
   }
 </style>
 <script src="/assets/mx-nav.js?v=e7077d341f" defer></script>
+<link rel="stylesheet" href="/assets/soft.css?v=f4492d600a">
 <!-- app tags: scripts/pwa.mjs -->
 <link rel="manifest" href="/app.webmanifest">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">

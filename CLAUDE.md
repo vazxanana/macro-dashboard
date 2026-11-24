@@ -2608,6 +2608,17 @@ reads it. Not advice, not a tested edge (the page and the system text say so).
   and "The facts sent" in a fold. Hidden and not run for guests. `window.msStructAssistant()` is a read-only view.
 - Tests: `tests/structure-assistant.test.mjs` (7). Not checked against a real provider (no key in the build sandbox).
 
+## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
+Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
+right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to
+`THEMES`, `window.msTvView`) opens every chart at about 8 px a candle (width / 8, at least 50 and at most 220 candles in view, a
+tenth of that as room on the right): the six panes (`P.fit`), the free chart and Markets side by side. `tvLook(t, theme)` = one solid
+background, a faint grid (`TV_GRID` per theme), dashed crosshair with dark labels, the scales' borders, kinetic scrolling, scale by
+dragging either axis; applied by `applyTheme`, `spTheme`, `mmTheme` (a member's own background still wins). Style → "Green / red
+candles" (`#ms-sty-tv`) sets the member's up / down colours to the dark themes' green / red; the owner's grey / black light-theme
+default (#686) is unchanged. Toolbar from 1024 px: one row, the key hints left to Help (the keys work), Indicators beside the
+markets switch (last rules of `#ms-ch-flat-css`). Panning measured 60 fps (p95 16.8 ms) on the panes. Test: `tests/charts-tv-look.test.mjs`.
+
 ## Charts bug hunt (20 Nov 2026: the chart features of 18-20 Nov, used in a browser)
 Every drawing tool, the paper account, the volume profile, Layout, Markets side by side, Split, any timeframe, full screen and the
 live ticks were driven with Playwright (1440 px mouse, 390 px touch; owner and guest; live candles). Twelve defects, each
@@ -3499,6 +3510,14 @@ Tests: `tests/ctrader-mirror.test.mjs` ("Equinox", "ICT copies stopped").
 its state file is `mirror-155.json` (`mirrorFile`: digits only, so the Trader's `mirror(-\d+)?.json` reader holds). 10152145 is in
 `drain`: it opens nothing and manages its open Mosha copies to their exits. On $200, 0.25 % is $0.50 a trade: most gold trades need
 more than the smallest lot allows and are skipped (`riskVolume`'s minimum-lot rule, at most 2 %).
+**Checked 24 Nov 2026**: the token holds no demo account whose login ends 155 (`ctrader/accounts.json`: "account not found for this
+token"; `mirror-155.json` "refused"), so nothing trades there until the owner authorises that account for the cTrader app. The
+…144 account was reset from about $10,000 to $500 after the UTC day began and the 2 % day stop then held every copy ("95 % down
+today"): a balance under `RESET_SHARE` 0.5 of the day's start is now read as an account reset and the day starts again
+(`state.day.reset`). **Withdrawals and deposits** (owner, 24 Nov 2026: "I took money from the accounts … it is not a loss"): a
+balance move of more than `CASH_SHARE` 1 % between two rounds while every position and resting order of the last round is still
+there and the mirror sent no order last round is cash, not trading: the day's start moves with it (`state.day.cash`, a log line);
+`state.day.lastBalance` / `ids` / `oids` / `sent` carry what the next round compares. `dom/trades.json` `conn` records a refused connection once (`{ error, acct, since }`, then `{ ok }` when back).
 
 ## Mirror stop safety (9 Nov 2026, owner: "fix that, the most important part of this project")
 Monday open: every market order logged "set the missing stop". Two changes in `council/ctrader-mirror.mjs`:
@@ -6764,3 +6783,25 @@ no council member reads it, and nothing is kept in the browser.
   own rule still applies: an open record's entry is usually already past, so its call counts only once price comes back to the
   entry. Never for guests (`span.dc` hidden for the public role; the script returns there). Practice only.
 - Not built (the proposal's later steps): the study's report from this file. Tests: `tests/journal.test.mjs`, `tests/desk-calls.test.mjs`.
+
+## Soft look (24 Nov 2026, owner: "make the design and theme of the website more soft and transparent, right now looks heavy like rock")
+Display only. `assets/soft.css`, linked right before `</head>` on every page (Desk, Macro desk, ChronosTrade, Academy, Edge lab,
+Equinox, gold terminal, /veteran/; offline.html stays self-contained), loaded last and written with `:root:root:root` / `html:root body`
+so it wins over each page's own token block whatever the order. Surfaces are see-through (`--au-surface` rgba .58 dark / .68 light,
+`--au-surface-2` .42 / .70) over a fixed soft background wash (`--soft-wash`, three faint radial gradients), cards and panels get a
+16 px backdrop blur, header, phone tab bar and side rail are frosted glass (`color-mix` of the background at 72 %, 30 px blur; the header switch and round buttons see-through too), menus, popovers, dialogs and toasts a
+more opaque glass (`--soft-glass`) with a 22 px blur, hairlines lighter, radii 10 / 16 / 22 px, diffuse shadows, h1 / h2 weight 600.
+Text colours are unchanged. `prefers-reduced-transparency: reduce` gets solid surfaces. To undo: remove the link from the pages.
+Second pass (same day, "keep improving the theme"): chips and BUY / SELL tags are tinted pills without an outline; calendar day
+and week cells 12 px, their coloured frames gone (the result tint stays); segmented switches, timeframe chips and card buttons soft
+filled without a frame, the chosen one a soft accent tint; inputs and selects a soft well; table rules lighter; list rows a soft
+hover; primary buttons pills; clickable cards lift 1 px on hover (not with reduced motion).
+Rules found by the ChronosTrade audit (24 Nov 2026): light is `data-theme="light"` OR the system set to light with no
+`dark` / `midnight` chosen (every page's own rule); dark keeps the pinned background #121315, midnight #0b0c0e; a selected
+item takes the page's ink on its accent tint; **no backdrop blur on a card that holds a chart** (`.chartc`, any card with a
+canvas): a backdrop filter makes the card the frame of its fixed-position children and broke the synced panes and drawings.
+Third pass (24 Nov 2026, "keep going"): the Macro desk's sticky section bar (`nav.toc`) is the header's glass as a rounded strip
+(it was a 90 % slab of the page colour); the Edge lab's Forward records card has a sixth record, the gotobi fade (`gotobi-forward`,
+written by `vb-forward.yml` since 21 Nov), in a grid of three; the early-against-late card says "no trades yet" before its first
+trade. Found by the smoke test on today's data: a long line in the Macro desk's "Your read" list (`.pl-list .d`, no wrap) widened
+the phone page to 607 px; its column now shrinks (`minmax(0, 1fr)`) and that line wraps.

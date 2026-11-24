@@ -180,6 +180,12 @@ export const moshaHasOwnAccount = (byBook) => !!(byBook && byBook.mosha6 && byBo
 // balance; maxLots stays only as the cap when that margin is unknown.
 // 8 Nov (owner: mirror everything): maxOpen 5 -> 40, maxOpenRisk 1% -> 50% (minimum-lot orders on a ~$1,000 demo risk about 1% each),
 // minLot fallback on, total margin of all open mirror positions at most 80% of the balance.
+// 24 Nov 2026: a day-start balance this many times the balance now is an account reset, not a loss (see the day stop below)
+export const RESET_SHARE = 0.5;
+// 24 Nov 2026 (owner: "I took money from the accounts yesterday, so that's why there's a loss showing but it is not a loss"): a balance
+// change of more than this share between two rounds while every position of the last round is still open cannot come from a closed
+// trade (opening one costs a commission of about 0.01 %): it is a withdrawal or deposit, and the day's start moves with it.
+export const CASH_SHARE = 0.01;
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
   risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.0025 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
@@ -592,9 +598,29 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
     const today = new Date(now * 1000).toISOString().slice(0, 10);
     if (!st.day || st.day.date !== today) st.day = { date: today, startBalance: balance };
     if (st.day.startBalance == null && balance != null) st.day.startBalance = balance;   // first readable balance of the day
+    // 24 Nov 2026: a demo account reset (the owner set …144 from about $10,000 to $500) is not a loss: with the 2 % daily
+    // stop that reads the day's start balance it held every copy all day ("95 % down today"). A fall of half the balance or
+    // more inside one day cannot come from trades sized at a fraction of a per cent with stops, so the day starts again there.
+    if (balance != null && st.day.startBalance > 0 && balance < st.day.startBalance * RESET_SHARE) {
+      say(`balance ${balance} against a day start of ${st.day.startBalance}: read as an account reset, the day starts again`);
+      st.day = { date: today, startBalance: balance, reset: new Date(now * 1000).toISOString() };
+    }
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES);
     const positions = new Map((rc.position || []).map((p) => [String(p.positionId), p]));
     const bOrders = new Map((rc.order || []).map((o) => [String(o.orderId), o]));   // pending orders resting at the broker
+    // cash in or out (see CASH_SHARE): only when the last round's positions are all still here, so no closed trade is hidden in it
+    // ...and every resting order of the last round is still resting (none filled and closed in between), and the mirror sent no
+    // new order last round (one opened and stopped out before this round would not be in the last round's list)
+    if (balance != null && st.day.lastBalance != null && Array.isArray(st.day.ids) && st.day.ids.every((id) => positions.has(id))
+      && Array.isArray(st.day.oids) && st.day.oids.every((id) => bOrders.has(id)) && !st.day.sent) {
+      const cash = balance - st.day.lastBalance;
+      if (Math.abs(cash) > st.day.lastBalance * CASH_SHARE && st.day.startBalance != null) {
+        st.day.startBalance += cash; st.day.cash = +((st.day.cash || 0) + cash).toFixed(2);
+        say(`balance moved ${cash.toFixed(2)} with no position closed: read as a ${cash < 0 ? 'withdrawal' : 'deposit'}, the day start moves with it`);
+      }
+    }
+    if (balance != null) { st.day.lastBalance = balance; st.day.ids = [...positions.keys()]; st.day.oids = [...bOrders.keys()]; }
+    st.day.sent = false;
     const iso = new Date(now * 1000).toISOString(), byId = new Map(trades.map((t) => [t.id, t]));
     st.orders = st.orders || {};   // the mirror's own resting LIMIT orders, by council trade id
     const limitsPlaced = [];       // the limits placed in THIS round: read back before the round ends (the stop check below)
@@ -817,7 +843,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
             comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), timeInForce: 1, expirationTimestamp: exp * 1000 };   // 1: GOOD_TILL_DATE
           if (t.t1 != null && !(t.rr >= 50)) order.takeProfit = at(t.t1);
           try {
-            const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, pendingStep);
+            st.day.sent = true; const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, pendingStep);
             const oid = ev.order && ev.order.orderId; if (oid == null) throw Object.assign(new Error('order accepted without an order id'), { code: 'NO_ORDER_ID' });
             st.orders[t.id] = { orderId: String(oid), symbol: name, side: t.side, volume: rv.volume, lots: rv.lots, digits: d, setup: t.k, limitPrice: order.limitPrice, stop: t.stop, t1: t.t1, placedAt: iso,
               expires: new Date(exp * 1000).toISOString(), riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}) };
@@ -854,7 +880,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
           comment: commentFor(t), clientOrderId: String(t.id).slice(0, 50), relativeStopLoss: relative(from - t.stop, d) };
         if (t.t1 != null && !(t.rr >= 50)) order.relativeTakeProfit = relative(t.t1 - from, d);   // trailing systems: no fixed target
         try {
-          const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
+          st.day.sent = true; const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const pid = (ev.position && ev.position.positionId) ?? (ev.order && ev.order.positionId), filled = !ev.interim && pid != null;
           st.map[t.id] = { positionId: pid != null ? String(pid) : null, symbol: name, side: t.side, volume, lots: volume / +info.lotSize, digits: d, setup: t.k, status: filled ? 'open' : 'sent', openedAt: iso, councilEntry: t.entry, stop: t.stop, t1: t.t1, ...(t.feedAdj ? { feedAdj: adjOf(t) } : {}), riskCash: rv.riskCash, ...(rv.margin != null ? { margin: rv.margin } : {}), ...(rv.minLot ? { minLot: true } : {}), ...(t.shadow ? { shadow: true } : {}), ...(mark ? { mark, levelsFrom: 'mark' } : {}),
             ...fillQuality(t, (ev.deal && ev.deal.executionPrice) ?? (filled && ev.position ? ev.position.price : null), now) };

@@ -1,0 +1,449 @@
+{
+ "study": "usdjpy-vb-tokyo-open",
+ "title": "USD/JPY T1: New York or Tokyo day instead of the UTC day",
+ "built": "2026-11-24",
+ "preregistration": "research/edge/usdjpy-vb-tokyo-open/PREREGISTRATION.md",
+ "planSha256": "3732f098b5337e34930da7514d2c8a0606488f2b3e5ba5d16293c05565110233",
+ "verdict": "NO DIFFERENCE SHOWN: A. New York day NO DIFFERENCE SHOWN; B. Tokyo day NO DIFFERENCE SHOWN. Paired monthly difference against the UTC rule, net R a trade, discovery / confirmation: New York day −0.047 (t −2.18) / −0.013 (t −0.83); Tokyo day −0.063 (t −1.77) / −0.014 (t −0.43); the rule stays the UTC day",
+ "gate": {
+  "want": {
+   "early": {
+    "n": 2089,
+    "netR": 0.079
+   },
+   "late": {
+    "n": 2079,
+    "netR": 0.063
+   }
+  },
+  "got": {
+   "early": {
+    "n": 2089,
+    "win": 0.447,
+    "grossR": 0.109,
+    "netR": 0.079,
+    "net2R": 0.05,
+    "t": 2.95,
+    "grossT": 4.06,
+    "maxDD": -42.21,
+    "total": 165.76,
+    "overRoll": 0
+   },
+   "late": {
+    "n": 2079,
+    "win": 0.444,
+    "grossR": 0.096,
+    "netR": 0.063,
+    "net2R": 0.031,
+    "t": 2.5,
+    "grossT": 3.77,
+    "maxDD": -33.76,
+    "total": 131.7,
+    "overRoll": 0
+   }
+  },
+  "ok": true
+ },
+ "windows": {
+  "discovery": [
+   "2005-01-04",
+   "2014-12-31"
+  ],
+  "confirmation": [
+   "2015-01-01",
+   "2026-11-21"
+  ]
+ },
+ "k": 0.5,
+ "days": {
+  "UTC (the rule)": {
+   "discovery": {
+    "n": 1894,
+    "win": 0.455,
+    "grossR": 0.121,
+    "netR": 0.092,
+    "net2R": 0.063,
+    "t": 3.32,
+    "grossT": 4.39,
+    "maxDD": -42.21,
+    "total": 174.92,
+    "overRoll": 0
+   },
+   "confirmation": {
+    "n": 2275,
+    "win": 0.439,
+    "grossR": 0.087,
+    "netR": 0.055,
+    "net2R": 0.023,
+    "t": 2.22,
+    "grossT": 3.53,
+    "maxDD": -33.76,
+    "total": 124.99,
+    "overRoll": 0
+   },
+   "pooled": {
+    "n": 4169,
+    "win": 0.446,
+    "grossR": 0.103,
+    "netR": 0.072,
+    "net2R": 0.041,
+    "t": 3.89,
+    "grossT": 5.58,
+    "maxDD": -42.21,
+    "total": 299.91,
+    "overRoll": 0
+   }
+  },
+  "A. New York day (17:00 NY, 24 h)": {
+   "discovery": {
+    "n": 1921,
+    "win": 0.441,
+    "grossR": 0.08,
+    "netR": 0.051,
+    "net2R": 0.021,
+    "t": 1.94,
+    "grossT": 3.1,
+    "maxDD": -39.81,
+    "total": 97.79,
+    "overRoll": 0
+   },
+   "confirmation": {
+    "n": 2309,
+    "win": 0.43,
+    "grossR": 0.072,
+    "netR": 0.039,
+    "net2R": 0.006,
+    "t": 1.56,
+    "grossT": 2.9,
+    "maxDD": -35.12,
+    "total": 89.8,
+    "overRoll": 0
+   },
+   "pooled": {
+    "n": 4230,
+    "win": 0.435,
+    "grossR": 0.076,
+    "netR": 0.044,
+    "net2R": 0.013,
+    "t": 2.46,
+    "grossT": 4.23,
+    "maxDD": -39.81,
+    "total": 187.59,
+    "overRoll": 0
+   }
+  },
+  "B. Tokyo day (00:00 Tokyo = 15:00 UTC, 24 h)": {
+   "discovery": {
+    "n": 1645,
+    "win": 0.423,
+    "grossR": 0.069,
+    "netR": 0.039,
+    "net2R": 0.008,
+    "t": 1.24,
+    "grossT": 2.21,
+    "maxDD": -38.04,
+    "total": 63.38,
+    "overRoll": 451
+   },
+   "confirmation": {
+    "n": 1915,
+    "win": 0.407,
+    "grossR": 0.072,
+    "netR": 0.039,
+    "net2R": 0.005,
+    "t": 1.19,
+    "grossT": 2.22,
+    "maxDD": -55.9,
+    "total": 74.31,
+    "overRoll": 499
+   },
+   "pooled": {
+    "n": 3560,
+    "win": 0.415,
+    "grossR": 0.071,
+    "netR": 0.039,
+    "net2R": 0.007,
+    "t": 1.71,
+    "grossT": 3.12,
+    "maxDD": -55.9,
+    "total": 137.69,
+    "overRoll": 950
+   }
+  }
+ },
+ "tests": [
+  {
+   "name": "A. New York day (17:00 NY, 24 h)",
+   "discovery": {
+    "v": {
+     "n": 1921,
+     "win": 0.441,
+     "grossR": 0.08,
+     "netR": 0.051,
+     "net2R": 0.021,
+     "t": 1.94,
+     "grossT": 3.1,
+     "maxDD": -39.81,
+     "total": 97.79,
+     "overRoll": 0
+    },
+    "pair": {
+     "months": 120,
+     "d": -0.047,
+     "t": -2.18,
+     "dSum": -0.643,
+     "tSum": -2.03
+    }
+   },
+   "confirmation": {
+    "v": {
+     "n": 2309,
+     "win": 0.43,
+     "grossR": 0.072,
+     "netR": 0.039,
+     "net2R": 0.006,
+     "t": 1.56,
+     "grossT": 2.9,
+     "maxDD": -35.12,
+     "total": 89.8,
+     "overRoll": 0
+    },
+    "pair": {
+     "months": 143,
+     "d": -0.013,
+     "t": -0.83,
+     "dSum": -0.246,
+     "tSum": -0.98
+    }
+   },
+   "pBetter": 0.797,
+   "pWorse": 0.203,
+   "pBetterHolm": 1,
+   "pWorseHolm": 0.406,
+   "decision": "NO DIFFERENCE SHOWN"
+  },
+  {
+   "name": "B. Tokyo day (00:00 Tokyo = 15:00 UTC, 24 h)",
+   "discovery": {
+    "v": {
+     "n": 1645,
+     "win": 0.423,
+     "grossR": 0.069,
+     "netR": 0.039,
+     "net2R": 0.008,
+     "t": 1.24,
+     "grossT": 2.21,
+     "maxDD": -38.04,
+     "total": 63.38,
+     "overRoll": 451
+    },
+    "pair": {
+     "months": 120,
+     "d": -0.063,
+     "t": -1.77,
+     "dSum": -0.93,
+     "tSum": -1.88
+    }
+   },
+   "confirmation": {
+    "v": {
+     "n": 1915,
+     "win": 0.407,
+     "grossR": 0.072,
+     "netR": 0.039,
+     "net2R": 0.005,
+     "t": 1.19,
+     "grossT": 2.22,
+     "maxDD": -55.9,
+     "total": 74.31,
+     "overRoll": 499
+    },
+    "pair": {
+     "months": 143,
+     "d": -0.014,
+     "t": -0.43,
+     "dSum": -0.354,
+     "tSum": -0.78
+    }
+   },
+   "pBetter": 0.666,
+   "pWorse": 0.334,
+   "pBetterHolm": 1,
+   "pWorseHolm": 0.406,
+   "decision": "NO DIFFERENCE SHOWN"
+  }
+ ],
+ "control": [
+  {
+   "h": 0,
+   "n": 4639,
+   "netR": 0.046,
+   "t": 2.17,
+   "note": "00:00 UTC, 24-hour day (not the rule: the rule exits at 21:00)"
+  },
+  {
+   "h": 1,
+   "n": 4616,
+   "netR": 0.048,
+   "t": 2.2,
+   "note": null
+  },
+  {
+   "h": 2,
+   "n": 4584,
+   "netR": 0.039,
+   "t": 1.8,
+   "note": null
+  },
+  {
+   "h": 3,
+   "n": 4535,
+   "netR": 0.029,
+   "t": 1.36,
+   "note": null
+  },
+  {
+   "h": 4,
+   "n": 4520,
+   "netR": 0.025,
+   "t": 1.14,
+   "note": null
+  },
+  {
+   "h": 5,
+   "n": 4030,
+   "netR": 0.049,
+   "t": 2.38,
+   "note": null
+  },
+  {
+   "h": 6,
+   "n": 3772,
+   "netR": 0.051,
+   "t": 2.57,
+   "note": null
+  },
+  {
+   "h": 7,
+   "n": 3782,
+   "netR": 0.053,
+   "t": 2.53,
+   "note": null
+  },
+  {
+   "h": 8,
+   "n": 3735,
+   "netR": 0.053,
+   "t": 2.51,
+   "note": null
+  },
+  {
+   "h": 9,
+   "n": 3663,
+   "netR": 0.043,
+   "t": 2.01,
+   "note": null
+  },
+  {
+   "h": 10,
+   "n": 3638,
+   "netR": 0.06,
+   "t": 2.7,
+   "note": null
+  },
+  {
+   "h": 11,
+   "n": 3640,
+   "netR": 0.05,
+   "t": 2.29,
+   "note": null
+  },
+  {
+   "h": 12,
+   "n": 3619,
+   "netR": 0.063,
+   "t": 2.84,
+   "note": null
+  },
+  {
+   "h": 13,
+   "n": 3600,
+   "netR": 0.04,
+   "t": 1.81,
+   "note": null
+  },
+  {
+   "h": 14,
+   "n": 3584,
+   "netR": 0.027,
+   "t": 1.23,
+   "note": null
+  },
+  {
+   "h": 15,
+   "n": 3560,
+   "netR": 0.039,
+   "t": 1.71,
+   "note": "Tokyo day (B)"
+  },
+  {
+   "h": 16,
+   "n": 3506,
+   "netR": 0.011,
+   "t": 0.52,
+   "note": null
+  },
+  {
+   "h": 17,
+   "n": 3528,
+   "netR": 0.04,
+   "t": 1.75,
+   "note": null
+  },
+  {
+   "h": 18,
+   "n": 3717,
+   "netR": 0,
+   "t": -0.01,
+   "note": null
+  },
+  {
+   "h": 19,
+   "n": 3840,
+   "netR": -0.045,
+   "t": -2.08,
+   "note": null
+  },
+  {
+   "h": 20,
+   "n": 4317,
+   "netR": -0.086,
+   "t": -3.27,
+   "note": null
+  },
+  {
+   "h": 21,
+   "n": 4433,
+   "netR": -0.043,
+   "t": -1.89,
+   "note": null
+  },
+  {
+   "h": 22,
+   "n": 4545,
+   "netR": -0.065,
+   "t": -2.53,
+   "note": null
+  },
+  {
+   "h": 23,
+   "n": 4662,
+   "netR": 0.011,
+   "t": 0.44,
+   "note": null
+  }
+ ],
+ "controlText": "Among the 22 other whole-hour anchors (pooled net R a trade from -0.086 to 0.063, median 0.04), the UTC rule (+0.072R, its 21-hour day) is above 22 of 22, the New York day (+0.044R) above 14 and the Tokyo day (+0.039R) above 10. Hours 21 and 22 UTC are close to the New York day (its anchor is 21:00 or 22:00 UTC with daylight saving). The control is reported only; it decides nothing.",
+ "text": "Neither other open does better. Pooled after costs the UTC rule makes +0.072R a trade (n 4169, month t +3.89), the New York day +0.044R (n 4230, t +2.46) and the Tokyo day +0.039R (n 3560, t +1.71); before costs +0.103 / +0.076 / +0.071R. Both variants trail the UTC rule in both windows (per-trade monthly difference New York −0.047 / −0.013R, Tokyo −0.063 / −0.014R), but the confirmation-window paired t (−0.83 and −0.43) is far from the pre-registered bar, so the result is NO DIFFERENCE SHOWN, not WORSE; in discovery the New York day trails at t −2.18 (not a test window). Neither variant clears the parent bar on its own: New York confirmation +0.039R (t +1.56), Tokyo +0.039R (t +1.19); at 2x costs the Tokyo day is +0.007R and the New York day +0.013R against the rule's +0.041R. The Tokyo day also holds 950 of its 3560 trades over the 17:00 New York rollover, where financing (not charged here) and the break-hour spread (hidden by mid candles) would cost more, so its true figure is lower than shown. What the control adds: the effect is not special to 00:00 UTC; days started anywhere from about 00:00 to 12:00 UTC give similar pooled net R (most +0.04 to +0.06R), while days started 18:00-22:00 UTC (around the New York close) lose. The 00:00 UTC rule with its 21:00 exit is the best of the three tested here mainly because it stops before the rollover hours (the same 00:00 UTC day held 24 hours gives +0.046R). A before-cost tilt common to many anchors is not an edge, and none of these settings is chosen from this reading. Paper research; nothing live changes.",
+ "data": "OANDA mid USD/JPY M5, 2005-01-02 → 2026-11-21 (1644641 candles)"
+}
