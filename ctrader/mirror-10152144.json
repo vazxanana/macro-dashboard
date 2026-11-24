@@ -958,7 +958,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T18:19:41.000Z",
     "councilEntry": 1.3122,
     "stop": 1.313136,
@@ -972,10 +972,12 @@
     "slipR": 0.534,
     "lagSec": 1181,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T18:19:41.000Z",
-    "brokerStop": 1.31304
+    "brokerStop": 1.31304,
+    "closedAt": "2026-11-24T22:08:56.000Z"
    },
    "eqx:fade:gbpusd:fade-m15-b1795554900": {
     "positionId": "51239602",
@@ -985,7 +987,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T21:31:08.000Z",
     "councilEntry": 1.31134,
     "stop": 1.310916,
@@ -998,28 +1000,25 @@
     "slipR": 0.33,
     "lagSec": 968,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T21:31:08.000Z",
-    "brokerStop": 1.31086
+    "brokerStop": 1.31086,
+    "closedAt": "2026-11-24T22:08:56.000Z"
    }
   },
   "day": {
    "date": "2026-11-24",
    "startBalance": 500.21,
    "reset": "2026-11-24T18:13:38.000Z",
-   "lastBalance": 500.21,
-   "ids": [
-    "51189635",
-    "51239602"
-   ],
-   "oids": [
-    "34787600"
-   ],
+   "lastBalance": 499.64,
+   "ids": [],
+   "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 500.21 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 499.64 · 0 open",
   "skipped": {},
   "wait": {
    "eqx:fade:audusd:fade-m15-b1795535100": {
@@ -1048,20 +1047,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 500.21,
-  "lastRun": "2026-11-24T22:04:21.000Z"
+  "balance": 499.64,
+  "lastRun": "2026-11-24T22:08:56.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T12:47:47.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T12:49:55.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 12:57 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T12:59:53.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2540,6 +2529,16 @@
   {
    "at": "2026-11-24T21:31:08.000Z",
    "msg": "opened buy GBPUSD 0.02 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795554900"
+  },
+  {
+   "at": "2026-11-24T22:08:56.000Z",
+   "msg": "GBPUSD position 51189635 closed at the broker",
+   "trade": "eqx:fade:gbpusd:fade-m15-s1795543200"
+  },
+  {
+   "at": "2026-11-24T22:08:56.000Z",
+   "msg": "GBPUSD position 51239602 closed at the broker",
    "trade": "eqx:fade:gbpusd:fade-m15-b1795554900"
   }
  ],
