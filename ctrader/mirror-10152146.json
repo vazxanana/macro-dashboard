@@ -530,6 +530,35 @@
     "positionId": "50808923",
     "volume": 100000,
     "status": "open"
+   },
+   "xau-m30m1-1795527264": {
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "setup": "m30m1",
+    "openedAt": "2026-11-24T13:35:42.000Z",
+    "councilEntry": 3622.095,
+    "stop": 3638.9731785714284,
+    "t1": 3588.3386428571425,
+    "adopted": false,
+    "alerted": [
+     "open"
+    ],
+    "viaLimit": true,
+    "limitPrice": 3622.09,
+    "digits": 2,
+    "lots": 0.01,
+    "riskCash": 16.88,
+    "margin": 7.26,
+    "minLot": true,
+    "shadow": true,
+    "fillPrice": 3622.44,
+    "slipR": -0.02,
+    "lagSec": 78,
+    "positionId": "51100073",
+    "volume": 100,
+    "status": "open",
+    "stopCheckedAt": "2026-11-24T13:35:42.000Z",
+    "brokerStop": 3638.97
    }
   },
   "day": {
@@ -537,7 +566,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9792.11 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 9792.11 · 10 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -549,7 +578,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9792.11,
-  "lastRun": "2026-11-24T13:32:55.000Z"
+  "lastRun": "2026-11-24T13:35:42.000Z"
  },
  "log": [
   {
@@ -862,6 +891,16 @@
    "at": "2026-11-24T12:39:14.000Z",
    "msg": "XAUUSD limit order 34746384 for xau-m30m1-1795521805 is gone at the broker (expired or cancelled there)",
    "trade": "xau-m30m1-1795521805"
+  },
+  {
+   "at": "2026-11-24T13:35:42.000Z",
+   "msg": "placed sell limit XAUUSD 0.01 lot at 3622.09 (council m30m1, valid to 2026-11-24T19:34Z)",
+   "trade": "xau-m30m1-1795527264"
+  },
+  {
+   "at": "2026-11-24T13:35:42.000Z",
+   "msg": "limit filled at once: XAUUSD position 51100073 at the broker at 3622.44",
+   "trade": "xau-m30m1-1795527264"
   }
  ],
  "limits": {
@@ -954,11 +993,11 @@
   ]
  },
  "execution": {
-  "n": 18,
-  "meanSlipR": 0.001,
+  "n": 19,
+  "meanSlipR": 0,
   "medianSlipR": -0.001,
   "worstSlipR": 0.034,
-  "medianLagSec": 92.5,
+  "medianLagSec": 78,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -985,8 +1024,8 @@
     "meanSlipR": 0
    },
    "XAUUSD": {
-    "n": 2,
-    "meanSlipR": -0.005
+    "n": 3,
+    "meanSlipR": -0.01
    },
    "EURUSD": {
     "n": 1,
