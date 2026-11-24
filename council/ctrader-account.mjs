@@ -15,7 +15,8 @@ const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
 export const BOOK_LABEL = { council: 'Council', ict: 'ICT', shadow: 'Shadows', lit: 'LIT', replica: 'Replica', mosha6: 'Mosha 6R barrier', eqx: 'Equinox' };
-export const labelOf = (books) => (books || []).map((b) => BOOK_LABEL[b] || b).join(' + ');
+// Equinox is named before ICT on the account they share (ICT copies are stopped since 24 Nov 2026): "Equinox + ICT"
+export const labelOf = (books) => { const b = [...(books || [])], e = b.indexOf('eqx'), i = b.indexOf('ict'); if (e > i && i >= 0) { b.splice(e, 1); b.splice(i, 0, 'eqx'); } return b.map((x) => BOOK_LABEL[x] || x).join(' + '); };
 const mask = (s) => (s ? '…' + String(s).slice(-3) : null);
 
 // one snapshot per account the mirror trades on (accountsFor: council/ctrader-accounts.json, config.json, env), the base

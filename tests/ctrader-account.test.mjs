@@ -11,7 +11,7 @@ const lib = (live, extra = []) => ({
 test('publishes the demo account with masked numbers', async () => {
   const s = await accountSnapshot({ env: ENV, lib: lib(false) });
   assert.equal(s.balance, 997.73); assert.equal(s.source, 'council'); assert.equal(s.account.id, '…137'); assert.equal(s.account.login, '…028');
-  assert.equal(s.label, 'Council + ICT + Shadows + LIT + Replica + Mosha 6R barrier + Equinox'); assert.equal(s.base, true);
+  assert.equal(s.label, 'Council + Equinox + ICT + Shadows + LIT + Replica + Mosha 6R barrier'); assert.equal(s.base, true);
   assert.doesNotMatch(JSON.stringify(s), /49478137|10152028/);
 });
 test('refuses a live account, and does nothing when the mirror is off or not demo', async () => {
