@@ -395,6 +395,12 @@ const USER_RULES = [
   // shadows LIT"): the Lyriac desk's rules are traded by the breakout and gotobi demo jobs (council/vb-demo.mjs,
   // council/gotobi.mjs), which use the Shadows + LIT demo account by default (gotobi.mjs accountFor: the LIT book's account).
   // So no rule is needed: a first rule that pointed them at the $200 account was taken out before it ever ran.
+  // shadow-mirror-off (owner, 24 Nov 2026: "lyriac alone"): the Shadows + LIT demo account is to hold Lyriac alone, so the mirror
+  // opens no new SHADOW copy on any demo account (the shadow book has no other account to go to). Copies already open are
+  // managed to their exits with their stops; the shadow book stays a paper record. Undo: a rule setting c.mirrorShadow = true.
+  { id: 'shadow-mirror-off', apply: (c) => { c.mirrorShadow = false; },
+    change: 'cTrader mirror: no new shadow copies on any demo account (owner, 24 Nov: "lyriac alone"); the Shadows + LIT account takes the Lyriac jobs only',
+    why: 'Owner request of 24 Nov 2026. Demo only. Open shadow copies run to their exits with their stops; the shadow book stays paper. The account then holds the breakout and gotobi demo jobs (Lyriac) alone.' },
   // ict-mirror-off (owner, 24 Nov 2026: "Stop ICT copies"): the mirror opens no new ICT copy on any demo account; the ICT desk
   // stays a paper record. Its account (login ending 144) takes the Equinox desks (ctrader-accounts.json book eqx).
   { id: 'ict-mirror-off', apply: (c) => { c.mirrorIct = false; },

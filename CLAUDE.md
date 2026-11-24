@@ -7026,6 +7026,9 @@ intraday rules as ONE desk (the first tab of `/equinox`):
   account, the Shadows + LIT demo account (`gotobi.mjs` `accountFor`: the LIT book's account, 10152146), at 0.25 % a trade. No
   Trader rule: a first rule `lyriac-155` (the $200 account ending 155, where 1 oz of gold would risk about 12 % a trade and
   which the token did not hold) was removed before it ever ran. The shadow book's copies trade on that same account.
+- **Lyriac alone** (owner, same day): Trader rule `shadow-mirror-off` sets `config.mirrorShadow = false`: the mirror opens no new
+  shadow copy on any demo account (the shadow book has no other account); open copies are managed to their exits. The account
+  then holds the breakout and gotobi jobs only. Undo: a rule setting it true.
 - The standalone `VolBreakout` bots written the same day were removed on the owner's word ("dont do it").
 - First 60-day read (before costs, not evidence): gold breakout 31 trades +18.9R, USD/JPY breakout 29 +0.2R, gotobi 11 +2.7R.
 A paper desk and a demo record of rules whose studies passed; the forward records judge. Tests: `tests/lyriac.test.mjs` (4).

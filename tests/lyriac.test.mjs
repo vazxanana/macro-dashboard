@@ -53,5 +53,8 @@ test('wiring: the Equinox tab, the loop line, data health, and the demo jobs on 
   assert.match(rd('council/datahealth.mjs'), /file: 'lyriac\/desk\.json'/);
   assert.doesNotMatch(rd('council/trader.mjs'), /id: 'lyriac-155'/, 'the jobs stay on their default account');
   assert.match(rd('council/gotobi.mjs'), /find\(\(x\) => \(x\.books \|\| \[\]\)\.includes\('lit'\)\)/, 'the default is the LIT book\'s account');
+  const sm = rd('council/trader.mjs').match(/\{ id: 'shadow-mirror-off', apply: (\(c\) => \{[^\n]*\}),\n/); assert.ok(sm, 'Lyriac alone: no new shadow copies');
+  const cc = { mirrorIct: false }; (0, eval)(sm[1])(cc); assert.deepEqual(cc, { mirrorIct: false, mirrorShadow: false });
+  assert.match(rd('council/ctrader-mirror.mjs'), /const shadows = cfg\.mirrorShadow !== false;/); assert.match(rd('council/ctrader-mirror.mjs'), /const fresh = trades\.filter\(\(t\) => \(!t\.shadow \|\| shadows\)/, 'only NEW copies are held back; open ones are still managed');
   assert.match(rd('council/vb-demo.mjs'), /cfg\.vb && cfg\.vb\.account && String\(cfg\.vb\.account\)/); assert.match(rd('council/gotobi.mjs'), /cfg\.gotobi\.account\) return String\(cfg\.gotobi\.account\)/);
 });
