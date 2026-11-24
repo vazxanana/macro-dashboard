@@ -126,6 +126,7 @@ export const FILES = [
   { file: 'dom/desk.json', label: 'DOM zone desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'eg/desk.json', label: 'Engulfing desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'msnr/desk.json', label: 'MSNR desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
+  { file: 'eqx/trades.json', label: 'Equinox demo record (account …144)', every: 'each round and quick pass, written on a change', check: (j, c) => { if (!j || !Array.isArray(j.trades)) c.add('parse', 'warn', 'no trades list (the Equinox demo job leaves the file as it is and places nothing)'); } },   // 24 Nov 2026
   { file: 'research/trade-review-ledger.json', label: 'Trade review ledger', every: 'append-only, when the trade review records a new proposal', check: (j, c) => { if (!j || !Array.isArray(j.entries)) c.add('parse', 'warn', 'no entries list (the review leaves the file as it is and records nothing new)'); } },
   { file: 'coach.json', label: 'Coach (daily review + 6-hourly decay)', every: 'daily; decay every 6 h', need: true, at: (j) => j.at, warn: 26 * H, bad: 30 * H, check: coachCheck },
   { file: 'digest.json', label: 'Daily owner digest', every: '21:15 UTC Mon-Fri + Sunday preview', check: digestCheck },

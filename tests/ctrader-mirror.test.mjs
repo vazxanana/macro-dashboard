@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS, feedOnlyMove, adjOf } from '../council/ctrader-mirror.mjs';
+import { mirrorRound, PT, ALLOWED, session, volumeFor, relative, seal, unseal, LIMITS, ictCandidates, ictMirrorOff, replicaCandidates, replicaMarkets, replicaHasOwnAccount, orderStep, commentFor, mirrorAlertText, sendMirrorAlerts, riskVolume, quoteRate, specFor, markOf, applyReset, validUntil, WAIT, pendingStep, cancelStep, bookOf, accountsFor, BOOKS, feedOnlyMove, adjOf } from '../council/ctrader-mirror.mjs';
 
 const ENV = { CTRADER_CLIENT_ID: 'fake-client-id', CTRADER_CLIENT_SECRET: 'fake-client-secret', CTRADER_ACCESS_TOKEN: 'fake-access-old',
   CTRADER_REFRESH_TOKEN: 'fake-refresh-old', CTRADER_ACCOUNT_ID: '4242', CTRADER_ENV: 'demo', CTRADER_MIRROR: 'on' };
@@ -194,6 +194,25 @@ test('ICT desk: A-setups mirrored on the cash index (no fixed target), others ne
   assert.equal(r.state.map['ict:nq-b-1'].symbol, 'NAS100');
   r = await mirrorRound({ env: ENV, trades: ictCandidates([{ ...ict[0], status: 'win', R: 2.1 }]), state: r.state, WS: b.WS, now: NOW + 300 });
   assert.equal(b.positions.size, 0); assert.equal(r.state.map['ict:nq-b-1'].status, 'closed by council');
+});
+
+test('ICT copies off (owner, 24 Nov 2026): nothing new is opened, a copy already held is still closed with its trade', async () => {
+  const ict = [{ id: 'nq-b-1', market: 'nq', side: 'buy', entry: 25000, stop: 24950, t1: null, status: 'open', opened: NOW - 120, aset: true, aplus: false }];
+  assert.equal(ictMirrorOff({ mirrorIct: false }), true); assert.equal(ictMirrorOff({}), false); assert.equal(ictMirrorOff(null), false);
+  const off = ictCandidates(ict, true); assert.equal(off[0].noCopy, true); assert.equal(off[0].id, 'ict:nq-b-1');
+  assert.equal(ictCandidates(ict)[0].noCopy, undefined);
+  // off from the start: no order at all
+  const b0 = broker(); await mirrorRound({ env: ENV, trades: off, state: started, WS: b0.WS, now: NOW });
+  assert.equal(b0.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).length, 0);
+  // a copy made before the rule is still managed: the desk closes the trade, the copy is closed
+  const b = broker(); let r = await mirrorRound({ env: ENV, trades: ictCandidates(ict), state: started, WS: b.WS, now: NOW });
+  assert.equal(b.positions.size, 1);
+  r = await mirrorRound({ env: ENV, trades: ictCandidates([{ ...ict[0], status: 'win', R: 2.1 }], true), state: r.state, WS: b.WS, now: NOW + 300 });
+  assert.equal(b.positions.size, 0); assert.equal(r.state.map['ict:nq-b-1'].status, 'closed by council');
+  // the Trader carries the owner rule, and the mirror's CLI reads it
+  const tr = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
+  assert.match(tr, /id: 'ict-mirror-off', apply: \(c\) => \{ c\.mirrorIct = false; \}/);
+  assert.match(fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8'), /ictCandidates\(ict, ictMirrorOff\(cfg\)\)/);
 });
 
 // ---- review fixes (8 Nov) -------------------------------------------------------------------------------------------------

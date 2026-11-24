@@ -174,7 +174,8 @@ export function execChecks({ rows, mirrors, accounts, prev, now, start = START, 
   // choice, under its own label 'dom': its positions and orders (the label, as the account file carries it) and its closing deals
   // (no label on a deal: the position and order ids of council-data dom/trades.json) are not the mirror's and never flagged here.
   const domIds = new Set(); for (const x of (dom && Array.isArray(dom.trades) ? dom.trades : [])) { if (x && x.positionId != null) domIds.add(String(x.positionId)); if (x && x.orderId != null) domIds.add(String(x.orderId)); }
-  const isDom = (f) => f.label === 'dom' || domIds.has(String(f.id));
+  // The Equinox demo job (council/eqx-demo.mjs, 24 Nov 2026) runs on its own account under label 'eqx': never the mirror's either.
+  const isDom = (f) => f.label === 'dom' || f.label === 'eqx' || domIds.has(String(f.id));
   const held = (f) => isDom(f) || (f.kind === 'order' ? orders.has(String(f.id)) || (f.price != null && limits.has(lk(f.symbol, f.side, f.price))) : known.has(String(f.id)));
   const key = (f) => (f.kind === 'order' ? 'order:' : 'pos:') + f.id;
   const foreign = (Array.isArray(P.foreign) ? P.foreign : []).filter((f) => f && !held(f)).reduce((a, f) => (a.some((x) => key(x) === key(f)) ? a : a.concat([f])), []);

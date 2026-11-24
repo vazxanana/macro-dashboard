@@ -147,6 +147,9 @@ jobs:
             # H1 dominant-zone limit on the Council DEMO account (council/dom-demo.mjs, 23 Nov 2026): a forward demo record, label "dom";
             # reads H1 candles, connects only when an order is due or one of its own rests or is open; never fails or holds the round.
             timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo round $i failed"
+            # Equinox rules on the DEMO account 10152144 (council/eqx-demo.mjs, 24 Nov 2026): Break fade, Big-candle fade, FVG return, gold
+            # breakout; label "eqx", 0.25 % a trade, at most 30 open; a forward demo record of paper rules; never fails or holds the round.
+            timeout 45 node council/eqx-demo.mjs data || echo "Equinox demo round $i failed"
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
@@ -217,6 +220,7 @@ jobs:
                 node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
                 timeout 45 node council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo quick pass $i failed"
+                timeout 45 node council/eqx-demo.mjs data || echo "Equinox demo quick pass $i failed"
                 node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true

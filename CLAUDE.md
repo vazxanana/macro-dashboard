@@ -598,6 +598,9 @@ failed the council's own 2023-26 test (council-data research/log.md, 6 Nov), so 
 ## ICT desk (6 Nov 2026, owner: a separate edge)
 
 ICT is its own edge and approach: never mix it into the council systems, their rules, filters or reports.
+**No demo copies since 24 Nov 2026** (owner: "Stop ICT copies"): Trader rule `ict-mirror-off` sets `config.mirrorIct = false`;
+the mirror keeps ICT trades in its list as `noCopy` (no new copy or order on any demo account; a copy already held is managed to
+its close). ICT stays a paper desk; nothing under `ict/` changed. Undo: a user rule deleting `c.mirrorIct`.
 Rules and research live in `.claude/skills/ICT/SKILL.md` (results also in council-data `research/ict/`).
 - Tracker: `ict/tracker.mjs`, run inside the council loop every 3rd round (~35 min; `ict.yml` is manual only since GitHub
   dropped its 15-min schedule, and the Vercel cron `/api/run?job=ict` runs it at :04/:19/:34/:49 when the run mode is live), data in council-data `ict/`
@@ -1433,6 +1436,10 @@ Coach, Macro, veteran, data check, digest, ledger) keep the full round (~11-12 m
 data-health monitor shows the OANDA proxy or Kraken throttling, drop the pass (delete the quick-pass block) before shortening anything else.
 
 ## cTrader demo mirror: same-time copies (8 Nov 2026)
+**24 Nov 2026 (owner: "Stop ICT copies")**: with `config.mirrorIct === false` (Trader rule `ict-mirror-off`) `ictCandidates(ict, true)`
+marks every ICT trade `noCopy` (`ictMirrorOff`); nothing new goes to the ICT book's account …144 (which the Equinox demo job now
+uses under its own label). `ict` stays in `ctrader-accounts.json`: removing it would route ICT trades to the council account.
+Test: `tests/ctrader-mirror.test.mjs` ("ICT copies off"). The text below about ICT copies is history.
 `council/ctrader-mirror.mjs` runs straight after the Trader and the ICT desk in each council round (council.yml). A council trade
 that is still `pending` gets a resting LIMIT order at the broker: price = the council entry, absolute `stopLoss` / `takeProfit` = the
 council levels, GOOD_TILL_DATE at the council's own expiry (`validUntil`: `validFor`, else `WAIT[h]`, else a day; keep `WAIT` in step
@@ -6689,6 +6696,33 @@ a verdict. **0 of 5 pass.** Pooled holdout, R a trade after costs, month-sum t:
 The phase reader `research/edge/_lib/phase.mjs` (`readPhase`, closed candles only: per D1 / H4 / H1 / M15 side, stage, BO / ChoCh,
 ranges and their 50 %, box, the storyline step below; `tests/phase.test.mjs`) is shown on Charts as the "Market phase" panel
 (`assets/ms-phase.js`, a copy compared by `tests/ms-phase.test.mjs`; display only, hidden for guests). A reading, not a tested rule.
+
+## Equinox rules on the demo account …144 (24 Nov 2026, owner: "Break fade / Big-candle fade / FVG return / gold breakout — put all these running on demo account finishing 144 risking 0.25% per trade max 30 trades open at same time")
+`council/eqx-demo.mjs` (council.yml: each round and each quick pass after the dom job, `timeout 45`, never fails the round) on the
+cTrader DEMO account 10152144 (config `eqx.account` overrides; that account is also the mirror's `ict` book: the job uses its own label
+`eqx`, comment `eqx <desk> <id>`, and touches and counts nothing else). **A forward DEMO record of paper rules, not an edge**: the three
+fades lose after costs on their studies; the gold breakout passed at the broker's quotes on in-sample years, its forward record is short.
+- **Signals LIVE** from the Equinox desks' own code (`council/edge-desks-2.mjs` `fadeTrades`, `bigTrades`, `fvgTrades`: each study's
+  exported signal code) on the job's own OANDA 5-minute candles (`MD_BASE`, 8 days, ten markets): closed candles plus the FORMING
+  candle's open alone (`feed`), so the fill candle is the one now forming. Never copied from the desk files (their tracker runs every
+  ~35 min). **Freshness**: a signal is taken only while its fill candle opened at most `FRESH_S` 600 s ago, and its decisions are
+  before it; **late-copy check** (`lateCheck`): the price now must not be past its stop or target, nor more than `LATE_R` 0.25 of its
+  risk into the trade, else recorded `skip` with why. One order per signal id, ever (a skipped id is never placed later).
+- Orders: the three fades enter at market as their rules do: a MARKET order with the rule's stop and target as distances from the
+  price now (`relativeStopLoss` / `relativeTakeProfit`, the mirror's way); read back after 1.5 s. Time exit: fades a day, FVG 2 days
+  from the fill candle (`deadline`), closed at market. **Gold breakout**: `council/vb-demo.mjs`'s own `step` (levels, two stop orders
+  WITH stopLoss = the open, fill handling, 21:00 UTC exit) run with options (`markets` = `VB_MARKETS` label `eqx`, comment `eqx goldvb
+  xau-<day>`, `file` = eqx/trades.json, record market `goldvb`, `account`, `canPlace`); vb-demo's defaults and its own account are
+  unchanged (`tests/vb-demo.test.mjs`).
+- Caps: 0.25 % of the balance a trade (`eqx.risk`, 0.0005-0.005; the smallest volume only while a stop-out costs at most 1 %); at most
+  30 `eqx` positions + resting orders (`eqx.maxOpen`; the larger of the records' count, a goldvb day with two resting orders = 2, and
+  the broker's label-eqx count); at the cap a signal is recorded `skip: cap`. `eqx.desks` narrows the four; `config.eqx = { on: false }`
+  stops it. Markets the broker does not offer are held off a day (`notOffered`, dom-demo's broker names via `normName`).
+- Rule 1: a fill with no stop at the broker gets it by amend, refused = closed at once; any `eqx` position without a stop is amended
+  to its record's stop or closed. Rule 2: demo host, `CTRADER_ENV=demo`, `isLive === false` (gotobi's `connect`). An exit not seen at
+  the broker is inferred from the 5-minute candles (stop first in one candle), marked `inferred`. Record: council-data
+  `eqx/trades.json` (`datahealth.mjs` lists it). `council/forward.mjs` E5 ignores label `eqx`. Not checked live: the broker's answer
+  to these market orders on 10152144, and the job's run time with ten markets inside 45 s. Test: `tests/eqx-demo.test.mjs` (fake broker).
 
 ## Decision journal (23 Nov 2026, overnight)
 The design of `research/proposals/2026-11-20-discretion.md`: the studies say a person's edge, if any, is in the choosing, and only

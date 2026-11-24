@@ -76,7 +76,12 @@ export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD']
   nq: ['US100', 'NAS100', 'USTEC'], es: ['US500', 'SPX500', 'US500.cash'], ym: ['US30', 'DJ30', 'US30.cash'], rty: ['US2000', 'RUSSELL2000'], gc: ['XAUUSD'] };
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
-export const ictCandidates = (ict) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr }));
+// 24 Nov 2026 (owner: "Stop ICT copies"; Trader rule 'ict-mirror-off' writes config.mirrorIct = false): with `off`, every ICT
+// trade stays in the list but carries noCopy (the replica pattern), so no new copy or order is opened on any demo account while a
+// copy already held is still managed to its close (stop guard, stop moves, the close). ICT stays a paper desk.
+export const ictCandidates = (ict, off = false) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr,
+  ...(off ? { noCopy: true, noCopyWhy: 'owner rule: no ICT copies since 2026-11-24' } : {}) }));
+export const ictMirrorOff = (cfg) => !!cfg && cfg.mirrorIct === false;
 // The replica's forward paper trades (10 Nov, owner: "the mirror is not taking the replica trades"). The Trader records them in
 // research.json (k 'replica', gold, forex and crypto), never in trades.json, which holds only the live gold replica; the mirror
 // used to read trades.json and the ICT desk alone, so the Replica demo account stayed empty. They are candidates for the
@@ -897,7 +902,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   const replicaOwn = replicaHasOwnAccount(byBook);
   // the Mosha 6R barrier records (23 Nov 2026) the same way: only while the mosha6 book has a demo account of its own
   let desk = null; try { desk = JSON.parse(fs.readFileSync(path.join(DIR, 'mosha', 'desk.json'), 'utf8')); } catch (e) {}
-  const trades = own.concat(ictCandidates(ict), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
+  const trades = own.concat(ictCandidates(ict, ictMirrorOff(cfg)), replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
   const fileOf0 = (a) => (a === base ? 'mirror.json' : `mirror-${a}.json`);
   const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));

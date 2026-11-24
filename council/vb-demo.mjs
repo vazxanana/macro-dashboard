@@ -46,36 +46,42 @@ export function due(rec, t) {
   return t >= rec.exitAt ? 'exit' : 'watch';
 }
 const sizeOf = (M, info, balance, risk, D, px) => volumeOf(info, units(balance, risk, M.usdPerUnit(D, px) * px, px));   // units(): balance x risk / (D / price); here D / price is the dollar loss a unit
-const oursPos = (M, day) => (p) => { const td = p.tradeData || {}; return td.label === M.label && String(td.comment || '').includes(day); };
+const commentFor = (M, day) => (M.comment ? M.comment(day) : `${M.label} ${day}`);
+const oursPos = (M, day) => (p) => { const td = p.tradeData || {}; return td.label === M.label && (M.comment ? String(td.comment || '') === M.comment(day) : String(td.comment || '').includes(day)); };
 const R1 = (rec, exit) => (rec.fill != null && exit != null && rec.O != null && rec.fill !== rec.O ? +((rec.side === 'buy' ? 1 : -1) * (exit - rec.fill) / Math.abs(rec.fill - rec.O)).toFixed(3) : null);
 
-export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
-  const scrub = scrubber(env), file = path.join(dir, 'vb', 'trades.json'), now = Math.floor(clock() / 1000), day = ymdOf(now), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
+// Options for another job reusing this rule on its own account (council/eqx-demo.mjs, 24 Nov 2026): markets (own labels / comments),
+// file, conf (its config block), account, keep (records kept), canPlace (false = 'skip: cap'), tag (log prefix). Defaults = this job.
+export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log: log0 = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)),
+  markets: MK = MARKETS, file: file0 = null, conf, account: account0 = null, keep = 2000, canPlace = () => true, tag = 'vb' } = {}) {
+  const log = tag === 'vb' ? log0 : (m) => log0(String(m).replace(/^vb:/, tag + ':'));
+  const scrub = scrubber(env), file = file0 || path.join(dir, 'vb', 'trades.json'), now = Math.floor(clock() / 1000), day = ymdOf(now), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
   let J; try { J = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { if (fs.existsSync(file)) { log('vb: vb/trades.json does not parse: left as it is'); return { skipped: 'file' }; } J = { trades: [] }; }
   J.trades = J.trades || [];
   let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
-  if (cfg.vb && cfg.vb.on === false) return { skipped: 'off' };
+  const V = conf !== undefined ? conf : cfg.vb;
+  if (V && V.on === false) return { skipped: 'off' };
   // what is there to do this minute? (an open record of an earlier day is still due its exit)
   const work = [];
-  for (const k of Object.keys(MARKETS)) { const open = J.trades.filter((x) => x.market === k && (x.status === 'placed' || x.status === 'open'));
+  for (const k of Object.keys(MK)) { const open = J.trades.filter((x) => x.market === k && (x.status === 'placed' || x.status === 'open'));
     for (const r of open) work.push({ k, rec: r, what: due(r, now) });
     if (!J.trades.some((x) => x.market === k && x.day === day) && due(null, now) === 'place') work.push({ k, rec: null, what: 'place' }); }
   // a weekday whose first twenty minutes no pass looked at (the loop down or handing over) is written as missed, once, without
   // connecting (23 Nov 2026: such a day left no record, so the demo record could not be set beside the forward record day by day)
-  const s0 = now - d0Of(now), late = weekday(now) && s0 > PLACE_UNTIL && s0 < EXIT_S ? Object.keys(MARKETS).filter((k) => !J.trades.some((x) => x.market === k && x.day === day)) : [];
+  const s0 = now - d0Of(now), late = weekday(now) && s0 > PLACE_UNTIL && s0 < EXIT_S ? Object.keys(MK).filter((k) => !J.trades.some((x) => x.market === k && x.day === day)) : [];
   if (!work.length && !late.length) return { skipped: 'nothing due' };
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('vb: cTrader demo not configured'); return { skipped: 'config' }; }
-  const account = (cfg.vb && cfg.vb.account && String(cfg.vb.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('vb: no demo account for it'); return { skipped: 'account' }; }
-  const risk = Math.min(0.01, Math.max(0.0005, +(cfg.vb && cfg.vb.risk) || RISK));
-  const write = () => { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; if (J.trades.length > 2000) J.trades = J.trades.slice(-2000); fs.writeFileSync(tmp, JSON.stringify(J, null, 1)); fs.renameSync(tmp, file); save(); };
+  const account = account0 || (V && V.account && String(V.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('vb: no demo account for it'); return { skipped: 'account' }; }
+  const risk = Math.min(0.01, Math.max(0.0005, +(V && V.risk) || RISK));
+  const write = () => { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; if (J.trades.length > keep) J.trades = J.trades.slice(-keep); fs.writeFileSync(tmp, JSON.stringify(J, null, 1)); fs.renameSync(tmp, file); save(); };
   const did = []; let s = null, ctid, dirty = false;
   for (const k of late) { J.trades.push({ id: `${k}-${day}`, market: k, day, status: 'missed', why: 'no order was placed in the first twenty minutes of the day, 00:00-00:20 UTC (no pass looked, or the demo could not be reached)', exitAt: d0Of(now) + EXIT_S, account: `…${String(account).slice(-3)}` }); dirty = true; did.push(`${k} missed`); }
   if (!work.length) { write(); return { did }; }
   try {
     ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), positions = rc.position || [], orders = rc.order || [];
-    const cancel = async (M, d) => { for (const o of orders.filter((x) => (x.tradeData || {}).label === M.label && String((x.tradeData || {}).comment || '').includes(d) && !x._gone)) { try { await s.send(PT.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(o.orderId) }, PT.EXECUTION_EVENT, cancelStep); } catch (e) { /* filled or gone meanwhile: the next look sees it */ } o._gone = true; } };
-    for (const w of work) { const M = MARKETS[w.k];
+    const cancel = async (M, d) => { for (const o of orders.filter(oursPos(M, d)).filter((x) => !x._gone)) { try { await s.send(PT.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(o.orderId) }, PT.EXECUTION_EVENT, cancelStep); } catch (e) { /* filled or gone meanwhile: the next look sees it */ } o._gone = true; } };
+    for (const w of work) { const M = MK[w.k];
       try {
         if (w.what === 'place') {
           const rows = await barsFn(M.sym, now), L = levels(rows, now), last = rows.length ? rows[rows.length - 1][4] : null;
@@ -85,6 +91,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           if (orders.some(oursPos(M, day)) || positions.some(oursPos(M, day))) {   // placed by a pass whose record was lost: never placed twice
             const mine = orders.filter(oursPos(M, day)), ids = {}; for (const o of mine) ids[+o.tradeData.tradeSide === 2 || o.tradeData.tradeSide === 'SELL' ? 'sell' : 'buy'] = String(o.orderId);
             Object.assign(rec, { status: 'placed', placedAt: iso(), stop: +(mine[0] ? mine[0].stopLoss : L.O), orders: ids, adopted: true }); J.trades.push(rec); dirty = true; did.push(`${w.k} adopted`); continue; }
+          if (!canPlace()) { rec.status = 'skip'; rec.why = 'cap'; J.trades.push(rec); dirty = true; did.push(`${w.k} skip: cap`); continue; }
           if (!(L.hi < L.buyAt && L.lo > L.sellAt && last > L.sellAt && last < L.buyAt)) { rec.status = 'missed'; rec.why = 'a level had already traded when the orders were to be placed'; J.trades.push(rec); dirty = true; did.push(`${w.k} missed`); continue; }
           const names = await s.send(PT.SYMBOLS_LIST_REQ, { ctidTraderAccountId: ctid }, PT.SYMBOLS_LIST_RES), sym = (names.symbol || []).find((x) => String(x.symbolName).toUpperCase().replace(/[^A-Z]/g, '') === M.symbol);
           if (!sym) throw new Error(`${M.symbol} is not offered on this account`);
@@ -95,7 +102,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           let volume = sizeOf(M, info, balance, risk, L.D, last), riskNow = risk;
           if (!volume) { const min = +info.minVolume || +info.stepVolume || 0, loss = (min / 100) * M.usdPerUnit(L.D, last); riskNow = balance > 0 ? loss / balance : Infinity;
             if (!(min > 0 && riskNow <= MAX_RISK)) throw new Error('the smallest volume would risk more than 1 % of the balance'); volume = min; }
-          const stop = at(L.O), base = { ctidTraderAccountId: ctid, symbolId: sym.symbolId, orderType: 3, volume, stopLoss: stop, label: M.label, comment: `${M.label} ${day}`, timeInForce: 1, expirationTimestamp: rec.exitAt * 1000 };   // 3: STOP order, 1: GOOD_TILL_DATE
+          const stop = at(L.O), base = { ctidTraderAccountId: ctid, symbolId: sym.symbolId, orderType: 3, volume, stopLoss: stop, label: M.label, comment: commentFor(M, day), timeInForce: 1, expirationTimestamp: rec.exitAt * 1000 };   // 3: STOP order, 1: GOOD_TILL_DATE
           if (!(stop < at(L.buyAt) && stop > at(L.sellAt))) throw new Error('the levels do not leave a stop on the losing side');
           const ids = {};
           const b = await s.send(PT.NEW_ORDER_REQ, { ...base, tradeSide: 1, stopPrice: at(L.buyAt), clientOrderId: `${rec.id}-b` }, PT.EXECUTION_EVENT, pendingStep); ids.buy = b.order && b.order.orderId != null ? String(b.order.orderId) : null;
@@ -115,7 +122,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
         } else if (!p && rec.status === 'open') {   // the position is gone before 21:00: its stop
           Object.assign(rec, { status: 'closed', exit: rec.stop, how: 'stopped at the broker', closedSeen: iso() }); rec.R = R1(rec, rec.exit); dirty = true; await cancel(M, rec.day); did.push(`${w.k} stopped`);
         } else if (!p && rec.status === 'placed' && w.what === 'watch') {   // an order that filled AND stopped between two looks leaves one order behind
-          const left = orders.filter((x) => (x.tradeData || {}).label === M.label && String((x.tradeData || {}).comment || '').includes(rec.day)).length;
+          const left = orders.filter(oursPos(M, rec.day)).length;
           if (left < 2 && now - Date.parse(rec.placedAt) / 1000 > 90) { Object.assign(rec, { status: 'closed', how: 'an order filled and stopped between two looks (the other was cancelled)', exit: rec.stop, R: -1, closedSeen: iso() }); dirty = true; await cancel(M, rec.day); did.push(`${w.k} filled and stopped`); }
         }
         if (w.what === 'exit' && (rec.status === 'placed' || rec.status === 'open')) {

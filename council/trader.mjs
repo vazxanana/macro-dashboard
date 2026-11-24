@@ -385,6 +385,12 @@ const USER_RULES = [
   { id: 'replica-live-again', apply: (c) => { if (c.ownerShadow && c.ownerShadow.replica) { const { replica, ...rest } = c.ownerShadow; c.ownerShadow = rest; } },
     change: 'Gold replica (owner, 20 Nov): new trades are live paper trades again (alerted, main book, council demo account); same rule and stops; open shadow trades run to their exits',
     why: 'Owner request of 20 Nov 2026. Said with it: the replica has no out-of-sample edge on record (replica-oos 2017-22 -0.05R a trade, n 115; replica-sides FAIL) and its forward record is too short to judge; paper and demo only.' },
+  // 24 Nov 2026, owner: "Stop ICT copies". The demo mirror opens no new copy or order of an ICT signal on any demo account
+  // (council/ctrader-mirror.mjs reads config.mirrorIct; ICT trades stay in its list as noCopy, so a copy already held is managed
+  // to its close). ICT stays a paper desk; nothing under ict/ changes. Undo: a user rule deleting c.mirrorIct.
+  { id: 'ict-mirror-off', apply: (c) => { c.mirrorIct = false; },
+    change: 'Demo mirror (owner, 24 Nov): no new ICT copies on any demo account; ICT stays a paper desk; copies already open run to their close',
+    why: 'Owner, 24 Nov 2026: "Stop ICT copies".' },
 ];
 config.userRules = config.userRules || [];
 // supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote
