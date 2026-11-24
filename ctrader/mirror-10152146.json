@@ -444,6 +444,34 @@
     "status": "open",
     "stopCheckedAt": "2026-11-24T01:52:08.000Z",
     "brokerStop": 1848.49
+   },
+   "btc-swing-1795488221": {
+    "positionId": "50977895",
+    "symbol": "BTCUSD",
+    "side": "sell",
+    "volume": 1,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "swing",
+    "status": "open",
+    "openedAt": "2026-11-24T02:44:43.000Z",
+    "councilEntry": 60283.4,
+    "stop": 64655.9225,
+    "t1": 55100,
+    "riskCash": 43.73,
+    "margin": 60.55,
+    "minLot": true,
+    "shadow": true,
+    "mark": 60283.4,
+    "levelsFrom": "mark",
+    "fillPrice": 60225.44,
+    "slipR": 0.013,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T02:44:43.000Z",
+    "brokerStop": 64597.96
    }
   },
   "day": {
@@ -451,7 +479,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9846.42 · 8 open · 1 resting",
+  "status": "ok · demo Fusion Markets · balance 9846.42 · 9 open · 1 resting",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -485,7 +513,7 @@
   },
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9846.42,
-  "lastRun": "2026-11-24T02:42:14.000Z"
+  "lastRun": "2026-11-24T02:44:43.000Z"
  },
  "log": [
   {
@@ -758,6 +786,11 @@
    "at": "2026-11-24T01:52:08.000Z",
    "msg": "limit filled at once: ETHUSD position 50968562 at the broker at 1704.65",
    "trade": "eth-position-1795485068"
+  },
+  {
+   "at": "2026-11-24T02:44:43.000Z",
+   "msg": "opened sell BTCUSD 0.01 lot (council swing)",
+   "trade": "btc-swing-1795488221"
   }
  ],
  "limits": {
@@ -837,8 +870,8 @@
   ]
  },
  "execution": {
-  "n": 15,
-  "meanSlipR": 0.001,
+  "n": 16,
+  "meanSlipR": 0.002,
   "medianSlipR": -0.001,
   "worstSlipR": 0.034,
   "medianLagSec": 76,
@@ -852,8 +885,8 @@
     "meanSlipR": 0.008
    },
    "BTCUSD": {
-    "n": 3,
-    "meanSlipR": -0.008
+    "n": 4,
+    "meanSlipR": -0.003
    },
    "USDCAD": {
     "n": 3,
