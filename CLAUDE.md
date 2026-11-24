@@ -6796,3 +6796,7 @@ Second pass (same day, "keep improving the theme"): chips and BUY / SELL tags ar
 and week cells 12 px, their coloured frames gone (the result tint stays); segmented switches, timeframe chips and card buttons soft
 filled without a frame, the chosen one a soft accent tint; inputs and selects a soft well; table rules lighter; list rows a soft
 hover; primary buttons pills; clickable cards lift 1 px on hover (not with reduced motion).
+Rules found by the ChronosTrade audit (24 Nov 2026): light is `data-theme="light"` OR the system set to light with no
+`dark` / `midnight` chosen (every page's own rule); dark keeps the pinned background #121315, midnight #0b0c0e; a selected
+item takes the page's ink on its accent tint; **no backdrop blur on a card that holds a chart** (`.chartc`, any card with a
+canvas): a backdrop filter makes the card the frame of its fixed-position children and broke the synced panes and drawings.
