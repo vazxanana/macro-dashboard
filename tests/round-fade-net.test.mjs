@@ -43,12 +43,12 @@ test('RESULT.md lists every cell with its figures, and the cut test is clean', (
 });
 
 test('filters: exhaustion candle, quiet hours and the daily-range edge', () => {
-  const T = [{ h: 1.103, l: 1.100 }];
+  const T = [{ h: 1.1031, l: 1.100 }];
   const D = Array.from({ length: 20 }, (_, i) => ({ t: i * 86400, e: (i + 1) * 86400, h: 1.11, l: 1.09 }));
   const t = 20 * 86400 + 18 * 3600; // 18:00 UTC, after 20 closed days
   const ev = { j: 0, d: 1, a: 0.002 };
   assert.deepEqual(filtersOf(ev, T, 1.107, t, D), [true, true, true, true, true]);     // range 1.5 ATR, quiet, top 20 %
   assert.deepEqual(filtersOf(ev, T, 1.100, t, D), [true, true, true, false, false]);    // middle of the range
   assert.deepEqual(filtersOf({ ...ev, d: -1 }, T, 1.092, t + 19 * 3600, D), [true, true, false, true, true]); // buy fade near the low, 13:00 next day (New York hours)
-  assert.equal(filtersOf({ ...ev, a: 0.0025 }, T, 1.107, t, D)[1], false);              // 0.003 < 1.5 x 0.0025
+  assert.equal(filtersOf({ ...ev, a: 0.0025 }, T, 1.107, t, D)[1], false);              // 0.0031 < 1.5 x 0.0025
 });
