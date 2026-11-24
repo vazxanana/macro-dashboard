@@ -11,7 +11,7 @@ const lib = (live, extra = []) => ({
 test('publishes the demo account with masked numbers', async () => {
   const s = await accountSnapshot({ env: ENV, lib: lib(false) });
   assert.equal(s.balance, 997.73); assert.equal(s.source, 'council'); assert.equal(s.account.id, '…137'); assert.equal(s.account.login, '…028');
-  assert.equal(s.label, 'Council + ICT + Shadows + LIT + Replica + Mosha 6R barrier + Equinox'); assert.equal(s.base, true);
+  assert.equal(s.label, 'Council + Equinox + ICT + Shadows + LIT + Replica + Mosha 6R barrier'); assert.equal(s.base, true);
   assert.doesNotMatch(JSON.stringify(s), /49478137|10152028/);
 });
 test('refuses a live account, and does nothing when the mirror is off or not demo', async () => {
@@ -33,4 +33,11 @@ test('one labelled snapshot per mirror account, the base first; unknown accounts
   assert.equal(labelOf(['council', 'shadow']), 'Council + Shadows');
   const s = await accountSnapshot({ env: ENV, cfg, lib: lib(false, extra) });
   assert.equal(s.label, 'Council + Mosha 6R barrier + Equinox');
+});
+
+test('a book whose copies are switched off is not named on a shared account', async () => {
+  const { labelOf, shown } = await import('../council/ctrader-account.mjs');
+  assert.equal(labelOf(shown(['ict', 'eqx'], { mirrorIct: false })), 'Equinox');
+  assert.equal(labelOf(shown(['ict', 'eqx'], {})), 'Equinox + ICT');
+  assert.equal(labelOf(shown(['ict'], { mirrorIct: false })), 'ICT');        // never an empty name
 });

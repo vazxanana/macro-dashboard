@@ -6964,3 +6964,13 @@ T1 on GBP/JPY for complete UTC weekdays from 2026-11-25, the yen-crosses study's
 optimistic; "confirmed" at 240 trades also needs the total at TWICE the cost above zero. `vb-forward.yml` writes council-data
 `research/forward/gbpjpy-vol-breakout.json`. Nothing trades. First reading: too few (n 0). Test:
 `tests/gbpjpy-vol-breakout-forward.test.mjs`.
+
+## Demo test order, and the Equinox account's name (24 Nov 2026, owner: "give equinox and place a order as a test i will cancel it manually")
+- `council/test-order.mjs` + `.github/workflows/demo-test-order.yml` (started by hand only, input `account` as `*<last digits>`,
+  default the Equinox book's account): ONE resting EUR/USD buy limit 3 % under the price, the broker's smallest volume, with a
+  stop and a target on the order and a 24-hour expiry, label `aureum-test` (the mirror and the demo jobs manage only their own
+  labels). Through the gotobi job's `connect()` (demo host, `isLive === false`); refuses unless `CTRADER_ENV` is demo. It writes
+  nothing to council-data and never cancels, amends or closes anything. Test: `tests/test-order.test.mjs`.
+- `council/ctrader-account.mjs` `labelOf` names Equinox before ICT, and `shown(books, cfg)` leaves a book whose copies are
+  switched off (`config.mirrorIct === false`) out of the NAME of an account it shares: the …144 row reads "Equinox". The
+  account's `books` list and the mirror's mapping are unchanged (ICT copies it still holds are managed as before).
