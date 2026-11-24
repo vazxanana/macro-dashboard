@@ -1,0 +1,626 @@
+{
+ "study": "fade-box-edge",
+ "built": "2026-11-24",
+ "verdict": "FAIL",
+ "headline": "FAIL: 0 of 3 candidates pass after costs on both unread sets (best E1: D +0.017R a trade, n 3,085, month t 0.74; E +0.043R, n 4,190, t 1.86); costs on these markets are assumed",
+ "basis": "judged AFTER costs (pre-registered), month-sum t, Holm over 6 primary tests (3 candidates x sets D and E); costs assumed on these markets",
+ "candidates": {
+  "E1": {
+   "k": 1,
+   "conds": [
+    "rc8",
+    "topIn"
+   ],
+   "text": "M15 box close-out faded, stop at the grid distance, trailing exit; risk >= 8 round trips and the close-out inside the H4 box"
+  },
+  "E2": {
+   "k": 2,
+   "conds": [
+    "rc8",
+    "er30"
+   ],
+   "text": "M15 box close-out faded, stop 2 x the grid distance, trailing exit; risk >= 8 round trips and a choppy H1 (ER20 < 0.30)"
+  },
+  "E3": {
+   "k": 2,
+   "conds": [],
+   "text": "M15 box close-out faded, stop 2 x the grid distance, trailing exit; no condition"
+  }
+ },
+ "primary": [
+  {
+   "candidate": "E1",
+   "set": "D",
+   "n": 3085,
+   "meanR": 0.0166,
+   "tMonth": 0.74,
+   "pOne": 0.2321,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "candidate": "E2",
+   "set": "D",
+   "n": 9636,
+   "meanR": 0.0068,
+   "tMonth": 0.35,
+   "pOne": 0.3636,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "candidate": "E3",
+   "set": "D",
+   "n": 16898,
+   "meanR": -0.0054,
+   "tMonth": -0.32,
+   "pOne": 0.6239,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "candidate": "E1",
+   "set": "E",
+   "n": 4190,
+   "meanR": 0.0428,
+   "tMonth": 1.86,
+   "pOne": 0.0334,
+   "holm": 0.2004,
+   "pass": false
+  },
+  {
+   "candidate": "E2",
+   "set": "E",
+   "n": 13589,
+   "meanR": 0.0018,
+   "tMonth": 0.13,
+   "pOne": 0.4501,
+   "holm": 1,
+   "pass": false
+  },
+  {
+   "candidate": "E3",
+   "set": "E",
+   "n": 24727,
+   "meanR": -0.0129,
+   "tMonth": -1.05,
+   "pOne": 0.851,
+   "holm": 1,
+   "pass": false
+  }
+ ],
+ "byCandidate": {
+  "E1": {
+   "D": false,
+   "E": false,
+   "pass": false
+  },
+  "E2": {
+   "D": false,
+   "E": false,
+   "pass": false
+  },
+  "E3": {
+   "D": false,
+   "E": false,
+   "pass": false
+  }
+ },
+ "sets": {
+  "D": {
+   "E1": {
+    "after": {
+     "n": 3085,
+     "meanR": 0.0166,
+     "win": 0.498,
+     "tMonth": 0.74,
+     "months": 60,
+     "pOne": 0.2321
+    },
+    "before": {
+     "n": 3085,
+     "meanR": 0.0482,
+     "win": 0.517,
+     "tMonth": 2.13,
+     "months": 60,
+     "pOne": 0.01853
+    },
+    "doubleCost": {
+     "n": 3085,
+     "meanR": -0.015,
+     "win": 0.488,
+     "tMonth": -0.66,
+     "months": 60,
+     "pOne": 0.7442
+    },
+    "perMarket": {
+     "nzdusd": {
+      "n": 780,
+      "meanR": -0.0045,
+      "win": 0.5,
+      "tMonth": -0.09,
+      "months": 60,
+      "pOne": 0.5375
+     },
+     "usdcad": {
+      "n": 730,
+      "meanR": 0.1086,
+      "win": 0.533,
+      "tMonth": 2.07,
+      "months": 60,
+      "pOne": 0.02127
+     },
+     "usdchf": {
+      "n": 808,
+      "meanR": -0.0253,
+      "win": 0.485,
+      "tMonth": -0.55,
+      "months": 60,
+      "pOne": 0.7071
+     },
+     "eurjpy": {
+      "n": 725,
+      "meanR": -0.0037,
+      "win": 0.477,
+      "tMonth": -0.07,
+      "months": 60,
+      "pOne": 0.5282
+     },
+     "xag": {
+      "n": 42,
+      "meanR": -0.0333,
+      "win": 0.452,
+      "tMonth": -0.18,
+      "months": 60,
+      "pOne": 0.57
+     }
+    }
+   },
+   "E2": {
+    "after": {
+     "n": 9636,
+     "meanR": 0.0068,
+     "win": 0.499,
+     "tMonth": 0.35,
+     "months": 60,
+     "pOne": 0.3636
+    },
+    "before": {
+     "n": 9636,
+     "meanR": 0.022,
+     "win": 0.507,
+     "tMonth": 1.14,
+     "months": 60,
+     "pOne": 0.1304
+    },
+    "doubleCost": {
+     "n": 9636,
+     "meanR": -0.0084,
+     "win": 0.49,
+     "tMonth": -0.43,
+     "months": 60,
+     "pOne": 0.6666
+    },
+    "perMarket": {
+     "nzdusd": {
+      "n": 2487,
+      "meanR": -0.0081,
+      "win": 0.497,
+      "tMonth": -0.23,
+      "months": 60,
+      "pOne": 0.5899
+     },
+     "usdcad": {
+      "n": 2323,
+      "meanR": 0.0087,
+      "win": 0.515,
+      "tMonth": 0.28,
+      "months": 60,
+      "pOne": 0.3893
+     },
+     "usdchf": {
+      "n": 2215,
+      "meanR": -0.0022,
+      "win": 0.502,
+      "tMonth": -0.07,
+      "months": 60,
+      "pOne": 0.5269
+     },
+     "eurjpy": {
+      "n": 2343,
+      "meanR": 0.0339,
+      "win": 0.488,
+      "tMonth": 0.89,
+      "months": 60,
+      "pOne": 0.1895
+     },
+     "xag": {
+      "n": 268,
+      "meanR": -0.0336,
+      "win": 0.448,
+      "tMonth": -0.47,
+      "months": 60,
+      "pOne": 0.6805
+     }
+    }
+   },
+   "E3": {
+    "after": {
+     "n": 16898,
+     "meanR": -0.0054,
+     "win": 0.495,
+     "tMonth": -0.32,
+     "months": 60,
+     "pOne": 0.6239
+    },
+    "before": {
+     "n": 16898,
+     "meanR": 0.0218,
+     "win": 0.509,
+     "tMonth": 1.29,
+     "months": 60,
+     "pOne": 0.1015
+    },
+    "doubleCost": {
+     "n": 16898,
+     "meanR": -0.0327,
+     "win": 0.481,
+     "tMonth": -1.87,
+     "months": 60,
+     "pOne": 0.9669
+    },
+    "perMarket": {
+     "nzdusd": {
+      "n": 3799,
+      "meanR": -0.017,
+      "win": 0.497,
+      "tMonth": -0.55,
+      "months": 60,
+      "pOne": 0.7078
+     },
+     "usdcad": {
+      "n": 3543,
+      "meanR": -0.0068,
+      "win": 0.511,
+      "tMonth": -0.23,
+      "months": 60,
+      "pOne": 0.5922
+     },
+     "usdchf": {
+      "n": 3521,
+      "meanR": 0.0161,
+      "win": 0.505,
+      "tMonth": 0.55,
+      "months": 60,
+      "pOne": 0.2935
+     },
+     "eurjpy": {
+      "n": 3793,
+      "meanR": 0.0434,
+      "win": 0.5,
+      "tMonth": 1.39,
+      "months": 60,
+      "pOne": 0.08451
+     },
+     "xag": {
+      "n": 2242,
+      "meanR": -0.1002,
+      "win": 0.444,
+      "tMonth": -2.83,
+      "months": 60,
+      "pOne": 0.9968
+     }
+    }
+   }
+  },
+  "E": {
+   "E1": {
+    "after": {
+     "n": 4190,
+     "meanR": 0.0428,
+     "win": 0.501,
+     "tMonth": 1.86,
+     "months": 82,
+     "pOne": 0.0334
+    },
+    "before": {
+     "n": 4190,
+     "meanR": 0.091,
+     "win": 0.527,
+     "tMonth": 4.01,
+     "months": 82,
+     "pOne": 0.00006794
+    },
+    "doubleCost": {
+     "n": 4190,
+     "meanR": -0.0055,
+     "win": 0.482,
+     "tMonth": -0.23,
+     "months": 82,
+     "pOne": 0.5919
+    },
+    "perMarket": {
+     "nzdusd": {
+      "n": 1019,
+      "meanR": 0.0087,
+      "win": 0.469,
+      "tMonth": 0.16,
+      "months": 82,
+      "pOne": 0.4385
+     },
+     "usdcad": {
+      "n": 971,
+      "meanR": 0.0118,
+      "win": 0.486,
+      "tMonth": 0.28,
+      "months": 82,
+      "pOne": 0.3919
+     },
+     "usdchf": {
+      "n": 927,
+      "meanR": 0.0776,
+      "win": 0.528,
+      "tMonth": 1.59,
+      "months": 82,
+      "pOne": 0.05733
+     },
+     "eurjpy": {
+      "n": 956,
+      "meanR": 0.0692,
+      "win": 0.52,
+      "tMonth": 1.37,
+      "months": 82,
+      "pOne": 0.08709
+     },
+     "xag": {
+      "n": 317,
+      "meanR": 0.0656,
+      "win": 0.517,
+      "tMonth": 0.72,
+      "months": 82,
+      "pOne": 0.2358
+     }
+    }
+   },
+   "E2": {
+    "after": {
+     "n": 13589,
+     "meanR": 0.0018,
+     "win": 0.503,
+     "tMonth": 0.13,
+     "months": 82,
+     "pOne": 0.4501
+    },
+    "before": {
+     "n": 13589,
+     "meanR": 0.0247,
+     "win": 0.514,
+     "tMonth": 1.71,
+     "months": 82,
+     "pOne": 0.04527
+    },
+    "doubleCost": {
+     "n": 13589,
+     "meanR": -0.021,
+     "win": 0.49,
+     "tMonth": -1.44,
+     "months": 82,
+     "pOne": 0.9227
+    },
+    "perMarket": {
+     "nzdusd": {
+      "n": 3201,
+      "meanR": 0.0183,
+      "win": 0.509,
+      "tMonth": 0.65,
+      "months": 82,
+      "pOne": 0.2602
+     },
+     "usdcad": {
+      "n": 3068,
+      "meanR": 0.0164,
+      "win": 0.509,
+      "tMonth": 0.45,
+      "months": 82,
+      "pOne": 0.3257
+     },
+     "usdchf": {
+      "n": 2940,
+      "meanR": 0.0157,
+      "win": 0.513,
+      "tMonth": 0.51,
+      "months": 82,
+      "pOne": 0.3063
+     },
+     "eurjpy": {
+      "n": 3144,
+      "meanR": -0.017,
+      "win": 0.492,
+      "tMonth": -0.59,
+      "months": 82,
+      "pOne": 0.7222
+     },
+     "xag": {
+      "n": 1236,
+      "meanR": -0.0619,
+      "win": 0.474,
+      "tMonth": -1.42,
+      "months": 82,
+      "pOne": 0.9204
+     }
+    }
+   },
+   "E3": {
+    "after": {
+     "n": 24727,
+     "meanR": -0.0129,
+     "win": 0.495,
+     "tMonth": -1.05,
+     "months": 82,
+     "pOne": 0.851
+    },
+    "before": {
+     "n": 24727,
+     "meanR": 0.0195,
+     "win": 0.511,
+     "tMonth": 1.57,
+     "months": 82,
+     "pOne": 0.06006
+    },
+    "doubleCost": {
+     "n": 24727,
+     "meanR": -0.0453,
+     "win": 0.478,
+     "tMonth": -3.68,
+     "months": 82,
+     "pOne": 0.9998
+    },
+    "perMarket": {
+     "nzdusd": {
+      "n": 5244,
+      "meanR": 0.0105,
+      "win": 0.505,
+      "tMonth": 0.44,
+      "months": 82,
+      "pOne": 0.3294
+     },
+     "usdcad": {
+      "n": 5014,
+      "meanR": 0.0192,
+      "win": 0.506,
+      "tMonth": 0.65,
+      "months": 82,
+      "pOne": 0.2587
+     },
+     "usdchf": {
+      "n": 4958,
+      "meanR": 0.0021,
+      "win": 0.506,
+      "tMonth": 0.08,
+      "months": 82,
+      "pOne": 0.4665
+     },
+     "eurjpy": {
+      "n": 5102,
+      "meanR": -0.0287,
+      "win": 0.489,
+      "tMonth": -1.15,
+      "months": 82,
+      "pOne": 0.8739
+     },
+     "xag": {
+      "n": 4409,
+      "meanR": -0.0761,
+      "win": 0.467,
+      "tMonth": -2.8,
+      "months": 82,
+      "pOne": 0.9968
+     }
+    }
+   }
+  }
+ },
+ "cut": {
+  "checks": 12,
+  "mismatches": 0,
+  "rows": [
+   {
+    "set": "D",
+    "market": "nzdusd",
+    "cut": "2006-07-03T13:37",
+    "signals": 1072,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "D",
+    "market": "nzdusd",
+    "cut": "2008-01-02T13:37",
+    "signals": 2196,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "D",
+    "market": "nzdusd",
+    "cut": "2009-07-02T13:37",
+    "signals": 3393,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "D",
+    "market": "xag",
+    "cut": "2006-07-03T13:37",
+    "signals": 187,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "D",
+    "market": "xag",
+    "cut": "2008-01-02T13:37",
+    "signals": 1073,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "D",
+    "market": "xag",
+    "cut": "2009-07-02T13:37",
+    "signals": 2022,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "E",
+    "market": "nzdusd",
+    "cut": "2022-01-19T13:37",
+    "signals": 1586,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "E",
+    "market": "nzdusd",
+    "cut": "2024-02-07T13:37",
+    "signals": 3164,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "E",
+    "market": "nzdusd",
+    "cut": "2026-02-24T13:37",
+    "signals": 4724,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "E",
+    "market": "xag",
+    "cut": "2022-01-19T13:37",
+    "signals": 1310,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "E",
+    "market": "xag",
+    "cut": "2024-02-07T13:37",
+    "signals": 2706,
+    "missing": 0,
+    "extra": 0
+   },
+   {
+    "set": "E",
+    "market": "xag",
+    "cut": "2026-02-24T13:37",
+    "signals": 4074,
+    "missing": 0,
+    "extra": 0
+   }
+  ]
+ },
+ "discovery": "discovery.json (6,096 cells on data the fade was already read on; not evidence)"
+}
