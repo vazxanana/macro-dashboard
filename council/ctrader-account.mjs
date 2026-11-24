@@ -14,7 +14,7 @@ import { unseal, scrubber, accountsFor, BOOKS } from './ctrader-mirror.mjs';
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
-export const BOOK_LABEL = { council: 'Council', ict: 'ICT', shadow: 'Shadows', lit: 'LIT', replica: 'Replica', mosha6: 'Mosha 6R barrier' };
+export const BOOK_LABEL = { council: 'Council', ict: 'ICT', shadow: 'Shadows', lit: 'LIT', replica: 'Replica', mosha6: 'Mosha 6R barrier', eqx: 'Equinox' };
 export const labelOf = (books) => (books || []).map((b) => BOOK_LABEL[b] || b).join(' + ');
 const mask = (s) => (s ? '…' + String(s).slice(-3) : null);
 

@@ -391,6 +391,11 @@ const USER_RULES = [
   { id: 'dom-demo-6154', apply: (c) => { c.dom = { ...(c.dom || {}), account: '*6154', risk: 0.01 }; },
     change: 'H1 dominant-zone demo job (owner, 24 Nov): moves to the new $100 demo account (login ending 6154), 1 % of the balance a trade',
     why: 'Owner request of 24 Nov 2026. Demo only; every order carries its stop. On $100 the smallest lot often risks more than 1 % (then that order is skipped). A forward demo record of a before-cost tilt, not an edge.' },
+  // ict-mirror-off (owner, 24 Nov 2026: "Stop ICT copies"): the mirror opens no new ICT copy on any demo account; the ICT desk
+  // stays a paper record. Its account (login ending 144) takes the Equinox desks (ctrader-accounts.json book eqx).
+  { id: 'ict-mirror-off', apply: (c) => { c.mirrorIct = false; },
+    change: 'cTrader mirror: no new ICT copies on any demo account (owner, 24 Nov); the ICT desk stays paper only',
+    why: 'Owner request of 24 Nov 2026, so its demo account can trade the Equinox desks. Copies opened before (none were open) keep following their records with their stops. Undo: a user rule setting c.mirrorIct = true.' },
 ];
 config.userRules = config.userRules || [];
 // supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote
