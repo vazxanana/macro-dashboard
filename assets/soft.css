@@ -147,12 +147,12 @@ html:root body .cal-nav button { border-color: transparent !important; backgroun
 html:root body :is(.pri, .primary, .btn.gold, .gate-go, .u-btn) { border-radius: 999px !important; }
 /* buttons, segmented switches and timeframe chips: soft filled, no hard frame; the chosen one a soft accent tint */
 html:root body :is(.seg, .tfs, .ms-tf, .mk-mode, .desk-sw, .c-nav, .ict-seg, .ict-src, .dl-tfs, .mo-seg) button,
-html:root body :is(.dl-card, .mo-card, .card) > :is(div, header) > button:not(.pri):not(.primary) {
+html:root body :is(.dl-card, .mo-card, .card) > :is(div, header) > button:not(.pri):not(.primary):not(.btn):not(.qb):not(.danger):not([class*="buy"]):not([class*="sell"]) {   /* a button with its own meaning colour (Buy / Sell, danger) keeps it */
   border-color: transparent !important;
   background-color: color-mix(in srgb, var(--au-ink) 5%, transparent);
   border-radius: 10px;
 }
-html:root body :is(button, [role="tab"]):is([aria-pressed="true"], [aria-selected="true"], .on, .active):not(.pri):not(.primary):not(.btab a) {
+html:root body :is(button, [role="tab"]):is([aria-pressed="true"], [aria-selected="true"], .on, .active):not(.pri):not(.primary):not(.btab a):not([class*="buy"]):not([class*="sell"]):not([data-side]) {
   background-color: color-mix(in srgb, var(--au-accent) 16%, transparent) !important;
   border-color: transparent !important;
   color: var(--au-ink) !important;   /* the page's own ink: a chip that was white on a solid fill keeps AA on the tint */

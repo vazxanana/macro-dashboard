@@ -6821,3 +6821,17 @@ Four pre-registered studies (each PREREGISTRATION.md pushed alone first), all **
 The breakouts stay flat 1R with no macro gate; do not test another FRED gauge on these trades or these weeks without a new reason.
 Local reruns: `run.mjs fetch <dir>` (FRED + `git show` of the candle cache), then `run <dir>`. Tests: `tests/fred-gauges.test.mjs`,
 `tests/fred-gauges-2.test.mjs`.
+
+## Colour faults after the soft look, and charts that use the page (24 Nov 2026, owner: "fix the website too many color errors specially with the chart", "for the charts I would like to use more of the space of the page")
+Display only. Causes found on screenshots and fixed:
+- **Canvas code got see-through tokens.** The soft look made `--au-surface`, `--panel` and friends rgba; every chart reader hands
+  them to a canvas or to a hex-only helper (`rgba(hex, a)`), so plates and labels came out black or washed. Each reader now passes
+  its tokens through `auSolid` (market-structure `auChart`, backtest `tok`, gold terminal `gxPalette`, `assets/academy-ui.js`,
+  `bt-review.js`, `desk-live.js`, `mosha-replay.js`, `ms-draw.js`): an rgba with alpha 0.4 to under 1 is flattened onto `--au-bg`
+  and returned as #rrggbb; fainter tints, grids and bands stay see-through. **A new chart reader of a token must use it.**
+- **Buy / Sell lost their fills** (ChronosTrade's quick bar and Trade card were grey): soft.css's "buttons in a card" and
+  "pressed" rules now skip `.btn`, `.qb`, `.danger`, any class containing `buy` / `sell`, and `[data-side]`.
+- **The candle countdown** takes the candle's own colour (it was the theme's softer red beside the candle-red price label).
+- **Space** (`<style id="ms-ch-space-css">` after `#ms-ch-flat-css`; phone rules in the simple view's block): from 901 px a tighter
+  toolbar and phase strip, 8 px gaps, All = two rows a screen (`clamp(320px, (100vh - 300px) / 2, 620px)`), one chart / Split /
+  Layout fill the window (`100vh - 262px`), no max width on Charts; on a phone the chart card runs edge to edge and is 36 px taller.

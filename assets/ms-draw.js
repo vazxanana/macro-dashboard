@@ -29,7 +29,9 @@
   const load = (mk) => { if (!ST[mk]) { let a = []; try { a = JSON.parse(ls.get(KEY(mk)) || '[]'); } catch (e) {} ST[mk] = BT() ? BT().drawNorm(a) : []; } return ST[mk]; };
   const save = (mk) => ls.set(KEY(mk), JSON.stringify(ST[mk] || []));
   let SELC = null, TOOL = null, MAG = +(ls.get(MAGK) || 0) || 0, SEL = null, HOV = null, GES = null, DRAFT = null;   // SEL / HOV = { mk, i }
-  const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  const auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  const css = (n) => auSolid(getComputedStyle(document.documentElement).getPropertyValue(n).trim());
   const colOf = (d) => { const c = COLS[d.col || 'draw']; return c.startsWith('--') ? css(c) || '#2962ff' : c; };
   const mkOf = (cx) => cx.market();
   const view = (cx) => { const B = cx.bars() || []; return { bars: B, n: B.length, sec: cx.sec() }; };

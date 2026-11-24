@@ -97,7 +97,9 @@
   function st(k) { return ST[k] || (ST[k] = { k: k, mk: null, tf: '15m', bars: [], times: [], recs: null, detail: null, recAt: 0, shown: [], focus: null, timer: 0, gen: 0, msg: 'Reading the candles…', at: 0, chart: null, series: null, cv: null, raf: 0, key: '', h4on: true, h4: [], h4At: 0, h4map: [] }); }
   function allowed() { if (H.dataset.role === 'public') return false; return true; }
   function teachOnly() { return H.dataset.mosha === 'teach' && H.dataset.role !== 'owner'; }
-  function tok(n, f) { var v = getComputedStyle(H).getPropertyValue(n).trim(); return v || f; }
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  var auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  function tok(n, f) { var v = auSolid(getComputedStyle(H).getPropertyValue(n).trim()); return v || f; }
   function isLight() { var c = tok('--au-bg', tok('--bg', '#121315')), m = /^#([0-9a-f]{6})$/i.exec(c); if (m) { var n = parseInt(m[1], 16); return ((n >> 16) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) > 140; }
     var r = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(c); return r ? (+r[1] * 0.299 + +r[2] * 0.587 + +r[3] * 0.114) > 140 : false; }
   function colours() { var L = isLight();

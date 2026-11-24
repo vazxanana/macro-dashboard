@@ -32,7 +32,7 @@
 <script src="/assets/bt-fx.js?v=992a34f736"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3"></script>
 <script src="/assets/coach-lens.js?v=17bebc07fb"></script>
-<script src="/assets/bt-review.js?v=2449781261"></script>
+<script src="/assets/bt-review.js?v=2b0eac01e3"></script>
 <script src="/assets/mosha-i18n.js?v=22ed49dcd7"></script>
 <style>
   /* Graphite (17 Nov 2026, docs/design/aureum-theme.md): the --au-* tokens per theme (dark "graphite" is the default, light
@@ -762,7 +762,7 @@
   }
 </style>
 <script src="/assets/mx-nav.js?v=e7077d341f" defer></script>
-<link rel="stylesheet" href="/assets/soft.css?v=f4492d600a">
+<link rel="stylesheet" href="/assets/soft.css?v=a0db0c9f77">
 <!-- app tags: scripts/pwa.mjs -->
 <link rel="manifest" href="/app.webmanifest">
 <meta name="theme-color" content="#121315">
@@ -1046,7 +1046,9 @@
   // ---- chart ----
   // chart look (chart design pass, 9 Nov): every colour comes from the theme tokens (dark, light, midnight; `--c-*`), both scales use
   // tabular figures (Inter 12 px; one font on the whole page since 18 Nov 2026), quiet grid, symbol + timeframe watermark; applyTheme() re-reads them when the system theme flips
-  const tok = (n, d) => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || d;
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  const auSolid = window.auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  const tok = (n, d) => auSolid(getComputedStyle(document.documentElement).getPropertyValue(n).trim()) || d;
   const rgba = (c, a) => { const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(c); if (!m) return c; const h = m[1].length === 3 ? m[1].replace(/./g, '$&$&') : m[1], n = parseInt(h, 16); return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`; };
   const CT = {}; const MONO = 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
   const readTheme = () => Object.assign(CT, { up: tok('--c-up', '#2fbf8f'), dn: tok('--c-dn', '#f2576f'), grid: tok('--c-grid', 'rgba(127,127,127,.06)'), axis: tok('--c-axis', 'rgba(127,127,127,.2)'), cross: tok('--c-cross', 'rgba(127,127,127,.5)'), label: tok('--c-label', '#2b3140'), wm: tok('--c-wm', 'rgba(127,127,127,.06)'), vol: +tok('--c-vol', '.26') || .26, ses1: tok('--c-ses1', 'rgba(91,140,255,.05)'), ses2: tok('--c-ses2', 'rgba(224,165,38,.05)'), pd: tok('--c-pd', 'rgba(224,165,38,.6)'), draw: tok('--c-draw', '#5b8cff'), zone: +tok('--c-zone', '.13') || .13, ink: tok('--ink', '#eceef2'), dim: tok('--ink-dim', '#a4abb8'), faint: tok('--ink-faint', '#8a92a1'), panel: tok('--panel', '#0f1116'), accent: tok('--accent', '#5b8cff'), gold: tok('--gold', '#e0a526'), text: tok('--c-text', tok('--ink-faint', '#8e939b')) });

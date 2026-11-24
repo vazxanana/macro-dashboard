@@ -5117,7 +5117,9 @@ function msNextSetup(bars, A) {
   // graphite look (17 Nov 2026, docs/design/aureum-theme.md): when the page defines the --au- tokens the chart canvas takes its
   // background (--au-surface), text (--au-ink-3) and grid / borders (--au-line) from them; without them the table above stands.
   // Candle colours are not touched.
-  const auChart = (k) => { try { const cs = getComputedStyle(document.documentElement), v = (n) => cs.getPropertyValue(n).trim(), bg = v('--au-surface'), tx = v('--au-ink-3'), ln = v('--au-line');
+  // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
+  const auSolid = window.auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
+  const auChart = (k) => { try { const cs = getComputedStyle(document.documentElement), v = (n) => auSolid(cs.getPropertyValue(n).trim()), bg = v('--au-surface'), tx = v('--au-ink-3'), ln = v('--au-line');
     if (bg && tx && ln && THEMES[k]) Object.assign(THEMES[k], { bg, bgTop: bg, text: tx, grid: ln, border: ln }); } catch (e) {} };
   const UPC = '#089981', DNC = '#f23645';
   // a trading-terminal look (24 Nov 2026, owner: "make the interface look more like TradingView", "the candles should display the
@@ -5832,7 +5834,9 @@ function msNextSetup(bars, A) {
         const h = Math.floor(left / 3600), m = Math.floor(left % 3600 / 60), s2 = left % 60, p2 = (v) => String(v).padStart(2, '0');
         cd.textContent = h ? `${h}:${p2(m)}:${p2(s2)}` : `${p2(m)}:${p2(s2)}`;
         cd.style.display = ''; cd.style.width = `${w}px`; cd.style.transform = `translateY(${Math.round(y + 11)}px)`;
-        cd.classList.toggle('up', L.close >= L.open);
+        const up = L.close >= L.open; cd.classList.toggle('up', up);
+        // the pill takes the candle's own colour, as the price label above it does (it was the theme's softer red / green beside the candle's)
+        try { const K = candleCols(), c = up ? (K.borderUpColor || K.upColor) : (K.borderDownColor || K.downColor); if (hexOk(c)) { cd.style.background = c; cd.style.color = lumOf(c) > 0.4 ? '#101214' : '#fff'; cd.style.opacity = '1'; } } catch (e) {}
       };
       setInterval(tickCd, 1000); chart.timeScale().subscribeVisibleLogicalRangeChange(() => requestAnimationFrame(tickCd)); }
     chart.subscribeCrosshairMove((pr) => { if (!P.bars) return; if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { lgHover = true; P._cp = series.coordinateToPrice(pr.point.y); lgSoon(Math.round(pr.logical)); } else { lgHover = false; lgSoon(undefined); } });
@@ -15258,6 +15262,10 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"] #ms-pp .pp-set { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } html[data-phone="simple"] #ms-pp .pp-set label { display: grid; gap: 2px; } html[data-phone="simple"] #ms-pp .pp-set select { width: 100%; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
+  /* 24 Nov 2026, owner: charts use more of the page: the chart card runs edge to edge and the toolbar row is tighter */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-pane { margin-left: -16px; width: calc(100% + 32px); max-width: none; border-radius: 0; border-left: 0; border-right: 0; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h { margin-bottom: 4px; padding-bottom: 2px; border-bottom: 0; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 300px), 700px); }
 
   /* Council → Trades: the forward record in one sentence, then the latest five rows */
   .ps-t-ans { padding: 2px 2px 0; min-height: 0; }
@@ -15754,6 +15762,21 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
   #v-charts .sec-h h2 .kbd-hint { display: none !important; }
   #v-charts .sec-h > h2 { font-size: 18px; letter-spacing: -.01em; margin-right: 4px; }
   #v-charts .sec-h > .ind-open.ind-open { order: 3; margin-left: 8px; }
+}
+</style>
+<style id="ms-ch-space-css">
+/* Charts use the page (24 Nov 2026, owner: "for the charts I would like to use more of the space of the page"). Display only.
+   From 901 px: a tighter toolbar and phase strip, smaller gaps, and chart heights taken from the window: one chart (a
+   timeframe, Split, Layout, any timeframe) fills what is left under the toolbar; All shows two rows in one screen. */
+@media (min-width: 901px) {
+  html:not([data-role="public"]) #v-charts .sec-h { padding-top: 4px; padding-bottom: 4px; margin-bottom: 6px; row-gap: 4px; }
+  html:not([data-role="public"]) #v-charts #ms-phase { margin: 0 0 6px; }
+  html:not([data-role="public"]) #v-charts .ms-grid4 { gap: 8px; }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4[data-view="all"] .ms-chart { height: clamp(320px, calc((100vh - 300px) / 2), 620px); }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4:not([data-view="all"]):not([data-view="lay"]) .ms-chart { height: calc(100vh - 262px); min-height: 380px; max-height: none; }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="1"], [data-lay-n="2"]) .ms-chart { height: max(420px, calc(100vh - 262px)) !important; }
+  html:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4[data-view="lay"]:is([data-lay-n="3"], [data-lay-n="4"]) .ms-chart { height: max(240px, calc(50vh - 155px)) !important; }
+  html[data-view="charts"]:not([data-role="public"]) .ms-live.app { max-width: none; }
 }
 </style>
 <script id="ms-ps-js">
