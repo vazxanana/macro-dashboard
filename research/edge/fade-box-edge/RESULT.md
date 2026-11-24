@@ -77,3 +77,22 @@ trailing exit, R a trade:
 - **Waiting for confirmation is worse.** By the time an M15 candle closes back inside the box, the bounce has mostly happened.
 - So the entry E1 already uses (market at the first open after the close-out, stop at the box) is the best of these. What
   limits E1 is the size of the bounce relative to the cost, not the stop or the entry.
+
+## After the result: 10 % less stop, 10 % more target (24 Nov 2026, owner's question; exploration, not a test)
+
+`explore-stoptp.mjs`, E1's signals on every set already read, after costs, R a trade (R in units of the stop actually used;
+targets set at 1 / 1.1 / 2 / 2.2 x the ORIGINAL stop distance from the fill; "pooled" = every trade of the seven windows):
+
+| Stop, exit | 2010-14 | 2015-19 | A | B | C | D | E | Pooled |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1.0 x, trailing (E1) | +0.075 | +0.012 | +0.045 | +0.021 | +0.024 | +0.018 | +0.044 | +0.033 |
+| 0.9 x, trailing | +0.070 | -0.006 | +0.043 | +0.014 | +0.028 | +0.016 | +0.042 | +0.029 |
+| 1.0 x, target 1 x | +0.016 | -0.013 | +0.003 | -0.022 | +0.009 | +0.005 | +0.013 | +0.001 |
+| 0.9 x, target 1.1 x | +0.024 | -0.017 | +0.008 | -0.028 | +0.010 | +0.009 | +0.025 | +0.003 |
+| 1.0 x, target 2 x | +0.066 | +0.007 | +0.042 | -0.010 | +0.025 | +0.018 | +0.052 | +0.026 |
+| 0.9 x, target 2.2 x | +0.085 | +0.004 | +0.046 | -0.012 | +0.019 | +0.020 | +0.064 | +0.029 |
+
+Ten percent either way moves the result by a few thousandths of R a trade, well inside the noise (window t values 0 to 2.5
+whatever the setting): the tighter stop adds a little cost and a few more stop-outs, the further target a little more per
+winner, and the two about cancel. With the 0.9 x stop, a 1.1 x target is about +0.002R better than a 1 x target and a
+2.2 x target about +0.003R better than 2 x; neither beats E1's trailing exit pooled (+0.033R). Nothing here changes E1.
