@@ -657,6 +657,33 @@
     "volume": 100,
     "status": "closed at broker",
     "closedAt": "2026-11-24T15:17:29.000Z"
+   },
+   "eth-swing-1795533545": {
+    "positionId": "51137930",
+    "symbol": "ETHUSD",
+    "side": "sell",
+    "volume": 4,
+    "lots": 0.04,
+    "digits": 2,
+    "setup": "swing",
+    "status": "open",
+    "openedAt": "2026-11-24T15:20:20.000Z",
+    "councilEntry": 1669.09,
+    "stop": 1709.1152499999998,
+    "t1": 1536,
+    "riskCash": 1.97,
+    "margin": 6.73,
+    "shadow": true,
+    "mark": 1669.09,
+    "levelsFrom": "mark",
+    "fillPrice": 1667.95,
+    "slipR": 0.028,
+    "lagSec": 75,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-24T15:20:20.000Z",
+    "brokerStop": 1707.98
    }
   },
   "day": {
@@ -664,7 +691,7 @@
    "startBalance": 9846.42
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9832.32 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 9832.32 · 7 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -676,7 +703,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9832.32,
-  "lastRun": "2026-11-24T15:17:29.000Z"
+  "lastRun": "2026-11-24T15:20:20.000Z"
  },
  "log": [
   {
@@ -1059,6 +1086,11 @@
    "at": "2026-11-24T15:17:29.000Z",
    "msg": "XAUUSD position 51131382 closed at the broker",
    "trade": "xau-m30m1-1795532506"
+  },
+  {
+   "at": "2026-11-24T15:20:20.000Z",
+   "msg": "opened sell ETHUSD 0.04 lot (council swing)",
+   "trade": "eth-swing-1795533545"
   }
  ],
  "limits": {
@@ -1151,19 +1183,19 @@
   ]
  },
  "execution": {
-  "n": 22,
-  "meanSlipR": -0.025,
-  "medianSlipR": -0.003,
+  "n": 23,
+  "meanSlipR": -0.022,
+  "medianSlipR": -0.001,
   "worstSlipR": 0.034,
-  "medianLagSec": 82.5,
+  "medianLagSec": 79,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
     "meanSlipR": 0.004
    },
    "ETHUSD": {
-    "n": 3,
-    "meanSlipR": 0.008
+    "n": 4,
+    "meanSlipR": 0.013
    },
    "BTCUSD": {
     "n": 4,
