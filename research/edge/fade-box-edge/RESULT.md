@@ -53,3 +53,27 @@ Files: `discover.mjs` (rows: every faded box close-out with its features and res
 `discovery.json`, `report.mjs` (the bar and the cut test), `result.json`; test `tests/fade-box-edge.test.mjs`. To repeat:
 `EDGE_DATA=<cache> node discover.mjs <gate|A|B|C|D|E> <m> <dir>` for each set's markets, `node analyze.mjs <dir>`, then
 `node report.mjs cut <set> <m>` (collected into `<dir>/cut.json`) and `node report.mjs <dir>`.
+
+## After the result: a tighter stop or a better entry? (24 Nov 2026, owner's question; exploration, not a test)
+
+`explore-entry.mjs` ran E1's signals (risk at least 8 round trips, close-out inside the H4 box) under tighter stops and other
+entries, on every set already read (2010-14, 2015-19, A, B, C, D, E; set F was not run because nothing beat E1). After costs,
+trailing exit, R a trade:
+
+| Variant | 2010-14 | 2015-19 | A | B | C | D | E |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| E1 as tested (market at the next open, stop at the box) | +0.075 | +0.012 | +0.046 | +0.021 | +0.024 | +0.018 | +0.044 |
+| Stop at 0.75 x the distance | +0.051 | -0.035 | +0.029 | -0.007 | +0.022 | -0.001 | +0.009 |
+| Stop at 0.5 x the distance | +0.017 | -0.066 | +0.005 | -0.043 | -0.045 | -0.013 | -0.035 |
+| Limit 0.25 x the distance further out (better price) | +0.016 | -0.074 | +0.001 | -0.079 | -0.026 | -0.032 | -0.062 |
+| Limit 0.5 x the distance further out | -0.089 | -0.168 | -0.083 | -0.128 | -0.106 | -0.079 | -0.107 |
+| Wait for an M15 close back inside the box | -0.050 | -0.039 | -0.020 | -0.141 | -0.105 | -0.018 | -0.127 |
+
+- **A tighter stop is worse in every window.** The bounce is a fixed amount of price and so is the cost; a smaller stop
+  makes the cost a bigger share of each trade (0.5 x the stop roughly doubles it) and stops out more trades in the noise.
+- **A better price is worse.** A limit further out fills only when the break keeps going (about 60 % fill at 0.25 x, 40 % at
+  0.5 x), and those are the trades where the bounce did not come: before costs E1's +0.092R on set E falls to +0.006R at
+  0.25 x and to 0.000R at 0.5 x. Adverse selection, the same lesson as the limit entries of the earlier grids.
+- **Waiting for confirmation is worse.** By the time an M15 candle closes back inside the box, the bounce has mostly happened.
+- So the entry E1 already uses (market at the first open after the close-out, stop at the box) is the best of these. What
+  limits E1 is the size of the bounce relative to the cost, not the stop or the entry.
