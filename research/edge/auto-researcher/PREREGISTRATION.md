@@ -49,3 +49,13 @@ goes to a pre-registered forward record before anyone trades it.
 No threshold, grid, window or stage changes after a run starts; a change is a new version (`VERSION`), counted separately.
 Results are never edited. The ledger keeps every C look, passes and fails. A rule that depends on a stop being absent is not
 generated: every rule has a stop.
+
+## Four more workers (25 Nov 2026, owner: "add more 4 helpers to the researcher to speed it more")
+
+Workers 6-9 join workers 1-5, **version `auto-1` unchanged**: the same grids, windows, bars, stages and Holm rule; nothing in the
+search space, a threshold or a stage changed. Only the seeds differ (`worker * 1000003`). Their families: 6 and 7 wild (two
+triggers that must agree, the largest space), 8 all families, 9 big + blk + sweep. This is more tries, not another search:
+every try is still counted and the report sums all nine files, so the chance count and the Holm correction over every C look
+grow with the tries. A group that two workers both reach is looked at once per worker file and each look counts in Holm. No
+result so far is edited or discounted by the change.
+

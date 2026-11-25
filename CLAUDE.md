@@ -7075,7 +7075,7 @@ to -0.121R). Before costs the Big-candle fade is about +0.18R tagged or not: the
 version of the harness dropped zones whose end was not yet known; the cut test caught it (4 tag mismatches) and it was fixed before
 the run counted. Nothing live changed; do not test variants of these tags on these years. Test: `tests/fade-liquidity.test.mjs`.
 
-## The auto-researcher: five workers that never stop (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
+## The auto-researcher: nine workers that never stop (five at the start; four more on 25 Nov 2026, owner: "add more 4 helpers to the researcher to speed it more": workers 6-9, same version `auto-1`, only the seeds differ; `researcher.yml` runs `[1..9]`) (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
 `research/edge/auto-researcher/` (PREREGISTRATION.md committed alone first, `engine.mjs`, `tests/auto-researcher.test.mjs`) and
 `.github/workflows/researcher.yml` (free runner minutes; five matrix jobs; each works about 5.5 hours, saves to council-data
 `research/auto/worker-<n>.json` every 25 minutes and dispatches its own next run; cancel the runs, or set the repository variable
@@ -7105,3 +7105,14 @@ shared with this session). Tests: `tests/auto-researcher.test.mjs` (7).
 
 ## Wheel bar on the Charts (25 Nov 2026, owner: "change time frame and currency like that" with a phone picker screenshot, "make the chart occupy more space of the window")
 Display only, `market-structure.html` (`<style id="ms-wb-css">` + `<script id="ms-wb-js">` before the phone view's script). Up to 700 px, on Charts and not for guests, a bar `#ms-wb` above the tab bar shows the market and the timeframe; each opens a bottom sheet (`#ms-wb-sheet`) with a scroll-snap wheel (the one in the middle is bold, tap an item or scroll, Done applies, Cancel / a tap outside closes). It calls the page's own mechanisms: `window.msOneTf(id)` for a timeframe (an analysed one opens its pane) and a `?s=<market>#charts` link for a market (the page loads again, as the header's market list does); `window.msMarkets()` lists the markets, `window.msTfGroups()` the timeframes. It stores nothing and sends no order. On the phone's simple view the toolbar's market button `#ms-ch-mk` is hidden (the bar replaces it) and one chart is `100dvh - 314px` tall (was 300 with no bar). `window.msWheelBar()` is the read-only view. Test: `tests/charts-wheel-bar.test.mjs`. Not checked on a real phone.
+
+## FVG tap after a continuation move, then an H1 QM or an M15 CHoCH (25 Nov 2026, owner's chart idea: "Fvg tap after continue move, qm, entry, target low")
+`research/edge/fvg-qm-continuation/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, MEANING.md, result.json, trades.json;
+`tests/fvg-qm-continuation.test.mjs`). The owner's answers fixed the rule: H1 for the gap and the QM, "continue move" = an H1 BO in the trade's
+direction, target the low the move came from, and at the tap either the H1 QM confirms (entry A) or an M15 CHoCH does (entry B). An H1 BO, an
+H1 FVG formed from the broken swing to three candles after the break (gap >= 0.25 ATR), the first M5 tap, a stop past the pullback's high + one
+cost, one position at a time, five markets on the toolkit's M5 cache, 2010-19 replication / 2020-23 / 2024 on, month-sum t, Holm over two.
+**Verdict: FAIL.** Entry A: 81 trades in 15 years, 18 since 2024 (-0.285R a trade after costs, month t -0.74): too few to judge, negative. Entry B:
+353 trades since 2024, -0.146R after costs (month t -1.74), -0.083R on 2010-2019 (n 1,265, t -2.08); about -0.11R before costs. Gold alone
+with B +0.095R since 2024 (n 72, t 0.45) and -0.178R before: noise, not tested. Nothing live changed; no variant on these years.
+

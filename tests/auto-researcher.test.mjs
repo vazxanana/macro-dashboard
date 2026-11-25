@@ -14,23 +14,24 @@ const data = (bars, mk = 'eurusd') => E.prep(E.toArrays(bars), mk);
 test('the three windows are 2005-14, 2015-19 and 2020 on, in that order, and the bars are the protocol\'s', () => {
   assert.ok(E.WIN.A[1] === E.WIN.B[0] && E.WIN.B[1] === E.WIN.C[0]);
   assert.deepEqual(E.BAR.A, { n: 250, mean: 0.04, t: 3.0 }); assert.deepEqual(E.BAR.B, { n: 100, mean: 0, t: 1.5 }); assert.deepEqual(E.BAR.C, { n: 100, mean: 0, t: 2.0 });
-  assert.deepEqual(E.FAMILY[5], ['wild']); assert.equal(Object.keys(E.FAMILY).length, 5);
+  assert.deepEqual(E.FAMILY[5], ['wild']); assert.equal(Object.keys(E.FAMILY).length, 9);
 });
 
 test('every generated rule has a stop and only known pieces', () => {
   const r = E.rng(11);
-  for (let w = 1; w <= 5; w++) for (let i = 0; i < 300; i++) {
+  for (let w = 1; w <= 9; w++) for (let i = 0; i < 300; i++) {
     const g = E.genome(r, w);
     assert.ok(g.stop > 0 && E.SPACE.stop.includes(g.stop)); assert.ok(E.MARKETS.includes(g.mk)); assert.ok(g.hold >= 4);
-    assert.equal(g.trig.length, w === 5 ? 2 : 1);
-    for (const t of g.trig) if (w !== 5) assert.ok(E.FAMILY[w].includes(t.kind));
+    const wild = E.FAMILY[w][0] === 'wild';
+    assert.equal(g.trig.length, wild ? 2 : 1);
+    for (const t of g.trig) if (!wild) assert.ok(E.FAMILY[w].includes(t.kind));
   }
 });
 
 test('no look-ahead: the trades before a cut do not change when every later candle is removed', () => {
   const bars = walk(9000), cutAt = 6000, r = E.rng(3);
   const full = data(bars), short = data(bars.slice(0, cutAt));
-  for (let w = 1; w <= 5; w++) for (let i = 0; i < 60; i++) {
+  for (let w = 1; w <= 9; w++) for (let i = 0; i < 60; i++) {
     const g = E.genome(r, w); g.mk = 'eurusd';
     // trades are compared through their month sums over a window that ends well before the cut (the last trades need later candles to exit)
     const hi = cutAt - 400, a = E.simulate(full, g, 250, hi), b = E.simulate(short, g, 250, hi);
