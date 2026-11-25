@@ -56,3 +56,8 @@ year of C not to hold more than 40 % of the C-window loss-free total (a single y
 PASS = the gate and T1-T5 all hold: the rule is a CANDIDATE for a pre-registered forward record, never an edge. Anything else:
 "does not hold up", with the failing tests named. No parameter, filter or window is changed after seeing a result; any further
 idea gets its own pre-registration. Nothing live changes.
+
+## Amendment before any result (25 Nov 2026, same day, run.mjs not yet run)
+T5's last sentence read "the worst calendar year ... of the C-window loss-free total", which is not a defined quantity. What is
+meant, and what the run uses: **no single calendar year of the C window may hold more than 40 % of the C window's total R**
+(the year with the largest R; if the total is not positive the test fails). Nothing else changed.
