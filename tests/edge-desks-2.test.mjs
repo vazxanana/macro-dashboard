@@ -37,7 +37,7 @@ test('the adapters read the studies\' own cells', () => {
   assert.equal(BIG.TFS[D2.BIG_CELL.tf], '15m'); assert.equal(BIG.KS[D2.BIG_CELL.k], 1.5);
   assert.deepEqual(FB.F1, { ch: 2, trig: 0, sess: 2, ei: 0, si: 0, x: 0 });
   const med = D2.fvgMedians(); assert.equal(Object.keys(med).length, 10); assert.ok(med.xau['1h'] > 0);
-  assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nasbrk', 'lyriac', 'dom']);
+  assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'zero', 'lyriac', 'dom']);
   for (const k of ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
   assert.deepEqual(D2.DESKS2.goldvb.markets, ['xau']); assert.deepEqual(D2.DESKS2.jpyvb.markets, ['usdjpy']);
   for (const k of Object.keys(D2.DESKS2)) assert.equal(DESKS[k], D2.DESKS2[k]);
@@ -104,7 +104,7 @@ test('gold breakout: the study\'s buildDays / vbTrade, day by day', () => {
 });
 
 test('every record: its stop on the losing side, stored by clean(), each id once', () => {
-  for (const [k, d] of Object.entries(D2.DESKS2)) { const L = d.read(B, { from: FROM, market: d.markets[0] === 'usdjpy' ? 'usdjpy' : d.markets[0] === 'nas100' ? 'nas100' : 'xau' }); if (k !== 'jpyvb' && k !== 'nasbrk') assert.ok(L.length > 0, k + ': no trade on the test market');
+  for (const [k, d] of Object.entries(D2.DESKS2)) { const L = d.read(B, { from: FROM, market: d.markets[0] === 'usdjpy' ? 'usdjpy' : d.markets[0] === 'nas100' ? 'nas100' : 'xau' }); if (k !== 'jpyvb' && k !== 'nq1' && k !== 'zero') assert.ok(L.length > 0, k + ': no trade on the test market');
     const ids = new Set();
     for (const r of L) { assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, `${k}: stop on the wrong side`); assert.ok(!ids.has(r.id), `${k}: id twice`); ids.add(r.id);
       const c = clean(r); assert.ok(c, `${k}: clean() refused a record`); assert.equal(c.kind, r.kind); assert.equal(c.id, r.id);
@@ -115,7 +115,7 @@ test('every record: its stop on the losing side, stored by clean(), each id once
 test('no look-ahead: candles cut at a date give the same trades up to a day before it', () => {
   for (const cut of [T0 + 12.4 * 86400, T0 + 19.7 * 86400]) {
     const Bc = { '5m': M.filter((b) => b.time + 300 <= cut) };
-    for (const [k, d] of Object.entries(D2.DESKS2)) { if (k === 'jpyvb' || k === 'nasbrk') continue;
+    for (const [k, d] of Object.entries(D2.DESKS2)) { if (k === 'jpyvb' || k === 'nq1' || k === 'zero') continue;
       const key = (r) => [r.id, r.side, r.entry, r.stop, r.target].join('|');
       const A = new Set(d.read(B, { from: FROM, market: 'xau' }).filter((r) => r.t <= cut - 86400).map(key));
       const C = new Set(d.read(Bc, { from: FROM, market: 'xau' }).filter((r) => r.t <= cut - 86400).map(key));
@@ -151,7 +151,7 @@ test("DOM zone: the demo job's own zones, plan and arming rule", async () => {
 
 test('Equinox: its own page with the eight desks; the Desk keeps its five', () => {
   const src = fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), keys = Object.keys(D2.DESKS2);
-  assert.deepEqual(keys, ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nasbrk', 'lyriac', 'dom']);
+  assert.deepEqual(keys, ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'zero', 'lyriac', 'dom']);
   for (const k of keys) { const i = src.indexOf(`id="v-${k}"`); assert.ok(i > 0, k); const sec = src.slice(i, src.indexOf('</section>', i));
     for (const dk of ['open', 'trades', 'chart']) assert.ok(sec.includes(`data-dk="${dk}"`), `${k}: ${dk}`); assert.ok(src.includes(`"k":"${k}"`) || src.includes(`"k": "${k}"`), k + ' tab'); }
   for (const a of ['mosha-sop.js', 'mosha-replay.js', 'desk-trades.js', 'desk-live.js', 'mx-nav.js', 'lightweight-charts-4.1.3.js']) assert.ok(src.includes(a), a);
@@ -171,11 +171,11 @@ test('Equinox: its own page with the eight desks; the Desk keeps its five', () =
   assert.match(fs.readFileSync(new URL('../assets/mx-nav.js', import.meta.url), 'utf8'), /\[data-mx-desks\]/);
   const dt = fs.readFileSync(new URL('../assets/desk-trades.js', import.meta.url), 'utf8'), dl = fs.readFileSync(new URL('../assets/desk-live.js', import.meta.url), 'utf8');
   for (const k of keys) { assert.ok(dt.includes(`${k}: { file: '${k}/desk.json'`), k); assert.ok(dl.includes(`${k}: { passing: true, file: '${k}/desk.json'`), k); }
-  assert.equal((dt.match(/passing: true/g) || []).length, 10); assert.doesNotMatch(dt, /#v-lit, #v-eg, #v-msnr/);
+  assert.equal((dt.match(/passing: true/g) || []).length, 11); assert.doesNotMatch(dt, /#v-lit, #v-eg, #v-msnr/);
   assert.match(dt, /dom-tick-exec: -0\.111R a filled trade, n 1,706, month t -3\.73/);
   const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   assert.match(yml, /node council\/edge-desks\.mjs data --only eg,msnr,lit/);
-  assert.match(yml, /timeout 150 node council\/edge-desks\.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nasbrk,lyriac,dom/);
+  assert.match(yml, /timeout 150 node council\/edge-desks\.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,zero,lyriac,dom/);
   const src2 = fs.readFileSync(new URL('../council/edge-desks-2.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(src2, /from '\.\/(ctrader|dom-demo|gotobi|trader)|placeOrder|NEW_ORDER/);
 });

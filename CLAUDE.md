@@ -7139,15 +7139,23 @@ is −0.05R (n 74), the rule came out of 118 million tries, and the cost is assu
 Local reruns of research fetches need `node --use-env-proxy`; the engine's `loadMarket` prefers a local 5-minute cache, so the
 study reads its own fetched H1 file.
 
-**The NAS100 breakout as an Equinox desk** (25 Nov 2026, owner: "make it an edge for equinox and fill the months from January").
-`council/edge-desks-2.mjs` `nasbrkTrades` (`DESKS2.nasbrk`, kind `nasbrk-h1`, market nas100, `extra: { '5m': 60 }` days of warm-up for the 200-bar
-average and the ATR; the loop line is `--only fade,…,jpyvb,nasbrk,lyriac,dom`): the study's rule read on H1 candles built from the 5-minute ones
-(closed bars only, thin bars dropped as the engine does), the engine's own `atr` and `sma`; a long at the next open when that hour is 14-21 UTC,
-stop 1 ATR(14) below, 4R, out after 96 hours, ONE position at a time (a signal waits until the hour after the last trade's exit; an open trade
-blocks later ones). It is managed on 5-minute candles like every desk, so the order of stop and target inside an hour is read exactly (the study
-read hourly candles, stop first). Before costs. Page: Equinox tab "NAS100 breakout" (`#v-nasbrk`), `desk-trades.js` `DESKS.nasbrk`,
-`desk-live.js`; `datahealth.mjs` lists `nasbrk/desk.json`; `mosha-desk.mjs` `clean` takes the kind. History filled from 1 Jan 2026 with
-`node council/edge-desks.mjs <dir> --days 330 --from 2026-01-01 --only nasbrk` (74 closed trades, 16 won, −2.4R before costs, −0.032R a trade:
-the study's own 2026, n 74, was −0.05R after its assumed cost). A paper record of a candidate that passed its follow-up but is not an edge;
-2026 so far is flat to slightly negative. Tests: `tests/nasbrk-desk.test.mjs` (signal bars checked one by one, one position at a time, the
-engine's first trade, no look-ahead, wiring).
+**NQ1: the auto-researcher's Nasdaq leads, one Equinox desk** (25 Nov 2026, owner: "all nasdaq studies put it altogether and call it NQ1 in
+equinox, and fill from january till now", then "NQ1 should be the nasdaq leads"; it replaces the same-day NAS100 breakout desk, and turnaround
+Tuesday and the breakout of the day were on it for a few hours and taken off). `council/edge-desks-2.mjs` `nq1Trades` (`DESKS2.nq1`, market nas100,
+`extra: { '5m': 60 }` days; loop line `--only fade,…,jpyvb,nq1,lyriac,dom`; `nq1/desk.json` + `detail/`; kinds `nq1-l1`, `l2`, `l4`, `l5`, `l6`, `nq1-t1`; `datahealth.mjs`,
+`mosha-desk.mjs` `clean` know them). Five of the seven NAS100 leads the auto-researcher had on 25 Nov 2026 (Holm below 0.05 over every holdout look;
+`NQ1_LEADS`, genomes FROZEN, a lead found later joins only by a deliberate change; `l3`, the rule of `research/edge/nas100-brk-long-focus`, and `l7` were
+taken off at the owner's word: "remove 3 and 7", both slightly negative in 2026) read
+on H1 candles built from the 5-minute ones (closed bars only, thin bars dropped) with the engine's own `sig`, `atr`, `sma`, `atrPct` (the engine
+now exports `sig` and `atrPct`; behaviour unchanged), the entry the next hour's open, managed on 5-minute candles like every desk, ONE position at a
+time PER READING; **plus `nq1-t1` = index-vol-breakout T1 on NAS100** (`vbDays`, k 0.5: the UTC open +/- 0.5 x the previous range, stop back at the open, out at 21:00 UTC; it lost its placebo test; owner: "Nasdaq breakout of the day should be in NQ1"). Not in it: the NQ open run (a council system) and anything of the ICT desk (a separate edge). **Readings overlap (several are long
+at once): totals are not additive, and the leads are probably one effect, the Nasdaq's rise, found in several forms.** Before costs (the research
+ran at none: futures). **The January-onward history is NOT new evidence: 2026 lies inside the years the search and the follow-up already read;
+only trades from 26 Nov 2026 are forward.** Filled with `node --use-env-proxy council/edge-desks.mjs <dir> --days 330 --from 2026-01-01 --only nq1`.
+Tests: `tests/nq1-desk.test.mjs`.
+
+**ZERO: turnaround Tuesday on the Nasdaq, one Equinox desk** (25 Nov 2026, owner: "put it in another strategy and call it ZERO"; "NQ1 and ZERO are 2 different
+things"; the Nasdaq breakout of the day went back to NQ1). `council/edge-desks-2.mjs` `zeroTrades` (`DESKS2.zero`, market nas100; loop line `--only …,nq1,zero,lyriac,dom`;
+`zero/desk.json`; kind `zero-tue`): turnaround-tuesday R2 on NAS100 by the study's own `tradingDays`, `weekPairs`, `buildDays`, `trade` (the first trading day of a week closed
+down more than 1 %, buy that close, stop 2 ATR(20 days), out at the next trading day's close; R before costs and financing; an open trade is read to the last candle).
+Before costs; 1 Jan - 25 Nov 2026: 5 trades, 4 won, +0.169R (inside the years the study read). Tests: `tests/nq1-desk.test.mjs`.
