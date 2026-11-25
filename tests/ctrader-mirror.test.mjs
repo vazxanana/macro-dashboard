@@ -706,13 +706,13 @@ test('amend: a council stop / target move on an open trade is sent to the broker
 
 // ---- 8 Nov (owner): one demo account per book ---------------------------------------------------------------------------------
 test('books and accounts: every trade has one book; accounts come from config.json or CTRADER_ACCOUNTS, the base account takes the rest', () => {
-  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx']); assert.equal(bookOf({ id: 'xau-replica-1-s', k: 'replica', shadow: true }), 'replica');
+  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx', 'bfade']); assert.equal(bookOf({ id: 'xau-replica-1-s', k: 'replica', shadow: true }), 'replica');
   assert.equal(bookOf({ id: 'ict:nq-b-1' }), 'ict'); assert.equal(bookOf({ id: 'xau-lit-s-1', k: 'lit', shadow: true }), 'lit'); assert.equal(bookOf({ id: 'eurusd-scalp-1', shadow: true }), 'shadow'); assert.equal(bookOf({ id: 'eurusd-scalp-1', k: 'scalp' }), 'council');
-  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242', replica: '4242', mosha6: '4242', eqx: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
+  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
   a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, { mirrorAccounts: { shadow: '5000', lit: '6000' } });
-  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000', replica: '4242', mosha6: '4242', eqx: '4242' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict', 'replica', 'mosha6', 'eqx']], ['5000', ['shadow']], ['6000', ['lit']]]);
+  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict', 'replica', 'mosha6', 'eqx', 'bfade']], ['5000', ['shadow']], ['6000', ['lit']]]);
   a = accountsFor({ CTRADER_ACCOUNT_ID: '4242', CTRADER_ACCOUNTS: 'ict:7000, lit:8000,bogus:1' }, { mirrorAccounts: { lit: '6000' } });
-  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000', replica: '4242', mosha6: '4242', eqx: '4242' }, 'the env wins over config.json; unknown books ignored');
+  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242' }, 'the env wins over config.json; unknown books ignored');
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', book: 'shadow', result: 'no' }, 0).title, /^Demo mirror \[shadow\]: order rejected/);
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', result: 'no' }, 0).title, /^Demo mirror: order rejected/);
 });
@@ -1101,7 +1101,7 @@ test('Mosha 6R: copied only while the mosha6 book has its own account; the repo 
   const ACCF = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
   const a = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACCF.mirrorAccounts, drain: ACCF.drain });
   assert.equal(a.byBook.mosha6, '*155'); assert.deepEqual(a.groups.find((g) => g.account === '*155').books, ['mosha6']);
-  assert.deepEqual(a.groups.find((g) => g.account === '10152145'), { account: '10152145', books: [], drain: true });
+  assert.deepEqual(a.groups.find((g) => g.account === '10152145'), { account: '10152145', books: ['bfade'] });   // 25 Nov 2026: the Big-candle fade book, no longer drained
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
   assert.match(src, /moshaHasOwnAccount\(byBook\) \? moshaCandidates\(desk\) : \[\]/);
   assert.equal(LIMITS.risk.mosha6, 0.0025);
@@ -1160,7 +1160,7 @@ test('pickAccount: "*155" = the one demo account whose login ends 155; two match
   assert.equal(pickAccount([{ id: '2', login: '50210155', live: false }], '*155', { id: 'id', login: 'login', live: 'live' }).id, '2');
   assert.equal(mirrorFile('*155', '9'), 'mirror-155.json'); assert.equal(mirrorFile('9', '9'), 'mirror.json'); assert.match(mirrorFile('*155', '9'), /^mirror(-\d+)?\.json$/);
   const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
-  assert.equal(acc.mirrorAccounts.mosha6, '*155'); assert.deepEqual(acc.drain, ['10152145']); assert.equal(acc.mirrorAccounts.eqx, '10152144');
+  assert.equal(acc.mirrorAccounts.mosha6, '*155'); assert.deepEqual(acc.drain, []); assert.equal(acc.mirrorAccounts.eqx, '10152144');
 });
 
 test('daily stop: a balance cut to under half the day start is an account reset, not a loss (24 Nov 2026)', async () => {
@@ -1187,4 +1187,17 @@ test('daily stop: a fall right after the mirror sent an order is still a loss (t
   r.state.day.sent = true; b.setBalance(970000);
   r = await mirrorRound({ env: ENV, trades: [tr({ opened: NOW + 30, filled: NOW + 30 })], state: r.state, WS: b.WS, now: NOW + 60 });
   assert.equal(r.state.day.startBalance, 10000); assert.match(r.state.wait['eurusd-intraday-1'].why, /daily loss stop/);
+});
+
+test('Big-candle fade book (25 Nov 2026): own ids, 5 % risk, own day stop, stop required', async () => {
+  const M = await import('../council/ctrader-mirror.mjs');
+  const now = 1_800_000_000, rec = (o) => ({ id: 'bf-1', market: 'eurusd', side: 1, entry: 1.1, stop: 1.099, target: 1.1015, t: now - 60, first: now - 30, status: 'open', ...o });
+  const out = M.bfadeCandidates({ records: [rec(), rec({ id: 'bf-2', stop: 1.101 }), rec({ id: 'bf-3', t: now - 7200, first: now - 7200 })] }, now);
+  assert.deepEqual(out.map((t) => t.id), ['bfade:bf-1', 'bfade:bf-3']);   // a stop on the winning side is never written
+  assert.equal(M.bookOf(out[0]), 'bfade'); assert.ok(M.BOOKS.includes('bfade'));
+  assert.equal(out[0].noCopy, undefined); assert.equal(out[1].noCopy, true); assert.match(out[1].noCopyWhy, /^Big-candle fade:/);
+  assert.equal(M.LIMITS.risk.bfade, 0.05); assert.equal(M.LIMITS.dayStopBfade, 0.15); assert.equal(M.LIMITS.risk.eqx, 0.01);
+  assert.equal(M.bfadeHasOwnAccount({ bfade: '10152145', council: '1' }), true); assert.equal(M.bfadeHasOwnAccount({ bfade: '1', council: '1' }), false);
+  const a = M.accountsFor({ CTRADER_ACCOUNT_ID: '10152148' }, { mirrorAccounts: JSON.parse(fs.readFileSync('council/ctrader-accounts.json', 'utf8')).mirrorAccounts, drain: [] });
+  assert.equal(a.byBook.bfade, '10152145');
 });

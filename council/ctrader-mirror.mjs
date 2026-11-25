@@ -168,6 +168,14 @@ export function eqxCandidates(files, nowS = Math.floor(Date.now() / 1000)) {
   }
   return out;
 }
+// 25 Nov 2026 (owner: "Put big fade candle edge in one of the demo accounts replace it and risk 5% per trade"; account 10152145):
+// the Big-candle fade desk's records (council-data bigfade/desk.json) alone, the Equinox rules above (same choices: stop required,
+// fresh and not more than maxFloat R from the entry), ids `bfade:<desk record id>`, 5 % of the balance a trade (LIMITS.risk.bfade),
+// its own day stop LIMITS.dayStopBfade 15 % (the 2 % stop would end the day at the first loser). Copied only while the bfade book
+// has a demo account of its own. Demo only; a paper reading of a rule that loses after costs, not an edge.
+export const bfadeCandidates = (file, nowS) => eqxCandidates({ bigfade: file }, nowS).map((t) => ({ ...t, id: t.id.replace(/^eqx:bigfade:/, 'bfade:'), k: 'bfade', eqx: false, bfade: true,
+  ...(t.noCopyWhy ? { noCopyWhy: t.noCopyWhy.replace(/^Equinox: /, 'Big-candle fade: ') } : {}) }));
+export const bfadeHasOwnAccount = (byBook) => !!(byBook && byBook.bfade && byBook.council && byBook.bfade !== byBook.council);
 export const eqxHasOwnAccount = (byBook) => !!(byBook && byBook.eqx && byBook.council && byBook.eqx !== byBook.council);
 // true only while the mosha6 book trades on a different demo account from the council book
 export const moshaHasOwnAccount = (byBook) => !!(byBook && byBook.mosha6 && byBook.council && byBook.mosha6 !== byBook.council);
@@ -187,7 +195,7 @@ export const RESET_SHARE = 0.5;
 // trade (opening one costs a commission of about 0.01 %): it is a withdrawal or deposit, and the day's start moves with it.
 export const CASH_SHARE = 0.01;
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.01 }, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
+  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.01, bfade: 0.05 }, dayStopBfade: 0.15, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -368,7 +376,7 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 
   const qr = quoteRate({ name, px, spec, now }), toAcc = qr && qr.rate;
   if (!toAcc) return { skip: `${name}: cannot value its quote currency${spec && spec.quote ? ` (${spec.quote})` : ''} in the account currency${spec && spec.deposit ? ` (${spec.deposit})` : ''}` };
   const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
-  let riskCash = balance * (isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : String(t.id).startsWith('eqx:') ? LIMITS.risk.eqx : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
+  let riskCash = balance * (isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : String(t.id).startsWith('eqx:') ? LIMITS.risk.eqx : String(t.id).startsWith('bfade:') ? LIMITS.risk.bfade : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
   const perLot = (lot / 100) * dist * toAcc, lots = riskCash / perLot;
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
   let v = Math.floor((lots * lot) / step + 1e-9) * step, atMin = false;   // epsilon: 0.01 lot must not floor to 0 on float noise
@@ -425,8 +433,8 @@ export const copiedIds = (state) => new Set([...Object.keys((state && state.map)
 // Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
 // not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
 // "council:123,ict:456,shadow:789,lit:321,replica:654" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
-export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx'];
-export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : String(t.id).startsWith('eqx:') ? 'eqx' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
+export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx', 'bfade'];
+export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : String(t.id).startsWith('eqx:') ? 'eqx' : String(t.id).startsWith('bfade:') ? 'bfade' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
 // an account number, or "*<digits>" = the ONE demo account whose login ends with those digits (24 Nov 2026: the owner gives the
 // last digits; two matches, or only a live one, find nothing). f names the fields of the list's entries.
 export function pickAccount(list, spec, f = { id: 'ctidTraderAccountId', login: 'traderLogin', live: 'isLive' }) {
@@ -812,7 +820,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       for (const t of fresh) {
         const skip = (why) => skipT(t, why), later = (why, count = false) => laterT(t, why, count);
         const pending = t.status === 'pending';
-        if (dayDown >= LIMITS.dayStop) { later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
+        if (dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : LIMITS.dayStop)) { later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
         if (String(t.id).startsWith('eqx:') && Object.entries(st.map).filter(([id, m]) => id.startsWith('eqx:') && (m.status === 'open' || m.status === 'sent')).length >= EQX.maxOpen) { later(`${EQX.maxOpen} Equinox positions already open`); continue; }
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
@@ -973,7 +981,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // the Mosha 6R barrier records (23 Nov 2026) the same way: only while the mosha6 book has a demo account of its own
   let desk = null; try { desk = JSON.parse(fs.readFileSync(path.join(DIR, 'mosha', 'desk.json'), 'utf8')); } catch (e) {}
   const eqxFiles = {}; for (const k of EQX.desks) { try { eqxFiles[k] = JSON.parse(fs.readFileSync(path.join(DIR, k, 'desk.json'), 'utf8')); } catch (e) {} }
-  const trades = own.concat(ictCandidates(ict, cfg.mirrorIct !== false), eqxHasOwnAccount(byBook) ? eqxCandidates(eqxFiles) : [], replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
+  const trades = own.concat(ictCandidates(ict, cfg.mirrorIct !== false), eqxHasOwnAccount(byBook) ? eqxCandidates(eqxFiles) : [], bfadeHasOwnAccount(byBook) ? bfadeCandidates(eqxFiles.bigfade) : [], replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
   const fileOf0 = (a) => mirrorFile(a, base);
   const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));
