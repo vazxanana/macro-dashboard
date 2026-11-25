@@ -7090,3 +7090,6 @@ forward record). About 100 tries a second a worker. Read the state: `node resear
 (−0.088R, t −1.24). No threshold, grid or window changes while a version runs; a change is `auto-2` and is counted apart.
 Not yet in it: the owner's EF zones, Mosha VR / CF, the iFVG and the Telegram-downloads folder on his laptop (needs the folder
 shared with this session). Tests: `tests/auto-researcher.test.mjs` (7).
+
+## The late-evening Break fade at the broker's own ticks (25 Nov 2026)
+`research/edge/fade-late-tick-exec/` (PREREGISTRATION.md pushed alone first; `run.mjs fetch|report`, MEANING.md, RESULT.md, result.json). The `m15 none atr 2R all` Break fade whose break candle starts at 20-22 UTC, XAUUSD and USDJPY, 2023-12 to 2026-11-20, entered at the demo broker's ask / bid (tick probe `fills` / `marks`). **INCONCLUSIVE on coverage, negative in substance**: −0.452R a trade after commission (n 354 resolved of 523, month t −3.98) against +0.075R on mid candles; 119 orders had no entry quote, 50 an unresolved exit (49 "window not read", USD/JPY). 21:00 UTC (rollover) is the worst hour: USD/JPY −1.12R, entry spread median 0.53R. Gold about −0.23R everywhere. Hours were picked after looking at these years: an execution measurement, never a rule. Nothing live changed.
