@@ -15,7 +15,10 @@ export const WIN = { A: [UTC(2005), UTC(2015)], B: [UTC(2015), UTC(2020)], C: [U
 export const BAR = { A: { n: 250, mean: 0.04, t: 3.0 }, B: { n: 100, mean: 0, t: 1.5 }, C: { n: 100, mean: 0, t: 2.0 } };
 export const FAMILY = { 1: ['brk', 'fade', 'eg'], 2: ['pull', 'dev'], 3: ['big', 'blk', 'sweep'], 4: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 5: ['wild'],
   // 25 Nov 2026: four more workers, same grids and bars (PREREGISTRATION.md, "Four more workers"); only the seeds differ
-  6: ['wild'], 7: ['wild'], 8: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 9: ['big', 'blk', 'sweep'] };
+  6: ['wild'], 7: ['wild'], 8: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 9: ['big', 'blk', 'sweep'],
+  // 25 Nov 2026 (owner: "one worker just for NQ try all the edges possible and do combinations"): worker 10 = NAS100 only, every trigger kind, one or two combined
+  10: ['nq'] };
+export const NQ_WORKER = 10, NQ_COST = 0;   // owner, 25 Nov 2026: "no cost because will be futures": NQ results are BEFORE costs (futures still pay a tick and a commission; a lead is re-priced at real quotes before anything else)
 const ALLK = ['brk', 'fade', 'pull', 'big', 'blk', 'dev', 'eg', 'sweep'];
 export const SPACE = {
   N: [5, 8, 10, 15, 20, 30, 50, 80, 120], fast: [5, 10, 20, 30], slow: [50, 100, 150, 200], rsi: [20, 25, 30, 35, 65, 70, 75, 80],
@@ -65,7 +68,7 @@ const atrPct = (D) => cache(D, 'atrpct', () => { const a = atr(D), o = new Float
 export function prep(D, mk) {
   D.mk = mk; D.ind = {}; D.hour = new Uint8Array(D.n); D.dow = new Uint8Array(D.n); D.month = new Int32Array(D.n);
   for (let i = 0; i < D.n; i++) { const d = new Date(D.t[i] * 1000); D.hour[i] = d.getUTCHours(); D.dow[i] = d.getUTCDay(); D.month[i] = d.getUTCFullYear() * 12 + d.getUTCMonth(); }
-  D.cost = K.COSTS[mk];
+  D.cost = K.COSTS[mk]; if (mk === 'nas100') { D.costRel = NQ_COST; D.cost = 0; }   // a share of price when NQ_COST is set, none by the owner's word
   const find = (x) => { let lo = 0, hi = D.n; while (lo < hi) { const m = (lo + hi) >> 1; if (D.t[m] < x) lo = m + 1; else hi = m; } return lo; };
   D.idx = { A: [find(WIN.A[0]), find(WIN.A[1])], B: [find(WIN.B[0]), find(WIN.B[1])], C: [find(WIN.C[0]), D.n] };
   return D;
@@ -87,9 +90,9 @@ function trigger(r, kind) {
   }
 }
 export function genome(r, worker) {
-  const fam = FAMILY[worker], kinds = fam[0] === 'wild' ? [pick(r, ALLK), pick(r, ALLK)] : [pick(r, fam)];
+  const fam = FAMILY[worker], kinds = fam[0] === 'wild' ? [pick(r, ALLK), pick(r, ALLK)] : fam[0] === 'nq' ? (r() < 0.5 ? [pick(r, ALLK)] : [pick(r, ALLK), pick(r, ALLK)]) : [pick(r, fam)];
   const h0 = r() < 0.5 ? null : pick(r, SPACE.hours);
-  return { mk: pick(r, MARKETS), trig: kinds.map((k) => trigger(r, k)), side: pick(r, ['both', 'both', 'long', 'short']),
+  return { mk: worker === NQ_WORKER ? 'nas100' : pick(r, MARKETS), trig: kinds.map((k) => trigger(r, k)), side: pick(r, ['both', 'both', 'long', 'short']),
     hours: h0 == null ? null : [h0, (h0 + pick(r, [1, 2, 3, 4, 6, 8, 12])) % 24], dows: r() < 0.7 ? null : pick(r, [[1, 2, 3, 4, 5], [1, 2, 3], [2, 3, 4], [3, 4, 5], [1, 5]]),
     trend: pick(r, ['none', 'none', 'with', 'against']), vol: pick(r, ['none', 'none', 'low', 'high']), volP: pick(r, SPACE.atrPct),
     stop: pick(r, SPACE.stop), rr: pick(r, SPACE.rr), hold: pick(r, SPACE.hold) };
@@ -136,7 +139,8 @@ export function simulate(D, g, lo, hi, flip = false) {
     if (trendMA) { const m = trendMA[i]; if (!(m === m)) continue; const up = D.c[i] > m ? 1 : -1; if (g.trend === 'with' ? up !== s : up === s) continue; }
     if (!passes(D, g, i)) continue;
     const side = flip ? -s : s, entry = D.o[i + 1], dist = g.stop * A, stop = entry - side * dist, tgt = g.rr > 0 ? entry + side * g.rr * dist : null;
-    if (!(dist > 0) || D.cost / dist > 0.5) continue;                                  // a stop smaller than twice the cost is no trade
+    const cst = D.costRel ? D.costRel * entry : D.cost;     // an index costs a share of its price, a currency or metal a fixed amount
+    if (!(dist > 0) || cst / dist > 0.5) continue;                                  // a stop smaller than twice the cost is no trade
     let ex = null, j = i + 1;
     for (; j <= i + g.hold && j < D.n; j++) {
       const o = j === i + 1 ? entry : D.o[j];
@@ -145,7 +149,7 @@ export function simulate(D, g, lo, hi, flip = false) {
       if (tgt != null && (side > 0 ? D.h[j] >= tgt : D.l[j] <= tgt)) { ex = tgt; break; }
     }
     if (ex == null) { j = Math.min(i + g.hold, D.n - 1); ex = D.c[j]; }
-    const R = ((ex - entry) * side - D.cost) / dist; free = j + 1;
+    const R = ((ex - entry) * side - cst) / dist; free = j + 1;
     out.n++; out.sum += R; if (R > 0) out.wins++; out.months.set(D.month[i + 1], (out.months.get(D.month[i + 1]) || 0) + R);
   }
   return out;
@@ -164,8 +168,8 @@ export async function run(worker, outDir, minutes, cacheDir) {
   fs.mkdirSync(outDir, { recursive: true });
   let S = { version: VERSION, worker, started: new Date().toISOString(), tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0, groups: {}, leads: [], looks: [], chunks: 0 };
   try { const prev = JSON.parse(fs.readFileSync(file, 'utf8')); if (prev.version === VERSION) S = { ...prev, chunks: prev.chunks + 1 }; } catch {}
-  const D = {}; for (const mk of MARKETS) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
-  const have = MARKETS.filter((m) => D[m] && D[m].n > 5000); if (!have.length) throw new Error('no candles');
+  const MY = worker === NQ_WORKER ? ['nas100'] : MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
+  const have = MY.filter((m) => D[m] && D[m].n > 5000); if (!have.length) throw new Error('no candles');
   const r = rng(worker * 1000003 + LANE * 104729000 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); S.chanceCandidates = +(S.tries * 0.0013 * 0.07).toFixed(1); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
   let lastSave = Date.now();
   while (Date.now() - t0 < minutes * 60e3) {

@@ -14,7 +14,7 @@ const data = (bars, mk = 'eurusd') => E.prep(E.toArrays(bars), mk);
 test('the three windows are 2005-14, 2015-19 and 2020 on, in that order, and the bars are the protocol\'s', () => {
   assert.ok(E.WIN.A[1] === E.WIN.B[0] && E.WIN.B[1] === E.WIN.C[0]);
   assert.deepEqual(E.BAR.A, { n: 250, mean: 0.04, t: 3.0 }); assert.deepEqual(E.BAR.B, { n: 100, mean: 0, t: 1.5 }); assert.deepEqual(E.BAR.C, { n: 100, mean: 0, t: 2.0 });
-  assert.deepEqual(E.FAMILY[5], ['wild']); assert.equal(Object.keys(E.FAMILY).length, 9);
+  assert.deepEqual(E.FAMILY[5], ['wild']); assert.equal(Object.keys(E.FAMILY).length, 10); assert.deepEqual(E.FAMILY[10], ['nq']);
 });
 
 test('every generated rule has a stop and only known pieces', () => {
@@ -73,4 +73,16 @@ test('the report adds the workers up; a lead needs the C bar AND Holm over every
   const R = E.report(dir); assert.equal(R.tries, 3000); assert.equal(R.cLooks, 3); assert.equal(R.cPasses, 2);
   assert.equal(R.leads.length, 1); assert.equal(R.leads[0].group, 'g0.01');                 // 0.01 x 3 = 0.03 clears; 0.04 x 2 = 0.08 does not
   fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('worker 10 trades NAS100 only, every trigger kind alone or two together, and an index cost is a share of its price (none now)', () => {
+  const r = E.rng(3), seen = new Set(); let two = 0;
+  for (let i = 0; i < 600; i++) { const g = E.genome(r, 10); assert.equal(g.mk, 'nas100'); assert.ok(g.stop > 0); assert.ok(g.trig.length === 1 || g.trig.length === 2); two += g.trig.length === 2; g.trig.forEach((t) => seen.add(t.kind)); }
+  assert.ok(two > 200 && two < 400); assert.deepEqual([...seen].sort(), ['big', 'blk', 'brk', 'dev', 'eg', 'fade', 'pull', 'sweep']);
+  assert.equal(E.NQ_COST, 0);   // the owner's word: no cost on NQ (futures); results are before costs
+  // a cost, if set, is a share of the entry price: the same walk at ten times the level costs ten times as much, so R is the same
+  const mk = (k) => data(walk(9000, 5).map((b) => ({ t: b.t, o: b.o * k, h: b.h * k, l: b.l * k, c: b.c * k })), 'nas100');
+  const g = { mk: 'nas100', trig: [{ kind: 'brk', N: 20 }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 1, rr: 2, hold: 24 };
+  const a = E.simulate(mk(1), g, 300, 8000), b = E.simulate(mk(10), g, 300, 8000);
+  assert.ok(a.n > 50); assert.equal(a.n, b.n); assert.ok(Math.abs(a.sum - b.sum) < 1e-6);
 });
