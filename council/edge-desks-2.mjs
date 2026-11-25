@@ -285,6 +285,8 @@ export const lyriacTrades = (B, { from, market = 'xau' } = {}) => (market === 'x
 // (stop first in one candle), no time limit. Not modelled: the job's 20-a-account cap across markets and its stale-market pause.
 export const DOM = { RR: 2, ATR_K: 0.25, NEAR_ATR: 1, LIFE_S: 24 * 3600, MAX_MARKET: 3 };
 export const DOM_MARKETS = ['xau', 'xag', 'eurusd', 'gbpusd', 'audusd', 'nzdusd', 'usdjpy', 'usdcad', 'usdchf', 'eurjpy', 'gbpjpy', 'audjpy', 'cadjpy', 'eurgbp', 'euraud', 'nas100', 'spx500', 'de40'];
+// the DESK reads eight of the job's eighteen (owner, 25 Nov 2026: EUR/AUD, CAD/JPY, GBP/JPY, USD/CHF, NZD/USD, DAX, S&P 500, silver, EUR/USD and GBP/USD left it); the demo job keeps its list
+export const DOM_DESK_MARKETS = DOM_MARKETS.filter((m) => !['euraud', 'cadjpy', 'gbpjpy', 'usdchf', 'nzdusd', 'de40', 'spx500', 'xag', 'eurusd', 'gbpusd'].includes(m));
 export function domPlan(z, atr, cost) {   // the job's plan(), the same arithmetic
   const s = z.side === 'buy' ? 1 : -1, entry = s > 0 ? z.top : z.bot, pad = cost / 2 + DOM.ATR_K * atr, stop = s > 0 ? z.bot - pad : z.top + pad, risk = Math.abs(entry - stop);
   if (!(risk > 0)) return null;
@@ -340,6 +342,6 @@ export const DESKS2 = {
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
   nasbrk: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nasbrkTrades, note: 'NAS100 breakout: the auto-researcher\'s lead, an H1 close above the 20 hours\' high and above the 200-hour average, bought at the next open between 14:00 and 22:00 UTC, stop 1 ATR, 4R, out after 96 hours (nas100-brk-long-focus). It passed its pre-registered tests but is a candidate, not an edge, and its cost is not measured.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
-  dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
+  dom: { tfs: ['5m'], markets: DOM_DESK_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on eight of its markets (gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP and the Nasdaq 100). It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };
 export const KINDS2 = Object.keys(DESKS2);

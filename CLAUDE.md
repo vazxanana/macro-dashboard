@@ -7156,3 +7156,8 @@ engine's first trade, no look-ahead, wiring).
 xau, xag and usdcad (seven: EUR/USD, GBP/USD, USD/JPY, AUD/USD, NZD/USD, USD/CHF, EUR/JPY); `DESKS2.boxfade.markets` reads them; the other fade / gap desks keep their ten.
 `council/edge-desks.mjs` `buildDesk` now drops a stored record of a market the desk no longer reads, so the three markets' Box fade records leave `boxfade/desk.json` on the
 loop's next run after this merges (every other desk's markets list is the full list its records come from; nothing else changes). Test: `tests/edge-desks-2.test.mjs`.
+
+**DOM zone desk on eight markets** (25 Nov 2026, owner: "DOM zone remove euraud cadjpy gbpjpy usdchf nzdusd dax40 sp500 silver eurusd and gbpusd"). `council/edge-desks-2.mjs`
+`DOM_DESK_MARKETS` = the job's eighteen less those ten = gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP, Nasdaq 100; `DESKS2.dom.markets` reads them. The desk's stored
+records of the ten leave `dom/desk.json` on the loop's next run after this merges (`buildDesk` drops a record of a market the desk no longer reads). The demo JOB (`council/dom-demo.mjs`,
+its `config.dom.markets`, the $100 account) is NOT changed: it still arms its eighteen unless `config.dom.markets` narrows them; ask the owner if that is meant too. Test: `tests/edge-desks-2.test.mjs`.
