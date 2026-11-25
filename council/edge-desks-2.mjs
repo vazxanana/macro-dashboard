@@ -15,8 +15,7 @@
 //   goldvb     gold-vol-breakout T1 (as gold-vol-breakout-forward reads it): gold, UTC open +/- 0.5 x the previous folded day's range,
 //              stop back at the open, out at 21:00 UTC
 //   jpyvb      the same rule on USD/JPY (usdjpy-vol-breakout-forward)
-//   nq1        every NAS100 rule the research found as one desk: the auto-researcher's seven NAS100 leads, turnaround Tuesday and the
-//              index breakout of the day (below)
+//   nq1        the auto-researcher's seven NAS100 leads as one desk (below)
 // Every signal, stop and exit comes from the study's own exported code (imported, never edited); only the record (id, log, marks,
 // an open trade's reading) is written here. The studies judged trades before costs and so does each desk; the five fade / gap
 // rules lose after costs and the two breakouts are short forward records. PAPER RECORDS ONLY: no order, alert, broker or mirror,
@@ -39,8 +38,6 @@ import { T1 as GOLD_T1 } from '../research/edge/gold-vol-breakout-hourcost/costs
 import * as JO from '../research/edge/index-vol-breakout/original.mjs';
 import { K as JPY_K } from '../research/edge/fx-vol-breakout/run.mjs';
 import { toArrays, prep, atr as engAtr, sma as engSma, atrPct as engAtrPct, sig as engSig } from '../research/edge/auto-researcher/engine.mjs';
-import * as TT from '../research/edge/turnaround-tuesday/run.mjs';
-import { nyParts } from '../ict/calendar.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
 const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, usdjpy: 3, audusd: 5, nzdusd: 5, usdcad: 5, usdchf: 5, eurjpy: 3, gbpjpy: 3, audjpy: 3, cadjpy: 3, eurgbp: 5, euraud: 5, nas100: 1, spx500: 1, de40: 1 };
@@ -212,14 +209,11 @@ function vbDays(Bk, O, desk, market, k, from, sec = 300) {
 export const goldTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau' ? vbDays(toK(B['5m']), GO, 'goldvb', 'xau', GOLD_T1.k, from) : []);
 export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'jpyvb', 'usdjpy', JPY_K, from) : []);
 
-// ─── nq1: every NAS100 rule the research has found, as one desk (owner, 25 Nov 2026: "all nasdaq studies put it altogether and call it NQ1") ───
-// Readings (each its own kind, ids `nas100:nq1-<reading>-…`), the rules of the studies and of the auto-researcher's leads, unchanged:
-//   l1-l7  the seven NAS100 leads the auto-researcher had (Holm over every holdout look below 0.05) on 25 Nov 2026, genomes FROZEN
-//          here (a lead found later joins only by a deliberate change); l3 is the rule of research/edge/nas100-brk-long-focus
-//   tue    turnaround-tuesday R2 on NAS100: the first trading day of a week closed down more than 1 %: buy that close, stop 2 ATR(20
-//          days), out at the next trading day's close (the study's own buildDays / trade)
-//   t1     index-vol-breakout T1 on NAS100: the UTC open +/- 0.5 x the previous range, stop back at the open, out at 21:00 UTC
-// Left out on purpose: the NQ open run (a council system, kept apart) and anything of the ICT desk (a separate edge).
+// ─── nq1: the auto-researcher's NAS100 leads as one desk (owner, 25 Nov 2026: "all nasdaq studies put it altogether and call it NQ1", then "NQ1 should be the nasdaq leads") ───
+// Seven readings (each its own kind `nq1-l1`…`nq1-l7`, ids `nas100:nq1-<reading>-…`): the seven NAS100 leads the auto-researcher had (Holm over
+// every holdout look below 0.05) on 25 Nov 2026, genomes FROZEN here (a lead found later joins only by a deliberate change); l3 is the rule of
+// research/edge/nas100-brk-long-focus. Turnaround Tuesday and the breakout of the day were on the desk for a few hours and taken off at the
+// owner's word. Left out: the NQ open run (a council system, kept apart) and anything of the ICT desk (a separate edge).
 // A lead reading is read on H1 candles built from the 5-minute ones (closed bars only, thin bars dropped as the engine does) with the
 // engine's own `sig`, `atr`, `sma`, `atrPct`; the entry is the open of the next hour; managed on 5-minute candles like every desk, one
 // position at a time PER READING (a signal waits until the hour after that reading's last exit). Several readings are often long
@@ -261,28 +255,6 @@ function leadTrades(L, ctx, from) {
   }
   return out;
 }
-// turnaround Tuesday R2 on NAS100, the study's own buildDays / trade (before costs: grossR)
-function tuesdayTrades(H, from, market, f) {
-  const rows = H.map((b) => [b.t, b.o, b.h, b.l, b.c]); if (rows.length < 600) return [];
-  const days = TT.tradingDays(nyParts(rows[0][0]).ymd, nyParts(rows[rows.length - 1][0]).ymd), D = TT.buildDays(rows, days), opt = { cost: 0, rate: () => null }, out = [], lastBar = rows[rows.length - 1];
-  for (const p of TT.weekPairs(days)) {
-    const E = D[p.m], X = D[p.x]; if (E.close == null || E.i == null) continue;
-    const chg = TT.dayChg(D, p.m); if (!TT.ruleOn(chg, TT.RULES.r2.drop)) continue;
-    const t = rows[E.i][0] + 3600; if (t < from) continue;
-    const atr = TT.atrAt(D, p.m); if (atr == null || !(atr > 0)) continue;
-    const entry = E.close, risk = TT.STOP_ATR * atr, stop = entry - risk, closed = X.close != null && X.i != null;
-    let hit = null; for (let j = E.i + 1; j < rows.length && (!closed || j <= X.i); j++) { const b = rows[j]; if (b[1] <= stop) { hit = { px: b[1], t: b[0] }; break; } if (b[3] <= stop) { hit = { px: stop, t: b[0] }; break; } }
-    let status, R = null, exit = null, endT = null, fl = null;
-    if (hit) { status = 'stopped'; exit = hit.px; endT = hit.t; R = (hit.px - entry) / risk; }
-    else if (closed) { const st = TT.trade(rows, D, p.m, p.x, opt); if (!st) continue; status = 'time'; exit = st.exit; endT = rows[X.i][0] + 3600; R = st.grossR; }
-    else { status = 'open'; fl = (lastBar[4] - entry) / risk; }
-    const dayName = E.d;
-    out.push({ id: `${pre(market)}nq1-tue-b${t}`, market, kind: 'nq1-tue', label: 'Turnaround Tuesday: buy a down Monday', h: '1d', l: '1h', side: 1, t, entry, stop, target: null, status, R, endT, exit, mfe: null, float: fl,
-      log: [{ t: E.t, text: `${dayName}, the first trading day of the week, closed ${(100 * chg).toFixed(2)}% (down more than 1 %). The rule buys that close: ${f(entry)}, the stop 2 x the 20-day ATR (${f(risk)}) below at ${f(stop)}, out at the next trading day's close, no target.` },
-        status === 'open' ? { t: null, text: `Still open on the last candle read (${sg(fl)} now).` } : status === 'stopped' ? { t: endT, text: `Stopped: ${sg(R)}` + (R < -1.0001 ? ' (the candle opened beyond the stop).' : '.') } : { t: endT, text: `Out at the next trading day's close, ${f(exit)}: ${sg(R)}.` }],
-      marks: [{ kind: 'level', p: stop, a: t, at: t, label: 'Stop (2 ATR)', under: true }] }); }
-  return out;
-}
 export function nq1Trades(B, { from, market = 'nas100' } = {}) {
   if (market !== 'nas100') return [];
   const M5 = toK(B['5m']); if (M5.length < 3000) return [];
@@ -291,8 +263,6 @@ export function nq1Trades(B, { from, market = 'nas100' } = {}) {
   M5.forEach((b, k) => { const h = Math.floor(b.t / 3600) * 3600; if (!firstM5.has(h)) firstM5.set(h, k); });
   const ctx = { D, H, M5, firstM5, f, market }, out = [];
   for (const L of NQ1_LEADS) out.push(...leadTrades(L, ctx, from));
-  out.push(...tuesdayTrades(H, from, market, f));
-  for (const x of vbDays(toK(B['5m']), JO, 'nq1', market, 0.5, from)) out.push({ ...x, label: 'UTC open ± ½ the previous range (breakout of the day)' });
   return out;
 }
 
@@ -390,7 +360,7 @@ export const DESKS2 = {
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
-  nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: every NAS100 rule the research found as one desk: the auto-researcher\'s seven NAS100 leads (stretch, breakout and big-candle combinations), turnaround Tuesday and the breakout of the day, each a reading of its own (study verdicts on the page). Before costs; readings overlap, so totals are not additive.' + PAPER },
+  nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s seven Nasdaq 100 leads (stretch, breakout and big-candle combinations), each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };

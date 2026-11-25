@@ -1,6 +1,5 @@
-// tests/nq1-desk.test.mjs - the NQ1 desk (council/edge-desks-2.mjs nq1Trades): every NAS100 rule the research found as one desk. The seven
-// leads of the auto-researcher read with the engine's own signals, turnaround Tuesday with its study's own functions, the breakout of the
-// day with its study's; every record has its stop on the losing side, one position at a time per reading, no look-ahead, the wiring.
+// tests/nq1-desk.test.mjs - the NQ1 desk (council/edge-desks-2.mjs nq1Trades): the auto-researcher's seven NAS100 leads as one desk,
+// read with the engine's own signals; every record has its stop on the losing side, one position at a time per reading, no look-ahead, the wiring.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -33,7 +32,7 @@ test('the desk is registered and holds the frozen leads of the research', () => 
 
 test('every record: a stop on the losing side, an id once, stored by clean(), kinds of this desk only', () => {
   assert.ok(ALL.length > 10, 'the seeded market must give trades: ' + ALL.length); const ids = new Set();
-  for (const r of ALL) { assert.match(r.kind, /^nq1-(l[1-7]|tue|t1)$/); assert.equal(r.market, 'nas100'); assert.ok(!ids.has(r.id), 'id twice ' + r.id); ids.add(r.id);
+  for (const r of ALL) { assert.match(r.kind, /^nq1-l[1-7]$/); assert.equal(r.market, 'nas100'); assert.ok(!ids.has(r.id), 'id twice ' + r.id); ids.add(r.id);
     assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, r.id + ': stop on the wrong side'); assert.ok(r.t >= FROM);
     if (r.R != null) assert.ok(Number.isFinite(r.R) && r.endT >= r.t, r.id); const c = clean(r); assert.ok(c, 'clean() refused ' + r.id); assert.equal(c.kind, r.kind); }
 });
@@ -53,11 +52,6 @@ test('a lead reading is the engine\'s signals: filters, entry hour, stop in ATR,
 test('the focused-study rule (l3) gives the study\'s own first trade; counts stay near the engine\'s', () => {
   const g = D2.NQ1_LEADS.find((l) => l.id === 'l3').g; D.costRel = 0; D.cost = 0;
   const E = trades(D, RULE, 211, D.n, 0), first = E.find((x) => D.t[x.i + 1] >= FROM); assert.ok(first); assert.ok(of('l3').some((r) => r.t === D.t[first.i + 1]), 'the first engine trade is on the desk');
-});
-
-test('turnaround Tuesday and the breakout of the day come from their studies, each with a stop below the entry', () => {
-  for (const r of ALL.filter((x) => x.kind === 'nq1-tue')) { assert.equal(r.side, 1); assert.ok(r.stop < r.entry); assert.equal(r.target, null); }
-  for (const r of ALL.filter((x) => x.kind === 'nq1-t1')) assert.ok(r.stop && r.target === null);
 });
 
 test('no look-ahead: candles cut at a date give the same trades up to two days before it', () => {
