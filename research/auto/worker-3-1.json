@@ -2,34 +2,34 @@
  "version": "auto-1",
  "worker": 3,
  "started": "2026-11-25T11:14:32.871Z",
- "tries": 891000,
- "survivedA": 1128,
- "candidates": 193,
- "cLooks": 37,
+ "tries": 1173000,
+ "survivedA": 1493,
+ "candidates": 244,
+ "cLooks": 42,
  "cPasses": 0,
  "groups": {
   "usdchf|blk-|both": {
-   "more": 7,
+   "more": 8,
    "pass": false
   },
   "eurusd|big+|long": {
-   "more": 6,
+   "more": 9,
    "pass": false
   },
   "eurjpy|blk-|both": {
-   "more": 33,
+   "more": 39,
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 22,
+   "more": 27,
    "pass": false
   },
   "usdchf|big+|both": {
-   "more": 4,
+   "more": 6,
    "pass": false
   },
   "audusd|blk-|both": {
-   "more": 4,
+   "more": 7,
    "pass": false
   },
   "usdjpy|blk-|short": {
@@ -37,23 +37,23 @@
    "pass": true
   },
   "usdchf|big+|short": {
-   "more": 5,
+   "more": 6,
    "pass": false
   },
   "audusd|blk-|short": {
-   "more": 3,
+   "more": 4,
    "pass": false
   },
   "usdjpy|blk-|both": {
-   "more": 14,
+   "more": 18,
    "pass": false
   },
   "eurjpy|blk-|short": {
-   "more": 3,
+   "more": 5,
    "pass": false
   },
   "xau|big+|long": {
-   "more": 4,
+   "more": 6,
    "pass": false
   },
   "xau|sweep-|both": {
@@ -61,7 +61,7 @@
    "pass": true
   },
   "nzdusd|blk-|both": {
-   "more": 9,
+   "more": 11,
    "pass": false
   },
   "xau|blk-|both": {
@@ -77,15 +77,15 @@
    "pass": false
   },
   "gbpusd|big-|both": {
-   "more": 1,
-   "pass": false
-  },
-  "eurjpy|blk+|both": {
    "more": 2,
    "pass": false
   },
+  "eurjpy|blk+|both": {
+   "more": 3,
+   "pass": false
+  },
   "usdcad|big-|both": {
-   "more": 4,
+   "more": 6,
    "pass": false
   },
   "gbpusd|big+|short": {
@@ -93,7 +93,7 @@
    "pass": false
   },
   "eurusd|big+|both": {
-   "more": 15,
+   "more": 24,
    "pass": false
   },
   "gbpusd|big-|short": {
@@ -125,7 +125,7 @@
    "pass": false
   },
   "eurusd|big-|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurjpy|big-|both": {
@@ -153,6 +153,26 @@
    "pass": false
   },
   "usdjpy|big+|short": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|sweep-|long": {
+   "more": 0,
+   "pass": false
+  },
+  "usdchf|blk-|short": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|sweep+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "nzdusd|big+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "usdjpy|sweep+|short": {
    "more": 0,
    "pass": false
   }
@@ -2160,9 +2180,287 @@
     "months": 81
    },
    "p": 0.22663
+  },
+  {
+   "at": "2026-11-25T12:36:52.364Z",
+   "group": "eurusd|sweep-|long",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "sweep",
+      "N": 120,
+      "follow": false
+     }
+    ],
+    "side": "long",
+    "hours": [
+     14,
+     20
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.3,
+    "stop": 1,
+    "rr": 2,
+    "hold": 4
+   },
+   "A": {
+    "n": 256,
+    "mean": 0.2084,
+    "t": 3.05,
+    "win": 54.3,
+    "months": 95
+   },
+   "B": {
+    "n": 110,
+    "mean": 0.1723,
+    "t": 1.81,
+    "win": 50,
+    "months": 46
+   },
+   "placeboA": {
+    "n": 278,
+    "mean": -0.1729,
+    "t": -2.96,
+    "win": 39.9,
+    "months": 95
+   },
+   "C": {
+    "n": 146,
+    "mean": -0.0308,
+    "t": -0.37,
+    "win": 43.8,
+    "months": 62
+   },
+   "p": 0.64431
+  },
+  {
+   "at": "2026-11-25T12:42:06.151Z",
+   "group": "usdchf|blk-|short",
+   "g": {
+    "mk": "usdchf",
+    "trig": [
+     {
+      "kind": "blk",
+      "H": 3,
+      "at": 20,
+      "follow": false
+     }
+    ],
+    "side": "short",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 0.75,
+    "rr": 1,
+    "hold": 96
+   },
+   "A": {
+    "n": 258,
+    "mean": 0.2144,
+    "t": 3.55,
+    "win": 63.6,
+    "months": 105
+   },
+   "B": {
+    "n": 109,
+    "mean": 0.1776,
+    "t": 1.56,
+    "win": 64.2,
+    "months": 51
+   },
+   "placeboA": {
+    "n": 258,
+    "mean": -0.3602,
+    "t": -6.1,
+    "win": 34.9,
+    "months": 105
+   },
+   "C": {
+    "n": 198,
+    "mean": 0.0796,
+    "t": 1.07,
+    "win": 58.1,
+    "months": 78
+   },
+   "p": 0.14231
+  },
+  {
+   "at": "2026-11-25T12:46:15.946Z",
+   "group": "eurusd|sweep+|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "sweep",
+      "N": 8,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": [
+     3,
+     4,
+     5
+    ],
+    "trend": "against",
+    "vol": "low",
+    "volP": 0.5,
+    "stop": 3,
+    "rr": 0,
+    "hold": 240
+   },
+   "A": {
+    "n": 389,
+    "mean": 0.4571,
+    "t": 3.16,
+    "win": 23.4,
+    "months": 119
+   },
+   "B": {
+    "n": 219,
+    "mean": 0.3367,
+    "t": 1.71,
+    "win": 23.7,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 459,
+    "mean": -0.112,
+    "t": -0.99,
+    "win": 16.1,
+    "months": 119
+   },
+   "C": {
+    "n": 317,
+    "mean": -0.0842,
+    "t": -0.61,
+    "win": 18.3,
+    "months": 83
+   },
+   "p": 0.72907
+  },
+  {
+   "at": "2026-11-25T12:47:59.887Z",
+   "group": "nzdusd|big+|both",
+   "g": {
+    "mk": "nzdusd",
+    "trig": [
+     {
+      "kind": "big",
+      "k": 1.5,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": [
+     12,
+     18
+    ],
+    "dows": [
+     1,
+     2,
+     3
+    ],
+    "trend": "against",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 2,
+    "rr": 6,
+    "hold": 48
+   },
+   "A": {
+    "n": 571,
+    "mean": 0.2464,
+    "t": 3.23,
+    "win": 36.4,
+    "months": 120
+   },
+   "B": {
+    "n": 247,
+    "mean": 0.1882,
+    "t": 1.54,
+    "win": 33.2,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 587,
+    "mean": -0.0937,
+    "t": -1.46,
+    "win": 29.8,
+    "months": 120
+   },
+   "C": {
+    "n": 388,
+    "mean": -0.0618,
+    "t": -0.68,
+    "win": 29.6,
+    "months": 83
+   },
+   "p": 0.75175
+  },
+  {
+   "at": "2026-11-25T12:53:36.453Z",
+   "group": "usdjpy|sweep+|short",
+   "g": {
+    "mk": "usdjpy",
+    "trig": [
+     {
+      "kind": "sweep",
+      "N": 5,
+      "follow": true
+     }
+    ],
+    "side": "short",
+    "hours": [
+     0,
+     2
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 3,
+    "rr": 2,
+    "hold": 4
+   },
+   "A": {
+    "n": 693,
+    "mean": 0.0646,
+    "t": 3.79,
+    "win": 57.6,
+    "months": 120
+   },
+   "B": {
+    "n": 299,
+    "mean": 0.0411,
+    "t": 1.73,
+    "win": 54.5,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 693,
+    "mean": -0.1024,
+    "t": -5.77,
+    "win": 38.4,
+    "months": 120
+   },
+   "C": {
+    "n": 463,
+    "mean": -0.0128,
+    "t": -0.6,
+    "win": 47.9,
+    "months": 83
+   },
+   "p": 0.72575
   }
  ],
- "chunks": 2,
- "updated": "2026-11-25T12:29:54.055Z",
- "chanceCandidates": 81.1
+ "chunks": 3,
+ "updated": "2026-11-25T12:54:57.492Z",
+ "chanceCandidates": 106.7
 }
