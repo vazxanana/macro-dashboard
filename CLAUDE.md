@@ -7186,3 +7186,7 @@ its `config.dom.markets`, the $100 account) is NOT changed: it still arms its ei
 **FVG return without GBP/USD** (25 Nov 2026, owner: "FVG return GBPUSD remove"). `council/edge-desks-2.mjs` `FVG_MARKETS` = the study's ten markets less GBP/USD (nine); `DESKS2.fvg.markets`
 reads them. The desk's GBP/USD records leave `fvg/desk.json` on the loop's next run after this merges (`buildDesk` drops a record of a market the desk no longer reads). The other
 fade / gap desks keep their markets. Test: `tests/edge-desks-2.test.mjs`.
+
+**Round-number fade on five markets** (25 Nov 2026, owner: "Round-number fade trades remove gold silver nzdusd usdjpy eurjpy"). `council/edge-desks-2.mjs` `ROUND_MARKETS` = the study's ten markets less
+those five = EUR/USD, GBP/USD, AUD/USD, USD/CAD, USD/CHF; `DESKS2.roundfade.markets` reads them (the round levels in play are the forex 0.0050 ones). The five markets' records leave
+`roundfade/desk.json` on the loop's next run after this merges. Test: `tests/edge-desks-2.test.mjs`.
