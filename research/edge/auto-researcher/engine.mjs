@@ -63,7 +63,7 @@ export function rsi(D, n = 14) { return cache(D, 'rsi' + n, () => { const o = ne
   for (let i = 1; i < D.n; i++) { const d = D.c[i] - D.c[i - 1], up = Math.max(d, 0), dn = Math.max(-d, 0); if (i <= n) { g += up; l += dn; if (i === n) { g /= n; l /= n; o[i] = l === 0 ? 100 : 100 - 100 / (1 + g / l); } } else { g = (g * (n - 1) + up) / n; l = (l * (n - 1) + dn) / n; o[i] = l === 0 ? 100 : 100 - 100 / (1 + g / l); } } return o; }); }
 const hiN = (D, n) => cache(D, 'hi' + n, () => { const o = new Float64Array(D.n).fill(NaN); for (let i = n; i < D.n; i++) { let m = -Infinity; for (let k = i - n; k < i; k++) if (D.h[k] > m) m = D.h[k]; o[i] = m; } return o; });
 const loN = (D, n) => cache(D, 'lo' + n, () => { const o = new Float64Array(D.n).fill(NaN); for (let i = n; i < D.n; i++) { let m = Infinity; for (let k = i - n; k < i; k++) if (D.l[k] < m) m = D.l[k]; o[i] = m; } return o; });
-const atrPct = (D) => cache(D, 'atrpct', () => { const a = atr(D), o = new Float64Array(D.n).fill(NaN), W = 500;
+export const atrPct = (D) => cache(D, 'atrpct', () => { const a = atr(D), o = new Float64Array(D.n).fill(NaN), W = 500;
   for (let i = W; i < D.n; i++) { let r = 0, c = 0; for (let k = i - W; k < i; k += 5) { c++; if (a[k] < a[i]) r++; } o[i] = r / c; } return o; });
 export function prep(D, mk) {
   D.mk = mk; D.ind = {}; D.hour = new Uint8Array(D.n); D.dow = new Uint8Array(D.n); D.month = new Int32Array(D.n);
@@ -98,7 +98,7 @@ export function genome(r, worker) {
     stop: pick(r, SPACE.stop), rr: pick(r, SPACE.rr), hold: pick(r, SPACE.hold) };
 }
 // one trigger: +1 long, -1 short, 0 none, at the close of bar i
-function sig(D, tr, i) {
+export function sig(D, tr, i) {
   switch (tr.kind) {
     case 'brk': { const H = hiN(D, tr.N)[i], L = loN(D, tr.N)[i]; return D.c[i] > H ? 1 : D.c[i] < L ? -1 : 0; }
     case 'fade': { const H = hiN(D, tr.N)[i], L = loN(D, tr.N)[i]; return D.c[i] > H ? -1 : D.c[i] < L ? 1 : 0; }

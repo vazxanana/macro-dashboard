@@ -67,7 +67,7 @@ test('the files: markets are joined into one record, nothing without a stop is s
   assert.ok(f.records.every((r) => (r.side > 0 ? r.stop < r.entry : r.stop > r.entry))); assert.ok(f.records.some((r) => r.market === 'eurusd' && /^eurusd:eg-/.test(r.id) && r.label));
   assert.equal(f.counts.n, f.records.length); assert.ok(f.records.every((r) => r.src === 'live' || r.src === 'replay'));
   const again = E.buildDesk('eg', [['xau', B]], f, now + 2100, 30); assert.equal(again.records.length, f.records.length, 'a second run adds nothing and keeps the other market');
-  assert.deepEqual(Object.keys(E.DESKS), ['eg', 'msnr', 'lit', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nasbrk', 'lyriac', 'dom']); assert.equal(E.DESKS.lit.markets.length, 11); assert.deepEqual(E.OLD, ['eg', 'msnr', 'lit']); assert.deepEqual(E.DESKS.eg.markets, Object.keys(SOP.MARKETS));
+  assert.deepEqual(Object.keys(E.DESKS), ['eg', 'msnr', 'lit', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'zero', 'lyriac', 'dom']); assert.equal(E.DESKS.lit.markets.length, 11); assert.deepEqual(E.OLD, ['eg', 'msnr', 'lit']); assert.deepEqual(E.DESKS.eg.markets, Object.keys(SOP.MARKETS));
 });
 
 test('wiring: the loop runs the trackers, data health lists the files, and the page has both desks with an Open now panel', () => {
