@@ -40,6 +40,7 @@ export const RISK = 0.005, RISK_MIN = 0.0005, RISK_MAX = 0.01, MAX_RISK = 0.01, 
 export const STALE_S = 2 * 3600;          // a market whose newest candle is older than this is shut: nothing is armed there
 const H = 3600, DAY = 86400;
 // market -> broker names to try (normalised) and the currency its price is quoted in (for the size)
+export const DESK_MARKETS = ['xau', 'audusd', 'usdjpy', 'usdcad', 'eurjpy', 'audjpy', 'eurgbp', 'nas100'];
 export const MARKETS = {
   xau: { names: ['XAUUSD'], quote: 'USD' }, xag: { names: ['XAGUSD'], quote: 'USD' },
   eurusd: { names: ['EURUSD'], quote: 'USD' }, gbpusd: { names: ['GBPUSD'], quote: 'USD' }, audusd: { names: ['AUDUSD'], quote: 'USD' }, nzdusd: { names: ['NZDUSD'], quote: 'USD' },
@@ -107,7 +108,9 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('dom: cTrader demo not configured'); return { skipped: 'config' }; }
   const account = (C.account && String(C.account).trim()) || String(env.CTRADER_ACCOUNT_ID || '').trim(); if (!account) { log('dom: no demo account for it'); return { skipped: 'account' }; }
   const risk = Math.min(RISK_MAX, Math.max(RISK_MIN, +C.risk || RISK));
-  const markets = Array.isArray(C.markets) ? Object.keys(MARKETS).filter((k) => C.markets.includes(k)) : Object.keys(MARKETS);
+  // 25 Nov 2026 (owner: "All the orders must be the ones included in the edge"): the job arms the DOM desk's eight markets (a test
+  // compares DESK_MARKETS with council/edge-desks-2.mjs); config.dom.markets may narrow them further, never widen
+  const markets = Object.keys(MARKETS).filter((k) => DESK_MARKETS.includes(k) && (!Array.isArray(C.markets) || C.markets.includes(k)));
   // candles of every market (a failed market is left out of this pass)
   const R = {}, px = {};
   await Promise.all(markets.map(async (k) => { try { const rows = await barsFn(k, now); R[k] = read(rows, now); if (R[k].price > 0) px[k] = R[k].price; } catch (e) { log(`dom: ${k}: ${scrub(String(e.message || e)).slice(0, 100)}`); } }));

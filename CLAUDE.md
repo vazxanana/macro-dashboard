@@ -7194,3 +7194,7 @@ those five = EUR/USD, GBP/USD, AUD/USD, USD/CAD, USD/CHF; `DESKS2.roundfade.mark
 **Break fade without gold** (25 Nov 2026, owner: "Brake fade remove gold" = the Break fade desk). `council/edge-desks-2.mjs` `BREAK_MARKETS` = the study's ten markets less gold (nine);
 `DESKS2.fade.markets` reads them; gold's records leave `fade/desk.json` on the loop's next run after this merges. Note: the Lyriac desk still trades its gold breakout (a different rule).
 Test: `tests/edge-desks-2.test.mjs`.
+
+**Orders follow the edge's markets** (25 Nov 2026, owner: "All the orders must be the ones included in the edge"). The demo mirror's Equinox book (`council/ctrader-mirror.mjs` `EQX.not`: Break fade not gold, FVG return not GBP/USD) and the bridge feed (`api/_eqx-bridge.js` `NOT`) never copy a record of a market its desk dropped, even an older stored one; the DOM demo job (`council/dom-demo.mjs` `DESK_MARKETS`) arms only the DOM desk's eight markets (`config.dom.markets` may narrow them, never widen). A test compares each list with `DESKS2` in `council/edge-desks-2.mjs`: change a desk's markets and these lists together. Positions already open on a dropped market run to their own exits with their stops.
+
+**Box fade without EUR/JPY** (25 Nov 2026, owner: "Box fade remove eurjpy"): `BOX_MARKETS` is now six markets (EUR/USD, GBP/USD, USD/JPY, AUD/USD, NZD/USD, USD/CHF); its stored EUR/JPY records leave `boxfade/desk.json` on the loop's next run.

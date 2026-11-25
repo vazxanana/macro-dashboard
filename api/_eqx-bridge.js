@@ -10,6 +10,7 @@
 // costs in their studies: a demo feed, not trade advice.
 const crypto = require('crypto');
 const DESKS = ['fade', 'bigfade', 'fvg', 'goldvb'];
+const NOT = { fade: ['xau'], fvg: ['gbpusd'] };   // markets a desk dropped (25 Nov 2026): same as the mirror's EQX.not
 const NAMES = { fade: 'Break fade', bigfade: 'Big-candle fade', fvg: 'FVG return', goldvb: 'Gold breakout' };
 const MARKETS = ['xau', 'xag', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd', 'usdcad', 'usdchf', 'eurjpy'];
 const FRESH = 3600, KEEP = 2 * 86400, MAX_FLOAT = 0.75, MAX_LINES = 400;
@@ -40,7 +41,7 @@ function lines(files, nowS, only) {
     for (const r of recs) {
       if (!r || typeof r.id !== 'string' || !/^[a-z0-9:._-]{1,80}$/i.test(r.id)) continue;
       const market = r.market || 'xau', side = +r.side === 1 ? 'buy' : +r.side === -1 ? 'sell' : null, entry = +r.entry, stop = +r.stop, t = +r.t;
-      if (!MARKETS.includes(market) || !side || !(entry > 0) || !(stop > 0) || !Number.isFinite(t)) continue;
+      if (!MARKETS.includes(market) || (NOT[k] || []).includes(market) || !side || !(entry > 0) || !(stop > 0) || !Number.isFinite(t)) continue;
       const sgn = side === 'sell' ? -1 : 1; if (sgn * (entry - stop) <= 0) continue;   // absolute rule 1
       const open = r.status === 'open', endT = +r.endT;
       if (!open && !(Number.isFinite(endT) && nowS - endT <= KEEP)) continue;

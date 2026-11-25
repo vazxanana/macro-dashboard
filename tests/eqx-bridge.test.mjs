@@ -9,7 +9,7 @@ const require = createRequire(import.meta.url);
 const E = require('../api/_eqx-bridge.js'), H = require('../api/eqx-bridge.js'), S = require('../api/_session.js'), G = require('../api/_guard.js');
 const rd = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
 const NOW = 1795560000, env = { SESSION_SECRET: 'a-test-secret-of-enough-length' }, secret = S.secret(env);
-const rec = (o) => ({ id: 'fade-m15-b' + (o.t || NOW - 600), kind: 'fade-m15', side: 1, t: NOW - 600, entry: 100, stop: 99, target: 102, status: 'open', first: NOW - 500, float: 0.1, ...o });
+const rec = (o) => ({ id: 'fade-m15-b' + (o.t || NOW - 600), kind: 'fade-m15', market: 'audusd', side: 1, t: NOW - 600, entry: 100, stop: 99, target: 102, status: 'open', first: NOW - 500, float: 0.1, ...o });
 const FILES = { fade: { records: [
   rec({}),                                                                    // fresh: open
   rec({ id: 'old', t: NOW - 9000, first: NOW - 8000 }),                        // late: hold
@@ -19,7 +19,8 @@ const FILES = { fade: { records: [
   rec({ id: 'nostop', t: NOW - 650, stop: 101 }),                              // stop on the winning side: never written
   rec({ id: 'eurusd:x', market: 'eurusd', side: -1, t: NOW - 300, entry: 1.1, stop: 1.101, target: 1.098 }),
   rec({ id: 'weird', market: 'zzz', t: NOW - 200 }),
-] }, bigfade: { records: [] }, fvg: { records: [] }, goldvb: { records: [rec({ id: 'vb', t: NOW - 100, target: null })] } };
+  rec({ id: 'gold', market: 'xau', t: NOW - 250 }),                            // gold left the Break fade desk: never written
+] }, bigfade: { records: [] }, fvg: { records: [] }, goldvb: { records: [rec({ id: 'vb', market: 'xau', t: NOW - 100, target: null })] } };
 const res = () => ({ h: {}, code: 0, body: null, setHeader(k, v) { this.h[k] = v; }, status(c) { this.code = c; return this; }, json(x) { this.body = x; return this; }, send(x) { this.body = x; return this; } });
 const deps = (over = {}) => ({ env, now: () => NOW * 1000, readFile: async (p) => ({ ok: true, buf: Buffer.from(JSON.stringify(FILES[p.split('/')[0]])) }), users: async () => ({ ana: { name: 'Ana', role: 'reviewer' }, vic: { name: 'Vic', role: 'viewer' } }), ...over });
 
