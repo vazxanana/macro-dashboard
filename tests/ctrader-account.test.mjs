@@ -11,7 +11,7 @@ const lib = (live, extra = []) => ({
 test('publishes the demo account with masked numbers', async () => {
   const s = await accountSnapshot({ env: ENV, lib: lib(false) });
   assert.equal(s.balance, 997.73); assert.equal(s.source, 'council'); assert.equal(s.account.id, '…137'); assert.equal(s.account.login, '…028');
-  assert.equal(s.label, 'Council + Equinox + ICT + Shadows + LIT + Replica + Mosha 6R barrier + Big-candle fade'); assert.equal(s.base, true);
+  assert.equal(s.label, 'Council + Equinox + ICT + Shadows + LIT + Replica + Mosha 6R barrier + Big-candle fade + Box fade'); assert.equal(s.base, true);
   assert.doesNotMatch(JSON.stringify(s), /49478137|10152028/);
 });
 test('refuses a live account, and does nothing when the mirror is off or not demo', async () => {
@@ -23,8 +23,8 @@ test('one labelled snapshot per mirror account, the base first; unknown accounts
   const cfg = { mirrorAccounts: { ict: '10152144', shadow: '10152145', lit: '10152146', replica: '10152148' } };
   const extra = [{ id: '49485359', login: '10152144', live: false, broker: 'Fusion Markets' }, { id: '49485361', login: '10152145', live: false, broker: 'Fusion Markets' }, { id: '49485365', login: '10152146', live: true, broker: 'Fusion Markets' }];
   const all = await accountSnapshots({ env: ENV, cfg, lib: lib(false, extra) });
-  assert.deepEqual(all.map((a) => a.label), ['Council + Mosha 6R barrier + Equinox + Big-candle fade', 'ICT', 'Shadows', 'LIT', 'Replica']);   // no mosha6 number in this cfg: it shares the base account
-  assert.deepEqual(all.map((a) => a.books), [['council', 'mosha6', 'eqx', 'bfade'], ['ict'], ['shadow'], ['lit'], ['replica']]);
+  assert.deepEqual(all.map((a) => a.label), ['Council + Mosha 6R barrier + Equinox + Big-candle fade + Box fade', 'ICT', 'Shadows', 'LIT', 'Replica']);   // no mosha6 number in this cfg: it shares the base account
+  assert.deepEqual(all.map((a) => a.books), [['council', 'mosha6', 'eqx', 'bfade', 'boxfade'], ['ict'], ['shadow'], ['lit'], ['replica']]);
   assert.equal(all[0].base, true); assert.equal(all[1].base, false);
   assert.equal(all[1].balance, 10000); assert.equal(all[1].account.login, '…144');
   assert.match(all[3].error, /not a demo/);                       // the LIT number is live in this fake: refused
@@ -32,7 +32,7 @@ test('one labelled snapshot per mirror account, the base first; unknown accounts
   assert.doesNotMatch(JSON.stringify(all), /49485359|10152144|10152148/);
   assert.equal(labelOf(['council', 'shadow']), 'Council + Shadows');
   const s = await accountSnapshot({ env: ENV, cfg, lib: lib(false, extra) });
-  assert.equal(s.label, 'Council + Mosha 6R barrier + Equinox + Big-candle fade');
+  assert.equal(s.label, 'Council + Mosha 6R barrier + Equinox + Big-candle fade + Box fade');
 });
 
 test('a book whose copies are switched off is not named on a shared account', async () => {

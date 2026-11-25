@@ -14,7 +14,7 @@ import { unseal, scrubber, accountsFor, BOOKS, pickAccount } from './ctrader-mir
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
-export const BOOK_LABEL = { council: 'Council', ict: 'ICT', shadow: 'Shadows', lit: 'LIT', replica: 'Replica', mosha6: 'Mosha 6R barrier', eqx: 'Equinox', bfade: 'Big-candle fade' };
+export const BOOK_LABEL = { council: 'Council', ict: 'ICT', shadow: 'Shadows', lit: 'LIT', replica: 'Replica', mosha6: 'Mosha 6R barrier', eqx: 'Equinox', bfade: 'Big-candle fade', boxfade: 'Box fade' };
 // Equinox is named before ICT on the account they share (ICT copies are stopped since 24 Nov 2026): "Equinox + ICT"
 export const labelOf = (books) => { const b = [...(books || [])], e = b.indexOf('eqx'), i = b.indexOf('ict'); if (e > i && i >= 0) { b.splice(e, 1); b.splice(i, 0, 'eqx'); } return b.map((x) => BOOK_LABEL[x] || x).join(' + '); };
 // a book whose copies are switched off is not named on an account it shares (24 Nov 2026, owner: "give equinox": with ICT copies
