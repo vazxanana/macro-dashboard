@@ -31,6 +31,7 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .tag{position:absolute;transform:translate(-50%,-100%);font:600 11px var(--mono);padding:2px 6px;border-radius:4px;background:rgba(18,19,21,.88);border:1px solid var(--line);white-space:nowrap;pointer-events:none}
 .tag.lap{border-color:var(--laptop)}
 .say{position:absolute;transform:translate(-50%,-100%);max-width:190px;font:12px/1.3 var(--sans);padding:6px 8px;border-radius:10px;background:#f2f3f5;color:#16181c;pointer-events:none;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.feed{position:absolute;right:10px;top:8px;margin:0;padding:0;list-style:none;font:11px var(--mono);color:var(--dim);text-align:right;max-width:46%}
 .hint{position:absolute;left:10px;bottom:8px;font:11px var(--mono);color:var(--dim)}
 .side{display:flex;flex-direction:column;gap:8px;min-width:0}
 .row{display:grid;grid-template-columns:10px 1fr auto;gap:2px 10px;align-items:center;padding:9px 11px;border-radius:8px;text-align:left;width:100%;min-height:0}
@@ -72,10 +73,10 @@ html.widget .row{padding:12px}html.widget .num{font-size:20px}
 <section class="recap" id="recap" aria-live="off"><h2>What they have done so far</h2><p>Reading the research files…</p></section>
 <div class="btns"><button id="b-coffee" type="button">☕ Coffee break</button><button id="b-dance" type="button" aria-pressed="false">🕺 Dance party</button><button id="b-race" type="button" aria-pressed="false">🏁 Race</button><button id="b-shake" type="button">📣 Wake everyone</button><button id="b-widget" type="button" aria-pressed="false">▢ Widget view</button></div>
 <div class="grid">
- <div id="stage"><canvas id="c" aria-label="3D view of ten research agents at desks"></canvas><div id="tags"></div><div class="hint">drag to orbit · scroll to zoom · tap an agent to poke it</div></div>
+ <div id="stage"><canvas id="c" aria-label="3D view of ten research agents at desks"></canvas><div id="tags"></div><ul id="feed" class="feed"></ul><div class="hint">drag to orbit · scroll to zoom · tap an agent to poke it</div></div>
  <div class="side" id="side"></div>
 </div>
-<p class="foot">Live from council-data: each agent's saved research files, re-read every 3 minutes. Speed and distance use a made-up scale: one try is one metre, so one try a second is 3.6 km/h. Squares under a name are its lanes (blue on GitHub's cloud, orange on the laptop) and light up while a lane has saved in the last 40 minutes. Coffee, dancing and the race are for fun only; they change nothing in the research. Nothing here trades.</p>
+<p class="foot">Live from council-data: each agent's saved research files, re-read every 3 minutes. Speed and distance use a made-up scale: one try is one metre, so one try a second is 3.6 km/h. Squares under a name are its lanes (blue on GitHub's cloud, orange on the laptop) and light up while a lane has saved in the last 40 minutes. Coffee, dancing, the race and what the agents choose to do (walk, chat, nap) are for fun only; they change nothing in the research. Nothing here trades.</p>
 </main>
 <div id="toast" role="status"></div>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
@@ -125,6 +126,7 @@ function refresh() {
     if (!done) { setLive('err', fail ? 'could not read the research files' : 'no research files yet'); return; }
     D.forEach(function (d) {
       var n = d.next; if (d.prev && n.tries >= d.prev.tries && now - d.prev.at > 20e3) { var dr = (n.tries - d.prev.tries) / ((now - d.prev.at) / 1000); if (dr > 0) n.rate = dr; else n.rate = d.rate * .6; } else if (d.prev && n.tries === d.prev.tries) n.rate = d.rate * .6;
+      if (d.prev && typeof cheer === 'function' && pods.length && n.A > (d.A || 0)) cheer(d.id - 1, '+' + (n.A - d.A) + ' passed stage A!');
       d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.chance = n.chance; d.since = n.since; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.at = now;
     });
     recap(); setLive('on', 'live · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); drawRows();
@@ -133,7 +135,7 @@ function refresh() {
 function setLive(c, t) { var e = $('live'); e.className = 'live ' + c; $('livet').textContent = t; }
 
 /* ── page ── */
-var sel = -1, mode = { dance: false, race: false, coffee: 0 };
+var sel = -1, mode = { dance: false, race: false, coffee: 0, free: true, wake: false };
 function drawRows() {
   D.forEach(function (d, i) {
     var b = $('r' + i); if (!b) return;
@@ -152,35 +154,72 @@ function mk() {
 }
 var JOKES = ['Another ten thousand tries. Still nothing. Classic.','I found an edge! …no, that was a typo.','Coffee is a legitimate trading cost.','My Holm correction says: calm down.','Overfitting is just optimism with a spreadsheet.','Is it an edge or is it Tuesday?','I tried everything. Twice.','Lead? No lead. Back to work.','One more lane and I will beat Rex.','If I stare at the chart long enough it will pay me.','Backtest says yes. Forward test says lol.','My code is fast. My ideas are slow.'];
 var SLEEPY = ['zzz… tries… zzz…','Five more minutes…','Is it Friday yet? zzz'];
-var says = [];
+var CHAT = [['Seen any leads?','Only in my dreams.'],['Is your lane still saving?','Every 25 minutes, like a heartbeat.'],['Coffee?','Always.'],['How many tries today?','I lost count after a million.'],['Did Holm approve?','Holm never approves.'],['Race you later?','You will lose.'],['That chart looks haunted.','It is just the 2008 candle.'],['Lunch at the cooler?','Water is lunch.'],['Is it an edge?','It is a Tuesday.'],['I won a stage A!','Do not tell the chance machine.']];
+var says = [], feed = [];
 function say(i, text, ms) { var e = document.createElement('div'); e.className = 'say'; e.textContent = text; $('stage').appendChild(e); says.push({ i: i, e: e, until: performance.now() + (ms || 3200) }); }
+function logEv(t) { feed.unshift(t); if (feed.length > 7) feed.pop(); var e = $('feed'); if (e) e.innerHTML = feed.map(function (x) { return '<li>' + x + '</li>'; }).join(''); }
 
-/* three.js */
+/* three.js: a floor with desks, a coffee corner, a cooler, a sofa and a whiteboard, and ten characters who decide for themselves what to do next */
 var S, R, cam, pods = [], v, clock, ray, mv, th = .6, ph = .95, dist = 19, auto = true, drag = null, moved = 0, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, gl = true;
+var XS = [-11.8, -9.2, -6.9, -4.6, -2.3, 0, 2.3, 4.6, 6.9, 9.2, 11.8], GAPS = [-6.9, -2.3, 2.3, 6.9], NODES = [], ADJ = [], NIDX = {}, bits = [];
+var rnd = function (a, b) { return a + Math.random() * (b - a); };
+var key = function (c, x) { return c + (+x).toFixed(1); };
 function box(w, h, d, m, x, y, z) { var o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x || 0, y || 0, z || 0); o.castShadow = true; o.receiveShadow = true; return o; }
 var Mt = function (c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, flatShading: true, roughness: .8 }, o || {})); };
+/* walking routes: the aisle in front of the back row (z 0), the lane behind it (z -5.4), joined through the gaps between desks */
+function graph() {
+  function add(k, x, z) { NIDX[k] = NODES.length; NODES.push(new THREE.Vector3(x, 0, z)); ADJ.push([]); }
+  function link(a, b) { ADJ[NIDX[a]].push(NIDX[b]); ADJ[NIDX[b]].push(NIDX[a]); }
+  XS.forEach(function (x) { add(key('A', x), x, 0); add(key('B', x), x, -5.4); });
+  GAPS.forEach(function (x) { add(key('M', x), x, -2.7); });
+  for (var k = 0; k < XS.length - 1; k++) { link(key('A', XS[k]), key('A', XS[k + 1])); link(key('B', XS[k]), key('B', XS[k + 1])); }
+  GAPS.forEach(function (x) { link(key('A', x), key('M', x)); link(key('M', x), key('B', x)); });
+}
+function dijkstra(a, b) {
+  var n = NODES.length, dd = [], prev = [], done = [], s = NIDX[a], t = NIDX[b], k; for (k = 0; k < n; k++) dd[k] = 1e9; dd[s] = 0;
+  for (var it = 0; it < n; it++) {
+    var u = -1; for (k = 0; k < n; k++) if (!done[k] && (u < 0 || dd[k] < dd[u])) u = k; if (u < 0 || dd[u] >= 1e9) break; done[u] = true;
+    ADJ[u].forEach(function (w) { var nd = dd[u] + NODES[u].distanceTo(NODES[w]); if (nd < dd[w]) { dd[w] = nd; prev[w] = u; } });
+  }
+  var out = []; for (var c = t; c !== undefined && c !== s; c = prev[c]) out.unshift(NODES[c].clone()); return out;
+}
+function seat(i) { var x = (i % 5 - 2) * 4.6, back = i < 5; return { x: x, z: back ? -3.25 : 2.15, key: key(back ? 'B' : 'A', x), pos: new THREE.Vector3(x, 0, back ? -3.25 : 2.15) }; }
 function build() {
   var cv = $('c'), st = $('stage');
   try { R = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); } catch (e) { gl = false; st.hidden = true; return; }
   R.setPixelRatio(Math.min(devicePixelRatio, 2)); R.shadowMap.enabled = true;
-  S = new THREE.Scene(); S.background = new THREE.Color(0x0e0f11); S.fog = new THREE.Fog(0x0e0f11, 22, 50);
+  S = new THREE.Scene(); S.background = new THREE.Color(0x0e0f11); S.fog = new THREE.Fog(0x0e0f11, 24, 52);
   cam = new THREE.PerspectiveCamera(42, 1, .1, 100); v = new THREE.Vector3(); clock = new THREE.Clock(); ray = new THREE.Raycaster(); mv = new THREE.Vector2();
   S.add(new THREE.HemisphereLight(0xbcd0ff, 0x1a1c22, .9));
   var sun = new THREE.DirectionalLight(0xffffff, .8); sun.position.set(6, 12, 8); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
-  sun.shadow.camera.left = -14; sun.shadow.camera.right = 14; sun.shadow.camera.top = 10; sun.shadow.camera.bottom = -10; S.add(sun);
+  sun.shadow.camera.left = -15; sun.shadow.camera.right = 15; sun.shadow.camera.top = 12; sun.shadow.camera.bottom = -12; S.add(sun);
   var fl = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({ color: 0x181b21 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; S.add(fl);
   S.add(new THREE.GridHelper(60, 60, 0x242833, 0x1c2029));
   var disco = new THREE.PointLight(0xff44cc, 0, 30); disco.position.set(0, 6, 0); S.add(disco); S.userData.disco = disco;
+  graph();
+  /* props at the back: coffee machine, water cooler, sofa, whiteboard, a plant */
+  var cof = new THREE.Group(); cof.position.set(-7.6, 0, -7.6); S.add(cof);
+  cof.add(box(1, 1.5, .9, Mt(0x2a2e38), 0, .75, 0), box(.5, .12, .5, Mt(0xf2f3f5), 0, .4, .5), box(.14, .14, .05, new THREE.MeshBasicMaterial({ color: 0xe0675a }), .3, 1.2, .46));
+  var coo = new THREE.Group(); coo.position.set(0, 0, -7.8); S.add(coo);
+  coo.add(box(.8, 1, .8, Mt(0xd9dde4), 0, .5, 0), box(.5, .8, .5, Mt(0x6fb3e8, { transparent: true, opacity: .75 }), 0, 1.4, 0));
+  var sofa = new THREE.Group(); sofa.position.set(6.9, 0, -7.6); S.add(sofa);
+  sofa.add(box(3.6, .5, 1.5, Mt(0x4a3f6b), 0, .25, 0), box(3.6, 1, .35, Mt(0x4a3f6b), 0, .8, -.6), box(.35, .8, 1.5, Mt(0x3d3459), -1.8, .5, 0), box(.35, .8, 1.5, Mt(0x3d3459), 1.8, .5, 0));
+  var wc = document.createElement('canvas'); wc.width = 256; wc.height = 128; var wx = wc.getContext('2d'); wx.fillStyle = '#f2f3f5'; wx.fillRect(0, 0, 256, 128); wx.fillStyle = '#c54'; wx.font = 'bold 18px sans-serif'; wx.fillText('edge?', 12, 28); wx.fillStyle = '#345'; wx.font = '13px monospace'; wx.fillText('t > 2   Holm < .05', 12, 56); wx.fillText('n  = 118,000,000', 12, 78); wx.strokeStyle = '#3a7'; wx.lineWidth = 3; wx.beginPath(); wx.moveTo(14, 118); for (var wi = 0; wi < 10; wi++) wx.lineTo(14 + wi * 22, 112 - wi * 4 + Math.sin(wi * 2.3) * 8); wx.stroke();
+  var wb = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 2.2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(wc) })); wb.position.set(2.6, 2.4, -9.5); S.add(wb);
+  var plant = new THREE.Group(); plant.position.set(-11.4, 0, -8); S.add(plant); plant.add(box(.7, .6, .7, Mt(0x6b4a2e), 0, .3, 0), box(.9, 1.2, .9, Mt(0x3a8a55), 0, 1.2, 0));
+  /* each agent: a desk (fixed) and a walker (free) */
   D.forEach(function (d, i) {
-    var g = new THREE.Group(), home = new THREE.Vector3((i % 5 - 2) * 4.6, 0, (Math.floor(i / 5) - .5) * 5.4); g.position.copy(home); S.add(g);
+    var sd = seat(i), g = new THREE.Group(), home = new THREE.Vector3(sd.x, 0, i < 5 ? -2.7 : 2.7); g.position.copy(home); S.add(g);
     var plate = box(3.6, .1, 3.4, Mt(d.lap ? 0x5a4020 : 0x26334a)); plate.position.y = .05; g.add(plate);
     var ring = new THREE.Mesh(new THREE.RingGeometry(1.95, 2.1, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, side: 2 })); ring.rotation.x = -Math.PI / 2; ring.position.y = .12; g.add(ring);
     g.add(box(2.4, .12, 1.1, Mt(0x3a3f4b), 0, 1.05, .5));
     [-1, 1].forEach(function (s) { g.add(box(.1, 1, .9, Mt(0x2c3039), s * 1.1, .55, .5)); });
+    g.add(box(.9, .1, .8, Mt(0x20232a), 0, .62, -.55));   // the chair
     var cvs = document.createElement('canvas'); cvs.width = 256; cvs.height = 160; var tex = new THREE.CanvasTexture(cvs);
     var scr = new THREE.Mesh(new THREE.PlaneGeometry(1.5, .95), new THREE.MeshBasicMaterial({ map: tex })); scr.position.set(0, 1.95, .2);
     g.add(box(1.65, 1.1, .1, Mt(0x111318), 0, 1.95, .12), scr, box(.12, .4, .12, Mt(0x111318), 0, 1.4, .2));
-    var mat = Mt(COL[i]), ch = new THREE.Group(); ch.position.set(0, 0, -.55); g.add(ch);
+    var w = new THREE.Group(); w.position.copy(sd.pos); S.add(w);
+    var mat = Mt(COL[i]), ch = new THREE.Group(); w.add(ch);
     ch.add(box(.9, .8, .55, mat, 0, .9, 0));
     var head = box(.7, .62, .62, Mt(COL[i], { roughness: .6 }), 0, 1.55, 0); ch.add(head);
     var eyes = [-.17, .17].map(function (x) { var e = box(.11, .14, .05, new THREE.MeshBasicMaterial({ color: 0x101216 }), x, 1.58, .33); ch.add(e); return e; });
@@ -189,9 +228,11 @@ function build() {
     if (d.id % 3 === 1) ch.add(box(.8, .14, .7, Mt(0x2a2e38), 0, 1.92, 0));
     if (d.id % 3 === 2) ch.add(box(.2, .25, .2, Mt(0xffffff), .45, 1.7, 0));
     var arms = [-1, 1].map(function (s) { var p = new THREE.Group(); p.position.set(s * .55, 1.15, 0); p.add(box(.2, .2, .8, mat, 0, 0, .4)); ch.add(p); return p; });
-    ch.add(box(.35, .5, .35, mat, -.2, .35, .2), box(.35, .5, .35, mat, .2, .35, .2), box(.9, .1, .8, Mt(0x20232a), 0, .62, 0));
-    var hit = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3, 3.2), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 1.5; hit.userData.i = i; g.add(hit);
-    pods.push({ g: g, home: home, ch: ch, arms: arms, head: head, eyes: eyes, ring: ring, cvs: cvs, tex: tex, ctx: cvs.getContext('2d'), hit: hit, ph: i * 1.7, lines: [], jump: 0, big: 0 });
+    var legs = [-1, 1].map(function (s) { var p = new THREE.Group(); p.position.set(s * .2, .62, 0); p.add(box(.35, .5, .35, mat, 0, -.25, 0)); ch.add(p); return p; });
+    var cup = box(.16, .2, .16, Mt(0xf2f3f5), 0, 0, .78); cup.visible = false; arms[1].add(cup);
+    var hit = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3, 1.6), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 1.5; hit.userData.i = i; w.add(hit);
+    pods.push({ g: g, w: w, home: home, ch: ch, arms: arms, legs: legs, head: head, eyes: eyes, cup: cup, ring: ring, cvs: cvs, tex: tex, ctx: cvs.getContext('2d'), hit: hit, ph: i * 1.7, lines: [], jump: 0, big: 0,
+      tr: { soc: rnd(.4, 1.6), lazy: rnd(.4, 1.6), cur: rnd(.4, 1.6), silly: rnd(.3, 1.8) }, plan: [{ do: 'sit', ms: rnd(1500, 9000) }], step: null, end: 0, route: [], node: sd.key, atSeat: true, sit: 1, ang: 0, face: 0, walk: 0, later: [], swivel: 0, wave: 0, cheerT: 0, act: 'work' });
   });
   cv.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, y: e.clientY }; moved = 0; auto = false; cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing'; });
   cv.addEventListener('pointermove', function (e) { if (!drag) return; var dx = e.clientX - drag.x, dy = e.clientY - drag.y; moved += Math.abs(dx) + Math.abs(dy); th -= dx * .006; ph = Math.min(1.35, Math.max(.35, ph - dy * .005)); drag = { x: e.clientX, y: e.clientY }; });
@@ -199,40 +240,125 @@ function build() {
   cv.addEventListener('wheel', function (e) { e.preventDefault(); dist = Math.min(32, Math.max(8, dist + e.deltaY * .01)); }, { passive: false });
   new ResizeObserver(function () { var w = st.clientWidth, h = st.clientHeight; if (w && h) { R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); } }).observe(st);
 }
+/* free will: when an agent has nothing planned it weighs what it feels like doing, using its own temperament and how its real lanes are doing */
+var ICON = { work: '💻', walk: '🚶', run: '🏃', coffee: '☕', chat: '🗣', nap: '💤', sofa: '💤', stretch: '🙆', dance: '🕺', board: '📝', look: '👀', five: '🙌', cooler: '💧', pant: '😮‍💨', cheer: '🎉' };
+function back(i) { var sd = seat(i); return [{ go: sd.key, to: sd.pos, seat: true, face: 0 }, { do: 'sit', ms: rnd(6000, 15000) }]; }
+function choose(i) {
+  var p = pods[i], d = D[i], sd = seat(i), now = performance.now(), sleepy = d.last && Date.now() - d.last > FRESH * 1.5, busy = d.alive > 0, nm = d.name;
+  var ms = rnd(7000, 16000) * (busy ? 1.3 : .8);
+  if (!mode.free || mode.dance) return [{ do: 'sit', ms: 4000 }];
+  var others = []; pods.forEach(function (q, k) { if (k !== i && q.atSeat && !q.plan.length) others.push(k); });
+  var W = { work: busy ? 5 : 2, stretch: 1.5, wander: 2 * p.tr.cur, visit: others.length ? 3 * p.tr.soc : 0, coffee: mode.coffee > now ? 7 : 2, board: p.tr.cur, dance: p.tr.silly, nap: (sleepy ? 6 : .5) * p.tr.lazy, cooler: 1.2 };
+  var sum = 0, k; for (k in W) sum += W[k]; var r = Math.random() * sum, pick = 'work'; for (k in W) { r -= W[k]; if (r <= 0) { pick = k; break; } }
+  var plan;
+  if (pick === 'stretch') { logEv(nm + ' stretches'); plan = [{ do: 'stretch', ms: 2600 }, { do: 'sit', ms: ms }]; }
+  else if (pick === 'coffee') { logEv(nm + ' went for coffee ☕'); plan = [{ go: key('B', -6.9), to: new THREE.Vector3(-7.4, 0, -6.2), face: Math.PI }, { do: 'coffee', ms: 3800 }].concat(back(i)); }
+  else if (pick === 'cooler') { logEv(nm + ' visits the water cooler'); plan = [{ go: key('B', 0), to: new THREE.Vector3(0, 0, -6.4), face: Math.PI }, { do: 'cooler', ms: 3200 }].concat(back(i)); }
+  else if (pick === 'board') { logEv(nm + ' is at the whiteboard 📝'); plan = [{ go: key('B', 2.3), to: new THREE.Vector3(2.6, 0, -7.9), face: Math.PI }, { do: 'board', ms: 5200, fn: function (q, j) { say(j, ['What if it is a regime?','Holm… Holm… Holm…','Stage A, stage B, stage C…'][Math.floor(Math.random() * 3)], 3000); } }].concat(back(i)); }
+  else if (pick === 'dance') { logEv(nm + ' is dancing 🕺'); plan = [{ do: 'dance', ms: 4800 }, { do: 'sit', ms: ms }]; }
+  else if (pick === 'nap') {
+    if (Math.random() < .55) { logEv(nm + ' naps on the sofa 💤'); plan = [{ go: key('B', 6.9), to: new THREE.Vector3(6.9 + rnd(-.8, .8), 0, -7.3), face: 0 }, { do: 'sofa', ms: rnd(9000, 16000) }].concat(back(i)); }
+    else { logEv(nm + ' dozes at the desk 💤'); plan = [{ do: 'nap', ms: rnd(7000, 13000) }, { do: 'sit', ms: ms }]; }
+  }
+  else if (pick === 'wander') {
+    var xk = XS[1 + Math.floor(Math.random() * (XS.length - 2))], lane = Math.random() < .5 ? 'A' : 'B';
+    logEv(nm + ' takes a walk 🚶'); plan = [{ go: key(lane, xk), to: new THREE.Vector3(xk + rnd(-.4, .4), 0, (lane === 'A' ? 0 : -5.4) + rnd(-.3, .3)), face: rnd(-2, 2) }, { do: 'look', ms: 2600 }].concat(back(i));
+  }
+  else if (pick === 'visit') {
+    var j = others[Math.floor(Math.random() * others.length)], sj = seat(j), line = CHAT[Math.floor(Math.random() * CHAT.length)];
+    logEv(nm + ' visits ' + D[j].name + ' 🗣');
+    plan = [{ go: sj.key, to: new THREE.Vector3(sj.x + rnd(-.5, .5), 0, j < 5 ? -4.9 : .6), face: 0 }, { do: 'chat', ms: 5200, fn: function (q, a, t0) { var o = pods[j]; o.swivel = t0 + 5200; say(a, line[0], 2500); q.later.push({ at: t0 + 2500, fn: function () { say(j, line[1], 2500); } }); } }, { do: 'five', ms: 900, fn: function (q, a) { q.jump = 1; pods[j].jump = 1; } }].concat(back(i));
+  }
+  else plan = [{ do: 'sit', ms: ms }];
+  return plan;
+}
+function begin(i, now) {
+  var p = pods[i], s = p.plan.shift(); if (!s) { p.plan = choose(i); s = p.plan.shift(); }
+  p.step = s; if (s.face != null && !s.go) p.face = s.face;
+  if (s.go) { var pts = [], sd = seat(i); if (p.atSeat) { pts.push(NODES[NIDX[sd.key]].clone()); p.node = sd.key; p.atSeat = false; } pts = pts.concat(dijkstra(p.node, s.go)); if (s.to) pts.push(s.to.clone()); p.route = pts; }
+  else { p.end = now + (s.ms || 1000); if (s.fn) s.fn(p, i, now); }
+}
+function cheer(i, msg) {
+  var p = pods[i]; if (!p) return; p.jump = 1; p.big = 1; p.cheerT = performance.now() + 2200; say(i, msg, 3600); logEv(D[i].name + ': ' + msg + ' 🎉');
+  for (var k = 0; k < 22; k++) { var m = new THREE.Mesh(new THREE.BoxGeometry(.12, .12, .12), new THREE.MeshBasicMaterial({ color: COL[(i + k) % 10] })); m.position.copy(p.w.position); m.position.y = 2.2; S.add(m); bits.push({ m: m, vx: rnd(-3, 3), vy: rnd(3, 7), vz: rnd(-3, 3), life: 1.8 }); }
+}
 function poke(i) {
   sel = sel === i ? -1 : i; var d = D[i], p = pods[i];
-  if (p) { p.jump = 1; p.big = 1; }
+  if (p) { p.jump = 1; p.big = 1; p.wave = performance.now() + 2600; }
   var sleepy = d.last && Date.now() - d.last > FRESH * 1.5;
-  say(i, sleepy ? SLEEPY[Math.floor(Math.random() * SLEEPY.length)] : JOKES[Math.floor(Math.random() * JOKES.length)]);
+  say(i, sleepy ? SLEEPY[Math.floor(Math.random() * SLEEPY.length)] : ['Hi there!','Oh, a visitor!','Do not touch the chart.','Wave back!'][Math.floor(Math.random() * 4)] + ' ' + JOKES[Math.floor(Math.random() * JOKES.length)]);
   D.forEach(function (_, k) { $('r' + k).style.borderColor = k === sel ? 'var(--fg)' : ''; });
 }
-var last = 0, lastJoke = 0, disco;
+var last = 0, lastJoke = 0, lastT = 0, raceNow = false, danceNow = false;
+function lerpAng(a, b, k) { var d = ((b - a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return a + d * k; }
 function frame() {
-  var t = clock.getElapsedTime(), now = performance.now(), maxRate = Math.max.apply(null, D.map(function (d) { return d.rate; })) || 1, coffee = mode.coffee > now ? 2.2 : 1;
+  var t = clock.getElapsedTime(), now = performance.now(), dt = Math.min(.1, t - lastT); lastT = t;
+  var maxRate = Math.max.apply(null, D.map(function (d) { return d.rate; })) || 1, maxKm = Math.max.apply(null, D.map(function (d) { return d.tries; })) || 1;
   if (auto && !reduce) th += .0016;
-  var tx = 0, tz = 0; if (sel >= 0 && !mode.race) { tx = pods[sel].home.x; tz = pods[sel].home.z; }
-  var k = sel >= 0 && !mode.race ? .5 : 1;
-  cam.position.set(tx + Math.sin(th) * Math.sin(ph) * dist * k, 1 + Math.cos(ph) * dist * k, tz + Math.cos(th) * Math.sin(ph) * dist * k); cam.lookAt(tx, 1, tz);
-  var maxKm = Math.max.apply(null, D.map(function (d) { return d.tries; })) || 1;
+  /* the race and the end of it re-plan everyone once */
+  if (mode.race !== raceNow) {
+    raceNow = mode.race;
+    pods.forEach(function (p, i) { var d = D[i]; p.step = null; p.later = [];
+      if (raceNow) { p.plan = [{ go: key('A', -11.8), to: new THREE.Vector3(-10 + 20 * (d.tries / maxKm), 0, 6 + i * .9), race: true, face: Math.PI / 2 }, { do: 'pant', ms: 6e8 }]; logEv('🏁 The race has started'); }
+      else p.plan = back(i); });
+  }
+  var tx = 0, tz = 0; if (sel >= 0 && !mode.race) { tx = pods[sel].w.position.x; tz = pods[sel].w.position.z; }
+  var kz = sel >= 0 && !mode.race ? .5 : 1;
+  cam.position.set(tx + Math.sin(th) * Math.sin(ph) * dist * kz, 1 + Math.cos(ph) * dist * kz, tz + Math.cos(th) * Math.sin(ph) * dist * kz); cam.lookAt(tx, 1, tz);
   pods.forEach(function (p, i) {
-    var d = D[i], sleepy = d.last && Date.now() - d.last > FRESH * 1.5, sp = (3 + 8 * d.rate / maxRate) * coffee * (sleepy ? .15 : 1);
-    var target = mode.race ? new THREE.Vector3(-11 + 22 * (d.tries / maxKm), 0, (i - 4.5) * 1.5) : p.home; p.g.position.lerp(target, .06);
+    var d = D[i], sleepy = d.last && Date.now() - d.last > FRESH * 1.5;
+    if (!p.step) begin(i, now);
+    var s = p.step, walking = !!s.go;
+    p.later = p.later.filter(function (l) { if (now >= l.at) { l.fn(); return false; } return true; });
+    if (walking) {
+      var tg = p.route[0];
+      if (tg) { var dx = tg.x - p.w.position.x, dz = tg.z - p.w.position.z, dl = Math.hypot(dx, dz), sp = (s.race ? 6.5 : 2.6) * (sleepy ? .6 : 1) * dt; if (dl <= sp) { p.w.position.x = tg.x; p.w.position.z = tg.z; p.route.shift(); } else { p.w.position.x += dx / dl * sp; p.w.position.z += dz / dl * sp; p.face = Math.atan2(dx, dz); } p.walk += sp * 3.4; }
+      if (!p.route.length) { p.node = s.go; if (s.seat) p.atSeat = true; if (s.face != null) p.face = s.face; p.step = null; p.walk = 0; }
+    } else if (now >= p.end || (mode.wake && (s.do === 'nap' || s.do === 'sofa'))) { p.step = null; }
+    var act = walking ? (s.race ? 'run' : 'walk') : s.do; if (p.cheerT > now) act = 'cheer'; p.act = act;
+    var dance = (mode.dance && !walking && act !== 'cheer') || act === 'dance';
+    var want = p.swivel > now ? Math.PI : p.face; p.ang = lerpAng(p.ang, want, Math.min(1, dt * 7)); p.w.rotation.y = p.ang;
+    var seated = !walking && (p.atSeat || s.do === 'sofa') && !dance && act !== 'stretch' && act !== 'pant';
+    p.sit += ((seated ? 1 : 0) - p.sit) * Math.min(1, dt * 6);
+    var a = t * (3 + 8 * d.rate / maxRate) * (sleepy ? .15 : 1) * (mode.coffee > now ? 2.2 : 1) + p.ph, sw = Math.sin(p.walk), A = p.arms, L = p.legs, napping = act === 'nap' || act === 'sofa';
+    var la = walking ? sw * .75 : 0; L[0].rotation.x = la * (1 - p.sit) - 1.4 * p.sit; L[1].rotation.x = -la * (1 - p.sit) - 1.4 * p.sit;
+    p.cup.visible = act === 'coffee' || act === 'cooler';
     if (!reduce) {
-      var dance = mode.dance, a = t * (dance ? 7 : sp) + p.ph;
-      p.arms[0].rotation.x = dance ? -2 + Math.sin(a) * .8 : -.5 + Math.sin(a) * .25; p.arms[1].rotation.x = dance ? -2 + Math.sin(a + 3) * .8 : -.5 + Math.sin(a + 2) * .25;
-      p.head.rotation.y = Math.sin(t * .7 + p.ph) * (dance ? .8 : .25); p.head.rotation.z = sleepy ? .35 : 0; p.head.position.y = 1.55 + Math.abs(Math.sin(a * .5)) * (dance ? .12 : .03);
+      var a0, a1;
+      if (act === 'cheer' || act === 'five') { a0 = -1.7 + Math.sin(t * 12) * .25; a1 = -1.7 - Math.sin(t * 12) * .25; }
+      else if (p.wave > now) { a0 = 1.2; a1 = -1.7 + Math.sin(t * 10) * .4; }
+      else if (walking) { a0 = 1.2 + sw * .55; a1 = 1.2 - sw * .55; }
+      else if (act === 'run' || act === 'pant') { a0 = 1 + Math.sin(t * 8) * .3; a1 = 1 - Math.sin(t * 8) * .3; }
+      else if (dance) { a0 = -2 + Math.sin(t * 7 + p.ph) * .8; a1 = -2 + Math.sin(t * 7 + p.ph + 3) * .8; }
+      else if (act === 'stretch') { a0 = a1 = -1.65 + Math.sin(t * 3) * .12; }
+      else if (act === 'coffee' || act === 'cooler') { a0 = 1.2; a1 = -1.1 + Math.sin(t * 2) * .12; }
+      else if (act === 'chat') { a0 = -.9 + Math.sin(t * 5 + p.ph) * .6; a1 = -.9 + Math.sin(t * 5 + p.ph + 2) * .6; }
+      else if (act === 'board') { a0 = 1.1; a1 = -1.55 + Math.sin(t * 5) * .3; }
+      else if (napping) { a0 = a1 = 1.2; }
+      else if (act === 'look') { a0 = a1 = 1.2; }
+      else { a0 = -.5 + Math.sin(a) * .25; a1 = -.5 + Math.sin(a + 2) * .25; }
+      A[0].rotation.x = a0; A[1].rotation.x = a1;
+      p.head.rotation.y = act === 'look' ? Math.sin(t * 1.3 + p.ph) * 1.1 : Math.sin(t * .7 + p.ph) * (dance ? .8 : .25);
+      p.head.rotation.x = napping || sleepy ? .45 : act === 'chat' ? Math.sin(t * 6) * .12 : 0; p.head.rotation.z = sleepy && !napping ? .3 : 0;
+      p.head.position.y = 1.55 + Math.abs(Math.sin(a * .5)) * (dance ? .12 : .03);
       p.ch.rotation.y = dance ? Math.sin(t * 3 + p.ph) * .5 : 0;
     }
-    p.jump = Math.max(0, p.jump - .03); p.big = Math.max(0, p.big - .02); p.ch.position.y = Math.sin(p.jump * Math.PI) * .8; var sc = 1 + p.big * .25; p.ch.scale.set(sc, sc, sc);
-    p.eyes.forEach(function (e) { e.scale.y = sleepy ? .15 : 1; });
-    p.ring.material.opacity = i === sel ? .9 : 0;
-    v.copy(p.g.position); v.y = 2.9; v.project(cam); var w = $('stage').clientWidth, h = $('stage').clientHeight;
+    p.jump = Math.max(0, p.jump - .03); p.big = Math.max(0, p.big - .02);
+    p.ch.position.y = Math.sin(p.jump * Math.PI) * .8 + (walking ? Math.abs(sw) * .09 : dance ? Math.abs(Math.sin(t * 7 + p.ph)) * .12 : 0) + (p.sit > .5 && s.do === 'sofa' ? .05 : 0);
+    var sc = 1 + p.big * .25; p.ch.scale.set(sc, sc, sc);
+    var closed = sleepy || napping; p.eyes.forEach(function (e) { e.scale.y = closed ? .15 : 1; });
+    p.ring.material.opacity = i === sel ? .9 : 0; p.ring.position.set(p.w.position.x - p.home.x, .12, p.w.position.z - p.home.z);
+    if (napping && Math.random() < .004) say(i, 'z' + 'z'.repeat(Math.floor(Math.random() * 3)) + '…', 1800);
+    v.copy(p.w.position); v.y = 2.9; v.project(cam); var w = $('stage').clientWidth, h = $('stage').clientHeight;
     d.tag.style.left = (v.x * .5 + .5) * w + 'px'; d.tag.style.top = (-v.y * .5 + .5) * h + 'px'; d.tag.style.display = v.z < 1 ? 'block' : 'none';
-    d.tag.textContent = d.name + ' · ' + kmh(d) + ' km/h' + (sleepy ? ' · zzz' : '');
+    d.tag.textContent = (ICON[act] || '') + ' ' + d.name + ' · ' + kmh(d) + ' km/h' + (sleepy ? ' · zzz' : '');
   });
+  /* confetti */
+  bits = bits.filter(function (b) { b.life -= dt; if (b.life <= 0) { S.remove(b.m); b.m.geometry.dispose(); b.m.material.dispose(); return false; } b.vy -= 9 * dt; b.m.position.x += b.vx * dt; b.m.position.y = Math.max(.05, b.m.position.y + b.vy * dt); b.m.position.z += b.vz * dt; b.m.rotation.x += dt * 6; b.m.rotation.y += dt * 5; return true; });
   S.userData.disco.intensity = mode.dance ? 1.4 + Math.sin(t * 8) * .6 : 0; S.userData.disco.color.setHSL((t * .3) % 1, 1, .5);
-  if (now - lastJoke > 5500 && !mode.race) { lastJoke = now; var i = Math.floor(Math.random() * 10); if (D[i].last) say(i, JOKES[Math.floor(Math.random() * JOKES.length)], 3400); }
-  says = says.filter(function (s) { if (now > s.until) { s.e.remove(); return false; } v.copy(pods[s.i].g.position); v.y = 3.5; v.project(cam); s.e.style.left = (v.x * .5 + .5) * $('stage').clientWidth + 'px'; s.e.style.top = (-v.y * .5 + .5) * $('stage').clientHeight - 18 + 'px'; return true; });
+  if (now - lastJoke > 6500 && !mode.race) { lastJoke = now; var i = Math.floor(Math.random() * 10); if (D[i].last && pods[i].atSeat) say(i, JOKES[Math.floor(Math.random() * JOKES.length)], 3400); }
+  says = says.filter(function (s) { if (now > s.until) { s.e.remove(); return false; } v.copy(pods[s.i].w.position); v.y = 3.5; v.project(cam); s.e.style.left = (v.x * .5 + .5) * $('stage').clientWidth + 'px'; s.e.style.top = (-v.y * .5 + .5) * $('stage').clientHeight - 18 + 'px'; return true; });
+  mode.wake = false;
   if (t - last > .3) { last = t; paint(); }
   R.render(S, cam); requestAnimationFrame(frame);
 }
@@ -262,7 +388,7 @@ function buttons() {
   $('b-coffee').onclick = function () { mode.coffee = performance.now() + 8000; toast('☕ Everyone drinks coffee. Typing speed ×2.2 for 8 seconds (on screen only).'); };
   $('b-dance').onclick = function () { mode.dance = !mode.dance; this.setAttribute('aria-pressed', mode.dance); toast(mode.dance ? '🕺 Dance party! The research carries on in the background.' : 'Back to work.'); };
   $('b-race').onclick = function () { mode.race = !mode.race; this.setAttribute('aria-pressed', mode.race); toast(mode.race ? '🏁 Race: the further right, the more kilometres tried.' : 'Back to the desks.'); };
-  $('b-shake').onclick = function () { pods.forEach(function (p, i) { p.jump = 1; p.big = 1; setTimeout(function () { say(i, ['Awake!','I was reading!','Not sleeping!','Boss?!'][i % 4], 1800); }, i * 90); }); };
+  $('b-shake').onclick = function () { mode.wake = true; pods.forEach(function (p, i) { p.jump = 1; p.big = 1; setTimeout(function () { say(i, ['Awake!','I was reading!','Not sleeping!','Boss?!'][i % 4], 1800); }, i * 90); }); };
   $('b-widget').onclick = function () { var on = !document.documentElement.classList.contains('widget'); document.documentElement.classList.toggle('widget', on); this.setAttribute('aria-pressed', on); if (location.hash !== '#widget' && on) history.replaceState(null, '', '#widget'); if (!on) history.replaceState(null, '', location.pathname); };
 }
 function start() {
