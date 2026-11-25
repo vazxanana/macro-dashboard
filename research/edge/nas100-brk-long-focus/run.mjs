@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import zlib from 'node:zlib';
 import { loadMarket, simulate, summary, atr, sma, rng } from '../auto-researcher/engine.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url)), cacheDir = process.argv[2] || '/tmp/nasbrk-cache';
@@ -55,7 +56,26 @@ const vari = (a) => { const m = mean(a); return a.length > 1 ? a.reduce((x, y) =
 export const welch = (a, b) => { const se = Math.sqrt(vari(a) / a.length + vari(b) / b.length); return se > 0 ? (mean(a) - mean(b)) / se : 0; };
 const yearOf = (t) => new Date(t * 1000).getUTCFullYear();
 
+
+// the engine's own fetch skips a window that fails four times and goes on (that left 2019 on only); this one retries hard and stops loudly
+async function ensureCache(mk) {
+  const f = path.join(cacheDir, `${mk}-1h.json.gz`); fs.mkdirSync(cacheDir, { recursive: true });
+  if (fs.existsSync(f) && fs.statSync(f).size > 0) { const rows = JSON.parse(zlib.gunzipSync(fs.readFileSync(f))); if (rows.length && rows[0].t < Date.UTC(2011, 0, 1) / 1000 || mk === 'us2000' && rows.length > 20000) return; }
+  const BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/', now = Math.floor(Date.now() / 1000), span = 4900 * 3600, map = new Map();
+  for (let a = Date.UTC(2005, 0, 1) / 1000; a < now; a += span) {
+    let ok = false, lastErr = '';
+    for (let k = 0; k < 10 && !ok; k++) {
+      try { const r = await fetch(`${BASE}bars?sym=${mk}&tf=1h&from=${a}&to=${Math.min(a + span, now)}`); if (r.ok) { for (const x of (await r.json()).bars || []) if (x.time + 3600 <= now) map.set(x.time, { t: x.time, o: x.open, h: x.high, l: x.low, c: x.close }); ok = true; } else lastErr = 'HTTP ' + r.status; } catch (e) { lastErr = String(e.message || e); }
+      if (!ok) await new Promise((q) => setTimeout(q, 2000 * (k + 1)));
+    }
+    if (!ok) throw new Error(`${mk}: window from ${new Date(a * 1000).toISOString()} failed 10 times (${lastErr})`);
+    await new Promise((q) => setTimeout(q, 500));
+  }
+  const rows = [...map.values()].sort((p, q) => p.t - q.t); fs.writeFileSync(f, zlib.gzipSync(JSON.stringify(rows))); console.log(mk, rows.length, 'H1 bars from', new Date(rows[0].t * 1000).toISOString());
+}
+
 async function main() {
+  await ensureCache('nas100');
   const out = { rule: RULE, ran: new Date().toISOString(), checks: {} }, D = await loadMarket('nas100', cacheDir);
   out.bars = D.n; out.first = new Date(D.t[0] * 1000).toISOString(); out.last = new Date(D.t[D.n - 1] * 1000).toISOString();
   const W = { A: D.idx.A, B: D.idx.B, C: D.idx.C };
@@ -101,7 +121,7 @@ async function main() {
   // ---- T4 other indices ----
   const T4 = { markets: {} }, pooled = new Map(); let pn = 0, ps = 0, positive = 0;
   for (const mk2 of ['spx500', 'us30', 'de40', 'jp225', 'us2000']) {
-    try { const E = await loadMarket(mk2, cacheDir); E.costRel = COST; E.cost = 0; const tr = trades(E, RULE, ...E.idx.C, COST), s = sum(tr);
+    try { await ensureCache(mk2); const E = await loadMarket(mk2, cacheDir); E.costRel = COST; E.cost = 0; const tr = trades(E, RULE, ...E.idx.C, COST), s = sum(tr);
       T4.markets[mk2] = { bars: E.n, first: new Date(E.t[0] * 1000).toISOString().slice(0, 10), C: s }; if (s.n && s.mean > 0) positive++;
       for (const x of tr) { pooled.set(x.m, (pooled.get(x.m) || 0) + x.R); } pn += tr.length; ps += tr.reduce((a, x) => a + x.R, 0);
     } catch (e) { T4.markets[mk2] = { error: String(e.message || e) }; }
