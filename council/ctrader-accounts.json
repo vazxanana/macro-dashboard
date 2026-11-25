@@ -1,5 +1,5 @@
 {
- "note": "Demo account numbers per book (not secrets). Empty = that book trades on CTRADER_ACCOUNT_ID. Books: council (live Meridian systems), ict (ICT A-setups), shadow (paper shadow streams), lit (LIT paper shadow), replica (the owner's replica stream). Same cTrader ID for all, so the one token covers them. Owner, 8 Nov 2026. 20 Nov 2026 (owner): the shadow book moved to the idle LIT account 10152146 (shared with lit and the gotobi job); the old Shadows account 10152145 is drained: it opens nothing and keeps managing its open copies until none is left. 23 Nov 2026 (owner: \"Mosha barrier 6 put it in one of the demo accounts on ctrader can be any one just swap with the one there previous\"): 10152145 is the mosha6 book (the Mosha desk's 6R barrier records, gold) and no longer drained; its round still manages the old shadow copies it holds, because every trade is passed to every account's round. 24 Nov 2026 (owner: \"Break fade / Big-candle fade / FVG return / gold breakout ... on demo account finishing 144 risking 0.25% per trade max 30 trades open\", \"Stop ICT copies\"): 10152144 is also the eqx book (the four Equinox desks); ICT copies are stopped by the Trader rule ict-mirror-off. 24 Nov 2026 (owner: \"And on the 200 account mosha barrier 6r\", \"200$ finish with 155\"): the mosha6 book moved to the $200 demo account whose login ends 155 (\"*155\": the one demo account on the token with that ending; council/ctrader-mirror.mjs pickAccount), risk 0.25 % unchanged; 10152145 is drained (opens nothing, manages its open Mosha copies until none is left).",
+ "note": "Demo account numbers per book (not secrets). Empty = that book trades on CTRADER_ACCOUNT_ID. Books: council (live Meridian systems), ict (ICT A-setups), shadow (paper shadow streams), lit (LIT paper shadow), replica (the owner's replica stream). Same cTrader ID for all, so the one token covers them. Owner, 8 Nov 2026. 20 Nov 2026 (owner): the shadow book moved to the idle LIT account 10152146 (shared with lit and the gotobi job); the old Shadows account 10152145 is drained: it opens nothing and keeps managing its open copies until none is left. 23 Nov 2026 (owner: \"Mosha barrier 6 put it in one of the demo accounts on ctrader can be any one just swap with the one there previous\"): 10152145 is the mosha6 book (the Mosha desk's 6R barrier records, gold) and no longer drained; its round still manages the old shadow copies it holds, because every trade is passed to every account's round. 24 Nov 2026 (owner: \"Break fade / Big-candle fade / FVG return / gold breakout ... on demo account finishing 144 risking 0.25% per trade max 30 trades open\", \"Stop ICT copies\"): 10152144 is also the eqx book (the four Equinox desks); ICT copies are stopped by the Trader rule ict-mirror-off. 24 Nov 2026 (owner: \"And on the 200 account mosha barrier 6r\", \"200$ finish with 155\"): the mosha6 book moved to the $200 demo account whose login ends 155 (\"*155\": the one demo account on the token with that ending; council/ctrader-mirror.mjs pickAccount), risk 0.25 % unchanged; 10152145 is drained (opens nothing, manages its open Mosha copies until none is left). 25 Nov 2026 (owner: \"Put big fade candle edge in one of the demo accounts replace it and risk 5% per trade\"): 10152145 is the bfade book (the Big-candle fade desk, 5 % a trade, day stop 15 %); no longer drained; it still manages the old shadow copies it holds.",
  "mirrorAccounts": {
   "council": "",
   "ict": "10152144",
@@ -7,9 +7,8 @@
   "lit": "10152146",
   "replica": "10152148",
   "mosha6": "*155",
-  "eqx": "10152144"
+  "eqx": "10152144",
+  "bfade": "10152145"
  },
- "drain": [
-  "10152145"
- ]
+ "drain": []
 }
