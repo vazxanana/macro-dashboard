@@ -2,14 +2,14 @@
  "version": "auto-1",
  "worker": 4,
  "started": "2026-11-25T12:10:03.296Z",
- "tries": 343000,
- "survivedA": 544,
- "candidates": 74,
- "cLooks": 40,
+ "tries": 528200,
+ "survivedA": 818,
+ "candidates": 108,
+ "cLooks": 44,
  "cPasses": 0,
  "groups": {
   "eurusd|dev+|both": {
-   "more": 10,
+   "more": 14,
    "pass": false
   },
   "usdjpy|blk-|short": {
@@ -25,7 +25,7 @@
    "pass": false
   },
   "usdchf|fade|both": {
-   "more": 6,
+   "more": 11,
    "pass": false
   },
   "eurusd|dev+|long": {
@@ -45,7 +45,7 @@
    "pass": false
   },
   "usdjpy|fade|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|fade|short": {
@@ -53,7 +53,7 @@
    "pass": false
   },
   "eurjpy|blk-|both": {
-   "more": 6,
+   "more": 10,
    "pass": false
   },
   "nzdusd|eg-|both": {
@@ -69,7 +69,7 @@
    "pass": false
   },
   "usdjpy|blk-|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|big+|both": {
@@ -89,11 +89,11 @@
    "pass": false
   },
   "usdcad|fade|short": {
-   "more": 0,
+   "more": 1,
    "pass": true
   },
   "gbpusd|blk-|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "xau|blk-|both": {
@@ -109,11 +109,11 @@
    "pass": true
   },
   "nzdusd|blk-|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurjpy|brk|both": {
-   "more": 2,
+   "more": 4,
    "pass": false
   },
   "eurjpy|eg-|long": {
@@ -125,7 +125,7 @@
    "pass": false
   },
   "nzdusd|fade|short": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "xau|brk|long": {
@@ -137,7 +137,7 @@
    "pass": false
   },
   "eurusd|big+|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "audusd|fade|short": {
@@ -145,7 +145,7 @@
    "pass": false
   },
   "eurjpy|brk|long": {
-   "more": 0,
+   "more": 3,
    "pass": false
   },
   "usdcad|eg-|both": {
@@ -153,11 +153,11 @@
    "pass": false
   },
   "eurjpy|brk|short": {
-   "more": 0,
+   "more": 2,
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|big+|short": {
@@ -165,6 +165,22 @@
    "pass": false
   },
   "eurjpy|dev-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurjpy|fade|both": {
+   "more": 1,
+   "pass": false
+  },
+  "audusd|blk-|both": {
+   "more": 1,
+   "pass": false
+  },
+  "usdcad|fade|both": {
+   "more": 0,
+   "pass": true
+  },
+  "eurusd|big-|long": {
    "more": 0,
    "pass": false
   }
@@ -2343,9 +2359,231 @@
     "months": 64
    },
    "p": 0.60642
+  },
+  {
+   "at": "2026-11-25T13:07:29.422Z",
+   "group": "eurjpy|fade|both",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 8
+     }
+    ],
+    "side": "both",
+    "hours": [
+     19,
+     3
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.7,
+    "stop": 1,
+    "rr": 1.5,
+    "hold": 8
+   },
+   "A": {
+    "n": 1635,
+    "mean": 0.0743,
+    "t": 3.29,
+    "win": 47.2,
+    "months": 119
+   },
+   "B": {
+    "n": 729,
+    "mean": 0.0831,
+    "t": 2.24,
+    "win": 48.6,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 1507,
+    "mean": -0.1086,
+    "t": -4.46,
+    "win": 39.2,
+    "months": 119
+   },
+   "C": {
+    "n": 1058,
+    "mean": -0.0108,
+    "t": -0.31,
+    "win": 42.7,
+    "months": 83
+   },
+   "p": 0.62172
+  },
+  {
+   "at": "2026-11-25T13:15:22.327Z",
+   "group": "audusd|blk-|both",
+   "g": {
+    "mk": "audusd",
+    "trig": [
+     {
+      "kind": "blk",
+      "H": 6,
+      "at": 19,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 0.75,
+    "rr": 1,
+    "hold": 24
+   },
+   "A": {
+    "n": 379,
+    "mean": 0.1733,
+    "t": 3.44,
+    "win": 60.9,
+    "months": 113
+   },
+   "B": {
+    "n": 177,
+    "mean": 0.1366,
+    "t": 1.82,
+    "win": 60.5,
+    "months": 55
+   },
+   "placeboA": {
+    "n": 379,
+    "mean": -0.2748,
+    "t": -5.55,
+    "win": 38.3,
+    "months": 113
+   },
+   "C": {
+    "n": 245,
+    "mean": 0.0678,
+    "t": 1.07,
+    "win": 56.7,
+    "months": 78
+   },
+   "p": 0.14231
+  },
+  {
+   "at": "2026-11-25T13:23:28.850Z",
+   "group": "usdcad|fade|both",
+   "g": {
+    "mk": "usdcad",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 5
+     }
+    ],
+    "side": "both",
+    "hours": [
+     22,
+     23
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 3,
+    "rr": 1.5,
+    "hold": 8
+   },
+   "A": {
+    "n": 342,
+    "mean": 0.0922,
+    "t": 3.45,
+    "win": 58.8,
+    "months": 110
+   },
+   "B": {
+    "n": 123,
+    "mean": 0.0486,
+    "t": 1.54,
+    "win": 52.8,
+    "months": 51
+   },
+   "placeboA": {
+    "n": 342,
+    "mean": -0.1107,
+    "t": -4.21,
+    "win": 36.3,
+    "months": 110
+   },
+   "C": {
+    "n": 151,
+    "mean": 0.1214,
+    "t": 3.33,
+    "win": 64.2,
+    "months": 62
+   },
+   "p": 0.00043
+  },
+  {
+   "at": "2026-11-25T13:24:36.417Z",
+   "group": "eurusd|big-|long",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "big",
+      "k": 1,
+      "follow": false
+     }
+    ],
+    "side": "long",
+    "hours": [
+     0,
+     2
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 1.5,
+    "rr": 1.5,
+    "hold": 4
+   },
+   "A": {
+    "n": 661,
+    "mean": 0.0844,
+    "t": 3.41,
+    "win": 57.2,
+    "months": 117
+   },
+   "B": {
+    "n": 164,
+    "mean": 0.0738,
+    "t": 1.62,
+    "win": 61.6,
+    "months": 55
+   },
+   "placeboA": {
+    "n": 653,
+    "mean": -0.1054,
+    "t": -4.31,
+    "win": 38.1,
+    "months": 117
+   },
+   "C": {
+    "n": 297,
+    "mean": -0.044,
+    "t": -1.36,
+    "win": 48.1,
+    "months": 80
+   },
+   "p": 0.91308
   }
  ],
- "chunks": 1,
- "updated": "2026-11-25T13:03:57.813Z",
- "chanceCandidates": 31.2
+ "chunks": 2,
+ "updated": "2026-11-25T13:29:00.525Z",
+ "chanceCandidates": 48.1
 }
