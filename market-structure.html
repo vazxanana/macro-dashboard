@@ -7498,6 +7498,7 @@ function msNextSetup(bars, A) {
   // the menu's groups, in order (each id once); a timeframe with an analysed pane opens that pane
   const TF_GROUPS = [['Seconds', ['1s', '5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
   window.msTfGroups = () => TF_GROUPS.map(([g, ids]) => [g, ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return { id, label: t ? t.label : id, analysed: !!panes[id] }; })]);
+  window.msMarkets = () => Object.entries(INSTRUMENTS).map(([k, I]) => ({ k, label: I.label, name: I.name, group: I.group, on: k === instKey }));   // the wheel bar's list
   // a year's candles from monthly ones (UTC calendar years)
   const yearOf = (bars) => { const out = []; bars.forEach((b) => { const y = new Date(b.time * 1e3).getUTCFullYear(), t = Date.UTC(y, 0, 1) / 1e3, l = out[out.length - 1];
     if (l && l.time === t) { l.high = Math.max(l.high, +b.high); l.low = Math.min(l.low, +b.low); l.close = +b.close; l.volume = (l.volume || 0) + (+b.volume || 0); }
@@ -15407,11 +15408,11 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"] #ms-pp .pp-ttl small { display: none; } html[data-phone="simple"] #ms-pp .pp-trade { width: 100%; } html[data-phone="simple"] #ms-pp .pp-go { flex: 1; }
   html[data-phone="simple"] #ms-pp .pp-set { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } html[data-phone="simple"] #ms-pp .pp-set label { display: grid; gap: 2px; } html[data-phone="simple"] #ms-pp .pp-set select { width: 100%; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .sec-h { padding-top: 0; margin-top: -6px; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 336px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 376px), 660px); min-height: 0; }   /* one chart: it ends above the tab bar */
   /* 24 Nov 2026, owner: charts use more of the page: the chart card runs edge to edge and the toolbar row is tighter */
   html[data-phone="simple"]:not([data-role="public"]) #v-charts .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-pane { margin-left: -16px; width: calc(100% + 32px); max-width: none; border-radius: 0; border-left: 0; border-right: 0; }
   html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .sec-h { margin-bottom: 4px; padding-bottom: 2px; border-bottom: 0; }
-  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 300px), 700px); }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not([data-ps-more]) .ms-grid4:not([data-view="all"]):not([data-view="split"]) .ms-chart { height: clamp(380px, calc(100dvh - 314px), 700px); }
 
   /* Council → Trades: the forward record in one sentence, then the latest five rows */
   .ps-t-ans { padding: 2px 2px 0; min-height: 0; }
@@ -15925,6 +15926,62 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
   html[data-view="charts"]:not([data-role="public"]) .ms-live.app { max-width: none; }
 }
 </style>
+<style id="ms-wb-css">
+/* Wheel bar on Charts (25 Nov 2026, owner: "change time frame and currency like that" + "make the chart occupy more space"). Display only.
+   Up to 700 px a bar above the tab bar holds the market and the timeframe; each opens a sheet with a scrolling wheel (the current one
+   in the middle, bold), like a phone's pickers. It calls the page's own setters (msOneTf, a market link): no second mechanism. */
+#ms-wb, #ms-wb-sheet { display: none; }
+@media (max-width: 700px) {
+  html[data-view="charts"]:not([data-role="public"]) #ms-wb { display: flex; position: fixed; left: 0; right: 0; bottom: calc(62px + env(safe-area-inset-bottom, 0px)); z-index: 24; gap: 8px; padding: 6px 12px; background: color-mix(in srgb, var(--au-bg, var(--bg)) 92%, transparent); border-top: 1px solid var(--au-line, var(--line)); }
+  #ms-wb button { flex: 1 1 0; min-height: 44px; border-radius: 12px; border: 0; background: var(--au-surface-2, var(--panel)); color: var(--au-ink-1, var(--ink)); font: 650 15px var(--sans); display: flex; align-items: center; justify-content: center; gap: 8px; }
+  #ms-wb button small { font: 500 12px var(--sans); color: var(--au-ink-2, var(--ink-dim)); }
+  #ms-wb button:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 2px; }
+  #ms-wb-sheet[data-open] { display: block; position: fixed; inset: 0; z-index: 60; background: rgba(0, 0, 0, .45); }
+  #ms-wb-sheet .wb-card { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-radius: 18px 18px 0 0; background: var(--au-bg, var(--bg)); color: var(--au-ink-1, var(--ink)); box-shadow: 0 -8px 30px rgba(0,0,0,.35); }
+  #ms-wb-sheet .wb-h { display: flex; justify-content: space-between; align-items: center; font: 650 13px var(--sans); color: var(--au-ink-2, var(--ink-dim)); margin-bottom: 4px; }
+  #ms-wb-sheet .wb-h button { min-height: 44px; min-width: 64px; border: 0; background: none; color: var(--au-accent, var(--accent)); font: 650 15px var(--sans); }
+  #ms-wb-sheet .wb-wheel { position: relative; background: transparent; height: 220px; overflow-y: auto; scroll-snap-type: y mandatory; overscroll-behavior: contain; padding: 88px 0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  #ms-wb-sheet .wb-wheel::-webkit-scrollbar { display: none; }
+  #ms-wb-sheet .wb-i { height: 44px; display: flex; align-items: center; justify-content: center; scroll-snap-align: center; font: 500 18px var(--sans); color: var(--au-ink-2, var(--ink-dim)); cursor: pointer; }
+  #ms-wb-sheet .wb-i[aria-selected="true"] { font-weight: 700; font-size: 20px; color: var(--au-ink-1, var(--ink)); }
+  #ms-wb-sheet .wb-mid { position: absolute; left: 0; right: 0; top: 88px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 8%, transparent); pointer-events: none; }
+  #ms-wb-sheet .wb-box { position: relative; }
+  #v-charts #ms-ch-mk { display: none; }   /* the bar replaces the toolbar's market button */
+}
+</style>
+<script id="ms-wb-js">
+(function () {
+  var bar, sheet, cur = null;
+  var $ = function (id) { return document.getElementById(id); };
+  function tfNow() { var g = $('v-charts') && document.querySelector('#v-charts .ms-grid4'); var v = g ? g.dataset.view : ''; if (v === 'one' && window.msOneState) return window.msOneState().tf; return /^(1d|4h|1h|15m|5m|1m)$/.test(v) ? v : ''; }
+  function tfList() { var o = []; (window.msTfGroups ? window.msTfGroups() : []).forEach(function (g) { g[1].forEach(function (t) { o.push({ id: t.id, label: t.label }); }); }); return o; }
+  function mkList() { return window.msMarkets ? window.msMarkets() : []; }
+  function paint() { if (!bar) return; var m = mkList().filter(function (x) { return x.on; })[0], t = tfList().filter(function (x) { return x.id === tfNow(); })[0];
+    bar.querySelector('[data-wb="mk"] b').textContent = m ? m.label : 'Market'; bar.querySelector('[data-wb="tf"] b').textContent = t ? t.label : 'All'; }
+  function close() { if (sheet) { sheet.removeAttribute('data-open'); sheet.innerHTML = ''; } cur = null; }
+  function open(kind) { var items = kind === 'mk' ? mkList().map(function (x) { return { id: x.k, label: x.label, on: x.on }; }) : tfList().map(function (x) { return { id: x.id, label: x.label, on: x.id === tfNow() }; });
+    var pick = (items.filter(function (x) { return x.on; })[0] || items.filter(function (x) { return x.id === '1d'; })[0] || items[0] || {}).id;
+    sheet.innerHTML = '<div class="wb-card" role="dialog" aria-modal="true" aria-label="' + (kind === 'mk' ? 'Choose a market' : 'Choose a timeframe') + '"><div class="wb-h"><span>' + (kind === 'mk' ? 'Market' : 'Timeframe') + '</span><button type="button" data-wb-x="cancel">Cancel</button><button type="button" data-wb-x="ok">Done</button></div><div class="wb-box"><div class="wb-mid"></div><div class="wb-wheel" tabindex="0" role="listbox">'
+      + items.map(function (x) { return '<div class="wb-i" role="option" data-id="' + x.id + '" aria-selected="' + (x.id === pick) + '">' + x.label + '</div>'; }).join('') + '</div></div></div>';
+    sheet.setAttribute('data-open', ''); cur = { kind: kind, pick: pick };
+    var w = sheet.querySelector('.wb-wheel'), sel = w.querySelector('[aria-selected="true"]'); if (sel) w.scrollTop = sel.offsetTop - 88;
+    var tm; w.addEventListener('scroll', function () { clearTimeout(tm); tm = setTimeout(function () { var i = Math.max(0, Math.min(items.length - 1, Math.round(w.scrollTop / 44))), n = w.children[i]; if (!n) return; w.querySelectorAll('.wb-i').forEach(function (e) { e.setAttribute('aria-selected', e === n ? 'true' : 'false'); }); cur.pick = n.dataset.id; }, 80); });
+    w.addEventListener('click', function (e) { var n = e.target.closest('.wb-i'); if (n) w.scrollTo({ top: n.offsetTop - 88, behavior: 'smooth' }); });
+    w.addEventListener('keydown', function (e) { if (e.key === 'Enter') apply(); if (e.key === 'Escape') close(); }); w.focus({ preventScroll: true }); }
+  function apply() { if (!cur) return; var k = cur.kind, id = cur.pick; close();
+    if (k === 'tf') { if (id !== tfNow() && window.msOneTf) window.msOneTf(id); setTimeout(paint, 50); }
+    else if (id && !mkList().some(function (x) { return x.k === id && x.on; })) location.href = '?s=' + encodeURIComponent(id) + '#charts'; }
+  function build() { if (bar || !$('v-charts')) return;
+    bar = document.createElement('div'); bar.id = 'ms-wb'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Market and timeframe');
+    bar.innerHTML = '<button type="button" data-wb="mk" aria-haspopup="dialog"><small>Market</small><b></b></button><button type="button" data-wb="tf" aria-haspopup="dialog"><small>Timeframe</small><b></b></button>';
+    sheet = document.createElement('div'); sheet.id = 'ms-wb-sheet'; document.body.appendChild(bar); document.body.appendChild(sheet);
+    bar.addEventListener('click', function (e) { var b = e.target.closest('[data-wb]'); if (b) open(b.dataset.wb); });
+    sheet.addEventListener('click', function (e) { var x = e.target.closest('[data-wb-x]'); if (x) { if (x.dataset.wbX === 'ok') apply(); else close(); } else if (e.target === sheet) close(); });
+    addEventListener('hashchange', function () { close(); setTimeout(paint, 100); }); setInterval(paint, 1500); paint(); }
+  window.msWheelBar = function () { return { built: !!bar, market: bar ? bar.querySelector('[data-wb="mk"] b').textContent : '', tf: bar ? bar.querySelector('[data-wb="tf"] b').textContent : '', open: !!(sheet && sheet.hasAttribute('data-open')) }; };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(build, 0); }); else setTimeout(build, 0);
+})();
+</script>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked
 // out (window.MS_TODAY and window.MS_LIVE from the main script, window.FLOAT, MS_WEEK.decisions on the loaded council files)
