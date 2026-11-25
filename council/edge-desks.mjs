@@ -329,6 +329,8 @@ export const DESKS = {
 export const OLD = ['eg', 'msnr', 'lit'];
 export function buildDesk(name, perMarket, prev, now, days, fromT = null) {
   let records = (prev && prev.records) || [], through = (prev && prev.through) || 0; const read = [];
+  // a record of a market the desk no longer reads leaves it (owner, 25 Nov 2026: gold, silver and USD/CAD left the Box fade desk)
+  records = records.filter((r) => DESKS[name].markets.includes(r.market || 'xau'));
   for (const [market, B] of perMarket) { if (!B['5m'] || !B['5m'].length) continue;
     const last = B['5m'][B['5m'].length - 1].time + 300, from = fromT != null ? Math.max(fromT, last - days * 86400) : last - days * 86400;
     const fresh = DESKS[name].read(B, { from, market }); records = settle(merge(records, fresh, now), new Set(fresh.map((r) => r.id)), B['5m'], market); read.push(market); through = Math.max(through, last); }

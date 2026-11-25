@@ -7159,3 +7159,38 @@ things"; the Nasdaq breakout of the day went back to NQ1). `council/edge-desks-2
 `zero/desk.json`; kind `zero-tue`): turnaround-tuesday R2 on NAS100 by the study's own `tradingDays`, `weekPairs`, `buildDays`, `trade` (the first trading day of a week closed
 down more than 1 %, buy that close, stop 2 ATR(20 days), out at the next trading day's close; R before costs and financing; an open trade is read to the last candle).
 Before costs; 1 Jan - 25 Nov 2026: 5 trades, 4 won, +0.169R (inside the years the study read). Tests: `tests/nq1-desk.test.mjs`.
+
+**The NAS100 breakout as an Equinox desk** (25 Nov 2026, owner: "make it an edge for equinox and fill the months from January").
+`council/edge-desks-2.mjs` `nasbrkTrades` (`DESKS2.nasbrk`, kind `nasbrk-h1`, market nas100, `extra: { '5m': 60 }` days of warm-up for the 200-bar
+average and the ATR; the loop line is `--only fade,…,jpyvb,nasbrk,lyriac,dom`): the study's rule read on H1 candles built from the 5-minute ones
+(closed bars only, thin bars dropped as the engine does), the engine's own `atr` and `sma`; a long at the next open when that hour is 14-21 UTC,
+stop 1 ATR(14) below, 4R, out after 96 hours, ONE position at a time (a signal waits until the hour after the last trade's exit; an open trade
+blocks later ones). It is managed on 5-minute candles like every desk, so the order of stop and target inside an hour is read exactly (the study
+read hourly candles, stop first). Before costs. Page: Equinox tab "NAS100 breakout" (`#v-nasbrk`), `desk-trades.js` `DESKS.nasbrk`,
+`desk-live.js`; `datahealth.mjs` lists `nasbrk/desk.json`; `mosha-desk.mjs` `clean` takes the kind. History filled from 1 Jan 2026 with
+`node council/edge-desks.mjs <dir> --days 330 --from 2026-01-01 --only nasbrk` (74 closed trades, 16 won, −2.4R before costs, −0.032R a trade:
+the study's own 2026, n 74, was −0.05R after its assumed cost). A paper record of a candidate that passed its follow-up but is not an edge;
+2026 so far is flat to slightly negative. Tests: `tests/nasbrk-desk.test.mjs` (signal bars checked one by one, one position at a time, the
+engine's first trade, no look-ahead, wiring).
+
+**Box fade without gold, silver and USD/CAD** (25 Nov 2026, owner: "in box fade remove usdcad silver gold"). `council/edge-desks-2.mjs` `BOX_MARKETS` = the study's ten markets less
+xau, xag and usdcad (seven: EUR/USD, GBP/USD, USD/JPY, AUD/USD, NZD/USD, USD/CHF, EUR/JPY); `DESKS2.boxfade.markets` reads them; the other fade / gap desks keep their ten.
+`council/edge-desks.mjs` `buildDesk` now drops a stored record of a market the desk no longer reads, so the three markets' Box fade records leave `boxfade/desk.json` on the
+loop's next run after this merges (every other desk's markets list is the full list its records come from; nothing else changes). Test: `tests/edge-desks-2.test.mjs`.
+
+**DOM zone desk on eight markets** (25 Nov 2026, owner: "DOM zone remove euraud cadjpy gbpjpy usdchf nzdusd dax40 sp500 silver eurusd and gbpusd"). `council/edge-desks-2.mjs`
+`DOM_DESK_MARKETS` = the job's eighteen less those ten = gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP, Nasdaq 100; `DESKS2.dom.markets` reads them. The desk's stored
+records of the ten leave `dom/desk.json` on the loop's next run after this merges (`buildDesk` drops a record of a market the desk no longer reads). The demo JOB (`council/dom-demo.mjs`,
+its `config.dom.markets`, the $100 account) is NOT changed: it still arms its eighteen unless `config.dom.markets` narrows them; ask the owner if that is meant too. Test: `tests/edge-desks-2.test.mjs`.
+
+**FVG return without GBP/USD** (25 Nov 2026, owner: "FVG return GBPUSD remove"). `council/edge-desks-2.mjs` `FVG_MARKETS` = the study's ten markets less GBP/USD (nine); `DESKS2.fvg.markets`
+reads them. The desk's GBP/USD records leave `fvg/desk.json` on the loop's next run after this merges (`buildDesk` drops a record of a market the desk no longer reads). The other
+fade / gap desks keep their markets. Test: `tests/edge-desks-2.test.mjs`.
+
+**Round-number fade on five markets** (25 Nov 2026, owner: "Round-number fade trades remove gold silver nzdusd usdjpy eurjpy"). `council/edge-desks-2.mjs` `ROUND_MARKETS` = the study's ten markets less
+those five = EUR/USD, GBP/USD, AUD/USD, USD/CAD, USD/CHF; `DESKS2.roundfade.markets` reads them (the round levels in play are the forex 0.0050 ones). The five markets' records leave
+`roundfade/desk.json` on the loop's next run after this merges. Test: `tests/edge-desks-2.test.mjs`.
+
+**Break fade without gold** (25 Nov 2026, owner: "Brake fade remove gold" = the Break fade desk). `council/edge-desks-2.mjs` `BREAK_MARKETS` = the study's ten markets less gold (nine);
+`DESKS2.fade.markets` reads them; gold's records leave `fade/desk.json` on the loop's next run after this merges. Note: the Lyriac desk still trades its gold breakout (a different rule).
+Test: `tests/edge-desks-2.test.mjs`.

@@ -43,6 +43,10 @@ import { nyParts } from '../ict/calendar.mjs';
 import { toArrays, prep, atr as engAtr, sma as engSma, atrPct as engAtrPct, sig as engSig } from '../research/edge/auto-researcher/engine.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
+export const FVG_MARKETS = STUDY_MARKETS.filter((m) => m !== 'gbpusd');   // the FVG return desk: GBP/USD left it (owner, 25 Nov 2026)
+export const ROUND_MARKETS = STUDY_MARKETS.filter((m) => !['xau', 'xag', 'nzdusd', 'usdjpy', 'eurjpy'].includes(m));   // the Round-number fade desk: gold, silver, NZD/USD, USD/JPY and EUR/JPY left it (owner, 25 Nov 2026)
+export const BREAK_MARKETS = STUDY_MARKETS.filter((m) => m !== 'xau');   // the Break fade desk: gold left it (owner, 25 Nov 2026)
+export const BOX_MARKETS = STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m));   // the Box fade desk: gold, silver and USD/CAD left it (owner, 25 Nov 2026)
 const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, usdjpy: 3, audusd: 5, nzdusd: 5, usdcad: 5, usdchf: 5, eurjpy: 3, gbpjpy: 3, audjpy: 3, cadjpy: 3, eurgbp: 5, euraud: 5, nas100: 1, spx500: 1, de40: 1 };
 const fx = (m) => (v) => (+v).toFixed(DEC[m] ?? 5);
 const word = (d) => (d > 0 ? 'buy' : 'sell');
@@ -342,6 +346,8 @@ export const lyriacTrades = (B, { from, market = 'xau' } = {}) => (market === 'x
 // (stop first in one candle), no time limit. Not modelled: the job's 20-a-account cap across markets and its stale-market pause.
 export const DOM = { RR: 2, ATR_K: 0.25, NEAR_ATR: 1, LIFE_S: 24 * 3600, MAX_MARKET: 3 };
 export const DOM_MARKETS = ['xau', 'xag', 'eurusd', 'gbpusd', 'audusd', 'nzdusd', 'usdjpy', 'usdcad', 'usdchf', 'eurjpy', 'gbpjpy', 'audjpy', 'cadjpy', 'eurgbp', 'euraud', 'nas100', 'spx500', 'de40'];
+// the DESK reads eight of the job's eighteen (owner, 25 Nov 2026: EUR/AUD, CAD/JPY, GBP/JPY, USD/CHF, NZD/USD, DAX, S&P 500, silver, EUR/USD and GBP/USD left it); the demo job keeps its list
+export const DOM_DESK_MARKETS = DOM_MARKETS.filter((m) => !['euraud', 'cadjpy', 'gbpjpy', 'usdchf', 'nzdusd', 'de40', 'spx500', 'xag', 'eurusd', 'gbpusd'].includes(m));
 export function domPlan(z, atr, cost) {   // the job's plan(), the same arithmetic
   const s = z.side === 'buy' ? 1 : -1, entry = s > 0 ? z.top : z.bot, pad = cost / 2 + DOM.ATR_K * atr, stop = s > 0 ? z.bot - pad : z.top + pad, risk = Math.abs(entry - stop);
   if (!(risk > 0)) return null;
@@ -388,16 +394,16 @@ export function domTrades(B, { from, market = 'xau' } = {}) {
 // the studies' own way)
 const PAPER = ' Nothing is traded and results are before costs; a paper record of the rule, not a trade signal.';
 export const DESKS2 = {
-  fade: { tfs: ['5m'], markets: STUDY_MARKETS, read: fadeTrades, note: 'Break fade: the first M15 structure break faded at the next 5-minute open, stop 1 ATR, 2R, out after a day (grid7-wide-fade, cell m15 none atr 2R all), on ten markets.' + PAPER },
+  fade: { tfs: ['5m'], markets: BREAK_MARKETS, read: fadeTrades, note: 'Break fade: the first M15 structure break faded at the next 5-minute open, stop 1 ATR, 2R, out after a day (grid7-wide-fade, cell m15 none atr 2R all), on nine markets (not gold).' + PAPER },
   bigfade: { tfs: ['5m'], markets: STUDY_MARKETS, read: bigTrades, note: 'Big-candle fade: an M15 candle with a body over 1.5 ATR and no break the same way, faded to its 50 % (big-candle-fade, cell m15 k1.5 nobreak half), on ten markets.' + PAPER },
-  roundfade: { tfs: ['5m'], markets: STUDY_MARKETS, read: roundTrades, note: 'Round-number fade: an M15 close beyond a round level faded outside 07-17 UTC, 2R (round-number-breaks, cell fade other 2R), on ten markets.' + PAPER },
-  boxfade: { tfs: ['5m'], markets: STUDY_MARKETS, read: boxTrades, note: 'Box fade: an M5 box close-out of the H1-M15-M5 box chain faded outside 07-17 UTC, 1R (fade-breaks-holdout, rule F1), on ten markets.' + PAPER },
-  fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
+  roundfade: { tfs: ['5m'], markets: ROUND_MARKETS, read: roundTrades, note: 'Round-number fade: an M15 close beyond a round level faded outside 07-17 UTC, 2R (round-number-breaks, cell fade other 2R), on five markets (EUR/USD, GBP/USD, AUD/USD, USD/CAD, USD/CHF).' + PAPER },
+  boxfade: { tfs: ['5m'], markets: BOX_MARKETS, read: boxTrades, note: 'Box fade: an M5 box close-out of the H1-M15-M5 box chain faded outside 07-17 UTC, 1R (fade-breaks-holdout, rule F1), on seven markets.' + PAPER },
+  fvg: { tfs: ['5m'], markets: FVG_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on nine markets (not GBP/USD).' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
   nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s Nasdaq 100 leads (stretch, breakout and big-candle combinations) and the Nasdaq breakout of the day, each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
   zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: turnaround Tuesday on the Nasdaq 100: buy the close of a first trading day of the week that fell more than 1 %, out at the next trading day\'s close (turnaround-tuesday, rule R2). Before costs.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
-  dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
+  dom: { tfs: ['5m'], markets: DOM_DESK_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on eight of its markets (gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP and the Nasdaq 100). It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };
 export const KINDS2 = Object.keys(DESKS2);
