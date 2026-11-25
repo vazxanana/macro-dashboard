@@ -1089,35 +1089,48 @@
     "stopCheckedAt": "2026-11-24T23:25:51.000Z",
     "brokerStop": 1.09595,
     "closedAt": "2026-11-25T00:25:15.000Z"
+   },
+   "eqx:fade:gbpusd:fade-m15-b1795566600": {
+    "positionId": "51260174",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 800000,
+    "lots": 0.08,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-25T00:40:00.000Z",
+    "councilEntry": 1.31084,
+    "stop": 1.310441,
+    "t1": 1.311637,
+    "riskCash": 4.97,
+    "margin": 20.98,
+    "mark": 1.31104,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31107,
+    "slipR": 0.576,
+    "lagSec": 600,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-25T00:40:00.000Z",
+    "brokerStop": 1.31047
    }
   },
   "day": {
    "date": "2026-11-25",
    "startBalance": 497.82,
    "lastBalance": 497.04,
-   "ids": [],
+   "ids": [
+    "51260174"
+   ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 497.04 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 497.04 · 1 open",
   "skipped": {},
   "wait": {
-   "eqx:fade:audusd:fade-m15-b1795535100": {
-    "why": "daily loss stop (95.0% down today)",
-    "n": 0,
-    "at": "2026-11-24T16:43:28.000Z"
-   },
-   "eqx:fvg:fvg-h1-b1795395600-1795536900": {
-    "why": "daily loss stop (95.0% down today)",
-    "n": 0,
-    "at": "2026-11-24T17:13:31.000Z"
-   },
-   "eqx:fade:fade-m15-b1795545900": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 13.39, 2.7% of the balance (cap 2%); a bigger demo balance fixes this",
-    "n": 0,
-    "at": "2026-11-24T19:34:19.000Z"
-   },
    "eqx:fvg:fvg-h1-b1795392000-1795545900": {
     "why": "XAUUSD: even the minimum lot (0.01) risks 31.24, 6.2% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
@@ -1130,14 +1143,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 497.04,
-  "lastRun": "2026-11-25T00:35:33.000Z"
+  "lastRun": "2026-11-25T00:40:27.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T13:35:16.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:44 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:44:58.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2622,6 +2630,11 @@
    "at": "2026-11-25T00:25:15.000Z",
    "msg": "EURUSD position 51247620 closed at the broker",
    "trade": "eqx:fade:eurusd:fade-m15-b1795562100"
+  },
+  {
+   "at": "2026-11-25T00:40:00.000Z",
+   "msg": "opened buy GBPUSD 0.08 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795566600"
   }
  ],
  "limits": {
@@ -2637,7 +2650,7 @@
    "ict": 0.002,
    "council": 0.0002,
    "mosha6": 0.0025,
-   "eqx": 0.0025
+   "eqx": 0.01
   },
   "maxOpenRisk": 0.5,
   "minLot": true,
@@ -2714,15 +2727,15 @@
   ]
  },
  "execution": {
-  "n": 5,
-  "meanSlipR": 0.384,
-  "medianSlipR": 0.33,
+  "n": 6,
+  "meanSlipR": 0.416,
+  "medianSlipR": 0.432,
   "worstSlipR": 1.352,
   "medianLagSec": 26,
   "bySymbol": {
    "GBPUSD": {
-    "n": 2,
-    "meanSlipR": 0.432
+    "n": 3,
+    "meanSlipR": 0.48
    },
    "NZDUSD": {
     "n": 1,
