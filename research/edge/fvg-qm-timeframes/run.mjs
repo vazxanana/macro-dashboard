@@ -145,8 +145,8 @@ export function main() {
   const praw = tests.map((t) => oneSided(t.pooled.net.tMonth, t.pooled.net.pMonth)), hp = K.holm(praw);
   tests.forEach((t, i) => { t.pRaw = r4(praw[i]); t.holmP = r4(hp[i]); const v = judge(t, hp[i]); t.lines = v.lines; t.pass = v.pass; });
   const verdict = tests.some((t) => t.pass) ? 'PASS' : tests.some((t) => t.pooled.net.n >= 100) ? 'FAIL' : 'INCONCLUSIVE';
-  const line = (t) => `${t.id} ${f(t.pooled.net.meanR)}R (n ${t.pooled.net.n}, month t ${ft(t.pooled.net.tMonth)})`;
-  const headline = `Pooled holdout, R a trade after costs: ${tests.map(line).join('; ')}.`;
+  const line = (t) => `${t.id} ${f(t.pooled.net.meanR)} (n ${t.pooled.net.n})`;
+  const headline = `Holdout R a trade after costs: ${tests.map(line).join(', ')}; ${verdict === 'PASS' ? 'a reading passes' : 'none passes'}.`;
   const plain = tests.map((t) => `${t.id} ${t.name}: before costs ${f(t.pooled.gross.meanR)}R, after ${f(t.pooled.net.meanR)}R; Set A ${f(t.sets.A.net.meanR)}R (n ${t.sets.A.net.n}), Set B ${f(t.sets.B.net.meanR)}R (n ${t.sets.B.net.n}).`);
   const res = { study: 'fvg-qm-timeframes', built: '2026-11-25', verdict, headline, params: P, sets: Object.fromEntries(Object.entries(SETS).map(([k, v]) => [k, { markets: v.markets, from: v.from, to: v.to === Infinity ? null : v.to }])), costs: K.COSTS, plain,
     tests: tests.map(({ trades, ...t }) => t) };

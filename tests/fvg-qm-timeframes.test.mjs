@@ -64,6 +64,7 @@ test('RESULT.md says what result.json says, and every stored trade has its stop 
   const md = fs.readFileSync(new URL('RESULT.md', DIR), 'utf8');
   assert.match(md.split('\n')[2], new RegExp(`^\\*\\*Verdict: ${res.verdict}\\.`));
   assert.equal(res.tests.length, 5);
+  assert.equal(res.verdict, 'FAIL');
   assert.equal(res.verdict === 'PASS', res.tests.some((t) => t.pass));
   const tj = JSON.parse(fs.readFileSync(new URL('trades.json', DIR)));
   const c = Object.fromEntries(tj.cols.map((k, i) => [k, i]));

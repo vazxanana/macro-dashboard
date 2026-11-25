@@ -7099,3 +7099,15 @@ shared with this session). Tests: `tests/auto-researcher.test.mjs` (7).
 
 ## The auto-researcher's USD/CHF lead at the broker's own ticks (25 Nov 2026)
 `research/edge/usdchf-blk-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report`, MEANING.md, RESULT.md, result.json). The researcher's one lead (USD/CHF, the 19:00 UTC H1 close beyond the previous 3 candles' range faded at the 20:00 open, stop 1 ATR, target 0.5R, out at 00:00 UTC; +0.081R on mid candles) filled at the demo broker's bid / ask, 185 orders 2023-12 to 2026-11 (every order quoted and resolved). **FAIL**: −0.011R a trade after commission (month t −0.26); tick minus mid −0.059R (month t −2.10). 138 of 185 trades were open inside the 21:00-22:59 UTC rollover and made −0.076R against +0.179R for the 47 that were not (found after the result, not a rule). No forward record, no variants on these years. A lead of the auto-researcher must be re-priced at the broker's quotes before anything else. Test: `tests/usdchf-blk-exec.test.mjs`.
+
+## The FVG tap after a continuation move, other timeframes, on the holdout (25 Nov 2026, owner's chart idea: "FVG tap after continue move, QM, entry, target low")
+`research/edge/fvg-qm-timeframes/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, MEANING.md, result.json, trades.json). The
+follow-up of `fvg-qm-continuation` (H1 only, five markets 2010 on, FAIL: that data is spent for this idea and is NOT loaded here). Five fixed
+readings with the owner's parts kept (continuation BO on the gap timeframe, FVG formed in the move, tap, QM or lower-timeframe CHoCH, stop past the
+pullback extreme + one cost, target the move's low, 1R minimum, one position at a time, 240 gap-candles hold): R1 H4 gap + H1 QM, R2 H4 + H1 CHoCH,
+R3 M15 + M5 QM, R4 M15 + M5 CHoCH, R5 H1 gap + H1 QM with the zone-reach clause dropped. Judged on the untouched holdout (gold, EUR/USD, GBP/USD,
+USD/JPY, AUD/USD 2005-2009; NZD/USD, USD/CAD, USD/CHF, EUR/JPY, silver 2005 to now; gold and silver start in 2006; Set B costs ASSUMED), pooled,
+month-sum t, Holm over five, bar: mean > 0 in both sets and both halves, 2x costs, 100+ trades. **FAIL, 0 of 5**: R1 -0.035R (n 418, month t -0.44),
+R2 -0.064R (n 1,003, -1.19), R3 -0.097R (n 3,301, -3.79), R4 -0.099R (n 8,751, -6.11), R5 +0.042R (n 180, t 0.40, Set A -0.196R). Before costs every
+reading is about zero (-0.03 to +0.09R). Not an edge; no variants on these years. Nothing live changed. The candle cache was rebuilt in the session
+(`fetch-cache.mjs`, EDGE_DATA). Test: `tests/fvg-qm-timeframes.test.mjs`.
