@@ -160,12 +160,13 @@ export const groupOf = (g) => [g.mk, g.trig.map((t) => t.kind + (t.follow === un
 
 // ─── the worker ───
 export async function run(worker, outDir, minutes, cacheDir) {
-  const t0 = Date.now(), file = path.join(outDir, `worker-${worker}.json`); fs.mkdirSync(outDir, { recursive: true });
+  const t0 = Date.now(), LANE = +(process.env.LANE || 0), file = path.join(outDir, `worker-${worker}${LANE ? '-' + LANE : ''}.json`);   // lane 0 = the file as before; lanes 1-3 are extra processes of one worker on the same runner (only the seed and the file differ)
+  fs.mkdirSync(outDir, { recursive: true });
   let S = { version: VERSION, worker, started: new Date().toISOString(), tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0, groups: {}, leads: [], looks: [], chunks: 0 };
   try { const prev = JSON.parse(fs.readFileSync(file, 'utf8')); if (prev.version === VERSION) S = { ...prev, chunks: prev.chunks + 1 }; } catch {}
   const D = {}; for (const mk of MARKETS) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
   const have = MARKETS.filter((m) => D[m] && D[m].n > 5000); if (!have.length) throw new Error('no candles');
-  const r = rng(worker * 1000003 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); S.chanceCandidates = +(S.tries * 0.0013 * 0.07).toFixed(1); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
+  const r = rng(worker * 1000003 + LANE * 104729000 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); S.chanceCandidates = +(S.tries * 0.0013 * 0.07).toFixed(1); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
   let lastSave = Date.now();
   while (Date.now() - t0 < minutes * 60e3) {
     for (let q = 0; q < 200; q++) {
@@ -190,7 +191,7 @@ export async function run(worker, outDir, minutes, cacheDir) {
 
 // every worker's file in one dir -> the totals and the leads (a C pass that also clears Holm over every C look made)
 export function report(dir) {
-  const W = fs.readdirSync(dir).filter((f) => /^worker-\d+\.json$/.test(f)).map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
+  const W = fs.readdirSync(dir).filter((f) => /^worker-\d+(-\d+)?\.json$/.test(f)).map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
   const T = { workers: W.length, tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0 }, looks = [];
   for (const w of W) { T.tries += w.tries; T.survivedA += w.survivedA; T.candidates += w.candidates; T.cLooks += w.cLooks; for (const l of w.looks) looks.push({ ...l, worker: w.worker }); }
   T.chanceCandidates = +(T.tries * 0.0013 * 0.07).toFixed(1);

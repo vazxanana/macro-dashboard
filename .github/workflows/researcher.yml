@@ -3,7 +3,7 @@ name: Researcher (nine workers, research only)
 # research/edge/auto-researcher (PREREGISTRATION.md): nine seeded searchers over rule combinations on H1 OANDA candles, three
 # stages (search 2005-14, validate 2015-19, holdout 2020 on), every try counted, results in council-data research/auto/. Paper
 # research only: nothing is traded, alerted or copied and no council member reads the files. Free runner minutes (public
-# repository). Each worker keeps itself alive like the council loop: a run works for about 5.5 hours, saves, then dispatches
+# repository). Each worker runs four processes on its 4-core runner and keeps itself alive like the council loop: a run works for about 5.5 hours, saves, then dispatches
 # its own next run (workflow_dispatch from GITHUB_TOKEN is allowed). To stop: cancel the runs (a cancelled run never
 # dispatches) or set the repository variable RESEARCHER_OFF to 1.
 on:
@@ -89,7 +89,16 @@ jobs:
           mkdir -p data/research/auto
           end=$(( $(date +%s) + 19200 ))   # 320 minutes
           while [ $(( end - $(date +%s) )) -gt 1800 ]; do
-            node --max-old-space-size=3000 research/edge/auto-researcher/engine.mjs run "$W" data/research/auto 25 || echo "engine run failed, trying again"
+            # four processes a runner (a 4-core machine ran one): lane 0 is the worker's own file, lanes 1-3 add worker-<W>-<lane>.json
+            for L in 0 1 2 3; do
+              if [ "$L" != 0 ]; then
+                # the other lanes start once lane 0 has the candle files (up to 15 minutes), so they never read a half-written file
+                n=0; while [ "$(ls "$RESEARCH_CACHE"/*-1h.json.gz 2>/dev/null | wc -l)" -lt 10 ] && [ $n -lt 90 ]; do sleep 10; n=$((n+1)); done
+              fi
+              LANE=$L node --max-old-space-size=2500 research/edge/auto-researcher/engine.mjs run "$W" data/research/auto 25 > "$RUNNER_TEMP/lane-$L.log" 2>&1 &
+            done
+            wait
+            tail -n 2 "$RUNNER_TEMP"/lane-*.log
             node council/datasync.mjs data save "Researcher worker $W $(date -u +%Y-%m-%dT%H:%MZ)" research/auto || echo "save failed"
           done
 
