@@ -18,7 +18,7 @@ export const FAMILY = { 1: ['brk', 'fade', 'eg'], 2: ['pull', 'dev'], 3: ['big',
   6: ['wild'], 7: ['wild'], 8: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 9: ['big', 'blk', 'sweep'],
   // 25 Nov 2026 (owner: "one worker just for NQ try all the edges possible and do combinations"): worker 10 = NAS100 only, every trigger kind, one or two combined
   10: ['nq'] };
-export const NQ_WORKER = 10, NQ_COST = 2.7e-5;   // the demo's quoted NAS100 spread as a share of price (tick probe, index-vol-breakout-hourcost); no commission
+export const NQ_WORKER = 10, NQ_COST = 0;   // owner, 25 Nov 2026: "no cost because will be futures": NQ results are BEFORE costs (futures still pay a tick and a commission; a lead is re-priced at real quotes before anything else)
 const ALLK = ['brk', 'fade', 'pull', 'big', 'blk', 'dev', 'eg', 'sweep'];
 export const SPACE = {
   N: [5, 8, 10, 15, 20, 30, 50, 80, 120], fast: [5, 10, 20, 30], slow: [50, 100, 150, 200], rsi: [20, 25, 30, 35, 65, 70, 75, 80],
@@ -68,7 +68,7 @@ const atrPct = (D) => cache(D, 'atrpct', () => { const a = atr(D), o = new Float
 export function prep(D, mk) {
   D.mk = mk; D.ind = {}; D.hour = new Uint8Array(D.n); D.dow = new Uint8Array(D.n); D.month = new Int32Array(D.n);
   for (let i = 0; i < D.n; i++) { const d = new Date(D.t[i] * 1000); D.hour[i] = d.getUTCHours(); D.dow[i] = d.getUTCDay(); D.month[i] = d.getUTCFullYear() * 12 + d.getUTCMonth(); }
-  D.cost = K.COSTS[mk]; if (mk === 'nas100') { D.costRel = NQ_COST; D.cost = 0; }
+  D.cost = K.COSTS[mk]; if (mk === 'nas100') { D.costRel = NQ_COST; D.cost = 0; }   // a share of price when NQ_COST is set, none by the owner's word
   const find = (x) => { let lo = 0, hi = D.n; while (lo < hi) { const m = (lo + hi) >> 1; if (D.t[m] < x) lo = m + 1; else hi = m; } return lo; };
   D.idx = { A: [find(WIN.A[0]), find(WIN.A[1])], B: [find(WIN.B[0]), find(WIN.B[1])], C: [find(WIN.C[0]), D.n] };
   return D;

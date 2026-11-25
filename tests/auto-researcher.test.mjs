@@ -75,11 +75,12 @@ test('the report adds the workers up; a lead needs the C bar AND Holm over every
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('worker 10 trades NAS100 only, every trigger kind alone or two together, and an index pays a share of its price', () => {
+test('worker 10 trades NAS100 only, every trigger kind alone or two together, and an index cost is a share of its price (none now)', () => {
   const r = E.rng(3), seen = new Set(); let two = 0;
   for (let i = 0; i < 600; i++) { const g = E.genome(r, 10); assert.equal(g.mk, 'nas100'); assert.ok(g.stop > 0); assert.ok(g.trig.length === 1 || g.trig.length === 2); two += g.trig.length === 2; g.trig.forEach((t) => seen.add(t.kind)); }
   assert.ok(two > 200 && two < 400); assert.deepEqual([...seen].sort(), ['big', 'blk', 'brk', 'dev', 'eg', 'fade', 'pull', 'sweep']);
-  // the cost is a share of the entry price: the same walk at ten times the level costs ten times as much, so R is the same
+  assert.equal(E.NQ_COST, 0);   // the owner's word: no cost on NQ (futures); results are before costs
+  // a cost, if set, is a share of the entry price: the same walk at ten times the level costs ten times as much, so R is the same
   const mk = (k) => data(walk(9000, 5).map((b) => ({ t: b.t, o: b.o * k, h: b.h * k, l: b.l * k, c: b.c * k })), 'nas100');
   const g = { mk: 'nas100', trig: [{ kind: 'brk', N: 20 }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 1, rr: 2, hold: 24 };
   const a = E.simulate(mk(1), g, 300, 8000), b = E.simulate(mk(10), g, 300, 8000);
