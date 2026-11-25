@@ -104,7 +104,7 @@ test('gold breakout: the study\'s buildDays / vbTrade, day by day', () => {
 });
 
 test('every record: its stop on the losing side, stored by clean(), each id once', () => {
-  for (const [k, d] of Object.entries(D2.DESKS2)) { const L = d.read(B, { from: FROM, market: d.markets[0] === 'usdjpy' ? 'usdjpy' : d.markets[0] === 'nas100' ? 'nas100' : 'xau' }); if (k !== 'jpyvb' && k !== 'nq1') assert.ok(L.length > 0, k + ': no trade on the test market');
+  for (const [k, d] of Object.entries(D2.DESKS2)) { const L = d.read(B, { from: FROM, market: d.markets[0] === 'usdjpy' ? 'usdjpy' : d.markets[0] === 'nas100' ? 'nas100' : 'xau' }); if (k !== 'jpyvb' && k !== 'nq1' && k !== 'zero') assert.ok(L.length > 0, k + ': no trade on the test market');
     const ids = new Set();
     for (const r of L) { assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, `${k}: stop on the wrong side`); assert.ok(!ids.has(r.id), `${k}: id twice`); ids.add(r.id);
       const c = clean(r); assert.ok(c, `${k}: clean() refused a record`); assert.equal(c.kind, r.kind); assert.equal(c.id, r.id);
@@ -115,7 +115,7 @@ test('every record: its stop on the losing side, stored by clean(), each id once
 test('no look-ahead: candles cut at a date give the same trades up to a day before it', () => {
   for (const cut of [T0 + 12.4 * 86400, T0 + 19.7 * 86400]) {
     const Bc = { '5m': M.filter((b) => b.time + 300 <= cut) };
-    for (const [k, d] of Object.entries(D2.DESKS2)) { if (k === 'jpyvb' || k === 'nq1') continue;
+    for (const [k, d] of Object.entries(D2.DESKS2)) { if (k === 'jpyvb' || k === 'nq1' || k === 'zero') continue;
       const key = (r) => [r.id, r.side, r.entry, r.stop, r.target].join('|');
       const A = new Set(d.read(B, { from: FROM, market: 'xau' }).filter((r) => r.t <= cut - 86400).map(key));
       const C = new Set(d.read(Bc, { from: FROM, market: 'xau' }).filter((r) => r.t <= cut - 86400).map(key));

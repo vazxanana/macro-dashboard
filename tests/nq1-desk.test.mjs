@@ -30,7 +30,7 @@ test('the desk is registered and holds the frozen leads of the research', () => 
 
 test('every record: a stop on the losing side, an id once, stored by clean(), kinds of this desk only', () => {
   assert.ok(ALL.length > 10, 'the seeded market must give trades: ' + ALL.length); const ids = new Set();
-  for (const r of ALL) { assert.match(r.kind, /^nq1-l[12456]$/); assert.equal(r.market, 'nas100'); assert.ok(!ids.has(r.id), 'id twice ' + r.id); ids.add(r.id);
+  for (const r of ALL) { assert.match(r.kind, /^nq1-(l[12456]|t1)$/); assert.equal(r.market, 'nas100'); assert.ok(!ids.has(r.id), 'id twice ' + r.id); ids.add(r.id);
     assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, r.id + ': stop on the wrong side'); assert.ok(r.t >= FROM);
     if (r.R != null) assert.ok(Number.isFinite(r.R) && r.endT >= r.t, r.id); const c = clean(r); assert.ok(c, 'clean() refused ' + r.id); assert.equal(c.kind, r.kind); }
 });
@@ -62,11 +62,11 @@ test('wiring: the page, the Equinox tab, the loop, the data check and the record
   assert.ok(clean({ id: 'x', kind: 'nq1-l3', side: 1, entry: 100, stop: 99, t: 1 })); assert.equal(clean({ id: 'x', kind: 'nq1-l3', side: 1, entry: 100, stop: 101, t: 1 }), null);
 });
 
-test('ZERO: turnaround Tuesday and the breakout of the day, each with a stop below the entry, stored by clean()', () => {
+test('the Nasdaq breakout of the day is an NQ1 reading; ZERO is turnaround Tuesday alone, each with a stop below the entry, stored by clean()', () => {
   const Z = D2.zeroTrades(B, { from: FROM, market: 'nas100' }); assert.deepEqual(Object.keys(D2.DESKS2).includes('zero'), true); assert.equal(D2.zeroTrades(B, { from: FROM, market: 'xau' }).length, 0);
   const ids = new Set();
-  for (const r of Z) { assert.match(r.kind, /^zero-(tue|t1)$/); assert.ok(!ids.has(r.id)); ids.add(r.id); assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, r.id); assert.equal(r.target, null); assert.ok(clean(r), 'clean() refused ' + r.id); }
-  assert.ok(Z.some((r) => r.kind === 'zero-t1'), 'the seeded market must give breakout days');
+  for (const r of Z) { assert.equal(r.kind, 'zero-tue'); assert.ok(!ids.has(r.id)); ids.add(r.id); assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, r.id); assert.equal(r.target, null); assert.ok(clean(r), 'clean() refused ' + r.id); }
+  const T1 = ALL.filter((r) => r.kind === 'nq1-t1'); assert.ok(T1.length > 5, 'the seeded market must give breakout days'); for (const r of T1) { assert.equal(r.target, null); assert.ok(r.stop < r.entry || r.stop > r.entry); assert.ok(clean(r)); assert.match(r.id, /^nas100:nq1-[bs]\d+$/); }
   const rd = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
   assert.match(rd('equinox.html'), /id="v-zero"/); assert.match(rd('equinox.html'), /"k": "zero", "name": "ZERO"/); assert.match(rd('assets/desk-trades.js'), /zero: \{ file: 'zero\/desk\.json'/);
   assert.match(rd('.github/workflows/council.yml'), /--only [a-z0-9,]*zero/); assert.match(rd('council/datahealth.mjs'), /zero\/desk\.json/);
