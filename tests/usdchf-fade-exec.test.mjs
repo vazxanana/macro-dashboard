@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import { entryOf, tickOrder, verdictOf, overRoll, inBand, RR, N_MIN, SYM } from '../research/edge/usdchf-fade-exec/run.mjs';
 import { G, FROM, TO } from '../research/edge/usdchf-fade-exec/orders.mjs';
 const D = 'research/edge/usdchf-fade-exec/';
+const R = JSON.parse(fs.readFileSync(D + 'result.json', 'utf8'));
 test('pre-registration names the rule, the test and the bars', () => {
   const p = fs.readFileSync(D + 'PREREGISTRATION.md', 'utf8');
   for (const w of ['127 orders', 'month t >= 2', 'at least 100', 'one run', 'commission', 'closing side']) assert.ok(p.toLowerCase().includes(w.toLowerCase()), w);
@@ -33,4 +34,11 @@ test('verdict rules and rollover helpers', () => {
   assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 127, mean: 0.2, monthT: 2.1 } }), 'PASS');
   assert.ok(inBand(21 * 3600) && !inBand(19 * 3600));
   assert.ok(overRoll(20 * 3600, 24 * 3600) && !overRoll(10 * 3600, 14 * 3600));
+});
+test('result: TOO FEW as pre-registered, mid positive, the broker takes it away', () => {
+  const md = fs.readFileSync(D + 'RESULT.md', 'utf8').split('\n');
+  assert.match(md[2], /^\*\*Verdict: TOO FEW\./);
+  assert.equal(R.primary.orders, 127); assert.equal(R.primary.entryUnresolved, 33); assert.equal(R.primary.exitUnresolved, 0);
+  assert.ok(R.primary.mid.mean > 0.2 && R.primary.net.mean < 0 && R.primary.net.n === 94);
+  assert.ok(fs.readFileSync(D + 'RESULT.md', 'utf8').includes('## What it means'));
 });
