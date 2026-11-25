@@ -40,6 +40,11 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .meta{grid-column:2/4;color:var(--dim);font:11px var(--mono);font-weight:400}
 .lap-b{color:var(--laptop)}
 .st{display:flex;gap:3px;margin-top:3px}.st i{width:9px;height:9px;border-radius:2px;background:var(--line)}.st i.on{background:var(--cloud)}.st i.on.l{background:var(--laptop)}
+.recap{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+.recap h2{font-size:.72rem;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-family:var(--mono);font-weight:600}
+.recap p{margin:4px 0;max-width:80ch}
+.recap ul{margin:6px 0 0;padding-left:18px;color:var(--dim)}
+html.widget .recap ul{display:none}
 .foot{margin-top:12px;color:var(--dim);font-size:12px;max-width:80ch}
 #gate{padding:40px 0;color:var(--dim)}
 #toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#f2f3f5;color:#16181c;padding:9px 14px;border-radius:10px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
@@ -56,6 +61,7 @@ html.widget .row{padding:12px}html.widget .num{font-size:20px}
 <div id="gate" hidden>Sign in on the desk first, then open this page again. <a href="/market-structure.html">Go to the desk</a></div>
 <main id="app" hidden>
 <div class="tot" id="tot"></div>
+<section class="recap" id="recap" aria-live="off"><h2>What they have done so far</h2><p>Reading the research files…</p></section>
 <div class="btns"><button id="b-coffee" type="button">☕ Coffee break</button><button id="b-dance" type="button" aria-pressed="false">🕺 Dance party</button><button id="b-race" type="button" aria-pressed="false">🏁 Race</button><button id="b-shake" type="button">📣 Wake everyone</button><button id="b-widget" type="button" aria-pressed="false">▢ Widget view</button></div>
 <div class="grid">
  <div id="stage"><canvas id="c" aria-label="3D view of ten research agents at desks"></canvas><div id="tags"></div><div class="hint">drag to orbit · scroll to zoom · tap an agent to poke it</div></div>
@@ -73,7 +79,7 @@ var FAM = ['break · fade · engulf','pullback · deviation','big candle · bloc
 var LAP = [0,0,1,1,1,1,0,0,0,0];            // workers whose shard 2 (lanes 8-11) runs on the laptop
 var COL = [0xe0675a,0x5fb3d9,0x8bc96a,0xe8c25a,0xb48be0,0xe58fb8,0x5fd1c4,0xe89a5a,0x9aa8e6,0xf2d46b];
 var LANES = [11,11,11,11,11,11,11,11,11,11], FRESH = 40 * 60e3, EVERY = 180e3;
-var D = NAMES.map(function (n, i) { return { id: i + 1, name: n, fam: FAM[i], lap: !!LAP[i], tries: 0, A: 0, cand: 0, looks: 0, lanes: {}, rate: 0, prev: null, alive: 0, last: 0 }; });
+var D = NAMES.map(function (n, i) { return { id: i + 1, name: n, fam: FAM[i], lap: !!LAP[i], tries: 0, A: 0, cand: 0, looks: 0, chance: 0, since: 0, lanes: {}, rate: 0, prev: null, alive: 0, last: 0 }; });
 var $ = function (id) { return document.getElementById(id); };
 var fmt = function (n) { return n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : String(Math.round(n)); };
 var kmh = function (d) { return Math.round(d.rate * 3.6).toLocaleString(); };
@@ -97,12 +103,12 @@ function files() {
 }
 function refresh() {
   var list = files(), now = Date.now(), done = 0, fail = 0;
-  D.forEach(function (d) { d.next = { tries: 0, A: 0, cand: 0, looks: 0, lanes: {}, rate: 0, alive: 0, last: 0 }; });
+  D.forEach(function (d) { d.next = { tries: 0, A: 0, cand: 0, looks: 0, chance: 0, since: 0, lanes: {}, rate: 0, alive: 0, last: 0 }; });
   function worker() {
     var f = list.shift(); if (!f) return Promise.resolve();
     return get(f[1]).then(function (j) {
       if (!j) return; done++; var n = D[f[0]].next, u = Date.parse(j.updated || j.started), s = Date.parse(j.started);
-      n.tries += j.tries || 0; n.A += j.survivedA || 0; n.cand += j.candidates || 0; n.looks += j.cLooks || 0;
+      n.chance += j.chanceCandidates || 0; n.since = n.since ? Math.min(n.since, s) : s; n.tries += j.tries || 0; n.A += j.survivedA || 0; n.cand += j.candidates || 0; n.looks += j.cLooks || 0;
       n.rate += (j.tries || 0) / Math.max(60, (u - s) / 1000); n.last = Math.max(n.last, u);
       var fresh = now - u < FRESH; n.lanes[f[2]] = fresh; if (fresh) n.alive++;
     }, function () { fail++; }).then(worker);
@@ -111,9 +117,9 @@ function refresh() {
     if (!done) { setLive('err', fail ? 'could not read the research files' : 'no research files yet'); return; }
     D.forEach(function (d) {
       var n = d.next; if (d.prev && n.tries >= d.prev.tries && now - d.prev.at > 20e3) { var dr = (n.tries - d.prev.tries) / ((now - d.prev.at) / 1000); if (dr > 0) n.rate = dr; else n.rate = d.rate * .6; } else if (d.prev && n.tries === d.prev.tries) n.rate = d.rate * .6;
-      d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.at = now;
+      d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.chance = n.chance; d.since = n.since; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.at = now;
     });
-    setLive('on', 'live · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); drawRows();
+    recap(); setLive('on', 'live · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); drawRows();
   });
 }
 function setLive(c, t) { var e = $('live'); e.className = 'live ' + c; $('livet').textContent = t; }
@@ -233,6 +239,16 @@ function paint() {
     c.fillStyle = '#3f9d78'; p.lines.forEach(function (l, k) { c.fillText(l, 10, 100 + k * 12); }); p.tex.needsUpdate = true;
   });
   $('tot').innerHTML = '<div><b>' + Math.round(sum / 1000).toLocaleString() + ' km</b><span>distance, all agents</span></div><div><b>' + Math.round(rate * 3.6).toLocaleString() + ' km/h</b><span>speed together</span></div><div><b>' + fmt(D.reduce(function (a, d) { return a + d.A; }, 0)) + '</b><span>passed stage A</span></div><div><b>' + D.reduce(function (a, d) { return a + d.looks; }, 0).toLocaleString() + '</b><span>holdout looks</span></div><div><b>' + D.reduce(function (a, d) { return a + d.alive; }, 0) + '</b><span>lanes working now</span></div>';
+}
+function recap() {
+  var tr = 0, A = 0, c = 0, ch = 0, lk = 0, since = 0, top = null, busy = null;
+  D.forEach(function (d) { tr += d.tries; A += d.A; c += d.cand; ch += d.chance; lk += d.looks; if (d.since && (!since || d.since < since)) since = d.since; if (d.tries && (!top || d.tries > top.tries)) top = d; if (d.tries && (!busy || d.looks > busy.looks)) busy = d; });
+  if (!tr) return;
+  var days = since ? ((Date.now() - since) / 86400e3) : 0, el = days ? ' in ' + (days < 1 ? Math.round(days * 24) + ' hours' : days.toFixed(1) + ' days') : '';
+  $('recap').innerHTML = '<h2>What they have done so far</h2>' +
+    '<p><b>' + fmt(tr) + ' rules tried' + el + '</b> on ten markets of history: ' + fmt(A) + ' passed the first test (2005–2014), ' + fmt(c) + ' went on to the second (2015–2019), and ' + lk.toLocaleString() + ' were looked at on the untouched years from 2020.</p>' +
+    '<p>Chance alone would let about ' + fmt(ch) + ' of the ' + fmt(c) + ' candidates through, so a candidate is not a find. A <b>lead</b> has to clear a stricter test on 2020 onwards, and a lead is still not an edge: it gets re-priced at real market quotes and then a forward record. The last full report (25 Nov) listed 10 leads, all long positions on the Nasdaq 100, before costs.</p>' +
+    '<ul><li>Furthest: ' + top.name + ' with ' + Math.round(top.tries / 1000).toLocaleString() + ' km (' + fmt(top.tries) + ' tries)</li><li>Most holdout looks: ' + busy.name + ' with ' + busy.looks + '</li><li>' + D.reduce(function (a, d) { return a + d.alive; }, 0) + ' lanes saved in the last 40 minutes</li></ul>';
 }
 function buttons() {
   $('b-coffee').onclick = function () { mode.coffee = performance.now() + 8000; toast('☕ Everyone drinks coffee. Typing speed ×2.2 for 8 seconds (on screen only).'); };
