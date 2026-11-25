@@ -401,6 +401,12 @@ const USER_RULES = [
   { id: 'shadow-mirror-off', apply: (c) => { c.mirrorShadow = false; },
     change: 'cTrader mirror: no new shadow copies on any demo account (owner, 24 Nov: "lyriac alone"); the Shadows + LIT account takes the Lyriac jobs only',
     why: 'Owner request of 24 Nov 2026. Demo only. Open shadow copies run to their exits with their stops; the shadow book stays paper. The account then holds the breakout and gotobi demo jobs (Lyriac) alone.' },
+  // lyriac-risk-1 (owner, 24 Nov 2026: "increase the risk of equinox to 1% and Lyriac to 1%"): the two demo jobs that trade
+  // Lyriac's rules (council/vb-demo.mjs, council/gotobi.mjs) risk 1 % of the balance a trade, the most either job allows.
+  // Demo account only. The Equinox copies' 1 % is LIMITS.risk.eqx in council/ctrader-mirror.mjs.
+  { id: 'lyriac-risk-1', apply: (c) => { c.vb = { ...(c.vb || {}), risk: 0.01 }; c.gotobi = { ...(c.gotobi || {}), risk: 0.01 }; },
+    change: 'Lyriac demo risk 0.25% -> 1% a trade (gold and USD/JPY breakout, gotobi fade)',
+    why: 'Owner, 24 Nov 2026: "increase the risk of equinox to 1% and Lyriac to 1%". Demo account only; every order keeps its stop.' },
   // ict-mirror-off (owner, 24 Nov 2026: "Stop ICT copies"): the mirror opens no new ICT copy on any demo account; the ICT desk
   // stays a paper record. Its account (login ending 144) takes the Equinox desks (ctrader-accounts.json book eqx).
   { id: 'ict-mirror-off', apply: (c) => { c.mirrorIct = false; },

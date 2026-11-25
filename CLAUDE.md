@@ -2678,6 +2678,13 @@ crosses and comes back inside the 1.5 s between two looks is not seen: by design
 timeframe from 1 s to a year, Split, touch drawing, the guest's view (no paper, no layout). Not tested: Safari / a real iPhone,
 crypto markets (the exchanges are not reachable from the build sandbox), a real weekend.
 
+## Charts full screen, roomier (25 Nov 2026, owner: "improve the full screen mode more spacious, organised and easy to work")
+Display only, `market-structure.html` (`#ms-cfs-css`, the full-screen block next to `msChartsFs`). Full screen (the browser's or the page's own) now
+has a visible **Exit** button and a **Hide toolbar / Show toolbar** button (`.ch-fs-x`, `.ch-fs-tb`, made by `bar()` on `fullscreenchange` and by the
+page's own full screen; Esc still works; the toolbar comes back on exit), a wide screen no longer keeps the 52 px a phone needs (padding 10 / 14 / 12),
+the toolbar is one non-wrapping row that scrolls sideways (room kept for the two buttons), gaps between charts are 8-10 px, and with the toolbar hidden
+the charts take its row and the buttons shrink to small chips. Checked at 1440 x 900 and 390 x 844. Test: `tests/charts-phone-fs.test.mjs`.
+
 ## Charts on a phone: full screen and the Style panel (20 Nov 2026, owner on an iPhone: "the phone can't read the rest", "I can't find the full screen button")
 Display only, `market-structure.html`. (1) The full-screen button was hidden under 700 px (`.ch-fs`); only the pane-header copy hides
 there now, so the chart toolbar (`#ms-ch-one`, behind the pencil "Draw" toggle on a phone) shows it as its last icon. (2) iPhone Safari
@@ -3496,7 +3503,7 @@ round-number, box fade and USD/JPY breakout are NOT copied), the Mosha 6R patter
 the usual path (stop required, spread skip, `ensureStop`, caps); only a record first written and filled within `EQX.fresh` 1 h and not
 more than `EQX.maxFloat` 0.75R from its entry at the desk's last reading is OPENED (else `noCopy`, kept so an earlier copy follows its
 record); closed ones stay `EQX.keep` 2 days so the copy closes with them; no market = gold; one per desk, market, side and fill time;
-ids `eqx:<desk>:<record id>`. Risk `LIMITS.risk.eqx` 0.25 % of the balance; at most `EQX.maxOpen` 30 eqx positions at once (the
+ids `eqx:<desk>:<record id>`. Risk `LIMITS.risk.eqx` 1 % of the balance (owner, 24 Nov 2026; 0.25 % before); at most `EQX.maxOpen` 30 eqx positions at once (the
 account's 40 cap and the 2 % daily loss stop also apply). `SYMBOLS` gained nzdusd, usdjpy, eurjpy, xag (so `ctrader-symbols.mjs`
 reads their specs; USD/JPY and EUR/JPY leave the yen watch-only list's "never in symbols" rule). Copied only while `eqx` has its own
 account (`eqxHasOwnAccount`). Trader rule `ict-mirror-off` sets `config.mirrorIct = false`: `ictCandidates(ict, false)` marks every
@@ -3570,6 +3577,7 @@ toggle `#ms-alerts` now uses a pulse icon so the bell means notifications only. 
 Audit 9 Nov (`tests/audit-nov9.test.mjs`): `/api/logout` and `/api/sounds` POST refuse a foreign Origin; the notify / sounds / profile Blob reads
 throw on a failed read (they used to return empty, so the next save overwrote the list, the other sound or the photo); veteran
 expectations fill a consensus the calendar posts after the first capture but before the release (never after).
+**Email too (25 Nov 2026, owner: "Email them")**: `POST /api/notify { title, body, email: true }` (the owner's session; Profile → Send a notification has the box "Also email it to everyone who has an email address on file") mails the notice to the owner (`OWNER_EMAIL`, else `GMAIL_USER`) and every enabled member with an address on file, once each, at most 60, through the sign-up senders (`signup.js` `mailer`). Addresses are never logged or returned (counts only: `email { ok, failed, recipients }`); an unreadable member list or a failing sender never loses the notice. No permission filter: a notice by email goes to every address. Test: `tests/notify.test.mjs`.
 
 ## API hardening (9 Nov 2026)
 `api/_guard.js`: one per-IP table of failed password checks shared by `/api/login`, ctrader-link `session`, mcp `mykey` and the
@@ -7031,6 +7039,9 @@ intraday rules as ONE desk (the first tab of `/equinox`):
   then holds the breakout and gotobi jobs only. Undo: a rule setting it true.
 - The standalone `VolBreakout` bots written the same day were removed on the owner's word ("dont do it").
 - First 60-day read (before costs, not evidence): gold breakout 31 trades +18.9R, USD/JPY breakout 29 +0.2R, gotobi 11 +2.7R.
+- **1 % a trade** (owner, 24 Nov 2026: "increase the risk of equinox to 1% and Lyriac to 1%"): Trader rule `lyriac-risk-1` sets
+  `config.vb.risk` and `config.gotobi.risk` to 0.01 (the most either job allows); the Equinox copies' `LIMITS.risk.eqx` is 0.01 too.
+  The mirror's daily loss stop is 2 % of the balance, so two Equinox stop-outs in a UTC day hold its new copies until the next day.
 A paper desk and a demo record of rules whose studies passed; the forward records judge. Tests: `tests/lyriac.test.mjs` (4).
 
 ## Twenty combinations of the owner's methods (24 Nov 2026, owner: "use 20 agents to keep studying, do combinations of the strategies I've given")
@@ -7050,3 +7061,32 @@ loses about 0.05R less than away from one) · `equal-pool-m5-confirm` +0.063 (1,
 −0.121 (2,097, −3.99). The pattern is the one of every earlier grid: about zero before costs, the cost decides, and no key level,
 direction call, session or confluence picks the better trades. Do not re-test variants of these on these years. The agents shared
 one checkout and a three-slot run queue (4 cores); each committed only its own paths.
+
+## Fades inside an H1 DOM zone, and liquidity sweeps as a filter (25 Nov 2026, owner: "test fade m15 inside h1 DOM and check the other edges if we can use liquidity to improve our trades", then "i mean big candle")
+`research/edge/fade-liquidity/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, result.json). The Big-candle fade (M15,
+the desk's 50 % target; gate reproduced exactly) and the Break fade (M15, 1 ATR stop, 2R) on ten markets, each trade tagged from closed
+candles at the signal: fill inside a standing H1 DOM zone (`combo-grid-3` `buildZones('dom')`, by the zone's side against the trade),
+the signal candle's extreme beyond the previous New York day's high / low (`pdl`), beyond the previous 96 M15 candles' extreme (`hi24`),
+beyond the Asia range (`asia`, 07-17 UTC signals). Eight tests (desk x tag), Holm. **FAIL, 0 of 8**: inside a DOM zone the Big-candle
+fade makes -0.263R a trade after costs in 2015-26 (n 26,017) against -0.231R outside: no better (Welch t -1.72), and worse when the
+zone is against the trade (-0.384R, n 3,511). Liquidity sweeps do separate better from worse trades (tagged beats untagged by Welch
+t 3.0-4.8 on `hi24`, `pdl`, `asia`) but every tagged group still loses after costs (Big-candle fade -0.196R to -0.205R; Break fade -0.090R
+to -0.121R). Before costs the Big-candle fade is about +0.18R tagged or not: the cost decides, as in every earlier fade study. A first
+version of the harness dropped zones whose end was not yet known; the cut test caught it (4 tag mismatches) and it was fixed before
+the run counted. Nothing live changed; do not test variants of these tags on these years. Test: `tests/fade-liquidity.test.mjs`.
+
+## The auto-researcher: five workers that never stop (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
+`research/edge/auto-researcher/` (PREREGISTRATION.md committed alone first, `engine.mjs`, `tests/auto-researcher.test.mjs`) and
+`.github/workflows/researcher.yml` (free runner minutes; five matrix jobs; each works about 5.5 hours, saves to council-data
+`research/auto/worker-<n>.json` every 25 minutes and dispatches its own next run; cancel the runs, or set the repository variable
+`RESEARCHER_OFF` to 1, to stop). A seeded generator of rules over H1 OANDA mid candles of ten markets: a trigger (breakout,
+fade, pullback, big candle, block break, deviation, the owner's engulf, sweep; worker 5 combines two) + filters (hour, weekday,
+trend, volatility) + an exit (stop 0.5-3 ATR, target 0-6R, time limit). **Three stages**: A search 2005-14 (n >= 250, +0.04R
+net, month t >= 3), B validation 2015-19 (n >= 100, mean > 0, t >= 1.5, the side-flipped twin negative), C holdout 2020 on,
+ONE look per market / trigger / side group, a **lead** only with t >= 2 AND Holm p < 0.05 over every C look made. Every try is
+counted and the file says how many chance candidates the tries should give; a lead is never an edge (it goes to a pre-registered
+forward record). About 100 tries a second a worker. Read the state: `node research/edge/auto-researcher/engine.mjs report
+<dir with the worker files>`. A first smoke run: 8,600 tries in 90 seconds, 12 survived A, 1 candidate, which failed on C
+(−0.088R, t −1.24). No threshold, grid or window changes while a version runs; a change is `auto-2` and is counted apart.
+Not yet in it: the owner's EF zones, Mosha VR / CF, the iFVG and the Telegram-downloads folder on his laptop (needs the folder
+shared with this session). Tests: `tests/auto-researcher.test.mjs` (7).

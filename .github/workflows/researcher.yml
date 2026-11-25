@@ -1,0 +1,101 @@
+name: Researcher (five workers, research only)
+
+# research/edge/auto-researcher (PREREGISTRATION.md): five seeded searchers over rule combinations on H1 OANDA candles, three
+# stages (search 2005-14, validate 2015-19, holdout 2020 on), every try counted, results in council-data research/auto/. Paper
+# research only: nothing is traded, alerted or copied and no council member reads the files. Free runner minutes (public
+# repository). Each worker keeps itself alive like the council loop: a run works for about 5.5 hours, saves, then dispatches
+# its own next run (workflow_dispatch from GITHUB_TOKEN is allowed). To stop: cancel the runs (a cancelled run never
+# dispatches) or set the repository variable RESEARCHER_OFF to 1.
+on:
+  workflow_dispatch:
+    inputs:
+      worker:
+        description: 'A worker number 1-5, or all'
+        required: false
+        default: 'all'
+
+permissions:
+  contents: write
+  actions: write
+
+env:
+  MD_BASE: ${{ format('{0}/md/', vars.MD_ORIGIN || 'https://aureumdesk.co.uk') }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      workers: ${{ steps.p.outputs.workers }}
+    steps:
+      - id: p
+        env:
+          W: ${{ inputs.worker }}
+        run: |
+          case "$W" in
+            1|2|3|4|5) echo "workers=[$W]" >> "$GITHUB_OUTPUT" ;;
+            *) echo 'workers=[1,2,3,4,5]' >> "$GITHUB_OUTPUT" ;;
+          esac
+
+  work:
+    needs: plan
+    if: vars.RESEARCHER_OFF != '1'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: ${{ fromJSON(needs.plan.outputs.workers) }}
+    concurrency:
+      group: researcher-${{ matrix.worker }}
+      cancel-in-progress: false
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            research/edge
+            council
+            api
+            scripts
+            package.json
+
+      - name: Checkout council data (the researcher's folder only)
+        uses: actions/checkout@v4
+        with:
+          ref: council-data
+          path: data
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /research/auto/*
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: The job's own OANDA candles (falls back to the website's proxy)
+        env:
+          OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}
+          OANDA_ENV: ${{ secrets.OANDA_ENV }}
+        run: sh scripts/own-candles.sh
+
+      - name: Search
+        env:
+          W: ${{ matrix.worker }}
+          RESEARCH_CACHE: ${{ runner.temp }}/auto-cache
+        run: |
+          git -C data config user.name "mosha-council"
+          git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p data/research/auto
+          end=$(( $(date +%s) + 19200 ))   # 320 minutes
+          while [ $(( end - $(date +%s) )) -gt 1800 ]; do
+            node --max-old-space-size=3000 research/edge/auto-researcher/engine.mjs run "$W" data/research/auto 25 || echo "engine run failed, trying again"
+            node council/datasync.mjs data save "Researcher worker $W $(date -u +%Y-%m-%dT%H:%MZ)" research/auto || echo "save failed"
+          done
+
+      - name: Next run
+        if: success() && vars.RESEARCHER_OFF != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          W: ${{ matrix.worker }}
+        run: gh workflow run researcher.yml --ref main -R "${{ github.repository }}" -f worker="$W" || echo "next run not dispatched"
