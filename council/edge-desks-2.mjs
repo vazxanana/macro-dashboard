@@ -15,8 +15,8 @@
 //   goldvb     gold-vol-breakout T1 (as gold-vol-breakout-forward reads it): gold, UTC open +/- 0.5 x the previous folded day's range,
 //              stop back at the open, out at 21:00 UTC
 //   jpyvb      the same rule on USD/JPY (usdjpy-vol-breakout-forward)
-//   nasbrk     the auto-researcher's NAS100 breakout, long (nas100-brk-long-focus): an H1 close above the 20 hours' high, above the
-//              200-hour average, entry 14-21 UTC, stop 1 ATR(14), 4R, out after 96 hours, one position at a time
+//   nq1        the auto-researcher's NAS100 leads as one desk (below)
+//   zero       turnaround Tuesday on the Nasdaq (below)
 // Every signal, stop and exit comes from the study's own exported code (imported, never edited); only the record (id, log, marks,
 // an open trade's reading) is written here. The studies judged trades before costs and so does each desk; the five fade / gap
 // rules lose after costs and the two breakouts are short forward records. PAPER RECORDS ONLY: no order, alert, broker or mirror,
@@ -38,7 +38,9 @@ import * as GO from '../research/edge/gold-vol-breakout-hourcost/original.mjs';
 import { T1 as GOLD_T1 } from '../research/edge/gold-vol-breakout-hourcost/costs.mjs';
 import * as JO from '../research/edge/index-vol-breakout/original.mjs';
 import { K as JPY_K } from '../research/edge/fx-vol-breakout/run.mjs';
-import { toArrays, prep, atr as engAtr, sma as engSma } from '../research/edge/auto-researcher/engine.mjs';
+import * as TT from '../research/edge/turnaround-tuesday/run.mjs';
+import { nyParts } from '../ict/calendar.mjs';
+import { toArrays, prep, atr as engAtr, sma as engSma, atrPct as engAtrPct, sig as engSig } from '../research/edge/auto-researcher/engine.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
 export const BOX_MARKETS = STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m));   // the Box fade desk: gold, silver and USD/CAD left it (owner, 25 Nov 2026)
@@ -211,36 +213,92 @@ function vbDays(Bk, O, desk, market, k, from, sec = 300) {
 export const goldTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau' ? vbDays(toK(B['5m']), GO, 'goldvb', 'xau', GOLD_T1.k, from) : []);
 export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'jpyvb', 'usdjpy', JPY_K, from) : []);
 
-// ─── nasbrk: the auto-researcher's NAS100 breakout, long (nas100-brk-long-focus; owner, 25 Nov 2026: "make it an edge for equinox") ───
-// The rule of the study, signals on H1 candles built from the 5-minute ones (the studies' way): the close of H1 bar i is above the highest
-// high of the 20 bars before it and above the 200-bar average, the NEXT bar opens 14:00-21:59 UTC: long at that open, stop 1 ATR(14)
-// (Wilder, of H1) below it, target 4R, out after 96 hours, one position at a time (a signal waits until the hour after the last
-// trade's exit). The study managed a trade on hourly candles with the stop first when one holds both; the desk reads the 5-minute
-// candles like every desk, so the order inside an hour is read exactly. Before costs (the research ran at none: futures).
-export const NASBRK = { N: 20, ma: 200, hours: [14, 22], stop: 1, rr: 4, hold: 96 };
-export function nasbrkTrades(B, { from, market = 'nas100' } = {}) {
-  if (market !== 'nas100') return [];
-  const M5 = toK(B['5m']); if (M5.length < 3000) return [];
-  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 260) return [];
-  const D = prep(toArrays(H.map((b) => ({ t: b.t, o: b.o, h: b.h, l: b.l, c: b.c }))), market), A = engAtr(D), MA = engSma(D.c, NASBRK.ma);
-  const firstM5 = new Map(); M5.forEach((b, k) => { const h = Math.floor(b.t / 3600) * 3600; if (!firstM5.has(h)) firstM5.set(h, k); });
-  const f = fx(market), id = uniq(), out = []; let freeT = -Infinity;
-  for (let i = Math.max(NASBRK.ma + 10, NASBRK.N); i < D.n; i++) {
+// ─── nq1: the auto-researcher's NAS100 leads as one desk (owner, 25 Nov 2026: "all nasdaq studies put it altogether and call it NQ1", then "NQ1 should be the nasdaq leads") ───
+// Five readings (each its own kind `nq1-l1`, `l2`, `l4`, `l5`, `l6`; the numbers are the leads' numbers on 25 Nov, `l3` and `l7` taken off at the owner's word), ids `nas100:nq1-<reading>-…`): the NAS100 leads the auto-researcher had (Holm over
+// every holdout look below 0.05) on 25 Nov 2026, genomes FROZEN here (a lead found later joins only by a deliberate change). The 20-hour breakout with the trend (the rule of
+// research/edge/nas100-brk-long-focus, `l3`) and the Wed-Fri stretch + big candle (`l7`) were on it and taken off. Turnaround Tuesday was on the desk for a few hours and taken off (it is ZERO); the Nasdaq breakout of the day (index-vol-breakout T1, `nq1-t1`) is on it as an eighth reading, taken off at the
+// owner's word. Left out: the NQ open run (a council system, kept apart) and anything of the ICT desk (a separate edge).
+// A lead reading is read on H1 candles built from the 5-minute ones (closed bars only, thin bars dropped as the engine does) with the
+// engine's own `sig`, `atr`, `sma`, `atrPct`; the entry is the open of the next hour; managed on 5-minute candles like every desk, one
+// position at a time PER READING (a signal waits until the hour after that reading's last exit). Several readings are often long
+// at once: their totals overlap and are NOT additive. Before costs (the research ran at none: futures).
+export const NQ1_LEADS = [
+  { id: 'l1', name: 'Stretch + 10-hour breakout, long', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'brk', N: 10 }], side: 'long', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.7, stop: 1, rr: 4, hold: 48 } },
+  { id: 'l2', name: 'Stretch + 20-hour breakout, long', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'brk', N: 20 }], side: 'long', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.3, stop: 1, rr: 4, hold: 240 } },
+  { id: 'l4', name: 'Double stretch with the trend, 4-hour hold', g: { trig: [{ kind: 'dev', n: 20, z: 1.5, follow: true }, { kind: 'dev', n: 10, z: 2, follow: true }], side: 'both', hours: [15, 21], dows: [1, 2, 3, 4, 5], trend: 'with', vol: 'none', volP: 0.5, stop: 1, rr: 4, hold: 4 } },
+  { id: 'l5', name: 'Double stretch, high volatility, long', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'dev', n: 50, z: 1, follow: true }], side: 'long', hours: null, dows: null, trend: 'with', vol: 'high', volP: 0.7, stop: 0.75, rr: 3, hold: 240 } },
+  { id: 'l6', name: 'Big candle + stretch', g: { trig: [{ kind: 'big', k: 1, follow: true }, { kind: 'dev', n: 20, z: 2.5, follow: true }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 0.75, rr: 3, hold: 240 } },
+];
+const trigText = (tr, D, i, s, f, cache) => {
+  if (tr.kind === 'brk') { let v = s > 0 ? -Infinity : Infinity; for (let k = i - tr.N; k < i; k++) v = s > 0 ? Math.max(v, D.h[k]) : Math.min(v, D.l[k]); return { text: `closed ${s > 0 ? 'above the highest high' : 'below the lowest low'} of the ${tr.N} hours before it (${f(v)})`, mark: { kind: 'level', p: v, a: D.t[Math.max(0, i - tr.N)], at: D.t[i] + 3600, label: `${tr.N}-hour ${s > 0 ? 'high' : 'low'}`, under: s < 0 } }; }
+  if (tr.kind === 'dev') { const key = 'sma' + tr.n; const m = (cache[key] ||= engSma(D.c, tr.n))[i]; return { text: `closed ${tr.z} ATR(14) ${s > 0 ? 'above' : 'below'} its ${tr.n}-hour average (${f(m)})`, mark: { kind: 'level', p: m, a: D.t[Math.max(0, i - tr.n)], at: D.t[i] + 3600, label: `${tr.n}-hour average`, under: s > 0 } }; }
+  return { text: `was a candle with a range of at least ${tr.k} ATR(14), closing ${s > 0 ? 'up' : 'down'}`, mark: { kind: 'zone', top: D.h[i], bot: D.l[i], a: D.t[i], at: D.t[i] + 3600, label: 'Big H1 candle' } };
+};
+function leadTrades(L, ctx, from) {
+  const { D, H, M5, firstM5, f, market } = ctx, g = L.g, A = engAtr(D), MA = g.trend === 'none' ? null : engSma(D.c, 200), P = g.vol !== 'none' ? engAtrPct(D) : null, cache = {}, id = uniq(), out = [];
+  let freeT = -Infinity;
+  for (let i = 210; i < D.n; i++) {
     const entryT = i + 1 < D.n ? D.t[i + 1] : D.t[i] + 3600; if (entryT < freeT) continue;
-    const hr = new Date(entryT * 1000).getUTCHours(); if (!(hr >= NASBRK.hours[0] && hr < NASBRK.hours[1])) continue;
-    let hi = -Infinity; for (let k = i - NASBRK.N; k < i; k++) if (D.h[k] > hi) hi = D.h[k];
-    if (!(D.c[i] > hi) || !(MA[i] === MA[i]) || !(D.c[i] > MA[i])) continue;
-    const a = A[i]; if (!(a > 0)) continue;
-    const fi = firstM5.get(entryT); if (fi == null) continue;
-    const fill = M5[fi].o, stop = fill - NASBRK.stop * a, tgt = fill + NASBRK.rr * NASBRK.stop * a;
-    const r = rec('nasbrk', market, { idTail: id(`b${M5[fi].t}`), kind: 'nasbrk-h1', label: 'H1 20-hour breakout, long', h: '1h', l: '1h', s: 1, M5, fi, fill, stop, tgt, cap: NASBRK.hold * 3600,
-      log: [{ t: H[i].e, text: `An H1 candle closed at ${f(D.c[i])}, above the highest high of the 20 hours before it (${f(hi)}) and above its 200-hour average (${f(MA[i])}). The next hour (${String(hr).padStart(2, '0')}:00 UTC) is inside the rule's 14:00-22:00 window: buy at that open, the stop 1 ATR(14) of H1 (${f(a)}) below, 4R.` }],
-      marks: [{ kind: 'level', p: hi, a: H[i - NASBRK.N].t, at: H[i].e, label: '20-hour high' }, { kind: 'level', p: MA[i], a: H[i - NASBRK.N].t, at: H[i].e, label: '200-hour average', under: true }] });
+    let s = 0; for (const tr of g.trig) { const q = engSig(D, tr, i); if (q === 0 || (s !== 0 && q !== s)) { s = 0; break; } s = q; } if (!s) continue;
+    if (g.side === 'long' && s < 0 || g.side === 'short' && s > 0) continue;
+    if (MA) { const m = MA[i]; if (!(m === m)) continue; const up = D.c[i] > m ? 1 : -1; if (g.trend === 'with' ? up !== s : up === s) continue; }
+    if (g.hours) { const h = new Date(entryT * 1000).getUTCHours(), [x, y] = g.hours; if (x <= y ? !(h >= x && h < y) : !(h >= x || h < y)) continue; }
+    if (g.dows && !g.dows.includes(new Date(entryT * 1000).getUTCDay())) continue;
+    if (P) { const p = P[i]; if (!(p === p) || (g.vol === 'low' ? !(p <= g.volP) : !(p >= 1 - g.volP))) continue; }
+    const a = A[i]; if (!(a > 0)) continue; const fi = firstM5.get(entryT); if (fi == null) continue;
+    const fill = M5[fi].o, dist = g.stop * a, stop = fill - s * dist, tgt = g.rr > 0 ? fill + s * g.rr * dist : null, parts = g.trig.map((tr) => trigText(tr, D, i, s, f, cache));
+    const hr = String(new Date(entryT * 1000).getUTCHours()).padStart(2, '0');
+    const r = rec('nq1', market, { idTail: id(`${L.id}-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: `nq1-${L.id}`, label: L.name, h: '1h', l: '1h', s, M5, fi, fill, stop, tgt, cap: g.hold * 3600,
+      log: [{ t: D.t[i] + 3600, text: `An H1 candle ${parts.map((x) => x.text).join(' and ')}. The next hour (${hr}:00 UTC) passes the reading's filters: ${word(s)} at that open, the stop ${g.stop} ATR(14) of H1 (${f(a)}) away` + (g.rr > 0 ? `, ${g.rr}R.` : ', no target.') }],
+      marks: parts.map((x) => x.mark) });
     if (!r) continue;
     freeT = r.status === 'open' ? Infinity : Math.floor(r.endT / 3600) * 3600 + 3600;
     if (r.t >= from) out.push(r);
   }
   return out;
+}
+export function nq1Trades(B, { from, market = 'nas100' } = {}) {
+  if (market !== 'nas100') return [];
+  const M5 = toK(B['5m']); if (M5.length < 3000) return [];
+  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 600) return [];
+  const D = prep(toArrays(H.map((b) => ({ t: b.t, o: b.o, h: b.h, l: b.l, c: b.c }))), market), firstM5 = new Map(), f = fx(market);
+  M5.forEach((b, k) => { const h = Math.floor(b.t / 3600) * 3600; if (!firstM5.has(h)) firstM5.set(h, k); });
+  const ctx = { D, H, M5, firstM5, f, market }, out = [];
+  for (const L of NQ1_LEADS) out.push(...leadTrades(L, ctx, from));
+  for (const x of vbDays(toK(B['5m']), JO, 'nq1', market, 0.5, from)) out.push({ ...x, label: 'Breakout of the day: UTC open ± ½ the previous range' });   // index-vol-breakout T1 on NAS100 (owner, 25 Nov 2026: "Nasdaq breakout of the day should be in NQ1")
+  return out;
+}
+// ─── zero: turnaround Tuesday on the Nasdaq (owner, 25 Nov 2026: "put it in another strategy and call it ZERO"; the Nasdaq breakout of the day went back to NQ1) ───
+// One reading on NAS100 by its study's own code: `zero-tue` = turnaround-tuesday R2 (the first trading day of a week that closed down more than 1 %:
+// buy that close, stop 2 ATR(20 days), out at the next trading day's close; the study's own tradingDays / weekPairs / buildDays / trade; R before costs
+// and financing). It was on the NQ1 desk for a few hours. Before costs; a paper record.
+// turnaround Tuesday R2 on NAS100, the study's own buildDays / trade (before costs: grossR)
+function tuesdayTrades(H, from, market, f, desk) {
+  const rows = H.map((b) => [b.t, b.o, b.h, b.l, b.c]); if (rows.length < 600) return [];
+  const days = TT.tradingDays(nyParts(rows[0][0]).ymd, nyParts(rows[rows.length - 1][0]).ymd), D = TT.buildDays(rows, days), opt = { cost: 0, rate: () => null }, out = [], lastBar = rows[rows.length - 1];
+  for (const p of TT.weekPairs(days)) {
+    const E = D[p.m], X = D[p.x]; if (E.close == null || E.i == null) continue;
+    const chg = TT.dayChg(D, p.m); if (!TT.ruleOn(chg, TT.RULES.r2.drop)) continue;
+    const t = rows[E.i][0] + 3600; if (t < from) continue;
+    const atr = TT.atrAt(D, p.m); if (atr == null || !(atr > 0)) continue;
+    const entry = E.close, risk = TT.STOP_ATR * atr, stop = entry - risk, closed = X.close != null && X.i != null;
+    let hit = null; for (let j = E.i + 1; j < rows.length && (!closed || j <= X.i); j++) { const b = rows[j]; if (b[1] <= stop) { hit = { px: b[1], t: b[0] }; break; } if (b[3] <= stop) { hit = { px: stop, t: b[0] }; break; } }
+    let status, R = null, exit = null, endT = null, fl = null;
+    if (hit) { status = 'stopped'; exit = hit.px; endT = hit.t; R = (hit.px - entry) / risk; }
+    else if (closed) { const st = TT.trade(rows, D, p.m, p.x, opt); if (!st) continue; status = 'time'; exit = st.exit; endT = rows[X.i][0] + 3600; R = st.grossR; }
+    else { status = 'open'; fl = (lastBar[4] - entry) / risk; }
+    const dayName = E.d;
+    out.push({ id: `${pre(market)}${desk}-tue-b${t}`, market, kind: `${desk}-tue`, label: 'Turnaround Tuesday: buy a down Monday', h: '1d', l: '1h', side: 1, t, entry, stop, target: null, status, R, endT, exit, mfe: null, float: fl,
+      log: [{ t: E.t, text: `${dayName}, the first trading day of the week, closed ${(100 * chg).toFixed(2)}% (down more than 1 %). The rule buys that close: ${f(entry)}, the stop 2 x the 20-day ATR (${f(risk)}) below at ${f(stop)}, out at the next trading day's close, no target.` },
+        status === 'open' ? { t: null, text: `Still open on the last candle read (${sg(fl)} now).` } : status === 'stopped' ? { t: endT, text: `Stopped: ${sg(R)}` + (R < -1.0001 ? ' (the candle opened beyond the stop).' : '.') } : { t: endT, text: `Out at the next trading day's close, ${f(exit)}: ${sg(R)}.` }],
+      marks: [{ kind: 'level', p: stop, a: t, at: t, label: 'Stop (2 ATR)', under: true }] }); }
+  return out;
+}
+export function zeroTrades(B, { from, market = 'nas100' } = {}) {
+  if (market !== 'nas100') return [];
+  const M5 = toK(B['5m']); if (M5.length < 3000) return [];
+  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll);
+  return tuesdayTrades(H, from, market, fx(market), 'zero');
 }
 
 
@@ -340,7 +398,8 @@ export const DESKS2 = {
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
-  nasbrk: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nasbrkTrades, note: 'NAS100 breakout: the auto-researcher\'s lead, an H1 close above the 20 hours\' high and above the 200-hour average, bought at the next open between 14:00 and 22:00 UTC, stop 1 ATR, 4R, out after 96 hours (nas100-brk-long-focus). It passed its pre-registered tests but is a candidate, not an edge, and its cost is not measured.' + PAPER },
+  nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s Nasdaq 100 leads (stretch, breakout and big-candle combinations) and the Nasdaq breakout of the day, each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
+  zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: turnaround Tuesday on the Nasdaq 100: buy the close of a first trading day of the week that fell more than 1 %, out at the next trading day\'s close (turnaround-tuesday, rule R2). Before costs.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_DESK_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on eight of its markets (gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP and the Nasdaq 100). It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };
