@@ -55,9 +55,7 @@ jobs:
         worker: ${{ fromJSON(needs.plan.outputs.workers) }}
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
         exclude:
-          # a second runner (lanes 4-7) only for five workers: 15 research jobs in all, so the council loop and CI always find a free runner (a free plan allows 20 at once)
-          - { worker: 5, shard: 1 }
-          - { worker: 6, shard: 1 }
+          # a second runner (lanes 4-7) for seven workers: 17 research jobs in all, so the council loop and CI always find a free runner (a free plan allows 20 at once)
           - { worker: 7, shard: 1 }
           - { worker: 8, shard: 1 }
           - { worker: 9, shard: 1 }
