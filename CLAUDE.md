@@ -7152,3 +7152,12 @@ at once): totals are not additive, and the leads are probably one effect, the Na
 ran at none: futures). **The January-onward history is NOT new evidence: 2026 lies inside the years the search and the follow-up already read;
 only trades from 26 Nov 2026 are forward.** Filled with `node --use-env-proxy council/edge-desks.mjs <dir> --days 330 --from 2026-01-01 --only nq1`.
 Tests: `tests/nq1-desk.test.mjs`.
+
+**ZERO: the other Nasdaq studies, one Equinox desk** (25 Nov 2026, owner: "put it in another strategy and call it ZERO", after NQ1 became the auto-researcher's leads
+only; read as the two Nasdaq studies taken off NQ1). `council/edge-desks-2.mjs` `zeroTrades` (`DESKS2.zero`, market nas100; loop line `--only …,nq1,zero,lyriac,dom`;
+`zero/desk.json`; kinds `zero-tue`, `zero-t1`): **tue** = turnaround-tuesday R2 on NAS100 (the study's own `tradingDays`, `weekPairs`, `buildDays`, `trade`: the first
+trading day of a week closed down more than 1 %, buy that close, stop 2 ATR(20 days), out at the next trading day's close; R before costs and financing; an open trade
+is read to the last candle); **t1** = index-vol-breakout T1 on NAS100 (`vbDays`, k 0.5: the UTC open +/- 0.5 x the previous range, stop back at the open, out at
+21:00 UTC; it lost its placebo test at the measured cost). Before costs; January-onward history is inside the years both studies already read (1 Jan - 25 Nov 2026:
+t1 174 trades +0.146R, 1 open; tue 5 trades, 4 won, +0.169R). Other Nasdaq studies (the NQ open run, a council system; the ICT desk, a separate edge) are not here.
+Tests: `tests/nq1-desk.test.mjs` (ZERO).

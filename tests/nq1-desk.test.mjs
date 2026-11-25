@@ -68,3 +68,13 @@ test('wiring: the page, the Equinox tab, the loop, the data check and the record
   assert.match(rd('.github/workflows/council.yml'), /--only [a-z,]*nq1/); assert.match(rd('council/datahealth.mjs'), /nq1\/desk\.json/);
   assert.ok(clean({ id: 'x', kind: 'nq1-l3', side: 1, entry: 100, stop: 99, t: 1 })); assert.equal(clean({ id: 'x', kind: 'nq1-l3', side: 1, entry: 100, stop: 101, t: 1 }), null);
 });
+
+test('ZERO: turnaround Tuesday and the breakout of the day, each with a stop below the entry, stored by clean()', () => {
+  const Z = D2.zeroTrades(B, { from: FROM, market: 'nas100' }); assert.deepEqual(Object.keys(D2.DESKS2).includes('zero'), true); assert.equal(D2.zeroTrades(B, { from: FROM, market: 'xau' }).length, 0);
+  const ids = new Set();
+  for (const r of Z) { assert.match(r.kind, /^zero-(tue|t1)$/); assert.ok(!ids.has(r.id)); ids.add(r.id); assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, r.id); assert.equal(r.target, null); assert.ok(clean(r), 'clean() refused ' + r.id); }
+  assert.ok(Z.some((r) => r.kind === 'zero-t1'), 'the seeded market must give breakout days');
+  const rd = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  assert.match(rd('equinox.html'), /id="v-zero"/); assert.match(rd('equinox.html'), /"k": "zero", "name": "ZERO"/); assert.match(rd('assets/desk-trades.js'), /zero: \{ file: 'zero\/desk\.json'/);
+  assert.match(rd('.github/workflows/council.yml'), /--only [a-z0-9,]*zero/); assert.match(rd('council/datahealth.mjs'), /zero\/desk\.json/);
+});

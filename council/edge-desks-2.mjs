@@ -16,6 +16,7 @@
 //              stop back at the open, out at 21:00 UTC
 //   jpyvb      the same rule on USD/JPY (usdjpy-vol-breakout-forward)
 //   nq1        the auto-researcher's seven NAS100 leads as one desk (below)
+//   zero       the other Nasdaq studies: turnaround Tuesday and the breakout of the day (below)
 // Every signal, stop and exit comes from the study's own exported code (imported, never edited); only the record (id, log, marks,
 // an open trade's reading) is written here. The studies judged trades before costs and so does each desk; the five fade / gap
 // rules lose after costs and the two breakouts are short forward records. PAPER RECORDS ONLY: no order, alert, broker or mirror,
@@ -37,6 +38,8 @@ import * as GO from '../research/edge/gold-vol-breakout-hourcost/original.mjs';
 import { T1 as GOLD_T1 } from '../research/edge/gold-vol-breakout-hourcost/costs.mjs';
 import * as JO from '../research/edge/index-vol-breakout/original.mjs';
 import { K as JPY_K } from '../research/edge/fx-vol-breakout/run.mjs';
+import * as TT from '../research/edge/turnaround-tuesday/run.mjs';
+import { nyParts } from '../ict/calendar.mjs';
 import { toArrays, prep, atr as engAtr, sma as engSma, atrPct as engAtrPct, sig as engSig } from '../research/edge/auto-researcher/engine.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
@@ -265,6 +268,42 @@ export function nq1Trades(B, { from, market = 'nas100' } = {}) {
   for (const L of NQ1_LEADS) out.push(...leadTrades(L, ctx, from));
   return out;
 }
+// ─── zero: the Nasdaq studies that are not the auto-researcher's leads (owner, 25 Nov 2026: "put it in another strategy and call it ZERO") ───
+// Two readings on NAS100, each by its own study's code: `zero-tue` = turnaround-tuesday R2 (the first trading day of a week that closed down
+// more than 1 %: buy that close, stop 2 ATR(20 days), out at the next trading day's close; the study's own tradingDays / weekPairs / buildDays /
+// trade; R before costs and financing) and `zero-t1` = index-vol-breakout T1 (the UTC open +/- 0.5 x the previous range, stop back at the open,
+// out at 21:00 UTC; it lost its placebo test). They were on the NQ1 desk for a few hours. Before costs; paper records.
+// turnaround Tuesday R2 on NAS100, the study's own buildDays / trade (before costs: grossR)
+function tuesdayTrades(H, from, market, f, desk) {
+  const rows = H.map((b) => [b.t, b.o, b.h, b.l, b.c]); if (rows.length < 600) return [];
+  const days = TT.tradingDays(nyParts(rows[0][0]).ymd, nyParts(rows[rows.length - 1][0]).ymd), D = TT.buildDays(rows, days), opt = { cost: 0, rate: () => null }, out = [], lastBar = rows[rows.length - 1];
+  for (const p of TT.weekPairs(days)) {
+    const E = D[p.m], X = D[p.x]; if (E.close == null || E.i == null) continue;
+    const chg = TT.dayChg(D, p.m); if (!TT.ruleOn(chg, TT.RULES.r2.drop)) continue;
+    const t = rows[E.i][0] + 3600; if (t < from) continue;
+    const atr = TT.atrAt(D, p.m); if (atr == null || !(atr > 0)) continue;
+    const entry = E.close, risk = TT.STOP_ATR * atr, stop = entry - risk, closed = X.close != null && X.i != null;
+    let hit = null; for (let j = E.i + 1; j < rows.length && (!closed || j <= X.i); j++) { const b = rows[j]; if (b[1] <= stop) { hit = { px: b[1], t: b[0] }; break; } if (b[3] <= stop) { hit = { px: stop, t: b[0] }; break; } }
+    let status, R = null, exit = null, endT = null, fl = null;
+    if (hit) { status = 'stopped'; exit = hit.px; endT = hit.t; R = (hit.px - entry) / risk; }
+    else if (closed) { const st = TT.trade(rows, D, p.m, p.x, opt); if (!st) continue; status = 'time'; exit = st.exit; endT = rows[X.i][0] + 3600; R = st.grossR; }
+    else { status = 'open'; fl = (lastBar[4] - entry) / risk; }
+    const dayName = E.d;
+    out.push({ id: `${pre(market)}${desk}-tue-b${t}`, market, kind: `${desk}-tue`, label: 'Turnaround Tuesday: buy a down Monday', h: '1d', l: '1h', side: 1, t, entry, stop, target: null, status, R, endT, exit, mfe: null, float: fl,
+      log: [{ t: E.t, text: `${dayName}, the first trading day of the week, closed ${(100 * chg).toFixed(2)}% (down more than 1 %). The rule buys that close: ${f(entry)}, the stop 2 x the 20-day ATR (${f(risk)}) below at ${f(stop)}, out at the next trading day's close, no target.` },
+        status === 'open' ? { t: null, text: `Still open on the last candle read (${sg(fl)} now).` } : status === 'stopped' ? { t: endT, text: `Stopped: ${sg(R)}` + (R < -1.0001 ? ' (the candle opened beyond the stop).' : '.') } : { t: endT, text: `Out at the next trading day's close, ${f(exit)}: ${sg(R)}.` }],
+      marks: [{ kind: 'level', p: stop, a: t, at: t, label: 'Stop (2 ATR)', under: true }] }); }
+  return out;
+}
+export function zeroTrades(B, { from, market = 'nas100' } = {}) {
+  if (market !== 'nas100') return [];
+  const M5 = toK(B['5m']); if (M5.length < 3000) return [];
+  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll);
+  const out = tuesdayTrades(H, from, market, fx(market), 'zero');
+  for (const x of vbDays(toK(B['5m']), JO, 'zero', market, 0.5, from)) out.push({ ...x, label: 'UTC open ± ½ the previous range (breakout of the day)' });
+  return out;
+}
+
 
 // ─── lyriac: the passing rules as one desk (24 Nov 2026, owner: "build as new edge called Lyriac and put it in equinox") ───
 // The three intraday rules of research/edge/passing-rules-book that pass their tests, each with its own study's code: the gold
@@ -361,6 +400,7 @@ export const DESKS2 = {
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
   nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s seven Nasdaq 100 leads (stretch, breakout and big-candle combinations), each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
+  zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: the Nasdaq 100 studies that are not the auto-researcher\'s leads: turnaround Tuesday (buy a first trading day of the week that fell over 1 %, out at the next day\'s close) and the breakout of the day (the gold rule on NAS100, which lost its placebo test). Before costs.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };

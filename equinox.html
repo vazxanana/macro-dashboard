@@ -163,6 +163,15 @@
       <div class="mo-wide" data-dk="chart"></div>
     </div>
   </section>
+  <section class="view eq-desk" id="v-zero" role="tabpanel" aria-labelledby="eq-t-zero" hidden>
+    <h2 class="h-head">ZERO <span class="mo-tag">Paper record</span></h2>
+    <p class="ms-note">The Nasdaq 100 studies that are not the auto-researcher's leads: turnaround Tuesday and the breakout of the day. Paper records before costs.</p>
+    <div class="mo-grid">
+      <div class="card mo-wide mo-open-c" data-dk="open"><div class="ms-k"><span>Open now</span><small></small></div><ul class="mo-open"><li class="empty">Loading…</li></ul></div>
+      <div class="card mo-wide" data-dk="trades"><div class="ms-k"><span>Trades</span></div><div class="ct-empty">The trades load when the desk opens.</div></div>
+      <div class="mo-wide" data-dk="chart"></div>
+    </div>
+  </section>
   <section class="view eq-desk" id="v-dom" role="tabpanel" aria-labelledby="eq-t-dom" hidden>
     <h2 class="h-head">DOM zone <span class="mo-tag">Paper record</span></h2>
     <p class="ms-note">The H1 dominant-zone limit as the demo job arms it, on its eighteen markets: a limit at the zone's near edge, the stop past its far side, 2R.</p>
@@ -178,7 +187,7 @@
   </section></div>
 </main>
 <script>
-  window.EQ_DESKS = [{"k": "lyriac", "name": "Lyriac"}, {"k": "fade", "name": "Break fade"}, {"k": "bigfade", "name": "Big-candle fade"}, {"k": "roundfade", "name": "Round-number fade"}, {"k": "boxfade", "name": "Box fade"}, {"k": "fvg", "name": "FVG return"}, {"k": "goldvb", "name": "Gold breakout"}, {"k": "jpyvb", "name": "USD/JPY breakout"}, {"k": "nq1", "name": "NQ1"}, {"k": "dom", "name": "DOM zone"}];
+  window.EQ_DESKS = [{"k": "lyriac", "name": "Lyriac"}, {"k": "fade", "name": "Break fade"}, {"k": "bigfade", "name": "Big-candle fade"}, {"k": "roundfade", "name": "Round-number fade"}, {"k": "boxfade", "name": "Box fade"}, {"k": "fvg", "name": "FVG return"}, {"k": "goldvb", "name": "Gold breakout"}, {"k": "jpyvb", "name": "USD/JPY breakout"}, {"k": "nq1", "name": "NQ1"}, {"k": "zero", "name": "ZERO"}, {"k": "dom", "name": "DOM zone"}];
   // Equinox: one tab a desk; the open one is remembered on this device (localStorage eq-desk, a display preference)
   (function () {
     var D = window.EQ_DESKS || [], H = document.documentElement, tabs = document.getElementById('eq-tabs');

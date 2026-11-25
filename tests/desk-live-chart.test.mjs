@@ -19,8 +19,8 @@ test('the page loads the asset after the desks\' card code, and every desk view 
   }
   // the borrowed replay slot of desk-trades.js stays as it was: the live chart makes its own host
   assert.equal(page.split('<div class="mo-wide" data-dk="chart"></div>').length - 1, 3);
-  assert.equal(Object.keys(L.DESKS).join(), 'mosha,lit,eg,msnr,lyriac,fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,dom');   // the last eight: the Equinox page (23 Nov 2026)
-  assert.deepEqual(Object.values(L.DESKS).map((d) => d.file), ['mosha', 'lit', 'eg', 'msnr', 'lyriac', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'dom'].map((k) => k + '/desk.json'));
+  assert.equal(Object.keys(L.DESKS).join(), 'mosha,lit,eg,msnr,lyriac,fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,zero,dom');   // the last eight: the Equinox page (23 Nov 2026)
+  assert.deepEqual(Object.values(L.DESKS).map((d) => d.file), ['mosha', 'lit', 'eg', 'msnr', 'lyriac', 'fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'zero', 'dom'].map((k) => k + '/desk.json'));
 });
 
 test('the asset parses, runs in Node without a page, and is display only', () => {
