@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-25T17:24:52.000Z",
+ "at": "2026-11-25T18:07:11.000Z",
  "rule": "proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.",
  "inSample": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.",
  "windows": {
@@ -60,14 +60,14 @@
   },
   "shadow": {
    "d30": {
-    "n": 1065,
-    "net": 23.59,
-    "gross": 213.69
+    "n": 1066,
+    "net": 22.58,
+    "gross": 212.69
    },
    "all": {
-    "n": 1065,
-    "net": 23.59,
-    "gross": 213.69
+    "n": 1066,
+    "net": 22.58,
+    "gross": 212.69
    }
   }
  },
@@ -3404,7 +3404,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -9296,6 +9296,370 @@
    ]
   },
   {
+   "key": "gmp|shadow",
+   "id": "gmp",
+   "k": "gmp",
+   "name": "Gold momentum pullback",
+   "book": "shadow",
+   "src": "trades",
+   "variant": null,
+   "ownerShadow": true,
+   "retired": false,
+   "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "xau"
+   ],
+   "regime": null,
+   "windows": {
+    "d7": {
+     "n": 3,
+     "wins": 2,
+     "losses": 1,
+     "flat": 0,
+     "winRate": 0.667,
+     "days": 2,
+     "gross": {
+      "sum": 2.28,
+      "mean": 0.76,
+      "t": 0.85
+     },
+     "net": {
+      "sum": 2.27,
+      "mean": 0.757,
+      "t": 0.84,
+      "byDay": {
+       "days": 2,
+       "t": null,
+       "p": null
+      }
+     },
+     "cost": {
+      "known": 3,
+      "sum": 0.01,
+      "perTrade": 0.003,
+      "shareOfGrossWins": 0.003
+     }
+    },
+    "d30": {
+     "n": 5,
+     "wins": 3,
+     "losses": 2,
+     "flat": 0,
+     "winRate": 0.6,
+     "days": 3,
+     "gross": {
+      "sum": 3.44,
+      "mean": 0.688,
+      "t": 1.16
+     },
+     "net": {
+      "sum": 3.42,
+      "mean": 0.684,
+      "t": 1.15,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
+     },
+     "cost": {
+      "known": 5,
+      "sum": 0.02,
+      "perTrade": 0.004,
+      "shareOfGrossWins": 0.004
+     }
+    },
+    "all": {
+     "n": 5,
+     "wins": 3,
+     "losses": 2,
+     "flat": 0,
+     "winRate": 0.6,
+     "days": 3,
+     "gross": {
+      "sum": 3.44,
+      "mean": 0.688,
+      "t": 1.16
+     },
+     "net": {
+      "sum": 3.42,
+      "mean": 0.684,
+      "t": 1.15,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
+     },
+     "cost": {
+      "known": 5,
+      "sum": 0.02,
+      "perTrade": 0.004,
+      "shareOfGrossWins": 0.004
+     }
+    }
+   },
+   "whereR": {
+    "exits": {
+     "trail": {
+      "n": 3,
+      "net": 4.9
+     },
+     "time": {
+      "n": 1,
+      "net": -0.47
+     },
+     "stop": {
+      "n": 1,
+      "net": -1.01
+     }
+    },
+    "fastStops": {
+     "n": 1,
+     "ofLosses": 2,
+     "share": 0.5,
+     "net": -1.01,
+     "within": "30 minutes of the fill"
+    },
+    "reached1R": {
+     "withMfe": 5,
+     "n": 3,
+     "closedAtLoss": 0,
+     "lossNet": 0
+    },
+    "giveback": {
+     "n": 3,
+     "mean": 1,
+     "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
+    },
+    "lock1R": {
+     "n": 5,
+     "mean": -0.382,
+     "t": -2.17,
+     "byDay": {
+      "days": 3,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
+    },
+    "targetAfterStop": {
+     "n": 0,
+     "ofLosses": 2,
+     "note": "losses whose target was reached after the stop (post-mortem)"
+    }
+   },
+   "splits": {
+    "session": [
+     {
+      "v": "london",
+      "n": 1,
+      "mean": 1.62,
+      "sum": 1.62,
+      "t": 0,
+      "rest": {
+       "n": 4,
+       "mean": 0.45
+      },
+      "vsRest": null
+     },
+     {
+      "v": "newyork",
+      "n": 3,
+      "mean": 0.14,
+      "sum": 0.42,
+      "t": 0.16,
+      "rest": {
+       "n": 2,
+       "mean": 1.5
+      },
+      "vsRest": null
+     },
+     {
+      "v": "overlap",
+      "n": 1,
+      "mean": 1.38,
+      "sum": 1.38,
+      "t": 0,
+      "rest": {
+       "n": 4,
+       "mean": 0.51
+      },
+      "vsRest": null
+     }
+    ],
+    "hours": [
+     {
+      "v": "08-12",
+      "n": 1,
+      "mean": 1.62,
+      "sum": 1.62,
+      "t": 0,
+      "rest": {
+       "n": 4,
+       "mean": 0.45
+      },
+      "vsRest": null
+     },
+     {
+      "v": "12-16",
+      "n": 1,
+      "mean": 1.38,
+      "sum": 1.38,
+      "t": 0,
+      "rest": {
+       "n": 4,
+       "mean": 0.51
+      },
+      "vsRest": null
+     },
+     {
+      "v": "16-20",
+      "n": 3,
+      "mean": 0.14,
+      "sum": 0.42,
+      "t": 0.16,
+      "rest": {
+       "n": 2,
+       "mean": 1.5
+      },
+      "vsRest": null
+     }
+    ],
+    "side": [
+     {
+      "v": "sell",
+      "n": 5,
+      "mean": 0.684,
+      "sum": 3.42,
+      "t": 1.15,
+      "rest": {
+       "n": 0,
+       "mean": 0
+      },
+      "vsRest": null
+     }
+    ],
+    "market": [],
+    "exit": [
+     {
+      "v": "trail",
+      "n": 3,
+      "sum": 4.9
+     },
+     {
+      "v": "time",
+      "n": 1,
+      "sum": -0.47
+     },
+     {
+      "v": "stop",
+      "n": 1,
+      "sum": -1.01
+     }
+    ]
+   },
+   "slippage": {
+    "n": 3,
+    "mean": -0.009,
+    "t": -0.25,
+    "worse": 1,
+    "note": "fill minus the council entry in R, positive = worse"
+   },
+   "reviews": {
+    "reviewed": 0,
+    "tags": {}
+   },
+   "decay": {
+    "status": "healthy",
+    "few": false,
+    "why": "in line with its backtest: last 30 trades −0.08R a trade, CUSUM 0.71 of 14.48",
+    "ref": 0.032
+   },
+   "expect": {
+    "perTrade": {
+     "exp": -0.052,
+     "lo": -0.134,
+     "hi": 0.03
+    },
+    "src": "research/edge/robustness"
+   },
+   "flags": [],
+   "review": {
+    "head": "Gold momentum pullback (shadow): 5 closed, 60% won, +3.44R before costs, +3.42R after (too few to judge); last 30 days +3.42R on 5, last 7 days +2.27R on 3.",
+    "working": [
+     "after costs +3.42R on 5 trades (+0.68R a trade, too few to judge)",
+     "trail exits +4.90R on 3"
+    ],
+    "losing": [
+     "stop exits −1.01R on 1"
+    ]
+   },
+   "recent": [
+    {
+     "id": "xau-gmp-1794470400",
+     "market": "xau",
+     "side": "sell",
+     "e": 1794477325,
+     "t": 1794492960,
+     "R": 1.63,
+     "net": 1.62,
+     "exit": "trail",
+     "mfe": 2.63,
+     "session": "london"
+    },
+    {
+     "id": "xau-gmp-1794492000",
+     "market": "xau",
+     "side": "sell",
+     "e": 1794502993,
+     "t": 1794531840,
+     "R": -0.47,
+     "net": -0.47,
+     "exit": "time",
+     "mfe": 0.14,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-gmp-1795100400",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795107676,
+     "t": 1795133400,
+     "R": 1.9,
+     "net": 1.9,
+     "exit": "trail",
+     "mfe": 2.9,
+     "session": "newyork"
+    },
+    {
+     "id": "xau-gmp-1795604400",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795608607,
+     "t": 1795623720,
+     "R": 1.38,
+     "net": 1.38,
+     "exit": "trail",
+     "mfe": 2.38,
+     "session": "overlap"
+    },
+    {
+     "id": "xau-gmp-1795611600",
+     "market": "xau",
+     "side": "sell",
+     "e": 1795627601,
+     "t": 1795629300,
+     "R": -1,
+     "net": -1.01,
+     "exit": "stop",
+     "mfe": 0.44,
+     "session": "newyork"
+    }
+   ]
+  },
+  {
    "key": "nq-open:nyflip-trend|shadow",
    "id": "nq-open:nyflip-trend",
    "k": "nq-open",
@@ -9529,7 +9893,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -9611,347 +9975,6 @@
      "net": -1,
      "exit": "stop",
      "mfe": 0.82,
-     "session": "overlap"
-    }
-   ]
-  },
-  {
-   "key": "gmp|shadow",
-   "id": "gmp",
-   "k": "gmp",
-   "name": "Gold momentum pullback",
-   "book": "shadow",
-   "src": "trades",
-   "variant": null,
-   "ownerShadow": true,
-   "retired": false,
-   "stopped": false,
-   "shadowed": null,
-   "markets": [
-    "xau"
-   ],
-   "regime": null,
-   "windows": {
-    "d7": {
-     "n": 2,
-     "wins": 2,
-     "losses": 0,
-     "flat": 0,
-     "winRate": 1,
-     "days": 2,
-     "gross": {
-      "sum": 3.28,
-      "mean": 1.64,
-      "t": 6.31
-     },
-     "net": {
-      "sum": 3.28,
-      "mean": 1.64,
-      "t": 6.31,
-      "byDay": {
-       "days": 2,
-       "t": null,
-       "p": null
-      }
-     },
-     "cost": {
-      "known": 2,
-      "sum": 0,
-      "perTrade": 0,
-      "shareOfGrossWins": 0
-     }
-    },
-    "d30": {
-     "n": 4,
-     "wins": 3,
-     "losses": 1,
-     "flat": 0,
-     "winRate": 0.75,
-     "days": 3,
-     "gross": {
-      "sum": 4.44,
-      "mean": 1.11,
-      "t": 2.07
-     },
-     "net": {
-      "sum": 4.43,
-      "mean": 1.108,
-      "t": 2.06,
-      "byDay": {
-       "days": 3,
-       "t": null,
-       "p": null
-      }
-     },
-     "cost": {
-      "known": 4,
-      "sum": 0.01,
-      "perTrade": 0.003,
-      "shareOfGrossWins": 0.002
-     }
-    },
-    "all": {
-     "n": 4,
-     "wins": 3,
-     "losses": 1,
-     "flat": 0,
-     "winRate": 0.75,
-     "days": 3,
-     "gross": {
-      "sum": 4.44,
-      "mean": 1.11,
-      "t": 2.07
-     },
-     "net": {
-      "sum": 4.43,
-      "mean": 1.108,
-      "t": 2.06,
-      "byDay": {
-       "days": 3,
-       "t": null,
-       "p": null
-      }
-     },
-     "cost": {
-      "known": 4,
-      "sum": 0.01,
-      "perTrade": 0.003,
-      "shareOfGrossWins": 0.002
-     }
-    }
-   },
-   "whereR": {
-    "exits": {
-     "trail": {
-      "n": 3,
-      "net": 4.9
-     },
-     "time": {
-      "n": 1,
-      "net": -0.47
-     }
-    },
-    "fastStops": {
-     "n": 0,
-     "ofLosses": 1,
-     "share": 0,
-     "net": 0,
-     "within": "30 minutes of the fill"
-    },
-    "reached1R": {
-     "withMfe": 4,
-     "n": 3,
-     "closedAtLoss": 0,
-     "lossNet": 0
-    },
-    "giveback": {
-     "n": 3,
-     "mean": 1,
-     "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
-    },
-    "lock1R": {
-     "n": 4,
-     "mean": -0.477,
-     "t": -2.5,
-     "byDay": {
-      "days": 3,
-      "t": null,
-      "p": null
-     },
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
-    },
-    "targetAfterStop": {
-     "n": 0,
-     "ofLosses": 1,
-     "note": "losses whose target was reached after the stop (post-mortem)"
-    }
-   },
-   "splits": {
-    "session": [
-     {
-      "v": "london",
-      "n": 1,
-      "mean": 1.62,
-      "sum": 1.62,
-      "t": 0,
-      "rest": {
-       "n": 3,
-       "mean": 0.937
-      },
-      "vsRest": null
-     },
-     {
-      "v": "newyork",
-      "n": 2,
-      "mean": 0.715,
-      "sum": 1.43,
-      "t": 0.6,
-      "rest": {
-       "n": 2,
-       "mean": 1.5
-      },
-      "vsRest": null
-     },
-     {
-      "v": "overlap",
-      "n": 1,
-      "mean": 1.38,
-      "sum": 1.38,
-      "t": 0,
-      "rest": {
-       "n": 3,
-       "mean": 1.017
-      },
-      "vsRest": null
-     }
-    ],
-    "hours": [
-     {
-      "v": "08-12",
-      "n": 1,
-      "mean": 1.62,
-      "sum": 1.62,
-      "t": 0,
-      "rest": {
-       "n": 3,
-       "mean": 0.937
-      },
-      "vsRest": null
-     },
-     {
-      "v": "12-16",
-      "n": 1,
-      "mean": 1.38,
-      "sum": 1.38,
-      "t": 0,
-      "rest": {
-       "n": 3,
-       "mean": 1.017
-      },
-      "vsRest": null
-     },
-     {
-      "v": "16-20",
-      "n": 2,
-      "mean": 0.715,
-      "sum": 1.43,
-      "t": 0.6,
-      "rest": {
-       "n": 2,
-       "mean": 1.5
-      },
-      "vsRest": null
-     }
-    ],
-    "side": [
-     {
-      "v": "sell",
-      "n": 4,
-      "mean": 1.108,
-      "sum": 4.43,
-      "t": 2.06,
-      "rest": {
-       "n": 0,
-       "mean": 0
-      },
-      "vsRest": null
-     }
-    ],
-    "market": [],
-    "exit": [
-     {
-      "v": "trail",
-      "n": 3,
-      "sum": 4.9
-     },
-     {
-      "v": "time",
-      "n": 1,
-      "sum": -0.47
-     }
-    ]
-   },
-   "slippage": {
-    "n": 3,
-    "mean": -0.009,
-    "t": -0.25,
-    "worse": 1,
-    "note": "fill minus the council entry in R, positive = worse"
-   },
-   "reviews": {
-    "reviewed": 0,
-    "tags": {}
-   },
-   "decay": {
-    "status": "healthy",
-    "few": false,
-    "why": "in line with its backtest: last 30 trades −0.02R a trade, CUSUM 0.9 of 14.48",
-    "ref": 0.032
-   },
-   "expect": {
-    "perTrade": {
-     "exp": -0.052,
-     "lo": -0.134,
-     "hi": 0.03
-    },
-    "src": "research/edge/robustness"
-   },
-   "flags": [],
-   "review": {
-    "head": "Gold momentum pullback (shadow): 4 closed, 75% won, +4.44R before costs, +4.43R after (too few to judge); last 30 days +4.43R on 4, last 7 days +3.28R on 2.",
-    "working": [
-     "after costs +4.43R on 4 trades (+1.11R a trade, too few to judge)",
-     "trail exits +4.90R on 3"
-    ],
-    "losing": []
-   },
-   "recent": [
-    {
-     "id": "xau-gmp-1794470400",
-     "market": "xau",
-     "side": "sell",
-     "e": 1794477325,
-     "t": 1794492960,
-     "R": 1.63,
-     "net": 1.62,
-     "exit": "trail",
-     "mfe": 2.63,
-     "session": "london"
-    },
-    {
-     "id": "xau-gmp-1794492000",
-     "market": "xau",
-     "side": "sell",
-     "e": 1794502993,
-     "t": 1794531840,
-     "R": -0.47,
-     "net": -0.47,
-     "exit": "time",
-     "mfe": 0.14,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-gmp-1795100400",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795107676,
-     "t": 1795133400,
-     "R": 1.9,
-     "net": 1.9,
-     "exit": "trail",
-     "mfe": 2.9,
-     "session": "newyork"
-    },
-    {
-     "id": "xau-gmp-1795604400",
-     "market": "xau",
-     "side": "sell",
-     "e": 1795608607,
-     "t": 1795623720,
-     "R": 1.38,
-     "net": 1.38,
-     "exit": "trail",
-     "mfe": 2.38,
      "session": "overlap"
     }
    ]
@@ -10190,7 +10213,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -10845,25 +10868,25 @@
    },
    "windows": {
     "d7": {
-     "n": 572,
-     "wins": 194,
+     "n": 570,
+     "wins": 192,
      "losses": 378,
      "flat": 0,
-     "winRate": 0.339,
+     "winRate": 0.337,
      "days": 9,
      "gross": {
-      "sum": 6.47,
-      "mean": 0.011,
-      "t": 0.19
+      "sum": 2.47,
+      "mean": 0.004,
+      "t": 0.07
      },
      "net": {
-      "sum": 6.47,
-      "mean": 0.011,
-      "t": 0.19,
+      "sum": 2.47,
+      "mean": 0.004,
+      "t": 0.07,
       "byDay": {
        "days": 9,
-       "t": 0.17,
-       "p": 0.872
+       "t": 0.06,
+       "p": 0.951
       }
      },
      "cost": {
@@ -11547,7 +11570,7 @@
     "replica|research|strong-side:sell"
    ],
    "review": {
-    "head": "Replica (research): 1731 closed, 33% won, −85.71R before costs, no cost on record (t −1.45, by day t −1.53 over 23 days before costs); last 30 days −85.71R on 1731, last 7 days +6.47R on 572.",
+    "head": "Replica (research): 1731 closed, 33% won, −85.71R before costs, no cost on record (t −1.45, by day t −1.53 over 23 days before costs); last 30 days −85.71R on 1731, last 7 days +2.47R on 570.",
     "working": [
      "time exits +13.17R on 38",
      "target exits +1078.01R on 539",
@@ -12742,7 +12765,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -13095,7 +13118,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -13431,7 +13454,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -13715,7 +13738,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -13975,7 +13998,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -14223,7 +14246,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -14471,7 +14494,7 @@
    "decay": {
     "status": "healthy",
     "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 3.33 of 12.73",
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
     "ref": 0.331
    },
    "expect": {
@@ -15694,5 +15717,5 @@
    }
   ]
  },
- "hash": "c9b953b00dcd3912"
+ "hash": "4fd3b5492acf5a1f"
 }
