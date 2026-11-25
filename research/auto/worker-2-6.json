@@ -2,14 +2,14 @@
  "version": "auto-1",
  "worker": 2,
  "started": "2026-11-25T12:14:14.860Z",
- "tries": 402600,
- "survivedA": 375,
- "candidates": 46,
- "cLooks": 14,
+ "tries": 502000,
+ "survivedA": 484,
+ "candidates": 56,
+ "cLooks": 16,
  "cPasses": 0,
  "groups": {
   "eurusd|dev+|both": {
-   "more": 23,
+   "more": 28,
    "pass": false
   },
   "nzdusd|dev-|short": {
@@ -33,7 +33,7 @@
    "pass": true
   },
   "eurjpy|dev+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurusd|dev+|short": {
@@ -41,7 +41,7 @@
    "pass": false
   },
   "eurusd|dev+|long": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|dev-|short": {
@@ -62,6 +62,14 @@
   },
   "usdcad|dev-|both": {
    "more": 0,
+   "pass": false
+  },
+  "eurjpy|dev+|long": {
+   "more": 0,
+   "pass": false
+  },
+  "xau|dev+|both": {
+   "more": 1,
    "pass": false
   }
  },
@@ -855,9 +863,122 @@
     "months": 82
    },
    "p": 0.42465
+  },
+  {
+   "at": "2026-11-25T13:58:21.100Z",
+   "group": "eurjpy|dev+|long",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 20,
+      "z": 1.5,
+      "follow": true
+     }
+    ],
+    "side": "long",
+    "hours": [
+     14,
+     17
+    ],
+    "dows": [
+     3,
+     4,
+     5
+    ],
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 2,
+    "rr": 1.5,
+    "hold": 24
+   },
+   "A": {
+    "n": 354,
+    "mean": 0.1841,
+    "t": 3.04,
+    "win": 52.8,
+    "months": 111
+   },
+   "B": {
+    "n": 159,
+    "mean": 0.1275,
+    "t": 1.62,
+    "win": 49.7,
+    "months": 52
+   },
+   "placeboA": {
+    "n": 376,
+    "mean": -0.1583,
+    "t": -2.91,
+    "win": 37,
+    "months": 111
+   },
+   "C": {
+    "n": 257,
+    "mean": -0.0428,
+    "t": -0.65,
+    "win": 42,
+    "months": 79
+   },
+   "p": 0.74215
+  },
+  {
+   "at": "2026-11-25T14:09:04.716Z",
+   "group": "xau|dev+|both",
+   "g": {
+    "mk": "xau",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 1,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 2,
+    "rr": 0,
+    "hold": 48
+   },
+   "A": {
+    "n": 1829,
+    "mean": 0.1726,
+    "t": 3.66,
+    "win": 33.8,
+    "months": 106
+   },
+   "B": {
+    "n": 962,
+    "mean": 0.0959,
+    "t": 2.12,
+    "win": 34.2,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 2098,
+    "mean": -0.0366,
+    "t": -0.88,
+    "win": 29.3,
+    "months": 106
+   },
+   "C": {
+    "n": 1365,
+    "mean": 0.0739,
+    "t": 1.59,
+    "win": 30.3,
+    "months": 83
+   },
+   "p": 0.05592
   }
  ],
- "chunks": 3,
- "updated": "2026-11-25T13:54:30.204Z",
- "chanceCandidates": 36.6
+ "chunks": 4,
+ "updated": "2026-11-25T14:19:35.295Z",
+ "chanceCandidates": 45.7
 }
