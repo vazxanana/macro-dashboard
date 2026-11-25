@@ -141,7 +141,9 @@ export function moshaCandidates(desk, nowS = Math.floor(Date.now() / 1000)) {
 // record), and not one the tracker already read more than EQX.maxFloat R from its entry either way. A record with no market is
 // gold (the desks' convention). One position per desk, market, side and fill time. At most EQX.maxOpen eqx positions at once.
 // Paper readings of rules that lose after costs on their studies; a demo record, not an edge.
-export const EQX = { desks: ['fade', 'bigfade', 'fvg', 'goldvb'], fresh: 3600, keep: 2 * 86400, maxOpen: 30, maxFloat: 0.75,
+// 25 Nov 2026 (owner: "All the orders must be the ones included in the edge"): a desk's own market list is the list of its orders;
+// `not` = the markets a desk dropped (council/edge-desks-2.mjs `DESKS2.<desk>.markets`; a test compares), never copied even from an older record.
+export const EQX = { desks: ['fade', 'bigfade', 'fvg', 'goldvb'], not: { fade: ['xau'], fvg: ['gbpusd'] }, fresh: 3600, keep: 2 * 86400, maxOpen: 30, maxFloat: 0.75,
   names: { fade: 'Break fade', bigfade: 'Big-candle fade', fvg: 'FVG return', goldvb: 'Gold breakout' } };
 export function eqxCandidates(files, nowS = Math.floor(Date.now() / 1000)) {
   const out = [], seen = new Set();
@@ -151,6 +153,7 @@ export function eqxCandidates(files, nowS = Math.floor(Date.now() / 1000)) {
       if (!r || typeof r.id !== 'string') continue;
       const market = r.market || 'xau', side = +r.side === 1 ? 'buy' : +r.side === -1 ? 'sell' : null, entry = +r.entry, stop = +r.stop, t = +r.t;
       if (!SYMBOLS[market] || !side || !(entry > 0) || !(stop > 0) || !Number.isFinite(t)) continue;
+      if ((EQX.not[k] || []).includes(market)) continue;   // not a market of this desk any more
       const sgn = side === 'sell' ? -1 : 1;
       if (sgn * (entry - stop) <= 0) continue;   // absolute rule 1
       const open = r.status === 'open', endT = +r.endT;

@@ -41,7 +41,7 @@ test('the adapters read the studies\' own cells', () => {
   assert.deepEqual(D2.DESKS2.bigfade.markets, FADE.MARKETS); assert.deepEqual(D2.DESKS2.fade.markets, FADE.MARKETS.filter((m) => m !== 'xau'));   // gold left the Break fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.roundfade.markets, ['eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']);   // gold, silver, NZD/USD, USD/JPY and EUR/JPY left the Round-number fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.fvg.markets, FADE.MARKETS.filter((m) => m !== 'gbpusd'));   // GBP/USD left the FVG return desk (25 Nov 2026)
-  assert.deepEqual(D2.DESKS2.boxfade.markets, FADE.MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m)));   // gold, silver and USD/CAD left the Box fade desk (25 Nov 2026)
+  assert.deepEqual(D2.DESKS2.boxfade.markets, FADE.MARKETS.filter((m) => !['xau', 'xag', 'usdcad', 'eurjpy'].includes(m)));   // gold, silver and USD/CAD left the Box fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.goldvb.markets, ['xau']); assert.deepEqual(D2.DESKS2.jpyvb.markets, ['usdjpy']);
   for (const k of Object.keys(D2.DESKS2)) assert.equal(DESKS[k], D2.DESKS2[k]);
   assert.equal(DESKS.lit.markets, ELEVEN); assert.equal(DESKS.msnr.markets, ELEVEN); assert.equal(ELEVEN.length, 11);
@@ -184,17 +184,20 @@ test('Equinox: its own page with the eight desks; the Desk keeps its five', () =
 });
 
 test('Box fade: gold, silver and USD/CAD left the desk, and their stored records go on the next run (owner, 25 Nov 2026)', () => {
-  assert.deepEqual(D2.BOX_MARKETS, D2.STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m))); assert.equal(D2.BOX_MARKETS.length, 7);
+  assert.deepEqual(D2.BOX_MARKETS, D2.STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad', 'eurjpy'].includes(m))); assert.equal(D2.BOX_MARKETS.length, 6);
   assert.deepEqual(D2.DESKS2.boxfade.markets, D2.BOX_MARKETS); assert.deepEqual(D2.DESKS2.bigfade.markets, D2.STUDY_MARKETS);   // the Big-candle fade keeps its ten
   const old = ['xau', 'xag', 'usdcad', 'eurusd'].map((m, k) => ({ id: `${m}:boxfade-x${k}`, ...(m === 'xau' ? {} : { market: m }), kind: 'boxfade-m5', side: 1, entry: 100, stop: 99, target: 101, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
   const o = buildDesk('boxfade', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14);
   assert.deepEqual(o.records.map((r) => r.market || 'xau'), ['eurusd']); assert.deepEqual(o.markets, ['eurusd']);
-  assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on seven markets \(not gold, silver or USD\/CAD\)/);
+  assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on six markets \(not gold, silver, USD\/CAD or EUR\/JPY\)/);
 });
 
-test('DOM zone desk: eight markets (EUR/AUD, CAD/JPY, GBP/JPY, USD/CHF, NZD/USD, DAX, S&P 500, silver, EUR/USD, GBP/USD left); the demo job keeps its eighteen (owner, 25 Nov 2026)', () => {
+test('DOM zone desk: eight markets (EUR/AUD, CAD/JPY, GBP/JPY, USD/CHF, NZD/USD, DAX, S&P 500, silver, EUR/USD, GBP/USD left); the demo job arms the same eight (owner, 25 Nov 2026)', async () => {
   assert.deepEqual(D2.DOM_DESK_MARKETS, ['xau', 'audusd', 'usdjpy', 'usdcad', 'eurjpy', 'audjpy', 'eurgbp', 'nas100']); assert.equal(D2.DOM_MARKETS.length, 18);
   assert.deepEqual(D2.DESKS2.dom.markets, D2.DOM_DESK_MARKETS);
+  { const J2 = await import('../council/dom-demo.mjs'), M2 = await import('../council/ctrader-mirror.mjs');
+    assert.deepEqual(J2.DESK_MARKETS, D2.DOM_DESK_MARKETS, 'the demo job arms the desk markets only');
+    for (const k of M2.EQX.desks) { const dm = D2.DESKS2[k].markets; for (const m of dm) assert.ok(!(M2.EQX.not[k] || []).includes(m), `${k}/${m} is a desk market, never skipped`); for (const m of M2.EQX.not[k] || []) assert.ok(!dm.includes(m), `${k}/${m} left the desk`); } }
   const old = ['eurusd', 'xag', 'spx500', 'nas100'].map((m, k) => ({ id: `${m}:dom-b${k}`, market: m, kind: 'dom-h1', side: 1, entry: 100, stop: 99, target: 102, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
   const o = buildDesk('dom', [['nas100', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14); assert.deepEqual(o.records.map((r) => r.market), ['nas100']);
   assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on eight of its markets/);

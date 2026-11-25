@@ -80,7 +80,7 @@ const ENV = { CTRADER_MIRROR: 'on', CTRADER_ENV: 'demo', CTRADER_CLIENT_ID: 'id'
 function setup(cfg, seed) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dom-')); if (cfg) fs.writeFileSync(path.join(dir, 'config.json'), JSON.stringify(cfg));
   if (seed) { fs.mkdirSync(path.join(dir, 'dom')); fs.writeFileSync(path.join(dir, 'dom', 'trades.json'), JSON.stringify({ trades: seed })); } return dir; }
 const file = (dir) => JSON.parse(fs.readFileSync(path.join(dir, 'dom', 'trades.json'), 'utf8'));
-const go = (dir, b, R, extra = {}) => step({ env: ENV, dir, WS: b.WS, clock: () => R.now * 1000, bars: async (k) => (k === 'xau' ? R.rows : k === 'eurusd' && extra.eur ? extra.eur.rows : []), log: () => {}, ...extra });
+const go = (dir, b, R, extra = {}) => step({ env: ENV, dir, WS: b.WS, clock: () => R.now * 1000, bars: async (k) => (k === 'xau' ? R.rows : k === 'eurjpy' && extra.eur ? extra.eur.rows : []), log: () => {}, ...extra });
 const news = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).map((m) => m.payload);
 
 test('an order: a LIMIT at the near edge WITH stopLoss and takeProfit, label dom, 24 h; one order per zone, ever', async () => {
@@ -149,7 +149,7 @@ test('caps: at most 3 a market; config off; a live account; nothing due does not
   { const R = rows({ formClose: 4012 }), dir = setup(), b = broker(); const out = await go(dir, b, R); assert.equal(out.skipped, 'nothing due'); assert.equal(b.sent.length, 0, 'no zone near the price, nothing resting: no connection'); }
   { const R = rows(), dir = setup(), b = broker(); const out = await step({ env: { ...ENV, CTRADER_ENV: 'live' }, dir, WS: b.WS, clock: () => R.now * 1000, bars: async () => R.rows, log: () => {} }); assert.equal(out.skipped, 'config'); assert.equal(b.sent.length, 0); }
   { const R = rows(), E = { rows: R.rows.map((x) => [x[0], x[1] / 4000, x[2] / 4000, x[3] / 4000, x[4] / 4000]), now: R.now }, dir = setup(), b = broker();
-    await go(dir, b, R, { eur: E }); assert.deepEqual(news(b).map((x) => x.comment.split('-')[0]), ['dom xau']); const J = file(dir); assert.ok(J.notOffered.eurusd, 'EUR/USD not offered: logged and held off a day');
+    await go(dir, b, R, { eur: E }); assert.deepEqual(news(b).map((x) => x.comment.split('-')[0]), ['dom xau']); const J = file(dir); assert.ok(J.notOffered.eurjpy, 'EUR/JPY not offered: logged and held off a day');
     const n = b.sent.length; await go(dir, b, { ...R, now: R.now + 60 }, { eur: E }); assert.equal(news(b).length, 1); assert.ok(b.sent.length > n); }
 });
 test('forward.mjs E5 leaves the dom job out (label on positions and orders, its ids for closing deals); a stranger is still flagged', () => {
