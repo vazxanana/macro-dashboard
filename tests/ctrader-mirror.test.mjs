@@ -1201,3 +1201,9 @@ test('Big-candle fade book (25 Nov 2026): own ids, 5 % risk, own day stop, stop 
   const a = M.accountsFor({ CTRADER_ACCOUNT_ID: '10152148' }, { mirrorAccounts: JSON.parse(fs.readFileSync('council/ctrader-accounts.json', 'utf8')).mirrorAccounts, drain: [] });
   assert.equal(a.byBook.bfade, '10152145');
 });
+
+test('Mosha 6R barrier book: no daily loss stop (owner, 25 Nov 2026), others keep theirs', () => {
+  const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
+  assert.match(src, /!String\(t\.id\)\.startsWith\('mosha6:'\) && dayDown >=/);
+  assert.equal(LIMITS.dayStop, 0.02);
+});

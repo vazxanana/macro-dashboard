@@ -823,7 +823,8 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       for (const t of fresh) {
         const skip = (why) => skipT(t, why), later = (why, count = false) => laterT(t, why, count);
         const pending = t.status === 'pending';
-        if (dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : LIMITS.dayStop)) { later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
+        if (!String(t.id).startsWith('mosha6:') && dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : LIMITS.dayStop)) {   // 25 Nov 2026 (owner): the Mosha 6R barrier book has no daily stop; every trade still has its own stop
+          later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
         if (String(t.id).startsWith('eqx:') && Object.entries(st.map).filter(([id, m]) => id.startsWith('eqx:') && (m.status === 'open' || m.status === 'sent')).length >= EQX.maxOpen) { later(`${EQX.maxOpen} Equinox positions already open`); continue; }
         const name = SYMBOLS[t.market].find((n) => idOf.has(normName(n))), symbolId = name && idOf.get(normName(name));
