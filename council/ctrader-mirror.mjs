@@ -114,7 +114,7 @@ export const replicaHasOwnAccount = (byBook) => !!(byBook && byBook.replica && b
 export const MOSHA6 = { fresh: 2 * 3600, keep: 2 * 86400 };
 export const isMosha6 = (id) => /(^|:)bar-r6-/.test(String(id || ''));
 export function moshaCandidates(desk, nowS = Math.floor(Date.now() / 1000)) {
-  const recs = desk && Array.isArray(desk.records) ? desk.records : [], seen = new Set(), out = [];
+  const recs = desk && Array.isArray(desk.records) ? desk.records : [], out = [];
   for (const r of recs) {
     if (!r || typeof r.id !== 'string' || !isMosha6(r.id) || (r.market != null && r.market !== 'xau')) continue;
     const side = +r.side === 1 ? 'buy' : +r.side === -1 ? 'sell' : null, entry = +r.entry, stop = +r.stop, t = +r.t;
@@ -123,7 +123,7 @@ export function moshaCandidates(desk, nowS = Math.floor(Date.now() / 1000)) {
     if (sgn * (entry - stop) <= 0) continue;   // absolute rule 1: a stop on the losing side or no record at all
     const open = r.status === 'open', endT = +r.endT;
     if (!open && !(Number.isFinite(endT) && nowS - endT <= MOSHA6.keep)) continue;
-    const key = side + '|' + t; if (seen.has(key)) continue; seen.add(key);   // one position per side and fill time
+    // 25 Nov 2026 (owner: "yes, every record"): every 6R record is its own copy (it was one per side and fill time)
     const tgt = +r.target, t1 = tgt > 0 && sgn * (tgt - entry) > 0 ? tgt : null;
     const why = !open ? null : r.feed === 'Kraken' ? 'priced on the Kraken fallback, never opened' : !(nowS - (+r.first || 0) <= MOSHA6.fresh && nowS - t <= MOSHA6.fresh) ? 'recorded or filled over 2 h ago, never opened late' : null;
     out.push({ id: 'mosha6:' + r.id, k: 'mosha6', market: 'xau', label: 'XAU/USD', name: 'Mosha 6R barrier', side, entry, stop, t1, ...(r.r0 > 0 ? { r0: +r.r0 } : {}),
