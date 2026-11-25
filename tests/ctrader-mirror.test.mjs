@@ -1204,16 +1204,16 @@ test('Big-candle fade book (25 Nov 2026): own ids, 5 % risk, own day stop, stop 
 
 test('Mosha 6R barrier book: no daily loss stop (owner, 25 Nov 2026), others keep theirs', () => {
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
-  assert.match(src, /!String\(t\.id\)\.startsWith\('mosha6:'\) && dayDown >=/);
+  assert.match(src, /!\/\^\(mosha6\|boxfade\):\/\.test\(String\(t\.id\)\) && dayDown >=/);
   assert.equal(LIMITS.dayStop, 0.02);
 });
 import { boxfadeCandidates, boxfadeHasOwnAccount, EQX as EQX2 } from '../council/ctrader-mirror.mjs';
-test('Box fade book (owner, 25 Nov 2026): the desk six markets only, 2 % a trade, own day stop, on the former Replica account', () => {
+test('Box fade book (owner, 25 Nov 2026): the desk six markets only, 2 % a trade, no day stop, on the former Replica account', () => {
   const now = 1_800_000_000, rec = (o = {}) => ({ id: 'bx-1', market: 'eurusd', side: 1, entry: 1.1, stop: 1.099, target: 1.102, t: now - 60, first: now - 60, status: 'open', ...o });
   const out = boxfadeCandidates({ records: [rec(), rec({ id: 'bx-2', stop: 1.101 }), rec({ id: 'bx-3', market: 'usdcad', t: now - 90 }), rec({ id: 'bx-4', t: now - 7200, first: now - 7200 })] }, now);
   assert.deepEqual(out.map((t) => t.id), ['boxfade:bx-1', 'boxfade:bx-4']);
   assert.equal(bookOf(out[0]), 'boxfade'); assert.equal(out[0].noCopy, undefined); assert.equal(out[1].noCopy, true); assert.match(out[1].noCopyWhy, /^Box fade:/);
-  assert.equal(LIMITS.risk.boxfade, 0.02); assert.equal(LIMITS.dayStopBoxfade, 0.15);
+  assert.equal(LIMITS.risk.boxfade, 0.02); assert.equal(LIMITS.dayStopBoxfade, undefined);
   assert.equal(boxfadeHasOwnAccount({ boxfade: '10152148', council: '1' }), true); assert.equal(boxfadeHasOwnAccount({ boxfade: '1', council: '1' }), false);
   const cfg = JSON.parse(fs.readFileSync('council/ctrader-accounts.json', 'utf8')), a = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: cfg.mirrorAccounts, drain: cfg.drain });
   assert.equal(a.byBook.boxfade, '10152148'); assert.equal(a.byBook.replica, '49478137');

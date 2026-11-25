@@ -181,7 +181,7 @@ export const bfadeCandidates = (file, nowS) => eqxCandidates({ bigfade: file }, 
 export const bfadeHasOwnAccount = (byBook) => !!(byBook && byBook.bfade && byBook.council && byBook.bfade !== byBook.council);
 // 25 Nov 2026 (owner: "replace replica with box fade and 2%risk"; account 10152148, the former Replica account): the Box fade desk's
 // records (council-data boxfade/desk.json) alone, the same rules as above, ids `boxfade:<desk record id>`, 2 % of the balance a trade
-// (LIMITS.risk.boxfade), its own day stop LIMITS.dayStopBoxfade 15 % (the default 2 % would end the day at the first loser). Only the
+// (LIMITS.risk.boxfade), NO daily stop (owner, 25 Nov 2026: "no day stop"; every copy keeps its own stop). Only the
 // desk's six markets (EQX.not.boxfade). Copied only while the boxfade book has a demo account of its own. Demo only; the rule loses
 // after costs on its studies: a paper reading copied to a demo, not an edge.
 export const boxfadeCandidates = (file, nowS) => eqxCandidates({ boxfade: file }, nowS, ['boxfade']).map((t) => ({ ...t, id: t.id.replace(/^eqx:boxfade:/, 'boxfade:'), k: 'boxfade', eqx: false, boxfade: true,
@@ -206,7 +206,7 @@ export const RESET_SHARE = 0.5;
 // trade (opening one costs a commission of about 0.01 %): it is a withdrawal or deposit, and the day's start moves with it.
 export const CASH_SHARE = 0.01;
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.01, bfade: 0.05, boxfade: 0.02 }, dayStopBfade: 0.15, dayStopBoxfade: 0.15, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
+  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.01, bfade: 0.05, boxfade: 0.02 }, dayStopBfade: 0.15, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -831,7 +831,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       for (const t of fresh) {
         const skip = (why) => skipT(t, why), later = (why, count = false) => laterT(t, why, count);
         const pending = t.status === 'pending';
-        if (!String(t.id).startsWith('mosha6:') && dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : String(t.id).startsWith('boxfade:') ? LIMITS.dayStopBoxfade : LIMITS.dayStop)) {   // 25 Nov 2026 (owner): the Mosha 6R barrier book has no daily stop; every trade still has its own stop
+        if (!/^(mosha6|boxfade):/.test(String(t.id)) && dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : LIMITS.dayStop)) {   // 25 Nov 2026 (owner): the Mosha 6R barrier book has no daily stop; every trade still has its own stop
           later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
         if (String(t.id).startsWith('eqx:') && Object.entries(st.map).filter(([id, m]) => id.startsWith('eqx:') && (m.status === 'open' || m.status === 'sent')).length >= EQX.maxOpen) { later(`${EQX.maxOpen} Equinox positions already open`); continue; }
