@@ -15,6 +15,8 @@
 //   goldvb     gold-vol-breakout T1 (as gold-vol-breakout-forward reads it): gold, UTC open +/- 0.5 x the previous folded day's range,
 //              stop back at the open, out at 21:00 UTC
 //   jpyvb      the same rule on USD/JPY (usdjpy-vol-breakout-forward)
+//   nasbrk     the auto-researcher's NAS100 breakout, long (nas100-brk-long-focus): an H1 close above the 20 hours' high, above the
+//              200-hour average, entry 14-21 UTC, stop 1 ATR(14), 4R, out after 96 hours, one position at a time
 // Every signal, stop and exit comes from the study's own exported code (imported, never edited); only the record (id, log, marks,
 // an open trade's reading) is written here. The studies judged trades before costs and so does each desk; the five fade / gap
 // rules lose after costs and the two breakouts are short forward records. PAPER RECORDS ONLY: no order, alert, broker or mirror,
@@ -36,6 +38,7 @@ import * as GO from '../research/edge/gold-vol-breakout-hourcost/original.mjs';
 import { T1 as GOLD_T1 } from '../research/edge/gold-vol-breakout-hourcost/costs.mjs';
 import * as JO from '../research/edge/index-vol-breakout/original.mjs';
 import { K as JPY_K } from '../research/edge/fx-vol-breakout/run.mjs';
+import { toArrays, prep, atr as engAtr, sma as engSma } from '../research/edge/auto-researcher/engine.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
 const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, usdjpy: 3, audusd: 5, nzdusd: 5, usdcad: 5, usdchf: 5, eurjpy: 3, gbpjpy: 3, audjpy: 3, cadjpy: 3, eurgbp: 5, euraud: 5, nas100: 1, spx500: 1, de40: 1 };
@@ -207,6 +210,38 @@ function vbDays(Bk, O, desk, market, k, from, sec = 300) {
 export const goldTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau' ? vbDays(toK(B['5m']), GO, 'goldvb', 'xau', GOLD_T1.k, from) : []);
 export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'jpyvb', 'usdjpy', JPY_K, from) : []);
 
+// ─── nasbrk: the auto-researcher's NAS100 breakout, long (nas100-brk-long-focus; owner, 25 Nov 2026: "make it an edge for equinox") ───
+// The rule of the study, signals on H1 candles built from the 5-minute ones (the studies' way): the close of H1 bar i is above the highest
+// high of the 20 bars before it and above the 200-bar average, the NEXT bar opens 14:00-21:59 UTC: long at that open, stop 1 ATR(14)
+// (Wilder, of H1) below it, target 4R, out after 96 hours, one position at a time (a signal waits until the hour after the last
+// trade's exit). The study managed a trade on hourly candles with the stop first when one holds both; the desk reads the 5-minute
+// candles like every desk, so the order inside an hour is read exactly. Before costs (the research ran at none: futures).
+export const NASBRK = { N: 20, ma: 200, hours: [14, 22], stop: 1, rr: 4, hold: 96 };
+export function nasbrkTrades(B, { from, market = 'nas100' } = {}) {
+  if (market !== 'nas100') return [];
+  const M5 = toK(B['5m']); if (M5.length < 3000) return [];
+  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 260) return [];
+  const D = prep(toArrays(H.map((b) => ({ t: b.t, o: b.o, h: b.h, l: b.l, c: b.c }))), market), A = engAtr(D), MA = engSma(D.c, NASBRK.ma);
+  const firstM5 = new Map(); M5.forEach((b, k) => { const h = Math.floor(b.t / 3600) * 3600; if (!firstM5.has(h)) firstM5.set(h, k); });
+  const f = fx(market), id = uniq(), out = []; let freeT = -Infinity;
+  for (let i = Math.max(NASBRK.ma + 10, NASBRK.N); i < D.n; i++) {
+    const entryT = i + 1 < D.n ? D.t[i + 1] : D.t[i] + 3600; if (entryT < freeT) continue;
+    const hr = new Date(entryT * 1000).getUTCHours(); if (!(hr >= NASBRK.hours[0] && hr < NASBRK.hours[1])) continue;
+    let hi = -Infinity; for (let k = i - NASBRK.N; k < i; k++) if (D.h[k] > hi) hi = D.h[k];
+    if (!(D.c[i] > hi) || !(MA[i] === MA[i]) || !(D.c[i] > MA[i])) continue;
+    const a = A[i]; if (!(a > 0)) continue;
+    const fi = firstM5.get(entryT); if (fi == null) continue;
+    const fill = M5[fi].o, stop = fill - NASBRK.stop * a, tgt = fill + NASBRK.rr * NASBRK.stop * a;
+    const r = rec('nasbrk', market, { idTail: id(`b${M5[fi].t}`), kind: 'nasbrk-h1', label: 'H1 20-hour breakout, long', h: '1h', l: '1h', s: 1, M5, fi, fill, stop, tgt, cap: NASBRK.hold * 3600,
+      log: [{ t: H[i].e, text: `An H1 candle closed at ${f(D.c[i])}, above the highest high of the 20 hours before it (${f(hi)}) and above its 200-hour average (${f(MA[i])}). The next hour (${String(hr).padStart(2, '0')}:00 UTC) is inside the rule's 14:00-22:00 window: buy at that open, the stop 1 ATR(14) of H1 (${f(a)}) below, 4R.` }],
+      marks: [{ kind: 'level', p: hi, a: H[i - NASBRK.N].t, at: H[i].e, label: '20-hour high' }, { kind: 'level', p: MA[i], a: H[i - NASBRK.N].t, at: H[i].e, label: '200-hour average', under: true }] });
+    if (!r) continue;
+    freeT = r.status === 'open' ? Infinity : Math.floor(r.endT / 3600) * 3600 + 3600;
+    if (r.t >= from) out.push(r);
+  }
+  return out;
+}
+
 
 // ─── lyriac: the passing rules as one desk (24 Nov 2026, owner: "build as new edge called Lyriac and put it in equinox") ───
 // The three intraday rules of research/edge/passing-rules-book that pass their tests, each with its own study's code: the gold
@@ -302,6 +337,7 @@ export const DESKS2 = {
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
+  nasbrk: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nasbrkTrades, note: 'NAS100 breakout: the auto-researcher\'s lead, an H1 close above the 20 hours\' high and above the 200-hour average, bought at the next open between 14:00 and 22:00 UTC, stop 1 ATR, 4R, out after 96 hours (nas100-brk-long-focus). It passed its pre-registered tests but is a candidate, not an edge, and its cost is not measured.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };

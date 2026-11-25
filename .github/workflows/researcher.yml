@@ -14,7 +14,7 @@ on:
         required: false
         default: 'all'
       shard:
-        description: 'Only this shard (0, 1 or 2), or 0 and 1 when empty. Shard 2 (lanes 8-11) is a one-off third runner for workers 1, 2 and 10: it never chains itself'
+        description: 'Only this shard (0, 1 or 2), or 0 and 1 when empty. Shard 2 (lanes 8-11) is a third runner for workers 1, 2 and 10; from 25 Nov 2026 (owner: keep the 3 extra going) it chains itself like shard 0'
         required: false
         default: ''
 
@@ -59,7 +59,7 @@ jobs:
           - { worker: 7, shard: 1 }
           - { worker: 8, shard: 1 }
           - { worker: 9, shard: 1 }
-          # shard 2 (lanes 8-11) only for workers 1, 2 and 10, started by hand for a few hours (owner, 25 Nov 2026: use the 3 spare slots until 8pm); it does not dispatch a next run
+          # shard 2 (lanes 8-11) only for workers 1, 2 and 10, started by hand once, then chaining itself (owner, 25 Nov 2026: use the 3 spare slots, then keep them going)
           - { worker: 3, shard: 2 }
           - { worker: 4, shard: 2 }
           - { worker: 5, shard: 2 }
@@ -124,6 +124,13 @@ jobs:
             tail -n 2 "$RUNNER_TEMP"/lane-*.log
             node council/datasync.mjs data save "Researcher worker $W $(date -u +%Y-%m-%dT%H:%MZ)" research/auto || echo "save failed"
           done
+
+      - name: Next run (shard 2 chains itself, owner 25 Nov 2026 - keep the 3 extra going)
+        if: matrix.shard == 2 && success() && vars.RESEARCHER_OFF != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          W: ${{ matrix.worker }}
+        run: gh workflow run researcher.yml --ref main -R "${{ github.repository }}" -f worker="$W" -f shard=2 || echo "next run not dispatched"
 
       - name: Next run (shard 0 only, it starts both shards)
         if: matrix.shard == 0 && success() && vars.RESEARCHER_OFF != '1'
