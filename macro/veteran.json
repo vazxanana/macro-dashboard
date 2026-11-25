@@ -1,8 +1,8 @@
 {
  "v": 1,
- "at": "2026-11-25T16:18:19.000Z",
+ "at": "2026-11-25T17:24:51.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-25T16:17:58.000Z",
+ "strategistAt": "2026-11-25T17:24:28.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
@@ -115,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.08 pts in 5 sessions (vote flat); score z (4-week fall) −0.82",
+   "macro": "−0.24 pts in 5 sessions (vote flat); score z (4-week fall) −0.82",
    "veteran": "DXY 103.84, +0.19% on the week, +1.39% over 4 weeks · broad USD +1.85% over 4 weeks",
    "stance": "qualify",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -1325,7 +1325,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 45% on average, came true 32%."
  },
  "briefing": {
-  "at": "2026-11-25T16:18:19.000Z",
+  "at": "2026-11-25T17:24:51.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1704,8 +1704,7 @@
       "why": "The veteran's week call: the middle 60% of past 5-session outcomes ends above this.",
       "dist": -1.61,
       "side": "below",
-      "near": 1,
-      "crossed": true
+      "near": 1
      },
      {
       "price": 3467.3,
@@ -1714,8 +1713,7 @@
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends above this.",
       "dist": -2.36,
       "side": "below",
-      "near": 0,
-      "crossed": true
+      "near": 0
      }
     ],
     "fresh": {
@@ -1725,9 +1723,9 @@
      "text": "as of 2026-11-24 close"
     },
     "mark": {
-     "px": 3448.35,
-     "at": "2026-11-25T16:17:58.000Z",
-     "dist": -2.9
+     "px": 3495.675,
+     "at": "2026-11-25T17:24:28.000Z",
+     "dist": -1.56
     }
    },
    "dxy": {
@@ -3097,133 +3095,7 @@
    }
   ]
  },
- "events": [
-  {
-   "key": "2026-11-25T13:30|USD",
-   "title": "Core PCE Price Index m/m",
-   "country": "USD",
-   "at": "2026-11-25T13:30:00.000Z",
-   "type": null,
-   "released": true,
-   "titles": [
-    "Core PCE Price Index m/m",
-    "Prelim GDP q/q"
-   ],
-   "expMovePct": 1.6,
-   "note": "Gold trades this through real yields: watch the TIPS reaction, not the headline.",
-   "bands": {
-    "cool": 0.2,
-    "hot": 0.4
-   },
-   "expectations": [
-    {
-     "title": "Core PCE Price Index m/m",
-     "consensus": "0.3%",
-     "previous": "0.3%",
-     "captured": "2026-11-22T06:23:21.000Z",
-     "source": "captured before the release from the strategist's calendar (not a verified survey)",
-     "range": null,
-     "rangeNote": "n/a: the calendar publishes no forecast range",
-     "actual": null,
-     "cluster": []
-    },
-    {
-     "title": "Prelim GDP q/q",
-     "consensus": "3.5%",
-     "previous": "3.4%",
-     "captured": "2026-11-22T06:23:21.000Z",
-     "source": "captured before the release from the strategist's calendar (not a verified survey)",
-     "range": null,
-     "rangeNote": "n/a: the calendar publishes no forecast range",
-     "actual": null,
-     "cluster": []
-    }
-   ],
-   "scenarios": [
-    {
-     "k": "hot",
-     "name": "Hot",
-     "when": "≥ 0.4%",
-     "path": "Fed: hawkish repricing",
-     "usd": "USD up",
-     "gold": "Down first, through real yields",
-     "action": "Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction's direction, at ¼ starter size. A gold short is never a macro call: it needs this hawkish surprise and a bearish reaction (rule G). The rule book's \"gold closing up anyway cancels the sell bias\" failed its test (research/edge/rulebook-stress C5: after such days gold fell more, n 12, t −1.04), so an up-close is not read as an all-clear.",
-     "history": null
-    },
-    {
-     "k": "inline",
-     "name": "In line",
-     "when": "> 0.2% and < 0.4%",
-     "path": "Fed: path unchanged",
-     "usd": "Little; the trend resumes",
-     "gold": "Little; the prevailing trend resumes",
-     "action": "No event trade. Volatility runs about an hour even on an in-line print; after it, the desks' own setups decide.",
-     "history": null
-    },
-    {
-     "k": "cool",
-     "name": "Cool",
-     "when": "≤ 0.2%",
-     "path": "Fed: dovish repricing",
-     "usd": "USD down",
-     "gold": "Up, through real yields",
-     "action": "Act after the release, not before. After the first hour, only a retest of a level marked before the release, in the reaction's direction, at ¼ starter size; full size only once price confirms (rule G).",
-     "history": null
-    }
-   ],
-   "stats": null,
-   "call": null,
-   "callNote": "Released: no new call after the release.",
-   "label": "Descriptive, not a tested edge.",
-   "publicOnly": true,
-   "paperOnly": true,
-   "batch": {
-    "kind": "PCE",
-    "points": [
-     {
-      "text": "Core CPI for October printed 0.30% m/m (the Cleveland Fed's file of actual prints, read 2026-11-25). On the 2022-24 record a core CPI of 0.3% went with core PCE near 0.24% (fit on 36 months, typical miss ±0.07 pp): a descriptive fit on past months, not a forecast on the record.",
-      "kind": "lead"
-     },
-     {
-      "text": "In 2022-24 core PCE printed on average −0.08 pp from core CPI; the same to one decimal in 13 of 36 months, lower in 21. The CPI and PPI of the month were both out before every PCE release (36 of 36).",
-      "kind": "fact"
-     },
-     {
-      "text": "Adding PPI to core CPI did not reliably improve the PCE read (24 rolling tests): read PPI as colour, not a signal.",
-      "kind": "fact"
-     }
-    ],
-    "label": "From the 2022-24 first-print record (36 months): descriptive, not a tested edge or a forecast on the record.",
-    "noSurprise": "No consensus field from the batch is used: a surprise needs the expectation captured before the release."
-   },
-   "research": {
-    "items": [
-     {
-      "id": "N6",
-      "priority": "medium",
-      "title": "CPI and PPI detail → PCE",
-      "rule": "Replace the weak aggregate PPI feature with BEA-source-mapped component surprises; compare against CPI-only and prior-PCE baselines with expanding training and a prospective ledger.",
-      "gate": "BEA detailed source-map explanation and the 36-month first-release panel. Historical crosswalk, weights, adjustments and timestamped consensus remain open."
-     }
-    ],
-    "status": "Test specifications from your news-trading register (V2, 19 Nov 2026): none is validated, none places an order. The register's first step is a timestamped consensus and a demo quote log for this release."
-   },
-   "gate": {
-    "doc": "news-expectation-source-and-timing-gates-2026-11-19.md",
-    "state": "context",
-    "text": "Consensus captured 79 h before the release from the Forex Factory calendar: usable as context. It is below your gate for a scored surprise (no licensed point-in-time snapshot, fetch clock or hash).",
-    "nowcast": "For a nowcast baseline, use the Cleveland Fed value from before 08:30 ET; its 10:00 ET update the same day is after the release."
-   },
-   "gdpCase": {
-    "doc": "gdp-revision-and-composition-case-2023-q3.md",
-    "lines": [
-     "The calendar's 3.5% is an annualized (SAAR) rate: about 0.86% quarter over quarter. Never compare it with a non-annualized figure.",
-     "Read the parts, not only the headline: in your 2023 Q3 case GDP ended where the advance estimate began (0.0 pp) while consumption was revised −0.9 pp and core PCE inflation −0.4 pp.",
-     "A revision is not a surprise: compare the print with a consensus captured before it, and say which vintage you score."
-    ]
-   }
-  }
- ],
+ "events": [],
  "newsAhead": {
   "label": "From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.",
   "items": []
@@ -3446,7 +3318,7 @@
   }
  },
  "summary": {
-  "sentence": "This week: the macro leans against gold (at the 20 Nov close he put 53% on gold closing above $3,538 on 18 Dec, base 57%; gold is now 2.5% below that level, so read the lean, not the odds). No major release is scheduled this week. Gold has traded below $3,503 (last week's low) since the 24 Nov close and is near $3,448. Watch $3,500 above (broken since the close) and $3,400 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
+  "sentence": "This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,503 (last week's low) since the 24 Nov close and is near $3,496. Watch $3,600 above and $3,450 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
   "bias": {
    "lean": "against",
    "p": 0.53,
@@ -3466,25 +3338,24 @@
     "total": 8
    },
    "why": "The tested Gold Macro Score shows no edge, so the odds stay near the base rate.",
-   "gapPct": -2.5
+   "gapPct": -1.2
   },
   "event": null,
   "levels": {
    "px": 3551.215,
    "asOf": "2026-11-24",
    "above": {
-    "price": 3500,
+    "price": 3600,
     "label": "Round number",
-    "dist": -1.44,
-    "distNow": 1.5,
-    "crossed": true
+    "dist": 1.37,
+    "distNow": 2.98
    },
    "below": {
-    "price": 3400,
+    "price": 3450,
     "label": "Round number (price is under every level he tracks)",
     "made": true,
-    "dist": -4.26,
-    "distNow": -1.4
+    "dist": -2.85,
+    "distNow": -1.31
    },
    "fresh": {
     "asOf": "2026-11-24",
@@ -3493,9 +3364,9 @@
     "text": "as of 2026-11-24 close"
    },
    "mark": {
-    "px": 3448.35,
-    "at": "2026-11-25T16:17:58.000Z",
-    "dist": -2.9
+    "px": 3495.675,
+    "at": "2026-11-25T17:24:28.000Z",
+    "dist": -1.56
    },
    "broken": {
     "price": 3503,
@@ -3532,7 +3403,7 @@
    "issues": []
   }
  },
- "brief": "Macro veteran, 2026-11-25 16:18 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, US dollar. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4062: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.82 vs ry hit 52%, t 1.09; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.36. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 80% (all weeks 56%) | 2. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 3. Gold below its 10-week average (−12.6%); Gold Macro Score −0.66 (AUCTION) | H1 (54%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-01 before any close below $3,503 | H2 (76%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-12-01 | H3 (56%): DXY closes 2026-12-22 below 103.84 (the 2026-11-24 close) At a glance: This week: the macro leans against gold (at the 20 Nov close he put 53% on gold closing above $3,538 on 18 Dec, base 57%; gold is now 2.5% below that level, so read the lean, not the odds). No major release is scheduled this week. Gold has traded below $3,503 (last week's low) since the 24 Nov close and is near $3,448. Watch $3,500 above (broken since the close) and $3,400 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov. Event playbook: USD Core PCE Price Index m/m 2026-11-25 13:30 UTC: consensus 0.3% (previous 0.3%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-25 17:24 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, US dollar. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4062: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.82 vs ry hit 52%, t 1.09; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.36. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 80% (all weeks 56%) | 2. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 3. Gold below its 10-week average (−12.6%); Gold Macro Score −0.66 (AUCTION) | H1 (54%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-01 before any close below $3,503 | H2 (76%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-12-01 | H3 (56%): DXY closes 2026-12-22 below 103.84 (the 2026-11-24 close) At a glance: This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,503 (last week's low) since the 24 Nov close and is near $3,496. Watch $3,600 above and $3,450 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
