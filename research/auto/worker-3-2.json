@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 3,
  "started": "2026-11-25T11:14:32.873Z",
- "tries": 3969400,
- "survivedA": 4903,
- "candidates": 704,
- "cLooks": 54,
+ "tries": 4112800,
+ "survivedA": 5067,
+ "candidates": 724,
+ "cLooks": 56,
  "cPasses": 0,
  "groups": {
   "usdchf|blk-|both": {
@@ -17,15 +17,15 @@
    "pass": false
   },
   "eurjpy|blk-|both": {
-   "more": 132,
+   "more": 133,
    "pass": false
   },
   "eurjpy|big+|both": {
-   "more": 23,
+   "more": 25,
    "pass": false
   },
   "eurusd|big+|both": {
-   "more": 80,
+   "more": 81,
    "pass": false
   },
   "eurusd|big+|long": {
@@ -33,15 +33,15 @@
    "pass": false
   },
   "usdjpy|blk-|both": {
-   "more": 59,
+   "more": 60,
    "pass": false
   },
   "usdcad|big-|both": {
-   "more": 27,
+   "more": 28,
    "pass": false
   },
   "xau|big+|long": {
-   "more": 33,
+   "more": 34,
    "pass": false
   },
   "nzdusd|blk-|both": {
@@ -49,7 +49,7 @@
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 51,
+   "more": 55,
    "pass": false
   },
   "xau|big+|both": {
@@ -77,15 +77,15 @@
    "pass": false
   },
   "xau|blk-|both": {
-   "more": 8,
+   "more": 10,
    "pass": false
   },
   "eurjpy|big-|both": {
-   "more": 7,
+   "more": 8,
    "pass": false
   },
   "gbpusd|blk-|both": {
-   "more": 21,
+   "more": 22,
    "pass": false
   },
   "usdjpy|big+|short": {
@@ -113,7 +113,7 @@
    "pass": false
   },
   "audusd|blk-|both": {
-   "more": 16,
+   "more": 17,
    "pass": false
   },
   "usdjpy|big+|both": {
@@ -145,7 +145,7 @@
    "pass": false
   },
   "eurusd|blk-|both": {
-   "more": 7,
+   "more": 8,
    "pass": false
   },
   "nzdusd|blk+|both": {
@@ -193,7 +193,7 @@
    "pass": true
   },
   "usdchf|blk-|long": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|big-|short": {
@@ -221,6 +221,14 @@
    "pass": false
   },
   "eurusd|blk+|short": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|sweep-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "nzdusd|blk-|short": {
    "more": 0,
    "pass": false
   }
@@ -3176,9 +3184,117 @@
     "months": 83
    },
    "p": 0.11507
+  },
+  {
+   "at": "2026-11-25T17:57:13.657Z",
+   "group": "eurusd|sweep-|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "sweep",
+      "N": 10,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     10,
+     12
+    ],
+    "dows": null,
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 0.75,
+    "rr": 6,
+    "hold": 240
+   },
+   "A": {
+    "n": 558,
+    "mean": 0.3356,
+    "t": 3.11,
+    "win": 19.7,
+    "months": 119
+   },
+   "B": {
+    "n": 287,
+    "mean": 0.2313,
+    "t": 1.55,
+    "win": 18.5,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 577,
+    "mean": -0.1906,
+    "t": -1.87,
+    "win": 12.3,
+    "months": 119
+   },
+   "C": {
+    "n": 388,
+    "mean": 0.0146,
+    "t": 0.12,
+    "win": 15.5,
+    "months": 83
+   },
+   "p": 0.45224
+  },
+  {
+   "at": "2026-11-25T17:59:27.283Z",
+   "group": "nzdusd|blk-|short",
+   "g": {
+    "mk": "nzdusd",
+    "trig": [
+     {
+      "kind": "blk",
+      "H": 3,
+      "at": 18,
+      "follow": false
+     }
+    ],
+    "side": "short",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 3,
+    "rr": 0.5,
+    "hold": 4
+   },
+   "A": {
+    "n": 316,
+    "mean": 0.0706,
+    "t": 3.71,
+    "win": 61.7,
+    "months": 110
+   },
+   "B": {
+    "n": 151,
+    "mean": 0.0632,
+    "t": 2.3,
+    "win": 63.6,
+    "months": 54
+   },
+   "placeboA": {
+    "n": 316,
+    "mean": -0.1023,
+    "t": -4.37,
+    "win": 40.2,
+    "months": 110
+   },
+   "C": {
+    "n": 237,
+    "mean": 0.0352,
+    "t": 1.96,
+    "win": 55.7,
+    "months": 76
+   },
+   "p": 0.025
   }
  ],
- "chunks": 14,
- "updated": "2026-11-25T17:34:39.177Z",
- "chanceCandidates": 361.2
+ "chunks": 15,
+ "updated": "2026-11-25T17:59:44.671Z",
+ "chanceCandidates": 374.3
 }
