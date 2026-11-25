@@ -7151,3 +7151,8 @@ read hourly candles, stop first). Before costs. Page: Equinox tab "NAS100 breako
 the study's own 2026, n 74, was −0.05R after its assumed cost). A paper record of a candidate that passed its follow-up but is not an edge;
 2026 so far is flat to slightly negative. Tests: `tests/nasbrk-desk.test.mjs` (signal bars checked one by one, one position at a time, the
 engine's first trade, no look-ahead, wiring).
+
+**Box fade without gold, silver and USD/CAD** (25 Nov 2026, owner: "in box fade remove usdcad silver gold"). `council/edge-desks-2.mjs` `BOX_MARKETS` = the study's ten markets less
+xau, xag and usdcad (seven: EUR/USD, GBP/USD, USD/JPY, AUD/USD, NZD/USD, USD/CHF, EUR/JPY); `DESKS2.boxfade.markets` reads them; the other fade / gap desks keep their ten.
+`council/edge-desks.mjs` `buildDesk` now drops a stored record of a market the desk no longer reads, so the three markets' Box fade records leave `boxfade/desk.json` on the
+loop's next run after this merges (every other desk's markets list is the full list its records come from; nothing else changes). Test: `tests/edge-desks-2.test.mjs`.

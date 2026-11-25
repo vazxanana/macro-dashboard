@@ -41,6 +41,7 @@ import { K as JPY_K } from '../research/edge/fx-vol-breakout/run.mjs';
 import { toArrays, prep, atr as engAtr, sma as engSma } from '../research/edge/auto-researcher/engine.mjs';
 
 export const STUDY_MARKETS = FADE.MARKETS;   // the ten markets of the five fade / gap grids
+export const BOX_MARKETS = STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m));   // the Box fade desk: gold, silver and USD/CAD left it (owner, 25 Nov 2026)
 const DEC = { xau: 2, xag: 3, eurusd: 5, gbpusd: 5, usdjpy: 3, audusd: 5, nzdusd: 5, usdcad: 5, usdchf: 5, eurjpy: 3, gbpjpy: 3, audjpy: 3, cadjpy: 3, eurgbp: 5, euraud: 5, nas100: 1, spx500: 1, de40: 1 };
 const fx = (m) => (v) => (+v).toFixed(DEC[m] ?? 5);
 const word = (d) => (d > 0 ? 'buy' : 'sell');
@@ -333,7 +334,7 @@ export const DESKS2 = {
   fade: { tfs: ['5m'], markets: STUDY_MARKETS, read: fadeTrades, note: 'Break fade: the first M15 structure break faded at the next 5-minute open, stop 1 ATR, 2R, out after a day (grid7-wide-fade, cell m15 none atr 2R all), on ten markets.' + PAPER },
   bigfade: { tfs: ['5m'], markets: STUDY_MARKETS, read: bigTrades, note: 'Big-candle fade: an M15 candle with a body over 1.5 ATR and no break the same way, faded to its 50 % (big-candle-fade, cell m15 k1.5 nobreak half), on ten markets.' + PAPER },
   roundfade: { tfs: ['5m'], markets: STUDY_MARKETS, read: roundTrades, note: 'Round-number fade: an M15 close beyond a round level faded outside 07-17 UTC, 2R (round-number-breaks, cell fade other 2R), on ten markets.' + PAPER },
-  boxfade: { tfs: ['5m'], markets: STUDY_MARKETS, read: boxTrades, note: 'Box fade: an M5 box close-out of the H1-M15-M5 box chain faded outside 07-17 UTC, 1R (fade-breaks-holdout, rule F1), on ten markets.' + PAPER },
+  boxfade: { tfs: ['5m'], markets: BOX_MARKETS, read: boxTrades, note: 'Box fade: an M5 box close-out of the H1-M15-M5 box chain faded outside 07-17 UTC, 1R (fade-breaks-holdout, rule F1), on seven markets.' + PAPER },
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },

@@ -5,7 +5,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as D2 from '../council/edge-desks-2.mjs';
-import { DESKS, ELEVEN } from '../council/edge-desks.mjs';
+import { DESKS, ELEVEN, buildDesk } from '../council/edge-desks.mjs';
 import { clean, merge } from '../council/mosha-desk.mjs';
 import { frames } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
@@ -38,7 +38,8 @@ test('the adapters read the studies\' own cells', () => {
   assert.deepEqual(FB.F1, { ch: 2, trig: 0, sess: 2, ei: 0, si: 0, x: 0 });
   const med = D2.fvgMedians(); assert.equal(Object.keys(med).length, 10); assert.ok(med.xau['1h'] > 0);
   assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nasbrk', 'lyriac', 'dom']);
-  for (const k of ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
+  for (const k of ['fade', 'bigfade', 'roundfade', 'fvg']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
+  assert.deepEqual(D2.DESKS2.boxfade.markets, FADE.MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m)));   // gold, silver and USD/CAD left the Box fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.goldvb.markets, ['xau']); assert.deepEqual(D2.DESKS2.jpyvb.markets, ['usdjpy']);
   for (const k of Object.keys(D2.DESKS2)) assert.equal(DESKS[k], D2.DESKS2[k]);
   assert.equal(DESKS.lit.markets, ELEVEN); assert.equal(DESKS.msnr.markets, ELEVEN); assert.equal(ELEVEN.length, 11);
@@ -178,4 +179,13 @@ test('Equinox: its own page with the eight desks; the Desk keeps its five', () =
   assert.match(yml, /timeout 150 node council\/edge-desks\.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nasbrk,lyriac,dom/);
   const src2 = fs.readFileSync(new URL('../council/edge-desks-2.mjs', import.meta.url), 'utf8');
   assert.doesNotMatch(src2, /from '\.\/(ctrader|dom-demo|gotobi|trader)|placeOrder|NEW_ORDER/);
+});
+
+test('Box fade: gold, silver and USD/CAD left the desk, and their stored records go on the next run (owner, 25 Nov 2026)', () => {
+  assert.deepEqual(D2.BOX_MARKETS, D2.STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m))); assert.equal(D2.BOX_MARKETS.length, 7);
+  assert.deepEqual(D2.DESKS2.boxfade.markets, D2.BOX_MARKETS); assert.deepEqual(D2.DESKS2.fade.markets, D2.STUDY_MARKETS);   // the other fade desks keep their ten
+  const old = ['xau', 'xag', 'usdcad', 'eurusd'].map((m, k) => ({ id: `${m}:boxfade-x${k}`, ...(m === 'xau' ? {} : { market: m }), kind: 'boxfade-m5', side: 1, entry: 100, stop: 99, target: 101, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
+  const o = buildDesk('boxfade', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14);
+  assert.deepEqual(o.records.map((r) => r.market || 'xau'), ['eurusd']); assert.deepEqual(o.markets, ['eurusd']);
+  assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on seven markets \(not gold, silver or USD\/CAD\)/);
 });
