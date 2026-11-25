@@ -7124,3 +7124,17 @@ with B +0.095R since 2024 (n 72, t 0.45) and -0.178R before: noise, not tested. 
 `research/edge/usdchf-fade-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report`, MEANING.md, RESULT.md, result.json). The researcher's `usdchf|fade|short` lead (a close above the previous 5 H1 highs sold at the next open at 20-22 UTC; stop 0.75 x ATR(14), 1R, out after 12 candles; +0.240R on mid candles 2020 on, Holm 0.0036) filled at the demo broker's bid / ask, 127 orders 2023-12 to 2026-11. **TOO FEW as pre-registered**: 33 orders had no quote to enter on (the rollover), 94 resolved (bar 100). Mid +0.225R; at the broker +0.011R before and −0.034R after commission (month t −0.25); tick minus mid −0.214R (t −2.31). Both researcher leads are mid-candle results the broker's quotes remove. No forward record; no variant on these years. Test: `tests/usdchf-fade-exec.test.mjs`.
 
 **Second runner for five workers (25 Nov 2026, owner: "More speed")**: `researcher.yml` has a matrix `shard` 0 / 1; shard 1 (lanes 4-7, files `worker-<W>-4..7.json`, same engine and seeds-by-lane) runs for workers 1-6 and 10 (17 research jobs in all; 25 Nov 2026 owner: "double the worker and jobs": the free plan's 20 concurrent jobs are the ceiling, so 17 leaves room for the council loop and CI), so the council loop and CI always find a free runner (a free plan allows 20 at once). Only shard 0 dispatches the next run (it starts both shards); the input `shard` (0 or 1) starts one shard alone. Never add shards to every worker: 20 jobs would starve the council loop.
+
+## The auto-researcher's NAS100 breakout lead, tested on its own (25 Nov 2026, owner: "NAS100 breakout, long, focus on that")
+`research/edge/nas100-brk-long-focus/` (PREREGISTRATION.md committed alone first, one wording amendment before any result; `run.mjs`,
+RESULT.md, result.json; `tests/nas100-brk-long-focus.test.mjs`). The rule: worker 10's lead `nas100|brk|long` on OANDA NAS100 H1,
+long when the close beats the previous 20 highs, entry 14-21 UTC, close above the 200-bar average, stop 1 ATR, 4R, out after 96 h.
+Gate: the engine on the full file (131,132 bars from 2005) gives A n 1,018 +0.198R, B n 473 +0.370R, C n 645 +0.484R. **PASS on the
+five pre-registered tests, so a CANDIDATE for a forward record, never an edge**: at an assumed 6e-5 cost C is +0.464R (t 4.86);
+the same long filters with no breakout +0.098R and 2,000 random filter-only draws none near it; 16 of 16 one-at-a-time neighbours
+positive in A, B and C; other indices positive but about a fifth the size (US500 +0.155R, pooled +0.095R, month t 2.28, JP225 0);
+best year 25 % of the C total. Weak points said in RESULT.md: the other indices are one bull market seen five times, 2026 so far
+is −0.05R (n 74), the rule came out of 118 million tries, and the cost is assumed, not a futures quote. Expect nearer +0.1R than
++0.46R forward. Proposed next (owner): a forward record from 26 Nov 2026, then a measured broker cost. Nothing live changed.
+Local reruns of research fetches need `node --use-env-proxy`; the engine's `loadMarket` prefers a local 5-minute cache, so the
+study reads its own fetched H1 file.

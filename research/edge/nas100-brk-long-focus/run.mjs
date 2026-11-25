@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import zlib from 'node:zlib';
-import { loadMarket, simulate, summary, atr, sma, rng } from '../auto-researcher/engine.mjs';
+import { toArrays, prep, simulate, summary, atr, sma, rng } from '../auto-researcher/engine.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url)), cacheDir = process.argv[2] || '/tmp/nasbrk-cache';
 export const RULE = { mk: 'nas100', trig: [{ kind: 'brk', N: 20 }], side: 'long', hours: [14, 22], dows: null, trend: 'with', vol: 'none', volP: 0.3, stop: 1, rr: 4, hold: 96 };
@@ -58,6 +58,8 @@ const yearOf = (t) => new Date(t * 1000).getUTCFullYear();
 
 
 // the engine's own fetch skips a window that fails four times and goes on (that left 2019 on only); this one retries hard and stops loudly
+// the engine's loadMarket prefers a local 5-minute cache that holds NAS100 only from 2019 here; read the fetched H1 file directly (what a runner without that cache gets)
+const loadMarket = async (mk, dir) => prep(toArrays(JSON.parse(zlib.gunzipSync(fs.readFileSync(path.join(dir, `${mk}-1h.json.gz`))))), mk);
 async function ensureCache(mk) {
   const f = path.join(cacheDir, `${mk}-1h.json.gz`); fs.mkdirSync(cacheDir, { recursive: true });
   if (fs.existsSync(f) && fs.statSync(f).size > 0) { const rows = JSON.parse(zlib.gunzipSync(fs.readFileSync(f))); if (rows.length && rows[0].t < Date.UTC(2011, 0, 1) / 1000 || mk === 'us2000' && rows.length > 20000) return; }
