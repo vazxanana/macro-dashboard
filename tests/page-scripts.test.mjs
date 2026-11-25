@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const PAGES = ['market-structure.html', 'gold-trading.html', 'edge-lab.html'];
+const PAGES = ['market-structure.html', 'gold-trading.html', 'edge-lab.html', 'farm.html'];
 for (const page of PAGES) {
   test(`${page}: inline scripts parse`, () => {
     const html = fs.readFileSync(new URL(`../${page}`, import.meta.url), 'utf8'), re = /<script(\s[^>]*)?>([\s\S]*?)<\/script>/gi;
