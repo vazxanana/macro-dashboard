@@ -19,12 +19,14 @@ beyond the stop exits at its open, one position at a time per rule.
 A rule = trigger + filters + exit. Triggers (the worker's family): **brk** (close beyond the prior N-bar high / low, followed),
 **fade** (the same, traded the other way), **pull** (a moving-average trend with an RSI pullback), **big** (a candle over k ATR,
 faded or followed), **blk** (a break of the previous clock block's range, followed or faded), **dev** (a close z ATR from its
-moving average, faded or followed), and for the "wild" worker two triggers that must agree on the side. Filters: UTC hour
+moving average, faded or followed), **eg** (the owner's engulf: a candle closing beyond the high / low of the nearest opposite
+candle within the 3 candles before it, first close only; followed or faded), **sweep** (a wick through the prior N-bar high
+or low that closes back inside: traded as the reversal, or against it), and for the "wild" worker two triggers that must agree on the side. Filters: UTC hour
 window, weekdays, trend with / against the 200-bar average, ATR percentile below / above. Exit: stop 0.5-3 ATR, target 0.5-6R or
 none, a time limit of 4-240 candles. Side: long, short or both. The grids are in `engine.mjs` (`SPACE`); nothing is added after
 a run starts.
 
-Workers: 1 brk + fade, 2 pull + dev, 3 big + blk, 4 all families, 5 wild (two triggers). Seeds differ by worker and by chunk.
+Workers: 1 brk + fade + eg, 2 pull + dev, 3 big + blk + sweep, 4 all families, 5 wild (two triggers). Seeds differ by worker and by chunk. Version `auto-1`; adding the `eg` and `sweep` triggers happened before any run.
 
 ## The three stages (windows by entry date)
 
