@@ -7053,3 +7053,19 @@ loses about 0.05R less than away from one) · `equal-pool-m5-confirm` +0.063 (1,
 −0.121 (2,097, −3.99). The pattern is the one of every earlier grid: about zero before costs, the cost decides, and no key level,
 direction call, session or confluence picks the better trades. Do not re-test variants of these on these years. The agents shared
 one checkout and a three-slot run queue (4 cores); each committed only its own paths.
+
+## The auto-researcher: five workers that never stop (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
+`research/edge/auto-researcher/` (PREREGISTRATION.md committed alone first, `engine.mjs`, `tests/auto-researcher.test.mjs`) and
+`.github/workflows/researcher.yml` (free runner minutes; five matrix jobs; each works about 5.5 hours, saves to council-data
+`research/auto/worker-<n>.json` every 25 minutes and dispatches its own next run; cancel the runs, or set the repository variable
+`RESEARCHER_OFF` to 1, to stop). A seeded generator of rules over H1 OANDA mid candles of ten markets: a trigger (breakout,
+fade, pullback, big candle, block break, deviation, the owner's engulf, sweep; worker 5 combines two) + filters (hour, weekday,
+trend, volatility) + an exit (stop 0.5-3 ATR, target 0-6R, time limit). **Three stages**: A search 2005-14 (n >= 250, +0.04R
+net, month t >= 3), B validation 2015-19 (n >= 100, mean > 0, t >= 1.5, the side-flipped twin negative), C holdout 2020 on,
+ONE look per market / trigger / side group, a **lead** only with t >= 2 AND Holm p < 0.05 over every C look made. Every try is
+counted and the file says how many chance candidates the tries should give; a lead is never an edge (it goes to a pre-registered
+forward record). About 100 tries a second a worker. Read the state: `node research/edge/auto-researcher/engine.mjs report
+<dir with the worker files>`. A first smoke run: 8,600 tries in 90 seconds, 12 survived A, 1 candidate, which failed on C
+(−0.088R, t −1.24). No threshold, grid or window changes while a version runs; a change is `auto-2` and is counted apart.
+Not yet in it: the owner's EF zones, Mosha VR / CF, the iFVG and the Telegram-downloads folder on his laptop (needs the folder
+shared with this session). Tests: `tests/auto-researcher.test.mjs` (7).
