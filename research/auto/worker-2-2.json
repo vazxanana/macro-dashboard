@@ -2,14 +2,14 @@
  "version": "auto-1",
  "worker": 2,
  "started": "2026-11-25T11:14:32.773Z",
- "tries": 187600,
- "survivedA": 159,
- "candidates": 17,
- "cLooks": 9,
+ "tries": 249200,
+ "survivedA": 220,
+ "candidates": 26,
+ "cLooks": 10,
  "cPasses": 0,
  "groups": {
   "eurusd|dev+|both": {
-   "more": 7,
+   "more": 12,
    "pass": false
   },
   "eurjpy|dev-|both": {
@@ -17,7 +17,7 @@
    "pass": false
   },
   "nzdusd|dev-|short": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurjpy|dev+|short": {
@@ -29,7 +29,7 @@
    "pass": false
   },
   "eurjpy|dev+|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdjpy|dev+|long": {
@@ -37,12 +37,16 @@
    "pass": true
   },
   "eurusd|dev+|long": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdcad|dev-|both": {
    "more": 0,
    "pass": true
+  },
+  "usdjpy|dev-|both": {
+   "more": 0,
+   "pass": false
   }
  },
  "leads": [],
@@ -555,9 +559,65 @@
     "months": 80
    },
    "p": 0.02222
+  },
+  {
+   "at": "2026-11-25T12:38:40.150Z",
+   "group": "usdjpy|dev-|both",
+   "g": {
+    "mk": "usdjpy",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 1,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     19,
+     3
+    ],
+    "dows": null,
+    "trend": "against",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 2,
+    "rr": 6,
+    "hold": 4
+   },
+   "A": {
+    "n": 1816,
+    "mean": 0.0467,
+    "t": 3.29,
+    "win": 55.8,
+    "months": 120
+   },
+   "B": {
+    "n": 946,
+    "mean": 0.0329,
+    "t": 1.61,
+    "win": 55,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 1760,
+    "mean": -0.1133,
+    "t": -6.73,
+    "win": 38.1,
+    "months": 120
+   },
+   "C": {
+    "n": 1263,
+    "mean": -0.0145,
+    "t": -0.8,
+    "win": 51.5,
+    "months": 83
+   },
+   "p": 0.78814
   }
  ],
- "chunks": 2,
- "updated": "2026-11-25T12:29:48.758Z",
- "chanceCandidates": 17.1
+ "chunks": 3,
+ "updated": "2026-11-25T12:54:55.894Z",
+ "chanceCandidates": 22.7
 }
