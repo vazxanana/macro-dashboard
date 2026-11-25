@@ -7,7 +7,7 @@ const page = read('farm.html');
 test('the page is built, routed and offered as a home-screen shortcut', () => {
   assert.match(read('scripts/build.sh'), /farm\.html/);
   assert.match(read('vercel.json'), /"source": "\/farm"[\s\S]{0,40}"destination": "\/farm\.html"/);
-  assert.match(read('app.webmanifest'), /"url": "\/farm#widget"/);
+  assert.match(read('app.webmanifest'), /"url": "\/farm"/);
 });
 test('only a signed-in member sees it, and it reads research files only', () => {
   assert.match(page, /fetch\('\/api\/me'/);
