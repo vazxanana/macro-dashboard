@@ -6020,6 +6020,33 @@
     ],
     "stopCheckedAt": "2026-11-25T02:18:23.000Z",
     "brokerStop": 3532.09
+   },
+   "xau-replica-1795579813-s": {
+    "positionId": "51297368",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "replica",
+    "status": "open",
+    "openedAt": "2026-11-25T04:11:20.000Z",
+    "councilEntry": 3544.63,
+    "stop": 3576.55,
+    "t1": 3480.79,
+    "riskCash": 31.92,
+    "margin": 7.09,
+    "minLot": true,
+    "mark": 3544.63,
+    "levelsFrom": "mark",
+    "fillPrice": 3543.65,
+    "slipR": 0.031,
+    "lagSec": 67,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-25T04:11:20.000Z",
+    "brokerStop": 3575.57
    }
   },
   "day": {
@@ -6030,10 +6057,10 @@
     "51279867"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12684.73 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12684.73 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6042,14 +6069,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12684.73,
-  "lastRun": "2026-11-25T04:05:53.000Z"
+  "lastRun": "2026-11-25T04:11:20.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T15:16:37.000Z",
-   "msg": "not mirrored yet usdchf-replica-1794410120-s: daily loss stop (44.8% down today) (will retry)",
-   "trade": "usdchf-replica-1794410120-s"
-  },
   {
    "at": "2026-11-11T15:27:57.000Z",
    "msg": "not mirrored yet eth-replica-1794410816-s: daily loss stop (44.8% down today) (will retry)",
@@ -7538,6 +7560,11 @@
    "at": "2026-11-25T02:28:34.000Z",
    "msg": "XAUUSD position 51249955 closed at the broker",
    "trade": "xau-replica-1795563612-s"
+  },
+  {
+   "at": "2026-11-25T04:11:20.000Z",
+   "msg": "opened sell XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1795579813-s"
   }
  ],
  "limits": {
@@ -7630,9 +7657,9 @@
   ]
  },
  "execution": {
-  "n": 204,
+  "n": 205,
   "meanSlipR": 0.05,
-  "medianSlipR": 0.021,
+  "medianSlipR": 0.024,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
   "bySymbol": {
@@ -7645,7 +7672,7 @@
     "meanSlipR": 0.189
    },
    "XAUUSD": {
-    "n": 93,
+    "n": 94,
     "meanSlipR": 0.018
    },
    "BTCUSD": {
