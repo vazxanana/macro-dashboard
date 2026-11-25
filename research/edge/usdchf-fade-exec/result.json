@@ -1,0 +1,137 @@
+{
+ "study": "usdchf-fade-exec",
+ "built": "2026-11-25",
+ "commit": "4073ae0197",
+ "window": [
+  "2023-12-01",
+  "2026-11-20"
+ ],
+ "probes": [
+  {
+   "file": "ticks-USDCHF-chff-entry.json",
+   "at": "2026-11-25T10:52:41.865Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDCHF-chff-dead.json",
+   "at": "2026-11-25T10:52:38.186Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDCHF-chff-fills-1.json",
+   "at": "2026-11-25T10:55:49.314Z",
+   "errors": 0
+  }
+ ],
+ "primary": {
+  "orders": 127,
+  "entryUnresolved": 33,
+  "exitUnresolved": 0,
+  "unresolvedShare": 0,
+  "unresolvedWhy": {},
+  "net": {
+   "n": 94,
+   "mean": -0.0337,
+   "monthT": -0.2464,
+   "months": 31
+  },
+  "tick": {
+   "n": 94,
+   "mean": 0.0109,
+   "monthT": 0.0803,
+   "months": 31
+  },
+  "mid": {
+   "n": 94,
+   "mean": 0.225,
+   "monthT": 2.346,
+   "months": 31
+  },
+  "tickMinusMid": {
+   "n": 94,
+   "mean": -0.2141,
+   "monthT": -2.3104,
+   "months": 31
+  },
+  "win": 0.5319,
+  "exits": {
+   "stop": {
+    "n": 43,
+    "tick": -1.138,
+    "net": -1.1841,
+    "mid": -0.5265
+   },
+   "target": {
+    "n": 50,
+    "tick": 1,
+    "net": 0.9566,
+    "mid": 0.878
+   },
+   "time": {
+    "n": 1,
+    "tick": -0.0361,
+    "net": -0.0796,
+    "mid": -0.1083
+   }
+  },
+  "byYear": {
+   "2023": {
+    "n": 3,
+    "tick": 0.3325,
+    "net": 0.2962,
+    "mid": -0.3987
+   },
+   "2024": {
+    "n": 29,
+    "tick": -0.4208,
+    "net": -0.4695,
+    "mid": 0.018
+   },
+   "2025": {
+    "n": 33,
+    "tick": 0.1427,
+    "net": 0.1024,
+    "mid": 0.2863
+   },
+   "2026": {
+    "n": 29,
+    "tick": 0.2595,
+    "net": 0.2132,
+    "mid": 0.4267
+   }
+  },
+  "bySide": {
+   "sell": {
+    "n": 94,
+    "tick": 0.0109,
+    "net": -0.0337,
+    "mid": 0.225
+   }
+  },
+  "byRoll": {
+   "never open inside 21:00-22:59": {
+    "n": 14,
+    "tick": 0.2778,
+    "net": 0.2342,
+    "mid": 0.3453
+   },
+   "open inside 21:00-22:59": {
+    "n": 80,
+    "tick": -0.0358,
+    "net": -0.0805,
+    "mid": 0.2039
+   }
+  },
+  "entrySpreadR": {
+   "median": 0,
+   "p90": 0.2717
+  },
+  "entrySlipR": 0.0627
+ },
+ "verdict": "TOO FEW. At the broker's own bid and ask the USD/CHF fade (short, 20-22 UTC) made −0.034R a trade after commission (n 94, month t -0.2464). On mid candles the same orders made +0.225R; 33 of 127 had no quote to enter on.",
+ "meaning": [
+  "The pre-registered verdict is TOO FEW: 33 of the 127 orders had no broker quote to enter on (the 21:00-22:59 UTC rollover is when this broker does not quote USD/CHF), which left 94 resolved, under the 100 fixed before any tick was read. Nothing was re-defined after the result.",
+  "In substance it is the same answer as the first USD/CHF lead: on mid candles the 94 orders made +0.225R, at the broker's own bid and ask they made +0.011R before commission and −0.034R after (month t −0.25). The tick minus mid difference is −0.214R a trade (month t −2.31): the broker's quotes take away the whole of the mid-candle result. The 14 orders that were never open inside the rollover made +0.234R after commission, too few (n 14) and picked after looking: not a rule.",
+  "So the auto-researcher's two leads are both mid-candle results that the broker's quotes remove. No forward record and no variant on these years. A lead of the auto-researcher must be re-priced at the broker's quotes before anything else, and a lead that trades through the rollover is unlikely to survive it."
+ ]
+}

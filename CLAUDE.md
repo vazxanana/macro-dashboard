@@ -7116,3 +7116,6 @@ cost, one position at a time, five markets on the toolkit's M5 cache, 2010-19 re
 353 trades since 2024, -0.146R after costs (month t -1.74), -0.083R on 2010-2019 (n 1,265, t -2.08); about -0.11R before costs. Gold alone
 with B +0.095R since 2024 (n 72, t 0.45) and -0.178R before: noise, not tested. Nothing live changed; no variant on these years.
 
+
+## The auto-researcher's second USD/CHF lead at the broker's own ticks (25 Nov 2026)
+`research/edge/usdchf-fade-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report`, MEANING.md, RESULT.md, result.json). The researcher's `usdchf|fade|short` lead (a close above the previous 5 H1 highs sold at the next open at 20-22 UTC; stop 0.75 x ATR(14), 1R, out after 12 candles; +0.240R on mid candles 2020 on, Holm 0.0036) filled at the demo broker's bid / ask, 127 orders 2023-12 to 2026-11. **TOO FEW as pre-registered**: 33 orders had no quote to enter on (the rollover), 94 resolved (bar 100). Mid +0.225R; at the broker +0.011R before and −0.034R after commission (month t −0.25); tick minus mid −0.214R (t −2.31). Both researcher leads are mid-candle results the broker's quotes remove. No forward record; no variant on these years. Test: `tests/usdchf-fade-exec.test.mjs`.
