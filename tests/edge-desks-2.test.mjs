@@ -38,7 +38,8 @@ test('the adapters read the studies\' own cells', () => {
   assert.deepEqual(FB.F1, { ch: 2, trig: 0, sess: 2, ei: 0, si: 0, x: 0 });
   const med = D2.fvgMedians(); assert.equal(Object.keys(med).length, 10); assert.ok(med.xau['1h'] > 0);
   assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'zero', 'lyriac', 'dom']);
-  for (const k of ['fade', 'bigfade', 'roundfade', 'fvg']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
+  for (const k of ['fade', 'bigfade', 'roundfade']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
+  assert.deepEqual(D2.DESKS2.fvg.markets, FADE.MARKETS.filter((m) => m !== 'gbpusd'));   // GBP/USD left the FVG return desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.boxfade.markets, FADE.MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m)));   // gold, silver and USD/CAD left the Box fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.goldvb.markets, ['xau']); assert.deepEqual(D2.DESKS2.jpyvb.markets, ['usdjpy']);
   for (const k of Object.keys(D2.DESKS2)) assert.equal(DESKS[k], D2.DESKS2[k]);
@@ -196,4 +197,11 @@ test('DOM zone desk: eight markets (EUR/AUD, CAD/JPY, GBP/JPY, USD/CHF, NZD/USD,
   const old = ['eurusd', 'xag', 'spx500', 'nas100'].map((m, k) => ({ id: `${m}:dom-b${k}`, market: m, kind: 'dom-h1', side: 1, entry: 100, stop: 99, target: 102, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
   const o = buildDesk('dom', [['nas100', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14); assert.deepEqual(o.records.map((r) => r.market), ['nas100']);
   assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on eight of its markets/);
+});
+
+test('FVG return desk: nine markets (GBP/USD left), its stored GBP/USD records go on the next run (owner, 25 Nov 2026)', () => {
+  assert.equal(D2.FVG_MARKETS.length, 9); assert.ok(!D2.FVG_MARKETS.includes('gbpusd')); assert.deepEqual(D2.DESKS2.fvg.markets, D2.FVG_MARKETS);
+  const old = ['gbpusd', 'eurusd'].map((m, k) => ({ id: `${m}:fvg-x${k}`, market: m, kind: 'fvg-h1', side: 1, entry: 100, stop: 99, target: 101, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
+  const o = buildDesk('fvg', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14); assert.deepEqual(o.records.map((r) => r.market), ['eurusd']);
+  assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on nine markets \(not GBP\/USD\)/);
 });

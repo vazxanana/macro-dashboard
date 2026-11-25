@@ -7182,3 +7182,7 @@ loop's next run after this merges (every other desk's markets list is the full l
 `DOM_DESK_MARKETS` = the job's eighteen less those ten = gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP, Nasdaq 100; `DESKS2.dom.markets` reads them. The desk's stored
 records of the ten leave `dom/desk.json` on the loop's next run after this merges (`buildDesk` drops a record of a market the desk no longer reads). The demo JOB (`council/dom-demo.mjs`,
 its `config.dom.markets`, the $100 account) is NOT changed: it still arms its eighteen unless `config.dom.markets` narrows them; ask the owner if that is meant too. Test: `tests/edge-desks-2.test.mjs`.
+
+**FVG return without GBP/USD** (25 Nov 2026, owner: "FVG return GBPUSD remove"). `council/edge-desks-2.mjs` `FVG_MARKETS` = the study's ten markets less GBP/USD (nine); `DESKS2.fvg.markets`
+reads them. The desk's GBP/USD records leave `fvg/desk.json` on the loop's next run after this merges (`buildDesk` drops a record of a market the desk no longer reads). The other
+fade / gap desks keep their markets. Test: `tests/edge-desks-2.test.mjs`.
