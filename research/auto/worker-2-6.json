@@ -2,18 +2,18 @@
  "version": "auto-1",
  "worker": 2,
  "started": "2026-11-25T12:14:14.860Z",
- "tries": 1759600,
- "survivedA": 1643,
- "candidates": 194,
- "cLooks": 20,
+ "tries": 1830200,
+ "survivedA": 1720,
+ "candidates": 202,
+ "cLooks": 22,
  "cPasses": 0,
  "groups": {
   "eurusd|dev+|both": {
-   "more": 113,
+   "more": 116,
    "pass": false
   },
   "nzdusd|dev-|short": {
-   "more": 0,
+   "more": 1,
    "pass": true
   },
   "eurjpy|dev-|long": {
@@ -53,7 +53,7 @@
    "pass": false
   },
   "audusd|dev-|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "audusd|dev-|short": {
@@ -69,7 +69,7 @@
    "pass": false
   },
   "xau|dev+|both": {
-   "more": 12,
+   "more": 13,
    "pass": false
   },
   "eurjpy|dev+|short": {
@@ -85,6 +85,14 @@
    "pass": false
   },
   "usdchf|dev+|long": {
+   "more": 0,
+   "pass": false
+  },
+  "nzdusd|dev+|long": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|pull|both": {
    "more": 0,
    "pass": false
   }
@@ -1219,9 +1227,121 @@
     "months": 75
    },
    "p": 0.97778
+  },
+  {
+   "at": "2026-11-25T20:55:47.665Z",
+   "group": "nzdusd|dev+|long",
+   "g": {
+    "mk": "nzdusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 1.5,
+      "follow": true
+     }
+    ],
+    "side": "long",
+    "hours": [
+     0,
+     6
+    ],
+    "dows": null,
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 1.5,
+    "rr": 1,
+    "hold": 240
+   },
+   "A": {
+    "n": 1125,
+    "mean": 0.0954,
+    "t": 3.28,
+    "win": 56.3,
+    "months": 120
+   },
+   "B": {
+    "n": 616,
+    "mean": 0.0835,
+    "t": 1.92,
+    "win": 56.2,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 1125,
+    "mean": -0.1576,
+    "t": -5.15,
+    "win": 43.6,
+    "months": 120
+   },
+   "C": {
+    "n": 832,
+    "mean": -0.052,
+    "t": -1.77,
+    "win": 49.6,
+    "months": 82
+   },
+   "p": 0.96164
+  },
+  {
+   "at": "2026-11-25T20:59:52.425Z",
+   "group": "eurusd|pull|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "pull",
+      "fast": 10,
+      "slow": 100,
+      "rsi": 65
+     }
+    ],
+    "side": "both",
+    "hours": [
+     22,
+     10
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 3,
+    "rr": 6,
+    "hold": 12
+   },
+   "A": {
+    "n": 296,
+    "mean": 0.2119,
+    "t": 3.22,
+    "win": 54.4,
+    "months": 107
+   },
+   "B": {
+    "n": 106,
+    "mean": 0.2029,
+    "t": 2.31,
+    "win": 59.4,
+    "months": 52
+   },
+   "placeboA": {
+    "n": 292,
+    "mean": -0.1228,
+    "t": -2.16,
+    "win": 40.8,
+    "months": 107
+   },
+   "C": {
+    "n": 181,
+    "mean": 0.0152,
+    "t": 0.19,
+    "win": 46.4,
+    "months": 77
+   },
+   "p": 0.42465
   }
  ],
- "chunks": 19,
- "updated": "2026-11-25T20:39:31.235Z",
- "chanceCandidates": 160.1
+ "chunks": 20,
+ "updated": "2026-11-25T21:04:36.094Z",
+ "chanceCandidates": 166.5
 }
