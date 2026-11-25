@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T11:14:23.950Z",
- "tries": 1474000,
- "survivedA": 382,
- "candidates": 41,
- "cLooks": 29,
+ "tries": 1637000,
+ "survivedA": 433,
+ "candidates": 47,
+ "cLooks": 32,
  "cPasses": 0,
  "groups": {
   "usdchf|brk&big+|short": {
@@ -13,7 +13,7 @@
    "pass": false
   },
   "eurusd|brk&dev+|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "eurusd|brk&big+|both": {
@@ -65,7 +65,7 @@
    "pass": false
   },
   "eurusd|big+&dev+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurusd|brk&dev+|short": {
@@ -73,7 +73,7 @@
    "pass": false
   },
   "eurusd|fade&fade|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "audusd|eg-&eg-|short": {
@@ -121,6 +121,18 @@
    "pass": false
   },
   "nzdusd|fade&dev-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurjpy|fade&big-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|dev+&brk|both": {
+   "more": 0,
+   "pass": false
+  },
+  "nzdusd|dev+&eg-|both": {
    "more": 0,
    "pass": false
   }
@@ -1820,9 +1832,186 @@
     "months": 82
    },
    "p": 0.37828
+  },
+  {
+   "at": "2026-11-25T15:08:51.009Z",
+   "group": "eurjpy|fade&big-|both",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 8
+     },
+     {
+      "kind": "big",
+      "k": 1,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     23,
+     1
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.7,
+    "stop": 0.75,
+    "rr": 1.5,
+    "hold": 24
+   },
+   "A": {
+    "n": 280,
+    "mean": 0.424,
+    "t": 5.26,
+    "win": 58.9,
+    "months": 105
+   },
+   "B": {
+    "n": 103,
+    "mean": 0.2918,
+    "t": 2.34,
+    "win": 54.4,
+    "months": 47
+   },
+   "placeboA": {
+    "n": 280,
+    "mean": -0.4689,
+    "t": -6.48,
+    "win": 23.2,
+    "months": 105
+   },
+   "C": {
+    "n": 148,
+    "mean": 0.091,
+    "t": 0.87,
+    "win": 45.9,
+    "months": 63
+   },
+   "p": 0.19215
+  },
+  {
+   "at": "2026-11-25T15:19:36.346Z",
+   "group": "eurusd|dev+&brk|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 2.5,
+      "follow": true
+     },
+     {
+      "kind": "brk",
+      "N": 120
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": [
+     3,
+     4,
+     5
+    ],
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.7,
+    "stop": 2,
+    "rr": 1,
+    "hold": 48
+   },
+   "A": {
+    "n": 338,
+    "mean": 0.1937,
+    "t": 3.03,
+    "win": 60.4,
+    "months": 111
+   },
+   "B": {
+    "n": 166,
+    "mean": 0.1824,
+    "t": 2.75,
+    "win": 60.2,
+    "months": 55
+   },
+   "placeboA": {
+    "n": 338,
+    "mean": -0.2255,
+    "t": -3.49,
+    "win": 39.6,
+    "months": 111
+   },
+   "C": {
+    "n": 224,
+    "mean": -0.081,
+    "t": -1.28,
+    "win": 46.9,
+    "months": 78
+   },
+   "p": 0.89973
+  },
+  {
+   "at": "2026-11-25T15:25:03.745Z",
+   "group": "nzdusd|dev+&eg-|both",
+   "g": {
+    "mk": "nzdusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 3,
+      "follow": true
+     },
+     {
+      "kind": "eg",
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": null,
+    "trend": "with",
+    "vol": "low",
+    "volP": 0.7,
+    "stop": 2,
+    "rr": 4,
+    "hold": 4
+   },
+   "A": {
+    "n": 333,
+    "mean": 0.1332,
+    "t": 3.28,
+    "win": 53.8,
+    "months": 112
+   },
+   "B": {
+    "n": 198,
+    "mean": 0.0875,
+    "t": 1.74,
+    "win": 51.5,
+    "months": 54
+   },
+   "placeboA": {
+    "n": 335,
+    "mean": -0.1435,
+    "t": -4.43,
+    "win": 40.9,
+    "months": 112
+   },
+   "C": {
+    "n": 270,
+    "mean": -0.068,
+    "t": -1.78,
+    "win": 45.2,
+    "months": 80
+   },
+   "p": 0.96246
   }
  ],
- "chunks": 8,
- "updated": "2026-11-25T15:00:11.113Z",
- "chanceCandidates": 134.1
+ "chunks": 9,
+ "updated": "2026-11-25T15:25:16.230Z",
+ "chanceCandidates": 149
 }
