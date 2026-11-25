@@ -7075,7 +7075,7 @@ to -0.121R). Before costs the Big-candle fade is about +0.18R tagged or not: the
 version of the harness dropped zones whose end was not yet known; the cut test caught it (4 tag mismatches) and it was fixed before
 the run counted. Nothing live changed; do not test variants of these tags on these years. Test: `tests/fade-liquidity.test.mjs`.
 
-## The auto-researcher: five workers that never stop (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
+## The auto-researcher: nine workers that never stop (five at the start; four more on 25 Nov 2026, owner: "add more 4 helpers to the researcher to speed it more": workers 6-9, same version `auto-1`, only the seeds differ; `researcher.yml` runs `[1..9]`) (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
 `research/edge/auto-researcher/` (PREREGISTRATION.md committed alone first, `engine.mjs`, `tests/auto-researcher.test.mjs`) and
 `.github/workflows/researcher.yml` (free runner minutes; five matrix jobs; each works about 5.5 hours, saves to council-data
 `research/auto/worker-<n>.json` every 25 minutes and dispatches its own next run; cancel the runs, or set the repository variable

@@ -1,6 +1,6 @@
-name: Researcher (five workers, research only)
+name: Researcher (nine workers, research only)
 
-# research/edge/auto-researcher (PREREGISTRATION.md): five seeded searchers over rule combinations on H1 OANDA candles, three
+# research/edge/auto-researcher (PREREGISTRATION.md): nine seeded searchers over rule combinations on H1 OANDA candles, three
 # stages (search 2005-14, validate 2015-19, holdout 2020 on), every try counted, results in council-data research/auto/. Paper
 # research only: nothing is traded, alerted or copied and no council member reads the files. Free runner minutes (public
 # repository). Each worker keeps itself alive like the council loop: a run works for about 5.5 hours, saves, then dispatches
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       worker:
-        description: 'A worker number 1-5, or all'
+        description: 'A worker number 1-9, or all'
         required: false
         default: 'all'
 
@@ -33,8 +33,8 @@ jobs:
           W: ${{ inputs.worker }}
         run: |
           case "$W" in
-            1|2|3|4|5) echo "workers=[$W]" >> "$GITHUB_OUTPUT" ;;
-            *) echo 'workers=[1,2,3,4,5]' >> "$GITHUB_OUTPUT" ;;
+            1|2|3|4|5|6|7|8|9) echo "workers=[$W]" >> "$GITHUB_OUTPUT" ;;
+            *) echo 'workers=[1,2,3,4,5,6,7,8,9]' >> "$GITHUB_OUTPUT" ;;
           esac
 
   work:
