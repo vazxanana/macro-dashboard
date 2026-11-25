@@ -1,5 +1,5 @@
 // Auto-researcher engine (PREREGISTRATION.md, 24 Nov 2026). Paper research only: nothing here trades or changes a rule.
-//   node engine.mjs run <worker 1-5> <outDir> [minutes]   search until the time is up, writing <outDir>/worker-<k>.json
+//   node engine.mjs run <worker 1-9> <outDir> [minutes]   search until the time is up, writing <outDir>/worker-<k>.json
 //   node engine.mjs bench <worker> [tries]                 time a few tries on the local candle cache
 // Candles: H1 OANDA mid. EDGE_DATA (edgekit cache, 5-minute files) when present, else the site's /md/bars through MD_BASE.
 import fs from 'node:fs';
@@ -13,7 +13,9 @@ export const MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd',
 const UTC = (y, m = 0, d = 1) => Date.UTC(y, m, d) / 1000;
 export const WIN = { A: [UTC(2005), UTC(2015)], B: [UTC(2015), UTC(2020)], C: [UTC(2020), Infinity] };
 export const BAR = { A: { n: 250, mean: 0.04, t: 3.0 }, B: { n: 100, mean: 0, t: 1.5 }, C: { n: 100, mean: 0, t: 2.0 } };
-export const FAMILY = { 1: ['brk', 'fade', 'eg'], 2: ['pull', 'dev'], 3: ['big', 'blk', 'sweep'], 4: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 5: ['wild'] };
+export const FAMILY = { 1: ['brk', 'fade', 'eg'], 2: ['pull', 'dev'], 3: ['big', 'blk', 'sweep'], 4: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 5: ['wild'],
+  // 25 Nov 2026: four more workers, same grids and bars (PREREGISTRATION.md, "Four more workers"); only the seeds differ
+  6: ['wild'], 7: ['wild'], 8: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 9: ['big', 'blk', 'sweep'] };
 const ALLK = ['brk', 'fade', 'pull', 'big', 'blk', 'dev', 'eg', 'sweep'];
 export const SPACE = {
   N: [5, 8, 10, 15, 20, 30, 50, 80, 120], fast: [5, 10, 20, 30], slow: [50, 100, 150, 200], rsi: [20, 25, 30, 35, 65, 70, 75, 80],
