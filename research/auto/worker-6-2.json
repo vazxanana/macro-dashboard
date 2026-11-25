@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 6,
  "started": "2026-11-25T11:14:12.828Z",
- "tries": 1891800,
- "survivedA": 479,
- "candidates": 75,
- "cLooks": 46,
+ "tries": 1979400,
+ "survivedA": 508,
+ "candidates": 79,
+ "cLooks": 47,
  "cPasses": 0,
  "groups": {
   "xau|brk&big+|both": {
@@ -13,7 +13,7 @@
    "pass": false
   },
   "nzdusd|eg-&dev+|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "eurusd|brk&dev+|both": {
@@ -25,7 +25,7 @@
    "pass": false
   },
   "eurusd|big+&dev+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurusd|fade&fade|both": {
@@ -65,7 +65,7 @@
    "pass": true
   },
   "eurusd|dev+&brk|both": {
-   "more": 3,
+   "more": 4,
    "pass": false
   },
   "eurusd|big+&brk|both": {
@@ -191,6 +191,10 @@
   "usdcad|blk-&fade|both": {
    "more": 0,
    "pass": true
+  },
+  "usdjpy|fade&fade|both": {
+   "more": 0,
+   "pass": false
   }
  },
  "leads": [],
@@ -2901,9 +2905,67 @@
     "months": 62
    },
    "p": 0.0113
+  },
+  {
+   "at": "2026-11-25T18:13:18.996Z",
+   "group": "usdjpy|fade&fade|both",
+   "g": {
+    "mk": "usdjpy",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 10
+     },
+     {
+      "kind": "fade",
+      "N": 5
+     }
+    ],
+    "side": "both",
+    "hours": [
+     21,
+     0
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 3,
+    "rr": 1,
+    "hold": 24
+   },
+   "A": {
+    "n": 476,
+    "mean": 0.1247,
+    "t": 3.15,
+    "win": 57.6,
+    "months": 116
+   },
+   "B": {
+    "n": 221,
+    "mean": 0.0899,
+    "t": 1.61,
+    "win": 55.7,
+    "months": 58
+   },
+   "placeboA": {
+    "n": 476,
+    "mean": -0.1614,
+    "t": -4.04,
+    "win": 42.4,
+    "months": 116
+   },
+   "C": {
+    "n": 236,
+    "mean": -0.1905,
+    "t": -3.47,
+    "win": 40.7,
+    "months": 75
+   },
+   "p": 0.99974
   }
  ],
- "chunks": 15,
- "updated": "2026-11-25T17:59:17.507Z",
- "chanceCandidates": 172.2
+ "chunks": 16,
+ "updated": "2026-11-25T18:24:22.298Z",
+ "chanceCandidates": 180.1
 }
