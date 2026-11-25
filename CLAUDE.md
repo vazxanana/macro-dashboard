@@ -7054,6 +7054,19 @@ loses about 0.05R less than away from one) · `equal-pool-m5-confirm` +0.063 (1,
 direction call, session or confluence picks the better trades. Do not re-test variants of these on these years. The agents shared
 one checkout and a three-slot run queue (4 cores); each committed only its own paths.
 
+## Fades inside an H1 DOM zone, and liquidity sweeps as a filter (25 Nov 2026, owner: "test fade m15 inside h1 DOM and check the other edges if we can use liquidity to improve our trades", then "i mean big candle")
+`research/edge/fade-liquidity/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, result.json). The Big-candle fade (M15,
+the desk's 50 % target; gate reproduced exactly) and the Break fade (M15, 1 ATR stop, 2R) on ten markets, each trade tagged from closed
+candles at the signal: fill inside a standing H1 DOM zone (`combo-grid-3` `buildZones('dom')`, by the zone's side against the trade),
+the signal candle's extreme beyond the previous New York day's high / low (`pdl`), beyond the previous 96 M15 candles' extreme (`hi24`),
+beyond the Asia range (`asia`, 07-17 UTC signals). Eight tests (desk x tag), Holm. **FAIL, 0 of 8**: inside a DOM zone the Big-candle
+fade makes -0.263R a trade after costs in 2015-26 (n 26,017) against -0.231R outside: no better (Welch t -1.72), and worse when the
+zone is against the trade (-0.384R, n 3,511). Liquidity sweeps do separate better from worse trades (tagged beats untagged by Welch
+t 3.0-4.8 on `hi24`, `pdl`, `asia`) but every tagged group still loses after costs (Big-candle fade -0.196R to -0.205R; Break fade -0.090R
+to -0.121R). Before costs the Big-candle fade is about +0.18R tagged or not: the cost decides, as in every earlier fade study. A first
+version of the harness dropped zones whose end was not yet known; the cut test caught it (4 tag mismatches) and it was fixed before
+the run counted. Nothing live changed; do not test variants of these tags on these years. Test: `tests/fade-liquidity.test.mjs`.
+
 ## The auto-researcher: five workers that never stop (25 Nov 2026, owner: "a 24h researcher that does studies and try million of simulations of different combinations … never stops till i say", "5 researcher agents so its 5x the results")
 `research/edge/auto-researcher/` (PREREGISTRATION.md committed alone first, `engine.mjs`, `tests/auto-researcher.test.mjs`) and
 `.github/workflows/researcher.yml` (free runner minutes; five matrix jobs; each works about 5.5 hours, saves to council-data
