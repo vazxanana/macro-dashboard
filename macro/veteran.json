@@ -1,14 +1,14 @@
 {
  "v": 1,
- "at": "2026-11-25T12:55:18.000Z",
+ "at": "2026-11-25T14:15:02.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-25T12:54:55.000Z",
+ "strategistAt": "2026-11-25T14:14:40.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
    "VIX/VIX3M 1.044",
    "HY +29 bp on the week",
-   "SOFR−EFFR 4 bp",
+   "SOFR−EFFR 6 bp",
    "DXY +0.19%"
   ],
   "goldTest": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
@@ -55,7 +55,7 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 26.6 (VIX/VIX3M 1.04) · HY OAS 3.63%, +29 bp on the week · SOFR−EFFR 4 bp",
+   "obs": "VIX 26.6 (VIX/VIX3M 1.04) · HY OAS 3.63%, +29 bp on the week · SOFR−EFFR 6 bp",
    "lean": 0,
    "asOf": "2026-11-23",
    "stale": false,
@@ -115,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "+0.12 pts in 5 sessions (vote flat); score z (4-week fall) −0.82",
+   "macro": "+0.09 pts in 5 sessions (vote flat); score z (4-week fall) −0.82",
    "veteran": "DXY 103.84, +0.19% on the week, +1.39% over 4 weeks · broad USD +1.85% over 4 weeks",
    "stance": "qualify",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -124,8 +124,8 @@
   },
   {
    "topic": "Inflation and the next release",
-   "macro": "2.12%, −9 bp a week (vote down); playbook: Core PCE Price Index m/m 2026-11-25 13:30 UTC",
-   "veteran": "10Y breakeven 2.12%, −9 bp on the week. A red-folder event lands within 72 hours (Core PCE Price Index m/m): the view is conditional and the plan is to read real yields and the dollar after the print, not before.",
+   "macro": "2.12%, −9 bp a week (vote down)",
+   "veteran": "10Y breakeven 2.12%, −9 bp on the week. No red-folder event within 72 hours.",
    "stance": "agree",
    "why": "A hot print has two opposing paths (inflation-protection demand versus a stronger policy response lifting real yields and the dollar); the observed move shows which won, not which wins next.",
    "m": -1,
@@ -143,7 +143,7 @@
   {
    "topic": "Regime",
    "macro": "Dollar Smile left side (stress) · liquidity flat · VIX curve inverted (stress)",
-   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.044, HY +29 bp on the week, SOFR−EFFR 4 bp, DXY +0.19%",
+   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.044, HY +29 bp on the week, SOFR−EFFR 6 bp, DXY +0.19%",
    "stance": "agree",
    "why": "Strongest competing explanation: A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
    "m": null,
@@ -153,7 +153,7 @@
  "verdict": {
   "bias": "AUCTION",
   "conviction": null,
-  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Core PCE Price Index m/m): the bias is conditional until the print.",
+  "note": "Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size.",
   "agree": 4,
   "qualify": 2,
   "disagree": 0,
@@ -162,24 +162,20 @@
    "DXY above 105.4 (+1.5%) says the dollar is still rising against gold",
    "gold is already below the 10-week average 4062: the trend tiebreaker is off until a weekly close back above it"
   ],
-  "eventWithin72h": {
-   "title": "Core PCE Price Index m/m",
-   "at": "2026-11-25T13:30:00.000Z",
-   "consensus": "0.3%"
-  }
+  "eventWithin72h": null
  },
  "card": {
   "claim": "No directional macro claim for gold over 20 trading days (the score's tested horizon)",
   "claimType": "descriptive association",
   "shock": "Risk-off / de-risking, funding still calm",
-  "surprise": "Pending: Core PCE Price Index m/m at 2026-11-25 13:30 UTC against the calendar expectation captured before it (0.3%); print minus previous is not a surprise",
-  "observed": "VIX/VIX3M 1.044 · HY +29 bp on the week · SOFR−EFFR 4 bp · DXY +0.19%",
+  "surprise": "No scheduled red-folder release inside 72 hours; the week's moves are judged against their own 1-week windows",
+  "observed": "VIX/VIX3M 1.044 · HY +29 bp on the week · SOFR−EFFR 6 bp · DXY +0.19%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
   "alternative": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
   "confounders": "Overlapping releases and speakers in the window; COT as of a Tuesday; the council's gold quote is a broker CFD mid, not the LBMA benchmark",
   "falsifier": "10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4062: the trend tiebreaker is off until a weekly close back above it",
-  "nextReview": "after Core PCE Price Index m/m",
+  "nextReview": "Friday close (the score is weekly)",
   "forecastId": "xau-4w-2026-11-21",
   "confidence": "none; 1 of 8 channels unobserved (official); base rate 57% up over 20 days (2016-11-28..2026-11-24, n 2574)"
  },
@@ -573,13 +569,13 @@
    "list": [
     {
      "claim": "Gold closes 2026-11-27 above $3,538 (the 2026-11-20 close)",
-     "p": 0.55,
+     "p": 0.54,
      "baseP": 0.562,
      "asset": "gold",
      "kind": "closeAbove",
      "level": 3538.305,
      "by": "2026-11-27",
-     "pRaw": 0.55,
+     "pRaw": 0.54,
      "status": {
       "state": "open",
       "side": "on track",
@@ -603,13 +599,13 @@
     },
     {
      "claim": "Gold closes at or above $3,630 on some day by 2026-11-27 (stretch)",
-     "p": 0.14,
+     "p": 0.13,
      "baseP": 0.145,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3630,
      "by": "2026-11-27",
-     "pRaw": 0.14,
+     "pRaw": 0.13,
      "status": {
       "state": "happened",
       "on": "2026-11-23",
@@ -618,13 +614,13 @@
     },
     {
      "claim": "Gold closes at or below $3,520 on some day by 2026-11-27",
-     "p": 0.53,
+     "p": 0.54,
      "baseP": 0.521,
      "asset": "gold",
      "kind": "touchDown",
      "level": 3520,
      "by": "2026-11-27",
-     "pRaw": 0.53,
+     "pRaw": 0.54,
      "status": {
       "state": "open",
       "text": "not yet: the last close (2026-11-24) was 3,551, 0.9% away"
@@ -645,13 +641,13 @@
      }
     },
     {
-     "claim": "Gold's 2026-11-27 close lands between $3,492 and $3,604",
+     "claim": "Gold's 2026-11-27 close lands between $3,494 and $3,605",
      "p": 0.6,
      "baseP": 0.6,
      "asset": "gold",
      "kind": "range",
-     "lo": 3492.3783,
-     "hi": 3604.0693,
+     "lo": 3493.8764,
+     "hi": 3605.0983,
      "by": "2026-11-27",
      "pRaw": 0.6,
      "status": {
@@ -702,13 +698,13 @@
    "list": [
     {
      "claim": "Gold closes 2026-12-18 above $3,538 (the 2026-11-20 close)",
-     "p": 0.55,
+     "p": 0.53,
      "baseP": 0.567,
      "asset": "gold",
      "kind": "closeAbove",
      "level": 3538.305,
      "by": "2026-12-18",
-     "pRaw": 0.55,
+     "pRaw": 0.53,
      "status": {
       "state": "open",
       "side": "on track",
@@ -717,13 +713,13 @@
     },
     {
      "claim": "Gold closes at or above $3,630 on some day by 2026-12-18",
-     "p": 0.48,
+     "p": 0.46,
      "baseP": 0.493,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3630,
      "by": "2026-12-18",
-     "pRaw": 0.48,
+     "pRaw": 0.46,
      "status": {
       "state": "happened",
       "on": "2026-11-23",
@@ -732,13 +728,13 @@
     },
     {
      "claim": "Gold closes at or above $3,770 on some day by 2026-12-18 (stretch)",
-     "p": 0.14,
+     "p": 0.12,
      "baseP": 0.153,
      "asset": "gold",
      "kind": "touchUp",
      "level": 3770,
      "by": "2026-12-18",
-     "pRaw": 0.14,
+     "pRaw": 0.12,
      "status": {
       "state": "open",
       "text": "not yet: the last close (2026-11-24) was 3,551, 6.2% away"
@@ -746,13 +742,13 @@
     },
     {
      "claim": "Gold closes at or below $3,480 on some day by 2026-12-18",
-     "p": 0.5,
+     "p": 0.52,
      "baseP": 0.489,
      "asset": "gold",
      "kind": "touchDown",
      "level": 3480,
      "by": "2026-12-18",
-     "pRaw": 0.5,
+     "pRaw": 0.52,
      "status": {
       "state": "open",
       "text": "not yet: the last close (2026-11-24) was 3,551, 2.0% away"
@@ -760,26 +756,26 @@
     },
     {
      "claim": "Gold closes at or below $3,380 on some day by 2026-12-18 (stretch)",
-     "p": 0.17,
+     "p": 0.18,
      "baseP": 0.152,
      "asset": "gold",
      "kind": "touchDown",
      "level": 3380,
      "by": "2026-12-18",
-     "pRaw": 0.17,
+     "pRaw": 0.18,
      "status": {
       "state": "open",
       "text": "not yet: the last close (2026-11-24) was 3,551, 4.8% away"
      }
     },
     {
-     "claim": "Gold's 2026-12-18 close lands between $3,464 and $3,699",
+     "claim": "Gold's 2026-12-18 close lands between $3,467 and $3,705",
      "p": 0.6,
      "baseP": 0.6,
      "asset": "gold",
      "kind": "range",
-     "lo": 3464.1078,
-     "hi": 3698.7459,
+     "lo": 3467.2617,
+     "hi": 3704.7464,
      "by": "2026-12-18",
      "pRaw": 0.6,
      "status": {
@@ -821,7 +817,7 @@
     }
    ]
   },
-  "tilt": -0.02,
+  "tilt": -0.04,
   "digest": {
    "list": [
     {
@@ -832,7 +828,7 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 26.6 (VIX/VIX3M 1.04) · HY OAS 3.63%, +29 bp on the week · SOFR−EFFR 4 bp (as of 2026-11-23)",
+     "read": "VIX 26.6 (VIX/VIX3M 1.04) · HY OAS 3.63%, +29 bp on the week · SOFR−EFFR 6 bp (as of 2026-11-23)",
      "says": "neutral for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
@@ -1329,46 +1325,11 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 45% on average, came true 32%."
  },
  "briefing": {
-  "at": "2026-11-25T12:55:18.000Z",
+  "at": "2026-11-25T14:15:02.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
     "rank": 1,
-    "lean": 0,
-    "fx": "Hot → EUR/USD down (DXY up), USD/JPY up; cool the reverse.",
-    "k": "event",
-    "score": 3.19,
-    "event": {
-     "title": "Core PCE Price Index m/m",
-     "country": "USD",
-     "at": "2026-11-25T13:30:00.000Z",
-     "consensus": "0.3%",
-     "previous": "0.3%",
-     "goldMovePct": 1.6
-    },
-    "title": "USD Core PCE Price Index m/m on Wed, 25 Nov is the week's pivot",
-    "evidence": [
-     {
-      "text": "Core PCE Price Index m/m at 2026-11-25 13:30 UTC: consensus 0.3%, previous 0.3%",
-      "asOf": "2026-11-22 06:23 UTC (captured before the release)",
-      "source": "economic calendar (Forex Factory feed via the strategist); veteran-expectations.json"
-     },
-     {
-      "text": "typical gold day move 1.6% (naive: mean absolute move of the last 20 days)",
-      "asOf": "2026-11-25",
-      "source": "macro/forecast.json playbook"
-     },
-     {
-      "text": "also this week: Prelim GDP q/q",
-      "asOf": "2026-11-25",
-      "source": "calendar"
-     }
-    ],
-    "why": "Hot (above 0.3%) → gold down; cool → gold up. The path runs through real yields and the dollar: a hot print helps gold only if real yields do not reprice higher.",
-    "change": "the print against the captured 0.3% and the reaction of real yields and the dollar in the first hours"
-   },
-   {
-    "rank": 2,
     "lean": 1,
     "fx": null,
     "k": "analogs",
@@ -1385,7 +1346,7 @@
     "change": "a week that moves the fingerprint (real yields, the dollar or gold's place in its range) changes the analog set"
    },
    {
-    "rank": 3,
+    "rank": 2,
     "lean": 0,
     "fx": "Dollar Smile left side: the USD tends to be bid in stress, so gold and the DXY can rise together.",
     "k": "stress",
@@ -1403,8 +1364,8 @@
       "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
      },
      {
-      "text": "SOFR − EFFR 4 bp",
-      "asOf": "2026-11-23",
+      "text": "SOFR − EFFR 6 bp",
+      "asOf": "2026-11-24",
       "source": "NY Fed SOFR / EFFR via FRED"
      }
     ],
@@ -1412,7 +1373,7 @@
     "change": "VIX/VIX3M back below 1 ends the stress read; SOFR − EFFR above 15 bp would make it a funding squeeze (gold sold for cash)"
    },
    {
-    "rank": 4,
+    "rank": 3,
     "lean": -1,
     "fx": null,
     "k": "price",
@@ -1434,7 +1395,7 @@
     "change": "a weekly close above the 10-week average 4062, or the score crossing +0.25"
    },
    {
-    "rank": 5,
+    "rank": 4,
     "lean": 0,
     "fx": null,
     "k": "pos",
@@ -1451,7 +1412,7 @@
     "change": "the next COT (Friday) moving net length into the top or bottom 20% of its 3-year range"
    },
    {
-    "rank": 6,
+    "rank": 5,
     "lean": -1,
     "fx": "DXY up 4 weeks means EUR/USD down, the majors against the USD softer.",
     "k": "usd",
@@ -1466,6 +1427,23 @@
     ],
     "why": "Gold is priced in dollars: a weaker DXY lifts it mechanically and through foreign demand. EUR is 57.6% of the DXY, so EUR/USD is its mirror.",
     "change": "DXY through 102.28 (−1.5%) would turn the dollar channel"
+   },
+   {
+    "rank": 6,
+    "lean": -1,
+    "fx": "Falling US real yields usually weigh on the dollar (EUR/USD up, USD/JPY down) unless risk-off demand for dollars dominates.",
+    "k": "real",
+    "score": 0.54,
+    "title": "Real yields rose 13 bp in 4 weeks (10Y TIPS 2.79%)",
+    "evidence": [
+     {
+      "text": "10Y TIPS 2.79%, +13 bp over 4 weeks (z +0.5 vs every week since 2007-03-16)",
+      "asOf": "2026-11-23",
+      "source": "FRED DFII10 (US Treasury real par curve)"
+     }
+    ],
+    "why": "Real yields are gold's opportunity cost: a falling 4-week change is the strongest single input of the tested Gold Macro Score (2007-26). A high level caps the upside; the change sets the near-term lean.",
+    "change": "10Y TIPS back above 2.94% (+15 bp)"
    }
   ],
   "hypotheses": [
@@ -1496,9 +1474,9 @@
     "hit": null,
     "live": {
      "claim": "If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-01 before any close below $3,503",
-     "p": 0.55,
-     "why": "Of 20 analogs, 13 (65%) made this move first within 5 sessions vs 37% of all 1015 weeks since 2007-03-16; the analogs favour this side, council tilt −1 pts applied.",
-     "invalid": "a daily close below $3,503 before the target; and watch: the print against the captured 0.3% and the reaction of real yields and the dollar in the first hours"
+     "p": 0.54,
+     "why": "Of 20 analogs, 13 (65%) made this move first within 5 sessions vs 37% of all 1015 weeks since 2007-03-16; the analogs favour this side, council tilt −2 pts applied.",
+     "invalid": "a daily close below $3,503 before the target; and watch: a week that moves the fingerprint (real yields, the dollar or gold's place in its range) changes the analog set"
     }
    },
    {
@@ -1645,11 +1623,11 @@
       "near": 0
      },
      {
-      "price": 3698.7,
+      "price": 3704.7,
       "label": "Month call: 60% range high (2026-12-18)",
       "kind": "range60",
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends below this.",
-      "dist": 4.15,
+      "dist": 4.32,
       "side": "above",
       "near": 0
      },
@@ -1672,11 +1650,11 @@
       "near": 2
      },
      {
-      "price": 3604.1,
+      "price": 3605.1,
       "label": "Week call: 60% range high (2026-11-27)",
       "kind": "range60",
       "why": "The veteran's week call: the middle 60% of past 5-session outcomes ends below this.",
-      "dist": 1.49,
+      "dist": 1.52,
       "side": "above",
       "near": 2
      },
@@ -1696,7 +1674,8 @@
       "why": "The first support (2026-11-16..2026-11-20): a daily close below it says sellers took last week's range.",
       "dist": -1.36,
       "side": "below",
-      "near": 2
+      "near": 2,
+      "crossed": true
      },
      {
       "price": 3503,
@@ -1705,7 +1684,8 @@
       "why": "The bottom of the quarter's range.",
       "dist": -1.36,
       "side": "below",
-      "near": 2
+      "near": 2,
+      "crossed": true
      },
      {
       "price": 3500,
@@ -1714,23 +1694,25 @@
       "why": "Option strikes and resting orders cluster at round numbers; price often pauses there.",
       "dist": -1.44,
       "side": "below",
-      "near": 3
+      "near": 3,
+      "crossed": true
      },
      {
-      "price": 3492.4,
+      "price": 3493.9,
       "label": "Week call: 60% range low (2026-11-27)",
       "kind": "range60",
       "why": "The veteran's week call: the middle 60% of past 5-session outcomes ends above this.",
-      "dist": -1.66,
+      "dist": -1.61,
       "side": "below",
-      "near": 1
+      "near": 1,
+      "crossed": true
      },
      {
-      "price": 3464.1,
+      "price": 3467.3,
       "label": "Month call: 60% range low (2026-12-18)",
       "kind": "range60",
       "why": "The veteran's month call: the middle 60% of past 20-session outcomes ends above this.",
-      "dist": -2.45,
+      "dist": -2.36,
       "side": "below",
       "near": 0
      }
@@ -1742,9 +1724,9 @@
      "text": "as of 2026-11-24 close"
     },
     "mark": {
-     "px": 3517.605,
-     "at": "2026-11-25T12:54:55.000Z",
-     "dist": -0.95
+     "px": 3484.14,
+     "at": "2026-11-25T14:14:40.000Z",
+     "dist": -1.89
     }
    },
    "dxy": {
@@ -3121,7 +3103,7 @@
    "country": "USD",
    "at": "2026-11-25T13:30:00.000Z",
    "type": null,
-   "released": false,
+   "released": true,
    "titles": [
     "Core PCE Price Index m/m",
     "Prelim GDP q/q"
@@ -3190,7 +3172,7 @@
    ],
    "stats": null,
    "call": null,
-   "callNote": "No release history for this event in the repository: no call.",
+   "callNote": "Released: no new call after the release.",
    "label": "Descriptive, not a tested edge.",
    "publicOnly": true,
    "paperOnly": true,
@@ -3243,14 +3225,7 @@
  ],
  "newsAhead": {
   "label": "From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.",
-  "items": [
-   {
-    "kind": "PCE",
-    "title": "Core PCE Price Index m/m",
-    "at": "2026-11-25T13:30:00.000Z",
-    "point": "Core CPI for October printed 0.30% m/m (the Cleveland Fed's file of actual prints, read 2026-11-24). On the 2022-24 record a core CPI of 0.3% went with core PCE near 0.24% (fit on 36 months, typical miss ±0.07 pp): a descriptive fit on past months, not a forecast on the record."
-   }
-  ]
+  "items": []
  },
  "research": {
   "label": "Your research, applied: each line checks a document's own conditions against today's data. Not a forecast, not a tested edge.",
@@ -3299,7 +3274,7 @@
       "market": "funding",
       "k": "sofr",
       "on": false,
-      "text": "SOFR minus fed funds 4 bp (normal)"
+      "text": "SOFR minus fed funds 6 bp (normal)"
      },
      {
       "market": "fx",
@@ -3470,18 +3445,18 @@
   }
  },
  "summary": {
-  "sentence": "This week: no macro edge for gold, neutral (55% chance it is higher by 18 Dec, base 57%). USD Core PCE Price Index m/m (Wed 25 Nov, 13:30 UTC) is the event that matters most. Watch $3,600 above and $3,503 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
+  "sentence": "This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,503 (last week's low) since the 24 Nov close and is near $3,484. Watch $3,500 above (broken since the close) and $3,450 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov.",
   "bias": {
-   "lean": "neutral",
-   "p": 0.55,
+   "lean": "against",
+   "p": 0.53,
    "base": 0.57,
-   "tilt": -0.017,
+   "tilt": -0.037,
    "by": "2026-12-18",
    "src": "month call",
    "level": 3538.305,
    "from": "2026-11-20",
    "confidence": "low",
-   "meter": -0.1133333333333327,
+   "meter": -0.24666666666666615,
    "channels": {
     "up": 0,
     "down": 4,
@@ -3490,31 +3465,25 @@
     "total": 8
    },
    "why": "The tested Gold Macro Score shows no edge, so the odds stay near the base rate.",
-   "gapPct": -0.6
+   "gapPct": -1.5
   },
-  "event": {
-   "title": "Core PCE Price Index m/m",
-   "country": "USD",
-   "at": "2026-11-25T13:30:00.000Z",
-   "consensus": "0.3%",
-   "previous": "0.3%",
-   "goldMovePct": 1.6,
-   "when": "Wed 25 Nov, 13:30 UTC"
-  },
+  "event": null,
   "levels": {
    "px": 3551.215,
    "asOf": "2026-11-24",
    "above": {
-    "price": 3600,
+    "price": 3500,
     "label": "Round number",
-    "dist": 1.37,
-    "distNow": 2.34
+    "dist": -1.44,
+    "distNow": 0.46,
+    "crossed": true
    },
    "below": {
-    "price": 3503,
-    "label": "Last week's low",
-    "dist": -1.36,
-    "distNow": -0.42
+    "price": 3450,
+    "label": "Round number (price is under every level he tracks)",
+    "made": true,
+    "dist": -2.85,
+    "distNow": -0.98
    },
    "fresh": {
     "asOf": "2026-11-24",
@@ -3523,11 +3492,15 @@
     "text": "as of 2026-11-24 close"
    },
    "mark": {
-    "px": 3517.605,
-    "at": "2026-11-25T12:54:55.000Z",
-    "dist": -0.95
+    "px": 3484.14,
+    "at": "2026-11-25T14:14:40.000Z",
+    "dist": -1.89
    },
-   "broken": null
+   "broken": {
+    "price": 3503,
+    "label": "Last week's low",
+    "side": "below"
+   }
   },
   "holidays": [
    {
@@ -3558,7 +3531,7 @@
    "issues": []
   }
  },
- "brief": "Macro veteran, 2026-11-25 12:55 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, US dollar. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Event within 72 hours (Core PCE Price Index m/m): the bias is conditional until the print. Fails if 10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4062: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.82 vs ry hit 52%, t 1.09; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.36. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. USD Core PCE Price Index m/m on Wed, 25 Nov is the week's pivot | 2. The 20 closest past set-ups: gold higher 20 sessions on in 80% (all weeks 56%) | 3. Stress gauges are lit (VIX 27, curve inverted), funding still calm | H1 (55%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-01 before any close below $3,503 | H2 (76%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-12-01 | H3 (56%): DXY closes 2026-12-22 below 103.84 (the 2026-11-24 close) At a glance: This week: no macro edge for gold, neutral (55% chance it is higher by 18 Dec, base 57%). USD Core PCE Price Index m/m (Wed 25 Nov, 13:30 UTC) is the event that matters most. Watch $3,600 above and $3,503 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov. Event playbook: USD Core PCE Price Index m/m 2026-11-25 13:30 UTC: consensus 0.3% (previous 0.3%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
+ "brief": "Macro veteran, 2026-11-25 14:15 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, US dollar. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.4 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4062: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.82 vs ry hit 52%, t 1.09; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.22; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.36. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. The 20 closest past set-ups: gold higher 20 sessions on in 80% (all weeks 56%) | 2. Stress gauges are lit (VIX 27, curve inverted), funding still calm | 3. Gold below its 10-week average (−12.6%); Gold Macro Score −0.66 (AUCTION) | H1 (54%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-01 before any close below $3,503 | H2 (76%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-12-01 | H3 (56%): DXY closes 2026-12-22 below 103.84 (the 2026-11-24 close) At a glance: This week: the macro leans against gold (53% chance it is higher by 18 Dec, base 57%). No major release is scheduled this week. Gold has traded below $3,503 (last week's low) since the 24 Nov close and is near $3,484. Watch $3,500 above (broken since the close) and $3,450 below. Levels as of the 24 Nov close. Holiday trading ahead: Thanksgiving Thu 26 Nov (US stocks closed, gold thin), early close Fri 27 Nov. Event playbook: USD Core PCE Price Index m/m 2026-11-25 13:30 UTC: consensus 0.3% (previous 0.3%). Act after the release, not before (¼ starter). Descriptive, not a tested edge.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {
@@ -3657,8 +3630,8 @@
   "items": [
    {
     "area": "bias",
-    "text": "Bias against → neutral (53% → 55% chance gold is higher in 20 sessions)",
-    "dir": 1
+    "text": "Bias unchanged: against (53%)",
+    "dir": 0
    },
    {
     "area": "price",
@@ -3667,12 +3640,12 @@
    },
    {
     "area": "insight",
-    "text": "New: USD Core PCE Price Index m/m on Wed, 25 Nov is the week's pivot",
+    "text": "Moved up to #1 (from #3): The 20 closest past set-ups: gold higher 20 sessions on in 80% (all weeks 56%)",
     "dir": 0
    },
    {
     "area": "insight",
-    "text": "Dropped: Real yields rose 24 bp in 4 weeks (10Y TIPS 2.88%)",
+    "text": "Moved up to #4 (from #6): Speculators' gold length is middle of its range (21st percentile of 3 years)",
     "dir": 0
    },
    {
