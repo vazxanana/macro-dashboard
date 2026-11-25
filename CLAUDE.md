@@ -7190,3 +7190,7 @@ fade / gap desks keep their markets. Test: `tests/edge-desks-2.test.mjs`.
 **Round-number fade on five markets** (25 Nov 2026, owner: "Round-number fade trades remove gold silver nzdusd usdjpy eurjpy"). `council/edge-desks-2.mjs` `ROUND_MARKETS` = the study's ten markets less
 those five = EUR/USD, GBP/USD, AUD/USD, USD/CAD, USD/CHF; `DESKS2.roundfade.markets` reads them (the round levels in play are the forex 0.0050 ones). The five markets' records leave
 `roundfade/desk.json` on the loop's next run after this merges. Test: `tests/edge-desks-2.test.mjs`.
+
+**Break fade without gold** (25 Nov 2026, owner: "Brake fade remove gold" = the Break fade desk). `council/edge-desks-2.mjs` `BREAK_MARKETS` = the study's ten markets less gold (nine);
+`DESKS2.fade.markets` reads them; gold's records leave `fade/desk.json` on the loop's next run after this merges. Note: the Lyriac desk still trades its gold breakout (a different rule).
+Test: `tests/edge-desks-2.test.mjs`.

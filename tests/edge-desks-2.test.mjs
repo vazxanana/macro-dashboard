@@ -38,7 +38,7 @@ test('the adapters read the studies\' own cells', () => {
   assert.deepEqual(FB.F1, { ch: 2, trig: 0, sess: 2, ei: 0, si: 0, x: 0 });
   const med = D2.fvgMedians(); assert.equal(Object.keys(med).length, 10); assert.ok(med.xau['1h'] > 0);
   assert.deepEqual(Object.keys(D2.DESKS2), ['fade', 'bigfade', 'roundfade', 'boxfade', 'fvg', 'goldvb', 'jpyvb', 'nq1', 'zero', 'lyriac', 'dom']);
-  for (const k of ['fade', 'bigfade']) assert.deepEqual(D2.DESKS2[k].markets, FADE.MARKETS);
+  assert.deepEqual(D2.DESKS2.bigfade.markets, FADE.MARKETS); assert.deepEqual(D2.DESKS2.fade.markets, FADE.MARKETS.filter((m) => m !== 'xau'));   // gold left the Break fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.roundfade.markets, ['eurusd', 'gbpusd', 'audusd', 'usdcad', 'usdchf']);   // gold, silver, NZD/USD, USD/JPY and EUR/JPY left the Round-number fade desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.fvg.markets, FADE.MARKETS.filter((m) => m !== 'gbpusd'));   // GBP/USD left the FVG return desk (25 Nov 2026)
   assert.deepEqual(D2.DESKS2.boxfade.markets, FADE.MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m)));   // gold, silver and USD/CAD left the Box fade desk (25 Nov 2026)
@@ -185,7 +185,7 @@ test('Equinox: its own page with the eight desks; the Desk keeps its five', () =
 
 test('Box fade: gold, silver and USD/CAD left the desk, and their stored records go on the next run (owner, 25 Nov 2026)', () => {
   assert.deepEqual(D2.BOX_MARKETS, D2.STUDY_MARKETS.filter((m) => !['xau', 'xag', 'usdcad'].includes(m))); assert.equal(D2.BOX_MARKETS.length, 7);
-  assert.deepEqual(D2.DESKS2.boxfade.markets, D2.BOX_MARKETS); assert.deepEqual(D2.DESKS2.fade.markets, D2.STUDY_MARKETS);   // the other fade desks keep their ten
+  assert.deepEqual(D2.DESKS2.boxfade.markets, D2.BOX_MARKETS); assert.deepEqual(D2.DESKS2.bigfade.markets, D2.STUDY_MARKETS);   // the Big-candle fade keeps its ten
   const old = ['xau', 'xag', 'usdcad', 'eurusd'].map((m, k) => ({ id: `${m}:boxfade-x${k}`, ...(m === 'xau' ? {} : { market: m }), kind: 'boxfade-m5', side: 1, entry: 100, stop: 99, target: 101, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
   const o = buildDesk('boxfade', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14);
   assert.deepEqual(o.records.map((r) => r.market || 'xau'), ['eurusd']); assert.deepEqual(o.markets, ['eurusd']);
@@ -212,4 +212,11 @@ test('Round-number fade desk: five markets (gold, silver, NZD/USD, USD/JPY, EUR/
   const old = ['xau', 'xag', 'nzdusd', 'usdjpy', 'eurjpy', 'eurusd'].map((m, k) => ({ id: `${m}:roundfade-x${k}`, ...(m === 'xau' ? {} : { market: m }), kind: 'roundfade-m15', side: 1, entry: 100, stop: 99, target: 102, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
   const o = buildDesk('roundfade', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14); assert.deepEqual(o.records.map((r) => r.market), ['eurusd']);
   assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /on five markets \(EUR\/USD, GBP\/USD, AUD\/USD, USD\/CAD, USD\/CHF\)/);
+});
+
+test('Break fade desk: nine markets (gold left), its stored gold records go on the next run (owner, 25 Nov 2026)', () => {
+  assert.equal(D2.BREAK_MARKETS.length, 9); assert.ok(!D2.BREAK_MARKETS.includes('xau')); assert.deepEqual(D2.DESKS2.fade.markets, D2.BREAK_MARKETS);
+  const old = ['xau', 'eurusd'].map((m, k) => ({ id: `${m}:fade-x${k}`, ...(m === 'xau' ? {} : { market: m }), kind: 'fade-m15', side: 1, entry: 100, stop: 99, target: 102, t: T0 + k, status: 'stopped', R: -1, endT: T0 + k + 60 }));
+  const o = buildDesk('fade', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14); assert.deepEqual(o.records.map((r) => r.market), ['eurusd']);
+  assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /first M15 structure break on nine markets \(not gold\)/);
 });
