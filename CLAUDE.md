@@ -3570,6 +3570,7 @@ toggle `#ms-alerts` now uses a pulse icon so the bell means notifications only. 
 Audit 9 Nov (`tests/audit-nov9.test.mjs`): `/api/logout` and `/api/sounds` POST refuse a foreign Origin; the notify / sounds / profile Blob reads
 throw on a failed read (they used to return empty, so the next save overwrote the list, the other sound or the photo); veteran
 expectations fill a consensus the calendar posts after the first capture but before the release (never after).
+**Email too (25 Nov 2026, owner: "Email them")**: `POST /api/notify { title, body, email: true }` (the owner's session; Profile → Send a notification has the box "Also email it to everyone who has an email address on file") mails the notice to the owner (`OWNER_EMAIL`, else `GMAIL_USER`) and every enabled member with an address on file, once each, at most 60, through the sign-up senders (`signup.js` `mailer`). Addresses are never logged or returned (counts only: `email { ok, failed, recipients }`); an unreadable member list or a failing sender never loses the notice. No permission filter: a notice by email goes to every address. Test: `tests/notify.test.mjs`.
 
 ## API hardening (9 Nov 2026)
 `api/_guard.js`: one per-IP table of failed password checks shared by `/api/login`, ctrader-link `session`, mcp `mykey` and the

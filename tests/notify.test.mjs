@@ -43,3 +43,17 @@ test('the installed app icon shows the unread count (19 Nov 2026): set with the 
   assert.match(b, /navigator\.setAppBadge\(n\)/); assert.match(b, /navigator\.clearAppBadge\(\)/);
   assert.match(page, /window\.msSignOut = function \(\) \{ try \{ if \(navigator\.clearAppBadge\) navigator\.clearAppBadge\(\)/);
 });
+
+test('notify: email:true mails the owner and every enabled member once, counts only, a failing sender keeps the notice', async () => {
+  const notify = (await import('../api/notify.js')).default || (await import('../api/notify.js'));
+  const sent = []; let list = [];
+  const store = { get: async () => list, put: async (x) => { list = x; } };
+  const users = { a: { email: 'A@x.com' }, b: { email: 'a@x.com' }, c: { email: 'c@x.com', disabled: true }, d: {}, e: { email: 'e@x.com' } };
+  const run = (body, send) => new Promise((resolve) => { const res = { h: {}, setHeader() {}, status(c) { this.c = c; return this; }, json(j) { resolve({ c: this.c, j }); } };
+    (notify.handle || notify)({ method: 'POST', body, headers: {} }, res, { store, who: async () => ({ u: 'owner' }), sameOrigin: () => true, env: { OWNER_EMAIL: 'o@x.com' }, users, send }); });
+  const r = await run({ title: 'T', body: 'Hello', email: true }, async (to, subj) => { sent.push([to, subj]); });
+  assert.equal(r.c, 200); assert.deepEqual(sent.map((x) => x[0]).sort(), ['a@x.com', 'e@x.com', 'o@x.com']); assert.equal(JSON.stringify(r.j).includes('@'), false); assert.equal(r.j.email.ok, 3);
+  const r2 = await run({ title: 'T2', body: 'Hi', email: true }, async () => { throw new Error('smtp'); });
+  assert.equal(r2.c, 200); assert.equal(r2.j.email.failed, 3); assert.equal(list.length, 2);
+  const r3 = await run({ title: 'T3', body: 'No mail' }, async () => { sent.push('x'); }); assert.equal(r3.j.email, undefined);
+});

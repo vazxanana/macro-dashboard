@@ -2,11 +2,16 @@
 // feature on my profile to send a notification to all"). The owner posts; every signed-in member reads them.
 //   GET  /api/notify                       signed in -> { items: [{ id, at, title, body }] } newest first (last 50)
 //   POST /api/notify { title, body }       owner session only -> the new item; { remove: id } deletes one
+//   POST /api/notify { title, body, email: true }  also emails it to the owner and every member with an address on file (25 Nov 2026,
+//     owner: "Email them"): the sign-up senders (signup.js mailer), at most 60 addresses, addresses never logged or returned, counts only;
+//     an unreadable member list or a failing sender never loses the notice (answer `email: { ok: 0, why }`).
 // Stored privately in the Blob store as notices/list.json (100 kept). Read/unread is kept per browser and account (localStorage).
 // 19 Nov 2026: api/daily.js posts ONE notice a day for the daily reports (`dailyNotice`: id `daily-<day>`, `perm: 'macro'`, `link`).
 // A notice with `perm` is shown only to accounts that have that permission (owner: all; a member: unless `perms.macro === false`,
 // the role defaults give macro to every role).
 const S = require('./_session.js');
+const A = require('./_accounts.js');
+const U = require('./users.js');
 const DAILY_LATE = 3 * 3600e3;   // a report found more than 3 h after its publish time is not announced (a late build never wakes everyone)
 // effective permission of a signed-in account, as the page's msPerms reads it (only macro is used today)
 function allowed(acct, perm) { if (!perm) return true; if (!acct) return false; if (acct.u === 'owner') return true;
@@ -34,6 +39,20 @@ function blobStore(env, io = {}) {
   };
 }
 const clean = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').trim().slice(0, n);
+// the owner and every enabled member with a valid address, once each (at most 60)
+function addresses(users, ownerEmail) {
+  const out = [], seen = new Set(), add = (e) => { const m = String(e == null ? '' : e).trim().toLowerCase(); if (m && m.length <= 254 && U.EMAIL_RE.test(m) && !seen.has(m) && out.length < 60) { seen.add(m); out.push(m); } };
+  add(ownerEmail); for (const R of Object.values(users || {})) { if (R && !R.disabled && R.email) add(R.email); } return out;
+}
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+async function emailAll(env, d, item) {
+  let users; try { users = await (d.users ? Promise.resolve(d.users) : (d.userList || (() => A.userList(S.defaultDeps(env))))()); } catch (e) { return { ok: 0, failed: 0, why: 'the member list could not be read: nothing was emailed' }; }
+  const to = addresses(users, env.OWNER_EMAIL || env.GMAIL_USER); if (!to.length) return { ok: 0, failed: 0, why: 'no address is on file' };
+  const send = d.send || require('./signup.js').mailer(env, {}); if (!send) return { ok: 0, failed: to.length, why: 'no mail sender is set up' };
+  const text = `${item.body}\n\n— The Aureum Desk · https://aureumdesk.co.uk`, html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.5;color:#16181B"><p>${esc(item.body).replace(/\n/g, '<br>')}</p><p style="color:#5B616A">The Aureum Desk · <a href="https://aureumdesk.co.uk">aureumdesk.co.uk</a></p></div>`;
+  let ok = 0, failed = 0; for (const a of to) { try { await send(a, item.title, text, html); ok++; } catch (e) { failed++; } }
+  return { ok, failed, recipients: to.length };
+}
 async function handle(req, res, d = {}) {
   const env = d.env || process.env; res.setHeader('Cache-Control', 'private, no-store');
   if (!env.BLOB_READ_WRITE_TOKEN && !d.store) return res.status(503).json({ error: 'storage not set up' });
@@ -51,7 +70,9 @@ async function handle(req, res, d = {}) {
     const title = clean(b.title, 80), body = clean(b.body, 1000); if (!title && !body) return res.status(400).json({ error: 'write a title or a message' });
     const at = new Date(d.now || Date.now()).toISOString(), item = { id: at.replace(/\D/g, '').slice(0, 17) + Math.random().toString(36).slice(2, 6), at, title: title || 'Message from the desk', body };
     const next = list.concat(item).slice(-KEEP); await store.put(next);
-    return res.status(200).json({ ok: true, item });
+    let email;
+    if (b.email === true) email = await emailAll(env, d, item).catch(() => ({ ok: 0, failed: 0, why: 'the email could not be sent' }));
+    return res.status(200).json({ ok: true, item, ...(email ? { email } : {}) });
   } catch (e) { return res.status(e.status === 503 ? 503 : 500).json({ error: 'notifications unavailable' }); }
 }
 module.exports = (req, res) => handle(req, res);
