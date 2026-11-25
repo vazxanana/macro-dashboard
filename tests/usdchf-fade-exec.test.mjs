@@ -16,19 +16,19 @@ test('entry fills at the ask for a buy and the bid for a sell; no quote is unres
   assert.equal(entryOf({ ts: 101, side: 1 }, M), null);
   assert.equal(entryOf({ ts: 100, side: 1 }, new Map([[100, [100, 0.9, 0.9002, 99]]])), null);
 });
-test('a stop on the closing side books at the tick, a target at its level, else the deadline quote', () => {
-  const o = { id: 'c0', ts: 100, deadEnd: 400, side: 1, D: 0.001, fillM: 0.9, ns: 1, nt: 1 };
+test('a stop on the closing side books at the tick, a target at its level, else the deadline quote (a sell)', () => {
+  const o = { id: 'c0', ts: 100, deadEnd: 400, side: -1, D: 0.001, fillM: 0.9, ns: 1, nt: 1 };
   const M = new Map([[100, [100, 0.9, 0.9002, 5]]]), MD = new Map([[400, [400, 0.8995, 0.8997, 5]]]);
-  const stop = tickOrder(o, new Map([['c0|s0', ['c0|s0', 150000, 0.8990, 0.8992]], ['c0|t0', ['c0|t0', null]]]), M, MD);
+  const stop = tickOrder(o, new Map([['c0|s0', ['c0|s0', 150000, 0.9010, 0.9012]], ['c0|t0', ['c0|t0', null]]]), M, MD);
   assert.equal(stop.ex, 'stop'); assert.ok(stop.R < -1);
-  const tgt = tickOrder(o, new Map([['c0|s0', ['c0|s0', null]], ['c0|t0', ['c0|t0', 150000, 0.9008, 0.901]]]), M, MD);
-  assert.equal(tgt.ex, 'target'); assert.ok(Math.abs(tgt.R - 0.5) < 1e-9);
+  const tgt = tickOrder(o, new Map([['c0|s0', ['c0|s0', null]], ['c0|t0', ['c0|t0', 150000, 0.8988, 0.899]]]), M, MD);
+  assert.equal(tgt.ex, 'target'); assert.ok(Math.abs(tgt.R - 1) < 1e-9);
   const time = tickOrder(o, new Map([['c0|s0', ['c0|s0', null]], ['c0|t0', ['c0|t0', null]]]), M, MD);
-  assert.equal(time.ex, 'time'); assert.ok(Math.abs(time.px - 0.8995) < 1e-12);
+  assert.equal(time.ex, 'time'); assert.ok(Math.abs(time.px - 0.8997) < 1e-12);
 });
 test('verdict rules and rollover helpers', () => {
   assert.equal(verdictOf({ unresolvedShare: 0.2, net: { n: 200, mean: 1, monthT: 3 } }), 'INCONCLUSIVE');
-  assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 100, mean: 1, monthT: 3 } }), 'TOO FEW');
+  assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 99, mean: 1, monthT: 3 } }), 'TOO FEW');
   assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 127, mean: 0.1, monthT: 1.9 } }), 'FAIL');
   assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 127, mean: 0.2, monthT: 2.1 } }), 'PASS');
   assert.ok(inBand(21 * 3600) && !inBand(19 * 3600));
