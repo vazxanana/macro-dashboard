@@ -1,0 +1,151 @@
+{
+ "study": "usdchf-blk-exec",
+ "built": "2026-11-25",
+ "commit": null,
+ "window": [
+  "2023-12-01",
+  "2026-11-20"
+ ],
+ "probes": [
+  {
+   "file": "ticks-USDCHF-chf-entry.json",
+   "at": "2026-11-25T06:51:58.150Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDCHF-chf-dead.json",
+   "at": "2026-11-25T06:51:57.486Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDCHF-chf-fills-1.json",
+   "at": "2026-11-25T06:56:28.671Z",
+   "errors": 0
+  }
+ ],
+ "primary": {
+  "orders": 185,
+  "entryUnresolved": 0,
+  "exitUnresolved": 0,
+  "unresolvedShare": 0,
+  "unresolvedWhy": {},
+  "net": {
+   "n": 185,
+   "mean": -0.0111,
+   "monthT": -0.2611,
+   "months": 36
+  },
+  "tick": {
+   "n": 185,
+   "mean": 0.0221,
+   "monthT": 0.5248,
+   "months": 36
+  },
+  "mid": {
+   "n": 185,
+   "mean": 0.0807,
+   "monthT": 2.37,
+   "months": 36
+  },
+  "tickMinusMid": {
+   "n": 185,
+   "mean": -0.0586,
+   "monthT": -2.0952,
+   "months": 36
+  },
+  "win": 0.6216,
+  "exits": {
+   "stop": {
+    "n": 31,
+    "tick": -1.0637,
+    "net": -1.0959,
+    "mid": -0.7459
+   },
+   "target": {
+    "n": 88,
+    "tick": 0.5,
+    "net": 0.4663,
+    "mid": 0.4196
+   },
+   "time": {
+    "n": 66,
+    "tick": -0.1051,
+    "net": -0.1381,
+    "mid": 0.0171
+   }
+  },
+  "byYear": {
+   "2023": {
+    "n": 4,
+    "tick": -0.3129,
+    "net": -0.3405,
+    "mid": -0.0569
+   },
+   "2024": {
+    "n": 64,
+    "tick": -0.1309,
+    "net": -0.1665,
+    "mid": -0.0018
+   },
+   "2025": {
+    "n": 64,
+    "tick": 0.0141,
+    "net": -0.0171,
+    "mid": 0.0981
+   },
+   "2026": {
+    "n": 53,
+    "tick": 0.2418,
+    "net": 0.2087,
+    "mid": 0.1697
+   }
+  },
+  "bySide": {
+   "buy": {
+    "n": 87,
+    "tick": -0.05,
+    "net": -0.0824,
+    "mid": 0.046
+   },
+   "sell": {
+    "n": 98,
+    "tick": 0.0861,
+    "net": 0.0523,
+    "mid": 0.1114
+   }
+  },
+  "byRoll": {
+   "never open inside 21:00-22:59": {
+    "n": 47,
+    "tick": 0.2107,
+    "net": 0.1786,
+    "mid": 0.1446
+   },
+   "open inside 21:00-22:59": {
+    "n": 138,
+    "tick": -0.0421,
+    "net": -0.0757,
+    "mid": 0.0589
+   }
+  },
+  "entrySpreadR": {
+   "median": 0,
+   "p90": 0.0228
+  },
+  "entrySlipR": 0.0046
+ },
+ "verdict": "FAIL. At the broker's own bid and ask the USD/CHF block-break fade made −0.011R a trade after commission (n 185, month t -0.2611). On mid candles the same orders made +0.081R; 0 of 185 had no quote to enter on.",
+ "meaning": [
+  "The researcher's one lead does not survive the broker's quotes. On the 185 orders of 2023-12 to 2026-11 the fade made +0.081R a",
+  "trade on mid candles with the engine's 0.7 pip cost, and −0.011R after commission when filled at the demo broker's own bid and ask",
+  "(month t −0.26): zero, not an edge. Every order had a quote to enter on and every exit was resolved, so the number is not a",
+  "coverage artefact. The spread cost about 0.06R a trade (tick minus mid −0.059R, month t −2.10), which is the whole of the lead.",
+  "",
+  "The audit's suspicion was right: 138 of the 185 trades were open inside the 21:00-22:59 UTC rollover and made −0.076R after",
+  "commission against +0.179R for the 47 that were not. That split was found after the result on 47 trades and is not a rule; it is",
+  "the same shape the late-evening Break fade showed, and a hypothesis at best.",
+  "",
+  "The lead does not go to a forward record. One out of 262 holdout looks, with one chance candidate expected by luck, filled at the",
+  "broker's price makes nothing. Do not test variants of this rule on these years."
+ ]
+}
