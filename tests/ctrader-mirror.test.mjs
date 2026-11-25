@@ -1100,7 +1100,7 @@ test('Mosha 6R: copied only while the mosha6 book has its own account; the repo 
   assert.equal(moshaHasOwnAccount({ council: '1', mosha6: '1' }), false); assert.equal(moshaHasOwnAccount({ council: '1', mosha6: '2' }), true); assert.equal(moshaHasOwnAccount({ council: '', mosha6: '2' }), false);
   const ACCF = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
   const a = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACCF.mirrorAccounts, drain: ACCF.drain });
-  assert.equal(a.byBook.mosha6, '*155'); assert.deepEqual(a.groups.find((g) => g.account === '*155').books, ['mosha6']);
+  assert.equal(a.byBook.mosha6, '10152146'); assert.ok(a.groups.find((g) => g.account === '10152146').books.includes('mosha6'));
   assert.deepEqual(a.groups.find((g) => g.account === '10152145'), { account: '10152145', books: ['bfade'] });   // 25 Nov 2026: the Big-candle fade book, no longer drained
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
   assert.match(src, /moshaHasOwnAccount\(byBook\) \? moshaCandidates\(desk\) : \[\]/);
@@ -1160,7 +1160,7 @@ test('pickAccount: "*155" = the one demo account whose login ends 155; two match
   assert.equal(pickAccount([{ id: '2', login: '50210155', live: false }], '*155', { id: 'id', login: 'login', live: 'live' }).id, '2');
   assert.equal(mirrorFile('*155', '9'), 'mirror-155.json'); assert.equal(mirrorFile('9', '9'), 'mirror.json'); assert.match(mirrorFile('*155', '9'), /^mirror(-\d+)?\.json$/);
   const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8'));
-  assert.equal(acc.mirrorAccounts.mosha6, '*155'); assert.deepEqual(acc.drain, []); assert.equal(acc.mirrorAccounts.eqx, '10152144');
+  assert.equal(acc.mirrorAccounts.mosha6, '10152146'); assert.deepEqual(acc.drain, []); assert.equal(acc.mirrorAccounts.eqx, '10152144');
 });
 
 test('daily stop: a balance cut to under half the day start is an account reset, not a loss (24 Nov 2026)', async () => {

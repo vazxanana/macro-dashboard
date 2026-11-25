@@ -9,12 +9,12 @@ const MIRROR = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.m
 
 test('shadows go to the former LIT account (still the lit book and gotobi\'s); the old Shadows account was the Mosha 6R book 23-24 Nov 2026 and drains since', () => {
   assert.equal(ACC.mirrorAccounts.shadow, '10152146'); assert.equal(ACC.mirrorAccounts.lit, '10152146');
-  assert.equal(ACC.mirrorAccounts.mosha6, '*155'); assert.deepEqual(ACC.drain, []);   // 25 Nov 2026: 10152145 is the bfade book
+  assert.equal(ACC.mirrorAccounts.mosha6, '10152146'); assert.deepEqual(ACC.drain, []);   // 25 Nov 2026: 10152145 is the bfade book
   const { groups, byBook } = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACC.mirrorAccounts, drain: ACC.drain });
   assert.equal(byBook.shadow, '10152146');
   const g = Object.fromEntries(groups.map((x) => [x.account, x]));
-  assert.deepEqual(g['10152146'].books, ['shadow', 'lit']);
-  assert.deepEqual(g['*155'], { account: '*155', books: ['mosha6'] }, 'the $200 account ending 155 opens the mosha6 book');
+  assert.deepEqual(g['10152146'].books, ['shadow', 'lit', 'mosha6']);   // 25 Nov 2026: mosha6 moved here from *155
+  assert.equal(g['*155'], undefined, 'no account ending 155 any more');
   assert.deepEqual(g['10152145'], { account: '10152145', books: ['bfade'] }, '25 Nov 2026: the Big-candle fade book; it still manages the old copies it holds');
 });
 
