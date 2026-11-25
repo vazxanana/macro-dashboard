@@ -3668,7 +3668,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
          the whole view goes full screen; the charts share the height that is left, in whatever view is on (All, Split, Layout, one chart) */
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
       /* 20 Nov 2026: the floating parts that are moved in here (a drawing's style bar, the right-click menu, a chart's timeframe menu, the toasts) are not hidden with the rest */
-      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ms-dsel):not(.ms-cmenu):not(.ph-menu):not(#ms-toasts):not(.ch-fs-x) { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ms-dsel):not(.ms-cmenu):not(.ph-menu):not(#ms-toasts):not(.ch-fs-x):not(.ch-fs-tb) { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .ch-row { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-row > .ch-col { flex: 1 1 auto; }   /* a phone has no rail: the column still takes the full height (20 Nov 2026) */ :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col { display: flex; flex-direction: column; min-height: 0; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col > .mm { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp { margin: 0; padding: 6px 10px; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp .pp-ttl small { display: none; }
@@ -3681,9 +3681,26 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
          element full screen, so the Charts view covers the page instead; the exit button sits top right */
       #v-charts.ch-fake-fs { position: fixed; inset: 0; z-index: 900; height: 100dvh; padding: calc(max(8px, env(safe-area-inset-top)) + 52px) 10px max(8px, env(safe-area-inset-bottom)); box-sizing: border-box; }   /* the top 52 px hold the exit button */
       html.ch-fake-fs-on, html.ch-fake-fs-on body { overflow: hidden; }
-      .ch-fs-x { display: none; }
-      #v-charts.ch-fake-fs .ch-fs-x { display: inline-flex; align-items: center; gap: 6px; position: fixed; z-index: 905; top: max(8px, env(safe-area-inset-top)); right: 10px; min-height: 44px; padding: 0 14px;
-        border-radius: 22px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface-2, var(--panel)); color: var(--au-ink-1, var(--ink)); font: 600 13px var(--sans); cursor: pointer; }
+      .ch-fs-x, .ch-fs-tb { display: none; }
+      /* a roomier full screen (25 Nov 2026, owner: "improve the full screen mode more spacious, organised and easy to work"): the toolbar is one quiet row
+         with an Exit button of its own in the browser's full screen too (Esc still works), "Hide toolbar" gives the charts that row back, and a wide
+         screen no longer keeps the 52 px a phone needs for its exit button */
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) :is(.ch-fs-x, .ch-fs-tb) { display: inline-flex; align-items: center; gap: 6px; position: fixed; z-index: 905; top: 10px; min-height: 36px; padding: 0 14px;
+        border-radius: 18px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface-2, var(--panel)); color: var(--au-ink-1, var(--ink)); font: 600 13px var(--sans); cursor: pointer; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-fs-x { right: 12px; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-fs-tb { right: 80px; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) :is(.ch-fs-x, .ch-fs-tb):hover { background: var(--au-surface, var(--panel)); }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) :is(.ch-fs-x, .ch-fs-tb):focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 2px; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) { padding: 10px 14px 12px; gap: 8px; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h { flex: 0 0 auto; flex-wrap: nowrap; overflow-x: auto; min-height: 48px; padding-right: 232px; margin: 0; scrollbar-width: none; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h::-webkit-scrollbar { display: none; }
+      #v-charts.ch-fs-tb-off > .sec-h { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h > * { flex-shrink: 0; white-space: nowrap; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h #ms-sty-btn { flex-direction: row; gap: 6px; }
+      @media (min-width: 641px) { #v-charts.ch-fs-tb-off :is(.ch-fs-x, .ch-fs-tb) { min-height: 28px; padding: 0 10px; top: 6px; font-size: 12px; } }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ms-grid4[data-view="all"] { gap: 10px; }
+      @media (min-width: 641px) { #v-charts.ch-fake-fs { padding: 10px 14px 12px; } }
+      @media (max-width: 640px) { :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) :is(.ch-fs-x, .ch-fs-tb) { min-height: 44px; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h { padding-right: 0; } #v-charts.ch-fake-fs :is(.ch-fs-x, .ch-fs-tb) { top: max(8px, env(safe-area-inset-top)); } }
+      /* the exit button's look is the shared rule above */
 </style>
       <style id="ms-rail-css">/* The drawing rail on the left and the floating favourites bar (19 Nov 2026, owner: "the drawing bar in the left … favorite and
          have it floated like tradingview"); wider than 640 px only, a phone keeps its "Draw" button */
@@ -8256,10 +8273,17 @@ function msNextSetup(bars, A) {
   // ─── Full screen of the Charts view (20 Nov 2026): the browser's own where an element can go full screen, else the page's own
   // (iPhone Safari): #v-charts covers the screen with an exit button; Escape, the button or the toolbar's full-screen button leave it
   { const VC = () => document.getElementById('v-charts');
+    const inFs = () => { const vc = VC(); return !!(vc && (vc.classList.contains('ch-fake-fs') || document.fullscreenElement === vc)); };
+    function bar() { const vc = VC(); if (!vc) return; const on = inFs();
+      let x = vc.querySelector(':scope > .ch-fs-x'), t = vc.querySelector(':scope > .ch-fs-tb');
+      if (on && !x) { x = document.createElement('button'); x.type = 'button'; x.className = 'ch-fs-x'; x.setAttribute('aria-label', 'Exit full screen (Esc)'); x.title = 'Exit full screen (Esc)'; x.textContent = 'Exit';
+        x.addEventListener('click', () => { if (vc.classList.contains('ch-fake-fs')) fake(false); else if (document.fullscreenElement) document.exitFullscreen(); }); vc.appendChild(x); }
+      if (on && !t) { t = document.createElement('button'); t.type = 'button'; t.className = 'ch-fs-tb'; t.setAttribute('aria-pressed', 'false'); t.textContent = 'Hide toolbar';
+        t.addEventListener('click', () => { const off = vc.classList.toggle('ch-fs-tb-off'); t.textContent = off ? 'Show toolbar' : 'Hide toolbar'; t.setAttribute('aria-pressed', String(off)); setTimeout(() => window.dispatchEvent(new Event('resize')), 30); }); vc.appendChild(t); }
+      if (!on) { vc.classList.remove('ch-fs-tb-off'); if (t) t.textContent = 'Hide toolbar'; } }
+    document.addEventListener('fullscreenchange', bar);
     const fake = (on) => { const vc = VC(); if (!vc) return; vc.classList.toggle('ch-fake-fs', on); document.documentElement.classList.toggle('ch-fake-fs-on', on);
-      let x = vc.querySelector(':scope > .ch-fs-x');
-      if (on && !x) { x = document.createElement('button'); x.type = 'button'; x.className = 'ch-fs-x'; x.textContent = 'Exit full screen'; x.addEventListener('click', () => fake(false)); vc.appendChild(x); }
-      document.dispatchEvent(new Event('ms:fs'));   // the floating parts follow (assets/ms-draw.js)
+      bar(); document.dispatchEvent(new Event('ms:fs'));   // the floating parts follow (assets/ms-draw.js)
       setTimeout(() => window.dispatchEvent(new Event('resize')), 30); };
     window.msChartsFs = () => {
       const vc = VC(); if (!vc) return;

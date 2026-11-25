@@ -2678,6 +2678,13 @@ crosses and comes back inside the 1.5 s between two looks is not seen: by design
 timeframe from 1 s to a year, Split, touch drawing, the guest's view (no paper, no layout). Not tested: Safari / a real iPhone,
 crypto markets (the exchanges are not reachable from the build sandbox), a real weekend.
 
+## Charts full screen, roomier (25 Nov 2026, owner: "improve the full screen mode more spacious, organised and easy to work")
+Display only, `market-structure.html` (`#ms-cfs-css`, the full-screen block next to `msChartsFs`). Full screen (the browser's or the page's own) now
+has a visible **Exit** button and a **Hide toolbar / Show toolbar** button (`.ch-fs-x`, `.ch-fs-tb`, made by `bar()` on `fullscreenchange` and by the
+page's own full screen; Esc still works; the toolbar comes back on exit), a wide screen no longer keeps the 52 px a phone needs (padding 10 / 14 / 12),
+the toolbar is one non-wrapping row that scrolls sideways (room kept for the two buttons), gaps between charts are 8-10 px, and with the toolbar hidden
+the charts take its row and the buttons shrink to small chips. Checked at 1440 x 900 and 390 x 844. Test: `tests/charts-phone-fs.test.mjs`.
+
 ## Charts on a phone: full screen and the Style panel (20 Nov 2026, owner on an iPhone: "the phone can't read the rest", "I can't find the full screen button")
 Display only, `market-structure.html`. (1) The full-screen button was hidden under 700 px (`.ch-fs`); only the pane-header copy hides
 there now, so the chart toolbar (`#ms-ch-one`, behind the pencil "Draw" toggle on a phone) shows it as its last icon. (2) iPhone Safari
