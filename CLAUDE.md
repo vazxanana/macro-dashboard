@@ -7099,3 +7099,14 @@ shared with this session). Tests: `tests/auto-researcher.test.mjs` (7).
 
 ## The auto-researcher's USD/CHF lead at the broker's own ticks (25 Nov 2026)
 `research/edge/usdchf-blk-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report`, MEANING.md, RESULT.md, result.json). The researcher's one lead (USD/CHF, the 19:00 UTC H1 close beyond the previous 3 candles' range faded at the 20:00 open, stop 1 ATR, target 0.5R, out at 00:00 UTC; +0.081R on mid candles) filled at the demo broker's bid / ask, 185 orders 2023-12 to 2026-11 (every order quoted and resolved). **FAIL**: −0.011R a trade after commission (month t −0.26); tick minus mid −0.059R (month t −2.10). 138 of 185 trades were open inside the 21:00-22:59 UTC rollover and made −0.076R against +0.179R for the 47 that were not (found after the result, not a rule). No forward record, no variants on these years. A lead of the auto-researcher must be re-priced at the broker's quotes before anything else. Test: `tests/usdchf-blk-exec.test.mjs`.
+
+## FVG tap after a continuation move, then an H1 QM or an M15 CHoCH (25 Nov 2026, owner's chart idea: "Fvg tap after continue move, qm, entry, target low")
+`research/edge/fvg-qm-continuation/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, MEANING.md, result.json, trades.json;
+`tests/fvg-qm-continuation.test.mjs`). The owner's answers fixed the rule: H1 for the gap and the QM, "continue move" = an H1 BO in the trade's
+direction, target the low the move came from, and at the tap either the H1 QM confirms (entry A) or an M15 CHoCH does (entry B). An H1 BO, an
+H1 FVG formed from the broken swing to three candles after the break (gap >= 0.25 ATR), the first M5 tap, a stop past the pullback's high + one
+cost, one position at a time, five markets on the toolkit's M5 cache, 2010-19 replication / 2020-23 / 2024 on, month-sum t, Holm over two.
+**Verdict: FAIL.** Entry A: 81 trades in 15 years, 18 since 2024 (-0.285R a trade after costs, month t -0.74): too few to judge, negative. Entry B:
+353 trades since 2024, -0.146R after costs (month t -1.74), -0.083R on 2010-2019 (n 1,265, t -2.08); about -0.11R before costs. Gold alone
+with B +0.095R since 2024 (n 72, t 0.45) and -0.178R before: noise, not tested. Nothing live changed; no variant on these years.
+
