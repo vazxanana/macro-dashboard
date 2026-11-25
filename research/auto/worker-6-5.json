@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 6,
  "started": "2026-11-25T12:49:48.296Z",
- "tries": 2441200,
- "survivedA": 639,
- "candidates": 84,
- "cLooks": 42,
+ "tries": 2532000,
+ "survivedA": 662,
+ "candidates": 90,
+ "cLooks": 45,
  "cPasses": 0,
  "groups": {
   "eurusd|dev-&fade|both": {
@@ -21,7 +21,7 @@
    "pass": false
   },
   "eurusd|dev+&big+|both": {
-   "more": 4,
+   "more": 5,
    "pass": false
   },
   "eurusd|dev+&dev+|both": {
@@ -89,7 +89,7 @@
    "pass": false
   },
   "eurusd|dev+&brk|both": {
-   "more": 5,
+   "more": 6,
    "pass": false
   },
   "eurusd|brk&big+|both": {
@@ -101,7 +101,7 @@
    "pass": false
   },
   "eurusd|big+&big+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurjpy|brk&brk|short": {
@@ -173,6 +173,18 @@
    "pass": true
   },
   "xau|brk&dev+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "usdcad|fade&dev+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "usdjpy|blk-&fade|both": {
+   "more": 0,
+   "pass": false
+  },
+  "audusd|fade&fade|both": {
    "more": 0,
    "pass": false
   }
@@ -2625,9 +2637,187 @@
     "months": 83
    },
    "p": 0.36693
+  },
+  {
+   "at": "2026-11-25T20:05:59.057Z",
+   "group": "usdcad|fade&dev+|both",
+   "g": {
+    "mk": "usdcad",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 5
+     },
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 3,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 2,
+    "rr": 0.5,
+    "hold": 24
+   },
+   "A": {
+    "n": 273,
+    "mean": 0.1213,
+    "t": 3.47,
+    "win": 75.8,
+    "months": 105
+   },
+   "B": {
+    "n": 181,
+    "mean": 0.1834,
+    "t": 4.32,
+    "win": 80.1,
+    "months": 58
+   },
+   "placeboA": {
+    "n": 274,
+    "mean": -0.0966,
+    "t": -2.2,
+    "win": 60.6,
+    "months": 105
+   },
+   "C": {
+    "n": 206,
+    "mean": 0.0271,
+    "t": 0.61,
+    "win": 69.9,
+    "months": 75
+   },
+   "p": 0.27093
+  },
+  {
+   "at": "2026-11-25T20:13:11.716Z",
+   "group": "usdjpy|blk-&fade|both",
+   "g": {
+    "mk": "usdjpy",
+    "trig": [
+     {
+      "kind": "blk",
+      "H": 3,
+      "at": 22,
+      "follow": false
+     },
+     {
+      "kind": "fade",
+      "N": 5
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 2,
+    "rr": 3,
+    "hold": 12
+   },
+   "A": {
+    "n": 456,
+    "mean": 0.2105,
+    "t": 3.66,
+    "win": 51.5,
+    "months": 115
+   },
+   "B": {
+    "n": 180,
+    "mean": 0.1746,
+    "t": 2.16,
+    "win": 55,
+    "months": 56
+   },
+   "placeboA": {
+    "n": 455,
+    "mean": -0.1966,
+    "t": -4.17,
+    "win": 38.5,
+    "months": 115
+   },
+   "C": {
+    "n": 282,
+    "mean": -0.0846,
+    "t": -1.55,
+    "win": 41.8,
+    "months": 80
+   },
+   "p": 0.93943
+  },
+  {
+   "at": "2026-11-25T20:22:50.603Z",
+   "group": "audusd|fade&fade|both",
+   "g": {
+    "mk": "audusd",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 120
+     },
+     {
+      "kind": "fade",
+      "N": 20
+     }
+    ],
+    "side": "both",
+    "hours": [
+     20,
+     2
+    ],
+    "dows": null,
+    "trend": "against",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 3,
+    "rr": 6,
+    "hold": 4
+   },
+   "A": {
+    "n": 397,
+    "mean": 0.0731,
+    "t": 3.14,
+    "win": 59.9,
+    "months": 114
+   },
+   "B": {
+    "n": 171,
+    "mean": 0.0715,
+    "t": 2.06,
+    "win": 57.9,
+    "months": 57
+   },
+   "placeboA": {
+    "n": 397,
+    "mean": -0.1032,
+    "t": -4.87,
+    "win": 38.3,
+    "months": 114
+   },
+   "C": {
+    "n": 221,
+    "mean": -0.0123,
+    "t": -0.41,
+    "win": 52.5,
+    "months": 74
+   },
+   "p": 0.6591
   }
  ],
- "chunks": 16,
- "updated": "2026-11-25T20:00:08.577Z",
- "chanceCandidates": 222.1
+ "chunks": 17,
+ "updated": "2026-11-25T20:25:13.630Z",
+ "chanceCandidates": 230.4
 }
