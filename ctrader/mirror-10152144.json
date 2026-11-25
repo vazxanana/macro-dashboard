@@ -1070,7 +1070,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-24T23:25:51.000Z",
     "councilEntry": 1.0962,
     "stop": 1.095949,
@@ -1083,24 +1083,24 @@
     "slipR": 0.319,
     "lagSec": 651,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-24T23:25:51.000Z",
-    "brokerStop": 1.09595
+    "brokerStop": 1.09595,
+    "closedAt": "2026-11-25T00:25:15.000Z"
    }
   },
   "day": {
    "date": "2026-11-25",
    "startBalance": 497.82,
-   "lastBalance": 498.17,
-   "ids": [
-    "51247620"
-   ],
+   "lastBalance": 497.04,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 498.17 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 497.04 · 0 open",
   "skipped": {},
   "wait": {
    "eqx:fade:audusd:fade-m15-b1795535100": {
@@ -1129,15 +1129,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 498.17,
-  "lastRun": "2026-11-25T00:22:15.000Z"
+  "balance": 497.04,
+  "lastRun": "2026-11-25T00:25:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T13:34:10.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:35:16.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:44 UTC) (will retry)",
@@ -2622,6 +2617,11 @@
    "at": "2026-11-25T00:00:00.000Z",
    "msg": "closed USDJPY position 51246396 (council: target)",
    "trade": "eqx:fade:usdjpy:fade-m15-s1795559400"
+  },
+  {
+   "at": "2026-11-25T00:25:15.000Z",
+   "msg": "EURUSD position 51247620 closed at the broker",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795562100"
   }
  ],
  "limits": {
