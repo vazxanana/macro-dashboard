@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 8,
  "started": "2026-11-25T11:14:12.997Z",
- "tries": 3173400,
- "survivedA": 4774,
- "candidates": 576,
- "cLooks": 100,
+ "tries": 3357800,
+ "survivedA": 5042,
+ "candidates": 610,
+ "cLooks": 101,
  "cPasses": 0,
  "groups": {
   "usdcad|blk-|long": {
@@ -21,7 +21,7 @@
    "pass": false
   },
   "eurusd|fade|both": {
-   "more": 17,
+   "more": 19,
    "pass": false
   },
   "eurjpy|eg+|both": {
@@ -29,31 +29,31 @@
    "pass": false
   },
   "usdchf|fade|both": {
-   "more": 52,
+   "more": 58,
    "pass": false
   },
   "eurusd|big+|both": {
-   "more": 27,
+   "more": 30,
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 17,
+   "more": 18,
    "pass": false
   },
   "usdchf|big+|both": {
-   "more": 15,
+   "more": 16,
    "pass": false
   },
   "eurusd|dev+|both": {
-   "more": 52,
+   "more": 55,
    "pass": false
   },
   "usdjpy|blk-|both": {
-   "more": 15,
+   "more": 16,
    "pass": false
   },
   "eurjpy|blk-|both": {
-   "more": 37,
+   "more": 40,
    "pass": false
   },
   "eurusd|big+|long": {
@@ -69,7 +69,7 @@
    "pass": false
   },
   "eurjpy|brk|both": {
-   "more": 10,
+   "more": 12,
    "pass": false
   },
   "eurjpy|dev+|both": {
@@ -77,7 +77,7 @@
    "pass": false
   },
   "eurjpy|sweep-|short": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "usdchf|fade|long": {
@@ -105,7 +105,7 @@
    "pass": false
   },
   "eurjpy|fade|both": {
-   "more": 24,
+   "more": 25,
    "pass": false
   },
   "usdchf|eg-|both": {
@@ -129,7 +129,7 @@
    "pass": true
   },
   "usdcad|fade|both": {
-   "more": 17,
+   "more": 18,
    "pass": false
   },
   "audusd|dev-|short": {
@@ -169,7 +169,7 @@
    "pass": false
   },
   "eurjpy|brk|long": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|blk-|short": {
@@ -181,7 +181,7 @@
    "pass": true
   },
   "usdjpy|fade|both": {
-   "more": 8,
+   "more": 10,
    "pass": false
   },
   "eurusd|fade|long": {
@@ -189,11 +189,11 @@
    "pass": false
   },
   "eurjpy|dev+|short": {
-   "more": 4,
+   "more": 5,
    "pass": false
   },
   "audusd|fade|both": {
-   "more": 11,
+   "more": 12,
    "pass": false
   },
   "eurjpy|sweep-|both": {
@@ -225,7 +225,7 @@
    "pass": false
   },
   "usdcad|fade|short": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "audusd|blk-|short": {
@@ -249,7 +249,7 @@
    "pass": false
   },
   "eurusd|blk-|both": {
-   "more": 3,
+   "more": 4,
    "pass": false
   },
   "gbpusd|fade|long": {
@@ -313,7 +313,7 @@
    "pass": false
   },
   "eurusd|big-|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|big-|short": {
@@ -405,6 +405,10 @@
    "pass": false
   },
   "eurusd|big-|long": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|sweep-|long": {
    "more": 0,
    "pass": false
   }
@@ -5852,9 +5856,70 @@
     "months": 68
    },
    "p": 0.6591
+  },
+  {
+   "at": "2026-11-25T19:54:30.905Z",
+   "group": "eurusd|sweep-|long",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "sweep",
+      "N": 30,
+      "follow": false
+     }
+    ],
+    "side": "long",
+    "hours": [
+     11,
+     17
+    ],
+    "dows": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "trend": "with",
+    "vol": "high",
+    "volP": 0.3,
+    "stop": 1,
+    "rr": 0,
+    "hold": 12
+   },
+   "A": {
+    "n": 256,
+    "mean": 0.2897,
+    "t": 3.17,
+    "win": 49.6,
+    "months": 93
+   },
+   "B": {
+    "n": 116,
+    "mean": 0.2676,
+    "t": 1.59,
+    "win": 42.2,
+    "months": 48
+   },
+   "placeboA": {
+    "n": 285,
+    "mean": -0.1464,
+    "t": -1.76,
+    "win": 34.4,
+    "months": 93
+   },
+   "C": {
+    "n": 160,
+    "mean": -0.0974,
+    "t": -0.83,
+    "win": 33.1,
+    "months": 67
+   },
+   "p": 0.79673
   }
  ],
- "chunks": 19,
- "updated": "2026-11-25T19:39:53.499Z",
- "chanceCandidates": 288.8
+ "chunks": 20,
+ "updated": "2026-11-25T20:04:57.649Z",
+ "chanceCandidates": 305.6
 }
