@@ -1098,7 +1098,7 @@
     "lots": 0.08,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-25T00:40:00.000Z",
     "councilEntry": 1.31084,
     "stop": 1.310441,
@@ -1111,10 +1111,12 @@
     "slipR": 0.576,
     "lagSec": 600,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-25T00:40:00.000Z",
-    "brokerStop": 1.31047
+    "brokerStop": 1.31047,
+    "closedAt": "2026-11-25T02:47:43.000Z"
    },
    "eqx:fade:fade-m15-b1795566600": {
     "positionId": "51260866",
@@ -1149,15 +1151,13 @@
   "day": {
    "date": "2026-11-25",
    "startBalance": 497.82,
-   "lastBalance": 487.13,
-   "ids": [
-    "51260174"
-   ],
+   "lastBalance": 481.77,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 487.13 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 481.77 · 0 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:fvg-h1-b1795392000-1795545900": {
@@ -1166,19 +1166,19 @@
     "at": "2026-11-24T19:34:19.000Z"
    },
    "eqx:fade:xag:fade-m15-s1795572900": {
-    "why": "daily loss stop (2.1% down today)",
+    "why": "daily loss stop (3.2% down today)",
     "n": 0,
-    "at": "2026-11-25T02:45:02.000Z"
+    "at": "2026-11-25T02:47:43.000Z"
    },
    "eqx:fade:fade-m15-s1795572900": {
-    "why": "daily loss stop (2.1% down today)",
+    "why": "daily loss stop (3.2% down today)",
     "n": 0,
-    "at": "2026-11-25T02:45:02.000Z"
+    "at": "2026-11-25T02:47:43.000Z"
    },
    "eqx:fvg:xag:fvg-h1-s1795539600-1795572900": {
-    "why": "daily loss stop (2.1% down today)",
+    "why": "daily loss stop (3.2% down today)",
     "n": 0,
-    "at": "2026-11-25T02:45:02.000Z"
+    "at": "2026-11-25T02:47:43.000Z"
    }
   },
   "paused": {},
@@ -1186,30 +1186,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 487.13,
-  "lastRun": "2026-11-25T02:45:02.000Z"
+  "balance": 481.77,
+  "lastRun": "2026-11-25T02:47:43.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T14:07:44.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 14:15 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T14:15:32.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T14:18:09.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 14:25 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T14:27:51.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T14:29:59.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 14:37 UTC) (will retry)",
@@ -2678,6 +2658,26 @@
   {
    "at": "2026-11-25T02:26:16.000Z",
    "msg": "not mirrored yet eqx:fvg:xag:fvg-h1-s1795539600-1795572900: daily loss stop (2.1% down today) (will retry)",
+   "trade": "eqx:fvg:xag:fvg-h1-s1795539600-1795572900"
+  },
+  {
+   "at": "2026-11-25T02:47:43.000Z",
+   "msg": "GBPUSD position 51260174 closed at the broker",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795566600"
+  },
+  {
+   "at": "2026-11-25T02:47:43.000Z",
+   "msg": "not mirrored yet eqx:fade:xag:fade-m15-s1795572900: daily loss stop (3.2% down today) (will retry)",
+   "trade": "eqx:fade:xag:fade-m15-s1795572900"
+  },
+  {
+   "at": "2026-11-25T02:47:43.000Z",
+   "msg": "not mirrored yet eqx:fade:fade-m15-s1795572900: daily loss stop (3.2% down today) (will retry)",
+   "trade": "eqx:fade:fade-m15-s1795572900"
+  },
+  {
+   "at": "2026-11-25T02:47:43.000Z",
+   "msg": "not mirrored yet eqx:fvg:xag:fvg-h1-s1795539600-1795572900: daily loss stop (3.2% down today) (will retry)",
    "trade": "eqx:fvg:xag:fvg-h1-s1795539600-1795572900"
   }
  ],
