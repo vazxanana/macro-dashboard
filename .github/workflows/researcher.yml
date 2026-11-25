@@ -14,7 +14,7 @@ on:
         required: false
         default: 'all'
       shard:
-        description: 'Only this shard (0 or 1), or both when empty'
+        description: 'Only this shard (0, 1 or 2), or 0 and 1 when empty. Shard 2 (lanes 8-11) is a one-off third runner for workers 1, 2 and 10: it never chains itself'
         required: false
         default: ''
 
@@ -38,7 +38,7 @@ jobs:
           W: ${{ inputs.worker }}
           SH: ${{ inputs.shard }}
         run: |
-          case "$SH" in 0|1) echo "shards=[$SH]" >> "$GITHUB_OUTPUT" ;; *) echo 'shards=[0,1]' >> "$GITHUB_OUTPUT" ;; esac
+          case "$SH" in 0|1|2) echo "shards=[$SH]" >> "$GITHUB_OUTPUT" ;; *) echo 'shards=[0,1]' >> "$GITHUB_OUTPUT" ;; esac
           case "$W" in
             1|2|3|4|5|6|7|8|9|10) echo "workers=[$W]" >> "$GITHUB_OUTPUT" ;;
             *) echo 'workers=[1,2,3,4,5,6,7,8,9,10]' >> "$GITHUB_OUTPUT" ;;
@@ -59,6 +59,14 @@ jobs:
           - { worker: 7, shard: 1 }
           - { worker: 8, shard: 1 }
           - { worker: 9, shard: 1 }
+          # shard 2 (lanes 8-11) only for workers 1, 2 and 10, started by hand for a few hours (owner, 25 Nov 2026: use the 3 spare slots until 8pm); it does not dispatch a next run
+          - { worker: 3, shard: 2 }
+          - { worker: 4, shard: 2 }
+          - { worker: 5, shard: 2 }
+          - { worker: 6, shard: 2 }
+          - { worker: 7, shard: 2 }
+          - { worker: 8, shard: 2 }
+          - { worker: 9, shard: 2 }
     concurrency:
       group: researcher-${{ matrix.worker }}-${{ matrix.shard }}
       cancel-in-progress: false
@@ -105,7 +113,7 @@ jobs:
           while [ $(( end - $(date +%s) )) -gt 1800 ]; do
             # four processes a runner (a 4-core machine ran one): lane 0 is the worker's own file, lanes 1-3 add worker-<W>-<lane>.json
             for L0 in 0 1 2 3; do
-              L=$(( SHARD * 4 + L0 ))
+              L=$(( SHARD * 4 + L0 ))   # shard 0 lanes 0-3, shard 1 lanes 4-7, shard 2 lanes 8-11
               if [ "$L0" != 0 ]; then
                 # the other lanes start once lane 0 has the candle files (up to 15 minutes), so they never read a half-written file
                 n=0; while [ "$(ls "$RESEARCH_CACHE"/*-1h.json.gz 2>/dev/null | wc -l)" -lt 10 ] && [ $n -lt 90 ]; do sleep 10; n=$((n+1)); done
