@@ -6114,7 +6114,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-25T08:07:10.000Z",
     "councilEntry": 3516.85,
     "stop": 3533,
@@ -6128,26 +6128,27 @@
     "slipR": 0.01,
     "lagSec": 60,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-25T08:07:10.000Z",
-    "brokerStop": 3532.84
+    "brokerStop": 3532.84,
+    "closedAt": "2026-11-25T08:30:22.000Z"
    }
   },
   "day": {
    "date": "2026-11-25",
    "startBalance": 12699.68,
-   "lastBalance": 12639.33,
+   "lastBalance": 12623.07,
    "ids": [
     "51297368",
-    "51345581",
-    "51353883"
+    "51345581"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12639.33 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 12623.07 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6155,15 +6156,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12639.33,
-  "lastRun": "2026-11-25T08:27:56.000Z"
+  "balance": 12623.07,
+  "lastRun": "2026-11-25T08:30:22.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T15:36:33.000Z",
-   "msg": "not mirrored yet gbpusd-replica-1794409826-b: daily loss stop (44.7% down today) (will retry)",
-   "trade": "gbpusd-replica-1794409826-b"
-  },
   {
    "at": "2026-11-11T15:36:33.000Z",
    "msg": "not mirrored yet audusd-replica-1794409826-b: daily loss stop (44.7% down today) (will retry)",
@@ -7651,6 +7647,11 @@
   {
    "at": "2026-11-25T08:07:10.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1795593970-s"
+  },
+  {
+   "at": "2026-11-25T08:30:22.000Z",
+   "msg": "XAUUSD position 51353883 closed at the broker",
    "trade": "xau-replica-1795593970-s"
   }
  ],
