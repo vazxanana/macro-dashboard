@@ -1124,7 +1124,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-25T00:44:28.000Z",
     "councilEntry": 3542.635,
     "stop": 3534.57,
@@ -1138,25 +1138,26 @@
     "slipR": 0.193,
     "lagSec": 868,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-25T00:44:28.000Z",
-    "brokerStop": 3534.36
+    "brokerStop": 3534.36,
+    "closedAt": "2026-11-25T01:18:08.000Z"
    }
   },
   "day": {
    "date": "2026-11-25",
    "startBalance": 497.82,
-   "lastBalance": 497.04,
+   "lastBalance": 487.13,
    "ids": [
-    "51260174",
-    "51260866"
+    "51260174"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 497.04 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 487.13 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:fvg-h1-b1795392000-1795545900": {
@@ -1170,15 +1171,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 497.04,
-  "lastRun": "2026-11-25T01:14:19.000Z"
+  "balance": 487.13,
+  "lastRun": "2026-11-25T01:18:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T13:45:34.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 13:54 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T13:55:17.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2662,6 +2658,11 @@
   {
    "at": "2026-11-25T00:44:28.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council eqx-fade)",
+   "trade": "eqx:fade:fade-m15-b1795566600"
+  },
+  {
+   "at": "2026-11-25T01:18:08.000Z",
+   "msg": "XAUUSD position 51260866 closed at the broker",
    "trade": "eqx:fade:fade-m15-b1795566600"
   }
  ],
