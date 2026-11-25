@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T00:36:22.851Z",
- "tries": 1792000,
- "survivedA": 477,
- "candidates": 40,
- "cLooks": 31,
+ "tries": 2013000,
+ "survivedA": 532,
+ "candidates": 48,
+ "cLooks": 36,
  "cPasses": 0,
  "groups": {
   "usdchf|eg-&dev-|both": {
@@ -41,7 +41,7 @@
    "pass": false
   },
   "xau|dev+&brk|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|big+&brk|both": {
@@ -61,7 +61,7 @@
    "pass": false
   },
   "eurusd|dev+&brk|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "xau|big+&big+|long": {
@@ -117,7 +117,7 @@
    "pass": false
   },
   "eurusd|fade&fade|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|brk&big+|both": {
@@ -129,6 +129,26 @@
    "pass": false
   },
   "xau|fade&big-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "nzdusd|eg-&dev+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "gbpusd|eg-&eg-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "gbpusd|dev-&fade|both": {
+   "more": 0,
+   "pass": false
+  },
+  "nzdusd|dev+&eg-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "audusd|fade&dev-|both": {
    "more": 0,
    "pass": false
   }
@@ -1950,9 +1970,310 @@
     "months": 70
    },
    "p": 0.4721
+  },
+  {
+   "at": "2026-11-25T04:06:48.019Z",
+   "group": "nzdusd|eg-&dev+|both",
+   "g": {
+    "mk": "nzdusd",
+    "trig": [
+     {
+      "kind": "eg",
+      "follow": false
+     },
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 2.5,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "low",
+    "volP": 0.7,
+    "stop": 1.5,
+    "rr": 6,
+    "hold": 8
+   },
+   "A": {
+    "n": 503,
+    "mean": 0.1813,
+    "t": 3.09,
+    "win": 49.1,
+    "months": 117
+   },
+   "B": {
+    "n": 286,
+    "mean": 0.0965,
+    "t": 1.52,
+    "win": 49.3,
+    "months": 57
+   },
+   "placeboA": {
+    "n": 521,
+    "mean": -0.1652,
+    "t": -3.78,
+    "win": 39.9,
+    "months": 117
+   },
+   "C": {
+    "n": 382,
+    "mean": -0.1284,
+    "t": -2.23,
+    "win": 41.1,
+    "months": 82
+   },
+   "p": 0.98713
+  },
+  {
+   "at": "2026-11-25T04:07:53.781Z",
+   "group": "gbpusd|eg-&eg-|both",
+   "g": {
+    "mk": "gbpusd",
+    "trig": [
+     {
+      "kind": "eg",
+      "follow": false
+     },
+     {
+      "kind": "eg",
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     19,
+     21
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 1,
+    "rr": 0.5,
+    "hold": 12
+   },
+   "A": {
+    "n": 799,
+    "mean": 0.073,
+    "t": 3.26,
+    "win": 72.3,
+    "months": 120
+   },
+   "B": {
+    "n": 306,
+    "mean": 0.0627,
+    "t": 1.64,
+    "win": 71.9,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 786,
+    "mean": -0.0641,
+    "t": -2.53,
+    "win": 62.7,
+    "months": 120
+   },
+   "C": {
+    "n": 473,
+    "mean": 0.037,
+    "t": 1.27,
+    "win": 71.7,
+    "months": 83
+   },
+   "p": 0.10204
+  },
+  {
+   "at": "2026-11-25T04:13:56.783Z",
+   "group": "gbpusd|dev-&fade|both",
+   "g": {
+    "mk": "gbpusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 1.5,
+      "follow": false
+     },
+     {
+      "kind": "fade",
+      "N": 15
+     }
+    ],
+    "side": "both",
+    "hours": [
+     20,
+     0
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.7,
+    "stop": 1,
+    "rr": 1,
+    "hold": 8
+   },
+   "A": {
+    "n": 271,
+    "mean": 0.1774,
+    "t": 3.54,
+    "win": 64.2,
+    "months": 99
+   },
+   "B": {
+    "n": 138,
+    "mean": 0.1423,
+    "t": 2.02,
+    "win": 57.2,
+    "months": 53
+   },
+   "placeboA": {
+    "n": 271,
+    "mean": -0.2402,
+    "t": -4.83,
+    "win": 34.3,
+    "months": 99
+   },
+   "C": {
+    "n": 222,
+    "mean": 0.0394,
+    "t": 0.78,
+    "win": 55.9,
+    "months": 75
+   },
+   "p": 0.2177
+  },
+  {
+   "at": "2026-11-25T04:16:26.249Z",
+   "group": "nzdusd|dev+&eg-|both",
+   "g": {
+    "mk": "nzdusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 3,
+      "follow": true
+     },
+     {
+      "kind": "eg",
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     12,
+     0
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 1.5,
+    "rr": 3,
+    "hold": 24
+   },
+   "A": {
+    "n": 256,
+    "mean": 0.3667,
+    "t": 3.91,
+    "win": 48,
+    "months": 105
+   },
+   "B": {
+    "n": 158,
+    "mean": 0.2632,
+    "t": 2.05,
+    "win": 43.7,
+    "months": 57
+   },
+   "placeboA": {
+    "n": 273,
+    "mean": -0.3994,
+    "t": -5.02,
+    "win": 25.3,
+    "months": 105
+   },
+   "C": {
+    "n": 220,
+    "mean": -0.0496,
+    "t": -0.51,
+    "win": 35,
+    "months": 81
+   },
+   "p": 0.69497
+  },
+  {
+   "at": "2026-11-25T04:18:49.879Z",
+   "group": "audusd|fade&dev-|both",
+   "g": {
+    "mk": "audusd",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 30
+     },
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 2,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     18,
+     0
+    ],
+    "dows": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "trend": "against",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 3,
+    "rr": 4,
+    "hold": 4
+   },
+   "A": {
+    "n": 517,
+    "mean": 0.0801,
+    "t": 4.47,
+    "win": 60.9,
+    "months": 120
+   },
+   "B": {
+    "n": 218,
+    "mean": 0.0523,
+    "t": 2.2,
+    "win": 53.7,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 515,
+    "mean": -0.0972,
+    "t": -6.42,
+    "win": 36.9,
+    "months": 120
+   },
+   "C": {
+    "n": 304,
+    "mean": 0.0214,
+    "t": 1.34,
+    "win": 55.3,
+    "months": 82
+   },
+   "p": 0.09012
   }
  ],
- "chunks": 7,
- "updated": "2026-11-25T03:57:08.079Z",
- "chanceCandidates": 163.1
+ "chunks": 8,
+ "updated": "2026-11-25T04:22:10.924Z",
+ "chanceCandidates": 183.2
 }
