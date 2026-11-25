@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agent Farm · Aureum Desk</title>
+<meta name="theme-color" content="#121315">
+<style>
+/* Agent Farm (25 Nov 2026): ten research agents as 3D characters, read live from council-data (the researcher's saved files). Display only. */
+:root{--bg:#121315;--panel:#1a1c20;--line:#2a2d33;--fg:#e8eaee;--dim:#9aa1ae;--cloud:#6f93c9;--laptop:#e8a24a;--ok:#5fcf9a;--bad:#e0675a;--sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:14px/1.45 var(--sans);padding:max(14px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+a{color:var(--fg)}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:10px}
+h1{font-size:1.45rem;margin:0;letter-spacing:-.01em}
+.live{font:600 12px var(--mono);color:var(--dim);display:inline-flex;align-items:center;gap:6px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.live.on i{background:var(--ok)}.live.err i{background:var(--bad)}
+.tot{display:flex;flex-wrap:wrap;gap:12px 26px;margin:6px 0 12px;font-family:var(--mono)}
+.tot b{display:block;font-size:1.2rem;font-weight:600;font-variant-numeric:tabular-nums}
+.tot span{color:var(--dim);font-size:.7rem;text-transform:uppercase;letter-spacing:.08em}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+button{font:600 13px var(--sans);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 13px;min-height:44px;cursor:pointer}
+button:hover,button[aria-pressed=true]{border-color:var(--fg)}
+button:focus-visible{outline:2px solid var(--fg)}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+#stage{position:relative;height:min(62vh,560px);min-height:320px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0e0f11}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.tag{position:absolute;transform:translate(-50%,-100%);font:600 11px var(--mono);padding:2px 6px;border-radius:4px;background:rgba(18,19,21,.88);border:1px solid var(--line);white-space:nowrap;pointer-events:none}
+.tag.lap{border-color:var(--laptop)}
+.say{position:absolute;transform:translate(-50%,-100%);max-width:190px;font:12px/1.3 var(--sans);padding:6px 8px;border-radius:10px;background:#f2f3f5;color:#16181c;pointer-events:none;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.hint{position:absolute;left:10px;bottom:8px;font:11px var(--mono);color:var(--dim)}
+.side{display:flex;flex-direction:column;gap:8px;min-width:0}
+.row{display:grid;grid-template-columns:10px 1fr auto;gap:2px 10px;align-items:center;padding:9px 11px;border-radius:8px;text-align:left;width:100%;min-height:0}
+.dot{width:10px;height:10px;border-radius:50%;grid-row:span 2}
+.nm{font-weight:700}.nm small{font-weight:500;color:var(--dim);margin-left:6px}
+.num{font:600 13px var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.meta{grid-column:2/4;color:var(--dim);font:11px var(--mono);font-weight:400}
+.lap-b{color:var(--laptop)}
+.st{display:flex;gap:3px;margin-top:3px}.st i{width:9px;height:9px;border-radius:2px;background:var(--line)}.st i.on{background:var(--cloud)}.st i.on.l{background:var(--laptop)}
+.recap{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:0 0 12px}
+.recap h2{font-size:.72rem;margin:0 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-family:var(--mono);font-weight:600}
+.recap p{margin:4px 0;max-width:80ch}
+.recap ul{margin:6px 0 0;padding-left:18px;color:var(--dim)}
+html.widget .recap ul{display:none}
+.foot{margin-top:12px;color:var(--dim);font-size:12px;max-width:80ch}
+#gate{padding:40px 0;color:var(--dim)}
+#toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#f2f3f5;color:#16181c;padding:9px 14px;border-radius:10px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
+#toast.on{opacity:1}
+/* widget view: no 3D, big numbers, for a pinned home-screen window */
+html.widget #stage,html.widget .btns,html.widget .foot,html.widget .side .meta,html.widget .st{display:none}
+html.nogl .grid,html.widget .grid{grid-template-columns:minmax(0,1fr)}
+html.widget .row{padding:12px}html.widget .num{font-size:20px}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+<!-- app tags: scripts/pwa.mjs -->
+<link rel="manifest" href="/app.webmanifest">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Aureum Desk">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<script src="/assets/pwa.js?v=9cf723945c" defer></script>
+</head>
+<body>
+<header><h1>Agent Farm</h1><span class="live" id="live"><i></i><span id="livet">connecting…</span></span><a href="/market-structure.html" style="font-size:12px;color:var(--dim)">Desk</a></header>
+<div id="gate" hidden>Sign in on the desk first, then open this page again. <a href="/market-structure.html">Go to the desk</a></div>
+<main id="app" hidden>
+<div class="tot" id="tot"></div>
+<section class="recap" id="recap" aria-live="off"><h2>What they have done so far</h2><p>Reading the research files…</p></section>
+<div class="btns"><button id="b-coffee" type="button">☕ Coffee break</button><button id="b-dance" type="button" aria-pressed="false">🕺 Dance party</button><button id="b-race" type="button" aria-pressed="false">🏁 Race</button><button id="b-shake" type="button">📣 Wake everyone</button><button id="b-widget" type="button" aria-pressed="false">▢ Widget view</button></div>
+<div class="grid">
+ <div id="stage"><canvas id="c" aria-label="3D view of ten research agents at desks"></canvas><div id="tags"></div><div class="hint">drag to orbit · scroll to zoom · tap an agent to poke it</div></div>
+ <div class="side" id="side"></div>
+</div>
+<p class="foot">Live from council-data: each agent's saved research files, re-read every 3 minutes. Speed and distance use a made-up scale: one try is one metre, so one try a second is 3.6 km/h. Squares under a name are its lanes (blue on GitHub's cloud, orange on the laptop) and light up while a lane has saved in the last 40 minutes. Coffee, dancing and the race are for fun only; they change nothing in the research. Nothing here trades.</p>
+</main>
+<div id="toast" role="status"></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+(function () {
+'use strict';
+var NAMES = ['Rex','Pip','Juno','Otto','Mina','Zed','Lux','Bo','Kit','Nova'];
+var FAM = ['break · fade · engulf','pullback · deviation','big candle · block · sweep','all eight kinds','wild combos','wild combos','wild combos','all eight kinds','big candle · block · sweep','Nasdaq only'];
+var LAP = [0,0,1,1,1,1,0,0,0,0];            // workers whose shard 2 (lanes 8-11) runs on the laptop
+var COL = [0xe0675a,0x5fb3d9,0x8bc96a,0xe8c25a,0xb48be0,0xe58fb8,0x5fd1c4,0xe89a5a,0x9aa8e6,0xf2d46b];
+var LANES = [11,11,11,11,11,11,11,11,11,11], FRESH = 40 * 60e3, EVERY = 180e3;
+var D = NAMES.map(function (n, i) { return { id: i + 1, name: n, fam: FAM[i], lap: !!LAP[i], tries: 0, A: 0, cand: 0, looks: 0, chance: 0, since: 0, lanes: {}, rate: 0, prev: null, alive: 0, last: 0 }; });
+var $ = function (id) { return document.getElementById(id); };
+var fmt = function (n) { return n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : String(Math.round(n)); };
+var kmh = function (d) { return Math.round(d.rate * 3.6).toLocaleString(); };
+var etag = {}, cache = {}, missing = {}, miss404 = 0;
+var toastT; function toast(t) { var e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { e.classList.remove('on'); }, 2600); }
+
+/* ── data: every lane file of every worker through /cdata (a signed-in member's session), conditional requests ── */
+function get(file) {
+  var h = { cache: 'no-store', credentials: 'same-origin' }, hd = {}; if (etag[file]) hd['If-None-Match'] = etag[file];
+  return fetch('/cdata/' + file + '?m=1', { cache: 'no-store', credentials: 'same-origin', headers: hd }).then(function (r) {
+    if (r.status === 304) return cache[file];
+    if (r.status === 404) { missing[file] = Date.now(); return null; }
+    if (!r.ok) throw new Error(String(r.status));
+    var t = r.headers.get('ETag'); return r.json().then(function (j) { if (t) etag[file] = t; cache[file] = j; return j; });
+  });
+}
+function files() {
+  var out = [];
+  D.forEach(function (d, i) { out.push([i, 'research/auto/worker-' + d.id + '.json', 0]); for (var l = 1; l <= LANES[i]; l++) out.push([i, 'research/auto/worker-' + d.id + '-' + l + '.json', l]); });
+  return out.filter(function (f) { return !missing[f[1]] || Date.now() - missing[f[1]] > 600e3; });
+}
+function refresh() {
+  var list = files(), now = Date.now(), done = 0, fail = 0;
+  D.forEach(function (d) { d.next = { tries: 0, A: 0, cand: 0, looks: 0, chance: 0, since: 0, lanes: {}, rate: 0, alive: 0, last: 0 }; });
+  function worker() {
+    var f = list.shift(); if (!f) return Promise.resolve();
+    return get(f[1]).then(function (j) {
+      if (!j) return; done++; var n = D[f[0]].next, u = Date.parse(j.updated || j.started), s = Date.parse(j.started);
+      n.chance += j.chanceCandidates || 0; n.since = n.since ? Math.min(n.since, s) : s; n.tries += j.tries || 0; n.A += j.survivedA || 0; n.cand += j.candidates || 0; n.looks += j.cLooks || 0;
+      n.rate += (j.tries || 0) / Math.max(60, (u - s) / 1000); n.last = Math.max(n.last, u);
+      var fresh = now - u < FRESH; n.lanes[f[2]] = fresh; if (fresh) n.alive++;
+    }, function () { fail++; }).then(worker);
+  }
+  return Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]).then(function () {
+    if (!done) { setLive('err', fail ? 'could not read the research files' : 'no research files yet'); return; }
+    D.forEach(function (d) {
+      var n = d.next; if (d.prev && n.tries >= d.prev.tries && now - d.prev.at > 20e3) { var dr = (n.tries - d.prev.tries) / ((now - d.prev.at) / 1000); if (dr > 0) n.rate = dr; else n.rate = d.rate * .6; } else if (d.prev && n.tries === d.prev.tries) n.rate = d.rate * .6;
+      d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.chance = n.chance; d.since = n.since; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.at = now;
+    });
+    recap(); setLive('on', 'live · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); drawRows();
+  });
+}
+function setLive(c, t) { var e = $('live'); e.className = 'live ' + c; $('livet').textContent = t; }
+
+/* ── page ── */
+var sel = -1, mode = { dance: false, race: false, coffee: 0 };
+function drawRows() {
+  D.forEach(function (d, i) {
+    var b = $('r' + i); if (!b) return;
+    var sq = ''; for (var l = 0; l <= LANES[i]; l++) if (d.lanes[l] !== undefined) sq += '<i class="' + (d.lanes[l] ? 'on' : '') + (l > 7 && d.lap ? ' l' : '') + '"></i>';
+    b.querySelector('.meta').innerHTML = d.fam + (d.lap ? ' · <span class="lap-b">also on laptop</span>' : '') + '<br>' + fmt(d.A) + ' passed A · ' + fmt(d.cand) + ' candidates · ' + d.looks + ' looks<div class="st">' + sq + '</div>';
+  });
+}
+function mk() {
+  var side = $('side'), tags = $('tags');
+  D.forEach(function (d, i) {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'row'; b.id = 'r' + i;
+    b.innerHTML = '<span class="dot" style="background:#' + COL[i].toString(16).padStart(6, '0') + '"></span><span class="nm">' + d.name + '<small>worker ' + d.id + ' · <span class="spd" id="s' + i + '"></span></small></span><span class="num" id="t' + i + '">–</span><span class="meta"></span>';
+    b.onclick = function () { poke(i); }; side.appendChild(b);
+    var g = document.createElement('div'); g.className = 'tag' + (d.lap ? ' lap' : ''); g.id = 'g' + i; tags.appendChild(g); d.tag = g;
+  });
+}
+var JOKES = ['Another ten thousand tries. Still nothing. Classic.','I found an edge! …no, that was a typo.','Coffee is a legitimate trading cost.','My Holm correction says: calm down.','Overfitting is just optimism with a spreadsheet.','Is it an edge or is it Tuesday?','I tried everything. Twice.','Lead? No lead. Back to work.','One more lane and I will beat Rex.','If I stare at the chart long enough it will pay me.','Backtest says yes. Forward test says lol.','My code is fast. My ideas are slow.'];
+var SLEEPY = ['zzz… tries… zzz…','Five more minutes…','Is it Friday yet? zzz'];
+var says = [];
+function say(i, text, ms) { var e = document.createElement('div'); e.className = 'say'; e.textContent = text; $('stage').appendChild(e); says.push({ i: i, e: e, until: performance.now() + (ms || 3200) }); }
+
+/* three.js */
+var S, R, cam, pods = [], v, clock, ray, mv, th = .6, ph = .95, dist = 19, auto = true, drag = null, moved = 0, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, gl = true;
+function box(w, h, d, m, x, y, z) { var o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); o.position.set(x || 0, y || 0, z || 0); o.castShadow = true; o.receiveShadow = true; return o; }
+var Mt = function (c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, flatShading: true, roughness: .8 }, o || {})); };
+function build() {
+  var cv = $('c'), st = $('stage');
+  try { R = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); } catch (e) { gl = false; st.hidden = true; return; }
+  R.setPixelRatio(Math.min(devicePixelRatio, 2)); R.shadowMap.enabled = true;
+  S = new THREE.Scene(); S.background = new THREE.Color(0x0e0f11); S.fog = new THREE.Fog(0x0e0f11, 22, 50);
+  cam = new THREE.PerspectiveCamera(42, 1, .1, 100); v = new THREE.Vector3(); clock = new THREE.Clock(); ray = new THREE.Raycaster(); mv = new THREE.Vector2();
+  S.add(new THREE.HemisphereLight(0xbcd0ff, 0x1a1c22, .9));
+  var sun = new THREE.DirectionalLight(0xffffff, .8); sun.position.set(6, 12, 8); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.camera.left = -14; sun.shadow.camera.right = 14; sun.shadow.camera.top = 10; sun.shadow.camera.bottom = -10; S.add(sun);
+  var fl = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({ color: 0x181b21 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; S.add(fl);
+  S.add(new THREE.GridHelper(60, 60, 0x242833, 0x1c2029));
+  var disco = new THREE.PointLight(0xff44cc, 0, 30); disco.position.set(0, 6, 0); S.add(disco); S.userData.disco = disco;
+  D.forEach(function (d, i) {
+    var g = new THREE.Group(), home = new THREE.Vector3((i % 5 - 2) * 4.6, 0, (Math.floor(i / 5) - .5) * 5.4); g.position.copy(home); S.add(g);
+    var plate = box(3.6, .1, 3.4, Mt(d.lap ? 0x5a4020 : 0x26334a)); plate.position.y = .05; g.add(plate);
+    var ring = new THREE.Mesh(new THREE.RingGeometry(1.95, 2.1, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, side: 2 })); ring.rotation.x = -Math.PI / 2; ring.position.y = .12; g.add(ring);
+    g.add(box(2.4, .12, 1.1, Mt(0x3a3f4b), 0, 1.05, .5));
+    [-1, 1].forEach(function (s) { g.add(box(.1, 1, .9, Mt(0x2c3039), s * 1.1, .55, .5)); });
+    var cvs = document.createElement('canvas'); cvs.width = 256; cvs.height = 160; var tex = new THREE.CanvasTexture(cvs);
+    var scr = new THREE.Mesh(new THREE.PlaneGeometry(1.5, .95), new THREE.MeshBasicMaterial({ map: tex })); scr.position.set(0, 1.95, .2);
+    g.add(box(1.65, 1.1, .1, Mt(0x111318), 0, 1.95, .12), scr, box(.12, .4, .12, Mt(0x111318), 0, 1.4, .2));
+    var mat = Mt(COL[i]), ch = new THREE.Group(); ch.position.set(0, 0, -.55); g.add(ch);
+    ch.add(box(.9, .8, .55, mat, 0, .9, 0));
+    var head = box(.7, .62, .62, Mt(COL[i], { roughness: .6 }), 0, 1.55, 0); ch.add(head);
+    var eyes = [-.17, .17].map(function (x) { var e = box(.11, .14, .05, new THREE.MeshBasicMaterial({ color: 0x101216 }), x, 1.58, .33); ch.add(e); return e; });
+    if (d.id === 10) ch.add(box(.18, .5, .06, Mt(0xf2d46b), 0, .95, .3));
+    if (d.id % 3 === 0) { ch.add(box(.04, .35, .04, Mt(0xdddddd), 0, 2.05, 0)); ch.add(box(.12, .12, .12, Mt(0xff6a5a), 0, 2.28, 0)); }
+    if (d.id % 3 === 1) ch.add(box(.8, .14, .7, Mt(0x2a2e38), 0, 1.92, 0));
+    if (d.id % 3 === 2) ch.add(box(.2, .25, .2, Mt(0xffffff), .45, 1.7, 0));
+    var arms = [-1, 1].map(function (s) { var p = new THREE.Group(); p.position.set(s * .55, 1.15, 0); p.add(box(.2, .2, .8, mat, 0, 0, .4)); ch.add(p); return p; });
+    ch.add(box(.35, .5, .35, mat, -.2, .35, .2), box(.35, .5, .35, mat, .2, .35, .2), box(.9, .1, .8, Mt(0x20232a), 0, .62, 0));
+    var hit = new THREE.Mesh(new THREE.BoxGeometry(3.4, 3, 3.2), new THREE.MeshBasicMaterial({ visible: false })); hit.position.y = 1.5; hit.userData.i = i; g.add(hit);
+    pods.push({ g: g, home: home, ch: ch, arms: arms, head: head, eyes: eyes, ring: ring, cvs: cvs, tex: tex, ctx: cvs.getContext('2d'), hit: hit, ph: i * 1.7, lines: [], jump: 0, big: 0 });
+  });
+  cv.addEventListener('pointerdown', function (e) { drag = { x: e.clientX, y: e.clientY }; moved = 0; auto = false; cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing'; });
+  cv.addEventListener('pointermove', function (e) { if (!drag) return; var dx = e.clientX - drag.x, dy = e.clientY - drag.y; moved += Math.abs(dx) + Math.abs(dy); th -= dx * .006; ph = Math.min(1.35, Math.max(.35, ph - dy * .005)); drag = { x: e.clientX, y: e.clientY }; });
+  cv.addEventListener('pointerup', function (e) { cv.style.cursor = 'grab'; if (drag && moved < 6) { var r = cv.getBoundingClientRect(); mv.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(mv, cam); var h = ray.intersectObjects(pods.map(function (p) { return p.hit; }))[0]; if (h) poke(h.object.userData.i); } drag = null; });
+  cv.addEventListener('wheel', function (e) { e.preventDefault(); dist = Math.min(32, Math.max(8, dist + e.deltaY * .01)); }, { passive: false });
+  new ResizeObserver(function () { var w = st.clientWidth, h = st.clientHeight; if (w && h) { R.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); } }).observe(st);
+}
+function poke(i) {
+  sel = sel === i ? -1 : i; var d = D[i], p = pods[i];
+  if (p) { p.jump = 1; p.big = 1; }
+  var sleepy = d.last && Date.now() - d.last > FRESH * 1.5;
+  say(i, sleepy ? SLEEPY[Math.floor(Math.random() * SLEEPY.length)] : JOKES[Math.floor(Math.random() * JOKES.length)]);
+  D.forEach(function (_, k) { $('r' + k).style.borderColor = k === sel ? 'var(--fg)' : ''; });
+}
+var last = 0, lastJoke = 0, disco;
+function frame() {
+  var t = clock.getElapsedTime(), now = performance.now(), maxRate = Math.max.apply(null, D.map(function (d) { return d.rate; })) || 1, coffee = mode.coffee > now ? 2.2 : 1;
+  if (auto && !reduce) th += .0016;
+  var tx = 0, tz = 0; if (sel >= 0 && !mode.race) { tx = pods[sel].home.x; tz = pods[sel].home.z; }
+  var k = sel >= 0 && !mode.race ? .5 : 1;
+  cam.position.set(tx + Math.sin(th) * Math.sin(ph) * dist * k, 1 + Math.cos(ph) * dist * k, tz + Math.cos(th) * Math.sin(ph) * dist * k); cam.lookAt(tx, 1, tz);
+  var maxKm = Math.max.apply(null, D.map(function (d) { return d.tries; })) || 1;
+  pods.forEach(function (p, i) {
+    var d = D[i], sleepy = d.last && Date.now() - d.last > FRESH * 1.5, sp = (3 + 8 * d.rate / maxRate) * coffee * (sleepy ? .15 : 1);
+    var target = mode.race ? new THREE.Vector3(-11 + 22 * (d.tries / maxKm), 0, (i - 4.5) * 1.5) : p.home; p.g.position.lerp(target, .06);
+    if (!reduce) {
+      var dance = mode.dance, a = t * (dance ? 7 : sp) + p.ph;
+      p.arms[0].rotation.x = dance ? -2 + Math.sin(a) * .8 : -.5 + Math.sin(a) * .25; p.arms[1].rotation.x = dance ? -2 + Math.sin(a + 3) * .8 : -.5 + Math.sin(a + 2) * .25;
+      p.head.rotation.y = Math.sin(t * .7 + p.ph) * (dance ? .8 : .25); p.head.rotation.z = sleepy ? .35 : 0; p.head.position.y = 1.55 + Math.abs(Math.sin(a * .5)) * (dance ? .12 : .03);
+      p.ch.rotation.y = dance ? Math.sin(t * 3 + p.ph) * .5 : 0;
+    }
+    p.jump = Math.max(0, p.jump - .03); p.big = Math.max(0, p.big - .02); p.ch.position.y = Math.sin(p.jump * Math.PI) * .8; var sc = 1 + p.big * .25; p.ch.scale.set(sc, sc, sc);
+    p.eyes.forEach(function (e) { e.scale.y = sleepy ? .15 : 1; });
+    p.ring.material.opacity = i === sel ? .9 : 0;
+    v.copy(p.g.position); v.y = 2.9; v.project(cam); var w = $('stage').clientWidth, h = $('stage').clientHeight;
+    d.tag.style.left = (v.x * .5 + .5) * w + 'px'; d.tag.style.top = (-v.y * .5 + .5) * h + 'px'; d.tag.style.display = v.z < 1 ? 'block' : 'none';
+    d.tag.textContent = d.name + ' · ' + kmh(d) + ' km/h' + (sleepy ? ' · zzz' : '');
+  });
+  S.userData.disco.intensity = mode.dance ? 1.4 + Math.sin(t * 8) * .6 : 0; S.userData.disco.color.setHSL((t * .3) % 1, 1, .5);
+  if (now - lastJoke > 5500 && !mode.race) { lastJoke = now; var i = Math.floor(Math.random() * 10); if (D[i].last) say(i, JOKES[Math.floor(Math.random() * JOKES.length)], 3400); }
+  says = says.filter(function (s) { if (now > s.until) { s.e.remove(); return false; } v.copy(pods[s.i].g.position); v.y = 3.5; v.project(cam); s.e.style.left = (v.x * .5 + .5) * $('stage').clientWidth + 'px'; s.e.style.top = (-v.y * .5 + .5) * $('stage').clientHeight - 18 + 'px'; return true; });
+  if (t - last > .3) { last = t; paint(); }
+  R.render(S, cam); requestAnimationFrame(frame);
+}
+function paint() {
+  var sum = 0, rate = 0, km = 0;
+  D.forEach(function (d, i) {
+    var el = d.at ? (Date.now() - d.at) / 1000 : 0, n = d.tries + d.rate * el; sum += n; rate += d.rate;
+    $('t' + i).textContent = d.tries ? Math.round(n / 1000).toLocaleString() + ' km' : '–'; $('s' + i).textContent = d.tries ? kmh(d) + ' km/h' : '';
+    var p = pods[i]; if (!p) return; var c = p.ctx;
+    c.fillStyle = '#0b1a14'; c.fillRect(0, 0, 256, 160); c.fillStyle = '#5fcf9a'; c.font = 'bold 22px monospace'; c.fillText(d.name.toUpperCase(), 10, 28); c.font = 'bold 30px monospace'; c.fillText(kmh(d), 10, 66); c.font = '13px monospace'; c.fillText('km/h', 10, 82);
+    p.lines.unshift(Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0') + ' ' + (Math.random() * 4 - 1).toFixed(2) + 'R'); if (p.lines.length > 5) p.lines.pop();
+    c.fillStyle = '#3f9d78'; p.lines.forEach(function (l, k) { c.fillText(l, 10, 100 + k * 12); }); p.tex.needsUpdate = true;
+  });
+  $('tot').innerHTML = '<div><b>' + Math.round(sum / 1000).toLocaleString() + ' km</b><span>distance, all agents</span></div><div><b>' + Math.round(rate * 3.6).toLocaleString() + ' km/h</b><span>speed together</span></div><div><b>' + fmt(D.reduce(function (a, d) { return a + d.A; }, 0)) + '</b><span>passed stage A</span></div><div><b>' + D.reduce(function (a, d) { return a + d.looks; }, 0).toLocaleString() + '</b><span>holdout looks</span></div><div><b>' + D.reduce(function (a, d) { return a + d.alive; }, 0) + '</b><span>lanes working now</span></div>';
+}
+function recap() {
+  var tr = 0, A = 0, c = 0, ch = 0, lk = 0, since = 0, top = null, busy = null;
+  D.forEach(function (d) { tr += d.tries; A += d.A; c += d.cand; ch += d.chance; lk += d.looks; if (d.since && (!since || d.since < since)) since = d.since; if (d.tries && (!top || d.tries > top.tries)) top = d; if (d.tries && (!busy || d.looks > busy.looks)) busy = d; });
+  if (!tr) return;
+  var days = since ? ((Date.now() - since) / 86400e3) : 0, el = days ? ' in ' + (days < 1 ? Math.round(days * 24) + ' hours' : days.toFixed(1) + ' days') : '';
+  $('recap').innerHTML = '<h2>What they have done so far</h2>' +
+    '<p><b>' + fmt(tr) + ' rules tried' + el + '</b> on ten markets of history: ' + fmt(A) + ' passed the first test (2005–2014), ' + fmt(c) + ' went on to the second (2015–2019), and ' + lk.toLocaleString() + ' were looked at on the untouched years from 2020.</p>' +
+    '<p>Chance alone would let about ' + fmt(ch) + ' of the ' + fmt(c) + ' candidates through, so a candidate is not a find. A <b>lead</b> has to clear a stricter test on 2020 onwards, and a lead is still not an edge: it gets re-priced at real market quotes and then a forward record. The last full report (25 Nov) listed 10 leads, all long positions on the Nasdaq 100, before costs.</p>' +
+    '<ul><li>Furthest: ' + top.name + ' with ' + Math.round(top.tries / 1000).toLocaleString() + ' km (' + fmt(top.tries) + ' tries)</li><li>Most holdout looks: ' + busy.name + ' with ' + busy.looks + '</li><li>' + D.reduce(function (a, d) { return a + d.alive; }, 0) + ' lanes saved in the last 40 minutes</li></ul>';
+}
+function buttons() {
+  $('b-coffee').onclick = function () { mode.coffee = performance.now() + 8000; toast('☕ Everyone drinks coffee. Typing speed ×2.2 for 8 seconds (on screen only).'); };
+  $('b-dance').onclick = function () { mode.dance = !mode.dance; this.setAttribute('aria-pressed', mode.dance); toast(mode.dance ? '🕺 Dance party! The research carries on in the background.' : 'Back to work.'); };
+  $('b-race').onclick = function () { mode.race = !mode.race; this.setAttribute('aria-pressed', mode.race); toast(mode.race ? '🏁 Race: the further right, the more kilometres tried.' : 'Back to the desks.'); };
+  $('b-shake').onclick = function () { pods.forEach(function (p, i) { p.jump = 1; p.big = 1; setTimeout(function () { say(i, ['Awake!','I was reading!','Not sleeping!','Boss?!'][i % 4], 1800); }, i * 90); }); };
+  $('b-widget').onclick = function () { var on = !document.documentElement.classList.contains('widget'); document.documentElement.classList.toggle('widget', on); this.setAttribute('aria-pressed', on); if (location.hash !== '#widget' && on) history.replaceState(null, '', '#widget'); if (!on) history.replaceState(null, '', location.pathname); };
+}
+function start() {
+  $('app').hidden = false; mk(); buttons();
+  if (location.hash === '#widget') { document.documentElement.classList.add('widget'); $('b-widget').setAttribute('aria-pressed', 'true'); }
+  if (typeof THREE !== 'undefined') build(); else gl = false;
+  if (!gl) { $('stage').hidden = true; document.documentElement.classList.add('nogl'); }
+  refresh().then(function () { setInterval(refresh, EVERY); });
+  setInterval(paint, 1000);
+  if (gl) frame();
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) refresh(); });
+}
+fetch('/api/me', { cache: 'no-store', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { return (j && j.account) || null; }, function () { return null; }).then(function (me) {
+  if (!me || me.role === 'public') { $('gate').hidden = false; setLive('', 'signed out'); return; }
+  start();
+});
+window.msFarm = function () { return { agents: D.map(function (d) { return { name: d.name, tries: d.tries, kmh: kmh(d), lanes: d.alive }; }), mode: mode, webgl: gl }; };
+})();
+</script>
+</body>
+</html>

@@ -4746,6 +4746,7 @@ function msInternalLeg(bars, closedN, d, breaks, N = 6) {
   let ti = -1; for (let j = e.breakIdx - 1; j >= start && ti < 0; j--) if (piv(j)) ti = j;
   if (ti < 0) { ti = start; for (let j = start; j <= e.breakIdx; j++) if (hiOf(bars[j]) > hiOf(bars[ti])) ti = j; }
   let bi = e.breakIdx; for (let j = e.breakIdx; j < n; j++) if (loOf(bars[j]) < loOf(bars[bi])) bi = j;
+  if (!bars[ti] || !bars[bi]) return null;   // 25 Nov 2026: a break whose origin lies past the loaded candles gave bars[ti] undefined and threw 'reading low' in P.draw on live candles
   const top = hiOf(bars[ti]), bot = loOf(bars[bi]), mid = bot + 0.5 * (top - bot);
   let reached = false; for (let j = bi + 1; j < n; j++) if (hiOf(bars[j]) >= mid) { reached = true; break; }
   const s = d < 0 ? 1 : -1, from = s * top, to = s * bot;

@@ -345,3 +345,8 @@ test('M1 reads both sides inside the H1 candle: the side with a VR and a CF is t
   assert.equal(msSides(B.slice(0, 10), 10, 1000 * 3600, 1).pick, 0, 'before the drop no side has a CF');
   assert.match(html, /tf\.id === '1m' && G\.show\.vr !== false/); assert.match(html, /: VR \+ CF` : `\$\{nm\}: VR only`/); assert.match(html, /X\.pick > 0 \? \[w\(X\.buy, 'Buy'\)/);
 });
+
+test('internal leg: a break whose origin lies past the loaded candles gives no leg instead of throwing', () => {
+  const bars = Array.from({ length: 6 }, (_, i) => ({ time: i, open: 10 - i, close: 9.5 - i, high: 10.2 - i, low: 9.2 - i }));
+  assert.equal(msInternalLeg(bars, 6, -1, [{ dir: -1, fromIdx: 9, breakIdx: 4 }]), null);
+});
