@@ -6208,7 +6208,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-25T17:07:20.000Z",
     "councilEntry": 3479.63,
     "stop": 3424.78,
@@ -6222,10 +6222,15 @@
     "slipR": 0.073,
     "lagSec": 54,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-25T17:07:20.000Z",
-    "brokerStop": 3428.77
+    "brokerStop": 3428.77,
+    "closedAt": "2026-11-25T21:30:12.000Z",
+    "exitPrice": 3578.97,
+    "councilExit": null,
+    "councilR": 2
    }
   },
   "day": {
@@ -6239,7 +6244,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12664.42 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12664.42 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6248,14 +6253,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12664.42,
-  "lastRun": "2026-11-25T21:28:00.000Z"
+  "lastRun": "2026-11-25T21:30:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T16:46:06.000Z",
-   "msg": "not mirrored yet audusd-replica-1794415489-s: daily loss stop (44.7% down today) (will retry)",
-   "trade": "audusd-replica-1794415489-s"
-  },
   {
    "at": "2026-11-11T16:46:06.000Z",
    "msg": "not mirrored yet usdcad-replica-1794415489-b: daily loss stop (44.7% down today) (will retry)",
@@ -7743,6 +7743,11 @@
   {
    "at": "2026-11-25T17:07:20.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
+   "trade": "xau-replica-1795626386-b"
+  },
+  {
+   "at": "2026-11-25T21:30:12.000Z",
+   "msg": "closed XAUUSD position 51519998 (council: win)",
    "trade": "xau-replica-1795626386-b"
   }
  ],
