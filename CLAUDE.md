@@ -7138,3 +7138,16 @@ is −0.05R (n 74), the rule came out of 118 million tries, and the cost is assu
 +0.46R forward. Proposed next (owner): a forward record from 26 Nov 2026, then a measured broker cost. Nothing live changed.
 Local reruns of research fetches need `node --use-env-proxy`; the engine's `loadMarket` prefers a local 5-minute cache, so the
 study reads its own fetched H1 file.
+
+**The NAS100 breakout as an Equinox desk** (25 Nov 2026, owner: "make it an edge for equinox and fill the months from January").
+`council/edge-desks-2.mjs` `nasbrkTrades` (`DESKS2.nasbrk`, kind `nasbrk-h1`, market nas100, `extra: { '5m': 60 }` days of warm-up for the 200-bar
+average and the ATR; the loop line is `--only fade,…,jpyvb,nasbrk,lyriac,dom`): the study's rule read on H1 candles built from the 5-minute ones
+(closed bars only, thin bars dropped as the engine does), the engine's own `atr` and `sma`; a long at the next open when that hour is 14-21 UTC,
+stop 1 ATR(14) below, 4R, out after 96 hours, ONE position at a time (a signal waits until the hour after the last trade's exit; an open trade
+blocks later ones). It is managed on 5-minute candles like every desk, so the order of stop and target inside an hour is read exactly (the study
+read hourly candles, stop first). Before costs. Page: Equinox tab "NAS100 breakout" (`#v-nasbrk`), `desk-trades.js` `DESKS.nasbrk`,
+`desk-live.js`; `datahealth.mjs` lists `nasbrk/desk.json`; `mosha-desk.mjs` `clean` takes the kind. History filled from 1 Jan 2026 with
+`node council/edge-desks.mjs <dir> --days 330 --from 2026-01-01 --only nasbrk` (74 closed trades, 16 won, −2.4R before costs, −0.032R a trade:
+the study's own 2026, n 74, was −0.05R after its assumed cost). A paper record of a candidate that passed its follow-up but is not an edge;
+2026 so far is flat to slightly negative. Tests: `tests/nasbrk-desk.test.mjs` (signal bars checked one by one, one position at a time, the
+engine's first trade, no look-ahead, wiring).
