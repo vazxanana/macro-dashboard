@@ -7142,9 +7142,10 @@ study reads its own fetched H1 file.
 **NQ1: the auto-researcher's Nasdaq leads, one Equinox desk** (25 Nov 2026, owner: "all nasdaq studies put it altogether and call it NQ1 in
 equinox, and fill from january till now", then "NQ1 should be the nasdaq leads"; it replaces the same-day NAS100 breakout desk, and turnaround
 Tuesday and the breakout of the day were on it for a few hours and taken off). `council/edge-desks-2.mjs` `nq1Trades` (`DESKS2.nq1`, market nas100,
-`extra: { '5m': 60 }` days; loop line `--only fade,…,jpyvb,nq1,lyriac,dom`; `nq1/desk.json` + `detail/`; kinds `nq1-l1`…`nq1-l7`; `datahealth.mjs`,
-`mosha-desk.mjs` `clean` know them). The seven NAS100 leads the auto-researcher had on 25 Nov 2026 (Holm below 0.05 over every holdout look;
-`NQ1_LEADS`, genomes FROZEN, a lead found later joins only by a deliberate change; l3 is the rule of `research/edge/nas100-brk-long-focus`) read
+`extra: { '5m': 60 }` days; loop line `--only fade,…,jpyvb,nq1,lyriac,dom`; `nq1/desk.json` + `detail/`; kinds `nq1-l1`, `l2`, `l4`, `l5`, `l6`; `datahealth.mjs`,
+`mosha-desk.mjs` `clean` know them). Five of the seven NAS100 leads the auto-researcher had on 25 Nov 2026 (Holm below 0.05 over every holdout look;
+`NQ1_LEADS`, genomes FROZEN, a lead found later joins only by a deliberate change; `l3`, the rule of `research/edge/nas100-brk-long-focus`, and `l7` were
+taken off at the owner's word: "remove 3 and 7", both slightly negative in 2026) read
 on H1 candles built from the 5-minute ones (closed bars only, thin bars dropped) with the engine's own `sig`, `atr`, `sma`, `atrPct` (the engine
 now exports `sig` and `atrPct`; behaviour unchanged), the entry the next hour's open, managed on 5-minute candles like every desk, ONE position at a
 time PER READING. Not in it: the NQ open run (a council system) and anything of the ICT desk (a separate edge). **Readings overlap (several are long

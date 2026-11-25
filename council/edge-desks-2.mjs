@@ -15,7 +15,7 @@
 //   goldvb     gold-vol-breakout T1 (as gold-vol-breakout-forward reads it): gold, UTC open +/- 0.5 x the previous folded day's range,
 //              stop back at the open, out at 21:00 UTC
 //   jpyvb      the same rule on USD/JPY (usdjpy-vol-breakout-forward)
-//   nq1        the auto-researcher's seven NAS100 leads as one desk (below)
+//   nq1        the auto-researcher's NAS100 leads as one desk (below)
 //   zero       the other Nasdaq studies: turnaround Tuesday and the breakout of the day (below)
 // Every signal, stop and exit comes from the study's own exported code (imported, never edited); only the record (id, log, marks,
 // an open trade's reading) is written here. The studies judged trades before costs and so does each desk; the five fade / gap
@@ -213,9 +213,9 @@ export const goldTrades = (B, { from, market = 'xau' } = {}) => (market === 'xau
 export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'usdjpy' ? vbDays(toK(B['5m']), JO, 'jpyvb', 'usdjpy', JPY_K, from) : []);
 
 // ─── nq1: the auto-researcher's NAS100 leads as one desk (owner, 25 Nov 2026: "all nasdaq studies put it altogether and call it NQ1", then "NQ1 should be the nasdaq leads") ───
-// Seven readings (each its own kind `nq1-l1`…`nq1-l7`, ids `nas100:nq1-<reading>-…`): the seven NAS100 leads the auto-researcher had (Holm over
-// every holdout look below 0.05) on 25 Nov 2026, genomes FROZEN here (a lead found later joins only by a deliberate change); l3 is the rule of
-// research/edge/nas100-brk-long-focus. Turnaround Tuesday and the breakout of the day were on the desk for a few hours and taken off at the
+// Five readings (each its own kind `nq1-l1`, `l2`, `l4`, `l5`, `l6`; the numbers are the leads' numbers on 25 Nov, `l3` and `l7` taken off at the owner's word), ids `nas100:nq1-<reading>-…`): the NAS100 leads the auto-researcher had (Holm over
+// every holdout look below 0.05) on 25 Nov 2026, genomes FROZEN here (a lead found later joins only by a deliberate change). The 20-hour breakout with the trend (the rule of
+// research/edge/nas100-brk-long-focus, `l3`) and the Wed-Fri stretch + big candle (`l7`) were on it and taken off. Turnaround Tuesday and the breakout of the day were on the desk for a few hours and taken off at the
 // owner's word. Left out: the NQ open run (a council system, kept apart) and anything of the ICT desk (a separate edge).
 // A lead reading is read on H1 candles built from the 5-minute ones (closed bars only, thin bars dropped as the engine does) with the
 // engine's own `sig`, `atr`, `sma`, `atrPct`; the entry is the open of the next hour; managed on 5-minute candles like every desk, one
@@ -224,11 +224,9 @@ export const jpyTrades = (B, { from, market = 'usdjpy' } = {}) => (market === 'u
 export const NQ1_LEADS = [
   { id: 'l1', name: 'Stretch + 10-hour breakout, long', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'brk', N: 10 }], side: 'long', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.7, stop: 1, rr: 4, hold: 48 } },
   { id: 'l2', name: 'Stretch + 20-hour breakout, long', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'brk', N: 20 }], side: 'long', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.3, stop: 1, rr: 4, hold: 240 } },
-  { id: 'l3', name: '20-hour breakout with the trend, long', g: { trig: [{ kind: 'brk', N: 20 }], side: 'long', hours: [14, 22], dows: null, trend: 'with', vol: 'none', volP: 0.3, stop: 1, rr: 4, hold: 96 } },
   { id: 'l4', name: 'Double stretch with the trend, 4-hour hold', g: { trig: [{ kind: 'dev', n: 20, z: 1.5, follow: true }, { kind: 'dev', n: 10, z: 2, follow: true }], side: 'both', hours: [15, 21], dows: [1, 2, 3, 4, 5], trend: 'with', vol: 'none', volP: 0.5, stop: 1, rr: 4, hold: 4 } },
   { id: 'l5', name: 'Double stretch, high volatility, long', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'dev', n: 50, z: 1, follow: true }], side: 'long', hours: null, dows: null, trend: 'with', vol: 'high', volP: 0.7, stop: 0.75, rr: 3, hold: 240 } },
   { id: 'l6', name: 'Big candle + stretch', g: { trig: [{ kind: 'big', k: 1, follow: true }, { kind: 'dev', n: 20, z: 2.5, follow: true }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 0.75, rr: 3, hold: 240 } },
-  { id: 'l7', name: 'Stretch + big candle, Wed-Fri 14-22 UTC', g: { trig: [{ kind: 'dev', n: 20, z: 2, follow: true }, { kind: 'big', k: 1.25, follow: true }], side: 'both', hours: [14, 22], dows: [3, 4, 5], trend: 'none', vol: 'none', volP: 0.7, stop: 0.75, rr: 6, hold: 240 } },
 ];
 const trigText = (tr, D, i, s, f, cache) => {
   if (tr.kind === 'brk') { let v = s > 0 ? -Infinity : Infinity; for (let k = i - tr.N; k < i; k++) v = s > 0 ? Math.max(v, D.h[k]) : Math.min(v, D.l[k]); return { text: `closed ${s > 0 ? 'above the highest high' : 'below the lowest low'} of the ${tr.N} hours before it (${f(v)})`, mark: { kind: 'level', p: v, a: D.t[Math.max(0, i - tr.N)], at: D.t[i] + 3600, label: `${tr.N}-hour ${s > 0 ? 'high' : 'low'}`, under: s < 0 } }; }
@@ -399,7 +397,7 @@ export const DESKS2 = {
   fvg: { tfs: ['5m'], markets: STUDY_MARKETS, read: fvgTrades, note: 'FVG return: a large H1 fair-value gap entered with it after the first M15 close inside it, 1R (grid7-fvg-wide, cell 1h mkt large 1R), on ten markets.' + PAPER },
   goldvb: { tfs: ['5m'], markets: ['xau'], read: goldTrades, note: 'Gold breakout: gold\'s UTC open +/- 0.5 x the previous day\'s range, stop back at the open, out at 21:00 UTC (gold-vol-breakout T1).' + PAPER },
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
-  nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s seven Nasdaq 100 leads (stretch, breakout and big-candle combinations), each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
+  nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s Nasdaq 100 leads (stretch, breakout and big-candle combinations), each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
   zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: the Nasdaq 100 studies that are not the auto-researcher\'s leads: turnaround Tuesday (buy a first trading day of the week that fell over 1 %, out at the next day\'s close) and the breakout of the day (the gold rule on NAS100, which lost its placebo test). Before costs.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on its eighteen markets. It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },

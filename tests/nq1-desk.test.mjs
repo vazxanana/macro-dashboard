@@ -7,7 +7,6 @@ import * as D2 from '../council/edge-desks-2.mjs';
 import { clean } from '../council/mosha-desk.mjs';
 import * as K from '../research/edge/_lib/edgekit.mjs';
 import { toArrays, prep, atr, sma } from '../research/edge/auto-researcher/engine.mjs';
-import { RULE, trades } from '../research/edge/nas100-brk-long-focus/run.mjs';
 
 const T0 = Date.UTC(2025, 2, 3) / 1000;
 function market(seed = 11, days = 150, p0 = 15000) {
@@ -25,14 +24,13 @@ const H = K.resample(D2.toK(M), 3600).filter((b) => b.n >= 10), D = prep(toArray
 
 test('the desk is registered and holds the frozen leads of the research', () => {
   assert.deepEqual(D2.DESKS2.nq1.markets, ['nas100']); assert.equal(D2.nq1Trades(B, { from: FROM, market: 'xau' }).length, 0);
-  assert.deepEqual(D2.NQ1_LEADS.map((l) => l.id), ['l1', 'l2', 'l3', 'l4', 'l5', 'l6', 'l7']);
-  const l3 = D2.NQ1_LEADS.find((l) => l.id === 'l3').g; assert.deepEqual(l3.trig, RULE.trig); assert.deepEqual(l3.hours, RULE.hours); assert.equal(l3.stop, RULE.stop); assert.equal(l3.rr, RULE.rr); assert.equal(l3.hold, RULE.hold); assert.equal(l3.trend, RULE.trend);
+  assert.deepEqual(D2.NQ1_LEADS.map((l) => l.id), ['l1', 'l2', 'l4', 'l5', 'l6']);   // l3 and l7 taken off (owner, 25 Nov 2026)
   for (const l of D2.NQ1_LEADS) { assert.ok(l.g.stop > 0 && l.g.hold > 0 && l.g.trig.length >= 1); assert.ok(['long', 'both'].includes(l.g.side)); }
 });
 
 test('every record: a stop on the losing side, an id once, stored by clean(), kinds of this desk only', () => {
   assert.ok(ALL.length > 10, 'the seeded market must give trades: ' + ALL.length); const ids = new Set();
-  for (const r of ALL) { assert.match(r.kind, /^nq1-l[1-7]$/); assert.equal(r.market, 'nas100'); assert.ok(!ids.has(r.id), 'id twice ' + r.id); ids.add(r.id);
+  for (const r of ALL) { assert.match(r.kind, /^nq1-l[12456]$/); assert.equal(r.market, 'nas100'); assert.ok(!ids.has(r.id), 'id twice ' + r.id); ids.add(r.id);
     assert.ok(r.side > 0 ? r.stop < r.entry : r.stop > r.entry, r.id + ': stop on the wrong side'); assert.ok(r.t >= FROM);
     if (r.R != null) assert.ok(Number.isFinite(r.R) && r.endT >= r.t, r.id); const c = clean(r); assert.ok(c, 'clean() refused ' + r.id); assert.equal(c.kind, r.kind); }
 });
@@ -47,11 +45,6 @@ test('a lead reading is the engine\'s signals: filters, entry hour, stop in ATR,
       assert.ok(Math.abs(r.entry - D.o[j]) < 1e-9, L.id + ' entry is the next open'); }
     for (let k = 1; k < rows.length; k++) assert.ok(rows[k - 1].status === 'open' ? false : rows[k].t >= Math.floor(rows[k - 1].endT / 3600) * 3600 + 3600, L.id + ' overlap'); }
   assert.ok(seen > 5, 'leads gave ' + seen);
-});
-
-test('the focused-study rule (l3) gives the study\'s own first trade; counts stay near the engine\'s', () => {
-  const g = D2.NQ1_LEADS.find((l) => l.id === 'l3').g; D.costRel = 0; D.cost = 0;
-  const E = trades(D, RULE, 211, D.n, 0), first = E.find((x) => D.t[x.i + 1] >= FROM); assert.ok(first); assert.ok(of('l3').some((r) => r.t === D.t[first.i + 1]), 'the first engine trade is on the desk');
 });
 
 test('no look-ahead: candles cut at a date give the same trades up to two days before it', () => {
