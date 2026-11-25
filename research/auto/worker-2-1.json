@@ -2,18 +2,18 @@
  "version": "auto-1",
  "worker": 2,
  "started": "2026-11-25T11:14:32.769Z",
- "tries": 1288600,
- "survivedA": 1207,
- "candidates": 128,
- "cLooks": 19,
+ "tries": 1428800,
+ "survivedA": 1323,
+ "candidates": 148,
+ "cLooks": 20,
  "cPasses": 0,
  "groups": {
   "eurusd|dev+|both": {
-   "more": 84,
+   "more": 96,
    "pass": false
   },
   "eurjpy|dev+|long": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "nzdusd|dev+|both": {
@@ -29,7 +29,7 @@
    "pass": false
   },
   "eurjpy|dev+|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurjpy|dev-|short": {
@@ -37,7 +37,7 @@
    "pass": false
   },
   "xau|dev+|both": {
-   "more": 5,
+   "more": 6,
    "pass": false
   },
   "usdcad|dev-|both": {
@@ -45,11 +45,11 @@
    "pass": false
   },
   "eurjpy|dev+|short": {
-   "more": 2,
+   "more": 5,
    "pass": false
   },
   "audusd|dev-|short": {
-   "more": 5,
+   "more": 6,
    "pass": false
   },
   "usdchf|pull|both": {
@@ -83,6 +83,10 @@
   "usdchf|dev+|short": {
    "more": 0,
    "pass": true
+  },
+  "usdjpy|dev+|long": {
+   "more": 0,
+   "pass": false
   }
  },
  "leads": [],
@@ -1151,9 +1155,65 @@
     "months": 65
    },
    "p": 0.00023
+  },
+  {
+   "at": "2026-11-25T18:10:27.121Z",
+   "group": "usdjpy|dev+|long",
+   "g": {
+    "mk": "usdjpy",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 20,
+      "z": 1,
+      "follow": true
+     }
+    ],
+    "side": "long",
+    "hours": [
+     5,
+     17
+    ],
+    "dows": null,
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 1.5,
+    "rr": 4,
+    "hold": 8
+   },
+   "A": {
+    "n": 1602,
+    "mean": 0.0904,
+    "t": 3.04,
+    "win": 45.8,
+    "months": 120
+   },
+   "B": {
+    "n": 771,
+    "mean": 0.0726,
+    "t": 1.66,
+    "win": 46.6,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 1993,
+    "mean": -0.1245,
+    "t": -4.45,
+    "win": 38.7,
+    "months": 120
+   },
+   "C": {
+    "n": 1327,
+    "mean": 0.0677,
+    "t": 1.86,
+    "win": 44.5,
+    "months": 83
+   },
+   "p": 0.03144
   }
  ],
- "chunks": 15,
- "updated": "2026-11-25T17:59:35.391Z",
- "chanceCandidates": 117.3
+ "chunks": 16,
+ "updated": "2026-11-25T18:24:39.040Z",
+ "chanceCandidates": 130
 }
