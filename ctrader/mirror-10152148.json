@@ -6719,6 +6719,30 @@
     ],
     "stopCheckedAt": "2026-11-26T20:40:50.000Z",
     "brokerStop": 0.83457
+   },
+   "boxfade:usdjpy:boxfade-m5-s1795726800": {
+    "positionId": "51647446",
+    "symbol": "USDJPY",
+    "side": "sell",
+    "volume": 114700000,
+    "lots": 11.47,
+    "digits": 3,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T21:01:44.000Z",
+    "councilEntry": 159.285,
+    "stop": 159.319,
+    "t1": 159.251,
+    "riskCash": 244.9,
+    "margin": 2294,
+    "fillPrice": 159.278,
+    "slipR": 0.206,
+    "lagSec": 104,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T21:01:44.000Z",
+    "brokerStop": 159.312
    }
   },
   "day": {
@@ -6733,10 +6757,10 @@
     "51647375"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12244.8 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 12244.8 · 6 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6745,14 +6769,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12244.8,
-  "lastRun": "2026-11-26T20:57:24.000Z"
+  "lastRun": "2026-11-26T21:01:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T21:37:32.000Z",
-   "msg": "not mirrored yet sol-replica-1794432990-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "sol-replica-1794432990-s"
-  },
   {
    "at": "2026-11-11T21:41:48.000Z",
    "msg": "not mirrored yet btc-replica-1794433267-s: daily loss stop (44.6% down today) (will retry)",
@@ -8241,6 +8260,11 @@
    "at": "2026-11-26T20:40:50.000Z",
    "msg": "opened sell USDCHF 6.28 lot (council boxfade)",
    "trade": "boxfade:usdchf:boxfade-m5-s1795725600"
+  },
+  {
+   "at": "2026-11-26T21:01:44.000Z",
+   "msg": "opened sell USDJPY 11.47 lot (council boxfade)",
+   "trade": "boxfade:usdjpy:boxfade-m5-s1795726800"
   }
  ],
  "limits": {
@@ -8345,9 +8369,9 @@
   ]
  },
  "execution": {
-  "n": 229,
-  "meanSlipR": 0.062,
-  "medianSlipR": 0.028,
+  "n": 230,
+  "meanSlipR": 0.063,
+  "medianSlipR": 0.029,
   "worstSlipR": 1.236,
   "medianLagSec": 70,
   "bySymbol": {
@@ -8392,8 +8416,8 @@
     "meanSlipR": 0.257
    },
    "USDJPY": {
-    "n": 2,
-    "meanSlipR": 0.067
+    "n": 3,
+    "meanSlipR": 0.113
    }
   }
  }
