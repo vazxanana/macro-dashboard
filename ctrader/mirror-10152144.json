@@ -1670,7 +1670,7 @@
     "lots": 0.11,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T14:15:23.000Z",
     "councilEntry": 1.4224,
     "stop": 1.42188,
@@ -1683,10 +1683,12 @@
     "slipR": -0.038,
     "lagSec": 23,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T14:15:23.000Z",
-    "brokerStop": 1.4218
+    "brokerStop": 1.4218,
+    "closedAt": "2026-11-26T14:47:50.000Z"
    },
    "eqx:fade:usdchf:fade-m15-b1795703400": {
     "positionId": "51600789",
@@ -1718,17 +1720,16 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 454.47,
+   "lastBalance": 461.54,
    "ids": [
     "51599860",
-    "51600309",
     "51600789"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 454.47 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 461.54 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:nzdusd:fvg-h1-b1795633200-1795641300": {
@@ -1757,15 +1758,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 454.47,
-  "lastRun": "2026-11-26T14:44:37.000Z"
+  "balance": 461.54,
+  "lastRun": "2026-11-26T14:47:50.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T20:29:10.000Z",
-   "msg": "moved US500 47417910 protection: stop 7507.85 -> 7510.25 (council ict-A+)",
-   "trade": "ict:es-b-1794182400"
-  },
   {
    "at": "2026-11-10T13:56:42.000Z",
    "msg": "closed US500 position 47417910 (council: win)",
@@ -3250,6 +3246,11 @@
    "at": "2026-11-26T14:31:03.000Z",
    "msg": "opened buy USDCHF 0.07 lot (council eqx-fade)",
    "trade": "eqx:fade:usdchf:fade-m15-b1795703400"
+  },
+  {
+   "at": "2026-11-26T14:47:50.000Z",
+   "msg": "USDCAD position 51600309 closed at the broker",
+   "trade": "eqx:fade:usdcad:fade-m15-b1795702500"
   }
  ],
  "limits": {
