@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T12:48:47.507Z",
- "tries": 6502600,
- "survivedA": 1788,
- "candidates": 197,
- "cLooks": 88,
+ "tries": 6624400,
+ "survivedA": 1810,
+ "candidates": 201,
+ "cLooks": 89,
  "cPasses": 0,
  "groups": {
   "eurusd|big+&big+|both": {
@@ -25,7 +25,7 @@
    "pass": false
   },
   "eurusd|brk&big+|both": {
-   "more": 11,
+   "more": 12,
    "pass": false
   },
   "eurusd|dev+&big+|both": {
@@ -65,7 +65,7 @@
    "pass": false
   },
   "usdchf|big+&big+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurusd|fade&fade|both": {
@@ -345,7 +345,7 @@
    "pass": false
   },
   "audusd|fade&dev-|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|fade&fade|long": {
@@ -357,6 +357,10 @@
    "pass": false
   },
   "eurusd|big+&brk|long": {
+   "more": 0,
+   "pass": false
+  },
+  "xau|big+&brk|both": {
    "more": 0,
    "pass": false
   }
@@ -5570,9 +5574,65 @@
     "months": 80
    },
    "p": 0.75804
+  },
+  {
+   "at": "2026-11-26T12:46:29.668Z",
+   "group": "xau|big+&brk|both",
+   "g": {
+    "mk": "xau",
+    "trig": [
+     {
+      "kind": "big",
+      "k": 2.5,
+      "follow": true
+     },
+     {
+      "kind": "brk",
+      "N": 120
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 2,
+    "rr": 1,
+    "hold": 48
+   },
+   "A": {
+    "n": 657,
+    "mean": 0.1159,
+    "t": 3.02,
+    "win": 58.1,
+    "months": 105
+   },
+   "B": {
+    "n": 262,
+    "mean": 0.1256,
+    "t": 2.27,
+    "win": 58.8,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 657,
+    "mean": -0.2181,
+    "t": -5.62,
+    "win": 41.6,
+    "months": 105
+   },
+   "C": {
+    "n": 329,
+    "mean": -0.0176,
+    "t": -0.37,
+    "win": 50.8,
+    "months": 83
+   },
+   "p": 0.64431
   }
  ],
- "chunks": 45,
- "updated": "2026-11-26T12:42:33.612Z",
- "chanceCandidates": 591.7
+ "chunks": 46,
+ "updated": "2026-11-26T13:07:37.000Z",
+ "chanceCandidates": 602.8
 }
