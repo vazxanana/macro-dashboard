@@ -6643,6 +6643,32 @@
     ],
     "stopCheckedAt": "2026-11-26T17:26:13.000Z",
     "brokerStop": 0.83504
+   },
+   "boxfade:gbpusd:boxfade-m5-s1795716000": {
+    "positionId": "51639443",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 58300000,
+    "lots": 5.83,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T18:01:57.000Z",
+    "councilEntry": 1.3108,
+    "stop": 1.31124,
+    "t1": 1.31036,
+    "riskCash": 244.9,
+    "margin": 1528.16,
+    "mark": 1.31082,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31066,
+    "slipR": 0.318,
+    "lagSec": 117,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T18:01:57.000Z",
+    "brokerStop": 1.31108
    }
   },
   "day": {
@@ -6651,13 +6677,14 @@
    "lastBalance": 12244.8,
    "ids": [
     "51571061",
-    "51631994"
+    "51631994",
+    "51639443"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12244.8 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12244.8 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6666,14 +6693,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12244.8,
-  "lastRun": "2026-11-26T18:00:49.000Z"
+  "lastRun": "2026-11-26T18:04:26.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T20:51:42.000Z",
-   "msg": "not mirrored yet xau-replica-1794430232-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "xau-replica-1794430232-b"
-  },
   {
    "at": "2026-11-11T21:01:58.000Z",
    "msg": "not mirrored yet gbpusd-replica-1794430843-s: daily loss stop (44.6% down today) (will retry)",
@@ -8162,6 +8184,11 @@
    "at": "2026-11-26T17:26:13.000Z",
    "msg": "opened sell USDCHF 2.98 lot (council boxfade)",
    "trade": "boxfade:usdchf:boxfade-m5-s1795713900"
+  },
+  {
+   "at": "2026-11-26T18:01:57.000Z",
+   "msg": "opened sell GBPUSD 5.83 lot (council boxfade)",
+   "trade": "boxfade:gbpusd:boxfade-m5-s1795716000"
   }
  ],
  "limits": {
@@ -8257,8 +8284,8 @@
   ]
  },
  "execution": {
-  "n": 226,
-  "meanSlipR": 0.061,
+  "n": 227,
+  "meanSlipR": 0.062,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
   "medianLagSec": 70,
@@ -8288,8 +8315,8 @@
     "meanSlipR": 0.049
    },
    "GBPUSD": {
-    "n": 14,
-    "meanSlipR": 0.119
+    "n": 15,
+    "meanSlipR": 0.133
    },
    "USDCHF": {
     "n": 14,
