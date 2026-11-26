@@ -1421,7 +1421,7 @@
     "lots": 0.08,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T03:59:29.000Z",
     "councilEntry": 0.83192,
     "stop": 0.832326,
@@ -1434,10 +1434,12 @@
     "slipR": 0.197,
     "lagSec": 2669,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T03:59:29.000Z",
-    "brokerStop": 0.83231
+    "brokerStop": 0.83231,
+    "closedAt": "2026-11-26T05:42:53.000Z"
    },
    "eqx:fade:nzdusd:fade-m15-b1795665600": {
     "positionId": "51573220",
@@ -1469,17 +1471,16 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 473.59,
+   "lastBalance": 468.71,
    "ids": [
     "51567422",
-    "51571436",
-    "51571438"
+    "51571436"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 473.59 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 468.71 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:usdcad:fvg-h1-s1795629600-1795641300": {
@@ -1503,15 +1504,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 473.59,
-  "lastRun": "2026-11-26T05:40:27.000Z"
+  "balance": 468.71,
+  "lastRun": "2026-11-26T05:42:53.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:48:04.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T20:50:16.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:58 UTC) (will retry)",
@@ -2996,6 +2992,11 @@
    "at": "2026-11-26T05:24:06.000Z",
    "msg": "NZDUSD position 51573220 closed at the broker",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795665600"
+  },
+  {
+   "at": "2026-11-26T05:42:53.000Z",
+   "msg": "USDCHF position 51571438 closed at the broker",
+   "trade": "eqx:fade:usdchf:fade-m15-s1795662900"
   }
  ],
  "limits": {
