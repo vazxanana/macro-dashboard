@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 7,
  "started": "2026-11-25T11:13:52.036Z",
- "tries": 5466400,
- "survivedA": 1451,
- "candidates": 168,
- "cLooks": 83,
+ "tries": 5591200,
+ "survivedA": 1487,
+ "candidates": 171,
+ "cLooks": 84,
  "cPasses": 0,
  "groups": {
   "usdchf|blk-&dev-|both": {
@@ -37,7 +37,7 @@
    "pass": false
   },
   "eurusd|brk&dev+|both": {
-   "more": 6,
+   "more": 7,
    "pass": false
   },
   "usdjpy|blk-&fade|both": {
@@ -93,7 +93,7 @@
    "pass": false
   },
   "eurusd|big+&big+|both": {
-   "more": 4,
+   "more": 5,
    "pass": false
   },
   "audusd|fade&dev+|both": {
@@ -337,6 +337,10 @@
    "pass": false
   },
   "gbpusd|fade&dev-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|big+&eg+|both": {
    "more": 0,
    "pass": false
   }
@@ -5240,9 +5244,74 @@
     "months": 82
    },
    "p": 0.08534
+  },
+  {
+   "at": "2026-11-26T09:28:08.227Z",
+   "group": "eurusd|big+&eg+|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "big",
+      "k": 1.25,
+      "follow": true
+     },
+     {
+      "kind": "eg",
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": [
+     3,
+     15
+    ],
+    "dows": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.3,
+    "stop": 1.5,
+    "rr": 6,
+    "hold": 12
+   },
+   "A": {
+    "n": 648,
+    "mean": 0.1679,
+    "t": 3.16,
+    "win": 46.1,
+    "months": 115
+   },
+   "B": {
+    "n": 270,
+    "mean": 0.1409,
+    "t": 1.92,
+    "win": 45.9,
+    "months": 57
+   },
+   "placeboA": {
+    "n": 635,
+    "mean": -0.0019,
+    "t": -0.04,
+    "win": 39.7,
+    "months": 115
+   },
+   "C": {
+    "n": 447,
+    "mean": -0.1038,
+    "t": -1.58,
+    "win": 35.8,
+    "months": 79
+   },
+   "p": 0.94295
   }
  ],
- "chunks": 51,
- "updated": "2026-11-26T09:13:49.827Z",
- "chanceCandidates": 497.4
+ "chunks": 52,
+ "updated": "2026-11-26T09:38:55.057Z",
+ "chanceCandidates": 508.8
 }
