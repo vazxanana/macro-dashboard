@@ -1,5 +1,5 @@
 // The two Nasdaq leads that passed at the broker's own ticks, on a cTrader DEMO account (26 Nov 2026, owner: "Get the nasdaq
-// ready"; rules "l1 and l5 only", risk 0.5 % a trade). The rules are the auto-researcher's frozen genomes (NQ1_LEADS l1, l5 in
+// ready"; rules "l1 and l5 only"; risk 1 % a trade, owner the same day: "1% for both"). The rules are the auto-researcher's frozen genomes (NQ1_LEADS l1, l5 in
 // council/edge-desks-2.mjs; research/edge/nq1-leads-exec: +0.269R and +0.364R a trade after financing, in years the search had
 // already read, so a candidate and not an edge): at the close of an H1 candle of NAS100 the engine's own triggers are read
 // (research/edge/auto-researcher/engine.mjs sig / atr / sma / atrPct); a signal is a BUY at market at the next hour's open,
@@ -23,7 +23,7 @@ import { connect, accountFor, volumeOf } from './gotobi.mjs';
 import { NQ1_LEADS } from './edge-desks-2.mjs';
 import { prep, toArrays, sig, atr, sma, atrPct } from '../research/edge/auto-researcher/engine.mjs';
 
-export const IDS = ['l1', 'l5'], RISK = 0.005, MAX_RISK = 0.01, LOOK_FROM = 8, LOOK_UNTIL = 720, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
+export const IDS = ['l1', 'l5'], RISK = 0.01, MAX_RISK = 0.01, LOOK_FROM = 8, LOOK_UNTIL = 720, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
 export const RULES = Object.fromEntries(IDS.map((id) => { const L = NQ1_LEADS.find((x) => x.id === id); return [id, { id, name: L.name, label: `nq-${id}`, g: L.g }]; }));
 const H = 3600, hourOf = (t) => Math.floor(t / H) * H;
 

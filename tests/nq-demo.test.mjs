@@ -20,7 +20,7 @@ const DALL = arr(ALL);
 const fires = (id, lo = 900) => { const out = []; for (let i = lo; i < ALL.length - 2; i++) if (signalAt(DALL, RULES[id].g, i, ALL[i + 1][0])) out.push(i); return out; };
 
 test('the rules are the frozen l1 and l5 genomes, long only, each with a stop distance and a target', () => {
-  assert.deepEqual(IDS, ['l1', 'l5']); assert.equal(RISK, 0.005); assert.equal(MAX_RISK, 0.01);
+  assert.deepEqual(IDS, ['l1', 'l5']); assert.equal(RISK, 0.01); assert.equal(MAX_RISK, 0.01);
   for (const id of IDS) { const L = NQ1_LEADS.find((x) => x.id === id); assert.deepEqual(RULES[id].g, L.g); assert.equal(L.g.side, 'long'); assert.ok(L.g.stop > 0 && L.g.rr > 0 && L.g.hold > 0); assert.equal(RULES[id].label, `nq-${id}`); }
 });
 test('the signal is the study\'s: every order of orders() is a signal with the same stop distance, and a signal with no position open is an order', () => {
@@ -77,13 +77,13 @@ const news = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).map
 // a bar where l1 fires and l5 does not, so one order is expected
 const I1 = fires('l1').find((i) => !signalAt(DALL, RULES.l5.g, i, ALL[i + 1][0]));
 
-test('a signal: one market BUY with its stop and target on the order, 0.5 % of the balance at risk, read back; once an hour', async () => {
+test('a signal: one market BUY with its stop and target on the order, 1 % of the balance at risk, read back; once an hour', async () => {
   assert.ok(I1 > 0); const dir = setup(), b = broker(), t = ALL[I1 + 1][0] + 40, sg = signalAt(DALL, RULES.l1.g, I1, ALL[I1 + 1][0]); b.px = ALL[I1 + 1][1] - 15;   // the broker's price basis sits under the candles'
   let saves = 0; const out = await go(dir, b, t, feedAt(I1), { save: () => saves++ }); assert.deepEqual(out.did, ['l1 bought']); assert.equal(saves, 1);
   const o = news(b); assert.equal(o.length, 1); const x = o[0];
   assert.equal(x.orderType, 1); assert.equal(x.tradeSide, 1); assert.equal(x.label, 'nq-l1'); assert.equal(x.ctidTraderAccountId, 77); assert.equal(x.symbolId, 9);
   assert.equal(x.relativeStopLoss, relative(sg.dist, 2)); assert.ok(x.relativeStopLoss > 0, 'a stop on the order itself'); assert.equal(x.relativeTakeProfit, relative(4 * sg.dist, 2));
-  assert.equal(x.volume, Math.floor(10000 * 0.005 / sg.dist * 100), 'units = balance x 0.5 % / stop distance, in hundredths of a unit');
+  assert.equal(x.volume, Math.floor(10000 * 0.01 / sg.dist * 100), 'units = balance x 1 % / stop distance, in hundredths of a unit');
   const J = file(dir), rec = J.trades[0]; assert.equal(rec.status, 'open'); assert.equal(rec.fill, b.px); assert.ok(rec.stop < rec.fill && rec.target > rec.fill, 'the stop on the losing side, measured from the fill');
   assert.ok(Math.abs((rec.fill - rec.stop) - sg.dist) < 0.011); assert.equal(rec.basis, -15); assert.equal(rec.brokerStop, rec.stop); assert.equal(rec.account, '…146'); assert.equal(J.looked, ALL[I1 + 1][0]);
   // the same hour again: nothing is read or sent
@@ -118,7 +118,7 @@ test('late or too small: the price already a quarter of the risk away is a misse
   assert.deepEqual((await go(dir, b, t, moved)).did, ['l1 missed']); assert.equal(news(b).length, 0); assert.equal(file(dir).trades[0].status, 'missed');
   dir = setup(); b = broker({ balance: 10000 }); b.px = ALL[I1 + 1][1]; await go(dir, b, t, feedAt(I1));   // $100: 0.01 unit risks dist x 0.01 dollars
   const rec = file(dir).trades[0], minRisk = 0.01 * sg.dist / 100;
-  if (Math.floor(100 * 0.005 / sg.dist * 100) >= 1) assert.equal(rec.status, 'open'); else if (minRisk <= 0.01) { assert.equal(rec.status, 'open'); assert.equal(rec.volume, 1); } else { assert.equal(rec.status, 'error'); assert.match(rec.why, /more than 1 %/); }
+  if (Math.floor(100 * 0.01 / sg.dist * 100) >= 1) assert.equal(rec.status, 'open'); else if (minRisk <= 0.01) { assert.equal(rec.status, 'open'); assert.equal(rec.volume, 1); } else { assert.equal(rec.status, 'error'); assert.match(rec.why, /more than 1 %/); }
   dir = setup(); b = broker({ balance: 100 }); await go(dir, b, t, feedAt(I1)); assert.equal(file(dir).trades[0].status, 'error'); assert.equal(news(b).length, 0, '$1: nothing is sent');
 });
 test('one position at a time a rule; a position the broker closed is booked from the candles (stop first); the time exit after `hold` candles', async () => {
