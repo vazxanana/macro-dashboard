@@ -15044,6 +15044,30 @@
     "stopCheckedAt": "2026-11-24T06:31:56.000Z",
     "brokerStop": 3642.29,
     "closedAt": "2026-11-24T12:44:25.000Z"
+   },
+   "bfade:xag:bigfade-m15-b1795698900": {
+    "positionId": "51598649",
+    "symbol": "XAGUSD",
+    "side": "buy",
+    "volume": 665000,
+    "lots": 1.33,
+    "digits": 3,
+    "setup": "bfade",
+    "status": "open",
+    "openedAt": "2026-11-26T13:15:46.000Z",
+    "councilEntry": 41.3575,
+    "stop": 41.278789,
+    "t1": 41.51825,
+    "riskCash": 525.48,
+    "margin": 554.13,
+    "fillPrice": 41.374,
+    "slipR": 0.21,
+    "lagSec": 46,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T13:15:46.000Z",
+    "brokerStop": 41.295
    }
   },
   "day": {
@@ -15053,13 +15077,14 @@
    "ids": [
     "47373486",
     "47373487",
-    "47373484"
+    "47373484",
+    "51598649"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10509.65 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 10509.65 · 4 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.685 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -15071,14 +15096,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10509.65,
-  "lastRun": "2026-11-26T13:13:24.000Z"
+  "lastRun": "2026-11-26T13:17:49.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T16:53:58.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 454.40, 4.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T16:57:25.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 452.37, 4.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -16566,6 +16586,11 @@
    "at": "2026-11-26T01:25:06.000Z",
    "msg": "not mirrored bfade:usdjpy:bigfade-m15-s1795655700: USDJPY: 28.97 lot would use 5794.00 margin, over 20% of the balance",
    "trade": "bfade:usdjpy:bigfade-m15-s1795655700"
+  },
+  {
+   "at": "2026-11-26T13:15:46.000Z",
+   "msg": "opened buy XAGUSD 1.33 lot (council bfade)",
+   "trade": "bfade:xag:bigfade-m15-b1795698900"
   }
  ],
  "limits": {
@@ -16661,11 +16686,11 @@
   ]
  },
  "execution": {
-  "n": 498,
+  "n": 499,
   "meanSlipR": -0.011,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 154.5,
+  "medianLagSec": 154,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -16702,6 +16727,10 @@
    "XAUUSD": {
     "n": 119,
     "meanSlipR": -0.036
+   },
+   "XAGUSD": {
+    "n": 1,
+    "meanSlipR": 0.21
    }
   }
  }
