@@ -6349,7 +6349,7 @@
     "lots": 2.45,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T01:25:08.000Z",
     "councilEntry": 0.83126,
     "stop": 0.830685,
@@ -6362,10 +6362,12 @@
     "slipR": 0.504,
     "lagSec": 1508,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T01:25:08.000Z",
-    "brokerStop": 0.83071
+    "brokerStop": 0.83071,
+    "closedAt": "2026-11-26T03:10:56.000Z"
    },
    "boxfade:gbpusd:boxfade-m5-s1795654800": {
     "positionId": "51567440",
@@ -6427,15 +6429,13 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12778.78,
-   "ids": [
-    "51567439"
-   ],
+   "lastBalance": 12864.95,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12778.78 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12864.95 · 0 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6443,15 +6443,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12778.78,
-  "lastRun": "2026-11-26T03:08:25.000Z"
+  "balance": 12864.95,
+  "lastRun": "2026-11-26T03:10:56.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet usdcad-replica-1794415489-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "usdcad-replica-1794415489-b"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet eurusd-replica-1794417021-s: daily loss stop (44.6% down today) (will retry)",
@@ -7940,6 +7935,11 @@
    "at": "2026-11-26T03:05:54.000Z",
    "msg": "EURUSD position 51570278 closed at the broker",
    "trade": "boxfade:eurusd:boxfade-m5-s1795659600"
+  },
+  {
+   "at": "2026-11-26T03:10:56.000Z",
+   "msg": "USDCHF position 51567439 closed at the broker",
+   "trade": "boxfade:usdchf:boxfade-m5-b1795654800"
   }
  ],
  "limits": {
