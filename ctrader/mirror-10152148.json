@@ -6403,7 +6403,7 @@
     "lots": 7.09,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T02:41:49.000Z",
     "councilEntry": 1.09692,
     "stop": 1.09738,
@@ -6416,25 +6416,26 @@
     "slipR": -0.196,
     "lagSec": 1309,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T02:41:49.000Z",
-    "brokerStop": 1.09736
+    "brokerStop": 1.09736,
+    "closedAt": "2026-11-26T03:05:54.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12409.64,
+   "lastBalance": 12778.78,
    "ids": [
-    "51567439",
-    "51570278"
+    "51567439"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12409.64 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12778.78 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6442,15 +6443,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12409.64,
-  "lastRun": "2026-11-26T03:02:51.000Z"
+  "balance": 12778.78,
+  "lastRun": "2026-11-26T03:05:54.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet audusd-replica-1794415489-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "audusd-replica-1794415489-s"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet usdcad-replica-1794415489-b: daily loss stop (44.6% down today) (will retry)",
@@ -7938,6 +7934,11 @@
   {
    "at": "2026-11-26T02:41:49.000Z",
    "msg": "opened sell EURUSD 7.09 lot (council boxfade)",
+   "trade": "boxfade:eurusd:boxfade-m5-s1795659600"
+  },
+  {
+   "at": "2026-11-26T03:05:54.000Z",
+   "msg": "EURUSD position 51570278 closed at the broker",
    "trade": "boxfade:eurusd:boxfade-m5-s1795659600"
   }
  ],
