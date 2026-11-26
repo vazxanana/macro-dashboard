@@ -2618,8 +2618,12 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   strip or paper bar opening, and every 2.5 s. Never for guests, never in full screen (those rules are untouched). The Charts view's grid row gap
   is 0 there (it also counted for undrawn parts) and the toolbar's "Charts" title is hidden from 641 px.
 - **A phone on its side** (`max-height: 560px` and landscape, any width): the site header, the bottom tab bar, the wheel bar and the phase strip
-  step aside, the toolbar is one row of icons with a Menu button (`#ms-fit-menu`, goes Home) and the market button. Before, the chart was below
+  step aside, the toolbar is one row of icons with the Menu button and the market button. Before, the chart was below
   the first screen at 844 x 390 and about 50 px tall at 568 x 320.
+- **The chart is the whole screen on desktop** (owner, 26 Nov 2026: "The chart should be the whole screen, so probably the sidebar hide it"):
+  from 1180 px the side rail and the site header are hidden on Charts (`body` padding 0). The Menu button `#ms-fit-menu` at the start of the
+  toolbar sets `html[data-chnav="1"]`, which brings them back (also on a phone on its side), and hides them again; memory only, so every
+  visit to Charts starts with the chart alone. Other views are unchanged.
 - **Watchlist** (`#ms-wlp`, 1280 px and up, in `.ch-row` beside the chart): every market by group with its price and change on the day from the
   page's shared quotes (`window.msQuotes` = `mdQuotes`, no request of its own; crypto has no quote), a filter box (Enter opens the first match), a
   row opens `?s=<market>#charts`. Hide (x) folds it to a tab at the right edge (`#ms-wlp-btn`); `window.msWatchlist()` is the read-only view.

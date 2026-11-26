@@ -5896,14 +5896,24 @@ html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fu
 @media (min-width: 641px) { html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) > .sec-h { padding-top: 4px; padding-bottom: 4px; margin-top: 0; } }
 /* a phone on its side, or any short window: the chart is the screen. The site header steps aside (a Menu button goes Home),
    the phase strip waits, and the toolbar's words give way to their icons so it stays one row. */
-#ms-fit-menu { display: none; }
+#ms-fit-menu { display: none; align-items: center; justify-content: center; width: 40px; height: 36px; padding: 0; border: 0; border-radius: 10px; color: var(--au-ink-2, var(--ink-dim)); background: var(--au-surface-2, var(--panel)); cursor: pointer; order: -5; flex: none; }
+#ms-fit-menu[aria-pressed="true"] { color: var(--au-ink-1, var(--ink)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
+/* desktop: the chart is the whole screen (owner, 26 Nov 2026: "The chart should be the whole screen, so probably the sidebar
+   hide it"). On Charts the side rail and the site header are hidden; the Menu button at the start of the toolbar brings them
+   back and hides them again (not remembered: every visit to Charts starts with the chart alone). */
+@media (min-width: 1180px) {
+  html[data-view="charts"]:not([data-role="public"]) #ms-fit-menu { display: inline-flex; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) :is(nav.btab, header.top) { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) body { padding-left: 0 !important; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) #v-charts { padding-top: 6px; }
+}
 @media (min-width: 641px) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > h2 { display: none !important; } }
 @media (max-height: 560px) and (orientation: landscape) {
-  html[data-view="charts"]:not([data-role="public"]) :is(nav.btab, #ms-wb, #ps-sw) { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) :is(nav.btab, #ms-wb, #ps-sw) { display: none !important; }
   html[data-view="charts"]:not([data-role="public"]) .ms-live.app { padding-bottom: 0 !important; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(.seg, .mk-mode, .ch-one) { flex: 0 0 auto !important; width: auto !important; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-ch-mk { display: inline-flex !important; }
-  html[data-view="charts"]:not([data-role="public"]) header.top { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) header.top { display: none !important; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts #ms-phase { display: none !important; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts { padding-top: 4px; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h { padding: 2px 0; margin: 0 0 4px; gap: 4px; row-gap: 2px; }
@@ -5912,7 +5922,7 @@ html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fu
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h :is(#ms-sty-btn, #ms-ind-open, #ms-sa-btn) { font-size: 0; gap: 0; min-width: 40px; padding-left: 10px; padding-right: 10px; justify-content: center; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h :is(#ms-sty-btn, #ms-ind-open) small { display: none; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn::before { content: "Aa"; font-size: 14px; font-weight: 600; }
-  html[data-view="charts"]:not([data-role="public"]) #ms-fit-menu { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 36px; border-radius: 10px; color: var(--au-ink-2, var(--ink-dim)); background: var(--au-surface-2, var(--panel)); text-decoration: none; order: -5; flex: none; }
+  html[data-view="charts"]:not([data-role="public"]) #ms-fit-menu { display: inline-flex; }
   html[data-view="charts"]:not([data-role="public"]) .ms-live.app { padding-top: 0; }
 }
 /* tablets and small laptops (641 to 1179 px): the page header is two short rows instead of three tall ones on Charts */
@@ -16238,7 +16248,7 @@ function msNextSetup(bars, A) {
     const ro = new ResizeObserver(ask);
     for (const s of ['header.top', '#v-charts .sec-h', '#ms-phase', '#ms-pp', '#ms-sp-bar', '#ms-ict-strip', '#ms-wb', '#ms-mm .mm-bar']) { const e = document.querySelector(s); if (e) ro.observe(e); }
     const mo = new MutationObserver(ask);
-    mo.observe(H, { attributes: true, attributeFilter: ['data-view', 'data-phone', 'data-clean', 'data-role'] });
+    mo.observe(H, { attributes: true, attributeFilter: ['data-view', 'data-phone', 'data-clean', 'data-role', 'data-chnav'] });
     mo.observe(V, { attributes: true, attributeFilter: ['class', 'data-ps-more'], subtree: false });
     const hook = () => { const g = V.querySelector('.ms-grid4'); if (!g) return false; mo.observe(g, { attributes: true, attributeFilter: ['data-view', 'data-lay-n'] }); const mm = document.getElementById('ms-mm'); if (mm) mo.observe(mm, { attributes: true, attributeFilter: ['hidden', 'data-n', 'class'] }); return true; };
     hook();
@@ -16249,7 +16259,8 @@ function msNextSetup(bars, A) {
   // the Menu button a short window gets in place of the site header
   const bar = V.querySelector('.sec-h');
   if (bar && !document.getElementById('ms-fit-menu')) {
-    const a = document.createElement('a'); a.id = 'ms-fit-menu'; a.href = '#home'; a.setAttribute('aria-label', 'Leave the charts: go to Home'); a.title = 'Home';
+    const a = document.createElement('button'); a.type = 'button'; a.id = 'ms-fit-menu'; a.setAttribute('aria-label', 'Show or hide the site menu'); a.title = 'Menu'; a.setAttribute('aria-pressed', 'false');
+    a.addEventListener('click', () => { const on = H.dataset.chnav !== '1'; if (on) H.dataset.chnav = '1'; else delete H.dataset.chnav; a.setAttribute('aria-pressed', String(on)); ask(); setTimeout(ask, 120); });
     a.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
     bar.insertBefore(a, bar.firstChild);
   }
