@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 7,
  "started": "2026-11-25T11:13:52.023Z",
- "tries": 4478600,
- "survivedA": 1227,
- "candidates": 144,
- "cLooks": 73,
+ "tries": 4603800,
+ "survivedA": 1262,
+ "candidates": 150,
+ "cLooks": 76,
  "cPasses": 0,
  "groups": {
   "eurusd|brk&dev+|both": {
@@ -49,7 +49,7 @@
    "pass": false
   },
   "eurusd|brk&big+|long": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|fade&dev-|both": {
@@ -69,7 +69,7 @@
    "pass": false
   },
   "eurusd|dev+&big+|both": {
-   "more": 8,
+   "more": 9,
    "pass": false
   },
   "xau|big+&brk|long": {
@@ -129,7 +129,7 @@
    "pass": false
   },
   "eurusd|dev-&fade|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "xau|big+&dev+|both": {
@@ -297,6 +297,18 @@
    "pass": false
   },
   "eurusd|fade&eg-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "audusd|dev-&fade|both": {
+   "more": 0,
+   "pass": false
+  },
+  "xau|brk&big+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurjpy|fade&dev-|both": {
    "more": 0,
    "pass": false
   }
@@ -4549,9 +4561,189 @@
     "months": 83
    },
    "p": 0.08076
+  },
+  {
+   "at": "2026-11-26T05:49:41.455Z",
+   "group": "audusd|dev-&fade|both",
+   "g": {
+    "mk": "audusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 20,
+      "z": 1.5,
+      "follow": false
+     },
+     {
+      "kind": "fade",
+      "N": 10
+     }
+    ],
+    "side": "both",
+    "hours": [
+     6,
+     12
+    ],
+    "dows": null,
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 3,
+    "rr": 4,
+    "hold": 4
+   },
+   "A": {
+    "n": 365,
+    "mean": 0.0886,
+    "t": 3.74,
+    "win": 61.6,
+    "months": 114
+   },
+   "B": {
+    "n": 162,
+    "mean": 0.0582,
+    "t": 1.52,
+    "win": 63,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 364,
+    "mean": -0.1149,
+    "t": -4.87,
+    "win": 37.4,
+    "months": 114
+   },
+   "C": {
+    "n": 249,
+    "mean": -0.0424,
+    "t": -1.46,
+    "win": 50.6,
+    "months": 78
+   },
+   "p": 0.92785
+  },
+  {
+   "at": "2026-11-26T05:55:37.834Z",
+   "group": "xau|brk&big+|both",
+   "g": {
+    "mk": "xau",
+    "trig": [
+     {
+      "kind": "brk",
+      "N": 120
+     },
+     {
+      "kind": "big",
+      "k": 2.5,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": [
+     3,
+     4,
+     5
+    ],
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 1.5,
+    "rr": 1,
+    "hold": 24
+   },
+   "A": {
+    "n": 412,
+    "mean": 0.1554,
+    "t": 3.21,
+    "win": 60.4,
+    "months": 100
+   },
+   "B": {
+    "n": 177,
+    "mean": 0.1211,
+    "t": 1.63,
+    "win": 58.8,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 412,
+    "mean": -0.2951,
+    "t": -5.71,
+    "win": 38.6,
+    "months": 100
+   },
+   "C": {
+    "n": 208,
+    "mean": 0.0248,
+    "t": 0.41,
+    "win": 52.9,
+    "months": 80
+   },
+   "p": 0.3409
+  },
+  {
+   "at": "2026-11-26T06:12:22.146Z",
+   "group": "eurjpy|fade&dev-|both",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 8
+     },
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 2,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     20,
+     4
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 0.5,
+    "rr": 4,
+    "hold": 4
+   },
+   "A": {
+    "n": 491,
+    "mean": 0.3319,
+    "t": 4.44,
+    "win": 42,
+    "months": 111
+   },
+   "B": {
+    "n": 208,
+    "mean": 0.1686,
+    "t": 1.57,
+    "win": 39.9,
+    "months": 57
+   },
+   "placeboA": {
+    "n": 424,
+    "mean": -0.3483,
+    "t": -3.92,
+    "win": 20.5,
+    "months": 111
+   },
+   "C": {
+    "n": 263,
+    "mean": -0.0451,
+    "t": -0.38,
+    "win": 32.3,
+    "months": 73
+   },
+   "p": 0.64803
   }
  ],
- "chunks": 43,
- "updated": "2026-11-26T05:49:16.168Z",
- "chanceCandidates": 407.6
+ "chunks": 44,
+ "updated": "2026-11-26T06:14:20.371Z",
+ "chanceCandidates": 418.9
 }
