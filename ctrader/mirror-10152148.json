@@ -6617,6 +6617,32 @@
     "stopCheckedAt": "2026-11-26T07:09:29.000Z",
     "brokerStop": 0.54736,
     "closedAt": "2026-11-26T15:15:31.000Z"
+   },
+   "boxfade:usdchf:boxfade-m5-s1795713900": {
+    "positionId": "51631994",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 29800000,
+    "lots": 2.98,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T17:26:13.000Z",
+    "councilEntry": 0.83446,
+    "stop": 0.835135,
+    "t1": 0.833785,
+    "riskCash": 244.9,
+    "margin": 596,
+    "mark": 0.83445,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83436,
+    "slipR": 0.148,
+    "lagSec": 73,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T17:26:13.000Z",
+    "brokerStop": 0.83504
    }
   },
   "day": {
@@ -6624,13 +6650,14 @@
    "startBalance": 12894.31,
    "lastBalance": 12244.8,
    "ids": [
-    "51571061"
+    "51571061",
+    "51631994"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12244.8 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12244.8 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6639,14 +6666,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12244.8,
-  "lastRun": "2026-11-26T17:25:06.000Z"
+  "lastRun": "2026-11-26T17:28:35.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T20:12:41.000Z",
-   "msg": "not mirrored yet xrp-replica-1794427893-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "xrp-replica-1794427893-b"
-  },
   {
    "at": "2026-11-11T20:51:42.000Z",
    "msg": "not mirrored yet xau-replica-1794430232-b: daily loss stop (44.6% down today) (will retry)",
@@ -8135,6 +8157,11 @@
    "at": "2026-11-26T15:15:31.000Z",
    "msg": "NZDUSD position 51577450 closed at the broker",
    "trade": "boxfade:nzdusd:boxfade-m5-b1795674900"
+  },
+  {
+   "at": "2026-11-26T17:26:13.000Z",
+   "msg": "opened sell USDCHF 2.98 lot (council boxfade)",
+   "trade": "boxfade:usdchf:boxfade-m5-s1795713900"
   }
  ],
  "limits": {
@@ -8230,8 +8257,8 @@
   ]
  },
  "execution": {
-  "n": 225,
-  "meanSlipR": 0.06,
+  "n": 226,
+  "meanSlipR": 0.061,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
   "medianLagSec": 70,
@@ -8265,8 +8292,8 @@
     "meanSlipR": 0.119
    },
    "USDCHF": {
-    "n": 13,
-    "meanSlipR": 0.158
+    "n": 14,
+    "meanSlipR": 0.157
    },
    "EURUSD": {
     "n": 15,
