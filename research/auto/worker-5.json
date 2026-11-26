@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T00:36:22.851Z",
- "tries": 9086800,
- "survivedA": 2347,
- "candidates": 272,
- "cLooks": 105,
+ "tries": 9207400,
+ "survivedA": 2375,
+ "candidates": 276,
+ "cLooks": 106,
  "cPasses": 0,
  "groups": {
   "usdchf|eg-&dev-|both": {
@@ -29,7 +29,7 @@
    "pass": false
   },
   "eurjpy|fade&fade|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "usdjpy|eg-&fade|both": {
@@ -209,7 +209,7 @@
    "pass": false
   },
   "eurjpy|brk&brk|both": {
-   "more": 3,
+   "more": 4,
    "pass": false
   },
   "eurusd|fade&dev-|both": {
@@ -277,7 +277,7 @@
    "pass": false
   },
   "eurjpy|fade&dev-|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "nzdusd|eg-&dev+|short": {
@@ -426,6 +426,10 @@
   },
   "eurjpy|blk-&fade|both": {
    "more": 1,
+   "pass": false
+  },
+  "audusd|dev-&dev-|short": {
+   "more": 0,
    "pass": false
   }
  },
@@ -6620,9 +6624,71 @@
     "months": 81
    },
    "p": 0.17619
+  },
+  {
+   "at": "2026-11-25T23:38:08.687Z",
+   "group": "audusd|dev-&dev-|short",
+   "g": {
+    "mk": "audusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 1,
+      "follow": false
+     },
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 1.5,
+      "follow": false
+     }
+    ],
+    "side": "short",
+    "hours": [
+     20,
+     23
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 3,
+    "rr": 6,
+    "hold": 4
+   },
+   "A": {
+    "n": 472,
+    "mean": 0.0843,
+    "t": 4.89,
+    "win": 62.1,
+    "months": 117
+   },
+   "B": {
+    "n": 169,
+    "mean": 0.0503,
+    "t": 1.6,
+    "win": 55.6,
+    "months": 55
+   },
+   "placeboA": {
+    "n": 472,
+    "mean": -0.1091,
+    "t": -6.73,
+    "win": 36,
+    "months": 117
+   },
+   "C": {
+    "n": 246,
+    "mean": -0.0185,
+    "t": -1.07,
+    "win": 47.6,
+    "months": 80
+   },
+   "p": 0.85769
   }
  ],
- "chunks": 39,
- "updated": "2026-11-25T23:37:19.937Z",
- "chanceCandidates": 826.9
+ "chunks": 40,
+ "updated": "2026-11-26T00:02:22.784Z",
+ "chanceCandidates": 837.9
 }
