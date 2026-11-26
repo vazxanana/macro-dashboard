@@ -6652,7 +6652,7 @@
     "lots": 5.83,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T18:01:57.000Z",
     "councilEntry": 1.3108,
     "stop": 1.31124,
@@ -6665,10 +6665,12 @@
     "slipR": 0.318,
     "lagSec": 117,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T18:01:57.000Z",
-    "brokerStop": 1.31108
+    "brokerStop": 1.31108,
+    "closedAt": "2026-11-26T22:11:34.000Z"
    },
    "boxfade:nzdusd:boxfade-m5-b1795721100": {
     "positionId": "51643494",
@@ -6733,7 +6735,7 @@
     "lots": 11.47,
     "digits": 3,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T21:01:44.000Z",
     "councilEntry": 159.285,
     "stop": 159.319,
@@ -6744,10 +6746,12 @@
     "slipR": 0.206,
     "lagSec": 104,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T21:01:44.000Z",
-    "brokerStop": 159.312
+    "brokerStop": 159.312,
+    "closedAt": "2026-11-26T22:11:34.000Z"
    },
    "boxfade:nzdusd:boxfade-m5-b1795729500": {
     "positionId": "51647575",
@@ -6777,20 +6781,18 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12060.44,
+   "lastBalance": 11148.46,
    "ids": [
     "51571061",
     "51631994",
-    "51639443",
     "51643494",
-    "51647446",
     "51647575"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12060.44 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 11148.46 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6798,20 +6800,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12060.44,
-  "lastRun": "2026-11-26T22:08:57.000Z"
+  "balance": 11148.46,
+  "lastRun": "2026-11-26T22:11:34.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T21:41:48.000Z",
-   "msg": "not mirrored yet audusd-replica-1794433267-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "audusd-replica-1794433267-b"
-  },
-  {
-   "at": "2026-11-11T23:00:41.000Z",
-   "msg": "AUDUSD position 48193610 closed at the broker",
-   "trade": "audusd-replica-1794336369-b"
-  },
   {
    "at": "2026-11-11T23:00:41.000Z",
    "msg": "not mirrored yet xau-replica-1794425423-b: daily loss stop (44.7% down today) (will retry)",
@@ -8295,6 +8287,16 @@
    "at": "2026-11-26T22:06:12.000Z",
    "msg": "closed USDCHF position 51647375 (council: target)",
    "trade": "boxfade:usdchf:boxfade-m5-s1795725600"
+  },
+  {
+   "at": "2026-11-26T22:11:34.000Z",
+   "msg": "GBPUSD position 51639443 closed at the broker",
+   "trade": "boxfade:gbpusd:boxfade-m5-s1795716000"
+  },
+  {
+   "at": "2026-11-26T22:11:34.000Z",
+   "msg": "USDJPY position 51647446 closed at the broker",
+   "trade": "boxfade:usdjpy:boxfade-m5-s1795726800"
   }
  ],
  "limits": {

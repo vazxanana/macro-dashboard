@@ -1894,7 +1894,7 @@
     "lots": 0.15,
     "digits": 3,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T19:16:39.000Z",
     "councilEntry": 159.267,
     "stop": 159.218557,
@@ -1905,10 +1905,12 @@
     "slipR": 0,
     "lagSec": 99,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T19:16:39.000Z",
-    "brokerStop": 159.219
+    "brokerStop": 159.219,
+    "closedAt": "2026-11-26T22:11:30.000Z"
    },
    "eqx:fade:nzdusd:fade-m15-b1795721400": {
     "positionId": "51644179",
@@ -1966,17 +1968,16 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 435.86,
+   "lastBalance": 426.94,
    "ids": [
     "51608452",
-    "51642525",
     "51644179"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 435.86 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 426.94 · 2 open",
   "skipped": {
    "eqx:fade:usdjpy:fade-m15-b1795725000": "stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set"
   },
@@ -2007,15 +2008,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 435.86,
-  "lastRun": "2026-11-26T22:08:53.000Z"
+  "balance": 426.94,
+  "lastRun": "2026-11-26T22:11:30.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T14:50:19.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28074.94 -> 28094.76 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T15:37:13.000Z",
    "msg": "opened sell US30 0.06 lot (council ict-A)",
@@ -3500,6 +3496,11 @@
    "at": "2026-11-26T22:06:08.000Z",
    "msg": "USDCAD position 51642524 closed at the broker",
    "trade": "eqx:fade:usdcad:fade-m15-s1795720500"
+  },
+  {
+   "at": "2026-11-26T22:11:30.000Z",
+   "msg": "USDJPY position 51642525 closed at the broker",
+   "trade": "eqx:fvg:usdjpy:fvg-h1-b1795712400-1795720500"
   }
  ],
  "limits": {
