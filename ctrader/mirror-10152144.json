@@ -1562,7 +1562,7 @@
     "lots": 0.14,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T13:47:20.000Z",
     "councilEntry": 1.31121,
     "stop": 1.311847,
@@ -1575,25 +1575,26 @@
     "slipR": -0.502,
     "lagSec": 140,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T13:47:20.000Z",
-    "brokerStop": 1.31186
+    "brokerStop": 1.31186,
+    "closedAt": "2026-11-26T14:00:20.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 464.49,
+   "lastBalance": 459.05,
    "ids": [
-    "51597661",
-    "51599490"
+    "51597661"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 464.49 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 459.05 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:nzdusd:fvg-h1-b1795633200-1795641300": {
@@ -1622,15 +1623,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 464.49,
-  "lastRun": "2026-11-26T13:57:25.000Z"
+  "balance": 459.05,
+  "lastRun": "2026-11-26T14:00:20.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T07:49:02.000Z",
-   "msg": "NAS100 position 47468781 closed at the broker",
-   "trade": "ict:nq-b-1794189600"
-  },
   {
    "at": "2026-11-09T08:21:04.000Z",
    "msg": "opened sell US30 0.14 lot (council ict-A)",
@@ -3114,6 +3110,11 @@
   {
    "at": "2026-11-26T13:47:20.000Z",
    "msg": "opened sell GBPUSD 0.14 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-s1795700700"
+  },
+  {
+   "at": "2026-11-26T14:00:20.000Z",
+   "msg": "GBPUSD position 51599490 closed at the broker",
    "trade": "eqx:fade:gbpusd:fade-m15-s1795700700"
   }
  ],
