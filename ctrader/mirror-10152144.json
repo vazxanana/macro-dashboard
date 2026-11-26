@@ -1341,7 +1341,7 @@
     "lots": 0.14,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T02:41:40.000Z",
     "councilEntry": 0.66434,
     "stop": 0.664921,
@@ -1354,10 +1354,12 @@
     "slipR": -0.327,
     "lagSec": 700,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T02:41:40.000Z",
-    "brokerStop": 0.66486
+    "brokerStop": 0.66486,
+    "closedAt": "2026-11-26T04:38:03.000Z"
    },
    "eqx:fvg:eurjpy:fvg-h1-s1795658400-1795660200": {
     "positionId": "51570277",
@@ -1436,23 +1438,46 @@
     ],
     "stopCheckedAt": "2026-11-26T03:59:29.000Z",
     "brokerStop": 0.83231
+   },
+   "eqx:fade:nzdusd:fade-m15-b1795665600": {
+    "positionId": "51573220",
+    "symbol": "NZDUSD",
+    "side": "buy",
+    "volume": 1200000,
+    "lots": 0.12,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T04:38:03.000Z",
+    "councilEntry": 0.54822,
+    "stop": 0.547826,
+    "t1": 0.549007,
+    "riskCash": 4.79,
+    "margin": 13.17,
+    "fillPrice": 0.54859,
+    "slipR": 0.939,
+    "lagSec": 2283,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T04:38:03.000Z",
+    "brokerStop": 0.5482
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 483.73,
+   "lastBalance": 478.69,
    "ids": [
     "51567422",
-    "51570276",
     "51571436",
     "51571438"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 483.73 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 478.69 · 4 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:usdcad:fvg-h1-s1795629600-1795641300": {
@@ -1476,20 +1501,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 483.73,
-  "lastRun": "2026-11-26T04:34:12.000Z"
+  "balance": 478.69,
+  "lastRun": "2026-11-26T04:38:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:28:53.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:36 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T20:37:32.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T20:38:50.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:47 UTC) (will retry)",
@@ -2969,6 +2984,16 @@
    "at": "2026-11-26T03:59:29.000Z",
    "msg": "opened sell USDCHF 0.08 lot (council eqx-fade)",
    "trade": "eqx:fade:usdchf:fade-m15-s1795662900"
+  },
+  {
+   "at": "2026-11-26T04:38:03.000Z",
+   "msg": "AUDUSD position 51570276 closed at the broker",
+   "trade": "eqx:fade:audusd:fade-m15-s1795660200"
+  },
+  {
+   "at": "2026-11-26T04:38:03.000Z",
+   "msg": "opened buy NZDUSD 0.12 lot (council eqx-fade)",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795665600"
   }
  ],
  "limits": {
@@ -3064,9 +3089,9 @@
   ]
  },
  "execution": {
-  "n": 18,
-  "meanSlipR": 0.193,
-  "medianSlipR": 0.258,
+  "n": 19,
+  "meanSlipR": 0.233,
+  "medianSlipR": 0.319,
   "worstSlipR": 1.352,
   "medianLagSec": 29,
   "bySymbol": {
@@ -3075,8 +3100,8 @@
     "meanSlipR": 0.479
    },
    "NZDUSD": {
-    "n": 1,
-    "meanSlipR": -0.616
+    "n": 2,
+    "meanSlipR": 0.161
    },
    "USDJPY": {
     "n": 3,
