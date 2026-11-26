@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { IDS, RULES, RISK, MAX_RISK, LOOK_UNTIL, signalAt, frame, inferExit, step } from '../council/nq-demo.mjs';
+import { IDS as ALL_IDS, RULES, RISK, MAX_RISK, LOOK_UNTIL, UJ, MARKETS, usdPerUnit, signalAt, frame, inferExit, step } from '../council/nq-demo.mjs';
+import { G as UJ_G } from '../research/edge/usdjpy-brk-exec/orders.mjs';
+const IDS = ['l1', 'l5'];   // the Nasdaq rules; the USD/JPY rule (uj) has its own test below
 import { PT, relative } from '../council/ctrader-mirror.mjs';
 import { NQ1_LEADS } from '../council/edge-desks-2.mjs';
 import { prep, toArrays } from '../research/edge/auto-researcher/engine.mjs';
@@ -20,7 +22,7 @@ const DALL = arr(ALL);
 const fires = (id, lo = 900) => { const out = []; for (let i = lo; i < ALL.length - 2; i++) if (signalAt(DALL, RULES[id].g, i, ALL[i + 1][0])) out.push(i); return out; };
 
 test('the rules are the frozen l1 and l5 genomes, long only, each with a stop distance and a target', () => {
-  assert.deepEqual(IDS, ['l1', 'l5']); assert.equal(RISK, 0.01); assert.equal(MAX_RISK, 0.01);
+  assert.deepEqual(ALL_IDS, ['l1', 'l5', 'uj']); assert.equal(RISK, 0.01); assert.equal(MAX_RISK, 0.01);
   for (const id of IDS) { const L = NQ1_LEADS.find((x) => x.id === id); assert.deepEqual(RULES[id].g, L.g); assert.equal(L.g.side, 'long'); assert.ok(L.g.stop > 0 && L.g.rr > 0 && L.g.hold > 0); assert.equal(RULES[id].label, `nq-${id}`); }
 });
 test('the signal is the study\'s: every order of orders() is a signal with the same stop distance, and a signal with no position open is an order', () => {
@@ -72,7 +74,7 @@ function setup(cfg) { const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'nq-'));
 // the feed at second `sec` of the hour that follows signal bar i: closed candles up to i and the forming candle, flat at its open
 const feedAt = (i, upto = i + 1) => async () => ALL.slice(Math.max(0, upto - 900), upto + 1).map((r, k, a) => (k === a.length - 1 ? [r[0], r[1], r[1] + 1, r[1] - 1, r[1]] : r));
 const file = (dir) => JSON.parse(fs.readFileSync(path.join(dir, 'nq', 'trades.json'), 'utf8'));
-const go = (dir, b, t, bars, extra = {}) => step({ env: ENV, dir, WS: b.WS, clock: () => t * 1000, bars, log: () => {}, pause: async () => {}, ...extra });
+const go = (dir, b, t, bars, extra = {}) => step({ env: ENV, dir, WS: b.WS, clock: () => t * 1000, bars: (now, mk) => (mk === 'nas100' ? bars(now) : []), log: () => {}, pause: async () => {}, ...extra });   // the seeded market is the Nasdaq; USD/JPY has no candles in these tests
 const news = (b) => b.sent.filter((m) => m.payloadType === PT.NEW_ORDER_REQ).map((m) => m.payload);
 // a bar where l1 fires and l5 does not, so one order is expected
 const I1 = fires('l1').find((i) => !signalAt(DALL, RULES.l5.g, i, ALL[i + 1][0]));
@@ -143,4 +145,21 @@ test('one position at a time a rule; a position the broker closed is booked from
 test('wiring: the loop runs it each round and quick pass, the health list knows its file', () => {
   const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8'); assert.equal((yml.match(/timeout 45 node council\/nq-demo\.mjs data \|\| echo/g) || []).length, 2);
   assert.match(fs.readFileSync(new URL('../council/datahealth.mjs', import.meta.url), 'utf8'), /nq\/trades\.json/);
+});
+
+test('the USD/JPY rule (uj): the study genome, 2 % a trade, yen sizing, and it only fires on a Tuesday-to-Thursday morning breakout above the 200-hour average', () => {
+  assert.deepEqual(UJ.g, UJ_G); assert.equal(RULES.uj, UJ); assert.equal(UJ.risk, 0.02); assert.equal(UJ.maxRisk, 0.02); assert.equal(UJ.symbol, 'USDJPY'); assert.equal(UJ.label, 'nq-uj'); assert.deepEqual(MARKETS, ['nas100', 'usdjpy']);
+  assert.ok(UJ.g.stop > 0 && UJ.g.rr > 0 && UJ.g.side === 'long');
+  // one unit of USD/JPY loses `dist` yen = dist / price dollars; a Nasdaq unit loses a dollar a point
+  assert.ok(Math.abs(usdPerUnit('usdjpy', 0.54, 150) - 0.0036) < 1e-12); assert.equal(usdPerUnit('nas100', 80, 24000), 80);
+  // $10,000 at 2 % with a 0.54 stop at 150: 200 / 0.0036 = 55,555 units
+  assert.equal(Math.floor(10000 * 0.02 / usdPerUnit('usdjpy', 0.54, 150)), 55555);
+  const rows = []; let px = 150, sd = 7; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+  for (let k = 0; k < 2500; k++) { const o = px; px += (r() - 0.46) * 0.12; rows.push({ t: T0 + k * H, o, h: Math.max(o, px) + r() * 0.03, l: Math.min(o, px) - r() * 0.03, c: px }); }
+  const D = prep(toArrays(rows), 'usdjpy'); let n = 0;
+  for (let i = 300; i < D.n - 1; i++) { const sg = signalAt(D, UJ.g, i, D.t[i + 1]); if (!sg) continue; n++;
+    const d = new Date(D.t[i + 1] * 1000); assert.ok([2, 3, 4].includes(d.getUTCDay())); assert.ok(d.getUTCHours() >= 7 && d.getUTCHours() < 13); assert.equal(sg.side, 1);
+    let hi = -Infinity; for (let k = i - 10; k < i; k++) hi = Math.max(hi, D.h[k]); assert.ok(D.c[i] > hi); assert.ok(sg.dist > 0 && sg.rr === 3 && sg.hold === 8); }
+  assert.ok(n > 5, 'the seeded market gives signals (' + n + ')');
+  const src = fs.readFileSync(new URL('../council/nq-demo.mjs', import.meta.url), 'utf8'); assert.match(src, /R\.symbol \+ ' is not offered on this account'/); assert.match(src, /barsFn\(now, mk\)/);
 });
