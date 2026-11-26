@@ -1812,7 +1812,7 @@
     "lots": 0.1,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T18:35:26.000Z",
     "councilEntry": 0.66325,
     "stop": 0.663586,
@@ -1825,10 +1825,12 @@
     "slipR": 0.417,
     "lagSec": 326,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T18:35:26.000Z",
-    "brokerStop": 0.66357
+    "brokerStop": 0.66357,
+    "closedAt": "2026-11-26T21:23:40.000Z"
    },
    "eqx:fade:eurjpy:fade-m15-b1795720500": {
     "positionId": "51642523",
@@ -1960,10 +1962,9 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 461.57,
+   "lastBalance": 456.57,
    "ids": [
     "51608452",
-    "51640396",
     "51642523",
     "51642524",
     "51642525",
@@ -1973,7 +1974,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 461.57 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 456.57 · 5 open",
   "skipped": {
    "eqx:fade:usdjpy:fade-m15-b1795725000": "stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set"
   },
@@ -2004,15 +2005,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 461.57,
-  "lastRun": "2026-11-26T21:20:19.000Z"
+  "balance": 456.57,
+  "lastRun": "2026-11-26T21:23:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T12:52:44.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28063.92 -> 28066.13 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T13:54:27.000Z",
    "msg": "moved NAS100 48212677 protection: stop 28066.13 -> 28074.94 (council ict-A)",
@@ -3497,6 +3493,11 @@
    "at": "2026-11-26T20:33:14.000Z",
    "msg": "not mirrored eqx:fade:usdjpy:fade-m15-b1795725000: stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set",
    "trade": "eqx:fade:usdjpy:fade-m15-b1795725000"
+  },
+  {
+   "at": "2026-11-26T21:23:40.000Z",
+   "msg": "AUDUSD position 51640396 closed at the broker",
+   "trade": "eqx:fvg:audusd:fvg-h1-s1795712400-1795717800"
   }
  ],
  "limits": {
