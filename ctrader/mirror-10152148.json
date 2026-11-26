@@ -6702,7 +6702,7 @@
     "lots": 6.28,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-26T20:40:50.000Z",
     "councilEntry": 0.83428,
     "stop": 0.834535,
@@ -6715,10 +6715,15 @@
     "slipR": 0.157,
     "lagSec": 50,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T20:40:50.000Z",
-    "brokerStop": 0.83457
+    "brokerStop": 0.83457,
+    "closedAt": "2026-11-26T22:06:12.000Z",
+    "exitPrice": 0.83431,
+    "councilExit": 0.83396,
+    "councilR": 1.255
    },
    "boxfade:usdjpy:boxfade-m5-s1795726800": {
     "positionId": "51647446",
@@ -6786,7 +6791,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12244.8 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 12244.8 · 6 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6795,14 +6800,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12244.8,
-  "lastRun": "2026-11-26T22:02:03.000Z"
+  "lastRun": "2026-11-26T22:06:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T21:41:48.000Z",
-   "msg": "not mirrored yet xrp-replica-1794433267-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "xrp-replica-1794433267-s"
-  },
   {
    "at": "2026-11-11T21:41:48.000Z",
    "msg": "not mirrored yet audusd-replica-1794433267-b: daily loss stop (44.6% down today) (will retry)",
@@ -8291,6 +8291,11 @@
    "at": "2026-11-26T21:47:24.000Z",
    "msg": "opened buy NZDUSD 9.6 lot (council boxfade)",
    "trade": "boxfade:nzdusd:boxfade-m5-b1795729500"
+  },
+  {
+   "at": "2026-11-26T22:06:12.000Z",
+   "msg": "closed USDCHF position 51647375 (council: target)",
+   "trade": "boxfade:usdchf:boxfade-m5-s1795725600"
   }
  ],
  "limits": {

@@ -1866,7 +1866,7 @@
     "lots": 0.24,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T19:16:39.000Z",
     "councilEntry": 1.42486,
     "stop": 1.425209,
@@ -1879,10 +1879,12 @@
     "slipR": -0.258,
     "lagSec": 99,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T19:16:39.000Z",
-    "brokerStop": 1.42522
+    "brokerStop": 1.42522,
+    "closedAt": "2026-11-26T22:06:08.000Z"
    },
    "eqx:fvg:usdjpy:fvg-h1-b1795712400-1795720500": {
     "positionId": "51642525",
@@ -1964,10 +1966,9 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 443.15,
+   "lastBalance": 435.86,
    "ids": [
     "51608452",
-    "51642524",
     "51642525",
     "51644179"
    ],
@@ -1975,7 +1976,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 443.15 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 435.86 · 3 open",
   "skipped": {
    "eqx:fade:usdjpy:fade-m15-b1795725000": "stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set"
   },
@@ -2006,15 +2007,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 443.15,
-  "lastRun": "2026-11-26T22:01:59.000Z"
+  "balance": 435.86,
+  "lastRun": "2026-11-26T22:06:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T14:38:41.000Z",
-   "msg": "XAUUSD position 48239176 closed at the broker",
-   "trade": "ict:gc-b-1794351600"
-  },
   {
    "at": "2026-11-11T14:50:19.000Z",
    "msg": "moved NAS100 48212677 protection: stop 28074.94 -> 28094.76 (council ict-A)",
@@ -3499,6 +3495,11 @@
    "at": "2026-11-26T22:01:59.000Z",
    "msg": "EURJPY position 51642523 closed at the broker",
    "trade": "eqx:fade:eurjpy:fade-m15-b1795720500"
+  },
+  {
+   "at": "2026-11-26T22:06:08.000Z",
+   "msg": "USDCAD position 51642524 closed at the broker",
+   "trade": "eqx:fade:usdcad:fade-m15-s1795720500"
   }
  ],
  "limits": {
