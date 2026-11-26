@@ -1172,6 +1172,32 @@
     ],
     "stopCheckedAt": "2026-11-26T00:00:47.000Z",
     "brokerStop": 1.42022
+   },
+   "eqx:fade:eurusd:fade-m15-b1795650300": {
+    "positionId": "51562647",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 1000000,
+    "lots": 0.1,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T00:07:58.000Z",
+    "councilEntry": 1.09708,
+    "stop": 1.096837,
+    "t1": 1.097566,
+    "riskCash": 4.82,
+    "margin": 21.95,
+    "mark": 1.09728,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09728,
+    "slipR": 0.823,
+    "lagSec": 1378,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T00:07:58.000Z",
+    "brokerStop": 1.09684
    }
   },
   "day": {
@@ -1182,10 +1208,10 @@
     "51562052"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 481.77 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 481.77 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:audusd:fvg-h1-s1795579200-1795629600": {
@@ -1230,14 +1256,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 481.77,
-  "lastRun": "2026-11-26T00:03:27.000Z"
+  "lastRun": "2026-11-26T00:07:58.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T18:59:23.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T19:01:31.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 19:09 UTC) (will retry)",
@@ -2722,6 +2743,11 @@
    "at": "2026-11-26T00:00:47.000Z",
    "msg": "opened buy USDCAD 0.05 lot (council eqx-fvg)",
    "trade": "eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500"
+  },
+  {
+   "at": "2026-11-26T00:07:58.000Z",
+   "msg": "opened buy EURUSD 0.1 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795650300"
   }
  ],
  "limits": {
@@ -2817,9 +2843,9 @@
   ]
  },
  "execution": {
-  "n": 8,
-  "meanSlipR": 0.404,
-  "medianSlipR": 0.432,
+  "n": 9,
+  "meanSlipR": 0.45,
+  "medianSlipR": 0.534,
   "worstSlipR": 1.352,
   "medianLagSec": 27,
   "bySymbol": {
@@ -2836,8 +2862,8 @@
     "meanSlipR": 1.352
    },
    "EURUSD": {
-    "n": 1,
-    "meanSlipR": 0.319
+    "n": 2,
+    "meanSlipR": 0.571
    },
    "XAUUSD": {
     "n": 1,
