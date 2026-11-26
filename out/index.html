@@ -5909,6 +5909,8 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
    (and --mm-h for Markets side by side), so the charts end at the bottom of the window on every screen: phone, phone on its
    side, tablet, desktop, with or without the paper bar or an open phase strip. No fixed numbers. Not for guests, not in full screen. */
 html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4.ms-grid4 .ms-chart { height: var(--ch-h, 420px) !important; min-height: 0 !important; max-height: none !important; }
+/* Layout with three charts: the big one spans both rows, so its chart is two charts and the gap between them tall */
+@media (min-width: 901px) { html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4.ms-grid4[data-view="lay"][data-lay-n="3"] .ms-pane[data-lay-i="0"] .ms-chart { height: var(--ch-h2, var(--ch-h, 420px)) !important; } }
 html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .mm.mm .mm-chart { height: var(--mm-h, 380px) !important; min-height: 0 !important; }
 html[data-chfit][data-view="charts"]:not([data-role="public"]) .foot { display: none; }
 /* the space between the toolbar, the phase strip and the charts is one small step (the view is a grid: its row gap also
@@ -5983,8 +5985,10 @@ html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fu
   #v-charts .sec-h > #ms-phase:not([open]), #v-charts .sec-h > #ms-phase:not([open]) > summary { max-width: 132px; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h::after { display: none; }   /* the older forced break before Style: one row now */
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sty.sty { order: 4; }
-  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn { order: 4; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(#ms-sa-btn, #ms-jr-btn) { order: 4; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl, html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn .sa-bl { display: none; }   /* icons: "Log a call" wrapped to a second row */
 }
+@media (min-width: 1440px) and (max-width: 1799px) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl { display: none; } }   /* "Log a call" as its icon: it wrapped the toolbar */
 /* Watchlist (desktop, 1280 px and up): every market with its price and its change on the day, beside the chart. A row opens
    that market. Its Hide button folds it to a tab at the right edge; the choice stays on this device. */
 #ms-wlp, #ms-wlp-btn { display: none; }
@@ -16290,10 +16294,13 @@ function msNextSetup(bars, A) {
     const pad = reserve ? 6 : 10, narrow = innerWidth <= 900, short = win <= 560;
     const set = {};
     if (vis(grid)) {
-      const pane = [...grid.querySelectorAll('.ms-pane')].find(vis), ch = pane && pane.querySelector('.ms-chart');
+      // the pane with the least around its chart: a pane that spans two rows (Layout with three charts) is taller than its chart
+      const ps = [...grid.querySelectorAll('.ms-pane')].filter(vis).map((p) => [p, p.querySelector('.ms-chart')]).filter((x) => x[1]).sort((a, b) => (a[0].offsetHeight - a[1].offsetHeight) - (b[0].offsetHeight - b[1].offsetHeight));
+      const pane = ps.length ? ps[0][0] : null, ch = pane && ps[0][1];
       if (pane && ch) {
-        const r = heightFor({ win, top: grid.getBoundingClientRect().top + y, reserve, pad, gap: parseFloat(getComputedStyle(grid).rowGap) || 0, chrome: pane.offsetHeight - ch.offsetHeight, rows: rowsOf(grid.dataset.view, +grid.dataset.layN || 1, narrow), minOne: short ? 170 : 260, minHalf: short ? 150 : 200 });
-        set['--ch-h'] = r.h + 'px'; set['--ch-av'] = Math.max(300, r.av) + 'px';
+        const gap = parseFloat(getComputedStyle(grid).rowGap) || 0, chrome = Math.max(0, pane.offsetHeight - ch.offsetHeight);
+        const r = heightFor({ win, top: grid.getBoundingClientRect().top + y, reserve, pad, gap, chrome, rows: rowsOf(grid.dataset.view, +grid.dataset.layN || 1, narrow), minOne: short ? 170 : 260, minHalf: short ? 150 : 200 });
+        set['--ch-h'] = r.h + 'px'; set['--ch-av'] = Math.max(300, r.av) + 'px'; set['--ch-h2'] = (r.h * 2 + gap + chrome) + 'px';
       }
     }
     const mm = document.getElementById('ms-mm'), mg = mm && mm.querySelector('.mm-g'), cell = mg && [...mg.children].find(vis), mc = cell && cell.querySelector('.mm-chart');

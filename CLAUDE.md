@@ -2642,6 +2642,10 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   line saying to scroll left for more), **Auto** (fit the price scale), **Log** and **%** (the chart library's price-scale modes 1 and 2 on EVERY
   chart; one display preference `ms-scale-mode`; Log keeps Settings' `#ms-show-log` box in step). Up to 640 px the group is one "…" button that
   opens the rest. Appended to the chart's PARENT (the drawing layer captures presses inside the chart element). Not for guests.
+- **Layout with three charts** (26 Nov 2026, owner's screenshot): the fit measured the first pane, which spans two rows there and is taller than
+  its chart, so every chart came out about a quarter of the window. It now reads the pane with the least around its chart, and the big chart is
+  `--ch-h2` (two charts and the gap) tall. "Log a call" and "Structure" are icons at 1180-1439 px and "Log a call" up to 1799 px (they wrapped
+  the toolbar to a second row).
 - **Market switch without the wait** (26 Nov 2026, the next step toward a main chart app): a market link (`a[href^="?s="]`, the watchlist, the
   market list, Home, the wheel bar through `window.msGoMarket(k, hash)`) still loads the page again (so every stream, level and record belongs to
   the new market), but `<script id="ms-swap-js">` reads that market's candles for the six analysed timeframes while the pointer rests on the link

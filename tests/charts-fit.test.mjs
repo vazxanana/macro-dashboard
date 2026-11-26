@@ -109,3 +109,10 @@ test('on-chart controls: display only, one display preference, not for guests, r
   for (const label of ['Back to the latest candle', 'Go to a date', 'Fit the price scale']) assert.ok(cnJs.includes(label), label);
   assert.match(cnJs, /MODES = \{ n: 0, log: 1, pct: 2 \}/);   // the chart library's Normal, Logarithmic, Percentage
 });
+
+test('Layout with three charts: the fit reads the pane with the least around its chart, and the big chart spans both rows', () => {
+  assert.match(page, /\.sort\(\(a, b\) => \(a\[0\]\.offsetHeight - a\[1\]\.offsetHeight\) - \(b\[0\]\.offsetHeight - b\[1\]\.offsetHeight\)\)/);
+  assert.match(page, /set\['--ch-h2'\] = \(r\.h \* 2 \+ gap \+ chrome\) \+ 'px'/);
+  assert.match(page, /\[data-view="lay"\]\[data-lay-n="3"\] \.ms-pane\[data-lay-i="0"\] \.ms-chart \{ height: var\(--ch-h2, var\(--ch-h, 420px\)\) !important; \}/);
+  assert.match(page, /#ms-jr-btn \.jr-bl[^}]*\{ display: none; \}/);
+});
