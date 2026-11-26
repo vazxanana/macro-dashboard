@@ -1183,7 +1183,7 @@
     "lots": 0.1,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T00:07:58.000Z",
     "councilEntry": 1.09708,
     "stop": 1.096837,
@@ -1196,10 +1196,12 @@
     "slipR": 0.823,
     "lagSec": 1378,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T00:07:58.000Z",
-    "brokerStop": 1.09684
+    "brokerStop": 1.09684,
+    "closedAt": "2026-11-26T01:30:08.000Z"
    },
    "eqx:fade:eurjpy:fade-m15-b1795653000": {
     "positionId": "51565707",
@@ -1333,9 +1335,8 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 477.27,
+   "lastBalance": 472.37,
    "ids": [
-    "51562647",
     "51567421",
     "51567422"
    ],
@@ -1343,7 +1344,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 477.27 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 472.37 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fade:gbpusd:fade-m15-s1795631400": {
@@ -1372,15 +1373,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 477.27,
-  "lastRun": "2026-11-26T01:27:39.000Z"
+  "balance": 472.37,
+  "lastRun": "2026-11-26T01:30:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T19:55:02.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T19:55:30.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:05 UTC) (will retry)",
@@ -2865,6 +2861,11 @@
    "at": "2026-11-26T01:24:47.000Z",
    "msg": "opened buy EURJPY 0.02 lot (council eqx-fvg)",
    "trade": "eqx:fvg:eurjpy:fvg-h1-b1795633200-1795653900"
+  },
+  {
+   "at": "2026-11-26T01:30:08.000Z",
+   "msg": "EURUSD position 51562647 closed at the broker",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795650300"
   }
  ],
  "limits": {
