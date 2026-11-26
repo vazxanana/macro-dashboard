@@ -2,34 +2,34 @@
  "version": "auto-1",
  "worker": 3,
  "started": "2026-11-25T12:13:54.050Z",
- "tries": 6353800,
- "survivedA": 7833,
- "candidates": 1166,
- "cLooks": 71,
+ "tries": 6560000,
+ "survivedA": 8098,
+ "candidates": 1216,
+ "cLooks": 72,
  "cPasses": 0,
  "groups": {
   "eurusd|big+|both": {
-   "more": 130,
+   "more": 139,
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 100,
+   "more": 103,
    "pass": false
   },
   "eurjpy|blk-|both": {
-   "more": 205,
+   "more": 213,
    "pass": false
   },
   "eurjpy|big-|both": {
-   "more": 15,
+   "more": 16,
    "pass": false
   },
   "usdchf|big+|both": {
-   "more": 53,
+   "more": 55,
    "pass": false
   },
   "usdjpy|blk-|short": {
-   "more": 10,
+   "more": 11,
    "pass": false
   },
   "eurjpy|big+|both": {
@@ -37,7 +37,7 @@
    "pass": true
   },
   "usdchf|blk-|both": {
-   "more": 39,
+   "more": 40,
    "pass": true
   },
   "eurusd|big+|long": {
@@ -49,11 +49,11 @@
    "pass": false
   },
   "usdchf|big+|short": {
-   "more": 22,
+   "more": 23,
    "pass": false
   },
   "nzdusd|blk-|both": {
-   "more": 45,
+   "more": 48,
    "pass": false
   },
   "xau|big-|both": {
@@ -61,7 +61,7 @@
    "pass": true
   },
   "gbpusd|blk-|both": {
-   "more": 29,
+   "more": 32,
    "pass": false
   },
   "audusd|blk-|both": {
@@ -69,15 +69,15 @@
    "pass": false
   },
   "eurusd|blk-|both": {
-   "more": 10,
+   "more": 11,
    "pass": false
   },
   "eurjpy|blk+|both": {
-   "more": 13,
+   "more": 14,
    "pass": false
   },
   "usdcad|big-|both": {
-   "more": 39,
+   "more": 41,
    "pass": false
   },
   "usdchf|blk-|long": {
@@ -85,7 +85,7 @@
    "pass": true
   },
   "eurjpy|blk-|short": {
-   "more": 18,
+   "more": 19,
    "pass": true
   },
   "gbpusd|big-|short": {
@@ -117,7 +117,7 @@
    "pass": false
   },
   "xau|big+|long": {
-   "more": 44,
+   "more": 49,
    "pass": false
   },
   "usdjpy|big+|both": {
@@ -129,7 +129,7 @@
    "pass": false
   },
   "audusd|blk-|short": {
-   "more": 23,
+   "more": 24,
    "pass": false
   },
   "usdjpy|big-|both": {
@@ -141,7 +141,7 @@
    "pass": false
   },
   "eurjpy|big+|short": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurjpy|big-|long": {
@@ -185,7 +185,7 @@
    "pass": false
   },
   "gbpusd|big-|both": {
-   "more": 10,
+   "more": 11,
    "pass": false
   },
   "usdjpy|sweep+|both": {
@@ -197,7 +197,7 @@
    "pass": false
   },
   "xau|big+|both": {
-   "more": 7,
+   "more": 9,
    "pass": false
   },
   "eurjpy|blk-|long": {
@@ -225,7 +225,7 @@
    "pass": false
   },
   "eurjpy|sweep-|both": {
-   "more": 5,
+   "more": 6,
    "pass": false
   },
   "nzdusd|blk-|short": {
@@ -277,7 +277,7 @@
    "pass": false
   },
   "eurjpy|blk+|long": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "nzdusd|sweep+|short": {
@@ -289,6 +289,10 @@
    "pass": false
   },
   "gbpusd|blk-|long": {
+   "more": 0,
+   "pass": false
+  },
+  "xau|sweep-|short": {
    "more": 0,
    "pass": false
   }
@@ -4167,9 +4171,68 @@
     "months": 79
    },
    "p": 0.83398
+  },
+  {
+   "at": "2026-11-26T12:14:38.715Z",
+   "group": "xau|sweep-|short",
+   "g": {
+    "mk": "xau",
+    "trig": [
+     {
+      "kind": "sweep",
+      "N": 10,
+      "follow": false
+     }
+    ],
+    "side": "short",
+    "hours": [
+     5,
+     11
+    ],
+    "dows": [
+     2,
+     3,
+     4
+    ],
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.3,
+    "stop": 1.5,
+    "rr": 1.5,
+    "hold": 48
+   },
+   "A": {
+    "n": 253,
+    "mean": 0.243,
+    "t": 3.08,
+    "win": 52.6,
+    "months": 86
+   },
+   "B": {
+    "n": 182,
+    "mean": 0.2298,
+    "t": 2.43,
+    "win": 52.7,
+    "months": 55
+   },
+   "placeboA": {
+    "n": 267,
+    "mean": -0.321,
+    "t": -4.34,
+    "win": 30,
+    "months": 86
+   },
+   "C": {
+    "n": 240,
+    "mean": 0.0271,
+    "t": 0.31,
+    "win": 42.9,
+    "months": 69
+   },
+   "p": 0.37828
   }
  ],
- "chunks": 27,
- "updated": "2026-11-26T11:58:29.242Z",
- "chanceCandidates": 578.2
+ "chunks": 28,
+ "updated": "2026-11-26T12:23:33.397Z",
+ "chanceCandidates": 597
 }
