@@ -438,7 +438,7 @@ function bubble(i, text, ms, talking) { if (!gl || !pods.length) return null; va
 function logEv(t) { feed.unshift(t); if (feed.length > 6) feed.pop(); var e = $('feed'); if (e) e.innerHTML = feed.map(function (x) { return '<li>' + x + '</li>'; }).join(''); }
 
 /* ── three.js: a cosy research office (wood floor, a rug, a window whose sky follows the visitor's clock, warm lamps, a coffee
-   corner, plants, a wall board with the live totals) and ten low-poly characters who decide for themselves what to do next ── */
+   corner, plants, a big results board on the wall) and ten low-poly characters who decide for themselves what to do next ── */
 var S, R, cam, pods = [], hits = [], v, clock, ray, mv, th = 0, ph = 1.0, dist = 21, zoomK = 1, auto = true, orbitDir = 1, idleAt = 0, drag = null, moved = 0, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches, gl = true, running = false, SW = 1, SH = 1;
 var camT, camD = 21, GEO = {}, MAT = {}, LIGHT = {}, sky, board;
 var XS = [-11.8, -9.2, -6.9, -4.6, -2.3, 0, 2.3, 4.6, 6.9, 9.2, 11.8], GAPS = [-6.9, -2.3, 2.3, 6.9], NODES = [], ADJ = [], NIDX = {}, bits = [];
@@ -504,9 +504,9 @@ function room() {
   var bc = [0xe0675a, 0x5fb3d9, 0xe8c25a, 0x8bc96a, 0xb48be0, 0xf1ede4, 0xe89a5a, 0x5fd1c4];
   for (k = 0; k < 14; k++) S.add(box(.2, .5 + (k * 7 % 3) * .08, .3, M(bc[k % 8]), -5.3 + k * .27, 1.36 + (k * 7 % 3) * .04, -9.5));
   /* the wall board with the live totals */
-  board = canvasTex(512, 288);
-  var bd = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 3.15), new THREE.MeshBasicMaterial({ map: board.t })); bd.position.set(4.4, 3.55, -9.92); S.add(bd);
-  S.add(box(5.9, 3.45, .1, M(0x2a2e38), 4.4, 3.55, -9.99));
+  board = canvasTex(1536, 768);                                        // the big results board of the office: totals and the strongest results, from the files
+  var bd = new THREE.Mesh(new THREE.PlaneGeometry(10.6, 5.3), new THREE.MeshBasicMaterial({ map: board.t })); bd.position.set(5.8, 4.1, -9.92); S.add(bd);
+  S.add(box(10.9, 5.6, .1, M(0x2a2e38), 5.8, 4.1, -9.99));
   /* coffee corner */
   var cof = new THREE.Group(); cof.position.set(-9.4, 0, -9.1); S.add(cof);
   cof.add(box(3.2, 1.05, 1, M(0x8a6a48), 0, .52, 0, true), box(3.4, .1, 1.15, M(0xe9e4da), 0, 1.1, 0), box(.9, .95, .7, M(0x2a2e38), -.7, 1.62, -.05, true), box(.5, .06, .4, M(0xb9bec6), -.7, 1.2, .25), box(.14, .14, .05, glow(0xff6a5a), -.45, 1.9, .31), cyl(.09, .18, M(0xf4f5f7), .3, 1.24, .1), cyl(.09, .18, M(0xf4f5f7), .58, 1.24, .22), cyl(.09, .18, M(0xe0675a), .88, 1.24, .05), box(2.4, .08, .5, M(0x7a5a3c), 0, 3.1, -.6), cyl(.12, .3, M(0x5fd1c4), -.7, 3.3, -.6), cyl(.12, .3, M(0xe8c25a), -.2, 3.3, -.6), cyl(.12, .3, M(0xe58fb8), .3, 3.3, -.6));
@@ -543,13 +543,27 @@ function skyPaint() {
   LIGHT.hemi.intensity = .62 + .36 * day; LIGHT.sun.intensity = .34 + .5 * day; LIGHT.l1.intensity = LIGHT.l2.intensity = 1.9 - 1.1 * day;
 }
 /* the wall board: the live totals, as the page shows them */
+function clip(x, t, w) { if (x.measureText(t).width <= w) return t; while (t.length > 3 && x.measureText(t + '…').width > w) t = t.slice(0, -1); return t + '…'; }
 function boardPaint() {
-  if (!board) return; var x = board.x;
-  x.fillStyle = '#f6f4ee'; x.fillRect(0, 0, 512, 288); x.fillStyle = '#16181c'; x.font = '700 30px sans-serif'; x.fillText('AGENT FARM', 24, 46);
-  x.font = '500 15px sans-serif'; x.fillStyle = '#5b616a'; x.fillText(VER.name ? 'research ' + VER.name + ' · live' : 'reading the files…', 26, 70);
-  var rows = [['rules tried', fmt(TOT.tries), '#16181c'], ['checks made', TOT.looks.toLocaleString(), '#16181c'], ['results', TOT.res.toLocaleString(), '#1f7a55'], ['lanes working', String(TOT.alive), '#2f5e9e']];
-  rows.forEach(function (r, k) { var cx = 24 + (k % 2) * 244, cy = 122 + Math.floor(k / 2) * 82; x.fillStyle = r[2]; x.font = '700 40px sans-serif'; x.fillText(r[1], cx, cy); x.fillStyle = '#5b616a'; x.font = '500 16px sans-serif'; x.fillText(r[0], cx, cy + 22); });
-  x.fillStyle = '#9a5b12'; x.font = '600 15px sans-serif'; x.fillText('results: a low bar, many are luck', 24, 270);
+  if (!board) return; var x = board.x, top = RES.slice(0, 7);
+  var k = [VER.name, fmt(TOT.tries), TOT.looks, TOT.res, TOT.alive, RES.length, top.map(function (r) { return r.ALL.t; }).join()].join('|'); if (k === board.k) return; board.k = k;   // painted only when something on it changed
+  x.fillStyle = '#f6f4ee'; x.fillRect(0, 0, 1536, 768); x.textBaseline = 'alphabetic'; x.textAlign = 'left';
+  x.fillStyle = '#16181c'; x.font = '700 54px sans-serif'; x.fillText('RESULTS BOARD', 44, 82);
+  x.font = '500 26px sans-serif'; x.fillStyle = '#5b616a'; x.fillText(VER.name ? 'research ' + VER.name + ' · live from the agents\' files' : 'reading the files…', 520, 80);
+  var tiles = [['rules tried', fmt(TOT.tries), '#16181c'], ['taken to a check', TOT.looks.toLocaleString(), '#16181c'], ['results', TOT.res.toLocaleString(), '#1f7a55'], ['lanes working', String(TOT.alive), '#2f5e9e']];
+  tiles.forEach(function (r, i) { var cx = 44 + i * 372; x.fillStyle = r[2]; x.font = '700 74px sans-serif'; x.fillText(r[1], cx, 186); x.fillStyle = '#5b616a'; x.font = '500 26px sans-serif'; x.fillText(r[0], cx, 222); });
+  x.fillStyle = '#d9d5ca'; x.fillRect(44, 250, 1448, 3);
+  x.font = '600 24px sans-serif'; x.fillStyle = '#5b616a'; x.fillText('#', 44, 292); x.fillText('MARKET', 96, 292); x.fillText('RULE', 330, 292); x.textAlign = 'right'; x.fillText('TRADES', 1080, 292); x.fillText('R A TRADE', 1250, 292); x.fillText('t', 1330, 292); x.textAlign = 'left'; x.fillText('BY', 1370, 292);
+  if (!top.length) { x.font = '500 34px sans-serif'; x.fillStyle = '#5b616a'; x.fillText('No results on file yet. The board fills as the agents save.', 96, 420); }
+  top.forEach(function (r, i) {
+    var y = 346 + i * 54; if (i % 2 === 0) { x.fillStyle = 'rgba(22,24,28,.045)'; x.fillRect(36, y - 38, 1464, 54); }
+    x.fillStyle = '#8a8f98'; x.font = '600 28px sans-serif'; x.fillText(String(i + 1), 44, y);
+    x.fillStyle = '#16181c'; x.font = '700 30px sans-serif'; x.fillText(clip(x, MKN[r.g.mk] || String(r.g.mk), 220), 96, y);
+    x.font = '500 27px sans-serif'; x.fillStyle = '#30343b'; x.fillText(clip(x, ruleText(r.g) + ', ' + sideText(r.g), 640), 330, y);
+    x.textAlign = 'right'; x.fillText((+r.ALL.n || 0).toLocaleString(), 1080, y); x.fillStyle = r.ALL.mean > 0 ? '#1f7a55' : '#30343b'; x.font = '700 28px sans-serif'; x.fillText((r.ALL.mean > 0 ? '+' : '') + num(r.ALL.mean, 3) + 'R', 1250, y); x.fillStyle = '#16181c'; x.fillText(num(r.ALL.t, 2), 1330, y); x.textAlign = 'left';
+    x.fillStyle = hex(COL[r.who]); x.beginPath(); x.arc(1382, y - 10, 10, 0, 6.3); x.fill(); x.fillStyle = '#30343b'; x.font = '500 27px sans-serif'; x.fillText(D[r.who].name, 1402, y);
+  });
+  x.fillStyle = '#9a5b12'; x.font = '600 25px sans-serif'; x.fillText('A result clears a low bar: about one random rule in forty does by luck. A list to look through, never an edge.', 44, 742);
   board.t.needsUpdate = true;
 }
 /* hair, hats, headphones, glasses: each of the ten is recognisably someone */
@@ -639,7 +653,7 @@ function choose(i) {
   else if (go === 'peek') plan = [{ do: 'look', ms: 2600 }, { do: 'sit', ms: ms }];
   else if (go === 'coffee') { logEv(nm + ' went for coffee ☕'); plan = [{ go: key('B', -9.2), to: new THREE.Vector3(-9.2 + rnd(-.7, .9), 0, -7.6), face: Math.PI }, { do: 'coffee', ms: 4200, fn: function (q, j) { if (Math.random() < .6) talk(j, pick(PT.coffee)); } }].concat(back(i)); }
   else if (go === 'cooler') { logEv(nm + ' visits the water cooler'); plan = [{ go: key('B', 0), to: new THREE.Vector3(.45, 0, -7.9), face: Math.PI }, { do: 'cooler', ms: 3200 }].concat(back(i)); }
-  else if (go === 'board') { logEv(nm + ' is at the wall board 📝'); plan = [{ go: key('B', 4.6), to: new THREE.Vector3(4.4 + rnd(-1, 1), 0, -8.3), face: Math.PI }, { do: 'board', ms: 5200, fn: function (q, j) { talk(j, lineFor(j, 'board')); } }].concat(back(i)); }
+  else if (go === 'board') { logEv(nm + ' is at the wall board 📝'); plan = [{ go: key('B', 4.6), to: new THREE.Vector3(5.8 + rnd(-3, 3), 0, -8.3), face: Math.PI }, { do: 'board', ms: 5200, fn: function (q, j) { talk(j, lineFor(j, 'board')); } }].concat(back(i)); }
   else if (go === 'dance') { logEv(nm + ' is dancing 🕺'); plan = [{ do: 'dance', ms: 4800 }, { do: 'sit', ms: ms }]; }
   else if (go === 'nap') {
     if (Math.random() < .55) { logEv(nm + ' naps on the sofa 💤'); plan = [{ go: key('B', 9.2), to: new THREE.Vector3(9.6 + rnd(-1, 1), 0, -7.6), face: 0 }, { do: 'sofa', ms: rnd(9000, 16000), fn: function (q, j) { if (Math.random() < .5) talk(j, pick(PT.sleep)); } }].concat(back(i)); }
