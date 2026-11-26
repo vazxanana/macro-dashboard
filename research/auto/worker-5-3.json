@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T11:14:23.953Z",
- "tries": 4345000,
- "survivedA": 1176,
- "candidates": 159,
- "cLooks": 83,
+ "tries": 4506600,
+ "survivedA": 1218,
+ "candidates": 165,
+ "cLooks": 86,
  "cPasses": 0,
  "groups": {
   "usdchf|eg-&eg-|short": {
@@ -81,7 +81,7 @@
    "pass": false
   },
   "eurusd|dev+&big+|both": {
-   "more": 10,
+   "more": 11,
    "pass": false
   },
   "usdjpy|eg+&eg+|short": {
@@ -113,7 +113,7 @@
    "pass": false
   },
   "xau|big+&brk|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|brk&big+|both": {
@@ -241,7 +241,7 @@
    "pass": false
   },
   "eurusd|big+&big+|long": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdcad|fade&dev+|both": {
@@ -339,6 +339,18 @@
   "audusd|fade&fade|both": {
    "more": 0,
    "pass": true
+  },
+  "eurusd|eg-&dev+|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurjpy|eg-&eg-|short": {
+   "more": 0,
+   "pass": false
+  },
+  "usdcad|dev+&fade|both": {
+   "more": 0,
+   "pass": false
   }
  },
  "leads": [],
@@ -5249,9 +5261,184 @@
     "months": 76
    },
    "p": 0.0044
+  },
+  {
+   "at": "2026-11-26T06:00:37.185Z",
+   "group": "eurusd|eg-&dev+|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "eg",
+      "follow": false
+     },
+     {
+      "kind": "dev",
+      "n": 20,
+      "z": 2,
+      "follow": true
+     }
+    ],
+    "side": "both",
+    "hours": null,
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 1,
+    "rr": 1,
+    "hold": 240
+   },
+   "A": {
+    "n": 313,
+    "mean": 0.2103,
+    "t": 3.79,
+    "win": 62.3,
+    "months": 110
+   },
+   "B": {
+    "n": 154,
+    "mean": 0.1228,
+    "t": 1.61,
+    "win": 58.4,
+    "months": 57
+   },
+   "placeboA": {
+    "n": 313,
+    "mean": -0.2845,
+    "t": -5.25,
+    "win": 37.4,
+    "months": 110
+   },
+   "C": {
+    "n": 187,
+    "mean": 0.0224,
+    "t": 0.33,
+    "win": 54,
+    "months": 74
+   },
+   "p": 0.3707
+  },
+  {
+   "at": "2026-11-26T06:03:20.084Z",
+   "group": "eurjpy|eg-&eg-|short",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "eg",
+      "follow": false
+     },
+     {
+      "kind": "eg",
+      "follow": false
+     }
+    ],
+    "side": "short",
+    "hours": [
+     22,
+     0
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 3,
+    "rr": 3,
+    "hold": 12
+   },
+   "A": {
+    "n": 420,
+    "mean": 0.1298,
+    "t": 3.22,
+    "win": 54,
+    "months": 118
+   },
+   "B": {
+    "n": 167,
+    "mean": 0.0967,
+    "t": 1.72,
+    "win": 55.1,
+    "months": 56
+   },
+   "placeboA": {
+    "n": 420,
+    "mean": -0.1354,
+    "t": -3.84,
+    "win": 41,
+    "months": 118
+   },
+   "C": {
+    "n": 229,
+    "mean": -0.0534,
+    "t": -0.95,
+    "win": 45.9,
+    "months": 76
+   },
+   "p": 0.82894
+  },
+  {
+   "at": "2026-11-26T06:12:42.707Z",
+   "group": "usdcad|dev+&fade|both",
+   "g": {
+    "mk": "usdcad",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 50,
+      "z": 2,
+      "follow": true
+     },
+     {
+      "kind": "fade",
+      "N": 5
+     }
+    ],
+    "side": "both",
+    "hours": [
+     18,
+     6
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 2,
+    "rr": 0.5,
+    "hold": 96
+   },
+   "A": {
+    "n": 366,
+    "mean": 0.1428,
+    "t": 4.39,
+    "win": 77.9,
+    "months": 115
+   },
+   "B": {
+    "n": 159,
+    "mean": 0.1296,
+    "t": 2.63,
+    "win": 76.7,
+    "months": 53
+   },
+   "placeboA": {
+    "n": 371,
+    "mean": -0.1396,
+    "t": -3.7,
+    "win": 59,
+    "months": 115
+   },
+   "C": {
+    "n": 243,
+    "mean": 0.0162,
+    "t": 0.4,
+    "win": 69.5,
+    "months": 78
+   },
+   "p": 0.34458
   }
  ],
- "chunks": 29,
- "updated": "2026-11-26T05:57:09.046Z",
- "chanceCandidates": 395.4
+ "chunks": 30,
+ "updated": "2026-11-26T06:22:13.415Z",
+ "chanceCandidates": 410.1
 }
