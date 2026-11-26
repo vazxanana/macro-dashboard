@@ -137,6 +137,11 @@ jobs:
             # "You have unstaged changes"), clears a half-done rebase, and on a conflict keeps the council-data copy of that file
             node council/datasync.mjs data pull || true
             # (17 Nov 2026: the never-installed VPS live runner and its heartbeat check are gone; this loop always runs the Trader)
+            # The Equinox desks whose records are COPIED to demo accounts (26 Nov 2026, owner: "We need to fix these delays and late
+            # entries"): read every round and every quick pass, BEFORE the Trader and the mirror, so a desk fill reaches its demo
+            # account within about a minute (they were read every 3rd round, and the copies went out 17 to 42 minutes late). Paper
+            # records only; about 6 s a run.
+            timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb || echo "Copied desks round $i failed"
             node council/trader.mjs data || echo "Trader round $i failed"
             # cTrader DEMO mirror (8 Nov, owner: "when he places a trade it must go instantly on ctrader"): the very next step after
             # the Trader, so a council fill or pending order reaches the demo within seconds of being recorded; nothing runs in between
@@ -213,6 +218,7 @@ jobs:
                 # markets again and the mirror copies what it recorded, so a setup reaches cTrader within about a minute. The heavy
                 # members keep the 5-minute round. Saved as its own commit; a failure never stops the loop.
                 node council/datasync.mjs data pull || true
+                timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb || echo "Copied desks quick pass $i failed"
                 node council/trader.mjs data || echo "Trader quick pass $i failed"
                 node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
                 timeout 45 node council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"
