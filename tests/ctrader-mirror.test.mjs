@@ -1204,7 +1204,7 @@ test('Big-candle fade book (25 Nov 2026): own ids, 5 % risk, own day stop, stop 
 
 test('Mosha 6R barrier book: no daily loss stop (owner, 25 Nov 2026), others keep theirs', () => {
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
-  assert.match(src, /!\/\^\(mosha6\|boxfade\):\/\.test\(String\(t\.id\)\) && dayDown >=/);
+  assert.match(src, /!\/\^\(mosha6\|boxfade\|eqx\|bfade\):\/\.test\(String\(t\.id\)\) && dayDown >=/);
   assert.equal(LIMITS.dayStop, 0.02);
 });
 import { boxfadeCandidates, boxfadeHasOwnAccount, EQX as EQX2 } from '../council/ctrader-mirror.mjs';
