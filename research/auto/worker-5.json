@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T00:36:22.851Z",
- "tries": 13184200,
- "survivedA": 3415,
- "candidates": 405,
- "cLooks": 133,
+ "tries": 13313000,
+ "survivedA": 3454,
+ "candidates": 409,
+ "cLooks": 134,
  "cPasses": 0,
  "groups": {
   "usdchf|eg-&dev-|both": {
@@ -17,7 +17,7 @@
    "pass": false
   },
   "eurusd|dev+&big+|both": {
-   "more": 16,
+   "more": 17,
    "pass": false
   },
   "usdchf|fade&big-|both": {
@@ -133,7 +133,7 @@
    "pass": false
   },
   "nzdusd|eg-&dev+|both": {
-   "more": 9,
+   "more": 10,
    "pass": false
   },
   "gbpusd|eg-&eg-|both": {
@@ -425,7 +425,7 @@
    "pass": false
   },
   "eurjpy|blk-&fade|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "audusd|dev-&dev-|short": {
@@ -537,6 +537,10 @@
    "pass": false
   },
   "eurusd|dev+&big+|long": {
+   "more": 0,
+   "pass": false
+  },
+  "usdchf|fade&eg-|both": {
    "more": 0,
    "pass": false
   }
@@ -8362,9 +8366,67 @@
     "months": 75
    },
    "p": 0.87493
+  },
+  {
+   "at": "2026-11-26T12:36:54.455Z",
+   "group": "usdchf|fade&eg-|both",
+   "g": {
+    "mk": "usdchf",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 5
+     },
+     {
+      "kind": "eg",
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     19,
+     1
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 3,
+    "rr": 2,
+    "hold": 4
+   },
+   "A": {
+    "n": 462,
+    "mean": 0.0575,
+    "t": 3.06,
+    "win": 58.2,
+    "months": 113
+   },
+   "B": {
+    "n": 189,
+    "mean": 0.0368,
+    "t": 1.71,
+    "win": 56.1,
+    "months": 59
+   },
+   "placeboA": {
+    "n": 462,
+    "mean": -0.0809,
+    "t": -4.27,
+    "win": 37,
+    "months": 113
+   },
+   "C": {
+    "n": 280,
+    "mean": -0.019,
+    "t": -0.93,
+    "win": 50,
+    "months": 80
+   },
+   "p": 0.82381
   }
  ],
- "chunks": 69,
- "updated": "2026-11-26T12:16:58.540Z",
- "chanceCandidates": 1199.8
+ "chunks": 70,
+ "updated": "2026-11-26T12:42:09.035Z",
+ "chanceCandidates": 1211.5
 }
