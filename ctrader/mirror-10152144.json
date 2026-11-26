@@ -1332,6 +1332,56 @@
     ],
     "stopCheckedAt": "2026-11-26T01:24:47.000Z",
     "brokerStop": 174.237
+   },
+   "eqx:fade:audusd:fade-m15-s1795660200": {
+    "positionId": "51570276",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 1400000,
+    "lots": 0.14,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T02:41:40.000Z",
+    "councilEntry": 0.66434,
+    "stop": 0.664921,
+    "t1": 0.663179,
+    "riskCash": 4.8,
+    "margin": 18.6,
+    "mark": 0.66459,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66453,
+    "slipR": -0.327,
+    "lagSec": 700,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T02:41:40.000Z",
+    "brokerStop": 0.66486
+   },
+   "eqx:fvg:eurjpy:fvg-h1-s1795658400-1795660200": {
+    "positionId": "51570277",
+    "symbol": "EURJPY",
+    "side": "sell",
+    "volume": 1100000,
+    "lots": 0.11,
+    "digits": 3,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-26T02:41:40.000Z",
+    "councilEntry": 174.59,
+    "stop": 174.653657,
+    "t1": 174.526343,
+    "riskCash": 4.8,
+    "margin": 24.13,
+    "fillPrice": 174.61,
+    "slipR": -0.314,
+    "lagSec": 700,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T02:41:40.000Z",
+    "brokerStop": 174.674
    }
   },
   "day": {
@@ -1342,10 +1392,10 @@
     "51567422"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 479.85 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 479.85 · 3 open",
   "skipped": {},
   "wait": {
    "eqx:fade:gbpusd:fade-m15-s1795631400": {
@@ -1375,19 +1425,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 479.85,
-  "lastRun": "2026-11-26T02:37:18.000Z"
+  "lastRun": "2026-11-26T02:41:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:05:43.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T20:07:08.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:15 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T20:16:07.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2867,6 +2907,16 @@
    "at": "2026-11-26T01:32:39.000Z",
    "msg": "USDJPY position 51567421 closed at the broker",
    "trade": "eqx:bigfade:usdjpy:bigfade-m15-s1795655700"
+  },
+  {
+   "at": "2026-11-26T02:41:40.000Z",
+   "msg": "opened sell AUDUSD 0.14 lot (council eqx-fade)",
+   "trade": "eqx:fade:audusd:fade-m15-s1795660200"
+  },
+  {
+   "at": "2026-11-26T02:41:40.000Z",
+   "msg": "opened sell EURJPY 0.11 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:eurjpy:fvg-h1-s1795658400-1795660200"
   }
  ],
  "limits": {
@@ -2962,9 +3012,9 @@
   ]
  },
  "execution": {
-  "n": 14,
-  "meanSlipR": 0.248,
-  "medianSlipR": 0.325,
+  "n": 16,
+  "meanSlipR": 0.177,
+  "medianSlipR": 0.256,
   "worstSlipR": 1.352,
   "medianLagSec": 27,
   "bySymbol": {
@@ -2993,8 +3043,12 @@
     "meanSlipR": 0.543
    },
    "EURJPY": {
-    "n": 2,
-    "meanSlipR": -0.245
+    "n": 3,
+    "meanSlipR": -0.268
+   },
+   "AUDUSD": {
+    "n": 1,
+    "meanSlipR": -0.327
    }
   }
  }
