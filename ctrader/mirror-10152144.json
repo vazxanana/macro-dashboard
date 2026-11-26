@@ -1317,7 +1317,7 @@
     "lots": 0.02,
     "digits": 3,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T01:24:47.000Z",
     "councilEntry": 174.522,
     "stop": 174.254343,
@@ -1328,10 +1328,12 @@
     "slipR": -0.064,
     "lagSec": 2387,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T01:24:47.000Z",
-    "brokerStop": 174.237
+    "brokerStop": 174.237,
+    "closedAt": "2026-11-26T09:24:09.000Z"
    },
    "eqx:fade:audusd:fade-m15-s1795660200": {
     "positionId": "51570276",
@@ -1473,15 +1475,13 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 463.4,
-   "ids": [
-    "51567422"
-   ],
+   "lastBalance": 466.67,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 463.4 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 466.67 · 0 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:nzdusd:fvg-h1-b1795633200-1795641300": {
@@ -1500,15 +1500,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 463.4,
-  "lastRun": "2026-11-26T09:22:40.000Z"
+  "balance": 466.67,
+  "lastRun": "2026-11-26T09:24:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T22:16:07.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 22:24 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T22:24:54.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2993,6 +2988,11 @@
    "at": "2026-11-26T08:25:14.000Z",
    "msg": "not mirrored yet eqx:fade:usdchf:fade-m15-s1795680000: daily loss stop (3.8% down today) (will retry)",
    "trade": "eqx:fade:usdchf:fade-m15-s1795680000"
+  },
+  {
+   "at": "2026-11-26T09:24:09.000Z",
+   "msg": "EURJPY position 51567422 closed at the broker",
+   "trade": "eqx:fvg:eurjpy:fvg-h1-b1795633200-1795653900"
   }
  ],
  "limits": {
