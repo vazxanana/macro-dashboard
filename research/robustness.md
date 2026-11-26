@@ -1,6 +1,6 @@
 # Robustness audit: which edges hold up?
 
-Generated 2026-11-26T17:07:30.128Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
+Generated 2026-11-26T19:34:45.462Z by `node research/robustness.mjs <council-data>`. Paper research only: no trading rule, config or tracker was changed. The owner decides on every flag below.
 
 ## Short answer
 
@@ -119,7 +119,7 @@ Generated 2026-11-26T17:07:30.128Z by `node research/robustness.mjs <council-dat
 
 ## Data
 
-- `ict/replay.json`: at 2026-11-26T13:52:26.899Z, from 2025-08-01
+- `ict/replay.json`: at 2026-11-26T17:19:22.065Z, from 2025-08-01
 - `research/replay-2w.json`: from 2022-12-27, to 2026-11-03
 - `backtest.json`: at 2026-11-26T12:56:55.918Z, from 2026-10-27T12:53:00.000Z, to 2026-11-26T12:53:00.000Z, days 30
 - `research/backtest-150d.json`: at 2026-11-02T21:57:46.797Z, from 2026-06-05T21:54:00.000Z, to 2026-11-02T21:54:00.000Z, days 150
