@@ -17,6 +17,7 @@
 //   jpyvb      the same rule on USD/JPY (usdjpy-vol-breakout-forward)
 //   nq1        the auto-researcher's NAS100 leads as one desk (below)
 //   zero       turnaround Tuesday on the Nasdaq (below)
+//   nq2        the two Nasdaq leads the demo job trades, l1 and l5 (below)
 // Every signal, stop and exit comes from the study's own exported code (imported, never edited); only the record (id, log, marks,
 // an open trade's reading) is written here. The studies judged trades before costs and so does each desk; the five fade / gap
 // rules lose after costs and the two breakouts are short forward records. PAPER RECORDS ONLY: no order, alert, broker or mirror,
@@ -253,7 +254,7 @@ const trigText = (tr, D, i, s, f, cache) => {
   if (tr.kind === 'dev') { const key = 'sma' + tr.n; const m = (cache[key] ||= engSma(D.c, tr.n))[i]; return { text: `closed ${tr.z} ATR(14) ${s > 0 ? 'above' : 'below'} its ${tr.n}-hour average (${f(m)})`, mark: { kind: 'level', p: m, a: D.t[Math.max(0, i - tr.n)], at: D.t[i] + 3600, label: `${tr.n}-hour average`, under: s > 0 } }; }
   return { text: `was a candle with a range of at least ${tr.k} ATR(14), closing ${s > 0 ? 'up' : 'down'}`, mark: { kind: 'zone', top: D.h[i], bot: D.l[i], a: D.t[i], at: D.t[i] + 3600, label: 'Big H1 candle' } };
 };
-function leadTrades(L, ctx, from) {
+function leadTrades(L, ctx, from, desk = 'nq1') {
   const { D, H, M5, firstM5, f, market } = ctx, g = L.g, A = engAtr(D), MA = g.trend === 'none' ? null : engSma(D.c, 200), P = g.vol !== 'none' ? engAtrPct(D) : null, cache = {}, id = uniq(), out = [];
   let freeT = -Infinity;
   for (let i = 210; i < D.n; i++) {
@@ -267,7 +268,7 @@ function leadTrades(L, ctx, from) {
     const a = A[i]; if (!(a > 0)) continue; const fi = firstM5.get(entryT); if (fi == null) continue;
     const fill = M5[fi].o, dist = g.stop * a, stop = fill - s * dist, tgt = g.rr > 0 ? fill + s * g.rr * dist : null, parts = g.trig.map((tr) => trigText(tr, D, i, s, f, cache));
     const hr = String(new Date(entryT * 1000).getUTCHours()).padStart(2, '0');
-    const r = rec('nq1', market, { idTail: id(`${L.id}-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: `nq1-${L.id}`, label: L.name, h: '1h', l: '1h', s, M5, fi, fill, stop, tgt, cap: g.hold * 3600,
+    const r = rec(desk, market, { idTail: id(`${L.id}-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: `${desk}-${L.id}`, label: L.name, h: '1h', l: '1h', s, M5, fi, fill, stop, tgt, cap: g.hold * 3600,
       log: [{ t: D.t[i] + 3600, text: `An H1 candle ${parts.map((x) => x.text).join(' and ')}. The next hour (${hr}:00 UTC) passes the reading's filters: ${word(s)} at that open, the stop ${g.stop} ATR(14) of H1 (${f(a)}) away` + (g.rr > 0 ? `, ${g.rr}R.` : ', no target.') }],
       marks: parts.map((x) => x.mark) });
     if (!r) continue;
@@ -285,6 +286,20 @@ export function nq1Trades(B, { from, market = 'nas100' } = {}) {
   const ctx = { D, H, M5, firstM5, f, market }, out = [];
   for (const L of NQ1_LEADS) out.push(...leadTrades(L, ctx, from));
   for (const x of vbDays(toK(B['5m']), JO, 'nq1', market, 0.5, from)) out.push({ ...x, label: 'Breakout of the day: UTC open ± ½ the previous range' });   // index-vol-breakout T1 on NAS100 (owner, 25 Nov 2026: "Nasdaq breakout of the day should be in NQ1")
+  return out;
+}
+// ─── nq2: the two Nasdaq leads the demo job trades (owner, 26 Nov 2026: "Put the edge on the desk with the results since january on calendar") ───
+// l1 and l5 alone (the two that passed nq1-leads-exec at the broker's own ticks; council/nq-demo.mjs trades them on a demo account), read exactly as
+// the NQ1 desk reads them (leadTrades: the frozen genomes, one position at a time a reading), kinds `nq2-l1` / `nq2-l5`. Before costs; a paper record.
+export const NQ2_IDS = ['l1', 'l5'];
+export function nq2Trades(B, { from, market = 'nas100' } = {}) {
+  if (market !== 'nas100') return [];
+  const M5 = toK(B['5m']); if (M5.length < 3000) return [];
+  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 600) return [];
+  const D = prep(toArrays(H.map((b) => ({ t: b.t, o: b.o, h: b.h, l: b.l, c: b.c }))), market), firstM5 = new Map(), f = fx(market);
+  M5.forEach((b, k) => { const h = Math.floor(b.t / 3600) * 3600; if (!firstM5.has(h)) firstM5.set(h, k); });
+  const ctx = { D, H, M5, firstM5, f, market }, out = [];
+  for (const L of NQ1_LEADS.filter((x) => NQ2_IDS.includes(x.id))) out.push(...leadTrades(L, ctx, from, 'nq2'));
   return out;
 }
 // ─── zero: turnaround Tuesday on the Nasdaq (owner, 25 Nov 2026: "put it in another strategy and call it ZERO"; the Nasdaq breakout of the day went back to NQ1) ───
@@ -419,6 +434,7 @@ export const DESKS2 = {
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
   nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s Nasdaq 100 leads (stretch, breakout and big-candle combinations) and the Nasdaq breakout of the day, each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
   zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: turnaround Tuesday on the Nasdaq 100: buy the close of a first trading day of the week that fell more than 1 %, out at the next trading day\'s close (turnaround-tuesday, rule R2). Before costs.' + PAPER },
+  nq2: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq2Trades, note: 'NQ2: the two Nasdaq 100 leads that passed at the broker\'s own ticks (l1: stretch + 10-hour breakout; l5: double stretch in high volatility), long only, the ones the Nasdaq demo job trades. Before costs; the two readings overlap, so totals are not additive.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_DESK_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on eight of its markets (gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP and the Nasdaq 100). It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };

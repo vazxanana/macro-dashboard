@@ -14,7 +14,7 @@ const data = (bars, mk = 'eurusd') => E.prep(E.toArrays(bars), mk);
 test('the three windows are 2005-14, 2015-19 and 2020 on, in that order, and the bars are the protocol\'s', () => {
   assert.ok(E.WIN.A[1] === E.WIN.B[0] && E.WIN.B[1] === E.WIN.C[0]);
   assert.deepEqual(E.BAR.A, { n: 250, mean: 0.04, t: 3.0 }); assert.deepEqual(E.BAR.B, { n: 100, mean: 0, t: 1.5 }); assert.deepEqual(E.BAR.C, { n: 100, mean: 0, t: 2.0 });
-  assert.deepEqual(E.FAMILY[5], ['wild']); assert.equal(Object.keys(E.FAMILY).length, 10); assert.deepEqual(E.FAMILY[10], ['nq']);
+  assert.deepEqual(E.FAMILY[5], ['wild']); assert.equal(Object.keys(E.FAMILY).length, 12); assert.deepEqual(E.FAMILY[10], ['nq']);
 });
 
 test('every generated rule has a stop and only known pieces', () => {
@@ -85,4 +85,38 @@ test('worker 10 trades NAS100 only, every trigger kind alone or two together, an
   const g = { mk: 'nas100', trig: [{ kind: 'brk', N: 20 }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 1, rr: 2, hold: 24 };
   const a = E.simulate(mk(1), g, 300, 8000), b = E.simulate(mk(10), g, 300, 8000);
   assert.ok(a.n > 50); assert.equal(a.n, b.n); assert.ok(Math.abs(a.sum - b.sum) < 1e-6);
+});
+
+test('market structure (workers 11, 12): closed candles only, breaks named bos / choch, pullbacks inside the leg, the older workers unchanged', () => {
+  const bars = walk(9000, 9), D = data(bars);
+  for (const P of E.MS_SPACE.P.concat(E.MS_SPACE.msP)) { const S = E.struct(D, P); let dir = 0, breaks = 0, choch = 0, pb = 0;
+    for (let i = 0; i < D.n; i++) {
+      if (S.bk[i]) { breaks++; assert.equal(S.kd[i], dir === -S.bk[i] ? 2 : 1, 'a break against the structure is a choch, else a bos'); if (S.kd[i] === 2) choch++; dir = S.bk[i]; assert.equal(S.dp[i], 0, 'a break candle is no pullback'); }
+      else assert.equal(S.kd[i], 0);
+      assert.equal(S.st[i], dir); if (S.dp[i] > 0) { pb++; assert.ok(dir !== 0 && (dir > 0 ? D.c[i] > D.o[i] : D.c[i] < D.o[i]), 'a pullback candle closes with the structure'); } }
+    assert.ok(breaks > 20 && choch > 5 && pb > 20, `P ${P}: ${breaks} breaks, ${choch} choch, ${pb} pullbacks`); }
+  // no look-ahead: a cut series gives the same structure up to the cut, and a swing counts only P candles after it
+  const cut = 5000, C = data(bars.slice(0, cut));
+  for (const P of [2, 5, 12]) { const a = E.struct(D, P), b = E.struct(C, P); for (let i = 0; i < cut; i++) { assert.equal(a.bk[i], b.bk[i]); assert.equal(a.kd[i], b.kd[i]); assert.equal(a.st[i], b.st[i]); assert.equal(a.dp[i], b.dp[i]); } }
+  // the triggers read it
+  const S = E.struct(D, 3), i1 = S.kd.findIndex((x) => x === 1), i2 = S.kd.findIndex((x) => x === 2), i3 = S.dp.findIndex((x) => x >= 0.5);
+  assert.equal(E.sig(D, { kind: 'bos', P: 3, follow: true }, i1), S.bk[i1]); assert.equal(E.sig(D, { kind: 'bos', P: 3, follow: false }, i1), -S.bk[i1]); assert.equal(E.sig(D, { kind: 'choch', P: 3, follow: true }, i1), 0);
+  assert.equal(E.sig(D, { kind: 'choch', P: 3, follow: true }, i2), S.bk[i2]); assert.equal(E.sig(D, { kind: 'mspb', P: 3, d: 0.5 }, i3), S.st[i3]); assert.equal(E.sig(D, { kind: 'mspb', P: 3, d: 0.5 }, i1), 0);
+  // the larger-structure filter only ever removes trades
+  const g = { mk: 'eurusd', trig: [{ kind: 'bos', P: 3, follow: true }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 1, rr: 2, hold: 12 };
+  const all = E.simulate(D, g, 300, 8000), w = E.simulate(D, { ...g, ms: 'with', msP: 12 }, 300, 8000), ag = E.simulate(D, { ...g, ms: 'against', msP: 12 }, 300, 8000);
+  assert.ok(all.n > 50 && w.n > 0 && ag.n > 0 && w.n < all.n && ag.n < all.n); assert.deepEqual(E.simulate(D, { ...g, ms: 'none', msP: 12 }, 300, 8000).n, all.n);
+});
+test('workers 11 and 12 draw structure rules with a stop; workers 1-10 draw exactly what they drew before', () => {
+  assert.deepEqual(E.MS_WORKERS, [11, 12]); assert.deepEqual(E.MSK, ['bos', 'choch', 'mspb']); assert.deepEqual(E.MS_MARKETS, [...E.MARKETS, 'nas100']);
+  const r = E.rng(21), kinds = new Set(); let two = 0;
+  for (let i = 0; i < 800; i++) { const w = 11 + (i % 2), g = E.genome(r, w); assert.ok(E.SPACE.stop.includes(g.stop) && g.stop > 0); assert.ok(E.MS_MARKETS.includes(g.mk)); assert.ok(E.MSK.includes(g.trig[0].kind)); assert.ok(E.MS_SPACE.P.includes(g.trig[0].P));
+    assert.equal(g.trig.length, w === 11 ? 1 : 2); assert.ok(['none', 'with', 'against'].includes(g.ms) && E.MS_SPACE.msP.includes(g.msP)); g.trig.forEach((t) => kinds.add(t.kind)); if (g.trig[0].kind === 'mspb') assert.ok(E.MS_SPACE.d.includes(g.trig[0].d)); two += w === 12; }
+  assert.ok(['bos', 'choch', 'mspb', 'brk', 'eg', 'sweep'].every((k) => kinds.has(k)));
+  // pinned draws of the older workers (the generator's use of the random stream is unchanged): none carries a structure field
+  for (let w = 1; w <= 10; w++) { const q = E.rng(100 + w); for (let i = 0; i < 50; i++) { const g = E.genome(q, w); assert.equal(g.ms, undefined); assert.ok(!g.trig.some((t) => E.MSK.includes(t.kind))); } }
+  const first = E.genome(E.rng(7), 4); assert.deepEqual(Object.keys(first), ['mk', 'trig', 'side', 'hours', 'dows', 'trend', 'vol', 'volP', 'stop', 'rr', 'hold']);
+  const yml = fs.readFileSync(new URL('../.github/workflows/researcher.yml', import.meta.url), 'utf8');
+  assert.match(yml, /workers=\[1,2,3,4,5,6,8,10,11,12\]/); assert.match(yml, /7\) echo 'workers=\[11\]'/); assert.match(yml, /9\) echo 'workers=\[12\]'/);
+  assert.equal((yml.match(/worker: 1[12], shard: [12]/g) || []).length, 4, 'one runner each: the job count stays at 20');
 });

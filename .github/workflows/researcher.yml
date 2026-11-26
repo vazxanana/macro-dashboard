@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       worker:
-        description: 'A worker number 1-10 (10 = NQ only), or all'
+        description: 'A worker number 1-12 (10 = NQ only, 11 and 12 = market structure; 7 and 9 now start 11 and 12), or all'
         required: false
         default: 'all'
       shard:
@@ -40,8 +40,12 @@ jobs:
         run: |
           case "$SH" in 0|1|2) echo "shards=[$SH]" >> "$GITHUB_OUTPUT" ;; *) echo 'shards=[0,1]' >> "$GITHUB_OUTPUT" ;; esac
           case "$W" in
-            1|2|3|4|5|6|7|8|9|10) echo "workers=[$W]" >> "$GITHUB_OUTPUT" ;;
-            *) echo 'workers=[1,2,3,4,5,6,7,8,9,10]' >> "$GITHUB_OUTPUT" ;;
+            1|2|3|4|5|6|8|10|11|12) echo "workers=[$W]" >> "$GITHUB_OUTPUT" ;;
+            # 26 Nov 2026: workers 7 and 9 (duplicates of 5 / 6 and of 3) stopped drawing; their chains hand their runners to the two
+            # market-structure workers (PREREGISTRATION.md, "Two market-structure workers"), so the job count stays the same
+            7) echo 'workers=[11]' >> "$GITHUB_OUTPUT" ;;
+            9) echo 'workers=[12]' >> "$GITHUB_OUTPUT" ;;
+            *) echo 'workers=[1,2,3,4,5,6,8,10,11,12]' >> "$GITHUB_OUTPUT" ;;
           esac
 
   work:
@@ -58,13 +62,13 @@ jobs:
         shard: ${{ fromJSON(needs.plan.outputs.shards) }}
         exclude:
           # a second runner (lanes 4-7) for seven workers: 17 research jobs in all, so the council loop and CI always find a free runner (a free plan allows 20 at once)
-          - { worker: 7, shard: 1 }
+          - { worker: 11, shard: 1 }
           - { worker: 8, shard: 1 }
-          - { worker: 9, shard: 1 }
+          - { worker: 12, shard: 1 }
           # shard 2 (lanes 8-11) only for workers 1, 2 and 10, started by hand once, then chaining itself (owner, 25 Nov 2026: use the 3 spare slots, then keep them going)
-          - { worker: 7, shard: 2 }
+          - { worker: 11, shard: 2 }
           - { worker: 8, shard: 2 }
-          - { worker: 9, shard: 2 }
+          - { worker: 12, shard: 2 }
     concurrency:
       group: researcher-${{ matrix.worker }}-${{ matrix.shard }}
       cancel-in-progress: false
@@ -107,6 +111,7 @@ jobs:
           git -C data config user.name "mosha-council"
           git -C data config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p data/research/auto
+          NEED=10; case "$W" in 10) NEED=1 ;; 11|12) NEED=11 ;; esac   # candle files lane 0 writes before the other lanes start
           end=$(( $(date +%s) + 19200 ))   # 320 minutes
           while [ $(( end - $(date +%s) )) -gt 1800 ]; do
             # four processes a runner (a 4-core machine ran one): lane 0 is the worker's own file, lanes 1-3 add worker-<W>-<lane>.json
@@ -114,7 +119,7 @@ jobs:
               L=$(( SHARD * 4 + L0 ))   # shard 0 lanes 0-3, shard 1 lanes 4-7, shard 2 lanes 8-11
               if [ "$L0" != 0 ]; then
                 # the other lanes start once lane 0 has the candle files (up to 15 minutes), so they never read a half-written file
-                n=0; while [ "$(ls "$RESEARCH_CACHE"/*-1h.json.gz 2>/dev/null | wc -l)" -lt 10 ] && [ $n -lt 90 ]; do sleep 10; n=$((n+1)); done
+                n=0; while [ "$(ls "$RESEARCH_CACHE"/*-1h.json.gz 2>/dev/null | wc -l)" -lt "$NEED" ] && [ $n -lt 90 ]; do sleep 10; n=$((n+1)); done
               fi
               LANE=$L node --max-old-space-size=2500 research/edge/auto-researcher/engine.mjs run "$W" data/research/auto 25 > "$RUNNER_TEMP/lane-$L.log" 2>&1 &
             done

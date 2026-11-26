@@ -71,3 +71,13 @@ test('the Nasdaq breakout of the day is an NQ1 reading; ZERO is turnaround Tuesd
   assert.match(rd('equinox.html'), /id="v-zero"/); assert.match(rd('equinox.html'), /"k": "zero", "name": "ZERO"/); assert.match(rd('assets/desk-trades.js'), /zero: \{ file: 'zero\/desk\.json'/);
   assert.match(rd('.github/workflows/council.yml'), /--only [a-z0-9,]*zero/); assert.match(rd('council/datahealth.mjs'), /zero\/desk\.json/);
 });
+
+test('NQ2 is l1 and l5 alone, the same trades the NQ1 desk reads for them, under its own kinds; wired like the other desks', () => {
+  const N = D2.nq2Trades(B, { from: FROM, market: 'nas100' }); assert.deepEqual(D2.NQ2_IDS, ['l1', 'l5']); assert.equal(D2.nq2Trades(B, { from: FROM, market: 'xau' }).length, 0);
+  const key = (r) => [r.kind.split('-')[1], r.t, r.entry, r.stop, r.target, r.status, r.R].join('|');
+  assert.deepEqual(N.map(key).sort(), ALL.filter((r) => /^nq1-l[15]$/.test(r.kind)).map(key).sort()); assert.ok(N.length > 0, 'the seeded market gives l1 / l5 trades');
+  for (const r of N) { assert.match(r.kind, /^nq2-l[15]$/); assert.equal(r.side, 1); assert.ok(r.stop < r.entry && r.target > r.entry, r.id); assert.ok(clean(r), 'clean() refused ' + r.id); assert.equal(clean(r).kind, r.kind); }
+  const rd = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
+  assert.match(rd('equinox.html'), /id="v-nq2"/); assert.match(rd('equinox.html'), /"k": "nq2", "name": "NQ2"/); assert.match(rd('assets/desk-trades.js'), /nq2: \{ file: 'nq2\/desk\.json'/); assert.match(rd('assets/desk-live.js'), /nq2: \{ passing: true, file: 'nq2\/desk\.json'/);
+  assert.match(rd('.github/workflows/council.yml'), /--only [a-z0-9,]*nq2/); assert.match(rd('council/datahealth.mjs'), /nq2\/desk\.json/);
+});

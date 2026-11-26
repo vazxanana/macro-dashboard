@@ -49,7 +49,7 @@ test('the desk: gold and USD/JPY, the breakouts by the breakout desks\' own code
 test('wiring: the Equinox tab, the loop line, data health, and the demo jobs on the Shadows + LIT account', () => {
   const page = rd('equinox.html'); assert.match(page, /id="v-lyriac"/); assert.match(page, /window\.EQ_DESKS = \[\{"k": "lyriac", "name": "Lyriac"\}/);
   assert.match(rd('assets/desk-trades.js'), /lyriac: \{ file: 'lyriac\/desk\.json', title: 'Lyriac trades'/); assert.match(rd('assets/desk-trades.js'), /describes the past and is not proof/);
-  assert.match(rd('.github/workflows/council.yml'), /--only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,zero,lyriac,dom/);
+  assert.match(rd('.github/workflows/council.yml'), /--only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,zero,nq2,lyriac,dom/);
   assert.match(rd('council/datahealth.mjs'), /file: 'lyriac\/desk\.json'/);
   assert.doesNotMatch(rd('council/trader.mjs'), /id: 'lyriac-155'/, 'the jobs stay on their default account');
   assert.match(rd('council/gotobi.mjs'), /find\(\(x\) => \(x\.books \|\| \[\]\)\.includes\('lit'\)\)/, 'the default is the LIT book\'s account');

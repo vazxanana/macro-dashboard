@@ -162,6 +162,9 @@ jobs:
             timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo round $i failed"
             # gold only, 4R target, its own label and record (26 Nov 2026, owner: "yes do gold dom 4r on demo"); demo account only
             timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo round $i failed"
+            # The two Nasdaq leads that passed at the broker's own ticks (l1, l5) on a DEMO account (council/nq-demo.mjs, 26 Nov 2026):
+            # reads H1 candles once an hour, connects only on a signal or while one of its positions is open; every order has a stop.
+            timeout 45 node council/nq-demo.mjs data || echo "Nasdaq demo round $i failed"
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
@@ -174,7 +177,7 @@ jobs:
             fastcopy "round $i"
             # The eight Equinox desks (23 Nov 2026, council/edge-desks-2.mjs, shown on /equinox): each study's own rule as a paper record, no order and no alert.
             # Own line and timeout (5-minute candles of eighteen markets, read once for the eight desks), so the older desks keep their 280 s.
-            if [ $((i % 3)) -eq 1 ]; then timeout 150 node council/edge-desks.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,zero,lyriac,dom || echo "Passing-edge desks round $i failed"; fi
+            if [ $((i % 3)) -eq 1 ]; then timeout 150 node council/edge-desks.mjs data --only fade,bigfade,roundfade,boxfade,fvg,goldvb,jpyvb,nq1,zero,nq2,lyriac,dom || echo "Passing-edge desks round $i failed"; fi
             # Macro strategist (7 Nov, paper only): next-day odds, event playbook and scorecard → data/macro/; every 6th round
             # (~25 min), capped at 3 min; a failure never stops the loop.
             if [ $((i % 6)) -eq 1 ]; then timeout 180 node council/macro.mjs data || echo "Macro round $i failed"; fi
@@ -239,6 +242,7 @@ jobs:
                 timeout 45 node council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo quick pass $i failed"
+                timeout 45 node council/nq-demo.mjs data || echo "Nasdaq demo quick pass $i failed"
                 node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true
