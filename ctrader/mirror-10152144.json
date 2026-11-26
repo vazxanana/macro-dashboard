@@ -1280,6 +1280,54 @@
     "stopCheckedAt": "2026-11-26T00:46:14.000Z",
     "brokerStop": 158.954,
     "closedAt": "2026-11-26T01:01:04.000Z"
+   },
+   "eqx:bigfade:usdjpy:bigfade-m15-s1795655700": {
+    "positionId": "51567421",
+    "symbol": "USDJPY",
+    "side": "sell",
+    "volume": 2600000,
+    "lots": 0.26,
+    "digits": 3,
+    "setup": "eqx-bigfade",
+    "status": "open",
+    "openedAt": "2026-11-26T01:24:47.000Z",
+    "councilEntry": 159.078,
+    "stop": 159.10685,
+    "t1": 159.026,
+    "riskCash": 4.77,
+    "margin": 52,
+    "fillPrice": 159.093,
+    "slipR": -0.52,
+    "lagSec": 587,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T01:24:47.000Z",
+    "brokerStop": 159.122
+   },
+   "eqx:fvg:eurjpy:fvg-h1-b1795633200-1795653900": {
+    "positionId": "51567422",
+    "symbol": "EURJPY",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 3,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-26T01:24:47.000Z",
+    "councilEntry": 174.522,
+    "stop": 174.254343,
+    "t1": 174.789657,
+    "riskCash": 4.77,
+    "margin": 4.39,
+    "fillPrice": 174.505,
+    "slipR": -0.064,
+    "lagSec": 2387,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T01:24:47.000Z",
+    "brokerStop": 174.237
    }
   },
   "day": {
@@ -1290,26 +1338,16 @@
     "51562647"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 477.27 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 477.27 · 3 open",
   "skipped": {},
   "wait": {
-   "eqx:fvg:audusd:fvg-h1-s1795579200-1795629600": {
-    "why": "daily loss stop (3.2% down today)",
-    "n": 0,
-    "at": "2026-11-25T18:57:52.000Z"
-   },
    "eqx:fade:gbpusd:fade-m15-s1795631400": {
     "why": "daily loss stop (3.2% down today)",
     "n": 0,
     "at": "2026-11-25T19:28:32.000Z"
-   },
-   "eqx:fvg:fvg-h1-s1795539600-1795638600": {
-    "why": "daily loss stop (3.2% down today)",
-    "n": 0,
-    "at": "2026-11-25T21:27:58.000Z"
    },
    "eqx:fvg:usdcad:fvg-h1-s1795629600-1795641300": {
     "why": "daily loss stop (3.2% down today)",
@@ -1333,19 +1371,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 477.27,
-  "lastRun": "2026-11-26T01:20:22.000Z"
+  "lastRun": "2026-11-26T01:24:47.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T19:44:38.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T19:47:05.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 19:54 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T19:55:02.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2825,6 +2853,16 @@
    "at": "2026-11-26T01:01:04.000Z",
    "msg": "USDJPY position 51565715 closed at the broker",
    "trade": "eqx:fvg:usdjpy:fvg-h1-b1795636800-1795653000"
+  },
+  {
+   "at": "2026-11-26T01:24:47.000Z",
+   "msg": "opened sell USDJPY 0.26 lot (council eqx-bigfade)",
+   "trade": "eqx:bigfade:usdjpy:bigfade-m15-s1795655700"
+  },
+  {
+   "at": "2026-11-26T01:24:47.000Z",
+   "msg": "opened buy EURJPY 0.02 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:eurjpy:fvg-h1-b1795633200-1795653900"
   }
  ],
  "limits": {
@@ -2920,9 +2958,9 @@
   ]
  },
  "execution": {
-  "n": 12,
-  "meanSlipR": 0.338,
-  "medianSlipR": 0.404,
+  "n": 14,
+  "meanSlipR": 0.248,
+  "medianSlipR": 0.325,
   "worstSlipR": 1.352,
   "medianLagSec": 27,
   "bySymbol": {
@@ -2935,8 +2973,8 @@
     "meanSlipR": -0.616
    },
    "USDJPY": {
-    "n": 2,
-    "meanSlipR": 0.653
+    "n": 3,
+    "meanSlipR": 0.262
    },
    "EURUSD": {
     "n": 2,
@@ -2951,8 +2989,8 @@
     "meanSlipR": 0.543
    },
    "EURJPY": {
-    "n": 1,
-    "meanSlipR": -0.427
+    "n": 2,
+    "meanSlipR": -0.245
    }
   }
  }

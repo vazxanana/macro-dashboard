@@ -6338,6 +6338,58 @@
     "stopCheckedAt": "2026-11-26T00:46:25.000Z",
     "brokerStop": 158.984,
     "closedAt": "2026-11-26T00:58:29.000Z"
+   },
+   "boxfade:usdchf:boxfade-m5-b1795654800": {
+    "positionId": "51567439",
+    "symbol": "USDCHF",
+    "side": "buy",
+    "volume": 24500000,
+    "lots": 2.45,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T01:25:08.000Z",
+    "councilEntry": 0.83126,
+    "stop": 0.830685,
+    "t1": 0.831835,
+    "riskCash": 246.85,
+    "margin": 490,
+    "mark": 0.83152,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83155,
+    "slipR": 0.504,
+    "lagSec": 1508,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T01:25:08.000Z",
+    "brokerStop": 0.83071
+   },
+   "boxfade:gbpusd:boxfade-m5-s1795654800": {
+    "positionId": "51567440",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 19200000,
+    "lots": 1.92,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T01:25:08.000Z",
+    "councilEntry": 1.31181,
+    "stop": 1.3127,
+    "t1": 1.31092,
+    "riskCash": 246.85,
+    "margin": 503.58,
+    "mark": 1.31142,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31135,
+    "slipR": 0.517,
+    "lagSec": 1508,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T01:25:08.000Z",
+    "brokerStop": 1.31263
    }
   },
   "day": {
@@ -6348,10 +6400,10 @@
     "51559058"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12342.42 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12342.42 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6360,19 +6412,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12342.42,
-  "lastRun": "2026-11-26T01:20:26.000Z"
+  "lastRun": "2026-11-26T01:25:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet usdcad-replica-1794409920-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "usdcad-replica-1794409920-s"
-  },
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet btc-replica-1794411328-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "btc-replica-1794411328-b"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet sol-replica-1794411328-b: daily loss stop (44.6% down today) (will retry)",
@@ -7856,6 +7898,16 @@
    "at": "2026-11-26T01:18:23.000Z",
    "msg": "NZDUSD position 51559862 closed at the broker",
    "trade": "boxfade:nzdusd:boxfade-m5-s1795647900"
+  },
+  {
+   "at": "2026-11-26T01:25:08.000Z",
+   "msg": "opened buy USDCHF 2.45 lot (council boxfade)",
+   "trade": "boxfade:usdchf:boxfade-m5-b1795654800"
+  },
+  {
+   "at": "2026-11-26T01:25:08.000Z",
+   "msg": "opened sell GBPUSD 1.92 lot (council boxfade)",
+   "trade": "boxfade:gbpusd:boxfade-m5-s1795654800"
   }
  ],
  "limits": {
@@ -7951,8 +8003,8 @@
   ]
  },
  "execution": {
-  "n": 215,
-  "meanSlipR": 0.049,
+  "n": 217,
+  "meanSlipR": 0.053,
   "medianSlipR": 0.024,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
@@ -7982,12 +8034,12 @@
     "meanSlipR": 0.016
    },
    "GBPUSD": {
-    "n": 12,
-    "meanSlipR": 0.071
+    "n": 13,
+    "meanSlipR": 0.105
    },
    "USDCHF": {
-    "n": 11,
-    "meanSlipR": 0.111
+    "n": 12,
+    "meanSlipR": 0.144
    },
    "EURUSD": {
     "n": 13,
