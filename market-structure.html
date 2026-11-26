@@ -31,6 +31,23 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
+<script id="ms-swap-head">
+/* market switch without the wait (26 Nov 2026): the page that was left hands over the next market's candles (sessionStorage
+   'ms-swap', a 20-second cache of public candles, read once). Only then: the first paint waits for the charts and the old page
+   cross-fades into the new one. Any other navigation is as it was (its view transition is skipped). */
+(function () { var ok = false; try {
+  var m = sessionStorage.getItem('ms-swap-at'), p = m ? m.split('|') : null, k = null;
+  try { k = new URLSearchParams(location.search).get('s'); } catch (e) {}
+  ok = !!(p && p[0] === k && Date.now() - +p[1] < 20000);
+  if (m && !ok) { sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); }
+  if (ok) { var R = document.documentElement; R.dataset.vt = 'swap';
+    var l = document.createElement('link'); l.rel = 'expect'; l.href = '#ms-swap-ready'; l.setAttribute('blocking', 'render'); document.head.appendChild(l);
+    setTimeout(function () { if (R.dataset.vt === 'swap') delete R.dataset.vt; }, 1500); }
+} catch (e) {}
+  window.MS_SWAP_IN = ok;
+  try { addEventListener('pagereveal', function (e) { if (e.viewTransition && !ok) e.viewTransition.skipTransition(); }); } catch (e) {}
+})();
+</script>
 <script src="/assets/ms-dialog.js"></script>
 <script src="/assets/backtest-engine.js" defer></script>
 <script src="/assets/ms-draw.js" defer></script>
@@ -2091,6 +2108,11 @@ html[data-motion="off"] .odo > span { animation-duration: 1ms; } html[data-motio
 @keyframes vt-out-b { to { opacity: 0; transform: translateX(28px); } }
 @keyframes vt-in-b { from { opacity: 0; transform: translateX(-36px); } }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; } }
+/* market switch (26 Nov 2026): a page-to-page cross-fade, only when the head script marked the arrival (data-vt="swap") */
+@view-transition { navigation: auto; }
+html[data-vt="swap"]::view-transition-old(root) { animation: none; }
+html[data-vt="swap"]::view-transition-new(root) { animation: vt-fade .14s ease-out both; }
+@keyframes vt-fade { from { opacity: 0; } }
 
 /* ═══ POLISH 3 · professional & smooth (7 Nov) ═══ */
 /* 1 rendering */
@@ -7099,7 +7121,12 @@ function msNextSetup(bars, A) {
     // 11 Nov: under the first-load sign-in card nothing below is seen, and leaving the card always reloads the page (sign-in,
     // Continue as guest), so no candles, streams or scans start until the card is gone
     if (window.msBootGate) await window.msBootGate;
-    const res = await Promise.allSettled(ACTIVE.map((tf) => fetchBars(tf)));
+    // market switch (26 Nov 2026): candles the page before read for this market in the last 20 s are used once, so the charts
+    // are drawn at the first paint; a timeframe without them is fetched as always, and the usual polling and ticks follow
+    let stash = null;
+    try { if (window.MS_SWAP_IN) { const s = JSON.parse(sessionStorage.getItem('ms-swap') || 'null'); if (s && s.k === instKey && Date.now() - s.at < 20000 && s.tfs) stash = s.tfs; }
+      sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); } catch (e) { stash = null; }
+    const res = await Promise.allSettled(ACTIVE.map((tf) => (stash && Array.isArray(stash[tf.id]) && stash[tf.id].length > 50 ? Promise.resolve({ src: 'OANDA', bars: stash[tf.id] }) : fetchBars(tf))));
     const ok = res.filter((r) => r.status === 'fulfilled');
     if (!ok.length) {
       const why = res.map((r) => r.reason && r.reason.message).filter(Boolean)[0] || '';
@@ -7501,6 +7528,7 @@ function msNextSetup(bars, A) {
   // the menu's groups, in order (each id once); a timeframe with an analysed pane opens that pane
   const TF_GROUPS = [['Seconds', ['1s', '5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
   window.msTfGroups = () => TF_GROUPS.map(([g, ids]) => [g, ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return { id, label: t ? t.label : id, analysed: !!panes[id] }; })]);
+  window.msSwapInfo = () => ({ base: MD.base, on: MD.on, tfs: ACTIVE.map((t) => t.id), n: BARS, md: (k) => (INSTRUMENTS[k] ? INSTRUMENTS[k].md : null), cur: instKey, pub: PUB });   // for the market switch
   window.msMarkets = () => Object.entries(INSTRUMENTS).map(([k, I]) => ({ k, label: I.label, name: I.name, group: I.group, dec: I.dec, on: k === instKey }));   // the wheel bar's list
   // a year's candles from monthly ones (UTC calendar years)
   const yearOf = (bars) => { const out = []; bars.forEach((b) => { const y = new Date(b.time * 1e3).getUTCFullYear(), t = Date.UTC(y, 0, 1) / 1e3, l = out[out.length - 1];
@@ -10117,6 +10145,7 @@ function msNextSetup(bars, A) {
   boot();
 })();
 </script>
+<span id="ms-swap-ready" hidden></span>
 <script id="ms-ict-lib">
 // ICT desk helpers (9 Nov): pure functions behind the #ict view, kept apart so tests/ict-desk.test.mjs runs them without a page.
 // Every time on the desk is New York time (the clock, the sessions, the calendar days, the signal times and the chart's axis), so
@@ -15973,7 +16002,7 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
     w.addEventListener('keydown', function (e) { if (e.key === 'Enter') apply(); if (e.key === 'Escape') close(); }); w.focus({ preventScroll: true }); }
   function apply() { if (!cur) return; var k = cur.kind, id = cur.pick; close();
     if (k === 'tf') { if (id !== tfNow() && window.msOneTf) window.msOneTf(id); setTimeout(paint, 50); }
-    else if (id && !mkList().some(function (x) { return x.k === id && x.on; })) location.href = '?s=' + encodeURIComponent(id) + '#charts'; }
+    else if (id && !mkList().some(function (x) { return x.k === id && x.on; })) { if (window.msGoMarket) window.msGoMarket(id, '#charts'); else location.href = '?s=' + encodeURIComponent(id) + '#charts'; } }
   function build() { if (bar || !$('v-charts')) return;
     bar = document.createElement('div'); bar.id = 'ms-wb'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Market and timeframe');
     bar.innerHTML = '<button type="button" data-wb="mk" aria-haspopup="dialog"><small>Market</small><b></b></button><button type="button" data-wb="tf" aria-haspopup="dialog"><small>Timeframe</small><b></b></button>';
@@ -16308,6 +16337,59 @@ html[data-role="public"] .ms-cn { display: none; }
   document.addEventListener('ms:chart', (e) => attach(e.detail));
   hook(); setTimeout(hook, 1500); setInterval(() => { hook(); all.forEach(place); }, 3000);
   window.msChartNav = () => ({ mode, charts: all.length, shown: all.filter((o) => o.box.offsetHeight > 0).length });
+})();
+</script>
+<script id="ms-swap-js">
+/* Market switch without the wait (26 Nov 2026). Display only. Pointing at (120 ms) or pressing a market link (`?s=<market>`)
+   reads that market's candles for the six analysed timeframes from the candle service; the click then hands them to the next
+   page (sessionStorage 'ms-swap' + 'ms-swap-at': public candles, 20 seconds, read once), which draws its charts at the first
+   paint and cross-fades in. Nothing else changes: the page still loads again, so every stream, level and record belongs to
+   the new market. Never for guests. `window.msGoMarket(k, hash)`, `window.msSwap()` (read-only view). */
+(function () {
+  'use strict';
+  var PF = {}, FRESH = 12000, WAIT = 200, hov = null, going = false;
+  function info() { try { return window.msSwapInfo ? window.msSwapInfo() : null; } catch (e) { return null; } }
+  function keyOf(a) { var m = /^\?s=([a-z0-9]+)(#.*)?$/i.exec((a && a.getAttribute('href')) || ''); return m ? m[1] : null; }
+  function clear() { try { sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); } catch (e) {} }
+  function prefetch(k) {
+    var I = info(); if (!I || !I.base || I.on === false || I.pub || !k || k === I.cur) return null;
+    var md = I.md(k); if (!md) return null;
+    var p = PF[k]; if (p && Date.now() - p.at < FRESH - 4000) return p;
+    p = PF[k] = { at: Date.now(), tfs: {}, n: 0, want: I.tfs.length };
+    I.tfs.forEach(function (id) {
+      fetch(location.origin + I.base + 'bars?sym=' + encodeURIComponent(md) + '&tf=' + id + '&n=' + I.n, { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (j && Array.isArray(j.bars) && j.bars.length > 50) p.tfs[id] = j.bars; p.n++; })
+        .catch(function () { p.n++; });
+    });
+    return p;
+  }
+  function leave(k, href) {
+    var p = PF[k];
+    try { if (p && Date.now() - p.at < FRESH && Object.keys(p.tfs).length) { sessionStorage.setItem('ms-swap', JSON.stringify({ k: k, at: p.at, tfs: p.tfs })); sessionStorage.setItem('ms-swap-at', k + '|' + p.at); } else clear(); }
+    catch (e) { clear(); }
+    location.href = href;
+  }
+  function go(k, href) {
+    if (going) return; var p = prefetch(k); if (!p) { location.href = href; return; }
+    going = true; var t0 = Date.now();
+    (function tick() { if (p.n >= p.want || Date.now() - t0 >= WAIT) leave(k, href); else setTimeout(tick, 20); })();
+  }
+  window.msGoMarket = function (k, hash) { go(String(k), '?s=' + encodeURIComponent(k) + (hash || location.hash || '')); };
+  window.msSwap = function () { var o = {}; Object.keys(PF).forEach(function (k) { o[k] = { age: Date.now() - PF[k].at, done: PF[k].n, want: PF[k].want, tfs: Object.keys(PF[k].tfs) }; }); return { arrived: !!window.MS_SWAP_IN, read: o }; };
+  document.addEventListener('pointerover', function (e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="?s="]') : null, k = keyOf(a);
+    clearTimeout(hov); if (k) hov = setTimeout(function () { prefetch(k); }, 120);
+  }, { passive: true });
+  document.addEventListener('pointerdown', function (e) { var a = e.target && e.target.closest ? e.target.closest('a[href^="?s="]') : null, k = keyOf(a); if (k) prefetch(k); }, { passive: true });
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="?s="]') : null, k = keyOf(a); if (!k || a.target === '_blank') return;
+    var I = info(); if (!I || I.pub || k === I.cur) return;
+    e.preventDefault(); a.classList.add('cur'); go(k, a.getAttribute('href'));
+  });
+  addEventListener('pageshow', function (e) { if (e.persisted) going = false; });
 })();
 </script>
 <script id="ms-ps-js">

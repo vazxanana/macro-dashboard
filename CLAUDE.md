@@ -2642,6 +2642,17 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   line saying to scroll left for more), **Auto** (fit the price scale), **Log** and **%** (the chart library's price-scale modes 1 and 2 on EVERY
   chart; one display preference `ms-scale-mode`; Log keeps Settings' `#ms-show-log` box in step). Up to 640 px the group is one "…" button that
   opens the rest. Appended to the chart's PARENT (the drawing layer captures presses inside the chart element). Not for guests.
+- **Market switch without the wait** (26 Nov 2026, the next step toward a main chart app): a market link (`a[href^="?s="]`, the watchlist, the
+  market list, Home, the wheel bar through `window.msGoMarket(k, hash)`) still loads the page again (so every stream, level and record belongs to
+  the new market), but `<script id="ms-swap-js">` reads that market's candles for the six analysed timeframes while the pointer rests on the link
+  (120 ms) or at the press, and the click hands them over in sessionStorage `ms-swap` + `ms-swap-at` (public candles, at most 12 s old at the
+  click, refused after 20 s, read once and removed). `<script id="ms-swap-head">` then holds the first paint until the app script has run
+  (`<link rel="expect" href="#ms-swap-ready" blocking="render">`, added only on such an arrival) and the pages cross-fade
+  (`@view-transition { navigation: auto }`, `html[data-vt="swap"]`); every OTHER navigation skips the transition (`pagereveal`), so nothing else
+  changed. `boot()` uses a handed timeframe instead of `fetchBars` and fetches the rest as always; polling and ticks follow. The click waits at
+  most 200 ms for candles still on their way. Never for guests. Measured locally at 1440 px: 0.8-1.2 s before, about 0.5 s with the pointer on
+  the row first, charts drawn at the first paint. `window.msSwap()` is the read-only view. A true no-reload switch was looked at and left: the
+  page's streams, timers and per-market keys are set up once per load. Test: `tests/charts-swap.test.mjs`.
 - Checked in a browser at 1920, 1440, 1280, 1180 x 820, 820 x 1180, 932 x 430, 844 x 390, 700 x 500, 568 x 320, 390 x 844 and 360 x 640: the grid
   ends 10 px above the window (6 px above the phone's bars) in every view, no sideways scroll; drawing, full screen, the phase strip, a resize
   and a market change through the watchlist work. Not checked on a real phone. Test: `tests/charts-fit.test.mjs`.
