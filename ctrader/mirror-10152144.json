@@ -1927,6 +1927,32 @@
     ],
     "stopCheckedAt": "2026-11-26T19:31:14.000Z",
     "brokerStop": 0.54685
+   },
+   "eqx:fade:audusd:fade-m15-s1795723200": {
+    "positionId": "51647287",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 3800000,
+    "lots": 0.38,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T20:01:37.000Z",
+    "councilEntry": 0.66336,
+    "stop": 0.663501,
+    "t1": 0.663079,
+    "riskCash": 4.68,
+    "margin": 50.41,
+    "mark": 0.66338,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66336,
+    "slipR": 0,
+    "lagSec": 97,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T20:01:37.000Z",
+    "brokerStop": 0.66348
    }
   },
   "day": {
@@ -1942,10 +1968,10 @@
     "51644179"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 467.65 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 467.65 · 7 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -1975,14 +2001,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 467.65,
-  "lastRun": "2026-11-26T19:58:16.000Z"
+  "lastRun": "2026-11-26T20:01:37.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T11:04:18.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28000.05 -> 28026.48 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T11:40:21.000Z",
    "msg": "moved NAS100 48212677 protection: stop 28026.48 -> 28046.3 (council ict-A)",
@@ -3467,6 +3488,11 @@
    "at": "2026-11-26T19:31:14.000Z",
    "msg": "opened buy NZDUSD 0.29 lot (council eqx-fade)",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795721400"
+  },
+  {
+   "at": "2026-11-26T20:01:37.000Z",
+   "msg": "opened sell AUDUSD 0.38 lot (council eqx-fade)",
+   "trade": "eqx:fade:audusd:fade-m15-s1795723200"
   }
  ],
  "limits": {
@@ -3571,11 +3597,11 @@
   ]
  },
  "execution": {
-  "n": 36,
-  "meanSlipR": 0.166,
-  "medianSlipR": 0.157,
+  "n": 37,
+  "meanSlipR": 0.161,
+  "medianSlipR": 0.121,
   "worstSlipR": 1.352,
-  "medianLagSec": 43,
+  "medianLagSec": 51.5,
   "bySymbol": {
    "GBPUSD": {
     "n": 5,
@@ -3606,8 +3632,8 @@
     "meanSlipR": -0.202
    },
    "AUDUSD": {
-    "n": 3,
-    "meanSlipR": 0.252
+    "n": 4,
+    "meanSlipR": 0.189
    },
    "USDCHF": {
     "n": 2,
