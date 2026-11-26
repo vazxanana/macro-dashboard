@@ -293,6 +293,8 @@ export function nq1Trades(B, { from, market = 'nas100' } = {}) {
 // the NQ1 desk reads them (leadTrades: the frozen genomes, one position at a time a reading), kinds `nq2-l1` / `nq2-l5`. Before costs; a paper record.
 export const NQ2_IDS = ['l1', 'l5'];
 export function nq2Trades(B, { from, market = 'nas100' } = {}) {
+  // owner, 26 Nov 2026: "add the gold break out on nq2": the gold breakout T1 (the Gold breakout desk's own trades) as a third reading, kind `nq2-t1`
+  if (market === 'xau') return vbDays(toK(B['5m']), GO, 'nq2', 'xau', GOLD_T1.k, from).map((x) => ({ ...x, label: 'Gold breakout: UTC open ± ½ the previous range' }));
   if (market !== 'nas100') return [];
   const M5 = toK(B['5m']); if (M5.length < 3000) return [];
   const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 600) return [];
@@ -434,7 +436,7 @@ export const DESKS2 = {
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
   nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s Nasdaq 100 leads (stretch, breakout and big-candle combinations) and the Nasdaq breakout of the day, each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
   zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: turnaround Tuesday on the Nasdaq 100: buy the close of a first trading day of the week that fell more than 1 %, out at the next trading day\'s close (turnaround-tuesday, rule R2). Before costs.' + PAPER },
-  nq2: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq2Trades, note: 'NQ2: the two Nasdaq 100 leads that passed at the broker\'s own ticks (l1: stretch + 10-hour breakout; l5: double stretch in high volatility), long only, the ones the Nasdaq demo job trades. Before costs; the two readings overlap, so totals are not additive.' + PAPER },
+  nq2: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100', 'xau'], read: nq2Trades, note: 'NQ2: the gold breakout (gold-vol-breakout T1) and the two Nasdaq 100 leads that passed at the broker\'s own ticks (l1: stretch + 10-hour breakout; l5: double stretch in high volatility), long only, the ones the Nasdaq demo job trades. Before costs; the two readings overlap, so totals are not additive.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_DESK_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on eight of its markets (gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP and the Nasdaq 100). It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };

@@ -73,7 +73,9 @@ test('the Nasdaq breakout of the day is an NQ1 reading; ZERO is turnaround Tuesd
 });
 
 test('NQ2 is l1 and l5 alone, the same trades the NQ1 desk reads for them, under its own kinds; wired like the other desks', () => {
-  const N = D2.nq2Trades(B, { from: FROM, market: 'nas100' }); assert.deepEqual(D2.NQ2_IDS, ['l1', 'l5']); assert.equal(D2.nq2Trades(B, { from: FROM, market: 'xau' }).length, 0);
+  const N = D2.nq2Trades(B, { from: FROM, market: 'nas100' }); assert.deepEqual(D2.NQ2_IDS, ['l1', 'l5']); assert.equal(D2.nq2Trades(B, { from: FROM, market: 'usdjpy' }).length, 0);
+  { const G = D2.nq2Trades(B, { from: FROM, market: 'xau' }), V = D2.goldTrades(B, { from: FROM, market: 'xau' }), k2 = (r) => [r.t, r.side, r.entry, r.stop, r.status, r.R].join('|');   // the gold breakout: the Gold breakout desk's own trades
+    assert.ok(G.length > 0); assert.deepEqual(G.map(k2), V.map(k2)); for (const r of G) { assert.equal(r.kind, 'nq2-t1'); assert.ok(clean(r), r.id); } assert.deepEqual(D2.DESKS2.nq2.markets, ['nas100', 'xau']); }
   const key = (r) => [r.kind.split('-')[1], r.t, r.entry, r.stop, r.target, r.status, r.R].join('|');
   assert.deepEqual(N.map(key).sort(), ALL.filter((r) => /^nq1-l[15]$/.test(r.kind)).map(key).sort()); assert.ok(N.length > 0, 'the seeded market gives l1 / l5 trades');
   for (const r of N) { assert.match(r.kind, /^nq2-l[15]$/); assert.equal(r.side, 1); assert.ok(r.stop < r.entry && r.target > r.entry, r.id); assert.ok(clean(r), 'clean() refused ' + r.id); assert.equal(clean(r).kind, r.kind); }
