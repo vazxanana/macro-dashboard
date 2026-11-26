@@ -1840,7 +1840,7 @@
     "lots": 0.18,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T19:16:39.000Z",
     "councilEntry": 174.716,
     "stop": 174.675643,
@@ -1851,10 +1851,12 @@
     "slipR": -0.173,
     "lagSec": 99,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T19:16:39.000Z",
-    "brokerStop": 174.669
+    "brokerStop": 174.669,
+    "closedAt": "2026-11-26T22:01:59.000Z"
    },
    "eqx:fade:usdcad:fade-m15-s1795720500": {
     "positionId": "51642524",
@@ -1962,10 +1964,9 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 456.57,
+   "lastBalance": 443.15,
    "ids": [
     "51608452",
-    "51642523",
     "51642524",
     "51642525",
     "51644179"
@@ -1974,7 +1975,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 456.57 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 443.15 · 4 open",
   "skipped": {
    "eqx:fade:usdjpy:fade-m15-b1795725000": "stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set"
   },
@@ -2005,15 +2006,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 456.57,
-  "lastRun": "2026-11-26T22:00:06.000Z"
+  "balance": 443.15,
+  "lastRun": "2026-11-26T22:01:59.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T13:54:27.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28066.13 -> 28074.94 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T14:38:41.000Z",
    "msg": "XAUUSD position 48239176 closed at the broker",
@@ -3498,6 +3494,11 @@
    "at": "2026-11-26T21:23:40.000Z",
    "msg": "AUDUSD position 51640396 closed at the broker",
    "trade": "eqx:fvg:audusd:fvg-h1-s1795712400-1795717800"
+  },
+  {
+   "at": "2026-11-26T22:01:59.000Z",
+   "msg": "EURJPY position 51642523 closed at the broker",
+   "trade": "eqx:fade:eurjpy:fade-m15-b1795720500"
   }
  ],
  "limits": {
