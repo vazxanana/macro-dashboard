@@ -75,12 +75,13 @@ html.widget .row{padding:12px}html.widget .num{font-size:20px}
 <script>
 (function () {
 'use strict';
-var NAMES = ['Rex','Pip','Juno','Otto','Mina','Zed','Lux','Bo','Kit','Nova'];
-var FAM = ['break · fade · engulf','pullback · deviation','big candle · block · sweep','all eight kinds','wild combos','wild combos','wild combos','all eight kinds','big candle · block · sweep','Nasdaq only'];
+var NAMES = ['Rex','Pip','Juno','Otto','Mina','Zed','Sol','Bo','Ivy','Nova'];
+var IDS = [1,2,3,4,5,6,11,8,12,10];        // 26 Nov 2026: workers 7 and 9 stopped; the two market-structure workers (11, 12) sit at their desks
+var FAM = ['break · fade · engulf','pullback · deviation','big candle · block · sweep','all eight kinds','wild combos','wild combos','market structure','all eight kinds','structure + a second trigger','Nasdaq only'];
 var LAP = [0,0,1,1,1,1,0,0,0,0];            // workers whose shard 2 (lanes 8-11) runs on the laptop
 var COL = [0xe0675a,0x5fb3d9,0x8bc96a,0xe8c25a,0xb48be0,0xe58fb8,0x5fd1c4,0xe89a5a,0x9aa8e6,0xf2d46b];
-var LANES = [11,11,11,11,11,11,11,11,11,11], FRESH = 40 * 60e3, EVERY = 180e3;
-var D = NAMES.map(function (n, i) { return { id: i + 1, name: n, fam: FAM[i], lap: !!LAP[i], tries: 0, A: 0, cand: 0, looks: 0, chance: 0, since: 0, lanes: {}, rate: 0, prev: null, alive: 0, last: 0 }; });
+var LANES = [11,11,11,11,11,11,3,3,3,11], FRESH = 40 * 60e3, EVERY = 180e3;
+var D = NAMES.map(function (n, i) { return { id: IDS[i], name: n, fam: FAM[i], lap: !!LAP[i], tries: 0, A: 0, cand: 0, looks: 0, chance: 0, since: 0, lanes: {}, rate: 0, prev: null, alive: 0, last: 0 }; });
 var $ = function (id) { return document.getElementById(id); };
 var fmt = function (n) { return n >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : String(Math.round(n)); };
 var kmh = function (d) { return Math.round(d.rate * 3.6).toLocaleString(); };
@@ -118,7 +119,7 @@ function refresh() {
     if (!done) { setLive('err', fail ? 'could not read the research files' : 'no research files yet'); return; }
     D.forEach(function (d) {
       var n = d.next; if (d.prev && n.tries >= d.prev.tries && now - d.prev.at > 20e3) { var dr = (n.tries - d.prev.tries) / ((now - d.prev.at) / 1000); if (dr > 0) n.rate = dr; else n.rate = d.rate * .6; } else if (d.prev && n.tries === d.prev.tries) n.rate = d.rate * .6;
-      if (d.prev && typeof cheer === 'function' && pods.length && n.A > (d.A || 0)) cheer(d.id - 1, '+' + (n.A - d.A) + ' passed stage A!');
+      if (d.prev && typeof cheer === 'function' && pods.length && n.A > (d.A || 0)) cheer(D.indexOf(d), '+' + (n.A - d.A) + ' passed stage A!');
       d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.chance = n.chance; d.since = n.since; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.at = now;
     });
     recap(); setLive('on', 'live · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); drawRows();

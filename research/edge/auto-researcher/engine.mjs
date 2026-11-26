@@ -17,7 +17,11 @@ export const FAMILY = { 1: ['brk', 'fade', 'eg'], 2: ['pull', 'dev'], 3: ['big',
   // 25 Nov 2026: four more workers, same grids and bars (PREREGISTRATION.md, "Four more workers"); only the seeds differ
   6: ['wild'], 7: ['wild'], 8: ['brk', 'fade', 'pull', 'dev', 'big', 'blk', 'eg', 'sweep'], 9: ['big', 'blk', 'sweep'],
   // 25 Nov 2026 (owner: "one worker just for NQ try all the edges possible and do combinations"): worker 10 = NAS100 only, every trigger kind, one or two combined
-  10: ['nq'] };
+  10: ['nq'],
+  // 26 Nov 2026 (owner: "look the edges following market structure"; PREREGISTRATION.md, "Two market-structure workers"): 11 = one structure trigger, 12 = a structure trigger with a second trigger
+  11: ['ms'], 12: ['ms'] };
+export const MS_WORKERS = [11, 12], MSK = ['bos', 'choch', 'mspb'], MS_MARKETS = [...MARKETS, 'nas100'];
+export const MS_SPACE = { P: [2, 3, 5, 8], d: [0.382, 0.5, 0.618, 0.786], msP: [8, 12, 20, 30], ms: ['none', 'with', 'with', 'against'] };
 export const NQ_WORKER = 10, NQ_COST = 0;   // owner, 25 Nov 2026: "no cost because will be futures": NQ results are BEFORE costs (futures still pay a tick and a commission; a lead is re-priced at real quotes before anything else)
 const ALLK = ['brk', 'fade', 'pull', 'big', 'blk', 'dev', 'eg', 'sweep'];
 export const SPACE = {
@@ -65,6 +69,28 @@ const hiN = (D, n) => cache(D, 'hi' + n, () => { const o = new Float64Array(D.n)
 const loN = (D, n) => cache(D, 'lo' + n, () => { const o = new Float64Array(D.n).fill(NaN); for (let i = n; i < D.n; i++) { let m = Infinity; for (let k = i - n; k < i; k++) if (D.l[k] < m) m = D.l[k]; o[i] = m; } return o; });
 export const atrPct = (D) => cache(D, 'atrpct', () => { const a = atr(D), o = new Float64Array(D.n).fill(NaN), W = 500;
   for (let i = W; i < D.n; i++) { let r = 0, c = 0; for (let k = i - W; k < i; k += 5) { c++; if (a[k] < a[i]) r++; } o[i] = r / c; } return o; });
+// market structure from closed candles (PREREGISTRATION.md, "Two market-structure workers"): per bar i, known at its close:
+// bk = +1 / -1 on a break up / down, kd = 1 continuation (bos) / 2 against the structure (choch), st = the structure's direction
+// after bar i, dp = how far a non-break candle that closed with the structure pulled back into the leg (0 = none)
+export function struct(D, P) { return cache(D, 'ms' + P, () => {
+  const n = D.n, bk = new Int8Array(n), kd = new Int8Array(n), st = new Int8Array(n), dp = new Float32Array(n);
+  let sh = NaN, shI = -1, sl = NaN, slI = -1, dir = 0, org = NaN, ext = NaN;
+  for (let i = 0; i < n; i++) {
+    const k = i - P;
+    if (k >= P) { let hi = true, lo = true;
+      for (let j = k - P; j <= i && (hi || lo); j++) { if (j === k) continue; if (j < k ? D.h[j] >= D.h[k] : D.h[j] > D.h[k]) hi = false; if (j < k ? D.l[j] <= D.l[k] : D.l[j] < D.l[k]) lo = false; }
+      if (hi) { sh = D.h[k]; shI = k; } if (lo) { sl = D.l[k]; slI = k; } }
+    let b = 0;
+    if (sh === sh && D.c[i] > sh) b = 1; else if (sl === sl && D.c[i] < sl) b = -1;
+    if (b) { bk[i] = b; kd[i] = dir === -b ? 2 : 1; let o = b > 0 ? Infinity : -Infinity;
+      for (let j = b > 0 ? shI : slI; j <= i; j++) o = b > 0 ? Math.min(o, D.l[j]) : Math.max(o, D.h[j]);
+      org = o; ext = b > 0 ? D.h[i] : D.l[i]; dir = b; if (b > 0) sh = NaN; else sl = NaN; }
+    else if (dir) { const leg = dir > 0 ? ext - org : org - ext;
+      if (leg > 0 && (dir > 0 ? D.c[i] > D.o[i] && D.l[i] > org : D.c[i] < D.o[i] && D.h[i] < org)) { const q = (dir > 0 ? ext - D.l[i] : D.h[i] - ext) / leg; if (q > 0) dp[i] = q; }
+      if (dir > 0 ? D.h[i] > ext : D.l[i] < ext) ext = dir > 0 ? D.h[i] : D.l[i]; }
+    st[i] = dir;
+  }
+  return { bk, kd, st, dp }; }); }
 export function prep(D, mk) {
   D.mk = mk; D.ind = {}; D.hour = new Uint8Array(D.n); D.dow = new Uint8Array(D.n); D.month = new Int32Array(D.n);
   for (let i = 0; i < D.n; i++) { const d = new Date(D.t[i] * 1000); D.hour[i] = d.getUTCHours(); D.dow[i] = d.getUTCDay(); D.month[i] = d.getUTCFullYear() * 12 + d.getUTCMonth(); }
@@ -89,7 +115,17 @@ function trigger(r, kind) {
     case 'sweep': return { kind, N: pick(r, SPACE.N), follow: r() < 0.5 };
   }
 }
+function msGenome(r, worker) {
+  const one = () => { const kind = pick(r, MSK), P = pick(r, MS_SPACE.P); return kind === 'mspb' ? { kind, P, d: pick(r, MS_SPACE.d) } : { kind, P, follow: r() < 0.7 }; };
+  const trig = [one()]; if (worker === 12) trig.push(r() < 0.5 ? one() : trigger(r, pick(r, ALLK)));
+  const h0 = r() < 0.5 ? null : pick(r, SPACE.hours);
+  return { mk: pick(r, MS_MARKETS), trig, side: pick(r, ['both', 'both', 'long', 'short']),
+    hours: h0 == null ? null : [h0, (h0 + pick(r, [1, 2, 3, 4, 6, 8, 12])) % 24], dows: r() < 0.7 ? null : pick(r, [[1, 2, 3, 4, 5], [1, 2, 3], [2, 3, 4], [3, 4, 5], [1, 5]]),
+    trend: pick(r, ['none', 'none', 'with', 'against']), vol: pick(r, ['none', 'none', 'low', 'high']), volP: pick(r, SPACE.atrPct),
+    ms: pick(r, MS_SPACE.ms), msP: pick(r, MS_SPACE.msP), stop: pick(r, SPACE.stop), rr: pick(r, SPACE.rr), hold: pick(r, SPACE.hold) };
+}
 export function genome(r, worker) {
+  if (FAMILY[worker][0] === 'ms') return msGenome(r, worker);
   const fam = FAMILY[worker], kinds = fam[0] === 'wild' ? [pick(r, ALLK), pick(r, ALLK)] : fam[0] === 'nq' ? (r() < 0.5 ? [pick(r, ALLK)] : [pick(r, ALLK), pick(r, ALLK)]) : [pick(r, fam)];
   const h0 = r() < 0.5 ? null : pick(r, SPACE.hours);
   return { mk: worker === NQ_WORKER ? 'nas100' : pick(r, MARKETS), trig: kinds.map((k) => trigger(r, k)), side: pick(r, ['both', 'both', 'long', 'short']),
@@ -117,6 +153,8 @@ export function sig(D, tr, i) {
         else if (bear || bull) { if ((bear && D.c[i] <= D.h[b]) || (bull && D.c[i] >= D.l[b])) break; }
       }
       return tr.follow ? dir : -dir; }
+    case 'bos': case 'choch': { const S = struct(D, tr.P), b = S.bk[i]; if (!b || S.kd[i] !== (tr.kind === 'bos' ? 1 : 2)) return 0; return tr.follow ? b : -b; }
+    case 'mspb': { const S = struct(D, tr.P); return S.dp[i] >= tr.d ? S.st[i] : 0; }
     case 'sweep': { const H = hiN(D, tr.N)[i], L = loN(D, tr.N)[i]; const dir = D.l[i] < L && D.c[i] > L ? 1 : D.h[i] > H && D.c[i] < H ? -1 : 0; return tr.follow ? dir : -dir; }
   }
   return 0;
@@ -137,6 +175,7 @@ export function simulate(D, g, lo, hi, flip = false) {
     let s = 0; for (const tr of g.trig) { const q = sig(D, tr, i); if (q === 0 || (s !== 0 && q !== s)) { s = 0; break; } s = q; } if (s === 0) continue;
     if (g.side === 'long' && s < 0 || g.side === 'short' && s > 0) continue;
     if (trendMA) { const m = trendMA[i]; if (!(m === m)) continue; const up = D.c[i] > m ? 1 : -1; if (g.trend === 'with' ? up !== s : up === s) continue; }
+    if (g.ms && g.ms !== 'none') { const d = struct(D, g.msP).st[i]; if (!d || (g.ms === 'with' ? d !== s : d === s)) continue; }   // the larger structure (workers 11, 12 only)
     if (!passes(D, g, i)) continue;
     const side = flip ? -s : s, entry = D.o[i + 1], dist = g.stop * A, stop = entry - side * dist, tgt = g.rr > 0 ? entry + side * g.rr * dist : null;
     const cst = D.costRel ? D.costRel * entry : D.cost;     // an index costs a share of its price, a currency or metal a fixed amount
@@ -168,7 +207,7 @@ export async function run(worker, outDir, minutes, cacheDir) {
   fs.mkdirSync(outDir, { recursive: true });
   let S = { version: VERSION, worker, started: new Date().toISOString(), tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0, groups: {}, leads: [], looks: [], chunks: 0 };
   try { const prev = JSON.parse(fs.readFileSync(file, 'utf8')); if (prev.version === VERSION) S = { ...prev, chunks: prev.chunks + 1 }; } catch {}
-  const MY = worker === NQ_WORKER ? ['nas100'] : MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
+  const MY = worker === NQ_WORKER ? ['nas100'] : MS_WORKERS.includes(worker) ? MS_MARKETS : MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
   const have = MY.filter((m) => D[m] && D[m].n > 5000); if (!have.length) throw new Error('no candles');
   const r = rng(worker * 1000003 + LANE * 104729000 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); S.chanceCandidates = +(S.tries * 0.0013 * 0.07).toFixed(1); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
   let lastSave = Date.now();
