@@ -6319,7 +6319,7 @@
     "lots": 3.66,
     "digits": 3,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T00:46:25.000Z",
     "councilEntry": 159.128,
     "stop": 159.016,
@@ -6330,26 +6330,27 @@
     "slipR": -0.286,
     "lagSec": 2185,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T00:46:25.000Z",
-    "brokerStop": 158.984
+    "brokerStop": 158.984,
+    "closedAt": "2026-11-26T00:58:29.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12894.31,
+   "lastBalance": 12615.39,
    "ids": [
     "51559058",
-    "51559862",
-    "51565725"
+    "51559862"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12894.31 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 12615.39 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6357,15 +6358,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12894.31,
-  "lastRun": "2026-11-26T00:55:26.000Z"
+  "balance": 12615.39,
+  "lastRun": "2026-11-26T00:58:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet gbpusd-replica-1794409826-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "gbpusd-replica-1794409826-b"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet audusd-replica-1794409826-b: daily loss stop (44.6% down today) (will retry)",
@@ -7853,6 +7849,11 @@
   {
    "at": "2026-11-26T00:46:25.000Z",
    "msg": "opened buy USDJPY 3.66 lot (council boxfade)",
+   "trade": "boxfade:usdjpy:boxfade-m5-b1795651800"
+  },
+  {
+   "at": "2026-11-26T00:58:29.000Z",
+   "msg": "USDJPY position 51565725 closed at the broker",
    "trade": "boxfade:usdjpy:boxfade-m5-b1795651800"
   }
  ],

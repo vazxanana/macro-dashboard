@@ -1235,7 +1235,7 @@
     "lots": 0.1,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T00:46:14.000Z",
     "councilEntry": 1.31112,
     "stop": 1.310806,
@@ -1248,10 +1248,12 @@
     "slipR": 0.478,
     "lagSec": 2774,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T00:46:14.000Z",
-    "brokerStop": 1.31082
+    "brokerStop": 1.31082,
+    "closedAt": "2026-11-26T00:58:25.000Z"
    },
    "eqx:fvg:usdjpy:fvg-h1-b1795636800-1795653000": {
     "positionId": "51565715",
@@ -1281,17 +1283,16 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 477.12,
+   "lastBalance": 481.52,
    "ids": [
     "51562647",
-    "51565713",
     "51565715"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 477.12 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 481.52 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:audusd:fvg-h1-s1795579200-1795629600": {
@@ -1330,15 +1331,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 477.12,
-  "lastRun": "2026-11-26T00:55:21.000Z"
+  "balance": 481.52,
+  "lastRun": "2026-11-26T00:58:25.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T19:33:46.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T19:34:52.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 19:43 UTC) (will retry)",
@@ -2823,6 +2819,11 @@
    "at": "2026-11-26T00:51:21.000Z",
    "msg": "EURJPY position 51565707 closed at the broker",
    "trade": "eqx:fade:eurjpy:fade-m15-b1795653000"
+  },
+  {
+   "at": "2026-11-26T00:58:25.000Z",
+   "msg": "GBPUSD position 51565713 closed at the broker",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795651200"
   }
  ],
  "limits": {
