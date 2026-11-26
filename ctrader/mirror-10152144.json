@@ -1592,7 +1592,7 @@
     "lots": 0.1,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T14:01:39.000Z",
     "councilEntry": 174.884,
     "stop": 174.951,
@@ -1603,10 +1603,12 @@
     "slipR": -0.03,
     "lagSec": 99,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T14:01:39.000Z",
-    "brokerStop": 174.953
+    "brokerStop": 174.953,
+    "closedAt": "2026-11-26T15:27:13.000Z"
    },
    "eqx:fade:nzdusd:fade-m15-s1795701600": {
     "positionId": "51599861",
@@ -1777,16 +1779,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 462.74,
+   "lastBalance": 470.65,
    "ids": [
-    "51599860",
     "51604105"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 462.74 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 470.65 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -1807,7 +1808,7 @@
    "eqx:fade:xag:fade-m15-s1795705200": {
     "why": "XAGUSD: even the minimum lot (0.01) risks 10.35, 2.2% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-26T15:20:59.000Z"
+    "at": "2026-11-26T15:27:13.000Z"
    }
   },
   "paused": {},
@@ -1815,15 +1816,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 462.74,
-  "lastRun": "2026-11-26T15:24:11.000Z"
+  "balance": 470.65,
+  "lastRun": "2026-11-26T15:27:13.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T04:27:35.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 27856.89 -> 27883.32 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T05:03:21.000Z",
    "msg": "moved NAS100 48212677 protection: stop 27883.32 -> 27889.92 (council ict-A)",
@@ -3308,6 +3304,11 @@
    "at": "2026-11-26T15:15:24.000Z",
    "msg": "opened buy NZDUSD 0.14 lot (council eqx-fade)",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795706100"
+  },
+  {
+   "at": "2026-11-26T15:27:13.000Z",
+   "msg": "EURJPY position 51599860 closed at the broker",
+   "trade": "eqx:fade:eurjpy:fade-m15-s1795701600"
   }
  ],
  "limits": {
