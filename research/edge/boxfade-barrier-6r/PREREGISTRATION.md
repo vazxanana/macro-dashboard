@@ -92,3 +92,27 @@ the primary with the hours filter dropped (any hour), each with 6R and one at a 
 fixed moment removed, the trades that closed before it (side, fill time, fill, stop, barrier label, result) are unchanged.
 
 No variant (another target, distance, timeframe set, hours rule or market) is tested on these years after this run.
+
+## Amendment (26 Nov 2026, committed alone before any result was read)
+
+The first run of one year counted how many Box fade signals qualify as "at a barrier" under the text above, and nothing else
+(no R, win rate or outcome of any trade was printed or read): 1,995 of the 2,009 signals of 2018. With every unbroken zone of
+five timeframes standing for up to 1,500 days, almost any price is inside some zone of the right side, so the condition
+selects nothing and C1 would be empty. That is not how the desk uses a barrier: it acts when price COMES BACK to the zone (the
+first return and each later visit) and watches for 60 candles of the barrier's confirmation timeframe (`BARRIER_WATCH`,
+`BARRIER`, `BARRIER30`). Condition (a) is therefore tightened to the desk's own notion; everything else above stands.
+
+A zone must also be **in play** at T: a **return** R of price to it exists with R <= T < R + the watch, where
+
+- a return = the close of a 5-minute candle that trades into the zone (a buy zone: low <= the zone's high; a sell zone: high
+  >= the zone's low) when the zone is waiting for one. A zone waits for a return from the moment it is known (the first
+  return), and again each time a candle of its own timeframe has closed wholly outside it on the side price came from (a buy
+  zone: the candle's low above the zone's high; a sell zone mirrored): the desk's rule for a later visit. Only candles closed
+  by T are read; a zone broken by T has no return after its break.
+- the watch = 60 candles of the confirmation timeframe of the desk's tables: a D1 barrier 60 hours (H1), H4 15 hours (M15),
+  H1 5 hours (M5), M30 5 hours (M5), M15 1 hour (M1).
+
+So the primary takes a Box fade signal when its fill is inside (or within 0.25 x ATR of the near edge of) a standing zone of
+its own side that price returned to within that zone's watch. C1 = the Box fade signals for which no such zone exists. The
+"opposite side" context row uses the same in-play rule. The test, the bar, the windows, the costs and the controls are
+unchanged. No other change will be made.
