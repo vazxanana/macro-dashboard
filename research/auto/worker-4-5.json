@@ -2,14 +2,14 @@
  "version": "auto-1",
  "worker": 4,
  "started": "2026-11-25T12:13:53.454Z",
- "tries": 3240200,
- "survivedA": 4733,
- "candidates": 581,
- "cLooks": 98,
+ "tries": 3350800,
+ "survivedA": 4890,
+ "candidates": 598,
+ "cLooks": 100,
  "cPasses": 0,
  "groups": {
   "usdchf|fade|both": {
-   "more": 46,
+   "more": 47,
    "pass": false
   },
   "xau|brk|long": {
@@ -17,7 +17,7 @@
    "pass": false
   },
   "eurjpy|fade|both": {
-   "more": 21,
+   "more": 22,
    "pass": false
   },
   "eurusd|dev+|both": {
@@ -25,7 +25,7 @@
    "pass": false
   },
   "eurjpy|blk-|both": {
-   "more": 36,
+   "more": 37,
    "pass": false
   },
   "audusd|fade|short": {
@@ -37,7 +37,7 @@
    "pass": false
   },
   "eurjpy|brk|both": {
-   "more": 13,
+   "more": 15,
    "pass": false
   },
   "xau|big+|long": {
@@ -49,7 +49,7 @@
    "pass": false
   },
   "usdjpy|blk-|both": {
-   "more": 20,
+   "more": 21,
    "pass": false
   },
   "eurusd|big+|both": {
@@ -65,7 +65,7 @@
    "pass": false
   },
   "usdchf|big+|both": {
-   "more": 9,
+   "more": 11,
    "pass": false
   },
   "usdchf|pull|both": {
@@ -105,7 +105,7 @@
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 19,
+   "more": 22,
    "pass": true
   },
   "usdjpy|fade|both": {
@@ -113,7 +113,7 @@
    "pass": false
   },
   "usdcad|fade|both": {
-   "more": 20,
+   "more": 21,
    "pass": false
   },
   "eurjpy|eg+|both": {
@@ -153,7 +153,7 @@
    "pass": false
   },
   "audusd|eg-|short": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "xau|eg-|both": {
@@ -293,7 +293,7 @@
    "pass": false
   },
   "eurjpy|big-|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "eurusd|big-|both": {
@@ -381,7 +381,7 @@
    "pass": false
   },
   "nzdusd|blk+|long": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|brk|short": {
@@ -397,6 +397,14 @@
    "pass": false
   },
   "eurjpy|blk+|long": {
+   "more": 0,
+   "pass": false
+  },
+  "eurjpy|blk-|long": {
+   "more": 0,
+   "pass": false
+  },
+  "usdchf|dev-|short": {
    "more": 0,
    "pass": false
   }
@@ -5735,9 +5743,124 @@
     "months": 77
    },
    "p": 0.5438
+  },
+  {
+   "at": "2026-11-26T02:15:33.139Z",
+   "group": "eurjpy|blk-|long",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "blk",
+      "H": 4,
+      "at": 23,
+      "follow": false
+     }
+    ],
+    "side": "long",
+    "hours": null,
+    "dows": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 1.5,
+    "rr": 0,
+    "hold": 96
+   },
+   "A": {
+    "n": 288,
+    "mean": 0.6063,
+    "t": 3.09,
+    "win": 24,
+    "months": 110
+   },
+   "B": {
+    "n": 135,
+    "mean": 0.3778,
+    "t": 1.51,
+    "win": 22.2,
+    "months": 52
+   },
+   "placeboA": {
+    "n": 289,
+    "mean": -0.3613,
+    "t": -2.94,
+    "win": 11.8,
+    "months": 109
+   },
+   "C": {
+    "n": 216,
+    "mean": 0.2289,
+    "t": 1.11,
+    "win": 18.5,
+    "months": 79
+   },
+   "p": 0.1335
+  },
+  {
+   "at": "2026-11-26T02:26:49.493Z",
+   "group": "usdchf|dev-|short",
+   "g": {
+    "mk": "usdchf",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 1,
+      "follow": false
+     }
+    ],
+    "side": "short",
+    "hours": [
+     20,
+     4
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.5,
+    "stop": 1,
+    "rr": 0.5,
+    "hold": 96
+   },
+   "A": {
+    "n": 665,
+    "mean": 0.0849,
+    "t": 3.38,
+    "win": 74.7,
+    "months": 115
+   },
+   "B": {
+    "n": 318,
+    "mean": 0.0767,
+    "t": 1.86,
+    "win": 74.8,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 699,
+    "mean": -0.1031,
+    "t": -4.1,
+    "win": 62.2,
+    "months": 115
+   },
+   "C": {
+    "n": 448,
+    "mean": 0.0462,
+    "t": 1.39,
+    "win": 73.4,
+    "months": 80
+   },
+   "p": 0.08226
   }
  ],
- "chunks": 20,
- "updated": "2026-11-26T02:07:31.443Z",
- "chanceCandidates": 294.9
+ "chunks": 21,
+ "updated": "2026-11-26T02:32:36.609Z",
+ "chanceCandidates": 304.9
 }
