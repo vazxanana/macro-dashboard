@@ -160,6 +160,8 @@ jobs:
             # H1 dominant-zone limit on the Council DEMO account (council/dom-demo.mjs, 23 Nov 2026): a forward demo record, label "dom";
             # reads H1 candles, connects only when an order is due or one of its own rests or is open; never fails or holds the round.
             timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo round $i failed"
+            # gold only, 4R target, its own label and record (26 Nov 2026, owner: "yes do gold dom 4r on demo"); demo account only
+            timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo round $i failed"
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
@@ -236,6 +238,7 @@ jobs:
                 node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
                 timeout 45 node council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo quick pass $i failed"
+                timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo quick pass $i failed"
                 node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true

@@ -31,11 +31,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { PT, scrubber, orderStep, pendingStep, cancelStep, amendStep, normName } from './ctrader-mirror.mjs';
-import { connect } from './gotobi.mjs';
+import { connect, accountFor } from './gotobi.mjs';
 import { buildZones } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
 
 export const LABEL = 'dom';
+// A second, separate record (26 Nov 2026, owner: "yes do gold dom 4r on demo"): `node council/dom-demo.mjs data --variant gold4r`.
+// The same zone, order, stop and guards on GOLD ONLY with a 4R target (the cell of research/edge/dom-gold-hourcost that made
+// +0.072R a trade at measured costs in 2024-now and -0.015R in 2021-23: it FAILED its test, so this is a forward demo record to
+// see which half repeats, never an edge). Its own label ('dom4': the base job never touches its orders, nor it the base job's),
+// its own file dom4/trades.json and config key (config.dom4 = { on, account, risk }). Account: config.dom4.account, else the
+// gotobi job's (the Shadows + LIT demo account), never the base job's small account. Risk 0.25 % of the balance a trade.
+export const VARIANTS = { gold4r: { key: 'dom4', label: 'dom4', rr: 4, markets: ['xau'], risk: 0.0025, name: 'Gold DOM 4R demo' } };
+const BASE = { key: 'dom', label: LABEL, rr: null, markets: null, risk: null, name: 'H1 DOM demo' };
+let V = BASE;
 export const RISK = 0.005, RISK_MIN = 0.0005, RISK_MAX = 0.01, MAX_RISK = 0.01, MAX_MARKET = 3, MAX_TOTAL = 20, LIFE_S = 24 * 3600, RR = 2, ATR_K = 0.25, NEAR_ATR = 1;
 export const STALE_S = 2 * 3600;          // a market whose newest candle is older than this is shut: nothing is armed there
 const H = 3600, DAY = 86400;
@@ -64,7 +73,7 @@ export function usdPer(quote, px) {
 }
 
 export const idOf = (market, side, t) => `${market}-${side}-${t}`;
-export const commentOf = (id) => `${LABEL} ${id}`;
+export const commentOf = (id) => `${V.label} ${id}`;
 // ATR(14): the mean true range of the last 14 closed candles (needs 15)
 export function atr14(L) { if (L.length < 15) return null; let s = 0; for (let i = L.length - 14; i < L.length; i++) s += Math.max(L[i].h - L[i].l, Math.abs(L[i].h - L[i - 1].c), Math.abs(L[i].l - L[i - 1].c)); return s / 14; }
 // rows [[t, o, h, l, c]] (the forming candle may be the last) -> closed candles, the zones (all, with `stands`), ATR, last price
@@ -76,10 +85,10 @@ export function read(rows, now) {
   return { L, zones, atr: atr14(L), price, lastT };
 }
 // the order for one zone (prices unrounded); null when the levels leave no room
-export function plan(z, atr, cost) {
+export function plan(z, atr, cost, rr = V.rr || RR) {
   const s = z.side === 'buy' ? 1 : -1, entry = s > 0 ? z.top : z.bot, pad = cost / 2 + ATR_K * atr, stop = s > 0 ? z.bot - pad : z.top + pad, risk = Math.abs(entry - stop);
   if (!(risk > 0)) return null;
-  return { entry, stop, target: entry + s * RR * risk, risk };
+  return { entry, stop, target: entry + s * rr * risk, risk };
 }
 // zones to arm on one market now: standing, right side of the price, near edge within 1 ATR, not traded before
 export function armable(market, R, have) {
@@ -99,18 +108,20 @@ const Rof = (rec, exit) => (rec.fill != null && exit != null && rec.fill !== rec
 const LIVE = (x) => x.status === 'placed' || x.status === 'open';
 const NOTNOW = /MARKET_CLOSED|SYMBOL_HAS_HOLIDAY|NO_QUOTES|TRADING_DISABLED|not tradable now/;
 
-export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log } = {}) {
-  const scrub = scrubber(env), file = path.join(dir, 'dom', 'trades.json'), now = Math.floor(clock() / 1000), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
-  let J; try { J = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { if (fs.existsSync(file)) { log('dom: dom/trades.json does not parse: left as it is'); return { skipped: 'file' }; } J = { trades: [] }; }
+export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log: log0 = console.log, variant = null } = {}) {
+  V = variant ? VARIANTS[variant] : BASE; if (!V) throw new Error('dom: unknown variant ' + variant);
+  const log = V === BASE ? log0 : (m) => log0(String(m).replace(/^dom:/, V.key + ':'));
+  const scrub = scrubber(env), file = path.join(dir, V.key, 'trades.json'), now = Math.floor(clock() / 1000), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
+  let J; try { J = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { if (fs.existsSync(file)) { log(`dom: ${V.key}/trades.json does not parse: left as it is`); return { skipped: 'file' }; } J = { trades: [] }; }
   J.trades = J.trades || []; J.notOffered = J.notOffered || {};
   let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
-  const C = cfg.dom || {}; if (C.on === false) return { skipped: 'off' };
+  const C = cfg[V.key] || {}; if (C.on === false) return { skipped: 'off' };
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('dom: cTrader demo not configured'); return { skipped: 'config' }; }
-  const account = (C.account && String(C.account).trim()) || String(env.CTRADER_ACCOUNT_ID || '').trim(); if (!account) { log('dom: no demo account for it'); return { skipped: 'account' }; }
-  const risk = Math.min(RISK_MAX, Math.max(RISK_MIN, +C.risk || RISK));
+  const account = (C.account && String(C.account).trim()) || (V === BASE ? String(env.CTRADER_ACCOUNT_ID || '').trim() : String(accountFor(dir, env, cfg) || '').trim()); if (!account) { log('dom: no demo account for it'); return { skipped: 'account' }; }
+  const risk = Math.min(RISK_MAX, Math.max(RISK_MIN, +C.risk || V.risk || RISK));
   // 25 Nov 2026 (owner: "All the orders must be the ones included in the edge"): the job arms the DOM desk's eight markets (a test
   // compares DESK_MARKETS with council/edge-desks-2.mjs); config.dom.markets may narrow them further, never widen
-  const markets = Object.keys(MARKETS).filter((k) => DESK_MARKETS.includes(k) && (!Array.isArray(C.markets) || C.markets.includes(k)));
+  const markets = Object.keys(MARKETS).filter((k) => DESK_MARKETS.includes(k) && (!V.markets || V.markets.includes(k)) && (!Array.isArray(C.markets) || C.markets.includes(k)));
   // candles of every market (a failed market is left out of this pass)
   const R = {}, px = {};
   await Promise.all(markets.map(async (k) => { try { const rows = await barsFn(k, now); R[k] = read(rows, now); if (R[k].price > 0) px[k] = R[k].price; } catch (e) { log(`dom: ${k}: ${scrub(String(e.message || e)).slice(0, 100)}`); } }));
@@ -130,7 +141,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
     ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
     if (J.conn && J.conn.error) { J.conn = { ok: true, acct: cur, since: iso() }; dirty = true; }   // back after a refusal: said once
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), positions = rc.position || [], orders = rc.order || [];
-    const mine = (x) => (x.tradeData || {}).label === LABEL, byComment = (list, id) => list.find((x) => mine(x) && String((x.tradeData || {}).comment || '') === commentOf(id));
+    const mine = (x) => (x.tradeData || {}).label === V.label, byComment = (list, id) => list.find((x) => mine(x) && String((x.tradeData || {}).comment || '') === commentOf(id));
     const sideOf = (td) => (+td.tradeSide === 2 || td.tradeSide === 'SELL' ? 'sell' : 'buy');
     const closePos = async (p) => s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(p.positionId), volume: +p.tradeData.volume }, PT.EXECUTION_EVENT, orderStep);
     // RULE 1 on a filled position: a stop at the broker, else set by amend, else closed at once
@@ -207,7 +218,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           if (volume > max) volume = Math.floor(max / stepV) * stepV;
           if (!(volume >= min)) { riskNow = (min / 100) * lossUnit / balance; if (!(riskNow <= MAX_RISK)) throw Object.assign(new Error('the smallest volume would risk more than 1 % of the balance'), { skip: true }); volume = min; }
           const order = { ctidTraderAccountId: ctid, symbolId, orderType: 2, tradeSide: sgn > 0 ? 1 : 2, volume, limitPrice: entry, stopLoss: stop, takeProfit: target,
-            label: LABEL, comment: commentOf(id), clientOrderId: id.slice(0, 50), timeInForce: 1, expirationTimestamp: (now + LIFE_S) * 1000 };   // 2: LIMIT, 1: GOOD_TILL_DATE
+            label: V.label, comment: commentOf(id), clientOrderId: id.slice(0, 50), timeInForce: 1, expirationTimestamp: (now + LIFE_S) * 1000 };   // 2: LIMIT, 1: GOOD_TILL_DATE
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, pendingStep);
           Object.assign(base, { entry, stop, target, risk: +riskNow.toFixed(5), volume, balance, digits, status: 'placed', orderId: ev.order && ev.order.orderId != null ? String(ev.order.orderId) : null });
           J.trades.push(base); dirty = true; did.push(`${id} placed`); log(`dom: ${k} ${z.side} limit ${entry}, stop ${stop}, target ${target}, volume ${volume}`);
@@ -232,6 +243,8 @@ export async function oandaRows(sym, now, base = process.env.MD_BASE || 'https:/
 }
 if (process.argv[1] && process.argv[1].endsWith('dom-demo.mjs')) {
   const dir = process.argv[2] || 'data'; const { execFileSync } = await import('node:child_process');
-  const save = () => { try { execFileSync('node', ['council/datasync.mjs', dir, 'save', `H1 DOM demo ${new Date().toISOString().slice(0, 16)}Z`, 'dom/trades.json'], { stdio: 'inherit' }); } catch (e) { console.log('dom: save failed (kept locally)'); } };
-  const out = await step({ dir, bars: oandaRows, save }); if (out.did && out.did.length) console.log('dom:', out.did.join(', '));
+  const vi = process.argv.indexOf('--variant'), variant = vi > 0 ? process.argv[vi + 1] : null, W = variant ? VARIANTS[variant] : BASE;
+  if (!W) { console.log('dom: unknown variant ' + variant); process.exit(1); }
+  const save = () => { try { execFileSync('node', ['council/datasync.mjs', dir, 'save', `${W.name} ${new Date().toISOString().slice(0, 16)}Z`, `${W.key}/trades.json`], { stdio: 'inherit' }); } catch (e) { console.log(W.key + ': save failed (kept locally)'); } };
+  const out = await step({ dir, bars: oandaRows, save, variant }); if (out.did && out.did.length) console.log(W.key + ':', out.did.join(', '));
 }

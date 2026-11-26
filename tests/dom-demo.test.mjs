@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { LABEL, MAX_MARKET, MAX_TOTAL, LIFE_S, read, plan, armable, idOf, commentOf, inferExit, usdPer, step } from '../council/dom-demo.mjs';
+import { VARIANTS, LABEL, MAX_MARKET, MAX_TOTAL, LIFE_S, read, plan, armable, idOf, commentOf, inferExit, usdPer, step } from '../council/dom-demo.mjs';
 import { PT } from '../council/ctrader-mirror.mjs';
 import { execChecks } from '../council/forward.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
@@ -164,9 +164,34 @@ test('forward.mjs E5 leaves the dom job out (label on positions and orders, its 
 });
 test('wiring: demo only, its own label, the loop runs it under a timeout after the breakout job, no live import', () => {
   const src = fs.readFileSync(new URL('../council/dom-demo.mjs', import.meta.url), 'utf8'), yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
-  assert.match(src, /CTRADER_ENV\)\.trim\(\)\.toLowerCase\(\) !== 'demo'/); assert.ok(src.includes("import { connect } from './gotobi.mjs'"));
+  assert.match(src, /CTRADER_ENV\)\.trim\(\)\.toLowerCase\(\) !== 'demo'/); assert.ok(src.includes("import { connect, accountFor } from './gotobi.mjs'"));
   assert.equal((yml.match(/timeout 45 node council\/dom-demo\.mjs data \|\| echo/g) || []).length, 2, 'the round and the quick pass');
-  const m = src.match(/const order = \{[^}]*\}/); assert.ok(m && /stopLoss: stop/.test(m[0]) && /takeProfit: target/.test(m[0]) && /label: LABEL/.test(m[0]));
+  const m = src.match(/const order = \{[^}]*\}/); assert.ok(m && /stopLoss: stop/.test(m[0]) && /takeProfit: target/.test(m[0]) && /label: V\.label/.test(m[0]));
   assert.equal(src.match(/PT\.NEW_ORDER_REQ/g).length, 1);
   const tr = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8'); assert.match(tr, /dom: rd\('dom\/trades\.json', null\)/);
+});
+
+test('26 Nov 2026, gold DOM 4R: gold only, a 4R target, its own label, file and account; the base job and it never touch each other', async () => {
+  const R = rows(), r = read(R.rows, R.now), b = broker({ offered: ['XAUUSD', 'EURJPY'] });
+  b.accounts = [{ ctidTraderAccountId: 77, traderLogin: 49478137, isLive: false }, { ctidTraderAccountId: 55, traderLogin: 10152146, isLive: false }];
+  const dir = setup(); fs.mkdirSync(path.join(dir, 'ctrader')); fs.writeFileSync(path.join(dir, 'ctrader', 'mirror-accounts.json'), JSON.stringify({ groups: [{ account: '10152146', books: ['shadow', 'lit'] }] }));
+  await go(dir, b, R, { variant: 'gold4r', eur: R });
+  const o = news(b); assert.equal(o.length, 1, 'gold only: the EUR/JPY zone gives no order'); const W = VARIANTS.gold4r;
+  const P = plan({ side: 'buy', bot: 4000, top: 4002 }, r.atr, COSTS.xau, 4), at = (v) => +v.toFixed(2);
+  assert.equal(o[0].label, 'dom4'); assert.notEqual(W.label, LABEL); assert.equal(o[0].comment, 'dom4 ' + idOf('xau', 'buy', ZT(R)));
+  assert.equal(o[0].ctidTraderAccountId, 55, 'the Shadows + LIT demo account, not the base job account'); assert.equal(o[0].limitPrice, 4002);
+  assert.equal(o[0].stopLoss, at(P.stop)); assert.ok(o[0].stopLoss < o[0].limitPrice, 'a stop on the losing side');
+  assert.ok(Math.abs((o[0].takeProfit - o[0].limitPrice) / (o[0].limitPrice - o[0].stopLoss) - 4) < 0.01, 'target 4R');
+  const loss = (o[0].volume / 100) * (o[0].limitPrice - o[0].stopLoss); assert.ok(loss <= 25 + 1e-6 && loss > 24, `0.25 % of $10,000 = $25, risked $${loss}`);
+  const J = JSON.parse(fs.readFileSync(path.join(dir, 'dom4', 'trades.json'), 'utf8')); assert.equal(J.trades[0].status, 'placed'); assert.ok(!fs.existsSync(path.join(dir, 'dom', 'trades.json')));
+  assert.ok(!JSON.stringify(J).includes('10152146'), 'the account number is never written');
+  await go(dir, b, { ...R, now: R.now + 60 }, { variant: 'gold4r' }); assert.equal(news(b).length, 1, 'never placed twice');
+  // the base job on its own account places its own 2R order and leaves the dom4 order alone
+  await go(dir, b, { ...R, now: R.now + 120 }); const all = news(b); assert.equal(all.length, 2); assert.equal(all[1].label, LABEL); assert.equal(all[1].ctidTraderAccountId, 77);
+  assert.ok(!b.sent.some((m) => m.payloadType === PT.CANCEL_ORDER_REQ), 'neither cancels the order of the other');
+  // off switch, a live account, an unknown variant
+  const d2 = setup({ dom4: { on: false } }); assert.deepEqual(await go(d2, broker(), R, { variant: 'gold4r' }), { skipped: 'off' });
+  const d3 = setup({ dom4: { account: '49478137' } }), bl = broker({ live: true }); await go(d3, bl, R, { variant: 'gold4r' }); assert.equal(news(bl).length, 0, 'a live account: nothing sent');
+  await assert.rejects(() => go(setup(), broker(), R, { variant: 'nope' }));
+  const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8'); assert.equal((yml.match(/dom-demo\.mjs data --variant gold4r \|\|/g) || []).length, 2);
 });
