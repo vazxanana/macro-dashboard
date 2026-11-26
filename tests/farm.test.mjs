@@ -89,6 +89,15 @@ test('the site look, reduced motion and a light frame loop', () => {
   const frame = script.match(/function frame\(\) \{[\s\S]*?\n\}/)[0];
   assert.ok(!/\.map\(|\.filter\(|new THREE\.(?!Vector3\(-10)/.test(frame.replace(/if \(mode\.race !== raceNow\) \{[\s\S]*?\n  \}/, '')), 'the frame loop allocates nothing of its own');
 });
+test('what each agent is doing and the results board come from the files, escaped, with the luck caveat', () => {
+  assert.match(page, /id="crew"/); assert.match(page, /id="rb"/);
+  assert.match(page, /About one random rule in forty clears that by luck/);
+  assert.match(page, /never an edge/);
+  const fns = new Function(['esc', 'num', 'trigText', 'ruleText', 'sideText'].map((n) => script.match(new RegExp('function ' + n + '\\([^)]*\\) \\{[\\s\\S]*?\\n\\}|function ' + n + '\\([^)]*\\) \\{[^\\n]*\\}'))[0]).join('\n') + '; return { esc, ruleText, sideText };')();
+  assert.equal(fns.ruleText({ trig: [{ kind: 'ef', life: 24 }, { kind: 'bo', P: 3, bo: 'choch' }] }), 'an engulf zone fails (24 h) + a structure break against the structure (swing 3)');
+  assert.equal(fns.ruleText({ trig: [{ kind: '<img src=x>' }] }), '&#60;img src=x&#62;', 'a value from a file is never drawn as markup');
+  assert.equal(fns.sideText({ side: 'short' }), 'sells only');
+});
 test('no model or assistant product names on the page', () => {
   for (const [key, re] of RULES) assert.ok(!re.test(page), key);
   assert.ok(!/\b(chatbot|LLM|language model)\b/i.test(page));

@@ -24,12 +24,12 @@ h1{font-size:1.5rem;font-weight:600;margin:0;letter-spacing:-.015em}
 .live.on i{background:var(--au-gain)}.live.err i{background:var(--au-loss)}
 .back{margin-left:auto;font-size:13px;color:var(--au-ink-2);text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;background:var(--au-surface)}
 .back:hover{color:var(--au-ink)}
-.tot{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:0 0 12px}
-.tot div{background:var(--au-surface);border:1px solid var(--au-line);border-radius:var(--au-r);padding:10px 14px;min-width:0}
-.tot b{display:block;font:600 1.25rem var(--sans);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tot{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:0 0 14px}
+.tot div{background:var(--au-surface);border:1px solid var(--au-line);border-radius:18px;padding:14px 18px;min-width:0}
+.tot b{display:block;font:600 1.7rem/1.15 var(--sans);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tot span{color:var(--au-ink-3);font-size:12px}
 @media(max-width:900px){.tot{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:520px){.tot{grid-template-columns:repeat(2,minmax(0,1fr))}.tot b{font-size:1.1rem}}
+@media(max-width:520px){.tot{grid-template-columns:repeat(2,minmax(0,1fr))}.tot b{font-size:1.25rem}}
 .btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
 button{font:600 13px var(--sans);color:var(--au-ink);background:var(--au-surface);border:1px solid var(--au-line);border-radius:999px;padding:8px 15px;min-height:44px;cursor:pointer}
 button:hover{background:var(--au-surface-2)}
@@ -42,9 +42,10 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
 #nowsay b{color:var(--au-ink);font-weight:600}
 #nowsay i{font-style:normal;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;background:var(--au-accent)}
 #vnote{font-size:12px;color:var(--au-ink-3)}
-.grid{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:14px;align-items:start}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}
+.grid:has(#card:not([hidden])){grid-template-columns:minmax(0,1fr) 340px}
 @media(max-width:980px){.grid{grid-template-columns:minmax(0,1fr)}}
-#stage{position:relative;height:min(66vh,640px);min-height:340px;border:1px solid var(--au-line);border-radius:16px;overflow:hidden;background:#15171b;box-shadow:var(--au-shadow)}
+#stage{position:relative;height:min(70vh,720px);min-height:340px;border:1px solid var(--au-line);border-radius:22px;overflow:hidden;background:#15171b;box-shadow:var(--au-shadow)}
 @media(max-width:640px){#stage{height:56vh}.feed{display:none}}
 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #tags,#says{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -64,16 +65,52 @@ canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .card dt{color:var(--au-ink-2)}.card dd{margin:0;font-weight:600;text-align:right}
 .card dt small{color:var(--au-ink-3);font-size:12px}
 .card .acts{display:flex;gap:8px;flex-wrap:wrap}
-.row{display:grid;grid-template-columns:12px 1fr auto;gap:2px 10px;align-items:center;padding:10px 13px;border-radius:var(--au-r);text-align:left;width:100%;min-height:44px}
+.row{display:grid;grid-template-columns:12px 1fr auto;gap:4px 10px;align-items:center;align-content:start;padding:14px 16px;border-radius:18px;text-align:left;width:100%;min-height:44px;font-weight:400}
+/* what each one is doing: one card an agent */
+.sec{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:26px 0 12px}
+.sec h2{margin:0;font-size:1.2rem;font-weight:600;letter-spacing:-.01em}
+.sec span{color:var(--au-ink-3);font-size:13px}
+.crew{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.pill{font:600 12px var(--sans);padding:3px 9px;border-radius:999px;background:var(--au-surface-2);color:var(--au-ink-2);white-space:nowrap}
+.pill.on{color:var(--au-gain)}.pill.off{color:var(--au-warn)}
+.doing{grid-column:1/4;font-size:13px;line-height:1.45;color:var(--au-ink);margin-top:4px}
+.doing small{display:block;color:var(--au-ink-2);font-size:12px;margin-top:5px}
+.doing em{font-style:normal;font-weight:600}
+.doing .ok{color:var(--au-gain)}.doing .no{color:var(--au-ink-3)}
+.bar{grid-column:1/4;height:4px;border-radius:4px;background:var(--au-surface-2);overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--au-accent)}
+/* the big results board */
+.rb{background:var(--au-surface);border:1px solid var(--au-line);border-radius:22px;padding:20px 22px;box-shadow:var(--au-shadow)}
+.rb-top{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 24px;margin-bottom:14px}
+.rb-top b{display:block;font:600 2.6rem/1.05 var(--sans);letter-spacing:-.03em;white-space:nowrap}
+.rb-top b.g{color:var(--au-gain)}
+.rb-top span{color:var(--au-ink-3);font-size:13px}
+.rb-note{color:var(--au-ink-2);font-size:13px;max-width:92ch;margin:0 0 12px}
+.rb-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.rb-chips span{font:500 12px var(--sans);padding:4px 10px;border-radius:999px;background:var(--au-surface-2);color:var(--au-ink-2)}
+.rb-chips b{color:var(--au-ink);font-weight:600;margin-left:5px}
+.rb-t{overflow-x:auto;border-radius:14px;background:var(--au-well)}
+.rb table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+.rb th{font:600 12px var(--sans);color:var(--au-ink-2);text-align:left;padding:10px 12px;white-space:nowrap}
+.rb td{padding:10px 12px;border-top:1px solid var(--au-line);vertical-align:top}
+.rb td.n,.rb th.n{text-align:right;white-space:nowrap}
+.rb td.rk{color:var(--au-ink-3);width:1%}
+.rb td b{font-weight:600}
+.rb td small{display:block;color:var(--au-ink-3);font-size:12px}
+.rb .up{color:var(--au-gain)}
+.rb .who{white-space:nowrap}.rb .who .dot{display:inline-block;width:10px;height:10px;vertical-align:-1px;margin-right:6px}
+.rb-empty{padding:26px 16px;color:var(--au-ink-2);text-align:center}
+.rb-more{margin-top:12px}
+@media(max-width:700px){.rb{padding:16px 14px}.rb-top{grid-template-columns:repeat(2,minmax(0,1fr))}.rb-top b{font-size:1.9rem}}
 .row.sel{border-color:var(--au-accent)}
 .row.talk{border-color:var(--au-primary);background:var(--au-surface-2)}
 .dot{width:12px;height:12px;border-radius:50%;grid-row:span 2;flex:none}
 .nm{font-weight:600}.nm small{font-weight:500;color:var(--au-ink-3);margin-left:6px;font-size:12px}
 .num{font:600 13px var(--sans);text-align:right}
-.meta{grid-column:2/4;color:var(--au-ink-3);font-size:12px;font-weight:400}
+.meta{grid-column:1/4;margin-top:4px;color:var(--au-ink-3);font-size:12px;font-weight:400}
 .lap-b{color:var(--au-warn)}
 .st{display:flex;gap:3px;margin-top:4px}.st i{width:9px;height:9px;border-radius:3px;background:var(--au-line-strong)}.st i.on{background:var(--au-accent)}.st i.on.l{background:var(--au-warn)}
-.recap{background:var(--au-surface);border:1px solid var(--au-line);border-radius:16px;padding:13px 16px;margin:0 0 12px}
+.recap{background:var(--au-surface);border:1px solid var(--au-line);border-radius:18px;padding:14px 18px;margin:14px 0 0}
 .recap h2{font-size:13px;margin:0 0 6px;color:var(--au-ink-2);font-weight:600}
 .recap p{margin:4px 0;max-width:86ch}
 .recap ul{margin:6px 0 0;padding-left:18px;color:var(--au-ink-2);font-size:13px}
@@ -83,7 +120,7 @@ html.widget .recap ul{display:none}
 #toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#f4f5f7;color:#16181c;padding:10px 16px;border-radius:14px;font-weight:600;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center;z-index:5}
 #toast.on{opacity:1}
 /* widget view: no 3D, big numbers, for a pinned home-screen window */
-html.widget #stage,html.widget .btns .fun,html.widget .foot,html.widget .side .meta,html.widget .st,html.widget #card{display:none}
+html.widget #stage,html.widget .btns .fun,html.widget .foot,html.widget .crew .meta,html.widget .st,html.widget .bar,html.widget #card{display:none}
 html.nogl .grid,html.widget .grid{grid-template-columns:minmax(0,1fr)}
 html.widget .row{padding:13px}html.widget .num{font-size:20px}
 @media(prefers-reduced-motion:reduce){#toast{transition:none}}
@@ -96,7 +133,6 @@ html.widget .row{padding:13px}html.widget .num{font-size:20px}
 <div id="gate" hidden>Sign in on the desk first, then open this page again. <a href="/market-structure.html">Go to the desk</a></div>
 <main id="app" hidden>
 <div class="tot" id="tot"></div>
-<section class="recap" id="recap" aria-live="off"><h2>What they have done so far</h2><p>Reading the research files…</p></section>
 <div class="btns">
  <button id="b-snd" type="button" aria-pressed="false" title="The agents speak Portuguese. Off until you switch it on.">🔇 Voices: off</button>
  <label class="vol">Volume <input type="range" id="vol" min="0" max="1" step="0.05" value="0.8" aria-label="Voice volume"></label>
@@ -107,6 +143,11 @@ html.widget .row{padding:13px}html.widget .num{font-size:20px}
  <div id="stage"><canvas id="c" aria-label="3D view of a research office with ten agents at their desks"></canvas><div id="tags"></div><div id="says"></div><ul id="feed" class="feed"></ul><div class="hint">drag to look around · scroll to zoom · tap an agent</div></div>
  <div class="side" id="side"><section class="card" id="card" hidden></section></div>
 </div>
+<div class="sec"><h2>What each one is doing</h2><span id="crew-n">read from each agent's own saved files</span></div>
+<div class="crew" id="crew"></div>
+<div class="sec"><h2>Results board</h2><span id="rb-at">the best results of every agent, strongest first</span></div>
+<section class="rb" id="rb" aria-live="off"><div class="rb-empty">Reading the research files…</div></section>
+<section class="recap" id="recap" aria-live="off"><h2>What they have done so far</h2><p>Reading the research files…</p></section>
 <p class="foot">Live from council-data: each agent's saved research files, re-read every 3 minutes. Speed and distance use a made-up scale: one try is one metre, so one try a second is 3.6 km/h. "Results" are checks that came out positive at a low bar: many are luck, none is an edge. Squares under a name are its lanes (blue on GitHub's cloud, orange on the laptop) and light up while a lane has saved in the last 40 minutes. Coffee, dancing, the race, the jokes, what the agents say and what they choose to do (walk, chat, nap) are for fun only; they change nothing in the research. Every number an agent speaks is read from those files. Nothing here trades.</p>
 </main>
 </div>
@@ -117,7 +158,8 @@ html.widget .row{padding:13px}html.widget .num{font-size:20px}
 'use strict';
 var NAMES = ['Rex','Pip','Juno','Otto','Mina','Zed','Sol','Bo','Ivy','Nova'];
 var IDS = [1,2,3,4,5,6,11,8,12,10];        // 26 Nov 2026: workers 7 and 9 stopped; the two market-structure workers (11, 12) sit at their desks
-var FAM = ['break · fade · engulf','pullback · deviation','big candle · block · sweep','all eight kinds','wild combos','wild combos','market structure','all eight kinds','structure + a second trigger','Nasdaq only'];
+var FAM = ['engulf · zone return · zone failure · structure break'], WHERE = ['eleven markets','eleven markets','eleven markets','eleven markets','eleven markets','eleven markets','eleven markets','eleven markets','eleven markets','the Nasdaq only'];
+for (var fk = 1; fk < 10; fk++) FAM.push(FAM[0]);   // research version auto-2: every agent draws the same four kinds of rule, only the seeds differ
 var LAP = [0,0,1,1,1,1,0,0,0,0];            // workers whose shard 2 (lanes 8-11) runs on the laptop
 var COL = [0xe0675a,0x5fb3d9,0x8bc96a,0xe8c25a,0xb48be0,0xe58fb8,0x5fd1c4,0xe89a5a,0x9aa8e6,0xf2d46b];
 var SKIN = [0xf1c9a5,0xe0ac86,0xf6d7b8,0xd99f7a,0xa8734f,0xf1c9a5,0x8d5a3a,0xe8b894,0xc68a63,0xf3d2b4];
@@ -131,7 +173,7 @@ var kmh = function (d) { return Math.round(d.rate * 3.6).toLocaleString(); };
 var hex = function (c) { return '#' + c.toString(16).padStart(6, '0'); };
 var rnd = function (a, b) { return a + Math.random() * (b - a); };
 var pick = function (a) { return a[Math.floor(Math.random() * a.length)]; };
-var etag = {}, cache = {}, missing = {}, VER = { n: 0, name: '' }, TOT = { tries: 0, res: 0, looks: 0, A: 0, alive: 0, rate: 0, maxRate: 1, maxTries: 1 };
+var RES = [], SHOW = 15, etag = {}, cache = {}, missing = {}, VER = { n: 0, name: '' }, TOT = { tries: 0, res: 0, looks: 0, A: 0, alive: 0, rate: 0, maxRate: 1, maxTries: 1 };
 var toastT; function toast(t) { var e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { e.classList.remove('on'); }, 2600); }
 
 /* ── data: every lane file of every worker through /cdata (a signed-in member's session), conditional requests ── */
@@ -155,6 +197,27 @@ function marketOf(j) {
   var r = Array.isArray(j.results) && j.results.length ? j.results[j.results.length - 1] : null; if (!r || typeof r !== 'object') return '';
   var m = r.market || r.mkt || (typeof r.group === 'string' ? r.group.split('|')[0] : '') || (r.g && r.g.market) || ''; return typeof m === 'string' ? m.toLowerCase() : '';
 }
+/* a rule in plain words, from the genome the file stores (every value escaped: it is drawn as HTML) */
+var MKN = { xau: 'Gold', xag: 'Silver', nas100: 'Nasdaq 100', eurusd: 'EUR/USD', gbpusd: 'GBP/USD', usdjpy: 'USD/JPY', audusd: 'AUD/USD', nzdusd: 'NZD/USD', usdcad: 'USD/CAD', usdchf: 'USD/CHF', eurjpy: 'EUR/JPY' };
+function esc(x) { return String(x == null ? '' : x).replace(/[&<>"']/g, function (c) { return '&#' + c.charCodeAt(0) + ';'; }); }
+function num(x, d) { return typeof x === 'number' && isFinite(x) ? x.toFixed(d) : 'n/a'; }
+function trigText(t) {
+  if (!t || typeof t !== 'object') return 'rule';
+  if (t.kind === 'eg') return 'an engulf completes';
+  if (t.kind === 'egr') return 'price returns to an engulf zone (' + esc(t.life) + ' h)';
+  if (t.kind === 'ef') return 'an engulf zone fails (' + esc(t.life) + ' h)';
+  if (t.kind === 'bo') return 'a structure break' + (t.bo === 'bos' ? ' with the structure' : t.bo === 'choch' ? ' against the structure' : '') + ' (swing ' + esc(t.P) + ')';
+  return esc(t.kind);
+}
+function ruleText(g) { return g && Array.isArray(g.trig) ? g.trig.map(trigText).join(' + ') : 'rule'; }
+function sideText(g) { return g.side === 'long' ? 'buys only' : g.side === 'short' ? 'sells only' : 'both sides'; }
+function extraText(g) {
+  var a = []; if (g.trend === 'with') a.push('with the trend'); if (g.trend === 'against') a.push('against the trend');
+  if (Array.isArray(g.hours)) a.push(esc(g.hours[0]) + '-' + esc(g.hours[1]) + ' UTC'); if (g.vol && g.vol !== 'none') a.push(esc(g.vol) + ' volatility');
+  a.push('stop ' + esc(g.stop) + ' ATR'); a.push(g.rr ? 'target ' + esc(g.rr) + 'R' : 'no target'); if (g.hold) a.push('out after ' + esc(g.hold) + ' h');
+  return a.join(' · ');
+}
+function agoText(t) { var m = Math.max(0, Math.round((Date.now() - t) / 60e3)); return m < 1 ? 'just now' : m < 90 ? m + ' min ago' : Math.round(m / 60) + ' h ago'; }
 function refresh() {
   var list = files(), now = Date.now(), got = [], fail = 0;
   function worker() {
@@ -164,7 +227,7 @@ function refresh() {
   return Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]).then(function () {
     if (!got.length) { setLive('err', fail ? 'could not read the research files' : 'no research files yet'); return; }
     var vmax = 0; VER.name = ''; got.forEach(function (g) { var n = verOf(g[2]); if (n >= vmax && g[2].version) { vmax = n; VER.name = String(g[2].version); } }); VER.n = vmax;
-    var N = D.map(function () { return { tries: 0, A: 0, cand: 0, looks: 0, res: 0, since: 0, lanes: {}, rate: 0, alive: 0, last: 0, mkt: '', mktAt: 0 }; });
+    var N = D.map(function () { return { tries: 0, A: 0, cand: 0, looks: 0, res: 0, since: 0, lanes: {}, rate: 0, alive: 0, last: 0, mkt: '', mktAt: 0, look: null, lookAt: 0 }; }), best = {};
     got.forEach(function (g) {
       var j = g[2]; if (verOf(j) !== vmax) return;                       // an older research version: not counted
       var n = N[g[0]], u = Date.parse(j.updated || j.started) || 0, s = Date.parse(j.started) || u;
@@ -172,6 +235,12 @@ function refresh() {
       n.tries += j.tries || 0; n.A += j.survivedA || 0; n.cand += j.candidates || 0; n.looks += j.cLooks || 0; n.res += j.cPasses || 0;
       n.rate += (j.tries || 0) / Math.max(60, (u - s) / 1000); n.last = Math.max(n.last, u);
       var mk = marketOf(j); if (mk && u >= n.mktAt) { n.mkt = mk; n.mktAt = u; }
+      var lk = Array.isArray(j.looks) && j.looks.length ? j.looks[j.looks.length - 1] : null, la = lk && lk.g ? Date.parse(lk.at) || 0 : 0;
+      if (la > n.lookAt) { n.lookAt = la; n.look = { at: la, g: lk.g, t: lk.ALL && lk.ALL.t, pass: !!(j.groups && j.groups[lk.group] && j.groups[lk.group].pass) }; }   // the last rule this agent took to a check
+      (Array.isArray(j.results) ? j.results : []).forEach(function (r) {            // the board: the best result of each group over every agent
+        if (!r || !r.g || !r.ALL || typeof r.ALL.t !== 'number' || !r.C) return; var k = String(r.group);
+        if (!best[k] || best[k].ALL.t < r.ALL.t) best[k] = { g: r.g, ALL: r.ALL, C: r.C, at: Date.parse(r.at) || 0, who: g[0] };
+      });
       var fresh = now - u < FRESH; n.lanes[g[1]] = fresh; if (fresh) n.alive++;
     });
     TOT.tries = TOT.res = TOT.looks = TOT.A = TOT.alive = TOT.rate = 0; TOT.maxRate = 1; TOT.maxTries = 1;
@@ -179,11 +248,12 @@ function refresh() {
       var n = N[i], first = !d.prev;
       if (d.prev && n.tries >= d.prev.tries && now - d.prev.at > 20e3) { var dr = (n.tries - d.prev.tries) / ((now - d.prev.at) / 1000); n.rate = dr > 0 ? dr : d.rate * .6; }
       var more = !first && n.res > d.res ? n.res - d.res : 0;
-      d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.res = n.res; d.since = n.since; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.mkt = n.mkt; d.at = now;
+      d.prev = { tries: n.tries, at: now }; d.tries = n.tries; d.A = n.A; d.cand = n.cand; d.looks = n.looks; d.res = n.res; d.since = n.since; d.rate = n.rate || d.rate; d.lanes = n.lanes; d.alive = n.alive; d.last = n.last; d.mkt = n.mkt; d.look = n.look; d.at = now;
       TOT.tries += d.tries; TOT.res += d.res; TOT.looks += d.looks; TOT.A += d.A; TOT.alive += d.alive; TOT.rate += d.rate; if (d.rate > TOT.maxRate) TOT.maxRate = d.rate; if (d.tries > TOT.maxTries) TOT.maxTries = d.tries;
       if (more) cheer(i, more);
     });
-    recap(); setLive('on', 'live · ' + (VER.name || 'research') + ' · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); drawRows(); paint(); boardPaint(); if (sel >= 0) card(sel);
+    recap(); setLive('on', 'live · ' + (VER.name || 'research') + ' · read ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); RES = Object.keys(best).map(function (k) { return best[k]; }).sort(function (a, b) { return b.ALL.t - a.ALL.t; });
+    drawRows(); paint(); boardPaint(); results(); if (sel >= 0) card(sel);
     if (!hello) { hello = true; var who = Math.floor(Math.random() * 10), h = new Date().getHours(); talk(who, pick(h < 12 ? PT.helloM : h < 20 ? PT.helloT : PT.helloN)); talk((who + 3) % 10, pick(PT.hello)); }
   });
 }
@@ -296,18 +366,49 @@ function chatter() {
 /* ── page ── */
 var sel = -1, mode = { dance: false, race: false, coffee: 0, free: true, wake: false };
 function asleep(i) { var d = D[i]; return !!d.last && Date.now() - d.last > FRESH * 1.5; }
+/* what agent i is doing, from its files: where it searches, how fast, and the last rule it took to a check */
+function doing(i) {
+  var d = D[i];
+  if (!d.last) return { st: 'no file yet', cls: '', html: 'No file of this research version yet. A file appears after its first save.' };
+  if (asleep(i)) return { st: 'not saving', cls: 'off', html: 'Last save ' + agoText(d.last) + ': its runs are waiting for a runner or have stopped.' };
+  var h = 'Searching <em>' + esc(d.fam) + '</em> on ' + WHERE[i] + ': about <em>' + Math.round(d.rate).toLocaleString() + '</em> rules a second over ' + d.alive + ' lane' + (d.alive === 1 ? '' : 's') + (d.lap ? ', the laptop among them' : '') + '.';
+  if (d.look && d.look.g) h += '<small>Last rule it took to a check, ' + agoText(d.look.at) + ': ' + esc(MKN[d.look.g.mk] || d.look.g.mk) + ', ' + ruleText(d.look.g) + ', ' + sideText(d.look.g) + '. ' +
+    (d.look.pass ? '<span class="ok">It became a result (t ' + num(d.look.t, 2) + ' since 2019).</span>' : '<span class="no">It did not hold up (t ' + num(d.look.t, 2) + ' since 2019).</span>') + '</small>';
+  return { st: 'working', cls: 'on', html: h };
+}
 function drawRows() {
+  var on = 0;
   D.forEach(function (d, i) {
-    var b = $('r' + i); if (!b) return;
+    var b = $('r' + i); if (!b) return; var w = doing(i); if (w.cls === 'on') on++;
     var sq = ''; for (var l = 0; l <= LANES[i]; l++) if (d.lanes[l] !== undefined) sq += '<i class="' + (d.lanes[l] ? 'on' : '') + (l > 7 && d.lap ? ' l' : '') + '"></i>';
-    b.querySelector('.meta').innerHTML = d.fam + (d.lap ? ' · <span class="lap-b">also on laptop</span>' : '') + '<br>' + fmt(d.A) + ' passed the first test · ' + d.looks.toLocaleString() + ' checks · ' + d.res.toLocaleString() + ' results<div class="st">' + sq + '</div>';
+    var pl = b.querySelector('.pill'); pl.textContent = w.st; pl.className = 'pill ' + w.cls;
+    b.querySelector('.doing').innerHTML = w.html;
+    b.querySelector('.bar i').style.width = (w.cls === 'on' ? Math.round(100 * Math.min(1, d.rate / TOT.maxRate)) : 0) + '%';
+    b.querySelector('.meta').innerHTML = fmt(d.tries) + ' rules tried · ' + fmt(d.A) + ' passed the first test · ' + d.looks.toLocaleString() + ' checks · ' + d.res.toLocaleString() + ' results<div class="st">' + sq + '</div>';
   });
+  $('crew-n').textContent = on + ' of 10 working now · read from each agent\'s own saved files';
+}
+/* the results board: the strongest result of each rule group, every agent together */
+function results() {
+  var e = $('rb'), by = {}, strong = 0;
+  RES.forEach(function (r) { var m = MKN[r.g.mk] || r.g.mk; by[m] = (by[m] || 0) + 1; if (r.C.n >= 100 && r.C.t >= 2) strong++; });
+  var h = '<div class="rb-top"><div><b>' + fmt(TOT.tries) + '</b><span>rules tried</span></div><div><b>' + TOT.looks.toLocaleString() + '</b><span>taken to a check</span></div><div><b class="g">' + TOT.res.toLocaleString() + '</b><span>results (low bar: many are luck)</span></div><div><b>' + strong + '</b><span>with t of 2 or more on 2023 to now</span></div></div>' +
+    '<p class="rb-note">A result is a rule that was positive with t of 1 or more in 2019-22, again in 2023 to now, and over both. About one random rule in forty clears that by luck, so this board is a list to look through, never an edge: anything taken further is first re-priced at real market quotes. The Nasdaq is before costs.</p>';
+  if (!RES.length) { e.innerHTML = h + '<div class="rb-empty">No results on file yet. The agents save every 25 minutes; this board fills as they do.</div>'; return; }
+  h += '<div class="rb-chips">' + Object.keys(by).sort(function (a, b) { return by[b] - by[a]; }).map(function (m) { return '<span>' + esc(m) + '<b>' + by[m] + '</b></span>'; }).join('') + '</div>';
+  h += '<div class="rb-t"><table><thead><tr><th>#</th><th>Market</th><th>Rule</th><th class="n">Trades</th><th class="n">R a trade</th><th class="n">t since 2019</th><th class="n">t 2023 on</th><th>Found by</th></tr></thead><tbody>' +
+    RES.slice(0, SHOW).map(function (r, k) {
+      return '<tr><td class="rk">' + (k + 1) + '</td><td><b>' + esc(MKN[r.g.mk] || r.g.mk) + '</b><small>' + sideText(r.g) + '</small></td><td>' + ruleText(r.g) + '<small>' + extraText(r.g) + '</small></td><td class="n">' + (+r.ALL.n || 0).toLocaleString() + '</td><td class="n' + (r.ALL.mean > 0 ? ' up' : '') + '">' + (r.ALL.mean > 0 ? '+' : '') + num(r.ALL.mean, 3) + 'R</td><td class="n"><b>' + num(r.ALL.t, 2) + '</b></td><td class="n">' + num(r.C.t, 2) + '<small>' + (+r.C.n || 0) + ' trades</small></td><td class="who"><span class="dot" style="background:' + hex(COL[r.who]) + '"></span>' + D[r.who].name + (r.at ? '<small>' + agoText(r.at) + '</small>' : '') + '</td></tr>';
+    }).join('') + '</tbody></table></div>';
+  if (RES.length > SHOW) h += '<button type="button" class="rb-more" id="rb-more">Show ' + Math.min(RES.length, 200) + ' results</button>';
+  e.innerHTML = h; $('rb-at').textContent = RES.length + ' rule groups with a result · strongest first';
+  var mo = $('rb-more'); if (mo) mo.onclick = function () { SHOW = 200; results(); };
 }
 function mk() {
-  var side = $('side'), tags = $('tags');
+  var side = $('crew'), tags = $('tags');
   D.forEach(function (d, i) {
     var b = document.createElement('button'); b.type = 'button'; b.className = 'row'; b.id = 'r' + i;
-    b.innerHTML = '<span class="dot" style="background:' + hex(COL[i]) + '"></span><span class="nm">' + d.name + '<small>worker ' + d.id + ' · <span class="spd" id="s' + i + '"></span></small></span><span class="num" id="t' + i + '">–</span><span class="meta"></span>';
+    b.innerHTML = '<span class="dot" style="background:' + hex(COL[i]) + '"></span><span class="nm">' + d.name + '<small>worker ' + d.id + ' · <span class="spd" id="s' + i + '"></span></small></span><span class="pill">reading…</span><span class="doing"></span><span class="bar"><i></i></span><span class="num" id="t' + i + '" hidden>–</span><span class="meta"></span>';
     b.onclick = function () { poke(i); }; side.appendChild(b);
     var g = document.createElement('div'); g.className = 'tag' + (d.lap ? ' lap' : ''); g.id = 'g' + i; g.style.display = 'none'; tags.appendChild(g); d.tag = g;
   });
@@ -318,7 +419,7 @@ function card(i) {
   var d = D[i], on = 0, all = 0, k; for (k in d.lanes) { all++; if (d.lanes[k]) on++; }
   var ago = d.last ? Math.max(0, Math.round((Date.now() - d.last) / 60e3)) : -1;
   c.hidden = false;
-  c.innerHTML = '<h2><span class="dot" style="background:' + hex(COL[i]) + '"></span>' + d.name + ' <small>worker ' + d.id + '</small></h2><p>' + d.fam + (d.lap ? ' · also on the laptop' : '') + '</p><dl>' +
+  c.innerHTML = '<h2><span class="dot" style="background:' + hex(COL[i]) + '"></span>' + d.name + ' <small>worker ' + d.id + '</small></h2><p>' + doing(i).html + '</p><dl>' +
     '<dt>Rules tried</dt><dd>' + Math.round(d.tries).toLocaleString() + '</dd>' +
     '<dt>Speed <small>(made-up scale)</small></dt><dd>' + kmh(d) + ' km/h</dd>' +
     '<dt>Passed the first test</dt><dd>' + d.A.toLocaleString() + '</dd>' +
@@ -719,7 +820,7 @@ fetch('/api/me', { cache: 'no-store', credentials: 'same-origin' }).then(functio
   start();
 });
 /* a read-only view for the page checks */
-window.msFarm = function () { return { agents: D.map(function (d) { return { name: d.name, id: d.id, tries: d.tries, results: d.res, checks: d.looks, kmh: kmh(d), lanes: d.alive }; }), totals: { tries: TOT.tries, results: TOT.res, checks: TOT.looks, lanes: TOT.alive }, version: VER.name, mode: mode, webgl: gl, selected: sel,
+window.msFarm = function () { return { board: RES.slice(0, 50).map(function (r) { return { market: r.g.mk, rule: ruleText(r.g), t: r.ALL.t, n: r.ALL.n, by: D[r.who].name }; }), agents: D.map(function (d, i) { return { doing: doing(i).st, name: d.name, id: d.id, tries: d.tries, results: d.res, checks: d.looks, kmh: kmh(d), lanes: d.alive }; }), totals: { tries: TOT.tries, results: TOT.res, checks: TOT.looks, lanes: TOT.alive }, version: VER.name, mode: mode, webgl: gl, selected: sel,
   speech: { on: VO.on, supported: VO.ok, voice: VO.voice ? VO.voice.lang : null, speaking: VO.cur ? { name: D[VO.cur.i].name, line: VO.cur.text } : null, queued: VO.q.length, spoken: VO.spoken } }; };
 })();
 </script>
