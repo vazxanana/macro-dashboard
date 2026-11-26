@@ -1367,7 +1367,7 @@
     "lots": 0.11,
     "digits": 3,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T02:41:40.000Z",
     "councilEntry": 174.59,
     "stop": 174.653657,
@@ -1378,26 +1378,27 @@
     "slipR": -0.314,
     "lagSec": 700,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T02:41:40.000Z",
-    "brokerStop": 174.674
+    "brokerStop": 174.674,
+    "closedAt": "2026-11-26T02:50:42.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 479.85,
+   "lastBalance": 483.73,
    "ids": [
     "51567422",
-    "51570276",
-    "51570277"
+    "51570276"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 479.85 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 483.73 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fade:gbpusd:fade-m15-s1795631400": {
@@ -1426,15 +1427,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 479.85,
-  "lastRun": "2026-11-26T02:49:11.000Z"
+  "balance": 483.73,
+  "lastRun": "2026-11-26T02:50:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T20:16:07.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T20:17:28.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:26 UTC) (will retry)",
@@ -2918,6 +2914,11 @@
   {
    "at": "2026-11-26T02:41:40.000Z",
    "msg": "opened sell EURJPY 0.11 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:eurjpy:fvg-h1-s1795658400-1795660200"
+  },
+  {
+   "at": "2026-11-26T02:50:42.000Z",
+   "msg": "EURJPY position 51570277 closed at the broker",
    "trade": "eqx:fvg:eurjpy:fvg-h1-s1795658400-1795660200"
   }
  ],
