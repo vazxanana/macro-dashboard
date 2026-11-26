@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 6,
  "started": "2026-11-25T11:14:12.828Z",
- "tries": 3684800,
- "survivedA": 948,
- "candidates": 115,
- "cLooks": 62,
+ "tries": 3827200,
+ "survivedA": 984,
+ "candidates": 119,
+ "cLooks": 63,
  "cPasses": 0,
  "groups": {
   "xau|brk&big+|both": {
@@ -13,11 +13,11 @@
    "pass": false
   },
   "nzdusd|eg-&dev+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurusd|brk&dev+|both": {
-   "more": 6,
+   "more": 7,
    "pass": false
   },
   "nzdusd|dev+&eg-|both": {
@@ -245,7 +245,7 @@
    "pass": false
   },
   "eurusd|dev+&dev+|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "usdchf|fade&fade|long": {
@@ -253,6 +253,10 @@
    "pass": false
   },
   "audusd|dev-&fade|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|big+&big+|short": {
    "more": 0,
    "pass": false
   }
@@ -3898,9 +3902,69 @@
     "months": 74
    },
    "p": 0.06301
+  },
+  {
+   "at": "2026-11-26T16:47:27.927Z",
+   "group": "eurusd|big+&big+|short",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "big",
+      "k": 1.25,
+      "follow": true
+     },
+     {
+      "kind": "big",
+      "k": 1.25,
+      "follow": true
+     }
+    ],
+    "side": "short",
+    "hours": [
+     9,
+     12
+    ],
+    "dows": null,
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 2,
+    "rr": 0,
+    "hold": 4
+   },
+   "A": {
+    "n": 719,
+    "mean": 0.1475,
+    "t": 4.68,
+    "win": 55.1,
+    "months": 117
+   },
+   "B": {
+    "n": 393,
+    "mean": 0.0744,
+    "t": 1.73,
+    "win": 50.9,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 768,
+    "mean": -0.1349,
+    "t": -4.83,
+    "win": 41.4,
+    "months": 117
+   },
+   "C": {
+    "n": 541,
+    "mean": -0.0144,
+    "t": -0.4,
+    "win": 47.5,
+    "months": 83
+   },
+   "p": 0.65542
   }
  ],
- "chunks": 34,
- "updated": "2026-11-26T14:04:29.815Z",
- "chanceCandidates": 335.3
+ "chunks": 35,
+ "updated": "2026-11-26T17:01:04.933Z",
+ "chanceCandidates": 348.3
 }
