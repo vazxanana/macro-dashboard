@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 8,
  "started": "2026-11-25T10:25:49.498Z",
- "tries": 8921800,
- "survivedA": 13251,
- "candidates": 1557,
- "cLooks": 129,
+ "tries": 9026600,
+ "survivedA": 13411,
+ "candidates": 1575,
+ "cLooks": 131,
  "cPasses": 0,
  "groups": {
   "usdcad|dev-|both": {
@@ -13,7 +13,7 @@
    "pass": false
   },
   "eurusd|fade|both": {
-   "more": 65,
+   "more": 66,
    "pass": false
   },
   "eurjpy|big+|both": {
@@ -21,11 +21,11 @@
    "pass": false
   },
   "usdcad|blk-|both": {
-   "more": 59,
+   "more": 60,
    "pass": true
   },
   "eurusd|big+|both": {
-   "more": 84,
+   "more": 86,
    "pass": false
   },
   "usdjpy|fade|short": {
@@ -45,15 +45,15 @@
    "pass": false
   },
   "usdchf|fade|both": {
-   "more": 116,
+   "more": 118,
    "pass": false
   },
   "gbpusd|fade|both": {
-   "more": 42,
+   "more": 43,
    "pass": false
   },
   "usdjpy|blk-|both": {
-   "more": 52,
+   "more": 53,
    "pass": false
   },
   "usdchf|fade|long": {
@@ -69,15 +69,15 @@
    "pass": false
   },
   "eurjpy|brk|both": {
-   "more": 25,
+   "more": 26,
    "pass": false
   },
   "xau|big+|long": {
-   "more": 24,
+   "more": 25,
    "pass": false
   },
   "usdcad|eg-|both": {
-   "more": 36,
+   "more": 38,
    "pass": false
   },
   "gbpusd|big-|both": {
@@ -105,7 +105,7 @@
    "pass": false
   },
   "usdcad|fade|both": {
-   "more": 39,
+   "more": 40,
    "pass": false
   },
   "usdjpy|fade|both": {
@@ -133,7 +133,7 @@
    "pass": false
   },
   "usdchf|big+|both": {
-   "more": 43,
+   "more": 44,
    "pass": false
   },
   "nzdusd|fade|short": {
@@ -221,7 +221,7 @@
    "pass": false
   },
   "eurusd|big+|long": {
-   "more": 14,
+   "more": 15,
    "pass": false
   },
   "usdjpy|eg+|short": {
@@ -277,7 +277,7 @@
    "pass": false
   },
   "audusd|eg-|both": {
-   "more": 6,
+   "more": 7,
    "pass": false
   },
   "xau|fade|long": {
@@ -521,6 +521,14 @@
    "pass": false
   },
   "usdchf|eg-|short": {
+   "more": 0,
+   "pass": false
+  },
+  "eurusd|brk|both": {
+   "more": 0,
+   "pass": false
+  },
+  "gbpusd|dev-|both": {
    "more": 0,
    "pass": false
   }
@@ -7587,9 +7595,123 @@
     "months": 81
    },
    "p": 0.20327
+  },
+  {
+   "at": "2026-11-26T08:23:05.922Z",
+   "group": "eurusd|brk|both",
+   "g": {
+    "mk": "eurusd",
+    "trig": [
+     {
+      "kind": "brk",
+      "N": 20
+     }
+    ],
+    "side": "both",
+    "hours": [
+     3,
+     15
+    ],
+    "dows": [
+     2,
+     3,
+     4
+    ],
+    "trend": "with",
+    "vol": "none",
+    "volP": 0.5,
+    "stop": 2,
+    "rr": 2,
+    "hold": 24
+   },
+   "A": {
+    "n": 935,
+    "mean": 0.1348,
+    "t": 3.37,
+    "win": 43.4,
+    "months": 120
+   },
+   "B": {
+    "n": 472,
+    "mean": 0.0992,
+    "t": 1.81,
+    "win": 44.1,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 1098,
+    "mean": -0.0516,
+    "t": -1.42,
+    "win": 37.8,
+    "months": 120
+   },
+   "C": {
+    "n": 705,
+    "mean": -0.0359,
+    "t": -0.82,
+    "win": 38.2,
+    "months": 83
+   },
+   "p": 0.79389
+  },
+  {
+   "at": "2026-11-26T08:23:31.842Z",
+   "group": "gbpusd|dev-|both",
+   "g": {
+    "mk": "gbpusd",
+    "trig": [
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 1,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     20,
+     2
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.3,
+    "stop": 0.75,
+    "rr": 0.5,
+    "hold": 4
+   },
+   "A": {
+    "n": 936,
+    "mean": 0.0724,
+    "t": 3.86,
+    "win": 71.6,
+    "months": 118
+   },
+   "B": {
+    "n": 533,
+    "mean": 0.0454,
+    "t": 1.69,
+    "win": 67.9,
+    "months": 60
+   },
+   "placeboA": {
+    "n": 918,
+    "mean": -0.1592,
+    "t": -7.67,
+    "win": 51.6,
+    "months": 118
+   },
+   "C": {
+    "n": 648,
+    "mean": -0.0046,
+    "t": -0.2,
+    "win": 64.5,
+    "months": 83
+   },
+   "p": 0.57926
   }
  ],
- "chunks": 50,
- "updated": "2026-11-26T08:21:59.736Z",
- "chanceCandidates": 811.9
+ "chunks": 51,
+ "updated": "2026-11-26T08:47:04.590Z",
+ "chanceCandidates": 821.4
 }
