@@ -2002,7 +2002,7 @@
     "lots": 0.36,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T23:15:21.000Z",
     "councilEntry": 159.297,
     "stop": 159.315357,
@@ -2013,10 +2013,12 @@
     "slipR": -0.109,
     "lagSec": 21,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T23:15:21.000Z",
-    "brokerStop": 159.317
+    "brokerStop": 159.317,
+    "closedAt": "2026-11-26T23:27:38.000Z"
    },
    "eqx:fade:xag:fade-m15-b1795734900": {
     "positionId": "51648056",
@@ -2047,17 +2049,16 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 423.58,
+   "lastBalance": 430.32,
    "ids": [
     "51608452",
-    "51648055",
     "51648056"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 423.58 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 430.32 · 2 open",
   "skipped": {
    "eqx:fade:nzdusd:fade-m15-b1795734000": "stop distance 0.000119 sits inside the broker spread 0.00017 on NZDUSD: no stop could be set"
   },
@@ -2083,15 +2084,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 423.58,
-  "lastRun": "2026-11-26T23:25:01.000Z"
+  "balance": 430.32,
+  "lastRun": "2026-11-26T23:27:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T23:00:34.000Z",
-   "msg": "NAS100 position 48212677 closed at the broker",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-12T00:21:15.000Z",
    "msg": "opened sell US2000 1.7 lot (council ict-A)",
@@ -3576,6 +3572,11 @@
    "at": "2026-11-26T23:15:21.000Z",
    "msg": "opened buy XAGUSD 0.01 lot (council eqx-fade)",
    "trade": "eqx:fade:xag:fade-m15-b1795734900"
+  },
+  {
+   "at": "2026-11-26T23:27:38.000Z",
+   "msg": "USDJPY position 51648055 closed at the broker",
+   "trade": "eqx:fade:usdjpy:fade-m15-s1795734900"
   }
  ],
  "limits": {
