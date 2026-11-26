@@ -1,0 +1,512 @@
+{
+ "study": "boxfade-barrier-6r",
+ "built": "2026-11-26",
+ "verdict": "FAIL",
+ "headline": "The Box fade entry at a Mosha barrier with a 6R target made −0.003R a trade after costs on gold out of sample, 2022 to Oct 2026 (n 1294, month t -0.04). Before costs +0.065R, 18.1% winners; in sample 2018-21 −0.108R (n 994); the same signals away from a barrier −0.159R (n 318), Welch t 1.04",
+ "system": "The Equinox Box fade signal (grid6-box-in-box signals, the fade-breaks-holdout F1 cell, its 07-17 UTC filter kept) taken only at a standing Mosha barrier zone of its own side (assets/mosha-sop.js zonesOf, one-candle structure, D1 to M15; inside it or within 0.25 x ATR(14, M15) of its near edge), the Box fade stop, a 6R target, out after 5 days, one position at a time; gold OANDA mid M5; in sample 2018-21, out of sample 2022 to Oct 2026; $0.30 a round trip.",
+ "market": "xau",
+ "cost": 0.3,
+ "rr": 6,
+ "windows": {
+  "inSample": "2018-01-01 to 2021-12-31",
+  "outOfSample": "2022-01-01 to 2026-10-31"
+ },
+ "checks": {
+  "n": true,
+  "mean": false,
+  "monthT": false,
+  "inSample": false,
+  "twiceCost": false,
+  "beatsC1": false
+ },
+ "welchVsC1": {
+  "oos": 1.04,
+  "inSample": -1.14
+ },
+ "counts": {
+  "signalsAnyHour": 18814,
+  "signalsOwnHours": 9981,
+  "atBarrier": 9197,
+  "notAtBarrier": 784,
+  "stopWrongSide": 0,
+  "zones": {
+   "2018": 16762,
+   "2019": 16355,
+   "2020": 17455,
+   "2021": 17801,
+   "2022": 18418,
+   "2023": 17881,
+   "2024": 17964,
+   "2025": 18256,
+   "2026": 15845
+  }
+ },
+ "streams": {
+  "primary": {
+   "is": {
+    "n": 994,
+    "win": 17.8,
+    "gross": 0.011,
+    "net": -0.1083,
+    "net2": -0.2276,
+    "t": -1.69,
+    "months": 48,
+    "costShare": 0.1,
+    "total": -107.7
+   },
+   "oos": {
+    "n": 1294,
+    "win": 18.1,
+    "gross": 0.0645,
+    "net": -0.0028,
+    "net2": -0.0702,
+    "t": -0.04,
+    "months": 58,
+    "costShare": 0.053,
+    "total": -3.7
+   },
+   "skippedOpenPosition": 6909,
+   "stillOpen": 0
+  },
+  "C1": {
+   "is": {
+    "n": 187,
+    "win": 21.9,
+    "gross": 0.2521,
+    "net": 0.1225,
+    "net2": -0.0071,
+    "t": 0.71,
+    "months": 47,
+    "costShare": 0.119,
+    "total": 22.9
+   },
+   "oos": {
+    "n": 318,
+    "win": 15.1,
+    "gross": -0.0875,
+    "net": -0.1585,
+    "net2": -0.2295,
+    "t": -1.29,
+    "months": 55,
+    "costShare": 0.051,
+    "total": -50.4
+   },
+   "skippedOpenPosition": 279,
+   "stillOpen": 0
+  },
+  "C3": {
+   "is": {
+    "n": 2136,
+    "win": 52.6,
+    "gross": 0.0502,
+    "net": -0.0749,
+    "net2": -0.2,
+    "t": -3.46,
+    "months": 48,
+    "costShare": 0.106,
+    "total": -159.9
+   },
+   "oos": {
+    "n": 2765,
+    "win": 50.7,
+    "gross": 0.0164,
+    "net": -0.0533,
+    "net2": -0.1231,
+    "t": -2.46,
+    "months": 58,
+    "costShare": 0.055,
+    "total": -147.4
+   },
+   "skippedOpenPosition": 4296,
+   "stillOpen": 0
+  },
+  "opposite": {
+   "is": {
+    "n": 118,
+    "win": 15.3,
+    "gross": 0.0251,
+    "net": -0.1328,
+    "net2": -0.2907,
+    "t": -0.55,
+    "months": 43,
+    "costShare": 0.145,
+    "total": -15.7
+   },
+   "oos": {
+    "n": 157,
+    "win": 15.9,
+    "gross": -0.06,
+    "net": -0.1567,
+    "net2": -0.2534,
+    "t": -0.79,
+    "months": 55,
+    "costShare": 0.078,
+    "total": -24.6
+   },
+   "skippedOpenPosition": 76,
+   "stillOpen": 0
+  },
+  "anyHour": {
+   "is": {
+    "n": 1018,
+    "win": 20.5,
+    "gross": 0.0931,
+    "net": -0.0031,
+    "net2": -0.0994,
+    "t": -0.05,
+    "months": 48,
+    "costShare": 0.079,
+    "total": -3.2
+   },
+   "oos": {
+    "n": 1412,
+    "win": 18,
+    "gross": -0.0455,
+    "net": -0.0979,
+    "net2": -0.1504,
+    "t": -1.65,
+    "months": 58,
+    "costShare": 0.04,
+    "total": -138.3
+   },
+   "skippedOpenPosition": 15069,
+   "stillOpen": 0
+  }
+ },
+ "C2": {
+  "is": {
+   "n": 66834,
+   "win": 13.9,
+   "gross": -0.0298,
+   "net": -0.1971,
+   "net2": -0.3644,
+   "t": -9.35,
+   "months": 48,
+   "costShare": 0.155,
+   "total": -13173.1
+  },
+  "oos": {
+   "n": 92504,
+   "win": 14.9,
+   "gross": 0.0357,
+   "net": -0.0817,
+   "net2": -0.1991,
+   "t": -4.61,
+   "months": 58,
+   "costShare": 0.097,
+   "total": -7554.8
+  }
+ },
+ "byYear": {
+  "2018": {
+   "n": 228,
+   "win": 17.5,
+   "gross": -0.0615,
+   "net": -0.2075,
+   "net2": -0.3536,
+   "t": -1.39,
+   "months": 12,
+   "costShare": 0.135,
+   "total": -47.3
+  },
+  "2019": {
+   "n": 257,
+   "win": 18.7,
+   "gross": 0.059,
+   "net": -0.0961,
+   "net2": -0.2512,
+   "t": -0.7,
+   "months": 12,
+   "costShare": 0.135,
+   "total": -24.7
+  },
+  "2020": {
+   "n": 263,
+   "win": 17.1,
+   "gross": 0.0649,
+   "net": -0.0196,
+   "net2": -0.1042,
+   "t": -0.17,
+   "months": 12,
+   "costShare": 0.069,
+   "total": -5.2
+  },
+  "2021": {
+   "n": 246,
+   "win": 17.9,
+   "gross": -0.0296,
+   "net": -0.124,
+   "net2": -0.2184,
+   "t": -1.02,
+   "months": 12,
+   "costShare": 0.084,
+   "total": -30.5
+  },
+  "2022": {
+   "n": 291,
+   "win": 15.8,
+   "gross": 0.0038,
+   "net": -0.0891,
+   "net2": -0.182,
+   "t": -0.67,
+   "months": 12,
+   "costShare": 0.084,
+   "total": -25.9
+  },
+  "2023": {
+   "n": 254,
+   "win": 19.3,
+   "gross": 0.0799,
+   "net": -0.0192,
+   "net2": -0.1183,
+   "t": -0.1,
+   "months": 12,
+   "costShare": 0.087,
+   "total": -4.9
+  },
+  "2024": {
+   "n": 264,
+   "win": 18.6,
+   "gross": 0.1424,
+   "net": 0.0702,
+   "net2": -0.002,
+   "t": 0.45,
+   "months": 12,
+   "costShare": 0.06,
+   "total": 18.5
+  },
+  "2025": {
+   "n": 259,
+   "win": 16.6,
+   "gross": -0.0018,
+   "net": -0.0437,
+   "net2": -0.0857,
+   "t": -0.31,
+   "months": 12,
+   "costShare": 0.034,
+   "total": -11.3
+  },
+  "2026": {
+   "n": 226,
+   "win": 20.8,
+   "gross": 0.1101,
+   "net": 0.0882,
+   "net2": 0.0663,
+   "t": 0.55,
+   "months": 10,
+   "costShare": 0.019,
+   "total": 19.9
+  }
+ },
+ "c1ByYear": {
+  "2018": {
+   "n": 30,
+   "win": 30,
+   "gross": 0.7003,
+   "net": 0.5226,
+   "net2": 0.3449,
+   "t": 1.02,
+   "months": 12,
+   "costShare": 0.169,
+   "total": 15.7
+  },
+  "2019": {
+   "n": 47,
+   "win": 17,
+   "gross": -0.0303,
+   "net": -0.2015,
+   "net2": -0.3727,
+   "t": -0.58,
+   "months": 11,
+   "costShare": 0.173,
+   "total": -9.5
+  },
+  "2020": {
+   "n": 67,
+   "win": 22.4,
+   "gross": 0.4138,
+   "net": 0.3251,
+   "net2": 0.2365,
+   "t": 1.22,
+   "months": 12,
+   "costShare": 0.067,
+   "total": 21.8
+  },
+  "2021": {
+   "n": 43,
+   "win": 20.9,
+   "gross": -0.0037,
+   "net": -0.1181,
+   "net2": -0.2325,
+   "t": -0.33,
+   "months": 12,
+   "costShare": 0.12,
+   "total": -5.1
+  },
+  "2022": {
+   "n": 43,
+   "win": 20.9,
+   "gross": 0.3144,
+   "net": 0.1902,
+   "net2": 0.0661,
+   "t": 0.39,
+   "months": 10,
+   "costShare": 0.095,
+   "total": 8.2
+  },
+  "2023": {
+   "n": 41,
+   "win": 19.5,
+   "gross": 0.1791,
+   "net": 0.0527,
+   "net2": -0.0736,
+   "t": 0.16,
+   "months": 12,
+   "costShare": 0.099,
+   "total": 2.2
+  },
+  "2024": {
+   "n": 80,
+   "win": 12.5,
+   "gross": -0.2819,
+   "net": -0.3652,
+   "net2": -0.4484,
+   "t": -1.63,
+   "months": 12,
+   "costShare": 0.067,
+   "total": -29.2
+  },
+  "2025": {
+   "n": 110,
+   "win": 12.7,
+   "gross": -0.1916,
+   "net": -0.232,
+   "net2": -0.2723,
+   "t": -1.22,
+   "months": 11,
+   "costShare": 0.035,
+   "total": -25.5
+  },
+  "2026": {
+   "n": 44,
+   "win": 15.9,
+   "gross": -0.1148,
+   "net": -0.1366,
+   "net2": -0.1585,
+   "t": -0.44,
+   "months": 10,
+   "costShare": 0.018,
+   "total": -6
+  }
+ },
+ "byTimeframe": {
+  "15m": {
+   "n": 109,
+   "win": 18.3,
+   "gross": 0.2203,
+   "net": 0.1155,
+   "net2": 0.0106,
+   "t": 0.48,
+   "months": 68,
+   "costShare": 0.078,
+   "total": 12.6
+  },
+  "1d": {
+   "n": 1025,
+   "win": 18.9,
+   "gross": 0.0376,
+   "net": -0.0473,
+   "net2": -0.1323,
+   "t": -0.6,
+   "months": 105,
+   "costShare": 0.069,
+   "total": -48.5
+  },
+  "1h": {
+   "n": 327,
+   "win": 15.9,
+   "gross": -0.0226,
+   "net": -0.1123,
+   "net2": -0.2021,
+   "t": -0.88,
+   "months": 100,
+   "costShare": 0.069,
+   "total": -36.7
+  },
+  "30m": {
+   "n": 239,
+   "win": 15.9,
+   "gross": 0.0736,
+   "net": -0.0276,
+   "net2": -0.1287,
+   "t": -0.18,
+   "months": 88,
+   "costShare": 0.079,
+   "total": -6.6
+  },
+  "4h": {
+   "n": 588,
+   "win": 18.2,
+   "gross": 0.0367,
+   "net": -0.0546,
+   "net2": -0.1459,
+   "t": -0.52,
+   "months": 105,
+   "costShare": 0.073,
+   "total": -32.1
+  }
+ },
+ "byKind": {
+  "bo": {
+   "n": 672,
+   "win": 19.2,
+   "gross": 0.0862,
+   "net": -0.0011,
+   "net2": -0.0885,
+   "t": -0.01,
+   "months": 105,
+   "costShare": 0.067,
+   "total": -0.8
+  },
+  "eg": {
+   "n": 1293,
+   "win": 17.1,
+   "gross": -0.0067,
+   "net": -0.0981,
+   "net2": -0.1894,
+   "t": -1.45,
+   "months": 105,
+   "costShare": 0.073,
+   "total": -126.8
+  },
+  "ibo": {
+   "n": 323,
+   "win": 18.9,
+   "gross": 0.1395,
+   "net": 0.0501,
+   "net2": -0.0393,
+   "t": 0.41,
+   "months": 89,
+   "costShare": 0.069,
+   "total": 16.2
+  }
+ },
+ "cutTest": [
+  {
+   "year": 2020,
+   "at": "2020-04-30T00:00:00.000Z",
+   "full": 670,
+   "cut": 670,
+   "atBarrier": 617,
+   "same": true
+  },
+  {
+   "year": 2024,
+   "at": "2024-04-30T00:00:00.000Z",
+   "full": 673,
+   "cut": 673,
+   "atBarrier": 604,
+   "same": true
+  }
+ ]
+}

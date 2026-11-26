@@ -12,26 +12,28 @@ import { build, LEADS, FROM, TO } from './orders.mjs';
 import { spans } from '../fade-tick-exec/run.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-export const SYM = 'NAS100', W = 3, W_BREAK = 15, SWAP_LONG = 0.62, ROLL_H = 22, TRIPLE_DOW = 5;
+export const SYM = 'NAS100', W = 10, W_BREAK = 25, W_DAY = 1, FILLS = 'nq1-f2', SWAP_LONG = 0.62, ROLL_H = 22, TRIPLE_DOW = 5;
 export const ENTRY_AGE = 60, DEAD_AGE = 3600, N_MIN = 100, UNRES_MAX = 0.10, MAX_FILLS = 3500, MAX_MARKS = 600;
 const r6 = (x) => +(+x).toPrecision(8), r4 = (v) => (Number.isFinite(v) ? Math.round(v * 1e4) / 1e4 : null);
 const mean = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : NaN);
 const pct = (a, p) => { const v = [...a].sort((x, y) => x - y); return v.length ? v[Math.min(v.length - 1, Math.floor(p * (v.length - 1) + 0.5))] : null; };
 export const inBand = (t) => { const m = (t % 86400) / 60; return m >= 20 * 60 + 55 && m < 23 * 60 + 5; };
 const quote = (M, t, age) => { const m = M.get(t); return m && m[1] > 0 && m[2] > 0 && m[3] != null && m[3] <= age ? m : null; };
-export function entryOf(o, M) { const m = quote(M, o.ts, ENTRY_AGE); return m ? { A: o.side > 0 ? m[2] : m[1], spread: m[2] - m[1] } : null; }
+export function entryOf(o, M) { const m = quote(M, o.ts, ENTRY_AGE); return m ? { A: o.side > 0 ? m[2] : m[1], spread: m[2] - m[1], b0: (m[1] + m[2]) / 2 - o.fillM } : null; }
 // nights a position pays financing for: every 22:00 UTC of a weekday with entry < t <= exit, Friday three
 export function nights(t0, t1) { let n = 0; for (let t = Math.floor(t0 / 86400) * 86400 + ROLL_H * 3600; t <= t1; t += 86400) { if (t <= t0) continue; const d = new Date(t * 1000).getUTCDay(); if (d === 0 || d === 6) continue; n += d === TRIPLE_DOW ? 3 : 1; } return n; }
 
 // pass 2: exact-level queries once the tick fill A is known. [id, t0, t1, level, dir]. The scan ends at the first 5-minute
 // candle that is clearly through a level (the trade is over by then whatever the ticks say).
-export function queriesOf(o, A, M5, from = 0) {
-  const s = o.side, X = A - s * o.D, T = A + s * o.rr * o.D, nS = [], nT = [];
+// amendment (26 Nov 2026): the broker is not on the candles' price basis; a broker level L is looked for on candles at L - b0,
+// within N = W + W_DAY a day since the entry (W_BREAK inside the daily break); the scan ends at a candle through a level by 3 x N
+export function queriesOf(o, A, M5, from = 0, b0 = 0) {
+  const s = o.side, X = A - s * o.D, T = A + s * o.rr * o.D, Xc = X - b0, Tc = T - b0, nS = [], nT = [];
   if (!(s * (A - X) > 0)) throw new Error('stop on the wrong side');
-  for (let j = from; j < M5.length && M5[j].t < o.deadEnd; j++) { const b = M5[j]; if (b.t + 300 <= o.ts) continue; const n = inBand(b.t) ? W_BREAK : W;
-    const ns = s > 0 ? b.l <= X + n : b.h >= X - n, nt = s > 0 ? b.h >= T - n : b.l <= T + n;
+  for (let j = from; j < M5.length && M5[j].t < o.deadEnd; j++) { const b = M5[j]; if (b.t + 300 <= o.ts) continue; const n = (inBand(b.t) ? W_BREAK : W) + W_DAY * Math.max(0, (b.t - o.ts) / 86400);
+    const ns = s > 0 ? b.l <= Xc + n : b.h >= Xc - n, nt = s > 0 ? b.h >= Tc - n : b.l <= Tc + n;
     if (ns) nS.push(b.t); if (nt) nT.push(b.t);
-    if (b.t >= o.ts && (s > 0 ? b.l < X - n || b.h > T + n : b.h > X + n || b.l < T - n)) break; }
+    if (b.t >= o.ts && (s > 0 ? b.l < Xc - 3 * n || b.h > Tc + 3 * n : b.h > Xc + 3 * n || b.l < Tc - 3 * n)) break; }
   const q = [];
   spans(nS).forEach(([a, b], k) => q.push([`${o.id}|s${k}`, a, b, r6(X), -s]));
   spans(nT).forEach(([a, b], k) => q.push([`${o.id}|t${k}`, a, b, r6(T), 2 * s]));
@@ -114,18 +116,18 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
     const files = [[]]; let none = 0, nq = 0, p = 0;
     for (const o of [...O].sort((a, b) => a.ts - b.ts)) { const e = entryOf(o, M); if (!e) { none++; o.ns = 0; o.nt = 0; continue; }
       while (p < M5.length && M5[p].t + 300 <= o.ts) p++;
-      const r = queriesOf(o, e.A, M5, p); o.ns = r.ns; o.nt = r.nt; nq += r.q.length;
+      const r = queriesOf(o, e.A, M5, p, e.b0); o.ns = r.ns; o.nt = r.nt; nq += r.q.length;
       if (files[files.length - 1].length + r.q.length > MAX_FILLS) files.push([]); files[files.length - 1].push(...r.q); }
     fs.writeFileSync(ORD, JSON.stringify(O));
-    const batches = files.map((q, k) => { fs.writeFileSync(path.join(HERE, `fills-${k + 1}.json`), JSON.stringify({ fills: { [SYM]: q } })); return { file: `fills-${k + 1}.json`, tag: `nq1-fills-${k + 1}`, n: q.length }; });
+    const batches = files.map((q, k) => { fs.writeFileSync(path.join(HERE, `fills-${k + 1}.json`), JSON.stringify({ fills: { [SYM]: q } })); return { file: `fills-${k + 1}.json`, tag: `${FILLS}-${k + 1}`, n: q.length }; });
     console.log(JSON.stringify({ noEntryQuote: none, queries: nq, batches }));
   } else if (mode === 'dead') {
-    const O = JSON.parse(fs.readFileSync(ORD, 'utf8')), e = readProbe(dir, 'nq1-entry'), f = readProbe(dir, 'nq1-fills');
+    const O = JSON.parse(fs.readFileSync(ORD, 'utf8')), e = readProbe(dir, 'nq1-entry'), f = readProbe(dir, FILLS);
     const ts = [...new Set(O.filter((o) => tickOrder(o, f.F, e.M, new Map()).needDead).map((o) => o.deadEnd))].sort((a, b) => a - b), files = chunks(ts, MAX_MARKS);
     files.forEach((c, k) => fs.writeFileSync(path.join(HERE, `marks-dead-${k + 1}.json`), JSON.stringify({ [SYM]: c })));
     console.log(JSON.stringify({ deadMarks: ts.length, files: files.length }));
   } else if (mode === 'report') {
-    const O = JSON.parse(fs.readFileSync(ORD, 'utf8')), e = readProbe(dir, 'nq1-entry'), d = readProbe(dir, 'nq1-dead'), f = readProbe(dir, 'nq1-fills');
+    const O = JSON.parse(fs.readFileSync(ORD, 'utf8')), e = readProbe(dir, 'nq1-entry'), d = readProbe(dir, 'nq1-dead'), f = readProbe(dir, FILLS);
     const rules = LEADS.map((L) => { const rows = O.filter((o) => o.lead === L.id).map((o) => ({ ts: o.ts, side: o.side, b: tickOrder(o, f.F, e.M, d.M), midR: o.midR })); return { id: L.id, name: L.name, stats: stats(rows) }; });
     const hp = holm(rules.map((r) => pOf(r.stats.net.monthT))); rules.forEach((r, i) => { r.holm = r4(hp[i]); r.verdict = verdictOf(r.stats, hp[i]); });
     const pass = rules.filter((r) => r.verdict === 'PASS');

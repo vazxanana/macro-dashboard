@@ -64,3 +64,21 @@ six forms, picked in sample.
 
 One run. No variant of a rule, window or allowance on these years after the result. Deliverables: `orders.mjs`, `run.mjs`, the
 mark and query files, `RESULT.md`, `result.json`, `tests/nq1-leads-exec.test.mjs`.
+
+## Amendment (26 Nov 2026, before any R on ticks was computed or read)
+
+Pass 2 as written found no stop or target for 557 orders that the candles say were closed. Cause, measured on the entry quotes
+alone: the broker's NAS100 is not on the candle feed's price basis. Broker mid minus the candle's open at the entry moment has a
+median of -15.9 points (1st to 99th percentile -82.9 to +8.9), so a window chosen where the CANDLES come within 3 points of a
+level misses the broker's own crossing, and the scan stopped at a candle that was "clearly through" only on the candle feed.
+Only the count of unresolved orders and this basis were looked at; no tick R, mean or verdict was computed.
+
+Changed, the measurement only (rules, levels, test, bar, financing unchanged; levels are still exact broker prices):
+
+- Each order's basis b0 = the broker's mid at the entry quote minus the candle's entry open. A level L (a broker price) is
+  looked for on candles at L - b0.
+- A 5-minute candle is "near" a level within N = 10 points + 1 point for each day since the entry (the basis drifts as the
+  quarter's futures premium decays; 25 + 1 a day inside 20:55-23:04 UTC). The scan ends only at a candle through a level by
+  more than 3 x N.
+- The pass-2 file already read (tag nq1-fills-1) is not used; the new queries are read under tags nq1-f2-<k>.
+- If, after this, more than 10 % of a rule's entry-resolved orders are still unresolved, that rule is INCONCLUSIVE as already written.

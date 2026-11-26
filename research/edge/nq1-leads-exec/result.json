@@ -1,0 +1,743 @@
+{
+ "study": "nq1-leads-exec",
+ "built": "2026-11-26",
+ "commit": "a90c6597db",
+ "window": [
+  "2023-12-01",
+  "2026-11-20"
+ ],
+ "probes": [
+  {
+   "file": "ticks-NAS100-nq1-entry-1.json",
+   "at": "2026-11-26T13:28:01.119Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-entry-2.json",
+   "at": "2026-11-26T13:32:53.164Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-entry-3.json",
+   "at": "2026-11-26T13:33:07.210Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-dead-1.json",
+   "at": "2026-11-26T16:13:19.224Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-f2-1.json",
+   "at": "2026-11-26T14:58:50.836Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-f2-2.json",
+   "at": "2026-11-26T14:58:51.836Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-f2-3.json",
+   "at": "2026-11-26T14:58:51.067Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-NAS100-nq1-f2-4.json",
+   "at": "2026-11-26T14:58:56.022Z",
+   "errors": 0
+  }
+ ],
+ "rules": [
+  {
+   "id": "l1",
+   "name": "Stretch + 10-hour breakout, long",
+   "stats": {
+    "orders": 380,
+    "entryUnresolved": 15,
+    "exitUnresolved": 0,
+    "unresolvedShare": 0,
+    "unresolvedWhy": {},
+    "net": {
+     "n": 365,
+     "mean": 0.2688,
+     "monthT": 3.194,
+     "months": 36
+    },
+    "tick": {
+     "n": 365,
+     "mean": 0.2755,
+     "monthT": 3.2617,
+     "months": 36
+    },
+    "mid": {
+     "n": 365,
+     "mean": 0.3035,
+     "monthT": 3.5715,
+     "months": 36
+    },
+    "tickMinusMid": {
+     "n": 365,
+     "mean": -0.028,
+     "monthT": -1.3443,
+     "months": 36
+    },
+    "win": 0.2795,
+    "financingR": 0.0068,
+    "nights": 0.7178,
+    "exits": {
+     "stop": {
+      "n": 263,
+      "tick": -1.0236,
+      "net": -1.0276,
+      "mid": -0.974
+     },
+     "target": {
+      "n": 81,
+      "tick": 4,
+      "net": 3.9887,
+      "mid": 4
+     },
+     "time": {
+      "n": 21,
+      "tick": 2.1798,
+      "net": 2.1552,
+      "mid": 2.0451
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 16,
+      "tick": 0.3347,
+      "net": 0.3249,
+      "mid": 0.25
+     },
+     "2024": {
+      "n": 129,
+      "tick": 0.4656,
+      "net": 0.4582,
+      "mid": 0.5213
+     },
+     "2025": {
+      "n": 115,
+      "tick": 0.1891,
+      "net": 0.1814,
+      "mid": 0.238
+     },
+     "2026": {
+      "n": 105,
+      "tick": 0.1277,
+      "net": 0.1231,
+      "mid": 0.116
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 365,
+      "tick": 0.2755,
+      "net": 0.2688,
+      "mid": 0.3035
+     }
+    },
+    "byBreak": {
+     "never open over the break": {
+      "n": 217,
+      "tick": -0.4362,
+      "net": -0.4362,
+      "mid": -0.424
+     },
+     "open over the 21:00-22:59 break": {
+      "n": 148,
+      "tick": 1.3191,
+      "net": 1.3024,
+      "mid": 1.3702
+     }
+    },
+    "entrySpreadR": {
+     "median": 0.0129,
+     "p90": 0.022
+    },
+    "entrySlipR": -0.2444
+   },
+   "holm": 0.0035,
+   "verdict": "PASS"
+  },
+  {
+   "id": "l2",
+   "name": "Stretch + 20-hour breakout, long",
+   "stats": {
+    "orders": 360,
+    "entryUnresolved": 16,
+    "exitUnresolved": 0,
+    "unresolvedShare": 0,
+    "unresolvedWhy": {},
+    "net": {
+     "n": 344,
+     "mean": 0.1891,
+     "monthT": 1.8462,
+     "months": 36
+    },
+    "tick": {
+     "n": 344,
+     "mean": 0.1968,
+     "monthT": 1.9175,
+     "months": 36
+    },
+    "mid": {
+     "n": 344,
+     "mean": 0.2328,
+     "monthT": 2.2829,
+     "months": 36
+    },
+    "tickMinusMid": {
+     "n": 344,
+     "mean": -0.036,
+     "monthT": -1.7361,
+     "months": 36
+    },
+    "win": 0.2413,
+    "financingR": 0.0077,
+    "nights": 0.8314,
+    "exits": {
+     "stop": {
+      "n": 261,
+      "tick": -1.0126,
+      "net": -1.0182,
+      "mid": -0.9652
+     },
+     "target": {
+      "n": 83,
+      "tick": 4,
+      "net": 3.9854,
+      "mid": 4
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 15,
+      "tick": -0.0054,
+      "net": -0.0159,
+      "mid": 0
+     },
+     "2024": {
+      "n": 124,
+      "tick": 0.4406,
+      "net": 0.4321,
+      "mid": 0.4919
+     },
+     "2025": {
+      "n": 107,
+      "tick": 0.0656,
+      "net": 0.0567,
+      "mid": 0.113
+     },
+     "2026": {
+      "n": 98,
+      "tick": 0.0625,
+      "net": 0.0575,
+      "mid": 0.0714
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 344,
+      "tick": 0.1968,
+      "net": 0.1891,
+      "mid": 0.2328
+     }
+    },
+    "byBreak": {
+     "never open over the break": {
+      "n": 202,
+      "tick": -0.4919,
+      "net": -0.4919,
+      "mid": -0.4802
+     },
+     "open over the 21:00-22:59 break": {
+      "n": 142,
+      "tick": 1.1766,
+      "net": 1.1579,
+      "mid": 1.2471
+     }
+    },
+    "entrySpreadR": {
+     "median": 0.0128,
+     "p90": 0.0216
+    },
+    "entrySlipR": -0.2445
+   },
+   "holm": 0.1297,
+   "verdict": "FAIL"
+  },
+  {
+   "id": "l3",
+   "name": "20-hour breakout with the trend, long",
+   "stats": {
+    "orders": 277,
+    "entryUnresolved": 0,
+    "exitUnresolved": 0,
+    "unresolvedShare": 0,
+    "unresolvedWhy": {},
+    "net": {
+     "n": 277,
+     "mean": 0.2062,
+     "monthT": 1.5482,
+     "months": 36
+    },
+    "tick": {
+     "n": 277,
+     "mean": 0.2159,
+     "monthT": 1.615,
+     "months": 36
+    },
+    "mid": {
+     "n": 277,
+     "mean": 0.2432,
+     "monthT": 1.8828,
+     "months": 36
+    },
+    "tickMinusMid": {
+     "n": 277,
+     "mean": -0.0273,
+     "monthT": -0.8639,
+     "months": 36
+    },
+    "win": 0.2491,
+    "financingR": 0.0096,
+    "nights": 0.9458,
+    "exits": {
+     "stop": {
+      "n": 208,
+      "tick": -1.0287,
+      "net": -1.0355,
+      "mid": -0.9676
+     },
+     "target": {
+      "n": 68,
+      "tick": 4,
+      "net": 3.9826,
+      "mid": 3.9265
+     },
+     "time": {
+      "n": 1,
+      "tick": 1.755,
+      "net": 1.6992,
+      "mid": 1.6302
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 17,
+      "tick": 0.1676,
+      "net": 0.1571,
+      "mid": 0.1765
+     },
+     "2024": {
+      "n": 98,
+      "tick": 0.3126,
+      "net": 0.3013,
+      "mid": 0.3265
+     },
+     "2025": {
+      "n": 88,
+      "tick": 0.3288,
+      "net": 0.3181,
+      "mid": 0.3935
+     },
+     "2026": {
+      "n": 74,
+      "tick": -0.0354,
+      "net": -0.0414,
+      "mid": -0.0306
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 277,
+      "tick": 0.2159,
+      "net": 0.2062,
+      "mid": 0.2432
+     }
+    },
+    "byBreak": {
+     "never open over the break": {
+      "n": 135,
+      "tick": -0.6422,
+      "net": -0.6422,
+      "mid": -0.6296
+     },
+     "open over the 21:00-22:59 break": {
+      "n": 142,
+      "tick": 1.0316,
+      "net": 1.0128,
+      "mid": 1.073
+     }
+    },
+    "entrySpreadR": {
+     "median": 0.0133,
+     "p90": 0.0215
+    },
+    "entrySlipR": -0.2427
+   },
+   "holm": 0.1297,
+   "verdict": "FAIL"
+  },
+  {
+   "id": "l4",
+   "name": "Double stretch with the trend, 4-hour hold",
+   "stats": {
+    "orders": 340,
+    "entryUnresolved": 0,
+    "exitUnresolved": 0,
+    "unresolvedShare": 0,
+    "unresolvedWhy": {},
+    "net": {
+     "n": 340,
+     "mean": 0.1392,
+     "monthT": 1.8146,
+     "months": 36
+    },
+    "tick": {
+     "n": 340,
+     "mean": 0.1415,
+     "monthT": 1.8453,
+     "months": 36
+    },
+    "mid": {
+     "n": 340,
+     "mean": 0.1438,
+     "monthT": 1.8892,
+     "months": 36
+    },
+    "tickMinusMid": {
+     "n": 340,
+     "mean": -0.0023,
+     "monthT": -0.4361,
+     "months": 36
+    },
+    "win": 0.4559,
+    "financingR": 0.0023,
+    "nights": 0.3382,
+    "exits": {
+     "stop": {
+      "n": 151,
+      "tick": -1.0238,
+      "net": -1.0251,
+      "mid": -1.0111
+     },
+     "target": {
+      "n": 11,
+      "tick": 4,
+      "net": 4,
+      "mid": 4
+     },
+     "time": {
+      "n": 178,
+      "tick": 0.8917,
+      "net": 0.8884,
+      "mid": 0.8853
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 11,
+      "tick": -0.521,
+      "net": -0.5241,
+      "mid": -0.487
+     },
+     "2024": {
+      "n": 130,
+      "tick": 0.1996,
+      "net": 0.1964,
+      "mid": 0.1838
+     },
+     "2025": {
+      "n": 107,
+      "tick": 0.0485,
+      "net": 0.0462,
+      "mid": 0.0635
+     },
+     "2026": {
+      "n": 92,
+      "tick": 0.2469,
+      "net": 0.246,
+      "mid": 0.2563
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 177,
+      "tick": 0.1869,
+      "net": 0.1825,
+      "mid": 0.198
+     },
+     "sell": {
+      "n": 163,
+      "tick": 0.0922,
+      "net": 0.0922,
+      "mid": 0.085
+     }
+    },
+    "byBreak": {
+     "never open over the break": {
+      "n": 254,
+      "tick": 0.0658,
+      "net": 0.0658,
+      "mid": 0.0697
+     },
+     "open over the 21:00-22:59 break": {
+      "n": 86,
+      "tick": 0.3652,
+      "net": 0.3561,
+      "mid": 0.3629
+     }
+    },
+    "entrySpreadR": {
+     "median": 0.0113,
+     "p90": 0.0191
+    },
+    "entrySlipR": -0.0021
+   },
+   "holm": 0.1297,
+   "verdict": "FAIL"
+  },
+  {
+   "id": "l5",
+   "name": "Double stretch, high volatility, long",
+   "stats": {
+    "orders": 330,
+    "entryUnresolved": 13,
+    "exitUnresolved": 0,
+    "unresolvedShare": 0,
+    "unresolvedWhy": {},
+    "net": {
+     "n": 317,
+     "mean": 0.3643,
+     "monthT": 3.9778,
+     "months": 35
+    },
+    "tick": {
+     "n": 317,
+     "mean": 0.3702,
+     "monthT": 4.0236,
+     "months": 35
+    },
+    "mid": {
+     "n": 317,
+     "mean": 0.3262,
+     "monthT": 3.6453,
+     "months": 35
+    },
+    "tickMinusMid": {
+     "n": 317,
+     "mean": 0.044,
+     "monthT": 1.8174,
+     "months": 35
+    },
+    "win": 0.347,
+    "financingR": 0.006,
+    "nights": 0.4795,
+    "exits": {
+     "stop": {
+      "n": 207,
+      "tick": -1.0272,
+      "net": -1.0307,
+      "mid": -1.0174
+     },
+     "target": {
+      "n": 110,
+      "tick": 3,
+      "net": 2.9894,
+      "mid": 2.8545
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 15,
+      "tick": 0.3273,
+      "net": 0.3202,
+      "mid": 0.3333
+     },
+     "2024": {
+      "n": 113,
+      "tick": 0.6186,
+      "net": 0.6113,
+      "mid": 0.5929
+     },
+     "2025": {
+      "n": 102,
+      "tick": 0.3628,
+      "net": 0.3576,
+      "mid": 0.2941
+     },
+     "2026": {
+      "n": 87,
+      "tick": 0.0638,
+      "net": 0.0589,
+      "mid": 0.0161
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 317,
+      "tick": 0.3702,
+      "net": 0.3643,
+      "mid": 0.3262
+     }
+    },
+    "byBreak": {
+     "never open over the break": {
+      "n": 203,
+      "tick": 0.0134,
+      "net": 0.0134,
+      "mid": -0.0148
+     },
+     "open over the 21:00-22:59 break": {
+      "n": 114,
+      "tick": 1.0056,
+      "net": 0.989,
+      "mid": 0.9334
+     }
+    },
+    "entrySpreadR": {
+     "median": 0.0164,
+     "p90": 0.0261
+    },
+    "entrySlipR": -0.327
+   },
+   "holm": 0.0002,
+   "verdict": "PASS"
+  },
+  {
+   "id": "l6",
+   "name": "Big candle + stretch",
+   "stats": {
+    "orders": 699,
+    "entryUnresolved": 25,
+    "exitUnresolved": 0,
+    "unresolvedShare": 0,
+    "unresolvedWhy": {},
+    "net": {
+     "n": 674,
+     "mean": 0.094,
+     "monthT": 1.4907,
+     "months": 36
+    },
+    "tick": {
+     "n": 674,
+     "mean": 0.0965,
+     "monthT": 1.5289,
+     "months": 36
+    },
+    "mid": {
+     "n": 674,
+     "mean": 0.0854,
+     "monthT": 1.3805,
+     "months": 36
+    },
+    "tickMinusMid": {
+     "n": 674,
+     "mean": 0.0111,
+     "monthT": 0.5947,
+     "months": 36
+    },
+    "win": 0.2774,
+    "financingR": 0.0026,
+    "nights": 0.3071,
+    "exits": {
+     "stop": {
+      "n": 487,
+      "tick": -1.0184,
+      "net": -1.0199,
+      "mid": -0.9763
+     },
+     "target": {
+      "n": 187,
+      "tick": 3,
+      "net": 2.9948,
+      "mid": 2.8503
+     }
+    },
+    "byYear": {
+     "2023": {
+      "n": 17,
+      "tick": 0.1691,
+      "net": 0.1628,
+      "mid": 0.1765
+     },
+     "2024": {
+      "n": 256,
+      "tick": 0.1548,
+      "net": 0.1513,
+      "mid": 0.2022
+     },
+     "2025": {
+      "n": 212,
+      "tick": 0.0066,
+      "net": 0.0047,
+      "mid": -0.057
+     },
+     "2026": {
+      "n": 189,
+      "tick": 0.1119,
+      "net": 0.1102,
+      "mid": 0.0787
+     }
+    },
+    "bySide": {
+     "buy": {
+      "n": 305,
+      "tick": 0.1282,
+      "net": 0.1226,
+      "mid": 0.0883
+     },
+     "sell": {
+      "n": 369,
+      "tick": 0.0703,
+      "net": 0.0703,
+      "mid": 0.083
+     }
+    },
+    "byBreak": {
+     "never open over the break": {
+      "n": 531,
+      "tick": -0.041,
+      "net": -0.041,
+      "mid": -0.0282
+     },
+     "open over the 21:00-22:59 break": {
+      "n": 143,
+      "tick": 0.6071,
+      "net": 0.595,
+      "mid": 0.5074
+     }
+    },
+    "entrySpreadR": {
+     "median": 0.0159,
+     "p90": 0.0272
+    },
+    "entrySlipR": 0.0249
+   },
+   "holm": 0.1297,
+   "verdict": "FAIL"
+  }
+ ],
+ "verdict": "2 of 6 pass (l1, l5). At the broker's own NAS100 bid and ask, after financing: l1 +0.269R (n 365, month t 3.194; mid +0.303R); l2 +0.189R (n 344, month t 1.8462; mid +0.233R); l3 +0.206R (n 277, month t 1.5482; mid +0.243R); l4 +0.139R (n 340, month t 1.8146; mid +0.144R); l5 +0.364R (n 317, month t 3.9778; mid +0.326R); l6 +0.094R (n 674, month t 1.4907; mid +0.085R).",
+ "meaning": [
+  "The broker's own quotes do NOT take these rules away, unlike the two USD/CHF leads: every one of the six stays positive at Fusion's",
+  "bid and ask after financing, and the cost of trading the Nasdaq there (a spread of about 0.013R a trade, financing under 0.01R) is",
+  "small against stops of an ATR. Two rules clear the pre-registered bar (l1 and l5); the other four are positive with a month t of",
+  "1.5 to 1.8.",
+  "",
+  "What this does and does not show. It is an execution measurement on years the search itself read (2023-12 to 2026-11 lies inside",
+  "the auto-researcher's holdout window, where these rules were chosen out of about 118 million tries), so it says the mid-candle",
+  "figures were not an artefact of the candle feed; it is not new evidence that the rules work. All six are long-biased readings of one",
+  "market in a rising stretch, they overlap heavily (their totals are not additive), and the result sits almost wholly in trades held",
+  "over the 21:00-22:59 UTC break (trades never open over it lose). The years fade: l1 +0.46R a trade in 2024, +0.18R in 2025, +0.12R",
+  "in 2026. A candidate for the forward record that already runs on the NQ1 desk from 26 Nov 2026, never an edge.",
+  "",
+  "The broker's NAS100 price is not the candles' price: its mid sat a median 15.9 points under the candle open at entry (1st to 99th",
+  "percentile -82.9 to +8.9), so levels were looked for on the broker's own basis (the amendment to the pre-registration, committed",
+  "before any tick R was read)."
+ ]
+}
