@@ -74,13 +74,39 @@ const NEED = ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKE
 export const SYMBOLS = { xau: ['XAUUSD'], eurusd: ['EURUSD'], gbpusd: ['GBPUSD'], audusd: ['AUDUSD'], usdcad: ['USDCAD'], usdchf: ['USDCHF'],
   btc: ['BTCUSD'], eth: ['ETHUSD'], sol: ['SOLUSD'], xrp: ['XRPUSD'],   // 8 Nov: the council's crypto paper trades too (CFDs at the broker)
   nq: ['US100', 'NAS100', 'USTEC'], es: ['US500', 'SPX500', 'US500.cash'], ym: ['US30', 'DJ30', 'US30.cash'], rty: ['US2000', 'RUSSELL2000'], gc: ['XAUUSD'],
-  nzdusd: ['NZDUSD'], usdjpy: ['USDJPY'], eurjpy: ['EURJPY'], xag: ['XAGUSD'] };   // 24 Nov 2026: the Equinox desks' markets (eqx book)
+  nas100: ['US100', 'NAS100', 'USTEC'], nzdusd: ['NZDUSD'], usdjpy: ['USDJPY'], eurjpy: ['EURJPY'], xag: ['XAGUSD'] };   // 24 Nov 2026: the Equinox desks' markets (eqx book)
 // the ICT desk's trades as mirror candidates: only its A-setups (the part that holds up after costs: research/edge/costs), with
 // their own id space; everything else is treated like a shadow (never sent)
 // 24 Nov 2026 (owner: "Stop ICT copies"): with config.json mirrorIct === false no new ICT copy is opened on any account; the
 // signals stay in the list (noCopy) so a copy made before keeps following its record to the close. ICT stays paper only.
 export const ictCandidates = (ict, on = true) => (Array.isArray(ict) ? ict : []).map((t) => ({ ...t, id: 'ict:' + t.id, k: 'ict-' + (t.aplus ? 'A+' : 'A'), shadow: !t.aset, rr: t.t1 == null ? 99 : t.rr,
   ...(on ? {} : { noCopy: true, noCopyWhy: 'ICT copies stopped by the owner (24 Nov 2026)' }) }));
+// ICT on the Nasdaq, three setups, on the Nasdaq job's demo account (26 Nov 2026, owner: "find the best setup of ict", "add 1 and 2 to nq live", "and 3").
+// Book `ictnq`, ids `ict:x:<desk record id>` (still an `ict:` id, so every ICT path applies: the stop DISTANCE is copied from the fill, the trail and
+// break-even follow the desk's record, rolls are absorbed). From the ICT desk's own records, NQ only:
+//   1 dip-buy   = ict/shadow.json variant 'dip' (buys with the gold rule's stop band while the index is below its close of 20 trading days ago)
+//   2 htf-fvg   = an A-setup whose sweep ran into an unfilled Daily / H4 FVG (feat.htfFvg)
+//   3 no-friday = an A-setup whose signal candle did not close on a New York Friday
+// One copy a signal (an A-setup that is also a dip record is the A record). Only a record opened within ICTNQ.fresh may be OPENED (an older one is
+// noCopy, kept so an earlier copy follows its record). Flat LIMITS.risk.ictnq a trade (the desk's size multiplier is not applied). A stop is required
+// on the losing side. Demo only; ICT stays Fred's separate edge: nothing in ict/ reads this, and these copies are never counted with a council system.
+export const ICTNQ = { market: 'nq', fresh: 2 * 3600, keep: 2 * 86400 };
+const NY_DAY = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short' });
+export const ictnqSetups = (t) => { const out = []; if (t.variant === 'dip') out.push('dip'); if (t.aset && t.feat && t.feat.htfFvg) out.push('htf-fvg'); if (t.aset && Number.isFinite(+t.signalAt) && NY_DAY.format(new Date(+t.signalAt * 1000)) !== 'Fri') out.push('no-friday'); return out; };
+export function ictnqCandidates(ict, shadow, nowS = Math.floor(Date.now() / 1000), on = true) {
+  const A = (Array.isArray(ict) ? ict : []).filter((t) => t && t.market === ICTNQ.market && t.aset && !t.shadow), dips = ((shadow && Array.isArray(shadow.trades)) ? shadow.trades : []).filter((t) => t && t.market === ICTNQ.market && t.variant === 'dip');
+  const seen = new Set(A.map((t) => String(t.id))), out = [];
+  for (const t of A.concat(dips.filter((d) => !seen.has(String(d.id).replace(/-dip$/, ''))))) {
+    const setups = ictnqSetups(t); if (!setups.length) continue;
+    const buy = t.side === 'buy', e = +t.entry, s = +t.stop0 || +t.stop; if (!(e > 0) || !(s > 0) || (buy ? s >= e : s <= e)) continue;          // rule 1: no stop on the losing side, no candidate
+    const open = t.status === 'open', closed = +t.closed || 0; if (!open && !(closed && nowS - closed <= ICTNQ.keep)) continue;
+    const late = open && !(Number.isFinite(+t.opened) && nowS - +t.opened <= ICTNQ.fresh);
+    out.push({ ...t, id: 'ict:x:' + t.id, k: 'ictnq-' + setups[0], setups, shadow: false, size: 1, rr: t.t1 == null ? 99 : t.rr,
+      ...(!on ? { noCopy: true, noCopyWhy: 'ICT Nasdaq copies switched off (config.mirrorIctNq)' } : late ? { noCopy: true, noCopyWhy: 'opened more than 2 h ago at the desk' } : {}) });
+  }
+  return out;
+}
+export const ictnqHasOwnAccount = (byBook) => !!(byBook && byBook.ictnq && byBook.council && byBook.ictnq !== byBook.council);
 // The replica's forward paper trades (10 Nov, owner: "the mirror is not taking the replica trades"). The Trader records them in
 // research.json (k 'replica', gold, forex and crypto), never in trades.json, which holds only the live gold replica; the mirror
 // used to read trades.json and the ICT desk alone, so the Replica demo account stayed empty. They are candidates for the
@@ -186,6 +212,25 @@ export const bfadeHasOwnAccount = (byBook) => !!(byBook && byBook.bfade && byBoo
 // after costs on its studies: a paper reading copied to a demo, not an edge.
 export const boxfadeCandidates = (file, nowS) => eqxCandidates({ boxfade: file }, nowS, ['boxfade']).map((t) => ({ ...t, id: t.id.replace(/^eqx:boxfade:/, 'boxfade:'), k: 'boxfade', eqx: false, boxfade: true,
   ...(t.noCopyWhy ? { noCopyWhy: t.noCopyWhy.replace(/^Equinox: /, 'Box fade: ') } : {}) }));
+// FVG return, gold and silver only, on the Nasdaq job's demo account (26 Nov 2026, owner: "add fvg return (gold and silver) to nq live account"). Book `fvgm`,
+// ids `fvgm:<desk record id>`: the Equinox rules (stop required, fresh within 1 h, under 0.75R from the entry, closed ones kept 2 days) on fvg/desk.json alone,
+// FVGM.markets only, LIMITS.risk.fvgm 1 % a trade, no daily stop (a desk-copy book). The Equinox account copies the same desk independently. Demo only; the
+// rule is about zero after costs on its studies: a demo record, not an edge.
+export const FVGM = { markets: ['xau', 'xag'] };
+export const fvgmCandidates = (file, nowS) => eqxCandidates({ fvg: file }, nowS, ['fvg']).filter((t) => FVGM.markets.includes(t.market)).map((t) => ({ ...t, id: t.id.replace(/^eqx:fvg:/, 'fvgm:'), k: 'fvgm', eqx: false, fvgm: true,
+  ...(t.noCopyWhy ? { noCopyWhy: String(t.noCopyWhy).replace(/^Equinox/, 'FVG return') } : {}) }));
+export const fvgmHasOwnAccount = (byBook) => !!(byBook && byBook.fvgm && byBook.council && byBook.fvgm !== byBook.council);
+// Desk slices on the Nasdaq job's demo account (26 Nov 2026, owner: "D1 engulf zone nasdaq eurusd silver add to nq live", "add LIT the rule (audusd,usdcad) to nq live
+// account"). One book a slice, ids `<book>:<desk record id>`: the records of ONE kind of ONE desk file on the named markets only, copied by the Equinox rules
+// (stop required, fresh within 1 h, under 0.75R from the entry, closed ones kept 2 days), LIMITS.risk[book] 1 % a trade, no daily stop (desk-copy books).
+// Their trackers run every 3rd round, so a copy can come up to about 35 minutes after the desk's fill. Demo only; paper readings, not tested edges.
+export const SLICES = { egd1: { desk: 'eg', kind: 'eg-1d', markets: ['nas100', 'eurusd', 'xag'], name: 'D1 engulf zone' }, litr: { desk: 'lit', kind: 'lit-rule', markets: ['audusd', 'usdcad'], name: 'LIT rule' } };
+export function sliceCandidates(book, file, nowS) {
+  const S = SLICES[book], recs = (file && Array.isArray(file.records) ? file.records : []).filter((r) => r && r.kind === S.kind && S.markets.includes(r.market || 'xau'));
+  return eqxCandidates({ [S.desk]: { records: recs } }, nowS, [S.desk]).map((t) => ({ ...t, id: book + ':' + t.id.slice(('eqx:' + S.desk + ':').length), k: book, name: S.name, eqx: false,
+    ...(t.noCopyWhy ? { noCopyWhy: String(t.noCopyWhy).replace(/^Equinox/, S.name) } : {}) }));
+}
+export const sliceHasOwnAccount = (byBook, book) => !!(byBook && byBook[book] && byBook.council && byBook[book] !== byBook.council);
 export const boxfadeHasOwnAccount = (byBook) => !!(byBook && byBook.boxfade && byBook.council && byBook.boxfade !== byBook.council);
 export const eqxHasOwnAccount = (byBook) => !!(byBook && byBook.eqx && byBook.council && byBook.eqx !== byBook.council);
 // true only while the mosha6 book trades on a different demo account from the council book
@@ -206,7 +251,7 @@ export const RESET_SHARE = 0.5;
 // trade (opening one costs a commission of about 0.01 %): it is a withdrawal or deposit, and the day's start moves with it.
 export const CASH_SHARE = 0.01;
 export const LIMITS = { lots: 0.01, maxLots: 5, maxMarginShare: 0.2, maxTotalMarginShare: 0.8, maxOpen: 40, dayStop: 0.02, retries: 3, keepDays: 30,
-  risk: { ict: 0.002, council: 0.0002, mosha6: 0.0025, eqx: 0.01, bfade: 0.05, boxfade: 0.02 }, dayStopBfade: 0.15, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
+  risk: { ict: 0.002, ictnq: 0.01, fvgm: 0.01, egd1: 0.01, litr: 0.01, council: 0.0002, mosha6: 0.0025, eqx: 0.01, bfade: 0.05, boxfade: 0.02 }, dayStopBfade: 0.15, maxOpenRisk: 0.5, minLot: true, maxMinLotRisk: 0.02, maxDriftR: 1, markMaxAge: 30 * 60, pause: 10 * 60, settle: 20 * 60 };   // settle: market orders wait this long after the last "market closed" answer (>= ~10 min after the real open)
 const LABEL = 'council';
 const OPEN = new Set(['open']), isDone = (t) => !!t.status && t.status !== 'open' && t.status !== 'pending';
 // the order comment is also the key that finds our position at the broker again (ProtoOATradeData.label + comment)
@@ -387,7 +432,7 @@ export function riskVolume({ info, t, balance, name, openRisk = 0, openMargin = 
   const qr = quoteRate({ name, px, spec, now }), toAcc = qr && qr.rate;
   if (!toAcc) return { skip: `${name}: cannot value its quote currency${spec && spec.quote ? ` (${spec.quote})` : ''} in the account currency${spec && spec.deposit ? ` (${spec.deposit})` : ''}` };
   const isIct = String(t.id).startsWith('ict:'), size = isIct && Number.isFinite(+t.size) && +t.size > 0 ? +t.size : 1;
-  let riskCash = balance * (isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : String(t.id).startsWith('eqx:') ? LIMITS.risk.eqx : String(t.id).startsWith('bfade:') ? LIMITS.risk.bfade : String(t.id).startsWith('boxfade:') ? LIMITS.risk.boxfade : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
+  let riskCash = balance * (String(t.id).startsWith('ict:x:') ? LIMITS.risk.ictnq : isIct ? LIMITS.risk.ict : String(t.id).startsWith('mosha6:') ? LIMITS.risk.mosha6 : String(t.id).startsWith('eqx:') ? LIMITS.risk.eqx : String(t.id).startsWith('bfade:') ? LIMITS.risk.bfade : String(t.id).startsWith('boxfade:') ? LIMITS.risk.boxfade : String(t.id).startsWith('fvgm:') ? LIMITS.risk.fvgm : /^(egd1|litr):/.test(String(t.id)) ? LIMITS.risk[String(t.id).split(':')[0]] : LIMITS.risk.council) * size;   // mosha6: 0.25% (23 Nov 2026)
   const perLot = (lot / 100) * dist * toAcc, lots = riskCash / perLot;
   const step = +info.stepVolume || 1, min = +info.minVolume || step;
   let v = Math.floor((lots * lot) / step + 1e-9) * step, atMin = false;   // epsilon: 0.01 lot must not floor to 0 on float noise
@@ -444,8 +489,8 @@ export const copiedIds = (state) => new Set([...Object.keys((state && state.map)
 // Every trade belongs to one book; each book can have its own demo account (same cTrader ID, same token). Account numbers are
 // not secrets: council-data config.json { mirrorAccounts: { council, ict, shadow, lit } }, or the env CTRADER_ACCOUNTS
 // "council:123,ict:456,shadow:789,lit:321,replica:654" (wins). A book without its own number trades on CTRADER_ACCOUNT_ID.
-export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx', 'bfade', 'boxfade'];
-export const bookOf = (t) => (String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : String(t.id).startsWith('eqx:') ? 'eqx' : String(t.id).startsWith('bfade:') ? 'bfade' : String(t.id).startsWith('boxfade:') ? 'boxfade' : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
+export const BOOKS = ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx', 'bfade', 'boxfade', 'ictnq', 'fvgm', 'egd1', 'litr'];
+export const bookOf = (t) => (String(t.id).startsWith('ict:x:') ? 'ictnq' : String(t.id).startsWith('ict:') ? 'ict' : String(t.id).startsWith('mosha6:') ? 'mosha6' : String(t.id).startsWith('eqx:') ? 'eqx' : String(t.id).startsWith('bfade:') ? 'bfade' : String(t.id).startsWith('boxfade:') ? 'boxfade' : String(t.id).startsWith('fvgm:') ? 'fvgm' : /^(egd1|litr):/.test(String(t.id)) ? String(t.id).split(':')[0] : t.k === 'lit' ? 'lit' : t.k === 'replica' ? 'replica' : t.shadow ? 'shadow' : 'council');
 // an account number, or "*<digits>" = the ONE demo account whose login ends with those digits (24 Nov 2026: the owner gives the
 // last digits; two matches, or only a live one, find nothing). f names the fields of the list's entries.
 export function pickAccount(list, spec, f = { id: 'ctidTraderAccountId', login: 'traderLogin', live: 'isLive' }) {
@@ -831,7 +876,7 @@ export async function mirrorRound({ env, trades, state, tokens, specs = null, WS
       for (const t of fresh) {
         const skip = (why) => skipT(t, why), later = (why, count = false) => laterT(t, why, count);
         const pending = t.status === 'pending';
-        if (!/^(mosha6|boxfade|eqx|bfade):/.test(String(t.id)) && dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : LIMITS.dayStop)) {   // 25-26 Nov 2026 (owner: "the daily stops OFF"): the desk-copy books (Mosha 6R, Box fade, Equinox, Big-candle fade) have no daily stop; every trade still has its own stop
+        if (!/^(mosha6|boxfade|eqx|bfade|ict:x|fvgm|egd1|litr):/.test(String(t.id)) && dayDown >= (String(t.id).startsWith('bfade:') ? LIMITS.dayStopBfade : LIMITS.dayStop)) {   // 25-26 Nov 2026 (owner: "the daily stops OFF"): the desk-copy books (Mosha 6R, Box fade, Equinox, Big-candle fade) have no daily stop; every trade still has its own stop
           later(`daily loss stop (${(dayDown * 100).toFixed(1)}% down today)`); continue; }
         if (openCount() >= LIMITS.maxOpen) { later(`${LIMITS.maxOpen} mirror positions already open`); continue; }
         if (String(t.id).startsWith('eqx:') && Object.entries(st.map).filter(([id, m]) => id.startsWith('eqx:') && (m.status === 'open' || m.status === 'sent')).length >= EQX.maxOpen) { later(`${EQX.maxOpen} Equinox positions already open`); continue; }
@@ -993,7 +1038,9 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // the Mosha 6R barrier records (23 Nov 2026) the same way: only while the mosha6 book has a demo account of its own
   let desk = null; try { desk = JSON.parse(fs.readFileSync(path.join(DIR, 'mosha', 'desk.json'), 'utf8')); } catch (e) {}
   const eqxFiles = {}; for (const k of EQX.desks.concat('boxfade')) { try { eqxFiles[k] = JSON.parse(fs.readFileSync(path.join(DIR, k, 'desk.json'), 'utf8')); } catch (e) {} }
-  const trades = own.concat(ictCandidates(ict, cfg.mirrorIct !== false), eqxHasOwnAccount(byBook) ? eqxCandidates(eqxFiles) : [], bfadeHasOwnAccount(byBook) ? bfadeCandidates(eqxFiles.bigfade) : [], boxfadeHasOwnAccount(byBook) ? boxfadeCandidates(eqxFiles.boxfade) : [], replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
+  let ictShadow = null; try { ictShadow = JSON.parse(fs.readFileSync(path.join(DIR, 'ict', 'shadow.json'), 'utf8')); } catch (e) {}
+  const ictNq = ictnqHasOwnAccount(byBook) ? ictnqCandidates(ict, ictShadow, Math.floor(Date.now() / 1000), cfg.mirrorIctNq !== false) : [], nqTaken = new Set(ictNq.map((t) => t.id.slice(6)));
+  const trades = own.concat(ictCandidates((Array.isArray(ict) ? ict : []).filter((t) => !nqTaken.has(String(t.id))), cfg.mirrorIct !== false), ictNq, fvgmHasOwnAccount(byBook) ? fvgmCandidates(eqxFiles.fvg) : [], ...Object.keys(SLICES).map((b) => { if (!sliceHasOwnAccount(byBook, b)) return []; let f = null; try { f = JSON.parse(fs.readFileSync(path.join(DIR, SLICES[b].desk, 'desk.json'), 'utf8')); } catch (e) {} return sliceCandidates(b, f); }), eqxHasOwnAccount(byBook) ? eqxCandidates(eqxFiles) : [], bfadeHasOwnAccount(byBook) ? bfadeCandidates(eqxFiles.bigfade) : [], boxfadeHasOwnAccount(byBook) ? boxfadeCandidates(eqxFiles.boxfade) : [], replicaOwn ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(byBook) ? moshaCandidates(desk) : []);
   let tokens = rd('tokens.json', null), summaryLines = [];
   const fileOf0 = (a) => mirrorFile(a, base);
   const groups = acc.groups.filter((g) => !g.drain || stillHolds((rd(fileOf0(g.account), {}).state) || {}));
