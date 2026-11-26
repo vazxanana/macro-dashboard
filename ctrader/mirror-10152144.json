@@ -1920,7 +1920,7 @@
     "lots": 0.29,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T19:31:14.000Z",
     "councilEntry": 0.547,
     "stop": 0.546843,
@@ -1931,10 +1931,12 @@
     "slipR": 0.064,
     "lagSec": 74,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T19:31:14.000Z",
-    "brokerStop": 0.54685
+    "brokerStop": 0.54685,
+    "closedAt": "2026-11-26T22:42:33.000Z"
    },
    "eqx:fade:audusd:fade-m15-s1795723200": {
     "positionId": "51647287",
@@ -1996,16 +1998,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 429.8,
+   "lastBalance": 423.58,
    "ids": [
-    "51608452",
-    "51644179"
+    "51608452"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 429.8 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 423.58 · 1 open",
   "skipped": {
    "eqx:fade:usdjpy:fade-m15-b1795732200": "USDJPY: 0.44 lot would use 88.00 margin, over 20% of the balance"
   },
@@ -2036,15 +2037,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 429.8,
-  "lastRun": "2026-11-26T22:39:57.000Z"
+  "balance": 423.58,
+  "lastRun": "2026-11-26T22:42:33.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:20:20.000Z",
-   "msg": "opened buy US30 0.03 lot (council ict-A)",
-   "trade": "ict:ym-b-1794412800"
-  },
   {
    "at": "2026-11-11T17:42:43.000Z",
    "msg": "US30 position 48478147 closed at the broker",
@@ -3529,6 +3525,11 @@
    "at": "2026-11-26T22:37:03.000Z",
    "msg": "EURUSD position 51647664 closed at the broker",
    "trade": "eqx:fade:eurusd:fade-m15-b1795732200"
+  },
+  {
+   "at": "2026-11-26T22:42:33.000Z",
+   "msg": "NZDUSD position 51644179 closed at the broker",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795721400"
   }
  ],
  "limits": {
