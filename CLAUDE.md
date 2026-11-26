@@ -2662,6 +2662,30 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   ends 10 px above the window (6 px above the phone's bars) in every view, no sideways scroll; drawing, full screen, the phase strip, a resize
   and a market change through the watchlist work. Not checked on a real phone. Test: `tests/charts-fit.test.mjs`.
 
+## Candles with no delay, the charts-only app, touch (26 Nov 2026, owner: "I want the candles faster, no delays and make an app just for the charts, try to have easy to move touch smooth on phones as well")
+Display only: nothing here places, changes or refuses an order.
+- **Live candles** (`api/stream.js`, `market-structure.html` `startTicks(pre)`): the stream forwards every OANDA quote at once (`GAP_MS` 25 ms
+  apart at most; it was 100) and sends OANDA's heartbeat as an `hb` event the page hears, so a silent connection is replaced after
+  `STREAM_QUIET` 12 s (45 before; a quiet market's heartbeats keep its stream). `boot()` opens the stream BESIDE the candle reads (`early`,
+  its last quote applied once the charts exist). `STREAM_LIFE` 240 s into a stream a second one is opened and takes over at its first
+  price (`renew`, `G.esRenew`), so the server's 4.5-minute limit leaves no gap; back from another tab or app after `STREAM_AWAY` 8 s the
+  same hand-over starts at once; `online` reconnects. The forming candle moves to each price in the same frame: "Smooth price motion"
+  (the eased body) is OFF unless the member ticked it (`ms-smooth` === '1'; it was on by default and trailed the price a few frames).
+  The other markets' streams (free charts, Markets) hear `hb` too. Not measured on a live market (written during the daily break).
+- **Charts app** `/charts` (vercel.json rewrite to `charts.html`): `scripts/charts-app.mjs` (build.sh, after pwa.mjs, before
+  stamp-assets) copies the built Desk page with `html[data-app="charts"]`, title "Aureum Charts" and its own manifest
+  `charts.webmanifest` (id and start `/charts`), so a phone or desktop installs it as an app of its own (Add to Home Screen / Install
+  from `/charts`). In it `showView` always shows Charts, the site header, tab bar, side rail and view switch are hidden on every
+  screen (`<style id="ms-app-css">`; the toolbar's Menu button brings them back), the wheel bar sits at the bottom edge, the page never
+  bounces or pulls to refresh, and two page-wide housekeeping observers stand down. Same sign-in, same candles, same tools: one source,
+  the Desk page. Ways in: account menu "Charts app", the main app's shortcut. Phone chart 713 px tall at 390 x 844 (587 in the Desk).
+- **Touch** (same style block, `pointer: coarse`): a chart that fills the view (`.ms-grid4:not([data-view="all"]) .ms-chart`, `.mm-chart`)
+  has `touch-action: none`, so the browser never waits to choose between scrolling the page and moving the chart and never zooms the
+  page on a pinch; no text selection, callout or tap flash on a chart; no vertical overscroll on Charts. The six-chart view keeps the
+  page's scrolling. A phone on its side: Log a call and Structure leave the toolbar so it stays one row. Panning measured about 1 ms
+  of script a frame on a phone profile; not checked on a real phone.
+- Tests: `tests/charts-app.test.mjs`, `tests/desk-live.test.mjs` (the stream hand-over on a fake EventSource and clock).
+
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
 right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to

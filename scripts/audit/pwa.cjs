@@ -204,7 +204,7 @@ const VERSIONED = /^\/(?:macro-dashboard\/)?assets\/[^?]+\?v=[0-9a-f]{10}$/;
     const has = (size, purpose) => man.icons.some((i) => i[1] === size && i[2] === purpose && i[3] === size);
     check('manifest: 192 and 512 icons, plain and maskable, load at their declared sizes', has('192x192', 'any') && has('512x512', 'any') && has('192x192', 'maskable') && has('512x512', 'maskable') && man.icons.every((i) => i[3] === i[1]), JSON.stringify(man.icons));
     check('manifest: id, name, standalone, start_url inside scope and answering, colours, served as a manifest', man.m.id === '/' && man.m.name && man.m.short_name && man.m.display === 'standalone' && man.m.scope === '/' && man.m.start_url.startsWith(man.m.scope) && man.start === 200 && /^#[0-9a-f]{6}$/.test(man.m.theme_color) && /^#[0-9a-f]{6}$/.test(man.m.background_color) && /manifest\+json/.test(man.type), JSON.stringify({ start: man.start, type: man.type }));
-    check('manifest: every shortcut opens a real page and its icon loads', man.shortcuts.length === 4 && man.shortcuts.every((s) => s[1] === 200 && s[2] === 'text/html' && s[3] === '192x192'), JSON.stringify(man.shortcuts));
+    check('manifest: every shortcut opens a real page and its icon loads', man.shortcuts.length === 5 && man.shortcuts.every((s) => s[1] === 200 && s[2] === 'text/html' && s[3] === '192x192'), JSON.stringify(man.shortcuts));
     check('Apple touch icon: 180 px at /icons/ and at the root', man.apple === '180x180' && man.appleRoot === '180x180', man.apple + ' ' + man.appleRoot);
     const cdp = await ctx.newCDPSession(p);
     const inst = await cdp.send('Page.getInstallabilityErrors').catch(() => null);

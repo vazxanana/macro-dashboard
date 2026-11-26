@@ -1341,7 +1341,7 @@ window.msFetchUsers = function () {
   if (E.mosha) document.documentElement.dataset.mosha = E.mosha;   // the Mosha desk is open to this account ('teach' = may send lessons)
   // owner, 18 Nov 2026: a member whose home is the Macro desk (the "macro" account) lands there, once per browser tab, so the
   // Desk switch still opens the Desk afterwards; a link to a view (#…) is never redirected; no redirect when storage is unavailable
-  if (R && R.home === 'macro' && E.macro && !location.hash) { try { if (!sessionStorage.getItem('ms-landed')) { sessionStorage.setItem('ms-landed', '1'); location.replace('/macro-desk'); } } catch (e) {} }
+  if (R && R.home === 'macro' && E.macro && !location.hash && document.documentElement.dataset.app !== 'charts') { try { if (!sessionStorage.getItem('ms-landed')) { sessionStorage.setItem('ms-landed', '1'); location.replace('/macro-desk'); } } catch (e) {} }
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 /* ms-data:start */
@@ -3477,6 +3477,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <a role="menuitem" class="me-link" id="ms-me-profile" href="#profile">Profile and demo accounts</a>
           <a role="menuitem" class="me-link adm own" id="ms-me-academy" href="/academy">Aureum Academy</a>
           <a role="menuitem" class="me-link adm" id="ms-me-farm" href="/farm">Agent Farm</a>
+          <a role="menuitem" class="me-link" id="ms-me-charts" href="/charts">Charts app</a>
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
@@ -3916,7 +3917,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
         <div class="sty-h">Live price</div>
-        <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion</label>
+        <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion (a little later)</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
         <div class="sty-h">Markup</div>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Keeps only the BO, VR and CF; hides the rest (origin, next setup, trade lines, iBO, earlier breaks, zones, Mosha and cycle notes, trade history, sessions, news, volume, key levels). Tap again to bring them back.</small></div>
@@ -6962,7 +6963,7 @@ function msNextSetup(bars, A) {
   // data, the markup and every reading use the real quotes only, never an eased value). A candle refresh that comes back from
   // the edge cache older than the last tick keeps the tick (liveKeep), so the candle never jumps back.
   const LT = { q: [], px: null, t: 0, at: 0, raf: 0, disp: null, tgt: null, bt: 0, hdr: 0, n: 0, rate: 0, rt: 0 };
-  try { G.smooth = localStorage.getItem('ms-smooth') !== '0'; G.bidAsk = localStorage.getItem('ms-bidask') === '1'; } catch (e) { G.smooth = true; G.bidAsk = false; }
+  try { G.smooth = localStorage.getItem('ms-smooth') === '1'; G.bidAsk = localStorage.getItem('ms-bidask') === '1'; } catch (e) { G.smooth = true; G.bidAsk = false; }
   function liveTick(px, t, quote) {
     if (!isFinite(px) || px <= 0 || G.csv) return;
     if (!G.live) { G.live = true; setStatus(); }
@@ -7042,23 +7043,45 @@ function msNextSetup(bars, A) {
     if (sm) { sm.checked = !!G.smooth; sm.addEventListener('change', () => { G.smooth = sm.checked; try { localStorage.setItem('ms-smooth', sm.checked ? '1' : '0'); } catch (e) {} if (!G.smooth) { LT.disp = LT.tgt; liveEase(); } }); }
     if (ba) { ba.checked = !!G.bidAsk; ba.addEventListener('change', () => { G.bidAsk = ba.checked; try { localStorage.setItem('ms-bidask', ba.checked ? '1' : '0'); } catch (e) {} bidAskDraw(); }); } }
   // OANDA ticks (Server-Sent Events from the /md/stream Vercel function): every price change moves the forming candle on all timeframes
-  const STREAM_QUIET = 45e3;
-  function startTicks() {
-    if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') return;
-    if (marketClosed()) { setTimeout(startTicks, 5 * 60e3); return; }   // no ticks over the weekend: look again later
-    const es = new EventSource(`${MD.base}stream?sym=${INST.md}`); G.es = es; let upd = 0, heard = Date.now();
+  // No delay (26 Nov 2026, owner: "I want the candles faster, no delays"): the stream is opened while the candles are still
+  // being read (boot hands it in as `pre`), its heartbeat is heard (event `hb`), so a connection that went silent is replaced
+  // after STREAM_QUIET 12 s (45 before); the next stream is opened STREAM_LIFE into this one and takes over at its first price,
+  // so the server's 4.5-minute limit never leaves a gap; and coming back to the tab or the app after 8 s away reconnects at once.
+  const STREAM_QUIET = 12e3, STREAM_LIFE = 240e3, STREAM_AWAY = 8e3;
+  const streamUrl = () => `${MD.base}stream?sym=${INST.md}`;
+  function startTicks(pre) {
+    if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') { if (pre && pre !== G.es) try { pre.close(); } catch (e) {} return; }
+    if (marketClosed() && !pre) { setTimeout(startTicks, 5 * 60e3); return; }   // no ticks over the weekend: look again later
+    const es = pre || new EventSource(streamUrl()); G.es = es; let heard = Date.now(), next = null; const born = Date.now();
+    const drop = () => { clearInterval(quiet); if (next) { try { next.close(); } catch (e) {} next = null; } try { es.close(); } catch (e) {} if (G.es === es) G.es = null; };
     es.onmessage = (m) => {
       heard = Date.now();
       let d; try { d = JSON.parse(m.data); } catch (e) { return; }
       if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
       G.quote = d; liveTick((d.b + d.a) / 2, d.t || Date.now() / 1000, d);
     };
+    es.addEventListener('hb', () => { heard = Date.now(); });
+    // a second stream that takes over at its first price; this one keeps the candles moving until then
+    const renew = () => { if (next || G.es !== es) return; const n = new EventSource(streamUrl()); next = n;
+      n.onmessage = (m) => { if (next !== n || G.es !== es) { try { n.close(); } catch (e) {} return; } next = null; clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; startTicks(n); if (n.onmessage) n.onmessage(m); };
+      n.onerror = () => { if (n.readyState === 2 && next === n) next = null; }; };
+    G.esRenew = renew;
     // a stream that goes silent with its connection open (20 Nov 2026): the browser reports no error for it, so the candles
     // froze until a reload. With the market open and the tab in view, STREAM_QUIET seconds without a price = ask again.
-    const quiet = setInterval(() => { if (G.es !== es) { clearInterval(quiet); return; } if (document.hidden) { heard = Date.now(); return; } if (marketClosed() || Date.now() - heard < STREAM_QUIET) return;
-      clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; if (G.live) { G.live = false; setStatus(); } startTicks(); }, 5000);
-    es.onerror = () => { if (es.readyState === 2) { G.es = null; const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
+    const quiet = setInterval(() => { if (G.es !== es) { clearInterval(quiet); return; } if (document.hidden) { heard = Date.now(); return; }
+      if (Date.now() - born > STREAM_LIFE && !marketClosed()) renew();   // the next stream, before this one ends
+      if (marketClosed() || Date.now() - heard < STREAM_QUIET) return;
+      clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; if (G.live) { G.live = false; setStatus(); } startTicks(); }, 1000);
+    es.onerror = () => { if (es.readyState === 2) { drop(); const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 1500); } };
+    G.esDrop = drop;
   }
+  // back from another tab or app: a phone usually cut the stream meanwhile, and the browser does not say so
+  { let awayAt = 0;
+    const back = () => { if (document.hidden) { awayAt = Date.now(); return; } const gone = awayAt ? Date.now() - awayAt : 0; awayAt = 0;
+      if (gone < STREAM_AWAY || !G.es || !G.booted || G.source !== 'OANDA' || marketClosed()) return;
+      if (G.esRenew) G.esRenew(); };
+    document.addEventListener('visibilitychange', back); window.addEventListener('pageshow', (e) => { if (e.persisted) { awayAt = Date.now() - STREAM_AWAY; back(); } });
+    window.addEventListener('online', () => { if (G.es && G.booted && G.source === 'OANDA') { if (G.esDrop) G.esDrop(); G.es = null; startTicks(); } }); }
   // Exchange price ticks (8 Nov, owner: "the charts should be moving like real data; bitcoin is static"): when the Binance stream
   // is not connected (blocked network, region, or a Kraken / Bitstamp source), the last price is read every 2.5 s from Binance,
   // else Kraken, and moves the forming candle on every pane the way the OANDA ticks do. Stops by itself once a stream is live.
@@ -7126,9 +7149,13 @@ function msNextSetup(bars, A) {
     let stash = null;
     try { if (window.MS_SWAP_IN) { const s = JSON.parse(sessionStorage.getItem('ms-swap') || 'null'); if (s && s.k === instKey && Date.now() - s.at < 20000 && s.tfs) stash = s.tfs; }
       sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); } catch (e) { stash = null; }
+    // the price stream is opened now, beside the candle reads, so the first live price is there when the charts are (26 Nov 2026)
+    let early = null, earlyQ = null;
+    try { if (!G.csv && MD.on !== false && MD.base && INST.md && typeof EventSource !== 'undefined' && !marketClosed()) { early = new EventSource(`${MD.base}stream?sym=${INST.md}`); early.onmessage = (m) => { earlyQ = m; }; } } catch (e) { early = null; }
     const res = await Promise.allSettled(ACTIVE.map((tf) => (stash && Array.isArray(stash[tf.id]) && stash[tf.id].length > 50 ? Promise.resolve({ src: 'OANDA', bars: stash[tf.id] }) : fetchBars(tf))));
     const ok = res.filter((r) => r.status === 'fulfilled');
     if (!ok.length) {
+      if (early) { try { early.close(); } catch (e) {} }
       const why = res.map((r) => r.reason && r.reason.message).filter(Boolean)[0] || '';
       root.classList.add('ms-offline');
       $('ms-offline-why').textContent = why;
@@ -7149,7 +7176,9 @@ function msNextSetup(bars, A) {
     topDown(); setStatus();
     $('ms-updated').textContent = new Date().toLocaleTimeString();
     if (INST.spot) setInterval(refreshSpot, 60e3);
-    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') startTicks(); else startRestTicks(); }
+    G.booted = true;
+    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') { startTicks(early); if (early && earlyQ && early.onmessage) early.onmessage(earlyQ); early = null; } else startRestTicks(); }
+    if (early) { try { early.close(); } catch (e) {} }
     if (SCAN.el) { setTimeout(scanAll, 2500); setInterval(scanAll, 5 * 60e3); }
   }
 
@@ -7707,10 +7736,10 @@ function msNextSetup(bars, A) {
       if (SP.on && !spPane() && spSym() !== instKey) want.add(spSym()); if (MM.on) MM.cells.slice(0, MM.n).forEach((c) => { if (c.k !== instKey) want.add(c.k); }); }
     for (const [k, f] of FT) if (!want.has(k)) { try { f.es.close(); } catch (e) {} clearTimeout(f.re); FT.delete(k); }
     for (const k of [...want].slice(0, 4)) { if (FT.has(k)) continue; const I = INSTRUMENTS[k]; if (!I || !I.md) continue; const f = { q: [], raf: 0 }; FT.set(k, f);
-      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es; f.heard = Date.now();
+      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es; f.heard = Date.now(); es.addEventListener('hb', () => { f.heard = Date.now(); });
         es.onmessage = (m) => { f.heard = Date.now(); let d; try { d = JSON.parse(m.data); } catch (e) { return; } if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
           f.q.push({ px: (d.b + d.a) / 2, t: d.t || Date.now() / 1000 }); if (!f.raf) f.raf = requestAnimationFrame(() => { f.raf = 0; const Q = f.q.splice(0); if (Q.length) freeTicks(k, Q); }); };
-        es.onerror = () => { if (es.readyState === 2 && FT.get(k) === f) f.re = setTimeout(open, 5000); }; };
+        es.onerror = () => { if (es.readyState === 2 && FT.get(k) === f) f.re = setTimeout(open, 1500); }; };
       f.open = open; open(); }
     // a free chart's stream that went silent with its connection open is asked again (as the page's own stream); not over the weekend
     { const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(), shut = wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21);
@@ -9908,7 +9937,7 @@ function msNextSetup(bars, A) {
     const boxes = () => document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm, .c-pane-overview > .c-active .c-act');
     const wire = () => boxes().forEach((el) => { if (!el.dataset.fadeWired) { el.dataset.fadeWired = '1'; el.addEventListener('scroll', () => upd(el), { passive: true }); } upd(el); });
     // perf (8 Nov): every mutation batch used to queue its own frame callback, each reading scrollHeight (a layout) on every box; now one pass per frame
-    let wq = false; new MutationObserver((recs) => { if (wq || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
+    let wq = false; new MutationObserver((recs) => { if (wq || document.documentElement.dataset.app === 'charts' || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
     const dot = document.getElementById('ms-live-dot'), txt = document.getElementById('ms-live-txt');
     if (dot && txt) { const name = () => { const t = txt.textContent.trim() || (dot.classList.contains('on') ? 'Live' : dot.classList.contains('poll') ? 'Updating every few seconds' : 'Connecting'); dot.title = t; dot.setAttribute('role', 'img'); dot.setAttribute('aria-label', `Price feed: ${t}`); };
       new MutationObserver(name).observe(txt, { childList: true, characterData: true, subtree: true }); new MutationObserver(name).observe(dot, { attributes: true, attributeFilter: ['class'] }); name(); }
@@ -10036,7 +10065,7 @@ function msNextSetup(bars, A) {
   // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
   // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
   function showView(hx) {
-    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = PUB ? 'charts' : !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
+    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB || document.documentElement.dataset.app === 'charts' ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = PUB ? 'charts' : !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
     // a view this account may not open (a viewer or a guest on #mosha, #ict, …) is shown as another one: the address says which
     // (QA sweep 11 Nov; replaceState, so no second hashchange and Back does not return to the refused link)
     if (h0 !== v && VIEWS.includes(h0) && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + '#' + v); } catch (e) {}
@@ -11313,7 +11342,7 @@ function msNextSetup(bars, A) {
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#ms-theme, [data-theme-set], .cmdk-it')) fade(); }, true);
   // "Loading…" labels breathe until real text replaces them
   function mark(root) { (root || document).querySelectorAll('.tile-big, .h-head, .tile-sub, .ms-note, h1, h2').forEach(function (el) { el.classList.toggle('is-loading', /^(Loading|Starting up|Scanning soon)/.test(el.textContent.trim())); }); }
-  var mt = null; new MutationObserver(function (recs) { if (mt || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  var mt = null; new MutationObserver(function (recs) { if (mt || document.documentElement.dataset.app === 'charts' || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
   document.addEventListener('DOMContentLoaded', function () { mark(); }); mark();
   // staggered entrance the first time a list fills
   function stagger(id, item) { var el = document.getElementById(id); if (!el) return; var done = false;
@@ -16257,6 +16286,28 @@ html[data-chfit]:not([data-role="public"]) #v-charts #ms-rail::-webkit-scrollbar
   window.msChartFit = () => ({ on: H.hasAttribute('data-chfit'), h: H.style.getPropertyValue('--ch-h'), mm: H.style.getPropertyValue('--mm-h'), av: H.style.getPropertyValue('--ch-av') });
 })();
 </script>
+<style id="ms-app-css">
+/* Charts app (26 Nov 2026, owner: "make an app just for the charts"). /charts is this page with html[data-app="charts"] (a copy made
+   at build by scripts/charts-app.mjs, with its own manifest so it installs as its own app): Charts is the only view, the site
+   header, tab bar and side rail step aside on every screen (the toolbar's Menu button brings them back), the page never
+   bounces or pulls to refresh. Display only. */
+html[data-app="charts"]:not([data-chnav="1"]) :is(header.top, nav.btab, #ps-sw) { display: none !important; }
+html[data-app="charts"]:not([data-chnav="1"]) body { padding-left: 0 !important; }
+html[data-app="charts"]:not([data-chnav="1"]) .ms-live.app { padding-bottom: 0 !important; padding-top: env(safe-area-inset-top, 0px); }
+html[data-app="charts"]:not([data-role="public"]) #ms-fit-menu { display: inline-flex; }
+html[data-app="charts"]:not([data-chnav="1"]) #ms-wb { bottom: env(safe-area-inset-bottom, 0px) !important; }
+html[data-app="charts"] #ms-me-charts { display: none; }
+html[data-app="charts"], html[data-app="charts"] body { overscroll-behavior: none; }
+@media (max-height: 560px) and (orientation: landscape) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(#ms-jr-btn, #ms-sa-btn) { display: none !important; } }   /* a phone on its side: one toolbar row */
+/* Touch (26 Nov 2026, owner: "easy to move, touch smooth on phones"): a chart that fills the view takes every touch itself, so
+   the browser never waits to decide between scrolling the page and moving the chart, never zooms the page on a pinch and
+   never selects text or opens the callout on a long press. The six-chart view keeps the page's own scrolling. */
+@media (pointer: coarse) {
+  html[data-view="charts"] #v-charts .ms-grid4:not([data-view="all"]) .ms-chart, html[data-view="charts"] #v-charts .mm-chart { touch-action: none; }
+  html[data-view="charts"] #v-charts :is(.ms-chart, .mm-chart) { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  html[data-view="charts"], html[data-view="charts"] body { overscroll-behavior-y: none; }
+}
+</style>
 <style id="ms-cn-css">
 /* On-chart controls (26 Nov 2026): at the lower right of every chart, as a trading terminal has them: back to the latest
    candle (shown only when the chart is scrolled away from it), go to a date, and the price scale: auto fit, log, percent.

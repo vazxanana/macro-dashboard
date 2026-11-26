@@ -127,8 +127,8 @@ test('volume profile: the free charts carry the feed\'s volume, and a move of th
 });
 
 test('a price stream that goes silent is asked again; a market shut for the weekend is not read every second', () => {
-  assert.match(PAGE, /const STREAM_QUIET = 45e3;/);
-  assert.match(PAGE, /if \(document\.hidden\) \{ heard = Date\.now\(\); return; \} if \(marketClosed\(\) \|\| Date\.now\(\) - heard < STREAM_QUIET\) return;\s*clearInterval\(quiet\); try \{ es\.close\(\); \} catch \(e\) \{\} G\.es = null; if \(G\.live\) \{ G\.live = false; setStatus\(\); \} startTicks\(\);/);
+  assert.match(PAGE, /const STREAM_QUIET = 12e3,/);   // 45 s until 26 Nov 2026; the stream's heartbeat is heard now
+  assert.match(PAGE, /if \(document\.hidden\) \{ heard = Date\.now\(\); return; \}[\s\S]{0,200}?if \(marketClosed\(\) \|\| Date\.now\(\) - heard < STREAM_QUIET\) return;\s*clearInterval\(quiet\); try \{ es\.close\(\); \} catch \(e\) \{\} G\.es = null; if \(G\.live\) \{ G\.live = false; setStatus\(\); \} startTicks\(\);/);
   assert.match(PAGE, /if \(f\.es && f\.open && Date\.now\(\) - \(f\.heard \|\| 0\) > STREAM_QUIET\) \{ try \{ f\.es\.close\(\); \} catch \(e\) \{\} clearTimeout\(f\.re\); f\.open\(\); \}/, 'the free charts\' streams too');
   const src = /const shutNow = (\(I, d = new Date\(\)\) => \{[^\n]*?\});\n/.exec(PAGE)[1], shut = new Function(`return ${src};`)();
   const at = (s) => new Date(s), fx = { group: 'Forex' };
