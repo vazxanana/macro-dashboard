@@ -824,6 +824,19 @@
       : oc.status === 'stopped' ? { t: oc.endT, text: 'Stopped: ' + (tr.R > 0 ? '+' : '−') + Math.abs(tr.R).toFixed(2) + 'R' + (tr.R < -1.005 ? ' (the candle opened beyond the stop)' : '') + (oc.mfe >= 1 ? ' after running +' + oc.mfe.toFixed(1) + 'R first.' : '.') }
       : { t: null, text: 'Still open on the last candle read' + (oc['float'] != null ? ' (' + (oc['float'] >= 0 ? '+' : '−') + Math.abs(oc['float']).toFixed(2) + 'R now).' : '.') });
   }
+  // After costs (26 Nov 2026, owner: "on all edges add the option after costs"). Display only. One round trip a trade, in price
+  // units, taken off the R on the risk the trade opened with: the demo broker's measured figures where the desk has them (gold,
+  // the majors, the Nasdaq), ASSUMED for the rest (the studies' own cost table).
+  // No financing. The choice lives in memory for the visit (window.MS_DESK_COSTS), shared by every desk; nothing is stored.
+  var COSTS = { xau: 0.30, xag: 0.03, eurusd: 0.00006, gbpusd: 0.00008, usdjpy: 0.008, audusd: 0.00006, nzdusd: 0.00007, usdcad: 0.00007, usdchf: 0.00007,
+    eurjpy: 0.010, gbpjpy: 0.014, audjpy: 0.010, cadjpy: 0.010, eurgbp: 0.00009, euraud: 0.00013, nas100: 1.0, spx500: 0.4, us30: 3, de40: 1.5 };
+  function costR(r) { var c = COSTS[r.market || 'xau'], d = Math.abs(r.entry - r.stop); return c > 0 && d > 0 ? c / d : 0; }
+  function costsOn() { return typeof window !== 'undefined' && !!window.MS_DESK_COSTS; }
+  function costsSet(v) { if (typeof window !== 'undefined') window.MS_DESK_COSTS = !!v; }
+  function costed(rows, on) { if (!(on === undefined ? costsOn() : on)) return rows || [];
+    return (rows || []).map(function (r) { var c = costR(r), o = {}; for (var k in r) o[k] = r[k]; o.costR = c; if (r.R != null) { o.grossR = r.R; o.R = r.R - c; } if (r['float'] != null) o['float'] = r['float'] - c; return o; }); }
+  function costsBtn(attr) { return '<button type="button" class="mo-sop-b" ' + attr + ' aria-pressed="' + costsOn() + '" title="Take one round-trip cost off every trade">After costs</button>'; }
+  function costsWord() { return costsOn() ? 'after costs' : 'before costs'; }
   function summary(rows) {
     var cl = rows.filter(function (r) { return r.R != null; }), n = cl.length, sum = cl.reduce(function (s, r) { return s + r.R; }, 0), m = n ? sum / n : 0, t = null;
     if (n > 1) { var v = cl.reduce(function (s, r) { return s + (r.R - m) * (r.R - m); }, 0) / (n - 1); t = v > 0 ? m / Math.sqrt(v / n) : null; }
@@ -858,7 +871,7 @@
     var list = '';
     if (st.calDay && st.calDay.slice(0, 7) === M.ym) { var day = rows.filter(function (r) { return r.R != null && r.endT && new Date(r.endT * 1000).toISOString().slice(0, 10) === st.calDay; }).sort(function (a, b) { return a.endT - b.endT; });
       list = '<ul class="mo-cal-day">' + day.map(function (r) { return '<li ' + chartAttr + '="' + e(r.id) + '" title="Open this trade on the chart"><span class="chip ' + word(r.side) + '">' + word(r.side) + '</span><span>' + e(nameOf ? nameOf(r) : '') + '</span><b class="' + (r.R > 0 ? 'pos' : r.R < 0 ? 'neg' : '') + '">' + r2(r.R) + '</b><small>ended ' + utc(r.endT) + '</small><button type="button" class="mo-sop-b" ' + chartAttr + '="' + e(r.id) + '">Chart</button></li>'; }).join('') + '</ul>'; }
-    return '<h3 class="mo-sop-h mo-cal-k">P&amp;L calendar <small>closed R by the UTC day each trade ended · open trades not added in · before costs</small>' + nav + '</h3><div class="mo-cal">' + grid + '</div>' + list;
+    return '<h3 class="mo-sop-h mo-cal-k">P&amp;L calendar <small>closed R by the UTC day each trade ended · open trades not added in · ' + costsWord() + '</small>' + nav + '</h3><div class="mo-cal">' + grid + '</div>' + list;
   }
   // The barrier with its OLDER, higher target, kept as a reading of its own beside the current one (owner, 22 Nov 2026: "add the
   // old barrier as different separate", "the old barrier I mean is the one with higher R"): the SAME barrier entries as the
@@ -899,7 +912,7 @@
     return Promise.resolve(D.json(detail.dir + '/' + day + '.json')).then(function (j) { var x = j && j[r.id]; r.log = x && x.log || []; r.marks = x && x.marks || []; if (!x) r.noDetail = true; return r; },
       function () { r.log = []; r.marks = []; r.noDetail = true; return r; });
   }
-  var API = { deskTrades: deskTrades, sixCandle: sixCandle, oneCandle: oneCandle, ONE_N: ONE_N, styleOf: styleOf, backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, r6BarrierTrades: r6BarrierTrades, R6_BARRIER: R6_BARRIER, zonesOf: zonesOf, summary: summary, byDay: byDay,
+  var API = { deskTrades: deskTrades, sixCandle: sixCandle, oneCandle: oneCandle, ONE_N: ONE_N, styleOf: styleOf, backEv: backEv, CF_LIMIT: CF_LIMIT, egBoxes: egBoxes, MOSHA: MOSHA, withDetail: withDetail, calMonth: calMonth, calHTML: calHTML, MARKETS: MARKETS, ALL: ALL, sizes: sizes, fmt: fmt, unit: unit, SEC: SEC, LADDER: LADDER, BACK: BACK, DAYS: DAYS, BARRIER_R: BARRIER_R, BARRIER: BARRIER, JANDA_ALT: JANDA_ALT, M5_ALT: M5_ALT, ALT2: ALT2, BARRIER30: BARRIER30, LOWER: LOWER, DOWN: DOWN, CFTF: CFTF, smallEv: smallEv, swingEv: swingEv, m30of: m30of, SWEEP_N: SWEEP_N, sweepsOf: sweepsOf, readings: readings, MIN_JUDGE: MIN_JUDGE, outcome: outcome, uniq: uniq, orderKey: orderKey, dayTags: dayTags, sopTrades: sopTrades, barrierTrades: barrierTrades, oldBarrierTrades: oldBarrierTrades, OLD_BARRIER: OLD_BARRIER, r6BarrierTrades: r6BarrierTrades, R6_BARRIER: R6_BARRIER, zonesOf: zonesOf, summary: summary, COSTS: COSTS, costR: costR, costed: costed, costsOn: costsOn, costsSet: costsSet, costsBtn: costsBtn, costsWord: costsWord, byDay: byDay,
     visible: function (ds) { return !!ds && ds.role !== 'public' && !(ds.mosha === 'teach' && ds.role !== 'owner'); } };
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
   root.MS_MOSHA_SOP = API;
@@ -943,7 +956,7 @@
   }
   function line(name, rows, extra) {
     var s = summary(rows), parts = [s.n + (s.n === 1 ? ' entry' : ' entries')];
-    if (s.closed) parts.push(s.wins + ' reached target, ' + (s.closed - s.wins) + ' stopped', fR(s.total) + ' before costs'); if (s.open) parts.push(s.open + ' still open');
+    if (s.closed) parts.push(s.wins + ' reached target, ' + (s.closed - s.wins) + ' stopped', fR(s.total) + ' ' + costsWord()); if (s.open) parts.push(s.open + ' still open');
     return '<p class="mo-sys-l"><b>' + esc(name) + '</b>: ' + esc(parts.join(' · ')) + '. ' + (s.closed < MIN_JUDGE ? 'Too few to judge (' + s.closed + ' of ' + MIN_JUDGE + ' closed).' : 'One reading on past candles, not a tested rule (t ' + (s.t == null ? 'n/a' : s.t.toFixed(2)) + ').') + (extra ? ' ' + esc(extra) : '') + '</p>';
   }
   // what kind of entry a row is: the sequence (major or internal BO), or the barrier with its kind and its confirmation
@@ -1038,19 +1051,19 @@
     var head = '<div class="ms-k"><span>Mosha trades</span><small>the method as the course documents write it, on gold, EUR/USD and GBP/USD · recorded by the desk\'s tracker like the ICT desk · paper only · each trade with its log</small></div>';
     if (S.state === 'idle' || S.state === 'busy') { box.innerHTML = head + '<div class="ct-empty">' + (S.state === 'busy' ? 'Reading the trades…' : 'The trades load when the desk opens.') + '</div>'; return; }
     if (S.state === 'failed') { box.innerHTML = head + '<div class="ct-empty">The tracker has no stored trades yet and the candles could not be read, so there is nothing to show. <button type="button" class="mo-sop-b" data-sop-run>Try again</button></div>'; return; }
-    var every = S.rows || [], nLive = every.filter(function (r) { return r.src === 'live'; }).length, bySrc = S.file && S.src !== 'both' ? every.filter(function (r) { return (r.src === 'live') === (S.src === 'live'); }) : every, mks = MOSHA.filter(function (k) { return bySrc.some(function (r) { return mkR(r) === k; }); }), all = S.mk === 'all' || mks.indexOf(S.mk) < 0 ? bySrc : bySrc.filter(function (r) { return mkR(r) === S.mk; }), sop = all.filter(function (r) { return r.kind === 'sop'; }), barAll = all.filter(function (r) { return r.kind === 'barrier'; }), bar = barAll.filter(function (r) { var g = readings(r); return !g.old && !g.r6; }), barOld = barAll.filter(function (r) { return readings(r).old; }), barR6 = barAll.filter(function (r) { return readings(r).r6; });
+    var every = costed(S.rows || []), nLive = every.filter(function (r) { return r.src === 'live'; }).length, bySrc = S.file && S.src !== 'both' ? every.filter(function (r) { return (r.src === 'live') === (S.src === 'live'); }) : every, mks = MOSHA.filter(function (k) { return bySrc.some(function (r) { return mkR(r) === k; }); }), all = S.mk === 'all' || mks.indexOf(S.mk) < 0 ? bySrc : bySrc.filter(function (r) { return mkR(r) === S.mk; }), sop = all.filter(function (r) { return r.kind === 'sop'; }), barAll = all.filter(function (r) { return r.kind === 'barrier'; }), bar = barAll.filter(function (r) { var g = readings(r); return !g.old && !g.r6; }), barOld = barAll.filter(function (r) { return readings(r).old; }), barR6 = barAll.filter(function (r) { return readings(r).r6; });
     var list = S.flt === 'sop' ? sop : S.flt === 'barrier' ? bar : S.flt === 'old' ? barOld : S.flt === 'r6' ? barR6 : all, shown = S.all ? list : list.slice(0, 30);
     var chip = function (k, t, n) { return '<button type="button" class="mo-sop-b" data-sop-flt="' + k + '" aria-pressed="' + (S.flt === k) + '">' + t + ' (' + n + ')</button>'; };
     var sm = summary(list), open = all.filter(function (r) { return r.R == null; }), last = all[0];
     var ans = (open.length ? open.length + (open.length === 1 ? ' trade is' : ' trades are') + ' open now. ' : 'No trade is open now. ') + (last ? 'Latest entry: ' + ALL[mkR(last)].name + ' ' + word(last.side) + ' at ' + fP(last, last.entry) + ', ' + utc(last.t) + '.' : '');
     var tile = function (k, v, sub, cls) { return '<div class="mo-sop-tile"><small>' + k + '</small><b' + (cls ? ' class="' + cls + '"' : '') + '>' + v + '</b><span>' + sub + '</span></div>'; };
     var tiles = '<div class="mo-sop-tiles">' + tile('Entries', sm.n, sm.open + ' open') + tile('Reached target', sm.closed ? sm.wins + ' of ' + sm.closed : '—', sm.closed ? Math.round(100 * sm.wins / sm.closed) + '% of closed' : 'none closed') +
-      tile('Total, before costs', sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
+      tile('Total, ' + costsWord(), sm.closed ? fR(sm.total) : '—', sm.closed ? fR(sm.mean) + ' a trade' : 'none closed', sm.total > 0 ? 'pos' : sm.total < 0 ? 'neg' : '') + tile('Can it be judged?', sm.closed < MIN_JUDGE ? 'Too few' : 'Not a test', sm.closed < MIN_JUDGE ? sm.closed + ' of ' + MIN_JUDGE + ' closed' : 't ' + (sm.t == null ? 'n/a' : sm.t.toFixed(2)) + ' · a paper record') + '</div>';
     var openHTML = ''; openPanel(every.filter(function (r) { return r.R == null; }));
     var cal = calHTML(list, S, 'data-sop-chart', function (r) { return ALL[mkR(r)].name + ' · ' + kindText(r); });
     box.innerHTML = head + '<p class="mo-sop-ans">' + esc(ans) + '</p>' +
       '<div class="mo-sop-a mo-sop-f">' + chip('all', 'All', all.length) + chip('sop', 'BO, VR, CF', sop.length) + chip('barrier', 'Barrier entry', bar.length) + chip('old', 'Barrier, 3R target', barOld.length) + chip('r6', 'Barrier, 6R target', barR6.length) + (S.file ? '<span class="mo-sop-sep" aria-hidden="true"></span>' + ['both', 'live', 'replay'].map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-src="' + k + '" aria-pressed="' + (S.src === k) + '">' + (k === 'both' ? 'Both' : k === 'live' ? 'Live (' + nLive + ')' : 'Replay (' + (every.length - nLive) + ')') + '</button>'; }).join('') : '') +
-      '<button type="button" class="mo-sop-b" data-sop-run>Refresh</button></div>' +
+      costsBtn('data-sop-costs') + '<button type="button" class="mo-sop-b" data-sop-run>Refresh</button></div>' +
       (mks.length > 1 ? '<div class="mo-sop-a mo-sop-f">' + ['all'].concat(mks).map(function (k) { return '<button type="button" class="mo-sop-b" data-sop-mk="' + k + '" aria-pressed="' + ((S.mk === k) || (k === 'all' && mks.indexOf(S.mk) < 0)) + '">' + (k === 'all' ? 'All markets' : esc(MARKETS[k].name)) + ' (' + (k === 'all' ? bySrc.length : bySrc.filter(function (r) { return mkR(r) === k; }).length) + ')</button>'; }).join('') + '</div>' : '') +
       '<p class="ms-note mo-sop-st">' + (S.file ? 'Recorded by the tracker in the council loop, about every 35 minutes' + (S.file.at ? ' · last run ' + utc(Math.floor(Date.parse(S.file.at) / 1000)) : '') + (S.file.since ? ' · trades since ' + utc(S.file.since).slice(0, 10) : '') + '. Live = the tracker recorded it within an hour of its entry; Replay = worked out afterwards from the same closed candles.' : 'The tracker has no stored trades yet, so these were worked out in this browser from the last two weeks of candles.') + '</p>' +
       tiles + openHTML +
@@ -1079,11 +1092,12 @@
   function byId(id) { return (S.rows || []).filter(function (r) { return r.id === id; })[0]; }
   document.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('#mo-open [data-sop-chart][role="button"]')) { e.preventDefault(); e.target.click(); } });
   document.addEventListener('click', function (e) {
-    var b = e.target && e.target.closest ? e.target.closest('#mo-open [data-sop-chart], #mo-sopr [data-cal-m], #mo-sopr [data-cal-day], #mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-mk], #mo-sopr [data-sop-run], #mo-sopr [data-sop-all]') : null; if (!b) return;
+    var b = e.target && e.target.closest ? e.target.closest('#mo-open [data-sop-chart], #mo-sopr [data-cal-m], #mo-sopr [data-cal-day], #mo-sopr [data-sop-log], #mo-sopr [data-sop-chart], #mo-sopr [data-sop-flt], #mo-sopr [data-sop-src], #mo-sopr [data-sop-mk], #mo-sopr [data-sop-run], #mo-sopr [data-sop-costs], #mo-sopr [data-sop-all]') : null; if (!b) return;
     if (b.hasAttribute('data-cal-m')) { if (b.getAttribute('data-cal-m')) { S.calM = b.getAttribute('data-cal-m'); S.calDay = null; draw(); } return; }
     if (b.hasAttribute('data-cal-day')) { var cd = b.getAttribute('data-cal-day'); S.calDay = S.calDay === cd ? null : cd; draw(); var nd = document.querySelector('#mo-sopr [data-cal-day="' + cd + '"]'); if (nd) nd.focus(); return; }
     if (b.hasAttribute('data-sop-src')) { S.src = b.getAttribute('data-sop-src'); S.all = false; draw(); return; }
     if (b.hasAttribute('data-sop-mk')) { S.mk = b.getAttribute('data-sop-mk'); S.all = false; draw(); return; }
+    if (b.hasAttribute('data-sop-costs')) { costsSet(!costsOn()); draw(); if (typeof document !== 'undefined') document.dispatchEvent(new Event('ms:desk-costs')); return; }
     if (b.hasAttribute('data-sop-run')) { S.all = false; run(); return; }
     if (b.hasAttribute('data-sop-all')) { S.all = true; draw(); return; }
     if (b.hasAttribute('data-sop-flt')) { S.flt = b.getAttribute('data-sop-flt'); S.all = false; draw(); return; }
