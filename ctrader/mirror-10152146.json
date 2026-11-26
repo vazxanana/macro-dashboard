@@ -1139,6 +1139,32 @@
     ],
     "stopCheckedAt": "2026-11-26T02:03:19.000Z",
     "brokerStop": 3557.53
+   },
+   "mosha6:bar-r6-tap-15m-v2-b1795674120": {
+    "positionId": "51576182",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 200,
+    "lots": 0.02,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-26T06:31:50.000Z",
+    "councilEntry": 3573.205,
+    "stop": 3561.16,
+    "t1": 3645.475,
+    "riskCash": 23.96,
+    "margin": 14.29,
+    "mark": 3570.68,
+    "levelsFrom": "mark",
+    "fillPrice": 3570.74,
+    "slipR": -0.205,
+    "lagSec": 590,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T06:31:50.000Z",
+    "brokerStop": 3561.22
    }
   },
   "day": {
@@ -1161,18 +1187,14 @@
     "34886002",
     "34885999"
    ],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 9585.79 · 8 open",
+  "status": "ok · demo Fusion Markets · balance 9585.79 · 9 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
-   "mosha6:bar-r6-15m-v2-b1795657740": "price 3570.56 has run 1.07R from the council entry 3562.145: a different trade now",
-   "mosha6:bar-r6-eg-15m-m5-b1795659300": "price 3600.945 has run 1.01R from the council entry 3584.05: a different trade now",
-   "mosha6:bar-r6-eg-1h-b1795666620": "price 3596.61 has run 1.15R from the council entry 3584.825: a different trade now",
-   "mosha6:bar-r6-15m-m5-z-b1795666620": "price 3596.61 has run 1.32R from the council entry 3584.05: a different trade now",
-   "mosha6:bar-r6-tap-eg-30m-b1795666440": "price 3596.61 has run 1.04R from the council entry 3585.34: a different trade now"
+   "mosha6:bar-r6-15m-v2-b1795657740": "price 3570.56 has run 1.07R from the council entry 3562.145: a different trade now"
   },
   "wait": {},
   "paused": {},
@@ -1181,7 +1203,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 9585.79,
-  "lastRun": "2026-11-26T06:27:08.000Z"
+  "lastRun": "2026-11-26T06:31:50.000Z"
  },
  "log": [
   {
@@ -1769,6 +1791,11 @@
    "at": "2026-11-26T04:38:06.000Z",
    "msg": "not mirrored mosha6:bar-r6-tap-eg-30m-b1795666440: price 3596.61 has run 1.04R from the council entry 3585.34: a different trade now",
    "trade": "mosha6:bar-r6-tap-eg-30m-b1795666440"
+  },
+  {
+   "at": "2026-11-26T06:31:50.000Z",
+   "msg": "opened buy XAUUSD 0.02 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-tap-15m-v2-b1795674120"
   }
  ],
  "limits": {
@@ -1864,11 +1891,11 @@
   ]
  },
  "execution": {
-  "n": 39,
-  "meanSlipR": -0.006,
+  "n": 40,
+  "meanSlipR": -0.011,
   "medianSlipR": -0.004,
   "worstSlipR": 0.939,
-  "medianLagSec": 125,
+  "medianLagSec": 129.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -1895,8 +1922,8 @@
     "meanSlipR": -0.018
    },
    "XAUUSD": {
-    "n": 21,
-    "meanSlipR": -0.012
+    "n": 22,
+    "meanSlipR": -0.02
    },
    "EURUSD": {
     "n": 1,
