@@ -1936,7 +1936,7 @@
     "lots": 0.38,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T20:01:37.000Z",
     "councilEntry": 0.66336,
     "stop": 0.663501,
@@ -1949,31 +1949,34 @@
     "slipR": 0,
     "lagSec": 97,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T20:01:37.000Z",
-    "brokerStop": 0.66348
+    "brokerStop": 0.66348,
+    "closedAt": "2026-11-26T20:33:14.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 467.65,
+   "lastBalance": 461.57,
    "ids": [
     "51608452",
     "51640396",
     "51642523",
     "51642524",
     "51642525",
-    "51644179",
-    "51647287"
+    "51644179"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 467.65 · 7 open",
-  "skipped": {},
+  "status": "ok · demo Fusion Markets · balance 461.57 · 6 open",
+  "skipped": {
+   "eqx:fade:usdjpy:fade-m15-b1795725000": "stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set"
+  },
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
     "why": "daily loss stop (3.2% down today)",
@@ -2001,20 +2004,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 467.65,
-  "lastRun": "2026-11-26T20:28:59.000Z"
+  "balance": 461.57,
+  "lastRun": "2026-11-26T20:33:14.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T11:40:21.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28026.48 -> 28046.3 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
-  {
-   "at": "2026-11-11T12:16:38.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28046.3 -> 28063.92 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T12:52:44.000Z",
    "msg": "moved NAS100 48212677 protection: stop 28063.92 -> 28066.13 (council ict-A)",
@@ -3494,6 +3487,16 @@
    "at": "2026-11-26T20:01:37.000Z",
    "msg": "opened sell AUDUSD 0.38 lot (council eqx-fade)",
    "trade": "eqx:fade:audusd:fade-m15-s1795723200"
+  },
+  {
+   "at": "2026-11-26T20:33:14.000Z",
+   "msg": "AUDUSD position 51647287 closed at the broker",
+   "trade": "eqx:fade:audusd:fade-m15-s1795723200"
+  },
+  {
+   "at": "2026-11-26T20:33:14.000Z",
+   "msg": "not mirrored eqx:fade:usdjpy:fade-m15-b1795725000: stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set",
+   "trade": "eqx:fade:usdjpy:fade-m15-b1795725000"
   }
  ],
  "limits": {
