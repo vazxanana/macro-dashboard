@@ -6761,7 +6761,7 @@
     "lots": 9.6,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T21:47:24.000Z",
     "councilEntry": 0.54708,
     "stop": 0.546825,
@@ -6772,10 +6772,12 @@
     "slipR": 0.314,
     "lagSec": 144,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T21:47:24.000Z",
-    "brokerStop": 0.5469
+    "brokerStop": 0.5469,
+    "closedAt": "2026-11-26T22:37:08.000Z"
    },
    "boxfade:audusd:boxfade-m5-s1795731300": {
     "positionId": "51647631",
@@ -6807,19 +6809,18 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 11148.46,
+   "lastBalance": 10760.32,
    "ids": [
     "51571061",
     "51631994",
     "51643494",
-    "51647575",
     "51647631"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 11148.46 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 10760.32 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6827,15 +6828,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 11148.46,
-  "lastRun": "2026-11-26T22:33:46.000Z"
+  "balance": 10760.32,
+  "lastRun": "2026-11-26T22:37:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T23:00:41.000Z",
-   "msg": "not mirrored yet xau-replica-1794430232-b: daily loss stop (44.7% down today) (will retry)",
-   "trade": "xau-replica-1794430232-b"
-  },
   {
    "at": "2026-11-11T23:16:47.000Z",
    "msg": "not mirrored yet xau-replica-1794438963-s: daily loss stop (44.7% down today) (will retry)",
@@ -8324,6 +8320,11 @@
    "at": "2026-11-26T22:17:53.000Z",
    "msg": "opened sell AUDUSD 2.93 lot (council boxfade)",
    "trade": "boxfade:audusd:boxfade-m5-s1795731300"
+  },
+  {
+   "at": "2026-11-26T22:37:08.000Z",
+   "msg": "NZDUSD position 51647575 closed at the broker",
+   "trade": "boxfade:nzdusd:boxfade-m5-b1795729500"
   }
  ],
  "limits": {
