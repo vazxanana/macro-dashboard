@@ -6267,7 +6267,7 @@
     "lots": 4.59,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-25T23:28:15.000Z",
     "councilEntry": 0.5488,
     "stop": 0.549355,
@@ -6278,10 +6278,12 @@
     "slipR": 0.324,
     "lagSec": 1395,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-25T23:28:15.000Z",
-    "brokerStop": 0.54918
+    "brokerStop": 0.54918,
+    "closedAt": "2026-11-26T01:18:23.000Z"
    },
    "boxfade:eurusd:boxfade-m5-s1795647300": {
     "positionId": "51559864",
@@ -6341,16 +6343,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12615.39,
+   "lastBalance": 12342.42,
    "ids": [
-    "51559058",
-    "51559862"
+    "51559058"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12615.39 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12342.42 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6358,15 +6359,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12615.39,
-  "lastRun": "2026-11-26T01:15:55.000Z"
+  "balance": 12342.42,
+  "lastRun": "2026-11-26T01:18:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet audusd-replica-1794409826-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "audusd-replica-1794409826-b"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet usdcad-replica-1794409920-s: daily loss stop (44.6% down today) (will retry)",
@@ -7855,6 +7851,11 @@
    "at": "2026-11-26T00:58:29.000Z",
    "msg": "USDJPY position 51565725 closed at the broker",
    "trade": "boxfade:usdjpy:boxfade-m5-b1795651800"
+  },
+  {
+   "at": "2026-11-26T01:18:23.000Z",
+   "msg": "NZDUSD position 51559862 closed at the broker",
+   "trade": "boxfade:nzdusd:boxfade-m5-s1795647900"
   }
  ],
  "limits": {
