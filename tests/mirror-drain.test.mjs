@@ -13,7 +13,7 @@ test('shadows go to the former LIT account (still the lit book and gotobi\'s); t
   const { groups, byBook } = accountsFor({ CTRADER_ACCOUNT_ID: '49478137' }, { mirrorAccounts: ACC.mirrorAccounts, drain: ACC.drain });
   assert.equal(byBook.shadow, '10152146');
   const g = Object.fromEntries(groups.map((x) => [x.account, x]));
-  assert.deepEqual(g['10152146'].books, ['shadow', 'lit', 'mosha6']);   // 25 Nov 2026: mosha6 moved here from *155
+  assert.deepEqual(g['10152146'].books, ['shadow', 'lit', 'mosha6', 'ictnq', 'fvgm', 'egd1', 'litr']);   // 25 Nov 2026: mosha6 moved here from *155
   assert.equal(g['*155'], undefined, 'no account ending 155 any more');
   assert.deepEqual(g['10152145'], { account: '10152145', books: ['bfade'] }, '25 Nov 2026: the Big-candle fade book; it still manages the old copies it holds');
 });

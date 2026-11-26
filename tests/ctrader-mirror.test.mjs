@@ -706,13 +706,13 @@ test('amend: a council stop / target move on an open trade is sent to the broker
 
 // ---- 8 Nov (owner): one demo account per book ---------------------------------------------------------------------------------
 test('books and accounts: every trade has one book; accounts come from config.json or CTRADER_ACCOUNTS, the base account takes the rest', () => {
-  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx', 'bfade', 'boxfade']); assert.equal(bookOf({ id: 'xau-replica-1-s', k: 'replica', shadow: true }), 'replica');
+  assert.deepEqual(BOOKS, ['council', 'ict', 'shadow', 'lit', 'replica', 'mosha6', 'eqx', 'bfade', 'boxfade', 'ictnq', 'fvgm', 'egd1', 'litr']); assert.equal(bookOf({ id: 'xau-replica-1-s', k: 'replica', shadow: true }), 'replica');
   assert.equal(bookOf({ id: 'ict:nq-b-1' }), 'ict'); assert.equal(bookOf({ id: 'xau-lit-s-1', k: 'lit', shadow: true }), 'lit'); assert.equal(bookOf({ id: 'eurusd-scalp-1', shadow: true }), 'shadow'); assert.equal(bookOf({ id: 'eurusd-scalp-1', k: 'scalp' }), 'council');
-  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242', boxfade: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
+  let a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, {}); assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '4242', lit: '4242', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242', boxfade: '4242', ictnq: '4242', fvgm: '4242', egd1: '4242', litr: '4242' }); assert.equal(a.groups.length, 1); assert.deepEqual(a.groups[0].books, BOOKS);
   a = accountsFor({ CTRADER_ACCOUNT_ID: '4242' }, { mirrorAccounts: { shadow: '5000', lit: '6000' } });
-  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242', boxfade: '4242' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict', 'replica', 'mosha6', 'eqx', 'bfade', 'boxfade']], ['5000', ['shadow']], ['6000', ['lit']]]);
+  assert.deepEqual(a.byBook, { council: '4242', ict: '4242', shadow: '5000', lit: '6000', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242', boxfade: '4242', ictnq: '4242', fvgm: '4242', egd1: '4242', litr: '4242' }); assert.deepEqual(a.groups.map((g) => [g.account, g.books]), [['4242', ['council', 'ict', 'replica', 'mosha6', 'eqx', 'bfade', 'boxfade', 'ictnq', 'fvgm', 'egd1', 'litr']], ['5000', ['shadow']], ['6000', ['lit']]]);
   a = accountsFor({ CTRADER_ACCOUNT_ID: '4242', CTRADER_ACCOUNTS: 'ict:7000, lit:8000,bogus:1' }, { mirrorAccounts: { lit: '6000' } });
-  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242', boxfade: '4242' }, 'the env wins over config.json; unknown books ignored');
+  assert.deepEqual(a.byBook, { council: '4242', ict: '7000', shadow: '4242', lit: '8000', replica: '4242', mosha6: '4242', eqx: '4242', bfade: '4242', boxfade: '4242', ictnq: '4242', fvgm: '4242', egd1: '4242', litr: '4242' }, 'the env wins over config.json; unknown books ignored');
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', book: 'shadow', result: 'no' }, 0).title, /^Demo mirror \[shadow\]: order rejected/);
   assert.match(mirrorAlertText({ kind: 'reject', symbol: 'XAUUSD', side: 'buy', result: 'no' }, 0).title, /^Demo mirror: order rejected/);
 });
@@ -1204,7 +1204,7 @@ test('Big-candle fade book (25 Nov 2026): own ids, 5 % risk, own day stop, stop 
 
 test('Mosha 6R barrier book: no daily loss stop (owner, 25 Nov 2026), others keep theirs', () => {
   const src = fs.readFileSync(new URL('../council/ctrader-mirror.mjs', import.meta.url), 'utf8');
-  assert.match(src, /!\/\^\(mosha6\|boxfade\|eqx\|bfade\):\/\.test\(String\(t\.id\)\) && dayDown >=/);
+  assert.match(src, /!\/\^\(mosha6\|boxfade\|eqx\|bfade\|ict:x\|fvgm\|egd1\|litr\):\/\.test\(String\(t\.id\)\) && dayDown >=/);
   assert.equal(LIMITS.dayStop, 0.02);
 });
 import { boxfadeCandidates, boxfadeHasOwnAccount, EQX as EQX2 } from '../council/ctrader-mirror.mjs';
@@ -1219,4 +1219,45 @@ test('Box fade book (owner, 25 Nov 2026): the desk six markets only, 2 % a trade
   assert.equal(a.byBook.boxfade, '10152148'); assert.equal(a.byBook.replica, '49478137');
   assert.deepEqual(a.groups.find((g) => g.account === '10152148').books, ['boxfade']);
   assert.deepEqual(EQX2.not.boxfade, ['xau', 'xag', 'usdcad', 'eurjpy']);
+});
+
+// 26 Nov 2026 (owner: "add 1 and 2 to nq live", "and 3"): three ICT setups on the Nasdaq as the ictnq book
+test('ICT Nasdaq book: dip-buy, A-setup with an HTF FVG, A-setup not on a Friday; NQ only, a stop required, one copy a signal, fresh ones only', async () => {
+  const M = await import('../council/ctrader-mirror.mjs'), now = 1795600000, thu = Date.UTC(2026, 10, 19, 15) / 1000, fri = Date.UTC(2026, 10, 20, 15) / 1000;
+  const rec = (id, o = {}) => ({ id, market: 'nq', side: 'buy', entry: 27000, stop: 26800, stop0: 26800, t1: null, status: 'open', opened: now - 600, signalAt: thu, aset: true, feat: { htfFvg: null }, size: 1.5, ...o });
+  const ict = [rec('nq-b-1'), rec('nq-b-2', { signalAt: fri }), rec('nq-b-3', { signalAt: fri, feat: { htfFvg: 'D1' } }), rec('es-b-4', { market: 'es' }), rec('nq-b-5', { aset: false }), rec('nq-b-6', { stop: 27100, stop0: 27100 }),
+    rec('nq-b-7', { opened: now - 3 * 3600 }), rec('nq-b-8', { status: 'loss', closed: now - 3600 }), rec('nq-b-9', { status: 'loss', closed: now - 5 * 86400 })];
+  const shadow = { trades: [rec('nq-b-1-dip', { variant: 'dip', aset: false, shadow: true }), rec('nq-b-10-dip', { variant: 'dip', aset: false, shadow: true, signalAt: fri }), rec('es-b-11-dip', { market: 'es', variant: 'dip', aset: false })] };
+  const C = M.ictnqCandidates(ict, shadow, now), by = Object.fromEntries(C.map((t) => [t.id, t]));
+  assert.deepEqual(Object.keys(by).sort(), ['ict:x:nq-b-1', 'ict:x:nq-b-10-dip', 'ict:x:nq-b-3', 'ict:x:nq-b-7', 'ict:x:nq-b-8'].sort());   // a Friday A-setup without an FVG, ES, a non A-setup, a wrong-side stop, an old close and the dip twin of an A record are out
+  assert.deepEqual(by['ict:x:nq-b-1'].setups, ['no-friday']); assert.deepEqual(by['ict:x:nq-b-3'].setups, ['htf-fvg']); assert.deepEqual(by['ict:x:nq-b-10-dip'].setups, ['dip']);
+  assert.equal(by['ict:x:nq-b-7'].noCopy, true); assert.ok(!by['ict:x:nq-b-1'].noCopy);
+  for (const t of C) { assert.equal(M.bookOf(t), 'ictnq'); assert.equal(t.shadow, false); assert.equal(t.size, 1); assert.ok(t.stop0 < t.entry); }
+  assert.ok(M.ictnqCandidates(ict, shadow, now, false).every((t) => t.noCopy));
+  assert.equal(M.bookOf({ id: 'ict:nq-b-1' }), 'ict'); assert.equal(M.LIMITS.risk.ictnq, 0.01); assert.ok(M.BOOKS.includes('ictnq'));
+  assert.equal(M.ictnqHasOwnAccount({ ictnq: '2', council: '1' }), true); assert.equal(M.ictnqHasOwnAccount({ ictnq: '1', council: '1' }), false);
+  const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8')); assert.equal(acc.mirrorAccounts.ictnq, '10152146');
+});
+
+test('FVG return (gold and silver) book: the fvg desk records of those two markets only, 1 % a trade', async () => {
+  const M = await import('../council/ctrader-mirror.mjs'), now = 1795600000;
+  const r = (id, market, o = {}) => ({ id, ...(market === 'xau' ? {} : { market }), side: 1, entry: 100, stop: 99, target: 101, t: now - 300, first: now - 200, status: 'open', float: 0.1, ...o });
+  const C = M.fvgmCandidates({ records: [r('a', 'xau'), r('b', 'xag'), r('c', 'eurusd'), r('d', 'xau', { stop: 101 }), r('e', 'xau', { t: now - 9000, first: now - 9000 })] }, now);
+  assert.deepEqual(C.map((t) => t.id), ['fvgm:a', 'fvgm:b', 'fvgm:e']); assert.ok(C.every((t) => M.bookOf(t) === 'fvgm' && ['xau', 'xag'].includes(t.market)));
+  assert.equal(C[2].noCopy, true); assert.ok(!C[0].noCopy); assert.equal(M.LIMITS.risk.fvgm, 0.01); assert.deepEqual(M.FVGM.markets, ['xau', 'xag']);
+  assert.equal(M.fvgmHasOwnAccount({ fvgm: '2', council: '1' }), true);
+  const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8')); assert.equal(acc.mirrorAccounts.fvgm, '10152146');
+});
+
+test('desk slices: the D1 engulf zone (Nasdaq, EUR/USD, silver) and the LIT rule (AUD/USD, USD/CAD), one kind and the named markets only', async () => {
+  const M = await import('../council/ctrader-mirror.mjs'), now = 1795600000;
+  const r = (id, market, kind, o = {}) => ({ id, market, kind, side: -1, entry: 100, stop: 101, target: 98, t: now - 300, first: now - 200, status: 'open', float: 0.1, ...o });
+  const eg = { records: [r('nas100:eg-1d-s-1', 'nas100', 'eg-1d'), r('eurusd:eg-1d-s-2', 'eurusd', 'eg-1d'), r('xag:eg-1d-s-3', 'xag', 'eg-1d'), r('gbpusd:eg-1d-s-4', 'gbpusd', 'eg-1d'), r('nas100:eg-4h-s-5', 'nas100', 'eg-4h'), r('eurusd:eg-1d-s-6', 'eurusd', 'eg-1d', { stop: 99 })] };
+  const A = M.sliceCandidates('egd1', eg, now); assert.deepEqual(A.map((t) => t.id), ['egd1:nas100:eg-1d-s-1', 'egd1:eurusd:eg-1d-s-2', 'egd1:xag:eg-1d-s-3']);
+  const lit = { records: [r('audusd:lit-rule-s-1', 'audusd', 'lit-rule'), r('usdcad:lit-rule-s-2', 'usdcad', 'lit-rule'), r('eurusd:lit-rule-s-3', 'eurusd', 'lit-rule'), r('audusd:lit-loose-s-4', 'audusd', 'lit-loose')] };
+  const B = M.sliceCandidates('litr', lit, now); assert.deepEqual(B.map((t) => t.id), ['litr:audusd:lit-rule-s-1', 'litr:usdcad:lit-rule-s-2']);
+  for (const t of A) assert.equal(M.bookOf(t), 'egd1'); for (const t of B) assert.equal(M.bookOf(t), 'litr');
+  assert.equal(M.LIMITS.risk.egd1, 0.01); assert.equal(M.LIMITS.risk.litr, 0.01); assert.ok(M.SYMBOLS.nas100 && M.SYMBOLS.xag && M.SYMBOLS.audusd && M.SYMBOLS.usdcad);
+  assert.deepEqual(M.sliceCandidates('litr', null, now), []);
+  const acc = JSON.parse(fs.readFileSync(new URL('../council/ctrader-accounts.json', import.meta.url), 'utf8')); assert.equal(acc.mirrorAccounts.egd1, '10152146'); assert.equal(acc.mirrorAccounts.litr, '10152146');
 });

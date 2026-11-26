@@ -15,7 +15,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { openRisk } from './fills.mjs';   // the risk a trade OPENED with (12 Nov 2026, moved-stop audit)
-import { bookOf, ictCandidates, replicaCandidates, replicaHasOwnAccount, replicaMarkets, moshaCandidates, moshaHasOwnAccount, eqxCandidates, eqxHasOwnAccount, bfadeCandidates, bfadeHasOwnAccount, boxfadeCandidates, boxfadeHasOwnAccount, EQX, SYMBOLS } from './ctrader-mirror.mjs';
+import { bookOf, ictCandidates, replicaCandidates, replicaHasOwnAccount, replicaMarkets, moshaCandidates, moshaHasOwnAccount, ictnqCandidates, ictnqHasOwnAccount, fvgmCandidates, fvgmHasOwnAccount, SLICES, sliceCandidates, sliceHasOwnAccount, eqxCandidates, eqxHasOwnAccount, bfadeCandidates, bfadeHasOwnAccount, boxfadeCandidates, boxfadeHasOwnAccount, EQX, SYMBOLS } from './ctrader-mirror.mjs';
 
 const rd = (dir, f, d) => { try { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); } catch (e) { return d; } };
 // "owner rule: replica gold only since 2026-11-11" (the markets and the date from config.json mirrorReplica)
@@ -32,7 +32,8 @@ export function reconcile(dir) {
   const byBook = {}; for (const g of map.groups) for (const b of g.books) byBook[b] = g;
   const accOf = Object.fromEntries(Object.entries(byBook).map(([b, g]) => [b, g.account])), desk = rd(dir, 'mosha/desk.json', null);
   const eqxFiles = Object.fromEntries(EQX.desks.concat('boxfade').map((k) => [k, rd(dir, `${k}/desk.json`, null)]));
-  const trades = own.concat(ictCandidates(ict, cfg.mirrorIct !== false), eqxHasOwnAccount(accOf) ? eqxCandidates(eqxFiles) : [], bfadeHasOwnAccount(accOf) ? bfadeCandidates(eqxFiles.bigfade) : [], boxfadeHasOwnAccount(accOf) ? boxfadeCandidates(eqxFiles.boxfade) : [], replicaHasOwnAccount(accOf) ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(accOf) ? moshaCandidates(desk) : []);
+  const ictNq = ictnqHasOwnAccount(accOf) ? ictnqCandidates(ict, rd(dir, 'ict/shadow.json', null), Math.floor(Date.now() / 1000), cfg.mirrorIctNq !== false) : [], nqTaken = new Set(ictNq.map((t) => t.id.slice(6)));
+  const trades = own.concat(ictCandidates((Array.isArray(ict) ? ict : []).filter((t) => !nqTaken.has(String(t.id))), cfg.mirrorIct !== false), ictNq, fvgmHasOwnAccount(accOf) ? fvgmCandidates(eqxFiles.fvg) : [], ...Object.keys(SLICES).map((b) => (sliceHasOwnAccount(accOf, b) ? sliceCandidates(b, rd(dir, `${SLICES[b].desk}/desk.json`, null)) : [])), eqxHasOwnAccount(accOf) ? eqxCandidates(eqxFiles) : [], bfadeHasOwnAccount(accOf) ? bfadeCandidates(eqxFiles.bigfade) : [], boxfadeHasOwnAccount(accOf) ? boxfadeCandidates(eqxFiles.boxfade) : [], replicaHasOwnAccount(accOf) ? replicaCandidates(research, own, replicaMarkets(cfg)) : [], moshaHasOwnAccount(accOf) ? moshaCandidates(desk) : []);
   const state = new Map(); for (const g of map.groups) state.set(g.account, (rd(dir, 'ctrader/' + g.file, {}).state) || {});
   const acct = (g) => (accounts.accounts || []).find((a) => (a.books || []).some((b) => g.books.includes(b))) || { open: [], orders: [] };
   const rows = [], usedPos = new Set(), usedOrd = new Set();

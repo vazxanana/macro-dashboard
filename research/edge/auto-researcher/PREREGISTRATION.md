@@ -90,3 +90,39 @@ workers is, like every lead, re-priced at the broker's own quotes before it mean
 
 Runner budget: the workflow already uses the 20 jobs a free plan allows, so workers 7 and 9 (duplicates of 5 / 6 and of 3)
 stop drawing and their runners go to 11 and 12; the files of 7 and 9 stay and are still counted.
+
+## Version auto-2: EG, EF and BO only, 2019 to now, t above 1 (26 Nov 2026)
+
+Owner, 26 Nov 2026: "save what we got now and make it focus only in EG EF BO, and i only want results from 2019 till today t
+above 1 is okey". Written and committed alone before the engine changes. `auto-1` stops here and is kept: its worker files are
+copied to council-data `research/auto-1/` and its last report is committed as `auto-1-final.json`; nothing of it is counted in
+`auto-2`.
+
+**What changes**
+
+- Triggers, four kinds only, on H1 candles, all read from closed candles:
+  - `eg`: an engulf completes at this candle (the engine's existing rule: the nearest opposite candle within the 3 before, this
+    close the first beyond its high / low): trade its direction.
+  - `egr`: the first return to a standing engulf zone (the base candle, wick to wick; alive `life` candles, until a close through
+    its far side): this candle trades into the zone and closes back out on the engulf's side: trade the engulf's direction.
+  - `ef`: an engulf zone fails: this candle is the first to close through the far side of a standing zone: trade the direction of
+    the failure.
+  - `bo`: a close beyond the last unbroken swing (`P` candles a side, known `P` candles later; the structure code of workers 11
+    and 12): any break, or only a break with the structure, or only one against it. Trade the break's direction.
+  A rule is one trigger or two that agree on the same candle. Grids: `life` 12 / 24 / 48 / 96, `P` 2 / 3 / 5 / 8.
+- Filters and exits: the same grids as `auto-1` (entry hours, weekdays, 200-hour trend, volatility, stop 0.5-3 ATR, target 0-6R,
+  time limit). Markets: the ten of `auto-1` and the Nasdaq 100 (before costs, as worker 10); worker 10 stays Nasdaq only.
+- Windows: only 2019-01-01 to now. Search 2019-2022, check 2023 to now (one look per group, a group = market, triggers with their
+  settings, side, trend filter, stop and target).
+- Bars (the owner's): search n >= 100, mean > 0, month-sum t >= 1, and the side-flipped twin negative; check n >= 50, mean > 0,
+  t >= 1; and the whole of 2019 to now t >= 1. A rule that clears all three is a **result** and is listed with all three sets of
+  figures.
+
+**What a result is worth, said before any is seen**
+
+A t of 1 is what one rule in six shows by luck in any window. Clearing it in the search window and again in the check window
+happens by luck about once in forty tries with no edge at all, and the workers make about a hundred tries a second, so the list
+will fill with chance results within minutes. The 2023-now window is also read once per group, and groups are numerous, so it is
+not a clean holdout. A result of `auto-2` is therefore a list to look through, never an edge and never evidence by itself. The
+strict reading is kept beside it: a **lead** still needs check-window n >= 100, t >= 2 and a Holm p under 0.05 over every check
+look made in `auto-2`. Anything taken further is re-priced at the broker's own quotes first, as before.

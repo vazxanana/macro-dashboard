@@ -8,7 +8,12 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import * as K from '../_lib/edgekit.mjs';
 
-export const VERSION = 'auto-1';
+export const VERSION = 'auto-2';
+// auto-2 (26 Nov 2026, owner: "focus only in EG EF BO ... results from 2019 till today t above 1 is okey"; PREREGISTRATION.md, "Version auto-2"). auto-1's
+// windows, bars and families below are kept for the studies and desks that import them; the worker (`run`) draws auto-2 rules only.
+export const WIN2 = { A: [Date.UTC(2019, 0, 1) / 1000, Date.UTC(2023, 0, 1) / 1000], C: [Date.UTC(2023, 0, 1) / 1000, Infinity] };
+export const BAR2 = { A: { n: 100, t: 1.0 }, C: { n: 50, t: 1.0 }, ALL: { t: 1.0 }, LEAD: { n: 100, t: 2.0 } };
+export const K2 = ['eg', 'egr', 'ef', 'bo'], SPACE2 = { life: [12, 24, 48, 96], P: [2, 3, 5, 8], bo: ['any', 'bos', 'choch'] };
 export const MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
 const UTC = (y, m = 0, d = 1) => Date.UTC(y, m, d) / 1000;
 export const WIN = { A: [UTC(2005), UTC(2015)], B: [UTC(2015), UTC(2020)], C: [UTC(2020), Infinity] };
@@ -97,6 +102,7 @@ export function prep(D, mk) {
   D.cost = K.COSTS[mk]; if (mk === 'nas100') { D.costRel = NQ_COST; D.cost = 0; }   // a share of price when NQ_COST is set, none by the owner's word
   const find = (x) => { let lo = 0, hi = D.n; while (lo < hi) { const m = (lo + hi) >> 1; if (D.t[m] < x) lo = m + 1; else hi = m; } return lo; };
   D.idx = { A: [find(WIN.A[0]), find(WIN.A[1])], B: [find(WIN.B[0]), find(WIN.B[1])], C: [find(WIN.C[0]), D.n] };
+  D.idx2 = { A: [find(WIN2.A[0]), find(WIN2.A[1])], C: [find(WIN2.C[0]), D.n] };
   return D;
 }
 
@@ -133,6 +139,44 @@ export function genome(r, worker) {
     trend: pick(r, ['none', 'none', 'with', 'against']), vol: pick(r, ['none', 'none', 'low', 'high']), volP: pick(r, SPACE.atrPct),
     stop: pick(r, SPACE.stop), rr: pick(r, SPACE.rr), hold: pick(r, SPACE.hold) };
 }
+// the engulf at bar i: [direction, index of its base candle]. The nearest opposite candle within the 3 before: this close is the first to go beyond its high / low
+export function egAt(D, i) {
+  for (let b = i - 1; b >= i - 3 && b >= 1; b--) {
+    const bull = D.c[b] > D.o[b], bear = D.c[b] < D.o[b];
+    if (bear && D.c[i] > D.h[b]) { let first = true; for (let k = b + 1; k < i; k++) if (D.c[k] > D.h[b]) first = false; return first ? [1, b] : [0, -1]; }
+    if (bull && D.c[i] < D.l[b]) { let first = true; for (let k = b + 1; k < i; k++) if (D.c[k] < D.l[b]) first = false; return first ? [-1, b] : [0, -1]; }
+    if (bear || bull) return [0, -1];
+  }
+  return [0, -1];
+}
+// auto-2: engulf zones walked once, candle by candle (only candles up to i decide bar i). A zone = the base candle wick to wick, alive `life` candles from the
+// candle that completed it, until a close through its far side. egr[i] = the first return: bar i trades into the zone and closes back out on the engulf's side
+// (the engulf's direction). ef[i] = bar i is the first close through the far side (the direction of the failure). Two opposite signals on one bar = none.
+export function zones(D, life) { return cache(D, 'zn' + life, () => {
+  const n = D.n, egr = new Int8Array(n), ef = new Int8Array(n); let live = [];
+  for (let i = 4; i < n; i++) {
+    let r = 0, f = 0, rx = false, fx = false; const keep = [];
+    for (const z of live) {
+      if (i - z.born > life) continue;
+      if (z.d > 0 ? D.c[i] < z.bot : D.c[i] > z.top) { if (f && f !== -z.d) fx = true; f = -z.d; continue; }
+      if (!z.hit && (z.d > 0 ? D.l[i] <= z.top : D.h[i] >= z.bot)) { z.hit = true; if (z.d > 0 ? D.c[i] > z.top : D.c[i] < z.bot) { if (r && r !== z.d) rx = true; r = z.d; } }
+      keep.push(z);
+    }
+    live = keep; egr[i] = rx ? 0 : r; ef[i] = fx ? 0 : f;
+    const [d, b] = egAt(D, i); if (d) live.push({ d, top: D.h[b], bot: D.l[b], born: i, hit: false });
+  }
+  return { egr, ef }; }); }
+// auto-2 rules: one trigger of K2, or two that agree on the same candle
+function trigger2(r, kind) { return kind === 'eg' ? { kind, follow: true } : kind === 'bo' ? { kind, P: pick(r, SPACE2.P), bo: pick(r, SPACE2.bo) } : { kind, life: pick(r, SPACE2.life) }; }
+export function genome2(r, worker) {
+  const trig = [trigger2(r, pick(r, K2))]; if (r() < 0.5) { const k = pick(r, K2); if (k !== trig[0].kind) trig.push(trigger2(r, k)); }
+  const h0 = r() < 0.5 ? null : pick(r, SPACE.hours);
+  return { mk: worker === NQ_WORKER ? 'nas100' : pick(r, MS_MARKETS), trig, side: pick(r, ['both', 'both', 'long', 'short']),
+    hours: h0 == null ? null : [h0, (h0 + pick(r, [1, 2, 3, 4, 6, 8, 12])) % 24], dows: r() < 0.7 ? null : pick(r, [[1, 2, 3, 4, 5], [1, 2, 3], [2, 3, 4], [3, 4, 5], [1, 5]]),
+    trend: pick(r, ['none', 'none', 'with', 'against']), vol: pick(r, ['none', 'none', 'low', 'high']), volP: pick(r, SPACE.atrPct),
+    stop: pick(r, SPACE.stop), rr: pick(r, SPACE.rr), hold: pick(r, SPACE.hold) };
+}
+export const group2 = (g) => [g.mk, g.trig.map((t) => t.kind + (t.life ? t.life : '') + (t.P ? t.P + t.bo : '')).join('&'), g.side, g.trend, g.stop, g.rr].join('|');
 // one trigger: +1 long, -1 short, 0 none, at the close of bar i
 export function sig(D, tr, i) {
   switch (tr.kind) {
@@ -144,15 +188,10 @@ export function sig(D, tr, i) {
     case 'blk': { if (D.hour[i] !== tr.at) return 0; let H = -Infinity, L = Infinity; for (let k = i - tr.H; k < i; k++) { if (k < 0) return 0; if (D.h[k] > H) H = D.h[k]; if (D.l[k] < L) L = D.l[k]; }
       const up = D.c[i] > H ? 1 : D.c[i] < L ? -1 : 0; return tr.follow ? up : -up; }
     case 'dev': { const m = maOf(D, tr.n)[i], a = atr(D)[i]; if (!(m === m && a > 0)) return 0; const z = (D.c[i] - m) / a; const dir = z > tr.z ? 1 : z < -tr.z ? -1 : 0; return tr.follow ? dir : -dir; }
-    case 'eg': { // the nearest opposite candle within the 3 before: this close is the first to go beyond its high / low
-      let dir = 0;
-      for (let b = i - 1; b >= i - 3 && b >= 1 && !dir; b--) {
-        const bull = D.c[b] > D.o[b], bear = D.c[b] < D.o[b];
-        if (bear && D.c[i] > D.h[b]) { let first = true; for (let k = b + 1; k < i; k++) if (D.c[k] > D.h[b]) first = false; if (first) dir = 1; if (bear) break; }
-        else if (bull && D.c[i] < D.l[b]) { let first = true; for (let k = b + 1; k < i; k++) if (D.c[k] < D.l[b]) first = false; if (first) dir = -1; if (bull) break; }
-        else if (bear || bull) { if ((bear && D.c[i] <= D.h[b]) || (bull && D.c[i] >= D.l[b])) break; }
-      }
-      return tr.follow ? dir : -dir; }
+    case 'eg': { const dir = egAt(D, i)[0]; return tr.follow ? dir : -dir; }
+    case 'egr': return zones(D, tr.life).egr[i];
+    case 'ef': return zones(D, tr.life).ef[i];
+    case 'bo': { const S = struct(D, tr.P), b = S.bk[i]; if (!b || (tr.bo === 'bos' && S.kd[i] !== 1) || (tr.bo === 'choch' && S.kd[i] !== 2)) return 0; return b; }
     case 'bos': case 'choch': { const S = struct(D, tr.P), b = S.bk[i]; if (!b || S.kd[i] !== (tr.kind === 'bos' ? 1 : 2)) return 0; return tr.follow ? b : -b; }
     case 'mspb': { const S = struct(D, tr.P); return S.dp[i] >= tr.d ? S.st[i] : 0; }
     case 'sweep': { const H = hiN(D, tr.N)[i], L = loN(D, tr.N)[i]; const dir = D.l[i] < L && D.c[i] > L ? 1 : D.h[i] > H && D.c[i] < H ? -1 : 0; return tr.follow ? dir : -dir; }
@@ -205,51 +244,53 @@ export const groupOf = (g) => [g.mk, g.trig.map((t) => t.kind + (t.follow === un
 export async function run(worker, outDir, minutes, cacheDir) {
   const t0 = Date.now(), LANE = +(process.env.LANE || 0), file = path.join(outDir, `worker-${worker}${LANE ? '-' + LANE : ''}.json`);   // lane 0 = the file as before; lanes 1-3 are extra processes of one worker on the same runner (only the seed and the file differ)
   fs.mkdirSync(outDir, { recursive: true });
-  let S = { version: VERSION, worker, started: new Date().toISOString(), tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0, groups: {}, leads: [], looks: [], chunks: 0 };
-  try { const prev = JSON.parse(fs.readFileSync(file, 'utf8')); if (prev.version === VERSION) S = { ...prev, chunks: prev.chunks + 1 }; } catch {}
-  const MY = worker === NQ_WORKER ? ['nas100'] : MS_WORKERS.includes(worker) ? MS_MARKETS : MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
+  let S = { version: VERSION, worker, started: new Date().toISOString(), tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0, groups: {}, leads: [], looks: [], results: [], chunks: 0 };
+  try { const prev = JSON.parse(fs.readFileSync(file, 'utf8')); if (prev.version === VERSION) S = { results: [], ...prev, chunks: prev.chunks + 1 }; } catch {}
+  const MY = worker === NQ_WORKER ? ['nas100'] : MS_MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
   const have = MY.filter((m) => D[m] && D[m].n > 5000); if (!have.length) throw new Error('no candles');
-  const r = rng(worker * 1000003 + LANE * 104729000 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); S.chanceCandidates = +(S.tries * 0.0013 * 0.07).toFixed(1); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
+  const r = rng(worker * 1000003 + LANE * 104729000 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
   let lastSave = Date.now();
   while (Date.now() - t0 < minutes * 60e3) {
     for (let q = 0; q < 200; q++) {
-      const g = genome(r, worker); if (!D[g.mk]) continue; const d = D[g.mk]; S.tries++;
-      const a = simulate(d, g, d.idx.A[0], d.idx.A[1]), sa = summary(a);
-      if (sa.n < BAR.A.n || sa.mean < BAR.A.mean || sa.t < BAR.A.t) continue;
+      const g = genome2(r, worker); if (!D[g.mk]) continue; const d = D[g.mk]; S.tries++;
+      const sa = summary(simulate(d, g, d.idx2.A[0], d.idx2.A[1]));
+      if (sa.n < BAR2.A.n || !(sa.mean > 0) || sa.t < BAR2.A.t) continue;
       S.survivedA++;
-      const sb = summary(simulate(d, g, d.idx.B[0], d.idx.B[1]));
-      if (sb.n < BAR.B.n || !(sb.mean > BAR.B.mean) || sb.t < BAR.B.t) continue;
-      const pl = summary(simulate(d, g, d.idx.A[0], d.idx.A[1], true)); if (!(pl.mean < 0)) continue;
-      S.candidates++; const grp = groupOf(g); if (S.groups[grp]) { S.groups[grp].more++; continue; }
-      const sc = summary(simulate(d, g, d.idx.C[0], d.idx.C[1])); S.cLooks++;
-      const p = sc.n >= 2 ? pOne(sc.t) : 1, look = { at: new Date().toISOString(), group: grp, g, A: sa, B: sb, placeboA: pl, C: sc, p: +p.toFixed(5) };
-      S.groups[grp] = { more: 0, pass: sc.n >= BAR.C.n && sc.mean > 0 && sc.t >= BAR.C.t }; S.looks.push(look);
-      if (S.looks.length > 400) S.looks.shift(); save();
-      console.log('C look', grp, 'A', sa.mean, sa.t, 'B', sb.mean, sb.t, 'C', sc.n, sc.mean, sc.t);
+      const pl = summary(simulate(d, g, d.idx2.A[0], d.idx2.A[1], true)); if (!(pl.mean < 0)) continue;
+      S.candidates++; const grp = group2(g); if (S.groups[grp]) { S.groups[grp].more++; continue; }
+      const sc = summary(simulate(d, g, d.idx2.C[0], d.idx2.C[1])), all = summary(simulate(d, g, d.idx2.A[0], d.n)); S.cLooks++;
+      const p = sc.n >= 2 ? pOne(sc.t) : 1, look = { at: new Date().toISOString(), group: grp, g, A: sa, placeboA: pl, C: sc, ALL: all, p: +p.toFixed(5) };
+      const pass = resultOk(look); S.groups[grp] = { more: 0, pass }; if (pass) S.cPasses++;
+      S.looks.push(look); if (S.looks.length > 300) S.looks.shift();
+      if (pass) { S.results.push(look); S.results.sort((x, y) => y.ALL.t - x.ALL.t); if (S.results.length > 200) S.results.length = 200; }
     }
-    if (Date.now() - lastSave > 60e3) { save(); lastSave = Date.now(); console.log(`worker ${worker}: ${S.tries} tries, ${S.survivedA} survive A, ${S.candidates} candidates, ${S.cLooks} C looks`); }
+    if (Date.now() - lastSave > 60e3) { save(); lastSave = Date.now(); console.log(`worker ${worker}: ${S.tries} tries, ${S.survivedA} survive the search, ${S.cLooks} checks, ${S.cPasses} results`); }
   }
   save(); return S;
 }
 
 // every worker's file in one dir -> the totals and the leads (a C pass that also clears Holm over every C look made)
+export const resultOk = (l) => l.C.n >= BAR2.C.n && l.C.mean > 0 && l.C.t >= BAR2.C.t && l.ALL.t >= BAR2.ALL.t;
 export function report(dir) {
-  const W = fs.readdirSync(dir).filter((f) => /^worker-\d+(-\d+)?\.json$/.test(f)).map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')));
-  const T = { workers: W.length, tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0 }, looks = [];
-  for (const w of W) { T.tries += w.tries; T.survivedA += w.survivedA; T.candidates += w.candidates; T.cLooks += w.cLooks; for (const l of w.looks) looks.push({ ...l, worker: w.worker }); }
-  T.chanceCandidates = +(T.tries * 0.0013 * 0.07).toFixed(1);
-  const ps = looks.map((l) => l.p).sort((a, b) => a - b), m = ps.length; looks.forEach((l) => { l.holm = Math.min(1, l.p * (m - ps.indexOf(l.p))); });
-  const leads = looks.filter((l) => l.C.n >= BAR.C.n && l.C.mean > 0 && l.C.t >= BAR.C.t && l.holm < 0.05); T.cPasses = looks.filter((l) => l.C.n >= BAR.C.n && l.C.mean > 0 && l.C.t >= BAR.C.t).length;
-  return { ...T, leads, bestLooks: [...looks].sort((a, b) => b.C.t - a.C.t).slice(0, 10) };
+  const W = fs.readdirSync(dir).filter((f) => /^worker-\d+(-\d+)?\.json$/.test(f)).map((f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'))).filter((w) => w.version === VERSION);
+  const T = { version: VERSION, workers: W.length, tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0 }, looks = [], res = new Map(), ps = [];
+  for (const w of W) { T.tries += w.tries; T.survivedA += w.survivedA; T.candidates += w.candidates; T.cLooks += w.cLooks; T.cPasses += w.cPasses || 0;
+    for (const l of w.looks) { looks.push({ ...l, worker: w.worker }); ps.push(l.p); }
+    for (const l of w.results || []) if (!res.has(l.group) || res.get(l.group).ALL.t < l.ALL.t) res.set(l.group, { ...l, worker: w.worker }); }
+  // Holm over every check look made (the files keep the last 300 looks each: the count is T.cLooks, the p values those on file)
+  ps.sort((a, b) => a - b); const m = Math.max(T.cLooks, ps.length), holm = (p) => Math.min(1, p * (m - Math.max(0, ps.indexOf(p))));
+  const results = [...res.values()].sort((a, b) => b.ALL.t - a.ALL.t).map((l) => ({ ...l, holm: holm(l.p) }));
+  const leads = results.filter((l) => l.C.n >= BAR2.LEAD.n && l.C.t >= BAR2.LEAD.t && l.holm < 0.05);
+  return { ...T, note: 'a result clears t >= 1 in 2019-22, in 2023-now and over 2019-now: about one random rule in forty does by luck', results, leads, bestLooks: results.slice(0, 10) };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const [cmd, a, b, c] = process.argv.slice(2), here = path.dirname(fileURLToPath(import.meta.url));
   if (cmd === 'run') { await run(+a, b, +(c || 300), process.env.RESEARCH_CACHE || path.join(process.env.RUNNER_TEMP || '/tmp', 'auto-cache')); }
-  else if (cmd === 'report') { const R = report(a); console.log(JSON.stringify({ ...R, leads: R.leads.length, bestLooks: R.bestLooks.map((l) => [l.group, l.A.mean, l.A.t, l.B.mean, l.C.n, l.C.mean, l.C.t, l.holm]) }, null, 1)); }
+  else if (cmd === 'report') { const R = report(a); console.log(JSON.stringify({ ...R, results: R.results.length, leads: R.leads.length, bestLooks: R.results.slice(0, 25).map((l) => [l.group, 'search', l.A.n, l.A.mean, l.A.t, 'check', l.C.n, l.C.mean, l.C.t, 'all', l.ALL.n, l.ALL.mean, l.ALL.t, +l.holm.toFixed(3)]) }, null, 1)); }
   else if (cmd === 'bench') {
     const d = await loadMarket('xau', '/tmp/auto-cache'), r = rng(1), n = +(b || 300), t0 = Date.now(); let ok = 0;
-    for (let i = 0; i < n; i++) { const g = genome(r, +a); g.mk = 'xau'; const s = summary(simulate(d, g, d.idx.A[0], d.idx.A[1])); if (s.n >= 250) ok++; }
-    console.log(n, 'tries', ((Date.now() - t0) / n).toFixed(1), 'ms each;', ok, 'with 250+ trades;', d.n, 'bars');
+    for (let i = 0; i < n; i++) { const g = genome2(r, +a); g.mk = 'xau'; const s = summary(simulate(d, g, d.idx2.A[0], d.idx2.A[1])); if (s.n >= 100) ok++; }
+    console.log(n, 'tries', ((Date.now() - t0) / n).toFixed(1), 'ms each;', ok, 'with 100+ trades;', d.n, 'bars');
   } else { console.log('run <worker> <outDir> [minutes] | bench <worker> [tries]'); process.exit(1); }
 }
