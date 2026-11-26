@@ -1963,6 +1963,32 @@
     "stopCheckedAt": "2026-11-26T20:01:37.000Z",
     "brokerStop": 0.66348,
     "closedAt": "2026-11-26T20:33:14.000Z"
+   },
+   "eqx:fade:eurusd:fade-m15-b1795732200": {
+    "positionId": "51647664",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 1500000,
+    "lots": 0.15,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T22:33:02.000Z",
+    "councilEntry": 1.09674,
+    "stop": 1.096581,
+    "t1": 1.097057,
+    "riskCash": 4.27,
+    "margin": 32.91,
+    "mark": 1.09686,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09691,
+    "slipR": 1.069,
+    "lagSec": 182,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T22:33:02.000Z",
+    "brokerStop": 1.09663
    }
   },
   "day": {
@@ -1971,16 +1997,17 @@
    "lastBalance": 426.94,
    "ids": [
     "51608452",
-    "51644179"
+    "51644179",
+    "51647664"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 426.94 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 426.94 · 3 open",
   "skipped": {
    "eqx:fade:usdjpy:fade-m15-b1795725000": "stop distance 0.017643 sits inside the broker spread 0.02 on USDJPY: no stop could be set",
-   "eqx:fade:eurjpy:fade-m15-b1795731300": "stop distance 0.026286 sits inside the broker spread 0.196 on EURJPY: no stop could be set"
+   "eqx:fade:usdjpy:fade-m15-b1795732200": "USDJPY: 0.44 lot would use 88.00 margin, over 20% of the balance"
   },
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2010,19 +2037,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 426.94,
-  "lastRun": "2026-11-26T22:30:52.000Z"
+  "lastRun": "2026-11-26T22:33:41.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T16:11:38.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28094.76 -> 28224.71 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
-  {
-   "at": "2026-11-11T16:46:30.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 28224.71 -> 28244.53 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T17:20:20.000Z",
    "msg": "moved NAS100 48212677 protection: stop 28244.53 -> 28295.19 (council ict-A)",
@@ -3502,6 +3519,16 @@
    "at": "2026-11-26T22:17:49.000Z",
    "msg": "not mirrored eqx:fade:eurjpy:fade-m15-b1795731300: stop distance 0.026286 sits inside the broker spread 0.196 on EURJPY: no stop could be set",
    "trade": "eqx:fade:eurjpy:fade-m15-b1795731300"
+  },
+  {
+   "at": "2026-11-26T22:32:28.000Z",
+   "msg": "not mirrored eqx:fade:usdjpy:fade-m15-b1795732200: USDJPY: 0.44 lot would use 88.00 margin, over 20% of the balance",
+   "trade": "eqx:fade:usdjpy:fade-m15-b1795732200"
+  },
+  {
+   "at": "2026-11-26T22:33:02.000Z",
+   "msg": "opened buy EURUSD 0.15 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795732200"
   }
  ],
  "limits": {
@@ -3606,11 +3633,11 @@
   ]
  },
  "execution": {
-  "n": 37,
-  "meanSlipR": 0.161,
-  "medianSlipR": 0.121,
+  "n": 38,
+  "meanSlipR": 0.185,
+  "medianSlipR": 0.157,
   "worstSlipR": 1.352,
-  "medianLagSec": 51.5,
+  "medianLagSec": 60,
   "bySymbol": {
    "GBPUSD": {
     "n": 5,
@@ -3625,8 +3652,8 @@
     "meanSlipR": 0.196
    },
    "EURUSD": {
-    "n": 3,
-    "meanSlipR": 0.609
+    "n": 4,
+    "meanSlipR": 0.724
    },
    "XAUUSD": {
     "n": 1,
