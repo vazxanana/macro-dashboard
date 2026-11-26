@@ -1829,6 +1829,80 @@
     ],
     "stopCheckedAt": "2026-11-26T18:35:26.000Z",
     "brokerStop": 0.66357
+   },
+   "eqx:fade:eurjpy:fade-m15-b1795720500": {
+    "positionId": "51642523",
+    "symbol": "EURJPY",
+    "side": "buy",
+    "volume": 1800000,
+    "lots": 0.18,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T19:16:39.000Z",
+    "councilEntry": 174.716,
+    "stop": 174.675643,
+    "t1": 174.796714,
+    "riskCash": 4.68,
+    "margin": 39.5,
+    "fillPrice": 174.709,
+    "slipR": -0.173,
+    "lagSec": 99,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T19:16:39.000Z",
+    "brokerStop": 174.669
+   },
+   "eqx:fade:usdcad:fade-m15-s1795720500": {
+    "positionId": "51642524",
+    "symbol": "USDCAD",
+    "side": "sell",
+    "volume": 2400000,
+    "lots": 0.24,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-26T19:16:39.000Z",
+    "councilEntry": 1.42486,
+    "stop": 1.425209,
+    "t1": 1.424163,
+    "riskCash": 4.68,
+    "margin": 48,
+    "mark": 1.42494,
+    "levelsFrom": "mark",
+    "fillPrice": 1.42495,
+    "slipR": -0.258,
+    "lagSec": 99,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T19:16:39.000Z",
+    "brokerStop": 1.42522
+   },
+   "eqx:fvg:usdjpy:fvg-h1-b1795712400-1795720500": {
+    "positionId": "51642525",
+    "symbol": "USDJPY",
+    "side": "buy",
+    "volume": 1500000,
+    "lots": 0.15,
+    "digits": 3,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-26T19:16:39.000Z",
+    "councilEntry": 159.267,
+    "stop": 159.218557,
+    "t1": 159.315443,
+    "riskCash": 4.68,
+    "margin": 30,
+    "fillPrice": 159.267,
+    "slipR": 0,
+    "lagSec": 99,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T19:16:39.000Z",
+    "brokerStop": 159.219
    }
   },
   "day": {
@@ -1837,13 +1911,16 @@
    "lastBalance": 467.65,
    "ids": [
     "51608452",
-    "51640396"
+    "51640396",
+    "51642523",
+    "51642524",
+    "51642525"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 467.65 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 467.65 · 5 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -1873,24 +1950,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 467.65,
-  "lastRun": "2026-11-26T19:15:07.000Z"
+  "lastRun": "2026-11-26T19:18:24.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T06:51:42.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 27922.96 -> 27949.39 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
-  {
-   "at": "2026-11-11T08:40:51.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 27949.39 -> 27975.82 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
-  {
-   "at": "2026-11-11T08:54:36.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 27975.82 -> 27995.65 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T10:28:18.000Z",
    "msg": "moved NAS100 48212677 protection: stop 27995.65 -> 28000.05 (council ict-A)",
@@ -3365,6 +3427,21 @@
    "at": "2026-11-26T18:35:26.000Z",
    "msg": "opened sell AUDUSD 0.1 lot (council eqx-fvg)",
    "trade": "eqx:fvg:audusd:fvg-h1-s1795712400-1795717800"
+  },
+  {
+   "at": "2026-11-26T19:16:39.000Z",
+   "msg": "opened buy EURJPY 0.18 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurjpy:fade-m15-b1795720500"
+  },
+  {
+   "at": "2026-11-26T19:16:39.000Z",
+   "msg": "opened sell USDCAD 0.24 lot (council eqx-fade)",
+   "trade": "eqx:fade:usdcad:fade-m15-s1795720500"
+  },
+  {
+   "at": "2026-11-26T19:16:39.000Z",
+   "msg": "opened buy USDJPY 0.15 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdjpy:fvg-h1-b1795712400-1795720500"
   }
  ],
  "limits": {
@@ -3460,11 +3537,11 @@
   ]
  },
  "execution": {
-  "n": 32,
-  "meanSlipR": 0.198,
-  "medianSlipR": 0.205,
+  "n": 35,
+  "meanSlipR": 0.169,
+  "medianSlipR": 0.193,
   "worstSlipR": 1.352,
-  "medianLagSec": 39,
+  "medianLagSec": 42,
   "bySymbol": {
    "GBPUSD": {
     "n": 5,
@@ -3475,8 +3552,8 @@
     "meanSlipR": 0.076
    },
    "USDJPY": {
-    "n": 3,
-    "meanSlipR": 0.262
+    "n": 4,
+    "meanSlipR": 0.196
    },
    "EURUSD": {
     "n": 3,
@@ -3487,12 +3564,12 @@
     "meanSlipR": 0.193
    },
    "USDCAD": {
-    "n": 5,
-    "meanSlipR": 0.258
+    "n": 6,
+    "meanSlipR": 0.172
    },
    "EURJPY": {
-    "n": 4,
-    "meanSlipR": -0.209
+    "n": 5,
+    "meanSlipR": -0.202
    },
    "AUDUSD": {
     "n": 3,
