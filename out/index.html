@@ -8217,7 +8217,7 @@ function msNextSetup(bars, A) {
   // candles of room on the right) instead of all its candles squeezed into the width. Display only.
   const TV_GRID = { light: '#f0f3fa', dark: 'rgba(255,255,255,0.045)', midnight: 'rgba(255,255,255,0.05)', pro: 'rgba(255,255,255,0.045)' };
   const tvLook = (t, k) => ({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text, fontSize: 12 },
-    grid: { vertLines: { visible: true, color: TV_GRID[k] || TV_GRID.dark }, horzLines: { visible: true, color: TV_GRID[k] || TV_GRID.dark } },
+    grid: { vertLines: { visible: false, color: TV_GRID[k] || TV_GRID.dark }, horzLines: { visible: false, color: TV_GRID[k] || TV_GRID.dark } },   // no grid lines (owner, 26 Nov 2026: "the white grids I want them out")
     crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: '#9598a1', width: 1, style: LW.LineStyle.LargeDashed, labelBackgroundColor: '#131722' }, horzLine: { color: '#9598a1', width: 1, style: LW.LineStyle.LargeDashed, labelBackgroundColor: '#131722' } },
     rightPriceScale: { borderVisible: true, borderColor: t.border }, timeScale: { borderVisible: true, borderColor: t.border, rightOffset: 8, minBarSpacing: 0.5 },
     kineticScroll: { mouse: true, touch: true }, handleScale: { axisPressedMouseMove: { time: true, price: true }, mouseWheel: true, pinch: true } });
@@ -8239,7 +8239,7 @@ function msNextSetup(bars, A) {
   const chartLight = window.msChartLight = () => hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light';
   // a chart with its own background: that colour, an ink that reads on it, and the light grid on a light one
   const cusLook = (chart) => { if (!chart || !hexOk(CUS.bg)) return; const lt = lumOf(CUS.bg) > 0.35; try { chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lt ? '#3b4252' : '#a7b0c2' },
-    grid: { vertLines: { color: lt ? '#e9ecf1' : TV_GRID.dark }, horzLines: { color: lt ? '#e9ecf1' : TV_GRID.dark } }, rightPriceScale: { borderColor: lt ? '#d9dde4' : '#273042' }, timeScale: { borderColor: lt ? '#d9dde4' : '#273042' } }); } catch (e) {} };
+    grid: { vertLines: { visible: false, color: lt ? '#e9ecf1' : TV_GRID.dark }, horzLines: { visible: false, color: lt ? '#e9ecf1' : TV_GRID.dark } }, rightPriceScale: { borderColor: lt ? '#d9dde4' : '#273042' }, timeScale: { borderColor: lt ? '#d9dde4' : '#273042' } }); } catch (e) {} };
   const candleCols = () => { const K = themeCols(); if (CUS.mono && CUS.up === PAPER.up && CUS.dn === PAPER.dn) return MONO; if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
     const u = hexOk(CUS.up) ? CUS.up : K.upColor, d = hexOk(CUS.dn) ? CUS.dn : K.downColor;
     return { upColor: u, downColor: d, borderUpColor: u, borderDownColor: d, wickUpColor: u, wickDownColor: d }; };

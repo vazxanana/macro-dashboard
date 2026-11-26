@@ -2646,6 +2646,7 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   its chart, so every chart came out about a quarter of the window. It now reads the pane with the least around its chart, and the big chart is
   `--ch-h2` (two charts and the gap) tall. "Log a call" and "Structure" are icons at 1180-1439 px and "Log a call" up to 1799 px (they wrapped
   the toolbar to a second row).
+- **No grid lines** (26 Nov 2026, owner: "the white grids I want them out"): `tvLook` and `cusLook` draw the charts without grid lines (panes, the free chart, Markets side by side).
 - **Market switch without the wait** (26 Nov 2026, the next step toward a main chart app): a market link (`a[href^="?s="]`, the watchlist, the
   market list, Home, the wheel bar through `window.msGoMarket(k, hash)`) still loads the page again (so every stream, level and record belongs to
   the new market), but `<script id="ms-swap-js">` reads that market's candles for the six analysed timeframes while the pointer rests on the link
