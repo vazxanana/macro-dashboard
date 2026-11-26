@@ -338,14 +338,20 @@ export function buildDesk(name, perMarket, prev, now, days, fromT = null) {
   return { v: 1, desk: name, at: new Date(now * 1000).toISOString(), markets: [...new Set(records.map((r) => r.market || 'xau'))], read, feed: 'OANDA', through, days,
     since: records.length ? records[records.length - 1].t : null, counts: { n: s.n, closed: s.closed, open: s.open, live: records.filter((r) => r.src === 'live').length }, note: DESKS[name].note, records };
 }
-export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SOP.DAYS, only = null, from = null, get = fetch } = {}) {
+// the 5-minute candle now forming (--live; council/edge-desks-2.mjs `withLive`): any failure = none, and the run is as before
+export async function liveBar(m, now, get = fetch) {
+  try { const r = await get(`${(process.env.MD_BASE || 'https://aureumdesk.co.uk/md/').replace(/\/?$/, '/')}bars?sym=${m}&tf=5m&n=3`, { signal: AbortSignal.timeout(8000) }); if (!r.ok) return null;
+    const j = await r.json(); return (j.bars || j || []).find((b) => b.time <= now && now < b.time + 300) || null; } catch { return null; }
+}
+export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SOP.DAYS, only = null, from = null, get = fetch, live = false } = {}) {
   const out = {}, want = only ? String(only).split(',').map((x) => x.trim()).filter(Boolean) : null, cache = new Map();
   // one read of a market's candles serves every desk of the run (the passing-edge desks all read the same 5-minute candles)
   const read = (tf, m, d) => { const key = `${m}|${tf}|${d}`; if (!cache.has(key)) cache.set(key, bars(tf, now, get, d, m)); return cache.get(key); };
+  const lives = new Map(), liveOf = (m) => { if (!lives.has(m)) lives.set(m, liveBar(m, now, get)); return lives.get(m); };
   for (const name of Object.keys(DESKS)) { if (want && !want.includes(name)) continue;
     let prev = null; try { prev = readDesk(dir, name); } catch (e) { console.log(e.message); continue; }   // the logs live in <name>/detail/ (council/desk-store.mjs)
     const per = [];
-    for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await read(tf, m, days + ((DESKS[name].extra || {})[tf] || 0)); per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
+    for (const m of DESKS[name].markets) { try { const B = {}; for (const tf of DESKS[name].tfs) B[tf] = await read(tf, m, days + ((DESKS[name].extra || {})[tf] || 0)); if (live) { const L = await liveOf(m); if (L) B.live5 = L; } per.push([m, B]); } catch (e) { console.log(`${name} desk: ${m} skipped (${e && e.message || e})`); } }
     if (!per.length) { console.log(`${name} desk: no candles, file left as it is`); continue; }
     const o = out[name] = buildDesk(name, per, prev, now, days, from);
     writeDesk(dir, name, o);
@@ -353,4 +359,4 @@ export async function main(dir, { now = Math.floor(Date.now() / 1000), days = SO
   return out;
 }
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) { const a = process.argv, arg = (k) => (a.includes(k) ? a[a.indexOf(k) + 1] : null);
-  main(a[2] || 'data', { days: Math.min(365, Math.max(SOP.DAYS, +(arg('--days') || process.env.DESK_DAYS) || SOP.DAYS)), only: arg('--only'), from: arg('--from') ? Date.parse(arg('--from') + 'T00:00:00Z') / 1000 : null }).catch((e) => { console.error('Edge desks failed: ' + (e && e.message || e)); process.exit(1); }); }
+  main(a[2] || 'data', { days: Math.min(365, Math.max(SOP.DAYS, +(arg('--days') || process.env.DESK_DAYS) || SOP.DAYS)), only: arg('--only'), live: a.includes('--live'), from: arg('--from') ? Date.parse(arg('--from') + 'T00:00:00Z') / 1000 : null }).catch((e) => { console.error('Edge desks failed: ' + (e && e.message || e)); process.exit(1); }); }

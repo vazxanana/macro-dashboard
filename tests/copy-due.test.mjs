@@ -30,7 +30,7 @@ test('the council loop runs the copied desks and the mirror between quick passes
   const y = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   assert.match(y, /fastcopy\(\) \{/);
   assert.match(y, /nap; fastcopy "wait \$i"; nap; fastcopy "wait \$i"; nap/);
-  assert.match(y, /nap\(\) \{ b=\$\(\( 300 - \( \$\(date \+%s\) - 4 \) % 300 \)\)/, 'wakes 4 s after a 5-minute close');
+  assert.match(y, /nap\(\) \{ b=\$\(\( 300 - \( \$\(date \+%s\) - 2 \) % 300 \)\)/, 'wakes 2 s after a 5-minute close');
   assert.ok(!/for k in 1 2 3 4; do sleep 60/.test(y));
   assert.ok((y.match(/^\s+fastcopy "round \$i"$/gm) || []).length >= 4, 'between the heavy members of a round');
 });
