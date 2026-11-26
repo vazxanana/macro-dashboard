@@ -6240,7 +6240,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "replica",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-25T23:14:23.000Z",
     "councilEntry": 3570.38,
     "stop": 3591.54,
@@ -6254,10 +6254,12 @@
     "slipR": -0.03,
     "lagSec": 41,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-25T23:14:23.000Z",
-    "brokerStop": 3592.18
+    "brokerStop": 3592.18,
+    "closedAt": "2026-11-26T02:35:19.000Z"
    },
    "boxfade:nzdusd:boxfade-m5-s1795647900": {
     "positionId": "51559862",
@@ -6397,16 +6399,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12430.93,
+   "lastBalance": 12409.64,
    "ids": [
-    "51559058",
     "51567439"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12430.93 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12409.64 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6414,15 +6415,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12430.93,
-  "lastRun": "2026-11-26T02:32:49.000Z"
+  "balance": 12409.64,
+  "lastRun": "2026-11-26T02:35:19.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet eth-replica-1794414289-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "eth-replica-1794414289-b"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet gbpusd-replica-1794415489-s: daily loss stop (44.6% down today) (will retry)",
@@ -7911,6 +7907,11 @@
    "at": "2026-11-26T01:37:15.000Z",
    "msg": "GBPUSD position 51567440 closed at the broker",
    "trade": "boxfade:gbpusd:boxfade-m5-s1795654800"
+  },
+  {
+   "at": "2026-11-26T02:35:19.000Z",
+   "msg": "XAUUSD position 51559058 closed at the broker",
+   "trade": "xau-replica-1795648422-s"
   }
  ],
  "limits": {
