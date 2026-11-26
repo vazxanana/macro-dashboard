@@ -6459,7 +6459,7 @@
     "lots": 3.48,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T04:38:09.000Z",
     "councilEntry": 0.83171,
     "stop": 0.831285,
@@ -6472,25 +6472,26 @@
     "slipR": 0.329,
     "lagSec": 1389,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T04:38:09.000Z",
-    "brokerStop": 0.83124
+    "brokerStop": 0.83124,
+    "closedAt": "2026-11-26T04:55:12.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 12864.95,
+   "lastBalance": 12945.48,
    "ids": [
-    "51571061",
-    "51573230"
+    "51571061"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12864.95 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12945.48 · 1 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6498,15 +6499,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 12864.95,
-  "lastRun": "2026-11-26T04:52:44.000Z"
+  "balance": 12945.48,
+  "lastRun": "2026-11-26T04:55:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:36:49.000Z",
-   "msg": "not mirrored yet xrp-replica-1794418549-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "xrp-replica-1794418549-s"
-  },
   {
    "at": "2026-11-11T18:10:43.000Z",
    "msg": "not mirrored yet usdchf-replica-1794420582-s: daily loss stop (44.6% down today) (will retry)",
@@ -7994,6 +7990,11 @@
   {
    "at": "2026-11-26T04:38:09.000Z",
    "msg": "opened buy USDCHF 3.48 lot (council boxfade)",
+   "trade": "boxfade:usdchf:boxfade-m5-b1795666500"
+  },
+  {
+   "at": "2026-11-26T04:55:12.000Z",
+   "msg": "USDCHF position 51573230 closed at the broker",
    "trade": "boxfade:usdchf:boxfade-m5-b1795666500"
   }
  ],
