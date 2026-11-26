@@ -125,6 +125,7 @@ export const FILES = [
   { file: 'lyriac/desk.json', label: 'Lyriac desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'jpyvb/desk.json', label: 'USD/JPY breakout desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'nq1/desk.json', label: 'NQ1 desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
+  { file: 'nq2/desk.json', label: 'NQ2 desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'zero/desk.json', label: 'ZERO desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'dom/desk.json', label: 'DOM zone desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
   { file: 'eg/desk.json', label: 'Engulfing desk trades', every: 'every 3rd round (~35 min)', at: (j) => j.at, warn: 6 * H, bad: 72 * H, check: deskCheck },
