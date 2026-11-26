@@ -1395,7 +1395,7 @@
     "lots": 0.1,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T03:59:29.000Z",
     "councilEntry": 1.42232,
     "stop": 1.422786,
@@ -1408,10 +1408,12 @@
     "slipR": 0.451,
     "lagSec": 1769,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T03:59:29.000Z",
-    "brokerStop": 1.42279
+    "brokerStop": 1.42279,
+    "closedAt": "2026-11-26T06:34:22.000Z"
    },
    "eqx:fade:usdchf:fade-m15-s1795662900": {
     "positionId": "51571438",
@@ -1471,16 +1473,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 468.71,
+   "lastBalance": 463.4,
    "ids": [
-    "51567422",
-    "51571436"
+    "51567422"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 468.71 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 463.4 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:nzdusd:fvg-h1-b1795633200-1795641300": {
@@ -1494,24 +1495,24 @@
     "at": "2026-11-25T21:44:17.000Z"
    },
    "eqx:fade:usdcad:fade-m15-s1795673700": {
-    "why": "daily loss stop (2.7% down today)",
+    "why": "daily loss stop (3.8% down today)",
     "n": 0,
-    "at": "2026-11-26T06:31:48.000Z"
+    "at": "2026-11-26T06:34:22.000Z"
    },
    "eqx:fade:audusd:fade-m15-b1795673700": {
-    "why": "daily loss stop (2.7% down today)",
+    "why": "daily loss stop (3.8% down today)",
     "n": 0,
-    "at": "2026-11-26T06:31:48.000Z"
+    "at": "2026-11-26T06:34:22.000Z"
    },
    "eqx:fade:eurusd:fade-m15-s1795673700": {
-    "why": "daily loss stop (2.7% down today)",
+    "why": "daily loss stop (3.8% down today)",
     "n": 0,
-    "at": "2026-11-26T06:31:48.000Z"
+    "at": "2026-11-26T06:34:22.000Z"
    },
    "eqx:fvg:eurusd:fvg-h1-s1795669200-1795673700": {
-    "why": "daily loss stop (2.7% down today)",
+    "why": "daily loss stop (3.8% down today)",
     "n": 0,
-    "at": "2026-11-26T06:31:48.000Z"
+    "at": "2026-11-26T06:34:22.000Z"
    }
   },
   "paused": {},
@@ -1519,35 +1520,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 468.71,
-  "lastRun": "2026-11-26T06:31:48.000Z"
+  "balance": 463.4,
+  "lastRun": "2026-11-26T06:34:22.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T21:22:42.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 21:30 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T21:31:25.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T21:32:20.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 21:41 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T21:41:38.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
-  {
-   "at": "2026-11-08T21:43:49.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 21:51 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T21:52:40.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -3011,6 +2987,31 @@
   {
    "at": "2026-11-26T06:31:48.000Z",
    "msg": "not mirrored yet eqx:fvg:eurusd:fvg-h1-s1795669200-1795673700: daily loss stop (2.7% down today) (will retry)",
+   "trade": "eqx:fvg:eurusd:fvg-h1-s1795669200-1795673700"
+  },
+  {
+   "at": "2026-11-26T06:34:22.000Z",
+   "msg": "USDCAD position 51571436 closed at the broker",
+   "trade": "eqx:fade:usdcad:fade-m15-s1795663800"
+  },
+  {
+   "at": "2026-11-26T06:34:22.000Z",
+   "msg": "not mirrored yet eqx:fade:usdcad:fade-m15-s1795673700: daily loss stop (3.8% down today) (will retry)",
+   "trade": "eqx:fade:usdcad:fade-m15-s1795673700"
+  },
+  {
+   "at": "2026-11-26T06:34:22.000Z",
+   "msg": "not mirrored yet eqx:fade:audusd:fade-m15-b1795673700: daily loss stop (3.8% down today) (will retry)",
+   "trade": "eqx:fade:audusd:fade-m15-b1795673700"
+  },
+  {
+   "at": "2026-11-26T06:34:22.000Z",
+   "msg": "not mirrored yet eqx:fade:eurusd:fade-m15-s1795673700: daily loss stop (3.8% down today) (will retry)",
+   "trade": "eqx:fade:eurusd:fade-m15-s1795673700"
+  },
+  {
+   "at": "2026-11-26T06:34:22.000Z",
+   "msg": "not mirrored yet eqx:fvg:eurusd:fvg-h1-s1795669200-1795673700: daily loss stop (3.8% down today) (will retry)",
    "trade": "eqx:fvg:eurusd:fvg-h1-s1795669200-1795673700"
   }
  ],
