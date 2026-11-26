@@ -1614,7 +1614,7 @@
     "lots": 0.17,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T14:01:39.000Z",
     "councilEntry": 0.54824,
     "stop": 0.548496,
@@ -1625,10 +1625,12 @@
     "slipR": 0.391,
     "lagSec": 99,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T14:01:39.000Z",
-    "brokerStop": 0.5484
+    "brokerStop": 0.5484,
+    "closedAt": "2026-11-26T14:11:11.000Z"
    },
    "eqx:fade:audusd:fade-m15-s1795701600": {
     "positionId": "51599864",
@@ -1638,7 +1640,7 @@
     "lots": 0.14,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T14:01:39.000Z",
     "councilEntry": 0.66373,
     "stop": 0.664046,
@@ -1651,27 +1653,27 @@
     "slipR": 0.665,
     "lagSec": 99,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T14:01:39.000Z",
-    "brokerStop": 0.66385
+    "brokerStop": 0.66385,
+    "closedAt": "2026-11-26T14:11:11.000Z"
    }
   },
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 459.05,
+   "lastBalance": 449.17,
    "ids": [
     "51597661",
-    "51599860",
-    "51599861",
-    "51599864"
+    "51599860"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 459.05 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 449.17 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:nzdusd:fvg-h1-b1795633200-1795641300": {
@@ -1700,20 +1702,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 459.05,
-  "lastRun": "2026-11-26T14:05:58.000Z"
+  "balance": 449.17,
+  "lastRun": "2026-11-26T14:11:11.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-09T15:53:42.000Z",
-   "msg": "moved US500 47417910 protection: stop 7423.25 -> 7459.25 (council ict-A+)",
-   "trade": "ict:es-b-1794182400"
-  },
-  {
-   "at": "2026-11-09T16:31:29.000Z",
-   "msg": "moved US500 47417910 protection: stop 7459.25 -> 7474.25 (council ict-A+)",
-   "trade": "ict:es-b-1794182400"
-  },
   {
    "at": "2026-11-09T17:44:43.000Z",
    "msg": "moved US500 47417910 protection: stop 7474.25 -> 7486.25 (council ict-A+)",
@@ -3192,6 +3184,16 @@
   {
    "at": "2026-11-26T14:01:39.000Z",
    "msg": "opened sell AUDUSD 0.14 lot (council eqx-fade)",
+   "trade": "eqx:fade:audusd:fade-m15-s1795701600"
+  },
+  {
+   "at": "2026-11-26T14:11:11.000Z",
+   "msg": "NZDUSD position 51599861 closed at the broker",
+   "trade": "eqx:fade:nzdusd:fade-m15-s1795701600"
+  },
+  {
+   "at": "2026-11-26T14:11:11.000Z",
+   "msg": "AUDUSD position 51599864 closed at the broker",
    "trade": "eqx:fade:audusd:fade-m15-s1795701600"
   }
  ],
