@@ -132,11 +132,11 @@ jobs:
           # fast copy (26 Nov 2026, owner: "More speed"): the copied Equinox desks are read again (about 6 s) and, only when one holds
           # a fill first written in the last 3 minutes (council/copy-due.mjs, read only), the mirror runs at once. Called every 20 s
           # between quick passes and between a round's heavy members; it never fails the loop and is saved by the next save.
-          fastcopy() { timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb >/dev/null 2>&1 || echo "Copied desks ($1) failed"
+          fastcopy() { timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live >/dev/null 2>&1 || echo "Copied desks ($1) failed"
             if timeout 15 node council/copy-due.mjs data; then timeout 120 node council/ctrader-mirror.mjs data || echo "cTrader mirror fast copy ($1) failed"; fi; }
-          # nap (26 Nov 2026, owner: "More speed" again): 20 s, or less when a 5-minute candle closes sooner: it wakes 4 s after the
+          # nap (26 Nov 2026, owner: "More speed" again): 20 s, or less when a 5-minute candle closes sooner: it wakes 2 s after the
           # close, the moment a desk fill can first be read, so a copy goes out seconds after the candle instead of up to 20 s later.
-          nap() { b=$(( 300 - ( $(date +%s) - 4 ) % 300 )); if [ "$b" -lt 20 ]; then sleep "$b"; else sleep 20; fi; }
+          nap() { b=$(( 300 - ( $(date +%s) - 2 ) % 300 )); if [ "$b" -lt 20 ]; then sleep "$b"; else sleep 20; fi; }
           for i in $(seq 1 $ROUNDS); do
             # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
             # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
@@ -149,7 +149,7 @@ jobs:
             # entries"): read every round and every quick pass, BEFORE the Trader and the mirror, so a desk fill reaches its demo
             # account within about a minute (they were read every 3rd round, and the copies went out 17 to 42 minutes late). Paper
             # records only; about 6 s a run.
-            timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb || echo "Copied desks round $i failed"
+            timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live || echo "Copied desks round $i failed"
             node council/trader.mjs data || echo "Trader round $i failed"
             # cTrader DEMO mirror (8 Nov, owner: "when he places a trade it must go instantly on ctrader"): the very next step after
             # the Trader, so a council fill or pending order reaches the demo within seconds of being recorded; nothing runs in between
@@ -231,7 +231,7 @@ jobs:
                 # markets again and the mirror copies what it recorded, so a setup reaches cTrader within about a minute. The heavy
                 # members keep the 5-minute round. Saved as its own commit; a failure never stops the loop.
                 node council/datasync.mjs data pull || true
-                timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb || echo "Copied desks quick pass $i failed"
+                timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live || echo "Copied desks quick pass $i failed"
                 node council/trader.mjs data || echo "Trader quick pass $i failed"
                 node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
                 timeout 45 node council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"

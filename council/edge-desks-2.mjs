@@ -56,6 +56,15 @@ const pre = (m) => (m === 'xau' ? '' : m + ':');
 
 // the desk's candles ({ time, open, high, low, close }) in the studies' shape ({ t, o, h, l, c, e })
 export const toK = (B) => (B || []).map((b) => ({ t: b.time, o: +b.open, h: +b.high, l: +b.low, c: +b.close, e: b.time + 300 }));
+// The forming 5-minute candle (26 Nov 2026, owner: "More faster"): a market entry fills at the OPEN of the candle after the
+// signal, and the desks read closed candles only, so a fill was seen 5 minutes late (when its own candle had closed) and its
+// demo copy with it. With `B.live5` (edge-desks.mjs --live: the candle now forming, straight after the last closed one) the fill
+// is read as soon as that candle opens. Signals still come from CLOSED candles only: the forming candle is never in frames()
+// or a study's signal code as a closed candle; it only gives the fill and what price has done since (a stop or target it has
+// already traded; never a time exit, which waits for the close). Without `live5` everything is as before.
+export const withLive = (B, M5) => { const L = B && B.live5, last = M5[M5.length - 1];
+  return L && last && +L.time === last.t + 300 && [L.open, L.high, L.low, L.close].every((x) => Number.isFinite(+x) && +x > 0)
+    ? M5.concat({ t: +L.time, o: +L.open, h: +L.high, l: +L.low, c: +L.close, e: +L.time + 300, live: true }) : M5; };
 
 // one position from its fill with ONE target, exactly the order of checks of the studies' exits() / manage(): after the fill candle
 // an open beyond the stop exits at the open, an open beyond the target exits at the open; then the stop, then the target (on the
@@ -70,7 +79,7 @@ export function walk(M5, s, fi, fill, stop, tgt, deadline, firstFull = true) {
     const low = s > 0 ? b.l : b.h, high = s > 0 ? b.h : b.l;
     if (s * (low - stop) <= 0) return done('stopped', stop);
     if (!(first && !firstFull)) { if (tgt != null && s * (high - tgt) >= 0) return done('target', tgt); mfe = Math.max(mfe, (s * (high - fill)) / risk); }
-    if (b.e >= deadline) return done('time', b.c); }
+    if (b.e >= deadline && !b.live) return done('time', b.c); }
   const last = M5[M5.length - 1];
   return { status: 'open', exit: null, R: null, endT: null, mfe, float: last ? (s * (last.c - fill)) / risk : null };
 }
@@ -95,13 +104,14 @@ const uniq = () => { const seen = new Map(); return (id) => { const n = (seen.ge
 export const FADE_CELL = { tf: 1, cx: 0, st: 1, rr: 2 };
 export function fadeTrades(B, { from, market = 'xau' } = {}) {
   const M5 = toK(B['5m']); if (!M5.length) return [];
+  const MF = withLive(B, M5);
   const F = frames(M5), cost = COSTS[market], f = fx(market), out = [], id = uniq(), cap = FADE.CAP[FADE.TFS[FADE_CELL.tf]];
   for (const g of FADE.signals(F)) { if (g.tf !== FADE_CELL.tf || g.cx !== FADE_CELL.cx) continue;
-    const fi = startIdx(M5, g.ts); if (fi >= M5.length || !inWin(M5[fi].t, from)) continue;
-    const fill = M5[fi].o, s = -g.d, stop = fill + g.d * g.a, risk = s * (fill - stop);
+    const fi = startIdx(MF, g.ts); if (fi >= MF.length || !inWin(MF[fi].t, from)) continue;
+    const fill = MF[fi].o, s = -g.d, stop = fill + g.d * g.a, risk = s * (fill - stop);
     if (!(risk > 0) || risk < cost) continue;
     const T = F['15m'][g.j];
-    const r = rec('fade', market, { idTail: id(`m15-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: 'fade-m15', label: 'Fade of an M15 break', h: '15m', s, M5, fi, fill, stop, tgt: fill + s * FADE_CELL.rr * risk, cap,
+    const r = rec('fade', market, { idTail: id(`m15-${s > 0 ? 'b' : 's'}${MF[fi].t}`), kind: 'fade-m15', label: 'Fade of an M15 break', h: '15m', s, M5: MF, fi, fill, stop, tgt: fill + s * FADE_CELL.rr * risk, cap,
       log: [{ t: g.ts, text: `An M15 candle closed ${g.d > 0 ? 'above the last swing high' : 'below the last swing low'} (a structure break ${word(g.d)}, 3 candles a side). The rule fades it: ${word(s)} at the next 5-minute open, the stop 1 ATR(14) of M15 (${f(g.a)}) from the fill, 2R.` }],
       marks: [{ kind: 'zone', top: T.h, bot: T.l, a: T.t, at: g.ts, label: 'M15 break candle' }] });
     if (r) out.push(r); }
@@ -112,14 +122,15 @@ export function fadeTrades(B, { from, market = 'xau' } = {}) {
 export const BIG_CELL = { tf: 0, k: 0, brk: false };
 export function bigTrades(B, { from, market = 'xau' } = {}) {
   const M5 = toK(B['5m']); if (!M5.length) return [];
+  const MF = withLive(B, M5);
   const F = frames(M5), cost = COSTS[market], f = fx(market), out = [], id = uniq(), cap = FADE.CAP[BIG.TFS[BIG_CELL.tf]];
   for (const g of BIG.signals(F).big) { if (g.tf !== BIG_CELL.tf || g.kmax < BIG_CELL.k || g.brk !== BIG_CELL.brk) continue;
-    const fi = startIdx(M5, g.ts); if (fi >= M5.length || !inWin(M5[fi].t, from)) continue;
-    const fill = M5[fi].o, s = -g.d, stop = g.ext + g.d * FADE.ATRK * g.a, risk = s * (fill - stop);
+    const fi = startIdx(MF, g.ts); if (fi >= MF.length || !inWin(MF[fi].t, from)) continue;
+    const fill = MF[fi].o, s = -g.d, stop = g.ext + g.d * FADE.ATRK * g.a, risk = s * (fill - stop);
     if (!(risk > 0) || risk < cost) continue;
     if (!((s * (g.mid - fill)) / risk >= 1)) continue;   // the "half" exit is a cell only when the 50 % is 1R or more away
     const T = F['15m'][g.j];
-    const r = rec('bigfade', market, { idTail: id(`m15-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: 'bigfade-m15', label: 'Fade of a big M15 candle', h: '15m', s, M5, fi, fill, stop, tgt: g.mid, cap,
+    const r = rec('bigfade', market, { idTail: id(`m15-${s > 0 ? 'b' : 's'}${MF[fi].t}`), kind: 'bigfade-m15', label: 'Fade of a big M15 candle', h: '15m', s, M5: MF, fi, fill, stop, tgt: g.mid, cap,
       log: [{ t: g.ts, text: `An M15 candle closed ${g.d > 0 ? 'up' : 'down'} with a body of ${f(Math.abs(T.c - T.o))}, over 1.5 x the ATR(14) of the candles before it (${f(g.a)}), and broke no structure the same way. The rule fades it: ${word(s)} at the next 5-minute open, the stop past its ${g.d > 0 ? 'high' : 'low'} + 0.1 ATR, the target its 50 % (${f(g.mid)}).` }],
       marks: [{ kind: 'zone', top: T.h, bot: T.l, a: T.t, at: g.ts, label: 'Big M15 candle' }, { kind: 'level', p: g.mid, a: T.t, at: g.ts, label: '50 % of the candle', under: s < 0 }] });
     if (r) out.push(r); }
@@ -129,13 +140,14 @@ export function bigTrades(B, { from, market = 'xau' } = {}) {
 // ─── roundfade: round-number-breaks, fade other 2R ───
 export function roundTrades(B, { from, market = 'xau' } = {}) {
   const M5 = toK(B['5m']); if (!M5.length || !RND.STEPS[market]) return [];
+  const MF = withLive(B, M5);
   const F = frames(M5), T = F['15m'], atr = atr14(T), cost = COSTS[market], f = fx(market), out = [], id = uniq();
   const [S, Bg] = RND.STEPS[market], ratio = Math.round(Bg / S);
   for (const ev of RND.events(T, atr, { off: 0, S, ratio })) { if (ev.type !== 'cross') continue;
-    const fi = startIdx(M5, ev.ts); if (fi >= M5.length || !inWin(M5[fi].t, from) || FADE.sessionOf(M5[fi].t) !== 2) continue;
-    const fill = M5[fi].o, s = -ev.d, stop = ev.ext + ev.d * RND.ATRK * ev.a, risk = s * (fill - stop);
+    const fi = startIdx(MF, ev.ts); if (fi >= MF.length || !inWin(MF[fi].t, from) || FADE.sessionOf(MF[fi].t) !== 2) continue;
+    const fill = MF[fi].o, s = -ev.d, stop = ev.ext + ev.d * RND.ATRK * ev.a, risk = s * (fill - stop);
     if (!(risk > 0) || risk < cost) continue;
-    const r = rec('roundfade', market, { idTail: id(`m15-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: 'roundfade-m15', label: `Fade of a round ${ev.big ? 'big' : 'small'} level`, h: '15m', s, M5, fi, fill, stop, tgt: fill + 2 * s * risk, cap: RND.CAP,
+    const r = rec('roundfade', market, { idTail: id(`m15-${s > 0 ? 'b' : 's'}${MF[fi].t}`), kind: 'roundfade-m15', label: `Fade of a round ${ev.big ? 'big' : 'small'} level`, h: '15m', s, M5: MF, fi, fill, stop, tgt: fill + 2 * s * risk, cap: RND.CAP,
       log: [{ t: ev.ts, text: `An M15 candle closed ${ev.d > 0 ? 'above' : 'below'} the round level ${f(ev.L)} (${ev.big ? 'a big' : 'a small'} round number) outside 07-17 UTC. The rule fades it: ${word(s)} at the next 5-minute open, the stop past the candle's ${ev.d > 0 ? 'high' : 'low'} + 0.1 ATR, 2R.` }],
       marks: [{ kind: 'level', p: ev.L, a: T[ev.j].t, at: ev.ts, label: 'Round level', under: s > 0 }] });
     if (r) out.push(r); }
@@ -145,14 +157,15 @@ export function roundTrades(B, { from, market = 'xau' } = {}) {
 // ─── boxfade: fade-breaks-holdout F1 (the grid6-box-in-box placebo cell: the trade mirrored) ───
 export function boxTrades(B, { from, market = 'xau' } = {}) {
   const M5 = toK(B['5m']); if (!M5.length) return [];
+  const MF = withLive(B, M5);
   const F = frames(M5), cost = COSTS[market], c = FB_CELLS.F1, f = fx(market), out = [], id = uniq(), cap = BOX.CAPS[c.ch];
   for (const sg0 of BOX.signals(F, { from, to: Infinity })) {
     if (sg0.ch !== c.ch || sg0.trig !== c.trig || sg0.sess !== c.sess) continue;
     const d = sg0.d, buf = cost / 2, ts = sg0.ts, stopR = d > 0 ? sg0.box.lo - buf : sg0.box.hi + buf;
     if (!(d * (sg0.c0 - stopR) >= 2 * cost)) continue;
-    const s = -d, sp = 2 * sg0.c0 - stopR, fi = startIdx(M5, ts); if (fi >= M5.length || !inWin(M5[fi].t, from)) continue;
-    const fill = M5[fi].o, risk = s * (fill - sp); if (!(risk > 0) || !(risk >= cost)) continue;
-    const r = rec('boxfade', market, { idTail: id(`m5-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: 'boxfade-m5', label: 'Fade of an M5 box close-out', h: '5m', s, M5, fi, fill, stop: sp, tgt: fill + s * risk, cap,
+    const s = -d, sp = 2 * sg0.c0 - stopR, fi = startIdx(MF, ts); if (fi >= MF.length || !inWin(MF[fi].t, from)) continue;
+    const fill = MF[fi].o, risk = s * (fill - sp); if (!(risk > 0) || !(risk >= cost)) continue;
+    const r = rec('boxfade', market, { idTail: id(`m5-${s > 0 ? 'b' : 's'}${MF[fi].t}`), kind: 'boxfade-m5', label: 'Fade of an M5 box close-out', h: '5m', s, M5: MF, fi, fill, stop: sp, tgt: fill + s * risk, cap,
       log: [{ t: ts, text: `An M5 box (${f(sg0.box.lo)} to ${f(sg0.box.hi)}) closed out ${d > 0 ? 'up' : 'down'}, the same way as the last H1 box close-out, outside 07-17 UTC. The rule fades it: ${word(s)} at the next 5-minute open, the stop the box's stop mirrored around that close, 1R.` }],
       marks: [{ kind: 'zone', top: sg0.box.hi, bot: sg0.box.lo, a: ts - 300, at: ts, label: 'M5 box' }] });
     if (r) out.push(r); }
@@ -170,13 +183,16 @@ export function fvgTrades(B, { from, market = 'xau' } = {}) {
   const M5 = toK(B['5m']), med = fvgMedians()[market]; if (!M5.length || !med) return [];
   const cost = COSTS[market], f = fx(market), out = [], id = uniq(), g1 = FVG.GTF.indexOf('1h'), cap = FVG.CAP['1h'];
   const G = K.resample(M5, 3600);
-  for (const sg0 of FVG.signals(M5, market, med).sigs) {
+  // with a forming candle: the study's signal code is run once more with it as the last candle, and ONLY a fill on that candle
+  // is taken from that run (a test compares it with the same run once the candle has closed)
+  const MF = withLive(B, M5), sigs = FVG.signals(M5, market, med).sigs.concat(MF === M5 ? [] : FVG.signals(MF, market, med).sigs.filter((x) => x.fi === MF.length - 1 && x.et <= MF[x.fi].t));
+  for (const sg0 of sigs) {
     if (sg0.ctl || sg0.g !== g1 || sg0.kind !== 0 || !sg0.large) continue;
-    if (!inWin(M5[sg0.fi].t, from)) continue;
+    if (!inWin(MF[sg0.fi].t, from)) continue;
     const risk = sg0.s * (sg0.fill - sg0.stop); if (!(risk > 0) || risk < cost) continue;
     const gi = G.findIndex((x) => x.e === sg0.bt), gc = gi >= 2 ? [G[gi - 2], G[gi]] : null;
     const top = gc ? (sg0.s > 0 ? gc[1].l : gc[0].l) : null, bot = gc ? (sg0.s > 0 ? gc[0].h : gc[1].h) : null;
-    const r = rec('fvg', market, { idTail: id(`h1-${sg0.s > 0 ? 'b' : 's'}${sg0.bt}-${M5[sg0.fi].t}`), kind: 'fvg-h1', label: 'H1 gap, market entry', h: '1h', l: '15m', s: sg0.s, M5, fi: sg0.fi, fill: sg0.fill, stop: sg0.stop, tgt: sg0.fill + sg0.s * risk, cap, firstFull: sg0.firstFull,
+    const r = rec('fvg', market, { idTail: id(`h1-${sg0.s > 0 ? 'b' : 's'}${sg0.bt}-${MF[sg0.fi].t}`), kind: 'fvg-h1', label: 'H1 gap, market entry', h: '1h', l: '15m', s: sg0.s, M5: MF, fi: sg0.fi, fill: sg0.fill, stop: sg0.stop, tgt: sg0.fill + sg0.s * risk, cap, firstFull: sg0.firstFull,
       log: [{ t: sg0.bt, text: `A three-candle H1 fair-value gap ${word(sg0.s)}` + (top != null ? ` (${f(bot)} to ${f(top)})` : '') + `, larger than this market's 2005-14 median gap.` },
         { t: sg0.et, text: `The first M15 candle closed inside the gap: ${word(sg0.s)} at the next 5-minute open, the stop past the gap's far side + 0.1 ATR, 1R.` }],
       marks: top != null && top > bot ? [{ kind: 'zone', top, bot, a: gc[0].t, at: sg0.bt, label: 'H1 gap' }] : [] });

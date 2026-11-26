@@ -223,3 +223,28 @@ test('Break fade desk: nine markets (gold left), its stored gold records go on t
   const o = buildDesk('fade', [['eurusd', { '5m': [] }]], { records: old, through: 0 }, T0 + 86400, 14); assert.deepEqual(o.records.map((r) => r.market), ['eurusd']);
   assert.match(fs.readFileSync(new URL('../equinox.html', import.meta.url), 'utf8'), /first M15 structure break on nine markets \(not gold\)/);
 });
+
+// 26 Nov 2026 (owner: "More faster"): the forming 5-minute candle gives the fill as soon as it opens
+test('forming candle: a fill read on it is the fill read once it has closed, and nothing else changes', () => {
+  const READ = { fade: D2.fadeTrades, bigfade: D2.bigTrades, boxfade: D2.boxTrades, fvg: D2.fvgTrades };
+  const lev = (r) => [r.id, r.side, r.t, r.entry, r.stop, r.target].join('|');
+  for (const [name, read] of Object.entries(READ)) { let seen = 0, cuts = 0;
+    const full = read(B, { from: FROM, market: 'xau' }), fills = [...new Set(full.map((r) => r.t))];
+    const idx = new Set(); for (const t of fills) { const i = M.findIndex((b) => b.time === t); if (i > 300) { idx.add(i); idx.add(i + 1); idx.add(i - 1); } }
+    for (const n of [...idx].sort((a, b) => a - b).slice(0, 90)) { if (n >= M.length - 1 || M[n].time !== M[n - 1].time + 300) continue; cuts++;
+      const closed = { '5m': M.slice(0, n) }, c = M[n];
+      const part = { time: c.time, open: c.open, high: Math.max(c.open, (c.open + c.high) / 2), low: Math.min(c.open, (c.open + c.low) / 2), close: c.open, live: true };   // the candle a moment after it opened
+      const before = read(closed, { from: FROM, market: 'xau' }), live = read({ ...closed, live5: part }, { from: FROM, market: 'xau' }), after = read({ '5m': M.slice(0, n + 1) }, { from: FROM, market: 'xau' });
+      const bId = byId(before), aLev = new Set(after.map(lev));
+      for (const r of live) { if (bId.has(r.id)) { assert.equal(lev(r), lev(bId.get(r.id)), name + ': an earlier record changed its levels'); continue; }
+        assert.equal(r.t, c.time, name + ': a new record that does not fill on the forming candle'); assert.ok(aLev.has(lev(r)), name + ': a record on the forming candle that the closed candle does not give'); assert.notEqual(r.status, 'time'); seen++; }
+      assert.equal(live.length, before.length + after.filter((r) => r.t === c.time).length, name + ': every fill of the candle is read while it forms');
+      assert.deepEqual(read({ ...closed, live5: { ...part, time: c.time + 300 } }, { from: FROM, market: 'xau' }).map(lev), before.map(lev), name + ': a candle that is not the next one is ignored'); }
+    assert.ok(cuts > 10 && seen > 3, `${name}: too few fills read on a forming candle (${seen} of ${cuts} cuts)`); }
+  // a time limit waits for the close
+  const k = D2.toK(M.slice(0, 50)), last = { ...k[49], live: true };
+  assert.equal(D2.walk(k.slice(0, 49).concat(last), 1, 40, k[40].o, k[40].o - 1e6, null, k[49].e).status, 'open');
+  assert.equal(D2.walk(k, 1, 40, k[40].o, k[40].o - 1e6, null, k[49].e).status, 'time');
+  const y = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
+  assert.equal((y.match(/--only fade,bigfade,boxfade,fvg,goldvb --live/g) || []).length, 3, 'the three fast reads of the copied desks ask for the forming candle');
+});
