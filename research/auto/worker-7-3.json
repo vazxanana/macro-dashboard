@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 7,
  "started": "2026-11-25T11:13:52.036Z",
- "tries": 3954600,
- "survivedA": 1039,
- "candidates": 122,
- "cLooks": 66,
+ "tries": 4080800,
+ "survivedA": 1074,
+ "candidates": 126,
+ "cLooks": 67,
  "cPasses": 0,
  "groups": {
   "usdchf|blk-&dev-|both": {
@@ -49,7 +49,7 @@
    "pass": false
   },
   "usdchf|fade&fade|long": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "usdchf|big+&big+|both": {
@@ -57,7 +57,7 @@
    "pass": false
   },
   "eurusd|big+&dev+|both": {
-   "more": 4,
+   "more": 5,
    "pass": false
   },
   "eurjpy|big-&fade|both": {
@@ -141,7 +141,7 @@
    "pass": false
   },
   "nzdusd|eg-&dev+|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "eurjpy|brk&dev+|long": {
@@ -269,6 +269,10 @@
    "pass": false
   },
   "eurusd|fade&eg-|both": {
+   "more": 0,
+   "pass": false
+  },
+  "eurjpy|big-&big-|both": {
    "more": 0,
    "pass": false
   }
@@ -4172,9 +4176,69 @@
     "months": 83
    },
    "p": 0.15386
+  },
+  {
+   "at": "2026-11-26T04:32:17.141Z",
+   "group": "eurjpy|big-&big-|both",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "big",
+      "k": 1.25,
+      "follow": false
+     },
+     {
+      "kind": "big",
+      "k": 1.5,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     19,
+     1
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "high",
+    "volP": 0.3,
+    "stop": 0.5,
+    "rr": 3,
+    "hold": 24
+   },
+   "A": {
+    "n": 384,
+    "mean": 0.3142,
+    "t": 3.45,
+    "win": 34.4,
+    "months": 104
+   },
+   "B": {
+    "n": 166,
+    "mean": 0.2268,
+    "t": 1.82,
+    "win": 33.1,
+    "months": 53
+   },
+   "placeboA": {
+    "n": 384,
+    "mean": -0.2915,
+    "t": -3.08,
+    "win": 19.8,
+    "months": 104
+   },
+   "C": {
+    "n": 206,
+    "mean": 0.1057,
+    "t": 1.03,
+    "win": 29.6,
+    "months": 69
+   },
+   "p": 0.15151
   }
  ],
- "chunks": 39,
- "updated": "2026-11-26T04:08:50.229Z",
- "chanceCandidates": 359.9
+ "chunks": 40,
+ "updated": "2026-11-26T04:34:02.214Z",
+ "chanceCandidates": 371.4
 }
