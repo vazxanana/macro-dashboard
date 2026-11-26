@@ -826,7 +826,7 @@
   }
   // After costs (26 Nov 2026, owner: "on all edges add the option after costs"). Display only. One round trip a trade, in price
   // units, taken off the R on the risk the trade opened with: the demo broker's measured figures where the desk has them (gold,
-  // the majors, the Nasdaq), ASSUMED for the rest (the studies' own table, research/edge/_lib/edgekit.mjs and combo-grid-2).
+  // the majors, the Nasdaq), ASSUMED for the rest (the studies' own cost table).
   // No financing. The choice lives in memory for the visit (window.MS_DESK_COSTS), shared by every desk; nothing is stored.
   var COSTS = { xau: 0.30, xag: 0.03, eurusd: 0.00006, gbpusd: 0.00008, usdjpy: 0.008, audusd: 0.00006, nzdusd: 0.00007, usdcad: 0.00007, usdchf: 0.00007,
     eurjpy: 0.010, gbpjpy: 0.014, audjpy: 0.010, cadjpy: 0.010, eurgbp: 0.00009, euraud: 0.00013, nas100: 1.0, spx500: 0.4, us30: 3, de40: 1.5 };
