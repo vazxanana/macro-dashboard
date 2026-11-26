@@ -6310,6 +6310,30 @@
     "stopCheckedAt": "2026-11-25T23:28:15.000Z",
     "brokerStop": 1.09799,
     "closedAt": "2026-11-25T23:36:13.000Z"
+   },
+   "boxfade:usdjpy:boxfade-m5-b1795651800": {
+    "positionId": "51565725",
+    "symbol": "USDJPY",
+    "side": "buy",
+    "volume": 36600000,
+    "lots": 3.66,
+    "digits": 3,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T00:46:25.000Z",
+    "councilEntry": 159.128,
+    "stop": 159.016,
+    "t1": 159.24,
+    "riskCash": 257.89,
+    "margin": 732,
+    "fillPrice": 159.096,
+    "slipR": -0.286,
+    "lagSec": 2185,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T00:46:25.000Z",
+    "brokerStop": 158.984
    }
   },
   "day": {
@@ -6321,10 +6345,10 @@
     "51559862"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12894.31 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 12894.31 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6333,14 +6357,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12894.31,
-  "lastRun": "2026-11-26T00:42:24.000Z"
+  "lastRun": "2026-11-26T00:46:25.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T17:18:37.000Z",
-   "msg": "not mirrored yet eurusd-replica-1794409826-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "eurusd-replica-1794409826-b"
-  },
   {
    "at": "2026-11-11T17:18:37.000Z",
    "msg": "not mirrored yet gbpusd-replica-1794409826-b: daily loss stop (44.6% down today) (will retry)",
@@ -7829,6 +7848,11 @@
    "at": "2026-11-25T23:36:13.000Z",
    "msg": "EURUSD position 51559864 closed at the broker",
    "trade": "boxfade:eurusd:boxfade-m5-s1795647300"
+  },
+  {
+   "at": "2026-11-26T00:46:25.000Z",
+   "msg": "opened buy USDJPY 3.66 lot (council boxfade)",
+   "trade": "boxfade:usdjpy:boxfade-m5-b1795651800"
   }
  ],
  "limits": {
@@ -7924,8 +7948,8 @@
   ]
  },
  "execution": {
-  "n": 214,
-  "meanSlipR": 0.05,
+  "n": 215,
+  "meanSlipR": 0.049,
   "medianSlipR": 0.024,
   "worstSlipR": 1.236,
   "medianLagSec": 69,
@@ -7969,6 +7993,10 @@
    "NZDUSD": {
     "n": 1,
     "meanSlipR": 0.324
+   },
+   "USDJPY": {
+    "n": 1,
+    "meanSlipR": -0.286
    }
   }
  }
