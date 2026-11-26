@@ -2,10 +2,10 @@
  "version": "auto-1",
  "worker": 5,
  "started": "2026-11-25T12:48:47.504Z",
- "tries": 2080400,
- "survivedA": 562,
- "candidates": 77,
- "cLooks": 51,
+ "tries": 2267400,
+ "survivedA": 602,
+ "candidates": 84,
+ "cLooks": 52,
  "cPasses": 0,
  "groups": {
   "usdchf|fade&fade|long": {
@@ -17,7 +17,7 @@
    "pass": false
   },
   "eurusd|big+&dev+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "eurjpy|fade&blk-|both": {
@@ -81,15 +81,15 @@
    "pass": false
   },
   "usdchf|fade&fade|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "eurusd|dev+&brk|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "usdchf|dev-&fade|both": {
-   "more": 0,
+   "more": 1,
    "pass": false
   },
   "audusd|eg-&eg-|both": {
@@ -165,7 +165,7 @@
    "pass": false
   },
   "nzdusd|eg-&dev+|both": {
-   "more": 1,
+   "more": 2,
    "pass": false
   },
   "usdcad|blk-&fade|both": {
@@ -177,7 +177,7 @@
    "pass": false
   },
   "eurusd|brk&big+|both": {
-   "more": 2,
+   "more": 3,
    "pass": false
   },
   "xau|brk&big+|long": {
@@ -211,6 +211,10 @@
   "usdjpy|fade&dev-|both": {
    "more": 0,
    "pass": false
+  },
+  "eurjpy|fade&dev-|both": {
+   "more": 0,
+   "pass": true
   }
  },
  "leads": [],
@@ -3192,9 +3196,69 @@
     "months": 60
    },
    "p": 0.84375
+  },
+  {
+   "at": "2026-11-25T23:47:39.073Z",
+   "group": "eurjpy|fade&dev-|both",
+   "g": {
+    "mk": "eurjpy",
+    "trig": [
+     {
+      "kind": "fade",
+      "N": 8
+     },
+     {
+      "kind": "dev",
+      "n": 10,
+      "z": 2,
+      "follow": false
+     }
+    ],
+    "side": "both",
+    "hours": [
+     20,
+     2
+    ],
+    "dows": null,
+    "trend": "none",
+    "vol": "none",
+    "volP": 0.7,
+    "stop": 1,
+    "rr": 1,
+    "hold": 96
+   },
+   "A": {
+    "n": 312,
+    "mean": 0.1731,
+    "t": 3.23,
+    "win": 60.9,
+    "months": 102
+   },
+   "B": {
+    "n": 130,
+    "mean": 0.1637,
+    "t": 1.91,
+    "win": 60.8,
+    "months": 53
+   },
+   "placeboA": {
+    "n": 312,
+    "mean": -0.3205,
+    "t": -5.72,
+    "win": 36.2,
+    "months": 102
+   },
+   "C": {
+    "n": 141,
+    "mean": 0.1732,
+    "t": 2.01,
+    "win": 61,
+    "months": 61
+   },
+   "p": 0.02222
   }
  ],
- "chunks": 14,
- "updated": "2026-11-25T23:37:33.784Z",
- "chanceCandidates": 189.3
+ "chunks": 15,
+ "updated": "2026-11-26T00:02:36.786Z",
+ "chanceCandidates": 206.3
 }
