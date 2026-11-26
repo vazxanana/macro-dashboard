@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-26 03:09 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-26 03:12 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 
@@ -19,19 +19,17 @@ Session now: **asia** — the rule skips it, so no live Scalp until it ends.
 | ETH/USD | down (Kraken) | no (not live, asia session) | READY buy | 19 trades, 32% won, −0.17R a trade |
 | SOL/USD | down (Kraken) | no (not live, asia session) | READY buy | 20 trades, 25% won, −0.40R a trade |
 | XRP/USD | down (Kraken) | no (not live, asia session) | IN ORIGIN buy | 40 trades, 50% won, +0.47R a trade |
-| EUR/USD | down (OANDA) | no (not live, asia session) | IN ORIGIN buy | 33 trades, 12% won, −0.78R a trade |
 | GBP/USD | down (OANDA) | no (not live, asia session) | READY sell (blocked: wrong side) | 32 trades, 28% won, −0.32R a trade |
-| AUD/USD | down (OANDA) | no (not live, rule skips AUD/USD, asia session) | READY sell (blocked: wrong side) | 25 trades, 32% won, −0.19R a trade |
-| USD/CAD | up (OANDA) | no (not live, asia session) | IN ORIGIN sell | 16 trades, 38% won, −0.08R a trade |
+| AUD/USD | down (Kraken, OANDA failed) | no (not live, rule skips AUD/USD, asia session) | READY sell (blocked: wrong side) | 25 trades, 32% won, −0.19R a trade |
 | USD/CHF | up (OANDA) | no (not live, asia session) | WAIT RETRACE sell | 32 trades, 44% won, +0.40R a trade |
 
-Replay total on the markets it trades live: 219 trades, −0.02R a trade (−4.93R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
+Replay total on the markets it trades live: 170 trades, +0.13R a trade (+22.00R), after spread and overnight financing on gold buys. Each signal still has to clear reward:risk ≥ 1.2, the 2-trades-per-market cap and the 3-hour re-entry rule.
 <!-- live-rule:end -->
 
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-26 03:09 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-26 03:12 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -43,13 +41,13 @@ Built by the Trader at 2026-11-26 03:09 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-26 03:09 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-26 03:12 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 2 signals (0 open, 2 closed, −2.00R, 0% won); 12 other signals tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 1 signal in 7 days, 1 closed −1.00R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9418.21 · 0 open (checked 2026-11-26 03:08 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9418.21 · 0 open (checked 2026-11-26 03:10 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
@@ -64,7 +62,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-26 03:09 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-26 03:12 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -168,7 +166,7 @@ Checked 2026-11-25 13:13 UTC; live signals 2026-11-01 to 2026-11-25.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-26 03:09 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-26 03:12 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
