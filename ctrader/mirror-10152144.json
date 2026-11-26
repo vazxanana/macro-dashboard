@@ -1146,18 +1146,44 @@
     "stopCheckedAt": "2026-11-25T00:44:28.000Z",
     "brokerStop": 3534.36,
     "closedAt": "2026-11-25T01:18:08.000Z"
+   },
+   "eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500": {
+    "positionId": "51562052",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 5,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-26T00:00:47.000Z",
+    "councilEntry": 1.42108,
+    "stop": 1.420343,
+    "t1": 1.421817,
+    "riskCash": 4.82,
+    "margin": 10,
+    "mark": 1.4216,
+    "levelsFrom": "mark",
+    "fillPrice": 1.42148,
+    "slipR": 0.543,
+    "lagSec": 2747,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T00:00:47.000Z",
+    "brokerStop": 1.42022
    }
   },
   "day": {
-   "date": "2026-11-25",
-   "startBalance": 497.82,
+   "date": "2026-11-26",
+   "startBalance": 481.77,
    "lastBalance": 481.77,
    "ids": [],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 481.77 · 0 open",
+  "status": "ok · demo Fusion Markets · balance 481.77 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:audusd:fvg-h1-s1795579200-1795629600": {
@@ -1194,11 +1220,6 @@
     "why": "daily loss stop (3.2% down today)",
     "n": 0,
     "at": "2026-11-25T23:14:20.000Z"
-   },
-   "eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500": {
-    "why": "daily loss stop (3.2% down today)",
-    "n": 0,
-    "at": "2026-11-25T23:58:22.000Z"
    }
   },
   "paused": {},
@@ -1207,14 +1228,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 481.77,
-  "lastRun": "2026-11-25T23:58:22.000Z"
+  "lastRun": "2026-11-26T00:00:47.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T18:49:24.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 18:57 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T18:59:23.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2699,6 +2715,11 @@
    "at": "2026-11-25T23:36:02.000Z",
    "msg": "not mirrored yet eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500: daily loss stop (3.2% down today) (will retry)",
    "trade": "eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500"
+  },
+  {
+   "at": "2026-11-26T00:00:47.000Z",
+   "msg": "opened buy USDCAD 0.05 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500"
   }
  ],
  "limits": {
@@ -2794,11 +2815,11 @@
   ]
  },
  "execution": {
-  "n": 7,
-  "meanSlipR": 0.384,
-  "medianSlipR": 0.33,
+  "n": 8,
+  "meanSlipR": 0.404,
+  "medianSlipR": 0.432,
   "worstSlipR": 1.352,
-  "medianLagSec": 26.5,
+  "medianLagSec": 27,
   "bySymbol": {
    "GBPUSD": {
     "n": 3,
@@ -2819,6 +2840,10 @@
    "XAUUSD": {
     "n": 1,
     "meanSlipR": 0.193
+   },
+   "USDCAD": {
+    "n": 1,
+    "meanSlipR": 0.543
    }
   }
  }
