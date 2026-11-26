@@ -6570,7 +6570,7 @@
     "lots": 4.36,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T06:31:55.000Z",
     "councilEntry": 1.09634,
     "stop": 1.09699,
@@ -6583,10 +6583,12 @@
     "slipR": 0.108,
     "lagSec": 1015,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T06:31:55.000Z",
-    "brokerStop": 1.09687
+    "brokerStop": 1.09687,
+    "closedAt": "2026-11-26T07:18:28.000Z"
    },
    "boxfade:nzdusd:boxfade-m5-b1795674900": {
     "positionId": "51577450",
@@ -6616,18 +6618,17 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 12894.31,
-   "lastBalance": 13081.22,
+   "lastBalance": 12793.75,
    "ids": [
     "51571061",
     "51574450",
-    "51576185",
     "51577450"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 13081.22 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 12793.75 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6635,15 +6636,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 13081.22,
-  "lastRun": "2026-11-26T07:16:57.000Z"
+  "balance": 12793.75,
+  "lastRun": "2026-11-26T07:18:28.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T19:31:29.000Z",
-   "msg": "not mirrored yet audusd-replica-1794425423-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "audusd-replica-1794425423-b"
-  },
   {
    "at": "2026-11-11T19:58:02.000Z",
    "msg": "not mirrored yet eurusd-replica-1794427016-s: daily loss stop (44.6% down today) (will retry)",
@@ -8132,6 +8128,11 @@
    "at": "2026-11-26T07:09:29.000Z",
    "msg": "opened buy NZDUSD 3.13 lot (council boxfade)",
    "trade": "boxfade:nzdusd:boxfade-m5-b1795674900"
+  },
+  {
+   "at": "2026-11-26T07:18:28.000Z",
+   "msg": "EURUSD position 51576185 closed at the broker",
+   "trade": "boxfade:eurusd:boxfade-m5-s1795673700"
   }
  ],
  "limits": {
