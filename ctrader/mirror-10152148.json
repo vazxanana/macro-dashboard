@@ -6478,6 +6478,82 @@
     "stopCheckedAt": "2026-11-26T04:38:09.000Z",
     "brokerStop": 0.83124,
     "closedAt": "2026-11-26T04:55:12.000Z"
+   },
+   "boxfade:usdjpy:boxfade-m5-b1795668300": {
+    "positionId": "51574449",
+    "symbol": "USDJPY",
+    "side": "buy",
+    "volume": 36700000,
+    "lots": 3.67,
+    "digits": 3,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T05:16:41.000Z",
+    "councilEntry": 159.112,
+    "stop": 159,
+    "t1": 159.224,
+    "riskCash": 258.91,
+    "margin": 734,
+    "fillPrice": 159.159,
+    "slipR": 0.42,
+    "lagSec": 1901,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T05:16:41.000Z",
+    "brokerStop": 159.047
+   },
+   "boxfade:gbpusd:boxfade-m5-s1795668300": {
+    "positionId": "51574450",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 28400000,
+    "lots": 2.84,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T05:16:41.000Z",
+    "councilEntry": 1.31038,
+    "stop": 1.3111,
+    "t1": 1.30966,
+    "riskCash": 258.91,
+    "margin": 744.17,
+    "mark": 1.31019,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31016,
+    "slipR": 0.306,
+    "lagSec": 1901,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T05:16:41.000Z",
+    "brokerStop": 1.31107
+   },
+   "boxfade:audusd:boxfade-m5-s1795667700": {
+    "positionId": "51574451",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 17200000,
+    "lots": 1.72,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T05:16:41.000Z",
+    "councilEntry": 0.66476,
+    "stop": 0.6658,
+    "t1": 0.66372,
+    "riskCash": 258.91,
+    "margin": 228.55,
+    "mark": 0.6643,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66434,
+    "slipR": 0.404,
+    "lagSec": 2501,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T05:16:41.000Z",
+    "brokerStop": 0.66584
    }
   },
   "day": {
@@ -6488,10 +6564,10 @@
     "51571061"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12945.48 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 12945.48 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6500,24 +6576,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12945.48,
-  "lastRun": "2026-11-26T05:12:14.000Z"
+  "lastRun": "2026-11-26T05:16:41.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T18:10:43.000Z",
-   "msg": "not mirrored yet usdchf-replica-1794420582-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "usdchf-replica-1794420582-s"
-  },
-  {
-   "at": "2026-11-11T18:21:53.000Z",
-   "msg": "not mirrored yet gbpusd-replica-1794421250-b: daily loss stop (44.6% down today) (will retry)",
-   "trade": "gbpusd-replica-1794421250-b"
-  },
-  {
-   "at": "2026-11-11T19:05:54.000Z",
-   "msg": "not mirrored yet sol-replica-1794423889-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "sol-replica-1794423889-s"
-  },
   {
    "at": "2026-11-11T19:05:54.000Z",
    "msg": "not mirrored yet audusd-replica-1794423889-s: daily loss stop (44.6% down today) (will retry)",
@@ -7996,6 +8057,21 @@
    "at": "2026-11-26T04:55:12.000Z",
    "msg": "USDCHF position 51573230 closed at the broker",
    "trade": "boxfade:usdchf:boxfade-m5-b1795666500"
+  },
+  {
+   "at": "2026-11-26T05:16:41.000Z",
+   "msg": "opened buy USDJPY 3.67 lot (council boxfade)",
+   "trade": "boxfade:usdjpy:boxfade-m5-b1795668300"
+  },
+  {
+   "at": "2026-11-26T05:16:41.000Z",
+   "msg": "opened sell GBPUSD 2.84 lot (council boxfade)",
+   "trade": "boxfade:gbpusd:boxfade-m5-s1795668300"
+  },
+  {
+   "at": "2026-11-26T05:16:41.000Z",
+   "msg": "opened sell AUDUSD 1.72 lot (council boxfade)",
+   "trade": "boxfade:audusd:boxfade-m5-s1795667700"
   }
  ],
  "limits": {
@@ -8091,11 +8167,11 @@
   ]
  },
  "execution": {
-  "n": 220,
-  "meanSlipR": 0.054,
-  "medianSlipR": 0.026,
+  "n": 223,
+  "meanSlipR": 0.059,
+  "medianSlipR": 0.027,
   "worstSlipR": 1.236,
-  "medianLagSec": 69.5,
+  "medianLagSec": 70,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -8118,12 +8194,12 @@
     "meanSlipR": 0.044
    },
    "AUDUSD": {
-    "n": 20,
-    "meanSlipR": 0.031
+    "n": 21,
+    "meanSlipR": 0.049
    },
    "GBPUSD": {
-    "n": 13,
-    "meanSlipR": 0.105
+    "n": 14,
+    "meanSlipR": 0.119
    },
    "USDCHF": {
     "n": 13,
@@ -8138,8 +8214,8 @@
     "meanSlipR": 0.324
    },
    "USDJPY": {
-    "n": 1,
-    "meanSlipR": -0.286
+    "n": 2,
+    "meanSlipR": 0.067
    }
   }
  }
