@@ -5933,6 +5933,36 @@ html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fu
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h { margin-bottom: 4px; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts #ms-phase { margin: 0 0 6px; }
 }
+/* More room for the chart (26 Nov 2026, owner: "Try to use more the space"). On every screen the chart's own header (timeframe, trend, cycle) lies ON the chart's top-left corner instead of in a row above it, with the
+   candle's O H L C line under it; from 1180 px the Market phase strip is a chip in the toolbar (the script moves it there; opened, it
+   takes a row of its own); the page's side margins and the toolbar are thinner. */
+@media all {
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4 .ms-pane > .ms-ph { position: absolute; z-index: 7; top: 0; left: 0; right: 70px; background: transparent !important; border: 0 !important; pointer-events: none; min-height: 0; padding: 3px 8px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4 .ms-pane > .ms-ph > * { pointer-events: auto; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4 .ms-pane .ms-chart > .ch-lg { top: 38px; }
+}
+@media (min-width: 1180px) {
+  html[data-view="charts"]:not([data-role="public"]) .ms-live.app { padding-left: 6px; padding-right: 6px; padding-bottom: 6px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) { padding-top: 2px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) > .sec-h { padding-top: 1px; padding-bottom: 1px; margin-bottom: 4px; row-gap: 2px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts .ch-row { gap: 6px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts #ms-wlp, html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts #ms-wlp-btn { margin-left: 0; }
+  #v-charts .sec-h > #ms-phase { order: 3; flex: 0 0 auto; width: auto; max-width: 250px; margin: 0 !important; min-width: 0; background: transparent; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #v-charts .sec-h > #ms-phase > summary { padding: 6px 10px; min-height: 0; border-radius: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; font-size: 12.5px; }
+  #v-charts .sec-h > #ms-phase[open] { order: 99; flex: 1 0 100%; max-width: none; }
+  #v-charts .sec-h > #ms-phase[open] > summary { max-width: none; }
+}
+/* a laptop (1180 to 1439 px): the toolbar stays one row: Style is its "Aa" button, the phase chip is shorter, Help waits in the Menu state */
+@media (min-width: 1180px) and (max-width: 1439px) {
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn { font-size: 0; min-width: 40px; padding-left: 10px; padding-right: 10px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn small { display: none; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn::before { content: "Aa"; font-size: 14px; font-weight: 600; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) #v-charts .sec-h > .ch-help { display: none !important; }
+  #v-charts .sec-h > #ms-phase:not([open]), #v-charts .sec-h > #ms-phase:not([open]) > summary { max-width: 132px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h::after { display: none; }   /* the older forced break before Style: one row now */
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sty.sty { order: 4; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn { order: 4; }
+}
 /* Watchlist (desktop, 1280 px and up): every market with its price and its change on the day, beside the chart. A row opens
    that market. Its Hide button folds it to a tab at the right edge; the choice stays on this device. */
 #ms-wlp, #ms-wlp-btn { display: none; }
@@ -5970,6 +6000,11 @@ html[data-role="public"] .ms-cn { display: none; }
 .ms-cn button[aria-pressed="true"] { color: var(--au-ink-1, var(--ink)); border-color: var(--au-accent, var(--accent)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
 .ms-cn button:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 1px; }
 .ms-cn .cn-live[hidden] { display: none; }
+/* with a mouse the scale and date buttons show while the pointer is over that chart (the latest-candle button always) */
+@media (hover: hover) and (pointer: fine) {
+  .ms-cn button:not(.cn-live) { opacity: 0; transition: opacity .15s; }
+  :hover > .ms-cn button, .ms-cn:focus-within button, .ms-cn button[aria-pressed="true"] { opacity: 1; }
+}
 .ms-cn .cn-live { border-radius: 999px; }
 @media (pointer: coarse) { .ms-cn button { min-width: 40px; height: 36px; font-size: 13px; } }
 /* a phone: one small button; a tap on it shows the rest, so the candles stay in sight */
@@ -16264,6 +16299,18 @@ function msNextSetup(bars, A) {
     a.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
     bar.insertBefore(a, bar.firstChild);
   }
+
+  // the Market phase strip is a chip in the toolbar from 1180 px (a comment marks its own place, where it goes back)
+  (function phase() {
+    if (!bar || !window.matchMedia) return;
+    const mq = matchMedia('(min-width: 1180px)'); let ph = null, home = null, n = 0;
+    const go = () => { if (!ph) return; if (mq.matches && !pub()) { if (ph.parentNode !== bar) bar.appendChild(ph); } else if (ph.parentNode === bar && home.parentNode) home.parentNode.insertBefore(ph, home.nextSibling); ask(); };
+    (mq.addEventListener ? mq.addEventListener('change', go) : mq.addListener(go));
+    const t = setInterval(() => {   // the strip is made by its own script a moment after the page
+      const e = document.getElementById('ms-phase'); if (!e) { if (++n > 120) clearInterval(t); return; }
+      clearInterval(t); ph = e; home = document.createComment('ms-phase'); ph.parentNode.insertBefore(home, ph); go();
+    }, 250);
+  })();
 
   // one chart first, once a device: a chart app opens on one chart (All, Split, Layout and Markets stay one tap away)
   (function once() {

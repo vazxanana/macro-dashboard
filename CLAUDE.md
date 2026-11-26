@@ -2624,6 +2624,13 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   from 1180 px the side rail and the site header are hidden on Charts (`body` padding 0). The Menu button `#ms-fit-menu` at the start of the
   toolbar sets `html[data-chnav="1"]`, which brings them back (also on a phone on its side), and hides them again; memory only, so every
   visit to Charts starts with the chart alone. Other views are unchanged.
+- **More room** (owner, 26 Nov 2026: "Try to use more the space"; same block): on every screen each chart's own header (`.ms-ph`: timeframe, trend,
+  cycle) lies ON the chart's top-left corner (absolute, `pointer-events` only on its children) with the O H L C line under it (`.ch-lg` top 38 px),
+  so the row above the chart is gone; from 1180 px the Market phase strip is a chip in the toolbar (the script moves `#ms-phase` into `.sec-h` once
+  its own script has made it, a comment marks its place for narrower windows; opened it takes a row of its own), the page's side margins are 6 px
+  and the toolbar is thinner; at 1180-1439 px the toolbar is one row (Style is its "Aa" button, Help shows in the Menu state, the older forced
+  break `.sec-h::after` is off there). With a mouse the on-chart Date / Auto / Log / % buttons show only while the pointer is over that chart.
+  One H1 chart: 1440 x 900 825 px tall (478 before the day's work), 1280 x 720 645 px (401), 1920 x 1080 1005 px, phone 390 x 844 587 px (526).
 - **Watchlist** (`#ms-wlp`, 1280 px and up, in `.ch-row` beside the chart): every market by group with its price and change on the day from the
   page's shared quotes (`window.msQuotes` = `mdQuotes`, no request of its own; crypto has no quote), a filter box (Enter opens the first match), a
   row opens `?s=<market>#charts`. Hide (x) folds it to a tab at the right edge (`#ms-wlp-btn`); `window.msWatchlist()` is the read-only view.
