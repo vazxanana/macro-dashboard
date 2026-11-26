@@ -1155,7 +1155,7 @@
     "lots": 0.05,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T00:00:47.000Z",
     "councilEntry": 1.42108,
     "stop": 1.420343,
@@ -1168,10 +1168,12 @@
     "slipR": 0.543,
     "lagSec": 2747,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T00:00:47.000Z",
-    "brokerStop": 1.42022
+    "brokerStop": 1.42022,
+    "closedAt": "2026-11-26T00:25:26.000Z"
    },
    "eqx:fade:eurusd:fade-m15-b1795650300": {
     "positionId": "51562647",
@@ -1203,16 +1205,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 481.77,
+   "lastBalance": 482.32,
    "ids": [
-    "51562052",
     "51562647"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 481.77 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 482.32 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:audusd:fvg-h1-s1795579200-1795629600": {
@@ -1256,15 +1257,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 481.77,
-  "lastRun": "2026-11-26T00:22:57.000Z"
+  "balance": 482.32,
+  "lastRun": "2026-11-26T00:25:26.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T19:01:31.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 19:09 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T19:11:21.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2749,6 +2745,11 @@
    "at": "2026-11-26T00:07:58.000Z",
    "msg": "opened buy EURUSD 0.1 lot (council eqx-fade)",
    "trade": "eqx:fade:eurusd:fade-m15-b1795650300"
+  },
+  {
+   "at": "2026-11-26T00:25:26.000Z",
+   "msg": "USDCAD position 51562052 closed at the broker",
+   "trade": "eqx:fvg:usdcad:fvg-h1-b1795644000-1795648500"
   }
  ],
  "limits": {
