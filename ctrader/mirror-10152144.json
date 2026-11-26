@@ -1803,6 +1803,32 @@
     ],
     "stopCheckedAt": "2026-11-26T15:31:00.000Z",
     "brokerStop": 0.54611
+   },
+   "eqx:fvg:audusd:fvg-h1-s1795712400-1795717800": {
+    "positionId": "51640396",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 1000000,
+    "lots": 0.1,
+    "digits": 5,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-26T18:35:26.000Z",
+    "councilEntry": 0.66325,
+    "stop": 0.663586,
+    "t1": 0.662914,
+    "riskCash": 4.68,
+    "margin": 13.26,
+    "mark": 0.66313,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66311,
+    "slipR": 0.417,
+    "lagSec": 326,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T18:35:26.000Z",
+    "brokerStop": 0.66357
    }
   },
   "day": {
@@ -1810,13 +1836,14 @@
    "startBalance": 481.77,
    "lastBalance": 467.65,
    "ids": [
-    "51608452"
+    "51608452",
+    "51640396"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 467.65 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 467.65 · 2 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -1846,14 +1873,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 467.65,
-  "lastRun": "2026-11-26T18:13:17.000Z"
+  "lastRun": "2026-11-26T18:37:05.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T06:15:59.000Z",
-   "msg": "moved NAS100 48212677 protection: stop 27905.34 -> 27922.96 (council ict-A)",
-   "trade": "ict:nq-b-1794337200"
-  },
   {
    "at": "2026-11-11T06:51:42.000Z",
    "msg": "moved NAS100 48212677 protection: stop 27922.96 -> 27949.39 (council ict-A)",
@@ -3338,6 +3360,11 @@
    "at": "2026-11-26T15:31:00.000Z",
    "msg": "opened buy NZDUSD 0.04 lot (council eqx-fvg)",
    "trade": "eqx:fvg:nzdusd:fvg-h1-b1795629600-1795707000"
+  },
+  {
+   "at": "2026-11-26T18:35:26.000Z",
+   "msg": "opened sell AUDUSD 0.1 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:audusd:fvg-h1-s1795712400-1795717800"
   }
  ],
  "limits": {
@@ -3433,11 +3460,11 @@
   ]
  },
  "execution": {
-  "n": 31,
-  "meanSlipR": 0.191,
-  "medianSlipR": 0.197,
+  "n": 32,
+  "meanSlipR": 0.198,
+  "medianSlipR": 0.205,
   "worstSlipR": 1.352,
-  "medianLagSec": 34.5,
+  "medianLagSec": 39,
   "bySymbol": {
    "GBPUSD": {
     "n": 5,
@@ -3468,8 +3495,8 @@
     "meanSlipR": -0.209
    },
    "AUDUSD": {
-    "n": 2,
-    "meanSlipR": 0.169
+    "n": 3,
+    "meanSlipR": 0.252
    },
    "USDCHF": {
     "n": 2,
