@@ -1,0 +1,131 @@
+{
+ "study": "usdjpy-brk-exec",
+ "built": "2026-11-26",
+ "commit": "72bcd85509",
+ "window": [
+  "2023-12-01",
+  "2026-11-20"
+ ],
+ "probes": [
+  {
+   "file": "ticks-USDJPY-jpyb-entry.json",
+   "at": "2026-11-26T18:27:38.819Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-jpyb-dead.json",
+   "at": "2026-11-26T18:39:09.474Z",
+   "errors": 0
+  },
+  {
+   "file": "ticks-USDJPY-jpyb-fills-1.json",
+   "at": "2026-11-26T19:08:09.050Z",
+   "errors": 0
+  }
+ ],
+ "primary": {
+  "orders": 131,
+  "entryUnresolved": 0,
+  "exitUnresolved": 0,
+  "unresolvedShare": 0,
+  "unresolvedWhy": {},
+  "net": {
+   "n": 131,
+   "mean": 0.2496,
+   "monthT": 3.3057,
+   "months": 34
+  },
+  "tick": {
+   "n": 131,
+   "mean": 0.264,
+   "monthT": 3.4613,
+   "months": 34
+  },
+  "mid": {
+   "n": 131,
+   "mean": 0.2516,
+   "monthT": 3.3425,
+   "months": 34
+  },
+  "tickMinusMid": {
+   "n": 131,
+   "mean": 0.0123,
+   "monthT": 6.0414,
+   "months": 34
+  },
+  "win": 0.6183,
+  "exits": {
+   "stop": {
+    "n": 23,
+    "tick": -1.0188,
+    "net": -1.0329,
+    "mid": -1.0162
+   },
+   "target": {
+    "n": 1,
+    "tick": 3,
+    "net": 2.9654,
+    "mid": 2.9595
+   },
+   "time": {
+    "n": 107,
+    "tick": 0.5141,
+    "net": 0.4999,
+    "mid": 0.4988
+   }
+  },
+  "byYear": {
+   "2023": {
+    "n": 1,
+    "tick": -0.2976,
+    "net": -0.303,
+    "mid": -0.305
+   },
+   "2024": {
+    "n": 46,
+    "tick": 0.3325,
+    "net": 0.3189,
+    "mid": 0.3242
+   },
+   "2025": {
+    "n": 38,
+    "tick": 0.2488,
+    "net": 0.2377,
+    "mid": 0.2393
+   },
+   "2026": {
+    "n": 46,
+    "tick": 0.2202,
+    "net": 0.2022,
+    "mid": 0.2013
+   }
+  },
+  "bySide": {
+   "buy": {
+    "n": 131,
+    "tick": 0.264,
+    "net": 0.2496,
+    "mid": 0.2516
+   }
+  },
+  "byRoll": {
+   "never open inside 21:00-22:59": {
+    "n": 131,
+    "tick": 0.264,
+    "net": 0.2496,
+    "mid": 0.2516
+   }
+  },
+  "entrySpreadR": {
+   "median": 0,
+   "p90": 0.0034
+  },
+  "entrySlipR": 0.0001
+ },
+ "verdict": "PASS. At the broker's own bid and ask the USD/JPY morning breakout (long) made +0.250R a trade after commission (n 131, month t 3.3057). On mid candles the same orders made +0.252R; 0 of 131 had no quote to enter on.",
+ "meaning": [
+  "The pre-registered verdict is PASS: every one of the 131 orders had a broker quote to enter on and every exit was resolved; at the broker's own bid and ask the rule made +0.250R a trade after commission (month t 3.31), the same as on mid candles (+0.252R). The cost is not what this result rests on: the stop is about 54 pips, the entry spread a small fraction of that, and no trade is open inside the 21:00-22:59 UTC rollover.",
+  "What the pass does not answer, as written before the run: the rule came out of about 554 million tries and missed the researcher's own bar for a lead (Holm p 0.067); these three years are inside the years it was found on; the Tuesday-to-Thursday filter may be luck (Monday and Friday together made 0.000R on the search data, every weekday +0.129R); USD/JPY rose over most of the window and the rule only buys; and it overlaps the USD/JPY breakout of the day, which already has a forward record. 107 of the 131 trades ended at the time limit (+0.50R on average) and 23 at the stop: the result is \"USD/JPY kept rising for eight hours after a morning breakout\", which a falling market would not give.",
+  "So: a candidate for a forward paper or demo record, to be judged on trades from now on. Not an edge, and no variant of the rule, hours or weekdays is to be tried on these years."
+ ]
+}
