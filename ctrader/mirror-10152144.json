@@ -1291,7 +1291,7 @@
     "lots": 0.26,
     "digits": 3,
     "setup": "eqx-bigfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T01:24:47.000Z",
     "councilEntry": 159.078,
     "stop": 159.10685,
@@ -1302,10 +1302,12 @@
     "slipR": -0.52,
     "lagSec": 587,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T01:24:47.000Z",
-    "brokerStop": 159.122
+    "brokerStop": 159.122,
+    "closedAt": "2026-11-26T01:32:39.000Z"
    },
    "eqx:fvg:eurjpy:fvg-h1-b1795633200-1795653900": {
     "positionId": "51567422",
@@ -1335,16 +1337,15 @@
   "day": {
    "date": "2026-11-26",
    "startBalance": 481.77,
-   "lastBalance": 472.37,
+   "lastBalance": 479.85,
    "ids": [
-    "51567421",
     "51567422"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 472.37 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 479.85 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fade:gbpusd:fade-m15-s1795631400": {
@@ -1373,15 +1374,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 472.37,
-  "lastRun": "2026-11-26T01:30:08.000Z"
+  "balance": 479.85,
+  "lastRun": "2026-11-26T01:32:39.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T19:55:30.000Z",
-   "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed (paused until 20:05 UTC) (will retry)",
-   "trade": "ict:es-s-1793995200"
-  },
   {
    "at": "2026-11-08T20:05:43.000Z",
    "msg": "not mirrored yet ict:es-s-1793995200: US500 market closed: MARKET_CLOSED: Trading is not available: Market is closed. (will retry)",
@@ -2866,6 +2862,11 @@
    "at": "2026-11-26T01:30:08.000Z",
    "msg": "EURUSD position 51562647 closed at the broker",
    "trade": "eqx:fade:eurusd:fade-m15-b1795650300"
+  },
+  {
+   "at": "2026-11-26T01:32:39.000Z",
+   "msg": "USDJPY position 51567421 closed at the broker",
+   "trade": "eqx:bigfade:usdjpy:bigfade-m15-s1795655700"
   }
  ],
  "limits": {
