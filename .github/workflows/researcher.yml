@@ -69,6 +69,7 @@ jobs:
       group: researcher-${{ matrix.worker }}-${{ matrix.shard }}
       cancel-in-progress: false
     steps:
+      # root files (package.json) come with cone mode; naming a file here fails on a runner that keeps its checkout (the laptop)
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -77,7 +78,6 @@ jobs:
             council
             api
             scripts
-            package.json
 
       - name: Checkout council data (the researcher's folder only)
         uses: actions/checkout@v4
