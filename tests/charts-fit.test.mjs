@@ -74,3 +74,38 @@ test('the rules: never for guests, never in full screen, the phone simple view b
   assert.ok(sizes.every((x) => x >= 12), 'text under 12 px');
   assert.ok(page.indexOf('id="ms-fit-css"') > page.indexOf('id="ms-ch-space-css"'));
 });
+
+// ---- on-chart controls (latest candle, go to a date, auto / log / percent)
+const cnJs = /<script id="ms-cn-js">([\s\S]*?)<\/script>/.exec(page)[1];
+const cnCss = /<style id="ms-cn-css">([\s\S]*?)<\/style>/.exec(page)[1];
+function loadCn() {
+  const pick = (name) => { const i = cnJs.indexOf('function ' + name + '('); assert.ok(i > 0, name); let d = 0; for (let k = cnJs.indexOf('{', i); k < cnJs.length; k++) { if (cnJs[k] === '{') d++; else if (cnJs[k] === '}' && --d === 0) return cnJs.slice(i, k + 1); } };
+  const ctx = {}; vm.createContext(ctx);
+  vm.runInContext(['findBar', 'windowAt', 'dayStart'].map(pick).join('\n') + '\nthis.F = { findBar, windowAt, dayStart };', ctx);
+  return ctx.F;
+}
+
+test('go to a date: the first candle at or after it, and a window that keeps it in view', () => {
+  const F = loadCn();
+  const bars = Array.from({ length: 500 }, (_, i) => ({ time: 1_700_000_000 + i * 3600 }));
+  assert.equal(F.findBar(bars, bars[0].time - 5), 0);
+  assert.equal(F.findBar(bars, bars[200].time), 200);
+  assert.equal(F.findBar(bars, bars[200].time + 1), 201);
+  assert.equal(F.findBar(bars, bars[499].time + 99), 500);
+  const w = F.windowAt(200, 120, 500); assert.equal(w.to - w.from, 120); assert.ok(w.from < 200 && w.to > 200);
+  const first = F.windowAt(0, 120, 500); assert.ok(first.from <= 0 && first.to > 0);
+  const end = F.windowAt(499, 120, 500); assert.ok(end.from <= 499 && end.from >= 0);
+  assert.equal(F.dayStart('2026-11-10'), Date.UTC(2026, 10, 10) / 1000);
+  for (const bad of ['', '10/11/2026', '2026-11', 'x']) assert.equal(F.dayStart(bad), null);
+});
+
+test('on-chart controls: display only, one display preference, not for guests, readable', () => {
+  assert.ok(!/fetch\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|\.stop\s*=|msPaper/.test(cnJs));
+  const sets = [...cnJs.matchAll(/localStorage\.setItem\('([^']+)'/g)].map((m) => m[1]);
+  assert.deepEqual([...new Set(sets)], ['ms-scale-mode']);
+  assert.match(cnJs, /dataset\.role === 'public'\) return/);
+  assert.match(cnCss, /html\[data-role="public"\] \.ms-cn \{ display: none; \}/);
+  assert.ok([...cnCss.matchAll(/(?:font-size:|font:\s*\d+\s+)([\d.]+)px/g)].every((m) => +m[1] >= 12));
+  for (const label of ['Back to the latest candle', 'Go to a date', 'Fit the price scale']) assert.ok(cnJs.includes(label), label);
+  assert.match(cnJs, /MODES = \{ n: 0, log: 1, pct: 2 \}/);   // the chart library's Normal, Logarithmic, Percentage
+});

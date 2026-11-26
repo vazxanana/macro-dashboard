@@ -16168,6 +16168,90 @@ html[data-chfit]:not([data-role="public"]) #v-charts #ms-rail::-webkit-scrollbar
   window.msChartFit = () => ({ on: H.hasAttribute('data-chfit'), h: H.style.getPropertyValue('--ch-h'), mm: H.style.getPropertyValue('--mm-h'), av: H.style.getPropertyValue('--ch-av') });
 })();
 </script>
+<style id="ms-cn-css">
+/* On-chart controls (26 Nov 2026): at the lower right of every chart, as a trading terminal has them: back to the latest
+   candle (shown only when the chart is scrolled away from it), go to a date, and the price scale: auto fit, log, percent.
+   Display only. Not for guests. */
+.ms-cn { position: absolute; z-index: 6; display: flex; gap: 4px; align-items: center; pointer-events: none; opacity: .92; }
+html[data-role="public"] .ms-cn { display: none; }
+.ms-cn button { pointer-events: auto; min-width: 30px; height: 26px; padding: 0 7px; border-radius: 8px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface-2, var(--panel)); color: var(--au-ink-2, var(--ink-dim)); font: 600 12px var(--sans, inherit); line-height: 1; cursor: pointer; }
+.ms-cn button:hover { color: var(--au-ink-1, var(--ink)); }
+.ms-cn button[aria-pressed="true"] { color: var(--au-ink-1, var(--ink)); border-color: var(--au-accent, var(--accent)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
+.ms-cn button:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 1px; }
+.ms-cn .cn-live[hidden] { display: none; }
+.ms-cn .cn-live { border-radius: 999px; }
+@media (pointer: coarse) { .ms-cn button { min-width: 40px; height: 36px; font-size: 13px; } }
+/* a phone: one small button; a tap on it shows the rest, so the candles stay in sight */
+.ms-cn .cn-more { display: none; }
+@media (max-width: 640px) {
+  .ms-cn .cn-more { display: inline-block; opacity: .85; }
+  .ms-cn:not(.cn-open) button:not(.cn-live):not(.cn-more) { display: none; }
+}
+</style>
+<script id="ms-cn-js">
+/* On-chart controls (26 Nov 2026). Display only: they scroll a chart and change how its price scale is drawn; no order, no
+   request. One display preference on this device: ms-scale-mode (n | log | pct), shared by every chart. */
+(function () {
+  'use strict';
+  if (document.documentElement.dataset.role === 'public') return;
+  const MODES = { n: 0, log: 1, pct: 2 };
+  let mode = 'n'; try { const m = localStorage.getItem('ms-scale-mode'); if (MODES[m] != null) mode = m; else if (localStorage.getItem('ms-log') === '1') mode = 'log'; } catch (e) {}
+  const all = [];
+  // pure: where a date lands in a chart's candles (index of the first candle at or after it), and the window to show around it
+  function findBar(bars, t) { let lo = 0, hi = bars.length; while (lo < hi) { const m = (lo + hi) >> 1; if (bars[m].time < t) lo = m + 1; else hi = m; } return lo; }
+  function windowAt(i, span, n) { const w = Math.max(20, Math.round(span)), from = Math.max(-5, Math.min(i - Math.round(w * 0.35), n - 5)); return { from, to: from + w }; }
+  function dayStart(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || '').trim()); if (!m) return null; const t = Date.UTC(+m[1], +m[2] - 1, +m[3]) / 1000; return isFinite(t) ? t : null; }
+  window.MS_CN = { findBar, windowAt, dayStart, MODES };
+  function applyMode(cx) { try { const ps = cx.chart.priceScale('right'); if (ps.options().mode !== MODES[mode]) ps.applyOptions({ mode: MODES[mode] }); } catch (e) {} }
+  function setMode(m) {
+    mode = MODES[m] != null ? m : 'n'; try { localStorage.setItem('ms-scale-mode', mode); } catch (e) {}
+    const k = document.getElementById('ms-show-log'); if (k && k.checked !== (mode === 'log')) { k.checked = mode === 'log'; k.dispatchEvent(new Event('change', { bubbles: true })); }   // the Settings box stays in step
+    all.forEach((o) => { applyMode(o.cx); paint(o); });
+  }
+  function paint(o) { o.box.querySelectorAll('[data-cn-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cnMode === mode))); }
+  function place(o) {
+    const cx = o.cx, el = cx.el; if (!el.offsetParent) return;
+    let pw = 60, th = 26; try { pw = cx.chart.priceScale('right').width() || pw; th = cx.chart.timeScale().height() || th; } catch (e) {}
+    const par = o.box.offsetParent || el.parentElement, pr = par.getBoundingClientRect(), r = el.getBoundingClientRect();
+    o.box.style.right = Math.max(4, pr.right - r.right + pw + 6) + 'px';
+    o.box.style.top = Math.max(0, r.bottom - pr.top - th - o.box.offsetHeight - 6) + 'px';
+    let away = false; try { away = cx.chart.timeScale().scrollPosition() < -3; } catch (e) {}
+    if (o.live.hidden === away) o.live.hidden = !away;
+    applyMode(cx);
+  }
+  async function goDate(cx) {
+    const bars = cx.bars(); if (!bars || !bars.length || typeof window.msAsk !== 'function') return;
+    const tz = +cx.TZ || 0, first = new Date((bars[0].time - tz) * 1000).toISOString().slice(0, 10), lastD = new Date((bars[bars.length - 1].time - tz) * 1000).toISOString().slice(0, 10);
+    const v = await window.msAsk('Date (YYYY-MM-DD). Candles on this chart run from ' + first + ' to ' + lastD + '; scroll left to load older ones.', lastD, { title: 'Go to a date', ok: 'Go', max: 10 });
+    if (v == null) return; const t = dayStart(v);
+    if (t == null) { if (window.msAlert) window.msAlert('Write the date as YYYY-MM-DD, for example ' + lastD + '.'); return; }
+    const i = findBar(bars, t + tz); let span = 120; try { const lr = cx.chart.timeScale().getVisibleLogicalRange(); if (lr) span = lr.to - lr.from; } catch (e) {}
+    try { cx.chart.timeScale().setVisibleLogicalRange(windowAt(Math.min(i, bars.length - 1), span, bars.length)); } catch (e) {}
+    if (t + tz < bars[0].time && window.msAlert) window.msAlert('This chart has candles from ' + first + ' on. It shows the oldest ones now; scroll left and it loads older candles.');
+  }
+  function attach(cx) {
+    if (!cx || !cx.el || !cx.chart || all.some((o) => o.cx === cx)) return;
+    const par = cx.el.parentElement; if (!par) return;
+    if (getComputedStyle(par).position === 'static') par.style.position = 'relative';
+    const box = document.createElement('div'); box.className = 'ms-cn';
+    box.innerHTML = '<button type="button" class="cn-live" hidden aria-label="Back to the latest candle" title="Back to the latest candle">&raquo;</button><button type="button" class="cn-more" aria-expanded="false" aria-label="Chart scale and date controls" title="Scale and date">&hellip;</button><button type="button" data-cn="date" aria-label="Go to a date" title="Go to a date">Date</button><button type="button" data-cn="auto" aria-label="Fit the price scale to the candles in view" title="Fit the price scale to the candles in view">Auto</button><button type="button" data-cn-mode="log" aria-pressed="false" title="Log price scale (every chart)">Log</button><button type="button" data-cn-mode="pct" aria-pressed="false" title="Percent scale: change from the first candle in view (every chart)">%</button>';
+    par.appendChild(box);
+    const o = { cx, box, live: box.querySelector('.cn-live') }; all.push(o);
+    o.live.addEventListener('click', () => { try { cx.chart.timeScale().scrollToRealTime(); } catch (e) {} });
+    { const m = box.querySelector('.cn-more'); m.addEventListener('click', () => { const on = box.classList.toggle('cn-open'); m.setAttribute('aria-expanded', String(on)); place(o); }); }
+    box.querySelector('[data-cn="date"]').addEventListener('click', () => goDate(cx));
+    box.querySelector('[data-cn="auto"]').addEventListener('click', () => { try { cx.chart.priceScale('right').applyOptions({ autoScale: true }); } catch (e) {} });
+    box.querySelectorAll('[data-cn-mode]').forEach((b) => b.addEventListener('click', () => setMode(mode === b.dataset.cnMode ? 'n' : b.dataset.cnMode)));
+    try { cx.chart.timeScale().subscribeVisibleLogicalRangeChange(() => place(o)); } catch (e) {}
+    try { new ResizeObserver(() => place(o)).observe(cx.el); } catch (e) {}
+    paint(o); place(o);
+  }
+  const hook = () => { if (window.msCharts) window.msCharts.list.forEach(attach); };
+  document.addEventListener('ms:chart', (e) => attach(e.detail));
+  hook(); setTimeout(hook, 1500); setInterval(() => { hook(); all.forEach(place); }, 3000);
+  window.msChartNav = () => ({ mode, charts: all.length, shown: all.filter((o) => o.box.offsetHeight > 0).length });
+})();
+</script>
 <script id="ms-ps-js">
 // Simple phone view (11 Nov 2026): fills the phone summary blocks and runs the folds. It reads what the page already worked
 // out (window.MS_TODAY and window.MS_LIVE from the main script, window.FLOAT, MS_WEEK.decisions on the loaded council files)

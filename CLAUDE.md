@@ -2625,6 +2625,12 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   row opens `?s=<market>#charts`. Hide (x) folds it to a tab at the right edge (`#ms-wlp-btn`); `window.msWatchlist()` is the read-only view.
 - **One chart first**: once a device (`ms-tv-v1`), a desktop still on All opens on the H1 chart (All, Split, Layout, Markets one tap away).
 - Browser storage: two display preferences, `ms-wlp` and `ms-tv-v1`. The drawing rail scrolls inside itself when it is taller than the chart.
+- **On-chart controls** (`<style id="ms-cn-css">` + `<script id="ms-cn-js">`, `window.MS_CN`; a `.ms-cn` group beside every chart of `window.msCharts`,
+  at the lower right above the time axis, placed from the chart's own price-scale width and time-axis height): "»" back to the latest candle (shown
+  only when the chart is scrolled over 3 candles away), **Date** (go to a date through `msAsk`; within the loaded candles, else the oldest ones and a
+  line saying to scroll left for more), **Auto** (fit the price scale), **Log** and **%** (the chart library's price-scale modes 1 and 2 on EVERY
+  chart; one display preference `ms-scale-mode`; Log keeps Settings' `#ms-show-log` box in step). Up to 640 px the group is one "…" button that
+  opens the rest. Appended to the chart's PARENT (the drawing layer captures presses inside the chart element). Not for guests.
 - Checked in a browser at 1920, 1440, 1280, 1180 x 820, 820 x 1180, 932 x 430, 844 x 390, 700 x 500, 568 x 320, 390 x 844 and 360 x 640: the grid
   ends 10 px above the window (6 px above the phone's bars) in every view, no sideways scroll; drawing, full screen, the phase strip, a resize
   and a market change through the watchlist work. Not checked on a real phone. Test: `tests/charts-fit.test.mjs`.
