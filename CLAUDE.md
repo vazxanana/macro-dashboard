@@ -7263,3 +7263,14 @@ All are demo records of rules that are not proven: never an edge. Tests: `tests/
 
 ## USD/JPY morning breakout on the Nasdaq job's demo account, 2 % a trade (26 Nov 2026, owner: "So the usdjpy risk 2%")
 `council/nq-demo.mjs` has a third rule `uj` (`UJ`): the genome of `research/edge/usdjpy-brk-exec` (`G`, a test compares), market `usdjpy`, broker symbol USDJPY, label `nq-uj`, **2 % of the balance a trade** (`UJ.risk`, `maxRisk` 0.02; `config.nq.ujRisk` may lower it), the same hourly look, market BUY with a relative stop (3 x ATR(14)) and target (3R) on the order, time exit after 8 closed H1 candles, rule-1 guard, the 0.25R late-order guard. The job now reads one H1 feed a market (`MARKETS`, `oandaH1(now, mk)`; a market with no candle of the hour is skipped alone) and sizes by `usdPerUnit` (a USD/JPY unit loses dist / price dollars). The Nasdaq rules keep 1 %. Records stay in `nq/trades.json` (`market` on each). Demo only (the shared `connect()`); a candidate from in-sample years, never an edge. Test: `tests/nq-demo.test.mjs` ("the USD/JPY rule").
+## The FVG tap after a continuation move, other timeframes, on the holdout (25 Nov 2026, owner's chart idea: "FVG tap after continue move, QM, entry, target low")
+`research/edge/fvg-qm-timeframes/` (PREREGISTRATION.md committed alone first; `run.mjs`, RESULT.md, MEANING.md, result.json, trades.json). The
+follow-up of `fvg-qm-continuation` (H1 only, five markets 2010 on, FAIL: that data is spent for this idea and is NOT loaded here). Five fixed
+readings with the owner's parts kept (continuation BO on the gap timeframe, FVG formed in the move, tap, QM or lower-timeframe CHoCH, stop past the
+pullback extreme + one cost, target the move's low, 1R minimum, one position at a time, 240 gap-candles hold): R1 H4 gap + H1 QM, R2 H4 + H1 CHoCH,
+R3 M15 + M5 QM, R4 M15 + M5 CHoCH, R5 H1 gap + H1 QM with the zone-reach clause dropped. Judged on the untouched holdout (gold, EUR/USD, GBP/USD,
+USD/JPY, AUD/USD 2005-2009; NZD/USD, USD/CAD, USD/CHF, EUR/JPY, silver 2005 to now; gold and silver start in 2006; Set B costs ASSUMED), pooled,
+month-sum t, Holm over five, bar: mean > 0 in both sets and both halves, 2x costs, 100+ trades. **FAIL, 0 of 5**: R1 -0.035R (n 418, month t -0.44),
+R2 -0.064R (n 1,003, -1.19), R3 -0.097R (n 3,301, -3.79), R4 -0.099R (n 8,751, -6.11), R5 +0.042R (n 180, t 0.40, Set A -0.196R). Before costs every
+reading is about zero (-0.03 to +0.09R). Not an edge; no variants on these years. Nothing live changed. The candle cache was rebuilt in the session
+(`fetch-cache.mjs`, EDGE_DATA). Test: `tests/fvg-qm-timeframes.test.mjs`.
