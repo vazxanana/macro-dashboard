@@ -6743,6 +6743,30 @@
     ],
     "stopCheckedAt": "2026-11-26T21:01:44.000Z",
     "brokerStop": 159.312
+   },
+   "boxfade:nzdusd:boxfade-m5-b1795729500": {
+    "positionId": "51647575",
+    "symbol": "NZDUSD",
+    "side": "buy",
+    "volume": 96000000,
+    "lots": 9.6,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-26T21:47:24.000Z",
+    "councilEntry": 0.54708,
+    "stop": 0.546825,
+    "t1": 0.547335,
+    "riskCash": 244.9,
+    "margin": 1050.62,
+    "fillPrice": 0.54716,
+    "slipR": 0.314,
+    "lagSec": 144,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-26T21:47:24.000Z",
+    "brokerStop": 0.5469
    }
   },
   "day": {
@@ -6755,13 +6779,14 @@
     "51639443",
     "51643494",
     "51647375",
-    "51647446"
+    "51647446",
+    "51647575"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 12244.8 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 12244.8 · 7 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6770,14 +6795,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 12244.8,
-  "lastRun": "2026-11-26T21:45:34.000Z"
+  "lastRun": "2026-11-26T21:48:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-11T21:41:48.000Z",
-   "msg": "not mirrored yet btc-replica-1794433267-s: daily loss stop (44.6% down today) (will retry)",
-   "trade": "btc-replica-1794433267-s"
-  },
   {
    "at": "2026-11-11T21:41:48.000Z",
    "msg": "not mirrored yet xrp-replica-1794433267-s: daily loss stop (44.6% down today) (will retry)",
@@ -8266,6 +8286,11 @@
    "at": "2026-11-26T21:01:44.000Z",
    "msg": "opened sell USDJPY 11.47 lot (council boxfade)",
    "trade": "boxfade:usdjpy:boxfade-m5-s1795726800"
+  },
+  {
+   "at": "2026-11-26T21:47:24.000Z",
+   "msg": "opened buy NZDUSD 9.6 lot (council boxfade)",
+   "trade": "boxfade:nzdusd:boxfade-m5-b1795729500"
   }
  ],
  "limits": {
@@ -8370,9 +8395,9 @@
   ]
  },
  "execution": {
-  "n": 230,
-  "meanSlipR": 0.063,
-  "medianSlipR": 0.029,
+  "n": 231,
+  "meanSlipR": 0.064,
+  "medianSlipR": 0.03,
   "worstSlipR": 1.236,
   "medianLagSec": 70,
   "bySymbol": {
@@ -8413,8 +8438,8 @@
     "meanSlipR": 0.015
    },
    "NZDUSD": {
-    "n": 3,
-    "meanSlipR": 0.257
+    "n": 4,
+    "meanSlipR": 0.271
    },
    "USDJPY": {
     "n": 3,
