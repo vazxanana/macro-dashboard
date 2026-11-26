@@ -2608,6 +2608,27 @@ reads it. Not advice, not a tested edge (the page and the system text say so).
   and "The facts sent" in a fold. Hidden and not run for guests. `window.msStructAssistant()` is a read-only view.
 - Tests: `tests/structure-assistant.test.mjs` (7). Not checked against a real provider (no key in the build sandbox).
 
+## Charts fit the window, a phone on its side, the watchlist (26 Nov 2026, owner: "improve our charts flawlessly that I can use it in phone and desktop 80% like trading view that will be my main chart app")
+Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="ms-fit-js">` right before `#ms-ps-js`; pure pieces on `window.MS_FIT`).
+- **Fit**: the script measures where the chart grid starts and what is fixed at the bottom of the screen (the phone's tab bar and wheel bar; the
+  desktop side rail is the same `nav.btab` fixed at the left and is not counted) and sets `--ch-h` (every `.ms-chart`), `--mm-h` (Markets side by
+  side) and `--ch-av` on `<html>` with `data-chfit`: one chart, Split and Layout 1-2 fill the window, All and Layout 3-4 show two rows a screen
+  (`rowsOf`, `heightFor`; never under 260 / 200 px, 170 / 150 in a short window: the page scrolls instead). It replaces the fixed numbers of
+  `#ms-ch-space-css` and the phone rules (they stay as the fallback before the first measure). Re-measured on resize, a view change, the phase
+  strip or paper bar opening, and every 2.5 s. Never for guests, never in full screen (those rules are untouched). The Charts view's grid row gap
+  is 0 there (it also counted for undrawn parts) and the toolbar's "Charts" title is hidden from 641 px.
+- **A phone on its side** (`max-height: 560px` and landscape, any width): the site header, the bottom tab bar, the wheel bar and the phase strip
+  step aside, the toolbar is one row of icons with a Menu button (`#ms-fit-menu`, goes Home) and the market button. Before, the chart was below
+  the first screen at 844 x 390 and about 50 px tall at 568 x 320.
+- **Watchlist** (`#ms-wlp`, 1280 px and up, in `.ch-row` beside the chart): every market by group with its price and change on the day from the
+  page's shared quotes (`window.msQuotes` = `mdQuotes`, no request of its own; crypto has no quote), a filter box (Enter opens the first match), a
+  row opens `?s=<market>#charts`. Hide (x) folds it to a tab at the right edge (`#ms-wlp-btn`); `window.msWatchlist()` is the read-only view.
+- **One chart first**: once a device (`ms-tv-v1`), a desktop still on All opens on the H1 chart (All, Split, Layout, Markets one tap away).
+- Browser storage: two display preferences, `ms-wlp` and `ms-tv-v1`. The drawing rail scrolls inside itself when it is taller than the chart.
+- Checked in a browser at 1920, 1440, 1280, 1180 x 820, 820 x 1180, 932 x 430, 844 x 390, 700 x 500, 568 x 320, 390 x 844 and 360 x 640: the grid
+  ends 10 px above the window (6 px above the phone's bars) in every view, no sideways scroll; drawing, full screen, the phase strip, a resize
+  and a market change through the watchlist work. Not checked on a real phone. Test: `tests/charts-fit.test.mjs`.
+
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
 right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to

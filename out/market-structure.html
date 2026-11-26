@@ -5881,6 +5881,74 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
   #v-charts #ms-ch-mk { display: none; }   /* the bar replaces the toolbar's market button */
 }
 </style>
+<style id="ms-fit-css">
+/* Charts fit the window (26 Nov 2026, owner: "improve our charts ... use it in phone and desktop 80% like trading view that
+   will be my main chart app"). Display only. The script below measures what is above and below the charts and sets --ch-h
+   (and --mm-h for Markets side by side), so the charts end at the bottom of the window on every screen: phone, phone on its
+   side, tablet, desktop, with or without the paper bar or an open phase strip. No fixed numbers. Not for guests, not in full screen. */
+html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4.ms-grid4 .ms-chart { height: var(--ch-h, 420px) !important; min-height: 0 !important; max-height: none !important; }
+html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .mm.mm .mm-chart { height: var(--mm-h, 380px) !important; min-height: 0 !important; }
+html[data-chfit][data-view="charts"]:not([data-role="public"]) .foot { display: none; }
+/* the space between the toolbar, the phase strip and the charts is one small step (the view is a grid: its row gap also
+   counted for parts that are not drawn, 20 px each) */
+html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) { row-gap: 0; }
+html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) > :is(.sec-h, #ms-phase, #ms-pp, #ms-sp-bar, #ms-ict-strip) { margin-bottom: 6px; }
+@media (min-width: 641px) { html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) > .sec-h { padding-top: 4px; padding-bottom: 4px; margin-top: 0; } }
+/* a phone on its side, or any short window: the chart is the screen. The site header steps aside (a Menu button goes Home),
+   the phase strip waits, and the toolbar's words give way to their icons so it stays one row. */
+#ms-fit-menu { display: none; }
+@media (min-width: 641px) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > h2 { display: none !important; } }
+@media (max-height: 560px) and (orientation: landscape) {
+  html[data-view="charts"]:not([data-role="public"]) :is(nav.btab, #ms-wb, #ps-sw) { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]) .ms-live.app { padding-bottom: 0 !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(.seg, .mk-mode, .ch-one) { flex: 0 0 auto !important; width: auto !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-ch-mk { display: inline-flex !important; }
+  html[data-view="charts"]:not([data-role="public"]) header.top { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts #ms-phase { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts { padding-top: 4px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h { padding: 2px 0; margin: 0 0 4px; gap: 4px; row-gap: 2px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > h2 { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(.ch-help, .rl-fav) { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h :is(#ms-sty-btn, #ms-ind-open, #ms-sa-btn) { font-size: 0; gap: 0; min-width: 40px; padding-left: 10px; padding-right: 10px; justify-content: center; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h :is(#ms-sty-btn, #ms-ind-open) small { display: none; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn::before { content: "Aa"; font-size: 14px; font-weight: 600; }
+  html[data-view="charts"]:not([data-role="public"]) #ms-fit-menu { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 36px; border-radius: 10px; color: var(--au-ink-2, var(--ink-dim)); background: var(--au-surface-2, var(--panel)); text-decoration: none; order: -5; flex: none; }
+  html[data-view="charts"]:not([data-role="public"]) .ms-live.app { padding-top: 0; }
+}
+/* tablets and small laptops (641 to 1179 px): the page header is two short rows instead of three tall ones on Charts */
+@media (min-width: 641px) and (max-width: 1179px) and (min-height: 561px) {
+  html[data-view="charts"]:not([data-role="public"]) header.top { padding-top: 6px; padding-bottom: 4px; row-gap: 2px; }
+  html[data-view="charts"]:not([data-role="public"]) header.top .me-hi, html[data-view="charts"]:not([data-role="public"]) header.top .me-greet { display: none; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > h2 { display: none !important; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h { margin-bottom: 4px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts #ms-phase { margin: 0 0 6px; }
+}
+/* Watchlist (desktop, 1280 px and up): every market with its price and its change on the day, beside the chart. A row opens
+   that market. Its Hide button folds it to a tab at the right edge; the choice stays on this device. */
+#ms-wlp, #ms-wlp-btn { display: none; }
+@media (min-width: 1280px) {
+  html:not([data-role="public"])[data-wlp="0"] #v-charts:not(:fullscreen):not(.ch-fake-fs) #ms-wlp-btn { display: flex; flex: none; align-items: center; justify-content: center; width: 30px; margin-left: 8px; position: sticky; top: 8px; align-self: flex-start; height: 132px; padding: 0; border: 1px solid var(--au-line, var(--line)); border-radius: 10px; background: var(--au-surface, var(--panel)); color: var(--au-ink-2, var(--ink-dim)); font: inherit; font-size: 12.5px; cursor: pointer; writing-mode: vertical-rl; }
+  html:not([data-role="public"])[data-wlp="1"] #v-charts:not(:fullscreen):not(.ch-fake-fs) #ms-wlp { display: flex; flex-direction: column; flex: none; width: 248px; margin-left: 8px; position: sticky; top: 8px; align-self: flex-start; height: var(--ch-av, 70vh); min-height: 300px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); overflow: hidden; }
+}
+#ms-wlp .wlp-h { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--au-line, var(--line)); }
+#ms-wlp .wlp-h b { font-size: 12.5px; font-weight: 650; }
+#ms-wlp .wlp-x { flex: none; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--au-ink-2, var(--ink-dim)); font-size: 18px; line-height: 1; cursor: pointer; }
+#ms-wlp .wlp-x:hover { background: var(--au-surface-2, var(--panel-hover)); }
+/* the drawing rail never runs past the chart: it scrolls inside itself in a short window */
+html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) #ms-rail { max-height: var(--ch-av, none); overflow-y: auto; scrollbar-width: none; }
+html[data-chfit]:not([data-role="public"]) #v-charts #ms-rail::-webkit-scrollbar { display: none; }
+#ms-wlp .wlp-q { flex: 1; min-width: 0; height: 30px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--au-line, var(--line)); background: var(--au-well, transparent); color: inherit; font: inherit; font-size: 12.5px; }
+#ms-wlp .wlp-l { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+#ms-wlp .wlp-g { padding: 8px 10px 2px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+#ms-wlp a.wlp-i { display: grid; grid-template-columns: minmax(0, 1fr) auto 58px; gap: 8px; align-items: center; padding: 7px 10px; font-size: 12.5px; color: inherit; text-decoration: none; font-variant-numeric: tabular-nums; border-left: 2px solid transparent; }
+#ms-wlp a.wlp-i:hover { background: var(--au-surface-2, var(--panel-hover)); }
+#ms-wlp a.wlp-i:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: -2px; }
+#ms-wlp a.wlp-i.cur { border-left-color: var(--au-accent, var(--accent)); background: var(--au-surface-2, var(--panel-hover)); font-weight: 650; }
+#ms-wlp .wlp-c { text-align: right; }
+#ms-wlp .wlp-c.up { color: var(--buy-ink, var(--buy)); } #ms-wlp .wlp-c.dn { color: var(--sell-ink, var(--sell)); }
+#ms-wlp .wlp-p { text-align: right; color: var(--au-ink-2, var(--ink-dim)); }
+#ms-wlp .wlp-n { padding: 8px 10px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); border-top: 1px solid var(--au-line, var(--line)); }
+</style>
 <style id="ms-phase-css">/* Market phase panel on the Charts (23 Nov 2026, assets/ms-phase.js): the phase reader per timeframe, closed candles only. Display only; tokens only; 12 px minimum, 44 px on touch; never for guests. */
   .mph { margin: 0 0 12px; border: 1px solid var(--au-line, var(--line)); border-radius: 12px; background: var(--au-surface, var(--panel)); color: var(--au-ink-1, var(--ink)); font: 400 13px/1.45 var(--sans); }
   .mph > summary { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 8px 14px; cursor: pointer; list-style: none; }
@@ -9153,6 +9221,7 @@ function msNextSetup(bars, A) {
   // closed = the newest daily candle is complete (weekend / holiday); stale = no H1 candle in the last 3 hours while not closed.
   const MDQ = { at: 0, p: null, q: {} };
   // one unit of a cross's quote currency in US dollars, from the shared quotes (null until they are in)
+  window.msQuotes = () => mdQuotes();   // the watchlist beside the chart reads the same shared quotes
   window.msQuoteUsd = (I) => { if (!I || !I.quote) return null; const q = MDQ.q[I.quote[0]]; if (!q || !(q.c > 0)) return null; return I.quote[1] > 0 ? q.c : 1 / q.c; };
   function mdQuotes() {
     if (!MD.base || MD.on === false || window.msBootGate) return Promise.resolve({});   // no quotes under the first-load sign-in card
@@ -10365,7 +10434,7 @@ function msNextSetup(bars, A) {
   // the menu's groups, in order (each id once); a timeframe with an analysed pane opens that pane
   const TF_GROUPS = [['Seconds', ['1s', '5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
   window.msTfGroups = () => TF_GROUPS.map(([g, ids]) => [g, ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return { id, label: t ? t.label : id, analysed: !!panes[id] }; })]);
-  window.msMarkets = () => Object.entries(INSTRUMENTS).map(([k, I]) => ({ k, label: I.label, name: I.name, group: I.group, on: k === instKey }));   // the wheel bar's list
+  window.msMarkets = () => Object.entries(INSTRUMENTS).map(([k, I]) => ({ k, label: I.label, name: I.name, group: I.group, dec: I.dec, on: k === instKey }));   // the wheel bar's list
   // a year's candles from monthly ones (UTC calendar years)
   const yearOf = (bars) => { const out = []; bars.forEach((b) => { const y = new Date(b.time * 1e3).getUTCFullYear(), t = Date.UTC(y, 0, 1) / 1e3, l = out[out.length - 1];
     if (l && l.time === t) { l.high = Math.max(l.high, +b.high); l.low = Math.min(l.low, +b.low); l.close = +b.close; l.volume = (l.volume || 0) + (+b.volume || 0); }
@@ -16092,6 +16161,121 @@ function msNextSetup(bars, A) {
     addEventListener('hashchange', function () { close(); setTimeout(paint, 100); }); setInterval(paint, 1500); paint(); }
   window.msWheelBar = function () { return { built: !!bar, market: bar ? bar.querySelector('[data-wb="mk"] b').textContent : '', tf: bar ? bar.querySelector('[data-wb="tf"] b').textContent : '', open: !!(sheet && sheet.hasAttribute('data-open')) }; };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(build, 0); }); else setTimeout(build, 0);
+})();
+</script>
+<script id="ms-fit-js">
+/* Charts fit the window, and the desktop watchlist (26 Nov 2026). Display only: it measures, sets two CSS lengths and draws a
+   list of links; it sends no order and keeps two display preferences on this device (ms-wlp, ms-tv-v1). */
+(function () {
+  'use strict';
+  const H = document.documentElement, V = document.getElementById('v-charts'); if (!V) return;
+  const pub = () => H.dataset.role === 'public';
+  const vis = (e) => !!e && e.offsetHeight > 0 && getComputedStyle(e).visibility !== 'hidden';
+  const pget = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+  const pset = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  // pure: the chart height that makes `rows` rows of charts end at the bottom of the window
+  function heightFor(o) {
+    const av = o.win - o.top - o.reserve - o.pad, rows = Math.max(1, o.rows | 0), gap = o.gap || 0;
+    const h = Math.floor((av - gap * (rows - 1)) / rows - o.chrome);
+    return { av: Math.max(0, Math.floor(av)), h: Math.max(rows > 1 ? o.minHalf : o.minOne, h) };
+  }
+  function rowsOf(view, n, narrow) {
+    if (view === 'all') return 2;
+    if (view === 'lay') return n >= 3 ? 2 : (narrow && n === 2 ? 2 : 1);
+    if (view === 'split') return narrow ? 2 : 1;
+    return 1;
+  }
+  let raf = 0, last = '';
+  function fit() {
+    raf = 0;
+    const grid = V.querySelector('.ms-grid4'), on = H.dataset.view === 'charts' && !pub() && grid && V.offsetHeight > 0 && !V.classList.contains('ch-fake-fs') && !document.fullscreenElement;
+    if (!on) { if (!grid || H.dataset.view !== 'charts' || pub()) H.removeAttribute('data-chfit'); return; }
+    const win = innerHeight, y = scrollY;
+    let reserve = 0;
+    for (const e of [document.querySelector('nav.btab'), document.getElementById('ms-wb')]) if (vis(e) && getComputedStyle(e).position === 'fixed') { const t = e.getBoundingClientRect().top; if (t > win * 0.6) reserve = Math.max(reserve, win - t); }   // a bar at the bottom of the screen (the desktop's side rail is the same nav, fixed at the left: not counted)
+    const pad = reserve ? 6 : 10, narrow = innerWidth <= 900, short = win <= 560;
+    const set = {};
+    if (vis(grid)) {
+      const pane = [...grid.querySelectorAll('.ms-pane')].find(vis), ch = pane && pane.querySelector('.ms-chart');
+      if (pane && ch) {
+        const r = heightFor({ win, top: grid.getBoundingClientRect().top + y, reserve, pad, gap: parseFloat(getComputedStyle(grid).rowGap) || 0, chrome: pane.offsetHeight - ch.offsetHeight, rows: rowsOf(grid.dataset.view, +grid.dataset.layN || 1, narrow), minOne: short ? 170 : 260, minHalf: short ? 150 : 200 });
+        set['--ch-h'] = r.h + 'px'; set['--ch-av'] = Math.max(300, r.av) + 'px';
+      }
+    }
+    const mm = document.getElementById('ms-mm'), mg = mm && mm.querySelector('.mm-g'), cell = mg && [...mg.children].find(vis), mc = cell && cell.querySelector('.mm-chart');
+    if (mc) {
+      const n = +mm.dataset.n || [...mg.children].filter(vis).length, r = heightFor({ win, top: mg.getBoundingClientRect().top + y, reserve, pad, gap: parseFloat(getComputedStyle(mg).rowGap) || 0, chrome: cell.offsetHeight - mc.offsetHeight, rows: narrow ? Math.min(2, n) : n >= 4 ? 2 : 1, minOne: 260, minHalf: 200 });
+      set['--mm-h'] = r.h + 'px'; if (!set['--ch-av']) set['--ch-av'] = Math.max(300, r.av) + 'px';
+    }
+    const k = JSON.stringify(set); if (k !== last) { last = k; for (const p in set) H.style.setProperty(p, set[p]); }
+    if (Object.keys(set).length) H.setAttribute('data-chfit', '1');
+  }
+  const ask = () => { if (!raf) raf = requestAnimationFrame(fit); };
+  addEventListener('resize', ask); addEventListener('orientationchange', ask); addEventListener('hashchange', () => setTimeout(ask, 60)); addEventListener('ms:phone', ask);
+  document.addEventListener('fullscreenchange', ask);
+  if (window.visualViewport) visualViewport.addEventListener('resize', ask);
+  try {
+    const ro = new ResizeObserver(ask);
+    for (const s of ['header.top', '#v-charts .sec-h', '#ms-phase', '#ms-pp', '#ms-sp-bar', '#ms-ict-strip', '#ms-wb', '#ms-mm .mm-bar']) { const e = document.querySelector(s); if (e) ro.observe(e); }
+    const mo = new MutationObserver(ask);
+    mo.observe(H, { attributes: true, attributeFilter: ['data-view', 'data-phone', 'data-clean', 'data-role'] });
+    mo.observe(V, { attributes: true, attributeFilter: ['class', 'data-ps-more'], subtree: false });
+    const hook = () => { const g = V.querySelector('.ms-grid4'); if (!g) return false; mo.observe(g, { attributes: true, attributeFilter: ['data-view', 'data-lay-n'] }); const mm = document.getElementById('ms-mm'); if (mm) mo.observe(mm, { attributes: true, attributeFilter: ['hidden', 'data-n', 'class'] }); return true; };
+    hook();
+  } catch (e) {}
+  setInterval(ask, 2500);   // late parts (the readout under a chart, a strip that arrives with data) are measured too
+  ask();
+
+  // the Menu button a short window gets in place of the site header
+  const bar = V.querySelector('.sec-h');
+  if (bar && !document.getElementById('ms-fit-menu')) {
+    const a = document.createElement('a'); a.id = 'ms-fit-menu'; a.href = '#home'; a.setAttribute('aria-label', 'Leave the charts: go to Home'); a.title = 'Home';
+    a.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+    bar.insertBefore(a, bar.firstChild);
+  }
+
+  // one chart first, once a device: a chart app opens on one chart (All, Split, Layout and Markets stay one tap away)
+  (function once() {
+    if (pub() || pget('ms-tv-v1')) return;
+    let tries = 0; const t = setInterval(() => {
+      const g = V.querySelector('.ms-grid4[data-view]'); if (!g && ++tries < 80) return; clearInterval(t); if (!g) return;
+      pset('ms-tv-v1', '1');
+      if (g.dataset.view === 'all' && innerWidth >= 1000) { const b = V.querySelector('[data-view="1h"]'); if (b) b.click(); }
+    }, 250);
+  })();
+
+  // ---- watchlist
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  function rowsHtml(list, Q, q) {
+    const f = String(q || '').trim().toLowerCase(), out = []; let g = null;
+    for (const m of list) {
+      if (f && !(m.label + ' ' + m.name + ' ' + m.k).toLowerCase().includes(f)) continue;
+      if (m.group && m.group !== g) { g = m.group; out.push('<div class="wlp-g">' + esc(g) + '</div>'); }
+      const r = Q && Q[m.k], d = m.dec == null ? 2 : m.dec, up = r && r.ch >= 0;
+      out.push('<a class="wlp-i' + (m.on ? ' cur' : '') + '" href="?s=' + encodeURIComponent(m.k) + '#charts"' + (m.on ? ' aria-current="true"' : '') + '><span>' + esc(m.label) + '</span><span class="wlp-p">' + (r ? esc((+r.c).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d })) : '—') + '</span><span class="wlp-c ' + (r ? (up ? 'up' : 'dn') : '') + '">' + (r ? (up ? '+' : '−') + Math.abs(r.ch).toFixed(2) + '%' : '') + '</span></a>');
+    }
+    return out.join('') || '<div class="wlp-g">No market matches.</div>';
+  }
+  window.MS_FIT = { heightFor, rowsOf, rowsHtml };
+  const row = V.querySelector('.ch-row');
+  if (row && bar && typeof window.msMarkets === 'function') {
+    const p = document.createElement('aside'); p.id = 'ms-wlp'; p.setAttribute('aria-label', 'Watchlist');
+    p.innerHTML = '<div class="wlp-h"><b>Watchlist</b><input class="wlp-q" type="search" placeholder="Find a market" aria-label="Find a market in the watchlist"><button type="button" class="wlp-x" aria-label="Hide the watchlist" title="Hide the watchlist">&times;</button></div><div class="wlp-l"></div><div class="wlp-n">Change against the previous day\'s close.</div>';
+    row.appendChild(p);
+    const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'ms-wlp-btn'; btn.textContent = 'Watchlist'; btn.title = 'Show the watchlist beside the chart';
+    row.appendChild(btn);
+    const L = p.querySelector('.wlp-l'), q = p.querySelector('.wlp-q'); let Q = {};
+    const draw = () => { const h = rowsHtml(window.msMarkets(), Q, q.value); if (L._h !== h) { L._h = h; L.innerHTML = h; } };
+    const load = async () => { if (!vis(p) || document.hidden || typeof window.msQuotes !== 'function') return; try { Q = await window.msQuotes() || Q; } catch (e) {} draw(); };
+    const state = (on) => { H.dataset.wlp = on ? '1' : '0'; btn.setAttribute('aria-pressed', String(on)); pset('ms-wlp', on ? '1' : '0'); ask(); if (on) { draw(); setTimeout(load, 50); } };
+    btn.addEventListener('click', () => state(true)); p.querySelector('.wlp-x').addEventListener('click', () => { state(false); btn.focus(); });
+    q.addEventListener('input', draw);
+    q.addEventListener('keydown', (e) => { if (e.key === 'Enter') { const a = L.querySelector('a.wlp-i'); if (a) location.href = a.href; } e.stopPropagation(); });
+    H.dataset.wlp = pget('ms-wlp') === '0' ? '0' : '1'; btn.setAttribute('aria-pressed', String(H.dataset.wlp === '1'));
+    draw(); setTimeout(load, 4000); setInterval(load, 30e3);
+    window.msWatchlist = () => ({ on: H.dataset.wlp === '1', shown: vis(p), rows: L.querySelectorAll('a.wlp-i').length, priced: L.querySelectorAll('.wlp-c.up, .wlp-c.dn').length });
+  }
+  window.msChartFit = () => ({ on: H.hasAttribute('data-chfit'), h: H.style.getPropertyValue('--ch-h'), mm: H.style.getPropertyValue('--mm-h'), av: H.style.getPropertyValue('--ch-av') });
 })();
 </script>
 <script id="ms-ps-js">
