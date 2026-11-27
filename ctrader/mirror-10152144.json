@@ -3488,6 +3488,32 @@
     ],
     "stopCheckedAt": "2026-11-27T15:17:18.000Z",
     "brokerStop": 1.09323
+   },
+   "eqx:fade:gbpusd:fade-m15-b1795794300": {
+    "positionId": "51726430",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 300000,
+    "lots": 0.03,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T15:46:27.000Z",
+    "councilEntry": 1.3104,
+    "stop": 1.309576,
+    "t1": 1.312047,
+    "riskCash": 3.2,
+    "margin": 7.86,
+    "mark": 1.31042,
+    "levelsFrom": "mark",
+    "fillPrice": 1.3104,
+    "slipR": 0,
+    "lagSec": 87,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T15:46:27.000Z",
+    "brokerStop": 1.30956
    }
   },
   "day": {
@@ -3497,13 +3523,14 @@
    "ids": [
     "51718694",
     "51722970",
-    "51722979"
+    "51722979",
+    "51726430"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 319.72 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 319.72 · 4 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3514,14 +3541,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 319.72,
-  "lastRun": "2026-11-27T15:45:17.000Z"
+  "lastRun": "2026-11-27T15:48:36.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:07:51.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 16.56, 3.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
   {
    "at": "2026-11-24T19:07:51.000Z",
    "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 34.42, 6.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5016,6 +5038,11 @@
    "at": "2026-11-27T15:36:35.000Z",
    "msg": "closed NZDUSD position 51722975 (council: stopped)",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795792500"
+  },
+  {
+   "at": "2026-11-27T15:46:27.000Z",
+   "msg": "opened buy GBPUSD 0.03 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795794300"
   }
  ],
  "limits": {
@@ -5120,15 +5147,15 @@
   ]
  },
  "execution": {
-  "n": 92,
+  "n": 93,
   "meanSlipR": 0.025,
-  "medianSlipR": 0.007,
+  "medianSlipR": 0,
   "worstSlipR": 1.352,
-  "medianLagSec": 59,
+  "medianLagSec": 59.5,
   "bySymbol": {
    "GBPUSD": {
-    "n": 9,
-    "meanSlipR": 0.175
+    "n": 10,
+    "meanSlipR": 0.157
    },
    "NZDUSD": {
     "n": 13,
