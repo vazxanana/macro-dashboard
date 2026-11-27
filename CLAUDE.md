@@ -7455,5 +7455,6 @@ demo runs go on beside it. Every order carries its stop and is read back (rule 1
 account for the cTrader app, (2) sets `CTRADER_LIVE=on`, (3) gives the login's last digits for config.json. Not checked against the
 real live server (the build sandbox reaches no broker): the live host name is cTrader Open API's documented `live.ctraderapi.com:5036`.
 Named 27 Nov 2026: owner rule `live-on-7653` = the Fusion USD live account ending 7653 (the GBP live account ending 7681 is never picked).
+Faster orders (owner, 27 Nov 2026: "make sure the orders are faster"): council.yml `fastorder` (inside every 20-second `fastcopy`) runs the Nasdaq job (live and demo) in the first 12 minutes of each hour and the breakout job in the first 20 minutes of a UTC day, and `nap` wakes 9 s after the hour, so an hourly rule's order goes out about 10-30 s after the candle close.
 Gold at 3 % (owner, 27 Nov 2026: "on gold change risk to 3 %", live): rule `live-gold-3` sets `live.goldRisk` 0.03 (`LIVE.maxGold` 3 %): the gold breakout and the gold 8-swing break risk 3 % a trade on the live account; the Nasdaq and USD/JPY rules stay 0.5 %.
 Tests: `tests/live-account.test.mjs`.

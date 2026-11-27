@@ -135,11 +135,22 @@ jobs:
           # fast copy (26 Nov 2026, owner: "More speed"): the copied Equinox desks are read again (about 6 s) and, only when one holds
           # a fill first written in the last 3 minutes (council/copy-due.mjs, read only), the mirror runs at once. Called every 20 s
           # between quick passes and between a round's heavy members; it never fails the loop and is saved by the next save.
-          fastcopy() { timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live >/dev/null 2>&1 || echo "Copied desks ($1) failed"
+          # fastorder (27 Nov 2026, owner: "make sure the orders are faster"): the hourly rules (Nasdaq l1 / l5, USD/JPY morning
+          # breakout, gold 8-swing break; demo and live) are read again inside every fastcopy during the first 12 minutes of an hour,
+          # and the breakouts of the day during the first 20 minutes of a UTC day, so an order goes out within about 20 s of the
+          # candle close instead of waiting for the next quick pass. Each job skips at once when nothing is due or it already looked.
+          fastorder() { s=$(( $(date +%s) % 3600 )); if [ "$s" -ge 8 ] && [ "$s" -le 720 ]; then
+              timeout 45 node council/nq-demo.mjs data --live >/dev/null 2>&1 || echo "Nasdaq live fast ($1) failed"
+              timeout 45 node council/nq-demo.mjs data >/dev/null 2>&1 || echo "Nasdaq demo fast ($1) failed"; fi
+            d=$(( $(date +%s) % 86400 )); if [ "$d" -le 1200 ]; then
+              timeout 45 node council/vb-demo.mjs data --live >/dev/null 2>&1 || echo "Breakout live fast ($1) failed"
+              timeout 45 node council/vb-demo.mjs data >/dev/null 2>&1 || echo "Breakout demo fast ($1) failed"; fi; }
+          fastcopy() { fastorder "$1"; timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live >/dev/null 2>&1 || echo "Copied desks ($1) failed"
             if timeout 15 node council/copy-due.mjs data; then timeout 120 node council/ctrader-mirror.mjs data || echo "cTrader mirror fast copy ($1) failed"; fi; }
           # nap (26 Nov 2026, owner: "More speed" again): 20 s, or less when a 5-minute candle closes sooner: it wakes 2 s after the
           # close, the moment a desk fill can first be read, so a copy goes out seconds after the candle instead of up to 20 s later.
-          nap() { b=$(( 300 - ( $(date +%s) - 2 ) % 300 )); if [ "$b" -lt 20 ]; then sleep "$b"; else sleep 20; fi; }
+          # it also wakes 9 s after the hour, so the hourly rules' orders go out at once (fastorder)
+          nap() { b=$(( 300 - ( $(date +%s) - 2 ) % 300 )); h=$(( 3600 - ( $(date +%s) - 9 ) % 3600 )); [ "$h" -lt "$b" ] && b=$h; if [ "$b" -lt 20 ]; then sleep "$b"; else sleep 20; fi; }
           for i in $(seq 1 $ROUNDS); do
             # 60 rounds take ~5.6 h (~5.6 min each), longer than the 330-min job timeout, so the job was killed before "Start the
             # next run" (6 Nov 05:44: 79 min with no run until the cron watchdog restarted it). Stop at 300 min so the hand-off runs.
