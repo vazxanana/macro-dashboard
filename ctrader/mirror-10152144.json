@@ -2963,7 +2963,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T10:15:18.000Z",
     "councilEntry": 3670.635,
     "stop": 3663.981,
@@ -2977,10 +2977,15 @@
     "slipR": 0.1,
     "lagSec": 18,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T10:15:18.000Z",
-    "brokerStop": 3664.55
+    "brokerStop": 3664.55,
+    "closedAt": "2026-11-27T10:39:54.000Z",
+    "exitPrice": 3677.42,
+    "councilExit": 3677.289,
+    "councilR": 1
    },
    "eqx:fade:nzdusd:fade-m15-b1795775400": {
     "positionId": "51692951",
@@ -3010,18 +3015,17 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 360.75,
+   "lastBalance": 366.79,
    "ids": [
     "51656090",
     "51688521",
-    "51691949",
     "51692951"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 360.75 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 366.79 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3042,15 +3046,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 360.75,
-  "lastRun": "2026-11-27T10:38:17.000Z"
+  "balance": 366.79,
+  "lastRun": "2026-11-27T10:40:30.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T10:36:03.000Z",
-   "msg": "not mirrored yet eqx:fade:nzdusd:fade-m15-s1795515300: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:nzdusd:fade-m15-s1795515300"
-  },
   {
    "at": "2026-11-24T10:36:03.000Z",
    "msg": "not mirrored yet eqx:fade:usdjpy:fade-m15-s1795514400: daily loss stop (95.0% down today) (will retry)",
@@ -4544,6 +4543,11 @@
    "at": "2026-11-27T10:30:24.000Z",
    "msg": "opened buy NZDUSD 0.08 lot (council eqx-fade)",
    "trade": "eqx:fade:nzdusd:fade-m15-b1795775400"
+  },
+  {
+   "at": "2026-11-27T10:39:54.000Z",
+   "msg": "closed XAUUSD position 51691949 (council: target)",
+   "trade": "eqx:fvg:fvg-h1-b1795773600-1795774500"
   }
  ],
  "limits": {
