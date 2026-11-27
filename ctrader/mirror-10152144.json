@@ -2772,7 +2772,7 @@
     "lots": 0.08,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T05:45:59.000Z",
     "councilEntry": 174.971,
     "stop": 175.038071,
@@ -2783,10 +2783,12 @@
     "slipR": -0.075,
     "lagSec": 59,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T05:45:59.000Z",
-    "brokerStop": 175.043
+    "brokerStop": 175.043,
+    "closedAt": "2026-11-27T07:26:12.000Z"
    },
    "eqx:fade:usdcad:fade-m15-b1795763700": {
     "positionId": "51668761",
@@ -2818,17 +2820,16 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 363.8,
+   "lastBalance": 370.13,
    "ids": [
     "51656090",
-    "51663815",
     "51668761"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 363.8 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 370.13 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2844,15 +2845,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 363.8,
-  "lastRun": "2026-11-27T07:22:22.000Z"
+  "balance": 370.13,
+  "lastRun": "2026-11-27T07:26:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-23T03:36:38.000Z",
-   "msg": "US2000 position 50584644 closed at the broker",
-   "trade": "ict:rty-s-1795186800"
-  },
   {
    "at": "2026-11-23T15:22:03.000Z",
    "msg": "US30 position 50601007 closed at the broker",
@@ -4346,6 +4342,11 @@
    "at": "2026-11-27T07:15:33.000Z",
    "msg": "opened buy USDCAD 0.07 lot (council eqx-fade)",
    "trade": "eqx:fade:usdcad:fade-m15-b1795763700"
+  },
+  {
+   "at": "2026-11-27T07:26:12.000Z",
+   "msg": "EURJPY position 51663815 closed at the broker",
+   "trade": "eqx:fade:eurjpy:fade-m15-s1795758300"
   }
  ],
  "limits": {
