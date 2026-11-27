@@ -2706,6 +2706,10 @@ the O H L C line and the on-chart buttons were dark-theme ink on the light chart
 tags had dark backings. `.ms-live[data-chart]` (set by `applyTheme` from the chart's own background) now gives `.ms-pane` and `.mm-c` the
 light tokens when the chart is light on a dark page and the dark tokens when it is dark on a light page; the cycle tag `.ms-cy` follows;
 the markup's label backings take `CUS.bg`. Never style text on a chart from the page theme alone.
+**Charts polish, 27 Nov 2026**: "Structure" is its icon at 1440-1799 px too (it wrapped the toolbar to a second row: the chart is 34 px
+taller); the watchlist's crypto rows read Kraken's public ticker through `window.msCryptoQuotes` (main script, next to `msQuotes`; at most
+every 25 s, change against today's 00:00 UTC open, said in the watchlist's note; the fit script still makes no request of its own); Markets
+side by side keeps its candles above the volume band (`scaleMargins` top 0.1, bottom 0.18). Test: `tests/charts-quick.test.mjs`.
 
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's

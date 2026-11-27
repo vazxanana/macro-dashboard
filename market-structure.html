@@ -6339,6 +6339,14 @@ function msNextSetup(bars, A) {
   const MDQ = { at: 0, p: null, q: {} };
   // one unit of a cross's quote currency in US dollars, from the shared quotes (null until they are in)
   window.msQuotes = () => mdQuotes();   // the watchlist beside the chart reads the same shared quotes
+  // crypto has no OANDA quote: Kraken's public ticker (the page's own crypto source), change against today's 00:00 UTC open (27 Nov 2026);
+  // read by the watchlist beside the chart only, at most every 25 s; a failed read keeps the last good quotes
+  { const KR = { btc: 'XBTUSD', eth: 'ETHUSD', sol: 'SOLUSD', xrp: 'XRPUSD' }, KRK = { XXBTZUSD: 'btc', XBTUSD: 'btc', XETHZUSD: 'eth', ETHUSD: 'eth', SOLUSD: 'sol', XXRPZUSD: 'xrp', XRPUSD: 'xrp' };
+    let CQ = {}, cAt = 0;
+    window.msCryptoQuotes = async () => { if (Date.now() - cAt < 25e3) return CQ; cAt = Date.now();
+      try { const j = await fetch('https://api.kraken.com/0/public/Ticker?pair=' + Object.values(KR).join(','), { cache: 'no-store' }).then((r) => r.json()), n = {};
+        for (const [key, v] of Object.entries((j && j.result) || {})) { const k = KRK[key], c = v && v.c ? +v.c[0] : NaN, o = v ? +v.o : NaN; if (k && c > 0 && o > 0) n[k] = { k, c, ch: (c - o) / o * 100, src: 'kraken' }; }
+        if (Object.keys(n).length) CQ = n; } catch (e) { /* keep the last good quotes */ } return CQ; }; }
   window.msQuoteUsd = (I) => { if (!I || !I.quote) return null; const q = MDQ.q[I.quote[0]]; if (!q || !(q.c > 0)) return null; return I.quote[1] > 0 ? q.c : 1 / q.c; };
   function mdQuotes() {
     if (!MD.base || MD.on === false || window.msBootGate) return Promise.resolve({});   // no quotes under the first-load sign-in card
@@ -7713,7 +7721,7 @@ function msNextSetup(bars, A) {
     for (let i = 0; i < 4; i++) { const cell = document.createElement('div'); cell.className = 'mm-c'; cell.dataset.i = i;
       cell.innerHTML = `<div class="mm-h"><select class="mm-k" aria-label="Market of chart ${i + 1}"></select><select class="mm-tf" aria-label="Timeframe of chart ${i + 1}"></select><b class="mm-px"></b><span class="mm-ch"></span><span class="mm-src"></span></div><div class="mm-chart"></div>`;
       MM.grid.appendChild(cell); const el = cell.querySelector('.mm-chart');
-      const chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 }, rightPriceScale: { borderVisible: false }, localization: { priceFormatter: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST) } });
+      const chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 }, rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.1, bottom: 0.18 } }, localization: { priceFormatter: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST) } });
       const series = chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
       const vol = chart.addHistogramSeries({ priceScaleId: 'mmv', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false }); chart.priceScale('mmv').applyOptions({ scaleMargins: { top: 0.86, bottom: 0 }, visible: false });
       const C = { i, cell, el, chart, series, vol, bars: [], key: '', at: 0 }; MM.ch.push(C);
@@ -16155,7 +16163,7 @@ html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fu
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(#ms-sa-btn, #ms-jr-btn) { order: 4; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl, html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn .sa-bl { display: none; }   /* icons: "Log a call" wrapped to a second row */
 }
-@media (min-width: 1440px) and (max-width: 1799px) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl { display: none; } }   /* "Log a call" as its icon: it wrapped the toolbar */
+@media (min-width: 1440px) and (max-width: 1799px) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl, html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn .sa-bl { display: none; } }   /* "Log a call" and "Structure" as their icons: they wrapped the toolbar */
 /* Watchlist (desktop, 1280 px and up): every market with its price and its change on the day, beside the chart. A row opens
    that market. Its Hide button folds it to a tab at the right edge; the choice stays on this device. */
 #ms-wlp, #ms-wlp-btn { display: none; }
@@ -16295,13 +16303,13 @@ html[data-chfit]:not([data-role="public"]) #v-charts #ms-rail::-webkit-scrollbar
   const row = V.querySelector('.ch-row');
   if (row && bar && typeof window.msMarkets === 'function') {
     const p = document.createElement('aside'); p.id = 'ms-wlp'; p.setAttribute('aria-label', 'Watchlist');
-    p.innerHTML = '<div class="wlp-h"><b>Watchlist</b><input class="wlp-q" type="search" placeholder="Find a market" aria-label="Find a market in the watchlist"><button type="button" class="wlp-x" aria-label="Hide the watchlist" title="Hide the watchlist">&times;</button></div><div class="wlp-l"></div><div class="wlp-n">Change against the previous day\'s close.</div>';
+    p.innerHTML = '<div class="wlp-h"><b>Watchlist</b><input class="wlp-q" type="search" placeholder="Find a market" aria-label="Find a market in the watchlist"><button type="button" class="wlp-x" aria-label="Hide the watchlist" title="Hide the watchlist">&times;</button></div><div class="wlp-l"></div><div class="wlp-n">Change against the previous day\'s close (crypto: today\'s 00:00 UTC open).</div>';
     row.appendChild(p);
     const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'ms-wlp-btn'; btn.textContent = 'Watchlist'; btn.title = 'Show the watchlist beside the chart';
     row.appendChild(btn);
     const L = p.querySelector('.wlp-l'), q = p.querySelector('.wlp-q'); let Q = {};
     const draw = () => { const h = rowsHtml(window.msMarkets(), Q, q.value); if (L._h !== h) { L._h = h; L.innerHTML = h; } };
-    const load = async () => { if (!vis(p) || document.hidden || typeof window.msQuotes !== 'function') return; try { Q = await window.msQuotes() || Q; } catch (e) {} draw(); };
+    const load = async () => { if (!vis(p) || document.hidden || typeof window.msQuotes !== 'function') return; try { Q = Object.assign({}, window.msCryptoQuotes ? await window.msCryptoQuotes() : {}, await window.msQuotes() || Q); } catch (e) {} draw(); };
     const state = (on) => { H.dataset.wlp = on ? '1' : '0'; btn.setAttribute('aria-pressed', String(on)); pset('ms-wlp', on ? '1' : '0'); ask(); if (on) { draw(); setTimeout(load, 50); } };
     btn.addEventListener('click', () => state(true)); p.querySelector('.wlp-x').addEventListener('click', () => { state(false); btn.focus(); });
     q.addEventListener('input', draw);

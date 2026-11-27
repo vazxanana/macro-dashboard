@@ -84,3 +84,12 @@ test('Markets side by side: volume in the panes\' colours, the source label shri
   assert.match(h, /value: \+b\.volume \|\| 0, color: window\.msChartLight && window\.msChartLight\(\) \?/);
   assert.match(h, /\.mm-src \{[^}]*text-overflow: ellipsis;/);
 });
+
+test('charts polish 27 Nov: Structure is an icon at 1440-1799 px, crypto quotes in the watchlist, Markets candles above the volume', () => {
+  const P = fs.readFileSync('market-structure.html', 'utf8');
+  assert.match(P, /@media \(min-width: 1440px\) and \(max-width: 1799px\) \{[^\n]*#ms-sa-btn \.sa-bl \{ display: none; \}/);
+  assert.match(P, /fetch\('https:\/\/api\.kraken\.com\/0\/public\/Ticker\?pair=' \+ Object\.values\(KR\)\.join\(','\)/);
+  assert.match(P, /ch: \(c - o\) \/ o \* 100, src: 'kraken'/);
+  assert.match(P, /crypto: today\\'s 00:00 UTC open/);
+  assert.match(P, /rightPriceScale: \{ borderVisible: false, scaleMargins: \{ top: 0\.1, bottom: 0\.18 \} \}/);
+});
