@@ -2907,7 +2907,7 @@
     "lots": 0.13,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T08:15:12.000Z",
     "councilEntry": 1.09686,
     "stop": 1.096262,
@@ -2920,26 +2920,27 @@
     "slipR": 0.117,
     "lagSec": 12,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T08:15:12.000Z",
-    "brokerStop": 1.09666
+    "brokerStop": 1.09666,
+    "closedAt": "2026-11-27T08:21:52.000Z"
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 368.94,
+   "lastBalance": 364.79,
    "ids": [
     "51656090",
-    "51680625",
-    "51680641"
+    "51680625"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 368.94 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 364.79 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2955,15 +2956,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 368.94,
-  "lastRun": "2026-11-27T08:20:15.000Z"
+  "balance": 364.79,
+  "lastRun": "2026-11-27T08:22:27.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T08:37:46.000Z",
-   "msg": "not mirrored yet eqx:fvg:eurjpy:fvg-h1-s1795453200-1795508100: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fvg:eurjpy:fvg-h1-s1795453200-1795508100"
-  },
   {
    "at": "2026-11-24T09:17:08.000Z",
    "msg": "not mirrored yet eqx:fade:usdcad:fade-m15-b1795510800: daily loss stop (95.0% down today) (will retry)",
@@ -4456,6 +4452,11 @@
   {
    "at": "2026-11-27T08:15:12.000Z",
    "msg": "opened buy EURUSD 0.13 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795767300"
+  },
+  {
+   "at": "2026-11-27T08:21:52.000Z",
+   "msg": "EURUSD position 51680641 closed at the broker",
    "trade": "eqx:fade:eurusd:fade-m15-b1795767300"
   }
  ],
