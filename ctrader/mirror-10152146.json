@@ -3530,6 +3530,58 @@
     ],
     "stopCheckedAt": "2026-11-27T18:46:13.000Z",
     "brokerStop": 3626.57
+   },
+   "mosha6:bar-r6-15m-b1795806780": {
+    "positionId": "51742427",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 300,
+    "lots": 0.03,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-27T19:31:03.000Z",
+    "councilEntry": 3643.5,
+    "stop": 3637.61,
+    "t1": 3678.84,
+    "riskCash": 21.29,
+    "margin": 21.86,
+    "mark": 3644.095,
+    "levelsFrom": "mark",
+    "fillPrice": 3642.53,
+    "slipR": -0.165,
+    "lagSec": 1083,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T19:31:03.000Z",
+    "brokerStop": 3636.05
+   },
+   "mosha6:bar-r6-tap-1h-b1795806780": {
+    "positionId": "51742429",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 300,
+    "lots": 0.03,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-27T19:31:03.000Z",
+    "councilEntry": 3643.61,
+    "stop": 3637.61,
+    "t1": 3679.61,
+    "riskCash": 21.29,
+    "margin": 21.86,
+    "mark": 3644.095,
+    "levelsFrom": "mark",
+    "fillPrice": 3642.53,
+    "slipR": -0.18,
+    "lagSec": 1083,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T19:31:03.000Z",
+    "brokerStop": 3636.05
    }
   },
   "day": {
@@ -3558,10 +3610,10 @@
     "35000818",
     "35000621"
    ],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8515.62 · 13 open",
+  "status": "ok · demo Fusion Markets · balance 8515.62 · 15 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -3571,7 +3623,7 @@
    "ict:x:nq-b-1795798800-dip": {
     "why": "NAS100 market closed (paused until 19:34 UTC)",
     "n": 0,
-    "at": "2026-11-27T19:25:11.000Z"
+    "at": "2026-11-27T19:31:03.000Z"
    }
   },
   "paused": {
@@ -3582,22 +3634,12 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 8515.62,
-  "lastRun": "2026-11-27T19:25:11.000Z",
+  "lastRun": "2026-11-27T19:31:03.000Z",
   "closedSeen": {
    "NAS100": "2026-11-27T19:24:39.000Z"
   }
  },
  "log": [
-  {
-   "at": "2026-11-20T21:23:12.000Z",
-   "msg": "not mirrored xrp-swing-1795209727: none of XRPUSD found at the broker",
-   "trade": "xrp-swing-1795209727"
-  },
-  {
-   "at": "2026-11-21T03:33:31.000Z",
-   "msg": "placed sell limit SOLUSD 0.01 lot at 67.37 (council position, valid to 2026-11-26T03:32Z)",
-   "trade": "sol-position-1795231964"
-  },
   {
    "at": "2026-11-21T05:11:17.000Z",
    "msg": "error: could not reach the cTrader demo server"
@@ -5080,6 +5122,16 @@
    "at": "2026-11-27T19:25:11.000Z",
    "msg": "not mirrored yet ict:x:nq-b-1795798800-dip: NAS100 market closed (paused until 19:34 UTC) (will retry)",
    "trade": "ict:x:nq-b-1795798800-dip"
+  },
+  {
+   "at": "2026-11-27T19:31:03.000Z",
+   "msg": "opened buy XAUUSD 0.03 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-15m-b1795806780"
+  },
+  {
+   "at": "2026-11-27T19:31:03.000Z",
+   "msg": "opened buy XAUUSD 0.03 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-tap-1h-b1795806780"
   }
  ],
  "limits": {
@@ -5184,11 +5236,11 @@
   ]
  },
  "execution": {
-  "n": 124,
-  "meanSlipR": -0.004,
-  "medianSlipR": -0.007,
+  "n": 126,
+  "meanSlipR": -0.007,
+  "medianSlipR": -0.008,
   "worstSlipR": 1.148,
-  "medianLagSec": 879,
+  "medianLagSec": 899,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -5215,8 +5267,8 @@
     "meanSlipR": -0.018
    },
    "XAUUSD": {
-    "n": 103,
-    "meanSlipR": -0.006
+    "n": 105,
+    "meanSlipR": -0.009
    },
    "EURUSD": {
     "n": 1,
