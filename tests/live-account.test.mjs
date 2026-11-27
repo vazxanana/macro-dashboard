@@ -98,7 +98,9 @@ test('owner rule live-gold-3: live gold rules risk 3 % (capped there), the other
   assert.ok(T.indexOf("{ id: 'live-gold-3'") > T.indexOf("{ id: 'live-on-7653'"), 'applied after the live account rule');
   const L = liveConfig({ live: { on: true, account: '*7653', risk: 0.005, dayStop: 0.15, goldRisk: 0.03 } });
   assert.equal(L.risk, 0.005); assert.equal(L.goldRisk, 0.03);
-  assert.equal(liveConfig({ live: { on: true, account: '*7653', goldRisk: 0.2 } }).goldRisk, LIVE.maxGold, 'never over 3 %');
+  assert.equal(liveConfig({ live: { on: true, account: '*7653', goldRisk: 0.2 } }).goldRisk, LIVE.maxGold, 'never over the cap');
+  assert.equal(LIVE.maxGold, 0.05); assert.ok(T.indexOf("{ id: 'live-gold-5', apply: (c) => { c.live = { ...(c.live || {}), goldRisk: 0.05 }; }") > T.indexOf("{ id: 'live-gold-3'"));
+  assert.equal(liveConfig({ live: { on: true, account: '*7653', goldRisk: 0.05 } }).goldRisk, 0.05);
   assert.equal(liveConfig({ live: { on: true, account: '*7653', risk: 0.005 } }).goldRisk, 0.005, 'no goldRisk = the common risk');
   const NQ = fs.readFileSync(new URL('../council/nq-demo.mjs', import.meta.url), 'utf8'), VB = fs.readFileSync(new URL('../council/vb-demo.mjs', import.meta.url), 'utf8');
   assert.ok(NQ.includes("X.live ? (R.market === 'xau' ? X.goldRisk : risk)"));

@@ -14,7 +14,7 @@ import { PT, liveSession, unseal } from './ctrader-mirror.mjs';
 
 // goldRisk (owner, 27 Nov 2026: "on gold change risk to 3 %", live account): the gold rules (gold breakout, gold 8-swing break)
 // risk their own share, at most maxGold 3 %; every other rule keeps `risk` (at most 1 %)
-export const LIVE = { risk: 0.005, maxRisk: 0.01, dayStop: 0.15, maxGold: 0.03 };
+export const LIVE = { risk: 0.005, maxRisk: 0.01, dayStop: 0.15, maxGold: 0.05 };   // maxGold 5 % (owner, 27 Nov 2026: "gold change to 5%")
 export function liveConfig(cfg) {
   const L = (cfg && cfg.live) || {}, m = /^\*(\d{3,})$/.exec(String(L.account || '').trim());
   if (L.on !== true) return { off: 'live is off in config.json' };

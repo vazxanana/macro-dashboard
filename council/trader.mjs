@@ -423,6 +423,11 @@ const USER_RULES = [
   { id: 'live-gold-3', apply: (c) => { c.live = { ...(c.live || {}), goldRisk: 0.03 }; },
     change: 'Live account: gold rules (gold breakout, gold 8-swing break) 3 % of the balance a trade; the others stay 0.5 %',
     why: 'Owner, 27 Nov 2026, real money. Two gold stop-outs in a day cost about 6 %; the 15 % daily stop is about five. Every order carries its stop.' },
+  // live-gold-5 (owner, 27 Nov 2026: "gold change to 5%"): the live gold rules risk 5 % of the balance a trade (live.mjs caps gold
+  // at 5 %). Three gold stop-outs in one day reach the 15 % daily stop.
+  { id: 'live-gold-5', apply: (c) => { c.live = { ...(c.live || {}), goldRisk: 0.05 }; },
+    change: 'Live account: gold rules (gold breakout, gold 8-swing break) 5 % of the balance a trade; the others stay 0.5 %',
+    why: 'Owner, 27 Nov 2026, real money. Three gold stop-outs in one day cost about 15 % and reach the daily stop. Every order carries its stop.' },
 ];
 config.userRules = config.userRules || [];
 // supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote
