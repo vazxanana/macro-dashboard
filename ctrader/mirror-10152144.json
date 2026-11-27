@@ -2843,6 +2843,32 @@
     "stopCheckedAt": "2026-11-27T07:30:12.000Z",
     "brokerStop": 174.79,
     "closedAt": "2026-11-27T07:45:54.000Z"
+   },
+   "eqx:fade:usdchf:fade-m15-s1795766400": {
+    "positionId": "51677071",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 600000,
+    "lots": 0.06,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T08:01:16.000Z",
+    "councilEntry": 0.8346,
+    "stop": 0.835084,
+    "t1": 0.833633,
+    "riskCash": 3.71,
+    "margin": 12,
+    "mark": 0.83458,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83481,
+    "slipR": -0.434,
+    "lagSec": 76,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T08:01:16.000Z",
+    "brokerStop": 0.83531
    }
   },
   "day": {
@@ -2850,13 +2876,14 @@
    "startBalance": 439.97,
    "lastBalance": 371.3,
    "ids": [
-    "51656090"
+    "51656090",
+    "51677071"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 371.3 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 371.3 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2873,14 +2900,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 371.3,
-  "lastRun": "2026-11-27T07:59:58.000Z"
+  "lastRun": "2026-11-27T08:03:25.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T06:42:12.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795501800: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795501800"
-  },
   {
    "at": "2026-11-24T07:20:00.000Z",
    "msg": "not mirrored yet eqx:fade:nzdusd:fade-m15-s1795502700: daily loss stop (95.0% down today) (will retry)",
@@ -4374,6 +4396,11 @@
    "at": "2026-11-27T07:45:54.000Z",
    "msg": "EURJPY position 51671430 closed at the broker",
    "trade": "eqx:fvg:eurjpy:fvg-h1-b1795762800-1795764600"
+  },
+  {
+   "at": "2026-11-27T08:01:16.000Z",
+   "msg": "opened sell USDCHF 0.06 lot (council eqx-fade)",
+   "trade": "eqx:fade:usdchf:fade-m15-s1795766400"
   }
  ],
  "limits": {
@@ -4478,9 +4505,9 @@
   ]
  },
  "execution": {
-  "n": 69,
-  "meanSlipR": 0.06,
-  "medianSlipR": 0.032,
+  "n": 70,
+  "meanSlipR": 0.052,
+  "medianSlipR": 0.026,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
   "bySymbol": {
@@ -4517,8 +4544,8 @@
     "meanSlipR": 0.11
    },
    "USDCHF": {
-    "n": 5,
-    "meanSlipR": 0.021
+    "n": 6,
+    "meanSlipR": -0.054
    },
    "XAGUSD": {
     "n": 4,
