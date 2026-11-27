@@ -2601,21 +2601,72 @@
     "exitPrice": 159.229,
     "councilExit": 159.207636,
     "councilR": 1
+   },
+   "eqx:fvg:eurjpy:fvg-h1-b1795752000-1795752900": {
+    "positionId": "51658074",
+    "symbol": "EURJPY",
+    "side": "buy",
+    "volume": 1100000,
+    "lots": 0.11,
+    "digits": 3,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-27T04:16:50.000Z",
+    "councilEntry": 174.754,
+    "stop": 174.701993,
+    "t1": 174.806007,
+    "riskCash": 3.76,
+    "margin": 24.15,
+    "fillPrice": 174.756,
+    "slipR": 0.038,
+    "lagSec": 110,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T04:16:50.000Z",
+    "brokerStop": 174.704
+   },
+   "eqx:fvg:eurusd:fvg-h1-b1795752000-1795752900": {
+    "positionId": "51658080",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 1200000,
+    "lots": 0.12,
+    "digits": 5,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-27T04:16:50.000Z",
+    "councilEntry": 1.09748,
+    "stop": 1.09717,
+    "t1": 1.09779,
+    "riskCash": 3.76,
+    "margin": 26.34,
+    "mark": 1.09748,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09749,
+    "slipR": 0.032,
+    "lagSec": 110,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T04:16:50.000Z",
+    "brokerStop": 1.09718
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 377.55,
+   "lastBalance": 375.65,
    "ids": [
     "51656090",
-    "51656455"
+    "51658074",
+    "51658080"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 377.55 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 375.65 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2631,20 +2682,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 377.55,
-  "lastRun": "2026-11-27T04:14:10.000Z"
+  "balance": 375.65,
+  "lastRun": "2026-11-27T04:18:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-20T19:53:41.000Z",
-   "msg": "moved US500 50584629 protection: stop 7217.25 -> 7114.75 (council ict-A)",
-   "trade": "ict:es-s-1795186800"
-  },
-  {
-   "at": "2026-11-20T20:53:27.000Z",
-   "msg": "moved US2000 50584644 protection: stop 2677.7 -> 2641.7 (council ict-A)",
-   "trade": "ict:rty-s-1795186800"
-  },
   {
    "at": "2026-11-20T21:29:47.000Z",
    "msg": "moved US500 50584629 protection: stop 7114.75 -> 7052.23 (council ict-A)",
@@ -4124,6 +4165,16 @@
    "at": "2026-11-27T04:14:10.000Z",
    "msg": "closed USDJPY position 51656455 (council: target)",
    "trade": "eqx:fvg:usdjpy:fvg-h1-s1795748400-1795752000"
+  },
+  {
+   "at": "2026-11-27T04:16:50.000Z",
+   "msg": "opened buy EURJPY 0.11 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:eurjpy:fvg-h1-b1795752000-1795752900"
+  },
+  {
+   "at": "2026-11-27T04:16:50.000Z",
+   "msg": "opened buy EURUSD 0.12 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:eurusd:fvg-h1-b1795752000-1795752900"
   }
  ],
  "limits": {
@@ -4228,9 +4279,9 @@
   ]
  },
  "execution": {
-  "n": 60,
-  "meanSlipR": 0.082,
-  "medianSlipR": 0.074,
+  "n": 62,
+  "meanSlipR": 0.081,
+  "medianSlipR": 0.057,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
   "bySymbol": {
@@ -4247,8 +4298,8 @@
     "meanSlipR": 0.284
    },
    "EURUSD": {
-    "n": 7,
-    "meanSlipR": 0.503
+    "n": 8,
+    "meanSlipR": 0.444
    },
    "XAUUSD": {
     "n": 1,
@@ -4259,8 +4310,8 @@
     "meanSlipR": 0.092
    },
    "EURJPY": {
-    "n": 7,
-    "meanSlipR": -0.17
+    "n": 8,
+    "meanSlipR": -0.144
    },
    "AUDUSD": {
     "n": 6,

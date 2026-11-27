@@ -7175,6 +7175,32 @@
     ],
     "stopCheckedAt": "2026-11-27T03:26:02.000Z",
     "brokerStop": 1.31138
+   },
+   "boxfade:usdchf:boxfade-m5-s1795752900": {
+    "positionId": "51658088",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 31100000,
+    "lots": 3.11,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T04:16:57.000Z",
+    "councilEntry": 0.83394,
+    "stop": 0.834455,
+    "t1": 0.833425,
+    "riskCash": 192.62,
+    "margin": 622,
+    "mark": 0.83394,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83387,
+    "slipR": 0.136,
+    "lagSec": 117,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T04:16:57.000Z",
+    "brokerStop": 0.83438
    }
   },
   "day": {
@@ -7183,13 +7209,14 @@
    "lastBalance": 9631.03,
    "ids": [
     "51656025",
-    "51656026"
+    "51656026",
+    "51658088"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9631.03 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 9631.03 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7198,14 +7225,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9631.03,
-  "lastRun": "2026-11-27T04:14:12.000Z"
+  "lastRun": "2026-11-27T04:18:45.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T13:35:29.000Z",
-   "msg": "XAUUSD position 49406279 closed at the broker",
-   "trade": "xau-replica-1794566727-s"
-  },
   {
    "at": "2026-11-13T15:31:59.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council replica)",
@@ -8694,6 +8716,11 @@
    "at": "2026-11-27T03:58:48.000Z",
    "msg": "AUDUSD position 51654553 closed at the broker",
    "trade": "boxfade:audusd:boxfade-m5-s1795747500"
+  },
+  {
+   "at": "2026-11-27T04:16:57.000Z",
+   "msg": "opened sell USDCHF 3.11 lot (council boxfade)",
+   "trade": "boxfade:usdchf:boxfade-m5-s1795752900"
   }
  ],
  "limits": {
@@ -8798,9 +8825,9 @@
   ]
  },
  "execution": {
-  "n": 245,
+  "n": 246,
   "meanSlipR": 0.059,
-  "medianSlipR": 0.027,
+  "medianSlipR": 0.028,
   "worstSlipR": 1.236,
   "medianLagSec": 71,
   "bySymbol": {
@@ -8833,8 +8860,8 @@
     "meanSlipR": 0.117
    },
    "USDCHF": {
-    "n": 17,
-    "meanSlipR": 0.146
+    "n": 18,
+    "meanSlipR": 0.145
    },
    "EURUSD": {
     "n": 17,
