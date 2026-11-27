@@ -2954,6 +2954,33 @@
     ],
     "stopCheckedAt": "2026-11-27T08:45:32.000Z",
     "brokerStop": 1.42519
+   },
+   "eqx:fvg:fvg-h1-b1795773600-1795774500": {
+    "positionId": "51691949",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-27T10:15:18.000Z",
+    "councilEntry": 3670.635,
+    "stop": 3663.981,
+    "t1": 3677.289,
+    "riskCash": 6.75,
+    "margin": 7.34,
+    "minLot": true,
+    "mark": 3670.735,
+    "levelsFrom": "mark",
+    "fillPrice": 3671.3,
+    "slipR": 0.1,
+    "lagSec": 18,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T10:15:18.000Z",
+    "brokerStop": 3664.55
    }
   },
   "day": {
@@ -2962,13 +2989,14 @@
    "lastBalance": 360.75,
    "ids": [
     "51656090",
-    "51688521"
+    "51688521",
+    "51691949"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 360.75 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 360.75 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2990,14 +3018,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 360.75,
-  "lastRun": "2026-11-27T10:14:09.000Z"
+  "lastRun": "2026-11-27T10:17:34.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T09:17:08.000Z",
-   "msg": "not mirrored yet eqx:fade:xag:fade-m15-b1795509000: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:xag:fade-m15-b1795509000"
-  },
   {
    "at": "2026-11-24T09:55:48.000Z",
    "msg": "not mirrored yet eqx:fade:usdchf:fade-m15-b1795511700: daily loss stop (95.0% down today) (will retry)",
@@ -4491,6 +4514,11 @@
    "at": "2026-11-27T09:00:39.000Z",
    "msg": "not mirrored yet eqx:fade:xag:fade-m15-s1795770000: XAGUSD: even the minimum lot (0.01) risks 14.08, 3.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "eqx:fade:xag:fade-m15-s1795770000"
+  },
+  {
+   "at": "2026-11-27T10:15:18.000Z",
+   "msg": "opened buy XAUUSD 0.01 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:fvg-h1-b1795773600-1795774500"
   }
  ],
  "limits": {
@@ -4595,9 +4623,9 @@
   ]
  },
  "execution": {
-  "n": 73,
-  "meanSlipR": 0.053,
-  "medianSlipR": 0.033,
+  "n": 74,
+  "meanSlipR": 0.054,
+  "medianSlipR": 0.035,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
   "bySymbol": {
@@ -4618,8 +4646,8 @@
     "meanSlipR": 0.408
    },
    "XAUUSD": {
-    "n": 1,
-    "meanSlipR": 0.193
+    "n": 2,
+    "meanSlipR": 0.147
    },
    "USDCAD": {
     "n": 10,
