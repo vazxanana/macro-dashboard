@@ -57,7 +57,7 @@
   }
  ],
  "decay": {
-  "at": "2026-11-26T18:03:23.000Z",
+  "at": "2026-11-27T00:00:28.000Z",
   "v": 1,
   "baseAt": "2026-11-11T22:19:46.138Z",
   "financing": {
@@ -545,10 +545,10 @@
   ],
   "decaying": [],
   "watch": [],
-  "slot": "2026-11-26T18"
+  "slot": "2026-11-27T00"
  },
  "book": {
-  "at": "2026-11-26T18:03:23.000Z",
+  "at": "2026-11-27T00:00:28.000Z",
   "v": 1,
   "label": "paper comparison, no live change",
   "from": "2026-11-04",
@@ -816,10 +816,10 @@
     "cumProp": 17.804
    }
   ],
-  "slot": "2026-11-26T18"
+  "slot": "2026-11-27T00"
  },
  "expect": {
-  "at": "2026-11-26T18:03:23.000Z",
+  "at": "2026-11-27T00:00:28.000Z",
   "v": 1,
   "baseAt": "2026-11-12T09:34:49.973Z",
   "rule": "expectations only: nothing here changes a rule, a size or a filter; the owner decides",
@@ -1541,10 +1541,10 @@
    }
   ],
   "out": [],
-  "slot": "2026-11-26T18"
+  "slot": "2026-11-27T00"
  },
  "forward": {
-  "at": "2026-11-26T18:03:23.000Z",
+  "at": "2026-11-27T00:00:28.000Z",
   "v": 1,
   "label": "protocol adopted by the owner, 12 Nov 2026 (decision 43)",
   "decision": 43,
@@ -1588,7 +1588,7 @@
    "ddMarked": 1,
    "firstAt": 1794491160,
    "lastAt": 1794491160,
-   "months": 0.48,
+   "months": 0.49,
    "from": "2026-11-12",
    "path": [
     [
@@ -1598,10 +1598,10 @@
    ]
   },
   "band": {
-   "months": 0.4846767815042969,
-   "p5": -0.59,
+   "months": 0.49282378888128375,
+   "p5": -0.6,
    "p50": 0.1,
-   "p95": 1.39,
+   "p95": 1.41,
    "clamp": false,
    "where": "below",
    "show": 12
@@ -1807,7 +1807,7 @@
   "alerts": [
    "Forward book: execution check E5 fails (nothing on the account the mirror did not place): 9 on the Council demo account with no mirror record: deal 50836523 USDCAD buy; deal 50838523 CADJPY sell; deal 50885979 EURJPY sell. Reported only (protocol adopted 12 Nov 2026, decision 43): nothing was changed."
   ],
-  "slot": "2026-11-26T18"
+  "slot": "2026-11-27T00"
  },
  "ledger": [
   {
@@ -2708,12 +2708,32 @@
    "d30": {
     "due": "2026-12-26T00:01:53.000Z"
    }
+  },
+  {
+   "id": "ch-1795737628-News-guard-on",
+   "at": "2026-11-27T00:00:28.000Z",
+   "by": "coach-stats",
+   "change": "News guard on",
+   "scope": {
+    "all": true
+   },
+   "evidence": {
+    "why": "Reviews: 14 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
+   },
+   "before": {
+    "n": 1087,
+    "R": 197.77,
+    "exp": 0.18
+   },
+   "d30": {
+    "due": "2026-12-27T00:00:28.000Z"
+   }
   }
  ],
- "ledgerSlot": "2026-11-26T18",
+ "ledgerSlot": "2026-11-27T00",
  "ledgerSince": "2026-11-07T20:36:23.000Z",
- "date": "2026-11-26",
- "at": "2026-11-26T00:01:53.000Z",
+ "date": "2026-11-27",
+ "at": "2026-11-27T00:00:28.000Z",
  "stats": {
   "rscalp": {
    "n": 6,
@@ -2780,17 +2800,17 @@
   }
  },
  "last14": {
-  "n": 1,
+  "n": 0,
   "w": 0,
-  "wr": 0,
-  "R": -1,
-  "exp": -1
+  "wr": null,
+  "R": 0,
+  "exp": null
  },
  "lessons": {
-  "n": 1125,
-  "losses": 671,
-  "system": 336,
-  "market": 335,
+  "n": 1130,
+  "losses": 673,
+  "system": 337,
+  "market": 336,
   "byCause": {
    "retrace-fail": {
     "n": 60,
@@ -2811,31 +2831,31 @@
     "shadow": 54
    },
    "leftmoney": {
-    "n": 248,
-    "R": 587.24,
+    "n": 255,
+    "R": 603.02,
     "verdict": "system",
     "title": "Target left money on the table",
     "lesson": "Consider holding part of the position for the next target.",
     "live": 2,
-    "shadow": 246
+    "shadow": 253
    },
    "reversal": {
-    "n": 62,
-    "R": -62,
+    "n": 63,
+    "R": -63,
     "verdict": "market",
     "title": "The market turned for real",
     "lesson": "Valid loss: the stop did its job. Nothing to fix unless this setup keeps doing it.",
     "live": 1,
-    "shadow": 61
+    "shadow": 62
    },
    "clean": {
-    "n": 176,
-    "R": 321.75,
+    "n": 172,
+    "R": 310.2,
     "verdict": "market",
     "title": "Clean win",
     "lesson": "The setup worked as designed.",
     "live": 4,
-    "shadow": 172
+    "shadow": 168
    },
    "becost": {
     "n": 3,
@@ -2847,13 +2867,13 @@
     "shadow": 1
    },
    "normal": {
-    "n": 135,
-    "R": -134.53,
+    "n": 134,
+    "R": -133.53,
     "verdict": "market",
     "title": "Normal loss",
     "lesson": "An accepted cost of trading. Count it, don't change the rules for it.",
     "live": 4,
-    "shadow": 131
+    "shadow": 130
    },
    "late": {
     "n": 11,
@@ -2874,13 +2894,13 @@
     "shadow": 4
    },
    "against": {
-    "n": 135,
-    "R": -135.22,
+    "n": 136,
+    "R": -136.22,
     "verdict": "system",
     "title": "Against the D1 trend",
     "lesson": "Favour trades with the D1 trend, or demand more reward:risk against it.",
     "live": 7,
-    "shadow": 128
+    "shadow": 129
    },
    "gaveback": {
     "n": 145,
@@ -2901,24 +2921,23 @@
     "shadow": 31
    },
    "news": {
-    "n": 57,
-    "R": -57,
+    "n": 58,
+    "R": -58,
     "verdict": "market",
     "title": "News spike",
     "lesson": "Avoid holding scalps and intraday trades through high-impact news: check the calendar before entering.",
     "live": 7,
-    "shadow": 50
+    "shadow": 51
    }
   },
   "top": [
-   "Target left money on the table (248×): Consider holding part of the position for the next target.",
+   "Target left money on the table (255×): Consider holding part of the position for the next target.",
    "Gave back the profit (145×): Move the stop to break-even or take a partial at +1R.",
-   "Against the D1 trend (135×): Favour trades with the D1 trend, or demand more reward:risk against it."
+   "Against the D1 trend (136×): Favour trades with the D1 trend, or demand more reward:risk against it."
   ]
  },
- "fslot": "2026-11-26T18",
+ "fslot": "2026-11-27T00",
  "notes": [
-  "News guard off for a re-test: Trades it blocked made 0.89R over 21."
- ],
- "proposalsBt": "2026-11-26T12:56:55.918Z"
+  "News guard on: Reviews: 14 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
+ ]
 }

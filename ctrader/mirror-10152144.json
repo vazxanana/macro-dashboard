@@ -2028,7 +2028,7 @@
     "lots": 0.01,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T23:15:21.000Z",
     "councilEntry": 41.468,
     "stop": 41.371911,
@@ -2040,25 +2040,26 @@
     "slipR": 0.135,
     "lagSec": 21,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T23:15:21.000Z",
-    "brokerStop": 41.385
+    "brokerStop": 41.385,
+    "closedAt": "2026-11-27T00:01:38.000Z"
    }
   },
   "day": {
-   "date": "2026-11-26",
-   "startBalance": 481.77,
-   "lastBalance": 430.32,
+   "date": "2026-11-27",
+   "startBalance": 439.97,
+   "lastBalance": 439.97,
    "ids": [
-    "51608452",
-    "51648056"
+    "51608452"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 430.32 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 439.97 · 1 open",
   "skipped": {
    "eqx:fade:nzdusd:fade-m15-b1795734000": "stop distance 0.000119 sits inside the broker spread 0.00017 on NZDUSD: no stop could be set"
   },
@@ -2084,15 +2085,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 430.32,
-  "lastRun": "2026-11-26T23:59:32.000Z"
+  "balance": 439.97,
+  "lastRun": "2026-11-27T00:01:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T00:21:15.000Z",
-   "msg": "opened sell US2000 1.7 lot (council ict-A)",
-   "trade": "ict:rty-s-1794438000"
-  },
   {
    "at": "2026-11-12T13:42:10.000Z",
    "msg": "moved US2000 48579371 protection: stop 2860.8 -> 2849.1 (council ict-A)",
@@ -3577,6 +3573,11 @@
    "at": "2026-11-26T23:27:38.000Z",
    "msg": "USDJPY position 51648055 closed at the broker",
    "trade": "eqx:fade:usdjpy:fade-m15-s1795734900"
+  },
+  {
+   "at": "2026-11-27T00:01:38.000Z",
+   "msg": "XAGUSD position 51648056 closed at the broker",
+   "trade": "eqx:fade:xag:fade-m15-b1795734900"
   }
  ],
  "limits": {

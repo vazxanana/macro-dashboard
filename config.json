@@ -4,7 +4,7 @@
  "minRisk": 1.1,
  "be": null,
  "fresh": 12,
- "newsGuard": false,
+ "newsGuard": true,
  "maxUsd": 2,
  "paused": {},
  "pausedMarkets": {},
@@ -697,6 +697,12 @@
    "by": "coach-stats",
    "change": "News guard off for a re-test",
    "why": "Trades it blocked made 0.89R over 21."
+  },
+  {
+   "at": "2026-11-27T00:00:28.000Z",
+   "by": "coach-stats",
+   "change": "News guard on",
+   "why": "Reviews: 14 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
   }
  ],
  "btAt": "2026-11-26T12:56:55.918Z",
@@ -770,19 +776,19 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-26T23:58:52.000Z",
+   "at": "2026-11-27T00:00:28.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-26T23:58:52.000Z",
+   "at": "2026-11-27T00:00:28.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
-   "at": "2026-11-26T00:01:53.000Z",
+   "at": "2026-11-27T00:00:28.000Z",
    "why": "market: -0.69R per trade over 13 trades"
   },
   "btc": {
-   "at": "2026-11-26T00:01:53.000Z",
+   "at": "2026-11-27T00:00:28.000Z",
    "why": "market: -1.00R per trade over 6 trades"
   },
   "position": {
@@ -916,7 +922,8 @@
  "cryptoTrendShadow": true,
  "coachChanged": {
   "intraday:d1": "2026-11-07T21:26:49.000Z",
-  "intraday:cf": "2026-11-12T11:35:21.000Z"
+  "intraday:cf": "2026-11-12T11:35:21.000Z",
+  "all:newsGuard": "2026-11-27T00:00:28.000Z"
  },
  "goldTrendFastShadow": true,
  "nqRegimeShadow": {
@@ -965,5 +972,6 @@
  },
  "gotobi": {
   "risk": 0.01
- }
+ },
+ "newsSince": "2026-11-27T00:00:28.000Z"
 }
