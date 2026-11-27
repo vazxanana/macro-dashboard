@@ -2444,7 +2444,7 @@
     "lots": 0.1,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T02:16:36.000Z",
     "councilEntry": 174.77,
     "stop": 174.826214,
@@ -2455,10 +2455,12 @@
     "slipR": -0.036,
     "lagSec": 96,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T02:16:36.000Z",
-    "brokerStop": 174.828
+    "brokerStop": 174.828,
+    "closedAt": "2026-11-27T03:03:40.000Z"
    },
    "eqx:fade:usdchf:fade-m15-b1795745700": {
     "positionId": "51652673",
@@ -2551,15 +2553,13 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 381.57,
-   "ids": [
-    "51652670"
-   ],
+   "lastBalance": 377.55,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 381.57 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 377.55 · 0 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2575,15 +2575,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 381.57,
-  "lastRun": "2026-11-27T03:00:53.000Z"
+  "balance": 377.55,
+  "lastRun": "2026-11-27T03:03:40.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-20T15:25:04.000Z",
-   "msg": "US2000 position 50566131 closed at the broker",
-   "trade": "ict:rty-b-1795183200"
-  },
   {
    "at": "2026-11-20T16:15:45.000Z",
    "msg": "opened sell US500 0.19 lot (council ict-A)",
@@ -4068,6 +4063,11 @@
    "at": "2026-11-27T02:47:37.000Z",
    "msg": "USDCHF position 51652673 closed at the broker",
    "trade": "eqx:fade:usdchf:fade-m15-b1795745700"
+  },
+  {
+   "at": "2026-11-27T03:03:40.000Z",
+   "msg": "EURJPY position 51652670 closed at the broker",
+   "trade": "eqx:fade:eurjpy:fade-m15-s1795745700"
   }
  ],
  "limits": {
