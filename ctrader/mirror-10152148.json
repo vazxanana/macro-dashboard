@@ -7338,6 +7338,30 @@
     ],
     "stopCheckedAt": "2026-11-27T05:46:03.000Z",
     "brokerStop": 159.392
+   },
+   "boxfade:nzdusd:boxfade-m5-b1795761600": {
+    "positionId": "51665287",
+    "symbol": "NZDUSD",
+    "side": "buy",
+    "volume": 25700000,
+    "lots": 2.57,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T06:42:07.000Z",
+    "councilEntry": 0.5488,
+    "stop": 0.548095,
+    "t1": 0.549505,
+    "riskCash": 181.37,
+    "margin": 282.13,
+    "fillPrice": 0.5488,
+    "slipR": 0,
+    "lagSec": 127,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T06:42:07.000Z",
+    "brokerStop": 0.5481
    }
   },
   "day": {
@@ -7347,13 +7371,14 @@
    "ids": [
     "51662133",
     "51662947",
-    "51663818"
+    "51663818",
+    "51665287"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9068.49 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 9068.49 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7362,14 +7387,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9068.49,
-  "lastRun": "2026-11-27T06:40:58.000Z"
+  "lastRun": "2026-11-27T06:44:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:04:50.000Z",
-   "msg": "close XAUUSD 49606352 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794597418-s"
-  },
   {
    "at": "2026-11-15T22:07:38.000Z",
    "msg": "close XAUUSD 49525852 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -8858,6 +8878,11 @@
    "at": "2026-11-27T05:46:03.000Z",
    "msg": "opened sell USDJPY 3.85 lot (council boxfade)",
    "trade": "boxfade:usdjpy:boxfade-m5-s1795758300"
+  },
+  {
+   "at": "2026-11-27T06:42:07.000Z",
+   "msg": "opened buy NZDUSD 2.57 lot (council boxfade)",
+   "trade": "boxfade:nzdusd:boxfade-m5-b1795761600"
   }
  ],
  "limits": {
@@ -8962,11 +8987,11 @@
   ]
  },
  "execution": {
-  "n": 251,
+  "n": 252,
   "meanSlipR": 0.057,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
-  "medianLagSec": 70,
+  "medianLagSec": 70.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -9005,8 +9030,8 @@
     "meanSlipR": 0.014
    },
    "NZDUSD": {
-    "n": 7,
-    "meanSlipR": 0.084
+    "n": 8,
+    "meanSlipR": 0.073
    },
    "USDJPY": {
     "n": 6,
