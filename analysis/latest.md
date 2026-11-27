@@ -8,7 +8,7 @@ _Snapshot 2026-11-09 05:40 UTC. Paper trading only._
 <!-- live-rule:start -->
 ## Live Scalp rule check
 
-Built by the Trader at 2026-11-27 18:14 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
+Built by the Trader at 2026-11-27 18:17 UTC from snapshot, config and the 30-day replay. Rule now: Scalp (M15 → M1) against D1 only, not in asia/overlap, skips audusd. **Scalp is not live right now** (not in focusSetups), so nothing below trades live.
 
 Session now: **newyork**.
 
@@ -31,7 +31,7 @@ Replay total on the markets it trades live: 226 trades, −0.07R a trade (−16.
 <!-- coach-churn:start -->
 ## Coach rule changes
 
-Built by the Trader at 2026-11-27 18:14 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
+Built by the Trader at 2026-11-27 18:17 UTC from the rule history. Rules the Coach changed by itself in the last 7 days (owner rules are not counted).
 
 | Rule | Changes | Steps (oldest first) |
 |---|---|---|
@@ -45,13 +45,13 @@ Built by the Trader at 2026-11-27 18:14 UTC from the rule history. Rules the Coa
 <!-- desk-status:start -->
 ## Desk & mirror status
 
-Built by the Trader at 2026-11-27 18:14 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
+Built by the Trader at 2026-11-27 18:17 UTC. ICT desk: the last 7 days; mirror: the cTrader DEMO account (0.01 lot, demo only).
 
 **ICT A-setups:** 0 signals (0 open, 0 closed); 8 other signals tracked, not A-setups.
 
 **Dip-buy candidate (NQ/ES, paper only):** 1 signal in 7 days, 1 closed −1.00R · recording since 2026-11-07.
 
-**cTrader mirror:** ok · demo Fusion Markets · balance 9418.21 · 0 open (checked 2026-11-27 18:11 UTC).
+**cTrader mirror:** ok · demo Fusion Markets · balance 9418.21 · 0 open (checked 2026-11-27 18:15 UTC).
 
 **Execution vs paper:** 14 demo fills; slippage against the council entry −0.01R on average (median +0.00R, worst +0.86R; positive = worse than paper), median 67638s from council fill to demo order.
 
@@ -66,7 +66,7 @@ Last mirror events:
 <!-- coach-ledger:start -->
 ## Coach change ledger
 
-Built by the Trader at 2026-11-27 18:14 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
+Built by the Trader at 2026-11-27 18:17 UTC. Every rule the Coach changed by itself, the evidence it used and what happened 30 days later. Filter changes run as champion/challenger trials: the old rule keeps running as a shadow and the change stays only if it beats it on the same forward signals (20 where they disagree, shrunk edge ≥ +0.05R a signal; else back to the old rule after 60 days). Owner rules and live setups are not Coach changes.
 
 | Date | Change | Evidence | Before → after (the sample it used) | Trial | 30 days later |
 |---|---|---|---|---|---|
@@ -171,7 +171,7 @@ Checked 2026-11-27 12:49 UTC; live signals 2026-11-01 to 2026-11-27.
 <!-- gold-systems:start -->
 ## Live gold systems now
 
-Built by the Trader at 2026-11-27 18:14 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
+Built by the Trader at 2026-11-27 18:17 UTC from its own snapshot and the live record. Status only: what each Meridian system is waiting for right now; the Book column says which trade live on paper and which are paper shadows; the Scalp block below describes a shadow system.
 
 | System | Book | Now | On |
 |---|---|---|---|
@@ -182,7 +182,7 @@ Built by the Trader at 2026-11-27 18:14 UTC from its own snapshot and the live r
 | Gold trend fast | shadow | waiting for a daily close above the 5-day high 3689.86 (last close 3568.01) | paper only |
 | Gold H4 trendline | shadow (paper, owner 11 Nov) | in a trade, stop 3426.50 | 1 open |
 | Gold daily engulf | live | daily close 3568.01 below the 20-day average 3841.56 | nothing on |
-| Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 down; 1 pullback zone watched (sell 3652.79-3659.84) · paper test | nothing on |
+| Gold momentum pullback | shadow (paper, owner 11 Nov) | D1 down; no pullback zone watched · paper test | 1 open |
 | NQ New York open run | shadow (paper, owner 11 Nov; research.json) | today: buy 26565.75, loss −1.00R | — |
 <!-- gold-systems:end -->
 
