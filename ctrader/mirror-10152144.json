@@ -3047,7 +3047,7 @@
     "lots": 0.05,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T11:30:56.000Z",
     "councilEntry": 0.83538,
     "stop": 0.834802,
@@ -3060,10 +3060,12 @@
     "slipR": -0.156,
     "lagSec": 56,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T11:30:56.000Z",
-    "brokerStop": 0.83469
+    "brokerStop": 0.83469,
+    "closedAt": "2026-11-27T11:46:40.000Z"
    },
    "eqx:fvg:usdchf:fvg-h1-b1795773600-1795779000": {
     "positionId": "51694327",
@@ -3073,7 +3075,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T11:30:56.000Z",
     "councilEntry": 0.83538,
     "stop": 0.834736,
@@ -3086,28 +3088,84 @@
     "slipR": -0.14,
     "lagSec": 56,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T11:30:56.000Z",
-    "brokerStop": 0.83463
+    "brokerStop": 0.83463,
+    "closedAt": "2026-11-27T11:46:40.000Z"
+   },
+   "eqx:fade:audusd:fade-m15-b1795779900": {
+    "positionId": "51694624",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 900000,
+    "lots": 0.09,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T11:46:40.000Z",
+    "councilEntry": 0.66702,
+    "stop": 0.666586,
+    "t1": 0.667887,
+    "riskCash": 3.55,
+    "margin": 12.01,
+    "mark": 0.66698,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66688,
+    "slipR": -0.323,
+    "lagSec": 100,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T11:46:40.000Z",
+    "brokerStop": 0.66649
+   },
+   "eqx:fvg:usdjpy:fvg-h1-b1795773600-1795779900": {
+    "positionId": "51694628",
+    "symbol": "USDJPY",
+    "side": "buy",
+    "volume": 1000000,
+    "lots": 0.1,
+    "digits": 3,
+    "setup": "eqx-fvg",
+    "status": "closed by council",
+    "openedAt": "2026-11-27T11:46:40.000Z",
+    "councilEntry": 159.438,
+    "stop": 159.382757,
+    "t1": 159.493243,
+    "riskCash": 3.55,
+    "margin": 20,
+    "fillPrice": 159.423,
+    "slipR": -0.272,
+    "lagSec": 100,
+    "alerted": [
+     "open",
+     "close"
+    ],
+    "stopCheckedAt": "2026-11-27T11:46:40.000Z",
+    "brokerStop": 159.368,
+    "closedAt": "2026-11-27T11:47:36.000Z",
+    "exitPrice": 159.4,
+    "councilExit": 159.382757,
+    "councilR": -1
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 362.25,
+   "lastBalance": 353.15,
    "ids": [
     "51656090",
     "51688521",
     "51692951",
-    "51694326",
-    "51694327"
+    "51694624"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 362.25 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 353.15 · 4 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3128,35 +3186,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 362.25,
-  "lastRun": "2026-11-27T11:44:38.000Z"
+  "balance": 353.15,
+  "lastRun": "2026-11-27T11:47:53.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T11:16:14.000Z",
-   "msg": "not mirrored yet eqx:fvg:xag:fvg-h1-s1795514400-1795518000: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fvg:xag:fvg-h1-s1795514400-1795518000"
-  },
-  {
-   "at": "2026-11-24T11:43:59.000Z",
-   "msg": "not mirrored yet eqx:fade:usdjpy:fade-m15-b1795518900: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:usdjpy:fade-m15-b1795518900"
-  },
-  {
-   "at": "2026-11-24T11:43:59.000Z",
-   "msg": "not mirrored yet eqx:fade:gbpusd:fade-m15-s1795518900: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:gbpusd:fade-m15-s1795518900"
-  },
-  {
-   "at": "2026-11-24T11:43:59.000Z",
-   "msg": "not mirrored yet eqx:fvg:usdcad:fvg-h1-b1795435200-1795519800: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fvg:usdcad:fvg-h1-b1795435200-1795519800"
-  },
-  {
-   "at": "2026-11-24T12:23:47.000Z",
-   "msg": "not mirrored yet eqx:fade:audusd:fade-m15-s1795520700: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:audusd:fade-m15-s1795520700"
-  },
   {
    "at": "2026-11-24T12:23:47.000Z",
    "msg": "not mirrored yet eqx:fvg:nzdusd:fvg-h1-s1795435200-1795521600: daily loss stop (95.0% down today) (will retry)",
@@ -4630,6 +4663,31 @@
    "at": "2026-11-27T11:30:56.000Z",
    "msg": "opened buy USDCHF 0.04 lot (council eqx-fvg)",
    "trade": "eqx:fvg:usdchf:fvg-h1-b1795773600-1795779000"
+  },
+  {
+   "at": "2026-11-27T11:46:40.000Z",
+   "msg": "USDCHF position 51694326 closed at the broker",
+   "trade": "eqx:fade:usdchf:fade-m15-b1795779000"
+  },
+  {
+   "at": "2026-11-27T11:46:40.000Z",
+   "msg": "USDCHF position 51694327 closed at the broker",
+   "trade": "eqx:fvg:usdchf:fvg-h1-b1795773600-1795779000"
+  },
+  {
+   "at": "2026-11-27T11:46:40.000Z",
+   "msg": "opened buy AUDUSD 0.09 lot (council eqx-fade)",
+   "trade": "eqx:fade:audusd:fade-m15-b1795779900"
+  },
+  {
+   "at": "2026-11-27T11:46:40.000Z",
+   "msg": "opened buy USDJPY 0.1 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdjpy:fvg-h1-b1795773600-1795779900"
+  },
+  {
+   "at": "2026-11-27T11:47:36.000Z",
+   "msg": "closed USDJPY position 51694628 (council: stopped)",
+   "trade": "eqx:fvg:usdjpy:fvg-h1-b1795773600-1795779900"
   }
  ],
  "limits": {
@@ -4734,11 +4792,11 @@
   ]
  },
  "execution": {
-  "n": 78,
-  "meanSlipR": 0.049,
-  "medianSlipR": 0.033,
+  "n": 80,
+  "meanSlipR": 0.04,
+  "medianSlipR": 0.026,
   "worstSlipR": 1.352,
-  "medianLagSec": 60,
+  "medianLagSec": 63,
   "bySymbol": {
    "GBPUSD": {
     "n": 8,
@@ -4749,8 +4807,8 @@
     "meanSlipR": -0.001
    },
    "USDJPY": {
-    "n": 9,
-    "meanSlipR": 0.216
+    "n": 10,
+    "meanSlipR": 0.168
    },
    "EURUSD": {
     "n": 9,
@@ -4769,8 +4827,8 @@
     "meanSlipR": -0.121
    },
    "AUDUSD": {
-    "n": 7,
-    "meanSlipR": 0.11
+    "n": 8,
+    "meanSlipR": 0.056
    },
    "USDCHF": {
     "n": 8,
