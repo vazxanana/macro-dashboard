@@ -86,8 +86,21 @@ test('owner rule live-on-7653: the USD live account, 0.5 % a trade, 15 % daily s
   const i = T.indexOf("{ id: 'live-on-7653'"); assert.ok(i > 0 && i < T.indexOf('for (const u of USER_RULES)'));
   assert.ok(T.includes("c.live = { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 };"));
   const L = liveConfig({ live: { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 } });
-  assert.deepEqual(L, { account: '*7653', tail: '7653', risk: 0.005, dayStop: 0.15 });
+  assert.deepEqual(L, { account: '*7653', tail: '7653', risk: 0.005, dayStop: 0.15, goldRisk: 0.005 });
   // the owner's real account list: only 9087653 is picked, never a demo, never the GBP live account
   const list = [{ traderLogin: 9027681, isLive: true }, { traderLogin: 9087653, isLive: true }, { traderLogin: 10156153, isLive: false }];
   assert.equal(pickLive(list, L.tail).traderLogin, 9087653);
+});
+
+test('owner rule live-gold-3: live gold rules risk 3 % (capped there), the others keep 0.5 %', () => {
+  const T = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
+  assert.ok(T.includes("{ id: 'live-gold-3', apply: (c) => { c.live = { ...(c.live || {}), goldRisk: 0.03 }; }"));
+  assert.ok(T.indexOf("{ id: 'live-gold-3'") > T.indexOf("{ id: 'live-on-7653'"), 'applied after the live account rule');
+  const L = liveConfig({ live: { on: true, account: '*7653', risk: 0.005, dayStop: 0.15, goldRisk: 0.03 } });
+  assert.equal(L.risk, 0.005); assert.equal(L.goldRisk, 0.03);
+  assert.equal(liveConfig({ live: { on: true, account: '*7653', goldRisk: 0.2 } }).goldRisk, LIVE.maxGold, 'never over 3 %');
+  assert.equal(liveConfig({ live: { on: true, account: '*7653', risk: 0.005 } }).goldRisk, 0.005, 'no goldRisk = the common risk');
+  const NQ = fs.readFileSync(new URL('../council/nq-demo.mjs', import.meta.url), 'utf8'), VB = fs.readFileSync(new URL('../council/vb-demo.mjs', import.meta.url), 'utf8');
+  assert.ok(NQ.includes("X.live ? (R.market === 'xau' ? X.goldRisk : risk)"));
+  assert.ok(VB.includes("X.live && M.sym === 'xau' ? X.goldRisk : risk"));
 });

@@ -98,9 +98,10 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           // the size that risks `risk` of the balance; when that is under the broker's smallest volume, the smallest volume is
           // used as long as a stop-out then costs no more than MAX_RISK of the balance (gold on a small demo balance), else no trade
           if (X.live) { const gt = dayGate(dir, balance, now, X.dayStop); if (!gt.ok) { rec.why = gt.why; J.trades.push(rec); dirty = true; did.push(`${w.k} daily stop`); continue; } }
-          let volume = sizeOf(M, info, balance, risk, L.D, last), riskNow = risk;
+          const mRisk = X.live && M.sym === 'xau' ? X.goldRisk : risk, mCap = X.live && M.sym === 'xau' ? X.maxGold : MAX_RISK;   // live gold: its own share (owner, 27 Nov 2026)
+          let volume = sizeOf(M, info, balance, mRisk, L.D, last), riskNow = mRisk;
           if (!volume) { const min = +info.minVolume || +info.stepVolume || 0, loss = (min / 100) * M.usdPerUnit(L.D, last); riskNow = balance > 0 ? loss / balance : Infinity;
-            if (!(min > 0 && riskNow <= MAX_RISK)) throw new Error('the smallest volume would risk more than 1 % of the balance'); volume = min; }
+            if (!(min > 0 && riskNow <= mCap)) throw new Error(`the smallest volume would risk more than ${mCap * 100} % of the balance`); volume = min; }
           const stop = at(L.O), base = { ctidTraderAccountId: ctid, symbolId: sym.symbolId, orderType: 3, volume, stopLoss: stop, label: M.label, comment: `${M.label} ${day}`, timeInForce: 1, expirationTimestamp: rec.exitAt * 1000 };   // 3: STOP order, 1: GOOD_TILL_DATE
           if (!(stop < at(L.buyAt) && stop > at(L.sellAt))) throw new Error('the levels do not leave a stop on the losing side');
           const ids = {};

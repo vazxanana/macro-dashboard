@@ -12,13 +12,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { PT, liveSession, unseal } from './ctrader-mirror.mjs';
 
-export const LIVE = { risk: 0.005, maxRisk: 0.01, dayStop: 0.15 };
+// goldRisk (owner, 27 Nov 2026: "on gold change risk to 3 %", live account): the gold rules (gold breakout, gold 8-swing break)
+// risk their own share, at most maxGold 3 %; every other rule keeps `risk` (at most 1 %)
+export const LIVE = { risk: 0.005, maxRisk: 0.01, dayStop: 0.15, maxGold: 0.03 };
 export function liveConfig(cfg) {
   const L = (cfg && cfg.live) || {}, m = /^\*(\d{3,})$/.exec(String(L.account || '').trim());
   if (L.on !== true) return { off: 'live is off in config.json' };
   if (!m) return { off: 'config.json live.account must be "*" and the last digits of the live login' };
   const risk = Math.min(LIVE.maxRisk, Math.max(0.0005, +L.risk || LIVE.risk)), dayStop = Math.min(0.5, Math.max(0.01, +L.dayStop || LIVE.dayStop));
-  return { account: '*' + m[1], tail: m[1], risk, dayStop };
+  const goldRisk = L.goldRisk == null ? risk : Math.min(LIVE.maxGold, Math.max(0.0005, +L.goldRisk || risk));
+  return { account: '*' + m[1], tail: m[1], risk, dayStop, goldRisk };
 }
 export const liveEnvOk = (env) => String(env.CTRADER_LIVE || '').trim().toLowerCase() === 'on' && ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET'].every((k) => env[k]) && !!(env.CTRADER_LIVE_ACCESS_TOKEN || env.CTRADER_ACCESS_TOKEN);
 // the one live account whose login ends in `tail`; null when none or several (never a demo account)
@@ -51,6 +54,6 @@ export function dayGate(dir, balance, now, dayStop) {
 export function modeOf(mode, cfg, env, demo) {
   if (mode !== 'live') return { live: false, ...demo };
   const L = liveConfig(cfg);
-  return { live: true, off: L.off || (!liveEnvOk(env) ? 'CTRADER_LIVE is not on' : null), account: L.account, risk: L.risk, maxRisk: LIVE.maxRisk, dayStop: L.dayStop,
+  return { live: true, off: L.off || (!liveEnvOk(env) ? 'CTRADER_LIVE is not on' : null), account: L.account, risk: L.risk, maxRisk: LIVE.maxRisk, dayStop: L.dayStop, goldRisk: L.goldRisk, maxGold: LIVE.maxGold,
     file: path.join(demo.dir, 'live', demo.name + '.json'), label: (x) => 'lv-' + x, connect: liveConnect };
 }

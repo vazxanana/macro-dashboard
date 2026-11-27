@@ -1320,6 +1320,9 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   7653; the token also sees a GBP live account, ending 7681, which is never picked). Owner rule `live-on-7653` sets
   `config.live = { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 }`. It trades only once `CTRADER_LIVE=on` is set and
   the account holds money (a balance of 0 places nothing).
+- **Status (27 Nov 2026, later): gold at 3 %.** Owner: "on gold change risk to 3 %", for the live account. Rule `live-gold-3`:
+  the gold breakout and the gold 8-swing break risk 3 % of the balance a trade (capped at 3 %); the other live rules stay 0.5 %.
+  Two gold stop-outs in one day cost about 6 %; the 15 % daily stop then needs about five.
 - **What it is**: `council/live.mjs` + `council/nq-demo.mjs --live` + `council/vb-demo.mjs --live` (council.yml, each round and
   quick pass). Its own records `live/nq.json`, `live/vb.json`, `live/day.json`, labels `lv-...`.
 - **To switch it on (all three needed)**: (1) authorise the live account for the cTrader app (the same app the demo uses);

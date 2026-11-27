@@ -107,7 +107,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
       try { await s.send(PT.AMEND_POSITION_SLTP_REQ, { ctidTraderAccountId: ctid, positionId: Number(p.positionId), stopLoss: rec.stop, ...(rec.target != null ? { takeProfit: rec.target } : {}) }, PT.EXECUTION_EVENT, amendStep); rec.stopSetBy = 'amend'; return true; }
       catch (e) { const px = await closeNow(p); Object.assign(rec, { status: 'closed', exit: px, how: 'closed at once: the broker took no stop', closedSeen: iso(), R: px != null && rec.fill != null ? +((px - rec.fill) / rec.dist).toFixed(3) : null }); return false; } };
     let positions = await reconcile();
-    for (const w of work) { const R = w.R, { D, forming } = w.F, i = D.n - 1, rows = ROWS[R.market], r5 = (v) => +(+v).toFixed(R.dp + 2), ruleRisk = !X.live && R.risk ? Math.min(R.maxRisk, Math.max(0.0005, +C[R.id + 'Risk'] || R.risk)) : risk, capRisk = X.live ? X.maxRisk : R.maxRisk || MAX_RISK, LB = lab(R.label);
+    for (const w of work) { const R = w.R, { D, forming } = w.F, i = D.n - 1, rows = ROWS[R.market], r5 = (v) => +(+v).toFixed(R.dp + 2), ruleRisk = X.live ? (R.market === 'xau' ? X.goldRisk : risk) : R.risk ? Math.min(R.maxRisk, Math.max(0.0005, +C[R.id + 'Risk'] || R.risk)) : risk, capRisk = X.live ? (R.market === 'xau' ? X.maxGold : X.maxRisk) : R.maxRisk || MAX_RISK, LB = lab(R.label);
       try {
         if (w.what === 'enter') {
           const sg = w.sg, rec = { id: `${R.id}-${h0}`, rule: R.id, barT: h0, status: 'skip', side: 'buy', signalBar: D.t[i], market: R.market, atr: r5(sg.atr), dist: r5(sg.dist), rr: sg.rr, hold: sg.hold, account: tag };
