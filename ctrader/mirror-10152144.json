@@ -2137,7 +2137,7 @@
     "lots": 0.12,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T00:17:51.000Z",
     "councilEntry": 1.09638,
     "stop": 1.09611,
@@ -2150,10 +2150,12 @@
     "slipR": 0.333,
     "lagSec": 171,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T00:17:51.000Z",
-    "brokerStop": 1.09611
+    "brokerStop": 1.09611,
+    "closedAt": "2026-11-27T00:53:10.000Z"
    },
    "eqx:fade:nzdusd:fade-m15-b1795738500": {
     "positionId": "51649052",
@@ -2211,18 +2213,17 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 424.68,
+   "lastBalance": 419.76,
    "ids": [
     "51608452",
     "51649037",
-    "51649040",
     "51649273"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 424.68 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 419.76 · 3 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2246,15 +2247,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 424.68,
-  "lastRun": "2026-11-27T00:50:40.000Z"
+  "balance": 419.76,
+  "lastRun": "2026-11-27T00:53:36.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T10:16:28.000Z",
-   "msg": "opened buy US500 0.18 lot (council ict-A+)",
-   "trade": "ict:es-b-1794560400"
-  },
   {
    "at": "2026-11-13T11:31:20.000Z",
    "msg": "opened buy US30 0.14 lot (council ict-A)",
@@ -3739,6 +3735,11 @@
    "at": "2026-11-27T00:41:33.000Z",
    "msg": "EURUSD position 51649039 closed at the broker",
    "trade": "eqx:fade:eurusd:fade-m15-b1795738500"
+  },
+  {
+   "at": "2026-11-27T00:53:10.000Z",
+   "msg": "EURUSD position 51649040 closed at the broker",
+   "trade": "eqx:fvg:eurusd:fvg-h1-b1795680000-1795738500"
   }
  ],
  "limits": {
