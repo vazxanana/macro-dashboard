@@ -45,3 +45,13 @@ test('a level from the right-click menu, and arrow keys on the chart', () => {
   assert.match(q, /'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'End'/);
   assert.match(q, /document\.querySelector\('\.ch-rp\.on'\)/, 'a replay keeps its arrow keys');
 });
+
+test('the drawings list: every drawing of the market, select, lock, delete', () => {
+  const d = fs.readFileSync('assets/ms-draw.js', 'utf8'), h = fs.readFileSync('market-structure.html', 'utf8');
+  assert.match(d, /window\.msDrawList = openList/);
+  assert.match(d, /data-m="list">Drawings list/);
+  assert.match(d, /e\.code === 'KeyL'/);
+  assert.match(d, /data-rm="\$\{i\}"/);
+  assert.match(h, /\.ms-dlist \{/);
+  assert.match(h, /:not\(\.ms-dlist\)/, 'kept in full screen');
+});

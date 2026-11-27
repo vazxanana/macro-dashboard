@@ -30,7 +30,7 @@
   // undo / redo (27 Nov 2026): every save keeps the market's previous saved drawings; memory only, 100 steps, cleared on a reload
   const SAVED = {}, UNDO = [], REDO = [];
   const savedOf = (mk) => (mk in SAVED ? SAVED[mk] : (SAVED[mk] = ls.get(KEY(mk)) || '[]'));
-  const save = (mk) => { const now = JSON.stringify(ST[mk] || []), prev = savedOf(mk); if (prev !== now) { UNDO.push([mk, prev]); if (UNDO.length > 100) UNDO.shift(); REDO.length = 0; } SAVED[mk] = now; ls.set(KEY(mk), now); };
+  const save = (mk) => { const now = JSON.stringify(ST[mk] || []), prev = savedOf(mk); if (prev !== now) { UNDO.push([mk, prev]); if (UNDO.length > 100) UNDO.shift(); REDO.length = 0; } SAVED[mk] = now; ls.set(KEY(mk), now); if (typeof listDraw === 'function') try { listDraw(); } catch (e) {} };
   function back(from, to) { const it = from.pop(); if (!it) { note(from === UNDO ? 'Nothing to undo.' : 'Nothing to redo.'); return false; } const [mk, s] = it; to.push([mk, savedOf(mk)]);
     let a = []; try { a = JSON.parse(s); } catch (e) {} ST[mk] = BT() ? BT().drawNorm(a) : a; SAVED[mk] = s; ls.set(KEY(mk), s); SEL = null; HOV = null; GES = null; bar(); paintAll(); return true; }
   let SELC = null, TOOL = null, MAG = +(ls.get(MAGK) || 0) || 0, SEL = null, HOV = null, GES = null, DRAFT = null;   // SEL / HOV = { mk, i }
@@ -212,7 +212,7 @@
     const last = [...L.keys()].reverse().find((i) => !L[i].lock);
     m.innerHTML = `<button type="button" role="menuitem" data-m="reset">Reset chart view</button>` + (h ? `<button type="button" role="menuitem" data-m="del">Delete this drawing</button>` : '')
       + `<button type="button" role="menuitem" data-m="last"${last == null ? ' disabled' : ''}>Remove the last drawing</button><button type="button" role="menuitem" data-m="all"${L.length ? '' : ' disabled'}>Delete all drawings</button>`
-      + `<button type="button" role="menuitem" data-m="undo"${UNDO.length ? '' : ' disabled'}>Undo <kbd>Ctrl+Z</kbd></button><button type="button" role="menuitem" data-m="redo"${REDO.length ? '' : ' disabled'}>Redo <kbd>Ctrl+Y</kbd></button>`
+      + `<button type="button" role="menuitem" data-m="list">Drawings list <kbd>Alt+L</kbd></button><button type="button" role="menuitem" data-m="undo"${UNDO.length ? '' : ' disabled'}>Undo <kbd>Ctrl+Z</kbd></button><button type="button" role="menuitem" data-m="redo"${REDO.length ? '' : ' disabled'}>Redo <kbd>Ctrl+Y</kbd></button>`
       + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0)) return ''; menu.lv = p; const t = cx.fmt ? cx.fmt(p) : p.toFixed(2);   // a level from the menu (27 Nov 2026)
         return `<hr class="cm-sep"><button type="button" role="menuitem" data-m="hl">Horizontal line at ${t}</button><button type="button" role="menuitem" data-m="al">Alert at ${t}</button>`; })()
       + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0) || !window.msPaperDraftAt || !window.msPaperMarket || window.msPaperMarket() !== mk) return '';   // paper orders from the chart (19 Nov 2026)
@@ -225,6 +225,7 @@
       if (k === 'last' && last != null) remove(mk, last);
       if ((k === 'hl' || k === 'al') && menu.lv > 0) { LASTCX = cx; const d = { type: 'h', price: menu.lv }; if (k === 'al') d.alert = true; commit(mk, d);
         if (k === 'al') { note('Alert on: you are told when price crosses this line while this page is open.'); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {} } }
+      if (k === 'list') openList(cx);
       if (k === 'undo') back(UNDO, REDO); if (k === 'redo') back(REDO, UNDO);
       if (k === 'all') { const ok = window.msConfirm ? await window.msConfirm(`Delete all ${L.filter((d) => !d.lock).length} drawings on this market? Locked ones stay.`, { title: 'Delete all drawings', ok: 'Delete all', danger: true }) : confirm('Delete all drawings?');
         if (ok) { ST[mk] = L.filter((d) => d.lock); save(mk); SEL = null; bar(); paintAll(); } } };
@@ -232,10 +233,36 @@
 
   // ---- keys ----
   document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '') || document.querySelector('dialog[open]') || !CX.some((c) => c.visible())) return;
-    if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x', KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
+    if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x', KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } if (e.code === 'KeyL') { e.preventDefault(); if (LIST && !LIST.hidden) LIST.hidden = true; else openList(); return; } }
     if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES) { if (SEL && GES.d0) load(SEL.mk)[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
     if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); }
     if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.code === 'KeyZ' || e.code === 'KeyY')) { e.preventDefault(); back(e.code === 'KeyY' || e.shiftKey ? REDO : UNDO, e.code === 'KeyY' || e.shiftKey ? UNDO : REDO); } });
+  // ---- the drawings list (27 Nov 2026): every drawing of the market on the chart, newest first; a row selects it and brings it into
+  // view, with lock and delete. Opened from the right-click menu or Alt+L. Nothing new is stored.
+  const NAMES = { h: 'Horizontal line', hr: 'Horizontal ray', v: 'Vertical line', t: 'Trend line', r: 'Box', f: 'Fibonacci', a: 'Arrow', x: 'Text', c: 'Channel', m: 'Price range', w: 'Anchored VWAP', p: 'Measured move', b: 'ATR band' };
+  let LIST = null, LISTCX = null;
+  const fmtP = (cx, p) => (p > 0 ? (cx && cx.fmt ? cx.fmt(p) : (+p).toFixed(2)) : '');
+  const fmtT = (t) => { if (!(t > 0)) return ''; const d = new Date(t * 1000); return d.toISOString().slice(5, 16).replace('T', ' ') + ' UTC'; };
+  function rowsOf(cx) { const mk = mkOf(cx), L = load(mk);
+    return L.map((d, i) => ({ i, d })).reverse().map(({ i, d }) => { const pr = d.type === 'h' || d.type === 'b' ? d.price : d.p1, what = d.type === 'x' ? '“' + String(d.text || '').slice(0, 24) + '”' : fmtP(cx, pr);
+      return `<li${SEL && SEL.mk === mk && SEL.i === i ? ' class="on"' : ''}><button type="button" class="dl-go" data-i="${i}"><b>${NAMES[d.type] || d.type}</b><span>${what}${d.t1 ? ' · ' + fmtT(d.t1) : ''}${d.alert ? ' · alert' : ''}</span></button>`
+        + `<button type="button" class="dl-ic" data-lk="${i}" aria-pressed="${!!d.lock}" aria-label="${d.lock ? 'Unlock' : 'Lock'} ${NAMES[d.type] || ''}">${d.lock ? 'Locked' : 'Lock'}</button>`
+        + `<button type="button" class="dl-ic" data-rm="${i}" title="Delete" aria-label="Delete ${NAMES[d.type] || ''}"${d.lock ? ' disabled' : ''}>✕</button></li>`; }).join(''); }
+  function listDraw() { if (!LIST || LIST.hidden || !LISTCX) return; const n = load(mkOf(LISTCX)).length;
+    LIST.innerHTML = `<div class="dl-h"><b>Drawings</b><span>${n} on ${String(mkOf(LISTCX)).toUpperCase()}</span><button type="button" class="dl-ic" data-x aria-label="Close">✕</button></div>` + (n ? `<ul>${rowsOf(LISTCX)}</ul>` : '<p class="dl-e">No drawings on this market yet. Pick a tool on the left (or Alt+T, Alt+H, …) and draw.</p>'); }
+  function focusOn(cx, d) { const c = toChart(d, cx.TZ), t = c.t1 || null; if (!t) return; const v = view(cx), lg = BT().tfLogical(v.bars, v.n, v.sec, t); if (lg == null) return;
+    const ts = cx.chart.timeScale(), r = ts.getVisibleLogicalRange(); if (!r || (lg > r.from + 2 && lg < r.to - 2)) return; const w = r.to - r.from; ts.setVisibleLogicalRange({ from: lg - w / 2, to: lg + w / 2 }); }
+  function openList(cx) { if (!cx) cx = LASTCX || CX.find((c) => c.visible()); if (!cx) return; LISTCX = cx;
+    if (!LIST) { LIST = document.createElement('div'); LIST.id = 'ms-dlist'; LIST.className = 'ms-dlist'; LIST.setAttribute('role', 'dialog'); LIST.setAttribute('aria-label', 'Drawings on this market');
+      LIST.addEventListener('pointerdown', (e) => e.stopPropagation());
+      LIST.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; const mk = mkOf(LISTCX), L = load(mk);
+        if (b.hasAttribute('data-x')) { LIST.hidden = true; return; }
+        if (b.dataset.rm != null) { remove(mk, +b.dataset.rm); listDraw(); return; }
+        if (b.dataset.lk != null) { const d = L[+b.dataset.lk]; if (d) { if (d.lock) delete d.lock; else d.lock = true; save(mk); bar(); paintAll(); } listDraw(); return; }
+        if (b.dataset.i != null) { const i = +b.dataset.i; if (!L[i]) return; SEL = { mk, i }; SELC = LISTCX; focusOn(LISTCX, L[i]); paintAll(); bar(); listDraw(); } });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && LIST && !LIST.hidden) LIST.hidden = true; }); }
+    if (LIST.parentNode !== fsHost()) fsHost().appendChild(LIST); LIST.hidden = false; listDraw(); }
+  window.msDrawList = openList;
   window.msDrawUndo = () => back(UNDO, REDO); window.msDrawRedo = () => back(REDO, UNDO);
   addEventListener('scroll', () => { if (SEL) bar(); }, { passive: true });
 

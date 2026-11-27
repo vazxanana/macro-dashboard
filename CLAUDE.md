@@ -2695,7 +2695,9 @@ are left alone. Styles `.ms-qk` (glass in `assets/soft.css`). `assets/ms-draw.js
 drawings in memory (100 steps, gone on a reload): Ctrl / Cmd + Z undo, Ctrl + Shift + Z or Ctrl + Y redo, and both in the right-click
 menu; `window.msDrawUndo` / `msDrawRedo`. The right-click menu also offers "Horizontal line at <price>" and "Alert at <price>" (a line
 alert, `d.alert`) at the price under the pointer. Arrow keys move the chart under the mouse a candle (Shift: ten), up / down zoom, End
-goes to the latest candle (not while a pane is in replay). Test: `tests/charts-quick.test.mjs`.
+goes to the latest candle (not while a pane is in replay). **Drawings list** (`#ms-dlist`, Alt+L or the right-click menu,
+`window.msDrawList`): every drawing of the market, newest first; a row selects it and brings it into view, Lock / Delete per row.
+Test: `tests/charts-quick.test.mjs`.
 
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
