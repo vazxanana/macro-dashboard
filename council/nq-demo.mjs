@@ -30,7 +30,7 @@ import { readConfig } from './owner-config.mjs';
 // study's `G` (a test compares). Each rule names its market; the Nasdaq rules keep 1 %.
 export const UJ = { id: 'uj', name: 'USD/JPY morning breakout', label: 'nq-uj', market: 'usdjpy', symbol: 'USDJPY', risk: 0.02, maxRisk: 0.02, dp: 3,
   g: { mk: 'usdjpy', trig: [{ kind: 'brk', N: 10 }], side: 'long', hours: [7, 13], dows: [2, 3, 4], trend: 'with', vol: 'none', volP: 0.5, stop: 3, rr: 3, hold: 8 } };
-export const IDS = ['l1', 'l5', 'uj'], RISK = 0.01, MAX_RISK = 0.01, LOOK_FROM = 8, LOOK_UNTIL = 720, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
+export const IDS = ['l1', 'l5', 'uj'], RISK = 0.01, MAX_RISK = 0.01, LOOK_FROM = 2, LOOK_UNTIL = 720, SHUT_AFTER = 60, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
 export const RULES = Object.fromEntries(IDS.map((id) => { if (id === UJ.id) return [id, UJ]; const L = NQ1_LEADS.find((x) => x.id === id); return [id, { id, name: L.name, label: `nq-${id}`, market: 'nas100', symbol: 'NAS100', dp: 2, g: L.g }]; }));
 export const MARKETS = [...new Set(IDS.map((id) => RULES[id].market))];
 // the live account (27 Nov 2026, owner: rules "All"): the three rules above and the gold 8-swing break (NQ2_GOLD: research/edge/gold-bo8-exec,
@@ -86,7 +86,8 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   const FR = {}, ROWS = {}; let shut = 0;   // one read a market; a failed read is not marked looked: the next pass tries again
   for (const mk of markets) { let rows; try { rows = await barsFn(now, mk); } catch (e) { log(NM + ': ' + scrub(String((e && e.message) || e)).slice(0, 160)); return { error: true }; }
     const F = frame(rows || [], now, mk); ROWS[mk] = rows || []; if (F.why || !F.forming) { shut++; continue; } FR[mk] = F; }
-  if (shut === markets.length) { J.looked = h0; write(false); return { skipped: 'market shut (no candle of this hour)' }; }
+  // the new hour's candle can take a few seconds to appear: only after SHUT_AFTER s is a missing one a shut market (marked looked)
+  if (shut === markets.length) { if (sec < SHUT_AFTER) return { skipped: 'waiting for the candle of this hour' }; J.looked = h0; write(false); return { skipped: 'market shut (no candle of this hour)' }; }
   const work = [];
   for (const id of ids) { const R = RULES[id], F = FR[R.market]; if (!F) continue; const open = J.trades.find((x) => x.rule === id && x.status === 'open');
     if (open) { const held = F.closed.filter((r) => r[0] >= open.barT).length; work.push({ R, F, rec: open, what: held >= open.hold ? 'exit' : 'watch', held }); continue; }

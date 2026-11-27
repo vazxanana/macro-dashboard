@@ -125,7 +125,7 @@ test('wiring: demo only, its own labels, the loop runs it under a timeout, and n
   const src = fs.readFileSync(new URL('../council/vb-demo.mjs', import.meta.url), 'utf8'), yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8');
   assert.match(src, /CTRADER_ENV\)\.trim\(\)\.toLowerCase\(\) !== 'demo'/); assert.ok(src.includes("from './gotobi.mjs'"), 'connect() refuses an account that is not a demo');
   assert.equal(MARKETS.xau.label, 'vb-xau'); assert.equal(MARKETS.usdjpy.label, 'vb-usdjpy');
-  assert.equal((yml.match(/timeout 45 node council\/vb-demo\.mjs data \|\| echo/g) || []).length, 2, 'the round and the quick pass');
+  assert.equal((yml.match(/job council\/vb-demo\.mjs data \|\| echo/g) || []).length, 2, 'the round and the quick pass');
   for (const m of src.matchAll(/PT\.NEW_ORDER_REQ, \{([^}]*)\}/g)) assert.ok(m[1].includes('...base'), 'every order carries the stop of `base`');
   assert.ok(/stopLoss: stop, label: M\.label/.test(src));
 });

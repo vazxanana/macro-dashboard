@@ -96,7 +96,7 @@ test('a signal: one market BUY with its stop and target on the order, 1 % of the
 test('no signal, a shut market or the switch off: no connection at all', async () => {
   const quiet = (() => { for (let i = 1000; i < ALL.length - 2; i++) if (IDS.every((id) => !signalAt(DALL, RULES[id].g, i, ALL[i + 1][0]))) return i; })();
   let dir = setup(), b = broker(); assert.deepEqual(await go(dir, b, ALL[quiet + 1][0] + 30, feedAt(quiet)), { skipped: 'no signal' }); assert.equal(b.sent.length, 0);
-  dir = setup(); b = broker(); const out = await go(dir, b, ALL[I1 + 1][0] + 30, async () => ALL.slice(I1 - 899, I1 + 1)); assert.match(out.skipped, /market shut/); assert.equal(b.sent.length, 0);
+  dir = setup(); b = broker(); const out = await go(dir, b, ALL[I1 + 1][0] + 30, async () => ALL.slice(I1 - 899, I1 + 1)); assert.match(out.skipped, /waiting for the candle/); assert.equal(b.sent.length, 0); { const o2 = await go(dir, b, ALL[I1 + 1][0] + 90, async () => ALL.slice(I1 - 899, I1 + 1)); assert.match(o2.skipped, /market shut/); }; assert.equal(b.sent.length, 0);
   dir = setup({ nq: { on: false } }); b = broker(); assert.deepEqual(await go(dir, b, ALL[I1 + 1][0] + 30, feedAt(I1)), { skipped: 'off' }); assert.equal(b.sent.length, 0);
   // a failed candle read is tried again by the next pass (the hour is not marked)
   dir = setup(); b = broker(); assert.equal((await go(dir, b, ALL[I1 + 1][0] + 30, async () => { throw new Error('HTTP 502'); })).error, true); assert.ok(!fs.existsSync(path.join(dir, 'nq', 'trades.json')));
@@ -143,7 +143,7 @@ test('one position at a time a rule; a position the broker closed is booked from
   assert.equal(inferExit(base, [[100, 100, 110, 95, 105]]).R, null);
 });
 test('wiring: the loop runs it each round and quick pass, the health list knows its file', () => {
-  const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8'); assert.equal((yml.match(/timeout 45 node council\/nq-demo\.mjs data \|\| echo/g) || []).length, 2);
+  const yml = fs.readFileSync(new URL('../.github/workflows/council.yml', import.meta.url), 'utf8'); assert.equal((yml.match(/job council\/nq-demo\.mjs data \|\| echo/g) || []).length, 2);
   assert.match(fs.readFileSync(new URL('../council/datahealth.mjs', import.meta.url), 'utf8'), /nq\/trades\.json/);
 });
 
