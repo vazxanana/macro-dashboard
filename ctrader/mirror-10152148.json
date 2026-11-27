@@ -6815,7 +6815,7 @@
     "lots": 5.24,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T23:20:28.000Z",
     "councilEntry": 0.66336,
     "stop": 0.66377,
@@ -6828,10 +6828,12 @@
     "slipR": 0,
     "lagSec": 28,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T23:20:28.000Z",
-    "brokerStop": 0.66377
+    "brokerStop": 0.66377,
+    "closedAt": "2026-11-27T00:28:51.000Z"
    },
    "boxfade:usdchf:boxfade-m5-s1795737000": {
     "positionId": "51648374",
@@ -6867,7 +6869,7 @@
     "lots": 5.04,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T00:06:46.000Z",
     "councilEntry": 0.54684,
     "stop": 0.546425,
@@ -6878,10 +6880,15 @@
     "slipR": -0.41,
     "lagSec": 106,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T00:06:46.000Z",
-    "brokerStop": 0.54626
+    "brokerStop": 0.54626,
+    "closedAt": "2026-11-27T00:28:51.000Z",
+    "exitPrice": 0.54641,
+    "councilExit": 0.546425,
+    "councilR": -1
    },
    "boxfade:usdjpy:boxfade-m5-s1795737900": {
     "positionId": "51648873",
@@ -6911,12 +6918,11 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 10760.32,
-   "lastBalance": 10459.48,
+   "lastBalance": 10658.68,
    "ids": [
     "51571061",
     "51631994",
     "51647631",
-    "51648131",
     "51648374",
     "51648872",
     "51648873"
@@ -6925,7 +6931,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10459.48 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 10658.68 · 5 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6933,20 +6939,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 10459.48,
-  "lastRun": "2026-11-27T00:25:58.000Z"
+  "balance": 10658.68,
+  "lastRun": "2026-11-27T00:28:51.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T05:31:12.000Z",
-   "msg": "XAUUSD position 48600464 closed at the broker",
-   "trade": "xau-replica-1794447416-s"
-  },
-  {
-   "at": "2026-11-12T05:57:54.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council replica)",
-   "trade": "xau-replica-1794463011-b"
-  },
   {
    "at": "2026-11-12T06:48:24.000Z",
    "msg": "XAUUSD position 48580700 closed at the broker",
@@ -8430,6 +8426,16 @@
    "at": "2026-11-27T00:06:46.000Z",
    "msg": "opened sell USDJPY 4.76 lot (council boxfade)",
    "trade": "boxfade:usdjpy:boxfade-m5-s1795737900"
+  },
+  {
+   "at": "2026-11-27T00:28:51.000Z",
+   "msg": "AUDUSD position 51648131 closed at the broker",
+   "trade": "boxfade:audusd:boxfade-m5-s1795735200"
+  },
+  {
+   "at": "2026-11-27T00:28:51.000Z",
+   "msg": "closed NZDUSD position 51648872 (council: stopped)",
+   "trade": "boxfade:nzdusd:boxfade-m5-b1795737900"
   }
  ],
  "limits": {

@@ -2159,7 +2159,7 @@
     "lots": 0.23,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T00:18:27.000Z",
     "councilEntry": 0.54662,
     "stop": 0.546436,
@@ -2170,29 +2170,30 @@
     "slipR": -0.38,
     "lagSec": 207,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T00:18:27.000Z",
-    "brokerStop": 0.54637
+    "brokerStop": 0.54637,
+    "closedAt": "2026-11-27T00:28:47.000Z"
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 439.97,
+   "lastBalance": 435.27,
    "ids": [
     "51608452",
     "51649037",
     "51649038",
     "51649039",
-    "51649040",
-    "51649052"
+    "51649040"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 439.97 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 435.27 · 5 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2216,15 +2217,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 439.97,
-  "lastRun": "2026-11-27T00:25:53.000Z"
+  "balance": 435.27,
+  "lastRun": "2026-11-27T00:28:47.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T06:12:54.000Z",
-   "msg": "US2000 position 49110961 closed at the broker",
-   "trade": "ict:rty-b-1794524400"
-  },
   {
    "at": "2026-11-13T07:30:48.000Z",
    "msg": "closed US30 position 48507360 (council: loss)",
@@ -3709,6 +3705,11 @@
    "at": "2026-11-27T00:18:27.000Z",
    "msg": "not mirrored eqx:bigfade:audusd:bigfade-m15-b1795738500: price 0.66328 has run 1.08R from the council entry 0.6632: a different trade now",
    "trade": "eqx:bigfade:audusd:bigfade-m15-b1795738500"
+  },
+  {
+   "at": "2026-11-27T00:28:47.000Z",
+   "msg": "NZDUSD position 51649052 closed at the broker",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795738500"
   }
  ],
  "limits": {
