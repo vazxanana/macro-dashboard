@@ -7273,7 +7273,7 @@
     "lots": 2.33,
     "digits": 3,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T04:56:42.000Z",
     "councilEntry": 159.262,
     "stop": 159.386,
@@ -7284,10 +7284,15 @@
     "slipR": -0.032,
     "lagSec": 102,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T04:56:42.000Z",
-    "brokerStop": 159.39
+    "brokerStop": 159.39,
+    "closedAt": "2026-11-27T07:43:03.000Z",
+    "exitPrice": 159.323,
+    "councilExit": 159.386,
+    "councilR": -1
    },
    "boxfade:audusd:boxfade-m5-s1795757100": {
     "positionId": "51662947",
@@ -7405,7 +7410,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9068.49 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 9068.49 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7414,14 +7419,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9068.49,
-  "lastRun": "2026-11-27T07:37:33.000Z"
+  "lastRun": "2026-11-27T07:43:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:07:38.000Z",
-   "msg": "close XAUUSD 49547717 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794587098-b"
-  },
   {
    "at": "2026-11-15T22:07:38.000Z",
    "msg": "close XAUUSD 49606352 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -8910,6 +8910,11 @@
    "at": "2026-11-27T06:45:15.000Z",
    "msg": "opened buy GBPUSD 2.21 lot (council boxfade)",
    "trade": "boxfade:gbpusd:boxfade-m5-b1795761900"
+  },
+  {
+   "at": "2026-11-27T07:43:03.000Z",
+   "msg": "closed USDJPY position 51662133 (council: stopped)",
+   "trade": "boxfade:usdjpy:boxfade-m5-s1795755300"
   }
  ],
  "limits": {
