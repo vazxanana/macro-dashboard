@@ -7433,6 +7433,32 @@
     ],
     "stopCheckedAt": "2026-11-27T17:46:41.000Z",
     "brokerStop": 1.09276
+   },
+   "boxfade:gbpusd:boxfade-m5-b1795804500": {
+    "positionId": "51740459",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 13600000,
+    "lots": 1.36,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T18:36:59.000Z",
+    "councilEntry": 1.30943,
+    "stop": 1.3081,
+    "t1": 1.31076,
+    "riskCash": 172.09,
+    "margin": 356.18,
+    "mark": 1.30936,
+    "levelsFrom": "mark",
+    "fillPrice": 1.30938,
+    "slipR": -0.038,
+    "lagSec": 119,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T18:36:59.000Z",
+    "brokerStop": 1.30812
    }
   },
   "day": {
@@ -7440,13 +7466,14 @@
    "startBalance": 10760.32,
    "lastBalance": 8604.44,
    "ids": [
-    "51732199"
+    "51732199",
+    "51740459"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 8604.44 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 8604.44 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7455,14 +7482,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 8604.44,
-  "lastRun": "2026-11-27T18:36:04.000Z"
+  "lastRun": "2026-11-27T18:39:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:12:06.000Z",
-   "msg": "close XAUUSD 49547717 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794587098-b"
-  },
   {
    "at": "2026-11-15T22:12:06.000Z",
    "msg": "close XAUUSD 49606352 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -8951,6 +8973,11 @@
    "at": "2026-11-27T17:46:41.000Z",
    "msg": "opened buy EURUSD 2.82 lot (council boxfade)",
    "trade": "boxfade:eurusd:boxfade-m5-b1795801500"
+  },
+  {
+   "at": "2026-11-27T18:36:59.000Z",
+   "msg": "opened buy GBPUSD 1.36 lot (council boxfade)",
+   "trade": "boxfade:gbpusd:boxfade-m5-b1795804500"
   }
  ],
  "limits": {
@@ -9055,11 +9082,11 @@
   ]
  },
  "execution": {
-  "n": 254,
-  "meanSlipR": 0.056,
+  "n": 255,
+  "meanSlipR": 0.055,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
-  "medianLagSec": 70.5,
+  "medianLagSec": 71,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -9086,8 +9113,8 @@
     "meanSlipR": 0.033
    },
    "GBPUSD": {
-    "n": 17,
-    "meanSlipR": 0.112
+    "n": 18,
+    "meanSlipR": 0.104
    },
    "USDCHF": {
     "n": 18,
