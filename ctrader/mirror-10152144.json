@@ -3478,7 +3478,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T15:17:18.000Z",
     "councilEntry": 1.09404,
     "stop": 1.093254,
@@ -3491,10 +3491,15 @@
     "slipR": -0.089,
     "lagSec": 138,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T15:17:18.000Z",
-    "brokerStop": 1.09323
+    "brokerStop": 1.09323,
+    "closedAt": "2026-11-27T18:47:59.000Z",
+    "exitPrice": 1.09326,
+    "councilExit": 1.093254,
+    "councilR": -1
    },
    "eqx:fade:gbpusd:fade-m15-b1795794300": {
     "positionId": "51726430",
@@ -3547,21 +3552,74 @@
     ],
     "stopCheckedAt": "2026-11-27T17:46:36.000Z",
     "brokerStop": 174.321
+   },
+   "eqx:fade:gbpusd:fade-m15-b1795805100": {
+    "positionId": "51740551",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T18:47:21.000Z",
+    "councilEntry": 1.30922,
+    "stop": 1.308606,
+    "t1": 1.310449,
+    "riskCash": 3.12,
+    "margin": 10.47,
+    "mark": 1.30927,
+    "levelsFrom": "mark",
+    "fillPrice": 1.30927,
+    "slipR": 0.081,
+    "lagSec": 141,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T18:47:21.000Z",
+    "brokerStop": 1.30861
+   },
+   "eqx:fade:eurusd:fade-m15-b1795805100": {
+    "positionId": "51740552",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T18:47:21.000Z",
+    "councilEntry": 1.09326,
+    "stop": 1.09281,
+    "t1": 1.09416,
+    "riskCash": 3.12,
+    "margin": 10.93,
+    "mark": 1.09333,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09329,
+    "slipR": 0.067,
+    "lagSec": 141,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T18:47:21.000Z",
+    "brokerStop": 1.09277
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 311.75,
+   "lastBalance": 308.71,
    "ids": [
-    "51722979",
-    "51732185"
+    "51732185",
+    "51740551",
+    "51740552"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 311.75 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 308.71 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3579,7 +3637,7 @@
    "eqx:fade:xag:fade-m15-s1795802400": {
     "why": "XAGUSD: even the minimum lot (0.01) risks 15.51, 5.0% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-27T18:46:12.000Z"
+    "at": "2026-11-27T18:49:34.000Z"
    },
    "eqx:fvg:fvg-h1-s1795791600-1795802400": {
     "why": "XAUUSD: even the minimum lot (0.01) risks 17.69, 5.7% of the balance (cap 2%); a bigger demo balance fixes this",
@@ -3592,25 +3650,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 311.75,
-  "lastRun": "2026-11-27T18:46:12.000Z"
+  "balance": 308.71,
+  "lastRun": "2026-11-27T18:49:34.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:20:06.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 16.57, 3.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
-  {
-   "at": "2026-11-24T19:20:06.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 34.42, 6.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
-  {
-   "at": "2026-11-24T19:21:39.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 16.64, 3.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
   {
    "at": "2026-11-24T19:21:39.000Z",
    "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 34.50, 6.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5095,6 +5138,21 @@
    "at": "2026-11-27T18:02:21.000Z",
    "msg": "not mirrored yet eqx:fvg:fvg-h1-s1795791600-1795802400: XAUUSD: even the minimum lot (0.01) risks 17.69, 5.7% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "eqx:fvg:fvg-h1-s1795791600-1795802400"
+  },
+  {
+   "at": "2026-11-27T18:47:21.000Z",
+   "msg": "opened buy GBPUSD 0.04 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795805100"
+  },
+  {
+   "at": "2026-11-27T18:47:21.000Z",
+   "msg": "opened buy EURUSD 0.05 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795805100"
+  },
+  {
+   "at": "2026-11-27T18:47:59.000Z",
+   "msg": "closed EURUSD position 51722979 (council: stopped)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795792500"
   }
  ],
  "limits": {
@@ -5199,15 +5257,15 @@
   ]
  },
  "execution": {
-  "n": 94,
-  "meanSlipR": 0.023,
-  "medianSlipR": 0,
+  "n": 96,
+  "meanSlipR": 0.024,
+  "medianSlipR": 0.007,
   "worstSlipR": 1.352,
-  "medianLagSec": 60,
+  "medianLagSec": 63,
   "bySymbol": {
    "GBPUSD": {
-    "n": 10,
-    "meanSlipR": 0.157
+    "n": 11,
+    "meanSlipR": 0.15
    },
    "NZDUSD": {
     "n": 13,
@@ -5218,8 +5276,8 @@
     "meanSlipR": 0.168
    },
    "EURUSD": {
-    "n": 11,
-    "meanSlipR": 0.316
+    "n": 12,
+    "meanSlipR": 0.296
    },
    "XAUUSD": {
     "n": 2,

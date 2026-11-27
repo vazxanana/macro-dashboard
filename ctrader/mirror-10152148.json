@@ -7459,6 +7459,32 @@
     ],
     "stopCheckedAt": "2026-11-27T18:36:59.000Z",
     "brokerStop": 1.30812
+   },
+   "boxfade:eurusd:boxfade-m5-b1795805100": {
+    "positionId": "51740553",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 28600000,
+    "lots": 2.86,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T18:47:28.000Z",
+    "councilEntry": 1.09326,
+    "stop": 1.09273,
+    "t1": 1.09379,
+    "riskCash": 172.09,
+    "margin": 625.42,
+    "mark": 1.09333,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09329,
+    "slipR": 0.057,
+    "lagSec": 148,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T18:47:28.000Z",
+    "brokerStop": 1.09269
    }
   },
   "day": {
@@ -7467,13 +7493,14 @@
    "lastBalance": 8604.44,
    "ids": [
     "51732199",
-    "51740459"
+    "51740459",
+    "51740553"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 8604.44 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 8604.44 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7482,14 +7509,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 8604.44,
-  "lastRun": "2026-11-27T18:46:22.000Z"
+  "lastRun": "2026-11-27T18:49:38.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:12:06.000Z",
-   "msg": "close XAUUSD 49606352 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794597418-s"
-  },
   {
    "at": "2026-11-15T22:12:42.000Z",
    "msg": "close XAUUSD 49525852 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -8978,6 +9000,11 @@
    "at": "2026-11-27T18:36:59.000Z",
    "msg": "opened buy GBPUSD 1.36 lot (council boxfade)",
    "trade": "boxfade:gbpusd:boxfade-m5-b1795804500"
+  },
+  {
+   "at": "2026-11-27T18:47:28.000Z",
+   "msg": "opened buy EURUSD 2.86 lot (council boxfade)",
+   "trade": "boxfade:eurusd:boxfade-m5-b1795805100"
   }
  ],
  "limits": {
@@ -9082,8 +9109,8 @@
   ]
  },
  "execution": {
-  "n": 255,
-  "meanSlipR": 0.055,
+  "n": 256,
+  "meanSlipR": 0.056,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
   "medianLagSec": 71,
@@ -9121,8 +9148,8 @@
     "meanSlipR": 0.145
    },
    "EURUSD": {
-    "n": 18,
-    "meanSlipR": 0.004
+    "n": 19,
+    "meanSlipR": 0.007
    },
    "NZDUSD": {
     "n": 8,
