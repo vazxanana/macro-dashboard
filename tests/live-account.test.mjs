@@ -78,7 +78,7 @@ test('demo stays demo: session() refuses the live host, the demo jobs still use 
   await go(dir, b, { mode: 'demo', env: { CTRADER_MIRROR: 'on', CTRADER_ENV: 'demo', CTRADER_CLIENT_ID: 'id', CTRADER_CLIENT_SECRET: 's', CTRADER_ACCESS_TOKEN: 't' } }); assert.ok(b.urls.length && b.urls.every((u) => u === DEMO_HOST)); assert.equal(news(b)[0].label, 'nq-l1');
   assert.deepEqual(LIVE_IDS, ['l1', 'l5', 'uj', 'bo8']); const { mk, ...g } = BO8_G; assert.deepEqual(BO8.g, g); assert.equal(BO8.market, 'xau'); assert.deepEqual(BO8.g, NQ2_GOLD.g);
   for (const f of ['council/ctrader-mirror.mjs', 'council/gotobi.mjs', 'council/dom-demo.mjs', 'council/ctrader-suite.mjs', 'council/gotobi-due.mjs', 'council/test-order.mjs']) assert.ok(!/from '\.\/live\.mjs'/.test(fs.readFileSync(f, 'utf8')), f + ' never reaches the live account');
-  const users = fs.readdirSync('council').filter((f) => f.endsWith('.mjs') && /liveSession|LIVE_HOST|from '\.\/live\.mjs'/.test(fs.readFileSync('council/' + f, 'utf8'))).sort(); assert.deepEqual(users, ['ctrader-mirror.mjs', 'live.mjs', 'nq-demo.mjs', 'vb-demo.mjs'], 'only the live module, the two jobs and the session code name the live host');
+  const users = fs.readdirSync('council').filter((f) => f.endsWith('.mjs') && /liveSession|LIVE_HOST|from '\.\/live\.mjs'/.test(fs.readFileSync('council/' + f, 'utf8'))).sort(); assert.deepEqual(users, ['ctrader-mirror.mjs', 'live-account.mjs', 'live.mjs', 'nq-demo.mjs', 'vb-demo.mjs'], 'only the live module, the two jobs, the read-only snapshot (tests/live-account-card.test.mjs) and the session code name the live host');
 });
 
 test('owner rule live-on-7653: the USD live account, 0.5 % a trade, 15 % daily stop', () => {

@@ -4619,6 +4619,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <nav class="pf-box pf-list" id="ms-pf-more" aria-labelledby="ms-pf-more-h">
           <button class="pf-row" type="button" data-pf-go="ms-pf-pk" hidden><i class="pf-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5v3.5h-1"/><path d="M9 16c1.6 1.2 4.4 1.2 6 0"/></svg></i><span class="pf-tx"><b>Face ID devices</b><small>Where Face ID or fingerprint signs you in</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-nt" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/></svg></i><span class="pf-tx"><b>Send a notification</b><small>A message on every member's bell</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" data-pf-go="ms-pf-live" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-8"/><path d="M15 8h5v5"/></svg></i><span class="pf-tx"><b>Live account</b><small>Balance, open positions and the live trades</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-dset" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></i><span class="pf-tx"><b>Demo account settings</b><small>Which strategy trades where, its risk, on or off</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-snd" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 010 6"/></svg></i><span class="pf-tx"><b>ChronosTrade sounds</b><small>What a target or a stop sounds like</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-mcp" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5M15 7l5 5-5 5"/></svg></i><span class="pf-tx"><b>ChatGPT connector</b><small>Work on the ICT edge from ChatGPT</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
@@ -4655,6 +4656,89 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
       </section>
+      <section class="card pf-ct pf-lv" id="ms-pf-live" aria-labelledby="ms-pf-live-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-live-t">Live account</h2><div class="ct-sub">Real money: balance, the room left before the daily stop, open positions and every live trade</div></div></div>
+        <div class="ct-b pf-ct-b" id="ms-lv-b"><p class="ms-note" style="margin:0">Loading…</p></div>
+      </section>
+      <style id="ms-lv-css">
+      /* Live account (27 Nov 2026): the owner's own card on the Profile; tokens only */
+      .pf-lv .lv-k { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+      .pf-lv .lv-t { padding: 10px 12px; border-radius: 10px; background: var(--au-well, var(--panel-2, transparent)); }
+      .pf-lv .lv-t small { display: block; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      .pf-lv .lv-t b { display: block; font-size: 18px; font-weight: 650; color: var(--au-ink, var(--ink)); font-variant-numeric: tabular-nums; }
+      .pf-lv .lv-h { margin: 16px 0 6px; font-size: 13px; font-weight: 650; color: var(--au-ink, var(--ink)); }
+      .pf-lv .lv-l { display: grid; gap: 6px; }
+      .pf-lv .lv-r { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--au-well, var(--panel-2, transparent)); font-size: 13px; color: var(--au-ink-2, var(--ink)); font-variant-numeric: tabular-nums; }
+      .pf-lv .lv-r b { color: var(--au-ink, var(--ink)); font-weight: 600; }
+      .pf-lv .lv-r small { display: block; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      .pf-lv .up { color: var(--au-gain, var(--buy)); }
+      .pf-lv .dn { color: var(--au-loss, var(--sell)); }
+      .pf-lv .lv-w { margin: 10px 0 0; padding: 8px 10px; border-radius: 10px; font-size: 13px; color: var(--au-loss, var(--sell)); background: color-mix(in srgb, var(--au-loss, #c8243f) 12%, transparent); }
+      .pf-lv .lv-s { margin-top: 12px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      @media (max-width: 640px) { .pf-lv .lv-r { grid-template-columns: minmax(0, 1fr) auto; } .pf-lv .lv-r .lv-m { grid-column: 1 / -1; order: 3; } }
+      </style>
+      <script id="ms-lv-js">
+      // Live account (27 Nov 2026, owner: "okey" to a live account card). The owner's session only (/cdata serves live/* to the owner
+      // alone). Reads council-data live/account.json (council/live-account.mjs: balance, positions, resting orders; read only) and the
+      // live jobs' records live/nq.json and live/vb.json. Display only: nothing here can place, change or close a trade; nothing is
+      // kept in the browser.
+      (function () {
+        const R = document.documentElement, c = document.getElementById('ms-pf-live'), b = document.getElementById('ms-lv-b'); if (!c || !b) return;
+        const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        const ok = () => R.dataset.role === 'owner' && !!window.msData && /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
+        const money = (v) => (v == null || !isFinite(v) ? '—' : '$' + (+v).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        const pc = (v) => (v == null || !isFinite(v) ? '—' : (v * 100).toFixed(1) + ' %');
+        const rTx = (v) => (v == null || !isFinite(v) ? '' : (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2) + 'R');
+        const when = (x) => { const t = typeof x === 'number' ? x * 1000 : Date.parse(x); return isFinite(t) ? new Date(t).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''; };
+        const NAME = { l1: 'Nasdaq lead l1', l5: 'Nasdaq lead l5', uj: 'USD/JPY morning breakout', bo8: 'Gold 8-swing break', xau: 'Gold breakout of the day', usdjpy: 'USD/JPY breakout of the day' };
+        const STATUS = { open: 'Open', placed: 'Order resting', closed: 'Closed', missed: 'Missed', skip: 'Skipped', nofill: 'Not filled', error: 'Error' };
+        let busy = false, at = 0;
+        function draw(A, nq, vb) {
+          const trades = [].concat((nq && nq.trades) || [], (vb && vb.trades) || []).map((t) => ({ ...t, name: NAME[t.rule] || NAME[t.market] || t.rule || t.market || '?', time: t.openedAt || t.barT || t.day || t.exitAt }))
+            .sort((x, y) => (Date.parse(y.time) || +y.time * 1000 || 0) - (Date.parse(x.time) || +x.time * 1000 || 0));
+          const closed = trades.filter((t) => t.status === 'closed' && isFinite(t.R)), sumR = closed.reduce((s, t) => s + +t.R, 0);
+          let h = '';
+          if (!A) h += '<p class="ms-note" style="margin:0 0 10px">No balance read yet: the loop reads the live account every second round once CTRADER_LIVE is on.</p>';
+          else {
+            const room = A.dayStop && A.day && A.day.loss != null ? A.dayStop - A.day.loss : null;
+            h += '<div class="lv-k">'
+              + '<div class="lv-t"><small>Balance</small><b>' + money(A.balance) + '</b></div>'
+              + '<div class="lv-t"><small>Today</small><b class="' + (A.day && A.day.loss > 0 ? 'dn' : A.day && A.day.loss < 0 ? 'up' : '') + '">' + (A.day && A.day.loss != null ? (A.day.loss > 0 ? '−' : '+') + pc(Math.abs(A.day.loss)) : '—') + '</b></div>'
+              + '<div class="lv-t"><small>Room before the daily stop (' + pc(A.dayStop) + ')</small><b>' + (room == null ? 'from the first order' : pc(Math.max(0, room))) + '</b></div>'
+              + '<div class="lv-t"><small>Open now</small><b>' + (A.positions || []).length + (A.orders && A.orders.length ? ' · ' + A.orders.length + ' resting' : '') + '</b></div>'
+              + '<div class="lv-t"><small>Closed live trades</small><b class="' + (sumR > 0 ? 'up' : sumR < 0 ? 'dn' : '') + '">' + closed.length + (closed.length ? ' · ' + rTx(sumR) : '') + '</b></div>'
+              + '</div>';
+            if (A.noStop) h += '<p class="lv-w">' + A.noStop + ' open position(s) show no stop at the broker. The live jobs close any of theirs without a stop at their next look; a position you opened by hand is not theirs.</p>';
+            if ((A.positions || []).length) {
+              h += '<h3 class="lv-h">Open positions</h3><div class="lv-l">' + A.positions.map((p) => '<div class="lv-r"><div><b>' + esc(p.symbol) + '</b><small>' + esc(p.side) + (p.label ? ' · ' + esc(p.label) : '') + '</small></div>'
+                + '<div class="lv-m">Entry ' + esc(p.entry) + ' · stop ' + (p.stop == null ? '<span class="dn">none</span>' : esc(p.stop)) + (p.target != null ? ' · target ' + esc(p.target) : '') + '<small>' + esc(when(p.openedAt)) + (p.swap ? ' · swap ' + money(p.swap) : '') + '</small></div>'
+                + '<div>' + esc(p.volume != null ? (p.volume / 100).toLocaleString('en-GB') : '') + '</div></div>').join('') + '</div>';
+            }
+          }
+          const shown = trades.filter((t) => t.status !== 'missed' || trades.indexOf(t) < 6).slice(0, 25);
+          h += '<h3 class="lv-h">Live trades</h3>';
+          if (!shown.length) h += '<p class="ms-note" style="margin:0">No live trade yet. The rules look every hour (the Nasdaq, USD/JPY and gold 8-swing rules) and at 00:00 UTC on weekdays (the two breakouts of the day).</p>';
+          else h += '<div class="lv-l">' + shown.map((t) => '<div class="lv-r"><div><b>' + esc(t.name) + '</b><small>' + esc(when(t.time)) + '</small></div>'
+            + '<div class="lv-m">' + esc(STATUS[t.status] || t.status) + (t.fill != null ? ' · filled ' + esc(t.fill) : '') + (t.stop != null ? ' · stop ' + esc(t.stop) : '') + (t.why ? '<small>' + esc(t.why) + '</small>' : '') + '</div>'
+            + '<div class="' + (t.R > 0 ? 'up' : t.R < 0 ? 'dn' : '') + '">' + esc(rTx(t.R)) + '</div></div>').join('') + '</div>';
+          h += '<p class="lv-s">' + (A ? 'Account ' + esc(A.account || '') + ' · read ' + esc(when(A.at)) + ' · ' : '') + 'Read only: this card cannot place, change or close a trade. R before costs.</p>';
+          b.innerHTML = h;
+        }
+        async function load() {
+          if (busy || !ok()) return; busy = true; at = Date.now();
+          try {
+            const g = (f) => window.msData.json(f, { fresh: 0 }).catch(() => null);
+            const [A, nq, vb] = await Promise.all([g('live/account.json'), g('live/nq.json'), g('live/vb.json')]);
+            draw(A, nq, vb);
+          } catch (e) { b.innerHTML = '<p class="ms-note" style="margin:0">The live account could not be read. Try again in a minute.</p>'; }
+          finally { busy = false; }
+        }
+        const sync = () => { c.hidden = !ok(); };
+        sync(); new MutationObserver(sync).observe(R, { attributes: true, attributeFilter: ['data-role'] });
+        if (typeof IntersectionObserver === 'function') new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting) && Date.now() - at > 60e3) load(); }).observe(c);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden && !c.hidden && Date.now() - at > 60e3) load(); });
+      })();
+      </script>
       <section class="card pf-ct pf-ds" id="ms-pf-dset" aria-labelledby="ms-pf-dset-t" hidden>
         <div class="pf-ct-h"><div><h2 id="ms-pf-dset-t">Demo account settings</h2><div class="ct-sub">Which strategy trades on which demo account, how much it risks, and whether it opens new trades</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-ds-b"><p class="ms-note" style="margin:0">Loading…</p></div>
@@ -12554,7 +12638,7 @@ html[data-role="public"] .hdr-sw { display: none; }
       if (f) f.click(); const to = f || c; to.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
       c.classList.remove('pf-hit'); void c.offsetWidth; c.classList.add('pf-hit'); }));
     // the More rows follow their cards: the owner's cards and the connector open later, by their own scripts
-    if (typeof MutationObserver === 'function') ['ms-pf-nt', 'ms-pf-snd', 'ms-pf-mcp'].forEach((id) => { const c = $(id); if (c) new MutationObserver(pfSync).observe(c, { attributes: true, attributeFilter: ['hidden'] }); });
+    if (typeof MutationObserver === 'function') ['ms-pf-nt', 'ms-pf-snd', 'ms-pf-mcp', 'ms-pf-live'].forEach((id) => { const c = $(id); if (c) new MutationObserver(pfSync).observe(c, { attributes: true, attributeFilter: ['hidden'] }); });
     new MutationObserver(pfSync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     pfSync();
     // the router may have shown the profile before this module was ready (a direct #profile load): render it now
