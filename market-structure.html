@@ -4619,6 +4619,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <nav class="pf-box pf-list" id="ms-pf-more" aria-labelledby="ms-pf-more-h">
           <button class="pf-row" type="button" data-pf-go="ms-pf-pk" hidden><i class="pf-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5v3.5h-1"/><path d="M9 16c1.6 1.2 4.4 1.2 6 0"/></svg></i><span class="pf-tx"><b>Face ID devices</b><small>Where Face ID or fingerprint signs you in</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-nt" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/></svg></i><span class="pf-tx"><b>Send a notification</b><small>A message on every member's bell</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" data-pf-go="ms-pf-dset" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></i><span class="pf-tx"><b>Demo account settings</b><small>Which strategy trades where, its risk, on or off</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-snd" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 010 6"/></svg></i><span class="pf-tx"><b>ChronosTrade sounds</b><small>What a target or a stop sounds like</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-mcp" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5M15 7l5 5-5 5"/></svg></i><span class="pf-tx"><b>ChatGPT connector</b><small>Work on the ICT edge from ChatGPT</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <a class="pf-row" href="/academy" data-pf-ac><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c3 2 7 2 10 0v-5"/></svg></i><span class="pf-tx"><b>Aureum Academy</b><small>Replay a setup and train your eye</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
@@ -4654,6 +4655,130 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
       </section>
+      <section class="card pf-ct pf-ds" id="ms-pf-dset" aria-labelledby="ms-pf-dset-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-dset-t">Demo account settings</h2><div class="ct-sub">Which strategy trades on which demo account, how much it risks, and whether it opens new trades</div></div></div>
+        <div class="ct-b pf-ct-b" id="ms-ds-b"><p class="ms-note" style="margin:0">Loading…</p></div>
+      </section>
+      <style id="ms-ds-css">
+      /* Demo account settings (27 Nov 2026): the owner's own card on the Profile; tokens only */
+      .pf-ds .ds-h { margin: 14px 0 6px; font-size: 13px; font-weight: 650; color: var(--au-ink, var(--ink)); }
+      .pf-ds .ds-h:first-child { margin-top: 0; }
+      .pf-ds .ds-t { display: grid; gap: 6px; }
+      .pf-ds .ds-r { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr) 92px 64px; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--au-well, var(--panel-2, transparent)); }
+      .pf-ds .ds-r.off .ds-n { opacity: .62; }
+      .pf-ds .ds-n b { display: block; font-size: 13px; font-weight: 600; color: var(--au-ink, var(--ink)); }
+      .pf-ds .ds-n small { display: block; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      .pf-ds select, .pf-ds input[type="number"], .pf-ds input[type="text"] { width: 100%; min-height: 36px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font: inherit; font-size: 13px; }
+      .pf-ds .ds-rk { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      .pf-ds .ds-on { display: flex; justify-content: flex-end; }
+      .pf-ds .ds-sw { position: relative; width: 44px; height: 26px; border-radius: 13px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface-2, var(--panel-2)); cursor: pointer; padding: 0; }
+      .pf-ds .ds-sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--au-ink-3, var(--ink-faint)); transition: transform .15s ease; }
+      .pf-ds .ds-sw[aria-checked="true"] { background: var(--au-gain, var(--buy)); border-color: transparent; }
+      .pf-ds .ds-sw[aria-checked="true"]::after { transform: translateX(18px); background: #fff; }
+      .pf-ds .ds-cust { margin-top: 4px; }
+      .pf-ds .ds-acts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+      .pf-ds .ds-ch { font-size: 12px; color: var(--au-warn, var(--gold-ink)); }
+      .pf-ds .ct-msg.ok { color: var(--au-gain, var(--buy)); }
+      @media (max-width: 640px) { .pf-ds .ds-r { grid-template-columns: minmax(0, 1fr) 84px 56px; } .pf-ds .ds-n { grid-column: 1 / -1; } }
+      @media (pointer: coarse) { .pf-ds select, .pf-ds input[type="number"], .pf-ds input[type="text"] { min-height: 44px; font-size: 16px; } .pf-ds .ds-on { min-height: 44px; align-items: center; } }
+      @media (prefers-reduced-motion: reduce) { .pf-ds .ds-sw::after { transition: none; } }
+      </style>
+      <script id="ms-ds-js">
+      // Demo account settings (27 Nov 2026, owner: "In my profile make me available to manage the demo account settings risk, assign
+      // strategies etc"). The owner's session only. Reads /api/demo-settings, shows every strategy the demo mirror copies and every
+      // demo job with its account, its risk a trade and on / off, and saves the owner's changes (the server checks every field and
+      // writes council-data owner/demo-settings.json; the council reads it on its next round). Demo only. Nothing is kept in the browser.
+      (function () {
+        const R = document.documentElement, c = document.getElementById('ms-pf-dset'); if (!c) return;
+        const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        const ok = () => R.dataset.role === 'owner' && /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
+        let D = null, loading = false;
+        // loads once the card is on screen (the Profile opened), not on every page load
+        const sync = () => { c.hidden = !ok(); };
+        if (typeof IntersectionObserver === 'function') new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting) && ok() && !D && !loading) load(); }).observe(c);
+        const b = document.getElementById('ms-ds-b');
+        const pct = (v) => (v == null || !isFinite(v) ? '' : String(+(v * 100).toFixed(3)));
+        const money = (v, cur) => (v == null ? '' : (cur === 'USD' || !cur ? '$' : cur + ' ') + Math.round(v).toLocaleString('en-GB'));
+        // the account picker: the mirror's demo accounts (label, login ending, balance), the base account, and "another account…"
+        function accOpts(val, accts, base) {
+          const o = ['<option value="">' + esc(base) + '</option>'], known = new Set(['']);
+          for (const a of accts) { known.add(a.id); o.push('<option value="' + esc(a.id) + '"' + (a.id === val ? ' selected' : '') + '>' + esc((a.login ? 'login ' + a.login : a.id) + (a.label ? ' · ' + a.label.slice(0, 40) : '') + (a.balance != null ? ' · ' + money(a.balance, a.currency) : '')) + '</option>'); }
+          if (val && !known.has(val)) o.push('<option value="' + esc(val) + '" selected>' + esc(val.charAt(0) === '*' ? 'login ending ' + val.slice(1) : 'account ' + val) + '</option>');
+          o.push('<option value="__other">Another demo account…</option>'); return o.join('');
+        }
+        function row(kind, k, def, cur, val) {
+          const acct = val.account !== undefined ? val.account : cur.account || '', risk = val.risk !== undefined ? val.risk : cur.risk, on = val.on !== undefined ? val.on : cur.on !== false;
+          const base = kind === 'book' ? 'The base account' : 'The job\'s own default account';
+          const max = kind === 'book' ? D.bookMax : def.max, min = kind === 'book' ? D.bookMin : D.riskMin, uj = def.uj;
+          return '<div class="ds-r' + (on ? '' : ' off') + '" data-kind="' + kind + '" data-k="' + esc(k) + '">'
+            + '<div class="ds-n"><b>' + esc(def.label) + '</b>' + (kind === 'book' && def.riskKey !== k ? '<small>Sized with the council\'s trades</small>' : uj ? '<small>' + esc(uj.label) + ': <input type="number" class="ds-uj" step="any" min="' + D.riskMin * 100 + '" max="' + uj.max * 100 + '" value="' + esc(pct(val.ujRisk !== undefined ? val.ujRisk : cur.ujRisk != null ? cur.ujRisk : uj.risk)) + '" aria-label="' + esc(uj.label) + ' risk, % a trade" style="width:70px;min-height:28px"> %</small>' : '') + '</div>'
+            + '<div><select class="ds-acc" aria-label="' + esc(def.label) + ': demo account">' + accOpts(acct, D.accounts, base) + '</select><input type="text" class="ds-cust" placeholder="Account number, or * and the login\'s last digits" aria-label="Another demo account" hidden></div>'
+            + '<label class="ds-rk"><input type="number" class="ds-risk" step="any" min="' + min * 100 + '" max="' + max * 100 + '" value="' + esc(pct(risk != null ? risk : def.risk)) + '" aria-label="' + esc(def.label) + ': risk, % of the balance a trade">%</label>'
+            + '<div class="ds-on"><button type="button" class="ds-sw" role="switch" aria-checked="' + on + '" aria-label="' + esc(def.label) + ': opens new trades"></button></div></div>';
+        }
+        function draw() {
+          const S = D.settings || {}, SB = S.books || {}, SJ = S.jobs || {};
+          b.innerHTML = '<p class="ms-note" style="margin:0 0 10px">Demo accounts only. A change reaches the council on its next round (about a minute). A strategy switched off opens nothing new; the trades it already has keep their own stop and target to their exit. Risk is the share of the account\'s balance one trade may lose at its stop.' + (D.canWrite ? '' : ' <b>Saving is not set up</b>: the site has no GitHub token that can write the council\'s data (GH_MCP_TOKEN or GH_TOKEN with Contents: write).') + '</p>'
+            + '<div class="ds-h">Strategies the demo mirror copies</div><div class="ds-t">' + Object.keys(D.books).map((k) => row('book', k, D.books[k], { account: D.current.books[k] || '', risk: null, on: true }, SB[k] || {})).join('') + '</div>'
+            + '<div class="ds-h">Demo jobs that trade a rule themselves</div><div class="ds-t">' + Object.keys(D.jobs).map((k) => row('job', k, D.jobs[k], D.current.jobs[k] || {}, SJ[k] || {})).join('') + '</div>'
+            + '<div class="ds-acts"><button type="button" class="ct-btn" id="ms-ds-save"' + (D.canWrite ? '' : ' disabled') + '>Save settings</button><button type="button" class="ct-btn ghost" id="ms-ds-undo">Undo changes</button><span class="ds-ch" id="ms-ds-ch" role="status"></span></div>'
+            + '<div class="ct-msg" id="ms-ds-msg" role="status"></div>' + (S.at ? '<p class="ms-note" style="margin:8px 0 0">Last saved ' + esc(new Date(S.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '.</p>' : '');
+          wire();
+        }
+        // what the owner has on screen -> the settings to send (every row's account, risk and on/off)
+        function collect() {
+          const out = { books: {}, jobs: {} };
+          b.querySelectorAll('.ds-r').forEach((r) => {
+            const sel = r.querySelector('.ds-acc'), cu = r.querySelector('.ds-cust'), acct = sel.value === '__other' ? cu.value.trim() : sel.value;
+            const o = { account: acct, risk: +(+r.querySelector('.ds-risk').value / 100).toFixed(5), on: r.querySelector('.ds-sw').getAttribute('aria-checked') === 'true' };
+            const uj = r.querySelector('.ds-uj'); if (uj) o.ujRisk = +(+uj.value / 100).toFixed(5);
+            (r.dataset.kind === 'book' ? out.books : out.jobs)[r.dataset.k] = o;
+          });
+          // books sized as one (the council's, the replica, the shadows, LIT) take the council's risk
+          const ck = out.books.council && out.books.council.risk; for (const k of Object.keys(out.books)) if (D.books[k].riskKey === 'council' && ck != null) out.books[k].risk = ck;
+          return out;
+        }
+        // only what the owner changed on screen, on top of what was saved before: a value left as it was is not frozen into the
+        // file (so a later change in the council's own defaults still reaches a field the owner never set)
+        function changes(now, was, prev) {
+          const out = { books: {}, jobs: {} };
+          for (const kind of ['books', 'jobs']) for (const k of Object.keys(now[kind])) {
+            const o = { ...((prev[kind] || {})[k] || {}) }, n = now[kind][k], w = (was[kind] || {})[k] || {};
+            for (const f of Object.keys(n)) if (JSON.stringify(n[f]) !== JSON.stringify(w[f])) o[f] = n[f];
+            if (Object.keys(o).length) out[kind][k] = o;
+          }
+          return out;
+        }
+        window.msDemoSettingsChanges = changes;
+        let first = '';
+        function wire() {
+          first = JSON.stringify(collect());
+          const ch = document.getElementById('ms-ds-ch'), changed = () => { ch.textContent = JSON.stringify(collect()) !== first ? 'Unsaved changes' : ''; };
+          b.querySelectorAll('.ds-acc').forEach((s) => s.addEventListener('change', () => { const cu = s.parentNode.querySelector('.ds-cust'); cu.hidden = s.value !== '__other'; if (!cu.hidden) cu.focus(); changed(); }));
+          b.querySelectorAll('input').forEach((i) => i.addEventListener('input', changed));
+          b.querySelectorAll('.ds-sw').forEach((w) => w.addEventListener('click', () => { const on = w.getAttribute('aria-checked') !== 'true'; w.setAttribute('aria-checked', String(on)); w.closest('.ds-r').classList.toggle('off', !on); changed(); }));
+          document.getElementById('ms-ds-undo').addEventListener('click', () => draw());
+          document.getElementById('ms-ds-save').addEventListener('click', save);
+        }
+        async function save() {
+          const btn = document.getElementById('ms-ds-save'), msg = document.getElementById('ms-ds-msg'); msg.className = 'ct-msg'; btn.disabled = true; msg.textContent = 'Saving…';
+          const settings = changes(collect(), JSON.parse(first), D.settings || {});
+          try {
+            const r = await fetch('/api/demo-settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ settings }), cache: 'no-store' });
+            const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || (r.status === 401 ? 'Your session has ended. Sign in again.' : 'The server could not save (error ' + r.status + ').'));
+            D.settings = j.settings; draw(); const m = document.getElementById('ms-ds-msg'); m.className = 'ct-msg ok'; m.textContent = 'Saved. The council uses it from its next round.';
+          } catch (e) { btn.disabled = false; msg.textContent = e instanceof TypeError ? (navigator.onLine === false ? 'You are offline. Nothing was saved; connect and try again.' : 'The server could not be reached. Nothing was saved; try again.') : e.message + ' Nothing was saved.'; }
+        }
+        async function load() {
+          loading = true;
+          try { const r = await fetch('/api/demo-settings', { cache: 'no-store' }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'error ' + r.status); D = j; draw(); }
+          catch (e) { b.innerHTML = '<p class="ms-note" style="margin:0">The settings could not be loaded (' + esc(e.message || e) + ').</p><button type="button" class="ct-btn ghost" id="ms-ds-retry">Try again</button>'; document.getElementById('ms-ds-retry').addEventListener('click', () => { loading = false; load(); }); return; }
+          finally { loading = false; }
+        }
+        window.msDemoSettings = () => (D ? { settings: D.settings, onScreen: collect() } : null);
+        sync(); if (typeof MutationObserver === 'function') new MutationObserver(sync).observe(R, { attributes: true, attributeFilter: ['data-role'] });
+      })();
+      </script>
       <section class="card pf-ct" id="ms-pf-eqb" aria-labelledby="ms-pf-eqb-t" hidden>
         <div class="pf-ct-h"><div><h2 id="ms-pf-eqb-t">MetaTrader 5 bridge</h2><div class="ct-sub">Follow the Equinox desks from your own MetaTrader 5 demo account</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-eqb-b">

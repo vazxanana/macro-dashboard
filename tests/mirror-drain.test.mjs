@@ -30,7 +30,7 @@ test('a drained account runs only while it still holds an open copy or a resting
   assert.equal(stillHolds({ map: {}, orders: { t: { orderId: 1 } } }), true);
   assert.equal(stillHolds({}), false);
   assert.match(MIRROR, /acc\.groups\.filter\(\(g\) => !g\.drain \|\| stillHolds\(/);
-  assert.match(MIRROR, /drain: accFile\.drain/);
+  assert.match(MIRROR, /drain: cfg\.drain \|\| accFile\.drain/);
   // the round of a drained account passes no books, so mirrorRound opens nothing there (openBooks filter)
   assert.match(MIRROR, /\(!openBooks \|\| openBooks\.includes\(bookOf\(t\)\)\)/);
 });

@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { isGotobi, isTokyoBusinessDay, addD } from './gotobi-calendar.mjs';
 import { PT, session, scrubber, unseal, relative, orderStep, amendStep } from './ctrader-mirror.mjs';
+import { readConfig } from './owner-config.mjs';
 
 export const RULE = { pair: 'usdjpy', symbol: 'USDJPY', side: 'sell', entry: 55 * 60, exit: 6 * 3600, K: 1.5, LOOKBACK: 20, MIN_LOOK: 15, EXIT_GRACE: 900 };
 export const LABEL = 'gotobi';
@@ -93,7 +94,7 @@ export async function run({ env = process.env, dir = 'data', WS = globalThis.Web
   const scrub = scrubber(env), file = path.join(dir, 'gotobi', 'trades.json');
   const read = () => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return { trades: [] }; } };
   const write = (j) => { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; fs.writeFileSync(tmp, JSON.stringify(j, null, 1)); fs.renameSync(tmp, file); save(); };
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
+  const cfg = readConfig(dir);   // config.json with the owner's demo settings on top (council/owner-config.mjs)
   if (cfg.gotobi && cfg.gotobi.on === false) { log('gotobi: switched off in config'); return { skipped: 'off' }; }
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || NEED.some((k) => !env[k]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('gotobi: cTrader demo not configured'); return { skipped: 'config' }; }
   const account = accountFor(dir, env, cfg); if (!account) { log('gotobi: no demo account for it'); return { skipped: 'account' }; }

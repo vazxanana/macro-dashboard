@@ -23,6 +23,7 @@ import { connect, accountFor, volumeOf } from './gotobi.mjs';
 import { NQ1_LEADS, NQ2_GOLD } from './edge-desks-2.mjs';
 import { modeOf, dayGate } from './live.mjs';
 import { prep, toArrays, sig, atr, sma, atrPct } from '../research/edge/auto-researcher/engine.mjs';
+import { readConfig } from './owner-config.mjs';
 
 // 26 Nov 2026 (owner: "usdjpy run", then "So the usdjpy risk 2%"): a third rule, `uj` = the auto-researcher's USD/JPY morning breakout (research/edge/usdjpy-brk-exec:
 // PASS at the broker's own ticks, +0.250R a trade, n 131, in years the search had read; a candidate, not an edge), 2 % of the balance a trade. Its genome is that
@@ -73,7 +74,7 @@ export function inferExit(rec, rows) {
 const ours = (label, barT) => (p) => { const td = p.tradeData || {}; return td.label === label && String(td.comment || '').includes(String(barT)); };
 
 export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)), mode = 'demo' } = {}) {
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
+  const cfg = readConfig(dir);   // config.json with the owner's demo settings on top (council/owner-config.mjs)
   const X = modeOf(mode, cfg, env, { dir, name: 'nq', file: path.join(dir, 'nq', 'trades.json'), label: (x) => x, connect }), lab = X.label, ids = X.live ? LIVE_IDS : IDS, markets = X.live ? LIVE_MARKETS : MARKETS, NM = X.live ? 'nq live' : 'nq';
   if (X.live && X.off) return { skipped: 'off', why: X.off };
   const scrub = scrubber(env), file = X.file, now = Math.floor(clock() / 1000), h0 = hourOf(now), sec = now - h0, iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();

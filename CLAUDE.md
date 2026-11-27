@@ -2727,6 +2727,28 @@ labels) stand down on the Charts and run once when another view opens; a pane te
 IntersectionObserver (`P.vis`), not a layout read each frame. Load: 113 -> 47 candle requests in the first 12 s; idle with the charts
 open: 1.15 -> 0.76 s of main-thread work per 20 s, script 0.33 -> 0.17 s. Test: `tests/charts-speed.test.mjs`.
 
+## Demo account settings on the owner's Profile (27 Nov 2026, owner: "In my profile make me available to manage the demo account settings risk, assign strategies etc")
+The owner's session only. Profile card `#ms-pf-dset` (row "Demo account settings" under More; `<style id="ms-ds-css">` + `<script
+id="ms-ds-js">`, loads when the card comes on screen, keeps nothing in the browser): every book the demo mirror copies and every demo
+job, each with its demo account (a picker of the mirror's accounts with login ending, label and balance; the base / the job's default;
+or another account by number or `*<login digits>`), its risk a trade in % and an on / off switch. Save sends ONLY the fields changed
+on screen, on top of what was saved before (`changes`), so a value never touched is not frozen into the file.
+- **Rules, one copy** `api/_demo-settings.js` (pure; `BOOKS` = the mirror's books with their `LIMITS.risk` key and today's value,
+  `JOBS` = vb, gotobi, nq (+ `ujRisk`), dom, dom4 with their defaults and limits; a test compares all of them with the code).
+  `clean` checks every field (a book 0.01-5 %, a job its own limit; books sized together, council / replica / shadow / LIT, must agree),
+  `apply(cfg, settings, accFile)` lays them over config.json: `mirrorAccounts`, `drain` (an account a book moved away from keeps a
+  round to manage its open copies), `mirrorRisk`, `mirrorOff`, and the jobs' keys. `live` and every other key are untouched.
+- **Endpoint** `api/demo-settings.js` (routed in `cloudflare/src/worker.mjs`, `vercel.json`): GET = the stored settings, today's
+  mapping (`ctrader/mirror-accounts.json`), the jobs' config.json values and the accounts (a live account is never listed); POST
+  (same origin) writes council-data `owner/demo-settings.json` through the GitHub contents API with `GH_MCP_TOKEN`, else `GH_TOKEN`
+  (needs Contents: write); without such a token the card says saving is not set up and nothing is saved.
+- **Council** `council/owner-config.mjs` `readConfig(dir)`: config.json with the settings on top (a missing or broken file changes
+  nothing), read by `ctrader-mirror.mjs` (accounts, risk over `LIMITS.risk`, `openBooks` without the books switched off: their open
+  copies are still managed to their exits), `ctrader-account.mjs`, `vb-demo.mjs`, `gotobi.mjs`, `nq-demo.mjs`, `dom-demo.mjs`.
+  **The owner's saved values win over the code's defaults and config.json**: a later code change to a book's risk or account does
+  not reach a field the owner saved. Demo only: `council/live.mjs` and the jobs' `--live` mode never read it; the mirror and the jobs
+  still refuse a live account; nothing here moves or removes a stop. Test: `tests/demo-settings.test.mjs`.
+
 ## Indicator values in the chart legend (27 Nov 2026, owner: "Keep improving the charts")
 Display only, `market-structure.html`. Each Desk chart pane's legend (`.ch-lg`) has one row per indicator under O H L C, as
 TradingView shows it: the study's name and its values at the candle under the crosshair (the newest one when the pointer is away).

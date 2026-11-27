@@ -21,6 +21,7 @@ import { PT, scrubber, orderStep, pendingStep, cancelStep, amendStep } from './c
 import { connect, accountFor, units, volumeOf } from './gotobi.mjs';
 import { buildDays } from '../research/edge/gold-vol-breakout/run.mjs';
 import { modeOf, dayGate } from './live.mjs';
+import { readConfig } from './owner-config.mjs';
 
 export const K = 0.5, EXIT_S = 21 * 3600, PLACE_FROM = 15, PLACE_UNTIL = 1200, RISK = 0.0025, MAX_RISK = 0.01;
 export const MARKETS = {
@@ -51,7 +52,7 @@ const oursPos = (M, day) => (p) => { const td = p.tradeData || {}; return td.lab
 const R1 = (rec, exit) => (rec.fill != null && exit != null && rec.O != null && rec.fill !== rec.O ? +((rec.side === 'buy' ? 1 : -1) * (exit - rec.fill) / Math.abs(rec.fill - rec.O)).toFixed(3) : null);
 
 export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)), mode = 'demo' } = {}) {
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
+  const cfg = readConfig(dir);   // config.json with the owner's demo settings on top (council/owner-config.mjs)
   const X = modeOf(mode, cfg, env, { dir, name: 'vb', file: path.join(dir, 'vb', 'trades.json'), label: (x) => x, connect });   // the live account (27 Nov 2026): council/live.mjs
   if (X.live && X.off) return { skipped: 'off', why: X.off };
   const LM = (M) => (X.live ? { ...M, label: X.label(M.label) } : M);
