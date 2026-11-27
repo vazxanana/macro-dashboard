@@ -2981,6 +2981,30 @@
     ],
     "stopCheckedAt": "2026-11-27T10:15:18.000Z",
     "brokerStop": 3664.55
+   },
+   "eqx:fade:nzdusd:fade-m15-b1795775400": {
+    "positionId": "51692951",
+    "symbol": "NZDUSD",
+    "side": "buy",
+    "volume": 800000,
+    "lots": 0.08,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T10:30:24.000Z",
+    "councilEntry": 0.54814,
+    "stop": 0.547696,
+    "t1": 0.549027,
+    "riskCash": 3.61,
+    "margin": 8.77,
+    "fillPrice": 0.54813,
+    "slipR": -0.023,
+    "lagSec": 24,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T10:30:24.000Z",
+    "brokerStop": 0.54769
    }
   },
   "day": {
@@ -2990,13 +3014,14 @@
    "ids": [
     "51656090",
     "51688521",
-    "51691949"
+    "51691949",
+    "51692951"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 360.75 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 360.75 · 4 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3018,14 +3043,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 360.75,
-  "lastRun": "2026-11-27T10:28:59.000Z"
+  "lastRun": "2026-11-27T10:32:09.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T09:55:48.000Z",
-   "msg": "not mirrored yet eqx:fade:usdchf:fade-m15-b1795511700: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:usdchf:fade-m15-b1795511700"
-  },
   {
    "at": "2026-11-24T10:36:03.000Z",
    "msg": "not mirrored yet eqx:fade:nzdusd:fade-m15-s1795515300: daily loss stop (95.0% down today) (will retry)",
@@ -4519,6 +4539,11 @@
    "at": "2026-11-27T10:15:18.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council eqx-fvg)",
    "trade": "eqx:fvg:fvg-h1-b1795773600-1795774500"
+  },
+  {
+   "at": "2026-11-27T10:30:24.000Z",
+   "msg": "opened buy NZDUSD 0.08 lot (council eqx-fade)",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795775400"
   }
  ],
  "limits": {
@@ -4623,19 +4648,19 @@
   ]
  },
  "execution": {
-  "n": 74,
-  "meanSlipR": 0.054,
-  "medianSlipR": 0.035,
+  "n": 75,
+  "meanSlipR": 0.053,
+  "medianSlipR": 0.033,
   "worstSlipR": 1.352,
-  "medianLagSec": 73,
+  "medianLagSec": 68,
   "bySymbol": {
    "GBPUSD": {
     "n": 7,
     "meanSlipR": 0.219
    },
    "NZDUSD": {
-    "n": 10,
-    "meanSlipR": 0.001
+    "n": 11,
+    "meanSlipR": -0.001
    },
    "USDJPY": {
     "n": 9,
