@@ -23,8 +23,8 @@ test('every feed goes through one tick engine, applied on the next frame', () =>
 });
 
 test('a candle refresh older than the last tick keeps the tick (no jump back)', () => {
-  assert.match(PAGE, /P\.raw = r\.src === G\.source \? mergeBars\(P\.raw, r\.bars\) : r\.bars; liveKeep\(P\); P\.rebuild\(true\);/);
-  const src = /function liveKeep\(P\) \{[\s\S]*?\n {2}\}/.exec(PAGE)[0];
+  assert.match(PAGE, /const same = r\.src === G\.source, nx = same \? mergeBars\(P\.raw, r\.bars\) : r\.bars; liveKeep\(P, nx\);/);   // 27 Nov 2026: kept on the refreshed list before it is compared
+  const src = /function liveKeep\(P, arr\) \{[\s\S]*?\n {2}\}/.exec(PAGE)[0];
   const LT = { px: 4010, t: 1000 * 60 + 30 }, keep = Function('LT', `${src}; return liveKeep;`)(LT);
   const P = { tf: { sec: 60 }, raw: [{ time: 1000 * 60, open: 4000, high: 4005, low: 3999, close: 4001 }] };
   keep(P); assert.deepEqual(P.raw[0], { time: 60000, open: 4000, high: 4010, low: 3999, close: 4010 });

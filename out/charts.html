@@ -8212,6 +8212,13 @@ function msNextSetup(bars, A) {
   ];
   const BARS = 1500, PIVOT = 6, CAP = 6000;   // 12 Nov 2026: 1,500 candles a timeframe at load (was 500); scrolling back loads older ones up to CAP
   const POLL_N = 300;   // a refresh asks for the latest 300 and joins them to what is loaded (mergeBars), so older history stays
+  // what a refresh changed (27 Nov 2026, speed): 'same', the candles from the old last one on (at most 3 new), or null = rebuild
+  window.msPollPlan = (old, nx) => { if (!old || !old.length || !nx || !nx.length || nx.length < old.length || nx.length - old.length > 3) return null;
+    const eq = (a, b) => a === b || (a && b && a.time === b.time && a.open === b.open && a.high === b.high && a.low === b.low && a.close === b.close && (a.volume || 0) === (b.volume || 0));
+    let d = 0; while (d < old.length && eq(old[d], nx[d])) d++;
+    if (d === old.length && nx.length === old.length) return 'same';
+    if (d < old.length - 1 || nx[old.length - 1].time !== old[old.length - 1].time) return null;
+    return nx.slice(Math.min(d, old.length - 1)); };
   const mergeBars = (old, fresh) => { if (!old || !old.length || !fresh || !fresh.length) return fresh; const t0 = fresh[0].time; return old.filter((b) => b.time < t0).concat(fresh).slice(-CAP); };
   const INSTRUMENTS = {
     xau:    { group: 'Metals', md: 'xau', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
@@ -9288,7 +9295,7 @@ function msNextSetup(bars, A) {
   // ChronosTrade's drawing tools on every chart (18 Nov 2026; assets/ms-draw.js, loaded with defer, picks these up): the same
   // shapes on every chart of a market, drawn and edited on any of them. Display only.
   window.msCharts = window.msCharts || { list: [], add(cx) { this.list.push(cx); document.dispatchEvent(new CustomEvent('ms:chart', { detail: cx })); } };
-  Object.values(panes).forEach((P) => window.msCharts.add({ id: P.tf.id, el: P.el, chart: P.chart, series: P.series, bars: () => P.bars || [], sec: () => P.tf.sec, market: () => instKey, TZ, dec: () => INST.dec ?? 2, fmt: (v) => fmt(v), visible: () => !!P.el.offsetParent }));
+  Object.values(panes).forEach((P) => window.msCharts.add({ id: P.tf.id, el: P.el, chart: P.chart, series: P.series, bars: () => P.bars || [], sec: () => P.tf.sec, market: () => instKey, TZ, dec: () => INST.dec ?? 2, fmt: (v) => fmt(v), visible: () => P.vis !== false && !(VCH && VCH.hidden) }));   // IntersectionObserver, no layout read each frame (27 Nov 2026)
   // the paper trading account (assets/ms-paper.js, 18 Nov 2026): the page's one-minute candles, the 15-minute candles for its ATR
   // stop, and one-minute candles of another market for the catch-up of its open positions. Read only.
   window.msPaperHost = { key: instKey, insts: INSTRUMENTS, TZ, m1: () => (panes['1m'] && panes['1m'].bars) || [], atr: () => (panes['15m'] && panes['15m'].bars) || [],
@@ -10031,8 +10038,8 @@ function msNextSetup(bars, A) {
     if (!LT.raf) LT.raf = document.hidden ? setTimeout(liveFrame, 200) : requestAnimationFrame(liveFrame);   // a hidden tab gets no frames
   }
   window.msLiveTick = liveTick;
-  function liveKeep(P) {   // a refreshed candle older than the last tick keeps the tick's price
-    if (LT.px == null || !P.raw || !P.raw.length) return; const last = P.raw[P.raw.length - 1], bt = Math.floor(LT.t / P.tf.sec) * P.tf.sec;
+  function liveKeep(P, arr) {   // a refreshed candle older than the last tick keeps the tick's price
+    const A = arr || P.raw; if (LT.px == null || !A || !A.length) return; const last = A[A.length - 1], bt = Math.floor(LT.t / P.tf.sec) * P.tf.sec;
     if (last.time !== bt) return; last.close = LT.px; last.high = Math.max(last.high, LT.px); last.low = Math.min(last.low, LT.px);
   }
   function liveFrame(now) {
@@ -10171,7 +10178,15 @@ function msNextSetup(bars, A) {
     ACTIVE.forEach((tf) => {
       const tick = async () => {
         try { const I = INST, r = await fetchBars(tf, I, POLL_N); const P = panes[tf.id]; if (I !== INST) throw 0;
-          P.raw = r.src === G.source ? mergeBars(P.raw, r.bars) : r.bars; liveKeep(P); P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+          // speed (27 Nov 2026): a refresh that only moved the last candle (or added one or two) goes through the tick path
+          // (P.push: series.update, analysis at most every 2 s or on a closed candle); nothing changed = nothing redrawn; a
+          // changed older candle, another feed or a shifted history is the full rebuild, as before
+          const same = r.src === G.source, nx = same ? mergeBars(P.raw, r.bars) : r.bars; liveKeep(P, nx);
+          const plan = same ? window.msPollPlan(P.raw, nx) : null;
+          if (plan === 'same') { /* nothing new */ }
+          else if (plan && P.bars && P.bars.length) plan.forEach((k, i) => P.push(Object.assign({}, k, { closed: i < plan.length - 1 })));
+          else { P.raw = nx; P.rebuild(true); }
+          $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
         if (!G.csv) setTimeout(tick, iv());
       };
@@ -11093,6 +11108,10 @@ function msNextSetup(bars, A) {
       .sort((a, b) => (ORDER[a.state] ?? 9) - (ORDER[b.state] ?? 9) || b.rr - a.rr);
     return { price: m.price, list, trend: m.trend || {}, chg: null, from: 'council' };
   }
+  // the background scan reads 6 timeframes of every market the council's snapshot does not cover (about 80 requests): not while the
+  // Charts are on screen, where it competed with the chart's own candles (27 Nov 2026); it runs as soon as another view opens
+  const onCharts = () => document.documentElement.dataset.app === 'charts' || document.documentElement.dataset.view === 'charts';
+  new MutationObserver(() => { if (SCAN.later && !onCharts()) { SCAN.later = false; scanAll(); } }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-view'] });
   async function scanAll(ev) {
     if (!SCAN.el || SCAN.busy || G.csv) return;
     const force = !!(ev && ev.type === 'click');
@@ -11105,11 +11124,13 @@ function msNextSetup(bars, A) {
         SCAN.at = Date.parse(snap.at); SCAN.snapAt = snap.at; renderScan();
         // markets the council does not trade (silver, indices, USD/JPY) are not in its snapshot: scan them here instead of leaving them "waiting" for good
         const miss = Object.keys(INSTRUMENTS).filter((k) => k !== instKey && !snap.markets[k] && (!SCAN.res[k] || Date.now() - (SCAN.res[k].at || 0) > 4 * 60e3));
+        if (onCharts()) { SCAN.later = miss.length > 0; return; }   // speed (27 Nov 2026): the other markets are scanned when the Charts are left
         await Promise.all(miss.map(async (k) => { try { SCAN.res[k] = Object.assign(await scanInst(k) || { err: 'No data' }, { at: Date.now() }); } catch (e) { SCAN.res[k] = { err: e.message || 'No data', at: Date.now() }; } renderScan(); }));
         return;
       }
     }
     SCAN.snapAt = null;
+    if (!force && onCharts()) { SCAN.later = true; return; }
     SCAN.busy = true; SCAN.res = {}; renderScan();
     const btn = document.getElementById('ms-scan-btn'); if (btn) btn.disabled = true;
     await Promise.all(Object.keys(INSTRUMENTS).map(async (k) => {
@@ -12996,7 +13017,9 @@ function msNextSetup(bars, A) {
     const boxes = () => document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm, .c-pane-overview > .c-active .c-act');
     const wire = () => boxes().forEach((el) => { if (!el.dataset.fadeWired) { el.dataset.fadeWired = '1'; el.addEventListener('scroll', () => upd(el), { passive: true }); } upd(el); });
     // perf (8 Nov): every mutation batch used to queue its own frame callback, each reading scrollHeight (a layout) on every box; now one pass per frame
-    let wq = false; new MutationObserver((recs) => { if (wq || document.documentElement.dataset.app === 'charts' || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
+    let wq = false; const chOn = () => document.documentElement.dataset.app === 'charts' || document.documentElement.dataset.view === 'charts';   // none of these boxes is on the Charts (27 Nov 2026, speed)
+    new MutationObserver(() => { if (!chOn()) wire(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-view'] });
+    new MutationObserver((recs) => { if (wq || chOn() || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
     const dot = document.getElementById('ms-live-dot'), txt = document.getElementById('ms-live-txt');
     if (dot && txt) { const name = () => { const t = txt.textContent.trim() || (dot.classList.contains('on') ? 'Live' : dot.classList.contains('poll') ? 'Updating every few seconds' : 'Connecting'); dot.title = t; dot.setAttribute('role', 'img'); dot.setAttribute('aria-label', `Price feed: ${t}`); };
       new MutationObserver(name).observe(txt, { childList: true, characterData: true, subtree: true }); new MutationObserver(name).observe(dot, { attributes: true, attributeFilter: ['class'] }); name(); }
@@ -14382,7 +14405,8 @@ function msNextSetup(bars, A) {
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#ms-theme, [data-theme-set], .cmdk-it')) fade(); }, true);
   // "Loading…" labels breathe until real text replaces them
   function mark(root) { (root || document).querySelectorAll('.tile-big, .h-head, .tile-sub, .ms-note, h1, h2').forEach(function (el) { el.classList.toggle('is-loading', /^(Loading|Starting up|Scanning soon)/.test(el.textContent.trim())); }); }
-  var mt = null; new MutationObserver(function (recs) { if (mt || document.documentElement.dataset.app === 'charts' || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  var mt = null; new MutationObserver(function () { if (document.documentElement.dataset.view !== 'charts') mark(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-view'] });
+  new MutationObserver(function (recs) { if (mt || document.documentElement.dataset.app === 'charts' || document.documentElement.dataset.view === 'charts' || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
   document.addEventListener('DOMContentLoaded', function () { mark(); }); mark();
   // staggered entrance the first time a list fills
   function stagger(id, item) { var el = document.getElementById(id); if (!el) return; var done = false;

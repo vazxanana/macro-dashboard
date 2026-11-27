@@ -2714,6 +2714,19 @@ taller); the watchlist's crypto rows read Kraken's public ticker through `window
 every 25 s, change against today's 00:00 UTC open, said in the watchlist's note; the fit script still makes no request of its own); Markets
 side by side keeps its candles above the volume band (`scaleMargins` top 0.1, bottom 0.18). Test: `tests/charts-quick.test.mjs`.
 
+## Charts speed (27 Nov 2026, owner: "Keep improving the charts, speed")
+Display only, `market-structure.html`. Measured on the Desk's Charts (1440 px, live OANDA candles, no tick stream): (1) **a refresh no
+longer rebuilds a chart**: each pane's poll (every 3-10 s on the low timeframes) used to `setData` every candle, the volume, the averages,
+the indicators and run the analysis; `window.msPollPlan(old, nx)` (pure) says what the refresh changed: `'same'` = nothing redrawn, the
+candles from the old last one on (at most 3 new) = the tick path `P.push` (series.update, analysis at most every 2 s or on a closed
+candle, off-screen panes only marked stale), `null` (an older candle changed, another feed, a shifted history) = the full rebuild as
+before. (2) **The background scanner waits while the Charts are on screen** (`onCharts`, `SCAN.later`): it read 6 timeframes of every
+market the council's snapshot does not cover (about 66 requests at load and every 5 minutes) and competed with the chart's own candles;
+the snapshot part still runs, the rest starts when another view opens. (3) Two page-wide watchers (the scroll-box fades, the "Loading"
+labels) stand down on the Charts and run once when another view opens; a pane tells the drawing layer it is visible from its
+IntersectionObserver (`P.vis`), not a layout read each frame. Load: 113 -> 47 candle requests in the first 12 s; idle with the charts
+open: 1.15 -> 0.76 s of main-thread work per 20 s, script 0.33 -> 0.17 s. Test: `tests/charts-speed.test.mjs`.
+
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
 right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to
