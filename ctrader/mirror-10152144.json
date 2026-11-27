@@ -2787,6 +2787,32 @@
     ],
     "stopCheckedAt": "2026-11-27T05:45:59.000Z",
     "brokerStop": 175.043
+   },
+   "eqx:fade:usdcad:fade-m15-b1795763700": {
+    "positionId": "51668761",
+    "symbol": "USDCAD",
+    "side": "buy",
+    "volume": 700000,
+    "lots": 0.07,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T07:15:33.000Z",
+    "councilEntry": 1.42242,
+    "stop": 1.421801,
+    "t1": 1.423657,
+    "riskCash": 3.64,
+    "margin": 14,
+    "mark": 1.42254,
+    "levelsFrom": "mark",
+    "fillPrice": 1.42238,
+    "slipR": -0.065,
+    "lagSec": 33,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T07:15:33.000Z",
+    "brokerStop": 1.42164
    }
   },
   "day": {
@@ -2795,13 +2821,14 @@
    "lastBalance": 363.8,
    "ids": [
     "51656090",
-    "51663815"
+    "51663815",
+    "51668761"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 363.8 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 363.8 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2818,14 +2845,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 363.8,
-  "lastRun": "2026-11-27T07:14:31.000Z"
+  "lastRun": "2026-11-27T07:17:45.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-23T00:35:24.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council ict-A)",
-   "trade": "ict:gc-b-1795388400"
-  },
   {
    "at": "2026-11-23T03:36:38.000Z",
    "msg": "US2000 position 50584644 closed at the broker",
@@ -4319,6 +4341,11 @@
    "at": "2026-11-27T06:44:11.000Z",
    "msg": "NZDUSD position 51663241 closed at the broker",
    "trade": "eqx:fvg:nzdusd:fvg-h1-s1795755600-1795757400"
+  },
+  {
+   "at": "2026-11-27T07:15:33.000Z",
+   "msg": "opened buy USDCAD 0.07 lot (council eqx-fade)",
+   "trade": "eqx:fade:usdcad:fade-m15-b1795763700"
   }
  ],
  "limits": {
@@ -4423,8 +4450,8 @@
   ]
  },
  "execution": {
-  "n": 67,
-  "meanSlipR": 0.062,
+  "n": 68,
+  "meanSlipR": 0.06,
   "medianSlipR": 0.033,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
@@ -4450,8 +4477,8 @@
     "meanSlipR": 0.193
    },
    "USDCAD": {
-    "n": 8,
-    "meanSlipR": 0.092
+    "n": 9,
+    "meanSlipR": 0.075
    },
    "EURJPY": {
     "n": 9,
