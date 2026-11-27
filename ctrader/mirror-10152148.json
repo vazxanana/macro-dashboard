@@ -6956,7 +6956,7 @@
     "lots": 2.97,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T01:46:16.000Z",
     "councilEntry": 0.66454,
     "stop": 0.66517,
@@ -6969,10 +6969,41 @@
     "slipR": -0.349,
     "lagSec": 76,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T01:46:16.000Z",
-    "brokerStop": 0.66543
+    "brokerStop": 0.66543,
+    "closedAt": "2026-11-27T01:58:44.000Z",
+    "exitPrice": 0.66515,
+    "councilExit": 0.66517,
+    "councilR": -1
+   },
+   "boxfade:eurusd:boxfade-m5-s1795744500": {
+    "positionId": "51651070",
+    "symbol": "EURUSD",
+    "side": "sell",
+    "volume": 36100000,
+    "lots": 3.61,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T01:56:48.000Z",
+    "councilEntry": 1.09697,
+    "stop": 1.09753,
+    "t1": 1.09641,
+    "riskCash": 199.07,
+    "margin": 791.85,
+    "mark": 1.09698,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09702,
+    "slipR": -0.089,
+    "lagSec": 108,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T01:56:48.000Z",
+    "brokerStop": 1.09757
    }
   },
   "day": {
@@ -6982,7 +7013,8 @@
    "ids": [
     "51571061",
     "51648374",
-    "51650872"
+    "51650872",
+    "51651070"
    ],
    "oids": [],
    "sent": false
@@ -6997,19 +7029,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9953.36,
-  "lastRun": "2026-11-27T01:55:58.000Z"
+  "lastRun": "2026-11-27T01:58:44.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T13:10:45.000Z",
-   "msg": "XAUUSD position 48760953 closed at the broker",
-   "trade": "xau-replica-1794484073-s"
-  },
-  {
-   "at": "2026-11-12T13:15:24.000Z",
-   "msg": "XAUUSD position 48750699 closed at the broker",
-   "trade": "xau-replica-1794480911-b"
-  },
   {
    "at": "2026-11-12T14:22:18.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
@@ -8493,6 +8515,16 @@
    "at": "2026-11-27T01:46:16.000Z",
    "msg": "opened sell AUDUSD 2.97 lot (council boxfade)",
    "trade": "boxfade:audusd:boxfade-m5-s1795743900"
+  },
+  {
+   "at": "2026-11-27T01:56:48.000Z",
+   "msg": "opened sell EURUSD 3.61 lot (council boxfade)",
+   "trade": "boxfade:eurusd:boxfade-m5-s1795744500"
+  },
+  {
+   "at": "2026-11-27T01:58:44.000Z",
+   "msg": "closed AUDUSD position 51650872 (council: stopped)",
+   "trade": "boxfade:audusd:boxfade-m5-s1795743900"
   }
  ],
  "limits": {
@@ -8597,7 +8629,7 @@
   ]
  },
  "execution": {
-  "n": 238,
+  "n": 239,
   "meanSlipR": 0.059,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
@@ -8636,8 +8668,8 @@
     "meanSlipR": 0.148
    },
    "EURUSD": {
-    "n": 15,
-    "meanSlipR": 0.015
+    "n": 16,
+    "meanSlipR": 0.008
    },
    "NZDUSD": {
     "n": 5,
