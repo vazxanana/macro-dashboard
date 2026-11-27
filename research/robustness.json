@@ -1,5 +1,5 @@
 {
- "at": "2026-11-27T12:50:06.699Z",
+ "at": "2026-11-27T13:48:35.190Z",
  "bar": {
   "minN": 30,
   "oosT": 2,
@@ -418,81 +418,81 @@
    "source": "ict/replay.json trades",
    "fitFrom": "2023-01-01",
    "family": "ict",
-   "n": 834,
-   "mean": 0.1088,
-   "sd": 1.5559,
-   "t": 2.0192,
-   "wr": 0.3741,
-   "sum": 90.7251,
-   "skew": 1.9838,
-   "kurt": 10.0496,
+   "n": 838,
+   "mean": 0.1136,
+   "sd": 1.5539,
+   "t": 2.1159,
+   "wr": 0.3771,
+   "sum": 95.1799,
+   "skew": 1.9744,
+   "kurt": 10.0284,
    "maxDD": 38.1654,
    "from": "2025-08-01",
-   "to": "2026-11-24",
+   "to": "2026-11-25",
    "is": {
-    "n": 500,
-    "mean": 0.1405,
-    "sd": 1.5978,
-    "t": 1.967,
-    "wr": 0.392,
-    "sum": 70.2743,
-    "skew": 2.1764,
-    "kurt": 12.2737,
-    "maxDD": 16.1215
+    "n": 502,
+    "mean": 0.136,
+    "sd": 1.5962,
+    "t": 1.9084,
+    "wr": 0.3904,
+    "sum": 68.2527,
+    "skew": 2.1811,
+    "kurt": 12.298,
+    "maxDD": 16.1512
    },
    "oos": {
-    "n": 334,
-    "mean": 0.0612,
-    "sd": 1.492,
-    "t": 0.75,
-    "wr": 0.3473,
-    "sum": 20.4508,
-    "skew": 1.611,
-    "kurt": 5.4211,
-    "maxDD": 24.0358
+    "n": 336,
+    "mean": 0.0801,
+    "sd": 1.4903,
+    "t": 0.9857,
+    "wr": 0.3571,
+    "sum": 26.9272,
+    "skew": 1.5775,
+    "kurt": 5.3379,
+    "maxDD": 22.3076
    },
    "boot": {
-    "lo": 0.0059,
-    "hi": 0.2204,
-    "pLE0": 0.0198
+    "lo": 0.0088,
+    "hi": 0.2194,
+    "pLE0": 0.0164
    },
    "cost": {
     "x0": {
-     "mean": 0.1358,
-     "t": 2.5221,
-     "sum": 113.29
+     "mean": 0.1405,
+     "t": 2.6189,
+     "sum": 117.77
     },
     "x1": {
-     "mean": 0.1088,
-     "t": 2.0192,
-     "sum": 90.7251
+     "mean": 0.1136,
+     "t": 2.1159,
+     "sum": 95.1799
     },
     "x1.5": {
-     "mean": 0.0953,
-     "t": 1.7676,
-     "sum": 79.4427
+     "mean": 0.1001,
+     "t": 1.8643,
+     "sum": 83.8848
     },
     "x2": {
-     "mean": 0.0817,
-     "t": 1.5161,
-     "sum": 68.1602
+     "mean": 0.0866,
+     "t": 1.6127,
+     "sum": 72.5897
     }
    },
    "mc": {
-    "dd50": 26.0057,
-    "dd95": 41.2118,
+    "dd50": 25.3166,
+    "dd95": 39.739,
     "ddActual": 38.1654
    },
    "mt": {
     "N": 363,
     "bonf": {
-     "p": 0.0217,
+     "p": 0.0172,
      "pAdj": 1,
      "tReq": 3.6373
     },
-    "sr": 0.0699,
-    "sr0": 0.1024,
-    "dsr": 0.1579
+    "sr": 0.0731,
+    "sr0": 0.1021,
+    "dsr": 0.1835
    },
    "untouched": {
     "n": 0,
@@ -502,8 +502,8 @@
    "warn": [],
    "verdict": "fragile",
    "why": [
-    "out-of-sample t 0.75 < 2",
-    "fails Bonferroni for N=363 (needs t 3.64, has 2.02)",
+    "out-of-sample t 0.99 < 2",
+    "fails Bonferroni for N=363 (needs t 3.64, has 2.12)",
     "no untouched sample: the rule was chosen on data from 2023-01-01 on (0 trades before)"
    ]
   },
@@ -2964,29 +2964,29 @@
    "system": "Meridian",
    "status": "Coach rule changes (applied automatically)",
    "name": "Coach-stats session / D1 / stop toggles",
-   "claim": "40 automatic rule changes",
+   "claim": "41 automatic rule changes",
    "source": "config.json history (coach-stats, coach-backtest)",
    "family": "coach",
-   "n": 40,
+   "n": 41,
    "toggles": {
-    "n": 40,
+    "n": 41,
     "withN": 28,
     "medianN": 10.5,
     "underThirty": 21,
     "topics": 17,
-    "flipped": 12,
+    "flipped": 13,
     "maxFlips": 5
    },
    "verdict": "not proven",
    "why": [
     "median evidence 10.5 trades; 21 of 28 cite fewer than 30",
-    "12 topics changed 2+ times (5 at most)"
+    "13 topics changed 2+ times (5 at most)"
    ]
   }
  ],
  "sources": {
   "ict/replay.json": {
-   "at": "2026-11-26T17:19:22.065Z",
+   "at": "2026-11-27T13:33:38.859Z",
    "from": "2025-08-01"
   },
   "research/replay-2w.json": {
