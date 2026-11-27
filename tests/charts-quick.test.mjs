@@ -78,3 +78,9 @@ test('what is drawn on a chart follows the chart\'s background, not the page the
   assert.match(h, /:root\[data-theme="light"\] \.ms-live\[data-chart="dark"\] :is\(\.ms-pane, \.mm-c\) \{ --au-bg: #121315;[^}]*--buy: #4cc38a;/);
   assert.match(h, /t = Object\.assign\(\{\}, THEMES\[G\.theme\], hexOk\(CUS\.bg\) \? \{ bg: CUS\.bg \} : \{\}\)/, 'label backings take the chart\'s own background');
 });
+
+test('Markets side by side: volume in the panes\' colours, the source label shrinks', () => {
+  const h = fs.readFileSync('market-structure.html', 'utf8');
+  assert.match(h, /value: \+b\.volume \|\| 0, color: window\.msChartLight && window\.msChartLight\(\) \?/);
+  assert.match(h, /\.mm-src \{[^}]*text-overflow: ellipsis;/);
+});
