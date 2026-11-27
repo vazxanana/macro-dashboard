@@ -2664,7 +2664,7 @@
     "lots": 0.09,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T04:45:41.000Z",
     "councilEntry": 0.83432,
     "stop": 0.834567,
@@ -2677,25 +2677,26 @@
     "slipR": -0.202,
     "lagSec": 41,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T04:45:41.000Z",
-    "brokerStop": 0.83468
+    "brokerStop": 0.83468,
+    "closedAt": "2026-11-27T04:56:40.000Z"
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 367.13,
+   "lastBalance": 368.78,
    "ids": [
-    "51656090",
-    "51661038"
+    "51656090"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 367.13 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 368.78 · 1 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2711,14 +2712,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 367.13,
-  "lastRun": "2026-11-27T04:55:16.000Z"
+  "balance": 368.78,
+  "lastRun": "2026-11-27T04:58:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-21T07:19:56.000Z",
-   "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
-  },
   {
    "at": "2026-11-21T08:57:02.000Z",
    "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
@@ -4205,6 +4202,11 @@
   {
    "at": "2026-11-27T04:45:41.000Z",
    "msg": "opened sell USDCHF 0.09 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdchf:fvg-h1-s1795748400-1795754700"
+  },
+  {
+   "at": "2026-11-27T04:56:40.000Z",
+   "msg": "USDCHF position 51661038 closed at the broker",
    "trade": "eqx:fvg:usdchf:fvg-h1-s1795748400-1795754700"
   }
  ],
