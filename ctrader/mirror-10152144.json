@@ -2572,6 +2572,30 @@
     ],
     "stopCheckedAt": "2026-11-27T03:31:13.000Z",
     "brokerStop": 0.5472
+   },
+   "eqx:fvg:usdjpy:fvg-h1-s1795748400-1795752000": {
+    "positionId": "51656455",
+    "symbol": "USDJPY",
+    "side": "sell",
+    "volume": 1500000,
+    "lots": 0.15,
+    "digits": 3,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-27T04:01:15.000Z",
+    "councilEntry": 159.246,
+    "stop": 159.284364,
+    "t1": 159.207636,
+    "riskCash": 3.78,
+    "margin": 30,
+    "fillPrice": 159.216,
+    "slipR": 0.782,
+    "lagSec": 75,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T04:01:15.000Z",
+    "brokerStop": 159.254
    }
   },
   "day": {
@@ -2582,12 +2606,13 @@
     "51656090"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 377.55 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 377.55 · 2 open",
   "skipped": {
-   "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
+   "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now",
+   "eqx:fvg:usdcad:fvg-h1-s1795748400-1795752000": "stop distance 0.000151 sits inside the broker spread 0.0002 on USDCAD: no stop could be set"
   },
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2602,19 +2627,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 377.55,
-  "lastRun": "2026-11-27T03:58:45.000Z"
+  "lastRun": "2026-11-27T04:01:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-20T16:15:45.000Z",
-   "msg": "opened sell US2000 0.55 lot (council ict-A)",
-   "trade": "ict:rty-s-1795186800"
-  },
-  {
-   "at": "2026-11-20T16:50:39.000Z",
-   "msg": "US30 position 50566126 closed at the broker",
-   "trade": "ict:ym-b-1795183200"
-  },
   {
    "at": "2026-11-20T17:29:50.000Z",
    "msg": "opened sell US30 0.02 lot (council ict-A)",
@@ -4094,6 +4109,16 @@
    "at": "2026-11-27T03:31:13.000Z",
    "msg": "opened buy NZDUSD 0.01 lot (council eqx-fvg)",
    "trade": "eqx:fvg:nzdusd:fvg-h1-b1795748400-1795750200"
+  },
+  {
+   "at": "2026-11-27T04:01:15.000Z",
+   "msg": "not mirrored eqx:fvg:usdcad:fvg-h1-s1795748400-1795752000: stop distance 0.000151 sits inside the broker spread 0.0002 on USDCAD: no stop could be set",
+   "trade": "eqx:fvg:usdcad:fvg-h1-s1795748400-1795752000"
+  },
+  {
+   "at": "2026-11-27T04:01:15.000Z",
+   "msg": "opened sell USDJPY 0.15 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdjpy:fvg-h1-s1795748400-1795752000"
   }
  ],
  "limits": {
@@ -4198,9 +4223,9 @@
   ]
  },
  "execution": {
-  "n": 59,
-  "meanSlipR": 0.071,
-  "medianSlipR": 0.064,
+  "n": 60,
+  "meanSlipR": 0.082,
+  "medianSlipR": 0.074,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
   "bySymbol": {
@@ -4213,8 +4238,8 @@
     "meanSlipR": 0.035
    },
    "USDJPY": {
-    "n": 6,
-    "meanSlipR": 0.201
+    "n": 7,
+    "meanSlipR": 0.284
    },
    "EURUSD": {
     "n": 7,
