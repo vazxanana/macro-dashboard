@@ -1,6 +1,6 @@
 {
- "at": "2026-11-27T22:02:39.000Z",
- "status": "bad",
+ "at": "2026-11-27T22:29:02.000Z",
+ "status": "warn",
  "feeds": {
   "oanda": {
    "label": "OANDA spot (md/bars)",
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-27T22:00:00.000Z",
+     "last": "2026-11-27T22:25:00.000Z",
      "staleMin": 0,
      "maxJump": 2.36,
      "clipped": 0,
@@ -94,9 +94,9 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-27T22:00:00.000Z",
+     "last": "2026-11-27T22:25:00.000Z",
      "staleMin": 0,
-     "maxJump": 2.15,
+     "maxJump": 3.3,
      "clipped": 0,
      "issues": []
     },
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-27T22:00:00.000Z",
+     "last": "2026-11-27T22:25:00.000Z",
      "staleMin": 0,
      "maxJump": 2.17,
      "clipped": 0,
@@ -116,9 +116,9 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-27T22:00:00.000Z",
+     "last": "2026-11-27T22:25:00.000Z",
      "staleMin": 0,
-     "maxJump": 1.77,
+     "maxJump": 2.27,
      "clipped": 0,
      "issues": []
     }
@@ -126,7 +126,7 @@
   },
   "cnbc": {
    "label": "CNBC futures (ICT desk)",
-   "status": "bad",
+   "status": "closed",
    "markets": {
     "nq": {
      "label": "NQ",
@@ -142,15 +142,13 @@
     "es": {
      "label": "ES",
      "sym": "@SP.1",
-     "status": "bad",
-     "n": 0,
-     "issues": [
-      {
-       "kind": "error",
-       "sev": "bad",
-       "detail": "unreachable: Error in getting bars for symbol: @ES.1 and barType: FIVE_MIN Security Master not found"
-      }
-     ]
+     "status": "closed",
+     "n": 1011,
+     "last": "2026-11-27T18:10:00.000Z",
+     "staleMin": 0,
+     "maxJump": 5.98,
+     "clipped": 0,
+     "issues": []
     },
     "ym": {
      "label": "YM",
@@ -244,31 +242,31 @@
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 2,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
      "label": "cTrader mirror 10152144 (ctrader/mirror-10152144.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-10152145.json": {
      "label": "cTrader mirror 10152145 (ctrader/mirror-10152145.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-10152146.json": {
      "label": "cTrader mirror 10152146 (ctrader/mirror-10152146.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-10152148.json": {
      "label": "cTrader mirror 10152148 (ctrader/mirror-10152148.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 1,
      "issues": []
     },
     "ctrader/mirror-155.json": {
@@ -330,7 +328,7 @@
     "macro/forecast.json": {
      "label": "Macro forecast (macro/forecast.json)",
      "status": "warn",
-     "ageMin": 25,
+     "ageMin": 52,
      "issues": [
       {
        "kind": "input",
@@ -347,25 +345,25 @@
     "macro/veteran.json": {
      "label": "Macro veteran (macro/veteran.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 51,
      "issues": []
     },
     "macro/cot.json": {
      "label": "COT positioning (macro/cot.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 51,
      "issues": []
     },
     "macro/hard-data.json": {
      "label": "Hard-to-find data (macro/hard-data.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 51,
      "issues": []
     },
     "macro/week-ahead.json": {
      "label": "Week ahead (macro/week-ahead.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 51,
      "issues": []
     },
     "macro/source-record.json": {
@@ -376,7 +374,7 @@
     "macro/week-review.json": {
      "label": "Week in review (macro/week-review.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 51,
      "issues": []
     },
     "macro/prep-record.json": {
@@ -387,7 +385,7 @@
     "macro/daily-report.json": {
      "label": "Daily reports (macro/daily-report.json)",
      "status": "ok",
-     "ageMin": 954,
+     "ageMin": 981,
      "issues": []
     },
     "macro/history.json": {
@@ -408,19 +406,19 @@
     "research/trade-review.json": {
      "label": "Trade review (research/trade-review.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 51,
      "issues": []
     },
     "mosha/desk.json": {
      "label": "Mosha desk trades (mosha/desk.json)",
      "status": "ok",
-     "ageMin": 26,
+     "ageMin": 14,
      "issues": []
     },
     "lit/desk.json": {
      "label": "LIT desk trades (lit/desk.json)",
      "status": "ok",
-     "ageMin": 26,
+     "ageMin": 13,
      "issues": []
     },
     "fade/desk.json": {
@@ -438,7 +436,7 @@
     "roundfade/desk.json": {
      "label": "Round-number fade desk trades (roundfade/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "boxfade/desk.json": {
@@ -462,49 +460,49 @@
     "lyriac/desk.json": {
      "label": "Lyriac desk trades (lyriac/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "jpyvb/desk.json": {
      "label": "USD/JPY breakout desk trades (jpyvb/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "nq1/desk.json": {
      "label": "NQ1 desk trades (nq1/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "nq2/desk.json": {
      "label": "NQ2 desk trades (nq2/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "zero/desk.json": {
      "label": "ZERO desk trades (zero/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "dom/desk.json": {
      "label": "DOM zone desk trades (dom/desk.json)",
      "status": "ok",
-     "ageMin": 25,
+     "ageMin": 12,
      "issues": []
     },
     "eg/desk.json": {
      "label": "Engulfing desk trades (eg/desk.json)",
      "status": "ok",
-     "ageMin": 26,
+     "ageMin": 13,
      "issues": []
     },
     "msnr/desk.json": {
      "label": "MSNR desk trades (msnr/desk.json)",
      "status": "ok",
-     "ageMin": 26,
+     "ageMin": 13,
      "issues": []
     },
     "nq/trades.json": {
@@ -520,7 +518,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 1322,
+     "ageMin": 1349,
      "issues": []
     },
     "digest.json": {
@@ -531,31 +529,31 @@
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
      "status": "ok",
-     "ageMin": 122,
+     "ageMin": 149,
      "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 553,
+     "ageMin": 579,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 553,
+     "ageMin": 579,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 553,
+     "ageMin": 579,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 494,
+     "ageMin": 520,
      "issues": []
     },
     "research/ledger.json": {
@@ -576,13 +574,13 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 303,
+     "ageMin": 330,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 9301,
+     "ageMin": 9327,
      "issues": [
       {
        "kind": "stale",
@@ -620,13 +618,11 @@
    }
   }
  },
- "summary": "CNBC futures (ICT desk): ES error · Council data files: Trade records (trades.json) range, cTrader mirror 155 (ctrader/mirror-155.json) stale/source, Macro forecast (macro/forecast.json) input/source, Coach AI review (reviews/latest.md) stale",
+ "summary": "Council data files: Trade records (trades.json) range, cTrader mirror 155 (ctrader/mirror-155.json) stale/source, Macro forecast (macro/forecast.json) input/source, Coach AI review (reviews/latest.md) stale",
  "brief": {
-  "status": "bad",
-  "line": "1 problem, 6 warnings: CNBC futures (ICT desk) ES: unreachable: Error in getting bars for symbol: @ES.1 and barType: FIVE_MIN Security Master not found",
-  "bad": [
-   "CNBC futures (ICT desk) ES: unreachable: Error in getting bars for symbol: @ES.1 and barType: FIVE_MIN Security Master not found"
-  ],
+  "status": "warn",
+  "line": "6 warnings: Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry tha",
+  "bad": [],
   "warn": [
    "Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry than the opening risk 0.011773)",
    "cTrader mirror 155 (ctrader/mirror-155.json): no update time inside",
@@ -638,9 +634,7 @@
   "notes": 3
  },
  "alert": {
-  "streak": {
-   "cnbc:es": 1
-  },
+  "streak": {},
   "sent": {
    "key": "",
    "at": "2026-11-26T00:04:59.000Z",
