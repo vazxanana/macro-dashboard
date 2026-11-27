@@ -1,7 +1,7 @@
 {
  "v": 1,
- "at": "2026-11-26T23:03:32.000Z",
- "target": "2026-11-27",
+ "at": "2026-11-27T00:36:29.000Z",
+ "target": "2026-11-30",
  "targetEvent": null,
  "paperOnly": true,
  "regime": {
@@ -13,16 +13,16 @@
   "vixTermRatio": 1.035,
   "liquidity": {
    "level": 5825,
-   "chg": 79
+   "chg": 83
   },
   "realYield": {
    "level": 2.79,
    "chg": -0.1,
    "bias": "bear"
   },
-  "dxyProxy": 103.78,
-  "dxy5d": -0.18,
-  "broadUsd20dPct": 1.06,
+  "dxyProxy": 103.83,
+  "dxy5d": -0.01,
+  "broadUsd20dPct": 1.85,
   "sofrEffrBps": 6,
   "curve10y3m": 0.51,
   "us2y": 4.63,
@@ -34,15 +34,15 @@
    "label": "Gold",
    "pUp": 0.531,
    "score": 0,
-   "last": 3566.3,
-   "expMovePct": 1.62,
-   "naiveMovePct": 1.62,
+   "last": 3567.845,
+   "expMovePct": 1.58,
+   "naiveMovePct": 1.58,
    "volModel": "naive",
-   "volRatio": 1.06,
+   "volRatio": 1.05,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.1239,
-    "b": 0.2328,
+    "a": 0.124,
+    "b": 0.2376,
     "n": 1000,
     "base": 0.531
    },
@@ -100,19 +100,19 @@
   },
   "eurusd": {
    "label": "EUR/USD",
-   "pUp": 0.483,
+   "pUp": 0.482,
    "score": -0.286,
-   "last": 1.09704,
-   "expMovePct": 0.31,
-   "naiveMovePct": 0.31,
+   "last": 1.09642,
+   "expMovePct": 0.29,
+   "naiveMovePct": 0.29,
    "volModel": "naive",
-   "volRatio": 1.11,
+   "volRatio": 1.1,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": -0.0661,
+    "a": -0.0701,
     "b": 0,
     "n": 999,
-    "base": 0.483
+    "base": 0.482
    },
    "drivers": [
     {
@@ -168,17 +168,17 @@
   },
   "usdjpy": {
    "label": "USD/JPY",
-   "pUp": 0.553,
+   "pUp": 0.552,
    "score": -0.368,
-   "last": 159.284,
+   "last": 159.347,
    "expMovePct": 0.24,
    "naiveMovePct": 0.24,
    "volModel": "naive",
    "volRatio": 0.71,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.2486,
-    "b": 0.101,
+    "a": 0.2483,
+    "b": 0.1029,
     "n": 999,
     "base": 0.565
    },
@@ -245,15 +245,15 @@
    "label": "NQ (Nasdaq 100)",
    "pUp": 0.55,
    "score": -0.133,
-   "last": 26215.6,
-   "expMovePct": 2.08,
-   "naiveMovePct": 2.08,
+   "last": 26222.5,
+   "expMovePct": 2.01,
+   "naiveMovePct": 2.01,
    "volModel": "naive",
-   "volRatio": 1.89,
+   "volRatio": 1.87,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
     "a": 0.2301,
-    "b": 0.2302,
+    "b": 0.2245,
     "n": 999,
     "base": 0.557
    },
@@ -318,17 +318,17 @@
   },
   "es": {
    "label": "ES (S&P 500)",
-   "pUp": 0.524,
+   "pUp": 0.525,
    "score": -0.154,
-   "last": 7231.6,
-   "expMovePct": 1.36,
-   "naiveMovePct": 1.36,
+   "last": 7234.2,
+   "expMovePct": 1.35,
+   "naiveMovePct": 1.35,
    "volModel": "naive",
    "volRatio": 1.96,
    "expBasis": "naive: mean absolute move of the last 20 days",
    "fit": {
-    "a": 0.1469,
-    "b": 0.3229,
+    "a": 0.1472,
+    "b": 0.3162,
     "n": 997,
     "base": 0.538
    },
@@ -393,7 +393,7 @@
   }
  },
  "dxy": {
-  "pUp": 0.517,
+  "pUp": 0.518,
   "note": "mirror of EUR/USD (EUR is 57.6% of the DXY)"
  },
  "drivers": [
@@ -488,7 +488,7 @@
    "name": "USD 5-day momentum (ICE DXY on OANDA)",
    "cluster": "dollar",
    "vote": 0,
-   "detail": "−0.18 pts in 5 sessions",
+   "detail": "−0.01 pts in 5 sessions",
    "weights": {
     "gold": 1,
     "eurusd": 1,
@@ -568,7 +568,7 @@
    "name": "Yen carry-unwind risk (BoJ / VIX)",
    "cluster": "risk",
    "vote": null,
-   "detail": "USD/JPY −0.3% in 5 days: calm",
+   "detail": "USD/JPY +0.5% in 5 days: calm",
    "weights": {}
   },
   {
@@ -587,7 +587,7 @@
    "name": "Dollar liquidity (Fed balance sheet − RRP − TGA)",
    "cluster": "risk",
    "vote": 1,
-   "detail": "$5.83tn, +79bn in 4 weeks",
+   "detail": "$5.83tn, +83bn in 4 weeks",
    "weights": {}
   },
   {
@@ -658,7 +658,7 @@
    "name": "Veteran: dollar (DXY), 4-week change",
    "cluster": "dollar",
    "vote": -1,
-   "detail": "DXY +1.79% in 4 weeks",
+   "detail": "DXY +1.73% in 4 weeks",
    "weights": {},
    "challenger": true,
    "vs": "dxymom",
@@ -681,14 +681,14 @@
     "vs": "ry",
     "challenger": {
      "n": 650,
-     "hit": 0.515,
-     "t": 0.78,
+     "hit": 0.517,
+     "t": 0.86,
      "proven": false
     },
     "incumbent": {
      "n": 752,
-     "hit": 0.52,
-     "t": 1.09,
+     "hit": 0.521,
+     "t": 1.17,
      "proven": false
     },
     "adopted": false
@@ -713,8 +713,8 @@
     "vs": "dxymom",
     "challenger": {
      "n": 624,
-     "hit": 0.498,
-     "t": -0.08,
+     "hit": 0.5,
+     "t": 0,
      "proven": false
     },
     "incumbent": {
@@ -795,14 +795,14 @@
     "base": 0.536,
     "edge": -0.01,
     "z": -0.61,
-    "pt": 0.5,
+    "pt": 0.45,
     "brier": 0.249,
     "brierRW": 0.25,
     "brierClim": 0.2487,
-    "skillRW": 0.0041,
-    "skillClim": -0.0012,
+    "skillRW": 0.0042,
+    "skillClim": -0.0011,
     "logLoss": 0.6911,
-    "ece": 0.036,
+    "ece": 0.042,
     "calib": [
      {
       "bin": "0-40%",
@@ -812,39 +812,39 @@
      },
      {
       "bin": "40-45%",
-      "n": 14,
-      "p": 0.439,
-      "obs": 0.5
+      "n": 12,
+      "p": 0.437,
+      "obs": 0.583
      },
      {
       "bin": "45-48%",
-      "n": 72,
-      "p": 0.469,
-      "obs": 0.528
+      "n": 70,
+      "p": 0.467,
+      "obs": 0.5
      },
      {
       "bin": "48-50%",
-      "n": 125,
+      "n": 119,
       "p": 0.491,
-      "obs": 0.52
+      "obs": 0.529
      },
      {
       "bin": "50-52%",
-      "n": 124,
-      "p": 0.512,
-      "obs": 0.46
+      "n": 115,
+      "p": 0.511,
+      "obs": 0.435
      },
      {
       "bin": "52-55%",
-      "n": 272,
+      "n": 285,
       "p": 0.535,
-      "obs": 0.577
+      "obs": 0.582
      },
      {
       "bin": "55-60%",
-      "n": 273,
-      "p": 0.562,
-      "obs": 0.542
+      "n": 279,
+      "p": 0.564,
+      "obs": 0.541
      },
      {
       "bin": "60-100%",
@@ -856,19 +856,19 @@
    },
    "eurusd": {
     "n": 879,
-    "upRate": 0.479,
-    "hit": 0.511,
-    "base": 0.521,
-    "edge": -0.01,
-    "z": -0.61,
-    "pt": 0.32,
+    "upRate": 0.478,
+    "hit": 0.51,
+    "base": 0.522,
+    "edge": -0.013,
+    "z": -0.74,
+    "pt": 0.22,
     "brier": 0.2504,
     "brierRW": 0.25,
-    "brierClim": 0.2496,
-    "skillRW": -0.0016,
-    "skillClim": -0.0034,
-    "logLoss": 0.6939,
-    "ece": 0.025,
+    "brierClim": 0.2495,
+    "skillRW": -0.0017,
+    "skillClim": -0.0037,
+    "logLoss": 0.694,
+    "ece": 0.022,
     "calib": [
      {
       "bin": "0-40%",
@@ -884,32 +884,32 @@
      },
      {
       "bin": "45-48%",
-      "n": 13,
-      "p": 0.477,
-      "obs": 0.615
+      "n": 8,
+      "p": 0.475,
+      "obs": 0.5
      },
      {
       "bin": "48-50%",
-      "n": 545,
+      "n": 554,
       "p": 0.493,
-      "obs": 0.472
+      "obs": 0.475
      },
      {
       "bin": "50-52%",
-      "n": 279,
-      "p": 0.511,
-      "obs": 0.498
+      "n": 277,
+      "p": 0.509,
+      "obs": 0.495
      },
      {
       "bin": "52-55%",
-      "n": 38,
-      "p": 0.526,
-      "obs": 0.395
+      "n": 36,
+      "p": 0.525,
+      "obs": 0.389
      },
      {
       "bin": "55-60%",
       "n": 4,
-      "p": 0.554,
+      "p": 0.552,
       "obs": 0.5
      },
      {
@@ -922,19 +922,19 @@
    },
    "usdjpy": {
     "n": 879,
-    "upRate": 0.565,
-    "hit": 0.565,
-    "base": 0.565,
+    "upRate": 0.567,
+    "hit": 0.567,
+    "base": 0.567,
     "edge": 0,
     "z": 0,
     "pt": null,
-    "brier": 0.2465,
+    "brier": 0.2464,
     "brierRW": 0.25,
-    "brierClim": 0.2457,
-    "skillRW": 0.0142,
-    "skillClim": -0.003,
-    "logLoss": 0.6861,
-    "ece": 0.017,
+    "brierClim": 0.2456,
+    "skillRW": 0.0143,
+    "skillClim": -0.0035,
+    "logLoss": 0.686,
+    "ece": 0.02,
     "calib": [
      {
       "bin": "0-40%",
@@ -968,39 +968,39 @@
      },
      {
       "bin": "52-55%",
-      "n": 166,
-      "p": 0.541,
-      "obs": 0.584
+      "n": 182,
+      "p": 0.54,
+      "obs": 0.593
      },
      {
       "bin": "55-60%",
-      "n": 711,
-      "p": 0.572,
+      "n": 694,
+      "p": 0.571,
       "obs": 0.561
      },
      {
       "bin": "60-100%",
-      "n": 2,
-      "p": 0.6,
-      "obs": 0.5
+      "n": 3,
+      "p": 0.602,
+      "obs": 0.333
      }
     ]
    },
    "nq": {
     "n": 879,
     "upRate": 0.554,
-    "hit": 0.556,
+    "hit": 0.554,
     "base": 0.554,
-    "edge": 0.002,
-    "z": 0.14,
-    "pt": 1.23,
+    "edge": 0,
+    "z": 0,
+    "pt": null,
     "brier": 0.2476,
     "brierRW": 0.25,
     "brierClim": 0.2471,
     "skillRW": 0.0097,
     "skillClim": -0.002,
     "logLoss": 0.6883,
-    "ece": 0.018,
+    "ece": 0.02,
     "calib": [
      {
       "bin": "0-40%",
@@ -1022,33 +1022,33 @@
      },
      {
       "bin": "48-50%",
-      "n": 4,
-      "p": 0.499,
-      "obs": 0.25
+      "n": 0,
+      "p": null,
+      "obs": null
      },
      {
       "bin": "50-52%",
-      "n": 23,
-      "p": 0.514,
-      "obs": 0.609
+      "n": 21,
+      "p": 0.512,
+      "obs": 0.619
      },
      {
       "bin": "52-55%",
-      "n": 186,
+      "n": 192,
       "p": 0.538,
-      "obs": 0.543
+      "obs": 0.547
      },
      {
       "bin": "55-60%",
-      "n": 607,
+      "n": 614,
       "p": 0.572,
       "obs": 0.554
      },
      {
       "bin": "60-100%",
-      "n": 59,
-      "p": 0.61,
-      "obs": 0.593
+      "n": 52,
+      "p": 0.609,
+      "obs": 0.558
      }
     ]
    },
@@ -1059,14 +1059,14 @@
     "base": 0.539,
     "edge": 0.002,
     "z": 0.14,
-    "pt": 1.01,
+    "pt": 0.99,
     "brier": 0.2484,
     "brierRW": 0.25,
     "brierClim": 0.2485,
     "skillRW": 0.0065,
     "skillClim": 0.0003,
     "logLoss": 0.6899,
-    "ece": 0.025,
+    "ece": 0.023,
     "calib": [
      {
       "bin": "0-40%",
@@ -1082,59 +1082,59 @@
      },
      {
       "bin": "45-48%",
-      "n": 16,
-      "p": 0.474,
-      "obs": 0.5
+      "n": 21,
+      "p": 0.475,
+      "obs": 0.476
      },
      {
       "bin": "48-50%",
-      "n": 72,
-      "p": 0.493,
-      "obs": 0.486
+      "n": 63,
+      "p": 0.494,
+      "obs": 0.492
      },
      {
       "bin": "50-52%",
-      "n": 127,
-      "p": 0.511,
+      "n": 132,
+      "p": 0.51,
       "obs": 0.591
      },
      {
       "bin": "52-55%",
-      "n": 358,
+      "n": 372,
       "p": 0.535,
-      "obs": 0.514
+      "obs": 0.513
      },
      {
       "bin": "55-60%",
-      "n": 298,
+      "n": 285,
       "p": 0.569,
-      "obs": 0.56
+      "obs": 0.565
      },
      {
       "bin": "60-100%",
-      "n": 6,
-      "p": 0.602,
-      "obs": 0.667
+      "n": 4,
+      "p": 0.603,
+      "obs": 0.5
      }
     ]
    }
   },
   "live": {
    "gold": {
-    "n": 13,
-    "upRate": 0.308,
-    "hit": 0.231,
-    "base": 0.692,
-    "edge": -0.462,
-    "z": -3.61,
+    "n": 14,
+    "upRate": 0.286,
+    "hit": 0.214,
+    "base": 0.714,
+    "edge": -0.5,
+    "z": -4.14,
     "pt": null,
-    "brier": 0.2527,
+    "brier": 0.2548,
     "brierRW": 0.25,
-    "brierClim": 0.213,
-    "skillRW": -0.0109,
-    "skillClim": -0.1864,
-    "logLoss": 0.6986,
-    "ece": 0.285,
+    "brierClim": 0.2041,
+    "skillRW": -0.0192,
+    "skillClim": -0.2486,
+    "logLoss": 0.7028,
+    "ece": 0.302,
     "calib": [
      {
       "bin": "0-40%",
@@ -1168,9 +1168,9 @@
      },
      {
       "bin": "52-55%",
-      "n": 4,
-      "p": 0.528,
-      "obs": 0.5
+      "n": 5,
+      "p": 0.529,
+      "obs": 0.4
      },
      {
       "bin": "55-60%",
@@ -1185,27 +1185,27 @@
       "obs": null
      }
     ],
-    "volN": 13,
-    "volMaeModel": 0.96,
-    "volMaeNaive": 0.96,
-    "volQlikeModel": 2.588,
-    "volQlikeNaive": 2.588
+    "volN": 14,
+    "volMaeModel": 0.989,
+    "volMaeNaive": 0.989,
+    "volQlikeModel": 2.504,
+    "volQlikeNaive": 2.504
    },
    "eurusd": {
-    "n": 13,
-    "upRate": 0.308,
-    "hit": 0.692,
-    "base": 0.692,
+    "n": 14,
+    "upRate": 0.286,
+    "hit": 0.714,
+    "base": 0.714,
     "edge": 0,
     "z": 0,
     "pt": null,
-    "brier": 0.2416,
+    "brier": 0.241,
     "brierRW": 0.25,
-    "brierClim": 0.213,
-    "skillRW": 0.0336,
-    "skillClim": -0.1342,
-    "logLoss": 0.6763,
-    "ece": 0.174,
+    "brierClim": 0.2041,
+    "skillRW": 0.036,
+    "skillClim": -0.1809,
+    "logLoss": 0.6751,
+    "ece": 0.196,
     "calib": [
      {
       "bin": "0-40%",
@@ -1227,9 +1227,9 @@
      },
      {
       "bin": "48-50%",
-      "n": 11,
-      "p": 0.486,
-      "obs": 0.364
+      "n": 12,
+      "p": 0.485,
+      "obs": 0.333
      },
      {
       "bin": "50-52%",
@@ -1256,27 +1256,27 @@
       "obs": null
      }
     ],
-    "volN": 13,
-    "volMaeModel": 0.233,
-    "volMaeNaive": 0.233,
-    "volQlikeModel": -0.611,
-    "volQlikeNaive": -0.611
+    "volN": 14,
+    "volMaeModel": 0.238,
+    "volMaeNaive": 0.238,
+    "volQlikeModel": -0.698,
+    "volQlikeNaive": -0.698
    },
    "usdjpy": {
-    "n": 12,
-    "upRate": 0.5,
-    "hit": 0.5,
-    "base": 0.5,
+    "n": 13,
+    "upRate": 0.538,
+    "hit": 0.538,
+    "base": 0.538,
     "edge": 0,
     "z": 0,
     "pt": null,
-    "brier": 0.2583,
+    "brier": 0.2538,
     "brierRW": 0.25,
-    "brierClim": 0.25,
-    "skillRW": -0.0332,
-    "skillClim": -0.0332,
-    "logLoss": 0.71,
-    "ece": 0.07,
+    "brierClim": 0.2485,
+    "skillRW": -0.0152,
+    "skillClim": -0.0213,
+    "logLoss": 0.701,
+    "ece": 0.03,
     "calib": [
      {
       "bin": "0-40%",
@@ -1316,9 +1316,9 @@
      },
      {
       "bin": "55-60%",
-      "n": 12,
-      "p": 0.57,
-      "obs": 0.5
+      "n": 13,
+      "p": 0.568,
+      "obs": 0.538
      },
      {
       "bin": "60-100%",
@@ -1327,27 +1327,27 @@
       "obs": null
      }
     ],
-    "volN": 12,
-    "volMaeModel": 0.22,
-    "volMaeNaive": 0.22,
-    "volQlikeModel": -1.199,
-    "volQlikeNaive": -1.199
+    "volN": 13,
+    "volMaeModel": 0.218,
+    "volMaeNaive": 0.218,
+    "volQlikeModel": -1.29,
+    "volQlikeNaive": -1.29
    },
    "nq": {
-    "n": 12,
-    "upRate": 0.417,
-    "hit": 0.417,
-    "base": 0.583,
-    "edge": -0.167,
-    "z": -1.17,
+    "n": 13,
+    "upRate": 0.462,
+    "hit": 0.462,
+    "base": 0.538,
+    "edge": -0.077,
+    "z": -0.56,
     "pt": null,
-    "brier": 0.2572,
+    "brier": 0.253,
     "brierRW": 0.25,
-    "brierClim": 0.2431,
-    "skillRW": -0.0288,
-    "skillClim": -0.0582,
-    "logLoss": 0.7076,
-    "ece": 0.121,
+    "brierClim": 0.2485,
+    "skillRW": -0.0119,
+    "skillClim": -0.018,
+    "logLoss": 0.6991,
+    "ece": 0.077,
     "calib": [
      {
       "bin": "0-40%",
@@ -1387,9 +1387,9 @@
      },
      {
       "bin": "55-60%",
-      "n": 1,
+      "n": 2,
       "p": 0.55,
-      "obs": 0
+      "obs": 0.5
      },
      {
       "bin": "60-100%",
@@ -1398,27 +1398,27 @@
       "obs": null
      }
     ],
-    "volN": 12,
-    "volMaeModel": 1.335,
-    "volMaeNaive": 1.335,
-    "volQlikeModel": 2.916,
-    "volQlikeNaive": 2.916
+    "volN": 13,
+    "volMaeModel": 1.354,
+    "volMaeNaive": 1.354,
+    "volQlikeModel": 2.843,
+    "volQlikeNaive": 2.843
    },
    "es": {
-    "n": 12,
-    "upRate": 0.417,
-    "hit": 0.5,
-    "base": 0.583,
-    "edge": -0.083,
-    "z": -0.59,
+    "n": 13,
+    "upRate": 0.462,
+    "hit": 0.538,
+    "base": 0.538,
+    "edge": 0,
+    "z": 0,
     "pt": null,
-    "brier": 0.2484,
+    "brier": 0.2468,
     "brierRW": 0.25,
-    "brierClim": 0.2431,
-    "skillRW": 0.0066,
-    "skillClim": -0.0218,
-    "logLoss": 0.6899,
-    "ece": 0.327,
+    "brierClim": 0.2485,
+    "skillRW": 0.013,
+    "skillClim": 0.0071,
+    "logLoss": 0.6867,
+    "ece": 0.338,
     "calib": [
      {
       "bin": "0-40%",
@@ -1452,9 +1452,9 @@
      },
      {
       "bin": "52-55%",
-      "n": 5,
+      "n": 6,
       "p": 0.523,
-      "obs": 0.8
+      "obs": 0.833
      },
      {
       "bin": "55-60%",
@@ -1469,11 +1469,11 @@
       "obs": null
      }
     ],
-    "volN": 12,
-    "volMaeModel": 0.87,
-    "volMaeNaive": 0.87,
-    "volQlikeModel": 2.147,
-    "volQlikeNaive": 2.147
+    "volN": 13,
+    "volMaeModel": 0.876,
+    "volMaeNaive": 0.876,
+    "volQlikeModel": 2.067,
+    "volQlikeNaive": 2.067
    }
   },
   "vol": {
@@ -1481,24 +1481,24 @@
     "used": "naive",
     "picked": null,
     "tried": 3,
-    "split": "2025-03-05",
-    "reason": "none of the 3 models beat naive on the first half (to 2025-03-05)",
+    "split": "2025-03-06",
+    "reason": "none of the 3 models beat naive on the first half (to 2025-03-06)",
     "full": {
      "n": 897,
      "eventDays": 105,
      "eventAvgAbs": 0.991,
-     "otherAvgAbs": 0.877,
-     "from": "2023-06-15",
-     "to": "2026-11-25",
+     "otherAvgAbs": 0.876,
+     "from": "2023-06-16",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 897,
-        "mae": 0.589,
-        "maeNaive": 0.595,
-        "qlike": 2.164,
-        "qlikeNaive": 1.367,
-        "dmMae": 0.83,
+        "mae": 0.59,
+        "maeNaive": 0.597,
+        "qlike": 2.165,
+        "qlikeNaive": 1.369,
+        "dmMae": 0.86,
         "dmQlike": -3.33
        },
        "event": {
@@ -1514,10 +1514,10 @@
       "evt": {
        "all": {
         "n": 897,
-        "mae": 0.6,
-        "maeNaive": 0.595,
-        "qlike": 1.498,
-        "qlikeNaive": 1.367,
+        "mae": 0.602,
+        "maeNaive": 0.597,
+        "qlike": 1.5,
+        "qlikeNaive": 1.369,
         "dmMae": -1.33,
         "dmQlike": -2.43
        },
@@ -1534,16 +1534,16 @@
       "ewma": {
        "all": {
         "n": 897,
-        "mae": 0.593,
-        "maeNaive": 0.595,
-        "qlike": 1.321,
-        "qlikeNaive": 1.367,
-        "dmMae": 0.39,
-        "dmQlike": 0.98
+        "mae": 0.594,
+        "maeNaive": 0.597,
+        "qlike": 1.322,
+        "qlikeNaive": 1.369,
+        "dmMae": 0.48,
+        "dmQlike": 0.99
        },
        "event": {
         "n": 105,
-        "mae": 0.767,
+        "mae": 0.766,
         "maeNaive": 0.68,
         "qlike": 1.71,
         "qlikeNaive": 1.82,
@@ -1554,21 +1554,21 @@
       "har": {
        "all": {
         "n": 897,
-        "mae": 0.591,
-        "maeNaive": 0.595,
-        "qlike": 1.362,
-        "qlikeNaive": 1.367,
-        "dmMae": 0.65,
-        "dmQlike": 0.12
+        "mae": 0.592,
+        "maeNaive": 0.597,
+        "qlike": 1.368,
+        "qlikeNaive": 1.369,
+        "dmMae": 0.59,
+        "dmQlike": 0.02
        },
        "event": {
         "n": 105,
-        "mae": 0.764,
+        "mae": 0.765,
         "maeNaive": 0.68,
-        "qlike": 1.775,
+        "qlike": 1.776,
         "qlikeNaive": 1.82,
-        "dmMae": -3.03,
-        "dmQlike": 0.26
+        "dmMae": -3.06,
+        "dmQlike": 0.25
        }
       }
      }
@@ -1577,19 +1577,19 @@
      "n": 448,
      "eventDays": 52,
      "eventAvgAbs": 0.801,
-     "otherAvgAbs": 0.619,
-     "from": "2023-06-15",
-     "to": "2025-03-04",
+     "otherAvgAbs": 0.618,
+     "from": "2023-06-16",
+     "to": "2025-03-05",
      "models": {
       "cur": {
        "all": {
         "n": 448,
-        "mae": 0.424,
-        "maeNaive": 0.433,
-        "qlike": 0.91,
-        "qlikeNaive": 0.712,
-        "dmMae": 1.06,
-        "dmQlike": -2.59
+        "mae": 0.425,
+        "maeNaive": 0.434,
+        "qlike": 0.909,
+        "qlikeNaive": 0.711,
+        "dmMae": 1.08,
+        "dmQlike": -2.58
        },
        "event": {
         "n": 52,
@@ -1604,10 +1604,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.435,
-        "maeNaive": 0.433,
-        "qlike": 0.715,
-        "qlikeNaive": 0.712,
+        "mae": 0.436,
+        "maeNaive": 0.434,
+        "qlike": 0.714,
+        "qlikeNaive": 0.711,
         "dmMae": -0.55,
         "dmQlike": -0.27
        },
@@ -1624,40 +1624,40 @@
       "ewma": {
        "all": {
         "n": 448,
-        "mae": 0.437,
-        "maeNaive": 0.433,
-        "qlike": 0.764,
-        "qlikeNaive": 0.712,
-        "dmMae": -0.76,
-        "dmQlike": -1.42
+        "mae": 0.438,
+        "maeNaive": 0.434,
+        "qlike": 0.763,
+        "qlikeNaive": 0.711,
+        "dmMae": -0.72,
+        "dmQlike": -1.41
        },
        "event": {
         "n": 52,
-        "mae": 0.623,
+        "mae": 0.622,
         "maeNaive": 0.543,
         "qlike": 1.24,
         "qlikeNaive": 1.166,
-        "dmMae": -2.13,
-        "dmQlike": -0.46
+        "dmMae": -2.12,
+        "dmQlike": -0.47
        }
       },
       "har": {
        "all": {
         "n": 448,
-        "mae": 0.44,
-        "maeNaive": 0.433,
-        "qlike": 0.757,
-        "qlikeNaive": 0.712,
-        "dmMae": -0.95,
-        "dmQlike": -0.85
+        "mae": 0.441,
+        "maeNaive": 0.434,
+        "qlike": 0.759,
+        "qlikeNaive": 0.711,
+        "dmMae": -1.03,
+        "dmQlike": -0.9
        },
        "event": {
         "n": 52,
-        "mae": 0.652,
+        "mae": 0.653,
         "maeNaive": 0.543,
-        "qlike": 1.225,
+        "qlike": 1.226,
         "qlikeNaive": 1.166,
-        "dmMae": -2.65,
+        "dmMae": -2.66,
         "dmQlike": -0.33
        }
       }
@@ -1668,18 +1668,18 @@
      "eventDays": 53,
      "eventAvgAbs": 1.177,
      "otherAvgAbs": 1.134,
-     "from": "2025-03-05",
-     "to": "2026-11-25",
+     "from": "2025-03-06",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 449,
-        "mae": 0.753,
-        "maeNaive": 0.757,
-        "qlike": 3.414,
-        "qlikeNaive": 2.022,
-        "dmMae": 0.33,
-        "dmQlike": -2.97
+        "mae": 0.754,
+        "maeNaive": 0.759,
+        "qlike": 3.417,
+        "qlikeNaive": 2.025,
+        "dmMae": 0.36,
+        "dmQlike": -2.96
        },
        "event": {
         "n": 53,
@@ -1694,10 +1694,10 @@
       "evt": {
        "all": {
         "n": 449,
-        "mae": 0.765,
-        "maeNaive": 0.757,
-        "qlike": 2.28,
-        "qlikeNaive": 2.022,
+        "mae": 0.767,
+        "maeNaive": 0.759,
+        "qlike": 2.283,
+        "qlikeNaive": 2.025,
         "dmMae": -1.21,
         "dmQlike": -2.42
        },
@@ -1714,18 +1714,18 @@
       "ewma": {
        "all": {
         "n": 449,
-        "mae": 0.749,
-        "maeNaive": 0.757,
-        "qlike": 1.877,
-        "qlikeNaive": 2.022,
-        "dmMae": 0.91,
-        "dmQlike": 1.67
+        "mae": 0.75,
+        "maeNaive": 0.759,
+        "qlike": 1.88,
+        "qlikeNaive": 2.025,
+        "dmMae": 0.98,
+        "dmQlike": 1.68
        },
        "event": {
         "n": 53,
         "mae": 0.908,
         "maeNaive": 0.814,
-        "qlike": 2.17,
+        "qlike": 2.171,
         "qlikeNaive": 2.462,
         "dmMae": -2.63,
         "dmQlike": 0.72
@@ -1734,20 +1734,20 @@
       "har": {
        "all": {
         "n": 449,
-        "mae": 0.741,
-        "maeNaive": 0.757,
-        "qlike": 1.965,
-        "qlikeNaive": 2.022,
-        "dmMae": 1.34,
-        "dmQlike": 0.8
+        "mae": 0.743,
+        "maeNaive": 0.759,
+        "qlike": 1.975,
+        "qlikeNaive": 2.025,
+        "dmMae": 1.31,
+        "dmQlike": 0.73
        },
        "event": {
         "n": 53,
-        "mae": 0.874,
+        "mae": 0.875,
         "maeNaive": 0.814,
-        "qlike": 2.314,
+        "qlike": 2.316,
         "qlikeNaive": 2.462,
-        "dmMae": -1.61,
+        "dmMae": -1.64,
         "dmQlike": 0.48
        }
       }
@@ -1758,25 +1758,25 @@
     "used": "naive",
     "picked": null,
     "tried": 3,
-    "split": "2025-03-07",
-    "reason": "none of the 3 models beat naive on the first half (to 2025-03-07)",
+    "split": "2025-03-10",
+    "reason": "none of the 3 models beat naive on the first half (to 2025-03-10)",
     "full": {
-     "n": 893,
+     "n": 894,
      "eventDays": 105,
      "eventAvgAbs": 0.443,
      "otherAvgAbs": 0.289,
      "from": "2023-06-21",
-     "to": "2026-11-25",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.199,
         "maeNaive": 0.204,
-        "qlike": -0.49,
-        "qlikeNaive": -0.704,
-        "dmMae": 1.6,
-        "dmQlike": -3.23
+        "qlike": -0.493,
+        "qlikeNaive": -0.706,
+        "dmMae": 1.63,
+        "dmQlike": -3.22
        },
        "event": {
         "n": 105,
@@ -1790,11 +1790,11 @@
       },
       "evt": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.206,
         "maeNaive": 0.204,
-        "qlike": -0.76,
-        "qlikeNaive": -0.704,
+        "qlike": -0.761,
+        "qlikeNaive": -0.706,
         "dmMae": -1.14,
         "dmQlike": 1.38
        },
@@ -1810,13 +1810,13 @@
       },
       "ewma": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.202,
         "maeNaive": 0.204,
-        "qlike": -0.848,
-        "qlikeNaive": -0.704,
-        "dmMae": 1.05,
-        "dmQlike": 3.76
+        "qlike": -0.85,
+        "qlikeNaive": -0.706,
+        "dmMae": 1.07,
+        "dmQlike": 3.77
        },
        "event": {
         "n": 105,
@@ -1830,12 +1830,12 @@
       },
       "har": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.204,
         "maeNaive": 0.204,
-        "qlike": -0.851,
-        "qlikeNaive": -0.704,
-        "dmMae": 0.12,
+        "qlike": -0.853,
+        "qlikeNaive": -0.706,
+        "dmMae": 0.13,
         "dmQlike": 3.39
        },
        "event": {
@@ -1851,181 +1851,181 @@
      }
     },
     "selection": {
-     "n": 446,
-     "eventDays": 52,
+     "n": 447,
+     "eventDays": 53,
      "eventAvgAbs": 0.457,
      "otherAvgAbs": 0.291,
      "from": "2023-06-21",
-     "to": "2025-03-06",
+     "to": "2025-03-07",
      "models": {
       "cur": {
        "all": {
-        "n": 446,
-        "mae": 0.201,
-        "maeNaive": 0.204,
-        "qlike": -0.575,
+        "n": 447,
+        "mae": 0.202,
+        "maeNaive": 0.203,
+        "qlike": -0.574,
         "qlikeNaive": -0.674,
-        "dmMae": 0.48,
-        "dmQlike": -1.15
+        "dmMae": 0.39,
+        "dmQlike": -1.16
        },
        "event": {
-        "n": 52,
-        "mae": 0.338,
-        "maeNaive": 0.317,
-        "qlike": 0.116,
-        "qlikeNaive": 1.062,
-        "dmMae": -0.68,
-        "dmQlike": 2.14
+        "n": 53,
+        "mae": 0.336,
+        "maeNaive": 0.313,
+        "qlike": 0.112,
+        "qlikeNaive": 1.033,
+        "dmMae": -0.79,
+        "dmQlike": 2.12
        }
       },
       "evt": {
        "all": {
-        "n": 446,
+        "n": 447,
         "mae": 0.205,
-        "maeNaive": 0.204,
-        "qlike": -0.786,
+        "maeNaive": 0.203,
+        "qlike": -0.784,
         "qlikeNaive": -0.674,
-        "dmMae": -0.52,
-        "dmQlike": 2.18
+        "dmMae": -0.68,
+        "dmQlike": 2.16
        },
        "event": {
-        "n": 52,
+        "n": 53,
         "mae": 0.331,
-        "maeNaive": 0.317,
-        "qlike": 0.101,
-        "qlikeNaive": 1.062,
-        "dmMae": -0.53,
-        "dmQlike": 2.27
+        "maeNaive": 0.313,
+        "qlike": 0.1,
+        "qlikeNaive": 1.033,
+        "dmMae": -0.68,
+        "dmQlike": 2.25
        }
       },
       "ewma": {
        "all": {
-        "n": 446,
-        "mae": 0.203,
-        "maeNaive": 0.204,
-        "qlike": -0.81,
+        "n": 447,
+        "mae": 0.204,
+        "maeNaive": 0.203,
+        "qlike": -0.807,
         "qlikeNaive": -0.674,
-        "dmMae": 0.12,
-        "dmQlike": 2.79
+        "dmMae": -0.09,
+        "dmQlike": 2.76
        },
        "event": {
-        "n": 52,
-        "mae": 0.324,
-        "maeNaive": 0.317,
-        "qlike": 0.157,
-        "qlikeNaive": 1.062,
-        "dmMae": -0.31,
-        "dmQlike": 2.38
+        "n": 53,
+        "mae": 0.325,
+        "maeNaive": 0.313,
+        "qlike": 0.158,
+        "qlikeNaive": 1.033,
+        "dmMae": -0.54,
+        "dmQlike": 2.34
        }
       },
       "har": {
        "all": {
-        "n": 446,
+        "n": 447,
         "mae": 0.205,
-        "maeNaive": 0.204,
-        "qlike": -0.817,
+        "maeNaive": 0.203,
+        "qlike": -0.816,
         "qlikeNaive": -0.674,
-        "dmMae": -0.44,
+        "dmMae": -0.47,
         "dmQlike": 2.41
        },
        "event": {
-        "n": 52,
-        "mae": 0.342,
-        "maeNaive": 0.317,
-        "qlike": 0.066,
-        "qlikeNaive": 1.062,
-        "dmMae": -0.8,
-        "dmQlike": 2.11
+        "n": 53,
+        "mae": 0.338,
+        "maeNaive": 0.313,
+        "qlike": 0.058,
+        "qlikeNaive": 1.033,
+        "dmMae": -0.83,
+        "dmQlike": 2.1
        }
       }
      }
     },
     "confirmation": {
      "n": 447,
-     "eventDays": 53,
+     "eventDays": 52,
      "eventAvgAbs": 0.43,
-     "otherAvgAbs": 0.287,
-     "from": "2025-03-07",
-     "to": "2026-11-25",
+     "otherAvgAbs": 0.286,
+     "from": "2025-03-10",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 447,
         "mae": 0.197,
-        "maeNaive": 0.204,
-        "qlike": -0.406,
-        "qlikeNaive": -0.734,
-        "dmMae": 1.89,
-        "dmQlike": -3.27
+        "maeNaive": 0.205,
+        "qlike": -0.411,
+        "qlikeNaive": -0.738,
+        "dmMae": 2.03,
+        "dmQlike": -3.25
        },
        "event": {
-        "n": 53,
-        "mae": 0.299,
-        "maeNaive": 0.287,
-        "qlike": 0.941,
-        "qlikeNaive": 0.814,
-        "dmMae": -0.86,
-        "dmQlike": -0.27
+        "n": 52,
+        "mae": 0.3,
+        "maeNaive": 0.291,
+        "qlike": 0.961,
+        "qlikeNaive": 0.838,
+        "dmMae": -0.64,
+        "dmQlike": -0.26
        }
       },
       "evt": {
        "all": {
         "n": 447,
         "mae": 0.207,
-        "maeNaive": 0.204,
-        "qlike": -0.734,
-        "qlikeNaive": -0.734,
-        "dmMae": -1.42,
-        "dmQlike": -0.01
+        "maeNaive": 0.205,
+        "qlike": -0.738,
+        "qlikeNaive": -0.738,
+        "dmMae": -1.17,
+        "dmQlike": 0.01
        },
        "event": {
-        "n": 53,
+        "n": 52,
         "mae": 0.307,
-        "maeNaive": 0.287,
-        "qlike": 0.819,
-        "qlikeNaive": 0.814,
-        "dmMae": -1.45,
-        "dmQlike": -0.01
+        "maeNaive": 0.291,
+        "qlike": 0.834,
+        "qlikeNaive": 0.838,
+        "dmMae": -1.18,
+        "dmQlike": 0.01
        }
       },
       "ewma": {
        "all": {
         "n": 447,
         "mae": 0.2,
-        "maeNaive": 0.204,
-        "qlike": -0.887,
-        "qlikeNaive": -0.734,
-        "dmMae": 1.33,
-        "dmQlike": 2.58
+        "maeNaive": 0.205,
+        "qlike": -0.892,
+        "qlikeNaive": -0.738,
+        "dmMae": 1.6,
+        "dmQlike": 2.61
        },
        "event": {
-        "n": 53,
-        "mae": 0.298,
-        "maeNaive": 0.287,
-        "qlike": -0.089,
-        "qlikeNaive": 0.814,
-        "dmMae": -0.48,
-        "dmQlike": 1.96
+        "n": 52,
+        "mae": 0.297,
+        "maeNaive": 0.291,
+        "qlike": -0.094,
+        "qlikeNaive": 0.838,
+        "dmMae": -0.25,
+        "dmQlike": 1.99
        }
       },
       "har": {
        "all": {
         "n": 447,
         "mae": 0.202,
-        "maeNaive": 0.204,
-        "qlike": -0.886,
-        "qlikeNaive": -0.734,
-        "dmMae": 0.66,
-        "dmQlike": 2.38
+        "maeNaive": 0.205,
+        "qlike": -0.89,
+        "qlikeNaive": -0.738,
+        "dmMae": 0.71,
+        "dmQlike": 2.39
        },
        "event": {
-        "n": 53,
-        "mae": 0.299,
-        "maeNaive": 0.287,
-        "qlike": -0.023,
-        "qlikeNaive": 0.814,
-        "dmMae": -0.53,
-        "dmQlike": 1.79
+        "n": 52,
+        "mae": 0.302,
+        "maeNaive": 0.291,
+        "qlike": -0.017,
+        "qlikeNaive": 0.838,
+        "dmMae": -0.49,
+        "dmQlike": 1.8
        }
       }
      }
@@ -2035,24 +2035,24 @@
     "used": "naive",
     "picked": null,
     "tried": 3,
-    "split": "2025-03-07",
-    "reason": "none of the 3 models beat naive on the first half (to 2025-03-07)",
+    "split": "2025-03-10",
+    "reason": "none of the 3 models beat naive on the first half (to 2025-03-10)",
     "full": {
-     "n": 893,
+     "n": 894,
      "eventDays": 105,
      "eventAvgAbs": 0.566,
-     "otherAvgAbs": 0.393,
+     "otherAvgAbs": 0.392,
      "from": "2023-06-21",
-     "to": "2026-11-25",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.278,
         "maeNaive": 0.286,
-        "qlike": 0.984,
-        "qlikeNaive": 0.083,
-        "dmMae": 1.8,
+        "qlike": 0.979,
+        "qlikeNaive": 0.08,
+        "dmMae": 1.83,
         "dmQlike": -3.75
        },
        "event": {
@@ -2067,11 +2067,11 @@
       },
       "evt": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.287,
         "maeNaive": 0.286,
-        "qlike": 0.001,
-        "qlikeNaive": 0.083,
+        "qlike": -0.002,
+        "qlikeNaive": 0.08,
         "dmMae": -0.73,
         "dmQlike": 1.58
        },
@@ -2087,11 +2087,11 @@
       },
       "ewma": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.289,
         "maeNaive": 0.286,
-        "qlike": -0.097,
-        "qlikeNaive": 0.083,
+        "qlike": -0.1,
+        "qlikeNaive": 0.08,
         "dmMae": -0.88,
         "dmQlike": 2.52
        },
@@ -2107,12 +2107,12 @@
       },
       "har": {
        "all": {
-        "n": 893,
+        "n": 894,
         "mae": 0.293,
         "maeNaive": 0.286,
-        "qlike": -0.146,
-        "qlikeNaive": 0.083,
-        "dmMae": -1.82,
+        "qlike": -0.148,
+        "qlikeNaive": 0.08,
+        "dmMae": -1.83,
         "dmQlike": 2.6
        },
        "event": {
@@ -2128,181 +2128,181 @@
      }
     },
     "selection": {
-     "n": 446,
-     "eventDays": 52,
-     "eventAvgAbs": 0.675,
+     "n": 447,
+     "eventDays": 53,
+     "eventAvgAbs": 0.664,
      "otherAvgAbs": 0.413,
      "from": "2023-06-21",
-     "to": "2025-03-06",
+     "to": "2025-03-07",
      "models": {
       "cur": {
        "all": {
-        "n": 446,
-        "mae": 0.302,
-        "maeNaive": 0.306,
-        "qlike": 0.727,
-        "qlikeNaive": 0.205,
-        "dmMae": 0.63,
-        "dmQlike": -2.19
+        "n": 447,
+        "mae": 0.303,
+        "maeNaive": 0.307,
+        "qlike": 0.725,
+        "qlikeNaive": 0.202,
+        "dmMae": 0.57,
+        "dmQlike": -2.2
        },
        "event": {
-        "n": 52,
-        "mae": 0.508,
+        "n": 53,
+        "mae": 0.51,
         "maeNaive": 0.417,
-        "qlike": 1.426,
-        "qlikeNaive": 2.217,
-        "dmMae": -2.11,
-        "dmQlike": 1.06
+        "qlike": 1.395,
+        "qlikeNaive": 2.159,
+        "dmMae": -2.2,
+        "dmQlike": 1.04
        }
       },
       "evt": {
        "all": {
-        "n": 446,
-        "mae": 0.306,
-        "maeNaive": 0.306,
-        "qlike": 0.048,
-        "qlikeNaive": 0.205,
-        "dmMae": 0.03,
+        "n": 447,
+        "mae": 0.307,
+        "maeNaive": 0.307,
+        "qlike": 0.046,
+        "qlikeNaive": 0.202,
+        "dmMae": 0.04,
         "dmQlike": 1.56
        },
        "event": {
-        "n": 52,
+        "n": 53,
         "mae": 0.416,
         "maeNaive": 0.417,
-        "qlike": 0.876,
-        "qlikeNaive": 2.217,
-        "dmMae": 0.03,
+        "qlike": 0.842,
+        "qlikeNaive": 2.159,
+        "dmMae": 0.04,
         "dmQlike": 1.59
        }
       },
       "ewma": {
        "all": {
-        "n": 446,
+        "n": 447,
         "mae": 0.305,
-        "maeNaive": 0.306,
-        "qlike": -0.025,
-        "qlikeNaive": 0.205,
-        "dmMae": 0.28,
+        "maeNaive": 0.307,
+        "qlike": -0.026,
+        "qlikeNaive": 0.202,
+        "dmMae": 0.23,
         "dmQlike": 1.88
        },
        "event": {
-        "n": 52,
-        "mae": 0.434,
+        "n": 53,
+        "mae": 0.437,
         "maeNaive": 0.417,
-        "qlike": 0.838,
-        "qlikeNaive": 2.217,
-        "dmMae": -0.42,
-        "dmQlike": 1.48
+        "qlike": 0.815,
+        "qlikeNaive": 2.159,
+        "dmMae": -0.49,
+        "dmQlike": 1.47
        }
       },
       "har": {
        "all": {
-        "n": 446,
-        "mae": 0.312,
-        "maeNaive": 0.306,
-        "qlike": -0.022,
-        "qlikeNaive": 0.205,
-        "dmMae": -0.8,
-        "dmQlike": 1.6
+        "n": 447,
+        "mae": 0.313,
+        "maeNaive": 0.307,
+        "qlike": -0.023,
+        "qlikeNaive": 0.202,
+        "dmMae": -0.86,
+        "dmQlike": 1.59
        },
        "event": {
-        "n": 52,
-        "mae": 0.428,
+        "n": 53,
+        "mae": 0.432,
         "maeNaive": 0.417,
-        "qlike": 0.764,
-        "qlikeNaive": 2.217,
-        "dmMae": -0.24,
-        "dmQlike": 1.38
+        "qlike": 0.745,
+        "qlikeNaive": 2.159,
+        "dmMae": -0.32,
+        "dmQlike": 1.37
        }
       }
      }
     },
     "confirmation": {
      "n": 447,
-     "eventDays": 53,
-     "eventAvgAbs": 0.46,
-     "otherAvgAbs": 0.373,
-     "from": "2025-03-07",
-     "to": "2026-11-25",
+     "eventDays": 52,
+     "eventAvgAbs": 0.467,
+     "otherAvgAbs": 0.372,
+     "from": "2025-03-10",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 447,
-        "mae": 0.254,
-        "maeNaive": 0.265,
-        "qlike": 1.239,
-        "qlikeNaive": -0.039,
-        "dmMae": 2.32,
-        "dmQlike": -3.08
+        "mae": 0.253,
+        "maeNaive": 0.264,
+        "qlike": 1.232,
+        "qlikeNaive": -0.042,
+        "dmMae": 2.47,
+        "dmQlike": -3.07
        },
        "event": {
-        "n": 53,
-        "mae": 0.307,
-        "maeNaive": 0.282,
-        "qlike": 0.095,
-        "qlikeNaive": 0.161,
-        "dmMae": -1.66,
-        "dmQlike": 0.43
+        "n": 52,
+        "mae": 0.3,
+        "maeNaive": 0.279,
+        "qlike": 0.101,
+        "qlikeNaive": 0.181,
+        "dmMae": -1.44,
+        "dmQlike": 0.51
        }
       },
       "evt": {
        "all": {
         "n": 447,
-        "mae": 0.268,
-        "maeNaive": 0.265,
-        "qlike": -0.046,
-        "qlikeNaive": -0.039,
-        "dmMae": -2.34,
+        "mae": 0.267,
+        "maeNaive": 0.264,
+        "qlike": -0.049,
+        "qlikeNaive": -0.042,
+        "dmMae": -2.36,
         "dmQlike": 0.28
        },
        "event": {
-        "n": 53,
-        "mae": 0.304,
-        "maeNaive": 0.282,
-        "qlike": 0.099,
-        "qlikeNaive": 0.161,
-        "dmMae": -2.46,
+        "n": 52,
+        "mae": 0.302,
+        "maeNaive": 0.279,
+        "qlike": 0.118,
+        "qlikeNaive": 0.181,
+        "dmMae": -2.48,
         "dmQlike": 0.28
        }
       },
       "ewma": {
        "all": {
         "n": 447,
-        "mae": 0.273,
-        "maeNaive": 0.265,
-        "qlike": -0.17,
-        "qlikeNaive": -0.039,
-        "dmMae": -1.76,
-        "dmQlike": 1.73
+        "mae": 0.272,
+        "maeNaive": 0.264,
+        "qlike": -0.174,
+        "qlikeNaive": -0.042,
+        "dmMae": -1.69,
+        "dmQlike": 1.75
        },
        "event": {
-        "n": 53,
-        "mae": 0.356,
-        "maeNaive": 0.282,
-        "qlike": 0.07,
-        "qlikeNaive": 0.161,
-        "dmMae": -2.5,
-        "dmQlike": 0.34
+        "n": 52,
+        "mae": 0.352,
+        "maeNaive": 0.279,
+        "qlike": 0.079,
+        "qlikeNaive": 0.181,
+        "dmMae": -2.41,
+        "dmQlike": 0.37
        }
       },
       "har": {
        "all": {
         "n": 447,
-        "mae": 0.275,
-        "maeNaive": 0.265,
-        "qlike": -0.269,
-        "qlikeNaive": -0.039,
-        "dmMae": -1.96,
+        "mae": 0.274,
+        "maeNaive": 0.264,
+        "qlike": -0.273,
+        "qlikeNaive": -0.042,
+        "dmMae": -1.9,
         "dmQlike": 2.23
        },
        "event": {
-        "n": 53,
-        "mae": 0.35,
-        "maeNaive": 0.282,
-        "qlike": 0.061,
-        "qlikeNaive": 0.161,
-        "dmMae": -2.16,
-        "dmQlike": 0.31
+        "n": 52,
+        "mae": 0.344,
+        "maeNaive": 0.279,
+        "qlike": 0.067,
+        "qlikeNaive": 0.181,
+        "dmMae": -2.04,
+        "dmQlike": 0.34
        }
       }
      }
@@ -2312,24 +2312,24 @@
     "used": "naive",
     "picked": "ewma",
     "tried": 4,
-    "split": "2025-03-06",
-    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-03-06)",
+    "split": "2025-03-07",
+    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-03-07)",
     "full": {
      "n": 896,
      "eventDays": 105,
      "eventAvgAbs": 1.188,
      "otherAvgAbs": 0.885,
-     "from": "2023-06-16",
-     "to": "2026-11-25",
+     "from": "2023-06-19",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 896,
-        "mae": 0.629,
-        "maeNaive": 0.647,
-        "qlike": 1.716,
-        "qlikeNaive": 1.47,
-        "dmMae": 1.88,
+        "mae": 0.63,
+        "maeNaive": 0.648,
+        "qlike": 1.718,
+        "qlikeNaive": 1.471,
+        "dmMae": 1.89,
         "dmQlike": -3.65
        },
        "event": {
@@ -2345,10 +2345,10 @@
       "evt": {
        "all": {
         "n": 896,
-        "mae": 0.647,
-        "maeNaive": 0.647,
-        "qlike": 1.435,
-        "qlikeNaive": 1.47,
+        "mae": 0.648,
+        "maeNaive": 0.648,
+        "qlike": 1.436,
+        "qlikeNaive": 1.471,
         "dmMae": 0,
         "dmQlike": 1.55
        },
@@ -2365,11 +2365,11 @@
       "ewma": {
        "all": {
         "n": 896,
-        "mae": 0.64,
-        "maeNaive": 0.647,
-        "qlike": 1.482,
-        "qlikeNaive": 1.47,
-        "dmMae": 1.04,
+        "mae": 0.641,
+        "maeNaive": 0.648,
+        "qlike": 1.484,
+        "qlikeNaive": 1.471,
+        "dmMae": 1.08,
         "dmQlike": -0.29
        },
        "event": {
@@ -2385,32 +2385,32 @@
       "har": {
        "all": {
         "n": 896,
-        "mae": 0.638,
-        "maeNaive": 0.647,
-        "qlike": 1.412,
-        "qlikeNaive": 1.47,
-        "dmMae": 1.17,
-        "dmQlike": 1.3
+        "mae": 0.639,
+        "maeNaive": 0.648,
+        "qlike": 1.414,
+        "qlikeNaive": 1.471,
+        "dmMae": 1.14,
+        "dmQlike": 1.29
        },
        "event": {
         "n": 105,
-        "mae": 0.812,
+        "mae": 0.81,
         "maeNaive": 0.797,
-        "qlike": 1.927,
+        "qlike": 1.928,
         "qlikeNaive": 2.265,
-        "dmMae": -0.34,
-        "dmQlike": 1.5
+        "dmMae": -0.29,
+        "dmQlike": 1.49
        }
       },
       "vix": {
        "all": {
         "n": 896,
         "mae": 0.624,
-        "maeNaive": 0.647,
-        "qlike": 1.346,
-        "qlikeNaive": 1.47,
-        "dmMae": 2.53,
-        "dmQlike": 2.44
+        "maeNaive": 0.648,
+        "qlike": 1.348,
+        "qlikeNaive": 1.471,
+        "dmMae": 2.57,
+        "dmQlike": 2.45
        },
        "event": {
         "n": 105,
@@ -2428,19 +2428,19 @@
      "n": 448,
      "eventDays": 52,
      "eventAvgAbs": 1.139,
-     "otherAvgAbs": 0.769,
-     "from": "2023-06-16",
-     "to": "2025-03-05",
+     "otherAvgAbs": 0.774,
+     "from": "2023-06-19",
+     "to": "2025-03-06",
      "models": {
       "cur": {
        "all": {
         "n": 448,
-        "mae": 0.557,
-        "maeNaive": 0.574,
-        "qlike": 1.38,
-        "qlikeNaive": 1.204,
-        "dmMae": 1.49,
-        "dmQlike": -2.26
+        "mae": 0.56,
+        "maeNaive": 0.575,
+        "qlike": 1.404,
+        "qlikeNaive": 1.213,
+        "dmMae": 1.39,
+        "dmQlike": -2.43
        },
        "event": {
         "n": 52,
@@ -2455,10 +2455,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.568,
-        "maeNaive": 0.574,
-        "qlike": 1.15,
-        "qlikeNaive": 1.204,
+        "mae": 0.57,
+        "maeNaive": 0.575,
+        "qlike": 1.158,
+        "qlikeNaive": 1.213,
         "dmMae": 0.82,
         "dmQlike": 1.44
        },
@@ -2475,12 +2475,12 @@
       "ewma": {
        "all": {
         "n": 448,
-        "mae": 0.563,
-        "maeNaive": 0.574,
-        "qlike": 1.133,
-        "qlikeNaive": 1.204,
-        "dmMae": 1.66,
-        "dmQlike": 1.77
+        "mae": 0.564,
+        "maeNaive": 0.575,
+        "qlike": 1.141,
+        "qlikeNaive": 1.213,
+        "dmMae": 1.65,
+        "dmQlike": 1.78
        },
        "event": {
         "n": 52,
@@ -2495,32 +2495,32 @@
       "har": {
        "all": {
         "n": 448,
-        "mae": 0.563,
-        "maeNaive": 0.574,
-        "qlike": 1.139,
-        "qlikeNaive": 1.204,
-        "dmMae": 1.24,
-        "dmQlike": 1.44
+        "mae": 0.564,
+        "maeNaive": 0.575,
+        "qlike": 1.149,
+        "qlikeNaive": 1.213,
+        "dmMae": 1.27,
+        "dmQlike": 1.4
        },
        "event": {
         "n": 52,
-        "mae": 0.746,
+        "mae": 0.745,
         "maeNaive": 0.767,
-        "qlike": 1.747,
+        "qlike": 1.745,
         "qlikeNaive": 2.184,
-        "dmMae": 0.28,
-        "dmQlike": 1.2
+        "dmMae": 0.3,
+        "dmQlike": 1.21
        }
       },
       "vix": {
        "all": {
         "n": 448,
-        "mae": 0.557,
-        "maeNaive": 0.574,
-        "qlike": 1.096,
-        "qlikeNaive": 1.204,
-        "dmMae": 2.02,
-        "dmQlike": 2.94
+        "mae": 0.558,
+        "maeNaive": 0.575,
+        "qlike": 1.102,
+        "qlikeNaive": 1.213,
+        "dmMae": 2.08,
+        "dmQlike": 3
        },
        "event": {
         "n": 52,
@@ -2538,19 +2538,19 @@
      "n": 448,
      "eventDays": 53,
      "eventAvgAbs": 1.236,
-     "otherAvgAbs": 1.001,
-     "from": "2025-03-06",
-     "to": "2026-11-25",
+     "otherAvgAbs": 0.998,
+     "from": "2025-03-07",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 448,
         "mae": 0.701,
-        "maeNaive": 0.72,
-        "qlike": 2.053,
-        "qlikeNaive": 1.735,
-        "dmMae": 1.23,
-        "dmQlike": -2.87
+        "maeNaive": 0.721,
+        "qlike": 2.032,
+        "qlikeNaive": 1.73,
+        "dmMae": 1.31,
+        "dmQlike": -2.75
        },
        "event": {
         "n": 53,
@@ -2565,10 +2565,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.726,
-        "maeNaive": 0.72,
-        "qlike": 1.719,
-        "qlikeNaive": 1.735,
+        "mae": 0.727,
+        "maeNaive": 0.721,
+        "qlike": 1.714,
+        "qlikeNaive": 1.73,
         "dmMae": -1.36,
         "dmQlike": 0.64
        },
@@ -2586,10 +2586,10 @@
        "all": {
         "n": 448,
         "mae": 0.718,
-        "maeNaive": 0.72,
-        "qlike": 1.832,
-        "qlikeNaive": 1.735,
-        "dmMae": 0.22,
+        "maeNaive": 0.721,
+        "qlike": 1.827,
+        "qlikeNaive": 1.73,
+        "dmMae": 0.27,
         "dmQlike": -1.27
        },
        "event": {
@@ -2605,32 +2605,32 @@
       "har": {
        "all": {
         "n": 448,
-        "mae": 0.713,
-        "maeNaive": 0.72,
-        "qlike": 1.684,
-        "qlikeNaive": 1.735,
-        "dmMae": 0.55,
-        "dmQlike": 0.66
+        "mae": 0.715,
+        "maeNaive": 0.721,
+        "qlike": 1.68,
+        "qlikeNaive": 1.73,
+        "dmMae": 0.48,
+        "dmQlike": 0.67
        },
        "event": {
         "n": 53,
-        "mae": 0.877,
+        "mae": 0.874,
         "maeNaive": 0.827,
-        "qlike": 2.104,
+        "qlike": 2.108,
         "qlikeNaive": 2.344,
-        "dmMae": -1,
-        "dmQlike": 0.9
+        "dmMae": -0.92,
+        "dmQlike": 0.88
        }
       },
       "vix": {
        "all": {
         "n": 448,
-        "mae": 0.69,
-        "maeNaive": 0.72,
-        "qlike": 1.597,
-        "qlikeNaive": 1.735,
-        "dmMae": 1.8,
-        "dmQlike": 1.47
+        "mae": 0.691,
+        "maeNaive": 0.721,
+        "qlike": 1.594,
+        "qlikeNaive": 1.73,
+        "dmMae": 1.82,
+        "dmQlike": 1.45
        },
        "event": {
         "n": 53,
@@ -2647,26 +2647,26 @@
    },
    "es": {
     "used": "naive",
-    "picked": "evt",
+    "picked": "ewma",
     "tried": 4,
-    "split": "2025-03-06",
-    "reason": "evt won the first half but did not beat naive on the second half (from 2025-03-06)",
+    "split": "2025-03-07",
+    "reason": "ewma won the first half but did not beat naive on the second half (from 2025-03-07)",
     "full": {
      "n": 896,
      "eventDays": 105,
      "eventAvgAbs": 0.854,
      "otherAvgAbs": 0.609,
-     "from": "2023-06-16",
-     "to": "2026-11-25",
+     "from": "2023-06-19",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 896,
         "mae": 0.437,
         "maeNaive": 0.457,
-        "qlike": 1.132,
-        "qlikeNaive": 0.794,
-        "dmMae": 2.87,
+        "qlike": 1.133,
+        "qlikeNaive": 0.796,
+        "dmMae": 2.93,
         "dmQlike": -3.4
        },
        "event": {
@@ -2684,8 +2684,8 @@
         "n": 896,
         "mae": 0.458,
         "maeNaive": 0.457,
-        "qlike": 0.762,
-        "qlikeNaive": 0.794,
+        "qlike": 0.764,
+        "qlikeNaive": 0.796,
         "dmMae": -0.41,
         "dmQlike": 0.76
        },
@@ -2704,10 +2704,10 @@
         "n": 896,
         "mae": 0.45,
         "maeNaive": 0.457,
-        "qlike": 0.801,
-        "qlikeNaive": 0.794,
-        "dmMae": 1.22,
-        "dmQlike": -0.1
+        "qlike": 0.802,
+        "qlikeNaive": 0.796,
+        "dmMae": 1.26,
+        "dmQlike": -0.09
        },
        "event": {
         "n": 105,
@@ -2722,21 +2722,21 @@
       "har": {
        "all": {
         "n": 896,
-        "mae": 0.447,
+        "mae": 0.449,
         "maeNaive": 0.457,
-        "qlike": 0.662,
-        "qlikeNaive": 0.794,
-        "dmMae": 1.43,
-        "dmQlike": 1.99
+        "qlike": 0.664,
+        "qlikeNaive": 0.796,
+        "dmMae": 1.33,
+        "dmQlike": 1.98
        },
        "event": {
         "n": 105,
-        "mae": 0.596,
+        "mae": 0.595,
         "maeNaive": 0.559,
-        "qlike": 1.239,
+        "qlike": 1.242,
         "qlikeNaive": 1.826,
-        "dmMae": -1,
-        "dmQlike": 1.36
+        "dmMae": -0.97,
+        "dmQlike": 1.35
        }
       },
       "vix": {
@@ -2744,10 +2744,10 @@
         "n": 896,
         "mae": 0.427,
         "maeNaive": 0.457,
-        "qlike": 0.596,
-        "qlikeNaive": 0.794,
-        "dmMae": 4.22,
-        "dmQlike": 2.58
+        "qlike": 0.597,
+        "qlikeNaive": 0.796,
+        "dmMae": 4.27,
+        "dmQlike": 2.59
        },
        "event": {
         "n": 105,
@@ -2765,19 +2765,19 @@
      "n": 448,
      "eventDays": 52,
      "eventAvgAbs": 0.827,
-     "otherAvgAbs": 0.531,
-     "from": "2023-06-16",
-     "to": "2025-03-05",
+     "otherAvgAbs": 0.535,
+     "from": "2023-06-19",
+     "to": "2025-03-06",
      "models": {
       "cur": {
        "all": {
         "n": 448,
-        "mae": 0.376,
-        "maeNaive": 0.394,
-        "qlike": 0.824,
-        "qlikeNaive": 0.523,
-        "dmMae": 2.22,
-        "dmQlike": -2.12
+        "mae": 0.378,
+        "maeNaive": 0.395,
+        "qlike": 0.854,
+        "qlikeNaive": 0.531,
+        "dmMae": 2.1,
+        "dmQlike": -2.26
        },
        "event": {
         "n": 52,
@@ -2792,10 +2792,10 @@
       "evt": {
        "all": {
         "n": 448,
-        "mae": 0.39,
-        "maeNaive": 0.394,
-        "qlike": 0.414,
-        "qlikeNaive": 0.523,
+        "mae": 0.391,
+        "maeNaive": 0.395,
+        "qlike": 0.422,
+        "qlikeNaive": 0.531,
         "dmMae": 0.8,
         "dmQlike": 1.34
        },
@@ -2812,12 +2812,12 @@
       "ewma": {
        "all": {
         "n": 448,
-        "mae": 0.388,
-        "maeNaive": 0.394,
-        "qlike": 0.404,
-        "qlikeNaive": 0.523,
-        "dmMae": 1.16,
-        "dmQlike": 1.36
+        "mae": 0.389,
+        "maeNaive": 0.395,
+        "qlike": 0.411,
+        "qlikeNaive": 0.531,
+        "dmMae": 1.17,
+        "dmQlike": 1.37
        },
        "event": {
         "n": 52,
@@ -2833,31 +2833,31 @@
        "all": {
         "n": 448,
         "mae": 0.389,
-        "maeNaive": 0.394,
-        "qlike": 0.399,
-        "qlikeNaive": 0.523,
-        "dmMae": 0.77,
-        "dmQlike": 1.27
+        "maeNaive": 0.395,
+        "qlike": 0.406,
+        "qlikeNaive": 0.531,
+        "dmMae": 0.83,
+        "dmQlike": 1.28
        },
        "event": {
         "n": 52,
-        "mae": 0.535,
+        "mae": 0.534,
         "maeNaive": 0.535,
-        "qlike": 1.131,
+        "qlike": 1.13,
         "qlikeNaive": 2.044,
         "dmMae": 0.01,
-        "dmQlike": 1.11
+        "dmQlike": 1.12
        }
       },
       "vix": {
        "all": {
         "n": 448,
         "mae": 0.381,
-        "maeNaive": 0.394,
-        "qlike": 0.352,
-        "qlikeNaive": 0.523,
-        "dmMae": 2.17,
-        "dmQlike": 2.18
+        "maeNaive": 0.395,
+        "qlike": 0.358,
+        "qlikeNaive": 0.531,
+        "dmMae": 2.25,
+        "dmQlike": 2.21
        },
        "event": {
         "n": 52,
@@ -2875,19 +2875,19 @@
      "n": 448,
      "eventDays": 53,
      "eventAvgAbs": 0.882,
-     "otherAvgAbs": 0.686,
-     "from": "2025-03-06",
-     "to": "2026-11-25",
+     "otherAvgAbs": 0.684,
+     "from": "2025-03-07",
+     "to": "2026-11-26",
      "models": {
       "cur": {
        "all": {
         "n": 448,
-        "mae": 0.497,
+        "mae": 0.496,
         "maeNaive": 0.519,
-        "qlike": 1.439,
-        "qlikeNaive": 1.066,
-        "dmMae": 1.94,
-        "dmQlike": -2.7
+        "qlike": 1.411,
+        "qlikeNaive": 1.062,
+        "dmMae": 2.1,
+        "dmQlike": -2.55
        },
        "event": {
         "n": 53,
@@ -2904,8 +2904,8 @@
         "n": 448,
         "mae": 0.526,
         "maeNaive": 0.519,
-        "qlike": 1.111,
-        "qlikeNaive": 1.066,
+        "qlike": 1.107,
+        "qlikeNaive": 1.062,
         "dmMae": -2.06,
         "dmQlike": -1.89
        },
@@ -2924,9 +2924,9 @@
         "n": 448,
         "mae": 0.512,
         "maeNaive": 0.519,
-        "qlike": 1.198,
-        "qlikeNaive": 1.066,
-        "dmMae": 0.77,
+        "qlike": 1.194,
+        "qlikeNaive": 1.062,
+        "dmMae": 0.81,
         "dmQlike": -1.41
        },
        "event": {
@@ -2942,21 +2942,21 @@
       "har": {
        "all": {
         "n": 448,
-        "mae": 0.506,
+        "mae": 0.509,
         "maeNaive": 0.519,
-        "qlike": 0.924,
-        "qlikeNaive": 1.066,
-        "dmMae": 1.2,
-        "dmQlike": 1.55
+        "qlike": 0.922,
+        "qlikeNaive": 1.062,
+        "dmMae": 1.05,
+        "dmQlike": 1.53
        },
        "event": {
         "n": 53,
-        "mae": 0.657,
+        "mae": 0.655,
         "maeNaive": 0.583,
-        "qlike": 1.346,
+        "qlike": 1.351,
         "qlikeNaive": 1.612,
-        "dmMae": -1.64,
-        "dmQlike": 0.95
+        "dmMae": -1.57,
+        "dmQlike": 0.93
        }
       },
       "vix": {
@@ -2964,10 +2964,10 @@
         "n": 448,
         "mae": 0.473,
         "maeNaive": 0.519,
-        "qlike": 0.839,
-        "qlikeNaive": 1.066,
-        "dmMae": 3.64,
-        "dmQlike": 1.71
+        "qlike": 0.836,
+        "qlikeNaive": 1.062,
+        "dmMae": 3.66,
+        "dmQlike": 1.7
        },
        "event": {
         "n": 53,
@@ -2989,14 +2989,8 @@
    "gold": {
     "ry": {
      "n": 752,
-     "hit": 0.52,
-     "t": 1.09,
-     "proven": false
-    },
-    "macro": {
-     "n": 598,
-     "hit": 0.538,
-     "t": 1.88,
+     "hit": 0.521,
+     "t": 1.17,
      "proven": false
     },
     "rymom": {
@@ -3011,40 +3005,10 @@
      "t": -0.62,
      "proven": false
     },
-    "dgs2": {
-     "n": 808,
-     "hit": 0.54,
-     "t": 2.25,
-     "proven": false
-    },
     "curve": {
-     "n": 579,
-     "hit": 0.53,
-     "t": 1.45,
-     "proven": false
-    },
-    "eugrowth": {
-     "n": 278,
-     "hit": 0.511,
-     "t": 0.36,
-     "proven": false
-    },
-    "trend": {
-     "n": 1000,
-     "hit": 0.497,
-     "t": -0.19,
-     "proven": false
-    },
-    "v_ry4w": {
-     "n": 650,
-     "hit": 0.515,
-     "t": 0.78,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 624,
-     "hit": 0.498,
-     "t": -0.08,
+     "n": 578,
+     "hit": 0.531,
+     "t": 1.5,
      "proven": false
     },
     "smile": {
@@ -3053,10 +3017,46 @@
      "t": 0.69,
      "proven": false
     },
+    "eugrowth": {
+     "n": 277,
+     "hit": 0.509,
+     "t": 0.3,
+     "proven": false
+    },
+    "trend": {
+     "n": 1000,
+     "hit": 0.498,
+     "t": -0.13,
+     "proven": false
+    },
+    "v_ry4w": {
+     "n": 650,
+     "hit": 0.517,
+     "t": 0.86,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 624,
+     "hit": 0.5,
+     "t": 0,
+     "proven": false
+    },
+    "macro": {
+     "n": 597,
+     "hit": 0.539,
+     "t": 1.92,
+     "proven": false
+    },
     "dxymom": {
      "n": 759,
      "hit": 0.493,
      "t": -0.4,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 808,
+     "hit": 0.54,
+     "t": 2.25,
      "proven": false
     },
     "v_d2_4w": {
@@ -3066,15 +3066,15 @@
      "proven": false
     },
     "vix": {
-     "n": 394,
-     "hit": 0.487,
-     "t": -0.5,
+     "n": 395,
+     "hit": 0.486,
+     "t": -0.55,
      "proven": false
     },
     "hy": {
-     "n": 413,
-     "hit": 0.538,
-     "t": 1.53,
+     "n": 414,
+     "hit": 0.536,
+     "t": 1.47,
      "proven": false
     },
     "cot": {
@@ -3093,20 +3093,20 @@
     },
     "rymom": {
      "n": 862,
-     "hit": 0.487,
-     "t": -0.75,
+     "hit": 0.486,
+     "t": -0.82,
      "proven": false
     },
-    "dgs2": {
-     "n": 807,
-     "hit": 0.487,
-     "t": -0.74,
+    "smile": {
+     "n": 652,
+     "hit": 0.488,
+     "t": -0.63,
      "proven": false
     },
     "eugrowth": {
-     "n": 277,
-     "hit": 0.487,
-     "t": -0.42,
+     "n": 276,
+     "hit": 0.489,
+     "t": -0.36,
      "proven": false
     },
     "trend": {
@@ -3127,16 +3127,16 @@
      "t": -2.04,
      "proven": false
     },
-    "smile": {
-     "n": 651,
-     "hit": 0.487,
-     "t": -0.67,
-     "proven": false
-    },
     "dxymom": {
      "n": 758,
      "hit": 0.488,
      "t": -0.65,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 807,
+     "hit": 0.486,
+     "t": -0.81,
      "proven": false
     },
     "v_d2_4w": {
@@ -3146,29 +3146,53 @@
      "proven": false
     },
     "vix": {
-     "n": 393,
-     "hit": 0.494,
-     "t": -0.25,
+     "n": 394,
+     "hit": 0.495,
+     "t": -0.2,
      "proven": false
     },
     "hy": {
-     "n": 412,
-     "hit": 0.481,
-     "t": -0.79,
+     "n": 413,
+     "hit": 0.482,
+     "t": -0.74,
      "proven": false
     }
    },
    "usdjpy": {
     "ry": {
      "n": 751,
-     "hit": 0.531,
-     "t": 1.72,
+     "hit": 0.533,
+     "t": 1.79,
      "proven": false
     },
     "rymom": {
      "n": 862,
      "hit": 0.514,
      "t": 0.82,
+     "proven": false
+    },
+    "trend": {
+     "n": 999,
+     "hit": 0.531,
+     "t": 1.93,
+     "proven": false
+    },
+    "v_ry4w": {
+     "n": 649,
+     "hit": 0.538,
+     "t": 1.92,
+     "proven": false
+    },
+    "v_dxy4w": {
+     "n": 624,
+     "hit": 0.51,
+     "t": 0.48,
+     "proven": false
+    },
+    "dxymom": {
+     "n": 759,
+     "hit": 0.515,
+     "t": 0.83,
      "proven": false
     },
     "dgs2": {
@@ -3183,30 +3207,6 @@
      "t": 0.04,
      "proven": false
     },
-    "trend": {
-     "n": 999,
-     "hit": 0.53,
-     "t": 1.87,
-     "proven": false
-    },
-    "v_ry4w": {
-     "n": 649,
-     "hit": 0.536,
-     "t": 1.84,
-     "proven": false
-    },
-    "v_dxy4w": {
-     "n": 624,
-     "hit": 0.508,
-     "t": 0.4,
-     "proven": false
-    },
-    "dxymom": {
-     "n": 759,
-     "hit": 0.515,
-     "t": 0.83,
-     "proven": false
-    },
     "v_d2_4w": {
      "n": 512,
      "hit": 0.531,
@@ -3214,29 +3214,29 @@
      "proven": false
     },
     "smile": {
-     "n": 357,
-     "hit": 0.529,
-     "t": 1.11,
+     "n": 358,
+     "hit": 0.528,
+     "t": 1.06,
      "proven": false
     },
     "vix": {
-     "n": 394,
-     "hit": 0.576,
-     "t": 3.02,
-     "proven": true
+     "n": 395,
+     "hit": 0.575,
+     "t": 2.97,
+     "proven": false
     },
     "hy": {
-     "n": 413,
-     "hit": 0.521,
-     "t": 0.84,
+     "n": 414,
+     "hit": 0.519,
+     "t": 0.79,
      "proven": false
     }
    },
    "nq": {
     "ry": {
      "n": 752,
-     "hit": 0.504,
-     "t": 0.22,
+     "hit": 0.503,
+     "t": 0.15,
      "proven": false
     },
     "rymom": {
@@ -3245,40 +3245,40 @@
      "t": 1.43,
      "proven": false
     },
-    "dgs2": {
-     "n": 807,
-     "hit": 0.499,
-     "t": -0.04,
+    "smile": {
+     "n": 413,
+     "hit": 0.538,
+     "t": 1.53,
      "proven": false
     },
     "trend": {
      "n": 999,
-     "hit": 0.529,
-     "t": 1.8,
+     "hit": 0.528,
+     "t": 1.74,
      "proven": false
     },
     "v_ry4w": {
      "n": 649,
-     "hit": 0.502,
-     "t": 0.12,
+     "hit": 0.501,
+     "t": 0.04,
      "proven": false
     },
     "v_dxy4w": {
      "n": 624,
-     "hit": 0.514,
-     "t": 0.72,
-     "proven": false
-    },
-    "smile": {
-     "n": 412,
-     "hit": 0.539,
-     "t": 1.58,
+     "hit": 0.513,
+     "t": 0.64,
      "proven": false
     },
     "dxymom": {
      "n": 758,
      "hit": 0.512,
      "t": 0.65,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 807,
+     "hit": 0.499,
+     "t": -0.04,
      "proven": false
     },
     "v_d2_4w": {
@@ -3288,29 +3288,29 @@
      "proven": false
     },
     "vix": {
-     "n": 394,
-     "hit": 0.485,
-     "t": -0.6,
+     "n": 395,
+     "hit": 0.486,
+     "t": -0.55,
      "proven": false
     },
     "hy": {
-     "n": 413,
-     "hit": 0.506,
-     "t": 0.25,
+     "n": 414,
+     "hit": 0.505,
+     "t": 0.2,
      "proven": false
     },
     "vixts": {
-     "n": 51,
-     "hit": 0.51,
-     "t": 0.14,
+     "n": 52,
+     "hit": 0.519,
+     "t": 0.28,
      "proven": false
     }
    },
    "es": {
     "ry": {
      "n": 750,
-     "hit": 0.517,
-     "t": 0.95,
+     "hit": 0.516,
+     "t": 0.88,
      "proven": false
     },
     "rymom": {
@@ -3319,40 +3319,40 @@
      "t": 2.08,
      "proven": false
     },
-    "dgs2": {
-     "n": 805,
-     "hit": 0.514,
-     "t": 0.81,
+    "smile": {
+     "n": 412,
+     "hit": 0.539,
+     "t": 1.58,
      "proven": false
     },
     "trend": {
      "n": 997,
-     "hit": 0.52,
-     "t": 1.24,
+     "hit": 0.519,
+     "t": 1.17,
      "proven": false
     },
     "v_ry4w": {
      "n": 648,
-     "hit": 0.522,
-     "t": 1.1,
+     "hit": 0.52,
+     "t": 1.02,
      "proven": false
     },
     "v_dxy4w": {
      "n": 621,
-     "hit": 0.533,
-     "t": 1.65,
-     "proven": false
-    },
-    "smile": {
-     "n": 411,
-     "hit": 0.54,
-     "t": 1.63,
+     "hit": 0.531,
+     "t": 1.57,
      "proven": false
     },
     "dxymom": {
      "n": 757,
      "hit": 0.518,
      "t": 0.98,
+     "proven": false
+    },
+    "dgs2": {
+     "n": 805,
+     "hit": 0.514,
+     "t": 0.81,
      "proven": false
     },
     "v_d2_4w": {
@@ -3362,59 +3362,59 @@
      "proven": false
     },
     "vix": {
-     "n": 393,
-     "hit": 0.501,
-     "t": 0.05,
+     "n": 394,
+     "hit": 0.503,
+     "t": 0.1,
      "proven": false
     },
     "hy": {
-     "n": 412,
-     "hit": 0.522,
-     "t": 0.89,
+     "n": 413,
+     "hit": 0.521,
+     "t": 0.84,
      "proven": false
     },
     "vixts": {
-     "n": 51,
-     "hit": 0.51,
-     "t": 0.14,
+     "n": 52,
+     "hit": 0.519,
+     "t": 0.28,
      "proven": false
     }
    }
   },
   "logged": 72,
-  "resolved": 62,
+  "resolved": 67,
   "method": "Walk-forward: each replay day uses only data published before it (FRED with publication lags, candles before the day); the score-to-probability map (anchored on the base up-rate, strongly shrunk, capped 35-65%) is refitted every 20 days on earlier days only (needs 120). Target: the next UTC weekday candle, up if close > open. Base rate = the share of the more common direction; coin flip (random walk) = 50% every day, Brier 0.25. Pesaran-Timmermann above 1.96 = direction calls better than chance. A 53% hit rate needs about 1,100 forecasts to tell from luck. The live log is append-only, written from 21:00 UTC before each day opens."
  },
  "sources": {
   "fred:DGS2": "ok, last 2026-11-24",
+  "fred:DGS10": "ok, last 2026-11-24",
   "fred:T10YIE": "ok, last 2026-11-25",
   "fred:DFII10": "ok, last 2026-11-24",
-  "fred:DGS10": "ok, last 2026-11-24",
   "fred:VIXCLS": "ok, last 2026-11-24",
-  "fred:VXVCLS": "ok, last 2026-11-24",
-  "fred:T10Y3M": "ok, last 2026-11-25",
   "fred:BAMLH0A0HYM2": "ok, last 2026-11-24",
-  "fred:RRPONTSYD": "ok, last 2026-11-25",
-  "fred:WALCL": "ok, last 2026-11-18",
   "fred:DTWEXBGS": "ok, last 2026-11-20",
+  "fred:T10Y3M": "ok, last 2026-11-25",
+  "fred:RRPONTSYD": "ok, last 2026-11-25",
+  "fred:VXVCLS": "ok, last 2026-11-24",
+  "fred:WALCL": "ok, last 2026-11-18",
   "fred:WTREGEN": "ok, last 2026-11-18",
+  "fred:SWPT": "ok, last 2026-11-18",
   "fred:SOFR": "ok, last 2026-11-24",
   "fred:EFFR": "ok, last 2026-11-24",
-  "fred:SWPT": "ok, last 2026-11-18",
   "fred:BSCICP03DEM665S": "ok, last 2024-01-01",
-  "release": "kept from today's earlier run",
+  "release": "10 of 10 release series fetched",
   "ecb:2y": "ok, last 2026-11-25",
-  "bars:eurusd": "OANDA ok (1400 days)",
-  "bars:es": "OANDA ok (1400 days)",
   "bars:gold": "OANDA ok (1400 days)",
-  "bars:gbpusd": "OANDA ok (1400 days)",
+  "bars:eurusd": "OANDA ok (1400 days)",
   "bars:nq": "OANDA ok (1400 days)",
-  "bars:usdchf": "OANDA ok (1400 days)",
+  "bars:gbpusd": "OANDA ok (1400 days)",
+  "bars:es": "OANDA ok (1400 days)",
   "bars:usdjpy": "OANDA ok (1400 days)",
   "bars:usdcad": "OANDA ok (1400 days)",
+  "bars:usdchf": "OANDA ok (1400 days)",
   "calendar:thisweek": "ok (77 events)",
   "calendar:nextweek": "failed (HTTP 404)",
-  "calendar:cache": "using the last good copy for the week that failed (150 cached events)",
+  "calendar:cache": "using the last good copy for the week that failed (149 cached events)",
   "rss:Fed": "ok (20 items)",
   "rss:BoJ": "ok (46 items)",
   "rss:ECB": "ok (15 items)",
@@ -3422,23 +3422,23 @@
   "score:DFII10": "ok, 5228 days to 2026-11-24",
   "score:DGS2": "ok, 5228 days to 2026-11-24",
   "score:DGS10": "ok, 5228 days to 2026-11-24",
-  "score:dxy": "7690 days (daily cache since 2002-05-08)"
+  "score:dxy": "7691 days (daily cache since 2002-05-08)"
  },
  "goldScore": {
   "ok": true,
   "asOf": "2026-11-27",
-  "partial": true,
+  "partial": false,
   "stale": [],
   "score": -0.66,
   "z": {
    "ry4w": -0.87,
-   "dxy4w": -0.77,
+   "dxy4w": -0.79,
    "y2_13w": -0.63,
    "curve13w": -0.37
   },
   "raw": {
    "ry4w": -0.19,
-   "dxy4w": -0.0162,
+   "dxy4w": -0.0167,
    "y2_13w": -0.29,
    "curve13w": -0.11
   },
@@ -3559,13 +3559,13 @@
   "weeks": 1070,
   "trend": {
    "above10w": false,
-   "last": 3576.32,
-   "avg10w": 3972.69
+   "last": 3568.01,
+   "avg10w": 3971.86
   },
   "bias": "AUCTION",
   "conviction": null,
   "label": "AUCTION (no macro edge)",
   "rule": "direction only, long-or-flat: > +0.5 BUY High, +0.25..+0.5 BUY Medium, else AUCTION; a negative score is not a sell (skill test 2007-26: no short edge). Paper reading; nothing trades on it."
  },
- "brief": "Macro strategist, Thu 26 Nov 23:03 UTC, for Fri 27 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity rising · VIX curve inverted (stress). Gold: 53% up (base rate 53%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Expected move ±1.62% (20-day average). EUR/USD: 48% up (base rate 48%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, dollar smile regime; against: real-yield 1-week momentum. Expected move ±0.31% (20-day average). USD/JPY: 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Expected move ±0.24% (20-day average). NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean down: real yields, credit stress; against: real-yield 1-week momentum. Expected move ±2.08% (20-day average). ES (S&P 500): 52% up (base rate 54%; macro tilt down 1 pt). Drivers lean down: real yields, credit stress; against: vix term structure. Expected move ±1.36% (20-day average). DXY: 52% up (mirror of EUR/USD). Gold Macro Score -0.66 → AUCTION (no macro edge) (real yield 4w z -0.87, DXY 4w z -0.77, 2Y 13w z -0.63, curve 13w z -0.37; 6-week path -0.13 → +0.13 → +0.05 → -0.96 → -0.75 → -0.66; week to 2026-11-27, not closed; gold below its 10-week average). Direction only, never a sell; paper reading. No high-impact events in the next 5 days on the calendar we could read (next week's calendar is not published yet; it usually appears over the weekend). Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.5): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.991% on average against 0.877% on other days, but no model turned that into a better forecast."
+ "brief": "Macro strategist, Fri 27 Nov 00:36 UTC, for Mon 30 Nov (UTC day, open to close). Regime: Dollar Smile left side (stress) · dollar liquidity rising · VIX curve inverted (stress). Gold: 53% up (base rate 53%; base rate, no macro tilt). Drivers lean up: real-yield 1-week momentum, risk sentiment; against: real yields. Expected move ±1.58% (20-day average). EUR/USD: 48% up (base rate 48%; base rate, no macro tilt, the replay finds no edge in its drivers). Drivers lean down: real yields, dollar smile regime; against: real-yield 1-week momentum. Expected move ±0.29% (20-day average). USD/JPY: 55% up (base rate 56%; macro tilt down 1 pt). Drivers lean down: us 10y yield trend, real-yield 1-week momentum; against: real yields. Expected move ±0.24% (20-day average). NQ (Nasdaq 100): 55% up (base rate 56%; base rate, no macro tilt). Drivers lean down: real yields, credit stress; against: real-yield 1-week momentum. Expected move ±2.01% (20-day average). ES (S&P 500): 53% up (base rate 54%; macro tilt down 1 pt). Drivers lean down: real yields, credit stress; against: vix term structure. Expected move ±1.35% (20-day average). DXY: 52% up (mirror of EUR/USD). Gold Macro Score -0.66 → AUCTION (no macro edge) (real yield 4w z -0.87, DXY 4w z -0.79, 2Y 13w z -0.63, curve 13w z -0.37; 6-week path -0.13 → +0.13 → +0.05 → -0.96 → -0.75 → -0.66; week to 2026-11-27; gold below its 10-week average). Direction only, never a sell; paper reading. No high-impact events in the next 5 days on the calendar we could read (next week's calendar is not published yet; it usually appears over the weekend). Honesty check: on the 880-day walk-forward replay the gold calls hit 53% against a 54% base rate (Brier 0.249 vs 0.25 for a coin flip, Pesaran-Timmermann 0.45): no proven edge (about the base rate). Treat the direction odds as context, not trade signals. Move size: all five markets keep the naive 20-day average: none of the 4 models tried beat it out of sample on both MAE and QLIKE, on all days and on CPI / NFP / FOMC days. CPI / NFP / FOMC days moved gold 0.991% on average against 0.876% on other days, but no model turned that into a better forecast."
 }
