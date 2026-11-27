@@ -3461,7 +3461,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "mosha6",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T18:46:13.000Z",
     "councilEntry": 3648.23,
     "stop": 3656.225,
@@ -3474,10 +3474,12 @@
     "slipR": 0.954,
     "lagSec": 1933,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T18:46:13.000Z",
-    "brokerStop": 3654.44
+    "brokerStop": 3654.44,
+    "closedAt": "2026-11-27T19:47:45.000Z"
    },
    "mosha6:bar-r6-tap-15m-v3-s1795803240": {
     "positionId": "51740548",
@@ -3487,7 +3489,7 @@
     "lots": 0.01,
     "digits": 2,
     "setup": "mosha6",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T18:46:13.000Z",
     "councilEntry": 3648.005,
     "stop": 3656.225,
@@ -3500,10 +3502,12 @@
     "slipR": 0.901,
     "lagSec": 1933,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T18:46:13.000Z",
-    "brokerStop": 3654.44
+    "brokerStop": 3654.44,
+    "closedAt": "2026-11-27T19:47:45.000Z"
    },
    "mosha6:bar-r6-tap-eg-15m-b1795802160": {
     "positionId": "51740549",
@@ -3587,7 +3591,7 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 9116.86,
-   "lastBalance": 8515.62,
+   "lastBalance": 8487.72,
    "ids": [
     "50808923",
     "50809509",
@@ -3602,8 +3606,6 @@
     "51730157",
     "51734810",
     "51735304",
-    "51740547",
-    "51740548",
     "51740549",
     "51742427",
     "51742429"
@@ -3612,10 +3614,10 @@
     "35000818",
     "35000621"
    ],
-   "sent": true
+   "sent": false
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8515.62 · 15 open",
+  "status": "ok · demo Fusion Markets · balance 8487.72 · 13 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -3623,9 +3625,9 @@
   },
   "wait": {
    "ict:x:nq-b-1795798800-dip": {
-    "why": "NAS100 market closed: SYMBOL_HAS_HOLIDAY: Symbols has a holiday right now",
+    "why": "NAS100 market closed (paused until 19:54 UTC)",
     "n": 0,
-    "at": "2026-11-27T19:44:39.000Z"
+    "at": "2026-11-27T19:47:45.000Z"
    }
   },
   "paused": {
@@ -3635,27 +3637,13 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 8515.62,
-  "lastRun": "2026-11-27T19:44:39.000Z",
+  "balance": 8487.72,
+  "lastRun": "2026-11-27T19:47:45.000Z",
   "closedSeen": {
    "NAS100": "2026-11-27T19:44:39.000Z"
   }
  },
  "log": [
-  {
-   "at": "2026-11-21T06:48:51.000Z",
-   "msg": "placed buy limit ETHUSD 0.02 lot at 1629.51 (council rswing, valid to 2026-11-23T06:48Z)",
-   "trade": "eth-rswing-1795243694"
-  },
-  {
-   "at": "2026-11-21T07:02:55.000Z",
-   "msg": "limit filled: ETHUSD position 50661738 at the broker",
-   "trade": "eth-rswing-1795243694"
-  },
-  {
-   "at": "2026-11-21T07:19:57.000Z",
-   "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
-  },
   {
    "at": "2026-11-21T08:57:03.000Z",
    "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
@@ -5134,6 +5122,21 @@
   {
    "at": "2026-11-27T19:44:39.000Z",
    "msg": "not mirrored yet ict:x:nq-b-1795798800-dip: NAS100 market closed: SYMBOL_HAS_HOLIDAY: Symbols has a holiday right now (will retry)",
+   "trade": "ict:x:nq-b-1795798800-dip"
+  },
+  {
+   "at": "2026-11-27T19:47:45.000Z",
+   "msg": "XAUUSD position 51740547 closed at the broker",
+   "trade": "mosha6:bar-r6-15m-v3-s1795803240"
+  },
+  {
+   "at": "2026-11-27T19:47:45.000Z",
+   "msg": "XAUUSD position 51740548 closed at the broker",
+   "trade": "mosha6:bar-r6-tap-15m-v3-s1795803240"
+  },
+  {
+   "at": "2026-11-27T19:47:45.000Z",
+   "msg": "not mirrored yet ict:x:nq-b-1795798800-dip: NAS100 market closed (paused until 19:54 UTC) (will retry)",
    "trade": "ict:x:nq-b-1795798800-dip"
   }
  ],
