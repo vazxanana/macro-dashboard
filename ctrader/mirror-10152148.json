@@ -7302,7 +7302,7 @@
     "lots": 1.63,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T05:25:47.000Z",
     "councilEntry": 0.66686,
     "stop": 0.66781,
@@ -7315,10 +7315,15 @@
     "slipR": -0.158,
     "lagSec": 47,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T05:25:47.000Z",
-    "brokerStop": 0.66812
+    "brokerStop": 0.66812,
+    "closedAt": "2026-11-27T09:00:44.000Z",
+    "exitPrice": 0.6677,
+    "councilExit": 0.66781,
+    "councilR": -1
    },
    "boxfade:usdjpy:boxfade-m5-s1795758300": {
     "positionId": "51663818",
@@ -7400,9 +7405,8 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 10760.32,
-   "lastBalance": 8773.76,
+   "lastBalance": 8656.39,
    "ids": [
-    "51662947",
     "51665287",
     "51665337"
    ],
@@ -7410,7 +7414,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 8773.76 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 8656.39 · 2 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7418,15 +7422,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 8773.76,
-  "lastRun": "2026-11-27T08:59:35.000Z"
+  "balance": 8656.39,
+  "lastRun": "2026-11-27T09:03:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:10:22.000Z",
-   "msg": "close XAUUSD 49525852 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794583847-s"
-  },
   {
    "at": "2026-11-15T22:10:22.000Z",
    "msg": "close XAUUSD 49547717 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -8915,6 +8914,11 @@
    "at": "2026-11-27T08:11:27.000Z",
    "msg": "USDJPY position 51663818 closed at the broker",
    "trade": "boxfade:usdjpy:boxfade-m5-s1795758300"
+  },
+  {
+   "at": "2026-11-27T09:00:44.000Z",
+   "msg": "closed AUDUSD position 51662947 (council: stopped)",
+   "trade": "boxfade:audusd:boxfade-m5-s1795757100"
   }
  ],
  "limits": {
