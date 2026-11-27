@@ -2544,7 +2544,7 @@
     "lots": 0.02,
     "digits": 2,
     "setup": "mosha6",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T10:46:19.000Z",
     "councilEntry": 3676.995,
     "stop": 3685.69,
@@ -2557,10 +2557,12 @@
     "slipR": 0.089,
     "lagSec": 559,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T10:46:19.000Z",
-    "brokerStop": 3685.45
+    "brokerStop": 3685.45,
+    "closedAt": "2026-11-27T15:21:49.000Z"
    },
    "mosha6:bar-r6-eg-1h-v3-z-s1795775820": {
     "positionId": "51693343",
@@ -3111,7 +3113,7 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 9116.86,
-   "lastBalance": 8477.09,
+   "lastBalance": 8564.17,
    "ids": [
     "50808923",
     "50809509",
@@ -3120,8 +3122,6 @@
     "50977895",
     "51648787",
     "51648789",
-    "51664407",
-    "51693342",
     "51693343",
     "51713490",
     "51721932",
@@ -3137,7 +3137,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8477.09 · 14 open",
+  "status": "ok · demo Fusion Markets · balance 8564.17 · 13 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -3150,8 +3150,8 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 8477.09,
-  "lastRun": "2026-11-27T15:19:48.000Z"
+  "balance": 8564.17,
+  "lastRun": "2026-11-27T15:21:49.000Z"
  },
  "log": [
   {
@@ -4509,6 +4509,11 @@
    "at": "2026-11-27T15:09:18.000Z",
    "msg": "opened buy XAUUSD 0.02 lot (council mosha6)",
    "trade": "mosha6:bar-r6-tap-15m-v3-b1795790580"
+  },
+  {
+   "at": "2026-11-27T15:21:49.000Z",
+   "msg": "XAUUSD position 51693342 closed at the broker",
+   "trade": "mosha6:bar-r6-1h-v3-s1795775820"
   }
  ],
  "limits": {
