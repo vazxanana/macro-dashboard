@@ -2081,7 +2081,7 @@
     "lots": 0.15,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T00:17:51.000Z",
     "councilEntry": 1.31,
     "stop": 1.309751,
@@ -2094,10 +2094,12 @@
     "slipR": 0.161,
     "lagSec": 171,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T00:17:51.000Z",
-    "brokerStop": 1.30975
+    "brokerStop": 1.30975,
+    "closedAt": "2026-11-27T00:41:33.000Z"
    },
    "eqx:fade:eurusd:fade-m15-b1795738500": {
     "positionId": "51649039",
@@ -2107,7 +2109,7 @@
     "lots": 0.13,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T00:17:51.000Z",
     "councilEntry": 1.09638,
     "stop": 1.096139,
@@ -2120,10 +2122,12 @@
     "slipR": 0.456,
     "lagSec": 171,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T00:17:51.000Z",
-    "brokerStop": 1.09616
+    "brokerStop": 1.09616,
+    "closedAt": "2026-11-27T00:41:33.000Z"
    },
    "eqx:fvg:eurusd:fvg-h1-b1795680000-1795738500": {
     "positionId": "51649040",
@@ -2207,12 +2211,10 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 435.27,
+   "lastBalance": 424.68,
    "ids": [
     "51608452",
     "51649037",
-    "51649038",
-    "51649039",
     "51649040",
     "51649273"
    ],
@@ -2220,7 +2222,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 435.27 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 424.68 · 4 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2244,20 +2246,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 435.27,
-  "lastRun": "2026-11-27T00:34:33.000Z"
+  "balance": 424.68,
+  "lastRun": "2026-11-27T00:41:33.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T08:25:46.000Z",
-   "msg": "opened buy US2000 13.34 lot (council ict-A)",
-   "trade": "ict:rty-b-1794553200"
-  },
-  {
-   "at": "2026-11-13T08:36:20.000Z",
-   "msg": "US2000 position 49347311 closed at the broker",
-   "trade": "ict:rty-b-1794553200"
-  },
   {
    "at": "2026-11-13T10:16:28.000Z",
    "msg": "opened buy US500 0.18 lot (council ict-A+)",
@@ -3737,6 +3729,16 @@
    "at": "2026-11-27T00:30:18.000Z",
    "msg": "opened sell USDCAD 0.14 lot (council eqx-fade)",
    "trade": "eqx:fade:usdcad:fade-m15-s1795739400"
+  },
+  {
+   "at": "2026-11-27T00:41:33.000Z",
+   "msg": "GBPUSD position 51649038 closed at the broker",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795738500"
+  },
+  {
+   "at": "2026-11-27T00:41:33.000Z",
+   "msg": "EURUSD position 51649039 closed at the broker",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795738500"
   }
  ],
  "limits": {
