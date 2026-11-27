@@ -2361,7 +2361,7 @@
     "lots": 0.13,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T02:01:13.000Z",
     "councilEntry": 159.223,
     "stop": 159.177929,
@@ -2372,10 +2372,12 @@
     "slipR": 0.532,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T02:01:13.000Z",
-    "brokerStop": 159.202
+    "brokerStop": 159.202,
+    "closedAt": "2026-11-27T02:14:08.000Z"
    },
    "eqx:fade:gbpusd:fade-m15-s1795744800": {
     "positionId": "51651275",
@@ -2438,15 +2440,13 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 388.07,
-   "ids": [
-    "51651273"
-   ],
+   "lastBalance": 383.65,
+   "ids": [],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 388.07 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 383.65 · 0 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2455,9 +2455,9 @@
     "at": "2026-11-25T21:44:17.000Z"
    },
    "eqx:goldvb:goldvb-b1795744800": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 51.83, 13.4% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 49.42, 12.9% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-27T02:11:32.000Z"
+    "at": "2026-11-27T02:14:08.000Z"
    }
   },
   "paused": {},
@@ -2465,20 +2465,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 388.07,
-  "lastRun": "2026-11-27T02:11:32.000Z"
+  "balance": 383.65,
+  "lastRun": "2026-11-27T02:14:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-18T00:42:38.000Z",
-   "msg": "opened buy NAS100 0.03 lot (council ict-A)",
-   "trade": "ict:nq-b-1794956400"
-  },
-  {
-   "at": "2026-11-18T00:42:38.000Z",
-   "msg": "opened buy US30 0.05 lot (council ict-A)",
-   "trade": "ict:ym-b-1794956400"
-  },
   {
    "at": "2026-11-18T14:32:55.000Z",
    "msg": "US30 position 50238807 closed at the broker",
@@ -3957,6 +3947,16 @@
   {
    "at": "2026-11-27T02:11:32.000Z",
    "msg": "not mirrored yet eqx:goldvb:goldvb-b1795744800: XAUUSD: even the minimum lot (0.01) risks 51.83, 13.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "eqx:goldvb:goldvb-b1795744800"
+  },
+  {
+   "at": "2026-11-27T02:14:08.000Z",
+   "msg": "USDJPY position 51651273 closed at the broker",
+   "trade": "eqx:fade:usdjpy:fade-m15-b1795744800"
+  },
+  {
+   "at": "2026-11-27T02:14:08.000Z",
+   "msg": "not mirrored yet eqx:goldvb:goldvb-b1795744800: XAUUSD: even the minimum lot (0.01) risks 49.42, 12.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "eqx:goldvb:goldvb-b1795744800"
   }
  ],
