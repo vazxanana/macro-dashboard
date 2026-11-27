@@ -3656,6 +3656,30 @@
     ],
     "stopCheckedAt": "2026-11-27T20:15:56.000Z",
     "brokerStop": 0.6652
+   },
+   "eqx:fade:usdjpy:fade-m15-s1795814100": {
+    "positionId": "51748849",
+    "symbol": "USDJPY",
+    "side": "sell",
+    "volume": 2100000,
+    "lots": 0.21,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T21:17:04.000Z",
+    "councilEntry": 159.578,
+    "stop": 159.600786,
+    "t1": 159.532429,
+    "riskCash": 3.09,
+    "margin": 42,
+    "fillPrice": 159.58,
+    "slipR": -0.088,
+    "lagSec": 124,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T21:17:04.000Z",
+    "brokerStop": 159.603
    }
   },
   "day": {
@@ -3667,13 +3691,14 @@
     "51740551",
     "51740552",
     "51744241",
-    "51745307"
+    "51745307",
+    "51748849"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 308.71 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 308.71 · 6 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3705,14 +3730,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 308.71,
-  "lastRun": "2026-11-27T21:15:46.000Z"
+  "lastRun": "2026-11-27T21:19:08.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:24:43.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 30.61, 6.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
   {
    "at": "2026-11-24T19:27:13.000Z",
    "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 14.11, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5207,6 +5227,11 @@
    "at": "2026-11-27T20:15:56.000Z",
    "msg": "opened sell AUDUSD 0.09 lot (council eqx-fade)",
    "trade": "eqx:fade:audusd:fade-m15-s1795810500"
+  },
+  {
+   "at": "2026-11-27T21:17:04.000Z",
+   "msg": "opened sell USDJPY 0.21 lot (council eqx-fade)",
+   "trade": "eqx:fade:usdjpy:fade-m15-s1795814100"
   }
  ],
  "limits": {
@@ -5311,11 +5336,11 @@
   ]
  },
  "execution": {
-  "n": 98,
-  "meanSlipR": 0.025,
-  "medianSlipR": 0.016,
+  "n": 99,
+  "meanSlipR": 0.024,
+  "medianSlipR": 0.014,
   "worstSlipR": 1.352,
-  "medianLagSec": 63,
+  "medianLagSec": 68,
   "bySymbol": {
    "GBPUSD": {
     "n": 11,
@@ -5326,8 +5351,8 @@
     "meanSlipR": -0.042
    },
    "USDJPY": {
-    "n": 10,
-    "meanSlipR": 0.168
+    "n": 11,
+    "meanSlipR": 0.144
    },
    "EURUSD": {
     "n": 12,
