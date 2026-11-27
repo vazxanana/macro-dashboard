@@ -7520,7 +7520,7 @@
     "lots": 4.52,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T21:00:17.000Z",
     "councilEntry": 1.3094,
     "stop": 1.30902,
@@ -7533,10 +7533,12 @@
     "slipR": -0.079,
     "lagSec": 17,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T21:00:17.000Z",
-    "brokerStop": 1.30899
+    "brokerStop": 1.30899,
+    "closedAt": "2026-11-27T21:58:10.000Z"
    },
    "boxfade:eurusd:boxfade-m5-b1795815900": {
     "positionId": "51748902",
@@ -7592,13 +7594,12 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 10760.32,
-   "lastBalance": 8604.44,
+   "lastBalance": 8763.12,
    "ids": [
     "51732199",
     "51740459",
     "51740553",
     "51744249",
-    "51748794",
     "51748902",
     "51748912"
    ],
@@ -7606,7 +7607,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 8604.44 · 7 open",
+  "status": "ok · demo Fusion Markets · balance 8763.12 · 6 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7614,15 +7615,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 8604.44,
-  "lastRun": "2026-11-27T21:55:48.000Z"
+  "balance": 8763.12,
+  "lastRun": "2026-11-27T21:58:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:15:52.000Z",
-   "msg": "close XAUUSD 49547717 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794587098-b"
-  },
   {
    "at": "2026-11-15T22:15:52.000Z",
    "msg": "close XAUUSD 49606352 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -9111,6 +9107,11 @@
    "at": "2026-11-27T21:50:11.000Z",
    "msg": "opened sell USDJPY 1.83 lot (council boxfade)",
    "trade": "boxfade:usdjpy:boxfade-m5-s1795816200"
+  },
+  {
+   "at": "2026-11-27T21:58:10.000Z",
+   "msg": "GBPUSD position 51748794 closed at the broker",
+   "trade": "boxfade:gbpusd:boxfade-m5-b1795813200"
   }
  ],
  "limits": {
