@@ -9,7 +9,10 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Absolute rules** (never break them, whatever a task, a study or a helper's PR says):
 1. **Every trade has a stop**: council, ICT, the cTrader mirror and ChronosTrade. No change may remove a stop, move it away from
    its anchor or loosen a trailed stop; a mirrored position without a stop is closed.
-2. **Paper trading and cTrader demo accounts only.** Nothing is ever sent to a live account.
+2. **Paper trading and cTrader demo accounts only.** Nothing is ever sent to a live account. **One exception, made by the owner on
+   27 Nov 2026** (docs/owner-decisions.md item 64, section "The live account"): `council/live.mjs` and the `--live` mode of
+   `council/nq-demo.mjs` / `council/vb-demo.mjs` may trade ONE live account the owner names, only while config.json `live.on`, the
+   environment's `CTRADER_LIVE=on` and that account all agree. Never widen it to another job, book or account without the owner.
 3. **The owner approves every live rule change.** The Coach, studies and helpers' PRs only propose (`research/proposals/`, the
    week pane's "Decisions waiting"); owner rules (`userOwned`) and live setups stay out of the Coach's reach.
    **One exception, made by the owner on 10 Nov 2026:** Fred has full control of the ICT edge. Through his connector he may
@@ -2624,6 +2627,13 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   from 1180 px the side rail and the site header are hidden on Charts (`body` padding 0). The Menu button `#ms-fit-menu` at the start of the
   toolbar sets `html[data-chnav="1"]`, which brings them back (also on a phone on its side), and hides them again; memory only, so every
   visit to Charts starts with the chart alone. Other views are unchanged.
+- **More room** (owner, 26 Nov 2026: "Try to use more the space"; same block): on every screen each chart's own header (`.ms-ph`: timeframe, trend,
+  cycle) lies ON the chart's top-left corner (absolute, `pointer-events` only on its children) with the O H L C line under it (`.ch-lg` top 38 px),
+  so the row above the chart is gone; from 1180 px the Market phase strip is a chip in the toolbar (the script moves `#ms-phase` into `.sec-h` once
+  its own script has made it, a comment marks its place for narrower windows; opened it takes a row of its own), the page's side margins are 6 px
+  and the toolbar is thinner; at 1180-1439 px the toolbar is one row (Style is its "Aa" button, Help shows in the Menu state, the older forced
+  break `.sec-h::after` is off there). With a mouse the on-chart Date / Auto / Log / % buttons show only while the pointer is over that chart.
+  One H1 chart: 1440 x 900 825 px tall (478 before the day's work), 1280 x 720 645 px (401), 1920 x 1080 1005 px, phone 390 x 844 587 px (526).
 - **Watchlist** (`#ms-wlp`, 1280 px and up, in `.ch-row` beside the chart): every market by group with its price and change on the day from the
   page's shared quotes (`window.msQuotes` = `mdQuotes`, no request of its own; crypto has no quote), a filter box (Enter opens the first match), a
   row opens `?s=<market>#charts`. Hide (x) folds it to a tab at the right edge (`#ms-wlp-btn`); `window.msWatchlist()` is the read-only view.
@@ -2635,9 +2645,117 @@ Display only, `market-structure.html` (`<style id="ms-fit-css">` + `<script id="
   line saying to scroll left for more), **Auto** (fit the price scale), **Log** and **%** (the chart library's price-scale modes 1 and 2 on EVERY
   chart; one display preference `ms-scale-mode`; Log keeps Settings' `#ms-show-log` box in step). Up to 640 px the group is one "…" button that
   opens the rest. Appended to the chart's PARENT (the drawing layer captures presses inside the chart element). Not for guests.
+- **Layout with three charts** (26 Nov 2026, owner's screenshot): the fit measured the first pane, which spans two rows there and is taller than
+  its chart, so every chart came out about a quarter of the window. It now reads the pane with the least around its chart, and the big chart is
+  `--ch-h2` (two charts and the gap) tall. "Log a call" and "Structure" are icons at 1180-1439 px and "Log a call" up to 1799 px (they wrapped
+  the toolbar to a second row).
+- **No grid lines** (26 Nov 2026, owner: "the white grids I want them out"): `tvLook` and `cusLook` draw the charts without grid lines (panes, the free chart, Markets side by side).
+- **Market switch without the wait** (26 Nov 2026, the next step toward a main chart app): a market link (`a[href^="?s="]`, the watchlist, the
+  market list, Home, the wheel bar through `window.msGoMarket(k, hash)`) still loads the page again (so every stream, level and record belongs to
+  the new market), but `<script id="ms-swap-js">` reads that market's candles for the six analysed timeframes while the pointer rests on the link
+  (120 ms) or at the press, and the click hands them over in sessionStorage `ms-swap` + `ms-swap-at` (public candles, at most 12 s old at the
+  click, refused after 20 s, read once and removed). `<script id="ms-swap-head">` then holds the first paint until the app script has run
+  (`<link rel="expect" href="#ms-swap-ready" blocking="render">`, added only on such an arrival) and the pages cross-fade
+  (`@view-transition { navigation: auto }`, `html[data-vt="swap"]`); every OTHER navigation skips the transition (`pagereveal`), so nothing else
+  changed. `boot()` uses a handed timeframe instead of `fetchBars` and fetches the rest as always; polling and ticks follow. The click waits at
+  most 200 ms for candles still on their way. Never for guests. Measured locally at 1440 px: 0.8-1.2 s before, about 0.5 s with the pointer on
+  the row first, charts drawn at the first paint. `window.msSwap()` is the read-only view. A true no-reload switch was looked at and left: the
+  page's streams, timers and per-market keys are set up once per load. Test: `tests/charts-swap.test.mjs`.
 - Checked in a browser at 1920, 1440, 1280, 1180 x 820, 820 x 1180, 932 x 430, 844 x 390, 700 x 500, 568 x 320, 390 x 844 and 360 x 640: the grid
   ends 10 px above the window (6 px above the phone's bars) in every view, no sideways scroll; drawing, full screen, the phase strip, a resize
   and a market change through the watchlist work. Not checked on a real phone. Test: `tests/charts-fit.test.mjs`.
+
+## Candles with no delay, the charts-only app, touch (26 Nov 2026, owner: "I want the candles faster, no delays and make an app just for the charts, try to have easy to move touch smooth on phones as well")
+Display only: nothing here places, changes or refuses an order.
+- **Live candles** (`api/stream.js`, `market-structure.html` `startTicks(pre)`): the stream forwards every OANDA quote at once (`GAP_MS` 25 ms
+  apart at most; it was 100) and sends OANDA's heartbeat as an `hb` event the page hears, so a silent connection is replaced after
+  `STREAM_QUIET` 12 s (45 before; a quiet market's heartbeats keep its stream). `boot()` opens the stream BESIDE the candle reads (`early`,
+  its last quote applied once the charts exist). `STREAM_LIFE` 240 s into a stream a second one is opened and takes over at its first
+  price (`renew`, `G.esRenew`), so the server's 4.5-minute limit leaves no gap; back from another tab or app after `STREAM_AWAY` 8 s the
+  same hand-over starts at once; `online` reconnects. The forming candle moves to each price in the same frame: "Smooth price motion"
+  (the eased body) is OFF unless the member ticked it (`ms-smooth` === '1'; it was on by default and trailed the price a few frames).
+  The other markets' streams (free charts, Markets) hear `hb` too. Not measured on a live market (written during the daily break).
+- **Charts app** `/charts` (vercel.json rewrite to `charts.html`): `scripts/charts-app.mjs` (build.sh, after pwa.mjs, before
+  stamp-assets) copies the built Desk page with `html[data-app="charts"]`, title "Aureum Charts" and its own manifest
+  `charts.webmanifest` (id and start `/charts`), so a phone or desktop installs it as an app of its own (Add to Home Screen / Install
+  from `/charts`). In it `showView` always shows Charts, the site header, tab bar, side rail and view switch are hidden on every
+  screen (`<style id="ms-app-css">`; the toolbar's Menu button brings them back), the wheel bar sits at the bottom edge, the page never
+  bounces or pulls to refresh, and two page-wide housekeeping observers stand down. Same sign-in, same candles, same tools: one source,
+  the Desk page. Ways in: account menu "Charts app", the main app's shortcut. Phone chart 713 px tall at 390 x 844 (587 in the Desk).
+- **Touch** (same style block, `pointer: coarse`): a chart that fills the view (`.ms-grid4:not([data-view="all"]) .ms-chart`, `.mm-chart`)
+  has `touch-action: none`, so the browser never waits to choose between scrolling the page and moving the chart and never zooms the
+  page on a pinch; no text selection, callout or tap flash on a chart; no vertical overscroll on Charts. The six-chart view keeps the
+  page's scrolling. A phone on its side: Log a call and Structure leave the toolbar so it stays one row. Panning measured about 1 ms
+  of script a frame on a phone profile; not checked on a real phone.
+- Tests: `tests/charts-app.test.mjs`, `tests/desk-live.test.mjs` (the stream hand-over on a fake EventSource and clock).
+
+## Quick type and drawing undo on the Charts (27 Nov 2026, owner: "Keep improving the charts")
+Display only. `assets/ms-quick.js` (`window.MS_QUICK` pure `parseTf`, `matchMarkets`; loaded after ms-draw.js): on Charts (and the
+Charts app), not for guests, typing a digit opens a "Timeframe" box ("15" = M15, "60" = H1, "240" = H4, "4h", "30s", "1d", "w",
+"1M"; Enter applies through `msOneTf`) and a letter a "Market" box (the key, the label or the name; arrows, Enter goes through
+`msGoMarket`). A lone digit 0-6 keeps its old pane meaning after 0.9 s; the tool letters f h t b p m r and "/" (the command palette)
+are left alone. Styles `.ms-qk` (glass in `assets/soft.css`). `assets/ms-draw.js`: every save keeps the market's previous saved
+drawings in memory (100 steps, gone on a reload): Ctrl / Cmd + Z undo, Ctrl + Shift + Z or Ctrl + Y redo, and both in the right-click
+menu; `window.msDrawUndo` / `msDrawRedo`. The right-click menu also offers "Horizontal line at <price>" and "Alert at <price>" (a line
+alert, `d.alert`) at the price under the pointer. Arrow keys move the chart under the mouse a candle (Shift: ten), up / down zoom, End
+goes to the latest candle (not while a pane is in replay). **Drawings list** (`#ms-dlist`, Alt+L or the right-click menu,
+`window.msDrawList`): every drawing of the market, newest first; a row selects it and brings it into view, Lock / Delete per row.
+**Hide drawings** (Alt+Shift+H, the menu, or the eye button in the drawing strip, which also has a list button for phones; memory only, a new tool shows them again; `window.msDrawHide`). The drawing tools' short
+messages (`#ms-dr-note`) float at the bottom of the screen instead of pushing the charts down a line. Never Alt+D (the browser's address bar).
+Test: `tests/charts-quick.test.mjs`.
+
+**On-chart ink follows the chart's background** (27 Nov 2026): with the paper look (a light chart) on a dark page, each pane's header,
+the O H L C line and the on-chart buttons were dark-theme ink on the light chart (contrast about 1.1-2.3:1) and the BO / CF / iBO / VR
+tags had dark backings. `.ms-live[data-chart]` (set by `applyTheme` from the chart's own background) now gives `.ms-pane` and `.mm-c` the
+light tokens when the chart is light on a dark page and the dark tokens when it is dark on a light page; the cycle tag `.ms-cy` follows;
+the markup's label backings take `CUS.bg`. Never style text on a chart from the page theme alone.
+**Charts polish, 27 Nov 2026**: "Structure" is its icon at 1440-1799 px too (it wrapped the toolbar to a second row: the chart is 34 px
+taller); the watchlist's crypto rows read Kraken's public ticker through `window.msCryptoQuotes` (main script, next to `msQuotes`; at most
+every 25 s, change against today's 00:00 UTC open, said in the watchlist's note; the fit script still makes no request of its own); Markets
+side by side keeps its candles above the volume band (`scaleMargins` top 0.1, bottom 0.18). Test: `tests/charts-quick.test.mjs`.
+
+## Charts speed (27 Nov 2026, owner: "Keep improving the charts, speed")
+Display only, `market-structure.html`. Measured on the Desk's Charts (1440 px, live OANDA candles, no tick stream): (1) **a refresh no
+longer rebuilds a chart**: each pane's poll (every 3-10 s on the low timeframes) used to `setData` every candle, the volume, the averages,
+the indicators and run the analysis; `window.msPollPlan(old, nx)` (pure) says what the refresh changed: `'same'` = nothing redrawn, the
+candles from the old last one on (at most 3 new) = the tick path `P.push` (series.update, analysis at most every 2 s or on a closed
+candle, off-screen panes only marked stale), `null` (an older candle changed, another feed, a shifted history) = the full rebuild as
+before. (2) **The background scanner waits while the Charts are on screen** (`onCharts`, `SCAN.later`): it read 6 timeframes of every
+market the council's snapshot does not cover (about 66 requests at load and every 5 minutes) and competed with the chart's own candles;
+the snapshot part still runs, the rest starts when another view opens. (3) Two page-wide watchers (the scroll-box fades, the "Loading"
+labels) stand down on the Charts and run once when another view opens; a pane tells the drawing layer it is visible from its
+IntersectionObserver (`P.vis`), not a layout read each frame. Load: 113 -> 47 candle requests in the first 12 s; idle with the charts
+open: 1.15 -> 0.76 s of main-thread work per 20 s, script 0.33 -> 0.17 s. Test: `tests/charts-speed.test.mjs`.
+
+## Demo account settings on the owner's Profile (27 Nov 2026, owner: "In my profile make me available to manage the demo account settings risk, assign strategies etc")
+The owner's session only. Profile card `#ms-pf-dset` (row "Demo account settings" under More; `<style id="ms-ds-css">` + `<script
+id="ms-ds-js">`, loads when the card comes on screen, keeps nothing in the browser): every book the demo mirror copies and every demo
+job, each with its demo account (a picker of the mirror's accounts with login ending, label and balance; the base / the job's default;
+or another account by number or `*<login digits>`), its risk a trade in % and an on / off switch. Save sends ONLY the fields changed
+on screen, on top of what was saved before (`changes`), so a value never touched is not frozen into the file.
+- **Rules, one copy** `api/_demo-settings.js` (pure; `BOOKS` = the mirror's books with their `LIMITS.risk` key and today's value,
+  `JOBS` = vb, gotobi, nq (+ `ujRisk`), dom, dom4 with their defaults and limits; a test compares all of them with the code).
+  `clean` checks every field (a book 0.01-5 %, a job its own limit; books sized together, council / replica / shadow / LIT, must agree),
+  `apply(cfg, settings, accFile)` lays them over config.json: `mirrorAccounts`, `drain` (an account a book moved away from keeps a
+  round to manage its open copies), `mirrorRisk`, `mirrorOff`, and the jobs' keys. `live` and every other key are untouched.
+- **Endpoint** `api/demo-settings.js` (routed in `cloudflare/src/worker.mjs`, `vercel.json`): GET = the stored settings, today's
+  mapping (`ctrader/mirror-accounts.json`), the jobs' config.json values and the accounts (a live account is never listed); POST
+  (same origin) writes council-data `owner/demo-settings.json` through the GitHub contents API with `GH_MCP_TOKEN`, else `GH_TOKEN`
+  (needs Contents: write); without such a token the card says saving is not set up and nothing is saved.
+- **Council** `council/owner-config.mjs` `readConfig(dir)`: config.json with the settings on top (a missing or broken file changes
+  nothing), read by `ctrader-mirror.mjs` (accounts, risk over `LIMITS.risk`, `openBooks` without the books switched off: their open
+  copies are still managed to their exits), `ctrader-account.mjs`, `vb-demo.mjs`, `gotobi.mjs`, `nq-demo.mjs`, `dom-demo.mjs`.
+  **The owner's saved values win over the code's defaults and config.json**: a later code change to a book's risk or account does
+  not reach a field the owner saved. Demo only: `council/live.mjs` and the jobs' `--live` mode never read it; the mirror and the jobs
+  still refuse a live account; nothing here moves or removes a stop. Test: `tests/demo-settings.test.mjs`.
+
+## Indicator values in the chart legend (27 Nov 2026, owner: "Keep improving the charts")
+Display only, `market-structure.html`. Each Desk chart pane's legend (`.ch-lg`) has one row per indicator under O H L C, as
+TradingView shows it: the study's name and its values at the candle under the crosshair (the newest one when the pointer is away).
+`indDraw` records the rows in `out.leg` from what it already computed, so the legend computes nothing while the crosshair moves.
+`window.msIndLegend(rows, i, n, fmt)` (pure) builds them: names escaped, a colour shown only when it is a plain colour, "—" before
+a study has a value, at most 8 rows. A guide line with one value everywhere (RSI's 70 / 30) is drawn but left out of the legend
+(`flatLine`). No rows during bar replay. The free chart and Markets side by side are not done. Test: `tests/charts-ind-legend.test.mjs`.
 
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
@@ -7266,6 +7384,11 @@ What the evidence is: `nq1-leads-exec` (l1 +0.269R, l5 +0.364R a trade after fin
 
 **NQ2: the two leads the demo job trades, as an Equinox desk** (26 Nov 2026, owner: "Put the edge on the desk with the results since january on calendar"). `council/edge-desks-2.mjs` `nq2Trades` (`DESKS2.nq2`, `NQ2_IDS` l1 + l5, market nas100, `extra: { '5m': 60 }`; kinds `nq2-l1` / `nq2-l5`; `leadTrades(L, ctx, from, desk)` now takes the desk name): exactly the trades the NQ1 desk reads for those two leads (a test compares), one position at a time a reading. Loop line `--only …,nq1,zero,nq2,lyriac,dom`; `nq2/desk.json` + `detail/`; `mosha-desk.mjs` `clean`, `datahealth.mjs`, `desk-trades.js` `DESKS.nq2`, `desk-live.js`, `equinox.html` `#v-nq2` (tab "NQ2" after ZERO). Filled with `node --use-env-proxy council/edge-desks.mjs <dir> --days 330 --from 2026-01-01 --only nq2`: 202 closed trades to 26 Nov 2026, before costs: l1 112 trades, 30 won, +8.8R (October −8.0R, November −6.0R); l5 90 trades, 25 won, +6.4R. **Not new evidence**: 2026 lies inside the years the search and the tick study read; only trades from 26 Nov 2026 are forward. The readings overlap: totals are not additive. This is the PAPER reading on OANDA candles; the demo job's own fills are council-data `nq/trades.json`. Test: `tests/nq1-desk.test.mjs` ("NQ2").
 **Gold breakout added to NQ2** (26 Nov 2026, owner: "add the gold break out on nq2"): `nq2Trades` with market `xau` = the Gold breakout desk's own T1 trades (`vbDays`, the same entries, stops and R as `goldvb`: a test compares) under kind `nq2-t1`, label "Gold breakout: UTC open ± ½ the previous range"; `DESKS2.nq2.markets` = `['nas100', 'xau']`. The desk is then the owner's planned book for a later live account less the USD/JPY breakout. Three readings on two markets: totals are not additive across the Nasdaq leads, and a desk total is never evidence.
+**The gold 8-swing break added to NQ2** (27 Nov 2026, owner: "Put it in nq2"): `NQ2_GOLD` (kind `nq2-bo8`, the genome of
+`research/edge/gold-bo8-exec` `G`, a test compares) read by `leadTrades` on gold H1 built from the 5-minute candles: an H1 close above the
+last unbroken 8-a-side swing high, long at the next open, stop 0.75 x ATR(14), 6R, out after 24 hours, one position at a time, the
+researcher's own skip when the stop is under twice the cost. Filled from 1 Jan 2026: 76 closed, 24 won, +41.7R before costs. Those months
+lie inside the years the search and the tick study read: not new evidence; only trades from 27 Nov 2026 on are forward.
 
 **The live account's planned book** (26 Nov 2026, owner: "Lyriac (no gotobi) should be in the same live account as well"): when the owner's real account exists, the plan is the Nasdaq job (l1, l5) AND Lyriac's two breakouts (gold and USD/JPY, `council/vb-demo.mjs`), never the gotobi fade, on that ONE account. Today both jobs already share one DEMO account (the Shadows + LIT demo account, `accountFor`); nothing live is wired, and the three conditions of the section above apply to the breakout job as well (its own deliberate change, the account's digits from the owner, the exception written into the rules). The gotobi job stays demo. Risk on that account (owner: "1% for both"): 1 % a trade for the Nasdaq rules and for the breakouts (the breakouts were already 1 %, `config.vb.risk`).
 
@@ -7306,3 +7429,32 @@ month-sum t, Holm over five, bar: mean > 0 in both sets and both halves, 2x cost
 R2 -0.064R (n 1,003, -1.19), R3 -0.097R (n 3,301, -3.79), R4 -0.099R (n 8,751, -6.11), R5 +0.042R (n 180, t 0.40, Set A -0.196R). Before costs every
 reading is about zero (-0.03 to +0.09R). Not an edge; no variants on these years. Nothing live changed. The candle cache was rebuilt in the session
 (`fetch-cache.mjs`, EDGE_DATA). Test: `tests/fvg-qm-timeframes.test.mjs`.
+
+## The researcher's gold 8-swing break at the broker's own ticks (27 Nov 2026, owner: "Yes" to pricing the gold result)
+`research/edge/gold-bo8-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`,
+MEANING.md, RESULT.md, result.json; probe tags `gbo8-entry`, `gbo8-dead`, `gbo8-fills-1/2`). The auto-2 result
+`xau|bo8any|long|none|0.75|6` (an H1 close above the last unbroken 8-a-side H1 swing high, bought at the next open; stop 0.75 x
+ATR(14), target 6R, out after 24 H1 candles; gate: equal to the engine's `simulate`), 282 orders 2023-12 to 2026-11, filled at the
+demo broker's ask and closed at its bid, after commission (0.000024 a side) and the demo's overnight financing on a gold buy.
+**PASS**: +0.714R a trade after costs (n 280, month t 4.02; mid +0.739R; 2 without an entry quote, none unresolved); every year
+positive; without the ten best trades +0.52R. Found among about 4 million looks on these same years and long only in a rising gold:
+a candidate for a forward record, never an edge; the rollover split in RESULT.md is a selection effect. Nothing live changed.
+Test: `tests/gold-bo8-exec.test.mjs`.
+
+## The live account (27 Nov 2026, owner: "Ima set up the live account now, risk 0.5 per trade -15% daily stop"; rules "All")
+The one exception to absolute rule 2 (docs/owner-decisions.md item 64). `council/live.mjs`: `liveConfig(cfg)` (config.json `live =
+{ on, account: '*<last digits of the live login>', risk 0.005 (at most 0.01), dayStop 0.15 }`), `liveEnvOk(env)` (`CTRADER_LIVE=on`,
+the app id and secret, `CTRADER_LIVE_ACCESS_TOKEN` else the demo token), `pickLive` (exactly ONE account with `isLive === true` whose
+login ends in the digits; a demo account is never picked), `liveConnect` (the live host through `ctrader-mirror.mjs` `liveSession`;
+`session()` still refuses every host but the demo's), `dayGate` (the UTC day's first balance seen = its start, `live/day.json`; no
+NEW order once the balance is `dayStop` under it; open positions keep their own stops and exits), `modeOf`. The jobs: `node
+council/nq-demo.mjs data --live` (l1, l5, uj and `BO8` = the gold 8-swing break, `LIVE_IDS`; every rule at `live.risk`; the
+researcher's cost skip for bo8) and `node council/vb-demo.mjs data --live` (gold and USD/JPY breakouts), each round and quick pass
+in council.yml; records `live/nq.json`, `live/vb.json`, labels `lv-<demo label>`; the demo records and labels are untouched and the
+demo runs go on beside it. Every order carries its stop and is read back (rule 1). OFF until the owner (1) authorises the live
+account for the cTrader app, (2) sets `CTRADER_LIVE=on`, (3) gives the login's last digits for config.json. Not checked against the
+real live server (the build sandbox reaches no broker): the live host name is cTrader Open API's documented `live.ctraderapi.com:5036`.
+Named 27 Nov 2026: owner rule `live-on-7653` = the Fusion USD live account ending 7653 (the GBP live account ending 7681 is never picked).
+Faster orders (owner, 27 Nov 2026: "make sure the orders are faster"): council.yml `fastorder` (inside every 20-second `fastcopy`) runs the Nasdaq job (live and demo) in the first 12 minutes of each hour and the breakout job in the first 20 minutes of a UTC day, and `nap` wakes 9 s after the hour, so an hourly rule's order goes out soon after the candle close. Then ("more faster"): an hour watcher runs in the background beside the rounds, wakes 1 s after every hour and runs the order jobs every 2 s for a minute (live first), whatever member the round is on; every order-job call goes through `job` (one flock per job and mode, so the same job never runs twice at once and a live job never waits for a demo one); `nq-demo.mjs` `LOOK_FROM` 1 s, and a missing candle of the new hour counts as a shut market only after `SHUT_AFTER` 60 s (it marked the hour looked at once before).
+Gold at 3 % (owner, 27 Nov 2026: "on gold change risk to 3 %", live): rule `live-gold-3` sets `live.goldRisk` 0.03 (`LIVE.maxGold` 3 %): the gold breakout and the gold 8-swing break risk 3 % a trade on the live account; the Nasdaq and USD/JPY rules stay 0.5 %.
+Tests: `tests/live-account.test.mjs`.

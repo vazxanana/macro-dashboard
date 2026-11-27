@@ -412,6 +412,17 @@ const USER_RULES = [
   { id: 'ict-mirror-off', apply: (c) => { c.mirrorIct = false; },
     change: 'cTrader mirror: no new ICT copies on any demo account (owner, 24 Nov); the ICT desk stays paper only',
     why: 'Owner request of 24 Nov 2026, so its demo account can trade the Equinox desks. Copies opened before (none were open) keep following their records with their stops. Undo: a user rule setting c.mirrorIct = true.' },
+  // live-on-7653 (owner, 27 Nov 2026: "lets set up live account", chose the USD Fusion account, login ending 7653): turns on
+  // the one live account of council/live.mjs (docs/owner-decisions.md item 64). Still needs CTRADER_LIVE=on in the environment,
+  // and the token must see exactly ONE live account whose login ends 7653; 0.5 % a trade, no new order 15 % under the day's start.
+  { id: 'live-on-7653', apply: (c) => { c.live = { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 }; },
+    change: 'Live account on: the Fusion USD account ending 7653, 0.5 % a trade, 15 % daily stop (Nasdaq l1 / l5, USD/JPY morning breakout, gold 8-swing break, gold and USD/JPY breakouts)',
+    why: 'Owner, 27 Nov 2026 (item 64). Every order carries its stop; nothing else reaches the account. Off: a user rule setting c.live = { on: false }.' },
+  // live-gold-3 (owner, 27 Nov 2026: "on gold change risk to 3 %", for the live account): the live gold rules (gold breakout, gold
+  // 8-swing break) risk 3 % of the balance a trade; the Nasdaq and USD/JPY rules keep 0.5 %. council/live.mjs caps gold at 3 %.
+  { id: 'live-gold-3', apply: (c) => { c.live = { ...(c.live || {}), goldRisk: 0.03 }; },
+    change: 'Live account: gold rules (gold breakout, gold 8-swing break) 3 % of the balance a trade; the others stay 0.5 %',
+    why: 'Owner, 27 Nov 2026, real money. Two gold stop-outs in a day cost about 6 %; the 15 % daily stop is about five. Every order carries its stop.' },
 ];
 config.userRules = config.userRules || [];
 // supported-book (owner, 11 Nov 2026): the systems whose NEW trades are paper shadows; ownerSh(k) reads the config the rule wrote

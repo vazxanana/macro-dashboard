@@ -1,7 +1,9 @@
 // Live OANDA prices as Server-Sent Events: /md/stream?sym=xau. One upstream pricing stream per viewer, forwarded tick by tick
-// (at most ~10 messages a second since 19 Nov 2026; 5 before). It closes after ~4.5 min and the browser's EventSource reconnects on its own.
+// (every quote at once, at most one per 25 ms, since 26 Nov 2026; 10 a second before). OANDA's heartbeat goes on as an `hb` event the
+// page can hear, so a silent connection is noticed in seconds. It closes after ~4.5 min; the page opens the next stream before that.
 const { SYM } = require('./_oanda');
 let acct = null;
+const GAP_MS = 25;   // the least time between two messages to one viewer
 module.exports = async (req, res) => {
   const inst = SYM[String((req.query && req.query.sym) || '')], tok = process.env.OANDA_TOKEN;
   if (!inst) return res.status(400).json({ error: 'unknown sym' });
@@ -30,10 +32,10 @@ module.exports = async (req, res) => {
       let i; while ((i = buf.indexOf('\n')) >= 0) {
         const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1); if (!line) continue;
         let m; try { m = JSON.parse(line); } catch (e) { continue; }
-        if (m.type === 'HEARTBEAT') { res.write(': hb\n\n'); continue; }
+        if (m.type === 'HEARTBEAT') { res.write('event: hb\ndata: 1\n\n'); continue; }
         if (m.type !== 'PRICE' || !m.bids || !m.asks) continue;
         pend = { t: +m.time, b: +m.bids[0].price, a: +m.asks[0].price, ok: m.tradeable !== false };
-        const wait = 100 - (Date.now() - last); if (wait <= 0) flush(); else if (!flushT) flushT = setTimeout(flush, wait);
+        const wait = GAP_MS - (Date.now() - last); if (wait <= 0) flush(); else if (!flushT) flushT = setTimeout(flush, wait);
       }
     }
   } catch (e) { /* aborted or closed: the browser reconnects */ }

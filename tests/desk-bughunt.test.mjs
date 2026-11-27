@@ -88,9 +88,9 @@ test('a drawing let go outside its chart is let go', () => {
 
 test('full screen: the floating parts are made, moved and shown inside the full-screen element (the browser\'s and the page\'s own)', () => {
   assert.match(DRAW, /const fsHost = \(\) => document\.fullscreenElement \|\| document\.querySelector\('#v-charts\.ch-fake-fs'\) \|\| document\.body;/);
-  assert.equal((DRAW.match(/fsHost\(\)\.appendChild\(/g) || []).length, 2, 'the style bar and the right-click menu, made on first use');
+  assert.equal((DRAW.match(/fsHost\(\)\.appendChild\(/g) || []).length, 3, 'the style bar, the right-click menu and the drawings list, made on first use');
   assert.doesNotMatch(DRAW, /document\.body\.appendChild\((el|m)\)/);
-  assert.match(DRAW, /for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts'\]\)/);
+  assert.match(DRAW, /for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts', 'ms-dlist'\]\)/);
   assert.match(DRAW, /document\.addEventListener\('fullscreenchange', fsMove\); document\.addEventListener\('ms:fs', fsMove\);/);
   assert.match(PAGE, /document\.dispatchEvent\(new Event\('ms:fs'\)\);/, 'the page\'s own full screen says so');
   // the rule that hides everything else in full screen leaves them alone
@@ -127,8 +127,8 @@ test('volume profile: the free charts carry the feed\'s volume, and a move of th
 });
 
 test('a price stream that goes silent is asked again; a market shut for the weekend is not read every second', () => {
-  assert.match(PAGE, /const STREAM_QUIET = 45e3;/);
-  assert.match(PAGE, /if \(document\.hidden\) \{ heard = Date\.now\(\); return; \} if \(marketClosed\(\) \|\| Date\.now\(\) - heard < STREAM_QUIET\) return;\s*clearInterval\(quiet\); try \{ es\.close\(\); \} catch \(e\) \{\} G\.es = null; if \(G\.live\) \{ G\.live = false; setStatus\(\); \} startTicks\(\);/);
+  assert.match(PAGE, /const STREAM_QUIET = 12e3,/);   // 45 s until 26 Nov 2026; the stream's heartbeat is heard now
+  assert.match(PAGE, /if \(document\.hidden\) \{ heard = Date\.now\(\); return; \}[\s\S]{0,200}?if \(marketClosed\(\) \|\| Date\.now\(\) - heard < STREAM_QUIET\) return;\s*clearInterval\(quiet\); try \{ es\.close\(\); \} catch \(e\) \{\} G\.es = null; if \(G\.live\) \{ G\.live = false; setStatus\(\); \} startTicks\(\);/);
   assert.match(PAGE, /if \(f\.es && f\.open && Date\.now\(\) - \(f\.heard \|\| 0\) > STREAM_QUIET\) \{ try \{ f\.es\.close\(\); \} catch \(e\) \{\} clearTimeout\(f\.re\); f\.open\(\); \}/, 'the free charts\' streams too');
   const src = /const shutNow = (\(I, d = new Date\(\)\) => \{[^\n]*?\});\n/.exec(PAGE)[1], shut = new Function(`return ${src};`)();
   const at = (s) => new Date(s), fx = { group: 'Forex' };

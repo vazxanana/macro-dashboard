@@ -34,6 +34,7 @@ import { PT, scrubber, orderStep, pendingStep, cancelStep, amendStep, normName }
 import { connect, accountFor } from './gotobi.mjs';
 import { buildZones } from '../research/edge/combo-grid-3/run.mjs';
 import { COSTS } from '../research/edge/combo-grid-2/run.mjs';
+import { readConfig } from './owner-config.mjs';
 
 export const LABEL = 'dom';
 // A second, separate record (26 Nov 2026, owner: "yes do gold dom 4r on demo"): `node council/dom-demo.mjs data --variant gold4r`.
@@ -114,7 +115,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   const scrub = scrubber(env), file = path.join(dir, V.key, 'trades.json'), now = Math.floor(clock() / 1000), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
   let J; try { J = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { if (fs.existsSync(file)) { log(`dom: ${V.key}/trades.json does not parse: left as it is`); return { skipped: 'file' }; } J = { trades: [] }; }
   J.trades = J.trades || []; J.notOffered = J.notOffered || {};
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
+  const cfg = readConfig(dir);   // config.json with the owner's demo settings on top (council/owner-config.mjs)
   const C = cfg[V.key] || {}; if (C.on === false) return { skipped: 'off' };
   if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('dom: cTrader demo not configured'); return { skipped: 'config' }; }
   const account = (C.account && String(C.account).trim()) || (V === BASE ? String(env.CTRADER_ACCOUNT_ID || '').trim() : String(accountFor(dir, env, cfg) || '').trim()); if (!account) { log('dom: no demo account for it'); return { skipped: 'account' }; }

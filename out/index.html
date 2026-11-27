@@ -36,20 +36,38 @@
 <!-- charting library served from this site (same connection, cached for a year); the public CDN is the fallback -->
 <!-- 11 Nov (desk load): the charting library's script tag sits just before the app script in the body, so the first screen paints
      without waiting for it. No preload: the browser finds the tag as the page arrives, after the styles the first paint needs. -->
+<script id="ms-swap-head">
+/* market switch without the wait (26 Nov 2026): the page that was left hands over the next market's candles (sessionStorage
+   'ms-swap', a 20-second cache of public candles, read once). Only then: the first paint waits for the charts and the old page
+   cross-fades into the new one. Any other navigation is as it was (its view transition is skipped). */
+(function () { var ok = false; try {
+  var m = sessionStorage.getItem('ms-swap-at'), p = m ? m.split('|') : null, k = null;
+  try { k = new URLSearchParams(location.search).get('s'); } catch (e) {}
+  ok = !!(p && p[0] === k && Date.now() - +p[1] < 20000);
+  if (m && !ok) { sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); }
+  if (ok) { var R = document.documentElement; R.dataset.vt = 'swap';
+    var l = document.createElement('link'); l.rel = 'expect'; l.href = '#ms-swap-ready'; l.setAttribute('blocking', 'render'); document.head.appendChild(l);
+    setTimeout(function () { if (R.dataset.vt === 'swap') delete R.dataset.vt; }, 1500); }
+} catch (e) {}
+  window.MS_SWAP_IN = ok;
+  try { addEventListener('pagereveal', function (e) { if (e.viewTransition && !ok) e.viewTransition.skipTransition(); }); } catch (e) {}
+})();
+</script>
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3" defer></script>
-<script src="/assets/ms-draw.js?v=715b85c043" defer></script>
+<script src="/assets/ms-draw.js?v=f0ecc1dbb7" defer></script>
+<script src="/assets/ms-quick.js?v=9dee0227b8" defer></script>
 <script src="/assets/ms-paper.js?v=b052c8753d" defer></script>
 <script src="/assets/ms-vprof.js?v=b6a82cd65f" defer></script>
 <script src="/assets/ms-script.js?v=237d9fd7d7" defer></script>
 <script src="/assets/ms-phase.js?v=05b91e8028" defer></script>
-<script src="/assets/ms-charts-guide.js?v=d11de693cd" defer></script>
+<script src="/assets/ms-charts-guide.js?v=6b9635c518" defer></script>
 <script src="/assets/mosha-desk.js?v=bfa1c0c95c" defer></script>
 <script src="/assets/mosha-record.js?v=fd0623aee3" defer></script>
 <script src="/assets/mosha-systems.js?v=f3fc074083" defer></script>
 <script src="/assets/mosha-sop.js?v=5afd5c1c8c" defer></script>
 <script src="/assets/mosha-replay.js?v=8499d92d48" defer></script>
-<script src="/assets/desk-trades.js?v=0fe96d36d3" defer></script>
+<script src="/assets/desk-trades.js?v=496d37ce80" defer></script>
 <script src="/assets/desk-live.js?v=28c7f6b689" defer></script>
 <script src="/assets/ms-journal.js?v=4fc2cd90b0" defer></script>
 <script src="/assets/mosha-i18n.js?v=22ed49dcd7" defer></script>
@@ -1329,7 +1347,7 @@ window.msFetchUsers = function () {
   if (E.mosha) document.documentElement.dataset.mosha = E.mosha;   // the Mosha desk is open to this account ('teach' = may send lessons)
   // owner, 18 Nov 2026: a member whose home is the Macro desk (the "macro" account) lands there, once per browser tab, so the
   // Desk switch still opens the Desk afterwards; a link to a view (#…) is never redirected; no redirect when storage is unavailable
-  if (R && R.home === 'macro' && E.macro && !location.hash) { try { if (!sessionStorage.getItem('ms-landed')) { sessionStorage.setItem('ms-landed', '1'); location.replace('/macro-desk'); } } catch (e) {} }
+  if (R && R.home === 'macro' && E.macro && !location.hash && document.documentElement.dataset.app !== 'charts') { try { if (!sessionStorage.getItem('ms-landed')) { sessionStorage.setItem('ms-landed', '1'); location.replace('/macro-desk'); } } catch (e) {} }
   var guest = null; try { guest = localStorage.getItem('ms-guest'); } catch (e) {}
   if (!owner && !R && !guest) document.documentElement.dataset.gate = '1'; if (guest && !owner && !R) document.documentElement.dataset.guest = '1'; })();
 /* ms-data:start */
@@ -2096,6 +2114,11 @@ html[data-motion="off"] .odo > span { animation-duration: 1ms; } html[data-motio
 @keyframes vt-out-b { to { opacity: 0; transform: translateX(28px); } }
 @keyframes vt-in-b { from { opacity: 0; transform: translateX(-36px); } }
 @media (prefers-reduced-motion: reduce) { ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; } }
+/* market switch (26 Nov 2026): a page-to-page cross-fade, only when the head script marked the arrival (data-vt="swap") */
+@view-transition { navigation: auto; }
+html[data-vt="swap"]::view-transition-old(root) { animation: none; }
+html[data-vt="swap"]::view-transition-new(root) { animation: vt-fade .14s ease-out both; }
+@keyframes vt-fade { from { opacity: 0; } }
 
 /* ═══ POLISH 3 · professional & smooth (7 Nov) ═══ */
 /* 1 rendering */
@@ -2221,6 +2244,7 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .ch-lg { position: absolute; top: 8px; left: 10px; right: 90px; z-index: 3; pointer-events: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font: 500 11.5px/1.35 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-faint); text-shadow: 0 0 6px var(--panel), 0 0 2px var(--panel); }
 .ch-lg .k { color: var(--ink-faint); margin-left: 4px; } .ch-lg .k:first-child { margin-left: 0; }
 .ch-lg b { font-weight: 600; } .ch-lg b.up { color: var(--buy); } .ch-lg b.dn { color: var(--sell); }
+.ch-lg .ind-r { flex-basis: 100%; display: flex; gap: 6px; flex-wrap: wrap; } .ch-lg .ind-r b { font-weight: 500; }
 .ch-lg .chg { margin-left: 6px; } .ch-lg .cur { display: inline-flex; gap: 4px; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); } .ch-lg .t { margin-left: 8px; color: var(--ink-faint); }
 @media (max-width: 700px) { .ch-lg { font-size: 10.5px; right: 64px; gap: 0 4px; } .ch-lg .t { display: none; } }
 .ms-chart { position: relative; }
@@ -2649,7 +2673,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msThemeMeta();
 })();
 </script>
-<link rel="stylesheet" href="/assets/soft.css?v=74a1850eb4">
+<link rel="stylesheet" href="/assets/soft.css?v=f4c1f7e1f6">
 <style id="ms-pk-css">
 .gate-pk { margin-top: 10px; }
 .gate-pkb { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: var(--g-ink, #eceef2); font: 600 14.5px Figtree, -apple-system, sans-serif; cursor: pointer; touch-action: manipulation; }
@@ -2864,7 +2888,7 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
          the whole view goes full screen; the charts share the height that is left, in whatever view is on (All, Split, Layout, one chart) */
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) { background: var(--bg); padding: 10px 14px; overflow: hidden; display: flex !important; flex-direction: column; gap: 6px; }
       /* 20 Nov 2026: the floating parts that are moved in here (a drawing's style bar, the right-click menu, a chart's timeframe menu, the toasts) are not hidden with the rest */
-      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ms-dsel):not(.ms-cmenu):not(.ph-menu):not(#ms-toasts):not(.ch-fs-x):not(.ch-fs-tb) { display: none !important; }
+      :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > :not(.sec-h):not(.ch-row):not(#ms-sp-bar):not(#ms-pp):not(.ms-fav):not(.ms-dsel):not(.ms-cmenu):not(.ms-qk):not(.ms-dlist):not(.ph-menu):not(#ms-toasts):not(.ch-fs-x):not(.ch-fs-tb) { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .ch-row { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-row > .ch-col { flex: 1 1 auto; }   /* a phone has no rail: the column still takes the full height (20 Nov 2026) */ :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col { display: flex; flex-direction: column; min-height: 0; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) .ch-col > .mm { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > .sec-h > :is(h1, h2, .wl, .wl-wrap, .adr, .mtf, .cycle) { display: none !important; }
       :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp { margin: 0; padding: 6px 10px; } :is(#v-charts:fullscreen, #v-charts.ch-fake-fs) > #ms-pp .pp-ttl small { display: none; }
@@ -3048,6 +3072,9 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       .dr-bar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .dr-bar .dr-mag small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--accent); } .dr-bar .dr-mag small:empty { display: none; }
       .dr-note { order: 9; font-size: 12px; color: var(--ink-dim); } .dr-note:empty { display: none; }
+      /* 27 Nov 2026: the drawing tools' short messages float over the charts instead of pushing them down a line */
+      #v-charts .dr-note:not(:empty) { position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 72; max-width: calc(100vw - 32px); padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); color: var(--ink); font: 500 13px var(--sans); pointer-events: none; }
+      @media (max-width: 700px) { #v-charts .dr-note:not(:empty) { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); } }
       .ms-dsel { position: fixed; left: 0; top: 0; z-index: 60; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); font: 600 12px var(--sans); color: var(--ink); }
       .ms-dsel { flex-wrap: wrap; max-width: calc(100vw - 16px); box-sizing: border-box; }   /* a phone: the bar wraps to rows inside the screen (it ran 230 px past a 390 px screen: Lock, Clone, Delete out of reach; 20 Nov 2026) */
       .ms-dsel[hidden] { display: none; } .ms-dsel .sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }
@@ -3057,6 +3084,29 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       .ms-dsel .del { color: var(--sell); }
       .ms-cmenu { position: fixed; left: 0; top: 0; z-index: 70; min-width: 210px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 10px 30px rgba(0,0,0,.3); display: grid; }
       .ms-cmenu[hidden] { display: none; } .ms-cmenu button { text-align: left; min-height: 34px; padding: 0 12px; border: 0; border-radius: 7px; background: transparent; color: var(--ink); font: 500 13px var(--sans); cursor: pointer; }
+      .ms-dlist { position: fixed; right: 16px; top: 120px; z-index: 71; width: min(340px, calc(100vw - 32px)); max-height: min(70vh, 560px); overflow: auto; padding: 8px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: 0 16px 40px rgba(0,0,0,.3); color: var(--ink); font: 500 13px var(--sans); }
+      #ms-dr-bar [data-dh] .dh-x { display: none; } #ms-dr-bar [data-dh][aria-pressed="true"] .dh-x { display: inline; }
+      .ms-dlist[hidden] { display: none; } .ms-dlist .dl-h { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px; } .ms-dlist .dl-h span { flex: 1; color: var(--ink-dim); font-size: 12px; }
+      .ms-dlist ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; } .ms-dlist li { display: flex; align-items: center; gap: 4px; border-radius: 8px; } .ms-dlist li.on { background: var(--panel-2, rgba(127,127,127,.14)); }
+      .ms-dlist .dl-go { flex: 1; min-width: 0; display: grid; text-align: left; gap: 1px; min-height: 40px; padding: 4px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; cursor: pointer; }
+      .ms-dlist .dl-go:hover { background: var(--panel-2, rgba(127,127,127,.1)); } .ms-dlist .dl-go span { color: var(--ink-dim); font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .ms-dlist .dl-ic { min-width: 36px; min-height: 36px; padding: 0 6px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font: 500 12px var(--sans); cursor: pointer; } .ms-dlist .dl-ic:hover:not(:disabled) { background: var(--panel-2, rgba(127,127,127,.12)); color: var(--ink); } .ms-dlist .dl-ic:disabled { opacity: .4; cursor: default; }
+      .ms-dlist .dl-e { margin: 6px; color: var(--ink-dim); } @media (pointer: coarse) { .ms-dlist .dl-ic, .ms-dlist .dl-go { min-height: 44px; } .ms-dlist .dl-ic { min-width: 44px; } }
+      /* 27 Nov 2026: what is drawn ON a chart (its header, the O H L C line, the on-chart buttons) follows the chart's own background,
+         not the page theme: the paper look is a light chart on a dark page, and the header and legend were dark-theme ink on it */
+      :root:not([data-theme="light"]) .ms-live[data-chart="light"] :is(.ms-pane, .mm-c) { --au-bg: #f2f3f5; --au-surface: #ffffff; --au-surface-2: #e7e9ec; --au-well: #f7f8f9; --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20); --au-line-soft: rgba(20,24,30,.06); --au-ink: #17191c; --au-ink-2: #474c54; --au-ink-3: #5b616a; --au-accent: #2f5e9e; --au-gain: #0a7350; --au-loss: #b3261e; --au-warn: #8a5a00;
+        --bg: #f2f3f5; --panel: #ffffff; --panel-raised: #e7e9ec; --panel-hover: #e7e9ec; --panel-2: #f7f8f9; --well: #f7f8f9; --line: rgba(20,24,30,.10); --line-soft: rgba(20,24,30,.06); --line-strong: rgba(20,24,30,.20); --ink: #17191c; --ink-dim: #474c54; --ink-faint: #5b616a; --accent: #2f5e9e; --buy: #0a7350; --sell: #b3261e; --buy-soft: rgba(10,115,80,.10); --sell-soft: rgba(179,38,30,.10); --buy-ink: #075c40; --sell-ink: #951c16; --warn-ink: #714900; --gold-ink: #24497c; --accent-ink: #24497c; color-scheme: light; }
+      :root[data-theme="light"] .ms-live[data-chart="dark"] :is(.ms-pane, .mm-c) { --au-bg: #121315; --au-surface: #1a1c1f; --au-surface-2: #23262a; --au-well: #16181b; --au-line: rgba(255,255,255,.08); --au-line-strong: rgba(255,255,255,.16); --au-line-soft: rgba(255,255,255,.05); --au-ink: #ecedef; --au-ink-2: #b4b8bf; --au-ink-3: #a4a9b1;
+        --bg: #121315; --panel: #1a1c1f; --panel-raised: #23262a; --panel-hover: #23262a; --panel-2: #16181b; --well: #16181b; --line: rgba(255,255,255,.08); --line-soft: rgba(255,255,255,.05); --line-strong: rgba(255,255,255,.16); --ink: #ecedef; --ink-dim: #b4b8bf; --ink-faint: #a4a9b1; --au-accent: #9db4d3; --accent: #9db4d3; --au-gain: #4cc38a; --au-loss: #f2726a; --au-warn: #e8b04b; --buy: #4cc38a; --sell: #f2726a; --buy-ink: #4cc38a; --sell-ink: #f2726a; --warn-ink: #e8b04b; --gold-ink: #9db4d3; --accent-ink: #9db4d3; color-scheme: dark; }
+      :root:not([data-theme="light"]) .ms-live[data-chart="light"] .ms-ph .ms-cy { color: #8a3fb0; } :root:not([data-theme="light"]) .ms-live[data-chart="light"] .ms-ph .ms-cy.pullback { color: #714900; }
+      :root[data-theme="light"] .ms-live[data-chart="dark"] .ms-ph .ms-cy { color: #d3a4ec; } :root[data-theme="light"] .ms-live[data-chart="dark"] .ms-ph .ms-cy.pullback { color: #e8b04b; }
+      .ms-qk { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 72; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: 0 16px 40px rgba(0,0,0,.35); color: var(--ink); font: 500 13px var(--sans); }
+      .ms-qk[hidden] { display: none; } .ms-qk .qk-h { font-size: 12px; color: var(--ink-dim); margin-bottom: 6px; }
+      .ms-qk .qk-in { font: 600 22px var(--mono, var(--sans)); letter-spacing: .02em; min-height: 30px; } .ms-qk .qk-in i { display: inline-block; width: 2px; height: 22px; margin-left: 2px; vertical-align: -3px; background: var(--accent); }
+      .ms-qk .qk-r { margin-top: 6px; color: var(--ink-dim); } .ms-qk .qk-f { margin-top: 8px; font-size: 12px; color: var(--ink-faint); }
+      .ms-qk .qk-l { display: grid; gap: 2px; margin-top: 6px; } .ms-qk .qk-l button { display: flex; gap: 10px; align-items: baseline; min-height: 36px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+      .ms-qk .qk-l button.on, .ms-qk .qk-l button:hover { background: var(--panel-2, rgba(127,127,127,.12)); } .ms-qk .qk-l span { color: var(--ink-dim); font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+      .ms-cmenu button kbd { float: right; margin-left: 14px; font: 500 12px var(--sans); color: var(--ink-faint); background: none; border: 0; }
       .ms-cmenu button:hover:not([disabled]), .ms-cmenu button:focus-visible { background: var(--panel-hover, rgba(127,127,127,.12)); outline: none; } .ms-cmenu button[disabled] { color: var(--ink-faint); cursor: default; } .ms-cmenu .cm-sep { border: 0; border-top: 1px solid var(--line); margin: 4px 6px; }
       .lay-pop { position: absolute; z-index: 45; right: 0; top: calc(100% + 6px); width: 300px; max-width: calc(100vw - 32px); display: grid; gap: 8px; padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--ink); box-shadow: 0 10px 30px rgba(0,0,0,.3); }
       .lay-pop[hidden] { display: none; } .lay-pop .sty-seg button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -3126,6 +3176,30 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
           #ms-tr .tr-note { font-size: 12px; color: var(--tr-ink3); }
           @media (pointer: coarse) { #ms-tr .tr-seg button { min-height: 44px; } #ms-tr details > summary { min-height: 44px; align-items: center; } }
         </style>
+<style id="ms-ds-css">
+      /* Demo account settings (27 Nov 2026): the owner's own card on the Profile; tokens only */
+      .pf-ds .ds-h { margin: 14px 0 6px; font-size: 13px; font-weight: 650; color: var(--au-ink, var(--ink)); }
+      .pf-ds .ds-h:first-child { margin-top: 0; }
+      .pf-ds .ds-t { display: grid; gap: 6px; }
+      .pf-ds .ds-r { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr) 92px 64px; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 10px; background: var(--au-well, var(--panel-2, transparent)); }
+      .pf-ds .ds-r.off .ds-n { opacity: .62; }
+      .pf-ds .ds-n b { display: block; font-size: 13px; font-weight: 600; color: var(--au-ink, var(--ink)); }
+      .pf-ds .ds-n small { display: block; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      .pf-ds select, .pf-ds input[type="number"], .pf-ds input[type="text"] { width: 100%; min-height: 36px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font: inherit; font-size: 13px; }
+      .pf-ds .ds-rk { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); }
+      .pf-ds .ds-on { display: flex; justify-content: flex-end; }
+      .pf-ds .ds-sw { position: relative; width: 44px; height: 26px; border-radius: 13px; border: 1px solid var(--au-line, var(--line)); background: var(--au-surface-2, var(--panel-2)); cursor: pointer; padding: 0; }
+      .pf-ds .ds-sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--au-ink-3, var(--ink-faint)); transition: transform .15s ease; }
+      .pf-ds .ds-sw[aria-checked="true"] { background: var(--au-gain, var(--buy)); border-color: transparent; }
+      .pf-ds .ds-sw[aria-checked="true"]::after { transform: translateX(18px); background: #fff; }
+      .pf-ds .ds-cust { margin-top: 4px; }
+      .pf-ds .ds-acts { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+      .pf-ds .ds-ch { font-size: 12px; color: var(--au-warn, var(--gold-ink)); }
+      .pf-ds .ct-msg.ok { color: var(--au-gain, var(--buy)); }
+      @media (max-width: 640px) { .pf-ds .ds-r { grid-template-columns: minmax(0, 1fr) 84px 56px; } .pf-ds .ds-n { grid-column: 1 / -1; } }
+      @media (pointer: coarse) { .pf-ds select, .pf-ds input[type="number"], .pf-ds input[type="text"] { min-height: 44px; font-size: 16px; } .pf-ds .ds-on { min-height: 44px; align-items: center; } }
+      @media (prefers-reduced-motion: reduce) { .pf-ds .ds-sw::after { transition: none; } }
+      </style>
 <style id="ms-trv-css">
 /* Trade replay (#ms-trv-js, 7 Nov): the trade viewers (#ms-tv council / systems, #ict-tv ICT desk) as phone sheets with a #trade/<id> link */
 .tv-nb { display: grid; gap: 6px; padding: 10px 16px 12px; border-top: 1px solid var(--line-soft); font-size: 12.5px; color: var(--ink-dim); line-height: 1.5; }
@@ -5746,7 +5820,7 @@ html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role=
 .mm-h select { min-height: 32px; max-width: 46%; padding: 0 8px; border: 1px solid var(--au-line, var(--line)); border-radius: 8px; background: var(--au-surface, var(--panel)); color: var(--au-ink, var(--ink)); font: 600 13px var(--sans); }
 .mm-px { margin-left: auto; font: 650 13px var(--sans); font-variant-numeric: tabular-nums; color: var(--au-ink, var(--ink)); }
 .mm-ch { font-size: 12px; font-variant-numeric: tabular-nums; } .mm-ch.up { color: var(--buy-ink, var(--buy)); } .mm-ch.dn { color: var(--sell-ink, var(--sell)); }
-.mm-src { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); white-space: nowrap; }
+.mm-src { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }   /* 27 Nov 2026: shrinks instead of running past the cell */
 .mm-chart { height: max(300px, calc((100vh - 300px) / 2)); }
 .mm[data-n="2"] .mm-chart, .mm[data-n="3"] .mm-chart { height: max(380px, calc(100vh - 300px)); }
 @media (max-width: 900px) { .mm-g, .mm[data-n="3"] .mm-g { grid-template-columns: minmax(0, 1fr); } .mm-chart, .mm[data-n] .mm-chart { height: min(46vh, 420px); } .mm-src { display: none; } }
@@ -5887,6 +5961,8 @@ html:not([data-role="public"])[data-view="charts"] .top .brand #ms-mk-btn { disp
    (and --mm-h for Markets side by side), so the charts end at the bottom of the window on every screen: phone, phone on its
    side, tablet, desktop, with or without the paper bar or an open phase strip. No fixed numbers. Not for guests, not in full screen. */
 html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4.ms-grid4 .ms-chart { height: var(--ch-h, 420px) !important; min-height: 0 !important; max-height: none !important; }
+/* Layout with three charts: the big one spans both rows, so its chart is two charts and the gap between them tall */
+@media (min-width: 901px) { html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4.ms-grid4.ms-grid4[data-view="lay"][data-lay-n="3"] .ms-pane[data-lay-i="0"] .ms-chart { height: var(--ch-h2, var(--ch-h, 420px)) !important; } }
 html[data-chfit]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .mm.mm .mm-chart { height: var(--mm-h, 380px) !important; min-height: 0 !important; }
 html[data-chfit][data-view="charts"]:not([data-role="public"]) .foot { display: none; }
 /* the space between the toolbar, the phase strip and the charts is one small step (the view is a grid: its row gap also
@@ -5933,6 +6009,38 @@ html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fu
   html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h { margin-bottom: 4px; }
   html[data-view="charts"]:not([data-role="public"]) #v-charts #ms-phase { margin: 0 0 6px; }
 }
+/* More room for the chart (26 Nov 2026, owner: "Try to use more the space"). On every screen the chart's own header (timeframe, trend, cycle) lies ON the chart's top-left corner instead of in a row above it, with the
+   candle's O H L C line under it; from 1180 px the Market phase strip is a chip in the toolbar (the script moves it there; opened, it
+   takes a row of its own); the page's side margins and the toolbar are thinner. */
+@media all {
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4 .ms-pane > .ms-ph { position: absolute; z-index: 7; top: 0; left: 0; right: 70px; background: transparent !important; border: 0 !important; pointer-events: none; min-height: 0; padding: 3px 8px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4 .ms-pane > .ms-ph > * { pointer-events: auto; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) .ms-grid4 .ms-pane .ms-chart > .ch-lg { top: 38px; }
+}
+@media (min-width: 1180px) {
+  html[data-view="charts"]:not([data-role="public"]) .ms-live.app { padding-left: 6px; padding-right: 6px; padding-bottom: 6px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) { padding-top: 2px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts:not(:fullscreen):not(.ch-fake-fs) > .sec-h { padding-top: 1px; padding-bottom: 1px; margin-bottom: 4px; row-gap: 2px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts .ch-row { gap: 6px; }
+  html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts #ms-wlp, html[data-chfit][data-view="charts"]:not([data-role="public"]) #v-charts #ms-wlp-btn { margin-left: 0; }
+  #v-charts .sec-h > #ms-phase { order: 3; flex: 0 0 auto; width: auto; max-width: 250px; margin: 0 !important; min-width: 0; background: transparent; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  #v-charts .sec-h > #ms-phase > summary { padding: 6px 10px; min-height: 0; border-radius: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; font-size: 12.5px; }
+  #v-charts .sec-h > #ms-phase[open] { order: 99; flex: 1 0 100%; max-width: none; }
+  #v-charts .sec-h > #ms-phase[open] > summary { max-width: none; }
+}
+/* a laptop (1180 to 1439 px): the toolbar stays one row: Style is its "Aa" button, the phase chip is shorter, Help waits in the Menu state */
+@media (min-width: 1180px) and (max-width: 1439px) {
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn { font-size: 0; min-width: 40px; padding-left: 10px; padding-right: 10px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn small { display: none; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h #ms-sty-btn::before { content: "Aa"; font-size: 14px; font-weight: 600; }
+  html[data-view="charts"]:not([data-role="public"]):not([data-chnav="1"]) #v-charts .sec-h > .ch-help { display: none !important; }
+  #v-charts .sec-h > #ms-phase:not([open]), #v-charts .sec-h > #ms-phase:not([open]) > summary { max-width: 132px; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h::after { display: none; }   /* the older forced break before Style: one row now */
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sty.sty { order: 4; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(#ms-sa-btn, #ms-jr-btn) { order: 4; }
+  html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl, html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn .sa-bl { display: none; }   /* icons: "Log a call" wrapped to a second row */
+}
+@media (min-width: 1440px) and (max-width: 1799px) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-jr-btn .jr-bl, html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > #ms-sa-btn .sa-bl { display: none; } }   /* "Log a call" and "Structure" as their icons: they wrapped the toolbar */
 /* Watchlist (desktop, 1280 px and up): every market with its price and its change on the day, beside the chart. A row opens
    that market. Its Hide button folds it to a tab at the right edge; the choice stays on this device. */
 #ms-wlp, #ms-wlp-btn { display: none; }
@@ -5959,6 +6067,28 @@ html[data-chfit]:not([data-role="public"]) #v-charts #ms-rail::-webkit-scrollbar
 #ms-wlp .wlp-p { text-align: right; color: var(--au-ink-2, var(--ink-dim)); }
 #ms-wlp .wlp-n { padding: 8px 10px; font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); border-top: 1px solid var(--au-line, var(--line)); }
 </style>
+<style id="ms-app-css">
+/* Charts app (26 Nov 2026, owner: "make an app just for the charts"). /charts is this page with html[data-app="charts"] (a copy made
+   at build by scripts/charts-app.mjs, with its own manifest so it installs as its own app): Charts is the only view, the site
+   header, tab bar and side rail step aside on every screen (the toolbar's Menu button brings them back), the page never
+   bounces or pulls to refresh. Display only. */
+html[data-app="charts"]:not([data-chnav="1"]) :is(header.top, nav.btab, #ps-sw) { display: none !important; }
+html[data-app="charts"]:not([data-chnav="1"]) body { padding-left: 0 !important; }
+html[data-app="charts"]:not([data-chnav="1"]) .ms-live.app { padding-bottom: 0 !important; padding-top: env(safe-area-inset-top, 0px); }
+html[data-app="charts"]:not([data-role="public"]) #ms-fit-menu { display: inline-flex; }
+html[data-app="charts"]:not([data-chnav="1"]) #ms-wb { bottom: env(safe-area-inset-bottom, 0px) !important; }
+html[data-app="charts"] #ms-me-charts { display: none; }
+html[data-app="charts"], html[data-app="charts"] body { overscroll-behavior: none; }
+@media (max-height: 560px) and (orientation: landscape) { html[data-view="charts"]:not([data-role="public"]) #v-charts .sec-h > :is(#ms-jr-btn, #ms-sa-btn) { display: none !important; } }   /* a phone on its side: one toolbar row */
+/* Touch (26 Nov 2026, owner: "easy to move, touch smooth on phones"): a chart that fills the view takes every touch itself, so
+   the browser never waits to decide between scrolling the page and moving the chart, never zooms the page on a pinch and
+   never selects text or opens the callout on a long press. The six-chart view keeps the page's own scrolling. */
+@media (pointer: coarse) {
+  html[data-view="charts"] #v-charts .ms-grid4:not([data-view="all"]) .ms-chart, html[data-view="charts"] #v-charts .mm-chart { touch-action: none; }
+  html[data-view="charts"] #v-charts :is(.ms-chart, .mm-chart) { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+  html[data-view="charts"], html[data-view="charts"] body { overscroll-behavior-y: none; }
+}
+</style>
 <style id="ms-cn-css">
 /* On-chart controls (26 Nov 2026): at the lower right of every chart, as a trading terminal has them: back to the latest
    candle (shown only when the chart is scrolled away from it), go to a date, and the price scale: auto fit, log, percent.
@@ -5970,6 +6100,11 @@ html[data-role="public"] .ms-cn { display: none; }
 .ms-cn button[aria-pressed="true"] { color: var(--au-ink-1, var(--ink)); border-color: var(--au-accent, var(--accent)); box-shadow: inset 0 -2px 0 var(--au-accent, var(--accent)); }
 .ms-cn button:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 1px; }
 .ms-cn .cn-live[hidden] { display: none; }
+/* with a mouse the scale and date buttons show while the pointer is over that chart (the latest-candle button always) */
+@media (hover: hover) and (pointer: fine) {
+  .ms-cn button:not(.cn-live) { opacity: 0; transition: opacity .15s; }
+  :hover > .ms-cn button, .ms-cn:focus-within button, .ms-cn button[aria-pressed="true"] { opacity: 1; }
+}
 .ms-cn .cn-live { border-radius: 999px; }
 @media (pointer: coarse) { .ms-cn button { min-width: 40px; height: 36px; font-size: 13px; } }
 /* a phone: one small button; a tap on it shows the rest, so the candles stay in sight */
@@ -6712,6 +6847,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
           <a role="menuitem" class="me-link" id="ms-me-profile" href="#profile">Profile and demo accounts</a>
           <a role="menuitem" class="me-link adm own" id="ms-me-academy" href="/academy">Aureum Academy</a>
           <a role="menuitem" class="me-link adm" id="ms-me-farm" href="/farm">Agent Farm</a>
+          <a role="menuitem" class="me-link" id="ms-me-charts" href="/charts">Charts app</a>
           <button type="button" role="menuitem" id="ms-me-photo">Change photo</button>
           <button type="button" role="menuitem" id="ms-me-rmphoto" hidden>Remove photo</button>
           <button type="button" role="menuitem" id="ms-me-rename">Change display name</button>
@@ -6907,7 +7043,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
         <div class="sty-h">Live price</div>
-        <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion</label>
+        <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion (a little later)</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
         <div class="sty-h">Markup</div>
         <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-clean" aria-pressed="false">Clean look</button><small class="sty-note" id="ms-sty-note">Keeps only the BO, VR and CF; hides the rest (origin, next setup, trade lines, iBO, earlier breaks, zones, Mosha and cycle notes, trade history, sessions, news, volume, key levels). Tap again to bring them back.</small></div>
@@ -7531,6 +7667,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <nav class="pf-box pf-list" id="ms-pf-more" aria-labelledby="ms-pf-more-h">
           <button class="pf-row" type="button" data-pf-go="ms-pf-pk" hidden><i class="pf-ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9.5v1M15 9.5v1M12 9.5v3.5h-1"/><path d="M9 16c1.6 1.2 4.4 1.2 6 0"/></svg></i><span class="pf-tx"><b>Face ID devices</b><small>Where Face ID or fingerprint signs you in</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-nt" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0112 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 004 0"/></svg></i><span class="pf-tx"><b>Send a notification</b><small>A message on every member's bell</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+          <button class="pf-row" type="button" data-pf-go="ms-pf-dset" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></i><span class="pf-tx"><b>Demo account settings</b><small>Which strategy trades where, its risk, on or off</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-snd" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10v4h4l5 4V6L8 10z"/><path d="M16.5 9a4 4 0 010 6"/></svg></i><span class="pf-tx"><b>ChronosTrade sounds</b><small>What a target or a stop sounds like</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <button class="pf-row" type="button" data-pf-go="ms-pf-mcp" hidden><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7L4 12l5 5M15 7l5 5-5 5"/></svg></i><span class="pf-tx"><b>ChatGPT connector</b><small>Work on the ICT edge from ChatGPT</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
           <a class="pf-row" href="/academy" data-pf-ac><i class="pf-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-4 9 4-9 4z"/><path d="M7 11v5c3 2 7 2 10 0v-5"/></svg></i><span class="pf-tx"><b>Aureum Academy</b><small>Replay a setup and train your eye</small></span><svg class="pf-chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></a>
@@ -7566,6 +7703,106 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <div class="pf-ct-h"><div><h2 id="ms-pf-mcp-t">ChatGPT connector</h2><div class="ct-sub">Work on the ICT edge from ChatGPT: read the rules and every signal, save notes, propose changes</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-mcp-b"></div>
       </section>
+      <section class="card pf-ct pf-ds" id="ms-pf-dset" aria-labelledby="ms-pf-dset-t" hidden>
+        <div class="pf-ct-h"><div><h2 id="ms-pf-dset-t">Demo account settings</h2><div class="ct-sub">Which strategy trades on which demo account, how much it risks, and whether it opens new trades</div></div></div>
+        <div class="ct-b pf-ct-b" id="ms-ds-b"><p class="ms-note" style="margin:0">Loading…</p></div>
+      </section>
+            <script id="ms-ds-js">
+      // Demo account settings (27 Nov 2026, owner: "In my profile make me available to manage the demo account settings risk, assign
+      // strategies etc"). The owner's session only. Reads /api/demo-settings, shows every strategy the demo mirror copies and every
+      // demo job with its account, its risk a trade and on / off, and saves the owner's changes (the server checks every field and
+      // writes council-data owner/demo-settings.json; the council reads it on its next round). Demo only. Nothing is kept in the browser.
+      (function () {
+        const R = document.documentElement, c = document.getElementById('ms-pf-dset'); if (!c) return;
+        const esc = (x) => String(x == null ? '' : x).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        const ok = () => R.dataset.role === 'owner' && /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname);
+        let D = null, loading = false;
+        // loads once the card is on screen (the Profile opened), not on every page load
+        const sync = () => { c.hidden = !ok(); };
+        if (typeof IntersectionObserver === 'function') new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting) && ok() && !D && !loading) load(); }).observe(c);
+        const b = document.getElementById('ms-ds-b');
+        const pct = (v) => (v == null || !isFinite(v) ? '' : String(+(v * 100).toFixed(3)));
+        const money = (v, cur) => (v == null ? '' : (cur === 'USD' || !cur ? '$' : cur + ' ') + Math.round(v).toLocaleString('en-GB'));
+        // the account picker: the mirror's demo accounts (label, login ending, balance), the base account, and "another account…"
+        function accOpts(val, accts, base) {
+          const o = ['<option value="">' + esc(base) + '</option>'], known = new Set(['']);
+          for (const a of accts) { known.add(a.id); o.push('<option value="' + esc(a.id) + '"' + (a.id === val ? ' selected' : '') + '>' + esc((a.login ? 'login ' + a.login : a.id) + (a.label ? ' · ' + a.label.slice(0, 40) : '') + (a.balance != null ? ' · ' + money(a.balance, a.currency) : '')) + '</option>'); }
+          if (val && !known.has(val)) o.push('<option value="' + esc(val) + '" selected>' + esc(val.charAt(0) === '*' ? 'login ending ' + val.slice(1) : 'account ' + val) + '</option>');
+          o.push('<option value="__other">Another demo account…</option>'); return o.join('');
+        }
+        function row(kind, k, def, cur, val) {
+          const acct = val.account !== undefined ? val.account : cur.account || '', risk = val.risk !== undefined ? val.risk : cur.risk, on = val.on !== undefined ? val.on : cur.on !== false;
+          const base = kind === 'book' ? 'The base account' : 'The job\'s own default account';
+          const max = kind === 'book' ? D.bookMax : def.max, min = kind === 'book' ? D.bookMin : D.riskMin, uj = def.uj;
+          return '<div class="ds-r' + (on ? '' : ' off') + '" data-kind="' + kind + '" data-k="' + esc(k) + '">'
+            + '<div class="ds-n"><b>' + esc(def.label) + '</b>' + (kind === 'book' && def.riskKey !== k ? '<small>Sized with the council\'s trades</small>' : uj ? '<small>' + esc(uj.label) + ': <input type="number" class="ds-uj" step="any" min="' + D.riskMin * 100 + '" max="' + uj.max * 100 + '" value="' + esc(pct(val.ujRisk !== undefined ? val.ujRisk : cur.ujRisk != null ? cur.ujRisk : uj.risk)) + '" aria-label="' + esc(uj.label) + ' risk, % a trade" style="width:70px;min-height:28px"> %</small>' : '') + '</div>'
+            + '<div><select class="ds-acc" aria-label="' + esc(def.label) + ': demo account">' + accOpts(acct, D.accounts, base) + '</select><input type="text" class="ds-cust" placeholder="Account number, or * and the login\'s last digits" aria-label="Another demo account" hidden></div>'
+            + '<label class="ds-rk"><input type="number" class="ds-risk" step="any" min="' + min * 100 + '" max="' + max * 100 + '" value="' + esc(pct(risk != null ? risk : def.risk)) + '" aria-label="' + esc(def.label) + ': risk, % of the balance a trade">%</label>'
+            + '<div class="ds-on"><button type="button" class="ds-sw" role="switch" aria-checked="' + on + '" aria-label="' + esc(def.label) + ': opens new trades"></button></div></div>';
+        }
+        function draw() {
+          const S = D.settings || {}, SB = S.books || {}, SJ = S.jobs || {};
+          b.innerHTML = '<p class="ms-note" style="margin:0 0 10px">Demo accounts only. A change reaches the council on its next round (about a minute). A strategy switched off opens nothing new; the trades it already has keep their own stop and target to their exit. Risk is the share of the account\'s balance one trade may lose at its stop.' + (D.canWrite ? '' : ' <b>Saving is not set up</b>: the site has no GitHub token that can write the council\'s data (GH_MCP_TOKEN or GH_TOKEN with Contents: write).') + '</p>'
+            + '<div class="ds-h">Strategies the demo mirror copies</div><div class="ds-t">' + Object.keys(D.books).map((k) => row('book', k, D.books[k], { account: D.current.books[k] || '', risk: null, on: true }, SB[k] || {})).join('') + '</div>'
+            + '<div class="ds-h">Demo jobs that trade a rule themselves</div><div class="ds-t">' + Object.keys(D.jobs).map((k) => row('job', k, D.jobs[k], D.current.jobs[k] || {}, SJ[k] || {})).join('') + '</div>'
+            + '<div class="ds-acts"><button type="button" class="ct-btn" id="ms-ds-save"' + (D.canWrite ? '' : ' disabled') + '>Save settings</button><button type="button" class="ct-btn ghost" id="ms-ds-undo">Undo changes</button><span class="ds-ch" id="ms-ds-ch" role="status"></span></div>'
+            + '<div class="ct-msg" id="ms-ds-msg" role="status"></div>' + (S.at ? '<p class="ms-note" style="margin:8px 0 0">Last saved ' + esc(new Date(S.at).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })) + '.</p>' : '');
+          wire();
+        }
+        // what the owner has on screen -> the settings to send (every row's account, risk and on/off)
+        function collect() {
+          const out = { books: {}, jobs: {} };
+          b.querySelectorAll('.ds-r').forEach((r) => {
+            const sel = r.querySelector('.ds-acc'), cu = r.querySelector('.ds-cust'), acct = sel.value === '__other' ? cu.value.trim() : sel.value;
+            const o = { account: acct, risk: +(+r.querySelector('.ds-risk').value / 100).toFixed(5), on: r.querySelector('.ds-sw').getAttribute('aria-checked') === 'true' };
+            const uj = r.querySelector('.ds-uj'); if (uj) o.ujRisk = +(+uj.value / 100).toFixed(5);
+            (r.dataset.kind === 'book' ? out.books : out.jobs)[r.dataset.k] = o;
+          });
+          // books sized as one (the council's, the replica, the shadows, LIT) take the council's risk
+          const ck = out.books.council && out.books.council.risk; for (const k of Object.keys(out.books)) if (D.books[k].riskKey === 'council' && ck != null) out.books[k].risk = ck;
+          return out;
+        }
+        // only what the owner changed on screen, on top of what was saved before: a value left as it was is not frozen into the
+        // file (so a later change in the council's own defaults still reaches a field the owner never set)
+        function changes(now, was, prev) {
+          const out = { books: {}, jobs: {} };
+          for (const kind of ['books', 'jobs']) for (const k of Object.keys(now[kind])) {
+            const o = { ...((prev[kind] || {})[k] || {}) }, n = now[kind][k], w = (was[kind] || {})[k] || {};
+            for (const f of Object.keys(n)) if (JSON.stringify(n[f]) !== JSON.stringify(w[f])) o[f] = n[f];
+            if (Object.keys(o).length) out[kind][k] = o;
+          }
+          return out;
+        }
+        window.msDemoSettingsChanges = changes;
+        let first = '';
+        function wire() {
+          first = JSON.stringify(collect());
+          const ch = document.getElementById('ms-ds-ch'), changed = () => { ch.textContent = JSON.stringify(collect()) !== first ? 'Unsaved changes' : ''; };
+          b.querySelectorAll('.ds-acc').forEach((s) => s.addEventListener('change', () => { const cu = s.parentNode.querySelector('.ds-cust'); cu.hidden = s.value !== '__other'; if (!cu.hidden) cu.focus(); changed(); }));
+          b.querySelectorAll('input').forEach((i) => i.addEventListener('input', changed));
+          b.querySelectorAll('.ds-sw').forEach((w) => w.addEventListener('click', () => { const on = w.getAttribute('aria-checked') !== 'true'; w.setAttribute('aria-checked', String(on)); w.closest('.ds-r').classList.toggle('off', !on); changed(); }));
+          document.getElementById('ms-ds-undo').addEventListener('click', () => draw());
+          document.getElementById('ms-ds-save').addEventListener('click', save);
+        }
+        async function save() {
+          const btn = document.getElementById('ms-ds-save'), msg = document.getElementById('ms-ds-msg'); msg.className = 'ct-msg'; btn.disabled = true; msg.textContent = 'Saving…';
+          const settings = changes(collect(), JSON.parse(first), D.settings || {});
+          try {
+            const r = await fetch('/api/demo-settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ settings }), cache: 'no-store' });
+            const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || (r.status === 401 ? 'Your session has ended. Sign in again.' : 'The server could not save (error ' + r.status + ').'));
+            D.settings = j.settings; draw(); const m = document.getElementById('ms-ds-msg'); m.className = 'ct-msg ok'; m.textContent = 'Saved. The council uses it from its next round.';
+          } catch (e) { btn.disabled = false; msg.textContent = e instanceof TypeError ? (navigator.onLine === false ? 'You are offline. Nothing was saved; connect and try again.' : 'The server could not be reached. Nothing was saved; try again.') : e.message + ' Nothing was saved.'; }
+        }
+        async function load() {
+          loading = true;
+          try { const r = await fetch('/api/demo-settings', { cache: 'no-store' }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'error ' + r.status); D = j; draw(); }
+          catch (e) { b.innerHTML = '<p class="ms-note" style="margin:0">The settings could not be loaded (' + esc(e.message || e) + ').</p><button type="button" class="ct-btn ghost" id="ms-ds-retry">Try again</button>'; document.getElementById('ms-ds-retry').addEventListener('click', () => { loading = false; load(); }); return; }
+          finally { loading = false; }
+        }
+        window.msDemoSettings = () => (D ? { settings: D.settings, onScreen: collect() } : null);
+        sync(); if (typeof MutationObserver === 'function') new MutationObserver(sync).observe(R, { attributes: true, attributeFilter: ['data-role'] });
+      })();
+      </script>
       <section class="card pf-ct" id="ms-pf-eqb" aria-labelledby="ms-pf-eqb-t" hidden>
         <div class="pf-ct-h"><div><h2 id="ms-pf-eqb-t">MetaTrader 5 bridge</h2><div class="ct-sub">Follow the Equinox desks from your own MetaTrader 5 demo account</div></div></div>
         <div class="ct-b pf-ct-b" id="ms-pf-eqb-b">
@@ -8101,6 +8338,13 @@ function msNextSetup(bars, A) {
   ];
   const BARS = 1500, PIVOT = 6, CAP = 6000;   // 12 Nov 2026: 1,500 candles a timeframe at load (was 500); scrolling back loads older ones up to CAP
   const POLL_N = 300;   // a refresh asks for the latest 300 and joins them to what is loaded (mergeBars), so older history stays
+  // what a refresh changed (27 Nov 2026, speed): 'same', the candles from the old last one on (at most 3 new), or null = rebuild
+  window.msPollPlan = (old, nx) => { if (!old || !old.length || !nx || !nx.length || nx.length < old.length || nx.length - old.length > 3) return null;
+    const eq = (a, b) => a === b || (a && b && a.time === b.time && a.open === b.open && a.high === b.high && a.low === b.low && a.close === b.close && (a.volume || 0) === (b.volume || 0));
+    let d = 0; while (d < old.length && eq(old[d], nx[d])) d++;
+    if (d === old.length && nx.length === old.length) return 'same';
+    if (d < old.length - 1 || nx[old.length - 1].time !== old[old.length - 1].time) return null;
+    return nx.slice(Math.min(d, old.length - 1)); };
   const mergeBars = (old, fresh) => { if (!old || !old.length || !fresh || !fresh.length) return fresh; const t0 = fresh[0].time; return old.filter((b) => b.time < t0).concat(fresh).slice(-CAP); };
   const INSTRUMENTS = {
     xau:    { group: 'Metals', md: 'xau', label: 'XAU/USD', name: 'Gold',     binance: 'PAXGUSDT', kraken: 'PAXGUSD', dec: 1, spot: true, size: 'gold', color: '#c99400' },
@@ -8156,7 +8400,7 @@ function msNextSetup(bars, A) {
   // candles of room on the right) instead of all its candles squeezed into the width. Display only.
   const TV_GRID = { light: '#f0f3fa', dark: 'rgba(255,255,255,0.045)', midnight: 'rgba(255,255,255,0.05)', pro: 'rgba(255,255,255,0.045)' };
   const tvLook = (t, k) => ({ layout: { background: { type: 'solid', color: t.bg }, textColor: t.text, fontSize: 12 },
-    grid: { vertLines: { visible: true, color: TV_GRID[k] || TV_GRID.dark }, horzLines: { visible: true, color: TV_GRID[k] || TV_GRID.dark } },
+    grid: { vertLines: { visible: false, color: TV_GRID[k] || TV_GRID.dark }, horzLines: { visible: false, color: TV_GRID[k] || TV_GRID.dark } },   // no grid lines (owner, 26 Nov 2026: "the white grids I want them out")
     crosshair: { mode: LW.CrosshairMode.Normal, vertLine: { color: '#9598a1', width: 1, style: LW.LineStyle.LargeDashed, labelBackgroundColor: '#131722' }, horzLine: { color: '#9598a1', width: 1, style: LW.LineStyle.LargeDashed, labelBackgroundColor: '#131722' } },
     rightPriceScale: { borderVisible: true, borderColor: t.border }, timeScale: { borderVisible: true, borderColor: t.border, rightOffset: 8, minBarSpacing: 0.5 },
     kineticScroll: { mouse: true, touch: true }, handleScale: { axisPressedMouseMove: { time: true, price: true }, mouseWheel: true, pinch: true } });
@@ -8178,7 +8422,7 @@ function msNextSetup(bars, A) {
   const chartLight = window.msChartLight = () => hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light';
   // a chart with its own background: that colour, an ink that reads on it, and the light grid on a light one
   const cusLook = (chart) => { if (!chart || !hexOk(CUS.bg)) return; const lt = lumOf(CUS.bg) > 0.35; try { chart.applyOptions({ layout: { background: { type: 'solid', color: CUS.bg }, textColor: lt ? '#3b4252' : '#a7b0c2' },
-    grid: { vertLines: { color: lt ? '#e9ecf1' : TV_GRID.dark }, horzLines: { color: lt ? '#e9ecf1' : TV_GRID.dark } }, rightPriceScale: { borderColor: lt ? '#d9dde4' : '#273042' }, timeScale: { borderColor: lt ? '#d9dde4' : '#273042' } }); } catch (e) {} };
+    grid: { vertLines: { visible: false, color: lt ? '#e9ecf1' : TV_GRID.dark }, horzLines: { visible: false, color: lt ? '#e9ecf1' : TV_GRID.dark } }, rightPriceScale: { borderColor: lt ? '#d9dde4' : '#273042' }, timeScale: { borderColor: lt ? '#d9dde4' : '#273042' } }); } catch (e) {} };
   const candleCols = () => { const K = themeCols(); if (CUS.mono && CUS.up === PAPER.up && CUS.dn === PAPER.dn) return MONO; if (!hexOk(CUS.up) && !hexOk(CUS.dn)) return K;
     const u = hexOk(CUS.up) ? CUS.up : K.upColor, d = hexOk(CUS.dn) ? CUS.dn : K.downColor;
     return { upColor: u, downColor: d, borderUpColor: u, borderDownColor: d, wickUpColor: u, wickDownColor: d }; };
@@ -8228,7 +8472,7 @@ function msNextSetup(bars, A) {
     if (!o.chart || !o.series) return;
     const ts = o.chart.timeScale(), s = o.series;
     const X = (l) => ts.logicalToCoordinate(l), Y = (p) => s.priceToCoordinate(p);
-    const it = o.items, t = THEMES[G.theme];
+    const it = o.items, t = Object.assign({}, THEMES[G.theme], hexOk(CUS.bg) ? { bg: CUS.bg } : {});   // 27 Nov 2026: label backings take the chart's own background (the paper look on a dark page)
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
       const HH = ctx.canvas.height / (window.devicePixelRatio || 1);
@@ -8841,6 +9085,7 @@ function msNextSetup(bars, A) {
       // cursor readout (7 Nov loop): the price under the crosshair and its distance from the last price
       let hx = h; const L0 = B[B.length - 1];
       if (lgHover && P._cp != null && isFinite(P._cp) && L0) { const d = P._cp - L0.close, pc2 = d / L0.close * 100; hx += `<span class="cur"><span class="k">⌖</span><b>${fmt(P._cp)}</b><b class="${d >= 0 ? 'up' : 'dn'}">${d >= 0 ? '+' : '−'}${fmt(Math.abs(d))} (${d >= 0 ? '+' : '−'}${Math.abs(pc2).toFixed(2)}%)</b><span class="k">from last</span></span>`; }
+      { const IL = P._ind && P._ind.leg; if (IL && IL.length && !P.rp) hx += window.msIndLegend(IL, i, B.length, fmt); }
       if (hx !== lgLast) { lg.innerHTML = hx; lgLast = hx; }
     };
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
@@ -9177,7 +9422,7 @@ function msNextSetup(bars, A) {
   // ChronosTrade's drawing tools on every chart (18 Nov 2026; assets/ms-draw.js, loaded with defer, picks these up): the same
   // shapes on every chart of a market, drawn and edited on any of them. Display only.
   window.msCharts = window.msCharts || { list: [], add(cx) { this.list.push(cx); document.dispatchEvent(new CustomEvent('ms:chart', { detail: cx })); } };
-  Object.values(panes).forEach((P) => window.msCharts.add({ id: P.tf.id, el: P.el, chart: P.chart, series: P.series, bars: () => P.bars || [], sec: () => P.tf.sec, market: () => instKey, TZ, dec: () => INST.dec ?? 2, fmt: (v) => fmt(v), visible: () => !!P.el.offsetParent }));
+  Object.values(panes).forEach((P) => window.msCharts.add({ id: P.tf.id, el: P.el, chart: P.chart, series: P.series, bars: () => P.bars || [], sec: () => P.tf.sec, market: () => instKey, TZ, dec: () => INST.dec ?? 2, fmt: (v) => fmt(v), visible: () => P.vis !== false && !(VCH && VCH.hidden) }));   // IntersectionObserver, no layout read each frame (27 Nov 2026)
   // the paper trading account (assets/ms-paper.js, 18 Nov 2026): the page's one-minute candles, the 15-minute candles for its ATR
   // stop, and one-minute candles of another market for the catch-up of its open positions. Read only.
   window.msPaperHost = { key: instKey, insts: INSTRUMENTS, TZ, m1: () => (panes['1m'] && panes['1m'].bars) || [], atr: () => (panes['15m'] && panes['15m'].bars) || [],
@@ -9252,6 +9497,14 @@ function msNextSetup(bars, A) {
   const MDQ = { at: 0, p: null, q: {} };
   // one unit of a cross's quote currency in US dollars, from the shared quotes (null until they are in)
   window.msQuotes = () => mdQuotes();   // the watchlist beside the chart reads the same shared quotes
+  // crypto has no OANDA quote: Kraken's public ticker (the page's own crypto source), change against today's 00:00 UTC open (27 Nov 2026);
+  // read by the watchlist beside the chart only, at most every 25 s; a failed read keeps the last good quotes
+  { const KR = { btc: 'XBTUSD', eth: 'ETHUSD', sol: 'SOLUSD', xrp: 'XRPUSD' }, KRK = { XXBTZUSD: 'btc', XBTUSD: 'btc', XETHZUSD: 'eth', ETHUSD: 'eth', SOLUSD: 'sol', XXRPZUSD: 'xrp', XRPUSD: 'xrp' };
+    let CQ = {}, cAt = 0;
+    window.msCryptoQuotes = async () => { if (Date.now() - cAt < 25e3) return CQ; cAt = Date.now();
+      try { const j = await fetch('https://api.kraken.com/0/public/Ticker?pair=' + Object.values(KR).join(','), { cache: 'no-store' }).then((r) => r.json()), n = {};
+        for (const [key, v] of Object.entries((j && j.result) || {})) { const k = KRK[key], c = v && v.c ? +v.c[0] : NaN, o = v ? +v.o : NaN; if (k && c > 0 && o > 0) n[k] = { k, c, ch: (c - o) / o * 100, src: 'kraken' }; }
+        if (Object.keys(n).length) CQ = n; } catch (e) { /* keep the last good quotes */ } return CQ; }; }
   window.msQuoteUsd = (I) => { if (!I || !I.quote) return null; const q = MDQ.q[I.quote[0]]; if (!q || !(q.c > 0)) return null; return I.quote[1] > 0 ? q.c : 1 / q.c; };
   function mdQuotes() {
     if (!MD.base || MD.on === false || window.msBootGate) return Promise.resolve({});   // no quotes under the first-load sign-in card
@@ -9903,7 +10156,7 @@ function msNextSetup(bars, A) {
   // data, the markup and every reading use the real quotes only, never an eased value). A candle refresh that comes back from
   // the edge cache older than the last tick keeps the tick (liveKeep), so the candle never jumps back.
   const LT = { q: [], px: null, t: 0, at: 0, raf: 0, disp: null, tgt: null, bt: 0, hdr: 0, n: 0, rate: 0, rt: 0 };
-  try { G.smooth = localStorage.getItem('ms-smooth') !== '0'; G.bidAsk = localStorage.getItem('ms-bidask') === '1'; } catch (e) { G.smooth = true; G.bidAsk = false; }
+  try { G.smooth = localStorage.getItem('ms-smooth') === '1'; G.bidAsk = localStorage.getItem('ms-bidask') === '1'; } catch (e) { G.smooth = true; G.bidAsk = false; }
   function liveTick(px, t, quote) {
     if (!isFinite(px) || px <= 0 || G.csv) return;
     if (!G.live) { G.live = true; setStatus(); }
@@ -9912,8 +10165,8 @@ function msNextSetup(bars, A) {
     if (!LT.raf) LT.raf = document.hidden ? setTimeout(liveFrame, 200) : requestAnimationFrame(liveFrame);   // a hidden tab gets no frames
   }
   window.msLiveTick = liveTick;
-  function liveKeep(P) {   // a refreshed candle older than the last tick keeps the tick's price
-    if (LT.px == null || !P.raw || !P.raw.length) return; const last = P.raw[P.raw.length - 1], bt = Math.floor(LT.t / P.tf.sec) * P.tf.sec;
+  function liveKeep(P, arr) {   // a refreshed candle older than the last tick keeps the tick's price
+    const A = arr || P.raw; if (LT.px == null || !A || !A.length) return; const last = A[A.length - 1], bt = Math.floor(LT.t / P.tf.sec) * P.tf.sec;
     if (last.time !== bt) return; last.close = LT.px; last.high = Math.max(last.high, LT.px); last.low = Math.min(last.low, LT.px);
   }
   function liveFrame(now) {
@@ -9983,23 +10236,45 @@ function msNextSetup(bars, A) {
     if (sm) { sm.checked = !!G.smooth; sm.addEventListener('change', () => { G.smooth = sm.checked; try { localStorage.setItem('ms-smooth', sm.checked ? '1' : '0'); } catch (e) {} if (!G.smooth) { LT.disp = LT.tgt; liveEase(); } }); }
     if (ba) { ba.checked = !!G.bidAsk; ba.addEventListener('change', () => { G.bidAsk = ba.checked; try { localStorage.setItem('ms-bidask', ba.checked ? '1' : '0'); } catch (e) {} bidAskDraw(); }); } }
   // OANDA ticks (Server-Sent Events from the /md/stream Vercel function): every price change moves the forming candle on all timeframes
-  const STREAM_QUIET = 45e3;
-  function startTicks() {
-    if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') return;
-    if (marketClosed()) { setTimeout(startTicks, 5 * 60e3); return; }   // no ticks over the weekend: look again later
-    const es = new EventSource(`${MD.base}stream?sym=${INST.md}`); G.es = es; let upd = 0, heard = Date.now();
+  // No delay (26 Nov 2026, owner: "I want the candles faster, no delays"): the stream is opened while the candles are still
+  // being read (boot hands it in as `pre`), its heartbeat is heard (event `hb`), so a connection that went silent is replaced
+  // after STREAM_QUIET 12 s (45 before); the next stream is opened STREAM_LIFE into this one and takes over at its first price,
+  // so the server's 4.5-minute limit never leaves a gap; and coming back to the tab or the app after 8 s away reconnects at once.
+  const STREAM_QUIET = 12e3, STREAM_LIFE = 240e3, STREAM_AWAY = 8e3;
+  const streamUrl = () => `${MD.base}stream?sym=${INST.md}`;
+  function startTicks(pre) {
+    if (G.csv || G.es || !MD.base || !INST.md || typeof EventSource === 'undefined') { if (pre && pre !== G.es) try { pre.close(); } catch (e) {} return; }
+    if (marketClosed() && !pre) { setTimeout(startTicks, 5 * 60e3); return; }   // no ticks over the weekend: look again later
+    const es = pre || new EventSource(streamUrl()); G.es = es; let heard = Date.now(), next = null; const born = Date.now();
+    const drop = () => { clearInterval(quiet); if (next) { try { next.close(); } catch (e) {} next = null; } try { es.close(); } catch (e) {} if (G.es === es) G.es = null; };
     es.onmessage = (m) => {
       heard = Date.now();
       let d; try { d = JSON.parse(m.data); } catch (e) { return; }
       if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
       G.quote = d; liveTick((d.b + d.a) / 2, d.t || Date.now() / 1000, d);
     };
+    es.addEventListener('hb', () => { heard = Date.now(); });
+    // a second stream that takes over at its first price; this one keeps the candles moving until then
+    const renew = () => { if (next || G.es !== es) return; const n = new EventSource(streamUrl()); next = n;
+      n.onmessage = (m) => { if (next !== n || G.es !== es) { try { n.close(); } catch (e) {} return; } next = null; clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; startTicks(n); if (n.onmessage) n.onmessage(m); };
+      n.onerror = () => { if (n.readyState === 2 && next === n) next = null; }; };
+    G.esRenew = renew;
     // a stream that goes silent with its connection open (20 Nov 2026): the browser reports no error for it, so the candles
     // froze until a reload. With the market open and the tab in view, STREAM_QUIET seconds without a price = ask again.
-    const quiet = setInterval(() => { if (G.es !== es) { clearInterval(quiet); return; } if (document.hidden) { heard = Date.now(); return; } if (marketClosed() || Date.now() - heard < STREAM_QUIET) return;
-      clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; if (G.live) { G.live = false; setStatus(); } startTicks(); }, 5000);
-    es.onerror = () => { if (es.readyState === 2) { G.es = null; const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 5000); } };
+    const quiet = setInterval(() => { if (G.es !== es) { clearInterval(quiet); return; } if (document.hidden) { heard = Date.now(); return; }
+      if (Date.now() - born > STREAM_LIFE && !marketClosed()) renew();   // the next stream, before this one ends
+      if (marketClosed() || Date.now() - heard < STREAM_QUIET) return;
+      clearInterval(quiet); try { es.close(); } catch (e) {} G.es = null; if (G.live) { G.live = false; setStatus(); } startTicks(); }, 1000);
+    es.onerror = () => { if (es.readyState === 2) { drop(); const sp = $('ms-hdr-spr'); if (sp) sp.hidden = true; if (G.live) { G.live = false; setStatus(); } setTimeout(startTicks, 1500); } };
+    G.esDrop = drop;
   }
+  // back from another tab or app: a phone usually cut the stream meanwhile, and the browser does not say so
+  { let awayAt = 0;
+    const back = () => { if (document.hidden) { awayAt = Date.now(); return; } const gone = awayAt ? Date.now() - awayAt : 0; awayAt = 0;
+      if (gone < STREAM_AWAY || !G.es || !G.booted || G.source !== 'OANDA' || marketClosed()) return;
+      if (G.esRenew) G.esRenew(); };
+    document.addEventListener('visibilitychange', back); window.addEventListener('pageshow', (e) => { if (e.persisted) { awayAt = Date.now() - STREAM_AWAY; back(); } });
+    window.addEventListener('online', () => { if (G.es && G.booted && G.source === 'OANDA') { if (G.esDrop) G.esDrop(); G.es = null; startTicks(); } }); }
   // Exchange price ticks (8 Nov, owner: "the charts should be moving like real data; bitcoin is static"): when the Binance stream
   // is not connected (blocked network, region, or a Kraken / Bitstamp source), the last price is read every 2.5 s from Binance,
   // else Kraken, and moves the forming candle on every pane the way the OANDA ticks do. Stops by itself once a stream is live.
@@ -10030,7 +10305,15 @@ function msNextSetup(bars, A) {
     ACTIVE.forEach((tf) => {
       const tick = async () => {
         try { const I = INST, r = await fetchBars(tf, I, POLL_N); const P = panes[tf.id]; if (I !== INST) throw 0;
-          P.raw = r.src === G.source ? mergeBars(P.raw, r.bars) : r.bars; liveKeep(P); P.rebuild(true); $('ms-updated').textContent = new Date().toLocaleTimeString(); }
+          // speed (27 Nov 2026): a refresh that only moved the last candle (or added one or two) goes through the tick path
+          // (P.push: series.update, analysis at most every 2 s or on a closed candle); nothing changed = nothing redrawn; a
+          // changed older candle, another feed or a shifted history is the full rebuild, as before
+          const same = r.src === G.source, nx = same ? mergeBars(P.raw, r.bars) : r.bars; liveKeep(P, nx);
+          const plan = same ? window.msPollPlan(P.raw, nx) : null;
+          if (plan === 'same') { /* nothing new */ }
+          else if (plan && P.bars && P.bars.length) plan.forEach((k, i) => P.push(Object.assign({}, k, { closed: i < plan.length - 1 })));
+          else { P.raw = nx; P.rebuild(true); }
+          $('ms-updated').textContent = new Date().toLocaleTimeString(); }
         catch (e) { /* keep last candles */ }
         if (!G.csv) setTimeout(tick, iv());
       };
@@ -10062,9 +10345,18 @@ function msNextSetup(bars, A) {
     // 11 Nov: under the first-load sign-in card nothing below is seen, and leaving the card always reloads the page (sign-in,
     // Continue as guest), so no candles, streams or scans start until the card is gone
     if (window.msBootGate) await window.msBootGate;
-    const res = await Promise.allSettled(ACTIVE.map((tf) => fetchBars(tf)));
+    // market switch (26 Nov 2026): candles the page before read for this market in the last 20 s are used once, so the charts
+    // are drawn at the first paint; a timeframe without them is fetched as always, and the usual polling and ticks follow
+    let stash = null;
+    try { if (window.MS_SWAP_IN) { const s = JSON.parse(sessionStorage.getItem('ms-swap') || 'null'); if (s && s.k === instKey && Date.now() - s.at < 20000 && s.tfs) stash = s.tfs; }
+      sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); } catch (e) { stash = null; }
+    // the price stream is opened now, beside the candle reads, so the first live price is there when the charts are (26 Nov 2026)
+    let early = null, earlyQ = null;
+    try { if (!G.csv && MD.on !== false && MD.base && INST.md && typeof EventSource !== 'undefined' && !marketClosed()) { early = new EventSource(`${MD.base}stream?sym=${INST.md}`); early.onmessage = (m) => { earlyQ = m; }; } } catch (e) { early = null; }
+    const res = await Promise.allSettled(ACTIVE.map((tf) => (stash && Array.isArray(stash[tf.id]) && stash[tf.id].length > 50 ? Promise.resolve({ src: 'OANDA', bars: stash[tf.id] }) : fetchBars(tf))));
     const ok = res.filter((r) => r.status === 'fulfilled');
     if (!ok.length) {
+      if (early) { try { early.close(); } catch (e) {} }
       const why = res.map((r) => r.reason && r.reason.message).filter(Boolean)[0] || '';
       root.classList.add('ms-offline');
       $('ms-offline-why').textContent = why;
@@ -10085,7 +10377,9 @@ function msNextSetup(bars, A) {
     topDown(); setStatus();
     $('ms-updated').textContent = new Date().toLocaleTimeString();
     if (INST.spot) setInterval(refreshSpot, 60e3);
-    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') startTicks(); else startRestTicks(); }
+    G.booted = true;
+    if (G.source === 'Binance' && INST.binance) startStream(); else { startPolling(); if (G.source === 'OANDA') { startTicks(early); if (early && earlyQ && early.onmessage) early.onmessage(earlyQ); early = null; } else startRestTicks(); }
+    if (early) { try { early.close(); } catch (e) {} }
     if (SCAN.el) { setTimeout(scanAll, 2500); setInterval(scanAll, 5 * 60e3); }
   }
 
@@ -10164,12 +10458,27 @@ function msNextSetup(bars, A) {
   }
 
 
+  // indicator legend (27 Nov 2026, owner: "Keep improving the charts"): one row a study under O H L C, its name and its
+  // values at the legend's candle (the newest when the crosshair is away); a value the study has not got yet reads "—".
+  // Pure: the rows are built from what indDraw already computed, so nothing is recomputed while the crosshair moves.
+  // a guide line (RSI's 70 / 30, a zero line) has one value everywhere: it is drawn, but its number says nothing, so the legend skips it
+  const flatLine = (v) => { let f = null; for (const x of v) { if (x == null || !isFinite(x)) continue; if (f == null) f = x; else if (x !== f) return false; } return true; };
+  window.msIndLegend = function (rows, i, n, fmt) {
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    // a study on the price scale reads like a price (the market's decimals); an oscillator with two decimals, or three figures under 1
+    const num = (v, px) => { if (v == null || !isFinite(v)) return '—'; if (px && fmt) return fmt(v); const a = Math.abs(v); return a >= 1 || a === 0 ? v.toFixed(2) : v.toPrecision(3); };
+    return rows.slice(0, 8).map((r) => '<span class="ind-r"><span class="k">' + esc(r.name) + '</span>'
+      + r.vals.map((x) => { const v = x.v && x.v.length === n ? x.v[i] : null; const c = x.color && /^(#[0-9a-f]{3,8}|rgba?\([0-9., ]+\))$/i.test(x.color) ? ' style="color:' + x.color + '"' : '';
+        return '<b' + c + '>' + num(v, !r.osc) + '</b>'; }).join('') + '</span>').join('');
+  };
   // indicators on any chart (panes and the Split screen's free chart): overlays on the price scale, oscillators in stacked bands
   function indDraw(chart, B, out) {
     const L = (window.msInd && window.msInd.list()) || [], osc = L.filter((x) => IND_DEF[x.type] && IND_DEF[x.type].osc), m = osc.length, band = m ? Math.min(0.16, 0.45 / m) : 0;
     try { chart.priceScale('right').applyOptions({ scaleMargins: { top: 0.13, bottom: m ? 0.05 + band * m : 0.08 } }); } catch (e) {}
-    if (!B || B.length < 30) return; const T = B.map((b) => b.time);
+    out.leg = []; if (!B || B.length < 30) return; const T = B.map((b) => b.time);
     L.forEach((x) => { const D = IND_DEF[x.type]; if (!D) return; let res; try { res = D.calc(B, x); } catch (e) { return; }
+      // legend rows (27 Nov 2026): the study's name and its values at the candle under the crosshair, as TradingView shows them
+      out.leg.push({ name: (res.find((o) => o.title) || {}).title || D.name, osc: !!D.osc, vals: res.filter((o) => !o.dots && Array.isArray(o.v) && !flatLine(o.v)).slice(0, 4).map((o) => ({ v: o.v, color: o.hist ? null : (o.color || x.color) })) });
       const k = D.osc ? osc.indexOf(x) : -1, sid = D.osc ? `osc${k}` : 'right';
       res.forEach((o) => { const opt = { priceScaleId: sid, color: o.color || x.color, lineWidth: o.w || 1.5, lineStyle: o.dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: !!o.last, crosshairMarkerVisible: false, title: o.title || '' };
         const s2 = o.hist ? chart.addHistogramSeries({ priceScaleId: sid, priceLineVisible: false, lastValueVisible: false }) : o.dots ? chart.addLineSeries({ ...opt, lineVisible: false, pointMarkersVisible: true, pointMarkersRadius: 1.5 }) : chart.addLineSeries(opt);
@@ -10464,6 +10773,7 @@ function msNextSetup(bars, A) {
   // the menu's groups, in order (each id once); a timeframe with an analysed pane opens that pane
   const TF_GROUPS = [['Seconds', ['1s', '5s', '10s', '15s', '30s']], ['Minutes', ['1m', '2m', '5m', '10m', '15m', '30m']], ['Hours', ['1h', '2h', '3h', '4h', '6h', '8h', '12h']], ['Days', ['1d']], ['Week', ['1w']], ['Month', ['1M']], ['Year', ['1Y']]];
   window.msTfGroups = () => TF_GROUPS.map(([g, ids]) => [g, ids.map((id) => { const t = SPTFS.find((x) => x.id === id); return { id, label: t ? t.label : id, analysed: !!panes[id] }; })]);
+  window.msSwapInfo = () => ({ base: MD.base, on: MD.on, tfs: ACTIVE.map((t) => t.id), n: BARS, md: (k) => (INSTRUMENTS[k] ? INSTRUMENTS[k].md : null), cur: instKey, pub: PUB });   // for the market switch
   window.msMarkets = () => Object.entries(INSTRUMENTS).map(([k, I]) => ({ k, label: I.label, name: I.name, group: I.group, dec: I.dec, on: k === instKey }));   // the wheel bar's list
   // a year's candles from monthly ones (UTC calendar years)
   const yearOf = (bars) => { const out = []; bars.forEach((b) => { const y = new Date(b.time * 1e3).getUTCFullYear(), t = Date.UTC(y, 0, 1) / 1e3, l = out[out.length - 1];
@@ -10592,7 +10902,7 @@ function msNextSetup(bars, A) {
     for (let i = 0; i < 4; i++) { const cell = document.createElement('div'); cell.className = 'mm-c'; cell.dataset.i = i;
       cell.innerHTML = `<div class="mm-h"><select class="mm-k" aria-label="Market of chart ${i + 1}"></select><select class="mm-tf" aria-label="Timeframe of chart ${i + 1}"></select><b class="mm-px"></b><span class="mm-ch"></span><span class="mm-src"></span></div><div class="mm-chart"></div>`;
       MM.grid.appendChild(cell); const el = cell.querySelector('.mm-chart');
-      const chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 }, rightPriceScale: { borderVisible: false }, localization: { priceFormatter: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST) } });
+      const chart = LW.createChart(el, { autoSize: true, layout: { fontSize: 11, fontFamily: 'Figtree, -apple-system, "Segoe UI", Roboto, sans-serif' }, grid: { vertLines: { visible: false }, horzLines: { visible: false } }, crosshair: { mode: LW.CrosshairMode.Normal }, timeScale: { timeVisible: true, secondsVisible: false, rightOffset: 6 }, rightPriceScale: { borderVisible: false, scaleMargins: { top: 0.1, bottom: 0.18 } }, localization: { priceFormatter: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST) } });
       const series = chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
       const vol = chart.addHistogramSeries({ priceScaleId: 'mmv', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false }); chart.priceScale('mmv').applyOptions({ scaleMargins: { top: 0.86, bottom: 0 }, visible: false });
       const C = { i, cell, el, chart, series, vol, bars: [], key: '', at: 0 }; MM.ch.push(C);
@@ -10608,7 +10918,7 @@ function msNextSetup(bars, A) {
     C.series.applyOptions({ priceFormat: { type: 'price', precision: I.dec ?? 2, minMove: Math.pow(10, -(I.dec ?? 2)) } }); C.chart.timeScale().applyOptions({ secondsVisible: T.sec < 60 });
     try { const r = await spFetch(T, I, 500); if (C.key !== key) return; if (!r || !r.bars || !r.bars.length) { C.cell.querySelector('.mm-src').textContent = 'no data for this timeframe'; return; }
       mmSet(C, r.bars, true); C.cell.querySelector('.mm-src').textContent = r.src || ''; requestAnimationFrame(() => tvView(C.chart, C.bars.length)); } catch (e) { if (C.key === key) C.cell.querySelector('.mm-src').textContent = 'no data'; } }
-  function mmSet(C, raw, all) { const bars = raw.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 })); const vols = raw.map((b, i) => ({ time: b.time + TZ, value: +b.volume || 0, color: +b.close >= +b.open ? 'rgba(8,153,129,.35)' : 'rgba(242,54,69,.35)' }));
+  function mmSet(C, raw, all) { const bars = raw.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 })); const vols = raw.map((b, i) => ({ time: b.time + TZ, value: +b.volume || 0, color: window.msChartLight && window.msChartLight() ? (+b.close >= +b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : +b.close >= +b.open ? 'rgba(8,153,129,.35)' : 'rgba(242,54,69,.35)' }));   // 27 Nov 2026: the panes' volume colours (grey on a paper chart)
     if (all) { C.bars = bars; C.series.setData(bars); C.vol.setData(vols); }
     else bars.forEach((x, j) => { const L = C.bars[C.bars.length - 1]; if (L && x.time < L.time) return; if (L && x.time === L.time) C.bars[C.bars.length - 1] = x; else C.bars.push(x); try { C.series.update(x); C.vol.update(vols[j]); } catch (e) {} });
     const L = C.bars[C.bars.length - 1], I = INSTRUMENTS[MM.cells[C.i].k], q = MDQ.q[MM.cells[C.i].k]; if (L) { C.cell.querySelector('.mm-px').textContent = fmtI(L.close, I); const ch = q && isFinite(q.ch) ? q.ch : null, e2 = C.cell.querySelector('.mm-ch'); e2.textContent = ch == null ? '' : `${ch >= 0 ? '+' : '−'}${Math.abs(ch).toFixed(2)}%`; e2.className = 'mm-ch ' + (ch > 0 ? 'up' : ch < 0 ? 'dn' : ''); } }
@@ -10642,10 +10952,10 @@ function msNextSetup(bars, A) {
       if (SP.on && !spPane() && spSym() !== instKey) want.add(spSym()); if (MM.on) MM.cells.slice(0, MM.n).forEach((c) => { if (c.k !== instKey) want.add(c.k); }); }
     for (const [k, f] of FT) if (!want.has(k)) { try { f.es.close(); } catch (e) {} clearTimeout(f.re); FT.delete(k); }
     for (const k of [...want].slice(0, 4)) { if (FT.has(k)) continue; const I = INSTRUMENTS[k]; if (!I || !I.md) continue; const f = { q: [], raf: 0 }; FT.set(k, f);
-      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es; f.heard = Date.now();
+      const open = () => { if (FT.get(k) !== f) return; const es = new EventSource(`${MD.base}stream?sym=${I.md}`); f.es = es; f.heard = Date.now(); es.addEventListener('hb', () => { f.heard = Date.now(); });
         es.onmessage = (m) => { f.heard = Date.now(); let d; try { d = JSON.parse(m.data); } catch (e) { return; } if (!d || d.error || !isFinite(d.b) || !isFinite(d.a)) return;
           f.q.push({ px: (d.b + d.a) / 2, t: d.t || Date.now() / 1000 }); if (!f.raf) f.raf = requestAnimationFrame(() => { f.raf = 0; const Q = f.q.splice(0); if (Q.length) freeTicks(k, Q); }); };
-        es.onerror = () => { if (es.readyState === 2 && FT.get(k) === f) f.re = setTimeout(open, 5000); }; };
+        es.onerror = () => { if (es.readyState === 2 && FT.get(k) === f) f.re = setTimeout(open, 1500); }; };
       f.open = open; open(); }
     // a free chart's stream that went silent with its connection open is asked again (as the page's own stream); not over the weekend
     { const d = new Date(), wd = d.getUTCDay(), h = d.getUTCHours(), shut = wd === 6 || (wd === 0 && h < 23) || (wd === 5 && h >= 21);
@@ -10940,6 +11250,10 @@ function msNextSetup(bars, A) {
       .sort((a, b) => (ORDER[a.state] ?? 9) - (ORDER[b.state] ?? 9) || b.rr - a.rr);
     return { price: m.price, list, trend: m.trend || {}, chg: null, from: 'council' };
   }
+  // the background scan reads 6 timeframes of every market the council's snapshot does not cover (about 80 requests): not while the
+  // Charts are on screen, where it competed with the chart's own candles (27 Nov 2026); it runs as soon as another view opens
+  const onCharts = () => document.documentElement.dataset.app === 'charts' || document.documentElement.dataset.view === 'charts';
+  new MutationObserver(() => { if (SCAN.later && !onCharts()) { SCAN.later = false; scanAll(); } }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-view'] });
   async function scanAll(ev) {
     if (!SCAN.el || SCAN.busy || G.csv) return;
     const force = !!(ev && ev.type === 'click');
@@ -10952,11 +11266,13 @@ function msNextSetup(bars, A) {
         SCAN.at = Date.parse(snap.at); SCAN.snapAt = snap.at; renderScan();
         // markets the council does not trade (silver, indices, USD/JPY) are not in its snapshot: scan them here instead of leaving them "waiting" for good
         const miss = Object.keys(INSTRUMENTS).filter((k) => k !== instKey && !snap.markets[k] && (!SCAN.res[k] || Date.now() - (SCAN.res[k].at || 0) > 4 * 60e3));
+        if (onCharts()) { SCAN.later = miss.length > 0; return; }   // speed (27 Nov 2026): the other markets are scanned when the Charts are left
         await Promise.all(miss.map(async (k) => { try { SCAN.res[k] = Object.assign(await scanInst(k) || { err: 'No data' }, { at: Date.now() }); } catch (e) { SCAN.res[k] = { err: e.message || 'No data', at: Date.now() }; } renderScan(); }));
         return;
       }
     }
     SCAN.snapAt = null;
+    if (!force && onCharts()) { SCAN.later = true; return; }
     SCAN.busy = true; SCAN.res = {}; renderScan();
     const btn = document.getElementById('ms-scan-btn'); if (btn) btn.disabled = true;
     await Promise.all(Object.keys(INSTRUMENTS).map(async (k) => {
@@ -12843,7 +13159,9 @@ function msNextSetup(bars, A) {
     const boxes = () => document.querySelectorAll('.t-scroll, #ms-cal-day, #ms-nq-list, #ms-rep-list, .loss-rows, #ms-c-pm, .c-pane-overview > .c-active .c-act');
     const wire = () => boxes().forEach((el) => { if (!el.dataset.fadeWired) { el.dataset.fadeWired = '1'; el.addEventListener('scroll', () => upd(el), { passive: true }); } upd(el); });
     // perf (8 Nov): every mutation batch used to queue its own frame callback, each reading scrollHeight (a layout) on every box; now one pass per frame
-    let wq = false; new MutationObserver((recs) => { if (wq || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
+    let wq = false; const chOn = () => document.documentElement.dataset.app === 'charts' || document.documentElement.dataset.view === 'charts';   // none of these boxes is on the Charts (27 Nov 2026, speed)
+    new MutationObserver(() => { if (!chOn()) wire(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-view'] });
+    new MutationObserver((recs) => { if (wq || chOn() || window.msLiveOnly(recs)) return; wq = true; requestAnimationFrame(() => { wq = false; wire(); }); }).observe(document.body, { childList: true, subtree: true }); addEventListener('resize', wire); wire();
     const dot = document.getElementById('ms-live-dot'), txt = document.getElementById('ms-live-txt');
     if (dot && txt) { const name = () => { const t = txt.textContent.trim() || (dot.classList.contains('on') ? 'Live' : dot.classList.contains('poll') ? 'Updating every few seconds' : 'Connecting'); dot.title = t; dot.setAttribute('role', 'img'); dot.setAttribute('aria-label', `Price feed: ${t}`); };
       new MutationObserver(name).observe(txt, { childList: true, characterData: true, subtree: true }); new MutationObserver(name).observe(dot, { attributes: true, attributeFilter: ['class'] }); name(); }
@@ -12971,7 +13289,7 @@ function msNextSetup(bars, A) {
   // hx: the address when the navigation happened. A view transition draws a frame later, and by then the trade router may have
   // put a #trade/<id> entry on top (a pasted trade link): drawn from the address of that moment, the desk behind the sheet went home.
   function showView(hx) {
-    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = PUB ? 'charts' : !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
+    const HX = typeof hx === 'string' ? hx : location.hash, [h0, sub] = HX.slice(1).split('/'), h = PUB || document.documentElement.dataset.app === 'charts' ? 'charts' : h0 === 'guest' ? 'home' : msDenied(h0) ? 'home' : h0 === 'users' && document.documentElement.dataset.role !== 'owner' ? 'home' : h0 === 'ict' && !document.documentElement.dataset.ict ? 'home' : !h0 && window.MS_ACCT && window.MS_ACCT.home === 'mosha' && !msDenied('mosha') ? 'mosha' : !h0 && document.documentElement.dataset.ict && document.documentElement.dataset.role === 'reviewer' ? 'ict' : h0, v0 = VIEWS.includes(h) ? h : 'home', v = PUB ? 'charts' : !msDenied(v0) ? v0 : !msDenied('home') ? 'home' : !msDenied('charts') ? 'charts' : 'profile';
     // a view this account may not open (a viewer or a guest on #mosha, #ict, …) is shown as another one: the address says which
     // (QA sweep 11 Nov; replaceState, so no second hashchange and Back does not return to the refused link)
     if (h0 !== v && VIEWS.includes(h0) && location.hash === HX) try { history.replaceState(null, '', location.pathname + location.search + '#' + v); } catch (e) {}
@@ -13080,6 +13398,7 @@ function msNextSetup(bars, A) {
   boot();
 })();
 </script>
+<span id="ms-swap-ready" hidden></span>
 <script id="ms-ict-lib">
 // ICT desk helpers (9 Nov): pure functions behind the #ict view, kept apart so tests/ict-desk.test.mjs runs them without a page.
 // Every time on the desk is New York time (the clock, the sessions, the calendar days, the signal times and the chart's axis), so
@@ -14228,7 +14547,8 @@ function msNextSetup(bars, A) {
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#ms-theme, [data-theme-set], .cmdk-it')) fade(); }, true);
   // "Loading…" labels breathe until real text replaces them
   function mark(root) { (root || document).querySelectorAll('.tile-big, .h-head, .tile-sub, .ms-note, h1, h2').forEach(function (el) { el.classList.toggle('is-loading', /^(Loading|Starting up|Scanning soon)/.test(el.textContent.trim())); }); }
-  var mt = null; new MutationObserver(function (recs) { if (mt || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  var mt = null; new MutationObserver(function () { if (document.documentElement.dataset.view !== 'charts') mark(); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-view'] });
+  new MutationObserver(function (recs) { if (mt || document.documentElement.dataset.app === 'charts' || document.documentElement.dataset.view === 'charts' || (window.msLiveOnly && window.msLiveOnly(recs))) return; mt = setTimeout(function () { mt = null; mark(); }, 250); }).observe(document.body, { childList: true, subtree: true, characterData: true });
   document.addEventListener('DOMContentLoaded', function () { mark(); }); mark();
   // staggered entrance the first time a list fills
   function stagger(id, item) { var el = document.getElementById(id); if (!el) return; var done = false;
@@ -16181,7 +16501,7 @@ function msNextSetup(bars, A) {
     w.addEventListener('keydown', function (e) { if (e.key === 'Enter') apply(); if (e.key === 'Escape') close(); }); w.focus({ preventScroll: true }); }
   function apply() { if (!cur) return; var k = cur.kind, id = cur.pick; close();
     if (k === 'tf') { if (id !== tfNow() && window.msOneTf) window.msOneTf(id); setTimeout(paint, 50); }
-    else if (id && !mkList().some(function (x) { return x.k === id && x.on; })) location.href = '?s=' + encodeURIComponent(id) + '#charts'; }
+    else if (id && !mkList().some(function (x) { return x.k === id && x.on; })) { if (window.msGoMarket) window.msGoMarket(id, '#charts'); else location.href = '?s=' + encodeURIComponent(id) + '#charts'; } }
   function build() { if (bar || !$('v-charts')) return;
     bar = document.createElement('div'); bar.id = 'ms-wb'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Market and timeframe');
     bar.innerHTML = '<button type="button" data-wb="mk" aria-haspopup="dialog"><small>Market</small><b></b></button><button type="button" data-wb="tf" aria-haspopup="dialog"><small>Timeframe</small><b></b></button>';
@@ -16226,10 +16546,13 @@ function msNextSetup(bars, A) {
     const pad = reserve ? 6 : 10, narrow = innerWidth <= 900, short = win <= 560;
     const set = {};
     if (vis(grid)) {
-      const pane = [...grid.querySelectorAll('.ms-pane')].find(vis), ch = pane && pane.querySelector('.ms-chart');
+      // the pane with the least around its chart: a pane that spans two rows (Layout with three charts) is taller than its chart
+      const ps = [...grid.querySelectorAll('.ms-pane')].filter(vis).map((p) => [p, p.querySelector('.ms-chart')]).filter((x) => x[1]).sort((a, b) => (a[0].offsetHeight - a[1].offsetHeight) - (b[0].offsetHeight - b[1].offsetHeight));
+      const pane = ps.length ? ps[0][0] : null, ch = pane && ps[0][1];
       if (pane && ch) {
-        const r = heightFor({ win, top: grid.getBoundingClientRect().top + y, reserve, pad, gap: parseFloat(getComputedStyle(grid).rowGap) || 0, chrome: pane.offsetHeight - ch.offsetHeight, rows: rowsOf(grid.dataset.view, +grid.dataset.layN || 1, narrow), minOne: short ? 170 : 260, minHalf: short ? 150 : 200 });
-        set['--ch-h'] = r.h + 'px'; set['--ch-av'] = Math.max(300, r.av) + 'px';
+        const gap = parseFloat(getComputedStyle(grid).rowGap) || 0, chrome = Math.max(0, pane.offsetHeight - ch.offsetHeight);
+        const r = heightFor({ win, top: grid.getBoundingClientRect().top + y, reserve, pad, gap, chrome, rows: rowsOf(grid.dataset.view, +grid.dataset.layN || 1, narrow), minOne: short ? 170 : 260, minHalf: short ? 150 : 200 });
+        set['--ch-h'] = r.h + 'px'; set['--ch-av'] = Math.max(300, r.av) + 'px'; set['--ch-h2'] = (r.h * 2 + gap + chrome) + 'px';
       }
     }
     const mm = document.getElementById('ms-mm'), mg = mm && mm.querySelector('.mm-g'), cell = mg && [...mg.children].find(vis), mc = cell && cell.querySelector('.mm-chart');
@@ -16265,6 +16588,18 @@ function msNextSetup(bars, A) {
     bar.insertBefore(a, bar.firstChild);
   }
 
+  // the Market phase strip is a chip in the toolbar from 1180 px (a comment marks its own place, where it goes back)
+  (function phase() {
+    if (!bar || !window.matchMedia) return;
+    const mq = matchMedia('(min-width: 1180px)'); let ph = null, home = null, n = 0;
+    const go = () => { if (!ph) return; if (mq.matches && !pub()) { if (ph.parentNode !== bar) bar.appendChild(ph); } else if (ph.parentNode === bar && home.parentNode) home.parentNode.insertBefore(ph, home.nextSibling); ask(); };
+    (mq.addEventListener ? mq.addEventListener('change', go) : mq.addListener(go));
+    const t = setInterval(() => {   // the strip is made by its own script a moment after the page
+      const e = document.getElementById('ms-phase'); if (!e) { if (++n > 120) clearInterval(t); return; }
+      clearInterval(t); ph = e; home = document.createComment('ms-phase'); ph.parentNode.insertBefore(home, ph); go();
+    }, 250);
+  })();
+
   // one chart first, once a device: a chart app opens on one chart (All, Split, Layout and Markets stay one tap away)
   (function once() {
     if (pub() || pget('ms-tv-v1')) return;
@@ -16291,13 +16626,13 @@ function msNextSetup(bars, A) {
   const row = V.querySelector('.ch-row');
   if (row && bar && typeof window.msMarkets === 'function') {
     const p = document.createElement('aside'); p.id = 'ms-wlp'; p.setAttribute('aria-label', 'Watchlist');
-    p.innerHTML = '<div class="wlp-h"><b>Watchlist</b><input class="wlp-q" type="search" placeholder="Find a market" aria-label="Find a market in the watchlist"><button type="button" class="wlp-x" aria-label="Hide the watchlist" title="Hide the watchlist">&times;</button></div><div class="wlp-l"></div><div class="wlp-n">Change against the previous day\'s close.</div>';
+    p.innerHTML = '<div class="wlp-h"><b>Watchlist</b><input class="wlp-q" type="search" placeholder="Find a market" aria-label="Find a market in the watchlist"><button type="button" class="wlp-x" aria-label="Hide the watchlist" title="Hide the watchlist">&times;</button></div><div class="wlp-l"></div><div class="wlp-n">Change against the previous day\'s close (crypto: today\'s 00:00 UTC open).</div>';
     row.appendChild(p);
     const btn = document.createElement('button'); btn.type = 'button'; btn.id = 'ms-wlp-btn'; btn.textContent = 'Watchlist'; btn.title = 'Show the watchlist beside the chart';
     row.appendChild(btn);
     const L = p.querySelector('.wlp-l'), q = p.querySelector('.wlp-q'); let Q = {};
     const draw = () => { const h = rowsHtml(window.msMarkets(), Q, q.value); if (L._h !== h) { L._h = h; L.innerHTML = h; } };
-    const load = async () => { if (!vis(p) || document.hidden || typeof window.msQuotes !== 'function') return; try { Q = await window.msQuotes() || Q; } catch (e) {} draw(); };
+    const load = async () => { if (!vis(p) || document.hidden || typeof window.msQuotes !== 'function') return; try { Q = Object.assign({}, window.msCryptoQuotes ? await window.msCryptoQuotes() : {}, await window.msQuotes() || Q); } catch (e) {} draw(); };
     const state = (on) => { H.dataset.wlp = on ? '1' : '0'; btn.setAttribute('aria-pressed', String(on)); pset('ms-wlp', on ? '1' : '0'); ask(); if (on) { draw(); setTimeout(load, 50); } };
     btn.addEventListener('click', () => state(true)); p.querySelector('.wlp-x').addEventListener('click', () => { state(false); btn.focus(); });
     q.addEventListener('input', draw);
@@ -16371,6 +16706,59 @@ function msNextSetup(bars, A) {
   document.addEventListener('ms:chart', (e) => attach(e.detail));
   hook(); setTimeout(hook, 1500); setInterval(() => { hook(); all.forEach(place); }, 3000);
   window.msChartNav = () => ({ mode, charts: all.length, shown: all.filter((o) => o.box.offsetHeight > 0).length });
+})();
+</script>
+<script id="ms-swap-js">
+/* Market switch without the wait (26 Nov 2026). Display only. Pointing at (120 ms) or pressing a market link (`?s=<market>`)
+   reads that market's candles for the six analysed timeframes from the candle service; the click then hands them to the next
+   page (sessionStorage 'ms-swap' + 'ms-swap-at': public candles, 20 seconds, read once), which draws its charts at the first
+   paint and cross-fades in. Nothing else changes: the page still loads again, so every stream, level and record belongs to
+   the new market. Never for guests. `window.msGoMarket(k, hash)`, `window.msSwap()` (read-only view). */
+(function () {
+  'use strict';
+  var PF = {}, FRESH = 12000, WAIT = 200, hov = null, going = false;
+  function info() { try { return window.msSwapInfo ? window.msSwapInfo() : null; } catch (e) { return null; } }
+  function keyOf(a) { var m = /^\?s=([a-z0-9]+)(#.*)?$/i.exec((a && a.getAttribute('href')) || ''); return m ? m[1] : null; }
+  function clear() { try { sessionStorage.removeItem('ms-swap'); sessionStorage.removeItem('ms-swap-at'); } catch (e) {} }
+  function prefetch(k) {
+    var I = info(); if (!I || !I.base || I.on === false || I.pub || !k || k === I.cur) return null;
+    var md = I.md(k); if (!md) return null;
+    var p = PF[k]; if (p && Date.now() - p.at < FRESH - 4000) return p;
+    p = PF[k] = { at: Date.now(), tfs: {}, n: 0, want: I.tfs.length };
+    I.tfs.forEach(function (id) {
+      fetch(location.origin + I.base + 'bars?sym=' + encodeURIComponent(md) + '&tf=' + id + '&n=' + I.n, { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { if (j && Array.isArray(j.bars) && j.bars.length > 50) p.tfs[id] = j.bars; p.n++; })
+        .catch(function () { p.n++; });
+    });
+    return p;
+  }
+  function leave(k, href) {
+    var p = PF[k];
+    try { if (p && Date.now() - p.at < FRESH && Object.keys(p.tfs).length) { sessionStorage.setItem('ms-swap', JSON.stringify({ k: k, at: p.at, tfs: p.tfs })); sessionStorage.setItem('ms-swap-at', k + '|' + p.at); } else clear(); }
+    catch (e) { clear(); }
+    location.href = href;
+  }
+  function go(k, href) {
+    if (going) return; var p = prefetch(k); if (!p) { location.href = href; return; }
+    going = true; var t0 = Date.now();
+    (function tick() { if (p.n >= p.want || Date.now() - t0 >= WAIT) leave(k, href); else setTimeout(tick, 20); })();
+  }
+  window.msGoMarket = function (k, hash) { go(String(k), '?s=' + encodeURIComponent(k) + (hash || location.hash || '')); };
+  window.msSwap = function () { var o = {}; Object.keys(PF).forEach(function (k) { o[k] = { age: Date.now() - PF[k].at, done: PF[k].n, want: PF[k].want, tfs: Object.keys(PF[k].tfs) }; }); return { arrived: !!window.MS_SWAP_IN, read: o }; };
+  document.addEventListener('pointerover', function (e) {
+    if (e.pointerType && e.pointerType !== 'mouse') return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="?s="]') : null, k = keyOf(a);
+    clearTimeout(hov); if (k) hov = setTimeout(function () { prefetch(k); }, 120);
+  }, { passive: true });
+  document.addEventListener('pointerdown', function (e) { var a = e.target && e.target.closest ? e.target.closest('a[href^="?s="]') : null, k = keyOf(a); if (k) prefetch(k); }, { passive: true });
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target && e.target.closest ? e.target.closest('a[href^="?s="]') : null, k = keyOf(a); if (!k || a.target === '_blank') return;
+    var I = info(); if (!I || I.pub || k === I.cur) return;
+    e.preventDefault(); a.classList.add('cur'); go(k, a.getAttribute('href'));
+  });
+  addEventListener('pageshow', function (e) { if (e.persisted) going = false; });
 })();
 </script>
 <script id="ms-ps-js">

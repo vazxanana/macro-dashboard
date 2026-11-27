@@ -112,6 +112,9 @@ jobs:
           CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
           CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
+          # the ONE live account (council/live.mjs, owner 27 Nov 2026): inert unless CTRADER_LIVE is "on" AND config.json live is on
+          CTRADER_LIVE: ${{ secrets.CTRADER_LIVE || vars.CTRADER_LIVE }}
+          CTRADER_LIVE_ACCESS_TOKEN: ${{ secrets.CTRADER_LIVE_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}   # newcode(): compare this run's commit with main (read only)
           OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}   # council/md-proxy.mjs: the loop's own OANDA candles (empty = the website's proxy)
           OANDA_ENV: ${{ secrets.OANDA_ENV }}
@@ -132,7 +135,26 @@ jobs:
           # fast copy (26 Nov 2026, owner: "More speed"): the copied Equinox desks are read again (about 6 s) and, only when one holds
           # a fill first written in the last 3 minutes (council/copy-due.mjs, read only), the mirror runs at once. Called every 20 s
           # between quick passes and between a round's heavy members; it never fails the loop and is saved by the next save.
-          fastcopy() { timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live >/dev/null 2>&1 || echo "Copied desks ($1) failed"
+          # fastorder (27 Nov 2026, owner: "make sure the orders are faster"): the hourly rules (Nasdaq l1 / l5, USD/JPY morning
+          # breakout, gold 8-swing break; demo and live) are read again inside every fastcopy during the first 12 minutes of an hour,
+          # and the breakouts of the day during the first 20 minutes of a UTC day, so an order goes out within about 20 s of the
+          # candle close instead of waiting for the next quick pass. Each job skips at once when nothing is due or it already looked.
+          # Every call of the order jobs goes through `job`: one lock per job and mode (flock), so the inline passes and the hour
+          # watcher below never run the same job at once, and a live job never waits for a demo one.
+          job() { l="/tmp/council-$(printf %s "$*" | tr -c 'a-z' '-').lock"; flock -w 60 "$l" timeout 45 node "$@"; }
+          fastorder() { s=$(( $(date +%s) % 3600 )); if [ "$s" -ge 1 ] && [ "$s" -le 720 ]; then
+              job council/nq-demo.mjs data --live >/dev/null 2>&1 || echo "Nasdaq live fast ($1) failed"
+              job council/nq-demo.mjs data >/dev/null 2>&1 || echo "Nasdaq demo fast ($1) failed"; fi
+            d=$(( $(date +%s) % 86400 )); if [ "$d" -le 1200 ]; then
+              job council/vb-demo.mjs data --live >/dev/null 2>&1 || echo "Breakout live fast ($1) failed"
+              job council/vb-demo.mjs data >/dev/null 2>&1 || echo "Breakout demo fast ($1) failed"; fi; }
+          # The hour watcher (27 Nov 2026, owner: "more faster", "faster"): a background loop beside the rounds that wakes 1 s after
+          # every hour and runs the order jobs every 2 s for the first minute (live first), whatever the round is doing (a heavy member
+          # can take minutes). Its files are saved by the loop's next save. It is stopped when the step ends.
+          ( while true; do w=$(( 3600 - ( $(date +%s) - 1 ) % 3600 )); sleep "$w"
+              for k in $(seq 1 30); do fastorder watch; sleep 2; done; done ) &
+          WATCH=$!; trap 'kill $WATCH 2>/dev/null' EXIT
+          fastcopy() { fastorder "$1"; timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live >/dev/null 2>&1 || echo "Copied desks ($1) failed"
             if timeout 15 node council/copy-due.mjs data; then timeout 120 node council/ctrader-mirror.mjs data || echo "cTrader mirror fast copy ($1) failed"; fi; }
           # nap (26 Nov 2026, owner: "More speed" again): 20 s, or less when a 5-minute candle closes sooner: it wakes 2 s after the
           # close, the moment a desk fill can first be read, so a copy goes out seconds after the candle instead of up to 20 s later.
@@ -156,7 +178,7 @@ jobs:
             node council/ctrader-mirror.mjs data || echo "cTrader mirror round $i failed"
             # Volatility breakout on a DEMO account (council/vb-demo.mjs, 21 Nov 2026): gold and USD/JPY, the studies' T1. Looks at the
             # clock and its own record and connects only when the minute needs it; demo only; never fails or holds the round.
-            timeout 45 node council/vb-demo.mjs data || echo "Breakout demo round $i failed"
+            job council/vb-demo.mjs data || echo "Breakout demo round $i failed"
             # H1 dominant-zone limit on the Council DEMO account (council/dom-demo.mjs, 23 Nov 2026): a forward demo record, label "dom";
             # reads H1 candles, connects only when an order is due or one of its own rests or is open; never fails or holds the round.
             timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo round $i failed"
@@ -164,7 +186,11 @@ jobs:
             timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo round $i failed"
             # The two Nasdaq leads that passed at the broker's own ticks (l1, l5) on a DEMO account (council/nq-demo.mjs, 26 Nov 2026):
             # reads H1 candles once an hour, connects only on a signal or while one of its positions is open; every order has a stop.
-            timeout 45 node council/nq-demo.mjs data || echo "Nasdaq demo round $i failed"
+            job council/nq-demo.mjs data || echo "Nasdaq demo round $i failed"
+            # The LIVE account (council/live.mjs, owner 27 Nov 2026): the same rules (+ the gold 8-swing break) at config.live.risk,
+            # its own records (live/), a daily stop; does nothing unless config.json live is on and CTRADER_LIVE=on
+            job council/vb-demo.mjs data --live || echo "Breakout live round $i failed"
+            job council/nq-demo.mjs data --live || echo "Nasdaq live round $i failed"
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
@@ -239,10 +265,12 @@ jobs:
                 timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live || echo "Copied desks quick pass $i failed"
                 node council/trader.mjs data || echo "Trader quick pass $i failed"
                 node council/ctrader-mirror.mjs data || echo "cTrader mirror quick pass $i failed"
-                timeout 45 node council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"
+                job council/vb-demo.mjs data || echo "Breakout demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo quick pass $i failed"
-                timeout 45 node council/nq-demo.mjs data || echo "Nasdaq demo quick pass $i failed"
+                job council/nq-demo.mjs data || echo "Nasdaq demo quick pass $i failed"
+                job council/vb-demo.mjs data --live || echo "Breakout live quick pass $i failed"
+                job council/nq-demo.mjs data --live || echo "Nasdaq live quick pass $i failed"
                 node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true

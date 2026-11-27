@@ -344,7 +344,8 @@ test('built site: every page has each app tag exactly once, and every manifest s
   for (const f of pages) {
     const rel = path.relative(out, f), head = fs.readFileSync(f, 'utf8').split(/<\/head>/i)[0];
     for (const re of once) assert.equal((head.match(re) || []).length, 1, `${rel}: ${re.source}`);
-    assert.match(head, /<link rel="manifest" href="\/app\.webmanifest">/, rel);
+    // the charts-only app (26 Nov 2026) is the one page with a manifest of its own
+    assert.match(head, rel === 'charts.html' ? /<link rel="manifest" href="\/charts\.webmanifest">/ : /<link rel="manifest" href="\/app\.webmanifest">/, rel);
     assert.match(head, /<link rel="apple-touch-icon" href="\/icons\/apple-touch-icon\.png">/, rel);
     // one theme colour, or one per colour scheme
     const themes = head.match(/<meta\b[^>]*\bname=["']theme-color["'][^>]*>/gi) || [];

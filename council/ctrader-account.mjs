@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { unseal, scrubber, accountsFor, BOOKS, pickAccount } from './ctrader-mirror.mjs';
+import { readConfig } from './owner-config.mjs';
 const require = createRequire(import.meta.url);
 const { _t } = require('../api/ctrader-link.js');
 
@@ -58,11 +59,11 @@ export async function accountSnapshot(opts) {
 if (process.argv[1] && process.argv[1].endsWith('ctrader-account.mjs')) {
   const D = process.argv[2] || 'data', CD = path.join(D, 'ctrader');
   let tokens = null; try { tokens = JSON.parse(fs.readFileSync(path.join(CD, 'tokens.json'), 'utf8')); } catch (e) {}
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(D, 'config.json'), 'utf8')); } catch (e) {}
   let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
+  const cfg = readConfig(D, accFile);   // config.json with the owner's demo settings on top (council/owner-config.mjs)
   const scrub = scrubber(process.env);
   try {
-    const all = await accountSnapshots({ env: process.env, tokens, cfg: { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: accFile.drain, mirrorIct: cfg.mirrorIct } });
+    const all = await accountSnapshots({ env: process.env, tokens, cfg: { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: cfg.drain || accFile.drain, mirrorIct: cfg.mirrorIct } });
     if (!all) process.exit(0);
     fs.mkdirSync(CD, { recursive: true });
     const snap = all.find((a) => a.base) || all[0];

@@ -52,6 +52,7 @@ import { sendAlerts, when, NTFY_DEFAULT } from './alerts.mjs';
 import { openRisk as riskAtOpen } from './fills.mjs';   // the risk a trade OPENED with (12 Nov 2026, moved-stop audit): fill quality in R (renamed: riskVolume and the round have their own openRisk = cash at risk)
 import { writeAtomic } from './jsonio.mjs';   // state files: a killed run never leaves one cut short (the live runner's child timeout)
 import { dropTwins, sameOrder } from './dedupe.mjs';   // 12 Nov 2026: one order is copied once (never a duplicate record, never the twin of a copied order)
+import { readConfig } from './owner-config.mjs';
 
 export const DEMO_HOST = 'wss://demo.ctraderapi.com:5036';
 export const PT = {
@@ -348,9 +349,17 @@ export function amendStep(p) {
 }
 export function session(WS, scrub, url = DEMO_HOST, { timeout = 10000 } = {}) {
   if (url !== DEMO_HOST) throw new Error('refusing a non-demo host');
+  return openSession(WS, scrub, url, { timeout });
+}
+// The live host (27 Nov 2026, owner: "set up the live account now"): used ONLY by council/live.mjs liveConnect(), which also wants
+// CTRADER_LIVE=on and the one live account config.live.account names. session() above still refuses every host but the demo's.
+export const LIVE_HOST = 'wss://live.ctraderapi.com:5036';
+export function liveSession(WS, scrub, { timeout = 10000 } = {}) { return openSession(WS, scrub, LIVE_HOST, { timeout }); }
+function openSession(WS, scrub, url, { timeout = 10000 } = {}) {
+  if (url !== DEMO_HOST && url !== LIVE_HOST) throw new Error('refusing an unknown host');
   const ws = new WS(url), waiting = new Map();
   let n = 0, beat, closed = false;
-  const opened = new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error('could not reach the cTrader demo server')); });
+  const opened = new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error(url === LIVE_HOST ? 'could not reach the cTrader live server' : 'could not reach the cTrader demo server')); });
   // a request that already had an interim answer (ORDER_ACCEPTED) resolves with it, flagged interim, instead of failing on timeout/close
   const finish = (id, w, why) => { waiting.delete(id); clearTimeout(w.t); if (w.interim) w.ok({ ...w.interim, interim: true }); else w.fail(new Error(why)); };
   const drop = (id, w) => { waiting.delete(id); clearTimeout(w.t); };
@@ -1019,7 +1028,12 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   let research = []; try { research = JSON.parse(fs.readFileSync(path.join(DIR, 'research.json'), 'utf8')); } catch (e) {}
   const own = Array.isArray(raw) ? raw : raw.trades || [];
   const saveTokens = (t) => { fs.mkdirSync(CD, { recursive: true }); writeAtomic(path.join(CD, 'tokens.json'), JSON.stringify(t)); };
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(DIR, 'config.json'), 'utf8')) || {}; } catch (e) {}
+  // config.json with the owner's demo settings on top (27 Nov 2026, the Profile's "Demo accounts: settings"): which account a
+  // book is copied to (mirrorAccounts, an account a book left is drained), its risk (mirrorRisk over LIMITS.risk) and books that
+  // open nothing new (mirrorOff; their open copies are still managed to their exits)
+  let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
+  const cfg = readConfig(DIR, accFile) || {}, offBooks = new Set(Array.isArray(cfg.mirrorOff) ? cfg.mirrorOff : []);
+  for (const [k, v] of Object.entries(cfg.mirrorRisk || {})) if (Object.prototype.hasOwnProperty.call(LIMITS.risk, k) && Number.isFinite(+v) && +v >= 0.0001 && +v <= 0.05) LIMITS.risk[k] = +v;
   const shadows = cfg.mirrorShadow !== false;   // 8 Nov, owner: shadows mirrored too; config.json mirrorShadow: false turns it off
   // the council's latest prices (Trader snapshot): stop/target distances of a council trade are measured from them, see the header
   let marks = null; try { const sn = JSON.parse(fs.readFileSync(path.join(DIR, 'snapshot.json'), 'utf8'));
@@ -1030,8 +1044,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
   // mirror-<account>.json. The token pair is shared (one cTrader ID), so a refresh in one round is handed to the next.
   // account numbers: council/ctrader-accounts.json on main (owner gives the numbers in chat, a PR records them; no secrets), then
   // council-data config.json mirrorAccounts, then the env CTRADER_ACCOUNTS
-  let accFile = {}; try { accFile = JSON.parse(fs.readFileSync(new URL('./ctrader-accounts.json', import.meta.url), 'utf8')); } catch (e) {}
-  const acc = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: accFile.drain }), byBook = acc.byBook, allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
+  const acc = accountsFor(process.env, { mirrorAccounts: { ...(accFile.mirrorAccounts || {}), ...(cfg.mirrorAccounts || {}) }, drain: cfg.drain || accFile.drain }), byBook = acc.byBook, allAlerts = [], base = String(process.env.CTRADER_ACCOUNT_ID || '').trim();
   // the replica's research trades are copied only while the replica book has a demo account of its own: without one they
   // would land on the council's account (a book without a number trades on the base account)
   const replicaOwn = replicaHasOwnAccount(byBook);
@@ -1054,7 +1067,7 @@ if (process.argv[1] && process.argv[1].endsWith('ctrader-mirror.mjs')) {
     const reset = applyReset(prev.state, resetFile);
     if (reset.applied) prev.log = (prev.log || []).concat({ at: new Date().toISOString(), msg: `owner reset ${resetFile.at}: ${reset.dropped} copied-trade records, the skip/wait notes and the day's start balance dropped; the open book is copied afresh` });
     // every trade is passed (this account keeps managing what it already holds); only its books are opened here
-    const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks, openBooks: g.books, exclude });
+    const r = await mirrorRound({ env: { ...process.env, CTRADER_ACCOUNT_ID: g.account }, trades, state: reset.state, tokens, specs: rd('symbols.json', null), onTokens: saveTokens, shadows, marks, openBooks: g.books.filter((b) => !offBooks.has(b)), exclude });
     if (r.tokens) tokens = r.tokens;
     writeAtomic(path.join(CD, file), JSON.stringify({ account: g.account, books: g.books, state: r.state, log: (prev.log || []).concat(r.log).slice(-300), limits: LIMITS, symbols: SYMBOLS, execution: executionStats(r.state.map) }, null, 1));
     summaryLines.push(`${g.drain ? 'drain' : g.books.join('+')} (${g.account}): ${r.state.status}${r.sent.length ? ` · ${r.sent.length} sent` : ''}`);

@@ -52,6 +52,10 @@
       "destination": "/equinox.html"
     },
     {
+      "source": "/charts",
+      "destination": "/charts.html"
+    },
+    {
       "source": "/farm",
       "destination": "/farm.html"
     },
@@ -182,6 +186,19 @@
       ]
     },
     {
+      "source": "/charts.webmanifest",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
+    },
+    {
       "source": "/(icons/.*|apple-touch-icon.png)",
       "headers": [
         {
@@ -251,6 +268,9 @@
       "maxDuration": 15
     },
     "api/journal.js": {
+      "maxDuration": 15
+    },
+    "api/demo-settings.js": {
       "maxDuration": 15
     },
     "api/eqx-bridge.js": {
