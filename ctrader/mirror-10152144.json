@@ -2692,7 +2692,7 @@
     "lots": 0.11,
     "digits": 3,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T05:00:13.000Z",
     "councilEntry": 159.283,
     "stop": 159.334286,
@@ -2703,10 +2703,12 @@
     "slipR": -0.078,
     "lagSec": 13,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T05:00:13.000Z",
-    "brokerStop": 159.338
+    "brokerStop": 159.338,
+    "closedAt": "2026-11-27T05:42:32.000Z"
    },
    "eqx:fade:audusd:fade-m15-s1795757400": {
     "positionId": "51663235",
@@ -2764,17 +2766,16 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 364.7,
+   "lastBalance": 360.4,
    "ids": [
     "51656090",
-    "51662482",
     "51663241"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 364.7 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 360.4 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2790,14 +2791,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 364.7,
-  "lastRun": "2026-11-27T05:38:04.000Z"
+  "balance": 360.4,
+  "lastRun": "2026-11-27T05:42:32.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-21T09:03:06.000Z",
-   "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
-  },
   {
    "at": "2026-11-21T11:35:44.000Z",
    "msg": "error: could not reach the cTrader demo server"
@@ -4290,6 +4287,11 @@
    "at": "2026-11-27T05:33:40.000Z",
    "msg": "AUDUSD position 51663235 closed at the broker",
    "trade": "eqx:fade:audusd:fade-m15-s1795757400"
+  },
+  {
+   "at": "2026-11-27T05:42:32.000Z",
+   "msg": "USDJPY position 51662482 closed at the broker",
+   "trade": "eqx:fade:usdjpy:fade-m15-s1795755600"
   }
  ],
  "limits": {
