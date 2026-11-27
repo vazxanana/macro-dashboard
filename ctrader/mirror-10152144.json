@@ -3019,7 +3019,7 @@
     "lots": 0.12,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T11:15:34.000Z",
     "councilEntry": 1.31305,
     "stop": 1.313745,
@@ -3032,27 +3032,28 @@
     "slipR": 0.129,
     "lagSec": 34,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T11:15:34.000Z",
-    "brokerStop": 1.31326
+    "brokerStop": 1.31326,
+    "closedAt": "2026-11-27T11:25:49.000Z"
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 366.79,
+   "lastBalance": 362.25,
    "ids": [
     "51656090",
     "51688521",
-    "51692951",
-    "51694025"
+    "51692951"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 366.79 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 362.25 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3073,15 +3074,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 366.79,
-  "lastRun": "2026-11-27T11:22:56.000Z"
+  "balance": 362.25,
+  "lastRun": "2026-11-27T11:25:49.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T10:36:03.000Z",
-   "msg": "not mirrored yet eqx:bigfade:eurusd:bigfade-m15-s1795514400: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:bigfade:eurusd:bigfade-m15-s1795514400"
-  },
   {
    "at": "2026-11-24T11:16:14.000Z",
    "msg": "not mirrored yet eqx:fade:eurusd:fade-m15-s1795518000: daily loss stop (95.0% down today) (will retry)",
@@ -4574,6 +4570,11 @@
   {
    "at": "2026-11-27T11:15:34.000Z",
    "msg": "opened sell GBPUSD 0.12 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-s1795778100"
+  },
+  {
+   "at": "2026-11-27T11:25:49.000Z",
+   "msg": "GBPUSD position 51694025 closed at the broker",
    "trade": "eqx:fade:gbpusd:fade-m15-s1795778100"
   }
  ],
