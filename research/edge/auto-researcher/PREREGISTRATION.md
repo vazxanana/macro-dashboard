@@ -126,3 +126,32 @@ will fill with chance results within minutes. The 2023-now window is also read o
 not a clean holdout. A result of `auto-2` is therefore a list to look through, never an edge and never evidence by itself. The
 strict reading is kept beside it: a **lead** still needs check-window n >= 100, t >= 2 and a Holm p under 0.05 over every check
 look made in `auto-2`. Anything taken further is re-priced at the broker's own quotes first, as before.
+
+## Version auto-3: engulf (EG) and engulf failure (EF) only, 2021 to now (27 Nov 2026)
+
+Owner, 27 Nov 2026: "from now on focus only 2021 till today, specially engulfing eg and ef". Written and committed alone before
+the engine changes. `auto-2` stops here and is kept: its worker files are copied to council-data `research/auto-2/` and its last
+report is committed as `auto-2-final.json`; nothing of it is counted in `auto-3`.
+
+**What changes**
+
+- Triggers, four kinds, all engulf-based, on H1 candles read from closed candles only:
+  - `eg`, `egr`, `ef`: exactly as in `auto-2` (an engulf completes; the first return to a standing engulf zone that closes back
+    out on the engulf's side; the first close through a standing zone's far side, traded in the direction of the failure).
+  - `efr` (new): the first return to a FAILED engulf zone. A zone that failed (`ef`) becomes a zone of the other side, alive
+    `life` candles from the failing candle until a close back through it; `efr` = the first candle that trades into it and
+    closes back out on the failure's side: trade the failure's direction (the "EF barrier" of the Engulfing desk, on H1).
+  `bo` is dropped. A rule is one trigger or two of these that agree on the same candle. Grids: `life` 12 / 24 / 48 / 96.
+- Filters and exits: unchanged from `auto-2`. Markets: unchanged (the ten and the Nasdaq 100 before costs; worker 10 Nasdaq
+  only; the structure workers 11 and 12 draw the same engulf rules as every other worker now).
+- Windows: only 2021-01-01 to now. Search 2021-2023, check 2024 to now (one look per group), and the whole of 2021 to now.
+- Bars: unchanged from `auto-2` (search n >= 100, mean > 0, month-sum t >= 1, side-flipped twin negative; check n >= 50,
+  mean > 0, t >= 1; 2021-now t >= 1 = a **result**; a **lead** = check n >= 100, t >= 2 and Holm p < 0.05 over every check look
+  made in `auto-3`).
+
+**What a result is worth, said before any is seen**
+
+The same as `auto-2`: about one rule in forty clears the result bar with no edge, the windows are shorter (fewer trades, wider
+noise), and 2021 to now has already been read by `auto-1`, `auto-2` and the Engulfing desks' studies, so none of it is a clean
+holdout. A result is a list to look through, never an edge and never evidence by itself; anything taken further is re-priced at
+the broker's own quotes first.
