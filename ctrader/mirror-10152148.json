@@ -7189,7 +7189,7 @@
     "lots": 3.11,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T04:16:57.000Z",
     "councilEntry": 0.83394,
     "stop": 0.834455,
@@ -7202,10 +7202,12 @@
     "slipR": 0.136,
     "lagSec": 117,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T04:16:57.000Z",
-    "brokerStop": 0.83438
+    "brokerStop": 0.83438,
+    "closedAt": "2026-11-27T04:45:46.000Z"
    },
    "boxfade:nzdusd:boxfade-m5-b1795754100": {
     "positionId": "51659975",
@@ -7230,22 +7232,48 @@
     ],
     "stopCheckedAt": "2026-11-27T04:35:19.000Z",
     "brokerStop": 0.54799
+   },
+   "boxfade:audusd:boxfade-m5-s1795754700": {
+    "positionId": "51661045",
+    "symbol": "AUDUSD",
+    "side": "sell",
+    "volume": 29400000,
+    "lots": 2.94,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T04:45:46.000Z",
+    "councilEntry": 0.66614,
+    "stop": 0.66671,
+    "t1": 0.66557,
+    "riskCash": 185.55,
+    "margin": 391.67,
+    "mark": 0.66608,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66618,
+    "slipR": -0.07,
+    "lagSec": 46,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T04:45:46.000Z",
+    "brokerStop": 0.66681
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 10760.32,
-   "lastBalance": 9485.36,
+   "lastBalance": 9277.54,
    "ids": [
     "51656025",
-    "51658088",
-    "51659975"
+    "51659975",
+    "51661045"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9485.36 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 9277.54 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7253,20 +7281,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9485.36,
-  "lastRun": "2026-11-27T04:43:30.000Z"
+  "balance": 9277.54,
+  "lastRun": "2026-11-27T04:47:15.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T19:18:31.000Z",
-   "msg": "opened sell XAUUSD 0.01 lot (council replica)",
-   "trade": "xau-replica-1794597418-s"
-  },
-  {
-   "at": "2026-11-13T20:11:58.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council replica)",
-   "trade": "xau-replica-1794600656-b"
-  },
   {
    "at": "2026-11-13T20:40:35.000Z",
    "msg": "XAUUSD position 49618119 closed at the broker",
@@ -8750,6 +8768,16 @@
    "at": "2026-11-27T04:39:52.000Z",
    "msg": "closed GBPUSD position 51656026 (council: stopped)",
    "trade": "boxfade:gbpusd:boxfade-m5-b1795749900"
+  },
+  {
+   "at": "2026-11-27T04:45:46.000Z",
+   "msg": "USDCHF position 51658088 closed at the broker",
+   "trade": "boxfade:usdchf:boxfade-m5-s1795752900"
+  },
+  {
+   "at": "2026-11-27T04:45:46.000Z",
+   "msg": "opened sell AUDUSD 2.94 lot (council boxfade)",
+   "trade": "boxfade:audusd:boxfade-m5-s1795754700"
   }
  ],
  "limits": {
@@ -8854,11 +8882,11 @@
   ]
  },
  "execution": {
-  "n": 247,
-  "meanSlipR": 0.059,
+  "n": 248,
+  "meanSlipR": 0.058,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
-  "medianLagSec": 71,
+  "medianLagSec": 70.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -8881,8 +8909,8 @@
     "meanSlipR": 0.044
    },
    "AUDUSD": {
-    "n": 27,
-    "meanSlipR": 0.044
+    "n": 28,
+    "meanSlipR": 0.04
    },
    "GBPUSD": {
     "n": 16,

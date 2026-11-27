@@ -2655,6 +2655,32 @@
     "stopCheckedAt": "2026-11-27T04:16:50.000Z",
     "brokerStop": 1.09718,
     "closedAt": "2026-11-27T04:35:16.000Z"
+   },
+   "eqx:fvg:usdchf:fvg-h1-s1795748400-1795754700": {
+    "positionId": "51661038",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 900000,
+    "lots": 0.09,
+    "digits": 5,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-27T04:45:41.000Z",
+    "councilEntry": 0.83432,
+    "stop": 0.834567,
+    "t1": 0.834073,
+    "riskCash": 3.67,
+    "margin": 18,
+    "mark": 0.83426,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83437,
+    "slipR": -0.202,
+    "lagSec": 41,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T04:45:41.000Z",
+    "brokerStop": 0.83468
    }
   },
   "day": {
@@ -2662,13 +2688,14 @@
    "startBalance": 439.97,
    "lastBalance": 367.13,
    "ids": [
-    "51656090"
+    "51656090",
+    "51661038"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 367.13 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 367.13 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2685,13 +2712,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 367.13,
-  "lastRun": "2026-11-27T04:43:27.000Z"
+  "lastRun": "2026-11-27T04:47:12.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-21T05:11:14.000Z",
-   "msg": "error: could not reach the cTrader demo server"
-  },
   {
    "at": "2026-11-21T07:19:56.000Z",
    "msg": "error: CANT_ROUTE_REQUEST: Cannot route request"
@@ -4178,6 +4201,11 @@
    "at": "2026-11-27T04:35:16.000Z",
    "msg": "EURUSD position 51658080 closed at the broker",
    "trade": "eqx:fvg:eurusd:fvg-h1-b1795752000-1795752900"
+  },
+  {
+   "at": "2026-11-27T04:45:41.000Z",
+   "msg": "opened sell USDCHF 0.09 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdchf:fvg-h1-s1795748400-1795754700"
   }
  ],
  "limits": {
@@ -4282,9 +4310,9 @@
   ]
  },
  "execution": {
-  "n": 62,
-  "meanSlipR": 0.081,
-  "medianSlipR": 0.057,
+  "n": 63,
+  "meanSlipR": 0.076,
+  "medianSlipR": 0.049,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
   "bySymbol": {
@@ -4321,8 +4349,8 @@
     "meanSlipR": 0.162
    },
    "USDCHF": {
-    "n": 4,
-    "meanSlipR": 0.077
+    "n": 5,
+    "meanSlipR": 0.021
    },
    "XAGUSD": {
     "n": 4,
