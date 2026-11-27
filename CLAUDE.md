@@ -2686,6 +2686,15 @@ Display only: nothing here places, changes or refuses an order.
   of script a frame on a phone profile; not checked on a real phone.
 - Tests: `tests/charts-app.test.mjs`, `tests/desk-live.test.mjs` (the stream hand-over on a fake EventSource and clock).
 
+## Quick type and drawing undo on the Charts (27 Nov 2026, owner: "Keep improving the charts")
+Display only. `assets/ms-quick.js` (`window.MS_QUICK` pure `parseTf`, `matchMarkets`; loaded after ms-draw.js): on Charts (and the
+Charts app), not for guests, typing a digit opens a "Timeframe" box ("15" = M15, "60" = H1, "240" = H4, "4h", "30s", "1d", "w",
+"1M"; Enter applies through `msOneTf`) and a letter a "Market" box (the key, the label or the name; arrows, Enter goes through
+`msGoMarket`). A lone digit 0-6 keeps its old pane meaning after 0.9 s; the tool letters f h t b p m r and "/" (the command palette)
+are left alone. Styles `.ms-qk` (glass in `assets/soft.css`). `assets/ms-draw.js`: every save keeps the market's previous saved
+drawings in memory (100 steps, gone on a reload): Ctrl / Cmd + Z undo, Ctrl + Shift + Z or Ctrl + Y redo, and both in the right-click
+menu; `window.msDrawUndo` / `msDrawRedo`. Test: `tests/charts-quick.test.mjs`.
+
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
 right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to

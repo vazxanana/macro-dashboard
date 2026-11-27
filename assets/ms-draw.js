@@ -27,7 +27,12 @@
   const ST = {};   // market -> shapes (UTC times)
   const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
   const load = (mk) => { if (!ST[mk]) { let a = []; try { a = JSON.parse(ls.get(KEY(mk)) || '[]'); } catch (e) {} ST[mk] = BT() ? BT().drawNorm(a) : []; } return ST[mk]; };
-  const save = (mk) => ls.set(KEY(mk), JSON.stringify(ST[mk] || []));
+  // undo / redo (27 Nov 2026): every save keeps the market's previous saved drawings; memory only, 100 steps, cleared on a reload
+  const SAVED = {}, UNDO = [], REDO = [];
+  const savedOf = (mk) => (mk in SAVED ? SAVED[mk] : (SAVED[mk] = ls.get(KEY(mk)) || '[]'));
+  const save = (mk) => { const now = JSON.stringify(ST[mk] || []), prev = savedOf(mk); if (prev !== now) { UNDO.push([mk, prev]); if (UNDO.length > 100) UNDO.shift(); REDO.length = 0; } SAVED[mk] = now; ls.set(KEY(mk), now); };
+  function back(from, to) { const it = from.pop(); if (!it) { note(from === UNDO ? 'Nothing to undo.' : 'Nothing to redo.'); return false; } const [mk, s] = it; to.push([mk, savedOf(mk)]);
+    let a = []; try { a = JSON.parse(s); } catch (e) {} ST[mk] = BT() ? BT().drawNorm(a) : a; SAVED[mk] = s; ls.set(KEY(mk), s); SEL = null; HOV = null; GES = null; bar(); paintAll(); return true; }
   let SELC = null, TOOL = null, MAG = +(ls.get(MAGK) || 0) || 0, SEL = null, HOV = null, GES = null, DRAFT = null;   // SEL / HOV = { mk, i }
   // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
   const auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
@@ -207,6 +212,7 @@
     const last = [...L.keys()].reverse().find((i) => !L[i].lock);
     m.innerHTML = `<button type="button" role="menuitem" data-m="reset">Reset chart view</button>` + (h ? `<button type="button" role="menuitem" data-m="del">Delete this drawing</button>` : '')
       + `<button type="button" role="menuitem" data-m="last"${last == null ? ' disabled' : ''}>Remove the last drawing</button><button type="button" role="menuitem" data-m="all"${L.length ? '' : ' disabled'}>Delete all drawings</button>`
+      + `<button type="button" role="menuitem" data-m="undo"${UNDO.length ? '' : ' disabled'}>Undo <kbd>Ctrl+Z</kbd></button><button type="button" role="menuitem" data-m="redo"${REDO.length ? '' : ' disabled'}>Redo <kbd>Ctrl+Y</kbd></button>`
       + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0) || !window.msPaperDraftAt || !window.msPaperMarket || window.msPaperMarket() !== mk) return '';   // paper orders from the chart (19 Nov 2026)
         menu.px = p; const t = cx.fmt ? cx.fmt(p) : p.toFixed(2); return `<hr class="cm-sep"><button type="button" role="menuitem" data-m="pbuy">Paper buy at ${t}</button><button type="button" role="menuitem" data-m="psell">Paper sell at ${t}</button>`; })();
     m.hidden = false; const bw = m.offsetWidth || 220, bh = m.offsetHeight || 160; m.style.transform = `translate(${Math.min(ev.clientX, innerWidth - bw - 8)}px, ${Math.min(ev.clientY, innerHeight - bh - 8)}px)`;
@@ -215,6 +221,7 @@
       if (k === 'del' && h) remove(h.mk, h.i);
       if ((k === 'pbuy' || k === 'psell') && window.msPaperDraftAt) window.msPaperDraftAt(k === 'pbuy' ? 'buy' : 'sell', menu.px);
       if (k === 'last' && last != null) remove(mk, last);
+      if (k === 'undo') back(UNDO, REDO); if (k === 'redo') back(REDO, UNDO);
       if (k === 'all') { const ok = window.msConfirm ? await window.msConfirm(`Delete all ${L.filter((d) => !d.lock).length} drawings on this market? Locked ones stay.`, { title: 'Delete all drawings', ok: 'Delete all', danger: true }) : confirm('Delete all drawings?');
         if (ok) { ST[mk] = L.filter((d) => d.lock); save(mk); SEL = null; bar(); paintAll(); } } };
     m.querySelector('button:not([disabled])').focus({ preventScroll: true }); }
@@ -223,7 +230,9 @@
   document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '') || document.querySelector('dialog[open]') || !CX.some((c) => c.visible())) return;
     if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x', KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } }
     if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES) { if (SEL && GES.d0) load(SEL.mk)[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
-    if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); } });
+    if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); }
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.code === 'KeyZ' || e.code === 'KeyY')) { e.preventDefault(); back(e.code === 'KeyY' || e.shiftKey ? REDO : UNDO, e.code === 'KeyY' || e.shiftKey ? UNDO : REDO); } });
+  window.msDrawUndo = () => back(UNDO, REDO); window.msDrawRedo = () => back(REDO, UNDO);
   addEventListener('scroll', () => { if (SEL) bar(); }, { passive: true });
 
   // ---- charts: the page registers each one ----
