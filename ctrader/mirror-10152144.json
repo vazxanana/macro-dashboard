@@ -2761,6 +2761,30 @@
     ],
     "stopCheckedAt": "2026-11-27T05:31:43.000Z",
     "brokerStop": 0.54993
+   },
+   "eqx:fade:eurjpy:fade-m15-s1795758300": {
+    "positionId": "51663815",
+    "symbol": "EURJPY",
+    "side": "sell",
+    "volume": 800000,
+    "lots": 0.08,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T05:45:59.000Z",
+    "councilEntry": 174.971,
+    "stop": 175.038071,
+    "t1": 174.836857,
+    "riskCash": 3.6,
+    "margin": 17.57,
+    "fillPrice": 174.976,
+    "slipR": -0.075,
+    "lagSec": 59,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T05:45:59.000Z",
+    "brokerStop": 175.043
    }
   },
   "day": {
@@ -2769,13 +2793,14 @@
    "lastBalance": 360.4,
    "ids": [
     "51656090",
-    "51663241"
+    "51663241",
+    "51663815"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 360.4 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 360.4 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2792,13 +2817,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 360.4,
-  "lastRun": "2026-11-27T05:45:08.000Z"
+  "lastRun": "2026-11-27T05:47:56.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-21T11:35:44.000Z",
-   "msg": "error: could not reach the cTrader demo server"
-  },
   {
    "at": "2026-11-22T23:53:30.000Z",
    "msg": "US500 position 50584629 closed at the broker",
@@ -4292,6 +4313,11 @@
    "at": "2026-11-27T05:42:32.000Z",
    "msg": "USDJPY position 51662482 closed at the broker",
    "trade": "eqx:fade:usdjpy:fade-m15-s1795755600"
+  },
+  {
+   "at": "2026-11-27T05:45:59.000Z",
+   "msg": "opened sell EURJPY 0.08 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurjpy:fade-m15-s1795758300"
   }
  ],
  "limits": {
@@ -4396,9 +4422,9 @@
   ]
  },
  "execution": {
-  "n": 66,
-  "meanSlipR": 0.064,
-  "medianSlipR": 0.036,
+  "n": 67,
+  "meanSlipR": 0.062,
+  "medianSlipR": 0.033,
   "worstSlipR": 1.352,
   "medianLagSec": 73,
   "bySymbol": {
@@ -4427,8 +4453,8 @@
     "meanSlipR": 0.092
    },
    "EURJPY": {
-    "n": 8,
-    "meanSlipR": -0.144
+    "n": 9,
+    "meanSlipR": -0.136
    },
    "AUDUSD": {
     "n": 7,
