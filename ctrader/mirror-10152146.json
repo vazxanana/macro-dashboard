@@ -3612,7 +3612,7 @@
     "35000818",
     "35000621"
    ],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
   "status": "ok · demo Fusion Markets · balance 8515.62 · 15 open",
@@ -3623,28 +3623,25 @@
   },
   "wait": {
    "ict:x:nq-b-1795798800-dip": {
-    "why": "NAS100 market closed or just reopened: next try after 19:44 UTC, once spreads settle",
+    "why": "NAS100 market closed: SYMBOL_HAS_HOLIDAY: Symbols has a holiday right now",
     "n": 0,
-    "at": "2026-11-27T19:40:59.000Z"
+    "at": "2026-11-27T19:44:39.000Z"
    }
   },
-  "paused": {},
+  "paused": {
+   "NAS100": "2026-11-27T19:54:39.000Z"
+  },
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 8515.62,
-  "lastRun": "2026-11-27T19:40:59.000Z",
+  "lastRun": "2026-11-27T19:44:39.000Z",
   "closedSeen": {
-   "NAS100": "2026-11-27T19:24:39.000Z"
+   "NAS100": "2026-11-27T19:44:39.000Z"
   }
  },
  "log": [
-  {
-   "at": "2026-11-21T06:46:53.000Z",
-   "msg": "limit filled: SOLUSD position 50661044 at the broker",
-   "trade": "sol-position-1795231964"
-  },
   {
    "at": "2026-11-21T06:48:51.000Z",
    "msg": "placed buy limit ETHUSD 0.02 lot at 1629.51 (council rswing, valid to 2026-11-23T06:48Z)",
@@ -5132,6 +5129,11 @@
   {
    "at": "2026-11-27T19:36:46.000Z",
    "msg": "not mirrored yet ict:x:nq-b-1795798800-dip: NAS100 market closed or just reopened: next try after 19:44 UTC, once spreads settle (will retry)",
+   "trade": "ict:x:nq-b-1795798800-dip"
+  },
+  {
+   "at": "2026-11-27T19:44:39.000Z",
+   "msg": "not mirrored yet ict:x:nq-b-1795798800-dip: NAS100 market closed: SYMBOL_HAS_HOLIDAY: Symbols has a holiday right now (will retry)",
    "trade": "ict:x:nq-b-1795798800-dip"
   }
  ],
