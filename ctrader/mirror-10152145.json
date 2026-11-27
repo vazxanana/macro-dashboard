@@ -15073,6 +15073,30 @@
     "exitPrice": 41.423,
     "councilExit": 41.51825,
     "councilR": 2.042
+   },
+   "bfade:xag:bigfade-m15-s1795744800": {
+    "positionId": "51651306",
+    "symbol": "XAGUSD",
+    "side": "sell",
+    "volume": 1650000,
+    "lots": 3.3,
+    "digits": 3,
+    "setup": "bfade",
+    "status": "open",
+    "openedAt": "2026-11-27T02:01:23.000Z",
+    "councilEntry": 42.629,
+    "stop": 42.661729,
+    "t1": 42.24075,
+    "riskCash": 541.44,
+    "margin": 1393.79,
+    "fillPrice": 42.734,
+    "slipR": -3.208,
+    "lagSec": 83,
+    "alerted": [
+     "open",
+     "nostop"
+    ],
+    "noStopTries": 1
    }
   },
   "day": {
@@ -15085,10 +15109,10 @@
     "47373484"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 10828.89 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 10828.89 · 4 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.68666 has run 1.27R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.685 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -15100,19 +15124,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:40.000Z",
   "balance": 10828.89,
-  "lastRun": "2026-11-27T01:58:43.000Z"
+  "lastRun": "2026-11-27T02:01:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-19T17:02:18.000Z",
-   "msg": "opened sell XAUUSD 0.01 lot (council gmp)",
-   "trade": "xau-gmp-1795100400"
-  },
-  {
-   "at": "2026-11-19T17:04:47.000Z",
-   "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 465.92, 4.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "xau-position-1794495673"
-  },
   {
    "at": "2026-11-19T17:06:14.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 467.95, 4.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -16595,6 +16609,16 @@
    "at": "2026-11-27T00:18:32.000Z",
    "msg": "not mirrored bfade:audusd:bigfade-m15-b1795738500: price 0.66328 has run 1.08R from the council entry 0.6632: a different trade now",
    "trade": "bfade:audusd:bigfade-m15-b1795738500"
+  },
+  {
+   "at": "2026-11-27T02:01:23.000Z",
+   "msg": "opened sell XAGUSD 3.3 lot (council bfade)",
+   "trade": "bfade:xag:bigfade-m15-s1795744800"
+  },
+  {
+   "at": "2026-11-27T02:01:23.000Z",
+   "msg": "close of unprotected XAGUSD 51651306 failed: POSITION_NOT_FOUND: Position not found with id 51651306 (again next round)",
+   "trade": "bfade:xag:bigfade-m15-s1795744800"
   }
  ],
  "limits": {
@@ -16699,11 +16723,11 @@
   ]
  },
  "execution": {
-  "n": 499,
-  "meanSlipR": -0.011,
+  "n": 500,
+  "meanSlipR": -0.017,
   "medianSlipR": -0.001,
   "worstSlipR": 1.687,
-  "medianLagSec": 154,
+  "medianLagSec": 152.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 27,
@@ -16742,8 +16766,8 @@
     "meanSlipR": -0.036
    },
    "XAGUSD": {
-    "n": 1,
-    "meanSlipR": 0.21
+    "n": 2,
+    "meanSlipR": -1.499
    }
   }
  }
