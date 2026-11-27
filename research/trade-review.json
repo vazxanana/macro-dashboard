@@ -1,6 +1,6 @@
 {
  "v": 1,
- "at": "2026-11-27T15:55:41.000Z",
+ "at": "2026-11-27T16:27:05.000Z",
  "rule": "proposals only: nothing here changes a rule, a size, a stop, a filter or config.json; the owner decides (absolute rule 3). ICT is a separate edge and is not read.",
  "inSample": "In sample: found by looking at these same trades, so it proves nothing until a pre-registered test on other data confirms it.",
  "windows": {
@@ -60,14 +60,14 @@
   },
   "shadow": {
    "d30": {
-    "n": 1076,
-    "net": 25.05,
-    "gross": 215.57
+    "n": 1078,
+    "net": 23.05,
+    "gross": 213.57
    },
    "all": {
-    "n": 1076,
-    "net": 25.05,
-    "gross": 215.57
+    "n": 1078,
+    "net": 23.05,
+    "gross": 213.57
    }
   }
  },
@@ -9311,6 +9311,338 @@
    ]
   },
   {
+   "key": "nq-open:nyflip-trend|shadow",
+   "id": "nq-open:nyflip-trend",
+   "k": "nq-open",
+   "name": "NQ open run, trend-on only · nyflip-trend",
+   "book": "shadow",
+   "src": "research",
+   "variant": "nyflip-trend",
+   "ownerShadow": true,
+   "retired": false,
+   "stopped": false,
+   "shadowed": null,
+   "markets": [
+    "nq"
+   ],
+   "regime": null,
+   "windows": {
+    "d7": {
+     "n": 3,
+     "wins": 1,
+     "losses": 2,
+     "flat": 0,
+     "winRate": 0.333,
+     "days": 3,
+     "gross": {
+      "sum": -0.94,
+      "mean": -0.313,
+      "t": -0.46
+     },
+     "net": {
+      "sum": -0.94,
+      "mean": -0.313,
+      "t": -0.46,
+      "byDay": {
+       "days": 3,
+       "t": null,
+       "p": null
+      }
+     },
+     "cost": {
+      "known": 0,
+      "sum": 0,
+      "perTrade": null,
+      "shareOfGrossWins": null
+     }
+    },
+    "d30": {
+     "n": 6,
+     "wins": 1,
+     "losses": 5,
+     "flat": 0,
+     "winRate": 0.167,
+     "days": 6,
+     "gross": {
+      "sum": -4.19,
+      "mean": -0.698,
+      "t": -1.98
+     },
+     "net": {
+      "sum": -4.19,
+      "mean": -0.698,
+      "t": -1.98,
+      "byDay": {
+       "days": 6,
+       "t": -1.98,
+       "p": 0.105
+      }
+     },
+     "cost": {
+      "known": 0,
+      "sum": 0,
+      "perTrade": null,
+      "shareOfGrossWins": null
+     }
+    },
+    "all": {
+     "n": 6,
+     "wins": 1,
+     "losses": 5,
+     "flat": 0,
+     "winRate": 0.167,
+     "days": 6,
+     "gross": {
+      "sum": -4.19,
+      "mean": -0.698,
+      "t": -1.98
+     },
+     "net": {
+      "sum": -4.19,
+      "mean": -0.698,
+      "t": -1.98,
+      "byDay": {
+       "days": 6,
+       "t": -1.98,
+       "p": 0.105
+      }
+     },
+     "cost": {
+      "known": 0,
+      "sum": 0,
+      "perTrade": null,
+      "shareOfGrossWins": null
+     }
+    }
+   },
+   "whereR": {
+    "exits": {
+     "stop": {
+      "n": 5,
+      "net": -5.25
+     },
+     "trail": {
+      "n": 1,
+      "net": 1.06
+     }
+    },
+    "fastStops": {
+     "n": 5,
+     "ofLosses": 5,
+     "share": 1,
+     "net": -5.25,
+     "within": "30 minutes of the fill"
+    },
+    "reached1R": {
+     "withMfe": 4,
+     "n": 1,
+     "closedAtLoss": 0,
+     "lossNet": 0
+    },
+    "giveback": {
+     "n": 1,
+     "mean": 1,
+     "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
+    },
+    "lock1R": {
+     "n": 4,
+     "mean": -0.015,
+     "t": -1,
+     "byDay": {
+      "days": 4,
+      "t": null,
+      "p": null
+     },
+     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
+    },
+    "targetAfterStop": {
+     "n": 0,
+     "ofLosses": 5,
+     "note": "losses whose target was reached after the stop (post-mortem)"
+    }
+   },
+   "splits": {
+    "session": [
+     {
+      "v": "overlap",
+      "n": 6,
+      "mean": -0.698,
+      "sum": -4.19,
+      "t": -1.98,
+      "rest": {
+       "n": 0,
+       "mean": 0
+      },
+      "vsRest": null
+     }
+    ],
+    "hours": [
+     {
+      "v": "12-16",
+      "n": 6,
+      "mean": -0.698,
+      "sum": -4.19,
+      "t": -1.98,
+      "rest": {
+       "n": 0,
+       "mean": 0
+      },
+      "vsRest": null
+     }
+    ],
+    "side": [
+     {
+      "v": "buy",
+      "n": 4,
+      "mean": -0.485,
+      "sum": -1.94,
+      "t": -0.94,
+      "rest": {
+       "n": 2,
+       "mean": -1.125
+      },
+      "vsRest": null
+     },
+     {
+      "v": "sell",
+      "n": 2,
+      "mean": -1.125,
+      "sum": -2.25,
+      "t": -15,
+      "rest": {
+       "n": 4,
+       "mean": -0.485
+      },
+      "vsRest": null
+     }
+    ],
+    "market": [],
+    "exit": [
+     {
+      "v": "stop",
+      "n": 5,
+      "sum": -5.25
+     },
+     {
+      "v": "trail",
+      "n": 1,
+      "sum": 1.06
+     }
+    ]
+   },
+   "slippage": {
+    "n": 0,
+    "mean": 0,
+    "t": 0,
+    "worse": 0,
+    "note": "fill minus the council entry in R, positive = worse"
+   },
+   "reviews": {
+    "reviewed": 0,
+    "tags": {}
+   },
+   "decay": {
+    "status": "healthy",
+    "few": false,
+    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
+    "ref": 0.331
+   },
+   "expect": {
+    "perTrade": {
+     "exp": -0.018,
+     "lo": -0.073,
+     "hi": 0.037
+    },
+    "src": "research/edge/nq-open-oos"
+   },
+   "flags": [],
+   "review": {
+    "head": "NQ open run, trend-on only · nyflip-trend (shadow): 6 closed, 17% won, −4.19R before costs, no cost on record (too few to judge); last 30 days −4.19R on 6, last 7 days −0.94R on 3.",
+    "working": [
+     "trail exits +1.06R on 1"
+    ],
+    "losing": [
+     "before costs (none on record) −4.19R on 6 trades (−0.70R a trade, too few to judge)",
+     "stop exits −5.25R on 5",
+     "5 of 5 losses stopped within 30 minutes of the fill (−5.25R)"
+    ]
+   },
+   "recent": [
+    {
+     "id": "nq-nyflipt-2026-11-09",
+     "market": "nq",
+     "side": "sell",
+     "e": 1794234720,
+     "t": 1794234780,
+     "R": -1.05,
+     "net": -1.05,
+     "exit": "stop",
+     "mfe": null,
+     "session": "overlap"
+    },
+    {
+     "id": "nq-nyflipt-2026-11-19",
+     "market": "nq",
+     "side": "sell",
+     "e": 1795099260,
+     "t": 1795099320,
+     "R": -1.2,
+     "net": -1.2,
+     "exit": "stop",
+     "mfe": null,
+     "session": "overlap"
+    },
+    {
+     "id": "nq-nyflipt-2026-11-20",
+     "market": "nq",
+     "side": "buy",
+     "e": 1795187400,
+     "t": 1795187940,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": 0.43,
+     "session": "overlap"
+    },
+    {
+     "id": "nq-nyflipt-2026-11-24",
+     "market": "nq",
+     "side": "buy",
+     "e": 1795530720,
+     "t": 1795532520,
+     "R": 1.06,
+     "net": 1.06,
+     "exit": "trail",
+     "mfe": 2.06,
+     "session": "overlap"
+    },
+    {
+     "id": "nq-nyflipt-2026-11-25",
+     "market": "nq",
+     "side": "buy",
+     "e": 1795618860,
+     "t": 1795619700,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": 0.82,
+     "session": "overlap"
+    },
+    {
+     "id": "nq-nyflipt-2026-11-27",
+     "market": "nq",
+     "side": "buy",
+     "e": 1795794480,
+     "t": 1795794720,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": 0.23,
+     "session": "overlap"
+    }
+   ]
+  },
+  {
    "key": "gmp|shadow",
    "id": "gmp",
    "k": "gmp",
@@ -9675,326 +10007,6 @@
    ]
   },
   {
-   "key": "nq-open:nyflip-trend|shadow",
-   "id": "nq-open:nyflip-trend",
-   "k": "nq-open",
-   "name": "NQ open run, trend-on only · nyflip-trend",
-   "book": "shadow",
-   "src": "research",
-   "variant": "nyflip-trend",
-   "ownerShadow": true,
-   "retired": false,
-   "stopped": false,
-   "shadowed": null,
-   "markets": [
-    "nq"
-   ],
-   "regime": null,
-   "windows": {
-    "d7": {
-     "n": 2,
-     "wins": 1,
-     "losses": 1,
-     "flat": 0,
-     "winRate": 0.5,
-     "days": 2,
-     "gross": {
-      "sum": 0.06,
-      "mean": 0.03,
-      "t": 0.03
-     },
-     "net": {
-      "sum": 0.06,
-      "mean": 0.03,
-      "t": 0.03,
-      "byDay": {
-       "days": 2,
-       "t": null,
-       "p": null
-      }
-     },
-     "cost": {
-      "known": 0,
-      "sum": 0,
-      "perTrade": null,
-      "shareOfGrossWins": null
-     }
-    },
-    "d30": {
-     "n": 5,
-     "wins": 1,
-     "losses": 4,
-     "flat": 0,
-     "winRate": 0.2,
-     "days": 5,
-     "gross": {
-      "sum": -3.19,
-      "mean": -0.638,
-      "t": -1.5
-     },
-     "net": {
-      "sum": -3.19,
-      "mean": -0.638,
-      "t": -1.5,
-      "byDay": {
-       "days": 5,
-       "t": -1.5,
-       "p": 0.209
-      }
-     },
-     "cost": {
-      "known": 0,
-      "sum": 0,
-      "perTrade": null,
-      "shareOfGrossWins": null
-     }
-    },
-    "all": {
-     "n": 5,
-     "wins": 1,
-     "losses": 4,
-     "flat": 0,
-     "winRate": 0.2,
-     "days": 5,
-     "gross": {
-      "sum": -3.19,
-      "mean": -0.638,
-      "t": -1.5
-     },
-     "net": {
-      "sum": -3.19,
-      "mean": -0.638,
-      "t": -1.5,
-      "byDay": {
-       "days": 5,
-       "t": -1.5,
-       "p": 0.209
-      }
-     },
-     "cost": {
-      "known": 0,
-      "sum": 0,
-      "perTrade": null,
-      "shareOfGrossWins": null
-     }
-    }
-   },
-   "whereR": {
-    "exits": {
-     "stop": {
-      "n": 4,
-      "net": -4.25
-     },
-     "trail": {
-      "n": 1,
-      "net": 1.06
-     }
-    },
-    "fastStops": {
-     "n": 4,
-     "ofLosses": 4,
-     "share": 1,
-     "net": -4.25,
-     "within": "30 minutes of the fill"
-    },
-    "reached1R": {
-     "withMfe": 3,
-     "n": 1,
-     "closedAtLoss": 0,
-     "lossNet": 0
-    },
-    "giveback": {
-     "n": 1,
-     "mean": 1,
-     "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
-    },
-    "lock1R": {
-     "n": 3,
-     "mean": -0.02,
-     "t": -1,
-     "byDay": {
-      "days": 3,
-      "t": null,
-      "p": null
-     },
-     "note": "if every trade had closed at +1R once it reached +1R: the paired change in R a trade, before costs; an approximation from the recorded MFE (which leaves out the exit candle, so a trade closed at +1R or more counts as having reached +1R)"
-    },
-    "targetAfterStop": {
-     "n": 0,
-     "ofLosses": 4,
-     "note": "losses whose target was reached after the stop (post-mortem)"
-    }
-   },
-   "splits": {
-    "session": [
-     {
-      "v": "overlap",
-      "n": 5,
-      "mean": -0.638,
-      "sum": -3.19,
-      "t": -1.5,
-      "rest": {
-       "n": 0,
-       "mean": 0
-      },
-      "vsRest": null
-     }
-    ],
-    "hours": [
-     {
-      "v": "12-16",
-      "n": 5,
-      "mean": -0.638,
-      "sum": -3.19,
-      "t": -1.5,
-      "rest": {
-       "n": 0,
-       "mean": 0
-      },
-      "vsRest": null
-     }
-    ],
-    "side": [
-     {
-      "v": "buy",
-      "n": 3,
-      "mean": -0.313,
-      "sum": -0.94,
-      "t": -0.46,
-      "rest": {
-       "n": 2,
-       "mean": -1.125
-      },
-      "vsRest": null
-     },
-     {
-      "v": "sell",
-      "n": 2,
-      "mean": -1.125,
-      "sum": -2.25,
-      "t": -15,
-      "rest": {
-       "n": 3,
-       "mean": -0.313
-      },
-      "vsRest": null
-     }
-    ],
-    "market": [],
-    "exit": [
-     {
-      "v": "stop",
-      "n": 4,
-      "sum": -4.25
-     },
-     {
-      "v": "trail",
-      "n": 1,
-      "sum": 1.06
-     }
-    ]
-   },
-   "slippage": {
-    "n": 0,
-    "mean": 0,
-    "t": 0,
-    "worse": 0,
-    "note": "fill minus the council entry in R, positive = worse"
-   },
-   "reviews": {
-    "reviewed": 0,
-    "tags": {}
-   },
-   "decay": {
-    "status": "healthy",
-    "few": false,
-    "why": "in line with its backtest: last 30 trades +0.15R a trade, CUSUM 4.08 of 12.73",
-    "ref": 0.331
-   },
-   "expect": {
-    "perTrade": {
-     "exp": -0.018,
-     "lo": -0.073,
-     "hi": 0.037
-    },
-    "src": "research/edge/nq-open-oos"
-   },
-   "flags": [],
-   "review": {
-    "head": "NQ open run, trend-on only · nyflip-trend (shadow): 5 closed, 20% won, −3.19R before costs, no cost on record (too few to judge); last 30 days −3.19R on 5, last 7 days +0.06R on 2.",
-    "working": [
-     "trail exits +1.06R on 1"
-    ],
-    "losing": [
-     "before costs (none on record) −3.19R on 5 trades (−0.64R a trade, too few to judge)",
-     "stop exits −4.25R on 4",
-     "4 of 4 losses stopped within 30 minutes of the fill (−4.25R)"
-    ]
-   },
-   "recent": [
-    {
-     "id": "nq-nyflipt-2026-11-09",
-     "market": "nq",
-     "side": "sell",
-     "e": 1794234720,
-     "t": 1794234780,
-     "R": -1.05,
-     "net": -1.05,
-     "exit": "stop",
-     "mfe": null,
-     "session": "overlap"
-    },
-    {
-     "id": "nq-nyflipt-2026-11-19",
-     "market": "nq",
-     "side": "sell",
-     "e": 1795099260,
-     "t": 1795099320,
-     "R": -1.2,
-     "net": -1.2,
-     "exit": "stop",
-     "mfe": null,
-     "session": "overlap"
-    },
-    {
-     "id": "nq-nyflipt-2026-11-20",
-     "market": "nq",
-     "side": "buy",
-     "e": 1795187400,
-     "t": 1795187940,
-     "R": -1,
-     "net": -1,
-     "exit": "stop",
-     "mfe": 0.43,
-     "session": "overlap"
-    },
-    {
-     "id": "nq-nyflipt-2026-11-24",
-     "market": "nq",
-     "side": "buy",
-     "e": 1795530720,
-     "t": 1795532520,
-     "R": 1.06,
-     "net": 1.06,
-     "exit": "trail",
-     "mfe": 2.06,
-     "session": "overlap"
-    },
-    {
-     "id": "nq-nyflipt-2026-11-25",
-     "market": "nq",
-     "side": "buy",
-     "e": 1795618860,
-     "t": 1795619700,
-     "R": -1,
-     "net": -1,
-     "exit": "stop",
-     "mfe": 0.82,
-     "session": "overlap"
-    }
-   ]
-  },
-  {
    "key": "nq-open:nyflip|shadow",
    "id": "nq-open:nyflip",
    "k": "nq-open",
@@ -10012,23 +10024,23 @@
    "regime": null,
    "windows": {
     "d7": {
-     "n": 2,
+     "n": 3,
      "wins": 1,
-     "losses": 1,
+     "losses": 2,
      "flat": 0,
-     "winRate": 0.5,
-     "days": 2,
+     "winRate": 0.333,
+     "days": 3,
      "gross": {
-      "sum": 0.06,
-      "mean": 0.03,
-      "t": 0.03
+      "sum": -0.94,
+      "mean": -0.313,
+      "t": -0.46
      },
      "net": {
-      "sum": 0.06,
-      "mean": 0.03,
-      "t": 0.03,
+      "sum": -0.94,
+      "mean": -0.313,
+      "t": -0.46,
       "byDay": {
-       "days": 2,
+       "days": 3,
        "t": null,
        "p": null
       }
@@ -10041,25 +10053,25 @@
      }
     },
     "d30": {
-     "n": 4,
+     "n": 5,
      "wins": 1,
-     "losses": 3,
+     "losses": 4,
      "flat": 0,
-     "winRate": 0.25,
-     "days": 4,
+     "winRate": 0.2,
+     "days": 5,
      "gross": {
-      "sum": -2.14,
-      "mean": -0.535,
-      "t": -1
+      "sum": -3.14,
+      "mean": -0.628,
+      "t": -1.48
      },
      "net": {
-      "sum": -2.14,
-      "mean": -0.535,
-      "t": -1,
+      "sum": -3.14,
+      "mean": -0.628,
+      "t": -1.48,
       "byDay": {
-       "days": 4,
-       "t": null,
-       "p": null
+       "days": 5,
+       "t": -1.48,
+       "p": 0.212
       }
      },
      "cost": {
@@ -10070,25 +10082,25 @@
      }
     },
     "all": {
-     "n": 4,
+     "n": 5,
      "wins": 1,
-     "losses": 3,
+     "losses": 4,
      "flat": 0,
-     "winRate": 0.25,
-     "days": 4,
+     "winRate": 0.2,
+     "days": 5,
      "gross": {
-      "sum": -2.14,
-      "mean": -0.535,
-      "t": -1
+      "sum": -3.14,
+      "mean": -0.628,
+      "t": -1.48
      },
      "net": {
-      "sum": -2.14,
-      "mean": -0.535,
-      "t": -1,
+      "sum": -3.14,
+      "mean": -0.628,
+      "t": -1.48,
       "byDay": {
-       "days": 4,
-       "t": null,
-       "p": null
+       "days": 5,
+       "t": -1.48,
+       "p": 0.212
       }
      },
      "cost": {
@@ -10102,8 +10114,8 @@
    "whereR": {
     "exits": {
      "stop": {
-      "n": 3,
-      "net": -3.2
+      "n": 4,
+      "net": -4.2
      },
      "trail": {
       "n": 1,
@@ -10111,14 +10123,14 @@
      }
     },
     "fastStops": {
-     "n": 3,
-     "ofLosses": 3,
+     "n": 4,
+     "ofLosses": 4,
      "share": 1,
-     "net": -3.2,
+     "net": -4.2,
      "within": "30 minutes of the fill"
     },
     "reached1R": {
-     "withMfe": 3,
+     "withMfe": 4,
      "n": 1,
      "closedAtLoss": 0,
      "lossNet": 0
@@ -10129,11 +10141,11 @@
      "note": "best open R minus the R closed, on trades that reached +1R (candle extremes)"
     },
     "lock1R": {
-     "n": 3,
-     "mean": -0.02,
+     "n": 4,
+     "mean": -0.015,
      "t": -1,
      "byDay": {
-      "days": 3,
+      "days": 4,
       "t": null,
       "p": null
      },
@@ -10141,7 +10153,7 @@
     },
     "targetAfterStop": {
      "n": 0,
-     "ofLosses": 3,
+     "ofLosses": 4,
      "note": "losses whose target was reached after the stop (post-mortem)"
     }
    },
@@ -10149,10 +10161,10 @@
     "session": [
      {
       "v": "overlap",
-      "n": 4,
-      "mean": -0.535,
-      "sum": -2.14,
-      "t": -1,
+      "n": 5,
+      "mean": -0.628,
+      "sum": -3.14,
+      "t": -1.48,
       "rest": {
        "n": 0,
        "mean": 0
@@ -10163,10 +10175,10 @@
     "hours": [
      {
       "v": "12-16",
-      "n": 4,
-      "mean": -0.535,
-      "sum": -2.14,
-      "t": -1,
+      "n": 5,
+      "mean": -0.628,
+      "sum": -3.14,
+      "t": -1.48,
       "rest": {
        "n": 0,
        "mean": 0
@@ -10177,10 +10189,10 @@
     "side": [
      {
       "v": "buy",
-      "n": 3,
-      "mean": -0.313,
-      "sum": -0.94,
-      "t": -0.46,
+      "n": 4,
+      "mean": -0.485,
+      "sum": -1.94,
+      "t": -0.94,
       "rest": {
        "n": 1,
        "mean": -1.2
@@ -10194,8 +10206,8 @@
       "sum": -1.2,
       "t": 0,
       "rest": {
-       "n": 3,
-       "mean": -0.313
+       "n": 4,
+       "mean": -0.485
       },
       "vsRest": null
      }
@@ -10204,8 +10216,8 @@
     "exit": [
      {
       "v": "stop",
-      "n": 3,
-      "sum": -3.2
+      "n": 4,
+      "sum": -4.2
      },
      {
       "v": "trail",
@@ -10241,14 +10253,14 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ New York open run · nyflip (shadow): 4 closed, 25% won, −2.14R before costs, no cost on record (too few to judge); last 30 days −2.14R on 4, last 7 days +0.06R on 2.",
+    "head": "NQ New York open run · nyflip (shadow): 5 closed, 20% won, −3.14R before costs, no cost on record (too few to judge); last 30 days −3.14R on 5, last 7 days −0.94R on 3.",
     "working": [
      "trail exits +1.06R on 1"
     ],
     "losing": [
-     "before costs (none on record) −2.14R on 4 trades (−0.54R a trade, too few to judge)",
-     "stop exits −3.20R on 3",
-     "3 of 3 losses stopped within 30 minutes of the fill (−3.20R)"
+     "before costs (none on record) −3.14R on 5 trades (−0.63R a trade, too few to judge)",
+     "stop exits −4.20R on 4",
+     "4 of 4 losses stopped within 30 minutes of the fill (−4.20R)"
     ]
    },
    "recent": [
@@ -10298,6 +10310,18 @@
      "net": -1,
      "exit": "stop",
      "mfe": 0.82,
+     "session": "overlap"
+    },
+    {
+     "id": "nq-nyflip-2026-11-27",
+     "market": "nq",
+     "side": "buy",
+     "e": 1795794480,
+     "t": 1795794720,
+     "R": -1,
+     "net": -1,
+     "exit": "stop",
+     "mfe": 0.23,
      "session": "overlap"
     }
    ]
@@ -10883,25 +10907,25 @@
    },
    "windows": {
     "d7": {
-     "n": 535,
-     "wins": 191,
-     "losses": 344,
+     "n": 531,
+     "wins": 188,
+     "losses": 343,
      "flat": 0,
-     "winRate": 0.357,
+     "winRate": 0.354,
      "days": 8,
      "gross": {
-      "sum": 33.99,
-      "mean": 0.064,
-      "t": 1.03
+      "sum": 28.99,
+      "mean": 0.055,
+      "t": 0.88
      },
      "net": {
-      "sum": 33.99,
-      "mean": 0.064,
-      "t": 1.03,
+      "sum": 28.99,
+      "mean": 0.055,
+      "t": 0.88,
       "byDay": {
        "days": 8,
-       "t": 1.02,
-       "p": 0.342
+       "t": 0.87,
+       "p": 0.411
       }
      },
      "cost": {
@@ -11595,7 +11619,7 @@
     "replica|research|weak-market:audusd"
    ],
    "review": {
-    "head": "Gold replica (research): 1909 closed, 33% won, −63.21R before costs, no cost on record (t −1.01, by day t −1.17 over 24 days before costs); last 30 days −63.21R on 1909, last 7 days +33.99R on 535.",
+    "head": "Gold replica (research): 1909 closed, 33% won, −63.21R before costs, no cost on record (t −1.01, by day t −1.17 over 24 days before costs); last 30 days −63.21R on 1909, last 7 days +28.99R on 531.",
     "working": [
      "other win exits +2.02R on 1",
      "time exits +14.66R on 39",
@@ -12575,23 +12599,23 @@
    "regime": null,
    "windows": {
     "d7": {
-     "n": 3,
+     "n": 2,
      "wins": 1,
-     "losses": 2,
+     "losses": 1,
      "flat": 0,
-     "winRate": 0.333,
-     "days": 3,
+     "winRate": 0.5,
+     "days": 2,
      "gross": {
-      "sum": 1.99,
-      "mean": 0.663,
-      "t": 0.4
+      "sum": 2.99,
+      "mean": 1.495,
+      "t": 0.6
      },
      "net": {
-      "sum": 1.99,
-      "mean": 0.663,
-      "t": 0.4,
+      "sum": 2.99,
+      "mean": 1.495,
+      "t": 0.6,
       "byDay": {
-       "days": 3,
+       "days": 2,
        "t": null,
        "p": null
       }
@@ -12828,7 +12852,7 @@
    },
    "flags": [],
    "review": {
-    "head": "NQ 2 SD IFVG fade · sd2ifvg (research): 7 closed, 43% won, +4.33R before costs, no cost on record (too few to judge); last 30 days +4.33R on 7, last 7 days +1.99R on 3.",
+    "head": "NQ 2 SD IFVG fade · sd2ifvg (research): 7 closed, 43% won, +4.33R before costs, no cost on record (too few to judge); last 30 days +4.33R on 7, last 7 days +2.99R on 2.",
     "working": [
      "before costs (none on record) +4.33R on 7 trades (+0.62R a trade, too few to judge)",
      "target exits +8.33R on 3"
@@ -15167,5 +15191,5 @@
    }
   ]
  },
- "hash": "5559ac6beb4c0694"
+ "hash": "0179e1b511612cfe"
 }
