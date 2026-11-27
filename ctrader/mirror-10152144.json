@@ -2581,7 +2581,7 @@
     "lots": 0.15,
     "digits": 3,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T04:01:15.000Z",
     "councilEntry": 159.246,
     "stop": 159.284364,
@@ -2592,10 +2592,15 @@
     "slipR": 0.782,
     "lagSec": 75,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T04:01:15.000Z",
-    "brokerStop": 159.254
+    "brokerStop": 159.254,
+    "closedAt": "2026-11-27T04:14:10.000Z",
+    "exitPrice": 159.229,
+    "councilExit": 159.207636,
+    "councilR": 1
    }
   },
   "day": {
@@ -2610,7 +2615,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 377.55 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 377.55 · 1 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2627,14 +2632,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 377.55,
-  "lastRun": "2026-11-27T04:11:32.000Z"
+  "lastRun": "2026-11-27T04:14:10.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-20T17:29:50.000Z",
-   "msg": "opened sell US30 0.02 lot (council ict-A)",
-   "trade": "ict:ym-s-1795190400"
-  },
   {
    "at": "2026-11-20T19:53:41.000Z",
    "msg": "moved US500 50584629 protection: stop 7217.25 -> 7114.75 (council ict-A)",
@@ -4118,6 +4118,11 @@
   {
    "at": "2026-11-27T04:01:15.000Z",
    "msg": "opened sell USDJPY 0.15 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:usdjpy:fvg-h1-s1795748400-1795752000"
+  },
+  {
+   "at": "2026-11-27T04:14:10.000Z",
+   "msg": "closed USDJPY position 51656455 (council: target)",
    "trade": "eqx:fvg:usdjpy:fvg-h1-s1795748400-1795752000"
   }
  ],
