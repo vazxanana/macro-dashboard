@@ -2448,6 +2448,58 @@
     "stopCheckedAt": "2026-11-27T07:42:56.000Z",
     "brokerStop": 3666.89,
     "closedAt": "2026-11-27T08:01:20.000Z"
+   },
+   "mosha6:bar-r6-eg-15m-b1795766460": {
+    "positionId": "51684122",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-27T08:27:27.000Z",
+    "councilEntry": 3665.745,
+    "stop": 3653.71,
+    "t1": 3737.955,
+    "riskCash": 22.17,
+    "margin": 7.36,
+    "mark": 3674.47,
+    "levelsFrom": "mark",
+    "fillPrice": 3673.85,
+    "slipR": 0.673,
+    "lagSec": 1587,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T08:27:27.000Z",
+    "brokerStop": 3653.09
+   },
+   "mosha6:bar-r6-tap-eg-15m-b1795766460": {
+    "positionId": "51684134",
+    "symbol": "XAUUSD",
+    "side": "buy",
+    "volume": 100,
+    "lots": 0.01,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-27T08:27:27.000Z",
+    "councilEntry": 3666.075,
+    "stop": 3653.71,
+    "t1": 3740.265,
+    "riskCash": 22.17,
+    "margin": 7.36,
+    "mark": 3674.47,
+    "levelsFrom": "mark",
+    "fillPrice": 3673.32,
+    "slipR": 0.586,
+    "lagSec": 1587,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T08:27:27.000Z",
+    "brokerStop": 3652.56
    }
   },
   "day": {
@@ -2470,10 +2522,10 @@
     "34940667",
     "34940666"
    ],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8867.15 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 8867.15 · 7 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now"
@@ -2485,7 +2537,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 8867.15,
-  "lastRun": "2026-11-27T08:22:29.000Z"
+  "lastRun": "2026-11-27T08:27:27.000Z"
  },
  "log": [
   {
@@ -3583,6 +3635,16 @@
    "at": "2026-11-27T08:20:17.000Z",
    "msg": "XAUUSD position 51650725 closed at the broker",
    "trade": "mosha6:bar-r6-15m-m5-v4-b1795743060"
+  },
+  {
+   "at": "2026-11-27T08:27:27.000Z",
+   "msg": "opened buy XAUUSD 0.01 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-eg-15m-b1795766460"
+  },
+  {
+   "at": "2026-11-27T08:27:27.000Z",
+   "msg": "opened buy XAUUSD 0.01 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-tap-eg-15m-b1795766460"
   }
  ],
  "limits": {
@@ -3687,11 +3749,11 @@
   ]
  },
  "execution": {
-  "n": 85,
-  "meanSlipR": -0.029,
-  "medianSlipR": -0.006,
+  "n": 87,
+  "meanSlipR": -0.014,
+  "medianSlipR": -0.005,
   "worstSlipR": 0.939,
-  "medianLagSec": 719,
+  "medianLagSec": 758,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -3718,8 +3780,8 @@
     "meanSlipR": -0.018
    },
    "XAUUSD": {
-    "n": 66,
-    "meanSlipR": -0.038
+    "n": 68,
+    "meanSlipR": -0.018
    },
    "EURUSD": {
     "n": 1,
