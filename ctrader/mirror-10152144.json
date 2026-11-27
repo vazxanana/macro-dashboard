@@ -2468,7 +2468,7 @@
     "lots": 0.09,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T02:16:36.000Z",
     "councilEntry": 0.83375,
     "stop": 0.83335,
@@ -2481,10 +2481,12 @@
     "slipR": -0.35,
     "lagSec": 96,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T02:16:36.000Z",
-    "brokerStop": 0.83326
+    "brokerStop": 0.83326,
+    "closedAt": "2026-11-27T02:47:37.000Z"
    },
    "eqx:fade:eurusd:fade-m15-s1795745700": {
     "positionId": "51652674",
@@ -2549,16 +2551,15 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 385.75,
+   "lastBalance": 381.57,
    "ids": [
-    "51652670",
-    "51652673"
+    "51652670"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 385.75 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 381.57 · 1 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2574,15 +2575,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 385.75,
-  "lastRun": "2026-11-27T02:46:47.000Z"
+  "balance": 381.57,
+  "lastRun": "2026-11-27T02:49:29.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-20T15:06:31.000Z",
-   "msg": "opened buy US2000 1.51 lot (council ict-A+)",
-   "trade": "ict:rty-b-1795183200"
-  },
   {
    "at": "2026-11-20T15:25:04.000Z",
    "msg": "US2000 position 50566131 closed at the broker",
@@ -4067,6 +4063,11 @@
    "at": "2026-11-27T02:34:34.000Z",
    "msg": "not mirrored eqx:goldvb:goldvb-b1795744800: price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now",
    "trade": "eqx:goldvb:goldvb-b1795744800"
+  },
+  {
+   "at": "2026-11-27T02:47:37.000Z",
+   "msg": "USDCHF position 51652673 closed at the broker",
+   "trade": "eqx:fade:usdchf:fade-m15-b1795745700"
   }
  ],
  "limits": {
