@@ -7454,4 +7454,5 @@ in council.yml; records `live/nq.json`, `live/vb.json`, labels `lv-<demo label>`
 demo runs go on beside it. Every order carries its stop and is read back (rule 1). OFF until the owner (1) authorises the live
 account for the cTrader app, (2) sets `CTRADER_LIVE=on`, (3) gives the login's last digits for config.json. Not checked against the
 real live server (the build sandbox reaches no broker): the live host name is cTrader Open API's documented `live.ctraderapi.com:5036`.
+Named 27 Nov 2026: owner rule `live-on-7653` = the Fusion USD live account ending 7653 (the GBP live account ending 7681 is never picked).
 Tests: `tests/live-account.test.mjs`.

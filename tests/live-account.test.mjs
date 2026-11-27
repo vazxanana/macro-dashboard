@@ -80,3 +80,14 @@ test('demo stays demo: session() refuses the live host, the demo jobs still use 
   for (const f of ['council/ctrader-mirror.mjs', 'council/gotobi.mjs', 'council/dom-demo.mjs', 'council/ctrader-suite.mjs', 'council/gotobi-due.mjs', 'council/test-order.mjs']) assert.ok(!/from '\.\/live\.mjs'/.test(fs.readFileSync(f, 'utf8')), f + ' never reaches the live account');
   const users = fs.readdirSync('council').filter((f) => f.endsWith('.mjs') && /liveSession|LIVE_HOST|from '\.\/live\.mjs'/.test(fs.readFileSync('council/' + f, 'utf8'))).sort(); assert.deepEqual(users, ['ctrader-mirror.mjs', 'live.mjs', 'nq-demo.mjs', 'vb-demo.mjs'], 'only the live module, the two jobs and the session code name the live host');
 });
+
+test('owner rule live-on-7653: the USD live account, 0.5 % a trade, 15 % daily stop', () => {
+  const T = fs.readFileSync(new URL('../council/trader.mjs', import.meta.url), 'utf8');
+  const i = T.indexOf("{ id: 'live-on-7653'"); assert.ok(i > 0 && i < T.indexOf('for (const u of USER_RULES)'));
+  assert.ok(T.includes("c.live = { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 };"));
+  const L = liveConfig({ live: { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 } });
+  assert.deepEqual(L, { account: '*7653', tail: '7653', risk: 0.005, dayStop: 0.15 });
+  // the owner's real account list: only 9087653 is picked, never a demo, never the GBP live account
+  const list = [{ traderLogin: 9027681, isLive: true }, { traderLogin: 9087653, isLive: true }, { traderLogin: 10156153, isLive: false }];
+  assert.equal(pickLive(list, L.tail).traderLogin, 9087653);
+});

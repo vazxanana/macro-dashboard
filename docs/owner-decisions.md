@@ -1316,6 +1316,10 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   gold and USD/JPY breakouts of the day, the gold 8-swing break; not gotobi); a -15 % daily stop kept as asked after being told
   that at 0.5 % a trade it needs about 30 losing trades in one day to act. This replaces item 46 for these rules only: the
   one exception to absolute rule 2. Every other book stays demo.
+- **Status (27 Nov 2026, later): the account is named.** The owner chose the Fusion Markets USD live account (login ending
+  7653; the token also sees a GBP live account, ending 7681, which is never picked). Owner rule `live-on-7653` sets
+  `config.live = { on: true, account: '*7653', risk: 0.005, dayStop: 0.15 }`. It trades only once `CTRADER_LIVE=on` is set and
+  the account holds money (a balance of 0 places nothing).
 - **What it is**: `council/live.mjs` + `council/nq-demo.mjs --live` + `council/vb-demo.mjs --live` (council.yml, each round and
   quick pass). Its own records `live/nq.json`, `live/vb.json`, `live/day.json`, labels `lv-...`.
 - **To switch it on (all three needed)**: (1) authorise the live account for the cTrader app (the same app the demo uses);
