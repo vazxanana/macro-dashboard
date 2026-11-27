@@ -3010,6 +3010,32 @@
     ],
     "stopCheckedAt": "2026-11-27T10:30:24.000Z",
     "brokerStop": 0.54769
+   },
+   "eqx:fade:gbpusd:fade-m15-s1795778100": {
+    "positionId": "51694025",
+    "symbol": "GBPUSD",
+    "side": "sell",
+    "volume": 1200000,
+    "lots": 0.12,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T11:15:34.000Z",
+    "councilEntry": 1.31305,
+    "stop": 1.313745,
+    "t1": 1.31166,
+    "riskCash": 3.67,
+    "margin": 31.5,
+    "mark": 1.31344,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31296,
+    "slipR": 0.129,
+    "lagSec": 34,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T11:15:34.000Z",
+    "brokerStop": 1.31326
    }
   },
   "day": {
@@ -3019,13 +3045,14 @@
    "ids": [
     "51656090",
     "51688521",
-    "51692951"
+    "51692951",
+    "51694025"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 366.79 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 366.79 · 4 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3047,14 +3074,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 366.79,
-  "lastRun": "2026-11-27T11:10:17.000Z"
+  "lastRun": "2026-11-27T11:17:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T10:36:03.000Z",
-   "msg": "not mirrored yet eqx:fade:usdjpy:fade-m15-s1795514400: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:usdjpy:fade-m15-s1795514400"
-  },
   {
    "at": "2026-11-24T10:36:03.000Z",
    "msg": "not mirrored yet eqx:bigfade:eurusd:bigfade-m15-s1795514400: daily loss stop (95.0% down today) (will retry)",
@@ -4548,6 +4570,11 @@
    "at": "2026-11-27T10:39:54.000Z",
    "msg": "closed XAUUSD position 51691949 (council: target)",
    "trade": "eqx:fvg:fvg-h1-b1795773600-1795774500"
+  },
+  {
+   "at": "2026-11-27T11:15:34.000Z",
+   "msg": "opened sell GBPUSD 0.12 lot (council eqx-fade)",
+   "trade": "eqx:fade:gbpusd:fade-m15-s1795778100"
   }
  ],
  "limits": {
@@ -4652,15 +4679,15 @@
   ]
  },
  "execution": {
-  "n": 75,
-  "meanSlipR": 0.053,
-  "medianSlipR": 0.033,
+  "n": 76,
+  "meanSlipR": 0.054,
+  "medianSlipR": 0.035,
   "worstSlipR": 1.352,
-  "medianLagSec": 68,
+  "medianLagSec": 63,
   "bySymbol": {
    "GBPUSD": {
-    "n": 7,
-    "meanSlipR": 0.219
+    "n": 8,
+    "meanSlipR": 0.208
    },
    "NZDUSD": {
     "n": 11,
