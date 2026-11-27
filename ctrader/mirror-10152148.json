@@ -7362,6 +7362,32 @@
     ],
     "stopCheckedAt": "2026-11-27T06:42:07.000Z",
     "brokerStop": 0.5481
+   },
+   "boxfade:gbpusd:boxfade-m5-b1795761900": {
+    "positionId": "51665337",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 22100000,
+    "lots": 2.21,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T06:45:15.000Z",
+    "councilEntry": 1.31219,
+    "stop": 1.31135,
+    "t1": 1.31303,
+    "riskCash": 181.37,
+    "margin": 580.08,
+    "mark": 1.31217,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31222,
+    "slipR": 0.036,
+    "lagSec": 15,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T06:45:15.000Z",
+    "brokerStop": 1.3114
    }
   },
   "day": {
@@ -7372,13 +7398,14 @@
     "51662133",
     "51662947",
     "51663818",
-    "51665287"
+    "51665287",
+    "51665337"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9068.49 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 9068.49 · 5 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7387,14 +7414,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9068.49,
-  "lastRun": "2026-11-27T06:44:15.000Z"
+  "lastRun": "2026-11-27T06:47:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:07:38.000Z",
-   "msg": "close XAUUSD 49525852 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794583847-s"
-  },
   {
    "at": "2026-11-15T22:07:38.000Z",
    "msg": "close XAUUSD 49547717 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -8883,6 +8905,11 @@
    "at": "2026-11-27T06:42:07.000Z",
    "msg": "opened buy NZDUSD 2.57 lot (council boxfade)",
    "trade": "boxfade:nzdusd:boxfade-m5-b1795761600"
+  },
+  {
+   "at": "2026-11-27T06:45:15.000Z",
+   "msg": "opened buy GBPUSD 2.21 lot (council boxfade)",
+   "trade": "boxfade:gbpusd:boxfade-m5-b1795761900"
   }
  ],
  "limits": {
@@ -8987,11 +9014,11 @@
   ]
  },
  "execution": {
-  "n": 252,
+  "n": 253,
   "meanSlipR": 0.057,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
-  "medianLagSec": 70.5,
+  "medianLagSec": 70,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -9018,8 +9045,8 @@
     "meanSlipR": 0.033
    },
    "GBPUSD": {
-    "n": 16,
-    "meanSlipR": 0.117
+    "n": 17,
+    "meanSlipR": 0.112
    },
    "USDCHF": {
     "n": 18,
