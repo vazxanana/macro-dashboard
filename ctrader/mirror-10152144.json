@@ -3442,7 +3442,7 @@
     "lots": 0.06,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T15:17:18.000Z",
     "councilEntry": 0.54677,
     "stop": 0.546296,
@@ -3453,10 +3453,15 @@
     "slipR": -0.38,
     "lagSec": 138,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T15:17:18.000Z",
-    "brokerStop": 0.54612
+    "brokerStop": 0.54612,
+    "closedAt": "2026-11-27T15:36:35.000Z",
+    "exitPrice": 0.5464,
+    "councilExit": 0.546296,
+    "councilR": -1
    },
    "eqx:fade:eurusd:fade-m15-b1795792500": {
     "positionId": "51722979",
@@ -3499,7 +3504,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 321 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 321 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3510,14 +3515,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 321,
-  "lastRun": "2026-11-27T15:33:29.000Z"
+  "lastRun": "2026-11-27T15:36:35.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:05:12.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 29.89, 6.0% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
   {
    "at": "2026-11-24T19:07:51.000Z",
    "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 16.56, 3.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5012,6 +5012,11 @@
    "at": "2026-11-27T15:17:18.000Z",
    "msg": "opened buy EURUSD 0.04 lot (council eqx-fade)",
    "trade": "eqx:fade:eurusd:fade-m15-b1795792500"
+  },
+  {
+   "at": "2026-11-27T15:36:35.000Z",
+   "msg": "closed NZDUSD position 51722975 (council: stopped)",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795792500"
   }
  ],
  "limits": {
