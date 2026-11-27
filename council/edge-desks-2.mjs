@@ -250,6 +250,10 @@ export const NQ1_LEADS = [
   { id: 'l6', name: 'Big candle + stretch', g: { trig: [{ kind: 'big', k: 1, follow: true }, { kind: 'dev', n: 20, z: 2.5, follow: true }], side: 'both', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.5, stop: 0.75, rr: 3, hold: 240 } },
 ];
 const trigText = (tr, D, i, s, f, cache) => {
+  if (tr.kind === 'bo') { let k = -1; for (let j = i - tr.P; j >= Math.max(tr.P, i - 600); j--) { const v = s > 0 ? D.h[j] : D.l[j]; if (s > 0 ? !(v < D.c[i] && D.c[i - 1] <= v) : !(v > D.c[i] && D.c[i - 1] >= v)) continue;
+      let ok = true; for (let q = j - tr.P; q <= j + tr.P && ok; q++) if (q !== j && (s > 0 ? D.h[q] > v : D.l[q] < v)) ok = false; if (ok) { k = j; break; } }
+    const v = k >= 0 ? (s > 0 ? D.h[k] : D.l[k]) : null;
+    return { text: `closed ${s > 0 ? 'above the last unbroken' : 'below the last unbroken'} ${tr.P}-a-side H1 swing ${s > 0 ? 'high' : 'low'}${v != null ? ` (${f(v)})` : ''}`, mark: v != null ? { kind: 'level', p: v, a: D.t[k], at: D.t[i] + 3600, label: `H1 swing ${s > 0 ? 'high' : 'low'} · BO ${s > 0 ? 'buy' : 'sell'}`, under: s < 0 } : null }; }
   if (tr.kind === 'brk') { let v = s > 0 ? -Infinity : Infinity; for (let k = i - tr.N; k < i; k++) v = s > 0 ? Math.max(v, D.h[k]) : Math.min(v, D.l[k]); return { text: `closed ${s > 0 ? 'above the highest high' : 'below the lowest low'} of the ${tr.N} hours before it (${f(v)})`, mark: { kind: 'level', p: v, a: D.t[Math.max(0, i - tr.N)], at: D.t[i] + 3600, label: `${tr.N}-hour ${s > 0 ? 'high' : 'low'}`, under: s < 0 } }; }
   if (tr.kind === 'dev') { const key = 'sma' + tr.n; const m = (cache[key] ||= engSma(D.c, tr.n))[i]; return { text: `closed ${tr.z} ATR(14) ${s > 0 ? 'above' : 'below'} its ${tr.n}-hour average (${f(m)})`, mark: { kind: 'level', p: m, a: D.t[Math.max(0, i - tr.n)], at: D.t[i] + 3600, label: `${tr.n}-hour average`, under: s > 0 } }; }
   return { text: `was a candle with a range of at least ${tr.k} ATR(14), closing ${s > 0 ? 'up' : 'down'}`, mark: { kind: 'zone', top: D.h[i], bot: D.l[i], a: D.t[i], at: D.t[i] + 3600, label: 'Big H1 candle' } };
@@ -266,11 +270,12 @@ function leadTrades(L, ctx, from, desk = 'nq1') {
     if (g.dows && !g.dows.includes(new Date(entryT * 1000).getUTCDay())) continue;
     if (P) { const p = P[i]; if (!(p === p) || (g.vol === 'low' ? !(p <= g.volP) : !(p >= 1 - g.volP))) continue; }
     const a = A[i]; if (!(a > 0)) continue; const fi = firstM5.get(entryT); if (fi == null) continue;
+    if (L.costSkip && D.cost / (g.stop * a) > L.costSkip) continue;   // the researcher's own skip: a stop under twice the round-trip cost is no trade
     const fill = M5[fi].o, dist = g.stop * a, stop = fill - s * dist, tgt = g.rr > 0 ? fill + s * g.rr * dist : null, parts = g.trig.map((tr) => trigText(tr, D, i, s, f, cache));
     const hr = String(new Date(entryT * 1000).getUTCHours()).padStart(2, '0');
     const r = rec(desk, market, { idTail: id(`${L.id}-${s > 0 ? 'b' : 's'}${M5[fi].t}`), kind: `${desk}-${L.id}`, label: L.name, h: '1h', l: '1h', s, M5, fi, fill, stop, tgt, cap: g.hold * 3600,
       log: [{ t: D.t[i] + 3600, text: `An H1 candle ${parts.map((x) => x.text).join(' and ')}. The next hour (${hr}:00 UTC) passes the reading's filters: ${word(s)} at that open, the stop ${g.stop} ATR(14) of H1 (${f(a)}) away` + (g.rr > 0 ? `, ${g.rr}R.` : ', no target.') }],
-      marks: parts.map((x) => x.mark) });
+      marks: parts.map((x) => x.mark).filter(Boolean) });
     if (!r) continue;
     freeT = r.status === 'open' ? Infinity : Math.floor(r.endT / 3600) * 3600 + 3600;
     if (r.t >= from) out.push(r);
@@ -292,9 +297,20 @@ export function nq1Trades(B, { from, market = 'nas100' } = {}) {
 // l1 and l5 alone (the two that passed nq1-leads-exec at the broker's own ticks; council/nq-demo.mjs trades them on a demo account), read exactly as
 // the NQ1 desk reads them (leadTrades: the frozen genomes, one position at a time a reading), kinds `nq2-l1` / `nq2-l5`. Before costs; a paper record.
 export const NQ2_IDS = ['l1', 'l5'];
+// owner, 27 Nov 2026: "Put it in nq2": the researcher's gold result xau|bo8any|long|none|0.75|6 (research/edge/gold-bo8-exec, PASS at the broker's own
+// ticks on in-sample years: a candidate, not an edge), the same genome, kind `nq2-bo8`. A test compares it with that study's `G`.
+export const NQ2_GOLD = { id: 'bo8', name: 'Gold H1 8-swing break, long, 6R', costSkip: 0.5, g: { trig: [{ kind: 'bo', P: 8, bo: 'any' }], side: 'long', hours: null, dows: null, trend: 'none', vol: 'none', volP: 0.7, stop: 0.75, rr: 6, hold: 24 } };
+const h1Ctx = (B, market) => {
+  const M5 = toK(B['5m']); if (M5.length < 3000) return null;
+  const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 600) return null;
+  const D = prep(toArrays(H.map((b) => ({ t: b.t, o: b.o, h: b.h, l: b.l, c: b.c }))), market), firstM5 = new Map();
+  M5.forEach((b, k) => { const h = Math.floor(b.t / 3600) * 3600; if (!firstM5.has(h)) firstM5.set(h, k); });
+  return { D, H, M5, firstM5, f: fx(market), market };
+};
 export function nq2Trades(B, { from, market = 'nas100' } = {}) {
   // owner, 26 Nov 2026: "add the gold break out on nq2": the gold breakout T1 (the Gold breakout desk's own trades) as a third reading, kind `nq2-t1`
-  if (market === 'xau') return vbDays(toK(B['5m']), GO, 'nq2', 'xau', GOLD_T1.k, from).map((x) => ({ ...x, label: 'Gold breakout: UTC open ± ½ the previous range' }));
+  if (market === 'xau') { const out = vbDays(toK(B['5m']), GO, 'nq2', 'xau', GOLD_T1.k, from).map((x) => ({ ...x, label: 'Gold breakout: UTC open ± ½ the previous range' }));
+    const ctx = h1Ctx(B, 'xau'); if (ctx) out.push(...leadTrades(NQ2_GOLD, ctx, from, 'nq2')); return out; }
   if (market !== 'nas100') return [];
   const M5 = toK(B['5m']); if (M5.length < 3000) return [];
   const endAll = M5[M5.length - 1].e, H = K.resample(M5, 3600).filter((b) => b.n >= 10 && b.e <= endAll); if (H.length < 600) return [];
@@ -436,7 +452,7 @@ export const DESKS2 = {
   jpyvb: { tfs: ['5m'], markets: ['usdjpy'], read: jpyTrades, note: 'USD/JPY breakout: the same rule on USD/JPY (usdjpy-vol-breakout-forward).' + PAPER },
   nq1: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: nq1Trades, note: 'NQ1: the auto-researcher\'s Nasdaq 100 leads (stretch, breakout and big-candle combinations) and the Nasdaq breakout of the day, each a reading of its own. Before costs; readings overlap, so totals are not additive. The leads came out of a search of over 100 million tries.' + PAPER },
   zero: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100'], read: zeroTrades, note: 'ZERO: turnaround Tuesday on the Nasdaq 100: buy the close of a first trading day of the week that fell more than 1 %, out at the next trading day\'s close (turnaround-tuesday, rule R2). Before costs.' + PAPER },
-  nq2: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100', 'xau'], read: nq2Trades, note: 'NQ2: the gold breakout (gold-vol-breakout T1) and the two Nasdaq 100 leads that passed at the broker\'s own ticks (l1: stretch + 10-hour breakout; l5: double stretch in high volatility), long only, the ones the Nasdaq demo job trades. Before costs; the two readings overlap, so totals are not additive.' + PAPER },
+  nq2: { tfs: ['5m'], extra: { '5m': 60 }, markets: ['nas100', 'xau'], read: nq2Trades, note: 'NQ2: the gold breakout (gold-vol-breakout T1) and the two Nasdaq 100 leads that passed at the broker\'s own ticks (l1: stretch + 10-hour breakout; l5: double stretch in high volatility), long only, the ones the Nasdaq demo job trades. Before costs; the two readings overlap, so totals are not additive. Also the auto-researcher\'s gold 8-swing break (an H1 close above the last unbroken 8-a-side swing high, long, stop 0.75 ATR, 6R, out after 24 hours), which passed at the broker\'s own ticks on years the search had read: a candidate, not an edge.' + PAPER },
   lyriac: { tfs: ['5m'], extra: { '5m': 40 }, markets: ['xau', 'usdjpy'], read: lyriacTrades, note: 'Lyriac: the three intraday rules that pass the desk\'s tests as one desk: the gold breakout, the USD/JPY breakout and the gotobi fade on USD/JPY, each by its own study\'s code (research/edge/passing-rules-book).' + PAPER },
   dom: { tfs: ['5m'], markets: DOM_DESK_MARKETS, read: domTrades, note: 'DOM zone: the H1 dominant-zone limit as the demo job (council/dom-demo.mjs) arms it, on eight of its markets (gold, AUD/USD, USD/JPY, USD/CAD, EUR/JPY, AUD/JPY, EUR/GBP and the Nasdaq 100). It passed before costs on mid candles, but a random recent candle body does as well and at the demo broker\'s own bid / ask it lost.' + PAPER },
 };

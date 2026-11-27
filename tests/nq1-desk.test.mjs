@@ -74,7 +74,7 @@ test('the Nasdaq breakout of the day is an NQ1 reading; ZERO is turnaround Tuesd
 
 test('NQ2 is l1 and l5 alone, the same trades the NQ1 desk reads for them, under its own kinds; wired like the other desks', () => {
   const N = D2.nq2Trades(B, { from: FROM, market: 'nas100' }); assert.deepEqual(D2.NQ2_IDS, ['l1', 'l5']); assert.equal(D2.nq2Trades(B, { from: FROM, market: 'usdjpy' }).length, 0);
-  { const G = D2.nq2Trades(B, { from: FROM, market: 'xau' }), V = D2.goldTrades(B, { from: FROM, market: 'xau' }), k2 = (r) => [r.t, r.side, r.entry, r.stop, r.status, r.R].join('|');   // the gold breakout: the Gold breakout desk's own trades
+  { const G = D2.nq2Trades(B, { from: FROM, market: 'xau' }).filter((r) => r.kind === 'nq2-t1'), V = D2.goldTrades(B, { from: FROM, market: 'xau' }), k2 = (r) => [r.t, r.side, r.entry, r.stop, r.status, r.R].join('|');   // the gold breakout: the Gold breakout desk's own trades
     assert.ok(G.length > 0); assert.deepEqual(G.map(k2), V.map(k2)); for (const r of G) { assert.equal(r.kind, 'nq2-t1'); assert.ok(clean(r), r.id); } assert.deepEqual(D2.DESKS2.nq2.markets, ['nas100', 'xau']); }
   const key = (r) => [r.kind.split('-')[1], r.t, r.entry, r.stop, r.target, r.status, r.R].join('|');
   assert.deepEqual(N.map(key).sort(), ALL.filter((r) => /^nq1-l[15]$/.test(r.kind)).map(key).sort()); assert.ok(N.length > 0, 'the seeded market gives l1 / l5 trades');
@@ -82,4 +82,12 @@ test('NQ2 is l1 and l5 alone, the same trades the NQ1 desk reads for them, under
   const rd = (f) => fs.readFileSync(new URL('../' + f, import.meta.url), 'utf8');
   assert.match(rd('equinox.html'), /id="v-nq2"/); assert.match(rd('equinox.html'), /"k": "nq2", "name": "NQ2"/); assert.match(rd('assets/desk-trades.js'), /nq2: \{ file: 'nq2\/desk\.json'/); assert.match(rd('assets/desk-live.js'), /nq2: \{ passing: true, file: 'nq2\/desk\.json'/);
   assert.match(rd('.github/workflows/council.yml'), /--only [a-z0-9,]*nq2/); assert.match(rd('council/datahealth.mjs'), /nq2\/desk\.json/);
+});
+
+test('NQ2: the gold 8-swing break is the gold-bo8-exec genome, gold only, a stop on the losing side', async () => {
+  const E2 = await import('../council/edge-desks-2.mjs'), S = await import('../research/edge/gold-bo8-exec/orders.mjs');
+  const { mk, ...g } = S.G; assert.equal(mk, 'xau'); assert.deepEqual(E2.NQ2_GOLD.g, g); assert.equal(E2.NQ2_GOLD.costSkip, 0.5);
+  assert.match(fs.readFileSync('council/edge-desks-2.mjs', 'utf8'), /if \(market === 'xau'\) \{[^\n]*\n[^\n]*leadTrades\(NQ2_GOLD, ctx, from, 'nq2'\)/);
+  const G = E2.nq2Trades(B, { from: FROM, market: 'xau' }).filter((r) => r.kind === 'nq2-bo8'); assert.ok(G.length > 0, 'the seeded market gives 8-swing trades');
+  let last = -Infinity; for (const r of G.sort((a, b) => a.t - b.t)) { assert.equal(r.side, 1); assert.ok(r.stop < r.entry && r.target > r.entry, r.id); assert.ok(Math.abs((r.target - r.entry) / (r.entry - r.stop) - 6) < 1e-6); assert.ok(clean(r), r.id); assert.ok(r.t >= last); last = r.endT || r.t; }
 });
