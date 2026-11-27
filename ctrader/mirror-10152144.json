@@ -2852,7 +2852,7 @@
     "lots": 0.06,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T08:01:16.000Z",
     "councilEntry": 0.8346,
     "stop": 0.835084,
@@ -2865,10 +2865,15 @@
     "slipR": -0.434,
     "lagSec": 76,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T08:01:16.000Z",
-    "brokerStop": 0.83531
+    "brokerStop": 0.83531,
+    "closedAt": "2026-11-27T08:11:23.000Z",
+    "exitPrice": 0.8351,
+    "councilExit": 0.835084,
+    "councilR": -1
    }
   },
   "day": {
@@ -2883,7 +2888,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 371.3 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 371.3 · 1 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2900,14 +2905,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 371.3,
-  "lastRun": "2026-11-27T08:07:50.000Z"
+  "lastRun": "2026-11-27T08:11:23.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T07:20:00.000Z",
-   "msg": "not mirrored yet eqx:fade:nzdusd:fade-m15-s1795502700: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fade:nzdusd:fade-m15-s1795502700"
-  },
   {
    "at": "2026-11-24T07:20:00.000Z",
    "msg": "not mirrored yet eqx:fade:audusd:fade-m15-s1795502700: daily loss stop (95.0% down today) (will retry)",
@@ -4400,6 +4400,11 @@
   {
    "at": "2026-11-27T08:01:16.000Z",
    "msg": "opened sell USDCHF 0.06 lot (council eqx-fade)",
+   "trade": "eqx:fade:usdchf:fade-m15-s1795766400"
+  },
+  {
+   "at": "2026-11-27T08:11:23.000Z",
+   "msg": "closed USDCHF position 51677071 (council: stopped)",
    "trade": "eqx:fade:usdchf:fade-m15-s1795766400"
   }
  ],
