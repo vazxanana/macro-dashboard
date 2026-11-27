@@ -30,7 +30,7 @@ import { readConfig } from './owner-config.mjs';
 // study's `G` (a test compares). Each rule names its market; the Nasdaq rules keep 1 %.
 export const UJ = { id: 'uj', name: 'USD/JPY morning breakout', label: 'nq-uj', market: 'usdjpy', symbol: 'USDJPY', risk: 0.02, maxRisk: 0.02, dp: 3,
   g: { mk: 'usdjpy', trig: [{ kind: 'brk', N: 10 }], side: 'long', hours: [7, 13], dows: [2, 3, 4], trend: 'with', vol: 'none', volP: 0.5, stop: 3, rr: 3, hold: 8 } };
-export const IDS = ['l1', 'l5', 'uj'], RISK = 0.01, MAX_RISK = 0.01, LOOK_FROM = 2, LOOK_UNTIL = 720, SHUT_AFTER = 60, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
+export const IDS = ['l1', 'l5', 'uj'], RISK = 0.01, MAX_RISK = 0.01, LOOK_FROM = 1, LOOK_UNTIL = 720, SHUT_AFTER = 60, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
 export const RULES = Object.fromEntries(IDS.map((id) => { if (id === UJ.id) return [id, UJ]; const L = NQ1_LEADS.find((x) => x.id === id); return [id, { id, name: L.name, label: `nq-${id}`, market: 'nas100', symbol: 'NAS100', dp: 2, g: L.g }]; }));
 export const MARKETS = [...new Set(IDS.map((id) => RULES[id].market))];
 // the live account (27 Nov 2026, owner: rules "All"): the three rules above and the gold 8-swing break (NQ2_GOLD: research/edge/gold-bo8-exec,

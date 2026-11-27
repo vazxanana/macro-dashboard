@@ -139,20 +139,20 @@ jobs:
           # breakout, gold 8-swing break; demo and live) are read again inside every fastcopy during the first 12 minutes of an hour,
           # and the breakouts of the day during the first 20 minutes of a UTC day, so an order goes out within about 20 s of the
           # candle close instead of waiting for the next quick pass. Each job skips at once when nothing is due or it already looked.
-          # Every call of the order jobs goes through `job` (one at a time, flock), so the inline passes and the hour watcher below
-          # never run the same job at once.
-          job() { flock -w 60 /tmp/council-orders.lock timeout 45 node "$@"; }
-          fastorder() { s=$(( $(date +%s) % 3600 )); if [ "$s" -ge 2 ] && [ "$s" -le 720 ]; then
+          # Every call of the order jobs goes through `job`: one lock per job and mode (flock), so the inline passes and the hour
+          # watcher below never run the same job at once, and a live job never waits for a demo one.
+          job() { l="/tmp/council-$(printf %s "$*" | tr -c 'a-z' '-').lock"; flock -w 60 "$l" timeout 45 node "$@"; }
+          fastorder() { s=$(( $(date +%s) % 3600 )); if [ "$s" -ge 1 ] && [ "$s" -le 720 ]; then
               job council/nq-demo.mjs data --live >/dev/null 2>&1 || echo "Nasdaq live fast ($1) failed"
               job council/nq-demo.mjs data >/dev/null 2>&1 || echo "Nasdaq demo fast ($1) failed"; fi
             d=$(( $(date +%s) % 86400 )); if [ "$d" -le 1200 ]; then
               job council/vb-demo.mjs data --live >/dev/null 2>&1 || echo "Breakout live fast ($1) failed"
               job council/vb-demo.mjs data >/dev/null 2>&1 || echo "Breakout demo fast ($1) failed"; fi; }
-          # The hour watcher (27 Nov 2026, owner: "more faster"): a background loop beside the rounds that wakes 2 s after every
-          # hour and runs the order jobs every 4 s for the first minute (live first), whatever the round is doing (a heavy member can
-          # take minutes). Its files are saved by the loop's next save. It is stopped when the step ends.
-          ( while true; do w=$(( 3600 - ( $(date +%s) - 2 ) % 3600 )); sleep "$w"
-              for k in $(seq 1 15); do fastorder watch; sleep 4; done; done ) &
+          # The hour watcher (27 Nov 2026, owner: "more faster", "faster"): a background loop beside the rounds that wakes 1 s after
+          # every hour and runs the order jobs every 2 s for the first minute (live first), whatever the round is doing (a heavy member
+          # can take minutes). Its files are saved by the loop's next save. It is stopped when the step ends.
+          ( while true; do w=$(( 3600 - ( $(date +%s) - 1 ) % 3600 )); sleep "$w"
+              for k in $(seq 1 30); do fastorder watch; sleep 2; done; done ) &
           WATCH=$!; trap 'kill $WATCH 2>/dev/null' EXIT
           fastcopy() { fastorder "$1"; timeout 60 node council/edge-desks.mjs data --only fade,bigfade,boxfade,fvg,goldvb --live >/dev/null 2>&1 || echo "Copied desks ($1) failed"
             if timeout 15 node council/copy-due.mjs data; then timeout 120 node council/ctrader-mirror.mjs data || echo "cTrader mirror fast copy ($1) failed"; fi; }
