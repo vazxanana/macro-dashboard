@@ -1871,8 +1871,12 @@
    "volume": 100000,
    "balance": 100,
    "digits": 3,
-   "status": "placed",
-   "orderId": "34982483"
+   "status": "open",
+   "orderId": "34982483",
+   "fill": 174.562,
+   "positionId": "51710405",
+   "filledAt": "2026-11-27T15:01:24.246Z",
+   "brokerStop": 174.417
   },
   {
    "id": "nas100-buy-1795744800",
@@ -2083,12 +2087,17 @@
    "volume": 100000,
    "balance": 99.16,
    "digits": 3,
-   "status": "open",
+   "status": "closed",
    "orderId": "34984081",
    "fill": 106.076,
    "positionId": "51713512",
    "filledAt": "2026-11-27T14:34:39.769Z",
-   "brokerStop": 105.984
+   "brokerStop": 105.984,
+   "closedSeen": "2026-11-27T15:02:26.000Z",
+   "inferred": true,
+   "exit": 106.26,
+   "how": "target (inferred from the H1 candles)",
+   "R": 2
   },
   {
    "id": "eurjpy-buy-1795669200",
@@ -2290,10 +2299,29 @@
    "acct": "…6154",
    "status": "skip",
    "why": "the smallest volume would risk more than 1 % of the balance"
+  },
+  {
+   "id": "xau-sell-1795784400",
+   "market": "xau",
+   "side": "sell",
+   "zone": {
+    "t": 1795784400,
+    "bot": 3644.235,
+    "top": 3669.65,
+    "formed": 1795791600
+   },
+   "atr": 21.18,
+   "symbol": "XAUUSD",
+   "placedAt": "2026-11-27T15:02:26.000Z",
+   "expiresAt": 1795878141,
+   "account": "…154",
+   "acct": "…6154",
+   "status": "skip",
+   "why": "the smallest volume would risk more than 1 % of the balance"
   }
  ],
  "notOffered": {},
- "at": "2026-11-27T14:59:59.000Z",
+ "at": "2026-11-27T15:02:27.000Z",
  "conn": {
   "ok": true,
   "acct": "…6154",
