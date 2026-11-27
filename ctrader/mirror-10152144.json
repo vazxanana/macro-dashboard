@@ -2798,7 +2798,7 @@
     "lots": 0.07,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T07:15:33.000Z",
     "councilEntry": 1.42242,
     "stop": 1.421801,
@@ -2811,10 +2811,12 @@
     "slipR": -0.065,
     "lagSec": 33,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T07:15:33.000Z",
-    "brokerStop": 1.42164
+    "brokerStop": 1.42164,
+    "closedAt": "2026-11-27T07:35:16.000Z"
    },
    "eqx:fvg:eurjpy:fvg-h1-b1795762800-1795764600": {
     "positionId": "51671430",
@@ -2844,17 +2846,16 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 370.13,
+   "lastBalance": 375.37,
    "ids": [
     "51656090",
-    "51668761",
     "51671430"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 370.13 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 375.37 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -2870,15 +2871,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 370.13,
-  "lastRun": "2026-11-27T07:32:24.000Z"
+  "balance": 375.37,
+  "lastRun": "2026-11-27T07:35:16.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-23T19:46:48.000Z",
-   "msg": "XAUUSD position 50686692 closed at the broker",
-   "trade": "ict:gc-b-1795388400"
-  },
   {
    "at": "2026-11-24T06:42:12.000Z",
    "msg": "not mirrored yet eqx:fade:usdcad:fade-m15-b1795501800: daily loss stop (95.0% down today) (will retry)",
@@ -4372,6 +4368,11 @@
    "at": "2026-11-27T07:30:12.000Z",
    "msg": "opened buy EURJPY 0.08 lot (council eqx-fvg)",
    "trade": "eqx:fvg:eurjpy:fvg-h1-b1795762800-1795764600"
+  },
+  {
+   "at": "2026-11-27T07:35:16.000Z",
+   "msg": "USDCAD position 51668761 closed at the broker",
+   "trade": "eqx:fade:usdcad:fade-m15-b1795763700"
   }
  ],
  "limits": {
