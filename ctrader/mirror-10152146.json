@@ -2801,6 +2801,58 @@
     ],
     "stopCheckedAt": "2026-11-27T12:46:31.000Z",
     "brokerStop": 43.531
+   },
+   "mosha6:bar-r6-eg-15m-s1795781160": {
+    "positionId": "51704919",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 200,
+    "lots": 0.02,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-27T12:57:21.000Z",
+    "councilEntry": 3668.795,
+    "stop": 3675.3,
+    "t1": 3629.765,
+    "riskCash": 21.81,
+    "margin": 14.66,
+    "mark": 3667.25,
+    "levelsFrom": "mark",
+    "fillPrice": 3667.15,
+    "slipR": 0.253,
+    "lagSec": 3081,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T12:57:21.000Z",
+    "brokerStop": 3675.2
+   },
+   "mosha6:bar-r6-tap-eg-15m-s1795781160": {
+    "positionId": "51704926",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 200,
+    "lots": 0.02,
+    "digits": 2,
+    "setup": "mosha6",
+    "status": "open",
+    "openedAt": "2026-11-27T12:57:21.000Z",
+    "councilEntry": 3668.635,
+    "stop": 3675.3,
+    "t1": 3628.645,
+    "riskCash": 21.81,
+    "margin": 14.66,
+    "mark": 3667.25,
+    "levelsFrom": "mark",
+    "fillPrice": 3667.61,
+    "slipR": 0.154,
+    "lagSec": 3081,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T12:57:21.000Z",
+    "brokerStop": 3675.66
    }
   },
   "day": {
@@ -2825,13 +2877,12 @@
    ],
    "oids": [
     "34957525",
-    "34920638",
     "34965786"
    ],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8722.6 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 8722.6 · 13 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -2840,7 +2891,8 @@
    "mosha6:bar-r6-tap-eg-15m-v3-s1795771200": "price 3672.065 has run 1.05R from the council entry 3679.055: a different trade now",
    "mosha6:bar-r6-j-eg-15m-v7-s1795779840": "price 3668.885 has run 1.04R from the council entry 3674.49: a different trade now",
    "mosha6:bar-r6-eg-15m-v7-s1795779420": "price 3668.885 has run 2.36R from the council entry 3676.59: a different trade now",
-   "mosha6:bar-r6-tap-eg-15m-v7-s1795779300": "price 3668.885 has run 1.82R from the council entry 3675.97: a different trade now"
+   "mosha6:bar-r6-tap-eg-15m-v7-s1795779300": "price 3668.885 has run 1.82R from the council entry 3675.97: a different trade now",
+   "mosha6:bar-r6-eg-15m-z-s1795781460": "price 3667.25 has run 2.07R from the council entry 3672.68: a different trade now"
   },
   "wait": {},
   "paused": {},
@@ -2849,7 +2901,7 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 8722.6,
-  "lastRun": "2026-11-27T12:51:14.000Z"
+  "lastRun": "2026-11-27T12:57:21.000Z"
  },
  "log": [
   {
@@ -4092,6 +4144,21 @@
    "at": "2026-11-27T12:46:31.000Z",
    "msg": "opened buy XAGUSD 0.04 lot (council fvgm)",
    "trade": "fvgm:xag:fvg-h1-b1795762800-1795783500"
+  },
+  {
+   "at": "2026-11-27T12:57:21.000Z",
+   "msg": "not mirrored mosha6:bar-r6-eg-15m-z-s1795781460: price 3667.25 has run 2.07R from the council entry 3672.68: a different trade now",
+   "trade": "mosha6:bar-r6-eg-15m-z-s1795781460"
+  },
+  {
+   "at": "2026-11-27T12:57:21.000Z",
+   "msg": "opened sell XAUUSD 0.02 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-eg-15m-s1795781160"
+  },
+  {
+   "at": "2026-11-27T12:57:21.000Z",
+   "msg": "opened sell XAUUSD 0.02 lot (council mosha6)",
+   "trade": "mosha6:bar-r6-tap-eg-15m-s1795781160"
   }
  ],
  "limits": {
@@ -4196,11 +4263,11 @@
   ]
  },
  "execution": {
-  "n": 98,
-  "meanSlipR": 0.029,
+  "n": 100,
+  "meanSlipR": 0.032,
   "medianSlipR": -0.001,
   "worstSlipR": 1.148,
-  "medianLagSec": 738.5,
+  "medianLagSec": 768.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -4227,8 +4294,8 @@
     "meanSlipR": -0.018
    },
    "XAUUSD": {
-    "n": 78,
-    "meanSlipR": 0.035
+    "n": 80,
+    "meanSlipR": 0.039
    },
    "EURUSD": {
     "n": 1,

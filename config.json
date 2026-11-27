@@ -703,9 +703,15 @@
    "by": "coach-stats",
    "change": "News guard on",
    "why": "Reviews: 14 losses came from high-impact news; no short-term trades from 15 min before to 45 min after news."
+  },
+  {
+   "at": "2026-11-27T12:56:19.000Z",
+   "by": "coach-backtest",
+   "change": "intraday: hold to the second target (backtest)",
+   "why": "107 trades over the last 30 days: the second target +0.79R per trade versus the first (t = 2.6), +1.47R and +0.21R in the two halves."
   }
  ],
- "btAt": "2026-11-26T12:56:55.918Z",
+ "btAt": "2026-11-27T12:49:43.588Z",
  "beSrc": "backtest",
  "userRules": [
   "rintra-origin",
@@ -764,10 +770,12 @@
   "lyriac-risk-1"
  ],
  "target": {
-  "scalp": "t2"
+  "scalp": "t2",
+  "intraday": "t2"
  },
  "targetBy": {
-  "scalp": "backtest"
+  "scalp": "backtest",
+  "intraday": "backtest"
  },
  "entry": {},
  "resumedAt": {
@@ -776,11 +784,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-27T12:49:29.000Z",
+   "at": "2026-11-27T12:56:19.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-27T12:49:29.000Z",
+   "at": "2026-11-27T12:56:19.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -792,8 +800,8 @@
    "why": "market: -1.00R per trade over 6 trades"
   },
   "position": {
-   "at": "2026-11-26T13:03:22.000Z",
-   "why": "backtest: 35 trades at -0.77R each"
+   "at": "2026-11-27T12:56:19.000Z",
+   "why": "backtest: 29 trades at -0.71R each"
   },
   "rscalp": {
    "at": "2026-11-16T11:51:45.000Z",
