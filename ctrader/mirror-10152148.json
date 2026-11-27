@@ -7563,6 +7563,30 @@
     ],
     "stopCheckedAt": "2026-11-27T21:45:53.000Z",
     "brokerStop": 1.09275
+   },
+   "boxfade:usdjpy:boxfade-m5-s1795816200": {
+    "positionId": "51748912",
+    "symbol": "USDJPY",
+    "side": "sell",
+    "volume": 18300000,
+    "lots": 1.83,
+    "digits": 3,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T21:50:11.000Z",
+    "councilEntry": 159.586,
+    "stop": 159.736,
+    "t1": 159.436,
+    "riskCash": 172.09,
+    "margin": 366,
+    "fillPrice": 159.576,
+    "slipR": 0.067,
+    "lagSec": 11,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T21:50:11.000Z",
+    "brokerStop": 159.726
    }
   },
   "day": {
@@ -7575,13 +7599,14 @@
     "51740553",
     "51744249",
     "51748794",
-    "51748902"
+    "51748902",
+    "51748912"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 8604.44 · 6 open",
+  "status": "ok · demo Fusion Markets · balance 8604.44 · 7 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7590,14 +7615,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 8604.44,
-  "lastRun": "2026-11-27T21:48:30.000Z"
+  "lastRun": "2026-11-27T21:51:06.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-15T22:15:52.000Z",
-   "msg": "close XAUUSD 49525852 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
-   "trade": "xau-replica-1794583847-s"
-  },
   {
    "at": "2026-11-15T22:15:52.000Z",
    "msg": "close XAUUSD 49547717 failed: MARKET_CLOSED: Trading is not available: Market is closed.",
@@ -9086,6 +9106,11 @@
    "at": "2026-11-27T21:45:53.000Z",
    "msg": "opened buy EURUSD 4.41 lot (council boxfade)",
    "trade": "boxfade:eurusd:boxfade-m5-b1795815900"
+  },
+  {
+   "at": "2026-11-27T21:50:11.000Z",
+   "msg": "opened sell USDJPY 1.83 lot (council boxfade)",
+   "trade": "boxfade:usdjpy:boxfade-m5-s1795816200"
   }
  ],
  "limits": {
@@ -9190,11 +9215,11 @@
   ]
  },
  "execution": {
-  "n": 259,
+  "n": 260,
   "meanSlipR": 0.054,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
-  "medianLagSec": 71,
+  "medianLagSec": 70.5,
   "bySymbol": {
    "SOLUSD": {
     "n": 16,
@@ -9237,8 +9262,8 @@
     "meanSlipR": 0.073
    },
    "USDJPY": {
-    "n": 6,
-    "meanSlipR": 0.051
+    "n": 7,
+    "meanSlipR": 0.053
    }
   }
  }
