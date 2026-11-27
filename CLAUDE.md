@@ -2701,6 +2701,12 @@ goes to the latest candle (not while a pane is in replay). **Drawings list** (`#
 messages (`#ms-dr-note`) float at the bottom of the screen instead of pushing the charts down a line. Never Alt+D (the browser's address bar).
 Test: `tests/charts-quick.test.mjs`.
 
+**On-chart ink follows the chart's background** (27 Nov 2026): with the paper look (a light chart) on a dark page, each pane's header,
+the O H L C line and the on-chart buttons were dark-theme ink on the light chart (contrast about 1.1-2.3:1) and the BO / CF / iBO / VR
+tags had dark backings. `.ms-live[data-chart]` (set by `applyTheme` from the chart's own background) now gives `.ms-pane` and `.mm-c` the
+light tokens when the chart is light on a dark page and the dark tokens when it is dark on a light page; the cycle tag `.ms-cy` follows;
+the markup's label backings take `CUS.bg`. Never style text on a chart from the page theme alone.
+
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
 right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to

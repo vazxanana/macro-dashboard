@@ -3897,6 +3897,14 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
       .ms-dlist .dl-go:hover { background: var(--panel-2, rgba(127,127,127,.1)); } .ms-dlist .dl-go span { color: var(--ink-dim); font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
       .ms-dlist .dl-ic { min-width: 36px; min-height: 36px; padding: 0 6px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-dim); font: 500 12px var(--sans); cursor: pointer; } .ms-dlist .dl-ic:hover:not(:disabled) { background: var(--panel-2, rgba(127,127,127,.12)); color: var(--ink); } .ms-dlist .dl-ic:disabled { opacity: .4; cursor: default; }
       .ms-dlist .dl-e { margin: 6px; color: var(--ink-dim); } @media (pointer: coarse) { .ms-dlist .dl-ic, .ms-dlist .dl-go { min-height: 44px; } .ms-dlist .dl-ic { min-width: 44px; } }
+      /* 27 Nov 2026: what is drawn ON a chart (its header, the O H L C line, the on-chart buttons) follows the chart's own background,
+         not the page theme: the paper look is a light chart on a dark page, and the header and legend were dark-theme ink on it */
+      :root:not([data-theme="light"]) .ms-live[data-chart="light"] :is(.ms-pane, .mm-c) { --au-bg: #f2f3f5; --au-surface: #ffffff; --au-surface-2: #e7e9ec; --au-well: #f7f8f9; --au-line: rgba(20,24,30,.10); --au-line-strong: rgba(20,24,30,.20); --au-line-soft: rgba(20,24,30,.06); --au-ink: #17191c; --au-ink-2: #474c54; --au-ink-3: #5b616a; --au-accent: #2f5e9e; --au-gain: #0a7350; --au-loss: #b3261e; --au-warn: #8a5a00;
+        --bg: #f2f3f5; --panel: #ffffff; --panel-raised: #e7e9ec; --panel-hover: #e7e9ec; --panel-2: #f7f8f9; --well: #f7f8f9; --line: rgba(20,24,30,.10); --line-soft: rgba(20,24,30,.06); --line-strong: rgba(20,24,30,.20); --ink: #17191c; --ink-dim: #474c54; --ink-faint: #5b616a; --accent: #2f5e9e; --buy: #0a7350; --sell: #b3261e; --buy-soft: rgba(10,115,80,.10); --sell-soft: rgba(179,38,30,.10); --buy-ink: #075c40; --sell-ink: #951c16; --warn-ink: #714900; --gold-ink: #24497c; --accent-ink: #24497c; color-scheme: light; }
+      :root[data-theme="light"] .ms-live[data-chart="dark"] :is(.ms-pane, .mm-c) { --au-bg: #121315; --au-surface: #1a1c1f; --au-surface-2: #23262a; --au-well: #16181b; --au-line: rgba(255,255,255,.08); --au-line-strong: rgba(255,255,255,.16); --au-line-soft: rgba(255,255,255,.05); --au-ink: #ecedef; --au-ink-2: #b4b8bf; --au-ink-3: #a4a9b1;
+        --bg: #121315; --panel: #1a1c1f; --panel-raised: #23262a; --panel-hover: #23262a; --panel-2: #16181b; --well: #16181b; --line: rgba(255,255,255,.08); --line-soft: rgba(255,255,255,.05); --line-strong: rgba(255,255,255,.16); --ink: #ecedef; --ink-dim: #b4b8bf; --ink-faint: #a4a9b1; --au-accent: #9db4d3; --accent: #9db4d3; --au-gain: #4cc38a; --au-loss: #f2726a; --au-warn: #e8b04b; --buy: #4cc38a; --sell: #f2726a; --buy-ink: #4cc38a; --sell-ink: #f2726a; --warn-ink: #e8b04b; --gold-ink: #9db4d3; --accent-ink: #9db4d3; color-scheme: dark; }
+      :root:not([data-theme="light"]) .ms-live[data-chart="light"] .ms-ph .ms-cy { color: #8a3fb0; } :root:not([data-theme="light"]) .ms-live[data-chart="light"] .ms-ph .ms-cy.pullback { color: #714900; }
+      :root[data-theme="light"] .ms-live[data-chart="dark"] .ms-ph .ms-cy { color: #d3a4ec; } :root[data-theme="light"] .ms-live[data-chart="dark"] .ms-ph .ms-cy.pullback { color: #e8b04b; }
       .ms-qk { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 72; width: min(320px, calc(100vw - 32px)); padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); box-shadow: 0 16px 40px rgba(0,0,0,.35); color: var(--ink); font: 500 13px var(--sans); }
       .ms-qk[hidden] { display: none; } .ms-qk .qk-h { font-size: 12px; color: var(--ink-dim); margin-bottom: 6px; }
       .ms-qk .qk-in { font: 600 22px var(--mono, var(--sans)); letter-spacing: .02em; min-height: 30px; } .ms-qk .qk-in i { display: inline-block; width: 2px; height: 22px; margin-left: 2px; vertical-align: -3px; background: var(--accent); }
@@ -5307,7 +5315,7 @@ function msNextSetup(bars, A) {
     if (!o.chart || !o.series) return;
     const ts = o.chart.timeScale(), s = o.series;
     const X = (l) => ts.logicalToCoordinate(l), Y = (p) => s.priceToCoordinate(p);
-    const it = o.items, t = THEMES[G.theme];
+    const it = o.items, t = Object.assign({}, THEMES[G.theme], hexOk(CUS.bg) ? { bg: CUS.bg } : {});   // 27 Nov 2026: label backings take the chart's own background (the paper look on a dark page)
     ctx.font = '600 11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
     if (z === 'bottom') {
       const HH = ctx.canvas.height / (window.devicePixelRatio || 1);

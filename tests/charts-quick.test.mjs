@@ -71,3 +71,10 @@ test('the drawing strip has the list and the hide buttons (a phone has no keyboa
   assert.match(d, /data-dh aria-pressed="false"/);
   assert.match(d, /b\.hasAttribute\('data-dh'\)\) \{ setHide\(!HIDE\)/);
 });
+
+test('what is drawn on a chart follows the chart\'s background, not the page theme', () => {
+  const h = fs.readFileSync('market-structure.html', 'utf8');
+  assert.match(h, /:root:not\(\[data-theme="light"\]\) \.ms-live\[data-chart="light"\] :is\(\.ms-pane, \.mm-c\) \{ --au-bg: #f2f3f5;[^}]*--ink: #17191c;/);
+  assert.match(h, /:root\[data-theme="light"\] \.ms-live\[data-chart="dark"\] :is\(\.ms-pane, \.mm-c\) \{ --au-bg: #121315;[^}]*--buy: #4cc38a;/);
+  assert.match(h, /t = Object\.assign\(\{\}, THEMES\[G\.theme\], hexOk\(CUS\.bg\) \? \{ bg: CUS\.bg \} : \{\}\)/, 'label backings take the chart\'s own background');
+});
