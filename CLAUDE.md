@@ -7374,3 +7374,14 @@ month-sum t, Holm over five, bar: mean > 0 in both sets and both halves, 2x cost
 R2 -0.064R (n 1,003, -1.19), R3 -0.097R (n 3,301, -3.79), R4 -0.099R (n 8,751, -6.11), R5 +0.042R (n 180, t 0.40, Set A -0.196R). Before costs every
 reading is about zero (-0.03 to +0.09R). Not an edge; no variants on these years. Nothing live changed. The candle cache was rebuilt in the session
 (`fetch-cache.mjs`, EDGE_DATA). Test: `tests/fvg-qm-timeframes.test.mjs`.
+
+## The researcher's gold 8-swing break at the broker's own ticks (27 Nov 2026, owner: "Yes" to pricing the gold result)
+`research/edge/gold-bo8-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`,
+MEANING.md, RESULT.md, result.json; probe tags `gbo8-entry`, `gbo8-dead`, `gbo8-fills-1/2`). The auto-2 result
+`xau|bo8any|long|none|0.75|6` (an H1 close above the last unbroken 8-a-side H1 swing high, bought at the next open; stop 0.75 x
+ATR(14), target 6R, out after 24 H1 candles; gate: equal to the engine's `simulate`), 282 orders 2023-12 to 2026-11, filled at the
+demo broker's ask and closed at its bid, after commission (0.000024 a side) and the demo's overnight financing on a gold buy.
+**PASS**: +0.714R a trade after costs (n 280, month t 4.02; mid +0.739R; 2 without an entry quote, none unresolved); every year
+positive; without the ten best trades +0.52R. Found among about 4 million looks on these same years and long only in a rising gold:
+a candidate for a forward record, never an edge; the rollover split in RESULT.md is a selection effect. Nothing live changed.
+Test: `tests/gold-bo8-exec.test.mjs`.
