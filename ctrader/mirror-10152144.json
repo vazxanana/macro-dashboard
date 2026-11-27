@@ -3392,7 +3392,7 @@
     "lots": 0.02,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T14:45:34.000Z",
     "councilEntry": 0.66509,
     "stop": 0.663612,
@@ -3405,10 +3405,15 @@
     "slipR": -0.061,
     "lagSec": 34,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T14:45:34.000Z",
-    "brokerStop": 0.66355
+    "brokerStop": 0.66355,
+    "closedAt": "2026-11-27T16:10:11.000Z",
+    "exitPrice": 0.66388,
+    "councilExit": 0.663612,
+    "councilR": -1
    },
    "eqx:fade:eurjpy:fade-m15-b1795792500": {
     "positionId": "51722970",
@@ -3530,7 +3535,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 319.72 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 319.72 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3541,14 +3546,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 319.72,
-  "lastRun": "2026-11-27T16:06:53.000Z"
+  "lastRun": "2026-11-27T16:10:11.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:07:51.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 34.42, 6.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
   {
    "at": "2026-11-24T19:09:21.000Z",
    "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 14.09, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5043,6 +5043,11 @@
    "at": "2026-11-27T15:46:27.000Z",
    "msg": "opened buy GBPUSD 0.03 lot (council eqx-fade)",
    "trade": "eqx:fade:gbpusd:fade-m15-b1795794300"
+  },
+  {
+   "at": "2026-11-27T16:10:11.000Z",
+   "msg": "closed AUDUSD position 51718694 (council: stopped)",
+   "trade": "eqx:fvg:audusd:fvg-h1-b1795748400-1795790700"
   }
  ],
  "limits": {
