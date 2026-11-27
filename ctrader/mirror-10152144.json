@@ -3353,6 +3353,58 @@
     ],
     "stopCheckedAt": "2026-11-27T13:31:52.000Z",
     "brokerStop": 174.54
+   },
+   "eqx:fade:audusd:fade-m15-b1795790700": {
+    "positionId": "51718687",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 600000,
+    "lots": 0.06,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T14:45:34.000Z",
+    "councilEntry": 0.66509,
+    "stop": 0.664546,
+    "t1": 0.666177,
+    "riskCash": 3.27,
+    "margin": 7.99,
+    "mark": 0.66506,
+    "levelsFrom": "mark",
+    "fillPrice": 0.66499,
+    "slipR": -0.184,
+    "lagSec": 34,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T14:45:34.000Z",
+    "brokerStop": 0.66448
+   },
+   "eqx:fvg:audusd:fvg-h1-b1795748400-1795790700": {
+    "positionId": "51718694",
+    "symbol": "AUDUSD",
+    "side": "buy",
+    "volume": 200000,
+    "lots": 0.02,
+    "digits": 5,
+    "setup": "eqx-fvg",
+    "status": "open",
+    "openedAt": "2026-11-27T14:45:34.000Z",
+    "councilEntry": 0.66509,
+    "stop": 0.663612,
+    "t1": 0.666568,
+    "riskCash": 3.27,
+    "margin": 2.66,
+    "mark": 0.66506,
+    "levelsFrom": "mark",
+    "fillPrice": 0.665,
+    "slipR": -0.061,
+    "lagSec": 34,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T14:45:34.000Z",
+    "brokerStop": 0.66355
    }
   },
   "day": {
@@ -3360,13 +3412,15 @@
    "startBalance": 439.97,
    "lastBalance": 327.46,
    "ids": [
-    "51708602"
+    "51708602",
+    "51718687",
+    "51718694"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 327.46 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 327.46 · 3 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3377,19 +3431,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 327.46,
-  "lastRun": "2026-11-27T14:43:16.000Z"
+  "lastRun": "2026-11-27T14:47:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T18:13:38.000Z",
-   "msg": "not mirrored eqx:fade:usdcad:fade-m15-b1795541400: price 1.4272 is already past the council stop 1.427311",
-   "trade": "eqx:fade:usdcad:fade-m15-b1795541400"
-  },
-  {
-   "at": "2026-11-24T18:19:41.000Z",
-   "msg": "opened sell GBPUSD 0.01 lot (council eqx-fade)",
-   "trade": "eqx:fade:gbpusd:fade-m15-s1795543200"
-  },
   {
    "at": "2026-11-24T18:59:49.000Z",
    "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 10.74, 2.1% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -4879,6 +4923,16 @@
    "at": "2026-11-27T14:05:37.000Z",
    "msg": "USDCHF position 51706600 closed at the broker",
    "trade": "eqx:fade:usdchf:fade-m15-s1795785300"
+  },
+  {
+   "at": "2026-11-27T14:45:34.000Z",
+   "msg": "opened buy AUDUSD 0.06 lot (council eqx-fade)",
+   "trade": "eqx:fade:audusd:fade-m15-b1795790700"
+  },
+  {
+   "at": "2026-11-27T14:45:34.000Z",
+   "msg": "opened buy AUDUSD 0.02 lot (council eqx-fvg)",
+   "trade": "eqx:fvg:audusd:fvg-h1-b1795748400-1795790700"
   }
  ],
  "limits": {
@@ -4983,11 +5037,11 @@
   ]
  },
  "execution": {
-  "n": 87,
-  "meanSlipR": 0.034,
-  "medianSlipR": 0.018,
+  "n": 89,
+  "meanSlipR": 0.03,
+  "medianSlipR": 0.014,
   "worstSlipR": 1.352,
-  "medianLagSec": 58.5,
+  "medianLagSec": 58,
   "bySymbol": {
    "GBPUSD": {
     "n": 9,
@@ -5018,8 +5072,8 @@
     "meanSlipR": -0.074
    },
    "AUDUSD": {
-    "n": 9,
-    "meanSlipR": 0.013
+    "n": 11,
+    "meanSlipR": -0.012
    },
    "USDCHF": {
     "n": 9,
