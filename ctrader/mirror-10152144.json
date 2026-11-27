@@ -1788,7 +1788,7 @@
     "lots": 0.04,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T15:31:00.000Z",
     "councilEntry": 0.5471,
     "stop": 0.546091,
@@ -1799,10 +1799,12 @@
     "slipR": 0.02,
     "lagSec": 60,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T15:31:00.000Z",
-    "brokerStop": 0.54611
+    "brokerStop": 0.54611,
+    "closedAt": "2026-11-27T01:00:14.000Z"
    },
    "eqx:fvg:audusd:fvg-h1-s1795712400-1795717800": {
     "positionId": "51640396",
@@ -2055,7 +2057,7 @@
     "lots": 0.1,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T00:17:51.000Z",
     "councilEntry": 0.83474,
     "stop": 0.835061,
@@ -2068,10 +2070,12 @@
     "slipR": 0.249,
     "lagSec": 171,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T00:17:51.000Z",
-    "brokerStop": 0.83502
+    "brokerStop": 0.83502,
+    "closedAt": "2026-11-27T01:02:21.000Z"
    },
    "eqx:fade:gbpusd:fade-m15-b1795738500": {
     "positionId": "51649038",
@@ -2210,21 +2214,44 @@
     "stopCheckedAt": "2026-11-27T00:30:18.000Z",
     "brokerStop": 1.4255,
     "closedAt": "2026-11-27T00:59:36.000Z"
+   },
+   "eqx:fade:eurjpy:fade-m15-b1795741200": {
+    "positionId": "51649765",
+    "symbol": "EURJPY",
+    "side": "buy",
+    "volume": 1300000,
+    "lots": 0.13,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T01:00:14.000Z",
+    "councilEntry": 174.652,
+    "stop": 174.603643,
+    "t1": 174.748714,
+    "riskCash": 4.11,
+    "margin": 28.5,
+    "fillPrice": 174.645,
+    "slipR": -0.145,
+    "lagSec": 14,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T01:00:14.000Z",
+    "brokerStop": 174.597
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 414.9,
+   "lastBalance": 405.75,
    "ids": [
-    "51608452",
-    "51649037"
+    "51649765"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 414.9 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 405.75 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2236,11 +2263,6 @@
     "why": "daily loss stop (3.1% down today)",
     "n": 0,
     "at": "2026-11-26T09:57:41.000Z"
-   },
-   "eqx:fade:eurjpy:fade-m15-s1795689900": {
-    "why": "daily loss stop (3.1% down today)",
-    "n": 0,
-    "at": "2026-11-26T11:29:59.000Z"
    }
   },
   "paused": {},
@@ -2248,25 +2270,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 414.9,
-  "lastRun": "2026-11-27T00:59:36.000Z"
+  "balance": 405.75,
+  "lastRun": "2026-11-27T01:02:21.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T14:11:24.000Z",
-   "msg": "moved US500 49396395 protection: stop 7598 -> 7625.25 (council ict-A+)",
-   "trade": "ict:es-b-1794560400"
-  },
-  {
-   "at": "2026-11-13T14:11:24.000Z",
-   "msg": "moved US30 49424997 protection: stop 52287 -> 52515 (council ict-A)",
-   "trade": "ict:ym-b-1794564000"
-  },
-  {
-   "at": "2026-11-13T14:33:48.000Z",
-   "msg": "US30 position 49424997 closed at the broker",
-   "trade": "ict:ym-b-1794564000"
-  },
   {
    "at": "2026-11-13T14:35:14.000Z",
    "msg": "US500 position 49396395 closed at the broker",
@@ -3741,6 +3748,21 @@
    "at": "2026-11-27T00:59:36.000Z",
    "msg": "USDCAD position 51649273 closed at the broker",
    "trade": "eqx:fade:usdcad:fade-m15-s1795739400"
+  },
+  {
+   "at": "2026-11-27T01:00:14.000Z",
+   "msg": "NZDUSD position 51608452 closed at the broker",
+   "trade": "eqx:fvg:nzdusd:fvg-h1-b1795629600-1795707000"
+  },
+  {
+   "at": "2026-11-27T01:00:14.000Z",
+   "msg": "opened buy EURJPY 0.13 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurjpy:fade-m15-b1795741200"
+  },
+  {
+   "at": "2026-11-27T01:02:21.000Z",
+   "msg": "USDCHF position 51649037 closed at the broker",
+   "trade": "eqx:fade:usdchf:fade-m15-s1795738500"
   }
  ],
  "limits": {
@@ -3845,11 +3867,11 @@
   ]
  },
  "execution": {
-  "n": 46,
-  "meanSlipR": 0.171,
-  "medianSlipR": 0.148,
+  "n": 47,
+  "meanSlipR": 0.164,
+  "medianSlipR": 0.135,
   "worstSlipR": 1.352,
-  "medianLagSec": 63,
+  "medianLagSec": 61.5,
   "bySymbol": {
    "GBPUSD": {
     "n": 6,
@@ -3876,8 +3898,8 @@
     "meanSlipR": 0.142
    },
    "EURJPY": {
-    "n": 5,
-    "meanSlipR": -0.202
+    "n": 6,
+    "meanSlipR": -0.192
    },
    "AUDUSD": {
     "n": 4,
