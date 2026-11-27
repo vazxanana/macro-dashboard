@@ -191,6 +191,8 @@ jobs:
             # its own records (live/), a daily stop; does nothing unless config.json live is on and CTRADER_LIVE=on
             job council/vb-demo.mjs data --live || echo "Breakout live round $i failed"
             job council/nq-demo.mjs data --live || echo "Nasdaq live round $i failed"
+            # the live account's balance and open positions for the owner's card (council/live-account.mjs, read only), every 2nd round
+            if [ $((i % 2)) -eq 0 ]; then timeout 40 node council/live-account.mjs data || echo "Live account snapshot round $i failed"; fi
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).

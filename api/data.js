@@ -75,6 +75,8 @@ async function handle(req, res, d = {}) {
     res.setHeader('Cache-Control', 'private, no-store');
     let acct = null; try { acct = await S.fromRequest(req, env, d.deps || S.defaultDeps(env), { cacheMs: 60e3 }); } catch (e) { return res.status(503).json({ error: 'sign-in check unavailable' }); }
     if (!acct) return res.status(401).json({ error: 'sign in to read this' });
+    // the live account's files (balance, positions, live trades) are the owner's alone (27 Nov 2026)
+    if (/^live\//i.test(p) && acct.u !== 'owner') return res.status(404).json({ error: 'not found' });
   }
   const open = guest && !marked;   // publicly cacheable: a guest file asked for without a cookie or a member mark
   try {
