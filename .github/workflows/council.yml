@@ -112,6 +112,9 @@ jobs:
           CTRADER_REFRESH_TOKEN: ${{ secrets.CTRADER_REFRESH_TOKEN || vars.CTRADER_REFRESH_TOKEN }}
           CTRADER_ACCOUNT_ID: ${{ secrets.CTRADER_ACCOUNT_ID || vars.CTRADER_ACCOUNT_ID }}
           CTRADER_ENV: ${{ secrets.CTRADER_ENV || vars.CTRADER_ENV }}
+          # the ONE live account (council/live.mjs, owner 27 Nov 2026): inert unless CTRADER_LIVE is "on" AND config.json live is on
+          CTRADER_LIVE: ${{ secrets.CTRADER_LIVE || vars.CTRADER_LIVE }}
+          CTRADER_LIVE_ACCESS_TOKEN: ${{ secrets.CTRADER_LIVE_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}   # newcode(): compare this run's commit with main (read only)
           OANDA_TOKEN: ${{ secrets.OANDA_TOKEN }}   # council/md-proxy.mjs: the loop's own OANDA candles (empty = the website's proxy)
           OANDA_ENV: ${{ secrets.OANDA_ENV }}
@@ -165,6 +168,10 @@ jobs:
             # The two Nasdaq leads that passed at the broker's own ticks (l1, l5) on a DEMO account (council/nq-demo.mjs, 26 Nov 2026):
             # reads H1 candles once an hour, connects only on a signal or while one of its positions is open; every order has a stop.
             timeout 45 node council/nq-demo.mjs data || echo "Nasdaq demo round $i failed"
+            # The LIVE account (council/live.mjs, owner 27 Nov 2026): the same rules (+ the gold 8-swing break) at config.live.risk,
+            # its own records (live/), a daily stop; does nothing unless config.json live is on and CTRADER_LIVE=on
+            timeout 45 node council/vb-demo.mjs data --live || echo "Breakout live round $i failed"
+            timeout 45 node council/nq-demo.mjs data --live || echo "Nasdaq live round $i failed"
             # ICT desk (7 Nov): GitHub fired ict.yml's 15-min schedule only 3 times in 22 h, so the desk runs here, every 3rd
             # round (~17 min). ict.yml keeps a manual trigger only (one writer of ict/). Its A-setups get their own mirror pass
             # right after it, so they too reach the demo within seconds (the mirror is idempotent: a second pass sends nothing new).
@@ -243,6 +250,8 @@ jobs:
                 timeout 45 node council/dom-demo.mjs data || echo "H1 DOM demo quick pass $i failed"
                 timeout 45 node council/dom-demo.mjs data --variant gold4r || echo "Gold DOM 4R demo quick pass $i failed"
                 timeout 45 node council/nq-demo.mjs data || echo "Nasdaq demo quick pass $i failed"
+                timeout 45 node council/vb-demo.mjs data --live || echo "Breakout live quick pass $i failed"
+                timeout 45 node council/nq-demo.mjs data --live || echo "Nasdaq live quick pass $i failed"
                 node council/datasync.mjs data save "Council quick pass $(date -u +%Y-%m-%dT%H:%MZ)" || echo "Quick pass $i not pushed"
                 # the owner's demo account every minute between rounds (owner, 7 Nov: a manual trade showed up late); saved only on a change
                 node council/ctrader-account.mjs data >/dev/null 2>&1 || true

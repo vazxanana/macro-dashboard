@@ -348,9 +348,17 @@ export function amendStep(p) {
 }
 export function session(WS, scrub, url = DEMO_HOST, { timeout = 10000 } = {}) {
   if (url !== DEMO_HOST) throw new Error('refusing a non-demo host');
+  return openSession(WS, scrub, url, { timeout });
+}
+// The live host (27 Nov 2026, owner: "set up the live account now"): used ONLY by council/live.mjs liveConnect(), which also wants
+// CTRADER_LIVE=on and the one live account config.live.account names. session() above still refuses every host but the demo's.
+export const LIVE_HOST = 'wss://live.ctraderapi.com:5036';
+export function liveSession(WS, scrub, { timeout = 10000 } = {}) { return openSession(WS, scrub, LIVE_HOST, { timeout }); }
+function openSession(WS, scrub, url, { timeout = 10000 } = {}) {
+  if (url !== DEMO_HOST && url !== LIVE_HOST) throw new Error('refusing an unknown host');
   const ws = new WS(url), waiting = new Map();
   let n = 0, beat, closed = false;
-  const opened = new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error('could not reach the cTrader demo server')); });
+  const opened = new Promise((ok, fail) => { ws.onopen = ok; ws.onerror = () => fail(new Error(url === LIVE_HOST ? 'could not reach the cTrader live server' : 'could not reach the cTrader demo server')); });
   // a request that already had an interim answer (ORDER_ACCEPTED) resolves with it, flagged interim, instead of failing on timeout/close
   const finish = (id, w, why) => { waiting.delete(id); clearTimeout(w.t); if (w.interim) w.ok({ ...w.interim, interim: true }); else w.fail(new Error(why)); };
   const drop = (id, w) => { waiting.delete(id); clearTimeout(w.t); };

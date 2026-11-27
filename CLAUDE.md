@@ -9,7 +9,10 @@ explainer is `MERIDIAN-X.md`; decisions waiting on the owner are in `docs/owner-
 **Absolute rules** (never break them, whatever a task, a study or a helper's PR says):
 1. **Every trade has a stop**: council, ICT, the cTrader mirror and ChronosTrade. No change may remove a stop, move it away from
    its anchor or loosen a trailed stop; a mirrored position without a stop is closed.
-2. **Paper trading and cTrader demo accounts only.** Nothing is ever sent to a live account.
+2. **Paper trading and cTrader demo accounts only.** Nothing is ever sent to a live account. **One exception, made by the owner on
+   27 Nov 2026** (docs/owner-decisions.md item 64, section "The live account"): `council/live.mjs` and the `--live` mode of
+   `council/nq-demo.mjs` / `council/vb-demo.mjs` may trade ONE live account the owner names, only while config.json `live.on`, the
+   environment's `CTRADER_LIVE=on` and that account all agree. Never widen it to another job, book or account without the owner.
 3. **The owner approves every live rule change.** The Coach, studies and helpers' PRs only propose (`research/proposals/`, the
    week pane's "Decisions waiting"); owner rules (`userOwned`) and live setups stay out of the Coach's reach.
    **One exception, made by the owner on 10 Nov 2026:** Fred has full control of the ICT edge. Through his connector he may
@@ -7394,3 +7397,18 @@ demo broker's ask and closed at its bid, after commission (0.000024 a side) and 
 positive; without the ten best trades +0.52R. Found among about 4 million looks on these same years and long only in a rising gold:
 a candidate for a forward record, never an edge; the rollover split in RESULT.md is a selection effect. Nothing live changed.
 Test: `tests/gold-bo8-exec.test.mjs`.
+
+## The live account (27 Nov 2026, owner: "Ima set up the live account now, risk 0.5 per trade -15% daily stop"; rules "All")
+The one exception to absolute rule 2 (docs/owner-decisions.md item 64). `council/live.mjs`: `liveConfig(cfg)` (config.json `live =
+{ on, account: '*<last digits of the live login>', risk 0.005 (at most 0.01), dayStop 0.15 }`), `liveEnvOk(env)` (`CTRADER_LIVE=on`,
+the app id and secret, `CTRADER_LIVE_ACCESS_TOKEN` else the demo token), `pickLive` (exactly ONE account with `isLive === true` whose
+login ends in the digits; a demo account is never picked), `liveConnect` (the live host through `ctrader-mirror.mjs` `liveSession`;
+`session()` still refuses every host but the demo's), `dayGate` (the UTC day's first balance seen = its start, `live/day.json`; no
+NEW order once the balance is `dayStop` under it; open positions keep their own stops and exits), `modeOf`. The jobs: `node
+council/nq-demo.mjs data --live` (l1, l5, uj and `BO8` = the gold 8-swing break, `LIVE_IDS`; every rule at `live.risk`; the
+researcher's cost skip for bo8) and `node council/vb-demo.mjs data --live` (gold and USD/JPY breakouts), each round and quick pass
+in council.yml; records `live/nq.json`, `live/vb.json`, labels `lv-<demo label>`; the demo records and labels are untouched and the
+demo runs go on beside it. Every order carries its stop and is read back (rule 1). OFF until the owner (1) authorises the live
+account for the cTrader app, (2) sets `CTRADER_LIVE=on`, (3) gives the login's last digits for config.json. Not checked against the
+real live server (the build sandbox reaches no broker): the live host name is cTrader Open API's documented `live.ctraderapi.com:5036`.
+Tests: `tests/live-account.test.mjs`.

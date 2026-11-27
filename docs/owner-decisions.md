@@ -1308,3 +1308,19 @@ Proposal: `research/proposals/2026-11-17-edge-check.md`. Study: `research/edge/r
   every trade, demo only) to measure real fills going forward. (c) Drop it.
 - **Recommended: (a)**, and decide (b) together with item 62 (the gold breakout), since both are the same rule.
 - **If nothing is decided.** Nothing trades; the forward record keeps counting.
+
+### [x] 64. A live account for the passing rules (decided 27 Nov 2026)
+
+- **Status (27 Nov 2026): decided by the owner, built, switched OFF until the account is ready.** Owner: "Ima set up the live
+  account now, risk 0.5 per trade -15% daily stop"; rules: "All" (the Nasdaq leads l1 and l5, the USD/JPY morning breakout, the
+  gold and USD/JPY breakouts of the day, the gold 8-swing break; not gotobi); a -15 % daily stop kept as asked after being told
+  that at 0.5 % a trade it needs about 30 losing trades in one day to act. This replaces item 46 for these rules only: the
+  one exception to absolute rule 2. Every other book stays demo.
+- **What it is**: `council/live.mjs` + `council/nq-demo.mjs --live` + `council/vb-demo.mjs --live` (council.yml, each round and
+  quick pass). Its own records `live/nq.json`, `live/vb.json`, `live/day.json`, labels `lv-...`.
+- **To switch it on (all three needed)**: (1) authorise the live account for the cTrader app (the same app the demo uses);
+  (2) the repository secret or variable `CTRADER_LIVE` = `on` (and `CTRADER_LIVE_ACCESS_TOKEN` if the live account is on another
+  token); (3) give the last digits of the live login, so config.json gets `live = { on: true, account: "*<digits>", risk: 0.005,
+  dayStop: 0.15 }`. To stop: any one of them off.
+- **Said plainly**: none of these rules has a forward record long enough to judge; their pass is on years the searches had
+  read. Real money can be lost quickly; the daily stop acts only on the balance (open positions keep their own stops).

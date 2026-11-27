@@ -20,7 +20,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { PT, scrubber, orderStep, amendStep, relative } from './ctrader-mirror.mjs';
 import { connect, accountFor, volumeOf } from './gotobi.mjs';
-import { NQ1_LEADS } from './edge-desks-2.mjs';
+import { NQ1_LEADS, NQ2_GOLD } from './edge-desks-2.mjs';
+import { modeOf, dayGate } from './live.mjs';
 import { prep, toArrays, sig, atr, sma, atrPct } from '../research/edge/auto-researcher/engine.mjs';
 
 // 26 Nov 2026 (owner: "usdjpy run", then "So the usdjpy risk 2%"): a third rule, `uj` = the auto-researcher's USD/JPY morning breakout (research/edge/usdjpy-brk-exec:
@@ -31,6 +32,11 @@ export const UJ = { id: 'uj', name: 'USD/JPY morning breakout', label: 'nq-uj', 
 export const IDS = ['l1', 'l5', 'uj'], RISK = 0.01, MAX_RISK = 0.01, LOOK_FROM = 8, LOOK_UNTIL = 720, MAX_DRIFT = 0.25, MIN_BARS = 600, WARM = 210;
 export const RULES = Object.fromEntries(IDS.map((id) => { if (id === UJ.id) return [id, UJ]; const L = NQ1_LEADS.find((x) => x.id === id); return [id, { id, name: L.name, label: `nq-${id}`, market: 'nas100', symbol: 'NAS100', dp: 2, g: L.g }]; }));
 export const MARKETS = [...new Set(IDS.map((id) => RULES[id].market))];
+// the live account (27 Nov 2026, owner: rules "All"): the three rules above and the gold 8-swing break (NQ2_GOLD: research/edge/gold-bo8-exec,
+// PASS at the broker's own ticks on years the search had read, a candidate, not an edge), every rule at config.live.risk (council/live.mjs)
+export const BO8 = { id: 'bo8', name: NQ2_GOLD.name, label: 'nq-bo8', market: 'xau', symbol: 'XAUUSD', dp: 2, g: NQ2_GOLD.g, costSkip: NQ2_GOLD.costSkip };
+RULES.bo8 = BO8;
+export const LIVE_IDS = [...IDS, 'bo8'], LIVE_MARKETS = [...new Set(LIVE_IDS.map((id) => RULES[id].market))];
 // the dollars one unit loses over a stop distance: a Nasdaq unit one dollar a point; a USD/JPY unit `dist` yen = dist / price dollars
 export const usdPerUnit = (market, dist, px) => (market === 'usdjpy' ? dist / px : dist);
 const H = 3600, hourOf = (t) => Math.floor(t / H) * H;
@@ -66,30 +72,32 @@ export function inferExit(rec, rows) {
 }
 const ours = (label, barT) => (p) => { const td = p.tradeData || {}; return td.label === label && String(td.comment || '').includes(String(barT)); };
 
-export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
-  const scrub = scrubber(env), file = path.join(dir, 'nq', 'trades.json'), now = Math.floor(clock() / 1000), h0 = hourOf(now), sec = now - h0, iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
+export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)), mode = 'demo' } = {}) {
+  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
+  const X = modeOf(mode, cfg, env, { dir, name: 'nq', file: path.join(dir, 'nq', 'trades.json'), label: (x) => x, connect }), lab = X.label, ids = X.live ? LIVE_IDS : IDS, markets = X.live ? LIVE_MARKETS : MARKETS, NM = X.live ? 'nq live' : 'nq';
+  if (X.live && X.off) return { skipped: 'off', why: X.off };
+  const scrub = scrubber(env), file = X.file, now = Math.floor(clock() / 1000), h0 = hourOf(now), sec = now - h0, iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
   let J; try { J = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { if (fs.existsSync(file)) { log('nq: nq/trades.json does not parse: left as it is'); return { skipped: 'file' }; } J = { trades: [] }; }
   J.trades = J.trades || [];
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
-  const C = cfg.nq || {}; if (C.on === false) return { skipped: 'off' };
+  const C = X.live ? {} : cfg.nq || {}; if (C.on === false) return { skipped: 'off' };
   if (!(sec >= LOOK_FROM && sec <= LOOK_UNTIL) || J.looked === h0) return { skipped: 'nothing due' };
   const write = (push) => { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; if (J.trades.length > 2000) J.trades = J.trades.slice(-2000); fs.writeFileSync(tmp, JSON.stringify(J, null, 1)); fs.renameSync(tmp, file); if (push) save(); };
   const FR = {}, ROWS = {}; let shut = 0;   // one read a market; a failed read is not marked looked: the next pass tries again
-  for (const mk of MARKETS) { let rows; try { rows = await barsFn(now, mk); } catch (e) { log('nq: ' + scrub(String((e && e.message) || e)).slice(0, 160)); return { error: true }; }
+  for (const mk of markets) { let rows; try { rows = await barsFn(now, mk); } catch (e) { log(NM + ': ' + scrub(String((e && e.message) || e)).slice(0, 160)); return { error: true }; }
     const F = frame(rows || [], now, mk); ROWS[mk] = rows || []; if (F.why || !F.forming) { shut++; continue; } FR[mk] = F; }
-  if (shut === MARKETS.length) { J.looked = h0; write(false); return { skipped: 'market shut (no candle of this hour)' }; }
+  if (shut === markets.length) { J.looked = h0; write(false); return { skipped: 'market shut (no candle of this hour)' }; }
   const work = [];
-  for (const id of IDS) { const R = RULES[id], F = FR[R.market]; if (!F) continue; const open = J.trades.find((x) => x.rule === id && x.status === 'open');
+  for (const id of ids) { const R = RULES[id], F = FR[R.market]; if (!F) continue; const open = J.trades.find((x) => x.rule === id && x.status === 'open');
     if (open) { const held = F.closed.filter((r) => r[0] >= open.barT).length; work.push({ R, F, rec: open, what: held >= open.hold ? 'exit' : 'watch', held }); continue; }
     if (J.trades.some((x) => x.rule === id && x.barT === h0)) continue;
-    const sg = signalAt(F.D, R.g, F.D.n - 1, h0); if (sg) work.push({ R, F, what: 'enter', sg }); }
+    const sg = signalAt(F.D, R.g, F.D.n - 1, h0); if (sg && !(R.costSkip && F.D.cost / sg.dist > R.costSkip)) work.push({ R, F, what: 'enter', sg }); }
   if (!work.length) { J.looked = h0; write(false); return { skipped: 'no signal' }; }
-  if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('nq: cTrader demo not configured'); return { skipped: 'config' }; }
-  const account = (C.account && String(C.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('nq: no demo account for it'); return { skipped: 'account' }; }
-  const risk = Math.min(MAX_RISK, Math.max(0.0005, +C.risk || RISK)), tag = `…${String(account).slice(-3)}`;
+  if (!X.live && (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo')) { log('nq: cTrader demo not configured'); return { skipped: 'config' }; }
+  const account = X.live ? X.account : (C.account && String(C.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('nq: no demo account for it'); return { skipped: 'account' }; }
+  const risk = X.live ? X.risk : Math.min(MAX_RISK, Math.max(0.0005, +C.risk || RISK)), tag = `…${String(account).slice(-3)}`;
   const did = []; let s = null, ctid, dirty = false, failed = false;
   try {
-    ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
+    ({ s, ctid } = await X.connect({ env, dir, account, WS, scrub }));
     const reconcile = async () => (await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES)).position || [];
     const closeNow = async (p) => { const ev = await s.send(PT.CLOSE_POSITION_REQ, { ctidTraderAccountId: ctid, positionId: Number(p.positionId), volume: +p.tradeData.volume }, PT.EXECUTION_EVENT, orderStep); return +(ev.deal && ev.deal.executionPrice) || null; };
     // RULE 1: a position of ours with no stop gets the record's stop by amend; refused -> closed at once
@@ -98,11 +106,11 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
       try { await s.send(PT.AMEND_POSITION_SLTP_REQ, { ctidTraderAccountId: ctid, positionId: Number(p.positionId), stopLoss: rec.stop, ...(rec.target != null ? { takeProfit: rec.target } : {}) }, PT.EXECUTION_EVENT, amendStep); rec.stopSetBy = 'amend'; return true; }
       catch (e) { const px = await closeNow(p); Object.assign(rec, { status: 'closed', exit: px, how: 'closed at once: the broker took no stop', closedSeen: iso(), R: px != null && rec.fill != null ? +((px - rec.fill) / rec.dist).toFixed(3) : null }); return false; } };
     let positions = await reconcile();
-    for (const w of work) { const R = w.R, { D, forming } = w.F, i = D.n - 1, rows = ROWS[R.market], r5 = (v) => +(+v).toFixed(R.dp + 2), ruleRisk = R.risk ? Math.min(R.maxRisk, Math.max(0.0005, +C[R.id + 'Risk'] || R.risk)) : risk, capRisk = R.maxRisk || MAX_RISK;
+    for (const w of work) { const R = w.R, { D, forming } = w.F, i = D.n - 1, rows = ROWS[R.market], r5 = (v) => +(+v).toFixed(R.dp + 2), ruleRisk = !X.live && R.risk ? Math.min(R.maxRisk, Math.max(0.0005, +C[R.id + 'Risk'] || R.risk)) : risk, capRisk = X.live ? X.maxRisk : R.maxRisk || MAX_RISK, LB = lab(R.label);
       try {
         if (w.what === 'enter') {
           const sg = w.sg, rec = { id: `${R.id}-${h0}`, rule: R.id, barT: h0, status: 'skip', side: 'buy', signalBar: D.t[i], market: R.market, atr: r5(sg.atr), dist: r5(sg.dist), rr: sg.rr, hold: sg.hold, account: tag };
-          if (positions.some(ours(R.label, h0))) { const p = positions.find(ours(R.label, h0));   // sent by a pass whose record was lost: never sent twice
+          if (positions.some(ours(LB, h0))) { const p = positions.find(ours(LB, h0));   // sent by a pass whose record was lost: never sent twice
             Object.assign(rec, { status: 'open', fill: +p.price || null, positionId: String(p.positionId), volume: +p.tradeData.volume, adopted: true, openedAt: iso() }); rec.stop = +p.stopLoss > 0 ? +p.stopLoss : +(rec.fill - sg.dist).toFixed(R.dp); rec.target = +p.takeProfit > 0 ? +p.takeProfit : +(rec.fill + sg.rr * sg.dist).toFixed(R.dp); rec.basis = r5(rec.fill - forming[1]);
             J.trades.push(rec); dirty = true; await guard(rec, p); did.push(`${R.id} adopted`); continue; }
           const drift = Math.abs(forming[4] - forming[1]) / sg.dist;
@@ -112,32 +120,33 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           const info = ((await s.send(PT.SYMBOL_BY_ID_REQ, { ctidTraderAccountId: ctid, symbolId: [sym.symbolId] }, PT.SYMBOL_BY_ID_RES)).symbol || [])[0] || {}, digits = Number.isFinite(+info.digits) ? +info.digits : R.dp, at = (v) => +(+v).toFixed(digits);
           const tr = (await s.send(PT.TRADER_REQ, { ctidTraderAccountId: ctid }, PT.TRADER_RES)).trader || {}, md = Number.isFinite(+tr.moneyDigits) ? +tr.moneyDigits : 2, balance = tr.balance != null ? Number(tr.balance) / 10 ** md : null;
           // units = balance x risk / the dollars one unit loses over the stop distance (USD account), fractions of a unit kept
+          if (X.live) { const gt = dayGate(dir, balance, now, X.dayStop); if (!gt.ok) { Object.assign(rec, { status: 'skip', why: gt.why }); J.trades.push(rec); dirty = true; did.push(`${R.id} daily stop`); continue; } }
           const per = usdPerUnit(R.market, sg.dist, forming[4]);
           let volume = balance > 0 ? volumeOf(info, balance * ruleRisk / per) : null, riskNow = ruleRisk;
           if (!volume) { const min = +info.minVolume || +info.stepVolume || 0, loss = (min / 100) * per; riskNow = balance > 0 ? loss / balance : Infinity;
             if (!(min > 0 && riskNow <= capRisk)) throw new Error(`the smallest volume would risk more than ${capRisk * 100} % of the balance`); volume = min; }
-          const order = { ctidTraderAccountId: ctid, symbolId: sym.symbolId, orderType: 1, tradeSide: 1, volume, relativeStopLoss: relative(sg.dist, digits), relativeTakeProfit: relative(sg.rr * sg.dist, digits), label: R.label, comment: `${R.label} ${h0}`, clientOrderId: rec.id };
+          const order = { ctidTraderAccountId: ctid, symbolId: sym.symbolId, orderType: 1, tradeSide: 1, volume, relativeStopLoss: relative(sg.dist, digits), relativeTakeProfit: relative(sg.rr * sg.dist, digits), label: LB, comment: `${LB} ${h0}`, clientOrderId: rec.id };
           if (!(order.relativeStopLoss > 0)) throw new Error('no stop distance: no order');
           const ev = await s.send(PT.NEW_ORDER_REQ, order, PT.EXECUTION_EVENT, orderStep);
           const fill = +(ev.deal && ev.deal.executionPrice) || +(ev.position && ev.position.price) || null;
           Object.assign(rec, { status: 'open', openedAt: iso(), lateS: sec, drift: +drift.toFixed(3), volume, balance, risk: +riskNow.toFixed(5), fill, digits, positionId: ev.position && ev.position.positionId != null ? String(ev.position.positionId) : null,
             stop: fill != null ? at(fill - sg.dist) : null, target: fill != null ? at(fill + sg.rr * sg.dist) : null, basis: fill != null ? r5(fill - forming[1]) : 0 });
-          J.trades.push(rec); dirty = true; did.push(`${R.id} bought`); log(`nq: ${R.id} buy ${R.symbol} at ${fill}, stop ${rec.stop}, target ${rec.target}, volume ${volume}`);
+          J.trades.push(rec); dirty = true; did.push(`${R.id} bought`); log(`${NM}: ${R.id} buy ${R.symbol} at ${fill}, stop ${rec.stop}, target ${rec.target}, volume ${volume}`);
           await pause(1500); positions = await reconcile();
-          const p = positions.find(ours(R.label, h0));
+          const p = positions.find(ours(LB, h0));
           if (p) { if (rec.fill == null && +p.price > 0) { rec.fill = +p.price; rec.stop = at(rec.fill - sg.dist); rec.target = at(rec.fill + sg.rr * sg.dist); rec.basis = r5(rec.fill - forming[1]); } rec.positionId = String(p.positionId); await guard(rec, p); }
           else rec.note = 'the position was not on the account at the read-back: the next hour looks again';
           continue;
         }
-        const rec = w.rec, p = positions.find(ours(R.label, rec.barT));
+        const rec = w.rec, p = positions.find(ours(LB, rec.barT));
         if (!p) { Object.assign(rec, { status: 'closed', closedSeen: iso(), inferred: true }, inferExit(rec, rows)); dirty = true; did.push(`${R.id} ${rec.how}`); continue; }
         if (!(await guard(rec, p))) { dirty = true; did.push(`${R.id} closed (no stop)`); continue; }
         if (rec.stopSetBy) dirty = true;
         if (w.what === 'exit') { const px = await closeNow(p); Object.assign(rec, { status: 'closed', exit: px, how: `time exit after ${rec.hold} H1 candles`, closedSeen: iso(), R: px != null && rec.fill != null ? +((px - rec.fill) / rec.dist).toFixed(3) : null }); dirty = true; did.push(`${R.id} time exit`); }
-      } catch (e) { const why = scrub(String((e && e.message) || e)).slice(0, 160); log(`nq: ${R.id}: ${why}`); failed = true;
+      } catch (e) { const why = scrub(String((e && e.message) || e)).slice(0, 160); log(`${NM}: ${R.id}: ${why}`); failed = true;
         if (w.what === 'enter' && !J.trades.some((x) => x.id === `${R.id}-${h0}`)) { J.trades.push({ id: `${R.id}-${h0}`, rule: R.id, barT: h0, status: 'error', why, account: tag }); dirty = true; failed = false; } did.push(`${R.id} error`); }
     }
-  } catch (e) { log('nq: ' + scrub(String((e && e.message) || e)).slice(0, 160)); return { error: true, did }; }
+  } catch (e) { log(NM + ': ' + scrub(String((e && e.message) || e)).slice(0, 160)); return { error: true, did }; }
   finally { if (s) s.close(); if (!failed && s) J.looked = h0; if (dirty || (!failed && s)) write(dirty); }
   await pause(0); return { did };
 }
@@ -149,6 +158,7 @@ export async function oandaH1(now, mk = 'nas100', base = process.env.MD_BASE || 
 }
 if (process.argv[1] && process.argv[1].endsWith('nq-demo.mjs')) {
   const dir = process.argv[2] || 'data'; const { execFileSync } = await import('node:child_process');
-  const save = () => { try { execFileSync('node', ['council/datasync.mjs', dir, 'save', `Nasdaq demo ${new Date().toISOString().slice(0, 16)}Z`, 'nq/trades.json'], { stdio: 'inherit' }); } catch (e) { console.log('nq: save failed (kept locally)'); } };
-  const out = await step({ dir, bars: oandaH1, save }); if (out.did && out.did.length) console.log('nq:', out.did.join(', '));
+  const live = process.argv.includes('--live'), rel = live ? 'live' : 'nq/trades.json';
+  const save = () => { try { execFileSync('node', ['council/datasync.mjs', dir, 'save', `Nasdaq ${live ? 'live' : 'demo'} ${new Date().toISOString().slice(0, 16)}Z`, rel], { stdio: 'inherit' }); } catch (e) { console.log('nq: save failed (kept locally)'); } };
+  const out = await step({ dir, bars: oandaH1, save, mode: live ? 'live' : 'demo' }); if (out.did && out.did.length) console.log('nq:', out.did.join(', '));
 }

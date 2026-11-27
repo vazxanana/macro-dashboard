@@ -20,6 +20,7 @@ import path from 'node:path';
 import { PT, scrubber, orderStep, pendingStep, cancelStep, amendStep } from './ctrader-mirror.mjs';
 import { connect, accountFor, units, volumeOf } from './gotobi.mjs';
 import { buildDays } from '../research/edge/gold-vol-breakout/run.mjs';
+import { modeOf, dayGate } from './live.mjs';
 
 export const K = 0.5, EXIT_S = 21 * 3600, PLACE_FROM = 15, PLACE_UNTIL = 1200, RISK = 0.0025, MAX_RISK = 0.01;
 export const MARKETS = {
@@ -49,12 +50,15 @@ const sizeOf = (M, info, balance, risk, D, px) => volumeOf(info, units(balance, 
 const oursPos = (M, day) => (p) => { const td = p.tradeData || {}; return td.label === M.label && String(td.comment || '').includes(day); };
 const R1 = (rec, exit) => (rec.fill != null && exit != null && rec.O != null && rec.fill !== rec.O ? +((rec.side === 'buy' ? 1 : -1) * (exit - rec.fill) / Math.abs(rec.fill - rec.O)).toFixed(3) : null);
 
-export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
-  const scrub = scrubber(env), file = path.join(dir, 'vb', 'trades.json'), now = Math.floor(clock() / 1000), day = ymdOf(now), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
+export async function step({ env = process.env, dir = 'data', WS = globalThis.WebSocket, clock = () => Date.now(), bars: barsFn, save = () => {}, log = console.log, pause = (ms) => new Promise((r) => setTimeout(r, ms)), mode = 'demo' } = {}) {
+  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
+  const X = modeOf(mode, cfg, env, { dir, name: 'vb', file: path.join(dir, 'vb', 'trades.json'), label: (x) => x, connect });   // the live account (27 Nov 2026): council/live.mjs
+  if (X.live && X.off) return { skipped: 'off', why: X.off };
+  const LM = (M) => (X.live ? { ...M, label: X.label(M.label) } : M);
+  const scrub = scrubber(env), file = X.file, now = Math.floor(clock() / 1000), day = ymdOf(now), iso = () => new Date(Math.floor(clock() / 1000) * 1000).toISOString();
   let J; try { J = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { if (fs.existsSync(file)) { log('vb: vb/trades.json does not parse: left as it is'); return { skipped: 'file' }; } J = { trades: [] }; }
   J.trades = J.trades || [];
-  let cfg = {}; try { cfg = JSON.parse(fs.readFileSync(path.join(dir, 'config.json'), 'utf8')); } catch (e) {}
-  if (cfg.vb && cfg.vb.on === false) return { skipped: 'off' };
+  if (!X.live && cfg.vb && cfg.vb.on === false) return { skipped: 'off' };
   // what is there to do this minute? (an open record of an earlier day is still due its exit)
   const work = [];
   for (const k of Object.keys(MARKETS)) { const open = J.trades.filter((x) => x.market === k && (x.status === 'placed' || x.status === 'open'));
@@ -64,18 +68,18 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
   // connecting (23 Nov 2026: such a day left no record, so the demo record could not be set beside the forward record day by day)
   const s0 = now - d0Of(now), late = weekday(now) && s0 > PLACE_UNTIL && s0 < EXIT_S ? Object.keys(MARKETS).filter((k) => !J.trades.some((x) => x.market === k && x.day === day)) : [];
   if (!work.length && !late.length) return { skipped: 'nothing due' };
-  if (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo') { log('vb: cTrader demo not configured'); return { skipped: 'config' }; }
-  const account = (cfg.vb && cfg.vb.account && String(cfg.vb.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('vb: no demo account for it'); return { skipped: 'account' }; }
-  const risk = Math.min(0.01, Math.max(0.0005, +(cfg.vb && cfg.vb.risk) || RISK));
+  if (!X.live && (String(env.CTRADER_MIRROR || '').trim().toLowerCase() !== 'on' || ['CTRADER_CLIENT_ID', 'CTRADER_CLIENT_SECRET', 'CTRADER_ACCESS_TOKEN', 'CTRADER_ENV'].some((x) => !env[x]) || String(env.CTRADER_ENV).trim().toLowerCase() !== 'demo')) { log('vb: cTrader demo not configured'); return { skipped: 'config' }; }
+  const account = X.live ? X.account : (cfg.vb && cfg.vb.account && String(cfg.vb.account)) || accountFor(dir, env, { gotobi: cfg.gotobi }); if (!account) { log('vb: no demo account for it'); return { skipped: 'account' }; }
+  const risk = X.live ? X.risk : Math.min(0.01, Math.max(0.0005, +(cfg.vb && cfg.vb.risk) || RISK));
   const write = () => { fs.mkdirSync(path.dirname(file), { recursive: true }); const tmp = file + '.tmp'; if (J.trades.length > 2000) J.trades = J.trades.slice(-2000); fs.writeFileSync(tmp, JSON.stringify(J, null, 1)); fs.renameSync(tmp, file); save(); };
   const did = []; let s = null, ctid, dirty = false;
   for (const k of late) { J.trades.push({ id: `${k}-${day}`, market: k, day, status: 'missed', why: 'no order was placed in the first twenty minutes of the day, 00:00-00:20 UTC (no pass looked, or the demo could not be reached)', exitAt: d0Of(now) + EXIT_S, account: `…${String(account).slice(-3)}` }); dirty = true; did.push(`${k} missed`); }
   if (!work.length) { write(); return { did }; }
   try {
-    ({ s, ctid } = await connect({ env, dir, account, WS, scrub }));
+    ({ s, ctid } = await X.connect({ env, dir, account, WS, scrub }));
     const rc = await s.send(PT.RECONCILE_REQ, { ctidTraderAccountId: ctid }, PT.RECONCILE_RES), positions = rc.position || [], orders = rc.order || [];
     const cancel = async (M, d) => { for (const o of orders.filter((x) => (x.tradeData || {}).label === M.label && String((x.tradeData || {}).comment || '').includes(d) && !x._gone)) { try { await s.send(PT.CANCEL_ORDER_REQ, { ctidTraderAccountId: ctid, orderId: Number(o.orderId) }, PT.EXECUTION_EVENT, cancelStep); } catch (e) { /* filled or gone meanwhile: the next look sees it */ } o._gone = true; } };
-    for (const w of work) { const M = MARKETS[w.k];
+    for (const w of work) { const M = LM(MARKETS[w.k]);
       try {
         if (w.what === 'place') {
           const rows = await barsFn(M.sym, now), L = levels(rows, now), last = rows.length ? rows[rows.length - 1][4] : null;
@@ -92,6 +96,7 @@ export async function step({ env = process.env, dir = 'data', WS = globalThis.We
           const tr = (await s.send(PT.TRADER_REQ, { ctidTraderAccountId: ctid }, PT.TRADER_RES)).trader || {}, md = Number.isFinite(+tr.moneyDigits) ? +tr.moneyDigits : 2, balance = tr.balance != null ? Number(tr.balance) / 10 ** md : null;
           // the size that risks `risk` of the balance; when that is under the broker's smallest volume, the smallest volume is
           // used as long as a stop-out then costs no more than MAX_RISK of the balance (gold on a small demo balance), else no trade
+          if (X.live) { const gt = dayGate(dir, balance, now, X.dayStop); if (!gt.ok) { rec.why = gt.why; J.trades.push(rec); dirty = true; did.push(`${w.k} daily stop`); continue; } }
           let volume = sizeOf(M, info, balance, risk, L.D, last), riskNow = risk;
           if (!volume) { const min = +info.minVolume || +info.stepVolume || 0, loss = (min / 100) * M.usdPerUnit(L.D, last); riskNow = balance > 0 ? loss / balance : Infinity;
             if (!(min > 0 && riskNow <= MAX_RISK)) throw new Error('the smallest volume would risk more than 1 % of the balance'); volume = min; }
@@ -140,6 +145,7 @@ export async function oandaRows(sym, now, base = process.env.MD_BASE || 'https:/
 }
 if (process.argv[1] && process.argv[1].endsWith('vb-demo.mjs')) {
   const dir = process.argv[2] || 'data'; const { execFileSync } = await import('node:child_process');
-  const save = () => { try { execFileSync('node', ['council/datasync.mjs', dir, 'save', `Breakout demo ${new Date().toISOString().slice(0, 16)}Z`, 'vb/trades.json'], { stdio: 'inherit' }); } catch (e) { console.log('vb: save failed (kept locally)'); } };
-  const out = await step({ dir, bars: oandaRows, save }); if (out.did && out.did.length) console.log('vb:', out.did.join(', '));
+  const live = process.argv.includes('--live'), rel = live ? 'live' : 'vb/trades.json';
+  const save = () => { try { execFileSync('node', ['council/datasync.mjs', dir, 'save', `Breakout ${live ? 'live' : 'demo'} ${new Date().toISOString().slice(0, 16)}Z`, rel], { stdio: 'inherit' }); } catch (e) { console.log('vb: save failed (kept locally)'); } };
+  const out = await step({ dir, bars: oandaRows, save, mode: live ? 'live' : 'demo' }); if (out.did && out.did.length) console.log('vb:', out.did.join(', '));
 }
