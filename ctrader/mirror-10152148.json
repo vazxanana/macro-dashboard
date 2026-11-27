@@ -7158,7 +7158,7 @@
     "lots": 2.56,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T03:26:02.000Z",
     "councilEntry": 1.3122,
     "stop": 1.31146,
@@ -7171,10 +7171,15 @@
     "slipR": -0.122,
     "lagSec": 62,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T03:26:02.000Z",
-    "brokerStop": 1.31138
+    "brokerStop": 1.31138,
+    "closedAt": "2026-11-27T04:39:52.000Z",
+    "exitPrice": 1.3116,
+    "councilExit": 1.31146,
+    "councilR": -1
    },
    "boxfade:usdchf:boxfade-m5-s1795752900": {
     "positionId": "51658088",
@@ -7241,7 +7246,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9631.03 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 9631.03 · 3 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7250,14 +7255,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
   "balance": 9631.03,
-  "lastRun": "2026-11-27T04:37:15.000Z"
+  "lastRun": "2026-11-27T04:39:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T16:26:10.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council replica)",
-   "trade": "xau-replica-1794587098-b"
-  },
   {
    "at": "2026-11-13T19:18:31.000Z",
    "msg": "opened sell XAUUSD 0.01 lot (council replica)",
@@ -8746,6 +8746,11 @@
    "at": "2026-11-27T04:35:19.000Z",
    "msg": "opened buy NZDUSD 4.42 lot (council boxfade)",
    "trade": "boxfade:nzdusd:boxfade-m5-b1795754100"
+  },
+  {
+   "at": "2026-11-27T04:39:52.000Z",
+   "msg": "closed GBPUSD position 51656026 (council: stopped)",
+   "trade": "boxfade:gbpusd:boxfade-m5-b1795749900"
   }
  ],
  "limits": {
