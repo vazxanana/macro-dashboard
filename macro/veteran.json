@@ -1,14 +1,14 @@
 {
  "v": 1,
- "at": "2026-11-27T12:53:23.000Z",
+ "at": "2026-11-27T13:51:40.000Z",
  "paperOnly": true,
- "strategistAt": "2026-11-27T12:52:58.000Z",
+ "strategistAt": "2026-11-27T13:51:11.000Z",
  "shock": {
   "shock": "Risk-off / de-risking, funding still calm",
   "clues": [
    "VIX/VIX3M 1.035",
    "HY +29 bp on the week",
-   "SOFR−EFFR 6 bp",
+   "SOFR−EFFR n/a bp",
    "DXY −0.17%"
   ],
   "goldTest": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
@@ -55,7 +55,7 @@
   {
    "k": "risk",
    "name": "Risk, safe haven and liquidity",
-   "obs": "VIX 26.4 (VIX/VIX3M 1.03) · HY OAS 3.72%, +29 bp on the week · SOFR−EFFR 6 bp",
+   "obs": "VIX 26.4 (VIX/VIX3M 1.03) · HY OAS 3.72%, +29 bp on the week",
    "lean": 0,
    "asOf": "2026-11-24",
    "stale": false,
@@ -115,7 +115,7 @@
   },
   {
    "topic": "US dollar",
-   "macro": "−0.05 pts in 5 sessions (vote flat); score z (4-week fall) −0.79",
+   "macro": "+0.06 pts in 5 sessions (vote flat); score z (4-week fall) −0.79",
    "veteran": "DXY 103.78, −0.17% on the week, +1.79% over 4 weeks · broad USD +1.85% over 4 weeks",
    "stance": "qualify",
    "why": "A 5-day momentum vote and a 4-week change can disagree without either being wrong; the veteran weights the 4-week window the score was tested on and notes that local-currency gold is not checked.",
@@ -143,7 +143,7 @@
   {
    "topic": "Regime",
    "macro": "Dollar Smile left side (stress) · dollar liquidity rising · VIX curve inverted (stress)",
-   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.035, HY +29 bp on the week, SOFR−EFFR 6 bp, DXY −0.17%",
+   "veteran": "Risk-off / de-risking, funding still calm (medium confidence) · clues: VIX/VIX3M 1.035, HY +29 bp on the week, SOFR−EFFR n/a bp, DXY −0.17%",
    "stance": "agree",
    "why": "Strongest competing explanation: A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
    "m": null,
@@ -169,7 +169,7 @@
   "claimType": "descriptive association",
   "shock": "Risk-off / de-risking, funding still calm",
   "surprise": "No scheduled red-folder release inside 72 hours; the week's moves are judged against their own 1-week windows",
-  "observed": "VIX/VIX3M 1.035 · HY +29 bp on the week · SOFR−EFFR 6 bp · DXY −0.17%",
+  "observed": "VIX/VIX3M 1.035 · HY +29 bp on the week · SOFR−EFFR n/a bp · DXY −0.17%",
   "decomposition": "TIPS real yield observed (DFII10); breakeven = 10Y nominal − TIPS, carrying inflation-risk and liquidity premia; no ACM term-premium estimate in the council's data",
   "mechanism": "Gold whipsaws: sold with risk assets first, then the haven bid if funding stays calm. The test is whether funding spreads widen; while they do not, this is risk aversion, not a liquidity squeeze.",
   "alternative": "A dollar funding squeeze building underneath (SOFR−EFFR and the FX swap basis would widen next), or forced de-grossing of crowded positions.",
@@ -296,7 +296,7 @@
    ],
    "trusted": false,
    "surprise": null,
-   "surpriseNote": "pending",
+   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
    "claim": "descriptive association"
   },
   {
@@ -325,7 +325,7 @@
    ],
    "trusted": false,
    "surprise": null,
-   "surpriseNote": "pending",
+   "surpriseNote": "no first print was captured within 48 hours of the release: no surprise is scored",
    "claim": "descriptive association"
   },
   {
@@ -741,7 +741,7 @@
     },
     {
      "src": "Fed H.4.1 / funding (SOFR, VIX curve, HY spreads)",
-     "read": "VIX 26.4 (VIX/VIX3M 1.03) · HY OAS 3.72%, +29 bp on the week · SOFR−EFFR 6 bp (as of 2026-11-24)",
+     "read": "VIX 26.4 (VIX/VIX3M 1.03) · HY OAS 3.72%, +29 bp on the week (as of 2026-11-24)",
      "says": "neutral for gold. Stress first sells gold for cash, then buys it",
      "limit": "Safe-haven behaviour is conditional: in a liquidity squeeze gold is sold for cash first (BIS WP 1380: the effect depends on financial conditions). An inverted VIX curve is stress, not a direction."
     },
@@ -1238,7 +1238,7 @@
   "method": "Each scored call (dated calls, COT calls, hypotheses, the weekly ledger forecast) is binned by its stated probability against how often it came true. One factor k scales every future call's distance from its own base rate: k is the Brier-optimal slope over the scored record, pulled toward 1 by a prior (0.3), clamped 0.25-1.5; it stays 1 until 30 calls are scored over 4+ weeks (pre-registered). In-sample Brier before / after is shown for transparency, not as proof. k cannot fix base rates that are themselves off: compare stated vs came true overall. So far: stated 45% on average, came true 32%."
  },
  "briefing": {
-  "at": "2026-11-27T12:53:23.000Z",
+  "at": "2026-11-27T13:51:40.000Z",
   "publicOnly": "Near-inside information here means reading public data early and carefully: CFTC positioning, funding and stress gauges, central-bank wording and the release calendar, expectations captured before each release, real yields and the dollar. Nothing on this page is, or uses, non-public information.",
   "insights": [
    {
@@ -1258,11 +1258,6 @@
       "text": "HY OAS 3.72%, +29 bp on the week",
       "asOf": "2026-11-24",
       "source": "FRED BAMLH0A0HYM2 (ICE BofA)"
-     },
-     {
-      "text": "SOFR − EFFR 6 bp",
-      "asOf": "2026-11-24",
-      "source": "NY Fed SOFR / EFFR via FRED"
      }
     ],
     "why": "In stress gold is often sold first for cash (margin calls), then bought as a haven: expect wider swings both ways, not a direction. Calm funding (SOFR − EFFR small) means a dash for cash is less likely.",
@@ -1636,9 +1631,9 @@
      "text": "as of 2026-11-26 close"
     },
     "mark": {
-     "px": 3665.155,
-     "at": "2026-11-27T12:52:58.000Z",
-     "dist": 2.72
+     "px": 3645.88,
+     "at": "2026-11-27T13:51:11.000Z",
+     "dist": 2.18
     }
    },
    "dxy": {
@@ -3020,7 +3015,15 @@
  "events": [],
  "newsAhead": {
   "label": "From the 2022-24 first-print record (veteran batch 1.6-1.8): facts and descriptive fits, not a tested edge or a forecast on the record.",
-  "items": []
+  "items": [
+   {
+    "kind": "NFP",
+    "title": "Non-Farm Payrolls (Employment Situation)",
+    "at": "2026-12-04T13:30:00.000Z",
+    "point": "The prior two months get revised with this report: in 2022-24 the revisions were negative in 22 of 35 releases (median size 71k, average −16k). Read the headline with them.",
+    "src": "schedule"
+   }
+  ]
  },
  "research": {
   "label": "Your research, applied: each line checks a document's own conditions against today's data. Not a forecast, not a tested edge.",
@@ -3069,7 +3072,7 @@
       "market": "funding",
       "k": "sofr",
       "on": false,
-      "text": "SOFR minus fed funds 6 bp (normal)"
+      "text": "SOFR minus fed funds 7 bp (normal)"
      },
      {
       "market": "fx",
@@ -3240,7 +3243,7 @@
   }
  },
  "summary": {
-  "sentence": "This week: the macro leans against gold (at the 20 Nov close he put 53% on gold closing above $3,538 on 18 Dec, base 57%; gold is now 3.6% above that level, so read the lean, not the odds). No major release in the next 72 hours; next on the schedule: US Non-Farm Payrolls (Fri 4 Dec, 13:30 UTC). Gold has traded above $3,600 (round number) since the 26 Nov close and is near $3,665. Watch $3,842 above and $3,600 below (that level, broken since the close). Levels as of the 26 Nov close. Holiday trading ahead: early close Fri 27 Nov.",
+  "sentence": "This week: the macro leans against gold (at the 20 Nov close he put 53% on gold closing above $3,538 on 18 Dec, base 57%; gold is now 3.0% above that level, so read the lean, not the odds). No major release in the next 72 hours; next on the schedule: US Non-Farm Payrolls (Fri 4 Dec, 13:30 UTC). Gold has traded above $3,600 (round number) since the 26 Nov close and is near $3,646. Watch $3,842 above and $3,600 below (that level, broken since the close). Levels as of the 26 Nov close. Holiday trading ahead: early close Fri 27 Nov.",
   "bias": {
    "lean": "against",
    "p": 0.53,
@@ -3260,7 +3263,7 @@
     "total": 8
    },
    "why": "The tested Gold Macro Score shows no edge, so the odds stay near the base rate.",
-   "gapPct": 3.6
+   "gapPct": 3
   },
   "event": null,
   "next": {
@@ -3277,13 +3280,13 @@
     "price": 3841.6,
     "label": "20-day average",
     "dist": 7.67,
-    "distNow": 4.81
+    "distNow": 5.37
    },
    "below": {
     "price": 3600,
     "label": "Round number",
     "dist": 0.9,
-    "distNow": -1.78,
+    "distNow": -1.26,
     "crossed": true
    },
    "fresh": {
@@ -3293,9 +3296,9 @@
     "text": "as of 2026-11-26 close"
    },
    "mark": {
-    "px": 3665.155,
-    "at": "2026-11-27T12:52:58.000Z",
-    "dist": 2.72
+    "px": 3645.88,
+    "at": "2026-11-27T13:51:11.000Z",
+    "dist": 2.18
    },
    "broken": {
     "price": 3600,
@@ -3324,7 +3327,7 @@
    "issues": []
   }
  },
- "brief": "Macro veteran, 2026-11-27 12:53 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, US dollar. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.3 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4032: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.86 vs ry hit 52%, t 1.17; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.25; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.4. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 2. Gold below its 10-week average (−11.5%); Gold Macro Score −0.66 (AUCTION) | 3. The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 56%) | H1 (52%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-03 before any close below $3,503 | H2 (79%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-12-03 | H3 (56%): DXY closes 2026-12-24 below 103.78 (the 2026-11-26 close) At a glance: This week: the macro leans against gold (at the 20 Nov close he put 53% on gold closing above $3,538 on 18 Dec, base 57%; gold is now 3.6% above that level, so read the lean, not the odds). No major release in the next 72 hours; next on the schedule: US Non-Farm Payrolls (Fri 4 Dec, 13:30 UTC). Gold has traded above $3,600 (round number) since the 26 Nov close and is near $3,665. Watch $3,842 above and $3,600 below (that level, broken since the close). Levels as of the 26 Nov close. Holiday trading ahead: early close Fri 27 Nov.",
+ "brief": "Macro veteran, 2026-11-27 13:51 UTC. Shock: Risk-off / de-risking, funding still calm (medium). Consensus with the strategist: AUCTION · 4 agree, 2 qualify, 0 disagree; qualified: Direction for gold, US dollar. Channels lean against gold and the score shows no edge: auction, and never a macro sell (shorts had no edge in any sub-period). A short needs a separate short-term reason at quarter size. Fails if 10Y TIPS real yield above 2.94% (+15 bp from 2.79%) adds to the real-rate headwind; DXY above 105.3 (+1.5%) says the dollar is still rising against gold; gold is already below the 10-week average 4032: the trend tiebreaker is off until a weekly close back above it. Ledger: P(gold up over 20 days) 53% vs base 57%, 0 resolved. Teaching: The strategist has adopted none of the veteran's challengers yet. v_ry4w hit 52%, t 0.86 vs ry hit 52%, t 1.17; v_d2_4w hit 52%, t 1.02 vs dgs2 hit 54%, t 2.25; v_dxy4w hit 50%, t 0 vs dxymom hit 49%, t -0.4. A challenger is adopted when it is proven on the replay (t ≥ 3, n ≥ 30) and beats its incumbent; it is handed back when it stops being proven. Briefing: 1. Stress gauges are lit (VIX 26, curve inverted), funding still calm | 2. Gold below its 10-week average (−11.5%); Gold Macro Score −0.66 (AUCTION) | 3. The 20 closest past set-ups: gold higher 20 sessions on in 75% (all weeks 56%) | H1 (52%): If gold holds above $3,503 (last week's low), it closes at or above $3,600 (round number) by 2026-12-03 before any close below $3,503 | H2 (79%): Gold's daily closes stay between $3,503 (last week's low) and $3,901 (last week's high) every day through 2026-12-03 | H3 (56%): DXY closes 2026-12-24 below 103.78 (the 2026-11-26 close) At a glance: This week: the macro leans against gold (at the 20 Nov close he put 53% on gold closing above $3,538 on 18 Dec, base 57%; gold is now 3.0% above that level, so read the lean, not the odds). No major release in the next 72 hours; next on the schedule: US Non-Farm Payrolls (Fri 4 Dec, 13:30 UTC). Gold has traded above $3,600 (round number) since the 26 Nov close and is near $3,646. Watch $3,842 above and $3,600 below (that level, broken since the close). Levels as of the 26 Nov close. Holiday trading ahead: early close Fri 27 Nov.",
  "closes": {
   "note": "Daily closes: the weekly candle cache (research/daily) plus the complete days the strategist fetched this run (macro/cache.json daily). Never a forming candle.",
   "markets": {

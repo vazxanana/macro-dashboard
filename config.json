@@ -709,6 +709,18 @@
    "by": "coach-backtest",
    "change": "intraday: hold to the second target (backtest)",
    "why": "107 trades over the last 30 days: the second target +0.79R per trade versus the first (t = 2.6), +1.47R and +0.21R in the two halves."
+  },
+  {
+   "at": "2026-11-27T13:47:41.000Z",
+   "by": "user",
+   "change": "Live account on: the Fusion USD account ending 7653, 0.5 % a trade, 15 % daily stop (Nasdaq l1 / l5, USD/JPY morning breakout, gold 8-swing break, gold and USD/JPY breakouts)",
+   "why": "Owner, 27 Nov 2026 (item 64). Every order carries its stop; nothing else reaches the account. Off: a user rule setting c.live = { on: false }."
+  },
+  {
+   "at": "2026-11-27T13:47:41.000Z",
+   "by": "user",
+   "change": "Live account: gold rules (gold breakout, gold 8-swing break) 3 % of the balance a trade; the others stay 0.5 %",
+   "why": "Owner, 27 Nov 2026, real money. Two gold stop-outs in a day cost about 6 %; the 15 % daily stop is about five. Every order carries its stop."
   }
  ],
  "btAt": "2026-11-27T12:49:43.588Z",
@@ -767,7 +779,9 @@
   "dom-demo-6154",
   "ict-mirror-off",
   "shadow-mirror-off",
-  "lyriac-risk-1"
+  "lyriac-risk-1",
+  "live-on-7653",
+  "live-gold-3"
  ],
  "target": {
   "scalp": "t2",
@@ -784,11 +798,11 @@
  "noPause": true,
  "wouldPause": {
   "rintra": {
-   "at": "2026-11-27T13:33:06.000Z",
+   "at": "2026-11-27T13:47:41.000Z",
    "why": "four losses in a row"
   },
   "scalp": {
-   "at": "2026-11-27T13:33:06.000Z",
+   "at": "2026-11-27T13:47:41.000Z",
    "why": "expectancy -1.00R over 13 trades"
   },
   "xau": {
@@ -981,5 +995,12 @@
  "gotobi": {
   "risk": 0.01
  },
- "newsSince": "2026-11-27T00:00:28.000Z"
+ "newsSince": "2026-11-27T00:00:28.000Z",
+ "live": {
+  "on": true,
+  "account": "*7653",
+  "risk": 0.005,
+  "dayStop": 0.15,
+  "goldRisk": 0.03
+ }
 }
