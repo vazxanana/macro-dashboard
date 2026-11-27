@@ -2330,7 +2330,7 @@
     "lots": 0.1,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T02:01:13.000Z",
     "councilEntry": 1.42394,
     "stop": 1.423475,
@@ -2343,10 +2343,15 @@
     "slipR": -0.258,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T02:01:13.000Z",
-    "brokerStop": 1.4233
+    "brokerStop": 1.4233,
+    "closedAt": "2026-11-27T02:06:56.000Z",
+    "exitPrice": 1.42337,
+    "councilExit": 1.423475,
+    "councilR": -1
    },
    "eqx:fade:usdjpy:fade-m15-b1795744800": {
     "positionId": "51651273",
@@ -2380,7 +2385,7 @@
     "lots": 0.06,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed by council",
     "openedAt": "2026-11-27T02:01:13.000Z",
     "councilEntry": 1.31152,
     "stop": 1.311981,
@@ -2393,10 +2398,15 @@
     "slipR": -0.043,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T02:01:13.000Z",
-    "brokerStop": 1.31212
+    "brokerStop": 1.31212,
+    "closedAt": "2026-11-27T02:08:52.000Z",
+    "exitPrice": 1.31189,
+    "councilExit": 1.311981,
+    "councilR": -1
    },
    "eqx:bigfade:xag:bigfade-m15-s1795744800": {
     "positionId": "51651303",
@@ -2428,9 +2438,8 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 394.15,
+   "lastBalance": 390.53,
    "ids": [
-    "51651270",
     "51651273",
     "51651275"
    ],
@@ -2438,7 +2447,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 394.15 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 390.53 · 1 open",
   "skipped": {},
   "wait": {
    "eqx:fvg:eurusd:fvg-h1-b1795629600-1795639500": {
@@ -2447,9 +2456,9 @@
     "at": "2026-11-25T21:44:17.000Z"
    },
    "eqx:goldvb:goldvb-b1795744800": {
-    "why": "XAUUSD: even the minimum lot (0.01) risks 33.70, 8.6% of the balance (cap 2%); a bigger demo balance fixes this",
+    "why": "XAUUSD: even the minimum lot (0.01) risks 46.71, 12.0% of the balance (cap 2%); a bigger demo balance fixes this",
     "n": 0,
-    "at": "2026-11-27T02:06:06.000Z"
+    "at": "2026-11-27T02:08:52.000Z"
    }
   },
   "paused": {},
@@ -2457,25 +2466,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 394.15,
-  "lastRun": "2026-11-27T02:06:06.000Z"
+  "balance": 390.53,
+  "lastRun": "2026-11-27T02:08:52.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-17T12:11:54.000Z",
-   "msg": "opened buy US500 0.65 lot (council ict-A+)",
-   "trade": "ict:es-b-1794913200"
-  },
-  {
-   "at": "2026-11-17T15:33:08.000Z",
-   "msg": "NAS100 position 50200669 closed at the broker",
-   "trade": "ict:nq-b-1794913200"
-  },
-  {
-   "at": "2026-11-17T15:33:08.000Z",
-   "msg": "US500 position 50200672 closed at the broker",
-   "trade": "ict:es-b-1794913200"
-  },
   {
    "at": "2026-11-18T00:25:06.000Z",
    "msg": "XAUUSD position 49854271 closed at the broker",
@@ -3949,6 +3943,21 @@
   {
    "at": "2026-11-27T02:06:06.000Z",
    "msg": "not mirrored yet eqx:goldvb:goldvb-b1795744800: XAUUSD: even the minimum lot (0.01) risks 33.70, 8.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "eqx:goldvb:goldvb-b1795744800"
+  },
+  {
+   "at": "2026-11-27T02:06:56.000Z",
+   "msg": "closed USDCAD position 51651270 (council: stopped)",
+   "trade": "eqx:fade:usdcad:fade-m15-b1795744800"
+  },
+  {
+   "at": "2026-11-27T02:08:52.000Z",
+   "msg": "closed GBPUSD position 51651275 (council: stopped)",
+   "trade": "eqx:fade:gbpusd:fade-m15-s1795744800"
+  },
+  {
+   "at": "2026-11-27T02:08:52.000Z",
+   "msg": "not mirrored yet eqx:goldvb:goldvb-b1795744800: XAUUSD: even the minimum lot (0.01) risks 46.71, 12.0% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
    "trade": "eqx:goldvb:goldvb-b1795744800"
   }
  ],
