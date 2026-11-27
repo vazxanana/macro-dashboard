@@ -3523,6 +3523,30 @@
     "stopCheckedAt": "2026-11-27T15:46:27.000Z",
     "brokerStop": 1.30956,
     "closedAt": "2026-11-27T16:15:43.000Z"
+   },
+   "eqx:fade:eurjpy:fade-m15-b1795801500": {
+    "positionId": "51732185",
+    "symbol": "EURJPY",
+    "side": "buy",
+    "volume": 500000,
+    "lots": 0.05,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T17:46:36.000Z",
+    "councilEntry": 174.42,
+    "stop": 174.335571,
+    "t1": 174.588857,
+    "riskCash": 3.12,
+    "margin": 10.94,
+    "fillPrice": 174.405,
+    "slipR": -0.178,
+    "lagSec": 96,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T17:46:36.000Z",
+    "brokerStop": 174.321
    }
   },
   "day": {
@@ -3530,13 +3554,14 @@
    "startBalance": 439.97,
    "lastBalance": 311.75,
    "ids": [
-    "51722979"
+    "51722979",
+    "51732185"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 311.75 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 311.75 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3563,14 +3588,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 311.75,
-  "lastRun": "2026-11-27T17:45:42.000Z"
+  "lastRun": "2026-11-27T17:48:42.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:14:58.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 32.51, 6.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
   {
    "at": "2026-11-24T19:17:39.000Z",
    "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 18.22, 3.6% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5065,6 +5085,11 @@
    "at": "2026-11-27T17:45:42.000Z",
    "msg": "EURJPY position 51722970 closed at the broker",
    "trade": "eqx:fade:eurjpy:fade-m15-b1795792500"
+  },
+  {
+   "at": "2026-11-27T17:46:36.000Z",
+   "msg": "opened buy EURJPY 0.05 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurjpy:fade-m15-b1795801500"
   }
  ],
  "limits": {
@@ -5169,11 +5194,11 @@
   ]
  },
  "execution": {
-  "n": 93,
-  "meanSlipR": 0.025,
+  "n": 94,
+  "meanSlipR": 0.023,
   "medianSlipR": 0,
   "worstSlipR": 1.352,
-  "medianLagSec": 59.5,
+  "medianLagSec": 60,
   "bySymbol": {
    "GBPUSD": {
     "n": 10,
@@ -5200,8 +5225,8 @@
     "meanSlipR": 0.068
    },
    "EURJPY": {
-    "n": 12,
-    "meanSlipR": -0.056
+    "n": 13,
+    "meanSlipR": -0.066
    },
    "AUDUSD": {
     "n": 11,
