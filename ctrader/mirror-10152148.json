@@ -7071,7 +7071,7 @@
     "lots": 3.32,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T03:16:11.000Z",
     "councilEntry": 0.54982,
     "stop": 0.549245,
@@ -7082,10 +7082,12 @@
     "slipR": -0.087,
     "lagSec": 71,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T03:16:11.000Z",
-    "brokerStop": 0.5492
+    "brokerStop": 0.5492,
+    "closedAt": "2026-11-27T03:26:02.000Z"
    },
    "boxfade:audusd:boxfade-m5-s1795749300": {
     "positionId": "51655888",
@@ -7112,23 +7114,74 @@
     ],
     "stopCheckedAt": "2026-11-27T03:17:03.000Z",
     "brokerStop": 0.66731
+   },
+   "boxfade:usdchf:boxfade-m5-s1795749900": {
+    "positionId": "51656025",
+    "symbol": "USDCHF",
+    "side": "sell",
+    "volume": 24100000,
+    "lots": 2.41,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T03:26:02.000Z",
+    "councilEntry": 0.83383,
+    "stop": 0.834415,
+    "t1": 0.833245,
+    "riskCash": 187.13,
+    "margin": 482,
+    "mark": 0.83377,
+    "levelsFrom": "mark",
+    "fillPrice": 0.83377,
+    "slipR": 0.103,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T03:26:02.000Z",
+    "brokerStop": 0.83442
+   },
+   "boxfade:gbpusd:boxfade-m5-b1795749900": {
+    "positionId": "51656026",
+    "symbol": "GBPUSD",
+    "side": "buy",
+    "volume": 25600000,
+    "lots": 2.56,
+    "digits": 5,
+    "setup": "boxfade",
+    "status": "open",
+    "openedAt": "2026-11-27T03:26:02.000Z",
+    "councilEntry": 1.3122,
+    "stop": 1.31146,
+    "t1": 1.31294,
+    "riskCash": 187.13,
+    "margin": 671.95,
+    "mark": 1.31219,
+    "levelsFrom": "mark",
+    "fillPrice": 1.31211,
+    "slipR": -0.122,
+    "lagSec": 62,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T03:26:02.000Z",
+    "brokerStop": 1.31138
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 10760.32,
-   "lastBalance": 9560.77,
+   "lastBalance": 9356.68,
    "ids": [
     "51654553",
     "51654556",
-    "51655859",
     "51655888"
    ],
    "oids": [],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 9560.77 · 4 open",
+  "status": "ok · demo Fusion Markets · balance 9356.68 · 5 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -7136,25 +7189,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 9560.77,
-  "lastRun": "2026-11-27T03:22:53.000Z"
+  "balance": 9356.68,
+  "lastRun": "2026-11-27T03:26:02.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-13T07:03:12.000Z",
-   "msg": "opened buy XAUUSD 0.01 lot (council replica)",
-   "trade": "xau-replica-1794553324-b"
-  },
-  {
-   "at": "2026-11-13T10:46:45.000Z",
-   "msg": "opened sell XAUUSD 0.01 lot (council replica)",
-   "trade": "xau-replica-1794566727-s"
-  },
-  {
-   "at": "2026-11-13T11:29:01.000Z",
-   "msg": "closed XAUUSD position 49313022 (council: loss)",
-   "trade": "xau-replica-1794553324-b"
-  },
   {
    "at": "2026-11-13T11:58:53.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council replica)",
@@ -8633,6 +8671,21 @@
    "at": "2026-11-27T03:17:03.000Z",
    "msg": "opened sell AUDUSD 2.65 lot (council boxfade)",
    "trade": "boxfade:audusd:boxfade-m5-s1795749300"
+  },
+  {
+   "at": "2026-11-27T03:26:02.000Z",
+   "msg": "NZDUSD position 51655859 closed at the broker",
+   "trade": "boxfade:nzdusd:boxfade-m5-b1795749300"
+  },
+  {
+   "at": "2026-11-27T03:26:02.000Z",
+   "msg": "opened sell USDCHF 2.41 lot (council boxfade)",
+   "trade": "boxfade:usdchf:boxfade-m5-s1795749900"
+  },
+  {
+   "at": "2026-11-27T03:26:02.000Z",
+   "msg": "opened buy GBPUSD 2.56 lot (council boxfade)",
+   "trade": "boxfade:gbpusd:boxfade-m5-b1795749900"
   }
  ],
  "limits": {
@@ -8737,7 +8790,7 @@
   ]
  },
  "execution": {
-  "n": 243,
+  "n": 245,
   "meanSlipR": 0.059,
   "medianSlipR": 0.027,
   "worstSlipR": 1.236,
@@ -8768,12 +8821,12 @@
     "meanSlipR": 0.044
    },
    "GBPUSD": {
-    "n": 15,
-    "meanSlipR": 0.133
+    "n": 16,
+    "meanSlipR": 0.117
    },
    "USDCHF": {
-    "n": 16,
-    "meanSlipR": 0.148
+    "n": 17,
+    "meanSlipR": 0.146
    },
    "EURUSD": {
     "n": 17,
