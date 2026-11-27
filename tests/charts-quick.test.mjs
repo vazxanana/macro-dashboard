@@ -64,3 +64,10 @@ test('hide all drawings (Alt+Shift+H), and the tools\' messages float', () => {
   assert.ok(!/KeyD/.test(d), 'Alt+D is the browser\'s address bar');
   assert.match(h, /#v-charts \.dr-note:not\(:empty\) \{ position: fixed;/);
 });
+
+test('the drawing strip has the list and the hide buttons (a phone has no keyboard or right-click)', () => {
+  const d = fs.readFileSync('assets/ms-draw.js', 'utf8');
+  assert.match(d, /data-dl title="Drawings list/);
+  assert.match(d, /data-dh aria-pressed="false"/);
+  assert.match(d, /b\.hasAttribute\('data-dh'\)\) \{ setHide\(!HIDE\)/);
+});

@@ -2697,7 +2697,7 @@ menu; `window.msDrawUndo` / `msDrawRedo`. The right-click menu also offers "Hori
 alert, `d.alert`) at the price under the pointer. Arrow keys move the chart under the mouse a candle (Shift: ten), up / down zoom, End
 goes to the latest candle (not while a pane is in replay). **Drawings list** (`#ms-dlist`, Alt+L or the right-click menu,
 `window.msDrawList`): every drawing of the market, newest first; a row selects it and brings it into view, Lock / Delete per row.
-**Hide drawings** (Alt+Shift+H or the menu; memory only, a new tool shows them again; `window.msDrawHide`). The drawing tools' short
+**Hide drawings** (Alt+Shift+H, the menu, or the eye button in the drawing strip, which also has a list button for phones; memory only, a new tool shows them again; `window.msDrawHide`). The drawing tools' short
 messages (`#ms-dr-note`) float at the bottom of the screen instead of pushing the charts down a line. Never Alt+D (the browser's address bar).
 Test: `tests/charts-quick.test.mjs`.
 
