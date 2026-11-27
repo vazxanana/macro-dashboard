@@ -3409,6 +3409,80 @@
     ],
     "stopCheckedAt": "2026-11-27T14:45:34.000Z",
     "brokerStop": 0.66355
+   },
+   "eqx:fade:eurjpy:fade-m15-b1795792500": {
+    "positionId": "51722970",
+    "symbol": "EURJPY",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 3,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T15:17:18.000Z",
+    "councilEntry": 174.512,
+    "stop": 174.404786,
+    "t1": 174.726429,
+    "riskCash": 3.21,
+    "margin": 8.76,
+    "fillPrice": 174.527,
+    "slipR": 0.14,
+    "lagSec": 138,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T15:17:18.000Z",
+    "brokerStop": 174.42
+   },
+   "eqx:fade:nzdusd:fade-m15-b1795792500": {
+    "positionId": "51722975",
+    "symbol": "NZDUSD",
+    "side": "buy",
+    "volume": 600000,
+    "lots": 0.06,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T15:17:18.000Z",
+    "councilEntry": 0.54677,
+    "stop": 0.546296,
+    "t1": 0.547719,
+    "riskCash": 3.21,
+    "margin": 6.56,
+    "fillPrice": 0.54659,
+    "slipR": -0.38,
+    "lagSec": 138,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T15:17:18.000Z",
+    "brokerStop": 0.54612
+   },
+   "eqx:fade:eurusd:fade-m15-b1795792500": {
+    "positionId": "51722979",
+    "symbol": "EURUSD",
+    "side": "buy",
+    "volume": 400000,
+    "lots": 0.04,
+    "digits": 5,
+    "setup": "eqx-fade",
+    "status": "open",
+    "openedAt": "2026-11-27T15:17:18.000Z",
+    "councilEntry": 1.09404,
+    "stop": 1.093254,
+    "t1": 1.095611,
+    "riskCash": 3.21,
+    "margin": 8.76,
+    "mark": 1.09399,
+    "levelsFrom": "mark",
+    "fillPrice": 1.09397,
+    "slipR": -0.089,
+    "lagSec": 138,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T15:17:18.000Z",
+    "brokerStop": 1.09323
    }
   },
   "day": {
@@ -3416,13 +3490,16 @@
    "startBalance": 439.97,
    "lastBalance": 321,
    "ids": [
-    "51718694"
+    "51718694",
+    "51722970",
+    "51722975",
+    "51722979"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 321 · 1 open",
+  "status": "ok · demo Fusion Markets · balance 321 · 4 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3433,24 +3510,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
   "balance": 321,
-  "lastRun": "2026-11-27T15:16:06.000Z"
+  "lastRun": "2026-11-27T15:19:47.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:02:39.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 11.06, 2.2% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
-  {
-   "at": "2026-11-24T19:02:39.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 28.92, 5.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
-  {
-   "at": "2026-11-24T19:05:12.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 12.03, 2.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
   {
    "at": "2026-11-24T19:05:12.000Z",
    "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 29.89, 6.0% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -4935,6 +4997,21 @@
    "at": "2026-11-27T15:02:14.000Z",
    "msg": "AUDUSD position 51718687 closed at the broker",
    "trade": "eqx:fade:audusd:fade-m15-b1795790700"
+  },
+  {
+   "at": "2026-11-27T15:17:18.000Z",
+   "msg": "opened buy EURJPY 0.04 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurjpy:fade-m15-b1795792500"
+  },
+  {
+   "at": "2026-11-27T15:17:18.000Z",
+   "msg": "opened buy NZDUSD 0.06 lot (council eqx-fade)",
+   "trade": "eqx:fade:nzdusd:fade-m15-b1795792500"
+  },
+  {
+   "at": "2026-11-27T15:17:18.000Z",
+   "msg": "opened buy EURUSD 0.04 lot (council eqx-fade)",
+   "trade": "eqx:fade:eurusd:fade-m15-b1795792500"
   }
  ],
  "limits": {
@@ -5039,27 +5116,27 @@
   ]
  },
  "execution": {
-  "n": 89,
-  "meanSlipR": 0.03,
-  "medianSlipR": 0.014,
+  "n": 92,
+  "meanSlipR": 0.025,
+  "medianSlipR": 0.007,
   "worstSlipR": 1.352,
-  "medianLagSec": 58,
+  "medianLagSec": 59,
   "bySymbol": {
    "GBPUSD": {
     "n": 9,
     "meanSlipR": 0.175
    },
    "NZDUSD": {
-    "n": 12,
-    "meanSlipR": -0.014
+    "n": 13,
+    "meanSlipR": -0.042
    },
    "USDJPY": {
     "n": 10,
     "meanSlipR": 0.168
    },
    "EURUSD": {
-    "n": 10,
-    "meanSlipR": 0.357
+    "n": 11,
+    "meanSlipR": 0.316
    },
    "XAUUSD": {
     "n": 2,
@@ -5070,8 +5147,8 @@
     "meanSlipR": 0.068
    },
    "EURJPY": {
-    "n": 11,
-    "meanSlipR": -0.074
+    "n": 12,
+    "meanSlipR": -0.056
    },
    "AUDUSD": {
     "n": 11,
