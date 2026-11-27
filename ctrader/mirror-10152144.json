@@ -2557,7 +2557,7 @@
     "lots": 0.01,
     "digits": 5,
     "setup": "eqx-fvg",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T03:31:13.000Z",
     "councilEntry": 0.54918,
     "stop": 0.547025,
@@ -2568,10 +2568,12 @@
     "slipR": 0.084,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T03:31:13.000Z",
-    "brokerStop": 0.5472
+    "brokerStop": 0.5472,
+    "closedAt": "2026-11-27T13:30:48.000Z"
    },
    "eqx:fvg:usdjpy:fvg-h1-s1795748400-1795752000": {
     "positionId": "51656455",
@@ -3190,7 +3192,7 @@
     "lots": 0.06,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T13:15:41.000Z",
     "councilEntry": 1.42517,
     "stop": 1.425857,
@@ -3203,10 +3205,12 @@
     "slipR": 0.029,
     "lagSec": 41,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T13:15:41.000Z",
-    "brokerStop": 1.42595
+    "brokerStop": 1.42595,
+    "closedAt": "2026-11-27T13:30:48.000Z"
    },
    "eqx:fade:nzdusd:fade-m15-b1795785300": {
     "positionId": "51706608",
@@ -3328,17 +3332,15 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 329.19,
+   "lastBalance": 323.36,
    "ids": [
-    "51656090",
-    "51706600",
-    "51706604"
+    "51706600"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 329.19 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 323.36 · 1 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3348,20 +3350,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 329.19,
-  "lastRun": "2026-11-27T13:26:18.000Z"
+  "balance": 323.36,
+  "lastRun": "2026-11-27T13:30:48.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T16:37:49.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795395600-1795536900: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795395600-1795536900"
-  },
-  {
-   "at": "2026-11-24T16:37:49.000Z",
-   "msg": "not mirrored yet eqx:goldvb:goldvb-s1795536000: daily loss stop (95.0% down today) (will retry)",
-   "trade": "eqx:goldvb:goldvb-s1795536000"
-  },
   {
    "at": "2026-11-24T17:39:29.000Z",
    "msg": "not mirrored yet eqx:fade:usdcad:fade-m15-b1795541400: daily loss stop (95.0% down today) (will retry)",
@@ -4850,6 +4842,16 @@
    "at": "2026-11-27T13:24:27.000Z",
    "msg": "closed EURUSD position 51706622 (council: stopped)",
    "trade": "eqx:fade:eurusd:fade-m15-b1795785300"
+  },
+  {
+   "at": "2026-11-27T13:30:48.000Z",
+   "msg": "NZDUSD position 51656090 closed at the broker",
+   "trade": "eqx:fvg:nzdusd:fvg-h1-b1795748400-1795750200"
+  },
+  {
+   "at": "2026-11-27T13:30:48.000Z",
+   "msg": "USDCAD position 51706604 closed at the broker",
+   "trade": "eqx:fade:usdcad:fade-m15-s1795785300"
   }
  ],
  "limits": {
