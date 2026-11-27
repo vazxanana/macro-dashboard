@@ -6626,7 +6626,7 @@
     "lots": 2.98,
     "digits": 5,
     "setup": "boxfade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-26T17:26:13.000Z",
     "councilEntry": 0.83446,
     "stop": 0.835135,
@@ -6639,10 +6639,12 @@
     "slipR": 0.148,
     "lagSec": 73,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-26T17:26:13.000Z",
-    "brokerStop": 0.83504
+    "brokerStop": 0.83504,
+    "closedAt": "2026-11-27T01:05:03.000Z"
    },
    "boxfade:gbpusd:boxfade-m5-s1795716000": {
     "positionId": "51639443",
@@ -6918,10 +6920,9 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 10760.32,
-   "lastBalance": 10515.24,
+   "lastBalance": 10210.08,
    "ids": [
     "51571061",
-    "51631994",
     "51647631",
     "51648374",
     "51648873"
@@ -6930,7 +6931,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:27.000Z",
-  "status": "ok · demo Fusion Markets · balance 10515.24 · 5 open",
+  "status": "ok · demo Fusion Markets · balance 10210.08 · 4 open",
   "skipped": {},
   "wait": {},
   "paused": {},
@@ -6938,15 +6939,10 @@
   "resetDoneAt": "2026-11-08T11:42:48.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:46.000Z",
-  "balance": 10515.24,
-  "lastRun": "2026-11-27T01:02:23.000Z"
+  "balance": 10210.08,
+  "lastRun": "2026-11-27T01:05:03.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-12T06:48:24.000Z",
-   "msg": "XAUUSD position 48580700 closed at the broker",
-   "trade": "xau-replica-1794443123-b"
-  },
   {
    "at": "2026-11-12T06:48:24.000Z",
    "msg": "XAUUSD position 48668985 closed at the broker",
@@ -8435,6 +8431,11 @@
    "at": "2026-11-27T00:28:51.000Z",
    "msg": "closed NZDUSD position 51648872 (council: stopped)",
    "trade": "boxfade:nzdusd:boxfade-m5-b1795737900"
+  },
+  {
+   "at": "2026-11-27T01:05:03.000Z",
+   "msg": "USDCHF position 51631994 closed at the broker",
+   "trade": "boxfade:usdchf:boxfade-m5-s1795713900"
   }
  ],
  "limits": {
