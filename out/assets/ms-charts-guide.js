@@ -69,11 +69,15 @@
         'Fills are at the chart\'s price, with no costs, and the account is kept in this browser.'] },
     { t: 'Keyboard', show: null,
       lead: 'Shortcuts on the Charts page (not while you type in a box).',
-      li: [`${K('1')}…${K('6')} one timeframe · ${K('0')} all timeframes · ${K('F')} fit every chart`,
+      li: [`Type a timeframe (${K('15')} ${K('60')} ${K('4h')} ${K('30s')} ${K('1d')}) or a market (${K('eur')} ${K('gold')} ${K('nas')}), then ${K('Enter')}`,
+        `${K('1')}…${K('6')} one timeframe · ${K('0')} all timeframes · ${K('F')} fit every chart`,
+        `${K('←')} ${K('→')} move the chart under the mouse (${K('Shift')} ten candles) · ${K('↑')} ${K('↓')} zoom · ${K('End')} back to the latest candle`,
+        `${K('Ctrl Z')} undo a drawing · ${K('Ctrl Y')} redo · ${K('Alt L')} drawings list · ${K('Alt Shift H')} hide all drawings`,
         `${K('Alt T')} ${K('Alt H')} ${K('Alt J')} ${K('Alt V')} ${K('Alt R')} drawing tools · ${K('Alt M')} magnet`,
         `${K('Delete')} remove the selected drawing · ${K('Esc')} let go or cancel the tool`,
         `${K('B')} Fibonacci · ${K('P')} position · ${K('M')} measure · ${K('R')} replay, on the chart under the mouse`,
-        `In replay: ${K('←')} ${K('→')} step back and forward`] },
+        `In replay: ${K('←')} ${K('→')} step back and forward`,
+        `Right-click a chart: a horizontal line or an alert at that price, undo, the drawings list`] },
   ];
 
   const css = `
