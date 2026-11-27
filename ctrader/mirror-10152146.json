@@ -3477,7 +3477,7 @@
     "35000818",
     "35000621"
    ],
-   "sent": false
+   "sent": true
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
   "status": "ok · demo Fusion Markets · balance 8515.62 · 10 open",
@@ -3487,21 +3487,27 @@
    "mosha6:bar-r6-tap-eg-30m-s1795785180": "price 3641.205 has run 2.02R from the council entry 3661.965: a different trade now",
    "mosha6:bar-r6-tap-30m-v2-s1795801620": "price 3647.635 is already past the council stop 3640.84"
   },
-  "wait": {},
-  "paused": {},
+  "wait": {
+   "ict:x:nq-b-1795798800-dip": {
+    "why": "NAS100 market closed: SYMBOL_HAS_HOLIDAY: Symbols has a holiday right now",
+    "n": 0,
+    "at": "2026-11-27T18:41:10.000Z"
+   }
+  },
+  "paused": {
+   "NAS100": "2026-11-27T18:51:10.000Z"
+  },
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 8515.62,
-  "lastRun": "2026-11-27T18:39:00.000Z"
+  "lastRun": "2026-11-27T18:41:10.000Z",
+  "closedSeen": {
+   "NAS100": "2026-11-27T18:41:10.000Z"
+  }
  },
  "log": [
-  {
-   "at": "2026-11-20T10:37:43.000Z",
-   "msg": "not mirrored audusd-position-1793601653: price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
-   "trade": "audusd-position-1793601653"
-  },
   {
    "at": "2026-11-20T10:37:43.000Z",
    "msg": "not mirrored yet xau-position-1794495673: XAUUSD: even the minimum lot (0.01) risks 549.91, 5.5% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -4989,6 +4995,11 @@
    "at": "2026-11-27T18:02:22.000Z",
    "msg": "opened sell XAUUSD 0.04 lot (council fvgm)",
    "trade": "fvgm:fvg-h1-s1795791600-1795802400"
+  },
+  {
+   "at": "2026-11-27T18:41:10.000Z",
+   "msg": "not mirrored yet ict:x:nq-b-1795798800-dip: NAS100 market closed: SYMBOL_HAS_HOLIDAY: Symbols has a holiday right now (will retry)",
+   "trade": "ict:x:nq-b-1795798800-dip"
   }
  ],
  "limits": {
