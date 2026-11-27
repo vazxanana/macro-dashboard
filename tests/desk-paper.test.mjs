@@ -52,7 +52,7 @@ test('stats come from the engine; a stored account without stops is cleaned on l
 test('practice only: no network write, no council, no broker; wired on the Charts above the six panes, hidden for guests', () => {
   assert.doesNotMatch(SRC, /fetch\(|XMLHttpRequest|sendBeacon|COUNCIL|ctrader|\/api\//);
   assert.match(SRC, /'ms-paper-' \+ \(who\(\) \|\| 'me'\)/);
-  assert.match(PAGE, /<script src="\/assets\/ms-draw\.js" defer><\/script>\n<script src="\/assets\/ms-paper\.js" defer><\/script>/);
+  assert.match(PAGE, /<script src="\/assets\/ms-draw\.js" defer><\/script>\n(?:<script src="\/assets\/ms-quick\.js" defer><\/script>\n)?<script src="\/assets\/ms-paper\.js" defer><\/script>/);
   assert.match(PAGE, /<section class="pp" id="ms-pp" aria-label="Paper trading account" hidden><\/section>\n {4}<div class="ms-grid4">/);
   assert.match(PAGE, /window\.msPaperHost = \{ key: instKey,/);
   const css = /<style id="ms-pp-css">([\s\S]*?)<\/style>/.exec(PAGE)[1];
@@ -77,7 +77,7 @@ test('full screen takes the whole Charts view, so the layout, split and tools st
   assert.match(css, /#v-charts:fullscreen(?:, #v-charts\.ch-fake-fs\))? \.ms-grid4 \{ flex: 1 1 0; min-height: 0; grid-auto-rows: minmax\(0, 1fr\);/);
   // 20 Nov 2026 (bug hunt): the floating parts are also MADE inside the full-screen element, the page's own full screen counts,
   // and each chart's timeframe menu and the toasts move too (tests/desk-bughunt.test.mjs)
-  assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /const fsMove = \(\) => \{ const host = fsHost\(\); for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts'\]\)/);
+  assert.match(fs.readFileSync('assets/ms-draw.js', 'utf8'), /const fsMove = \(\) => \{ const host = fsHost\(\); for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts', 'ms-dlist'\]\)/);
 });
 
 test('volume profile: a histogram of the candles in view, split into buying and selling, with POC and a 70 % value area', async () => {

@@ -288,7 +288,7 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', strip); else strip();
   // a full-screen element hides everything outside it: the style bar and the menu move into it, and back (18 Nov 2026)
   // 20 Nov 2026: each chart's timeframe menu and the page's toasts (a line alert) move with them
-  const fsMove = () => { const host = fsHost(); for (const id of ['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts']) { const el = document.getElementById(id); if (el && el.parentNode !== host) host.appendChild(el); } setTimeout(paintAll, 120); };
+  const fsMove = () => { const host = fsHost(); for (const id of ['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts', 'ms-dlist']) { const el = document.getElementById(id); if (el && el.parentNode !== host) host.appendChild(el); } setTimeout(paintAll, 120); };
   document.addEventListener('fullscreenchange', fsMove); document.addEventListener('ms:fs', fsMove);
   // ---- line alerts (19 Nov 2026): a horizontal line, ray or trend line marked "Alert" tells you once when the live price crosses
   // it while the page is open (a note on the page, and a browser notification when allowed); then the alert switches itself off.

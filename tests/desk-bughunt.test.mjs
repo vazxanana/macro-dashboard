@@ -88,9 +88,9 @@ test('a drawing let go outside its chart is let go', () => {
 
 test('full screen: the floating parts are made, moved and shown inside the full-screen element (the browser\'s and the page\'s own)', () => {
   assert.match(DRAW, /const fsHost = \(\) => document\.fullscreenElement \|\| document\.querySelector\('#v-charts\.ch-fake-fs'\) \|\| document\.body;/);
-  assert.equal((DRAW.match(/fsHost\(\)\.appendChild\(/g) || []).length, 2, 'the style bar and the right-click menu, made on first use');
+  assert.equal((DRAW.match(/fsHost\(\)\.appendChild\(/g) || []).length, 3, 'the style bar, the right-click menu and the drawings list, made on first use');
   assert.doesNotMatch(DRAW, /document\.body\.appendChild\((el|m)\)/);
-  assert.match(DRAW, /for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts'\]\)/);
+  assert.match(DRAW, /for \(const id of \['ms-dsel', 'ms-cmenu', 'ms-ph-menu', 'ms-toasts', 'ms-dlist'\]\)/);
   assert.match(DRAW, /document\.addEventListener\('fullscreenchange', fsMove\); document\.addEventListener\('ms:fs', fsMove\);/);
   assert.match(PAGE, /document\.dispatchEvent\(new Event\('ms:fs'\)\);/, 'the page\'s own full screen says so');
   // the rule that hides everything else in full screen leaves them alone
