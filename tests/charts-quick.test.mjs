@@ -36,3 +36,12 @@ test('drawings: undo and redo keep the previous saved state, in memory only', ()
   assert.match(s, /data-m="undo"/);
   assert.match(s, /window\.msDrawUndo/);
 });
+
+test('a level from the right-click menu, and arrow keys on the chart', () => {
+  const d = fs.readFileSync('assets/ms-draw.js', 'utf8'), q = fs.readFileSync('assets/ms-quick.js', 'utf8');
+  assert.match(d, /data-m="hl">Horizontal line at/);
+  assert.match(d, /data-m="al">Alert at/);
+  assert.match(d, /if \(k === 'al'\) d\.alert = true; commit\(mk, d\)/);
+  assert.match(q, /'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'End'/);
+  assert.match(q, /document\.querySelector\('\.ch-rp\.on'\)/, 'a replay keeps its arrow keys');
+});

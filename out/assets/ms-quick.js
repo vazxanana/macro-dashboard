@@ -77,4 +77,21 @@
   // a lone pane digit (0-6) applies by itself after a short pause, as the old key did; anything else waits for Enter (10 s at most)
   function arm() { clearTimeout(timer); timer = setTimeout(() => { if (mode === 'tf' && /^[0-6]$/.test(buf)) go(); else close(); }, mode === 'tf' && /^[0-6]$/.test(buf) ? 900 : 10000); }
   addEventListener('hashchange', close);
+
+  // arrow keys on the chart under the mouse (27 Nov 2026): left / right move it a candle (Shift: ten), up / down zoom in / out,
+  // End back to the latest candle. A chart in replay keeps its own arrow keys.
+  let OVER = null;
+  document.addEventListener('pointermove', (e) => { const L = (root.msCharts && root.msCharts.list) || []; OVER = L.find((c) => c.el && c.el.contains(e.target)) || OVER; }, { passive: true });
+  document.addEventListener('keydown', (e) => {
+    if (mode || e.ctrlKey || e.metaKey || e.altKey || !onCharts() || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'End'].includes(e.key)) return;
+    if (/INPUT|TEXTAREA|SELECT|BUTTON/.test((e.target || {}).tagName || '') || (e.target && e.target.closest && e.target.closest('[role="tablist"],[role="menu"],dialog'))) return;
+    const L = ((root.msCharts && root.msCharts.list) || []).filter((c) => c.el && c.el.getBoundingClientRect().height > 0), cx = (OVER && L.includes(OVER)) ? OVER : L.length === 1 ? L[0] : null;
+    if (!cx || !cx.chart || document.querySelector('.ch-rp.on')) return;
+    const ts = cx.chart.timeScale(), r = ts.getVisibleLogicalRange(); if (!r) return;
+    e.preventDefault();
+    if (e.key === 'End') { ts.scrollToRealTime(); return; }
+    const w = r.to - r.from;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { const d = (e.key === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 10 : 1); ts.setVisibleLogicalRange({ from: r.from + d, to: r.to + d }); return; }
+    const k = e.key === 'ArrowUp' ? 0.8 : 1.25, nw = Math.max(10, Math.min(5000, w * k)); ts.setVisibleLogicalRange({ from: r.to - nw, to: r.to });
+  });
 })(typeof window !== 'undefined' ? window : globalThis);

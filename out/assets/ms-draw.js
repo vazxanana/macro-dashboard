@@ -213,6 +213,8 @@
     m.innerHTML = `<button type="button" role="menuitem" data-m="reset">Reset chart view</button>` + (h ? `<button type="button" role="menuitem" data-m="del">Delete this drawing</button>` : '')
       + `<button type="button" role="menuitem" data-m="last"${last == null ? ' disabled' : ''}>Remove the last drawing</button><button type="button" role="menuitem" data-m="all"${L.length ? '' : ' disabled'}>Delete all drawings</button>`
       + `<button type="button" role="menuitem" data-m="undo"${UNDO.length ? '' : ' disabled'}>Undo <kbd>Ctrl+Z</kbd></button><button type="button" role="menuitem" data-m="redo"${REDO.length ? '' : ' disabled'}>Redo <kbd>Ctrl+Y</kbd></button>`
+      + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0)) return ''; menu.lv = p; const t = cx.fmt ? cx.fmt(p) : p.toFixed(2);   // a level from the menu (27 Nov 2026)
+        return `<hr class="cm-sep"><button type="button" role="menuitem" data-m="hl">Horizontal line at ${t}</button><button type="button" role="menuitem" data-m="al">Alert at ${t}</button>`; })()
       + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0) || !window.msPaperDraftAt || !window.msPaperMarket || window.msPaperMarket() !== mk) return '';   // paper orders from the chart (19 Nov 2026)
         menu.px = p; const t = cx.fmt ? cx.fmt(p) : p.toFixed(2); return `<hr class="cm-sep"><button type="button" role="menuitem" data-m="pbuy">Paper buy at ${t}</button><button type="button" role="menuitem" data-m="psell">Paper sell at ${t}</button>`; })();
     m.hidden = false; const bw = m.offsetWidth || 220, bh = m.offsetHeight || 160; m.style.transform = `translate(${Math.min(ev.clientX, innerWidth - bw - 8)}px, ${Math.min(ev.clientY, innerHeight - bh - 8)}px)`;
@@ -221,6 +223,8 @@
       if (k === 'del' && h) remove(h.mk, h.i);
       if ((k === 'pbuy' || k === 'psell') && window.msPaperDraftAt) window.msPaperDraftAt(k === 'pbuy' ? 'buy' : 'sell', menu.px);
       if (k === 'last' && last != null) remove(mk, last);
+      if ((k === 'hl' || k === 'al') && menu.lv > 0) { LASTCX = cx; const d = { type: 'h', price: menu.lv }; if (k === 'al') d.alert = true; commit(mk, d);
+        if (k === 'al') { note('Alert on: you are told when price crosses this line while this page is open.'); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {} } }
       if (k === 'undo') back(UNDO, REDO); if (k === 'redo') back(REDO, UNDO);
       if (k === 'all') { const ok = window.msConfirm ? await window.msConfirm(`Delete all ${L.filter((d) => !d.lock).length} drawings on this market? Locked ones stay.`, { title: 'Delete all drawings', ok: 'Delete all', danger: true }) : confirm('Delete all drawings?');
         if (ok) { ST[mk] = L.filter((d) => d.lock); save(mk); SEL = null; bar(); paintAll(); } } };
