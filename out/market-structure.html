@@ -55,7 +55,7 @@
 </script>
 <script src="/assets/ms-dialog.js?v=6e47d6292f"></script>
 <script src="/assets/backtest-engine.js?v=3b1a786bc3" defer></script>
-<script src="/assets/ms-draw.js?v=90a133b17c" defer></script>
+<script src="/assets/ms-draw.js?v=ef24354331" defer></script>
 <script src="/assets/ms-quick.js?v=9dee0227b8" defer></script>
 <script src="/assets/ms-paper.js?v=b052c8753d" defer></script>
 <script src="/assets/ms-vprof.js?v=b6a82cd65f" defer></script>
@@ -2672,7 +2672,7 @@ html[data-motion="off"] #v-ict .ict-cal-d:hover { transform: none !important; }
   window.msThemeMeta();
 })();
 </script>
-<link rel="stylesheet" href="/assets/soft.css?v=69b5a01c4d">
+<link rel="stylesheet" href="/assets/soft.css?v=f4c1f7e1f6">
 <style id="ms-pk-css">
 .gate-pk { margin-top: 10px; }
 .gate-pkb { width: 100%; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.03); color: var(--g-ink, #eceef2); font: 600 14.5px Figtree, -apple-system, sans-serif; cursor: pointer; touch-action: manipulation; }
@@ -3071,6 +3071,9 @@ html[data-motion="off"] .go-lock { display: none; } html[data-motion="off"] .go-
       .dr-bar svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
       .dr-bar .dr-mag small { position: absolute; right: 2px; bottom: 1px; font: 700 12px/1 var(--sans); color: var(--accent); } .dr-bar .dr-mag small:empty { display: none; }
       .dr-note { order: 9; font-size: 12px; color: var(--ink-dim); } .dr-note:empty { display: none; }
+      /* 27 Nov 2026: the drawing tools' short messages float over the charts instead of pushing them down a line */
+      #v-charts .dr-note:not(:empty) { position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 72; max-width: calc(100vw - 32px); padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); color: var(--ink); font: 500 13px var(--sans); pointer-events: none; }
+      @media (max-width: 700px) { #v-charts .dr-note:not(:empty) { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); } }
       .ms-dsel { position: fixed; left: 0; top: 0; z-index: 60; display: flex; align-items: center; gap: 3px; padding: 4px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); box-shadow: 0 8px 24px rgba(0,0,0,.25); font: 600 12px var(--sans); color: var(--ink); }
       .ms-dsel { flex-wrap: wrap; max-width: calc(100vw - 16px); box-sizing: border-box; }   /* a phone: the bar wraps to rows inside the screen (it ran 230 px past a 390 px screen: Lock, Clone, Delete out of reach; 20 Nov 2026) */
       .ms-dsel[hidden] { display: none; } .ms-dsel .sep { width: 1px; align-self: stretch; background: var(--line); margin: 0 2px; }

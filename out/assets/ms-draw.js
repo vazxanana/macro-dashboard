@@ -33,6 +33,8 @@
   const save = (mk) => { const now = JSON.stringify(ST[mk] || []), prev = savedOf(mk); if (prev !== now) { UNDO.push([mk, prev]); if (UNDO.length > 100) UNDO.shift(); REDO.length = 0; } SAVED[mk] = now; ls.set(KEY(mk), now); if (typeof listDraw === 'function') try { listDraw(); } catch (e) {} };
   function back(from, to) { const it = from.pop(); if (!it) { note(from === UNDO ? 'Nothing to undo.' : 'Nothing to redo.'); return false; } const [mk, s] = it; to.push([mk, savedOf(mk)]);
     let a = []; try { a = JSON.parse(s); } catch (e) {} ST[mk] = BT() ? BT().drawNorm(a) : a; SAVED[mk] = s; ls.set(KEY(mk), s); SEL = null; HOV = null; GES = null; bar(); paintAll(); return true; }
+  let HIDE = false;   // "Hide drawings" (27 Nov 2026): memory only, a new tool or a new drawing shows them again
+  function setHide(on) { HIDE = !!on; if (HIDE) { SEL = null; HOV = null; } document.documentElement.toggleAttribute('data-dr-hidden', HIDE); bar(); paintAll(); note(HIDE ? 'Drawings hidden (Alt+Shift+H shows them).' : 'Drawings shown.'); }
   let SELC = null, TOOL = null, MAG = +(ls.get(MAGK) || 0) || 0, SEL = null, HOV = null, GES = null, DRAFT = null;   // SEL / HOV = { mk, i }
   // a see-through token (the soft look's rgba surfaces and lines) is flattened onto the page colour: a canvas needs a solid colour
   const auSolid = (function () { var R = /^rgba\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)[,\s\/]+([\d.]+)\s*\)$/; return function (v) { var m = R.exec(v || ''); if (!m || +m[4] >= 1 || +m[4] < 0.4) return v;   /* tints, grids and bands stay see-through */ var b = getComputedStyle(document.documentElement).getPropertyValue('--au-bg').trim(), h = /^#([0-9a-f]{6})$/i.exec(b), q = h ? [0, 2, 4].map(function (i) { return parseInt(h[1].substr(i, 2), 16); }) : (document.documentElement.getAttribute('data-theme') === 'light' ? [238, 240, 244] : [18, 19, 21]), a = +m[4]; return '#' + [1, 2, 3].map(function (i) { return ('0' + Math.round(+m[i] * a + q[i - 1] * (1 - a)).toString(16)).slice(-2); }).join(''); }; })();
@@ -60,7 +62,7 @@
     if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = w + 'px'; c.style.height = h + 'px'; }
     const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, h); if (!cx.visible()) return;
     const mk = mkOf(cx), L = load(mk), { W, H } = size(cx); x.save(); x.beginPath(); x.rect(0, 0, W, H); x.clip();
-    const list = L.map((d, i) => [d, i]); if (DRAFT && DRAFT.mk === mk) list.push([DRAFT.d, -1]);
+    const list = HIDE ? [] : L.map((d, i) => [d, i]); if (DRAFT && DRAFT.mk === mk) list.push([DRAFT.d, -1]);
     for (const [d, i] of list) { const g = geo(cx, d); if (!g) continue; const sel = SEL && SEL.mk === mk && SEL.i === i, hov = HOV && HOV.mk === mk && HOV.i === i, col = colOf(d);
       x.strokeStyle = col; x.lineWidth = (d.w || 1) + (hov && !sel ? 0.5 : 0); x.setLineDash(d.ls === 'dash' ? [6, 4] : []);
       if (g.type === 'c') { const ex = g.xe != null ? g.xe : g.x2, ey = g.ye != null ? g.ye : g.y2, eyo = g.yeo != null ? g.yeo : g.y2o;
@@ -112,7 +114,7 @@
 
   // ---- what is under the pointer ----
   function hitAt(cx, xp, yp) { const mk = mkOf(cx), L = load(mk), touch = matchMedia('(pointer: coarse)').matches, hT = touch ? 22 : 7, tol = touch ? 12 : 6;
-    const order = L.map((d, i) => i).reverse(); if (SEL && SEL.mk === mk) order.unshift(SEL.i);
+    if (HIDE) return null; const order = L.map((d, i) => i).reverse(); if (SEL && SEL.mk === mk) order.unshift(SEL.i);
     for (const i of order) { const d = L[i]; if (!d) continue; const part = BT().drawHit(geo(cx, d), xp, yp, tol, hT); if (part) return { mk, i, part }; } return null; }
 
   // ---- gestures ----
@@ -166,7 +168,7 @@
     host.innerHTML = Object.keys(NAME).map((k) => `<button type="button" data-dt="${k}" aria-pressed="${k === ''}" title="${NAME[k]}" aria-label="${NAME[k].replace(/ \(.*/, '')}">${svg(k)}</button>`).join('') + `<button type="button" class="dr-mag" data-mag aria-pressed="false" title="Magnet: off (Alt+M)" aria-label="Magnet">${svg('mag')}<small></small></button>`;
     host.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; if (b.hasAttribute('data-mag')) { setMag((MAG + 1) % 3); return; } const t = b.dataset.dt; setTool(t && TOOL !== t ? t : null); });
     setMag(MAG); setTool(null); }
-  function setTool(t) { TOOL = t || null; DRAFT = null; if (TOOL) SEL = null; document.documentElement.toggleAttribute('data-drawing', !!TOOL);
+  function setTool(t) { if (t && HIDE) setHide(false); TOOL = t || null; DRAFT = null; if (TOOL) SEL = null; document.documentElement.toggleAttribute('data-drawing', !!TOOL);
     document.querySelectorAll('#ms-dr-bar [data-dt]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.dt || null) === TOOL)));
     CX.forEach((cx) => { cx.ring = null; }); bar(); paintAll(); }
   function setMag(m) { MAG = m; ls.set(MAGK, String(m)); const b = document.querySelector('#ms-dr-bar [data-mag]'); if (!b) return; const w = ['off', 'weak', 'strong'][m];
@@ -212,7 +214,7 @@
     const last = [...L.keys()].reverse().find((i) => !L[i].lock);
     m.innerHTML = `<button type="button" role="menuitem" data-m="reset">Reset chart view</button>` + (h ? `<button type="button" role="menuitem" data-m="del">Delete this drawing</button>` : '')
       + `<button type="button" role="menuitem" data-m="last"${last == null ? ' disabled' : ''}>Remove the last drawing</button><button type="button" role="menuitem" data-m="all"${L.length ? '' : ' disabled'}>Delete all drawings</button>`
-      + `<button type="button" role="menuitem" data-m="list">Drawings list <kbd>Alt+L</kbd></button><button type="button" role="menuitem" data-m="undo"${UNDO.length ? '' : ' disabled'}>Undo <kbd>Ctrl+Z</kbd></button><button type="button" role="menuitem" data-m="redo"${REDO.length ? '' : ' disabled'}>Redo <kbd>Ctrl+Y</kbd></button>`
+      + `<button type="button" role="menuitem" data-m="hide">${HIDE ? 'Show drawings' : 'Hide drawings'} <kbd>Alt+Shift+H</kbd></button><button type="button" role="menuitem" data-m="list">Drawings list <kbd>Alt+L</kbd></button><button type="button" role="menuitem" data-m="undo"${UNDO.length ? '' : ' disabled'}>Undo <kbd>Ctrl+Z</kbd></button><button type="button" role="menuitem" data-m="redo"${REDO.length ? '' : ' disabled'}>Redo <kbd>Ctrl+Y</kbd></button>`
       + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0)) return ''; menu.lv = p; const t = cx.fmt ? cx.fmt(p) : p.toFixed(2);   // a level from the menu (27 Nov 2026)
         return `<hr class="cm-sep"><button type="button" role="menuitem" data-m="hl">Horizontal line at ${t}</button><button type="button" role="menuitem" data-m="al">Alert at ${t}</button>`; })()
       + (() => { let p = null; try { p = cx.series.coordinateToPrice(yp); } catch (x) {} if (!(p > 0) || !window.msPaperDraftAt || !window.msPaperMarket || window.msPaperMarket() !== mk) return '';   // paper orders from the chart (19 Nov 2026)
@@ -225,7 +227,7 @@
       if (k === 'last' && last != null) remove(mk, last);
       if ((k === 'hl' || k === 'al') && menu.lv > 0) { LASTCX = cx; const d = { type: 'h', price: menu.lv }; if (k === 'al') d.alert = true; commit(mk, d);
         if (k === 'al') { note('Alert on: you are told when price crosses this line while this page is open.'); try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch (e) {} } }
-      if (k === 'list') openList(cx);
+      if (k === 'list') openList(cx); if (k === 'hide') setHide(!HIDE);
       if (k === 'undo') back(UNDO, REDO); if (k === 'redo') back(REDO, UNDO);
       if (k === 'all') { const ok = window.msConfirm ? await window.msConfirm(`Delete all ${L.filter((d) => !d.lock).length} drawings on this market? Locked ones stay.`, { title: 'Delete all drawings', ok: 'Delete all', danger: true }) : confirm('Delete all drawings?');
         if (ok) { ST[mk] = L.filter((d) => d.lock); save(mk); SEL = null; bar(); paintAll(); } } };
@@ -233,6 +235,7 @@
 
   // ---- keys ----
   document.addEventListener('keydown', (e) => { if (/INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '') || document.querySelector('dialog[open]') || !CX.some((c) => c.visible())) return;
+    if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyH') { e.preventDefault(); setHide(!HIDE); return; }
     if (e.altKey && !e.ctrlKey && !e.metaKey) { const t = { KeyT: 't', KeyH: 'h', KeyJ: 'hr', KeyV: 'v', KeyR: 'r', KeyF: 'f', KeyA: 'a', KeyX: 'x', KeyC: 'c', KeyG: 'm', KeyW: 'w', KeyP: 'p', KeyB: 'b' }[e.code]; if (t) { e.preventDefault(); setTool(TOOL === t ? null : t); return; } if (e.code === 'KeyM') { e.preventDefault(); setMag((MAG + 1) % 3); return; } if (e.code === 'KeyL') { e.preventDefault(); if (LIST && !LIST.hidden) LIST.hidden = true; else openList(); return; } }
     if (e.key === 'Escape' && (TOOL || SEL || GES)) { if (GES) { if (SEL && GES.d0) load(SEL.mk)[SEL.i] = GES.d0; GES.cx && lock(GES.cx, false); GES = null; } setTool(null); SEL = null; bar(); paintAll(); }
     if ((e.key === 'Delete' || e.key === 'Backspace') && SEL && !e.ctrlKey && !e.metaKey) { e.preventDefault(); remove(SEL.mk, SEL.i); }
@@ -262,7 +265,7 @@
         if (b.dataset.i != null) { const i = +b.dataset.i; if (!L[i]) return; SEL = { mk, i }; SELC = LISTCX; focusOn(LISTCX, L[i]); paintAll(); bar(); listDraw(); } });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && LIST && !LIST.hidden) LIST.hidden = true; }); }
     if (LIST.parentNode !== fsHost()) fsHost().appendChild(LIST); LIST.hidden = false; listDraw(); }
-  window.msDrawList = openList;
+  window.msDrawList = openList; window.msDrawHide = (on) => setHide(on == null ? !HIDE : on);
   window.msDrawUndo = () => back(UNDO, REDO); window.msDrawRedo = () => back(REDO, UNDO);
   addEventListener('scroll', () => { if (SEL) bar(); }, { passive: true });
 

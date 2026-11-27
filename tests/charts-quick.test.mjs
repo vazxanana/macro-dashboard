@@ -55,3 +55,12 @@ test('the drawings list: every drawing of the market, select, lock, delete', () 
   assert.match(h, /\.ms-dlist \{/);
   assert.match(h, /:not\(\.ms-dlist\)/, 'kept in full screen');
 });
+
+test('hide all drawings (Alt+Shift+H), and the tools\' messages float', () => {
+  const d = fs.readFileSync('assets/ms-draw.js', 'utf8'), h = fs.readFileSync('market-structure.html', 'utf8');
+  assert.match(d, /const list = HIDE \? \[\] :/);
+  assert.match(d, /if \(HIDE\) return null;/, 'a hidden drawing cannot be picked');
+  assert.match(d, /e\.altKey && e\.shiftKey && !e\.ctrlKey && !e\.metaKey && e\.code === 'KeyH'/);
+  assert.ok(!/KeyD/.test(d), 'Alt+D is the browser\'s address bar');
+  assert.match(h, /#v-charts \.dr-note:not\(:empty\) \{ position: fixed;/);
+});
