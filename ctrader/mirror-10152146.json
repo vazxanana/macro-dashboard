@@ -2790,7 +2790,7 @@
     "lots": 0.04,
     "digits": 3,
     "setup": "fvgm",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T12:46:31.000Z",
     "councilEntry": 43.9005,
     "stop": 43.508701,
@@ -2801,10 +2801,12 @@
     "slipR": 0.057,
     "lagSec": 91,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T12:46:31.000Z",
-    "brokerStop": 43.531
+    "brokerStop": 43.531,
+    "closedAt": "2026-11-27T13:21:25.000Z"
    },
    "mosha6:bar-r6-eg-15m-s1795781160": {
     "positionId": "51704919",
@@ -2862,7 +2864,7 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 9116.86,
-   "lastBalance": 8663.87,
+   "lastBalance": 8584.86,
    "ids": [
     "50808923",
     "50809509",
@@ -2876,7 +2878,6 @@
     "51693342",
     "51693343",
     "51694036",
-    "51702970",
     "51704919",
     "51704926"
    ],
@@ -2886,7 +2887,7 @@
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8663.87 · 11 open",
+  "status": "ok · demo Fusion Markets · balance 8584.86 · 10 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -2904,8 +2905,8 @@
   "resetDoneAt": "2026-11-08T11:42:47.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
-  "balance": 8663.87,
-  "lastRun": "2026-11-27T13:18:25.000Z"
+  "balance": 8584.86,
+  "lastRun": "2026-11-27T13:21:25.000Z"
  },
  "log": [
   {
@@ -4173,6 +4174,11 @@
    "at": "2026-11-27T13:18:25.000Z",
    "msg": "XAUUSD position 51684134 closed at the broker",
    "trade": "mosha6:bar-r6-tap-eg-15m-b1795766460"
+  },
+  {
+   "at": "2026-11-27T13:21:25.000Z",
+   "msg": "XAGUSD position 51702970 closed at the broker",
+   "trade": "fvgm:xag:fvg-h1-b1795762800-1795783500"
   }
  ],
  "limits": {
