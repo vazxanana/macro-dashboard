@@ -3426,6 +3426,32 @@
     ],
     "stopCheckedAt": "2026-11-27T18:01:10.000Z",
     "brokerStop": 3615.6
+   },
+   "fvgm:fvg-h1-s1795791600-1795802400": {
+    "positionId": "51735304",
+    "symbol": "XAUUSD",
+    "side": "sell",
+    "volume": 400,
+    "lots": 0.04,
+    "digits": 2,
+    "setup": "fvgm",
+    "status": "open",
+    "openedAt": "2026-11-27T18:02:22.000Z",
+    "councilEntry": 3648.155,
+    "stop": 3665.328,
+    "t1": 3630.982,
+    "riskCash": 85.16,
+    "margin": 29.16,
+    "mark": 3647.635,
+    "levelsFrom": "mark",
+    "fillPrice": 3652.28,
+    "slipR": -0.24,
+    "lagSec": 142,
+    "alerted": [
+     "open"
+    ],
+    "stopCheckedAt": "2026-11-27T18:02:22.000Z",
+    "brokerStop": 3669.97
    }
   },
   "day": {
@@ -3443,13 +3469,17 @@
     "51713490",
     "51720984",
     "51727995",
-    "51730157"
+    "51730157",
+    "51734810",
+    "51735304"
    ],
-   "oids": [],
-   "sent": true
+   "oids": [
+    "35000621"
+   ],
+   "sent": false
   },
   "startedAt": "2026-11-08T11:42:26.000Z",
-  "status": "ok · demo Fusion Markets · balance 8515.62 · 9 open",
+  "status": "ok · demo Fusion Markets · balance 8515.62 · 10 open",
   "skipped": {
    "audusd-position-1793601653": "price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
    "xau-position-1794495673": "price 3588.495 has run 1.00R from the council entry 3870.32: a different trade now",
@@ -3463,13 +3493,9 @@
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:44.000Z",
   "balance": 8515.62,
-  "lastRun": "2026-11-27T18:01:10.000Z"
+  "lastRun": "2026-11-27T18:04:31.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-08T12:04:44.000Z",
-   "msg": "catch-up round: 0 open council trades (shadows included) considered"
-  },
   {
    "at": "2026-11-20T10:37:43.000Z",
    "msg": "not mirrored audusd-position-1793601653: price 0.66669 has run 2.97R from the council entry 0.70162: a different trade now",
@@ -4957,6 +4983,11 @@
    "at": "2026-11-27T18:01:10.000Z",
    "msg": "opened buy XAUUSD 0.01 lot (council mosha6)",
    "trade": "mosha6:bar-r6-j-15m-m5-v4-b1795800660"
+  },
+  {
+   "at": "2026-11-27T18:02:22.000Z",
+   "msg": "opened sell XAUUSD 0.04 lot (council fvgm)",
+   "trade": "fvgm:fvg-h1-s1795791600-1795802400"
   }
  ],
  "limits": {
@@ -5061,11 +5092,11 @@
   ]
  },
  "execution": {
-  "n": 120,
-  "meanSlipR": -0.018,
-  "medianSlipR": -0.007,
+  "n": 121,
+  "meanSlipR": -0.02,
+  "medianSlipR": -0.008,
   "worstSlipR": 1.148,
-  "medianLagSec": 838.5,
+  "medianLagSec": 818,
   "bySymbol": {
    "SOLUSD": {
     "n": 2,
@@ -5092,8 +5123,8 @@
     "meanSlipR": -0.018
    },
    "XAUUSD": {
-    "n": 99,
-    "meanSlipR": -0.022
+    "n": 100,
+    "meanSlipR": -0.024
    },
    "EURUSD": {
     "n": 1,
