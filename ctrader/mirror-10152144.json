@@ -3502,7 +3502,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T15:46:27.000Z",
     "councilEntry": 1.3104,
     "stop": 1.309576,
@@ -3515,59 +3515,56 @@
     "slipR": 0,
     "lagSec": 87,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T15:46:27.000Z",
-    "brokerStop": 1.30956
+    "brokerStop": 1.30956,
+    "closedAt": "2026-11-27T16:15:43.000Z"
    }
   },
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 317.42,
+   "lastBalance": 314.66,
    "ids": [
     "51722970",
-    "51722979",
-    "51726430"
+    "51722979"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 317.42 · 3 open",
+  "status": "ok · demo Fusion Markets · balance 314.66 · 2 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
-  "wait": {},
+  "wait": {
+   "eqx:fade:xag:fade-m15-b1795796100": {
+    "why": "XAGUSD: even the minimum lot (0.01) risks 16.61, 5.3% of the balance (cap 2%); a bigger demo balance fixes this",
+    "n": 0,
+    "at": "2026-11-27T16:17:35.000Z"
+   },
+   "eqx:fvg:xag:fvg-h1-b1795752000-1795796100": {
+    "why": "XAGUSD: even the minimum lot (0.01) risks 32.49, 10.3% of the balance (cap 2%); a bigger demo balance fixes this",
+    "n": 0,
+    "at": "2026-11-27T16:15:43.000Z"
+   },
+   "eqx:fvg:fvg-h1-b1795752000-1795796100": {
+    "why": "XAUUSD: even the minimum lot (0.01) risks 27.69, 8.8% of the balance (cap 2%); a bigger demo balance fixes this",
+    "n": 0,
+    "at": "2026-11-27T16:15:43.000Z"
+   }
+  },
   "paused": {},
   "resetAt": "2026-11-08T09:45Z",
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 317.42,
-  "lastRun": "2026-11-27T16:12:38.000Z"
+  "balance": 314.66,
+  "lastRun": "2026-11-27T16:17:35.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T19:09:21.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 14.09, 2.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
-  {
-   "at": "2026-11-24T19:09:21.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 31.94, 6.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
-  {
-   "at": "2026-11-24T19:12:26.000Z",
-   "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 14.34, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fade:fade-m15-b1795545900"
-  },
-  {
-   "at": "2026-11-24T19:12:26.000Z",
-   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795392000-1795545900: XAUUSD: even the minimum lot (0.01) risks 32.19, 6.4% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
-   "trade": "eqx:fvg:fvg-h1-b1795392000-1795545900"
-  },
   {
    "at": "2026-11-24T19:14:58.000Z",
    "msg": "not mirrored yet eqx:fade:fade-m15-b1795545900: XAUUSD: even the minimum lot (0.01) risks 14.66, 2.9% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
@@ -5047,6 +5044,26 @@
    "at": "2026-11-27T16:10:11.000Z",
    "msg": "closed AUDUSD position 51718694 (council: stopped)",
    "trade": "eqx:fvg:audusd:fvg-h1-b1795748400-1795790700"
+  },
+  {
+   "at": "2026-11-27T16:15:43.000Z",
+   "msg": "GBPUSD position 51726430 closed at the broker",
+   "trade": "eqx:fade:gbpusd:fade-m15-b1795794300"
+  },
+  {
+   "at": "2026-11-27T16:15:43.000Z",
+   "msg": "not mirrored yet eqx:fade:xag:fade-m15-b1795796100: XAGUSD: even the minimum lot (0.01) risks 16.61, 5.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "eqx:fade:xag:fade-m15-b1795796100"
+  },
+  {
+   "at": "2026-11-27T16:15:43.000Z",
+   "msg": "not mirrored yet eqx:fvg:xag:fvg-h1-b1795752000-1795796100: XAGUSD: even the minimum lot (0.01) risks 32.49, 10.3% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "eqx:fvg:xag:fvg-h1-b1795752000-1795796100"
+  },
+  {
+   "at": "2026-11-27T16:15:43.000Z",
+   "msg": "not mirrored yet eqx:fvg:fvg-h1-b1795752000-1795796100: XAUUSD: even the minimum lot (0.01) risks 27.69, 8.8% of the balance (cap 2%); a bigger demo balance fixes this (will retry)",
+   "trade": "eqx:fvg:fvg-h1-b1795752000-1795796100"
   }
  ],
  "limits": {
