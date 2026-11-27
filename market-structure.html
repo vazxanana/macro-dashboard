@@ -2239,6 +2239,7 @@ html:not([data-mode="admin"]):not([data-ict]) .dsk, html[data-deny~="desks"]:not
 .ch-lg { position: absolute; top: 8px; left: 10px; right: 90px; z-index: 3; pointer-events: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; font: 500 11.5px/1.35 var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-faint); text-shadow: 0 0 6px var(--panel), 0 0 2px var(--panel); }
 .ch-lg .k { color: var(--ink-faint); margin-left: 4px; } .ch-lg .k:first-child { margin-left: 0; }
 .ch-lg b { font-weight: 600; } .ch-lg b.up { color: var(--buy); } .ch-lg b.dn { color: var(--sell); }
+.ch-lg .ind-r { flex-basis: 100%; display: flex; gap: 6px; flex-wrap: wrap; } .ch-lg .ind-r b { font-weight: 500; }
 .ch-lg .chg { margin-left: 6px; } .ch-lg .cur { display: inline-flex; gap: 4px; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); } .ch-lg .t { margin-left: 8px; color: var(--ink-faint); }
 @media (max-width: 700px) { .ch-lg { font-size: 10.5px; right: 64px; gap: 0 4px; } .ch-lg .t { display: none; } }
 .ms-chart { position: relative; }
@@ -5935,6 +5936,7 @@ function msNextSetup(bars, A) {
       // cursor readout (7 Nov loop): the price under the crosshair and its distance from the last price
       let hx = h; const L0 = B[B.length - 1];
       if (lgHover && P._cp != null && isFinite(P._cp) && L0) { const d = P._cp - L0.close, pc2 = d / L0.close * 100; hx += `<span class="cur"><span class="k">⌖</span><b>${fmt(P._cp)}</b><b class="${d >= 0 ? 'up' : 'dn'}">${d >= 0 ? '+' : '−'}${fmt(Math.abs(d))} (${d >= 0 ? '+' : '−'}${Math.abs(pc2).toFixed(2)}%)</b><span class="k">from last</span></span>`; }
+      { const IL = P._ind && P._ind.leg; if (IL && IL.length && !P.rp) hx += window.msIndLegend(IL, i, B.length, fmt); }
       if (hx !== lgLast) { lg.innerHTML = hx; lgLast = hx; }
     };
     { const pane = el.closest('.ms-pane'), ph = pane && pane.querySelector('.ms-ph');
@@ -7307,12 +7309,27 @@ function msNextSetup(bars, A) {
   }
 
 
+  // indicator legend (27 Nov 2026, owner: "Keep improving the charts"): one row a study under O H L C, its name and its
+  // values at the legend's candle (the newest when the crosshair is away); a value the study has not got yet reads "—".
+  // Pure: the rows are built from what indDraw already computed, so nothing is recomputed while the crosshair moves.
+  // a guide line (RSI's 70 / 30, a zero line) has one value everywhere: it is drawn, but its number says nothing, so the legend skips it
+  const flatLine = (v) => { let f = null; for (const x of v) { if (x == null || !isFinite(x)) continue; if (f == null) f = x; else if (x !== f) return false; } return true; };
+  window.msIndLegend = function (rows, i, n, fmt) {
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    // a study on the price scale reads like a price (the market's decimals); an oscillator with two decimals, or three figures under 1
+    const num = (v, px) => { if (v == null || !isFinite(v)) return '—'; if (px && fmt) return fmt(v); const a = Math.abs(v); return a >= 1 || a === 0 ? v.toFixed(2) : v.toPrecision(3); };
+    return rows.slice(0, 8).map((r) => '<span class="ind-r"><span class="k">' + esc(r.name) + '</span>'
+      + r.vals.map((x) => { const v = x.v && x.v.length === n ? x.v[i] : null; const c = x.color && /^(#[0-9a-f]{3,8}|rgba?\([0-9., ]+\))$/i.test(x.color) ? ' style="color:' + x.color + '"' : '';
+        return '<b' + c + '>' + num(v, !r.osc) + '</b>'; }).join('') + '</span>').join('');
+  };
   // indicators on any chart (panes and the Split screen's free chart): overlays on the price scale, oscillators in stacked bands
   function indDraw(chart, B, out) {
     const L = (window.msInd && window.msInd.list()) || [], osc = L.filter((x) => IND_DEF[x.type] && IND_DEF[x.type].osc), m = osc.length, band = m ? Math.min(0.16, 0.45 / m) : 0;
     try { chart.priceScale('right').applyOptions({ scaleMargins: { top: 0.13, bottom: m ? 0.05 + band * m : 0.08 } }); } catch (e) {}
-    if (!B || B.length < 30) return; const T = B.map((b) => b.time);
+    out.leg = []; if (!B || B.length < 30) return; const T = B.map((b) => b.time);
     L.forEach((x) => { const D = IND_DEF[x.type]; if (!D) return; let res; try { res = D.calc(B, x); } catch (e) { return; }
+      // legend rows (27 Nov 2026): the study's name and its values at the candle under the crosshair, as TradingView shows them
+      out.leg.push({ name: (res.find((o) => o.title) || {}).title || D.name, osc: !!D.osc, vals: res.filter((o) => !o.dots && Array.isArray(o.v) && !flatLine(o.v)).slice(0, 4).map((o) => ({ v: o.v, color: o.hist ? null : (o.color || x.color) })) });
       const k = D.osc ? osc.indexOf(x) : -1, sid = D.osc ? `osc${k}` : 'right';
       res.forEach((o) => { const opt = { priceScaleId: sid, color: o.color || x.color, lineWidth: o.w || 1.5, lineStyle: o.dash ? LW.LineStyle.Dashed : LW.LineStyle.Solid, priceLineVisible: false, lastValueVisible: !!o.last, crosshairMarkerVisible: false, title: o.title || '' };
         const s2 = o.hist ? chart.addHistogramSeries({ priceScaleId: sid, priceLineVisible: false, lastValueVisible: false }) : o.dots ? chart.addLineSeries({ ...opt, lineVisible: false, pointMarkersVisible: true, pointMarkersRadius: 1.5 }) : chart.addLineSeries(opt);

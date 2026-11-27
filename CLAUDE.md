@@ -2727,6 +2727,14 @@ labels) stand down on the Charts and run once when another view opens; a pane te
 IntersectionObserver (`P.vis`), not a layout read each frame. Load: 113 -> 47 candle requests in the first 12 s; idle with the charts
 open: 1.15 -> 0.76 s of main-thread work per 20 s, script 0.33 -> 0.17 s. Test: `tests/charts-speed.test.mjs`.
 
+## Indicator values in the chart legend (27 Nov 2026, owner: "Keep improving the charts")
+Display only, `market-structure.html`. Each Desk chart pane's legend (`.ch-lg`) has one row per indicator under O H L C, as
+TradingView shows it: the study's name and its values at the candle under the crosshair (the newest one when the pointer is away).
+`indDraw` records the rows in `out.leg` from what it already computed, so the legend computes nothing while the crosshair moves.
+`window.msIndLegend(rows, i, n, fmt)` (pure) builds them: names escaped, a colour shown only when it is a plain colour, "—" before
+a study has a value, at most 8 rows. A guide line with one value everywhere (RSI's 70 / 30) is drawn but left out of the legend
+(`flatLine`). No rows during bar replay. The free chart and Markets side by side are not done. Test: `tests/charts-ind-legend.test.mjs`.
+
 ## Charts in a trading-terminal look (24 Nov 2026, owner: "on 1 minute and small timeframes he doesn't show the candles", "make the interface look more TradingView")
 Display only, `market-structure.html`. Cause of the "no candles": the free chart (one chart on any timeframe, seconds too, Split's
 right chart) called `fitContent()` on its 500 candles, about 2.5 px a candle: hairlines without bodies. `tvView(chart, n)` (next to
