@@ -3166,7 +3166,7 @@
     "lots": 0.03,
     "digits": 5,
     "setup": "eqx-fade",
-    "status": "open",
+    "status": "closed at broker",
     "openedAt": "2026-11-27T13:15:41.000Z",
     "councilEntry": 0.83652,
     "stop": 0.837171,
@@ -3179,10 +3179,12 @@
     "slipR": -0.015,
     "lagSec": 41,
     "alerted": [
-     "open"
+     "open",
+     "close"
     ],
     "stopCheckedAt": "2026-11-27T13:15:41.000Z",
-    "brokerStop": 0.8373
+    "brokerStop": 0.8373,
+    "closedAt": "2026-11-27T14:05:37.000Z"
    },
    "eqx:fade:usdcad:fade-m15-s1795785300": {
     "positionId": "51706604",
@@ -3356,16 +3358,15 @@
   "day": {
    "date": "2026-11-27",
    "startBalance": 439.97,
-   "lastBalance": 323.36,
+   "lastBalance": 327.46,
    "ids": [
-    "51706600",
     "51708602"
    ],
    "oids": [],
    "sent": false
   },
   "startedAt": "2026-11-08T11:42:25.000Z",
-  "status": "ok · demo Fusion Markets · balance 323.36 · 2 open",
+  "status": "ok · demo Fusion Markets · balance 327.46 · 1 open",
   "skipped": {
    "eqx:goldvb:goldvb-b1795744800": "price 3632.33 has run 1.31R from the council entry 3595.852: a different trade now"
   },
@@ -3375,14 +3376,10 @@
   "resetDoneAt": "2026-11-08T11:42:46.000Z",
   "orders": {},
   "catchUpAt": "2026-11-08T12:04:38.000Z",
-  "balance": 323.36,
-  "lastRun": "2026-11-27T13:49:19.000Z"
+  "balance": 327.46,
+  "lastRun": "2026-11-27T14:06:28.000Z"
  },
  "log": [
-  {
-   "at": "2026-11-24T18:13:38.000Z",
-   "msg": "balance 500.21 against a day start of 9971.21: read as an account reset, the day starts again"
-  },
   {
    "at": "2026-11-24T18:13:38.000Z",
    "msg": "not mirrored eqx:fade:usdcad:fade-m15-b1795541400: price 1.4272 is already past the council stop 1.427311",
@@ -4877,6 +4874,11 @@
    "at": "2026-11-27T13:31:52.000Z",
    "msg": "opened buy EURJPY 0.05 lot (council eqx-fade)",
    "trade": "eqx:fade:eurjpy:fade-m15-b1795786200"
+  },
+  {
+   "at": "2026-11-27T14:05:37.000Z",
+   "msg": "USDCHF position 51706600 closed at the broker",
+   "trade": "eqx:fade:usdchf:fade-m15-s1795785300"
   }
  ],
  "limits": {
