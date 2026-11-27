@@ -8,12 +8,12 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import * as K from '../_lib/edgekit.mjs';
 
-export const VERSION = 'auto-2';
+export const VERSION = 'auto-3';
 // auto-2 (26 Nov 2026, owner: "focus only in EG EF BO ... results from 2019 till today t above 1 is okey"; PREREGISTRATION.md, "Version auto-2"). auto-1's
 // windows, bars and families below are kept for the studies and desks that import them; the worker (`run`) draws auto-2 rules only.
-export const WIN2 = { A: [Date.UTC(2019, 0, 1) / 1000, Date.UTC(2023, 0, 1) / 1000], C: [Date.UTC(2023, 0, 1) / 1000, Infinity] };
+export const WIN2 = { A: [Date.UTC(2021, 0, 1) / 1000, Date.UTC(2024, 0, 1) / 1000], C: [Date.UTC(2024, 0, 1) / 1000, Infinity] };   // auto-3 (27 Nov 2026): 2021 to now
 export const BAR2 = { A: { n: 100, t: 1.0 }, C: { n: 50, t: 1.0 }, ALL: { t: 1.0 }, LEAD: { n: 100, t: 2.0 } };
-export const K2 = ['eg', 'egr', 'ef', 'bo'], SPACE2 = { life: [12, 24, 48, 96], P: [2, 3, 5, 8], bo: ['any', 'bos', 'choch'] };
+export const K2 = ['eg', 'egr', 'ef', 'efr'], SPACE2 = { life: [12, 24, 48, 96], P: [2, 3, 5, 8], bo: ['any', 'bos', 'choch'] };
 export const MARKETS = ['xau', 'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'nzdusd', 'usdcad', 'usdchf', 'eurjpy', 'xag'];
 const UTC = (y, m = 0, d = 1) => Date.UTC(y, m, d) / 1000;
 export const WIN = { A: [UTC(2005), UTC(2015)], B: [UTC(2015), UTC(2020)], C: [UTC(2020), Infinity] };
@@ -153,19 +153,28 @@ export function egAt(D, i) {
 // candle that completed it, until a close through its far side. egr[i] = the first return: bar i trades into the zone and closes back out on the engulf's side
 // (the engulf's direction). ef[i] = bar i is the first close through the far side (the direction of the failure). Two opposite signals on one bar = none.
 export function zones(D, life) { return cache(D, 'zn' + life, () => {
-  const n = D.n, egr = new Int8Array(n), ef = new Int8Array(n); let live = [];
+  const n = D.n, egr = new Int8Array(n), ef = new Int8Array(n), efr = new Int8Array(n); let live = [], dead = [];
   for (let i = 4; i < n; i++) {
-    let r = 0, f = 0, rx = false, fx = false; const keep = [];
+    let r = 0, f = 0, rx = false, fx = false, q = 0, qx = false; const keep = [], born = [];
     for (const z of live) {
       if (i - z.born > life) continue;
-      if (z.d > 0 ? D.c[i] < z.bot : D.c[i] > z.top) { if (f && f !== -z.d) fx = true; f = -z.d; continue; }
+      if (z.d > 0 ? D.c[i] < z.bot : D.c[i] > z.top) { if (f && f !== -z.d) fx = true; f = -z.d; born.push({ d: -z.d, top: z.top, bot: z.bot, born: i, hit: false }); continue; }
       if (!z.hit && (z.d > 0 ? D.l[i] <= z.top : D.h[i] >= z.bot)) { z.hit = true; if (z.d > 0 ? D.c[i] > z.top : D.c[i] < z.bot) { if (r && r !== z.d) rx = true; r = z.d; } }
       keep.push(z);
     }
-    live = keep; egr[i] = rx ? 0 : r; ef[i] = fx ? 0 : f;
+    // auto-3: a failed zone serves the other side (d = the failure's direction) until a close back through it; efr = its first return closing back out
+    const keepD = [];
+    for (const z of dead) {
+      if (i - z.born > life) continue;
+      if (z.d > 0 ? D.c[i] < z.bot : D.c[i] > z.top) continue;
+      if (!z.hit && (z.d > 0 ? D.l[i] <= z.top : D.h[i] >= z.bot)) { z.hit = true; if (z.d > 0 ? D.c[i] > z.top : D.c[i] < z.bot) { if (q && q !== z.d) qx = true; q = z.d; } }
+      keepD.push(z);
+    }
+    dead = keepD.concat(born);
+    live = keep; egr[i] = rx ? 0 : r; ef[i] = fx ? 0 : f; efr[i] = qx ? 0 : q;
     const [d, b] = egAt(D, i); if (d) live.push({ d, top: D.h[b], bot: D.l[b], born: i, hit: false });
   }
-  return { egr, ef }; }); }
+  return { egr, ef, efr }; }); }
 // auto-2 rules: one trigger of K2, or two that agree on the same candle
 function trigger2(r, kind) { return kind === 'eg' ? { kind, follow: true } : kind === 'bo' ? { kind, P: pick(r, SPACE2.P), bo: pick(r, SPACE2.bo) } : { kind, life: pick(r, SPACE2.life) }; }
 export function genome2(r, worker) {
@@ -191,6 +200,7 @@ export function sig(D, tr, i) {
     case 'eg': { const dir = egAt(D, i)[0]; return tr.follow ? dir : -dir; }
     case 'egr': return zones(D, tr.life).egr[i];
     case 'ef': return zones(D, tr.life).ef[i];
+    case 'efr': return zones(D, tr.life).efr[i];
     case 'bo': { const S = struct(D, tr.P), b = S.bk[i]; if (!b || (tr.bo === 'bos' && S.kd[i] !== 1) || (tr.bo === 'choch' && S.kd[i] !== 2)) return 0; return b; }
     case 'bos': case 'choch': { const S = struct(D, tr.P), b = S.bk[i]; if (!b || S.kd[i] !== (tr.kind === 'bos' ? 1 : 2)) return 0; return tr.follow ? b : -b; }
     case 'mspb': { const S = struct(D, tr.P); return S.dp[i] >= tr.d ? S.st[i] : 0; }
@@ -281,7 +291,7 @@ export function report(dir) {
   ps.sort((a, b) => a - b); const m = Math.max(T.cLooks, ps.length), holm = (p) => Math.min(1, p * (m - Math.max(0, ps.indexOf(p))));
   const results = [...res.values()].sort((a, b) => b.ALL.t - a.ALL.t).map((l) => ({ ...l, holm: holm(l.p) }));
   const leads = results.filter((l) => l.C.n >= BAR2.LEAD.n && l.C.t >= BAR2.LEAD.t && l.holm < 0.05);
-  return { ...T, note: 'a result clears t >= 1 in 2019-22, in 2023-now and over 2019-now: about one random rule in forty does by luck', results, leads, bestLooks: results.slice(0, 10) };
+  return { ...T, note: 'a result clears t >= 1 in 2021-23, in 2024-now and over 2021-now: about one random rule in forty does by luck', results, leads, bestLooks: results.slice(0, 10) };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {

@@ -66,31 +66,33 @@ test('the worker writes its file, counts every try and puts only a C look after 
   assert.equal(tries, 200); assert.equal(typeof E.groupOf(E.genome(r, 1)), 'string'); fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('auto-2 report: only auto-2 files are counted; a result needs the three t >= 1 figures; a lead also the strict bar and Holm', () => {
+test('auto-3 report: only auto-3 files are counted; a result needs the three t >= 1 figures; a lead also the strict bar and Holm', () => {
   const dir = fs.mkdtempSync('/tmp/auto-rep-'), L = (p, t, all = 2) => ({ group: 'g' + p, p, A: { n: 150, mean: 0.1, t: 1.5 }, C: { n: 200, mean: 0.05, t }, ALL: { n: 350, mean: 0.07, t: all }, g: {} });
-  fs.writeFileSync(dir + '/worker-1.json', JSON.stringify({ version: 'auto-2', worker: 1, tries: 1000, survivedA: 5, candidates: 3, cLooks: 3, cPasses: 2, looks: [L(0.01, 2.3), L(0.2, 0.8), L(0.1, 1.2)], results: [L(0.01, 2.3), L(0.1, 1.2)] }));
-  fs.writeFileSync(dir + '/worker-2.json', JSON.stringify({ version: 'auto-2', worker: 2, tries: 2000, survivedA: 7, candidates: 3, cLooks: 1, cPasses: 1, looks: [L(0.04, 2.1)], results: [L(0.04, 2.1)] }));
-  fs.writeFileSync(dir + '/worker-3.json', JSON.stringify({ version: 'auto-1', worker: 3, tries: 9e6, survivedA: 9, candidates: 9, cLooks: 9, looks: [] }));
-  const R = E.report(dir); assert.equal(R.version, 'auto-2'); assert.equal(R.workers, 2); assert.equal(R.tries, 3000); assert.equal(R.cLooks, 4); assert.equal(R.results.length, 3);
+  fs.writeFileSync(dir + '/worker-1.json', JSON.stringify({ version: 'auto-3', worker: 1, tries: 1000, survivedA: 5, candidates: 3, cLooks: 3, cPasses: 2, looks: [L(0.01, 2.3), L(0.2, 0.8), L(0.1, 1.2)], results: [L(0.01, 2.3), L(0.1, 1.2)] }));
+  fs.writeFileSync(dir + '/worker-2.json', JSON.stringify({ version: 'auto-3', worker: 2, tries: 2000, survivedA: 7, candidates: 3, cLooks: 1, cPasses: 1, looks: [L(0.04, 2.1)], results: [L(0.04, 2.1)] }));
+  fs.writeFileSync(dir + '/worker-3.json', JSON.stringify({ version: 'auto-2', worker: 3, tries: 9e6, survivedA: 9, candidates: 9, cLooks: 9, looks: [] }));
+  const R = E.report(dir); assert.equal(R.version, 'auto-3'); assert.equal(R.workers, 2); assert.equal(R.tries, 3000); assert.equal(R.cLooks, 4); assert.equal(R.results.length, 3);
   assert.equal(R.leads.length, 1); assert.equal(R.leads[0].group, 'g0.01');                 // 0.01 x 4 = 0.04 clears; 0.04 x 3 = 0.12 does not
   assert.equal(E.resultOk(L(0.2, 0.8)), false); assert.equal(E.resultOk(L(0.1, 1.2, 0.9)), false); assert.equal(E.resultOk(L(0.1, 1.2)), true);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('auto-2 draws only EG, EF and BO rules on 2019 to now; the zone signals use closed candles only; every rule has a stop', () => {
-  assert.equal(E.VERSION, 'auto-2'); assert.deepEqual(E.K2, ['eg', 'egr', 'ef', 'bo']); assert.deepEqual(E.BAR2, { A: { n: 100, t: 1 }, C: { n: 50, t: 1 }, ALL: { t: 1 }, LEAD: { n: 100, t: 2 } });
-  assert.equal(new Date(E.WIN2.A[0] * 1000).toISOString().slice(0, 10), '2019-01-01'); assert.equal(E.WIN2.A[1], E.WIN2.C[0]);
+test('auto-3 draws only EG and EF rules on 2021 to now; a failed zone serves the other side (efr); the zone signals use closed candles only; every rule has a stop', () => {
+  assert.equal(E.VERSION, 'auto-3'); assert.deepEqual(E.K2, ['eg', 'egr', 'ef', 'efr']); assert.deepEqual(E.BAR2, { A: { n: 100, t: 1 }, C: { n: 50, t: 1 }, ALL: { t: 1 }, LEAD: { n: 100, t: 2 } });
+  assert.equal(new Date(E.WIN2.A[0] * 1000).toISOString().slice(0, 10), '2021-01-01'); assert.equal(new Date(E.WIN2.C[0] * 1000).toISOString().slice(0, 10), '2024-01-01'); assert.equal(E.WIN2.A[1], E.WIN2.C[0]);
   const r = E.rng(9);
   for (let i = 0; i < 3000; i++) { const w = 1 + (i % 12), g = E.genome2(r, w); assert.ok(g.stop > 0); assert.ok(g.trig.length >= 1 && g.trig.length <= 2);
     for (const t of g.trig) assert.ok(E.K2.includes(t.kind), t.kind); if (w === 10) assert.equal(g.mk, 'nas100'); assert.equal(typeof E.group2(g), 'string'); }
   const B = walk(6000, 11), full = data(B), cut = data(B.slice(0, 4000));
-  for (const life of [12, 48]) { const a = E.zones(full, life), b = E.zones(cut, life); let n = 0;
-    for (let i = 0; i < 4000; i++) { assert.equal(a.egr[i], b.egr[i]); assert.equal(a.ef[i], b.ef[i]); if (a.egr[i] || a.ef[i]) n++; } assert.ok(n > 50, 'zone signals exist'); }
+  for (const life of [12, 48]) { const a = E.zones(full, life), b = E.zones(cut, life); let n = 0, m = 0;
+    for (let i = 0; i < 4000; i++) { assert.equal(a.egr[i], b.egr[i]); assert.equal(a.ef[i], b.ef[i]); assert.equal(a.efr[i], b.efr[i]); if (a.egr[i] || a.ef[i]) n++; if (a.efr[i]) m++; } assert.ok(n > 50, 'zone signals exist'); assert.ok(m > 10, 'efr signals exist'); }
   // an EF is a close through the far side of a zone an engulf made; an engulf's base is one of the 3 candles before it
   const z = E.zones(full, 24); let seen = 0;
   for (let i = 10; i < full.n && seen < 40; i++) { const [d, b] = E.egAt(full, i); if (d) { assert.ok(b >= i - 3 && b < i); assert.ok(d > 0 ? full.c[i] > full.h[b] : full.c[i] < full.l[b]); seen++; } }
   assert.ok(seen === 40); assert.ok(full.idx2.A[0] <= full.idx2.A[1]);
-  const src = fs.readFileSync(new URL('../research/edge/auto-researcher/PREREGISTRATION.md', import.meta.url), 'utf8'); assert.match(src, /Version auto-2/); assert.match(src, /never an edge/);
+  const src = fs.readFileSync(new URL('../research/edge/auto-researcher/PREREGISTRATION.md', import.meta.url), 'utf8'); assert.match(src, /Version auto-3/); assert.match(src, /never an edge/);
+  // efr: the first return to a failed zone, closing back out on the failure's side; never on the candle that failed it
+  for (let i = 5; i < full.n; i++) { const q = z.efr[i]; if (!q) continue; assert.equal(E.sig(full, { kind: 'efr', life: 24 }, i), q); }
 });
 
 test('worker 10 trades NAS100 only, every trigger kind alone or two together, and an index cost is a share of its price (none now)', () => {
