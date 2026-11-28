@@ -2709,6 +2709,14 @@ Display only, `market-structure.html` (and so the Charts app). Up to 640 px, in 
   `data-tv*`**: the page puts flags such as `data-ct`, `data-mode`, `data-role` on `<html>`, so `closest('[data-ct]')` matched the root
   and swallowed every hub tap (found on the way). The Full phone view and wider screens are unchanged. Test: `tests/charts-tv-app.test.mjs`.
 
+## Legend on the free charts (28 Nov 2026, owner: "Keep improving the charts")
+Display only. The single chart on any timeframe, Split's right chart and Markets side by side had no O H L C line (the free chart's
+old `.ms-legend` is hidden by a later rule). `window.msFreeLegend({ el, chart, bars, fmt, sec, TZ, ind? })` (next to `msIndLegend`)
+puts a `.ch-lg.ch-lg-free` on the chart: O H L C, the change against the previous close, the candle's time, and on the free chart the
+indicator rows (`SP.ind.leg` through `msIndLegend`); the candle under the crosshair, else the newest; one redraw a frame and a 1 s
+refresh while not hovered so a live candle follows. Markets side by side with 3-4 charts leaves the time out (narrow cells). Test:
+`tests/charts-ind-legend.test.mjs`.
+
 ## Quick type and drawing undo on the Charts (27 Nov 2026, owner: "Keep improving the charts")
 Display only. `assets/ms-quick.js` (`window.MS_QUICK` pure `parseTf`, `matchMarkets`; loaded after ms-draw.js): on Charts (and the
 Charts app), not for guests, typing a digit opens a "Timeframe" box ("15" = M15, "60" = H1, "240" = H4, "4h", "30s", "1d", "w",

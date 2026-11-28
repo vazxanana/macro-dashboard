@@ -7531,6 +7531,28 @@ function msNextSetup(bars, A) {
       + r.vals.map((x) => { const v = x.v && x.v.length === n ? x.v[i] : null; const c = x.color && /^(#[0-9a-f]{3,8}|rgba?\([0-9., ]+\))$/i.test(x.color) ? ' style="color:' + x.color + '"' : '';
         return '<b' + c + '>' + num(v, !r.osc) + '</b>'; }).join('') + '</span>').join('');
   };
+  // the free charts' legend (28 Nov 2026, owner: "Keep improving the charts"): the single chart on any timeframe, Split's right
+  // chart and Markets side by side had no O H L C line (the free chart's old .ms-legend is hidden by a later rule). Same look and
+  // order as the panes' legend: O H L C, the change against the previous close, the candle's time, and on the free chart the
+  // indicator rows. The newest candle when the crosshair is away; redrawn at most once a frame, and every second while not hovered
+  // so a live candle's figures follow. Display only.
+  const FREE_LG = [];
+  window.msFreeLegend = function (o) {
+    const lg = document.createElement('div'); lg.className = 'ch-lg ch-lg-free'; lg.setAttribute('aria-hidden', 'true'); o.el.appendChild(lg);
+    let idx, raf = 0, last = '', hover = false;
+    const draw = () => { const B = o.bars() || []; if (!B.length) { if (last) { lg.innerHTML = ''; last = ''; } return; }
+      let i = typeof idx === 'number' && idx >= 0 && idx < B.length ? idx : B.length - 1; const b = B[i], fmt = o.fmt;
+      const pv = i > 0 ? B[i - 1].close : b.open, ch = b.close - pv, pc = pv ? ch / pv * 100 : 0, cl = ch >= 0 ? 'up' : 'dn', sg = ch >= 0 ? '+' : '−';
+      const when = (o.sec() >= 86400 ? LG_FD : LG_FT).format(new Date((b.time - (o.TZ || 0)) * 1000));
+      let h = `<span class="k">O</span><b class="${cl}">${fmt(b.open)}</b><span class="k">H</span><b class="${cl}">${fmt(b.high)}</b><span class="k">L</span><b class="${cl}">${fmt(b.low)}</b><span class="k">C</span><b class="${cl}">${fmt(b.close)}</b><b class="${cl} chg">${sg}${fmt(Math.abs(ch))} (${sg}${Math.abs(pc).toFixed(2)}%)</b><span class="t">${when}</span>`;
+      const IL = o.ind && o.ind(); if (IL && IL.length) h += window.msIndLegend(IL, i, B.length, fmt);
+      if (h !== last) { lg.innerHTML = h; last = h; } };
+    const soon = () => { if (raf) return; raf = requestAnimationFrame(() => { raf = 0; draw(); }); };
+    o.chart.subscribeCrosshairMove((pr) => { if (pr && pr.logical != null && pr.point && pr.point.x >= 0) { hover = true; idx = Math.round(pr.logical); } else { hover = false; idx = undefined; } soon(); });
+    const L = { el: o.el, refresh: () => { if (!hover) idx = undefined; soon(); }, tick: () => { if (!hover && o.el.offsetParent) soon(); }, html: () => last };
+    FREE_LG.push(L); return L;
+  };
+  setInterval(() => { if (!document.hidden) FREE_LG.forEach((L) => L.tick()); }, 1000);
   // indicators on any chart (panes and the Split screen's free chart): overlays on the price scale, oscillators in stacked bands
   function indDraw(chart, B, out) {
     const L = (window.msInd && window.msInd.list()) || [], osc = L.filter((x) => IND_DEF[x.type] && IND_DEF[x.type].osc), m = osc.length, band = m ? Math.min(0.16, 0.45 / m) : 0;
@@ -7871,9 +7893,7 @@ function msNextSetup(bars, A) {
     // volume, session shading, EMAs and VWAP from Settings → Chart layers, as on the panes
     SP.ly = chartLayers(SP.chart, () => { const k = spSym(); return { tf: SPTFS.find((t) => t.id === spTf()) || TFS[2], raw: SP.raw, bars: SP.bars, off: k === instKey ? G.offset || 0 : 0, crypto: (INSTRUMENTS[k] || INST).group === 'Crypto' }; });
     spTheme();
-    const lg = document.getElementById('ms-sp-lg');
-    SP.chart.subscribeCrosshairMove((pr) => { const b = pr && pr.time != null && SP.bars.find((x) => x.time === pr.time); const I = INSTRUMENTS[spSym()] || INST, d = I.dec ?? 2, f = (v) => (+v).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
-      const B = b || SP.bars[SP.bars.length - 1]; if (lg && B) lg.innerHTML = `<span class="k">O</span><b>${f(B.open)}</b> <span class="k">H</span><b>${f(B.high)}</b> <span class="k">L</span><b>${f(B.low)}</b> <span class="k">C</span><b class="${B.close >= B.open ? 'up' : 'dn'}">${f(B.close)}</b>`; });
+    SP.lg = window.msFreeLegend({ el, chart: SP.chart, bars: () => SP.bars || [], fmt: (v) => fmtI(v, INSTRUMENTS[spSym()] || INST), sec: () => (SPTFS.find((t) => t.id === spTf()) || TFS[2]).sec, TZ, ind: () => SP.ind && SP.ind.leg });
   }
   // markups on the free chart (another market, or the left chart's own timeframe): the same Meridian / ICT drawing as the panes
   // (merItems / fvgItems + ictSess) with the price lines they use; the page's plan and higher-timeframe origins only for its own market
@@ -7899,7 +7919,7 @@ function msNextSetup(bars, A) {
         // the gold M5 replica boxes, as on the M5 pane (they come from the page's own M5 / M15 / H1 panes)
         if (own && tf.id === '5m') { const keep = P5pv; try { replicaItems(items, B); } catch (e) {} P5pv = keep; } }
     } catch (e) { /* not enough swings yet */ }
-    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); if (SP.ly) SP.ly.setAll(); spCT(); }
+    SP.ov.set(items); indDraw(SP.chart, B, SP.ind); spKL(); if (SP.ly) SP.ly.setAll(); spCT(); if (SP.lg) SP.lg.refresh(); }
   async function spLoad() {
     if (!SP.on) return; spControls(); grid4.dataset.splitR = spPane() ? spTf() : ''; if (spPane()) { setTimeout(() => { const R = spPane(); if (R) R.fit(); if (SP.sync.range || SP.sync.time) spFromLeft(); }, 60); return; } spChart(); const k = spSym(), tf = spTf(), I = INSTRUMENTS[k], key = `${k}|${tf}`; if (!I || !SP.series) return;
     const T = SPTFS.find((t) => t.id === tf); document.getElementById('ms-sp-t').textContent = `${I.label} · ${T ? T.label : tf}`;
@@ -7966,6 +7986,7 @@ function msNextSetup(bars, A) {
       const series = chart.addCandlestickSeries({ ...candleCols(), priceLineStyle: LW.LineStyle.Dotted });
       const vol = chart.addHistogramSeries({ priceScaleId: 'mmv', priceFormat: { type: 'volume' }, lastValueVisible: false, priceLineVisible: false }); chart.priceScale('mmv').applyOptions({ scaleMargins: { top: 0.86, bottom: 0 }, visible: false });
       const C = { i, cell, el, chart, series, vol, bars: [], key: '', at: 0 }; MM.ch.push(C);
+      C.lg = window.msFreeLegend({ el, chart, bars: () => C.bars, fmt: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST), sec: () => (SPTFS.find((t) => t.id === MM.cells[i].tf) || TFS[2]).sec, TZ });
       cell.querySelector('.mm-k').addEventListener('change', (e) => { MM.cells[i].k = e.target.value; mmSave(); mmLoad(C); });
       cell.querySelector('.mm-tf').addEventListener('change', (e) => { MM.cells[i].tf = e.target.value; mmSave(); mmLoad(C); });
       if (window.msCharts) window.msCharts.add({ id: 'mm' + i, el, chart, series, bars: () => C.bars, sec: () => (SPTFS.find((t) => t.id === MM.cells[i].tf) || TFS[2]).sec, market: () => MM.cells[i].k, TZ, dec: () => (INSTRUMENTS[MM.cells[i].k] || INST).dec ?? 2, fmt: (v) => fmtI(v, INSTRUMENTS[MM.cells[i].k] || INST), visible: () => MM.on && i < MM.n && !!el.offsetParent }); }
@@ -7979,7 +8000,7 @@ function msNextSetup(bars, A) {
     try { const r = await spFetch(T, I, 500); if (C.key !== key) return; if (!r || !r.bars || !r.bars.length) { C.cell.querySelector('.mm-src').textContent = 'no data for this timeframe'; return; }
       mmSet(C, r.bars, true); C.cell.querySelector('.mm-src').textContent = r.src || ''; requestAnimationFrame(() => tvView(C.chart, C.bars.length)); } catch (e) { if (C.key === key) C.cell.querySelector('.mm-src').textContent = 'no data'; } }
   function mmSet(C, raw, all) { const bars = raw.map((b) => ({ time: b.time + TZ, open: +b.open, high: +b.high, low: +b.low, close: +b.close, volume: +b.volume || 0 })); const vols = raw.map((b, i) => ({ time: b.time + TZ, value: +b.volume || 0, color: window.msChartLight && window.msChartLight() ? (+b.close >= +b.open ? 'rgba(19,23,34,.12)' : 'rgba(19,23,34,.28)') : +b.close >= +b.open ? 'rgba(8,153,129,.35)' : 'rgba(242,54,69,.35)' }));   // 27 Nov 2026: the panes' volume colours (grey on a paper chart)
-    if (all) { C.bars = bars; C.series.setData(bars); C.vol.setData(vols); }
+    if (all) { C.bars = bars; C.series.setData(bars); C.vol.setData(vols); if (C.lg) C.lg.refresh(); }
     else bars.forEach((x, j) => { const L = C.bars[C.bars.length - 1]; if (L && x.time < L.time) return; if (L && x.time === L.time) C.bars[C.bars.length - 1] = x; else C.bars.push(x); try { C.series.update(x); C.vol.update(vols[j]); } catch (e) {} });
     const L = C.bars[C.bars.length - 1], I = INSTRUMENTS[MM.cells[C.i].k], q = MDQ.q[MM.cells[C.i].k]; if (L) { C.cell.querySelector('.mm-px').textContent = fmtI(L.close, I); const ch = q && isFinite(q.ch) ? q.ch : null, e2 = C.cell.querySelector('.mm-ch'); e2.textContent = ch == null ? '' : `${ch >= 0 ? '+' : '−'}${Math.abs(ch).toFixed(2)}%`; e2.className = 'mm-ch ' + (ch > 0 ? 'up' : ch < 0 ? 'dn' : ''); } }
   window.msMultiView = (on) => { MM.on = on; if (on) { mmBuild(); MM.host.hidden = false; mmLay(); } else if (MM.built) MM.host.hidden = true; };
@@ -16221,6 +16242,8 @@ html[data-role="public"] .ms-ph .ph-tf { pointer-events: none; } html[data-role=
 .mm-ch { font-size: 12px; font-variant-numeric: tabular-nums; } .mm-ch.up { color: var(--buy-ink, var(--buy)); } .mm-ch.dn { color: var(--sell-ink, var(--sell)); }
 .mm-src { font-size: 12px; color: var(--au-ink-3, var(--ink-faint)); white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; }   /* 27 Nov 2026: shrinks instead of running past the cell */
 .mm-chart { height: max(300px, calc((100vh - 300px) / 2)); }
+.mm-chart { position: relative; }   /* the free legend (28 Nov 2026) sits on the chart */
+.mm[data-n="3"] .mm-chart .ch-lg .t, .mm[data-n="4"] .mm-chart .ch-lg .t { display: none; }   /* narrow cells: the time axis names the candle */
 .mm[data-n="2"] .mm-chart, .mm[data-n="3"] .mm-chart { height: max(380px, calc(100vh - 300px)); }
 @media (max-width: 900px) { .mm-g, .mm[data-n="3"] .mm-g { grid-template-columns: minmax(0, 1fr); } .mm-chart, .mm[data-n] .mm-chart { height: min(46vh, 420px); } .mm-src { display: none; } }
 @media (pointer: coarse) { .mm-n button, .mm-h select { min-height: 44px; } }
