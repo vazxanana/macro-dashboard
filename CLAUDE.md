@@ -7456,7 +7456,8 @@ never an edge; anything taken further is re-priced at the broker's quotes first.
 (1.97 billion tries, 2.17 million checks, 2,921 results, 2 leads) is `auto-3-final.json` and its worker files are council-data
 `research/auto-3/`. `engine.mjs` `VERSION` is `auto-4`; the worker draws `genome4` / `simulate4` (auto-1/2/3 code stays exported for
 the desks and studies that import it). A rule now has a working timeframe (`WORK4`: M15, M30, H1, H4; `loadSet` builds them from M15
-since 2020 with `build`, UTC aligned, a candle kept when half its finer candles are there; D1 = the UTC day), the auto-3 triggers on
+since 2020 with `build`, UTC aligned, a candle kept when half its finer candles are there; D1 = the UTC day), the auto-3 triggers or a CHoCH
+(`K4`; amendment of the same day, owner: "And choch": the market-structure workers' `struct`, 2-8 candles a side, followed or faded) on
 it, an optional higher-timeframe zone (`ctx`: the newest standing engulf zone, or failed zone, of the trade's side on M30 / H1 / H4 /
 D1, read through `mapUp` = only higher candles closed by the working candle's close; `zones()` now also returns `st`, the newest
 standing zone of each side per candle), an entry (`mkt`, `lim` k x ATR behind the close, `mid` the signal candle's middle; a limit

@@ -257,6 +257,9 @@ export const groupOf = (g) => [g.mk, g.trig.map((t) => t.kind + (t.follow === un
 // ─── auto-4 (28 Nov 2026, PREREGISTRATION.md "Version auto-4"): timeframes, higher-timeframe zones, entry types, stop modes ───
 export const TF4 = { '15m': 900, '30m': 1800, '1h': 3600, '4h': 14400, '1d': 86400 }, WORK4 = ['15m', '30m', '1h', '4h'], UP4 = ['30m', '1h', '4h', '1d'];
 export const SPACE4 = { ctxLife: [12, 24, 48], k: [0.25, 0.5], wait: [3, 6, 12] };
+// the amendment of 28 Nov 2026 (owner: "And choch"): a change of character on the working timeframe, followed or faded
+export const K4 = [...K2, 'choch'];
+const trigger4 = (r, kind) => kind === 'choch' ? { kind, P: pick(r, SPACE2.P), follow: r() < 0.5 } : trigger2(r, kind);
 // UTC-aligned candles of `sec` from finer ones; a candle is kept only when at least half of its finer candles are there
 export function build(fine, fineSec, sec) {
   const need = Math.max(1, Math.floor(sec / fineSec / 2)), out = []; let cur = null;
@@ -292,11 +295,12 @@ export function mapUp(Dw, Dh) { return cache(Dw, 'up' + Dh.tf, () => { const o =
   for (let i = 0; i < Dw.n; i++) { const end = Dw.t[i] + Dw.sec; while (k + 1 < Dh.n && Dh.t[k + 1] + Dh.sec <= end) k++; o[i] = k; } return o; }); }
 export function genome4(r, worker) {
   const g = genome2(r, worker); g.tf = pick(r, WORK4);
+  g.trig = [trigger4(r, pick(r, K4))]; if (r() < 0.5) { const k = pick(r, K4); if (k !== g.trig[0].kind) g.trig.push(trigger4(r, k)); }
   if (r() < 0.5) { const ups = UP4.filter((u) => TF4[u] > TF4[g.tf]); g.ctx = { tf: pick(r, ups), kind: pick(r, ['zone', 'ef']), life: pick(r, SPACE4.ctxLife) }; } else g.ctx = null;
   const e = pick(r, ['mkt', 'mkt', 'lim', 'mid']); g.entry = e === 'mkt' ? { kind: e } : { kind: e, k: e === 'lim' ? pick(r, SPACE4.k) : undefined, wait: pick(r, SPACE4.wait) };
   g.stopMode = r() < 0.7 ? 'atr' : 'cdl'; return g;
 }
-export const group4 = (g) => [g.mk, g.tf, g.trig.map((t) => t.kind + (t.life ? t.life : '')).join('&'), g.ctx ? g.ctx.tf + g.ctx.kind + g.ctx.life : 'noctx',
+export const group4 = (g) => [g.mk, g.tf, g.trig.map((t) => t.kind + (t.life ? t.life : '') + (t.P ? t.P + (t.follow ? '+' : '-') : '')).join('&'), g.ctx ? g.ctx.tf + g.ctx.kind + g.ctx.life : 'noctx',
   g.entry.kind + (g.entry.k ?? '') + (g.entry.wait ?? ''), g.stopMode, g.side, g.trend, g.stopMode === 'atr' ? g.stop : '', g.rr].join('|');
 // is bar i of the working timeframe inside the higher timeframe's standing zone of side s (zones of candles closed by bar i's close)
 export function ctxOk(set, D, g, i, s) {

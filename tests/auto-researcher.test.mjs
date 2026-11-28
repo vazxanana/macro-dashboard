@@ -160,8 +160,11 @@ test('auto-4: timeframes built from M15 (half-filled rule, UTC aligned), higher 
   const W = set['15m'];
   for (const up of ['1h', '4h', '1d']) { const m = E.mapUp(W, set[up]); for (let i = 500; i < 3000; i += 37) { const k = m[i]; if (k < 0) continue; assert.ok(set[up].t[k] + set[up].sec <= W.t[i] + W.sec); if (k + 1 < set[up].n) assert.ok(set[up].t[k + 1] + set[up].sec > W.t[i] + W.sec); } }
   const r = E.rng(4);
-  for (let i = 0; i < 2000; i++) { const g = E.genome4(r, 1 + (i % 12)); assert.ok(E.WORK4.includes(g.tf)); assert.ok(g.stop > 0); assert.ok(['atr', 'cdl'].includes(g.stopMode)); assert.ok(['mkt', 'lim', 'mid'].includes(g.entry.kind));
+  let ch = 0; for (let i = 0; i < 2000; i++) { const g = E.genome4(r, 1 + (i % 12)); assert.ok(E.WORK4.includes(g.tf)); for (const t of g.trig) { assert.ok(E.K4.includes(t.kind)); if (t.kind === 'choch') { ch++; assert.ok(t.P > 0 && typeof t.follow === 'boolean'); } } assert.ok(g.stop > 0); assert.ok(['atr', 'cdl'].includes(g.stopMode)); assert.ok(['mkt', 'lim', 'mid'].includes(g.entry.kind));
     if (g.ctx) assert.ok(E.TF4[g.ctx.tf] > E.TF4[g.tf]); assert.equal(typeof E.group4(g), 'string'); }
+  assert.ok(ch > 200, 'CHoCH rules drawn: ' + ch);
+  // a CHoCH signal is a break against the structure, known from closed candles only
+  { const S = E.struct(W, 3); let k = 0; for (let i = 300; i < W.n && k < 30; i++) { const q = E.sig(W, { kind: 'choch', P: 3, follow: true }, i); if (q) { assert.equal(S.kd[i], 2); assert.equal(q, S.bk[i]); k++; } } assert.equal(k, 30); }
   const src = fs.readFileSync(new URL('../research/edge/auto-researcher/PREREGISTRATION.md', import.meta.url), 'utf8'); assert.match(src, /Version auto-4/);
 });
 test('auto-4: no look-ahead: trades over a window do not change when every later candle is changed', () => {
