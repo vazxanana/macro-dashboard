@@ -245,8 +245,9 @@ html:root body ::selection { background: color-mix(in srgb, var(--au-accent) 30%
 /* phones: the page switch names where you are (it was five unlabelled dots); the other places stay dots.
    The side pages give the wordmark's letters up for it; the mark stays and keeps the link's name. */
 @media (max-width: 760px) {
-  html:root body:not(:has(.top-actions)) .hdr-sw a.on span { display: inline !important; }
-  html:root body:not(:has(.top-actions)) .hdr-sw a.on { padding: 0 12px 0 10px; }
+  /* Not on ChronosTrade and the Academy: their headers hold more and the label pushed them 18-26 px past a 390 px phone. */
+  html:root body:not(:has(.top-actions)) .hdr-sw a.on:not(.hdr-ct):not([href*="academy"]) span { display: inline !important; }
+  html:root body:not(:has(.top-actions)) .hdr-sw a.on:not(.hdr-ct):not([href*="academy"]) { padding: 0 12px 0 10px; }
 }
 @media (max-width: 480px) {
   html:root body .brand :is(.wm-a, .wm-d) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

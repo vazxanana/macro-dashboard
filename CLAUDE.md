@@ -7533,7 +7533,7 @@ Council, the ICT desk, Equinox and the Macro desk at 1440 and 390 px.
   ends (a fixed child would otherwise find a new containing block). Nothing loops; none of it with reduced motion.
 - One focus ring everywhere (2 px accent); rows that open something have a pointer; tabular figures on numbers; tab rows that
   scroll sideways on a phone (Equinox, the Council's tabs, the desk switch) fade at the far edge with 28 px of padding.
-- **Phone page switch**: the side pages (Equinox, Macro desk, ChronosTrade, Academy, Edge lab) name the page you are on beside
+- **Phone page switch**: the side pages (Equinox, Macro desk, Edge lab; not ChronosTrade or the Academy, whose headers have no room) name the page you are on beside
   the dots (the wordmark's letters give way under 480 px; the mark and the link's name stay). The Desk keeps dots: its header
   has no room. Found on the way: the Desk's account button ran 22 px off a 390 px phone (12 px at 360) since Academy and Equinox
   joined the switch; search goes to the palette / More from 400 px down and the header's sides and dots are tighter under 380 px
