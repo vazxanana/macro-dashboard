@@ -1,5 +1,5 @@
 {
- "at": "2026-11-28T02:35:03.000Z",
+ "at": "2026-11-28T02:49:49.000Z",
  "status": "warn",
  "feeds": {
   "oanda": {
@@ -83,7 +83,7 @@
      "sym": "XBTUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-28T02:35:00.000Z",
+     "last": "2026-11-28T02:45:00.000Z",
      "staleMin": 0,
      "maxJump": 3.17,
      "clipped": 0,
@@ -94,7 +94,7 @@
      "sym": "ETHUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-28T02:35:00.000Z",
+     "last": "2026-11-28T02:45:00.000Z",
      "staleMin": 0,
      "maxJump": 3.3,
      "clipped": 0,
@@ -105,7 +105,7 @@
      "sym": "SOLUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-28T02:35:00.000Z",
+     "last": "2026-11-28T02:45:00.000Z",
      "staleMin": 0,
      "maxJump": 2.65,
      "clipped": 0,
@@ -116,7 +116,7 @@
      "sym": "XRPUSD",
      "status": "ok",
      "n": 721,
-     "last": "2026-11-28T02:35:00.000Z",
+     "last": "2026-11-28T02:45:00.000Z",
      "staleMin": 0,
      "maxJump": 2.27,
      "clipped": 0,
@@ -236,13 +236,13 @@
     "ctrader/account.json": {
      "label": "cTrader demo account (ctrader/account.json)",
      "status": "ok",
-     "ageMin": 3,
+     "ageMin": 4,
      "issues": []
     },
     "ctrader/accounts.json": {
      "label": "cTrader demo accounts (ctrader/accounts.json)",
      "status": "ok",
-     "ageMin": 3,
+     "ageMin": 4,
      "issues": []
     },
     "ctrader/mirror-10152144.json": {
@@ -294,7 +294,7 @@
     "ctrader/symbols.json": {
      "label": "cTrader symbol specs (ctrader/symbols.json)",
      "status": "ok",
-     "ageMin": 13,
+     "ageMin": 15,
      "issues": [
       {
        "kind": "source",
@@ -391,7 +391,7 @@
     "macro/daily-report.json": {
      "label": "Daily reports (macro/daily-report.json)",
      "status": "ok",
-     "ageMin": 1227,
+     "ageMin": 1242,
      "issues": []
     },
     "macro/history.json": {
@@ -412,7 +412,7 @@
     "research/trade-review.json": {
      "label": "Trade review (research/trade-review.json)",
      "status": "ok",
-     "ageMin": 0,
+     "ageMin": 15,
      "issues": []
     },
     "mosha/desk.json": {
@@ -524,7 +524,7 @@
     "coach.json": {
      "label": "Coach (daily review + 6-hourly decay) (coach.json)",
      "status": "ok",
-     "ageMin": 154,
+     "ageMin": 168,
      "issues": []
     },
     "digest.json": {
@@ -534,38 +534,32 @@
     },
     "watchdog.json": {
      "label": "Loop watchdog (watchdog.json)",
-     "status": "warn",
-     "ageMin": 191,
-     "issues": [
-      {
-       "kind": "stale",
-       "sev": "warn",
-       "detail": "not updated for 3.2 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops"
-      }
-     ]
+     "status": "ok",
+     "ageMin": 14,
+     "issues": []
     },
     "backtest.json": {
      "label": "Daily replay (backtest.json)",
      "status": "ok",
-     "ageMin": 825,
+     "ageMin": 840,
      "issues": []
     },
     "research/fidelity.json": {
      "label": "Replay fidelity check (research/fidelity.json)",
      "status": "ok",
-     "ageMin": 825,
+     "ageMin": 840,
      "issues": []
     },
     "research/spotcheck.json": {
      "label": "Feed spot-check (research/spotcheck.json)",
      "status": "ok",
-     "ageMin": 825,
+     "ageMin": 840,
      "issues": []
     },
     "research/robustness.json": {
      "label": "Robustness verdicts (research/robustness.json)",
      "status": "ok",
-     "ageMin": 766,
+     "ageMin": 781,
      "issues": []
     },
     "research/ledger.json": {
@@ -586,13 +580,13 @@
     "ict/replay.json": {
      "label": "ICT replay (ict/replay.json)",
      "status": "ok",
-     "ageMin": 576,
+     "ageMin": 590,
      "issues": []
     },
     "research/daily/_index.json": {
      "label": "Daily candle cache (research/daily/_index.json)",
      "status": "ok",
-     "ageMin": 9573,
+     "ageMin": 9588,
      "issues": [
       {
        "kind": "stale",
@@ -630,10 +624,10 @@
    }
   }
  },
- "summary": "Council data files: Trade records (trades.json) range, cTrader mirror 155 (ctrader/mirror-155.json) stale/source, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale, Loop watchdog (watchdog.json) stale, Coach AI review (reviews/latest.md) stale",
+ "summary": "Council data files: Trade records (trades.json) range, cTrader mirror 155 (ctrader/mirror-155.json) stale/source, Macro forecast (macro/forecast.json) input/source, COT positioning (macro/cot.json) stale, Coach AI review (reviews/latest.md) stale",
  "brief": {
   "status": "warn",
-  "line": "8 warnings: Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry tha",
+  "line": "7 warnings: Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry tha",
   "bad": [],
   "warn": [
    "Trade records (trades.json): 1 shadow trade with impossible levels (audusd-position-1793601653: stop 0.7136829 is further from the entry than the opening risk 0.011773)",
@@ -641,7 +635,6 @@
    "cTrader mirror 155 (ctrader/mirror-155.json): status: refused: CTRADER_ACCOUNT_ID not found for this token",
    "Macro forecast (macro/forecast.json): next week's calendar failed (HTTP 404): the 1-5 day playbook misses Monday's releases",
    "COT positioning (macro/cot.json): newest CFTC report is for 2026-11-17 (11 days ago; normally 3-10)",
-   "Loop watchdog (watchdog.json): not updated for 3.2 h (expected GitHub cron :11/:41 + each loop hand-over; flag after 3.0 h): while it is down nobody is alerted if the council loop stops",
    "Coach AI review (reviews/latest.md): newest daily review 2026-11-13 (8 business days ago)",
    "Coach AI review (reviews/latest.md): newest weekly Analyst brief analysis/2026-11-09.md is 19 days old (Mondays)"
   ],
