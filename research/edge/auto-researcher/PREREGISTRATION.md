@@ -155,3 +155,36 @@ The same as `auto-2`: about one rule in forty clears the result bar with no edge
 noise), and 2021 to now has already been read by `auto-1`, `auto-2` and the Engulfing desks' studies, so none of it is a clean
 holdout. A result is a list to look through, never an edge and never evidence by itself; anything taken further is re-priced at
 the broker's own quotes first.
+
+## Version auto-4: engulf and engulf failure across timeframes, higher-timeframe zones and entry types (28 Nov 2026)
+
+Owner, 28 Nov 2026: "Keep researching and do many combinations entry eg ef timeframe etc". Written and committed alone before
+the engine changes. `auto-3` stops here and is kept: its worker files are copied to council-data `research/auto-3/` and its last
+report is committed as `auto-3-final.json`; nothing of it is counted in `auto-4`.
+
+**What a rule is now** (every part drawn at random, seeded per worker and lane):
+
+- **Working timeframe** `tf`: M15, M30, H1 or H4 (M30, H1 and H4 built from the same candles as M15: UTC-aligned, a candle kept
+  only when at least half of its finer candles are there; H4 starts at 00, 04, 08 … UTC).
+- **Triggers** on that timeframe: one, or two that agree on the same candle, of `eg`, `egr`, `ef`, `efr` exactly as in `auto-3`
+  (zone life 12 / 24 / 48 / 96 candles of the working timeframe).
+- **Higher-timeframe zone** (half the rules, else none): one of the timeframes above the working one (M30, H1, H4 or D1; D1 = the
+  UTC day), kind `zone` = the newest engulf zone of the trade's side still standing on that timeframe, or `ef` = the newest failed
+  zone still serving the trade's side; life 12 / 24 / 48 candles of that timeframe. The working candle must trade into it. Only
+  higher-timeframe candles CLOSED by the working candle's close are read.
+- **Entry**: `mkt` at the next open (as before); `lim` = a limit `k` x ATR(14) behind the signal close (k 0.25 / 0.5); `mid` = a
+  limit at the middle of the signal candle. A limit lives 3 / 6 / 12 candles; a candle opening through it fills at its open; on
+  the fill candle only the stop counts (never the target).
+- **Stop**: `atr` = 0.5 / 0.75 / 1 / 1.5 / 2 / 3 x ATR(14) from the fill, or `cdl` = past the signal candle's far extreme by 0.1 x
+  ATR (a fill already past that level is no trade). Target 0.5-6R or none, time limit in candles of the working timeframe, the
+  filters (entry hours, weekdays, 200-candle average, volatility) and the costs as in `auto-3`.
+- Group key: market, timeframe, triggers, the higher-timeframe zone, entry, stop mode, side, trend, stop size, target.
+
+**Windows, bars, leads**: unchanged from `auto-3` (search 2021-2023, check 2024 to now once per group, 2021-now; a result = t >= 1
+in all three; a lead = check n >= 100, t >= 2 and Holm p < 0.05 over every check look made in `auto-4`). Markets: the ten and the
+Nasdaq 100 before costs; worker 10 Nasdaq only.
+
+**What a result is worth, said before any is seen**: the space is about a hundred times larger than `auto-3`'s, so luck finds
+more: about one rule in forty clears the result bar with no edge, and the lead bar's Holm count grows with every check. 2021 to
+now has been read by every earlier version and the desks; none of it is a clean holdout. A result is a list to look through; a lead
+is re-priced at the broker's own quotes, then judged forward. Never an edge on this file alone.
