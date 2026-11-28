@@ -7435,6 +7435,15 @@ commission (0.000045 a round trip) and swap on a short (1.007 pips a night). **P
 market, sells only: a candidate for a forward record, never an edge. Nothing live changed. The researcher was paused for the run
 (owner: "pause the researcher") and restarted after it. Test: `tests/eurjpy-egr-exec.test.mjs`.
 
+**Its forward record** (28 Nov 2026, owner: "Nice keep going"): `research/edge/eurjpy-egr-forward/` (PREREGISTRATION.md pushed
+alone first; `run.mjs baseline|fetch|run`). The same orders (`eurjpy-egr-exec/orders.mjs` `orders(D, G)`) on OANDA mid H1 read
+from 2025-06-01, filled from 2026-11-30 and counted once all 24 hold candles are on file; cost = the engine's round trip + the
+demo's commission + the short's swap (frozen); bands from the exec study's 106 window orders on mid (gated n 106, mid +0.364R;
+net mean +0.320R). Readings and checkpoints as `gold-vol-breakout-forward` (too few under 20, 120 / 240; "confirmed" also needs the
+total at twice the cost above zero). `vb-forward.yml` writes council-data `research/forward/eurjpy-egr.json`; the Edge lab's
+Forward records card has its row. About three trades a month: 20 take half a year. On the fetched H1 the 2026 orders match the
+cached ones 28 of 28 (one extra order on a thin hour). Nothing trades. Test: `tests/eurjpy-egr-forward.test.mjs`.
+
 ## The auto-researcher's USD/JPY morning breakout at the broker's own ticks (26 Nov 2026, owner: "usdjpy run")
 `research/edge/usdjpy-brk-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`, MEANING.md, RESULT.md, result.json). The near-lead of auto-1 (USD/JPY: an H1 close above the previous 10 highs and above the 200-hour average, bought at the next open at 07-12 UTC on a Tuesday, Wednesday or Thursday; stop 3 x ATR(14), 3R, out after 8 H1 candles; Holm p 0.067, so not a lead by the researcher's rule), 131 orders 2023-12 to 2026-11, filled at the demo broker's ask and closed at its bid (tick probe tags `jpyb-entry`, `jpyb-dead`, `jpyb-fills-1`). **PASS**: +0.250R a trade after commission (n 131, month t 3.31), equal to the mid-candle +0.252R; every order had an entry quote, no exit unresolved; 107 time exits (+0.50R), 23 stops, 1 target; 2024 +0.32R, 2025 +0.24R, 2026 +0.20R. The cost is not what it rests on (a stop of about 54 pips, never open in the rollover). **Not answered by the pass**: found on these years out of about 554 million tries; the weekday filter may be luck (Mon + Fri 0.000R, every weekday +0.129R on the search data); buys only in a rising USD/JPY; it overlaps the USD/JPY breakout of the day. A candidate for a forward paper / demo record, never an edge; no variant on these years. Nothing live changed. Test: `tests/usdjpy-brk-exec.test.mjs`.
 
