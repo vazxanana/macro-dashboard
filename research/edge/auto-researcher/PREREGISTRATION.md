@@ -188,3 +188,9 @@ Nasdaq 100 before costs; worker 10 Nasdaq only.
 more: about one rule in forty clears the result bar with no edge, and the lead bar's Holm count grows with every check. 2021 to
 now has been read by every earlier version and the desks; none of it is a clean holdout. A result is a list to look through; a lead
 is re-priced at the broker's own quotes, then judged forward. Never an edge on this file alone.
+
+**Amendment, 28 Nov 2026, before any auto-4 result was read** (owner: "And choch"; the local trial burst started earlier was stopped
+and its file deleted unread): the trigger list also takes `choch`, a change of character on the working timeframe: a close beyond
+the last unbroken swing (2 / 3 / 5 / 8 candles a side, known only that many candles later) AGAINST the structure the breaks had
+made (the market-structure workers' `struct`). Followed (trade the new direction) or faded, drawn at random. It can stand alone or
+agree with an engulf trigger on the same candle, with every other part of a rule as above. Nothing else changes.
