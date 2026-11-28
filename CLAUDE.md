@@ -7451,6 +7451,22 @@ back out on the failure's side; `zones()` returns it, causal like the others); `
 the same engulf rules now. 2021 to now has been read by every earlier version and the desks: a result is a list to look through,
 never an edge; anything taken further is re-priced at the broker's quotes first. Tests: `tests/auto-researcher.test.mjs`.
 
+## The auto-researcher, version auto-4: engulf and engulf failure across timeframes (28 Nov 2026, owner: "Keep researching and do many combinations entry eg ef timeframe etc")
+`research/edge/auto-researcher/PREREGISTRATION.md` section "Version auto-4" (committed alone first). auto-3 is saved: its last report
+(1.97 billion tries, 2.17 million checks, 2,921 results, 2 leads) is `auto-3-final.json` and its worker files are council-data
+`research/auto-3/`. `engine.mjs` `VERSION` is `auto-4`; the worker draws `genome4` / `simulate4` (auto-1/2/3 code stays exported for
+the desks and studies that import it). A rule now has a working timeframe (`WORK4`: M15, M30, H1, H4; `loadSet` builds them from M15
+since 2020 with `build`, UTC aligned, a candle kept when half its finer candles are there; D1 = the UTC day), the auto-3 triggers on
+it, an optional higher-timeframe zone (`ctx`: the newest standing engulf zone, or failed zone, of the trade's side on M30 / H1 / H4 /
+D1, read through `mapUp` = only higher candles closed by the working candle's close; `zones()` now also returns `st`, the newest
+standing zone of each side per candle), an entry (`mkt`, `lim` k x ATR behind the close, `mid` the signal candle's middle; a limit
+lives 3 / 6 / 12 candles, a candle opening through it fills at its open, on the fill candle only the stop counts) and a stop mode
+(`atr`, or `cdl` past the signal candle's far extreme by 0.1 ATR). Windows, bars and leads as auto-3. The runners fetch M15 from
+2020 (`fetchTf`, cache `<mk>-15m.json.gz`; the workflow's lanes wait for those files). The space is about a hundred times larger:
+more luck clears the result bar; a result is a list to look through, a lead goes to the broker's quotes first. Takes effect for the
+workers once this is on main. Tests: `tests/auto-researcher.test.mjs` (three auto-4 tests: the timeframes, a cut test with every
+later candle changed, limit entries).
+
 ## The researcher's EUR/JPY engulf-retest sell at the broker's own ticks (28 Nov 2026, owner: "yes price the eurjpy sell")
 `research/edge/eurjpy-egr-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`,
 MEANING.md, RESULT.md, result.json; probe tags `ejegr-entry`, `ejegr-dead`, `ejegr-fills-1..10`). The auto-3 lead

@@ -8,7 +8,7 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import * as K from '../_lib/edgekit.mjs';
 
-export const VERSION = 'auto-3';
+export const VERSION = 'auto-4';
 // auto-2 (26 Nov 2026, owner: "focus only in EG EF BO ... results from 2019 till today t above 1 is okey"; PREREGISTRATION.md, "Version auto-2"). auto-1's
 // windows, bars and families below are kept for the studies and desks that import them; the worker (`run`) draws auto-2 rules only.
 export const WIN2 = { A: [Date.UTC(2021, 0, 1) / 1000, Date.UTC(2024, 0, 1) / 1000], C: [Date.UTC(2024, 0, 1) / 1000, Infinity] };   // auto-3 (27 Nov 2026): 2021 to now
@@ -154,6 +154,8 @@ export function egAt(D, i) {
 // (the engulf's direction). ef[i] = bar i is the first close through the far side (the direction of the failure). Two opposite signals on one bar = none.
 export function zones(D, life) { return cache(D, 'zn' + life, () => {
   const n = D.n, egr = new Int8Array(n), ef = new Int8Array(n), efr = new Int8Array(n); let live = [], dead = [];
+  // auto-4: the newest standing zone of each side after bar i (Z = engulf zone, F = failed zone serving that side; b = buy, s = sell)
+  const st = {}; for (const k of ['ZbT', 'ZbB', 'ZsT', 'ZsB', 'FbT', 'FbB', 'FsT', 'FsB']) st[k] = new Float64Array(n).fill(NaN);
   for (let i = 4; i < n; i++) {
     let r = 0, f = 0, rx = false, fx = false, q = 0, qx = false; const keep = [], born = [];
     for (const z of live) {
@@ -173,8 +175,10 @@ export function zones(D, life) { return cache(D, 'zn' + life, () => {
     dead = keepD.concat(born);
     live = keep; egr[i] = rx ? 0 : r; ef[i] = fx ? 0 : f; efr[i] = qx ? 0 : q;
     const [d, b] = egAt(D, i); if (d) live.push({ d, top: D.h[b], bot: D.l[b], born: i, hit: false });
+    for (const z of live) { if (z.d > 0) { st.ZbT[i] = z.top; st.ZbB[i] = z.bot; } else { st.ZsT[i] = z.top; st.ZsB[i] = z.bot; } }
+    for (const z of dead) { if (z.d > 0) { st.FbT[i] = z.top; st.FbB[i] = z.bot; } else { st.FsT[i] = z.top; st.FsB[i] = z.bot; } }
   }
-  return { egr, ef, efr }; }); }
+  return { egr, ef, efr, st }; }); }
 // auto-2 rules: one trigger of K2, or two that agree on the same candle
 function trigger2(r, kind) { return kind === 'eg' ? { kind, follow: true } : kind === 'bo' ? { kind, P: pick(r, SPACE2.P), bo: pick(r, SPACE2.bo) } : { kind, life: pick(r, SPACE2.life) }; }
 export function genome2(r, worker) {
@@ -250,25 +254,111 @@ export function summary(o) {
 const pOne = (t) => { const z = Math.abs(t) / Math.SQRT2, k = 1 / (1 + 0.3275911 * z), erf = 1 - (((((1.061405429 * k - 1.453152027) * k) + 1.421413741) * k - 0.284496736) * k + 0.254829592) * k * Math.exp(-z * z), p = 0.5 * (1 - erf); return t > 0 ? p : 1 - p; };
 export const groupOf = (g) => [g.mk, g.trig.map((t) => t.kind + (t.follow === undefined ? '' : t.follow ? '+' : '-')).join('&'), g.side].join('|');
 
+// ─── auto-4 (28 Nov 2026, PREREGISTRATION.md "Version auto-4"): timeframes, higher-timeframe zones, entry types, stop modes ───
+export const TF4 = { '15m': 900, '30m': 1800, '1h': 3600, '4h': 14400, '1d': 86400 }, WORK4 = ['15m', '30m', '1h', '4h'], UP4 = ['30m', '1h', '4h', '1d'];
+export const SPACE4 = { ctxLife: [12, 24, 48], k: [0.25, 0.5], wait: [3, 6, 12] };
+// UTC-aligned candles of `sec` from finer ones; a candle is kept only when at least half of its finer candles are there
+export function build(fine, fineSec, sec) {
+  const need = Math.max(1, Math.floor(sec / fineSec / 2)), out = []; let cur = null;
+  for (const b of fine) { const k = Math.floor(b.t / sec) * sec;
+    if (!cur || cur.t !== k) { if (cur && cur.n >= need) out.push(cur); cur = { t: k, o: b.o, h: b.h, l: b.l, c: b.c, n: 1 }; }
+    else { if (b.h > cur.h) cur.h = b.h; if (b.l < cur.l) cur.l = b.l; cur.c = b.c; cur.n++; } }
+  if (cur && cur.n >= need) out.push(cur); return out.map(({ t, o, h, l, c }) => ({ t, o, h, l, c }));
+}
+async function fetchTf(mk, tf, cacheDir, from) {
+  const f = path.join(cacheDir, `${mk}-${tf}.json.gz`), sec = TF4[tf];
+  if (fs.existsSync(f) && Date.now() - fs.statSync(f).mtimeMs < 20 * 3600e3) return JSON.parse(zlib.gunzipSync(fs.readFileSync(f)));
+  const BASE = process.env.MD_BASE || 'https://aureumdesk.co.uk/md/', now = Math.floor(Date.now() / 1000), map = new Map(), span = 4900 * sec;
+  for (let a = from; a < now; a += span) {
+    for (let tries = 0; tries < 4; tries++) {
+      try { const r = await fetch(`${BASE}bars?sym=${mk}&tf=${tf}&from=${a}&to=${Math.min(a + span, now)}`);
+        if (r.ok) { for (const x of (await r.json()).bars || []) if (x.time + sec <= now) map.set(x.time, { t: x.time, o: x.open, h: x.high, l: x.low, c: x.close }); break; } } catch {}
+      await sleep(1500 * (tries + 1));
+    }
+    await sleep(200);
+  }
+  const rows = [...map.values()].sort((p, q) => p.t - q.t); fs.mkdirSync(cacheDir, { recursive: true }); fs.writeFileSync(f + '.tmp', zlib.gzipSync(JSON.stringify(rows))); fs.renameSync(f + '.tmp', f); return rows;
+}
+// one market on every timeframe, from 2020 (a year of warm-up before the search window)
+export async function loadSet(mk, cacheDir) {
+  const from = UTC(2020); let m15;
+  try { const five = K.load(mk, '5m', { from: '2020-01-01' }); if (five.length > 1000) m15 = build(five, 300, 900); } catch {}
+  if (!m15) m15 = await fetchTf(mk, '15m', cacheDir, from);
+  return setOf(m15, mk);
+}
+export function setOf(m15, mk) { const set = {}; for (const tf of Object.keys(TF4)) { const D = prep(toArrays(tf === '15m' ? m15 : build(m15, 900, TF4[tf])), mk); D.sec = TF4[tf]; D.tf = tf; set[tf] = D; } return set; }
+// for each candle of Dw, the last candle of Dh that has closed by Dw's close (-1 = none)
+export function mapUp(Dw, Dh) { return cache(Dw, 'up' + Dh.tf, () => { const o = new Int32Array(Dw.n).fill(-1); let k = -1;
+  for (let i = 0; i < Dw.n; i++) { const end = Dw.t[i] + Dw.sec; while (k + 1 < Dh.n && Dh.t[k + 1] + Dh.sec <= end) k++; o[i] = k; } return o; }); }
+export function genome4(r, worker) {
+  const g = genome2(r, worker); g.tf = pick(r, WORK4);
+  if (r() < 0.5) { const ups = UP4.filter((u) => TF4[u] > TF4[g.tf]); g.ctx = { tf: pick(r, ups), kind: pick(r, ['zone', 'ef']), life: pick(r, SPACE4.ctxLife) }; } else g.ctx = null;
+  const e = pick(r, ['mkt', 'mkt', 'lim', 'mid']); g.entry = e === 'mkt' ? { kind: e } : { kind: e, k: e === 'lim' ? pick(r, SPACE4.k) : undefined, wait: pick(r, SPACE4.wait) };
+  g.stopMode = r() < 0.7 ? 'atr' : 'cdl'; return g;
+}
+export const group4 = (g) => [g.mk, g.tf, g.trig.map((t) => t.kind + (t.life ? t.life : '')).join('&'), g.ctx ? g.ctx.tf + g.ctx.kind + g.ctx.life : 'noctx',
+  g.entry.kind + (g.entry.k ?? '') + (g.entry.wait ?? ''), g.stopMode, g.side, g.trend, g.stopMode === 'atr' ? g.stop : '', g.rr].join('|');
+// is bar i of the working timeframe inside the higher timeframe's standing zone of side s (zones of candles closed by bar i's close)
+export function ctxOk(set, D, g, i, s) {
+  const H = set[g.ctx.tf], k = mapUp(D, H)[i]; if (k < 0) return false;
+  const S = zones(H, g.ctx.life).st, P = (g.ctx.kind === 'zone' ? 'Z' : 'F') + (s > 0 ? 'b' : 's'), top = S[P + 'T'][k], bot = S[P + 'B'][k];
+  return top === top && D.l[i] <= top && D.h[i] >= bot;
+}
+export function simulate4(set, g, lo, hi, flip = false) {
+  const D = set[g.tf], out = { n: 0, sum: 0, months: new Map(), wins: 0 }, a = atr(D), trendMA = g.trend === 'none' ? null : maOf(D, 200);
+  let free = lo;
+  for (let i = Math.max(lo - 1, 210); i < hi - 1; i++) {
+    if (i + 1 < free) continue;
+    const A = a[i]; if (!(A > 0)) continue;
+    let s = 0; for (const tr of g.trig) { const q = sig(D, tr, i); if (q === 0 || (s !== 0 && q !== s)) { s = 0; break; } s = q; } if (s === 0) continue;
+    if (g.side === 'long' && s < 0 || g.side === 'short' && s > 0) continue;
+    if (trendMA) { const m = trendMA[i]; if (!(m === m)) continue; const up = D.c[i] > m ? 1 : -1; if (g.trend === 'with' ? up !== s : up === s) continue; }
+    if (g.ctx && !ctxOk(set, D, g, i, s)) continue;
+    if (!passes(D, g, i)) continue;
+    const side = flip ? -s : s, cst = D.costRel ? D.costRel * D.c[i] : D.cost;
+    // the fill: next open, or a limit that lives `wait` candles (a candle opening through it fills at its open)
+    let fi = i + 1, fill = D.o[i + 1];
+    if (g.entry.kind !== 'mkt') {
+      const L = g.entry.kind === 'lim' ? D.c[i] - side * g.entry.k * A : (D.h[i] + D.l[i]) / 2; fi = -1;
+      for (let j = i + 1; j <= i + g.entry.wait && j < hi; j++) { if (side > 0 ? D.o[j] <= L : D.o[j] >= L) { fi = j; fill = D.o[j]; break; } if (side > 0 ? D.l[j] <= L : D.h[j] >= L) { fi = j; fill = L; break; } }
+      if (fi < 0) { free = i + 1 + g.entry.wait; continue; }
+    }
+    const stop = g.stopMode === 'atr' ? fill - side * g.stop * A : (side > 0 ? D.l[i] - 0.1 * A : D.h[i] + 0.1 * A), dist = (fill - stop) * side;
+    if (!(dist > 0) || cst / dist > 0.5) { free = fi + 1; continue; }                 // a stop smaller than twice the cost (or already passed) is no trade
+    const tgt = g.rr > 0 ? fill + side * g.rr * dist : null;
+    let ex = null, j = fi;
+    if (side > 0 ? D.l[fi] <= stop : D.h[fi] >= stop) ex = stop;   // on the fill candle only the stop counts (never the target)
+    else for (j = fi + 1; j <= fi + g.hold && j < D.n; j++) {
+      if (side > 0 ? D.o[j] <= stop : D.o[j] >= stop) { ex = D.o[j]; break; }
+      if (side > 0 ? D.l[j] <= stop : D.h[j] >= stop) { ex = stop; break; }
+      if (tgt != null && (side > 0 ? D.h[j] >= tgt : D.l[j] <= tgt)) { ex = tgt; break; }
+    }
+    if (ex == null) { j = Math.min(fi + g.hold, D.n - 1); ex = D.c[j]; }
+    const R = ((ex - fill) * side - cst) / dist; free = Math.min(j, D.n - 1) + 1;
+    out.n++; out.sum += R; if (R > 0) out.wins++; out.months.set(D.month[fi], (out.months.get(D.month[fi]) || 0) + R);
+  }
+  return out;
+}
+
 // ─── the worker ───
 export async function run(worker, outDir, minutes, cacheDir) {
   const t0 = Date.now(), LANE = +(process.env.LANE || 0), file = path.join(outDir, `worker-${worker}${LANE ? '-' + LANE : ''}.json`);   // lane 0 = the file as before; lanes 1-3 are extra processes of one worker on the same runner (only the seed and the file differ)
   fs.mkdirSync(outDir, { recursive: true });
   let S = { version: VERSION, worker, started: new Date().toISOString(), tries: 0, survivedA: 0, candidates: 0, cLooks: 0, cPasses: 0, groups: {}, leads: [], looks: [], results: [], chunks: 0 };
   try { const prev = JSON.parse(fs.readFileSync(file, 'utf8')); if (prev.version === VERSION) S = { results: [], ...prev, chunks: prev.chunks + 1 }; } catch {}
-  const MY = worker === NQ_WORKER ? ['nas100'] : MS_MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadMarket(mk, cacheDir); console.log(mk, D[mk].n, 'H1 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
-  const have = MY.filter((m) => D[m] && D[m].n > 5000); if (!have.length) throw new Error('no candles');
+  const MY = worker === NQ_WORKER ? ['nas100'] : MS_MARKETS, D = {}; for (const mk of MY) { try { D[mk] = await loadSet(mk, cacheDir); console.log(mk, D[mk]['15m'].n, 'M15 bars'); } catch (e) { console.log(mk, 'no data', e.message); } }
+  const have = MY.filter((m) => D[m] && D[m]['15m'].n > 20000); if (!have.length) throw new Error('no candles');
   const r = rng(worker * 1000003 + LANE * 104729000 + S.chunks * 7919 + (Date.now() % 100000)), save = () => { S.updated = new Date().toISOString(); fs.writeFileSync(file + '.tmp', JSON.stringify(S, null, 1)); fs.renameSync(file + '.tmp', file); };
   let lastSave = Date.now();
   while (Date.now() - t0 < minutes * 60e3) {
     for (let q = 0; q < 200; q++) {
-      const g = genome2(r, worker); if (!D[g.mk]) continue; const d = D[g.mk]; S.tries++;
-      const sa = summary(simulate(d, g, d.idx2.A[0], d.idx2.A[1]));
+      const g = genome4(r, worker); if (!D[g.mk]) continue; const set = D[g.mk], d = set[g.tf]; S.tries++;
+      const sa = summary(simulate4(set, g, d.idx2.A[0], d.idx2.A[1]));
       if (sa.n < BAR2.A.n || !(sa.mean > 0) || sa.t < BAR2.A.t) continue;
       S.survivedA++;
-      const pl = summary(simulate(d, g, d.idx2.A[0], d.idx2.A[1], true)); if (!(pl.mean < 0)) continue;
-      S.candidates++; const grp = group2(g); if (S.groups[grp]) { S.groups[grp].more++; continue; }
-      const sc = summary(simulate(d, g, d.idx2.C[0], d.idx2.C[1])), all = summary(simulate(d, g, d.idx2.A[0], d.n)); S.cLooks++;
+      const pl = summary(simulate4(set, g, d.idx2.A[0], d.idx2.A[1], true)); if (!(pl.mean < 0)) continue;
+      S.candidates++; const grp = group4(g); if (S.groups[grp]) { S.groups[grp].more++; continue; }
+      const sc = summary(simulate4(set, g, d.idx2.C[0], d.idx2.C[1])), all = summary(simulate4(set, g, d.idx2.A[0], d.n)); S.cLooks++;
       const p = sc.n >= 2 ? pOne(sc.t) : 1, look = { at: new Date().toISOString(), group: grp, g, A: sa, placeboA: pl, C: sc, ALL: all, p: +p.toFixed(5) };
       const pass = resultOk(look); S.groups[grp] = { more: 0, pass }; if (pass) S.cPasses++;
       S.looks.push(look); if (S.looks.length > 300) S.looks.shift();
@@ -299,8 +389,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   if (cmd === 'run') { await run(+a, b, +(c || 300), process.env.RESEARCH_CACHE || path.join(process.env.RUNNER_TEMP || '/tmp', 'auto-cache')); }
   else if (cmd === 'report') { const R = report(a); console.log(JSON.stringify({ ...R, results: R.results.length, leads: R.leads.length, bestLooks: R.results.slice(0, 25).map((l) => [l.group, 'search', l.A.n, l.A.mean, l.A.t, 'check', l.C.n, l.C.mean, l.C.t, 'all', l.ALL.n, l.ALL.mean, l.ALL.t, +l.holm.toFixed(3)]) }, null, 1)); }
   else if (cmd === 'bench') {
-    const d = await loadMarket('xau', '/tmp/auto-cache'), r = rng(1), n = +(b || 300), t0 = Date.now(); let ok = 0;
-    for (let i = 0; i < n; i++) { const g = genome2(r, +a); g.mk = 'xau'; const s = summary(simulate(d, g, d.idx2.A[0], d.idx2.A[1])); if (s.n >= 100) ok++; }
-    console.log(n, 'tries', ((Date.now() - t0) / n).toFixed(1), 'ms each;', ok, 'with 100+ trades;', d.n, 'bars');
+    const set = await loadSet('xau', '/tmp/auto-cache'), r = rng(1), n = +(b || 300), t0 = Date.now(); let ok = 0;
+    for (let i = 0; i < n; i++) { const g = genome4(r, +a); g.mk = 'xau'; const d = set[g.tf], s = summary(simulate4(set, g, d.idx2.A[0], d.idx2.A[1])); if (s.n >= 100) ok++; }
+    console.log(n, 'tries', ((Date.now() - t0) / n).toFixed(1), 'ms each;', ok, 'with 100+ trades;', set['15m'].n, 'M15 bars');
   } else { console.log('run <worker> <outDir> [minutes] | bench <worker> [tries]'); process.exit(1); }
 }

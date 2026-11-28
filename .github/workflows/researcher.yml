@@ -118,8 +118,8 @@ jobs:
             for L0 in 0 1 2 3; do
               L=$(( SHARD * 4 + L0 ))   # shard 0 lanes 0-3, shard 1 lanes 4-7, shard 2 lanes 8-11
               if [ "$L0" != 0 ]; then
-                # the other lanes start once lane 0 has the candle files (up to 15 minutes), so they never read a half-written file
-                n=0; while [ "$(ls "$RESEARCH_CACHE"/*-1h.json.gz 2>/dev/null | wc -l)" -lt "$NEED" ] && [ $n -lt 90 ]; do sleep 10; n=$((n+1)); done
+                # the other lanes start once lane 0 has the candle files (up to 15 minutes; auto-4 reads M15, 28 Nov 2026), so they never read a half-written file
+                n=0; while [ "$(ls "$RESEARCH_CACHE"/*-15m.json.gz 2>/dev/null | wc -l)" -lt "$NEED" ] && [ $n -lt 90 ]; do sleep 10; n=$((n+1)); done
               fi
               LANE=$L node --max-old-space-size=2500 research/edge/auto-researcher/engine.mjs run "$W" data/research/auto 25 > "$RUNNER_TEMP/lane-$L.log" 2>&1 &
             done
