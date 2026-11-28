@@ -255,6 +255,20 @@
     .ms-open { display: inline-block; margin: 10px 0 6px; padding: 10px 18px; border-radius: 6px; background: #2962ff; color: #fff !important; font-weight: 700; font-size: 14px; text-decoration: none; }
     .ms-open:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
     .ms-offline-box { border: 1px solid rgba(240,165,0,.5); background: rgba(240,165,0,.1); border-radius: 6px; padding: 12px 14px; color: var(--ink); font-size: 12px; line-height: 1.6; }
+    /* one quiet line instead of a block on every page (28 Nov 2026, design pass): the reason folds under "Why", the x hides it for the visit */
+    .ms-live.ms-offline .ms-offline-box { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; padding: 6px 6px 6px 14px; border-radius: 999px; font-size: 12.5px; }
+    .ms-live.ms-offline .ms-offline-box.ofl-off { display: none; }
+    .ms-offline-box .ofl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--au-warn, #d99a1e); flex: none; }
+    .ms-offline-box .ofl-short { color: var(--ink-dim, inherit); }
+    .ms-offline-box .ofl-more { display: contents; }
+    .ms-offline-box .ofl-more > summary { cursor: pointer; color: var(--au-accent, var(--accent)); font-weight: 600; list-style: none; padding: 0 4px; }
+    .ms-offline-box .ofl-more > summary::-webkit-details-marker { display: none; }
+    .ms-offline-box .ofl-more[open] { display: block; flex-basis: 100%; order: 9; padding: 4px 8px 6px 0; }
+    .ms-offline-box .ofl-x { margin-left: auto; width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 18px; line-height: 1; cursor: pointer; }
+    .ms-offline-box .ofl-x:hover { background: color-mix(in srgb, currentColor 10%, transparent); }
+    .ms-live.ms-offline .ms-offline-box:has(.ofl-more[open]) { border-radius: 14px; }
+    @media (pointer: coarse) { .ms-offline-box .ofl-x { width: 44px; height: 44px; } .ms-offline-box .ofl-more > summary { padding: 12px 6px; } }
+    @media (max-width: 640px) { .ms-offline-box .ofl-short { display: none; } .ms-live.ms-offline .ms-offline-box { flex-wrap: wrap; padding-top: 0; padding-bottom: 0; } .ms-live.ms-offline .ms-offline-box:has(.ofl-more[open]) { padding-bottom: 8px; } }
     .ms-offline-box code { font-family: var(--mono); font-size: 11px; }
     @media (max-width: 1000px) { .ms-grid4, .ms-td { grid-template-columns: minmax(0, 1fr); } .ms-chart { height: 360px; } .ms-pane.full .ms-chart { height: 480px; } }
     @media (max-width: 520px) { .ms-live { margin: 0 12px 16px; } .ms-right { margin-left: 0; } .ms-legend { position: static; padding: 5px 10px 0; } }
@@ -3495,8 +3509,10 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
 
   <span id="ms-main-start" tabindex="-1"></span>
   <div class="ms-offline-box" role="alert">
-    <b>Live prices couldn't load.</b> The page couldn't reach the price feeds (OANDA through aureumdesk.co.uk, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
-    <div class="ms-note" id="ms-offline-why"></div>
+    <span class="ofl-dot" aria-hidden="true"></span><b>Live prices couldn't load.</b> <span class="ofl-short">Charts wait for the price feeds; everything else works.</span>
+    <details class="ofl-more"><summary>Why</summary>The page couldn't reach the price feeds (OANDA through aureumdesk.co.uk, then Binance and Kraken as backups). Check your connection; some networks block the exchange backups. You can still use <b>Settings → Load CSV</b> with a TradingView export.
+    <div class="ms-note" id="ms-offline-why"></div></details>
+    <button type="button" class="ofl-x" aria-label="Hide this notice" onclick="this.parentNode.classList.add('ofl-off')">&times;</button>
   </div>
 
   <!-- ─── Guest: one H4 gold chart with one trade setup ─── -->
@@ -15387,6 +15403,10 @@ html[data-motion="off"] .ms-live-dot::after, html[data-motion="off"] .g-live i::
 @media (max-width: 760px) { #v-home::before { left: -16px; right: -16px; } }
 .ms-live.app { overflow-x: clip; }
 @media (max-width: 360px) { .top-actions #ms-cmdk-btn { display: none !important; } }
+/* 28 Nov 2026: with five places in the switch the account button ran 22 px off a 390 px phone (12 px at 360): search waits
+   in the palette (Ctrl K) and the More tab from 400 px down, and the header's sides give 6 px each under 380 px */
+@media (max-width: 400px) { .top-actions #ms-cmdk-btn { display: none !important; } }
+@media (max-width: 380px) { header.top { padding-left: 10px !important; padding-right: 10px !important; } header.top .hdr-sw a:not(.on) { padding-left: 5px !important; padding-right: 5px !important; } }
 
 /* Charts toolbar: one order everywhere, most used first. Row 1 the markets, row 2 timeframe | markup | indicators, row 3 the
    context strip (daily range, timeframe alignment), which folds behind "Context" on phones */

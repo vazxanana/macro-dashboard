@@ -7518,3 +7518,23 @@ Faster orders (owner, 27 Nov 2026: "make sure the orders are faster"): council.y
 Gold at 3 % (owner, 27 Nov 2026: "on gold change risk to 3 %", live): rule `live-gold-3` sets `live.goldRisk` 0.03 (`LIVE.maxGold` 3 %): the gold breakout and the gold 8-swing break risk 3 % a trade on the live account; the Nasdaq and USD/JPY rules stay 0.5 %. Then 5 % (owner: "gold change to 5%"): rule `live-gold-5`, `LIVE.maxGold` 5 %.
 Tests: `tests/live-account.test.mjs`.
 **Live account card** (27 Nov 2026, owner: "okey" to a card): `council/live-account.mjs` (council.yml every 2nd round, `timeout 40`) connects through `liveConnect` and sends only TRADER_REQ, RECONCILE_REQ and SYMBOLS_LIST_REQ (no order message, a test reads the file), writing council-data `live/account.json` (balance, the day's loss against the daily stop from `live/day.json`, open positions with stop / target, resting orders, `noStop`; login masked). `/cdata` serves `live/*` to the owner's session only (`api/data.js`; the council-data branch itself is still readable on GitHub while the repository is public). Profile card `#ms-pf-live` (`#ms-lv-css`, `#ms-lv-js`, owner only, read only): balance, today, room before the daily stop, open positions, the live trades of `live/nq.json` + `live/vb.json`. Test: `tests/live-account-card.test.mjs`.
+
+## Design pass: enjoyable to use (28 Nov 2026, owner: "focus in the design, I want it to be enjoyable to use")
+Display only; chart colours untouched (owner, 28 Nov: "Not the colors, just the structure"). Found on screenshots of Home, Charts,
+Council, the ICT desk, Equinox and the Macro desk at 1440 and 390 px.
+- **The price-feed notice** (`.ms-offline-box`, Desk) was a four-line amber block on top of every view whenever the feeds failed.
+  It is one line now ("Live prices couldn't load. Charts wait for the price feeds; everything else works."), the reason folds under
+  "Why" (`details.ofl-more`, the `#ms-offline-why` line inside it), and "×" (`.ofl-x`) hides it for the visit (a class, nothing stored).
+  On a phone only the bold line, Why and × (one row).
+- **Motion and feedback** (`assets/soft.css`, section "Design pass, 28 Nov 2026", every page): a view, an Equinox desk or a Macro
+  desk section rises in when shown (opacity + 6 px, 240 ms, its parts 30 ms apart; NEVER on Charts or the guest page); menus,
+  dialogs and toasts open with a small pop; tabs, switches and buttons give a 4 % press (`scale`, the separate property, so a
+  button placed by its own transform keeps its place). The entrance fills BACKWARDS only, so nothing keeps a transform after it
+  ends (a fixed child would otherwise find a new containing block). Nothing loops; none of it with reduced motion.
+- One focus ring everywhere (2 px accent); rows that open something have a pointer; tabular figures on numbers; tab rows that
+  scroll sideways on a phone (Equinox, the Council's tabs, the desk switch) fade at the far edge with 28 px of padding.
+- **Phone page switch**: the side pages (Equinox, Macro desk, ChronosTrade, Academy, Edge lab) name the page you are on beside
+  the dots (the wordmark's letters give way under 480 px; the mark and the link's name stay). The Desk keeps dots: its header
+  has no room. Found on the way: the Desk's account button ran 22 px off a 390 px phone (12 px at 360) since Academy and Equinox
+  joined the switch; search goes to the palette / More from 400 px down and the header's sides and dots are tighter under 380 px
+  (the account button ends at 350 / 374 / 414 px at 360 / 390 / 430).
