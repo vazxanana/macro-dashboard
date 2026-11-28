@@ -7423,6 +7423,18 @@ back out on the failure's side; `zones()` returns it, causal like the others); `
 the same engulf rules now. 2021 to now has been read by every earlier version and the desks: a result is a list to look through,
 never an edge; anything taken further is re-priced at the broker's quotes first. Tests: `tests/auto-researcher.test.mjs`.
 
+## The researcher's EUR/JPY engulf-retest sell at the broker's own ticks (28 Nov 2026, owner: "yes price the eurjpy sell")
+`research/edge/eurjpy-egr-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`,
+MEANING.md, RESULT.md, result.json; probe tags `ejegr-entry`, `ejegr-dead`, `ejegr-fills-1..10`). The auto-3 lead
+`eurjpy|egr48|short|none|0.75|1.5` (the first return to a standing H1 engulf zone up to 48 candles old that closes back out, sold at
+the next open at 10-15 UTC with the ATR in the top 70 % of its last 500; stop 0.75 x ATR(14), 1.5R, out after 24 H1 candles; gate:
+equal to the engine's `simulate`), 106 orders 2023-12 to 2026-11, filled at the demo broker's bid and closed at its ask, after its
+commission (0.000045 a round trip) and swap on a short (1.007 pips a night). **PASS**: +0.409R a trade after costs (n 106, month t
+4.69; mid +0.364R; every order quoted and resolved; entry spread 0.004R, swap 0.005R). Lead 2 (12-candle zones, 07-18 UTC, out after
+96 candles) beside it: +0.347R (n 176, month t 5.08), the same idea. Found among about 1.1 million looks on these same years, one
+market, sells only: a candidate for a forward record, never an edge. Nothing live changed. The researcher was paused for the run
+(owner: "pause the researcher") and restarted after it. Test: `tests/eurjpy-egr-exec.test.mjs`.
+
 ## The auto-researcher's USD/JPY morning breakout at the broker's own ticks (26 Nov 2026, owner: "usdjpy run")
 `research/edge/usdjpy-brk-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`, MEANING.md, RESULT.md, result.json). The near-lead of auto-1 (USD/JPY: an H1 close above the previous 10 highs and above the 200-hour average, bought at the next open at 07-12 UTC on a Tuesday, Wednesday or Thursday; stop 3 x ATR(14), 3R, out after 8 H1 candles; Holm p 0.067, so not a lead by the researcher's rule), 131 orders 2023-12 to 2026-11, filled at the demo broker's ask and closed at its bid (tick probe tags `jpyb-entry`, `jpyb-dead`, `jpyb-fills-1`). **PASS**: +0.250R a trade after commission (n 131, month t 3.31), equal to the mid-candle +0.252R; every order had an entry quote, no exit unresolved; 107 time exits (+0.50R), 23 stops, 1 target; 2024 +0.32R, 2025 +0.24R, 2026 +0.20R. The cost is not what it rests on (a stop of about 54 pips, never open in the rollover). **Not answered by the pass**: found on these years out of about 554 million tries; the weekday filter may be luck (Mon + Fri 0.000R, every weekday +0.129R on the search data); buys only in a rising USD/JPY; it overlaps the USD/JPY breakout of the day. A candidate for a forward paper / demo record, never an edge; no variant on these years. Nothing live changed. Test: `tests/usdjpy-brk-exec.test.mjs`.
 

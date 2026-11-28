@@ -34,3 +34,11 @@ test('verdict rules', () => {
   assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 200, mean: 0.3, monthT: 1.9 } }), 'FAIL');
   assert.equal(verdictOf({ unresolvedShare: 0, net: { n: 200, mean: 0.4, monthT: 2.1 } }), 'PASS');
 });
+test('result: PASS as pre-registered, read with its caveats', () => {
+  const R = JSON.parse(fs.readFileSync(D + 'result.json', 'utf8')), m = fs.readFileSync(D + 'RESULT.md', 'utf8');
+  assert.match(m.split('\n')[2], /^\*\*Verdict: PASS\./);
+  assert.equal(R.primary.orders, 106); assert.equal(R.primary.entryUnresolved, 0); assert.equal(R.primary.exitUnresolved, 0);
+  assert.ok(R.primary.net.n === 106 && R.primary.net.mean > 0.4 && R.primary.net.monthT >= 4);
+  assert.equal(R.lead2.orders, 176);
+  assert.match(m, /not an edge/); assert.match(m, /1\.1 million/); assert.match(m, /not new evidence/);
+});
