@@ -3943,7 +3943,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Up candles <input type="color" id="ms-sty-up" value="#089981"></label>
         <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
-        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button><button type="button" class="ms-tbtn" id="ms-sty-navy" title="A navy chart with light-blue and blue candles, like a phone trading app">Navy / blue (app)</button></div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
         <div class="sty-h">Live price</div>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion (a little later)</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
@@ -5478,12 +5478,6 @@ function msNextSetup(bars, A) {
   const PAPER = { bg: '#f7f8fa', up: '#c9ccd2', dn: '#131722', mono: true };
   const MONO = { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' };
   try { if (!localStorage.getItem('ms-paper-v1')) { localStorage.setItem('ms-paper-v1', '1'); if (!localStorage.getItem('ms-colors')) { CUS = Object.assign({}, PAPER); localStorage.setItem('ms-colors', JSON.stringify(CUS)); } } } catch (e) {}
-  // navy app look (28 Nov 2026, owner's TradingView phone screenshots: "The chart needs to look more actual app"): a navy chart with
-  // light-blue rising and deeper-blue falling candles. Style → "Navy / blue (app)"; switched on once per PHONE (ms-navy-v1, up to
-  // 640 px) when the device still has no colours or the paper default. Display only.
-  const NAVY = { bg: '#161b3f', up: '#5ac8fa', dn: '#2f6fe0', ln: '#5ac8fa', mono: false };
-  try { if (!localStorage.getItem('ms-navy-v1') && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) { localStorage.setItem('ms-navy-v1', '1');
-    if (!hexOk(CUS.bg) || (CUS.mono && CUS.up === PAPER.up && CUS.dn === PAPER.dn)) { CUS = Object.assign({}, NAVY); localStorage.setItem('ms-colors', JSON.stringify(CUS)); } } } catch (e) {}
   // is the chart itself light? (its own background when the member chose one, else the page theme)
   const chartLight = window.msChartLight = () => hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light';
   // a chart with its own background: that colour, an ink that reads on it, and the light grid on a light one
@@ -6824,7 +6818,6 @@ function msNextSetup(bars, A) {
     [['ms-sty-bg', 'bg'], ['ms-sty-up', 'up'], ['ms-sty-dn', 'dn'], ['ms-sty-ln', 'ln']].forEach(([id, k]) => $(id).addEventListener('input', (e) => { CUS[k] = e.target.value; save(); }));
     $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
     $('ms-sty-paper').addEventListener('click', () => { CUS = Object.assign({}, CUS, PAPER); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
-    $('ms-sty-navy').addEventListener('click', () => { CUS = Object.assign({}, CUS, NAVY); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC, mono: false }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     btn.addEventListener('click', fill); fill();
     // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on

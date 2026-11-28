@@ -24,9 +24,7 @@ test('the script presses the page\'s own controls, places no order and stores on
   for (const m of js.matchAll(/closest\('\[data-([a-z-]+)\]'\)/g)) assert.ok(/^tv/.test(m[1]), m[1]);
   assert.match(js, /window\.msRailFav\('dt:'/);   // favourites are the rail's own (ms-dr-fav)
 });
-test('the navy preset: in Style, and once per phone over the paper default only', () => {
-  assert.match(H, /const NAVY = \{ bg: '#161b3f', up: '#5ac8fa', dn: '#2f6fe0', ln: '#5ac8fa', mono: false \};/);
-  assert.match(H, /id="ms-sty-navy"/);
-  assert.match(H, /ms-navy-v1[^\n]*max-width: 640px/);
-  assert.match(H, /if \(!hexOk\(CUS\.bg\) \|\| \(CUS\.mono && CUS\.up === PAPER\.up && CUS\.dn === PAPER\.dn\)\)/);
+test('the app look changes the structure only, never the chart colours', () => {
+  assert.doesNotMatch(H, /NAVY|ms-navy|ms-sty-navy/);
+  assert.doesNotMatch(block('ms-tva-js', 'script'), /ms-colors|applyTheme/);
 });

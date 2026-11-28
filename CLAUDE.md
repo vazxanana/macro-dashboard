@@ -2703,8 +2703,7 @@ Display only, `market-structure.html` (and so the Charts app). Up to 640 px, in 
 - **Analysis hub**: chart settings, indicators, chart type (cycles candles / line / both), bar replay, long / short position, measure,
   drawings list, hide drawings, magnet, undo, layout, all timeframes, markets side by side, chart image, full screen, Structure, Log a
   call, clean look, site menu (Charts app), Full phone view. Each presses the page's own control; a control the account lacks is left out.
-- **Navy preset** `NAVY` (bg #161b3f, up #5ac8fa, down #2f6fe0): Style → "Navy / blue (app)", and switched on once per phone
-  (`ms-navy-v1`, up to 640 px) only when the device has no colours of its own or the paper default.
+- **Colours are not touched** (owner, 28 Nov 2026: "Not the colors, just the structure"): the chart keeps the member's own colours.
 - **Rules**: its CSS lives in `#ms-ps-css`'s phone block (the simple view's one place; every selector names `html[data-phone="simple"]`,
   Charts rules `html[data-phone="simple"]:not([data-role="public"]) #v-charts`), its parts carry `.ps-only`. **Its data attributes are
   `data-tv*`**: the page puts flags such as `data-ct`, `data-mode`, `data-role` on `<html>`, so `closest('[data-ct]')` matched the root
