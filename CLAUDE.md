@@ -7538,3 +7538,13 @@ Council, the ICT desk, Equinox and the Macro desk at 1440 and 390 px.
   has no room. Found on the way: the Desk's account button ran 22 px off a 390 px phone (12 px at 360) since Academy and Equinox
   joined the switch; search goes to the palette / More from 400 px down and the header's sides and dots are tighter under 380 px
   (the account button ends at 350 / 374 / 414 px at 360 / 390 / 430).
+
+## Chart visual pass (28 Nov 2026, owner: "Mostly upgrades visual to the charts")
+Display only, `market-structure.html` `paint()` (every chart drawn with the page's `Overlay`: the panes, the free chart, Split's right
+chart); candle colours and the markup's colours unchanged. (1) **Zones** (CF, order blocks and every plain box) are a lighter fill
+(0.55 of the stored alpha), a softer hairline (stroke at most 0.55 alpha), 3 px corners and a 2 px edge in the zone's colour at its
+start. (2) **Labels** (BO, CF, iBO, VR, Target …) are small tags tinted with their own colour over the chart's background
+(`mixOn(colour, bg, 0.13)`, `window.msMixOn`), in Figtree (they were Trebuchet on a plain backing); pills are fully rounded. (3) A
+**"now" dot** on the last candle's close (a ringed dot in the chart's ink). (4) Labels keep out of the lower right corner, where the
+chart's own buttons sit. (5) **Bug fixed**: the day separators of days off the chart's left edge were all drawn on its first pixel
+column and made a dark vertical line down the left side; a separator off either edge is skipped and one column is drawn once.
