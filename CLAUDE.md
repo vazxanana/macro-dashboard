@@ -2689,6 +2689,27 @@ Display only: nothing here places, changes or refuses an order.
   of script a frame on a phone profile; not checked on a real phone.
 - Tests: `tests/charts-app.test.mjs`, `tests/desk-live.test.mjs` (the stream hand-over on a fake EventSource and clock).
 
+## Phone charts in an app look (28 Nov 2026, owner's TradingView phone screenshots: "The chart needs to look more actual app")
+Display only, `market-structure.html` (and so the Charts app). Up to 640 px, in the simple phone view, on Charts, for members:
+- **The toolbar row folds to nothing** (`#v-charts > .sec-h` height 0 and `visibility: hidden`, NOT `display: none`, so the Style and
+  Layout popovers still open from it; they are `visibility: visible`). The market-phase strip is hidden. The wheel bar `#ms-wb` becomes
+  a dock: its own two buttons are hidden and pressed by **two floating glass capsules** of `<script id="ms-tva-js">`: `#ms-tvl` (a
+  round market badge, the market, the timeframe: each opens the wheel sheet) and `#ms-tvr` (pencil = the **Drawings** sheet; the last
+  drawing tool used, trend line at first; "…" = the **Analysis hub**). The dock stays `#ms-wb`, so the fit script still reserves it.
+- **Drawings** sheet (`#ms-tvs`): search, groups (Favourites, All, Lines, Shapes, Fibonacci and measure, Text), a card per tool of
+  `assets/ms-draw.js` (a tap presses the tool's own `#ms-dr-bar` button) plus position and measure; a star adds a favourite through the
+  rail's own `window.msRailFav('dt:<k>')` (`ms-dr-fav`); "Show favourites on chart" (localStorage `ms-tv-favshow`, the only key it
+  writes) shows `#ms-tvfav`, a floating strip of the favourite tools at the chart's left edge. Opens on All until a favourite exists.
+- **Analysis hub**: chart settings, indicators, chart type (cycles candles / line / both), bar replay, long / short position, measure,
+  drawings list, hide drawings, magnet, undo, layout, all timeframes, markets side by side, chart image, full screen, Structure, Log a
+  call, clean look, site menu (Charts app), Full phone view. Each presses the page's own control; a control the account lacks is left out.
+- **Navy preset** `NAVY` (bg #161b3f, up #5ac8fa, down #2f6fe0): Style → "Navy / blue (app)", and switched on once per phone
+  (`ms-navy-v1`, up to 640 px) only when the device has no colours of its own or the paper default.
+- **Rules**: its CSS lives in `#ms-ps-css`'s phone block (the simple view's one place; every selector names `html[data-phone="simple"]`,
+  Charts rules `html[data-phone="simple"]:not([data-role="public"]) #v-charts`), its parts carry `.ps-only`. **Its data attributes are
+  `data-tv*`**: the page puts flags such as `data-ct`, `data-mode`, `data-role` on `<html>`, so `closest('[data-ct]')` matched the root
+  and swallowed every hub tap (found on the way). The Full phone view and wider screens are unchanged. Test: `tests/charts-tv-app.test.mjs`.
+
 ## Quick type and drawing undo on the Charts (27 Nov 2026, owner: "Keep improving the charts")
 Display only. `assets/ms-quick.js` (`window.MS_QUICK` pure `parseTf`, `matchMarkets`; loaded after ms-draw.js): on Charts (and the
 Charts app), not for guests, typing a digit opens a "Timeframe" box ("15" = M15, "60" = H1, "240" = H4, "4h", "30s", "1d", "w",

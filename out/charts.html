@@ -5459,6 +5459,65 @@ html[data-mk="ict"] #v-charts .mk-mode button[data-mk="ict"].on { background: va
   html[data-phone="simple"] #ms-scan-card:not([data-ps-all]) #ms-scan > a:nth-child(n+5) { display: none; }
 
   @media (prefers-reduced-motion: reduce) { .ps-fold::after { transition: none; } }
+  /* Phone charts in an app look (28 Nov 2026, owner's TradingView screenshots: "The chart needs to look more actual app"): the dock, the
+     Drawings sheet, the Analysis hub and the favourites strip of #ms-tva-js. Its parts carry .ps-only. */
+  /* app look (28 Nov 2026, ms-tva-js): the toolbar row folds to nothing but stays in the page, so its popovers (Style, Layout) still open from the hub */
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not(.ch-fake-fs) > .sec-h { height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; border: 0 !important; overflow: visible !important; visibility: hidden; }
+  html[data-phone="simple"]:not([data-role="public"]) #v-charts:not(.ch-fake-fs) > .sec-h :is(#ms-sty-pop, #ms-lay-pop) { visibility: visible; }
+  html[data-phone="simple"][data-view="charts"]:not([data-role="public"]) #ms-phase { display: none !important; }
+  html[data-phone="simple"][data-view="charts"]:not([data-role="public"]) #ms-wb { background: var(--au-bg, var(--bg)); border-top: 0; justify-content: space-between; align-items: center; padding: 6px 12px; gap: 10px; }
+  html[data-phone="simple"][data-view="charts"]:not([data-role="public"]) #ms-wb > button[data-wb] { display: none; }
+  html[data-phone="simple"] :is(#ms-tvl, #ms-tvr) { display: flex; align-items: center; min-height: 50px; padding: 3px; border-radius: 26px;
+    background: color-mix(in srgb, var(--au-surface-2, var(--panel)) 82%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);
+    border: 1px solid color-mix(in srgb, var(--au-ink-1, var(--ink)) 12%, transparent); box-shadow: 0 6px 22px rgba(0, 0, 0, .28); }
+  html[data-phone="simple"] #ms-tvl button, html[data-phone="simple"] #ms-tvr button { min-height: 44px; min-width: 44px; border: 0; background: transparent; color: var(--au-ink-1, var(--ink)); border-radius: 22px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 10px; font: 650 15px var(--sans); cursor: pointer; }
+  html[data-phone="simple"] #ms-tvl button:active, html[data-phone="simple"] #ms-tvr button:active { background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 10%, transparent); }
+  html[data-phone="simple"] #ms-tvl button:focus-visible, html[data-phone="simple"] #ms-tvr button:focus-visible, html[data-phone="simple"] #ms-tvs button:focus-visible, html[data-phone="simple"] #ms-tvs input:focus-visible { outline: 2px solid var(--au-accent, var(--accent)); outline-offset: 1px; }
+  html[data-phone="simple"] #ms-tvl .tv-ic { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--au-accent, var(--accent)); color: #0b1020; font: 750 12px var(--sans); letter-spacing: -.4px; flex: none; }
+  html[data-phone="simple"] #ms-tvl [data-tv="tf"] { padding: 0 14px; font-weight: 600; }
+  html[data-phone="simple"] #ms-tvl .tv-sep { width: 1px; height: 22px; background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 16%, transparent); }
+  html[data-phone="simple"] #ms-tvr svg, html[data-phone="simple"] #ms-tvs .tv-card svg, html[data-phone="simple"] #ms-tvfav svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  html[data-phone="simple"] #ms-tvr [aria-pressed="true"] { background: color-mix(in srgb, var(--au-accent, var(--accent)) 26%, transparent); color: var(--au-ink-1, var(--ink)); }
+  html[data-phone="simple"] #ms-tvr .tv-dot { position: relative; }
+  html[data-phone="simple"] #ms-tvs[data-open] { display: block; position: fixed; inset: 0; z-index: 70; background: rgba(0, 0, 0, .42); }
+  html[data-phone="simple"] #ms-tvs .tv-sheet { position: absolute; left: 8px; right: 8px; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); max-height: 76dvh; overflow: auto; overscroll-behavior: contain; border-radius: 26px; padding: 8px 16px 16px;
+    background: color-mix(in srgb, var(--au-surface, var(--panel)) 94%, transparent); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); color: var(--au-ink-1, var(--ink));
+    border: 1px solid color-mix(in srgb, var(--au-ink-1, var(--ink)) 10%, transparent); box-shadow: 0 -10px 40px rgba(0, 0, 0, .4); }
+  html[data-phone="simple"] #ms-tvs .tv-grab { width: 40px; height: 5px; border-radius: 3px; margin: 2px auto 6px; background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 26%, transparent); }
+  html[data-phone="simple"] #ms-tvs .tv-top { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; margin-bottom: 10px; }
+  html[data-phone="simple"] #ms-tvs .tv-top h2 { margin: 0; text-align: center; font: 700 17px var(--sans); }
+  html[data-phone="simple"] #ms-tvs .tv-x { width: 44px; height: 44px; border-radius: 50%; border: 0; background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 12%, transparent); color: var(--au-ink-1, var(--ink)); font: 500 22px/1 var(--sans); cursor: pointer; }
+  html[data-phone="simple"] #ms-tvs .tv-q { width: 100%; min-height: 46px; border-radius: 23px; border: 0; padding: 0 16px 0 42px; font: 500 16px var(--sans); color: var(--au-ink-1, var(--ink));
+    background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 10%, transparent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") 14px 50% / 18px no-repeat; }
+  html[data-phone="simple"] #ms-tvs .tv-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 10px -4px 4px; padding: 0 4px; }
+  html[data-phone="simple"] #ms-tvs .tv-tabs::-webkit-scrollbar { display: none; }
+  html[data-phone="simple"] #ms-tvs .tv-tabs button { flex: none; min-height: 40px; padding: 0 14px; border-radius: 20px; border: 0; background: transparent; color: var(--au-ink-2, var(--ink-dim)); font: 650 14px var(--sans); white-space: nowrap; cursor: pointer; }
+  html[data-phone="simple"] #ms-tvs .tv-tabs button[aria-selected="true"] { background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 13%, transparent); color: var(--au-ink-1, var(--ink)); }
+  html[data-phone="simple"] #ms-tvs .tv-h { background: none; border: 0; padding: 0; margin: 14px 2px 8px; font: 700 12px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--au-ink-2, var(--ink-dim)); }
+  html[data-phone="simple"] #ms-tvs .tv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  html[data-phone="simple"] #ms-tvs .tv-card { position: relative; min-height: 78px; border-radius: 16px; border: 1px solid color-mix(in srgb, var(--au-ink-1, var(--ink)) 9%, transparent);
+    background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 8%, transparent); color: var(--au-ink-1, var(--ink)); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 6px; font: 600 12.5px var(--sans); text-align: center; cursor: pointer; }
+  html[data-phone="simple"] #ms-tvs .tv-card[aria-pressed="true"] { border-color: var(--au-accent, var(--accent)); background: color-mix(in srgb, var(--au-accent, var(--accent)) 18%, transparent); }
+  html[data-phone="simple"] #ms-tvs .tv-star { position: absolute; top: 0; right: 0; width: 36px; height: 36px; border: 0; background: transparent; display: flex; align-items: flex-start; justify-content: flex-end; padding: 6px; cursor: pointer; }
+  html[data-phone="simple"] #ms-tvs .tv-star::before { content: ""; width: 16px; height: 16px; background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 30%, transparent);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5-4.8-4.6 6.6-.9z'/%3E%3C/svg%3E") center / contain no-repeat; }
+  html[data-phone="simple"] #ms-tvs .tv-star[aria-pressed="true"]::before { background: #f5b82e; }
+  html[data-phone="simple"] #ms-tvs .tv-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--au-ink-1, var(--ink)) 10%, transparent); font: 600 15px var(--sans); }
+  html[data-phone="simple"] #ms-tvs .tv-sw { width: 52px; height: 32px; border-radius: 16px; border: 0; position: relative; background: color-mix(in srgb, var(--au-ink-1, var(--ink)) 22%, transparent); cursor: pointer; flex: none; }
+  html[data-phone="simple"] #ms-tvs .tv-sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  html[data-phone="simple"] #ms-tvs .tv-sw[aria-checked="true"] { background: #34c759; }
+  html[data-phone="simple"] #ms-tvs .tv-sw[aria-checked="true"]::after { transform: translateX(20px); }
+  html[data-phone="simple"] #ms-tvs .tv-hub { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  html[data-phone="simple"] #ms-tvs .tv-hub .tv-card { min-height: 80px; }
+  html[data-phone="simple"] #ms-tvs .tv-hub .tv-card svg { width: 24px; height: 24px; }
+  html[data-phone="simple"] #ms-tvs .tv-hub .tv-wide { grid-column: span 2; }
+  html[data-phone="simple"] #ms-tvs .tv-empty { grid-column: 1 / -1; padding: 18px 8px; text-align: center; color: var(--au-ink-2, var(--ink-dim)); font: 500 14px var(--sans); }
+  html[data-phone="simple"][data-view="charts"]:not([data-role="public"]) #ms-tvfav:not([hidden]) { display: flex; flex-direction: column; gap: 2px; position: fixed; left: 8px; top: 38%; z-index: 23; padding: 4px; border-radius: 22px;
+    background: color-mix(in srgb, var(--au-surface-2, var(--panel)) 82%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid color-mix(in srgb, var(--au-ink-1, var(--ink)) 12%, transparent); }
+  html[data-phone="simple"] #ms-tvfav button { width: 44px; height: 44px; border: 0; border-radius: 18px; background: transparent; color: var(--au-ink-1, var(--ink)); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  html[data-phone="simple"] #ms-tvfav button[aria-pressed="true"] { background: color-mix(in srgb, var(--au-accent, var(--accent)) 26%, transparent);  }
+  html[data-phone="simple"] #ms-tvs:not([data-open]), html[data-phone="simple"] #ms-tvfav[hidden] { display: none !important; }
 }
 </style>
 <style id="ms-hs-css">
@@ -7058,7 +7117,7 @@ window.msData.warm(window.msBootGate ? ['trades.json', 'snapshot.json'] : ['trad
         <label class="sty-c">Up candles <input type="color" id="ms-sty-up" value="#089981"></label>
         <label class="sty-c">Down candles <input type="color" id="ms-sty-dn" value="#f23645"></label>
         <label class="sty-c">Line <input type="color" id="ms-sty-ln" value="#2962ff"></label>
-        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button></div>
+        <div class="sty-row"><button type="button" class="ms-tbtn" id="ms-sty-reset">Theme colours</button> <button type="button" class="ms-tbtn" id="ms-sty-paper" title="A light chart with grey rising and black falling candles, on every theme">Grey / black on white</button><button type="button" class="ms-tbtn" id="ms-sty-tv" title="Green up and red down candles, on every theme">Green / red candles</button><button type="button" class="ms-tbtn" id="ms-sty-navy" title="A navy chart with light-blue and blue candles, like a phone trading app">Navy / blue (app)</button></div>
         <div class="sty-h">Live price</div>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-smooth"> Smooth price motion (a little later)</label>
         <label class="sty-c sty-ck"><input type="checkbox" id="ms-sty-bidask"> Bid and ask lines</label>
@@ -8502,6 +8561,12 @@ function msNextSetup(bars, A) {
   const PAPER = { bg: '#f7f8fa', up: '#c9ccd2', dn: '#131722', mono: true };
   const MONO = { upColor: '#c9ccd2', downColor: '#131722', borderUpColor: '#131722', borderDownColor: '#131722', wickUpColor: '#131722', wickDownColor: '#131722' };
   try { if (!localStorage.getItem('ms-paper-v1')) { localStorage.setItem('ms-paper-v1', '1'); if (!localStorage.getItem('ms-colors')) { CUS = Object.assign({}, PAPER); localStorage.setItem('ms-colors', JSON.stringify(CUS)); } } } catch (e) {}
+  // navy app look (28 Nov 2026, owner's TradingView phone screenshots: "The chart needs to look more actual app"): a navy chart with
+  // light-blue rising and deeper-blue falling candles. Style → "Navy / blue (app)"; switched on once per PHONE (ms-navy-v1, up to
+  // 640 px) when the device still has no colours or the paper default. Display only.
+  const NAVY = { bg: '#161b3f', up: '#5ac8fa', dn: '#2f6fe0', ln: '#5ac8fa', mono: false };
+  try { if (!localStorage.getItem('ms-navy-v1') && window.matchMedia && window.matchMedia('(max-width: 640px)').matches) { localStorage.setItem('ms-navy-v1', '1');
+    if (!hexOk(CUS.bg) || (CUS.mono && CUS.up === PAPER.up && CUS.dn === PAPER.dn)) { CUS = Object.assign({}, NAVY); localStorage.setItem('ms-colors', JSON.stringify(CUS)); } } } catch (e) {}
   // is the chart itself light? (its own background when the member chose one, else the page theme)
   const chartLight = window.msChartLight = () => hexOk(CUS.bg) ? lumOf(CUS.bg) > 0.35 : G.theme === 'light';
   // a chart with its own background: that colour, an ink that reads on it, and the light grid on a light one
@@ -9842,6 +9907,7 @@ function msNextSetup(bars, A) {
     [['ms-sty-bg', 'bg'], ['ms-sty-up', 'up'], ['ms-sty-dn', 'dn'], ['ms-sty-ln', 'ln']].forEach(([id, k]) => $(id).addEventListener('input', (e) => { CUS[k] = e.target.value; save(); }));
     $('ms-sty-reset').addEventListener('click', () => { CUS = {}; try { localStorage.removeItem('ms-colors'); } catch (e) {} fill(); applyTheme(); });
     $('ms-sty-paper').addEventListener('click', () => { CUS = Object.assign({}, CUS, PAPER); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
+    $('ms-sty-navy').addEventListener('click', () => { CUS = Object.assign({}, CUS, NAVY); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     $('ms-sty-tv').addEventListener('click', () => { CUS = Object.assign({}, CUS, { up: UPC, dn: DNC, mono: false }); try { localStorage.setItem('ms-colors', JSON.stringify(CUS)); } catch (e) {} fill(); applyTheme(); });
     btn.addEventListener('click', fill); fill();
     // Clean look: switch the busiest layers off through their own checkboxes (so Settings shows the truth), remember what was on
@@ -16595,6 +16661,159 @@ function msNextSetup(bars, A) {
     addEventListener('hashchange', function () { close(); setTimeout(paint, 100); }); setInterval(paint, 1500); paint(); }
   window.msWheelBar = function () { return { built: !!bar, market: bar ? bar.querySelector('[data-wb="mk"] b').textContent : '', tf: bar ? bar.querySelector('[data-wb="tf"] b').textContent : '', open: !!(sheet && sheet.hasAttribute('data-open')) }; };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(build, 0); }); else setTimeout(build, 0);
+})();
+</script>
+<script id="ms-tva-js">
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, D = document.documentElement;
+  var mq = window.matchMedia ? window.matchMedia('(max-width: 640px)') : { matches: false };
+  var on = function () { return mq.matches && D.dataset.phone === 'simple' && D.dataset.role !== 'public'; };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  // drawing tools by group (keys of assets/ms-draw.js; a key the page does not have is left out)
+  var GROUPS = [['lines', 'Lines', ['t', 'h', 'hr', 'v', 'a', 'c']], ['shapes', 'Shapes and bands', ['r', 'b', 'w']], ['fib', 'Fibonacci and measure', ['f', 'm', 'p']], ['text', 'Text', ['x']]];
+  var CHART_TOOLS = [['.ch-pos', 'Long / short position'], ['.ch-ruler', 'Measure']];
+  var FSK = 'ms-tv-favshow', LAST = 't', sheet, left, right, fav, kind = null, tab = 'fav', q = '';
+  var dr = function (k) { var b = $('ms-dr-bar'); return b && b.querySelector('[data-dt="' + k + '"]'); };
+  var ct = function (sel) { var b = $('ms-ch-one'); return b && b.querySelector('[data-t="' + sel + '"]'); };
+  var nameOf = function (b) { return ((b && (b.getAttribute('aria-label') || b.title)) || '').replace(/ \(.*/, '').replace(/:.*/, ''); };
+  var iconOf = function (b) { var s = b && b.querySelector('svg'); return s ? s.outerHTML : ''; };
+  var favs = function () { try { var o = JSON.parse(localStorage.getItem('ms-dr-fav') || '{}'); return Array.isArray(o.tools) ? o.tools : []; } catch (e) { return []; } };
+  var favShow = function () { try { return localStorage.getItem(FSK) !== '0'; } catch (e) { return true; } };
+  var setFavShow = function (v) { try { localStorage.setItem(FSK, v ? '1' : '0'); } catch (e) {} };
+  var press = function (b) { if (b) b.click(); };
+  var activeTool = function () { var b = $('ms-dr-bar'), a = b && b.querySelector('[data-dt][aria-pressed="true"]'); return a ? a.dataset.dt : ''; };
+  var ICON = {
+    pen: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+    more: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/></svg>'
+  };
+  function shortOf(label) { var s = String(label || '').replace(/[^A-Za-z0-9]/g, ''); return (s.slice(0, 3) || '·').toUpperCase(); }
+  function paint() {
+    if (!left) return; var w = window.msWheelBar ? window.msWheelBar() : { market: '', tf: '' };
+    var m = w.market || 'Market', t = w.tf || 'All';
+    var mb = left.querySelector('[data-tv="mk"]'), tb = left.querySelector('[data-tv="tf"]');
+    if (mb.dataset.l !== m) { mb.dataset.l = m; mb.innerHTML = '<span class="tv-ic" aria-hidden="true">' + esc(shortOf(m)) + '</span><span>' + esc(m) + '</span>'; mb.setAttribute('aria-label', 'Market: ' + m + '. Change the market'); }
+    if (tb.dataset.l !== t) { tb.dataset.l = t; tb.textContent = t; tb.setAttribute('aria-label', 'Timeframe: ' + t + '. Change the timeframe'); }
+    var a = activeTool(); if (a && a !== LAST && dr(a)) LAST = a;
+    var lb = right.querySelector('[data-tv="last"]'), lt = dr(LAST);
+    if (lt && lb.dataset.k !== LAST) { lb.dataset.k = LAST; lb.innerHTML = iconOf(lt); lb.setAttribute('aria-label', nameOf(lt)); lb.title = nameOf(lt); }
+    var pr = String(!!a && a === LAST); if (lb.getAttribute('aria-pressed') !== pr) lb.setAttribute('aria-pressed', pr);
+    paintFav();
+  }
+  function paintFav() {
+    if (!fav) return; var ks = favs().filter(function (k) { return /^dt:/.test(k) && dr(k.slice(3)); }), show = on() && D.dataset.view === 'charts' && favShow() && ks.length > 0 && !(sheet && sheet.hasAttribute('data-open'));
+    fav.hidden = !show; if (!show) return; var sig = ks.join('|') + '#' + activeTool();
+    if (fav.dataset.sig === sig) return; fav.dataset.sig = sig;
+    fav.innerHTML = ks.map(function (k) { var b = dr(k.slice(3)); return '<button type="button" data-tvk="' + esc(k.slice(3)) + '" aria-pressed="' + (activeTool() === k.slice(3)) + '" aria-label="' + esc(nameOf(b)) + '" title="' + esc(nameOf(b)) + '">' + iconOf(b) + '</button>'; }).join('');
+  }
+  function close() { if (!sheet) return; sheet.removeAttribute('data-open'); sheet.innerHTML = ''; var k = kind; kind = null; paint(); var b = k === 'draw' ? right.querySelector('[data-tv="draw"]') : k === 'hub' ? right.querySelector('[data-tv="hub"]') : null; if (b) b.focus({ preventScroll: true }); }
+  function frame(title, body, foot) {
+    sheet.innerHTML = '<div class="tv-sheet" role="dialog" aria-modal="true" aria-label="' + esc(title) + '"><div class="tv-grab" aria-hidden="true"></div><div class="tv-top"><span></span><h2>' + esc(title) + '</h2><button type="button" class="tv-x" data-tvx aria-label="Close">×</button></div>' + body + (foot || '') + '</div>';
+    sheet.setAttribute('data-open', ''); paintFav();
+  }
+  function card(k, b, favSet) {
+    var n = nameOf(b), f = favSet.indexOf('dt:' + k) >= 0;
+    return '<div class="tv-card" role="button" tabindex="0" data-tvt="' + esc(k) + '" aria-pressed="' + (activeTool() === k) + '" aria-label="' + esc(n) + '">' + iconOf(b) + '<span>' + esc(n) + '</span><button type="button" class="tv-star" data-tvs="' + esc(k) + '" aria-pressed="' + f + '" aria-label="' + (f ? 'Remove ' : 'Add ') + esc(n) + (f ? ' from' : ' to') + ' favourites"></button></div>';
+  }
+  function drawBody() {
+    var F = favs(), ql = q.trim().toLowerCase(), html = '', any = false;
+    var match = function (b) { return !ql || nameOf(b).toLowerCase().indexOf(ql) >= 0; };
+    var groups = GROUPS.map(function (g) { return [g[0], g[1], g[2].filter(function (k) { return dr(k); })]; });
+    if (!ql && tab === 'fav') {
+      var fk = F.filter(function (k) { return /^dt:/.test(k) && dr(k.slice(3)); }).map(function (k) { return k.slice(3); });
+      html += '<div class="tv-h">Favourites</div><div class="tv-grid">' + (fk.length ? fk.map(function (k) { return card(k, dr(k), F); }).join('') : '<div class="tv-empty">Tap the star on a tool to keep it here.</div>') + '</div>';
+      any = true;
+    }
+    groups.forEach(function (g) { if (!ql && tab !== 'all' && tab !== g[0]) return; var ks = g[2].filter(function (k) { return match(dr(k)); }); if (!ks.length) return; any = true;
+      html += '<div class="tv-h">' + esc(g[1]) + '</div><div class="tv-grid">' + ks.map(function (k) { return card(k, dr(k), F); }).join('') + '</div>'; });
+    if ((!ql && (tab === 'all' || tab === 'fib')) || ql) { var cts = CHART_TOOLS.filter(function (c) { return ct(c[0]) && (!ql || c[1].toLowerCase().indexOf(ql) >= 0); });
+      if (cts.length) { any = true; html += '<div class="tv-h">On the chart</div><div class="tv-grid">' + cts.map(function (c) { return '<div class="tv-card" role="button" tabindex="0" data-tvc="' + esc(c[0]) + '" aria-label="' + esc(c[1]) + '"><span class="ch-b ' + esc(c[0].slice(1)) + '" aria-hidden="true"></span><span>' + esc(c[1]) + '</span></div>'; }).join('') + '</div>'; } }
+    if (!any) html = '<div class="tv-grid"><div class="tv-empty">No drawing tool is called that.</div></div>';
+    return html;
+  }
+  function openDraw() {
+    kind = 'draw'; if (tab === 'fav' && !favs().some(function (k) { return /^dt:/.test(k) && dr(k.slice(3)); })) tab = 'all'; var tabs = [['fav', 'Favourites'], ['all', 'All'], ['lines', 'Lines'], ['shapes', 'Shapes'], ['fib', 'Fibonacci and measure'], ['text', 'Text']];
+    frame('Drawings', '<input class="tv-q" type="search" placeholder="Search" aria-label="Search the drawing tools" value="' + esc(q) + '"><div class="tv-tabs" role="tablist" aria-label="Groups">'
+      + tabs.map(function (t) { return '<button type="button" role="tab" data-tvtab="' + t[0] + '" aria-selected="' + (tab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div><div class="tv-body">' + drawBody() + '</div>',
+      '<div class="tv-foot"><span id="ms-tvs-fl">Show favourites on chart</span><button type="button" class="tv-sw" role="switch" aria-labelledby="ms-tvs-fl" data-tvsw aria-checked="' + favShow() + '"></button></div>');
+    var inp = sheet.querySelector('.tv-q'); inp.addEventListener('input', function () { q = inp.value; sheet.querySelector('.tv-body').innerHTML = drawBody(); });
+  }
+  function hubItems() {
+    var cs = (function () { var p = $('ms-sty-pop'), b = p && p.querySelector('[data-cs][aria-pressed="true"]'); var t = $('ms-sty-now'); return t ? t.textContent.trim() : (b ? b.textContent : 'Candles'); })();
+    var I = [
+      ['sty', 'Chart settings', function () { return $('ms-sty-btn'); }],
+      ['ind', 'Indicators', function () { return $('ms-ind-open'); }],
+      ['cs', 'Chart type: ' + cs, function () { return $('ms-sty-pop'); }],
+      ['rp', 'Bar replay', function () { return ct('.ch-rp'); }],
+      ['pos', 'Long / short position', function () { return ct('.ch-pos'); }],
+      ['ruler', 'Measure', function () { return ct('.ch-ruler'); }],
+      ['dl', 'Drawings list', function () { var b = $('ms-dr-bar'); return b && b.querySelector('[data-dl]'); }],
+      ['dh', 'Hide drawings', function () { var b = $('ms-dr-bar'); return b && b.querySelector('[data-dh]'); }],
+      ['mag', 'Magnet', function () { var b = $('ms-dr-bar'); return b && b.querySelector('[data-mag]'); }],
+      ['undo', 'Undo drawing', function () { return window.msDrawUndo ? {} : null; }],
+      ['lay', 'Layout', function () { return $('ms-lay-btn'); }],
+      ['all', 'All timeframes', function () { var g = document.querySelector('#v-charts .seg [data-view="all"]'); return g; }],
+      ['mm', 'Markets side by side', function () { return $('ms-mm-btn'); }],
+      ['snap', 'Chart image', function () { return ct('.ch-snap'); }],
+      ['fs', 'Full screen', function () { return window.msChartsFs ? {} : null; }],
+      ['sa', 'Structure (AI reading)', function () { var b = $('ms-sa-btn'); return b && !b.hidden ? b : null; }],
+      ['jr', 'Log a call', function () { var b = $('ms-jr-btn'); return b && !b.hidden ? b : null; }],
+      ['clean', 'Clean look', function () { return $('ms-sty-clean'); }],
+      ['menu', 'Site menu', function () { var b = $('ms-fit-menu'); return b && D.dataset.app === 'charts' ? b : null; }],
+      ['full', 'Full phone view', function () { return window.msPhoneView ? {} : null; }]
+    ];
+    return I.filter(function (x) { return x[2](); });
+  }
+  function openHub() {
+    kind = 'hub';
+    frame('Analysis hub', '<div class="tv-hub">' + hubItems().map(function (x) { return '<button type="button" class="tv-card" data-tvh="' + x[0] + '"><svg viewBox="0 0 24 24" aria-hidden="true">' + (HUBI[x[0]] || '') + '</svg><span>' + esc(x[1]) + '</span></button>'; }).join('') + '</div>');
+  }
+  var HUBI = { sty: '<circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',
+    ind: '<path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/>', cs: '<path d="M7 4v16M17 4v16"/><rect x="5" y="8" width="4" height="7" rx="1"/><rect x="15" y="6" width="4" height="9" rx="1"/>',
+    rp: '<path d="M11 6L5 12l6 6M19 6l-6 6 6 6"/>', pos: '<path d="M4 7h16M4 12h10M4 17h16"/><circle cx="17" cy="12" r="2"/>', ruler: '<path d="M4 16L16 4l4 4L8 20z"/><path d="M8 12l2 2M11 9l2 2M14 6l2 2"/>',
+    dl: '<path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/>', dh: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/>',
+    mag: '<path d="M6 4v8a6 6 0 0 0 12 0V4h-4v8a2 2 0 0 1-4 0V4z"/>', undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>', lay: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16M3 12h9"/>',
+    all: '<rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><rect x="3" y="13" width="7" height="7" rx="1"/><rect x="14" y="13" width="7" height="7" rx="1"/>',
+    mm: '<rect x="3" y="4" width="8" height="16" rx="1.5"/><rect x="13" y="4" width="8" height="16" rx="1.5"/>', snap: '<rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l2-2h4l2 2"/>',
+    fs: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>', sa: '<path d="M12 3l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/>', jr: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/>',
+    clean: '<path d="M4 20l7-7M14 4l6 6-7 7-6-6z"/>', menu: '<path d="M4 6h16M4 12h16M4 18h16"/>', full: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>' };
+  function runHub(k) {
+    var it = hubItems().filter(function (x) { return x[0] === k; })[0]; if (!it) return; var t = it[2]();
+    if (k === 'cs') { var p = $('ms-sty-pop'), seq = ['candles', 'line', 'both'], cur = (p && p.querySelector('[data-cs][aria-pressed="true"]') || {}).dataset; var now = cur && cur.cs; if (!now) { try { now = localStorage.getItem('ms-cs') || 'candles'; } catch (e) { now = 'candles'; } }
+      var nx = seq[(seq.indexOf(now) + 1) % 3], b = p && p.querySelector('[data-cs="' + nx + '"]'); if (b) b.click(); openHub(); return; }
+    if (k === 'mag' || k === 'dh' || k === 'undo') { if (k === 'undo') window.msDrawUndo(); else press(t); openHub(); return; }
+    close();
+    if (k === 'fs') { window.msChartsFs(); return; }
+    if (k === 'full') { window.msPhoneView('full'); return; }
+    setTimeout(function () { press(t); }, 30);
+  }
+  function build() {
+    var wb = $('ms-wb'); if (!wb || left) return !!left;
+    left = document.createElement('div'); left.id = 'ms-tvl'; left.className = 'ps-only'; left.setAttribute('role', 'group'); left.setAttribute('aria-label', 'Market and timeframe');
+    left.innerHTML = '<button type="button" data-tv="mk" aria-haspopup="dialog"></button><span class="tv-sep" aria-hidden="true"></span><button type="button" data-tv="tf" aria-haspopup="dialog"></button>';
+    right = document.createElement('div'); right.id = 'ms-tvr'; right.className = 'ps-only'; right.setAttribute('role', 'toolbar'); right.setAttribute('aria-label', 'Drawing tools and more');
+    right.innerHTML = '<button type="button" data-tv="draw" aria-haspopup="dialog" aria-label="Drawings" title="Drawings">' + ICON.pen + '</button><button type="button" data-tv="last" aria-pressed="false"></button><button type="button" data-tv="hub" aria-haspopup="dialog" aria-label="Analysis hub" title="Analysis hub">' + ICON.more + '</button>';
+    wb.appendChild(left); wb.appendChild(right);
+    sheet = document.createElement('div'); sheet.id = 'ms-tvs'; sheet.className = 'ps-only'; document.body.appendChild(sheet);
+    fav = document.createElement('div'); fav.id = 'ms-tvfav'; fav.className = 'ps-only'; fav.hidden = true; fav.setAttribute('role', 'toolbar'); fav.setAttribute('aria-label', 'Favourite drawing tools'); fav.setAttribute('aria-orientation', 'vertical'); document.body.appendChild(fav);
+    left.addEventListener('click', function (e) { var b = e.target.closest('[data-tv]'); if (b) press(wb.querySelector('[data-wb="' + b.dataset.tv + '"]')); });
+    right.addEventListener('click', function (e) { var b = e.target.closest('[data-tv]'); if (!b) return;
+      if (b.dataset.tv === 'draw') openDraw(); else if (b.dataset.tv === 'hub') openHub(); else { press(dr(LAST)); setTimeout(paint, 30); } });
+    fav.addEventListener('click', function (e) { var b = e.target.closest('[data-tvk]'); if (b) { press(dr(b.dataset.tvk)); fav.dataset.sig = ''; setTimeout(paint, 30); } });
+    sheet.addEventListener('click', function (e) {
+      if (e.target === sheet || e.target.closest('[data-tvx]')) return close();
+      var s = e.target.closest('[data-tvs]'); if (s) { e.stopPropagation(); if (window.msRailFav) window.msRailFav('dt:' + s.dataset.tvs); sheet.querySelector('.tv-body').innerHTML = drawBody(); return; }
+      var tb = e.target.closest('[data-tvtab]'); if (tb) { tab = tb.dataset.tvtab; sheet.querySelectorAll('[data-tvtab]').forEach(function (x) { x.setAttribute('aria-selected', String(x === tb)); }); sheet.querySelector('.tv-body').innerHTML = drawBody(); return; }
+      var sw = e.target.closest('[data-tvsw]'); if (sw) { var v = !favShow(); setFavShow(v); sw.setAttribute('aria-checked', String(v)); return; }
+      var c = e.target.closest('[data-tvt]'); if (c) { var k = c.dataset.tvt; LAST = k; close(); if (activeTool() !== k) press(dr(k)); setTimeout(paint, 30); return; }
+      var cc = e.target.closest('[data-tvc]'); if (cc) { var sel = cc.dataset.tvc; close(); setTimeout(function () { press(ct(sel)); }, 30); return; }
+      var h = e.target.closest('[data-tvh]'); if (h) runHub(h.dataset.tvh);
+    });
+    sheet.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); else if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.tv-card[role="button"]')) { e.preventDefault(); e.target.click(); } });
+    addEventListener('hashchange', function () { if (sheet.hasAttribute('data-open')) close(); setTimeout(paint, 100); });
+    setInterval(function () { if (!document.hidden) paint(); }, 1000); paint(); return true;
+  }
+  window.msTvApp = function () { return { on: on(), built: !!left, market: left ? (left.querySelector('[data-tv="mk"]').dataset.l || '') : '', tf: left ? left.querySelector('[data-tv="tf"]').textContent : '', last: LAST, open: kind, favBar: !!(fav && !fav.hidden) }; };
+  var tries = 0, t = setInterval(function () { if (build() || ++tries > 60) clearInterval(t); }, 250);
 })();
 </script>
 <script id="ms-fit-js">
