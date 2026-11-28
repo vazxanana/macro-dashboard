@@ -2689,6 +2689,34 @@ Display only: nothing here places, changes or refuses an order.
   of script a frame on a phone profile; not checked on a real phone.
 - Tests: `tests/charts-app.test.mjs`, `tests/desk-live.test.mjs` (the stream hand-over on a fake EventSource and clock).
 
+## Phone charts in an app look (28 Nov 2026, owner's TradingView phone screenshots: "The chart needs to look more actual app")
+Display only, `market-structure.html` (and so the Charts app). Up to 640 px, in the simple phone view, on Charts, for members:
+- **The toolbar row folds to nothing** (`#v-charts > .sec-h` height 0 and `visibility: hidden`, NOT `display: none`, so the Style and
+  Layout popovers still open from it; they are `visibility: visible`). The market-phase strip is hidden. The wheel bar `#ms-wb` becomes
+  a dock: its own two buttons are hidden and pressed by **two floating glass capsules** of `<script id="ms-tva-js">`: `#ms-tvl` (a
+  round market badge, the market, the timeframe: each opens the wheel sheet) and `#ms-tvr` (pencil = the **Drawings** sheet; the last
+  drawing tool used, trend line at first; "…" = the **Analysis hub**). The dock stays `#ms-wb`, so the fit script still reserves it.
+- **Drawings** sheet (`#ms-tvs`): search, groups (Favourites, All, Lines, Shapes, Fibonacci and measure, Text), a card per tool of
+  `assets/ms-draw.js` (a tap presses the tool's own `#ms-dr-bar` button) plus position and measure; a star adds a favourite through the
+  rail's own `window.msRailFav('dt:<k>')` (`ms-dr-fav`); "Show favourites on chart" (localStorage `ms-tv-favshow`, the only key it
+  writes) shows `#ms-tvfav`, a floating strip of the favourite tools at the chart's left edge. Opens on All until a favourite exists.
+- **Analysis hub**: chart settings, indicators, chart type (cycles candles / line / both), bar replay, long / short position, measure,
+  drawings list, hide drawings, magnet, undo, layout, all timeframes, markets side by side, chart image, full screen, Structure, Log a
+  call, clean look, site menu (Charts app), Full phone view. Each presses the page's own control; a control the account lacks is left out.
+- **Colours are not touched** (owner, 28 Nov 2026: "Not the colors, just the structure"): the chart keeps the member's own colours.
+- **Rules**: its CSS lives in `#ms-ps-css`'s phone block (the simple view's one place; every selector names `html[data-phone="simple"]`,
+  Charts rules `html[data-phone="simple"]:not([data-role="public"]) #v-charts`), its parts carry `.ps-only`. **Its data attributes are
+  `data-tv*`**: the page puts flags such as `data-ct`, `data-mode`, `data-role` on `<html>`, so `closest('[data-ct]')` matched the root
+  and swallowed every hub tap (found on the way). The Full phone view and wider screens are unchanged. Test: `tests/charts-tv-app.test.mjs`.
+
+## Legend on the free charts (28 Nov 2026, owner: "Keep improving the charts")
+Display only. The single chart on any timeframe, Split's right chart and Markets side by side had no O H L C line (the free chart's
+old `.ms-legend` is hidden by a later rule). `window.msFreeLegend({ el, chart, bars, fmt, sec, TZ, ind? })` (next to `msIndLegend`)
+puts a `.ch-lg.ch-lg-free` on the chart: O H L C, the change against the previous close, the candle's time, and on the free chart the
+indicator rows (`SP.ind.leg` through `msIndLegend`); the candle under the crosshair, else the newest; one redraw a frame and a 1 s
+refresh while not hovered so a live candle follows. Markets side by side with 3-4 charts leaves the time out (narrow cells). Test:
+`tests/charts-ind-legend.test.mjs`.
+
 ## Quick type and drawing undo on the Charts (27 Nov 2026, owner: "Keep improving the charts")
 Display only. `assets/ms-quick.js` (`window.MS_QUICK` pure `parseTf`, `matchMarkets`; loaded after ms-draw.js): on Charts (and the
 Charts app), not for guests, typing a digit opens a "Timeframe" box ("15" = M15, "60" = H1, "240" = H4, "4h", "30s", "1d", "w",
@@ -7423,6 +7451,44 @@ back out on the failure's side; `zones()` returns it, causal like the others); `
 the same engulf rules now. 2021 to now has been read by every earlier version and the desks: a result is a list to look through,
 never an edge; anything taken further is re-priced at the broker's quotes first. Tests: `tests/auto-researcher.test.mjs`.
 
+## The auto-researcher, version auto-4: engulf and engulf failure across timeframes (28 Nov 2026, owner: "Keep researching and do many combinations entry eg ef timeframe etc")
+`research/edge/auto-researcher/PREREGISTRATION.md` section "Version auto-4" (committed alone first). auto-3 is saved: its last report
+(1.97 billion tries, 2.17 million checks, 2,921 results, 2 leads) is `auto-3-final.json` and its worker files are council-data
+`research/auto-3/`. `engine.mjs` `VERSION` is `auto-4`; the worker draws `genome4` / `simulate4` (auto-1/2/3 code stays exported for
+the desks and studies that import it). A rule now has a working timeframe (`WORK4`: M15, M30, H1, H4; `loadSet` builds them from M15
+since 2020 with `build`, UTC aligned, a candle kept when half its finer candles are there; D1 = the UTC day), the auto-3 triggers or a CHoCH
+(`K4`; amendment of the same day, owner: "And choch": the market-structure workers' `struct`, 2-8 candles a side, followed or faded) on
+it, an optional higher-timeframe zone (`ctx`: the newest standing engulf zone, or failed zone, of the trade's side on M30 / H1 / H4 /
+D1, read through `mapUp` = only higher candles closed by the working candle's close; `zones()` now also returns `st`, the newest
+standing zone of each side per candle), an entry (`mkt`, `lim` k x ATR behind the close, `mid` the signal candle's middle; a limit
+lives 3 / 6 / 12 candles, a candle opening through it fills at its open, on the fill candle only the stop counts) and a stop mode
+(`atr`, or `cdl` past the signal candle's far extreme by 0.1 ATR). Windows, bars and leads as auto-3. The runners fetch M15 from
+2020 (`fetchTf`, cache `<mk>-15m.json.gz`; the workflow's lanes wait for those files). The space is about a hundred times larger:
+more luck clears the result bar; a result is a list to look through, a lead goes to the broker's quotes first. Takes effect for the
+workers once this is on main. Tests: `tests/auto-researcher.test.mjs` (three auto-4 tests: the timeframes, a cut test with every
+later candle changed, limit entries).
+
+## The researcher's EUR/JPY engulf-retest sell at the broker's own ticks (28 Nov 2026, owner: "yes price the eurjpy sell")
+`research/edge/eurjpy-egr-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`,
+MEANING.md, RESULT.md, result.json; probe tags `ejegr-entry`, `ejegr-dead`, `ejegr-fills-1..10`). The auto-3 lead
+`eurjpy|egr48|short|none|0.75|1.5` (the first return to a standing H1 engulf zone up to 48 candles old that closes back out, sold at
+the next open at 10-15 UTC with the ATR in the top 70 % of its last 500; stop 0.75 x ATR(14), 1.5R, out after 24 H1 candles; gate:
+equal to the engine's `simulate`), 106 orders 2023-12 to 2026-11, filled at the demo broker's bid and closed at its ask, after its
+commission (0.000045 a round trip) and swap on a short (1.007 pips a night). **PASS**: +0.409R a trade after costs (n 106, month t
+4.69; mid +0.364R; every order quoted and resolved; entry spread 0.004R, swap 0.005R). Lead 2 (12-candle zones, 07-18 UTC, out after
+96 candles) beside it: +0.347R (n 176, month t 5.08), the same idea. Found among about 1.1 million looks on these same years, one
+market, sells only: a candidate for a forward record, never an edge. Nothing live changed. The researcher was paused for the run
+(owner: "pause the researcher") and restarted after it. Test: `tests/eurjpy-egr-exec.test.mjs`.
+
+**Its forward record** (28 Nov 2026, owner: "Nice keep going"): `research/edge/eurjpy-egr-forward/` (PREREGISTRATION.md pushed
+alone first; `run.mjs baseline|fetch|run`). The same orders (`eurjpy-egr-exec/orders.mjs` `orders(D, G)`) on OANDA mid H1 read
+from 2025-06-01, filled from 2026-11-30 and counted once all 24 hold candles are on file; cost = the engine's round trip + the
+demo's commission + the short's swap (frozen); bands from the exec study's 106 window orders on mid (gated n 106, mid +0.364R;
+net mean +0.320R). Readings and checkpoints as `gold-vol-breakout-forward` (too few under 20, 120 / 240; "confirmed" also needs the
+total at twice the cost above zero). `vb-forward.yml` writes council-data `research/forward/eurjpy-egr.json`; the Edge lab's
+Forward records card has its row. About three trades a month: 20 take half a year. On the fetched H1 the 2026 orders match the
+cached ones 28 of 28 (one extra order on a thin hour). Nothing trades. Test: `tests/eurjpy-egr-forward.test.mjs`.
+
 ## The auto-researcher's USD/JPY morning breakout at the broker's own ticks (26 Nov 2026, owner: "usdjpy run")
 `research/edge/usdjpy-brk-exec/` (PREREGISTRATION.md pushed alone first; `orders.mjs`, `run.mjs orders|queries|report <probe dir>`, MEANING.md, RESULT.md, result.json). The near-lead of auto-1 (USD/JPY: an H1 close above the previous 10 highs and above the 200-hour average, bought at the next open at 07-12 UTC on a Tuesday, Wednesday or Thursday; stop 3 x ATR(14), 3R, out after 8 H1 candles; Holm p 0.067, so not a lead by the researcher's rule), 131 orders 2023-12 to 2026-11, filled at the demo broker's ask and closed at its bid (tick probe tags `jpyb-entry`, `jpyb-dead`, `jpyb-fills-1`). **PASS**: +0.250R a trade after commission (n 131, month t 3.31), equal to the mid-candle +0.252R; every order had an entry quote, no exit unresolved; 107 time exits (+0.50R), 23 stops, 1 target; 2024 +0.32R, 2025 +0.24R, 2026 +0.20R. The cost is not what it rests on (a stop of about 54 pips, never open in the rollover). **Not answered by the pass**: found on these years out of about 554 million tries; the weekday filter may be luck (Mon + Fri 0.000R, every weekday +0.129R on the search data); buys only in a rising USD/JPY; it overlaps the USD/JPY breakout of the day. A candidate for a forward paper / demo record, never an edge; no variant on these years. Nothing live changed. Test: `tests/usdjpy-brk-exec.test.mjs`.
 
@@ -7469,3 +7535,33 @@ Faster orders (owner, 27 Nov 2026: "make sure the orders are faster"): council.y
 Gold at 3 % (owner, 27 Nov 2026: "on gold change risk to 3 %", live): rule `live-gold-3` sets `live.goldRisk` 0.03 (`LIVE.maxGold` 3 %): the gold breakout and the gold 8-swing break risk 3 % a trade on the live account; the Nasdaq and USD/JPY rules stay 0.5 %. Then 5 % (owner: "gold change to 5%"): rule `live-gold-5`, `LIVE.maxGold` 5 %.
 Tests: `tests/live-account.test.mjs`.
 **Live account card** (27 Nov 2026, owner: "okey" to a card): `council/live-account.mjs` (council.yml every 2nd round, `timeout 40`) connects through `liveConnect` and sends only TRADER_REQ, RECONCILE_REQ and SYMBOLS_LIST_REQ (no order message, a test reads the file), writing council-data `live/account.json` (balance, the day's loss against the daily stop from `live/day.json`, open positions with stop / target, resting orders, `noStop`; login masked). `/cdata` serves `live/*` to the owner's session only (`api/data.js`; the council-data branch itself is still readable on GitHub while the repository is public). Profile card `#ms-pf-live` (`#ms-lv-css`, `#ms-lv-js`, owner only, read only): balance, today, room before the daily stop, open positions, the live trades of `live/nq.json` + `live/vb.json`. Test: `tests/live-account-card.test.mjs`.
+
+## Design pass: enjoyable to use (28 Nov 2026, owner: "focus in the design, I want it to be enjoyable to use")
+Display only; chart colours untouched (owner, 28 Nov: "Not the colors, just the structure"). Found on screenshots of Home, Charts,
+Council, the ICT desk, Equinox and the Macro desk at 1440 and 390 px.
+- **The price-feed notice** (`.ms-offline-box`, Desk) was a four-line amber block on top of every view whenever the feeds failed.
+  It is one line now ("Live prices couldn't load. Charts wait for the price feeds; everything else works."), the reason folds under
+  "Why" (`details.ofl-more`, the `#ms-offline-why` line inside it), and "×" (`.ofl-x`) hides it for the visit (a class, nothing stored).
+  On a phone only the bold line, Why and × (one row).
+- **Motion and feedback** (`assets/soft.css`, section "Design pass, 28 Nov 2026", every page): a view, an Equinox desk or a Macro
+  desk section rises in when shown (opacity + 6 px, 240 ms, its parts 30 ms apart; NEVER on Charts or the guest page); menus,
+  dialogs and toasts open with a small pop; tabs, switches and buttons give a 4 % press (`scale`, the separate property, so a
+  button placed by its own transform keeps its place). The entrance fills BACKWARDS only, so nothing keeps a transform after it
+  ends (a fixed child would otherwise find a new containing block). Nothing loops; none of it with reduced motion.
+- One focus ring everywhere (2 px accent); rows that open something have a pointer; tabular figures on numbers; tab rows that
+  scroll sideways on a phone (Equinox, the Council's tabs, the desk switch) fade at the far edge with 28 px of padding.
+- **Phone page switch**: the side pages (Equinox, Macro desk, Edge lab; not ChronosTrade or the Academy, whose headers have no room) name the page you are on beside
+  the dots (the wordmark's letters give way under 480 px; the mark and the link's name stay). The Desk keeps dots: its header
+  has no room. Found on the way: the Desk's account button ran 22 px off a 390 px phone (12 px at 360) since Academy and Equinox
+  joined the switch; search goes to the palette / More from 400 px down and the header's sides and dots are tighter under 380 px
+  (the account button ends at 350 / 374 / 414 px at 360 / 390 / 430).
+
+## Chart visual pass (28 Nov 2026, owner: "Mostly upgrades visual to the charts")
+Display only, `market-structure.html` `paint()` (every chart drawn with the page's `Overlay`: the panes, the free chart, Split's right
+chart); candle colours and the markup's colours unchanged. (1) **Zones** (CF, order blocks and every plain box) are a lighter fill
+(0.55 of the stored alpha), a softer hairline (stroke at most 0.55 alpha), 3 px corners and a 2 px edge in the zone's colour at its
+start. (2) **Labels** (BO, CF, iBO, VR, Target …) are small tags tinted with their own colour over the chart's background
+(`mixOn(colour, bg, 0.13)`, `window.msMixOn`), in Figtree (they were Trebuchet on a plain backing); pills are fully rounded. (3) A
+**"now" dot** on the last candle's close (a ringed dot in the chart's ink). (4) Labels keep out of the lower right corner, where the
+chart's own buttons sit. (5) **Bug fixed**: the day separators of days off the chart's left edge were all drawn on its first pixel
+column and made a dark vertical line down the left side; a separator off either edge is skipped and one column is drawn once.

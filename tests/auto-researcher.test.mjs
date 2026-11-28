@@ -66,19 +66,19 @@ test('the worker writes its file, counts every try and puts only a C look after 
   assert.equal(tries, 200); assert.equal(typeof E.groupOf(E.genome(r, 1)), 'string'); fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('auto-3 report: only auto-3 files are counted; a result needs the three t >= 1 figures; a lead also the strict bar and Holm', () => {
+test('the report counts only the current version\'s files; a result needs the three t >= 1 figures; a lead also the strict bar and Holm', () => {
   const dir = fs.mkdtempSync('/tmp/auto-rep-'), L = (p, t, all = 2) => ({ group: 'g' + p, p, A: { n: 150, mean: 0.1, t: 1.5 }, C: { n: 200, mean: 0.05, t }, ALL: { n: 350, mean: 0.07, t: all }, g: {} });
-  fs.writeFileSync(dir + '/worker-1.json', JSON.stringify({ version: 'auto-3', worker: 1, tries: 1000, survivedA: 5, candidates: 3, cLooks: 3, cPasses: 2, looks: [L(0.01, 2.3), L(0.2, 0.8), L(0.1, 1.2)], results: [L(0.01, 2.3), L(0.1, 1.2)] }));
-  fs.writeFileSync(dir + '/worker-2.json', JSON.stringify({ version: 'auto-3', worker: 2, tries: 2000, survivedA: 7, candidates: 3, cLooks: 1, cPasses: 1, looks: [L(0.04, 2.1)], results: [L(0.04, 2.1)] }));
+  fs.writeFileSync(dir + '/worker-1.json', JSON.stringify({ version: E.VERSION, worker: 1, tries: 1000, survivedA: 5, candidates: 3, cLooks: 3, cPasses: 2, looks: [L(0.01, 2.3), L(0.2, 0.8), L(0.1, 1.2)], results: [L(0.01, 2.3), L(0.1, 1.2)] }));
+  fs.writeFileSync(dir + '/worker-2.json', JSON.stringify({ version: E.VERSION, worker: 2, tries: 2000, survivedA: 7, candidates: 3, cLooks: 1, cPasses: 1, looks: [L(0.04, 2.1)], results: [L(0.04, 2.1)] }));
   fs.writeFileSync(dir + '/worker-3.json', JSON.stringify({ version: 'auto-2', worker: 3, tries: 9e6, survivedA: 9, candidates: 9, cLooks: 9, looks: [] }));
-  const R = E.report(dir); assert.equal(R.version, 'auto-3'); assert.equal(R.workers, 2); assert.equal(R.tries, 3000); assert.equal(R.cLooks, 4); assert.equal(R.results.length, 3);
+  const R = E.report(dir); assert.equal(R.version, E.VERSION); assert.equal(R.workers, 2); assert.equal(R.tries, 3000); assert.equal(R.cLooks, 4); assert.equal(R.results.length, 3);
   assert.equal(R.leads.length, 1); assert.equal(R.leads[0].group, 'g0.01');                 // 0.01 x 4 = 0.04 clears; 0.04 x 3 = 0.12 does not
   assert.equal(E.resultOk(L(0.2, 0.8)), false); assert.equal(E.resultOk(L(0.1, 1.2, 0.9)), false); assert.equal(E.resultOk(L(0.1, 1.2)), true);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
 test('auto-3 draws only EG and EF rules on 2021 to now; a failed zone serves the other side (efr); the zone signals use closed candles only; every rule has a stop', () => {
-  assert.equal(E.VERSION, 'auto-3'); assert.deepEqual(E.K2, ['eg', 'egr', 'ef', 'efr']); assert.deepEqual(E.BAR2, { A: { n: 100, t: 1 }, C: { n: 50, t: 1 }, ALL: { t: 1 }, LEAD: { n: 100, t: 2 } });
+  assert.deepEqual(E.K2, ['eg', 'egr', 'ef', 'efr']); assert.deepEqual(E.BAR2, { A: { n: 100, t: 1 }, C: { n: 50, t: 1 }, ALL: { t: 1 }, LEAD: { n: 100, t: 2 } });
   assert.equal(new Date(E.WIN2.A[0] * 1000).toISOString().slice(0, 10), '2021-01-01'); assert.equal(new Date(E.WIN2.C[0] * 1000).toISOString().slice(0, 10), '2024-01-01'); assert.equal(E.WIN2.A[1], E.WIN2.C[0]);
   const r = E.rng(9);
   for (let i = 0; i < 3000; i++) { const w = 1 + (i % 12), g = E.genome2(r, w); assert.ok(g.stop > 0); assert.ok(g.trig.length >= 1 && g.trig.length <= 2);
@@ -139,4 +139,46 @@ test('workers 11 and 12 draw structure rules with a stop; workers 1-10 draw exac
   const yml = fs.readFileSync(new URL('../.github/workflows/researcher.yml', import.meta.url), 'utf8');
   assert.match(yml, /workers=\[1,2,3,4,5,6,8,10,11,12\]/); assert.match(yml, /7\) echo 'workers=\[11\]'/); assert.match(yml, /9\) echo 'workers=\[12\]'/);
   assert.equal((yml.match(/worker: 1[12], shard: [12]/g) || []).length, 4, 'one runner each: the job count stays at 20');
+});
+
+// a seeded random walk of M15 candles from 2020, with the weekend left out
+function walk15(n, seed = 7) {
+  const r = E.rng(seed), bars = []; let c = 1.2, t = Date.UTC(2020, 0, 6) / 1000;
+  while (bars.length < n) { const d = new Date(t * 1000).getUTCDay(); if (d !== 0 && d !== 6) { const o = c, ch = (r() - 0.5) * 0.002, h = Math.max(o, o + ch) + r() * 0.0008, l = Math.min(o, o + ch) - r() * 0.0008; c = o + ch; bars.push({ t, o, h, l, c }); } t += 900; }
+  return bars;
+}
+test('auto-4: timeframes built from M15 (half-filled rule, UTC aligned), higher timeframes read only when closed, every rule has a stop', () => {
+  assert.equal(E.VERSION, 'auto-4');
+  const B = walk15(60000), set = E.setOf(B, 'eurusd');
+  assert.deepEqual(Object.keys(set), ['15m', '30m', '1h', '4h', '1d']);
+  for (const tf of ['30m', '1h', '4h', '1d']) { const D = set[tf]; for (let i = 0; i < Math.min(D.n, 300); i++) assert.equal(D.t[i] % E.TF4[tf], 0); }
+  // a 4h candle = its 15m candles
+  { const H = set['4h'], k = 20, t0 = H.t[k], sub = B.filter((b) => b.t >= t0 && b.t < t0 + 14400);
+    assert.equal(H.o[k], sub[0].o); assert.equal(H.c[k], sub[sub.length - 1].c); assert.equal(H.h[k], Math.max(...sub.map((b) => b.h))); }
+  assert.equal(E.build([{ t: 0, o: 1, h: 2, l: 0, c: 1 }], 900, 3600).length, 0);          // 1 of 4 candles: under half, dropped
+  // the map up: the higher candle closed by the working candle's close, never a later one
+  const W = set['15m'];
+  for (const up of ['1h', '4h', '1d']) { const m = E.mapUp(W, set[up]); for (let i = 500; i < 3000; i += 37) { const k = m[i]; if (k < 0) continue; assert.ok(set[up].t[k] + set[up].sec <= W.t[i] + W.sec); if (k + 1 < set[up].n) assert.ok(set[up].t[k + 1] + set[up].sec > W.t[i] + W.sec); } }
+  const r = E.rng(4);
+  let ch = 0; for (let i = 0; i < 2000; i++) { const g = E.genome4(r, 1 + (i % 12)); assert.ok(E.WORK4.includes(g.tf)); for (const t of g.trig) { assert.ok(E.K4.includes(t.kind)); if (t.kind === 'choch') { ch++; assert.ok(t.P > 0 && typeof t.follow === 'boolean'); } } assert.ok(g.stop > 0); assert.ok(['atr', 'cdl'].includes(g.stopMode)); assert.ok(['mkt', 'lim', 'mid'].includes(g.entry.kind));
+    if (g.ctx) assert.ok(E.TF4[g.ctx.tf] > E.TF4[g.tf]); assert.equal(typeof E.group4(g), 'string'); }
+  assert.ok(ch > 200, 'CHoCH rules drawn: ' + ch);
+  // a CHoCH signal is a break against the structure, known from closed candles only
+  { const S = E.struct(W, 3); let k = 0; for (let i = 300; i < W.n && k < 30; i++) { const q = E.sig(W, { kind: 'choch', P: 3, follow: true }, i); if (q) { assert.equal(S.kd[i], 2); assert.equal(q, S.bk[i]); k++; } } assert.equal(k, 30); }
+  const src = fs.readFileSync(new URL('../research/edge/auto-researcher/PREREGISTRATION.md', import.meta.url), 'utf8'); assert.match(src, /Version auto-4/);
+});
+test('auto-4: no look-ahead: trades over a window do not change when every later candle is changed', () => {
+  const B = walk15(70000, 9), cut = 50000, B2 = B.map((b, i) => i < cut ? b : { ...b, o: b.o + 0.01, h: b.h + 0.02, l: b.l + 0.005, c: b.c + 0.015 });
+  const S1 = E.setOf(B, 'eurusd'), S2 = E.setOf(B2, 'eurusd'), tEnd = B[cut].t - 40 * 86400, r = E.rng(21); let used = 0;
+  for (let q = 0; q < 300; q++) { const g = E.genome4(r, 1); g.mk = 'eurusd'; g.hold = Math.min(g.hold, 24); const D = S1[g.tf], hi = (() => { let k = 0; while (k < D.n && D.t[k] < tEnd) k++; return k; })();
+    const a = E.summary(E.simulate4(S1, g, 300, hi)), b = E.summary(E.simulate4(S2, g, 300, hi)); assert.deepEqual(a, b, E.group4(g)); if (a.n) used++; }
+  assert.ok(used > 100, 'rules with trades: ' + used);
+});
+test('auto-4: limit entries give whole, finite trades', () => {
+  const B = walk15(40000, 3), set = E.setOf(B, 'eurusd'), D = set['15m'];
+  // a hand-made rule over a window; compare every trade to a direct reading of the candles
+  const r = E.rng(5); let n = 0;
+  for (let q = 0; q < 200 && n < 20; q++) { const g = E.genome4(r, 1); g.mk = 'eurusd'; g.tf = '15m'; g.ctx = null; g.entry = { kind: 'lim', k: 0.5, wait: 6 }; g.stopMode = 'atr'; g.rr = 2; g.hold = 12;
+    const o = E.simulate4(set, g, 300, D.n); if (o.n) { n++; assert.ok(Number.isFinite(o.sum)); for (const v of o.months.values()) assert.ok(Number.isFinite(v)); } }
+  assert.ok(n > 5);
 });

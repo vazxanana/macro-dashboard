@@ -87,6 +87,12 @@ jobs:
         # the gold and USD/JPY candles the two steps above fetched; nothing is fetched again
         run: node research/edge/vb-early-forward/run.mjs run "$RUNNER_TEMP/c" "$RUNNER_TEMP/u" data/research/forward/vb-early.json
 
+      - name: EUR/JPY engulf-retest sell, the forward record
+        if: ${{ !cancelled() }}
+        run: |
+          node research/edge/eurjpy-egr-forward/run.mjs fetch "$RUNNER_TEMP/e"
+          node research/edge/eurjpy-egr-forward/run.mjs run "$RUNNER_TEMP/e" data/research/forward/eurjpy-egr.json
+
       - name: Gotobi fade (T2), the forward record
         if: ${{ !cancelled() }}   # one record's failure never costs the others their save (the job still ends red)
         run: |
