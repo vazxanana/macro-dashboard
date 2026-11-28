@@ -86,6 +86,8 @@ review. `watchdog.yml` pages when the loop stops.
 - Side pages: Side pages: /macro, /veteran/, Edge lab, gold terminal.
 - Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study. QA: Post-merge QA sweeps (9, 11 and 12 Nov).
 - Academy: MeridianX Academy (owner only). Research notes: Research candle clock, Mosha level reversal study, Gold carry (cost of holding a gold buy, 12 Nov). QA: Post-merge QA sweeps (9 and 11 Nov).
+- Lessons that transfer between edges (cost as a share of the stop, one timeframe up, trailing exit, market over limit,
+  the placebo as a discovery tool, the holdout routine): the repo skill `.claude/skills/edge-lessons/SKILL.md` (28 Nov 2026).
 
 **Owner-facing docs** (11 Nov 2026: both re-checked against the code): `MERIDIAN-X.md` is the plain-English explainer;
 `docs/owner-decisions.md` opens with "What needs you now" and every item carries a dated status line. Item numbers are stable
